@@ -2,15 +2,22 @@ package org.helioviewer.jhv.data.gui.filter;
 
 import javax.swing.AbstractSpinnerModel;
 
+import org.helioviewer.jhv.base.conversion.GOESLevel;
+import org.helioviewer.jhv.math.MathUtils;
+
 @SuppressWarnings("serial")
 class FlareSpinnerModel extends AbstractSpinnerModel {
 
     private String curval;
-    private final double incr;
+    private final double step;
+    private final double min;
+    private final double max;
 
-    FlareSpinnerModel(String _start, String _min, String _max, double _stepsize) {
-        curval = _start;
-        incr = _stepsize;
+    FlareSpinnerModel(double start, double _min, double _max, double _step) {
+        min = _min;
+        max = _max;
+        step = _step;
+        curval = GOESLevel.getStringValue(MathUtils.clip(start, min, max));
     }
 
     @Override
@@ -24,67 +31,19 @@ class FlareSpinnerModel extends AbstractSpinnerModel {
         fireStateChanged();
     }
 
-    private String compose_next(double pv, String start, String alternative) {
-        if (pv < 9.9) {
-            pv += incr;
-            return start + String.format("%.1f", pv);
-        } else {
-            return alternative;
-        }
-    }
-
     @Override
     public Object getNextValue() {
-        if (curval.length() >= 2) {
-            char v = curval.charAt(0);
-            double pv = Double.parseDouble(curval.substring(1));
-            switch (v) {
-                case 'A':
-                    return compose_next(pv, "A", "B1.0");
-                case 'B':
-                    return compose_next(pv, "B", "C1.0");
-                case 'C':
-                    return compose_next(pv, "C", "M1.0");
-                case 'M':
-                    return compose_next(pv, "M", "X1.0");
-                case 'X':
-                    if (pv <= 19.9) {
-                        pv += 0.1;
-                        return String.format("X%.1f", pv);
-                    }
-            }
-        }
-        return null;
-    }
-
-    private String compose_prev(double pv, String start, String alternative) {
-        if (pv >= 1.1) {
-            pv -= incr;
-            return start + String.format("%.1f", pv);
-        } else {
-            return alternative;
-        }
+        double v = GOESLevel.getFloatValue(curval);
+        v += step * Math.pow(10., -8 + (int) Math.log10(v / 1e-8));
+        return GOESLevel.getStringValue(MathUtils.clip(v, min, max));
     }
 
     @Override
     public Object getPreviousValue() {
-        if (curval.length() >= 2) {
-            char v = curval.charAt(0);
-            double pv = Double.parseDouble(curval.substring(1));
-            switch (v) {
-                case 'X':
-                    return compose_prev(pv, "X", "M9.9");
-                case 'M':
-                    return compose_prev(pv, "M", "C9.9");
-                case 'C':
-                    return compose_prev(pv, "C", "B9.9");
-                case 'B':
-                    return compose_prev(pv, "B", "A9.9");
-                case 'A':
-                    return compose_prev(pv, "A", null);
-            }
-        }
-        return null;
+        double v = GOESLevel.getFloatValue(curval);
+        double p = Math.log10(v / 1e-8);
+        v -= step * Math.pow(10., -8 + (int) (p - (int) p == 0 ? p - 1 : p));
+        return GOESLevel.getStringValue(MathUtils.clip(v, min, max));
     }
 
 }
