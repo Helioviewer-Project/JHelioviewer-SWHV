@@ -42,7 +42,8 @@ public class FilterManager {
     }
 
     public static Map<SWEKParameter, List<SWEKParam>> getFilter(SWEKSupplier supplier) {
-        return filters.containsKey(supplier) ? filters.get(supplier) : new HashMap<>();
+        Map<SWEKParameter, List<SWEKParam>> filter = filters.get(supplier);
+        return filter == null ? new HashMap<>() : filter;
     }
 /*
     public static boolean isFiltered(SWEKSupplier supplier, SWEKParameter parameter) {
