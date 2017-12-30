@@ -6,10 +6,11 @@ import javax.swing.AbstractSpinnerModel;
 class FlareSpinnerModel extends AbstractSpinnerModel {
 
     private String curval;
-    private static final double incr = 0.1;
+    private final double incr;
 
-    FlareSpinnerModel(String _start, String _end, String startval, double _stepsize) {
-        curval = startval;
+    FlareSpinnerModel(String _start, String _min, String _max, double _stepsize) {
+        curval = _start;
+        incr = _stepsize;
     }
 
     @Override
@@ -23,7 +24,7 @@ class FlareSpinnerModel extends AbstractSpinnerModel {
         fireStateChanged();
     }
 
-    private static String compose_next(double pv, String start, String alternative) {
+    private String compose_next(double pv, String start, String alternative) {
         if (pv < 9.9) {
             pv += incr;
             return start + String.format("%.1f", pv);
@@ -56,7 +57,7 @@ class FlareSpinnerModel extends AbstractSpinnerModel {
         return null;
     }
 
-    private static String compose_prev(double pv, String start, String alternative) {
+    private String compose_prev(double pv, String start, String alternative) {
         if (pv >= 1.1) {
             pv -= incr;
             return start + String.format("%.1f", pv);

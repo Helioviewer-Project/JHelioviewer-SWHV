@@ -270,7 +270,7 @@
                             "min"           : 1e-8,
                             "max"           : 1e-3,
                             "start_value"   : 1e-5,
-                            "step_size"     : 0.2,
+                            "step_size"     : 0.1,
                             "units"         : "W/m^2",
                             "dbtype"        : "REAL"
                         }
