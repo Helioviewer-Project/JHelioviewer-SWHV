@@ -46,7 +46,7 @@ public class GOESLevel {
             } catch (Exception ignore) {
             }
         }
-        return -1;
+        return 1; // for log
     }
 
 }
