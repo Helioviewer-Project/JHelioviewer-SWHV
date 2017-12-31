@@ -20,7 +20,7 @@ class FilterPanel extends JPanel {
     private final JLabel label;
     private final JSpinner spinner;
 
-    private boolean enabled = false;
+    private boolean enabled;
 
     private final SWEKParameter parameter;
     private final SWEKSupplier supplier;
@@ -28,7 +28,7 @@ class FilterPanel extends JPanel {
     private final FilterDialog filterDialog;
     private final SWEKOperand operand;
 
-    FilterPanel(SWEKSupplier _supplier, SWEKParameter _parameter, JSpinner _spinner, FilterDialog _filterDialog, SWEKOperand _operand) {
+    FilterPanel(SWEKSupplier _supplier, SWEKParameter _parameter, JSpinner _spinner, FilterDialog _filterDialog, SWEKOperand _operand, boolean _enabled) {
         operand = _operand;
         filterDialog = _filterDialog;
         spinner = _spinner;
@@ -37,11 +37,12 @@ class FilterPanel extends JPanel {
 
         JCheckBox enableButton = new JCheckBox();
         enableButton.addActionListener(e -> toggleEnabled());
-
         label = new JLabel(parameter.getParameterDisplayName() + ' ' + operand.representation);
-
         spinner.setEnabled(enabled);
         label.setEnabled(enabled);
+
+        if (_enabled)
+            enableButton.doClick();
 
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
