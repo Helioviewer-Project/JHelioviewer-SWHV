@@ -40,7 +40,7 @@ public class HEKHandler extends SWEKHandler {
             for (int i = 0; i < len; i++) {
                 JSONObject result = results.getJSONObject(i);
                 if (result.has("fl_goescls"))
-                    result.put("JHV_GOESClass", GOESLevel.getFloatValue(result.getString("fl_goescls")));
+                    result.put("fl_val", GOESLevel.getFloatValue(result.getString("fl_goescls")));
 
                 long start = TimeUtils.parse(result.getString("event_starttime"));
                 long end = TimeUtils.parse(result.getString("event_endtime"));

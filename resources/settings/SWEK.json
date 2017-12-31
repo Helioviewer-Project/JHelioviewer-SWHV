@@ -262,7 +262,7 @@
                 },
                 {
                     "source"                    : "HEK",
-                    "parameter_name"            : "JHV_GOESClass",
+                    "parameter_name"            : "fl_val",
                     "parameter_display_name"    : "GOES value",
                     "filter"                    :
                         {
