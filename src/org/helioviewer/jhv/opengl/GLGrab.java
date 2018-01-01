@@ -1,12 +1,7 @@
 package org.helioviewer.jhv.opengl;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
 import java.nio.Buffer;
-import java.nio.ByteBuffer;
 
-import org.helioviewer.jhv.base.image.MappedFileBuffer;
-import org.helioviewer.jhv.base.image.MappedImageFactory;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 
@@ -17,8 +12,8 @@ import com.jogamp.opengl.GL2;
 
 public class GLGrab {
 
-    private final int w;
-    private final int h;
+    public final int w;
+    public final int h;
     private FBObject fbo;
     private TextureAttachment fboTex;
 
@@ -43,7 +38,7 @@ public class GLGrab {
         fboTex.free(gl);
     }
 
-    public BufferedImage renderFrame(Camera camera, GL2 gl) {
+    public void renderFrame(Camera camera, GL2 gl, Buffer buffer) {
         if (fbo == null)
             init(gl);
 
@@ -66,18 +61,6 @@ public class GLGrab {
 
         fbo.use(gl, fboTex);
 
-        BufferedImage screen;
-        Buffer buffer;
-
-        try {
-            screen = MappedImageFactory.createCompatibleMappedImage(fbo.getWidth(), fbo.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
-            buffer = ((MappedFileBuffer.DataBufferByte) screen.getRaster().getDataBuffer()).getBuffer();
-        } catch (Exception e) {
-            screen = new BufferedImage(fbo.getWidth(), fbo.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
-            byte[] array = ((DataBufferByte) screen.getRaster().getDataBuffer()).getData();
-            buffer = ByteBuffer.wrap(array);
-        }
-
         gl.glBindFramebuffer(GL2.GL_READ_FRAMEBUFFER, fbo.getReadFramebuffer());
         gl.glPixelStorei(GL2.GL_PACK_ALIGNMENT, 1);
         gl.glReadPixels(0, 0, fbo.getWidth(), fbo.getHeight(), GL2.GL_BGR, GL2.GL_UNSIGNED_BYTE, buffer);
@@ -87,8 +70,6 @@ public class GLGrab {
 
         Displayer.setGLSize(_x, _y, _w, _h);
         Displayer.reshapeAll();
-
-        return screen;
     }
 
 }
