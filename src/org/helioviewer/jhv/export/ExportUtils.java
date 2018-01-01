@@ -24,10 +24,10 @@ class ExportUtils {
         }
     }
 
-    static BufferedImage pasteCanvases(BufferedImage im1, int frameH, BufferedImage im2, int movieLinePosition, int finalH) {
+    static void pasteCanvases(BufferedImage im1, int frameH, BufferedImage im2, int movieLinePosition, int finalH) {
         flipVertically(im1, frameH);
         if (im2 == null)
-            return im1;
+            return;
 
         AffineTransformOp op = new AffineTransformOp(AffineTransform.getScaleInstance(1, 1), AffineTransformOp.TYPE_BILINEAR);
         im2 = op.filter(im2, null);
@@ -48,8 +48,6 @@ class ExportUtils {
         }
 
         g2.dispose();
-
-        return im1;
     }
 
 }
