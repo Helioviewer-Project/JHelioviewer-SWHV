@@ -9,6 +9,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 
 import org.helioviewer.jhv.base.image.MappedFileBuffer;
+import org.helioviewer.jhv.export.jcodec.JCodecUtils;
 import org.helioviewer.jhv.export.jcodec.JHVRgbToYuv420j8Bit;
 
 import org.jcodec.codecs.h264.H264Encoder;
@@ -64,7 +65,7 @@ class JCodecExporter implements MovieExporter {
             // Allocate a buffer big enough to hold output frames
             _out = (ByteBuffer) (new MappedFileBuffer.DataBufferByte(width * height * 6, 1).getBuffer()); //ByteBuffer.allocate(width * height * 6);
             // Create an instance of encoder
-            encoder = new H264Encoder();
+            encoder = new H264Encoder(new JCodecUtils.JHVRateControl(19));
             // Encoder extra data ( SPS, PPS ) to be stored in a special place of MP4
             spsList = new ArrayList<>();
             ppsList = new ArrayList<>();
