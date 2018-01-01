@@ -11,6 +11,8 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.ImageUtils;
 import org.helioviewer.jhv.base.Pair;
+import org.helioviewer.jhv.base.image.MappedFileBuffer;
+import org.helioviewer.jhv.base.image.MappedImageFactory;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -73,8 +75,9 @@ public class ExportMovie implements FrameListener {
         }
 
         try {
-            BufferedImage screenshot = grabber.renderFrame(camera, gl);
-            pasteExecutor.execute(new Paster(exporter, screenshot, EVEImage, EVEMovieLinePosition));
+            BufferedImage screen = MappedImageFactory.createCompatibleMappedImage(grabber.w, exporter.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+            grabber.renderFrame(camera, gl, ((MappedFileBuffer.DataBufferByte) screen.getRaster().getDataBuffer()).getBuffer());
+            pasteExecutor.execute(new Paster(exporter, screen, EVEImage, EVEMovieLinePosition));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -152,11 +155,13 @@ public class ExportMovie implements FrameListener {
 
         private final MovieExporter movieExporter;
         private final SoftReference<Pair<BufferedImage, BufferedImage>> ref;
+        private final int frameH;
         private final int movieLinePosition;
 
         Paster(MovieExporter _movieExporter, BufferedImage mainImage, BufferedImage eveImage, int _movieLinePosition) {
             movieExporter = _movieExporter;
             ref = new SoftReference<>(new Pair<>(mainImage, eveImage == null ? null : ImageUtils.deepCopy(eveImage)));
+            frameH = grabber.h;
             movieLinePosition = _movieLinePosition;
         }
 
@@ -165,7 +170,7 @@ public class ExportMovie implements FrameListener {
             Pair<BufferedImage, BufferedImage> p = ref.get();
             if (p != null) {
                 BufferedImage mainImage = p.a, eveImage = p.b;
-                BufferedImage composite = ExportUtils.pasteCanvases(mainImage, eveImage, movieLinePosition, movieExporter.getHeight());
+                BufferedImage composite = ExportUtils.pasteCanvases(mainImage, frameH, eveImage, movieLinePosition, movieExporter.getHeight());
                 xformExecutor.execute(new Transformer(movieExporter, composite));
             }
         }
