@@ -15,7 +15,6 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.io.APIRequest;
@@ -399,7 +398,7 @@ public class JP2View extends AbstractView {
 
         int maxDim = Math.max(subImage.width, subImage.height);
         double adj = 1;
-        if (maxDim > JHVGlobals.hiDpiCutoff && Movie.isPlaying() && !ImageViewerGui.getGLListener().isRecording()) {
+        if (maxDim > JHVGlobals.hiDpiCutoff && Movie.isPlaying() && !Movie.isRecording()) {
             adj = JHVGlobals.hiDpiCutoff / (double) maxDim;
             if (adj > 0.5)
                 adj = 1;

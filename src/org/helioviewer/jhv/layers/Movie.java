@@ -216,4 +216,27 @@ public class Movie {
         animationMode = mode;
     }
 
+    private static final int RECORD_FPS = 5;
+    private static boolean isRecording;
+    private static int saveDelay;
+
+    public static void startRecording() {
+        if (!isRecording) {
+            isRecording = true;
+            saveDelay = frameTimer.getDelay();
+            setDesiredRelativeSpeed(RECORD_FPS);
+        }
+    }
+
+    public static void stopRecording() {
+        if (isRecording) {
+            isRecording = false;
+            frameTimer.setDelay(saveDelay);
+        }
+    }
+
+    public static boolean isRecording() {
+        return isRecording;
+    }
+
 }
