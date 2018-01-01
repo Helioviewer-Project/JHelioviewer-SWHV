@@ -90,10 +90,6 @@ public class GLListener implements GLEventListener {
         exporter = null;
     }
 
-    public boolean isRecording() {
-        return exporter != null;
-    }
-
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) { // NEDT
         EventQueue.invokeLater(() -> {

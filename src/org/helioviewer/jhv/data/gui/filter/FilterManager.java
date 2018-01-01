@@ -50,5 +50,4 @@ public class FilterManager {
         return filters.containsKey(supplier) && filters.get(supplier).containsKey(parameter);
     }
 */
-
 }

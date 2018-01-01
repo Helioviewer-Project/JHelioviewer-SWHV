@@ -86,6 +86,8 @@ public class ExportMovie implements FrameListener {
     private static final int MACROBLOCK = 8;
 
     public static void start(int _w, int _h, boolean isInternal, int fps, RecordMode _mode) {
+        Movie.startRecording();
+
         int scrw = 1;
         int scrh = 0;
         if (EVEImage != null) {
@@ -133,6 +135,8 @@ public class ExportMovie implements FrameListener {
                 MoviePanel.clickRecordButton();
             Displayer.display(); // force detach
         }
+
+        Movie.stopRecording();
     }
 
     // loop mode only
