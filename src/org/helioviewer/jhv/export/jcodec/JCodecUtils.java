@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+import org.jcodec.codecs.h264.encode.RateControl;
 import org.jcodec.common.NIOUtils;
 import org.jcodec.common.SeekableByteChannel;
 import org.jcodec.containers.mp4.MP4Util;
@@ -24,6 +25,35 @@ public class JCodecUtils {
         input.close();
 
         Files.move(Paths.get(path + "_optim"), Paths.get(path), StandardCopyOption.REPLACE_EXISTING); // doesn't work on DOS
+    }
+
+    public static class JHVRateControl implements RateControl {
+
+        private final int QP;
+
+        public JHVRateControl(int _QP) {
+            QP = _QP;
+        }
+
+        @Override
+        public int getInitQp() {
+            return QP;
+        }
+
+        @Override
+        public int getQpDelta() {
+            return 0;
+        }
+
+        @Override
+        public boolean accept(int bits) {
+            return true;
+        }
+
+        @Override
+        public void reset() {
+            // Do nothing, remember we are dumb
+        }
     }
 
 }

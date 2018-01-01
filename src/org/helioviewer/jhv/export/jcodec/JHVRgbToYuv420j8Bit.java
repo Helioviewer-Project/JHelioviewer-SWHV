@@ -8,19 +8,6 @@ import org.helioviewer.jhv.base.image.MappedFileBuffer;
 import org.jcodec.common.model.Picture;
 import org.jcodec.common.tools.MathUtil;
 
-/**
- * This class is part of JCodec ( www.jcodec.org ) This software is distributed
- * under FreeBSD License
- * 
- * Transforms Picture in RGB colorspace ( one plane, 3 integers per pixel ) to
- * Yuv420 colorspace output picture ( 3 planes, luma - 0th plane, cb - 1th
- * plane, cr - 2nd plane; cb and cr planes are half width and half haight )
- * 
- * TODO: implement jpeg colorspace instead of NTSC
- * 
- * @author The JCodec project
- * 
- */
 public class JHVRgbToYuv420j8Bit {
 
     private static ByteBuffer getBuffer(BufferedImage img) {
