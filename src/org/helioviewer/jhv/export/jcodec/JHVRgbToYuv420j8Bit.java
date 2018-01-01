@@ -23,7 +23,7 @@ import org.jcodec.common.tools.MathUtil;
  */
 public class JHVRgbToYuv420j8Bit {
 
-    private static ByteBuffer getBytes(BufferedImage img) {
+    private static ByteBuffer getBuffer(BufferedImage img) {
         return (ByteBuffer) ((MappedFileBuffer.DataBufferByte) img.getRaster().getDataBuffer()).getBuffer();
     }
 
@@ -32,7 +32,6 @@ public class JHVRgbToYuv420j8Bit {
         bgr[0] = data.get(i);
         bgr[1] = data.get(i + 1);
         bgr[2] = data.get(i + 2);
-        // data.get(bgr, 3 * (w * y + x), 3);
     }
 
     public static void transform(BufferedImage img, Picture dst) {
@@ -40,7 +39,7 @@ public class JHVRgbToYuv420j8Bit {
         int[][] out = new int[4][3];
 
         byte[] bgr = new byte[3];
-        ByteBuffer data = getBytes(img);
+        ByteBuffer data = getBuffer(img);
 
         int x, y = 0, h = img.getHeight(), w = img.getWidth();
         int offChr = 0, offLuma = 0, strideDst = dst.getWidth();
