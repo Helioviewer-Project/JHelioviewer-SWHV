@@ -154,25 +154,23 @@ public class ExportMovie implements FrameListener {
     private class Paster implements Runnable {
 
         private final MovieExporter movieExporter;
-        private final SoftReference<Pair<BufferedImage, BufferedImage>> ref;
+        private final BufferedImage mainImage;
+        private final BufferedImage eveImage;
         private final int frameH;
         private final int movieLinePosition;
 
-        Paster(MovieExporter _movieExporter, BufferedImage mainImage, BufferedImage eveImage, int _movieLinePosition) {
+        Paster(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eveImage, int _movieLinePosition) {
             movieExporter = _movieExporter;
-            ref = new SoftReference<>(new Pair<>(mainImage, eveImage == null ? null : ImageUtils.deepCopy(eveImage)));
+            mainImage = _mainImage;
+            eveImage = _eveImage == null ? null : ImageUtils.deepCopy(_eveImage);
             frameH = grabber.h;
             movieLinePosition = _movieLinePosition;
         }
 
         @Override
         public void run() {
-            Pair<BufferedImage, BufferedImage> p = ref.get();
-            if (p != null) {
-                BufferedImage mainImage = p.a, eveImage = p.b;
-                BufferedImage composite = ExportUtils.pasteCanvases(mainImage, frameH, eveImage, movieLinePosition, movieExporter.getHeight());
-                xformExecutor.execute(new Transformer(movieExporter, composite));
-            }
+            ExportUtils.pasteCanvases(mainImage, frameH, eveImage, movieLinePosition, movieExporter.getHeight());
+            xformExecutor.execute(new Transformer(movieExporter, mainImage));
         }
 
     }
@@ -180,19 +178,16 @@ public class ExportMovie implements FrameListener {
     private class Transformer implements Runnable {
 
         private final MovieExporter movieExporter;
-        private final SoftReference<BufferedImage> ref;
+        private final BufferedImage frame;
 
-        Transformer(MovieExporter _movieExporter, BufferedImage image) {
+        Transformer(MovieExporter _movieExporter, BufferedImage _frame) {
             movieExporter = _movieExporter;
-            ref = new SoftReference<>(image);
+            frame = _frame;
         }
 
         @Override
         public void run() {
-            BufferedImage image = ref.get();
-            if (image != null) {
-                encodeExecutor.execute(new Encoder(movieExporter, movieExporter.transform(image)));
-            }
+            encodeExecutor.execute(new Encoder(movieExporter, movieExporter.transform(frame)));
         }
 
     }
