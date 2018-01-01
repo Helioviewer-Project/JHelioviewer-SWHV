@@ -10,7 +10,6 @@ import java.util.concurrent.ExecutorService;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.ImageUtils;
-import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.image.MappedFileBuffer;
 import org.helioviewer.jhv.base.image.MappedImageFactory;
 import org.helioviewer.jhv.camera.Camera;
