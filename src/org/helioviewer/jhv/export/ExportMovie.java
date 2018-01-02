@@ -3,7 +3,6 @@ package org.helioviewer.jhv.export;
 import java.awt.EventQueue;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.lang.ref.SoftReference;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
@@ -33,7 +32,6 @@ public class ExportMovie implements FrameListener {
     private static boolean stopped;
     private static boolean shallStop;
 
-    private final ExecutorService xformExecutor = Executors.newFixedThreadPool(1, new JHVThread.NamedThreadFactory("Movie Transform"));
     private final ExecutorService encodeExecutor = Executors.newFixedThreadPool(1, new JHVThread.NamedThreadFactory("Movie Encode"));
 
     public static BufferedImage EVEImage = null;
@@ -42,11 +40,10 @@ public class ExportMovie implements FrameListener {
     public void disposeMovieWriter(boolean keep) {
         if (exporter != null) {
             if (keep) {
-                xformExecutor.execute(new CloseWriter1(exporter, true));
+                encodeExecutor.execute(new CloseWriter(exporter, true));
             } else {
-                xformExecutor.shutdownNow();
                 encodeExecutor.shutdownNow();
-                new CloseWriter2(exporter, false).run();
+                new CloseWriter(exporter, false).run();
             }
             exporter = null;
         }
@@ -73,7 +70,7 @@ public class ExportMovie implements FrameListener {
         try {
             BufferedImage screen = MappedImageFactory.createCompatibleMappedImage(grabber.w, exporter.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
             grabber.renderFrame(camera, gl, MappedImageFactory.getByteBuffer(screen));
-            xformExecutor.execute(new Transformer(exporter, screen, EVEImage, EVEMovieLinePosition));
+            encodeExecutor.execute(new FrameConsumer(exporter, screen, EVEImage, EVEMovieLinePosition));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -111,10 +108,22 @@ public class ExportMovie implements FrameListener {
 
         String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + TimeUtils.formatFilename(System.currentTimeMillis());
         if (mode == RecordMode.SHOT) {
-            exporter = new PNGExporter(prefix + ".png", exportHeight);
+            try {
+                exporter = new PNGExporter();
+                exporter.open(prefix + ".png", canvasWidth, exportHeight, fps);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             Displayer.display();
         } else {
-            exporter = new JCodecExporter(prefix + ".mp4", canvasWidth, exportHeight, fps);
+            try {
+                exporter = new JCodecExporter();
+                exporter.open(prefix + ".mp4", canvasWidth, exportHeight, fps);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             if (mode == RecordMode.LOOP) {
                 Movie.addFrameListener(instance);
                 Movie.setFrame(0);
@@ -147,7 +156,7 @@ public class ExportMovie implements FrameListener {
             shallStop = true;
     }
 
-    private class Transformer implements Runnable {
+    private class FrameConsumer implements Runnable {
 
         private final MovieExporter movieExporter;
         private final BufferedImage mainImage;
@@ -155,7 +164,7 @@ public class ExportMovie implements FrameListener {
         private final int frameH;
         private final int movieLinePosition;
 
-        Transformer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eveImage, int _movieLinePosition) {
+        FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eveImage, int _movieLinePosition) {
             movieExporter = _movieExporter;
             mainImage = _mainImage;
             eveImage = _eveImage == null ? null : ImageUtils.deepCopy(_eveImage);
@@ -165,29 +174,9 @@ public class ExportMovie implements FrameListener {
 
         @Override
         public void run() {
-            ExportUtils.pasteCanvases(mainImage, frameH, eveImage, movieLinePosition, movieExporter.getHeight());
-            encodeExecutor.execute(new Encoder(movieExporter, movieExporter.transform(mainImage)));
-        }
-
-    }
-
-    private static class Encoder implements Runnable {
-
-        private final MovieExporter movieExporter;
-        private final SoftReference<Object> ref;
-
-        Encoder(MovieExporter _movieExporter, Object frame) {
-            movieExporter = _movieExporter;
-            ref = new SoftReference<>(frame);
-        }
-
-        @Override
-        public void run() {
             try {
-                Object frame = ref.get();
-                if (frame != null) {
-                    movieExporter.encode(frame);
-                }
+                ExportUtils.pasteCanvases(mainImage, frameH, eveImage, movieLinePosition, movieExporter.getHeight());
+                movieExporter.encode(mainImage);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -195,29 +184,12 @@ public class ExportMovie implements FrameListener {
 
     }
 
-    private class CloseWriter1 implements Runnable {
+    private static class CloseWriter implements Runnable {
 
         private final MovieExporter movieExporter;
         private final boolean keep;
 
-        CloseWriter1(MovieExporter _movieExporter, boolean _keep) {
-            movieExporter = _movieExporter;
-            keep = _keep;
-        }
-
-        @Override
-        public void run() {
-            encodeExecutor.execute(new CloseWriter2(movieExporter, keep));
-        }
-
-    }
-
-    private static class CloseWriter2 implements Runnable {
-
-        private final MovieExporter movieExporter;
-        private final boolean keep;
-
-        CloseWriter2(MovieExporter _movieExporter, boolean _keep) {
+        CloseWriter(MovieExporter _movieExporter, boolean _keep) {
             movieExporter = _movieExporter;
             keep = _keep;
         }

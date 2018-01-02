@@ -8,7 +8,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 
-import org.helioviewer.jhv.base.image.MappedFileBuffer;
 import org.helioviewer.jhv.export.jcodec.JCodecUtils;
 import org.helioviewer.jhv.export.jcodec.JHVRgbToYuv420j8Bit;
 
@@ -25,8 +24,8 @@ import org.jcodec.containers.mp4.muxer.MP4Muxer;
 
 class JCodecExporter implements MovieExporter {
 
-    private final String path;
-    private final int width, height, fps;
+    private String path;
+    private int height, fps;
 
     private FileChannelWrapper ch;
     private H264Encoder encoder;
@@ -36,44 +35,36 @@ class JCodecExporter implements MovieExporter {
     private ByteBuffer _out;
     private int frameNo;
     private MP4Muxer muxer;
+    private Picture toEncode;
 
-    JCodecExporter(String _path, int _width, int _height, int _fps) {
+    @Override
+    public void open(String _path, int width, int _height, int _fps) throws IOException {
         path = _path;
-        width = _width;
         height = _height;
         fps = _fps;
+
+        ch = new FileChannelWrapper(FileChannel.open(Paths.get(path), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING));
+        // Muxer that will store the encoded frames
+        muxer = new MP4Muxer(ch, Brand.MP4);
+        // Add video track to muxer
+        outTrack = muxer.addTrack(TrackType.VIDEO, fps);
+        // Allocate a buffer big enough to hold output frames
+        _out = ByteBuffer.allocateDirect(width * height * 6);
+        // Create an instance of encoder
+        encoder = new H264Encoder(new JCodecUtils.JHVRateControl(19));
+        // Encoder extra data ( SPS, PPS ) to be stored in a special place of MP4
+        spsList = new ArrayList<>();
+        ppsList = new ArrayList<>();
+        toEncode = Picture.create(width, height, ColorSpace.YUV420J);
     }
 
     @Override
-    public Object transform(BufferedImage img) {
-        Picture toEncode = Picture.create(img.getWidth(), img.getHeight(), ColorSpace.YUV420J);
+    public void encode(BufferedImage img) throws IOException {
         JHVRgbToYuv420j8Bit.transform(img, toEncode);
-        return toEncode;
-    }
-
-    @Override
-    public void encode(Object frame) throws IOException {
-        if (!(frame instanceof Picture))
-            throw new IOException("Not Picture");
-
-        if (ch == null) {
-            ch = new FileChannelWrapper(FileChannel.open(Paths.get(path), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING));
-            // Muxer that will store the encoded frames
-            muxer = new MP4Muxer(ch, Brand.MP4);
-            // Add video track to muxer
-            outTrack = muxer.addTrack(TrackType.VIDEO, fps);
-            // Allocate a buffer big enough to hold output frames
-            _out = (ByteBuffer) (new MappedFileBuffer.DataBufferByte(width * height * 6, 1).getBuffer()); //ByteBuffer.allocate(width * height * 6);
-            // Create an instance of encoder
-            encoder = new H264Encoder(new JCodecUtils.JHVRateControl(19));
-            // Encoder extra data ( SPS, PPS ) to be stored in a special place of MP4
-            spsList = new ArrayList<>();
-            ppsList = new ArrayList<>();
-        }
 
         // Encode image into H.264 frame, the result is stored in '_out' buffer
         _out.clear();
-        ByteBuffer result = encoder.encodeFrame((Picture) frame, _out);
+        ByteBuffer result = encoder.encodeFrame(toEncode, _out);
         // Based on the frame above form correct MP4 packet
         spsList.clear();
         ppsList.clear();
@@ -86,8 +77,6 @@ class JCodecExporter implements MovieExporter {
 
     @Override
     public void close() throws IOException {
-        if (ch == null)
-            throw new IOException("Channel not open");
         // Push saved SPS/PPS to a special storage in MP4
         outTrack.addSampleEntry(H264Utils.createMOVSampleEntry(spsList, ppsList, 4));
         // Write MP4 header and finalize recording

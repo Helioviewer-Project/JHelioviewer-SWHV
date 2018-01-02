@@ -6,27 +6,21 @@ import java.awt.image.BufferedImage;
 
 import javax.imageio.ImageIO;
 
-class PNGExporter implements MovieExporter {
+public class PNGExporter implements MovieExporter {
 
-    private final String path;
-    private final int height;
+    private String path;
+    private int height;
     private BufferedImage image;
 
-    PNGExporter(String _path, int _height) {
+    @Override
+    public void open(String _path, int w, int h, int fps) {
         path = _path;
-        height = _height;
+        height = h;
     }
 
     @Override
-    public Object transform(BufferedImage _image) {
-        return _image;
-    }
-
-    @Override
-    public void encode(Object frame) throws IOException {
-        if (!(frame instanceof BufferedImage))
-            throw new IOException("Not Picture");
-        image = (BufferedImage) frame;
+    public void encode(BufferedImage _image) {
+        image = _image;
     }
 
     @Override

@@ -11,7 +11,7 @@ import org.jcodec.common.tools.MathUtil;
 public class JHVRgbToYuv420j8Bit {
 
     private static void get(ByteBuffer data, int x, int y, int w, byte[] bgr) {
-        //data.position(3 * (w * y + x));
+        //data.position(3 * (w * y + x)); -- slower
         //data.get(bgr);
         int i = 3 * (w * y + x);
         bgr[0] = data.get(i);
