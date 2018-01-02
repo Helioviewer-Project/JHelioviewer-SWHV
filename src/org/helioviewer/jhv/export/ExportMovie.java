@@ -3,6 +3,7 @@ package org.helioviewer.jhv.export;
 import java.awt.EventQueue;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.lang.ref.SoftReference;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
@@ -160,14 +161,14 @@ public class ExportMovie implements FrameListener {
 
         private final MovieExporter movieExporter;
         private final BufferedImage mainImage;
-        private final BufferedImage eveImage;
+        private final SoftReference<BufferedImage> eveRef;
         private final int frameH;
         private final int movieLinePosition;
 
         FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eveImage, int _movieLinePosition) {
             movieExporter = _movieExporter;
             mainImage = _mainImage;
-            eveImage = _eveImage == null ? null : ImageUtils.deepCopy(_eveImage);
+            eveRef = new SoftReference<>(_eveImage == null ? null : ImageUtils.deepCopy(_eveImage));
             frameH = grabber.h;
             movieLinePosition = _movieLinePosition;
         }
@@ -175,7 +176,7 @@ public class ExportMovie implements FrameListener {
         @Override
         public void run() {
             try {
-                ExportUtils.pasteCanvases(mainImage, frameH, eveImage, movieLinePosition, movieExporter.getHeight());
+                ExportUtils.pasteCanvases(mainImage, frameH, eveRef.get(), movieLinePosition, movieExporter.getHeight());
                 movieExporter.encode(mainImage);
             } catch (Exception e) {
                 e.printStackTrace();
