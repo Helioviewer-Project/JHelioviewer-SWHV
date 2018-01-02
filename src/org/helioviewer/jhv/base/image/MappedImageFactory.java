@@ -36,6 +36,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.nio.ByteBuffer;
 
 /**
  * A factory for creating {@link BufferedImage}s backed by memory mapped files.
@@ -94,6 +95,14 @@ public final class MappedImageFactory {
     static BufferedImage createCompatibleMappedImage(int width, int height, SampleModel sm, ColorModel cm) throws IOException {
         DataBuffer buffer = MappedFileBuffer.create(sm.getTransferType(), width * height * sm.getNumDataElements(), 1);
         return new BufferedImage(cm, RASTER_FACTORY.createRaster(sm, buffer, new Point()), cm.isAlphaPremultiplied(), null);
+    }
+
+    public static ByteBuffer getByteBuffer(BufferedImage img) {
+        DataBuffer buffer = img.getRaster().getDataBuffer();
+        if (buffer instanceof MappedFileBuffer.DataBufferByte)
+            return (ByteBuffer) ((MappedFileBuffer.DataBufferByte) buffer).getBuffer();
+        else
+            throw new IncompatibleClassChangeError("Not a MappedFileBuffer byte backed image");
     }
 
     private static RasterFactory createRasterFactory() {

@@ -3,18 +3,16 @@ package org.helioviewer.jhv.export.jcodec;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 
-import org.helioviewer.jhv.base.image.MappedFileBuffer;
+import org.helioviewer.jhv.base.image.MappedImageFactory;
 
 import org.jcodec.common.model.Picture;
 import org.jcodec.common.tools.MathUtil;
 
 public class JHVRgbToYuv420j8Bit {
 
-    private static ByteBuffer getBuffer(BufferedImage img) {
-        return (ByteBuffer) ((MappedFileBuffer.DataBufferByte) img.getRaster().getDataBuffer()).getBuffer();
-    }
-
     private static void get(ByteBuffer data, int x, int y, int w, byte[] bgr) {
+        //data.position(3 * (w * y + x));
+        //data.get(bgr);
         int i = 3 * (w * y + x);
         bgr[0] = data.get(i);
         bgr[1] = data.get(i + 1);
@@ -26,7 +24,7 @@ public class JHVRgbToYuv420j8Bit {
         int[][] out = new int[4][3];
 
         byte[] bgr = new byte[3];
-        ByteBuffer data = getBuffer(img);
+        ByteBuffer data = MappedImageFactory.getByteBuffer(img);
 
         int x, y = 0, h = img.getHeight(), w = img.getWidth();
         int offChr = 0, offLuma = 0, strideDst = dst.getWidth();

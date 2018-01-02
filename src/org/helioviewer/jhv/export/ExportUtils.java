@@ -5,22 +5,29 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
+import java.nio.ByteBuffer;
 
+import org.helioviewer.jhv.base.image.MappedImageFactory;
 import org.helioviewer.jhv.opengl.GLInfo;
 
 class ExportUtils {
 
     private static void flipVertically(BufferedImage img, int h) {
-        int w = img.getWidth();
-        Object scanline1 = null, scanline2 = null;
-        WritableRaster raster = img.getRaster();
+        int w = 3 * img.getWidth(); // assume bgr
+        byte[] line1 = new byte[w];
+        byte[] line2 = new byte[w];
+        ByteBuffer data = MappedImageFactory.getByteBuffer(img);
 
         for (int i = 0; i < h / 2; i++) {
-            scanline1 = raster.getDataElements(0, i, w, 1, scanline1);
-            scanline2 = raster.getDataElements(0, h - i - 1, w, 1, scanline2);
-            raster.setDataElements(0, i, w, 1, scanline2);
-            raster.setDataElements(0, h - i - 1, w, 1, scanline1);
+            data.position(w * i);
+            data.get(line1);
+            data.position(w * (h - i - 1));
+            data.get(line2);
+
+            data.position(w * (h - i - 1));
+            data.put(line1);
+            data.position(w * i);
+            data.put(line2);
         }
     }
 
