@@ -10,7 +10,6 @@ import java.util.concurrent.ExecutorService;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.ImageUtils;
-import org.helioviewer.jhv.base.image.MappedFileBuffer;
 import org.helioviewer.jhv.base.image.MappedImageFactory;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
@@ -75,7 +74,7 @@ public class ExportMovie implements FrameListener {
 
         try {
             BufferedImage screen = MappedImageFactory.createCompatibleMappedImage(grabber.w, exporter.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
-            grabber.renderFrame(camera, gl, ((MappedFileBuffer.DataBufferByte) screen.getRaster().getDataBuffer()).getBuffer());
+            grabber.renderFrame(camera, gl, MappedImageFactory.getByteBuffer(screen));
             pasteExecutor.execute(new Paster(exporter, screen, EVEImage, EVEMovieLinePosition));
         } catch (Exception e) {
             e.printStackTrace();
