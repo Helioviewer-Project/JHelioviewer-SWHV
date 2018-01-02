@@ -85,7 +85,7 @@ public abstract class MappedFileBuffer extends DataBuffer {
         }
     }
 
-    public Buffer getBuffer() {
+    Buffer getBuffer() {
         return buffer;
     }
 
