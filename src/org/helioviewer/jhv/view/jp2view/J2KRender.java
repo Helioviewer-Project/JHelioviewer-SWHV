@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.view.jp2view;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
 import kdu_jni.KduException;
@@ -79,10 +80,10 @@ class J2KRender implements Runnable {
         Kdu_dims newRegion = new Kdu_dims();
 
         int[] intBuffer = null;
-        byte[] byteBuffer = null;
+        ByteBuffer byteBuffer = null;
 
         if (numComponents < 3) {
-            byteBuffer = new byte[aWidth * aHeight];
+            byteBuffer = ByteBuffer.allocateDirect(aWidth * aHeight).order(ByteOrder.nativeOrder());
         } else {
             intBuffer = new int[aWidth * aHeight];
         }
@@ -111,7 +112,7 @@ class J2KRender implements Runnable {
             if (numComponents < 3) {
                 for (int row = 0; row < newHeight; row++, dstIdx += aWidth, srcIdx += newWidth) {
                     for (int col = 0; col < newWidth; ++col) {
-                        byteBuffer[dstIdx + col] = (byte) (localIntBuffer[srcIdx + col] & 0xFF);
+                        byteBuffer.put(dstIdx + col, (byte) (localIntBuffer[srcIdx + col] & 0xFF));
                     }
                 }
             } else {
@@ -126,7 +127,7 @@ class J2KRender implements Runnable {
 
         ImageData data;
         if (numComponents < 3) {
-            data = new Single8ImageData(aWidth, aHeight, ByteBuffer.wrap(byteBuffer));
+            data = new Single8ImageData(aWidth, aHeight, byteBuffer);
         } else {
             data = new ARGBInt32ImageData(aWidth, aHeight, IntBuffer.wrap(intBuffer));
         }
