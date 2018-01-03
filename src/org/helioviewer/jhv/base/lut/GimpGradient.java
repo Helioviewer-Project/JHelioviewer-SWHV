@@ -79,12 +79,16 @@ class GimpGradient {
 
             String[] nL = Regex.Space.split(ln);
             // Either all exist or the last may not
-            if (nL.length == 15)
-                segments.add(new GimpGradientSegment(Double.parseDouble(nL[0]), Double.parseDouble(nL[1]), Double.parseDouble(nL[2]), Double.parseDouble(nL[3]), Double.parseDouble(nL[4]), Double.parseDouble(nL[5]), Double.parseDouble(nL[6]), Double.parseDouble(nL[7]), Double.parseDouble(nL[8]), Double.parseDouble(nL[9]), Double.parseDouble(nL[10]), Integer.parseInt(nL[11]), Integer.parseInt(nL[12])/*, Integer.parseInt(nL[13]), Integer.parseInt(nL[14])*/));
-            else if (nL.length == 13)
-                segments.add(new GimpGradientSegment(Double.parseDouble(nL[0]), Double.parseDouble(nL[1]), Double.parseDouble(nL[2]), Double.parseDouble(nL[3]), Double.parseDouble(nL[4]), Double.parseDouble(nL[5]), Double.parseDouble(nL[6]), Double.parseDouble(nL[7]), Double.parseDouble(nL[8]), Double.parseDouble(nL[9]), Double.parseDouble(nL[10]), Integer.parseInt(nL[11]), Integer.parseInt(nL[12])/*, 0, 0*/));
-            else
-                throw new Exception("Parsing error in segment " + i);
+            switch (nL.length) {
+                case 15:
+                    segments.add(new GimpGradientSegment(Double.parseDouble(nL[0]), Double.parseDouble(nL[1]), Double.parseDouble(nL[2]), Double.parseDouble(nL[3]), Double.parseDouble(nL[4]), Double.parseDouble(nL[5]), Double.parseDouble(nL[6]), Double.parseDouble(nL[7]), Double.parseDouble(nL[8]), Double.parseDouble(nL[9]), Double.parseDouble(nL[10]), Integer.parseInt(nL[11]), Integer.parseInt(nL[12])/*, Integer.parseInt(nL[13]), Integer.parseInt(nL[14])*/));
+                    break;
+                case 13:
+                    segments.add(new GimpGradientSegment(Double.parseDouble(nL[0]), Double.parseDouble(nL[1]), Double.parseDouble(nL[2]), Double.parseDouble(nL[3]), Double.parseDouble(nL[4]), Double.parseDouble(nL[5]), Double.parseDouble(nL[6]), Double.parseDouble(nL[7]), Double.parseDouble(nL[8]), Double.parseDouble(nL[9]), Double.parseDouble(nL[10]), Integer.parseInt(nL[11]), Integer.parseInt(nL[12])/*, 0, 0*/));
+                    break;
+                default:
+                    throw new Exception("Parsing error in segment " + i);
+            }
         }
     }
 
