@@ -42,6 +42,7 @@ import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
+// has to be public for state
 public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEventHandler {
 
     private static final SWEKPopupController controller = new SWEKPopupController(ImageViewerGui.getGLComponent());
