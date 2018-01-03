@@ -66,6 +66,15 @@ public class ImageLayers {
         return ct;
     }
 
+    public static boolean getSyncedImageLayers(long milli) {
+        for (ImageLayer layer : Layers.getImageLayers()) {
+            ImageData id;
+            if (layer.isEnabled() && (id = layer.getImageData()) != null && milli != id.getViewpoint().time.milli)
+                return false;
+        }
+        return true;
+    }
+
     public static double getLargestPhysicalHeight() {
         double size = 0;
         MetaData m;
