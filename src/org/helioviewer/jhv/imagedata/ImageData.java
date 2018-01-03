@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.imagedata;
 
-import java.awt.image.BufferedImage;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
@@ -20,8 +19,6 @@ public abstract class ImageData {
     private final int bpp;
     private final double gamma;
     Buffer buffer;
-
-    BufferedImage image = null;
 
     private Region region;
     private MetaData metaData;
@@ -55,25 +52,7 @@ public abstract class ImageData {
         return buffer;
     }
 
-    public BufferedImage getBufferedImage() {
-        if (image == null) {
-            image = createBufferedImageFromImageTransport();
-        }
-        return image;
-    }
-
     public abstract ImageFormat getImageFormat();
-
-    /**
-     * Internal function to create a BufferedImage from the image transport
-     * object.
-     *
-     * This function will be called from {@link #getBufferedImage()} when
-     * necessary.
-     *
-     * @return the created BufferedImage
-     */
-    protected abstract BufferedImage createBufferedImageFromImageTransport();
 
     public Region getRegion() {
         return region;

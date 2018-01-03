@@ -18,16 +18,15 @@ public class ARGBInt32ImageData extends ImageData {
         buffer = _buffer;
     }
 
-    public ARGBInt32ImageData(BufferedImage newImage) {
-        super(newImage.getWidth(), newImage.getHeight(), 32, 1);
-        image = newImage;
-        readImageTransportFromBufferedImage(newImage);
+    public ARGBInt32ImageData(BufferedImage image) {
+        super(image.getWidth(), image.getHeight(), 32, 1);
+        readImageTransportFromBufferedImage(image);
     }
 
-    private void readImageTransportFromBufferedImage(BufferedImage newImage) {
+    private void readImageTransportFromBufferedImage(BufferedImage image) {
         int[] outputData = new int[1];
 
-        DataBuffer dataBuffer = newImage.getRaster().getDataBuffer();
+        DataBuffer dataBuffer = image.getRaster().getDataBuffer();
         if (dataBuffer instanceof DataBufferInt) {
             outputData = ((DataBufferInt) dataBuffer).getData();
         } else if (dataBuffer instanceof DataBufferByte) {
@@ -53,13 +52,6 @@ public class ARGBInt32ImageData extends ImageData {
     @Override
     public ImageFormat getImageFormat() {
         return format;
-    }
-
-    @Override
-    protected BufferedImage createBufferedImageFromImageTransport() {
-        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        newImage.setRGB(0, 0, width, height, (int[]) buffer.array(), 0, width);
-        return newImage;
     }
 
 }
