@@ -216,7 +216,7 @@ public class Movie {
         animationMode = mode;
     }
 
-    private static final int RECORD_FPS = 5;
+    private static final int RECORD_FPS = 4;
     private static boolean isRecording;
     private static int saveDelay;
 

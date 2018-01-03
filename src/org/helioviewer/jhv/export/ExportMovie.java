@@ -157,7 +157,7 @@ public class ExportMovie implements FrameListener {
             shallStop = true;
     }
 
-    private class FrameConsumer implements Runnable {
+    private static class FrameConsumer implements Runnable {
 
         private final MovieExporter movieExporter;
         private final BufferedImage mainImage;
@@ -211,6 +211,7 @@ public class ExportMovie implements FrameListener {
                 File f = new File(movieExporter.getPath());
                 f.delete();
             }
+            System.gc();
         }
     }
 
