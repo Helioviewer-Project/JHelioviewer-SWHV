@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.pfss;
 
 import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.opengl.GLLine;
@@ -45,8 +46,8 @@ class PfssLine {
         brightColor[3] = 1;
     }
 
-    private static double decode(short f) {
-        return (f + 32768.) * (2. / 65535.) - 1.;
+    private static double decode(ShortBuffer buf, int idx) {
+        return (buf.get(idx) + 32768.) * (2. / 65535.) - 1.;
     }
 
     public void calculatePositions(GL2 gl, PfssData data, int detail, boolean fixedColor, double radius) {
@@ -56,26 +57,29 @@ class PfssLine {
         int pointsPerLine = data.pointsPerLine;
         double cphi = data.cphi;
         double sphi = data.sphi;
-        short[] flinex = data.flinex;
-        short[] fliney = data.fliney;
-        short[] flinez = data.flinez;
-        short[] flines = data.flines;
+        ShortBuffer flinex = data.flinex;
+        ShortBuffer fliney = data.fliney;
+        ShortBuffer flinez = data.flinez;
+        ShortBuffer flines = data.flines;
 
-        int numberOfLines = flinex.length / pointsPerLine;
-        int vlength = 3 * (flinex.length + 2 * numberOfLines);
+        int dlength = flinex.capacity();
+        int numberOfLines = dlength / pointsPerLine;
+
+        int vlength = 3 * (dlength + 2 * numberOfLines);
         if (vlength != vertices.capacity())
             vertices = BufferUtils.newFloatBuffer(vlength);
-        int clength = 4 * (flinex.length + 2 * numberOfLines);
+
+        int clength = 4 * (dlength + 2 * numberOfLines);
         if (clength != colors.capacity())
             colors = BufferUtils.newFloatBuffer(clength);
 
         float[] oneColor = loopColor;
-        for (int i = 0; i < flinex.length; i++) {
+        for (int i = 0; i < dlength; i++) {
             if (i / pointsPerLine % 9 <= detail) {
-                double x = 3. * decode(flinex[i]);
-                double y = 3. * decode(fliney[i]);
-                double z = 3. * decode(flinez[i]);
-                double b = decode(flines[i]);
+                double x = 3. * decode(flinex, i);
+                double y = 3. * decode(fliney, i);
+                double z = 3. * decode(flinez, i);
+                double b = decode(flines, i);
                 computeBrightColor(b);
 
                 double helpx = cphi * x + sphi * y;
@@ -89,9 +93,9 @@ class PfssLine {
                     colors.put(BufferUtils.colorNull);
 
                     if (fixedColor) {
-                        double xo = 3. * decode(flinex[i + pointsPerLine - 1]);
-                        double yo = 3. * decode(fliney[i + pointsPerLine - 1]);
-                        double zo = 3. * decode(flinez[i + pointsPerLine - 1]);
+                        double xo = 3. * decode(flinex, i + pointsPerLine - 1);
+                        double yo = 3. * decode(fliney, i + pointsPerLine - 1);
+                        double zo = 3. * decode(flinez, i + pointsPerLine - 1);
                         double ro = Math.sqrt(xo * xo + yo * yo + zo * zo);
 
                         if (Math.abs(r - ro) < 2.5 - 1.0 - 0.2) {

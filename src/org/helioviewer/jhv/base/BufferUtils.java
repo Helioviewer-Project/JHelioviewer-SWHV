@@ -3,6 +3,7 @@ package org.helioviewer.jhv.base;
 import java.awt.Color;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 
 import org.helioviewer.jhv.math.Vec3;
 
@@ -23,6 +24,10 @@ public class BufferUtils {
 
     public static IntBuffer newIntBuffer(int len) {
         return Buffers.newDirectIntBuffer(len);
+    }
+
+    public static ShortBuffer newShortBuffer(int len) {
+        return Buffers.newDirectShortBuffer(len);
     }
 
     public static void put3f(FloatBuffer buf, float x, float y, float z) {
