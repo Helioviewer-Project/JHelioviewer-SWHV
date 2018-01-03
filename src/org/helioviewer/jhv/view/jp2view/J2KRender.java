@@ -102,7 +102,7 @@ class J2KRender implements Runnable {
                 continue;
             }
 
-            localIntBuffer = newPixels > localIntBuffer.length ? new int[newPixels << 1] : localIntBuffer;
+            localIntBuffer = newPixels > localIntBuffer.length ? new int[newPixels] : localIntBuffer;
             compositorBuf.Get_region(newRegion, localIntBuffer);
 
             int srcIdx = 0;
