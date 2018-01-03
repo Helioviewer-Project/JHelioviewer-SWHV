@@ -18,7 +18,8 @@ import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-class PfssLayer extends AbstractLayer implements TimespanListener {
+// has to be public for state
+public class PfssLayer extends AbstractLayer implements TimespanListener {
 
     private final PfssLayerOptions optionsPanel;
     private final PfssLine line = new PfssLine();
