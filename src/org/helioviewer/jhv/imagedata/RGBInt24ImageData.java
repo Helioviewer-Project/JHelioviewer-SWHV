@@ -14,22 +14,14 @@ public class RGBInt24ImageData extends ImageData {
         buffer = _buffer;
     }
 
-    public RGBInt24ImageData(BufferedImage newImage) {
-        super(newImage.getWidth(), newImage.getHeight(), 32, 1);
-        image = newImage;
-        buffer = IntBuffer.wrap(((DataBufferInt) newImage.getRaster().getDataBuffer()).getData());
+    public RGBInt24ImageData(BufferedImage image) {
+        super(image.getWidth(), image.getHeight(), 32, 1);
+        buffer = IntBuffer.wrap(((DataBufferInt) image.getRaster().getDataBuffer()).getData());
     }
 
     @Override
     public ImageFormat getImageFormat() {
         return format;
-    }
-
-    @Override
-    protected BufferedImage createBufferedImageFromImageTransport() {
-        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        newImage.setRGB(0, 0, width, height, (int[]) buffer.array(), 0, width);
-        return newImage;
     }
 
 }
