@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.imagedata;
 
-import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.nio.ByteBuffer;
