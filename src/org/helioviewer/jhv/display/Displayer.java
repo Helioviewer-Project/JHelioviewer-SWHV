@@ -198,12 +198,18 @@ public class Displayer implements JHVEventHighlightListener {
         toDisplay = true;
     }
 
+    public static void handleData(long milli) { // special for ImageLayer.handleData
+        if (ImageLayers.getSyncedImageLayers(milli)) {
+            ImageViewerGui.getGLComponent().repaint(); // asap
+            toDisplay = false;
+        }
+    }
+
     private static class DisplayTimerListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (toDisplay) {
-                // ImageViewerGui.getGLWindow().display();
-                ImageViewerGui.getGLComponent().repaint();
+                ImageViewerGui.getGLComponent().repaint(); // asap
                 toDisplay = false;
             }
             if (renderFactor != -1) {
