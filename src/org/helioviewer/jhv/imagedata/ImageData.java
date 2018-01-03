@@ -93,11 +93,11 @@ public abstract class ImageData {
         if (!(buffer instanceof ByteBuffer))
             return 1;
 
-        byte[] ba = ((ByteBuffer) buffer).array();
-        int len = ba.length;
+        int len = buffer.capacity();
         int[] histogram = new int[256];
+        ByteBuffer byteBuffer = (ByteBuffer) buffer;
         for (int i = 0; i < len; i++) {
-            histogram[getUnsigned(ba[i])]++;
+            histogram[getUnsigned(byteBuffer.get(i))]++;
         }
 
         long ct = 0;
