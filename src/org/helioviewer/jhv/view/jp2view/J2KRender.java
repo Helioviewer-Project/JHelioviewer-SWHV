@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.view.jp2view;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
 import kdu_jni.KduException;
@@ -13,6 +12,7 @@ import kdu_jni.Kdu_ilayer_ref;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
 
+import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.imagedata.ARGBInt32ImageData;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.Single8ImageData;
@@ -83,7 +83,7 @@ class J2KRender implements Runnable {
         ByteBuffer byteBuffer = null;
 
         if (numComponents < 3) {
-            byteBuffer = ByteBuffer.allocateDirect(aWidth * aHeight).order(ByteOrder.nativeOrder());
+            byteBuffer = BufferUtils.newByteBuffer(aWidth * aHeight);
         } else {
             intBuffer = new int[aWidth * aHeight];
         }

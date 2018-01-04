@@ -61,8 +61,7 @@ public abstract class MappedFileBuffer extends DataBuffer {
             raf.setLength(length);
 
             // Map entire file into memory, let OS virtual memory/paging do the heavy lifting
-            MappedByteBuffer byteBuffer = channel.map(FileChannel.MapMode.READ_WRITE, 0, length);
-
+            ByteBuffer byteBuffer = channel.map(FileChannel.MapMode.READ_WRITE, 0, length).order(ByteOrder.nativeOrder());
             switch (type) {
                 case DataBuffer.TYPE_BYTE:
                     buffer = byteBuffer;
