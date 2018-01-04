@@ -79,13 +79,13 @@ class J2KRender implements Runnable {
 
         Kdu_dims newRegion = new Kdu_dims();
 
-        int[] intBuffer = null;
         ByteBuffer byteBuffer = null;
+        IntBuffer intBuffer = null;
 
         if (numComponents < 3) {
             byteBuffer = BufferUtils.newByteBuffer(aWidth * aHeight);
         } else {
-            intBuffer = new int[aWidth * aHeight];
+            intBuffer = BufferUtils.newIntBuffer(aWidth * aHeight);
         }
 
         int[] localIntBuffer = bufferLocal.get();
@@ -117,8 +117,10 @@ class J2KRender implements Runnable {
                 }
             } else {
                 for (int row = 0; row < newHeight; row++, dstIdx += aWidth, srcIdx += newWidth) {
-                    System.arraycopy(localIntBuffer, srcIdx, intBuffer, dstIdx, newWidth);
+                    intBuffer.position(dstIdx);
+                    intBuffer.put(localIntBuffer, srcIdx, newWidth);
                 }
+                intBuffer.rewind();
             }
         }
 
@@ -129,7 +131,7 @@ class J2KRender implements Runnable {
         if (numComponents < 3) {
             data = new Single8ImageData(aWidth, aHeight, byteBuffer);
         } else {
-            data = new ARGBInt32ImageData(aWidth, aHeight, IntBuffer.wrap(intBuffer));
+            data = new ARGBInt32ImageData(aWidth, aHeight, intBuffer);
         }
         viewRef.setDataFromRender(params, data);
     }
