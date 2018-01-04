@@ -75,6 +75,8 @@ public class ExportMovie implements FrameListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        Movie.grabDone();
+
         if (mode == RecordMode.SHOT) {
             stop();
         }

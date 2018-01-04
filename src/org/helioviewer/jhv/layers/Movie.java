@@ -147,6 +147,9 @@ public class Movie {
     }
 
     private static void syncTime(JHVDate dateTime) {
+        if (recording && notDone)
+            return;
+
         lastTimestamp = dateTime;
 
         Camera camera = Displayer.getCamera();
@@ -170,6 +173,9 @@ public class Movie {
         }
 
         MoviePanel.setFrameSlider(activeFrame);
+
+        if (recording)
+            notDone = true;
     }
 
     private static final HashSet<FrameListener> frameListeners = new HashSet<>();
@@ -216,27 +222,23 @@ public class Movie {
         animationMode = mode;
     }
 
-    private static final int RECORD_FPS = 4;
-    private static boolean isRecording;
-    private static int saveDelay;
+    private static boolean recording;
+    private static boolean notDone;
+
+    public static void grabDone() {
+        notDone = false;
+    }
 
     public static void startRecording() {
-        if (!isRecording) {
-            isRecording = true;
-            saveDelay = frameTimer.getDelay();
-            setDesiredRelativeSpeed(RECORD_FPS);
-        }
+        recording = true;
     }
 
     public static void stopRecording() {
-        if (isRecording) {
-            isRecording = false;
-            frameTimer.setDelay(saveDelay);
-        }
+        recording = false;
     }
 
     public static boolean isRecording() {
-        return isRecording;
+        return recording;
     }
 
 }

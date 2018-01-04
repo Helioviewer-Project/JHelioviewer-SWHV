@@ -51,7 +51,7 @@ class JCodecExporter implements MovieExporter {
         // Allocate a buffer big enough to hold output frames
         _out = ByteBuffer.allocateDirect(width * height * 6);
         // Create an instance of encoder
-        encoder = new H264Encoder(new JCodecUtils.JHVRateControl(19));
+        encoder = new H264Encoder(new JCodecUtils.JHVRateControl(20));
         // Encoder extra data ( SPS, PPS ) to be stored in a special place of MP4
         spsList = new ArrayList<>();
         ppsList = new ArrayList<>();
