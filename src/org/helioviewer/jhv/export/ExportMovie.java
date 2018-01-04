@@ -116,7 +116,7 @@ public class ExportMovie implements FrameListener {
                 e.printStackTrace();
             }
 
-            Displayer.display();
+            Displayer.render(1);
         } else {
             try {
                 exporter = new JCodecExporter();
