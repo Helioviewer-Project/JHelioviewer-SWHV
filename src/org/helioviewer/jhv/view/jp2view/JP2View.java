@@ -376,42 +376,51 @@ public class JP2View extends AbstractView {
 
     // Recalculates the image parameters used within the jp2-package
     ImageParams calculateParams(Camera camera, Viewport vp, int frame, double factor) {
-        MetaData m = metaData[frame];
-        Region mr = m.getPhysicalRegion();
-        Region r = ViewROI.updateROI(camera, vp, m);
+        ResolutionLevel res;
+        SubImage subImage;
 
-        double ratio = 2 * camera.getWidth() / vp.height;
-        int totalHeight = (int) (mr.height / ratio + .5);
+        if (Movie.isRecording()) { // all bets are off
+            res = cacheStatus.getResolutionSet(frame).getResolutionLevel(0);
+            subImage = new SubImage(0, 0, res.width, res.height, res.width, res.height);
+            factor = 1;
+        } else {
+            MetaData m = metaData[frame];
+            Region mr = m.getPhysicalRegion();
+            Region r = ViewROI.updateROI(camera, vp, m);
 
-        ResolutionLevel res = cacheStatus.getResolutionSet(frame).getNextResolutionLevel(totalHeight, totalHeight);
+            double ratio = 2 * camera.getWidth() / vp.height;
+            int totalHeight = (int) (mr.height / ratio + .5);
 
-        double currentMeterPerPixel = mr.width / res.width;
-        int imageWidth = (int) Math.ceil(r.width / currentMeterPerPixel); // +1 account for floor ??
-        int imageHeight = (int) Math.ceil(r.height / currentMeterPerPixel);
+            res = cacheStatus.getResolutionSet(frame).getNextResolutionLevel(totalHeight, totalHeight);
 
-        double posX = (r.ulx - mr.ulx) / mr.width * res.width;
-        double posY = (r.uly - mr.uly) / mr.height * res.height;
-        int imagePositionX = (int) Math.floor(+posX);
-        int imagePositionY = (int) Math.floor(-posY);
+            double currentMeterPerPixel = mr.width / res.width;
+            int imageWidth = (int) Math.ceil(r.width / currentMeterPerPixel); // +1 account for floor ??
+            int imageHeight = (int) Math.ceil(r.height / currentMeterPerPixel);
 
-        SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, res.width, res.height);
+            double posX = (r.ulx - mr.ulx) / mr.width * res.width;
+            double posY = (r.uly - mr.uly) / mr.height * res.height;
+            int imagePositionX = (int) Math.floor(+posX);
+            int imagePositionY = (int) Math.floor(-posY);
 
-        int maxDim = Math.max(subImage.width, subImage.height);
-        double adj = 1;
-        if (maxDim > JHVGlobals.hiDpiCutoff && Movie.isPlaying() && !Movie.isRecording()) {
-            adj = JHVGlobals.hiDpiCutoff / (double) maxDim;
-            if (adj > 0.5)
-                adj = 1;
-            else if (adj > 0.25)
-                adj = 0.5;
-            else if (adj > 0.125)
-                adj = 0.25;
-            else if (adj > 0.0625)
-                adj = 0.125;
-            else if (adj > 0.03125)
-                adj = 0.0625;
+            subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, res.width, res.height);
+
+            int maxDim = Math.max(subImage.width, subImage.height);
+            double adj = 1;
+            if (maxDim > JHVGlobals.hiDpiCutoff && Movie.isPlaying()) {
+                adj = JHVGlobals.hiDpiCutoff / (double) maxDim;
+                if (adj > 0.5)
+                    adj = 1;
+                else if (adj > 0.25)
+                    adj = 0.5;
+                else if (adj > 0.125)
+                    adj = 0.25;
+                else if (adj > 0.0625)
+                    adj = 0.125;
+                else if (adj > 0.03125)
+                    adj = 0.0625;
+            }
+            factor = Math.min(factor, adj);
         }
-        factor = Math.min(factor, adj);
 
         int level = res.level;
         AtomicBoolean status = cacheStatus.getFrameStatus(frame, level);
