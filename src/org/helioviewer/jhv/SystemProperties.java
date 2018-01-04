@@ -30,7 +30,7 @@ class SystemProperties {
             System.exit(1);
         }
 
-        if (arch.contains("64") && arch.contains("x86"))
+        if (arch.contains("x86_64") || arch.contains("amd64"))
             System.setProperty("jhv.arch", "x86-64");
         else
             Log.error("Platform > Could not determine platform. OS: " + os + " - arch: " + arch);
