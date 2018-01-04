@@ -18,12 +18,8 @@ class JHVLoader {
             pathlib = "macosx-universal/";
         } else if (System.getProperty("jhv.os").equals("windows") && System.getProperty("jhv.arch").equals("x86-64")) {
             pathlib = "windows-amd64/";
-        } else if (System.getProperty("jhv.os").equals("windows") && System.getProperty("jhv.arch").equals("x86-32")) {
-            pathlib = "windows-i586/";
         } else if (System.getProperty("jhv.os").equals("linux") && System.getProperty("jhv.arch").equals("x86-64")) {
             pathlib = "linux-amd64/";
-        } else if (System.getProperty("jhv.os").equals("linux") && System.getProperty("jhv.arch").equals("x86-32")) {
-            pathlib = "linux-i586/";
         }
 
         if (System.getProperty("jhv.os").equals("windows"))
