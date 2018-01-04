@@ -27,6 +27,11 @@ public class PfssData {
         fliney = BufferUtils.newShortBuffer(len).put(_fliney);
         flinez = BufferUtils.newShortBuffer(len).put(_flinez);
         flines = BufferUtils.newShortBuffer(len).put(_flines);
+        flinex.rewind();
+        fliney.rewind();
+        flinez.rewind();
+        flines.rewind();
+
         pointsPerLine = _pointsPerLine;
 
         Position.L p = Sun.getEarth(dateObs);
