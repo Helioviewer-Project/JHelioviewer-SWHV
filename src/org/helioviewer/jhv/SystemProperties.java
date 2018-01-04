@@ -21,7 +21,9 @@ class SystemProperties {
         os = os.toLowerCase();
         arch = arch.toLowerCase();
 
-        if (arch.contains("32")) {
+        if (arch.contains("x86_64") || arch.contains("amd64"))
+            System.setProperty("jhv.arch", "x86-64");
+        else {
             JOptionPane optionPane = new JOptionPane();
             optionPane.setMessage("Please install Java 64-bit to run JHelioviewer.");
             optionPane.setMessageType(JOptionPane.ERROR_MESSAGE);
@@ -29,11 +31,6 @@ class SystemProperties {
             optionPane.createDialog(null, "JHelioviewer: Java 64-bit required").setVisible(true);
             System.exit(1);
         }
-
-        if (arch.contains("x86_64") || arch.contains("amd64"))
-            System.setProperty("jhv.arch", "x86-64");
-        else
-            Log.error("Platform > Could not determine platform. OS: " + os + " - arch: " + arch);
 
         if (os.contains("windows"))
             System.setProperty("jhv.os", "windows");
