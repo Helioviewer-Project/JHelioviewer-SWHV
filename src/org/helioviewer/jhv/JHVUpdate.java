@@ -71,7 +71,6 @@ public class JHVUpdate implements Runnable {
                         Settings.getSingletonInstance().save("update.check.next");
                     }
                 } else {
-                    Log.info("Running the newest version of JHelioviewer");
                     if (verbose)
                         JOptionPane.showMessageDialog(null, "You are running the latest JHelioviewer version (" + runningVersion + ')');
                 }

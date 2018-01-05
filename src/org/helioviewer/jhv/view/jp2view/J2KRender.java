@@ -89,8 +89,7 @@ class J2KRender implements Runnable {
         }
 
         int[] localIntBuffer = bufferLocal.get();
-        while (!compositor.Is_processing_complete()) {
-            compositor.Process(KakaduConstants.MAX_RENDER_SAMPLES, newRegion);
+        while (compositor.Process(KakaduConstants.MAX_RENDER_SAMPLES, newRegion)) {
             Kdu_coords newOffset = newRegion.Access_pos();
             Kdu_coords newSize = newRegion.Access_size();
 
