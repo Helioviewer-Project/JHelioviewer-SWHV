@@ -20,7 +20,7 @@ public class KakaduConstants {
     public static final int KDU_WANT_CODESTREAM_COMPONENTS = 1;
 
     /** Maximum of samples to process per rendering iteration */
-    public static final int MAX_RENDER_SAMPLES = 1024 * 1024;
+    public static final int MAX_RENDER_SAMPLES = 256 * 1024;
     /** The amount of cache to allocate to each codestream */
     public static final int CODESTREAM_CACHE_THRESHOLD = 1024 * 1024;
 
