@@ -25,7 +25,7 @@ import okio.BufferedSource;
 
 class NetClientRemote implements NetClient {
 
-    private static final int cacheSize = 256 * 1024 * 1024;
+    private static final int cacheSize = 512 * 1024 * 1024;
     private static OkHttpClient client;
 
     private static void init() throws IOException {
