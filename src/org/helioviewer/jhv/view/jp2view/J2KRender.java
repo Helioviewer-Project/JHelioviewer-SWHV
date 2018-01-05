@@ -89,36 +89,45 @@ class J2KRender implements Runnable {
         int[] intArray = localArray.get();
         Kdu_dims newRegion = new Kdu_dims();
         while (compositor.Process(KakaduConstants.MAX_RENDER_SAMPLES, newRegion)) {
-            Kdu_coords newOffset = newRegion.Access_pos();
             Kdu_coords newSize = newRegion.Access_size();
-
-            newOffset.Subtract(actualOffset);
-
             int newWidth = newSize.Get_x();
             int newHeight = newSize.Get_y();
-            int newPixels = newWidth * newHeight;
-            if (newPixels == 0) {
+            if (newWidth * newHeight == 0)
                 continue;
-            }
 
-            intArray = newPixels > intArray.length ? new int[newPixels] : intArray;
-            compositorBuf.Get_region(newRegion, intArray);
+            Kdu_coords newOffset = newRegion.Access_pos();
+            newOffset.Subtract(actualOffset);
 
-            int srcIdx = 0;
-            int dstIdx = newOffset.Get_x() + newOffset.Get_y() * aWidth;
+            int theHeight = intArray.length / newWidth;
 
-            if (numComponents < 3) {
-                for (int row = 0; row < newHeight; row++, dstIdx += aWidth, srcIdx += newWidth) {
-                    for (int col = 0; col < newWidth; ++col) {
-                        byteBuffer.put(dstIdx + col, (byte) (intArray[srcIdx + col] & 0xFF));
+            Kdu_dims theRegion = new Kdu_dims();
+            Kdu_coords theSize = theRegion.Access_size();
+            theSize.Set_x(newWidth);
+            theSize.Set_y(theHeight);
+            theRegion.Access_pos().Assign(newOffset);
+
+            while (!(theRegion = theRegion.Intersection(newRegion)).Is_empty()) { // slide with buffer top to bottom
+                compositorBuf.Get_region(theRegion, intArray);
+
+                Kdu_coords theOffset = theRegion.Access_pos();
+                int yOff = theOffset.Get_y();
+                int dstIdx = theOffset.Get_x() + yOff * aWidth;
+                int height = theRegion.Access_size().Get_y();
+
+                if (numComponents < 3) {
+                    for (int row = 0, srcIdx = 0; row < height; row++, dstIdx += aWidth, srcIdx += newWidth) {
+                        for (int col = 0; col < newWidth; ++col) {
+                            byteBuffer.put(dstIdx + col, (byte) (intArray[srcIdx + col] & 0xFF));
+                        }
                     }
+                } else {
+                    for (int row = 0, srcIdx = 0; row < height; row++, dstIdx += aWidth, srcIdx += newWidth) {
+                        intBuffer.position(dstIdx);
+                        intBuffer.put(intArray, srcIdx, newWidth);
+                    }
+                    intBuffer.rewind();
                 }
-            } else {
-                for (int row = 0; row < newHeight; row++, dstIdx += aWidth, srcIdx += newWidth) {
-                    intBuffer.position(dstIdx);
-                    intBuffer.put(intArray, srcIdx, newWidth);
-                }
-                intBuffer.rewind();
+                theOffset.Set_y(yOff + height);
             }
         }
 
