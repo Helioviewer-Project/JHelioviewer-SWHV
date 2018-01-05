@@ -91,7 +91,7 @@ public class GLLine {
             indicesBuffer.put(j + 1);
             indicesBuffer.put(j + 3);
         }
-        indicesBuffer.flip();
+        indicesBuffer.rewind();
         return indicesBuffer;
     }
 
@@ -138,11 +138,11 @@ public class GLLine {
         addPoint(nextLineBuffer, points, 3 * (plen - 1), 3);
         addPoint(colorBuffer, colors, 4 * (plen - 1), 4);
 
-        previousLineBuffer.flip();
-        lineBuffer.flip();
-        nextLineBuffer.flip();
-        directionBuffer.flip();
-        colorBuffer.flip();
+        previousLineBuffer.rewind();
+        lineBuffer.rewind();
+        nextLineBuffer.rewind();
+        directionBuffer.rewind();
+        colorBuffer.rewind();
 
         vbos[0].bindBufferData(gl, previousLineBuffer, Buffers.SIZEOF_FLOAT);
         vbos[1].bindBufferData(gl, lineBuffer, Buffers.SIZEOF_FLOAT);

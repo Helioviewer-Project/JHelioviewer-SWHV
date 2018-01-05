@@ -117,8 +117,8 @@ class PfssLine {
                 }
             }
         }
-        vertices.flip();
-        colors.flip();
+        vertices.rewind();
+        colors.rewind();
 
         line.setData(gl, vertices, colors);
     }

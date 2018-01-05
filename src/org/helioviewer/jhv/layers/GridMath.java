@@ -54,8 +54,8 @@ class GridMath {
         BufferUtils.put3f(positionBuffer, 0, AXIS_STOP, 0);
         colorBuffer.put(axisNorthColor);
 
-        positionBuffer.flip();
-        colorBuffer.flip();
+        positionBuffer.rewind();
+        colorBuffer.rewind();
         axesLine.setData(gl, positionBuffer, colorBuffer);
     }
 
@@ -100,8 +100,8 @@ class GridMath {
         BufferUtils.put3f(positionBuffer, rotv);
         colorBuffer.put(BufferUtils.colorNull);
 
-        positionBuffer.flip();
-        colorBuffer.flip();
+        positionBuffer.rewind();
+        colorBuffer.rewind();
         earthCircleLine.setData(gl, positionBuffer, colorBuffer);
     }
 
@@ -165,10 +165,10 @@ class GridMath {
             BufferUtils.put3f(positionBuffer, rotv2);
             colorBuffer.put(BufferUtils.colorNull);
         }
-        positionBuffer.flip();
-        colorBuffer.flip();
-        positionThick.flip();
-        colorThick.flip();
+        positionBuffer.rewind();
+        colorBuffer.rewind();
+        positionThick.rewind();
+        colorThick.rewind();
 
         radialCircleLine.setData(gl, positionBuffer, colorBuffer);
         radialThickLine.setData(gl, positionThick, colorThick);
@@ -218,8 +218,8 @@ class GridMath {
             BufferUtils.put3f(positionBuffer, w / 2, start, 0);
             colorBuffer.put(BufferUtils.colorNull);
         }
-        positionBuffer.flip();
-        colorBuffer.flip();
+        positionBuffer.rewind();
+        colorBuffer.rewind();
         flatLine.setData(gl, positionBuffer, colorBuffer);
     }
 
@@ -243,17 +243,13 @@ class GridMath {
                     v.y = GRID_RADIUS * Math.sin(-Math.PI / 2 + Math.PI * i / HALFDIVISIONS);
                     v.z = 0.;
                     Vec3 rotv = q.rotateVector(v);
+
                     if (i == 0) {
                         BufferUtils.put3f(positionBuffer, rotv);
                         colorBuffer.put(BufferUtils.colorNull);
                     }
                     BufferUtils.put3f(positionBuffer, rotv);
-                    if (i % 2 == 0) {
-                        colorBuffer.put(color1);
-                    } else {
-                        colorBuffer.put(color2);
-                    }
-
+                    colorBuffer.put(i % 2 == 0 ? color1 : color2);
                     if (i == HALFDIVISIONS) {
                         BufferUtils.put3f(positionBuffer, rotv);
                         colorBuffer.put(BufferUtils.colorNull);
@@ -270,16 +266,13 @@ class GridMath {
                     v.y = GRID_RADIUS * scale;
                     v.x = GRID_RADIUS * Math.sqrt(1. - scale * scale) * Math.sin(2 * Math.PI * i / HALFDIVISIONS);
                     v.z = GRID_RADIUS * Math.sqrt(1. - scale * scale) * Math.cos(2 * Math.PI * i / HALFDIVISIONS);
+
                     if (i == 0) {
                         BufferUtils.put3f(positionBuffer, v);
                         colorBuffer.put(BufferUtils.colorNull);
                     }
                     BufferUtils.put3f(positionBuffer, v);
-                    if (i % 2 == 0) {
-                        colorBuffer.put(color1);
-                    } else {
-                        colorBuffer.put(color2);
-                    }
+                    colorBuffer.put(i % 2 == 0 ? color1 : color2);
                     if (i == HALFDIVISIONS) {
                         BufferUtils.put3f(positionBuffer, v);
                         colorBuffer.put(BufferUtils.colorNull);
@@ -288,8 +281,8 @@ class GridMath {
             }
         }
 
-        positionBuffer.flip();
-        colorBuffer.flip();
+        positionBuffer.rewind();
+        colorBuffer.rewind();
         gridLine.setData(gl, positionBuffer, colorBuffer);
     }
 
