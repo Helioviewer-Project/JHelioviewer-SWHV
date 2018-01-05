@@ -11,8 +11,7 @@ import com.google.common.cache.CacheBuilder;
 public class PfssCache {
 
     private final TreeMap<Long, String> map = new TreeMap<>();
-    private final Cache<String, PfssData> cache = CacheBuilder.newBuilder().maximumSize(128).build();
-    // 276480 direct + 320 JVM ~ 34MB
+    private final Cache<String, PfssData> cache = CacheBuilder.newBuilder().softValues().build();
 
     void put(Map<Long, String> urls) {
         map.putAll(urls);
