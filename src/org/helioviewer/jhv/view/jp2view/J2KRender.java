@@ -25,9 +25,9 @@ class J2KRender implements Runnable {
 
     private static final int MAX_INACTIVE_LAYERS = 200;
 
-    private static final ThreadLocal<int[]> bufferLocal = ThreadLocal.withInitial(() -> new int[KakaduConstants.MAX_RENDER_SAMPLES]);
-    private static final ThreadLocal<Kdu_thread_env> threadLocal = ThreadLocal.withInitial(J2KRender::createThreadEnv);
-    private static final ThreadLocal<KakaduEngine> engineLocal = new ThreadLocal<>();
+    private static final ThreadLocal<int[]> localArray = ThreadLocal.withInitial(() -> new int[KakaduConstants.MAX_RENDER_SAMPLES]);
+    private static final ThreadLocal<Kdu_thread_env> localThread = ThreadLocal.withInitial(J2KRender::createThreadEnv);
+    private static final ThreadLocal<KakaduEngine> localEngine = new ThreadLocal<>();
 
     private static final int[] firstComponent = { 0 };
 
@@ -77,8 +77,6 @@ class J2KRender implements Runnable {
         Kdu_coords actualSize = actualRenderedRegion.Access_size();
         int aWidth = actualSize.Get_x(), aHeight = actualSize.Get_y();
 
-        Kdu_dims newRegion = new Kdu_dims();
-
         ByteBuffer byteBuffer = null;
         IntBuffer intBuffer = null;
 
@@ -88,7 +86,8 @@ class J2KRender implements Runnable {
             intBuffer = BufferUtils.newIntBuffer(aWidth * aHeight);
         }
 
-        int[] localIntBuffer = bufferLocal.get();
+        int[] intArray = localArray.get();
+        Kdu_dims newRegion = new Kdu_dims();
         while (compositor.Process(KakaduConstants.MAX_RENDER_SAMPLES, newRegion)) {
             Kdu_coords newOffset = newRegion.Access_pos();
             Kdu_coords newSize = newRegion.Access_size();
@@ -102,8 +101,8 @@ class J2KRender implements Runnable {
                 continue;
             }
 
-            localIntBuffer = newPixels > localIntBuffer.length ? new int[newPixels] : localIntBuffer;
-            compositorBuf.Get_region(newRegion, localIntBuffer);
+            intArray = newPixels > intArray.length ? new int[newPixels] : intArray;
+            compositorBuf.Get_region(newRegion, intArray);
 
             int srcIdx = 0;
             int dstIdx = newOffset.Get_x() + newOffset.Get_y() * aWidth;
@@ -111,13 +110,13 @@ class J2KRender implements Runnable {
             if (numComponents < 3) {
                 for (int row = 0; row < newHeight; row++, dstIdx += aWidth, srcIdx += newWidth) {
                     for (int col = 0; col < newWidth; ++col) {
-                        byteBuffer.put(dstIdx + col, (byte) (localIntBuffer[srcIdx + col] & 0xFF));
+                        byteBuffer.put(dstIdx + col, (byte) (intArray[srcIdx + col] & 0xFF));
                     }
                 }
             } else {
                 for (int row = 0; row < newHeight; row++, dstIdx += aWidth, srcIdx += newWidth) {
                     intBuffer.position(dstIdx);
-                    intBuffer.put(localIntBuffer, srcIdx, newWidth);
+                    intBuffer.put(intArray, srcIdx, newWidth);
                 }
                 intBuffer.rewind();
             }
@@ -138,16 +137,16 @@ class J2KRender implements Runnable {
     @Override
     public void run() {
         try {
-            KakaduEngine kduEngine = engineLocal.get();
+            KakaduEngine kduEngine = localEngine.get();
             if (kduEngine == null) {
-                kduEngine = viewRef.getRenderEngine(threadLocal.get());
-                engineLocal.set(kduEngine);
+                kduEngine = viewRef.getRenderEngine(localThread.get());
+                localEngine.set(kduEngine);
             }
             renderLayer(kduEngine.getCompositor());
         } catch (Exception e) {
             // reboot the compositor
-            engineLocal.set(null);
-            threadLocal.remove();
+            localEngine.set(null);
+            localThread.remove();
             e.printStackTrace();
         }
     }

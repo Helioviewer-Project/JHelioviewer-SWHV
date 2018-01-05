@@ -63,13 +63,13 @@ public class IcoSphere {
                 vert = Math.nextAfter(vert, vert + 1.0f);
             positionBuffer.put(vert);
         }
-        positionBuffer.flip();
+        positionBuffer.rewind();
 
         IntBuffer indexBuffer = BufferUtils.newIntBuffer(faceIndices.size());
         for (int i : faceIndices) {
             indexBuffer.put(i);
         }
-        indexBuffer.flip();
+        indexBuffer.rewind();
 
         return new Pair<>(positionBuffer, indexBuffer);
     }
