@@ -55,7 +55,7 @@ public abstract class GridScale {
         protected double yStop;
         protected final Transform transform;
 
-        private GridScaleAbstract(double _xStart, double _xStop, double _yStart, double _yStop, Transform _transform) {
+        GridScaleAbstract(double _xStart, double _xStop, double _yStart, double _yStop, Transform _transform) {
             set(_xStart, _xStop, _yStart, _yStop);
             transform = _transform;
         }

@@ -3,13 +3,11 @@ package org.helioviewer.jhv.export;
 import java.awt.EventQueue;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.lang.ref.SoftReference;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.base.ImageUtils;
 import org.helioviewer.jhv.base.image.MappedImageFactory;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
@@ -163,14 +161,19 @@ public class ExportMovie implements FrameListener {
 
         private final MovieExporter movieExporter;
         private final BufferedImage mainImage;
-        private final SoftReference<BufferedImage> eveRef;
+        private final BufferedImage eveImage;
         private final int frameH;
         private final int movieLinePosition;
 
-        FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eveImage, int _movieLinePosition) {
+        FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eveImage, int _movieLinePosition) throws Exception {
             movieExporter = _movieExporter;
             mainImage = _mainImage;
-            eveRef = new SoftReference<>(_eveImage == null ? null : ImageUtils.deepCopy(_eveImage));
+            if (_eveImage == null)
+                eveImage = null;
+            else {
+                eveImage = MappedImageFactory.createCompatibleMappedImage(_eveImage.getWidth(), _eveImage.getHeight(), _eveImage.getType());
+                _eveImage.copyData(eveImage.getRaster());
+            }
             frameH = grabber.h;
             movieLinePosition = _movieLinePosition;
         }
@@ -178,7 +181,7 @@ public class ExportMovie implements FrameListener {
         @Override
         public void run() {
             try {
-                ExportUtils.pasteCanvases(mainImage, frameH, eveRef.get(), movieLinePosition, movieExporter.getHeight());
+                ExportUtils.pasteCanvases(mainImage, frameH, eveImage, movieLinePosition, movieExporter.getHeight());
                 movieExporter.encode(mainImage);
             } catch (Exception e) {
                 e.printStackTrace();

@@ -2,8 +2,8 @@ package org.helioviewer.jhv.export;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 
@@ -36,25 +36,23 @@ class ExportUtils {
         if (im2 == null)
             return;
 
-        AffineTransformOp op = new AffineTransformOp(AffineTransform.getScaleInstance(1, 1), AffineTransformOp.TYPE_BILINEAR);
-        im2 = op.filter(im2, null);
-
-        Graphics2D g2 = im1.createGraphics();
-        g2.drawImage(im2, 0, frameH, im1.getWidth(), finalH - frameH, null);
+        Graphics2D g = im1.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.drawImage(im2, 0, frameH, im1.getWidth(), finalH - frameH, null);
 
         if (ExportMovie.EVEMovieLinePosition != -1) {
-            g2.setColor(Color.BLACK);
+            g.setColor(Color.BLACK);
 
             double scaleY = (finalH - frameH) / (double) im2.getHeight();
             double scaleX = im1.getWidth() / (double) im2.getWidth();
 
             AffineTransform at = AffineTransform.getTranslateInstance(0, frameH);
             at.concatenate(AffineTransform.getScaleInstance(scaleX, scaleY));
-            g2.setTransform(at);
-            g2.drawLine(movieLinePosition * GLInfo.pixelScale[0], 0, movieLinePosition * GLInfo.pixelScale[0], im2.getHeight());
+            g.setTransform(at);
+            g.drawLine(movieLinePosition * GLInfo.pixelScale[0], 0, movieLinePosition * GLInfo.pixelScale[0], im2.getHeight());
         }
 
-        g2.dispose();
+        g.dispose();
     }
 
 }

@@ -82,11 +82,11 @@ public final class MappedImageFactory {
         return createCompatibleMappedImage(width, height, type.getSampleModel(width, height), type.getColorModel());
     }
 
-    static BufferedImage createCompatibleMappedImage(int width, int height, ColorModel cm) throws IOException {
+    private static BufferedImage createCompatibleMappedImage(int width, int height, ColorModel cm) throws IOException {
         return createCompatibleMappedImage(width, height, cm.createCompatibleSampleModel(width, height), cm);
     }
 
-    static BufferedImage createCompatibleMappedImage(int width, int height, SampleModel sm, ColorModel cm) throws IOException {
+    private static BufferedImage createCompatibleMappedImage(int width, int height, SampleModel sm, ColorModel cm) throws IOException {
         DataBuffer buffer = MappedFileBuffer.create(sm.getTransferType(), width * height * sm.getNumDataElements(), 1);
         return new BufferedImage(cm, RasterFactory.factory.createRaster(sm, buffer, new Point()), cm.isAlphaPremultiplied(), null);
     }
