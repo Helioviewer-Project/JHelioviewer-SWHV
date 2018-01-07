@@ -28,11 +28,13 @@
 
 package org.helioviewer.jhv.base.image;
 
-import javax.imageio.ImageTypeSpecifier;
-import java.awt.*;
+import java.awt.GraphicsConfiguration;
+import java.awt.Point;
 import java.awt.image.*;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+
+import javax.imageio.ImageTypeSpecifier;
 
 /**
  * A factory for creating {@link BufferedImage}s backed by memory mapped files.

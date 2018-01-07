@@ -2,18 +2,13 @@ package org.helioviewer.jhv.timelines.radio;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
-import java.awt.image.DataBuffer;
-import java.awt.image.SampleModel;
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.base.image.RasterFactory;
+import org.helioviewer.jhv.base.image.NIOBufferImageFactory;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.imagedata.Single8ImageData;
@@ -96,40 +91,9 @@ class RadioJP2Data implements ImageDataHandler {
             }
 
             region = imageData.getRegion();
-            bufferedImage = createBufferedImage(w, h, imageData.getBuffer());
+            bufferedImage = NIOBufferImageFactory.createIndexed(imageData.getBuffer(), w, h, RadioData.getColorModel());
 
             DrawController.drawRequest();
-        }
-    }
-
-    private static BufferedImage createBufferedImage(int width, int height, Buffer buffer) {
-        ByteBufferData dataBuffer = new ByteBufferData().setBuffer((ByteBuffer) buffer);
-        BufferedImage temp = new BufferedImage(1, 1, BufferedImage.TYPE_BYTE_INDEXED, RadioData.getColorModel());
-        SampleModel sm = temp.getSampleModel().createCompatibleSampleModel(width, height);
-        return new BufferedImage(temp.getColorModel(), RasterFactory.factory.createRaster(sm, dataBuffer, new Point()), false, null);
-    }
-
-    private static class ByteBufferData extends DataBuffer {
-
-        private ByteBuffer buffer;
-
-        ByteBufferData() {
-            super(DataBuffer.TYPE_BYTE, 0, 0);
-        }
-
-        ByteBufferData setBuffer(ByteBuffer _buffer) {
-            buffer = _buffer;
-            return this;
-        }
-
-        @Override
-        public int getElem(int bank, int i) {
-            return buffer.get(i) & 0xff;
-        }
-
-        @Override
-        public void setElem(int bank, int i, int val) {
-            buffer.put(i, (byte) val);
         }
     }
 

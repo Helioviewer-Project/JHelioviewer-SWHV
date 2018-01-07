@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutorService;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.image.MappedImageFactory;
+import org.helioviewer.jhv.base.image.NIOBufferImageFactory;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -69,7 +70,7 @@ public class ExportMovie implements FrameListener {
         try {
             BufferedImage screen = MappedImageFactory.createCompatibleMappedImage(grabber.w, exporter.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
             grabber.renderFrame(camera, gl, MappedImageFactory.getByteBuffer(screen));
-            BufferedImage eve = EVEImage == null ? null : MappedImageFactory.copyImage(EVEImage);
+            BufferedImage eve = EVEImage == null ? null : NIOBufferImageFactory.copyImage(EVEImage);
             encodeExecutor.execute(new FrameConsumer(exporter, screen, eve, EVEMovieLinePosition));
         } catch (Exception e) {
             e.printStackTrace();
