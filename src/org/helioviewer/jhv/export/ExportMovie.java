@@ -31,7 +31,6 @@ public class ExportMovie implements FrameListener {
     private static boolean stopped;
     private static boolean shallStop;
 
-    private static final ExecutorService xformExecutor = Executors.newFixedThreadPool(1, new JHVThread.NamedThreadFactory("Movie Transform"));
     private static final ExecutorService encodeExecutor = Executors.newFixedThreadPool(1, new JHVThread.NamedThreadFactory("Movie Encode"));
 
     public static BufferedImage EVEImage = null;
@@ -40,11 +39,10 @@ public class ExportMovie implements FrameListener {
     public void disposeMovieWriter(boolean keep) {
         if (exporter != null) {
             if (keep) {
-                xformExecutor.execute(new CloseWriter1(exporter, true));
+                encodeExecutor.execute(new CloseWriter(exporter, true));
             } else {
-                xformExecutor.shutdownNow();
                 encodeExecutor.shutdownNow();
-                new CloseWriter2(exporter, false).run();
+                new CloseWriter(exporter, false).run();
             }
             exporter = null;
         }
@@ -72,7 +70,7 @@ public class ExportMovie implements FrameListener {
             BufferedImage screen = MappedImageFactory.createCompatibleMappedImage(grabber.w, exporter.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
             grabber.renderFrame(camera, gl, MappedImageFactory.getByteBuffer(screen));
             BufferedImage eve = EVEImage == null ? null : MappedImageFactory.copyImage(EVEImage);
-            xformExecutor.execute(new Transformer(exporter, screen, eve, EVEMovieLinePosition));
+            encodeExecutor.execute(new FrameConsumer(exporter, screen, eve, EVEMovieLinePosition));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -160,7 +158,7 @@ public class ExportMovie implements FrameListener {
             shallStop = true;
     }
 
-    private static class Transformer implements Runnable {
+    private static class FrameConsumer implements Runnable {
 
         private final MovieExporter movieExporter;
         private final BufferedImage mainImage;
@@ -168,7 +166,7 @@ public class ExportMovie implements FrameListener {
         private final int frameH;
         private final int movieLinePosition;
 
-        Transformer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eveImage, int _movieLinePosition) throws Exception {
+        FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eveImage, int _movieLinePosition) throws Exception {
             movieExporter = _movieExporter;
             mainImage = _mainImage;
             eveImage = _eveImage;
@@ -180,7 +178,7 @@ public class ExportMovie implements FrameListener {
         public void run() {
             try {
                 ExportUtils.pasteCanvases(mainImage, frameH, eveImage, movieLinePosition, movieExporter.getHeight());
-                encodeExecutor.execute(new Encoder(movieExporter, mainImage));
+                movieExporter.encode(mainImage);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -188,50 +186,12 @@ public class ExportMovie implements FrameListener {
 
     }
 
-    private static class Encoder implements Runnable {
-
-        private final MovieExporter movieExporter;
-        private final BufferedImage image;
-
-        Encoder(MovieExporter _movieExporter, BufferedImage _image) {
-            movieExporter = _movieExporter;
-            image = _image;
-        }
-
-        @Override
-        public void run() {
-            try {
-                movieExporter.encode(image);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
-
-    private static class CloseWriter1 implements Runnable {
+    private static class CloseWriter implements Runnable {
 
         private final MovieExporter movieExporter;
         private final boolean keep;
 
-        CloseWriter1(MovieExporter _movieExporter, boolean _keep) {
-            movieExporter = _movieExporter;
-            keep = _keep;
-        }
-
-        @Override
-        public void run() {
-            encodeExecutor.execute(new CloseWriter2(movieExporter, keep));
-        }
-    }
-
-
-    private static class CloseWriter2 implements Runnable {
-
-        private final MovieExporter movieExporter;
-        private final boolean keep;
-
-        CloseWriter2(MovieExporter _movieExporter, boolean _keep) {
+        CloseWriter(MovieExporter _movieExporter, boolean _keep) {
             movieExporter = _movieExporter;
             keep = _keep;
         }
