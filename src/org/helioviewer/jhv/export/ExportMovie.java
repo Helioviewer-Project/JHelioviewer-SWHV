@@ -69,7 +69,8 @@ public class ExportMovie implements FrameListener {
         try {
             BufferedImage screen = MappedImageFactory.createCompatibleMappedImage(grabber.w, exporter.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
             grabber.renderFrame(camera, gl, MappedImageFactory.getByteBuffer(screen));
-            encodeExecutor.execute(new FrameConsumer(exporter, screen, EVEImage, EVEMovieLinePosition));
+            BufferedImage eve = EVEImage == null ? null : MappedImageFactory.copyImage(EVEImage);
+            encodeExecutor.execute(new FrameConsumer(exporter, screen, eve, EVEMovieLinePosition));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -168,12 +169,7 @@ public class ExportMovie implements FrameListener {
         FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eveImage, int _movieLinePosition) throws Exception {
             movieExporter = _movieExporter;
             mainImage = _mainImage;
-            if (_eveImage == null)
-                eveImage = null;
-            else {
-                eveImage = MappedImageFactory.createCompatibleMappedImage(_eveImage.getWidth(), _eveImage.getHeight(), _eveImage.getType());
-                _eveImage.copyData(eveImage.getRaster());
-            }
+            eveImage = _eveImage;
             frameH = grabber.h;
             movieLinePosition = _movieLinePosition;
         }
