@@ -33,9 +33,11 @@ public class GLGrab {
     }
 
     public void dispose(GL2 gl) {
-        fbo.detachAll(gl);
-        fbo.destroy(gl);
-        fboTex.free(gl);
+        if (fbo != null) {
+            fbo.detachAll(gl);
+            fbo.destroy(gl);
+            fboTex.free(gl);
+        }
     }
 
     public void renderFrame(Camera camera, GL2 gl, Buffer buffer) {
