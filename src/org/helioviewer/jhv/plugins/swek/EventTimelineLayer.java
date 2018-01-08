@@ -101,10 +101,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
             }
         }
         eventUnderMouse = shouldRedraw;
-    }
 
-    @Override
-    public void drawHighlighted(Graphics2D g, Rectangle graphArea, TimeAxis xAxis, Point mousePosition) {
         if (mousePosition != null) {
             if (highlightedEvent != null) {
                 int x0 = xAxis.value2pixel(graphArea.x, graphArea.width, highlightedEvent.getStart());

@@ -1,11 +1,8 @@
 package org.helioviewer.jhv.timelines;
 
-import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
 
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
-import org.helioviewer.jhv.timelines.draw.TimeAxis;
 
 public abstract class AbstractTimelineLayer implements TimelineLayer {
 
@@ -28,10 +25,6 @@ public abstract class AbstractTimelineLayer implements TimelineLayer {
     @Override
     public boolean highLightChanged(Point p) {
         return false;
-    }
-
-    @Override
-    public void drawHighlighted(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
     }
 
     @Override

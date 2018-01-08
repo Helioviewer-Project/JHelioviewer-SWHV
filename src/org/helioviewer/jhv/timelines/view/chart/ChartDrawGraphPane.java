@@ -20,7 +20,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Date;
-import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
@@ -166,14 +165,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void drawData(Graphics2D fullG, Graphics2D plotG, Rectangle graphArea, TimeAxis xAxis) {
-        List<TimelineLayer> list = TimelineLayers.get();
-        for (TimelineLayer tl : list) {
+        for (TimelineLayer tl : TimelineLayers.get()) {
             tl.draw(plotG, graphArea, xAxis, mousePosition);
         }
         drawLabels(fullG, graphArea, xAxis);
-        for (TimelineLayer tl : list) {
-            tl.drawHighlighted(plotG, graphArea, xAxis, mousePosition);
-        }
     }
 
     private static void drawBackground(Graphics2D g, int width, int height) {
@@ -462,12 +457,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         return movieLinePosition >= 0 && movieLinePosition - 3 <= p.x && p.x <= movieLinePosition + 3;
     }
 
-    private boolean highlightChanged() {
-        if (mousePosition == null) {
-            return false;
-        }
+    private boolean highlightChanged(Point p) {
         for (TimelineLayer tl : TimelineLayers.get()) {
-            if (tl.highLightChanged(mousePosition)) {
+            if (tl.highLightChanged(p)) {
                 return true;
             }
         }
@@ -487,7 +479,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             setCursor(Cursor.getDefaultCursor());
         }
 
-        if (highlightChanged()) {
+        if (highlightChanged(mousePosition)) {
             drawRequest();
         } else {
             repaint(); // for timeline values

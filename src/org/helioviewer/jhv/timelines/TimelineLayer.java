@@ -37,8 +37,6 @@ public interface TimelineLayer {
 
     void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition);
 
-    void drawHighlighted(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition);
-
     YAxis getYAxis();
 
     void fetchData(TimeAxis selectedAxis);
