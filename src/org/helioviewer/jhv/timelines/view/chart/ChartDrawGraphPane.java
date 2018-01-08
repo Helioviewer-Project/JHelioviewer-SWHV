@@ -140,7 +140,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         int width = sx * (int) graphSize.getWidth();
         int height = sy * (int) graphSize.getHeight();
 
-        if (width > 0 && height > 0 && sy * (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE + 1) < height && sx * (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + 1) < width) {
+        if (width > 0 && height > 0) {
             if (width != lastWidth || height != lastHeight) {
                 screenImage = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(width, height, Transparency.OPAQUE);
                 ExportMovie.EVEImage = screenImage;
@@ -148,26 +148,20 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 lastWidth = width;
                 lastHeight = height;
             }
-            Graphics2D g = screenImage.createGraphics();
-            AffineTransform tf = g.getTransform();
-            tf.preConcatenate(AffineTransform.getScaleInstance(sx, sy));
-            g.setTransform(tf);
-            drawBackground(g, (int) graphSize.getWidth(), (int) graphSize.getHeight());
-            if (graphArea.width > 0 && graphArea.height > 0) {
-                g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-                g.setFont(DrawConstants.font);
-                BufferedImage plotPart = screenImage.getSubimage(sx * DrawConstants.GRAPH_LEFT_SPACE, sy * DrawConstants.GRAPH_TOP_SPACE, sx * graphArea.width, sy * graphArea.height);
-                Graphics2D gplotPart = plotPart.createGraphics();
-                AffineTransform plottf = new AffineTransform();
-                plottf.preConcatenate(AffineTransform.getScaleInstance(sx, sy));
-                plottf.translate(-graphArea.x, -graphArea.y);
-                gplotPart.setTransform(plottf);
-                gplotPart.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-                gplotPart.setFont(DrawConstants.font);
-                drawData(g, gplotPart, graphArea, DrawController.selectedAxis);
-                gplotPart.dispose();
-            }
-            g.dispose();
+
+            Graphics2D fullG = screenImage.createGraphics();
+            drawBackground(fullG, screenImage.getWidth(), screenImage.getHeight());
+
+            fullG.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            fullG.setFont(DrawConstants.font);
+            fullG.setTransform(AffineTransform.getScaleInstance(sx, sy));
+
+            Graphics2D plotG = (Graphics2D) fullG.create();
+            plotG.setClip(graphArea);
+            drawData(fullG, plotG, graphArea, DrawController.selectedAxis);
+
+            plotG.dispose();
+            fullG.dispose();
         }
     }
 
@@ -482,13 +476,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        Rectangle graphArea = DrawController.getGraphArea();
         mousePosition = e.getPoint();
         if (overMovieLine(mousePosition)) {
             setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
         } else if (TimelineLayers.getDrawableUnderMouse() != null) {
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        } else if (mousePosition.x >= graphArea.x && mousePosition.x <= graphArea.x + graphArea.width && mousePosition.y >= graphArea.y && mousePosition.y <= graphArea.y + graphArea.height) {
+        } else if (DrawController.getGraphArea().contains(mousePosition)) {
             setCursor(UIGlobals.openHandCursor);
         } else {
             setCursor(Cursor.getDefaultCursor());
