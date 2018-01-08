@@ -40,7 +40,7 @@ class ExportUtils {
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         g.drawImage(im2, 0, frameH, im1.getWidth(), finalH - frameH, null);
 
-        if (ExportMovie.EVEMovieLinePosition != -1) {
+        if (movieLinePosition != -1) {
             g.setColor(Color.BLACK);
 
             double scaleY = (finalH - frameH) / (double) im2.getHeight();
