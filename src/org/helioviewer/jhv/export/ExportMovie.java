@@ -32,7 +32,7 @@ public class ExportMovie implements FrameListener {
     private static boolean stopped;
     private static boolean shallStop;
 
-    private static final ExecutorService encodeExecutor = Executors.newFixedThreadPool(1, new JHVThread.NamedThreadFactory("Movie Encode"));
+    private final ExecutorService encodeExecutor = Executors.newFixedThreadPool(1, new JHVThread.NamedThreadFactory("Movie Encode"));
 
     public static BufferedImage EVEImage = null;
     public static int EVEMovieLinePosition = -1;
@@ -71,7 +71,7 @@ public class ExportMovie implements FrameListener {
             BufferedImage screen = MappedImageFactory.createCompatibleMappedImage(grabber.w, exporter.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
             grabber.renderFrame(camera, gl, MappedImageFactory.getByteBuffer(screen));
             BufferedImage eve = EVEImage == null ? null : NIOBufferImageFactory.copyImage(EVEImage);
-            encodeExecutor.execute(new FrameConsumer(exporter, screen, eve, EVEMovieLinePosition));
+            encodeExecutor.execute(new FrameConsumer(exporter, screen, grabber.h, eve, EVEMovieLinePosition));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -167,11 +167,11 @@ public class ExportMovie implements FrameListener {
         private final int frameH;
         private final int movieLinePosition;
 
-        FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eveImage, int _movieLinePosition) throws Exception {
+        FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, int _frameH, BufferedImage _eveImage, int _movieLinePosition) throws Exception {
             movieExporter = _movieExporter;
             mainImage = _mainImage;
             eveImage = _eveImage;
-            frameH = grabber.h;
+            frameH = _frameH;
             movieLinePosition = _movieLinePosition;
         }
 
