@@ -19,7 +19,6 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.util.Date;
 
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
@@ -226,7 +225,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private static void drawHorizontalLabels(Graphics2D g, Rectangle graphArea, TimeAxis xAxis) {
-        Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(new Date(xAxis.start)), g);
+        Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(xAxis.start), g);
         int tickTextWidth = (int) tickTextBounds.getWidth();
         int tickTextHeight = (int) tickTextBounds.getHeight();
         int horizontalTickCount = Math.max(2, (graphArea.width - tickTextWidth * 2) / tickTextWidth);
