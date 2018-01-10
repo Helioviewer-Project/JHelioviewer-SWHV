@@ -105,8 +105,10 @@ public class ObservationDialog extends StandardDialog {
     }
 
     public void loadButtonPressed() {
-        if (observationPanel.doLoad(layer))
+        if (observationPanel.doLoad(layer)) {
             setVisible(false);
+            layer = null;
+        }
     }
 
     public void setAvailabilityStatus(boolean status) {
