@@ -68,7 +68,7 @@ public class ImageDataPanel extends JPanel {
             timeSelectionPanel.setEndTime(item.end);
 
             if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
-                loadRemote(ImageLayer.create(null), item);
+                loadRemote(null, item);
             }
         }
     }
@@ -91,6 +91,8 @@ public class ImageDataPanel extends JPanel {
     }
 
     private void loadRemote(ImageLayer layer, DataSourcesTree.SourceItem item) { // valid item
+        if (layer == null)
+            layer = ImageLayer.create(null);
         layer.load(new APIRequest(item.server, item.sourceId, getStartTime(), getEndTime(), getCadence()));
     }
 
@@ -116,9 +118,6 @@ public class ImageDataPanel extends JPanel {
             JOptionPane.showMessageDialog(null, "End date is before start date", "", JOptionPane.ERROR_MESSAGE);
             return false;
         }
-
-        if (layer == null) // other than ObservationDialog
-            layer = ImageLayer.create(null);
 
         loadRemote((ImageLayer) layer, item);
         return true;
