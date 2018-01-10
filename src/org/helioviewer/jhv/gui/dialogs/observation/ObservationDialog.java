@@ -58,6 +58,7 @@ public class ObservationDialog extends StandardDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 layer.unload();
+                layer = null;
                 setVisible(false);
             }
         };
@@ -104,7 +105,7 @@ public class ObservationDialog extends StandardDialog {
     }
 
     public void loadButtonPressed() {
-        if (observationPanel.loadButtonPressed(layer))
+        if (observationPanel.doLoad(layer))
             setVisible(false);
     }
 

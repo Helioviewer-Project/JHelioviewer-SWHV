@@ -25,7 +25,6 @@ import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataSourcesParser;
 import org.helioviewer.jhv.io.DataSourcesTree;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.TimeUtils;
 
 /**
@@ -95,7 +94,7 @@ public class ImageDataPanel extends JPanel {
         layer.load(new APIRequest(item.server, item.sourceId, getStartTime(), getEndTime(), getCadence()));
     }
 
-    public void setupLayer(ImageLayer layer) {
+    void setupLayer(ImageLayer layer) {
         APIRequest req = layer.getAPIRequest();
         if (req != null) {
             sourcesTree.setSelectedItem(req.server, req.sourceId);
@@ -105,7 +104,7 @@ public class ImageDataPanel extends JPanel {
         }
     }
 
-    boolean loadButtonPressed(Object layer) {
+    boolean doLoad(Object layer) {
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
         if (item == null) { // not valid
             Message.err("Data is not selected", "There is no information on what to add", false);
@@ -118,10 +117,8 @@ public class ImageDataPanel extends JPanel {
             return false;
         }
 
-        if (!(layer instanceof ImageLayer)) { // can't happen
-            Log.error("Not ImageLayer");
-            return false;
-        }
+        if (layer == null) // other than ObservationDialog
+            layer = ImageLayer.create(null);
 
         loadRemote((ImageLayer) layer, item);
         return true;
