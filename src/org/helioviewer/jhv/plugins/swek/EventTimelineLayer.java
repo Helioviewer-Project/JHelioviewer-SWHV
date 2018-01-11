@@ -30,7 +30,6 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
 
     private final YAxis yAxis = new YAxis(0, 0, "Events", false);
     private static EventPlotConfiguration eventUnderMouse;
-    private static JHVRelatedEvents highlightedEvent = null;
 
     public EventTimelineLayer(JSONObject jo) {
         cacheUpdated();
@@ -64,17 +63,16 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
         if (!enabled)
             return;
 
-        highlightedEvent = null;
-
         Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = JHVEventCache.get(xAxis.start, xAxis.end).getAvailableEvents();
         if (events.isEmpty())
             return;
 
         EventPlotConfiguration shouldRedraw = null;
-
         ArrayList<Long> endDates = new ArrayList<>();
         int nrLines = 0;
         int highlightedEventPosition = -1;
+        JHVRelatedEvents highlightedEvent = null;
+
         for (SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap : events.values()) {
             for (JHVRelatedEvents event : eventMap.values()) {
                 int i = 0;
@@ -202,7 +200,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
                 drawText(graphArea, g, event, y, mousePosition);
             }
 
-            return containsMouse ? highlightedEvent = event : null;
+            return containsMouse ? event : null;
         }
 
         private static void drawText(Rectangle graphArea, Graphics2D g, JHVRelatedEvents event, int y, Point mousePosition) {
