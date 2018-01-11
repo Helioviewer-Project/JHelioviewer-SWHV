@@ -89,7 +89,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
 
                 int x0 = xAxis.value2pixel(graphArea.x, graphArea.width, event.getStart());
                 int x1 = xAxis.value2pixel(graphArea.x, graphArea.width, event.getEnd());
-                JHVRelatedEvents rEvent = EventPlotConfiguration.draw(graphArea, event, x0, x1, eventPosition, g, mousePosition);
+                JHVRelatedEvents rEvent = drawEvent(graphArea, event, x0, x1, eventPosition, g, mousePosition);
                 if (rEvent != null) {
                     shouldRedraw = new EventPlotConfiguration(rEvent, x0, x1, eventPosition);
                     highlightedEvent = rEvent;
@@ -103,7 +103,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
             if (highlightedEvent != null) {
                 int x0 = xAxis.value2pixel(graphArea.x, graphArea.width, highlightedEvent.getStart());
                 int x1 = xAxis.value2pixel(graphArea.x, graphArea.width, highlightedEvent.getEnd());
-                EventPlotConfiguration.draw(graphArea, highlightedEvent, x0, x1, highlightedEventPosition, g, mousePosition);
+                drawEvent(graphArea, highlightedEvent, x0, x1, highlightedEventPosition, g, mousePosition);
             }
             JHVEventCache.highlight(highlightedEvent);
         }
@@ -156,7 +156,6 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
     private static class EventPlotConfiguration {
 
         final JHVRelatedEvents event;
-
         final int x0;
         final int x1;
         final int yPosition;
@@ -168,69 +167,70 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
             yPosition = _yPosition;
         }
 
-        static JHVRelatedEvents draw(Rectangle graphArea, JHVRelatedEvents event, int x0, int x1, int yPosition, Graphics2D g, Point mousePosition) {
-            int spacePerLine = 3;
-            int y = graphArea.y + spacePerLine * 2 * yPosition + DrawConstants.EVENT_OFFSET;
-            int w = Math.max(x1 - x0, 1);
-            int h = spacePerLine;
-            if (w < 5) {
-                x0 -= 5 / w;
-                w = 5;
-            }
+    }
 
-            boolean containsMouse = containsPoint(mousePosition, x0 - 1, y - 1, w + 2, h + 2);
-            boolean hl = event.isHighlighted() && containsMouse;
-            int sz = Math.min(w, 8);
-            if (hl) {
-                x0 -= 10;
-                y -= 1;
-                w += 20;
-                h += 2;
-                sz = 12;
-                spacePerLine = h;
-            }
-            g.setColor(event.getColor());
-            g.fillRect(x0, y, w, spacePerLine);
+    private static JHVRelatedEvents drawEvent(Rectangle graphArea, JHVRelatedEvents event, int x0, int x1, int yPosition, Graphics2D g, Point mousePosition) {
+        int spacePerLine = 3;
+        int y = graphArea.y + spacePerLine * 2 * yPosition + DrawConstants.EVENT_OFFSET;
+        int w = Math.max(x1 - x0, 1);
+        int h = spacePerLine;
+        if (w < 5) {
+            x0 -= 5 / w;
+            w = 5;
+        }
 
+        boolean containsMouse = containsPoint(mousePosition, x0 - 1, y - 1, w + 2, h + 2);
+        boolean hl = event.isHighlighted() && containsMouse;
+        int sz = Math.min(w, 8);
+        if (hl) {
+            x0 -= 10;
+            y -= 1;
+            w += 20;
+            h += 2;
+            sz = 12;
+            spacePerLine = h;
+        }
+        g.setColor(event.getColor());
+        g.fillRect(x0, y, w, spacePerLine);
+
+        ImageIcon icon = event.getIcon();
+        g.drawImage(icon.getImage(), x0 + w / 2 - sz / 2, y + h / 2 - sz / 2, x0 + w / 2 + sz / 2, y + h / 2 + sz / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
+
+        if (hl) {
+            drawText(graphArea, g, event, y, mousePosition);
+        }
+
+        return containsMouse ? event : null;
+    }
+
+    private static void drawText(Rectangle graphArea, Graphics2D g, JHVRelatedEvents event, int y, Point mousePosition) {
+        if (mousePosition != null) {
+            long ts = DrawController.selectedAxis.pixel2value(graphArea.x, graphArea.width, mousePosition.x);
+            ArrayList<String> txts = new ArrayList<>();
+            JHVEventParameter[] params = event.getClosestTo(ts).getSimpleVisibleEventParameters();
+            int width = 1;
+            for (JHVEventParameter p : params) {
+                String name = p.getParameterName();
+                if (name != "event_description" && name != "event_title") { // interned
+                    String str = p.getParameterDisplayName() + " : " + p.getSimpleDisplayParameterValue();
+                    txts.add(str);
+                    width = Math.max(width, g.getFontMetrics().stringWidth(str));
+                }
+            }
+            g.setColor(DrawConstants.TEXT_BACKGROUND_COLOR);
+            g.fillRect(mousePosition.x + 5, y, width + 21 + 10, (txts.size()) * 10 + 11);
+            g.setColor(DrawConstants.TEXT_COLOR);
+            y += 5;
             ImageIcon icon = event.getIcon();
-            g.drawImage(icon.getImage(), x0 + w / 2 - sz / 2, y + h / 2 - sz / 2, x0 + w / 2 + sz / 2, y + h / 2 + sz / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
-
-            if (hl) {
-                drawText(graphArea, g, event, y, mousePosition);
-            }
-
-            return containsMouse ? event : null;
-        }
-
-        private static void drawText(Rectangle graphArea, Graphics2D g, JHVRelatedEvents event, int y, Point mousePosition) {
-            if (mousePosition != null) {
-                long ts = DrawController.selectedAxis.pixel2value(graphArea.x, graphArea.width, mousePosition.x);
-                ArrayList<String> txts = new ArrayList<>();
-                JHVEventParameter[] params = event.getClosestTo(ts).getSimpleVisibleEventParameters();
-                int width = 1;
-                for (JHVEventParameter p : params) {
-                    String name = p.getParameterName();
-                    if (name != "event_description" && name != "event_title") { // interned
-                        String str = p.getParameterDisplayName() + " : " + p.getSimpleDisplayParameterValue();
-                        txts.add(str);
-                        width = Math.max(width, g.getFontMetrics().stringWidth(str));
-                    }
-                }
-                g.setColor(DrawConstants.TEXT_BACKGROUND_COLOR);
-                g.fillRect(mousePosition.x + 5, y, width + 21 + 10, (txts.size()) * 10 + 11);
-                g.setColor(DrawConstants.TEXT_COLOR);
-                y += 5;
-                ImageIcon icon = event.getIcon();
-                g.drawImage(icon.getImage(), mousePosition.x + 8, y - 2, mousePosition.x + 24, y + 14, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
-                for (String txt : txts) {
-                    g.drawString(txt, mousePosition.x + 26, y += 10);
-                }
+            g.drawImage(icon.getImage(), mousePosition.x + 8, y - 2, mousePosition.x + 24, y + 14, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
+            for (String txt : txts) {
+                g.drawString(txt, mousePosition.x + 26, y += 10);
             }
         }
+    }
 
-        private static boolean containsPoint(Point p, int clickx, int clicky, int clickw, int clickh) {
-            return p != null && p.x >= clickx && p.x <= clickx + clickw && p.y >= clicky && p.y <= clicky + clickh;
-        }
+    private static boolean containsPoint(Point p, int clickx, int clicky, int clickw, int clickh) {
+        return p != null && p.x >= clickx && p.x <= clickx + clickw && p.y >= clicky && p.y <= clicky + clickh;
     }
 
     @Override
