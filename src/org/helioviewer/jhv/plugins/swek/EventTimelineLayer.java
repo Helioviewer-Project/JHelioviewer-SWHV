@@ -89,7 +89,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
 
                 int x0 = xAxis.value2pixel(graphArea.x, graphArea.width, event.getStart());
                 int x1 = xAxis.value2pixel(graphArea.x, graphArea.width, event.getEnd());
-                JHVRelatedEvents rEvent = EventPlotConfiguration.draw(graphArea, event, x0, x1, eventPosition, g, mousePosition, event.isHighlighted());
+                JHVRelatedEvents rEvent = EventPlotConfiguration.draw(graphArea, event, x0, x1, eventPosition, g, mousePosition);
                 if (rEvent != null) {
                     shouldRedraw = new EventPlotConfiguration(rEvent, x0, x1, eventPosition);
                     highlightedEvent = rEvent;
@@ -103,7 +103,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
             if (highlightedEvent != null) {
                 int x0 = xAxis.value2pixel(graphArea.x, graphArea.width, highlightedEvent.getStart());
                 int x1 = xAxis.value2pixel(graphArea.x, graphArea.width, highlightedEvent.getEnd());
-                EventPlotConfiguration.draw(graphArea, highlightedEvent, x0, x1, highlightedEventPosition, g, mousePosition, highlightedEvent.isHighlighted());
+                EventPlotConfiguration.draw(graphArea, highlightedEvent, x0, x1, highlightedEventPosition, g, mousePosition);
             }
             JHVEventCache.highlight(highlightedEvent);
         }
@@ -168,7 +168,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
             yPosition = _yPosition;
         }
 
-        static JHVRelatedEvents draw(Rectangle graphArea, JHVRelatedEvents event, int x0, int x1, int yPosition, Graphics2D g, Point mousePosition, boolean highlight) {
+        static JHVRelatedEvents draw(Rectangle graphArea, JHVRelatedEvents event, int x0, int x1, int yPosition, Graphics2D g, Point mousePosition) {
             int spacePerLine = 3;
             int y = graphArea.y + spacePerLine * 2 * yPosition + DrawConstants.EVENT_OFFSET;
             int w = Math.max(x1 - x0, 1);
@@ -179,8 +179,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
             }
 
             boolean containsMouse = containsPoint(mousePosition, x0 - 1, y - 1, w + 2, h + 2);
-            boolean eventWasHightlighted = containsMouse || (mousePosition == null && event.isHighlighted());
-            boolean hl = eventWasHightlighted && highlight;
+            boolean hl = event.isHighlighted() && containsMouse;
             int sz = Math.min(w, 8);
             if (hl) {
                 x0 -= 10;
