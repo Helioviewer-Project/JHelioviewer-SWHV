@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.astronomy;
 
 import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVDate;
 
 public class Position {
@@ -40,6 +41,10 @@ public class Position {
             distance = _dist;
             orientation = _q;
             time = _time;
+        }
+
+        public Q sunAxis() {
+            return new Q(time, distance, orientation.twist(Vec3.YAxis));
         }
 
         @Override
