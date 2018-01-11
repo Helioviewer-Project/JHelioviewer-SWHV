@@ -31,7 +31,6 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
     private final YAxis yAxis = new YAxis(0, 0, "Events", false);
     private static EventPlotConfiguration eventUnderMouse;
     private static JHVRelatedEvents highlightedEvent = null;
-    private static int highlightedEventPosition = -1;
 
     public EventTimelineLayer(JSONObject jo) {
         cacheUpdated();
@@ -66,7 +65,6 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
             return;
 
         highlightedEvent = null;
-        highlightedEventPosition = -1;
 
         Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = JHVEventCache.get(xAxis.start, xAxis.end).getAvailableEvents();
         if (events.isEmpty())
@@ -76,6 +74,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
 
         ArrayList<Long> endDates = new ArrayList<>();
         int nrLines = 0;
+        int highlightedEventPosition = -1;
         for (SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap : events.values()) {
             for (JHVRelatedEvents event : eventMap.values()) {
                 int i = 0;
