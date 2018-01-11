@@ -17,6 +17,7 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.camera.InteractionAnnotate;
+import org.helioviewer.jhv.camera.InteractionAxis;
 import org.helioviewer.jhv.camera.InteractionPan;
 import org.helioviewer.jhv.camera.InteractionRotate;
 import org.helioviewer.jhv.display.Displayer;
@@ -64,8 +65,9 @@ public class ImageViewerGui {
     private static LayersPanel layersPanel;
     private static Layers layers;
 
-    private static InteractionRotate rotationInteraction;
     private static InteractionPan panInteraction;
+    private static InteractionRotate rotationInteraction;
+    private static InteractionAxis axisInteraction;
     private static InteractionAnnotate annotateInteraction;
     private static Interaction currentInteraction;
 
@@ -242,6 +244,10 @@ public class ImageViewerGui {
 
     public static Interaction getRotateInteraction() {
         return rotationInteraction;
+    }
+
+    public static Interaction getAxisInteraction() {
+        return axisInteraction;
     }
 
     public static InteractionAnnotate getAnnotateInteraction() {

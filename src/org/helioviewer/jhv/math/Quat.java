@@ -196,9 +196,9 @@ public class Quat {
         return l == 0 ? this : new Quat(a / l, u.x / l, u.y / l, u.z / l);
     }
 
-    public static Quat twist(Quat q, Vec3 vec) {
-        double m = Vec3.dot(vec, q.u) / vec.length();
-        return new Quat(q.a, new Vec3(vec.x * m, vec.y * m, vec.z * m)).normalize();
+    public Quat twist(Vec3 vec) {
+        double m = Vec3.dot(vec, u); // / vec.length(); assume vec normalized
+        return new Quat(a, new Vec3(vec.x * m, vec.y * m, vec.z * m)).normalize();
         // swing = rotateWithConjugate(q, twist(q))
     }
 
