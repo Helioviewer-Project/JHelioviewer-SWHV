@@ -67,7 +67,6 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
         if (events.isEmpty())
             return;
 
-        EventPlotConfiguration shouldRedraw = null;
         ArrayList<Long> endDates = new ArrayList<>();
         int nrLines = 0;
         int highlightedEventPosition = -1;
@@ -91,13 +90,12 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
                 int x1 = xAxis.value2pixel(graphArea.x, graphArea.width, event.getEnd());
                 JHVRelatedEvents rEvent = drawEvent(graphArea, event, x0, x1, eventPosition, g, mousePosition);
                 if (rEvent != null) {
-                    shouldRedraw = new EventPlotConfiguration(rEvent, x0, x1, eventPosition);
+                    eventUnderMouse = new EventPlotConfiguration(rEvent, x0, x1, eventPosition);
                     highlightedEvent = rEvent;
                     highlightedEventPosition = eventPosition;
                 }
             }
         }
-        eventUnderMouse = shouldRedraw;
 
         if (mousePosition != null) {
             if (highlightedEvent != null) {
