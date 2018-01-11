@@ -176,19 +176,6 @@ public class Quat {
         this.a = q.a;
         this.u = q.u;
     }
-
-    public Quat normalize() {
-        double l = Math.sqrt(a * a + u.x * u.x + u.y * u.y + u.z * u.z);
-        if (l != 0) {
-            l = 1 / l;
-            a *= l;
-            u.x *= l;
-            u.y *= l;
-            u.z *= l;
-        }
-        return this;
-    }
-
     public double dot(Quat q) {
         return this.a * q.a + this.u.x * q.u.x + this.u.y * q.u.y + this.u.z * q.u.z;
     }
@@ -204,9 +191,14 @@ public class Quat {
     }
 */
 
+    private Quat normalize() {
+        double l = Math.sqrt(a * a + u.x * u.x + u.y * u.y + u.z * u.z);
+        return l == 0 ? this : new Quat(a / l, u.x / l, u.y / l, u.z / l);
+    }
+
     public static Quat twist(Quat q, Vec3 vec) {
-        double m = Vec3.dot(vec, q.u) / vec.length(); // 0!
-        return new Quat(q.a, new Vec3(vec.x * m, vec.y * m, vec.z * m));
+        double m = Vec3.dot(vec, q.u) / vec.length();
+        return new Quat(q.a, new Vec3(vec.x * m, vec.y * m, vec.z * m)).normalize();
         // swing = rotateWithConjugate(q, twist(q))
     }
 
