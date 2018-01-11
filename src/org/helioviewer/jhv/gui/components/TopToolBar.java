@@ -63,6 +63,7 @@ public class TopToolBar extends JToolBar {
     private final ButtonText OFFDISK = new ButtonText(Buttons.offDisk, "Corona", "Toggle off-disk corona");
     private final ButtonText TRACK = new ButtonText(Buttons.track, "Track", "Track solar rotation");
     private final ButtonText ANNOTATE = new ButtonText(Buttons.annotate, "Annotate", "Annotate");
+    private final ButtonText AXIS = new ButtonText(Buttons.axis, "Axis", "Axis");
     private final ButtonText ROTATE = new ButtonText(Buttons.rotate, "Rotate", "Rotate");
     private final ButtonText PAN = new ButtonText(Buttons.pan, "Pan", "Pan");
     private final ButtonText RESETCAMERA = new ButtonText(Buttons.resetCamera, "Reset Camera", "Reset camera position to default");
@@ -72,7 +73,8 @@ public class TopToolBar extends JToolBar {
     private final ButtonText ZOOMIN = new ButtonText(Buttons.zoomIn, "Zoom In", "Zoom in");
 
     private enum InteractionMode {
-        PAN(ImageViewerGui.getPanInteraction()), ROTATE(ImageViewerGui.getRotateInteraction()), ANNOTATE(ImageViewerGui.getAnnotateInteraction());
+        PAN(ImageViewerGui.getPanInteraction()), ROTATE(ImageViewerGui.getRotateInteraction()),
+        AXIS(ImageViewerGui.getAxisInteraction()), ANNOTATE(ImageViewerGui.getAnnotateInteraction());
 
         final Interaction interaction;
 
@@ -166,19 +168,26 @@ public class TopToolBar extends JToolBar {
         pan.addActionListener(e -> setActiveInteractionMode(InteractionMode.PAN));
         JideToggleButton rotate = toolToggleButton(ROTATE);
         rotate.addActionListener(e -> setActiveInteractionMode(InteractionMode.ROTATE));
+        JideToggleButton axis = toolToggleButton(AXIS);
+        axis.addActionListener(e -> setActiveInteractionMode(InteractionMode.AXIS));
         JideToggleButton annotate = toolToggleButton(ANNOTATE);
         annotate.addActionListener(e -> setActiveInteractionMode(InteractionMode.ANNOTATE));
 
         group.add(pan);
         group.add(rotate);
+        group.add(axis);
         group.add(annotate);
         addButton(pan);
         addButton(rotate);
+        addButton(axis);
         addButton(annotate);
 
         switch (interactionMode) {
             case PAN:
                 pan.setSelected(true);
+                break;
+            case AXIS:
+                axis.setSelected(true);
                 break;
             case ANNOTATE:
                 annotate.setSelected(true);
