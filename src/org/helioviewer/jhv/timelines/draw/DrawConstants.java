@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.math.MathUtils;
 
-@SuppressWarnings("SimpleDateFormatConstant")
+@SuppressWarnings("DateFormatConstant")
 public class DrawConstants {
 
     public static final int GRAPH_LEFT_SPACE = 50;
