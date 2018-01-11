@@ -203,6 +203,13 @@ public class Quat {
         return new Quat(this.a, this.u.copy());
     }
 */
+
+    public static Quat twist(Quat q, Vec3 vec) {
+        double m = Vec3.dot(vec, q.u) / vec.length(); // 0!
+        return new Quat(q.a, new Vec3(vec.x * m, vec.y * m, vec.z * m));
+        // swing = rotateWithConjugate(q, twist(q))
+    }
+
     public static Quat calcRotation(Vec3 startPoint, Vec3 endPoint) {
         Vec3 rotationAxis = Vec3.cross(startPoint, endPoint);
         double rotationAngle = Math.atan2(rotationAxis.length(), Vec3.dot(startPoint, endPoint));
