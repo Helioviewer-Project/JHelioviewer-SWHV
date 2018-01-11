@@ -3,22 +3,15 @@ package org.helioviewer.jhv.math;
 import org.helioviewer.jhv.log.Log;
 
 public class Vec3 {
-    /**
-     * Predefined Vectors
-     */
+
     public static final Vec3 ZERO = new Vec3(0, 0, 0);
     public static final Vec3 XAxis = new Vec3(1, 0, 0);
     public static final Vec3 YAxis = new Vec3(0, 1, 0);
     public static final Vec3 ZAxis = new Vec3(0, 0, 1);
 
-    /**
-     * Coordinates
-     */
     public double x;
     public double y;
     public double z;
-
-    // Constructors
 
     public Vec3(double x, double y, double z) {
         this.x = x;
@@ -164,16 +157,8 @@ public class Vec3 {
         return new Vec3(vec1.x * s, vec1.y * s, vec1.z * s);
     }
 
-    public final double dot(Vec3 vec) {
-        return dot(this, vec);
-    }
-
     public static double dot(Vec3 u, Vec3 v) {
         return (u.x * v.x) + (u.y * v.y) + (u.z * v.z);
-    }
-
-    public final Vec3 cross(Vec3 vec) {
-        return cross(this, vec);
     }
 
     public static Vec3 cross(Vec3 u, Vec3 v) {
@@ -184,12 +169,6 @@ public class Vec3 {
         this.x = -this.x;
         this.y = -this.y;
         this.z = -this.z;
-    }
-
-    public static Vec3 negate(Vec3 vec) {
-        Vec3 vecCopy = vec.copy();
-        vecCopy.negate();
-        return vecCopy;
     }
 
     public final boolean isApproxEqual(Vec3 vec, double tolerance) {
@@ -246,10 +225,6 @@ public class Vec3 {
 
     public final Vec2 toVec2() {
         return new Vec2(x, y);
-    }
-
-    public final Vec3 copy() {
-        return new Vec3(this);
     }
 
     public static double[] toArray(Vec3[] vecs) {
