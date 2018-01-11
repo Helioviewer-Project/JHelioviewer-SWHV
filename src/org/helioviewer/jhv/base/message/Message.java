@@ -4,12 +4,8 @@ import java.awt.EventQueue;
 
 import javax.swing.JOptionPane;
 
-/**
- * General messages pulled from JHVGlobals
- * 
- * @author caplins
- * @author Helge Dietert
- */
+import org.helioviewer.jhv.base.Regex;
+
 public class Message {
     /**
      * Inserts linebreaks into the message so that it can shown as a message
@@ -18,10 +14,9 @@ public class Message {
      * @return Formatted string with every line at most 70 chararcters
      */
     public static String formatMessageString(String message) {
-        String[] messageWords = message.split(" ");
         StringBuilder sb = new StringBuilder();
         int lineLength = 0;
-        for (String word : messageWords) {
+        for (String word : Regex.Space.split(message)) {
             if (lineLength + word.length() < 70) {
                 lineLength += word.length() + 1;
             } else {

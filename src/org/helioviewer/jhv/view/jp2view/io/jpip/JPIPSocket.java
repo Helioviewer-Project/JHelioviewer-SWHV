@@ -8,6 +8,7 @@ import java.util.zip.InflaterInputStream;
 import java.util.zip.GZIPInputStream;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.view.jp2view.io.ChunkedInputStream;
 import org.helioviewer.jhv.view.jp2view.io.FixedSizedInputStream;
 import org.helioviewer.jhv.view.jp2view.io.TransferInputStream;
@@ -40,8 +41,7 @@ public class JPIPSocket extends HTTPSocket {
             throw new IOException("The header 'JPIP-cnew' was not sent by the server");
 
         HashMap<String, String> map = new HashMap<>();
-        String[] parts = cnew.split(",");
-        for (String part : parts)
+        for (String part : Regex.Comma.split(cnew))
             for (String cnewParam : cnewParams)
                 if (part.startsWith(cnewParam + '='))
                     map.put(cnewParam, part.substring(cnewParam.length() + 1));

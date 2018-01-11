@@ -23,6 +23,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
+import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.data.cache.JHVEventCache;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.UIGlobals;
@@ -253,7 +254,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
             g.setColor(Color.BLACK);
             int yl = graphArea.y + graphArea.height + 2 + tickTextHeight;
-            for (String line : tickText.split("\n")) {
+            for (String line : Regex.Return.split(tickText)) {
                 tickTextBounds = g.getFontMetrics().getStringBounds(line, g);
                 tickTextWidth = (int) tickTextBounds.getWidth();
                 int xl = x - (tickTextWidth / 2);
