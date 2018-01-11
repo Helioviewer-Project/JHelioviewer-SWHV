@@ -80,8 +80,9 @@ public class ImageViewerGui {
         mainFrame.setJMenuBar(menuBar);
 
         Camera camera = Displayer.getCamera();
-        rotationInteraction = new InteractionRotate(camera);
         panInteraction = new InteractionPan(camera);
+        rotationInteraction = new InteractionRotate(camera);
+        axisInteraction = new InteractionAxis(camera);
         annotateInteraction = new InteractionAnnotate(camera);
         currentInteraction = rotationInteraction;
 

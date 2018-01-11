@@ -3,6 +3,7 @@ package org.helioviewer.jhv.gui.components;
 public enum MaterialDesign {
 
     // https://github.com/aalmiray/ikonli
+    MDI_BACKUP_RESTORE("mdi-backup-restore", '\uf06f'),
     MDI_BRIGHTNESS_AUTO("mdi-brightness-auto", '\uf0e1'),
     MDI_CALENDAR("mdi-calendar", '\uf0ed'),
     MDI_CHECK("mdi-check", '\uf12c'),
