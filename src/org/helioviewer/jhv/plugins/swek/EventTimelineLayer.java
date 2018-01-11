@@ -195,35 +195,32 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
         g.drawImage(icon.getImage(), x0 + w / 2 - sz / 2, y + h / 2 - sz / 2, x0 + w / 2 + sz / 2, y + h / 2 + sz / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
 
         if (hl) {
-            drawText(graphArea, g, event, y, mousePosition);
+            drawText(graphArea, g, event, y, mousePosition.x);
         }
 
         return containsMouse ? event : null;
     }
 
-    private static void drawText(Rectangle graphArea, Graphics2D g, JHVRelatedEvents event, int y, Point mousePosition) {
-        if (mousePosition != null) {
-            long ts = DrawController.selectedAxis.pixel2value(graphArea.x, graphArea.width, mousePosition.x);
-            ArrayList<String> txts = new ArrayList<>();
-            JHVEventParameter[] params = event.getClosestTo(ts).getSimpleVisibleEventParameters();
-            int width = 1;
-            for (JHVEventParameter p : params) {
-                String name = p.getParameterName();
-                if (name != "event_description" && name != "event_title") { // interned
-                    String str = p.getParameterDisplayName() + " : " + p.getSimpleDisplayParameterValue();
-                    txts.add(str);
-                    width = Math.max(width, g.getFontMetrics().stringWidth(str));
-                }
+    private static void drawText(Rectangle graphArea, Graphics2D g, JHVRelatedEvents event, int y, int mouseX) {
+        ArrayList<String> txts = new ArrayList<>();
+        int width = 1;
+        long ts = DrawController.selectedAxis.pixel2value(graphArea.x, graphArea.width, mouseX);
+        for (JHVEventParameter p : event.getClosestTo(ts).getSimpleVisibleEventParameters()) {
+            String name = p.getParameterName();
+            if (name != "event_description" && name != "event_title") { // interned
+                String str = p.getParameterDisplayName() + " : " + p.getSimpleDisplayParameterValue();
+                txts.add(str);
+                width = Math.max(width, g.getFontMetrics().stringWidth(str));
             }
-            g.setColor(DrawConstants.TEXT_BACKGROUND_COLOR);
-            g.fillRect(mousePosition.x + 5, y, width + 21 + 10, (txts.size()) * 10 + 11);
-            g.setColor(DrawConstants.TEXT_COLOR);
-            y += 5;
-            ImageIcon icon = event.getIcon();
-            g.drawImage(icon.getImage(), mousePosition.x + 8, y - 2, mousePosition.x + 24, y + 14, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
-            for (String txt : txts) {
-                g.drawString(txt, mousePosition.x + 26, y += 10);
-            }
+        }
+        g.setColor(DrawConstants.TEXT_BACKGROUND_COLOR);
+        g.fillRect(mouseX + 5, y, width + 21 + 10, txts.size() * 10 + 11);
+        g.setColor(DrawConstants.TEXT_COLOR);
+        y += 5;
+        ImageIcon icon = event.getIcon();
+        g.drawImage(icon.getImage(), mouseX + 8, y - 2, mouseX + 24, y + 14, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
+        for (String txt : txts) {
+            g.drawString(txt, mouseX + 26, y += 10);
         }
     }
 
