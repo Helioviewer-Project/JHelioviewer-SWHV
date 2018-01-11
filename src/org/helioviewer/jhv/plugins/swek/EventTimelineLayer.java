@@ -69,9 +69,8 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
 
         ArrayList<Long> endDates = new ArrayList<>();
         int nrLines = 0;
-        int highlightedEventPosition = -1;
-        JHVRelatedEvents highlightedEvent = null;
 
+        eventUnderMouse = null;
         for (SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap : events.values()) {
             for (JHVRelatedEvents event : eventMap.values()) {
                 int i = 0;
@@ -91,19 +90,13 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
                 JHVRelatedEvents rEvent = drawEvent(graphArea, event, x0, x1, eventPosition, g, mousePosition);
                 if (rEvent != null) {
                     eventUnderMouse = new EventPlotConfiguration(rEvent, x0, x1, eventPosition);
-                    highlightedEvent = rEvent;
-                    highlightedEventPosition = eventPosition;
                 }
             }
         }
 
-        if (mousePosition != null) {
-            if (highlightedEvent != null) {
-                int x0 = xAxis.value2pixel(graphArea.x, graphArea.width, highlightedEvent.getStart());
-                int x1 = xAxis.value2pixel(graphArea.x, graphArea.width, highlightedEvent.getEnd());
-                drawEvent(graphArea, highlightedEvent, x0, x1, highlightedEventPosition, g, mousePosition);
-            }
-            JHVEventCache.highlight(highlightedEvent);
+        if (eventUnderMouse != null && mousePosition != null) {
+            drawEvent(graphArea, eventUnderMouse.event, eventUnderMouse.x0, eventUnderMouse.x1, eventUnderMouse.yPosition, g, mousePosition);
+            JHVEventCache.highlight(eventUnderMouse.event);
         }
     }
 
@@ -178,7 +171,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
         }
 
         boolean containsMouse = containsPoint(mousePosition, x0 - 1, y - 1, w + 2, h + 2);
-        boolean hl = event.isHighlighted() && containsMouse;
+        boolean hl = event.isHighlighted() && (mousePosition == null || containsMouse); // null mousePosition from image canvas
         int sz = Math.min(w, 8);
         if (hl) {
             x0 -= 10;
@@ -194,7 +187,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
         ImageIcon icon = event.getIcon();
         g.drawImage(icon.getImage(), x0 + w / 2 - sz / 2, y + h / 2 - sz / 2, x0 + w / 2 + sz / 2, y + h / 2 + sz / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
 
-        if (hl) {
+        if (hl && mousePosition != null) {
             drawText(graphArea, g, event, y, mousePosition.x);
         }
 
