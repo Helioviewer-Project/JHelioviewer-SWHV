@@ -88,7 +88,6 @@ public class CameraHelper {
             hitPoint = new Vec3(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
         else
             hitPoint = new Vec3(up1x, up1y, 0.5 * Sun.Radius2 / Math.sqrt(radius2));
-
         return camera.getCurrentDragRotation().rotateInverseVector(hitPoint);
     }
 

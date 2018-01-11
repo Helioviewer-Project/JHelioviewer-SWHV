@@ -9,6 +9,7 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 
 public class ViewROI {
@@ -112,7 +113,8 @@ public class ViewROI {
                 if (regionWidth > 0 && regionHeight > 0) {
                     return new Region(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
                 } else {
-                    Log.info("ViewROI.updateROI: empty ROI");
+                    String name = m instanceof HelioviewerMetaData ? ((HelioviewerMetaData) m).getFullName() : "";
+                    Log.info("ViewROI.updateROI: empty: " + name + " " + m.getViewpoint().time);
                     return new Region(minPhysicalX, minPhysicalY, 0, 0);
                 }
             }

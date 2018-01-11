@@ -58,8 +58,8 @@ public class DataSourcesTask extends JHVWorker<Void, Void> {
                 break;
             } catch (IOException e) {
                 try {
-                    // Log.error(e);
-                    Thread.sleep(5000);
+                    // Log.error("Server " + url + " " + e);
+                    Thread.sleep(15000);
                 } catch (InterruptedException e1) {
                     Log.error(e1);
                     break;
