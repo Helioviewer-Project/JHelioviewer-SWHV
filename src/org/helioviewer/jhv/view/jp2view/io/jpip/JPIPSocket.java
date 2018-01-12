@@ -83,6 +83,7 @@ public class JPIPSocket extends HTTPSocket {
         req.setHeader("Connection", "keep-alive");
         req.setHeader("Accept-Encoding", "gzip");
         req.setHeader("Cache-Control", "no-cache");
+        req.setHeader("Host", getHost() + ':' + getPort());
         queryStr = "GET " + jpipPath + '?' + queryStr + " HTTP/1.1\r\n" + req + "\r\n";
         write(queryStr);
 
