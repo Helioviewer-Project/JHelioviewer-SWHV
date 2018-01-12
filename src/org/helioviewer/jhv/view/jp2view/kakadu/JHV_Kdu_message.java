@@ -16,6 +16,11 @@ class JHV_Kdu_message extends Kdu_message {
     }
 
     @Override
+    public void Put_text(String text) {
+        System.out.print(text);
+    }
+
+    @Override
     public void Flush(boolean endOfMessage) throws KduException {
         if (endOfMessage && raiseException)
             throw new KduException("Kakadu message error");

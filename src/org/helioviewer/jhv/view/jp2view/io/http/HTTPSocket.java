@@ -18,8 +18,12 @@ public class HTTPSocket {
 
     private static final int TIMEOUT_CONNECT = 30000;
     private static final int TIMEOUT_READ = 30000;
+    private static final int PORT = 80;
 
     private final Socket socket;
+
+    private int lastUsedPort = 0;
+    private String lastUsedHost = null;
 
     protected final InputStream inputStream;
     private final OutputStream outputStream;
@@ -34,7 +38,10 @@ public class HTTPSocket {
         socket.setTcpNoDelay(true);
 
         int port = uri.getPort();
-        socket.connect(new InetSocketAddress(uri.getHost(), port == -1 ? 80 : port), TIMEOUT_CONNECT);
+        lastUsedPort = port <= 0 ? PORT : port;
+        lastUsedHost = uri.getHost();
+
+        socket.connect(new InetSocketAddress(lastUsedHost, lastUsedPort), TIMEOUT_CONNECT);
 
         inputStream = new BufferedInputStream(socket.getInputStream(), 65536);
         outputStream = socket.getOutputStream();
@@ -70,6 +77,14 @@ public class HTTPSocket {
 
     public boolean isClosed() {
         return socket.isClosed();
+    }
+
+    protected int getPort() {
+        return lastUsedPort;
+    }
+
+    protected String getHost() {
+        return lastUsedHost;
     }
 
 }
