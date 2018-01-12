@@ -20,29 +20,33 @@ public interface NetClient extends AutoCloseable {
 
     static NetClient of(String uri) throws IOException {
         try {
-            return of(new URI(uri), false);
+            return of(new URI(uri), false, false);
         } catch (URISyntaxException e) {
             throw new IOException(e);
         }
     }
 
     static NetClient of(URI uri) throws IOException {
-        return of(uri, false);
+        return of(uri, false, false);
     }
 
     static NetClient of(String uri, boolean allowError) throws IOException {
         try {
-            return of(new URI(uri), allowError);
+            return of(new URI(uri), allowError, false);
         } catch (URISyntaxException e) {
             throw new IOException(e);
         }
     }
 
     static NetClient of(URI uri, boolean allowError) throws IOException {
+        return of(uri, allowError, false);
+    }
+
+    static NetClient of(URI uri, boolean allowError, boolean network) throws IOException {
         if (EventQueue.isDispatchThread())
             throw new IOException("Don't do that");
 
-        return "file".equals(uri.getScheme()) ? new NetClientLocal(uri) : new NetClientRemote(uri, allowError);
+        return "file".equals(uri.getScheme()) ? new NetClientLocal(uri) : new NetClientRemote(uri, allowError, network);
     }
 
 }

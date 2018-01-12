@@ -16,6 +16,7 @@ import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.log.Log;
 
 import okhttp3.Cache;
+import okhttp3.CacheControl;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -43,13 +44,17 @@ class NetClientRemote implements NetClient {
 
     private final Response response;
 
-    NetClientRemote(URI uri, boolean allowError) throws IOException {
+    NetClientRemote(URI uri, boolean allowError, boolean network) throws IOException {
         HttpUrl url = HttpUrl.get(uri);
         if (url == null)
             throw new IOException("Could not parse " + uri);
-
         init();
-        Request request = new Request.Builder().header("User-Agent", JHVGlobals.userAgent).url(url).build();
+
+        Request.Builder builder = new Request.Builder().header("User-Agent", JHVGlobals.userAgent).url(url);
+        if (network)
+            builder.cacheControl(CacheControl.FORCE_NETWORK);
+        Request request = builder.build();
+
         response = client.newCall(request).execute();
         if (!allowError && !response.isSuccessful()) {
             response.close();
