@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.io;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -29,7 +28,7 @@ class NetClientRemote implements NetClient {
     private static final OkHttpClient client = new OkHttpClient.Builder()
         .connectTimeout(JHVGlobals.getStdConnectTimeout(), TimeUnit.MILLISECONDS)
         .readTimeout(JHVGlobals.getStdReadTimeout(), TimeUnit.MILLISECONDS)
-        .cache(new Cache(new File(JHVGlobals.ClientCacheDir), cacheSize))
+        .cache(new Cache(JHVGlobals.ClientCacheDir, cacheSize))
         //.addInterceptor(new LoggingInterceptor())
         .build();
 

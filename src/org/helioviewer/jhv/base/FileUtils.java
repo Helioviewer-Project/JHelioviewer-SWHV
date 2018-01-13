@@ -53,7 +53,7 @@ public class FileUtils {
         Files.walkFileTree(dir.toPath(), nukeVisitor);
     }
 
-    public static String tempDir(File parent, String name) throws IOException {
+    public static File tempDir(File parent, String name) throws IOException {
         String suffix = ".lock";
         // delete all directories without a lock file
         FileFilter filter = p -> p.getName().startsWith(name) && !p.getName().endsWith(suffix);
@@ -67,8 +67,8 @@ public class FileUtils {
             deleteDir(dir);
         }
 
-        String tempDir = Files.createTempDirectory(parent.toPath(), name).toString();
-        File lock = new File(tempDir + suffix);
+        File tempDir = Files.createTempDirectory(parent.toPath(), name).toFile();
+        File lock = new File(tempDir.toString() + suffix);
         lock.createNewFile();
         lock.deleteOnExit();
 

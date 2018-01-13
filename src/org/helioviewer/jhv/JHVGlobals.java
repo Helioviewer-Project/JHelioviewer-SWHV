@@ -120,15 +120,15 @@ public class JHVGlobals {
             FileCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "file");
             ClientCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "client");
         } catch (Exception e) {
-            LibCacheDir = System.getProperty("java.io.tmpdir");
-            FileCacheDir = System.getProperty("java.io.tmpdir");
-            ClientCacheDir = System.getProperty("java.io.tmpdir");
+            LibCacheDir = new File(System.getProperty("java.io.tmpdir"));
+            FileCacheDir = new File(System.getProperty("java.io.tmpdir"));
+            ClientCacheDir = new File(System.getProperty("java.io.tmpdir"));
         }
     }
 
-    public static String LibCacheDir;
-    public static String FileCacheDir;
-    public static String ClientCacheDir;
+    public static File LibCacheDir;
+    public static File FileCacheDir;
+    public static File ClientCacheDir;
 
     public static final HyperOpenURL hyperOpenURL = new HyperOpenURL();
 
