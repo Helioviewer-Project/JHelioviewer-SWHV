@@ -17,6 +17,7 @@ import java.util.jar.Manifest;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
+import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVExecutor;
@@ -113,7 +114,21 @@ public class JHVGlobals {
                 f.mkdirs();
             }
         }
+
+        try {
+            LibsCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "libs");
+            JP2CacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "jp2");
+            RemoteCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "remote");
+        } catch (Exception e) {
+            LibsCacheDir = System.getProperty("java.io.tmpdir");
+            JP2CacheDir = System.getProperty("java.io.tmpdir");
+            RemoteCacheDir = System.getProperty("java.io.tmpdir");
+        }
     }
+
+    public static String LibsCacheDir;
+    public static String JP2CacheDir;
+    public static String RemoteCacheDir;
 
     public static final HyperOpenURL hyperOpenURL = new HyperOpenURL();
 

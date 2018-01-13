@@ -28,10 +28,9 @@ class JHVLoader {
         kduLibs.add(System.mapLibraryName("kdu_a77R"));
         kduLibs.add(System.mapLibraryName("kdu_jni"));
 
-        String tempDir = FileUtils.tempDir(JHVDirectory.LIBS.getFile(), "kdulibs");
         for (String kduLib : kduLibs) {
             try (InputStream in = FileUtils.getResourceInputStream("/natives/" + pathlib + kduLib)) {
-                File f = new File(tempDir, kduLib);
+                File f = new File(JHVGlobals.LibsCacheDir, kduLib);
                 Files.copy(in, f.toPath());
                 System.load(f.getAbsolutePath());
             }
