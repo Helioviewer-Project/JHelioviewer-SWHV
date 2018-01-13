@@ -26,20 +26,12 @@ class NetClientRemote implements NetClient {
 
     private static final int cacheSize = 512 * 1024 * 1024;
     private static final CacheControl noStore = new CacheControl.Builder().noStore().build();
-    private static OkHttpClient client;
-
-    private static void init() {
-        if (client != null)
-            return;
-
-        // Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
-        client = new OkHttpClient.Builder()
-            .connectTimeout(JHVGlobals.getStdConnectTimeout(), TimeUnit.MILLISECONDS)
-            .readTimeout(JHVGlobals.getStdReadTimeout(), TimeUnit.MILLISECONDS)
-            .cache(new Cache(new File(JHVGlobals.RemoteCacheDir), cacheSize))
-            //.addInterceptor(new LoggingInterceptor())
-            .build();
-    }
+    private static final OkHttpClient client = new OkHttpClient.Builder()
+        .connectTimeout(JHVGlobals.getStdConnectTimeout(), TimeUnit.MILLISECONDS)
+        .readTimeout(JHVGlobals.getStdReadTimeout(), TimeUnit.MILLISECONDS)
+        .cache(new Cache(new File(JHVGlobals.RemoteCacheDir), cacheSize))
+        //.addInterceptor(new LoggingInterceptor())
+        .build();
 
     private final Response response;
 
@@ -47,7 +39,6 @@ class NetClientRemote implements NetClient {
         HttpUrl url = HttpUrl.get(uri);
         if (url == null)
             throw new IOException("Could not parse " + uri);
-        init();
 
         Request.Builder builder = new Request.Builder().header("User-Agent", JHVGlobals.userAgent).url(url);
         if (network)
