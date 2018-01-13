@@ -3,7 +3,6 @@ package org.helioviewer.jhv.io;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutionException;
 
 import org.helioviewer.jhv.JHVGlobals;
@@ -11,18 +10,16 @@ import org.helioviewer.jhv.JHVGlobals;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.io.BaseEncoding;
 import okio.BufferedSink;
 import okio.Okio;
 
-public class AccessibleCache {
+public class NetFileCache {
 
-    private static final LoadingCache<URI, URI> cache = CacheBuilder.newBuilder().maximumSize(10000).
+    private static final LoadingCache<URI, URI> cache = CacheBuilder.newBuilder().maximumSize(512).
         build(new CacheLoader<URI, URI>() {
             @Override
             public URI load(URI uri) throws IOException {
-                String out = BaseEncoding.base64Url().encode(uri.toString().getBytes(StandardCharsets.UTF_8));
-                File f = new File(JHVGlobals.FileCacheDir, out);
+                File f = File.createTempFile("jhv", null, new File(JHVGlobals.FileCacheDir));
                 try (NetClient nc = NetClient.of(uri, false, true); BufferedSink sink = Okio.buffer(Okio.sink(f))) {
                     sink.writeAll(nc.getSource());
                 }
@@ -36,6 +33,10 @@ public class AccessibleCache {
         } catch (ExecutionException e) {
             throw new IOException(e.getCause());
         }
+    }
+
+    public static void delete(URI uri) {
+        cache.invalidate(uri);
     }
 
 }
