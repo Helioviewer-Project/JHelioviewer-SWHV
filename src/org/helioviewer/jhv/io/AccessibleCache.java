@@ -22,7 +22,7 @@ public class AccessibleCache {
             @Override
             public URI load(URI uri) throws IOException {
                 String out = BaseEncoding.base64Url().encode(uri.toString().getBytes(StandardCharsets.UTF_8));
-                File f = new File(JHVGlobals.JP2CacheDir, out);
+                File f = new File(JHVGlobals.FileCacheDir, out);
                 try (NetClient nc = NetClient.of(uri, false, true); BufferedSink sink = Okio.buffer(Okio.sink(f))) {
                     sink.writeAll(nc.getSource());
                 }

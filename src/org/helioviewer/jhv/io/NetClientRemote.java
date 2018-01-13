@@ -29,7 +29,7 @@ class NetClientRemote implements NetClient {
     private static final OkHttpClient client = new OkHttpClient.Builder()
         .connectTimeout(JHVGlobals.getStdConnectTimeout(), TimeUnit.MILLISECONDS)
         .readTimeout(JHVGlobals.getStdReadTimeout(), TimeUnit.MILLISECONDS)
-        .cache(new Cache(new File(JHVGlobals.RemoteCacheDir), cacheSize))
+        .cache(new Cache(new File(JHVGlobals.ClientCacheDir), cacheSize))
         //.addInterceptor(new LoggingInterceptor())
         .build();
 

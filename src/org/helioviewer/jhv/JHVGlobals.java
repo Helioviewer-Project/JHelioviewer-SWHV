@@ -116,19 +116,19 @@ public class JHVGlobals {
         }
 
         try {
-            LibsCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "libs");
-            JP2CacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "jp2");
-            RemoteCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "remote");
+            LibCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "lib");
+            FileCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "file");
+            ClientCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "client");
         } catch (Exception e) {
-            LibsCacheDir = System.getProperty("java.io.tmpdir");
-            JP2CacheDir = System.getProperty("java.io.tmpdir");
-            RemoteCacheDir = System.getProperty("java.io.tmpdir");
+            LibCacheDir = System.getProperty("java.io.tmpdir");
+            FileCacheDir = System.getProperty("java.io.tmpdir");
+            ClientCacheDir = System.getProperty("java.io.tmpdir");
         }
     }
 
-    public static String LibsCacheDir;
-    public static String JP2CacheDir;
-    public static String RemoteCacheDir;
+    public static String LibCacheDir;
+    public static String FileCacheDir;
+    public static String ClientCacheDir;
 
     public static final HyperOpenURL hyperOpenURL = new HyperOpenURL();
 
