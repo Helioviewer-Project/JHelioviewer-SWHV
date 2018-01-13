@@ -34,13 +34,15 @@ class NetClientRemote implements NetClient {
 
     private final Response response;
 
-    NetClientRemote(URI uri, boolean allowError, boolean network) throws IOException {
+    NetClientRemote(URI uri, boolean allowError, NetCache cache) throws IOException {
         HttpUrl url = HttpUrl.get(uri);
         if (url == null)
             throw new IOException("Could not parse " + uri);
 
         Request.Builder builder = new Request.Builder().header("User-Agent", JHVGlobals.userAgent).url(url);
-        if (network)
+        if (cache == NetCache.NETWORK)
+            builder.cacheControl(CacheControl.FORCE_NETWORK);
+        else if (cache == NetCache.BYPASS)
             builder.cacheControl(noStore);
         Request request = builder.build();
 

@@ -18,35 +18,39 @@ public interface NetClient extends AutoCloseable {
     long getContentLength();
     @Override void close() throws IOException;
 
+    enum NetCache {
+        CACHE, NETWORK, BYPASS
+    }
+
     static NetClient of(String uri) throws IOException {
         try {
-            return of(new URI(uri), false, false);
+            return of(new URI(uri), false, NetCache.CACHE);
         } catch (URISyntaxException e) {
             throw new IOException(e);
         }
     }
 
     static NetClient of(URI uri) throws IOException {
-        return of(uri, false, false);
+        return of(uri, false, NetCache.CACHE);
     }
 
     static NetClient of(String uri, boolean allowError) throws IOException {
         try {
-            return of(new URI(uri), allowError, false);
+            return of(new URI(uri), allowError, NetCache.CACHE);
         } catch (URISyntaxException e) {
             throw new IOException(e);
         }
     }
 
     static NetClient of(URI uri, boolean allowError) throws IOException {
-        return of(uri, allowError, false);
+        return of(uri, allowError, NetCache.CACHE);
     }
 
-    static NetClient of(URI uri, boolean allowError, boolean network) throws IOException {
+    static NetClient of(URI uri, boolean allowError, NetCache cache) throws IOException {
         if (EventQueue.isDispatchThread())
             throw new IOException("Don't do that");
 
-        return "file".equals(uri.getScheme()) ? new NetClientLocal(uri) : new NetClientRemote(uri, allowError, network);
+        return "file".equals(uri.getScheme()) ? new NetClientLocal(uri) : new NetClientRemote(uri, allowError, cache);
     }
 
 }
