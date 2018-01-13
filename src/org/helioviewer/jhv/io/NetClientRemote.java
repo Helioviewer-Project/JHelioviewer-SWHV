@@ -27,6 +27,7 @@ import okio.BufferedSource;
 class NetClientRemote implements NetClient {
 
     private static final int cacheSize = 512 * 1024 * 1024;
+    private static final CacheControl noStore = new CacheControl.Builder().noStore().build();
     private static OkHttpClient client;
 
     private static void init() throws IOException {
@@ -52,7 +53,7 @@ class NetClientRemote implements NetClient {
 
         Request.Builder builder = new Request.Builder().header("User-Agent", JHVGlobals.userAgent).url(url);
         if (network)
-            builder.cacheControl(CacheControl.FORCE_NETWORK);
+            builder.cacheControl(noStore);
         Request request = builder.build();
 
         response = client.newCall(request).execute();
