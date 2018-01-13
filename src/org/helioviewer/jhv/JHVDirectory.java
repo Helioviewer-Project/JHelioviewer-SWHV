@@ -22,18 +22,6 @@ public enum JHVDirectory {
             return new File(getPath());
         }
     },
-    /** The shared library directory. */
-    LIBS {
-        @Override
-        public String getPath() {
-            return HOME.getPath() + "Libs" + File.separator;
-        }
-
-        @Override
-        public File getFile() {
-            return new File(getPath());
-        }
-    },
     CACHE {
         @Override
         public String getPath() {

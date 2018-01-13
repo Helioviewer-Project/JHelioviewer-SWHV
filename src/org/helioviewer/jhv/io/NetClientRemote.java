@@ -10,9 +10,7 @@ import java.util.concurrent.TimeUnit;
 //import java.util.logging.Level;
 //import java.util.logging.Logger;
 
-import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.log.Log;
 
 import okhttp3.Cache;
@@ -30,7 +28,7 @@ class NetClientRemote implements NetClient {
     private static final CacheControl noStore = new CacheControl.Builder().noStore().build();
     private static OkHttpClient client;
 
-    private static void init() throws IOException {
+    private static void init() {
         if (client != null)
             return;
 
@@ -38,7 +36,7 @@ class NetClientRemote implements NetClient {
         client = new OkHttpClient.Builder()
             .connectTimeout(JHVGlobals.getStdConnectTimeout(), TimeUnit.MILLISECONDS)
             .readTimeout(JHVGlobals.getStdReadTimeout(), TimeUnit.MILLISECONDS)
-            .cache(new Cache(new File(FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "remote")), cacheSize))
+            .cache(new Cache(new File(JHVGlobals.RemoteCacheDir), cacheSize))
             //.addInterceptor(new LoggingInterceptor())
             .build();
     }
