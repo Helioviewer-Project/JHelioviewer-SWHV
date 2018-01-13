@@ -30,7 +30,7 @@ class JHVLoader {
 
         for (String kduLib : kduLibs) {
             try (InputStream in = FileUtils.getResourceInputStream("/natives/" + pathlib + kduLib)) {
-                File f = new File(JHVGlobals.LibsCacheDir, kduLib);
+                File f = new File(JHVGlobals.LibCacheDir, kduLib);
                 Files.copy(in, f.toPath());
                 System.load(f.getAbsolutePath());
             }
