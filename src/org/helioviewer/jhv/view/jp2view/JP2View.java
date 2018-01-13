@@ -44,8 +44,6 @@ import org.helioviewer.jhv.view.jp2view.kakadu.KakaduMeta;
 // This class is responsible for reading and decoding of JPEG2000 images
 public class JP2View extends AbstractView {
 
-    private static final String[] SUPPORTED_EXTENSIONS = { ".jp2", ".jpx" };
-
     private int targetFrame = 0;
     private int trueFrame = -1;
 
@@ -65,14 +63,6 @@ public class JP2View extends AbstractView {
 
     public JP2View(URI _uri, APIRequest _req) throws Exception {
         super(_uri, _req);
-
-        String name = uri.getPath().toLowerCase();
-        boolean supported = false;
-        for (String ext : SUPPORTED_EXTENSIONS)
-            if (name.endsWith(ext))
-                supported = true;
-        if (!supported)
-            throw new JHV_KduException("File extension not supported");
 
         try {
             String scheme = uri.getScheme().toLowerCase();

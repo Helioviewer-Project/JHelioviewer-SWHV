@@ -36,8 +36,8 @@ public class APIRequest {
         String fileReq;
         if (startTime == endTime) {
             fileReq = DataSources.getServerSetting(server, "API.getJP2Image") + "sourceId=" + Integer.toString(sourceId) +
-                                                   "&date=" + TimeUtils.formatZ(startTime) + "&json=true";
-            jpipRequest = fileReq + "&jpip=true";
+                                                   "&date=" + TimeUtils.formatZ(startTime);
+            jpipRequest = null;
         } else {
             fileReq = DataSources.getServerSetting(server, "API.getJPX") + "sourceId=" + Integer.toString(sourceId) +
                                                    "&startTime=" + TimeUtils.formatZ(startTime) + "&endTime=" + TimeUtils.formatZ(endTime);

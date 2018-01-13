@@ -11,6 +11,9 @@ import org.helioviewer.jhv.log.Log;
 public class APIRequestManager {
 
     public static URI requestRemoteFile(APIRequest req) throws IOException {
+        if (req.jpipRequest == null)
+            return AccessibleCache.get(req.fileRequest); // get JP2 via cache
+
         try (NetClient nc = NetClient.of(req.jpipRequest)) {
             APIResponse response = new APIResponse(JSONUtils.readJSON(nc.getReader()));
             // Just some error from the server
