@@ -1,9 +1,7 @@
 package org.helioviewer.jhv.timelines.radio;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 
@@ -24,47 +22,40 @@ class RadioJP2Data implements ImageDataHandler {
 
     private JP2ViewCallisto view;
 
-    private long startDate;
-    private long endDate;
-    private double startFreq;
-    private double endFreq;
-    private int jp2Width;
-    private int jp2Height;
+    private final long startDate;
+    private final long endDate;
+    private final double startFreq;
+    private final double endFreq;
+    private final int jp2Width;
+    private final int jp2Height;
 
     private BufferedImage bufferedImage;
     private Region region;
-    private boolean failed;
 
-    RadioJP2Data(JP2ViewCallisto _view, long start) {
-        if (_view != null) { // null for empty
-            try {
-                ResolutionSet.ResolutionLevel resLevel = _view.getResolutionLevel(0, 0);
-                jp2Width = resLevel.width;
-                jp2Height = resLevel.height;
+    RadioJP2Data(JP2ViewCallisto _view, long start) throws Exception {
+        try {
+            ResolutionSet.ResolutionLevel resLevel = _view.getResolutionLevel(0, 0);
+            jp2Width = resLevel.width;
+            jp2Height = resLevel.height;
 
-                XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
+            XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
 
-                hvMetaData.parseXML(_view.getXMLMetaData());
-                endFreq = hvMetaData.getRequiredDouble("STARTFRQ");
-                startFreq = hvMetaData.getRequiredDouble("END-FREQ");
-                startDate = TimeUtils.parse(hvMetaData.getRequiredString("DATE-OBS"));
-                endDate = TimeUtils.parse(hvMetaData.getRequiredString("DATE-END"));
-                hvMetaData.destroyXML();
+            hvMetaData.parseXML(_view.getXMLMetaData());
+            endFreq = hvMetaData.getRequiredDouble("STARTFRQ");
+            startFreq = hvMetaData.getRequiredDouble("END-FREQ");
+            startDate = TimeUtils.parse(hvMetaData.getRequiredString("DATE-OBS"));
+            endDate = TimeUtils.parse(hvMetaData.getRequiredString("DATE-END"));
+            hvMetaData.destroyXML();
 
-                if (startDate == start && endDate <= start + TimeUtils.DAY_IN_MILLIS) {
-                    view = _view;
-                    view.setDataHandler(this);
-                    return;
-                }
-            } catch (Exception e) {
-                Log.error("Some of the metadata could not be read: " + _view.getURI() + " " + e);
-            }
+            if (startDate != start)
+                throw new Exception("Unexpected start date: " + TimeUtils.formatZ(startDate) + " " + _view.getURI());
+
+            view = _view;
+            view.setDataHandler(this);
+        } catch (Exception e) {
             _view.abolish();
+            throw e;
         }
-
-        failed = true;
-        startDate = start;
-        endDate = start + TimeUtils.DAY_IN_MILLIS;
     }
 
     long getStartDate() {
@@ -202,30 +193,12 @@ class RadioJP2Data implements ImageDataHandler {
             int dy1 = RadioData.yAxis.value2pixel(ga.y, ga.height, freqimEnd);
 
             g.drawImage(bufferedImage, dx0, dy0, dx1, dy1, sx0, sy0, sx1, sy1, null);
-        } else {
-            drawNoData(g, ga, xAxis);
-        }
-    }
-
-    private void drawNoData(Graphics2D g, Rectangle ga, TimeAxis xAxis) {
-        int dx0 = xAxis.value2pixel(ga.x, ga.width, Math.max(startDate, xAxis.start));
-        int dx1 = xAxis.value2pixel(ga.x, ga.width, Math.min(endDate, xAxis.end));
-        int dwidth = dx1 - dx0;
-        g.setColor(Color.GRAY);
-        g.fillRect(dx0, ga.y, dwidth, ga.height);
-        g.setColor(Color.WHITE);
-
-        String text = failed ? "No data available" : "Fetching data";
-        Rectangle2D r = g.getFontMetrics().getStringBounds(text, g);
-        int tWidth = (int) r.getWidth();
-        int tHeight = (int) r.getHeight();
-        int x = dx0 + dwidth / 2 - tWidth / 2;
-        int y = ga.y + ga.height / 2 - tHeight / 2;
-        g.drawString(text, x, y);
+        } else
+            RadioData.drawString(g, ga, xAxis, "Fetching data");
     }
 
     boolean isDownloading() {
-        return !failed && !hasData();
+        return !hasData();
     }
 
     void changeColormap(ColorModel cm) {
