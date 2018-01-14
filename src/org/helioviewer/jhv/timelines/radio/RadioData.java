@@ -147,9 +147,7 @@ public class RadioData extends AbstractTimelineLayer {
                     if (uri == null)
                         continue;
 
-                    if (remotes.contains(uri)) {
-                        jpList.add(new RadioJP2Data(null, req.startTime));
-                    } else {
+                    if (!remotes.contains(uri)) {
                         remotes.add(uri);
                         jpList.add(new RadioJP2Data(new JP2ViewCallisto(uri, req), req.startTime));
                     }
@@ -258,6 +256,7 @@ public class RadioData extends AbstractTimelineLayer {
             return;
 
         if (timeAxis.end - timeAxis.start <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS) {
+            drawString(g, graphArea, timeAxis, "No data available");
             for (RadioJP2Data jp2Data : cache.values()) {
                 jp2Data.draw(g, graphArea, timeAxis);
             }
@@ -287,6 +286,23 @@ public class RadioData extends AbstractTimelineLayer {
     @Override
     public void resetAxis() {
         yAxis.reset(400, 20);
+    }
+
+    static void drawString(Graphics2D g, Rectangle ga, TimeAxis xAxis, String text) {
+        int dx0 = xAxis.value2pixel(ga.x, ga.width, xAxis.start);
+        int dx1 = xAxis.value2pixel(ga.x, ga.width, xAxis.end);
+        int dwidth = dx1 - dx0;
+        g.setColor(Color.GRAY);
+        g.fillRect(dx0, ga.y, dwidth, ga.height);
+        g.setColor(Color.WHITE);
+
+        Rectangle2D r = g.getFontMetrics().getStringBounds(text, g);
+        int tWidth = (int) r.getWidth();
+        int tHeight = (int) r.getHeight();
+        int y = ga.y + ga.height / 2 - tHeight / 2;
+
+        for (int x = dx0 + tWidth / 2; x < dx1; x += tWidth + tWidth / 2)
+            g.drawString(text, x, y);
     }
 
 }
