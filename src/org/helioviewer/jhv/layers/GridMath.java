@@ -65,7 +65,7 @@ class GridMath {
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
 
         Vec3 rotv = new Vec3(), v = new Vec3();
-        Quat q = Quat.createRotation(Math.PI / 2, new Vec3(1, 0, 0));
+        Quat q = Quat.createRotation(Math.PI / 2, Vec3.XAxis);
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             v.x = EARTH_CIRCLE_RADIUS * Math.cos(2 * Math.PI * i / SUBDIVISIONS);
             v.y = EARTH_CIRCLE_RADIUS * Math.sin(2 * Math.PI * i / SUBDIVISIONS);
@@ -83,7 +83,7 @@ class GridMath {
         colorBuffer.put(BufferUtils.colorNull);
 
         v = new Vec3();
-        q = Quat.createRotation(Math.PI / 2, new Vec3(0, 1, 0));
+        q = Quat.createRotation(Math.PI / 2, Vec3.YAxis);
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             v.x = EARTH_CIRCLE_RADIUS * Math.cos(2 * Math.PI * i / SUBDIVISIONS);
             v.y = EARTH_CIRCLE_RADIUS * Math.sin(2 * Math.PI * i / SUBDIVISIONS);
@@ -149,7 +149,7 @@ class GridMath {
         double i = 0;
         for (int j = 0; j < no_lines; j++) {
             i += step;
-            Quat q = Quat.createRotation((Math.PI / 180) * i, new Vec3(0, 0, 1));
+            Quat q = Quat.createRotation((Math.PI / 180) * i, Vec3.ZAxis);
 
             v.set(START_RADIUS * unit, 0, 0);
             Vec3 rotv1 = q.rotateVector(v);
@@ -237,7 +237,7 @@ class GridMath {
         for (int j = 0; j < no_lon_steps; j++) {
             for (int k = -1; k <= 1; k += 2) {
                 rotation = lonstepDegrees * j * k;
-                Quat q = Quat.createRotation(Math.PI / 2 + Math.PI + (Math.PI / 180) * rotation, new Vec3(0, 1, 0));
+                Quat q = Quat.createRotation(Math.PI / 2 + Math.PI + (Math.PI / 180) * rotation, Vec3.YAxis);
                 for (int i = 0; i <= HALFDIVISIONS; i++) {
                     v.x = GRID_RADIUS * Math.cos(-Math.PI / 2 + Math.PI * i / HALFDIVISIONS);
                     v.y = GRID_RADIUS * Math.sin(-Math.PI / 2 + Math.PI * i / HALFDIVISIONS);
