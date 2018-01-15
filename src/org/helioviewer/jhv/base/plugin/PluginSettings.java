@@ -21,26 +21,20 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-// This class handles to write and read the settings made to plug-ins into a specific file
 public class PluginSettings {
 
-    private static final String NODES_PLUGINS = "JHVPlugins";
-    private static final String NODES_PLUGIN = "Plugin";
-    private static final String NODES_PLUGINLOCATION = "Name";
-    private static final String NODES_PLUGINACTIVATED = "Activated";
-
+    private static final String PLUGINS = "JHVPlugins";
+    private static final String PLUGIN = "Plugin";
+    private static final String PLUGIN_NAME = "Name";
+    private static final String PLUGIN_ACTIVATED = "Activated";
     private static final String PLUGIN_FILENAME = "PluginProperties.xml";
 
     private static final PluginSettings singletonInstance = new PluginSettings();
 
     private String settingsFileName;
-
     private Document xmlDocument;
     private Node pluginsRootNode;
 
-    /**
-     * The private constructor to support the singleton pattern.
-     * */
     private PluginSettings() {
         try {
             xmlDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
@@ -49,11 +43,6 @@ public class PluginSettings {
         }
     }
 
-    /**
-     * Method returns the sole instance of this class.
-     *
-     * @return the only instance of this class.
-     * */
     public static PluginSettings getSingletonInstance() {
         return singletonInstance;
     }
@@ -76,10 +65,9 @@ public class PluginSettings {
             }
         }
 
-        // check root node of XML; if there is an unexpected root node clean up
-        // the internal XML document
+        // check root node of XML; if there is an unexpected root node clean up the internal XML document
         if (xmlDocument != null) {
-            NodeList list = xmlDocument.getElementsByTagName(NODES_PLUGINS);
+            NodeList list = xmlDocument.getElementsByTagName(PLUGINS);
             if (list.getLength() == 1) {
                 pluginsRootNode = list.item(0);
             } else {
@@ -94,7 +82,7 @@ public class PluginSettings {
                 e.printStackTrace();
             }
             if (xmlDocument != null) {
-                pluginsRootNode = xmlDocument.createElement(NODES_PLUGINS);
+                pluginsRootNode = xmlDocument.createElement(PLUGINS);
                 xmlDocument.appendChild(pluginsRootNode);
             }
         }
@@ -111,7 +99,7 @@ public class PluginSettings {
      * @see #savePluginSettings()
      */
     public void pluginSettingsToXML(PluginContainer pluginContainer) {
-        Node pluginNode = findNode(pluginsRootNode, NODES_PLUGINLOCATION, pluginContainer.toString());
+        Node pluginNode = findNode(pluginsRootNode, pluginContainer.toString());
         if (pluginNode == null) {
             addPluginToXML(pluginContainer);
         } else {
@@ -127,9 +115,9 @@ public class PluginSettings {
      *            internal XML document.
      */
     private void addPluginToXML(PluginContainer pluginContainer) {
-        Node pluginNode = xmlDocument.createElement(NODES_PLUGIN);
-        Node locationNode = xmlDocument.createElement(NODES_PLUGINLOCATION);
-        Node activatedNode = xmlDocument.createElement(NODES_PLUGINACTIVATED);
+        Node pluginNode = xmlDocument.createElement(PLUGIN);
+        Node locationNode = xmlDocument.createElement(PLUGIN_NAME);
+        Node activatedNode = xmlDocument.createElement(PLUGIN_ACTIVATED);
 
         pluginNode.appendChild(locationNode);
         pluginNode.appendChild(activatedNode);
@@ -150,7 +138,7 @@ public class PluginSettings {
      *            internal XML document.
      */
     private static void editPluginInXML(Node pluginNode, PluginContainer pluginContainer) {
-        NodeList list = ((Element) pluginNode).getElementsByTagName(NODES_PLUGINACTIVATED);
+        NodeList list = ((Element) pluginNode).getElementsByTagName(PLUGIN_ACTIVATED);
         if (list.getLength() == 1) {
             Node textNode = list.item(0).getFirstChild();
             textNode.setNodeValue(Boolean.toString(pluginContainer.isActive()));
@@ -171,8 +159,8 @@ public class PluginSettings {
      * there is no entry in the XML document the return value is false.
      */
     public boolean isPluginActivated(String jarName) {
-        Node pluginNode = findNode(pluginsRootNode, NODES_PLUGINLOCATION, jarName);
-        return pluginNode == null || isActivated(pluginNode, NODES_PLUGINACTIVATED);
+        Node pluginNode = findNode(pluginsRootNode, jarName);
+        return pluginNode == null || isActivated(pluginNode);
     }
 
     /**
@@ -181,15 +169,13 @@ public class PluginSettings {
      *
      * @param root
      *            Check all child nodes of this node.
-     * @param nodeName
-     *            Name of the nodes where to check the text node.
      * @param compareValue
      *            Value of the text node to search for.
      * @return The first found node whose text node has the given value or null
      *         if no node could be found with the given values.
      */
-    private static Node findNode(Node root, String nodeName, String compareValue) {
-        NodeList list = ((Element) root).getElementsByTagName(nodeName);
+    private static Node findNode(Node root, String compareValue) {
+        NodeList list = ((Element) root).getElementsByTagName(PLUGIN_NAME);
         for (int i = 0; i < list.getLength(); i++) {
             Node child = list.item(i).getFirstChild();
             if (child != null && child.getNodeType() == Node.TEXT_NODE && child.getNodeValue().equals(compareValue)) {
@@ -205,13 +191,11 @@ public class PluginSettings {
      *
      * @param root
      *            Check all child nodes of this node.
-     * @param nodeName
-     *            Name of the nodes where to check the text node.
      * @return The boolean value of the first found given node. If no entry
      *         could be found the return value is false.
      */
-    private static boolean isActivated(Node root, String nodeName) {
-        NodeList list = ((Element) root).getElementsByTagName(nodeName);
+    private static boolean isActivated(Node root) {
+        NodeList list = ((Element) root).getElementsByTagName(PLUGIN_ACTIVATED);
         if (list.getLength() == 1) {
             Node child = list.item(0).getFirstChild();
             if (child != null && child.getNodeType() == Node.TEXT_NODE)

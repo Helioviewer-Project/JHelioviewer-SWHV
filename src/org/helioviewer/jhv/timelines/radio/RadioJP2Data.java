@@ -50,7 +50,7 @@ class RadioJP2Data implements ImageDataHandler {
 
             view = _view;
             view.setDataHandler(this);
-            willDraw = startDate == start ? true : false; // got closest
+            willDraw = startDate == start; // didn't get closest
         } catch (Exception e) {
             _view.abolish();
             throw e;
