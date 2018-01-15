@@ -10,7 +10,7 @@ public abstract class JHVWorker<T, V> extends SwingWorker<T, V> {
         return name;
     }
 
-    public void setThreadName(String _name) {
+    protected void setThreadName(String _name) {
         name = _name;
     }
 
