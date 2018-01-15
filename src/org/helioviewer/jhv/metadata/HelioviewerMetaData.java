@@ -196,7 +196,7 @@ public class HelioviewerMetaData extends AbstractMetaData {
                 crota = m.getDouble("CROTA1").map(Math::toRadians).orElse(Double.NaN);
             if (Double.isNaN(crota))
                 crota = m.getDouble("CROTA2").map(Math::toRadians).orElse(0.);
-            return Quat.rotate(Quat.createRotation(-crota, new Vec3(0, 0, 1)), viewpoint.orientation);
+            return Quat.rotate(Quat.createRotation(-crota, Vec3.ZAxis), viewpoint.orientation);
         }
         return viewpoint.orientation;
     }
