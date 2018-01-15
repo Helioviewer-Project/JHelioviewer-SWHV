@@ -98,6 +98,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
             drawEvent(graphArea, eventUnderMouse.event, eventUnderMouse.x0, eventUnderMouse.x1, eventUnderMouse.yPosition, g, mousePosition);
             JHVEventCache.highlight(eventUnderMouse.event);
         }
+        DrawController.drawRequest(); // for highlight
     }
 
     @Override
@@ -227,15 +228,6 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
 
     @Override
     public void resetAxis() {
-    }
-
-    @Override
-    public boolean highLightChanged(Point p) {
-        if (!enabled)
-            return false;
-        if (eventUnderMouse == null)
-            return true;
-        return !(eventUnderMouse.x0 <= p.x && p.x <= eventUnderMouse.x1 && eventUnderMouse.yPosition - 4 <= p.y && p.y <= eventUnderMouse.yPosition + 5);
     }
 
     @Override

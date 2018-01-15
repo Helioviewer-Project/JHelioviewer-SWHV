@@ -47,8 +47,6 @@ public interface TimelineLayer {
 
     void resetAxis();
 
-    boolean highLightChanged(Point p);
-
     String getStringValue(long ts);
 
     ClickableDrawable getDrawableUnderMouse();
