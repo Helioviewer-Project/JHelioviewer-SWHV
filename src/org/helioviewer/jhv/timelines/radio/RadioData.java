@@ -102,8 +102,8 @@ public class RadioData extends AbstractTimelineLayer {
         private final long date;
 
         RadioJPXDownload(long _date) {
-            isDownloading++;
             date = _date;
+            isDownloading++;
             Timelines.getLayers().downloadStarted(RadioData.this);
             setThreadName("EVE--RadioDownloader");
         }
@@ -114,7 +114,6 @@ public class RadioData extends AbstractTimelineLayer {
                 APIRequest req = new APIRequest("ROB", APIRequest.CallistoID, date, date, APIRequest.CADENCE_ANY);
                 URI uri = APIRequestManager.requestRemoteFile(req);
                 return uri == null ? null : new RadioJP2Data(new JP2ViewCallisto(uri, req), req.startTime);
-            } catch (RuntimeException ignore) { // got closest
             } catch (Exception e) {
                 Log.error("An error occured while opening the remote file: " + e.getMessage());
             }
@@ -123,9 +122,9 @@ public class RadioData extends AbstractTimelineLayer {
 
         @Override
         protected void done() {
+            isDownloading--;
+            Timelines.getLayers().downloadFinished(RadioData.this);
             try {
-                isDownloading--;
-                Timelines.getLayers().downloadFinished(RadioData.this);
                 RadioJP2Data data = get();
                 if (data != null) {
                     cache.put(date, data);
@@ -172,11 +171,6 @@ public class RadioData extends AbstractTimelineLayer {
 
     @Override
     public boolean isDownloading() {
-        for (RadioJP2Data data : cache.asMap().values()) {
-            if (data.isDownloading()) {
-                return true;
-            }
-        }
         return isDownloading != 0;
     }
 

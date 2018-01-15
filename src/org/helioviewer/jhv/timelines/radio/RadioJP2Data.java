@@ -28,6 +28,7 @@ class RadioJP2Data implements ImageDataHandler {
     private final double endFreq;
     private final int jp2Width;
     private final int jp2Height;
+    private final boolean willDraw;
 
     private BufferedImage bufferedImage;
     private Region region;
@@ -47,11 +48,9 @@ class RadioJP2Data implements ImageDataHandler {
             endDate = TimeUtils.parse(hvMetaData.getRequiredString("DATE-END"));
             hvMetaData.destroyXML();
 
-            if (startDate != start) // got closest
-                throw new RuntimeException();
-
             view = _view;
             view.setDataHandler(this);
+            willDraw = startDate == start ? true : false; // got closest
         } catch (Exception e) {
             _view.abolish();
             throw e;
@@ -84,7 +83,7 @@ class RadioJP2Data implements ImageDataHandler {
     }
 
     void requestData(TimeAxis xAxis) {
-        if (view != null) {
+        if (willDraw && view != null) {
             Rectangle roi = getROI(xAxis);
             if (decodingNeeded && roi.width > 0 && roi.height > 0) {
                 view.setRegion(roi);
@@ -170,6 +169,9 @@ class RadioJP2Data implements ImageDataHandler {
     }
 
     void draw(Graphics2D g, Rectangle ga, TimeAxis xAxis) {
+        if (!willDraw)
+            return;
+
         if (hasData()) {
             int sx0 = 0;
             int sy0 = 0;
@@ -190,10 +192,6 @@ class RadioJP2Data implements ImageDataHandler {
             g.drawImage(bufferedImage, dx0, dy0, dx1, dy1, sx0, sy0, sx1, sy1, null);
         } else
             RadioData.drawString(g, ga, xAxis, "Fetching data");
-    }
-
-    boolean isDownloading() {
-        return !hasData();
     }
 
     void changeColormap(ColorModel cm) {
