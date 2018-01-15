@@ -58,10 +58,6 @@ class RadioJP2Data implements ImageDataHandler {
         }
     }
 
-    long getStartDate() {
-        return startDate;
-    }
-
     void removeData() {
         if (view != null) {
             view.setDataHandler(null);
@@ -83,7 +79,6 @@ class RadioJP2Data implements ImageDataHandler {
 
             region = imageData.getRegion();
             bufferedImage = NIOBufferImageFactory.createIndexed(imageData.getBuffer(), w, h, RadioData.getColorModel());
-
             DrawController.drawRequest();
         }
     }

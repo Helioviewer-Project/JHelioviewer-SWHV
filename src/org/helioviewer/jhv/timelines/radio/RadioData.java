@@ -82,10 +82,10 @@ public class RadioData extends AbstractTimelineLayer {
         cache.invalidateAll();
     }
 
-    private void requestAndOpenIntervals(long start, long end) {
-        long now = System.currentTimeMillis();
+    private void requestAndOpenIntervals(long start) {
         start -= start % TimeUtils.DAY_IN_MILLIS + 2 * TimeUtils.DAY_IN_MILLIS;
-        end = Math.min(start + DAYS_IN_CACHE * TimeUtils.DAY_IN_MILLIS, now - now % TimeUtils.DAY_IN_MILLIS + TimeUtils.DAY_IN_MILLIS);
+        long now = System.currentTimeMillis();
+        long end = Math.min(start + DAYS_IN_CACHE * TimeUtils.DAY_IN_MILLIS, now - now % TimeUtils.DAY_IN_MILLIS);
 
         for (int i = 0; i < DAYS_IN_CACHE; i++) {
             long date = end - i * TimeUtils.DAY_IN_MILLIS;
@@ -136,12 +136,6 @@ public class RadioData extends AbstractTimelineLayer {
             }
         }
 
-    }
-
-    private static void requestForData() {
-        for (RadioJP2Data jp2Data : cache.asMap().values()) {
-            jp2Data.requestData(DrawController.selectedAxis);
-        }
     }
 
     @Override
@@ -209,8 +203,10 @@ public class RadioData extends AbstractTimelineLayer {
     @Override
     public void fetchData(TimeAxis selectedAxis) {
         if (enabled && selectedAxis.end - selectedAxis.start <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS) {
-            requestForData();
-            requestAndOpenIntervals(selectedAxis.start, selectedAxis.end);
+            for (RadioJP2Data jp2Data : cache.asMap().values()) {
+                jp2Data.requestData(selectedAxis);
+            }
+            requestAndOpenIntervals(selectedAxis.start);
         }
     }
 
