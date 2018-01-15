@@ -22,7 +22,7 @@ public class PfssCache {
     }
 
     private PfssData get(long time, String url) {
-        PfssData ret = cache.asMap().get(url);
+        PfssData ret = cache.getIfPresent(url);
         if (ret == null) {
             PfssPlugin.pfssDataPool.execute(new PfssDataLoader(time, url));
         }
