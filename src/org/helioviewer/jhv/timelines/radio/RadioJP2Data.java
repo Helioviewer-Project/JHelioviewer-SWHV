@@ -47,8 +47,8 @@ class RadioJP2Data implements ImageDataHandler {
             endDate = TimeUtils.parse(hvMetaData.getRequiredString("DATE-END"));
             hvMetaData.destroyXML();
 
-            if (startDate != start)
-                throw new Exception("Unexpected start date: " + TimeUtils.formatZ(startDate) + " " + _view.getURI());
+            if (startDate != start) // got closest
+                throw new RuntimeException();
 
             view = _view;
             view.setDataHandler(this);
