@@ -162,8 +162,8 @@ public class RadioData extends AbstractTimelineLayer {
     @Override
     public void setEnabled(boolean _enabled) {
         super.setEnabled(_enabled);
-        clearCache();
-        fetchData(DrawController.selectedAxis);
+        if (!enabled)
+            clearCache();
     }
 
     @Override
