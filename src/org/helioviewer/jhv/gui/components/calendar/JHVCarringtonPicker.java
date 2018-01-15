@@ -151,7 +151,7 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener {
             add(crCombo);
         }
 
-        public void setTime(long t) {
+        void setTime(long t) {
             int cr = (int) Math.round(Carrington.time2CR(new JHVDate(t)) - Carrington.CR_MINIMAL);
             crCombo.setSelectedIndex(cr);
         }

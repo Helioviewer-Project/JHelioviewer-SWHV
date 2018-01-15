@@ -183,7 +183,7 @@ class JHVCalendar extends JPanel {
          * @param text
          *            text to display on the button.
          */
-        public void setSelectButtonText(String text) {
+        void setSelectButtonText(String text) {
             selectButton.setText(text);
         }
 
@@ -256,7 +256,7 @@ class JHVCalendar extends JPanel {
          * Sets the quick forward button and the quick back button visible or
          * not depending on the current display mode.
          */
-        public void updateButtonsVisibility() {
+        void updateButtonsVisibility() {
             quickForwardButton.setVisible(displayMode != DisplayMode.YEARS);
             quickBackButton.setVisible(displayMode != DisplayMode.YEARS);
         }
@@ -346,7 +346,7 @@ class JHVCalendar extends JPanel {
          * @param showHeader
          *            true if the header should be displayed; false if not.
          */
-        public void fillGrid(Object[][] data, String[] columnNames, Point selectedCell, boolean showHeader) {
+        void fillGrid(Object[][] data, String[] columnNames, Point selectedCell, boolean showHeader) {
             // check if valid data is available
             if (data == null || columnNames == null)
                 return;
@@ -389,7 +389,7 @@ class JHVCalendar extends JPanel {
         /**
          * Sets the size of the table to the size of the available space.
          */
-        public void resizeTableSpace() {
+        void resizeTableSpace() {
             table.setSize(new Dimension(contentPane.getWidth() - 4, contentPane.getHeight()));
             table.setPreferredSize(new Dimension(contentPane.getWidth() - 4, contentPane.getHeight()));
         }
@@ -398,7 +398,7 @@ class JHVCalendar extends JPanel {
          * Computes the height of the rows so they will fit to the whole height
          * of the the table.
          */
-        public void resizeTableRowHeight() {
+        void resizeTableRowHeight() {
             int headerHeight = 0;
             if (displayMode == DisplayMode.DAYS)
                 headerHeight = table.getTableHeader().getHeight();
@@ -413,7 +413,7 @@ class JHVCalendar extends JPanel {
          * Sets the size of the columns so all columns will have the same size
          * and all columns will fit into the space of the table component.
          */
-        public void resizeTableColumnWidth() {
+        void resizeTableColumnWidth() {
             JTableHeader tableHeader = table.getTableHeader();
             for (int i = 0; i < tableHeader.getColumnModel().getColumnCount(); i++) {
                 tableHeader.getColumnModel().getColumn(i).setWidth(table.getColumnModel().getColumn(i).getWidth());
