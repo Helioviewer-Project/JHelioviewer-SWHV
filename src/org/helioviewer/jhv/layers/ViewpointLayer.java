@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.BufferUtils;
@@ -41,6 +42,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
     private final GLLine line = new GLLine();
     private final GLPoint center = new GLPoint();
+    private final GLPoint planets = new GLPoint();
     private final CameraOptionsPanel optionsPanel;
 
     private String timeString = null;
@@ -61,7 +63,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         gl.glMultMatrixd(camera.getViewpoint().orientation.toMatrix().transpose().m, 0);
         {
             if (Displayer.getUpdateViewpoint() == UpdateViewpoint.equatorial) {
-                gl.glPointSize(15f);
+                gl.glPointSize(centerSize);
                 gl.glBegin(GL2.GL_POINTS);
                 for (Map.Entry<LoadPosition, Position.L> entry : UpdateViewpoint.equatorial.getPositions()) {
                     float[] c = entry.getKey().getTarget().getColor();
@@ -70,6 +72,9 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
                     gl.glVertex3f((float) (p.rad * Math.cos(p.lon)), (float) (p.rad * Math.sin(p.lon)), 0);
                 }
                 gl.glEnd();
+
+                //computePlanets(gl, UpdateViewpoint.equatorial.getPositions());
+                //planets.render(gl);
             }
             center.render(gl);
             line.render(gl, vp.aspect, thickness);
@@ -195,6 +200,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     @Override
     public void init(GL2 gl) {
         line.init(gl);
+        planets.init(gl);
         center.init(gl);
         computeCenter(gl);
     }
@@ -202,6 +208,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     @Override
     public void dispose(GL2 gl) {
         line.dispose(gl);
+        planets.dispose(gl);
         center.dispose(gl);
     }
 
@@ -294,6 +301,29 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         centerPosition.rewind();
         centerColor.rewind();
         center.setData(gl, centerPosition, centerColor);
+    }
+
+    private void computePlanets(GL2 gl, Set<Map.Entry<LoadPosition, Position.L>> positions) {
+        int size = positions.size();
+        FloatBuffer planetPosition = BufferUtils.newFloatBuffer(4 * size);
+        FloatBuffer planetColor = BufferUtils.newFloatBuffer(4 * size);
+
+        for (Map.Entry<LoadPosition, Position.L> entry : UpdateViewpoint.equatorial.getPositions()) {
+            Position.L p = entry.getValue();
+            double theta = p.lat;
+            double phi = p.lon;
+
+            double y = p.rad * Math.cos(theta) * Math.sin(phi);
+            double x = p.rad * Math.cos(theta) * Math.cos(phi);
+            double z = p.rad * Math.sin(theta);
+
+            BufferUtils.put4f(planetPosition, (float) x, (float) y, (float) z, centerSize);
+            planetColor.put(entry.getKey().getTarget().getColor());
+        }
+
+        planetPosition.rewind();
+        planetColor.rewind();
+        planets.setData(gl, planetPosition, planetColor);
     }
 
 }
