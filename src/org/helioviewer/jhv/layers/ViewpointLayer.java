@@ -57,17 +57,21 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         gl.glPushMatrix();
         gl.glMultMatrixd(camera.getViewpoint().orientation.toMatrix().transpose().m, 0);
         {
+            gl.glPointSize(15f);
+            gl.glBegin(GL2.GL_POINTS);
             if (Displayer.getUpdateViewpoint() == UpdateViewpoint.equatorial) {
-                gl.glPointSize(15f);
-                gl.glBegin(GL2.GL_POINTS);
                 for (Map.Entry<LoadPosition, Position.L> entry : UpdateViewpoint.equatorial.getPositions()) {
                     float[] c = entry.getKey().getTarget().getColor();
                     gl.glColor3f(c[0], c[1], c[2]);
                     Position.L p = entry.getValue();
                     gl.glVertex3f((float) (p.rad * Math.cos(p.lon)), (float) (p.rad * Math.sin(p.lon)), 0);
                 }
-                gl.glEnd();
             }
+
+            gl.glColor3f(color1[0], color1[1], color1[2]);
+            gl.glVertex3f(0, 0, (float) (1 + epsilon));
+            gl.glEnd();
+
             line.render(gl, vp.aspect, thickness);
         }
         gl.glPopMatrix();
