@@ -22,7 +22,7 @@ public class GLLine {
         hasPoints = false;
         int plen = points.limit() / 3;
         if (plen != colors.limit() / 4 || plen < 2) {
-            Log.error("Something is wrong with the vertices or colors from this line.");
+            Log.error("Something is wrong with the vertices or colors from this GLLine.");
             return;
         }
         setBufferData(gl, points, colors, plen);

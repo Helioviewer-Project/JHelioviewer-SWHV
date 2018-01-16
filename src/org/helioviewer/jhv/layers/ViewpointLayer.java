@@ -18,6 +18,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLLine;
+import org.helioviewer.jhv.opengl.GLPoint;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.time.JHVDate;
 import org.json.JSONObject;
@@ -33,11 +34,13 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     private static final FloatBuffer colorBuffer = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2)) * 4);
     private static final double epsilon = 0.01;
     private static final double thickness = 0.002;
+    private static final float centerSize = 15f;
 
     private static final float[] color1 = BufferUtils.colorBlue;
     private static final float[] color2 = BufferUtils.colorWhite;
 
     private final GLLine line = new GLLine();
+    private final GLPoint center = new GLPoint();
     private final CameraOptionsPanel optionsPanel;
 
     private String timeString = null;
@@ -57,21 +60,18 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         gl.glPushMatrix();
         gl.glMultMatrixd(camera.getViewpoint().orientation.toMatrix().transpose().m, 0);
         {
-            gl.glPointSize(15f);
-            gl.glBegin(GL2.GL_POINTS);
             if (Displayer.getUpdateViewpoint() == UpdateViewpoint.equatorial) {
+                gl.glPointSize(15f);
+                gl.glBegin(GL2.GL_POINTS);
                 for (Map.Entry<LoadPosition, Position.L> entry : UpdateViewpoint.equatorial.getPositions()) {
                     float[] c = entry.getKey().getTarget().getColor();
                     gl.glColor3f(c[0], c[1], c[2]);
                     Position.L p = entry.getValue();
                     gl.glVertex3f((float) (p.rad * Math.cos(p.lon)), (float) (p.rad * Math.sin(p.lon)), 0);
                 }
+                gl.glEnd();
             }
-
-            gl.glColor3f(color1[0], color1[1], color1[2]);
-            gl.glVertex3f(0, 0, (float) (1 + epsilon));
-            gl.glEnd();
-
+            center.render(gl);
             line.render(gl, vp.aspect, thickness);
         }
         gl.glPopMatrix();
@@ -195,11 +195,14 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     @Override
     public void init(GL2 gl) {
         line.init(gl);
+        center.init(gl);
+        computeCenter(gl);
     }
 
     @Override
     public void dispose(GL2 gl) {
         line.dispose(gl);
+        center.dispose(gl);
     }
 
     @Override
@@ -279,6 +282,18 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         positionBuffer.rewind();
         colorBuffer.rewind();
         line.setData(gl, positionBuffer, colorBuffer);
+    }
+
+    private void computeCenter(GL2 gl) {
+        FloatBuffer centerPosition = BufferUtils.newFloatBuffer(4);
+        FloatBuffer centerColor = BufferUtils.newFloatBuffer(4);
+
+        BufferUtils.put4f(centerPosition, 0, 0, (float) (1 + epsilon), centerSize);
+        centerColor.put(color1);
+
+        centerPosition.rewind();
+        centerColor.rewind();
+        center.setData(gl, centerPosition, centerColor);
     }
 
 }
