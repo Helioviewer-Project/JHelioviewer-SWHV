@@ -160,11 +160,11 @@ public class GridLayer extends AbstractLayer {
             gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
             {
                 if (far) {
-                    radialCircleLineFar.render(gl, vp.aspect, thickness * factor);
-                    radialThickLineFar.render(gl, vp.aspect, 3 * thickness * factor);
+                    radialCircleLineFar.render(gl, vp.aspect, thickness);
+                    radialThickLineFar.render(gl, vp.aspect, 3 * thickness);
                 } else {
-                    radialCircleLine.render(gl, vp.aspect, 3 * thickness * factor);
-                    radialThickLine.render(gl, vp.aspect, 9 * thickness * factor);
+                    radialCircleLine.render(gl, vp.aspect, thickness);
+                    radialThickLine.render(gl, vp.aspect, 3 * thickness);
                 }
                 if (showLabels) {
                     if (far)

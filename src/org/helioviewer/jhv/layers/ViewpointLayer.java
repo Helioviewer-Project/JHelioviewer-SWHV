@@ -34,6 +34,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     private static final FloatBuffer positionBuffer = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2)) * 3);
     private static final FloatBuffer colorBuffer = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2)) * 4);
     private static final double epsilon = 0.001;
+    private static final double thickness = 0.00002;
     private static final float centerSize = 0.1f;
 
     private static final float[] color1 = BufferUtils.colorBlue;
@@ -77,7 +78,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
                 // planets.render(gl, factor);
             }
             center.render(gl, factor);
-            line.render(gl, vp.aspect, width / camera.getWidth() * 0.002);
+            line.render(gl, vp.aspect, thickness * factor);
         }
         gl.glPopMatrix();
     }
