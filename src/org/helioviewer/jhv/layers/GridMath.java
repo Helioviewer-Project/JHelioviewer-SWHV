@@ -107,7 +107,6 @@ class GridMath {
 
     static void initRadialCircles(GL2 gl, GLLine radialCircleLine, GLLine radialThickLine, double unit, double step) {
         int no_lines = (int) Math.ceil(360 / step);
-
         int no_points = (END_RADIUS - START_RADIUS + 1 - TENS_RADIUS) * (SUBDIVISIONS + 3) + 4 * no_lines;
         FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(no_points * 3);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
@@ -262,7 +261,7 @@ class GridMath {
             for (int k = -1; k <= 1; k += 2) {
                 rotation = latstepDegrees * j * k;
                 for (int i = 0; i <= HALFDIVISIONS; i++) {
-                    double scale = Math.cos(Math.PI / 180. * (90 - rotation));
+                    double scale = Math.cos((Math.PI / 180.) * (90 - rotation));
                     v.y = GRID_RADIUS * scale;
                     v.x = GRID_RADIUS * Math.sqrt(1. - scale * scale) * Math.sin(2 * Math.PI * i / HALFDIVISIONS);
                     v.z = GRID_RADIUS * Math.sqrt(1. - scale * scale) * Math.cos(2 * Math.PI * i / HALFDIVISIONS);
