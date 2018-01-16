@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.opengl.GLLine;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.time.JHVDate;
 import org.json.JSONObject;
@@ -26,13 +28,17 @@ import com.jogamp.newt.event.MouseListener;
 
 public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
-    private final CameraOptionsPanel optionsPanel;
+    private static final int SUBDIVISIONS = 12;
+    private static final FloatBuffer positionBuffer = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2)) * 3);
+    private static final FloatBuffer colorBuffer = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2)) * 4);
     private static final double epsilon = 0.01;
-
-    private static final float lineWidth = 2;
+    private static final double thickness = 0.002;
 
     private static final float[] color1 = BufferUtils.colorBlue;
     private static final float[] color2 = BufferUtils.colorWhite;
+
+    private final GLLine line = new GLLine();
+    private final CameraOptionsPanel optionsPanel;
 
     private String timeString = null;
 
@@ -46,8 +52,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             return;
 
         double width = camera.getViewpoint().distance * Math.tan(optionsPanel.getFOVAngle());
-        double height = width;
-        double scale = 1.;
+        computeLine(gl, width);
 
         gl.glPushMatrix();
         gl.glMultMatrixd(camera.getViewpoint().orientation.toMatrix().transpose().m, 0);
@@ -63,75 +68,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
                 }
                 gl.glEnd();
             }
-
-            gl.glLineWidth(lineWidth);
-            gl.glBegin(GL2.GL_LINE_LOOP);
-
-            double x, y, z, n;
-            double bw = width * scale / 2.;
-            double bh = height * scale / 2.;
-            int subdivisions = 10;
-            for (int i = 0; i <= subdivisions; i++) {
-                if (i % 2 == 0) {
-                    gl.glColor3f(color1[0], color1[1], color1[2]);
-                } else {
-                    gl.glColor3f(color2[0], color2[1], color2[2]);
-                }
-                x = -bw + 2 * bw / subdivisions * i;
-                y = bh;
-                z = epsilon;
-                n = 1 - x * x - y * y;
-                if (n > 0) {
-                    z += Math.sqrt(n);
-                }
-                gl.glVertex3f((float) x, (float) y, (float) z);
-            }
-            for (int i = 0; i <= subdivisions; i++) {
-                if (i % 2 == 0) {
-                    gl.glColor3f(color1[0], color1[1], color1[2]);
-                } else {
-                    gl.glColor3f(color2[0], color2[1], color2[2]);
-                }
-                x = bw;
-                y = bh - 2 * bh / subdivisions * i;
-                z = epsilon;
-                n = 1 - x * x - y * y;
-                if (n > 0) {
-                    z += Math.sqrt(n);
-                }
-                gl.glVertex3f((float) x, (float) y, (float) z);
-            }
-            for (int i = 0; i <= subdivisions; i++) {
-                if (i % 2 == 0) {
-                    gl.glColor3f(color1[0], color1[1], color1[2]);
-                } else {
-                    gl.glColor3f(color2[0], color2[1], color2[2]);
-                }
-                x = bw - 2 * bw / subdivisions * i;
-                y = -bh;
-                z = epsilon;
-                n = 1 - x * x - y * y;
-                if (n > 0) {
-                    z += Math.sqrt(n);
-                }
-                gl.glVertex3f((float) x, (float) y, (float) z);
-            }
-            for (int i = 0; i <= subdivisions; i++) {
-                if (i % 2 == 0) {
-                    gl.glColor3f(color1[0], color1[1], color1[2]);
-                } else {
-                    gl.glColor3f(color2[0], color2[1], color2[2]);
-                }
-                x = -bw;
-                y = -bh + 2 * bh / subdivisions * i;
-                z = epsilon;
-                n = 1 - x * x - y * y;
-                if (n > 0) {
-                    z += Math.sqrt(n);
-                }
-                gl.glVertex3f((float) x, (float) y, (float) z);
-            }
-            gl.glEnd();
+            line.render(gl, vp.aspect, thickness);
         }
         gl.glPopMatrix();
     }
@@ -253,15 +190,91 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
     @Override
     public void init(GL2 gl) {
+        line.init(gl);
     }
 
     @Override
     public void dispose(GL2 gl) {
+        line.dispose(gl);
     }
 
     @Override
     public void serialize(JSONObject jo) {
         optionsPanel.serialize(jo);
+    }
+
+    private void computeLine(GL2 gl, double size) {
+        double x, y, z, n;
+        double bw = size / 2.;
+        double bh = size / 2.;
+
+        for (int i = 0; i <= SUBDIVISIONS; i++) {
+            x = -bw + 2 * bw / SUBDIVISIONS * i;
+            y = bh;
+            z = epsilon;
+            n = 1 - x * x - y * y;
+            if (n > 0) {
+                z += Math.sqrt(n);
+            }
+            if (i == 0) {
+                BufferUtils.put3f(positionBuffer, (float) x, (float) y, (float) z);
+                colorBuffer.put(BufferUtils.colorNull);
+            }
+            BufferUtils.put3f(positionBuffer, (float) x, (float) y, (float) z);
+            colorBuffer.put(i % 2 == 0 ? color1 : color2);
+        }
+
+        for (int i = 0; i <= SUBDIVISIONS; i++) {
+            x = bw;
+            y = bh - 2 * bh / SUBDIVISIONS * i;
+            z = epsilon;
+            n = 1 - x * x - y * y;
+            if (n > 0) {
+                z += Math.sqrt(n);
+            }
+            if (i == 0) {
+                BufferUtils.put3f(positionBuffer, (float) x, (float) y, (float) z);
+                colorBuffer.put(BufferUtils.colorNull);
+            }
+            BufferUtils.put3f(positionBuffer, (float) x, (float) y, (float) z);
+            colorBuffer.put(i % 2 == 0 ? color1 : color2);
+        }
+
+        for (int i = 0; i <= SUBDIVISIONS; i++) {
+            x = bw - 2 * bw / SUBDIVISIONS * i;
+            y = -bh;
+            z = epsilon;
+            n = 1 - x * x - y * y;
+            if (n > 0) {
+                z += Math.sqrt(n);
+            }
+            if (i == 0) {
+                BufferUtils.put3f(positionBuffer, (float) x, (float) y, (float) z);
+                colorBuffer.put(BufferUtils.colorNull);
+            }
+            BufferUtils.put3f(positionBuffer, (float) x, (float) y, (float) z);
+            colorBuffer.put(i % 2 == 0 ? color1 : color2);
+        }
+
+        for (int i = 0; i <= SUBDIVISIONS; i++) {
+            x = -bw;
+            y = -bh + 2 * bh / SUBDIVISIONS * i;
+            z = epsilon;
+            n = 1 - x * x - y * y;
+            if (n > 0) {
+                z += Math.sqrt(n);
+            }
+            if (i == 0) {
+                BufferUtils.put3f(positionBuffer, (float) x, (float) y, (float) z);
+                colorBuffer.put(BufferUtils.colorNull);
+            }
+            BufferUtils.put3f(positionBuffer, (float) x, (float) y, (float) z);
+            colorBuffer.put(i % 2 == 0 ? color1 : color2);
+        }
+
+        positionBuffer.rewind();
+        colorBuffer.rewind();
+        line.setData(gl, positionBuffer, colorBuffer);
     }
 
 }
