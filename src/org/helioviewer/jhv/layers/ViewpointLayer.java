@@ -33,7 +33,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     private static final int SUBDIVISIONS = 36;
     private static final FloatBuffer positionBuffer = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2)) * 3);
     private static final FloatBuffer colorBuffer = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2)) * 4);
-    private static final double epsilon = 0.001;
+    private static final double epsilon = 0.01;
     private static final double thickness = 0.00002;
     private static final float centerSize = 0.1f;
 
@@ -297,7 +297,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         FloatBuffer centerColor = BufferUtils.newFloatBuffer(4);
 
         BufferUtils.put4f(centerPosition, 0, 0, (float) (1 + epsilon), centerSize);
-        centerColor.put(color1);
+        centerColor.put(BufferUtils.colorGreen);
 
         centerPosition.rewind();
         centerColor.rewind();
