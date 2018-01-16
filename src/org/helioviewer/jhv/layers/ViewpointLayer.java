@@ -35,7 +35,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     private static final FloatBuffer colorBuffer = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2)) * 4);
     private static final double epsilon = 0.01;
     private static final double thickness = 0.002;
-    private static final float centerSize = 10f;
+    private static final float centerSize = 0.2f;
 
     private static final float[] color1 = BufferUtils.colorBlue;
     private static final float[] color2 = BufferUtils.colorWhite;
@@ -63,7 +63,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         gl.glMultMatrixd(camera.getViewpoint().orientation.toMatrix().transpose().m, 0);
         {
             if (Displayer.getUpdateViewpoint() == UpdateViewpoint.equatorial) {
-                gl.glPointSize(centerSize);
+                gl.glPointSize(15f);
                 gl.glBegin(GL2.GL_POINTS);
                 for (Map.Entry<LoadPosition, Position.L> entry : UpdateViewpoint.equatorial.getPositions()) {
                     float[] c = entry.getKey().getTarget().getColor();
@@ -72,11 +72,10 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
                     gl.glVertex3f((float) (p.rad * Math.cos(p.lon)), (float) (p.rad * Math.sin(p.lon)), 0);
                 }
                 gl.glEnd();
-
-                //computePlanets(gl, UpdateViewpoint.equatorial.getPositions());
-                //planets.render(gl, 2);
+                // computePlanets(gl, UpdateViewpoint.equatorial.getPositions());
+                // planets.render(gl, 1 / camera.getFOV());
             }
-            center.render(gl, 2 / camera.getWidth());
+            center.render(gl, 1 / camera.getFOV());
             line.render(gl, vp.aspect, thickness);
         }
         gl.glPopMatrix();
