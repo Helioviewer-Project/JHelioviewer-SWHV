@@ -22,7 +22,7 @@ class GridMath {
     private static final float[] color1 = BufferUtils.colorRed;
     private static final float[] color2 = BufferUtils.colorGreen;
 
-    private static final float earthPointSize = 0.1f;
+    private static final float earthPointSize = 0.2f;
 
     private static final float AXIS_START = (float) (1. * Sun.Radius);
     private static final float AXIS_STOP = (float) (1.2 * Sun.Radius);
@@ -66,7 +66,7 @@ class GridMath {
         FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(4);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4);
 
-        BufferUtils.put4f(positionBuffer, 0, 0, (float) (EARTH_CIRCLE_RADIUS + 0.01), earthPointSize);
+        BufferUtils.put4f(positionBuffer, 0, 0, (float) EARTH_CIRCLE_RADIUS, earthPointSize);
         colorBuffer.put(earthLineColor);
 
         positionBuffer.rewind();

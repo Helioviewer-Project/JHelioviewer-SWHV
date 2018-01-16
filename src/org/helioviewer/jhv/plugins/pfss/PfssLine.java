@@ -11,7 +11,7 @@ import com.jogamp.opengl.GL2;
 
 class PfssLine {
 
-    private static final double thickness = 0.00004;
+    private static final double thickness = 0.004;
     private static final float[] openFieldColor = BufferUtils.colorRed;
     private static final float[] loopColor = BufferUtils.colorWhite;
     private static final float[] insideFieldColor = BufferUtils.colorBlue;
@@ -29,8 +29,8 @@ class PfssLine {
         line.dispose(gl);
     }
 
-    void render(GL2 gl, double aspect, double factor) {
-        line.render(gl, aspect, thickness * factor);
+    void render(GL2 gl, double aspect) {
+        line.render(gl, aspect, thickness);
     }
 
     private void computeBrightColor(double b) {
