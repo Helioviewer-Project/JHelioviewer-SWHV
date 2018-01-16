@@ -47,4 +47,11 @@ public class BufferUtils {
         buf.put((float) v.z);
     }
 
+    public static void put4f(FloatBuffer buf, float x, float y, float z, float w) {
+        buf.put(x);
+        buf.put(y);
+        buf.put(z);
+        buf.put(w);
+    }
+
 }

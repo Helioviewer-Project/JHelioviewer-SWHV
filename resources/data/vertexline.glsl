@@ -11,7 +11,6 @@ uniform int miter;
 varying vec4 frag_linecolor;
 varying float frag_direction;
 
-
 void main() {
   vec2 aspectVec = vec2(aspect, 1.);
   mat4 m = gl_ModelViewProjectionMatrix;
