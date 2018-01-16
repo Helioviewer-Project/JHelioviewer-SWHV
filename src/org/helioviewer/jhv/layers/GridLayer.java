@@ -149,7 +149,7 @@ public class GridLayer extends AbstractLayer {
             }
         }
         gl.glPopMatrix();
-        drawEarthCircles(gl, vp.aspect, Sun.getEarthQuat(camera.getViewpoint().time).orientation);
+        drawEarthCircles(gl, vp.aspect, 2 / camera.getWidth(), Sun.getEarthQuat(camera.getViewpoint().time).orientation);
 
         if (showRadial) {
             boolean far = camera.getViewpoint().distance > 100 * Sun.MeanEarthDistance;
@@ -223,11 +223,11 @@ public class GridLayer extends AbstractLayer {
         renderer.end3DRendering();
     }
 
-    private void drawEarthCircles(GL2 gl, double aspect, Quat q) {
+    private void drawEarthCircles(GL2 gl, double aspect, double factor, Quat q) {
         gl.glPushMatrix();
         gl.glMultMatrixd(q.toMatrix().transpose().m, 0);
         earthCircleLine.render(gl, aspect, thicknessEarth);
-        earthPoint.render(gl);
+        earthPoint.render(gl, factor);
         gl.glPopMatrix();
     }
 

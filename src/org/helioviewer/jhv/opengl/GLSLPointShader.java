@@ -8,6 +8,10 @@ class GLSLPointShader extends GLSLShader {
     static int positionRef = 0;
     static int colorRef = 1;
 
+    private int factorRef;
+
+    private final float[] factor = { 1 };
+
     private GLSLPointShader(String vertex, String fragment) {
         super(vertex, fragment);
     }
@@ -34,6 +38,15 @@ class GLSLPointShader extends GLSLShader {
     protected void _after_init(GL2 gl) {
         positionRef = gl.glGetAttribLocation(progID, "position");
         colorRef = gl.glGetAttribLocation(progID, "color");
+        factorRef = gl.glGetUniformLocation(progID, "factor");
+    }
+
+    public void bindParams(GL2 gl) {
+        gl.glUniform1fv(factorRef, 1, factor, 0);
+    }
+
+    public void setFactor(double _factor) {
+        factor[0] = (float) _factor;
     }
 
 }

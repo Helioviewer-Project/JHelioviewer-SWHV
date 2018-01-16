@@ -74,9 +74,9 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
                 gl.glEnd();
 
                 //computePlanets(gl, UpdateViewpoint.equatorial.getPositions());
-                //planets.render(gl);
+                //planets.render(gl, 2);
             }
-            center.render(gl);
+            center.render(gl, 2 / camera.getWidth());
             line.render(gl, vp.aspect, thickness);
         }
         gl.glPopMatrix();

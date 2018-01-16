@@ -43,11 +43,13 @@ public class GLPoint {
         return indicesBuffer;
     }
 
-    public void render(GL2 gl) {
+    public void render(GL2 gl, double factor) {
         if (!hasPoints)
             return;
 
         GLSLPointShader.point.bind(gl);
+        GLSLPointShader.point.setFactor(factor);
+        GLSLPointShader.point.bindParams(gl);
 
         bindVBOs(gl);
         gl.glDrawElements(GL2.GL_POINTS, ivbo.bufferSize, GL2.GL_UNSIGNED_INT, 0);
