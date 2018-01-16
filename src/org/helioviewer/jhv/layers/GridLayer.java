@@ -37,9 +37,9 @@ public class GridLayer extends AbstractLayer {
 
     // height of text in solar radii
     private static final float textScale = GridLabel.textScale;
-    private static final double thickness = 0.002;
-    private static final double thicknessEarth = 0.003;
-    private static final double thicknessAxes = 0.005;
+    private static final double thickness = 0.00002;
+    private static final double thicknessEarth = 0.00003;
+    private static final double thicknessAxes = 0.00005;
 
     private static final DecimalFormat formatter2 = MathUtils.numberFormatter("0", 2);
 
@@ -134,8 +134,10 @@ public class GridLayer extends AbstractLayer {
             gridNeedsInit = false;
         }
 
+        double factor = 1 / camera.getFOV();
+
         if (showAxis)
-            axesLine.render(gl, vp.aspect, thicknessAxes);
+            axesLine.render(gl, vp.aspect, thicknessAxes * factor);
 
         Mat4 cameraMatrix = getGridQuat(camera, gridType).toMatrix();
         double pixelsPerSolarRadius = textScale * vp.height / (2 * camera.getWidth());
@@ -143,13 +145,13 @@ public class GridLayer extends AbstractLayer {
         gl.glPushMatrix();
         gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
         {
-            gridLine.render(gl, vp.aspect, thickness);
+            gridLine.render(gl, vp.aspect, thickness * factor);
             if (showLabels) {
                 drawGridText(gl, (int) pixelsPerSolarRadius);
             }
         }
         gl.glPopMatrix();
-        drawEarthCircles(gl, vp.aspect, 1 / camera.getFOV(), Sun.getEarthQuat(camera.getViewpoint().time).orientation);
+        drawEarthCircles(gl, vp.aspect, factor, Sun.getEarthQuat(camera.getViewpoint().time).orientation);
 
         if (showRadial) {
             boolean far = camera.getViewpoint().distance > 100 * Sun.MeanEarthDistance;
@@ -226,7 +228,7 @@ public class GridLayer extends AbstractLayer {
     private void drawEarthCircles(GL2 gl, double aspect, double factor, Quat q) {
         gl.glPushMatrix();
         gl.glMultMatrixd(q.toMatrix().transpose().m, 0);
-        earthCircleLine.render(gl, aspect, thicknessEarth);
+        earthCircleLine.render(gl, aspect, thicknessEarth * factor);
         earthPoint.render(gl, factor);
         gl.glPopMatrix();
     }

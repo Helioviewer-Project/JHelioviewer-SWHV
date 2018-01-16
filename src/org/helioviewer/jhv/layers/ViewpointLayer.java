@@ -30,12 +30,12 @@ import com.jogamp.newt.event.MouseListener;
 
 public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
-    private static final int SUBDIVISIONS = 12;
+    private static final int SUBDIVISIONS = 36;
     private static final FloatBuffer positionBuffer = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2)) * 3);
     private static final FloatBuffer colorBuffer = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2)) * 4);
     private static final double epsilon = 0.01;
-    private static final double thickness = 0.002;
-    private static final float centerSize = 0.2f;
+    private static final double thickness = 0.00002;
+    private static final float centerSize = 0.1f;
 
     private static final float[] color1 = BufferUtils.colorBlue;
     private static final float[] color2 = BufferUtils.colorWhite;
@@ -59,6 +59,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         double width = camera.getViewpoint().distance * Math.tan(optionsPanel.getFOVAngle());
         computeLine(gl, width);
 
+        double factor = 1 / camera.getFOV();
+
         gl.glPushMatrix();
         gl.glMultMatrixd(camera.getViewpoint().orientation.toMatrix().transpose().m, 0);
         {
@@ -73,10 +75,10 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
                 }
                 gl.glEnd();
                 // computePlanets(gl, UpdateViewpoint.equatorial.getPositions());
-                // planets.render(gl, 1 / camera.getFOV());
+                // planets.render(gl, factor);
             }
-            center.render(gl, 1 / camera.getFOV());
-            line.render(gl, vp.aspect, thickness);
+            center.render(gl, factor);
+            line.render(gl, vp.aspect, thickness * factor);
         }
         gl.glPopMatrix();
     }
