@@ -15,6 +15,7 @@ import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.opengl.GLLine;
+import org.helioviewer.jhv.opengl.GLPoint;
 import org.helioviewer.jhv.opengl.GLText;
 import org.json.JSONObject;
 
@@ -52,6 +53,7 @@ public class GridLayer extends AbstractLayer {
     private boolean showLabels = true;
     private boolean showRadial = false;
 
+    private final GLPoint earthPoint = new GLPoint();
     private final GLLine axesLine = new GLLine();
     private final GLLine earthCircleLine = new GLLine();
     private final GLLine radialCircleLine = new GLLine();
@@ -225,6 +227,7 @@ public class GridLayer extends AbstractLayer {
         gl.glPushMatrix();
         gl.glMultMatrixd(q.toMatrix().transpose().m, 0);
         earthCircleLine.render(gl, aspect, thicknessEarth);
+        earthPoint.render(gl);
         gl.glPopMatrix();
     }
 
@@ -284,6 +287,8 @@ public class GridLayer extends AbstractLayer {
 
         earthCircleLine.init(gl);
         GridMath.initEarthCircles(gl, earthCircleLine);
+        earthPoint.init(gl);
+        GridMath.initEarthPoint(gl, earthPoint);
 
         radialCircleLine.init(gl);
         radialThickLine.init(gl);
@@ -300,6 +305,7 @@ public class GridLayer extends AbstractLayer {
         gridLine.dispose(gl);
         axesLine.dispose(gl);
         earthCircleLine.dispose(gl);
+        earthPoint.dispose(gl);
         radialCircleLine.dispose(gl);
         radialThickLine.dispose(gl);
         radialCircleLineFar.dispose(gl);
