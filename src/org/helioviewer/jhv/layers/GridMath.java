@@ -22,7 +22,7 @@ class GridMath {
     private static final float[] color1 = BufferUtils.colorRed;
     private static final float[] color2 = BufferUtils.colorGreen;
 
-    private static final float earthPointSize = 10f;
+    private static final float earthPointSize = 0.2f;
 
     private static final float AXIS_START = (float) (1. * Sun.Radius);
     private static final float AXIS_STOP = (float) (1.2 * Sun.Radius);
