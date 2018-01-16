@@ -7,6 +7,7 @@ import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLLine;
+import org.helioviewer.jhv.opengl.GLPoint;
 
 import com.jogamp.opengl.GL2;
 
@@ -20,6 +21,8 @@ class GridMath {
     private static final float[] radialLineColor = BufferUtils.colorWhite;
     private static final float[] color1 = BufferUtils.colorRed;
     private static final float[] color2 = BufferUtils.colorGreen;
+
+    private static final float earthPointSize = 10f;
 
     private static final float AXIS_START = (float) (1. * Sun.Radius);
     private static final float AXIS_STOP = (float) (1.2 * Sun.Radius);
@@ -57,6 +60,18 @@ class GridMath {
         positionBuffer.rewind();
         colorBuffer.rewind();
         axesLine.setData(gl, positionBuffer, colorBuffer);
+    }
+
+    static void initEarthPoint(GL2 gl, GLPoint earthPoint) {
+        FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(4);
+        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4);
+
+        BufferUtils.put4f(positionBuffer, 0, 0, (float) EARTH_CIRCLE_RADIUS, earthPointSize);
+        colorBuffer.put(earthLineColor);
+
+        positionBuffer.rewind();
+        colorBuffer.rewind();
+        earthPoint.setData(gl, positionBuffer, colorBuffer);
     }
 
     static void initEarthCircles(GL2 gl, GLLine earthCircleLine) {
