@@ -60,6 +60,7 @@ public class GLListener implements GLEventListener {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
         gl.glEnable(GL2.GL_VERTEX_PROGRAM_POINT_SIZE);
+        gl.glEnable(GL2.GL_POINT_SPRITE);
         GLSLSolarShader.init(gl);
         GLSLLineShader.init(gl);
         GLSLPointShader.init(gl);
