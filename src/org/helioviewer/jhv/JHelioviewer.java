@@ -30,6 +30,8 @@ import nom.tam.fits.FitsFactory;
 public class JHelioviewer {
 
     public static void main(String[] args) {
+        // Save command line arguments
+        CommandLine.setArguments(args);
         // Prints the usage message
         if (args.length == 1 && (args[0].equals("-h") || args[0].equals("--help"))) {
             System.out.println(CommandLine.getUsageMessage());
@@ -38,8 +40,6 @@ public class JHelioviewer {
 
         // Uncaught runtime errors are displayed in a dialog box in addition
         JHVUncaughtExceptionHandler.setupHandlerForThread();
-        // Save command line arguments
-        CommandLine.setArguments(args);
         // Save current default system timezone in user.timezone
         System.setProperty("user.timezone", TimeZone.getDefault().getID());
         // Per default all times should be given in GMT
