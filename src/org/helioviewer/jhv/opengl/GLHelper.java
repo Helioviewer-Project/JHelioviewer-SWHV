@@ -2,7 +2,9 @@ package org.helioviewer.jhv.opengl;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.nio.FloatBuffer;
 
+import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
@@ -19,21 +21,24 @@ import com.jogamp.opengl.GLProfile;
 
 public class GLHelper {
 
+    public static void initCircleFront(GL2 gl, GLShape circle, double x, double y, double r, int segments, float[] color) {
+        FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(4 * (segments + 1));
+        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4 * (segments + 1));
+        for (int n = 0; n <= segments; ++n) {
+            double t = -2 * Math.PI * n / segments; // + for backside
+            BufferUtils.put4f(positionBuffer, (float) (x + Math.sin(t) * r), (float) (y + Math.cos(t) * r), 0, 0);
+            colorBuffer.put(color);
+        }
+        positionBuffer.rewind();
+        colorBuffer.rewind();
+        circle.setData(gl, positionBuffer, colorBuffer);
+    }
+
     public static void drawCircleFront(GL2 gl, double x, double y, double r, int segments) {
         gl.glBegin(GL2.GL_TRIANGLE_FAN);
         gl.glVertex2f((float) x, (float) y);
         for (int n = 0; n <= segments; ++n) {
             double t = -2 * Math.PI * n / segments;
-            gl.glVertex2f((float) (x + Math.sin(t) * r), (float) (y + Math.cos(t) * r));
-        }
-        gl.glEnd();
-    }
-
-    public static void drawCircleBack(GL2 gl, double x, double y, double r, int segments) {
-        gl.glBegin(GL2.GL_TRIANGLE_FAN);
-        gl.glVertex2f((float) x, (float) y);
-        for (int n = 0; n <= segments; ++n) {
-            double t = 2 * Math.PI * n / segments;
             gl.glVertex2f((float) (x + Math.sin(t) * r), (float) (y + Math.cos(t) * r));
         }
         gl.glEnd();
