@@ -59,14 +59,16 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         double width = camera.getViewpoint().distance * Math.tan(optionsPanel.getFOVAngle());
         computeLine(gl, width);
 
+        double pointFactor = 1 / camera.getFOV();
+
         gl.glPushMatrix();
         gl.glMultMatrixd(camera.getViewpoint().orientation.toMatrix().transpose().m, 0);
         {
             if (Displayer.getUpdateViewpoint() == UpdateViewpoint.equatorial) {
                 computePlanets(gl, UpdateViewpoint.equatorial.getPositions());
-                planets.render(gl, 1 / camera.getFOV());
+                planets.render(gl, pointFactor);
             }
-            center.render(gl, 1 / camera.getFOV());
+            center.render(gl, pointFactor);
             line.render(gl, vp.aspect, thickness);
         }
         gl.glPopMatrix();
@@ -88,7 +90,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             mouseX = e.getX();
             mouseY = e.getY();
             Camera camera = Displayer.getCamera();
-            Vec3 v = CameraHelper.getVectorFromPlane(Displayer.getCamera(), Displayer.getActiveViewport(), mouseX, mouseY, Quat.ZERO, true);
+            Vec3 v = CameraHelper.getVectorFromPlane(camera, Displayer.getActiveViewport(), mouseX, mouseY, Quat.ZERO, true);
             if (v == null)
                 return;
 
