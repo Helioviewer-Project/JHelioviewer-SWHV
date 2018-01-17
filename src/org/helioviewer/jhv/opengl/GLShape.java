@@ -9,7 +9,7 @@ import org.helioviewer.jhv.log.Log;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 
-public class GLPoint {
+public class GLShape {
 
     private int[] vboAttribRefs;
     private final int[] vboAttribLens = { 4, 4 };
@@ -43,13 +43,13 @@ public class GLPoint {
         return indicesBuffer;
     }
 
-    public void render(GL2 gl, double factor) {
+    public void renderPoints(GL2 gl, double factor) {
         if (!hasPoints)
             return;
 
-        GLSLPointShader.point.bind(gl);
-        GLSLPointShader.point.setFactor(factor);
-        GLSLPointShader.point.bindParams(gl);
+        GLSLShapeShader.point.bind(gl);
+        GLSLShapeShader.point.setFactor(factor);
+        GLSLShapeShader.point.bindParams(gl);
 
         bindVBOs(gl);
         gl.glDrawElements(GL2.GL_POINTS, ivbo.bufferSize, GL2.GL_UNSIGNED_INT, 0);
@@ -62,7 +62,7 @@ public class GLPoint {
         if (!hasPoints)
             return;
 
-        GLSLPointShader.shape.bind(gl);
+        GLSLShapeShader.shape.bind(gl);
 
         bindVBOs(gl);
         gl.glDrawElements(mode, ivbo.bufferSize, GL2.GL_UNSIGNED_INT, 0);
@@ -108,7 +108,7 @@ public class GLPoint {
     }
 
     public void init(GL2 gl) {
-        vboAttribRefs = new int[] { GLSLPointShader.positionRef, GLSLPointShader.colorRef };
+        vboAttribRefs = new int[] { GLSLShapeShader.positionRef, GLSLShapeShader.colorRef };
         initVBOs(gl);
     }
 

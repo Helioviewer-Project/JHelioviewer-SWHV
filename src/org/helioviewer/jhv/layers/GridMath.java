@@ -7,7 +7,7 @@ import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLLine;
-import org.helioviewer.jhv.opengl.GLPoint;
+import org.helioviewer.jhv.opengl.GLShape;
 
 import com.jogamp.opengl.GL2;
 
@@ -62,7 +62,7 @@ class GridMath {
         axesLine.setData(gl, positionBuffer, colorBuffer);
     }
 
-    static void initEarthPoint(GL2 gl, GLPoint earthPoint) {
+    static void initEarthPoint(GL2 gl, GLShape earthPoint) {
         FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(4);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4);
 

@@ -19,7 +19,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLLine;
-import org.helioviewer.jhv.opengl.GLPoint;
+import org.helioviewer.jhv.opengl.GLShape;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.time.JHVDate;
 import org.json.JSONObject;
@@ -41,8 +41,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     private static final float[] color2 = BufferUtils.colorWhite;
 
     private final GLLine line = new GLLine();
-    private final GLPoint center = new GLPoint();
-    private final GLPoint planets = new GLPoint();
+    private final GLShape center = new GLShape();
+    private final GLShape planets = new GLShape();
     private final CameraOptionsPanel optionsPanel;
 
     private String timeString = null;
@@ -66,9 +66,9 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         {
             if (Displayer.getUpdateViewpoint() == UpdateViewpoint.equatorial) {
                 computePlanets(gl, UpdateViewpoint.equatorial.getPositions());
-                planets.render(gl, pointFactor);
+                planets.renderPoints(gl, pointFactor);
             }
-            center.render(gl, pointFactor);
+            center.renderPoints(gl, pointFactor);
             line.render(gl, vp.aspect, thickness);
         }
         gl.glPopMatrix();

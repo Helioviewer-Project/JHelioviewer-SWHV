@@ -9,7 +9,7 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.helioviewer.jhv.opengl.GLPoint;
+import org.helioviewer.jhv.opengl.GLShape;
 
 import com.jogamp.opengl.GL2;
 
@@ -31,7 +31,7 @@ public class CameraHelper {
         gl.glLoadMatrixd(transformation.m, 0);
     }
 
-    public static void applyPerspective(Camera camera, Viewport vp, GL2 gl, GLPoint blackCircle) {
+    public static void applyPerspective(Camera camera, Viewport vp, GL2 gl, GLShape blackCircle) {
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
 
