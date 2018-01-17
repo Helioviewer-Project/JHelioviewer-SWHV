@@ -44,7 +44,7 @@ public class CameraHelper {
         gl.glLoadMatrixd(transformation.m, 0);
 
         gl.glColor3f(0, 0, 0);
-        GLHelper.drawCircleFront(gl, 0, 0, 0.98 * Sun.Radius, 30);
+        GLHelper.drawCircleFront(gl, 0, 0, 0.996 * Sun.Radius, 36);
 
         transformation = camera.getRotation().toMatrix().translate(translation.x, translation.y, 0);
         gl.glLoadMatrixd(transformation.m, 0);
