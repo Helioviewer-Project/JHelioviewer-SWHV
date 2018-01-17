@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.opengl;
 
 import java.awt.EventQueue;
-import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.scale.GridScale;
@@ -69,24 +68,8 @@ public class GLListener implements GLEventListener {
         GLSLLineShader.init(gl);
         GLSLShapeShader.init(gl);
 
-        initBlackCircle(gl);
-    }
-
-    private void initBlackCircle(GL2 gl) {
         blackCircle.init(gl);
-
-        double r = 0.996;
-        int segments = 360;
-        FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(4 * (segments + 1));
-        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4 * (segments + 1));
-        for (int n = 0; n <= segments; ++n) {
-            double t = -2 * Math.PI * n / segments;
-            BufferUtils.put4f(positionBuffer, (float) (/*x +*/ Math.sin(t) * r), (float) (/*y +*/ Math.cos(t) * r), 0, 0);
-            colorBuffer.put(BufferUtils.colorBlack);
-        }
-        positionBuffer.rewind();
-        colorBuffer.rewind();
-        blackCircle.setData(gl, positionBuffer, colorBuffer);
+        GLHelper.initCircleFront(gl, blackCircle, 0, 0, 0.996, 360, BufferUtils.colorBlack);
     }
 
     @Override
