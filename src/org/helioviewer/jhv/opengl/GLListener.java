@@ -27,7 +27,7 @@ public class GLListener implements GLEventListener {
     private final ScalableSurface surface;
     private boolean reshaped;
 
-    private static final GLPoint blackCircle = new GLPoint();
+    private static final GLShape blackCircle = new GLShape();
 
     public GLListener(ScalableSurface _surface) {
         surface = _surface;
@@ -67,7 +67,7 @@ public class GLListener implements GLEventListener {
         gl.glEnable(GL2.GL_POINT_SPRITE);
         GLSLSolarShader.init(gl);
         GLSLLineShader.init(gl);
-        GLSLPointShader.init(gl);
+        GLSLShapeShader.init(gl);
 
         initBlackCircle(gl);
     }
@@ -105,6 +105,7 @@ public class GLListener implements GLEventListener {
         blackCircle.dispose(gl);
         GLSLSolarShader.dispose(gl);
         GLSLLineShader.dispose(gl);
+        GLSLShapeShader.dispose(gl);
     }
 
     private ExportMovie exporter;

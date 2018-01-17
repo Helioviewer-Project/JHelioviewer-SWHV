@@ -2,10 +2,10 @@ package org.helioviewer.jhv.opengl;
 
 import com.jogamp.opengl.GL2;
 
-class GLSLPointShader extends GLSLShader {
+class GLSLShapeShader extends GLSLShader {
 
-    static final GLSLPointShader point = new GLSLPointShader("/data/vertexpoint.glsl", "/data/fragmentpoint.glsl");
-    static final GLSLPointShader shape = new GLSLPointShader("/data/vertexshape.glsl", "/data/fragmentshape.glsl");
+    static final GLSLShapeShader point = new GLSLShapeShader("/data/vertexpoint.glsl", "/data/fragmentpoint.glsl");
+    static final GLSLShapeShader shape = new GLSLShapeShader("/data/vertexshape.glsl", "/data/fragmentshape.glsl");
     static int positionRef = 0;
     static int colorRef = 1;
 
@@ -13,7 +13,7 @@ class GLSLPointShader extends GLSLShader {
 
     private final float[] factor = { 1 };
 
-    private GLSLPointShader(String vertex, String fragment) {
+    private GLSLShapeShader(String vertex, String fragment) {
         super(vertex, fragment);
     }
 
