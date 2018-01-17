@@ -1,7 +1,9 @@
 package org.helioviewer.jhv.opengl;
 
 import java.awt.EventQueue;
+import java.nio.FloatBuffer;
 
+import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -24,6 +26,8 @@ public class GLListener implements GLEventListener {
 
     private final ScalableSurface surface;
     private boolean reshaped;
+
+    private static final GLPoint blackCircle = new GLPoint();
 
     public GLListener(ScalableSurface _surface) {
         surface = _surface;
@@ -64,6 +68,25 @@ public class GLListener implements GLEventListener {
         GLSLSolarShader.init(gl);
         GLSLLineShader.init(gl);
         GLSLPointShader.init(gl);
+
+        initBlackCircle(gl);
+    }
+
+    private void initBlackCircle(GL2 gl) {
+        blackCircle.init(gl);
+
+        double r = 0.996;
+        int segments = 360;
+        FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(4 * (segments + 1));
+        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4 * (segments + 1));
+        for (int n = 0; n <= segments; ++n) {
+            double t = -2 * Math.PI * n / segments;
+            BufferUtils.put4f(positionBuffer, (float) (/*x +*/ Math.sin(t) * r), (float) (/*y +*/ Math.cos(t) * r), 0, 0);
+            colorBuffer.put(BufferUtils.colorBlack);
+        }
+        positionBuffer.rewind();
+        colorBuffer.rewind();
+        blackCircle.setData(gl, positionBuffer, colorBuffer);
     }
 
     @Override
@@ -79,6 +102,7 @@ public class GLListener implements GLEventListener {
 
     private static void disposeImpl(GL2 gl) {
         Layers.dispose(gl);
+        blackCircle.dispose(gl);
         GLSLSolarShader.dispose(gl);
         GLSLLineShader.dispose(gl);
     }
@@ -110,7 +134,7 @@ public class GLListener implements GLEventListener {
         for (Viewport vp : Displayer.getViewports()) {
             if (vp != null) {
                 gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-                CameraHelper.applyPerspective(camera, vp, gl);
+                CameraHelper.applyPerspective(camera, vp, gl, blackCircle);
                 Layers.render(camera, vp, gl);
                 ImageViewerGui.getAnnotateInteraction().drawAnnotations(vp, gl);
             }
@@ -158,7 +182,7 @@ public class GLListener implements GLEventListener {
             miniCamera.timeChanged(Movie.getTime());
 
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            CameraHelper.applyPerspective(miniCamera, vp, gl);
+            CameraHelper.applyPerspective(miniCamera, vp, gl, blackCircle);
             Layers.renderMiniview(miniCamera, vp, gl);
         }
     }

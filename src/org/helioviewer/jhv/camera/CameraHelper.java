@@ -9,6 +9,7 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
+import org.helioviewer.jhv.opengl.GLPoint;
 
 import com.jogamp.opengl.GL2;
 
@@ -30,7 +31,7 @@ public class CameraHelper {
         gl.glLoadMatrixd(transformation.m, 0);
     }
 
-    public static void applyPerspective(Camera camera, Viewport vp, GL2 gl) {
+    public static void applyPerspective(Camera camera, Viewport vp, GL2 gl, GLPoint blackCircle) {
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
 
@@ -43,8 +44,7 @@ public class CameraHelper {
         Mat4 transformation = Mat4.translation(translation.x, translation.y, 0);
         gl.glLoadMatrixd(transformation.m, 0);
 
-        gl.glColor3f(0, 0, 0);
-        GLHelper.drawCircleFront(gl, 0, 0, 0.996 * Sun.Radius, 36);
+        blackCircle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
 
         transformation = camera.getRotation().toMatrix().translate(translation.x, translation.y, 0);
         gl.glLoadMatrixd(transformation.m, 0);

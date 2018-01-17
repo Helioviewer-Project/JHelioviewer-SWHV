@@ -5,6 +5,7 @@ import com.jogamp.opengl.GL2;
 class GLSLPointShader extends GLSLShader {
 
     static final GLSLPointShader point = new GLSLPointShader("/data/vertexpoint.glsl", "/data/fragmentpoint.glsl");
+    static final GLSLPointShader shape = new GLSLPointShader("/data/vertexshape.glsl", "/data/fragmentshape.glsl");
     static int positionRef = 0;
     static int colorRef = 1;
 
@@ -18,10 +19,12 @@ class GLSLPointShader extends GLSLShader {
 
     public static void init(GL2 gl) {
         point._init(gl, false);
+        shape._init(gl, false);
     }
 
     public static void dispose(GL2 gl) {
         point._dispose(gl);
+        shape._dispose(gl);
     }
 
     @Override

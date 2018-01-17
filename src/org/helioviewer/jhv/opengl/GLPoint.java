@@ -58,6 +58,19 @@ public class GLPoint {
         GLSLShader.unbind(gl);
     }
 
+    public void renderShape(GL2 gl, int mode) {
+        if (!hasPoints)
+            return;
+
+        GLSLPointShader.shape.bind(gl);
+
+        bindVBOs(gl);
+        gl.glDrawElements(mode, ivbo.bufferSize, GL2.GL_UNSIGNED_INT, 0);
+        unbindVBOs(gl);
+
+        GLSLShader.unbind(gl);
+    }
+
     private void bindVBOs(GL2 gl) {
         for (VBO vbo : vbos) {
             vbo.bindArray(gl);
