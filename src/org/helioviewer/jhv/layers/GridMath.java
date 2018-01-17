@@ -66,7 +66,7 @@ class GridMath {
         FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(4);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4);
 
-        BufferUtils.put4f(positionBuffer, 0, 0, (float) (EARTH_CIRCLE_RADIUS + 0.001), earthPointSize);
+        BufferUtils.put4f(positionBuffer, 0, 0, (float) (EARTH_CIRCLE_RADIUS + 0.006), earthPointSize);
         colorBuffer.put(earthLineColor);
 
         positionBuffer.rewind();

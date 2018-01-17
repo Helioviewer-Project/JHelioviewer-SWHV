@@ -30,12 +30,13 @@ import com.jogamp.newt.event.MouseListener;
 
 public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
-    private static final int SUBDIVISIONS = 12;
+    private static final int SUBDIVISIONS = 24;
     private static final FloatBuffer positionBuffer = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2)) * 3);
     private static final FloatBuffer colorBuffer = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2)) * 4);
-    private static final double epsilon = 0.001;
+    private static final double epsilon = 0.006;
     private static final double thickness = 0.002;
-    private static final float centerSize = 0.2f;
+    private static final float centerSize = 0.1f;
+    private static final float planetSize = 0.2f;
 
     private static final float[] color1 = BufferUtils.colorBlue;
     private static final float[] color2 = BufferUtils.colorWhite;
@@ -309,7 +310,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             double x = p.rad * Math.cos(theta) * Math.cos(phi);
             double z = p.rad * Math.sin(theta);
 
-            BufferUtils.put4f(planetPosition, (float) x, (float) y, (float) z, centerSize);
+            BufferUtils.put4f(planetPosition, (float) x, (float) y, (float) z, planetSize);
             planetColor.put(entry.getKey().getTarget().getColor());
         }
 

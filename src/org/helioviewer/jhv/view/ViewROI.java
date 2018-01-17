@@ -114,7 +114,7 @@ public class ViewROI {
                     return new Region(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
                 } else {
                     String name = m instanceof HelioviewerMetaData ? ((HelioviewerMetaData) m).getFullName() : "";
-                    Log.info("ViewROI.updateROI: empty: " + name + " " + m.getViewpoint().time);
+                    Log.info("ViewROI.updateROI empty: " + name + " " + m.getViewpoint().time);
                     return new Region(minPhysicalX, minPhysicalY, 0, 0);
                 }
             }
