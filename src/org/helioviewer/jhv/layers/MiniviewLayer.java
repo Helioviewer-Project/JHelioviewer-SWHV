@@ -16,6 +16,7 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.math.Mat4;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.GLHelper;
+import org.helioviewer.jhv.opengl.GLShape;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -25,6 +26,11 @@ public class MiniviewLayer extends AbstractLayer {
     private static final int MIN_SCALE = 5;
     private static final int MAX_SCALE = 15;
     private int scale = 10;
+
+    private static final float[] colorCircle = new float[] { 1 * 0.2f, 0, 0, 0.2f };
+    private static final float[] colorRectangle = new float[] { 0, 1 * 0.2f, 0, 0.2f };
+    private static final GLShape circle = new GLShape();
+    private static final GLShape rectangle = new GLShape();
 
     private final JPanel optionsPanel;
     private Viewport miniViewport = new Viewport(0, 0, 0, 100, 100);
@@ -60,12 +66,8 @@ public class MiniviewLayer extends AbstractLayer {
         gl.glPushMatrix();
         {
             gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
-
-            gl.glColor4f(0, 1 * 0.2f, 0, 0.2f);
-            GLHelper.drawRectangleFront(gl, -30, -30, 60, 60);
-
-            gl.glColor4f(1 * 0.2f, 0, 0, 0.2f);
-            GLHelper.drawCircleFront(gl, 0, 0, 1, 100);
+            rectangle.renderShape(gl, GL2.GL_QUADS);
+            circle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
         }
         gl.glPopMatrix();
         gl.glDepthRange(0, 1);
@@ -98,10 +100,16 @@ public class MiniviewLayer extends AbstractLayer {
 
     @Override
     public void init(GL2 gl) {
+        circle.init(gl);
+        GLHelper.initCircleFront(gl, circle, 0, 0, 1, 36, colorCircle);
+        rectangle.init(gl);
+        GLHelper.initRectangleFront(gl, rectangle, -30, -30, 60, 60, colorRectangle);
     }
 
     @Override
     public void dispose(GL2 gl) {
+        circle.dispose(gl);
+        rectangle.dispose(gl);
     }
 
     public Viewport getViewport() {

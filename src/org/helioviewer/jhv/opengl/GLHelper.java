@@ -24,8 +24,8 @@ public class GLHelper {
     public static void initCircleFront(GL2 gl, GLShape circle, double x, double y, double r, int segments, float[] color) {
         FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(4 * (segments + 1));
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4 * (segments + 1));
-        for (int n = 0; n <= segments; ++n) {
-            double t = -2 * Math.PI * n / segments; // + for backside
+        for (int i = 0; i <= segments; ++i) {
+            double t = -2 * Math.PI * i / segments; // + for backside
             BufferUtils.put4f(positionBuffer, (float) (x + Math.sin(t) * r), (float) (y + Math.cos(t) * r), 0, 0);
             colorBuffer.put(color);
         }
@@ -34,38 +34,24 @@ public class GLHelper {
         circle.setData(gl, positionBuffer, colorBuffer);
     }
 
-    public static void drawCircleFront(GL2 gl, double x, double y, double r, int segments) {
-        gl.glBegin(GL2.GL_TRIANGLE_FAN);
-        gl.glVertex2f((float) x, (float) y);
-        for (int n = 0; n <= segments; ++n) {
-            double t = -2 * Math.PI * n / segments;
-            gl.glVertex2f((float) (x + Math.sin(t) * r), (float) (y + Math.cos(t) * r));
-        }
-        gl.glEnd();
-    }
-
-    public static void drawRectangleFront(GL2 gl, double x0, double y0, double w, double h) {
+    public static void initRectangleFront(GL2 gl, GLShape rectangle, double x0, double y0, double w, double h, float[] color) {
+        int vertices = 4;
+        FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(4 * vertices);
+        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4 * vertices);
         float x1 = (float) (x0 + w);
         float y1 = (float) (y0 + h);
 
-        gl.glBegin(GL2.GL_QUADS);
-        gl.glVertex2f((float) x0, (float) -y0);
-        gl.glVertex2f((float) x0, -y1);
-        gl.glVertex2f(x1, -y1);
-        gl.glVertex2f(x1, (float) -y0);
-        gl.glEnd();
-    }
+        BufferUtils.put4f(positionBuffer, (float) x0, (float) -y0, 0, 0); // x0 -y0 backside
+        BufferUtils.put4f(positionBuffer, (float) x0,         -y1, 0, 0); // x1 -y0
+        BufferUtils.put4f(positionBuffer,         x1,         -y1, 0, 0); // x1 -y1
+        BufferUtils.put4f(positionBuffer,         x1, (float) -y0, 0, 0); // x0 -y1
 
-    public static void drawRectangleBack(GL2 gl, double x0, double y0, double w, double h) {
-        float x1 = (float) (x0 + w);
-        float y1 = (float) (y0 + h);
+        for (int i = 0; i < vertices; i++)
+            colorBuffer.put(color);
 
-        gl.glBegin(GL2.GL_QUADS);
-        gl.glVertex2f((float) x0, (float) -y0);
-        gl.glVertex2f(x1, (float) -y0);
-        gl.glVertex2f(x1, -y1);
-        gl.glVertex2f((float) x0, -y1);
-        gl.glEnd();
+        positionBuffer.rewind();
+        colorBuffer.rewind();
+        rectangle.setData(gl, positionBuffer, colorBuffer);
     }
 
     public static Point GL2AWTPoint(int x, int y) {
