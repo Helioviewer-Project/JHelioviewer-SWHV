@@ -38,7 +38,7 @@ public class GridLayer extends AbstractLayer {
     // height of text in solar radii
     private static final float textScale = GridLabel.textScale;
     private static final double thickness = 0.002;
-    private static final double thicknessEarth = 0.003;
+    private static final double thicknessEarth = 0.002;
     private static final double thicknessAxes = 0.005;
 
     private static final DecimalFormat formatter2 = MathUtils.numberFormatter("0", 2);
@@ -137,6 +137,8 @@ public class GridLayer extends AbstractLayer {
         if (showAxis)
             axesLine.render(gl, vp.aspect, thicknessAxes);
 
+        drawEarthCircles(gl, vp.aspect, 1 / camera.getFOV(), Sun.getEarthQuat(camera.getViewpoint().time).orientation);
+
         Mat4 cameraMatrix = getGridQuat(camera, gridType).toMatrix();
         double pixelsPerSolarRadius = textScale * vp.height / (2 * camera.getWidth());
 
@@ -149,7 +151,6 @@ public class GridLayer extends AbstractLayer {
             }
         }
         gl.glPopMatrix();
-        drawEarthCircles(gl, vp.aspect, 1 / camera.getFOV(), Sun.getEarthQuat(camera.getViewpoint().time).orientation);
 
         if (showRadial) {
             boolean far = camera.getViewpoint().distance > 100 * Sun.MeanEarthDistance;
