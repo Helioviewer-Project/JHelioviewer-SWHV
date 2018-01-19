@@ -33,6 +33,8 @@ import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.gui.dialogs.observation.CadencePanel;
+import org.helioviewer.jhv.gui.dialogs.observation.TimePanel;
 import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.opengl.GLHelper;
@@ -123,6 +125,9 @@ public class MoviePanel extends JPanel implements ChangeListener {
 
     private static boolean isAdvanced;
 
+    private static final TimePanel timeSelector = new TimePanel();
+    private static final CadencePanel cadencePanel = new CadencePanel();
+
     private static TimeSlider timeSlider;
     private static JideButton prevFrameButton;
     private static JideButton nextFrameButton;
@@ -169,6 +174,8 @@ public class MoviePanel extends JPanel implements ChangeListener {
 
     private MoviePanel() {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+
+        add(timeSelector);
 
         // Time line
         timeSlider = new TimeSlider(TimeSlider.HORIZONTAL, 0, 0, 0);
@@ -294,13 +301,12 @@ public class MoviePanel extends JPanel implements ChangeListener {
 
         add(timeSlider);
         add(secondLine);
-
-        ComponentUtils.smallVariant(speedPanel);
-        ComponentUtils.smallVariant(modePanel);
-        ComponentUtils.smallVariant(recordPanel);
+        add(cadencePanel);
         add(speedPanel);
         add(modePanel);
         add(recordPanel);
+
+        ComponentUtils.smallVariant(this);
 
         setEnabledState(false);
     }
@@ -365,6 +371,7 @@ public class MoviePanel extends JPanel implements ChangeListener {
     public static void setAdvanced(boolean advanced) {
         isAdvanced = advanced;
         advancedButton.setText(advanced ? Buttons.optionsDown : Buttons.optionsRight);
+        cadencePanel.setVisible(advanced);
         modePanel.setVisible(advanced);
         speedPanel.setVisible(advanced);
         recordPanel.setVisible(advanced);
