@@ -140,7 +140,6 @@ public class MoviePanel extends JPanel implements ChangeListener {
     private static JComboBox<SpeedUnit> speedUnitComboBox;
     private static JComboBox<AnimationMode> animationModeComboBox;
 
-    private static final JPanel speedPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
     private static final JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
     private static final JPanel recordPanel = new JPanel(new GridBagLayout());
 
@@ -177,6 +176,7 @@ public class MoviePanel extends JPanel implements ChangeListener {
 
         add(timeSelector);
 
+        JPanel sliderPanel = new JPanel(new GridBagLayout());
         // Time line
         timeSlider = new TimeSlider(TimeSlider.HORIZONTAL, 0, 0, 0);
         timeSlider.addChangeListener(this);
@@ -186,8 +186,22 @@ public class MoviePanel extends JPanel implements ChangeListener {
         timeSlider.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "LEFT_ARROW");
         timeSlider.getActionMap().put("LEFT_ARROW", getPreviousFrameAction());
 
-        JPanel secondLine = new JPanel(new BorderLayout());
+        JideButton setButton = new JideButton("Set");
 
+        GridBagConstraints c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.LINE_START;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weighty = 0;
+
+        c.gridy = 0;
+        c.gridx = 0;
+        c.weightx = 1;
+        sliderPanel.add(timeSlider, c);
+        c.gridx = 1;
+        c.weightx = 0;
+        sliderPanel.add(setButton, c);
+
+        JPanel secondLine = new JPanel(new BorderLayout());
         // Control buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 1, 0));
         int small = 18, big = 26;
@@ -226,11 +240,8 @@ public class MoviePanel extends JPanel implements ChangeListener {
         timeSlider.setLabel(frameNumberLabel);
         secondLine.add(frameNumberLabel, BorderLayout.EAST);
 
-        // The speed panel has some distinction from above as it is one of the advanced options
-        // It is not included in the main Panel to save space if it is not shown
-
         // Speed
-        speedPanel.add(new JLabel("Speed", JLabel.RIGHT));
+        modePanel.add(new JLabel("Play", JLabel.RIGHT));
 
         int speedMin = 1, speedMax = 60;
         speedSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(20), Double.valueOf(1), Double.valueOf(speedMax), Double.valueOf(speedMin)));
@@ -242,15 +253,15 @@ public class MoviePanel extends JPanel implements ChangeListener {
 
         speedSpinner.setMaximumSize(speedSpinner.getPreferredSize());
         WheelSupport.installMouseWheelSupport(speedSpinner);
-        speedPanel.add(speedSpinner);
+        modePanel.add(speedSpinner);
 
         speedUnitComboBox = new JComboBox<>(new SpeedUnit[]{SpeedUnit.FRAMESPERSECOND /*, SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND */});
         speedUnitComboBox.setSelectedItem(SpeedUnit.FRAMESPERSECOND);
         speedUnitComboBox.addActionListener(e -> updateMovieSpeed());
-        speedPanel.add(speedUnitComboBox);
+        modePanel.add(speedUnitComboBox);
 
         // Animation mode
-        modePanel.add(new JLabel("Animation mode", JLabel.RIGHT));
+        modePanel.add(new JLabel("and", JLabel.RIGHT));
 
         animationModeComboBox = new JComboBox<>(new AnimationMode[]{AnimationMode.Loop, AnimationMode.Stop, AnimationMode.Swing});
         animationModeComboBox.setPreferredSize(speedUnitComboBox.getPreferredSize());
@@ -258,7 +269,7 @@ public class MoviePanel extends JPanel implements ChangeListener {
         modePanel.add(animationModeComboBox);
 
         // Record
-        GridBagConstraints c = new GridBagConstraints();
+        c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
         c.gridy = 0;
         c.weightx = 1;
@@ -299,10 +310,9 @@ public class MoviePanel extends JPanel implements ChangeListener {
         c.gridx = 3;
         recordPanel.add(recordSizeCombo, c);
 
-        add(timeSlider);
+        add(sliderPanel);
         add(secondLine);
         add(cadencePanel);
-        add(speedPanel);
         add(modePanel);
         add(recordPanel);
 
@@ -373,7 +383,6 @@ public class MoviePanel extends JPanel implements ChangeListener {
         advancedButton.setText(advanced ? Buttons.optionsDown : Buttons.optionsRight);
         cadencePanel.setVisible(advanced);
         modePanel.setVisible(advanced);
-        speedPanel.setVisible(advanced);
         recordPanel.setVisible(advanced);
     }
 
