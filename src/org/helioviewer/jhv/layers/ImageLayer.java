@@ -5,7 +5,6 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -190,8 +189,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         _render(camera, vp, gl, depthScale);
     }
 
-    private static Mat4 getOrthoMatrixInverse(double fov, double aspect, double distance) {
-        double width = distance * Math.tan(0.5 * fov);
+    private static Mat4 getOrthoMatrixInverse(double width, double aspect) {
         return Mat4.orthoInverse(-width * aspect, width * aspect, -width, width, 0, 0); // do clipping planes matter?
     }
 
@@ -210,17 +208,16 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
             glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
             shader.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height);
 
-            Position.Q viewpoint = imageData.getViewpoint();
-
-            Mat4 vpmi = getOrthoMatrixInverse(camera.getFOV(), vp.aspect, viewpoint.distance); // use current FOV
+            Mat4 vpmi = getOrthoMatrixInverse(camera.getWidth(), vp.aspect);
             if (Displayer.mode == Displayer.DisplayMode.Orthographic)
                 vpmi.translate(-camera.getCurrentTranslation().x, -camera.getCurrentTranslation().y, 0.);
             else
                 vpmi.translate(-camera.getCurrentTranslation().x / vp.aspect, -camera.getCurrentTranslation().y, 0.);
             shader.bindMatrix(gl, vpmi.getFloatArray());
 
-            Quat q = Quat.rotate(camera.getCurrentDragRotation(), viewpoint.orientation);
+            Quat q = Quat.rotate(camera.getCurrentDragRotation(), imageData.getViewpoint().orientation);
             shader.bindCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, imageData.getMetaData().getCenterRotation()));
+
             DifferenceMode diffMode = glImage.getDifferenceMode();
             if (diffMode == DifferenceMode.Base) {
                 shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, baseImageData.getMetaData().getCenterRotation()));
