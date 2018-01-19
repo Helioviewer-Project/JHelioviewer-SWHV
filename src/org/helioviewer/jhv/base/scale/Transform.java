@@ -38,8 +38,7 @@ public interface Transform {
             double y = r * Math.cos(theta);
             double x = r * Math.sin(theta);
             double z = Math.sqrt(Math.max(0, 1 - x * x - y * y));
-            Quat q = Sun.getEarthQuat(Movie.getTime()).orientation;
-            return q.rotateInverseVector(new Vec3(x, y, z));
+            return Sun.getEarth(Movie.getTime()).toQuat().rotateInverseVector(new Vec3(x, y, z));
         }
     }
 

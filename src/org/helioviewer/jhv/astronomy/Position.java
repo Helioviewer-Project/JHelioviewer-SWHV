@@ -20,13 +20,17 @@ public class Position {
             time = _time;
         }
 
+        public Q toQ() {
+            return new Position.Q(time, rad, toQuat());
+        }
+
+        public Quat toQuat() {
+            return new Quat(lat, lon);
+        }
+
         @Override
         public String toString() {
             return String.format("%s [%f,%f,%f]", time, rad, lon, lat);
-        }
-
-        public Q toQ() {
-            return new Position.Q(time, rad, new Quat(lat, lon));
         }
 
     }

@@ -70,17 +70,24 @@ public class Quat {
         double y = u.y, y2 = y * y;
         double z = u.z, z2 = z * z;
 
-        return new Mat4(w2 + x2 - y2 - z2, 2 * x * y - 2 * w * z, 2 * x * z + 2 * w * y, 0, 2 * x * y + 2 * w * z, w2 - x2 + y2 - z2, 2 * y * z - 2 * w * x, 0, 2 * x * z - 2 * w * y, 2 * y * z + 2 * w * x, w2 - x2 - y2 + z2, 0, 0, 0, 0, w2 + x2 + y2 + z2);
-        /*
-         * return new GL3DMat4( w2+x2-y2-z2, 2*x*y+2*w*z, 2*x*z-2*w*y, 0,
-         *
-         * 2*x*y-2*w*z, w2-x2+y2-z2, 2*y*z+2*w*x, 0,
-         *
-         * 2*x*z+2*w*y, 2*y*z-2*w*x, w2-x2-y2+z2, 0,
-         *
-         * 0, 0, 0, 1 );
-         */
+        return new Mat4(w2 + x2 - y2 - z2,     2 * x * y - 2 * w * z, 2 * x * z + 2 * w * y, 0,
+                        2 * x * y + 2 * w * z, w2 - x2 + y2 - z2,     2 * y * z - 2 * w * x, 0,
+                        2 * x * z - 2 * w * y, 2 * y * z + 2 * w * x, w2 - x2 - y2 + z2,     0,
+                        0,                     0,                     0,                     w2 + x2 + y2 + z2);
     }
+
+    public Mat4 toMatrixTranspose() {
+        double w = a, w2 = w * w;
+        double x = u.x, x2 = x * x;
+        double y = u.y, y2 = y * y;
+        double z = u.z, z2 = z * z;
+
+        return new Mat4(w2 + x2 - y2 - z2,     2 * x * y + 2 * w * z, 2 * x * z - 2 * w * y, 0,
+                        2 * x * y - 2 * w * z, w2 - x2 + y2 - z2,     2 * y * z + 2 * w * x, 0,
+                        2 * x * z + 2 * w * y, 2 * y * z - 2 * w * x, w2 - x2 - y2 + z2,     0,
+                        0,                     0,                     0,                     w2 + x2 + y2 + z2);
+    }
+
 /*
     public double getAngle() {
         return a;

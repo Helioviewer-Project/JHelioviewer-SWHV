@@ -137,7 +137,7 @@ public class GridLayer extends AbstractLayer {
         if (showAxis)
             axesLine.render(gl, vp.aspect, thicknessAxes);
 
-        drawEarthCircles(gl, vp.aspect, 1 / camera.getFOV(), Sun.getEarthQuat(camera.getViewpoint().time).orientation);
+        drawEarthCircles(gl, vp.aspect, 1 / camera.getFOV(), Sun.getEarth(camera.getViewpoint().time).toQuat());
 
         Mat4 cameraMatrix = getGridQuat(camera, gridType).toMatrix();
         double pixelsPerSolarRadius = textScale * vp.height / (2 * camera.getWidth());
