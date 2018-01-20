@@ -13,7 +13,6 @@ import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataSourcesListener;
 import org.helioviewer.jhv.io.DataSourcesParser;
 import org.helioviewer.jhv.io.DataSourcesTree;
-import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.ObservationSelector;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -21,11 +20,13 @@ import org.helioviewer.jhv.time.TimeUtils;
 @SuppressWarnings("serial")
 public class ImageSelectorPanel extends JPanel implements DataSourcesListener {
 
+    private final ObservationSelector selector;
     private final DataSourcesTree sourcesTree;
-    private static boolean first = true;
+    private boolean first = true;
 
-    public ImageSelectorPanel(ObservationSelector selector) {
+    public ImageSelectorPanel(ObservationSelector _selector) {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        selector = _selector;
         sourcesTree = new DataSourcesTree(selector);
         add(new JScrollPane(sourcesTree));
         DataSources.addListener(this);
@@ -47,16 +48,15 @@ public class ImageSelectorPanel extends JPanel implements DataSourcesListener {
             Message.err("Could not retrieve data sources", "The list of available data could not be fetched, so you cannot use the GUI to add data." +
                         System.getProperty("line.separator") +
                         "This may happen if you do not have an internet connection or there are server problems. You can still open local files.", false);
-        } else if (first) {
-            first = false;
-
+        } else {
             long startTime = item.end - 2 * TimeUtils.DAY_IN_MILLIS;
             long endTime = item.end;
-            ObservationDialog.getInstance().setStartTime(startTime);
-            ObservationDialog.getInstance().setEndTime(endTime);
+            selector.setStartTime(startTime);
+            selector.setEndTime(endTime);
 
-            if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
-                load(null, startTime, endTime, ObservationDialog.getInstance().getCadence());
+            if (first && Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
+                first = false;
+                load(null, startTime, endTime, selector.getCadence());
             }
         }
     }
