@@ -54,7 +54,7 @@ public class ImageSelectorPanel extends JPanel implements DataSourcesListener {
             ObservationDialog.getInstance().setEndTime(endTime);
 
             if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
-                doLoad(null, startTime, endTime, ObservationDialog.getInstance().getCadence());
+                load(null, startTime, endTime, ObservationDialog.getInstance().getCadence());
             }
         }
     }
@@ -68,7 +68,7 @@ public class ImageSelectorPanel extends JPanel implements DataSourcesListener {
         sourcesTree.setSelectedItem(req.server, req.sourceId);
     }
 
-    public boolean doLoad(ImageLayer layer, long startTime, long endTime, int cadence) {
+    public boolean load(ImageLayer layer, long startTime, long endTime, int cadence) {
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
         if (item == null) { // not valid
             Message.err("Data is not selected", "There is no information on what to add", false);
