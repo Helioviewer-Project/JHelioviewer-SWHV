@@ -33,6 +33,7 @@ import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.gui.interfaces.TimeSelector;
 import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Movie;
@@ -45,7 +46,7 @@ import com.jidesoft.swing.JideSplitButton;
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
-public class MoviePanel extends JPanel implements ChangeListener {
+public class MoviePanel extends JPanel implements ChangeListener, TimeSelector {
 
     // different animation speeds
     private enum SpeedUnit {
@@ -341,6 +342,31 @@ public class MoviePanel extends JPanel implements ChangeListener {
         ComponentUtils.smallVariant(this);
 
         setEnabledState(false);
+    }
+
+    @Override
+    public int getCadence() {
+        return cadencePanel.getCadence();
+    }
+
+    @Override
+    public void setStartTime(long time) {
+        timeSelectorPanel.setStartTime(time);
+    }
+
+    @Override
+    public void setEndTime(long time) {
+        timeSelectorPanel.setEndTime(time);
+    }
+
+    @Override
+    public long getStartTime() {
+        return timeSelectorPanel.getStartTime();
+    }
+
+    @Override
+    public long getEndTime() {
+        return timeSelectorPanel.getEndTime();
     }
 
     public static void clickRecordButton() {
