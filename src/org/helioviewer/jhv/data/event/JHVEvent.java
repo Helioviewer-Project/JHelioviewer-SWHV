@@ -101,9 +101,9 @@ public class JHVEvent {
     }
 
     public void finishParams() {
-        allParameters = allParametersArray.toArray(new JHVEventParameter[allParametersArray.size()]);
+        allParameters = allParametersArray.toArray(new JHVEventParameter[0]);
         allParametersArray = new ArrayList<>();
-        visibleParameters = visibleParametersArray.toArray(new JHVEventParameter[visibleParametersArray.size()]);
+        visibleParameters = visibleParametersArray.toArray(new JHVEventParameter[0]);
 
         // maybe should be configured
         ArrayList<JHVEventParameter> simpleVisibleParametersArray = new ArrayList<>();
@@ -111,7 +111,7 @@ public class JHVEvent {
             if (!Regex.WEB_URL.matcher(param.getParameterValue()).matches())
                 simpleVisibleParametersArray.add(param);
         }
-        simpleVisibleParameters = simpleVisibleParametersArray.toArray(new JHVEventParameter[simpleVisibleParametersArray.size()]);
+        simpleVisibleParameters = simpleVisibleParametersArray.toArray(new JHVEventParameter[0]);
 
         visibleParametersArray = new ArrayList<>();
     }
