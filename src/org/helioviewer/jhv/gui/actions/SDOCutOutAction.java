@@ -36,7 +36,7 @@ public class SDOCutOutAction extends AbstractAction {
         url.append("&stopTime=").append(TimeUtils.formatTime(end));
 
         url.append("&wavelengths=").append(ImageLayers.getSDOCutoutString());
-        url.append("&cadence=").append(ObservationDialog.getInstance().getObservationPanel().getCadence()).append("&cadenceUnits=s");
+        url.append("&cadence=").append(ObservationDialog.getInstance().getCadence()).append("&cadenceUnits=s");
 
         ImageData id;
         ImageLayer layer = Layers.getActiveImageLayer();

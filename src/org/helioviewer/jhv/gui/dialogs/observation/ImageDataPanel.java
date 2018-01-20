@@ -2,7 +2,6 @@ package org.helioviewer.jhv.gui.dialogs.observation;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -24,16 +23,11 @@ import org.helioviewer.jhv.time.TimeUtils;
 @SuppressWarnings("serial")
 public class ImageDataPanel extends JPanel {
 
-    private final TimePanel timePanel = new TimePanel();
-    private final CadencePanel cadencePanel = new CadencePanel();
     private final DataSourcesTree sourcesTree = new DataSourcesTree();
     private static boolean first = true;
 
-    ImageDataPanel() {
+    public ImageDataPanel() {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-
-        add(timePanel);
-        add(cadencePanel);
         add(new JScrollPane(sourcesTree));
     }
 
@@ -49,15 +43,19 @@ public class ImageDataPanel extends JPanel {
 
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
         if (item == null) { // not valid
-            Message.err("Could not retrieve data sources", "The list of available data could not be fetched, so you cannot use the GUI to add data." + System.getProperty("line.separator") + "This may happen if you do not have an internet connection or there are server problems. You can still open local files.", false);
+            Message.err("Could not retrieve data sources", "The list of available data could not be fetched, so you cannot use the GUI to add data." +
+                        System.getProperty("line.separator") +
+                        "This may happen if you do not have an internet connection or there are server problems. You can still open local files.", false);
         } else if (first) {
             first = false;
 
-            timePanel.setStartTime(item.end - 2 * TimeUtils.DAY_IN_MILLIS);
-            timePanel.setEndTime(item.end);
+            long startTime = item.end - 2 * TimeUtils.DAY_IN_MILLIS;
+            long endTime = item.end;
+            ObservationDialog.getInstance().setStartTime(startTime);
+            ObservationDialog.getInstance().setEndTime(endTime);
 
             if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
-                loadRemote(null, item);
+                doLoad(null, startTime, endTime, ObservationDialog.getInstance().getCadence());
             }
         }
     }
@@ -67,40 +65,19 @@ public class ImageDataPanel extends JPanel {
         return item == null ? null : DataSources.getServerSetting(item.server, "availability.images") + "#IID" + item.sourceId;
     }
 
-    public int getCadence() {
-        return cadencePanel.getCadence();
+    void setupLayer(APIRequest req) {
+        sourcesTree.setSelectedItem(req.server, req.sourceId);
     }
 
-    private void loadRemote(ImageLayer layer, DataSourcesTree.SourceItem item) { // valid item
-        if (layer == null)
-            layer = ImageLayer.create(null);
-        layer.load(new APIRequest(item.server, item.sourceId, timePanel.getStartTime(), timePanel.getEndTime(), getCadence()));
-    }
-
-    void setupLayer(ImageLayer layer) {
-        APIRequest req = layer.getAPIRequest();
-        if (req != null) {
-            sourcesTree.setSelectedItem(req.server, req.sourceId);
-            timePanel.setStartTime(req.startTime);
-            timePanel.setEndTime(req.endTime);
-            cadencePanel.setCadence(req.cadence);
-        }
-    }
-
-    boolean doLoad(Object layer) {
+    boolean doLoad(Object layer, long startTime, long endTime, int cadence) {
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
         if (item == null) { // not valid
             Message.err("Data is not selected", "There is no information on what to add", false);
             return false;
         }
 
-        // show message if end date before start date
-        if (timePanel.getStartTime() > timePanel.getEndTime()) {
-            JOptionPane.showMessageDialog(null, "End date is before start date", "", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
-        loadRemote((ImageLayer) layer, item);
+        ImageLayer imageLayer = layer instanceof ImageLayer ? (ImageLayer) layer : ImageLayer.create(null);
+        imageLayer.load(new APIRequest(item.server, item.sourceId, startTime, endTime, cadence));
         return true;
     }
 
