@@ -37,7 +37,7 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
 
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
     private final CadencePanel cadencePanel = new CadencePanel();
-    private final ImageSelectorPanel imageSelectorPanel = new ImageSelectorPanel();
+    private final ImageSelectorPanel imageSelectorPanel;
     private ImageLayer layer;
 
     private static ObservationDialog instance;
@@ -53,6 +53,7 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
         super(mainFrame, true);
         setResizable(false);
 
+        imageSelectorPanel = new ImageSelectorPanel(this);
         availabilityBtn.addActionListener(e -> JHVGlobals.openURL(imageSelectorPanel.getAvailabilityURL()));
         setInitFocusedComponent(imageSelectorPanel.getFocused());
         setDefaultAction(load);
