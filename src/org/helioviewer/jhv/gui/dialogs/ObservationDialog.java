@@ -16,6 +16,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.CadencePanel;
 import org.helioviewer.jhv.gui.components.ImageSelectorPanel;
 import org.helioviewer.jhv.gui.components.TimeSelectorPanel;
+import org.helioviewer.jhv.gui.interfaces.TimeSelector;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.layers.ImageLayer;
 
@@ -23,7 +24,7 @@ import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings("serial")
-public class ObservationDialog extends StandardDialog {
+public class ObservationDialog extends StandardDialog implements TimeSelector {
 
     private final AbstractAction load = new AbstractAction() {
         @Override
@@ -143,16 +144,29 @@ public class ObservationDialog extends StandardDialog {
         availabilityBtn.setEnabled(status);
     }
 
+    @Override
     public int getCadence() {
         return cadencePanel.getCadence();
     }
 
+    @Override
     public void setStartTime(long time) {
         timeSelectorPanel.setStartTime(time);
     }
 
+    @Override
     public void setEndTime(long time) {
         timeSelectorPanel.setEndTime(time);
+    }
+
+    @Override
+    public long getStartTime() {
+        return timeSelectorPanel.getStartTime();
+    }
+
+    @Override
+    public long getEndTime() {
+        return timeSelectorPanel.getEndTime();
     }
 
 }
