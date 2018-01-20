@@ -43,6 +43,7 @@ import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.View.AnimationMode;
 
 import com.jidesoft.swing.JideButton;
+import com.jidesoft.swing.JideSplitButton;
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
@@ -133,6 +134,8 @@ public class MoviePanel extends JPanel implements ChangeListener {
     private static JideButton prevFrameButton;
     private static JideButton nextFrameButton;
     private static JideButton playButton;
+    private static JideSplitButton skipBackwardButton;
+    private static JideSplitButton skipForwardButton;
 
     private static RecordButton recordButton;
 
@@ -215,6 +218,12 @@ public class MoviePanel extends JPanel implements ChangeListener {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 1, 0));
         int small = 18, big = 26;
 
+        skipBackwardButton = new JideSplitButton(Buttons.skipBackward);
+        skipBackwardButton.setFont(Buttons.getMaterialFont(small));
+        skipBackwardButton.setToolTipText("Move time interval backward");
+        //skipBackwardButton.addActionListener(getPreviousFrameAction());
+        buttonPanel.add(skipBackwardButton);
+
         prevFrameButton = new JideButton(Buttons.backward);
         prevFrameButton.setFont(Buttons.getMaterialFont(small));
         prevFrameButton.setToolTipText("Step to previous frame");
@@ -232,6 +241,12 @@ public class MoviePanel extends JPanel implements ChangeListener {
         nextFrameButton.setToolTipText("Step to next frame");
         nextFrameButton.addActionListener(getNextFrameAction());
         buttonPanel.add(nextFrameButton);
+
+        skipForwardButton = new JideSplitButton(Buttons.skipForward);
+        skipForwardButton.setFont(Buttons.getMaterialFont(small));
+        skipForwardButton.setToolTipText("Move time interval forward");
+        //skipBackButton.addActionListener(getPreviousFrameAction());
+        buttonPanel.add(skipForwardButton);
 
         recordButton = new RecordButton(small);
         buttonPanel.add(recordButton);
@@ -381,6 +396,8 @@ public class MoviePanel extends JPanel implements ChangeListener {
         playButton.setEnabled(enabled);
         nextFrameButton.setEnabled(enabled);
         prevFrameButton.setEnabled(enabled);
+        skipBackwardButton.setEnabled(enabled);
+        skipForwardButton.setEnabled(enabled);
         recordButton.setEnabled(enabled);
         speedSpinner.setEnabled(enabled);
         speedUnitComboBox.setEnabled(enabled);

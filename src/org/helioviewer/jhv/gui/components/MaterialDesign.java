@@ -32,6 +32,8 @@ public enum MaterialDesign {
     MDI_ROTATE_3D("mdi-rotate-3d", '\uf464'),
     MDI_SHAPE_POLYGON_PLUS("mdi-shape-polygon-plus", '\uf65e'),
     MDI_SHARE_VARIANT("mdi-share-variant", '\uf497'),
+    MDI_SKIP_BACKWARD("mdi-skip-backward", '\uf4ab'),
+    MDI_SKIP_FORWARD("mdi-skip-forward", '\uf4ac'),
     MDI_SLACK("mdi-slack", '\uf4b1'),
     MDI_STEP_BACKWARD("mdi-step-backward", '\uf4d5'),
     MDI_STEP_FORWARD("mdi-step-forward", '\uf4d7'),
