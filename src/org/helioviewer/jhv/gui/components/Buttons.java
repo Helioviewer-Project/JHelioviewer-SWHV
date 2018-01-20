@@ -37,8 +37,8 @@ public class Buttons {
 
     public static final String newLayer = "<html><font face='Material Design Icons' size=4>" +
         uc2ent(MaterialDesign.MDI_PLUS_CIRCLE) + "</font>&nbsp;New Layer";
-    public static final String syncLayers = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
-        uc2ent(MaterialDesign.MDI_SYNC) + "</font>&nbsp;";
+//    public static final String syncLayers = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
+//        uc2ent(MaterialDesign.MDI_SYNC) + "</font>&nbsp;";
 
     public static final String lock = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
         uc2ent(MaterialDesign.MDI_LOCK) + "</font>&nbsp;";

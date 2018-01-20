@@ -140,10 +140,6 @@ public class LayersPanel extends JPanel {
         addLayerButton.addActionListener(e -> new NewLayerAction().actionPerformed(new ActionEvent(addLayerButton, 0, "")));
         addLayerButton.add(new ImageDataPanel());
 
-        JideButton syncSpanButton = new JideButton(Buttons.syncLayers);
-        syncSpanButton.setToolTipText("Synchronize time span to master layer");
-        syncSpanButton.addActionListener(e -> ImageLayers.syncLayersSpan());
-
         multiview = new JCheckBox("Multiview", Displayer.multiview);
         multiview.setHorizontalTextPosition(SwingConstants.LEADING);
         multiview.addItemListener(e -> {
@@ -156,7 +152,6 @@ public class LayersPanel extends JPanel {
         addLayerButtonWrapper.add(addLayerButton, BorderLayout.WEST);
 
         JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-        flowPanel.add(syncSpanButton);
         addLayerButtonWrapper.add(flowPanel, BorderLayout.CENTER);
         addLayerButtonWrapper.add(multiview, BorderLayout.EAST);
 

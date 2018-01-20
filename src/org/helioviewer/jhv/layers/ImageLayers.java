@@ -124,33 +124,6 @@ public class ImageLayers {
         }
     }
 
-    public static void syncLayersSpan() {
-        ImageLayer activeLayer = Layers.getActiveImageLayer();
-        if (activeLayer == null)
-            return;
-
-        APIRequest areq = activeLayer.getAPIRequest();
-        long startTime, endTime;
-        int cadence;
-        if (areq != null) {
-            startTime = areq.startTime;
-            endTime = areq.endTime;
-            cadence = areq.cadence;
-        } else {
-            View view = activeLayer.getView();
-            startTime = view.getFirstTime().milli;
-            endTime = view.getLastTime().milli;
-            cadence = ObservationDialog.getInstance().getCadence();
-        }
-
-        for (ImageLayer layer : Layers.getImageLayers()) {
-            APIRequest vreq = layer.getAPIRequest();
-            if (vreq != null && layer != activeLayer) {
-                layer.load(new APIRequest(vreq.server, vreq.sourceId, startTime, endTime, cadence));
-            }
-        }
-    }
-
     public static void getSAMPMessage(Message msg) {
         ImageData id;
         ImageLayer activeLayer = Layers.getActiveImageLayer();
