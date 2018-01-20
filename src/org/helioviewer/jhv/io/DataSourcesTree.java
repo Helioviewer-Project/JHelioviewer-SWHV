@@ -16,7 +16,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
+import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 
 import com.jidesoft.swing.SearchableUtils;
 

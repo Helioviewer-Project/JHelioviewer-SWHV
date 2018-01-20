@@ -1,23 +1,22 @@
-package org.helioviewer.jhv.gui.dialogs.observation;
+package org.helioviewer.jhv.gui.components;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.gui.components.DateTimePanel;
 import org.helioviewer.jhv.gui.components.calendar.JHVCarringtonPicker;
 import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
-public class TimePanel extends JPanel {
+public class TimeSelectorPanel extends JPanel {
 
     private final DateTimePanel startDateTimePanel = new DateTimePanel("Start");
     private final DateTimePanel endDateTimePanel = new DateTimePanel("End");
     private final JHVCarringtonPicker startCarrington = new JHVCarringtonPicker();
     private final JHVCarringtonPicker endCarrington = new JHVCarringtonPicker();
 
-    public TimePanel() {
+    public TimeSelectorPanel() {
         long milli = TimeUtils.START.milli;
         setStartTime(milli - 2 * TimeUtils.DAY_IN_MILLIS);
         setEndTime(milli);

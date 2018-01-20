@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.dialogs.observation;
+package org.helioviewer.jhv.gui.components;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;

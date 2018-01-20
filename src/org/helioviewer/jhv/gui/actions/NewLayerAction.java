@@ -7,7 +7,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
-import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
+import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.ImageLayer;
 

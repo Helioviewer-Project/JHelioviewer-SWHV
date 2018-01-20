@@ -33,8 +33,6 @@ import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
-import org.helioviewer.jhv.gui.dialogs.observation.CadencePanel;
-import org.helioviewer.jhv.gui.dialogs.observation.TimePanel;
 import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Movie;
@@ -127,7 +125,7 @@ public class MoviePanel extends JPanel implements ChangeListener {
 
     private static boolean isAdvanced;
 
-    private static final TimePanel timePanel = new TimePanel();
+    private static final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
     private static final CadencePanel cadencePanel = new CadencePanel();
 
     private static TimeSlider timeSlider;
@@ -178,7 +176,7 @@ public class MoviePanel extends JPanel implements ChangeListener {
     private MoviePanel() {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-        add(timePanel);
+        add(timeSelectorPanel);
 
         JPanel sliderPanel = new JPanel(new GridBagLayout());
         // Time line
@@ -192,10 +190,10 @@ public class MoviePanel extends JPanel implements ChangeListener {
 
         JideButton setButton = new JideButton("Set");
         setButton.addActionListener(e -> {
-            long start = timePanel.getStartTime();
-            long end = timePanel.getEndTime();
+            long start = timeSelectorPanel.getStartTime();
+            long end = timeSelectorPanel.getEndTime();
             if (start > end)
-                timePanel.setStartTime(end);
+                timeSelectorPanel.setStartTime(end);
             else
                 ImageLayers.syncLayersSpan(start, end, cadencePanel.getCadence());
         });

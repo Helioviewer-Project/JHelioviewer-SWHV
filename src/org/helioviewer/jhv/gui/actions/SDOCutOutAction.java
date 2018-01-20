@@ -6,7 +6,7 @@ import javax.swing.AbstractAction;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
+import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayers;
