@@ -10,6 +10,7 @@ import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
+import org.helioviewer.jhv.io.DataSourcesListener;
 import org.helioviewer.jhv.io.DataSourcesParser;
 import org.helioviewer.jhv.io.DataSourcesTree;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -21,7 +22,7 @@ import org.helioviewer.jhv.time.TimeUtils;
  * the {@link ObservationDialog}.
  * */
 @SuppressWarnings("serial")
-public class ImageDataPanel extends JPanel {
+public class ImageDataPanel extends JPanel implements DataSourcesListener {
 
     private final DataSourcesTree sourcesTree = new DataSourcesTree();
     private static boolean first = true;
@@ -29,12 +30,14 @@ public class ImageDataPanel extends JPanel {
     public ImageDataPanel() {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         add(new JScrollPane(sourcesTree));
+        DataSources.addListener(this);
     }
 
     JComponent getFocused() {
         return sourcesTree;
     }
 
+    @Override
     public void setupSources(DataSourcesParser parser) {
         if (!sourcesTree.setParsedData(parser)) // not preferred
             return;
