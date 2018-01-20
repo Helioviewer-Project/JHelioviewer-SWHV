@@ -45,7 +45,6 @@ import org.helioviewer.jhv.layers.selector.cellrenderer.RendererRemove;
 import org.helioviewer.jhv.layers.selector.cellrenderer.RendererTime;
 
 import com.jidesoft.swing.ButtonStyle;
-import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideSplitButton;
 
 @SuppressWarnings("serial")

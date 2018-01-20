@@ -15,7 +15,6 @@ import java.util.HashMap;
 
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.SampUtils;
-import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
 
