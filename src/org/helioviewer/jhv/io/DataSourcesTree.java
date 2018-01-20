@@ -184,7 +184,7 @@ public class DataSourcesTree extends JTree {
 
     private static class OneLeafTreeSelectionModel extends DefaultTreeSelectionModel {
 
-        TreePath selectedPath;
+        private TreePath selectedPath;
 
         OneLeafTreeSelectionModel() {
             setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
