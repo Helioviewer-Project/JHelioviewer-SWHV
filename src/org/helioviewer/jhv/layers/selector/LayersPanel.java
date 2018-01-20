@@ -32,6 +32,7 @@ import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.actions.NewLayerAction;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.ImageSelectorPanel;
+import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -134,7 +135,7 @@ public class LayersPanel extends JPanel {
         jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
         jsp.getViewport().setBackground(grid.getBackground());
 
-        imageSelectorPanel = new ImageSelectorPanel();
+        imageSelectorPanel = new ImageSelectorPanel(MoviePanel.getInstance());
         JideSplitButton addLayerButton = new JideSplitButton(Buttons.newLayer);
         addLayerButton.setButtonStyle(ButtonStyle.FLAT_STYLE);
         addLayerButton.setFocusable(false);

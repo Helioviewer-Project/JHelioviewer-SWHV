@@ -17,6 +17,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
+import org.helioviewer.jhv.gui.interfaces.ObservationSelector;
 
 import com.jidesoft.swing.SearchableUtils;
 
@@ -59,10 +60,12 @@ public class DataSourcesTree extends JTree {
 
     }
 
+    private final ObservationSelector selector;
     private final DefaultMutableTreeNode nodeRoot;
     private final HashMap<String, DefaultMutableTreeNode> nodes = new HashMap<>();
 
-    public DataSourcesTree() {
+    public DataSourcesTree(ObservationSelector _selector) {
+        selector = _selector;
         nodeRoot = new DefaultMutableTreeNode("Datasets");
 
         for (String serverName : DataSources.getServers()) {
@@ -90,7 +93,7 @@ public class DataSourcesTree extends JTree {
                 if (e.getClickCount() == 2 && getRowForLocation(e.getX(), e.getY()) != -1 && (path = getPathForLocation(e.getX(), e.getY())) != null) {
                     Object obj = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
                     if (obj instanceof SourceItem)
-                        ObservationDialog.getInstance().loadButtonPressed();
+                        selector.load(((SourceItem) obj).server, ((SourceItem) obj).sourceId);
                 }
             }
         });

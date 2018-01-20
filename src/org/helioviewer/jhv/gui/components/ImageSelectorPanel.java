@@ -14,17 +14,19 @@ import org.helioviewer.jhv.io.DataSourcesListener;
 import org.helioviewer.jhv.io.DataSourcesParser;
 import org.helioviewer.jhv.io.DataSourcesTree;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
+import org.helioviewer.jhv.gui.interfaces.ObservationSelector;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
 public class ImageSelectorPanel extends JPanel implements DataSourcesListener {
 
-    private final DataSourcesTree sourcesTree = new DataSourcesTree();
+    private final DataSourcesTree sourcesTree;
     private static boolean first = true;
 
-    public ImageSelectorPanel() {
+    public ImageSelectorPanel(ObservationSelector selector) {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        sourcesTree = new DataSourcesTree(selector);
         add(new JScrollPane(sourcesTree));
         DataSources.addListener(this);
     }
