@@ -16,7 +16,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.CadencePanel;
 import org.helioviewer.jhv.gui.components.ImageSelectorPanel;
 import org.helioviewer.jhv.gui.components.TimeSelectorPanel;
-import org.helioviewer.jhv.gui.interfaces.TimeSelector;
+import org.helioviewer.jhv.gui.interfaces.ObservationSelector;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.layers.ImageLayer;
 
@@ -24,7 +24,7 @@ import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings("serial")
-public class ObservationDialog extends StandardDialog implements TimeSelector {
+public class ObservationDialog extends StandardDialog implements ObservationSelector {
 
     private final AbstractAction load = new AbstractAction() {
         @Override
@@ -47,10 +47,6 @@ public class ObservationDialog extends StandardDialog implements TimeSelector {
             instance = new ObservationDialog(ImageViewerGui.getMainFrame());
         }
         return instance;
-    }
-
-    public ImageSelectorPanel getImageSelectorPanel() {
-        return imageSelectorPanel;
     }
 
     private ObservationDialog(JFrame mainFrame) {
@@ -134,7 +130,7 @@ public class ObservationDialog extends StandardDialog implements TimeSelector {
             return;
         }
 
-        if (imageSelectorPanel.doLoad(layer, startTime, endTime, getCadence())) {
+        if (imageSelectorPanel.load(layer, startTime, endTime, getCadence())) {
             setVisible(false);
             layer = null;
         }
@@ -167,6 +163,12 @@ public class ObservationDialog extends StandardDialog implements TimeSelector {
     @Override
     public long getEndTime() {
         return timeSelectorPanel.getEndTime();
+    }
+
+    @Override
+    public void load(String server, int sourceId) {
+        imageSelectorPanel.load(layer, getStartTime(), getEndTime(), getCadence());
+        layer = null;
     }
 
 }

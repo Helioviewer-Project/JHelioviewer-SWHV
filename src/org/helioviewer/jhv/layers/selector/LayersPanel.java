@@ -62,6 +62,7 @@ public class LayersPanel extends JPanel {
     private static final int NUMBEROFVISIBLEROWS = 7;
 
     private final LayersTable grid;
+    private final ImageSelectorPanel imageSelectorPanel;
     private final JPanel optionsPanelWrapper;
 
     static JCheckBox multiview;
@@ -133,11 +134,12 @@ public class LayersPanel extends JPanel {
         jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
         jsp.getViewport().setBackground(grid.getBackground());
 
+        imageSelectorPanel = new ImageSelectorPanel();
         JideSplitButton addLayerButton = new JideSplitButton(Buttons.newLayer);
         addLayerButton.setButtonStyle(ButtonStyle.FLAT_STYLE);
         addLayerButton.setFocusable(false);
+        addLayerButton.add(imageSelectorPanel);
         addLayerButton.addActionListener(e -> new NewLayerAction().actionPerformed(new ActionEvent(addLayerButton, 0, "")));
-        addLayerButton.add(new ImageSelectorPanel());
 
         multiview = new JCheckBox("Multiview", Displayer.multiview);
         multiview.setHorizontalTextPosition(SwingConstants.LEADING);
@@ -285,6 +287,10 @@ public class LayersPanel extends JPanel {
         }
         revalidate();
         repaint();
+    }
+
+    public ImageSelectorPanel getImageSelectorPanel() {
+        return imageSelectorPanel;
     }
 
 }
