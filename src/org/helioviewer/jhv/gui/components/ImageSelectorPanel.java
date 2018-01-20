@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.gui.components;
 
+import java.awt.Dimension;
+
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -26,6 +28,7 @@ public class ImageSelectorPanel extends JPanel implements DataSourcesListener {
 
     public ImageSelectorPanel(ObservationSelector _selector) {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        setPreferredSize(new Dimension(300, 400));
         selector = _selector;
         sourcesTree = new DataSourcesTree(selector);
         add(new JScrollPane(sourcesTree));
@@ -44,11 +47,7 @@ public class ImageSelectorPanel extends JPanel implements DataSourcesListener {
         CommandLine.loadRequest();
 
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
-        if (item == null) { // not valid
-            Message.err("Could not retrieve data sources", "The list of available data could not be fetched, so you cannot use the GUI to add data." +
-                        System.getProperty("line.separator") +
-                        "This may happen if you do not have an internet connection or there are server problems. You can still open local files.", false);
-        } else {
+        if (item != null) { // valid
             long startTime = item.end - 2 * TimeUtils.DAY_IN_MILLIS;
             long endTime = item.end;
             selector.setStartTime(startTime);
