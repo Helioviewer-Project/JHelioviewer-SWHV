@@ -64,10 +64,7 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
         AbstractAction close = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (layer != null) {
-                    layer.unload();
-                    layer = null;
-                }
+                layer = null;
                 setVisible(false);
             }
         };
@@ -103,8 +100,8 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
     public void showDialog(boolean newLayer, ImageLayer _layer) {
         layer = _layer;
 
-        APIRequest req = layer.getAPIRequest();
-        if (req != null) {
+        APIRequest req;
+        if (layer != null && (req = layer.getAPIRequest()) != null) {
             imageSelectorPanel.setupLayer(req);
             timeSelectorPanel.setStartTime(req.startTime);
             timeSelectorPanel.setEndTime(req.endTime);
