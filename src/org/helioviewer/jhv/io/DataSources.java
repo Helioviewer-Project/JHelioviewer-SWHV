@@ -100,4 +100,19 @@ public class DataSources {
             JHVGlobals.getExecutorService().execute(new DataSourcesTask(serverName));
     }
 
+    private static final HashSet<DataSourcesListener> listeners = new HashSet<>();
+
+    public static void addListener(DataSourcesListener listener) {
+        listeners.add(listener);
+    }
+
+    public static void removeListener(DataSourcesListener listener) {
+        listeners.remove(listener);
+    }
+
+    static void setupSources(DataSourcesParser parser) {
+        for (DataSourcesListener listener : listeners)
+            listener.setupSources(parser);
+    }
+
 }
