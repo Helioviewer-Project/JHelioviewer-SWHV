@@ -9,7 +9,6 @@ import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.input.KeyShortcuts;
-import org.helioviewer.jhv.layers.ImageLayer;
 
 @SuppressWarnings("serial")
 public class NewLayerAction extends AbstractAction {
@@ -24,7 +23,7 @@ public class NewLayerAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        ObservationDialog.getInstance().showDialog(true, ImageLayer.create(null));
+        ObservationDialog.getInstance().showDialog(true, null);
     }
 
 }
