@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.dialogs.observation;
+package org.helioviewer.jhv.gui.dialogs;
 
 import java.awt.event.ActionEvent;
 
@@ -13,6 +13,9 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.components.CadencePanel;
+import org.helioviewer.jhv.gui.components.ImageSelectorPanel;
+import org.helioviewer.jhv.gui.components.TimeSelectorPanel;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.layers.ImageLayer;
 
@@ -31,9 +34,9 @@ public class ObservationDialog extends StandardDialog {
     private final JButton okBtn = new JButton(load);
     private final JButton availabilityBtn = new JButton("Available data");
 
-    private final TimePanel timePanel = new TimePanel();
+    private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
     private final CadencePanel cadencePanel = new CadencePanel();
-    private final ImageDataPanel observationPanel = new ImageDataPanel();
+    private final ImageSelectorPanel imageSelectorPanel = new ImageSelectorPanel();
     private ImageLayer layer;
 
     private static ObservationDialog instance;
@@ -45,16 +48,16 @@ public class ObservationDialog extends StandardDialog {
         return instance;
     }
 
-    public ImageDataPanel getObservationPanel() {
-        return observationPanel;
+    public ImageSelectorPanel getImageSelectorPanel() {
+        return imageSelectorPanel;
     }
 
     private ObservationDialog(JFrame mainFrame) {
         super(mainFrame, true);
         setResizable(false);
 
-        availabilityBtn.addActionListener(e -> JHVGlobals.openURL(observationPanel.getAvailabilityURL()));
-        setInitFocusedComponent(observationPanel.getFocused());
+        availabilityBtn.addActionListener(e -> JHVGlobals.openURL(imageSelectorPanel.getAvailabilityURL()));
+        setInitFocusedComponent(imageSelectorPanel.getFocused());
         setDefaultAction(load);
     }
 
@@ -85,9 +88,9 @@ public class ObservationDialog extends StandardDialog {
     public JComponent createContentPanel() {
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
-        content.add(timePanel);
+        content.add(timeSelectorPanel);
         content.add(cadencePanel);
-        content.add(observationPanel);
+        content.add(imageSelectorPanel);
         content.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
         return content;
     }
@@ -102,9 +105,9 @@ public class ObservationDialog extends StandardDialog {
 
         APIRequest req = layer.getAPIRequest();
         if (req != null) {
-            observationPanel.setupLayer(req);
-            timePanel.setStartTime(req.startTime);
-            timePanel.setEndTime(req.endTime);
+            imageSelectorPanel.setupLayer(req);
+            timeSelectorPanel.setStartTime(req.startTime);
+            timeSelectorPanel.setEndTime(req.endTime);
             cadencePanel.setCadence(req.cadence);
         }
 
@@ -122,15 +125,15 @@ public class ObservationDialog extends StandardDialog {
     }
 
     public void loadButtonPressed() {
-        long startTime = timePanel.getStartTime();
-        long endTime = timePanel.getEndTime();
+        long startTime = timeSelectorPanel.getStartTime();
+        long endTime = timeSelectorPanel.getEndTime();
         if (startTime > endTime) {
-            timePanel.setStartTime(endTime);
+            timeSelectorPanel.setStartTime(endTime);
             JOptionPane.showMessageDialog(null, "End date is before start date", "", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        if (observationPanel.doLoad(layer, startTime, endTime, getCadence())) {
+        if (imageSelectorPanel.doLoad(layer, startTime, endTime, getCadence())) {
             setVisible(false);
             layer = null;
         }
@@ -144,12 +147,12 @@ public class ObservationDialog extends StandardDialog {
         return cadencePanel.getCadence();
     }
 
-    void setStartTime(long time) {
-        timePanel.setStartTime(time);
+    public void setStartTime(long time) {
+        timeSelectorPanel.setStartTime(time);
     }
 
-    void setEndTime(long time) {
-        timePanel.setEndTime(time);
+    public void setEndTime(long time) {
+        timeSelectorPanel.setEndTime(time);
     }
 
 }

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.dialogs.observation;
+package org.helioviewer.jhv.gui.components;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -13,22 +13,23 @@ import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataSourcesListener;
 import org.helioviewer.jhv.io.DataSourcesParser;
 import org.helioviewer.jhv.io.DataSourcesTree;
+import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
-public class ImageDataPanel extends JPanel implements DataSourcesListener {
+public class ImageSelectorPanel extends JPanel implements DataSourcesListener {
 
     private final DataSourcesTree sourcesTree = new DataSourcesTree();
     private static boolean first = true;
 
-    public ImageDataPanel() {
+    public ImageSelectorPanel() {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         add(new JScrollPane(sourcesTree));
         DataSources.addListener(this);
     }
 
-    JComponent getFocused() {
+    public JComponent getFocused() {
         return sourcesTree;
     }
 
@@ -58,16 +59,16 @@ public class ImageDataPanel extends JPanel implements DataSourcesListener {
         }
     }
 
-    String getAvailabilityURL() {
+    public String getAvailabilityURL() {
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
         return item == null ? null : DataSources.getServerSetting(item.server, "availability.images") + "#IID" + item.sourceId;
     }
 
-    void setupLayer(APIRequest req) {
+    public void setupLayer(APIRequest req) {
         sourcesTree.setSelectedItem(req.server, req.sourceId);
     }
 
-    boolean doLoad(ImageLayer layer, long startTime, long endTime, int cadence) {
+    public boolean doLoad(ImageLayer layer, long startTime, long endTime, int cadence) {
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
         if (item == null) { // not valid
             Message.err("Data is not selected", "There is no information on what to add", false);

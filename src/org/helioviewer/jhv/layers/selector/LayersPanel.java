@@ -31,8 +31,8 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.actions.NewLayerAction;
 import org.helioviewer.jhv.gui.components.Buttons;
-import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
-import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
+import org.helioviewer.jhv.gui.components.ImageSelectorPanel;
+import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayers;
@@ -137,7 +137,7 @@ public class LayersPanel extends JPanel {
         addLayerButton.setButtonStyle(ButtonStyle.FLAT_STYLE);
         addLayerButton.setFocusable(false);
         addLayerButton.addActionListener(e -> new NewLayerAction().actionPerformed(new ActionEvent(addLayerButton, 0, "")));
-        addLayerButton.add(new ImageDataPanel());
+        addLayerButton.add(new ImageSelectorPanel());
 
         multiview = new JCheckBox("Multiview", Displayer.multiview);
         multiview.setHorizontalTextPosition(SwingConstants.LEADING);
