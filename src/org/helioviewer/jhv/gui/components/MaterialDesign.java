@@ -35,7 +35,7 @@ public enum MaterialDesign {
     MDI_SLACK("mdi-slack", '\uf4b1'),
     MDI_STEP_BACKWARD("mdi-step-backward", '\uf4d5'),
     MDI_STEP_FORWARD("mdi-step-forward", '\uf4d7'),
-    MDI_SYNC("mdi-sync", '\uf4e6'),
+//    MDI_SYNC("mdi-sync", '\uf4e6'),
     MDI_UPLOAD("mdi-upload", '\uf552'),
     MDI_VECTOR_CIRCLE_VARIANT("mdi-vector-circle-variant", '\uf557'),
     MDI_WEATHER_SUNNY("mdi-weather-sunny", '\uf599'),
