@@ -16,11 +16,6 @@ import org.helioviewer.jhv.io.DataSourcesTree;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.time.TimeUtils;
 
-/**
- * In order to select and load image data from the Helioviewer server this class
- * provides the corresponding user interface. The UI will be displayed within
- * the {@link ObservationDialog}.
- * */
 @SuppressWarnings("serial")
 public class ImageDataPanel extends JPanel implements DataSourcesListener {
 
@@ -72,14 +67,14 @@ public class ImageDataPanel extends JPanel implements DataSourcesListener {
         sourcesTree.setSelectedItem(req.server, req.sourceId);
     }
 
-    boolean doLoad(Object layer, long startTime, long endTime, int cadence) {
+    boolean doLoad(ImageLayer layer, long startTime, long endTime, int cadence) {
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
         if (item == null) { // not valid
             Message.err("Data is not selected", "There is no information on what to add", false);
             return false;
         }
 
-        ImageLayer imageLayer = layer instanceof ImageLayer ? (ImageLayer) layer : ImageLayer.create(null);
+        ImageLayer imageLayer = layer == null ? ImageLayer.create(null) : layer;
         imageLayer.load(new APIRequest(item.server, item.sourceId, startTime, endTime, cadence));
         return true;
     }

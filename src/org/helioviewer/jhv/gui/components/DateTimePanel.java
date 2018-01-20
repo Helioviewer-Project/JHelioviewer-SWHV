@@ -40,6 +40,7 @@ public class DateTimePanel extends JPanel implements ActionListener, JHVCalendar
     }
 
     public void setTime(long time) {
+        time = (time / 1000L) * 1000L; // round to second
         long timeDate = time - time % TimeUtils.DAY_IN_MILLIS;
         datePicker.setTime(timeDate);
         timePicker.setText(TimeUtils.formatTime(time));
