@@ -31,6 +31,7 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.actions.NewLayerAction;
 import org.helioviewer.jhv.gui.components.Buttons;
+import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -43,7 +44,9 @@ import org.helioviewer.jhv.layers.selector.cellrenderer.RendererName;
 import org.helioviewer.jhv.layers.selector.cellrenderer.RendererRemove;
 import org.helioviewer.jhv.layers.selector.cellrenderer.RendererTime;
 
+import com.jidesoft.swing.ButtonStyle;
 import com.jidesoft.swing.JideButton;
+import com.jidesoft.swing.JideSplitButton;
 
 @SuppressWarnings("serial")
 public class LayersPanel extends JPanel {
@@ -131,8 +134,11 @@ public class LayersPanel extends JPanel {
         jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
         jsp.getViewport().setBackground(grid.getBackground());
 
-        JideButton addLayerButton = new JideButton(Buttons.newLayer);
+        JideSplitButton addLayerButton = new JideSplitButton(Buttons.newLayer);
+        addLayerButton.setButtonStyle(ButtonStyle.FLAT_STYLE);
+        addLayerButton.setFocusable(false);
         addLayerButton.addActionListener(e -> new NewLayerAction().actionPerformed(new ActionEvent(addLayerButton, 0, "")));
+        addLayerButton.add(new ImageDataPanel());
 
         JideButton syncSpanButton = new JideButton(Buttons.syncLayers);
         syncSpanButton.setToolTipText("Synchronize time span to master layer");

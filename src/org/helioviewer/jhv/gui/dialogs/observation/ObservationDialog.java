@@ -4,12 +4,16 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.layers.ImageLayer;
 
 import com.jidesoft.dialog.ButtonPanel;
@@ -27,6 +31,8 @@ public class ObservationDialog extends StandardDialog {
     private final JButton okBtn = new JButton(load);
     private final JButton availabilityBtn = new JButton("Available data");
 
+    private final TimePanel timePanel = new TimePanel();
+    private final CadencePanel cadencePanel = new CadencePanel();
     private final ImageDataPanel observationPanel = new ImageDataPanel();
     private ImageLayer layer;
 
@@ -77,8 +83,13 @@ public class ObservationDialog extends StandardDialog {
 
     @Override
     public JComponent createContentPanel() {
-        observationPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-        return observationPanel;
+        JPanel content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
+        content.add(timePanel);
+        content.add(cadencePanel);
+        content.add(observationPanel);
+        content.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        return content;
     }
 
     @Override
@@ -86,10 +97,16 @@ public class ObservationDialog extends StandardDialog {
         return null;
     }
 
-    // Shows up the dialog and initializes the UI with the given panel.
     public void showDialog(boolean newLayer, ImageLayer _layer) {
         layer = _layer;
-        observationPanel.setupLayer(layer);
+
+        APIRequest req = layer.getAPIRequest();
+        if (req != null) {
+            observationPanel.setupLayer(req);
+            timePanel.setStartTime(req.startTime);
+            timePanel.setEndTime(req.endTime);
+            cadencePanel.setCadence(req.cadence);
+        }
 
         if (newLayer) {
             setTitle("New Layer");
@@ -105,7 +122,15 @@ public class ObservationDialog extends StandardDialog {
     }
 
     public void loadButtonPressed() {
-        if (observationPanel.doLoad(layer)) {
+        long startTime = timePanel.getStartTime();
+        long endTime = timePanel.getEndTime();
+        if (startTime > endTime) {
+            timePanel.setStartTime(endTime);
+            JOptionPane.showMessageDialog(null, "End date is before start date", "", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (observationPanel.doLoad(layer, startTime, endTime, getCadence())) {
             setVisible(false);
             layer = null;
         }
@@ -113,6 +138,18 @@ public class ObservationDialog extends StandardDialog {
 
     public void setAvailabilityStatus(boolean status) {
         availabilityBtn.setEnabled(status);
+    }
+
+    public int getCadence() {
+        return cadencePanel.getCadence();
+    }
+
+    void setStartTime(long time) {
+        timePanel.setStartTime(time);
+    }
+
+    void setEndTime(long time) {
+        timePanel.setEndTime(time);
     }
 
 }
