@@ -64,8 +64,10 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
         AbstractAction close = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                layer.unload();
-                layer = null;
+                if (layer != null) {
+                    layer.unload();
+                    layer = null;
+                }
                 setVisible(false);
             }
         };

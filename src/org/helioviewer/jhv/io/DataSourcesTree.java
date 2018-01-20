@@ -12,6 +12,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultTreeSelectionModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -104,24 +105,45 @@ public class DataSourcesTree extends JTree {
         return null; // disable builtin search
     }
 
-    private static void reattach(DefaultMutableTreeNode tgt, DefaultMutableTreeNode src) {
-        tgt.removeAllChildren();
-        while (src.getChildCount() > 0)
-            tgt.add((DefaultMutableTreeNode) src.getFirstChild());
+    private static DefaultMutableTreeNode copyNode(DefaultMutableTreeNode src){
+        DefaultMutableTreeNode copy = new DefaultMutableTreeNode(src.getUserObject());
+        if (src.isLeaf()) {
+            return copy;
+        } else {
+            int cc = src.getChildCount();
+            for(int i = 0; i < cc; i++){
+                copy.add(copyNode((DefaultMutableTreeNode) src.getChildAt(i)));
+            }
+            return copy;
+        }
     }
 
+    private void reattach(DefaultMutableTreeNode tgt, DefaultMutableTreeNode src) {
+        tgt.removeAllChildren();
+        Enumeration<?> children = src.children();
+        while (children.hasMoreElements()) {
+            tgt.add(copyNode((DefaultMutableTreeNode) children.nextElement()));
+        }
+    }
+
+    private final String defaultServer = Settings.getSingletonInstance().getProperty("default.server");
+
     public boolean setParsedData(DataSourcesParser parser) {
-        String server = parser.rootNode.toString();
+        String server = parser.getRoot().toString();
         for (String serverName : DataSources.getServers()) {
             if (serverName.equals(server)) {
-                reattach(nodes.get(serverName), parser.rootNode);
+                reattach(nodes.get(serverName), parser.getRoot());
                 break;
             }
         }
 
-        boolean preferred = server.equals(Settings.getSingletonInstance().getProperty("default.server"));
-        if (preferred && parser.defaultNode != null)
-            setSelectionPath(new TreePath(parser.defaultNode.getPath()));
+        boolean preferred = server.equals(defaultServer);
+        if (preferred && parser.getDefault() != null) {
+            Object obj = parser.getDefault().getUserObject();
+            if (obj instanceof SourceItem) {
+                setSelectedItem(((SourceItem) obj).server, ((SourceItem) obj).sourceId);
+            }
+        }
         return preferred;
     }
 
