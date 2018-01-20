@@ -11,7 +11,6 @@ import java.awt.event.MouseEvent;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Objects;
-import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -122,8 +121,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         JPanel row1 = new JPanel(new FlowLayout(FlowLayout.LEADING));
         row1.add(new JLabel("Preferred server", JLabel.RIGHT));
 
-        Set<String> servers = DataSources.getServers();
-        JComboBox<String> combo = new JComboBox<>(servers.toArray(new String[servers.size()]));
+        JComboBox<String> combo = new JComboBox<>(DataSources.getServers().toArray(new String[0]));
         combo.setSelectedItem(Settings.getSingletonInstance().getProperty("default.server"));
         combo.addActionListener(e -> Settings.getSingletonInstance().setProperty("default.server", (String) Objects.requireNonNull(combo.getSelectedItem())));
         row1.add(combo);

@@ -28,7 +28,7 @@ public class ImageSelectorPanel extends JPanel implements DataSourcesListener {
 
     public ImageSelectorPanel(ObservationSelector _selector) {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        setPreferredSize(new Dimension(300, 400));
+        setPreferredSize(new Dimension(250, 300));
         selector = _selector;
         sourcesTree = new DataSourcesTree(selector);
         add(new JScrollPane(sourcesTree));

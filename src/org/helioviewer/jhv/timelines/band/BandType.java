@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -39,8 +38,7 @@ public class BandType {
     }
 
     public static String[] getGroups() {
-        Set<String> set = groups.keySet();
-        return set.toArray(new String[set.size()]);
+        return groups.keySet().toArray(new String[0]);
     }
 
     private String name = "unknown";
