@@ -137,6 +137,7 @@ public class LayersPanel extends JPanel {
 
         ObservationDialog.getInstance(); // make sure it's instanced
         imageSelectorPanel = new ImageSelectorPanel(MoviePanel.getInstance());
+
         JideSplitButton addLayerButton = new JideSplitButton(Buttons.newLayer);
         addLayerButton.setButtonStyle(ButtonStyle.FLAT_STYLE);
         addLayerButton.setFocusable(false);

@@ -12,10 +12,9 @@ import org.json.JSONObject;
 
 public class DataSourcesParser {
 
-    final DefaultMutableTreeNode rootNode;
-    DefaultMutableTreeNode defaultNode;
-
     private final String server;
+    private final DefaultMutableTreeNode rootNode;
+    private DefaultMutableTreeNode defaultNode;
 
     DataSourcesParser(String _server) {
         server = _server;
@@ -24,6 +23,14 @@ public class DataSourcesParser {
 
     void parse(JSONObject json) {
         parse(rootNode, json, null);
+    }
+
+    DefaultMutableTreeNode getRoot() {
+        return rootNode;
+    }
+
+    DefaultMutableTreeNode getDefault() {
+        return defaultNode;
     }
 
     private static String mergeNames(String str1, String str2) {
