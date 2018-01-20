@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.base.plugin;
 
-import java.util.Collection;
 import java.util.HashMap;
 
 import org.json.JSONObject;
@@ -49,8 +48,7 @@ public class PluginManager {
      * @return a list with all loaded plug-ins.
      */
     public PluginContainer[] getAllPlugins() {
-        Collection<PluginContainer> col = plugins.values();
-        return col.toArray(new PluginContainer[col.size()]);
+        return plugins.values().toArray(new PluginContainer[0]);
     }
 
     /**

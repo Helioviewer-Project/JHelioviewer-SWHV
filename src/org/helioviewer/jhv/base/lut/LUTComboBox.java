@@ -2,7 +2,6 @@ package org.helioviewer.jhv.base.lut;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -16,8 +15,7 @@ public class LUTComboBox extends JComboBox<String> {
 
     public LUTComboBox() {
         lutMap = LUT.copyMap(); // duplicate
-        Set<String> set = lutMap.keySet();
-        setModel(new DefaultComboBoxModel<>(set.toArray(new String[set.size()])));
+        setModel(new DefaultComboBoxModel<>(lutMap.keySet().toArray(new String[0])));
         setToolTipText("Choose a color table");
         SearchableUtils.installSearchable(this);
     }
