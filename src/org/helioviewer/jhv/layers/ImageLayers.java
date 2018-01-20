@@ -115,6 +115,15 @@ public class ImageLayers {
         return str.toString();
     }
 
+    public static void syncLayersSpan(long startTime, long endTime, int cadence) {
+        for (ImageLayer layer : Layers.getImageLayers()) {
+            APIRequest areq = layer.getAPIRequest();
+            if (areq != null) {
+                layer.load(new APIRequest(areq.server, areq.sourceId, startTime, endTime, cadence));
+            }
+        }
+    }
+
     public static void syncLayersSpan() {
         ImageLayer activeLayer = Layers.getActiveImageLayer();
         if (activeLayer == null)
@@ -131,7 +140,7 @@ public class ImageLayers {
             View view = activeLayer.getView();
             startTime = view.getFirstTime().milli;
             endTime = view.getLastTime().milli;
-            cadence = ObservationDialog.getInstance().getObservationPanel().getCadence();
+            cadence = ObservationDialog.getInstance().getCadence();
         }
 
         for (ImageLayer layer : Layers.getImageLayers()) {

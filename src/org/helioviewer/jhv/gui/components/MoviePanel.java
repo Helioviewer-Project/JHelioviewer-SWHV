@@ -36,6 +36,7 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.observation.CadencePanel;
 import org.helioviewer.jhv.gui.dialogs.observation.TimePanel;
 import org.helioviewer.jhv.input.KeyShortcuts;
+import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.view.View;
@@ -125,7 +126,7 @@ public class MoviePanel extends JPanel implements ChangeListener {
 
     private static boolean isAdvanced;
 
-    private static final TimePanel timeSelector = new TimePanel();
+    private static final TimePanel timePanel = new TimePanel();
     private static final CadencePanel cadencePanel = new CadencePanel();
 
     private static TimeSlider timeSlider;
@@ -174,7 +175,7 @@ public class MoviePanel extends JPanel implements ChangeListener {
     private MoviePanel() {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-        add(timeSelector);
+        add(timePanel);
 
         JPanel sliderPanel = new JPanel(new GridBagLayout());
         // Time line
@@ -187,6 +188,14 @@ public class MoviePanel extends JPanel implements ChangeListener {
         timeSlider.getActionMap().put("LEFT_ARROW", getPreviousFrameAction());
 
         JideButton setButton = new JideButton("Set");
+        setButton.addActionListener(e -> {
+            long start = timePanel.getStartTime();
+            long end = timePanel.getEndTime();
+            if (start > end)
+                timePanel.setStartTime(end);
+            else
+                ImageLayers.syncLayersSpan(start, end, cadencePanel.getCadence());
+        });
 
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.LINE_START;
