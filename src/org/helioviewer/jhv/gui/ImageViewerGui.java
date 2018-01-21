@@ -86,15 +86,13 @@ public class ImageViewerGui {
         annotateInteraction = new InteractionAnnotate(camera);
         currentInteraction = rotationInteraction;
 
-        leftPane = new SideContentPane();
-        leftPane.add("Movie Controls", MoviePanel.getInstance(), true);
-        MoviePanel.setAdvanced(false);
-
-        // Layer control
         layers = new Layers();
         layersPanel = new LayersPanel(layers);
 
-        leftPane.add("Image Layers", layersPanel, true);
+        leftPane = new SideContentPane();
+        leftPane.add("Image Layers", MoviePanel.getInstance(), true);
+        MoviePanel.setAdvanced(false);
+
         leftScrollPane = new JScrollPane(leftPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         leftScrollPane.setFocusable(false);
         leftScrollPane.setBorder(null);
