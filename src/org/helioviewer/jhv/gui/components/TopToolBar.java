@@ -27,6 +27,7 @@ import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.jhv.gui.actions.ZoomInAction;
 import org.helioviewer.jhv.gui.actions.ZoomOneToOneAction;
 import org.helioviewer.jhv.gui.actions.ZoomOutAction;
+import org.helioviewer.jhv.layers.ImageLayers;
 
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideToggleButton;
@@ -66,6 +67,7 @@ public class TopToolBar extends JToolBar {
     private final ButtonText AXIS = new ButtonText(Buttons.axis, "Axis", "Axis");
     private final ButtonText ROTATE = new ButtonText(Buttons.rotate, "Rotate", "Rotate");
     private final ButtonText PAN = new ButtonText(Buttons.pan, "Pan", "Pan");
+    private final ButtonText MULTIVIEW = new ButtonText(Buttons.multiview, "Multiview", "Multiview");
     private final ButtonText RESETCAMERA = new ButtonText(Buttons.resetCamera, "Reset Camera", "Reset camera position to default");
     private final ButtonText ZOOMONE = new ButtonText(Buttons.zoomOne, "Actual Size", "Zoom to native resolution");
     private final ButtonText ZOOMFIT = new ButtonText(Buttons.zoomFit, "Zoom to Fit", "Zoom to fit");
@@ -121,8 +123,13 @@ public class TopToolBar extends JToolBar {
         setDisplayMode(displayMode);
     }
 
+    private JideToggleButton multiviewButton;
     private JideToggleButton coronaButton;
     private JideToggleButton trackingButton;
+
+    public JideToggleButton getMultiviewButton() {
+        return multiviewButton;
+    }
 
     public JideToggleButton getShowCoronaButton() {
         return coronaButton;
@@ -158,6 +165,14 @@ public class TopToolBar extends JToolBar {
         addButton(zoomFit);
         addButton(zoomOne);
         addButton(resetCamera);
+
+        multiviewButton = toolToggleButton(MULTIVIEW);
+        multiviewButton.setSelected(Displayer.multiview);
+        multiviewButton.addItemListener(e -> {
+            Displayer.multiview = multiviewButton.isSelected();
+            ImageLayers.arrangeMultiView(Displayer.multiview);
+        });
+        addButton(multiviewButton);
 
         add(new JToolBar.Separator(dim));
 
