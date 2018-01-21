@@ -219,22 +219,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         addLayerButton.add(imageSelectorPanel);
         addLayerButton.addActionListener(e -> new NewLayerAction().actionPerformed(new ActionEvent(addLayerButton, 0, "")));
 
-        JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
-        addLayerButtonWrapper.add(addLayerButton, BorderLayout.WEST);
-
-        add(addLayerButtonWrapper);
-
-        JPanel sliderPanel = new JPanel(new GridBagLayout());
-        // Time line
-        timeSlider = new TimeSlider(TimeSlider.HORIZONTAL, 0, 0, 0);
-        timeSlider.addChangeListener(this);
-
-        timeSlider.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "RIGHT_ARROW");
-        timeSlider.getActionMap().put("RIGHT_ARROW", getNextFrameAction());
-        timeSlider.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "LEFT_ARROW");
-        timeSlider.getActionMap().put("LEFT_ARROW", getPreviousFrameAction());
-
-        JideButton setButton = new JideButton("Set");
+        JideButton setButton = new JideButton("Sync Layers");
         setButton.addActionListener(e -> {
             long start = timeSelectorPanel.getStartTime();
             long end = timeSelectorPanel.getEndTime();
@@ -244,18 +229,24 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
                 ImageLayers.syncLayersSpan(start, end, cadencePanel.getCadence());
         });
 
-        GridBagConstraints c = new GridBagConstraints();
-        c.anchor = GridBagConstraints.LINE_START;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.weighty = 0;
+        JPanel addLayerPanel = new JPanel(new BorderLayout());
+        addLayerPanel.add(addLayerButton, BorderLayout.WEST);
+        addLayerPanel.add(setButton, BorderLayout.EAST);
+        add(addLayerPanel);
 
-        c.gridy = 0;
-        c.gridx = 0;
-        c.weightx = 1;
-        sliderPanel.add(timeSlider, c);
-        c.gridx = 1;
-        c.weightx = 0;
-        sliderPanel.add(setButton, c);
+        // Time line
+        timeSlider = new TimeSlider(TimeSlider.HORIZONTAL, 0, 0, 0);
+        timeSlider.addChangeListener(this);
+
+        timeSlider.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "RIGHT_ARROW");
+        timeSlider.getActionMap().put("RIGHT_ARROW", getNextFrameAction());
+        timeSlider.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "LEFT_ARROW");
+        timeSlider.getActionMap().put("LEFT_ARROW", getPreviousFrameAction());
+        timeSlider.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false), "SPACE");
+        timeSlider.getActionMap().put("SPACE", getPlayPauseAction());
+
+        JPanel sliderPanel = new JPanel(new BorderLayout());
+        sliderPanel.add(timeSlider);
 
         JPanel secondLine = new JPanel(new BorderLayout());
         // Control buttons
@@ -349,7 +340,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         modePanel.add(animationModeComboBox);
 
         // Record
-        c = new GridBagConstraints();
+        GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
         c.gridy = 0;
         c.weightx = 1;
