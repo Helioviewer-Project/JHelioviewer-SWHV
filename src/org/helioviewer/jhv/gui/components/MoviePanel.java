@@ -22,12 +22,14 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSpinner;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ComponentUtils;
@@ -39,6 +41,7 @@ import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.opengl.GLHelper;
+import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.View.AnimationMode;
 
@@ -48,6 +51,16 @@ import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
 public class MoviePanel extends JPanel implements ChangeListener, ObservationSelector {
+
+    private enum SkipUnit {
+        Day(TimeUtils.DAY_IN_MILLIS), Week(7 * TimeUtils.DAY_IN_MILLIS), Rotation(Carrington.CR_SYNODIC_MEAN * TimeUtils.DAY_IN_MILLIS);
+
+        final long skipMillis;
+
+        SkipUnit(double m) {
+            skipMillis = (long) m;
+        }
+    }
 
     // different animation speeds
     private enum SpeedUnit {
@@ -175,6 +188,19 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         recordButton.setEnabled(true);
     }
 
+    private static ButtonGroup createSkipMenu(JideSplitButton menu) {
+        ButtonGroup group = new ButtonGroup();
+        for (SkipUnit unit : SkipUnit.values()) {
+            JRadioButtonMenuItem item = new JRadioButtonMenuItem(unit.toString());
+            item.setActionCommand(unit.toString());
+            if (unit == SkipUnit.Day)
+                item.setSelected(true);
+            group.add(item);
+            menu.add(item);
+        }
+        return group;
+    }
+
     private MoviePanel() {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
@@ -221,7 +247,13 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         skipBackwardButton = new JideSplitButton(Buttons.skipBackward);
         skipBackwardButton.setFont(Buttons.getMaterialFont(small));
         skipBackwardButton.setToolTipText("Move time interval backward");
-        //skipBackwardButton.addActionListener(getPreviousFrameAction());
+        ButtonGroup skipBackwardGroup = createSkipMenu(skipBackwardButton);
+        skipBackwardButton.addActionListener(e -> {
+            long skip = -SkipUnit.valueOf(skipBackwardGroup.getSelection().getActionCommand()).skipMillis;
+            timeSelectorPanel.setStartTime(timeSelectorPanel.getStartTime() + skip);
+            timeSelectorPanel.setEndTime(timeSelectorPanel.getEndTime() + skip);
+            setButton.doClick();
+        });
         buttonPanel.add(skipBackwardButton);
 
         prevFrameButton = new JideButton(Buttons.backward);
@@ -245,7 +277,13 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         skipForwardButton = new JideSplitButton(Buttons.skipForward);
         skipForwardButton.setFont(Buttons.getMaterialFont(small));
         skipForwardButton.setToolTipText("Move time interval forward");
-        //skipBackButton.addActionListener(getPreviousFrameAction());
+        ButtonGroup skipForwardGroup = createSkipMenu(skipForwardButton);
+        skipForwardButton.addActionListener(e -> {
+            long skip = SkipUnit.valueOf(skipForwardGroup.getSelection().getActionCommand()).skipMillis;
+            timeSelectorPanel.setStartTime(timeSelectorPanel.getStartTime() + skip);
+            timeSelectorPanel.setEndTime(timeSelectorPanel.getEndTime() + skip);
+            setButton.doClick();
+        });
         buttonPanel.add(skipForwardButton);
 
         recordButton = new RecordButton(small);
@@ -442,8 +480,6 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         recordPanel.setVisible(advanced);
     }
 
-    // Updates the speed of the animation. This function is called when changing
-    // the speed of the animation or its unit.
     private static void updateMovieSpeed() {
         int speed = ((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue();
         SpeedUnit unit = (SpeedUnit) Objects.requireNonNull(speedUnitComboBox.getSelectedItem());
