@@ -146,6 +146,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
     private static final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
     private static final CadencePanel cadencePanel = new CadencePanel();
     private final ImageSelectorPanel imageSelectorPanel;
+    private final JideToggleButton syncButton;
 
     private static TimeSlider timeSlider;
     private static JideButton prevFrameButton;
@@ -208,33 +209,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
     private MoviePanel() {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-        add(timeSelectorPanel);
-
-        ObservationDialog.getInstance(); // make sure it's instanced
-        imageSelectorPanel = new ImageSelectorPanel(this);
-
-        JideSplitButton addLayerButton = new JideSplitButton(Buttons.newLayer);
-        addLayerButton.setButtonStyle(ButtonStyle.FLAT_STYLE);
-        addLayerButton.setFocusable(false);
-        addLayerButton.add(imageSelectorPanel);
-        addLayerButton.addActionListener(e -> new NewLayerAction().actionPerformed(new ActionEvent(addLayerButton, 0, "")));
-
-        JideButton setButton = new JideButton("Sync Layers");
-        setButton.addActionListener(e -> {
-            long start = timeSelectorPanel.getStartTime();
-            long end = timeSelectorPanel.getEndTime();
-            if (start > end)
-                timeSelectorPanel.setStartTime(end);
-            else
-                ImageLayers.syncLayersSpan(start, end, cadencePanel.getCadence());
-        });
-
-        JPanel addLayerPanel = new JPanel(new BorderLayout());
-        addLayerPanel.add(addLayerButton, BorderLayout.WEST);
-        addLayerPanel.add(setButton, BorderLayout.EAST);
-        add(addLayerPanel);
-
-        // Time line
+        // Time slider
         timeSlider = new TimeSlider(TimeSlider.HORIZONTAL, 0, 0, 0);
         timeSlider.addChangeListener(this);
 
@@ -257,12 +232,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         skipBackwardButton.setFont(Buttons.getMaterialFont(small));
         skipBackwardButton.setToolTipText("Move time interval backward");
         ButtonGroup skipBackwardGroup = createSkipMenu(skipBackwardButton);
-        skipBackwardButton.addActionListener(e -> {
-            long skip = -SkipUnit.valueOf(skipBackwardGroup.getSelection().getActionCommand()).skipMillis;
-            timeSelectorPanel.setStartTime(timeSelectorPanel.getStartTime() + skip);
-            timeSelectorPanel.setEndTime(timeSelectorPanel.getEndTime() + skip);
-            setButton.doClick();
-        });
+        skipBackwardButton.addActionListener(e -> moveLayersSpan(-SkipUnit.valueOf(skipBackwardGroup.getSelection().getActionCommand()).skipMillis));
         buttonPanel.add(skipBackwardButton);
 
         prevFrameButton = new JideButton(Buttons.backward);
@@ -287,12 +257,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         skipForwardButton.setFont(Buttons.getMaterialFont(small));
         skipForwardButton.setToolTipText("Move time interval forward");
         ButtonGroup skipForwardGroup = createSkipMenu(skipForwardButton);
-        skipForwardButton.addActionListener(e -> {
-            long skip = SkipUnit.valueOf(skipForwardGroup.getSelection().getActionCommand()).skipMillis;
-            timeSelectorPanel.setStartTime(timeSelectorPanel.getStartTime() + skip);
-            timeSelectorPanel.setEndTime(timeSelectorPanel.getEndTime() + skip);
-            setButton.doClick();
-        });
+        skipForwardButton.addActionListener(e -> moveLayersSpan(SkipUnit.valueOf(skipForwardGroup.getSelection().getActionCommand()).skipMillis));
         buttonPanel.add(skipForwardButton);
 
         recordButton = new RecordButton(small);
@@ -389,6 +354,25 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         ComponentUtils.smallVariant(this);
         setEnabledState(false);
 
+        add(timeSelectorPanel);
+
+        ObservationDialog.getInstance(); // make sure it's instanced
+        imageSelectorPanel = new ImageSelectorPanel(this);
+
+        JideSplitButton addLayerButton = new JideSplitButton(Buttons.newLayer);
+        addLayerButton.setButtonStyle(ButtonStyle.FLAT_STYLE);
+        addLayerButton.setFocusable(false);
+        addLayerButton.add(imageSelectorPanel);
+        addLayerButton.addActionListener(e -> new NewLayerAction().actionPerformed(new ActionEvent(addLayerButton, 0, "")));
+
+        syncButton = new JideToggleButton("Sync Layers");
+        syncButton.addActionListener(e -> syncLayersSpan());
+
+        JPanel addLayerPanel = new JPanel(new BorderLayout());
+        addLayerPanel.add(addLayerButton, BorderLayout.WEST);
+        addLayerPanel.add(syncButton, BorderLayout.EAST);
+        add(addLayerPanel);
+
         add(ImageViewerGui.getLayersPanel());
     }
 
@@ -419,7 +403,19 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
 
     @Override
     public void load(String server, int sourceId) {
+        syncLayersSpan();
         imageSelectorPanel.load(null, getStartTime(), getEndTime(), getCadence());
+    }
+
+    private void moveLayersSpan(long skip) {
+        setStartTime(getStartTime() + skip);
+        setEndTime(getEndTime() + skip);
+        ImageLayers.moveLayersSpan(skip);
+    }
+
+    private void syncLayersSpan() {
+        if (syncButton.isSelected())
+            ImageLayers.syncLayersSpan(getStartTime(), getEndTime(), getCadence());
     }
 
     public static void clickRecordButton() {

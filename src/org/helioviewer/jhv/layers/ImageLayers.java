@@ -123,6 +123,15 @@ public class ImageLayers {
         }
     }
 
+    public static void moveLayersSpan(long delta) {
+        for (ImageLayer layer : Layers.getImageLayers()) {
+            APIRequest req = layer.getAPIRequest();
+            if (req != null) {
+                layer.load(new APIRequest(req.server, req.sourceId, req.startTime + delta, req.endTime + delta, req.cadence));
+            }
+        }
+    }
+
     public static void getSAMPMessage(Message msg) {
         ImageData id;
         ImageLayer activeLayer = Layers.getActiveImageLayer();
