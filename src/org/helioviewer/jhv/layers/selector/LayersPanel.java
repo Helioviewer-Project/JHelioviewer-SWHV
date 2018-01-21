@@ -8,7 +8,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -26,10 +25,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
-import org.helioviewer.jhv.gui.actions.NewLayerAction;
-import org.helioviewer.jhv.gui.components.Buttons;
-import org.helioviewer.jhv.gui.components.ImageSelectorPanel;
-import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -40,9 +35,6 @@ import org.helioviewer.jhv.layers.selector.cellrenderer.RendererLoading;
 import org.helioviewer.jhv.layers.selector.cellrenderer.RendererName;
 import org.helioviewer.jhv.layers.selector.cellrenderer.RendererRemove;
 import org.helioviewer.jhv.layers.selector.cellrenderer.RendererTime;
-
-import com.jidesoft.swing.ButtonStyle;
-import com.jidesoft.swing.JideSplitButton;
 
 @SuppressWarnings("serial")
 public class LayersPanel extends JPanel {
@@ -59,7 +51,6 @@ public class LayersPanel extends JPanel {
     private static final int NUMBEROFVISIBLEROWS = 7;
 
     private final LayersTable grid;
-    private final ImageSelectorPanel imageSelectorPanel;
     private final JPanel optionsPanelWrapper;
 
     private static class LayersTable extends JTable implements LazyComponent {
@@ -129,20 +120,7 @@ public class LayersPanel extends JPanel {
         jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
         jsp.getViewport().setBackground(grid.getBackground());
 
-        ObservationDialog.getInstance(); // make sure it's instanced
-        imageSelectorPanel = new ImageSelectorPanel(MoviePanel.getInstance());
-
-        JideSplitButton addLayerButton = new JideSplitButton(Buttons.newLayer);
-        addLayerButton.setButtonStyle(ButtonStyle.FLAT_STYLE);
-        addLayerButton.setFocusable(false);
-        addLayerButton.add(imageSelectorPanel);
-        addLayerButton.addActionListener(e -> new NewLayerAction().actionPerformed(new ActionEvent(addLayerButton, 0, "")));
-
-        JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
-        addLayerButtonWrapper.add(addLayerButton, BorderLayout.WEST);
-
         JPanel jspContainer = new JPanel(new BorderLayout());
-        jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
         jspContainer.add(jsp, BorderLayout.SOUTH);
         add(jspContainer, gc);
 
@@ -272,10 +250,6 @@ public class LayersPanel extends JPanel {
         }
         revalidate();
         repaint();
-    }
-
-    public ImageSelectorPanel getImageSelectorPanel() {
-        return imageSelectorPanel;
     }
 
 }
