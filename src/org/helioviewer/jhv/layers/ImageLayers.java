@@ -116,9 +116,9 @@ public class ImageLayers {
 
     public static void syncLayersSpan(long startTime, long endTime, int cadence) {
         for (ImageLayer layer : Layers.getImageLayers()) {
-            APIRequest areq = layer.getAPIRequest();
-            if (areq != null) {
-                layer.load(new APIRequest(areq.server, areq.sourceId, startTime, endTime, cadence));
+            APIRequest req = layer.getAPIRequest();
+            if (req != null) {
+                layer.load(new APIRequest(req.server, req.sourceId, startTime, endTime, cadence));
             }
         }
     }

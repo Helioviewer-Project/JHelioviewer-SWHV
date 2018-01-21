@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Point;
@@ -15,13 +14,11 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.DropMode;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableModel;
 
@@ -36,7 +33,6 @@ import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.selector.cellrenderer.RendererEnabled;
@@ -65,8 +61,6 @@ public class LayersPanel extends JPanel {
     private final LayersTable grid;
     private final ImageSelectorPanel imageSelectorPanel;
     private final JPanel optionsPanelWrapper;
-
-    static JCheckBox multiview;
 
     private static class LayersTable extends JTable implements LazyComponent {
 
@@ -144,20 +138,8 @@ public class LayersPanel extends JPanel {
         addLayerButton.add(imageSelectorPanel);
         addLayerButton.addActionListener(e -> new NewLayerAction().actionPerformed(new ActionEvent(addLayerButton, 0, "")));
 
-        multiview = new JCheckBox("Multiview", Displayer.multiview);
-        multiview.setHorizontalTextPosition(SwingConstants.LEADING);
-        multiview.addItemListener(e -> {
-            Displayer.multiview = multiview.isSelected();
-            ImageLayers.arrangeMultiView(Displayer.multiview);
-        });
-        ComponentUtils.smallVariant(multiview);
-
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
         addLayerButtonWrapper.add(addLayerButton, BorderLayout.WEST);
-
-        JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-        addLayerButtonWrapper.add(flowPanel, BorderLayout.CENTER);
-        addLayerButtonWrapper.add(multiview, BorderLayout.EAST);
 
         JPanel jspContainer = new JPanel(new BorderLayout());
         jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
