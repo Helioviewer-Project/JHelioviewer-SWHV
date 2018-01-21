@@ -33,6 +33,7 @@ import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.actions.NewLayerAction;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
@@ -394,10 +395,10 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         add(cadencePanel);
         add(modePanel);
         add(recordPanel);
-
         ComponentUtils.smallVariant(this);
-
         setEnabledState(false);
+
+        add(ImageViewerGui.getLayersPanel());
     }
 
     @Override
