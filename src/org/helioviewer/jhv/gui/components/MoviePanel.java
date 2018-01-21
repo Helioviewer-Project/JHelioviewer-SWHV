@@ -33,9 +33,10 @@ import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.actions.NewLayerAction;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.ObservationSelector;
 import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.ImageLayers;
@@ -45,6 +46,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.View.AnimationMode;
 
+import com.jidesoft.swing.ButtonStyle;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideSplitButton;
 import com.jidesoft.swing.JideToggleButton;
@@ -142,6 +144,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
 
     private static final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
     private static final CadencePanel cadencePanel = new CadencePanel();
+    private final ImageSelectorPanel imageSelectorPanel;
 
     private static TimeSlider timeSlider;
     private static JideButton prevFrameButton;
@@ -205,6 +208,20 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
         add(timeSelectorPanel);
+
+        ObservationDialog.getInstance(); // make sure it's instanced
+        imageSelectorPanel = new ImageSelectorPanel(this);
+
+        JideSplitButton addLayerButton = new JideSplitButton(Buttons.newLayer);
+        addLayerButton.setButtonStyle(ButtonStyle.FLAT_STYLE);
+        addLayerButton.setFocusable(false);
+        addLayerButton.add(imageSelectorPanel);
+        addLayerButton.addActionListener(e -> new NewLayerAction().actionPerformed(new ActionEvent(addLayerButton, 0, "")));
+
+        JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
+        addLayerButtonWrapper.add(addLayerButton, BorderLayout.WEST);
+
+        add(addLayerButtonWrapper);
 
         JPanel sliderPanel = new JPanel(new GridBagLayout());
         // Time line
@@ -410,7 +427,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
 
     @Override
     public void load(String server, int sourceId) {
-        ImageViewerGui.getLayersPanel().getImageSelectorPanel().load(null, getStartTime(), getEndTime(), getCadence());
+        imageSelectorPanel.load(null, getStartTime(), getEndTime(), getCadence());
     }
 
     public static void clickRecordButton() {
