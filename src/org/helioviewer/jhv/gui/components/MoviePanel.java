@@ -146,6 +146,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
     private static final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
     private static final CadencePanel cadencePanel = new CadencePanel();
     private final ImageSelectorPanel imageSelectorPanel;
+    private final JideSplitButton addLayerButton;
     private final JideToggleButton syncButton;
 
     private static TimeSlider timeSlider;
@@ -359,7 +360,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         ObservationDialog.getInstance(); // make sure it's instanced
         imageSelectorPanel = new ImageSelectorPanel(this);
 
-        JideSplitButton addLayerButton = new JideSplitButton(Buttons.newLayer);
+        addLayerButton = new JideSplitButton(Buttons.newLayer);
         addLayerButton.setButtonStyle(ButtonStyle.FLAT_STYLE);
         addLayerButton.setFocusable(false);
         addLayerButton.add(imageSelectorPanel);
@@ -405,6 +406,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
     public void load(String server, int sourceId) {
         syncLayersSpan();
         imageSelectorPanel.load(null, getStartTime(), getEndTime(), getCadence());
+        addLayerButton.doClickOnMenu();
     }
 
     private void moveLayersSpan(long skip) {
