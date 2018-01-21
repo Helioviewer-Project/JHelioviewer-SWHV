@@ -119,10 +119,7 @@ public class LayersPanel extends JPanel {
         JScrollPane jsp = new JScrollPane(grid, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
         jsp.getViewport().setBackground(grid.getBackground());
-
-        JPanel jspContainer = new JPanel(new BorderLayout());
-        jspContainer.add(jsp, BorderLayout.SOUTH);
-        add(jspContainer, gc);
+        add(jsp, gc);
 
         grid.setTableHeader(null);
         grid.setShowGrid(false);
@@ -226,9 +223,8 @@ public class LayersPanel extends JPanel {
         jsp.setPreferredSize(new Dimension(-1, getGridRowHeight() * NUMBEROFVISIBLEROWS + 1));
         grid.setRowHeight(getGridRowHeight());
 
-        optionsPanelWrapper = new JPanel(new BorderLayout());
-
         gc.gridy = 1;
+        optionsPanelWrapper = new JPanel(new BorderLayout());
         add(optionsPanelWrapper, gc);
     }
 
