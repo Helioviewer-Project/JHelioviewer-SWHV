@@ -41,7 +41,7 @@ public class State {
         JSONObject main = new JSONObject();
         main.put("time", Movie.getTime());
         main.put("play", Movie.isPlaying());
-        main.put("multiview", LayersPanel.multiview.isSelected());
+        main.put("multiview", ImageViewerGui.getToolBar().getMultiviewButton().isSelected());
         main.put("projection", Displayer.mode);
         main.put("tracking", ImageViewerGui.getToolBar().getTrackingButton().isSelected());
         main.put("showCorona", ImageViewerGui.getToolBar().getShowCoronaButton().isSelected());
@@ -173,7 +173,7 @@ public class State {
             }
         }
 
-        LayersPanel.multiview.setSelected(data.optBoolean("multiview", LayersPanel.multiview.isSelected()));
+        ImageViewerGui.getToolBar().getMultiviewButton().setSelected(data.optBoolean("multiview", ImageViewerGui.getToolBar().getMultiviewButton().isSelected()));
         ImageViewerGui.getToolBar().getShowCoronaButton().setSelected(data.optBoolean("showCorona", ImageViewerGui.getToolBar().getShowCoronaButton().isSelected()));
 
         JHVDate time = new JHVDate(TimeUtils.optParse(data.optString("time"), Movie.getTime().milli));

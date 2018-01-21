@@ -77,6 +77,7 @@ public class Buttons {
     public static final String axis = toolBar(MaterialDesign.MDI_BACKUP_RESTORE);
     public static final String annotate = toolBar(MaterialDesign.MDI_SHAPE_POLYGON_PLUS);
     public static final String track = toolBar(MaterialDesign.MDI_CROSSHAIRS_GPS);
+    public static final String multiview = toolBar(MaterialDesign.MDI_BORDER_ALL);
     public static final String resetCamera = toolBar(MaterialDesign.MDI_CROSSHAIRS);
     public static final String zoomOne = toolBar(MaterialDesign.MDI_PLUS_ONE);
     public static final String zoomFit = toolBar(MaterialDesign.MDI_CROP_LANDSCAPE);
