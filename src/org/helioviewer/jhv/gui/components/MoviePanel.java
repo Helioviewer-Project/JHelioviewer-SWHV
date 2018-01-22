@@ -146,7 +146,6 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
     private static final CadencePanel cadencePanel = new CadencePanel();
     private final ImageSelectorPanel imageSelectorPanel;
     private final JideSplitButton addLayerButton;
-    private final JideToggleButton syncButton;
 
     private static TimeSlider timeSlider;
     private static JideButton prevFrameButton;
@@ -361,12 +360,9 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         addLayerButton.setAlwaysDropdown(true);
         addLayerButton.add(imageSelectorPanel);
 
-        syncButton = new JideToggleButton(Buttons.unlock);
+        JideButton syncButton = new JideButton(Buttons.syncLayers);
         syncButton.setToolTipText("Synchronize layers time span");
-        syncButton.addActionListener(e -> {
-            syncButton.setText(syncButton.isSelected() ? Buttons.lock : Buttons.unlock);
-            syncLayersSpan();
-        });
+        syncButton.addActionListener(e -> ImageLayers.syncLayersSpan(getStartTime(), getEndTime(), getCadence()));
 
         JPanel addLayerPanel = new JPanel(new BorderLayout());
         addLayerPanel.add(addLayerButton, BorderLayout.WEST);
@@ -406,7 +402,6 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
 
     @Override
     public void load(String server, int sourceId) {
-        syncLayersSpan();
         imageSelectorPanel.load(null, getStartTime(), getEndTime(), getCadence());
         addLayerButton.doClickOnMenu();
     }
@@ -415,11 +410,6 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         setStartTime(getStartTime() + skip);
         setEndTime(getEndTime() + skip);
         ImageLayers.moveLayersSpan(skip);
-    }
-
-    private void syncLayersSpan() {
-        if (syncButton.isSelected())
-            ImageLayers.syncLayersSpan(getStartTime(), getEndTime(), getCadence());
     }
 
     public static void clickRecordButton() {
