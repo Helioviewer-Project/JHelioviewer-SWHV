@@ -121,16 +121,7 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
     }
 
     public void loadButtonPressed() {
-        long startTime = timeSelectorPanel.getStartTime();
-        long endTime = timeSelectorPanel.getEndTime();
-        if (startTime > endTime) {
-            timeSelectorPanel.setStartTime(endTime);
-            JOptionPane.showMessageDialog(null, "End date is before start date", "", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        // selection may not be good
-        load("xxx", -1);
+        load("xxx", -1); // selection may not be good
     }
 
     public void setAvailabilityStatus(boolean status) {
@@ -164,6 +155,14 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
 
     @Override
     public void load(String server, int sourceId) {
+        long startTime = getStartTime();
+        long endTime = getEndTime();
+        if (startTime > endTime) {
+            setStartTime(endTime);
+            JOptionPane.showMessageDialog(null, "End date is before start date", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         imageSelectorPanel.load(layer, getStartTime(), getEndTime(), getCadence());
         layer = null;
         setVisible(false);
