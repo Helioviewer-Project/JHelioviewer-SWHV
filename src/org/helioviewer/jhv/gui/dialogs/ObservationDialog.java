@@ -120,10 +120,6 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
         setVisible(true);
     }
 
-    public void setAvailabilityStatus(boolean status) {
-        availabilityBtn.setEnabled(status);
-    }
-
     @Override
     public int getCadence() {
         return cadencePanel.getCadence();
@@ -162,6 +158,11 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
         imageSelectorPanel.load(layer, getStartTime(), getEndTime(), getCadence());
         layer = null;
         setVisible(false);
+    }
+
+    @Override
+    public void setAvailabilityEnabled(boolean enabled) {
+        availabilityBtn.setEnabled(enabled);
     }
 
 }

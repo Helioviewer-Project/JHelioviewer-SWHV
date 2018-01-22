@@ -8,5 +8,6 @@ public interface ObservationSelector {
     long getStartTime();
     long getEndTime();
     void load(String server, int sourceId);
+    void setAvailabilityEnabled(boolean enable);
 
 }
