@@ -143,7 +143,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
 
     private static boolean isAdvanced;
 
-    private static final DateSelectorPanel dateSelectorPanel = new DateSelectorPanel();
+    private static final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
     private static final CadencePanel cadencePanel = new CadencePanel();
     private final ImageSelectorPanel imageSelectorPanel;
     private final JideSplitButton addLayerButton;
@@ -351,7 +351,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         add(cadencePanel);
         add(modePanel);
         add(recordPanel);
-        add(dateSelectorPanel);
+        add(timeSelectorPanel);
 
         ObservationDialog.getInstance(); // make sure it's instanced
         imageSelectorPanel = new ImageSelectorPanel(this);
@@ -383,22 +383,22 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
 
     @Override
     public void setStartTime(long time) {
-        dateSelectorPanel.setStartTime(time);
+        timeSelectorPanel.setStartTime(time);
     }
 
     @Override
     public void setEndTime(long time) {
-        dateSelectorPanel.setEndTime(time);
+        timeSelectorPanel.setEndTime(time);
     }
 
     @Override
     public long getStartTime() {
-        return dateSelectorPanel.getStartTime();
+        return timeSelectorPanel.getStartTime();
     }
 
     @Override
     public long getEndTime() {
-        return dateSelectorPanel.getEndTime();
+        return timeSelectorPanel.getEndTime();
     }
 
     @Override
