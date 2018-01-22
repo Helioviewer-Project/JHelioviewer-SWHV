@@ -45,6 +45,7 @@ class NetClientRemote implements NetClient {
         else if (cache == NetCache.BYPASS)
             builder.cacheControl(noStore);
         Request request = builder.build();
+        //System.out.println(">>> " + url);
 
         response = client.newCall(request).execute();
         if (!allowError && !response.isSuccessful()) {
