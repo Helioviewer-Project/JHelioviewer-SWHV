@@ -18,7 +18,6 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.ObservationSelector;
 
 import com.jidesoft.swing.SearchableUtils;
@@ -194,7 +193,7 @@ public class DataSourcesTree extends JTree {
         return null;
     }
 
-    private static class OneLeafTreeSelectionModel extends DefaultTreeSelectionModel {
+    private class OneLeafTreeSelectionModel extends DefaultTreeSelectionModel {
 
         private TreePath selectedPath;
 
@@ -207,8 +206,7 @@ public class DataSourcesTree extends JTree {
             if (node.isLeaf() && node.getUserObject() instanceof SourceItem) {
                 super.setSelectionPath(path);
                 selectedPath = path;
-
-                ObservationDialog.getInstance().setAvailabilityStatus(DataSources.getServerSetting(((SourceItem) node.getUserObject()).server, "availability.images") != null);
+                selector.setAvailabilityEnabled(DataSources.getServerSetting(((SourceItem) node.getUserObject()).server, "availability.images") != null);
             }
         }
 

@@ -408,6 +408,10 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
             imageSelectorPanel.load(null, getStartTime(), getEndTime(), getCadence());
     }
 
+    @Override
+    public void setAvailabilityEnabled(boolean enabled) {
+    }
+
     private boolean checkSanity() {
         long startTime = getStartTime();
         long endTime = getEndTime();
