@@ -20,6 +20,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
@@ -362,7 +363,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
 
         JideButton syncButton = new JideButton(Buttons.syncLayers);
         syncButton.setToolTipText("Synchronize layers time interval");
-        syncButton.addActionListener(e -> ImageLayers.syncLayersSpan(getStartTime(), getEndTime(), getCadence()));
+        syncButton.addActionListener(e -> syncLayersSpan());
 
         JPanel addLayerPanel = new JPanel(new BorderLayout());
         addLayerPanel.add(addLayerButton, BorderLayout.WEST);
@@ -402,14 +403,33 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
 
     @Override
     public void load(String server, int sourceId) {
-        imageSelectorPanel.load(null, getStartTime(), getEndTime(), getCadence());
         addLayerButton.doClickOnMenu();
+        if (checkSanity())
+            imageSelectorPanel.load(null, getStartTime(), getEndTime(), getCadence());
+    }
+
+    private boolean checkSanity() {
+        long startTime = getStartTime();
+        long endTime = getEndTime();
+        if (startTime > endTime) {
+            setStartTime(endTime);
+            JOptionPane.showMessageDialog(null, "End date is before start date", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        return true;
+    }
+
+    private void syncLayersSpan() {
+        if (checkSanity())
+            ImageLayers.syncLayersSpan(getStartTime(), getEndTime(), getCadence());
     }
 
     private void moveLayersSpan(long skip) {
-        setStartTime(getStartTime() + skip);
-        setEndTime(getEndTime() + skip);
-        ImageLayers.moveLayersSpan(skip);
+        if (checkSanity()) {
+            setStartTime(getStartTime() + skip);
+            setEndTime(getEndTime() + skip);
+            ImageLayers.moveLayersSpan(skip);
+        }
     }
 
     public static void clickRecordButton() {
