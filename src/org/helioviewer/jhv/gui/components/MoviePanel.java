@@ -362,6 +362,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         addLayerButton.add(imageSelectorPanel);
 
         JideButton syncButton = new JideButton(Buttons.syncLayers);
+        syncButton.setButtonStyle(ButtonStyle.FLAT_STYLE);
         syncButton.setToolTipText("Synchronize layers time interval");
         syncButton.addActionListener(e -> syncLayersSpan());
 
@@ -429,11 +430,9 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
     }
 
     private void moveLayersSpan(long skip) {
-        if (checkSanity()) {
-            setStartTime(getStartTime() + skip);
-            setEndTime(getEndTime() + skip);
-            ImageLayers.moveLayersSpan(skip);
-        }
+        setStartTime(getStartTime() + skip);
+        setEndTime(getEndTime() + skip);
+        ImageLayers.moveLayersSpan(skip);
     }
 
     public static void clickRecordButton() {
