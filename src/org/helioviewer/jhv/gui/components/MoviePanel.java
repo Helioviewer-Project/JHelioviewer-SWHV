@@ -34,7 +34,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.actions.NewLayerAction;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
@@ -352,9 +351,6 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         add(cadencePanel);
         add(modePanel);
         add(recordPanel);
-        ComponentUtils.smallVariant(this);
-        setEnabledState(false);
-
         add(timeSelectorPanel);
 
         ObservationDialog.getInstance(); // make sure it's instanced
@@ -362,12 +358,15 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
 
         addLayerButton = new JideSplitButton(Buttons.newLayer);
         addLayerButton.setButtonStyle(ButtonStyle.FLAT_STYLE);
-        addLayerButton.setFocusable(false);
+        addLayerButton.setAlwaysDropdown(true);
         addLayerButton.add(imageSelectorPanel);
-        addLayerButton.addActionListener(e -> new NewLayerAction().actionPerformed(new ActionEvent(addLayerButton, 0, "")));
 
-        syncButton = new JideToggleButton("Sync Layers");
-        syncButton.addActionListener(e -> syncLayersSpan());
+        syncButton = new JideToggleButton(Buttons.unlock);
+        syncButton.setToolTipText("Synchronize layers time span");
+        syncButton.addActionListener(e -> {
+            syncButton.setText(syncButton.isSelected() ? Buttons.lock : Buttons.unlock);
+            syncLayersSpan();
+        });
 
         JPanel addLayerPanel = new JPanel(new BorderLayout());
         addLayerPanel.add(addLayerButton, BorderLayout.WEST);
@@ -375,6 +374,9 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         add(addLayerPanel);
 
         add(ImageViewerGui.getLayersPanel());
+
+        setEnabledState(false);
+        ComponentUtils.smallVariant(this);
     }
 
     @Override
