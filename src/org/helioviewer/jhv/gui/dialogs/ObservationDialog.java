@@ -56,7 +56,6 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
         imageSelectorPanel = new ImageSelectorPanel(this);
         availabilityBtn.addActionListener(e -> JHVGlobals.openURL(imageSelectorPanel.getAvailabilityURL()));
         setInitFocusedComponent(imageSelectorPanel.getFocused());
-        setDefaultAction(load);
     }
 
     @Override
@@ -130,10 +129,8 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
             return;
         }
 
-        if (imageSelectorPanel.load(layer, startTime, endTime, getCadence())) {
-            setVisible(false);
-            layer = null;
-        }
+        // selection may not be good
+        load("xxx", -1);
     }
 
     public void setAvailabilityStatus(boolean status) {
@@ -169,6 +166,7 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
     public void load(String server, int sourceId) {
         imageSelectorPanel.load(layer, getStartTime(), getEndTime(), getCadence());
         layer = null;
+        setVisible(false);
     }
 
 }
