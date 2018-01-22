@@ -142,7 +142,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
 
     private static boolean isAdvanced;
 
-    private static final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
+    private static final DateSelectorPanel dateSelectorPanel = new DateSelectorPanel();
     private static final CadencePanel cadencePanel = new CadencePanel();
     private final ImageSelectorPanel imageSelectorPanel;
     private final JideSplitButton addLayerButton;
@@ -350,7 +350,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         add(cadencePanel);
         add(modePanel);
         add(recordPanel);
-        add(timeSelectorPanel);
+        add(dateSelectorPanel);
 
         ObservationDialog.getInstance(); // make sure it's instanced
         imageSelectorPanel = new ImageSelectorPanel(this);
@@ -361,7 +361,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         addLayerButton.add(imageSelectorPanel);
 
         JideButton syncButton = new JideButton(Buttons.syncLayers);
-        syncButton.setToolTipText("Synchronize layers time span");
+        syncButton.setToolTipText("Synchronize layers time interval");
         syncButton.addActionListener(e -> ImageLayers.syncLayersSpan(getStartTime(), getEndTime(), getCadence()));
 
         JPanel addLayerPanel = new JPanel(new BorderLayout());
@@ -382,22 +382,22 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
 
     @Override
     public void setStartTime(long time) {
-        timeSelectorPanel.setStartTime(time);
+        dateSelectorPanel.setStartTime(time);
     }
 
     @Override
     public void setEndTime(long time) {
-        timeSelectorPanel.setEndTime(time);
+        dateSelectorPanel.setEndTime(time);
     }
 
     @Override
     public long getStartTime() {
-        return timeSelectorPanel.getStartTime();
+        return dateSelectorPanel.getStartTime();
     }
 
     @Override
     public long getEndTime() {
-        return timeSelectorPanel.getEndTime();
+        return dateSelectorPanel.getEndTime();
     }
 
     @Override
