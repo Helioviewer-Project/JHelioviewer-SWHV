@@ -4,9 +4,11 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.imagedata.ImageData;
+import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.view.View;
+import org.helioviewer.jhv.time.TimeUtils;
 
 ///
 
@@ -15,8 +17,6 @@ import java.util.HashMap;
 
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.SampUtils;
-import org.helioviewer.jhv.imagedata.ImageData;
-import org.helioviewer.jhv.io.APIRequest;
 
 public class ImageLayers {
 
@@ -101,19 +101,6 @@ public class ImageLayers {
         return size;
     }
 
-    public static String getSDOCutoutString() {
-        StringBuilder str = new StringBuilder();
-        MetaData m;
-        for (ImageLayer layer : Layers.getImageLayers()) {
-            if (layer.isEnabled() && (m = layer.getMetaData()) instanceof HelioviewerMetaData) {
-                HelioviewerMetaData hm = (HelioviewerMetaData) m;
-                if (hm.getObservatory().contains("SDO") && hm.getInstrument().contains("AIA"))
-                    str.append(',').append(hm.getMeasurement());
-            }
-        }
-        return str.toString();
-    }
-
     public static void syncLayersSpan(long startTime, long endTime, int cadence) {
         for (ImageLayer layer : Layers.getImageLayers()) {
             APIRequest req = layer.getAPIRequest();
@@ -132,21 +119,55 @@ public class ImageLayers {
         }
     }
 
+    public static String getSDOCutoutString() {
+        StringBuilder str = new StringBuilder("&wavelengths=");
+        MetaData m;
+        for (ImageLayer layer : Layers.getImageLayers()) {
+            if (layer.isEnabled() && (m = layer.getMetaData()) instanceof HelioviewerMetaData) {
+                HelioviewerMetaData hm = (HelioviewerMetaData) m;
+                if (hm.getObservatory().contains("SDO") && hm.getInstrument().contains("AIA"))
+                    str.append(',').append(hm.getMeasurement());
+            }
+        }
+
+        ImageLayer activeLayer = Layers.getActiveImageLayer();
+        if (activeLayer != null) {
+            APIRequest req;
+            if ((req = activeLayer.getAPIRequest()) != null) {
+                str.append("&cadence=").append(req.cadence).append("&cadenceUnits=s");
+            }
+            ImageData id;
+            if ((id = activeLayer.getImageData()) != null) {
+                Region region = Region.scale(id.getRegion(), 1 / id.getMetaData().getUnitPerArcsec());
+                str.append(String.format("&xCen=%.1f", region.llx + region.width / 2.));
+                str.append(String.format("&yCen=%.1f", -(region.lly + region.height / 2.)));
+                str.append(String.format("&width=%.1f", region.width));
+                str.append(String.format("&height=%.1f", region.height));
+            }
+        }
+
+        long start = Movie.getStartTime();
+        str.append("&startDate=").append(TimeUtils.formatDate(start));
+        str.append("&startTime=").append(TimeUtils.formatTime(start));
+        long end = Movie.getEndTime();
+        str.append("&stopDate=").append(TimeUtils.formatDate(end));
+        str.append("&stopTime=").append(TimeUtils.formatTime(end));
+        return str.toString();
+    }
+
     public static void getSAMPMessage(Message msg) {
         ImageData id;
         ImageLayer activeLayer = Layers.getActiveImageLayer();
         if (activeLayer == null || activeLayer.getAPIRequest() == null || (id = activeLayer.getImageData()) == null)
             return;
 
-        View view = activeLayer.getView();
-        MetaData m = id.getMetaData();
-        msg.addParam("timestamp", m.getViewpoint().time.toString());
-        msg.addParam("start", view.getFirstTime().toString());
-        msg.addParam("end", view.getFirstTime().toString());
+        msg.addParam("timestamp", Movie.getTime().toString());
+        msg.addParam("start", TimeUtils.formatDate(Movie.getStartTime()));
+        msg.addParam("end", TimeUtils.formatDate(Movie.getEndTime()));
         msg.addParam("cadence", SampUtils.encodeLong(activeLayer.getAPIRequest().cadence * 1000L));
         msg.addParam("cutout.set", SampUtils.encodeBoolean(true));
 
-        Region region = Region.scale(id.getRegion(), 1 / m.getUnitPerArcsec());
+        Region region = Region.scale(id.getRegion(), 1 / id.getMetaData().getUnitPerArcsec());
         msg.addParam("cutout.x0", SampUtils.encodeFloat(region.llx + region.width / 2.));
         msg.addParam("cutout.y0", SampUtils.encodeFloat(-(region.lly + region.height / 2.)));
         msg.addParam("cutout.w", SampUtils.encodeFloat(region.width));
@@ -158,7 +179,7 @@ public class ImageLayers {
                 if ((id = layer.getImageData()) == null)
                     continue;
 
-                m = id.getMetaData();
+                MetaData m = id.getMetaData();
                 if (m instanceof HelioviewerMetaData) {
                     HelioviewerMetaData hm = (HelioviewerMetaData) m;
                     HashMap<String, String> layerMsg = new HashMap<>();
