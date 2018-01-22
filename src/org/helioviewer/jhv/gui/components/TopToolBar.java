@@ -166,14 +166,6 @@ public class TopToolBar extends JToolBar {
         addButton(zoomOne);
         addButton(resetCamera);
 
-        multiviewButton = toolToggleButton(MULTIVIEW);
-        multiviewButton.setSelected(Displayer.multiview);
-        multiviewButton.addItemListener(e -> {
-            Displayer.multiview = multiviewButton.isSelected();
-            ImageLayers.arrangeMultiView(Displayer.multiview);
-        });
-        addButton(multiviewButton);
-
         add(new JToolBar.Separator(dim));
 
         // Interaction
@@ -250,6 +242,14 @@ public class TopToolBar extends JToolBar {
         addButton(coronaButton);
 
         add(new JToolBar.Separator(dim));
+
+        multiviewButton = toolToggleButton(MULTIVIEW);
+        multiviewButton.setSelected(Displayer.multiview);
+        multiviewButton.addItemListener(e -> {
+            Displayer.multiview = multiviewButton.isSelected();
+            ImageLayers.arrangeMultiView(Displayer.multiview);
+        });
+        addButton(multiviewButton);
 
         JideButton projectionButton = toolButton(PROJECTION);
         addButton(projectionButton);
