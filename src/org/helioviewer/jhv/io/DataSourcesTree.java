@@ -122,7 +122,7 @@ public class DataSourcesTree extends JTree {
             return copy;
         } else {
             int cc = src.getChildCount();
-            for(int i = 0; i < cc; i++){
+            for (int i = 0; i < cc; i++) {
                 copy.add(copyNode((DefaultMutableTreeNode) src.getChildAt(i)));
             }
             return copy;
