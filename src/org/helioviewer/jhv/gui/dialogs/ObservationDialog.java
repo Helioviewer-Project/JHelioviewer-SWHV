@@ -29,7 +29,7 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
     private final AbstractAction load = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            loadButtonPressed();
+            load("xxx", -1); // selection may not be good
         }
     };
     private final JButton okBtn = new JButton(load);
@@ -118,10 +118,6 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
         pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
         setVisible(true);
-    }
-
-    public void loadButtonPressed() {
-        load("xxx", -1); // selection may not be good
     }
 
     public void setAvailabilityStatus(boolean status) {

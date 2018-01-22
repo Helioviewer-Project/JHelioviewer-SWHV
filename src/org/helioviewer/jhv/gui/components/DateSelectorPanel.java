@@ -62,8 +62,7 @@ public class DateSelectorPanel extends JPanel {
     }
 
     public long getEndTime() {
-        long time = endDatePicker.getTime() + TimeUtils.DAY_IN_MILLIS - 1; // till end of day
-        return time;
+        return endDatePicker.getTime() + TimeUtils.DAY_IN_MILLIS - 1; // till end of day
     }
 
 }
