@@ -78,7 +78,7 @@ public class RadioData extends AbstractTimelineLayer {
         return colorModel;
     }
 
-    private void clearCache() {
+    private static void clearCache() {
         cache.invalidateAll();
     }
 
