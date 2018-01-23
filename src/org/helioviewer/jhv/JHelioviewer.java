@@ -15,7 +15,6 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
-import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.log.LogSettings;
@@ -109,13 +108,11 @@ public class JHelioviewer {
                 e.printStackTrace();
             }
 
-            // set left pane width to fit the ImageLayer options
-            ImageLayer dummy = ImageLayer.create(null);
+            // set left pane width to fit the viewpoint options
+            ImageViewerGui.getLayersPanel().setOptionsPanel(Layers.getViewpointLayer());
             frame.pack();
             JComponent leftPane = ImageViewerGui.getLeftScrollPane();
             leftPane.setMinimumSize(new Dimension(leftPane.getPreferredSize().width, -1));
-            ImageViewerGui.getLayersPanel().setOptionsPanel(Layers.getViewpointLayer()); // nasty
-            dummy.unload();
 
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
