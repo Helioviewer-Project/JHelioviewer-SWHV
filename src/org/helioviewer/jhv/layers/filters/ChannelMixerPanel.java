@@ -2,7 +2,7 @@ package org.helioviewer.jhv.layers.filters;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.GridLayout;
+import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 
 import javax.swing.JCheckBox;
@@ -14,11 +14,9 @@ import org.helioviewer.jhv.layers.ImageLayer;
 
 public class ChannelMixerPanel implements FilterDetails {
 
-    private final JPanel boxPanel;
+    private final JPanel boxPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
 
     public ChannelMixerPanel(ImageLayer layer) {
-        boxPanel = new JPanel(new GridLayout(1, 3));
-
         JCheckBox redCheckBox = new JCheckBox("Red", layer.getGLImage().getRed());
         redCheckBox.setToolTipText("Toggle red channel");
         boxPanel.add(redCheckBox, BorderLayout.WEST);
