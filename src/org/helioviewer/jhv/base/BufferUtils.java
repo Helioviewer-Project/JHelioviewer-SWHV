@@ -1,7 +1,10 @@
 package org.helioviewer.jhv.base;
 
 import java.awt.Color;
+//import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
+import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
@@ -12,13 +15,13 @@ import com.jogamp.common.nio.Buffers;
 
 public class BufferUtils {
 
-    public static final float[] colorNull = { 0, 0, 0, 0 };
-    public static final float[] colorBlack = { 0, 0, 0, 1 };
-    public static final float[] colorRed = { Color.RED.getRed() / 255f, Color.RED.getGreen() / 255f, Color.RED.getBlue() / 255f, 1 };
-    public static final float[] colorGreen = { Color.GREEN.getRed() / 255f, Color.GREEN.getGreen() / 255f, Color.GREEN.getBlue() / 255f, 1 };
-    public static final float[] colorBlue = { Color.BLUE.getRed() / 255f, Color.BLUE.getGreen() / 255f, Color.BLUE.getBlue() / 255f, 1 };
-    public static final float[] colorWhite = { Color.WHITE.getRed() / 255f, Color.WHITE.getGreen() / 255f, Color.WHITE.getBlue() / 255f, 1 };
-    public static final float[] colorYellow = { Color.YELLOW.getRed() / 255f, Color.YELLOW.getGreen() / 255f, Color.YELLOW.getBlue() / 255f, 1 };
+    public static final float[] colorNull = {0, 0, 0, 0};
+    public static final float[] colorBlack = {0, 0, 0, 1};
+    public static final float[] colorRed = {Color.RED.getRed() / 255f, Color.RED.getGreen() / 255f, Color.RED.getBlue() / 255f, 1};
+    public static final float[] colorGreen = {Color.GREEN.getRed() / 255f, Color.GREEN.getGreen() / 255f, Color.GREEN.getBlue() / 255f, 1};
+    public static final float[] colorBlue = {Color.BLUE.getRed() / 255f, Color.BLUE.getGreen() / 255f, Color.BLUE.getBlue() / 255f, 1};
+    public static final float[] colorWhite = {Color.WHITE.getRed() / 255f, Color.WHITE.getGreen() / 255f, Color.WHITE.getBlue() / 255f, 1};
+    public static final float[] colorYellow = {Color.YELLOW.getRed() / 255f, Color.YELLOW.getGreen() / 255f, Color.YELLOW.getBlue() / 255f, 1};
 
     public static ByteBuffer newByteBuffer(int len) {
         return Buffers.newDirectByteBuffer(len);
@@ -53,6 +56,31 @@ public class BufferUtils {
         buf.put(y);
         buf.put(z);
         buf.put(w);
+    }
+
+    public static void free(Buffer buffer) {
+        try {
+            Method cleanerMethod = buffer.getClass().getMethod("cleaner");
+            cleanerMethod.setAccessible(true);
+            Object cleaner = cleanerMethod.invoke(buffer);
+            Method cleanMethod = cleaner.getClass().getMethod("clean");
+            cleanMethod.setAccessible(true);
+            cleanMethod.invoke(cleaner);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+/* JDK9
+        try {
+            Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
+            Field theUnsafeField = unsafeClass.getDeclaredField("theUnsafe");
+            theUnsafeField.setAccessible(true);
+            Object theUnsafe = theUnsafeField.get(null);
+            Method invokeCleanerMethod = unsafeClass.getMethod("invokeCleaner", ByteBuffer.class);
+            invokeCleanerMethod.invoke(theUnsafe, buffer);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+*/
     }
 
 }
