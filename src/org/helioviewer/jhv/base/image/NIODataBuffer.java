@@ -3,6 +3,8 @@ package org.helioviewer.jhv.base.image;
 import java.awt.image.DataBuffer;
 import java.nio.*;
 
+import org.helioviewer.jhv.base.BufferUtils;
+
 public abstract class NIODataBuffer extends DataBuffer {
     private final Buffer buffer;
 
@@ -12,7 +14,7 @@ public abstract class NIODataBuffer extends DataBuffer {
         int componentSize = DataBuffer.getDataTypeSize(type) / 8;
         int length = size * componentSize * numBanks;
 
-        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(length).order(ByteOrder.nativeOrder());
+        ByteBuffer byteBuffer = BufferUtils.newByteBuffer(length);
         switch (type) {
             case DataBuffer.TYPE_BYTE:
                 buffer = byteBuffer;
@@ -27,11 +29,11 @@ public abstract class NIODataBuffer extends DataBuffer {
                 throw new IllegalArgumentException("Unsupported data type: " + type);
         }
     }
-/*
+
     Buffer getBuffer() {
         return buffer;
     }
-*/
+
     @Override
     public String toString() {
         return String.format("NIODataBuffer: %s", buffer);
@@ -73,6 +75,10 @@ public abstract class NIODataBuffer extends DataBuffer {
         public DataBufferByte(int size, int numBanks) {
             super(DataBuffer.TYPE_BYTE, size, numBanks);
             buffer = (ByteBuffer) super.buffer;
+        }
+
+        public ByteBuffer getBuffer() {
+            return buffer;
         }
 
         @Override
@@ -124,7 +130,7 @@ public abstract class NIODataBuffer extends DataBuffer {
         }
     }
 
-    private static class ByteDataBuffer extends DataBuffer {
+    public static class ByteDataBuffer extends DataBuffer {
         private ByteBuffer buffer;
 
         ByteDataBuffer() {
@@ -134,6 +140,10 @@ public abstract class NIODataBuffer extends DataBuffer {
         ByteDataBuffer setBuffer(ByteBuffer _buffer) {
             buffer = _buffer;
             return this;
+        }
+
+        public ByteBuffer getBuffer() {
+            return buffer;
         }
 
         @Override
@@ -147,7 +157,7 @@ public abstract class NIODataBuffer extends DataBuffer {
         }
     }
 
-    private static class UShortDataBuffer extends DataBuffer {
+    public static class UShortDataBuffer extends DataBuffer {
         private ShortBuffer buffer;
 
         UShortDataBuffer() {
@@ -170,7 +180,7 @@ public abstract class NIODataBuffer extends DataBuffer {
         }
     }
 
-    private static class IntDataBuffer extends DataBuffer {
+    public static class IntDataBuffer extends DataBuffer {
         private IntBuffer buffer;
 
         IntDataBuffer() {
