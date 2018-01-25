@@ -144,7 +144,6 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
     private static boolean isAdvanced;
 
     private static final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
-    private static final CadencePanel cadencePanel = new CadencePanel();
     private final ImageSelectorPanel imageSelectorPanel;
     private final JideSplitButton addLayerButton;
 
@@ -348,7 +347,6 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
 
         add(sliderPanel);
         add(secondLine);
-        add(cadencePanel);
         add(modePanel);
         add(recordPanel);
         add(timeSelectorPanel);
@@ -379,7 +377,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
 
     @Override
     public int getCadence() {
-        return cadencePanel.getCadence();
+        return TimeUtils.defaultCadence(getStartTime(), getEndTime());
     }
 
     @Override
@@ -497,7 +495,6 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
     public static void setAdvanced(boolean advanced) {
         isAdvanced = advanced;
         advancedButton.setText(advanced ? Buttons.optionsDown : Buttons.optionsRight);
-        cadencePanel.setVisible(advanced);
         modePanel.setVisible(advanced);
         recordPanel.setVisible(advanced);
     }

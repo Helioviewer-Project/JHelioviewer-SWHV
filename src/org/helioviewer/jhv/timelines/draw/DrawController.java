@@ -9,7 +9,6 @@ import javax.swing.Timer;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.event.JHVEventHighlightListener;
-import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.TimeListener;
@@ -36,7 +35,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     private static final Timer layersTimer = new Timer(1000/2, e -> {
         long start = TimeUtils.floorSec(selectedAxis.start);
         long end = TimeUtils.ceilSec(selectedAxis.end);
-        ImageLayers.syncLayersSpan(start, end, APIRequest.defaultCadence(start, end));
+        ImageLayers.syncLayersSpan(start, end, TimeUtils.defaultCadence(start, end));
     });
 
     public DrawController() {
