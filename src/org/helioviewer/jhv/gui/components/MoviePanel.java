@@ -55,13 +55,13 @@ import com.jidesoft.swing.JideToggleButton;
 @SuppressWarnings("serial")
 public class MoviePanel extends JPanel implements ChangeListener, ObservationSelector {
 
-    private enum SkipUnit {
-        Day(TimeUtils.DAY_IN_MILLIS), Week(7 * TimeUtils.DAY_IN_MILLIS), Rotation(Carrington.CR_SYNODIC_MEAN * TimeUtils.DAY_IN_MILLIS);
+    private enum ShiftUnit {
+        Day(TimeUtils.DAY_IN_MILLIS), Week(7 * TimeUtils.DAY_IN_MILLIS), Rotation(Math.round(Carrington.CR_SYNODIC_MEAN * TimeUtils.DAY_IN_MILLIS));
 
-        final long skipMillis;
+        final long shift;
 
-        SkipUnit(double m) {
-            skipMillis = (long) m;
+        ShiftUnit(long _shift) {
+            shift = _shift;
         }
     }
 
@@ -152,8 +152,8 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
     private static JideButton prevFrameButton;
     private static JideButton nextFrameButton;
     private static JideButton playButton;
-    private static JideSplitButton skipBackwardButton;
-    private static JideSplitButton skipForwardButton;
+    private static JideSplitButton shiftBackButton;
+    private static JideSplitButton shiftForeButton;
 
     private static RecordButton recordButton;
 
@@ -193,12 +193,12 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         recordButton.setEnabled(true);
     }
 
-    private static ButtonGroup createSkipMenu(JideSplitButton menu) {
+    private static ButtonGroup createShiftMenu(JideSplitButton menu) {
         ButtonGroup group = new ButtonGroup();
-        for (SkipUnit unit : SkipUnit.values()) {
+        for (ShiftUnit unit : ShiftUnit.values()) {
             JRadioButtonMenuItem item = new JRadioButtonMenuItem(unit.toString());
             item.setActionCommand(unit.toString());
-            if (unit == SkipUnit.Day)
+            if (unit == ShiftUnit.Day)
                 item.setSelected(true);
             group.add(item);
             menu.add(item);
@@ -228,12 +228,12 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 1, 0));
         int small = 18, big = 26;
 
-        skipBackwardButton = new JideSplitButton(Buttons.skipBackward);
-        skipBackwardButton.setFont(Buttons.getMaterialFont(small));
-        skipBackwardButton.setToolTipText("Move time interval backward");
-        ButtonGroup skipBackwardGroup = createSkipMenu(skipBackwardButton);
-        skipBackwardButton.addActionListener(e -> moveLayersSpan(-SkipUnit.valueOf(skipBackwardGroup.getSelection().getActionCommand()).skipMillis));
-        buttonPanel.add(skipBackwardButton);
+        shiftBackButton = new JideSplitButton(Buttons.skipBackward);
+        shiftBackButton.setFont(Buttons.getMaterialFont(small));
+        shiftBackButton.setToolTipText("Move time interval backward");
+        ButtonGroup shiftBackGroup = createShiftMenu(shiftBackButton);
+        shiftBackButton.addActionListener(e -> shiftLayersSpan(-ShiftUnit.valueOf(shiftBackGroup.getSelection().getActionCommand()).shift));
+        buttonPanel.add(shiftBackButton);
 
         prevFrameButton = new JideButton(Buttons.backward);
         prevFrameButton.setFont(Buttons.getMaterialFont(small));
@@ -253,12 +253,12 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         nextFrameButton.addActionListener(getNextFrameAction());
         buttonPanel.add(nextFrameButton);
 
-        skipForwardButton = new JideSplitButton(Buttons.skipForward);
-        skipForwardButton.setFont(Buttons.getMaterialFont(small));
-        skipForwardButton.setToolTipText("Move time interval forward");
-        ButtonGroup skipForwardGroup = createSkipMenu(skipForwardButton);
-        skipForwardButton.addActionListener(e -> moveLayersSpan(SkipUnit.valueOf(skipForwardGroup.getSelection().getActionCommand()).skipMillis));
-        buttonPanel.add(skipForwardButton);
+        shiftForeButton = new JideSplitButton(Buttons.skipForward);
+        shiftForeButton.setFont(Buttons.getMaterialFont(small));
+        shiftForeButton.setToolTipText("Move time interval forward");
+        ButtonGroup shiftForeGroup = createShiftMenu(shiftForeButton);
+        shiftForeButton.addActionListener(e -> shiftLayersSpan(ShiftUnit.valueOf(shiftForeGroup.getSelection().getActionCommand()).shift));
+        buttonPanel.add(shiftForeButton);
 
         recordButton = new RecordButton(small);
         buttonPanel.add(recordButton);
@@ -429,10 +429,10 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
             ImageLayers.syncLayersSpan(getStartTime(), getEndTime(), getCadence());
     }
 
-    private void moveLayersSpan(long skip) {
-        setStartTime(getStartTime() + skip);
-        setEndTime(getEndTime() + skip);
-        ImageLayers.moveLayersSpan(skip);
+    private void shiftLayersSpan(long shift) {
+        setStartTime(getStartTime() + shift);
+        setEndTime(getEndTime() + shift);
+        ImageLayers.shiftLayersSpan(shift);
     }
 
     public static void clickRecordButton() {
@@ -486,8 +486,8 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         playButton.setEnabled(enabled);
         nextFrameButton.setEnabled(enabled);
         prevFrameButton.setEnabled(enabled);
-        skipBackwardButton.setEnabled(enabled);
-        skipForwardButton.setEnabled(enabled);
+        shiftBackButton.setEnabled(enabled);
+        shiftForeButton.setEnabled(enabled);
         recordButton.setEnabled(enabled);
         speedSpinner.setEnabled(enabled);
         speedUnitComboBox.setEnabled(enabled);

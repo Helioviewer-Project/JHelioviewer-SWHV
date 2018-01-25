@@ -110,7 +110,7 @@ public class ImageLayers {
         }
     }
 
-    public static void moveLayersSpan(long delta) {
+    public static void shiftLayersSpan(long delta) {
         for (ImageLayer layer : Layers.getImageLayers()) {
             APIRequest req = layer.getAPIRequest();
             if (req != null) {
