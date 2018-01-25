@@ -12,13 +12,14 @@ import org.helioviewer.jhv.data.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.TimeListener;
+import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.json.JSONObject;
 
-public class DrawController implements JHVEventHighlightListener, TimeListener {
+public class DrawController implements JHVEventHighlightListener, TimeListener, TimespanListener {
 
     public static final TimeAxis selectedAxis = new TimeAxis(0, 0);
     public static final TimeAxis availableAxis = new TimeAxis(0, 0);
@@ -29,7 +30,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener {
     private static Rectangle graphArea = new Rectangle();
     private static Rectangle graphSize = new Rectangle();
     private static long latestMovieTime = Long.MIN_VALUE;
-    private static boolean isLocked;
+    private static boolean locked;
 
     private static final double noImages = 99;
     private static final Timer layersTimer = new Timer(1000/2, e -> {
@@ -48,7 +49,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener {
         js.put("startTime", TimeUtils.format(selectedAxis.start));
         js.put("endTime", TimeUtils.format(selectedAxis.end));
         jo.put("selectedAxis", js);
-        jo.put("locked", isLocked);
+        jo.put("locked", locked);
     }
 
     public static void loadState(JSONObject jo) {
@@ -177,7 +178,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener {
     }
 
     private static void setAvailableInterval() {
-        if (isLocked)
+        if (locked)
             layersTimer.restart();
 
         long diff = selectedAxis.end - selectedAxis.start;
@@ -213,9 +214,9 @@ public class DrawController implements JHVEventHighlightListener, TimeListener {
         return graphSize;
     }
 
-    static void setLocked(boolean _isLocked) {
-        isLocked = _isLocked;
-        if (isLocked) // force sync
+    static void setLocked(boolean _locked) {
+        locked = _locked;
+        if (locked) // force sync
             setAvailableInterval();
     }
 
@@ -252,6 +253,12 @@ public class DrawController implements JHVEventHighlightListener, TimeListener {
         createGraphArea();
         moveX(0); // force recalculation of polylines
         drawRequest();
+    }
+
+    @Override
+    public void timespanChanged(long start, long end) {
+        if (locked)
+            setSelectedInterval(start, end);
     }
 
     public static void drawRequest() {
