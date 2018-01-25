@@ -75,7 +75,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener {
     }
 
     public static void setSelectedInterval(long start, long end) {
-        selectedAxis.set(start, end, true);
+        selectedAxis.set(start, end);
         setAvailableInterval();
     }
 

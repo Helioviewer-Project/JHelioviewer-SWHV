@@ -48,10 +48,9 @@ public class Interval implements Comparable<Interval> {
     }
 
     public static Interval makeCompleteDay(long start, long end) {
-        long endDate = end;
         long now = System.currentTimeMillis();
         if (end > now) {
-            endDate = now;
+            end = now;
         }
         return new Interval(TimeUtils.floorDay(start), TimeUtils.floorDay(end) + TimeUtils.DAY_IN_MILLIS);
     }
