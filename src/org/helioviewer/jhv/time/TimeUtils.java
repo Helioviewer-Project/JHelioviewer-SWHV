@@ -31,6 +31,10 @@ public class TimeUtils {
         return (milli / 1000L) * 1000L;
     }
 
+    public static long ceilSec(long milli) {
+        return ((milli + 500L) / 1000L) * 1000L;
+    }
+
     public static long floorDay(long milli) {
         return milli - milli % DAY_IN_MILLIS;
     }
