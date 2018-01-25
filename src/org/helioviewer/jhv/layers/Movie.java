@@ -36,7 +36,7 @@ public class Movie {
     private static long getMovieStart() {
         long min = Long.MAX_VALUE;
         for (ImageLayer layer : Layers.getImageLayers()) {
-            long t = layer.getView().getFirstTime().milli;
+            long t = layer.getStartTime();
             if (t < min) {
                 min = t;
             }
@@ -47,7 +47,7 @@ public class Movie {
     private static long getMovieEnd() {
         long max = Long.MIN_VALUE;
         for (ImageLayer layer : Layers.getImageLayers()) {
-            long t = layer.getView().getLastTime().milli;
+            long t = layer.getEndTime();
             if (t > max) {
                 max = t;
             }
