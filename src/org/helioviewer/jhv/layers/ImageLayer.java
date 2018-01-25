@@ -81,6 +81,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
             worker.cancel(true);
         worker = new LoadRemoteTask(this, req, 0);
         JHVGlobals.getExecutorService().execute(worker);
+        ImageViewerGui.getLayersPanel().refresh(); // give feedback asap
     }
 
     public void unload() {
