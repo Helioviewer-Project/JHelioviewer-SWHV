@@ -26,40 +26,40 @@ public class Movie {
     }
 
     public static long getStartTime() {
-        return movieStart.milli;
+        return movieStart;
     }
 
     public static long getEndTime() {
-        return movieEnd.milli;
+        return movieEnd;
     }
 
-    private static JHVDate getMovieStart() {
-        JHVDate min = null;
+    private static long getMovieStart() {
+        long min = Long.MAX_VALUE;
         for (ImageLayer layer : Layers.getImageLayers()) {
-            JHVDate d = layer.getView().getFirstTime();
-            if (min == null || d.milli < min.milli) {
-                min = d;
+            long t = layer.getView().getFirstTime().milli;
+            if (t < min) {
+                min = t;
             }
         }
-        return min == null ? lastTimestamp : min;
+        return min == Long.MAX_VALUE ? lastTimestamp.milli : min;
     }
 
-    private static JHVDate getMovieEnd() {
-        JHVDate max = null;
+    private static long getMovieEnd() {
+        long max = Long.MIN_VALUE;
         for (ImageLayer layer : Layers.getImageLayers()) {
-            JHVDate d = layer.getView().getLastTime();
-            if (max == null || d.milli > max.milli) {
-                max = d;
+            long t = layer.getView().getLastTime().milli;
+            if (t > max) {
+                max = t;
             }
         }
-        return max == null ? lastTimestamp : max;
+        return max == Long.MIN_VALUE ? lastTimestamp.milli : max;
     }
 
     static void timespanChanged() {
         movieStart = getMovieStart();
         movieEnd = getMovieEnd();
         for (TimespanListener ll : timespanListeners) {
-            ll.timespanChanged(movieStart.milli, movieEnd.milli);
+            ll.timespanChanged(movieStart, movieEnd);
         }
     }
 
@@ -139,8 +139,8 @@ public class Movie {
     }
 
     private static JHVDate lastTimestamp = TimeUtils.START;
-    private static JHVDate movieStart = TimeUtils.START;
-    private static JHVDate movieEnd = TimeUtils.START;
+    private static long movieStart = TimeUtils.START.milli;
+    private static long movieEnd = TimeUtils.START.milli;
 
     public static JHVDate getTime() {
         return lastTimestamp;
