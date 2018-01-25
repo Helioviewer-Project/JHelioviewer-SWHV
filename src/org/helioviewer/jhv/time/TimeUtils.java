@@ -23,9 +23,17 @@ public class TimeUtils {
     public static final long DAY_IN_MILLIS = 86400000;
     public static final long MINUTE_IN_MILLIS = 60000;
 
-    public static final JHVDate START = new JHVDate((System.currentTimeMillis() / 1000L) * 1000L);
+    public static final JHVDate START = new JHVDate(floorSec(System.currentTimeMillis()));
     public static final JHVDate MINIMAL_DATE = new JHVDate("1970-01-01T00:00:00");
     public static final JHVDate MAXIMAL_DATE = new JHVDate("2050-01-01T00:00:00");
+
+    public static long floorSec(long milli) {
+        return (milli / 1000L) * 1000L;
+    }
+
+    public static long floorDay(long milli) {
+        return milli - milli % DAY_IN_MILLIS;
+    }
 
     public static String format(long milli) {
         return DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(Instant.ofEpochMilli(milli).atOffset(ZERO));

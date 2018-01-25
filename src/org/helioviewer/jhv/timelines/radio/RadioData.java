@@ -83,10 +83,7 @@ public class RadioData extends AbstractTimelineLayer {
     }
 
     private void requestAndOpenIntervals(long start) {
-        start -= start % TimeUtils.DAY_IN_MILLIS + 2 * TimeUtils.DAY_IN_MILLIS;
-        long now = System.currentTimeMillis();
-        long end = Math.min(start + DAYS_IN_CACHE * TimeUtils.DAY_IN_MILLIS, now - now % TimeUtils.DAY_IN_MILLIS);
-
+        long end = Math.min(TimeUtils.floorDay(start) + (DAYS_IN_CACHE - 2) * TimeUtils.DAY_IN_MILLIS, TimeUtils.floorDay(System.currentTimeMillis()));
         for (int i = 0; i < DAYS_IN_CACHE; i++) {
             long date = end - i * TimeUtils.DAY_IN_MILLIS;
             if (cache.getIfPresent(date) == null) {

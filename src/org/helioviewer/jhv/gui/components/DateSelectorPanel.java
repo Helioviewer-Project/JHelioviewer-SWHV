@@ -48,13 +48,11 @@ public class DateSelectorPanel extends JPanel {
 
     public void setStartTime(long time) {
         carrington.setTime(time);
-        time -= time % TimeUtils.DAY_IN_MILLIS;
-        startDatePicker.setTime(time);
+        startDatePicker.setTime(TimeUtils.floorDay(time));
     }
 
     public void setEndTime(long time) {
-        time -= time % TimeUtils.DAY_IN_MILLIS;
-        endDatePicker.setTime(time);
+        endDatePicker.setTime(TimeUtils.floorDay(time));
     }
 
     public long getStartTime() {

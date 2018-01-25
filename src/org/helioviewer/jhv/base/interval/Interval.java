@@ -53,11 +53,7 @@ public class Interval implements Comparable<Interval> {
         if (end > now) {
             endDate = now;
         }
-
-        long new_start = start - start % TimeUtils.DAY_IN_MILLIS;
-        long new_end = endDate - endDate % TimeUtils.DAY_IN_MILLIS + TimeUtils.DAY_IN_MILLIS;
-
-        return new Interval(new_start, new_end);
+        return new Interval(TimeUtils.floorDay(start), TimeUtils.floorDay(end) + TimeUtils.DAY_IN_MILLIS);
     }
 
     public static ArrayList<Interval> splitInterval(Interval interval, int days) {
