@@ -422,6 +422,12 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         return true;
     }
 
+    public void syncLayersSpan(long start, long end) {
+        setStartTime(start);
+        setEndTime(end);
+        syncLayersSpan();
+    }
+
     private void syncLayersSpan() {
         if (checkSanity())
             ImageLayers.syncLayersSpan(getStartTime(), getEndTime(), getCadence());
