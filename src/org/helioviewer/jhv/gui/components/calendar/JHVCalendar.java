@@ -309,8 +309,6 @@ class JHVCalendar extends JPanel {
                         case DAYS:
                             informAllJHVCalendarListeners();
                             break;
-                        default:
-                            break;
                         }
                     }
                 }

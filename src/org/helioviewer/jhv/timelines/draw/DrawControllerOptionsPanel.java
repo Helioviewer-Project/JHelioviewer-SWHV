@@ -123,7 +123,6 @@ class DrawControllerOptionsPanel extends JPanel {
             DrawController.setSelectedInterval(Movie.getStartTime(), Movie.getEndTime());
             break;
         case CUSTOM:
-        default:
             break;
         }
     }

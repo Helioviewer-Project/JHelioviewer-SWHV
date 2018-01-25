@@ -8,7 +8,6 @@ import org.helioviewer.jhv.gui.components.MaterialDesign;
 import org.helioviewer.jhv.gui.components.TopToolBar.ButtonText;
 import org.json.JSONObject;
 
-@SuppressWarnings("serial")
 public class SampPlugin implements Plugin {
 
     private final ButtonText notifySamp = new ButtonText(Buttons.toolBar(MaterialDesign.MDI_SHARE_VARIANT), "SAMP", "Send SAMP message");
