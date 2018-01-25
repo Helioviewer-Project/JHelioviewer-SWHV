@@ -70,15 +70,11 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
     }
 
     private void computeIntervalBorderPositions(TimeAxis availableInterval, TimeAxis selectedInterval) {
-        double diffMin = (availableInterval.end - availableInterval.start) / 60000.0;
-
-        long start = selectedInterval.start - availableInterval.start;
-        start = Math.round(start / 60000.0);
-
-        long end = selectedInterval.end - availableInterval.start;
-        end = Math.round(end / 60000.0);
-
+        double diffMin = (availableInterval.end - availableInterval.start) / (double) TimeUtils.MINUTE_IN_MILLIS;
+        long start = Math.round((selectedInterval.start - availableInterval.start) / (double) TimeUtils.MINUTE_IN_MILLIS);
+        long end = Math.round((selectedInterval.end - availableInterval.start) / (double) TimeUtils.MINUTE_IN_MILLIS);
         int availableIntervalSpace = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1;
+
         leftIntervalBorderPosition = (int) ((start / diffMin) * availableIntervalSpace) + DrawConstants.GRAPH_LEFT_SPACE;
         rightIntervalBorderPosition = (int) ((end / diffMin) * availableIntervalSpace) + DrawConstants.GRAPH_LEFT_SPACE;
     }
