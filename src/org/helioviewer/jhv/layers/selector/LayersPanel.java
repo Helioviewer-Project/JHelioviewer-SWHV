@@ -248,4 +248,8 @@ public class LayersPanel extends JPanel {
         repaint();
     }
 
+    public void refresh() {
+        grid.repaint();
+    }
+
 }
