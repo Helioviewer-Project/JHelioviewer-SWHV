@@ -48,7 +48,7 @@ class DrawControllerOptionsPanel extends JPanel {
         });
 
         lockButton = new JideToggleButton(Buttons.unlock);
-        lockButton.setToolTipText("Synchronize time series with movie");
+        lockButton.setToolTipText("Synchronize movie with time series");
         lockButton.addActionListener(e -> {
             DrawController.setLocked(lockButton.isSelected());
             lockButton.setText(lockButton.isSelected() ? Buttons.lock : Buttons.unlock);

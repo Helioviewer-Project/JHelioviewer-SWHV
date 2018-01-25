@@ -5,18 +5,20 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.HashSet;
 
+import javax.swing.Timer;
+
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.TimeListener;
-import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.json.JSONObject;
 
-public class DrawController implements JHVEventHighlightListener, TimeListener, TimespanListener {
+public class DrawController implements JHVEventHighlightListener, TimeListener {
 
     public static final TimeAxis selectedAxis = new TimeAxis(0, 0);
     public static final TimeAxis availableAxis = new TimeAxis(0, 0);
@@ -29,9 +31,17 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     private static long latestMovieTime = Long.MIN_VALUE;
     private static boolean isLocked;
 
+    private static final double noImages = 99;
+    private static final Timer layersTimer = new Timer(1000/2, e -> {
+        System.out.println(">>> " + Thread.currentThread().getName());
+        int cadence = Math.max(1, (int) ((selectedAxis.end - selectedAxis.start) / noImages / 1000));
+        ImageLayers.syncLayersSpan(selectedAxis.start, selectedAxis.end, cadence);
+    });
+
     public DrawController() {
         long t = System.currentTimeMillis();
         setSelectedInterval(t - 2 * TimeUtils.DAY_IN_MILLIS, t);
+        layersTimer.setRepeats(false);
     }
 
     public static void saveState(JSONObject jo) {
@@ -168,6 +178,9 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     }
 
     private static void setAvailableInterval() {
+        if (isLocked)
+            layersTimer.restart();
+
         long diff = selectedAxis.end - selectedAxis.start;
         long availableStart = selectedAxis.start - diff;
         long availableEnd = selectedAxis.end + diff;
@@ -179,17 +192,6 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
             tl.fetchData(selectedAxis);
         }
         drawRequest();
-    }
-
-    private static void centraliseSelected(long time) {
-        if (time != Long.MIN_VALUE && isLocked && availableAxis.start <= time && availableAxis.end >= time) {
-            long halfDiff = (selectedAxis.end - selectedAxis.start) / 2;
-            selectedAxis.set(time - halfDiff, time + halfDiff, false);
-            drawRequest();
-            for (TimelineLayer tl : TimelineLayers.get()) {
-                tl.fetchData(selectedAxis);
-            }
-        }
     }
 
     public static void setGraphInformation(Rectangle _graphSize) {
@@ -214,15 +216,13 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
 
     static void setLocked(boolean _isLocked) {
         isLocked = _isLocked;
-        if (isLocked && latestMovieTime != Long.MIN_VALUE) {
-            centraliseSelected(latestMovieTime);
-        }
+        if (isLocked) // force sync
+            setAvailableInterval();
     }
 
     @Override
     public void timeChanged(long milli) {
         latestMovieTime = milli;
-        centraliseSelected(latestMovieTime);
         drawMovieLine = true;
     }
 
@@ -247,11 +247,6 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     @Override
     public void eventHightChanged() {
         drawRequest();
-    }
-
-    @Override
-    public void timespanChanged(long start, long end) {
-        setSelectedInterval(start, end);
     }
 
     public static void graphAreaChanged() {
