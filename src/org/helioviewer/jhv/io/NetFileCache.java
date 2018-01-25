@@ -13,7 +13,7 @@ import com.google.common.cache.LoadingCache;
 import okio.BufferedSink;
 import okio.Okio;
 
-class NetFileCache {
+public class NetFileCache {
 
     private static final LoadingCache<URI, URI> cache = CacheBuilder.newBuilder().maximumSize(512).
         build(new CacheLoader<URI, URI>() {
