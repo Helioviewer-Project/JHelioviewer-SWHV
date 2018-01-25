@@ -39,11 +39,10 @@ public class TimeAxis {
         adaptBounds();
     }
 
-    void set(long _start, long _end, boolean needAdapt) {
+    void set(long _start, long _end) {
         start = _start;
         end = _end;
-        if (needAdapt)
-            adaptBounds();
+        adaptBounds();
     }
 
     private void adaptBounds() {
