@@ -21,7 +21,6 @@ import org.helioviewer.jhv.opengl.GLImage;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideToggleButton;
 
-@SuppressWarnings("serial")
 public class RunningDifferencePanel implements FilterDetails {
 
     private final JideToggleButton downloadButton = new JideToggleButton(Buttons.download);
