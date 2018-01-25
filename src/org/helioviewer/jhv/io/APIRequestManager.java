@@ -11,10 +11,8 @@ import org.helioviewer.jhv.log.Log;
 public class APIRequestManager {
 
     public static URI requestRemoteFile(APIRequest req) throws IOException {
-        if (req.jpipRequest == null)
-            return NetFileCache.get(req.fileRequest); // get JP2 via cache
-
-        try (NetClient nc = NetClient.of(req.jpipRequest)) {
+        String jpipRequest = req.toJpipRequest();
+        try (NetClient nc = NetClient.of(jpipRequest)) {
             APIResponse response = new APIResponse(JSONUtils.readJSON(nc.getReader()));
             // Just some error from the server
             String error = response.getError();
@@ -30,10 +28,10 @@ public class APIRequestManager {
             if (uri == null) {
                 // We did not get a reply to load data or no reply at all
                 if (message != null) {
-                    Log.error("Server message for " + req.jpipRequest + " : " + message);
+                    Log.error("Server message for " + jpipRequest + " : " + message);
                     Message.err("Server could not return data", Message.formatMessageString(message), false);
                 } else {
-                    Log.error("Did not find URI in response to " + req.jpipRequest);
+                    Log.error("Did not find URI in response to " + jpipRequest);
                     Message.err("No data source response", "While quering the data source, the server did not provide an answer.", false);
                 }
             } else {
@@ -47,7 +45,7 @@ public class APIRequestManager {
             Log.error("Socket timeout while requesting JPIP URL", e);
             Message.err("Socket timeout", "Socket timeout while requesting JPIP URL", false);
         } catch (Exception e) {
-            throw new IOException("Invalid response for " + req.jpipRequest, e);
+            throw new IOException("Invalid response for " + jpipRequest, e);
         }
         return null;
     }

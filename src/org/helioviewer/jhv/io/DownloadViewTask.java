@@ -28,8 +28,17 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
         uri = view.getURI();
 
         APIRequest req = view.getAPIRequest();
-        downloadURI = req == null ? uri : req.fileRequest;
-
+        if (req == null)
+            downloadURI = uri;
+        else {
+            URI dURI;
+            try {
+                dURI = new URI(req.toFileRequest());
+            } catch (Exception e) {
+                dURI = uri;
+            }
+            downloadURI = dURI;
+        }
         setThreadName("MAIN--DownloadView");
     }
 
