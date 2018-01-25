@@ -334,12 +334,12 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     }
 
     public long getStartTime() {
-        APIRequest req = getAPIRequest();
+        APIRequest req = getAPIRequest(); // for locked timelines
         return req == null ? view.getFirstTime().milli : req.startTime;
     }
 
     public long getEndTime() {
-        APIRequest req = getAPIRequest();
+        APIRequest req = getAPIRequest(); // for locked timelines
         return req == null ? view.getLastTime().milli : req.endTime;
     }
 
