@@ -1,12 +1,9 @@
 package org.helioviewer.jhv.io;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.Pair;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.database.DataSourcesDB;
 import org.json.JSONObject;
@@ -23,37 +20,31 @@ public class APIRequest {
     public final long endTime;
     public final int cadence;
 
-    final String jpipRequest;
-    public final URI fileRequest;
-
     public APIRequest(String _server, int _sourceId, long _startTime, long _endTime, int _cadence) {
         server = _server;
         sourceId = _sourceId;
         startTime = _startTime;
         endTime = _endTime;
         cadence = _cadence;
+    }
 
+    public String toFileRequest() {
         String fileReq;
         if (startTime == endTime) {
             fileReq = DataSources.getServerSetting(server, "API.getJP2Image") + "sourceId=" + Integer.toString(sourceId) +
                                                    "&date=" + TimeUtils.formatZ(startTime);
-            jpipRequest = null;
         } else {
             fileReq = DataSources.getServerSetting(server, "API.getJPX") + "sourceId=" + Integer.toString(sourceId) +
                                                    "&startTime=" + TimeUtils.formatZ(startTime) + "&endTime=" + TimeUtils.formatZ(endTime);
             if (cadence != CADENCE_ANY) {
                 fileReq += "&cadence=" + Integer.toString(cadence);
             }
-            jpipRequest = fileReq + "&jpip=true&verbose=true&linked=true";
         }
+        return fileReq;
+    }
 
-        URI uri = null;
-        try {
-            uri = new URI(fileReq);
-        } catch (URISyntaxException e) {
-            Log.error("URI syntax exception: " + fileReq);
-        }
-        fileRequest = uri;
+    String toJpipRequest() {
+        return toFileRequest() + "&jpip=true&verbose=true&linked=true";
     }
 
     @Override
