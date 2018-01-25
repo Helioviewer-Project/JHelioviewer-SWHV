@@ -33,7 +33,6 @@ public class DrawController implements JHVEventHighlightListener, TimeListener {
 
     private static final double noImages = 99;
     private static final Timer layersTimer = new Timer(1000/2, e -> {
-        System.out.println(">>> " + Thread.currentThread().getName());
         int cadence = Math.max(1, (int) ((selectedAxis.end - selectedAxis.start) / noImages / 1000));
         ImageLayers.syncLayersSpan(selectedAxis.start, selectedAxis.end, cadence);
     });
