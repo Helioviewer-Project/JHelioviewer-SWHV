@@ -24,7 +24,7 @@ public class APIRequest {
     public final int cadence;
 
     final String jpipRequest;
-    final URI fileRequest;
+    public final URI fileRequest;
 
     public APIRequest(String _server, int _sourceId, long _startTime, long _endTime, int _cadence) {
         server = _server;

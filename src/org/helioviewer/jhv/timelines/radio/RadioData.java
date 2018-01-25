@@ -8,12 +8,11 @@ import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
-import java.net.URI;
 import java.util.concurrent.ExecutionException;
 
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.io.APIRequestManager;
+import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.threads.JHVWorker;
@@ -109,8 +108,7 @@ public class RadioData extends AbstractTimelineLayer {
         protected RadioJP2Data backgroundWork() {
             try {
                 APIRequest req = new APIRequest("ROB", APIRequest.CallistoID, date, date, APIRequest.CADENCE_ANY);
-                URI uri = APIRequestManager.requestRemoteFile(req);
-                return uri == null ? null : new RadioJP2Data(new JP2ViewCallisto(uri, req), req.startTime);
+                return new RadioJP2Data(new JP2ViewCallisto(NetFileCache.get(req.fileRequest), req), req.startTime);
             } catch (Exception e) {
                 Log.error("An error occured while opening the remote file: " + e.getMessage());
             }
