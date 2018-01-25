@@ -3,23 +3,27 @@ package org.helioviewer.jhv.io;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.everit.json.schema.Schema;
-import org.everit.json.schema.ValidationException;
-import org.everit.json.schema.loader.SchemaLoader;
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.TimeUtils;
+
+import org.everit.json.schema.Schema;
+import org.everit.json.schema.ValidationException;
+import org.everit.json.schema.Validator;
+import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 
 public class DataSourcesTask extends JHVWorker<Void, Void> {
 
+    private final Validator validator;
     private final DataSourcesParser parser;
     private final String url;
     private final String schemaName;
 
-    public DataSourcesTask(String server) {
+    public DataSourcesTask(String server, Validator _validator) {
+        validator = _validator;
         parser = new DataSourcesParser(server);
         url = DataSources.getServerSetting(server, "API.getDataSources");
         schemaName = DataSources.getServerSetting(server, "schema");
@@ -48,7 +52,7 @@ public class DataSourcesTask extends JHVWorker<Void, Void> {
                 }
 */
                 if (schema != null)
-                    schema.validate(jo);
+                    validator.performValidation(schema, jo);
                 parser.parse(jo);
                 return null;
             } catch (ValidationException e) {
