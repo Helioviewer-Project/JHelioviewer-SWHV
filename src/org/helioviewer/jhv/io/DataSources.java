@@ -11,6 +11,8 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.database.DataSourcesDB;
 
+import org.everit.json.schema.Validator;
+
 @SuppressWarnings("serial")
 public class DataSources {
 
@@ -96,8 +98,9 @@ public class DataSources {
         Settings.getSingletonInstance().setProperty("default.server", server);
 
         DataSourcesDB.init();
+        Validator validator = Validator.builder().failEarly().build();
         for (String serverName : serverSettings.keySet())
-            JHVGlobals.getExecutorService().execute(new DataSourcesTask(serverName));
+            JHVGlobals.getExecutorService().execute(new DataSourcesTask(serverName, validator));
     }
 
     private static final HashSet<DataSourcesListener> listeners = new HashSet<>();
