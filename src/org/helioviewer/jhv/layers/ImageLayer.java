@@ -333,6 +333,16 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         return view.getAPIRequest();
     }
 
+    public long getStartTime() {
+        APIRequest req = getAPIRequest();
+        return req == null ? view.getFirstTime().milli : req.startTime;
+    }
+
+    public long getEndTime() {
+        APIRequest req = getAPIRequest();
+        return req == null ? view.getLastTime().milli : req.endTime;
+    }
+
     public double getAutoBrightness() {
         return imageData.getAutoBrightness();
     }
