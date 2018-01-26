@@ -5,7 +5,9 @@ import java.awt.GridBagLayout;
 
 import javax.swing.JPanel;
 
+import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.gui.components.calendar.JHVCarringtonPicker;
+import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
@@ -13,8 +15,7 @@ public class TimeSelectorPanel extends JPanel {
 
     private final DateTimePanel startDateTimePanel = new DateTimePanel("Start");
     private final DateTimePanel endDateTimePanel = new DateTimePanel("End");
-    private final JHVCarringtonPicker startCarrington = new JHVCarringtonPicker();
-    private final JHVCarringtonPicker endCarrington = new JHVCarringtonPicker();
+    private final JHVCarringtonPicker carrington = new JHVCarringtonPicker();
 
     public TimeSelectorPanel() {
         long milli = TimeUtils.START.milli;
@@ -23,11 +24,12 @@ public class TimeSelectorPanel extends JPanel {
 
         startDateTimePanel.addListener(e -> setStartTime(startDateTimePanel.getTime()));
         endDateTimePanel.addListener(e -> setEndTime(endDateTimePanel.getTime()));
-        startCarrington.addJHVCalendarListener(e -> setStartTime(startCarrington.getTime()));
-        endCarrington.addJHVCalendarListener(e -> setEndTime(endCarrington.getTime()));
-
-        startDateTimePanel.add(startCarrington);
-        endDateTimePanel.add(endCarrington);
+        carrington.addJHVCalendarListener(e -> {
+            long time = carrington.getTime();
+            setStartTime(time);
+            int cr = (int) Math.round(Carrington.time2CR(new JHVDate(time)) - Carrington.CR_MINIMAL) + 1;
+            setEndTime(Carrington.CR_start[Math.min(cr, Carrington.CR_start.length - 1)]);
+        });
 
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -41,25 +43,21 @@ public class TimeSelectorPanel extends JPanel {
         add(startDateTimePanel, c);
         c.gridx = 1;
         c.weightx = 0;
-        add(startCarrington, c);
+        add(carrington, c);
 
         c.gridy = 1;
         c.gridx = 0;
         c.weightx = 1;
         add(endDateTimePanel, c);
-        c.gridx = 1;
-        c.weightx = 0;
-        add(endCarrington, c);
     }
 
     public void setStartTime(long time) {
+        carrington.setTime(time);
         startDateTimePanel.setTime(time);
-        startCarrington.setTime(time);
     }
 
     public void setEndTime(long time) {
         endDateTimePanel.setTime(time);
-        endCarrington.setTime(time);
     }
 
     public long getStartTime() {

@@ -151,8 +151,6 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
     private static JideButton prevFrameButton;
     private static JideButton nextFrameButton;
     private static JideButton playButton;
-    private static JideSplitButton shiftBackButton;
-    private static JideSplitButton shiftForeButton;
 
     private static RecordButton recordButton;
 
@@ -227,7 +225,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 1, 0));
         int small = 18, big = 26;
 
-        shiftBackButton = new JideSplitButton(Buttons.skipBackward);
+        JideSplitButton shiftBackButton = new JideSplitButton(Buttons.skipBackward);
         shiftBackButton.setFont(Buttons.getMaterialFont(small));
         shiftBackButton.setToolTipText("Move time interval backward");
         ButtonGroup shiftBackGroup = createShiftMenu(shiftBackButton);
@@ -252,7 +250,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         nextFrameButton.addActionListener(getNextFrameAction());
         buttonPanel.add(nextFrameButton);
 
-        shiftForeButton = new JideSplitButton(Buttons.skipForward);
+        JideSplitButton shiftForeButton = new JideSplitButton(Buttons.skipForward);
         shiftForeButton.setFont(Buttons.getMaterialFont(small));
         shiftForeButton.setToolTipText("Move time interval forward");
         ButtonGroup shiftForeGroup = createShiftMenu(shiftForeButton);
