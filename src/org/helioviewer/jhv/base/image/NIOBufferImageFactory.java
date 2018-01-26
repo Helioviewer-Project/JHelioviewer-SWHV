@@ -40,4 +40,11 @@ public class NIOBufferImageFactory {
         return new BufferedImage(cm, RasterFactory.factory.createRaster(sm, buffer, new Point()), cm.isAlphaPremultiplied(), null);
     }
 
+    public static void free(BufferedImage img) {
+        DataBuffer buffer = img.getRaster().getDataBuffer();
+        if (buffer instanceof NIODataBuffer) {
+            ((NIODataBuffer) buffer).free();
+        }
+    }
+
 }

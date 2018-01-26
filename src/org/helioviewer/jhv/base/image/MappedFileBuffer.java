@@ -50,7 +50,7 @@ import xerial.larray.mmap.MMapMode;
  */
 abstract class MappedFileBuffer extends DataBuffer {
     private final Buffer buffer;
-    private final MMapBuffer mappedBuffer;
+    private final MMapBuffer mmapBuffer;
 
     private MappedFileBuffer(int type, int size, int numBanks) throws IOException {
         super(type, size, numBanks);
@@ -59,8 +59,8 @@ abstract class MappedFileBuffer extends DataBuffer {
         long length = ((long) size) * componentSize * numBanks;
         File tempFile = File.createTempFile("mfilebuf", null, JHVGlobals.MMapCacheDir);
         try {
-            mappedBuffer = new MMapBuffer(tempFile, 0, length, MMapMode.READ_WRITE);
-            ByteBuffer byteBuffer = mappedBuffer.toDirectByteBuffer(0, (int) length).order(ByteOrder.nativeOrder());
+            mmapBuffer = new MMapBuffer(tempFile, 0, length, MMapMode.READ_WRITE);
+            ByteBuffer byteBuffer = mmapBuffer.toDirectByteBuffer(0, (int) length).order(ByteOrder.nativeOrder());
             switch (type) {
                 case DataBuffer.TYPE_BYTE:
                     buffer = byteBuffer;
@@ -86,7 +86,7 @@ abstract class MappedFileBuffer extends DataBuffer {
     }
 
     void free() throws IOException {
-        mappedBuffer.close();
+        mmapBuffer.close();
     }
 
     @Override

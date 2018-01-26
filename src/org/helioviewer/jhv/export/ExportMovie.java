@@ -179,6 +179,7 @@ public class ExportMovie implements FrameListener {
         public void run() {
             try {
                 ExportUtils.pasteCanvases(mainImage, frameH, eveImage, movieLinePosition, movieExporter.getHeight());
+                NIOBufferImageFactory.free(eveImage);
                 movieExporter.encode(mainImage);
                 MappedImageFactory.free(mainImage);
             } catch (Exception e) {
