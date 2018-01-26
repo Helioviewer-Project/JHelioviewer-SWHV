@@ -4,6 +4,7 @@ package org.helioviewer.jhv.base.image;
 import java.awt.Point;
 import java.awt.image.*;
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
 
 public class NIOBufferImageFactory {
 
@@ -22,7 +23,7 @@ public class NIOBufferImageFactory {
         return new BufferedImage(cm, RasterFactory.factory.createRaster(sm, NIODataBuffer.create(buffer), new Point()), false, null);
     }
 
-    private static BufferedImage createCompatible(int width, int height, int type) {
+    public static BufferedImage createCompatible(int width, int height, int type) {
         BufferedImage temp = new BufferedImage(1, 1, type);
         return createCompatible(width, height, temp.getSampleModel().createCompatibleSampleModel(width, height), temp.getColorModel());
     }
@@ -38,6 +39,14 @@ public class NIOBufferImageFactory {
     private static BufferedImage createCompatible(int width, int height, SampleModel sm, ColorModel cm) {
         DataBuffer buffer = NIODataBuffer.create(sm.getTransferType(), width * height * sm.getNumDataElements(), 1);
         return new BufferedImage(cm, RasterFactory.factory.createRaster(sm, buffer, new Point()), cm.isAlphaPremultiplied(), null);
+    }
+
+    public static ByteBuffer getByteBuffer(BufferedImage img) {
+        DataBuffer buffer = img.getRaster().getDataBuffer();
+        if (buffer instanceof NIODataBuffer.DataBufferByte)
+            return (ByteBuffer) ((NIODataBuffer.DataBufferByte) buffer).getBuffer();
+        else
+            throw new IncompatibleClassChangeError("Not a NIODataBuffer byte backed image");
     }
 
     public static void free(BufferedImage img) {

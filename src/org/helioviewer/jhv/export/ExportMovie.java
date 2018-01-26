@@ -68,7 +68,7 @@ public class ExportMovie implements FrameListener {
         }
 
         try {
-            BufferedImage screen = MappedImageFactory.createCompatibleMappedImage(grabber.w, exporter.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+            BufferedImage screen = MappedImageFactory.createCompatible(grabber.w, exporter.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
             grabber.renderFrame(camera, gl, MappedImageFactory.getByteBuffer(screen));
             BufferedImage eve = EVEImage == null ? null : NIOBufferImageFactory.copyImage(EVEImage);
             encodeExecutor.execute(new FrameConsumer(exporter, screen, grabber.h, eve, EVEMovieLinePosition));
