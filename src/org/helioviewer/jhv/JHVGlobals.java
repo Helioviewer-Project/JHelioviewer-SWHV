@@ -119,16 +119,19 @@ public class JHVGlobals {
             LibCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "lib");
             FileCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "file");
             ClientCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "client");
+            MMapCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "mmap");
         } catch (Exception e) {
             LibCacheDir = new File(System.getProperty("java.io.tmpdir"));
             FileCacheDir = new File(System.getProperty("java.io.tmpdir"));
             ClientCacheDir = new File(System.getProperty("java.io.tmpdir"));
+            MMapCacheDir = new File(System.getProperty("java.io.tmpdir"));
         }
     }
 
     public static File LibCacheDir;
     public static File FileCacheDir;
     public static File ClientCacheDir;
+    public static File MMapCacheDir;
 
     public static final HyperOpenURL hyperOpenURL = new HyperOpenURL();
 
