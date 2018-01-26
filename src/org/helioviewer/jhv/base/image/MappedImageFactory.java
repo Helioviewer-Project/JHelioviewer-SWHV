@@ -28,13 +28,13 @@
 
 package org.helioviewer.jhv.base.image;
 
-import java.awt.GraphicsConfiguration;
+//import java.awt.GraphicsConfiguration;
 import java.awt.Point;
 import java.awt.image.*;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import javax.imageio.ImageTypeSpecifier;
+//import javax.imageio.ImageTypeSpecifier;
 
 /**
  * A factory for creating {@link BufferedImage}s backed by memory mapped files.
@@ -70,18 +70,18 @@ public final class MappedImageFactory {
 
     private MappedImageFactory() {
     }
-
+/*
     public static BufferedImage copyImage(BufferedImage bi) throws IOException {
         BufferedImage ret = createCompatibleMappedImage(bi.getWidth(), bi.getHeight(), bi.getType());
         bi.copyData(ret.getRaster());
         return ret;
     }
-
+*/
     public static BufferedImage createCompatibleMappedImage(int width, int height, int type) throws IOException {
         BufferedImage temp = new BufferedImage(1, 1, type);
         return createCompatibleMappedImage(width, height, temp.getSampleModel().createCompatibleSampleModel(width, height), temp.getColorModel());
     }
-
+/*
     public static BufferedImage createCompatibleMappedImage(int width, int height, GraphicsConfiguration configuration, int transparency) throws IOException {
         return createCompatibleMappedImage(width, height, configuration.getColorModel(transparency));
     }
@@ -93,7 +93,7 @@ public final class MappedImageFactory {
     private static BufferedImage createCompatibleMappedImage(int width, int height, ColorModel cm) throws IOException {
         return createCompatibleMappedImage(width, height, cm.createCompatibleSampleModel(width, height), cm);
     }
-
+*/
     private static BufferedImage createCompatibleMappedImage(int width, int height, SampleModel sm, ColorModel cm) throws IOException {
         DataBuffer buffer = MappedFileBuffer.create(sm.getTransferType(), width * height * sm.getNumDataElements(), 1);
         return new BufferedImage(cm, RasterFactory.factory.createRaster(sm, buffer, new Point()), cm.isAlphaPremultiplied(), null);

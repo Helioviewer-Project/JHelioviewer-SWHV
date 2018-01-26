@@ -13,7 +13,6 @@ public abstract class NIODataBuffer extends DataBuffer {
 
         int componentSize = DataBuffer.getDataTypeSize(type) / 8;
         int length = size * componentSize * numBanks;
-
         ByteBuffer byteBuffer = BufferUtils.newByteBuffer(length);
         switch (type) {
             case DataBuffer.TYPE_BYTE:
@@ -28,10 +27,6 @@ public abstract class NIODataBuffer extends DataBuffer {
             default:
                 throw new IllegalArgumentException("Unsupported data type: " + type);
         }
-    }
-
-    Buffer getBuffer() {
-        return buffer;
     }
 
     @Override
@@ -69,17 +64,12 @@ public abstract class NIODataBuffer extends DataBuffer {
             throw new IllegalArgumentException("Unsupported data type: " + buffer);
     }
 
-    public static class DataBufferByte extends NIODataBuffer {
+    static class DataBufferByte extends NIODataBuffer {
         private final ByteBuffer buffer;
 
-        public DataBufferByte(int size, int numBanks) {
+        DataBufferByte(int size, int numBanks) {
             super(DataBuffer.TYPE_BYTE, size, numBanks);
             buffer = (ByteBuffer) super.buffer;
-        }
-
-        @Override
-        public ByteBuffer getBuffer() {
-            return buffer;
         }
 
         @Override
@@ -93,10 +83,10 @@ public abstract class NIODataBuffer extends DataBuffer {
         }
     }
 
-    public static class DataBufferUShort extends NIODataBuffer {
+    static class DataBufferUShort extends NIODataBuffer {
         private final ShortBuffer buffer;
 
-        public DataBufferUShort(int size, int numBanks) {
+        DataBufferUShort(int size, int numBanks) {
             super(DataBuffer.TYPE_USHORT, size, numBanks);
             buffer = (ShortBuffer) super.buffer;
         }
@@ -112,10 +102,10 @@ public abstract class NIODataBuffer extends DataBuffer {
         }
     }
 
-    public static class DataBufferInt extends NIODataBuffer {
+    static class DataBufferInt extends NIODataBuffer {
         private final IntBuffer buffer;
 
-        public DataBufferInt(int size, int numBanks) {
+        DataBufferInt(int size, int numBanks) {
             super(DataBuffer.TYPE_INT, size, numBanks);
             buffer = (IntBuffer) super.buffer;
         }
@@ -131,20 +121,15 @@ public abstract class NIODataBuffer extends DataBuffer {
         }
     }
 
-    public static class ByteDataBuffer extends DataBuffer {
+    static class ByteDataBuffer extends DataBuffer {
         private ByteBuffer buffer;
 
         ByteDataBuffer() {
             super(DataBuffer.TYPE_BYTE, 0, 0);
         }
 
-        ByteDataBuffer setBuffer(ByteBuffer _buffer) {
+        void setBuffer(ByteBuffer _buffer) {
             buffer = _buffer;
-            return this;
-        }
-
-        public ByteBuffer getBuffer() {
-            return buffer;
         }
 
         @Override
@@ -158,16 +143,15 @@ public abstract class NIODataBuffer extends DataBuffer {
         }
     }
 
-    public static class UShortDataBuffer extends DataBuffer {
+    static class UShortDataBuffer extends DataBuffer {
         private ShortBuffer buffer;
 
         UShortDataBuffer() {
             super(DataBuffer.TYPE_USHORT, 0, 0);
         }
 
-        UShortDataBuffer setBuffer(ShortBuffer _buffer) {
+        void setBuffer(ShortBuffer _buffer) {
             buffer = _buffer;
-            return this;
         }
 
         @Override
@@ -181,16 +165,15 @@ public abstract class NIODataBuffer extends DataBuffer {
         }
     }
 
-    public static class IntDataBuffer extends DataBuffer {
+    static class IntDataBuffer extends DataBuffer {
         private IntBuffer buffer;
 
         IntDataBuffer() {
             super(DataBuffer.TYPE_INT, 0, 0);
         }
 
-        IntDataBuffer setBuffer(IntBuffer _buffer) {
+        void setBuffer(IntBuffer _buffer) {
             buffer = _buffer;
-            return this;
         }
 
         @Override
