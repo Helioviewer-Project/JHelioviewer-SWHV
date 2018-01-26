@@ -48,8 +48,9 @@ import xerial.larray.mmap.MMapMode;
  * @version $Id: MappedFileBuffer.java,v 1.0 Jun 12, 2010 4:56:51 PM haraldk Exp$
  * @see java.nio.channels.FileChannel#map(java.nio.channels.FileChannel.MapMode, long, long)
  */
-public abstract class MappedFileBuffer extends DataBuffer {
+abstract class MappedFileBuffer extends DataBuffer {
     private final Buffer buffer;
+    private final MMapBuffer mappedBuffer;
 
     private MappedFileBuffer(int type, int size, int numBanks) throws IOException {
         super(type, size, numBanks);
@@ -57,11 +58,9 @@ public abstract class MappedFileBuffer extends DataBuffer {
         int componentSize = DataBuffer.getDataTypeSize(type) / 8;
         long length = ((long) size) * componentSize * numBanks;
         File tempFile = File.createTempFile("mfilebuf", null, JHVGlobals.MMapCacheDir);
-
         try {
-            MMapBuffer buf = new MMapBuffer(tempFile, 0, length, MMapMode.READ_WRITE);
-            ByteBuffer byteBuffer = buf.toDirectByteBuffer(0, (int) length).order(ByteOrder.nativeOrder());
-
+            mappedBuffer = new MMapBuffer(tempFile, 0, length, MMapMode.READ_WRITE);
+            ByteBuffer byteBuffer = mappedBuffer.toDirectByteBuffer(0, (int) length).order(ByteOrder.nativeOrder());
             switch (type) {
                 case DataBuffer.TYPE_BYTE:
                     buffer = byteBuffer;
@@ -84,6 +83,10 @@ public abstract class MappedFileBuffer extends DataBuffer {
 
     Buffer getBuffer() {
         return buffer;
+    }
+
+    void free() throws IOException {
+        mappedBuffer.close();
     }
 
     @Override
