@@ -3,17 +3,20 @@ package org.helioviewer.jhv.base.image;
 import java.awt.image.DataBuffer;
 import java.nio.*;
 
-import org.helioviewer.jhv.base.BufferUtils;
+import xerial.larray.buffer.LBuffer;
 
-public abstract class NIODataBuffer extends DataBuffer {
+abstract class NIODataBuffer extends DataBuffer {
     private final Buffer buffer;
+    private final LBuffer lBuffer;
 
     private NIODataBuffer(int type, int size, int numBanks) {
         super(type, size, numBanks);
 
         int componentSize = DataBuffer.getDataTypeSize(type) / 8;
-        int length = size * componentSize * numBanks;
-        ByteBuffer byteBuffer = BufferUtils.newByteBuffer(length);
+        long length = ((long) size) * componentSize * numBanks;
+
+        lBuffer = new LBuffer(length);
+        ByteBuffer byteBuffer = lBuffer.toDirectByteBuffer(0, (int) length).order(ByteOrder.nativeOrder());
         switch (type) {
             case DataBuffer.TYPE_BYTE:
                 buffer = byteBuffer;
@@ -27,6 +30,10 @@ public abstract class NIODataBuffer extends DataBuffer {
             default:
                 throw new IllegalArgumentException("Unsupported data type: " + type);
         }
+    }
+
+    void free() {
+        lBuffer.release();
     }
 
     @Override
