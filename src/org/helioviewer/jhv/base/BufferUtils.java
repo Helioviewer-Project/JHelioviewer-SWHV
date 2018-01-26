@@ -1,17 +1,15 @@
 package org.helioviewer.jhv.base;
 
 import java.awt.Color;
-//import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
-import java.nio.Buffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 import org.helioviewer.jhv.math.Vec3;
 
-import com.jogamp.common.nio.Buffers;
+import xerial.larray.buffer.LBuffer;
 
 public class BufferUtils {
 
@@ -24,19 +22,19 @@ public class BufferUtils {
     public static final float[] colorYellow = {Color.YELLOW.getRed() / 255f, Color.YELLOW.getGreen() / 255f, Color.YELLOW.getBlue() / 255f, 1};
 
     public static ByteBuffer newByteBuffer(int len) {
-        return Buffers.newDirectByteBuffer(len);
+        return new LBuffer(len).toDirectByteBuffer(0, len).order(ByteOrder.nativeOrder());
     }
 
     public static FloatBuffer newFloatBuffer(int len) {
-        return Buffers.newDirectFloatBuffer(len);
+        return newByteBuffer(4 * len).asFloatBuffer();
     }
 
     public static IntBuffer newIntBuffer(int len) {
-        return Buffers.newDirectIntBuffer(len);
+        return newByteBuffer(4 * len).asIntBuffer();
     }
 
     public static ShortBuffer newShortBuffer(int len) {
-        return Buffers.newDirectShortBuffer(len);
+        return newByteBuffer(2 * len).asShortBuffer();
     }
 
     public static void put3f(FloatBuffer buf, float x, float y, float z) {
@@ -56,31 +54,6 @@ public class BufferUtils {
         buf.put(y);
         buf.put(z);
         buf.put(w);
-    }
-
-    public static void free(Buffer buffer) {
-        try {
-            Method cleanerMethod = buffer.getClass().getMethod("cleaner");
-            cleanerMethod.setAccessible(true);
-            Object cleaner = cleanerMethod.invoke(buffer);
-            Method cleanMethod = cleaner.getClass().getMethod("clean");
-            cleanMethod.setAccessible(true);
-            cleanMethod.invoke(cleaner);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-/* JDK9
-        try {
-            Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
-            Field theUnsafeField = unsafeClass.getDeclaredField("theUnsafe");
-            theUnsafeField.setAccessible(true);
-            Object theUnsafe = theUnsafeField.get(null);
-            Method invokeCleanerMethod = unsafeClass.getMethod("invokeCleaner", ByteBuffer.class);
-            invokeCleanerMethod.invoke(theUnsafe, buffer);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-*/
     }
 
 }
