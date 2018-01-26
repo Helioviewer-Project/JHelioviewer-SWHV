@@ -31,9 +31,12 @@ package org.helioviewer.jhv.base.image;
 import java.awt.image.DataBuffer;
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.*;
-import java.nio.channels.FileChannel;
+
+import org.helioviewer.jhv.JHVGlobals;
+
+import xerial.larray.mmap.MMapBuffer;
+import xerial.larray.mmap.MMapMode;
 
 /**
  * A {@code DataBuffer} implementation that is backed by a memory mapped file.
@@ -48,20 +51,17 @@ import java.nio.channels.FileChannel;
 public abstract class MappedFileBuffer extends DataBuffer {
     private final Buffer buffer;
 
-    private MappedFileBuffer(final int type, final int size, final int numBanks) throws IOException {
+    private MappedFileBuffer(int type, int size, int numBanks) throws IOException {
         super(type, size, numBanks);
 
         int componentSize = DataBuffer.getDataTypeSize(type) / 8;
+        long length = ((long) size) * componentSize * numBanks;
+        File tempFile = File.createTempFile("mfilebuf", null, JHVGlobals.MMapCacheDir);
 
-        // Create temp file to get a file handle to use for memory mapping
-        File tempFile = File.createTempFile(String.format("%s-", getClass().getSimpleName().toLowerCase()), ".tmp");
+        try {
+            MMapBuffer buf = new MMapBuffer(tempFile, 0, length, MMapMode.READ_WRITE);
+            ByteBuffer byteBuffer = buf.toDirectByteBuffer(0, (int) length).order(ByteOrder.nativeOrder());
 
-        try (RandomAccessFile raf = new RandomAccessFile(tempFile, "rw"); FileChannel channel = raf.getChannel()) {
-            long length = ((long) size) * componentSize * numBanks;
-            raf.setLength(length);
-
-            // Map entire file into memory, let OS virtual memory/paging do the heavy lifting
-            ByteBuffer byteBuffer = channel.map(FileChannel.MapMode.READ_WRITE, 0, length).order(ByteOrder.nativeOrder());
             switch (type) {
                 case DataBuffer.TYPE_BYTE:
                     buffer = byteBuffer;
@@ -75,11 +75,9 @@ public abstract class MappedFileBuffer extends DataBuffer {
                 default:
                     throw new IllegalArgumentException("Unsupported data type: " + type);
             }
-        // According to the docs, we can safely close the channel and delete the file now
         } finally {
-            // NOTE: File can't be deleted right now on Windows, as the file is open. Let JVM clean up later
             if (!tempFile.delete()) {
-                tempFile.deleteOnExit();
+                tempFile.deleteOnExit(); // NOTE: File can't be deleted right now on Windows, as the file is open. Let JVM clean up later
             }
         }
     }
@@ -95,7 +93,7 @@ public abstract class MappedFileBuffer extends DataBuffer {
 
     // TODO: Is throws IOException a good idea?
 
-    public static DataBuffer create(final int type, final int size, final int numBanks) throws IOException {
+    public static DataBuffer create(int type, int size, int numBanks) throws IOException {
         switch (type) {
             case DataBuffer.TYPE_BYTE:
                 return new DataBufferByte(size, numBanks);
@@ -108,10 +106,10 @@ public abstract class MappedFileBuffer extends DataBuffer {
         }
     }
 
-    public final static class DataBufferByte extends MappedFileBuffer {
+    public static class DataBufferByte extends MappedFileBuffer {
         private final ByteBuffer buffer;
 
-        public DataBufferByte(int size, int numBanks) throws IOException {
+        DataBufferByte(int size, int numBanks) throws IOException {
             super(DataBuffer.TYPE_BYTE, size, numBanks);
             buffer = (ByteBuffer) super.buffer;
         }
@@ -127,10 +125,10 @@ public abstract class MappedFileBuffer extends DataBuffer {
         }
     }
 
-    public final static class DataBufferUShort extends MappedFileBuffer {
+    static class DataBufferUShort extends MappedFileBuffer {
         private final ShortBuffer buffer;
 
-        public DataBufferUShort(int size, int numBanks) throws IOException {
+        DataBufferUShort(int size, int numBanks) throws IOException {
             super(DataBuffer.TYPE_USHORT, size, numBanks);
             buffer = (ShortBuffer) super.buffer;
         }
@@ -146,10 +144,10 @@ public abstract class MappedFileBuffer extends DataBuffer {
         }
     }
 
-    public final static class DataBufferInt extends MappedFileBuffer {
+    static class DataBufferInt extends MappedFileBuffer {
         private final IntBuffer buffer;
 
-        public DataBufferInt(int size, int numBanks) throws IOException {
+        DataBufferInt(int size, int numBanks) throws IOException {
             super(DataBuffer.TYPE_INT, size, numBanks);
             buffer = (IntBuffer) super.buffer;
         }
