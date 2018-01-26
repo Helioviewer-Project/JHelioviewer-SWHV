@@ -107,4 +107,11 @@ public final class MappedImageFactory {
             throw new IncompatibleClassChangeError("Not a MappedFileBuffer byte backed image");
     }
 
+    public static void free(BufferedImage img) throws IOException {
+        DataBuffer buffer = img.getRaster().getDataBuffer();
+        if (buffer instanceof MappedFileBuffer) {
+            ((MappedFileBuffer) buffer).free();
+        }
+    }
+
 }

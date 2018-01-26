@@ -180,6 +180,7 @@ public class ExportMovie implements FrameListener {
             try {
                 ExportUtils.pasteCanvases(mainImage, frameH, eveImage, movieLinePosition, movieExporter.getHeight());
                 movieExporter.encode(mainImage);
+                MappedImageFactory.free(mainImage);
             } catch (Exception e) {
                 e.printStackTrace();
             }
