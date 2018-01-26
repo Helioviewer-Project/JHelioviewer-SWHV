@@ -32,6 +32,10 @@ abstract class NIODataBuffer extends DataBuffer {
         }
     }
 
+    Buffer getBuffer() {
+        return buffer;
+    }
+
     void free() {
         lBuffer.release();
     }
