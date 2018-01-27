@@ -15,6 +15,7 @@ import kdu_jni.Kdu_channel_mapping;
 import kdu_jni.Kdu_codestream;
 import kdu_jni.Kdu_coords;
 import kdu_jni.Kdu_dims;
+import kdu_jni.Kdu_global;
 import kdu_jni.Kdu_ilayer_ref;
 import kdu_jni.Kdu_quality_limiter;
 import kdu_jni.Kdu_region_compositor;
@@ -87,7 +88,7 @@ public class KakaduSource {
         res.addResolutionLevel(0, width0, height0, 1, 1);
 
         for (int i = 1; i <= maxDWT; i++) {
-            stream.Apply_input_restrictions(0, 0, i, 0, null, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS);
+            stream.Apply_input_restrictions(0, 0, i, 0, null, Kdu_global.KDU_WANT_CODESTREAM_COMPONENTS);
             stream.Get_dims(0, dims);
             siz = dims.Access_size();
             int width = siz.Get_x(), height = siz.Get_y();
