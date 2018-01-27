@@ -59,7 +59,7 @@ class J2KRender implements Runnable {
 
         if (numComponents < 3) {
             // alpha tbd
-            ilayer = compositor.Add_primitive_ilayer(frame, firstComponent, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS, dimsRef1, dimsRef2);
+            ilayer = compositor.Add_primitive_ilayer(frame, firstComponent, Kdu_global.KDU_WANT_CODESTREAM_COMPONENTS, dimsRef1, dimsRef2);
         } else {
             ilayer = compositor.Add_ilayer(frame, dimsRef1, dimsRef2);
         }

@@ -14,10 +14,6 @@ public class KakaduConstants {
     public static final int KDU_META_DATABIN = 4;
     /** Kakadu constant */
     public static final int KDU_UNDEFINED_DATABIN = 5;
-    /** Kakadu constant */
-    public static final int KDU_WANT_OUTPUT_COMPONENTS = 0;
-    /** Kakadu constant */
-    public static final int KDU_WANT_CODESTREAM_COMPONENTS = 1;
 
     /** Maximum of samples to process per rendering iteration */
     public static final int MAX_RENDER_SAMPLES = 256 * 1024;
