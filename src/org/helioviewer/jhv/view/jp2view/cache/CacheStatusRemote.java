@@ -22,7 +22,7 @@ public class CacheStatusRemote implements CacheStatus {
 
         engine = _engine;
         resolutionSet = new ResolutionSet[maxFrame + 1];
-        resolutionSet[0] = KakaduHelper.getResolutionSet(engine.getCompositor(), 0);
+        resolutionSet[0] = KakaduHelper.getResolutionSet(engine.getJpxSource(), 0);
         destroyIfFull();
     }
 
@@ -98,7 +98,7 @@ public class CacheStatusRemote implements CacheStatus {
     public void setFramePartial(int frame) {
         if (resolutionSet[frame] == null) {
             try {
-                resolutionSet[frame] = KakaduHelper.getResolutionSet(engine.getCompositor(), frame);
+                resolutionSet[frame] = KakaduHelper.getResolutionSet(engine.getJpxSource(), frame);
                 destroyIfFull();
             } catch (KduException e) {
                 e.printStackTrace();
