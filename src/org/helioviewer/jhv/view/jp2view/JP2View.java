@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
 import kdu_jni.Kdu_cache;
 import kdu_jni.Kdu_thread_env;
@@ -38,7 +37,6 @@ import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPSocket;
 import org.helioviewer.jhv.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.jhv.view.jp2view.kakadu.JHV_Kdu_cache;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduEngine;
-import org.helioviewer.jhv.view.jp2view.kakadu.KakaduHelper;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduMeta;
 
 // This class is responsible for reading and decoding of JPEG2000 images
@@ -82,13 +80,8 @@ public class JP2View extends AbstractView {
             }
 
             KakaduEngine kduReader = new KakaduEngine(cacheReader, uri);
-            Jpx_source jpx = kduReader.getJpxSource();
 
-            // Retrieve the number of composition layers
-            int[] tempVar = new int[1];
-            jpx.Count_compositing_layers(tempVar);
-            maxFrame = tempVar[0] - 1;
-
+            maxFrame = kduReader.getNumberLayers() - 1;
             metaData = new MetaData[maxFrame + 1];
             KakaduMeta.cacheMetaData(kduReader.getFamilySrc(), metaData);
             for (int i = 0; i <= maxFrame; i++) {
@@ -96,7 +89,7 @@ public class JP2View extends AbstractView {
                     metaData[i] = new PixelBasedMetaData(256, 256, i); // tbd real size
             }
 
-            int[] lut = KakaduHelper.getLUT(jpx);
+            int[] lut = kduReader.getLUT();
             if (lut != null)
                 builtinLUT = new LUT(getName() + " built-in", lut);
 
