@@ -7,7 +7,7 @@ import xerial.larray.buffer.LBuffer;
 
 abstract class NIODataBuffer extends DataBuffer {
     private final Buffer buffer;
-    private final LBuffer lBuffer;
+    private final LBuffer lbuffer;
 
     private NIODataBuffer(int type, int size, int numBanks) {
         super(type, size, numBanks);
@@ -15,8 +15,8 @@ abstract class NIODataBuffer extends DataBuffer {
         int componentSize = DataBuffer.getDataTypeSize(type) / 8;
         long length = ((long) size) * componentSize * numBanks;
 
-        lBuffer = new LBuffer(length);
-        ByteBuffer byteBuffer = lBuffer.toDirectByteBuffer(0, (int) length).order(ByteOrder.nativeOrder());
+        lbuffer = new LBuffer(length);
+        ByteBuffer byteBuffer = lbuffer.toDirectByteBuffer(0, (int) length).order(ByteOrder.nativeOrder());
         switch (type) {
             case DataBuffer.TYPE_BYTE:
                 buffer = byteBuffer;
@@ -37,7 +37,7 @@ abstract class NIODataBuffer extends DataBuffer {
     }
 
     void free() {
-        lBuffer.release();
+        lbuffer.release();
     }
 
     @Override

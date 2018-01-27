@@ -3,12 +3,12 @@ package org.helioviewer.jhv.export;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 
-import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.export.jcodec.JCodecUtils;
 import org.helioviewer.jhv.export.jcodec.JHVRgbToYuv420j8Bit;
 
@@ -23,6 +23,8 @@ import org.jcodec.containers.mp4.TrackType;
 import org.jcodec.containers.mp4.muxer.FramesMP4MuxerTrack;
 import org.jcodec.containers.mp4.muxer.MP4Muxer;
 
+import xerial.larray.buffer.LBuffer;
+
 class JCodecExporter implements MovieExporter {
 
     private String path;
@@ -33,6 +35,7 @@ class JCodecExporter implements MovieExporter {
     private ArrayList<ByteBuffer> spsList;
     private ArrayList<ByteBuffer> ppsList;
     private FramesMP4MuxerTrack outTrack;
+    private LBuffer lbuffer;
     private ByteBuffer _out;
     private int frameNo;
     private MP4Muxer muxer;
@@ -50,7 +53,9 @@ class JCodecExporter implements MovieExporter {
         // Add video track to muxer
         outTrack = muxer.addTrack(TrackType.VIDEO, fps);
         // Allocate a buffer big enough to hold output frames
-        _out = BufferUtils.newByteBuffer(width * height * 6);
+        long length = width * height * 6;
+        lbuffer = new LBuffer(length);
+        _out = lbuffer.toDirectByteBuffer(0, (int) length).order(ByteOrder.nativeOrder());
         // Create an instance of encoder
         encoder = new H264Encoder(new JCodecUtils.JHVRateControl(20));
         // Encoder extra data ( SPS, PPS ) to be stored in a special place of MP4
@@ -78,6 +83,7 @@ class JCodecExporter implements MovieExporter {
 
     @Override
     public void close() throws IOException {
+        lbuffer.release();
         // Push saved SPS/PPS to a special storage in MP4
         outTrack.addSampleEntry(H264Utils.createMOVSampleEntry(spsList, ppsList, 4));
         // Write MP4 header and finalize recording
