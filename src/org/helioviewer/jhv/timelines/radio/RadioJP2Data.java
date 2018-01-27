@@ -6,7 +6,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.base.image.NIOBufferImageFactory;
+import org.helioviewer.jhv.base.image.NIOImageFactory;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.imagedata.Single8ImageData;
@@ -77,7 +77,7 @@ class RadioJP2Data implements ImageDataHandler {
             }
 
             region = imageData.getRegion();
-            bufferedImage = NIOBufferImageFactory.createIndexed(imageData.getBuffer(), w, h, RadioData.getColorModel());
+            bufferedImage = NIOImageFactory.createIndexed(imageData.getBuffer(), w, h, RadioData.getColorModel());
             DrawController.drawRequest();
         }
     }
