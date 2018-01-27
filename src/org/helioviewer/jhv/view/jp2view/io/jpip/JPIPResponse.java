@@ -153,8 +153,9 @@ public class JPIPResponse {
         while ((seg = readSegment(in)) != null) {
             if (seg.isEOR)
                 status = seg.binID;
-            else
+            else if (seg.isFinal || seg.length > 0) { // avoid pointless segments
                 cache.addJPIPDataSegment(seg);
+            }
         }
     }
 
