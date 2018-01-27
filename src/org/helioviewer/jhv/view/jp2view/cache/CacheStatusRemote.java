@@ -6,22 +6,22 @@ import kdu_jni.KduException;
 
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.jp2view.image.ResolutionSet;
-import org.helioviewer.jhv.view.jp2view.kakadu.KakaduEngine;
+import org.helioviewer.jhv.view.jp2view.kakadu.KakaduSource;
 
 public class CacheStatusRemote implements CacheStatus {
 
     private final int maxFrame;
     private final ResolutionSet[] resolutionSet;
-    private KakaduEngine engine;
+    private KakaduSource source;
 
     private int partialUntil = 0;
 
-    public CacheStatusRemote(KakaduEngine _engine, int _maxFrame) throws KduException {
+    public CacheStatusRemote(KakaduSource _source, int _maxFrame) throws KduException {
         maxFrame = _maxFrame;
 
-        engine = _engine;
+        source = _source;
         resolutionSet = new ResolutionSet[maxFrame + 1];
-        resolutionSet[0] = engine.getResolutionSet(0);
+        resolutionSet[0] = source.getResolutionSet(0);
         destroyIfFull();
     }
 
@@ -31,7 +31,7 @@ public class CacheStatusRemote implements CacheStatus {
                 return;
             }
         }
-        engine = null;
+        source = null;
     }
 
     @Override
@@ -97,7 +97,7 @@ public class CacheStatusRemote implements CacheStatus {
     public void setFramePartial(int frame) {
         if (resolutionSet[frame] == null) {
             try {
-                resolutionSet[frame] = engine.getResolutionSet(frame);
+                resolutionSet[frame] = source.getResolutionSet(frame);
                 destroyIfFull();
             } catch (KduException e) {
                 e.printStackTrace();

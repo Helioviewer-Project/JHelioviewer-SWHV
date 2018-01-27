@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import kdu_jni.KduException;
 
 import org.helioviewer.jhv.view.jp2view.image.ResolutionSet;
-import org.helioviewer.jhv.view.jp2view.kakadu.KakaduEngine;
+import org.helioviewer.jhv.view.jp2view.kakadu.KakaduSource;
 
 public class CacheStatusLocal implements CacheStatus {
 
@@ -13,11 +13,11 @@ public class CacheStatusLocal implements CacheStatus {
     private final ResolutionSet[] resolutionSet;
     private final int maxFrame;
 
-    public CacheStatusLocal(KakaduEngine engine, int _maxFrame) throws KduException {
+    public CacheStatusLocal(KakaduSource source, int _maxFrame) throws KduException {
         maxFrame = _maxFrame;
         resolutionSet = new ResolutionSet[maxFrame + 1];
         for (int i = 0; i <= maxFrame; ++i) {
-            resolutionSet[i] = engine.getResolutionSet(i);
+            resolutionSet[i] = source.getResolutionSet(i);
             resolutionSet[i].setComplete(0);
         }
     }

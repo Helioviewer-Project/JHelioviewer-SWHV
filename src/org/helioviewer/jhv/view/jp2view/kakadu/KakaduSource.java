@@ -16,18 +16,19 @@ import kdu_jni.Kdu_codestream;
 import kdu_jni.Kdu_coords;
 import kdu_jni.Kdu_dims;
 import kdu_jni.Kdu_ilayer_ref;
+import kdu_jni.Kdu_quality_limiter;
 import kdu_jni.Kdu_region_compositor;
 
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.view.jp2view.image.ResolutionSet;
 
-public class KakaduEngine {
+public class KakaduSource {
 
     private final Jp2_threadsafe_family_src familySrc = new Jp2_threadsafe_family_src();
     private final Jpx_source jpxSrc;
     private final Kdu_region_compositor compositor;
 
-    public KakaduEngine(Kdu_cache cache, URI uri) throws KduException, IOException {
+    public KakaduSource(Kdu_cache cache, URI uri) throws KduException, IOException {
         if (cache == null) { // local
             File file = new File(uri);
             familySrc.Open(file.getCanonicalPath(), true);
@@ -123,7 +124,6 @@ public class KakaduEngine {
         for (int i = 0; i < lut.length; i++) {
             lut[i] = 0xFF000000 | ((int) ((red[i] + 0.5f) * 0xFF) << 16) | ((int) ((green[i] + 0.5f) * 0xFF) << 8) | ((int) ((blue[i] + 0.5f) * 0xFF));
         }
-
         return lut;
     }
 
@@ -160,6 +160,7 @@ public class KakaduEngine {
         // System.out.println(">>>> compositor create " + compositor + " " + Thread.currentThread().getName());
         compositor.Create(jpx, KakaduConstants.CODESTREAM_CACHE_THRESHOLD);
         compositor.Set_surface_initialization_mode(false);
+        compositor.Set_quality_limiting(new Kdu_quality_limiter(1f/256), -1, -1);
         return compositor;
     }
 

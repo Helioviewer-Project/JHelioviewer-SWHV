@@ -19,7 +19,7 @@ import org.helioviewer.jhv.imagedata.Single8ImageData;
 import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.view.jp2view.image.ImageParams;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduConstants;
-import org.helioviewer.jhv.view.jp2view.kakadu.KakaduEngine;
+import org.helioviewer.jhv.view.jp2view.kakadu.KakaduSource;
 
 class J2KRender implements Runnable {
 
@@ -27,7 +27,7 @@ class J2KRender implements Runnable {
 
     private static final ThreadLocal<int[]> localArray = ThreadLocal.withInitial(() -> new int[KakaduConstants.MAX_RENDER_SAMPLES]);
     private static final ThreadLocal<Kdu_thread_env> localThread = ThreadLocal.withInitial(J2KRender::createThreadEnv);
-    private static final ThreadLocal<KakaduEngine> localEngine = new ThreadLocal<>();
+    private static final ThreadLocal<KakaduSource> localSource = new ThreadLocal<>();
 
     private static final int[] firstComponent = { 0 };
 
@@ -146,15 +146,15 @@ class J2KRender implements Runnable {
     @Override
     public void run() {
         try {
-            KakaduEngine kduEngine = localEngine.get();
-            if (kduEngine == null) {
-                kduEngine = viewRef.getRenderEngine(localThread.get());
-                localEngine.set(kduEngine);
+            KakaduSource kduSource = localSource.get();
+            if (kduSource == null) {
+                kduSource = viewRef.getRenderSource(localThread.get());
+                localSource.set(kduSource);
             }
-            renderLayer(kduEngine.getCompositor());
+            renderLayer(kduSource.getCompositor());
         } catch (Exception e) {
             // reboot the compositor
-            localEngine.set(null);
+            localSource.set(null);
             localThread.remove();
             e.printStackTrace();
         }

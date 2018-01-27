@@ -36,8 +36,8 @@ import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPQuery;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPSocket;
 import org.helioviewer.jhv.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.jhv.view.jp2view.kakadu.JHV_Kdu_cache;
-import org.helioviewer.jhv.view.jp2view.kakadu.KakaduEngine;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduMeta;
+import org.helioviewer.jhv.view.jp2view.kakadu.KakaduSource;
 
 // This class is responsible for reading and decoding of JPEG2000 images
 public class JP2View extends AbstractView {
@@ -79,7 +79,7 @@ public class JP2View extends AbstractView {
                     throw new JHV_KduException(scheme + " scheme not supported!");
             }
 
-            KakaduEngine kduReader = new KakaduEngine(cacheReader, uri);
+            KakaduSource kduReader = new KakaduSource(cacheReader, uri);
 
             maxFrame = kduReader.getNumberLayers() - 1;
             metaData = new MetaData[maxFrame + 1];
@@ -345,11 +345,11 @@ public class JP2View extends AbstractView {
         });
     }
 
-    KakaduEngine getRenderEngine(Kdu_thread_env threadEnv) throws KduException, IOException {
+    KakaduSource getRenderSource(Kdu_thread_env threadEnv) throws KduException, IOException {
         Thread.currentThread().setName("Render " + getName());
-        KakaduEngine engine = new KakaduEngine(cacheRender, uri);
-        engine.getCompositor().Set_thread_env(threadEnv, null);
-        return engine;
+        KakaduSource source = new KakaduSource(cacheRender, uri);
+        source.getCompositor().Set_thread_env(threadEnv, null);
+        return source;
     }
 
     protected void signalReader(ImageParams params) {
@@ -467,7 +467,7 @@ public class JP2View extends AbstractView {
     // very slow
     @Override
     public String getXMLMetaData() throws Exception {
-        KakaduEngine kduTmp = new KakaduEngine(cacheReader, uri);
+        KakaduSource kduTmp = new KakaduSource(cacheReader, uri);
         return KakaduMeta.getXml(kduTmp.getFamilySrc(), trueFrame + 1);
     }
 
