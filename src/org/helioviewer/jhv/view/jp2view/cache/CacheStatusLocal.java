@@ -18,7 +18,7 @@ public class CacheStatusLocal implements CacheStatus {
         maxFrame = _maxFrame;
         resolutionSet = new ResolutionSet[maxFrame + 1];
         for (int i = 0; i <= maxFrame; ++i) {
-            resolutionSet[i] = KakaduHelper.getResolutionSet(engine.getCompositor(), i);
+            resolutionSet[i] = KakaduHelper.getResolutionSet(engine.getJpxSource(), i);
             resolutionSet[i].setComplete(0);
         }
     }

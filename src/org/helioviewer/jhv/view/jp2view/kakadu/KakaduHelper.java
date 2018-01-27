@@ -1,28 +1,26 @@
 package org.helioviewer.jhv.view.jp2view.kakadu;
 
 import kdu_jni.Jp2_palette;
-import kdu_jni.Jpx_codestream_source;
 import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
 import kdu_jni.Kdu_channel_mapping;
 import kdu_jni.Kdu_codestream;
 import kdu_jni.Kdu_coords;
 import kdu_jni.Kdu_dims;
-import kdu_jni.Kdu_ilayer_ref;
-import kdu_jni.Kdu_istream_ref;
-import kdu_jni.Kdu_region_compositor;
+import kdu_jni.Jpx_codestream_source;
+import kdu_jni.Jpx_input_box;
 
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.view.jp2view.image.ResolutionSet;
 
 public class KakaduHelper {
 
-    public static ResolutionSet getResolutionSet(Kdu_region_compositor compositor, int frame) throws KduException {
-        compositor.Refresh();
+    public static ResolutionSet getResolutionSet(Jpx_source jpxSrc, int frame) throws KduException {
+        Jpx_codestream_source xstream = jpxSrc.Access_codestream(frame);
+        Jpx_input_box inputBox = xstream.Open_stream();
+        Kdu_codestream stream = new Kdu_codestream();
+        stream.Create(inputBox);
 
-        Kdu_dims ref1 = new Kdu_dims(), ref2 = new Kdu_dims(); // avoid gc
-        Kdu_ilayer_ref ilayer = compositor.Add_ilayer(frame, ref1, ref2);
-        Kdu_codestream stream = compositor.Access_codestream(compositor.Get_next_istream(new Kdu_istream_ref(), false, true, frame));
         if (!stream.Exists()) {
             throw new KduException(">> stream does not exist " + frame);
         }
@@ -44,28 +42,23 @@ public class KakaduHelper {
         int maxDWT = stream.Get_min_dwt_levels();
         ResolutionSet res = new ResolutionSet(maxDWT + 1, maxComponents);
 
-        compositor.Set_scale(false, false, false, 1f);
         Kdu_dims dims = new Kdu_dims();
-        if (!compositor.Get_total_composition_dims(dims)) {
-            throw new KduException(">> cannot determine dimensions for stream " + frame);
-        }
-
+        stream.Get_dims(0, dims);
         Kdu_coords siz = dims.Access_size();
         int width0 = siz.Get_x(), height0 = siz.Get_y();
         res.addResolutionLevel(0, width0, height0, 1, 1);
 
         for (int i = 1; i <= maxDWT; i++) {
-            compositor.Set_scale(false, false, false, 1f / (1 << i));
-            dims = new Kdu_dims();
-            if (!compositor.Get_total_composition_dims(dims))
-                throw new KduException(">> cannot determine dimensions for stream " + frame);
-
+            stream.Apply_input_restrictions(0, 0, i, 0, null, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS);
+            stream.Get_dims(0, dims);
             siz = dims.Access_size();
             int width = siz.Get_x(), height = siz.Get_y();
             res.addResolutionLevel(i, width, height, width0 / (double) width, height0 / (double) height);
         }
 
-        compositor.Remove_ilayer(ilayer, true);
+        stream.Destroy();
+        inputBox.Close();
+        inputBox.Native_destroy();
 
         return res;
     }
