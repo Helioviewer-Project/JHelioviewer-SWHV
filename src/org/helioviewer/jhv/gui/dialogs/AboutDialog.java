@@ -49,9 +49,9 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
             "<li><a href=\"https://github.com/jidesoft/jide-oss\">JIDE Common Layer</a>, ©2002-2017, JIDE Software, Inc.</li>" +
             "<li><a href=\"https://github.com/google/guava\">Guava</a>, Google Core Libraries for Java.</li>" +
             "<li><a href=\"https://github.com/square/okio\">Okio</a> and <a href=\"https://github.com/square/okhttp\">OkHttp</a> libraries by Square, Inc.</li>" +
-            "<li><a href=\"http://nom-tam-fits.github.io/nom-tam-fits/\">FITS</a> in Java public domain library.</li>" +
-            "<li><a href=\"http://logging.apache.org/log4j/index.html\">log4j</a> logging library.</li>" +
-            "<li><a href=\"https://github.com/haraldk/TwelveMonkeys/blob/master/sandbox/sandbox-common/src/main/java/com/twelvemonkeys/image/MappedImageFactory.java\">MappedImageFactory</a>, ©2010, Harald Kuhr.</li>";
+            "<li><a href=\"http://nom-tam-fits.github.io/nom-tam-fits\">FITS</a> in Java public domain library.</li>" +
+            "<li><a href=\"https://github.com/xerial/larray\">LArray</a> large off-heap arrays library.</li>" +
+            "<li><a href=\"http://logging.apache.org/log4j/index.html\">log4j</a> logging library.</li>";
 
         JTextPane pane = new JTextPane();
         pane.setContentType("text/html");

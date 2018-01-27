@@ -6,9 +6,9 @@ import java.awt.image.*;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
-public class NIOBufferImageFactory {
+public class NIOImageFactory {
 
-    private NIOBufferImageFactory() {
+    private NIOImageFactory() {
     }
 
     public static BufferedImage copyImage(BufferedImage bi) {

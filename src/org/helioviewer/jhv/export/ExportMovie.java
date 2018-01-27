@@ -8,8 +8,7 @@ import java.util.concurrent.ExecutorService;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.base.image.MappedImageFactory;
-import org.helioviewer.jhv.base.image.NIOBufferImageFactory;
+import org.helioviewer.jhv.base.image.NIOImageFactory;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -68,9 +67,9 @@ public class ExportMovie implements FrameListener {
         }
 
         try {
-            BufferedImage screen = MappedImageFactory.createCompatible(grabber.w, exporter.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
-            grabber.renderFrame(camera, gl, MappedImageFactory.getByteBuffer(screen));
-            BufferedImage eve = EVEImage == null ? null : NIOBufferImageFactory.copyImage(EVEImage);
+            BufferedImage screen = NIOImageFactory.createCompatible(grabber.w, exporter.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+            grabber.renderFrame(camera, gl, NIOImageFactory.getByteBuffer(screen));
+            BufferedImage eve = EVEImage == null ? null : NIOImageFactory.copyImage(EVEImage);
             encodeExecutor.execute(new FrameConsumer(exporter, screen, grabber.h, eve, EVEMovieLinePosition));
         } catch (Exception e) {
             e.printStackTrace();
@@ -180,9 +179,9 @@ public class ExportMovie implements FrameListener {
             try {
                 ExportUtils.pasteCanvases(mainImage, frameH, eveImage, movieLinePosition, movieExporter.getHeight());
                 if (eveImage != null)
-                    NIOBufferImageFactory.free(eveImage);
+                    NIOImageFactory.free(eveImage);
                 movieExporter.encode(mainImage);
-                MappedImageFactory.free(mainImage);
+                NIOImageFactory.free(mainImage);
             } catch (Exception e) {
                 e.printStackTrace();
             }
