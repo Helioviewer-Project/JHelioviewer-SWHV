@@ -26,12 +26,7 @@ public class InteractionRotate extends Interaction {
 
         Vec3 currentRotationEndPoint = CameraHelper.getVectorFromSphereTrackball(camera, Displayer.getActiveViewport(), e.getX(), e.getY());
         camera.rotateCurrentDragRotation(Quat.calcRotation(currentRotationStartPoint, currentRotationEndPoint));
-        Displayer.render(0.5);
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        Displayer.render(1);
+        Displayer.display();
     }
 
 }

@@ -27,12 +27,7 @@ public class InteractionAxis extends Interaction {
         Vec3 currentRotationEndPoint = CameraHelper.getVectorFromSphereTrackball(camera, Displayer.getActiveViewport(), e.getX(), e.getY());
         Vec3 axis = Displayer.getUpdateViewpoint() == UpdateViewpoint.equatorial ? Vec3.ZAxis : Vec3.YAxis;
         camera.rotateCurrentDragRotation(Quat.calcRotation(currentRotationStartPoint, currentRotationEndPoint).twist(axis));
-        Displayer.render(0.5);
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        Displayer.render(1);
+        Displayer.display();
     }
 
 }

@@ -30,12 +30,7 @@ public class InteractionPan extends Interaction {
         Vec2 pan = camera.getCurrentTranslation();
         double m = 2. * camera.getWidth() / Displayer.getActiveViewport().height;
         camera.setCurrentTranslation(pan.x + x * m, pan.y - y * m);
-        Displayer.render(0.5);
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        Displayer.render(1);
+        Displayer.display();
     }
 
 }
