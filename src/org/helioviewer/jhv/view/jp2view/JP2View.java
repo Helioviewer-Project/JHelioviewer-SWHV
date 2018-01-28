@@ -21,9 +21,9 @@ import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
+import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.view.AbstractView;
-import org.helioviewer.jhv.view.ViewROI;
 import org.helioviewer.jhv.view.jp2view.cache.CacheStatus;
 import org.helioviewer.jhv.view.jp2view.cache.CacheStatusLocal;
 import org.helioviewer.jhv.view.jp2view.cache.CacheStatusRemote;
@@ -369,25 +369,13 @@ public class JP2View extends AbstractView {
         } else {
             MetaData m = metaData[frame];
             Region mr = m.getPhysicalRegion();
-            Region r = ViewROI.updateROI(camera, vp, m);
-
             double ratio = 2 * camera.getWidth() / vp.height;
             int totalHeight = (int) (mr.height / ratio + .5);
 
             res = cacheStatus.getResolutionSet(frame).getNextResolutionLevel(totalHeight, totalHeight);
+            subImage = new SubImage(0, 0, res.width, res.height, res.width, res.height);
 
-            double currentMeterPerPixel = mr.width / res.width;
-            int imageWidth = (int) Math.ceil(r.width / currentMeterPerPixel); // +1 account for floor ??
-            int imageHeight = (int) Math.ceil(r.height / currentMeterPerPixel);
-
-            double posX = (r.ulx - mr.ulx) / mr.width * res.width;
-            double posY = (r.uly - mr.uly) / mr.height * res.height;
-            int imagePositionX = (int) Math.floor(+posX);
-            int imagePositionY = (int) Math.floor(-posY);
-
-            subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, res.width, res.height);
-
-            int maxDim = Math.max(subImage.width, subImage.height);
+            int maxDim = Math.max(vp.width * GLInfo.pixelScale[0], vp.height * GLInfo.pixelScale[1]);
             double adj = 1;
             if (maxDim > JHVGlobals.hiDpiCutoff && Movie.isPlaying()) {
                 adj = JHVGlobals.hiDpiCutoff / (double) maxDim;
