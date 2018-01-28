@@ -9,6 +9,8 @@ import java.util.concurrent.TimeUnit;
 //import java.util.logging.Level;
 //import java.util.logging.Logger;
 
+import javax.annotation.Nonnull;
+
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.log.Log;
 
@@ -89,7 +91,7 @@ class NetClientRemote implements NetClient {
 
     private static class LoggingInterceptor implements Interceptor {
         @Override
-        public Response intercept(Chain chain) throws IOException {
+        public Response intercept(@Nonnull Chain chain) throws IOException {
             long t1 = System.nanoTime();
             Request r1 = chain.request();
             Log.info(String.format("Sending request %s on %s%n%s", r1.url(), chain.connection(), r1.headers()));

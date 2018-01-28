@@ -72,7 +72,7 @@ class BandOptionPanel extends JPanel {
                 } catch (Exception ex) {
                     Log.error("Failed to write JSON: " + ex);
                 }
-            }).run();
+            }).start();
         });
         add(downloadButton, c);
 

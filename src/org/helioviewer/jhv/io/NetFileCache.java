@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
 
+import javax.annotation.Nonnull;
+
 import org.helioviewer.jhv.JHVGlobals;
 
 import com.google.common.cache.CacheBuilder;
@@ -18,7 +20,7 @@ public class NetFileCache {
     private static final LoadingCache<URI, URI> cache = CacheBuilder.newBuilder().maximumSize(512).
         build(new CacheLoader<URI, URI>() {
             @Override
-            public URI load(URI uri) throws IOException {
+            public URI load(@Nonnull URI uri) throws IOException {
                 File f = File.createTempFile("jhv", null, JHVGlobals.FileCacheDir);
                 try (NetClient nc = NetClient.of(uri, false, NetClient.NetCache.BYPASS); BufferedSink sink = Okio.buffer(Okio.sink(f))) {
                     sink.writeAll(nc.getSource());
