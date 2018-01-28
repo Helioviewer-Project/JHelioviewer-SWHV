@@ -203,7 +203,7 @@ public class GridLayer extends AbstractLayer {
         float w = (float) vp.aspect;
         float h = 1;
         TextRenderer renderer = GLText.getRenderer(size);
-        float textScaleFactor = textScale / renderer.getFont().getSize2D() / 3 * vp.width / 2048;
+        float textScaleFactor = textScale / renderer.getFont().getSize2D() * w / GridMath.FLAT_STEPS_THETA * 5;
 
         renderer.begin3DRendering();
         {
