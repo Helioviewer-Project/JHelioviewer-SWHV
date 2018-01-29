@@ -53,7 +53,7 @@ class JCodecExporter implements MovieExporter {
         // Add video track to muxer
         outTrack = muxer.addTrack(TrackType.VIDEO, fps);
         // Allocate a buffer big enough to hold output frames
-        long length = width * height * 6;
+        long length = 6L * width * height;
         lbuffer = new LBuffer(length);
         _out = lbuffer.toDirectByteBuffer(0, (int) length).order(ByteOrder.nativeOrder());
         // Create an instance of encoder
