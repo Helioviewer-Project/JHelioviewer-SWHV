@@ -24,11 +24,14 @@ public class Interaction implements MouseListener, KeyListener {
         float r = e.getRotation()[1];
         if (r == 0)
             return;
-
-        camera.zoom(-Displayer.CAMERA_ZOOM_MULTIPLIER_WHEEL * r);
-
-        Displayer.render(0.5);
-        wheelTimer.restart();
+        else {
+            camera.zoom(-Displayer.CAMERA_ZOOM_MULTIPLIER_WHEEL * r);
+            if (r > 0) {
+                Displayer.render(0.5);
+                wheelTimer.restart();
+            } else
+                Displayer.display();
+        }
     }
 
     @Override
