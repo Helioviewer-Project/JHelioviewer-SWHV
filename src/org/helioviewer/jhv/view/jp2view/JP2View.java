@@ -21,7 +21,6 @@ import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
-import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.view.AbstractView;
 import org.helioviewer.jhv.view.jp2view.cache.CacheStatus;
@@ -375,20 +374,10 @@ public class JP2View extends AbstractView {
             res = cacheStatus.getResolutionSet(frame).getNextResolutionLevel(totalHeight, totalHeight);
             subImage = new SubImage(0, 0, res.width, res.height, res.width, res.height);
 
-            int maxDim = Math.max(vp.width * GLInfo.pixelScale[0], vp.height * GLInfo.pixelScale[1]);
+            int maxDim = Math.max(res.width, res.height);
             double adj = 1;
             if (maxDim > JHVGlobals.hiDpiCutoff && Movie.isPlaying()) {
-                adj = JHVGlobals.hiDpiCutoff / (double) maxDim;
-                if (adj > 0.5)
-                    adj = 1;
-                else if (adj > 0.25)
-                    adj = 0.5;
-                else if (adj > 0.125)
-                    adj = 0.25;
-                else if (adj > 0.0625)
-                    adj = 0.125;
-                else if (adj > 0.03125)
-                    adj = 0.0625;
+                adj = 0.5;
             }
             factor = Math.min(factor, adj);
         }

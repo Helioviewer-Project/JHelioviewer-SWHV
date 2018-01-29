@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.view.jp2view;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
 import kdu_jni.KduException;
@@ -55,20 +54,18 @@ class J2KRender implements Runnable {
         int numComponents = viewRef.getNumComponents(frame);
 
         Kdu_ilayer_ref ilayer;
-        Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
-
         if (numComponents < 3) {
             // alpha tbd
-            ilayer = compositor.Add_primitive_ilayer(frame, firstComponent, Kdu_global.KDU_WANT_CODESTREAM_COMPONENTS, dimsRef1, dimsRef2);
+            ilayer = compositor.Add_primitive_ilayer(frame, firstComponent, Kdu_global.KDU_WANT_CODESTREAM_COMPONENTS, new Kdu_dims(), new Kdu_dims());
         } else {
-            ilayer = compositor.Add_ilayer(frame, dimsRef1, dimsRef2);
+            ilayer = compositor.Add_ilayer(frame, new Kdu_dims(), new Kdu_dims());
         }
 
         compositor.Set_scale(false, false, false, 1f / (1 << params.resolution.level), (float) params.factor);
         Kdu_dims requestedRegion = jhvToKdu_dims(subImage.x, subImage.y, subImage.width, subImage.height);
         compositor.Set_buffer_surface(requestedRegion);
 
-        Kdu_compositor_buf compositorBuf = compositor.Get_composition_buffer(new Kdu_dims());
+        Kdu_compositor_buf compositorBuf = compositor.Get_composition_buffer(new Kdu_dims(), true);
         Kdu_dims actualRenderedRegion = compositorBuf.Get_rendering_region();
 
         // avoid gc
@@ -77,13 +74,13 @@ class J2KRender implements Runnable {
         Kdu_coords actualSize = actualRenderedRegion.Access_size();
         int aWidth = actualSize.Get_x(), aHeight = actualSize.Get_y();
 
-        ByteBuffer byteBuffer = null;
-        IntBuffer intBuffer = null;
+        int[] intBuffer = null;
+        byte[] byteBuffer = null;
 
         if (numComponents < 3) {
-            byteBuffer = ByteBuffer.allocate(aWidth * aHeight).order(ByteOrder.nativeOrder());
+            byteBuffer = new byte[aWidth * aHeight];
         } else {
-            intBuffer = ByteBuffer.allocate(4 * aWidth * aHeight).order(ByteOrder.nativeOrder()).asIntBuffer();
+            intBuffer = new int[aWidth * aHeight];
         }
 
         int[] intArray = localArray.get();
@@ -117,15 +114,13 @@ class J2KRender implements Runnable {
                 if (numComponents < 3) {
                     for (int row = 0, srcIdx = 0; row < height; row++, dstIdx += aWidth, srcIdx += newWidth) {
                         for (int col = 0; col < newWidth; ++col) {
-                            byteBuffer.put(dstIdx + col, (byte) (intArray[srcIdx + col] & 0xFF));
+                            byteBuffer[dstIdx + col] = (byte) (intArray[srcIdx + col] & 0xFF);
                         }
                     }
                 } else {
                     for (int row = 0, srcIdx = 0; row < height; row++, dstIdx += aWidth, srcIdx += newWidth) {
-                        intBuffer.position(dstIdx);
-                        intBuffer.put(intArray, srcIdx, newWidth);
+                        System.arraycopy(intArray, srcIdx, intBuffer, dstIdx, newWidth);
                     }
-                    intBuffer.rewind();
                 }
                 theOffset.Set_y(yOff + height);
             }
@@ -136,9 +131,9 @@ class J2KRender implements Runnable {
 
         ImageData data;
         if (numComponents < 3) {
-            data = new Single8ImageData(aWidth, aHeight, byteBuffer);
+            data = new Single8ImageData(aWidth, aHeight, ByteBuffer.wrap(byteBuffer));
         } else {
-            data = new ARGBInt32ImageData(aWidth, aHeight, intBuffer);
+            data = new ARGBInt32ImageData(aWidth, aHeight, IntBuffer.wrap(intBuffer));
         }
         viewRef.setDataFromRender(params, data);
     }
