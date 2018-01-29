@@ -22,9 +22,7 @@ public class Interaction implements MouseListener, KeyListener {
     @Override
     public void mouseWheelMoved(MouseEvent e) {
         float r = e.getRotation()[1];
-        if (r == 0)
-            return;
-        else {
+        if (r != 0) {
             camera.zoom(-Displayer.CAMERA_ZOOM_MULTIPLIER_WHEEL * r);
             if (r > 0) {
                 Displayer.render(0.5);
