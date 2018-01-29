@@ -57,14 +57,6 @@ public class CameraHelper {
         return -2. * ((screenY - vp.yAWT) / vp.height - 0.5);
     }
 
-    public static double deNormalizeX(Viewport vp, double normalizedX) {
-        return 0.5 * vp.width * (1 + normalizedX) + vp.x;
-    }
-
-    public static double deNormalizeY(Viewport vp, double normalizedY) {
-        return 0.5 * vp.height * (1 - normalizedY) + vp.yAWT;
-    }
-
     public static double computeUpX(Camera camera, Viewport vp, double screenX) {
         double width = camera.getWidth();
         Vec2 translation = camera.getCurrentTranslation();

@@ -65,23 +65,6 @@ public class CommandLine {
     }
 
     /**
-     * Checks whether a specific option is set
-     * 
-     * @param option
-     *            option which to check for
-     * @return true if the option was given as a command line argument, false
-     *         else
-     */
-    public static boolean isOptionSet(String option) {
-        for (String arg : arguments) {
-            if (arg.equals(option)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Method that looks for options in the command line.
      * 
      * @param param
