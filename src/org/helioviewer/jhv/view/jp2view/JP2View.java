@@ -375,11 +375,9 @@ public class JP2View extends AbstractView {
             subImage = new SubImage(0, 0, res.width, res.height, res.width, res.height);
 
             int maxDim = Math.max(res.width, res.height);
-            double adj = 1;
             if (maxDim > JHVGlobals.hiDpiCutoff && Movie.isPlaying()) {
-                adj = 0.5;
+                factor = Math.min(factor, 0.5);
             }
-            factor = Math.min(factor, adj);
         }
 
         int level = res.level;
