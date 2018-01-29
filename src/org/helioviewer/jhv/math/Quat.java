@@ -25,10 +25,6 @@ public class Quat {
         return new Quat(Math.cos(halfAngle), v.x * m, v.y * m, v.z * m);
     }
 
-    public static Quat createRotationAxis(double angle, Quat q) {
-        return createRotation(angle, q.u);
-    }
-
     public Quat(double ax, double ay, double az) {
         ax /= 2.;
         ay /= 2.;
