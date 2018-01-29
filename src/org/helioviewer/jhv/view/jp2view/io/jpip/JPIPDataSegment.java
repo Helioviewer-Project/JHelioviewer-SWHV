@@ -1,5 +1,9 @@
 package org.helioviewer.jhv.view.jp2view.io.jpip;
 
+import java.nio.ByteBuffer;
+
+import com.google.common.primitives.Shorts;
+
 /**
  * 
  * The class <code>JpipDataSegment</code> is used to construct objects to store
@@ -39,6 +43,54 @@ public class JPIPDataSegment {
 
     // Indicates if this segment is a End Of Response message
     public boolean isEOR;
+
+    public ByteBuffer toBuffer() {
+        ByteBuffer buffer = ByteBuffer.allocate(2 + 1 + 2 + 2 + 2 + length + 1);
+
+        buffer.putShort(Shorts.checkedCast(binID));
+        // buffer.putLong(aux); don't need
+        buffer.put((byte) classID.kakaduClassID); // fits surely
+        buffer.putShort(Shorts.checkedCast(codestreamID));
+        buffer.putShort(Shorts.checkedCast(offset));
+        buffer.putShort(Shorts.checkedCast(length));
+        if (length != 0)
+            buffer.put(data);
+
+        byte flags = 0;
+        if (isFinal)
+            flags += 1;
+        if (isEOR)
+            flags += 2;
+        buffer.put(flags);
+        buffer.rewind();
+
+        return buffer;
+    }
+
+    public void fromBuffer(ByteBuffer buffer) {
+        binID = buffer.getShort();
+
+        int classId = buffer.get();
+        for (JPIPDatabinClass idEnum : JPIPDatabinClass.values())
+            if (classId == idEnum.kakaduClassID) {
+                classID = idEnum;
+                break;
+            }
+
+        codestreamID = buffer.getShort();
+        offset = buffer.getShort();
+        length = buffer.getShort();
+        if (length > 0) {
+            data = new byte[length];
+            buffer.get(data);
+        }
+
+        byte flags = buffer.get();
+        if ((flags & 1) != 0)
+            isFinal = true;
+        if ((flags & 2) != 0)
+            isEOR = true;
+    }
 
     // Returns a string representation of the JPIP data segment
     @Override
