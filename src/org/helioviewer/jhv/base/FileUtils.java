@@ -68,7 +68,7 @@ public class FileUtils {
         }
 
         File tempDir = Files.createTempDirectory(parent.toPath(), name).toFile();
-        File lock = new File(tempDir.toString() + suffix);
+        File lock = new File(tempDir + suffix);
         lock.createNewFile();
         lock.deleteOnExit();
 

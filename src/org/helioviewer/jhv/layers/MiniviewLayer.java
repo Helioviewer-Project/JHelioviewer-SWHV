@@ -27,8 +27,8 @@ public class MiniviewLayer extends AbstractLayer {
     private static final int MAX_SCALE = 15;
     private int scale = 10;
 
-    private static final float[] colorCircle = new float[] { 1 * 0.2f, 0, 0, 0.2f };
-    private static final float[] colorRectangle = new float[] { 0, 1 * 0.2f, 0, 0.2f };
+    private static final float[] colorCircle = { 1 * 0.2f, 0, 0, 0.2f };
+    private static final float[] colorRectangle = { 0, 1 * 0.2f, 0, 0.2f };
     private static final GLShape circle = new GLShape();
     private static final GLShape rectangle = new GLShape();
 

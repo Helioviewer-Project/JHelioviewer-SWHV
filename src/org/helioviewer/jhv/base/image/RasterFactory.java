@@ -32,7 +32,7 @@ public interface RasterFactory {
      */
     final class GenericRasterFactory implements RasterFactory {
         @Override
-        public WritableRaster createRaster(final SampleModel model, final DataBuffer buffer, final Point origin) {
+        public WritableRaster createRaster(SampleModel model, DataBuffer buffer, Point origin) {
             return new GenericWritableRaster(model, buffer, origin);
         }
     }
@@ -42,7 +42,7 @@ public interface RasterFactory {
      * Callers must catch {@link LinkageError}.
      */
     final class SunRasterFactory implements RasterFactory {
-        final private Constructor<WritableRaster> factoryMethod = getFactoryMethod();
+        private final Constructor<WritableRaster> factoryMethod = getFactoryMethod();
 
         @SuppressWarnings("unchecked")
         private static Constructor<WritableRaster> getFactoryMethod() {
@@ -62,7 +62,7 @@ public interface RasterFactory {
         }
 
         @Override
-        public WritableRaster createRaster(final SampleModel model, final DataBuffer buffer, final Point origin) {
+        public WritableRaster createRaster(SampleModel model, DataBuffer buffer, Point origin) {
             try {
                 return factoryMethod.newInstance(model, buffer, origin);
             } catch (InstantiationException | IllegalAccessException e) {

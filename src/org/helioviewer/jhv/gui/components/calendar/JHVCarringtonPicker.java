@@ -34,6 +34,7 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener {
     public JHVCarringtonPicker() {
         setLayout(new BorderLayout());
 
+        crPopupButton.setToolTipText("Select Carrington rotation");
         crPopupButton.addFocusListener(this);
         crPopupButton.addActionListener(e -> {
             if (crPopup == null) {

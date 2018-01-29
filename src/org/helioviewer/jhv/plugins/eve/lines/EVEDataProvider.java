@@ -34,9 +34,8 @@ public class EVEDataProvider implements BandDataProvider {
             end += 7 * TimeUtils.DAY_IN_MILLIS;
 
             ArrayList<Interval> intervals = getIntervals(band, start, end);
-            if (intervals.size() == 0)
-                return;
-            addDownloads(band, intervals);
+            if (!intervals.isEmpty())
+                addDownloads(band, intervals);
         }
     }
 

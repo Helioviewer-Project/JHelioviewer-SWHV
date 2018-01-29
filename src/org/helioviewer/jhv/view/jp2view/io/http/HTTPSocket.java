@@ -22,8 +22,8 @@ public class HTTPSocket {
 
     private final Socket socket;
 
-    private int lastUsedPort;
-    private String lastUsedHost;
+    private final int lastUsedPort;
+    private final String lastUsedHost;
 
     protected final InputStream inputStream;
     private final OutputStream outputStream;
