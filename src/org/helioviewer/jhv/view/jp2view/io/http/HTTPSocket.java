@@ -22,8 +22,8 @@ public class HTTPSocket {
 
     private final Socket socket;
 
-    private final int lastUsedPort;
-    private final String lastUsedHost;
+    protected final int lastUsedPort;
+    protected final String lastUsedHost;
 
     protected final InputStream inputStream;
     private final OutputStream outputStream;
@@ -77,14 +77,6 @@ public class HTTPSocket {
 
     public boolean isClosed() {
         return socket.isClosed();
-    }
-
-    protected int getPort() {
-        return lastUsedPort;
-    }
-
-    protected String getHost() {
-        return lastUsedHost;
     }
 
 }
