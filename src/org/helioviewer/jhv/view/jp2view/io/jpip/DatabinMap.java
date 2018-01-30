@@ -7,7 +7,7 @@ import java.util.Map;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduConstants;
 
 @SuppressWarnings("serial")
-class DatabinMap {
+public class DatabinMap {
 
     private static final Map<Integer, Integer> classMap = Collections.unmodifiableMap(new HashMap<Integer, Integer>() {{
         put(JPIPConstants.PRECINCT_DATA_BIN_CLASS, KakaduConstants.KDU_PRECINCT_DATABIN);
@@ -17,7 +17,7 @@ class DatabinMap {
         put(JPIPConstants.META_DATA_BIN_CLASS, KakaduConstants.KDU_META_DATABIN);
     }});
 
-    static Integer getKlass(int classID) {
+    public static Integer getKlass(int classID) {
         return classMap.get(classID);
     }
 

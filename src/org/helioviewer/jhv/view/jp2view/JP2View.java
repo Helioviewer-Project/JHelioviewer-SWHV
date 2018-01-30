@@ -28,8 +28,8 @@ import org.helioviewer.jhv.view.jp2view.cache.CacheStatusLocal;
 import org.helioviewer.jhv.view.jp2view.cache.CacheStatusRemote;
 import org.helioviewer.jhv.view.jp2view.image.ImageParams;
 import org.helioviewer.jhv.view.jp2view.image.ResolutionSet.ResolutionLevel;
+import org.helioviewer.jhv.view.jp2view.io.jpip.DatabinMap;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPConstants;
-import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPDatabinClass;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPResponse;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPQuery;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPSocket;
@@ -104,6 +104,8 @@ public class JP2View extends AbstractView {
         }
     }
 
+    private static final int mainHeaderKlass = DatabinMap.getKlass(JPIPConstants.MAIN_HEADER_DATA_BIN_CLASS);
+
     private void initRemote(JHV_Kdu_cache cache) throws JHV_KduException {
         try {
             // Connect to the JPIP server and add the necessary initial data (the main header as well as the metadata) to cache
@@ -115,11 +117,11 @@ public class JP2View extends AbstractView {
                 res = socket.send(req, cache);
             } while (!res.isResponseComplete());
 
-            if (!cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0)) {
+            if (!cache.isDataBinCompleted(mainHeaderKlass, 0, 0)) {
                 req = JPIPQuery.create(JPIPConstants.MIN_REQUEST_LEN, "stream", "0");
                 do {
                     res = socket.send(req, cache);
-                } while (!res.isResponseComplete() && !cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0));
+                } while (!res.isResponseComplete() && !cache.isDataBinCompleted(mainHeaderKlass, 0, 0));
             }
 
             // prime first image
