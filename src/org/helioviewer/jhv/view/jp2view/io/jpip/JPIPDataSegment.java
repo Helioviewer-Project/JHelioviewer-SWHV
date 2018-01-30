@@ -45,16 +45,18 @@ public class JPIPDataSegment {
     public boolean isEOR;
 
     public ByteBuffer toBuffer() {
-        ByteBuffer buffer = ByteBuffer.allocate(2 + 1 + 2 + 2 + 2 + length + 1);
+        ByteBuffer buffer = ByteBuffer.allocate(length + 10);
 
         buffer.putShort(Shorts.checkedCast(binID));
         // buffer.putLong(aux); don't need
-        buffer.put((byte) classID.kakaduClassID); // fits surely
         buffer.putShort(Shorts.checkedCast(codestreamID));
         buffer.putShort(Shorts.checkedCast(offset));
         buffer.putShort(Shorts.checkedCast(length));
-        if (length != 0)
+
+        if (length > 0)
             buffer.put(data);
+
+        buffer.put((byte) classID.kakaduClassID); // fits surely
 
         byte flags = 0;
         if (isFinal)
@@ -69,21 +71,21 @@ public class JPIPDataSegment {
 
     public void fromBuffer(ByteBuffer buffer) {
         binID = buffer.getShort();
-
-        int classId = buffer.get();
-        for (JPIPDatabinClass idEnum : JPIPDatabinClass.values())
-            if (classId == idEnum.kakaduClassID) {
-                classID = idEnum;
-                break;
-            }
-
         codestreamID = buffer.getShort();
         offset = buffer.getShort();
         length = buffer.getShort();
+
         if (length > 0) {
             data = new byte[length];
             buffer.get(data);
         }
+
+        int klassID = buffer.get();
+        for (JPIPDatabinClass idEnum : JPIPDatabinClass.values())
+            if (klassID == idEnum.kakaduClassID) {
+                classID = idEnum;
+                break;
+            }
 
         byte flags = buffer.get();
         if ((flags & 1) != 0)
