@@ -37,7 +37,7 @@ public class JPIPResponse {
     }
 
     /** The last class identifier read. */
-    private long classId = 0;
+    private int classID = 0;
 
     /** The last code-stream index read. */
     private long codestream = 0;
@@ -110,24 +110,21 @@ public class JPIPResponse {
             if (m == 0)
                 throw new ProtocolException("Invalid Bin-ID value format");
             if (m >= 2) {
-                classId = readVBAS(in);
+                classID = (int) readVBAS(in);
                 if (m > 2)
                     codestream = readVBAS(in);
             }
             seg.codestreamID = codestream;
 
-            for (JPIPDatabinClass idEnum : JPIPDatabinClass.values())
-                if (classId == idEnum.standardClassID) {
-                    seg.classID = idEnum;
-                    break;
-                }
-            if (seg.classID == null)
+            Integer klassID = DatabinMap.getKlass(classID);
+            if (klassID == null)
                 throw new ProtocolException("Invalid databin classID");
+            seg.klassID = klassID;
 
             seg.offset = (int) readVBAS(in);
             seg.length = (int) readVBAS(in);
 
-            if (classId == JPIPConstants.EXTENDED_PRECINCT_DATA_BIN_CLASS || classId == JPIPConstants.EXTENDED_TILE_DATA_BIN_CLASS)
+            if (classID == JPIPConstants.EXTENDED_PRECINCT_DATA_BIN_CLASS || classID == JPIPConstants.EXTENDED_TILE_DATA_BIN_CLASS)
                 seg.aux = readVBAS(in);
         }
 

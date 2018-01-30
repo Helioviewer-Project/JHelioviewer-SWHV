@@ -24,7 +24,7 @@ public class JHV_Kdu_cache extends Kdu_cache implements JPIPCache {
     @Override
     public void addJPIPDataSegment(JPIPDataSegment data) throws IOException {
         try {
-            Add_to_databin(data.classID.kakaduClassID, data.codestreamID, data.binID, data.data, data.offset, data.length, data.isFinal, true, false);
+            Add_to_databin(data.klassID, data.codestreamID, data.binID, data.data, data.offset, data.length, data.isFinal, true, false);
         } catch (KduException e) {
             throw new IOException("Internal Kakadu error: " + e.getMessage(), e);
         }
