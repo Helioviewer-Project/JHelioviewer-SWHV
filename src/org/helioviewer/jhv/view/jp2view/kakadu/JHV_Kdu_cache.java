@@ -7,14 +7,13 @@ import kdu_jni.Kdu_cache;
 
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPCache;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPDataSegment;
-import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPDatabinClass;
 
 public class JHV_Kdu_cache extends Kdu_cache implements JPIPCache {
 
-    public boolean isDataBinCompleted(JPIPDatabinClass binClass, int streamID, int binID) throws JHV_KduException {
+    public boolean isDataBinCompleted(int klassID, int streamID, int binID) throws JHV_KduException {
         boolean complete[] = new boolean[1];
         try {
-            Get_databin_length(binClass.kakaduClassID, streamID, binID, complete);
+            Get_databin_length(klassID, streamID, binID, complete);
         } catch (KduException e) {
             throw new JHV_KduException("Internal Kakadu error: " + e.getMessage(), e);
         }

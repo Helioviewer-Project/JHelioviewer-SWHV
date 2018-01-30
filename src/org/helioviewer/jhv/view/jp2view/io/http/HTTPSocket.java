@@ -22,8 +22,8 @@ public class HTTPSocket {
 
     private final Socket socket;
 
-    protected final int lastUsedPort;
-    protected final String lastUsedHost;
+    protected final int usedPort;
+    protected final String usedHost;
 
     protected final InputStream inputStream;
     private final OutputStream outputStream;
@@ -38,10 +38,10 @@ public class HTTPSocket {
         socket.setTcpNoDelay(true);
 
         int port = uri.getPort();
-        lastUsedPort = port <= 0 ? PORT : port;
-        lastUsedHost = uri.getHost();
+        usedPort = port <= 0 ? PORT : port;
+        usedHost = uri.getHost();
 
-        socket.connect(new InetSocketAddress(lastUsedHost, lastUsedPort), TIMEOUT_CONNECT);
+        socket.connect(new InetSocketAddress(usedHost, usedPort), TIMEOUT_CONNECT);
 
         inputStream = new BufferedInputStream(socket.getInputStream(), 65536);
         outputStream = socket.getOutputStream();
