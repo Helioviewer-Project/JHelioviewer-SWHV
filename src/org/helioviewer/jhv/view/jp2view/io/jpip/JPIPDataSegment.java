@@ -24,7 +24,7 @@ public class JPIPDataSegment {
     public long aux;
 
     // The data-bin class identifier
-    public JPIPDatabinClass classID;
+    public int klassID;
 
     // The code-stream index
     public long codestreamID;
@@ -56,7 +56,7 @@ public class JPIPDataSegment {
         if (length > 0)
             buffer.put(data);
 
-        buffer.put((byte) classID.kakaduClassID); // fits surely
+        buffer.put((byte) klassID); // fits surely
 
         byte flags = 0;
         if (isFinal)
@@ -80,12 +80,7 @@ public class JPIPDataSegment {
             buffer.get(data);
         }
 
-        int klassID = buffer.get();
-        for (JPIPDatabinClass idEnum : JPIPDatabinClass.values())
-            if (klassID == idEnum.kakaduClassID) {
-                classID = idEnum;
-                break;
-            }
+        klassID = buffer.get();
 
         byte flags = buffer.get();
         if ((flags & 1) != 0)
@@ -101,7 +96,7 @@ public class JPIPDataSegment {
         if (isEOR)
             res += "EOR id=" + binID + " len=" + length;
         else {
-            res += "class=" + classID.jpipString + " stream=" + codestreamID;
+            res += "class=" + klassID + " stream=" + codestreamID;
             res += " id=" + binID + " off=" + offset + " len=" + length;
             if (isFinal)
                 res += " final";
