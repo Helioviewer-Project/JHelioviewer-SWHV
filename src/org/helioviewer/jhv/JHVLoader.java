@@ -24,8 +24,8 @@ class JHVLoader {
 
         if (System.getProperty("jhv.os").equals("windows"))
             kduLibs.add(System.mapLibraryName("msvcr120"));
-        kduLibs.add(System.mapLibraryName("kdu_v77R"));
-        kduLibs.add(System.mapLibraryName("kdu_a77R"));
+//        kduLibs.add(System.mapLibraryName("kdu_v77R"));
+//        kduLibs.add(System.mapLibraryName("kdu_a7AR"));
         kduLibs.add(System.mapLibraryName("kdu_jni"));
 
         for (String kduLib : kduLibs) {
