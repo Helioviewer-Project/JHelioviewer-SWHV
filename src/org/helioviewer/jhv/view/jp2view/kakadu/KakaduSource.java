@@ -118,9 +118,9 @@ public class KakaduSource {
         float[] green = new float[lut.length];
         float[] blue = new float[lut.length];
 
-        palette.Get_lut(0, red);
-        palette.Get_lut(1, green);
-        palette.Get_lut(2, blue);
+        palette.Get_lut(0, red, Kdu_global.JP2_CHANNEL_FORMAT_DEFAULT);
+        palette.Get_lut(1, green, Kdu_global.JP2_CHANNEL_FORMAT_DEFAULT);
+        palette.Get_lut(2, blue, Kdu_global.JP2_CHANNEL_FORMAT_DEFAULT);
 
         for (int i = 0; i < lut.length; i++) {
             lut[i] = 0xFF000000 | ((int) ((red[i] + 0.5f) * 0xFF) << 16) | ((int) ((green[i] + 0.5f) * 0xFF) << 8) | ((int) ((blue[i] + 0.5f) * 0xFF));
