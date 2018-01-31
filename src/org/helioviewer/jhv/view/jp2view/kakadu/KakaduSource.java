@@ -4,10 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
+import kdu_jni.Jp2_input_box;
 import kdu_jni.Jp2_palette;
 import kdu_jni.Jp2_threadsafe_family_src;
 import kdu_jni.Jpx_codestream_source;
 import kdu_jni.Jpx_input_box;
+import kdu_jni.Jpx_meta_manager;
+import kdu_jni.Jpx_metanode;
 import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
 import kdu_jni.Kdu_cache;
@@ -21,6 +24,8 @@ import kdu_jni.Kdu_quality_limiter;
 import kdu_jni.Kdu_region_compositor;
 
 import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.view.jp2view.image.ResolutionSet;
 
 public class KakaduSource {
@@ -171,6 +176,23 @@ public class KakaduSource {
         compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
         compositor.Set_thread_env(null, null);
         compositor.Native_destroy();
+    }
+
+    private static final long[] xmlFilter = { Kdu_global.jp2_xml_4cc };
+
+    public void cacheMetaData(MetaData[] metaDataList) throws Exception {
+        Jpx_meta_manager metaManager = jpxSrc.Access_meta_manager();
+        Jpx_metanode node = new Jpx_metanode();
+        int i = 0;
+
+        Jp2_input_box xmlBox = new Jp2_input_box();
+        while ((node = metaManager.Peek_and_clear_touched_nodes(1, xmlFilter, node)).Exists()) {
+            if (node.Open_existing(xmlBox)) {
+                metaDataList[i] = new XMLMetaDataContainer(KakaduMeta.xmlBox2xml(xmlBox)).getHVMetaData(i);
+                xmlBox.Close();
+                i++;
+            }
+        }
     }
 
 }
