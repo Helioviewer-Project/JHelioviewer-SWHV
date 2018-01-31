@@ -2,8 +2,6 @@ package org.helioviewer.jhv.gui.dialogs;
 
 import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -17,10 +15,10 @@ import javax.swing.JTextArea;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.base.XMLUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -133,9 +131,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
 
         try {
             String xml = layer.getView().getXMLMetaData();
-            InputStream in = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
-            Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);
-
+            Document doc = XMLUtils.parse(xml);
             // Send xml data to meta data dialog box
             Node root = doc.getDocumentElement().getElementsByTagName("fits").item(0);
             if (root != null)
