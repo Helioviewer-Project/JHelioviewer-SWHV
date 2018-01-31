@@ -13,16 +13,12 @@ import com.google.common.primitives.Ints;
 
 public class XMLMetaDataContainer implements MetaDataContainer {
 
-    private Element meta;
+    private final Element meta;
 
-    public void parseXML(String xml) throws Exception {
+    public XMLMetaDataContainer(String xml) throws Exception {
         meta = (Element) XMLUtils.parse(xml).getElementsByTagName("meta").item(0);
         if (meta == null)
             throw new Exception("XML metadata without meta tag");
-    }
-
-    public void destroyXML() {
-        meta = null;
     }
 
     private String getValueFromXML(String key) {
@@ -34,6 +30,10 @@ public class XMLMetaDataContainer implements MetaDataContainer {
         if (child instanceof CharacterData)
             return ((CharacterData) child).getData();
         return null;
+    }
+
+    public HelioviewerMetaData getHVMetaData(int i) {
+        return new HelioviewerMetaData(this, i);
     }
 
     @Override

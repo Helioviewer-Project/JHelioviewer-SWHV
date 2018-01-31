@@ -39,14 +39,11 @@ class RadioJP2Data implements ImageDataHandler {
             jp2Width = resLevel.width;
             jp2Height = resLevel.height;
 
-            XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
-
-            hvMetaData.parseXML(_view.getXMLMetaData());
+            XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer(_view.getXMLMetaData());
             endFreq = hvMetaData.getRequiredDouble("STARTFRQ");
             startFreq = hvMetaData.getRequiredDouble("END-FREQ");
             startDate = TimeUtils.parse(hvMetaData.getRequiredString("DATE-OBS"));
             endDate = TimeUtils.parse(hvMetaData.getRequiredString("DATE-END"));
-            hvMetaData.destroyXML();
 
             view = _view;
             view.setDataHandler(this);

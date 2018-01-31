@@ -8,7 +8,6 @@ import kdu_jni.Jp2_locator;
 import kdu_jni.KduException;
 import kdu_jni.Kdu_global;
 
-import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 
@@ -189,7 +188,7 @@ public class KakaduMeta {
             throw new JHV_KduException("Could not find XML box");
     }
 
-    private static String xmlBox2xml(Jp2_input_box xmlBox) throws JHV_KduException {
+    static String xmlBox2xml(Jp2_input_box xmlBox) throws JHV_KduException {
         try {
             int len = (int) xmlBox.Get_remaining_bytes();
             if (len <= 0)
@@ -224,8 +223,6 @@ public class KakaduMeta {
     }
 
     public static void cacheMetaData(Jp2_family_src src, MetaData[] metaDataList) throws Exception {
-        XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
-
         Jp2_input_box xmlBox = new Jp2_input_box();
         Jp2_input_box[] findBoxResult = findBox(src, Kdu_global.jp2_association_4cc, 1);
         Jp2_input_box assocBox = findBoxResult[0];
@@ -233,9 +230,7 @@ public class KakaduMeta {
             for (int i = 0; i < metaDataList.length; i++) {
                 try {
                     if (myFindBox2(xmlBox, assocBox, Kdu_global.jp2_xml_4cc, 1)) {
-                        hvMetaData.parseXML(xmlBox2xml(xmlBox));
-                        metaDataList[i] = new HelioviewerMetaData(hvMetaData, i);
-                        hvMetaData.destroyXML();
+                        metaDataList[i] = new XMLMetaDataContainer(xmlBox2xml(xmlBox)).getHVMetaData(i);
                     }
 
                     xmlBox.Close();
@@ -249,9 +244,7 @@ public class KakaduMeta {
             findBoxResult = findBox(src, Kdu_global.jp2_xml_4cc, 1);
             xmlBox = findBoxResult[0];
             if (xmlBox != null) {
-                hvMetaData.parseXML(xmlBox2xml(xmlBox));
-                metaDataList[0] = new HelioviewerMetaData(hvMetaData, 0);
-                hvMetaData.destroyXML();
+                metaDataList[0] = new XMLMetaDataContainer(xmlBox2xml(xmlBox)).getHVMetaData(0);
             }
         }
 
@@ -265,32 +258,5 @@ public class KakaduMeta {
             findBoxResult[0].Native_destroy();
         }
     }
-
-/*
-    private static final long[] xmlFilter = { Kdu_global.jp2_xml_4cc };
-
-    public static void cacheMetaData(Jpx_source jpx, MetaData[] metaDataList) throws Exception {
-        XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
-
-        Jpx_meta_manager metaManager = jpx.Access_meta_manager();
-        metaManager.Set_box_filter(1, xmlFilter);
-
-        Jpx_metanode metaNode = new Jpx_metanode();
-        Kdu_dims dims = new Kdu_dims();
-        for (int i = 0; i < metaDataList.length; i++) {
-            metaNode = metaManager.Enumerate_matches(metaNode, -1, i + 1, false, dims, 0);
-            Jpx_metanode xmlNode = metaNode.Get_descendant(0);
-            if (xmlNode.Exists() && xmlNode.Get_box_type() == xmlFilter[0]) {
-                Jp2_input_box xmlBox = new Jp2_input_box();
-                if (xmlNode.Open_existing(xmlBox)) {
-                    hvMetaData.parseXML(xmlBox2xml(xmlBox));
-                    metaDataList[i] = new HelioviewerMetaData(hvMetaData, i);
-                    hvMetaData.destroyXML();
-                    xmlBox.Close();
-                }
-            }
-        }
-    }
-*/
 
 }
