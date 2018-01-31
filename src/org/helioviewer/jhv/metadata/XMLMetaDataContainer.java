@@ -1,12 +1,8 @@
 package org.helioviewer.jhv.metadata;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import org.helioviewer.jhv.base.XMLUtils;
 
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Element;
@@ -20,13 +16,7 @@ public class XMLMetaDataContainer implements MetaDataContainer {
     private Element meta;
 
     public void parseXML(String xml) throws Exception {
-        try (InputStream in = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8))) {
-            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            meta = (Element) builder.parse(in).getElementsByTagName("meta").item(0);
-        } catch (Exception e) {
-            throw new Exception("XML metadata parse failure: ", e);
-        }
-
+        meta = (Element) XMLUtils.parse(xml).getElementsByTagName("meta").item(0);
         if (meta == null)
             throw new Exception("XML metadata without meta tag");
     }
