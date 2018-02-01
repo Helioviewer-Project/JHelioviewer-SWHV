@@ -30,10 +30,10 @@ public class APIRequestManager {
                 if (message != null) {
                     Log.error("Server message for " + jpipRequest + " : " + message);
                     Message.err("Server could not return data", Message.formatMessageString(message), false);
-                } else {
+                }/* else { most likely was cancelled
                     Log.error("Did not find URI in response to " + jpipRequest);
                     Message.err("No data source response", "While quering the data source, the server did not provide an answer.", false);
-                }
+                }*/
             } else {
                 // The server wants to load the data
                 if (message != null) {
