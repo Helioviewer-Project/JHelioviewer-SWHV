@@ -54,9 +54,10 @@
     <!-- JAR file generation -->
     <target name="init" depends="mkdir">
         <echo message="Trying to determine revision"/>
-        <exec executable="svnversion" outputproperty="jhv.revision.tmp" resolveexecutable="true" searchpath="true" resultproperty="jhv.revision.retcode" failifexecutionfails="false">
+        <!-- <exec executable="svnversion" outputproperty="jhv.revision.tmp" resolveexecutable="true" searchpath="true" resultproperty="jhv.revision.retcode" failifexecutionfails="false">
             <arg value="."/>
-        </exec>
+        </exec> -->
+        <property name="jhv.revision.retcode" value="8732"/>
         <loadfile property="jhv.version" srcFile="VERSION"/>
         <property name="jhv.version" value="2.0.0"/>
         <if>
