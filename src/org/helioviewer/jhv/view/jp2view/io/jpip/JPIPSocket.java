@@ -21,6 +21,8 @@ public class JPIPSocket extends HTTPSocket {
     // The jpip channel ID for the connection (persistent)
     private final String jpipChannelID;
 
+    // private int totalLength = 0;
+
     /**
      * The path supplied on the uri line of the HTTP message. Generally for the
      * first request it is the image path in relative terms, but the response
@@ -61,6 +63,7 @@ public class JPIPSocket extends HTTPSocket {
         if (isClosed())
             return;
 
+        // System.out.println(">>> total MB: " + (totalLength / (double) (1024 * 1024)));
         try {
             if (jpipChannelID != null) {
                 send(JPIPQuery.create(0, "cclose", jpipChannelID), null);
@@ -135,6 +138,7 @@ public class JPIPSocket extends HTTPSocket {
         try (InputStream in = input) {
             jpipRes.readSegments(in, cache);
         }
+        // totalLength += transferInput.getTotalLength();
 
         if ("close".equals(res.getHeader("Connection"))) {
             super.close();
