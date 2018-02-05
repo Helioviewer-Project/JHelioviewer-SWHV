@@ -9,8 +9,6 @@ import java.nio.ShortBuffer;
 
 import org.helioviewer.jhv.math.Vec3;
 
-import xerial.larray.buffer.LBuffer;
-
 public class BufferUtils {
 
     public static final float[] colorNull = {0, 0, 0, 0};
@@ -22,7 +20,7 @@ public class BufferUtils {
     public static final float[] colorYellow = {Color.YELLOW.getRed() / 255f, Color.YELLOW.getGreen() / 255f, Color.YELLOW.getBlue() / 255f, 1};
 
     public static ByteBuffer newByteBuffer(int len) {
-        return new LBuffer(len).toDirectByteBuffer(0, len).order(ByteOrder.nativeOrder());
+        return ByteBuffer.allocateDirect(len).order(ByteOrder.nativeOrder());
     }
 
     public static FloatBuffer newFloatBuffer(int len) {
