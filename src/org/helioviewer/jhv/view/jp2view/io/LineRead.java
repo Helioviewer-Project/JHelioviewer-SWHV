@@ -10,7 +10,7 @@ public class LineRead {
     private static final int CR = 13;
     private static final int LF = 10;
 
-    private static byte[] readRawLine(InputStream in) throws IOException {
+    public static String readAsciiLine(InputStream in) throws IOException {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream(64)) {
             int ch;
             while ((ch = in.read()) >= 0) {
@@ -18,21 +18,8 @@ public class LineRead {
                 if (ch == LF)
                     break;
             }
-            return baos.toByteArray();
+            return new String(baos.toByteArray(), StandardCharsets.UTF_8).trim();
         }
-    }
-
-    public static String readAsciiLine(InputStream in) throws IOException {
-        byte[] rawdata = readRawLine(in);
-        int len = rawdata.length;
-        int offset = 0;
-        if (len > 0 && rawdata[len - 1] == LF) {
-            offset++;
-            if (len > 1 && rawdata[len - 2] == CR) {
-                offset++;
-            }
-        }
-        return new String(rawdata, 0, len - offset, StandardCharsets.US_ASCII);
     }
 
     public static void readCRLF(InputStream in) throws IOException {
