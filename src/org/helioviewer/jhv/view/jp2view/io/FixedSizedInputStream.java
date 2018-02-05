@@ -47,12 +47,7 @@ public class FixedSizedInputStream extends TransferInputStream {
 
     @Override
     public int read(@Nonnull byte[] b) throws IOException {
-        if (remainingBytes > 0) {
-            int bytesRead = in.read(b, 0, remainingBytes < b.length ? remainingBytes : b.length);
-            remainingBytes -= bytesRead;
-            return bytesRead;
-        }
-        return -1;
+        return read(b, 0, b.length);
     }
 
 }
