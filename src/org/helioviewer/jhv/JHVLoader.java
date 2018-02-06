@@ -22,10 +22,12 @@ class JHVLoader {
             pathlib = "linux-amd64/";
         }
 
-        if (System.getProperty("jhv.os").equals("windows"))
+        if (System.getProperty("jhv.os").equals("windows")) {
             kduLibs.add(System.mapLibraryName("msvcr120"));
-//        kduLibs.add(System.mapLibraryName("kdu_v77R"));
-//        kduLibs.add(System.mapLibraryName("kdu_a7AR"));
+            kduLibs.add(System.mapLibraryName("msvcp120"));
+            kduLibs.add(System.mapLibraryName("kdu_v7AR"));
+            kduLibs.add(System.mapLibraryName("kdu_a7AR"));
+        }
         kduLibs.add(System.mapLibraryName("kdu_jni"));
 
         for (String kduLib : kduLibs) {
