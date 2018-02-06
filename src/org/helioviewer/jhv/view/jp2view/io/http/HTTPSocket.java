@@ -1,17 +1,17 @@
 package org.helioviewer.jhv.view.jp2view.io.http;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.ProtocolException;
-import java.net.Socket;
 import java.net.URI;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 
-import org.helioviewer.jhv.base.ProxySettings;
+//import org.helioviewer.jhv.base.ProxySettings;
 import org.helioviewer.jhv.base.Regex;
+import org.helioviewer.jhv.view.jp2view.io.ByteChannelInputStream;
 import org.helioviewer.jhv.view.jp2view.io.LineRead;
 
 public class HTTPSocket {
@@ -20,31 +20,30 @@ public class HTTPSocket {
     private static final int TIMEOUT_READ = 30000;
     private static final int PORT = 80;
 
-    private final Socket socket;
+    private final SocketChannel channel;
 
     protected final int usedPort;
     protected final String usedHost;
 
     protected final InputStream inputStream;
-    private final OutputStream outputStream;
 
     protected HTTPSocket(URI uri) throws IOException {
-        socket = new Socket(ProxySettings.proxy);
+        //socket = new Socket(ProxySettings.proxy);
+        channel = SocketChannel.open();
 
-        socket.setReceiveBufferSize(Math.max(262144 * 8, 2 * socket.getReceiveBufferSize()));
-        socket.setTrafficClass(0x10);
-        socket.setSoTimeout(TIMEOUT_READ);
-        socket.setKeepAlive(true);
-        socket.setTcpNoDelay(true);
+        channel.socket().setReceiveBufferSize(Math.max(262144 * 8, 2 * channel.socket().getReceiveBufferSize()));
+        channel.socket().setTrafficClass(0x10);
+        channel.socket().setSoTimeout(TIMEOUT_READ);
+        channel.socket().setKeepAlive(true);
+        channel.socket().setTcpNoDelay(true);
 
         int port = uri.getPort();
         usedPort = port <= 0 ? PORT : port;
         usedHost = uri.getHost();
 
-        socket.connect(new InetSocketAddress(usedHost, usedPort), TIMEOUT_CONNECT);
-
-        inputStream = new BufferedInputStream(socket.getInputStream(), 65536);
-        outputStream = socket.getOutputStream();
+        //socket.connect(new InetSocketAddress(usedHost, usedPort), TIMEOUT_CONNECT);
+        channel.connect(new InetSocketAddress(usedHost, usedPort));
+        inputStream = new ByteChannelInputStream(channel);
     }
 
     protected HTTPMessage recv() throws IOException {
@@ -66,17 +65,16 @@ public class HTTPSocket {
         }
     }
 
-    protected void write(String str) throws IOException {
-        outputStream.write(str.getBytes(StandardCharsets.UTF_8));
+    protected int write(String str) throws IOException {
+        return channel.write(ByteBuffer.wrap(str.getBytes(StandardCharsets.UTF_8)));
     }
 
     protected void close() throws IOException {
-        socket.close();
-        inputStream.close();
+        channel.close();
     }
 
     public boolean isClosed() {
-        return socket.isClosed();
+        return !channel.isOpen();
     }
 
 }

@@ -11,12 +11,10 @@ public class LineRead {
     private static final int LF = 10;
 
     public static String readAsciiLine(InputStream in) throws IOException {
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream(64)) {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream(128)) {
             int ch;
-            while ((ch = in.read()) >= 0) {
+            while ((ch = in.read()) >= 0 && ch != LF) {
                 baos.write(ch);
-                if (ch == LF)
-                    break;
             }
             return new String(baos.toByteArray(), StandardCharsets.UTF_8).trim();
         }

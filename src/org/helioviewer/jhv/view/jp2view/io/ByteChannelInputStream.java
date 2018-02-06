@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 
+import javax.annotation.Nonnull;
+
 public class ByteChannelInputStream extends InputStream {
 
     private final ByteBuffer buf = ByteBuffer.allocateDirect(512 * 1024);
@@ -17,18 +19,18 @@ public class ByteChannelInputStream extends InputStream {
     @Override
     public int read() throws IOException {
         ensure(1);
-        return buf.get() & 0xFF;
+        return (buf.get() + 256) & 0xFF;
     }
 
     @Override
-    public int read(byte[] bytes, int off, int len) throws IOException {
+    public int read(@Nonnull byte[] bytes, int off, int len) throws IOException {
         ensure(len);
         buf.get(bytes, off, len);
         return len;
     }
 
     @Override
-    public int read (byte[] b) throws IOException {
+    public int read(@Nonnull byte[] b) throws IOException {
         return read(b, 0, b.length);
     }
 
