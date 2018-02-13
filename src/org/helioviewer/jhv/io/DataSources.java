@@ -51,6 +51,15 @@ public class DataSources {
                 }
             }));
             /*
+            put("IAS Test", Collections.unmodifiableMap(new HashMap<String, String>() {
+                {
+                    put("API.getDataSources", "https://inf-helio-test-api.ias.u-psud.fr/v2/getDataSources/?verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
+                    put("API.getJP2Image", "https://inf-helio-test-api.ias.u-psud.fr/v2/getJP2Image/?");
+                    put("API.getJPX", "https://inf-helio-test-api.ias.u-psud.fr/v2/getJPX/?");
+                    put("label", "Institut d'Astrophysique Spatiale");
+                    put("schema", "/data/sources_v1.0.json");
+                }
+            }));
             put("GSFC SCI Test", Collections.unmodifiableMap(new HashMap<String, String>() {
                 {
                     put("API.getDataSources", "http://helioviewer.sci.gsfc.nasa.gov/api.php?action=getDataSources&verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
