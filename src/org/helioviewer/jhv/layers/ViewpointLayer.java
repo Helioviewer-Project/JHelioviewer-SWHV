@@ -18,6 +18,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLLine;
 import org.helioviewer.jhv.opengl.GLShape;
 import org.helioviewer.jhv.opengl.GLText;
@@ -60,7 +61,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         double width = camera.getViewpoint().distance * Math.tan(optionsPanel.getFOVAngle());
         computeLine(gl, width);
 
-        double pointFactor = 1 / camera.getFOV();
+        double pointFactor = GLInfo.pixelScale[0] / (2 * camera.getFOV());
 
         gl.glPushMatrix();
         gl.glMultMatrixd(camera.getViewpoint().orientation.toMatrix().transpose().m, 0);
