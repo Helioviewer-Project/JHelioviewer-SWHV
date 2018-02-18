@@ -23,7 +23,7 @@ import org.jcodec.containers.mp4.TrackType;
 import org.jcodec.containers.mp4.muxer.FramesMP4MuxerTrack;
 import org.jcodec.containers.mp4.muxer.MP4Muxer;
 
-import xerial.larray.buffer.LBuffer;
+//import xerial.larray.buffer.LBuffer;
 
 class JCodecExporter implements MovieExporter {
 
@@ -35,7 +35,7 @@ class JCodecExporter implements MovieExporter {
     private ArrayList<ByteBuffer> spsList;
     private ArrayList<ByteBuffer> ppsList;
     private FramesMP4MuxerTrack outTrack;
-    private LBuffer lbuffer;
+//    private LBuffer lbuffer;
     private ByteBuffer _out;
     private int frameNo;
     private MP4Muxer muxer;
@@ -54,8 +54,9 @@ class JCodecExporter implements MovieExporter {
         outTrack = muxer.addTrack(TrackType.VIDEO, fps);
         // Allocate a buffer big enough to hold output frames
         long length = 6L * width * height;
-        lbuffer = new LBuffer(length);
-        _out = lbuffer.toDirectByteBuffer(0, (int) length).order(ByteOrder.nativeOrder());
+//        lbuffer = new LBuffer(length);
+//        _out = lbuffer.toDirectByteBuffer(0, (int) length).order(ByteOrder.nativeOrder());
+        _out = ByteBuffer.allocateDirect((int)length).order(ByteOrder.nativeOrder());
         // Create an instance of encoder
         encoder = new H264Encoder(new JCodecUtils.JHVRateControl(20));
         // Encoder extra data ( SPS, PPS ) to be stored in a special place of MP4
@@ -83,7 +84,7 @@ class JCodecExporter implements MovieExporter {
 
     @Override
     public void close() throws IOException {
-        lbuffer.release();
+//        lbuffer.release();
         // Push saved SPS/PPS to a special storage in MP4
         outTrack.addSampleEntry(H264Utils.createMOVSampleEntry(spsList, ppsList, 4));
         // Write MP4 header and finalize recording
