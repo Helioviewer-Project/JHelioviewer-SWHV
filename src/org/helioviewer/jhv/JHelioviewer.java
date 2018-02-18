@@ -15,6 +15,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.log.LogSettings;
@@ -108,11 +109,16 @@ public class JHelioviewer {
                 e.printStackTrace();
             }
 
-            // set left pane width to fit the viewpoint options
+            // set left pane width to fit max of ViewpointLayer and ImageLayer options width
+            JComponent leftPane = ImageViewerGui.getLeftScrollPane();
             ImageViewerGui.getLayersPanel().setOptionsPanel(Layers.getViewpointLayer());
             frame.pack();
-            JComponent leftPane = ImageViewerGui.getLeftScrollPane();
-            leftPane.setMinimumSize(new Dimension(leftPane.getPreferredSize().width, -1));
+            int viewpointLayerWidth = leftPane.getPreferredSize().width; // wider on Mac
+            ImageLayer dummy = ImageLayer.create(null);
+            frame.pack();
+            int imageLayerWidth = leftPane.getPreferredSize().width; // wider on Windows
+            leftPane.setMinimumSize(new Dimension(Math.max(viewpointLayerWidth, imageLayerWidth), -1));
+            dummy.unload();
 
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
