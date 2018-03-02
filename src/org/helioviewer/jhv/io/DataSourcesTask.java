@@ -43,7 +43,7 @@ public class DataSourcesTask extends JHVWorker<Void, Void> {
             }
 
             try {
-                JSONObject jo = JSONUtils.readJSON(url);
+                JSONObject jo = LoadJSON.of(url);
 /*
                 if (url.contains("helioviewer.org")) {
                     jo.getJSONObject("PROBA2").getJSONObject("children").getJSONObject("SWAP").getJSONObject("children").remove("174");

@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.timelines.band;
 
-import org.helioviewer.jhv.base.JSONUtils;
+import org.helioviewer.jhv.io.LoadJSON;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.timelines.Timelines;
@@ -15,7 +15,7 @@ public class BandTypeTask extends JHVWorker<Void, Void> {
     @Override
     protected Void backgroundWork() {
        try {
-            BandType.loadBandTypes(JSONUtils.readJSON(TimelineSettings.baseURL).getJSONArray("objects"));
+            BandType.loadBandTypes(LoadJSON.of(TimelineSettings.baseURL).getJSONArray("objects"));
         } catch (Exception e) {
             Log.error("Error loading bandtypes", e);
         }

@@ -2,7 +2,6 @@ package org.helioviewer.jhv.io;
 
 import java.net.URI;
 
-import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
@@ -18,7 +17,7 @@ class LoadRequestTask extends LoadURITask {
     @Override
     protected View backgroundWork() {
         try {
-            APIRequest req = APIRequest.fromRequestJson(JSONUtils.readJSON(uri));
+            APIRequest req = APIRequest.fromRequestJson(LoadJSON.of(uri));
             return requestAndOpenRemoteFile(req);
         } catch (Exception e) {
             Log.error("An error occured while opening the remote file: ", e);
