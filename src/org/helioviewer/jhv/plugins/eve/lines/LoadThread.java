@@ -2,6 +2,7 @@ package org.helioviewer.jhv.plugins.eve.lines;
 
 import java.net.URI;
 
+import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.band.Band;
@@ -19,7 +20,7 @@ class LoadThread extends JHVWorker<EVEResponse, Void> {
     @Override
     protected EVEResponse backgroundWork() {
         try {
-            return EVEResponse.get(uri);
+            return new EVEResponse(JSONUtils.readJSON(uri));
         } catch (Exception e) {
             e.printStackTrace();
         }
