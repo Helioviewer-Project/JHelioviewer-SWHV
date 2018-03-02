@@ -8,11 +8,11 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.View;
 
-class LoadJSONTask extends LoadURITask {
+class LoadRequestTask extends LoadURITask {
 
-    LoadJSONTask(ImageLayer _imageLayer, URI _uri) {
+    LoadRequestTask(ImageLayer _imageLayer, URI _uri) {
         super(_imageLayer, _uri);
-        setThreadName("MAIN--LoadJSON");
+        setThreadName("MAIN--LoadRequest");
     }
 
     @Override

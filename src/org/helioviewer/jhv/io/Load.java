@@ -26,7 +26,7 @@ public interface Load {
     class Request implements Load {
         @Override
         public void get(URI uri) {
-            JHVGlobals.getExecutorService().execute(new LoadJSONTask(ImageLayer.create(null), uri));
+            JHVGlobals.getExecutorService().execute(new LoadRequestTask(ImageLayer.create(null), uri));
         }
     }
 
