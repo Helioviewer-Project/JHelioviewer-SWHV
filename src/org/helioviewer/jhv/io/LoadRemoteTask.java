@@ -7,7 +7,7 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.View;
 
-public class LoadRemoteTask extends LoadURITask {
+public class LoadRemoteTask extends LoadViewTask {
 
     private final APIRequest req;
 

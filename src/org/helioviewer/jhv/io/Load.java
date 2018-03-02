@@ -5,6 +5,7 @@ import java.net.URI;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
+import org.helioviewer.jhv.view.AbstractView;
 
 public interface Load {
 
@@ -19,7 +20,11 @@ public interface Load {
     class Image implements Load {
         @Override
         public void get(URI uri) {
-            LoadURITask.get(uri);
+            String scheme = uri.getScheme();
+            ImageLayer layer = ImageLayer.create(null);
+            JHVGlobals.getExecutorService().execute("http".equals(scheme) || "https".equals(scheme) ?
+                new DownloadViewTask(layer, new AbstractView(uri, null)) :
+                new LoadViewTask(layer, uri));
         }
     }
 

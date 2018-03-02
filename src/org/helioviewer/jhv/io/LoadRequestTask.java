@@ -7,7 +7,7 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.View;
 
-class LoadRequestTask extends LoadURITask {
+class LoadRequestTask extends LoadViewTask {
 
     LoadRequestTask(ImageLayer _imageLayer, URI _uri) {
         super(_imageLayer, _uri);
