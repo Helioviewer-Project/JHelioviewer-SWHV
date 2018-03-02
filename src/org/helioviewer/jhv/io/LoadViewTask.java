@@ -4,31 +4,21 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Locale;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVWorker;
-import org.helioviewer.jhv.view.AbstractView;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.fitsview.FITSView;
 import org.helioviewer.jhv.view.jp2view.JP2View;
 import org.helioviewer.jhv.view.simpleimageview.SimpleImageView;
 
-class LoadURITask extends JHVWorker<View, Void> {
+class LoadViewTask extends JHVWorker<View, Void> {
 
     private final ImageLayer imageLayer;
     protected final URI uri;
 
-    static void get(URI _uri) {
-        String scheme = _uri.getScheme();
-        ImageLayer layer = ImageLayer.create(null);
-        JHVGlobals.getExecutorService().execute("http".equals(scheme) || "https".equals(scheme) ?
-            new DownloadViewTask(layer, new AbstractView(_uri, null)) :
-            new LoadURITask(layer, _uri));
-    }
-
-    LoadURITask(ImageLayer _imageLayer, URI _uri) {
+    LoadViewTask(ImageLayer _imageLayer, URI _uri) {
         uri = _uri;
         imageLayer = _imageLayer;
         setThreadName("MAIN--LoadURI");

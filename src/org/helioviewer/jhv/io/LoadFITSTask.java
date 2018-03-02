@@ -8,7 +8,7 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.fitsview.FITSView;
 
-class LoadFITSTask extends LoadURITask {
+class LoadFITSTask extends LoadViewTask {
 
     LoadFITSTask(ImageLayer _imageLayer, URI _uri) {
         super(_imageLayer, _uri);
