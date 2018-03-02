@@ -1,13 +1,11 @@
 package org.helioviewer.jhv.data.event;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.database.EventDatabase;
-import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.log.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,25 +20,20 @@ public abstract class SWEKHandler {
             }
         }
 
-        try {
-            int page = 0;
-            boolean success = true;
-            boolean overmax = true;
-            while (overmax && success) {
-                try (NetClient nc = NetClient.of(createURL(supplier.getGroup(), start, end, params, page))) {
-                    JSONObject eventJSON = JSONUtils.readJSON(nc.getReader());
-                    overmax = eventJSON.optBoolean("overmax", false);
-                    success = parseRemote(eventJSON, supplier) && parseAssociations(eventJSON);
-                    page++;
-                }
+        int page = 0;
+        boolean success = true;
+        boolean overmax = true;
+        while (overmax && success) {
+            try {
+                JSONObject eventJSON = JSONUtils.readJSON(createURL(supplier.getGroup(), start, end, params, page));
+                overmax = eventJSON.optBoolean("overmax", false);
+                success = parseRemote(eventJSON, supplier) && parseAssociations(eventJSON);
+                page++;
+            } catch (Exception e) {
+                Log.error("Error loading SWEK", e);
             }
-            return success;
-        } catch (JSONException e) {
-            Log.error("JSON parse error: " + e);
-        } catch (IOException e) {
-            Log.error("SWEK URL error: " + e);
         }
-        return false;
+        return success;
     }
 
     protected abstract boolean parseRemote(JSONObject eventJSON, SWEKSupplier supplier);

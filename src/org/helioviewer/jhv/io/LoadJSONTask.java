@@ -17,8 +17,8 @@ class LoadJSONTask extends LoadURITask {
 
     @Override
     protected View backgroundWork() {
-        try (NetClient nc = NetClient.of(uri)) {
-            APIRequest req = APIRequest.fromRequestJson(JSONUtils.readJSON(nc.getReader()));
+        try {
+            APIRequest req = APIRequest.fromRequestJson(JSONUtils.readJSON(uri));
             return requestAndOpenRemoteFile(req);
         } catch (Exception e) {
             Log.error("An error occured while opening the remote file: ", e);

@@ -12,8 +12,8 @@ public class APIRequestManager {
 
     public static URI requestRemoteFile(APIRequest req) throws IOException {
         String jpipRequest = req.toJpipRequest();
-        try (NetClient nc = NetClient.of(jpipRequest)) {
-            APIResponse response = new APIResponse(JSONUtils.readJSON(nc.getReader()));
+        try {
+            APIResponse response = new APIResponse(JSONUtils.readJSON(jpipRequest));
             // Just some error from the server
             String error = response.getError();
             if (error != null) {

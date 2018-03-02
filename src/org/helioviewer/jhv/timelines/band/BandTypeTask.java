@@ -17,7 +17,7 @@ public class BandTypeTask extends JHVWorker<Void, Void> {
        try {
             BandType.loadBandTypes(JSONUtils.readJSON(TimelineSettings.baseURL).getJSONArray("objects"));
         } catch (Exception e) {
-            Log.error("Error downloading the bandtypes", e);
+            Log.error("Error loading bandtypes", e);
         }
         return null;
     }
