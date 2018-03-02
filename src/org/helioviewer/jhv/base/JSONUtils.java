@@ -7,10 +7,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPOutputStream;
 
+import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.log.Log;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -24,6 +27,18 @@ public class JSONUtils {
         } catch (Exception e) {
             Log.error("Error reading JSON: " + e);
             return new JSONObject();
+        }
+    }
+
+    public static JSONObject readJSON(URI uri) throws IOException, JSONException {
+        try (NetClient nc = NetClient.of(uri)) {
+            return JSONUtils.readJSON(nc.getReader());
+        }
+    }
+
+    public static JSONObject readJSON(String uri) throws IOException, JSONException {
+        try (NetClient nc = NetClient.of(uri)) {
+            return JSONUtils.readJSON(nc.getReader());
         }
     }
 
