@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.eve.lines;
 
-import java.net.URI;
-
+import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -21,7 +20,7 @@ class DownloadThread extends JHVWorker<EVEResponse, Void> {
     @Override
     protected EVEResponse backgroundWork() {
         try {
-            return EVEResponse.get(new URI(buildRequest(interval, band.getBandType())));
+            return new EVEResponse(JSONUtils.readJSON(buildRequest(interval, band.getBandType())));
         } catch (Exception e) {
             e.printStackTrace();
         }
