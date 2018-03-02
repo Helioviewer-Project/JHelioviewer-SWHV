@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.io;
 
-import java.io.IOException;
 import java.net.URI;
 
 import org.helioviewer.jhv.base.JSONUtils;
@@ -21,9 +20,9 @@ class LoadStateTask extends JHVWorker<JSONObject, Void> {
 
     @Override
     protected JSONObject backgroundWork() {
-        try (NetClient nc = NetClient.of(uri)) {
-            return JSONUtils.readJSON(nc.getReader());
-        } catch (IOException e) {
+        try {
+            return JSONUtils.readJSON(uri).getJSONObject("org.helioviewer.jhv.state");
+        } catch (Exception e) {
             Log.error("An error occurred while opening the remote file: ", e);
             Message.err("An error occurred while opening the remote file: ", e.getMessage(), false);
         }

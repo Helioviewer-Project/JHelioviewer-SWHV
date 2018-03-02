@@ -183,9 +183,8 @@ public class State {
         JHVGlobals.getExecutorService().execute(loadStateTask);
     }
 
-    public static void load(JSONObject obj) {
+    public static void load(JSONObject jo) {
         try {
-            JSONObject jo = obj.getJSONObject("org.helioviewer.jhv.state");
             // to be loaded before viewpoint
             try {
                 Displayer.DisplayMode.valueOf(jo.optString("projection")).radio.doClick();
