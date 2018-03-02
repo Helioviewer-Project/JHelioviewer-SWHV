@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 
-import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.log.Log;
 
@@ -13,7 +12,7 @@ public class APIRequestManager {
     public static URI requestRemoteFile(APIRequest req) throws IOException {
         String jpipRequest = req.toJpipRequest();
         try {
-            APIResponse response = new APIResponse(JSONUtils.readJSON(jpipRequest));
+            APIResponse response = new APIResponse(LoadJSON.of(jpipRequest));
             // Just some error from the server
             String error = response.getError();
             if (error != null) {
