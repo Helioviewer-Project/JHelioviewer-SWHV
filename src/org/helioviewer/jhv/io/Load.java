@@ -45,7 +45,11 @@ public interface Load {
     class State implements Load {
         @Override
         public void get(URI uri) {
-            JHVGlobals.getExecutorService().execute(new LoadStateTask(uri));
+            String name = uri.getPath().toLowerCase();
+            if (name.endsWith("jhvz"))
+                JHVGlobals.getExecutorService().execute(new LoadZipTask(uri));
+            else
+                JHVGlobals.getExecutorService().execute(new LoadStateTask(uri));
         }
     }
 

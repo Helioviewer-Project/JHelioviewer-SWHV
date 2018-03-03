@@ -35,63 +35,12 @@ abstract class ExtensionFileFilter extends FileFilter {
     static class JhvFilter extends ExtensionFileFilter {
 
         JhvFilter() {
-            extensions = new String[] { "jhv" };
+            extensions = new String[] { "jhv", "jhvz" };
         }
 
         @Override
         public String getDescription() {
-            return "State files (\".jhv\")";
-        }
-
-    }
-
-    private static class FitsFilter extends ExtensionFileFilter {
-
-        private FitsFilter() {
-            extensions = new String[] { "fits", "fts" };
-        }
-
-        @Override
-        public String getDescription() {
-            return "FITS files (\".fts\", \".fits\")";
-        }
-
-    }
-
-    private static class JP2Filter extends ExtensionFileFilter {
-
-        private JP2Filter() {
-            extensions = new String[] { "jp2", "jpx" };
-        }
-
-        @Override
-        public String getDescription() {
-            return "JPG2000 files (\".jp2\", \".jpx\")";
-        }
-    }
-
-    private static class JPGFilter extends ExtensionFileFilter {
-
-        private JPGFilter() {
-            extensions = new String[] { "jpg", "jpeg" };
-        }
-
-        @Override
-        public String getDescription() {
-           return "JPG files (\".jpg\", \".jpeg\")";
-        }
-
-    }
-
-    private static class PNGFilter extends ExtensionFileFilter {
-
-        private PNGFilter() {
-            extensions = new String[] { "png" };
-        }
-
-        @Override
-        public String getDescription() {
-            return "PNG files (\".png\")";
+            return "State files (\".jhv\", \".jhvz\")";
         }
 
     }
