@@ -20,7 +20,7 @@ class LoadThread extends JHVWorker<EVEResponse, Void> {
     @Override
     protected EVEResponse backgroundWork() {
         try {
-            return new EVEResponse(LoadJSON.of(uri));
+            return new EVEResponse(LoadJSON.get(uri));
         } catch (Exception e) {
             e.printStackTrace();
         }

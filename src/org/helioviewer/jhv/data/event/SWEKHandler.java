@@ -25,7 +25,7 @@ public abstract class SWEKHandler {
         boolean overmax = true;
         while (overmax && success) {
             try {
-                JSONObject eventJSON = LoadJSON.of(createURL(supplier.getGroup(), start, end, params, page));
+                JSONObject eventJSON = LoadJSON.get(createURL(supplier.getGroup(), start, end, params, page));
                 overmax = eventJSON.optBoolean("overmax", false);
                 success = parseRemote(eventJSON, supplier) && parseAssociations(eventJSON);
                 page++;
