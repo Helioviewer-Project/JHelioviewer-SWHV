@@ -20,7 +20,7 @@ class DownloadThread extends JHVWorker<EVEResponse, Void> {
     @Override
     protected EVEResponse backgroundWork() {
         try {
-            return new EVEResponse(LoadJSON.of(buildRequest(interval, band.getBandType())));
+            return new EVEResponse(LoadJSON.get(buildRequest(interval, band.getBandType())));
         } catch (Exception e) {
             e.printStackTrace();
         }

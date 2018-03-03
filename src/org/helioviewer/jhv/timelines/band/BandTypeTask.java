@@ -15,7 +15,7 @@ public class BandTypeTask extends JHVWorker<Void, Void> {
     @Override
     protected Void backgroundWork() {
        try {
-            BandType.loadBandTypes(LoadJSON.of(TimelineSettings.baseURL).getJSONArray("objects"));
+            BandType.loadBandTypes(LoadJSON.get(TimelineSettings.baseURL).getJSONArray("objects"));
         } catch (Exception e) {
             Log.error("Error loading bandtypes", e);
         }
