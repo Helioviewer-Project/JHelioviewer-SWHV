@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.data.event.JHVAssociation;
@@ -117,6 +118,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         associations.add(association);
     }
 
+    @Nullable
     private JHVEvent findEvent(int id) {
         for (JHVEvent evt : events) {
             if (evt.getUniqueID() == id) {

@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.data.event.JHVEvent;
@@ -170,8 +172,9 @@ class HEKParser {
      *
      * @param value
      *            the point to parse
-     * @return The GL3DVec3 or null if it could not be parsed.
+     * @return The Vec3 or null if it could not be parsed.
      */
+    @Nullable
     private static Vec3 parsePoint(String value) {
         if (value.toLowerCase(Locale.ENGLISH).contains("point")) {
             return parseCoordinates(value.substring(value.indexOf('(') + 1, value.indexOf(')')));
@@ -185,8 +188,9 @@ class HEKParser {
      *
      * @param value
      *            the string to parse
-     * @return the GL3DVec3 or null of it could not be parsed
+     * @return the Vec3 or null of it could not be parsed
      */
+    @Nullable
     private static Vec3 parseCoordinates(String value) {
         double[] coordinate = {0, 0, 0};
         boolean notnull = false;
@@ -212,6 +216,7 @@ class HEKParser {
         handleHGSCoordinates(currentEvent, hgsBoundedBox, hgsBoundCC, hgsCentralPoint, hgsX, hgsY);
     }
 
+    @Nullable
     private static List<Vec3> checkAndFixBoundingBox(List<Vec3> hgsBoundedBox) {
         if (hgsBoundedBox != null) {
             double minX = 0.0;

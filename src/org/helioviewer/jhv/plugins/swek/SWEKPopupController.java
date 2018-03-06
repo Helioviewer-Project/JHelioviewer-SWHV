@@ -5,6 +5,8 @@ import java.awt.Cursor;
 import java.awt.Point;
 import java.util.ArrayList;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -195,6 +197,7 @@ public class SWEKPopupController extends MouseAdapter implements TimeListener {
         }
     }
 
+    @Nullable
     private Vec3 getHitPoint(Viewport vp, int x, int y) {
         Vec3 hp = CameraHelper.getVectorFromSphere(camera, vp, x, y, camera.getViewpoint().orientation, true);
         if (hp != null)

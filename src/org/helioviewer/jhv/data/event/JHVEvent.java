@@ -2,6 +2,8 @@ package org.helioviewer.jhv.data.event;
 
 import java.util.ArrayList;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.base.Regex;
 
 public class JHVEvent {
@@ -39,6 +41,7 @@ public class JHVEvent {
         return simpleVisibleParameters;
     }
 
+    @Nullable
     public JHVEventParameter getParameter(String key) {
         int i = 0;
         while (i < allParameters.length) {

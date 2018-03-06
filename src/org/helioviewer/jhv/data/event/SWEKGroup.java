@@ -3,6 +3,7 @@ package org.helioviewer.jhv.data.event;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 
 public class SWEKGroup extends SWEKTreeModelElement {
@@ -78,6 +79,7 @@ public class SWEKGroup extends SWEKTreeModelElement {
         return parameterList;
     }
 
+    @Nullable
     public SWEKParameter getParameter(String _name) {
         for (SWEKParameter parameter : parameterList) {
             if (parameter.getParameterName().equalsIgnoreCase(_name)) {

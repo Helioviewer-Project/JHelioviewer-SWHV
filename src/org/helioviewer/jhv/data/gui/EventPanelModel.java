@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.data.gui;
 
+import javax.annotation.Nullable;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -23,6 +24,7 @@ class EventPanelModel implements TreeModel {
     public void removeTreeModelListener(TreeModelListener l) {
     }
 
+    @Nullable
     @Override
     public Object getChild(Object parent, int index) {
         return parent instanceof SWEKGroup ? ((SWEKGroup) parent).getSuppliers().get(index) : null;

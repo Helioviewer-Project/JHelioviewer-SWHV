@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.data.event.SWEKGroup;
@@ -56,6 +57,7 @@ class SWEKConfig {
         }
     }
 
+    @Nullable
     private static SWEKSource parseSource(JSONObject obj) {
         String name = obj.getString("name");
         switch (name) {
@@ -94,6 +96,7 @@ class SWEKConfig {
         return group;
     }
 
+    @Nullable
     private static ImageIcon parseEventIcon(JSONObject obj) {
         String eventIconValue = obj.getString("icon");
         try {
@@ -161,6 +164,7 @@ class SWEKConfig {
         return obj.getString("parameter_display_name");
     }
 
+    @Nullable
     private static SWEKParameterFilter parseParameterFilter(JSONObject obj) {
         JSONObject filterobj = obj.optJSONObject("filter");
         if (filterobj == null)
