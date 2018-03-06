@@ -10,6 +10,8 @@ import java.nio.file.Files;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.io.FileUtils;
@@ -135,6 +137,7 @@ public class LUT {
         return standardList.get(name);
     }
 
+    @Nullable
     public static LUT get(HelioviewerMetaData hvMetaData) {
         int length = colorRules.length();
         for (int i = 0; i < length; ++i) {

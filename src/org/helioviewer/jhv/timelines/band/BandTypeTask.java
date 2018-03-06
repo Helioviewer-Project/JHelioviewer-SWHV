@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.timelines.band;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVWorker;
@@ -12,6 +14,7 @@ public class BandTypeTask extends JHVWorker<Void, Void> {
         setThreadName("EVE--LoadSources");
     }
 
+    @Nullable
     @Override
     protected Void backgroundWork() {
        try {

@@ -3,6 +3,8 @@ package org.helioviewer.jhv.camera;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.Sun;
@@ -37,6 +39,7 @@ public class LoadPosition extends JHVWorker<Position.L[], Void> {
         setThreadName("MAIN--PositionLoad");
     }
 
+    @Nullable
     @Override
     protected Position.L[] backgroundWork() {
         long deltat = 60, span = (end - start) / 1000;

@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.plugins.eve.lines;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.threads.JHVWorker;
@@ -17,6 +19,7 @@ class DownloadThread extends JHVWorker<EVEResponse, Void> {
         band = _band;
     }
 
+    @Nullable
     @Override
     protected EVEResponse backgroundWork() {
         try {

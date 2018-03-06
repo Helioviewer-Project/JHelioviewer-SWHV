@@ -4,6 +4,8 @@ import java.awt.EventQueue;
 import java.io.File;
 import java.net.URI;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -42,6 +44,7 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
         setThreadName("MAIN--DownloadView");
     }
 
+    @Nullable
     @Override
     protected Void backgroundWork() {
         File dstFile = new File(JHVDirectory.REMOTEFILES.getPath(), uri.getPath().substring(Math.max(0, uri.getPath().lastIndexOf('/')))).getAbsoluteFile();

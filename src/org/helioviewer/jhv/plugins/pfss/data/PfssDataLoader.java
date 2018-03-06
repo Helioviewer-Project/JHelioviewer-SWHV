@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.plugins.pfss.data;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
@@ -22,6 +24,7 @@ class PfssDataLoader extends JHVWorker<PfssData, Void> {
         url = _url;
     }
 
+    @Nullable
     @Override
     protected PfssData backgroundWork() {
         try (NetClient nc = NetClient.of(url); Fits fits = new Fits(nc.getStream())) {

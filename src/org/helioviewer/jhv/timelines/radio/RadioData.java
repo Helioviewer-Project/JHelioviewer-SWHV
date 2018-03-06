@@ -11,6 +11,8 @@ import java.awt.image.IndexColorModel;
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.NetFileCache;
@@ -105,6 +107,7 @@ public class RadioData extends AbstractTimelineLayer {
             setThreadName("EVE--RadioDownloader");
         }
 
+        @Nullable
         @Override
         protected RadioJP2Data backgroundWork() {
             try {

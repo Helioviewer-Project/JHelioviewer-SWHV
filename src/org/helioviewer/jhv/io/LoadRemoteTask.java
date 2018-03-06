@@ -2,6 +2,8 @@ package org.helioviewer.jhv.io;
 
 import java.io.IOException;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
@@ -17,6 +19,7 @@ public class LoadRemoteTask extends LoadViewTask {
         setThreadName("MAIN--LoadRemote");
     }
 
+    @Nullable
     @Override
     protected View backgroundWork() {
         try {
