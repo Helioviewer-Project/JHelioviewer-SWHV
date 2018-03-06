@@ -11,16 +11,16 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import javax.annotation.Nullable;
-
 import okio.Okio;
 import okio.BufferedSource;
 
 public class FileUtils {
 
-    @Nullable
-    public static InputStream getResource(String resourcePath) {
-        return FileUtils.class.getResourceAsStream(resourcePath);
+    public static InputStream getResource(String path) throws IOException {
+        InputStream is = FileUtils.class.getResourceAsStream(path);
+        if (is == null)
+            throw new IOException("Resource " + path + " not found");
+        return is;
     }
 
     public static String streamToString(InputStream is) throws IOException {

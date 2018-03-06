@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -174,6 +175,7 @@ public class PluginSettings {
      * @return The first found node whose text node has the given value or null
      *         if no node could be found with the given values.
      */
+    @Nullable
     private static Node findNode(Node root, String compareValue) {
         NodeList list = ((Element) root).getElementsByTagName(PLUGIN_NAME);
         for (int i = 0; i < list.getLength(); i++) {
