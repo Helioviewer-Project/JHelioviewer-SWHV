@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.SortedMap;
 
+import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.data.cache.JHVEventCache;
@@ -115,6 +116,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
         return "SWEK Events";
     }
 
+    @Nullable
     @Override
     public Color getDataColor() {
         return null;
@@ -125,6 +127,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
         return false;
     }
 
+    @Nullable
     @Override
     public Component getOptionsPanel() {
         return null;
@@ -161,6 +164,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
 
     }
 
+    @Nullable
     private static JHVRelatedEvents drawEvent(Rectangle graphArea, JHVRelatedEvents event, int x0, int x1, int yPosition, Graphics2D g, Point mousePosition) {
         int spacePerLine = 3;
         int y = graphArea.y + spacePerLine * 2 * yPosition + DrawConstants.EVENT_OFFSET;
@@ -230,6 +234,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
     public void resetAxis() {
     }
 
+    @Nullable
     @Override
     public ClickableDrawable getDrawableUnderMouse() {
         return eventUnderMouse == null ? null : eventUnderMouse.event;

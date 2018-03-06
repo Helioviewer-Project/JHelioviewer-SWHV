@@ -5,6 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.log.Log;
 
 class OSXAdapter implements InvocationHandler {
@@ -124,6 +126,7 @@ class OSXAdapter implements InvocationHandler {
 
     // InvocationHandler implementation
     // This is the entry point for our proxy object; it is called every time an ApplicationListener method is invoked
+    @Nullable
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (isCorrectMethod(method, args)) {

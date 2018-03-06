@@ -15,6 +15,8 @@ import org.helioviewer.jhv.time.TimeUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.annotation.Nullable;
+
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.SampUtils;
 
@@ -48,6 +50,7 @@ public class ImageLayers {
         Displayer.render(1);
     }
 
+    @Nullable
     public static ImageLayer getImageLayerInViewport(int idx) {
         for (ImageLayer layer : Layers.getImageLayers()) {
             if (layer.isVisible(idx))

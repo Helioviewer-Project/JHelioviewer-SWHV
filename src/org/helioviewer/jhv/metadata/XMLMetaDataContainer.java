@@ -2,6 +2,8 @@ package org.helioviewer.jhv.metadata;
 
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.base.XMLUtils;
 
 import org.w3c.dom.CharacterData;
@@ -21,6 +23,7 @@ public class XMLMetaDataContainer implements MetaDataContainer {
             throw new Exception("XML metadata without meta tag");
     }
 
+    @Nullable
     private String getValueFromXML(String key) {
         Element line = (Element) meta.getElementsByTagName(key).item(0);
         if (line == null)

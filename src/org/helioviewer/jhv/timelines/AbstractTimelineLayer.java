@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.timelines;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 
 public abstract class AbstractTimelineLayer implements TimelineLayer {
@@ -20,16 +22,13 @@ public abstract class AbstractTimelineLayer implements TimelineLayer {
     public void yaxisChanged() {
     }
 
-    @Override
-    public boolean hasDataColor() {
-        return false;
-    }
-
+    @Nullable
     @Override
     public String getStringValue(long ts) {
         return null;
     }
 
+    @Nullable
     @Override
     public ClickableDrawable getDrawableUnderMouse() {
         return null;

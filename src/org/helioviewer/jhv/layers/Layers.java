@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.jhv.camera.Camera;
@@ -227,6 +228,7 @@ public class Layers extends AbstractTableModel implements Reorderable {
         return LayersPanel.NUMBER_COLUMNS;
     }
 
+    @Nullable
     @Override
     public Object getValueAt(int row, int col) {
         try {

@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import java.util.Enumeration;
 import java.util.HashMap;
 
+import javax.annotation.Nullable;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.text.Position;
@@ -110,6 +111,7 @@ public class DataSourcesTree extends JTree {
         });
     }
 
+    @Nullable
     @Override
     public TreePath getNextMatch(String prefix, int startingRow, Position.Bias bias) {
         return null; // disable builtin search
@@ -171,6 +173,7 @@ public class DataSourcesTree extends JTree {
         }
     }
 
+    @Nullable
     public SourceItem getSelectedItem() {
         TreePath path = getSelectionPath();
         if (path != null) {
@@ -181,6 +184,7 @@ public class DataSourcesTree extends JTree {
         return null; // only on source load error
     }
 
+    @Nullable
     @Override
     public String getToolTipText(MouseEvent e) {
         TreePath path;
