@@ -4,8 +4,8 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import org.helioviewer.jhv.base.FileUtils;
-import org.helioviewer.jhv.base.JSONUtils;
+import org.helioviewer.jhv.io.FileUtils;
+import org.helioviewer.jhv.io.JSONUtils;
 import org.json.JSONObject;
 
 @SuppressWarnings("serial")
@@ -59,8 +59,8 @@ public class AIAResponse {
     private static String lastDate;
 
     public static void load() throws Exception {
-        try (InputStream is = FileUtils.getResourceInputStream("/data/aia_rescaling_data.json")) {
-            JSONObject data = JSONUtils.getJSONStream(is);
+        try (InputStream is = FileUtils.getResource("/data/aia_rescaling_data.json")) {
+            JSONObject data = JSONUtils.get(is);
             String[] keys = JSONObject.getNames(data);
             Arrays.sort(keys);
 

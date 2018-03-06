@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.database.EventDatabase;
-import org.helioviewer.jhv.io.LoadJSON;
+import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.log.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,7 +25,7 @@ public abstract class SWEKHandler {
         boolean overmax = true;
         while (overmax && success) {
             try {
-                JSONObject eventJSON = LoadJSON.get(createURL(supplier.getGroup(), start, end, params, page));
+                JSONObject eventJSON = JSONUtils.get(createURL(supplier.getGroup(), start, end, params, page));
                 overmax = eventJSON.optBoolean("overmax", false);
                 success = parseRemote(eventJSON, supplier) && parseAssociations(eventJSON);
                 page++;

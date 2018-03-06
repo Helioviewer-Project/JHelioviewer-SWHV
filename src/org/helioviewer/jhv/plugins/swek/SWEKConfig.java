@@ -10,8 +10,6 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 
-import org.helioviewer.jhv.base.FileUtils;
-import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKParameter;
 import org.helioviewer.jhv.data.event.SWEKParameterFilter;
@@ -20,6 +18,8 @@ import org.helioviewer.jhv.data.event.SWEKRelatedOn;
 import org.helioviewer.jhv.data.event.SWEKSource;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
+import org.helioviewer.jhv.io.FileUtils;
+import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepHandler;
 import org.helioviewer.jhv.plugins.swek.sources.hek.HEKHandler;
@@ -34,8 +34,8 @@ class SWEKConfig {
 
     static List<SWEKGroup> load() {
         SWEKIconBank.init();
-        try (InputStream in = FileUtils.getResourceInputStream("/settings/SWEK.json")) {
-            JSONObject jo = JSONUtils.getJSONStream(in);
+        try (InputStream in = FileUtils.getResource("/settings/SWEK.json")) {
+            JSONObject jo = JSONUtils.get(in);
             EventDatabase.config_hash = Arrays.hashCode(jo.toString().toCharArray());
             parseSources(jo);
             parseGroups(jo);

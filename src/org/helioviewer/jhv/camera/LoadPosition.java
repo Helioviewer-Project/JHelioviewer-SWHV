@@ -6,7 +6,7 @@ import java.net.UnknownHostException;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.base.JSONUtils;
+import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.io.PositionRequest;
 import org.helioviewer.jhv.log.Log;
@@ -46,7 +46,7 @@ public class LoadPosition extends JHVWorker<Position.L[], Void> {
             deltat = span / max;
 
         try (NetClient nc = NetClient.of(new PositionRequest(target, frame, start, end, deltat).url, true)) {
-            JSONObject result = JSONUtils.readJSON(nc.getReader());
+            JSONObject result = JSONUtils.get(nc.getReader());
             if (nc.isSuccessful())
                 return PositionRequest.parseResponse(result);
             else

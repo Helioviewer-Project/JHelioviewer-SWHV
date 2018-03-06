@@ -9,7 +9,7 @@ import java.util.TimeZone;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.PropertyConfigurator;
-import org.helioviewer.jhv.base.FileUtils;
+import org.helioviewer.jhv.io.FileUtils;
 
 public class LogSettings {
 
@@ -21,7 +21,7 @@ public class LogSettings {
      */
     public static void init(String defaultLogSettingsPath, String logsDirectory) {
         Properties settings = new Properties();
-        try (InputStream is = FileUtils.getResourceInputStream(defaultLogSettingsPath)) {
+        try (InputStream is = FileUtils.getResource(defaultLogSettingsPath)) {
             settings.load(is);
         } catch (IOException e) {
             Log.log.error("Could not load default log settings: " + e.getMessage());

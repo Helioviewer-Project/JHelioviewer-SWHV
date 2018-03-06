@@ -20,7 +20,7 @@ class LoadStateTask extends JHVWorker<JSONObject, Void> {
     @Override
     protected JSONObject backgroundWork() {
         try {
-            return LoadJSON.get(uri).getJSONObject("org.helioviewer.jhv.state");
+            return JSONUtils.get(uri).getJSONObject("org.helioviewer.jhv.state");
         } catch (Exception e) {
             Log.error("An error occurred while opening the remote file: ", e);
             Message.err("An error occurred while opening the remote file: ", e.getMessage(), false);

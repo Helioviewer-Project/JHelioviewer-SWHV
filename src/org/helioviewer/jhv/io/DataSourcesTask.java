@@ -3,8 +3,6 @@ package org.helioviewer.jhv.io;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.helioviewer.jhv.base.FileUtils;
-import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -34,8 +32,8 @@ public class DataSourcesTask extends JHVWorker<Void, Void> {
     protected Void backgroundWork() {
         while (true) {
             Schema schema = null;
-            try (InputStream is = FileUtils.getResourceInputStream(schemaName)) {
-                JSONObject rawSchema = JSONUtils.getJSONStream(is);
+            try (InputStream is = FileUtils.getResource(schemaName)) {
+                JSONObject rawSchema = JSONUtils.get(is);
                 SchemaLoader schemaLoader = SchemaLoader.builder().schemaJson(rawSchema).addFormatValidator(new TimeUtils.SQLDateTimeFormatValidator()).build();
                 schema = schemaLoader.load().build();
             } catch (Exception e) {
@@ -43,7 +41,7 @@ public class DataSourcesTask extends JHVWorker<Void, Void> {
             }
 
             try {
-                JSONObject jo = LoadJSON.get(url);
+                JSONObject jo = JSONUtils.get(url);
 /*
                 if (url.contains("helioviewer.org")) {
                     jo.getJSONObject("PROBA2").getJSONObject("children").getJSONObject("SWAP").getJSONObject("children").remove("174");
