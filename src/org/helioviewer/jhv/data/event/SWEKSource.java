@@ -2,6 +2,8 @@ package org.helioviewer.jhv.data.event;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 public class SWEKSource {
 
     private final String name;
@@ -22,6 +24,7 @@ public class SWEKSource {
         return handler;
     }
 
+    @Nullable
     public SWEKParameter getParameter(String _name) {
         for (SWEKParameter parameter : generalParameters) {
             if (parameter.getParameterName().equalsIgnoreCase(_name)) {
