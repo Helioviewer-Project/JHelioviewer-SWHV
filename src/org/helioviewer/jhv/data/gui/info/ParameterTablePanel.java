@@ -10,6 +10,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.regex.Matcher;
 
+import javax.annotation.Nullable;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -88,6 +89,7 @@ class ParameterTablePanel extends JPanel implements MouseListener, MouseMotionLi
 
     }
 
+    @Nullable
     private static String extractURL(JTable table, int col, int row) {
         Object value = table.getValueAt(row, col);
         if (value instanceof String) {

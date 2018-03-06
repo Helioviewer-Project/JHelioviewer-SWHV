@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui.dialogs;
 
+import javax.annotation.Nullable;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
@@ -41,6 +42,7 @@ public class TextDialog extends StandardDialog implements ShowableDialog {
         return new JScrollPane(pane);
     }
 
+    @Nullable
     @Override
     public JComponent createBannerPanel() {
         return null;

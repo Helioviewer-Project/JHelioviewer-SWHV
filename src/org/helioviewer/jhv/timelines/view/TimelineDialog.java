@@ -2,6 +2,7 @@ package org.helioviewer.jhv.timelines.view;
 
 import java.awt.event.ActionEvent;
 
+import javax.annotation.Nullable;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -68,6 +69,7 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
         return observationPanel;
     }
 
+    @Nullable
     @Override
     public JComponent createBannerPanel() {
         return null;

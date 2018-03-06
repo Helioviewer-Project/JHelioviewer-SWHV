@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui.dialogs.plugins;
 
+import javax.annotation.Nullable;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -33,6 +34,7 @@ public class PluginsDialog extends StandardDialog implements ShowableDialog {
         return component;
     }
 
+    @Nullable
     @Override
     public JComponent createBannerPanel() {
         return null;
