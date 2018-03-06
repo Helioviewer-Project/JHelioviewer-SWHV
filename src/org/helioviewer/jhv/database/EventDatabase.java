@@ -1,6 +1,8 @@
 package org.helioviewer.jhv.database;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,6 +19,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.GZIPInputStream;
 
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.cache.RequestCache;
@@ -28,7 +31,6 @@ import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKRelatedEvents;
 import org.helioviewer.jhv.data.event.SWEKRelatedOn;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
-import org.helioviewer.jhv.io.GZIPUtils;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVThread;
@@ -424,9 +426,10 @@ public class EventDatabase {
         }
     }
 
-    private static JHVEvent parseJSON(JsonEvent jsonEvent, boolean full) {
-        return jsonEvent.type.getSource().getHandler().parseEventJSON(JSONUtils.get(GZIPUtils.decompress(jsonEvent.json)),
-            jsonEvent.type, jsonEvent.id, jsonEvent.start, jsonEvent.end, full);
+    private static JHVEvent parseJSON(JsonEvent jsonEvent, boolean full) throws IOException {
+        try (InputStream bais = new ByteArrayInputStream(jsonEvent.json); InputStream is = new GZIPInputStream(bais)) {
+            return jsonEvent.type.getSource().getHandler().parseEventJSON(JSONUtils.get(is), jsonEvent.type, jsonEvent.id, jsonEvent.start, jsonEvent.end, full);
+        }
     }
 
     private static ArrayList<JHVEvent> createUniqueList(ArrayList<JHVEvent> events) {
@@ -485,7 +488,11 @@ public class EventDatabase {
             }
 
             for (JsonEvent jsonEvent : jsonEvents) {
-                nEvents.add(parseJSON(jsonEvent, full));
+                try {
+                    nEvents.add(parseJSON(jsonEvent, full));
+                } catch (Exception e) {
+                    Log.error(e);
+                }
             }
             jsonEvents.clear();
         }
@@ -493,7 +500,11 @@ public class EventDatabase {
         JsonEvent ev;
         if (!is_dbthread && (ev = event2Program(id)) != null) {
             jsonEvents.add(ev);
-            nEvents.add(parseJSON(ev, full));
+            try {
+                nEvents.add(parseJSON(ev, full));
+            } catch (Exception e) {
+                Log.error(e);
+            }
         }
 
         return createUniqueList(nEvents);
@@ -696,7 +707,11 @@ public class EventDatabase {
                             long _start = rs.getLong(2);
                             long _end = rs.getLong(3);
                             byte[] json = rs.getBytes(4);
-                            eventList.add(parseJSON(new JsonEvent(json, type, id, _start, _end), false));
+                            try {
+                                eventList.add(parseJSON(new JsonEvent(json, type, id, _start, _end), false));
+                            } catch (Exception e) {
+                                Log.error(e);
+                            }
                         }
                     }
                 } catch (SQLException e) {
