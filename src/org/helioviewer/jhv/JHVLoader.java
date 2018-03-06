@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 
-import org.helioviewer.jhv.base.FileUtils;
+import org.helioviewer.jhv.io.FileUtils;
 
 class JHVLoader {
 
@@ -31,7 +31,7 @@ class JHVLoader {
         kduLibs.add(System.mapLibraryName("kdu_jni"));
 
         for (String kduLib : kduLibs) {
-            try (InputStream in = FileUtils.getResourceInputStream("/natives/" + pathlib + kduLib)) {
+            try (InputStream in = FileUtils.getResource("/natives/" + pathlib + kduLib)) {
                 File f = new File(JHVGlobals.LibCacheDir, kduLib);
                 Files.copy(in, f.toPath());
                 System.load(f.getAbsolutePath());

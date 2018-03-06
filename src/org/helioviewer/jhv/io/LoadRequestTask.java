@@ -17,7 +17,7 @@ class LoadRequestTask extends LoadViewTask {
     @Override
     protected View backgroundWork() {
         try {
-            APIRequest req = APIRequest.fromRequestJson(LoadJSON.get(uri));
+            APIRequest req = APIRequest.fromRequestJson(JSONUtils.get(uri));
             return requestAndOpenRemoteFile(req);
         } catch (Exception e) {
             Log.error("An error occured while opening the remote file: ", e);

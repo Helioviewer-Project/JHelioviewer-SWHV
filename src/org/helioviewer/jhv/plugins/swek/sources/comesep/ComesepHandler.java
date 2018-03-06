@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.data.event.JHVEvent;
 import org.helioviewer.jhv.data.event.SWEKGroup;
@@ -12,6 +11,7 @@ import org.helioviewer.jhv.data.event.SWEKHandler;
 import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
+import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;

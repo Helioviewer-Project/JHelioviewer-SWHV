@@ -13,11 +13,11 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
+import org.helioviewer.jhv.io.FileUtils;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
@@ -100,8 +100,8 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             if (e.getURL() == null) {
-                try (InputStream is = FileUtils.getResourceInputStream("/licenses/" + e.getDescription())) {
-                    new TextDialog("License - " + e.getDescription().substring(0, e.getDescription().indexOf('.')), FileUtils.convertStreamToString(is), true).showDialog();
+                try (InputStream is = FileUtils.getResource("/licenses/" + e.getDescription())) {
+                    new TextDialog("License - " + e.getDescription().substring(0, e.getDescription().indexOf('.')), FileUtils.streamToString(is), true).showDialog();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

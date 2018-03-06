@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.data.event.JHVEvent;
@@ -21,6 +20,7 @@ import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.database.JHVDatabaseParam;
+import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;

@@ -12,7 +12,7 @@ import java.util.TreeMap;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.base.FileUtils;
+import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.json.JSONArray;
@@ -80,7 +80,7 @@ public class LUT {
         // From the resources
         String ggrFiles[] = { "AIA94", "AIA131", "AIA171", "AIA193", "AIA211", "AIA304", "AIA335", "AIA1600", "AIA1700", "AIA4500" };
         for (String file : ggrFiles) {
-            try (InputStream is = FileUtils.getResourceInputStream("/ggr/" + file + ".ggr")) {
+            try (InputStream is = FileUtils.getResource("/ggr/" + file + ".ggr")) {
                 LUT l = readGimpGradient(is);
                 standardList.put(l.lutName, l);
             } catch (Exception e) {
@@ -118,7 +118,7 @@ public class LUT {
     }
 
     private static void readColors() {
-        try (InputStream is = FileUtils.getResourceInputStream("/settings/colors.js");
+        try (InputStream is = FileUtils.getResource("/settings/colors.js");
              BufferedReader in = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             colorRules = new JSONArray(new JSONTokener(in));
         } catch (IOException | JSONException e) {

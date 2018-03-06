@@ -17,8 +17,8 @@ import javax.swing.UIManager;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
 
-import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.log.Log;
 
 import com.jidesoft.plaf.LookAndFeelFactory;
@@ -84,14 +84,14 @@ public class UIGlobals {
 
         UIFontMono = new Font("Monospaced", Font.PLAIN, defaultSize);
 
-        try (InputStream is = FileUtils.getResourceInputStream("/fonts/RobotoCondensed-Regular.ttf")) {
+        try (InputStream is = FileUtils.getResource("/fonts/RobotoCondensed-Regular.ttf")) {
             UIFontRoboto = Font.createFont(Font.TRUETYPE_FONT, is);
             GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(UIFontRoboto);
         } catch (Exception e) {
             Log.warn("Font not loaded correctly, fallback to default");
             UIFontRoboto = new Font("SansSerif", Font.PLAIN, defaultSize);
         }
-        try (InputStream is = FileUtils.getResourceInputStream("/fonts/materialdesignicons-webfont.ttf")) {
+        try (InputStream is = FileUtils.getResource("/fonts/materialdesignicons-webfont.ttf")) {
             UIFontMDI = Font.createFont(Font.TRUETYPE_FONT, is);
             GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(UIFontMDI);
         } catch (Exception e) {

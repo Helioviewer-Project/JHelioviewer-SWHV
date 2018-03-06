@@ -1,9 +1,8 @@
 package org.helioviewer.jhv.opengl;
 
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-import org.helioviewer.jhv.base.FileUtils;
+import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.opengl.GL2;
@@ -24,21 +23,20 @@ public class GLSLShader {
     }
 
     protected void _init(GL2 gl, boolean common) {
-        String fragmentCommonText = "";
-        if (common) {
-            InputStream fragmentCommonStream = FileUtils.getResourceInputStream("/data/fragmentcommon.glsl");
-            fragmentCommonText = FileUtils.convertStreamToString(fragmentCommonStream);
-        }
-        InputStream fragmentStream = FileUtils.getResourceInputStream(fragment);
-        String fragmentText = FileUtils.convertStreamToString(fragmentStream);
-        fragmentText = fragmentCommonText + fragmentText;
-        InputStream vertexStream = FileUtils.getResourceInputStream(vertex);
-        String vertexText = FileUtils.convertStreamToString(vertexStream);
-        attachVertexShader(gl, vertexText);
-        attachFragmentShader(gl, fragmentText);
+        try {
+            String fragmentCommonText = common ? FileUtils.streamToString(FileUtils.getResource("/data/fragmentcommon.glsl")) : "";
+            String fragmentText = FileUtils.streamToString(FileUtils.getResource(fragment));
+            fragmentText = fragmentCommonText + fragmentText;
+            String vertexText = FileUtils.streamToString(FileUtils.getResource(vertex));
 
-        initializeProgram(gl, true);
-        _after_init(gl);
+            attachVertexShader(gl, vertexText);
+            attachFragmentShader(gl, fragmentText);
+
+            initializeProgram(gl, true);
+            _after_init(gl);
+        } catch (Exception e) {
+            throw new GLException("Cannot load shader", e);
+        }
     }
 
     protected void _after_init(GL2 gl) {

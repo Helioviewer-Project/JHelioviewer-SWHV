@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.base;
+package org.helioviewer.jhv.io;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

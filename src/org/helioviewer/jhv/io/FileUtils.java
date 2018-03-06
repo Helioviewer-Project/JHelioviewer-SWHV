@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.base;
+package org.helioviewer.jhv.io;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -10,18 +10,22 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Scanner;
+
+import javax.annotation.Nullable;
+
+import okio.Okio;
+import okio.BufferedSource;
 
 public class FileUtils {
 
-    public static InputStream getResourceInputStream(String resourcePath) {
+    @Nullable
+    public static InputStream getResource(String resourcePath) {
         return FileUtils.class.getResourceAsStream(resourcePath);
     }
 
-    public static String convertStreamToString(InputStream is) {
-        try (Scanner s = new Scanner(is, StandardCharsets.UTF_8.name())) {
-            s.useDelimiter("\\A");
-            return s.hasNext() ? s.next() : "";
+    public static String streamToString(InputStream is) throws IOException {
+        try (BufferedSource buffer = Okio.buffer(Okio.source(is))) {
+            return buffer.readString(StandardCharsets.UTF_8);
         }
     }
 

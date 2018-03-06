@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Properties;
 
-import org.helioviewer.jhv.base.FileUtils;
+import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.log.Log;
 
 public class Settings {
@@ -31,7 +31,7 @@ public class Settings {
             defaultProperties.clear();
             userProperties.clear();
 
-            try (InputStream is = FileUtils.getResourceInputStream("/settings/defaults.properties")) {
+            try (InputStream is = FileUtils.getResource("/settings/defaults.properties")) {
                 defaultProperties.load(is);
             }
 

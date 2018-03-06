@@ -17,8 +17,8 @@ import java.util.jar.Manifest;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
-import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
+import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVExecutor;
 

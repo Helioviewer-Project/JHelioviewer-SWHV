@@ -18,8 +18,6 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.helioviewer.jhv.base.GZIPUtils;
-import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
@@ -30,6 +28,8 @@ import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKRelatedEvents;
 import org.helioviewer.jhv.data.event.SWEKRelatedOn;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
+import org.helioviewer.jhv.io.GZIPUtils;
+import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.threads.JHVThread.ConnectionThread;
@@ -425,7 +425,7 @@ public class EventDatabase {
     }
 
     private static JHVEvent parseJSON(JsonEvent jsonEvent, boolean full) {
-        return jsonEvent.type.getSource().getHandler().parseEventJSON(JSONUtils.getJSONStream(GZIPUtils.decompress(jsonEvent.json)),
+        return jsonEvent.type.getSource().getHandler().parseEventJSON(JSONUtils.get(GZIPUtils.decompress(jsonEvent.json)),
             jsonEvent.type, jsonEvent.id, jsonEvent.start, jsonEvent.end, full);
     }
 
