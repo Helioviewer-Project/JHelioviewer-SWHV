@@ -3,6 +3,7 @@ package org.helioviewer.jhv.camera.object;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.jhv.astronomy.SpaceObject;
@@ -25,6 +26,7 @@ class SpaceObjectModel extends AbstractTableModel {
         return selected;
     }
 
+    @Nullable
     SpaceObjectElement elementOf(SpaceObject object) {
         for (SpaceObjectElement element : elements) {
             if (element.getObject() == object)

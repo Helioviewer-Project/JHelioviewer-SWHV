@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.time;
 
+import javax.annotation.Nullable;
+
 // derived from SOFA (http://www.iausofa.org)
 public class JulianDay {
 
@@ -47,6 +49,7 @@ public class JulianDay {
     private static final double DJMIN = -68569.5;
     private static final double DJMAX = 1e9;
 
+    @Nullable
     public static double[] mjd2cal(double dj2) {
         double id, im, iy, dj1 = DJM0;
 

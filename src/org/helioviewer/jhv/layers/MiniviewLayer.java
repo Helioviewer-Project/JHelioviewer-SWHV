@@ -8,6 +8,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
@@ -88,6 +90,7 @@ public class MiniviewLayer extends AbstractLayer {
         return "Miniview";
     }
 
+    @Nullable
     @Override
     public String getTimeString() {
         return null;

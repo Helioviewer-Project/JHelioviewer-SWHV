@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -463,6 +464,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         }
     }
 
+    @Nullable
     @Override
     public String getTimeString() {
         return null;

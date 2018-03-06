@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
+import javax.annotation.Nullable;
+
 import kdu_jni.Jp2_input_box;
 import kdu_jni.Jp2_palette;
 import kdu_jni.Jp2_threadsafe_family_src;
@@ -107,6 +109,7 @@ public class KakaduSource {
         return res;
     }
 
+    @Nullable
     public int[] getLUT() throws KduException {
         Jpx_codestream_source xstream = jpxSrc.Access_codestream(0);
         if (!xstream.Exists()) {

@@ -4,6 +4,8 @@ import java.awt.Component;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
@@ -257,12 +259,10 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         return worker != null ? "Loading..." : view.getName();
     }
 
+    @Nullable
     @Override
     public String getTimeString() {
-        if (imageData == null) {
-            return "N/A";
-        }
-        return imageData.getMetaData().getViewpoint().time.toString();
+        return imageData == null ? null : imageData.getMetaData().getViewpoint().time.toString();
     }
 
     @Override

@@ -3,6 +3,8 @@ package org.helioviewer.jhv.view;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
@@ -27,6 +29,7 @@ public interface View {
     boolean isLocal();
     String getName();
 
+    @Nullable
     LUT getDefaultLUT();
 
     boolean isMultiFrame();
