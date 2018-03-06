@@ -235,11 +235,6 @@ public class Band extends AbstractTimelineLayer {
     }
 
     @Override
-    public boolean hasDataColor() {
-        return true;
-    }
-
-    @Override
     public String toString() {
         return bandType.getName();
     }

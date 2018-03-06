@@ -78,6 +78,7 @@ class LoadViewTask extends JHVWorker<View, Void> {
         return null;
     }
 
+    @Nullable
     protected static View requestAndOpenRemoteFile(APIRequest req) throws IOException {
         URI uri = APIRequestManager.requestRemoteFile(req);
         return uri == null ? null : loadView(uri, req);

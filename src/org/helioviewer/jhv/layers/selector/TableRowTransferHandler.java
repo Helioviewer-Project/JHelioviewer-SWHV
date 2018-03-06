@@ -11,6 +11,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DragSource;
 import java.awt.image.BufferedImage;
 
+import javax.annotation.Nullable;
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.TransferHandler;
@@ -44,6 +45,7 @@ class TableRowTransferHandler extends TransferHandler {
         g2.dispose();
     }
 
+    @Nullable
     @Override
     protected Transferable createTransferable(JComponent c) {
         if (c != grid)

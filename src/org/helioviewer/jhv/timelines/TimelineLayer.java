@@ -6,6 +6,8 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
@@ -21,14 +23,14 @@ public interface TimelineLayer {
 
     String getName();
 
+    @Nullable
     Color getDataColor();
-
-    boolean hasDataColor();
 
     boolean isDownloading();
 
     boolean hasData();
 
+    @Nullable
     Component getOptionsPanel();
 
     boolean isDeletable();
@@ -47,8 +49,10 @@ public interface TimelineLayer {
 
     void resetAxis();
 
+    @Nullable
     String getStringValue(long ts);
 
+    @Nullable
     ClickableDrawable getDrawableUnderMouse();
 
     void serialize(JSONObject jo);

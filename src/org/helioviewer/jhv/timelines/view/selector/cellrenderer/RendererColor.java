@@ -23,10 +23,7 @@ public class RendererColor extends JHVTableCellRenderer {
 
         // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
         if (value instanceof TimelineLayer) {
-            TimelineLayer tl = (TimelineLayer) value;
-            if (tl.hasDataColor()) {
-                lineColorPanel.setLineColor(tl.getDataColor());
-            }
+            lineColorPanel.setLineColor(((TimelineLayer) value).getDataColor());
         }
         return lineColorPanel;
     }

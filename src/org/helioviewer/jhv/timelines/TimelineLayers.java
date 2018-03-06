@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
@@ -72,6 +73,7 @@ public class TimelineLayers extends AbstractTableModel {
         return TimelinePanel.NUMBEROFCOLUMNS;
     }
 
+    @Nullable
     @Override
     public Object getValueAt(int row, int col) {
         try {
@@ -81,6 +83,7 @@ public class TimelineLayers extends AbstractTableModel {
         }
     }
 
+    @Nullable
     public static ClickableDrawable getDrawableUnderMouse() {
         for (TimelineLayer tl : layers) {
             ClickableDrawable tlUnderMouse = tl.getDrawableUnderMouse();

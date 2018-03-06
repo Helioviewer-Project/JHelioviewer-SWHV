@@ -2,6 +2,8 @@ package org.helioviewer.jhv.view.jp2view.cache;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.annotation.Nullable;
+
 import kdu_jni.KduException;
 
 import org.helioviewer.jhv.log.Log;
@@ -74,6 +76,7 @@ public class CacheStatusRemote implements CacheStatus {
         return true;
     }
 
+    @Nullable
     @Override
     public AtomicBoolean getFrameStatus(int frame, int level) {
         if (fullyComplete)
