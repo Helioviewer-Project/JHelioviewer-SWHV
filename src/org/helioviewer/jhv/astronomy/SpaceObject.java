@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 
+import javax.annotation.Nullable;
 import javax.swing.border.Border;
 
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
@@ -48,6 +49,7 @@ public class SpaceObject {
         return objectMap.values();
     }
 
+    @Nullable
     public static SpaceObject get(String obj) {
         return objectMap.get(obj);
     }
