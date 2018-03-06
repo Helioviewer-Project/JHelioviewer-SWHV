@@ -11,7 +11,6 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPOutputStream;
 
-import org.helioviewer.jhv.log.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -20,22 +19,14 @@ public class JSONUtils {
 
     private static final int BUFSIZ = 65536;
 
-    public static JSONObject get(InputStream in) {
+    public static JSONObject get(InputStream in) throws IOException, JSONException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8), BUFSIZ)) {
             return new JSONObject(new JSONTokener(reader));
-        } catch (Exception e) {
-            Log.error("Error reading JSON: " + e);
-            return new JSONObject();
         }
     }
 
     public static JSONObject get(Reader in) {
-        try {
-            return new JSONObject(new JSONTokener(in));
-        } catch (Exception e) {
-            Log.error("Error reading JSON: " + e);
-            return new JSONObject();
-        }
+        return new JSONObject(new JSONTokener(in));
     }
 
     public static JSONObject get(URI uri) throws IOException, JSONException {
