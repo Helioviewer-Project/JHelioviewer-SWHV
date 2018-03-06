@@ -2,6 +2,8 @@ package org.helioviewer.jhv.plugins.eve.lines;
 
 import java.net.URI;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.timelines.Timelines;
@@ -17,6 +19,7 @@ class LoadThread extends JHVWorker<EVEResponse, Void> {
         uri = _uri;
     }
 
+    @Nullable
     @Override
     protected EVEResponse backgroundWork() {
         try {

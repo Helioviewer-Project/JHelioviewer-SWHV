@@ -2,6 +2,8 @@ package org.helioviewer.jhv.io;
 
 import java.net.URI;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.layers.selector.State;
 import org.helioviewer.jhv.log.Log;
@@ -17,6 +19,7 @@ class LoadStateTask extends JHVWorker<JSONObject, Void> {
         setThreadName("MAIN--LoadState");
     }
 
+    @Nullable
     @Override
     protected JSONObject backgroundWork() {
         try {

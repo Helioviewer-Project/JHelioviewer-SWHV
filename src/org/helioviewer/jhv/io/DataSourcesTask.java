@@ -3,6 +3,8 @@ package org.helioviewer.jhv.io;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -28,6 +30,7 @@ public class DataSourcesTask extends JHVWorker<Void, Void> {
         setThreadName("MAIN--DataSources");
     }
 
+    @Nullable
     @Override
     protected Void backgroundWork() {
         while (true) {

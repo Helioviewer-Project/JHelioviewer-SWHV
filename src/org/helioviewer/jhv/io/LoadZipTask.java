@@ -11,6 +11,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVWorker;
@@ -24,6 +26,7 @@ class LoadZipTask extends JHVWorker<Void, Void> {
         setThreadName("MAIN--LoadZip");
     }
 
+    @Nullable
     @Override
     protected Void backgroundWork() {
         try (FileSystem zipfs = FileSystems.newFileSystem(URI.create("jar:" + uri), new HashMap<>())) {

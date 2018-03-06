@@ -1,10 +1,11 @@
 package org.helioviewer.jhv.plugins.pfss.data;
 
 import java.awt.EventQueue;
-
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+
+import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.NetClient;
@@ -27,6 +28,7 @@ public class PfssNewDataLoader extends JHVWorker<Void, Void> {
         end = _end;
     }
 
+    @Nullable
     @Override
     protected Void backgroundWork() {
         Calendar cal = GregorianCalendar.getInstance();
