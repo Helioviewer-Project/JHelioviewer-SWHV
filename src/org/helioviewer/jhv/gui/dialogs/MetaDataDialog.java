@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import javax.annotation.Nullable;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -102,6 +103,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         return content;
     }
 
+    @Nullable
     @Override
     public JComponent createBannerPanel() {
         return null;

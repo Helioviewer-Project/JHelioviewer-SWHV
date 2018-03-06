@@ -2,6 +2,7 @@ package org.helioviewer.jhv.gui.dialogs;
 
 import java.awt.event.ActionEvent;
 
+import javax.annotation.Nullable;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -91,6 +92,7 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
         return content;
     }
 
+    @Nullable
     @Override
     public JComponent createBannerPanel() {
         return null;
