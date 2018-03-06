@@ -2,6 +2,8 @@ package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.json.JSONObject;
@@ -38,6 +40,7 @@ public interface Layer {
 
     void setVisible(int idx);
 
+    @Nullable
     String getTimeString();
 
     boolean isDeletable();

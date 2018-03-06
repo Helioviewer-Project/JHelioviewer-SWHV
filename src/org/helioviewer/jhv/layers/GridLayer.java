@@ -4,6 +4,8 @@ import java.awt.Component;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.scale.GridScale;
@@ -374,6 +376,7 @@ public class GridLayer extends AbstractLayer {
         showRadial = show;
     }
 
+    @Nullable
     @Override
     public String getTimeString() {
         return null;

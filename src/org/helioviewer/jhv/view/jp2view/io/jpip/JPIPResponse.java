@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.ProtocolException;
 
+import javax.annotation.Nullable;
+
 /**
  * A response to a JPIPRequest, encapsulates the JPIPDataSegments
  *
@@ -86,6 +88,7 @@ public class JPIPResponse {
      * buffer is not reallocated every time. It is only reallocated if the next
      * data length is bigger than the previous one.
      */
+    @Nullable
     private JPIPDataSegment readSegment(InputStream in) throws IOException {
         long id;
         if ((id = readVBAS(in)) < 0)

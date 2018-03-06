@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.camera;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
@@ -82,6 +84,7 @@ public class CameraHelper {
         return camera.getCurrentDragRotation().rotateInverseVector(hitPoint);
     }
 
+    @Nullable
     public static Vec3 getVectorFromSphere(Camera camera, Viewport vp, double screenX, double screenY, Quat rotation, boolean correctDrag) {
         double up1x = computeUpX(camera, vp, screenX);
         double up1y = computeUpY(camera, vp, screenY);
@@ -96,6 +99,7 @@ public class CameraHelper {
         return rotation.rotateInverseVector(hitPoint);
     }
 
+    @Nullable
     public static Vec3 getVectorFromPlane(Camera camera, Viewport vp, double screenX, double screenY, Quat rotation, boolean correctDrag) {
         Quat currentDragRotation = camera.getCurrentDragRotation();
         Vec3 altnormal = rotation.rotateVector(Vec3.ZAxis);
@@ -115,6 +119,7 @@ public class CameraHelper {
         return rotation.rotateInverseVector(hitPoint);
     }
 
+    @Nullable
     public static Vec3 getVectorFromSphereOrPlane(Camera camera, Viewport vp, double x, double y, Quat cameraDifferenceRotation) {
         Vec3 rotatedHitPoint = getVectorFromSphere(camera, vp, x, y, cameraDifferenceRotation, false);
         if (rotatedHitPoint != null && rotatedHitPoint.z > 0.)

@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.camera.annotate;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.camera.Camera;
@@ -40,6 +42,7 @@ abstract class AbstractAnnotateable implements Annotateable {
                         radius * Math.sin(y) * Math.cos(z));
     }
 
+    @Nullable
     Vec3 computePoint(int x, int y) {
         if (Displayer.mode == Displayer.DisplayMode.Orthographic) {
             return CameraHelper.getVectorFromSphere(camera, Displayer.getActiveViewport(), x, y, camera.getViewpoint().orientation, true);

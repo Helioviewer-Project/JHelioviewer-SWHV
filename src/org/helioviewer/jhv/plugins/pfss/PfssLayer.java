@@ -4,6 +4,8 @@ import java.awt.Component;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -75,6 +77,7 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
 
     private String timeString = null;
 
+    @Nullable
     @Override
     public String getTimeString() {
         return timeString;

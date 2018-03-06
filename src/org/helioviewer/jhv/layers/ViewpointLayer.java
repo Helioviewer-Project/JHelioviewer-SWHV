@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.camera.Camera;
@@ -175,6 +177,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         return "Viewpoint";
     }
 
+    @Nullable
     @Override
     public String getTimeString() {
         return timeString;

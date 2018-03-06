@@ -3,6 +3,8 @@ package org.helioviewer.jhv.view;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
@@ -138,6 +140,7 @@ public class AbstractView implements View {
         return metaData[0];
     }
 
+    @Nullable
     @Override
     public LUT getDefaultLUT() {
         if (builtinLUT != null)

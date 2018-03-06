@@ -7,6 +7,8 @@ import java.net.Proxy;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.Settings;
 
 public class ProxySettings {
@@ -56,6 +58,7 @@ public class ProxySettings {
         }
     }
 
+    @Nullable
     private static Proxy detectProxy(String host, String port, Proxy.Type type) {
         String proxyHost = System.getProperty(host);
         if (proxyHost != null) {

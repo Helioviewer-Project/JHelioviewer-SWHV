@@ -3,6 +3,8 @@ package org.helioviewer.jhv.plugins.pfss.data;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 
 import com.google.common.cache.Cache;
@@ -29,6 +31,7 @@ public class PfssCache {
         return ret;
     }
 
+    @Nullable
     public PfssData getNearestData(long time) {
         Long c = map.ceilingKey(time);
         Long f = map.floorKey(time);
