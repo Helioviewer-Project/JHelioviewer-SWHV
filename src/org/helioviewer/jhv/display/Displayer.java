@@ -7,6 +7,7 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.base.scale.GridScale;
+import org.helioviewer.jhv.base.scale.Transform;
 import org.helioviewer.jhv.camera.Camera;
 // import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.UpdateViewpoint;
@@ -22,16 +23,20 @@ public class Displayer implements JHVEventHighlightListener {
     public static final double CAMERA_ZOOM_MULTIPLIER_BUTTON = 2.;
 
     public enum DisplayMode {
-        Orthographic(GLSLSolarShader.ortho, GridScale.ortho), Latitudinal(GLSLSolarShader.lati, GridScale.lati),
-        LogPolar(GLSLSolarShader.logpolar, GridScale.logpolar), Polar(GLSLSolarShader.polar, GridScale.polar);
+        Orthographic(GLSLSolarShader.ortho, GridScale.ortho, Transform.transformlatitudinal),
+        Latitudinal(GLSLSolarShader.lati, GridScale.lati, Transform.transformlatitudinal),
+        LogPolar(GLSLSolarShader.logpolar, GridScale.logpolar, Transform.transformpolar),
+        Polar(GLSLSolarShader.polar, GridScale.polar, Transform.transformpolar);
 
         public final GLSLSolarShader shader;
         public final GridScale scale;
+        public final Transform xform;
         public final JRadioButtonMenuItem radio;
 
-        DisplayMode(GLSLSolarShader _shader, GridScale _scale) {
+        DisplayMode(GLSLSolarShader _shader, GridScale _scale, Transform _xform) {
             shader = _shader;
             scale = _scale;
+            xform = _xform;
             radio = new JRadioButtonMenuItem(toString());
             radio.addActionListener(e -> setProjectionMode(this));
         }

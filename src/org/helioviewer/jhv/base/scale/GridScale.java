@@ -12,10 +12,10 @@ import org.helioviewer.jhv.math.Vec3;
 
 public abstract class GridScale {
 
-    public static final GridScale polar = new GridScaleIdentity(0, 360, 0, 0.5 * ImageLayers.getLargestPhysicalSize(), Transform.transformpolar);
-    public static final GridScale lati = new GridScaleIdentity(0, 360, -90, 90, Transform.transformlatitudinal);
-    public static final GridScale logpolar = new GridScaleLogY(0, 360, 0, 0.5 * ImageLayers.getLargestPhysicalSize(), Transform.transformpolar);
-    public static final GridScale ortho = new GridScaleOrtho(0, 0, 0, 0, Transform.transformlatitudinal);
+    public static final GridScale polar = new GridScaleIdentity(0, 360, 0, 0.5 * ImageLayers.getLargestPhysicalSize());
+    public static final GridScale lati = new GridScaleIdentity(0, 360, -90, 90);
+    public static final GridScale logpolar = new GridScaleLogY(0, 360, 0, 0.5 * ImageLayers.getLargestPhysicalSize());
+    public static final GridScale ortho = new GridScaleOrtho(0, 0, 0, 0);
 
     protected abstract double scaleX(double val);
 
@@ -39,10 +39,6 @@ public abstract class GridScale {
 
     public abstract void set(double _xStart, double _xStop, double _yStart, double _yStop);
 
-    public abstract Vec2 transform(Vec3 pt);
-
-    public abstract Vec3 transformInverse(Vec2 pt);
-
     public abstract Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridLayer.GridType gridType);
 
     public abstract Vec2 mouseToGridInv(int px, int py, Viewport vp, Camera camera);
@@ -53,11 +49,9 @@ public abstract class GridScale {
         protected double xStop;
         protected double yStart;
         protected double yStop;
-        protected final Transform transform;
 
-        GridScaleAbstract(double _xStart, double _xStop, double _yStart, double _yStop, Transform _transform) {
+        GridScaleAbstract(double _xStart, double _xStop, double _yStart, double _yStop) {
             set(_xStart, _xStop, _yStart, _yStop);
-            transform = _transform;
         }
 
         @Override
@@ -99,16 +93,6 @@ public abstract class GridScale {
         }
 
         @Override
-        public Vec2 transform(Vec3 pt) {
-            return transform.transform(pt, this);
-        }
-
-        @Override
-        public Vec3 transformInverse(Vec2 pt) {
-            return transform.transformInverse(pt);
-        }
-
-        @Override
         public Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridLayer.GridType gridType) {
             double x = CameraHelper.computeUpX(camera, vp, px) / vp.aspect + 0.5;
             double y = CameraHelper.computeUpY(camera, vp, py) + 0.5;
@@ -125,8 +109,8 @@ public abstract class GridScale {
 
     private static class GridScaleLogY extends GridScaleAbstract {
 
-        GridScaleLogY(double _xStart, double _xStop, double _yStart, double _yStop, Transform _transform) {
-            super(_xStart, _xStop, _yStart, _yStop, _transform);
+        GridScaleLogY(double _xStart, double _xStop, double _yStart, double _yStop) {
+            super(_xStart, _xStop, _yStart, _yStop);
         }
 
         @Override
@@ -153,8 +137,8 @@ public abstract class GridScale {
 
     private static class GridScaleIdentity extends GridScaleAbstract {
 
-        GridScaleIdentity(double _xStart, double _xStop, double _yStart, double _yStop, Transform _transform) {
-            super(_xStart, _xStop, _yStart, _yStop, _transform);
+        GridScaleIdentity(double _xStart, double _xStop, double _yStart, double _yStop) {
+            super(_xStart, _xStop, _yStart, _yStop);
         }
 
         @Override
@@ -179,8 +163,8 @@ public abstract class GridScale {
     }
 
     private static class GridScaleOrtho extends GridScaleIdentity {
-        GridScaleOrtho(double _xStart, double _xStop, double _yStart, double _yStop, Transform _transform) {
-            super(_xStart, _xStop, _yStart, _yStop, _transform);
+        GridScaleOrtho(double _xStart, double _xStop, double _yStart, double _yStop) {
+            super(_xStart, _xStop, _yStart, _yStop);
         }
 
         @Override
