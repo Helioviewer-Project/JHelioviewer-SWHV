@@ -4,7 +4,6 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.GridLayer;
-import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
@@ -22,9 +21,9 @@ public interface GridScale {
     Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridLayer.GridType gridType);
     Vec2 mouseToGridInv(int px, int py, Viewport vp, Camera camera);
 
-    GridScale polar = new GridScaleIdentity(0, 360, 0, 0.5 * ImageLayers.getLargestPhysicalSize());
+    GridScale polar = new GridScaleIdentity(0, 360, 0, 0);
     GridScale lati = new GridScaleIdentity(0, 360, -90, 90);
-    GridScale logpolar = new GridScaleLogY(0, 360, 0, 0.5 * ImageLayers.getLargestPhysicalSize());
+    GridScale logpolar = new GridScaleLogY(0, 360, 0, 0);
     GridScale ortho = new GridScaleOrtho(0, 0, 0, 0);
 
     abstract class GridScaleAbstract implements GridScale {
