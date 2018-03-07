@@ -11,11 +11,11 @@ public interface Load {
 
     void get(URI uri);
 
-    Image image = new Image();
-    Request request = new Request();
-    FITS fits = new FITS();
-    Timeline timeline = new Timeline();
-    State state = new State();
+    Load image = new Image();
+    Load request = new Request();
+    Load fits = new FITS();
+    Load timeline = new Timeline();
+    Load state = new State();
 
     class Image implements Load {
         @Override

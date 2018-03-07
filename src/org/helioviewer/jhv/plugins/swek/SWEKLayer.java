@@ -17,6 +17,7 @@ import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.scale.GridScale;
+import org.helioviewer.jhv.base.scale.Transform;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.data.cache.JHVEventCache;
 import org.helioviewer.jhv.data.cache.JHVEventHandler;
@@ -261,7 +262,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         gl.glDisable(GL2.GL_TEXTURE_2D);
     }
 
-    private static void drawIconScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Camera camera, Viewport vp) {
+    private static void drawIconScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Transform xform, Camera camera, Viewport vp) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -269,7 +270,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         Vec3 pt = pi.centralPoint();
         if (pt != null) {
             pt = camera.getViewpoint().orientation.rotateVector(pt);
-            Vec2 tf = scale.transform(pt);
+            Vec2 tf = xform.transform(pt, scale);
             bindTexture(gl, evtr.getSupplier().getGroup());
             if (evtr.isHighlighted()) {
                 drawImageScale(gl, tf.x * vp.aspect, tf.y, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
@@ -415,7 +416,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
                     if (icons) {
                         gl.glDisable(GL2.GL_DEPTH_TEST);
-                        drawIconScale(gl, evtr, evt, Displayer.mode.scale, camera, vp);
+                        drawIconScale(gl, evtr, evt, Displayer.mode.scale, Displayer.mode.xform, camera, vp);
                         gl.glEnable(GL2.GL_DEPTH_TEST);
                     }
                 }
