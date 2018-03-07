@@ -2,6 +2,7 @@ package org.helioviewer.jhv.gui.components;
 
 import java.awt.Dimension;
 
+import javax.annotation.Nullable;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -60,6 +61,7 @@ public class ImageSelectorPanel extends JPanel implements DataSourcesListener {
         }
     }
 
+    @Nullable
     public String getAvailabilityURL() {
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
         return item == null ? null : DataSources.getServerSetting(item.server, "availability.images") + "#IID" + item.sourceId;

@@ -110,6 +110,7 @@ public class AbstractView implements View {
     public void setFrame(JHVDate time) {
     }
 
+    @Nullable
     @Override
     public JHVDate getNextTime(AnimationMode mode, int deltaT) {
         return null;

@@ -60,19 +60,4 @@ abstract class ExtensionFileFilter extends FileFilter {
         return false;
     }
 
-    /**
-     * Returns the default extensions of this file filter.
-     * 
-     * By default, the first element of the list of accepted extensions will be
-     * considered as the default extension.
-     * 
-     * @return The default extension
-     */
-    public String getDefaultExtension() {
-        if (extensions.length > 0) {
-            return extensions[0];
-        }
-        return null;
-    }
-
 }

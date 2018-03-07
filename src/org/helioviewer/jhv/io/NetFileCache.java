@@ -21,7 +21,7 @@ public class NetFileCache {
         build(new CacheLoader<URI, URI>() {
             @Override
             public URI load(@Nonnull URI uri) throws IOException {
-                File f = File.createTempFile("jhv", null, JHVGlobals.FileCacheDir);
+                File f = File.createTempFile("jhv", null, JHVGlobals.fileCacheDir);
                 try (NetClient nc = NetClient.of(uri, false, NetClient.NetCache.BYPASS); BufferedSink sink = Okio.buffer(Okio.sink(f))) {
                     sink.writeAll(nc.getSource());
                 }
