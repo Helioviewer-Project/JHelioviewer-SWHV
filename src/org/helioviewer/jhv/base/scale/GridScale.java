@@ -10,40 +10,24 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 
-public abstract class GridScale {
+public interface GridScale {
 
-    public static final GridScale polar = new GridScaleIdentity(0, 360, 0, 0.5 * ImageLayers.getLargestPhysicalSize());
-    public static final GridScale lati = new GridScaleIdentity(0, 360, -90, 90);
-    public static final GridScale logpolar = new GridScaleLogY(0, 360, 0, 0.5 * ImageLayers.getLargestPhysicalSize());
-    public static final GridScale ortho = new GridScaleOrtho(0, 0, 0, 0);
+    double getInterpolatedXValue(double v);
+    double getInterpolatedYValue(double v);
+    double getXValueInv(double v);
+    double getYValueInv(double v);
+    double getYstart();
+    double getYstop();
+    void set(double _xStart, double _xStop, double _yStart, double _yStop);
+    Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridLayer.GridType gridType);
+    Vec2 mouseToGridInv(int px, int py, Viewport vp, Camera camera);
 
-    protected abstract double scaleX(double val);
+    GridScale polar = new GridScaleIdentity(0, 360, 0, 0.5 * ImageLayers.getLargestPhysicalSize());
+    GridScale lati = new GridScaleIdentity(0, 360, -90, 90);
+    GridScale logpolar = new GridScaleLogY(0, 360, 0, 0.5 * ImageLayers.getLargestPhysicalSize());
+    GridScale ortho = new GridScaleOrtho(0, 0, 0, 0);
 
-    protected abstract double invScaleX(double val);
-
-    protected abstract double scaleY(double val);
-
-    protected abstract double invScaleY(double val);
-
-    public abstract double getInterpolatedXValue(double v);
-
-    public abstract double getInterpolatedYValue(double v);
-
-    public abstract double getXValueInv(double v);
-
-    public abstract double getYValueInv(double v);
-
-    public abstract double getYstart();
-
-    public abstract double getYstop();
-
-    public abstract void set(double _xStart, double _xStop, double _yStart, double _yStop);
-
-    public abstract Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridLayer.GridType gridType);
-
-    public abstract Vec2 mouseToGridInv(int px, int py, Viewport vp, Camera camera);
-
-    private abstract static class GridScaleAbstract extends GridScale {
+    abstract class GridScaleAbstract implements GridScale {
 
         protected double xStart;
         protected double xStop;
@@ -105,9 +89,18 @@ public abstract class GridScale {
             double y = CameraHelper.computeUpY(camera, vp, py);
             return new Vec2(x, y);
         }
+
+        protected abstract double scaleX(double val);
+
+        protected abstract double invScaleX(double val);
+
+        protected abstract double scaleY(double val);
+
+        protected abstract double invScaleY(double val);
+
     }
 
-    private static class GridScaleLogY extends GridScaleAbstract {
+    class GridScaleLogY extends GridScaleAbstract {
 
         GridScaleLogY(double _xStart, double _xStop, double _yStart, double _yStop) {
             super(_xStart, _xStop, _yStart, _yStop);
@@ -135,7 +128,7 @@ public abstract class GridScale {
 
     }
 
-    private static class GridScaleIdentity extends GridScaleAbstract {
+    class GridScaleIdentity extends GridScaleAbstract {
 
         GridScaleIdentity(double _xStart, double _xStop, double _yStart, double _yStop) {
             super(_xStart, _xStop, _yStart, _yStop);
@@ -162,7 +155,7 @@ public abstract class GridScale {
         }
     }
 
-    private static class GridScaleOrtho extends GridScaleIdentity {
+    class GridScaleOrtho extends GridScaleIdentity {
         GridScaleOrtho(double _xStart, double _xStop, double _yStart, double _yStop) {
             super(_xStart, _xStop, _yStart, _yStop);
         }
