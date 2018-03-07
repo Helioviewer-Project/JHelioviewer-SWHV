@@ -116,22 +116,19 @@ public class JHVGlobals {
         }
 
         try {
-            LibCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "lib");
-            FileCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "file");
-            ClientCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "client");
-            MMapCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "mmap");
+            libCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "lib");
+            fileCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "file");
+            clientCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "client");
         } catch (Exception e) {
-            LibCacheDir = new File(System.getProperty("java.io.tmpdir"));
-            FileCacheDir = new File(System.getProperty("java.io.tmpdir"));
-            ClientCacheDir = new File(System.getProperty("java.io.tmpdir"));
-            MMapCacheDir = new File(System.getProperty("java.io.tmpdir"));
+            libCacheDir = new File(System.getProperty("java.io.tmpdir"));
+            fileCacheDir = new File(System.getProperty("java.io.tmpdir"));
+            clientCacheDir = new File(System.getProperty("java.io.tmpdir"));
         }
     }
 
-    public static File LibCacheDir;
-    public static File FileCacheDir;
-    public static File ClientCacheDir;
-    public static File MMapCacheDir;
+    public static File libCacheDir;
+    public static File fileCacheDir;
+    public static File clientCacheDir;
 
     public static final HyperOpenURL hyperOpenURL = new HyperOpenURL();
 

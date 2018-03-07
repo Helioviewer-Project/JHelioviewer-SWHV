@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
 
+import javax.annotation.Nullable;
+
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.Metadata;
 import org.astrogrid.samp.client.AbstractMessageHandler;
@@ -48,6 +50,7 @@ class SampClient extends HubConnector {
         Map<String, String> harmless = Collections.singletonMap("x-samp.mostly-harmless", "1");
 
         addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("image.load.fits", harmless)) {
+            @Nullable
             @Override
             public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
@@ -62,6 +65,7 @@ class SampClient extends HubConnector {
         });
         // lie about support for FITS tables to get SSA to send us FITS
         addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("table.load.fits", harmless)) {
+            @Nullable
             @Override
             public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
@@ -77,6 +81,7 @@ class SampClient extends HubConnector {
             }
         });
         addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("jhv.load.image", harmless)) {
+            @Nullable
             @Override
             public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
@@ -90,6 +95,7 @@ class SampClient extends HubConnector {
             }
         });
         addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("jhv.load.request", harmless)) {
+            @Nullable
             @Override
             public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
@@ -103,6 +109,7 @@ class SampClient extends HubConnector {
             }
         });
         addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("jhv.load.timeline", harmless)) {
+            @Nullable
             @Override
             public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
@@ -116,6 +123,7 @@ class SampClient extends HubConnector {
             }
         });
         addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("jhv.load.state", harmless)) {
+            @Nullable
             @Override
             public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
                 try {

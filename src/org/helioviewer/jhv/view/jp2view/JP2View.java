@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.annotation.Nullable;
+
 import kdu_jni.KduException;
 import kdu_jni.Kdu_cache;
 import kdu_jni.Kdu_thread_env;
@@ -223,6 +225,7 @@ public class JP2View extends AbstractView {
     }
 
     // to be accessed only from Layers
+    @Nullable
     @Override
     public JHVDate getNextTime(AnimationMode mode, int deltaT) {
         int next = targetFrame + 1;

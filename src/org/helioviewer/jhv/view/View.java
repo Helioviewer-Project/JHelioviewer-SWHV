@@ -49,6 +49,7 @@ public interface View {
     JHVDate getLastTime();
 
     // <!- only for Layers
+    @Nullable
     JHVDate getNextTime(AnimationMode mode, int deltaT);
     void setFrame(JHVDate time);
     JHVDate getFrameTime(JHVDate time);
