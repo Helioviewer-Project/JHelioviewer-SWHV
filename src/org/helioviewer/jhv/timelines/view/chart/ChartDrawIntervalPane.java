@@ -12,7 +12,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.RoundRectangle2D;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import javax.swing.JComponent;
 
@@ -26,6 +25,8 @@ import org.helioviewer.jhv.timelines.draw.TimeAxis;
 
 @SuppressWarnings("serial")
 public class ChartDrawIntervalPane extends JComponent implements DrawListener, MouseListener, MouseMotionListener {
+
+    private final Calendar calendar = Calendar.getInstance();
 
     private boolean mouseOverInterval = true;
     private Point mousePressed;
@@ -186,11 +187,11 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
         double ratioTime = timeDiff / (double) maxTicks;
         int day = -1;
 
-        GregorianCalendar tickGreg = new GregorianCalendar();
         for (int i = 0; i < maxTicks; ++i) {
             long tickValue = availableInterval.start + (long) (i * ratioTime);
-            tickGreg.setTimeInMillis(tickValue);
-            int currentday = tickGreg.get(GregorianCalendar.DAY_OF_MONTH);
+            calendar.setTimeInMillis(tickValue);
+            int currentday = calendar.get(Calendar.DAY_OF_MONTH);
+
             String tickText;
             if (day == currentday) {
                 tickText = DrawConstants.HOUR_TIME_FORMAT_NO_SEC.format(tickValue);
@@ -203,7 +204,6 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
     }
 
     private void drawLabelsDay(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, int maxTicks, int availableIntervalWidth, double ratioX) {
-        Calendar calendar = new GregorianCalendar();
         calendar.setTimeInMillis(availableInterval.start);
 
         int startYear = calendar.get(Calendar.YEAR);
@@ -236,7 +236,6 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
     }
 
     private void drawLabelsMonth(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, int maxTicks, int availableIntervalWidth, double ratioX) {
-        Calendar calendar = new GregorianCalendar();
         calendar.setTimeInMillis(availableInterval.start);
 
         int startYear = calendar.get(Calendar.YEAR);
@@ -273,7 +272,6 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
     }
 
     private void drawLabelsYear(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, int maxTicks, int availableIntervalWidth, double ratioX) {
-        Calendar calendar = new GregorianCalendar();
         calendar.setTimeInMillis(availableInterval.start);
 
         int startYear = calendar.get(Calendar.YEAR);
