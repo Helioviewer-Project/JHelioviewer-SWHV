@@ -12,7 +12,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.RoundRectangle2D;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import javax.swing.JComponent;
@@ -158,7 +157,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
             return;
         }
 
-        int tickTextWidth = (int) g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(new Date()), g).getWidth();
+        int tickTextWidth = (int) g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(System.currentTimeMillis()), g).getWidth();
         int availableIntervalWidth = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1;
         int maxTicks = Math.max(2, (availableIntervalWidth - tickTextWidth * 2) / tickTextWidth);
         double ratioX = availableIntervalWidth / (double) (availableInterval.end - availableInterval.start);
@@ -189,8 +188,8 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
 
         GregorianCalendar tickGreg = new GregorianCalendar();
         for (int i = 0; i < maxTicks; ++i) {
-            Date tickValue = new Date(availableInterval.start + (long) (i * ratioTime));
-            tickGreg.setTime(tickValue);
+            long tickValue = availableInterval.start + (long) (i * ratioTime);
+            tickGreg.setTimeInMillis(tickValue);
             int currentday = tickGreg.get(GregorianCalendar.DAY_OF_MONTH);
             String tickText;
             if (day == currentday) {
@@ -199,14 +198,13 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
                 tickText = DrawConstants.FULL_DATE_TIME_FORMAT_NO_SEC.format(tickValue);
                 day = currentday;
             }
-            drawLabel(g, availableInterval, selectedInterval, tickText, availableIntervalWidth, tickValue.getTime(), ratioX);
+            drawLabel(g, availableInterval, selectedInterval, tickText, availableIntervalWidth, tickValue, ratioX);
         }
     }
 
     private void drawLabelsDay(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, int maxTicks, int availableIntervalWidth, double ratioX) {
         Calendar calendar = new GregorianCalendar();
-        calendar.clear();
-        calendar.setTime(new Date(availableInterval.start));
+        calendar.setTimeInMillis(availableInterval.start);
 
         int startYear = calendar.get(Calendar.YEAR);
         int startMonth = calendar.get(Calendar.MONTH);
@@ -239,8 +237,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
 
     private void drawLabelsMonth(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, int maxTicks, int availableIntervalWidth, double ratioX) {
         Calendar calendar = new GregorianCalendar();
-        calendar.clear();
-        calendar.setTime(new Date(availableInterval.start));
+        calendar.setTimeInMillis(availableInterval.start);
 
         int startYear = calendar.get(Calendar.YEAR);
         int startMonth = calendar.get(Calendar.MONTH);
@@ -255,9 +252,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
         startYear = calendar.get(Calendar.YEAR);
         startMonth = calendar.get(Calendar.MONTH);
 
-        calendar.clear();
-        calendar.setTime(new Date(availableInterval.end));
-
+        calendar.setTimeInMillis(availableInterval.end);
         int endYear = calendar.get(Calendar.YEAR);
         int endMonth = calendar.get(Calendar.MONTH);
 
@@ -279,27 +274,25 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
 
     private void drawLabelsYear(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, int maxTicks, int availableIntervalWidth, double ratioX) {
         Calendar calendar = new GregorianCalendar();
-        calendar.clear();
-        calendar.setTime(new Date(availableInterval.start));
+        calendar.setTimeInMillis(availableInterval.start);
 
         int startYear = calendar.get(Calendar.YEAR);
 
         calendar.clear();
-        calendar.set(startYear, 0, 1);
+        calendar.set(startYear, Calendar.JANUARY, 1);
         long ts = calendar.getTime().getTime();
         if (!(availableInterval.start <= ts && ts <= availableInterval.end)) {
             startYear++;
         }
 
-        calendar.clear();
-        calendar.setTime(new Date(availableInterval.end));
+        calendar.setTimeInMillis(availableInterval.end);
         int endYear = calendar.get(Calendar.YEAR);
 
         int hticks = Math.min(Math.max(endYear - startYear + 1, 2), maxTicks);
         int yearDifference = (endYear - startYear) / (hticks - 1);
         for (int i = 0; i < hticks; ++i) {
             calendar.clear();
-            calendar.set(startYear + i * yearDifference, 0, 1);
+            calendar.set(startYear + i * yearDifference, Calendar.JANUARY, 1);
 
             String tickText = DrawConstants.YEAR_ONLY_TIME_FORMAT.format(calendar.getTime());
             drawLabel(g, availableInterval, selectedInterval, tickText, availableIntervalWidth, calendar.getTime().getTime(), ratioX);
