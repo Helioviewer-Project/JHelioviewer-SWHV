@@ -157,7 +157,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
             return;
         }
 
-        int tickTextWidth = (int) g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(System.currentTimeMillis()), g).getWidth();
+        int tickTextWidth = (int) g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(availableInterval.start), g).getWidth();
         int availableIntervalWidth = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1;
         int maxTicks = Math.max(2, (availableIntervalWidth - tickTextWidth * 2) / tickTextWidth);
         double ratioX = availableIntervalWidth / (double) (availableInterval.end - availableInterval.start);

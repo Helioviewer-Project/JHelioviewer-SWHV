@@ -8,6 +8,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ClipBoardCopier;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 
@@ -22,7 +23,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
     private final Camera camera;
 
     public PositionStatusPanel() {
-        setText(formatOrtho(null, 0, 0, 0));
+        setText(formatOrtho(null, 0, 0, 0, 0));
         camera = Displayer.getCamera();
     }
 
@@ -37,15 +38,16 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         } else {
             Vec3 v = CameraHelper.getVectorFromSphereOrPlane(camera, vp, x, y, camera.getCurrentDragRotation());
             if (v == null) {
-                setText(formatOrtho(null, 0, 0, 0));
+                setText(formatOrtho(null, 0, 0, 0, 0));
             } else {
                 double r = Math.sqrt(v.x * v.x + v.y * v.y);
 
                 double d = camera.getViewpoint().distance;
                 double px = (180 / Math.PI) * Math.atan2(v.x, d);
                 double py = (180 / Math.PI) * Math.atan2(v.y, d);
+                double pa = MathUtils.mapTo0To360((180 / Math.PI) * Math.atan2(v.y, v.x) - 90); // w.r.t. axis
 
-                setText(formatOrtho(coord, r, px, py));
+                setText(formatOrtho(coord, r, px, py, pa));
             }
         }
     }
@@ -64,13 +66,13 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
             return String.format("%.2fau", r * Sun.MeanEarthDistanceInv);
     }
 
-    private static String formatOrtho(Vec2 coord, double r, double px, double py) {
+    private static String formatOrtho(Vec2 coord, double r, double px, double py, double pa) {
         String coordStr;
         if (coord == null || Double.isNaN(coord.x) || Double.isNaN(coord.y))
             coordStr = nullCoordStr;
         else
             coordStr = String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
-        return String.format("(\u03C6,\u03B8) : (%s) | \u03c1 : %s | (x,y) : (%s,%s)", coordStr, formatR(r), formatXY(px), formatXY(py));
+        return String.format("(\u03C6,\u03B8) : (%s) | \u03c1 : %s | (x,y,\u03c8) : (%s,%s,%6.2f)", coordStr, formatR(r), formatXY(px), formatXY(py), pa);
     }
 
     @Override
