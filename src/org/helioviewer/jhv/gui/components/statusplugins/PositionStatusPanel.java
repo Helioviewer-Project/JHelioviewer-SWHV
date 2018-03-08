@@ -47,7 +47,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
                 double py = (180 / Math.PI) * Math.atan2(v.y, d);
                 double pa = MathUtils.mapTo0To360((180 / Math.PI) * Math.atan2(v.y, v.x) - 90); // w.r.t. axis
 
-                setText(formatOrtho(coord, r, px, py, pa));
+                setText(formatOrtho(coord, r, pa, px, py));
             }
         }
     }
@@ -66,13 +66,13 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
             return String.format("%.2fau", r * Sun.MeanEarthDistanceInv);
     }
 
-    private static String formatOrtho(Vec2 coord, double r, double px, double py, double pa) {
+    private static String formatOrtho(Vec2 coord, double r, double pa, double px, double py) {
         String coordStr;
         if (coord == null || Double.isNaN(coord.x) || Double.isNaN(coord.y))
             coordStr = nullCoordStr;
         else
             coordStr = String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
-        return String.format("(\u03C6,\u03B8) : (%s) | \u03c1 : %s | (x,y,\u03c8) : (%s,%s,%6.2f)", coordStr, formatR(r), formatXY(px), formatXY(py), pa);
+        return String.format("(\u03C6,\u03B8) : (%s) | (\u03c1,\u03c8) : (%s,%6.2f\u00B0) | (x,y) : (%s,%s)", coordStr, formatR(r), pa, formatXY(px), formatXY(py));
     }
 
     @Override
