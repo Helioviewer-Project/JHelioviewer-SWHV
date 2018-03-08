@@ -8,6 +8,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.plugin.PluginManager;
@@ -91,6 +93,7 @@ public class State {
         main.put("timelines", ja);
     }
 
+    @Nullable
     private static Object json2Object(JSONObject json) {
         JSONObject jdata = json.optJSONObject("data");
         if (jdata == null)
@@ -215,6 +218,7 @@ public class State {
             play = _play;
         }
 
+        @Nullable
         @Override
         protected Void backgroundWork() {
             for (ImageLayer layer : newlist) {
