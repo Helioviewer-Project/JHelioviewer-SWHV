@@ -36,11 +36,10 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
 
     public ChartDrawIntervalPane() {
         setPreferredSize(new Dimension(getPreferredSize().width, DrawConstants.INTERVAL_SELECTION_HEIGHT));
-        setSize(getPreferredSize());
+        //setSize(getPreferredSize());
 
         addMouseListener(this);
         addMouseMotionListener(this);
-
         DrawController.addDrawListener(this);
     }
 
@@ -210,8 +209,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
         int startMonth = calendar.get(Calendar.MONTH);
         int startDay = calendar.get(Calendar.DAY_OF_MONTH);
 
-        calendar.clear();
-        calendar.set(startYear, startMonth, startDay);
+        calendar.set(startYear, startMonth, startDay, 0, 0, 0);
         long ts = calendar.getTimeInMillis();
         if (!(availableInterval.start <= ts && ts <= availableInterval.end)) {
             calendar.add(Calendar.DAY_OF_MONTH, 1);
@@ -226,8 +224,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
         int tickCount = Math.min(numberOfDays, maxTicks);
         double ratioDays = Math.ceil(numberOfDays / (double) tickCount);
         for (int i = 0; i < maxTicks; ++i) {
-            calendar.clear();
-            calendar.set(startYear, startMonth, startDay);
+            calendar.set(startYear, startMonth, startDay, 0, 0, 0);
             calendar.add(Calendar.DAY_OF_MONTH, (int) (i * ratioDays));
             long time = calendar.getTimeInMillis();
 
@@ -242,8 +239,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
         int startYear = calendar.get(Calendar.YEAR);
         int startMonth = calendar.get(Calendar.MONTH);
 
-        calendar.clear();
-        calendar.set(startYear, startMonth, 1);
+        calendar.set(startYear, startMonth, 1, 0, 0, 0);
         long ts = calendar.getTimeInMillis();
         if (!(availableInterval.start <= ts && ts <= availableInterval.end)) {
             calendar.add(Calendar.MONTH, 1);
@@ -263,8 +259,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
         double ratioMonth = Math.ceil(numberOfMonths / (double) tickCount);
 
         for (int i = 0; i < maxTicks; ++i) {
-            calendar.clear();
-            calendar.set(startYear, startMonth, 1);
+            calendar.set(startYear, startMonth, 1, 0, 0, 0);
             calendar.add(Calendar.MONTH, (int) (i * ratioMonth));
             long time = calendar.getTimeInMillis();
 
@@ -278,8 +273,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
 
         int startYear = calendar.get(Calendar.YEAR);
 
-        calendar.clear();
-        calendar.set(startYear, Calendar.JANUARY, 1);
+        calendar.set(startYear, Calendar.JANUARY, 1, 0, 0, 0);
         long ts = calendar.getTimeInMillis();
         if (!(availableInterval.start <= ts && ts <= availableInterval.end)) {
             startYear++;
@@ -291,8 +285,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
         int hticks = Math.min(Math.max(endYear - startYear + 1, 2), maxTicks);
         int yearDifference = (endYear - startYear) / (hticks - 1);
         for (int i = 0; i < hticks; ++i) {
-            calendar.clear();
-            calendar.set(startYear + i * yearDifference, Calendar.JANUARY, 1);
+            calendar.set(startYear + i * yearDifference, Calendar.JANUARY, 1, 0, 0, 0);
             long time = calendar.getTimeInMillis();
 
             String tickText = DrawConstants.YEAR_ONLY_TIME_FORMAT.format(time);
