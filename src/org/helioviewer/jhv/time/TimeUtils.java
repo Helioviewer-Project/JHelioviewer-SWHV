@@ -91,7 +91,7 @@ public class TimeUtils {
 
     public static long optParse(String date, long alt) {
         try {
-            return prettyParser.parse(date).get(0).getTime() / 1000 * 1000;
+            return roundSec(prettyParser.parse(date).get(0).getTime());
         } catch (Exception e) {
             return alt;
         }
