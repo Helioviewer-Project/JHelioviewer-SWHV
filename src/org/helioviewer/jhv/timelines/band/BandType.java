@@ -6,13 +6,35 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.helioviewer.jhv.timelines.draw.YAxis.YAxisScale;
+import org.helioviewer.jhv.timelines.draw.YAxis.YAxisLogScale;
+import org.helioviewer.jhv.timelines.draw.YAxis.YAxisPositiveIdentityScale;
+import org.helioviewer.jhv.timelines.draw.YAxis.YAxisIdentityScale;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class BandType {
+    public enum Scale {
+        Logarithmic, Linear, PositiveLinear;
 
+        YAxisScale generateScale(String _label) {
+            switch (this) {
+            case Logarithmic:
+                return new YAxisLogScale(_label);
+            case Linear:
+                return new YAxisIdentityScale(_label);
+            case PositiveLinear:
+                return new YAxisPositiveIdentityScale(_label);
+            default:
+                return new YAxisIdentityScale(_label);
+            }
+        }
+    }
     private static final HashMap<String, List<BandType>> groups = new HashMap<>();
-
+    
+    private Scale scale = Scale.Linear;
+    
     static void loadBandTypes(JSONArray jo) {
         for (int i = 0; i < jo.length(); i++) {
             BandType bandtype = new BandType(jo.getJSONObject(i));
@@ -49,7 +71,6 @@ public class BandType {
     private final Map<String, Double> warnLevels;
     private double min = 0;
     private double max = 1;
-    private boolean isLog = true;
 
     private final JSONObject json;
 
@@ -71,9 +92,13 @@ public class BandType {
             max = range.optDouble(1, max);
         }
 
-        String scale = jo.optString("scale", "");
-        if ("logarithmic".equals(scale))
-            isLog = true;
+        String scale_str = jo.optString("scale", "");
+        if ("logarithmic".equals(scale_str))
+            scale = Scale.Logarithmic;
+        else if ("linear".equals(scale_str))
+            scale = Scale.Linear;
+        else
+            scale = Scale.PositiveLinear;
 
         JSONArray warn = jo.optJSONArray("warnLevels");
         HashMap<String, Double> warnHelp = new HashMap<>();
@@ -112,8 +137,8 @@ public class BandType {
         return max;
     }
 
-    public boolean isLogScale() {
-        return isLog;
+    public YAxisScale getScale(String label) {
+        return scale.generateScale(label);
     }
 
     public String getBaseURL() {
@@ -139,3 +164,4 @@ public class BandType {
     }
 
 }
+

@@ -25,6 +25,7 @@ import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
+import org.helioviewer.jhv.timelines.draw.YAxis.YAxisPositiveIdentityScale;
 import org.helioviewer.jhv.view.jp2view.JP2ViewCallisto;
 import org.json.JSONObject;
 
@@ -34,7 +35,7 @@ import com.google.common.cache.RemovalListener;
 
 public class RadioData extends AbstractTimelineLayer {
 
-    static final YAxis yAxis = new YAxis(400, 20, "Mhz", false);
+    static final YAxis yAxis = new YAxis(400, 20, new YAxisPositiveIdentityScale("Mhz"));
 
     private static final int MAX_AMOUNT_OF_DAYS = 3;
     private static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 4;

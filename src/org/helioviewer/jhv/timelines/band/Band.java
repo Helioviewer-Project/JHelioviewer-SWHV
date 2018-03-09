@@ -39,7 +39,7 @@ public class Band extends AbstractTimelineLayer {
     public Band(BandType _bandType) {
         bandType = _bandType;
         optionsPanel = new BandOptionPanel(this);
-        yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getUnitLabel(), bandType.isLogScale());
+        yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getScale(bandType.getUnitLabel()));
         graphColor = BandColors.getNextColor();
         fillWarnLevels();
     }
@@ -51,7 +51,7 @@ public class Band extends AbstractTimelineLayer {
 
         bandType = new BandType(jbandType);
         optionsPanel = new BandOptionPanel(this);
-        yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getUnitLabel(), bandType.isLogScale());
+        yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getScale(bandType.getUnitLabel()));
 
         JSONObject jcolor = jo.optJSONObject("color");
         if (jcolor != null) {

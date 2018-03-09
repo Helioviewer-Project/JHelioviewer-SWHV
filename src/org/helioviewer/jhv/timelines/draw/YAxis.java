@@ -15,10 +15,10 @@ public class YAxis {
     private final double scaledMaxBound;
     private boolean highlighted = false;
 
-    public YAxis(double _start, double _end, String _label, boolean isLogScale) {
+    public YAxis(double _start, double _end, YAxisScale _scale) {
         start = _start;
         end = _end;
-        scale = isLogScale ? new YAxisLogScale(_label) : new YAxisPositiveIdentityScale(_label);
+        scale = _scale;
         scaledMinBound = scale(UNSCALED_MIN_BOUND);
         scaledMaxBound = scale(UNSCALED_MAX_BOUND);
     }
@@ -101,7 +101,7 @@ public class YAxis {
         return scale.invScale(maxValue);
     }
 
-    private interface YAxisScale {
+    public interface YAxisScale {
 
         double scale(double val);
 
@@ -111,10 +111,10 @@ public class YAxis {
 
     }
 
-    private static class YAxisLogScale implements YAxisScale {
+    public static class YAxisLogScale implements YAxisScale {
         private final String label;
 
-        YAxisLogScale(String _label) {
+        public YAxisLogScale(String _label) {
             label = "log(" + _label.replace("^2", "\u00B2") + ')';
         }
 
@@ -139,12 +139,42 @@ public class YAxis {
             return label;
         }
     }
-
-    private static class YAxisPositiveIdentityScale implements YAxisScale {
+    public static class YAxisIdentityScale implements YAxisScale {
 
         private final String label;
 
-        YAxisPositiveIdentityScale(String _label) {
+        public YAxisIdentityScale(String _label) {
+            label = _label.replace("^2", "\u00B2");
+        }
+
+        @Override
+        public double scale(double val) {
+            if (val < 0) {
+                return 0;
+            }
+            if (val > DrawConstants.DISCARD_LEVEL_HIGH) {
+                return DrawConstants.DISCARD_LEVEL_HIGH;
+            }
+            return val;
+        }
+
+        @Override
+        public double invScale(double val) {
+            return val;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
+
+    }
+
+    public static class YAxisPositiveIdentityScale implements YAxisScale {
+
+        private final String label;
+
+        public YAxisPositiveIdentityScale(String _label) {
             label = _label.replace("^2", "\u00B2");
         }
 
