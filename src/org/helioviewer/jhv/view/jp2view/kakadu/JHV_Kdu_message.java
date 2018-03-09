@@ -15,10 +15,12 @@ class JHV_Kdu_message extends Kdu_message {
         raiseException = _raiseException;
     }
 
+/*  Only for debug, may crash
     @Override
     public void Put_text(String text) {
         System.out.print(text);
     }
+*/
 
     @Override
     public void Flush(boolean endOfMessage) throws KduException {
