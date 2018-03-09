@@ -25,11 +25,12 @@ import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
+import org.helioviewer.jhv.timelines.draw.YAxis.YAxisIdentityScale;
 import org.json.JSONObject;
 
 public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEventHandler {
 
-    private final YAxis yAxis = new YAxis(0, 0, "Events", false);
+    private final YAxis yAxis = new YAxis(0, 0, new YAxisIdentityScale("Events"));
     private static EventPlotConfiguration eventUnderMouse;
 
     public EventTimelineLayer(JSONObject jo) {
