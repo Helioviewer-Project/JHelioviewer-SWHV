@@ -57,7 +57,7 @@ public class DataSourcesTask extends JHVWorker<Void, Void> {
                 parser.parse(jo);
                 return null;
             } catch (ValidationException e) {
-                Log.error("Server " + url + " " + e);
+                Log.error("Server " + url + ' ' + e);
                 e.getCausingExceptions().stream().map(ValidationException::getMessage).forEach(Log::error);
                 break;
             } catch (IOException e) {

@@ -27,7 +27,7 @@ public class Viewport {
 
     @Override
     public String toString() {
-        return "Offset: " + x + "," + yGL + " Size: " + width + "," + height;
+        return "Offset: " + x + ',' + yGL + " Size: " + width + ',' + height;
     }
 
 }

@@ -35,7 +35,7 @@ import com.google.common.cache.RemovalListener;
 
 public class RadioData extends AbstractTimelineLayer {
 
-    static final YAxis yAxis = new YAxis(400, 20, new YAxisPositiveIdentityScale("Mhz"));
+    static final YAxis yAxis = new YAxis(400, 20, new YAxisPositiveIdentityScale("MHz"));
 
     private static final int MAX_AMOUNT_OF_DAYS = 3;
     private static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 4;

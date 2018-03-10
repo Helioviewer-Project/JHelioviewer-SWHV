@@ -12,7 +12,7 @@ public class Pair<A, B> {
 
     @Override
     public String toString() {
-        return "Pair<" + a + "," + b + ">";
+        return "Pair<" + a + ',' + b + '>';
     }
 
 }
