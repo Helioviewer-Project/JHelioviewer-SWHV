@@ -112,6 +112,7 @@ public class YAxis {
     }
 
     public static class YAxisLogScale implements YAxisScale {
+
         private final String label;
 
         public YAxisLogScale(String _label) {
@@ -139,6 +140,7 @@ public class YAxis {
             return label;
         }
     }
+
     public static class YAxisIdentityScale implements YAxisScale {
 
         private final String label;

@@ -51,7 +51,7 @@ class PfssDataLoader extends JHVWorker<PfssData, Void> {
             short[] flinez = (short[]) bhdu.getColumn("FIELDLINEz");
             short[] flines = (short[]) bhdu.getColumn("FIELDLINEs");
             if (flinex.length != fliney.length || flinex.length != flinez.length || flinex.length != flines.length)
-                throw new Exception("Fieldline arrays not equal " + flinex.length + " " + fliney.length + " " + flinez.length + " " + flinex.length + ": " + url);
+                throw new Exception("Fieldline arrays not equal " + flinex.length + ' ' + fliney.length + ' ' + flinez.length + ' ' + flinex.length + ": " + url);
 
             return new PfssData(date, flinex, fliney, flinez, flines, points);
         } catch (Exception e) {

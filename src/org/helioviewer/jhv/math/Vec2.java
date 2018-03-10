@@ -189,7 +189,7 @@ public class Vec2 {
             return;
 
         // can't happen / something is really messed up
-        Log.error("The length of the vector is bigger than 1: " + len + " " + this);
+        Log.error("The length of the vector is bigger than 1: " + len + ' ' + this);
         System.exit(1);
 
         this.x = Double.NaN;
@@ -255,7 +255,7 @@ public class Vec2 {
 
     @Override
     public String toString() {
-        return "(" + x + ", " + y + ")";
+        return "(" + x + ',' + y + ')';
     }
 
 }

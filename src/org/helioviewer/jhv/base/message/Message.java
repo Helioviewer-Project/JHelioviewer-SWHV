@@ -45,7 +45,7 @@ public class Message {
             return;
 
         EventQueue.invokeLater(() -> {
-            JOptionPane.showMessageDialog(null, ((_title == null ? "" : _title + "\n") + (_msg == null ? "No error details available." : _msg.toString())), (_exitImmediately ? "Fatal Error" : "Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, ((_title == null ? "" : _title + '\n') + (_msg == null ? "No error details available." : _msg.toString())), (_exitImmediately ? "Fatal Error" : "Error"), JOptionPane.ERROR_MESSAGE);
             if (_exitImmediately)
                 System.exit(-1);
         });
@@ -64,7 +64,7 @@ public class Message {
             return;
 
         String msg = _msg.toString();
-        EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(null, ((_title == null ? "" : _title + "\n") + (msg == null || msg.isEmpty() ? "No warning details available." : msg)), "Warning", JOptionPane.WARNING_MESSAGE));
+        EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(null, ((_title == null ? "" : _title + '\n') + (msg == null || msg.isEmpty() ? "No warning details available." : msg)), "Warning", JOptionPane.WARNING_MESSAGE));
     }
 
 }

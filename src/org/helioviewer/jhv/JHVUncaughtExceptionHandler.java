@@ -105,7 +105,7 @@ class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
     // we do not use the logger here, since it should work even before logging initialization
     @Override
     public void uncaughtException(Thread t, Throwable e) {
-        String className = e.getClass().getCanonicalName() + "\n";
+        String className = e.getClass().getCanonicalName() + '\n';
         StringBuilder stackTrace = new StringBuilder(className);
         for (StackTraceElement el : e.getStackTrace()) {
             stackTrace.append("at ").append(el).append('\n');

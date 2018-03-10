@@ -90,7 +90,7 @@ public class ResolutionSet {
 
         @Override
         public String toString() {
-            return "[[Discard=" + level + "][ScaleFactor=" + factorX + "," + factorY + "][ZoomDims=" + width + "," + height + "]]";
+            return "[[Discard=" + level + "][ScaleFactor=" + factorX + ',' + factorY + "][ZoomDims=" + width + ',' + height + "]]";
         }
 
     }

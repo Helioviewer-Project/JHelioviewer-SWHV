@@ -24,7 +24,7 @@ public class LineRead {
         int cr = in.read();
         int lf = in.read();
         if (cr != CR || lf != LF) {
-            throw new IOException("CRLF expected: " + cr + "/" + lf);
+            throw new IOException("CRLF expected: " + cr + '/' + lf);
         }
     }
 

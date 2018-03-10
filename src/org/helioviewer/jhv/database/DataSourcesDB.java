@@ -66,8 +66,8 @@ public class DataSourcesDB {
         ArrayList<Pair<Integer, String>> res = new ArrayList<>();
         try {
             select.setString(1, server);
-            select.setString(2, "%" + observatory + "%");
-            select.setString(3, "%" + dataset + "%");
+            select.setString(2, '%' + observatory + '%');
+            select.setString(3, '%' + dataset + '%');
 
             try (ResultSet rs = select.executeQuery()) {
                 while (rs.next())

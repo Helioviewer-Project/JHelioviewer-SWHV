@@ -251,7 +251,7 @@ public class Vec3 {
 
     @Override
     public final String toString() {
-        return "(" + x + ", " + y + ", " + z + ")";
+        return "(" + x + ',' + y + ',' + z + ')';
     }
 
 }

@@ -46,7 +46,7 @@ public class Region {
 
     @Override
     public String toString() {
-        return "[Region: Corner: [" + llx + "," + lly + "] Size: [" + width + "," + height + "]";
+        return "[Region: Corner: [" + llx + ',' + lly + "] Size: [" + width + ',' + height + ']';
     }
 
 }

@@ -40,7 +40,7 @@ public class ImageParams {
 
     @Override
     public String toString() {
-        return "ImageParams[ " + viewpoint + " " + subImage + " " + resolution + " [LayerNum=" + frame + "] " + factor + "]";
+        return "ImageParams[ " + viewpoint + ' ' + subImage + ' ' + resolution + " [LayerNum=" + frame + "] " + factor + ']';
     }
 
 }
