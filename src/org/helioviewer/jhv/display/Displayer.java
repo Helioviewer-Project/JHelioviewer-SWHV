@@ -17,7 +17,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 
-public class Displayer implements JHVEventHighlightListener {
+public class Displayer implements ActionListener, JHVEventHighlightListener {
 
     public static final double CAMERA_ZOOM_MULTIPLIER_WHEEL = 2.;
     public static final double CAMERA_ZOOM_MULTIPLIER_BUTTON = 2.;
@@ -92,7 +92,8 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static void setActiveViewport(int x, int y) {
         if (multiview) {
-            for (int i = 0; i < viewports.length; ++i) {
+            int len = viewports.length;
+            for (int i = 0; i < len; ++i) {
                 Viewport vp = viewports[i];
                 if (vp != null && vp.contains(x, y)) {
                     activeViewport = i;
@@ -113,7 +114,8 @@ public class Displayer implements JHVEventHighlightListener {
     private static int countActiveLayers() {
         int ct = 0;
         if (multiview) {
-            for (int i = 0; i < viewports.length; ++i) {
+            int len = viewports.length;
+            for (int i = 0; i < len; ++i) {
                 if (ImageLayers.getImageLayerInViewport(i) != null)
                     ct++;
             }
@@ -184,12 +186,9 @@ public class Displayer implements JHVEventHighlightListener {
     private static double renderFactor = -1;
     private static boolean toDisplay = false;
 
-    private static final Timer displayTimer = new Timer(1000 / 60, new DisplayTimerListener());
-
     private Displayer() {
         JHVRelatedEvents.addHighlightListener(this);
-        displayTimer.setCoalesce(true);
-        displayTimer.start();
+        new Timer(1000 / 60, this).start();
     }
 
     public static void render(double f) {
@@ -210,17 +209,15 @@ public class Displayer implements JHVEventHighlightListener {
         }
     }
 
-    private static class DisplayTimerListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (toDisplay) {
-                ImageViewerGui.getGLComponent().repaint(); // asap
-                toDisplay = false;
-            }
-            if (renderFactor != -1) {
-                ImageLayers.setRender(camera, renderFactor);
-                renderFactor = -1;
-            }
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (toDisplay) {
+            ImageViewerGui.getGLComponent().repaint(); // asap
+            toDisplay = false;
+        }
+        if (renderFactor != -1) {
+            ImageLayers.setRender(camera, renderFactor);
+            renderFactor = -1;
         }
     }
 
@@ -240,9 +237,5 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     private static final Displayer instance = new Displayer();
-
-    public static Displayer getSingletonInstance() {
-        return instance;
-    }
 
 }
