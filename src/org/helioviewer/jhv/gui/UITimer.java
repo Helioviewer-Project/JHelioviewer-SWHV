@@ -14,13 +14,15 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 
-public class UITimer {
+public class UITimer implements ActionListener {
 
-    static {
-        new Timer(1000 / 10, new UIListener()).start();
-    }
-
+    private static final UITimer instance = new UITimer();
     private static final HashSet<LazyComponent> lazyComponents = new HashSet<>();
+    public static final BusyIndicator busyIndicator = new BusyIndicator();
+
+    private UITimer() {
+        new Timer(1000 / 10, this).start();
+    }
 
     public static void register(LazyComponent lazy) {
         lazyComponents.add(lazy);
@@ -30,45 +32,38 @@ public class UITimer {
         lazyComponents.remove(lazy);
     }
 
-    public static final BusyIndicator busyIndicator = new BusyIndicator();
-
     private static volatile boolean cacheChanged = false;
+    private int frameRate = -1;
 
     // accessed from J2KReader threads
     public static void cacheStatusChanged() {
         cacheChanged = true;
     }
 
-    private static class UIListener implements ActionListener {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        BusyIndicator.incrementAngle();
 
-        private int frameRate = -1;
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            BusyIndicator.incrementAngle();
-
-            if (cacheChanged) {
-                cacheChanged = false;
-                MoviePanel.getTimeSlider().repaint();
-            }
-
-            for (LazyComponent lazy : lazyComponents)
-                lazy.lazyRepaint();
-
-            int f = 0;
-            ImageLayer layer;
-            if (Movie.isPlaying() && (layer = Layers.getActiveImageLayer()) != null) {
-                f = layer.getView().getCurrentFramerate();
-            }
-
-            if (f != frameRate) {
-                frameRate = f;
-                ImageViewerGui.getFramerateStatusPanel().update(f);
-            }
-
-            DrawController.draw();
+        if (cacheChanged) {
+            cacheChanged = false;
+            MoviePanel.getTimeSlider().repaint();
         }
 
+        for (LazyComponent lazy : lazyComponents)
+            lazy.lazyRepaint();
+
+        int f = 0;
+        ImageLayer layer;
+        if (Movie.isPlaying() && (layer = Layers.getActiveImageLayer()) != null) {
+            f = layer.getView().getCurrentFramerate();
+        }
+
+        if (f != frameRate) {
+            frameRate = f;
+            ImageViewerGui.getFramerateStatusPanel().update(f);
+        }
+
+        DrawController.draw();
     }
 
 }
