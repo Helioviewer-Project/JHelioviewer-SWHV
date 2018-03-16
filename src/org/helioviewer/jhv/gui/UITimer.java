@@ -9,9 +9,6 @@ import javax.swing.Timer;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.base.BusyIndicator;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
-import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 
 public class UITimer implements ActionListener {
@@ -33,7 +30,6 @@ public class UITimer implements ActionListener {
     }
 
     private static volatile boolean cacheChanged = false;
-    private int frameRate = -1;
 
     // accessed from J2KReader threads
     public static void cacheStatusChanged() {
@@ -51,17 +47,6 @@ public class UITimer implements ActionListener {
 
         for (LazyComponent lazy : lazyComponents)
             lazy.lazyRepaint();
-
-        int f = 0;
-        ImageLayer layer;
-        if (Movie.isPlaying() && (layer = Layers.getActiveImageLayer()) != null) {
-            f = layer.getView().getCurrentFramerate();
-        }
-
-        if (f != frameRate) {
-            frameRate = f;
-            ImageViewerGui.getFramerateStatusPanel().update(f);
-        }
 
         DrawController.draw();
     }
