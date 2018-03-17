@@ -52,7 +52,6 @@ class ImageLayerOptions extends JPanel {
         addToGridBag(c, channelMixerPanel);
 
         ComponentUtils.smallVariant(this);
-        levelsPanel.syncFont(); // JideButton does not respect variant small
     }
 
     private void addToGridBag(GridBagConstraints c, FilterDetails details) {
