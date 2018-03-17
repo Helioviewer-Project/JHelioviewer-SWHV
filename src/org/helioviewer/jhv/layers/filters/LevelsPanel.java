@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.Buttons;
@@ -19,8 +20,7 @@ import com.jidesoft.swing.RangeSlider;
 public class LevelsPanel implements FilterDetails {
 
     private final RangeSlider slider;
-    private final JLabel label;
-    private final JideButton autoButton;
+    private final JTextArea label;
     private final JPanel buttonPanel;
 
     static String align3(int value) {
@@ -38,7 +38,7 @@ public class LevelsPanel implements FilterDetails {
     }
 
     private static String format(int low, int high) {
-        return "<html>" + align3(low) + "<br/>" + align3(high);
+        return align3(low) + '\n' + align3(high);
     }
 
     public LevelsPanel(ImageLayer layer) {
@@ -57,7 +57,13 @@ public class LevelsPanel implements FilterDetails {
             }
         });
         slider.setRangeDraggable(true);
-        label = new JLabel(format(slider.getLowValue(), slider.getHighValue()), JLabel.RIGHT);
+
+        label = new JTextArea(format(slider.getLowValue(), slider.getHighValue()));
+        label.setDragEnabled(false);
+        label.setHighlighter(null);
+        label.setEditable(false);
+        label.setOpaque(false);
+
         slider.addChangeListener(e -> {
             int lo = slider.getLowValue();
             int hi = slider.getHighValue();
@@ -67,7 +73,7 @@ public class LevelsPanel implements FilterDetails {
         });
         WheelSupport.installMouseWheelSupport(slider);
 
-        autoButton = new JideButton(Buttons.brightness);
+        JideButton autoButton = new JideButton(Buttons.brightness);
         autoButton.setToolTipText("Auto brightness");
         autoButton.addActionListener(e -> {
             slider.setLowValue(0);
@@ -92,10 +98,6 @@ public class LevelsPanel implements FilterDetails {
     @Override
     public Component getLabel() {
         return buttonPanel;
-    }
-
-    public void syncFont() {
-        autoButton.setFont(label.getFont());
     }
 
 }
