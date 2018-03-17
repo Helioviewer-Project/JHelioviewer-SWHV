@@ -15,6 +15,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultTreeSelectionModel;
+import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -79,10 +80,13 @@ public class DataSourcesTree extends JTree {
         setModel(new DefaultTreeModel(nodeRoot));
         // setRootVisible(false);
 
-        DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) getCellRenderer();
-        renderer.setOpenIcon(null);
-        renderer.setClosedIcon(null);
-        renderer.setLeafIcon(null);
+        TreeCellRenderer renderer = getCellRenderer();
+        if (renderer instanceof DefaultTreeCellRenderer) {
+            DefaultTreeCellRenderer defaultRenderer = (DefaultTreeCellRenderer) renderer;
+            defaultRenderer.setOpenIcon(null);
+            defaultRenderer.setClosedIcon(null);
+            defaultRenderer.setLeafIcon(null);
+        }
 
         setSelectionModel(new OneLeafTreeSelectionModel());
         ToolTipManager.sharedInstance().registerComponent(this);
