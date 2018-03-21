@@ -2,15 +2,13 @@ package org.helioviewer.jhv.gui.components.calendar;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Toolkit;
+import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.util.HashSet;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
@@ -22,7 +20,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
-public class JHVCarringtonPicker extends JPanel implements FocusListener {
+public class JHVCarringtonPicker extends JPanel {
 
     private final HashSet<JHVCalendarListener> listeners = new HashSet<>();
 
@@ -35,7 +33,12 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener {
         setLayout(new BorderLayout());
 
         crPopupButton.setToolTipText("Select Carrington rotation");
-        crPopupButton.addFocusListener(this);
+        crPopupButton.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                hideCRPopup();
+            }
+        });
         crPopupButton.addActionListener(e -> {
             if (crPopup == null) {
                 crPopupButton.requestFocus();
@@ -47,7 +50,6 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener {
         add(crPopupButton);
 
         carringtonPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        addFocusListenerToAllChildren(carringtonPanel);
     }
 
     public void addJHVCalendarListener(JHVCalendarListener l) {
@@ -80,22 +82,11 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener {
         }
     }
 
-    @Override
-    public void focusGained(FocusEvent e) {
-    }
-
-    @Override
-    public void focusLost(FocusEvent e) {
-        if (!carringtonPanel.isAncestorOf(e.getOppositeComponent()) && (e.getComponent() == crPopupButton || carringtonPanel.isAncestorOf(e.getComponent()))) {
-            hideCRPopup();
-        }
-    }
-
     private void hideCRPopup() {
         if (crPopup != null) {
             crPopup.hide();
-            informAllJHVCalendarListeners();
             crPopup = null;
+            informAllJHVCalendarListeners();
         }
     }
 
@@ -118,24 +109,6 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener {
         // show popup
         crPopup = factory.getPopup(crPopupButton, carringtonPanel, x, y);
         crPopup.show();
-    }
-
-    /**
-     * Adds to all subcomponents of a component the focus listener off this
-     * class.
-     *
-     * @param parent
-     *            add focus listener to subcomponents of this parent
-     */
-    private void addFocusListenerToAllChildren(JComponent parent) {
-        for (Component component : parent.getComponents()) {
-            if (component.getFocusListeners().length > 0) {
-                component.addFocusListener(this);
-            }
-            if (component instanceof JComponent) {
-                addFocusListenerToAllChildren((JComponent) component);
-            }
-        }
     }
 
     private class JHVCarrington extends JPanel {
