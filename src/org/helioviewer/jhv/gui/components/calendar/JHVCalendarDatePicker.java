@@ -2,10 +2,9 @@ package org.helioviewer.jhv.gui.components.calendar;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Toolkit;
+import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Calendar;
@@ -13,7 +12,6 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 
 import javax.swing.BorderFactory;
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.Popup;
@@ -32,7 +30,7 @@ import com.jidesoft.swing.JideButton;
  * @see JHVCalendar
  */
 @SuppressWarnings("serial")
-public class JHVCalendarDatePicker extends JPanel implements FocusListener {
+public class JHVCalendarDatePicker extends JPanel {
 
     private final HashSet<JHVCalendarListener> listeners = new HashSet<>();
     private final Calendar calendar = new GregorianCalendar();
@@ -47,7 +45,12 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener {
 
         // set up text field
         textField.setText(TimeUtils.formatDate(calendar.getTime().getTime()));
-        textField.addFocusListener(this);
+        textField.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                setDateFromTextField();
+            }
+        });
         textField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -57,7 +60,12 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener {
             }
         });
 
-        calPopupButton.addFocusListener(this);
+        calPopupButton.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                hideCalPopup();
+            }
+        });
         calPopupButton.addActionListener(e -> {
             setDateFromTextField();
             if (calPopup == null) {
@@ -75,8 +83,6 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener {
         jhvCalendar.setPreferredSize(jhvCalendar.getMinimumSize());
         jhvCalendar.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         jhvCalendar.addJHVCalendarListener(e -> hideCalPopup());
-
-        addFocusListenerToAllChildren(jhvCalendar);
     }
 
     public void addJHVCalendarListener(JHVCalendarListener l) {
@@ -91,23 +97,6 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener {
         JHVCalendarEvent e = new JHVCalendarEvent(this);
         for (JHVCalendarListener l : listeners) {
             l.actionPerformed(e);
-        }
-    }
-
-    @Override
-    public void focusGained(FocusEvent e) {
-    }
-
-    @Override
-    public void focusLost(FocusEvent e) {
-        // if the receiver of the focus is not a subcomponent of the jhvCalendar and
-        // the popup button or a subcomponent of jhvCalendar lost the focus than hide the popup
-        if (!jhvCalendar.isAncestorOf(e.getOppositeComponent()) && (e.getComponent() == calPopupButton || jhvCalendar.isAncestorOf(e.getComponent()))) {
-            hideCalPopup();
-        }
-        // has textfield lost the focus
-        if (e.getComponent() == textField) {
-            setDateFromTextField();
         }
     }
 
@@ -159,27 +148,9 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener {
     // Closes the popup window if it is still displayed.
     private void hideCalPopup() {
         if (calPopup != null) {
-            setDateFromCalendar();
             calPopup.hide();
             calPopup = null;
-        }
-    }
-
-    /**
-     * Adds to all subcomponents of a component the focus listener of this
-     * class.
-     *
-     * @param parent
-     *            add focus listener to subcomponents of this parent
-     */
-    private void addFocusListenerToAllChildren(JComponent parent) {
-        for (Component component : parent.getComponents()) {
-            if (component.getFocusListeners().length > 0) {
-                component.addFocusListener(this);
-            }
-            if (component instanceof JComponent) {
-                addFocusListenerToAllChildren((JComponent) component);
-            }
+            setDateFromCalendar();
         }
     }
 
