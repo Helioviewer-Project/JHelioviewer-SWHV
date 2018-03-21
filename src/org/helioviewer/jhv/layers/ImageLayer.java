@@ -344,7 +344,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     }
 
     public double getAutoBrightness() {
-        return imageData.getAutoBrightness();
+        return imageData == null ? 1 : imageData.getAutoBrightness();
     }
 
     public boolean isLoadedForState() {
