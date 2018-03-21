@@ -43,7 +43,7 @@ public class RadioData extends AbstractTimelineLayer {
     private static final RemovalListener<Long, RadioJP2Data> removalListener = removed -> removed.getValue().removeData();
     private static final Cache<Long, RadioJP2Data> cache = CacheBuilder.newBuilder().maximumSize(DAYS_IN_CACHE).removalListener(removalListener).build();
 
-    private static RadioOptionsPanel optionsPanel;
+    private final RadioOptionsPanel optionsPanel;
     private static IndexColorModel colorModel;
 
     public RadioData(JSONObject jo) {
