@@ -2,6 +2,7 @@ package org.helioviewer.jhv;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.GraphicsEnvironment;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -30,7 +31,7 @@ import nom.tam.fits.FitsFactory;
 
 public class JHelioviewer {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception{
         // Save command line arguments
         CommandLine.setArguments(args);
         // Prints the usage message
@@ -38,6 +39,9 @@ public class JHelioviewer {
             System.out.println(CommandLine.getUsageMessage());
             return;
         }
+
+        if (GraphicsEnvironment.isHeadless())
+            throw new Exception("This application cannot run in a headless configuration.");
 
         // Uncaught runtime errors are displayed in a dialog box in addition
         JHVUncaughtExceptionHandler.setupHandlerForThread();
