@@ -59,6 +59,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         return color;
     }
 
+    @Nullable
     public ImageIcon getIcon() {
         return supplier.getGroup().getIcon();
     }

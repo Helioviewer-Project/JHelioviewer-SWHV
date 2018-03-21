@@ -191,7 +191,8 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
         g.fillRect(x0, y, w, spacePerLine);
 
         ImageIcon icon = event.getIcon();
-        g.drawImage(icon.getImage(), x0 + w / 2 - sz / 2, y + h / 2 - sz / 2, x0 + w / 2 + sz / 2, y + h / 2 + sz / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
+        if (icon != null)
+            g.drawImage(icon.getImage(), x0 + w / 2 - sz / 2, y + h / 2 - sz / 2, x0 + w / 2 + sz / 2, y + h / 2 + sz / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
 
         if (hl && mousePosition != null) {
             drawText(graphArea, g, event, y, mousePosition.x);
@@ -215,9 +216,12 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
         g.setColor(DrawConstants.TEXT_BACKGROUND_COLOR);
         g.fillRect(mouseX + 5, y, width + 21 + 10, txts.size() * 10 + 11);
         g.setColor(DrawConstants.TEXT_COLOR);
+
         y += 5;
         ImageIcon icon = event.getIcon();
-        g.drawImage(icon.getImage(), mouseX + 8, y - 2, mouseX + 24, y + 14, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
+        if (icon != null)
+            g.drawImage(icon.getImage(), mouseX + 8, y - 2, mouseX + 24, y + 14, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
+
         for (String txt : txts) {
             g.drawString(txt, mouseX + 26, y += 10);
         }
