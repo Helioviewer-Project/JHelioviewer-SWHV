@@ -9,7 +9,9 @@ import javax.swing.Timer;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.event.JHVEventHighlightListener;
+import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.MoviePanel;
+import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.layers.TimespanListener;
@@ -19,7 +21,7 @@ import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.json.JSONObject;
 
-public class DrawController implements JHVEventHighlightListener, TimeListener, TimespanListener {
+public class DrawController implements JHVEventHighlightListener, TimeListener, TimespanListener, LazyComponent {
 
     public static final TimeAxis selectedAxis = new TimeAxis(0, 0);
     public static final TimeAxis availableAxis = new TimeAxis(0, 0);
@@ -42,6 +44,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
         long t = System.currentTimeMillis();
         setSelectedInterval(t - 2 * TimeUtils.DAY_IN_MILLIS, t);
         layersTimer.setRepeats(false);
+        UITimer.register(this);
     }
 
     public static void saveState(JSONObject jo) {
@@ -269,7 +272,8 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     private static boolean toDraw;
     private static boolean drawMovieLine;
 
-    public static void draw() {
+    @Override
+    public void lazyRepaint() {
         if (stopped)
             return;
 
