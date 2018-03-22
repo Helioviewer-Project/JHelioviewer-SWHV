@@ -14,7 +14,12 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.View.AnimationMode;
 
-public class Movie {
+public class Movie implements ActionListener {
+
+    private static final Movie instance = new Movie();
+
+    private Movie() {
+    }
 
     static void setMaster(ImageLayer layer) {
         View view;
@@ -63,25 +68,18 @@ public class Movie {
         }
     }
 
-    private static int deltaT = 0;
-    private static final Timer frameTimer;
+    private static int deltaT;
+    private static final Timer frameTimer = new Timer(1000 / 20, instance);
 
-    static {
-        frameTimer = new Timer(1000 / 20, new FrameTimerListener());
-        frameTimer.setCoalesce(true);
-    }
-
-    private static class FrameTimerListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            ImageLayer layer = Layers.getActiveImageLayer();
-            if (layer != null) {
-                JHVDate nextTime = layer.getView().getNextTime(animationMode, deltaT);
-                if (nextTime == null)
-                    pause();
-                else
-                    setTime(nextTime);
-            }
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        ImageLayer layer = Layers.getActiveImageLayer();
+        if (layer != null) {
+            JHVDate nextTime = layer.getView().getNextTime(animationMode, deltaT);
+            if (nextTime == null)
+                pause();
+            else
+                setTime(nextTime);
         }
     }
 
