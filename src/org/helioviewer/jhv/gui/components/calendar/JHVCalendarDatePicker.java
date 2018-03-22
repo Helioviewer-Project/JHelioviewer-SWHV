@@ -43,8 +43,7 @@ public class JHVCalendarDatePicker extends JPanel {
     public JHVCalendarDatePicker() {
         setLayout(new BorderLayout());
 
-        // set up text field
-        textField.setText(TimeUtils.formatDate(calendar.getTime().getTime()));
+        setTextField();
         textField.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -76,7 +75,6 @@ public class JHVCalendarDatePicker extends JPanel {
             }
         });
 
-        // place sub components
         add(calPopupButton, BorderLayout.EAST);
         add(textField, BorderLayout.CENTER);
 
@@ -104,7 +102,7 @@ public class JHVCalendarDatePicker extends JPanel {
         try {
             setTime(TimeUtils.parseDate(textField.getText()));
         } catch (Exception e) {
-            textField.setText(TimeUtils.formatDate(calendar.getTime().getTime()));
+            setTextField();
         }
         informAllJHVCalendarListeners();
     }
@@ -145,7 +143,6 @@ public class JHVCalendarDatePicker extends JPanel {
         calPopup.show();
     }
 
-    // Closes the popup window if it is still displayed.
     private void hideCalPopup() {
         if (calPopup != null) {
             calPopup.hide();
@@ -157,16 +154,15 @@ public class JHVCalendarDatePicker extends JPanel {
     public void setTime(long time) {
         if (time > TimeUtils.MINIMAL_DATE.milli && time < TimeUtils.MAXIMAL_DATE.milli)
             calendar.setTimeInMillis(time);
-        textField.setText(TimeUtils.formatDate(calendar.getTime().getTime()));
+        setTextField();
     }
 
-    /**
-     * Returns the selected date.
-     *
-     * @return the selected date.
-     */
     public long getTime() {
         return calendar.getTimeInMillis();
+    }
+
+    private void setTextField() {
+        textField.setText(TimeUtils.formatDate(calendar.getTimeInMillis()));
     }
 
     /**
