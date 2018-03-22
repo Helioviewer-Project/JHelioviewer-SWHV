@@ -18,7 +18,10 @@ public class UITimer implements ActionListener {
     public static final BusyIndicator busyIndicator = new BusyIndicator();
 
     private UITimer() {
-        new Timer(1000 / 10, this).start();
+    }
+
+    public static void start() {
+        new Timer(1000 / 10, instance).start();
     }
 
     public static void register(LazyComponent lazy) {
