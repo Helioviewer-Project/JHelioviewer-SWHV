@@ -186,9 +186,8 @@ public class Displayer implements ActionListener, JHVEventHighlightListener {
     private static double renderFactor = -1;
     private static boolean toDisplay = false;
 
-    private Displayer() {
-        JHVRelatedEvents.addHighlightListener(this);
-        new Timer(1000 / 60, this).start();
+    public static void start() {
+        new Timer(1000 / 60, instance).start();
     }
 
     public static void render(double f) {
@@ -237,5 +236,9 @@ public class Displayer implements ActionListener, JHVEventHighlightListener {
     }
 
     private static final Displayer instance = new Displayer();
+
+    private Displayer() {
+        JHVRelatedEvents.addHighlightListener(this);
+    }
 
 }
