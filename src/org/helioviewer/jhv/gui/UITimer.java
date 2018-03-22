@@ -9,7 +9,6 @@ import javax.swing.Timer;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.base.BusyIndicator;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
-import org.helioviewer.jhv.timelines.draw.DrawController;
 
 public class UITimer implements ActionListener {
 
@@ -50,8 +49,6 @@ public class UITimer implements ActionListener {
 
         for (LazyComponent lazy : lazyComponents)
             lazy.lazyRepaint();
-
-        DrawController.draw();
     }
 
 }
