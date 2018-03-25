@@ -44,6 +44,7 @@
     <target name="jar-bundle">
         <jar destfile="${jarfile}">
             <manifest>
+                <attribute name="Automatic-Module-Name" value="org.helioviewer.jhv"/>
                 <attribute name="Main-Class" value="org.helioviewer.jhv.JHelioviewer"/>
                 <attribute name="Class-Path" value="."/>
                 <attribute name="version" value="${version}"/>

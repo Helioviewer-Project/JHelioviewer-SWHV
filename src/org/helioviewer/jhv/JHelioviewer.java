@@ -33,7 +33,7 @@ import nom.tam.fits.FitsFactory;
 
 public class JHelioviewer {
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         // Save command line arguments
         CommandLine.setArguments(args);
         // Prints the usage message
