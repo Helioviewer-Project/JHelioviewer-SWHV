@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.gui.actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -9,6 +8,7 @@ import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
@@ -20,7 +20,7 @@ public class ZoomOneToOneAction extends AbstractAction {
     public ZoomOneToOneAction() {
         super("Actual Size");
 
-        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_0, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_0, UIGlobals.menuShortcutMask);
         putValue(ACCELERATOR_KEY, key);
         KeyShortcuts.registerKey(key, this);
     }

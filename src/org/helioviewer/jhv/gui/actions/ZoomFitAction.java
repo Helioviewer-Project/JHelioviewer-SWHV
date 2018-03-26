@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.gui.actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -9,6 +8,7 @@ import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.input.KeyShortcuts;
 
 @SuppressWarnings("serial")
@@ -17,7 +17,7 @@ public class ZoomFitAction extends AbstractAction {
     public ZoomFitAction() {
         super("Zoom to Fit");
 
-        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_9, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_9, UIGlobals.menuShortcutMask);
         putValue(ACCELERATOR_KEY, key);
         KeyShortcuts.registerKey(key, this);
     }
