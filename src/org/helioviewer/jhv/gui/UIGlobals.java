@@ -124,4 +124,6 @@ public class UIGlobals {
     public static Cursor openHandCursor;
     public static Cursor closedHandCursor;
 
+    public static final int menuShortcutMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+
 }

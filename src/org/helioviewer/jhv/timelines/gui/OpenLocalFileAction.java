@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.timelines.gui;
 
 import java.awt.FileDialog;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.InputEvent;
@@ -12,6 +11,7 @@ import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.actions.filefilters.JsonFilenameFilter;
 import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.io.Load;
@@ -22,7 +22,7 @@ public class OpenLocalFileAction extends AbstractAction {
     public OpenLocalFileAction() {
         super("Open Timeline...");
 
-        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.ALT_DOWN_MASK);
+        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_O, UIGlobals.menuShortcutMask | InputEvent.ALT_DOWN_MASK);
         putValue(ACCELERATOR_KEY, key);
         KeyShortcuts.registerKey(key, this);
     }

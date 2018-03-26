@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -35,6 +34,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
@@ -565,7 +565,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
 
         PlayPauseAction() {
             super("Play/Pause Movie");
-            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_P, UIGlobals.menuShortcutMask);
             putValue(ACCELERATOR_KEY, key);
             KeyShortcuts.registerKey(key, this);
         }
@@ -582,7 +582,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
 
         PreviousFrameAction() {
             super("Step to Previous Frame");
-            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.ALT_DOWN_MASK);
+            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, UIGlobals.menuShortcutMask | InputEvent.ALT_DOWN_MASK);
             putValue(ACCELERATOR_KEY, key);
             KeyShortcuts.registerKey(key, this);
         }
@@ -600,7 +600,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
 
         NextFrameAction() {
             super("Step to Next Frame");
-            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.ALT_DOWN_MASK);
+            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, UIGlobals.menuShortcutMask | InputEvent.ALT_DOWN_MASK);
             putValue(ACCELERATOR_KEY, key);
             KeyShortcuts.registerKey(key, this);
         }
