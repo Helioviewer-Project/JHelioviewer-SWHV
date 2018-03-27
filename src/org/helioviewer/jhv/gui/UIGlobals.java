@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.gui;
 
 import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
@@ -124,6 +125,7 @@ public class UIGlobals {
     public static Cursor openHandCursor;
     public static Cursor closedHandCursor;
 
+    public static final boolean canBrowse = Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE);
     public static final int menuShortcutMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
 }

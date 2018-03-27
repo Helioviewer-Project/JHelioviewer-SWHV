@@ -17,6 +17,7 @@ import java.util.jar.Manifest;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.log.Log;
@@ -145,7 +146,7 @@ public class JHVGlobals {
 
     public static void openURL(String url) {
         try {
-            if (url != null)
+            if (UIGlobals.canBrowse && url != null)
                 Desktop.getDesktop().browse(new URI(url));
         } catch (Exception e) {
             e.printStackTrace();
