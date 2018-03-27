@@ -6,6 +6,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JButton;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.gui.UIGlobals;
 
 import com.jidesoft.dialog.ButtonPanel;
 
@@ -46,6 +47,7 @@ public class NewVersionDialog extends TextDialog {
         setDefaultAction(download);
 
         JButton downBtn = new JButton(download);
+        downBtn.setEnabled(UIGlobals.canBrowse);
         downBtn.setText("Download");
         setInitFocusedComponent(downBtn);
 
