@@ -10,7 +10,7 @@ lot: true
 lof: true
 toc: true
 colorlinks: true
-mainfont: "Source Serif Pro"
+mainfont: "Georgia"
 monofont: "Source Code Pro"
 sansfont: "Source Sans Pro"
 fontsize: 11pt
@@ -88,19 +88,21 @@ This document describes the architecture of the Helioviewer System. For the purp
 
 ## Server Infrastructure ##
 
-The JHelioviewer and the website clients communicate with the Helioviewer servers using the HTTP network protocol. The JPEG2000 image service is implemented using a subset of the JPIP protocol on top of the HTTP network protocol. In addition, the JHelioviewer client supports the SAMP protocol and includes a SAMP hub.
+The JHelioviewer and the website clients communicate with the Helioviewer servers using the HTTP network protocol. The JPEG2000 image service is implemented using a subset of the JPIP protocol on top of the HTTP network protocol. In addition, the JHelioviewer client supports the SAMP protocol (<http://www.ivoa.net/documents/SAMP/>) and includes a SAMP hub.
 
 The following servers are included:
 
-- HTTP server (e.g., Apache or `nginx`) to serve static files, to proxy HTTP requests, and to run PHP scripts which implement various services:
+- HTTP server (e.g., Apache or `nginx`) to serve static files, to proxy HTTP requests, and to run various services:
   - API server (<https://github.com/Helioviewer-Project/api>) implements the image services with the API documented at <https://api.helioviewer.org/docs/v2/>. For the JHelioviewer client, it lists the available image datasets and commands the creation of JPX movies on demand. It includes a facility to ingest new images files. Metadata about the image files is stored in a MySQL database.
   - Timeline adapter to broker between the JHelioviewer client and the backend timeline storage services (ODI and STAFF <http://www.staff.oma.be>). For the JHelioviewer client, it lists the available timeline datasets and serves the data in a JSON format.
-  - A PFSS dataset, FITS static files produced regularly out of GONG magnetograms. The JHelioviewer client retrieves them on demand, based on a monthly listing (e.g., <http://swhv.oma.be/magtest/pfss/2018/01/list.txt>).
+  - A PFSS dataset, FITS static files produced regularly out of GONG magnetograms. The JHelioviewer client retrieves them on demand, based on monthly listings (e.g., <http://swhv.oma.be/magtest/pfss/2018/01/list.txt>).
   - COMESEP service which subscribes to the COMESEP alert system (not part of this project), stores the alerts and makes them available to the JHelioviewer server in a JSON format.
   - The Helioviewer web client (<https://github.com/Helioviewer-Project/helioviewer.org>), not relevant for this project.
 - The `esajpip` server (<https://github.com/Helioviewer-Project/esajpip-SWHV>), which delivers the image data streams to the JHelioviewer client using the JPIP protocol, built on top of the HTTP network protocol.
 - The `GeometryService` server (<https://github.com/Helioviewer-Project/GeometryService>) implements a set of celestial computation services and communicates with the JHelioviewer client using the JSON format.
 - The HEK server (maintained by LMSAL <https://www.lmsal.com/hek/>, not part of this project) which serves JSON formatted heliophysics events out of HER. The JHelioviewer client retrieves a curated list of space weather focused events.
+
+To ensure encapsulation, reproducibility, and full configuration control, the services which are part of this project are currently being containerized at <https://gitlab.com/SWHV/SWHV-COMBINED>.
 
 ## JPEG2000 Infrastructure ##
 
@@ -108,7 +110,9 @@ The following servers are included:
 
 The `esajpip` server serves the JPEG2000 encoded data to the JHelioviewer client. It implements a restricted set of the JPIP protocol over HTTP.
 
-This software is forked from the code at <https://launchpad.net/esajpip>. It was ported to a CMake build system and to C++11 standard features. Several bugs, vulnerabilities, and resource leaks (memory, file descriptors) were solved; sharing and locks between threads were eliminated; C library read functions were replaced by memory-mapping of input files. The code is verified by IDEA CLion and Synopsys Coverity (with 1 "outstanding defect", false positive) static code analyzers and with `valgrind` dynamic analyzer.
+This software is forked from the code at <https://launchpad.net/esajpip>. It was ported to a CMake build system and to C++11 standard features. Several bugs, vulnerabilities, and resource leaks (memory, file descriptors) were solved; sharing and locks between threads were eliminated; C library read functions were replaced by memory-mapping of input files. The JPX metadata is now sent compressed and several ranges of images can be requested in one JPIP request.
+
+The code is periodically verified with IDEA CLion and Synopsys Coverity static code analyzers and with `valgrind` dynamic analyzer.
 
 ### FITS to JPEG2000 ###
 
@@ -126,7 +130,7 @@ The package `hvJP2K` (<https://github.com/Helioviewer-Project/hvJP2K>) was creat
 - `hv_jp2_verify` - verify the conformity of JP2 file format to ensure end-to-end compatibility;
 - `hv_jpx_merge` - standalone replacement for `kdu_merge`, it can create JPX movies out of JP2 files;
 - `hv_jpx_mergec` - client for `hv_jpx_merged`, written in C;
-- `hv_jpx_merged` - server for JPX merging functionality, it avoids the startup overhead of `hv_jpx_merge`;
+- `hv_jpx_merged` - Unix domain sockets threaded server for JPX merging functionality, it avoids the startup overhead of `hv_jpx_merge`;
 - `hv_jpx_split` - split JPX movies into standalone JP2 files.
 
 This software is mainly written in Python and is based on the `glymur`[^glymur] and `jpylyzer`[^jpylyzer] open source libraries.
@@ -139,7 +143,7 @@ In order to ensure the communication between the server and the client, the Heli
 
 The JPEG2000 standards have a high degree of sophistication and versatility. In order to encourage the proliferation of Helioviewer image datasets, it should be possible to generate those files with standard conforming software other than the proprietary Kakadu software currently used. It becomes therefore necessary to validate the full structure of Helioviewer image files formally and automatically. A verification system based on Schematron[^schematron] XML schemas was developed. This procedure is able to verify the structure of JPEG2000 file and codestream, including the associated information such as the Helioviewer specific XML metadata, ensuring the end-to-end compatibility with the Helioviewer system.
 
-The current Helioviewer system needs to interpret JPEG2000 data at several stages:
+The Helioviewer system needs to interpret JPEG2000 data at several stages:
 
 1. during the generation of the JP2 files -- until now typically from software code written in IDL;
 1. during the ingestion into the Helioviewer server -- since the IDL code cannot be configured for the required features, i.e., precincts and PLT markers, the JP2 files produced by IDL have to be transcoded;
@@ -194,7 +198,7 @@ The response is a JSON file with the keys:
 
 ## Geometry Server ##
 
-The `GeometryService` is a network service that uses NASA's Navigation and Ancillary Information Facility (NAIF) SPICE Toolkit to compute positions of solar system objects with high precision and to return JSON and MessagePack (<https://msgpack.org>) encoded responses. For example, given the following REST request:
+The `GeometryService` is a REST network service that uses NASA's Navigation and Ancillary Information Facility (NAIF) SPICE Toolkit to compute positions of solar system objects with high precision and to return JSON and MessagePack (<https://msgpack.org>) encoded responses. For example, given the following request:
 
 ```
 http://swhv.oma.be/position?
@@ -232,8 +236,8 @@ This is a list of UTC timestamps and coordinates indicating the geometric positi
 
 The following functions are implemented:
 
-- `position` and `state` (in km and km/s); representations: `rectangular`, `latitudinal`, `radec`, `spherical`, `cylindrical`.
-- `transform` - transform between several reference frames used in heliophysics; representations: `matrix`, `angle` (Euler, rad), `quaternion`.
+- `position` and `state` (in km and km/s); representations: `rectangular`, `latitudinal`, `radec`, `spherical`, `cylindrical`;
+- `transform` - transform between several reference frames used in heliophysics; representations: `matrix`, `angle` (Euler, rad), `quaternion`;
 - `utc2scs` and `scs2utc` - transform between UTC and spacecraft OBET (Solar Orbiter supported).
 
 This service is used to support the Viewpoint functionality of the JHelioviewer client.
@@ -260,14 +264,14 @@ The field strength is mapped in the default JHelioviewer display as blue (negati
 
 The SAMP messages supported by the JHelioviewer client are:
 
-- `image.load.fits`
-- `table.load.fits` (only for ESA SSA, as JHelioviewer does not support FITS tables yet)
+- `image.load.fits` - specific FITS image
+- `table.load.fits` (only for ESA SOHO Science Archive tool, as JHelioviewer does not support FITS tables yet)
 - `jhv.load.image` - any image type supported by JHelioviewer, type determined by filename extension
 - `jhv.load.request` - image request file
 - `jhv.load.timeline` - timeline request file
 - `jhv.load.state` - state file
 
-An example of SAMP Web Profile usage is at <http://swhv.oma.be/test/samp/>.
+Those messages have as parameter an URI to load. Both local and remote URIs are supported. An example of SAMP Web Profile usage is at <http://swhv.oma.be/test/samp/>.
 
 ## File Formats ##
 
@@ -445,7 +449,7 @@ This will be implemented by combining the `hvJP2K` package functionality splitti
 
 2.  **(SWHV-CCN2-20400-02)** Packaging of software tools developed for the production and manipulation of JPEG2000 data.
 
-This is implemented by modifying the validation functionality of the `hvJP2K` package (<https://github.com/Helioviewer-Project/hvJP2K>) to use a current `jpylyzer` package (<https://github.com/openpreserve/jpylyzer>) release.
+This is implemented by modifying the validation functionality of the `hvJP2K` package to use a current `jpylyzer` package release.
 
 3.  **(SWHV-CCN2-20400-03)** Cache JP2 headers in database at insertion time.
 
@@ -472,9 +476,9 @@ This is an ongoing activity.
 
 Currently the support for 32bit operating systems was removed in order to avoid the incidence of out-of-memory crashes and virtual address exhaustion, especially during movie creation. The software is supported under Windows, macOS and Linux for Oracle Java 8 64bit.
 
-The software is also tested under later versions of OpenJDK. There are several warnings about illegal reflective accesses from JOGL, some of them OS-specific. Fixing those for a future Java version where they will become errors will be very difficult.
+The software is also tested under later versions of OpenJDK. There are several illegal reflective accesses from JOGL into the now modularized Java frameworks, some of them OS-specific. Currently manifesting as warnings, it will be very difficult to fix those for future Java versions where they will become errors.
 
-The software is under continuous refactoring and re-architecting as new features become available. Reducing the number of lines of code is one of the main concerns. The software is regularly submitted to static code analysis using IDEA IntelliJ, SpotBugs, PMD, and Synopsys Coverity (with 1 "outstanding defect", false positive).
+The software is under continuous refactoring and re-architecting as new features become available. Simplification and reduction of the number of lines of code are top priorities. Besides continuous testing, the software is regularly submitted to static code analysis using IDEA IntelliJ, Google Error Prone, SpotBugs, PMD, and Synopsys Coverity.
 
 ## WP21200 -- Improve Client Interoperability
 
