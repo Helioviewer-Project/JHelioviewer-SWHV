@@ -96,11 +96,11 @@ The following servers are included:
   - API server (<https://github.com/Helioviewer-Project/api>) implements the image services with the API documented at <https://api.helioviewer.org/docs/v2/>. For the JHelioviewer client, it lists the available image datasets and commands the creation of JPX movies on demand. It includes a facility to ingest new images files. Metadata about the image files is stored in a MySQL database.
   - Timeline adapter to broker between the JHelioviewer client and the backend timeline storage services (ODI and STAFF <http://www.staff.oma.be>). For the JHelioviewer client, it lists the available timeline datasets and serves the data in a JSON format.
   - A PFSS dataset, FITS static files produced regularly out of GONG magnetograms. The JHelioviewer client retrieves them on demand, based on a monthly listing (e.g., <http://swhv.oma.be/magtest/pfss/2018/01/list.txt>).
-  - COMESEP service which subscribes to the COMESEP alert system, stores the alerts and makes them available to the JHelioviewer server in a JSON format.
+  - COMESEP service which subscribes to the COMESEP alert system (not part of this project), stores the alerts and makes them available to the JHelioviewer server in a JSON format.
   - The Helioviewer web client (<https://github.com/Helioviewer-Project/helioviewer.org>), not relevant for this project.
-- The `esajpip` server, which delivers the image data streams to the JHelioviewer client using the JPIP protocol, built on top of the HTTP network protocol.
-- The `GeometryService` (<https://github.com/Helioviewer-Project/GeometryService>) server implements a set of celestial computation services and communicates with the JHelioviewer client using the JSON format.
-- The HEK server (<https://www.lmsal.com/hek/>) maintained by LMSAL which serves JSON formatted heliophysics events out of HER. The JHelioviewer client retrieves a curated list of space weather focused events.
+- The `esajpip` server (<https://github.com/Helioviewer-Project/esajpip-SWHV>), which delivers the image data streams to the JHelioviewer client using the JPIP protocol, built on top of the HTTP network protocol.
+- The `GeometryService` server (<https://github.com/Helioviewer-Project/GeometryService>) implements a set of celestial computation services and communicates with the JHelioviewer client using the JSON format.
+- The HEK server (maintained by LMSAL <https://www.lmsal.com/hek/>, not part of this project) which serves JSON formatted heliophysics events out of HER. The JHelioviewer client retrieves a curated list of space weather focused events.
 
 ## JPEG2000 Infrastructure ##
 
@@ -108,7 +108,7 @@ The following servers are included:
 
 The `esajpip` server serves the JPEG2000 encoded data to the JHelioviewer client. It implements a restricted set of the JPIP protocol over HTTP.
 
-This software is forked from the code at <https://launchpad.net/esajpip>. It was ported to a CMake build system and to C++11 standard features, several bugs, vulnerabilities, and resource leaks (memory, file descriptors) were solved. Sharing and locks between threads were eliminated; C library read functions were replaced by memory-mapping of input files. The code is verified by IDEA CLion and Synopsys Coverity (with 1 "outstanding defect", false positive) static code analyzers.
+This software is forked from the code at <https://launchpad.net/esajpip>. It was ported to a CMake build system and to C++11 standard features. Several bugs, vulnerabilities, and resource leaks (memory, file descriptors) were solved; sharing and locks between threads were eliminated; C library read functions were replaced by memory-mapping of input files. The code is verified by IDEA CLion and Synopsys Coverity (with 1 "outstanding defect", false positive) static code analyzers and with `valgrind` dynamic analyzer.
 
 ### FITS to JPEG2000 ###
 
