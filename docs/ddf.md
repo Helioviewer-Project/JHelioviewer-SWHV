@@ -97,9 +97,9 @@ The following servers are included:
   - Timeline adapter to broker between the JHelioviewer client and the backend timeline storage services (ODI and STAFF <http://www.staff.oma.be>). For the JHelioviewer client, it lists the available timeline datasets and serves the data in a JSON format.
   - A PFSS dataset, FITS static files produced regularly out of GONG magnetograms. The JHelioviewer client retrieves them on demand, based on a monthly listing (e.g., <http://swhv.oma.be/magtest/pfss/2018/01/list.txt>).
   - COMESEP service which subscribes to the COMESEP alert system, stores the alerts and makes them available to the JHelioviewer server in a JSON format.
-  - `GeometryServices` (<https://github.com/Helioviewer-Project/GeometryService>) implements a set of celestial computation services and communicates with the JHelioviewer client using the JSON format.
   - The Helioviewer web client (<https://github.com/Helioviewer-Project/helioviewer.org>), not relevant for this project.
 - The `esajpip` server, which delivers the image data streams to the JHelioviewer client using the JPIP protocol, built on top of the HTTP network protocol.
+- The `GeometryService` (<https://github.com/Helioviewer-Project/GeometryService>) server implements a set of celestial computation services and communicates with the JHelioviewer client using the JSON format.
 - The HEK server (<https://www.lmsal.com/hek/>) maintained by LMSAL which serves JSON formatted heliophysics events out of HER. The JHelioviewer client retrieves a curated list of space weather focused events.
 
 ## JPEG2000 Infrastructure ##
@@ -108,11 +108,11 @@ The following servers are included:
 
 The `esajpip` server serves the JPEG2000 encoded data to the JHelioviewer client. It implements a restricted set of the JPIP protocol over HTTP.
 
-This software is forked from the code at <https://launchpad.net/esajpip>. It was ported to a CMake build system and to C++11 standard features, several bugs, vulnerabilities, and resource leaks (memory, file descriptors) were solved. Sharing and locks between threads were eliminated.
+This software is forked from the code at <https://launchpad.net/esajpip>. It was ported to a CMake build system and to C++11 standard features, several bugs, vulnerabilities, and resource leaks (memory, file descriptors) were solved. Sharing and locks between threads were eliminated; C library read functions were replaced by memory-mapping of input files. The code is verified by IDEA CLion and Synopsys Coverity (with 1 "outstanding defect", false positive) static code analyzers.
 
 ### FITS to JPEG2000 ###
 
-Initially, the JPEG2000 files were created with SolarSoft IDL scripts employing various solar instrument calibration software pipelines. Those files have the limitations imposed by the implementation of JPEG2000 capabilities in IDL and they have to be transcoded for the use in the Helioviewer system. The software used both on the server and the client side is derived from the Kakadu Software toolkit (<http://kakadusoftware.com>).
+Initially, the JPEG2000 files were created with SolarSoft IDL scripts employing various solar instrument calibration software pipelines. Those files have the limitations imposed by the IDL JPEG2000 implementation and they have to be transcoded for the use in the Helioviewer system. The software used both on the server and the client side is derived from the Kakadu Software toolkit (<http://kakadusoftware.com>).
 
 Much of the server side usage of the Kakadu Software can be replaced with open source alternatives.
 
@@ -228,7 +228,7 @@ the server returns the following JSON response:
 }
 ````
 
-This is a list of UTC timestamps and coordinates indicating the geometric position of the camera (the STEREO Ahead spacecraft in this example). The first coordinate is the distance to Sun, the second and third coordinates are the Stonyhurst heliographic longitude and latitude of the given object. At the moment, the following locations are available: all solar system planets, Pluto, the Moon, comet 67P/Churyumov-Gerasimenko. Also available are the following spacecraft trajectories (existing or planned): SOHO, STEREO, SDO, PROBA-2, PROBA-3, Solar Orbiter, Parker Solar Probe.
+This is a list of UTC timestamps and coordinates indicating the geometric position of the camera (the STEREO Ahead spacecraft in this example). The first coordinate is the distance to Sun, the second and third coordinates are the Stonyhurst heliographic longitude and latitude of the given object. At the moment, the following locations are available: all JPL DE430 ephemeris locations (solar system planets, Pluto, the Moon), comet 67P/Churyumov-Gerasimenko. Also available are the following spacecraft trajectories (existing or planned): SOHO, STEREO, SDO, PROBA-2, PROBA-3, Solar Orbiter, Parker Solar Probe.
 
 The following functions are implemented:
 
@@ -353,7 +353,9 @@ The installation procedures of SWHV are derived from the previous versions. The 
 
 **T8. Telemetry (SWHV-CCN2-20100-08)**
 
-SWHV communicates back only crash reports to a Sentry server deployed at ROB. This server is connected to private email, Slack and GitLab services.
+SWHV communicates back only crash reports to a Sentry server deployed at ROB. This server is connected to private email, Slack and GitLab services. Since the 2.12 release, several crashes unreported by users were intercepted. Some which were not uncovered by testing were fixed, others need more information.
+
+The best manner to report issues is via <https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues>.
 
 **T9. Guidelines for contributing (SWHV-CCN2-20100-09)**
 
@@ -472,7 +474,7 @@ Currently the support for 32bit operating systems was removed in order to avoid 
 
 The software is also tested under later versions of OpenJDK. There are several warnings about illegal reflective accesses from JOGL, some of them OS-specific. Fixing those for a future Java version where they will become errors will be very difficult.
 
-The software is under continuous refactoring and re-architecting as new features become available. Reducing the number of lines of code is one of the main concerns. The software is under continuous static verification using IntelliJ, SpotBugs, PMD, and Synopsys Coverity (just 1 false positive).
+The software is under continuous refactoring and re-architecting as new features become available. Reducing the number of lines of code is one of the main concerns. The software is regularly submitted to static code analysis using IDEA IntelliJ, SpotBugs, PMD, and Synopsys Coverity (with 1 "outstanding defect", false positive).
 
 ## WP21200 -- Improve Client Interoperability
 
