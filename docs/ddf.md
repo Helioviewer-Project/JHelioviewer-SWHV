@@ -129,15 +129,15 @@ The package `hvJP2K` (<https://github.com/Helioviewer-Project/hvJP2K>) was creat
 - `hv_jpx_merged` - server for JPX merging functionality, it avoids the startup overhead of `hv_jpx_merge`;
 - `hv_jpx_split` - split JPX movies into standalone JP2 files.
 
-This software is mainly written in Python and is based on the `glymur`[^glymur] and `jpylyzer`[^jpylyzer] open source libraries
+This software is mainly written in Python and is based on the `glymur`[^glymur] and `jpylyzer`[^jpylyzer] open source libraries.
 
 ### JPEG2000 Files Handling ###
 
-The image data is encoded using the JPEG2000 coding standards. The JPEG2000 data consists of compressed data codestreams organised using *markers* according to a specific syntax, and several file formats, such as JP2 and JPX, which are organised using *boxes* encapsulating the codestreams of compressed image data organized in *packets* and the associated information.
+The image data is encoded using the JPEG2000 coding standards. The JPEG2000 data consists of compressed data codestreams organized using *markers* according to a specific syntax, and several file formats, such as JP2 and JPX, which are organized using *boxes* encapsulating the codestreams of compressed image data organized in *packets* and the associated information.
 
-In order to ensure the communication between the server and the client, the Helioviewer system imposes a set of constraints on the codestreams and file formats. This includes requirements for codestream organisation such as specific packetisation (PLT markers), coding precincts, and order of progression (RPCL), for file format organisation, such as the presence of specific boxes aggregating the codestreams and the associated information like metadata, and for file naming conventions.
+In order to ensure the communication between the server and the client, the Helioviewer system imposes a set of constraints on the codestreams and file formats. This includes requirements for codestream organization such as specific packetization (PLT markers), coding precincts, and order of progression (RPCL), for file format organization, such as the presence of specific boxes aggregating the codestreams and the associated information like metadata, and for file naming conventions.
 
-The JPEG2000 standards have a high degree of sophistication and versatility. In order to encourage the proliferation of Helioviewer image datasets, it should be possible to generate those files with standard conforming software other than the proprietary Kakadu[^kakadu] software currently used. It becomes therefore necessary to formally and automatically validate the full structure of Helioviewer image files. A verification system based on Schematron[^schematron] XML schemas was developed. This procedure is able to verify the structure of JPEG2000 file and codestream, including the associated information such as the Helioviewer specific XML metadata, ensuring the end-to-end compatibility with the Helioviewer system.
+The JPEG2000 standards have a high degree of sophistication and versatility. In order to encourage the proliferation of Helioviewer image datasets, it should be possible to generate those files with standard conforming software other than the proprietary Kakadu software currently used. It becomes therefore necessary to validate the full structure of Helioviewer image files formally and automatically. A verification system based on Schematron[^schematron] XML schemas was developed. This procedure is able to verify the structure of JPEG2000 file and codestream, including the associated information such as the Helioviewer specific XML metadata, ensuring the end-to-end compatibility with the Helioviewer system.
 
 The current Helioviewer system needs to interpret JPEG2000 data at several stages:
 
@@ -153,7 +153,7 @@ The Kakadu's `kdu_transcode` program is used in the 2nd stage for transcoding th
 
 The 3rd stage (decode JPEG2000 codestreams for the web clients) is replicated by `hv_jp2_decode`. This comes at the cost of lower performance, but with little impact for the user experience.
 
-The 4th stage (aggregate JPEG2000 codestreams into JPX files) can be replaced by `hv_jpx_merge`. From the point of view of the JHelioviewer user, the client -- server interaction latency and bandwidth dominates the waiting time for the display of the image data. Additionally, `hv_jpx_split` can now possible reconstruct JP2 files out of JPX files with embedded codestreams. Assembly and disassembly of JPX files allows JP2 files heterogeneous from the point of view of size, of component definition, number and type, and of colour specification. Those tasks involve only manipulations at the byte level structure of the file formats and not the decoding of the codestreams.
+The 4th stage (aggregate JPEG2000 codestreams into JPX files) can be replaced by `hv_jpx_merge`. From the point of view of the JHelioviewer user, the client -- server interaction latency and bandwidth dominate the waiting time for the display of the image data. Additionally, `hv_jpx_split` can now possible reconstruct JP2 files out of JPX files with embedded codestreams. Assembly and disassembly of JPX files allows JP2 files heterogeneous from the point of view of size, of component definition, number and type, and of color specification. Those tasks involve only manipulations at the byte level structure of the file formats and not the decoding of the codestreams.
 
 ## Timeline API ##
 
@@ -252,11 +252,22 @@ For the starting points on the photosphere, an equally spaced `theta`--`phi` gri
 
 The algorithm to compute the field lines uses an Adams–Bashforth explicit method (third order precision) that requires less evaluations of the vector field than the more commonly used fourth order precision Runge-Kutta methods. This is mainly done because the evaluation of the vector field at a given point is relatively slow.
 
-The resulting FITS files consist of `BINARY TABLE`s with four columns `FIELDLINEx`, `FIELDLINEy`, `FIELDLINEz`, `FIELDLINEs`. The first three are mapped to unsigned shorts and can be converted to Cartesian coordinates using the formula 3 × (value × 2 / 65535 - 1) (on the client side one needs to add 32768). The `FIELDLINEs` value encodes the strength and, by the sign, the radial direction of the field. This encoding was chosen for a compact representation.
+The resulting FITS files consist of `BINARY TABLE`s with four columns `FIELDLINEx`, `FIELDLINEy`, `FIELDLINEz`, `FIELDLINEs`. The first three are mapped to unsigned shorts and can be converted to Cartesian coordinates using the formula 3 × (value × 2 / 65535 − 1) (on the client side one needs to add 32768). The `FIELDLINEs` value encodes the strength and, by the sign, the radial direction of the field. This encoding was chosen for a compact representation.
 
-The field strength is mapped in the default JHelioviewer display as blue (negative radial) or red (positive radial); the lesser the colour saturation, the weaker the field. In order to better see the direction of the field, points of the field lines beyond 2.4 solar radii have red or blue colours without blending with white.
+The field strength is mapped in the default JHelioviewer display as blue (negative radial) or red (positive radial); the lesser the color saturation, the weaker the field. In order to better see the direction of the field, points of the field lines beyond 2.4 solar radii have red or blue colors without blending with white.
 
 ## SAMP ##
+
+The SAMP messages supported by the JHelioviewer client are:
+
+- `image.load.fits`
+- `table.load.fits` (only for ESA SSA, as JHelioviewer does not support FITS tables yet)
+- `jhv.load.image` - any image type supported by JHelioviewer, type determined by filename extension
+- `jhv.load.request` - image request file
+- `jhv.load.timeline` - timeline request file
+- `jhv.load.state` - state file
+
+An example of SAMP Web Profile usage is at <http://swhv.oma.be/test/samp/>.
 
 ## File Formats ##
 
@@ -270,6 +281,10 @@ Many of the file formats supported by the JHelioviewer client are based on the J
 
 ### Image Request File ###
 
+```
+{"org.helioviewer.jhv.request.image": {...}}
+```
+
 ### Timeline Request File ###
 
 ```
@@ -278,9 +293,9 @@ Many of the file formats supported by the JHelioviewer client are based on the J
 
 ### Image Formats ###
 
-PNG, JPEG, JP2, JPX
+FITS, PNG, JPEG, JP2, JPX - local and over HTTP.
 
-# DDF
+# Tasks
 
 ## WP20100 -- Study SWHV and JHV3D and WP20150 -- Merge JHV3D Ideas
 
@@ -330,11 +345,11 @@ SWHV operates in a fully asynchronous manner and can achieve high frame rates wi
 
 **T6. Handling of transparency (SWHV-CCN2-20100-06)**
 
-SWHV currently uses alpha-premultiplied colour blending. The default compositing of the layers is at the middle between the ADD and OVER operators and an extra setting named "Blend" was added to control the variable level of additivity and opacity.
+SWHV currently uses alpha-premultiplied color blending. The default compositing of the layers is at the middle between the ADD and OVER operators and an extra setting named "Blend" was added to control the variable level of additivity and opacity.
 
 **T7. Installation (SWHV-CCN2-20100-07)**
 
-The installation procedures of SWHV are derived from the previous versions. The install4j procedure of JHV3D is currently ported, but lightly tested and not deployed.
+The installation procedures of SWHV are derived from the previous versions. The install4j procedure of JHV3D is currently ported, but lightly tested and not deployed. In light of the announced Oracle approach to the release of future versions of Java, this is an essential feature.
 
 **T8. Telemetry (SWHV-CCN2-20100-08)**
 
@@ -362,7 +377,7 @@ This is implemented as a JSON document preserving with high fidelity the state o
 
 3.  **(SWHV-CCN2-20200-03)** Improve command line interface.
 
-This is implemented using JSON documents specifying requests to the default server in a simple manner as in the example below. Natural language specification of time is supported (as is the case for the state file) and, besides the "dataset" field, all fields are optional with sensible defaults.
+This is implemented using JSON documents specifying image requests to the default server in a simple manner as in the example below. Natural language specification of time is supported (as is the case for the state file) and, besides the "dataset" field, all fields are optional with sensible defaults.
 
 Example:
 
@@ -404,7 +419,7 @@ This is implemented by:
 
 3.  **(SWHV-CCN2-20300-03)** Build propagation server incorporating several propagation models, enabling correlation of in-situ data with remote sensing data.
 
-This will be implemented with a RPC server built on the Spyne toolkit (<http://spyne.io>, the same as the `GeometryService` service). The SWHV client will query a timestamp and a propagation model, the service will return a modified timestamp.
+This will be implemented with an RPC server built on the Spyne toolkit (<http://spyne.io>, the same as the `GeometryService` service). The SWHV client will query a timestamp and a propagation model, the service will return a modified timestamp.
 
 4.  **(SWHV-CCN2-20300-04)** Test with and integrate ACE, DSCVR or other current in-situ datasets identified as relevant today for space weather forecasters.
 
@@ -414,7 +429,7 @@ Once the propagation server is implemented, the specified datasets will be integ
 
 This is implemented using existing functionality. The magnetic connectivity aspect will need to be tackled together with the implementation of the Solar Orbiter requirements, therefore is out of scope.
 
-6.  **(SWHV-CCN2-20300-06)** Build on annotations to indicate instruments fields of view. Add ability to drag and show their centres. Optionally distort according to differential rotation. Distortion of solar images is outside of the resources for this CCN.
+6.  **(SWHV-CCN2-20300-06)** Build on annotations to indicate instruments fields of view. Add ability to drag and show their centers. Optionally distort according to differential rotation. Distortion of solar images is outside of the resources for this CCN.
 
 This will be implemented once the annotation functionality has full location awareness.
 
@@ -451,7 +466,13 @@ This is an ongoing activity.
 
 ## WP20500 -- Release, Testing, Documentation
 
-**(SWHV-CCN2-20500-01)** The tasks of this WP are an ongoing activity. Currently the support for 32bit operating systems was removed in order to avoid the incidence of out-of-memory crashes and virtual address exhaustion, especially during movie creation.
+**(SWHV-CCN2-20500-01)** The tasks of this WP are an ongoing activity.
+
+Currently the support for 32bit operating systems was removed in order to avoid the incidence of out-of-memory crashes and virtual address exhaustion, especially during movie creation. The software is supported under Windows, macOS and Linux for Oracle Java 8 64bit.
+
+The software is also tested under later versions of OpenJDK. There are several warnings about illegal reflective accesses from JOGL, some of them OS-specific. Fixing those for a future Java version where they will become errors will be very difficult.
+
+The software is under continuous refactoring and re-architecting as new features become available. Reducing the number of lines of code is one of the main concerns. The software is under continuous static verification using IntelliJ, SpotBugs, PMD, and Synopsys Coverity (just 1 false positive).
 
 ## WP21200 -- Improve Client Interoperability
 
