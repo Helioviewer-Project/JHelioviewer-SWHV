@@ -38,13 +38,12 @@ public class ByteChannelInputStream extends InputStream {
         if (buf.remaining() < len) {
             buf.compact();
             buf.flip();
-            int n;
             do {
                 buf.position(buf.limit());
                 buf.limit(buf.capacity());
-                n = chan.read(buf);
+                chan.read(buf);
                 buf.flip();
-            } while (n >= 0 && buf.remaining() < len);
+            } while (buf.remaining() < len);
         }
     }
 
