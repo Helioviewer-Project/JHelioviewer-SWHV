@@ -19,7 +19,7 @@ titlepage-rule-color: "ffffff"
 titlepage-rule-height: 5
 logo: hvLogo.png
 logowidth: 0.1
----
+...
 \frenchspacing
 
 `id: \exec{git hash-object \file}`
@@ -53,7 +53,7 @@ logowidth: 0.1
 
 ## Purpose & Scope
 
-This document (SWHV-DDF2) is part of the report of the design study of the work performed during the CCN2 phase of "Space Weather Helioviewer" project (Contract No. 4000107325/12/NL/AK, "High Performance Distributed Solar Imaging and Processing System" ESTEC/ITT AO/1-7186/12/NL/GLC). It focuses on the detailed explanation of the changes for several software components that need to be implemented or were already implemented by the time this document was made available for review.
+This document (SWHV-DDF2) is the design study report of the work performed during the CCN2 phase of "Space Weather Helioviewer" project (Contract No. 4000107325/12/NL/AK, "High Performance Distributed Solar Imaging and Processing System" ESTEC/ITT AO/1-7186/12/NL/GLC). It focuses on the detailed explanation of the changes for several software components that need to be implemented or were already implemented by the time this document was made available for review.
 
 ## Applicable Documents
 
@@ -65,7 +65,7 @@ This document (SWHV-DDF2) is part of the report of the design study of the work 
 
 # Work Logic
 
-Chapter 3 presents the current system architecture, while in chapter 4 the identified tasks for the CCN2 phase are presented together with a proposed implementation. In many cases, by the time of writing of this document (MS6), the work was already performed, therefore the present tense is used. For the work to be performed for the MS7, the future tense is used.
+Chapter 3 presents the current system architecture, while in chapter 4 the identified tasks for the CCN2 phase are presented together with a proposed implementation. For several, at the time of the current version of this document (MS6), the work was already performed, therefore the present tense is used. For the work to be performed for the MS7, the future tense is used.
 
 Chapter 5 presents a traceability matrix for the tasks, as well as the assigned priority and the milestone for delivery. Features already delivered will be subjected to refinement and refactoring as new functionality becomes available in the client-server system.
 
@@ -202,24 +202,16 @@ http://swhv.oma.be/position?
 
 the server returns the following JSON response:
 
-```
+```json
 {
 "result": [
-   { "2014-04-12T20:23:35.000":
-   [ 143356392.01232576, 2.712634949777619,
-   0.12486990461569629 ]},
-   { "2014-04-13T02:23:35.000":
-   [ 143359318.57914788, 2.7129759257313513,
-   0.12473463991365513 ]},
-   { "2014-04-13T08:23:35.000":
-   [ 143362256.29411626, 2.7133174795109087,
-   0.12459673837570125 ]},
-   { "2014-04-13T14:23:35.000":
-   [ 143365205.0945752,  2.713659603829239,
-   0.12445620339056596 ]}
+   { "2014-04-12T20:23:35.000": [143356392.01232576,2.712634949777619,0.12486990461569629]},
+   { "2014-04-13T02:23:35.000": [143359318.57914788,2.7129759257313513,0.12473463991365513]},
+   { "2014-04-13T08:23:35.000": [143362256.29411626,2.7133174795109087,0.12459673837570125]},
+   { "2014-04-13T14:23:35.000": [143365205.0945752,2.713659603829239,0.12445620339056596]}
  ]
 }
-````
+```
 
 This is a list of UTC timestamps and coordinates indicating the geometric position of the camera (the STEREO Ahead spacecraft in this example). The first coordinate is the distance to Sun, the second and third coordinates are the Stonyhurst heliographic longitude and latitude of the given object. At the moment, the following locations are available: all JPL DE430 ephemeris locations (solar system planets, Pluto, the Moon), comet 67P/Churyumov-Gerasimenko. Also available are the following spacecraft trajectories (existing or planned): SOHO, STEREO, SDO, PROBA-2, PROBA-3, Solar Orbiter, Parker Solar Probe.
 
@@ -268,7 +260,7 @@ Many of the file formats supported by the JHelioviewer client are based on the J
 
 ### State File ###
 
-```
+```json
 {"org.helioviewer.jhv.state": {...}}
 ```
 
@@ -278,7 +270,7 @@ JSON document specifying image requests to the default server in a simple manner
 
 Example:
 
-```
+```json
 {
   "org.helioviewer.jhv.request.image": {
     "observatory":"SDO",
@@ -292,7 +284,7 @@ Example:
 
 ### Timeline Request File ###
 
-```
+```json
 {
   "org.helioviewer.jhv.request.timeline": {
     "bandType": {
