@@ -123,7 +123,7 @@ public interface UpdateViewpoint {
 
             for (LoadPosition loadPosition : loadMap.keySet()) {
                 if (loadPosition.isLoaded())
-                    loadMap.put(loadPosition, loadPosition.getInterpolatedL(loadPosition.interpolateTime(time.milli, layerStart, layerEnd)));
+                    loadMap.put(loadPosition, loadPosition.getInterpolatedL(time.milli, layerStart, layerEnd));
             }
 
             Position.L p = Sun.getEarth(time);
@@ -163,7 +163,7 @@ public interface UpdateViewpoint {
                 layerStart = view.getFirstTime().milli;
                 layerEnd = view.getLastTime().milli;
             }
-            return loadPosition.getInterpolatedQ(loadPosition.interpolateTime(time.milli, layerStart, layerEnd));
+            return loadPosition.getInterpolatedQ(time.milli, layerStart, layerEnd);
         }
 
     }
