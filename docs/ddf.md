@@ -48,7 +48,7 @@ logowidth: 0.1
 +------------+----------------------------------------------+
 | 2018-03-12 | Version 1.01 (Update following CDR2)         |
 +------------+----------------------------------------------+
-| 2018-04-01 | Version 1.1 (Added design notes)             |
+| 2018-04-01 | Version 1.1 (Add design notes)               |
 +------------+----------------------------------------------+
 
 ## Purpose & Scope
@@ -77,17 +77,15 @@ The following figure depicts the architecture of the Helioviewer System as insta
 
 ## Server Infrastructure ##
 
-The JHelioviewer and the website clients communicate with the Helioviewer servers using the HTTP network protocol. The JPEG2000 image service is implemented using a subset of the JPIP protocol on top of the HTTP network protocol. In addition, the JHelioviewer client supports the SAMP protocol (<http://www.ivoa.net/documents/SAMP/>) and includes a SAMP hub.
-
 The following servers are included:
 
 - HTTP server (e.g., Apache or `nginx`) to serve static files, to proxy HTTP requests, and to run various services:
-  - API server (<https://github.com/Helioviewer-Project/api>) implements the image services with the API documented at <https://api.helioviewer.org/docs/v2/>. For the JHelioviewer client, it lists the available image datasets and commands the creation of JPX movies on demand. It includes a facility to ingest new images files. Metadata about the image files is stored in a MySQL database.
+  - API server (<https://github.com/Helioviewer-Project/api>) implements the image services. For the JHelioviewer client, it lists the available image datasets and commands the creation of JPX movies on demand. It includes a facility to ingest new images files. Metadata about the image files is stored in a MySQL database.
   - Timeline adapter to broker between the JHelioviewer client and the backend timeline storage services (ODI and STAFF <http://www.staff.oma.be>). For the JHelioviewer client, it lists the available timeline datasets and serves the data in a JSON format.
   - A PFSS dataset, FITS static files produced regularly out of GONG magnetograms. The JHelioviewer client retrieves them on demand, based on monthly listings (e.g., <http://swhv.oma.be/magtest/pfss/2018/01/list.txt>).
   - COMESEP service which subscribes to the COMESEP alert system (not part of this project), stores the alerts and makes them available to the JHelioviewer server in a JSON format.
   - The Helioviewer web client (<https://github.com/Helioviewer-Project/helioviewer.org>), not relevant for this project.
-- The `esajpip` server (<https://github.com/Helioviewer-Project/esajpip-SWHV>), which delivers the image data streams to the JHelioviewer client using the JPIP protocol, built on top of the HTTP network protocol.
+- The `esajpip` server (<https://github.com/Helioviewer-Project/esajpip-SWHV>), which delivers the JPEG2000 data streams to the JHelioviewer client using the JPIP protocol, built on top of the HTTP network protocol.
 - The `GeometryService` server (<https://github.com/Helioviewer-Project/GeometryService>) implements a set of celestial computation services and communicates with the JHelioviewer client using the JSON format.
 - The HEK server (maintained by LMSAL <https://www.lmsal.com/hek/>, not part of this project) which serves JSON formatted heliophysics events out of HER. The JHelioviewer client retrieves a curated list of space weather focused events.
 
@@ -97,9 +95,7 @@ To ensure encapsulation, reproducibility, and full configuration control, the se
 
 ### JPIP Server ###
 
-The `esajpip` server serves the JPEG2000 encoded data to the JHelioviewer client. It implements a restricted set of the JPIP protocol over HTTP.
-
-This software is forked from the code at <https://launchpad.net/esajpip>. It was ported to a CMake build system and to C++11 standard features. Several bugs, vulnerabilities, and resource leaks (memory, file descriptors) were solved; sharing and locks between threads were eliminated; C library read functions were replaced by memory-mapping of input files (for up to 10x higher network throughput). The JPX metadata is now sent compressed and several ranges of images can be requested in one JPIP request.
+The `esajpip` server serves the JPEG2000 encoded data to the JHelioviewer client. This software was forked from the code at <https://launchpad.net/esajpip>. It was ported to a CMake build system and to C++11 standard features. Several bugs, vulnerabilities, and resource leaks (memory, file descriptors) were solved; sharing and locks between threads were eliminated; C library read functions were replaced by memory-mapping of input files (for up to 10x higher network throughput). The JPX metadata is now sent compressed and several ranges of images can be requested in one JPIP request.
 
 The code is periodically verified with IDEA CLion and Synopsys Coverity static code analyzers and with `valgrind` dynamic analyzer.
 
@@ -109,7 +105,7 @@ Initially, the JPEG2000 files were created with SolarSoft IDL scripts employing 
 
 Much of the server side usage of the Kakadu Software can be replaced with open source alternatives.
 
-The `fits2img` package (<https://github.com/Helioviewer-Project/fits2img>) for the creation of JP2 files out of FITS files is derived from the software which makes JP2 files out of SWAP EUV data. This software uses a patched version of the open source OpenJPEG[^openjpeg] library. The JP2 files created by this tool do not need to be transcoded. While ingesting new datasets during the SWHV project, it became apparent that the metadata in the FITS headers of some datasets is lacking or is defective. A FITS-to-FITS conversion stage to adjust the metadata to the needs of the Helioviewer system is needed for those datasets. At <https://github.com/bogdanni/hv-HEP/blob/master/HEP-0010.md> there is a summary of those needs.
+The `fits2img` package (<https://github.com/Helioviewer-Project/fits2img>) for the creation of JP2 files out of calibrated FITS files is derived from the software which makes JP2 files out of SWAP EUV Level-1 data. This software uses a patched version of the open source OpenJPEG[^openjpeg] library. The JP2 files created by this tool do not need to be transcoded. While ingesting new datasets during the SWHV project, it became apparent that the metadata in the FITS headers of some datasets is lacking or is defective. A FITS-to-FITS conversion stage to adjust the metadata to the needs of the Helioviewer system is needed for those datasets. At <https://github.com/bogdanni/hv-HEP/blob/master/HEP-0010.md> there is a summary of those needs.
 
 The package `hvJP2K` (<https://github.com/Helioviewer-Project/hvJP2K>) was created to replace much of the server side usage of the Kakadu Software and consists in the following tools:
 
@@ -140,7 +136,7 @@ The Helioviewer system needs to interpret JPEG2000 data at several stages:
 1. before the image data is streamed using the JPIP server, it has to be aggregated into JPX files;
 1. the JHelioviewer client has to decode the codestreams and interpret the associated information.
 
-For the 1st stage, `fits2img` can replace the IDL Kakadu implementation. This C program directly outputs conforming JP2 files with PLT markers, XML boxes and it has the capability of embedding colormaps.
+For the 1st stage, `fits2img` can replace the IDL Kakadu implementation. It outputs conforming JP2 files with PLT markers, XML boxes and it has the capability of embedding colormaps.
 
 The Kakadu's `kdu_transcode` program is used in the 2nd stage for transcoding the IDL produced JP2 files without PLT markers and precincts. This is an old version, modified to output JP2 files, since the vanilla version of `kdu_transcode` is just a demo application for the Kakadu core system and is not able to produce JP2 files. `hv_jp2_transcode` can wrap the transcoding process and allows to use an unmodified `kdu_transcode`. It is not yet possible to replace the core functionality of `kdu_transcode`.
 
@@ -148,7 +144,36 @@ The 3rd stage (decode JPEG2000 codestreams for the web clients) is replicated by
 
 The 4th stage (aggregate JPEG2000 codestreams into JPX files) can be replaced by `hv_jpx_merge` (up to 10x faster than `kdu_merge`). From the point of view of the JHelioviewer user, the client -- server interaction latency and bandwidth dominate the waiting time for the display of the image data. The server latency has two main components: the database query for the list of files that will make up the JPX and the parsing of those files to extract the information for the assembly of the JPX. Additionally, `hv_jpx_split` can now possible reconstruct JP2 files out of JPX files with embedded codestreams. Assembly and disassembly of JPX files allows JP2 files heterogeneous from the point of view of size, of component definition, number and type, and of color specification. Those tasks involve only manipulations at the byte level structure of the file formats and not the decoding of the codestreams.
 
-## Timeline API ##
+## PFSS Dataset ##
+
+A PFSS algorithm[^pfssPaper] was implemented in C for fast computation. GONG magnetograms from <http://gong.nso.edu/data/magmap/index.html> are used as input. Those FITS files contain a full map of the latest available solar magnetic data at a resolution of 256×180 in a sine-latitude grid.
+
+The PFSS algorithm consists of several steps:
+
+1. For algorithm input, interpolate the magnetogram data onto an appropriate grid;
+1. Run the algorithm by solving a Poisson-type equation;
+1. Select the field lines and save them to a FITS file.
+
+For the starting points on the photosphere, an equally spaced `theta`--`phi` grid of points that lie above the photosphere is used. The set of starting points is augmented with starting points for which the magnetic field is strong.
+
+The algorithm to compute the field lines uses an Adams–Bashforth explicit method (third order precision) that requires less evaluations of the vector field than the more commonly used fourth order precision Runge-Kutta methods. This is mainly done because the evaluation of the vector field at a given point is relatively slow.
+
+The resulting FITS files consist of `BINARY TABLE`s with four columns `FIELDLINEx`, `FIELDLINEy`, `FIELDLINEz`, `FIELDLINEs`. The first three are mapped to unsigned shorts and can be converted to Cartesian coordinates using the formula 3 × (value × 2 / 65535 − 1) (on the client side one needs to add 32768). The `FIELDLINEs` value encodes the strength and, by the sign, the radial direction of the field. This encoding was chosen for a compact representation.
+
+The field strength is mapped in the default JHelioviewer display as blue (negative radial) or red (positive radial); the lesser the color saturation, the weaker the field. In order to better see the direction of the field, points of the field lines beyond 2.4 solar radii have red or blue colors without blending with white.
+
+
+## Interfaces ##
+
+The JHelioviewer and the website clients communicate with the Helioviewer services using the HTTP network protocol. The JPEG2000 data service is implemented using a subset of the JPIP protocol on top of the HTTP network protocol. In addition, the JHelioviewer client supports the SAMP protocol (<http://www.ivoa.net/documents/SAMP/>) and includes a SAMP hub.
+
+### Image Services API ###
+
+The image API is documented at <https://api.helioviewer.org/docs/v2/>.
+
+The JPEG2000 data services are provided by the `esajpip ` server which implements a restricted set of the JPIP protocol over HTTP (describe).
+
+### Timeline Services API ###
 
 The timeline API is a REST service and consists of three parts.
 
@@ -161,8 +186,10 @@ The timeline API is a REST service and consists of three parts.
         - `group`: the group identifier to which the dataset belongs
         - `label`: the label of the dataset
         - `name`: the unique identifier of the dataset
+
 1. **Data Availability API**: The server returns `coverage` as an array of disjoint time intervals, in increasing order. The coverage intervals are defined as containing data samples no further apart than five times the regular cadence. A similarly defined parameter demarcates the data gaps in the responses to the Data Request API.
-1. **Data Request API**: A `multiplier` parameter allows for sending scaled data to the client when necessary. The values of many datasets are rather small numbers when expressed in standard units like W/m^2, thus scaling them allows for more floating-point precision in the response to the client. There is a guarantee that the `[timestamp,value]` pairs are sent ordered by time. The timestamps are with respect to Unix epoch. Each individual dataset can be accessed with a URL like:
+
+1. **Data Request API**: Each individual dataset can be accessed with a URL like:
 
 ```
 http://swhv.oma.be/datasets/odi_read_data.php?
@@ -174,18 +201,22 @@ http://swhv.oma.be/datasets/odi_read_data.php?
 
 The first part of the URL is the `baseUrl` from the Dataset Query API. The parameters in the URL are:
 
-- `start_date`: the start date of the wanted timeline in the format YYYY-MM-DD
-- `end_date`: the end date of the wanted timeline in the format YYYY-MM-DD (full day included)
-- `timeline`: the name of the timeline as defined in the Data Request API
-- `data_format`: only JSON available currently
+- `start_date`: the start date of the wanted timeline in the format YYYY-MM-DD;
+- `end_date`: the end date of the wanted timeline in the format YYYY-MM-DD (full day included);
+- `timeline`: the name of the timeline as defined by the Dataset Query API;
+- `data_format`: only JSON available currently.
 
 The response is a JSON file with the keys:
 
 - `timeline`: the name of the timeline as defined in the Data Request API
 - `multiplier`: the multiplier that needs to be applied to the values
-- `data`: the list of timestamp value pairs. The values need to be multiplied by the multiplier.
+- `data`: a list of `[timestamp,value]` pairs. The values need to be multiplied by the `multiplier`.
 
-## Geometry Server ##
+The `multiplier` parameter allows for sending scaled data to the client when necessary. The values of many datasets are rather small numbers when expressed in standard units like W/m^2, thus scaling them allows for more floating-point precision in the response to the client.
+
+The timestamps are with respect to Unix epoch. There is a guarantee that the data is sent ordered by timestamp.
+
+### Geometry Services API ###
 
 The `GeometryService` is a REST network service that uses NASA's Navigation and Ancillary Information Facility (NAIF) SPICE Toolkit to compute positions of solar system objects with high precision and to return JSON and MessagePack (<https://msgpack.org>) encoded responses. For example, given the following request:
 
@@ -221,27 +252,11 @@ The following functions are implemented:
 - `transform` - transform between several reference frames used in heliophysics; representations: `matrix`, `angle` (Euler, rad), `quaternion`;
 - `utc2scs` and `scs2utc` - transform between UTC and spacecraft OBET (Solar Orbiter supported).
 
+There is a guarantee that the data is sent ordered by UTC timestamps.
+
 This service is used to support the Viewpoint functionality of the JHelioviewer client.
 
-## PFSS Dataset ##
-
-A PFSS algorithm[^pfssPaper] was implemented in C for fast computation. Magnetograms from <http://gong.nso.edu/data/magmap/index.html> are used as input. Those FITS files contain a full map of the latest available solar magnetic data at a resolution of 256×180 in a sine-latitude grid.
-
-The PFSS algorithm consists of several steps:
-
-1. For algorithm input, interpolate the magnetogram data onto an appropriate grid;
-1. Run the algorithm by solving a Poisson-type equation;
-1. Select the field lines and save them to FITS file.
-
-For the starting points on the photosphere, an equally spaced `theta`--`phi` grid of points that lie above the photosphere is used. The set of starting points is augmented with starting points for which the magnetic field is strong.
-
-The algorithm to compute the field lines uses an Adams–Bashforth explicit method (third order precision) that requires less evaluations of the vector field than the more commonly used fourth order precision Runge-Kutta methods. This is mainly done because the evaluation of the vector field at a given point is relatively slow.
-
-The resulting FITS files consist of `BINARY TABLE`s with four columns `FIELDLINEx`, `FIELDLINEy`, `FIELDLINEz`, `FIELDLINEs`. The first three are mapped to unsigned shorts and can be converted to Cartesian coordinates using the formula 3 × (value × 2 / 65535 − 1) (on the client side one needs to add 32768). The `FIELDLINEs` value encodes the strength and, by the sign, the radial direction of the field. This encoding was chosen for a compact representation.
-
-The field strength is mapped in the default JHelioviewer display as blue (negative radial) or red (positive radial); the lesser the color saturation, the weaker the field. In order to better see the direction of the field, points of the field lines beyond 2.4 solar radii have red or blue colors without blending with white.
-
-## SAMP ##
+### SAMP ###
 
 The SAMP messages supported by the JHelioviewer client are:
 
