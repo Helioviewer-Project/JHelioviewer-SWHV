@@ -98,18 +98,19 @@ public class LoadPosition extends JHVWorker<Position.L[], Void> {
         return position.length > 0;
     }
 
-    public long interpolateTime(long time, long startTime, long endTime) {
+    private long interpolateTime(long t, long startTime, long endTime) {
         long pStart = position[0].time.milli;
         long pEnd = position[position.length - 1].time.milli;
         if (startTime == endTime)
             return pEnd;
         else {
-            double f = (time - startTime) / (double) (endTime - startTime); //!
+            double f = (t - startTime) / (double) (endTime - startTime); //!
             return (long) (pStart + f * (pEnd - pStart) + .5);
         }
     }
 
-    public Position.L getInterpolatedL(long time) {
+    public Position.L getInterpolatedL(long t, long startTime, long endTime) {
+        long time = interpolateTime(t, startTime, endTime);
         double dist, hgln, hglt;
         long tstart = position[0].time.milli;
         long tend = position[position.length - 1].time.milli;
@@ -134,8 +135,8 @@ public class LoadPosition extends JHVWorker<Position.L[], Void> {
         return new Position.L(new JHVDate(time), dist, hgln, hglt);
     }
 
-    public Position.Q getInterpolatedQ(long time) {
-        Position.L p = getInterpolatedL(time);
+    public Position.Q getInterpolatedQ(long t, long startTime, long endTime) {
+        Position.L p = getInterpolatedL(t, startTime, endTime);
         Position.L e = Sun.getEarth(p.time);
         return new Position.Q(p.time, p.rad, new Quat(p.lat, e.lon - p.lon));
     }
