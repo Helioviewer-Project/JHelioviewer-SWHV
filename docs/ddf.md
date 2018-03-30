@@ -1,13 +1,11 @@
 ---
 title: SWHV CCN2 Design Document
-subtitle: ROB-SWHV(7186)-DDF2
+subtitle: ROB-SWHV(7186)-DDF2 v1.1
 author: SWHV Team
 subject: Space Weather HelioViewer
 date: 2018-04-01
 geometry: margin=1in
 papersize: A4
-lot: true
-lof: true
 toc: true
 colorlinks: true
 mainfont: "Georgia"
@@ -37,15 +35,11 @@ logowidth: 0.1
 
 # Introduction
 
-**Royal Observatory of Belgium**
-
-**University of Applied Sciences North-Western Switzerland**
-
-+----------------------+------------------------------------------------------------------+
-|Contributing authors: | Roman Bolzern, Bram Bourgoignie, Bogdan Nicula, Freek Verstringe |
-+----------------------+------------------------------------------------------------------+
-|Approved by:          | Bogdan Nicula                                                    |
-+----------------------+------------------------------------------------------------------+
++---------------------+------------------------------------------------------------------------------------------+
+|Contributing authors | Roman Bolzern (FHNW), Bram Bourgoignie (ROB), Bogdan Nicula (ROB), Freek Verstringe (ROB)|
++---------------------+------------------------------------------------------------------------------------------+
+|Approved by          | Bogdan Nicula (ROB)                                                                      |
++---------------------+------------------------------------------------------------------------------------------+
 
 +------------+----------------------------------------------+
 | Date       | Notes                                        |
@@ -57,7 +51,7 @@ logowidth: 0.1
 | 2018-04-01 | Version 1.1 (Update following remarks):\     |
 |            |                                              |
 |            | * translated to Markdown                     |
-|            | * added design                               |
+|            | * added some design notes                    |
 +------------+----------------------------------------------+
 
 Table: Document history
@@ -110,7 +104,7 @@ To ensure encapsulation, reproducibility, and full configuration control, the se
 
 The `esajpip` server serves the JPEG2000 encoded data to the JHelioviewer client. It implements a restricted set of the JPIP protocol over HTTP.
 
-This software is forked from the code at <https://launchpad.net/esajpip>. It was ported to a CMake build system and to C++11 standard features. Several bugs, vulnerabilities, and resource leaks (memory, file descriptors) were solved; sharing and locks between threads were eliminated; C library read functions were replaced by memory-mapping of input files. The JPX metadata is now sent compressed and several ranges of images can be requested in one JPIP request.
+This software is forked from the code at <https://launchpad.net/esajpip>. It was ported to a CMake build system and to C++11 standard features. Several bugs, vulnerabilities, and resource leaks (memory, file descriptors) were solved; sharing and locks between threads were eliminated; C library read functions were replaced by memory-mapping of input files (for up to 10x higher network throughput). The JPX metadata is now sent compressed and several ranges of images can be requested in one JPIP request.
 
 The code is periodically verified with IDEA CLion and Synopsys Coverity static code analyzers and with `valgrind` dynamic analyzer.
 
@@ -157,7 +151,7 @@ The Kakadu's `kdu_transcode` program is used in the 2nd stage for transcoding th
 
 The 3rd stage (decode JPEG2000 codestreams for the web clients) is replicated by `hv_jp2_decode`. This comes at the cost of lower performance, but with little impact for the user experience.
 
-The 4th stage (aggregate JPEG2000 codestreams into JPX files) can be replaced by `hv_jpx_merge`. From the point of view of the JHelioviewer user, the client -- server interaction latency and bandwidth dominate the waiting time for the display of the image data. Additionally, `hv_jpx_split` can now possible reconstruct JP2 files out of JPX files with embedded codestreams. Assembly and disassembly of JPX files allows JP2 files heterogeneous from the point of view of size, of component definition, number and type, and of color specification. Those tasks involve only manipulations at the byte level structure of the file formats and not the decoding of the codestreams.
+The 4th stage (aggregate JPEG2000 codestreams into JPX files) can be replaced by `hv_jpx_merge` (up to 10x faster than `kdu_merge`). From the point of view of the JHelioviewer user, the client -- server interaction latency and bandwidth dominate the waiting time for the display of the image data. The server latency has two main components: the database query for the list of files that will make up the JPX and the parsing of those files to extract the information for the assembly of the JPX. Additionally, `hv_jpx_split` can now possible reconstruct JP2 files out of JPX files with embedded codestreams. Assembly and disassembly of JPX files allows JP2 files heterogeneous from the point of view of size, of component definition, number and type, and of color specification. Those tasks involve only manipulations at the byte level structure of the file formats and not the decoding of the codestreams.
 
 ## Timeline API ##
 
@@ -275,7 +269,7 @@ Those messages have as parameter an URI to load. Both local and remote URIs are 
 
 ## File Formats ##
 
-Many of the file formats supported by the JHelioviewer client are based on the JSON format.
+Many of the file formats supported by the JHelioviewer client are based on the JSON format. All files can be either local or can be loaded over the HTTP protocol. JPX can additionally be loaded over the JPIP protocol.
 
 ### State File ###
 
@@ -297,9 +291,19 @@ Many of the file formats supported by the JHelioviewer client are based on the J
 
 ### Image Formats ###
 
-FITS, PNG, JPEG, JP2, JPX - local and over HTTP.
+FITS, PNG, JPEG, JP2, JPX.
 
-# Tasks
+## Core JHelioviewer Design ##
+
+In contrast to the 31k lines of code to implement all its many features, the core JHelioviewer design is very simple and can probably be expressed in a couple of thousands of lines of code. The principle of separation of concerns is applied throughout. Objects are asked to update themselves, they proceed to do so independently, and they report back when done. There are essentially no locks and no data structures synchronized between threads.
+
+The program is driven via three timers:
+
+- `Displayer` beats at constant 60Hz and coalesces requests for decoding the image layers and refreshing the image canvas;
+- `Movie` beats at configurable frequency (default 20Hz) and is responsible to ask for the time of the program to change (i.e., frame advance);
+- `UITimer` beats at constant 10Hz and commands the refresh of the Swing UI components that need to change together with the movie frame; additionally, it commands the refresh of the timeline canvas.
+
+# CCN2 Tasks #
 
 ## WP20100 -- Study SWHV and JHV3D and WP20150 -- Merge JHV3D Ideas
 
@@ -478,7 +482,7 @@ Currently the support for 32bit operating systems was removed in order to avoid 
 
 The software is also tested under later versions of OpenJDK. There are several illegal reflective accesses from JOGL into the now modularized Java frameworks, some of them OS-specific. Currently manifesting as warnings, it will be very difficult to fix those for future Java versions where they will become errors.
 
-The software is under continuous refactoring and re-architecting as new features become available. Simplification and reduction of the number of lines of code are top priorities. Besides continuous testing, the software is regularly submitted to static code analysis using IDEA IntelliJ, Google Error Prone, SpotBugs, PMD, and Synopsys Coverity.
+The software is under continuous refactoring and re-architecting as new features become available. Simplification and reduction of the number of lines of code are top priorities. Besides continuous testing, the software is regularly submitted to static code analysis using IDEA IntelliJ, Google ErrorProne, SpotBugs, PMD, and Synopsys Coverity.
 
 ## WP21200 -- Improve Client Interoperability
 
