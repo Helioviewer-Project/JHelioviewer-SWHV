@@ -48,13 +48,8 @@ logowidth: 0.1
 +------------+----------------------------------------------+
 | 2018-03-12 | Version 1.01 (Update following CDR2)         |
 +------------+----------------------------------------------+
-| 2018-04-01 | Version 1.1 (Update following remarks):\     |
-|            |                                              |
-|            | * translated to Markdown                     |
-|            | * added some design notes                    |
+| 2018-04-01 | Version 1.1 (Added design notes)             |
 +------------+----------------------------------------------+
-
-Table: Document history
 
 ## Purpose & Scope
 
@@ -70,13 +65,13 @@ This document (SWHV-DDF2) is part of the report of the design study of the work 
 
 # Work Logic
 
-The identified tasks are presented together with a proposed implementation. In many cases, by the time of writing of this document (MS6), the work was already performed, therefore the present tense is used. For the work to be performed for the MS7, the future tense is used.
+Chapter 3 presents the current system architecture, while in chapter 4 the identified tasks for the CCN2 phase are presented together with a proposed implementation. In many cases, by the time of writing of this document (MS6), the work was already performed, therefore the present tense is used. For the work to be performed for the MS7, the future tense is used.
 
-Chapter 4 presents a traceability matrix for the tasks, as well as the assigned priority and the milestone for delivery. Features already delivered will be subjected to refinement and refactoring as new functionality becomes available in the client-server system.
+Chapter 5 presents a traceability matrix for the tasks, as well as the assigned priority and the milestone for delivery. Features already delivered will be subjected to refinement and refactoring as new functionality becomes available in the client-server system.
 
 # System Architecture #
 
-This document describes the architecture of the Helioviewer System. For the purpose of this project, the focus is on the interaction between the JHelioviewer client and the Helioviewer server.
+The following figure depicts the architecture of the Helioviewer System as installed on the ROB server. For the purpose of this project, the focus is on the interaction between the JHelioviewer client and the Helioviewer server.
 
 ![Helioviewer system architecture][architecture]
 
@@ -269,7 +264,7 @@ Those messages have as parameter an URI to load. Both local and remote URIs are 
 
 ## File Formats ##
 
-Many of the file formats supported by the JHelioviewer client are based on the JSON format. All files can be either local or can be loaded over the HTTP protocol. JPX can additionally be loaded over the JPIP protocol.
+Many of the file formats supported by the JHelioviewer client are based on the JSON format. All files can be either local or can be loaded over the HTTP protocol. JPX can additionally be loaded over the JPIP protocol. Files can be loaded at start-up via the command line interface.
 
 ### State File ###
 
@@ -279,19 +274,49 @@ Many of the file formats supported by the JHelioviewer client are based on the J
 
 ### Image Request File ###
 
+JSON document specifying image requests to the default server in a simple manner as in the example below. Natural language specification of time is supported (as is the case for the state file) and, besides the `dataset` field, all fields are optional with sensible defaults.
+
+Example:
+
 ```
-{"org.helioviewer.jhv.request.image": {...}}
+{
+  "org.helioviewer.jhv.request.image": {
+    "observatory":"SDO",
+    "startTime":"yesterday",
+    "endTime":"today",
+    "cadence":1800,
+    "dataset":"AIA 304"
+  }
+}
 ```
 
 ### Timeline Request File ###
 
 ```
-{"org.helioviewer.jhv.request.timeline": {...}}
+{
+  "org.helioviewer.jhv.request.timeline": {
+    "bandType": {
+      "baseUrl": "http://swhv.oma.be/datasets/odi_read_data.php?",
+        "unitLabel": "W/m^2",
+        "name": "GOES_XRSA_ODI",
+        "range": [
+          1e-09,
+          0.001
+        ],
+        "scale": "logarithmic",
+        "label": "GOES XRS-A (shortwave)",
+        "group": "GROUP_SWHV"
+    },
+    "data": [],
+    "multiplier": 1.3000000187446403e-08,
+    "timeline": "GOES_XRSA_ODI"
+  }
+}
 ```
 
 ### Image Formats ###
 
-FITS, PNG, JPEG, JP2, JPX.
+WCS metadata is used to place image data at the correct viewpoint (time and position). Without metadata, image data is placed at a default viewpoint. JHelioviewer can extract and interpret metadata from JP2, JPX, and FITS formats. It also supports at a basic level, without metadata, the Java ImageIO formats (JPEG, PNG, BMP, GIF).
 
 ## Core JHelioviewer Design ##
 
@@ -299,9 +324,9 @@ In contrast to the 31k lines of code to implement all its many features, the cor
 
 The program is driven via three timers:
 
-- `Displayer` beats at constant 60Hz and coalesces requests for decoding the image layers and refreshing the image canvas;
-- `Movie` beats at configurable frequency (default 20Hz) and is responsible to ask for the time of the program to change (i.e., frame advance);
-- `UITimer` beats at constant 10Hz and commands the refresh of the Swing UI components that need to change together with the movie frame; additionally, it commands the refresh of the timeline canvas.
+- `Displayer` beats at constant 60 Hz and coalesces requests for decoding the image layers and refreshing the image canvas;
+- `Movie` beats at a configurable frequency (default 20 Hz) and is responsible for setting the program time (i.e., frame advance);
+- `UITimer` beats at constant 10 Hz and commands the refresh of the Swing UI components that need to change together with the movie frame; additionally, it commands the refresh of the timeline canvas.
 
 # CCN2 Tasks #
 
@@ -387,18 +412,15 @@ This is implemented as a JSON document preserving with high fidelity the state o
 
 3.  **(SWHV-CCN2-20200-03)** Improve command line interface.
 
-This is implemented using JSON documents specifying image requests to the default server in a simple manner as in the example below. Natural language specification of time is supported (as is the case for the state file) and, besides the "dataset" field, all fields are optional with sensible defaults.
-
-Example:
+The following command-line options are now available:
 
 ```
-{
-  "observatory":"SDO",
-  "startTime":"yesterday",
-  "endTime":"today",
-  "cadence":1800,
-  "dataset":"AIA 304"
-}
+  -load    file location
+         Load or request a supported file at program start. The option can be used multiple times.
+  -request request file location
+         Load a request file and issue a request at program start. The option can be used multiple times.
+  -state   state file
+         Load state file.
 ```
 
 4.  **(SWHV-CCN2-20200-04)** On disk caching of JP2 code-stream data.
@@ -435,7 +457,7 @@ This will be implemented with an RPC server built on the Spyne toolkit (<http://
 
 Once the propagation server is implemented, the specified datasets will be integrated.
 
-5.  **(SWHV-CCN2-20300-05)** Plot the sub-spacecraft point on the solar surface (both radially and w.r.t. magnetic connectivity, i.e. Parker spiral).
+5.  **(SWHV-CCN2-20300-05)** Plot the sub-spacecraft point on the solar surface (both radially and w.r.t. magnetic connectivity, i.e., Parker spiral).
 
 This is implemented using existing functionality. The magnetic connectivity aspect will need to be tackled together with the implementation of the Solar Orbiter requirements, therefore is out of scope.
 
@@ -509,13 +531,13 @@ This will be limited to known use cases exhibiting data calibration and known st
 **(SWHV-CCN2-21300-01)** For the task of this WP, a first web-based video streaming proof of concept was investigated. The focus lays on the identification and verification of required technical core components.
 
 1. __Video support__\
-     The most supported video format by current web browsers is MP4 H264 (<https://caniuse.com/#feat=mpeg4>), including «fragmented» versions for streaming). All tested platforms support HTML5 video playback of grayscale 8bit interlaced mp4 videos.
+     The most supported video format by current web browsers is MP4 H.264 (<https://caniuse.com/#feat=mpeg4>), including «fragmented» versions for streaming). All tested platforms support HTML5 video playback of grayscale 8bit interlaced mp4 videos.
 
 1. __Storage__\
-     For the proof of concept, a video tree was built from AIA images, covering one day, with 4 different pixel resolutions (full res 4k down to 512) and 6 different time resolutions i.e. playback speeds (1x, 2x, 4x, 8x, 16x, 32x). Helioviewer.org provided 2379 JPEG2000 images, from which 6\'035 videos were built. With the current video format, we expect **50TB** of videos, compared to the **57TB** of JPEG2000 images they cover.
+     For the proof of concept, a video tree was built from AIA images, covering one day, with 4 different pixel resolutions (full res 4k down to 512) and 6 different time resolutions, i.e., playback speeds (1x, 2x, 4x, 8x, 16x, 32x). Helioviewer.org provided 2379 JPEG2000 images, from which 6\'035 videos were built. With the current video format, we expect **50TB** of videos, compared to the **57TB** of JPEG2000 images they cover.
 
 1. __Bandwidth__\
-     In full resolution streaming mode, i.e. streaming the full 4k images, only 7MB/sec are required. Yet the tool is built to download with region of interests, with a realistic worst case of **2.5MB/sec** bandwidth required. For mobile devices, bandwidth usage can be throttled down to **0.15MB/sec**.
+     In full resolution streaming mode, i.e., streaming the full 4k images, only 7MB/sec are required. Yet the tool is built to download with region of interests, with a realistic worst case of **2.5MB/sec** bandwidth required. For mobile devices, bandwidth usage can be throttled down to **0.15MB/sec**.
 
 1. __WebGL__\
      The proof of concept projects 64 videos (8 512px videos in width and height) onto a 3D sphere. While the GPU has no issues, this worst-case performance test shows significant CPU consumption, with the naive implementation slowing down the playback to 10 FPS (frames per second). We are confident though that this can be addressed with improved GPU communication. Practically all devices support WebGL and 4k textures (<https://webglstats.com/webgl/parameter/MAX_TEXTURE_SIZE>)
