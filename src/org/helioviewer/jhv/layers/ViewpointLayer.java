@@ -305,7 +305,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         FloatBuffer planetPosition = BufferUtils.newFloatBuffer(4 * size);
         FloatBuffer planetColor = BufferUtils.newFloatBuffer(4 * size);
 
-        for (Map.Entry<LoadPosition, Position.L> entry : UpdateViewpoint.equatorial.getPositions()) {
+        for (Map.Entry<LoadPosition, Position.L> entry : positions) {
             Position.L p = entry.getValue();
             double theta = p.lat;
             double phi = p.lon;
