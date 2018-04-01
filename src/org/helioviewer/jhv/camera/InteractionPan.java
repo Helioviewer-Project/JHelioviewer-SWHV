@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.camera;
 
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.math.Vec2;
 
 import com.jogamp.newt.event.MouseEvent;
@@ -28,9 +28,9 @@ public class InteractionPan extends Interaction {
         lastY = e.getY();
 
         Vec2 pan = camera.getCurrentTranslation();
-        double m = 2. * camera.getWidth() / Displayer.getActiveViewport().height;
+        double m = 2. * camera.getWidth() / Display.getActiveViewport().height;
         camera.setCurrentTranslation(pan.x + x * m, pan.y - y * m);
-        Displayer.display();
+        Display.display();
     }
 
 }

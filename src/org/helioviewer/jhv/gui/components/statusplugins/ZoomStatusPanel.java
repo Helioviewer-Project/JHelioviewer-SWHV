@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.gui.components.statusplugins;
 
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
@@ -14,7 +14,7 @@ public class ZoomStatusPanel extends StatusPanel.StatusPlugin implements LazyCom
     private double distance;
 
     public ZoomStatusPanel() {
-        update(Displayer.getCamera().getWidth(), Displayer.getCamera().getViewpoint().distance);
+        update(Display.getCamera().getWidth(), Display.getCamera().getViewpoint().distance);
         UITimer.register(this);
     }
 

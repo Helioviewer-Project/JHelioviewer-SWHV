@@ -10,7 +10,7 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.image.NIOImageFactory;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.MoviePanel.RecordMode;
@@ -117,7 +117,7 @@ public class ExportMovie implements FrameListener {
                 e.printStackTrace();
             }
 
-            Displayer.render(1);
+            Display.render(1);
         } else {
             try {
                 exporter = new JCodecExporter();
@@ -143,7 +143,7 @@ public class ExportMovie implements FrameListener {
                 Movie.removeFrameListener(instance);
             if (mode != RecordMode.FREE)
                 MoviePanel.clickRecordButton();
-            Displayer.display(); // force detach
+            Display.display(); // force detach
         }
 
         Movie.stopRecording();

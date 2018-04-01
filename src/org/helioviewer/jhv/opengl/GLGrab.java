@@ -3,7 +3,7 @@ package org.helioviewer.jhv.opengl;
 import java.nio.Buffer;
 
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 
 import com.jogamp.opengl.FBObject;
 import com.jogamp.opengl.FBObject.Attachment.Type;
@@ -44,16 +44,16 @@ public class GLGrab {
         if (fbo == null)
             init(gl);
 
-        int _x = Displayer.fullViewport.x;
-        int _y = Displayer.fullViewport.yGL;
-        int _w = Displayer.fullViewport.width;
-        int _h = Displayer.fullViewport.height;
+        int _x = Display.fullViewport.x;
+        int _y = Display.fullViewport.yGL;
+        int _w = Display.fullViewport.width;
+        int _h = Display.fullViewport.height;
 
-        Displayer.setGLSize(0, 0, fbo.getWidth(), fbo.getHeight());
-        Displayer.reshapeAll();
+        Display.setGLSize(0, 0, fbo.getWidth(), fbo.getHeight());
+        Display.reshapeAll();
 
         fbo.bind(gl);
-        if (Displayer.mode == Displayer.DisplayMode.Orthographic) {
+        if (Display.mode == Display.DisplayMode.Orthographic) {
             GLListener.renderScene(camera, gl);
         } else {
             GLListener.renderSceneScale(camera, gl);
@@ -70,8 +70,8 @@ public class GLGrab {
 
         fbo.unuse(gl);
 
-        Displayer.setGLSize(_x, _y, _w, _h);
-        Displayer.reshapeAll();
+        Display.setGLSize(_x, _y, _w, _h);
+        Display.reshapeAll();
     }
 
 }

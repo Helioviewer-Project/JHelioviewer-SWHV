@@ -5,7 +5,7 @@ import java.awt.Component;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.layers.ImageLayer;
 
@@ -20,7 +20,7 @@ public class OpacityPanel implements FilterDetails {
         slider.addChangeListener(e -> {
             layer.getGLImage().setOpacity(slider.getValue() / 100.);
             label.setText(LevelsPanel.align3(slider.getValue()));
-            Displayer.display();
+            Display.display();
         });
         WheelSupport.installMouseWheelSupport(slider);
     }

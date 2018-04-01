@@ -17,7 +17,7 @@ public class Viewport {
         height = _h;
         aspect = _w / (double) _h;
         x = _x;
-        yGL = Displayer.glHeight - height - _y;
+        yGL = Display.glHeight - height - _y;
         yAWT = _y;
     }
 

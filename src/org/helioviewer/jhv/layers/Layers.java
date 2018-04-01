@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.selector.Reorderable;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
@@ -116,7 +116,7 @@ public class Layers extends AbstractTableModel implements Reorderable {
 
         int row = layers.indexOf(layer);
         fireTableRowsInserted(row, row);
-        Displayer.display(); // e.g., PFSS layer
+        Display.display(); // e.g., PFSS layer
     }
 
     public void remove(Layer layer) {
@@ -131,7 +131,7 @@ public class Layers extends AbstractTableModel implements Reorderable {
 
         if (row >= 0)
             fireTableRowsDeleted(row, row);
-        Displayer.display();
+        Display.display();
     }
 
     public static void prerender(GL2 gl) {
@@ -213,7 +213,7 @@ public class Layers extends AbstractTableModel implements Reorderable {
             insertRow(toIndex, toMove);
         }
 
-        if (Displayer.multiview) {
+        if (Display.multiview) {
             ImageLayers.arrangeMultiView(true);
         }
     }

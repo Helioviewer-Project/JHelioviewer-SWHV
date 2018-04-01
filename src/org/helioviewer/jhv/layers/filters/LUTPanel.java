@@ -8,7 +8,7 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.base.lut.LUTComboBox;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.layers.ImageLayer;
 
@@ -26,7 +26,7 @@ public class LUTPanel implements FilterDetails {
 
         ActionListener listener = e -> {
             layer.getGLImage().setLUT(lutCombo.getLUT(), invertButton.isSelected());
-            Displayer.display();
+            Display.display();
         };
         lutCombo.addActionListener(listener);
         invertButton.addActionListener(listener);
@@ -35,7 +35,7 @@ public class LUTPanel implements FilterDetails {
         enhanceButton.setToolTipText("Enhance off-disk corona");
         enhanceButton.addActionListener(e -> {
             layer.getGLImage().setEnhanced(enhanceButton.isSelected());
-            Displayer.display();
+            Display.display();
         });
 
         buttonPanel = new JPanel();

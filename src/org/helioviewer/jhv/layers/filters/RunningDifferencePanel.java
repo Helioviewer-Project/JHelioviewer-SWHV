@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.CircularProgressUI;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
@@ -36,7 +36,7 @@ public class RunningDifferencePanel implements FilterDetails {
                 item.setSelected(true);
             item.addActionListener(e -> {
                 layer.getGLImage().setDifferenceMode(mode);
-                Displayer.display();
+                Display.display();
             });
             modeGroup.add(item);
             modePanel.add(item);

@@ -15,7 +15,7 @@ import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.CameraOptionsPanel;
 import org.helioviewer.jhv.camera.LoadPosition;
 import org.helioviewer.jhv.camera.UpdateViewpoint;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.math.Quat;
@@ -68,7 +68,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         gl.glPushMatrix();
         gl.glMultMatrixd(camera.getViewpoint().orientation.toMatrix().transpose().m, 0);
         {
-            if (Displayer.getUpdateViewpoint() == UpdateViewpoint.equatorial) {
+            if (Display.getUpdateViewpoint() == UpdateViewpoint.equatorial) {
                 renderPlanets(gl, UpdateViewpoint.equatorial.getPositions(), pointFactor);
             }
             center.renderPoints(gl, pointFactor);
@@ -89,11 +89,11 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        if (Displayer.getUpdateViewpoint() == UpdateViewpoint.equatorial) {
+        if (Display.getUpdateViewpoint() == UpdateViewpoint.equatorial) {
             mouseX = e.getX();
             mouseY = e.getY();
-            Camera camera = Displayer.getCamera();
-            Vec3 v = CameraHelper.getVectorFromPlane(camera, Displayer.getActiveViewport(), mouseX, mouseY, Quat.ZERO, true);
+            Camera camera = Display.getCamera();
+            Vec3 v = CameraHelper.getVectorFromPlane(camera, Display.getActiveViewport(), mouseX, mouseY, Quat.ZERO, true);
             if (v == null)
                 return;
 
@@ -111,11 +111,11 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             }
             if (!text.isEmpty()) {
                 text.clear();
-                Displayer.display();
+                Display.display();
             }
             if (minDist < 0.01) {
                 text.add(name);
-                Displayer.display();
+                Display.display();
             }
         }
     }

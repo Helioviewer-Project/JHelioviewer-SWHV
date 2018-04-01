@@ -7,7 +7,7 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -30,12 +30,12 @@ public class ZoomOneToOneAction extends AbstractAction {
         MetaData m;
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null && (m = layer.getMetaData()) != null) {
-            Camera camera = Displayer.getCamera();
-            double imageFraction = Displayer.getActiveViewport().height / (double) m.getPixelHeight();
+            Camera camera = Display.getCamera();
+            double imageFraction = Display.getActiveViewport().height / (double) m.getPixelHeight();
             double fov = 2. * Math.atan2(0.5 * m.getPhysicalRegion().height * imageFraction, camera.getViewpoint().distance);
             camera.setFOV(fov);
 
-            Displayer.render(1);
+            Display.render(1);
         }
     }
 

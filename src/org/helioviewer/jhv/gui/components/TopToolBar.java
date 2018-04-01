@@ -18,7 +18,7 @@ import javax.swing.JToolBar;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.actions.ClearAnnotationsAction;
 import org.helioviewer.jhv.gui.actions.ResetCameraAction;
@@ -229,25 +229,25 @@ public class TopToolBar extends JToolBar {
         add(new JToolBar.Separator(dim));
 
         trackingButton = toolToggleButton(TRACK);
-        trackingButton.setSelected(Displayer.getCamera().getTrackingMode());
-        trackingButton.addItemListener(e -> Displayer.getCamera().setTrackingMode(trackingButton.isSelected()));
+        trackingButton.setSelected(Display.getCamera().getTrackingMode());
+        trackingButton.addItemListener(e -> Display.getCamera().setTrackingMode(trackingButton.isSelected()));
         addButton(trackingButton);
 
         coronaButton = toolToggleButton(OFFDISK);
-        coronaButton.setSelected(Displayer.getShowCorona());
+        coronaButton.setSelected(Display.getShowCorona());
         coronaButton.addItemListener(e -> {
-            Displayer.setShowCorona(coronaButton.isSelected());
-            Displayer.display();
+            Display.setShowCorona(coronaButton.isSelected());
+            Display.display();
         });
         addButton(coronaButton);
 
         add(new JToolBar.Separator(dim));
 
         multiviewButton = toolToggleButton(MULTIVIEW);
-        multiviewButton.setSelected(Displayer.multiview);
+        multiviewButton.setSelected(Display.multiview);
         multiviewButton.addItemListener(e -> {
-            Displayer.multiview = multiviewButton.isSelected();
-            ImageLayers.arrangeMultiView(Displayer.multiview);
+            Display.multiview = multiviewButton.isSelected();
+            ImageLayers.arrangeMultiView(Display.multiview);
         });
         addButton(multiviewButton);
 
@@ -256,11 +256,11 @@ public class TopToolBar extends JToolBar {
 
         JPopupMenu projectionPopup = new JPopupMenu();
         ButtonGroup projectionGroup = new ButtonGroup();
-        for (Displayer.DisplayMode el : Displayer.DisplayMode.values()) {
+        for (Display.DisplayMode el : Display.DisplayMode.values()) {
             projectionPopup.add(el.radio);
             projectionGroup.add(el.radio);
         }
-        Displayer.DisplayMode.Orthographic.radio.setSelected(true);
+        Display.DisplayMode.Orthographic.radio.setSelected(true);
 
         projectionButton.addMouseListener(new MouseAdapter() {
             @Override

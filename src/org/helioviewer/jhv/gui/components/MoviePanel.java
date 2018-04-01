@@ -30,7 +30,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.astronomy.Carrington;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -128,7 +128,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
 
             @Override
             protected Dimension getSize() {
-                return GLHelper.GL2AWTDimension(Displayer.fullViewport.width, Displayer.fullViewport.height);
+                return GLHelper.GL2AWTDimension(Display.fullViewport.width, Display.fullViewport.height);
             }
 
             @Override

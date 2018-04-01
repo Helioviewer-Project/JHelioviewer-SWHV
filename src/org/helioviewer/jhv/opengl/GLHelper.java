@@ -6,7 +6,7 @@ import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -64,7 +64,7 @@ public class GLHelper {
 
     public static Vec2 drawVertex(Camera camera, Viewport vp, GL2 gl, Vec3 current, Vec2 previous) {
         Vec3 pt = camera.getViewpoint().orientation.rotateVector(current);
-        Vec2 tf = Displayer.mode.xform.transform(pt, Displayer.mode.scale);
+        Vec2 tf = Display.mode.xform.transform(pt, Display.mode.scale);
         if (previous != null) {
             if (tf.x <= 0 && previous.x >= 0 && Math.abs(previous.x - tf.x) > 0.5) {
                 gl.glVertex2f((float) (0.5 * vp.aspect), (float) tf.y);

@@ -11,7 +11,7 @@ import javax.swing.JSlider;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
@@ -52,7 +52,7 @@ public class MiniviewLayer extends AbstractLayer {
     }
 
     public void reshapeViewport() {
-        int vpw = Displayer.fullViewport.width;
+        int vpw = Display.fullViewport.width;
         int offset = (int) (vpw * 0.01);
         int size = (int) (vpw * 0.01 * scale);
         miniViewport = new Viewport(0, offset, offset, size, size);
@@ -125,7 +125,7 @@ public class MiniviewLayer extends AbstractLayer {
         slider.addChangeListener(e -> {
             scale = slider.getValue();
             reshapeViewport();
-            Displayer.display();
+            Display.display();
         });
         WheelSupport.installMouseWheelSupport(slider);
 

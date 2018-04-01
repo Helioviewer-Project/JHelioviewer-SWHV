@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.plugin.PluginManager;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
@@ -44,7 +44,7 @@ public class State {
         main.put("time", Movie.getTime());
         main.put("play", Movie.isPlaying());
         main.put("multiview", ImageViewerGui.getToolBar().getMultiviewButton().isSelected());
-        main.put("projection", Displayer.mode);
+        main.put("projection", Display.mode);
         main.put("tracking", ImageViewerGui.getToolBar().getTrackingButton().isSelected());
         main.put("showCorona", ImageViewerGui.getToolBar().getShowCoronaButton().isSelected());
 
@@ -190,7 +190,7 @@ public class State {
         try {
             // to be loaded before viewpoint
             try {
-                Displayer.DisplayMode.valueOf(jo.optString("projection")).radio.doClick();
+                Display.DisplayMode.valueOf(jo.optString("projection")).radio.doClick();
             } catch (Exception ignore) {
             }
             loadTimelines(jo);

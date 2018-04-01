@@ -20,7 +20,7 @@ import org.helioviewer.jhv.camera.InteractionAnnotate;
 import org.helioviewer.jhv.camera.InteractionAxis;
 import org.helioviewer.jhv.camera.InteractionPan;
 import org.helioviewer.jhv.camera.InteractionRotate;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.components.MainContentPanel;
 import org.helioviewer.jhv.gui.components.MenuBar;
@@ -79,7 +79,7 @@ public class ImageViewerGui {
         menuBar = new MenuBar();
         mainFrame.setJMenuBar(menuBar);
 
-        Camera camera = Displayer.getCamera();
+        Camera camera = Display.getCamera();
         panInteraction = new InteractionPan(camera);
         rotationInteraction = new InteractionRotate(camera);
         axisInteraction = new InteractionAxis(camera);

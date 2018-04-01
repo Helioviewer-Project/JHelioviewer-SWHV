@@ -14,7 +14,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
@@ -79,7 +79,7 @@ public class CameraOptionsPanel extends JPanel {
             }
             JSONObject jc = jo.optJSONObject("camera");
             if (jc != null)
-                Displayer.getCamera().fromJson(jc);
+                Display.getCamera().fromJson(jc);
         }
 
         JPanel fovPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
@@ -90,7 +90,7 @@ public class CameraOptionsPanel extends JPanel {
         fovSpinner.setMaximumSize(new Dimension(6, 22));
         fovSpinner.addChangeListener(e -> {
             fovAngle = (Double) fovSpinner.getValue();
-            Displayer.display();
+            Display.display();
         });
 
         JFormattedTextField f = ((JSpinner.DefaultEditor) fovSpinner.getEditor()).getTextField();
@@ -145,7 +145,7 @@ public class CameraOptionsPanel extends JPanel {
 
     public void serialize(JSONObject jo) {
         jo.put("mode", modeGroup.getSelection().getActionCommand());
-        jo.put("camera", Displayer.getCamera().toJson());
+        jo.put("camera", Display.getCamera().toJson());
         jo.put("fovAngle", fovAngle);
         jo.put("expert", expertOptionPanel.toJson());
         jo.put("equatorial", equatorialOptionPanel.toJson());
@@ -184,9 +184,9 @@ public class CameraOptionsPanel extends JPanel {
         else if (mode == CameraMode.Equatorial)
             panel = equatorialOptionPanel;
 
-        Displayer.setViewpointUpdate(mode.update);
-        Displayer.getCamera().reset();
-        Displayer.getMiniCamera().reset();
+        Display.setViewpointUpdate(mode.update);
+        Display.getCamera().reset();
+        Display.getMiniCamera().reset();
         switchOptionsPanel(panel);
     }
 

@@ -2,7 +2,7 @@ package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
@@ -27,7 +27,7 @@ public class Camera {
     private Position.Q viewpoint = Sun.StartEarthQ;
 
     private void updateCamera(JHVDate time) {
-        viewpoint = Displayer.getUpdateViewpoint().update(time);
+        viewpoint = Display.getUpdateViewpoint().update(time);
         updateRotation();
         updateWidth();
     }
@@ -42,7 +42,7 @@ public class Camera {
 
     public void refresh() {
         updateCamera(Movie.getTime());
-        Displayer.render(1);
+        Display.render(1);
     }
 
     public void reset() {
@@ -51,7 +51,7 @@ public class Camera {
 
         updateCamera(Movie.getTime());
         CameraHelper.zoomToFit(this);
-        Displayer.render(1);
+        Display.render(1);
     }
 
     public Position.Q getViewpoint() {

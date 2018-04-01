@@ -10,7 +10,7 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.imagedata.ImageData;
@@ -112,7 +112,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     @Override
     public void setEnabled(boolean _enabled) {
         super.setEnabled(_enabled);
-        if (Displayer.multiview) {
+        if (Display.multiview) {
             ImageLayers.arrangeMultiView(true);
         }
     }
@@ -130,12 +130,12 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         ImageViewerGui.getLayersPanel().setOptionsPanel(this);
 
         view.setDataHandler(this);
-        CameraHelper.zoomToFit(Displayer.getMiniCamera());
+        CameraHelper.zoomToFit(Display.getMiniCamera());
         Layers.setActiveImageLayer(this);
         Movie.setFrame(0); //!
         Movie.timespanChanged();
 
-        if (Displayer.multiview) {
+        if (Display.multiview) {
             ImageLayers.arrangeMultiView(true);
         }
         optionsPanel.setLUT(view.getDefaultLUT());
@@ -144,7 +144,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     private void unsetView() {
         stopDownloadView();
 
-        CameraHelper.zoomToFit(Displayer.getMiniCamera());
+        CameraHelper.zoomToFit(Display.getMiniCamera());
         view.setDataHandler(null);
         view.abolish();
 
@@ -158,7 +158,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
             worker = null;
         }
         unsetView();
-        if (Displayer.multiview) {
+        if (Display.multiview) {
             ImageLayers.arrangeMultiView(true);
         }
         dispose(gl);
@@ -203,8 +203,8 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         if (!isVisible[vp.idx])
             return;
 
-        GLSLSolarShader shader = Displayer.mode.shader;
-        GridScale scale = Displayer.mode.scale;
+        GLSLSolarShader shader = Display.mode.shader;
+        GridScale scale = Display.mode.scale;
 
         shader.bind(gl);
         {
@@ -212,7 +212,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
             shader.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height);
 
             Mat4 vpmi = getOrthoMatrixInverse(camera.getWidth(), vp.aspect);
-            if (Displayer.mode == Displayer.DisplayMode.Orthographic)
+            if (Display.mode == Display.DisplayMode.Orthographic)
                 vpmi.translate(-camera.getCurrentTranslation().x, -camera.getCurrentTranslation().y, 0.);
             else
                 vpmi.translate(-camera.getCurrentTranslation().x / vp.aspect, -camera.getCurrentTranslation().y, 0.);
@@ -308,7 +308,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     public void handleData(ImageData newImageData) {
         setImageData(newImageData);
         ImageViewerGui.getLayers().fireTimeUpdated(this);
-        Displayer.handleData(imageData.getViewpoint().time.milli);
+        Display.handleData(imageData.getViewpoint().time.milli);
     }
 
     @Override
