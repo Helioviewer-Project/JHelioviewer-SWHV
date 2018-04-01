@@ -6,11 +6,11 @@ import java.awt.event.ActionListener;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.Timer;
 
+import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.base.scale.Transform;
 import org.helioviewer.jhv.camera.Camera;
 // import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.camera.UpdateViewpoint;
 import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.data.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
