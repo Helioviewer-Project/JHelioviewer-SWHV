@@ -13,7 +13,7 @@ import javax.swing.JSlider;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.GLInfo;
@@ -52,7 +52,7 @@ public class TimestampLayer extends AbstractLayer {
             return;
 
         String text = Movie.getTime().toString();
-        if (Displayer.multiview) {
+        if (Display.multiview) {
             ImageLayer im = ImageLayers.getImageLayerInViewport(vp.idx);
             if (im != null) {
                 text = im.getTimeString() + ' ' + im.getName();
@@ -113,7 +113,7 @@ public class TimestampLayer extends AbstractLayer {
         JSlider slider = new JSlider(JSlider.HORIZONTAL, MIN_SCALE, MAX_SCALE, scale);
         slider.addChangeListener(e -> {
             scale = slider.getValue();
-            Displayer.display();
+            Display.display();
         });
         WheelSupport.installMouseWheelSupport(slider);
 

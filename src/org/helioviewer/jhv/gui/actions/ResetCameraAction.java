@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 
 @SuppressWarnings("serial")
 public class ResetCameraAction extends AbstractAction {
@@ -15,7 +15,7 @@ public class ResetCameraAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Displayer.getCamera().reset();
+        Display.getCamera().reset();
     }
 
 }

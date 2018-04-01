@@ -13,7 +13,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
@@ -48,7 +48,7 @@ class GridLayerOptions extends JPanel {
         axis.setHorizontalTextPosition(SwingConstants.LEFT);
         axis.addActionListener(e -> {
             grid.showAxis(axis.isSelected());
-            Displayer.display();
+            Display.display();
         });
         add(axis, c0);
 
@@ -58,7 +58,7 @@ class GridLayerOptions extends JPanel {
         labels.setHorizontalTextPosition(SwingConstants.LEFT);
         labels.addActionListener(e -> {
             grid.showLabels(labels.isSelected());
-            Displayer.display();
+            Display.display();
         });
         add(labels, c0);
 
@@ -70,7 +70,7 @@ class GridLayerOptions extends JPanel {
         radial.setHorizontalTextPosition(SwingConstants.LEFT);
         radial.addActionListener(e -> {
             grid.showRadial(radial.isSelected());
-            Displayer.display();
+            Display.display();
         });
         add(radial, c0);
 
@@ -114,7 +114,7 @@ class GridLayerOptions extends JPanel {
         gridTypeBox.setSelectedItem(grid.getGridType());
         gridTypeBox.addActionListener(e -> {
             grid.setGridType((GridLayer.GridType) Objects.requireNonNull(gridTypeBox.getSelectedItem()));
-            Displayer.display();
+            Display.display();
         });
     }
 
@@ -122,7 +122,7 @@ class GridLayerOptions extends JPanel {
         gridResolutionXSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(grid.getLonStep()), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.1)));
         gridResolutionXSpinner.addChangeListener(e -> {
             grid.setLonStep((Double) gridResolutionXSpinner.getValue());
-            Displayer.display();
+            Display.display();
         });
         WheelSupport.installMouseWheelSupport(gridResolutionXSpinner);
     }
@@ -131,7 +131,7 @@ class GridLayerOptions extends JPanel {
         gridResolutionYSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(grid.getLatStep()), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.1)));
         gridResolutionYSpinner.addChangeListener(e -> {
             grid.setLatStep((Double) gridResolutionYSpinner.getValue());
-            Displayer.display();
+            Display.display();
         });
         WheelSupport.installMouseWheelSupport(gridResolutionYSpinner);
     }

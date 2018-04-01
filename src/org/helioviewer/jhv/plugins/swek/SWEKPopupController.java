@@ -15,7 +15,7 @@ import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.data.event.JHVEvent;
 import org.helioviewer.jhv.data.event.JHVPositionInformation;
 import org.helioviewer.jhv.data.gui.info.SWEKEventInformationDialog;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.math.Quat;
@@ -44,7 +44,7 @@ public class SWEKPopupController extends MouseAdapter implements TimeListener {
 
     public SWEKPopupController(Component _component) {
         component = _component;
-        camera = Displayer.getCamera();
+        camera = Display.getCamera();
     }
 
     @Override
@@ -122,14 +122,14 @@ public class SWEKPopupController extends MouseAdapter implements TimeListener {
         mouseOverX = e.getX();
         mouseOverY = e.getY();
 
-        Viewport vp = Displayer.getActiveViewport();
+        Viewport vp = Display.getActiveViewport();
         for (JHVRelatedEvents evtr : eventsToDraw) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
             JHVPositionInformation pi = evt.getPositionInformation();
             if (pi == null)
                 continue;
 
-            if (Displayer.mode == Displayer.DisplayMode.Orthographic) {
+            if (Display.mode == Display.DisplayMode.Orthographic) {
                 Vec3 hitpoint, pt;
                 if (evt.isCactus()) {
                     double principalAngle = Math.toRadians(SWEKData.readCMEPrincipalAngleDegree(evt));
@@ -159,20 +159,20 @@ public class SWEKPopupController extends MouseAdapter implements TimeListener {
                 Vec2 tf = null;
                 Vec2 mousepos = null;
                 if (evt.isCactus()) {
-                    if (Displayer.mode == Displayer.DisplayMode.LogPolar || Displayer.mode == Displayer.DisplayMode.Polar) {
+                    if (Display.mode == Display.DisplayMode.LogPolar || Display.mode == Display.DisplayMode.Polar) {
                         double principalAngle = SWEKData.readCMEPrincipalAngleDegree(evt) - 90;
                         double distSun = computeDistSun(evt);
 
-                        tf = new Vec2(Displayer.mode.scale.getXValueInv(principalAngle), Displayer.mode.scale.getYValueInv(distSun));
-                        mousepos = Displayer.mode.scale.mouseToGridInv(mouseOverX, mouseOverY, vp, camera);
+                        tf = new Vec2(Display.mode.scale.getXValueInv(principalAngle), Display.mode.scale.getYValueInv(distSun));
+                        mousepos = Display.mode.scale.mouseToGridInv(mouseOverX, mouseOverY, vp, camera);
                     }
                 } else {
                     Vec3 pt = pi.centralPoint();
                     if (pt != null) {
                         pt = camera.getViewpoint().orientation.rotateVector(pt);
-                        tf = Displayer.mode.xform.transform(pt, Displayer.mode.scale);
+                        tf = Display.mode.xform.transform(pt, Display.mode.scale);
                     }
-                    mousepos = Displayer.mode.scale.mouseToGridInv(mouseOverX, mouseOverY, vp, camera);
+                    mousepos = Display.mode.scale.mouseToGridInv(mouseOverX, mouseOverY, vp, camera);
                 }
 
                 if (tf != null && mousepos != null) {

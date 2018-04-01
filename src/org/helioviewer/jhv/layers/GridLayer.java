@@ -10,7 +10,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Mat4;
 import org.helioviewer.jhv.math.MathUtils;
@@ -111,7 +111,7 @@ public class GridLayer extends AbstractLayer {
     }
 
     public Vec2 gridPoint(Camera camera, Viewport vp, int x, int y) {
-        return Displayer.mode.scale.mouseToGrid(x, y, vp, camera, gridType);
+        return Display.mode.scale.mouseToGrid(x, y, vp, camera, gridType);
     }
 
     public static Quat getGridQuat(Camera camera, GridType _gridType) { // should be in GridScale
@@ -187,7 +187,7 @@ public class GridLayer extends AbstractLayer {
         {
             drawGridFlat(gl, vp);
             if (showLabels) {
-                drawGridTextFlat(pixelsPerSolarRadius, Displayer.mode.scale, vp);
+                drawGridTextFlat(pixelsPerSolarRadius, Display.mode.scale, vp);
             }
         }
     }

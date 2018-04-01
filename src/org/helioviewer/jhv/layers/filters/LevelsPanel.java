@@ -9,7 +9,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -69,7 +69,7 @@ public class LevelsPanel implements FilterDetails {
             int hi = slider.getHighValue();
             layer.getGLImage().setBrightness(lo / 100., (hi - lo) / 100.);
             label.setText(format(lo, hi));
-            Displayer.display();
+            Display.display();
         });
         WheelSupport.installMouseWheelSupport(slider);
 

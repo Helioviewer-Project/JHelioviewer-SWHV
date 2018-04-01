@@ -6,7 +6,7 @@ import org.helioviewer.jhv.camera.annotate.AnnotateCircle;
 import org.helioviewer.jhv.camera.annotate.AnnotateCross;
 import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 
 import com.jogamp.newt.event.KeyEvent;
@@ -58,14 +58,14 @@ public class InteractionAnnotate extends Interaction {
         if (!newAnnotateable.isDraggable()) {
             finishAnnotateable();
         }
-        Displayer.display();
+        Display.display();
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
         if (newAnnotateable != null && newAnnotateable.isDraggable()) {
             newAnnotateable.mouseDragged(e.getX(), e.getY());
-            Displayer.display();
+            Display.display();
         }
     }
 
@@ -76,7 +76,7 @@ public class InteractionAnnotate extends Interaction {
             activeIndex = annotateables.size() - 1;
         }
         newAnnotateable = null;
-        Displayer.display();
+        Display.display();
     }
 
     @Override
@@ -93,11 +93,11 @@ public class InteractionAnnotate extends Interaction {
                 annotateables.remove(activeIndex);
             }
             activeIndex = annotateables.size() - 1;
-            Displayer.display();
+            Display.display();
         } else if (code == KeyEvent.VK_N && activeIndex >= 0) {
             activeIndex++;
             activeIndex %= annotateables.size();
-            Displayer.display();
+            Display.display();
         }
     }
 

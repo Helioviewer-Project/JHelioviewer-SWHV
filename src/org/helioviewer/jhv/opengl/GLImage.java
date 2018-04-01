@@ -4,7 +4,7 @@ import java.nio.IntBuffer;
 
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec3;
@@ -95,7 +95,7 @@ public class GLImage {
 
         MetaData metaData = imageData.getMetaData();
         shader.bindAngles(gl, metaData.getViewpointL(), metaData.getCROTA());
-        shader.bindCutOffRadius(gl, metaData.getInnerCutOffRadius(), Displayer.getShowCorona() ? metaData.getOuterCutOffRadius() : 1);
+        shader.bindCutOffRadius(gl, metaData.getInnerCutOffRadius(), Display.getShowCorona() ? metaData.getOuterCutOffRadius() : 1);
         if (metaData.getCutOffValue() > 0) {
             Vec3 cdir = metaData.getCutOffDirection();
             shader.bindCutOffDirection(gl, cdir.x, cdir.y, 0);

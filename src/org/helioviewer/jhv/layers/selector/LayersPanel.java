@@ -21,7 +21,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableModel;
 
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
@@ -191,7 +191,7 @@ public class LayersPanel extends JPanel {
                     model.updateCell(row, col);
                     if (grid.getSelectedRow() == row)
                         setOptionsPanel(layer);
-                    Displayer.render(1);
+                    Display.render(1);
                 } else if (col == TITLE_COL && layer instanceof ImageLayer) {
                     Layers.setActiveImageLayer((ImageLayer) layer);
                     grid.repaint(); // multiple rows involved

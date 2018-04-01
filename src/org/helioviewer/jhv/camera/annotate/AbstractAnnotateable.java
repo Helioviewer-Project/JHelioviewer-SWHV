@@ -6,7 +6,7 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.GridLayer;
 import org.helioviewer.jhv.math.Vec2;
@@ -44,15 +44,15 @@ abstract class AbstractAnnotateable implements Annotateable {
 
     @Nullable
     Vec3 computePoint(int x, int y) {
-        if (Displayer.mode == Displayer.DisplayMode.Orthographic) {
-            return CameraHelper.getVectorFromSphere(camera, Displayer.getActiveViewport(), x, y, camera.getViewpoint().orientation, true);
+        if (Display.mode == Display.DisplayMode.Orthographic) {
+            return CameraHelper.getVectorFromSphere(camera, Display.getActiveViewport(), x, y, camera.getViewpoint().orientation, true);
         } else {
-            return Displayer.mode.xform.transformInverse(Displayer.mode.scale.mouseToGrid(x, y, Displayer.getActiveViewport(), camera, GridLayer.GridType.Viewpoint));
+            return Display.mode.xform.transformInverse(Display.mode.scale.mouseToGrid(x, y, Display.getActiveViewport(), camera, GridLayer.GridType.Viewpoint));
         }
     }
 
     void interpolatedLineDraw(Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s, int subdivisions) {
-        if (Displayer.mode == Displayer.DisplayMode.Orthographic) {
+        if (Display.mode == Display.DisplayMode.Orthographic) {
             gl.glBegin(GL2.GL_TRIANGLE_STRIP);
 
             for (double i = 0; i < subdivisions; i++) {

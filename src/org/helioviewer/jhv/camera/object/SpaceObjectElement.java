@@ -7,7 +7,7 @@ import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.camera.LoadPosition;
 import org.helioviewer.jhv.camera.LoadPositionFire;
 import org.helioviewer.jhv.camera.UpdateViewpoint;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.threads.CancelTask;
 
 class SpaceObjectElement implements LoadPositionFire {
@@ -52,7 +52,7 @@ class SpaceObjectElement implements LoadPositionFire {
             fireLoaded(null);
 
             load = null;
-            Displayer.display();
+            Display.display();
         }
     }
 
@@ -68,7 +68,7 @@ class SpaceObjectElement implements LoadPositionFire {
     public void fireLoaded(String _status) {
         status = _status;
         model.refresh(this);
-        Displayer.getCamera().refresh();
+        Display.getCamera().refresh();
     }
 
     @Override

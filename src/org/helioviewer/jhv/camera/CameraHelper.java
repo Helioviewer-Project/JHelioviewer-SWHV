@@ -3,7 +3,7 @@ package org.helioviewer.jhv.camera;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.math.Mat4;
@@ -130,7 +130,7 @@ public class CameraHelper {
 
     public static void zoomToFit(Camera camera) {
         double size = 1;
-        if (Displayer.mode == Displayer.DisplayMode.Orthographic) {
+        if (Display.mode == Display.DisplayMode.Orthographic) {
             size = ImageLayers.getLargestPhysicalHeight();
         }
 
