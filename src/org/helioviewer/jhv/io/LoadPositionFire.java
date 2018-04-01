@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.camera;
+package org.helioviewer.jhv.io;
 
 public interface LoadPositionFire {
 
