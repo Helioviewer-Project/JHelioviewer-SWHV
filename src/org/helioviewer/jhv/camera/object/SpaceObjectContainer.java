@@ -16,7 +16,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 
 import org.helioviewer.jhv.astronomy.SpaceObject;
-import org.helioviewer.jhv.camera.UpdateViewpoint;
+import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
 import org.json.JSONArray;
 

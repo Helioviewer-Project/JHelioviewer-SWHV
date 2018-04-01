@@ -7,6 +7,7 @@ import java.awt.GridBagLayout;
 import javax.swing.Box;
 import javax.swing.JCheckBox;
 
+import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.object.SpaceObjectContainer;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.DateTimePanel;

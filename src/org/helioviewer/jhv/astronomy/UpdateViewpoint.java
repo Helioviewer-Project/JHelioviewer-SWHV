@@ -1,11 +1,9 @@
-package org.helioviewer.jhv.camera;
+package org.helioviewer.jhv.astronomy;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.io.LoadPosition;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
