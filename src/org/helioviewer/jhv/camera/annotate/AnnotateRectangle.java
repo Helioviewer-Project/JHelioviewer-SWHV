@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.camera.annotate;
 
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -57,7 +57,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
             double z = (1 - t) * p1s.z + t * p2s.z;
 
             Vec3 pc = toCart(y, z);
-            if (Displayer.mode == Displayer.DisplayMode.Orthographic) {
+            if (Display.mode == Display.DisplayMode.Orthographic) {
                 gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
             } else {
                 pc.y = -pc.y;

@@ -2,7 +2,7 @@ package org.helioviewer.jhv.camera;
 
 import javax.swing.Timer;
 
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
@@ -12,7 +12,7 @@ import com.jogamp.newt.event.MouseListener;
 public class Interaction implements MouseListener, KeyListener {
 
     final Camera camera;
-    private static final Timer wheelTimer = new Timer(1000/2, e -> Displayer.render(1));
+    private static final Timer wheelTimer = new Timer(1000/2, e -> Display.render(1));
 
     Interaction(Camera _camera) {
         camera = _camera;
@@ -23,12 +23,12 @@ public class Interaction implements MouseListener, KeyListener {
     public void mouseWheelMoved(MouseEvent e) {
         float r = e.getRotation()[1];
         if (r != 0) {
-            camera.zoom(-Displayer.CAMERA_ZOOM_MULTIPLIER_WHEEL * r);
+            camera.zoom(-Display.CAMERA_ZOOM_MULTIPLIER_WHEEL * r);
             if (r > 0) {
-                Displayer.render(0.5);
+                Display.render(0.5);
                 wheelTimer.restart();
             } else
-                Displayer.display();
+                Display.display();
         }
     }
 

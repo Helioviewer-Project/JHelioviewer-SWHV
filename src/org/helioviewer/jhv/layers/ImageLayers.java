@@ -2,7 +2,7 @@ package org.helioviewer.jhv.layers;
 
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
@@ -24,7 +24,7 @@ public class ImageLayers {
 
     public static void setRender(Camera camera, double factor) {
         int i;
-        Viewport[] vp = Displayer.getViewports();
+        Viewport[] vp = Display.getViewports();
         for (ImageLayer layer : Layers.getImageLayers()) {
             if ((i = layer.isVisibleIdx()) != -1 && vp[i] != null)
                 layer.getView().render(camera, vp[i], factor);
@@ -46,8 +46,8 @@ public class ImageLayers {
                     layer.setVisible(0);
             }
         }
-        Displayer.reshapeAll();
-        Displayer.render(1);
+        Display.reshapeAll();
+        Display.render(1);
     }
 
     @Nullable

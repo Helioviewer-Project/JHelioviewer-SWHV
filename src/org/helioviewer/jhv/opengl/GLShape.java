@@ -22,7 +22,7 @@ public class GLShape {
         hasPoints = false;
         int plen = points.limit() / 4;
         if (plen * 4 != points.limit() || points.limit() != colors.limit()) {
-            Log.error("Something is wrong with the vertices or colors from this GLPoint.");
+            Log.error("Something is wrong with the vertices or colors from this GLShape");
             return;
         }
         vbos[0].bindBufferData(gl, points, Buffers.SIZEOF_FLOAT);

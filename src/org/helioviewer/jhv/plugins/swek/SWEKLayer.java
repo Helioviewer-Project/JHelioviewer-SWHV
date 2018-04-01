@@ -26,7 +26,7 @@ import org.helioviewer.jhv.data.event.JHVEvent;
 import org.helioviewer.jhv.data.event.JHVEventParameter;
 import org.helioviewer.jhv.data.event.JHVPositionInformation;
 import org.helioviewer.jhv.data.event.SWEKGroup;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -208,7 +208,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                     double znew = alpha * oldBoundaryPoint3d[2] + (1 - alpha) * points[3 * i + 2];
                     double r = Math.sqrt(xnew * xnew + ynew * ynew + znew * znew);
 
-                    if (Displayer.mode == Displayer.DisplayMode.Orthographic) {
+                    if (Display.mode == Display.DisplayMode.Orthographic) {
                         gl.glVertex3f((float) (xnew / r), (float) -(ynew / r), (float) (znew / r));
                     } else {
                         pt.x = xnew / r;
@@ -409,14 +409,14 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         if (isVisible[vp.idx]) {
             for (JHVRelatedEvents evtr : SWEKData.getActiveEvents(controller.currentTime)) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
-                if (evt.isCactus() && (Displayer.mode == Displayer.DisplayMode.LogPolar || Displayer.mode == Displayer.DisplayMode.Polar)) {
-                    drawCactusArcScale(gl, evtr, evt, controller.currentTime, Displayer.mode.scale, vp);
+                if (evt.isCactus() && (Display.mode == Display.DisplayMode.LogPolar || Display.mode == Display.DisplayMode.Polar)) {
+                    drawCactusArcScale(gl, evtr, evt, controller.currentTime, Display.mode.scale, vp);
                 } else {
                     drawPolygon(camera, vp, gl, evtr, evt);
 
                     if (icons) {
                         gl.glDisable(GL2.GL_DEPTH_TEST);
-                        drawIconScale(gl, evtr, evt, Displayer.mode.scale, Displayer.mode.xform, camera, vp);
+                        drawIconScale(gl, evtr, evt, Display.mode.scale, Display.mode.xform, camera, vp);
                         gl.glEnable(GL2.GL_DEPTH_TEST);
                     }
                 }
@@ -506,7 +506,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     @Override
     public void newEventsReceived() {
         if (enabled)
-            Displayer.display();
+            Display.display();
     }
 
     @Override
@@ -520,7 +520,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         check.setHorizontalTextPosition(SwingConstants.LEFT);
         check.addActionListener(e -> {
             icons = !icons;
-            Displayer.display();
+            Display.display();
         });
 
         GridBagConstraints c0 = new GridBagConstraints();

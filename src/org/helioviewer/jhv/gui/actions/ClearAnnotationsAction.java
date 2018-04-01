@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 
 @SuppressWarnings("serial")
@@ -17,7 +17,7 @@ public class ClearAnnotationsAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         ImageViewerGui.getAnnotateInteraction().clear();
-        Displayer.display();
+        Display.display();
     }
 
 }

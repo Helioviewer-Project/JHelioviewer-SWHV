@@ -7,7 +7,7 @@ import java.util.HashSet;
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -98,7 +98,7 @@ public class Movie implements ActionListener {
     public static void pause() {
         frameTimer.stop();
         MoviePanel.setPlayState(false);
-        Displayer.render(1); /* ! force update for on the fly resolution change */
+        Display.render(1); /* ! force update for on the fly resolution change */
     }
 
     public static void toggle() {
@@ -150,13 +150,13 @@ public class Movie implements ActionListener {
 
         lastTimestamp = dateTime;
 
-        Camera camera = Displayer.getCamera();
+        Camera camera = Display.getCamera();
         camera.timeChanged(lastTimestamp);
 
         for (ImageLayer layer : Layers.getImageLayers()) {
             layer.getView().setFrame(dateTime);
         }
-        Displayer.render(1);
+        Display.render(1);
 
         Layers.getViewpointLayer().fireTimeUpdated(camera.getViewpoint().time); // !
         for (TimeListener listener : timeListeners) {

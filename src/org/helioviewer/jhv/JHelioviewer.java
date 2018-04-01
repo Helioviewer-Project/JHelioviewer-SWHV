@@ -12,7 +12,7 @@ import javax.swing.JFrame;
 import org.helioviewer.jhv.base.ProxySettings;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.base.plugin.PluginManager;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
@@ -130,7 +130,7 @@ public class JHelioviewer {
             frame.setVisible(true);
 
             UITimer.start();
-            Displayer.start();
+            Display.start();
 
             DataSources.loadSources();
             CommandLine.load();

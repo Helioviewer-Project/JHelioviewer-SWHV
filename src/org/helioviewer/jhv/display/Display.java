@@ -17,7 +17,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 
-public class Displayer implements ActionListener, JHVEventHighlightListener {
+public class Display implements ActionListener, JHVEventHighlightListener {
 
     public static final double CAMERA_ZOOM_MULTIPLIER_WHEEL = 2.;
     public static final double CAMERA_ZOOM_MULTIPLIER_BUTTON = 2.;
@@ -235,9 +235,9 @@ public class Displayer implements ActionListener, JHVEventHighlightListener {
         return showCorona;
     }
 
-    private static final Displayer instance = new Displayer();
+    private static final Display instance = new Display();
 
-    private Displayer() {
+    private Display() {
         JHVRelatedEvents.addHighlightListener(this);
     }
 

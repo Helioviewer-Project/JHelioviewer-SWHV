@@ -4,7 +4,7 @@ import java.util.HashSet;
 
 import javax.swing.KeyStroke;
 
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 
 import com.jogamp.newt.event.KeyEvent;
@@ -58,7 +58,7 @@ public class InputController implements MouseListener, KeyListener {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        Displayer.setActiveViewport(e.getX(), e.getY());
+        Display.setActiveViewport(e.getX(), e.getY());
 
         ImageViewerGui.getCurrentInteraction().mouseMoved(e);
         for (MouseListener listener : mouseListeners)

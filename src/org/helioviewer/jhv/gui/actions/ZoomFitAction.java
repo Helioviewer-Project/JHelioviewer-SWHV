@@ -7,7 +7,7 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.input.KeyShortcuts;
 
@@ -24,8 +24,8 @@ public class ZoomFitAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        CameraHelper.zoomToFit(Displayer.getCamera());
-        Displayer.render(1);
+        CameraHelper.zoomToFit(Display.getCamera());
+        Display.render(1);
     }
 
 }
