@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.astronomy.SpaceObject;
-import org.helioviewer.jhv.camera.UpdateViewpoint;
+import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.io.LoadPosition;
 import org.helioviewer.jhv.io.LoadPositionFire;

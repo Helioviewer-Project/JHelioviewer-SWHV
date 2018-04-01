@@ -2,6 +2,7 @@ package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.math.Quat;
