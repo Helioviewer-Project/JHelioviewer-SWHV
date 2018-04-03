@@ -83,12 +83,12 @@ The following servers are included:
 
 - HTTP server (e.g., Apache or `nginx`) to serve static files, to proxy HTTP requests, and to run various services:
   - Image services API (<https://github.com/Helioviewer-Project/api>): For the JHelioviewer client, it lists the available image datasets and commands the creation of JPX movies on demand. It includes a facility to ingest new images files. Metadata about the image files is stored in a MySQL database.
-  - Timeline services API: This is an adapter brokering between the JHelioviewer client and the backend timeline storage services (ODI and the STAFF -- <http://www.staff.oma.be> -- backend). For the JHelioviewer client, it lists the available timeline datasets and serves the data in a JSON format.
+  - Timeline services API: This is an adapter brokering between the JHelioviewer client and the backend timeline storage services (ODI and STAFF backend -- <http://www.staff.oma.be>). For the JHelioviewer client, it lists the available timeline datasets and serves the data in a JSON format.
   - A PFSS dataset, static FITS files produced regularly out of GONG magnetograms. The JHelioviewer client retrieves them on demand, based on monthly listings (e.g., <http://swhv.oma.be/magtest/pfss/2018/01/list.txt>).
   - COMESEP service which subscribes to the COMESEP alert system (not part of this project), stores the alerts and makes them available to the JHelioviewer server in a JSON format.
   - The Helioviewer web client (<https://github.com/Helioviewer-Project/helioviewer.org>), not relevant for this project.
 - The `esajpip` server (<https://github.com/Helioviewer-Project/esajpip-SWHV>), which delivers the JPEG2000 data streams to the JHelioviewer client using the JPIP protocol, built on top of the HTTP network protocol.
-- The `GeometryService` server (<https://github.com/Helioviewer-Project/GeometryService>) implements a set of high precision celestial computation services based on NASA's Navigation and Ancillary Information Facility (NAIF) SPICE Toolkit and the JHelioviewer client communicates with it using a JSON format.
+- The `GeometryService` server (<https://github.com/Helioviewer-Project/GeometryService>) implements a set of high precision celestial computation services based on NASA's Navigation and Ancillary Information Facility (NAIF) SPICE Toolkit and communicates with the JHelioviewer client using a JSON format.
 - The HEK server (maintained by LMSAL <https://www.lmsal.com/hek/>, not part of this project) which serves JSON formatted heliophysics events out of HER. The JHelioviewer client retrieves a curated list of space weather focused events.
 
 To ensure encapsulation, reproducibility, and full configuration control, the services which are part of this project are currently being containerized at <https://gitlab.com/SWHV/SWHV-COMBINED>.
@@ -99,7 +99,7 @@ To ensure encapsulation, reproducibility, and full configuration control, the se
 
 The `esajpip` server serves the JPEG2000 encoded data to the JHelioviewer client. This software was forked from the code at <https://launchpad.net/esajpip>. It was ported to a CMake build system and to C++11 standard features. Several bugs, vulnerabilities, and resource leaks (memory, file descriptors) were solved; sharing and locks between threads were eliminated; C library read functions were replaced by memory-mapping of input files (for up to 10x higher network throughput). The JPX metadata is now sent compressed and several ranges of images can be requested in one JPIP request.
 
-The code is periodically verified with IDEA CLion and Synopsys Coverity static code analyzers and with `valgrind` dynamic analyzer, as well as various `sanitize` options of the compilers.
+The code is periodically verified with IDEA CLion and Synopsys Coverity static code analyzers and with `valgrind` dynamic analyzer, as well as various sanitize options of several C++ compilers.
 
 ### FITS to JPEG2000 ###
 
@@ -182,10 +182,10 @@ The API server reacts to the `getJPX` call by querying its database of image met
 
 JPX files can be of two types:
 
-- aggregates of metadata with pointers to JPEG2000 codestream data which refer to the original JP2 files;
+- aggregates of metadata with pointers to the JPEG2000 codestream data inside the original JP2 files;
 - aggregates of data with embedded JPEG2000 codestreams.
 
-The first form (`linked=true` and `jpip=true`) is used for the regular JHelioviewer interaction over JPIP, while the second form (`linked=false` and `jpip=false`) is used by the "Download layer" functionality to construct a self contained JPX file which is retrieved over HTTP and can be played back on the user computer without a network connection.
+The first form (`linked=true` and `jpip=true`) is used for the regular JHelioviewer interaction over JPIP, while the second form (`linked=false` and `jpip=false`) is used by the "Download layer" functionality to request the assembly of a self-contained JPX file which is then retrieved over HTTP and can be played back on the user computer without a network connection.
 
 The JPEG2000 data services are provided by the `esajpip ` server which implements a restricted subset of the JPIP protocol over HTTP (to be described).
 
@@ -232,7 +232,7 @@ The `multiplier` parameter allows for sending scaled data to the client when nec
 
 The timestamps are with respect to Unix epoch. There is a guarantee that the data is sent ordered by timestamp.
 
-On the server side this API is implemented as several PHP scripts that forward the data requests to the relevant backend timeline storage service and format the JSON response for the JHelioviewer client.
+The timeline API is implemented on the server side as several PHP scripts that forward the data requests to the relevant backend timeline storage service and format the JSON response for the JHelioviewer client.
 
 ### Geometry Services API ###
 
