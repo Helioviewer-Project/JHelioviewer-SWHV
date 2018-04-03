@@ -41,15 +41,17 @@ logowidth: 0.1
 |Approved by          | Bogdan Nicula (ROB)                                                                      |
 +---------------------+------------------------------------------------------------------------------------------+
 
-+------------+----------------------------------------------+
-| Date       | Notes                                        |
-+:===========+:=============================================+
-| 2018-01-15 | Version 1.00 (Initial release)               |
-+------------+----------------------------------------------+
-| 2018-03-12 | Version 1.01 (Update following CDR2)         |
-+------------+----------------------------------------------+
-| 2018-04-01 | Version 1.1 (Add design notes)               |
-+------------+----------------------------------------------+
++------------+--------------------------------------------------------------------+
+| Date       | Notes                                                              |
++:===========+:===================================================================+
+| 2018-01-15 | Version 1.00 (Initial release)                                     |
++------------+--------------------------------------------------------------------+
+| 2018-03-12 | Version 1.01 (Update following CDR2)                               |
++------------+--------------------------------------------------------------------+
+| 2018-04-01 | Version 1.1 (Add design notes)                                     |
++------------+--------------------------------------------------------------------+
+| 2018-04-03 | Version 1.2 (Clarify document structure, more server design notes) |
++------------+--------------------------------------------------------------------+
 
 ## Purpose & Scope
 
@@ -97,7 +99,7 @@ To ensure encapsulation, reproducibility, and full configuration control, the se
 
 The `esajpip` server serves the JPEG2000 encoded data to the JHelioviewer client. This software was forked from the code at <https://launchpad.net/esajpip>. It was ported to a CMake build system and to C++11 standard features. Several bugs, vulnerabilities, and resource leaks (memory, file descriptors) were solved; sharing and locks between threads were eliminated; C library read functions were replaced by memory-mapping of input files (for up to 10x higher network throughput). The JPX metadata is now sent compressed and several ranges of images can be requested in one JPIP request.
 
-The code is periodically verified with IDEA CLion and Synopsys Coverity static code analyzers and with `valgrind` dynamic analyzer.
+The code is periodically verified with IDEA CLion and Synopsys Coverity static code analyzers and with `valgrind` dynamic analyzer, as well as various `sanitize` options of the compilers.
 
 ### FITS to JPEG2000 ###
 
@@ -168,9 +170,24 @@ The JHelioviewer communicates with the Helioviewer services using the HTTP netwo
 
 ### Image Services API ###
 
-The image services API is documented at <https://api.helioviewer.org/docs/v2/>.
+The image services API is documented together with some examples at <https://api.helioviewer.org/docs/v2/>.
 
-The JPEG2000 data services are provided by the `esajpip ` server which implements a restricted set of the JPIP protocol over HTTP (describe).
+The API endpoints used by JHelioviewer are:
+
+- `getDataSources` -- to retrieve the list of available datasets which is then used by JHelioviewer to populate the "New Layer" UI elements for each server;
+- `getJPX` -- to request a time series of JP2 images as one JPX file;
+- `getJP2Image` -- to request one JP2 image.
+
+The API server reacts to the `getJPX` call by querying its database of image metadata, constructing a list of filenames to be used, passing the list to the program that will create the JPX file (`kdu_merge` or `hv_jpx_merge`), and making the resulting JPX file available to the `esajpip` server. Finally, the server sends back to the JHelioviewer client a JSON response which contains the JPIP URI to use. The client connects to that URI and starts interacting with the JPIP server.
+
+JPX files can be of two types:
+
+- aggregates of metadata with pointers to JPEG2000 codestream data which refer to the original JP2 files;
+- aggregates of data with embedded JPEG2000 codestreams.
+
+The first form (`linked=true` and `jpip=true`) is used for the regular JHelioviewer interaction over JPIP, while the second form (`linked=false` and `jpip=false`) is used by the "Download layer" functionality to construct a self contained JPX file which is retrieved over HTTP and can be played back on the user computer without a network connection.
+
+The JPEG2000 data services are provided by the `esajpip ` server which implements a restricted subset of the JPIP protocol over HTTP (to be described).
 
 ### Timeline Services API ###
 
@@ -214,6 +231,8 @@ The response is a JSON file with the keys:
 The `multiplier` parameter allows for sending scaled data to the client when necessary. The values of many datasets are rather small numbers when expressed in standard units like W/m^2, thus scaling them allows for more floating-point precision in the response to the client.
 
 The timestamps are with respect to Unix epoch. There is a guarantee that the data is sent ordered by timestamp.
+
+On the server side this API is implemented as several PHP scripts that forward the data requests to the relevant backend timeline storage service and format the JSON response for the JHelioviewer client.
 
 ### Geometry Services API ###
 
