@@ -14,7 +14,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import org.helioviewer.jhv.JHVDirectory;
@@ -42,24 +41,13 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
     private final JideSplitPane content = new JideSplitPane(JideSplitPane.VERTICAL_SPLIT);
     private final JButton exportFitsButton = new JButton("Export FITS Header as XML");
 
-    private final DefaultTableModel fitsModel = new DefaultTableModel(new Object[0][0], new Object[] { "FITS Keyword", "Value" }) {
-        @Override
-        public boolean isCellEditable(int row, int column) {
-            return false;
-        }
-    };
-
+    private final JTable fitsTable = new JTable();
     private final JTextArea basicArea = new JTextArea();
     private final JTextArea hvArea = new JTextArea();
 
     public MetaDataDialog() {
         super(ImageViewerGui.getMainFrame(), "Image Information");
 
-        exportFitsButton.setEnabled(false);
-
-        TableRowSorter<TableModel> sorter = new TableRowSorter<>(fitsModel);
-        JTable fitsTable = new JTable(fitsModel);
-        fitsTable.setRowSorter(sorter);
         setInitFocusedComponent(fitsTable);
         SearchableUtils.installSearchable(fitsTable);
 
@@ -115,6 +103,17 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
 
     public void setMetaData(ImageLayer layer) {
         hvArea.setText("");
+        lastNodeSeen = null;
+        exportFitsButton.setEnabled(false);
+
+        DefaultTableModel fitsModel = new DefaultTableModel(new Object[0][0], new Object[] { "FITS Keyword", "Value" }) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        fitsTable.setModel(fitsModel);
+        fitsTable.setRowSorter(new TableRowSorter<>(fitsModel));
 
         MetaData metaData = layer.getMetaData();
         if (!(metaData instanceof HelioviewerMetaData)) {
@@ -132,15 +131,16 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
 
         try {
             String xml = layer.getView().getXMLMetaData();
-            StringBuilder hvSB = new StringBuilder();
             Document doc = XMLUtils.parse(xml);
+
             // Send xml data to meta data dialog box
+            StringBuilder hvSB = new StringBuilder();
             Node root = doc.getDocumentElement().getElementsByTagName("fits").item(0);
             if (root != null)
-                readXMLData(hvSB, root);
+                readXMLData(fitsModel, hvSB, root);
             root = doc.getDocumentElement().getElementsByTagName("helioviewer").item(0);
             if (root != null)
-                readXMLData(hvSB, root);
+                readXMLData(fitsModel, hvSB, root);
             hvArea.setText(hvSB.toString().trim());
             hvArea.setCaretPosition(0);
 
@@ -160,16 +160,9 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         }
     }
 
-    private void addDataItem(StringBuilder hvSB, String nodeName, String nodeValue, boolean isFits) {
-        if (isFits)
-            fitsModel.addRow(new Object[] { nodeName, nodeValue });
-        else
-            hvSB.append(nodeName).append(": ").append(nodeValue).append('\n');
-    }
+    private String lastNodeSeen;
 
-    private String lastNodeSeen = null;
-
-    private void readXMLData(StringBuilder hvSB, Node node) {
+    private void readXMLData(DefaultTableModel fitsModel, StringBuilder hvSB, Node node) {
         // get element name and value
         String nodeName = node.getNodeName();
         String nodeValue = getElementValue(node);
@@ -180,7 +173,10 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
                 lastNodeSeen = nodeName;
                 break;
             default:
-                addDataItem(hvSB, nodeName, nodeValue, "fits".equals(lastNodeSeen));
+                if ("fits".equals(lastNodeSeen))
+                    fitsModel.addRow(new Object[] { nodeName, nodeValue });
+                else
+                    hvSB.append(nodeName).append(": ").append(nodeValue).append('\n');
                 break;
         }
 
@@ -189,7 +185,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
             if (child.getNodeType() == Node.ELEMENT_NODE) {
-                readXMLData(hvSB, child);
+                readXMLData(fitsModel, hvSB, child);
             }
         }
     }
