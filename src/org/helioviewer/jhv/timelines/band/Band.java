@@ -34,8 +34,8 @@ public class Band extends AbstractTimelineLayer {
     private int[] warnLevels;
     private String[] warnLabels;
     private final BandCache bandCache;
-    public Band(BandType _bandType) {
 
+    public Band(BandType _bandType) {
         if (_bandType.getBandCacheType().equals("BandCacheAll")) {
             bandCache = new BandCacheAll();
         } else {

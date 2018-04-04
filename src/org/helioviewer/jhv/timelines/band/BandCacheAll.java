@@ -2,20 +2,18 @@ package org.helioviewer.jhv.timelines.band;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
-
+import java.util.Collections;
 
 import javax.annotation.Nonnull;
-
 
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import java.util.Collections;
 
 class BandCacheAll implements BandCache {
-    ArrayList<DateVal> datevals = new ArrayList<DateVal>();
-    private static int MAX_SIZE = 10000;
+
+    ArrayList<DateVal> datevals = new ArrayList<>();
     private boolean hasData;
 
     public boolean hasData() {
@@ -26,6 +24,7 @@ class BandCacheAll implements BandCache {
         if (values.length != 0) {
             hasData = true;
         }
+        int MAX_SIZE = 10000;
         if (datevals.size() >= MAX_SIZE) {
             return;
         }
@@ -79,6 +78,7 @@ class BandCacheAll implements BandCache {
     }
 
     private static class DateVal implements Comparable<DateVal> {
+
         public long date;
         public float val;
 
@@ -95,6 +95,7 @@ class BandCacheAll implements BandCache {
         void serialize(JSONArray ja, double f) {
             ja.put(new JSONArray().put(date / 1000).put(val * f));
         }
+
     }
 
 }

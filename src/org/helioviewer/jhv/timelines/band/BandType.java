@@ -15,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class BandType {
+
     public enum Scale {
         Logarithmic, Linear, PositiveLinear;
 
@@ -31,10 +32,11 @@ public class BandType {
             }
         }
     }
+
     private static final HashMap<String, List<BandType>> groups = new HashMap<>();
-    
+
     private Scale scale = Scale.Linear;
-    
+
     static void loadBandTypes(JSONArray jo) {
         for (int i = 0; i < jo.length(); i++) {
             BandType bandtype = new BandType(jo.getJSONObject(i));
@@ -76,7 +78,6 @@ public class BandType {
     private final JSONObject json;
 
     public BandType(JSONObject jo) {
-        
         json = jo;
 
         name = jo.optString("name", name);
@@ -124,11 +125,11 @@ public class BandType {
     public String getName() {
         return name;
     }
-    
+
     public String getBandCacheType() {
         return bandCacheType;
     }
-    
+
     public String getUnitLabel() {
         return unitLabel;
     }
