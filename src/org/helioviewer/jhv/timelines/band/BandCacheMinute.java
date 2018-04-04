@@ -4,6 +4,7 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
@@ -12,7 +13,7 @@ import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-class BandCacheMinute implements BandCache{
+class BandCacheMinute implements BandCache {
 
     private static final long DAYS_PER_CHUNK = 8;
     private static final long MILLIS_PER_TICK = 60000;

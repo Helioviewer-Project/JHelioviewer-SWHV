@@ -8,16 +8,17 @@ import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.json.JSONObject;
 
 public interface BandCache {
+
     boolean hasData();
 
     void addToCache(float[] values, long[] dates);
 
     void createPolyLines(Rectangle graphArea, TimeAxis timeAxis, YAxis yAxis, ArrayList<GraphPolyline> graphPolylines);
 
-    public float getValue(long ts);
+    float getValue(long ts);
 
     void serialize(JSONObject jo, double f);
-    
+
     float[] getBounds(TimeAxis timeAxis);
 
 }
