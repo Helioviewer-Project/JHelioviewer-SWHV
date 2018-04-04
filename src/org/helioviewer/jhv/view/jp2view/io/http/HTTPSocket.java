@@ -28,22 +28,26 @@ public class HTTPSocket {
     protected final InputStream inputStream;
 
     protected HTTPSocket(URI uri) throws IOException {
-        //socket = new Socket(ProxySettings.proxy);
-        channel = SocketChannel.open();
+        try {
+            //socket = new Socket(ProxySettings.proxy);
+            channel = SocketChannel.open();
 
-        channel.socket().setReceiveBufferSize(Math.max(262144 * 8, 2 * channel.socket().getReceiveBufferSize()));
-        channel.socket().setTrafficClass(0x10);
-        channel.socket().setSoTimeout(TIMEOUT_READ);
-        channel.socket().setKeepAlive(true);
-        channel.socket().setTcpNoDelay(true);
+            channel.socket().setReceiveBufferSize(Math.max(262144 * 8, 2 * channel.socket().getReceiveBufferSize()));
+            channel.socket().setTrafficClass(0x10);
+            channel.socket().setSoTimeout(TIMEOUT_READ);
+            channel.socket().setKeepAlive(true);
+            channel.socket().setTcpNoDelay(true);
 
-        int port = uri.getPort();
-        usedPort = port <= 0 ? PORT : port;
-        usedHost = uri.getHost();
+            int port = uri.getPort();
+            usedPort = port <= 0 ? PORT : port;
+            usedHost = uri.getHost();
 
-        //socket.connect(new InetSocketAddress(usedHost, usedPort), TIMEOUT_CONNECT);
-        channel.connect(new InetSocketAddress(usedHost, usedPort));
-        inputStream = new ByteChannelInputStream(channel);
+            //socket.connect(new InetSocketAddress(usedHost, usedPort), TIMEOUT_CONNECT);
+            channel.connect(new InetSocketAddress(usedHost, usedPort));
+            inputStream = new ByteChannelInputStream(channel);
+        } catch (Exception e) { // redirect all to IOException
+            throw new IOException(e);
+        }
     }
 
     protected HTTPMessage recv() throws IOException {
