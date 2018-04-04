@@ -1,9 +1,9 @@
 ---
 title: SWHV CCN2 Design Document
-subtitle: ROB-SWHV(7186)-DDF2 v1.1
+subtitle: ROB-SWHV(7186)-DDF2 v1.2
 author: SWHV Team
 subject: Space Weather HelioViewer
-date: 2018-04-01
+date: 2018-04-04
 geometry: margin=1in
 papersize: A4
 toc: true
@@ -50,7 +50,7 @@ logowidth: 0.1
 +------------+--------------------------------------------------------------------+
 | 2018-04-01 | Version 1.1 (Add design notes)                                     |
 +------------+--------------------------------------------------------------------+
-| 2018-04-03 | Version 1.2 (Clarify document structure, more server design notes) |
+| 2018-04-04 | Version 1.2 (Clarify document structure, more server design notes) |
 +------------+--------------------------------------------------------------------+
 
 ## Purpose & Scope
@@ -67,9 +67,9 @@ This document (SWHV-DDF2) is the design study report of the work performed durin
 
 # Work Logic
 
-Chapter 3 presents the current system architecture, while in chapter 4 the identified tasks for the CCN2 phase are presented together with a proposed implementation. For several, at the time of the current version of this document (MS6), the work was already performed, therefore the present tense is used. For the work to be performed for the MS7, the future tense is used.
+The current system architecture is presented in Chapter 3, the interfaces of the JHelioviewer client are presented in Chapter 4, the current design of JHelioviewer is presented in Chapter 5, while the Chapter 6 presents the identified tasks for the CCN2 phase, together with a proposed implementation. For several tasks, at the time of the current version of this document (MS6), the work was already performed, therefore the present tense is used. For the work to be performed for the MS7, the future tense is used.
 
-Chapter 5 presents a traceability matrix for the tasks, as well as the assigned priority and the milestone for delivery. Features already delivered will be subjected to refinement and refactoring as new functionality becomes available in the client-server system.
+Chapter 7 presents a traceability matrix for the tasks, as well as the assigned priority and the milestone for delivery. Features already delivered will be subjected to refinement and refactoring as new functionality becomes available in the client-server system.
 
 # System Architecture #
 
@@ -97,19 +97,29 @@ To ensure encapsulation, reproducibility, and full configuration control, the se
 
 ### JPIP Server ###
 
-The `esajpip` server serves the JPEG2000 encoded data to the JHelioviewer client. This software was forked from the code at <https://launchpad.net/esajpip>. It was ported to a CMake build system and to C++11 standard features. Several bugs, vulnerabilities, and resource leaks (memory, file descriptors) were solved; sharing and locks between threads were eliminated; C library read functions were replaced by memory-mapping of input files (for up to 10x higher network throughput). The JPX metadata is now sent compressed and several ranges of images can be requested in one JPIP request.
+The `esajpip` server serves the JPEG2000 encoded data to the JHelioviewer client. This software was forked from the code at <https://launchpad.net/esajpip>. It was ported to a CMake build system and to C++11 standard features. Several bugs, vulnerabilities, and resource leaks (memory, file descriptors) were solved; sharing and locks between threads were eliminated; C library read functions were replaced by memory-mapping of input files (for up to 10× higher network throughput). The JPX metadata is now sent compressed and several ranges of images can be requested in one JPIP request.
 
 The code is periodically verified with IDEA CLion and Synopsys Coverity static code analyzers and with `valgrind` dynamic analyzer, as well as various sanitize options of several C++ compilers.
 
 ### FITS to JPEG2000 ###
 
-Initially, the JPEG2000 files were created with SolarSoft IDL scripts employing various solar instrument calibration software pipelines. Those files have the limitations imposed by the IDL JPEG2000 implementation and they have to be transcoded for the use in the Helioviewer system. The software used both on the server and the client side is derived from the Kakadu Software toolkit (<http://kakadusoftware.com>).
+The JPEG2000 files can be created with the IDL JPEG2000 implementation. Those files have to be transcoded for the use in the Helioviewer system.
 
-Much of the server side usage of the Kakadu Software can be replaced with open source alternatives.
+The open-source alternative for the creation of JPEG2000 files is the `fits2img` package (<https://github.com/Helioviewer-Project/fits2img>), which uses a patched version of the open source OpenJPEG[^openjpeg] library. The files created by this tool do not need to be transcoded.
 
-The `fits2img` package (<https://github.com/Helioviewer-Project/fits2img>) for the creation of JP2 files out of calibrated FITS files is derived from the software which makes JP2 files out of SWAP EUV Level-1 data. This software uses a patched version of the open source OpenJPEG[^openjpeg] library. The JP2 files created by this tool do not need to be transcoded. While ingesting new datasets during the SWHV project, it became apparent that the metadata in the FITS headers of some datasets is lacking or is defective. A FITS-to-FITS conversion stage to adjust the metadata to the needs of the Helioviewer system is needed for those datasets. At <https://github.com/bogdanni/hv-HEP/blob/master/HEP-0010.md> there is a summary of those needs.
+While ingesting new datasets during the SWHV project, it became apparent that the metadata in the FITS headers of some datasets is lacking or is defective. A FITS-to-FITS conversion stage is needed for those datasets to adjust the metadata to the needs of the Helioviewer system. At <https://github.com/bogdanni/hv-HEP/blob/master/HEP-0010.md> there is a summary of those needs.
 
-The package `hvJP2K` (<https://github.com/Helioviewer-Project/hvJP2K>) was created to replace much of the server side usage of the Kakadu Software and consists in the following tools:
+### JPEG2000 Files Handling ###
+
+The image data is encoded using the JPEG2000 coding standards. The JPEG2000 data consists of compressed data codestreams organized using *markers* according to a specific syntax, and several file formats, such as JP2 and JPX, which are organized using *boxes* encapsulating the codestreams of compressed image data organized in *packets* and the associated information.
+
+In order to ensure the communication between the server and the client, the Helioviewer system imposes a set of constraints on the codestreams and file formats. This includes requirements for codestream organization such as specific packetization (PLT markers), coding precincts, and order of progression (RPCL), for file format organization, such as the presence of specific boxes aggregating the codestreams and the associated information like metadata, and for file naming conventions.
+
+The JPEG2000 standards have a high degree of sophistication and versatility. In order to encourage the proliferation of Helioviewer image datasets, it should be possible to generate those files with standard conforming software other than the proprietary Kakadu software currently used. It becomes therefore necessary to validate the full structure of Helioviewer image files formally and automatically. A verification system based on Schematron[^schematron] XML schemas was developed. This procedure is able to verify the structure of JPEG2000 file and codestream, including the associated information such as the Helioviewer specific XML metadata, ensuring the end-to-end compatibility with the Helioviewer system.
+
+Before the SWHV project, both the server and the client side software were derived from the Kakadu Software toolkit (<http://kakadusoftware.com>). Much of the server side usage of the Kakadu software can be now replaced with the `fits2img` and `hvJP2K` (<https://github.com/Helioviewer-Project/hvJP2K>) packages. If the server does not handle files produced by IDL, no server side use of Kakadu software is necessary.
+
+`hvJP2K` consists in the following tools:
 
 - `hv_jp2_decode` -- replacement for `kdu_expand`, sufficient for the web client image tile decoding;
 - `hv_jp2_encode` -- proto-replacement for `fits2img`, not yet capable of emitting conforming JP2 files;
@@ -122,29 +132,17 @@ The package `hvJP2K` (<https://github.com/Helioviewer-Project/hvJP2K>) was creat
 
 This software is mainly written in Python and is based on the `glymur`[^glymur] and `jpylyzer`[^jpylyzer] open source libraries.
 
-### JPEG2000 Files Handling ###
+The Helioviewer server needs to interpret JPEG2000 data at several stages:
 
-The image data is encoded using the JPEG2000 coding standards. The JPEG2000 data consists of compressed data codestreams organized using *markers* according to a specific syntax, and several file formats, such as JP2 and JPX, which are organized using *boxes* encapsulating the codestreams of compressed image data organized in *packets* and the associated information.
+1. During the generation of the JP2 files -- until now typically from software code written in IDL. `fits2img` can replace the Kakadu implementation embedded in IDL. It outputs conforming JP2 files with PLT markers, XML boxes and it has the capability of embedding colormaps.
 
-In order to ensure the communication between the server and the client, the Helioviewer system imposes a set of constraints on the codestreams and file formats. This includes requirements for codestream organization such as specific packetization (PLT markers), coding precincts, and order of progression (RPCL), for file format organization, such as the presence of specific boxes aggregating the codestreams and the associated information like metadata, and for file naming conventions.
+1. During the ingestion into the Helioviewer server -- since the IDL code cannot be configured for the required features, i.e., precincts and PLT markers, the JP2 files produced by IDL have to be transcoded. The vanilla version of Kakadu's `kdu_transcode` program is just a demo application for the Kakadu core system and is not able to produce JP2 files. `hv_jp2_transcode` can wrap the transcoding process and allows to use an unmodified `kdu_transcode`. It is not yet possible to replace the core functionality of `kdu_transcode`. This stage is not necessary for files generated by `fits2img`.
 
-The JPEG2000 standards have a high degree of sophistication and versatility. In order to encourage the proliferation of Helioviewer image datasets, it should be possible to generate those files with standard conforming software other than the proprietary Kakadu software currently used. It becomes therefore necessary to validate the full structure of Helioviewer image files formally and automatically. A verification system based on Schematron[^schematron] XML schemas was developed. This procedure is able to verify the structure of JPEG2000 file and codestream, including the associated information such as the Helioviewer specific XML metadata, ensuring the end-to-end compatibility with the Helioviewer system.
+1. The web client itself has to decode the JP2 files in order to serve the image data to its browser clients, since those do not typically include JPEG2000 support. This can be replaced by `hv_jp2_decode`, at the cost of lower performance, but with little impact for the user experience.
 
-The Helioviewer system needs to interpret JPEG2000 data at several stages:
+1. Before the image data is streamed using the JPIP server, it has to be aggregated into JPX files. `kdu_merge` can be replaced with `hv_jpx_merge` (up to 10× faster than `kdu_merge`). This task involves only manipulations at the byte level structure of the file formats and not the decoding of the codestreams. From the point of view of the JHelioviewer user, the client -- server interaction latency and bandwidth dominate the waiting time for the display of the image data. The server latency has two main components: the database query for the list of files that will make up the JPX and the parsing of those files to extract the information for the assembly of the JPX.
 
-1. during the generation of the JP2 files -- until now typically from software code written in IDL;
-1. during the ingestion into the Helioviewer server -- since the IDL code cannot be configured for the required features, i.e., precincts and PLT markers, the JP2 files produced by IDL have to be transcoded;
-1. the web server itself has to decode the JP2 files in order to serve the image data to its web clients, since those do not typically include JPEG2000 support;
-1. before the image data is streamed using the JPIP server, it has to be aggregated into JPX files;
-1. the JHelioviewer client has to decode the codestreams and interpret the associated information.
-
-For the 1st stage, `fits2img` can replace the IDL Kakadu implementation. It outputs conforming JP2 files with PLT markers, XML boxes and it has the capability of embedding colormaps.
-
-The Kakadu's `kdu_transcode` program is used in the 2nd stage for transcoding the IDL produced JP2 files without PLT markers and precincts. This is an old version, modified to output JP2 files, since the vanilla version of `kdu_transcode` is just a demo application for the Kakadu core system and is not able to produce JP2 files. `hv_jp2_transcode` can wrap the transcoding process and allows to use an unmodified `kdu_transcode`. It is not yet possible to replace the core functionality of `kdu_transcode`.
-
-The 3rd stage (decode JPEG2000 codestreams for the web clients) is replicated by `hv_jp2_decode`. This comes at the cost of lower performance, but with little impact for the user experience.
-
-The 4th stage (aggregate JPEG2000 codestreams into JPX files) can be replaced by `hv_jpx_merge` (up to 10x faster than `kdu_merge`). From the point of view of the JHelioviewer user, the client -- server interaction latency and bandwidth dominate the waiting time for the display of the image data. The server latency has two main components: the database query for the list of files that will make up the JPX and the parsing of those files to extract the information for the assembly of the JPX. Additionally, `hv_jpx_split` can now possible reconstruct JP2 files out of JPX files with embedded codestreams. Assembly and disassembly of JPX files allows JP2 files heterogeneous from the point of view of size, of component definition, number and type, and of color specification. Those tasks involve only manipulations at the byte level structure of the file formats and not the decoding of the codestreams.
+Additionally, the JHelioviewer client has to decode the codestreams for display. The Kakadu software offers superior performance in this area and, for the foreseeable future, will not be replaced on the client side.
 
 ## PFSS Dataset ##
 
@@ -164,11 +162,11 @@ The resulting FITS files consist of `BINARY TABLE`s with four columns `FIELDLINE
 
 The field strength is mapped in the default JHelioviewer display as blue (negative radial) or red (positive radial); the lesser the color saturation, the weaker the field. In order to better see the direction of the field, points of the field lines beyond 2.4 solar radii have red or blue colors without blending with white.
 
-## Interfaces ##
+# JHelioviewer Interfaces #
 
-The JHelioviewer communicates with the Helioviewer services using the HTTP network protocol. The JPEG2000 data service is implemented using a subset of the JPIP protocol on top of the HTTP network protocol. In addition, the JHelioviewer client supports the SAMP protocol (<http://www.ivoa.net/documents/SAMP/>) and includes a SAMP hub.
+JHelioviewer communicates with the Helioviewer services using the HTTP network protocol. The JPEG2000 data service is implemented using a subset of the JPIP protocol on top of the HTTP network protocol. In addition, the JHelioviewer client supports the SAMP protocol (<http://www.ivoa.net/documents/SAMP/>) and includes a SAMP hub.
 
-### Image Services API ###
+## Image Services API ##
 
 The image services API is documented together with some examples at <https://api.helioviewer.org/docs/v2/>.
 
@@ -189,7 +187,7 @@ The first form (`linked=true` and `jpip=true`) is used for the regular JHeliovie
 
 The JPEG2000 data services are provided by the `esajpip ` server which implements a restricted subset of the JPIP protocol over HTTP (to be described).
 
-### Timeline Services API ###
+## Timeline Services API ##
 
 The timeline API is a REST service and consists of three parts.
 
@@ -234,7 +232,11 @@ The timestamps are with respect to Unix epoch. There is a guarantee that the dat
 
 The timeline API is implemented on the server side as several PHP scripts that forward the data requests to the relevant backend timeline storage service and format the JSON response for the JHelioviewer client.
 
-### Geometry Services API ###
+## HEK Services API ##
+
+This API is described at <http://solar.stanford.edu/hekwiki/ApplicationProgrammingInterface>.
+
+## Geometry Services API ##
 
 The `GeometryService` is a REST network service which can return JSON and MessagePack (<https://msgpack.org>) encoded responses. For example, given the following request:
 
@@ -274,7 +276,7 @@ There is a guarantee that the data is sent ordered by UTC timestamps.
 
 This service is used to support the Viewpoint functionality of the JHelioviewer client.
 
-### SAMP ###
+## SAMP ##
 
 The SAMP messages supported by the JHelioviewer client are:
 
@@ -289,7 +291,7 @@ Those messages have as parameter an URI to load. Both local and remote URIs are 
 
 ## File Formats ##
 
-Many of the file formats supported by the JHelioviewer client are based on the JSON format. All files can be either local or can be loaded over the HTTP protocol. JPX can additionally be loaded over the JPIP protocol. Files can be loaded at start-up via the command line interface.
+Many of the file formats supported by the JHelioviewer client are based on the JSON format. All files can be either local on the user's computer or can be loaded over HTTP. JPX data can additionally be loaded over the JPIP protocol. Files can be loaded at start-up via the command line interface.
 
 ### State File ###
 
@@ -343,7 +345,7 @@ Example:
 
 WCS metadata is used to place image data at the correct viewpoint (time and position). Without metadata, image data is placed at a default viewpoint. JHelioviewer can extract and interpret metadata from JP2, JPX, and FITS formats. It also supports at a basic level, without metadata, the Java ImageIO formats (JPEG, PNG, BMP, GIF).
 
-## Core JHelioviewer Design ##
+# JHelioviewer Design #
 
 In contrast to the 31k lines of code to implement all its many features, the core JHelioviewer design is very simple and can probably be expressed in a couple of thousands of lines of code. The principle of separation of concerns is applied throughout. Objects are asked to update themselves, they proceed to do so independently, and they report back when done. There are essentially no locks and no data structures synchronized between threads.
 
@@ -352,6 +354,8 @@ The program is driven via three timers:
 - `Displayer` beats at constant 60 Hz and coalesces requests for decoding the image layers and refreshing the image canvas;
 - `Movie` beats at a configurable frequency (default 20 Hz) and is responsible for setting the program time (i.e., frame advance);
 - `UITimer` beats at constant 10 Hz and commands the refresh of the Swing UI components that need to change together with the movie frame; additionally, it commands the refresh of the timeline canvas.
+
+The design description will be expanded in a future version of this document.
 
 # CCN2 Tasks #
 
@@ -504,7 +508,7 @@ This is implemented by modifying the validation functionality of the `hvJP2K` pa
 
 3.  **(SWHV-CCN2-20400-03)** Cache JP2 headers in database at insertion time.
 
-The purpose of this task is to reduce the server latency between the user selecting a dataset and the server making available the prepared JPX file to the `esajpip` server. While merge functionality of `hvJP2K` can be 10x faster than the Kakadu similar functionality, it is limited by I/O operations necessary to parse the JP2 files. Parsing the JP2
+The purpose of this task is to reduce the server latency between the user selecting a dataset and the server making available the prepared JPX file to the `esajpip` server. While merge functionality of `hvJP2K` can be 10× faster than the Kakadu similar functionality, it is limited by I/O operations necessary to parse the JP2 files. Parsing the JP2
 ahead of the time and storing the necessary information in the database together with the record of each file can possibly reduce this latency.
 
 Other means to achieve a reduction in this latency is by changing the way SWHV requests the datasets to always request entire days.
