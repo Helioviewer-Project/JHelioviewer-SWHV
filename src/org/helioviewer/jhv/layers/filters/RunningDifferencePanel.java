@@ -42,11 +42,12 @@ public class RunningDifferencePanel implements FilterDetails {
             modePanel.add(item);
         }
 
+        MetaDataDialog metaDialog = new MetaDataDialog();
         JideButton metaButton = new JideButton(Buttons.info);
         metaButton.setToolTipText("Show metadata of selected layer");
         metaButton.addActionListener(e -> {
-            MetaDataDialog dialog = new MetaDataDialog(layer);
-            dialog.showDialog();
+            metaDialog.setMetaData(layer);
+            metaDialog.showDialog();
         });
 
         downloadButton.setToolTipText("Download selected layer");
