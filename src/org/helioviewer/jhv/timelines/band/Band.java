@@ -30,36 +30,24 @@ public class Band extends AbstractTimelineLayer {
 
     private Color graphColor = Color.BLACK;
     private final YAxis yAxis;
-    private final ArrayList<BandCache.GraphPolyline> graphPolylines = new ArrayList<>();
+    private final ArrayList<GraphPolyline> graphPolylines = new ArrayList<>();
     private final RequestCache requestCache = new RequestCache();
     private int[] warnLevels;
     private String[] warnLabels;
-    private final BandCache bandCache = new BandCache();
-
+    private final BandCache bandCache;
     public Band(BandType _bandType) {
+        System.out.println(_bandType.getBandCacheType());
+
+        if (_bandType.getBandCacheType().equals("BandCacheAll")) {
+            bandCache = new BandCacheAll();
+        } else {
+            bandCache = new BandCacheMinute();
+        }
+
         bandType = _bandType;
         optionsPanel = new BandOptionPanel(this);
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getScale(bandType.getUnitLabel()));
         graphColor = BandColors.getNextColor();
-        fillWarnLevels();
-    }
-
-    public Band(JSONObject jo) throws Exception {
-        JSONObject jbandType = jo.optJSONObject("bandType");
-        if (jbandType == null)
-            throw new Exception("Bandtype not defined");
-
-        bandType = new BandType(jbandType);
-        optionsPanel = new BandOptionPanel(this);
-        yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getScale(bandType.getUnitLabel()));
-
-        JSONObject jcolor = jo.optJSONObject("color");
-        if (jcolor != null) {
-            int r = MathUtils.clip(jcolor.optInt("r", 0), 0, 255);
-            int g = MathUtils.clip(jcolor.optInt("g", 0), 0, 255);
-            int b = MathUtils.clip(jcolor.optInt("b", 0), 0, 255);
-            graphColor = new Color(r, g, b);
-        }
         fillWarnLevels();
     }
 
@@ -168,7 +156,7 @@ public class Band extends AbstractTimelineLayer {
             return;
 
         g.setColor(graphColor);
-        for (BandCache.GraphPolyline line : graphPolylines) {
+        for (GraphPolyline line : graphPolylines) {
             g.drawPolyline(line.xPoints, line.yPoints, line.yPoints.length);
         }
         for (int j = 0; j < warnLevels.length; j++) {

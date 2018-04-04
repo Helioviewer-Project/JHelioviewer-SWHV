@@ -71,10 +71,12 @@ public class BandType {
     private final Map<String, Double> warnLevels;
     private double min = 0;
     private double max = 1;
+    private String bandCacheType = "BandCacheMinute";
 
     private final JSONObject json;
 
     public BandType(JSONObject jo) {
+        
         json = jo;
 
         name = jo.optString("name", name);
@@ -110,6 +112,8 @@ public class BandType {
                 }
             }
         }
+        bandCacheType = jo.optString("bandCacheType", "BandCacheMinute");
+
         warnLevels = Collections.unmodifiableMap(warnHelp);
     }
 
@@ -120,7 +124,11 @@ public class BandType {
     public String getName() {
         return name;
     }
-
+    
+    public String getBandCacheType() {
+        return bandCacheType;
+    }
+    
     public String getUnitLabel() {
         return unitLabel;
     }
