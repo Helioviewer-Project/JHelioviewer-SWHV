@@ -1,9 +1,9 @@
 ---
 title: SWHV CCN2 Design Document
-subtitle: ROB-SWHV(7186)-DDF2 v1.2
+subtitle: ROB-SWHV(7186)-DDF2 v1.3
 author: SWHV Team
 subject: Space Weather HelioViewer
-date: 2018-04-04
+date: 2018-04-xx
 geometry: margin=1in
 papersize: A4
 toc: true
@@ -52,6 +52,8 @@ logowidth: 0.1
 +------------+--------------------------------------------------------------------+
 | 2018-04-04 | Version 1.2 (Clarify document structure, more server design notes) |
 +------------+--------------------------------------------------------------------+
+| 2018-04-xx | Version 1.3 (Complete JHelioviewer design notes)                   |
++------------+--------------------------------------------------------------------+
 
 ## Purpose & Scope
 
@@ -82,14 +84,14 @@ The following figure depicts the architecture of the Helioviewer System as insta
 The following servers are included:
 
 - HTTP server (e.g., Apache or `nginx`) to serve static files, to proxy HTTP requests, and to run various services:
-  - Image services API (<https://github.com/Helioviewer-Project/api>): For the JHelioviewer client, it lists the available image datasets and commands the creation of JPX movies on demand. It includes a facility to ingest new images files. Metadata about the image files is stored in a MySQL database.
-  - Timeline services API: This is an adapter brokering between the JHelioviewer client and the backend timeline storage services (ODI and STAFF backend -- <http://www.staff.oma.be>). For the JHelioviewer client, it lists the available timeline datasets and serves the data in a JSON format.
+  - Image services API (<https://github.com/Helioviewer-Project/api>): It lists the available image datasets and commands the creation of JPX movies on demand. It includes a facility to ingest new images files. Metadata about the image files is stored in a MySQL database.
+  - Timeline services API: This is an adapter brokering between the JHelioviewer client and the backend timeline storage services (ODI and STAFF backend -- <http://www.staff.oma.be>). It lists the available timeline datasets and serves the data in a JSON format.
   - A PFSS dataset, static FITS files produced regularly out of GONG magnetograms. The JHelioviewer client retrieves them on demand, based on monthly listings (e.g., <http://swhv.oma.be/magtest/pfss/2018/01/list.txt>).
   - COMESEP service which subscribes to the COMESEP alert system (not part of this project), stores the alerts and makes them available to the JHelioviewer server in a JSON format.
   - The Helioviewer web client (<https://github.com/Helioviewer-Project/helioviewer.org>), not relevant for this project.
 - The `esajpip` server (<https://github.com/Helioviewer-Project/esajpip-SWHV>), which delivers the JPEG2000 data streams to the JHelioviewer client using the JPIP protocol, built on top of the HTTP network protocol.
 - The `GeometryService` server (<https://github.com/Helioviewer-Project/GeometryService>) implements a set of high precision celestial computation services based on NASA's Navigation and Ancillary Information Facility (NAIF) SPICE Toolkit and communicates with the JHelioviewer client using a JSON format.
-- The HEK server (maintained by LMSAL <https://www.lmsal.com/hek/>, not part of this project) which serves JSON formatted heliophysics events out of HER. The JHelioviewer client retrieves a curated list of space weather focused events.
+- The HEK server (maintained by LMSAL <https://www.lmsal.com/hek/>, not part of this project) which serves JSON formatted heliophysics events out of HER. JHelioviewer retrieves a curated list of space weather focused events.
 
 To ensure encapsulation, reproducibility, and full configuration control, the services which are part of this project are currently being containerized at <https://gitlab.com/SWHV/SWHV-COMBINED>.
 
@@ -164,7 +166,7 @@ The field strength is mapped in the default JHelioviewer display as blue (negati
 
 # JHelioviewer Interfaces #
 
-JHelioviewer communicates with the Helioviewer services using the HTTP network protocol. The JPEG2000 data service is implemented using a subset of the JPIP protocol on top of the HTTP network protocol. In addition, the JHelioviewer client supports the SAMP protocol (<http://www.ivoa.net/documents/SAMP/>) and includes a SAMP hub.
+JHelioviewer communicates with the Helioviewer services using the HTTP network protocol. The JPEG2000 data service is implemented using a subset of the JPIP protocol on top of the HTTP network protocol. In addition, JHelioviewer supports the SAMP protocol (<http://www.ivoa.net/documents/SAMP/>) and includes a SAMP hub.
 
 ## Image Services API ##
 
@@ -176,7 +178,7 @@ The API endpoints used by JHelioviewer are:
 - `getJPX` -- to request a time series of JP2 images as one JPX file;
 - `getJP2Image` -- to request one JP2 image.
 
-The API server reacts to the `getJPX` call by querying its database of image metadata, constructing a list of filenames to be used, passing the list to the program that will create the JPX file (`kdu_merge` or `hv_jpx_merge`), and making the resulting JPX file available to the `esajpip` server. Finally, the server sends back to the JHelioviewer client a JSON response which contains the JPIP URI to use. The client connects to that URI and starts interacting with the JPIP server.
+The API server reacts to the `getJPX` call by querying its database of image metadata, constructing a list of filenames to be used, passing the list to the program that will create the JPX file (`kdu_merge` or `hv_jpx_merge`), and making the resulting JPX file available to the `esajpip` server. Finally, the server sends back to the client a JSON response which contains the JPIP URI to use. The client connects to that URI and starts interacting with the JPIP server.
 
 JPX files can be of two types:
 
@@ -274,11 +276,11 @@ The following functions are implemented:
 
 There is a guarantee that the data is sent ordered by UTC timestamps.
 
-This service is used to support the Viewpoint functionality of the JHelioviewer client.
+This service is used to support the Viewpoint functionality of JHelioviewer.
 
 ## SAMP ##
 
-The SAMP messages supported by the JHelioviewer client are:
+The SAMP messages supported by JHelioviewer are:
 
 - `image.load.fits` -- specific FITS image;
 - `table.load.fits` -- only for ESA SOHO Science Archive tool, as JHelioviewer does not support FITS tables yet;
@@ -291,7 +293,7 @@ Those messages have as parameter an URI to load. Both local and remote URIs are 
 
 ## File Formats ##
 
-Many of the file formats supported by the JHelioviewer client are based on the JSON format. All files can be either local on the user's computer or can be loaded over HTTP. JPX data can additionally be loaded over the JPIP protocol. Files can be loaded at start-up via the command line interface.
+Many of the file formats supported by JHelioviewer are based on the JSON format. All files can be either local on the user's computer or can be loaded over HTTP. JPX data can additionally be loaded over the JPIP protocol. Files can be loaded at start-up via the command line interface.
 
 ### State File ###
 
