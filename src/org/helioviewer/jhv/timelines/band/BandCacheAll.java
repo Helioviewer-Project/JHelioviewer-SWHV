@@ -2,21 +2,16 @@ package org.helioviewer.jhv.timelines.band;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.opengl.GLInfo;
-import org.helioviewer.jhv.time.TimeUtils;
-import org.helioviewer.jhv.timelines.draw.DrawConstants;
+
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.ocpsoft.prettytime.shade.edu.emory.mathcs.backport.java.util.Collections;
+import java.util.Collections;
 
 class BandCacheAll implements BandCache {
     ArrayList<DateVal> datevals = new ArrayList<DateVal>();
