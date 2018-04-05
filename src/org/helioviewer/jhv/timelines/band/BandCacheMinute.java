@@ -10,6 +10,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
+import org.helioviewer.jhv.timelines.propagation.PropagationModel;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -23,15 +24,12 @@ class BandCacheMinute implements BandCache {
     private static final int FACTOR_STEP = 2;
 
     private boolean hasData;
+    private PropagationModel propagationModel;
 
     private final HashMap<Long, DataChunk> cacheMap = new HashMap<>();
 
     private static long date2key(long date) {
         return date / MILLIS_PER_CHUNK;
-    }
-
-    public long getDepropagatedTime(long ts){
-        return ts - 60 * 60000;
     }
 
     public boolean hasData() {
@@ -78,8 +76,8 @@ class BandCacheMinute implements BandCache {
     }
 
     public void createPolyLines(Rectangle graphArea, TimeAxis timeAxis, YAxis yAxis, ArrayList<GraphPolyline> graphPolylines) {
-        long keyEnd = date2key(getDepropagatedTime(timeAxis.end));
-        long key = date2key(getDepropagatedTime(timeAxis.start));
+        long keyEnd = date2key(propagationModel.getPropagatedTime(timeAxis.end));
+        long key = date2key(propagationModel.getPropagatedTime(timeAxis.start));
         int level = 0;
         double factor = 1;
         double elsz = 1. * MILLIS_PER_CHUNK / CHUNKED_SIZE * factor;
@@ -110,7 +108,8 @@ class BandCacheMinute implements BandCache {
                     tvalues.clear();
                     tdates.clear();
                 } else if (value > Float.MIN_VALUE) {
-                    tdates.add(timeAxis.value2pixel(graphArea.x, graphArea.width, getDepropagatedTime(dates[i])));
+                    tdates.add(timeAxis.value2pixel(graphArea.x, graphArea.width,
+                            propagationModel.getPropagatedTime(dates[i])));
                     tvalues.add(yAxis.value2pixel(graphArea.y, graphArea.height, value));
                 }
                 i++;
@@ -121,7 +120,8 @@ class BandCacheMinute implements BandCache {
         }
     }
 
-    public float getValue(long ts) {
+    public float getValue(long _ts) {
+        long ts = propagationModel.getDepropagatedTime(_ts);
         long key = date2key(ts);
         DataChunk cache = cacheMap.get(key);
         if (cache != null) {
@@ -193,6 +193,15 @@ class BandCacheMinute implements BandCache {
             for (int i = 0; i < v.length; i++)
                 ja.put(new JSONArray().put(d[i] / 1000).put(f * v[i]));
         }
+    }
+
+    public void setPropagationModel(PropagationModel pm) {
+        propagationModel = pm;
+    }
+
+    @Override
+    public PropagationModel getPropagationModel() {
+        return propagationModel;
     }
 
 }

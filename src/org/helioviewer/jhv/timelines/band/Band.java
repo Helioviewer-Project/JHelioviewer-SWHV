@@ -18,6 +18,8 @@ import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
+import org.helioviewer.jhv.timelines.propagation.PropagationModel;
+import org.helioviewer.jhv.timelines.propagation.PropagationModelLinear;
 import org.json.JSONObject;
 
 public class Band extends AbstractTimelineLayer {
@@ -34,7 +36,7 @@ public class Band extends AbstractTimelineLayer {
     private int[] warnLevels;
     private String[] warnLabels;
     private final BandCache bandCache;
-    
+    public boolean isPropagated = false;
 
     public Band(BandType _bandType) {
         if (_bandType.getBandCacheType().equals("BandCacheAll")) {
@@ -42,7 +44,7 @@ public class Band extends AbstractTimelineLayer {
         } else {
             bandCache = new BandCacheMinute();
         }
-
+        bandCache.setPropagationModel(new PropagationModelLinear(0));
         bandType = _bandType;
         optionsPanel = new BandOptionPanel(this);
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getScale(bandType.getUnitLabel()));
@@ -238,12 +240,23 @@ public class Band extends AbstractTimelineLayer {
 
     @Override
     public boolean isPropagated() {
-        return true;
+        return isPropagated;
     }
 
     @Override
     public long getDepropagatedTime(long time) {
-        return this.bandCache.getDepropagatedTime(time);
+        return bandCache.getPropagationModel().getDepropagatedTime(time);
     }
 
+    public void setPropagationModel(PropagationModel pm) {
+        bandCache.setPropagationModel(pm);
+        isPropagated = true;
+        DrawController.graphAreaChanged();
+    }
+
+    public void removePropagationModel() {
+        bandCache.setPropagationModel(new PropagationModelLinear(0));
+        isPropagated = false;
+        DrawController.graphAreaChanged();
+    }
 }
