@@ -31,7 +31,6 @@ import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
-import org.helioviewer.jhv.timelines.band.Band;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -238,7 +237,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private static int value2pixel(int x0, int w, long val, long start, long end) {
         return (int) ((double) w * (val - start) / (end - start) + x0);
     }
-    
+
     private static void drawHorizontalLabels(Graphics2D g, Rectangle graphArea, TimeAxis xAxis, int ht, TimelineLayer tl) {
         Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(xAxis.start), g);
         int tickTextWidth = (int) tickTextBounds.getWidth();
