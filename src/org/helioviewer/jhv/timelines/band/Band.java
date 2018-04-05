@@ -34,6 +34,7 @@ public class Band extends AbstractTimelineLayer {
     private int[] warnLevels;
     private String[] warnLabels;
     private final BandCache bandCache;
+    
 
     public Band(BandType _bandType) {
         if (_bandType.getBandCacheType().equals("BandCacheAll")) {
@@ -233,6 +234,16 @@ public class Band extends AbstractTimelineLayer {
     @Override
     public int hashCode() {
         return toString().hashCode();
+    }
+
+    @Override
+    public boolean isPropagated() {
+        return true;
+    }
+
+    @Override
+    public long getDepropagatedTime(long time) {
+        return this.bandCache.getDepropagatedTime(time);
     }
 
 }

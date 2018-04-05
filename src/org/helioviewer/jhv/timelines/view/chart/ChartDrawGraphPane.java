@@ -31,6 +31,7 @@ import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
+import org.helioviewer.jhv.timelines.band.Band;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -180,8 +181,17 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         Stroke stroke = g.getStroke();
         g.setStroke(thinStroke);
         {
-            drawHorizontalLabels(g, graphArea, xAxis);
-
+            int ht = 0;
+            drawHorizontalLabels(g, graphArea, xAxis, ht, null);
+            ht++;
+            for (TimelineLayer tl : TimelineLayers.get()) {
+                if (tl.isPropagated()) {
+                    g.setColor(tl.getDataColor());
+                    drawHorizontalLabels(g, graphArea, xAxis, ht, tl);
+                    ht++;
+                }
+            }
+            
             int ct = -1;
             for (TimelineLayer tl : TimelineLayers.get()) {
                 if (tl.showYAxis()) {
@@ -225,17 +235,30 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
     }
 
-    private static void drawHorizontalLabels(Graphics2D g, Rectangle graphArea, TimeAxis xAxis) {
+    private static int value2pixel(int x0, int w, long val, long start, long end) {
+        return (int) ((double) w * (val - start) / (end - start) + x0);
+    }
+    
+    private static void drawHorizontalLabels(Graphics2D g, Rectangle graphArea, TimeAxis xAxis, int ht, TimelineLayer tl) {
         Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(xAxis.start), g);
         int tickTextWidth = (int) tickTextBounds.getWidth();
-        int tickTextHeight = (int) tickTextBounds.getHeight();
+        int tickTextHeight = (int) tickTextBounds.getHeight() + ht * DrawConstants.GRAPH_BOTTOM_AXIS_SPACE;
         int horizontalTickCount = Math.max(2, (graphArea.width - tickTextWidth * 2) / tickTextWidth);
-        long tickDifferenceHorizontal = (xAxis.end - xAxis.start) / (horizontalTickCount - 1);
+        long start; long end;
+        if(tl == null) {
+            start = xAxis.start;
+            end = xAxis.end;
+        } else {
+            start = tl.getDepropagatedTime(xAxis.start);
+            end = tl.getDepropagatedTime(xAxis.end);
+        }
+        long tickDifferenceHorizontal = (end - start) / (horizontalTickCount - 1);
+        
 
         long previousDate = Long.MIN_VALUE;
         for (int i = 0; i < horizontalTickCount; ++i) {
-            long tickValue = xAxis.start + i * tickDifferenceHorizontal;
-            int x = xAxis.value2pixel(graphArea.x, graphArea.width, tickValue);
+            long tickValue = start + i * tickDifferenceHorizontal;
+            int x = value2pixel(graphArea.x, graphArea.width, tickValue, start, end);
             String tickText;
             if (previousDate == Long.MIN_VALUE) {
                 tickText = DrawConstants.FULL_DATE_TIME_FORMAT_REVERSE.format(tickValue);

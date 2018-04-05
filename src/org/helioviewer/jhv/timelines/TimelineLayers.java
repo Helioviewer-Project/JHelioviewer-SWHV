@@ -104,4 +104,13 @@ public class TimelineLayers extends AbstractTableModel {
         return ct;
     }
 
+    public static int getNumberOfPropagationAxes() {
+        int ct = 0;
+        for (TimelineLayer tl : layers) {
+            if (tl.isPropagated()) {
+                ct++;
+            }
+        }
+        return ct;
+    }
 }
