@@ -252,12 +252,16 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             start = tl.getDepropagatedTime(xAxis.start);
             end = tl.getDepropagatedTime(xAxis.end);
         }
-        long tickDifferenceHorizontal = (end - start) / (horizontalTickCount - 1);
+        long tickDifferenceHorizontal = (xAxis.end - xAxis.start) / (horizontalTickCount - 1);
         
 
         long previousDate = Long.MIN_VALUE;
         for (int i = 0; i < horizontalTickCount; ++i) {
-            long tickValue = start + i * tickDifferenceHorizontal;
+            long tickValue = xAxis.start + i * tickDifferenceHorizontal;
+            if(tl != null) {
+                tickValue=tl.getDepropagatedTime(tickValue);
+            }
+
             int x = value2pixel(graphArea.x, graphArea.width, tickValue, start, end);
             String tickText;
             if (previousDate == Long.MIN_VALUE) {
@@ -272,10 +276,15 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                     tickText = DrawConstants.FULL_DATE_TIME_FORMAT_REVERSE.format(tickValue);
                 }
             }
-            g.setColor(DrawConstants.TICK_LINE_COLOR);
-            g.drawLine(x, graphArea.y, x, graphArea.y + graphArea.height + 3);
 
-            g.setColor(Color.BLACK);
+            if(tl == null) {
+                g.setColor(DrawConstants.TICK_LINE_COLOR);
+                g.drawLine(x, graphArea.y, x, graphArea.y + graphArea.height + 3);
+                g.setColor(Color.BLACK);
+            } else {
+                g.setColor(tl.getDataColor());
+            }
+
             int yl = graphArea.y + graphArea.height + 2 + tickTextHeight;
             for (String line : Regex.Return.split(tickText)) {
                 tickTextBounds = g.getFontMetrics().getStringBounds(line, g);

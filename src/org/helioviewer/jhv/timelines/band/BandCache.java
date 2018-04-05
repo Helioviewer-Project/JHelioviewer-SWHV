@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
+import org.helioviewer.jhv.timelines.propagation.PropagationModel;
 import org.json.JSONObject;
 
 public interface BandCache {
@@ -21,6 +22,7 @@ public interface BandCache {
 
     float[] getBounds(TimeAxis timeAxis);
 
-    long getDepropagatedTime(long time);
+    PropagationModel getPropagationModel();
 
+    void setPropagationModel(PropagationModel pm);
 }

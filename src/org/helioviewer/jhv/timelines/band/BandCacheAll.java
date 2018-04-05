@@ -8,6 +8,7 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
+import org.helioviewer.jhv.timelines.propagation.PropagationModel;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -15,6 +16,7 @@ class BandCacheAll implements BandCache {
 
     ArrayList<DateVal> datevals = new ArrayList<>();
     private boolean hasData;
+    private PropagationModel propagationModel;
 
     public boolean hasData() {
         return hasData;
@@ -98,8 +100,11 @@ class BandCacheAll implements BandCache {
 
     }
 
-    public long getDepropagatedTime(long time) {
-        return time;
+    public PropagationModel getPropagationModel() {
+        return propagationModel;
     }
 
+    public void setPropagationModel(PropagationModel pm) {
+        propagationModel = pm;
+    }
 }

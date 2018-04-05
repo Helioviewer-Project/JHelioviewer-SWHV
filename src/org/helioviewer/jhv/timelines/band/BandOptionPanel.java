@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.timelines.band;
 
-import java.awt.EventQueue;
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -9,9 +9,12 @@ import java.io.BufferedWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.JHVDirectory;
@@ -22,6 +25,7 @@ import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineSettings;
+import org.helioviewer.jhv.timelines.propagation.PropagationModelLinear;
 import org.json.JSONObject;
 
 import com.jidesoft.swing.JideButton;
@@ -76,6 +80,21 @@ class BandOptionPanel extends JPanel {
         });
         add(downloadButton, c);
 
+        c.gridx = 3;
+        c.anchor = GridBagConstraints.EAST;
+        NumberFormat integerFormat = NumberFormat.getIntegerInstance(Locale.GERMAN);
+        JFormattedTextField propagationField = new JFormattedTextField(integerFormat);
+        propagationField.setValue(new Integer(0));
+        propagationField.setColumns(10);
+        propagationField.addPropertyChangeListener("value", e -> {
+            int propagationSpeed = ((Number) propagationField.getValue()).intValue();
+            if (propagationSpeed == 0) {
+                band.removePropagationModel();
+            } else {
+                band.setPropagationModel(new PropagationModelLinear(propagationSpeed * 1000));
+            }
+        });
+        add(propagationField, c);
         ComponentUtils.smallVariant(this);
     }
 
