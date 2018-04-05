@@ -98,4 +98,8 @@ class BandCacheAll implements BandCache {
 
     }
 
+    public long getDepropagatedTime(long time) {
+        return time;
+    }
+
 }

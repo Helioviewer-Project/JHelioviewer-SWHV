@@ -244,5 +244,14 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
     public ClickableDrawable getDrawableUnderMouse() {
         return eventUnderMouse == null ? null : eventUnderMouse.event;
     }
+    
+    @Override
+    public boolean isPropagated() {
+        return false;
+    }
 
+    @Override
+    public long getDepropagatedTime(long time) {
+        return time;
+    }
 }

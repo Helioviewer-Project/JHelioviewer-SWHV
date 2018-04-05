@@ -21,4 +21,6 @@ public interface BandCache {
 
     float[] getBounds(TimeAxis timeAxis);
 
+    long getDepropagatedTime(long time);
+
 }

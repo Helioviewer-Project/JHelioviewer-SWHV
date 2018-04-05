@@ -56,5 +56,9 @@ public interface TimelineLayer {
     ClickableDrawable getDrawableUnderMouse();
 
     void serialize(JSONObject jo);
+    
+    boolean isPropagated();
+
+    long getDepropagatedTime(long time);
 
 }
