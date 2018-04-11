@@ -14,7 +14,7 @@ import org.json.JSONObject;
 
 class BandCacheAll implements BandCache {
 
-    ArrayList<DateVal> datevals = new ArrayList<>();
+    private final ArrayList<DateVal> datevals = new ArrayList<>();
     private boolean hasData;
     private PropagationModel propagationModel;
 

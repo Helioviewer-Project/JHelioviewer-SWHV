@@ -190,7 +190,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                     ht++;
                 }
             }
-            
+
             int ct = -1;
             for (TimelineLayer tl : TimelineLayers.get()) {
                 if (tl.showYAxis()) {
@@ -244,7 +244,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         int tickTextHeight = (int) tickTextBounds.getHeight() + ht * DrawConstants.GRAPH_BOTTOM_AXIS_SPACE;
         int horizontalTickCount = Math.max(2, (graphArea.width - tickTextWidth * 2) / tickTextWidth);
         long start; long end;
-        if(tl == null) {
+        if (tl == null) {
             start = xAxis.start;
             end = xAxis.end;
         } else {
@@ -252,13 +252,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             end = tl.getDepropagatedTime(xAxis.end);
         }
         long tickDifferenceHorizontal = (xAxis.end - xAxis.start) / (horizontalTickCount - 1);
-        
 
         long previousDate = Long.MIN_VALUE;
         for (int i = 0; i < horizontalTickCount; ++i) {
             long tickValue = xAxis.start + i * tickDifferenceHorizontal;
-            if(tl != null) {
-                tickValue=tl.getDepropagatedTime(tickValue);
+            if (tl != null) {
+                tickValue = tl.getDepropagatedTime(tickValue);
             }
 
             int x = value2pixel(graphArea.x, graphArea.width, tickValue, start, end);
@@ -276,7 +275,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
             }
 
-            if(tl == null) {
+            if (tl == null) {
                 g.setColor(DrawConstants.TICK_LINE_COLOR);
                 g.drawLine(x, graphArea.y, x, graphArea.y + graphArea.height + 3);
                 g.setColor(Color.BLACK);
