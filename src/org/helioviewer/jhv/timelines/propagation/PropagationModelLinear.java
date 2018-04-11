@@ -2,7 +2,7 @@ package org.helioviewer.jhv.timelines.propagation;
 
 public class PropagationModelLinear implements PropagationModel {
 
-    long timeshift;
+    private final long timeshift;
 
     public PropagationModelLinear(long _timeshift) {
         timeshift = _timeshift;
@@ -15,4 +15,5 @@ public class PropagationModelLinear implements PropagationModel {
     public long getPropagatedTime(long ts) {
         return ts - timeshift;
     }
+
 }

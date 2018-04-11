@@ -8,7 +8,7 @@ import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.timelines.propagation.PropagationModel;
 import org.json.JSONObject;
 
-public interface BandCache {
+interface BandCache {
 
     boolean hasData();
 
