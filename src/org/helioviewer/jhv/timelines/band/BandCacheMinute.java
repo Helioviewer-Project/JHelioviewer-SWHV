@@ -32,10 +32,12 @@ class BandCacheMinute implements BandCache {
         return date / MILLIS_PER_CHUNK;
     }
 
+    @Override
     public boolean hasData() {
         return hasData;
     }
 
+    @Override
     public void addToCache(float[] values, long[] dates) {
         if (values.length != 0) {
             hasData = true;
@@ -49,6 +51,7 @@ class BandCacheMinute implements BandCache {
         }
     }
 
+    @Override
     public float[] getBounds(TimeAxis timeAxis) {
         float min = Float.MAX_VALUE;
         float max = Float.MIN_VALUE;
@@ -75,6 +78,7 @@ class BandCacheMinute implements BandCache {
         return new float[] { min, max };
     }
 
+    @Override
     public void createPolyLines(Rectangle graphArea, TimeAxis timeAxis, YAxis yAxis, ArrayList<GraphPolyline> graphPolylines) {
         long keyEnd = date2key(propagationModel.getPropagatedTime(timeAxis.end));
         long key = date2key(propagationModel.getPropagatedTime(timeAxis.start));
@@ -120,6 +124,7 @@ class BandCacheMinute implements BandCache {
         }
     }
 
+    @Override
     public float getValue(long _ts) {
         long ts = propagationModel.getDepropagatedTime(_ts);
         long key = date2key(ts);
@@ -136,6 +141,7 @@ class BandCacheMinute implements BandCache {
         return Float.MIN_VALUE;
     }
 
+    @Override
     public void serialize(JSONObject jo, double f) {
         JSONArray ja = new JSONArray();
         for (DataChunk chunk : cacheMap.values())
@@ -144,6 +150,7 @@ class BandCacheMinute implements BandCache {
     }
 
     private static class DataChunk {
+
         private final float[][] values = new float[MAX_LEVEL][];
         private final long[][] dates = new long[MAX_LEVEL][];
 
@@ -193,8 +200,10 @@ class BandCacheMinute implements BandCache {
             for (int i = 0; i < v.length; i++)
                 ja.put(new JSONArray().put(d[i] / 1000).put(f * v[i]));
         }
+
     }
 
+    @Override
     public void setPropagationModel(PropagationModel pm) {
         propagationModel = pm;
     }

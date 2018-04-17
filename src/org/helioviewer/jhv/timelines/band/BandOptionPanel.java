@@ -84,7 +84,7 @@ class BandOptionPanel extends JPanel {
         c.anchor = GridBagConstraints.EAST;
         NumberFormat integerFormat = NumberFormat.getIntegerInstance(Locale.GERMAN);
         JFormattedTextField propagationField = new JFormattedTextField(integerFormat);
-        propagationField.setValue(new Integer(0));
+        propagationField.setValue(0);
         propagationField.setColumns(10);
         propagationField.addPropertyChangeListener("value", e -> {
             int propagationSpeed = ((Number) propagationField.getValue()).intValue();

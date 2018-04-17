@@ -18,10 +18,12 @@ class BandCacheAll implements BandCache {
     private boolean hasData;
     private PropagationModel propagationModel;
 
+    @Override
     public boolean hasData() {
         return hasData;
     }
 
+    @Override
     public void addToCache(float[] values, long[] dates) {
         if (values.length != 0) {
             hasData = true;
@@ -39,6 +41,7 @@ class BandCacheAll implements BandCache {
         Collections.sort(datevals);
     }
 
+    @Override
     public float[] getBounds(TimeAxis timeAxis) {
         float min = Float.MAX_VALUE;
         float max = Float.MIN_VALUE;
@@ -52,6 +55,7 @@ class BandCacheAll implements BandCache {
         return new float[] { min, max };
     }
 
+    @Override
     public void createPolyLines(Rectangle graphArea, TimeAxis timeAxis, YAxis yAxis,
             ArrayList<GraphPolyline> graphPolylines) {
 
@@ -68,10 +72,12 @@ class BandCacheAll implements BandCache {
         }
     }
 
+    @Override
     public float getValue(long ts) {
         return Float.MIN_VALUE;
     }
 
+    @Override
     public void serialize(JSONObject jo, double f) {
         JSONArray ja = new JSONArray();
         for (DateVal dv : datevals)
@@ -81,10 +87,10 @@ class BandCacheAll implements BandCache {
 
     private static class DateVal implements Comparable<DateVal> {
 
-        public long date;
-        public float val;
+        final long date;
+        final float val;
 
-        public DateVal(long _date, float _val) {
+        DateVal(long _date, float _val) {
             date = _date;
             val = _val;
         }
@@ -100,11 +106,14 @@ class BandCacheAll implements BandCache {
 
     }
 
+    @Override
     public PropagationModel getPropagationModel() {
         return propagationModel;
     }
 
+    @Override
     public void setPropagationModel(PropagationModel pm) {
         propagationModel = pm;
     }
+
 }
