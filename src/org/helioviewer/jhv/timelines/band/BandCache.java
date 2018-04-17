@@ -25,4 +25,5 @@ interface BandCache {
     PropagationModel getPropagationModel();
 
     void setPropagationModel(PropagationModel pm);
+
 }

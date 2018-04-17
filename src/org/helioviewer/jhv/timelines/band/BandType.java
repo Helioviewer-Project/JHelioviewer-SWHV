@@ -146,8 +146,8 @@ public class BandType {
         return max;
     }
 
-    public YAxisScale getScale(String label) {
-        return scale.generateScale(label);
+    public YAxisScale getScale(String _label) {
+        return scale.generateScale(_label);
     }
 
     public String getBaseURL() {

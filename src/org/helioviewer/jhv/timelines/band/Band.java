@@ -259,4 +259,5 @@ public class Band extends AbstractTimelineLayer {
         isPropagated = false;
         DrawController.graphAreaChanged();
     }
+
 }
