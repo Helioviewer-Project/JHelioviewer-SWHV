@@ -8,10 +8,12 @@ public class PropagationModelLinear implements PropagationModel {
         timeshift = _timeshift;
     }
 
+    @Override
     public long getDepropagatedTime(long ts) {
         return ts + timeshift;
     }
 
+    @Override
     public long getPropagatedTime(long ts) {
         return ts - timeshift;
     }

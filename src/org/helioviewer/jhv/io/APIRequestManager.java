@@ -12,7 +12,7 @@ import org.helioviewer.jhv.log.Log;
 class APIRequestManager {
 
     @Nullable
-    public static URI requestRemoteFile(APIRequest req) throws IOException {
+    public static APIResponse requestRemoteFile(APIRequest req) throws IOException {
         String jpipRequest = req.toJpipRequest();
         try {
             APIResponse response = new APIResponse(JSONUtils.get(jpipRequest));
@@ -36,12 +36,13 @@ class APIRequestManager {
                     Log.error("Did not find URI in response to " + jpipRequest);
                     Message.err("No data source response", "While quering the data source, the server did not provide an answer.", false);
                 }*/
+                return null;
             } else {
                 // The server wants to load the data
                 if (message != null) {
                     Message.warn("Warning", Message.formatMessageString(message));
                 }
-                return uri;
+                return response;
             }
         } catch (SocketTimeoutException e) {
             Log.error("Socket timeout while requesting JPIP URL", e);
