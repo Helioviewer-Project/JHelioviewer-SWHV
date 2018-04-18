@@ -7,7 +7,7 @@ import org.helioviewer.jhv.log.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-class APIResponse {
+public class APIResponse {
 
     private final String err;
     private final String msg;

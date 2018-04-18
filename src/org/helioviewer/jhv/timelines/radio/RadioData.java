@@ -114,7 +114,7 @@ public class RadioData extends AbstractTimelineLayer {
             try {
                 APIRequest req = new APIRequest("ROB", APIRequest.CallistoID, date, date, APIRequest.CADENCE_ANY);
                 URI uri = new URI(req.toFileRequest());
-                return new RadioJP2Data(new JP2ViewCallisto(NetFileCache.get(uri), req), req.startTime);
+                return new RadioJP2Data(new JP2ViewCallisto(NetFileCache.get(uri), req, null), req.startTime);
             } catch (Exception e) {
                 Log.error("An error occured while opening the remote file: " + e.getMessage());
             }

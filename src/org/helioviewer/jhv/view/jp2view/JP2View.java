@@ -19,6 +19,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.io.APIResponse;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.metadata.MetaData;
@@ -50,6 +51,7 @@ public class JP2View extends AbstractView {
     private int fpsCount;
     private long fpsTime = System.currentTimeMillis();
 
+    private final APIResponse response;
     private final RenderExecutor executor = new RenderExecutor();
     private final int maxFrame;
     private final CacheStatus cacheStatus;
@@ -60,8 +62,9 @@ public class JP2View extends AbstractView {
 
     private JPIPSocket socket;
 
-    public JP2View(URI _uri, APIRequest _req) throws Exception {
+    public JP2View(URI _uri, APIRequest _req, APIResponse _res) throws Exception {
         super(_uri, _req);
+        response = _res;
 
         try {
             String scheme = uri.getScheme().toLowerCase();

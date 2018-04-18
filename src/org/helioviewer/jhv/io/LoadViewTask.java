@@ -30,7 +30,7 @@ class LoadViewTask extends JHVWorker<View, Void> {
     @Override
     protected View backgroundWork() {
         try {
-            return loadView(uri, null);
+            return loadView(uri, null, null);
         } catch (IOException e) {
             Log.error("An error occurred while opening the remote file: ", e);
             Message.err("An error occurred while opening the remote file: ", e.getMessage(), false);
@@ -55,7 +55,7 @@ class LoadViewTask extends JHVWorker<View, Void> {
     }
 
     @Nullable
-    private static View loadView(URI uri, APIRequest req) throws IOException {
+    private static View loadView(URI uri, APIRequest req, APIResponse res) throws IOException {
         if (uri == null || uri.getScheme() == null) {
             throw new IOException("Invalid URI: " + uri);
         }
@@ -67,7 +67,7 @@ class LoadViewTask extends JHVWorker<View, Void> {
             } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
                  return new SimpleImageView(uri, req);
             } else {
-                return new JP2View(uri, req);
+                return new JP2View(uri, req, res);
             }
         } catch (InterruptedException ignore) {
             // nothing
@@ -80,8 +80,8 @@ class LoadViewTask extends JHVWorker<View, Void> {
 
     @Nullable
     protected static View requestAndOpenRemoteFile(APIRequest req) throws IOException {
-        URI uri = APIRequestManager.requestRemoteFile(req);
-        return uri == null ? null : loadView(uri, req);
+        APIResponse res = APIRequestManager.requestRemoteFile(req);
+        return res == null ? null : loadView(res.getURI(), req, res);
     }
 
 }
