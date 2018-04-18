@@ -51,7 +51,9 @@ public class JP2View extends AbstractView {
     private int fpsCount;
     private long fpsTime = System.currentTimeMillis();
 
+    private final long cacheKey;
     private final APIResponse response;
+
     private final RenderExecutor executor = new RenderExecutor();
     private final int maxFrame;
     private final CacheStatus cacheStatus;
@@ -62,9 +64,9 @@ public class JP2View extends AbstractView {
 
     private JPIPSocket socket;
 
-    public JP2View(URI _uri, APIRequest _req, APIResponse _res) throws Exception {
-        super(_uri, _req);
-        response = _res;
+    public JP2View(URI _uri, APIRequest _request, APIResponse _response) throws Exception {
+        super(_uri, _request);
+        response = _response;
 
         try {
             String scheme = uri.getScheme().toLowerCase();
@@ -99,12 +101,13 @@ public class JP2View extends AbstractView {
                 long[] frames = response.getFrames();
                 if (maxFrame + 1 != frames.length)
                     Log.warn(uri + ": expected " + (maxFrame + 1) + "frames, got " + frames.length);
-                for (int i =  0; i < Math.min(maxFrame + 1, frames.length); i++) {
+                for (int i = 0; i < Math.min(maxFrame + 1, frames.length); i++) {
                     JHVDate d = getFrameTime(i);
                     if (d.milli != frames[i])
                         Log.warn(uri + "[" + i + "]: expected " + d + ", got " + new JHVDate(frames[i]));
                 }
             }
+            cacheKey = request == null ? 0 : (request.server + request.sourceId).hashCode() << 32;
 
             int[] lut = kduReader.getLUT();
             if (lut != null)
@@ -120,6 +123,10 @@ public class JP2View extends AbstractView {
             e.printStackTrace();
             throw new JHV_KduException("Failed to create Kakadu machinery: " + e.getMessage(), e);
         }
+    }
+
+    public long getCacheKey(int frame, int level) {
+        return cacheKey == 0 ? 0 : (cacheKey ^ getFrameTime(frame).milli) + level;
     }
 
     private static final int mainHeaderKlass = DatabinMap.getKlass(JPIPConstants.MAIN_HEADER_DATA_BIN_CLASS);

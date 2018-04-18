@@ -13,8 +13,8 @@ import org.helioviewer.jhv.view.jp2view.image.ResolutionSet.ResolutionLevel;
 
 public class JP2ViewCallisto extends JP2View {
 
-    public JP2ViewCallisto(URI _uri, APIRequest _req, APIResponse _res) throws Exception {
-        super(_uri, _req, _res);
+    public JP2ViewCallisto(URI _uri, APIRequest _request, APIResponse _response) throws Exception {
+        super(_uri, _request, _response);
     }
 
     public void setRegion(Rectangle r) {

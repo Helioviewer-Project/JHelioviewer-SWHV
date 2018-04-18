@@ -14,8 +14,8 @@ import org.helioviewer.jhv.view.AbstractView;
 
 public class SimpleImageView extends AbstractView {
 
-    public SimpleImageView(URI _uri, APIRequest _req) throws Exception {
-        super(_uri, _req);
+    public SimpleImageView(URI _uri, APIRequest _request) throws Exception {
+        super(_uri, _request);
 
         BufferedImage image = ImageIO.read(uri.toURL());
         if (image == null)

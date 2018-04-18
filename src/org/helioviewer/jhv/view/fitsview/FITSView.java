@@ -12,8 +12,8 @@ public class FITSView extends AbstractView {
 
     private final String xml;
 
-    public FITSView(URI _uri, APIRequest _req) throws Exception {
-        super(_uri, _req);
+    public FITSView(URI _uri, APIRequest _request) throws Exception {
+        super(_uri, _request);
 
         FITSImage fits = new FITSImage(uri);
         if (fits.imageData == null)

@@ -20,17 +20,17 @@ public class AbstractView implements View {
 
     private static final AtomicBoolean fullCache = new AtomicBoolean(true);
 
-    private final APIRequest req;
     private final boolean isLocal;
+    protected final APIRequest request;
     protected final URI uri;
 
     protected ImageData imageData;
     protected LUT builtinLUT;
     protected MetaData metaData[] = { new PixelBasedMetaData(1, 1, 0) };
 
-    public AbstractView(URI _uri, APIRequest _req) {
+    public AbstractView(URI _uri, APIRequest _request) {
         uri = _uri;
-        req = _req;
+        request = _request;
         isLocal = uri != null && "file".equals(uri.getScheme());
     }
 
@@ -59,7 +59,7 @@ public class AbstractView implements View {
 
     @Override
     public APIRequest getAPIRequest() {
-        return req;
+        return request;
     }
 
     @Override
