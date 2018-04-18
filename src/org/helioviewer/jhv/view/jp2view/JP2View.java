@@ -95,6 +95,17 @@ public class JP2View extends AbstractView {
                     metaData[i] = new PixelBasedMetaData(256, 256, i); // tbd real size
             }
 
+            if (response != null) {
+                long[] frames = response.getFrames();
+                if (maxFrame + 1 != frames.length)
+                    Log.warn(uri + ": expected " + (maxFrame + 1) + "frames, got " + frames.length);
+                for (int i =  0; i < Math.min(maxFrame + 1, frames.length); i++) {
+                    JHVDate d = getFrameTime(i);
+                    if (d.milli != frames[i])
+                        Log.warn(uri + "[" + i + "]: expected " + d + ", got " + new JHVDate(frames[i]));
+                }
+            }
+
             int[] lut = kduReader.getLUT();
             if (lut != null)
                 builtinLUT = new LUT(getName() + " built-in", lut);
