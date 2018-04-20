@@ -86,7 +86,7 @@ public class JPIPConstants {
     /**
      * Maximum number of layers that can be requested at the same time.
      */
-    public static final int MAX_REQ_LAYERS = 12;
+    private static final int MAX_REQ_LAYERS = 1;
 
     /**
      * The maximum length in bytes of a JPIP request.
