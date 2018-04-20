@@ -4,32 +4,29 @@ import kdu_jni.KduException;
 import kdu_jni.Kdu_global;
 import kdu_jni.Kdu_message_formatter;
 
-/**
- * This class takes care of setting up the internal Kakadu messaging objects.
- * 
+/*
+ * This class takes care of setting up the internal Kakadu messaging objects
  * @author caplins
  */
 public class KakaduMessageSystem {
 
-    /**
+    /*
      * Static instances of KduSysMessage for both errors and warnings. Although
      * never explicitly used, the references must be maintained since the native
      * code calls back to this.
      */
     private static JHV_Kdu_message warnings, errors;
 
-    /**
+    /*
      * Static instances of Kdu_message_formatter for both errors and warnings.
      * Although never explicitly used, the references must be maintained since
      * the native code calls back to this.
      */
     private static Kdu_message_formatter warningsFormatter, errorsFormatter;
 
-    /**
+    /*
      * Attempts to setup the Kakadu message handlers. Honestly, if this fails
      * then there is probably a larger problem and it should error and exit.
-     * 
-     * @throws JHV_KduException
      */
     public static void startKduMessageSystem() throws Exception {
         try {

@@ -32,12 +32,12 @@ import org.helioviewer.jhv.view.jp2view.cache.CacheStatusRemote;
 import org.helioviewer.jhv.view.jp2view.image.ImageParams;
 import org.helioviewer.jhv.view.jp2view.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.jhv.view.jp2view.io.jpip.DatabinMap;
+import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPCache;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPConstants;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPResponse;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPQuery;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPSocket;
 import org.helioviewer.jhv.view.jp2view.kakadu.JHV_KduException;
-import org.helioviewer.jhv.view.jp2view.kakadu.JHV_Kdu_cache;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduMeta;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduSource;
 
@@ -52,31 +52,29 @@ public class JP2View extends AbstractView {
     private long fpsTime = System.currentTimeMillis();
 
     private final long cacheKey;
-    private final APIResponse response;
 
     private final RenderExecutor executor = new RenderExecutor();
     private final int maxFrame;
     private final CacheStatus cacheStatus;
 
     private J2KReader reader;
-    private JHV_Kdu_cache cacheReader;
+    private JPIPCache cacheReader;
     private Kdu_cache cacheRender;
 
     private JPIPSocket socket;
 
     public JP2View(URI _uri, APIRequest _request, APIResponse _response) throws Exception {
         super(_uri, _request);
-        response = _response;
 
         try {
             String scheme = uri.getScheme().toLowerCase();
             switch (scheme) {
                 case "jpip":
-                    cacheReader = new JHV_Kdu_cache();
+                    cacheReader = new JPIPCache();
                     cacheRender = new Kdu_cache();
                     cacheRender.Attach_to(cacheReader);
                     // cache.Set_preferred_memory_limit(60 * 1024 * 1024);
-                    initRemote(cacheReader);
+                    initJPIP(cacheReader);
                     break;
                 case "file":
                     // nothing
@@ -97,8 +95,8 @@ public class JP2View extends AbstractView {
                     metaData[i] = new PixelBasedMetaData(256, 256, i); // tbd real size
             }
 
-            if (response != null) {
-                long[] frames = response.getFrames();
+            if (_response != null) {
+                long[] frames = _response.getFrames();
                 if (maxFrame + 1 != frames.length)
                     Log.warn(uri + ": expected " + (maxFrame + 1) + "frames, got " + frames.length);
                 for (int i = 0; i < Math.min(maxFrame + 1, frames.length); i++) {
@@ -107,7 +105,7 @@ public class JP2View extends AbstractView {
                         Log.warn(uri + "[" + i + "]: expected " + d + ", got " + new JHVDate(frames[i]));
                 }
             }
-            cacheKey = request == null ? 0 : (request.server + request.sourceId).hashCode() << 32;
+            cacheKey = request == null ? 0 : ((long) (request.server + request.sourceId).hashCode()) << 32;
 
             int[] lut = kduReader.getLUT();
             if (lut != null)
@@ -125,13 +123,13 @@ public class JP2View extends AbstractView {
         }
     }
 
-    public long getCacheKey(int frame, int level) {
-        return cacheKey == 0 ? 0 : (cacheKey ^ getFrameTime(frame).milli) + level;
+    public long getCacheKey(int frame) {
+        return cacheKey == 0 || frame == 0 ? 0 : cacheKey + getFrameTime(frame).milli;
     }
 
     private static final int mainHeaderKlass = DatabinMap.getKlass(JPIPConstants.MAIN_HEADER_DATA_BIN_CLASS);
 
-    private void initRemote(JHV_Kdu_cache cache) throws JHV_KduException {
+    private void initJPIP(JPIPCache cache) throws JHV_KduException {
         try {
             // Connect to the JPIP server and add the necessary initial data (the main header as well as the metadata) to cache
             socket = new JPIPSocket(uri, cache);
@@ -142,18 +140,11 @@ public class JP2View extends AbstractView {
                 res = socket.send(req, cache);
             } while (!res.isResponseComplete());
 
-            if (!cache.isDataBinCompleted(mainHeaderKlass, 0, 0)) {
-                req = JPIPQuery.create(JPIPConstants.MIN_REQUEST_LEN, "stream", "0");
-                do {
-                    res = socket.send(req, cache);
-                } while (!res.isResponseComplete() && !cache.isDataBinCompleted(mainHeaderKlass, 0, 0));
-            }
-
             // prime first image
-            req = JPIPQuery.create(JPIPConstants.MAX_REQUEST_LEN, "context", "jpxl<0-0>", "fsiz", "64,64,closest", "rsiz", "64,64", "roff", "0,0");
+            req = JPIPQuery.create(JPIPConstants.MAX_REQUEST_LEN, "stream", "0", "fsiz", "64,64,closest", "rsiz", "64,64", "roff", "0,0");
             do {
                 res = socket.send(req, cache);
-            } while (!res.isResponseComplete());
+            } while (!res.isResponseComplete() && !cache.isDataBinCompleted(mainHeaderKlass, 0, 0));
         } catch (IOException e) {
             initCloseSocket();
             throw new JHV_KduException("Error in the server communication: " + e.getMessage(), e);
@@ -459,7 +450,7 @@ public class JP2View extends AbstractView {
         return cacheStatus.getResolutionSet(frame).numComps;
     }
 
-    JHV_Kdu_cache getReaderCache() {
+    JPIPCache getJPIPCache() {
         return cacheReader;
     }
 

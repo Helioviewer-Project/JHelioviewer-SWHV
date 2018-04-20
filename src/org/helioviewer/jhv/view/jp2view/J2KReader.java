@@ -7,11 +7,11 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.jp2view.cache.CacheStatus;
 import org.helioviewer.jhv.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.jhv.view.jp2view.image.ImageParams;
+import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPCache;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPConstants;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPQuery;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPResponse;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPSocket;
-import org.helioviewer.jhv.view.jp2view.kakadu.JHV_Kdu_cache;
 
 class J2KReader implements Runnable {
 
@@ -24,9 +24,7 @@ class J2KReader implements Runnable {
     // A reference to the JP2View this object is owned by
     private final JP2View viewRef;
 
-    // The a reference to the cache object used by the run method
-    private final JHV_Kdu_cache cacheRef;
-
+    private final JPIPCache cacheRef;
     private final CacheStatus cacheStatusRef;
 
     private JPIPSocket socket;
@@ -39,7 +37,7 @@ class J2KReader implements Runnable {
         viewRef = _viewRef;
 
         numFrames = viewRef.getMaximumFrameNumber() + 1;
-        cacheRef = viewRef.getReaderCache();
+        cacheRef = viewRef.getJPIPCache();
         cacheStatusRef = viewRef.getCacheStatus();
         socket = viewRef.getSocket();
 
