@@ -68,27 +68,14 @@ class J2KReader implements Runnable {
         readerSignal.signal(params);
     }
 
-    private static String createQuery(String fSiz, int iniLayer, int endLayer) {
-        return JPIPQuery.create(JPIPConstants.MAX_REQUEST_LEN, "context", "jpxl<" + iniLayer + '-' + endLayer + '>', "fsiz", fSiz + ",closest", "rsiz", fSiz, "roff", "0,0");
+    private static String createQuery(String fSiz, int layer) {
+        return JPIPQuery.create(JPIPConstants.MAX_REQUEST_LEN, "stream", String.valueOf(layer), "fsiz", fSiz + ",closest", "rsiz", fSiz, "roff", "0,0");
     }
 
     private String[] createMultiQuery(String fSiz) {
-        int numSteps = numFrames / JPIPConstants.MAX_REQ_LAYERS;
-        if ((numFrames % JPIPConstants.MAX_REQ_LAYERS) != 0)
-            numSteps++;
-
-        String[] stepQuerys = new String[numSteps];
-        int lpf = -1, lpi = 0, maxFrame = numFrames - 1;
-        for (int i = 0; i < numSteps; i++) {
-            lpf += JPIPConstants.MAX_REQ_LAYERS;
-            if (lpf > maxFrame)
-                lpf = maxFrame;
-
-            stepQuerys[i] = createQuery(fSiz, lpi, lpf);
-
-            lpi = lpf + 1;
-            if (lpi > maxFrame)
-                lpi = 0;
+        String[] stepQuerys = new String[numFrames];
+        for (int lpi = 0; lpi < numFrames; lpi++) {
+            stepQuerys[lpi] = createQuery(fSiz, lpi);
         }
         return stepQuerys;
     }
@@ -126,16 +113,16 @@ class J2KReader implements Runnable {
                 String[] stepQuerys;
                 String fSiz = params.resolution.width + "," + params.resolution.height;
                 if (singleFrame) {
-                    stepQuerys = new String[] { createQuery(fSiz, frame, frame) };
-                    currentStep = 0;
+                    stepQuerys = new String[] { createQuery(fSiz, frame) };
+                    currentStep = frame;
                 } else {
                     stepQuerys = createMultiQuery(fSiz);
 
                     int partial = cacheStatusRef.getPartialUntil();
                     if (partial < numFrames - 1)
-                        currentStep = partial / JPIPConstants.MAX_REQ_LAYERS;
+                        currentStep = partial;
                     else
-                        currentStep = frame / JPIPConstants.MAX_REQ_LAYERS;
+                        currentStep = frame;
                 }
 
                 // send queries until everything is complete or caching is interrupted
@@ -152,31 +139,18 @@ class J2KReader implements Runnable {
                     }
 
                     // receive and add data to cache
-                    JPIPResponse res = socket.send(stepQuerys[currentStep], cacheRef);
+                    JPIPResponse res = socket.send(stepQuerys[currentStep], currentStep, cacheRef);
                     // react if query complete
                     if (res.isResponseComplete()) {
                         // mark query as complete
                         completeSteps++;
                         stepQuerys[currentStep] = null;
 
-                        // tell the cache status
-                        if (singleFrame) {
-                            cacheStatusRef.setFrameComplete(frame, level);
+                        cacheStatusRef.setFrameComplete(currentStep, level); // tell the cache status
+                        if (singleFrame)
                             viewRef.signalRenderFromReader(params); // refresh current image
-                        } else {
-                            for (int j = currentStep * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((currentStep + 1) * JPIPConstants.MAX_REQ_LAYERS, numFrames); j++) {
-                                cacheStatusRef.setFrameComplete(j, level);
-                            }
-                        }
                     } else {
-                        // tell the cache status
-                        if (singleFrame) {
-                            cacheStatusRef.setFramePartial(frame);
-                        } else {
-                            for (int j = currentStep * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((currentStep + 1) * JPIPConstants.MAX_REQ_LAYERS, numFrames); j++) {
-                                cacheStatusRef.setFramePartial(j);
-                            }
-                        }
+                        cacheStatusRef.setFramePartial(currentStep); // tell the cache status
                     }
 
                     UITimer.cacheStatusChanged();
