@@ -130,6 +130,7 @@ public class JHVGlobals {
     public static File libCacheDir;
     public static File fileCacheDir;
     public static File clientCacheDir;
+    public static final File jpipCacheDir = new File(JHVDirectory.CACHE.getFile(), "jpip");
 
     public static final HyperOpenURL hyperOpenURL = new HyperOpenURL();
 

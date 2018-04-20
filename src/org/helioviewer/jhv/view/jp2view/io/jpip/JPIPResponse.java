@@ -7,16 +7,14 @@ import java.net.ProtocolException;
 
 import javax.annotation.Nullable;
 
-/**
- * A response to a JPIPRequest, encapsulates the JPIPDataSegments
- *
+/*
+ * A response to a JPIPRequest, encapsulates the JPIPSegments
  * @author Juan Pablo Garcia Ortiz
  * @author caplins
- *
  */
 public class JPIPResponse {
 
-    /** The status: could be EOR_WINDOW_DONE or EOR_IMAGE_DONE */
+    // The status: could be EOR_WINDOW_DONE or EOR_IMAGE_DONE
     private long status = -1;
 
     private final String cnew;
@@ -29,33 +27,27 @@ public class JPIPResponse {
         return cnew;
     }
 
-    /**
-     * Tells if the response completes the last request.
-     *
-     * @return True, if the response is complete
-     */
+    // Tells if the response completes the last request
     public boolean isResponseComplete() {
         return status == JPIPConstants.EOR_WINDOW_DONE || status == JPIPConstants.EOR_IMAGE_DONE;
     }
 
-    /** The last class identifier read. */
+    // The last class identifier read
     private int classID = 0;
 
-    /** The last code-stream index read. */
+    // The last code-stream index read
     private long codestream = 0;
 
-    /** The total length in bytes of the last VBAS read. */
+    // The total length in bytes of the last VBAS read
     private int vbasLength = 0;
 
-    /** The first byte of the last VBAS read. */
+    // The first byte of the last VBAS read
     private int vbasFstByte = 0;
 
-    /**
+    /*
      * Reads an VBAS integer from the stream. The length in bytes of the VBAS is
      * stored in the <code>vbasLength</code>variable, and the first byte of the
      * VBAS is stored in the <code>vbasFstByte</code> variable.
-     * 
-     * @throws IOException
      */
     private long readVBAS(InputStream in) throws IOException {
         vbasLength = 0;
@@ -82,19 +74,19 @@ public class JPIPResponse {
         return value;
     }
 
-    /**
+    /*
      * Reads the next data segment from the stream, and stores its information
-     * in the <code>JpipDataSegment</code> object passed as parameter. The data
+     * in the <code>JPIPSegment</code> object passed as parameter. The data
      * buffer is not reallocated every time. It is only reallocated if the next
      * data length is bigger than the previous one.
      */
     @Nullable
-    private JPIPDataSegment readSegment(InputStream in) throws IOException {
+    private JPIPSegment readSegment(InputStream in) throws IOException {
         long id;
         if ((id = readVBAS(in)) < 0)
             return null;
 
-        JPIPDataSegment seg = new JPIPDataSegment();
+        JPIPSegment seg = new JPIPSegment();
         seg.binID = id;
 
         if (vbasFstByte == 0) {
@@ -149,12 +141,12 @@ public class JPIPResponse {
     }
 
     public void readSegments(InputStream in, JPIPCache cache) throws IOException {
-        JPIPDataSegment seg;
+        JPIPSegment seg;
         while ((seg = readSegment(in)) != null) {
             if (seg.isEOR)
                 status = seg.binID;
             else if (seg.isFinal || seg.length > 0) { // avoid pointless segments
-                cache.addJPIPDataSegment(seg);
+                cache.addJPIPSegment(seg);
             }
         }
     }
