@@ -37,7 +37,7 @@ public class JPIPSocket extends HTTPSocket {
 
         jpipPath = uri.getPath();
 
-        JPIPResponse res = send(JPIPQuery.create(512, "cnew", "http", "type", "jpp-stream", "tid", "0"), cache); // deliberately short
+        JPIPResponse res = send(JPIPQuery.create(512, "cnew", "http", "type", "jpp-stream", "tid", "0"), 0, cache); // deliberately short
         String cnew = res.getCNew();
         if (cnew == null)
             throw new IOException("The header 'JPIP-cnew' was not sent by the server");
@@ -66,7 +66,7 @@ public class JPIPSocket extends HTTPSocket {
         // System.out.println(">>> total MB: " + (totalLength / (double) (1024 * 1024)));
         try {
             if (jpipChannelID != null) {
-                send(JPIPQuery.create(0, "cclose", jpipChannelID), null);
+                send(JPIPQuery.create(0, "cclose", jpipChannelID), 0, null);
             }
         } catch (IOException ignore) {
             // no problem, server may have closed the socket
@@ -75,7 +75,7 @@ public class JPIPSocket extends HTTPSocket {
         }
     }
 
-    public JPIPResponse send(String queryStr, JPIPCache cache) throws IOException {
+    public JPIPResponse send(String queryStr, int frame, JPIPCache cache) throws IOException {
         // Add a necessary JPIP request field
         if (jpipChannelID != null && !queryStr.contains("cid=") && !queryStr.contains("cclose"))
             queryStr += "&cid=" + jpipChannelID;
