@@ -140,13 +140,13 @@ public class JPIPResponse {
         return seg;
     }
 
-    public void readSegments(InputStream in, JPIPCache cache) throws IOException {
+    public void readSegments(InputStream in, JPIPCache cache, int frame) throws IOException {
         JPIPSegment seg;
         while ((seg = readSegment(in)) != null) {
             if (seg.isEOR)
                 status = seg.binID;
             else if (seg.isFinal || seg.length > 0) { // avoid pointless segments
-                cache.addJPIPSegment(seg);
+                cache.put(frame, seg);
             }
         }
     }
