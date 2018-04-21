@@ -51,7 +51,7 @@ public class JP2View extends AbstractView {
     private int fpsCount;
     private long fpsTime = System.currentTimeMillis();
 
-    private final long cacheKey;
+    private final long cacheKey[];
 
     private final RenderExecutor executor = new RenderExecutor();
     private final int maxFrame;
@@ -65,6 +65,16 @@ public class JP2View extends AbstractView {
 
     public JP2View(URI _uri, APIRequest _request, APIResponse _response) throws Exception {
         super(_uri, _request);
+
+        long frames[] = _response == null ? null : _response.getFrames();
+        if (frames != null) {
+            long key = request == null ? 0 : ((long) (request.server + request.sourceId).hashCode()) << 32;
+            cacheKey = new long[frames.length];
+            if (key != 0)
+                for (int i = 0; i < frames.length; i++)
+                    cacheKey[i] = key + frames[i];
+        } else
+            cacheKey = new long[1];
 
         try {
             String scheme = uri.getScheme().toLowerCase();
@@ -95,17 +105,17 @@ public class JP2View extends AbstractView {
                     metaData[i] = new PixelBasedMetaData(256, 256, i); // tbd real size
             }
 
-            if (_response != null) {
-                long[] frames = _response.getFrames();
+            if (frames != null) {
                 if (maxFrame + 1 != frames.length)
                     Log.warn(uri + ": expected " + (maxFrame + 1) + "frames, got " + frames.length);
                 for (int i = 0; i < Math.min(maxFrame + 1, frames.length); i++) {
                     JHVDate d = getFrameTime(i);
-                    if (d.milli != frames[i])
+                    if (d.milli != frames[i]) {
+                        cacheKey[i] = 0; // uncacheable
                         Log.warn(uri + "[" + i + "]: expected " + d + ", got " + new JHVDate(frames[i]));
+                    }
                 }
             }
-            cacheKey = request == null ? 0 : ((long) (request.server + request.sourceId).hashCode()) << 32;
 
             int[] lut = kduReader.getLUT();
             if (lut != null)
@@ -124,7 +134,7 @@ public class JP2View extends AbstractView {
     }
 
     public long getCacheKey(int frame) {
-        return cacheKey == 0 || frame == 0 ? 0 : cacheKey + getFrameTime(frame).milli;
+        return frame < 0 || frame >= cacheKey.length ? 0 : cacheKey[frame];
     }
 
     private static final int mainHeaderKlass = DatabinMap.getKlass(JPIPConstants.MAIN_HEADER_DATA_BIN_CLASS);
