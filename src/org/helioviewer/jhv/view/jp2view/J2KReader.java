@@ -139,7 +139,7 @@ class J2KReader implements Runnable {
                     }
 
                     // receive and add data to cache
-                    JPIPResponse res = socket.send(stepQuerys[currentStep], currentStep, cacheRef);
+                    JPIPResponse res = socket.send(stepQuerys[currentStep], cacheRef, currentStep);
                     // react if query complete
                     if (res.isResponseComplete()) {
                         // mark query as complete

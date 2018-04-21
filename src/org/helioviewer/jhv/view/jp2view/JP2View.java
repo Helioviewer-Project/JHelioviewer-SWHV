@@ -137,13 +137,13 @@ public class JP2View extends AbstractView {
             JPIPResponse res;
             String req = JPIPQuery.create(JPIPConstants.META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
             do {
-                res = socket.send(req, 0, cache);
+                res = socket.send(req, cache, 0);
             } while (!res.isResponseComplete());
 
             // prime first image
             req = JPIPQuery.create(JPIPConstants.MAX_REQUEST_LEN, "stream", "0", "fsiz", "64,64,closest", "rsiz", "64,64", "roff", "0,0");
             do {
-                res = socket.send(req, 0, cache);
+                res = socket.send(req, cache, 0);
             } while (!res.isResponseComplete() && !cache.isDataBinCompleted(mainHeaderKlass, 0, 0));
         } catch (IOException e) {
             initCloseSocket();
