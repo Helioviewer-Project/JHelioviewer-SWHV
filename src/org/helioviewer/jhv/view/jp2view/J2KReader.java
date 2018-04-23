@@ -8,10 +8,12 @@ import org.helioviewer.jhv.view.jp2view.cache.CacheStatus;
 import org.helioviewer.jhv.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.jhv.view.jp2view.image.ImageParams;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPCache;
+import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPConstants;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPQuery;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPResponse;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPSocket;
+import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPStream;
 
 class J2KReader implements Runnable {
 
@@ -139,13 +141,25 @@ class J2KReader implements Runnable {
                     }
 
                     // receive and add data to cache
-                    JPIPResponse res = socket.send(stepQuerys[currentStep], cacheRef, currentStep);
+                    long key = viewRef.getCacheKey(currentStep);
+                    JPIPResponse res = null;
+                    JPIPStream stream = JPIPCacheManager.get(key, level);
+                    if (stream != null)
+                        cacheRef.put(currentStep, stream);
+                    else
+                        res = socket.send(stepQuerys[currentStep], cacheRef, currentStep);
+
+                    if (res == null)
+                        System.out.println(">> hit " + viewRef.getURI() + " " + currentStep + " " + level);
+
                     // react if query complete
-                    if (res.isResponseComplete()) {
+                    if (res == null || res.isResponseComplete()) {
                         // mark query as complete
                         completeSteps++;
                         stepQuerys[currentStep] = null;
 
+                        if (res != null) // downloaded
+                            JPIPCacheManager.put(key, level, cacheRef.remove(currentStep));
                         cacheStatusRef.setFrameComplete(currentStep, level); // tell the cache status
                         if (singleFrame)
                             viewRef.signalRenderFromReader(params); // refresh current image
