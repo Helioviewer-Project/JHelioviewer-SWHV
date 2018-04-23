@@ -42,8 +42,8 @@ public class JPIPCache extends Kdu_cache {
             addToKdu(frame, seg);
     }
 
-    public JPIPStream remove(int frame) {
-        return map.remove(frame);
+    public JPIPStream get(int frame) {
+        return map.get(frame);
     }
 
 }
