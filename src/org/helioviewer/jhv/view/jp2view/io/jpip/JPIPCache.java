@@ -11,7 +11,7 @@ import org.helioviewer.jhv.view.jp2view.kakadu.KakaduConstants;
 
 public class JPIPCache extends Kdu_cache {
 
-    private final HashMap<Integer, JPIPSegmentStream> map = new HashMap<>();
+    private final HashMap<Integer, JPIPStream> map = new HashMap<>();
 
     public boolean isDataBinCompleted(int klassID, long streamID, long binID) throws JHV_KduException {
         boolean complete[] = new boolean[1];
@@ -33,16 +33,16 @@ public class JPIPCache extends Kdu_cache {
 
     public void put(int frame, JPIPSegment data) throws IOException {
         if (data.klassID != KakaduConstants.KDU_META_DATABIN)
-            map.computeIfAbsent(frame, k -> new JPIPSegmentStream()).segments.add(data);
+            map.computeIfAbsent(frame, k -> new JPIPStream()).segments.add(data);
         addToKdu(frame, data);
     }
 
-    public void put(int frame, JPIPSegmentStream stream) throws IOException {
+    public void put(int frame, JPIPStream stream) throws IOException {
         for (JPIPSegment seg : stream.segments)
             addToKdu(frame, seg);
     }
 
-    public JPIPSegmentStream remove(int frame) {
+    public JPIPStream remove(int frame) {
         return map.remove(frame);
     }
 
