@@ -39,9 +39,9 @@
         <mkdir dir="${bin}"/>
         <javac srcdir="${src}" destdir="${bin}" compiler="com.google.errorprone.ErrorProneAntCompilerAdapter" debug="true" includeantruntime="false" encoding="utf-8">
             <compilerarg value="-Xep:CatchAndPrintStackTrace:OFF"/>
-            <compilerarg value="-Xep:DoubleBraceInitialization:OFF"/> <!-- crashes 2.3.0 -->
+            <compilerarg value="-Xep:DoubleBraceInitialization:OFF"/> <!-- crashes 2.3.x -->
             <compilerclasspath>
-                <pathelement location="shared/error_prone_ant-2.3.0.jar"/>
+                <pathelement location="shared/error_prone_ant-2.3.1.jar"/>
             </compilerclasspath>
             <classpath>
                 <fileset refid="libfiles"/>
