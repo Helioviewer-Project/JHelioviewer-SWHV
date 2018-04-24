@@ -1,6 +1,10 @@
 package org.helioviewer.jhv.view.jp2view.io.jpip;
 
 import java.io.Serializable;
+//import java.nio.ByteBuffer;
+//import java.nio.ByteOrder;
+
+//import com.google.common.primitives.Shorts;
 
 /*
  * The class <code>JPIPSegment</code> is used to construct objects to store
@@ -39,6 +43,52 @@ class JPIPSegment implements Serializable {
 
     // Indicates if this segment is a End Of Response message
     public boolean isEOR;
+
+/*
+    public ByteBuffer toBuffer() {
+        ByteBuffer buffer = ByteBuffer.allocate(length + 6).order(ByteOrder.nativeOrder());
+
+        buffer.putShort(Shorts.checkedCast(binID));
+        // buffer.putLong(aux); not used
+        // buffer.putShort(Shorts.checkedCast(codestreamID)); don't need
+        // buffer.putShort(Shorts.checkedCast(offset)); don't need
+
+        buffer.putShort(Shorts.checkedCast(length));
+        if (length > 0)
+            buffer.put(data);
+
+        buffer.put((byte) klassID); // fits surely
+
+        byte flags = 0;
+        if (isFinal)
+            flags += 1;
+        buffer.put(flags);
+        buffer.rewind();
+
+        return buffer;
+    }
+
+    public static JPIPSegment fromBuffer(ByteBuffer buffer) {
+        JPIPSegment seg = new JPIPSegment();
+        seg.binID = buffer.getShort();
+        // seg.codestreamID = buffer.getShort();
+        // seg.offset = buffer.getShort();
+
+        seg.length = buffer.getShort();
+        if (seg.length > 0) {
+            seg.data = new byte[seg.length];
+            buffer.get(seg.data);
+        }
+
+        seg.klassID = buffer.get();
+
+        byte flags = buffer.get();
+        if ((flags & 1) != 0)
+            seg.isFinal = true;
+
+        return seg;
+    }
+*/
 
     // Returns a string representation of the JPIP segment
     @Override
