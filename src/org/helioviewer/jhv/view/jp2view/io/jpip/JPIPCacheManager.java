@@ -13,7 +13,7 @@ import org.ehcache.config.units.MemoryUnit;
 public class JPIPCacheManager {
 
     private static final PersistentCacheManager streamManager = CacheManagerBuilder.newCacheManagerBuilder()
-        .with(CacheManagerBuilder.persistence(JHVGlobals.jpipCacheDir))
+        .with(CacheManagerBuilder.persistence(JHVGlobals.jpipStreamCacheDir))
         .withCache("JPIPStream", CacheConfigurationBuilder
                                         .newCacheConfigurationBuilder(Long.class, JPIPStream.class,
                                             ResourcePoolsBuilder.newResourcePoolsBuilder()
@@ -33,7 +33,6 @@ public class JPIPCacheManager {
 
     private static final Thread destroy = new Thread(() -> {
         try {
-            //cacheManager.destroy();
             streamManager.close();
             levelManager.close();
         } catch (Exception ignore) {
