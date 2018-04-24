@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.view.jp2view.io.jpip;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.JHVGlobals;
 
 import org.ehcache.Cache;
@@ -43,6 +45,7 @@ public class JPIPCacheManager {
         Runtime.getRuntime().addShutdownHook(destroy);
     }
 
+    @Nullable
     public static JPIPStream get(long key, int level) {
         try {
             Integer clevel = levelCache.get(key);
