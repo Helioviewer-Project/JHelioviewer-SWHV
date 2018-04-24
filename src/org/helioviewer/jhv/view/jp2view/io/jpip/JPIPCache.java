@@ -2,6 +2,8 @@ package org.helioviewer.jhv.view.jp2view.io.jpip;
 
 import java.io.IOException;
 
+import javax.annotation.Nullable;
+
 import kdu_jni.KduException;
 import kdu_jni.Kdu_cache;
 import kdu_jni.Kdu_global;
@@ -43,7 +45,6 @@ public class JPIPCache extends Kdu_cache {
             byte data[] = new byte[binLen[0]];
             if (!Scan_databins(flags | Kdu_global.KDU_CACHE_SCAN_NO_ADVANCE, klassID, codestreamID, binID, binLen, complete, data, binLen[0]))
                 break;
-            flags &= ~Kdu_global.KDU_CACHE_SCAN_NO_ADVANCE;
             if (klassID[0] == KakaduConstants.KDU_META_DATABIN)
                 continue;
 
@@ -68,6 +69,7 @@ public class JPIPCache extends Kdu_cache {
             addToKdu(frame, seg);
     }
 
+    @Nullable
     public JPIPStream get(int frame) {
         try {
             return scan(frame);
