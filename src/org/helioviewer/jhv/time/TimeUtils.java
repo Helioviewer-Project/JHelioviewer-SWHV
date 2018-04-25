@@ -27,7 +27,7 @@ public class TimeUtils {
     public static final JHVDate MINIMAL_DATE = new JHVDate("1970-01-01T00:00:00");
     public static final JHVDate MAXIMAL_DATE = new JHVDate("2050-01-01T00:00:00");
 
-    private static final double MAX_FRAMES = 97;
+    private static final double MAX_FRAMES = 96;
 
     public static int defaultCadence(long start, long end) {
         return (int) Math.max(1, (end - start) / MAX_FRAMES / 1000);
