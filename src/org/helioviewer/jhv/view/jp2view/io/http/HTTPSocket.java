@@ -16,7 +16,7 @@ import org.helioviewer.jhv.view.jp2view.io.LineRead;
 
 public class HTTPSocket {
 
-    private static final int TIMEOUT_CONNECT = 30000;
+    //private static final int TIMEOUT_CONNECT = 30000;
     private static final int TIMEOUT_READ = 30000;
     private static final int PORT = 80;
 

@@ -41,12 +41,13 @@ public class JPIPCache extends Kdu_cache {
 
         JPIPStream stream = new JPIPStream();
         while (Scan_databins(flags, klassID, codestreamID, binID, binLen, complete, null, 0)) {
+            if (klassID[0] == KakaduConstants.KDU_META_DATABIN)
+                continue;
+
             flags &= ~Kdu_global.KDU_CACHE_SCAN_START;
             byte data[] = new byte[binLen[0]];
             if (!Scan_databins(flags | Kdu_global.KDU_CACHE_SCAN_NO_ADVANCE, klassID, codestreamID, binID, binLen, complete, data, binLen[0]))
                 break;
-            if (klassID[0] == KakaduConstants.KDU_META_DATABIN)
-                continue;
 
             JPIPSegment seg = new JPIPSegment();
             seg.binID = binID[0];
@@ -60,8 +61,8 @@ public class JPIPCache extends Kdu_cache {
         return stream;
     }
 
-    public void put(int frame, JPIPSegment data) throws IOException {
-        addToKdu(frame, data);
+    public void put(int frame, JPIPSegment seg) throws IOException {
+        addToKdu(frame, seg);
     }
 
     public void put(int frame, JPIPStream stream) throws IOException {

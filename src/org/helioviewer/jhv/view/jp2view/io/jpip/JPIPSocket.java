@@ -65,9 +65,8 @@ public class JPIPSocket extends HTTPSocket {
 
         // System.out.println(">>> total MB: " + (totalLength / (double) (1024 * 1024)));
         try {
-            if (jpipChannelID != null) {
-                send(JPIPQuery.create(0, "cclose", jpipChannelID), null, 0);
-            }
+            if (jpipChannelID != null)
+                send(JPIPQuery.create(0, "cclose", jpipChannelID));
         } catch (IOException ignore) {
             // no problem, server may have closed the socket
         } finally {
@@ -75,7 +74,7 @@ public class JPIPSocket extends HTTPSocket {
         }
     }
 
-    public JPIPResponse send(String queryStr, JPIPCache cache, int frame) throws IOException {
+    private void send(String queryStr) throws IOException {
         // Add a necessary JPIP request field
         if (jpipChannelID != null && !queryStr.contains("cid=") && !queryStr.contains("cclose"))
             queryStr += "&cid=" + jpipChannelID;
@@ -89,10 +88,10 @@ public class JPIPSocket extends HTTPSocket {
         req.setHeader("Host", usedHost + ':' + usedPort);
         queryStr = "GET " + jpipPath + '?' + queryStr + " HTTP/1.1\r\n" + req + "\r\n";
         write(queryStr);
+    }
 
-        if (cache == null) // not interested in response
-            return null;
-
+    public JPIPResponse send(String queryStr, JPIPCache cache, int frame) throws IOException {
+        send(queryStr);
         HTTPMessage res = recv();
         if (!"image/jpp-stream".equals(res.getHeader("Content-Type")))
             throw new IOException("Expected image/jpp-stream content");
