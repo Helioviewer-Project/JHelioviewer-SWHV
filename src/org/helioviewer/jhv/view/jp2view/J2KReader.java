@@ -121,10 +121,7 @@ class J2KReader implements Runnable {
                     stepQuerys = createMultiQuery(fSiz);
 
                     int partial = cacheStatusRef.getPartialUntil();
-                    if (partial < numFrames - 1)
-                        currentStep = partial;
-                    else
-                        currentStep = frame;
+                    currentStep = partial < numFrames - 1 ? partial : frame;
                 }
 
                 // send queries until everything is complete or caching is interrupted

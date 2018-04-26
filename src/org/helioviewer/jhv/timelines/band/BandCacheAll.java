@@ -95,13 +95,27 @@ class BandCacheAll implements BandCache {
             val = _val;
         }
 
+        void serialize(JSONArray ja, double f) {
+            ja.put(new JSONArray().put(date / 1000).put(val * f));
+        }
+
         @Override
         public int compareTo(@Nonnull DateVal o) {
             return Long.compare(date, o.date);
         }
 
-        void serialize(JSONArray ja, double f) {
-            ja.put(new JSONArray().put(date / 1000).put(val * f));
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof DateVal))
+                return false;
+            DateVal d = (DateVal) o;
+            return date == d.date;
+        }
+
+        @Override
+        public int hashCode() {
+            assert false : "hashCode not designed";
+            return 42;
         }
 
     }
