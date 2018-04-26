@@ -20,7 +20,7 @@ class SWEKDownloadWorker implements Runnable {
         params = _params;
     }
 
-    public void stopWorker() {
+    void stopWorker() {
         //TBD
     }
 
@@ -45,11 +45,11 @@ class SWEKDownloadWorker implements Runnable {
         }
     }
 
-    public SWEKSupplier getSupplier() {
+    SWEKSupplier getSupplier() {
         return supplier;
     }
 
-    public Interval getRequestInterval() {
+    Interval getRequestInterval() {
         return requestInterval;
     }
 

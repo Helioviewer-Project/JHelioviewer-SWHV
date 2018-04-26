@@ -10,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.NumberFormat;
-import java.util.Locale;
 
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -82,7 +81,8 @@ class BandOptionPanel extends JPanel {
 
         c.gridx = 3;
         c.anchor = GridBagConstraints.EAST;
-        NumberFormat integerFormat = NumberFormat.getIntegerInstance(Locale.GERMAN);
+        NumberFormat integerFormat = NumberFormat.getIntegerInstance();
+        integerFormat.setGroupingUsed(false);
         JFormattedTextField propagationField = new JFormattedTextField(integerFormat);
         propagationField.setValue(0);
         propagationField.setColumns(10);

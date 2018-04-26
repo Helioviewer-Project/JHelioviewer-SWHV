@@ -10,7 +10,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class PositionRequest {
+class PositionRequest {
 
     private static final String baseURL = "http://swhv.oma.be/position?";
     private static final String observer = "SUN";
