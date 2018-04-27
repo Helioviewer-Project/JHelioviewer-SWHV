@@ -36,7 +36,6 @@ public class Band extends AbstractTimelineLayer {
     private int[] warnLevels;
     private String[] warnLabels;
     private final BandCache bandCache;
-    private boolean isPropagated = false;
 
     public Band(BandType _bandType) {
         if (_bandType.getBandCacheType().equals("BandCacheAll")) {
@@ -240,7 +239,7 @@ public class Band extends AbstractTimelineLayer {
 
     @Override
     public boolean isPropagated() {
-        return isPropagated;
+        return bandCache.getPropagationModel().isPropagated();
     }
 
     @Override
@@ -250,13 +249,6 @@ public class Band extends AbstractTimelineLayer {
 
     public void setPropagationModel(PropagationModel pm) {
         bandCache.setPropagationModel(pm);
-        isPropagated = true;
-        DrawController.graphAreaChanged();
-    }
-
-    public void removePropagationModel() {
-        bandCache.setPropagationModel(new PropagationModelRadial(0));
-        isPropagated = false;
         DrawController.graphAreaChanged();
     }
 
