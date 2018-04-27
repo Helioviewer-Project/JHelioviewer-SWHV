@@ -243,7 +243,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         int tickTextWidth = (int) tickTextBounds.getWidth();
         int tickTextHeight = (int) tickTextBounds.getHeight() + ht * DrawConstants.GRAPH_BOTTOM_AXIS_SPACE;
         int horizontalTickCount = Math.max(2, (graphArea.width - tickTextWidth * 2) / tickTextWidth);
-        long start; long end;
+        long start, end;
         if (tl == null) {
             start = xAxis.start;
             end = xAxis.end;

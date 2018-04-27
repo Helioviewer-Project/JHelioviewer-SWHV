@@ -34,4 +34,14 @@ public abstract class AbstractTimelineLayer implements TimelineLayer {
         return null;
     }
 
+    @Override
+    public boolean isPropagated() {
+        return false;
+    }
+
+    @Override
+    public long getDepropagatedTime(long time) {
+        return time;
+    }
+
 }

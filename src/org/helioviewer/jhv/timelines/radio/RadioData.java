@@ -260,13 +260,4 @@ public class RadioData extends AbstractTimelineLayer {
             g.drawString(text, x, y);
     }
 
-    @Override
-    public boolean isPropagated() {
-        return false;
-    }
-
-    @Override
-    public long getDepropagatedTime(long time) {
-        return time;
-    }
 }

@@ -24,7 +24,7 @@ import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineSettings;
-import org.helioviewer.jhv.timelines.propagation.PropagationModelLinear;
+import org.helioviewer.jhv.timelines.propagation.PropagationModelRadial;
 import org.json.JSONObject;
 
 import com.jidesoft.swing.JideButton;
@@ -87,11 +87,11 @@ class BandOptionPanel extends JPanel {
         propagationField.setValue(0);
         propagationField.setColumns(10);
         propagationField.addPropertyChangeListener("value", e -> {
-            int propagationSpeed = ((Number) propagationField.getValue()).intValue();
-            if (propagationSpeed == 0) {
+            int speed = ((Number) propagationField.getValue()).intValue();
+            if (speed <= 0) {
                 band.removePropagationModel();
             } else {
-                band.setPropagationModel(new PropagationModelLinear(propagationSpeed * 1000));
+                band.setPropagationModel(new PropagationModelRadial(speed));
             }
         });
         add(propagationField, c);
