@@ -40,11 +40,13 @@ public class Position {
         public final double distance;
         public final Quat orientation;
         public final JHVDate time;
+        public final long lightTime;
 
         public Q(JHVDate _time, double _dist, Quat _q) {
             distance = _dist;
             orientation = _q;
             time = _time;
+            lightTime = (long) (distance * Sun.RadiusMilli + .5);
         }
 /*
         public Q sunAxis() {
