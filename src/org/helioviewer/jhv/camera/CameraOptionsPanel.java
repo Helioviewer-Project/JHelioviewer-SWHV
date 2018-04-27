@@ -30,7 +30,7 @@ import com.jidesoft.swing.JideButton;
 public class CameraOptionsPanel extends JPanel {
 
     private enum CameraMode {
-        Observer(UpdateViewpoint.observer), Earth(UpdateViewpoint.observer),
+        Observer(UpdateViewpoint.observer), Earth(UpdateViewpoint.earth),
         Equatorial(UpdateViewpoint.equatorial), Other(UpdateViewpoint.expert);
 
         final JRadioButton radio;
