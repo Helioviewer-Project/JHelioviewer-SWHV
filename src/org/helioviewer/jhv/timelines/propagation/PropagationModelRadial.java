@@ -11,8 +11,8 @@ public class PropagationModelRadial implements PropagationModel {
     private final double radiusMilli;
 
     public PropagationModelRadial(double speed) {
-        isPropagated = !(speed <= 0);
-        radiusMilli = Sun.RadiusMeter / speed; // km/s = m/msec
+        isPropagated = speed > 0;
+        radiusMilli = isPropagated ? Sun.RadiusMeter / speed : 0; // km/s = m/msec
     }
 
     @Override
