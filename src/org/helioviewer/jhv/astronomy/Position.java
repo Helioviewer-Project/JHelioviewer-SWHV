@@ -3,7 +3,6 @@ package org.helioviewer.jhv.astronomy;
 import org.helioviewer.jhv.math.Quat;
 //import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVDate;
-//import org.helioviewer.jhv.time.TimeUtils;
 
 public class Position {
 
@@ -41,7 +40,6 @@ public class Position {
         public final double distance;
         public final Quat orientation;
         public final JHVDate time;
-//        private JHVDate timeSun;
 
         public Q(JHVDate _time, double _dist, Quat _q) {
             distance = _dist;
@@ -51,12 +49,6 @@ public class Position {
 /*
         public Q sunAxis() {
             return new Q(time, distance, orientation.twist(Vec3.YAxis));
-        }
-
-        public JHVDate getTimeSun() {
-            if (timeSun == null)
-                timeSun = new JHVDate(TimeUtils.floorSec(time.milli - (long) (distance * Sun.RadiusMilli + .5)));
-            return timeSun;
         }
 */
         @Override

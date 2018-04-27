@@ -13,16 +13,16 @@ import com.google.common.cache.LoadingCache;
 public class Sun {
 
     // http://asa.usno.navy.mil/static/files/2016/Astronomical_Constants_2016.pdf
-    public static final double SunEarthMassRatio = 332946.0487;
+    private static final double SunEarthMassRatio = 332946.0487;
     // https://en.wikipedia.org/wiki/Lagrangian_point#L1
     public static final double L1Factor = 1 - Math.cbrt(1 / SunEarthMassRatio / 3);
 
     public static final double Radius = 1;
     public static final double Radius2 = Radius * Radius;
     public static final double RadiusMeter = 695508 * 1e3; // photospheric: Allen, SolO
-    static final double RadiusMilli = RadiusMeter / 299792458 * 1e3;
+    private static final double RadiusMilli = RadiusMeter / 299792458 * 1e3;
 
-    public static final double MeanEarthDistanceMeter = 149597870.7 * 1e3;
+    private static final double MeanEarthDistanceMeter = 149597870.7 * 1e3;
     public static final double MeanEarthDistance = MeanEarthDistanceMeter / RadiusMeter;
     public static final double MeanEarthDistanceInv = RadiusMeter / MeanEarthDistanceMeter;
 
@@ -49,6 +49,10 @@ public class Sun {
         EpochEarthL = getEarth(EPOCH);
         StartEarthL = getEarth(TimeUtils.START);
         StartEarthQ = getEarthQuat(TimeUtils.START);
+    }
+
+    public static long getTime(long milli, double distance) {
+        return milli - (long) (distance * RadiusMilli + .5);
     }
 
     public static Position.L getEarth(JHVDate time) {
