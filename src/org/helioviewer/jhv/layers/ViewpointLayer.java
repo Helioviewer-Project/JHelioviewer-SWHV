@@ -9,7 +9,6 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -68,8 +67,9 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         gl.glPushMatrix();
         gl.glMultMatrixd(camera.getViewpoint().orientation.toMatrix().transpose().m, 0);
         {
-            if (Display.getUpdateViewpoint() == UpdateViewpoint.equatorial) {
-                renderPlanets(gl, UpdateViewpoint.equatorial.getPositions(), pointFactor);
+            Set<Map.Entry<LoadPosition, Position.L>> positions = Display.getUpdateViewpoint().getPositions();
+            if (!positions.isEmpty()) {
+                renderPlanets(gl, positions, pointFactor);
             }
             center.renderPoints(gl, pointFactor);
             line.render(gl, vp.aspect, thickness);
@@ -89,7 +89,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        if (Display.getUpdateViewpoint() == UpdateViewpoint.equatorial) {
+        Set<Map.Entry<LoadPosition, Position.L>> positions = Display.getUpdateViewpoint().getPositions();
+        if (!positions.isEmpty()) {
             mouseX = e.getX();
             mouseY = e.getY();
             Camera camera = Display.getCamera();
@@ -99,7 +100,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
             double width = camera.getWidth(), minDist = 10;
             String name = null;
-            for (Map.Entry<LoadPosition, Position.L> entry : UpdateViewpoint.equatorial.getPositions()) {
+            for (Map.Entry<LoadPosition, Position.L> entry : positions) {
                 Position.L p = entry.getValue();
                 double deltaX = Math.abs(p.rad * Math.cos(p.lon) - v.x);
                 double deltaY = Math.abs(p.rad * Math.sin(p.lon) - v.y);
@@ -300,9 +301,6 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     }
 
     private void renderPlanets(GL2 gl, Set<Map.Entry<LoadPosition, Position.L>> positions, double pointFactor) {
-        if (positions.isEmpty())
-            return;
-
         int size = positions.size();
         FloatBuffer planetPosition = BufferUtils.newFloatBuffer(4 * size);
         FloatBuffer planetColor = BufferUtils.newFloatBuffer(4 * size);
