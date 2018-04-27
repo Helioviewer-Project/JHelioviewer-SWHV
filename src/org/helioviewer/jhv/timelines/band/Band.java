@@ -19,7 +19,7 @@ import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.timelines.propagation.PropagationModel;
-import org.helioviewer.jhv.timelines.propagation.PropagationModelLinear;
+import org.helioviewer.jhv.timelines.propagation.PropagationModelRadial;
 import org.json.JSONObject;
 
 public class Band extends AbstractTimelineLayer {
@@ -44,7 +44,7 @@ public class Band extends AbstractTimelineLayer {
         } else {
             bandCache = new BandCacheMinute();
         }
-        bandCache.setPropagationModel(new PropagationModelLinear(0));
+        bandCache.setPropagationModel(new PropagationModelRadial(0));
         bandType = _bandType;
         optionsPanel = new BandOptionPanel(this);
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getScale(bandType.getUnitLabel()));
@@ -255,7 +255,7 @@ public class Band extends AbstractTimelineLayer {
     }
 
     public void removePropagationModel() {
-        bandCache.setPropagationModel(new PropagationModelLinear(0));
+        bandCache.setPropagationModel(new PropagationModelRadial(0));
         isPropagated = false;
         DrawController.graphAreaChanged();
     }
