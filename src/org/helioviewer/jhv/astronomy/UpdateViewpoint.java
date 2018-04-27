@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.astronomy;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -18,14 +19,18 @@ public interface UpdateViewpoint {
     void clear();
     void setLoadPosition(LoadPosition _loadPosition);
     void unsetLoadPosition(LoadPosition _loadPosition);
+    Set<Map.Entry<LoadPosition, Position.L>> getPositions();
 
-    Observer observer = new Observer();
-    Earth earth = new Earth();
-    EarthFixedDistance earthFixedDistance = new EarthFixedDistance();
-    Equatorial equatorial = new Equatorial();
-    Expert expert = new Expert();
+    UpdateViewpoint observer = new Observer();
+    UpdateViewpoint earth = new Earth();
+    UpdateViewpoint earthFixedDistance = new EarthFixedDistance();
+    UpdateViewpoint equatorial = new Equatorial();
+    UpdateViewpoint expert = new Expert();
 
-    class Observer implements UpdateViewpoint {
+    abstract class AbstractUpdateViewpoint implements UpdateViewpoint {
+
+        private final Set<Map.Entry<LoadPosition, Position.L>> positions = Collections.emptySet();
+
         @Override
         public void clear() {
         }
@@ -38,6 +43,16 @@ public interface UpdateViewpoint {
         public void unsetLoadPosition(LoadPosition _loadPosition) {
         }
 
+        @Override
+        public Set<Map.Entry<LoadPosition, Position.L>> getPositions() {
+            return positions;
+        }
+
+        public abstract Position.Q update(JHVDate time);
+
+    }
+
+    class Observer extends AbstractUpdateViewpoint {
         @Override
         public Position.Q update(JHVDate time) {
             ImageLayer layer = Layers.getActiveImageLayer();
@@ -45,38 +60,14 @@ public interface UpdateViewpoint {
         }
     }
 
-    class Earth implements UpdateViewpoint {
-        @Override
-        public void clear() {
-        }
-
-        @Override
-        public void setLoadPosition(LoadPosition _loadPosition) {
-        }
-
-        @Override
-        public void unsetLoadPosition(LoadPosition _loadPosition) {
-        }
-
+    class Earth extends AbstractUpdateViewpoint {
         @Override
         public Position.Q update(JHVDate time) {
             return Sun.getEarthQuat(time);
         }
     }
 
-    class EarthFixedDistance implements UpdateViewpoint {
-        @Override
-        public void clear() {
-        }
-
-        @Override
-        public void setLoadPosition(LoadPosition _loadPosition) {
-        }
-
-        @Override
-        public void unsetLoadPosition(LoadPosition _loadPosition) {
-        }
-
+    class EarthFixedDistance extends AbstractUpdateViewpoint {
         @Override
         public Position.Q update(JHVDate time) {
             Position.L p = Sun.getEarth(time);
@@ -84,14 +75,10 @@ public interface UpdateViewpoint {
         }
     }
 
-    class Equatorial implements UpdateViewpoint {
+    class Equatorial extends AbstractUpdateViewpoint {
 
         private static final double distance = 2 * Sun.MeanEarthDistance / Math.tan(0.5 * Math.PI / 180);
         private final HashMap<LoadPosition, Position.L> loadMap = new HashMap<>();
-
-        public Set<Map.Entry<LoadPosition, Position.L>> getPositions() {
-            return loadMap.entrySet();
-        }
 
         @Override
         public void clear() {
@@ -107,6 +94,11 @@ public interface UpdateViewpoint {
         @Override
         public void unsetLoadPosition(LoadPosition loadPosition) {
             loadMap.remove(loadPosition);
+        }
+
+        @Override
+        public Set<Map.Entry<LoadPosition, Position.L>> getPositions() {
+            return loadMap.entrySet();
         }
 
         @Override
@@ -130,7 +122,7 @@ public interface UpdateViewpoint {
         }
     }
 
-    class Expert implements UpdateViewpoint {
+    class Expert extends AbstractUpdateViewpoint {
 
         private LoadPosition loadPosition;
 
