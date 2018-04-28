@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.timelines.propagation;
 
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.time.JHVDate;
 
 public class PropagationModelRadial implements PropagationModel {
 
@@ -29,7 +28,7 @@ public class PropagationModelRadial implements PropagationModel {
     }
 
     private double getInsituDistance(long ts) {
-        return Sun.getEarth(new JHVDate(ts)).rad * Sun.L1Factor;
+        return Sun.getEarthDistance(ts) * Sun.L1Factor;
     }
 
 }
