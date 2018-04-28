@@ -248,8 +248,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             start = xAxis.start;
             end = xAxis.end;
         } else {
-            start = tl.getDepropagatedTime(xAxis.start);
-            end = tl.getDepropagatedTime(xAxis.end);
+            start = tl.getInsituTime(xAxis.start);
+            end = tl.getInsituTime(xAxis.end);
         }
         long tickDifferenceHorizontal = (xAxis.end - xAxis.start) / (horizontalTickCount - 1);
 
@@ -257,7 +257,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         for (int i = 0; i < horizontalTickCount; ++i) {
             long tickValue = xAxis.start + i * tickDifferenceHorizontal;
             if (tl != null) {
-                tickValue = tl.getDepropagatedTime(tickValue);
+                tickValue = tl.getInsituTime(tickValue);
             }
 
             int x = value2pixel(graphArea.x, graphArea.width, tickValue, start, end);
