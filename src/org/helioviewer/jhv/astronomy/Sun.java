@@ -102,6 +102,28 @@ public class Sun {
         return new Position.L(time, dist * MeanEarthDistance, -he_lon, he_lat);
     }
 
+    public static double getEarthDistance(long milli) {
+        double mjd = JulianDay.milli2mjd(milli);
+        double t = JulianDay.mjd2jcy(mjd, 2415020.);
+
+        // Geometric Mean Longitude (deg)
+        // double mnl = 279.69668 + 36000.76892 * t + 0.0003025 * t * t;
+        // Mean anomaly (deg)
+        double mna = 358.47583 + 35999.04975 * t - 0.000150 * t * t - 0.0000033 * t * t * t;
+        // Eccentricity of orbit
+        double e = 0.01675104 - 0.0000418 * t - 0.000000126 * t * t;
+        // Sun's equation of center (deg)
+        double c = (1.919460 - 0.004789 * t - 0.000014 * t * t) * Math.sin(mna * MathUtils.degra) + (0.020094 - 0.000100 * t) * Math.sin(2 * mna * MathUtils.degra) + 0.000293 * Math.sin(3 * mna * MathUtils.degra);
+        // Sun's true geometric longitude (deg)
+        // double true_long = mnl + c;
+        // Sun's true anomaly (deg):
+        double ta = mna + c;
+        // Sun's radius vector (AU)
+        double dist = 1.0000002 * (1. - e * e) / (1. + e * Math.cos(ta * MathUtils.degra));
+
+        return dist * MeanEarthDistance;
+    }
+
     private static double sunRot(double mjd) {
         // 1854-01-01.5 / Carrington sidereal period 25.38
         return ((JulianDay.DJM0 - 2398220.) + mjd) * (2 * Math.PI / Carrington.CR_SIDEREAL); // rad
