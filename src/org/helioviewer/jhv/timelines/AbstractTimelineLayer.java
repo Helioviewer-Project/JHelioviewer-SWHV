@@ -40,7 +40,7 @@ public abstract class AbstractTimelineLayer implements TimelineLayer {
     }
 
     @Override
-    public long getDepropagatedTime(long time) {
+    public long getInsituTime(long time) {
         return time;
     }
 

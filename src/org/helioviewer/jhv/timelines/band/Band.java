@@ -243,8 +243,8 @@ public class Band extends AbstractTimelineLayer {
     }
 
     @Override
-    public long getDepropagatedTime(long time) {
-        return bandCache.getPropagationModel().getDepropagatedTime(time);
+    public long getInsituTime(long time) {
+        return bandCache.getPropagationModel().getInsituTime(time);
     }
 
     public void setPropagationModel(PropagationModel pm) {

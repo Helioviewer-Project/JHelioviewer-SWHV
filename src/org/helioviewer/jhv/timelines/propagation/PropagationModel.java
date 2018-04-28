@@ -4,8 +4,8 @@ public interface PropagationModel {
 
     boolean isPropagated();
 
-    long getDepropagatedTime(long ts);
+    long getInsituTime(long ts);
 
-    long getPropagatedTime(long ts);
+    long getSunTime(long ts);
 
 }

@@ -94,7 +94,7 @@ public class TimelineLayers extends AbstractTableModel {
         return null;
     }
 
-    public static int getNumberOfAxes() {
+    public static int getNumberOfYAxes() {
         int ct = 0;
         for (TimelineLayer tl : layers) {
             if (tl.showYAxis()) {

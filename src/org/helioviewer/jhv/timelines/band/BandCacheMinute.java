@@ -80,8 +80,8 @@ class BandCacheMinute implements BandCache {
 
     @Override
     public void createPolyLines(Rectangle graphArea, TimeAxis timeAxis, YAxis yAxis, ArrayList<GraphPolyline> graphPolylines) {
-        long keyEnd = date2key(propagationModel.getPropagatedTime(timeAxis.end));
-        long key = date2key(propagationModel.getPropagatedTime(timeAxis.start));
+        long keyEnd = date2key(propagationModel.getSunTime(timeAxis.end));
+        long key = date2key(propagationModel.getSunTime(timeAxis.start));
         int level = 0;
         double factor = 1;
         double elsz = 1. * MILLIS_PER_CHUNK / CHUNKED_SIZE * factor;
@@ -112,8 +112,7 @@ class BandCacheMinute implements BandCache {
                     tvalues.clear();
                     tdates.clear();
                 } else if (value > Float.MIN_VALUE) {
-                    tdates.add(timeAxis.value2pixel(graphArea.x, graphArea.width,
-                            propagationModel.getPropagatedTime(dates[i])));
+                    tdates.add(timeAxis.value2pixel(graphArea.x, graphArea.width, propagationModel.getSunTime(dates[i])));
                     tvalues.add(yAxis.value2pixel(graphArea.y, graphArea.height, value));
                 }
                 i++;
@@ -126,7 +125,7 @@ class BandCacheMinute implements BandCache {
 
     @Override
     public float getValue(long _ts) {
-        long ts = propagationModel.getDepropagatedTime(_ts);
+        long ts = propagationModel.getInsituTime(_ts);
         long key = date2key(ts);
         DataChunk cache = cacheMap.get(key);
         if (cache != null) {
