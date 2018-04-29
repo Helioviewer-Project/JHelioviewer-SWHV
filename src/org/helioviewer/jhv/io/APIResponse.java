@@ -27,7 +27,7 @@ public class APIResponse {
 
                 frames = new long[len];
                 for (int i = 0; i < len; i++)
-                    frames[i] = arr.getLong(i) * 1000L;
+                    frames[i] = arr.getLong(i); // seconds
                 data.put("frames", len); // don't log timestamps, modifies input
             }
 
