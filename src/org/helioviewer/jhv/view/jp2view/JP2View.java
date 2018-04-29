@@ -68,11 +68,13 @@ public class JP2View extends AbstractView {
 
         long frames[] = _response == null ? null : _response.getFrames();
         if (frames != null) {
-            long key = request == null ? 0 : ((long) (request.server + request.sourceId).hashCode()) << 32;
-            cacheKey = new long[frames.length];
+            long key = request == null ? 0 : ((long) request.sourceId) << 32;
+            int len = frames.length;
+            cacheKey = new long[len];
             if (key != 0)
-                for (int i = 0; i < frames.length; i++)
+                for (int i = 0; i < len; i++) {
                     cacheKey[i] = key + frames[i];
+                }
         } else
             cacheKey = new long[1];
 
@@ -110,7 +112,7 @@ public class JP2View extends AbstractView {
                     Log.warn(uri + ": expected " + (maxFrame + 1) + "frames, got " + frames.length);
                 for (int i = 0; i < Math.min(maxFrame + 1, frames.length); i++) {
                     JHVDate d = getFrameTime(i);
-                    if (d.milli != frames[i]) {
+                    if (d.milli != frames[i] * 1000) {
                         cacheKey[i] = 0; // uncacheable
                         Log.warn(uri + "[" + i + "]: expected " + d + ", got " + new JHVDate(frames[i]));
                     }
