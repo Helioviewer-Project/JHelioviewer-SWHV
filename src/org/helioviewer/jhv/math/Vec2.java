@@ -3,27 +3,25 @@ package org.helioviewer.jhv.math;
 import org.helioviewer.jhv.log.Log;
 
 public class Vec2 {
-    /**
-     * Predefined Vectors
-     */
-    public static final Vec2 ZERO = new Vec2(0.0, 0.0);
-    public static final Vec2 NEGATIVE_INFINITY_VECTOR = new Vec2(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
-    public static final Vec2 POSITIVE_INFINITY_VECTOR = new Vec2(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+
+//    public static final Vec2 ZERO = new Vec2(0.0, 0.0);
+//    public static final Vec2 NEGATIVE_INFINITY_VECTOR = new Vec2(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
+//    public static final Vec2 POSITIVE_INFINITY_VECTOR = new Vec2(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
     public static final Vec2 NAN_VECTOR = new Vec2(Double.NaN, Double.NaN);
 
-    /**
-     * Coordinates
-     */
     public double x;
     public double y;
-
-    // Constructors
 
     public Vec2(double x, double y) {
         this.x = x;
         this.y = y;
     }
 
+    public void clear() {
+        this.x = 0;
+        this.y = 0;
+    }
+/*
     public Vec2(Vec2 vector) {
         this.x = vector.x;
         this.y = vector.y;
@@ -39,11 +37,6 @@ public class Vec2 {
         }
         this.x = coordinates[0];
         this.y = coordinates[1];
-    }
-
-    public void clear() {
-        this.x = 0;
-        this.y = 0;
     }
 
     public void add(Vec2 vec) {
@@ -148,11 +141,11 @@ public class Vec2 {
     public Vec2 copy() {
         return new Vec2(this);
     }
-
+*/
     public boolean isApproxEqual(Vec2 vec, double tolerance) {
         return Math.abs(this.x - vec.x) <= tolerance && Math.abs(this.y - vec.y) <= tolerance;
     }
-
+/*
     public double length() {
         double absmax = Math.max(Math.abs(this.x), Math.abs(this.y));
         if (absmax == 0.0)
@@ -241,7 +234,7 @@ public class Vec2 {
     public static Vec2 componentMax(Vec2 v1, Vec2 v2) {
         return new Vec2(Math.max(v1.x, v2.x), Math.max(v1.y, v2.y));
     }
-
+*/
     @Override
     public boolean equals(Object o) {
         return o instanceof Vec2 && isApproxEqual((Vec2) o, 0.0);

@@ -48,6 +48,7 @@ public interface UpdateViewpoint {
             return positions;
         }
 
+        @Override
         public abstract Position.Q update(JHVDate time);
 
     }
