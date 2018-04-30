@@ -10,19 +10,14 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-/**
+/*
  * Allows to use syntax patterns of SimpleDateFormat for log file naming.
  * Overwrites the setFile method of FileAppender.
- * 
  * @author Andre Dau
- * 
  */
 public class TimestampRollingFileAppender extends FileAppender {
 
-    /**
-     * Denotes the maximum number of days to keep log files before they are
-     * deleted.
-     */
+    // Maximum number of days to keep log files before they are deleted
     private long days;
     private String directory;
     private String pattern;
@@ -69,10 +64,7 @@ public class TimestampRollingFileAppender extends FileAppender {
         return days;
     }
 
-    /**
-     * Deletes old log files older than the specified maximum age and calls
-     * underlying org.apache.log4j.FileAppender.activateOptions()
-     */
+    // Deletes old log files older than the specified maximum age and calls underlying org.apache.log4j.FileAppender.activateOptions()
     @Override
     public void activateOptions() {
         Date timeStamp;
@@ -84,7 +76,7 @@ public class TimestampRollingFileAppender extends FileAppender {
         }
         setFile(directory + formatter.format(timeStamp));
 
-        boolean deleteEmptyFile = (getThreshold() == Level.OFF) && !(new File(getFile()).exists());
+        boolean deleteEmptyFile = Level.OFF.equals(getThreshold()) && !new File(getFile()).exists();
 
         if (days != 0) {
             File fdir = new File(directory);

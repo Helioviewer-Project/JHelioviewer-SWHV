@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.base;
+package org.helioviewer.jhv.io;
 
 import java.net.Authenticator;
 import java.net.InetSocketAddress;
@@ -24,10 +24,9 @@ public class ProxySettings {
             _proxy = detectProxy(socksVars[0], socksVars[1], Proxy.Type.SOCKS);
         if (_proxy == null)
             _proxy = Proxy.NO_PROXY;
-
         proxy = _proxy;
 
-        if (proxy != Proxy.NO_PROXY) {
+        if (!Proxy.NO_PROXY.equals(proxy)) {
             Authenticator.setDefault(new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {

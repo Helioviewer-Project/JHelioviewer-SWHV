@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.math;
 
-import org.helioviewer.jhv.log.Log;
-
 public class Vec2 {
 
 //    public static final Vec2 ZERO = new Vec2(0.0, 0.0);

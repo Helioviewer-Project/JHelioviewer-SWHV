@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 
-//import org.helioviewer.jhv.base.ProxySettings;
+//import org.helioviewer.jhv.io.ProxySettings;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.view.jp2view.io.ByteChannelInputStream;
 import org.helioviewer.jhv.view.jp2view.io.LineRead;
