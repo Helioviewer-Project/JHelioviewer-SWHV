@@ -18,7 +18,7 @@ public class Camera {
     private double fov = INITFOV;
 
     private Quat rotation = Quat.ZERO;
-    private final Vec2 currentTranslation = new Vec2();
+    private final Vec2 currentTranslation = new Vec2(0, 0);
     private Quat currentDragRotation = Quat.ZERO;
     private double cameraWidth = 1;
 
