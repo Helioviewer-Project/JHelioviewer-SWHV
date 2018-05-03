@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutorService;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.base.image.MappedImageFactory;
 import org.helioviewer.jhv.base.image.NIOImageFactory;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
@@ -31,7 +32,7 @@ public class ExportMovie implements FrameListener {
     private static boolean stopped;
     private static boolean shallStop;
 
-    private final ExecutorService encodeExecutor = Executors.newFixedThreadPool(1, new JHVThread.NamedThreadFactory("Movie Encode"));
+    private final ExecutorService encodeExecutor = Executors.newSingleThreadExecutor(new JHVThread.NamedThreadFactory("Movie Encode"));
 
     public static BufferedImage EVEImage = null;
     public static int EVEMovieLinePosition = -1;
@@ -50,7 +51,7 @@ public class ExportMovie implements FrameListener {
 
     private void exportMovieFinish(GL2 gl) {
         ImageViewerGui.getGLListener().detachExport();
-        MoviePanel.recordPanelSetEnabled(true);
+        MoviePanel.setEnabledOptions(true);
 
         try {
             grabber.dispose(gl);
@@ -67,8 +68,8 @@ public class ExportMovie implements FrameListener {
         }
 
         try {
-            BufferedImage screen = NIOImageFactory.createCompatible(grabber.w, exporter.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
-            grabber.renderFrame(camera, gl, NIOImageFactory.getByteBuffer(screen));
+            BufferedImage screen = MappedImageFactory.createCompatible(grabber.w, exporter.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+            grabber.renderFrame(camera, gl, MappedImageFactory.getByteBuffer(screen));
             BufferedImage eve = EVEImage == null ? null : NIOImageFactory.copyImage(EVEImage);
             encodeExecutor.execute(new FrameConsumer(exporter, screen, grabber.h, eve, EVEMovieLinePosition));
         } catch (Exception e) {
@@ -103,7 +104,7 @@ public class ExportMovie implements FrameListener {
 
         stopped = false;
 
-        MoviePanel.recordPanelSetEnabled(false);
+        MoviePanel.setEnabledOptions(false);
 
         grabber = new GLGrab(canvasWidth, canvasHeight);
         ImageViewerGui.getGLListener().attachExport(instance);
@@ -181,7 +182,7 @@ public class ExportMovie implements FrameListener {
                 if (eveImage != null)
                     NIOImageFactory.free(eveImage);
                 movieExporter.encode(mainImage);
-                NIOImageFactory.free(mainImage);
+                MappedImageFactory.free(mainImage);
             } catch (Exception e) {
                 e.printStackTrace();
             }

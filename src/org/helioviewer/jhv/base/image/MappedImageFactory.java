@@ -45,28 +45,11 @@ import java.nio.ByteBuffer;
  * @author last modified by $Author: haraldk$
  * @version $Id: MappedImageFactory.java,v 1.0 May 26, 2010 5:07:01 PM haraldk Exp$
  */
-public final class MappedImageFactory {
+public class MappedImageFactory {
 
     // TODO: Create a way to do ColorConvertOp (or other color space conversion) on these images. 
     // - Current implementation of CCOp delegates to internal sun.awt classes that assumes java.awt.DataBufferByte for type byte buffers :-/
     // - Might be possible (but slow) to copy parts to memory and do CCOp on these copies
-
-    /* Constants for DirectColorModel masks, from BufferedImage. */
-/*
-    private static final int DCM_RED_MASK = 0x00ff0000;
-    private static final int DCM_GREEN_MASK = 0x0000ff00;
-    private static final int DCM_BLUE_MASK = 0x000000ff;
-    private static final int DCM_ALPHA_MASK = 0xff000000;
-    private static final int DCM_565_RED_MASK = 0xf800;
-    private static final int DCM_565_GRN_MASK = 0x07E0;
-    private static final int DCM_565_BLU_MASK = 0x001F;
-    private static final int DCM_555_RED_MASK = 0x7C00;
-    private static final int DCM_555_GRN_MASK = 0x03E0;
-    private static final int DCM_555_BLU_MASK = 0x001F;
-    private static final int DCM_BGR_RED_MASK = 0x0000ff;
-    private static final int DCM_BGR_GRN_MASK = 0x00ff00;
-    private static final int DCM_BGR_BLU_MASK = 0xff0000;
-*/
 
     private MappedImageFactory() {
     }
@@ -107,7 +90,7 @@ public final class MappedImageFactory {
             throw new IncompatibleClassChangeError("Not a MappedFileBuffer byte backed image");
     }
 
-    public static void free(BufferedImage img) throws IOException {
+    public static void free(BufferedImage img) {
         DataBuffer buffer = img.getRaster().getDataBuffer();
         if (buffer instanceof MappedFileBuffer) {
             ((MappedFileBuffer) buffer).free();
