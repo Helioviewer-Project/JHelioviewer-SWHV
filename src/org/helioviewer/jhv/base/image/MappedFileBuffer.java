@@ -36,7 +36,6 @@ import java.nio.*;
 import java.nio.channels.FileChannel;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.base.BufferUtils;
 
 /**
  * A {@code DataBuffer} implementation that is backed by a memory mapped file.
@@ -52,18 +51,16 @@ abstract class MappedFileBuffer extends DataBuffer {
 
     private Buffer buffer;
 
-    private MappedFileBuffer(final int type, final int size, final int numBanks) throws IOException {
+    private MappedFileBuffer(int type, int size, int numBanks) throws IOException {
         super(type, size, numBanks);
 
         int componentSize = DataBuffer.getDataTypeSize(type) / 8;
-        // Create temp file to get a file handle to use for memory mapping
         File tempFile = File.createTempFile("mfilebuf", null, JHVGlobals.exportCacheDir);
 
         try (RandomAccessFile raf = new RandomAccessFile(tempFile, "rw"); FileChannel channel = raf.getChannel()) {
             long length = ((long) size) * componentSize * numBanks;
             raf.setLength(length);
 
-            // Map entire file into memory, let OS virtual memory/paging do the heavy lifting
             ByteBuffer byteBuffer = channel.map(FileChannel.MapMode.READ_WRITE, 0, length).order(ByteOrder.nativeOrder());
             switch (type) {
                 case DataBuffer.TYPE_BYTE:
@@ -78,10 +75,8 @@ abstract class MappedFileBuffer extends DataBuffer {
                 default:
                     throw new IllegalArgumentException("Unsupported data type: " + type);
             }
-        // According to the docs, we can safely close the channel and delete the file now
         } finally {
-            // NOTE: File can't be deleted right now on Windows, as the file is open. Let JVM clean up later
-            if (!tempFile.delete()) {
+            if (!tempFile.delete()) { // NOTE: File can't be deleted right now on Windows, as the file is open. Let JVM clean up later
                 tempFile.deleteOnExit();
             }
         }
