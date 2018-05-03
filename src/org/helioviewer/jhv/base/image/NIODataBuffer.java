@@ -3,8 +3,6 @@ package org.helioviewer.jhv.base.image;
 import java.awt.image.DataBuffer;
 import java.nio.*;
 
-import org.helioviewer.jhv.base.BufferUtils;
-
 abstract class NIODataBuffer extends DataBuffer {
 
     private Buffer buffer;
