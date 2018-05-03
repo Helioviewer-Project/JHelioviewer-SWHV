@@ -156,8 +156,9 @@ public class JHVRelatedEvents implements ClickableDrawable {
     }
 
     void swapEvent(JHVEvent event, Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
+        int eid = event.getUniqueID();
         int i = 0;
-        while (events.get(i).getUniqueID() != event.getUniqueID()) {
+        while (events.get(i).getUniqueID() != eid) {
             i++;
         }
         events.remove(i);

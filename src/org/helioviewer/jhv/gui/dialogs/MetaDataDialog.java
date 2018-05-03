@@ -182,7 +182,8 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
 
         // write the child nodes recursively
         NodeList children = node.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
+        int len = children.getLength();
+        for (int i = 0; i < len; i++) {
             Node child = children.item(i);
             if (child.getNodeType() == Node.ELEMENT_NODE) {
                 readXMLData(fitsModel, hvSB, child);

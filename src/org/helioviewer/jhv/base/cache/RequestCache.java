@@ -72,14 +72,15 @@ public class RequestCache {
     }
 
     private static ArrayList<Interval> merge(ArrayList<Interval> intervals) {
-        if (intervals.size() <= 1) // cannot be null
+        int size = intervals.size();
+        if (size <= 1) // cannot be null
             return intervals;
 
         Collections.sort(intervals);
 
         ArrayList<Interval> result = new ArrayList<>();
         Interval prev = intervals.get(0);
-        for (int i = 1; i < intervals.size(); i++) {
+        for (int i = 1; i < size; i++) {
             Interval curr = intervals.get(i);
             if (prev.end >= curr.start) {
                 prev = new Interval(prev.start, Math.max(prev.end, curr.end));

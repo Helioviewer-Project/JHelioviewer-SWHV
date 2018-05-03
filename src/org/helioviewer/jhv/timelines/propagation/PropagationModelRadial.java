@@ -27,7 +27,7 @@ public class PropagationModelRadial implements PropagationModel {
         return isPropagated ? ts - (long) (getInsituDistance(ts) * radiusMilli + .5) : ts;
     }
 
-    private double getInsituDistance(long ts) {
+    private static double getInsituDistance(long ts) {
         return Sun.getEarthDistance(ts) * Sun.L1Factor;
     }
 

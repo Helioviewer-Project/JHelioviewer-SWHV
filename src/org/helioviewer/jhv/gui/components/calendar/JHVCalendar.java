@@ -353,7 +353,8 @@ class JHVCalendar extends JPanel {
             table.getTableHeader().setVisible(showHeader);
             // add a cell renderer to all cells which shows cell content centered
             TableCellRenderer cellRenderer = new CenterTableCellRenderer();
-            for (int i = 0; i < table.getColumnCount(); i++) {
+            int columnCount = table.getColumnCount();
+            for (int i = 0; i < columnCount; i++) {
                 table.getColumnModel().getColumn(i).setCellRenderer(cellRenderer);
             }
 
@@ -412,7 +413,8 @@ class JHVCalendar extends JPanel {
          */
         void resizeTableColumnWidth() {
             JTableHeader tableHeader = table.getTableHeader();
-            for (int i = 0; i < tableHeader.getColumnModel().getColumnCount(); i++) {
+            int columnCount = tableHeader.getColumnModel().getColumnCount();
+            for (int i = 0; i < columnCount; i++) {
                 tableHeader.getColumnModel().getColumn(i).setWidth(table.getColumnModel().getColumn(i).getWidth());
             }
         }
