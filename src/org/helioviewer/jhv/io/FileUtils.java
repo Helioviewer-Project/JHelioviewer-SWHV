@@ -57,7 +57,7 @@ public class FileUtils {
         Files.walkFileTree(dir.toPath(), nukeVisitor);
     }
 
-    private static final String lockSuffix = ".lock";
+    private static final String lockSuffix = ".lck";
 
     public static File tempDir(File parent, String name) throws IOException {
         // delete all directories without a lock file

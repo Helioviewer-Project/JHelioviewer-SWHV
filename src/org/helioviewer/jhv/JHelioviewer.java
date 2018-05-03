@@ -75,6 +75,7 @@ public class JHelioviewer {
         // Set the platform system properties
         SystemProperties.setPlatform();
         System.setProperty("newt.window.icons", "null,null");
+        System.setProperty("org.sqlite.tmpdir", JHVGlobals.libCacheDir.toString());
 
         FitsFactory.setUseHierarch(true);
 
