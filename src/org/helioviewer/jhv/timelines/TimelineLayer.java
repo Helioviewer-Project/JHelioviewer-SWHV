@@ -49,6 +49,8 @@ public interface TimelineLayer {
 
     void resetAxis();
 
+    boolean highLightChanged(Point p);
+
     @Nullable
     String getStringValue(long ts);
 
