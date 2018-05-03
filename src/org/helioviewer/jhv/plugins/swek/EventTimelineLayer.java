@@ -75,20 +75,22 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
         eventUnderMouse = null;
         for (SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap : events.values()) {
             for (JHVRelatedEvents event : eventMap.values()) {
+                long eventStart = event.getStart();
+                long eventEnd = event.getEnd();
                 int i = 0;
-                while (i < nrLines && endDates.get(i) >= event.getStart()) {
+                while (i < nrLines && endDates.get(i) >= eventStart) {
                     i++;
                 }
                 if (i == nrLines) {
-                    endDates.add(event.getEnd());
+                    endDates.add(eventEnd);
                 } else {
-                    endDates.set(i, event.getEnd());
+                    endDates.set(i, eventEnd);
                 }
                 int eventPosition = i;
                 nrLines = Math.max(nrLines, endDates.size());
 
-                int x0 = xAxis.value2pixel(graphArea.x, graphArea.width, event.getStart());
-                int x1 = xAxis.value2pixel(graphArea.x, graphArea.width, event.getEnd());
+                int x0 = xAxis.value2pixel(graphArea.x, graphArea.width, eventStart);
+                int x1 = xAxis.value2pixel(graphArea.x, graphArea.width, eventEnd);
                 JHVRelatedEvents rEvent = drawEvent(graphArea, event, x0, x1, eventPosition, g, mousePosition);
                 if (rEvent != null) {
                     eventUnderMouse = new EventPlotConfiguration(rEvent, x0, x1, eventPosition);
