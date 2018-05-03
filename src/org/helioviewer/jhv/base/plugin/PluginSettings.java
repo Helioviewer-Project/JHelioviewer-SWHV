@@ -178,7 +178,8 @@ public class PluginSettings {
     @Nullable
     private static Node findNode(Node root, String compareValue) {
         NodeList list = ((Element) root).getElementsByTagName(PLUGIN_NAME);
-        for (int i = 0; i < list.getLength(); i++) {
+        int len = list.getLength();
+        for (int i = 0; i < len; i++) {
             Node child = list.item(i).getFirstChild();
             if (child != null && child.getNodeType() == Node.TEXT_NODE && child.getNodeValue().equals(compareValue)) {
                 return list.item(i).getParentNode();

@@ -87,7 +87,8 @@ public class SpaceObjectContainer extends JScrollPane {
         grid.setRowHeight(getGridRowHeight(grid));
 
         uv.clear();
-        for (int i = 0; i < ja.length(); i++)
+        int len = ja.length();
+        for (int i = 0; i < len; i++)
             selectObject(SpaceObject.get(ja.optString(i, "Earth")));
     }
 

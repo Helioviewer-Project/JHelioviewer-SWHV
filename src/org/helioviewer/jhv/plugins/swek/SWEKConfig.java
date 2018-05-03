@@ -49,7 +49,8 @@ class SWEKConfig {
 
     private static void parseSources(JSONObject obj) {
         JSONArray sourcesArray = obj.getJSONArray("sources");
-        for (int i = 0; i < sourcesArray.length(); i++) {
+        int len = sourcesArray.length();
+        for (int i = 0; i < len; i++) {
             SWEKSource source = parseSource(sourcesArray.getJSONObject(i));
             if (source != null) {
                 sources.put(source.getName(), source);
@@ -82,7 +83,8 @@ class SWEKConfig {
 
     private static void parseGroups(JSONObject obj) {
         JSONArray eventJSONArray = obj.getJSONArray("events_types");
-        for (int i = 0; i < eventJSONArray.length(); i++) {
+        int len = eventJSONArray.length();
+        for (int i = 0; i < len; i++) {
             SWEKGroup group = parseGroup(eventJSONArray.getJSONObject(i));
             groups.put(group.getName(), group);
             orderedGroups.add(group);

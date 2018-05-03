@@ -38,7 +38,8 @@ public class BandType {
     private Scale scale = Scale.Linear;
 
     static void loadBandTypes(JSONArray jo) {
-        for (int i = 0; i < jo.length(); i++) {
+        int len = jo.length();
+        for (int i = 0; i < len; i++) {
             BandType bandtype = new BandType(jo.getJSONObject(i));
             if (groups.containsKey(bandtype.group))
                 groups.get(bandtype.group).add(bandtype);
@@ -173,4 +174,3 @@ public class BandType {
     }
 
 }
-

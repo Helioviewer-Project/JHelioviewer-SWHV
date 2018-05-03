@@ -98,7 +98,8 @@ class HEKParser {
     }
 
     private static void parseRefs(JHVEvent currentEvent, JSONArray refs) throws JSONException {
-        for (int i = 0; i < refs.length(); i++) {
+        int len = refs.length();
+        for (int i = 0; i < len; i++) {
             parseRef(currentEvent, refs.getJSONObject(i));
         }
     }
