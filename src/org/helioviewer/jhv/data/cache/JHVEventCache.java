@@ -75,7 +75,6 @@ public class JHVEventCache {
         }
         if (event != null) {
             event.highlight(true);
-
         }
         if (lastHighlighted != null) {
             lastHighlighted.highlight(false);

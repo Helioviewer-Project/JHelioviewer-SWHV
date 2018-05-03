@@ -72,8 +72,8 @@ public class RequestCache {
     }
 
     private static ArrayList<Interval> merge(ArrayList<Interval> intervals) {
-        int size = intervals.size();
-        if (size <= 1) // cannot be null
+        int size = intervals.size(); // cannot be null
+        if (size <= 1)
             return intervals;
 
         Collections.sort(intervals);
