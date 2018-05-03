@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.timelines;
 
+import java.awt.Point;
+
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
@@ -20,6 +22,11 @@ public abstract class AbstractTimelineLayer implements TimelineLayer {
 
     @Override
     public void yaxisChanged() {
+    }
+
+    @Override
+    public boolean highLightChanged(Point p) {
+        return false;
     }
 
     @Nullable

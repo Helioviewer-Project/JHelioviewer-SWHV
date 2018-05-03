@@ -487,6 +487,15 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         return movieLinePosition >= 0 && movieLinePosition - 3 <= p.x && p.x <= movieLinePosition + 3;
     }
 
+    private boolean highlightChanged(Point p) {
+        for (TimelineLayer tl : TimelineLayers.get()) {
+            if (tl.highLightChanged(p)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public void mouseMoved(MouseEvent e) {
         mousePosition = e.getPoint();
@@ -500,7 +509,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             setCursor(Cursor.getDefaultCursor());
         }
 
-        repaint(); // for timeline values
+        if (highlightChanged(mousePosition)) {
+            drawRequest();
+        } else {
+            repaint(); // for timeline values
+        }
     }
 
     @Override
