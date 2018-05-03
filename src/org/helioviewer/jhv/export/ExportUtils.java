@@ -7,7 +7,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 
-import org.helioviewer.jhv.base.image.NIOImageFactory;
+import org.helioviewer.jhv.base.image.MappedImageFactory;
 import org.helioviewer.jhv.opengl.GLInfo;
 
 class ExportUtils {
@@ -16,7 +16,7 @@ class ExportUtils {
         int w = 3 * img.getWidth(); // assume bgr
         byte[] line1 = new byte[w];
         byte[] line2 = new byte[w];
-        ByteBuffer data = NIOImageFactory.getByteBuffer(img);
+        ByteBuffer data = MappedImageFactory.getByteBuffer(img);
 
         for (int i = 0; i < h / 2; i++) {
             data.position(w * i);

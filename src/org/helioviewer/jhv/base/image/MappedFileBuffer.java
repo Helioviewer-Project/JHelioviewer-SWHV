@@ -31,12 +31,12 @@ package org.helioviewer.jhv.base.image;
 import java.awt.image.DataBuffer;
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.*;
+import java.nio.channels.FileChannel;
 
 import org.helioviewer.jhv.JHVGlobals;
-
-import xerial.larray.mmap.MMapBuffer;
-import xerial.larray.mmap.MMapMode;
+import org.helioviewer.jhv.base.BufferUtils;
 
 /**
  * A {@code DataBuffer} implementation that is backed by a memory mapped file.
@@ -49,18 +49,22 @@ import xerial.larray.mmap.MMapMode;
  * @see java.nio.channels.FileChannel#map(java.nio.channels.FileChannel.MapMode, long, long)
  */
 abstract class MappedFileBuffer extends DataBuffer {
-    private final Buffer buffer;
-    private final MMapBuffer mmapBuffer;
 
-    private MappedFileBuffer(int type, int size, int numBanks) throws IOException {
+    private Buffer buffer;
+
+    private MappedFileBuffer(final int type, final int size, final int numBanks) throws IOException {
         super(type, size, numBanks);
 
         int componentSize = DataBuffer.getDataTypeSize(type) / 8;
-        long length = ((long) size) * componentSize * numBanks;
-        File tempFile = File.createTempFile("mfilebuf", null, JHVGlobals.MMapCacheDir);
-        try {
-            mmapBuffer = new MMapBuffer(tempFile, 0, length, MMapMode.READ_WRITE);
-            ByteBuffer byteBuffer = mmapBuffer.toDirectByteBuffer(0, (int) length).order(ByteOrder.nativeOrder());
+        // Create temp file to get a file handle to use for memory mapping
+        File tempFile = File.createTempFile("mfilebuf", null, JHVGlobals.exportCacheDir);
+
+        try (RandomAccessFile raf = new RandomAccessFile(tempFile, "rw"); FileChannel channel = raf.getChannel()) {
+            long length = ((long) size) * componentSize * numBanks;
+            raf.setLength(length);
+
+            // Map entire file into memory, let OS virtual memory/paging do the heavy lifting
+            ByteBuffer byteBuffer = channel.map(FileChannel.MapMode.READ_WRITE, 0, length).order(ByteOrder.nativeOrder());
             switch (type) {
                 case DataBuffer.TYPE_BYTE:
                     buffer = byteBuffer;
@@ -74,9 +78,11 @@ abstract class MappedFileBuffer extends DataBuffer {
                 default:
                     throw new IllegalArgumentException("Unsupported data type: " + type);
             }
+        // According to the docs, we can safely close the channel and delete the file now
         } finally {
+            // NOTE: File can't be deleted right now on Windows, as the file is open. Let JVM clean up later
             if (!tempFile.delete()) {
-                tempFile.deleteOnExit(); // NOTE: File can't be deleted right now on Windows, as the file is open. Let JVM clean up later
+                tempFile.deleteOnExit();
             }
         }
     }
@@ -85,8 +91,8 @@ abstract class MappedFileBuffer extends DataBuffer {
         return buffer;
     }
 
-    void free() throws IOException {
-        mmapBuffer.close();
+    void free() {
+        buffer = null;
     }
 
     @Override
