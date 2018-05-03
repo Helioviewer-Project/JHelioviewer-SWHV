@@ -42,6 +42,7 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
             "<li><a href=\"https://jogamp.org\">JogAmp</a> libraries for Java 3D Graphics.</li>" +
             "<li><a href=\"https://github.com/stleary/JSON-java\">JSON</a> in Java library.</li>" +
             "<li>JSON <a href=\"https://github.com/everit-org/json-schema\">Schema Validator</a> library.</li>" +
+            "<li><a href=\"http://www.ehcache.org\">Ehcache</a> library.</li>" +
             "<li><a href=\"https://github.com/xerial/sqlite-jdbc\">Xerial</a> SQLite JDBC driver.</li>" +
             "<li><a href=\"http://jcodec.org\">JCodec</a>, a pure Java video codec library.</li>" +
             "<li><a href=\"http://www.star.bristol.ac.uk/%7Embt/jsamp/index.html\">JSAMP</a> toolkit for the Simple Applications Messaging Protocol.</li>" +
@@ -50,8 +51,8 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
             "<li><a href=\"https://github.com/google/guava\">Guava</a>, Google Core Libraries for Java.</li>" +
             "<li><a href=\"https://github.com/square/okio\">Okio</a> and <a href=\"https://github.com/square/okhttp\">OkHttp</a> libraries by Square, Inc.</li>" +
             "<li><a href=\"http://nom-tam-fits.github.io/nom-tam-fits\">FITS</a> in Java public domain library.</li>" +
-            "<li><a href=\"https://github.com/xerial/larray\">LArray</a> large off-heap arrays library.</li>" +
-            "<li><a href=\"http://logging.apache.org/log4j/index.html\">log4j</a> logging library.</li>";
+            "<li><a href=\"http://logging.apache.org/log4j/index.html\">log4j</a> logging library.</li>" +
+            "<li><a href=\"https://github.com/haraldk/TwelveMonkeys/blob/master/sandbox/sandbox-common/src/main/java/com/twelvemonkeys/image/MappedImageFactory.java\">MappedImageFactory</a>, ©2010, Harald Kuhr.</li>";
 
         JTextPane pane = new JTextPane();
         pane.setContentType("text/html");

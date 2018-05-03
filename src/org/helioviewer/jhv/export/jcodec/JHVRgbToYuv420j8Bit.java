@@ -3,7 +3,7 @@ package org.helioviewer.jhv.export.jcodec;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 
-import org.helioviewer.jhv.base.image.NIOImageFactory;
+import org.helioviewer.jhv.base.image.MappedImageFactory;
 
 import org.jcodec.common.model.Picture;
 import org.jcodec.common.tools.MathUtil;
@@ -24,7 +24,7 @@ public class JHVRgbToYuv420j8Bit {
         int[][] out = new int[4][3];
 
         byte[] bgr = new byte[3];
-        ByteBuffer data = NIOImageFactory.getByteBuffer(img);
+        ByteBuffer data = MappedImageFactory.getByteBuffer(img);
 
         int x, y = 0, h = img.getHeight(), w = img.getWidth();
         int offChr = 0, offLuma = 0, strideDst = dst.getWidth();

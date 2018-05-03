@@ -442,7 +442,8 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
             recordButton.doClick();
     }
 
-    public static void recordPanelSetEnabled(boolean enabled) {
+    public static void setEnabledOptions(boolean enabled) {
+        ComponentUtils.setEnabled(modePanel, enabled);
         ComponentUtils.setEnabled(recordPanel, enabled);
     }
 
