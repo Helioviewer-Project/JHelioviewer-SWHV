@@ -33,14 +33,13 @@ import org.helioviewer.jhv.view.jp2view.image.ImageParams;
 import org.helioviewer.jhv.view.jp2view.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPCache;
 import org.helioviewer.jhv.view.jp2view.kakadu.JHV_KduException;
-import org.helioviewer.jhv.view.jp2view.kakadu.KakaduMeta;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduSource;
 
 // This class is responsible for reading and decoding of JPEG2000 images
 public class JP2View extends AbstractView {
 
     private int targetFrame = 0;
-    private int trueFrame = -1;
+    private int trueFrame = 0;
 
     private int fps;
     private int fpsCount;
@@ -55,6 +54,8 @@ public class JP2View extends AbstractView {
     private J2KReader reader;
     private JPIPCache cacheReader;
     private Kdu_cache cacheRender;
+
+    private final KakaduSource kduReader;
 
     public JP2View(URI _uri, APIRequest _request, APIResponse _response) throws Exception {
         super(_uri, _request);
@@ -88,7 +89,7 @@ public class JP2View extends AbstractView {
                     throw new JHV_KduException(scheme + " scheme not supported!");
             }
 
-            KakaduSource kduReader = new KakaduSource(cacheReader, uri);
+            kduReader = new KakaduSource(cacheReader, uri);
 
             maxFrame = kduReader.getNumberLayers() - 1;
             metaData = new MetaData[maxFrame + 1];
@@ -413,8 +414,7 @@ public class JP2View extends AbstractView {
     // very slow
     @Override
     public String getXMLMetaData() throws Exception {
-        KakaduSource kduTmp = new KakaduSource(cacheReader, uri);
-        return KakaduMeta.getXml(kduTmp.getFamilySrc(), trueFrame + 1);
+        return kduReader.extractXMLString(trueFrame);
     }
 
 }

@@ -3,6 +3,7 @@ package org.helioviewer.jhv.view.jp2view.kakadu;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 
 import javax.annotation.Nullable;
 
@@ -32,9 +33,9 @@ import org.helioviewer.jhv.view.jp2view.image.ResolutionSet;
 
 public class KakaduSource {
 
-    private final Jp2_threadsafe_family_src familySrc = new Jp2_threadsafe_family_src();
+    private final Jp2_threadsafe_family_src familySrc = new Jp2_threadsafe_family_src(); // reference has to be maintained
     private final Jpx_source jpxSrc;
-    private final Kdu_region_compositor compositor;
+    private Kdu_region_compositor compositor;
 
     public KakaduSource(Kdu_cache cache, URI uri) throws KduException, IOException {
         if (cache == null) { // local
@@ -46,14 +47,11 @@ public class KakaduSource {
 
         jpxSrc = new Jpx_source();
         jpxSrc.Open(familySrc, false);
-        compositor = createCompositor(jpxSrc);
     }
 
-    public Jp2_threadsafe_family_src getFamilySrc() {
-        return familySrc;
-    }
-
-    public Kdu_region_compositor getCompositor() {
+    public Kdu_region_compositor getCompositor() throws KduException {
+        if (compositor == null)
+            compositor = createCompositor(jpxSrc);
         return compositor;
     }
 
@@ -179,6 +177,7 @@ public class KakaduSource {
         compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
         compositor.Set_thread_env(null, null);
         compositor.Native_destroy();
+        compositor = null;
     }
 
     private static final long[] xmlFilter = { Kdu_global.jp2_xml_4cc };
@@ -190,12 +189,40 @@ public class KakaduSource {
 
         Jp2_input_box xmlBox = new Jp2_input_box();
         while ((node = metaManager.Peek_and_clear_touched_nodes(1, xmlFilter, node)).Exists()) {
+            if (i == metaDataList.length)
+                return;
             if (node.Open_existing(xmlBox)) {
-                metaDataList[i] = new XMLMetaDataContainer(KakaduMeta.xmlBox2xml(xmlBox)).getHVMetaData(i);
+                metaDataList[i] = new XMLMetaDataContainer(xmlBox2String(xmlBox)).getHVMetaData(i);
                 xmlBox.Close();
-                i++;
             }
+            i++;
         }
+    }
+
+    public String extractXMLString(int frame) throws KduException {
+        Jpx_meta_manager metaManager = jpxSrc.Access_meta_manager();
+        Jpx_metanode node = new Jpx_metanode();
+        int i = 0;
+
+        Jp2_input_box xmlBox = new Jp2_input_box();
+        while ((node = metaManager.Peek_and_clear_touched_nodes(1, xmlFilter, node)).Exists()) {
+            if (i == frame && node.Open_existing(xmlBox)) {
+                String meta = xmlBox2String(xmlBox);
+                xmlBox.Close();
+                return meta;
+            }
+            i++;
+        }
+        return "<meta/>";
+    }
+
+    private static String xmlBox2String(Jp2_input_box xmlBox) throws KduException {
+        int len = (int) xmlBox.Get_remaining_bytes();
+        if (len <= 0)
+            return "<meta/>";
+        byte[] buf = new byte[len];
+        xmlBox.Read(buf, len);
+        return new String(buf, StandardCharsets.UTF_8).trim().replace("&", "&amp;");
     }
 
 }
