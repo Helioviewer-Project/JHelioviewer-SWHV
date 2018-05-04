@@ -3,12 +3,14 @@ package org.helioviewer.jhv.view.jp2view;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
+import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
 import kdu_jni.Kdu_compositor_buf;
 import kdu_jni.Kdu_coords;
 import kdu_jni.Kdu_dims;
 import kdu_jni.Kdu_global;
 import kdu_jni.Kdu_ilayer_ref;
+import kdu_jni.Kdu_quality_limiter;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
 
@@ -18,7 +20,6 @@ import org.helioviewer.jhv.imagedata.Single8ImageData;
 import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.view.jp2view.image.ImageParams;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduConstants;
-import org.helioviewer.jhv.view.jp2view.kakadu.KakaduSource;
 
 class J2KRender implements Runnable {
 
@@ -27,16 +28,18 @@ class J2KRender implements Runnable {
 
     private static final ThreadLocal<int[]> localArray = ThreadLocal.withInitial(() -> new int[KakaduConstants.MAX_RENDER_SAMPLES]);
     private static final ThreadLocal<Kdu_thread_env> localThread = ThreadLocal.withInitial(J2KRender::createThreadEnv);
-    private static final ThreadLocal<KakaduSource> localSource = new ThreadLocal<>();
+    private static final ThreadLocal<Kdu_region_compositor> localCompositor = new ThreadLocal<>();
 
     private final JP2View view;
     private final ImageParams params;
     private final boolean discard;
+    private final boolean abolish;
 
-    J2KRender(JP2View _view, ImageParams _currParams, boolean _discard) {
+    J2KRender(JP2View _view, ImageParams _currParams, boolean _discard, boolean _abolish) {
         view = _view;
         params = _currParams;
         discard = _discard;
+        abolish = _abolish;
     }
 
     private void renderLayer(Kdu_region_compositor compositor) throws KduException {
@@ -136,17 +139,25 @@ class J2KRender implements Runnable {
 
     @Override
     public void run() {
+        if (abolish) {
+            abolish();
+            return;
+        }
+
+        Kdu_region_compositor krc = null;
         try {
-            KakaduSource kduSource = localSource.get();
-            if (kduSource == null) {
-                kduSource = view.newRenderSource();
-                kduSource.getCompositor().Set_thread_env(localThread.get(), null);
-                localSource.set(kduSource);
+            krc = localCompositor.get();
+            if (krc == null) {
+                krc = createCompositor(view.getSource().getJpxSource());
+                krc.Set_thread_env(localThread.get(), null);
+                localCompositor.set(krc);
             }
-            renderLayer(kduSource.getCompositor());
+            renderLayer(krc);
         } catch (Exception e) {
             // reboot the compositor
-            localSource.set(null);
+            if (krc != null)
+                destroyCompositor(krc);
+            localCompositor.set(null);
             localThread.remove();
             e.printStackTrace();
         }
@@ -177,6 +188,40 @@ class J2KRender implements Runnable {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private static Kdu_region_compositor createCompositor(Jpx_source jpx) throws KduException {
+        Kdu_region_compositor krc = new Kdu_region_compositor();
+        // System.out.println(">>>> compositor create " + krc + " " + Thread.currentThread().getName());
+        krc.Create(jpx, KakaduConstants.CODESTREAM_CACHE_THRESHOLD);
+        krc.Set_surface_initialization_mode(false);
+        krc.Set_quality_limiting(new Kdu_quality_limiter(1f/256), -1, -1);
+        return krc;
+    }
+
+    private static void destroyCompositor(Kdu_region_compositor krc) {
+        try {
+            // System.out.println(">>>> compositor destroy " + krc + " " + Thread.currentThread().getName());
+            krc.Halt_processing();
+            krc.Remove_ilayer(new Kdu_ilayer_ref(), true);
+            krc.Set_thread_env(null, null);
+            krc.Native_destroy();
+        } catch (KduException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void abolish() {
+        try {
+            Kdu_region_compositor krc = localCompositor.get();
+            if (krc != null)
+                destroyCompositor(krc);
+            localCompositor.set(null);
+            localThread.get().Destroy();
+            localThread.set(null);
+        } catch (KduException e) {
+            e.printStackTrace();
+        }
     }
 
 }

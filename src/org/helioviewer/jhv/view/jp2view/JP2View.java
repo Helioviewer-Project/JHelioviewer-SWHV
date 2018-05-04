@@ -8,7 +8,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nullable;
 
 import kdu_jni.KduException;
-import kdu_jni.Kdu_cache;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Region;
@@ -48,12 +47,10 @@ public class JP2View extends AbstractView {
     private final RenderExecutor executor = new RenderExecutor();
     private final int maxFrame;
     private final CacheStatus cacheStatus;
+    private final KakaduSource kduSource;
 
     private J2KReader reader;
-    private JPIPCache cacheReader;
-    private Kdu_cache cacheRender;
-
-    private final KakaduSource kduReader;
+    private JPIPCache jpipCache;
 
     public JP2View(URI _uri, APIRequest _request, APIResponse _response) throws Exception {
         super(_uri, _request);
@@ -74,10 +71,7 @@ public class JP2View extends AbstractView {
             String scheme = uri.getScheme().toLowerCase();
             switch (scheme) {
                 case "jpip":
-                    cacheReader = new JPIPCache();
-                    cacheRender = new Kdu_cache();
-                    cacheRender.Attach_to(cacheReader);
-                    // cache.Set_preferred_memory_limit(60 * 1024 * 1024);
+                    jpipCache = new JPIPCache();
                     reader = new J2KReader(this);
                     break;
                 case "file":
@@ -87,12 +81,11 @@ public class JP2View extends AbstractView {
                     throw new IOException(scheme + " scheme not supported!");
             }
 
-            kduReader = new KakaduSource(cacheReader, uri);
-
-            maxFrame = kduReader.getNumberLayers() - 1;
+            kduSource = new KakaduSource(jpipCache, uri);
+            maxFrame = kduSource.getNumberLayers() - 1;
             metaData = new MetaData[maxFrame + 1];
 
-            kduReader.extractMetaData(metaData);
+            kduSource.extractMetaData(metaData);
             for (int i = 0; i <= maxFrame; i++) {
                 if (metaData[i] == null)
                     metaData[i] = new PixelBasedMetaData(256, 256, i); // tbd real size
@@ -110,14 +103,14 @@ public class JP2View extends AbstractView {
                 }
             }
 
-            int[] lut = kduReader.getLUT();
+            int[] lut = kduSource.getLUT();
             if (lut != null)
                 builtinLUT = new LUT(getName() + " built-in", lut);
 
-            if (cacheReader == null)
-                cacheStatus = new CacheStatusLocal(kduReader, maxFrame);
+            if (jpipCache == null)
+                cacheStatus = new CacheStatusLocal(kduSource, maxFrame);
             else { // remote
-                cacheStatus = new CacheStatusRemote(kduReader, maxFrame);
+                cacheStatus = new CacheStatusRemote(kduSource, maxFrame);
                 reader.start();
             }
         } catch (KduException e) {
@@ -160,19 +153,14 @@ public class JP2View extends AbstractView {
 
     private void kduDestroy() {
         try {
-            if (cacheRender != null) {
-                cacheRender.Close();
-                cacheRender.Native_destroy();
-            }
-            if (cacheReader != null) {
-                cacheReader.Close();
-                cacheReader.Native_destroy();
+            if (jpipCache != null) {
+                jpipCache.Close();
+                jpipCache.Native_destroy();
             }
         } catch (KduException e) {
             e.printStackTrace();
         } finally {
-            cacheRender = null;
-            cacheReader = null;
+            jpipCache = null;
         }
     }
 
@@ -331,9 +319,9 @@ public class JP2View extends AbstractView {
         });
     }
 
-    KakaduSource newRenderSource() throws KduException, IOException {
+    KakaduSource getSource() {
         Thread.currentThread().setName("Render " + getName());
-        return new KakaduSource(cacheRender, uri);
+        return kduSource;
     }
 
     protected void signalReader(ImageParams params) {
@@ -400,7 +388,7 @@ public class JP2View extends AbstractView {
     }
 
     JPIPCache getJPIPCache() {
-        return cacheReader;
+        return jpipCache;
     }
 
     CacheStatus getCacheStatus() {
@@ -410,7 +398,7 @@ public class JP2View extends AbstractView {
     // very slow
     @Override
     public String getXMLMetaData() throws Exception {
-        return kduReader.extractXMLString(trueFrame);
+        return kduSource.extractXMLString(trueFrame);
     }
 
 }

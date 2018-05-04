@@ -31,11 +31,13 @@ class RenderExecutor {
 
     void execute(JP2View view, ImageParams params, boolean discard) {
         blockingQueue.poll();
-        executor.execute(new J2KRender(view, params, discard));
+        executor.execute(new J2KRender(view, params, discard, false));
     }
 
     void abolish() {
         try {
+            blockingQueue.poll();
+            executor.execute(new J2KRender(null, null, false, true));
             executor.shutdown();
             while (!executor.awaitTermination(1000L, TimeUnit.MILLISECONDS)) ;
         } catch (Exception ignore) {

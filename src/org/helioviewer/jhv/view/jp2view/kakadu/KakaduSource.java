@@ -22,9 +22,6 @@ import kdu_jni.Kdu_codestream;
 import kdu_jni.Kdu_coords;
 import kdu_jni.Kdu_dims;
 import kdu_jni.Kdu_global;
-import kdu_jni.Kdu_ilayer_ref;
-import kdu_jni.Kdu_quality_limiter;
-import kdu_jni.Kdu_region_compositor;
 
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.metadata.MetaData;
@@ -35,7 +32,6 @@ public class KakaduSource {
 
     private final Jp2_threadsafe_family_src familySrc = new Jp2_threadsafe_family_src(); // reference has to be maintained
     private final Jpx_source jpxSrc;
-    private Kdu_region_compositor compositor;
 
     public KakaduSource(Kdu_cache cache, URI uri) throws KduException, IOException {
         if (cache == null) { // local
@@ -49,10 +45,8 @@ public class KakaduSource {
         jpxSrc.Open(familySrc, false);
     }
 
-    public Kdu_region_compositor getCompositor() throws KduException {
-        if (compositor == null)
-            compositor = createCompositor(jpxSrc);
-        return compositor;
+    public Jpx_source getJpxSource() {
+        return jpxSrc;
     }
 
     public int getNumberLayers() throws KduException {
@@ -132,52 +126,6 @@ public class KakaduSource {
             lut[i] = 0xFF000000 | ((int) ((red[i] + 0.5f) * 0xFF) << 16) | ((int) ((green[i] + 0.5f) * 0xFF) << 8) | ((int) ((blue[i] + 0.5f) * 0xFF));
         }
         return lut;
-    }
-
-    /*
-     * Deactivates the internal color lookup table for the given composition layer
-     *
-     * It is not allowed to call this function for a layer which is not loaded yet.
-     *
-     * @param numLayer
-     *            composition layer to deactivate internal color lookup for
-     */
-    /*
-        in preservation - not needed
-        void deactivateColorLookupTable(int numLayer) throws KduException {
-            for (int i = 0; i < numLUTs; i++) {
-                jpxSrc.Access_layer(numLayer).Access_channels().Set_colour_mapping(i, 0, -1, numLayer);
-            }
-        }
-    */
-
-    @Override
-    protected void finalize() throws Throwable {
-        try {
-            destroyCompositor(compositor);
-            compositor = null;
-        } catch (KduException e) {
-            e.printStackTrace();
-        } finally {
-            super.finalize();
-        }
-    }
-
-    private static Kdu_region_compositor createCompositor(Jpx_source jpx) throws KduException {
-        Kdu_region_compositor krc = new Kdu_region_compositor();
-        // System.out.println(">>>> compositor create " + compositor + " " + Thread.currentThread().getName());
-        krc.Create(jpx, KakaduConstants.CODESTREAM_CACHE_THRESHOLD);
-        krc.Set_surface_initialization_mode(false);
-        krc.Set_quality_limiting(new Kdu_quality_limiter(1f/256), -1, -1);
-        return krc;
-    }
-
-    private static void destroyCompositor(Kdu_region_compositor krc) throws KduException {
-        // System.out.println(">>>> compositor destroy " + compositor + " " + Thread.currentThread().getName());
-        krc.Halt_processing();
-        krc.Remove_ilayer(new Kdu_ilayer_ref(), true);
-        krc.Set_thread_env(null, null);
-        krc.Native_destroy();
     }
 
     private static final long[] xmlFilter = { Kdu_global.jp2_xml_4cc };
