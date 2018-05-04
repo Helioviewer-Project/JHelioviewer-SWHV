@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.view.jp2view.io.jpip;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVGlobals;
@@ -57,7 +58,7 @@ public class JPIPCacheManager {
         return null;
     }
 
-    public static void put(long key, int level, JPIPStream stream) {
+    public static void put(long key, int level, @Nonnull JPIPStream stream) {
         if (key != 0) {
             try {
                 Integer clevel = levelCache.get(key);

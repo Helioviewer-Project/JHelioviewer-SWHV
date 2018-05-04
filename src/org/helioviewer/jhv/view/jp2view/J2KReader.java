@@ -186,8 +186,8 @@ class J2KReader implements Runnable {
                         completeSteps++;
                         stepQuerys[currentStep] = null;
 
-                        if (res != null) // downloaded
-                            JPIPCacheManager.put(key, level, cache.get(currentStep));
+                        if (res != null && res.isResponseComplete() && (stream = cache.get(currentStep)) != null) // downloaded
+                            JPIPCacheManager.put(key, level, stream);
                         cacheStatus.setFrameComplete(currentStep, level); // tell the cache status
                         if (singleFrame)
                             view.signalRenderFromReader(params); // refresh current image
