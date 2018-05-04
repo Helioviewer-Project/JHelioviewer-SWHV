@@ -32,7 +32,6 @@ import org.helioviewer.jhv.view.jp2view.cache.CacheStatusRemote;
 import org.helioviewer.jhv.view.jp2view.image.ImageParams;
 import org.helioviewer.jhv.view.jp2view.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPCache;
-import org.helioviewer.jhv.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduSource;
 
 // This class is responsible for reading and decoding of JPEG2000 images
@@ -86,7 +85,7 @@ public class JP2View extends AbstractView {
                     // nothing
                     break;
                 default:
-                    throw new JHV_KduException(scheme + " scheme not supported!");
+                    throw new IOException(scheme + " scheme not supported!");
             }
 
             kduReader = new KakaduSource(cacheReader, uri);
@@ -124,7 +123,7 @@ public class JP2View extends AbstractView {
             }
         } catch (KduException e) {
             e.printStackTrace();
-            throw new JHV_KduException("Failed to create Kakadu machinery: " + e.getMessage(), e);
+            throw new IOException("Failed to create Kakadu machinery: " + e.getMessage(), e);
         }
     }
 
