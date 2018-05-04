@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 
 import kdu_jni.KduException;
 import kdu_jni.Kdu_cache;
-import kdu_jni.Kdu_thread_env;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Region;
@@ -332,11 +331,9 @@ public class JP2View extends AbstractView {
         });
     }
 
-    KakaduSource getRenderSource(Kdu_thread_env threadEnv) throws KduException, IOException {
+    KakaduSource newRenderSource() throws KduException, IOException {
         Thread.currentThread().setName("Render " + getName());
-        KakaduSource source = new KakaduSource(cacheRender, uri);
-        source.getCompositor().Set_thread_env(threadEnv, null);
-        return source;
+        return new KakaduSource(cacheRender, uri);
     }
 
     protected void signalReader(ImageParams params) {

@@ -23,22 +23,18 @@ import org.helioviewer.jhv.view.jp2view.kakadu.KakaduSource;
 class J2KRender implements Runnable {
 
     private static final int MAX_INACTIVE_LAYERS = 200;
+    private static final int[] firstComponent = { 0 };
 
     private static final ThreadLocal<int[]> localArray = ThreadLocal.withInitial(() -> new int[KakaduConstants.MAX_RENDER_SAMPLES]);
     private static final ThreadLocal<Kdu_thread_env> localThread = ThreadLocal.withInitial(J2KRender::createThreadEnv);
     private static final ThreadLocal<KakaduSource> localSource = new ThreadLocal<>();
 
-    private static final int[] firstComponent = { 0 };
-
-    // A reference to the JP2View this object is owned by
-    private final JP2View viewRef;
-
+    private final JP2View view;
     private final ImageParams params;
-
     private final boolean discard;
 
-    J2KRender(JP2View _viewRef, ImageParams _currParams, boolean _discard) {
-        viewRef = _viewRef;
+    J2KRender(JP2View _view, ImageParams _currParams, boolean _discard) {
+        view = _view;
         params = _currParams;
         discard = _discard;
     }
@@ -51,7 +47,7 @@ class J2KRender implements Runnable {
 
         SubImage subImage = params.subImage;
         int frame = params.frame;
-        int numComponents = viewRef.getNumComponents(frame);
+        int numComponents = view.getNumComponents(frame);
 
         Kdu_ilayer_ref ilayer;
         if (numComponents < 3) {
@@ -135,7 +131,7 @@ class J2KRender implements Runnable {
         } else {
             data = new ARGBInt32ImageData(aWidth, aHeight, IntBuffer.wrap(intBuffer));
         }
-        viewRef.setDataFromRender(params, data);
+        view.setDataFromRender(params, data);
     }
 
     @Override
@@ -143,7 +139,8 @@ class J2KRender implements Runnable {
         try {
             KakaduSource kduSource = localSource.get();
             if (kduSource == null) {
-                kduSource = viewRef.getRenderSource(localThread.get());
+                kduSource = view.newRenderSource();
+                kduSource.getCompositor().Set_thread_env(localThread.get(), null);
                 localSource.set(kduSource);
             }
             renderLayer(kduSource.getCompositor());
