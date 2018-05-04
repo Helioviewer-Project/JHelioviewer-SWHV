@@ -7,6 +7,7 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.jp2view.cache.CacheStatus;
 import org.helioviewer.jhv.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.jhv.view.jp2view.image.ImageParams;
+import org.helioviewer.jhv.view.jp2view.io.jpip.DatabinMap;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPCache;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPConstants;
@@ -17,34 +18,29 @@ import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPStream;
 
 class J2KReader implements Runnable {
 
-    // The thread that this object runs on
+    private final BooleanSignal readerSignal = new BooleanSignal(false);
+
+    private final JP2View view;
+    private final JPIPCache cache;
     private final Thread myThread;
 
     // A boolean flag used for stopping the thread
     private volatile boolean isAbolished;
 
-    // A reference to the JP2View this object is owned by
-    private final JP2View viewRef;
-
-    private final JPIPCache cacheRef;
-    private final CacheStatus cacheStatusRef;
-
     private JPIPSocket socket;
 
-    private final BooleanSignal readerSignal = new BooleanSignal(false);
+    J2KReader(JP2View _view) throws IOException {
+        view = _view;
 
-    private final int numFrames;
+        cache = view.getJPIPCache();
+        socket = new JPIPSocket(view.getURI(), cache);
+        initJPIP(cache);
 
-    J2KReader(JP2View _viewRef) {
-        viewRef = _viewRef;
-
-        numFrames = viewRef.getMaximumFrameNumber() + 1;
-        cacheRef = viewRef.getJPIPCache();
-        cacheStatusRef = viewRef.getCacheStatus();
-        socket = viewRef.getSocket();
-
-        myThread = new Thread(this, "Reader " + viewRef.getName());
+        myThread = new Thread(this, "Reader " + view.getName());
         myThread.setDaemon(true);
+    }
+
+    void start() {
         myThread.start();
     }
 
@@ -70,11 +66,43 @@ class J2KReader implements Runnable {
         readerSignal.signal(params);
     }
 
+    private static final int mainHeaderKlass = DatabinMap.getKlass(JPIPConstants.MAIN_HEADER_DATA_BIN_CLASS);
+
+    private void initJPIP(JPIPCache cache) throws IOException {
+        try {
+            JPIPResponse res;
+            String req = JPIPQuery.create(JPIPConstants.META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
+            do {
+                res = socket.send(req, cache, 0);
+            } while (!res.isResponseComplete());
+
+            // prime first image
+            req = JPIPQuery.create(JPIPConstants.MAX_REQUEST_LEN, "stream", "0", "fsiz", "64,64,closest", "rsiz", "64,64", "roff", "0,0");
+            do {
+                res = socket.send(req, cache, 0);
+            } while (!res.isResponseComplete() && !cache.isDataBinCompleted(mainHeaderKlass, 0, 0));
+        } catch (Exception e) {
+            initCloseSocket();
+            throw new IOException("Error in the server communication: " + e.getMessage(), e);
+        }
+    }
+
+    private void initCloseSocket() {
+        if (socket != null) {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                Log.error("J2KReader.initJPIP() > Error closing socket.", e);
+            }
+            socket = null;
+        }
+    }
+
     private static String createQuery(String fSiz, int layer) {
         return JPIPQuery.create(JPIPConstants.MAX_REQUEST_LEN, "stream", String.valueOf(layer), "fsiz", fSiz + ",closest", "rsiz", fSiz, "roff", "0,0");
     }
 
-    private String[] createMultiQuery(String fSiz) {
+    private String[] createMultiQuery(String fSiz, int numFrames) {
         String[] stepQuerys = new String[numFrames];
         for (int lpi = 0; lpi < numFrames; lpi++) {
             stepQuerys[lpi] = createQuery(fSiz, lpi);
@@ -84,13 +112,16 @@ class J2KReader implements Runnable {
 
     @Override
     public void run() {
+        int numFrames = view.getMaximumFrameNumber() + 1;
+        CacheStatus cacheStatus = view.getCacheStatus();
+
         while (!isAbolished) {
             ImageParams params;
             // wait for signal
             try {
-                viewRef.setDownloading(false);
+                view.setDownloading(false);
                 params = readerSignal.waitForSignal();
-                viewRef.setDownloading(true);
+                view.setDownloading(true);
             } catch (InterruptedException e) {
                 continue;
             }
@@ -98,7 +129,7 @@ class J2KReader implements Runnable {
             try {
                 if (socket.isClosed()) {
                     // System.out.println(">>> reconnect");
-                    socket = new JPIPSocket(viewRef.getURI(), cacheRef);
+                    socket = new JPIPSocket(view.getURI(), cache);
                 }
 
                 int frame = params.frame;
@@ -118,9 +149,9 @@ class J2KReader implements Runnable {
                     stepQuerys = new String[] { createQuery(fSiz, frame) };
                     currentStep = frame;
                 } else {
-                    stepQuerys = createMultiQuery(fSiz);
+                    stepQuerys = createMultiQuery(fSiz, numFrames);
 
-                    int partial = cacheStatusRef.getPartialUntil();
+                    int partial = cacheStatus.getPartialUntil();
                     currentStep = partial < numFrames - 1 ? partial : frame;
                 }
 
@@ -138,13 +169,13 @@ class J2KReader implements Runnable {
                     }
 
                     // receive and add data to cache
-                    long key = viewRef.getCacheKey(currentStep);
+                    long key = view.getCacheKey(currentStep);
                     JPIPResponse res = null;
                     JPIPStream stream = JPIPCacheManager.get(key, level);
                     if (stream != null)
-                        cacheRef.put(currentStep, stream);
+                        cache.put(currentStep, stream);
                     else
-                        res = socket.send(stepQuerys[currentStep], cacheRef, currentStep);
+                        res = socket.send(stepQuerys[currentStep], cache, currentStep);
 
                     //if (res == null)
                     //    System.out.println(">> hit " + viewRef.getURI() + " " + currentStep + " " + level);
@@ -156,12 +187,12 @@ class J2KReader implements Runnable {
                         stepQuerys[currentStep] = null;
 
                         if (res != null) // downloaded
-                            JPIPCacheManager.put(key, level, cacheRef.get(currentStep));
-                        cacheStatusRef.setFrameComplete(currentStep, level); // tell the cache status
+                            JPIPCacheManager.put(key, level, cache.get(currentStep));
+                        cacheStatus.setFrameComplete(currentStep, level); // tell the cache status
                         if (singleFrame)
-                            viewRef.signalRenderFromReader(params); // refresh current image
+                            view.signalRenderFromReader(params); // refresh current image
                     } else {
-                        cacheStatusRef.setFramePartial(currentStep); // tell the cache status
+                        cacheStatus.setFramePartial(currentStep); // tell the cache status
                     }
 
                     UITimer.cacheStatusChanged();
@@ -176,8 +207,8 @@ class J2KReader implements Runnable {
                     }
                 }
                 // suicide if fully done
-                if (cacheStatusRef.isComplete(0)) {
-                    viewRef.setDownloading(false);
+                if (cacheStatus.isComplete(0)) {
+                    view.setDownloading(false);
                     try {
                         socket.close();
                     } catch (IOException ignore) {
@@ -186,7 +217,7 @@ class J2KReader implements Runnable {
                 }
 
                 // if single frame & not interrupted & incomplete -> signal again to go on reading
-                if (singleFrame && !stopReading && !cacheStatusRef.isComplete(level)) {
+                if (singleFrame && !stopReading && !cacheStatus.isComplete(level)) {
                     params.priority = false;
                     readerSignal.signal(params);
                 }
@@ -201,7 +232,7 @@ class J2KReader implements Runnable {
                 if (retries++ < 13)
                     readerSignal.signal(params); // signal to retry
                 else
-                    Log.error("Retry limit reached: " + viewRef.getURI()); // something may be terribly wrong
+                    Log.error("Retry limit reached: " + view.getURI()); // something may be terribly wrong
             }
         }
     }

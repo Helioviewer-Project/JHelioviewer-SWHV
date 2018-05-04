@@ -31,12 +31,7 @@ import org.helioviewer.jhv.view.jp2view.cache.CacheStatusLocal;
 import org.helioviewer.jhv.view.jp2view.cache.CacheStatusRemote;
 import org.helioviewer.jhv.view.jp2view.image.ImageParams;
 import org.helioviewer.jhv.view.jp2view.image.ResolutionSet.ResolutionLevel;
-import org.helioviewer.jhv.view.jp2view.io.jpip.DatabinMap;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPCache;
-import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPConstants;
-import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPResponse;
-import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPQuery;
-import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPSocket;
 import org.helioviewer.jhv.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduMeta;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduSource;
@@ -61,8 +56,6 @@ public class JP2View extends AbstractView {
     private JPIPCache cacheReader;
     private Kdu_cache cacheRender;
 
-    private JPIPSocket socket;
-
     public JP2View(URI _uri, APIRequest _request, APIResponse _response) throws Exception {
         super(_uri, _request);
 
@@ -86,7 +79,7 @@ public class JP2View extends AbstractView {
                     cacheRender = new Kdu_cache();
                     cacheRender.Attach_to(cacheReader);
                     // cache.Set_preferred_memory_limit(60 * 1024 * 1024);
-                    initJPIP(cacheReader);
+                    reader = new J2KReader(this);
                     break;
                 case "file":
                     // nothing
@@ -123,11 +116,11 @@ public class JP2View extends AbstractView {
             if (lut != null)
                 builtinLUT = new LUT(getName() + " built-in", lut);
 
-            if (cacheReader != null) { // remote
-                cacheStatus = new CacheStatusRemote(kduReader, maxFrame);
-                reader = new J2KReader(this);
-            } else {
+            if (cacheReader == null)
                 cacheStatus = new CacheStatusLocal(kduReader, maxFrame);
+            else { // remote
+                cacheStatus = new CacheStatusRemote(kduReader, maxFrame);
+                reader.start();
             }
         } catch (KduException e) {
             e.printStackTrace();
@@ -135,43 +128,8 @@ public class JP2View extends AbstractView {
         }
     }
 
-    public long getCacheKey(int frame) {
+    long getCacheKey(int frame) {
         return frame < 0 || frame >= cacheKey.length ? 0 : cacheKey[frame];
-    }
-
-    private static final int mainHeaderKlass = DatabinMap.getKlass(JPIPConstants.MAIN_HEADER_DATA_BIN_CLASS);
-
-    private void initJPIP(JPIPCache cache) throws JHV_KduException {
-        try {
-            // Connect to the JPIP server and add the necessary initial data (the main header as well as the metadata) to cache
-            socket = new JPIPSocket(uri, cache);
-
-            JPIPResponse res;
-            String req = JPIPQuery.create(JPIPConstants.META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
-            do {
-                res = socket.send(req, cache, 0);
-            } while (!res.isResponseComplete());
-
-            // prime first image
-            req = JPIPQuery.create(JPIPConstants.MAX_REQUEST_LEN, "stream", "0", "fsiz", "64,64,closest", "rsiz", "64,64", "roff", "0,0");
-            do {
-                res = socket.send(req, cache, 0);
-            } while (!res.isResponseComplete() && !cache.isDataBinCompleted(mainHeaderKlass, 0, 0));
-        } catch (IOException e) {
-            initCloseSocket();
-            throw new JHV_KduException("Error in the server communication: " + e.getMessage(), e);
-        }
-    }
-
-    private void initCloseSocket() {
-        if (socket != null) {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                Log.error("JP2Image.initRemote() > Error closing socket.", e);
-            }
-            socket = null;
-        }
     }
 
     // if instance was built before cancelling
@@ -439,23 +397,6 @@ public class JP2View extends AbstractView {
 
     public ResolutionLevel getResolutionLevel(int frame, int level) {
         return cacheStatus.getResolutionSet(frame).getResolutionLevel(level);
-    }
-
-    /**
-     * Returns the socket, if in remote mode.
-     *
-     * The socket is returned only one time. After calling this function for the
-     * first time, it will always return null.
-     *
-     * @return Socket connected to the server
-     */
-    JPIPSocket getSocket() {
-        if (socket == null)
-            return null;
-
-        JPIPSocket output = socket;
-        socket = null;
-        return output;
     }
 
     int getNumComponents(int frame) {
