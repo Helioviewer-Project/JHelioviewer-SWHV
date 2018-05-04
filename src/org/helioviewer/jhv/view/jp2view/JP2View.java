@@ -93,8 +93,7 @@ public class JP2View extends AbstractView {
             maxFrame = kduReader.getNumberLayers() - 1;
             metaData = new MetaData[maxFrame + 1];
 
-            //kduReader.cacheMetaData(metaData);
-            KakaduMeta.cacheMetaData(kduReader.getFamilySrc(), metaData);
+            kduReader.extractMetaData(metaData);
             for (int i = 0; i <= maxFrame; i++) {
                 if (metaData[i] == null)
                     metaData[i] = new PixelBasedMetaData(256, 256, i); // tbd real size

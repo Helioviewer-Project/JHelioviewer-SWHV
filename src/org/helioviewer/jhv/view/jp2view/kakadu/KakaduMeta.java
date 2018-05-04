@@ -8,9 +8,6 @@ import kdu_jni.Jp2_locator;
 import kdu_jni.KduException;
 import kdu_jni.Kdu_global;
 
-import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
-
 /**
  * @author caplins
  * @author Benjamin Wamsler
@@ -198,64 +195,6 @@ public class KakaduMeta {
             return new String(buf, StandardCharsets.UTF_8).trim().replace("&", "&amp;");
         } catch (KduException ex) {
             throw new JHV_KduException("Kakadu core error: " + ex.getMessage(), ex);
-        }
-    }
-
-    private static boolean myFindBox2(Jp2_input_box box, Jp2_input_box supBox, long boxType, int boxNumber) throws JHV_KduException {
-        try {
-            if (!box.Open(supBox))
-                throw new JHV_KduException("Box not open: " + boxNumber);
-
-            int i = 1;
-            while ((box.Get_box_type() != boxType || i < boxNumber) && box.Exists()) {
-                if (box.Get_box_type() == boxType)
-                    i++;
-                box.Close();
-                box.Open_next();
-            }
-            if (!box.Exists() || box.Get_box_type() != boxType) {
-                return false;
-            }
-        } catch (KduException ex) {
-            throw new JHV_KduException("Internal Kakadu Error(myFindBox2 " + boxNumber + "): " + ex.getMessage(), ex);
-        }
-        return true;
-    }
-
-    public static void cacheMetaData(Jp2_family_src src, MetaData[] metaDataList) throws Exception {
-        Jp2_input_box xmlBox = new Jp2_input_box();
-        Jp2_input_box[] findBoxResult = findBox(src, Kdu_global.jp2_association_4cc, 1);
-        Jp2_input_box assocBox = findBoxResult[0];
-        if (assocBox != null) {
-            for (int i = 0; i < metaDataList.length; i++) {
-                try {
-                    if (myFindBox2(xmlBox, assocBox, Kdu_global.jp2_xml_4cc, 1)) {
-                        metaDataList[i] = new XMLMetaDataContainer(xmlBox2xml(xmlBox)).getHVMetaData(i);
-                    }
-
-                    xmlBox.Close();
-                    assocBox.Close();
-                    assocBox.Open_next();
-                } catch (KduException ex) {
-                    throw new JHV_KduException("Kakadu core error: " + ex.getMessage(), ex);
-                }
-            }
-        } else { // JP2
-            findBoxResult = findBox(src, Kdu_global.jp2_xml_4cc, 1);
-            xmlBox = findBoxResult[0];
-            if (xmlBox != null) {
-                metaDataList[0] = new XMLMetaDataContainer(xmlBox2xml(xmlBox)).getHVMetaData(0);
-            }
-        }
-
-        if (xmlBox != null) {
-            xmlBox.Native_destroy();
-        }
-        if (findBoxResult[1] != null) {
-            findBoxResult[1].Native_destroy();
-        }
-        if (findBoxResult[0] != null) {
-            findBoxResult[0].Native_destroy();
         }
     }
 
