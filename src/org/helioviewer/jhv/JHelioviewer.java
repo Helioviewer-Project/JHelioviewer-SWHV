@@ -76,6 +76,7 @@ public class JHelioviewer {
         SystemProperties.setPlatform();
         System.setProperty("newt.window.icons", "null,null");
         System.setProperty("org.sqlite.tmpdir", JHVGlobals.libCacheDir.toString());
+        // if (true) throw new NullPointerException("This is a Sentry test");
 
         FitsFactory.setUseHierarch(true);
 
