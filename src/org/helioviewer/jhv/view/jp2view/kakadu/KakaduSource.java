@@ -155,6 +155,7 @@ public class KakaduSource {
     protected void finalize() throws Throwable {
         try {
             destroyCompositor(compositor);
+            compositor = null;
         } catch (KduException e) {
             e.printStackTrace();
         } finally {
@@ -163,21 +164,20 @@ public class KakaduSource {
     }
 
     private static Kdu_region_compositor createCompositor(Jpx_source jpx) throws KduException {
-        Kdu_region_compositor compositor = new Kdu_region_compositor();
+        Kdu_region_compositor krc = new Kdu_region_compositor();
         // System.out.println(">>>> compositor create " + compositor + " " + Thread.currentThread().getName());
-        compositor.Create(jpx, KakaduConstants.CODESTREAM_CACHE_THRESHOLD);
-        compositor.Set_surface_initialization_mode(false);
-        compositor.Set_quality_limiting(new Kdu_quality_limiter(1f/256), -1, -1);
-        return compositor;
+        krc.Create(jpx, KakaduConstants.CODESTREAM_CACHE_THRESHOLD);
+        krc.Set_surface_initialization_mode(false);
+        krc.Set_quality_limiting(new Kdu_quality_limiter(1f/256), -1, -1);
+        return krc;
     }
 
-    private static void destroyCompositor(Kdu_region_compositor compositor) throws KduException {
+    private static void destroyCompositor(Kdu_region_compositor krc) throws KduException {
         // System.out.println(">>>> compositor destroy " + compositor + " " + Thread.currentThread().getName());
-        compositor.Halt_processing();
-        compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
-        compositor.Set_thread_env(null, null);
-        compositor.Native_destroy();
-        compositor = null;
+        krc.Halt_processing();
+        krc.Remove_ilayer(new Kdu_ilayer_ref(), true);
+        krc.Set_thread_env(null, null);
+        krc.Native_destroy();
     }
 
     private static final long[] xmlFilter = { Kdu_global.jp2_xml_4cc };
