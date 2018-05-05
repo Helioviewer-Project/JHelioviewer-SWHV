@@ -34,7 +34,7 @@ class J2KReader implements Runnable {
 
         cache = view.getJPIPCache();
         socket = new JPIPSocket(view.getURI(), cache);
-        initJPIP(cache);
+        initJPIP();
 
         myThread = new Thread(this, "Reader " + view.getName());
         myThread.setDaemon(true);
@@ -68,7 +68,7 @@ class J2KReader implements Runnable {
 
     private static final int mainHeaderKlass = DatabinMap.getKlass(JPIPConstants.MAIN_HEADER_DATA_BIN_CLASS);
 
-    private void initJPIP(JPIPCache cache) throws IOException {
+    private void initJPIP() throws IOException {
         try {
             JPIPResponse res;
             String req = JPIPQuery.create(JPIPConstants.META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
@@ -102,7 +102,7 @@ class J2KReader implements Runnable {
         return JPIPQuery.create(JPIPConstants.MAX_REQUEST_LEN, "stream", String.valueOf(layer), "fsiz", fSiz + ",closest", "rsiz", fSiz, "roff", "0,0");
     }
 
-    private String[] createMultiQuery(String fSiz, int numFrames) {
+    private static String[] createMultiQuery(String fSiz, int numFrames) {
         String[] stepQuerys = new String[numFrames];
         for (int lpi = 0; lpi < numFrames; lpi++) {
             stepQuerys[lpi] = createQuery(fSiz, lpi);
