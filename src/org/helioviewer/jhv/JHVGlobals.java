@@ -117,15 +117,17 @@ public class JHVGlobals {
         }
 
         try {
-            libCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "lib");
-            fileCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "file");
-            clientCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "client");
-            exportCacheDir = FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "export");
+            File cacheDir = JHVDirectory.CACHE.getFile();
+            libCacheDir = FileUtils.tempDir(cacheDir, "lib");
+            fileCacheDir = FileUtils.tempDir(cacheDir, "file");
+            clientCacheDir = FileUtils.tempDir(cacheDir, "client");
+            exportCacheDir = FileUtils.tempDir(cacheDir, "export");
         } catch (Exception e) {
-            libCacheDir = new File(System.getProperty("java.io.tmpdir"));
-            fileCacheDir = new File(System.getProperty("java.io.tmpdir"));
-            clientCacheDir = new File(System.getProperty("java.io.tmpdir"));
-            exportCacheDir = new File(System.getProperty("java.io.tmpdir"));
+            String cacheDir = System.getProperty("java.io.tmpdir");
+            libCacheDir = new File(cacheDir);
+            fileCacheDir = new File(cacheDir);
+            clientCacheDir = new File(cacheDir);
+            exportCacheDir = new File(cacheDir);
         }
     }
 

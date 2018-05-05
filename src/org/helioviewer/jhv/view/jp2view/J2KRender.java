@@ -3,6 +3,8 @@ package org.helioviewer.jhv.view.jp2view;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
+import javax.annotation.Nullable;
+
 import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
 import kdu_jni.Kdu_compositor_buf;
@@ -153,8 +155,7 @@ class J2KRender implements Runnable {
                 localCompositor.set(krc);
             }
             renderLayer(krc);
-        } catch (Exception e) {
-            // reboot the compositor
+        } catch (Exception e) { // reboot the compositor
             if (krc != null)
                 destroyCompositor(krc);
             localCompositor.set(null);
@@ -175,15 +176,16 @@ class J2KRender implements Runnable {
         return dims;
     }
 
+    @Nullable
     private static Kdu_thread_env createThreadEnv() {
         try {
-            Kdu_thread_env theThreadEnv = new Kdu_thread_env();
-            theThreadEnv.Create();
+            Kdu_thread_env kte = new Kdu_thread_env();
+            kte.Create();
             int numThreads = Kdu_global.Kdu_get_num_processors();
             for (int i = 1; i < numThreads; i++)
-                theThreadEnv.Add_thread();
-            // System.out.println(">>>> Kdu_thread_env create " + theThreadEnv);
-            return theThreadEnv;
+                kte.Add_thread();
+            // System.out.println(">>>> Kdu_thread_env create " + kte);
+            return kte;
         } catch (KduException e) {
             e.printStackTrace();
         }
@@ -214,11 +216,15 @@ class J2KRender implements Runnable {
     private static void abolish() {
         try {
             Kdu_region_compositor krc = localCompositor.get();
-            if (krc != null)
+            if (krc != null) {
                 destroyCompositor(krc);
-            localCompositor.set(null);
-            localThread.get().Destroy();
-            localThread.set(null);
+                localCompositor.set(null);
+            }
+            Kdu_thread_env kte = localThread.get();
+            if (kte != null) {
+                kte.Destroy();
+                localThread.set(null);
+            }
         } catch (KduException e) {
             e.printStackTrace();
         }
