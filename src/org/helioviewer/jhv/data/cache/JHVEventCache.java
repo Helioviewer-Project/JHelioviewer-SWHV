@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 
 import org.helioviewer.jhv.base.cache.RequestCache;
@@ -41,9 +42,10 @@ public class JHVEventCache {
 
         cacheEventHandlers.add(handler);
 
-        JHVEventCacheResult result = get(startDate, endDate, newStartDate, newEndDate);
-        for (SWEKSupplier eventType : result.getMissingIntervals().keySet()) {
-            List<Interval> missingList = result.getMissingIntervals().get(eventType);
+        Map<SWEKSupplier, List<Interval>> missingIntervals = get(startDate, endDate, newStartDate, newEndDate).getMissingIntervals();
+        for (Map.Entry<SWEKSupplier, List<Interval>> entry : missingIntervals.entrySet()) {
+            SWEKSupplier eventType = entry.getKey();
+            List<Interval> missingList = entry.getValue();
             for (Interval missing : missingList) {
                 incomingRequestManager.handleRequestForInterval(eventType, missing);
             }

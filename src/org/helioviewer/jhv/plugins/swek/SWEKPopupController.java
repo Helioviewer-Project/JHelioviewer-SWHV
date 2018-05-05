@@ -55,8 +55,9 @@ public class SWEKPopupController extends MouseAdapter implements TimeListener {
     private Point calcWindowPosition(Point p, int hekWidth, int hekHeight) {
         int compWidth = component.getWidth();
         int compHeight = component.getHeight();
-        int compLocX = component.getLocationOnScreen().x;
-        int compLocY = component.getLocationOnScreen().y;
+        Point compLoc = component.getLocationOnScreen();
+        int compLocX = compLoc.x;
+        int compLocY = compLoc.y;
 
         boolean yCoordInMiddle = false;
         int yCoord;
