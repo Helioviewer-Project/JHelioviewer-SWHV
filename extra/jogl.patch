@@ -1,6 +1,18 @@
+diff -ur jogl-v2.3.2-orig/src/jogl/classes/jogamp/opengl/GLContextImpl.java jogl-v2.3.2/src/jogl/classes/jogamp/opengl/GLContextImpl.java
+--- jogl-v2.3.2-orig/src/jogl/classes/jogamp/opengl/GLContextImpl.java	2015-10-10 03:08:14.000000000 +0200
++++ jogl-v2.3.2/src/jogl/classes/jogamp/opengl/GLContextImpl.java	2018-05-09 11:09:33.000000000 +0200
+@@ -2113,7 +2113,7 @@
+     final boolean isES = 0 != ( ctp & GLContext.CTX_PROFILE_ES );
+     final boolean isX11 = NativeWindowFactory.TYPE_X11 == NativeWindowFactory.getNativeWindowType(true);
+     final boolean isWindows = Platform.getOSType() == Platform.OSType.WINDOWS;
+-    final boolean isDriverMesa = glRenderer.contains(MesaSP) || glRenderer.contains("Gallium ");
++    final boolean isDriverMesa = glRenderer.contains(MesaSP) || glRenderer.contains("Gallium ") || glVersion.contains(MesaSP);
+ 
+     final boolean isDriverATICatalyst;
+     final boolean isDriverNVIDIAGeForce;
 diff -ur jogl-v2.3.2-orig/src/jogl/classes/jogamp/opengl/macosx/cgl/MacOSXCGLContext.java jogl-v2.3.2/src/jogl/classes/jogamp/opengl/macosx/cgl/MacOSXCGLContext.java
 --- jogl-v2.3.2-orig/src/jogl/classes/jogamp/opengl/macosx/cgl/MacOSXCGLContext.java	2015-10-10 03:08:14.000000000 +0200
-+++ jogl-v2.3.2/src/jogl/classes/jogamp/opengl/macosx/cgl/MacOSXCGLContext.java	2016-06-20 08:47:10.000000000 +0200
++++ jogl-v2.3.2/src/jogl/classes/jogamp/opengl/macosx/cgl/MacOSXCGLContext.java	2017-06-09 11:30:21.000000000 +0200
 @@ -1122,7 +1122,7 @@
                                    //
                                    // FIXME: IMHO this synchronization should be implicitly performed via 'CGL.flushBuffer(contextHandle)' above,
