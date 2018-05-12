@@ -2,6 +2,8 @@ package org.helioviewer.jhv.view.jp2view;
 
 import java.io.IOException;
 
+import kdu_jni.KduException;
+
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.jp2view.cache.CacheStatus;
@@ -29,7 +31,7 @@ class J2KReader implements Runnable {
 
     private JPIPSocket socket;
 
-    J2KReader(JP2View _view) throws IOException {
+    J2KReader(JP2View _view) throws KduException, IOException {
         view = _view;
 
         cache = view.getJPIPCache();
@@ -188,11 +190,11 @@ class J2KReader implements Runnable {
 
                         if (res != null && res.isResponseComplete() && (stream = cache.get(currentStep)) != null) // downloaded
                             JPIPCacheManager.put(key, level, stream);
-                        cacheStatus.setFrameComplete(currentStep, level); // tell the cache status
+                        cacheStatus.setFrameComplete(view.getSource(), currentStep, level); // tell the cache status
                         if (singleFrame)
                             view.signalRenderFromReader(params); // refresh current image
                     } else {
-                        cacheStatus.setFramePartial(currentStep); // tell the cache status
+                        cacheStatus.setFramePartial(view.getSource(), currentStep); // tell the cache status
                     }
 
                     UITimer.cacheStatusChanged();
@@ -221,7 +223,7 @@ class J2KReader implements Runnable {
                     params.priority = false;
                     readerSignal.signal(params);
                 }
-             } catch (IOException e) {
+             } catch (KduException | IOException e) {
                 // e.printStackTrace();
                 try {
                     socket.close();

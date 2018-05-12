@@ -43,11 +43,11 @@ public class CacheStatusLocal implements CacheStatus {
     }
 
     @Override
-    public void setFrameComplete(int frame, int level) {
+    public void setFrameComplete(KakaduSource source, int frame, int level) {
     }
 
     @Override
-    public void setFramePartial(int frame) {
+    public void setFramePartial(KakaduSource source, int frame) {
     }
 
 }

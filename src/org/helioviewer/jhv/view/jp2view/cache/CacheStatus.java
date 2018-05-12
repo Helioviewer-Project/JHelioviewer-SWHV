@@ -4,6 +4,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nullable;
 
+import kdu_jni.KduException;
+
+import org.helioviewer.jhv.view.jp2view.kakadu.KakaduSource;
 import org.helioviewer.jhv.view.jp2view.image.ResolutionSet;
 
 public interface CacheStatus {
@@ -17,8 +20,8 @@ public interface CacheStatus {
     @Nullable
     AtomicBoolean getFrameStatus(int frame, int level);
 
-    void setFrameComplete(int frame, int level);
+    void setFrameComplete(KakaduSource source, int frame, int level) throws KduException;
 
-    void setFramePartial(int frame);
+    void setFramePartial(KakaduSource source, int frame) throws KduException;
 
 }

@@ -14,26 +14,13 @@ public class CacheStatusRemote implements CacheStatus {
 
     private final int maxFrame;
     private final ResolutionSet[] resolutionSet;
-    private KakaduSource source;
 
     private int partialUntil = 0;
 
-    public CacheStatusRemote(KakaduSource _source, int _maxFrame) throws KduException {
+    public CacheStatusRemote(KakaduSource source, int _maxFrame) throws KduException {
         maxFrame = _maxFrame;
-
-        source = _source;
         resolutionSet = new ResolutionSet[maxFrame + 1];
         resolutionSet[0] = source.getResolutionSet(0);
-        destroyIfFull();
-    }
-
-    private void destroyIfFull() {
-        for (int i = 0; i <= maxFrame; i++) {
-            if (resolutionSet[i] == null) {
-                return;
-            }
-        }
-        source = null;
     }
 
     @Override
@@ -87,24 +74,19 @@ public class CacheStatusRemote implements CacheStatus {
     }
 
     @Override
-    public void setFrameComplete(int frame, int level) {
+    public void setFrameComplete(KakaduSource source, int frame, int level) throws KduException {
         if (fullyComplete)
             return;
 
-        setFramePartial(frame);
+        setFramePartial(source, frame);
         if (resolutionSet[frame] != null)
             resolutionSet[frame].setComplete(level);
     }
 
     @Override
-    public void setFramePartial(int frame) {
+    public void setFramePartial(KakaduSource source, int frame) throws KduException {
         if (resolutionSet[frame] == null) {
-            try {
-                resolutionSet[frame] = source.getResolutionSet(frame);
-                destroyIfFull();
-            } catch (KduException e) {
-                e.printStackTrace();
-            }
+            resolutionSet[frame] = source.getResolutionSet(frame);
         }
     }
 

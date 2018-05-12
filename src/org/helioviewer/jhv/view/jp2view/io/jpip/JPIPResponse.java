@@ -7,6 +7,8 @@ import java.net.ProtocolException;
 
 import javax.annotation.Nullable;
 
+import kdu_jni.KduException;
+
 /*
  * A response to a JPIPRequest, encapsulates the JPIPSegments
  * @author Juan Pablo Garcia Ortiz
@@ -140,7 +142,7 @@ public class JPIPResponse {
         return seg;
     }
 
-    public void readSegments(InputStream in, JPIPCache cache, int frame) throws IOException {
+    public void readSegments(InputStream in, JPIPCache cache, int frame) throws KduException, IOException {
         JPIPSegment seg;
         while ((seg = readSegment(in)) != null) {
             if (seg.isEOR)
