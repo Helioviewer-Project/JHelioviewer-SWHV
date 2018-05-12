@@ -320,7 +320,6 @@ public class JP2View extends AbstractView {
     }
 
     KakaduSource getSource() {
-        Thread.currentThread().setName("Render " + getName());
         return kduSource;
     }
 

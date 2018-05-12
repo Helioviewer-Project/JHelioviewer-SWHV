@@ -150,6 +150,7 @@ class J2KRender implements Runnable {
         try {
             krc = localCompositor.get();
             if (krc == null) {
+                Thread.currentThread().setName("Render " + view.getName());
                 krc = createCompositor(view.getSource().getJpxSource());
                 krc.Set_thread_env(localThread.get(), null);
                 localCompositor.set(krc);
