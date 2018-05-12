@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.zip.InflaterInputStream;
 import java.util.zip.GZIPInputStream;
 
+import kdu_jni.KduException;
+
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.view.jp2view.io.ChunkedInputStream;
@@ -32,7 +34,7 @@ public class JPIPSocket extends HTTPSocket {
 
     private static final String[] cnewParams = { "cid", "transport", "host", "path", "port", "auxport" };
 
-    public JPIPSocket(URI uri, JPIPCache cache) throws IOException {
+    public JPIPSocket(URI uri, JPIPCache cache) throws KduException, IOException {
         super(uri);
 
         jpipPath = uri.getPath();
@@ -90,7 +92,7 @@ public class JPIPSocket extends HTTPSocket {
         write(queryStr);
     }
 
-    public JPIPResponse send(String queryStr, JPIPCache cache, int frame) throws IOException {
+    public JPIPResponse send(String queryStr, JPIPCache cache, int frame) throws KduException, IOException {
         send(queryStr);
         HTTPMessage res = recv();
         if (!"image/jpp-stream".equals(res.getHeader("Content-Type")))

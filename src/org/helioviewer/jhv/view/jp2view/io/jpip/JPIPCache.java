@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.view.jp2view.io.jpip;
 
-import java.io.IOException;
-
 import javax.annotation.Nullable;
 
 import kdu_jni.KduException;
@@ -12,22 +10,14 @@ import org.helioviewer.jhv.view.jp2view.kakadu.KakaduConstants;
 
 public class JPIPCache extends Kdu_cache {
 
-    public boolean isDataBinCompleted(int klassID, long streamID, long binID) throws IOException {
+    public boolean isDataBinCompleted(int klassID, long streamID, long binID) throws KduException {
         boolean complete[] = new boolean[1];
-        try {
-            Get_databin_length(klassID, streamID, binID, complete);
-        } catch (KduException e) {
-            throw new IOException("Internal Kakadu error: " + e.getMessage(), e);
-        }
+        Get_databin_length(klassID, streamID, binID, complete);
         return complete[0];
     }
 
-    private void addToKdu(int frame, JPIPSegment data) throws IOException {
-        try {
-            Add_to_databin(data.klassID, frame, data.binID, data.data, data.offset, data.length, data.isFinal, true, false);
-        } catch (KduException e) {
-            throw new IOException("Internal Kakadu error: " + e.getMessage(), e);
-        }
+    private void addToKdu(int frame, JPIPSegment data) throws KduException {
+        Add_to_databin(data.klassID, frame, data.binID, data.data, data.offset, data.length, data.isFinal, true, false);
     }
 
     private JPIPStream scan(int frame) throws KduException {
@@ -60,11 +50,11 @@ public class JPIPCache extends Kdu_cache {
         return stream;
     }
 
-    public void put(int frame, JPIPSegment seg) throws IOException {
+    public void put(int frame, JPIPSegment seg) throws KduException {
         addToKdu(frame, seg);
     }
 
-    public void put(int frame, JPIPStream stream) throws IOException {
+    public void put(int frame, JPIPStream stream) throws KduException {
         for (JPIPSegment seg : stream.segments)
             addToKdu(frame, seg);
     }
