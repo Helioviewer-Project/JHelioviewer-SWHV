@@ -27,6 +27,7 @@ import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.samp.SampPlugin;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
+import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduMessageSystem;
 
 import nom.tam.fits.FitsFactory;
@@ -88,11 +89,17 @@ public class JHelioviewer {
             return;
         }
 
+        try {
+            JPIPCacheManager.init();
+        } catch (Exception e) {
+            Log.error("JPIP cache initialization error", e);
+        }
+
         ProxySettings.init();
         try {
             AIAResponse.load();
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.error("AIA response map load error", e);
         }
 
         EventQueue.invokeLater(() -> {
@@ -114,7 +121,7 @@ public class JHelioviewer {
                       PluginManager.getSingletonInstance().addPlugin(new SampPlugin(), "SAMP");
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.error("Plugin load error", e);
             }
 
             // set left pane width to fit max of ViewpointLayer and ImageLayer options width
