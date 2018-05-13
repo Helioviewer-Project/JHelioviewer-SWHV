@@ -15,35 +15,35 @@ import org.ehcache.config.units.MemoryUnit;
 
 public class JPIPCacheManager {
 
-    private static final PersistentCacheManager streamManager = CacheManagerBuilder.newCacheManagerBuilder()
-        .with(CacheManagerBuilder.persistence(JHVGlobals.jpipStreamCacheDir))
-        .withCache("JPIPStream", CacheConfigurationBuilder
-                                        .newCacheConfigurationBuilder(Long.class, JPIPStream.class,
-                                            ResourcePoolsBuilder.newResourcePoolsBuilder()
-                                                .disk(8, MemoryUnit.GB, true)
-        )).build(true);
-    private static final Cache<Long, JPIPStream> streamCache = streamManager.getCache("JPIPStream", Long.class, JPIPStream.class);
+    private static Cache<Long, JPIPStream> streamCache;
+    private static Cache<Long, Integer> levelCache;
 
-    private static final PersistentCacheManager levelManager = CacheManagerBuilder.newCacheManagerBuilder()
-        .with(CacheManagerBuilder.persistence(JHVGlobals.jpipLevelCacheDir))
-        .withCache("JPIPLevel", CacheConfigurationBuilder
-                                        .newCacheConfigurationBuilder(Long.class, Integer.class,
-                                            ResourcePoolsBuilder.newResourcePoolsBuilder()
-                                                .heap(10000, EntryUnit.ENTRIES)
-                                                .disk(10, MemoryUnit.MB, true)
-        )).build(true);
-    private static final Cache<Long, Integer> levelCache = levelManager.getCache("JPIPLevel", Long.class, Integer.class);
+    public static void init() {
+        PersistentCacheManager streamManager = CacheManagerBuilder.newCacheManagerBuilder()
+                                               .with(CacheManagerBuilder.persistence(JHVGlobals.jpipStreamCacheDir))
+                                               .withCache("JPIPStream", CacheConfigurationBuilder
+                                                                        .newCacheConfigurationBuilder(Long.class, JPIPStream.class,
+                                                                        ResourcePoolsBuilder.newResourcePoolsBuilder()
+                                                                        .disk(8, MemoryUnit.GB, true)
+                                               )).build(true);
+        PersistentCacheManager levelManager = CacheManagerBuilder.newCacheManagerBuilder()
+                                              .with(CacheManagerBuilder.persistence(JHVGlobals.jpipLevelCacheDir))
+                                              .withCache("JPIPLevel", CacheConfigurationBuilder
+                                                                      .newCacheConfigurationBuilder(Long.class, Integer.class,
+                                                                      ResourcePoolsBuilder.newResourcePoolsBuilder()
+                                                                      .heap(10000, EntryUnit.ENTRIES)
+                                                                      .disk(10, MemoryUnit.MB, true)
+                                              )).build(true);
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                streamManager.close();
+                levelManager.close();
+            } catch (Exception ignore) {
+            }
+        }));
 
-    private static final Thread destroy = new Thread(() -> {
-        try {
-            streamManager.close();
-            levelManager.close();
-        } catch (Exception ignore) {
-        }
-    });
-
-    static {
-        Runtime.getRuntime().addShutdownHook(destroy);
+        streamCache = streamManager.getCache("JPIPStream", Long.class, JPIPStream.class);
+        levelCache = levelManager.getCache("JPIPLevel", Long.class, Integer.class);
     }
 
     @Nullable
