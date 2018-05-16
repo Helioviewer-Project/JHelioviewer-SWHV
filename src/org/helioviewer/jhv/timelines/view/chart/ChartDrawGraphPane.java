@@ -24,7 +24,7 @@ import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.jhv.base.Regex;
-import org.helioviewer.jhv.data.cache.JHVEventCache;
+import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.opengl.GLInfo;

@@ -3,7 +3,7 @@ package org.helioviewer.jhv.plugins.swek.sources.comesep;
 import java.util.Iterator;
 import java.util.Locale;
 
-import org.helioviewer.jhv.data.event.JHVEvent;
+import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
