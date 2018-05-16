@@ -12,10 +12,10 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.data.event.JHVEvent;
-import org.helioviewer.jhv.data.event.JHVEventParameter;
-import org.helioviewer.jhv.data.event.JHVPositionInformation;
-import org.helioviewer.jhv.data.event.SWEKParameter;
+import org.helioviewer.jhv.events.JHVEvent;
+import org.helioviewer.jhv.events.JHVEventParameter;
+import org.helioviewer.jhv.events.JHVPositionInformation;
+import org.helioviewer.jhv.events.SWEKParameter;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVDate;

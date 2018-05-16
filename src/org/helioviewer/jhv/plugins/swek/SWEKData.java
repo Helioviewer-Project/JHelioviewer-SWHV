@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.SortedMap;
 
-import org.helioviewer.jhv.data.cache.JHVEventCache;
-import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
-import org.helioviewer.jhv.data.cache.SortedDateInterval;
-import org.helioviewer.jhv.data.event.JHVEvent;
-import org.helioviewer.jhv.data.event.JHVEventParameter;
-import org.helioviewer.jhv.data.event.SWEKSupplier;
+import org.helioviewer.jhv.events.JHVEvent;
+import org.helioviewer.jhv.events.JHVEventCache;
+import org.helioviewer.jhv.events.JHVEventParameter;
+import org.helioviewer.jhv.events.JHVRelatedEvents;
+import org.helioviewer.jhv.events.SortedDateInterval;
+import org.helioviewer.jhv.events.SWEKSupplier;
 import org.helioviewer.jhv.layers.Movie;
 
 class SWEKData {

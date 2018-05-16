@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.swing.JComponent;
 
-import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
+import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.jhv.layers.Movie;

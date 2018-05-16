@@ -8,7 +8,7 @@ import java.util.HashSet;
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.data.event.JHVEventHighlightListener;
+import org.helioviewer.jhv.events.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
