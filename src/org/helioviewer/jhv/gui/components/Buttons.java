@@ -9,7 +9,7 @@ public class Buttons {
     private static String uc2ent(MaterialDesign ...uc) {
         StringBuilder out = new StringBuilder();
         for (MaterialDesign c: uc)
-            out.append(String.valueOf(c.code));
+            out.append(c.code);
         return out.toString();
     }
 

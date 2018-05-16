@@ -13,140 +13,52 @@ public class Vec3 {
     public double y;
     public double z;
 
-    public Vec3(double x, double y, double z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+    public Vec3(double _x, double _y, double _z) {
+        x = _x;
+        y = _y;
+        z = _z;
     }
 
-    public Vec3(Vec2 vector) {
-        this.x = vector.x;
-        this.y = vector.y;
-        this.z = 0;
+    public Vec3(Vec2 vec) {
+        x = vec.x;
+        y = vec.y;
+        z = 0;
     }
 
-    public Vec3(Vec3 vector) {
-        this.x = vector.x;
-        this.y = vector.y;
-        this.z = vector.z;
+    public Vec3(Vec3 vec) {
+        x = vec.x;
+        y = vec.y;
+        z = vec.z;
     }
 
     public Vec3() {
         this(ZERO);
     }
 
-    public Vec3(double[] coordinates) {
-        if (coordinates == null || coordinates.length < 3) {
-            throw new IllegalArgumentException("Coordinate Array must contain at least 3 dimensions");
-        }
-        this.x = coordinates[0];
-        this.y = coordinates[1];
-        this.z = coordinates[2];
-    }
-
-    public final void set(double x, double y, double z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-
-    public final void set(Vec3 vector) {
-        this.x = vector.x;
-        this.y = vector.y;
-        this.z = vector.z;
-    }
-
-    public final void setMax(Vec3 vector) {
-        this.x = this.x > vector.x ? this.x : vector.x;
-        this.y = this.y > vector.y ? this.y : vector.y;
-        this.z = this.z > vector.z ? this.z : vector.z;
-    }
-
-    public final void setMin(Vec3 vector) {
-        this.x = this.x < vector.x ? this.x : vector.x;
-        this.y = this.y < vector.y ? this.y : vector.y;
-        this.z = this.z < vector.z ? this.z : vector.z;
+    public final void set(double _x, double _y, double _z) {
+        x = _x;
+        y = _y;
+        z = _z;
     }
 
     public final void add(Vec3 vec) {
-        this.x += vec.x;
-        this.y += vec.y;
-        this.z += vec.z;
-    }
-
-    public final void add(double s) {
-        this.x += s;
-        this.y += s;
-        this.z += s;
+        x += vec.x;
+        y += vec.y;
+        z += vec.z;
     }
 
     public static Vec3 add(Vec3 vec1, Vec3 vec2) {
         return new Vec3(vec1.x + vec2.x, vec1.y + vec2.y, vec1.z + vec2.z);
     }
 
-    public static Vec3 add(Vec3 vec1, double s) {
-        return new Vec3(vec1.x + s, vec1.y + s, vec1.z + s);
-    }
-
-    public final Vec3 subtract(Vec3 vec) {
-        this.x -= vec.x;
-        this.y -= vec.y;
-        this.z -= vec.z;
-        return this;
-    }
-
-    public final void subtract(double s) {
-        this.x -= s;
-        this.y -= s;
-        this.z -= s;
-    }
-
     public static Vec3 subtract(Vec3 vec1, Vec3 vec2) {
         return new Vec3(vec1.x - vec2.x, vec1.y - vec2.y, vec1.z - vec2.z);
     }
 
-    public static Vec3 subtract(Vec3 vec1, double s) {
-        return new Vec3(vec1.x - s, vec1.y - s, vec1.z - s);
-    }
-
-    public final void divide(Vec3 vec) {
-        if (vec.x == 0.0 || vec.y == 0.0 || vec.z == 0.0)
-            throw new IllegalArgumentException("Division by 0 not allowed!");
-        this.x /= vec.x;
-        this.y /= vec.y;
-        this.z /= vec.z;
-    }
-
-    public final void divide(double s) {
-        if (s == 0.0)
-            throw new IllegalArgumentException("Division by 0 not allowed!");
-        this.x /= s;
-        this.y /= s;
-        this.z /= s;
-    }
-
-    public static Vec3 divide(Vec3 vec1, Vec3 vec2) {
-        if (vec2.x == 0.0 || vec2.y == 0.0 || vec2.z == 0.0)
-            throw new IllegalArgumentException("Division by 0 not allowed!");
-        return new Vec3(vec1.x / vec2.x, vec1.y / vec2.y, vec1.z / vec2.z);
-    }
-
-    public static Vec3 divide(Vec3 vec1, double s) {
-        if (s == 0.0)
-            throw new IllegalArgumentException("Division by 0 not allowed!");
-        return new Vec3(vec1.x / s, vec1.y / s, vec1.z / s);
-    }
-
-    public final void multiply(Vec3 vec) {
-        this.x *= vec.x;
-        this.y *= vec.y;
-        this.z *= vec.z;
-    }
-
     public final void multiply(double s) {
-        this.x *= s;
-        this.y *= s;
-        this.z *= s;
+        x *= s;
+        y *= s;
+        z *= s;
     }
 
     public static Vec3 multiply(Vec3 vec1, Vec3 vec2) {
@@ -165,24 +77,18 @@ public class Vec3 {
         return new Vec3(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x);
     }
 
-    public final void negate() {
-        this.x = -this.x;
-        this.y = -this.y;
-        this.z = -this.z;
-    }
-
     public final boolean isApproxEqual(Vec3 vec, double tolerance) {
-        return Math.abs(this.x - vec.x) <= tolerance && Math.abs(this.y - vec.y) <= tolerance && Math.abs(this.z - vec.z) <= tolerance;
+        return Math.abs(x - vec.x) <= tolerance && Math.abs(y - vec.y) <= tolerance && Math.abs(z - vec.z) <= tolerance;
     }
 
     public final double length() {
-        double absmax = Math.max(Math.max(Math.abs(this.x), Math.abs(this.y)), Math.abs(this.z));
+        double absmax = Math.max(Math.max(Math.abs(x), Math.abs(y)), Math.abs(z));
         if (absmax == 0.0)
             return 0.0;
 
-        double tmpx = this.x / absmax;
-        double tmpy = this.y / absmax;
-        double tmpz = this.z / absmax;
+        double tmpx = x / absmax;
+        double tmpy = y / absmax;
+        double tmpz = z / absmax;
         return absmax * Math.sqrt(tmpx * tmpx + tmpy * tmpy + tmpz * tmpz);
     }
 
@@ -192,30 +98,30 @@ public class Vec3 {
     }
 
     public final void normalize() {
-        double len = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+        double len = Math.sqrt(x * x + y * y + z * z);
         if (len == 0.0)
             return;
 
-        this.x /= len;
-        this.y /= len;
-        this.z /= len;
+        x /= len;
+        y /= len;
+        z /= len;
 
-        len = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+        len = Math.sqrt(x * x + y * y + z * z);
         if (len <= 1.0)
             return;
 
         // errors up to 2ulp found in testing
         len = Math.nextAfter(len, len + 1.0);
-        this.x /= len;
-        this.y /= len;
-        this.z /= len;
+        x /= len;
+        y /= len;
+        z /= len;
 
-        len = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+        len = Math.sqrt(x * x + y * y + z * z);
         if (len > 1 || Double.isNaN(len)) {
             Log.error("Normalized to bigger than 1: please report. Computed length: " + len);
-            this.x = 0;
-            this.y = 0;
-            this.z = 0;
+            x = 0;
+            y = 0;
+            z = 0;
         }
     }
 

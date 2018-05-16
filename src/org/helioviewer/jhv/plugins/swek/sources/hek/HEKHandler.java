@@ -100,7 +100,7 @@ public class HEKHandler extends SWEKHandler {
         baseURL.append("event_coordsys=helioprojective&x1=-3600&x2=3600&y1=-3600&y2=3600&cosec=2&");
         baseURL.append("param0=event_starttime&op0=").append(SWEKOperand.SMALLER_OR_EQUAL.encodedRepresentation).append('&');
         baseURL.append("value0=").append(TimeUtils.format(end)).append('&');
-        baseURL = appendParams(baseURL, params);
+        appendParams(baseURL, params);
         baseURL.append("event_starttime=").append(TimeUtils.format(start)).append('&');
         long max = Math.max(System.currentTimeMillis(), end);
         baseURL.append("event_endtime=").append(TimeUtils.format(max)).append('&');
@@ -108,7 +108,7 @@ public class HEKHandler extends SWEKHandler {
         return baseURL.toString();
     }
 
-    private static StringBuilder appendParams(StringBuilder baseURL, List<SWEKParam> params) {
+    private static void appendParams(StringBuilder baseURL, List<SWEKParam> params) {
         int paramCount = 1;
 
         for (SWEKParam param : params) {
@@ -123,7 +123,6 @@ public class HEKHandler extends SWEKHandler {
                 paramCount++;
             }
         }
-        return baseURL;
     }
 
     @Override

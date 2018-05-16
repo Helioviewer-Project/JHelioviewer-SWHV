@@ -304,7 +304,6 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         // Record
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
-        c.gridy = 0;
         c.weightx = 1;
         c.weighty = 1;
         c.fill = GridBagConstraints.HORIZONTAL;

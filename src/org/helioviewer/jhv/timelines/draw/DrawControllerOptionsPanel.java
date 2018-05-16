@@ -78,13 +78,13 @@ class DrawControllerOptionsPanel extends JPanel {
             case All:
                 return "Maximum interval";
             case Hour:
-                return Long.toString(number) + " hour" + plural;
+                return number + " hour" + plural;
             case Day:
-                return Long.toString(number) + " day" + plural;
+                return number + " day" + plural;
             case Month:
-                return Long.toString(number) + " month" + plural;
+                return number + " month" + plural;
             case Year:
-                return Long.toString(number) + " year" + plural;
+                return number + " year" + plural;
             case Carrington:
                 return "Carrington rotation" + plural;
             case Movie:

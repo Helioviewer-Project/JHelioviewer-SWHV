@@ -20,7 +20,7 @@ class FilterPanel extends JPanel {
     private final JLabel label;
     private final JSpinner spinner;
 
-    private boolean enabled;
+    private boolean enabled = false;
 
     private final SWEKParameter parameter;
     private final SWEKSupplier supplier;
