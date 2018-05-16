@@ -1,9 +1,8 @@
 package org.helioviewer.jhv.math;
 
 public class Mat4 {
-    /**
-     * 0 4 8 12 1 5 9 13 2 6 10 14 3 7 11 15
-     */
+
+    //  0 4 8 12 1 5 9 13 2 6 10 14 3 7 11 15
     public final double[] m = new double[16];
 
     public Mat4(double M0, double M4, double M8, double M12, double M1, double M5, double M9, double M13, double M2, double M6, double M10, double M14, double M3, double M7, double M11, double M15) {
@@ -35,13 +34,13 @@ public class Mat4 {
     public float[] getFloatArray() {
         float[] arr = new float[16];
         for (int i = 0; i < 16; i++) {
-            arr[i] = (float) this.m[i];
+            arr[i] = (float) m[i];
         }
         return arr;
     }
 
-    public final void setIdentity() {
-        this.set(identity());
+    public void setIdentity() {
+        set(identity());
     }
 
     public static Mat4 identity() {
@@ -52,7 +51,7 @@ public class Mat4 {
         return new Mat4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
     }
 */
-    public final Mat4 set(Mat4 A) {
+    public Mat4 set(Mat4 A) {
         m[0] = A.m[0];
         m[4] = A.m[4];
         m[8] = A.m[8];
@@ -73,7 +72,7 @@ public class Mat4 {
         return this;
     }
 /*
-    public final Mat4 set(double M0, double M4, double M8, double M12, double M1, double M5, double M9, double M13, double M2, double M6, double M10, double M14, double M3, double M7, double M11, double M15) {
+    public Mat4 set(double M0, double M4, double M8, double M12, double M1, double M5, double M9, double M13, double M2, double M6, double M10, double M14, double M3, double M7, double M11, double M15) {
         m[0] = M0;
         m[4] = M4;
         m[8] = M8;
@@ -94,7 +93,7 @@ public class Mat4 {
         return this;
     }
 
-    public final Mat4 set(int index, double f) {
+    public Mat4 set(int index, double f) {
         if (index < 0 || index > 15)
             throw new IndexOutOfBoundsException("Mat4 has 16 fields");
 
@@ -102,14 +101,14 @@ public class Mat4 {
         return this;
     }
 
-    public final double get(int index) {
+    public double get(int index) {
         if (index < 0 || index > 15)
             throw new IndexOutOfBoundsException("Mat4 has 16 fields");
 
         return m[index];
     }
 
-    public final Mat4 multiply(Mat4 A) {
+    public Mat4 multiply(Mat4 A) {
         set(m[0] * A.m[0] + m[4] * A.m[1] + m[8] * A.m[2] + m[12] * A.m[3], // row 1
                 m[0] * A.m[4] + m[4] * A.m[5] + m[8] * A.m[6] + m[12] * A.m[7], m[0] * A.m[8] + m[4] * A.m[9] + m[8] * A.m[10] + m[12] * A.m[11], m[0] * A.m[12] + m[4] * A.m[13] + m[8] * A.m[14] + m[12] * A.m[15], m[1] * A.m[0] + m[5] * A.m[1] + m[9] * A.m[2] + m[13] * A.m[3], // row 2
                 m[1] * A.m[4] + m[5] * A.m[5] + m[9] * A.m[6] + m[13] * A.m[7], m[1] * A.m[8] + m[5] * A.m[9] + m[9] * A.m[10] + m[13] * A.m[11], m[1] * A.m[12] + m[5] * A.m[13] + m[9] * A.m[14] + m[13] * A.m[15], m[2] * A.m[0] + m[6] * A.m[1] + m[10] * A.m[2] + m[14] * A.m[3], // row 3
@@ -118,37 +117,37 @@ public class Mat4 {
         return this;
     }
 
-    public final Vec3 multiply(Vec3 v) {
+    public Vec3 multiply(Vec3 v) {
         double W = m[3] * v.x + m[7] * v.y + m[11] * v.z + m[15];
         return new Vec3((m[0] * v.x + m[4] * v.y + m[8] * v.z + m[12]) / W, (m[1] * v.x + m[5] * v.y + m[9] * v.z + m[13]) / W, (m[2] * v.x + m[6] * v.y + m[10] * v.z + m[14]) / W);
     }
 
-    public final Vec3 multiplyTranspose(Vec3 v) {
+    public Vec3 multiplyTranspose(Vec3 v) {
         double W = m[12] * v.x + m[13] * v.y + m[14] * v.z + m[15];
         return new Vec3((m[0] * v.x + m[1] * v.y + m[2] * v.z + m[3]) / W, (m[4] * v.x + m[5] * v.y + m[6] * v.z + m[7]) / W, (m[8] * v.x + m[9] * v.y + m[10] * v.z + m[11]) / W);
     }
 
-    public final Vec4 multiply(Vec4 v) {
+    public Vec4 multiply(Vec4 v) {
         return new Vec4(m[0] * v.x + m[4] * v.y + m[8] * v.z + m[12] * v.w, m[1] * v.x + m[5] * v.y + m[9] * v.z + m[13] * v.w, m[2] * v.x + m[6] * v.y + m[10] * v.z + m[14] * v.w, m[3] * v.x + m[7] * v.y + m[11] * v.z + m[15] * v.w);
     }
 
-    public final Vec3 translation() {
+    public Vec3 translation() {
         return new Vec3(m[12], m[13], m[14]);
     }
 
-    public final void setTranslation(double x, double y, double z) {
+    public void setTranslation(double x, double y, double z) {
         m[12] = x;
         m[13] = y;
         m[14] = z;
     }
 */
-    public final Mat4 inverse() {
+    public Mat4 inverse() {
         Mat4 inverse = new Mat4();
         // Cache the matrix values (makes for huge speed increases!)
-        double a00 = this.m[0], a01 = this.m[1], a02 = this.m[2], a03 = this.m[3];
-        double a10 = this.m[4], a11 = this.m[5], a12 = this.m[6], a13 = this.m[7];
-        double a20 = this.m[8], a21 = this.m[9], a22 = this.m[10], a23 = this.m[11];
-        double a30 = this.m[12], a31 = this.m[13], a32 = this.m[14], a33 = this.m[15];
+        double a00 = m[0], a01 = m[1], a02 = m[2], a03 = m[3];
+        double a10 = m[4], a11 = m[5], a12 = m[6], a13 = m[7];
+        double a20 = m[8], a21 = m[9], a22 = m[10], a23 = m[11];
+        double a30 = m[12], a31 = m[13], a32 = m[14], a33 = m[15];
 
         double b00 = a00 * a11 - a01 * a10;
         double b01 = a00 * a12 - a02 * a10;
@@ -187,7 +186,7 @@ public class Mat4 {
     }
 
     //
-    // public final GL3DMat4 inverse() {
+    // public GL3DMat4 inverse() {
     // GL3DMat4 I = new GL3DMat4();
     //
     // // Code from Mesa-2.2\src\glu\project.c
@@ -250,14 +249,14 @@ public class Mat4 {
     // return I;
     // }
 
-    public final Mat4 translate(Vec3 t) {
+    public Mat4 translate(Vec3 t) {
         m[12] += t.x;
         m[13] += t.y;
         m[14] += t.z;
         return this;
     }
 
-    public final Mat4 translate(double x, double y, double z) {
+    public Mat4 translate(double x, double y, double z) {
         m[12] += x;
         m[13] += y;
         m[14] += z;
@@ -272,14 +271,14 @@ public class Mat4 {
         return new Mat4(1, 0, 0, x, 0, 1, 0, y, 0, 0, 1, z, 0, 0, 0, 1);
     }
 
-    public final Mat4 scale(Vec3 s) {
+    public Mat4 scale(Vec3 s) {
         m[0] *= s.x;
         m[5] *= s.y;
         m[10] *= s.z;
         return this;
     }
 
-    public final Mat4 scale(double sx, double sy, double sz) {
+    public Mat4 scale(double sx, double sy, double sz) {
         m[0] *= sx;
         m[5] *= sy;
         m[10] *= sz;
@@ -290,19 +289,19 @@ public class Mat4 {
         return new Mat4(sx, 0, 0, 0, 0, sy, 0, 0, 0, 0, sz, 0, 0, 0, 0, 1);
     }
 
-    public final Mat4 rotate(double angle, Vec3 axis) {
-        return this.rotate(angle, axis.x, axis.y, axis.z);
+    public Mat4 rotate(double angle, Vec3 axis) {
+        return rotate(angle, axis.x, axis.y, axis.z);
     }
 
-    public final Mat4 rotate(double angle, double axisx, double axisy, double axisz) {
-        return this.multiply(rotation(angle, axisx, axisy, axisz));
+    public Mat4 rotate(double angle, double axisx, double axisy, double axisz) {
+        return multiply(rotation(angle, axisx, axisy, axisz));
+    }
+
+    public Mat4 invert() {
+        return set(inverse());
     }
 */
-    public final Mat4 invert() {
-        return this.set(this.inverse());
-    }
-
-    public final Mat4 transpose() {
+    public Mat4 transpose() {
         double temp;
         temp = m[1];
         m[1] = m[4];
@@ -325,7 +324,7 @@ public class Mat4 {
         return this;
     }
 /*
-    public final Mat4 swap(int i1, int i2) {
+    public Mat4 swap(int i1, int i2) {
         double temp = get(i1);
         set(i1, get(i2));
         set(i2, temp);
@@ -434,16 +433,16 @@ public class Mat4 {
         return new Mat4(ww2, 0, 0, ww2 + x, 0, -wh2, 0, wh2 + y, 0, 0, (f - n) * 0.5, (f + n) * 0.5, 0, 0, 0, 1);
     }
 
-    public final Mat3 mat3() {
+    public Mat3 mat3() {
         return new Mat3(m[0], m[4], m[8], m[1], m[5], m[9], m[2], m[6], m[10]);
     }
 */
-    public final Mat4 copy() {
+    public Mat4 copy() {
         return new Mat4(this);
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         String format = "%01.02f";
         return String.format(format + ", ", m[0]) +
                String.format(format + ", ", m[4]) +

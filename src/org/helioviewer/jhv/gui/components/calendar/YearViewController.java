@@ -43,7 +43,7 @@ public class YearViewController implements CalendarViewController {
     @Override
     public String getSelectionButtonText() {
         int currentYear = calendar.get(Calendar.YEAR);
-        return Integer.toString(currentYear - 6) + " - " + Integer.toString(currentYear + 5);
+        return (currentYear - 6) + " - " + (currentYear + 5);
     }
 
     /**

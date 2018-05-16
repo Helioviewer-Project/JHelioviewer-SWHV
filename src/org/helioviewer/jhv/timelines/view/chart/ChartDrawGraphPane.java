@@ -487,7 +487,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         return movieLinePosition >= 0 && movieLinePosition - 3 <= p.x && p.x <= movieLinePosition + 3;
     }
 
-    private boolean highlightChanged(Point p) {
+    private static boolean highlightChanged(Point p) {
         for (TimelineLayer tl : TimelineLayers.get()) {
             if (tl.highLightChanged(p)) {
                 return true;

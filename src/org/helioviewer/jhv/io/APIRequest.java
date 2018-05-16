@@ -31,13 +31,13 @@ public class APIRequest {
     public String toFileRequest() {
         String fileReq;
         if (startTime == endTime) {
-            fileReq = DataSources.getServerSetting(server, "API.getJP2Image") + "sourceId=" + Integer.toString(sourceId) +
+            fileReq = DataSources.getServerSetting(server, "API.getJP2Image") + "sourceId=" + sourceId +
                                                    "&date=" + TimeUtils.formatZ(startTime);
         } else {
-            fileReq = DataSources.getServerSetting(server, "API.getJPX") + "sourceId=" + Integer.toString(sourceId) +
+            fileReq = DataSources.getServerSetting(server, "API.getJPX") + "sourceId=" + sourceId +
                                                    "&startTime=" + TimeUtils.formatZ(startTime) + "&endTime=" + TimeUtils.formatZ(endTime);
             if (cadence != CADENCE_ANY) {
-                fileReq += "&cadence=" + Integer.toString(cadence);
+                fileReq += "&cadence=" + cadence;
             }
         }
         return fileReq;

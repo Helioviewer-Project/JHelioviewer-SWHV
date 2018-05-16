@@ -10,14 +10,14 @@ public class Vec2 {
     public double x;
     public double y;
 
-    public Vec2(double x, double y) {
-        this.x = x;
-        this.y = y;
+    public Vec2(double _x, double _y) {
+        x = _x;
+        y = _y;
     }
 
     public void clear() {
-        this.x = 0;
-        this.y = 0;
+        x = 0;
+        y = 0;
     }
 /*
     public Vec2(Vec2 vector) {
@@ -141,7 +141,7 @@ public class Vec2 {
     }
 */
     public boolean isApproxEqual(Vec2 vec, double tolerance) {
-        return Math.abs(this.x - vec.x) <= tolerance && Math.abs(this.y - vec.y) <= tolerance;
+        return Math.abs(x - vec.x) <= tolerance && Math.abs(y - vec.y) <= tolerance;
     }
 /*
     public double length() {
