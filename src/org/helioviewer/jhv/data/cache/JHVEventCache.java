@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.data.cache;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -13,6 +12,7 @@ import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.event.JHVAssociation;
 import org.helioviewer.jhv.data.event.JHVEvent;
+import org.helioviewer.jhv.data.event.SWEKDownloadManager;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -27,13 +27,7 @@ public class JHVEventCache {
     private static final HashMap<SWEKSupplier, RequestCache> downloadedCache = new HashMap<>();
     private static final ArrayList<JHVAssociation> assocs = new ArrayList<>();
 
-    private static JHVEventCacheRequestHandler incomingRequestManager;
-
     private static JHVRelatedEvents lastHighlighted = null;
-
-    public static void registerHandler(JHVEventCacheRequestHandler _incomingRequestManager) {
-        incomingRequestManager = _incomingRequestManager;
-    }
 
     public static void requestForInterval(long startDate, long endDate, JHVEventHandler handler) {
         long deltaT = Math.max((long) ((endDate - startDate) * factor), TimeUtils.DAY_IN_MILLIS);
@@ -45,12 +39,10 @@ public class JHVEventCache {
         Map<SWEKSupplier, List<Interval>> missingIntervals = get(startDate, endDate, newStartDate, newEndDate).getMissingIntervals();
         for (Map.Entry<SWEKSupplier, List<Interval>> entry : missingIntervals.entrySet()) {
             SWEKSupplier eventType = entry.getKey();
-            List<Interval> missingList = entry.getValue();
-            for (Interval missing : missingList) {
-                incomingRequestManager.handleRequestForInterval(eventType, missing);
+            for (Interval missing : entry.getValue()) {
+                SWEKDownloadManager.startDownloadSupplier(eventType, missing);
             }
         }
-
         handler.newEventsReceived();
     }
 
@@ -180,7 +172,7 @@ public class JHVEventCache {
         fireEventCacheChanged();
     }
 
-    public static Collection<Interval> getAllRequestIntervals(SWEKSupplier eventType) {
+    public static List<Interval> getAllRequestIntervals(SWEKSupplier eventType) {
         return downloadedCache.get(eventType).getAllRequestIntervals();
     }
 

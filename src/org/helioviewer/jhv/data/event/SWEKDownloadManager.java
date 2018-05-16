@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.data.event;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -14,14 +13,13 @@ import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.cache.JHVEventCache;
-import org.helioviewer.jhv.data.cache.JHVEventCacheRequestHandler;
 import org.helioviewer.jhv.data.gui.SWEKTreeModel;
 import org.helioviewer.jhv.data.gui.filter.FilterManager;
 import org.helioviewer.jhv.data.gui.filter.FilterManagerListener;
 import org.helioviewer.jhv.threads.JHVThread;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class SWEKDownloadManager implements FilterManagerListener, JHVEventCacheRequestHandler {
+public class SWEKDownloadManager implements FilterManagerListener {
 
     private static final int NUMBER_THREADS = 8;
     private static final long SIXHOURS = 1000 * 60 * 60 * 6;
@@ -35,12 +33,11 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
             JHVThread.afterExecute(r, t);
         }
     };
-    private static final Map<SWEKSupplier, ArrayList<SWEKDownloadWorker>> supplierMap = new HashMap<>();
+    private static final HashMap<SWEKSupplier, ArrayList<SWEKDownloadWorker>> supplierMap = new HashMap<>();
 
     private static final SWEKDownloadManager instance = new SWEKDownloadManager();
 
     private SWEKDownloadManager() {
-        JHVEventCache.registerHandler(this);
         FilterManager.addFilterManagerListener(this);
     }
 
@@ -110,18 +107,12 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
     }
 
     private static void downloadForAllDates(SWEKSupplier supplier) {
-        Collection<Interval> allIntervals = JHVEventCache.getAllRequestIntervals(supplier);
-        for (Interval interval : allIntervals) {
+        for (Interval interval : JHVEventCache.getAllRequestIntervals(supplier)) {
             startDownloadSupplier(supplier, interval);
         }
     }
 
-    @Override
-    public void handleRequestForInterval(SWEKSupplier supplier, Interval interval) {
-        startDownloadSupplier(supplier, interval);
-    }
-
-    private static void startDownloadSupplier(SWEKSupplier supplier, Interval interval) {
+    public static void startDownloadSupplier(SWEKSupplier supplier, Interval interval) {
         List<SWEKParam> params = defineParameters(supplier);
         for (Interval intt : Interval.splitInterval(interval, 2)) {
             if (intt.start < System.currentTimeMillis() + SIXHOURS) {
