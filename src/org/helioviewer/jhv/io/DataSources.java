@@ -8,6 +8,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.database.DataSourcesDB;
@@ -104,7 +107,8 @@ public class DataSources {
         return serverSettings.keySet();
     }
 
-    public static String getServerSetting(String server, String setting) {
+    @Nullable
+    public static String getServerSetting(@Nonnull String server, @Nonnull String setting) {
         Map<String, String> settings = serverSettings.get(server);
         return settings == null ? null : settings.get(setting);
     }
