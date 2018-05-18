@@ -7,15 +7,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+//import java.util.concurrent.ExecutorService;
+//import java.util.concurrent.Executors;
 
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.log.Log;
 
-public class DataSourcesDB {
+public class SourcesDatabase {
 
-    private static final DataSourcesDB instance = new DataSourcesDB();
+    private static final SourcesDatabase instance = new SourcesDatabase();
+    // private static final ExecutorService executor = Executors.newSingleThreadExecutor(new JHVThread.NamedDbThreadFactory("DataSourcesDatabase"));
 
     public static void init() {
     }
@@ -24,7 +27,7 @@ public class DataSourcesDB {
     private static PreparedStatement insert;
     private static PreparedStatement select;
 
-    private DataSourcesDB() {
+    private SourcesDatabase() {
         try {
             connection = DriverManager.getConnection("jdbc:sqlite::memory:");
 
