@@ -1,6 +1,9 @@
 package org.helioviewer.jhv.io;
 
+import java.io.IOException;
 import java.util.ArrayList;
+
+import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.Pair;
@@ -20,7 +23,7 @@ public class APIRequest {
     public final long endTime;
     public final int cadence;
 
-    public APIRequest(String _server, int _sourceId, long _startTime, long _endTime, int _cadence) {
+    public APIRequest(@Nonnull String _server, int _sourceId, long _startTime, long _endTime, int _cadence) {
         server = _server;
         sourceId = _sourceId;
         startTime = _startTime;
@@ -28,14 +31,17 @@ public class APIRequest {
         cadence = _cadence;
     }
 
-    public String toFileRequest() {
+    public String toFileRequest() throws IOException {
+        String api;
         String fileReq;
         if (startTime == endTime) {
-            fileReq = DataSources.getServerSetting(server, "API.getJP2Image") + "sourceId=" + sourceId +
-                                                   "&date=" + TimeUtils.formatZ(startTime);
+            if ((api = DataSources.getServerSetting(server, "API.getJP2Image")) == null)
+                throw new IOException("Unknown server: " + server);
+            fileReq = api + "sourceId=" + sourceId + "&date=" + TimeUtils.formatZ(startTime);
         } else {
-            fileReq = DataSources.getServerSetting(server, "API.getJPX") + "sourceId=" + sourceId +
-                                                   "&startTime=" + TimeUtils.formatZ(startTime) + "&endTime=" + TimeUtils.formatZ(endTime);
+            if ((api = DataSources.getServerSetting(server, "API.getJPX")) == null)
+                throw new IOException("Unknown server: " + server);
+            fileReq = api + "sourceId=" + sourceId + "&startTime=" + TimeUtils.formatZ(startTime) + "&endTime=" + TimeUtils.formatZ(endTime);
             if (cadence != CADENCE_ANY) {
                 fileReq += "&cadence=" + cadence;
             }
@@ -43,7 +49,7 @@ public class APIRequest {
         return fileReq;
     }
 
-    String toJpipRequest() {
+    String toJpipRequest() throws IOException {
         return toFileRequest() + "&jpip=true&verbose=true&linked=true";
     }
 
