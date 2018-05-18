@@ -21,6 +21,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 
+import javax.annotation.Nonnull;
+
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
@@ -34,7 +36,6 @@ import org.helioviewer.jhv.events.SWEKSupplier;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVThread;
-import org.helioviewer.jhv.threads.JHVThread.ConnectionThread;
 
 public class EventDatabase {
 
@@ -57,8 +58,22 @@ public class EventDatabase {
 
     }
 
+    private static class NamedDbThreadFactory extends JHVThread.NamedThreadFactory {
+
+        NamedDbThreadFactory(String _name) {
+            super(_name);
+        }
+
+        @Override
+        public EventDatabaseThread newThread(@Nonnull Runnable r) {
+            EventDatabaseThread thread = new EventDatabaseThread(r, name);
+            thread.setDaemon(true);
+            return thread;
+        }
+    }
+
     private static final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<>(10000);
-    private static final ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedDbThreadFactory("JHVDatabase"), new ThreadPoolExecutor.DiscardPolicy());
+    private static final ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new NamedDbThreadFactory("EventDatabase"), new ThreadPoolExecutor.DiscardPolicy());
 
     private static final long ONEWEEK = 1000 * 60 * 60 * 24 * 7;
     public static int config_hash;
@@ -247,7 +262,7 @@ public class EventDatabase {
 
         @Override
         public Integer call() {
-            Connection connection = ConnectionThread.getConnection();
+            Connection connection = EventDatabaseThread.getConnection();
             if (connection == null) {
                 return -1;
             }
@@ -332,7 +347,7 @@ public class EventDatabase {
         @Override
         public int[] call() {
             int[] inserted_ids = get_id_init_list(event2db_list.size());
-            Connection connection = ConnectionThread.getConnection();
+            Connection connection = EventDatabaseThread.getConnection();
             if (connection == null) {
                 return inserted_ids;
             }
@@ -527,7 +542,7 @@ public class EventDatabase {
 
         @Override
         public void run() {
-            Connection connection = ConnectionThread.getConnection();
+            Connection connection = EventDatabaseThread.getConnection();
             if (connection == null) {
                 return;
             }
@@ -580,7 +595,7 @@ public class EventDatabase {
 
         @Override
         public ArrayList<Interval> call() {
-            Connection connection = ConnectionThread.getConnection();
+            Connection connection = EventDatabaseThread.getConnection();
             if (connection == null) {
                 return new ArrayList<>();
             }
@@ -679,7 +694,7 @@ public class EventDatabase {
 
         @Override
         public ArrayList<JHVEvent> call() {
-            Connection connection = ConnectionThread.getConnection();
+            Connection connection = EventDatabaseThread.getConnection();
             ArrayList<JHVEvent> eventList = new ArrayList<>();
             if (connection == null) {
                 return eventList;
@@ -747,7 +762,7 @@ public class EventDatabase {
 
         @Override
         public ArrayList<JHVAssociation> call() {
-            Connection connection = ConnectionThread.getConnection();
+            Connection connection = EventDatabaseThread.getConnection();
             ArrayList<JHVAssociation> assocList = new ArrayList<>();
             if (connection == null) {
                 return assocList;
@@ -787,7 +802,7 @@ public class EventDatabase {
     }
 
     private static ArrayList<JsonEvent> rel2prog(int event_id, SWEKSupplier type_left, SWEKSupplier type_right, String param_left, String param_right) {
-        Connection connection = ConnectionThread.getConnection();
+        Connection connection = EventDatabaseThread.getConnection();
         if (connection == null) {
             return new ArrayList<>();
         }
@@ -862,7 +877,7 @@ public class EventDatabase {
     }
 
     private static JsonEvent event2prog(int event_id) {
-        Connection connection = ConnectionThread.getConnection();
+        Connection connection = EventDatabaseThread.getConnection();
         if (connection == null) {
             return null;
         }
