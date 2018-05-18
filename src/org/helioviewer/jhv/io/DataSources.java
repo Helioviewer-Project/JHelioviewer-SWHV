@@ -13,7 +13,6 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.database.DataSourcesDB;
 
 import org.everit.json.schema.Validator;
 
@@ -119,7 +118,6 @@ public class DataSources {
             server = "GSFC";
         Settings.getSingletonInstance().setProperty("default.server", server);
 
-        DataSourcesDB.init();
         Validator validator = Validator.builder().failEarly().build();
         for (String serverName : serverSettings.keySet())
             JHVGlobals.getExecutorService().execute(new DataSourcesTask(serverName, validator));

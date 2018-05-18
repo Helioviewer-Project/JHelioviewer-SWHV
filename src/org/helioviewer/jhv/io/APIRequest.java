@@ -8,7 +8,7 @@ import javax.annotation.Nonnull;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.helioviewer.jhv.database.DataSourcesDB;
+import org.helioviewer.jhv.database.SourcesDatabase;
 import org.json.JSONObject;
 
 public class APIRequest {
@@ -97,7 +97,7 @@ public class APIRequest {
 
         String observatory = jo.optString("observatory", "");
         String dataset = jo.getString("dataset");
-        ArrayList<Pair<Integer, String>> res = DataSourcesDB.doSelect(Settings.getSingletonInstance().getProperty("default.server"), observatory, dataset);
+        ArrayList<Pair<Integer, String>> res = SourcesDatabase.doSelect(Settings.getSingletonInstance().getProperty("default.server"), observatory, dataset);
         if (res.isEmpty())
             throw new Exception("Empty request result");
 
