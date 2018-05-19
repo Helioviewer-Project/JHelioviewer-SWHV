@@ -69,11 +69,11 @@ public class SourcesDatabase extends Thread {
     public static void insert(int sourceId, @Nonnull String server, @Nonnull String observatory, @Nonnull String dataset, long start, long end) {
         FutureTask<Void> ft = new FutureTask<>(new Insert(sourceId, server, observatory, dataset, start, end));
         executor.execute(ft);
-        try {
+     /* try {
             ft.get();
         } catch (InterruptedException | ExecutionException e) {
             e.getCause().printStackTrace();
-        }
+        } */
     }
 
     private static class Insert implements Callable<Void> {
