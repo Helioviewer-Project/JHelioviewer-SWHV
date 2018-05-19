@@ -97,7 +97,7 @@ public class APIRequest {
 
         String observatory = jo.optString("observatory", "");
         String dataset = jo.getString("dataset");
-        ArrayList<Pair<Integer, String>> res = SourcesDatabase.doSelect(Settings.getSingletonInstance().getProperty("default.server"), observatory, dataset);
+        ArrayList<Pair<Integer, String>> res = SourcesDatabase.select(Settings.getSingletonInstance().getProperty("default.server"), observatory, dataset);
         if (res.isEmpty())
             throw new Exception("Empty request result");
 
