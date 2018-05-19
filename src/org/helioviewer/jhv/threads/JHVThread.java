@@ -40,9 +40,9 @@ public class JHVThread {
 
         @Override
         public Thread newThread(@Nonnull Runnable r) {
-            Thread thread = new Thread(r, name);
-            thread.setDaemon(true);
-            return thread;
+            Thread t = new Thread(r, name);
+            t.setDaemon(true);
+            return t;
         }
     }
 

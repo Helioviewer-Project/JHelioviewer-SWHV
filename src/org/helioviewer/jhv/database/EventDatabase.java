@@ -65,10 +65,10 @@ public class EventDatabase {
         }
 
         @Override
-        public EventDatabaseThread newThread(@Nonnull Runnable r) {
-            EventDatabaseThread thread = new EventDatabaseThread(r, name);
-            thread.setDaemon(true);
-            return thread;
+        public Thread newThread(@Nonnull Runnable r) {
+            Thread t = new EventDatabaseThread(r, name);
+            t.setDaemon(true);
+            return t;
         }
     }
 
