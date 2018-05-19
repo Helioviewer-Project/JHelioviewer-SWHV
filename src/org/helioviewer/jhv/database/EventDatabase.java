@@ -12,16 +12,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.FutureTask;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
-
-import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.cache.RequestCache;
@@ -38,6 +34,8 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVThread;
 
 public class EventDatabase {
+
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor(new JHVThread.NamedClassThreadFactory(EventDatabaseThread.class, "EventDatabase"));
 
     public static class Event2Db {
         final byte[] compressedJson;
@@ -57,23 +55,6 @@ public class EventDatabase {
         }
 
     }
-
-    private static class NamedDbThreadFactory extends JHVThread.NamedThreadFactory {
-
-        NamedDbThreadFactory(String _name) {
-            super(_name);
-        }
-
-        @Override
-        public Thread newThread(@Nonnull Runnable r) {
-            Thread t = new EventDatabaseThread(r, name);
-            t.setDaemon(true);
-            return t;
-        }
-    }
-
-    private static final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<>(10000);
-    private static final ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new NamedDbThreadFactory("EventDatabase"), new ThreadPoolExecutor.DiscardPolicy());
 
     private static final long ONEWEEK = 1000 * 60 * 60 * 24 * 7;
     public static int config_hash;

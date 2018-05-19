@@ -11,12 +11,12 @@ import java.sql.Statement;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.log.Log;
 
-class EventDatabaseThread extends Thread {
+public class EventDatabaseThread extends Thread {
 
     private static final int CURRENT_VERSION_SCHEMA = 8;
     private static Connection connection;
 
-    EventDatabaseThread(Runnable r, String name) {
+    public EventDatabaseThread(Runnable r, String name) {
         super(r, name);
     }
 

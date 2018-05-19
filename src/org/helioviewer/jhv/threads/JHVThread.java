@@ -32,7 +32,7 @@ public class JHVThread {
     // this creates daemon threads
     public static class NamedThreadFactory implements ThreadFactory {
 
-        public final String name;
+        private final String name;
 
         public NamedThreadFactory(String _name) {
             name = _name;
@@ -43,6 +43,29 @@ public class JHVThread {
             Thread t = new Thread(r, name);
             t.setDaemon(true);
             return t;
+        }
+    }
+
+    public static class NamedClassThreadFactory implements ThreadFactory {
+
+        private final Class<? extends Thread> clazz;
+        private final String name;
+
+        public NamedClassThreadFactory(Class<? extends Thread> _clazz, String _name) {
+            clazz = _clazz;
+            name = _name;
+        }
+
+        @Override
+        public Thread newThread(@Nonnull Runnable r) {
+            try {
+                Thread t = clazz.getConstructor(Runnable.class, String.class).newInstance(r, name);
+                t.setDaemon(true);
+                return t;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
         }
     }
 
