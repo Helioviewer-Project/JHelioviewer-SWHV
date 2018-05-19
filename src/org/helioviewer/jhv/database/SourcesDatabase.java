@@ -35,7 +35,7 @@ public class SourcesDatabase extends Thread {
         }
     }
 
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor(new NamedDbThreadFactory("DataSourcesDatabase"));
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor(new NamedDbThreadFactory("SourcesDatabase"));
 
     private static Connection connection;
     private static PreparedStatement insert;
@@ -48,13 +48,13 @@ public class SourcesDatabase extends Thread {
 
             try (Statement create = connection.createStatement()) {
                 create.setQueryTimeout(30);
-                create.executeUpdate("drop table if exists DataSources"); // debug
-                create.executeUpdate("CREATE TABLE DataSources (sourceId INTEGER, server STRING, observatory STRING, dataset STRING, start INTEGER, end INTEGER, UNIQUE(sourceId, server) ON CONFLICT REPLACE)");
+                create.executeUpdate("drop table if exists Sources"); // debug
+                create.executeUpdate("CREATE TABLE Sources(sourceId INTEGER, server STRING, observatory STRING, dataset STRING, start INTEGER, end INTEGER, UNIQUE(sourceId, server) ON CONFLICT REPLACE)");
             }
 
-            insert = connection.prepareStatement("INSERT INTO DataSources(sourceId, server, observatory, dataset, start, end) VALUES(?,?,?,?,?,?)");
+            insert = connection.prepareStatement("INSERT INTO Sources(sourceId, server, observatory, dataset, start, end) VALUES(?,?,?,?,?,?)");
             insert.setQueryTimeout(30);
-            select = connection.prepareStatement("SELECT sourceId,server FROM DataSources WHERE server=? AND observatory LIKE ? AND dataset LIKE ?");
+            select = connection.prepareStatement("SELECT sourceId,server FROM Sources WHERE server=? AND observatory LIKE ? AND dataset LIKE ?");
             select.setQueryTimeout(30);
         } catch (SQLException e) {
             Log.error("Could not create database connection", e);
@@ -96,6 +96,9 @@ public class SourcesDatabase extends Thread {
 
         @Override
         public Void call() {
+            if (connection == null)
+                return null;
+
             try {
                 insert.setInt(1, sourceId);
                 insert.setString(2, server);
@@ -138,6 +141,9 @@ public class SourcesDatabase extends Thread {
         @Override
         public ArrayList<Pair<Integer, String>> call() {
             ArrayList<Pair<Integer, String>> res = new ArrayList<>();
+            if (connection == null)
+                return res;
+
             try {
                 select.setString(1, server);
                 select.setString(2, '%' + observatory + '%');
