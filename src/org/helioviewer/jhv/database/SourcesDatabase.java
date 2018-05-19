@@ -21,27 +21,13 @@ import org.helioviewer.jhv.threads.JHVThread;
 
 public class SourcesDatabase extends Thread {
 
-    private static class NamedDbThreadFactory extends JHVThread.NamedThreadFactory {
-
-        NamedDbThreadFactory(String _name) {
-            super(_name);
-        }
-
-        @Override
-        public Thread newThread(@Nonnull Runnable r) {
-            Thread t = new SourcesDatabase(r, name);
-            t.setDaemon(true);
-            return t;
-        }
-    }
-
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor(new NamedDbThreadFactory("SourcesDatabase"));
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor(new JHVThread.NamedClassThreadFactory(SourcesDatabase.class, "SourcesDatabase"));
 
     private static Connection connection;
     private static PreparedStatement insert;
     private static PreparedStatement select;
 
-    private SourcesDatabase(Runnable r, String name) {
+    public SourcesDatabase(Runnable r, String name) {
         super(r, name);
         try {
             connection = DriverManager.getConnection("jdbc:sqlite::memory:");
