@@ -161,4 +161,7 @@ public class SourcesDatabase extends Thread {
 
     }
 
+    private SourcesDatabase() {
+    }
+
 }
