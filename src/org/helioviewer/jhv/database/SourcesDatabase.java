@@ -28,10 +28,10 @@ public class SourcesDatabase extends Thread {
         }
 
         @Override
-        public SourcesDatabase newThread(@Nonnull Runnable r) {
-            SourcesDatabase thread = new SourcesDatabase(r, name);
-            thread.setDaemon(true);
-            return thread;
+        public Thread newThread(@Nonnull Runnable r) {
+            Thread t = new SourcesDatabase(r, name);
+            t.setDaemon(true);
+            return t;
         }
     }
 
@@ -159,9 +159,6 @@ public class SourcesDatabase extends Thread {
             return res;
         }
 
-    }
-
-    private SourcesDatabase() {
     }
 
 }
