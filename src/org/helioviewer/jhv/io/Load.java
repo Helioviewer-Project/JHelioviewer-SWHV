@@ -4,7 +4,6 @@ import java.net.URI;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.view.AbstractView;
 
 public interface Load {
@@ -14,7 +13,6 @@ public interface Load {
     Load image = new Image();
     Load request = new Request();
     Load fits = new FITS();
-    Load timeline = new Timeline();
     Load state = new State();
 
     class Image implements Load {
@@ -50,13 +48,6 @@ public interface Load {
                 JHVGlobals.getExecutorService().execute(new LoadZipTask(uri));
             else
                 JHVGlobals.getExecutorService().execute(new LoadStateTask(uri));
-        }
-    }
-
-    class Timeline implements Load {
-        @Override
-        public void get(URI uri) {
-            EVEPlugin.eveDataprovider.loadBand(uri);
         }
     }
 

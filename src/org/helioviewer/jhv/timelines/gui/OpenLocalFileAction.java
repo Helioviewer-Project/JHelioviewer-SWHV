@@ -44,7 +44,7 @@ public class OpenLocalFileAction extends AbstractAction {
             Settings.getSingletonInstance().save("default.local.path");
             for (File fileName : fileNames) {
                 if (fileName.isFile())
-                    Load.timeline.get(fileName.toURI());
+                    Load.request.get(fileName.toURI());
             }
         }
     }

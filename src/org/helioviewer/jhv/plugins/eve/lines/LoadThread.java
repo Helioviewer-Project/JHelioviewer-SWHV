@@ -1,29 +1,27 @@
 package org.helioviewer.jhv.plugins.eve.lines;
 
-import java.net.URI;
-
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.band.Band;
 import org.helioviewer.jhv.timelines.band.BandType;
 import org.helioviewer.jhv.timelines.draw.DrawController;
+import org.json.JSONObject;
 
 class LoadThread extends JHVWorker<EVEResponse, Void> {
 
-    private final URI uri;
+    private final JSONObject jo;
 
-    LoadThread(URI _uri) {
-        uri = _uri;
+    LoadThread(JSONObject _jo) {
+        jo = _jo;
     }
 
     @Nullable
     @Override
     protected EVEResponse backgroundWork() {
         try {
-            return new EVEResponse(JSONUtils.get(uri)/*.getJSONObject("org.helioviewer.jhv.request.timeline")*/);
+            return new EVEResponse(jo);
         } catch (Exception e) {
             e.printStackTrace();
         }
