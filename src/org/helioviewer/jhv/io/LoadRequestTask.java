@@ -29,17 +29,21 @@ class LoadRequestTask extends JHVWorker<Void, Void> {
             int len;
             JSONObject jo = JSONUtils.get(uri);
 
-            JSONArray ji = jo.getJSONArray("org.helioviewer.jhv.request.image");
-            len = ji.length();
-            for (int i = 0; i < len; i++) {
-                APIRequest req = APIRequest.fromRequestJson(ji.getJSONObject(i));
-                JHVGlobals.getExecutorService().execute(new LoadRemoteTask(ImageLayer.create(null), req));
+            JSONArray ji = jo.optJSONArray("org.helioviewer.jhv.request.image");
+            if (ji != null) {
+                len = ji.length();
+                for (int i = 0; i < len; i++) {
+                    APIRequest req = APIRequest.fromRequestJson(ji.getJSONObject(i));
+                    JHVGlobals.getExecutorService().execute(new LoadRemoteTask(ImageLayer.create(null), req));
+                }
             }
 
-            JSONArray jt = jo.getJSONArray("org.helioviewer.jhv.request.timeline");
-            len = jt.length();
-            for (int i = 0; i < len; i++) {
-                EVEPlugin.eveDataprovider.loadBand(jt.getJSONObject(i));
+            JSONArray jt = jo.optJSONArray("org.helioviewer.jhv.request.timeline");
+            if (jt != null) {
+                len = jt.length();
+                for (int i = 0; i < len; i++) {
+                    EVEPlugin.eveDataprovider.loadBand(jt.getJSONObject(i));
+                }
             }
         } catch (Exception e) {
             Log.error("An error occured while opening the remote file: ", e);
