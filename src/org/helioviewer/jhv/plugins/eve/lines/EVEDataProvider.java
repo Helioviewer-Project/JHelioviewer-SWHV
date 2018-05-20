@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.eve.lines;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +11,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.band.Band;
 import org.helioviewer.jhv.timelines.band.BandDataProvider;
+import org.json.JSONObject;
 
 public class EVEDataProvider implements BandDataProvider {
 
@@ -21,8 +21,8 @@ public class EVEDataProvider implements BandDataProvider {
     private static final HashMap<Band, List<Future<?>>> futureJobs = new HashMap<>();
 
     @Override
-    public void loadBand(URI uri) {
-        EVEPlugin.executorService.submit(new LoadThread(uri));
+    public void loadBand(JSONObject jo) {
+        EVEPlugin.executorService.submit(new LoadThread(jo));
     }
 
     @Override

@@ -1,10 +1,10 @@
 package org.helioviewer.jhv.timelines.band;
 
-import java.net.URI;
+import org.json.JSONObject;
 
 public interface BandDataProvider {
 
-    void loadBand(URI uri);
+    void loadBand(JSONObject jo);
 
     void updateBand(Band band, long start, long end);
 

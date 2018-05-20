@@ -28,6 +28,7 @@ public class ProxySettings {
 
         if (!Proxy.NO_PROXY.equals(proxy)) {
             Authenticator.setDefault(new Authenticator() {
+                @Nullable
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
                     String[] vars = proxy.type() == Proxy.Type.HTTP ? httpVars : socksVars;

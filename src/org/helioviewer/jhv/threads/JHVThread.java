@@ -6,6 +6,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class JHVThread {
 
@@ -56,6 +57,7 @@ public class JHVThread {
             name = _name;
         }
 
+        @Nullable
         @Override
         public Thread newThread(@Nonnull Runnable r) {
             try {
