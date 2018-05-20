@@ -20,6 +20,7 @@ import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.timelines.propagation.PropagationModel;
 import org.helioviewer.jhv.timelines.propagation.PropagationModelRadial;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Band extends AbstractTimelineLayer {
@@ -71,7 +72,7 @@ public class Band extends AbstractTimelineLayer {
         jo.put("multiplier", multiplier);
         bandCache.serialize(jo, 1 / multiplier);
         bandType.serialize(jo);
-        return jo;
+        return new JSONObject().put("org.helioviewer.jhv.request.timeline", new JSONArray().put(jo));
     }
 
     @Override
