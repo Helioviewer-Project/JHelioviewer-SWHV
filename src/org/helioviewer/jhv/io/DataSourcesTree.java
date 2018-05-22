@@ -142,7 +142,7 @@ public class DataSourcesTree extends JTree {
         }
     }
 
-    private static final String defaultServer = Settings.getSingletonInstance().getProperty("default.server");
+    private static final String defaultServer = Settings.getProperty("default.server");
 
     public boolean setParsedData(DataSourcesParser parser) {
         String server = parser.getRoot().toString();

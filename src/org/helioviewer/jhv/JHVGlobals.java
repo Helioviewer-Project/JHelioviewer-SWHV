@@ -53,15 +53,15 @@ public class JHVGlobals {
     private static int readTimeout = -1;
     private static int connectTimeout = -1;
 
-    public static int getStdReadTimeout() {
+    public static int getReadTimeout() {
         if (readTimeout == -1)
-            readTimeout = Integer.parseInt(Settings.getSingletonInstance().getProperty("connection.read.timeout"));
+            readTimeout = Integer.parseInt(Settings.getProperty("timeout.read"));
         return readTimeout;
     }
 
-    public static int getStdConnectTimeout() {
+    public static int getConnectTimeout() {
         if (connectTimeout == -1)
-            connectTimeout = Integer.parseInt(Settings.getSingletonInstance().getProperty("connection.connect.timeout"));
+            connectTimeout = Integer.parseInt(Settings.getProperty("timeout.connect"));
         return connectTimeout;
     }
 

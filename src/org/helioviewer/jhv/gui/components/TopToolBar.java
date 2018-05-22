@@ -117,7 +117,7 @@ public class TopToolBar extends JToolBar {
         });
 
         try {
-            displayMode = DisplayMode.valueOf(Settings.getSingletonInstance().getProperty("display.toolbar").toUpperCase());
+            displayMode = DisplayMode.valueOf(Settings.getProperty("display.toolbar").toUpperCase());
         } catch (Exception ignore) {
         }
         setDisplayMode(displayMode);
@@ -142,7 +142,7 @@ public class TopToolBar extends JToolBar {
     private void createNewToolBar() {
         InteractionMode interactionMode = InteractionMode.ROTATE;
         try {
-            interactionMode = InteractionMode.valueOf(Settings.getSingletonInstance().getProperty("display.interaction").toUpperCase());
+            interactionMode = InteractionMode.valueOf(Settings.getProperty("display.interaction").toUpperCase());
         } catch (Exception ignore) {
         }
 
@@ -285,8 +285,7 @@ public class TopToolBar extends JToolBar {
     }
 
     private static void setActiveInteractionMode(InteractionMode mode) {
-        Settings.getSingletonInstance().setProperty("display.interaction", mode.toString());
-        Settings.getSingletonInstance().save("display.interaction");
+        Settings.setProperty("display.interaction", mode.toString());
         ImageViewerGui.setCurrentInteraction(mode.interaction);
     }
 
@@ -297,8 +296,7 @@ public class TopToolBar extends JToolBar {
 
     private void setDisplayMode(DisplayMode mode) {
         displayMode = mode;
-        Settings.getSingletonInstance().setProperty("display.toolbar", mode.toString().toLowerCase());
-        Settings.getSingletonInstance().save("display.toolbar");
+        Settings.setProperty("display.toolbar", mode.toString().toLowerCase());
         recreate();
     }
 

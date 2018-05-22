@@ -75,7 +75,7 @@ public class APIRequest {
         return jo;
     }
 
-    private static final String defaultServer = Settings.getSingletonInstance().getProperty("default.server");
+    private static final String defaultServer = Settings.getProperty("default.server");
 
     public static APIRequest fromJson(JSONObject jo) {
         String _server = jo.optString("server", defaultServer);

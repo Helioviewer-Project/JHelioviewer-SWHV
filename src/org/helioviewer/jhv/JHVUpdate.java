@@ -37,11 +37,10 @@ public class JHVUpdate implements Runnable {
     public void run() {
         if (!verbose) {
             try {
-                int n = Integer.parseInt(Settings.getSingletonInstance().getProperty("update.check.next"));
+                int n = Integer.parseInt(Settings.getProperty("update.next"));
                 if (n > 0) {
                     n -= 1;
-                    Settings.getSingletonInstance().setProperty("update.check.next", Integer.toString(n));
-                    Settings.getSingletonInstance().save("update.check.next");
+                    Settings.setProperty("update.next", Integer.toString(n));
                 }
                 if (n != 0) {
                     Log.info("Update check suspended for this startup");
@@ -49,7 +48,7 @@ public class JHVUpdate implements Runnable {
                 }
             } catch (NumberFormatException e) {
                 Log.error("Invalid update setting", e);
-                Settings.getSingletonInstance().setProperty("update.check.next", Integer.toString(0));
+                Settings.setProperty("update.next", Integer.toString(0));
             }
         }
 
@@ -67,8 +66,7 @@ public class JHVUpdate implements Runnable {
                     NewVersionDialog dialog = new NewVersionDialog("JHelioviewer " + version + " is now available (you have " + runningVersion + ").", verbose);
                     dialog.showDialog();
                     if (!verbose) {
-                        Settings.getSingletonInstance().setProperty("update.check.next", Integer.toString(dialog.getNextCheck()));
-                        Settings.getSingletonInstance().save("update.check.next");
+                        Settings.setProperty("update.next", Integer.toString(dialog.getNextCheck()));
                     }
                 } else {
                     if (verbose)

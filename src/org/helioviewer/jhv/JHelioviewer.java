@@ -70,20 +70,12 @@ public class JHelioviewer {
         JHVGlobals.createDirs();
         // Read the version and revision from the JAR metafile
         JHVGlobals.determineVersionAndRevision();
-        // Load settings from file but do not apply them yet
-        // The settings must not be applied before the kakadu engine has been initialized
-        Settings.getSingletonInstance().load();
+        Settings.load();
         // Set the platform system properties
         SystemProperties.setPlatform();
         System.setProperty("newt.window.icons", "null,null");
         System.setProperty("org.sqlite.tmpdir", JHVGlobals.libCacheDir.toString());
         // if (true) throw new RuntimeException("This is a Sentry test");
-
-        // Make sure the default server is known
-        String server = Settings.getSingletonInstance().getProperty("default.server");
-        if (server == null || DataSources.getServerSetting(server, "API.getDataSources") == null)
-            server = "GSFC";
-        Settings.getSingletonInstance().setProperty("default.server", server);
 
         FitsFactory.setUseHierarch(true);
 
