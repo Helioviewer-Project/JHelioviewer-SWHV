@@ -910,7 +910,4 @@ public class EventDatabase {
         return evt;
     }
 
-    private EventDatabase() {
-    }
-
 }
