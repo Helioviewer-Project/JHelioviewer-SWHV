@@ -12,7 +12,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.Settings;
 
 import org.everit.json.schema.Validator;
 
