@@ -1,12 +1,10 @@
 package org.helioviewer.jhv.io;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.database.SourcesDatabase;
 import org.json.JSONObject;
@@ -77,8 +75,10 @@ public class APIRequest {
         return jo;
     }
 
+    private static final String defaultServer = Settings.getSingletonInstance().getProperty("default.server");
+
     public static APIRequest fromJson(JSONObject jo) {
-        String _server = jo.optString("server", Settings.getSingletonInstance().getProperty("default.server"));
+        String _server = jo.optString("server", defaultServer);
         int _sourceId = jo.optInt("sourceId", 10);
 
         long t = System.currentTimeMillis();
@@ -97,14 +97,11 @@ public class APIRequest {
 
         String observatory = jo.optString("observatory", "");
         String dataset = jo.getString("dataset");
-        ArrayList<Pair<Integer, String>> res = SourcesDatabase.select(Settings.getSingletonInstance().getProperty("default.server"), observatory, dataset);
-        if (res.isEmpty())
+        int _sourceId = SourcesDatabase.select(defaultServer, observatory, dataset);
+        if (_sourceId < 0)
             throw new Exception("Empty request result");
 
-        int _sourceId = res.get(0).a;
-        String _server = res.get(0).b;
-
-        return new APIRequest(_server, _sourceId, _startTime, _endTime, _cadence);
+        return new APIRequest(defaultServer, _sourceId, _startTime, _endTime, _cadence);
     }
 
 }
