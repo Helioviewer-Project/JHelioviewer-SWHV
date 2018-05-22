@@ -41,8 +41,8 @@ public class ProxySettings {
 
                         try {
                             if (user == null || pass == null) {
-                                user = Settings.getProperty("default.proxyUsername");
-                                pass = Settings.getProperty("default.proxyPassword");
+                                user = Settings.getProperty("proxy.username");
+                                pass = Settings.getProperty("proxy.password");
                                 if (pass != null)
                                     pass = new String(Base64.getDecoder().decode(pass), StandardCharsets.UTF_8);
                             }

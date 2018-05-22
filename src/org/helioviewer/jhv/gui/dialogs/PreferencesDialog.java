@@ -6,8 +6,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Objects;
@@ -19,7 +17,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -148,7 +145,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
             super(new BorderLayout());
             setPreferredSize(new Dimension(0, 150));
 
-            String pass = Settings.getProperty("default.proxyPassword");
+            String pass = Settings.getProperty("proxy.password");
             try {
                 pass = new String(Base64.getDecoder().decode(pass), StandardCharsets.UTF_8);
             } catch (Exception e) {
@@ -156,16 +153,14 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
             }
 
             Object[][] tableData = {
-                { "Default recording directory", Settings.getProperty("path.save") },
-                { "Default download directory", Settings.getProperty("path.local") },
-                { "Proxy username", Settings.getProperty("default.proxyUsername") },
+                { "Proxy username", Settings.getProperty("proxy.username") },
                 { "Proxy password", pass },
             };
 
             model = new DefaultTableModel(tableData, new String[] { "Description", "Value" }) {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return column == 1 && (row == 2 || row == 3);
+                    return column == 1;
                 }
             };
 
@@ -175,9 +170,10 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
             grid = new JTable(model) {
                 @Override
                 public TableCellEditor getCellEditor(int row, int column) {
-                    if (row == 3 && column == 1) {
-                        if (getValueAt(3, 1) instanceof String)
-                            passField.setText((String) getValueAt(3, 1));
+                    if (row == 1 && column == 1) {
+                        Object val = getValueAt(1, 1);
+                        if (val instanceof String)
+                            passField.setText((String) val);
                         return passEditor;
                     } else
                         return super.getCellEditor(row, column);
@@ -186,7 +182,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
             grid.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer () {
                 @Override
                 public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                    if (row == 3 && column == 1) {
+                    if (row == 1 && column == 1) {
                         if (value instanceof String)
                             passField.setText((String) value);
                         return passField;
@@ -200,24 +196,6 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
             grid.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             // grid.setFillsViewportHeight(true);
 
-            grid.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if (e.getClickCount() != 2)
-                        return;
-
-                    int row = grid.getSelectedRow();
-                    if (row == -1 || row >= 2)
-                        return;
-
-                    JFileChooser chooser = new JFileChooser((String) model.getValueAt(row, 1));
-                    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-                    if (chooser.showDialog(null, "Select") == JFileChooser.APPROVE_OPTION)
-                        model.setValueAt(chooser.getSelectedFile().toString(), row, 1);
-                }
-            });
-
             TableColumn col = grid.getColumnModel().getColumn(0);
             col.setMaxWidth(150);
             col.setMinWidth(150);
@@ -226,15 +204,13 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         }
 
         void setSettings() {
-            if (model.getValueAt(0, 1) instanceof String)
-                Settings.setProperty("path.save", (String) model.getValueAt(0, 1));
-            if (model.getValueAt(1, 1) instanceof String)
-                Settings.setProperty("path.local", (String) model.getValueAt(1, 1));
-            if (model.getValueAt(2, 1) instanceof String)
-                Settings.setProperty("default.proxyUsername", (String) model.getValueAt(2, 1));
-            if (model.getValueAt(3, 1) instanceof String) {
-                String s = Base64.getEncoder().withoutPadding().encodeToString(((String) model.getValueAt(3, 1)).getBytes(StandardCharsets.UTF_8));
-                Settings.setProperty("default.proxyPassword", s);
+            Object val0 = model.getValueAt(0, 1);
+            if (val0 instanceof String)
+                Settings.setProperty("proxy.username", (String) val0);
+            Object val1 = model.getValueAt(1, 1);
+            if (val1 instanceof String) {
+                String s = Base64.getEncoder().withoutPadding().encodeToString(((String) val1).getBytes(StandardCharsets.UTF_8));
+                Settings.setProperty("proxy.password", s);
             }
         }
 

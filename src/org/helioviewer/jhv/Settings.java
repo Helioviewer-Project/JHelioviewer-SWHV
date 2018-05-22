@@ -3,7 +3,6 @@ package org.helioviewer.jhv;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Properties;
@@ -35,13 +34,9 @@ public class Settings {
                 }
             }
 
-            if (getProperty("path.save") == null) {
-                setProperty("path.save", JHVDirectory.EXPORTS.getPath());
-            }
             if (getProperty("path.local") == null) {
                 setProperty("path.local", JHVDirectory.HOME.getPath());
             }
-
             String server = getProperty("default.server");
             if (server == null || DataSources.getServerSetting(server, "API.getDataSources") == null)
                 Settings.setProperty("default.server", "IAS");
