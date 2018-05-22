@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -15,7 +14,6 @@ import java.util.concurrent.FutureTask;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVThread;
 
@@ -40,7 +38,7 @@ public class SourcesDatabase extends Thread {
 
             insert = connection.prepareStatement("INSERT INTO Sources(sourceId, server, observatory, dataset, start, end) VALUES(?,?,?,?,?,?)");
             insert.setQueryTimeout(30);
-            select = connection.prepareStatement("SELECT sourceId,server FROM Sources WHERE server=? AND observatory LIKE ? AND dataset LIKE ?");
+            select = connection.prepareStatement("SELECT sourceId FROM Sources WHERE server=? AND observatory LIKE ? AND dataset LIKE ? LIMIT 1");
             select.setQueryTimeout(30);
         } catch (SQLException e) {
             Log.error("Could not create database connection", e);
@@ -101,18 +99,18 @@ public class SourcesDatabase extends Thread {
 
     }
 
-    public static ArrayList<Pair<Integer, String>> select(@Nonnull String server, @Nonnull String observatory, @Nonnull String dataset) {
-        FutureTask<ArrayList<Pair<Integer, String>>> ft = new FutureTask<>(new Select(server, observatory, dataset));
+    public static int select(@Nonnull String server, @Nonnull String observatory, @Nonnull String dataset) {
+        FutureTask<Integer> ft = new FutureTask<>(new Select(server, observatory, dataset));
         executor.execute(ft);
         try {
             return ft.get();
         } catch (InterruptedException | ExecutionException e) {
             e.getCause().printStackTrace();
         }
-        return new ArrayList<>();
+        return -1;
     }
 
-    private static class Select implements Callable<ArrayList<Pair<Integer, String>>> {
+    private static class Select implements Callable<Integer> {
 
         private final String server;
         private final String observatory;
@@ -125,8 +123,8 @@ public class SourcesDatabase extends Thread {
         }
 
         @Override
-        public ArrayList<Pair<Integer, String>> call() {
-            ArrayList<Pair<Integer, String>> res = new ArrayList<>();
+        public Integer call() {
+            int res = -1;
             if (connection == null)
                 return res;
 
@@ -136,8 +134,8 @@ public class SourcesDatabase extends Thread {
                 select.setString(3, '%' + dataset + '%');
 
                 try (ResultSet rs = select.executeQuery()) {
-                    while (rs.next())
-                        res.add(new Pair<>(rs.getInt(1), rs.getString(2)));
+                    if (rs.next())
+                        res = rs.getInt(1);
                 }
             } catch (SQLException e) {
                 Log.error("Failed to select", e);
