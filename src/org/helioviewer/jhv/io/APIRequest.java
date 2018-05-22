@@ -75,10 +75,8 @@ public class APIRequest {
         return jo;
     }
 
-    private static final String defaultServer = Settings.getProperty("default.server");
-
     public static APIRequest fromJson(JSONObject jo) {
-        String _server = jo.optString("server", defaultServer);
+        String _server = jo.optString("server", Settings.getProperty("default.server"));
         int _sourceId = jo.optInt("sourceId", 10);
 
         long t = System.currentTimeMillis();
@@ -97,6 +95,7 @@ public class APIRequest {
 
         String observatory = jo.optString("observatory", "");
         String dataset = jo.getString("dataset");
+        String defaultServer = Settings.getProperty("default.server");
         int _sourceId = SourcesDatabase.select(defaultServer, observatory, dataset);
         if (_sourceId < 0)
             throw new Exception("Empty request result");
