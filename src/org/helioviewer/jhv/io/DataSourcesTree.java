@@ -142,8 +142,6 @@ public class DataSourcesTree extends JTree {
         }
     }
 
-    private static final String defaultServer = Settings.getProperty("default.server");
-
     public boolean setParsedData(DataSourcesParser parser) {
         String server = parser.getRoot().toString();
         for (String serverName : DataSources.getServers()) {
@@ -153,7 +151,7 @@ public class DataSourcesTree extends JTree {
             }
         }
 
-        boolean preferred = server.equals(defaultServer);
+        boolean preferred = server.equals(Settings.getProperty("default.server"));
         if (preferred && parser.getDefault() != null) {
             Object obj = parser.getDefault().getUserObject();
             if (obj instanceof SourceItem) {

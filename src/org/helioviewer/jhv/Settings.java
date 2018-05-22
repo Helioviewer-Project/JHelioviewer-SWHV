@@ -34,9 +34,8 @@ public class Settings {
             Log.error("Settings.load() > Could not load settings", e);
         }
 
-        if (getProperty("path.local") == null) {
+        if (getProperty("path.local") == null)
             setProperty("path.local", JHVDirectory.HOME.getPath());
-        }
         String server = getProperty("default.server");
         if (server == null || DataSources.getServerSetting(server, "API.getDataSources") == null)
             setProperty("default.server", "IAS");
