@@ -19,6 +19,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.FutureTask;
 import java.util.zip.GZIPInputStream;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
@@ -432,8 +434,9 @@ public class EventDatabase {
         HashMap<Integer, JHVEvent> ids = new HashMap<>();
         ArrayList<JHVEvent> uniqueEvents = new ArrayList<>();
         for (JHVEvent ev : events) {
-            if (!ids.containsKey(ev.getUniqueID())) {
-                ids.put(ev.getUniqueID(), ev);
+            int id = ev.getUniqueID();
+            if (!ids.containsKey(id)) {
+                ids.put(id, ev);
                 uniqueEvents.add(ev);
             }
         }
@@ -857,33 +860,6 @@ public class EventDatabase {
         }
     }
 
-    private static JsonEvent event2prog(int event_id) {
-        Connection connection = EventDatabaseThread.getConnection();
-        if (connection == null) {
-            return null;
-        }
-
-        try {
-            PreparedStatement ps = getPreparedStatement(connection, SELECT_EVENT_BY_ID);
-            ps.setLong(1, event_id);
-
-            JsonEvent je = null;
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    int id = rs.getInt(1);
-                    long start = rs.getLong(2);
-                    long end = rs.getLong(3);
-                    byte[] json = rs.getBytes(4);
-                    je = new JsonEvent(json, SWEKSupplier.getSupplier(rs.getString(5)), id, start, end);
-                }
-            }
-            return je;
-        } catch (SQLException e) {
-            Log.error("Could not fetch associations " + e.getMessage());
-            return null;
-        }
-    }
-
     private static class Event2Program implements Callable<JsonEvent> {
         private final int event_id;
 
@@ -891,12 +867,37 @@ public class EventDatabase {
             event_id = _event_id;
         }
 
+        @Nullable
         @Override
         public JsonEvent call() {
-            return event2prog(event_id);
+            Connection connection = EventDatabaseThread.getConnection();
+            if (connection == null) {
+                return null;
+            }
+
+            try {
+                PreparedStatement ps = getPreparedStatement(connection, SELECT_EVENT_BY_ID);
+                ps.setLong(1, event_id);
+
+                JsonEvent je = null;
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        int id = rs.getInt(1);
+                        long start = rs.getLong(2);
+                        long end = rs.getLong(3);
+                        byte[] json = rs.getBytes(4);
+                        je = new JsonEvent(json, SWEKSupplier.getSupplier(rs.getString(5)), id, start, end);
+                    }
+                }
+                return je;
+            } catch (SQLException e) {
+                Log.error("Could not fetch associations " + e.getMessage());
+            }
+            return null;
         }
     }
 
+    @Nullable
     private static JsonEvent event2Program(int event_id) {
         FutureTask<JsonEvent> ft = new FutureTask<>(new Event2Program(event_id));
         executor.execute(ft);
