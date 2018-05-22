@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.helioviewer.jhv.JHVUpdate;
-import org.helioviewer.jhv.log.Log;
 
 @SuppressWarnings("serial")
 public class CheckUpdateAction extends AbstractAction {
@@ -16,13 +15,7 @@ public class CheckUpdateAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        try {
-            JHVUpdate update = new JHVUpdate(true);
-            update.check();
-        } catch (Exception ex) {
-            // Should not happen
-            Log.error("Error while parsing update URL " + ex.getLocalizedMessage(), ex);
-        }
+        new JHVUpdate(true).check();
     }
 
 }

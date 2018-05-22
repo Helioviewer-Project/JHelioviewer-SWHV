@@ -142,13 +142,7 @@ public class JHelioviewer {
             DataSources.loadSources();
             CommandLine.load();
 
-            try {
-                JHVUpdate update = new JHVUpdate(false);
-                update.check();
-            } catch (Exception e) {
-                // Should never happen
-                Log.error("Error retrieving update URL", e);
-            }
+            new JHVUpdate(false).check();
         });
     }
 

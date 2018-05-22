@@ -11,26 +11,22 @@ import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.log.Log;
 
 public class JHVUpdate implements Runnable {
-    /**
+    /*
      * Determines whether to show a message box if already the latest version is
      * running and if a message box is shown in case of an error.
      *
-     * Also it determines whether the properties update.check.* are used to
-     * suspend the checks.
+     * Also it determines whether the property update.next is used to suspend the checks.
      */
     private final boolean verbose;
 
-    /**
-     * Verbose whether a dialog box should be popped up.
-     * Otherwise a message box is shown in case of an update error.
-     */
+    // Verbose whether a dialog box should be popped up.
+    // Otherwise a message box is shown in case of an update error.
     public JHVUpdate(boolean _verbose) {
         verbose = _verbose;
     }
 
     public void check() {
-        Thread t = new Thread(this, "JHV Update Checker");
-        t.start();
+        new Thread(this, "JHV Update Checker").start();
     }
 
     @Override

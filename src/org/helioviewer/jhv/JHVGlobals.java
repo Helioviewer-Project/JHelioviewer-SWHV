@@ -101,11 +101,9 @@ public class JHVGlobals {
         }
     }
 
-    /**
+    /*
      * Attempts to create the necessary directories if they do not exist. It
      * gets its list of directories to create from the JHVDirectory class.
-     *
-     * @throws SecurityException
      */
     public static void createDirs() {
         JHVDirectory[] dirs = JHVDirectory.values();

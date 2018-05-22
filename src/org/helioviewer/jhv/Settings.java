@@ -31,7 +31,7 @@ public class Settings {
         try (BufferedReader reader = Files.newBufferedReader(userPath, StandardCharsets.UTF_8)) {
             settings.load(reader);
         } catch (Exception e) {
-            Log.error("Settings.load() > Could not load settings", e);
+            Log.error("Settings > Could not load settings", e);
         }
 
         if (getProperty("path.local") == null)
@@ -47,7 +47,7 @@ public class Settings {
             try (BufferedWriter writer = Files.newBufferedWriter(userPath, StandardCharsets.UTF_8)) {
                 settings.store(writer, null);
             } catch (Exception e) {
-                Log.error("Settings.load() > Could not save settings", e);
+                Log.error("Settings > Could not save settings", e);
             }
         }
     }
