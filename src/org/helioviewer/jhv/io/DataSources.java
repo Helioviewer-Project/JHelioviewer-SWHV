@@ -113,11 +113,6 @@ public class DataSources {
     }
 
     public static void loadSources() {
-        String server = Settings.getSingletonInstance().getProperty("default.server");
-        if (server == null || getServerSetting(server, "API.getDataSources") == null)
-            server = "GSFC";
-        Settings.getSingletonInstance().setProperty("default.server", server);
-
         Validator validator = Validator.builder().failEarly().build();
         for (String serverName : serverSettings.keySet())
             JHVGlobals.getExecutorService().execute(new DataSourcesTask(serverName, validator));
