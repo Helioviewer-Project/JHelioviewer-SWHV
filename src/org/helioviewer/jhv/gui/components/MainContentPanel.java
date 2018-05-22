@@ -15,7 +15,7 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 
-/**
+/*
  * This panel acts as a container for the GUI elements which are shown in the
  * main area of the application. Usually it contains the main image area. Below
  * the main image area plug-ins are able to display their GUI components.
@@ -33,7 +33,7 @@ public class MainContentPanel extends JPanel {
 
     public MainContentPanel(Component mainComponent) {
         pluginContainer = new JPanel(new BorderLayout());
-        collapsiblePane = new CollapsiblePane("Plugins", pluginContainer, !"false".equals(Settings.getSingletonInstance().getProperty("display.plugins")));
+        collapsiblePane = new CollapsiblePane("Plugins", pluginContainer, !"false".equals(Settings.getProperty("display.plugins")));
         collapsiblePane.toggleButton.addActionListener(e -> updateLayout());
 
         // nest in a container to avoid crash of GL drawables inside JSplitPane
@@ -53,13 +53,7 @@ public class MainContentPanel extends JPanel {
         add(splitPane, BorderLayout.CENTER);
     }
 
-    /**
-     * Adds a plug-in and the associated GUI to the container. The GUI will be
-     * displayed below the main component.
-     *
-     * @param plugin
-     *            Plugin to be added to the container.
-     * */
+    // Adds a plug-in and the associated GUI to the container. The GUI will be displayed below the main component.
     public void addPlugin(MainContentPanelPlugin plugin) {
         if (plugin == null || pluginList.contains(plugin)) {
             return;
@@ -69,12 +63,7 @@ public class MainContentPanel extends JPanel {
         updateLayout();
     }
 
-    /**
-     * Removes a plug-in and the associated GUI from the container.
-     *
-     * @param plugin
-     *            Plugin to be removed from the container.
-     * */
+    // Removes a plug-in and the associated GUI from the container
     public void removePlugin(MainContentPanelPlugin plugin) {
         if (pluginList.remove(plugin)) {
             ComponentUtils.setVisible(plugin.getVisualInterfaces().get(0), false);
@@ -82,7 +71,7 @@ public class MainContentPanel extends JPanel {
         }
     }
 
-    /**
+    /*
      * Updates the layout of the container and its sub components. Plug-ins will
      * be displayed, if available, in separated tabs below the main component
      * area. An split pane will be provided, if necessary, to readjust the
@@ -126,9 +115,7 @@ public class MainContentPanel extends JPanel {
         } else {
             add(collapsiblePane, BorderLayout.PAGE_END);
         }
-
-        Settings.getSingletonInstance().setProperty("display.plugins", Boolean.toString(collapsiblePane.toggleButton.isSelected()));
-        Settings.getSingletonInstance().save("display.plugins");
+        Settings.setProperty("display.plugins", Boolean.toString(collapsiblePane.toggleButton.isSelected()));
 
         revalidate();
         repaint();

@@ -48,8 +48,6 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
     private JCheckBox normalizeAIA;
     private DefaultsSelectionPanel defaultsPanel;
 
-    private final Settings settings = Settings.getSingletonInstance();
-
     public PreferencesDialog() {
         super(ImageViewerGui.getMainFrame(), "Preferences", true);
         setResizable(false);
@@ -110,11 +108,10 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
     }
 
     private void saveSettings() {
-        settings.setProperty("startup.loadmovie", Boolean.toString(loadDefaultMovie.isSelected()));
-        settings.setProperty("display.normalize", Boolean.toString(normalizeRadius.isSelected()));
-        settings.setProperty("display.normalizeAIA", Boolean.toString(normalizeAIA.isSelected()));
-        defaultsPanel.saveSettings();
-        settings.save();
+        Settings.setProperty("startup.loadmovie", Boolean.toString(loadDefaultMovie.isSelected()));
+        Settings.setProperty("display.normalize", Boolean.toString(normalizeRadius.isSelected()));
+        Settings.setProperty("display.normalizeAIA", Boolean.toString(normalizeAIA.isSelected()));
+        defaultsPanel.setSettings();
     }
 
     private JPanel createParametersPanel() {
@@ -122,17 +119,17 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         row1.add(new JLabel("Preferred server", JLabel.RIGHT));
 
         JComboBox<String> combo = new JComboBox<>(DataSources.getServers().toArray(new String[0]));
-        combo.setSelectedItem(Settings.getSingletonInstance().getProperty("default.server"));
-        combo.addActionListener(e -> Settings.getSingletonInstance().setProperty("default.server", (String) Objects.requireNonNull(combo.getSelectedItem())));
+        combo.setSelectedItem(Settings.getProperty("default.server"));
+        combo.addActionListener(e -> Settings.setProperty("default.server", (String) Objects.requireNonNull(combo.getSelectedItem())));
         row1.add(combo);
 
-        loadDefaultMovie = new JCheckBox("Load default movie at start-up", Boolean.parseBoolean(settings.getProperty("startup.loadmovie")));
+        loadDefaultMovie = new JCheckBox("Load default movie at start-up", Boolean.parseBoolean(Settings.getProperty("startup.loadmovie")));
         row1.add(loadDefaultMovie);
 
         JPanel row2 = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        normalizeAIA = new JCheckBox("Normalize SDO/AIA brightness (needs restart)", Boolean.parseBoolean(settings.getProperty("display.normalizeAIA")));
+        normalizeAIA = new JCheckBox("Normalize SDO/AIA brightness (needs restart)", Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA")));
         row2.add(normalizeAIA);
-        normalizeRadius = new JCheckBox("Normalize solar radius (needs restart)", Boolean.parseBoolean(settings.getProperty("display.normalize")));
+        normalizeRadius = new JCheckBox("Normalize solar radius (needs restart)", Boolean.parseBoolean(Settings.getProperty("display.normalize")));
         row2.add(normalizeRadius);
 
         JPanel paramsPanel = new JPanel(new GridLayout(0, 1));
@@ -151,8 +148,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
             super(new BorderLayout());
             setPreferredSize(new Dimension(0, 150));
 
-            Settings settings = Settings.getSingletonInstance();
-            String pass = settings.getProperty("default.proxyPassword");
+            String pass = Settings.getProperty("default.proxyPassword");
             try {
                 pass = new String(Base64.getDecoder().decode(pass), StandardCharsets.UTF_8);
             } catch (Exception e) {
@@ -160,9 +156,9 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
             }
 
             Object[][] tableData = {
-                { "Default recording directory", settings.getProperty("default.save.path") },
-                { "Default download directory", settings.getProperty("default.local.path") },
-                { "Proxy username", settings.getProperty("default.proxyUsername") },
+                { "Default recording directory", Settings.getProperty("path.save") },
+                { "Default download directory", Settings.getProperty("path.local") },
+                { "Proxy username", Settings.getProperty("default.proxyUsername") },
                 { "Proxy password", pass },
             };
 
@@ -229,17 +225,16 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
             add(scrollPane, BorderLayout.CENTER);
         }
 
-        void saveSettings() {
-            Settings settings = Settings.getSingletonInstance();
+        void setSettings() {
             if (model.getValueAt(0, 1) instanceof String)
-                settings.setProperty("default.save.path", (String) model.getValueAt(0, 1));
+                Settings.setProperty("path.save", (String) model.getValueAt(0, 1));
             if (model.getValueAt(1, 1) instanceof String)
-                settings.setProperty("default.local.path", (String) model.getValueAt(1, 1));
+                Settings.setProperty("path.local", (String) model.getValueAt(1, 1));
             if (model.getValueAt(2, 1) instanceof String)
-                settings.setProperty("default.proxyUsername", (String) model.getValueAt(2, 1));
+                Settings.setProperty("default.proxyUsername", (String) model.getValueAt(2, 1));
             if (model.getValueAt(3, 1) instanceof String) {
                 String s = Base64.getEncoder().withoutPadding().encodeToString(((String) model.getValueAt(3, 1)).getBytes(StandardCharsets.UTF_8));
-                settings.setProperty("default.proxyPassword", s);
+                Settings.setProperty("default.proxyPassword", s);
             }
         }
 

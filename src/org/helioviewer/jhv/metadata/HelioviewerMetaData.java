@@ -13,8 +13,8 @@ import org.helioviewer.jhv.time.JHVDate;
 
 public class HelioviewerMetaData extends AbstractMetaData {
 
-    private static final boolean normalizeAIA = Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("display.normalizeAIA"));
-    private static final boolean normalizeRadius = Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("display.normalize"));
+    private static final boolean normalizeAIA = Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA"));
+    private static final boolean normalizeRadius = Boolean.parseBoolean(Settings.getProperty("display.normalize"));
 
     private String instrument = "";
     private String detector = "";

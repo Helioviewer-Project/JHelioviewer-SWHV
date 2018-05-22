@@ -33,15 +33,14 @@ public class OpenLocalFileAction extends AbstractAction {
         // does not work on Windows
         fileDialog.setFilenameFilter(new JsonFilenameFilter());
         fileDialog.setMultipleMode(true);
-        fileDialog.setDirectory(Settings.getSingletonInstance().getProperty("default.local.path"));
+        fileDialog.setDirectory(Settings.getProperty("path.local"));
         fileDialog.setVisible(true);
 
         String directory = fileDialog.getDirectory();
         File[] fileNames = fileDialog.getFiles();
         if (fileNames.length > 0 && directory != null) {
             // remember the current directory for future
-            Settings.getSingletonInstance().setProperty("default.local.path", directory);
-            Settings.getSingletonInstance().save("default.local.path");
+            Settings.setProperty("path.local", directory);
             for (File fileName : fileNames) {
                 if (fileName.isFile())
                     Load.request.get(fileName.toURI());
