@@ -79,6 +79,12 @@ public class JHelioviewer {
         System.setProperty("org.sqlite.tmpdir", JHVGlobals.libCacheDir.toString());
         // if (true) throw new RuntimeException("This is a Sentry test");
 
+        // Make sure the default server is known
+        String server = Settings.getSingletonInstance().getProperty("default.server");
+        if (server == null || DataSources.getServerSetting(server, "API.getDataSources") == null)
+            server = "GSFC";
+        Settings.getSingletonInstance().setProperty("default.server", server);
+
         FitsFactory.setUseHierarch(true);
 
         try {
