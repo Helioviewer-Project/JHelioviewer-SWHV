@@ -165,7 +165,7 @@ public interface GridScale {
                 return Vec2.NAN_VECTOR;
 
             if (gridType != GridType.Viewpoint) {
-                Quat q = Quat.rotateWithConjugate(camera.getViewpoint().orientation, gridType.getGridQuat(camera));
+                Quat q = Quat.rotateWithConjugate(camera.getViewpoint().orientation, gridType.toQuat(camera));
                 p = q.rotateInverseVector(p);
             }
 
