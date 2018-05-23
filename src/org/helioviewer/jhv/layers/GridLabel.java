@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.base.scale.GridType;
 import org.helioviewer.jhv.math.MathUtils;
 
 class GridLabel {
@@ -71,7 +72,7 @@ class GridLabel {
         return labels;
     }
 
-    static ArrayList<GridLabel> makeLonLabels(GridLayer.GridType gridType, double lonStep) {
+    static ArrayList<GridLabel> makeLonLabels(GridType gridType, double lonStep) {
         double size = Sun.Radius * 1.05;
 
         ArrayList<GridLabel> labels = new ArrayList<>();
@@ -82,7 +83,7 @@ class GridLabel {
         }
         for (double theta = -lonStep; theta > -180.; theta -= lonStep) {
             double angle = (90 - theta) * Math.PI / 180.;
-            String txt = gridType == GridLayer.GridType.Carrington ? formatter1.format(theta + 360) : formatter1.format(theta);
+            String txt = gridType == GridType.Carrington ? formatter1.format(theta + 360) : formatter1.format(theta);
             labels.add(new GridLabel(txt, (float) (Math.cos(angle) * size), (float) (Math.sin(angle) * size), (float) theta));
         }
         return labels;

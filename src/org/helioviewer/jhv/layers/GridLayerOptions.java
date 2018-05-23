@@ -13,6 +13,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
+import org.helioviewer.jhv.base.scale.GridType;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
@@ -25,7 +26,7 @@ class GridLayerOptions extends JPanel {
 
     private JSpinner gridResolutionXSpinner;
     private JSpinner gridResolutionYSpinner;
-    private JComboBox<GridLayer.GridType> gridTypeBox;
+    private JComboBox<GridType> gridTypeBox;
     private final GridLayer grid;
 
     GridLayerOptions(GridLayer _grid) {
@@ -110,10 +111,10 @@ class GridLayerOptions extends JPanel {
     }
 
     private void createGridTypeBox() {
-        gridTypeBox = new JComboBox<>(GridLayer.GridType.values());
+        gridTypeBox = new JComboBox<>(GridType.values());
         gridTypeBox.setSelectedItem(grid.getGridType());
         gridTypeBox.addActionListener(e -> {
-            grid.setGridType((GridLayer.GridType) Objects.requireNonNull(gridTypeBox.getSelectedItem()));
+            grid.setGridType((GridType) Objects.requireNonNull(gridTypeBox.getSelectedItem()));
             Display.display();
         });
     }
