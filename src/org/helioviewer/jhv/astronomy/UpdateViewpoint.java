@@ -15,11 +15,11 @@ import org.helioviewer.jhv.view.View;
 
 public interface UpdateViewpoint {
 
-    Position.Q update(JHVDate time);
+    Position update(JHVDate time);
     void clear();
     void setLoadPosition(LoadPosition _loadPosition);
     void unsetLoadPosition(LoadPosition _loadPosition);
-    Set<Map.Entry<LoadPosition, Position.L>> getPositions();
+    Set<Map.Entry<LoadPosition, Position>> getPositions();
 
     UpdateViewpoint observer = new Observer();
     UpdateViewpoint earth = new Earth();
@@ -29,7 +29,7 @@ public interface UpdateViewpoint {
 
     abstract class AbstractUpdateViewpoint implements UpdateViewpoint {
 
-        private final Set<Map.Entry<LoadPosition, Position.L>> positions = Collections.emptySet();
+        private final Set<Map.Entry<LoadPosition, Position>> positions = Collections.emptySet();
 
         @Override
         public void clear() {
@@ -44,42 +44,42 @@ public interface UpdateViewpoint {
         }
 
         @Override
-        public Set<Map.Entry<LoadPosition, Position.L>> getPositions() {
+        public Set<Map.Entry<LoadPosition, Position>> getPositions() {
             return positions;
         }
 
         @Override
-        public abstract Position.Q update(JHVDate time);
+        public abstract Position update(JHVDate time);
 
     }
 
     class Observer extends AbstractUpdateViewpoint {
         @Override
-        public Position.Q update(JHVDate time) {
+        public Position update(JHVDate time) {
             ImageLayer layer = Layers.getActiveImageLayer();
-            return layer == null ? Sun.getEarthQuat(time) : layer.getView().getMetaData(time).getViewpoint();
+            return layer == null ? Sun.getEarth(time) : layer.getView().getMetaData(time).getViewpoint();
         }
     }
 
     class Earth extends AbstractUpdateViewpoint {
         @Override
-        public Position.Q update(JHVDate time) {
-            return Sun.getEarthQuat(time);
+        public Position update(JHVDate time) {
+            return Sun.getEarth(time);
         }
     }
 
     class EarthFixedDistance extends AbstractUpdateViewpoint {
         @Override
-        public Position.Q update(JHVDate time) {
-            Position.L p = Sun.getEarth(time);
-            return new Position.Q(time, Sun.MeanEarthDistance, new Quat(0, p.lon));
+        public Position update(JHVDate time) {
+            Position p = Sun.getEarth(time);
+            return new Position(time, Sun.MeanEarthDistance, p.lon, 0);
         }
     }
 
     class Equatorial extends AbstractUpdateViewpoint {
 
         private static final double distance = 2 * Sun.MeanEarthDistance / Math.tan(0.5 * Math.PI / 180);
-        private final HashMap<LoadPosition, Position.L> loadMap = new HashMap<>();
+        private final HashMap<LoadPosition, Position> loadMap = new HashMap<>();
 
         @Override
         public void clear() {
@@ -88,8 +88,8 @@ public interface UpdateViewpoint {
 
         @Override
         public void setLoadPosition(LoadPosition loadPosition) {
-            Position.L p = Sun.getEarth(Movie.getTime());
-            loadMap.put(loadPosition, new Position.L(p.time, p.rad, 0, /* -? */ p.lat));
+            Position p = Sun.getEarth(Movie.getTime());
+            loadMap.put(loadPosition, new Position(p.time, p.distance, 0, /* -? */ p.lat));
         }
 
         @Override
@@ -98,12 +98,12 @@ public interface UpdateViewpoint {
         }
 
         @Override
-        public Set<Map.Entry<LoadPosition, Position.L>> getPositions() {
+        public Set<Map.Entry<LoadPosition, Position>> getPositions() {
             return loadMap.entrySet();
         }
 
         @Override
-        public Position.Q update(JHVDate time) {
+        public Position update(JHVDate time) {
             long layerStart = 0, layerEnd = 0;
             // Active layer times
             ImageLayer layer = Layers.getActiveImageLayer();
@@ -115,11 +115,11 @@ public interface UpdateViewpoint {
 
             for (LoadPosition loadPosition : loadMap.keySet()) {
                 if (loadPosition.isLoaded())
-                    loadMap.put(loadPosition, loadPosition.getInterpolatedL(time.milli, layerStart, layerEnd));
+                    loadMap.put(loadPosition, loadPosition.getInterpolated(time.milli, layerStart, layerEnd));
             }
 
-            Position.L p = Sun.getEarth(time);
-            return new Position.Q(time, distance, new Quat(Math.PI / 2, p.lon));
+            Position p = Sun.getEarth(time);
+            return new Position(time, distance, p.lon, Math.PI / 2);
         }
     }
 
@@ -143,9 +143,9 @@ public interface UpdateViewpoint {
         }
 
         @Override
-        public Position.Q update(JHVDate time) {
+        public Position update(JHVDate time) {
             if (loadPosition == null || !loadPosition.isLoaded())
-                return Sun.getEarthQuat(time);
+                return Sun.getEarth(time);
 
             long layerStart = 0, layerEnd = 0;
             // Active layer times
@@ -155,7 +155,7 @@ public interface UpdateViewpoint {
                 layerStart = view.getFirstTime().milli;
                 layerEnd = view.getLastTime().milli;
             }
-            return loadPosition.getInterpolatedQ(time.milli, layerStart, layerEnd);
+            return loadPosition.getRelativeInterpolated(time.milli, layerStart, layerEnd);
         }
 
     }

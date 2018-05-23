@@ -123,7 +123,7 @@ public class GridLayer extends AbstractLayer {
         if (showAxis)
             axesLine.render(gl, vp.aspect, thicknessAxes);
 
-        Position.Q viewpoint = camera.getViewpoint();
+        Position viewpoint = camera.getViewpoint();
 
         drawEarthCircles(gl, vp.aspect, GLInfo.pixelScale[0] / (2 * camera.getFOV()), Sun.getEarth(viewpoint.time).toQuat());
 
@@ -142,7 +142,7 @@ public class GridLayer extends AbstractLayer {
 
         if (showRadial) {
             boolean far = viewpoint.distance > 100 * Sun.MeanEarthDistance;
-            Mat4 viewMatrix = viewpoint.orientation.toMatrix();
+            Mat4 viewMatrix = viewpoint.toQuat().toMatrix();
             gl.glPushMatrix();
             gl.glMultMatrixd(viewMatrix.transpose().m, 0);
             {

@@ -22,7 +22,7 @@ public abstract class ImageData {
 
     private Region region;
     private MetaData metaData;
-    private Position.Q viewpoint;
+    private Position viewpoint;
     private boolean uploaded = false;
 
     ImageData(int _width, int _height, int _bpp, double _gamma) {
@@ -70,11 +70,11 @@ public abstract class ImageData {
         return metaData;
     }
 
-    public void setViewpoint(Position.Q p) {
+    public void setViewpoint(Position p) {
         viewpoint = p;
     }
 
-    public Position.Q getViewpoint() {
+    public Position getViewpoint() {
         return viewpoint;
     }
 

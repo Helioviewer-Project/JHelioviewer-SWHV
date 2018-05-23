@@ -9,9 +9,9 @@ public class JHVPositionInformation {
 
     private final Vec3 centralPoint;
     private final float[] boundBox;
-    private final Position.Q earthPosition;
+    private final Position earthPosition;
 
-    public JHVPositionInformation(Vec3 _centralPoint, List<Vec3> _boundBox, List<Vec3> _boundBoxCC, Position.Q p) {
+    public JHVPositionInformation(Vec3 _centralPoint, List<Vec3> _boundBox, List<Vec3> _boundBoxCC, Position p) {
         centralPoint = _centralPoint;
 
         List<Vec3> tempboundBox = _boundBoxCC;
@@ -43,7 +43,7 @@ public class JHVPositionInformation {
         return boundBox;
     }
 
-    public Position.Q getEarth() {
+    public Position getEarth() {
         return earthPosition;
     }
 

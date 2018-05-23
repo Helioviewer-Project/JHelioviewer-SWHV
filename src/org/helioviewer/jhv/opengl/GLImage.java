@@ -85,16 +85,16 @@ public class GLImage {
         Region diffRegion = null;
         if (prevImageData != null && !isBaseDiff()) {
             diffRegion = prevImageData.getRegion();
-            shader.bindAnglesDiff(gl, prevImageData.getMetaData().getViewpointL(), prevImageData.getMetaData().getCROTA());
+            shader.bindAnglesDiff(gl, prevImageData.getMetaData().getViewpoint(), prevImageData.getMetaData().getCROTA());
         } else if (baseImageData != null && isBaseDiff()) {
             diffRegion = baseImageData.getRegion();
-            shader.bindAnglesDiff(gl, baseImageData.getMetaData().getViewpointL(), baseImageData.getMetaData().getCROTA());
+            shader.bindAnglesDiff(gl, baseImageData.getMetaData().getViewpoint(), baseImageData.getMetaData().getCROTA());
         }
         if (diffRegion != null)
             shader.bindDiffRect(gl, diffRegion.llx, diffRegion.lly, 1. / diffRegion.width, 1. / diffRegion.height);
 
         MetaData metaData = imageData.getMetaData();
-        shader.bindAngles(gl, metaData.getViewpointL(), metaData.getCROTA());
+        shader.bindAngles(gl, metaData.getViewpoint(), metaData.getCROTA());
         shader.bindCutOffRadius(gl, metaData.getInnerCutOffRadius(), Display.getShowCorona() ? metaData.getOuterCutOffRadius() : 1);
         if (metaData.getCutOffValue() > 0) {
             Vec3 cdir = metaData.getCutOffDirection();

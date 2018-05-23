@@ -20,8 +20,6 @@ public interface MetaData {
 
     double getResponseFactor();
 
-    Position.Q getViewpoint();
-
     double getCROTA();
 
     double getInnerCutOffRadius();
@@ -32,7 +30,7 @@ public interface MetaData {
 
     Vec3 getCutOffDirection();
 
-    Position.L getViewpointL();
+    Position getViewpoint();
 
     Quat getCenterRotation();
 

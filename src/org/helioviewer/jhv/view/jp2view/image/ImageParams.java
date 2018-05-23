@@ -6,15 +6,15 @@ import org.helioviewer.jhv.view.jp2view.image.ResolutionSet.ResolutionLevel;
 
 public class ImageParams {
 
-    public final Position.Q viewpoint;
+    public final Position viewpoint;
     public final SubImage subImage;
     public final ResolutionLevel resolution;
     public final int frame;
     public final double factor;
     public boolean priority;
 
-    public ImageParams(Position.Q _p, SubImage _roi, ResolutionLevel _resolution, int _frame, double _factor, boolean _priority) {
-        viewpoint = _p;
+    public ImageParams(Position _viewpoint, SubImage _roi, ResolutionLevel _resolution, int _frame, double _factor, boolean _priority) {
+        viewpoint = _viewpoint;
         subImage = _roi;
         resolution = _resolution;
         frame = _frame;

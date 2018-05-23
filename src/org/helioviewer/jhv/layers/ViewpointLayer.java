@@ -59,15 +59,16 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         if (!isVisible[vp.idx])
             return;
 
-        double width = camera.getViewpoint().distance * Math.tan(optionsPanel.getFOVAngle());
-        computeLine(gl, width);
+        Position viewpoint = camera.getViewpoint();
 
+        double width = viewpoint.distance * Math.tan(optionsPanel.getFOVAngle());
+        computeLine(gl, width);
         double pointFactor = GLInfo.pixelScale[0] / (2 * camera.getFOV());
 
         gl.glPushMatrix();
-        gl.glMultMatrixd(camera.getViewpoint().orientation.toMatrix().transpose().m, 0);
+        gl.glMultMatrixd(viewpoint.toQuat().toMatrix().transpose().m, 0);
         {
-            Set<Map.Entry<LoadPosition, Position.L>> positions = Display.getUpdateViewpoint().getPositions();
+            Set<Map.Entry<LoadPosition, Position>> positions = Display.getUpdateViewpoint().getPositions();
             if (!positions.isEmpty()) {
                 renderPlanets(gl, positions, pointFactor);
             }
@@ -89,7 +90,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        Set<Map.Entry<LoadPosition, Position.L>> positions = Display.getUpdateViewpoint().getPositions();
+        Set<Map.Entry<LoadPosition, Position>> positions = Display.getUpdateViewpoint().getPositions();
         if (!positions.isEmpty()) {
             mouseX = e.getX();
             mouseY = e.getY();
@@ -100,10 +101,10 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
             double width = camera.getWidth(), minDist = 10;
             String name = null;
-            for (Map.Entry<LoadPosition, Position.L> entry : positions) {
-                Position.L p = entry.getValue();
-                double deltaX = Math.abs(p.rad * Math.cos(p.lon) - v.x);
-                double deltaY = Math.abs(p.rad * Math.sin(p.lon) - v.y);
+            for (Map.Entry<LoadPosition, Position> entry : positions) {
+                Position p = entry.getValue();
+                double deltaX = Math.abs(p.distance * Math.cos(p.lon) - v.x);
+                double deltaY = Math.abs(p.distance * Math.sin(p.lon) - v.y);
                 double dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY) / width;
                 if (dist < minDist) {
                     minDist = dist;
@@ -300,19 +301,19 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         center.setData(gl, centerPosition, centerColor);
     }
 
-    private void renderPlanets(GL2 gl, Set<Map.Entry<LoadPosition, Position.L>> positions, double pointFactor) {
+    private void renderPlanets(GL2 gl, Set<Map.Entry<LoadPosition, Position>> positions, double pointFactor) {
         int size = positions.size();
         FloatBuffer planetPosition = BufferUtils.newFloatBuffer(4 * size);
         FloatBuffer planetColor = BufferUtils.newFloatBuffer(4 * size);
 
-        for (Map.Entry<LoadPosition, Position.L> entry : positions) {
-            Position.L p = entry.getValue();
+        for (Map.Entry<LoadPosition, Position> entry : positions) {
+            Position p = entry.getValue();
             double theta = p.lat;
             double phi = p.lon;
 
-            double y = p.rad * Math.cos(theta) * Math.sin(phi);
-            double x = p.rad * Math.cos(theta) * Math.cos(phi);
-            double z = p.rad * Math.sin(theta);
+            double y = p.distance * Math.cos(theta) * Math.sin(phi);
+            double x = p.distance * Math.cos(theta) * Math.cos(phi);
+            double z = p.distance * Math.sin(theta);
 
             BufferUtils.put4f(planetPosition, (float) x, (float) y, (float) z, planetSize);
             planetColor.put(entry.getKey().getTarget().getColor());

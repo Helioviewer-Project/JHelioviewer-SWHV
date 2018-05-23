@@ -16,8 +16,7 @@ public abstract class AbstractMetaData implements MetaData {
     double unitPerArcsec = Double.NaN;
     double responseFactor = 1;
 
-    Position.L viewpointL = Sun.StartEarthL;
-    Position.Q viewpoint = Sun.StartEarthQ;
+    Position viewpoint = Sun.StartEarth;
     double innerRadius = 0;
     double outerRadius = Double.MAX_VALUE;
     double crota;
@@ -57,13 +56,8 @@ public abstract class AbstractMetaData implements MetaData {
     }
 
     @Override
-    public Position.Q getViewpoint() {
+    public Position getViewpoint() {
         return viewpoint;
-    }
-
-    @Override
-    public Position.L getViewpointL() {
-        return viewpointL;
     }
 
     @Override
@@ -88,7 +82,7 @@ public abstract class AbstractMetaData implements MetaData {
 
     @Override
     public Quat getCenterRotation() {
-        return viewpoint.orientation;
+        return viewpoint.toQuat();
     }
 
     @Override

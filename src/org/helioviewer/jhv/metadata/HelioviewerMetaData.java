@@ -166,8 +166,8 @@ public class HelioviewerMetaData extends AbstractMetaData {
     }
 
     private void retrievePosition(MetaDataContainer m, JHVDate dateObs) {
-        Position.L p = Sun.getEarth(dateObs);
-        double distanceObs = m.getDouble("DSUN_OBS").map(d -> d / Sun.RadiusMeter).orElse(p.rad);
+        Position p = Sun.getEarth(dateObs);
+        double distanceObs = m.getDouble("DSUN_OBS").map(d -> d / Sun.RadiusMeter).orElse(p.distance);
         if (observatory.equals("SOHO"))
             distanceObs *= Sun.L1Factor;
 
@@ -185,8 +185,7 @@ public class HelioviewerMetaData extends AbstractMetaData {
             stonyhurstLongitude = m.getDouble("REF_L0").map(v -> Math.toRadians(v) + p.lon).orElse(Double.NaN);
         double phi = Double.isNaN(stonyhurstLongitude) ? p.lon : p.lon - stonyhurstLongitude;
 
-        viewpoint = new Position.Q(dateObs, distanceObs, new Quat(theta, phi));
-        viewpointL = new Position.L(dateObs, distanceObs, phi, theta);
+        viewpoint = new Position(dateObs, distanceObs, phi, theta);
     }
 
     private Quat retrieveCenterRotation(MetaDataContainer m) {
@@ -196,9 +195,9 @@ public class HelioviewerMetaData extends AbstractMetaData {
                 crota = m.getDouble("CROTA1").map(Math::toRadians).orElse(Double.NaN);
             if (Double.isNaN(crota))
                 crota = m.getDouble("CROTA2").map(Math::toRadians).orElse(0.);
-            return Quat.rotate(Quat.createRotation(-crota, Vec3.ZAxis), viewpoint.orientation);
+            return Quat.rotate(Quat.createRotation(-crota, Vec3.ZAxis), viewpoint.toQuat());
         }
-        return viewpoint.orientation;
+        return viewpoint.toQuat();
     }
 
     private void retrievePixelParameters(MetaDataContainer m) {

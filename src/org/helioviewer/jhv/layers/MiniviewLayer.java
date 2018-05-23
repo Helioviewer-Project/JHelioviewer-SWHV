@@ -63,7 +63,7 @@ public class MiniviewLayer extends AbstractLayer {
     }
 
     public static void renderBackground(Camera camera, Viewport vp, GL2 gl) {
-        Mat4 cameraMatrix = camera.getViewpoint().orientation.toMatrix();
+        Mat4 cameraMatrix = camera.getViewpoint().toQuat().toMatrix();
         gl.glDepthRange(0, 0);
         gl.glPushMatrix();
         {
