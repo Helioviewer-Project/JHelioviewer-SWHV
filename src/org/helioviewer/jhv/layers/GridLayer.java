@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.base.scale.GridType;
@@ -122,13 +123,15 @@ public class GridLayer extends AbstractLayer {
         if (showAxis)
             axesLine.render(gl, vp.aspect, thicknessAxes);
 
-        drawEarthCircles(gl, vp.aspect, GLInfo.pixelScale[0] / (2 * camera.getFOV()), Sun.getEarth(camera.getViewpoint().time).toQuat());
+        Position.Q viewpoint = camera.getViewpoint();
 
-        Mat4 cameraMatrix = gridType.toQuat(camera).toMatrix();
+        drawEarthCircles(gl, vp.aspect, GLInfo.pixelScale[0] / (2 * camera.getFOV()), Sun.getEarth(viewpoint.time).toQuat());
+
+        Mat4 gridMatrix = gridType.toQuat(viewpoint).toMatrix();
         double pixelsPerSolarRadius = textScale * vp.height / (2 * camera.getWidth());
 
         gl.glPushMatrix();
-        gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
+        gl.glMultMatrixd(gridMatrix.transpose().m, 0);
         {
             gridLine.render(gl, vp.aspect, thickness);
             if (showLabels) {
@@ -138,10 +141,10 @@ public class GridLayer extends AbstractLayer {
         gl.glPopMatrix();
 
         if (showRadial) {
-            boolean far = camera.getViewpoint().distance > 100 * Sun.MeanEarthDistance;
-            cameraMatrix = camera.getViewpoint().orientation.toMatrix();
+            boolean far = viewpoint.distance > 100 * Sun.MeanEarthDistance;
+            Mat4 viewMatrix = viewpoint.orientation.toMatrix();
             gl.glPushMatrix();
-            gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
+            gl.glMultMatrixd(viewMatrix.transpose().m, 0);
             {
                 if (far) {
                     radialCircleLineFar.render(gl, vp.aspect, thickness);
