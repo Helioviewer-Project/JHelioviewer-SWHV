@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.base.scale;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Viewport;
@@ -165,7 +166,8 @@ public interface GridScale {
                 return Vec2.NAN_VECTOR;
 
             if (gridType != GridType.Viewpoint) {
-                Quat q = Quat.rotateWithConjugate(camera.getViewpoint().orientation, gridType.toQuat(camera));
+                Position.Q viewpoint = camera.getViewpoint();
+                Quat q = Quat.rotateWithConjugate(viewpoint.orientation, gridType.toQuat(viewpoint));
                 p = q.rotateInverseVector(p);
             }
 
