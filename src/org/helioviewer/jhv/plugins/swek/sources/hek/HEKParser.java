@@ -262,20 +262,21 @@ class HEKParser {
             }
 
             Position p = Sun.getEarth(new JHVDate(currentEvent.start));
+            double elon = p.lon;
 
             ArrayList<Vec3> jhvBoundedBox = new ArrayList<>(localHGSBoundedBox.size());
             for (Vec3 el : localHGSBoundedBox) {
-                jhvBoundedBox.add(convertHGSJHV(el, p));
+                jhvBoundedBox.add(convertHGSJHV(el, elon));
             }
 
             ArrayList<Vec3> jhvBoundCC = new ArrayList<>(localHGSBoundCC.size());
             for (Vec3 el : localHGSBoundCC) {
-                jhvBoundCC.add(convertHGSJHV(el, p));
+                jhvBoundCC.add(convertHGSJHV(el, elon));
             }
 
             Vec3 jhvCentralPoint = null;
             if (localHGSCentralPoint != null) {
-                jhvCentralPoint = convertHGSJHV(localHGSCentralPoint, p);
+                jhvCentralPoint = convertHGSJHV(localHGSCentralPoint, elon);
             }
 
             currentEvent.addPositionInformation(new JHVPositionInformation(jhvCentralPoint, jhvBoundedBox, jhvBoundCC,
@@ -283,9 +284,9 @@ class HEKParser {
         }
     }
 
-    private static Vec3 convertHGSJHV(Vec3 el, Position p) {
+    private static Vec3 convertHGSJHV(Vec3 el, double elon) {
         double theta = Math.PI / 180 * el.y;
-        double phi = Math.PI / 180 * el.x - p.lon;
+        double phi = Math.PI / 180 * el.x - elon;
 
         double x = Math.cos(theta) * Math.sin(phi);
         double z = Math.cos(theta) * Math.cos(phi);

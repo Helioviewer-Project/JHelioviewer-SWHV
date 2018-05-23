@@ -45,7 +45,6 @@ public class JP2View extends AbstractView {
     private final long cacheKey[];
 
     private final RenderExecutor executor = new RenderExecutor();
-    private final int maxFrame;
     private final CacheStatus cacheStatus;
     private final KakaduSource kduSource;
 
@@ -178,16 +177,6 @@ public class JP2View extends AbstractView {
     }
 
     @Override
-    public boolean isMultiFrame() {
-        return maxFrame > 0;
-    }
-
-    @Override
-    public int getMaximumFrameNumber() {
-        return maxFrame;
-    }
-
-    @Override
     public int getCurrentFrameNumber() {
         return targetFrame;
     }
@@ -251,16 +240,6 @@ public class JP2View extends AbstractView {
             frame = maxFrame;
         }
         return metaData[frame].getViewpoint().time;
-    }
-
-    @Override
-    public JHVDate getFirstTime() {
-        return metaData[0].getViewpoint().time;
-    }
-
-    @Override
-    public JHVDate getLastTime() {
-        return metaData[maxFrame].getViewpoint().time;
     }
 
     @Override

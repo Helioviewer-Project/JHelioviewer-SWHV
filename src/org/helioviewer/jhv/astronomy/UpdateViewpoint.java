@@ -9,7 +9,6 @@ import org.helioviewer.jhv.io.LoadPosition;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.view.View;
 
@@ -71,8 +70,8 @@ public interface UpdateViewpoint {
     class EarthFixedDistance extends AbstractUpdateViewpoint {
         @Override
         public Position update(JHVDate time) {
-            Position p = Sun.getEarth(time);
-            return new Position(time, Sun.MeanEarthDistance, p.lon, 0);
+            double elon = Sun.getEarth(time).lon;
+            return new Position(time, Sun.MeanEarthDistance, elon, 0);
         }
     }
 
@@ -118,8 +117,8 @@ public interface UpdateViewpoint {
                     loadMap.put(loadPosition, loadPosition.getInterpolated(time.milli, layerStart, layerEnd));
             }
 
-            Position p = Sun.getEarth(time);
-            return new Position(time, distance, p.lon, Math.PI / 2);
+            double elon = Sun.getEarth(time).lon;
+            return new Position(time, distance, elon, Math.PI / 2);
         }
     }
 

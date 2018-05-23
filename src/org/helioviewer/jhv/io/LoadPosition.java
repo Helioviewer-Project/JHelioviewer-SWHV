@@ -10,7 +10,6 @@ import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.math.MathUtils;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.JHVDate;
 import org.json.JSONObject;
@@ -134,8 +133,8 @@ public class LoadPosition extends JHVWorker<Position[], Void> {
 
     public Position getRelativeInterpolated(long t, long startTime, long endTime) {
         Position p = getInterpolated(t, startTime, endTime);
-        Position e = Sun.getEarth(p.time);
-        return new Position(p.time, p.distance, e.lon - p.lon, p.lat);
+        double elon = Sun.getEarth(p.time /*!*/).lon;
+        return new Position(p.time, p.distance, elon - p.lon, p.lat);
     }
 
 }
