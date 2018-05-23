@@ -2,7 +2,6 @@ package org.helioviewer.jhv.plugins.pfss.data;
 
 import java.nio.ShortBuffer;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.time.JHVDate;
@@ -30,9 +29,9 @@ public class PfssData {
 
         pointsPerLine = _pointsPerLine;
 
-        Position p = Sun.getEarth(dateObs);
-        cphi = Math.cos(p.lon);
-        sphi = Math.sin(p.lon);
+        double elon = Sun.getEarth(dateObs).lon;
+        cphi = Math.cos(elon);
+        sphi = Math.sin(elon);
     }
 
 }

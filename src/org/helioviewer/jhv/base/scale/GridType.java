@@ -13,8 +13,8 @@ public enum GridType {
         case Viewpoint:
             return viewpoint.toQuat();
         case Stonyhurst:
-            Position p = Sun.getEarth(viewpoint.time);
-            return new Quat(0, p.lon);
+            double elon = Sun.getEarth(viewpoint.time).lon;
+            return new Quat(0, elon);
         case HCI:
             return Sun.getHCI(viewpoint.time);
         default: // Carrington

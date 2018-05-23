@@ -1093,12 +1093,10 @@ public class Carrington {
     public static double time2CR(JHVDate time) {
         double mjd = JulianDay.milli2mjd(time.milli);
         double cr = ((JulianDay.DJM0 - 2398167.) + mjd) / CR_SYNODIC_MEAN + 1.;
-
-        Position p = Sun.getEarth(time);
-        double flon = p.lon / (2 * Math.PI);
-
         int icr = (int) cr;
         double fcr = cr - icr;
+        double flon = Sun.getEarth(time).lon / (2 * Math.PI);
+
         if (Math.abs(fcr - flon) > 12 / 360.) {
             if (fcr > flon)
                 icr++;
