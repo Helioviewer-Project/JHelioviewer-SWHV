@@ -135,7 +135,7 @@ public class SWEKPopupController extends MouseAdapter implements TimeListener {
                 if (evt.isCactus()) {
                     double principalAngle = Math.toRadians(SWEKData.readCMEPrincipalAngleDegree(evt));
                     double distSun = computeDistSun(evt);
-                    Quat q = pi.getEarth().orientation;
+                    Quat q = pi.getEarth().toQuat();
                     pt = q.rotateInverseVector(new Vec3(distSun * Math.cos(principalAngle), distSun * Math.sin(principalAngle), 0));
 
                     hitpoint = CameraHelper.getVectorFromPlane(camera, vp, mouseOverX, mouseOverY, Quat.ZERO, true);
@@ -170,7 +170,7 @@ public class SWEKPopupController extends MouseAdapter implements TimeListener {
                 } else {
                     Vec3 pt = pi.centralPoint();
                     if (pt != null) {
-                        pt = camera.getViewpoint().orientation.rotateVector(pt);
+                        pt = camera.getViewpoint().toQuat().rotateVector(pt);
                         tf = Display.mode.xform.transform(pt, Display.mode.scale);
                     }
                     mousepos = Display.mode.scale.mouseToGridInv(mouseOverX, mouseOverY, vp, camera);
@@ -200,7 +200,7 @@ public class SWEKPopupController extends MouseAdapter implements TimeListener {
 
     @Nullable
     private Vec3 getHitPoint(Viewport vp, int x, int y) {
-        Vec3 hp = CameraHelper.getVectorFromSphere(camera, vp, x, y, camera.getViewpoint().orientation, true);
+        Vec3 hp = CameraHelper.getVectorFromSphere(camera, vp, x, y, camera.getViewpoint().toQuat(), true);
         if (hp != null)
             hp.y = -hp.y;
         return hp;

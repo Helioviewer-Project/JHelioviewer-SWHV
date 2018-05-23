@@ -127,7 +127,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         int lineResolution = 2;
         int angularResolution = (int) (angularWidthDegree / 4);
 
-        Quat q = evt.getPositionInformation().getEarth().orientation;
+        Quat q = evt.getPositionInformation().getEarth().toQuat();
         Color color = evtr.getColor();
 
         gl.glColor3f(0, 0, 0);
@@ -269,7 +269,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
         Vec3 pt = pi.centralPoint();
         if (pt != null) {
-            pt = camera.getViewpoint().orientation.rotateVector(pt);
+            pt = camera.getViewpoint().toQuat().rotateVector(pt);
             Vec2 tf = xform.transform(pt, scale);
             bindTexture(gl, evtr.getSupplier().getGroup());
             if (evtr.isHighlighted()) {

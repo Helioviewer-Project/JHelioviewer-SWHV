@@ -261,7 +261,7 @@ class HEKParser {
                 }
             }
 
-            Position.L p = Sun.getEarth(new JHVDate(currentEvent.start));
+            Position p = Sun.getEarth(new JHVDate(currentEvent.start));
 
             ArrayList<Vec3> jhvBoundedBox = new ArrayList<>(localHGSBoundedBox.size());
             for (Vec3 el : localHGSBoundedBox) {
@@ -279,11 +279,11 @@ class HEKParser {
             }
 
             currentEvent.addPositionInformation(new JHVPositionInformation(jhvCentralPoint, jhvBoundedBox, jhvBoundCC,
-                    currentEvent.isCactus() ? p.toQ() : null)); // reduce memory usage
+                    currentEvent.isCactus() ? p : null)); // reduce memory usage
         }
     }
 
-    private static Vec3 convertHGSJHV(Vec3 el, Position.L p) {
+    private static Vec3 convertHGSJHV(Vec3 el, Position p) {
         double theta = Math.PI / 180 * el.y;
         double phi = Math.PI / 180 * el.x - p.lon;
 

@@ -218,7 +218,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
                 vpmi.translate(-camera.getCurrentTranslation().x / vp.aspect, -camera.getCurrentTranslation().y, 0.);
             shader.bindMatrix(gl, vpmi.getFloatArray());
 
-            Quat q = Quat.rotate(camera.getCurrentDragRotation(), imageData.getViewpoint().orientation);
+            Quat q = Quat.rotate(camera.getCurrentDragRotation(), imageData.getViewpoint().toQuat());
             shader.bindCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, imageData.getMetaData().getCenterRotation()));
 
             DifferenceMode diffMode = glImage.getDifferenceMode();

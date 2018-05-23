@@ -48,10 +48,10 @@ class PositionRequest {
         return 42;
     }
 
-    public static Position.L[] parseResponse(JSONObject jo) throws Exception {
+    public static Position[] parseResponse(JSONObject jo) throws Exception {
         JSONArray res = jo.getJSONArray("result");
         int len = res.length();
-        Position.L[] ret = new Position.L[len];
+        Position[] ret = new Position[len];
 
         for (int j = 0; j < len; j++) {
             JSONObject posObject = res.getJSONObject(j);
@@ -65,7 +65,7 @@ class PositionRequest {
             double rad = posArray.getDouble(0) * (1000. / Sun.RadiusMeter);
             double lon = posArray.getDouble(1);
             double lat = posArray.getDouble(2);
-            ret[j] = new Position.L(new JHVDate(dateString), rad, lon, lat);
+            ret[j] = new Position(new JHVDate(dateString), rad, lon, lat);
         }
         return ret;
     }

@@ -1094,7 +1094,7 @@ public class Carrington {
         double mjd = JulianDay.milli2mjd(time.milli);
         double cr = ((JulianDay.DJM0 - 2398167.) + mjd) / CR_SYNODIC_MEAN + 1.;
 
-        Position.L p = Sun.getEarth(time);
+        Position p = Sun.getEarth(time);
         double flon = p.lon / (2 * Math.PI);
 
         int icr = (int) cr;

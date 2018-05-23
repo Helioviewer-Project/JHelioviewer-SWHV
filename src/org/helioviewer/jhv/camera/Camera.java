@@ -24,7 +24,7 @@ public class Camera {
 
     private boolean tracking;
 
-    private Position.Q viewpoint = Sun.StartEarthQ;
+    private Position viewpoint = Sun.StartEarth;
 
     private void updateCamera(JHVDate time) {
         viewpoint = Display.getUpdateViewpoint().update(time);
@@ -33,7 +33,7 @@ public class Camera {
     }
 
     private void updateRotation() {
-        rotation = Quat.rotate(currentDragRotation, viewpoint.orientation);
+        rotation = Quat.rotate(currentDragRotation, viewpoint.toQuat());
     }
 
     private void updateWidth() {
@@ -54,7 +54,7 @@ public class Camera {
         Display.render(1);
     }
 
-    public Position.Q getViewpoint() {
+    public Position getViewpoint() {
         return viewpoint;
     }
 

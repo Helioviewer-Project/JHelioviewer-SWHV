@@ -30,7 +30,7 @@ public class PfssData {
 
         pointsPerLine = _pointsPerLine;
 
-        Position.L p = Sun.getEarth(dateObs);
+        Position p = Sun.getEarth(dateObs);
         cphi = Math.cos(p.lon);
         sphi = Math.sin(p.lon);
     }

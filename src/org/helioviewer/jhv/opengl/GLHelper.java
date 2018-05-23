@@ -63,7 +63,7 @@ public class GLHelper {
     }
 
     public static Vec2 drawVertex(Camera camera, Viewport vp, GL2 gl, Vec3 current, Vec2 previous) {
-        Vec3 pt = camera.getViewpoint().orientation.rotateVector(current);
+        Vec3 pt = camera.getViewpoint().toQuat().rotateVector(current);
         Vec2 tf = Display.mode.xform.transform(pt, Display.mode.scale);
         if (previous != null) {
             if (tf.x <= 0 && previous.x >= 0 && Math.abs(previous.x - tf.x) > 0.5) {

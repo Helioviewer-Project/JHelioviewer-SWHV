@@ -15,7 +15,7 @@ import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.JHVDate;
 import org.json.JSONObject;
 
-public class LoadPosition extends JHVWorker<Position.L[], Void> {
+public class LoadPosition extends JHVWorker<Position[], Void> {
 
     private final LoadPositionFire receiver;
     private final SpaceObject target;
@@ -23,7 +23,7 @@ public class LoadPosition extends JHVWorker<Position.L[], Void> {
     private final long start;
     private final long end;
 
-    private Position.L[] position = new Position.L[0];
+    private Position[] position = new Position[0];
     private String report = null;
 
     public LoadPosition(LoadPositionFire _receiver, SpaceObject _target, String _frame, long _start, long _end) {
@@ -38,7 +38,7 @@ public class LoadPosition extends JHVWorker<Position.L[], Void> {
 
     @Nullable
     @Override
-    protected Position.L[] backgroundWork() {
+    protected Position[] backgroundWork() {
         long deltat = 60, span = (end - start) / 1000;
         long max = 100000;
 
@@ -68,7 +68,7 @@ public class LoadPosition extends JHVWorker<Position.L[], Void> {
             return;
         }
 
-        Position.L[] newPosition = null;
+        Position[] newPosition = null;
         try {
             newPosition = get();
         } catch (Exception e) {
@@ -106,13 +106,13 @@ public class LoadPosition extends JHVWorker<Position.L[], Void> {
         }
     }
 
-    public Position.L getInterpolatedL(long t, long startTime, long endTime) {
+    public Position getInterpolated(long t, long startTime, long endTime) {
         long time = interpolateTime(t, startTime, endTime);
         double dist, hgln, hglt;
         long tstart = position[0].time.milli;
         long tend = position[position.length - 1].time.milli;
         if (tstart == tend) {
-            dist = position[0].rad;
+            dist = position[0].distance;
             hgln = position[0].lon;
             hglt = position[0].lat;
         } else {
@@ -125,17 +125,17 @@ public class LoadPosition extends JHVWorker<Position.L[], Void> {
             tend = position[inext].time.milli;
 
             double alpha = tend == tstart ? 1. : ((time - tstart) / (double) (tend - tstart)) % 1.;
-            dist = (1. - alpha) * position[i].rad + alpha * position[inext].rad;
+            dist = (1. - alpha) * position[i].distance + alpha * position[inext].distance;
             hgln = (1. - alpha) * position[i].lon + alpha * position[inext].lon;
             hglt = (1. - alpha) * position[i].lat + alpha * position[inext].lat;
         }
-        return new Position.L(new JHVDate(time), dist, hgln, hglt);
+        return new Position(new JHVDate(time), dist, hgln, hglt);
     }
 
-    public Position.Q getInterpolatedQ(long t, long startTime, long endTime) {
-        Position.L p = getInterpolatedL(t, startTime, endTime);
-        Position.L e = Sun.getEarth(p.time);
-        return new Position.Q(p.time, p.rad, new Quat(p.lat, e.lon - p.lon));
+    public Position getRelativeInterpolated(long t, long startTime, long endTime) {
+        Position p = getInterpolated(t, startTime, endTime);
+        Position e = Sun.getEarth(p.time);
+        return new Position(p.time, p.distance, e.lon - p.lon, p.lat);
     }
 
 }

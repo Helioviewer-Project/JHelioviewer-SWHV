@@ -45,7 +45,7 @@ abstract class AbstractAnnotateable implements Annotateable {
     @Nullable
     Vec3 computePoint(int x, int y) {
         if (Display.mode == Display.DisplayMode.Orthographic) {
-            return CameraHelper.getVectorFromSphere(camera, Display.getActiveViewport(), x, y, camera.getViewpoint().orientation, true);
+            return CameraHelper.getVectorFromSphere(camera, Display.getActiveViewport(), x, y, camera.getViewpoint().toQuat(), true);
         } else {
             return Display.mode.xform.transformInverse(Display.mode.scale.mouseToGrid(x, y, Display.getActiveViewport(), camera, GridType.Viewpoint));
         }

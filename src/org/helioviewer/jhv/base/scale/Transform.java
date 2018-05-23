@@ -19,7 +19,7 @@ public interface Transform {
     class TransformPolar implements Transform {
         @Override
         public Vec2 transform(Vec3 pt, GridScale scale) {
-            Position.L p = Sun.getEarth(Movie.getTime());
+            Position p = Sun.getEarth(Movie.getTime());
             Quat q = new Quat(p.lat, 0);
             pt = q.rotateInverseVector(pt);
             double r = Math.sqrt(pt.x * pt.x + pt.y * pt.y);
@@ -47,7 +47,7 @@ public interface Transform {
         public Vec2 transform(Vec3 pt, GridScale scale) {
             double theta = Math.PI / 2 - Math.acos(-pt.y);
             double phi = Math.atan2(pt.x, pt.z);
-            Position.L p = Sun.getEarth(Movie.getTime());
+            Position p = Sun.getEarth(Movie.getTime());
             phi -= Math.PI + p.lon;
             phi += 6 * Math.PI;
             phi %= 2 * Math.PI;

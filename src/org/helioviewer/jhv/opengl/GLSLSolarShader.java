@@ -235,18 +235,18 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform3fv(cutOffDirectionRef, 1, cutOffDirection, 0);
     }
 
-    public void bindAngles(GL2 gl, Position.L viewpointL, double _crota) {
-        hglt[0] = (float) viewpointL.lat;
-        hgln[0] = (float) ((viewpointL.lon + 2. * Math.PI) % (2. * Math.PI));
+    public void bindAngles(GL2 gl, Position viewpoint, double _crota) {
+        hglt[0] = (float) viewpoint.lat;
+        hgln[0] = (float) ((viewpoint.lon + 2. * Math.PI) % (2. * Math.PI));
         gl.glUniform1fv(hgltRef, 1, hglt, 0);
         gl.glUniform1fv(hglnRef, 1, hgln, 0);
         crota[0] = (float) _crota;
         gl.glUniform1fv(crotaRef, 1, crota, 0);
     }
 
-    public void bindAnglesDiff(GL2 gl, Position.L viewpointL, double _crota) {
-        hgltDiff[0] = (float) viewpointL.lat;
-        hglnDiff[0] = (float) ((viewpointL.lon + 2. * Math.PI) % (2. * Math.PI));
+    public void bindAnglesDiff(GL2 gl, Position viewpoint, double _crota) {
+        hgltDiff[0] = (float) viewpoint.lat;
+        hglnDiff[0] = (float) ((viewpoint.lon + 2. * Math.PI) % (2. * Math.PI));
         gl.glUniform1fv(hgltDiffRef, 1, hgltDiff, 0);
         gl.glUniform1fv(hglnDiffRef, 1, hglnDiff, 0);
         crotaDiff[0] = (float) _crota;

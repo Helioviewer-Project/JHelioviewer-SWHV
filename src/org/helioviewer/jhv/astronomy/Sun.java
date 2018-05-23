@@ -38,20 +38,17 @@ public class Sun {
     public static final double RadiusFactor_6562 = MeanEarthDistance * Math.tan(960.017 / 3600 * Math.PI / 180);
 
     private static final JHVDate EPOCH = new JHVDate("2000-01-01T00:00:00");
-    private static final Position.L EpochEarthL;
+    private static final Position EpochEarth;
+    public static final Position StartEarth;
 
-    public static final Position.L StartEarthL;
-    public static final Position.Q StartEarthQ;
-
-    private static final LoadingCache<JHVDate, Position.L> cache = CacheBuilder.newBuilder().maximumSize(10000).build(CacheLoader.from(Sun::getEarthInternal));
+    private static final LoadingCache<JHVDate, Position> cache = CacheBuilder.newBuilder().maximumSize(10000).build(CacheLoader.from(Sun::getEarthInternal));
 
     static {
-        EpochEarthL = getEarth(EPOCH);
-        StartEarthL = getEarth(TimeUtils.START);
-        StartEarthQ = getEarthQuat(TimeUtils.START);
+        EpochEarth = getEarth(EPOCH);
+        StartEarth = getEarth(TimeUtils.START);
     }
 
-    public static Position.L getEarth(JHVDate time) {
+    public static Position getEarth(JHVDate time) {
         try {
             return cache.get(time);
         } catch (Exception e) {
@@ -61,7 +58,7 @@ public class Sun {
     }
 
     // derived from http://hesperia.gsfc.nasa.gov/ssw/gen/idl/solar/get_sun.pro
-    private static Position.L getEarthInternal(JHVDate time) {
+    private static Position getEarthInternal(JHVDate time) {
         double mjd = JulianDay.milli2mjd(time.milli);
         double t = JulianDay.mjd2jcy(mjd, 2415020.);
 
@@ -99,7 +96,7 @@ public class Sun {
 
         // convert distance to solar radii
         // change L0 Carrington longitude sign to increase towards West, like Stonyhurst
-        return new Position.L(time, dist * MeanEarthDistance, -he_lon, he_lat);
+        return new Position(time, dist * MeanEarthDistance, -he_lon, he_lat);
     }
 
     public static double getEarthDistance(long milli) {
@@ -133,11 +130,7 @@ public class Sun {
 
     public static Quat getHCI(JHVDate time) {
         // 1.7381339560109783
-        return new Quat(0, sunRot(JulianDay.milli2mjd(time.milli)) + (1.738033457804639 + EpochEarthL.lon - theta0));
-    }
-
-    public static Position.Q getEarthQuat(JHVDate time) {
-        return getEarth(time).toQ();
+        return new Quat(0, sunRot(JulianDay.milli2mjd(time.milli)) + (1.738033457804639 + EpochEarth.lon - theta0));
     }
 
     // better precison, to be recovered later
