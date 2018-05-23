@@ -11,11 +11,11 @@ import com.jogamp.opengl.GL2;
 
 public class AnnotateRectangle extends AbstractAnnotateable {
 
-    private Vec3 rectangleStartPoint;
-    private Vec3 rectangleEndPoint;
-
     private Vec3 startPoint;
     private Vec3 endPoint;
+
+    private Vec3 dragStartPoint;
+    private Vec3 dragEndPoint;
 
     public AnnotateRectangle(Camera _camera) {
         super(_camera);
@@ -42,7 +42,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
     @Override
     public boolean beingDragged() {
-        return endPoint != null && startPoint != null;
+        return dragEndPoint != null && dragStartPoint != null;
     }
 
     private void interpolatedDraw(Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s) {
@@ -68,20 +68,20 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
     @Override
     public void render(Viewport vp, GL2 gl, boolean active) {
-        if ((rectangleStartPoint == null || rectangleEndPoint == null) && !beingDragged())
+        if ((startPoint == null || endPoint == null) && !beingDragged())
             return;
 
         gl.glLineWidth(lineWidth);
 
         if (beingDragged()) {
             gl.glColor3f(dragColor[0], dragColor[1], dragColor[2]);
-            drawRectangle(vp, gl, toSpherical(startPoint), toSpherical(endPoint));
+            drawRectangle(vp, gl, toSpherical(dragStartPoint), toSpherical(dragEndPoint));
         } else {
             if (active)
                 gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
             else
                 gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
-            drawRectangle(vp, gl, toSpherical(rectangleStartPoint), toSpherical(rectangleEndPoint));
+            drawRectangle(vp, gl, toSpherical(startPoint), toSpherical(endPoint));
         }
     }
 
@@ -89,24 +89,24 @@ public class AnnotateRectangle extends AbstractAnnotateable {
     public void mousePressed(int x, int y) {
         Vec3 pt = computePoint(x, y);
         if (pt != null)
-            startPoint = pt;
+            dragStartPoint = pt;
     }
 
     @Override
     public void mouseDragged(int x, int y) {
         Vec3 pt = computePoint(x, y);
         if (pt != null)
-            endPoint = pt;
+            dragEndPoint = pt;
     }
 
     @Override
     public void mouseReleased() {
         if (beingDragged()) {
-            rectangleStartPoint = startPoint;
-            rectangleEndPoint = endPoint;
+            startPoint = dragStartPoint;
+            endPoint = dragEndPoint;
         }
-        endPoint = null;
-        startPoint = null;
+        dragStartPoint = null;
+        dragEndPoint = null;
     }
 
     @Override

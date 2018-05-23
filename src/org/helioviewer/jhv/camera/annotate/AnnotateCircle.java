@@ -11,11 +11,11 @@ import com.jogamp.opengl.GL2;
 
 public class AnnotateCircle extends AbstractAnnotateable {
 
-    private Vec3 circleStartPoint;
-    private Vec3 circleEndPoint;
-
     private Vec3 startPoint;
     private Vec3 endPoint;
+
+    private Vec3 dragStartPoint;
+    private Vec3 dragEndPoint;
 
     public AnnotateCircle(Camera _camera) {
         super(_camera);
@@ -58,25 +58,25 @@ public class AnnotateCircle extends AbstractAnnotateable {
 
     @Override
     public boolean beingDragged() {
-        return endPoint != null && startPoint != null;
+        return dragEndPoint != null && dragStartPoint != null;
     }
 
     @Override
     public void render(Viewport vp, GL2 gl, boolean active) {
-        if ((circleStartPoint == null || circleEndPoint == null) && !beingDragged())
+        if ((startPoint == null || endPoint == null) && !beingDragged())
             return;
 
         gl.glLineWidth(lineWidth);
 
         if (beingDragged()) {
             gl.glColor3f(dragColor[0], dragColor[1], dragColor[2]);
-            drawCircle(vp, gl, startPoint, endPoint);
+            drawCircle(vp, gl, dragStartPoint, dragEndPoint);
         } else {
             if (active)
                 gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
             else
                 gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
-            drawCircle(vp, gl, circleStartPoint, circleEndPoint);
+            drawCircle(vp, gl, startPoint, endPoint);
         }
     }
 
@@ -84,24 +84,24 @@ public class AnnotateCircle extends AbstractAnnotateable {
     public void mousePressed(int x, int y) {
         Vec3 pt = computePoint(x, y);
         if (pt != null)
-            startPoint = pt;
+            dragStartPoint = pt;
     }
 
     @Override
     public void mouseDragged(int x, int y) {
         Vec3 pt = computePoint(x, y);
         if (pt != null)
-            endPoint = pt;
+            dragEndPoint = pt;
     }
 
     @Override
     public void mouseReleased() {
         if (beingDragged()) {
-            circleStartPoint = startPoint;
-            circleEndPoint = endPoint;
+            startPoint = dragStartPoint;
+            endPoint = dragEndPoint;
         }
-        endPoint = null;
-        startPoint = null;
+        dragStartPoint = null;
+        dragEndPoint = null;
     }
 
     @Override

@@ -9,7 +9,7 @@ public enum GridType {
 
     Viewpoint, Stonyhurst, Carrington, HCI;
 
-    public Quat getGridQuat(Camera camera) {
+    public Quat toQuat(Camera camera) {
         switch (this) {
         case Viewpoint:
             return camera.getViewpoint().orientation;
