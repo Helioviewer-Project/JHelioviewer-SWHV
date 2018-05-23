@@ -6,9 +6,9 @@ import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.scale.GridScale;
+import org.helioviewer.jhv.base.scale.GridType;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
@@ -26,10 +26,6 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class GridLayer extends AbstractLayer {
-
-    public enum GridType {
-        Viewpoint, Stonyhurst, Carrington, HCI
-    }
 
     private static final double RADIAL_UNIT = Sun.Radius;
     private static final double RADIAL_STEP = 15;
@@ -114,20 +110,6 @@ public class GridLayer extends AbstractLayer {
         return Display.mode.scale.mouseToGrid(x, y, vp, camera, gridType);
     }
 
-    public static Quat getGridQuat(Camera camera, GridType _gridType) { // should be in GridScale
-        switch (_gridType) {
-        case Viewpoint:
-            return camera.getViewpoint().orientation;
-        case Stonyhurst:
-            Position.L p = Sun.getEarth(camera.getViewpoint().time);
-            return new Quat(0, p.lon);
-        case HCI:
-            return Sun.getHCI(camera.getViewpoint().time);
-        default: // Carrington
-            return Quat.ZERO;
-        }
-    }
-
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.idx])
@@ -142,7 +124,7 @@ public class GridLayer extends AbstractLayer {
 
         drawEarthCircles(gl, vp.aspect, GLInfo.pixelScale[0] / (2 * camera.getFOV()), Sun.getEarth(camera.getViewpoint().time).toQuat());
 
-        Mat4 cameraMatrix = getGridQuat(camera, gridType).toMatrix();
+        Mat4 cameraMatrix = gridType.getGridQuat(camera).toMatrix();
         double pixelsPerSolarRadius = textScale * vp.height / (2 * camera.getWidth());
 
         gl.glPushMatrix();
