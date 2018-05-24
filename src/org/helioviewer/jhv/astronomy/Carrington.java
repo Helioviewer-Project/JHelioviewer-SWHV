@@ -1103,7 +1103,6 @@ public class Carrington {
             else if (fcr < flon)
                 icr--;
         }
-
         return flon + icr;
     }
 

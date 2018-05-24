@@ -64,7 +64,7 @@ abstract class AbstractAnnotateable implements Annotateable {
         if (Display.mode == Display.DisplayMode.Orthographic) {
             return CameraHelper.getVectorFromSphere(camera, Display.getActiveViewport(), x, y, camera.getViewpoint().toQuat(), true);
         } else {
-            return Display.mode.xform.transformInverse(Display.mode.scale.mouseToGrid(x, y, Display.getActiveViewport(), camera, GridType.Viewpoint));
+            return Display.mode.xform.transformInverse(camera.getViewpoint(), Display.mode.scale.mouseToGrid(x, y, Display.getActiveViewport(), camera, GridType.Viewpoint));
         }
     }
 

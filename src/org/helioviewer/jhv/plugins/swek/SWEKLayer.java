@@ -15,6 +15,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.base.scale.Transform;
@@ -269,8 +270,9 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
         Vec3 pt = pi.centralPoint();
         if (pt != null) {
-            pt = camera.getViewpoint().toQuat().rotateVector(pt);
-            Vec2 tf = xform.transform(pt, scale);
+            Position viewpoint = camera.getViewpoint();
+            pt = viewpoint.toQuat().rotateVector(pt);
+            Vec2 tf = xform.transform(viewpoint, pt, scale);
             bindTexture(gl, evtr.getSupplier().getGroup());
             if (evtr.isHighlighted()) {
                 drawImageScale(gl, tf.x * vp.aspect, tf.y, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
