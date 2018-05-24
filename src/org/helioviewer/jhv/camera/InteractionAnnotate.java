@@ -138,9 +138,9 @@ public class InteractionAnnotate extends Interaction {
         if (jo == null)
             return;
 
-        activeIndex = jo.optInt("activeIndex", activeIndex);
         JSONArray ja = jo.optJSONArray("annotateables");
         if (ja != null) {
+            activeIndex = jo.optInt("activeIndex", activeIndex);
             int len = ja.length();
             for (int i = 0; i < len; i++) {
                 annotateables.add(generate(ja.getJSONObject(i)));
