@@ -16,16 +16,16 @@ import org.json.JSONObject;
 
 public class BandType {
 
-    public enum Scale {
-        Logarithmic, Linear, PositiveLinear;
+    private enum Scale {
+        LOGARITHMIC, LINEAR, POSITIVELINEAR;
 
         YAxisScale generateScale(String _label) {
             switch (this) {
-            case Logarithmic:
+            case LOGARITHMIC:
                 return new YAxisLogScale(_label);
-            case Linear:
+            case LINEAR:
                 return new YAxisIdentityScale(_label);
-            case PositiveLinear:
+            case POSITIVELINEAR:
                 return new YAxisPositiveIdentityScale(_label);
             default:
                 return new YAxisIdentityScale(_label);
@@ -34,8 +34,6 @@ public class BandType {
     }
 
     private static final HashMap<String, List<BandType>> groups = new HashMap<>();
-
-    private Scale scale = Scale.Linear;
 
     static void loadBandTypes(JSONArray jo) {
         int len = jo.length();
@@ -54,7 +52,7 @@ public class BandType {
                 if (bt.name.equals(name))
                     return bt;
         }
-        return new BandType(new JSONObject("{}"));
+        return new BandType(new JSONObject());
     }
 
     public static List<BandType> getBandTypes(String group) {
@@ -74,6 +72,7 @@ public class BandType {
     private final Map<String, Double> warnLevels;
     private double min = 0;
     private double max = 1;
+    private Scale scale = Scale.LINEAR;
     private String bandCacheType = "BandCacheMinute";
 
     private final JSONObject json;
@@ -96,13 +95,10 @@ public class BandType {
             max = range.optDouble(1, max);
         }
 
-        String scale_str = jo.optString("scale", "");
-        if ("logarithmic".equals(scale_str))
-            scale = Scale.Logarithmic;
-        else if ("linear".equals(scale_str))
-            scale = Scale.Linear;
-        else
-            scale = Scale.PositiveLinear;
+        try {
+            scale = Scale.valueOf(jo.optString("scale", scale.toString()).toUpperCase());
+        } catch (Exception ignore) {
+        }
 
         JSONArray warn = jo.optJSONArray("warnLevels");
         HashMap<String, Double> warnHelp = new HashMap<>();
