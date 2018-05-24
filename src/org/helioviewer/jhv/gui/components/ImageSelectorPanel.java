@@ -11,7 +11,6 @@ import javax.swing.JScrollPane;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataSourcesListener;
 import org.helioviewer.jhv.io.DataSourcesParser;
@@ -45,20 +44,16 @@ public class ImageSelectorPanel extends JPanel implements DataSourcesListener {
         if (!sourcesTree.setParsedData(parser)) // not preferred
             return;
 
-        if (first) {
-            first = false;
-            CommandLine.loadRequest();
+        DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
+        if (item != null) { // valid
+            long startTime = item.end - 2 * TimeUtils.DAY_IN_MILLIS;
+            long endTime = item.end;
+            selector.setStartTime(startTime);
+            selector.setEndTime(endTime);
 
-            DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
-            if (item != null) { // valid
-                long startTime = item.end - 2 * TimeUtils.DAY_IN_MILLIS;
-                long endTime = item.end;
-                selector.setStartTime(startTime);
-                selector.setEndTime(endTime);
-
-                if (Boolean.parseBoolean(Settings.getProperty("startup.loadmovie"))) {
-                    load(null, startTime, endTime, selector.getCadence());
-                }
+            if (first && Boolean.parseBoolean(Settings.getProperty("startup.loadmovie"))) {
+                load(null, startTime, endTime, selector.getCadence());
+                first = true;
             }
         }
     }
