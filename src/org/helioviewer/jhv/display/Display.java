@@ -10,7 +10,7 @@ import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.base.scale.Transform;
 import org.helioviewer.jhv.camera.Camera;
-// import org.helioviewer.jhv.camera.CameraHelper;
+//import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.events.JHVEventHighlightListener;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -48,8 +48,8 @@ public class Display implements ActionListener, JHVEventHighlightListener {
 
     private static void setProjectionMode(DisplayMode newMode) {
         mode = newMode;
-        // CameraHelper.zoomToFit(miniCamera);
-        // ImageViewerGui.getRenderableMiniview().getCamera().reset();
+        //CameraHelper.zoomToFit(miniCamera);
+        miniCamera.reset();
         camera.reset();
     }
 
