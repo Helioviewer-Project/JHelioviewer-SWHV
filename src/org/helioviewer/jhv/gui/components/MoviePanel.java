@@ -172,9 +172,10 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
     }
 
     public static void unsetMovie() {
+        timeSlider.removeChangeListener(instance);
         timeSlider.setMaximum(0);
-        timeSlider.setValue(0);
-        timeSlider.repaint();
+        timeSlider.addChangeListener(instance);
+        // timeSlider.repaint();
         setEnabledState(false);
 
         clickRecordButton();
@@ -182,9 +183,10 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
     }
 
     public static void setMovie(View view) {
+        timeSlider.removeChangeListener(instance);
         timeSlider.setMaximum(view.getMaximumFrameNumber());
-        timeSlider.setValue(view.getCurrentFrameNumber());
-        timeSlider.repaint();
+        timeSlider.addChangeListener(instance);
+        // timeSlider.repaint();
         setEnabledState(true);
 
         recordButton.setEnabled(true);
