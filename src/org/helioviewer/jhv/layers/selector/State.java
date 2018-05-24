@@ -177,6 +177,7 @@ public class State {
             }
         }
 
+        ImageViewerGui.getAnnotateInteraction().fromJson(data.optJSONObject("annotations"));
         ImageViewerGui.getToolBar().getMultiviewButton().setSelected(data.optBoolean("multiview", ImageViewerGui.getToolBar().getMultiviewButton().isSelected()));
         ImageViewerGui.getToolBar().getShowCoronaButton().setSelected(data.optBoolean("showCorona", ImageViewerGui.getToolBar().getShowCoronaButton().isSelected()));
 

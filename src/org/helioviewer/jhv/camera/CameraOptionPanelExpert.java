@@ -19,7 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 @SuppressWarnings("serial")
-public class CameraOptionPanelExpert extends CameraOptionPanel implements TimespanListener {
+class CameraOptionPanelExpert extends CameraOptionPanel implements TimespanListener {
 
     private final JCheckBox syncCheckBox;
     private final DateTimePanel startPanel = new DateTimePanel("Start");
