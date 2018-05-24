@@ -47,8 +47,8 @@ public class Quat {
         u = new Vec3(sx * cy, cx * sy, sx * sy);
     }
 
-    private Quat(double a, double x, double y, double z) {
-        this(a, new Vec3(x, y, z));
+    private Quat(double _a, double x, double y, double z) {
+        this(_a, new Vec3(x, y, z));
     }
 
     private Quat(double _a, Vec3 _u) {
