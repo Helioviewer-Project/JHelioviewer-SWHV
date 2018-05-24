@@ -28,6 +28,7 @@ public class Movie implements ActionListener {
             MoviePanel.unsetMovie();
         } else
             MoviePanel.setMovie(view);
+        setTime(lastTimestamp); // ensure master layer time is used
     }
 
     public static long getStartTime() {
