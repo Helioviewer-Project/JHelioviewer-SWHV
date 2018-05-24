@@ -11,8 +11,8 @@ import com.jogamp.opengl.GL2;
 
 public class AnnotateCross extends AbstractAnnotateable {
 
-    public AnnotateCross(Camera _camera, JSONObject _jo) {
-        super(_camera, _jo);
+    public AnnotateCross(Camera _camera, JSONObject jo) {
+        super(_camera, jo);
     }
 
     private void drawCross(Viewport vp, GL2 gl, Vec3 bp) {

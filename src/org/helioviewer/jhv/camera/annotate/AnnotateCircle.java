@@ -13,8 +13,8 @@ import com.jogamp.opengl.GL2;
 
 public class AnnotateCircle extends AbstractAnnotateable {
 
-    public AnnotateCircle(Camera _camera, JSONObject _jo) {
-        super(_camera, _jo);
+    public AnnotateCircle(Camera _camera, JSONObject jo) {
+        super(_camera, jo);
     }
 
     private void drawCircle(Viewport vp, GL2 gl, Vec3 bp, Vec3 ep) {

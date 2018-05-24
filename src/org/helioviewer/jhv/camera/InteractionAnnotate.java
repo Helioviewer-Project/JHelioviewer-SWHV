@@ -26,13 +26,13 @@ public class InteractionAnnotate extends Interaction {
             clazz = _clazz;
         }
 
-        Annotateable generate(Camera _camera, JSONObject _jo) {
+        Annotateable generate(Camera _camera, JSONObject jo) {
             try {
-                return clazz.getConstructor(Camera.class, JSONObject.class).newInstance(_camera, _jo);
+                return clazz.getConstructor(Camera.class, JSONObject.class).newInstance(_camera, jo);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return new AnnotateRectangle(_camera, _jo);
+            return new AnnotateRectangle(_camera, jo);
         }
     }
 
@@ -131,6 +131,21 @@ public class InteractionAnnotate extends Interaction {
         for (Annotateable annotateable : annotateables)
             ja.put(annotateable.toJson());
         return new JSONObject().put("activeIndex", activeIndex).put("annotateables", ja);
+    }
+
+    public void fromJson(JSONObject jo) {
+        clear();
+        if (jo == null)
+            return;
+
+        activeIndex = jo.optInt("activeIndex", activeIndex);
+        JSONArray ja = jo.optJSONArray("annotateables");
+        if (ja != null) {
+            int len = ja.length();
+            for (int i = 0; i < len; i++) {
+                annotateables.add(generate(ja.getJSONObject(i)));
+            }
+        }
     }
 
 }
