@@ -12,6 +12,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
+import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
@@ -27,7 +28,13 @@ abstract class AbstractAnnotateable implements Annotateable {
 
     final Camera camera;
 
-    AbstractAnnotateable(Camera _camera) {
+    Vec3 startPoint;
+    Vec3 endPoint;
+
+    Vec3 dragStartPoint;
+    Vec3 dragEndPoint;
+
+    AbstractAnnotateable(Camera _camera, JSONObject _jo) {
         camera = _camera;
     }
 
@@ -103,6 +110,16 @@ abstract class AbstractAnnotateable implements Annotateable {
 
             gl.glEnd();
         }
+    }
+
+    @Override
+    public JSONObject toJson() {
+        JSONObject jo = new JSONObject().put("type", getType());
+        if (startPoint != null)
+            jo.put("startPoint", startPoint.toJson());
+        if (endPoint != null)
+            jo.put("endPoint", endPoint.toJson());
+        return jo;
     }
 
 }

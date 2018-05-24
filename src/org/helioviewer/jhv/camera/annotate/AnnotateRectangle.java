@@ -1,24 +1,20 @@
 package org.helioviewer.jhv.camera.annotate;
 
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
+import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
 public class AnnotateRectangle extends AbstractAnnotateable {
 
-    private Vec3 startPoint;
-    private Vec3 endPoint;
-
-    private Vec3 dragStartPoint;
-    private Vec3 dragEndPoint;
-
-    public AnnotateRectangle(Camera _camera) {
-        super(_camera);
+    public AnnotateRectangle(Camera _camera, JSONObject _jo) {
+        super(_camera, _jo);
     }
 
     private void drawRectangle(Viewport vp, GL2 gl, Vec3 bp, Vec3 ep) {
@@ -40,10 +36,6 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         gl.glEnd();
     }
 
-    @Override
-    public boolean beingDragged() {
-        return dragEndPoint != null && dragStartPoint != null;
-    }
 
     private void interpolatedDraw(Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s) {
         double delta = Math.PI * 2.5 / 180;
@@ -110,8 +102,18 @@ public class AnnotateRectangle extends AbstractAnnotateable {
     }
 
     @Override
+    public boolean beingDragged() {
+        return dragEndPoint != null && dragStartPoint != null;
+    }
+
+    @Override
     public boolean isDraggable() {
         return true;
+    }
+
+    @Override
+    public String getType() {
+        return AnnotationMode.Rectangle.toString();
     }
 
 }
