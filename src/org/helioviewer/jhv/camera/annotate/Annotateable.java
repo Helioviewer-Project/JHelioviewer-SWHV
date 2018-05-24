@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.camera.annotate;
 
 import org.helioviewer.jhv.display.Viewport;
+import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
@@ -17,5 +18,9 @@ public interface Annotateable {
     boolean beingDragged();
 
     boolean isDraggable();
+
+    String getType();
+
+    JSONObject toJson();
 
 }

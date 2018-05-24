@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.math;
 
 import org.helioviewer.jhv.log.Log;
+import org.json.JSONArray;
 
 public class Vec3 {
 
@@ -145,6 +146,23 @@ public class Vec3 {
     }
 
     @Override
+    public String toString() {
+        return toJson().toString();
+    }
+
+    public JSONArray toJson() {
+        return new JSONArray(new double[] { x, y, z });
+    }
+
+    public static Vec3 fromJson(JSONArray ja) {
+        try {
+            return new Vec3(ja.getDouble(0), ja.getDouble(1), ja.getDouble(2));
+        } catch (Exception e) {
+            return ZERO;
+        }
+    }
+
+    @Override
     public final boolean equals(Object o) {
         return o instanceof Vec3 && isApproxEqual((Vec3) o, 0.0);
     }
@@ -153,11 +171,6 @@ public class Vec3 {
     public int hashCode() {
         assert false : "hashCode not designed";
         return 42;
-    }
-
-    @Override
-    public final String toString() {
-        return "(" + x + ',' + y + ',' + z + ')';
     }
 
 }

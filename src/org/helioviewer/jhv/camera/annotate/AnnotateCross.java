@@ -2,17 +2,17 @@ package org.helioviewer.jhv.camera.annotate;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec3;
+import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
 public class AnnotateCross extends AbstractAnnotateable {
 
-    private Vec3 crossPoint;
-
-    public AnnotateCross(Camera _camera) {
-        super(_camera);
+    public AnnotateCross(Camera _camera, JSONObject _jo) {
+        super(_camera, _jo);
     }
 
     private void drawCross(Viewport vp, GL2 gl, Vec3 bp) {
@@ -29,7 +29,7 @@ public class AnnotateCross extends AbstractAnnotateable {
 
     @Override
     public void render(Viewport vp, GL2 gl, boolean active) {
-        if (crossPoint == null)
+        if (startPoint == null)
             return;
 
         gl.glLineWidth(lineWidth);
@@ -38,14 +38,14 @@ public class AnnotateCross extends AbstractAnnotateable {
             gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
         else
             gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
-        drawCross(vp, gl, toSpherical(crossPoint));
+        drawCross(vp, gl, toSpherical(startPoint));
     }
 
     @Override
     public void mousePressed(int x, int y) {
         Vec3 pt = computePoint(x, y);
         if (pt != null)
-            crossPoint = pt;
+            startPoint = pt;
     }
 
     @Override
@@ -64,6 +64,11 @@ public class AnnotateCross extends AbstractAnnotateable {
     @Override
     public boolean isDraggable() {
         return false;
+    }
+
+    @Override
+    public String getType() {
+        return AnnotationMode.Cross.toString();
     }
 
 }

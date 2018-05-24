@@ -8,6 +8,8 @@ import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.MouseEvent;
@@ -16,17 +18,21 @@ import com.jogamp.opengl.GL2;
 public class InteractionAnnotate extends Interaction {
 
     public enum AnnotationMode {
-        Rectangle, Circle, Cross;
+        Rectangle(AnnotateRectangle.class), Circle(AnnotateCircle.class), Cross(AnnotateCross.class);
 
-        Annotateable generateAnnotateable(Camera camera) {
-            switch (this) {
-            case Circle:
-                return new AnnotateCircle(camera);
-            case Cross:
-                return new AnnotateCross(camera);
-            default:
-                return new AnnotateRectangle(camera);
+        private final Class<? extends Annotateable> clazz;
+
+        AnnotationMode(Class<? extends Annotateable> _clazz) {
+            clazz = _clazz;
+        }
+
+        Annotateable generate(Camera _camera, JSONObject _jo) {
+            try {
+                return clazz.getConstructor(Camera.class, JSONObject.class).newInstance(_camera, _jo);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+            return new AnnotateRectangle(_camera, _jo);
         }
     }
 
@@ -53,7 +59,7 @@ public class InteractionAnnotate extends Interaction {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        newAnnotateable = mode.generateAnnotateable(camera);
+        newAnnotateable = mode.generate(camera, null);
         newAnnotateable.mousePressed(e.getX(), e.getY());
         if (!newAnnotateable.isDraggable()) {
             finishAnnotateable();
@@ -102,21 +108,29 @@ public class InteractionAnnotate extends Interaction {
     }
 
     public void setMode(AnnotationMode newMode) {
-        switch (newMode) {
-        case Circle:
-            mode = AnnotationMode.Circle;
-            break;
-        case Cross:
-            mode = AnnotationMode.Cross;
-            break;
-        default:
-            mode = AnnotationMode.Rectangle;
-        }
+        mode = newMode;
     }
 
     public void clear() {
+        newAnnotateable = null;
         annotateables.clear();
         activeIndex = -1;
+    }
+
+    private Annotateable generate(JSONObject jo) {
+        try {
+            return AnnotationMode.valueOf(jo.getString("type")).generate(camera, jo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new AnnotateRectangle(camera, jo);
+    }
+
+    public JSONObject toJson() {
+        JSONArray ja = new JSONArray();
+        for (Annotateable annotateable : annotateables)
+            ja.put(annotateable.toJson());
+        return new JSONObject().put("activeIndex", activeIndex).put("annotateables", ja);
     }
 
 }

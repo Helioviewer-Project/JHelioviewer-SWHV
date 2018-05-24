@@ -47,6 +47,7 @@ public class State {
         main.put("projection", Display.mode);
         main.put("tracking", ImageViewerGui.getToolBar().getTrackingButton().isSelected());
         main.put("showCorona", ImageViewerGui.getToolBar().getShowCoronaButton().isSelected());
+        main.put("annotations", ImageViewerGui.getAnnotateInteraction().toJson());
 
         JSONArray ja = new JSONArray();
         for (Layer layer : Layers.getLayers()) {
