@@ -5,6 +5,7 @@ import java.net.URI;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.base.EventDispatchQueue;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
@@ -34,7 +35,8 @@ class LoadRequestTask extends JHVWorker<Void, Void> {
                 len = ji.length();
                 for (int i = 0; i < len; i++) {
                     APIRequest req = APIRequest.fromRequestJson(ji.getJSONObject(i));
-                    JHVGlobals.getExecutorService().execute(new LoadRemoteTask(ImageLayer.create(null), req));
+                    ImageLayer layer = EventDispatchQueue.invokeAndWait(() -> ImageLayer.create(null));
+                    JHVGlobals.getExecutorService().execute(new LoadRemoteTask(layer, req));
                 }
             }
 
