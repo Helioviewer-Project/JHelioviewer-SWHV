@@ -111,6 +111,8 @@ public class DataSources {
         return settings == null ? null : settings.get(setting);
     }
 
+    private static int toLoad = serverSettings.keySet().size();
+
     public static void loadSources() {
         Validator validator = Validator.builder().failEarly().build();
         for (String serverName : serverSettings.keySet())
@@ -130,6 +132,10 @@ public class DataSources {
     static void setupSources(DataSourcesParser parser) {
         for (DataSourcesListener listener : listeners)
             listener.setupSources(parser);
+
+        toLoad--;
+        if (toLoad == 0)
+            CommandLine.loadRequest();
     }
 
 }
