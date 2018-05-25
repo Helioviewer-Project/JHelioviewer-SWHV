@@ -2,7 +2,7 @@ package org.helioviewer.jhv.plugins;
 
 // The basic class which manages the interface between JHV and the contained
 // plugin. It manages the current status of the corresponding plug-in.
-public class PluginContainer {
+class PluginContainer {
 
     private final Plugin plugin;
     private final String jar;
