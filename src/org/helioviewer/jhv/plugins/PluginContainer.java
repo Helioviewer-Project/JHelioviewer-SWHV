@@ -5,13 +5,13 @@ package org.helioviewer.jhv.plugins;
 class PluginContainer {
 
     private final Plugin plugin;
-    private final String jar;
-    private boolean pluginActive;
+    private boolean active;
 
-    public PluginContainer(Plugin _plugin, String _jar, boolean _pluginActive) {
+    public PluginContainer(Plugin _plugin) {
         plugin = _plugin;
-        jar = _jar;
-        pluginActive = _pluginActive;
+        active = PluginSettings.getSingletonInstance().isPluginActivated(plugin.getClass().getSimpleName());
+        if (active)
+            plugin.installPlugin();
     }
 
     public String getName() {
@@ -27,24 +27,23 @@ class PluginContainer {
     }
 
     public boolean isActive() {
-        return pluginActive;
+        return active;
     }
 
-    public void setActive(boolean active) {
-        if (pluginActive == active)
-            return;
-
-        pluginActive = active;
-        PluginSettings.getSingletonInstance().save(this);
-        if (active)
-            plugin.installPlugin();
-        else
-            plugin.uninstallPlugin();
+    public void setActive(boolean _active) {
+        if (active != _active) {
+            active = _active;
+            PluginSettings.getSingletonInstance().save(this);
+            if (active)
+                plugin.installPlugin();
+            else
+                plugin.uninstallPlugin();
+        }
     }
 
     @Override
     public String toString() {
-        return jar;
+        return plugin.getClass().getSimpleName();
     }
 
 }

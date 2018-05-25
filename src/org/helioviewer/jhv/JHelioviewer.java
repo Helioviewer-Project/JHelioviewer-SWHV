@@ -114,10 +114,10 @@ public class JHelioviewer {
                     Log.info("Do not load plugins");
                 } else {
                     Log.info("Load bundled plugins");
-                      PluginManager.getSingletonInstance().addPlugin(new EVEPlugin(), "Eve");
-                      PluginManager.getSingletonInstance().addPlugin(new SWEKPlugin(), "SWEK");
-                      PluginManager.getSingletonInstance().addPlugin(new PfssPlugin(), "PFSS");
-                      PluginManager.getSingletonInstance().addPlugin(new SampPlugin(), "SAMP");
+                      PluginManager.getSingletonInstance().addPlugin(new EVEPlugin());
+                      PluginManager.getSingletonInstance().addPlugin(new SWEKPlugin());
+                      PluginManager.getSingletonInstance().addPlugin(new PfssPlugin());
+                      PluginManager.getSingletonInstance().addPlugin(new SampPlugin());
                 }
             } catch (Exception e) {
                 Log.error("Plugin load error", e);

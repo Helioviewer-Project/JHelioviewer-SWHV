@@ -22,12 +22,8 @@ public class PluginManager {
         return plugins.values();
     }
 
-    public void addPlugin(Plugin plugin, String name) {
-        PluginContainer pluginContainer = new PluginContainer(plugin, name, PluginSettings.getSingletonInstance().isPluginActivated(name));
-        plugins.put(plugin, pluginContainer);
-        if (pluginContainer.isActive()) {
-            plugin.installPlugin();
-        }
+    public void addPlugin(Plugin plugin) {
+        plugins.put(plugin, new PluginContainer(plugin));
     }
 
     public void loadState(JSONObject jo) {
