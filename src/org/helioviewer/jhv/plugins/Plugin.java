@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.base.plugin;
+package org.helioviewer.jhv.plugins;
 
 import org.json.JSONObject;
 

@@ -25,8 +25,8 @@ import org.helioviewer.jhv.gui.actions.ZoomOneToOneAction;
 import org.helioviewer.jhv.gui.actions.ZoomOutAction;
 import org.helioviewer.jhv.gui.dialogs.AboutDialog;
 import org.helioviewer.jhv.gui.dialogs.PreferencesDialog;
-import org.helioviewer.jhv.gui.dialogs.plugins.PluginsDialog;
 import org.helioviewer.jhv.platform.OSXHandler;
+import org.helioviewer.jhv.plugins.PluginsDialog;
 
 // Menu bar of the main window
 @SuppressWarnings("serial")

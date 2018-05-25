@@ -5,10 +5,10 @@ import java.awt.Component;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.base.plugin.Plugin;
 import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.events.gui.EventPanel;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.json.JSONObject;
 
