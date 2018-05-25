@@ -28,6 +28,7 @@ import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis.YAxisIdentityScale;
 import org.json.JSONObject;
 
+// has to be public for state
 public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEventHandler {
 
     private final YAxis yAxis = new YAxis(0, 0, new YAxisIdentityScale("Events"));

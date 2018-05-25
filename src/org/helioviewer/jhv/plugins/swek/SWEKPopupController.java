@@ -27,7 +27,7 @@ import org.helioviewer.jhv.opengl.GLHelper;
 import com.jogamp.newt.event.MouseAdapter;
 import com.jogamp.newt.event.MouseEvent;
 
-public class SWEKPopupController extends MouseAdapter implements TimeListener {
+class SWEKPopupController extends MouseAdapter implements TimeListener {
 
     private static final Cursor helpCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
     private static final int xOffset = 12;

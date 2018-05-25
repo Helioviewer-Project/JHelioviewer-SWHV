@@ -22,15 +22,6 @@ public class PluginManager {
         return plugins.values();
     }
 
-    /**
-     * Adds a plug-in to the list of all loaded plug-ins. By default a plug-in
-     * is not activated. If there is a plug-in entry in the plug-in settings
-     * file the status of the plug-in will be set to this value.
-     *
-     * @param plugin
-     *            Plug-in to add to the list.
-     * @param name
-     */
     public void addPlugin(Plugin plugin, String name) {
         PluginContainer pluginContainer = new PluginContainer(plugin, name, PluginSettings.getSingletonInstance().isPluginActivated(name));
         plugins.put(plugin, pluginContainer);
@@ -43,9 +34,9 @@ public class PluginManager {
         for (String classname : jo.keySet()) {
             for (Plugin plugin : plugins.keySet()) {
                 if (classname.equals(plugin.getClass().getName())) {
-                    JSONObject cl = jo.optJSONObject(classname);
-                    if (cl != null) {
-                        plugin.loadState(cl);
+                    JSONObject po = jo.optJSONObject(classname);
+                    if (po != null) {
+                        plugin.loadState(po);
                     }
                 }
             }
@@ -54,9 +45,9 @@ public class PluginManager {
 
     public void saveState(JSONObject jo) {
         for (Plugin plugin : plugins.keySet()) {
-            JSONObject swekObject = new JSONObject();
-            plugin.saveState(swekObject);
-            jo.put(plugin.getClass().getName(), swekObject);
+            JSONObject po = new JSONObject();
+            plugin.saveState(po);
+            jo.put(plugin.getClass().getName(), po);
         }
     }
 

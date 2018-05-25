@@ -97,7 +97,6 @@ public class PluginSettings {
      * @param pluginContainer
      *            Plug-in container whose information have to be updated in the
      *            internal XML document.
-     * @see #savePluginSettings()
      */
     private void pluginSettingsToXML(PluginContainer pluginContainer) {
         Node pluginNode = findNode(pluginsRootNode, pluginContainer.toString());
