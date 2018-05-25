@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.plugins;
 
+import org.helioviewer.jhv.Settings;
+
 // The basic class which manages the interface between JHV and the contained
 // plugin. It manages the current status of the corresponding plug-in.
 class PluginContainer {
@@ -9,7 +11,7 @@ class PluginContainer {
 
     public PluginContainer(Plugin _plugin) {
         plugin = _plugin;
-        active = PluginSettings.getSingletonInstance().isPluginActivated(plugin.getClass().getSimpleName());
+        active = getActive();
         if (active)
             plugin.installPlugin();
     }
@@ -30,15 +32,18 @@ class PluginContainer {
         return active;
     }
 
-    public void setActive(boolean _active) {
-        if (active != _active) {
-            active = _active;
-            PluginSettings.getSingletonInstance().save(this);
-            if (active)
-                plugin.installPlugin();
-            else
-                plugin.uninstallPlugin();
-        }
+    private boolean getActive() {
+        String p = Settings.getProperty("plugins." + this + ".active");
+        return p == null ? true : Boolean.valueOf(p);
+    }
+
+    public void toggleActive() {
+        active = !active;
+        Settings.setProperty("plugins." + this + ".active", Boolean.toString(active));
+        if (active)
+            plugin.installPlugin();
+        else
+            plugin.uninstallPlugin();
     }
 
     @Override

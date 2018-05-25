@@ -76,14 +76,6 @@ class PluginsListEntry extends JPanel implements MouseListener, HyperlinkListene
         }
     }
 
-    private void setPluginActive(boolean active) {
-        if (plugin.isActive() == active)
-            return;
-
-        plugin.setActive(active);
-        updateEnableLabel();
-    }
-
     @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
@@ -101,7 +93,8 @@ class PluginsListEntry extends JPanel implements MouseListener, HyperlinkListene
     public void mouseClicked(MouseEvent e) {
         list.selectItem(plugin.getName());
         if (e.getSource().equals(enableLabel)) {
-            setPluginActive(!plugin.isActive());
+            plugin.toggleActive();
+            updateEnableLabel();
         }
     }
 
