@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.dialogs.plugins;
+package org.helioviewer.jhv.plugins;
 
 import javax.annotation.Nullable;
 import javax.swing.BorderFactory;

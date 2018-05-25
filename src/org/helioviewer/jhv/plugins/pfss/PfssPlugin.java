@@ -8,8 +8,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.helioviewer.jhv.base.plugin.Plugin;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.plugins.pfss.data.PfssCache;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.json.JSONObject;

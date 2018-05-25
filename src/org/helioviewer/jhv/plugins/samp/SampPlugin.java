@@ -1,11 +1,11 @@
 package org.helioviewer.jhv.plugins.samp;
 
 import org.astrogrid.samp.client.DefaultClientProfile;
-import org.helioviewer.jhv.base.plugin.Plugin;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.MaterialDesign;
 import org.helioviewer.jhv.gui.components.TopToolBar.ButtonText;
+import org.helioviewer.jhv.plugins.Plugin;
 import org.json.JSONObject;
 
 public class SampPlugin implements Plugin {

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.dialogs.plugins;
+package org.helioviewer.jhv.plugins;
 
 import java.awt.Color;
 import java.util.Map;
@@ -7,9 +7,6 @@ import java.util.TreeMap;
 import javax.swing.BoxLayout;
 import javax.swing.JList;
 import javax.swing.JPanel;
-
-import org.helioviewer.jhv.base.plugin.PluginContainer;
-import org.helioviewer.jhv.base.plugin.PluginManager;
 
 @SuppressWarnings("serial")
 class PluginsList extends JPanel {
@@ -24,7 +21,7 @@ class PluginsList extends JPanel {
     PluginsList() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        for (PluginContainer plugin : PluginManager.getSingletonInstance().getAllPlugins())
+        for (PluginContainer plugin : PluginManager.getSingletonInstance().getPlugins())
             pluginsMap.put(plugin.getName(), new PluginsListEntry(plugin, this));
 
         boolean first = true;

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.base.plugin;
+package org.helioviewer.jhv.plugins;
 
 // The basic class which manages the interface between JHV and the contained
 // plugin. It manages the current status of the corresponding plug-in.
@@ -22,6 +22,10 @@ public class PluginContainer {
         return plugin.getDescription();
     }
 
+    public String getAboutLicenseText() {
+        return plugin.getAboutLicenseText();
+    }
+
     public boolean isActive() {
         return pluginActive;
     }
@@ -36,10 +40,6 @@ public class PluginContainer {
             plugin.installPlugin();
         else
             plugin.uninstallPlugin();
-    }
-
-    public Plugin getPlugin() {
-        return plugin;
     }
 
     @Override
