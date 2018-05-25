@@ -39,10 +39,11 @@ class BandCacheMinute implements BandCache {
 
     @Override
     public void addToCache(float[] values, long[] dates) {
-        if (values.length != 0) {
+        int len = values.length;
+        if (len > 0) {
             hasData = true;
         }
-        for (int i = 0; i < values.length; i++) {
+        for (int i = 0; i < len; i++) {
             long key = date2key(dates[i]);
             DataChunk cache = cacheMap.computeIfAbsent(key, DataChunk::new);
             if (values[i] > DrawConstants.DISCARD_LEVEL_LOW && values[i] < DrawConstants.DISCARD_LEVEL_HIGH) {
