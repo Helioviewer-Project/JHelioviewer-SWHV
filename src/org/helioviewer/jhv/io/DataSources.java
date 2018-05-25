@@ -111,7 +111,7 @@ public class DataSources {
         return settings == null ? null : settings.get(setting);
     }
 
-    private static int toLoad = serverSettings.keySet().size();
+    private static int toLoad = serverSettings.size();
 
     public static void loadSources() {
         Validator validator = Validator.builder().failEarly().build();

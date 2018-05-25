@@ -11,6 +11,7 @@ import javax.swing.JFrame;
 
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.base.plugin.PluginManager;
+import org.helioviewer.jhv.base.plugin.PluginSettings;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
@@ -107,7 +108,7 @@ public class JHelioviewer {
             ExitHooks.attach();
             JFrame frame = ImageViewerGui.prepareGui();
 
-            PluginManager.getSingletonInstance().loadSettings(JHVDirectory.PLUGINS.getPath());
+            PluginSettings.getSingletonInstance().load(JHVDirectory.PLUGINS.getPath());
             try {
                 if (args.length != 0 && args[0].equals("--exclude-plugins")) {
                     Log.info("Do not load plugins");
