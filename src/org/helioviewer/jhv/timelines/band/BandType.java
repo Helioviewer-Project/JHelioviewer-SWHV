@@ -110,7 +110,7 @@ public class BandType {
                 }
             }
         }
-        bandCacheType = jo.optString("bandCacheType", "BandCacheMinute");
+        bandCacheType = jo.optString("bandCacheType", bandCacheType);
 
         warnLevels = Collections.unmodifiableMap(warnHelp);
     }

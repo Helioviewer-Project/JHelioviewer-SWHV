@@ -25,7 +25,8 @@ class BandCacheAll implements BandCache {
 
     @Override
     public void addToCache(float[] values, long[] dates) {
-        if (values.length != 0) {
+        int len = values.length;
+        if (len > 0) {
             hasData = true;
         }
         int MAX_SIZE = 10000;
@@ -33,7 +34,7 @@ class BandCacheAll implements BandCache {
             return;
         }
 
-        for (int i = 0; i < values.length; i++) {
+        for (int i = 0; i < len; i++) {
             if (datevals.size() >= MAX_SIZE)
                 break;
             datevals.add(new DateVal(dates[i], values[i]));
