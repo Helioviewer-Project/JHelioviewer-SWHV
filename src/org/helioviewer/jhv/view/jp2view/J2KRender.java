@@ -63,25 +63,25 @@ class J2KRender implements Runnable {
         }
 
         compositor.Set_scale(false, false, false, 1f / (1 << params.resolution.level), (float) params.factor);
-        Kdu_dims requestedRegion = jhvToKdu_dims(subImage.x, subImage.y, subImage.width, subImage.height);
+
+        Kdu_dims requestedRegion = new Kdu_dims();
+        requestedRegion.From_u32(subImage.x, subImage.y, subImage.width, subImage.height);
         compositor.Set_buffer_surface(requestedRegion);
 
         Kdu_compositor_buf compositorBuf = compositor.Get_composition_buffer(new Kdu_dims(), true);
-        Kdu_dims actualRenderedRegion = compositorBuf.Get_rendering_region();
-
-        // avoid gc
-        Kdu_coords actualPos = actualRenderedRegion.Access_pos();
-        Kdu_coords actualOffset = new Kdu_coords(actualPos.Get_x(), actualPos.Get_y());
-        Kdu_coords actualSize = actualRenderedRegion.Access_size();
-        int aWidth = actualSize.Get_x(), aHeight = actualSize.Get_y();
+        Kdu_dims actualRegion = compositorBuf.Get_rendering_region();
+        Kdu_coords actualPos = actualRegion.Access_pos();
+        int actualX = actualPos.Get_x(), actualY = actualPos.Get_y();
+        Kdu_coords actualSize = actualRegion.Access_size();
+        int actualWidth = actualSize.Get_x(), actualHeight = actualSize.Get_y();
 
         int[] intBuffer = null;
         byte[] byteBuffer = null;
 
         if (numComponents < 3) {
-            byteBuffer = new byte[aWidth * aHeight];
+            byteBuffer = new byte[actualWidth * actualHeight];
         } else {
-            intBuffer = new int[aWidth * aHeight];
+            intBuffer = new int[actualWidth * actualHeight];
         }
 
         int[] intArray = localArray.get();
@@ -94,32 +94,25 @@ class J2KRender implements Runnable {
                 continue;
 
             Kdu_coords newOffset = newRegion.Access_pos();
-            newOffset.Subtract(actualOffset);
-
-            int theHeight = intArray.length / newWidth;
-
             Kdu_dims theRegion = new Kdu_dims();
-            Kdu_coords theSize = theRegion.Access_size();
-            theSize.Set_x(newWidth);
-            theSize.Set_y(theHeight);
-            theRegion.Access_pos().Assign(newOffset);
+            theRegion.From_u32(newOffset.Get_x() - actualX, newOffset.Get_y() - actualY, newWidth, intArray.length / newWidth);
 
             while (!(theRegion = theRegion.Intersection(newRegion)).Is_empty()) { // slide with buffer top to bottom
                 compositorBuf.Get_region(theRegion, intArray);
 
                 Kdu_coords theOffset = theRegion.Access_pos();
                 int yOff = theOffset.Get_y();
-                int dstIdx = theOffset.Get_x() + yOff * aWidth;
+                int dstIdx = theOffset.Get_x() + yOff * actualWidth;
                 int height = theRegion.Access_size().Get_y();
 
                 if (numComponents < 3) {
-                    for (int row = 0, srcIdx = 0; row < height; row++, dstIdx += aWidth, srcIdx += newWidth) {
+                    for (int row = 0, srcIdx = 0; row < height; row++, dstIdx += actualWidth, srcIdx += newWidth) {
                         for (int col = 0; col < newWidth; ++col) {
                             byteBuffer[dstIdx + col] = (byte) (intArray[srcIdx + col] & 0xFF);
                         }
                     }
                 } else {
-                    for (int row = 0, srcIdx = 0; row < height; row++, dstIdx += aWidth, srcIdx += newWidth) {
+                    for (int row = 0, srcIdx = 0; row < height; row++, dstIdx += actualWidth, srcIdx += newWidth) {
                         System.arraycopy(intArray, srcIdx, intBuffer, dstIdx, newWidth);
                     }
                 }
@@ -132,9 +125,9 @@ class J2KRender implements Runnable {
 
         ImageData data;
         if (numComponents < 3) {
-            data = new Single8ImageData(aWidth, aHeight, ByteBuffer.wrap(byteBuffer));
+            data = new Single8ImageData(actualWidth, actualHeight, ByteBuffer.wrap(byteBuffer));
         } else {
-            data = new ARGBInt32ImageData(aWidth, aHeight, IntBuffer.wrap(intBuffer));
+            data = new ARGBInt32ImageData(actualWidth, actualHeight, IntBuffer.wrap(intBuffer));
         }
         view.setDataFromRender(params, data);
     }
@@ -163,18 +156,6 @@ class J2KRender implements Runnable {
             localThread.remove();
             e.printStackTrace();
         }
-    }
-
-    private static Kdu_dims jhvToKdu_dims(int x, int y, int width, int height) throws KduException {
-        Kdu_dims dims = new Kdu_dims();
-        Kdu_coords pos = dims.Access_pos();
-        pos.Set_x(x);
-        pos.Set_y(y);
-        Kdu_coords siz = dims.Access_size();
-        siz.Set_x(width);
-        siz.Set_y(height);
-
-        return dims;
     }
 
     @Nullable
