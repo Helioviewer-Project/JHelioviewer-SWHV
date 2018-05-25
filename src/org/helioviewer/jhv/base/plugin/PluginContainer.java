@@ -31,7 +31,7 @@ public class PluginContainer {
             return;
 
         pluginActive = active;
-        PluginSettings.getSingletonInstance().pluginSettingsToXML(this);
+        PluginSettings.getSingletonInstance().save(this);
         if (active)
             plugin.installPlugin();
         else

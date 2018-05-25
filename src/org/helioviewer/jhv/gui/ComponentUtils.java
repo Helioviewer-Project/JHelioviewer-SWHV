@@ -9,8 +9,7 @@ public class ComponentUtils {
 
     public static void setVisible(Component container, boolean visible) {
         if (container instanceof Container) {
-            Component[] components = ((Container) container).getComponents();
-            for (Component component : components) {
+            for (Component component : ((Container) container).getComponents()) {
                 component.setVisible(visible);
                 if (component instanceof Container) {
                     setVisible(component, visible);

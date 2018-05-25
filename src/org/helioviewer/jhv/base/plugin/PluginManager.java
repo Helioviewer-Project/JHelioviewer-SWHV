@@ -4,15 +4,10 @@ import java.util.HashMap;
 
 import org.json.JSONObject;
 
-/**
- * This class is responsible to manage all plug-ins for JHV. It loads available
- * plug-ins and provides methods to access the loaded plug-ins.
- */
 public class PluginManager {
 
     private static final PluginManager singletonInstance = new PluginManager();
 
-    private final PluginSettings pluginSettings = PluginSettings.getSingletonInstance();
     private final HashMap<Plugin, PluginContainer> plugins = new HashMap<>();
 
     private PluginManager() {
@@ -22,31 +17,6 @@ public class PluginManager {
         return singletonInstance;
     }
 
-    /**
-     * Loads the saved settings from the corresponding file.
-     *
-     * @param settingsFilePath
-     *            Path of the directory where the plug-in settings file is
-     *            saved.
-     */
-    public void loadSettings(String settingsFilePath) {
-        pluginSettings.loadPluginSettings(settingsFilePath);
-    }
-
-    /**
-     * Saves the settings of all loaded plug-ins to a file. The file will be
-     * saved in the directory which was specified in
-     * {@link #loadSettings(String)}.
-     */
-    public void saveSettings() {
-        pluginSettings.savePluginSettings();
-    }
-
-    /**
-     * Returns a list with all loaded plug-ins.
-     *
-     * @return a list with all loaded plug-ins.
-     */
     public PluginContainer[] getAllPlugins() {
         return plugins.values().toArray(new PluginContainer[0]);
     }
@@ -61,7 +31,7 @@ public class PluginManager {
      * @param name
      */
     public void addPlugin(Plugin plugin, String name) {
-        PluginContainer pluginContainer = new PluginContainer(plugin, name, pluginSettings.isPluginActivated(name));
+        PluginContainer pluginContainer = new PluginContainer(plugin, name, PluginSettings.getSingletonInstance().isPluginActivated(name));
         plugins.put(plugin, pluginContainer);
         if (pluginContainer.isActive()) {
             plugin.installPlugin();

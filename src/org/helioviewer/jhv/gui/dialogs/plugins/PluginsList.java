@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.gui.dialogs.plugins;
 
 import java.awt.Color;
+import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.BoxLayout;
@@ -18,36 +19,40 @@ class PluginsList extends JPanel {
     private static final Color backgroundColor = new JList<JPanel>().getBackground();
     private static final Color foregroundColor = new JList<JPanel>().getForeground();
 
-    private final TreeMap<String, PluginsListEntry> entryMap = new TreeMap<>();
+    private final TreeMap<String, PluginsListEntry> pluginsMap = new TreeMap<>();
 
     PluginsList() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        PluginContainer[] pluginArray = PluginManager.getSingletonInstance().getAllPlugins();
-        for (PluginContainer plugin : pluginArray)
-            entryMap.put(plugin.getName(), new PluginsListEntry(plugin, this));
-        for (PluginsListEntry entry : entryMap.values())
-            add(entry);
-        if (!entryMap.isEmpty())
-            selectItem((String) entryMap.keySet().toArray()[0]);
+        for (PluginContainer plugin : PluginManager.getSingletonInstance().getAllPlugins())
+            pluginsMap.put(plugin.getName(), new PluginsListEntry(plugin, this));
+
+        boolean first = true;
+        for (Map.Entry<String, PluginsListEntry> entry : pluginsMap.entrySet()) { // add sorted
+            add(entry.getValue());
+            if (first) {
+                first = false;
+                selectItem(entry.getKey());
+            }
+        }
     }
 
     void selectItem(String name) {
         // deselect all
-        for (PluginsListEntry entry : entryMap.values()) {
+        for (PluginsListEntry entry : pluginsMap.values()) {
             entry.setForeground(foregroundColor);
             entry.setBackground(backgroundColor);
         }
 
-        if (entryMap.containsKey(name)) {
-            PluginsListEntry selected = entryMap.get(name);
+        PluginsListEntry selected = pluginsMap.get(name);
+        if (selected != null) {
             selected.setForeground(selectionForegroundColor);
             selected.setBackground(selectionBackgroundColor);
         }
     }
 
     boolean isEmpty() {
-        return entryMap.isEmpty();
+        return pluginsMap.isEmpty();
     }
 
 }

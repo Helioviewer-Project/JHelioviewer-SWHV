@@ -55,7 +55,7 @@ public class PluginSettings {
      *            Path of the directory where the plug-in settings file is
      *            saved.
      */
-    public void loadPluginSettings(String settingsFilePath) {
+    public void load(String settingsFilePath) {
         settingsFileName = settingsFilePath + PLUGIN_FILENAME;
         if (new File(settingsFileName).canRead()) {
             // load XML from file
@@ -99,7 +99,7 @@ public class PluginSettings {
      *            internal XML document.
      * @see #savePluginSettings()
      */
-    public void pluginSettingsToXML(PluginContainer pluginContainer) {
+    private void pluginSettingsToXML(PluginContainer pluginContainer) {
         Node pluginNode = findNode(pluginsRootNode, pluginContainer.toString());
         if (pluginNode == null) {
             addPluginToXML(pluginContainer);
@@ -147,7 +147,8 @@ public class PluginSettings {
     }
 
     // Saves the internal XML document to the settings file
-    public void savePluginSettings() {
+    public void save(PluginContainer pluginContainer) {
+        pluginSettingsToXML(pluginContainer);
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(settingsFileName), StandardCharsets.UTF_8)) {
             TransformerFactory.newInstance().newTransformer().transform(new DOMSource(xmlDocument), new StreamResult(writer));
         } catch (TransformerFactoryConfigurationError | TransformerException | IOException e) {
