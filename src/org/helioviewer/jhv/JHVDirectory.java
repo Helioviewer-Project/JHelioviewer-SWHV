@@ -93,18 +93,6 @@ public enum JHVDirectory {
             return new File(getPath());
         }
     },
-    /** The plugins directory. */
-    PLUGINS {
-        @Override
-        public String getPath() {
-            return HOME.getPath() + "Plugins" + File.separator;
-        }
-
-        @Override
-        public File getFile() {
-            return new File(getPath());
-        }
-    },
     /** Directory of automatically loaded GIMP gradient files. */
     COLOR_PLUGINS {
         @Override

@@ -23,7 +23,6 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.log.LogSettings;
 import org.helioviewer.jhv.metadata.AIAResponse;
 import org.helioviewer.jhv.plugins.PluginManager;
-import org.helioviewer.jhv.plugins.PluginSettings;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.samp.SampPlugin;
@@ -108,7 +107,6 @@ public class JHelioviewer {
             ExitHooks.attach();
             JFrame frame = ImageViewerGui.prepareGui();
 
-            PluginSettings.getSingletonInstance().load(JHVDirectory.PLUGINS.getPath());
             try {
                 if (args.length != 0 && args[0].equals("--exclude-plugins")) {
                     Log.info("Do not load plugins");
