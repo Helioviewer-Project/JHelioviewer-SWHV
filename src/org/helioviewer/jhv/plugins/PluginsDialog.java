@@ -3,7 +3,6 @@ package org.helioviewer.jhv.plugins;
 import javax.annotation.Nullable;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -28,8 +27,7 @@ public class PluginsDialog extends StandardDialog implements ShowableDialog {
 
     @Override
     public JComponent createContentPanel() {
-        PluginsList pluginList = new PluginsList();
-        JComponent component = pluginList.isEmpty() ? new JLabel("No plug-ins available") : new JScrollPane(pluginList);
+        JComponent component = new JScrollPane(new PluginsList());
         component.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
         return component;
     }

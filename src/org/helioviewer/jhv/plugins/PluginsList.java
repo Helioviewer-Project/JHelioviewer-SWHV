@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 
@@ -32,6 +33,9 @@ class PluginsList extends JPanel {
                 selectItem(entry.getKey());
             }
         }
+
+        if (pluginsMap.isEmpty())
+            add(new JLabel("No plug-ins available"));
     }
 
     void selectItem(String name) {
@@ -46,10 +50,6 @@ class PluginsList extends JPanel {
             selected.setForeground(selectionForegroundColor);
             selected.setBackground(selectionBackgroundColor);
         }
-    }
-
-    boolean isEmpty() {
-        return pluginsMap.isEmpty();
     }
 
 }
