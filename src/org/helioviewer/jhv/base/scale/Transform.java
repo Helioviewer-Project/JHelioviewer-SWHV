@@ -9,7 +9,7 @@ import org.helioviewer.jhv.math.Vec3;
 public interface Transform {
 
     Vec2 transform(Position viewpoint, Vec3 pt, GridScale scale);
-    Vec3 transformInverse(Position viewpoint, Vec2 pt);
+    Vec3 transformInverse(Quat frame, Vec2 pt);
 
     Transform transformpolar = new TransformPolar();
     Transform transformlatitudinal = new TransformLatitudinal();
@@ -29,13 +29,13 @@ public interface Transform {
         }
 
         @Override
-        public Vec3 transformInverse(Position viewpoint, Vec2 pt) {
+        public Vec3 transformInverse(Quat frame, Vec2 pt) {
             double r = pt.y;
             double theta = -pt.x / MathUtils.radeg;
             double y = r * Math.cos(theta);
             double x = r * Math.sin(theta);
             double z = Math.sqrt(Math.max(0, 1 - x * x - y * y));
-            return viewpoint.toQuat().rotateInverseVector(new Vec3(x, y, z));
+            return frame.rotateInverseVector(new Vec3(x, y, z));
         }
     }
 
@@ -53,7 +53,7 @@ public interface Transform {
         }
 
         @Override
-        public Vec3 transformInverse(Position viewpoint, Vec2 pt) {
+        public Vec3 transformInverse(Quat frame, Vec2 pt) {
             double phi = pt.x / MathUtils.radeg;
             double theta = pt.y / MathUtils.radeg;
             phi += Math.PI;
