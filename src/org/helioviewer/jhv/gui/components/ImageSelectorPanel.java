@@ -53,7 +53,7 @@ public class ImageSelectorPanel extends JPanel implements DataSourcesListener {
 
             if (first && Boolean.parseBoolean(Settings.getProperty("startup.loadmovie"))) {
                 load(null, startTime, endTime, selector.getCadence());
-                first = true;
+                first = false;
             }
         }
     }
