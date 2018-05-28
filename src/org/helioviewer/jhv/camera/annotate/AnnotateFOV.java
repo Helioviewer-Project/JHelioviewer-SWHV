@@ -1,9 +1,13 @@
 package org.helioviewer.jhv.camera.annotate;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
@@ -11,9 +15,9 @@ import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public class AnnotateRectangle extends AbstractAnnotateable {
+public class AnnotateFOV extends AbstractAnnotateable {
 
-    public AnnotateRectangle(Camera _camera, JSONObject jo) {
+    public AnnotateFOV(Camera _camera, JSONObject jo) {
         super(_camera, jo);
     }
 
@@ -64,6 +68,9 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
         gl.glLineWidth(lineWidth);
 
+        gl.glPushMatrix();
+        gl.glMultMatrixd(camera.getViewpoint().toQuat().toMatrix().transpose().m, 0);
+
         if (beingDragged()) {
             gl.glColor3f(dragColor[0], dragColor[1], dragColor[2]);
             drawRectangle(vp, gl, toSpherical(dragStartPoint), toSpherical(dragEndPoint));
@@ -74,18 +81,20 @@ public class AnnotateRectangle extends AbstractAnnotateable {
                 gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
             drawRectangle(vp, gl, toSpherical(startPoint), toSpherical(endPoint));
         }
+
+        gl.glPopMatrix();
     }
 
     @Override
     public void mousePressed(int x, int y) {
-        Vec3 pt = computePoint(x, y);
+        Vec3 pt = computePointFOV(x, y);
         if (pt != null)
             dragStartPoint = pt;
     }
 
     @Override
     public void mouseDragged(int x, int y) {
-        Vec3 pt = computePoint(x, y);
+        Vec3 pt = computePointFOV(x, y);
         if (pt != null)
             dragEndPoint = pt;
     }
@@ -112,7 +121,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
     @Override
     public String getType() {
-        return AnnotationMode.Rectangle.toString();
+        return AnnotationMode.FOV.toString();
     }
 
 }

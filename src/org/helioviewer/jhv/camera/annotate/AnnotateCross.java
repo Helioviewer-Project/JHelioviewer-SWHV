@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.camera.annotate;
 
-import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
 import org.helioviewer.jhv.display.Viewport;
@@ -16,11 +15,11 @@ public class AnnotateCross extends AbstractAnnotateable {
     }
 
     private void drawCross(Viewport vp, GL2 gl, Vec3 bp) {
-        double delta = Math.PI * 2.5 / 180;
-        Vec3 p1 = new Vec3(Sun.Radius, bp.y + delta, bp.z);
-        Vec3 p2 = new Vec3(Sun.Radius, bp.y - delta, bp.z);
-        Vec3 p3 = new Vec3(Sun.Radius, bp.y, bp.z + delta);
-        Vec3 p4 = new Vec3(Sun.Radius, bp.y, bp.z - delta);
+        double delta = 2.5 * Math.PI / 180;
+        Vec3 p1 = new Vec3(radius, bp.y + delta, bp.z);
+        Vec3 p2 = new Vec3(radius, bp.y - delta, bp.z);
+        Vec3 p3 = new Vec3(radius, bp.y, bp.z + delta);
+        Vec3 p4 = new Vec3(radius, bp.y, bp.z - delta);
         gl.glDisable(GL2.GL_DEPTH_TEST);
         interpolatedLineDraw(vp, gl, p1, p2, 2);
         interpolatedLineDraw(vp, gl, p3, p4, 2);
