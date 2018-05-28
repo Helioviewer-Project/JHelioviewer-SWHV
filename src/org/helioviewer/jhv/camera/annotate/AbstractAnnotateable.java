@@ -70,6 +70,15 @@ abstract class AbstractAnnotateable implements Annotateable {
         }
     }
 
+    @Nullable
+    Vec3 computePointFOV(int x, int y) {
+        if (Display.mode == Display.DisplayMode.Orthographic) {
+            return CameraHelper.getVectorFromSphereOrPlane(camera, Display.getActiveViewport(), x, y, camera.getCurrentDragRotation());
+        } else {
+            return Display.mode.xform.transformInverse(camera.getViewpoint().toQuat(), Display.mode.scale.mouseToGrid(x, y, Display.getActiveViewport(), camera, GridType.Viewpoint));
+        }
+    }
+
     void interpolatedLineDraw(Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s, int subdivisions) {
         if (Display.mode == Display.DisplayMode.Orthographic) {
             gl.glBegin(GL2.GL_TRIANGLE_STRIP);

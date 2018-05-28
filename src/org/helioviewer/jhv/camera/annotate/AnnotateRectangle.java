@@ -37,7 +37,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
     }
 
     private void interpolatedDraw(Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s) {
-        double delta = Math.PI * 2.5 / 180;
+        double delta = 2.5 * Math.PI / 180;
         int subdivisions = (int) Math.max(Math.abs(p1s.y - p2s.y) / delta, Math.abs(p1s.z - p2s.z) / delta);
         subdivisions = Math.max(1, subdivisions);
 
