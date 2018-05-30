@@ -117,11 +117,11 @@ public class MathUtils {
     }
 
     public static int roundDownTo(int a, int quanta) { // works with pot quanta
-        return a & ~(quanta - 1);
+        return a & -quanta;
     }
 
     public static int roundUpTo(int a, int quanta) { // works with pot quanta
-        return (a + (quanta - 1)) & ~(quanta - 1);
+        return (a + (quanta - 1)) & -quanta;
     }
 
 }
