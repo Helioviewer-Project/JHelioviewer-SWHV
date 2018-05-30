@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.io;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.DirectoryStream;
@@ -14,17 +15,17 @@ import java.util.HashSet;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVWorker;
 
 class LoadZipTask extends JHVWorker<Void, Void> {
 
-    private final URI uri;
+    private final URI remoteUri;
 
-    LoadZipTask(URI _uri) {
-        uri = _uri;
+    LoadZipTask(URI _remoteUri) {
+        remoteUri = _remoteUri;
         setThreadName("MAIN--LoadZip");
     }
 
@@ -33,7 +34,8 @@ class LoadZipTask extends JHVWorker<Void, Void> {
     protected Void backgroundWork() {
         try {
             HashSet<Path> exclude = new HashSet<>();
-            String tmpDir = FileUtils.tempDir(JHVDirectory.TEMP.getFile(), uri.getPath().substring(Math.max(0, uri.getPath().lastIndexOf('/') + 1))).toString();
+            URI uri = NetFileCache.get(remoteUri);
+            String tmpDir = FileUtils.tempDir(JHVGlobals.fileCacheDir, uri.getPath().substring(Math.max(0, uri.getPath().lastIndexOf('/') + 1)) + ".x").toString();
             try (FileSystem zipfs = FileSystems.newFileSystem(URI.create("jar:" + uri), new HashMap<>())) {
                 for (Path root : zipfs.getRootDirectories()) {
                     try (DirectoryStream<Path> stream = Files.newDirectoryStream(root, "*.jhv")) {
