@@ -66,7 +66,7 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Nullable
-    Vec3 computePoint(Camera camera, int x, int y) {
+    static Vec3 computePoint(Camera camera, int x, int y) {
         Quat frame = camera.getViewpoint().toQuat();
         if (Display.mode == Display.DisplayMode.Orthographic) {
             return CameraHelper.getVectorFromSphere(camera, Display.getActiveViewport(), x, y, frame, true);
@@ -75,7 +75,7 @@ abstract class AbstractAnnotateable implements Annotateable {
         }
     }
 
-    void interpolatedLineDraw(Camera camera, Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s, int subdivisions) {
+    static void interpolatedLineDraw(Camera camera, Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s, int subdivisions) {
         if (Display.mode == Display.DisplayMode.Orthographic) {
             gl.glBegin(GL2.GL_TRIANGLE_STRIP);
 

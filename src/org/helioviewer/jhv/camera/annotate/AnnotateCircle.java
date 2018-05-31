@@ -17,7 +17,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
         super(jo);
     }
 
-    private void drawCircle(Camera camera, Viewport vp, GL2 gl, Vec3 bp, Vec3 ep) {
+    private static void drawCircle(Camera camera, Viewport vp, GL2 gl, Vec3 bp, Vec3 ep) {
         double cosf = Vec3.dot(bp, ep);
         double r = Math.sqrt(1 - cosf * cosf);
         // P = center + r cos(A) (bp x ep) + r sin(A) ep

@@ -14,7 +14,7 @@ public class AnnotateCross extends AbstractAnnotateable {
         super(jo);
     }
 
-    private void drawCross(Camera camera, Viewport vp, GL2 gl, Vec3 bp) {
+    private static void drawCross(Camera camera, Viewport vp, GL2 gl, Vec3 bp) {
         double delta = 2.5 * Math.PI / 180;
         Vec3 p1 = new Vec3(radius, bp.y + delta, bp.z);
         Vec3 p2 = new Vec3(radius, bp.y - delta, bp.z);
