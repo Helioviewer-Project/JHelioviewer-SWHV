@@ -66,7 +66,7 @@ public class Camera {
         return currentTranslation;
     }
 
-    void setCurrentTranslation(double x, double y) {
+    public void setCurrentTranslation(double x, double y) {
         currentTranslation.x = x;
         currentTranslation.y = y;
     }

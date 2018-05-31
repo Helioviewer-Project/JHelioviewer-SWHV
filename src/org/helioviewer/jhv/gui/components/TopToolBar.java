@@ -23,6 +23,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.actions.ClearAnnotationsAction;
 import org.helioviewer.jhv.gui.actions.ResetCameraAction;
 import org.helioviewer.jhv.gui.actions.SDOCutOutAction;
+import org.helioviewer.jhv.gui.actions.ZoomFOVAnnotationAction;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.jhv.gui.actions.ZoomInAction;
 import org.helioviewer.jhv.gui.actions.ZoomOneToOneAction;
@@ -218,6 +219,8 @@ public class TopToolBar extends JToolBar {
 
         annotatePopup.addSeparator();
         annotatePopup.add(new ClearAnnotationsAction());
+        annotatePopup.addSeparator();
+        annotatePopup.add(new ZoomFOVAnnotationAction());
 
         annotate.addMouseListener(new MouseAdapter() {
             @Override
