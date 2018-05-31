@@ -71,6 +71,9 @@ public class InteractionAnnotate extends Interaction {
             ann.init(gl);
         }
         added.clear();
+        if (newAnnotateable != null) {
+            newAnnotateable.init(gl);
+        }
 
         Annotateable activeAnn = null;
         if (activeIndex >= 0 && activeIndex < anns.size())

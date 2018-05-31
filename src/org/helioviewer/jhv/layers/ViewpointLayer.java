@@ -50,8 +50,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         if (!isVisible[vp.idx])
             return;
 
-        double angle = optionsPanel.getFOVAngle();
-        fov.setAngles(angle, angle);
+        double tan = Math.tan(optionsPanel.getFOVAngle()) / 2;
+        fov.setTAngles(tan, tan);
         double pointFactor = GLInfo.pixelScale[0] / (2 * camera.getFOV());
         Position viewpoint = camera.getViewpoint();
 
@@ -62,7 +62,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             if (!positions.isEmpty()) {
                 renderPlanets(gl, positions, pointFactor);
             }
-            fov.render(gl, viewpoint.distance, vp.aspect, thickness, pointFactor);
+            fov.render(gl, viewpoint.distance, vp.aspect, pointFactor);
         }
         gl.glPopMatrix();
     }
