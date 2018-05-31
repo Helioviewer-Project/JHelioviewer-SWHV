@@ -3,7 +3,6 @@ package org.helioviewer.jhv.opengl;
 import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
-import org.helioviewer.jhv.math.Vec3;
 
 import com.jogamp.opengl.GL2;
 
@@ -11,6 +10,7 @@ public class FOVShape {
 
     private static final int SUBDIVISIONS = 24;
     private static final double epsilon = 0.006;
+    private static final double thickness = 0.002;
     private static final float pointSize = 0.1f;
 
     private static final float[] color1 = BufferUtils.colorBlue;
@@ -24,21 +24,25 @@ public class FOVShape {
     private final GLLine line = new GLLine();
     private final GLShape point = new GLShape();
 
-    private Vec3 center = new Vec3(0, 0, computeZ(0, 0));
+    private double centerX = 0;
+    private double centerY = 0;
+    private double centerZ = computeZ(centerX, centerY);
     private double tanX;
     private double tanY;
 
-    public void setAngles(double angleX, double angleY) {
-        tanX = Math.tan(angleX) / 2.;
-        tanY = Math.tan(angleY) / 2.;
+    public void setTAngles(double _tanX, double _tanY) {
+        tanX = _tanX;
+        tanY = _tanY;
     }
 
-    public void setCenter(Vec3 c) {
-        center = new Vec3(c.x, c.y, computeZ(c.x, c.y));
+    public void setCenter(double _centerX, double _centerY) {
+        centerX = _centerX;
+        centerY = _centerY;
+        centerZ = computeZ(centerX, centerY);
     }
 
     private void computeCenter(GL2 gl) {
-        BufferUtils.put4f(pointPosition, (float) center.x, (float) center.y, (float) center.z, pointSize);
+        BufferUtils.put4f(pointPosition, (float) centerX, (float) centerY, (float) centerZ, pointSize);
         pointColor.put(color1);
 
         pointPosition.rewind();
@@ -57,8 +61,8 @@ public class FOVShape {
         double bh = distance * tanY;
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
-            x = -bw + 2 * bw / SUBDIVISIONS * i + center.x;
-            y = bh + center.y;
+            x = -bw + 2 * bw / SUBDIVISIONS * i + centerX;
+            y = bh + centerY;
             z = computeZ(x, y);
             if (i == 0) {
                 BufferUtils.put3f(linePosition, (float) x, (float) y, (float) z);
@@ -69,8 +73,8 @@ public class FOVShape {
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
-            x = bw + center.x;
-            y = bh - 2 * bh / SUBDIVISIONS * i + center.y;
+            x = bw + centerX;
+            y = bh - 2 * bh / SUBDIVISIONS * i + centerY;
             z = computeZ(x, y);
             if (i == 0) {
                 BufferUtils.put3f(linePosition, (float) x, (float) y, (float) z);
@@ -81,8 +85,8 @@ public class FOVShape {
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
-            x = bw - 2 * bw / SUBDIVISIONS * i + center.x;
-            y = -bh + center.y;
+            x = bw - 2 * bw / SUBDIVISIONS * i + centerX;
+            y = -bh + centerY;
             z = computeZ(x, y);
             if (i == 0) {
                 BufferUtils.put3f(linePosition, (float) x, (float) y, (float) z);
@@ -93,8 +97,8 @@ public class FOVShape {
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
-            x = -bw + center.x;
-            y = -bh + 2 * bh / SUBDIVISIONS * i + center.y;
+            x = -bw + centerX;
+            y = -bh + 2 * bh / SUBDIVISIONS * i + centerY;
             z = computeZ(x, y);
             if (i == 0) {
                 BufferUtils.put3f(linePosition, (float) x, (float) y, (float) z);
@@ -109,7 +113,8 @@ public class FOVShape {
         line.setData(gl, linePosition, lineColor);
     }
 
-    public void render(GL2 gl, double distance, double aspect, double thickness, double pointFactor) {
+    public void render(GL2 gl, double distance, double aspect, double pointFactor) {
+        computeCenter(gl);
         point.renderPoints(gl, pointFactor);
         computeLine(gl, distance);
         line.render(gl, aspect, thickness);
@@ -118,7 +123,6 @@ public class FOVShape {
     public void init(GL2 gl) {
         line.init(gl);
         point.init(gl);
-        computeCenter(gl);
     }
 
     public void dispose(GL2 gl) {
