@@ -8,6 +8,10 @@ import com.jogamp.opengl.GL2;
 
 public interface Annotateable {
 
+    void init(GL2 gl);
+
+    void dispose(GL2 gl);
+
     void render(Camera camera, Viewport vp, GL2 gl, boolean active);
 
     void mousePressed(Camera camera, int x, int y);
