@@ -42,6 +42,27 @@ public class AnnotateFOV extends AbstractAnnotateable {
         return CameraHelper.getVectorFromSphereOrPlane(camera, Display.getActiveViewport(), x, y, camera.getCurrentDragRotation());
     }
 
+    public void zoom(Camera camera) {
+        if ((startPoint == null || endPoint == null) && !beingDragged())
+            return;
+
+        Position viewpoint = camera.getViewpoint();
+
+        Vec3 p0, p1;
+        if (beingDragged()) {
+            p0 = dragStartPoint;
+            p1 = dragEndPoint;
+        } else {
+            p0 = startPoint;
+            p1 = endPoint;
+        }
+        double dx = (p1.x - p0.x) / 2;
+        double dy = (p1.y - p0.y) / 2;
+        camera.setCurrentTranslation(-(p0.x + dx), -(p0.y + dy));
+        double aspect = Display.getActiveViewport().aspect;
+        camera.setFOV(2 * Math.atan2(Math.max(dx / aspect, dy), viewpoint.distance));
+    }
+
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl, boolean active) {
         if ((startPoint == null || endPoint == null) && !beingDragged())

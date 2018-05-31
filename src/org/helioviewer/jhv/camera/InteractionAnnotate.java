@@ -75,15 +75,19 @@ public class InteractionAnnotate extends Interaction {
             newAnnotateable.init(gl);
         }
 
-        Annotateable activeAnn = null;
-        if (activeIndex >= 0 && activeIndex < anns.size())
-            activeAnn = anns.get(activeIndex);
+        Annotateable activeAnn = activeIndex >= 0 && activeIndex < anns.size() ? anns.get(activeIndex) : null;
         for (Annotateable ann : anns) {
             ann.render(camera, vp, gl, ann == activeAnn);
         }
         if (newAnnotateable != null) {
             newAnnotateable.render(camera, vp, gl, false);
         }
+    }
+
+    public void zoom() {
+        Annotateable activeAnn = activeIndex >= 0 && activeIndex < anns.size() ? anns.get(activeIndex) : null;
+        if (activeAnn instanceof AnnotateFOV)
+            ((AnnotateFOV) activeAnn).zoom(camera);
     }
 
     @Override
