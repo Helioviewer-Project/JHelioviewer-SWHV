@@ -62,7 +62,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             if (!positions.isEmpty()) {
                 renderPlanets(gl, positions, pointFactor);
             }
-            fov.render(gl, viewpoint.distance, vp.aspect, pointFactor);
+            fov.render(gl, viewpoint.distance, vp.aspect, pointFactor, false);
         }
         gl.glPopMatrix();
     }
