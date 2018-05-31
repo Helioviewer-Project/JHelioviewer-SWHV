@@ -19,8 +19,8 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.io.LoadPosition;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.opengl.FOVShape;
 import org.helioviewer.jhv.opengl.GLInfo;
-import org.helioviewer.jhv.opengl.GLLine;
 import org.helioviewer.jhv.opengl.GLShape;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.time.JHVDate;
@@ -32,19 +32,10 @@ import com.jogamp.newt.event.MouseListener;
 
 public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
-    private static final int SUBDIVISIONS = 24;
-    private static final FloatBuffer positionBuffer = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2)) * 3);
-    private static final FloatBuffer colorBuffer = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2)) * 4);
-    private static final double epsilon = 0.006;
     private static final double thickness = 0.002;
-    private static final float centerSize = 0.1f;
     private static final float planetSize = 0.2f;
 
-    private static final float[] color1 = BufferUtils.colorBlue;
-    private static final float[] color2 = BufferUtils.colorWhite;
-
-    private final GLLine line = new GLLine();
-    private final GLShape center = new GLShape();
+    private final FOVShape fov = new FOVShape(Vec3.ZERO);
     private final GLShape planets = new GLShape();
     private final CameraOptionsPanel optionsPanel;
 
@@ -59,11 +50,10 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         if (!isVisible[vp.idx])
             return;
 
-        Position viewpoint = camera.getViewpoint();
-
-        double width = viewpoint.distance * Math.tan(optionsPanel.getFOVAngle());
-        computeLine(gl, width);
+        double angle = optionsPanel.getFOVAngle();
+        fov.setAngles(angle, angle);
         double pointFactor = GLInfo.pixelScale[0] / (2 * camera.getFOV());
+        Position viewpoint = camera.getViewpoint();
 
         gl.glPushMatrix();
         gl.glMultMatrixd(viewpoint.toQuat().toMatrix().transpose().m, 0);
@@ -72,8 +62,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             if (!positions.isEmpty()) {
                 renderPlanets(gl, positions, pointFactor);
             }
-            center.renderPoints(gl, pointFactor);
-            line.render(gl, vp.aspect, thickness);
+            fov.render(gl, viewpoint.distance, vp.aspect, thickness, pointFactor);
         }
         gl.glPopMatrix();
     }
@@ -197,108 +186,19 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
     @Override
     public void init(GL2 gl) {
-        line.init(gl);
+        fov.init(gl);
         planets.init(gl);
-        center.init(gl);
-        computeCenter(gl);
     }
 
     @Override
     public void dispose(GL2 gl) {
-        line.dispose(gl);
+        fov.dispose(gl);
         planets.dispose(gl);
-        center.dispose(gl);
     }
 
     @Override
     public void serialize(JSONObject jo) {
         optionsPanel.serialize(jo);
-    }
-
-    private void computeLine(GL2 gl, double size) {
-        double x, y, z, n;
-        double bw = size / 2.;
-        double bh = size / 2.;
-
-        for (int i = 0; i <= SUBDIVISIONS; i++) {
-            x = -bw + 2 * bw / SUBDIVISIONS * i;
-            y = bh;
-            z = epsilon;
-            n = 1 - x * x - y * y;
-            if (n > 0) {
-                z += Math.sqrt(n);
-            }
-            if (i == 0) {
-                BufferUtils.put3f(positionBuffer, (float) x, (float) y, (float) z);
-                colorBuffer.put(BufferUtils.colorNull);
-            }
-            BufferUtils.put3f(positionBuffer, (float) x, (float) y, (float) z);
-            colorBuffer.put(i % 2 == 0 ? color1 : color2);
-        }
-
-        for (int i = 0; i <= SUBDIVISIONS; i++) {
-            x = bw;
-            y = bh - 2 * bh / SUBDIVISIONS * i;
-            z = epsilon;
-            n = 1 - x * x - y * y;
-            if (n > 0) {
-                z += Math.sqrt(n);
-            }
-            if (i == 0) {
-                BufferUtils.put3f(positionBuffer, (float) x, (float) y, (float) z);
-                colorBuffer.put(BufferUtils.colorNull);
-            }
-            BufferUtils.put3f(positionBuffer, (float) x, (float) y, (float) z);
-            colorBuffer.put(i % 2 == 0 ? color1 : color2);
-        }
-
-        for (int i = 0; i <= SUBDIVISIONS; i++) {
-            x = bw - 2 * bw / SUBDIVISIONS * i;
-            y = -bh;
-            z = epsilon;
-            n = 1 - x * x - y * y;
-            if (n > 0) {
-                z += Math.sqrt(n);
-            }
-            if (i == 0) {
-                BufferUtils.put3f(positionBuffer, (float) x, (float) y, (float) z);
-                colorBuffer.put(BufferUtils.colorNull);
-            }
-            BufferUtils.put3f(positionBuffer, (float) x, (float) y, (float) z);
-            colorBuffer.put(i % 2 == 0 ? color1 : color2);
-        }
-
-        for (int i = 0; i <= SUBDIVISIONS; i++) {
-            x = -bw;
-            y = -bh + 2 * bh / SUBDIVISIONS * i;
-            z = epsilon;
-            n = 1 - x * x - y * y;
-            if (n > 0) {
-                z += Math.sqrt(n);
-            }
-            if (i == 0) {
-                BufferUtils.put3f(positionBuffer, (float) x, (float) y, (float) z);
-                colorBuffer.put(BufferUtils.colorNull);
-            }
-            BufferUtils.put3f(positionBuffer, (float) x, (float) y, (float) z);
-            colorBuffer.put(i % 2 == 0 ? color1 : color2);
-        }
-
-        positionBuffer.rewind();
-        colorBuffer.rewind();
-        line.setData(gl, positionBuffer, colorBuffer);
-    }
-
-    private void computeCenter(GL2 gl) {
-        FloatBuffer centerPosition = BufferUtils.newFloatBuffer(4);
-        FloatBuffer centerColor = BufferUtils.newFloatBuffer(4);
-
-        BufferUtils.put4f(centerPosition, 0, 0, (float) (1 + epsilon), centerSize);
-        centerColor.put(color1);
-
-        centerPosition.rewind();
-        centerColor.rewind();
-        center.setData(gl, centerPosition, centerColor);
     }
 
     private void renderPlanets(GL2 gl, Set<Map.Entry<LoadPosition, Position>> positions, double pointFactor) {
