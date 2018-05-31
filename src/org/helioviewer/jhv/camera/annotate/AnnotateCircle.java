@@ -13,11 +13,11 @@ import com.jogamp.opengl.GL2;
 
 public class AnnotateCircle extends AbstractAnnotateable {
 
-    public AnnotateCircle(Camera _camera, JSONObject jo) {
-        super(_camera, jo);
+    public AnnotateCircle(JSONObject jo) {
+        super(jo);
     }
 
-    private void drawCircle(Viewport vp, GL2 gl, Vec3 bp, Vec3 ep) {
+    private void drawCircle(Camera camera, Viewport vp, GL2 gl, Vec3 bp, Vec3 ep) {
         double cosf = Vec3.dot(bp, ep);
         double r = Math.sqrt(1 - cosf * cosf);
         // P = center + r cos(A) (bp x ep) + r sin(A) ep
@@ -53,7 +53,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
     }
 
     @Override
-    public void render(Viewport vp, GL2 gl, boolean active) {
+    public void render(Camera camera, Viewport vp, GL2 gl, boolean active) {
         if ((startPoint == null || endPoint == null) && !beingDragged())
             return;
 
@@ -61,26 +61,26 @@ public class AnnotateCircle extends AbstractAnnotateable {
 
         if (beingDragged()) {
             gl.glColor3f(dragColor[0], dragColor[1], dragColor[2]);
-            drawCircle(vp, gl, dragStartPoint, dragEndPoint);
+            drawCircle(camera, vp, gl, dragStartPoint, dragEndPoint);
         } else {
             if (active)
                 gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
             else
                 gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
-            drawCircle(vp, gl, startPoint, endPoint);
+            drawCircle(camera, vp, gl, startPoint, endPoint);
         }
     }
 
     @Override
-    public void mousePressed(int x, int y) {
-        Vec3 pt = computePoint(x, y);
+    public void mousePressed(Camera camera, int x, int y) {
+        Vec3 pt = computePoint(camera, x, y);
         if (pt != null)
             dragStartPoint = pt;
     }
 
     @Override
-    public void mouseDragged(int x, int y) {
-        Vec3 pt = computePoint(x, y);
+    public void mouseDragged(Camera camera, int x, int y) {
+        Vec3 pt = computePoint(camera, x, y);
         if (pt != null)
             dragEndPoint = pt;
     }

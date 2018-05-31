@@ -13,11 +13,11 @@ import com.jogamp.opengl.GL2;
 
 public class AnnotateRectangle extends AbstractAnnotateable {
 
-    public AnnotateRectangle(Camera _camera, JSONObject jo) {
-        super(_camera, jo);
+    public AnnotateRectangle(JSONObject jo) {
+        super(jo);
     }
 
-    private void drawRectangle(Viewport vp, GL2 gl, Vec3 bp, Vec3 ep) {
+    private void drawRectangle(Camera camera, Viewport vp, GL2 gl, Vec3 bp, Vec3 ep) {
         if (bp.z * ep.z < 0) {
             if (ep.z < bp.z && bp.z > Math.PI / 2)
                 ep.z += 2 * Math.PI;
@@ -29,14 +29,14 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         Vec3 p4 = new Vec3(radius, bp.y, ep.z);
 
         gl.glBegin(GL2.GL_LINE_STRIP);
-        interpolatedDraw(vp, gl, bp, p2);
-        interpolatedDraw(vp, gl, p2, ep);
-        interpolatedDraw(vp, gl, ep, p4);
-        interpolatedDraw(vp, gl, p4, bp);
+        interpolatedDraw(camera, vp, gl, bp, p2);
+        interpolatedDraw(camera, vp, gl, p2, ep);
+        interpolatedDraw(camera, vp, gl, ep, p4);
+        interpolatedDraw(camera, vp, gl, p4, bp);
         gl.glEnd();
     }
 
-    private void interpolatedDraw(Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s) {
+    private void interpolatedDraw(Camera camera, Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s) {
         double delta = 2.5 * Math.PI / 180;
         int subdivisions = (int) Math.max(Math.abs(p1s.y - p2s.y) / delta, Math.abs(p1s.z - p2s.z) / delta);
         subdivisions = Math.max(1, subdivisions);
@@ -58,7 +58,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
     }
 
     @Override
-    public void render(Viewport vp, GL2 gl, boolean active) {
+    public void render(Camera camera, Viewport vp, GL2 gl, boolean active) {
         if ((startPoint == null || endPoint == null) && !beingDragged())
             return;
 
@@ -66,26 +66,26 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
         if (beingDragged()) {
             gl.glColor3f(dragColor[0], dragColor[1], dragColor[2]);
-            drawRectangle(vp, gl, toSpherical(dragStartPoint), toSpherical(dragEndPoint));
+            drawRectangle(camera, vp, gl, toSpherical(dragStartPoint), toSpherical(dragEndPoint));
         } else {
             if (active)
                 gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
             else
                 gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
-            drawRectangle(vp, gl, toSpherical(startPoint), toSpherical(endPoint));
+            drawRectangle(camera, vp, gl, toSpherical(startPoint), toSpherical(endPoint));
         }
     }
 
     @Override
-    public void mousePressed(int x, int y) {
-        Vec3 pt = computePoint(x, y);
+    public void mousePressed(Camera camera, int x, int y) {
+        Vec3 pt = computePoint(camera, x, y);
         if (pt != null)
             dragStartPoint = pt;
     }
 
     @Override
-    public void mouseDragged(int x, int y) {
-        Vec3 pt = computePoint(x, y);
+    public void mouseDragged(Camera camera, int x, int y) {
+        Vec3 pt = computePoint(camera, x, y);
         if (pt != null)
             dragEndPoint = pt;
     }
