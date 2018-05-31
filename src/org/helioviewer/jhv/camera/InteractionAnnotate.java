@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.camera;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.helioviewer.jhv.camera.annotate.AnnotateCircle;
 import org.helioviewer.jhv.camera.annotate.AnnotateCross;
@@ -37,7 +38,10 @@ public class InteractionAnnotate extends Interaction {
         }
     }
 
-    private final ArrayList<Annotateable> annotateables = new ArrayList<>();
+    private final ArrayList<Annotateable> anns = new ArrayList<>();
+    private final HashSet<Annotateable> removed = new HashSet<>();
+    private final HashSet<Annotateable> added = new HashSet<>();
+
     private Annotateable newAnnotateable = null;
     private AnnotationMode mode = AnnotationMode.Rectangle;
     private int activeIndex = -1;
@@ -46,12 +50,33 @@ public class InteractionAnnotate extends Interaction {
         super(_camera);
     }
 
+    private void add(Annotateable ann) {
+        anns.add(ann);
+        added.add(ann);
+    }
+
+    private void remove() {
+        if (activeIndex >= 0 && activeIndex < anns.size()) {
+            removed.add(anns.remove(activeIndex));
+            activeIndex = anns.size() - 1;
+        }
+    }
+
     public void drawAnnotations(Viewport vp, GL2 gl) {
-        Annotateable activeAnnotateable = null;
-        if (activeIndex >= 0)
-            activeAnnotateable = annotateables.get(activeIndex);
-        for (Annotateable ann : annotateables) {
-            ann.render(camera, vp, gl, ann == activeAnnotateable);
+        for (Annotateable ann : removed) {
+            ann.dispose(gl);
+        }
+        removed.clear();
+        for (Annotateable ann : added) {
+            ann.init(gl);
+        }
+        added.clear();
+
+        Annotateable activeAnn = null;
+        if (activeIndex >= 0 && activeIndex < anns.size())
+            activeAnn = anns.get(activeIndex);
+        for (Annotateable ann : anns) {
+            ann.render(camera, vp, gl, ann == activeAnn);
         }
         if (newAnnotateable != null) {
             newAnnotateable.render(camera, vp, gl, false);
@@ -79,8 +104,8 @@ public class InteractionAnnotate extends Interaction {
     private void finishAnnotateable() {
         if (newAnnotateable != null && newAnnotateable.beingDragged()) {
             newAnnotateable.mouseReleased();
-            annotateables.add(newAnnotateable);
-            activeIndex = annotateables.size() - 1;
+            add(newAnnotateable);
+            activeIndex = anns.size() - 1;
         }
         newAnnotateable = null;
         Display.display();
@@ -96,14 +121,11 @@ public class InteractionAnnotate extends Interaction {
         int code = e.getKeyCode();
 
         if (code == KeyEvent.VK_BACK_SPACE || code == KeyEvent.VK_DELETE) {
-            if (activeIndex >= 0) {
-                annotateables.remove(activeIndex);
-            }
-            activeIndex = annotateables.size() - 1;
+            remove();
             Display.display();
         } else if (code == KeyEvent.VK_N && activeIndex >= 0) {
             activeIndex++;
-            activeIndex %= annotateables.size();
+            activeIndex %= anns.size();
             Display.display();
         }
     }
@@ -114,7 +136,8 @@ public class InteractionAnnotate extends Interaction {
 
     public void clear() {
         newAnnotateable = null;
-        annotateables.clear();
+        removed.addAll(anns);
+        anns.clear();
         activeIndex = -1;
     }
 
@@ -129,8 +152,8 @@ public class InteractionAnnotate extends Interaction {
 
     public JSONObject toJson() {
         JSONArray ja = new JSONArray();
-        for (Annotateable annotateable : annotateables)
-            ja.put(annotateable.toJson());
+        for (Annotateable ann : anns)
+            ja.put(ann.toJson());
         return new JSONObject().put("activeIndex", activeIndex).put("annotateables", ja);
     }
 
@@ -144,7 +167,7 @@ public class InteractionAnnotate extends Interaction {
             activeIndex = jo.optInt("activeIndex", activeIndex);
             int len = ja.length();
             for (int i = 0; i < len; i++) {
-                annotateables.add(generate(ja.getJSONObject(i)));
+                add(generate(ja.getJSONObject(i)));
             }
         }
     }

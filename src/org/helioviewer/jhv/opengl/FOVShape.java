@@ -24,17 +24,17 @@ public class FOVShape {
     private final GLLine line = new GLLine();
     private final GLShape point = new GLShape();
 
-    private final Vec3 center;
+    private Vec3 center = new Vec3(0, 0, computeZ(0, 0));
     private double tanX;
     private double tanY;
-
-    public FOVShape(Vec3 c) {
-        center = new Vec3(c.x, c.y, computeZ(c.x, c.y));
-    }
 
     public void setAngles(double angleX, double angleY) {
         tanX = Math.tan(angleX) / 2.;
         tanY = Math.tan(angleY) / 2.;
+    }
+
+    public void setCenter(Vec3 c) {
+        center = new Vec3(c.x, c.y, computeZ(c.x, c.y));
     }
 
     private void computeCenter(GL2 gl) {
