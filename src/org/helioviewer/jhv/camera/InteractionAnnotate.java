@@ -27,13 +27,13 @@ public class InteractionAnnotate extends Interaction {
             clazz = _clazz;
         }
 
-        Annotateable generate(Camera _camera, JSONObject jo) {
+        Annotateable generate(JSONObject jo) {
             try {
-                return clazz.getConstructor(Camera.class, JSONObject.class).newInstance(_camera, jo);
+                return clazz.getConstructor(JSONObject.class).newInstance(jo);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return new AnnotateRectangle(_camera, jo);
+            return new AnnotateRectangle(jo);
         }
     }
 
@@ -51,17 +51,17 @@ public class InteractionAnnotate extends Interaction {
         if (activeIndex >= 0)
             activeAnnotateable = annotateables.get(activeIndex);
         for (Annotateable ann : annotateables) {
-            ann.render(vp, gl, ann == activeAnnotateable);
+            ann.render(camera, vp, gl, ann == activeAnnotateable);
         }
         if (newAnnotateable != null) {
-            newAnnotateable.render(vp, gl, false);
+            newAnnotateable.render(camera, vp, gl, false);
         }
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        newAnnotateable = mode.generate(camera, null);
-        newAnnotateable.mousePressed(e.getX(), e.getY());
+        newAnnotateable = mode.generate(null);
+        newAnnotateable.mousePressed(camera, e.getX(), e.getY());
         if (!newAnnotateable.isDraggable()) {
             finishAnnotateable();
         }
@@ -71,7 +71,7 @@ public class InteractionAnnotate extends Interaction {
     @Override
     public void mouseDragged(MouseEvent e) {
         if (newAnnotateable != null && newAnnotateable.isDraggable()) {
-            newAnnotateable.mouseDragged(e.getX(), e.getY());
+            newAnnotateable.mouseDragged(camera, e.getX(), e.getY());
             Display.display();
         }
     }
@@ -120,11 +120,11 @@ public class InteractionAnnotate extends Interaction {
 
     private Annotateable generate(JSONObject jo) {
         try {
-            return AnnotationMode.valueOf(jo.getString("type")).generate(camera, jo);
+            return AnnotationMode.valueOf(jo.getString("type")).generate(jo);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new AnnotateRectangle(camera, jo);
+        return new AnnotateRectangle(jo);
     }
 
     public JSONObject toJson() {

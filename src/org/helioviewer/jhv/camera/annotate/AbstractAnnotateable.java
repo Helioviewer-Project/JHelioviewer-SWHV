@@ -28,16 +28,13 @@ abstract class AbstractAnnotateable implements Annotateable {
     static final double radius = Sun.Radius * 1.01;
     private static final double lineWidthSR = Sun.Radius * 0.002;
 
-    final Camera camera;
-
     Vec3 startPoint;
     Vec3 endPoint;
 
     Vec3 dragStartPoint;
     Vec3 dragEndPoint;
 
-    AbstractAnnotateable(Camera _camera, JSONObject jo) {
-        camera = _camera;
+    AbstractAnnotateable(JSONObject jo) {
         if (jo != null) {
             JSONArray jaStart = jo.optJSONArray("startPoint");
             if (jaStart != null)
@@ -61,7 +58,7 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Nullable
-    Vec3 computePoint(int x, int y) {
+    Vec3 computePoint(Camera camera, int x, int y) {
         Quat frame = camera.getViewpoint().toQuat();
         if (Display.mode == Display.DisplayMode.Orthographic) {
             return CameraHelper.getVectorFromSphere(camera, Display.getActiveViewport(), x, y, frame, true);
@@ -70,16 +67,7 @@ abstract class AbstractAnnotateable implements Annotateable {
         }
     }
 
-    @Nullable
-    Vec3 computePointFOV(int x, int y) {
-        if (Display.mode == Display.DisplayMode.Orthographic) {
-            return CameraHelper.getVectorFromSphereOrPlane(camera, Display.getActiveViewport(), x, y, camera.getCurrentDragRotation());
-        } else {
-            return Display.mode.xform.transformInverse(camera.getViewpoint().toQuat(), Display.mode.scale.mouseToGrid(x, y, Display.getActiveViewport(), camera, GridType.Viewpoint));
-        }
-    }
-
-    void interpolatedLineDraw(Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s, int subdivisions) {
+    void interpolatedLineDraw(Camera camera, Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s, int subdivisions) {
         if (Display.mode == Display.DisplayMode.Orthographic) {
             gl.glBegin(GL2.GL_TRIANGLE_STRIP);
 
