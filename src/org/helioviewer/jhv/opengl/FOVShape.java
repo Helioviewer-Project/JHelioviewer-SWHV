@@ -11,7 +11,7 @@ public class FOVShape {
     private static final int SUBDIVISIONS = 24;
     private static final double epsilon = 0.006;
     private static final double thickness = 0.002;
-    private static final float pointSize = 0.1f;
+    private static final float pointSize = 0.01f;
 
     private final FloatBuffer pointPosition = BufferUtils.newFloatBuffer(4);
     private final FloatBuffer pointColor = BufferUtils.newFloatBuffer(4);

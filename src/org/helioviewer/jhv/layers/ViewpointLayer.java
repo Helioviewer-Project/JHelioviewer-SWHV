@@ -33,7 +33,7 @@ import com.jogamp.newt.event.MouseListener;
 public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
     private static final double thickness = 0.002;
-    private static final float planetSize = 0.2f;
+    private static final float planetSize = 5f;
 
     private final FOVShape fov = new FOVShape();
     private final GLShape planets = new GLShape();
@@ -52,7 +52,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
         double tan = Math.tan(optionsPanel.getFOVAngle()) / 2;
         fov.setTAngles(tan, tan);
-        double pointFactor = GLInfo.pixelScale[0] / (2 * camera.getFOV());
+        double pixFactor = vp.height / (2 * camera.getWidth());
         Position viewpoint = camera.getViewpoint();
 
         gl.glPushMatrix();
@@ -60,9 +60,9 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         {
             Set<Map.Entry<LoadPosition, Position>> positions = Display.getUpdateViewpoint().getPositions();
             if (!positions.isEmpty()) {
-                renderPlanets(gl, positions, pointFactor);
+                renderPlanets(gl, positions, 1);
             }
-            fov.render(gl, viewpoint.distance, vp.aspect, pointFactor, false);
+            fov.render(gl, viewpoint.distance, vp.aspect, pixFactor, false);
         }
         gl.glPopMatrix();
     }
@@ -215,7 +215,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             double x = p.distance * Math.cos(theta) * Math.cos(phi);
             double z = p.distance * Math.sin(theta);
 
-            BufferUtils.put4f(planetPosition, (float) x, (float) y, (float) z, planetSize);
+            BufferUtils.put4f(planetPosition, (float) x, (float) y, (float) z, planetSize * GLInfo.pixelScale[0]);
             planetColor.put(entry.getKey().getTarget().getColor());
         }
 

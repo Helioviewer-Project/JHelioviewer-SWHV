@@ -17,7 +17,6 @@ import org.helioviewer.jhv.math.Mat4;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
-import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLLine;
 import org.helioviewer.jhv.opengl.GLShape;
 import org.helioviewer.jhv.opengl.GLText;
@@ -124,11 +123,11 @@ public class GridLayer extends AbstractLayer {
             axesLine.render(gl, vp.aspect, thicknessAxes);
 
         Position viewpoint = camera.getViewpoint();
-
-        drawEarthCircles(gl, vp.aspect, GLInfo.pixelScale[0] / (2 * camera.getFOV()), Sun.getEarth(viewpoint.time).toQuat());
+        double pixFactor = vp.height / (2 * camera.getWidth());
+        drawEarthCircles(gl, vp.aspect, pixFactor, Sun.getEarth(viewpoint.time).toQuat());
 
         Mat4 gridMatrix = gridType.toQuat(viewpoint).toMatrix();
-        double pixelsPerSolarRadius = textScale * vp.height / (2 * camera.getWidth());
+        double pixelsPerSolarRadius = textScale * pixFactor;
 
         gl.glPushMatrix();
         gl.glMultMatrixd(gridMatrix.transpose().m, 0);
