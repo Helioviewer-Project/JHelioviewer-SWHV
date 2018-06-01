@@ -319,8 +319,8 @@ public class JP2View extends AbstractView {
         } else {
             MetaData m = metaData[frame];
             Region mr = m.getPhysicalRegion();
-            double ratio = 2 * camera.getWidth() / vp.height;
-            int totalHeight = (int) (mr.height / ratio + .5);
+            double pixFactor = vp.height / (2 * camera.getWidth());
+            int totalHeight = (int) (mr.height * pixFactor + .5);
 
             res = cacheStatus.getResolutionSet(frame).getNextResolutionLevel(totalHeight, totalHeight);
             subImage = new SubImage(0, 0, res.width, res.height, res.width, res.height);
