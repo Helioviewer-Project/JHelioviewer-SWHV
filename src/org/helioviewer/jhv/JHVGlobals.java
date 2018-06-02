@@ -92,7 +92,7 @@ public class JHVGlobals {
 
                 System.setProperty("jhv.version", version);
                 System.setProperty("jhv.revision", revision);
-                Log.info("Running " + userAgent);
+                Log.info(String.format("Running %s on %.1fGB %dCPU", userAgent, Runtime.getRuntime().maxMemory() / (1024 * 1024 * 1024.), Runtime.getRuntime().availableProcessors()));
             } catch (IOException e) {
                 Log.error("JHVGlobals.determineVersionAndRevision > Error while reading version and revision from manifest in jar file: " + jarPath, e);
             }
