@@ -6,7 +6,7 @@ import java.net.URI;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.base.message.Message;
+import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.log.Log;
 
 class APIRequestManager {
@@ -20,7 +20,7 @@ class APIRequestManager {
             String error = response.getError();
             if (error != null) {
                 Log.error("Data query returned error: " + error);
-                Message.err("Error getting the data", Message.formatMessageString(error), false);
+                Message.err("Error getting the data", Message.formatMessage(error), false);
                 return null;
             }
 
@@ -31,7 +31,7 @@ class APIRequestManager {
                 // We did not get a reply to load data or no reply at all
                 if (message != null) {
                     Log.error("Server message for " + jpipRequest + " : " + message);
-                    Message.err("Server could not return data", Message.formatMessageString(message), false);
+                    Message.err("Server could not return data", Message.formatMessage(message), false);
                 }/* else { most likely was cancelled
                     Log.error("Did not find URI in response to " + jpipRequest);
                     Message.err("No data source response", "While quering the data source, the server did not provide an answer.", false);
@@ -40,7 +40,7 @@ class APIRequestManager {
             } else {
                 // The server wants to load the data
                 if (message != null) {
-                    Message.warn("Warning", Message.formatMessageString(message));
+                    Message.warn("Warning", Message.formatMessage(message));
                 }
                 return response;
             }

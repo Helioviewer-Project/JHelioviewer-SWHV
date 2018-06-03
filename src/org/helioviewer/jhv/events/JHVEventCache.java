@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
-import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.interval.RequestCache;
 import org.helioviewer.jhv.time.TimeUtils;
 
 public class JHVEventCache {

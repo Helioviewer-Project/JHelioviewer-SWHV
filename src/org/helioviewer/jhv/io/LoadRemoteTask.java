@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.base.message.Message;
+import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.View;

@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.interval.RequestCache;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;

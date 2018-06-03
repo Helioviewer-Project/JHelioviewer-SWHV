@@ -1,17 +1,15 @@
-package org.helioviewer.jhv.base.cache;
+package org.helioviewer.jhv.base.interval;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import org.helioviewer.jhv.base.interval.Interval;
 
 public class RequestCache {
 
     private ArrayList<Interval> cache = new ArrayList<>();
 
     public List<Interval> adaptRequestCache(long start, long end) {
-        ArrayList<Interval> missingIntervals = new ArrayList<>();
+        List<Interval> missingIntervals = new ArrayList<>();
         if (cache.isEmpty()) {
             Interval interval = new Interval(start, end);
             missingIntervals.add(interval);
@@ -23,24 +21,24 @@ public class RequestCache {
         return missingIntervals;
     }
 
-    private void updateRequestCache(long start, long end) {
-        cache.add(new Interval(start, end));
-        cache = merge(cache);
-    }
-
     public void removeRequestedInterval(long start, long end) {
         cache = remove(cache, new Interval(start, end));
     }
 
-    public ArrayList<Interval> getAllRequestIntervals() {
+    public List<Interval> getAllRequestIntervals() {
         return cache;
     }
 
-    public ArrayList<Interval> getMissingIntervals(long start, long end) {
+    public List<Interval> getMissingIntervals(long start, long end) {
         ArrayList<Interval> localCache = getInvertedCache(cache);
         localCache = remove(localCache, new Interval(Long.MIN_VALUE, start));
         localCache = remove(localCache, new Interval(end, Long.MAX_VALUE));
         return localCache;
+    }
+
+    private void updateRequestCache(long start, long end) {
+        cache.add(new Interval(start, end));
+        cache = merge(cache);
     }
 
     private static ArrayList<Interval> getInvertedCache(ArrayList<Interval> toInvert) {
