@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.base.message;
+package org.helioviewer.jhv.gui;
 
 import java.awt.EventQueue;
 
@@ -9,11 +9,11 @@ import org.helioviewer.jhv.base.Regex;
 public class Message {
     /**
      * Inserts linebreaks into the message so that it can shown as a message
-     * 
+     *
      * @param message
-     * @return Formatted string with every line at most 70 chararcters
+     * @return Formatted string with every line at most 70 characters
      */
-    public static String formatMessageString(String message) {
+    public static String formatMessage(String message) {
         StringBuilder sb = new StringBuilder();
         int lineLength = 0;
         for (String word : Regex.Space.split(message)) {
@@ -32,7 +32,7 @@ public class Message {
     /**
      * A central error handler. Displays an error message in a JOptionDialog and
      * exits if the flag is set.
-     * 
+     *
      * @param _title
      *            title of the error message.
      * @param _msg

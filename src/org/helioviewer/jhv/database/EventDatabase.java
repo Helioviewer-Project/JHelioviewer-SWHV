@@ -22,8 +22,8 @@ import java.util.zip.GZIPInputStream;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.Pair;
-import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.interval.RequestCache;
 import org.helioviewer.jhv.events.JHVAssociation;
 import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.SWEKGroup;
