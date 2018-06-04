@@ -22,7 +22,7 @@ public class LoadStateAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         FileDialog fileDialog = new FileDialog(ImageViewerGui.getMainFrame(), "Choose a file", FileDialog.LOAD);
         // does not work on Windows
-        fileDialog.setFilenameFilter(new ExtensionFileFilter.Jhv());
+        fileDialog.setFilenameFilter(ExtensionFileFilter.Jhv);
         fileDialog.setDirectory(JHVDirectory.STATES.getPath());
         fileDialog.setVisible(true);
 
