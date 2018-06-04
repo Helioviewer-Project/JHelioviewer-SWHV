@@ -31,7 +31,7 @@ public class OpenLocalFileAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         FileDialog fileDialog = new FileDialog(ImageViewerGui.getMainFrame(), "Choose a file", FileDialog.LOAD);
         // does not work on Windows
-        fileDialog.setFilenameFilter(new ExtensionFileFilter.Json());
+        fileDialog.setFilenameFilter(ExtensionFileFilter.Json);
         fileDialog.setMultipleMode(true);
         fileDialog.setDirectory(Settings.getProperty("path.local"));
         fileDialog.setVisible(true);

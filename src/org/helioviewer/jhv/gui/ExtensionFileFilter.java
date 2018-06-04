@@ -7,7 +7,11 @@ import javax.swing.filechooser.FileFilter;
 
 public abstract class ExtensionFileFilter extends FileFilter {
 
-    public static class Image implements FilenameFilter {
+    public static final FilenameFilter Image = new Image();
+    public static final FilenameFilter Jhv = new Jhv();
+    public static final FilenameFilter Json = new Json();
+
+    private static class Image implements FilenameFilter {
 
         private final FileFilter filter = new ExtensionFileFilter.ImageTypesFilter();
 
@@ -18,7 +22,7 @@ public abstract class ExtensionFileFilter extends FileFilter {
 
     }
 
-    public static class Jhv implements FilenameFilter {
+    private static class Jhv implements FilenameFilter {
 
         private final FileFilter filter = new ExtensionFileFilter.JhvFilter();
 
@@ -29,7 +33,7 @@ public abstract class ExtensionFileFilter extends FileFilter {
 
     }
 
-    public static class Json implements FilenameFilter {
+    private static class Json implements FilenameFilter {
 
         private final FileFilter filter = new ExtensionFileFilter.JsonFilter();
 
@@ -42,7 +46,7 @@ public abstract class ExtensionFileFilter extends FileFilter {
 
     private static class ImageTypesFilter extends ExtensionFileFilter {
 
-        public ImageTypesFilter() {
+        ImageTypesFilter() {
             extensions = new String[] { "jpg", "jpeg", "png", "fts", "fits", "jp2", "jpx" };
         }
 
