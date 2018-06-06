@@ -17,10 +17,8 @@ import com.jogamp.opengl.GL2;
 public class AnnotateCross extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 2;
-    private static final double thickness = 0.002;
 
     private final GLLine line = new GLLine();
-    private boolean inited = false;
 
     public AnnotateCross(JSONObject jo) {
         super(jo);
@@ -28,10 +26,7 @@ public class AnnotateCross extends AbstractAnnotateable {
 
     @Override
     public void init(GL2 gl) {
-        if (!inited) {
-            line.init(gl);
-            inited = true;
-        }
+        line.init(gl);
     }
 
     @Override

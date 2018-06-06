@@ -35,7 +35,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     private static final double thickness = 0.002;
     private static final float planetSize = 5f;
 
-    private final FOVShape fov = new FOVShape();
+    private final FOVShape fov = new FOVShape(thickness);
     private final GLShape planets = new GLShape();
     private final CameraOptionsPanel optionsPanel;
 
