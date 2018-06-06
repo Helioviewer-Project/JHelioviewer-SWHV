@@ -43,46 +43,36 @@ public class AnnotateFOV extends AbstractAnnotateable {
     }
 
     public void zoom(Camera camera) {
-        if ((startPoint == null || endPoint == null) && !beingDragged())
+        boolean dragged = beingDragged();
+        if ((startPoint == null || endPoint == null) && !dragged)
             return;
 
         Position viewpoint = camera.getViewpoint();
-
-        Vec3 p0, p1;
-        if (beingDragged()) {
-            p0 = dragStartPoint;
-            p1 = dragEndPoint;
-        } else {
-            p0 = startPoint;
-            p1 = endPoint;
-        }
+        Vec3 p0 = dragged ? dragStartPoint : startPoint;
+        Vec3 p1 = dragged ? dragEndPoint : endPoint;
         double dx = (p1.x - p0.x) / 2;
         double dy = (p1.y - p0.y) / 2;
+
         camera.setCurrentTranslation(-(p0.x + dx), -(p0.y + dy));
         camera.setFOV(2 * Math.atan2(Math.sqrt(dx * dx + dy * dy), viewpoint.distance));
     }
 
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl, boolean active) {
-        if ((startPoint == null || endPoint == null) && !beingDragged())
+        boolean dragged = beingDragged();
+        if ((startPoint == null || endPoint == null) && !dragged)
             return;
 
         double pointFactor = GLInfo.pixelScale[0] / (2 * camera.getFOV());
         Position viewpoint = camera.getViewpoint();
+        Vec3 p0 = dragged ? dragStartPoint : startPoint;
+        Vec3 p1 = dragged ? dragEndPoint : endPoint;
+        double dx = (p1.x - p0.x) / 2;
+        double dy = (p1.y - p0.y) / 2;
 
         gl.glPushMatrix();
         gl.glMultMatrixd(viewpoint.toQuat().toMatrix().transpose().m, 0);
         {
-            Vec3 p0, p1;
-            if (beingDragged()) {
-                p0 = dragStartPoint;
-                p1 = dragEndPoint;
-            } else {
-                p0 = startPoint;
-                p1 = endPoint;
-            }
-            double dx = (p1.x - p0.x) / 2;
-            double dy = (p1.y - p0.y) / 2;
             fov.setCenter(p0.x + dx, p0.y + dy);
             fov.setTAngles(dx / viewpoint.distance, dy / viewpoint.distance);
             fov.render(gl, viewpoint.distance, vp.aspect, pointFactor, active);
