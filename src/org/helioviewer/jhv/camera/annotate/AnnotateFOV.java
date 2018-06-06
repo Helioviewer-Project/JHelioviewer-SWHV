@@ -17,8 +17,7 @@ import com.jogamp.opengl.GL2;
 
 public class AnnotateFOV extends AbstractAnnotateable {
 
-    private final FOVShape fov = new FOVShape();
-    private boolean inited;
+    private final FOVShape fov = new FOVShape(thickness);
 
     public AnnotateFOV(JSONObject jo) {
         super(jo);
@@ -26,10 +25,7 @@ public class AnnotateFOV extends AbstractAnnotateable {
 
     @Override
     public void init(GL2 gl) {
-        if (!inited) {
-            fov.init(gl);
-            inited = true;
-        }
+        fov.init(gl);
     }
 
     @Override

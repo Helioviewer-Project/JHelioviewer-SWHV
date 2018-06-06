@@ -10,8 +10,9 @@ public class FOVShape {
 
     private static final int SUBDIVISIONS = 24;
     private static final double epsilon = 0.006;
-    private static final double thickness = 0.002;
     private static final float pointSize = 0.01f;
+
+    private final double thickness;
 
     private final FloatBuffer pointPosition = BufferUtils.newFloatBuffer(4);
     private final FloatBuffer pointColor = BufferUtils.newFloatBuffer(4);
@@ -26,6 +27,10 @@ public class FOVShape {
     private double centerZ = computeZ(centerX, centerY);
     private double tanX;
     private double tanY;
+
+    public FOVShape(double _thickness) {
+        thickness = _thickness;
+    }
 
     public void setTAngles(double _tanX, double _tanY) {
         tanX = _tanX;

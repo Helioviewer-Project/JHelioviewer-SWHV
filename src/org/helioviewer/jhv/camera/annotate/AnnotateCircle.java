@@ -16,10 +16,8 @@ import com.jogamp.opengl.GL2;
 public class AnnotateCircle extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 90;
-    private static final double thickness = 0.002;
 
     private final GLLine line = new GLLine();
-    private boolean inited = false;
 
     public AnnotateCircle(JSONObject jo) {
         super(jo);
@@ -27,10 +25,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
 
     @Override
     public void init(GL2 gl) {
-        if (!inited) {
-            line.init(gl);
-            inited = true;
-        }
+        line.init(gl);
     }
 
     @Override

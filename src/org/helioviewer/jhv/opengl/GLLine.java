@@ -17,6 +17,7 @@ public class GLLine {
     private final VBO[] vbos = new VBO[5];
     private VBO ivbo;
     private boolean hasPoints = false;
+    private boolean inited = false;
 
     public void setData(GL2 gl, FloatBuffer points, FloatBuffer colors) {
         hasPoints = false;
@@ -104,12 +105,6 @@ public class GLLine {
         }
     }
 
-    public void init(GL2 gl) {
-        vboAttribRefs = new int[] { GLSLLineShader.previousLineRef, GLSLLineShader.lineRef, GLSLLineShader.nextLineRef,
-                GLSLLineShader.directionRef, GLSLLineShader.linecolorRef };
-        initVBOs(gl);
-    }
-
     private void setBufferData(GL2 gl, FloatBuffer points, FloatBuffer colors, int plen) {
         FloatBuffer previousLineBuffer = BufferUtils.newFloatBuffer(3 * 2 * plen);
         FloatBuffer lineBuffer = BufferUtils.newFloatBuffer(3 * 2 * plen);
@@ -154,8 +149,20 @@ public class GLLine {
         ivbo.bindBufferData(gl, indexBuffer, Buffers.SIZEOF_INT);
     }
 
+    public void init(GL2 gl) {
+        if (!inited) {
+            vboAttribRefs = new int[] { GLSLLineShader.previousLineRef, GLSLLineShader.lineRef, GLSLLineShader.nextLineRef,
+                    GLSLLineShader.directionRef, GLSLLineShader.linecolorRef };
+            initVBOs(gl);
+            inited = true;
+        }
+    }
+
     public void dispose(GL2 gl) {
-        disposeVBOs(gl);
+        if (inited) {
+            disposeVBOs(gl);
+            inited = false;
+        }
     }
 
 }

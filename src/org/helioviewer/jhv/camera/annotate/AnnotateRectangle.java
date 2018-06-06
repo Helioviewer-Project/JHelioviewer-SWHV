@@ -15,10 +15,7 @@ import com.jogamp.opengl.GL2;
 
 public class AnnotateRectangle extends AbstractAnnotateable {
 
-    private static final double thickness = 0.002;
-
     private final GLLine line = new GLLine();
-    private boolean inited = false;
 
     public AnnotateRectangle(JSONObject jo) {
         super(jo);
@@ -26,10 +23,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
     @Override
     public void init(GL2 gl) {
-        if (!inited) {
-            line.init(gl);
-            inited = true;
-        }
+        line.init(gl);
     }
 
     @Override

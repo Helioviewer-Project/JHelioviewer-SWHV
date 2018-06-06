@@ -17,6 +17,7 @@ public class GLShape {
     private final VBO[] vbos = new VBO[2];
     private VBO ivbo;
     private boolean hasPoints = false;
+    private boolean inited = false;
 
     public void setData(GL2 gl, FloatBuffer points, FloatBuffer colors) {
         hasPoints = false;
@@ -108,12 +109,18 @@ public class GLShape {
     }
 
     public void init(GL2 gl) {
-        vboAttribRefs = new int[] { GLSLShapeShader.positionRef, GLSLShapeShader.colorRef };
-        initVBOs(gl);
+        if (!inited) {
+            vboAttribRefs = new int[] { GLSLShapeShader.positionRef, GLSLShapeShader.colorRef };
+            initVBOs(gl);
+            inited = true;
+        }
     }
 
     public void dispose(GL2 gl) {
-        disposeVBOs(gl);
+        if (inited) {
+            disposeVBOs(gl);
+            inited = false;
+        }
     }
 
 }
