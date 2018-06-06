@@ -62,10 +62,6 @@ public class AnnotateCircle extends AbstractAnnotateable {
             vx.y = center.y + cosr * u.y + sinr * v.y;
             vx.z = center.z + cosr * u.z + sinr * v.z;
             if (Display.mode == Display.DisplayMode.Orthographic) {
-                if (i == 0) {
-                    pos.put3f((float) vx.x, (float) vx.y, (float) vx.z);
-                    col.put4f(BufferUtils.colorNull);
-                }
                 pos.put3f((float) vx.x, (float) vx.y, (float) vx.z);
                 col.put4f(color);
             } else {
