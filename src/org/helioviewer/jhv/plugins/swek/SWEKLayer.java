@@ -179,7 +179,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                 }
                 vertex.rewind();
             }
-            GLHelper.drawTexture(gl, vertex, texBuf1);
+            GLHelper.drawTexQuad(gl, vertex, texBuf1);
             gl.glDisable(GL2.GL_TEXTURE_2D);
         }
     }
@@ -260,7 +260,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             BufferUtils.put3f(vertex, (float) (theta - width2), (float) (r - height2), 0);
             vertex.rewind();
         }
-        GLHelper.drawTexture(gl, vertex, texBuf2);
+        GLHelper.drawTexQuad(gl, vertex, texBuf2);
         gl.glDisable(GL2.GL_TEXTURE_2D);
     }
 
@@ -366,7 +366,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             BufferUtils.put3f(vertex, p0);
             vertex.rewind();
         }
-        GLHelper.drawTexture(gl, vertex, texBuf2);
+        GLHelper.drawTexQuad(gl, vertex, texBuf2);
         gl.glDisable(GL2.GL_TEXTURE_2D);
     }
 

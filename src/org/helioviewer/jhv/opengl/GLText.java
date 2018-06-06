@@ -2,8 +2,10 @@ package org.helioviewer.jhv.opengl;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.nio.FloatBuffer;
 import java.util.List;
 
+import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.UIGlobals;
 
@@ -18,6 +20,16 @@ public class GLText {
     private static final int SIZE = (MAX - MIN) / STEP + 1;
     private static final TextRenderer[] renderer = new TextRenderer[SIZE];
 
+    private static final FloatBuffer color = BufferUtils.newFloatBuffer(16);
+
+    static {
+        BufferUtils.put4f(color, 0.33f, 0.33f, 0.33f, 0.9f);
+        BufferUtils.put4f(color, 0.33f, 0.33f, 0.33f, 0.9f);
+        BufferUtils.put4f(color, 0.33f, 0.33f, 0.33f, 0.9f);
+        BufferUtils.put4f(color, 0.33f, 0.33f, 0.33f, 0.9f);
+        color.rewind();
+    }
+
     public static TextRenderer getRenderer(int size) {
         size *= GLInfo.pixelScale[1];
 
@@ -30,7 +42,7 @@ public class GLText {
         if (renderer[idx] == null) {
             Font font = UIGlobals.UIFontRoboto.deriveFont((float) (idx * STEP + MIN));
             renderer[idx] = new TextRenderer(font, true, true, null, true);
-            renderer[idx].setUseVertexArrays(true);
+            renderer[idx].setUseVertexArrays(false); // tbd what's going on, interference with the color quad
             // renderer[idx].setSmoothing(false);
             renderer[idx].setColor(Color.WHITE);
             // precache for grid text
@@ -88,19 +100,19 @@ public class GLText {
 
         renderer.beginRendering(vp.width, vp.height, true);
 
-        gl.glColor4f(0.33f, 0.33f, 0.33f, 0.9f);
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glPushMatrix();
         gl.glLoadIdentity();
+        FloatBuffer vertex = BufferUtils.newFloatBuffer(12);
         {
-            gl.glBegin(GL2.GL_QUADS);
-            gl.glVertex2f(left, vp.height - bottom);
-            gl.glVertex2f(left, vp.height - bottom - h);
-            gl.glVertex2f(left + w, vp.height - bottom - h);
-            gl.glVertex2f(left + w, vp.height - bottom);
-            gl.glEnd();
+            BufferUtils.put3f(vertex, left, vp.height - bottom, 0);
+            BufferUtils.put3f(vertex, left, vp.height - bottom - h, 0);
+            BufferUtils.put3f(vertex, left + w, vp.height - bottom - h, 0);
+            BufferUtils.put3f(vertex, left + w, vp.height - bottom, 0);
+            vertex.rewind();
 
         }
+        GLHelper.drawColQuad(gl, vertex, color);
         gl.glPopMatrix();
         gl.glEnable(GL2.GL_TEXTURE_2D);
 
