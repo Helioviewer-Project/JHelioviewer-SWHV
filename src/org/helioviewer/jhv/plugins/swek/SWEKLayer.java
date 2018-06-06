@@ -58,7 +58,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     private static final int DIVPOINTS = 10;
     private static final double LINEWIDTH = 0.002;
     private static final double LINEWIDTH_HIGHLIGHT = 0.003;
-    private static final float LINEWIDTH_CACTUS = 2.02f;
+    private static final double LINEWIDTH_CACTUS = 0.003;
 
     private static final HashMap<String, GLTexture> iconCacheId = new HashMap<>();
     private static final double ICON_SIZE = 0.1;
@@ -99,23 +99,26 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
     }
 
-    private static void interPolatedDraw(GL2 gl, int mres, double r_start, double r_end, double t_start, double t_end, Quat q) {
-        gl.glBegin(GL2.GL_LINE_STRIP);
-        {
-            Vec3 v = new Vec3();
-            for (int i = 0; i <= mres; i++) {
-                double alpha = 1. - i / (double) mres;
-                double r = alpha * r_start + (1 - alpha) * r_end;
-                double theta = alpha * t_start + (1 - alpha) * t_end;
+    private static void interPolatedDraw(GL2 gl, int mres, double r_start, double r_end, double t_start, double t_end, Quat q, FloatArray pos, FloatArray col, float[] color) {
+        Vec3 v = new Vec3();
+        for (int i = 0; i <= mres; i++) {
+            double alpha = 1. - i / (double) mres;
+            double r = alpha * r_start + (1 - alpha) * r_end;
+            double theta = alpha * t_start + (1 - alpha) * t_end;
 
-                v.x = r * Math.cos(theta);
-                v.y = r * Math.sin(theta);
-                Vec3 res = q.rotateInverseVector(v);
+            v.x = r * Math.cos(theta);
+            v.y = r * Math.sin(theta);
+            Vec3 res = q.rotateInverseVector(v);
 
-                gl.glVertex3f((float) res.x, (float) res.y, (float) res.z);
+            if (i == 0) {
+                pos.put3f((float) res.x, (float) res.y, (float) res.z);
+                col.put4f(BufferUtils.colorNull);
             }
+            pos.put3f((float) res.x, (float) res.y, (float) res.z);
+            col.put4f(color);
         }
-        gl.glEnd();
+        pos.repeat3f();
+        col.put4f(BufferUtils.colorNull);
     }
 
     private final float texCoord1[][] = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
@@ -123,7 +126,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     private final FloatBuffer texBuf1 = BufferUtils.newFloatBuffer(8);
     private final FloatBuffer texBuf2 = BufferUtils.newFloatBuffer(8);
 
-    private void drawCactusArc(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
+    private void drawCactusArc(Viewport vp, GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
         double angularWidthDegree = SWEKData.readCMEAngularWidthDegree(evt);
         double angularWidth = Math.toRadians(angularWidthDegree);
         double principalAngleDegree = SWEKData.readCMEPrincipalAngleDegree(evt);
@@ -136,25 +139,27 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         int angularResolution = (int) (angularWidthDegree / 4);
 
         Quat q = evt.getPositionInformation().getEarth().toQuat();
-        Color color = evtr.getColor();
-
-        gl.glColor3f(0, 0, 0);
-        gl.glLineWidth(LINEWIDTH_CACTUS * 1.2f);
+        Color c = evtr.getColor();
+        float[] color = { c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, 1 };
 
         double thetaStart = principalAngle - angularWidth / 2.;
-        interPolatedDraw(gl, angularResolution, distSun, distSun, thetaStart, principalAngle, q);
         double thetaEnd = principalAngle + angularWidth / 2.;
-        interPolatedDraw(gl, angularResolution, distSun, distSun, principalAngle, thetaEnd, q);
 
-        gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
-        gl.glLineWidth(LINEWIDTH_CACTUS);
+        FloatArray pos = new FloatArray();
+        FloatArray col = new FloatArray();
 
-        interPolatedDraw(gl, angularResolution, distSun, distSun, thetaStart, principalAngle, q);
-        interPolatedDraw(gl, angularResolution, distSun, distSun, principalAngle, thetaEnd, q);
+        interPolatedDraw(gl, angularResolution, distSun, distSun, thetaStart, principalAngle, q, pos, col, color);
+        interPolatedDraw(gl, angularResolution, distSun, distSun, principalAngle, thetaEnd, q, pos, col, color);
 
-        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaStart, thetaStart, q);
-        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, q);
-        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, q);
+        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaStart, thetaStart, q, pos, col, color);
+        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, q, pos, col, color);
+        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, q, pos, col, color);
+
+        GLLine line = new GLLine();
+        line.init(gl);
+        line.setData(gl, pos.toBuffer(), col.toBuffer());
+        line.render(gl, vp.aspect, LINEWIDTH_CACTUS);
+        line.dispose(gl);
 
         if (icons) {
             bindTexture(gl, evtr.getSupplier().getGroup());
@@ -318,7 +323,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         Color color = evtr.getColor();
 
         gl.glColor3f(0, 0, 0);
-        gl.glLineWidth(LINEWIDTH_CACTUS * 1.2f);
+        gl.glLineWidth(/*LINEWIDTH_CACTUS*/ 2.02f * 1.2f);
         gl.glBegin(GL2.GL_LINES);
         {
             gl.glVertex2f((float) (scale.getXValueInv(thetaStart) * vp.aspect), (float) scale.getYValueInv(distSun));
@@ -330,7 +335,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         }
         gl.glEnd();
 
-        gl.glLineWidth(LINEWIDTH_CACTUS);
+        gl.glLineWidth(/*LINEWIDTH_CACTUS*/ 2.02f);
         gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
         gl.glBegin(GL2.GL_LINES);
         {
@@ -411,7 +416,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             for (JHVRelatedEvents evtr : SWEKData.getActiveEvents(controller.currentTime)) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
                 if (evt.isCactus()) {
-                    drawCactusArc(gl, evtr, evt, controller.currentTime);
+                    drawCactusArc(vp, gl, evtr, evt, controller.currentTime);
                 } else {
                     drawPolygon(camera, vp, gl, evtr, evt);
                     if (icons) {
