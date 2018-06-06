@@ -42,14 +42,6 @@ abstract class AbstractAnnotateable implements Annotateable {
         }
     }
 
-    @Override
-    public void init(GL2 gl) {
-    }
-
-    @Override
-    public void dispose(GL2 gl) {
-    }
-
     static Vec3 toSpherical(Vec3 p) {
         double len = p.length();
         return new Vec3(len, Math.acos(p.y / len), Math.atan2(p.x, p.z));

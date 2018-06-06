@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.camera.annotate;
 
+import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.FloatArray;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
@@ -7,82 +9,72 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
+import org.helioviewer.jhv.opengl.GLLine;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
 public class AnnotateCross extends AbstractAnnotateable {
 
+    private static final int SUBDIVISIONS = 2;
     private static final double thickness = 0.002;
+
+    private final GLLine line = new GLLine();
+    private boolean inited = false;
 
     public AnnotateCross(JSONObject jo) {
         super(jo);
     }
 
-    private static void drawCross(Camera camera, Viewport vp, GL2 gl, Vec3 bp) {
+    @Override
+    public void init(GL2 gl) {
+        if (!inited) {
+            line.init(gl);
+            inited = true;
+        }
+    }
+
+    @Override
+    public void dispose(GL2 gl) {
+        line.dispose(gl);
+    }
+
+    private static void drawCross(Camera camera, Viewport vp, Vec3 bp, FloatArray pos, FloatArray col, float[] color) {
         double delta = 2.5 * Math.PI / 180;
         Vec3 p1 = new Vec3(radius, bp.y + delta, bp.z);
         Vec3 p2 = new Vec3(radius, bp.y - delta, bp.z);
         Vec3 p3 = new Vec3(radius, bp.y, bp.z + delta);
         Vec3 p4 = new Vec3(radius, bp.y, bp.z - delta);
-        gl.glDisable(GL2.GL_DEPTH_TEST);
-        interpolatedDraw(camera, vp, gl, p1, p2, 2);
-        interpolatedDraw(camera, vp, gl, p3, p4, 2);
-        gl.glEnable(GL2.GL_DEPTH_TEST);
+
+        interpolatedDraw(camera, vp, p1, p2, pos, col, color);
+        interpolatedDraw(camera, vp, p3, p4, pos, col, color);
     }
 
-    private static void interpolatedDraw(Camera camera, Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s, int subdivisions) {
-        if (Display.mode == Display.DisplayMode.Orthographic) {
-            gl.glBegin(GL2.GL_TRIANGLE_STRIP);
+    private static void interpolatedDraw(Camera camera, Viewport vp, Vec3 p1s, Vec3 p2s, FloatArray pos, FloatArray col, float[] color) {
+        Vec2 previous = null;
+        for (double i = 0; i <= SUBDIVISIONS; i++) {
+            double t = i / SUBDIVISIONS;
+            double y = (1 - t) * p1s.y + t * p2s.y;
+            double z = (1 - t) * p1s.z + t * p2s.z;
 
-            for (double i = 0; i < subdivisions; i++) {
-                double t = i / subdivisions;
-                double y0 = (1 - t) * p1s.y + t * p2s.y;
-                double z0 = (1 - t) * p1s.z + t * p2s.z;
-                Vec3 p0 = toCart(y0, z0);
-
-                t = (i + 1) / subdivisions;
-                double y1 = (1 - t) * p1s.y + t * p2s.y;
-                double z1 = (1 - t) * p1s.z + t * p2s.z;
-                Vec3 p1 = toCart(y1, z1);
-
-                Vec3 p1minusp0 = Vec3.subtract(p1, p0);
-                Vec3 v = Vec3.cross(p0, p1minusp0);
-                v.normalize();
-
-                v.multiply(thickness);
-                Vec3 p0plusv = Vec3.add(p0, v);
-                p0plusv.normalize();
-                gl.glVertex3f((float) p0plusv.x, (float) p0plusv.y, (float) p0plusv.z);
-                Vec3 p0minusv = Vec3.subtract(p0, v);
-                p0minusv.normalize();
-                gl.glVertex3f((float) p0minusv.x, (float) p0minusv.y, (float) p0minusv.z);
-                if (i == subdivisions - 1) {
-                    Vec3 p1plusv = Vec3.add(p1, v);
-                    p1plusv.normalize();
-                    gl.glVertex3f((float) p1plusv.x, (float) p1plusv.y, (float) p1plusv.z);
-                    Vec3 p1minusv = Vec3.subtract(p1, v);
-                    p1minusv.normalize();
-                    gl.glVertex3f((float) p1minusv.x, (float) p1minusv.y, (float) p1minusv.z);
+            Vec3 pc = toCart(y, z);
+            if (Display.mode == Display.DisplayMode.Orthographic) {
+                if (i == 0) {
+                    pos.put3f((float) pc.x, (float) pc.y, (float) pc.z);
+                    col.put4f(BufferUtils.colorNull);
                 }
+                pos.put3f((float) pc.x, (float) pc.y, (float) pc.z);
+                col.put4f(color);
+            } else {
+                pc.y = -pc.y;
+                if (i == 0) {
+                    previous = GLHelper.drawVertex(camera, vp, pc, previous, pos, col, BufferUtils.colorNull);
+                }
+                previous = GLHelper.drawVertex(camera, vp, pc, previous, pos, col, color);
             }
-
-            gl.glEnd();
-        } else {
-            gl.glBegin(GL2.GL_LINE_STRIP);
-
-            Vec2 previous = null;
-            for (double i = 0; i <= subdivisions; i++) {
-                double t = i / subdivisions;
-                double y0 = (1 - t) * p1s.y + t * p2s.y;
-                double z0 = (1 - t) * p1s.z + t * p2s.z;
-                Vec3 p0 = toCart(y0, z0);
-                p0.y = -p0.y;
-                previous = GLHelper.drawVertex(camera, vp, gl, p0, previous);
-            }
-
-            gl.glEnd();
         }
+        pos.repeat3f();
+        col.put4f(BufferUtils.colorNull);
     }
 
     @Override
@@ -90,13 +82,16 @@ public class AnnotateCross extends AbstractAnnotateable {
         if (startPoint == null)
             return;
 
-        gl.glLineWidth(lineWidth);
+        float[] color = active ? activeColor : baseColor;
 
-        if (active)
-            gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
-        else
-            gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
-        drawCross(camera, vp, gl, toSpherical(startPoint));
+        FloatArray pos = new FloatArray();
+        FloatArray col = new FloatArray();
+
+        drawCross(camera, vp, toSpherical(startPoint), pos, col, color);
+        line.setData(gl, pos.toBuffer(), col.toBuffer());
+//      gl.glDisable(GL2.GL_DEPTH_TEST);
+        line.render(gl, vp.aspect, thickness);
+//      gl.glEnable(GL2.GL_DEPTH_TEST);
     }
 
     @Override
