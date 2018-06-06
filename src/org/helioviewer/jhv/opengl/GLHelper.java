@@ -6,6 +6,7 @@ import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.FloatArray;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
@@ -67,22 +68,69 @@ public class GLHelper {
         Position viewpoint = camera.getViewpoint();
         Vec3 pt = viewpoint.toQuat().rotateVector(current);
         Vec2 tf = Display.mode.xform.transform(viewpoint, pt, Display.mode.scale);
+
+        float x;
+        float y = (float) tf.y;
         if (previous != null && Math.abs(previous.x - tf.x) > 0.5) {
             if (tf.x <= 0 && previous.x >= 0) {
-                gl.glVertex2f((float) (0.5 * vp.aspect), (float) tf.y);
+                x = (float) (0.5 * vp.aspect);
+                gl.glVertex2f(x, y);
                 gl.glEnd();
                 gl.glBegin(GL2.GL_LINE_STRIP);
-                gl.glVertex2f((float) (-0.5 * vp.aspect), (float) tf.y);
+                gl.glVertex2f(-x, y);
             } else if (tf.x >= 0 && previous.x <= 0) {
-                gl.glVertex2f((float) (-0.5 * vp.aspect), (float) tf.y);
+                x = (float) (-0.5 * vp.aspect);
+                gl.glVertex2f(x, y);
                 gl.glEnd();
                 gl.glBegin(GL2.GL_LINE_STRIP);
-                gl.glVertex2f((float) (0.5 * vp.aspect), (float) tf.y);
+                gl.glVertex2f(-x, y);
             }
         }
-        gl.glVertex2f((float) (tf.x * vp.aspect), (float) tf.y);
+        x = (float) (tf.x * vp.aspect);
+        gl.glVertex2f(x, y);
         return tf;
     }
+
+    public static Vec2 drawVertex(Camera camera, Viewport vp, Vec3 current, Vec2 previous, FloatArray pos, FloatArray col, float[] color) {
+        Position viewpoint = camera.getViewpoint();
+        Vec3 pt = viewpoint.toQuat().rotateVector(current);
+        Vec2 tf = Display.mode.xform.transform(viewpoint, pt, Display.mode.scale);
+
+        float x;
+        float y = (float) tf.y;
+        if (previous != null && Math.abs(previous.x - tf.x) > 0.5) {
+            if (tf.x <= 0 && previous.x >= 0) {
+                x = (float) (0.5 * vp.aspect);
+                pos.put3f(x, y, 0);
+                col.put4f(color);
+
+                pos.put3f(x, y, 0);
+                col.put4f(BufferUtils.colorNull);
+                pos.put3f(-x, y, 0);
+                col.put4f(BufferUtils.colorNull);
+
+                pos.put3f(-x, y, 0);
+                col.put4f(color);
+            } else if (tf.x >= 0 && previous.x <= 0) {
+                x = (float) (-0.5 * vp.aspect);
+                pos.put3f(x, y, 0);
+                col.put4f(color);
+
+                pos.put3f(x, y, 0);
+                col.put4f(BufferUtils.colorNull);
+                pos.put3f(-x, y, 0);
+                col.put4f(BufferUtils.colorNull);
+
+                pos.put3f(-x, y, 0);
+                col.put4f(color);
+            }
+        }
+        x = (float) (tf.x * vp.aspect);
+        pos.put3f(x, y, 0);
+        col.put4f(color);
+        return tf;
+    }
+
 /*
     public static GLCanvas createGLCanvas() {
         GLProfile profile = GLProfile.getDefault();
