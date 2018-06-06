@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.image.BufferedImage;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -17,6 +18,7 @@ import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.base.scale.Transform;
 import org.helioviewer.jhv.camera.Camera;
@@ -114,7 +116,10 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         gl.glEnd();
     }
 
-    private static final int texCoordHelpers[][] = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
+    private final float texCoord1[][] = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
+    private final float texCoord2[][] = { { 1, 1 }, { 1, 0 }, { 0, 0 }, { 0, 1 } };
+    private final FloatBuffer texBuf1 = BufferUtils.newFloatBuffer(8);
+    private final FloatBuffer texBuf2 = BufferUtils.newFloatBuffer(8);
 
     private void drawCactusArc(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
         double angularWidthDegree = SWEKData.readCMEAngularWidthDegree(evt);
@@ -158,10 +163,10 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             }
 
             gl.glEnable(GL2.GL_TEXTURE_2D);
-            gl.glBegin(GL2.GL_QUADS);
+            FloatBuffer vertex = BufferUtils.newFloatBuffer(12);
             {
                 Vec3 v = new Vec3();
-                for (int[] el : texCoordHelpers) {
+                for (float[] el : texCoord1) {
                     double deltatheta = sz / distSun * (el[1] * 2 - 1);
                     double deltar = sz * (el[0] * 2 - 1);
                     double r = distSun + deltar;
@@ -170,12 +175,11 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                     v.x = r * Math.cos(theta);
                     v.y = r * Math.sin(theta);
                     Vec3 res = q.rotateInverseVector(v);
-
-                    gl.glTexCoord2f(el[0], el[1]);
-                    gl.glVertex3f((float) res.x, (float) res.y, (float) res.z);
+                    BufferUtils.put3f(vertex, res);
                 }
+                vertex.rewind();
             }
-            gl.glEnd();
+            GLHelper.drawTexture(gl, vertex, texBuf1);
             gl.glDisable(GL2.GL_TEXTURE_2D);
         }
     }
@@ -224,7 +228,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         }
     }
 
-    private static void drawIcon(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
+    private void drawIcon(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -243,27 +247,24 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         }
     }
 
-    private static void drawImageScale(GL2 gl, double theta, double r, double width, double height) {
+    private void drawImageScale(GL2 gl, double theta, double r, double width, double height) {
         double width2 = width / 4.;
         double height2 = height / 4.;
 
         gl.glEnable(GL2.GL_TEXTURE_2D);
-        gl.glBegin(GL2.GL_QUADS);
+        FloatBuffer vertex = BufferUtils.newFloatBuffer(12);
         {
-            gl.glTexCoord2f(1, 1);
-            gl.glVertex2f((float) (theta + width2), (float) (r - height2));
-            gl.glTexCoord2f(1, 0);
-            gl.glVertex2f((float) (theta + width2), (float) (r + height2));
-            gl.glTexCoord2f(0, 0);
-            gl.glVertex2f((float) (theta - width2), (float) (r + height2));
-            gl.glTexCoord2f(0, 1);
-            gl.glVertex2f((float) (theta - width2), (float) (r - height2));
+            BufferUtils.put3f(vertex, (float) (theta + width2), (float) (r - height2), 0);
+            BufferUtils.put3f(vertex, (float) (theta + width2), (float) (r + height2), 0);
+            BufferUtils.put3f(vertex, (float) (theta - width2), (float) (r + height2), 0);
+            BufferUtils.put3f(vertex, (float) (theta - width2), (float) (r - height2), 0);
+            vertex.rewind();
         }
-        gl.glEnd();
+        GLHelper.drawTexture(gl, vertex, texBuf2);
         gl.glDisable(GL2.GL_TEXTURE_2D);
     }
 
-    private static void drawIconScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Transform xform, Camera camera, Viewport vp) {
+    private void drawIconScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Transform xform, Camera camera, Viewport vp) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -338,7 +339,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         }
     }
 
-    private static void drawImage3d(GL2 gl, double x, double y, double z, double width, double height) {
+    private void drawImage3d(GL2 gl, double x, double y, double z, double width, double height) {
         y = -y;
 
         double width2 = width / 2.;
@@ -357,18 +358,15 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         p3.add(targetDir);
 
         gl.glEnable(GL2.GL_TEXTURE_2D);
-        gl.glBegin(GL2.GL_QUADS);
+        FloatBuffer vertex = BufferUtils.newFloatBuffer(12);
         {
-            gl.glTexCoord2f(1, 1);
-            gl.glVertex3f((float) p3.x, (float) p3.y, (float) p3.z);
-            gl.glTexCoord2f(1, 0);
-            gl.glVertex3f((float) p2.x, (float) p2.y, (float) p2.z);
-            gl.glTexCoord2f(0, 0);
-            gl.glVertex3f((float) p1.x, (float) p1.y, (float) p1.z);
-            gl.glTexCoord2f(0, 1);
-            gl.glVertex3f((float) p0.x, (float) p0.y, (float) p0.z);
+            BufferUtils.put3f(vertex, p3);
+            BufferUtils.put3f(vertex, p2);
+            BufferUtils.put3f(vertex, p1);
+            BufferUtils.put3f(vertex, p0);
+            vertex.rewind();
         }
-        gl.glEnd();
+        GLHelper.drawTexture(gl, vertex, texBuf2);
         gl.glDisable(GL2.GL_TEXTURE_2D);
     }
 
@@ -480,6 +478,12 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
     @Override
     public void init(GL2 gl) {
+        for (float[] tc : texCoord1)
+            texBuf1.put(tc);
+        for (float[] tc : texCoord2)
+            texBuf2.put(tc);
+        texBuf1.rewind();
+        texBuf2.rewind();
     }
 
     @Override
