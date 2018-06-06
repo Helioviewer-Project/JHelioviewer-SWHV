@@ -10,6 +10,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.UIGlobals;
 
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class GLText {
 
@@ -17,7 +18,7 @@ public class GLText {
     private static final int MAX = 144;
     private static final int STEP = 1;
     private static final int SIZE = (MAX - MIN) / STEP + 1;
-    private static final JhvTextRenderer[] renderer = new JhvTextRenderer[SIZE];
+    private static final TextRenderer[] renderer = new TextRenderer[SIZE];
 
     private static final FloatBuffer color = BufferUtils.newFloatBuffer(16);
 
@@ -29,7 +30,7 @@ public class GLText {
         color.rewind();
     }
 
-    public static JhvTextRenderer getRenderer(int size) {
+    public static TextRenderer getRenderer(int size) {
         size *= GLInfo.pixelScale[1];
 
         int idx = (size - MIN) / STEP;
@@ -40,7 +41,7 @@ public class GLText {
 
         if (renderer[idx] == null) {
             Font font = UIGlobals.UIFontRoboto.deriveFont((float) (idx * STEP + MIN));
-            renderer[idx] = new JhvTextRenderer(font, true, true, null, true);
+            renderer[idx] = new TextRenderer(font, true, true, null, true);
             renderer[idx].setUseVertexArrays(true);
             // renderer[idx].setSmoothing(false);
             renderer[idx].setColor(Color.WHITE);
@@ -70,7 +71,7 @@ public class GLText {
         if (txts.isEmpty())
             return;
 
-        JhvTextRenderer renderer = getRenderer(TEXT_SIZE_NORMAL);
+        TextRenderer renderer = getRenderer(TEXT_SIZE_NORMAL);
         float fontSize = renderer.getFont().getSize2D();
 
         double boundW = 0;
@@ -100,8 +101,6 @@ public class GLText {
         renderer.beginRendering(vp.width, vp.height, true);
 
         gl.glDisable(GL2.GL_TEXTURE_2D);
-        gl.glPushMatrix();
-        gl.glLoadIdentity();
         FloatBuffer vertex = BufferUtils.newFloatBuffer(12);
         {
             BufferUtils.put3f(vertex, left, vp.height - bottom, 0);
@@ -112,10 +111,9 @@ public class GLText {
 
         }
         GLHelper.drawColorQuad(gl, vertex, color);
-        gl.glPopMatrix();
         gl.glEnable(GL2.GL_TEXTURE_2D);
 
-        gl.glColor3f(1, 1, 1);
+        gl.glColor4f(1, 1, 1, 1);
         int deltaY = 0;
         for (String txt : txts) {
             renderer.draw(txt, textInit_x, vp.height - textInit_y - deltaY);

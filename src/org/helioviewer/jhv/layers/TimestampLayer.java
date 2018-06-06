@@ -18,10 +18,10 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLText;
-import org.helioviewer.jhv.opengl.JhvTextRenderer;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class TimestampLayer extends AbstractLayer {
 
@@ -65,7 +65,7 @@ public class TimestampLayer extends AbstractLayer {
         if (GLInfo.pixelScale[1] == 1) //! nasty
             size *= 2;
 
-        JhvTextRenderer renderer = GLText.getRenderer(size);
+        TextRenderer renderer = GLText.getRenderer(size);
         renderer.beginRendering(vp.width, vp.height, true);
         renderer.setColor(Color.BLACK);
         renderer.draw(text, delta, delta);
