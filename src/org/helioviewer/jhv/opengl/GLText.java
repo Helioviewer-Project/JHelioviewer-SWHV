@@ -10,7 +10,6 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.UIGlobals;
 
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class GLText {
 
@@ -18,7 +17,7 @@ public class GLText {
     private static final int MAX = 144;
     private static final int STEP = 1;
     private static final int SIZE = (MAX - MIN) / STEP + 1;
-    private static final TextRenderer[] renderer = new TextRenderer[SIZE];
+    private static final JhvTextRenderer[] renderer = new JhvTextRenderer[SIZE];
 
     private static final FloatBuffer color = BufferUtils.newFloatBuffer(16);
 
@@ -30,7 +29,7 @@ public class GLText {
         color.rewind();
     }
 
-    public static TextRenderer getRenderer(int size) {
+    public static JhvTextRenderer getRenderer(int size) {
         size *= GLInfo.pixelScale[1];
 
         int idx = (size - MIN) / STEP;
@@ -41,7 +40,7 @@ public class GLText {
 
         if (renderer[idx] == null) {
             Font font = UIGlobals.UIFontRoboto.deriveFont((float) (idx * STEP + MIN));
-            renderer[idx] = new TextRenderer(font, true, true, null, true);
+            renderer[idx] = new JhvTextRenderer(font, true, true, null, true);
             renderer[idx].setUseVertexArrays(false); // tbd what's going on, interference with the color quad
             // renderer[idx].setSmoothing(false);
             renderer[idx].setColor(Color.WHITE);
@@ -71,7 +70,7 @@ public class GLText {
         if (txts.isEmpty())
             return;
 
-        TextRenderer renderer = getRenderer(TEXT_SIZE_NORMAL);
+        JhvTextRenderer renderer = getRenderer(TEXT_SIZE_NORMAL);
         float fontSize = renderer.getFont().getSize2D();
 
         double boundW = 0;
@@ -112,7 +111,7 @@ public class GLText {
             vertex.rewind();
 
         }
-        GLHelper.drawColQuad(gl, vertex, color);
+        GLHelper.drawColorQuad(gl, vertex, color);
         gl.glPopMatrix();
         gl.glEnable(GL2.GL_TEXTURE_2D);
 
