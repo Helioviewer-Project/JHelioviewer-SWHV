@@ -67,25 +67,20 @@ public class GLHelper {
         Position viewpoint = camera.getViewpoint();
         Vec3 pt = viewpoint.toQuat().rotateVector(current);
         Vec2 tf = Display.mode.xform.transform(viewpoint, pt, Display.mode.scale);
-        if (previous != null) {
-            if (tf.x <= 0 && previous.x >= 0 && Math.abs(previous.x - tf.x) > 0.5) {
+        if (previous != null && Math.abs(previous.x - tf.x) > 0.5) {
+            if (tf.x <= 0 && previous.x >= 0) {
                 gl.glVertex2f((float) (0.5 * vp.aspect), (float) tf.y);
                 gl.glEnd();
                 gl.glBegin(GL2.GL_LINE_STRIP);
                 gl.glVertex2f((float) (-0.5 * vp.aspect), (float) tf.y);
-                gl.glVertex2f((float) (tf.x * vp.aspect), (float) tf.y);
-            } else if (tf.x >= 0 && previous.x <= 0 && Math.abs(previous.x - tf.x) > 0.5) {
+            } else if (tf.x >= 0 && previous.x <= 0) {
                 gl.glVertex2f((float) (-0.5 * vp.aspect), (float) tf.y);
                 gl.glEnd();
                 gl.glBegin(GL2.GL_LINE_STRIP);
                 gl.glVertex2f((float) (0.5 * vp.aspect), (float) tf.y);
-                gl.glVertex2f((float) (tf.x * vp.aspect), (float) tf.y);
-            } else {
-                gl.glVertex2f((float) (tf.x * vp.aspect), (float) tf.y);
             }
-        } else {
-            gl.glVertex2f((float) (tf.x * vp.aspect), (float) tf.y);
         }
+        gl.glVertex2f((float) (tf.x * vp.aspect), (float) tf.y);
         return tf;
     }
 /*
