@@ -132,9 +132,9 @@ public class GLHelper {
         return tf;
     }
 
-    public static void drawTexture(GL2 gl, FloatBuffer vertex, FloatBuffer texCoord) {
+    public static void drawTexQuad(GL2 gl, FloatBuffer vertex, FloatBuffer texCoord) {
         if (vertex.limit() != 12 || texCoord.limit() != 8) {
-            Log.error("Something is wrong with the vertices of this texture");
+            Log.error("Something is wrong with the vertices of this texture quad");
             return;
         }
 
@@ -147,6 +147,23 @@ public class GLHelper {
 
         gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glDisableClientState(GL2.GL_TEXTURE_COORD_ARRAY);
+    }
+
+    public static void drawColQuad(GL2 gl, FloatBuffer vertex, FloatBuffer color) {
+        if (vertex.limit() != 12 || color.limit() != 16) {
+            Log.error("Something is wrong with the vertices of this color quad");
+            return;
+        }
+
+        gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
+        gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
+
+        gl.glVertexPointer(3, GL2.GL_FLOAT, 0, vertex);
+        gl.glColorPointer(4, GL2.GL_FLOAT, 0, color);
+        gl.glDrawArrays(GL2.GL_TRIANGLE_FAN, 0, 4);
+
+        gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
+        gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
     }
 
 /*
