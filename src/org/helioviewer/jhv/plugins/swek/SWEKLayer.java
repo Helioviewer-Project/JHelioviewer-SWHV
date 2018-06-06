@@ -19,6 +19,7 @@ import javax.swing.SwingConstants;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.FloatArray;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.base.scale.Transform;
 import org.helioviewer.jhv.camera.Camera;
@@ -40,6 +41,7 @@ import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.opengl.GLLine;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.GLTexture;
@@ -54,8 +56,8 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     private final JPanel optionsPanel;
 
     private static final int DIVPOINTS = 10;
-    private static final float LINEWIDTH = 1;
-    private static final float LINEWIDTH_HIGHLIGHT = 2;
+    private static final double LINEWIDTH = 0.002;
+    private static final double LINEWIDTH_HIGHLIGHT = 0.003;
     private static final float LINEWIDTH_CACTUS = 2.02f;
 
     private static final HashMap<String, GLTexture> iconCacheId = new HashMap<>();
@@ -194,17 +196,18 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             return;
         }
 
-        Color color = evtr.getColor();
-        gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
-        gl.glLineWidth(evtr.isHighlighted() ? LINEWIDTH_HIGHLIGHT : LINEWIDTH);
+        Color c = evtr.getColor();
+        float[] color = { c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, 1 };
 
         // draw bounds
         Vec3 pt = new Vec3();
         float[] oldBoundaryPoint3d = new float[0];
         Vec2 previous = null;
         int plen = points.length / 3;
+
+        FloatArray pos = new FloatArray();
+        FloatArray col = new FloatArray();
         for (int i = 0; i < plen; i++) {
-            gl.glBegin(GL2.GL_LINE_STRIP);
             if (oldBoundaryPoint3d.length != 0) {
                 for (int j = 0; j <= DIVPOINTS; j++) {
                     double alpha = 1. - j / (double) DIVPOINTS;
@@ -214,18 +217,36 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                     double r = Math.sqrt(xnew * xnew + ynew * ynew + znew * znew);
 
                     if (Display.mode == Display.DisplayMode.Orthographic) {
-                        gl.glVertex3f((float) (xnew / r), (float) -(ynew / r), (float) (znew / r));
+                        float x =  (float) (xnew / r);
+                        float y = -(float) (ynew / r);
+                        float z =  (float) (znew / r);
+                        if (i == 0) {
+                            pos.put3f(x, y, z);
+                            col.put4f(BufferUtils.colorNull);
+                        }
+                        pos.put3f(x, y, z);
+                        col.put4f(color);
                     } else {
                         pt.x = xnew / r;
                         pt.y = ynew / r;
                         pt.z = znew / r;
-                        previous = GLHelper.drawVertex(camera, vp, gl, pt, previous);
+                        if (i == 0) {
+                            previous = GLHelper.drawVertex(camera, vp, pt, previous, pos, col, BufferUtils.colorNull);
+                        }
+                        previous = GLHelper.drawVertex(camera, vp, pt, previous, pos, col, color);
                     }
                 }
+                pos.repeat3f();
+                col.put4f(BufferUtils.colorNull);
             }
-            gl.glEnd();
             oldBoundaryPoint3d = new float[] { points[3 * i], points[3 * i + 1], points[3 * i + 2] };
         }
+
+        GLLine line = new GLLine();
+        line.init(gl);
+        line.setData(gl, pos.toBuffer(), col.toBuffer());
+        line.render(gl, vp.aspect, evtr.isHighlighted() ? LINEWIDTH_HIGHLIGHT : LINEWIDTH);
+        line.dispose(gl);
     }
 
     private void drawIcon(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
@@ -393,7 +414,6 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                     drawCactusArc(gl, evtr, evt, controller.currentTime);
                 } else {
                     drawPolygon(camera, vp, gl, evtr, evt);
-
                     if (icons) {
                         gl.glDisable(GL2.GL_DEPTH_TEST);
                         drawIcon(gl, evtr, evt);
@@ -413,7 +433,6 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                     drawCactusArcScale(gl, evtr, evt, controller.currentTime, Display.mode.scale, vp);
                 } else {
                     drawPolygon(camera, vp, gl, evtr, evt);
-
                     if (icons) {
                         gl.glDisable(GL2.GL_DEPTH_TEST);
                         drawIconScale(gl, evtr, evt, Display.mode.scale, Display.mode.xform, camera, vp);
