@@ -20,10 +20,10 @@ import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.opengl.GLLine;
 import org.helioviewer.jhv.opengl.GLShape;
 import org.helioviewer.jhv.opengl.GLText;
+import org.helioviewer.jhv.opengl.JhvTextRenderer;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class GridLayer extends AbstractLayer {
 
@@ -189,7 +189,7 @@ public class GridLayer extends AbstractLayer {
     private static void drawGridTextFlat(int size, GridScale scale, Viewport vp) {
         float w = (float) vp.aspect;
         float h = 1;
-        TextRenderer renderer = GLText.getRenderer(size);
+        JhvTextRenderer renderer = GLText.getRenderer(size);
         float textScaleFactor = textScale / renderer.getFont().getSize2D() * w / GridMath.FLAT_STEPS_THETA * 5;
 
         renderer.begin3DRendering();
@@ -224,7 +224,7 @@ public class GridLayer extends AbstractLayer {
 
         float fuzz = 0.75f;
         for (float rsize : labelPos) {
-            TextRenderer renderer = GLText.getRenderer((int) (fuzz * rsize * size));
+            JhvTextRenderer renderer = GLText.getRenderer((int) (fuzz * rsize * size));
             float textScaleFactor = textScale / renderer.getFont().getSize2D();
             renderer.begin3DRendering();
             for (GridLabel label : labels) {
@@ -237,7 +237,7 @@ public class GridLayer extends AbstractLayer {
     }
 
     private void drawGridText(GL2 gl, int size) {
-        TextRenderer renderer = GLText.getRenderer(size);
+        JhvTextRenderer renderer = GLText.getRenderer(size);
         // the scale factor has to be divided by the current font size
         float textScaleFactor = textScale / renderer.getFont().getSize2D();
 

@@ -149,7 +149,7 @@ public class GLHelper {
         gl.glDisableClientState(GL2.GL_TEXTURE_COORD_ARRAY);
     }
 
-    public static void drawColQuad(GL2 gl, FloatBuffer vertex, FloatBuffer color) {
+    public static void drawColorQuad(GL2 gl, FloatBuffer vertex, FloatBuffer color) {
         if (vertex.limit() != 12 || color.limit() != 16) {
             Log.error("Something is wrong with the vertices of this color quad");
             return;
