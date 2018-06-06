@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.camera.annotate;
 
+import org.helioviewer.jhv.base.FloatArray;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
@@ -7,17 +8,36 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
+import org.helioviewer.jhv.opengl.GLLine;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
 public class AnnotateRectangle extends AbstractAnnotateable {
 
+    private static final double thickness = 0.002;
+
+    private final GLLine line = new GLLine();
+    private boolean inited = false;
+
     public AnnotateRectangle(JSONObject jo) {
         super(jo);
     }
 
-    private static void drawRectangle(Camera camera, Viewport vp, GL2 gl, Vec3 bp, Vec3 ep) {
+    @Override
+    public void init(GL2 gl) {
+        if (!inited) {
+            line.init(gl);
+            inited = true;
+        }
+    }
+
+    @Override
+    public void dispose(GL2 gl) {
+        line.dispose(gl);
+    }
+
+    private static void drawRectangle(Camera camera, Viewport vp, Vec3 bp, Vec3 ep, FloatArray pos, FloatArray col, float[] color) {
         if (bp.z * ep.z < 0) {
             if (ep.z < bp.z && bp.z > Math.PI / 2)
                 ep.z += 2 * Math.PI;
@@ -28,15 +48,13 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         Vec3 p2 = new Vec3(radius, ep.y, bp.z);
         Vec3 p4 = new Vec3(radius, bp.y, ep.z);
 
-        gl.glBegin(GL2.GL_LINE_STRIP);
-        interpolatedDraw(camera, vp, gl, bp, p2);
-        interpolatedDraw(camera, vp, gl, p2, ep);
-        interpolatedDraw(camera, vp, gl, ep, p4);
-        interpolatedDraw(camera, vp, gl, p4, bp);
-        gl.glEnd();
+        interpolatedDraw(camera, vp, bp, p2, pos, col, color);
+        interpolatedDraw(camera, vp, p2, ep, pos, col, color);
+        interpolatedDraw(camera, vp, ep, p4, pos, col, color);
+        interpolatedDraw(camera, vp, p4, bp, pos, col, color);
     }
 
-    private static void interpolatedDraw(Camera camera, Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s) {
+    private static void interpolatedDraw(Camera camera, Viewport vp, Vec3 p1s, Vec3 p2s, FloatArray pos, FloatArray col, float[] color) {
         double delta = 2.5 * Math.PI / 180;
         int subdivisions = (int) Math.max(Math.abs(p1s.y - p2s.y) / delta, Math.abs(p1s.z - p2s.z) / delta);
         subdivisions = Math.max(1, subdivisions);
@@ -49,31 +67,31 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
             Vec3 pc = toCart(y, z);
             if (Display.mode == Display.DisplayMode.Orthographic) {
-                gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
+                pos.put3f((float) pc.x, (float) pc.y, (float) pc.z);
+                col.put4f(color);
             } else {
                 pc.y = -pc.y;
-                previous = GLHelper.drawVertex(camera, vp, gl, pc, previous);
+                previous = GLHelper.drawVertex(camera, vp, pc, previous, pos, col, color);
             }
         }
     }
 
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl, boolean active) {
-        if ((startPoint == null || endPoint == null) && !beingDragged())
+        boolean dragged = beingDragged();
+        if ((startPoint == null || endPoint == null) && !dragged)
             return;
 
-        gl.glLineWidth(lineWidth);
+        float[] color = dragged ? dragColor : (active ? activeColor : baseColor);
+        Vec3 p0 = dragged ? dragStartPoint : startPoint;
+        Vec3 p1 = dragged ? dragEndPoint : endPoint;
 
-        if (beingDragged()) {
-            gl.glColor3f(dragColor[0], dragColor[1], dragColor[2]);
-            drawRectangle(camera, vp, gl, toSpherical(dragStartPoint), toSpherical(dragEndPoint));
-        } else {
-            if (active)
-                gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
-            else
-                gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
-            drawRectangle(camera, vp, gl, toSpherical(startPoint), toSpherical(endPoint));
-        }
+        FloatArray pos = new FloatArray();
+        FloatArray col = new FloatArray();
+
+        drawRectangle(camera, vp, toSpherical(p0), toSpherical(p1), pos, col, color);
+        line.setData(gl, pos.toBuffer(), col.toBuffer());
+        line.render(gl, vp.aspect, thickness);
     }
 
     @Override
