@@ -65,33 +65,6 @@ public class GLHelper {
         return new Dimension((int) (x / GLInfo.pixelScaleFloat[0]), (int) (y / GLInfo.pixelScaleFloat[1]));
     }
 
-    public static Vec2 drawVertex(Camera camera, Viewport vp, GL2 gl, Vec3 current, Vec2 previous) {
-        Position viewpoint = camera.getViewpoint();
-        Vec3 pt = viewpoint.toQuat().rotateVector(current);
-        Vec2 tf = Display.mode.xform.transform(viewpoint, pt, Display.mode.scale);
-
-        float x;
-        float y = (float) tf.y;
-        if (previous != null && Math.abs(previous.x - tf.x) > 0.5) {
-            if (tf.x <= 0 && previous.x >= 0) {
-                x = (float) (0.5 * vp.aspect);
-                gl.glVertex2f(x, y);
-                gl.glEnd();
-                gl.glBegin(GL2.GL_LINE_STRIP);
-                gl.glVertex2f(-x, y);
-            } else if (tf.x >= 0 && previous.x <= 0) {
-                x = (float) (-0.5 * vp.aspect);
-                gl.glVertex2f(x, y);
-                gl.glEnd();
-                gl.glBegin(GL2.GL_LINE_STRIP);
-                gl.glVertex2f(-x, y);
-            }
-        }
-        x = (float) (tf.x * vp.aspect);
-        gl.glVertex2f(x, y);
-        return tf;
-    }
-
     public static Vec2 drawVertex(Camera camera, Viewport vp, Vec3 current, Vec2 previous, FloatArray pos, FloatArray col, float[] color) {
         Position viewpoint = camera.getViewpoint();
         Vec3 pt = viewpoint.toQuat().rotateVector(current);

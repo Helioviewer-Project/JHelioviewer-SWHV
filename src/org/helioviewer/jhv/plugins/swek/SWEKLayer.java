@@ -99,7 +99,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
     }
 
-    private static void interPolatedDraw(GL2 gl, int mres, double r_start, double r_end, double t_start, double t_end, Quat q, FloatArray pos, FloatArray col, float[] color) {
+    private static void interPolatedDraw(int mres, double r_start, double r_end, double t_start, double t_end, Quat q, FloatArray pos, FloatArray col, float[] color) {
         Vec3 v = new Vec3();
         for (int i = 0; i <= mres; i++) {
             double alpha = 1. - i / (double) mres;
@@ -148,12 +148,12 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         FloatArray pos = new FloatArray();
         FloatArray col = new FloatArray();
 
-        interPolatedDraw(gl, angularResolution, distSun, distSun, thetaStart, principalAngle, q, pos, col, color);
-        interPolatedDraw(gl, angularResolution, distSun, distSun, principalAngle, thetaEnd, q, pos, col, color);
+        interPolatedDraw(angularResolution, distSun, distSun, thetaStart, principalAngle, q, pos, col, color);
+        interPolatedDraw(angularResolution, distSun, distSun, principalAngle, thetaEnd, q, pos, col, color);
 
-        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaStart, thetaStart, q, pos, col, color);
-        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, q, pos, col, color);
-        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, q, pos, col, color);
+        interPolatedDraw(lineResolution, distSunBegin, distSun + 0.05, thetaStart, thetaStart, q, pos, col, color);
+        interPolatedDraw(lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, q, pos, col, color);
+        interPolatedDraw(lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, q, pos, col, color);
 
         GLLine line = new GLLine();
         line.init(gl);
@@ -290,7 +290,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         gl.glDisable(GL2.GL_TEXTURE_2D);
     }
 
-    private void drawIconScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Transform xform, Camera camera, Viewport vp) {
+    private void drawIconScale(Camera camera, Viewport vp, GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Transform xform) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -309,7 +309,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         }
     }
 
-    private void drawCactusArcScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp, GridScale scale, Viewport vp) {
+    private void drawCactusArcScale(Viewport vp, GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp, GridScale scale) {
         double angularWidthDegree = SWEKData.readCMEAngularWidthDegree(evt);
         double principalAngleDegree = SWEKData.readCMEPrincipalAngleDegree(evt) - 90;
         double speed = SWEKData.readCMESpeed(evt);
@@ -399,7 +399,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     private static final int MOUSE_OFFSET_X = 25;
     private static final int MOUSE_OFFSET_Y = 25;
 
-    private static void drawText(GL2 gl, Viewport vp, JHVRelatedEvents mouseOverJHVEvent, int x, int y) {
+    private static void drawText(Viewport vp, GL2 gl, JHVRelatedEvents mouseOverJHVEvent, int x, int y) {
         ArrayList<String> txts = new ArrayList<>();
         for (JHVEventParameter p : mouseOverJHVEvent.getClosestTo(controller.currentTime).getSimpleVisibleEventParameters()) {
             String name = p.getParameterName();
@@ -435,12 +435,12 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             for (JHVRelatedEvents evtr : SWEKData.getActiveEvents(controller.currentTime)) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
                 if (evt.isCactus() && (Display.mode == Display.DisplayMode.LogPolar || Display.mode == Display.DisplayMode.Polar)) {
-                    drawCactusArcScale(gl, evtr, evt, controller.currentTime, Display.mode.scale, vp);
+                    drawCactusArcScale(vp, gl, evtr, evt, controller.currentTime, Display.mode.scale);
                 } else {
                     drawPolygon(camera, vp, gl, evtr, evt);
                     if (icons) {
                         gl.glDisable(GL2.GL_DEPTH_TEST);
-                        drawIconScale(gl, evtr, evt, Display.mode.scale, Display.mode.xform, camera, vp);
+                        drawIconScale(camera, vp, gl, evtr, evt, Display.mode.scale, Display.mode.xform);
                         gl.glEnable(GL2.GL_DEPTH_TEST);
                     }
                 }
@@ -451,7 +451,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     @Override
     public void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
         if (SWEKPopupController.mouseOverJHVEvent != null) {
-            drawText(gl, vp, SWEKPopupController.mouseOverJHVEvent, SWEKPopupController.mouseOverX, SWEKPopupController.mouseOverY);
+            drawText(vp, gl, SWEKPopupController.mouseOverJHVEvent, SWEKPopupController.mouseOverX, SWEKPopupController.mouseOverY);
         }
     }
 
