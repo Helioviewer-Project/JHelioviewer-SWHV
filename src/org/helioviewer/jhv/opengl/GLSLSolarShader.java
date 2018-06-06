@@ -13,7 +13,7 @@ public class GLSLSolarShader extends GLSLShader {
     private static final float[] offsets = { -1.2004377f, 0, 1.2004377f };
 
     static {
-        // float[] v = new float[] { 0.06136f, 0.24477f, 0.38774f, 0.24477f, 0.06136f };
+        // float[] v = { 0.06136f, 0.24477f, 0.38774f, 0.24477f, 0.06136f };
         // http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
         float[] v = { .30613f, .38774f, .30613f };
 
