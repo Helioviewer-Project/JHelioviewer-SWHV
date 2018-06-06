@@ -220,7 +220,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                         float x =  (float) (xnew / r);
                         float y = -(float) (ynew / r);
                         float z =  (float) (znew / r);
-                        if (i == 0) {
+                        if (j == 0) {
                             pos.put3f(x, y, z);
                             col.put4f(BufferUtils.colorNull);
                         }
@@ -230,7 +230,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                         pt.x = xnew / r;
                         pt.y = ynew / r;
                         pt.z = znew / r;
-                        if (i == 0) {
+                        if (j == 0) {
                             previous = GLHelper.drawVertex(camera, vp, pt, previous, pos, col, BufferUtils.colorNull);
                         }
                         previous = GLHelper.drawVertex(camera, vp, pt, previous, pos, col, color);
