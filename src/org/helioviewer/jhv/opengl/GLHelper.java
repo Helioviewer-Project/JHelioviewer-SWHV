@@ -158,6 +158,7 @@ public class GLHelper {
         gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
 
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0); // fix for usage with TextRenderer vertex arrays
         gl.glVertexPointer(3, GL2.GL_FLOAT, 0, vertex);
         gl.glColorPointer(4, GL2.GL_FLOAT, 0, color);
         gl.glDrawArrays(GL2.GL_TRIANGLE_FAN, 0, 4);

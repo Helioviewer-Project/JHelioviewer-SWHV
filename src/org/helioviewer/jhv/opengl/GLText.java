@@ -41,7 +41,7 @@ public class GLText {
         if (renderer[idx] == null) {
             Font font = UIGlobals.UIFontRoboto.deriveFont((float) (idx * STEP + MIN));
             renderer[idx] = new JhvTextRenderer(font, true, true, null, true);
-            renderer[idx].setUseVertexArrays(false); // tbd what's going on, interference with the color quad
+            renderer[idx].setUseVertexArrays(true);
             // renderer[idx].setSmoothing(false);
             renderer[idx].setColor(Color.WHITE);
             // precache for grid text
