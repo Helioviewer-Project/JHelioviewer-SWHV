@@ -105,8 +105,8 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             Vec3 v = new Vec3();
             for (int i = 0; i <= mres; i++) {
                 double alpha = 1. - i / (double) mres;
-                double r = alpha * r_start + (1 - alpha) * (r_end);
-                double theta = alpha * t_start + (1 - alpha) * (t_end);
+                double r = alpha * r_start + (1 - alpha) * r_end;
+                double theta = alpha * t_start + (1 - alpha) * t_end;
 
                 v.x = r * Math.cos(theta);
                 v.y = r * Math.sin(theta);

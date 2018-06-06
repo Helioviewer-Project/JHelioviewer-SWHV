@@ -13,8 +13,6 @@ import org.helioviewer.jhv.math.Vec3;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL2;
-
 abstract class AbstractAnnotateable implements Annotateable {
 
     static final float[] activeColor = BufferUtils.colorRed;
