@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.camera.annotate;
 
+import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.FloatArray;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
@@ -7,17 +9,37 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
+import org.helioviewer.jhv.opengl.GLLine;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
 public class AnnotateCircle extends AbstractAnnotateable {
 
+    private static final int SUBDIVISIONS = 90;
+    private static final double thickness = 0.002;
+
+    private final GLLine line = new GLLine();
+    private boolean inited = false;
+
     public AnnotateCircle(JSONObject jo) {
         super(jo);
     }
 
-    private static void drawCircle(Camera camera, Viewport vp, GL2 gl, Vec3 bp, Vec3 ep) {
+    @Override
+    public void init(GL2 gl) {
+        if (!inited) {
+            line.init(gl);
+            inited = true;
+        }
+    }
+
+    @Override
+    public void dispose(GL2 gl) {
+        line.dispose(gl);
+    }
+
+    private static void drawCircle(Camera camera, Viewport vp, Vec3 bp, Vec3 ep, FloatArray pos, FloatArray col, float[] color) {
         double cosf = Vec3.dot(bp, ep);
         double r = Math.sqrt(1 - cosf * cosf);
         // P = center + r cos(A) (bp x ep) + r sin(A) ep
@@ -29,46 +51,46 @@ public class AnnotateCircle extends AbstractAnnotateable {
         u.normalize();
         Vec3 v = Vec3.cross(bp, u);
 
-        int subdivs = 90;
         Vec2 previous = null;
         Vec3 vx = new Vec3();
 
-        gl.glBegin(GL2.GL_LINE_STRIP);
-        for (int i = 0; i <= subdivs; i++) {
-            double t = i * 2. * Math.PI / subdivs;
+        for (int i = 0; i <= SUBDIVISIONS; i++) {
+            double t = i * 2. * Math.PI / SUBDIVISIONS;
             double cosr = Math.cos(t) * r;
             double sinr = Math.sin(t) * r;
             vx.x = center.x + cosr * u.x + sinr * v.x;
             vx.y = center.y + cosr * u.y + sinr * v.y;
             vx.z = center.z + cosr * u.z + sinr * v.z;
-
             if (Display.mode == Display.DisplayMode.Orthographic) {
-                gl.glVertex3f((float) vx.x, (float) vx.y, (float) vx.z);
+                if (i == 0) {
+                    pos.put3f((float) vx.x, (float) vx.y, (float) vx.z);
+                    col.put4f(BufferUtils.colorNull);
+                }
+                pos.put3f((float) vx.x, (float) vx.y, (float) vx.z);
+                col.put4f(color);
             } else {
                 vx.y = -vx.y;
-                previous = GLHelper.drawVertex(camera, vp, gl, vx, previous);
+                previous = GLHelper.drawVertex(camera, vp, vx, previous, pos, col, color);
             }
         }
-        gl.glEnd();
     }
 
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl, boolean active) {
-        if ((startPoint == null || endPoint == null) && !beingDragged())
+        boolean dragged = beingDragged();
+        if ((startPoint == null || endPoint == null) && !dragged)
             return;
 
-        gl.glLineWidth(lineWidth);
+        float[] color = dragged ? dragColor : (active ? activeColor : baseColor);
+        Vec3 p0 = dragged ? dragStartPoint : startPoint;
+        Vec3 p1 = dragged ? dragEndPoint : endPoint;
 
-        if (beingDragged()) {
-            gl.glColor3f(dragColor[0], dragColor[1], dragColor[2]);
-            drawCircle(camera, vp, gl, dragStartPoint, dragEndPoint);
-        } else {
-            if (active)
-                gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
-            else
-                gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
-            drawCircle(camera, vp, gl, startPoint, endPoint);
-        }
+        FloatArray pos = new FloatArray();
+        FloatArray col = new FloatArray();
+
+        drawCircle(camera, vp, p0, p1, pos, col, color);
+        line.setData(gl, pos.toBuffer(), col.toBuffer());
+        line.render(gl, vp.aspect, thickness);
     }
 
     @Override
