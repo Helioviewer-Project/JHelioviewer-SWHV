@@ -11,27 +11,13 @@ import com.jogamp.opengl.GL2;
 
 class PfssLine {
 
-    private static final double thickness = 0.004;
     private static final float[] openFieldColor = BufferUtils.colorRed;
     private static final float[] loopColor = BufferUtils.colorWhite;
     private static final float[] insideFieldColor = BufferUtils.colorBlue;
 
-    private final GLLine line = new GLLine();
     private final float[] brightColor = new float[4];
     private FloatBuffer vertices = BufferUtils.newFloatBuffer(0);
     private FloatBuffer colors = BufferUtils.newFloatBuffer(0);
-
-    void init(GL2 gl) {
-        line.init(gl);
-    }
-
-    void dispose(GL2 gl) {
-        line.dispose(gl);
-    }
-
-    void render(GL2 gl, double aspect) {
-        line.render(gl, aspect, thickness);
-    }
 
     private void computeBrightColor(double b) {
         if (b > 0) {
@@ -50,7 +36,7 @@ class PfssLine {
         return (buf.get(idx) + 32768.) * (2. / 65535.) - 1.;
     }
 
-    public void calculatePositions(GL2 gl, PfssData data, int detail, boolean fixedColor, double radius) {
+    public void calculatePositions(GL2 gl, PfssData data, int detail, boolean fixedColor, double radius, GLLine glslLine) {
         vertices.clear();
         colors.clear();
 
@@ -120,7 +106,7 @@ class PfssLine {
 
         vertices.rewind();
         colors.rewind();
-        line.setData(gl, vertices, colors);
+        glslLine.setData(gl, vertices, colors);
     }
 
 }
