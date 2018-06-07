@@ -75,9 +75,7 @@ public class GLListener implements GLEventListener {
 
     @Override
     public void dispose(GLAutoDrawable drawable) { // NEDT
-        GLText.dispose();
         GL2 gl = drawable.getGL().getGL2();
-
         EventQueue.invokeLater(() -> {
             disposeImpl(gl);
             GLInfo.checkGLErrors(gl, "GLListener.dispose()");
@@ -87,6 +85,8 @@ public class GLListener implements GLEventListener {
     private static void disposeImpl(GL2 gl) {
         Layers.dispose(gl);
         blackCircle.dispose(gl);
+        GLText.dispose(gl);
+
         GLSLSolarShader.dispose(gl);
         GLSLLineShader.dispose(gl);
         GLSLShapeShader.dispose(gl);
