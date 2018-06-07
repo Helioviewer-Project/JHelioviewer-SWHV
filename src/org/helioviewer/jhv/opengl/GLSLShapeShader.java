@@ -4,8 +4,8 @@ import com.jogamp.opengl.GL2;
 
 class GLSLShapeShader extends GLSLShader {
 
-    static final GLSLShapeShader point = new GLSLShapeShader("/data/vertexpoint.glsl", "/data/fragmentpoint.glsl");
-    static final GLSLShapeShader shape = new GLSLShapeShader("/data/vertexshape.glsl", "/data/fragmentshape.glsl");
+    static final GLSLShapeShader point = new GLSLShapeShader("/data/PointVertex.glsl", "/data/PointFrag.glsl");
+    static final GLSLShapeShader shape = new GLSLShapeShader("/data/ShapeVertex.glsl", "/data/ShapeFrag.glsl");
     static int positionRef = 0;
     static int colorRef = 1;
 

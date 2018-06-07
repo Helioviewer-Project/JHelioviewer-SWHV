@@ -24,7 +24,7 @@ public class GLSLShader {
 
     protected void _init(GL2 gl, boolean common) {
         try {
-            String fragmentCommonText = common ? FileUtils.streamToString(FileUtils.getResource("/data/fragmentcommon.glsl")) : "";
+            String fragmentCommonText = common ? FileUtils.streamToString(FileUtils.getResource("/data/SolarFragCommon.glsl")) : "";
             String fragmentText = FileUtils.streamToString(FileUtils.getResource(fragment));
             fragmentText = fragmentCommonText + fragmentText;
             String vertexText = FileUtils.streamToString(FileUtils.getResource(vertex));
