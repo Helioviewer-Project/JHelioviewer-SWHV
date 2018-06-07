@@ -41,11 +41,11 @@ import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
-import org.helioviewer.jhv.opengl.GLLine;
 import org.helioviewer.jhv.opengl.GLHelper;
+import org.helioviewer.jhv.opengl.GLSLLine;
+import org.helioviewer.jhv.opengl.GLSLTexture;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.GLTexture;
-import org.helioviewer.jhv.opengl.GLSLTexture;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -67,8 +67,8 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
     private boolean icons = true;
 
+    private final GLSLLine glslLine = new GLSLLine();
     private final GLSLTexture glslTexture = new GLSLTexture();
-    private final GLLine glslLine = new GLLine();
 
     public SWEKLayer(JSONObject jo) {
         if (jo != null)
@@ -534,14 +534,14 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             texBuf2.put(tc);
         texBuf1.rewind();
         texBuf2.rewind();
-        glslTexture.init(gl);
         glslLine.init(gl);
+        glslTexture.init(gl);
     }
 
     @Override
     public void dispose(GL2 gl) {
-        glslTexture.dispose(gl);
         glslLine.dispose(gl);
+        glslTexture.dispose(gl);
         for (GLTexture el : iconCacheId.values())
             el.delete(gl);
         iconCacheId.clear();

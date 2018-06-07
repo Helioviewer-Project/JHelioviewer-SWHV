@@ -19,8 +19,8 @@ public class FOVShape {
     private final FloatBuffer linePosition = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2)) * 3);
     private final FloatBuffer lineColor = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2)) * 4);
 
-    private final GLLine line = new GLLine();
-    private final GLShape point = new GLShape();
+    private final GLSLLine line = new GLSLLine();
+    private final GLSLShape point = new GLSLShape();
 
     private double centerX = 0;
     private double centerY = 0;

@@ -9,7 +9,7 @@ import org.helioviewer.jhv.log.Log;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 
-public class GLShape {
+public class GLSLShape {
 
     private int[] vboAttribRefs;
     private final int[] vboAttribLens = { 4, 4 };

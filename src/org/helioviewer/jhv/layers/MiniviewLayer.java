@@ -18,7 +18,7 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.math.Mat4;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.helioviewer.jhv.opengl.GLShape;
+import org.helioviewer.jhv.opengl.GLSLShape;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -31,8 +31,8 @@ public class MiniviewLayer extends AbstractLayer {
 
     private static final float[] colorCircle = { 1 * 0.2f, 0, 0, 0.2f };
     private static final float[] colorRectangle = { 0, 1 * 0.2f, 0, 0.2f };
-    private static final GLShape circle = new GLShape();
-    private static final GLShape rectangle = new GLShape();
+    private static final GLSLShape circle = new GLSLShape();
+    private static final GLSLShape rectangle = new GLSLShape();
 
     private final JPanel optionsPanel;
     private Viewport miniViewport = new Viewport(0, 0, 0, 100, 100);

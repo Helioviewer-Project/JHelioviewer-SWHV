@@ -17,8 +17,8 @@ import org.helioviewer.jhv.math.Mat4;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
-import org.helioviewer.jhv.opengl.GLLine;
-import org.helioviewer.jhv.opengl.GLShape;
+import org.helioviewer.jhv.opengl.GLSLLine;
+import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
 import org.json.JSONObject;
 
@@ -52,15 +52,15 @@ public class GridLayer extends AbstractLayer {
     private boolean showLabels = true;
     private boolean showRadial = false;
 
-    private final GLShape earthPoint = new GLShape();
-    private final GLLine axesLine = new GLLine();
-    private final GLLine earthCircleLine = new GLLine();
-    private final GLLine radialCircleLine = new GLLine();
-    private final GLLine radialThickLine = new GLLine();
-    private final GLLine radialCircleLineFar = new GLLine();
-    private final GLLine radialThickLineFar = new GLLine();
-    private final GLLine flatLine = new GLLine();
-    private final GLLine gridLine = new GLLine();
+    private final GLSLShape earthPoint = new GLSLShape();
+    private final GLSLLine axesLine = new GLSLLine();
+    private final GLSLLine earthCircleLine = new GLSLLine();
+    private final GLSLLine radialCircleLine = new GLSLLine();
+    private final GLSLLine radialThickLine = new GLSLLine();
+    private final GLSLLine radialCircleLineFar = new GLSLLine();
+    private final GLSLLine radialThickLineFar = new GLSLLine();
+    private final GLSLLine flatLine = new GLSLLine();
+    private final GLSLLine gridLine = new GLSLLine();
 
     private ArrayList<GridLabel> latLabels;
     private ArrayList<GridLabel> lonLabels;

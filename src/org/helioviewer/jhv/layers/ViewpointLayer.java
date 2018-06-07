@@ -21,7 +21,7 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.FOVShape;
 import org.helioviewer.jhv.opengl.GLInfo;
-import org.helioviewer.jhv.opengl.GLShape;
+import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.time.JHVDate;
 import org.json.JSONObject;
@@ -36,7 +36,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     private static final float planetSize = 5f;
 
     private final FOVShape fov = new FOVShape(thickness);
-    private final GLShape planets = new GLShape();
+    private final GLSLShape planets = new GLSLShape();
     private final CameraOptionsPanel optionsPanel;
 
     private String timeString = null;

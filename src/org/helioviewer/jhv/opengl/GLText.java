@@ -18,7 +18,7 @@ public class GLText {
     private static final TextRenderer[] renderer = new TextRenderer[SIZE];
 
     private static final float[] col = { 0.33f, 0.33f, 0.33f, 0.9f };
-    private static final GLShape rectangle = new GLShape();
+    private static final GLSLShape rectangle = new GLSLShape();
 
     public static TextRenderer getRenderer(int size) {
         size *= GLInfo.pixelScale[1];
