@@ -18,6 +18,7 @@ public class GLText {
     private static final TextRenderer[] renderer = new TextRenderer[SIZE];
 
     private static final float[] col = { 0.33f, 0.33f, 0.33f, 0.9f };
+    private static final GLShape rectangle = new GLShape();
 
     public static TextRenderer getRenderer(int size) {
         size *= GLInfo.pixelScale[1];
@@ -40,7 +41,8 @@ public class GLText {
         return renderer[idx];
     }
 
-    public static void dispose() {
+    public static void dispose(GL2 gl) {
+        rectangle.dispose(gl);
         for (int i = 0; i < SIZE; i++) {
             if (renderer[i] != null) {
                 renderer[i].dispose();
@@ -89,7 +91,6 @@ public class GLText {
 
         renderer.beginRendering(vp.width, vp.height, true);
 
-        GLShape rectangle = new GLShape();
         rectangle.init(gl);
         GLHelper.initRectangleFront(gl, rectangle, left, bottom - vp.height, w, h, col);
         rectangle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
