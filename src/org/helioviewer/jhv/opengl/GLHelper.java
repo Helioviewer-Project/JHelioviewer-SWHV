@@ -23,7 +23,7 @@ import com.jogamp.opengl.GLProfile;
 
 public class GLHelper {
 
-    public static void initCircleFront(GL2 gl, GLShape circle, double x, double y, double r, int segments, float[] color) {
+    public static void initCircleFront(GL2 gl, GLSLShape circle, double x, double y, double r, int segments, float[] color) {
         FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(4 * (segments + 1));
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4 * (segments + 1));
         for (int i = 0; i <= segments; ++i) {
@@ -36,7 +36,7 @@ public class GLHelper {
         circle.setData(gl, positionBuffer, colorBuffer);
     }
 
-    public static void initRectangleFront(GL2 gl, GLShape rectangle, double x0, double y0, double w, double h, float[] color) {
+    public static void initRectangleFront(GL2 gl, GLSLShape rectangle, double x0, double y0, double w, double h, float[] color) {
         int vertices = 4;
         FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(4 * vertices);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4 * vertices);

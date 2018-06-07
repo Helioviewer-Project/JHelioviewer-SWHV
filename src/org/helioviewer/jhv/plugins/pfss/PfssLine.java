@@ -4,7 +4,7 @@ import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
-import org.helioviewer.jhv.opengl.GLLine;
+import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.plugins.pfss.data.PfssData;
 
 import com.jogamp.opengl.GL2;
@@ -36,7 +36,7 @@ class PfssLine {
         return (buf.get(idx) + 32768.) * (2. / 65535.) - 1.;
     }
 
-    public void calculatePositions(GL2 gl, PfssData data, int detail, boolean fixedColor, double radius, GLLine glslLine) {
+    public void calculatePositions(GL2 gl, PfssData data, int detail, boolean fixedColor, double radius, GLSLLine glslLine) {
         vertices.clear();
         colors.clear();
 

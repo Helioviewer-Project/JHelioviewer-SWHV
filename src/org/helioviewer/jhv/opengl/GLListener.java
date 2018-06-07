@@ -26,7 +26,7 @@ public class GLListener implements GLEventListener {
     private final ScalableSurface surface;
     private boolean reshaped;
 
-    private static final GLShape blackCircle = new GLShape();
+    private static final GLSLShape blackCircle = new GLSLShape();
 
     public GLListener(ScalableSurface _surface) {
         surface = _surface;
