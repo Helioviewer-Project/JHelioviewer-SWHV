@@ -19,7 +19,7 @@ import com.jogamp.opengl.GL2;
 
 public class GLTexture {
 
-    private int texID = -1;
+    private int texID;
 
     private int prev_width = -1;
     private int prev_height = -1;

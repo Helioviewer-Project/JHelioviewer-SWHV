@@ -45,6 +45,7 @@ import org.helioviewer.jhv.opengl.GLLine;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.GLTexture;
+import org.helioviewer.jhv.opengl.GLSLTexture;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -65,6 +66,8 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     private static final double ICON_SIZE_HIGHLIGHTED = 0.16;
 
     private boolean icons = true;
+
+    private final GLSLTexture glslTexture = new GLSLTexture();
 
     public SWEKLayer(JSONObject jo) {
         if (jo != null)
@@ -169,7 +172,6 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                 sz = ICON_SIZE_HIGHLIGHTED;
             }
 
-            gl.glEnable(GL2.GL_TEXTURE_2D);
             FloatBuffer vertex = BufferUtils.newFloatBuffer(12);
             {
                 Vec3 v = new Vec3();
@@ -186,8 +188,8 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                 }
                 vertex.rewind();
             }
-            GLHelper.drawTexQuad(gl, vertex, texBuf1);
-            gl.glDisable(GL2.GL_TEXTURE_2D);
+            glslTexture.setData(gl, vertex, texBuf1);
+            glslTexture.render(gl, color);
         }
     }
 
@@ -261,23 +263,23 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
         Vec3 pt = pi.centralPoint();
         if (pt != null) {
-            bindTexture(gl, evtr.getSupplier().getGroup());
-            Color color = evtr.getColor();
+            Color c = evtr.getColor();
             float alpha = 0.6f;
-            gl.glColor4f(color.getRed() / 255f * alpha, color.getGreen() / 255f * alpha, color.getBlue() / 255f * alpha, alpha);
+            float[] color = { c.getRed() / 255f * alpha, c.getGreen() / 255f * alpha, c.getBlue() / 255f * alpha, alpha };
+
+            bindTexture(gl, evtr.getSupplier().getGroup());
             if (evtr.isHighlighted()) {
-                drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
+                drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED, color);
             } else {
-                drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE, ICON_SIZE);
+                drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE, ICON_SIZE, color);
             }
         }
     }
 
-    private void drawImageScale(GL2 gl, double theta, double r, double width, double height) {
+    private void drawImageScale(GL2 gl, double theta, double r, double width, double height, float[] color) {
         double width2 = width / 4.;
         double height2 = height / 4.;
 
-        gl.glEnable(GL2.GL_TEXTURE_2D);
         FloatBuffer vertex = BufferUtils.newFloatBuffer(12);
         {
             BufferUtils.put3f(vertex, (float) (theta + width2), (float) (r - height2), 0);
@@ -286,8 +288,8 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             BufferUtils.put3f(vertex, (float) (theta - width2), (float) (r - height2), 0);
             vertex.rewind();
         }
-        GLHelper.drawTexQuad(gl, vertex, texBuf2);
-        gl.glDisable(GL2.GL_TEXTURE_2D);
+        glslTexture.setData(gl, vertex, texBuf2);
+        glslTexture.render(gl, color);
     }
 
     private void drawIconScale(Camera camera, Viewport vp, GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Transform xform) {
@@ -300,11 +302,16 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             Position viewpoint = camera.getViewpoint();
             pt = viewpoint.toQuat().rotateVector(pt);
             Vec2 tf = xform.transform(viewpoint, pt, scale);
+
+            Color c = evtr.getColor();
+            float alpha = 0.6f;
+            float[] color = { c.getRed() / 255f * alpha, c.getGreen() / 255f * alpha, c.getBlue() / 255f * alpha, alpha };
+
             bindTexture(gl, evtr.getSupplier().getGroup());
             if (evtr.isHighlighted()) {
-                drawImageScale(gl, tf.x * vp.aspect, tf.y, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
+                drawImageScale(gl, tf.x * vp.aspect, tf.y, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED, color);
             } else {
-                drawImageScale(gl, tf.x * vp.aspect, tf.y, ICON_SIZE, ICON_SIZE);
+                drawImageScale(gl, tf.x * vp.aspect, tf.y, ICON_SIZE, ICON_SIZE, color);
             }
         }
     }
@@ -387,14 +394,14 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         if (icons) {
             bindTexture(gl, evtr.getSupplier().getGroup());
             if (evtr.isHighlighted()) {
-                drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
+                drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED, color);
             } else {
-                drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), ICON_SIZE, ICON_SIZE);
+                drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), ICON_SIZE, ICON_SIZE, color);
             }
         }
     }
 
-    private void drawImage3d(GL2 gl, double x, double y, double z, double width, double height) {
+    private void drawImage3d(GL2 gl, double x, double y, double z, double width, double height, float[] color) {
         y = -y;
 
         double width2 = width / 2.;
@@ -412,7 +419,6 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         p2.add(targetDir);
         p3.add(targetDir);
 
-        gl.glEnable(GL2.GL_TEXTURE_2D);
         FloatBuffer vertex = BufferUtils.newFloatBuffer(12);
         {
             BufferUtils.put3f(vertex, p3);
@@ -421,8 +427,8 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             BufferUtils.put3f(vertex, p0);
             vertex.rewind();
         }
-        GLHelper.drawTexQuad(gl, vertex, texBuf2);
-        gl.glDisable(GL2.GL_TEXTURE_2D);
+        glslTexture.setData(gl, vertex, texBuf2);
+        glslTexture.render(gl, color);
     }
 
     private static final int MOUSE_OFFSET_X = 25;
@@ -537,10 +543,12 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             texBuf2.put(tc);
         texBuf1.rewind();
         texBuf2.rewind();
+        glslTexture.init(gl);
     }
 
     @Override
     public void dispose(GL2 gl) {
+        glslTexture.dispose(gl);
         for (GLTexture el : iconCacheId.values())
             el.delete(gl);
         iconCacheId.clear();
