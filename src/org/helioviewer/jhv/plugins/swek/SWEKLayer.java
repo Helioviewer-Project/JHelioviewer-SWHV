@@ -320,40 +320,69 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         double thetaStart = MathUtils.mapTo0To360(principalAngleDegree - angularWidthDegree / 2.);
         double thetaEnd = MathUtils.mapTo0To360(principalAngleDegree + angularWidthDegree / 2.);
 
-        Color color = evtr.getColor();
+        Color c = evtr.getColor();
+        float[] color = { c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, 1 };
+        float x, y;
 
-        gl.glColor3f(0, 0, 0);
-        gl.glLineWidth(/*LINEWIDTH_CACTUS*/ 2.02f * 1.2f);
-        gl.glBegin(GL2.GL_LINES);
-        {
-            gl.glVertex2f((float) (scale.getXValueInv(thetaStart) * vp.aspect), (float) scale.getYValueInv(distSun));
-            if (thetaEnd < thetaStart) {
-                gl.glVertex2f((float) (scale.getXValueInv(360) * vp.aspect), (float) scale.getYValueInv(distSun));
-                gl.glVertex2f((float) (scale.getXValueInv(0) * vp.aspect), (float) scale.getYValueInv(distSun));
-            }
-            gl.glVertex2f((float) (scale.getXValueInv(thetaEnd) * vp.aspect), (float) scale.getYValueInv(distSun));
-        }
-        gl.glEnd();
+        FloatArray pos = new FloatArray();
+        FloatArray col = new FloatArray();
 
-        gl.glLineWidth(/*LINEWIDTH_CACTUS*/ 2.02f);
-        gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
-        gl.glBegin(GL2.GL_LINES);
-        {
-            gl.glVertex2f((float) (scale.getXValueInv(thetaStart) * vp.aspect), (float) scale.getYValueInv(distSun));
-            if (thetaEnd < thetaStart) {
-                gl.glVertex2f((float) (scale.getXValueInv(360) * vp.aspect), (float) scale.getYValueInv(distSun));
-                gl.glVertex2f((float) (scale.getXValueInv(0) * vp.aspect), (float) scale.getYValueInv(distSun));
-            }
-            gl.glVertex2f((float) (scale.getXValueInv(thetaEnd) * vp.aspect), (float) scale.getYValueInv(distSun));
-            gl.glVertex2f((float) (scale.getXValueInv(thetaStart) * vp.aspect), (float) scale.getYValueInv(distSunBegin));
-            gl.glVertex2f((float) (scale.getXValueInv(thetaStart) * vp.aspect), (float) scale.getYValueInv(distSun + 0.05));
-            gl.glVertex2f((float) (scale.getXValueInv(thetaEnd) * vp.aspect), (float) scale.getYValueInv(distSunBegin));
-            gl.glVertex2f((float) (scale.getXValueInv(thetaEnd) * vp.aspect), (float) scale.getYValueInv(distSun + 0.05));
+        x = (float) (scale.getXValueInv(thetaStart) * vp.aspect);
+        y = (float) scale.getYValueInv(distSunBegin);
+        pos.put3f(x, y, 0);
+        col.put4f(BufferUtils.colorNull);
+        pos.put3f(x, y, 0);
+        col.put4f(color);
 
-            gl.glVertex2f((float) (scale.getXValueInv(principalAngleDegree) * vp.aspect), (float) scale.getYValueInv(distSunBegin));
-            gl.glVertex2f((float) (scale.getXValueInv(principalAngleDegree) * vp.aspect), (float) scale.getYValueInv(distSun + 0.05));
-        }
-        gl.glEnd();
+        y = (float) scale.getYValueInv(distSun + 0.05);
+        pos.put3f(x, y, 0);
+        col.put4f(color);
+        pos.put3f(x, y, 0);
+        col.put4f(BufferUtils.colorNull);
+
+        x = (float) (scale.getXValueInv(principalAngleDegree) * vp.aspect);
+        y = (float) scale.getYValueInv(distSunBegin);
+        pos.put3f(x, y, 0);
+        col.put4f(BufferUtils.colorNull);
+        pos.put3f(x, y, 0);
+        col.put4f(color);
+
+        y = (float) scale.getYValueInv(distSun + 0.05);
+        pos.put3f(x, y, 0);
+        col.put4f(color);
+        pos.put3f(x, y, 0);
+        col.put4f(BufferUtils.colorNull);
+
+        x = (float) (scale.getXValueInv(thetaEnd) * vp.aspect);
+        y = (float) scale.getYValueInv(distSunBegin);
+        pos.put3f(x, y, 0);
+        col.put4f(BufferUtils.colorNull);
+        pos.put3f(x, y, 0);
+        col.put4f(color);
+
+        y = (float) scale.getYValueInv(distSun + 0.05);
+        pos.put3f(x, y, 0);
+        col.put4f(color);
+        pos.put3f(x, y, 0);
+        col.put4f(BufferUtils.colorNull);
+
+        y = (float) scale.getYValueInv(distSun);
+        pos.put3f(x, y, 0);
+        col.put4f(BufferUtils.colorNull);
+        pos.put3f(x, y, 0);
+        col.put4f(color);
+
+        x = (float) (scale.getXValueInv(thetaStart) * vp.aspect);
+        pos.put3f(x, y, 0);
+        col.put4f(color);
+        pos.put3f(x, y, 0);
+        col.put4f(BufferUtils.colorNull);
+
+        GLLine line = new GLLine();
+        line.init(gl);
+        line.setData(gl, pos.toBuffer(), col.toBuffer());
+        line.render(gl, vp.aspect, LINEWIDTH_CACTUS);
+        line.dispose(gl);
 
         if (icons) {
             bindTexture(gl, evtr.getSupplier().getGroup());
