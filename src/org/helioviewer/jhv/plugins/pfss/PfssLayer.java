@@ -13,6 +13,7 @@ import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.opengl.GLLine;
 import org.helioviewer.jhv.plugins.pfss.data.PfssData;
 import org.helioviewer.jhv.plugins.pfss.data.PfssNewDataLoader;
 import org.helioviewer.jhv.threads.CancelTask;
@@ -23,8 +24,11 @@ import com.jogamp.opengl.GL2;
 // has to be public for state
 public class PfssLayer extends AbstractLayer implements TimespanListener {
 
+    private static final double thickness = 0.004;
+
     private final PfssLayerOptions optionsPanel;
-    private final PfssLine line = new PfssLine();
+    private final PfssLine pfssLine = new PfssLine();
+    private final GLLine glslLine = new GLLine();
     private PfssData previousPfssData;
 
     public PfssLayer(JSONObject jo) {
@@ -111,12 +115,12 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
 
     @Override
     public void init(GL2 gl) {
-        line.init(gl);
+        glslLine.init(gl);
     }
 
     @Override
     public void dispose(GL2 gl) {
-        line.dispose(gl);
+        glslLine.dispose(gl);
     }
 
     @Override
@@ -138,12 +142,12 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
             lastFixedColor = fixedColor;
             lastRadius = radius;
 
-            line.calculatePositions(gl, data, detail, fixedColor, radius);
+            pfssLine.calculatePositions(gl, data, detail, fixedColor, radius, glslLine);
 
             timeString = data.dateObs.toString();
             ImageViewerGui.getLayers().fireTimeUpdated(this);
         }
-        line.render(gl, aspect);
+        glslLine.render(gl, aspect, thickness);
     }
 
 }
