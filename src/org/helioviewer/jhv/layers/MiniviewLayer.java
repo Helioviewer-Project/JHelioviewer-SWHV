@@ -68,7 +68,7 @@ public class MiniviewLayer extends AbstractLayer {
         gl.glPushMatrix();
         {
             gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
-            rectangle.renderShape(gl, GL2.GL_QUADS);
+            rectangle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
             circle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
         }
         gl.glPopMatrix();
