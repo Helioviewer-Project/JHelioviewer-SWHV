@@ -2,10 +2,8 @@ package org.helioviewer.jhv.opengl;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.nio.FloatBuffer;
 import java.util.List;
 
-import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.UIGlobals;
 
@@ -20,15 +18,7 @@ public class GLText {
     private static final int SIZE = (MAX - MIN) / STEP + 1;
     private static final TextRenderer[] renderer = new TextRenderer[SIZE];
 
-    private static final FloatBuffer color = BufferUtils.newFloatBuffer(16);
-
-    static {
-        BufferUtils.put4f(color, 0.33f, 0.33f, 0.33f, 0.9f);
-        BufferUtils.put4f(color, 0.33f, 0.33f, 0.33f, 0.9f);
-        BufferUtils.put4f(color, 0.33f, 0.33f, 0.33f, 0.9f);
-        BufferUtils.put4f(color, 0.33f, 0.33f, 0.33f, 0.9f);
-        color.rewind();
-    }
+    private static final float[] col = { 0.33f, 0.33f, 0.33f, 0.9f };
 
     public static TextRenderer getRenderer(int size) {
         size *= GLInfo.pixelScale[1];
@@ -100,18 +90,11 @@ public class GLText {
 
         renderer.beginRendering(vp.width, vp.height, true);
 
-        gl.glDisable(GL2.GL_TEXTURE_2D);
-        FloatBuffer vertex = BufferUtils.newFloatBuffer(12);
-        {
-            BufferUtils.put3f(vertex, left, vp.height - bottom, 0);
-            BufferUtils.put3f(vertex, left, vp.height - bottom - h, 0);
-            BufferUtils.put3f(vertex, left + w, vp.height - bottom - h, 0);
-            BufferUtils.put3f(vertex, left + w, vp.height - bottom, 0);
-            vertex.rewind();
-
-        }
-        GLHelper.drawColorQuad(gl, vertex, color);
-        gl.glEnable(GL2.GL_TEXTURE_2D);
+        GLShape rectangle = new GLShape();
+        rectangle.init(gl);
+        GLHelper.initRectangleFront(gl, rectangle, left, bottom - vp.height, w, h, col);
+        rectangle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
+        rectangle.dispose(gl);
 
         gl.glColor4f(1, 1, 1, 1);
         int deltaY = 0;
@@ -120,7 +103,6 @@ public class GLText {
             deltaY += (int) (fontSize * 1.1);
         }
         renderer.endRendering();
-        gl.glDisable(GL2.GL_TEXTURE_2D);
     }
 
 }
