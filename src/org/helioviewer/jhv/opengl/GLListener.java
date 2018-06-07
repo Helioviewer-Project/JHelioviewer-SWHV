@@ -18,7 +18,6 @@ import org.helioviewer.jhv.layers.Movie;
 import com.jogamp.nativewindow.ScalableSurface;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.GLContext;
 import com.jogamp.opengl.GLEventListener;
 
 public class GLListener implements GLEventListener {
@@ -34,8 +33,7 @@ public class GLListener implements GLEventListener {
 
     @Override
     public void init(GLAutoDrawable drawable) { // NEDT
-        GLContext ctx = drawable.getContext();
-        GL2 gl = ctx.getGL().getGL2();
+        GL2 gl = drawable.getGL().getGL2();
         GLInfo.update(gl);
         GLInfo.updatePixelScale(surface);
 
@@ -180,7 +178,7 @@ public class GLListener implements GLEventListener {
             return;
         }
 
-        GL2 gl = (GL2) drawable.getGL();
+        GL2 gl = drawable.getGL().getGL2();
         GLInfo.updatePixelScale(surface);
 
         Layers.prerender(gl);
