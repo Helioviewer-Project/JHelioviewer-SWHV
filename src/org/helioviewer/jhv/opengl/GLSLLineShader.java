@@ -4,7 +4,7 @@ import com.jogamp.opengl.GL2;
 
 class GLSLLineShader extends GLSLShader {
 
-    static final GLSLLineShader line = new GLSLLineShader("/data/vertexline.glsl", "/data/fragmentline.glsl");
+    static final GLSLLineShader line = new GLSLLineShader("/data/LineVertex.glsl", "/data/LineFrag.glsl");
     static int previousLineRef = 0;
     static int lineRef = 1;
     static int nextLineRef = 2;

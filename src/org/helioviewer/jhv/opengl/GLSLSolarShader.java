@@ -24,10 +24,10 @@ public class GLSLSolarShader extends GLSLShader {
         };
     }
 
-    public static final GLSLSolarShader ortho = new GLSLSolarShader("/data/vertex.glsl", "/data/fragmentortho.glsl");
-    public static final GLSLSolarShader lati = new GLSLSolarShader("/data/vertex.glsl", "/data/fragmentlati.glsl");
-    public static final GLSLSolarShader polar = new GLSLSolarShader("/data/vertex.glsl", "/data/fragmentpolar.glsl");
-    public static final GLSLSolarShader logpolar = new GLSLSolarShader("/data/vertex.glsl", "/data/fragmentlogpolar.glsl");
+    public static final GLSLSolarShader ortho = new GLSLSolarShader("/data/SolarVertex.glsl", "/data/SolarFragOrtho.glsl");
+    public static final GLSLSolarShader lati = new GLSLSolarShader("/data/SolarVertex.glsl", "/data/SolarFragLati.glsl");
+    public static final GLSLSolarShader polar = new GLSLSolarShader("/data/SolarVertex.glsl", "/data/SolarFragPolar.glsl");
+    public static final GLSLSolarShader logpolar = new GLSLSolarShader("/data/SolarVertex.glsl", "/data/SolarFragLogPolar.glsl");
 
     private int isDiffRef;
     private int isDiscRef;
