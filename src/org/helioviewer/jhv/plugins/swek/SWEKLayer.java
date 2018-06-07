@@ -68,13 +68,13 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     private boolean icons = true;
 
     private final GLSLTexture glslTexture = new GLSLTexture();
+    private final GLLine glslLine = new GLLine();
 
     public SWEKLayer(JSONObject jo) {
         if (jo != null)
             icons = jo.optBoolean("icons", icons);
         else
             setEnabled(true);
-
         optionsPanel = optionsPanel();
     }
 
@@ -158,11 +158,8 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         interPolatedDraw(lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, q, pos, col, color);
         interPolatedDraw(lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, q, pos, col, color);
 
-        GLLine line = new GLLine();
-        line.init(gl);
-        line.setData(gl, pos.toBuffer(), col.toBuffer());
-        line.render(gl, vp.aspect, LINEWIDTH_CACTUS);
-        line.dispose(gl);
+        glslLine.setData(gl, pos.toBuffer(), col.toBuffer());
+        glslLine.render(gl, vp.aspect, LINEWIDTH_CACTUS);
 
         if (icons) {
             bindTexture(gl, evtr.getSupplier().getGroup());
@@ -193,7 +190,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         }
     }
 
-    private static void drawPolygon(Camera camera, Viewport vp, GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
+    private void drawPolygon(Camera camera, Viewport vp, GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -249,11 +246,8 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             oldBoundaryPoint3d = new float[] { points[3 * i], points[3 * i + 1], points[3 * i + 2] };
         }
 
-        GLLine line = new GLLine();
-        line.init(gl);
-        line.setData(gl, pos.toBuffer(), col.toBuffer());
-        line.render(gl, vp.aspect, evtr.isHighlighted() ? LINEWIDTH_HIGHLIGHT : LINEWIDTH);
-        line.dispose(gl);
+        glslLine.setData(gl, pos.toBuffer(), col.toBuffer());
+        glslLine.render(gl, vp.aspect, evtr.isHighlighted() ? LINEWIDTH_HIGHLIGHT : LINEWIDTH);
     }
 
     private void drawIcon(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
@@ -385,11 +379,8 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         pos.put3f(x, y, 0);
         col.put4f(BufferUtils.colorNull);
 
-        GLLine line = new GLLine();
-        line.init(gl);
-        line.setData(gl, pos.toBuffer(), col.toBuffer());
-        line.render(gl, vp.aspect, LINEWIDTH_CACTUS);
-        line.dispose(gl);
+        glslLine.setData(gl, pos.toBuffer(), col.toBuffer());
+        glslLine.render(gl, vp.aspect, LINEWIDTH_CACTUS);
 
         if (icons) {
             bindTexture(gl, evtr.getSupplier().getGroup());
@@ -544,11 +535,13 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         texBuf1.rewind();
         texBuf2.rewind();
         glslTexture.init(gl);
+        glslLine.init(gl);
     }
 
     @Override
     public void dispose(GL2 gl) {
         glslTexture.dispose(gl);
+        glslLine.dispose(gl);
         for (GLTexture el : iconCacheId.values())
             el.delete(gl);
         iconCacheId.clear();
