@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.util.List;
 
@@ -34,7 +33,7 @@ public class GLText {
             renderer[idx] = new TextRenderer(font, true, true, null, true);
             renderer[idx].setUseVertexArrays(true);
             // renderer[idx].setSmoothing(false);
-            renderer[idx].setColor(Color.WHITE);
+            // renderer[idx].setColor(1, 1, 1, 1);
             // precache for grid text
             renderer[idx].draw3D("-0123456789.", 0, 0, 0, 0);
         }
@@ -96,7 +95,6 @@ public class GLText {
         rectangle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
         rectangle.dispose(gl);
 
-        gl.glColor4f(1, 1, 1, 1);
         int deltaY = 0;
         for (String txt : txts) {
             renderer.draw(txt, textInit_x, vp.height - textInit_y - deltaY);
