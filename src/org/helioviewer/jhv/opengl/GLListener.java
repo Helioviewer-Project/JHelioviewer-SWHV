@@ -67,6 +67,7 @@ public class GLListener implements GLEventListener {
         GLSLSolarShader.init(gl);
         GLSLLineShader.init(gl);
         GLSLShapeShader.init(gl);
+        GLSLTextureShader.init(gl);
 
         blackCircle.init(gl);
         GLHelper.initCircleFront(gl, blackCircle, 0, 0, 0.996, 360, BufferUtils.colorBlack);
@@ -89,6 +90,7 @@ public class GLListener implements GLEventListener {
         GLSLSolarShader.dispose(gl);
         GLSLLineShader.dispose(gl);
         GLSLShapeShader.dispose(gl);
+        GLSLTextureShader.dispose(gl);
     }
 
     private ExportMovie exporter;

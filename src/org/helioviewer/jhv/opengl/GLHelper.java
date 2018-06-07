@@ -10,7 +10,6 @@ import org.helioviewer.jhv.base.FloatArray;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 
@@ -103,23 +102,6 @@ public class GLHelper {
         pos.put3f(x, y, 0);
         col.put4f(color);
         return tf;
-    }
-
-    public static void drawTexQuad(GL2 gl, FloatBuffer vertex, FloatBuffer texCoord) {
-        if (vertex.limit() != 12 || texCoord.limit() != 8) {
-            Log.error("Something is wrong with the vertices of this texture quad");
-            return;
-        }
-
-        gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
-        gl.glEnableClientState(GL2.GL_TEXTURE_COORD_ARRAY);
-
-        gl.glVertexPointer(3, GL2.GL_FLOAT, 0, vertex);
-        gl.glTexCoordPointer(2, GL2.GL_FLOAT, 0, texCoord);
-        gl.glDrawArrays(GL2.GL_TRIANGLE_FAN, 0, 4);
-
-        gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
-        gl.glDisableClientState(GL2.GL_TEXTURE_COORD_ARRAY);
     }
 /*
     public static GLCanvas createGLCanvas() {
