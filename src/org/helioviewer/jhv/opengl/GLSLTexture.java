@@ -60,11 +60,12 @@ public class GLSLTexture {
         GLSLShader.unbind(gl);
     }
 
-    public void renderQuads(GL2 gl, int count) {
+    public void renderQuads(GL2 gl, float[] color, int count) {
         if (!hasPoints)
             return;
 
         GLSLTextureShader.texture.bind(gl);
+        GLSLTextureShader.texture.setColor(color);
         GLSLTextureShader.texture.bindParams(gl);
 
         bindVBOs(gl);
