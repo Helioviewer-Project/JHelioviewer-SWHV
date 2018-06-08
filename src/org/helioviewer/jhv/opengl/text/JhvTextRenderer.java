@@ -1752,6 +1752,7 @@ public class JhvTextRenderer {
     }
 
     private static final GLSLTexture glslTexture = new GLSLTexture();
+    private static final float[] defaultColor = { 1, 1, 1, 1 };
 
     class Pipelined_QuadRenderer {
         int mOutstandingGlyphsVerticesPipeline = 0;
@@ -1829,7 +1830,7 @@ public class JhvTextRenderer {
 
                 glslTexture.init(gl);
                 glslTexture.setData(gl, mVertCoords, mTexCoords);
-                glslTexture.renderQuads(gl, mOutstandingGlyphsVerticesPipeline);
+                glslTexture.renderQuads(gl, defaultColor, mOutstandingGlyphsVerticesPipeline);
                 glslTexture.dispose(gl);
 /*
                 gl.glEnableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
