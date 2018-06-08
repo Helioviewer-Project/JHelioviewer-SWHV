@@ -107,9 +107,7 @@ public class GLListener implements GLEventListener {
             reshaped = true;
             Display.setGLSize(x, y, width, height);
             Display.reshapeAll();
-            MiniviewLayer miniview = Layers.getMiniviewLayer();
-            if (miniview != null)
-                miniview.reshapeViewport();
+            Layers.getMiniviewLayer().reshapeViewport();
             Display.render(1);
         });
     }
@@ -162,7 +160,7 @@ public class GLListener implements GLEventListener {
 
     private static void renderMiniview(GL2 gl) {
         MiniviewLayer miniview = Layers.getMiniviewLayer();
-        if (miniview != null && miniview.isEnabled()) {
+        if (miniview.isEnabled()) {
             Viewport vp = miniview.getViewport();
             Camera miniCamera = Display.getMiniCamera();
             miniCamera.timeChanged(Movie.getTime());
