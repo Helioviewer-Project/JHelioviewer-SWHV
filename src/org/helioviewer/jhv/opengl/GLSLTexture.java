@@ -8,7 +8,6 @@ import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GL2GL3;
 
 public class GLSLTexture {
 
@@ -69,7 +68,7 @@ public class GLSLTexture {
         GLSLTextureShader.texture.bindParams(gl);
 
         bindVBOs(gl);
-        gl.glDrawArrays(GL2GL3.GL_QUADS, 0, count);
+        gl.glDrawArrays(GL2.GL_TRIANGLES, 0, count);
         unbindVBOs(gl);
 
         GLSLShader.unbind(gl);
