@@ -56,7 +56,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         Position viewpoint = camera.getViewpoint();
 
         gl.glPushMatrix();
-        gl.glMultMatrixd(viewpoint.toQuat().toMatrix().transpose().m, 0);
+        gl.glMultMatrixd(viewpoint.toQuat().toMatrixTranspose().m, 0);
         {
             Set<Map.Entry<LoadPosition, Position>> positions = Display.getUpdateViewpoint().getPositions();
             if (!positions.isEmpty()) {

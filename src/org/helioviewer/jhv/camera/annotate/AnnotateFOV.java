@@ -67,13 +67,12 @@ public class AnnotateFOV extends AbstractAnnotateable {
         double dy = (p1.y - p0.y) / 2;
 
         gl.glPushMatrix();
-        gl.glMultMatrixd(viewpoint.toQuat().toMatrix().transpose().m, 0);
+        gl.glMultMatrixd(viewpoint.toQuat().toMatrixTranspose().m, 0);
         {
             fov.setCenter(p0.x + dx, p0.y + dy);
             fov.setTAngles(dx / viewpoint.distance, dy / viewpoint.distance);
             fov.render(gl, viewpoint.distance, vp.aspect, pointFactor, active);
         }
-
         gl.glPopMatrix();
     }
 

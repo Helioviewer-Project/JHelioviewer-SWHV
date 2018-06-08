@@ -213,9 +213,9 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
             Mat4 vpmi = getOrthoMatrixInverse(camera.getWidth(), vp.aspect);
             if (Display.mode == Display.DisplayMode.Orthographic)
-                vpmi.translate(-camera.getCurrentTranslation().x, -camera.getCurrentTranslation().y, 0.);
+                vpmi.translate(-camera.getCurrentTranslation().x, -camera.getCurrentTranslation().y, 0);
             else
-                vpmi.translate(-camera.getCurrentTranslation().x / vp.aspect, -camera.getCurrentTranslation().y, 0.);
+                vpmi.translate(-camera.getCurrentTranslation().x / vp.aspect, -camera.getCurrentTranslation().y, 0);
             shader.bindMatrix(gl, vpmi.getFloatArray());
 
             Quat q = Quat.rotate(camera.getCurrentDragRotation(), imageData.getViewpoint().toQuat());
