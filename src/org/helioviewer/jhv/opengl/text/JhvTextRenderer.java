@@ -65,7 +65,7 @@ import java.text.*;
 import java.util.*;
 
 import com.jogamp.opengl.*;
-import com.jogamp.opengl.fixedfunc.GLPointerFunc;
+//import com.jogamp.opengl.fixedfunc.GLPointerFunc;
 import com.jogamp.opengl.glu.*;
 import com.jogamp.opengl.awt.*;
 
@@ -671,7 +671,7 @@ public class JhvTextRenderer {
         }
 
         // Push client attrib bits used by the pipelined quad renderer
-        gl.glPushClientAttrib((int) GL2.GL_ALL_CLIENT_ATTRIB_BITS);
+        // gl.glPushClientAttrib((int) GL2.GL_ALL_CLIENT_ATTRIB_BITS);
 
         if (!haveMaxSize) {
             // Query OpenGL for the maximum texture size and set it in the
@@ -1304,8 +1304,8 @@ public class JhvTextRenderer {
                 }
 
                 // Push client attrib bits used by the pipelined quad renderer
-                final GL2 gl = GLContext.getCurrentGL().getGL2();
-                gl.glPushClientAttrib((int) GL2.GL_ALL_CLIENT_ATTRIB_BITS);
+                // final GL2 gl = GLContext.getCurrentGL().getGL2();
+                // gl.glPushClientAttrib((int) GL2.GL_ALL_CLIENT_ATTRIB_BITS);
 
                 if (haveCachedColor) {
                     if (cachedColor == null) {
@@ -1758,12 +1758,12 @@ public class JhvTextRenderer {
         int mOutstandingGlyphsVerticesPipeline = 0;
         final FloatBuffer mTexCoords;
         final FloatBuffer mVertCoords;
-//        boolean usingVBOs;
-        int mVBO_For_ResuableTileVertices;
-        int mVBO_For_ResuableTileTexCoords;
+//      boolean usingVBOs;
+//      int mVBO_For_ResuableTileVertices;
+//      int mVBO_For_ResuableTileTexCoords;
 
         Pipelined_QuadRenderer() {
-            final GL2 gl = GLContext.getCurrentGL().getGL2();
+//          final GL2 gl = GLContext.getCurrentGL().getGL2();
             mVertCoords = Buffers.newDirectFloatBuffer(kTotalBufferSizeCoordsVerts);
             mTexCoords = Buffers.newDirectFloatBuffer(kTotalBufferSizeCoordsTex);
 /*
@@ -2003,7 +2003,7 @@ public class JhvTextRenderer {
     public boolean getSmoothing() {
         return smoothing;
     }
-
+/*
     private boolean is15Available(final GL gl) {
         if (!checkFor_isExtensionAvailable_GL_VERSION_1_5) {
             isExtensionAvailable_GL_VERSION_1_5 = gl.isExtensionAvailable(GLExtensions.VERSION_1_5);
@@ -2011,4 +2011,5 @@ public class JhvTextRenderer {
         }
         return isExtensionAvailable_GL_VERSION_1_5;
     }
+*/
 }
