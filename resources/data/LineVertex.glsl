@@ -15,10 +15,10 @@ uniform mat4 ModelViewProjectionMatrix;
 
 void main() {
   vec2 aspectVec = vec2(aspect, 1.);
-  mat4 m = gl_ModelViewProjectionMatrix;
-  vec4 previousProjected = m * vec4(previousLine, 1.0);
-  vec4 currentProjected = m * vec4(line, 1.0);
-  vec4 nextProjected = m * vec4(nextLine, 1.0);
+
+  vec4 previousProjected = ModelViewProjectionMatrix * vec4(previousLine, 1.0);
+  vec4 currentProjected = ModelViewProjectionMatrix * vec4(line, 1.0);
+  vec4 nextProjected = ModelViewProjectionMatrix * vec4(nextLine, 1.0);
 
   vec2 currentScreen = currentProjected.xy / currentProjected.w * aspectVec;
   vec2 previousScreen = previousProjected.xy / previousProjected.w * aspectVec;

@@ -148,6 +148,7 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindMatrix(GL2 gl, float[] matrix) {
+        gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, GLMatrix.get());
         gl.glUniformMatrix4fv(cameraTransformationInverseRef, 1, false, matrix, 0);
     }
 

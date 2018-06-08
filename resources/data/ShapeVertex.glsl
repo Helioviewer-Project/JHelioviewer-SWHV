@@ -8,6 +8,6 @@ uniform float factor;
 uniform mat4 ModelViewProjectionMatrix;
 
 void main() {
-    gl_Position = gl_ModelViewProjectionMatrix * position;
+    gl_Position = ModelViewProjectionMatrix * position;
     frag_color = color;
 }

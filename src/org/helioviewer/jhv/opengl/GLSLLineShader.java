@@ -57,6 +57,7 @@ class GLSLLineShader extends GLSLShader {
     }
 
     public void bindParams(GL2 gl) {
+        gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, GLMatrix.get());
         gl.glUniform1fv(thicknessRef, 1, thickness, 0);
         gl.glUniform1fv(aspectRef, 1, aspect, 0);
         // gl.glUniform1iv(miterRef, 1, miter, 0);
