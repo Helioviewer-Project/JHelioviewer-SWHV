@@ -10,7 +10,7 @@ import org.helioviewer.jhv.math.MathUtils;
 class GridLabel {
 
     // height of text in solar radii
-    static final float textScale = (float) (0.08 * Sun.Radius);
+    static final float textScale = (float) (0.06 * Sun.Radius);
 
     private static final DecimalFormat formatter1 = MathUtils.numberFormatter("0", 1);
 
