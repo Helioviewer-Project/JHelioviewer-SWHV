@@ -2,6 +2,7 @@
 varying vec4 frag_linecolor;
 varying float frag_direction;
 
+/*
 float smoothstep(float edge0, float edge1, float x) {
     float t = clamp((x - edge0) / (edge1 - edge0), 0., 1.);
     return t * t * (3. - 2. * t);
@@ -15,7 +16,7 @@ float smoothpulse(float x) {
         return smoothstep(0., steppos, 1. - x);
     return 1.;
 }
-
+*/
 void main() {
     if (frag_linecolor.a == 0.)
         discard;

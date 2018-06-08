@@ -8,6 +8,7 @@ class GLSLTextureShader extends GLSLShader {
     static int positionRef = 0;
     static int coordRef = 1;
 
+    private int refModelViewProjectionMatrix;
     private int colorRef;
 
     private float[] color = { 1, 1, 1, 1 };
@@ -36,6 +37,7 @@ class GLSLTextureShader extends GLSLShader {
 
     @Override
     protected void _after_init(GL2 gl) {
+        refModelViewProjectionMatrix = gl.glGetUniformLocation(progID, "ModelViewProjectionMatrix");
         positionRef = gl.glGetAttribLocation(progID, "position");
         coordRef = gl.glGetAttribLocation(progID, "coord");
         colorRef = gl.glGetUniformLocation(progID, "color");
