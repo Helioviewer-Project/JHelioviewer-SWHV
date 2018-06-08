@@ -13,7 +13,6 @@ import org.helioviewer.jhv.base.scale.GridType;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.math.Mat4;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
@@ -126,11 +125,10 @@ public class GridLayer extends AbstractLayer {
         double pixFactor = vp.height / (2 * camera.getWidth());
         drawEarthCircles(gl, vp.aspect, pixFactor, Sun.getEarth(viewpoint.time).toQuat());
 
-        Mat4 gridMatrix = gridType.toQuat(viewpoint).toMatrix();
         double pixelsPerSolarRadius = textScale * pixFactor;
 
         gl.glPushMatrix();
-        gl.glMultMatrixd(gridMatrix.transpose().m, 0);
+        gl.glMultMatrixd(gridType.toQuat(viewpoint).toMatrixTranspose().m, 0);
         {
             gridLine.render(gl, vp.aspect, thickness);
             if (showLabels) {
@@ -141,9 +139,8 @@ public class GridLayer extends AbstractLayer {
 
         if (showRadial) {
             boolean far = viewpoint.distance > 100 * Sun.MeanEarthDistance;
-            Mat4 viewMatrix = viewpoint.toQuat().toMatrix();
             gl.glPushMatrix();
-            gl.glMultMatrixd(viewMatrix.transpose().m, 0);
+            gl.glMultMatrixd(viewpoint.toQuat().toMatrixTranspose().m, 0);
             {
                 if (far) {
                     radialCircleLineFar.render(gl, vp.aspect, thickness);
@@ -213,7 +210,7 @@ public class GridLayer extends AbstractLayer {
 
     private void drawEarthCircles(GL2 gl, double aspect, double factor, Quat q) {
         gl.glPushMatrix();
-        gl.glMultMatrixd(q.toMatrix().transpose().m, 0);
+        gl.glMultMatrixd(q.toMatrixTranspose().m, 0);
         earthCircleLine.render(gl, aspect, thicknessEarth);
         earthPoint.renderPoints(gl, factor);
         gl.glPopMatrix();

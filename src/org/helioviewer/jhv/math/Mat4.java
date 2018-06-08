@@ -5,7 +5,7 @@ public class Mat4 {
     //  0 4 8 12 1 5 9 13 2 6 10 14 3 7 11 15
     public final double[] m = new double[16];
 
-    public Mat4(double M0, double M4, double M8, double M12, double M1, double M5, double M9, double M13, double M2, double M6, double M10, double M14, double M3, double M7, double M11, double M15) {
+    Mat4(double M0, double M4, double M8, double M12, double M1, double M5, double M9, double M13, double M2, double M6, double M10, double M14, double M3, double M7, double M11, double M15) {
         m[0] = M0;
         m[4] = M4;
         m[8] = M8;
@@ -26,11 +26,11 @@ public class Mat4 {
 
     private Mat4() {
     }
-
+/*
     public Mat4(Mat4 mat) {
         set(mat);
     }
-
+*/
     public float[] getFloatArray() {
         float[] arr = new float[16];
         for (int i = 0; i < 16; i++) {
@@ -38,7 +38,7 @@ public class Mat4 {
         }
         return arr;
     }
-
+/*
     public void setIdentity() {
         set(identity());
     }
@@ -46,11 +46,11 @@ public class Mat4 {
     public static Mat4 identity() {
         return new Mat4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
     }
-/*
+
     public static Mat4 orthoIdentity() {
         return new Mat4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
     }
-*/
+
     public Mat4 set(Mat4 A) {
         m[0] = A.m[0];
         m[4] = A.m[4];
@@ -71,7 +71,7 @@ public class Mat4 {
 
         return this;
     }
-/*
+
     public Mat4 set(double M0, double M4, double M8, double M12, double M1, double M5, double M9, double M13, double M2, double M6, double M10, double M14, double M3, double M7, double M11, double M15) {
         m[0] = M0;
         m[4] = M4;
@@ -140,7 +140,7 @@ public class Mat4 {
         m[13] = y;
         m[14] = z;
     }
-*/
+
     public Mat4 inverse() {
         Mat4 inverse = new Mat4();
         // Cache the matrix values (makes for huge speed increases!)
@@ -184,7 +184,7 @@ public class Mat4 {
 
         return inverse;
     }
-
+*/
     //
     // public GL3DMat4 inverse() {
     // GL3DMat4 I = new GL3DMat4();
@@ -248,29 +248,29 @@ public class Mat4 {
     // }
     // return I;
     // }
-
+/*
     public Mat4 translate(Vec3 t) {
         m[12] += t.x;
         m[13] += t.y;
         m[14] += t.z;
         return this;
     }
-
+*/
     public Mat4 translate(double x, double y, double z) {
         m[12] += x;
         m[13] += y;
         m[14] += z;
         return this;
     }
-
+/*
     public static Mat4 translation(Vec3 t) {
         return new Mat4(1, 0, 0, t.x, 0, 1, 0, t.y, 0, 0, 1, t.z, 0, 0, 0, 1);
     }
-
+*/
     public static Mat4 translation(double x, double y, double z) {
         return new Mat4(1, 0, 0, x, 0, 1, 0, y, 0, 0, 1, z, 0, 0, 0, 1);
     }
-
+/*
     public Mat4 scale(Vec3 s) {
         m[0] *= s.x;
         m[5] *= s.y;
@@ -284,7 +284,7 @@ public class Mat4 {
         m[10] *= sz;
         return this;
     }
-/*
+
     public static Mat4 scaling(double sx, double sy, double sz) {
         return new Mat4(sx, 0, 0, 0, 0, sy, 0, 0, 0, 0, sz, 0, 0, 0, 0, 1);
     }
@@ -300,7 +300,7 @@ public class Mat4 {
     public Mat4 invert() {
         return set(inverse());
     }
-*/
+
     public Mat4 transpose() {
         double temp;
         temp = m[1];
@@ -323,7 +323,7 @@ public class Mat4 {
         m[14] = temp;
         return this;
     }
-/*
+
     public Mat4 swap(int i1, int i2) {
         double temp = get(i1);
         set(i1, get(i2));
@@ -405,7 +405,7 @@ public class Mat4 {
 
         return r;
     }
-*/
+
     public static Mat4 frustum(double l, double r, double b, double t, double n, double f) {
         return new Mat4((2 * n) / (r - l), 0, (r + l) / (r - l), 0, 0, (2 * n) / (t - b), (t + b) / (t - b), 0, 0, 0, -(f + n) / (f - n), (-2 * f * n) / (f - n), 0, 0, -1, 0);
     }
@@ -413,7 +413,7 @@ public class Mat4 {
     public static Mat4 ortho(double l, double r, double b, double t, double n, double f) {
         return new Mat4(2. / (r - l), 0., 0., -(r + l) / (r - l), 0., 2 / (t - b), 0., -(t + b) / (t - b), 0., 0., -2. / (f - n), -(f + n) / (f - n), 0., 0., 0., 1.);
     }
-
+*/
     public static Mat4 orthoInverse(double l, double r, double b, double t, double n, double f) {
         return new Mat4((r - l) * 0.5, 0., 0., -(r + l) * 0.5, 0., (t - b) * 0.5, 0., (t + b) * 0.5, 0., 0., (n - f) * 0.5, -(f + n) * 0.5, 0., 0., 0., 1.);
     }
@@ -436,11 +436,11 @@ public class Mat4 {
     public Mat3 mat3() {
         return new Mat3(m[0], m[4], m[8], m[1], m[5], m[9], m[2], m[6], m[10]);
     }
-*/
+
     public Mat4 copy() {
         return new Mat4(this);
     }
-
+*/
     @Override
     public String toString() {
         String format = "%01.02f";
