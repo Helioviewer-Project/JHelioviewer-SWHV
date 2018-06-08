@@ -64,6 +64,7 @@ public class GLSLShape {
             return;
 
         GLSLShapeShader.shape.bind(gl);
+        GLSLShapeShader.point.bindParams(gl);
 
         bindVBOs(gl);
         gl.glDrawElements(mode, ivbo.bufferSize, GL2.GL_UNSIGNED_INT, 0);

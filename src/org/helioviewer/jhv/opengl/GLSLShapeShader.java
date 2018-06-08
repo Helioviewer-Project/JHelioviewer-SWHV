@@ -47,6 +47,7 @@ class GLSLShapeShader extends GLSLShader {
     }
 
     public void bindParams(GL2 gl) {
+        gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, GLMatrix.get());
         gl.glUniform1fv(factorRef, 1, factor, 0);
     }
 

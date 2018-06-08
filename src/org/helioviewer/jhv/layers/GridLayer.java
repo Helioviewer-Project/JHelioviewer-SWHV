@@ -16,6 +16,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.opengl.GLMatrix;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
@@ -127,20 +128,20 @@ public class GridLayer extends AbstractLayer {
 
         double pixelsPerSolarRadius = textScale * pixFactor;
 
-        gl.glPushMatrix();
-        gl.glMultMatrixd(gridType.toQuat(viewpoint).toMatrixTranspose().m, 0);
+        GLMatrix.push();
+        GLMatrix.mulView(gridType.toQuat(viewpoint).toMatrixTranspose().getFloatArray());
         {
             gridLine.render(gl, vp.aspect, thickness);
             if (showLabels) {
                 drawGridText(gl, (int) pixelsPerSolarRadius);
             }
         }
-        gl.glPopMatrix();
+        GLMatrix.pop();
 
         if (showRadial) {
             boolean far = viewpoint.distance > 100 * Sun.MeanEarthDistance;
-            gl.glPushMatrix();
-            gl.glMultMatrixd(viewpoint.toQuat().toMatrixTranspose().m, 0);
+            GLMatrix.push();
+            GLMatrix.mulView(viewpoint.toQuat().toMatrixTranspose().getFloatArray());
             {
                 if (far) {
                     radialCircleLineFar.render(gl, vp.aspect, thickness);
@@ -156,7 +157,7 @@ public class GridLayer extends AbstractLayer {
                         drawRadialGridText(gl, radialLabels, pixelsPerSolarRadius * RADIAL_UNIT, R_LABEL_POS);
                 }
             }
-            gl.glPopMatrix();
+            GLMatrix.pop();
         }
     }
 
@@ -209,11 +210,13 @@ public class GridLayer extends AbstractLayer {
     }
 
     private void drawEarthCircles(GL2 gl, double aspect, double factor, Quat q) {
-        gl.glPushMatrix();
-        gl.glMultMatrixd(q.toMatrixTranspose().m, 0);
-        earthCircleLine.render(gl, aspect, thicknessEarth);
-        earthPoint.renderPoints(gl, factor);
-        gl.glPopMatrix();
+        GLMatrix.push();
+        GLMatrix.mulView(q.toMatrixTranspose().getFloatArray());
+        {
+            earthCircleLine.render(gl, aspect, thicknessEarth);
+            earthPoint.renderPoints(gl, factor);
+        }
+        GLMatrix.pop();
     }
 
     private static void drawRadialGridText(GL2 gl, ArrayList<GridLabel> labels, double size, float[] labelPos) {
@@ -248,15 +251,15 @@ public class GridLayer extends AbstractLayer {
         gl.glEnable(GL2.GL_CULL_FACE);
 
         for (GridLabel lonLabel : lonLabels) {
-            gl.glPushMatrix();
+            GLMatrix.push();
             {
-                gl.glTranslatef(lonLabel.x, 0, lonLabel.y);
-                gl.glRotatef(lonLabel.theta, 0, 1, 0);
+                GLMatrix.translateView(lonLabel.x, 0, lonLabel.y);
+                GLMatrix.rotateView(lonLabel.theta, 0, 1, 0);
 
                 renderer.draw3D(lonLabel.txt, 0, 0, 0, textScaleFactor);
                 renderer.flush();
             }
-            gl.glPopMatrix();
+            GLMatrix.pop();
         }
         renderer.end3DRendering();
     }
