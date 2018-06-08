@@ -10,7 +10,7 @@ public class GLMatrix {
 
     private static final FloatBuffer fb = BufferUtils.newFloatBuffer(16);
 
-    private static final Matrix4fStack proj = new Matrix4fStack(1);
+    private static final Matrix4fStack proj = new Matrix4fStack(2);
     private static final Matrix4fStack view = new Matrix4fStack(3);
     private static final Matrix4f mul = new Matrix4f();
     private static final Matrix4f projView = new Matrix4f();
@@ -19,12 +19,24 @@ public class GLMatrix {
         proj.setOrtho(left, right, bottom, top, zNear, zFar);
     }
 
-    public static void setTranslateView(float x, float y, float z) {
-        view.translation(x, y, z);
+    public static void pushProj() {
+        proj.pushMatrix();
+    }
+
+    public static void popProj() {
+        proj.popMatrix();
     }
 
     public static void setView(float[] m) {
         view.set(m);
+    }
+
+    public static void setIdentityView() {
+        view.identity();
+    }
+
+    public static void setTranslateView(float x, float y, float z) {
+        view.translation(x, y, z);
     }
 
     public static void translateView(float x, float y, float z) {

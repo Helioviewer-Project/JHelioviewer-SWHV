@@ -55,6 +55,8 @@ import com.jogamp.opengl.glu.gl2.*;
 import com.jogamp.opengl.util.texture.*;
 import com.jogamp.opengl.util.texture.awt.*;
 
+import org.helioviewer.jhv.opengl.GLMatrix;
+
 /** Provides the ability to render into an OpenGL {@link
     com.jogamp.opengl.util.texture.Texture Texture} using the Java 2D
     APIs. This renderer class uses an internal Java 2D image (of
@@ -565,6 +567,12 @@ class JhvTextureRenderer {
         gl.glDisable(GL.GL_DEPTH_TEST);
       }
       gl.glDisable(GL.GL_CULL_FACE);
+
+      GLMatrix.pushProj();
+      GLMatrix.setOrthoProj(0, width, 0, height, -1, 1);
+      GLMatrix.push();
+      GLMatrix.setIdentityView();
+/*
       gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);
       gl.glPushMatrix();
       gl.glLoadIdentity();
@@ -575,6 +583,7 @@ class JhvTextureRenderer {
       gl.glMatrixMode(GL.GL_TEXTURE);
       gl.glPushMatrix();
       gl.glLoadIdentity();
+*/
     }
     gl.glEnable(GL.GL_BLEND);
     gl.glBlendFunc(GL.GL_ONE, GL.GL_ONE_MINUS_SRC_ALPHA);
@@ -605,12 +614,16 @@ class JhvTextureRenderer {
     final Texture texture = getTexture();
     texture.disable(gl);
     if (ortho) {
+      GLMatrix.pop();
+      GLMatrix.popProj();
+/*
       gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);
       gl.glPopMatrix();
       gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
       gl.glPopMatrix();
       gl.glMatrixMode(GL.GL_TEXTURE);
       gl.glPopMatrix();
+*/
     }
     gl.glPopAttrib();
   }

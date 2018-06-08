@@ -56,18 +56,18 @@ class GLSLLineShader extends GLSLShader {
         thicknessRef = gl.glGetUniformLocation(progID, "thickness");
     }
 
-    public void bindParams(GL2 gl) {
+    void bindParams(GL2 gl) {
         gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, GLMatrix.get());
         gl.glUniform1fv(thicknessRef, 1, thickness, 0);
         gl.glUniform1fv(aspectRef, 1, aspect, 0);
         // gl.glUniform1iv(miterRef, 1, miter, 0);
     }
 
-    public void setAspect(double _aspect) {
+    void setAspect(double _aspect) {
         aspect[0] = (float) _aspect;
     }
 
-    public void setThickness(double _thickness) {
+    void setThickness(double _thickness) {
         thickness[0] = (float) _thickness;
     }
 
