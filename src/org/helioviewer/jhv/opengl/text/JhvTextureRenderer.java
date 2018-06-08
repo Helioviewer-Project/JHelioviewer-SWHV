@@ -62,7 +62,7 @@ import com.jogamp.opengl.util.texture.awt.*;
     that image to an OpenGL texture on demand. The resulting OpenGL
     texture can then be mapped on to a polygon for display. */
 
-public class JhvTextureRenderer {
+class JhvTextureRenderer {
   // For now, we supply only a BufferedImage back-end for this
   // renderer. In theory we could use the Java 2D/JOGL bridge to fully
   // accelerate the rendering paths, but there are restrictions on
@@ -111,7 +111,7 @@ public class JhvTextureRenderer {
       @param height the height of the texture to render into
       @param alpha whether to allocate an alpha channel for the texture
   */
-  public JhvTextureRenderer(final int width, final int height, final boolean alpha) {
+  JhvTextureRenderer(final int width, final int height, final boolean alpha) {
     this(width, height, alpha, false);
   }
 
@@ -126,7 +126,7 @@ public class JhvTextureRenderer {
       @param alpha whether to allocate an alpha channel for the texture
       @param mipmap whether to attempt use of automatic mipmap generation
   */
-  public JhvTextureRenderer(final int width, final int height, final boolean alpha, final boolean mipmap) {
+  JhvTextureRenderer(final int width, final int height, final boolean alpha, final boolean mipmap) {
     this(width, height, alpha, false, mipmap);
   }
 

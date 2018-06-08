@@ -42,7 +42,6 @@ package org.helioviewer.jhv.opengl.text;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.common.util.InterruptSource;
 import com.jogamp.common.util.PropertyAccess;
-import com.jogamp.opengl.GLExtensions;
 import com.jogamp.opengl.util.*;
 import com.jogamp.opengl.util.packrect.*;
 import com.jogamp.opengl.util.texture.*;
@@ -80,7 +79,7 @@ import jogamp.opengl.Debug;
     completely automatic, does not require any user intervention, and
     has no visible controls in the public API. <P>
 
-    Using the {@link TextRenderer TextRenderer} is simple. Add a
+    Using the {@link JhvTextRenderer TextRenderer} is simple. Add a
     "<code>TextRenderer renderer;</code>" field to your {@link
     com.jogamp.opengl.GLEventListener GLEventListener}. In your {@link
     com.jogamp.opengl.GLEventListener#init init} method, add:
@@ -170,7 +169,7 @@ public class JhvTextRenderer {
     private JhvTextureRenderer cachedBackingStore;
     private Graphics2D cachedGraphics;
     private FontRenderContext cachedFontRenderContext;
-    private final Map<String, Rect> stringLocations = new HashMap<String, Rect>();
+    private final Map<String, Rect> stringLocations = new HashMap<>();
     private final GlyphProducer mGlyphProducer;
 
     private int numRenderCycles;
@@ -368,7 +367,7 @@ public class JhvTextRenderer {
         return cachedFontRenderContext;
     }
 
-    /** Begins rendering with this {@link TextRenderer TextRenderer}
+    /** Begins rendering with this {@link JhvTextRenderer TextRenderer}
         into the current OpenGL drawable, pushing the projection and
         modelview matrices and some state bits and setting up a
         two-dimensional orthographic projection with (0, 0) as the
@@ -388,7 +387,7 @@ public class JhvTextRenderer {
         beginRendering(width, height, true);
     }
 
-    /** Begins rendering with this {@link TextRenderer TextRenderer}
+    /** Begins rendering with this {@link JhvTextRenderer TextRenderer}
         into the current OpenGL drawable, pushing the projection and
         modelview matrices and some state bits and setting up a
         two-dimensional orthographic projection with (0, 0) as the
@@ -409,7 +408,7 @@ public class JhvTextRenderer {
         beginRendering(true, width, height, disableDepthTest);
     }
 
-    /** Begins rendering of 2D text in 3D with this {@link TextRenderer
+    /** Begins rendering of 2D text in 3D with this {@link JhvTextRenderer
         TextRenderer} into the current OpenGL drawable. Assumes the end
         user is responsible for setting up the modelview and projection
         matrices, and will render text using the {@link #draw3D draw3D}
@@ -432,8 +431,7 @@ public class JhvTextRenderer {
         @throws GLException If an OpenGL context is not current when this method is called
     */
     public void setColor(final Color color) throws GLException {
-        final boolean noNeedForFlush = (haveCachedColor && (cachedColor != null) &&
-                                  color.equals(cachedColor));
+        final boolean noNeedForFlush = (haveCachedColor && color.equals(cachedColor));
 
         if (!noNeedForFlush) {
             flushGlyphPipeline();
@@ -539,7 +537,7 @@ public class JhvTextRenderer {
         flushGlyphPipeline();
     }
 
-    /** Ends a render cycle with this {@link TextRenderer TextRenderer}.
+    /** Ends a render cycle with this {@link JhvTextRenderer TextRenderer}.
         Restores the projection and modelview matrices as well as
         several OpenGL state bits. Should be paired with {@link
         #beginRendering beginRendering}.
@@ -550,7 +548,7 @@ public class JhvTextRenderer {
         endRendering(true);
     }
 
-    /** Ends a 3D render cycle with this {@link TextRenderer TextRenderer}.
+    /** Ends a 3D render cycle with this {@link JhvTextRenderer TextRenderer}.
         Restores several OpenGL state bits. Should be paired with {@link
         #begin3DRendering begin3DRendering}.
 
@@ -749,22 +747,19 @@ public class JhvTextRenderer {
     }
 
     private void clearUnusedEntries() {
-        final java.util.List<Rect> deadRects = new ArrayList<Rect>();
+        final List<Rect> deadRects = new ArrayList<>();
 
         // Iterate through the contents of the backing store, removing
         // text strings that haven't been used recently
-        packer.visit(new RectVisitor() {
-                @Override
-                public void visit(final Rect rect) {
-                    final TextData data = (TextData) rect.getUserData();
+        packer.visit(rect -> {
+            final TextData data = (TextData) rect.getUserData();
 
-                    if (data.used()) {
-                        data.clearUsed();
-                    } else {
-                        deadRects.add(rect);
-                    }
-                }
-            });
+            if (data.used()) {
+                data.clearUsed();
+            } else {
+                deadRects.add(rect);
+            }
+        });
 
         for (final Rect r : deadRects) {
             packer.remove(r);
@@ -831,7 +826,7 @@ public class JhvTextRenderer {
 
         if (rect == null) {
             // Rasterize this string and place it on the backing store
-            Graphics2D g = getGraphics2D();
+            // Graphics2D g = getGraphics2D();
             final Rectangle2D origBBox = preNormalize(renderDelegate.getBounds(curStr, font, getFontRenderContext()));
             final Rectangle2D bbox = normalize(origBBox);
             final Point origin = new Point((int) -bbox.getMinX(),
@@ -845,7 +840,7 @@ public class JhvTextRenderer {
 
             // Re-fetch the Graphics2D in case the addition of the rectangle
             // caused the old backing store to be thrown away
-            g = getGraphics2D();
+            Graphics2D g = getGraphics2D();
 
             // OK, should now have an (x, y) for this rectangle; rasterize
             // the String
@@ -916,12 +911,7 @@ public class JhvTextRenderer {
                     // Run this on another thread than the AWT event queue to
                     // make sure the call to Animator.stop() completes before
                     // exiting
-                    new InterruptSource.Thread(null, new Runnable() {
-                            @Override
-                            public void run() {
-                                anim.stop();
-                            }
-                        }).start();
+                    new InterruptSource.Thread(null, anim::stop).start();
                 }
             });
         dbgFrame.setSize(kSize, kSize);
@@ -939,25 +929,25 @@ public class JhvTextRenderer {
         closely-cropped rectangle around the text, and renders text
         using the color white, which is modulated by the set color
         during the rendering process. */
-    public static interface RenderDelegate {
+    public interface RenderDelegate {
         /** Indicates whether the backing store of this TextRenderer
             should be intensity-only (the default) or full-color. */
-        public boolean intensityOnly();
+        boolean intensityOnly();
 
         /** Computes the bounds of the given String relative to the
             origin. */
-        public Rectangle2D getBounds(String str, Font font,
-                                     FontRenderContext frc);
+        Rectangle2D getBounds(String str, Font font,
+                              FontRenderContext frc);
 
         /** Computes the bounds of the given character sequence relative
             to the origin. */
-        public Rectangle2D getBounds(CharSequence str, Font font,
-                                     FontRenderContext frc);
+        Rectangle2D getBounds(CharSequence str, Font font,
+                              FontRenderContext frc);
 
         /** Computes the bounds of the given GlyphVector, already
             assumed to have been created for a particular Font,
             relative to the origin. */
-        public Rectangle2D getBounds(GlyphVector gv, FontRenderContext frc);
+        Rectangle2D getBounds(GlyphVector gv, FontRenderContext frc);
 
         /** Render the passed character sequence at the designated
             location using the supplied Graphics2D instance. The
@@ -972,7 +962,7 @@ public class JhvTextRenderer {
             should reset the Graphics2D's state to that desired each time
             this method is called, in particular those states which are
             not the defaults. */
-        public void draw(Graphics2D graphics, String str, int x, int y);
+        void draw(Graphics2D graphics, String str, int x, int y);
 
         /** Render the passed GlyphVector at the designated location using
             the supplied Graphics2D instance. The surrounding region will
@@ -986,8 +976,8 @@ public class JhvTextRenderer {
             Implementors of this method should reset the Graphics2D's
             state to that desired each time this method is called, in
             particular those states which are not the defaults. */
-        public void drawGlyphVector(Graphics2D graphics, GlyphVector str,
-                                    int x, int y);
+        void drawGlyphVector(Graphics2D graphics, GlyphVector str,
+                             int x, int y);
     }
 
     private static class CharSequenceIterator implements CharacterIterator {
@@ -1088,7 +1078,7 @@ public class JhvTextRenderer {
 
         // If this TextData represents a single glyph, this is its
         // unicode ID
-        int unicodeID;
+        final int unicodeID;
 
         // The following must be defined and used VERY precisely. This is
         // the offset from the upper-left corner of this rectangle (Java
@@ -1228,11 +1218,8 @@ public class JhvTextRenderer {
                                    " *** Cleared all text because addition failed ***");
             }
 
-            if (attemptNumber == 0) {
-                return true;
-            }
+            return attemptNumber == 0;
 
-            return false;
         }
 
         @Override
@@ -1584,15 +1571,15 @@ public class JhvTextRenderer {
     class GlyphProducer {
         static final int undefined = -2;
         final FontRenderContext fontRenderContext = null; // FIXME: Never initialized!
-        List<Glyph> glyphsOutput = new ArrayList<Glyph>();
-        HashMap<String, GlyphVector> fullGlyphVectorCache = new HashMap<String, GlyphVector>();
-        HashMap<Character, GlyphMetrics> glyphMetricsCache = new HashMap<Character, GlyphMetrics>();
+        final List<Glyph> glyphsOutput = new ArrayList<>();
+        final HashMap<String, GlyphVector> fullGlyphVectorCache = new HashMap<>();
+        final HashMap<Character, GlyphMetrics> glyphMetricsCache = new HashMap<>();
         // The mapping from unicode character to font-specific glyph ID
-        int[] unicodes2Glyphs;
+        final int[] unicodes2Glyphs;
         // The mapping from glyph ID to Glyph
-        Glyph[] glyphCache;
+        final Glyph[] glyphCache;
         // We re-use this for each incoming string
-        CharSequenceIterator iter = new CharSequenceIterator();
+        final CharSequenceIterator iter = new CharSequenceIterator();
 
         GlyphProducer(final int fontLengthInGlyphs) {
             unicodes2Glyphs = new int[512];
@@ -1750,7 +1737,7 @@ public class JhvTextRenderer {
 
         static {
             for (int i = 0; i < cache.length; i++) {
-                cache[i] = Character.valueOf((char) i);
+                cache[i] = (char) i;
             }
         }
 
@@ -1758,14 +1745,14 @@ public class JhvTextRenderer {
             if (c <= 127) { // must cache
                 return CharacterCache.cache[c];
             }
-            return Character.valueOf(c);
+            return c;
         }
     }
 
     class Pipelined_QuadRenderer {
         int mOutstandingGlyphsVerticesPipeline = 0;
-        FloatBuffer mTexCoords;
-        FloatBuffer mVertCoords;
+        final FloatBuffer mTexCoords;
+        final FloatBuffer mVertCoords;
         boolean usingVBOs;
         int mVBO_For_ResuableTileVertices;
         int mVBO_For_ResuableTileTexCoords;
@@ -1939,12 +1926,7 @@ public class JhvTextRenderer {
             rend.endOrthoRendering();
 
             if ((frame.getWidth() != w) || (frame.getHeight() != h)) {
-                EventQueue.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            frame.setSize(w, h);
-                        }
-                    });
+                EventQueue.invokeLater(() -> frame.setSize(w, h));
             }
         }
 
@@ -2010,7 +1992,7 @@ public class JhvTextRenderer {
         return smoothing;
     }
 
-    private final boolean is15Available(final GL gl) {
+    private boolean is15Available(final GL gl) {
         if (!checkFor_isExtensionAvailable_GL_VERSION_1_5) {
             isExtensionAvailable_GL_VERSION_1_5 = gl.isExtensionAvailable(GLExtensions.VERSION_1_5);
             checkFor_isExtensionAvailable_GL_VERSION_1_5 = true;
