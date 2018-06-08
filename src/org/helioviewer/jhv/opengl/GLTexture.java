@@ -131,9 +131,9 @@ public class GLTexture {
     private static int mapImageFormatToInternalGLFormat(ImageFormat imageFormat) {
         switch (imageFormat) {
             case Single8:
-                return GL2.GL_LUMINANCE8;
+                return GL2.GL_R8;
             case Single16:
-                return GL2.GL_LUMINANCE16;
+                return GL2.GL_R16;
             case ARGB32:
             case RGB24:
                 return GL2.GL_RGBA;
@@ -154,7 +154,7 @@ public class GLTexture {
         switch (imageFormat) {
             case Single8:
             case Single16:
-                return GL2.GL_LUMINANCE;
+                return GL2.GL_RED;
             case ARGB32:
             case RGB24:
                 return GL2.GL_BGRA;
@@ -173,7 +173,7 @@ public class GLTexture {
      */
     private static int mapTypeToInternalGLFormat(int type) {
         if (type == BufferedImage.TYPE_BYTE_GRAY || type == BufferedImage.TYPE_BYTE_INDEXED)
-            return GL2.GL_LUMINANCE;
+            return GL2.GL_R8;
         else
             return GL2.GL_RGBA;
     }
@@ -190,7 +190,7 @@ public class GLTexture {
         switch (type) {
             case BufferedImage.TYPE_BYTE_GRAY:
             case BufferedImage.TYPE_BYTE_INDEXED:
-                return GL2.GL_LUMINANCE;
+                return GL2.GL_RED;
             case BufferedImage.TYPE_4BYTE_ABGR:
             case BufferedImage.TYPE_INT_BGR:
             case BufferedImage.TYPE_INT_ARGB:
