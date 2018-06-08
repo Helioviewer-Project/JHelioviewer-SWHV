@@ -29,6 +29,8 @@ public class GLSLSolarShader extends GLSLShader {
     public static final GLSLSolarShader polar = new GLSLSolarShader("/data/SolarVertex.glsl", "/data/SolarFragPolar.glsl");
     public static final GLSLSolarShader logpolar = new GLSLSolarShader("/data/SolarVertex.glsl", "/data/SolarFragLogPolar.glsl");
 
+    private int refModelViewProjectionMatrix;
+
     private int isDiffRef;
     private int isDiscRef;
 
@@ -94,6 +96,8 @@ public class GLSLSolarShader extends GLSLShader {
 
     @Override
     protected void _after_init(GL2 gl) {
+        refModelViewProjectionMatrix = gl.glGetUniformLocation(progID, "ModelViewProjectionMatrix");
+
         isDiffRef = gl.glGetUniformLocation(progID, "isdifference");
         isDiscRef = gl.glGetUniformLocation(progID, "isdisc");
 

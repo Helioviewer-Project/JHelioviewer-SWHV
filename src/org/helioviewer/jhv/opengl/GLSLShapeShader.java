@@ -9,6 +9,7 @@ class GLSLShapeShader extends GLSLShader {
     static int positionRef = 0;
     static int colorRef = 1;
 
+    private int refModelViewProjectionMatrix;
     private int factorRef;
 
     private final float[] factor = { 1 };
@@ -39,6 +40,7 @@ class GLSLShapeShader extends GLSLShader {
 
     @Override
     protected void _after_init(GL2 gl) {
+        refModelViewProjectionMatrix = gl.glGetUniformLocation(progID, "ModelViewProjectionMatrix");
         positionRef = gl.glGetAttribLocation(progID, "position");
         colorRef = gl.glGetAttribLocation(progID, "color");
         factorRef = gl.glGetUniformLocation(progID, "factor");

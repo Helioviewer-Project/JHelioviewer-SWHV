@@ -5,11 +5,13 @@ attribute vec3 nextLine;
 attribute float direction;
 attribute vec4 linecolor;
 
+varying vec4 frag_linecolor;
+varying float frag_direction;
+
 uniform float aspect;
 uniform float thickness;
 uniform int miter;
-varying vec4 frag_linecolor;
-varying float frag_direction;
+uniform mat4 ModelViewProjectionMatrix;
 
 void main() {
   vec2 aspectVec = vec2(aspect, 1.);

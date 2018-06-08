@@ -11,6 +11,7 @@ class GLSLLineShader extends GLSLShader {
     static int directionRef = 3;
     static int linecolorRef = 4;
 
+    private int refModelViewProjectionMatrix;
     // private int miterRef;
     private int thicknessRef;
     private int aspectRef;
@@ -43,6 +44,7 @@ class GLSLLineShader extends GLSLShader {
 
     @Override
     protected void _after_init(GL2 gl) {
+        refModelViewProjectionMatrix = gl.glGetUniformLocation(progID, "ModelViewProjectionMatrix");
         previousLineRef = gl.glGetAttribLocation(progID, "previousLine");
         lineRef = gl.glGetAttribLocation(progID, "line");
         nextLineRef = gl.glGetAttribLocation(progID, "nextLine");
