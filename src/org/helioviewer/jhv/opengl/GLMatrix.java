@@ -31,7 +31,7 @@ public class GLMatrix {
         view.translate(x, y, z);
     }
 
-    public static void rotateView(float ang, float x, float y, float z) { // degrees
+    public static void rotateView(float ang, float x, float y, float z) { // degrees, axis normalized
         view.rotate((float) (Math.PI / 180.) * ang, x, y, z);
     }
 
