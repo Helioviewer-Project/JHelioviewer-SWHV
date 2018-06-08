@@ -44,12 +44,12 @@ class GLSLTextureShader extends GLSLShader {
         setTextureUnit(gl, "image", 0);
     }
 
-    public void bindParams(GL2 gl) {
+    void bindParams(GL2 gl) {
         gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, GLMatrix.get());
         gl.glUniform4fv(colorRef, 1, color, 0);
     }
 
-    public void setColor(float[] _color) {
+    void setColor(float[] _color) {
         color = _color;
     }
 
