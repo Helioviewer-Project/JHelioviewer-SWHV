@@ -7,6 +7,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ClipBoardCopier;
 import org.helioviewer.jhv.gui.components.StatusPanel;
+import org.helioviewer.jhv.layers.GridLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec2;
@@ -29,7 +30,8 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
 
     private void update(int x, int y) {
         Viewport vp = Display.getActiveViewport();
-        Vec2 coord = Layers.getGridLayer().gridPoint(camera, vp, x, y);
+        GridLayer layer = Layers.getGridLayer();
+        Vec2 coord = layer == null ? Vec2.NAN_VECTOR : layer.gridPoint(camera, vp, x, y);
 
         if (Display.mode == Display.DisplayMode.Latitudinal) {
             setText(String.format("(\u03C6,\u03B8) : (%.2f\u00B0,%.2f\u00B0)", coord.x, coord.y));
