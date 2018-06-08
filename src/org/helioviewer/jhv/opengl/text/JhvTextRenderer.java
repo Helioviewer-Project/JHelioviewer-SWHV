@@ -71,6 +71,8 @@ import com.jogamp.opengl.awt.*;
 
 import jogamp.opengl.Debug;
 
+import org.helioviewer.jhv.opengl.GLSLTexture;
+
 
 /** Renders bitmapped Java 2D text into an OpenGL window with high
     performance, full Unicode support, and a simple API. Performs
@@ -1749,6 +1751,8 @@ public class JhvTextRenderer {
         }
     }
 
+    private static final GLSLTexture glslTexture = new GLSLTexture();
+
     class Pipelined_QuadRenderer {
         int mOutstandingGlyphsVerticesPipeline = 0;
         final FloatBuffer mTexCoords;
@@ -1823,6 +1827,11 @@ public class JhvTextRenderer {
                 mVertCoords.rewind();
                 mTexCoords.rewind();
 
+                glslTexture.init(gl);
+                glslTexture.setData(gl, mVertCoords, mTexCoords);
+                glslTexture.renderQuads(gl, mOutstandingGlyphsVerticesPipeline);
+                glslTexture.dispose(gl);
+/*
                 gl.glEnableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
 
                 if (usingVBOs) {
@@ -1854,6 +1863,7 @@ public class JhvTextRenderer {
 
                 mVertCoords.rewind();
                 mTexCoords.rewind();
+*/
                 mOutstandingGlyphsVerticesPipeline = 0;
             }
         }
