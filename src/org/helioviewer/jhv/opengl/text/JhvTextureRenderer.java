@@ -405,7 +405,7 @@ class JhvTextureRenderer {
       @throws GLException If an OpenGL context is not current when this method is called
   */
   public void setColor(final float r, final float g, final float b, final float a) throws GLException {
-    final GL2 gl = GLContext.getCurrentGL().getGL2();
+    final GL2 gl = (GL2) GLContext.getCurrentGL();
     this.r = r * a;
     this.g = g * a;
     this.b = b * a;
@@ -502,7 +502,7 @@ class JhvTextureRenderer {
                          final int texturex, final int texturey,
                          final int width, final int height,
                          final float scaleFactor) throws GLException {
-    final GL2 gl = GLContext.getCurrentGL().getGL2();
+    final GL2 gl = (GL2) GLContext.getCurrentGL();
     final Texture texture = getTexture();
     final TextureCoords coords = texture.getSubImageTexCoords(texturex, texturey,
                                                         texturex + width,
@@ -556,7 +556,7 @@ class JhvTextureRenderer {
   //
 
   private void beginRendering(final boolean ortho, final int width, final int height, final boolean disableDepthTestForOrtho) {
-    final GL2 gl = GLContext.getCurrentGL().getGL2();
+    final GL2 gl = (GL2) GLContext.getCurrentGL();
     final int attribBits =
       GL2.GL_ENABLE_BIT | GL2.GL_TEXTURE_BIT | GL.GL_COLOR_BUFFER_BIT |
       (ortho ? (GL.GL_DEPTH_BUFFER_BIT | GL2.GL_TRANSFORM_BIT) : 0);
@@ -610,7 +610,7 @@ class JhvTextureRenderer {
   }
 
   private void endRendering(final boolean ortho) {
-    final GL2 gl = GLContext.getCurrentGL().getGL2();
+    final GL2 gl = (GL2) GLContext.getCurrentGL();
     final Texture texture = getTexture();
     texture.disable(gl);
     if (ortho) {
@@ -629,7 +629,7 @@ class JhvTextureRenderer {
   }
 
   private void init(final int width, final int height) {
-    final GL2 gl = GLContext.getCurrentGL().getGL2();
+    final GL2 gl = (GL2) GLContext.getCurrentGL();
     // Discard previous BufferedImage if any
     if (image != null) {
       image.flush();

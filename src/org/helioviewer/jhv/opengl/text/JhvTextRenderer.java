@@ -651,7 +651,7 @@ public class JhvTextRenderer {
 
     private void beginRendering(final boolean ortho, final int width, final int height,
                                 final boolean disableDepthTestForOrtho) {
-        final GL2 gl = GLContext.getCurrentGL().getGL2();
+        final GL2 gl = (GL2) GLContext.getCurrentGL();
 
         if (DEBUG && !debugged) {
             debug(gl);
@@ -715,7 +715,7 @@ public class JhvTextRenderer {
 
         inBeginEndPair = false;
 /*
-        final GL2 gl = GLContext.getCurrentGL().getGL2();
+        final GL2 gl = (GL2) GLContext.getCurrentGL();
 
         // Pop client attrib bits used by the pipelined quad renderer
         gl.glPopClientAttrib();
@@ -1236,7 +1236,7 @@ public class JhvTextRenderer {
                 // Draw any outstanding glyphs
                 flush();
 /*
-                final GL2 gl = GLContext.getCurrentGL().getGL2();
+                final GL2 gl = (GL2) GLContext.getCurrentGL();
 
                 // Pop client attrib bits used by the pipelined quad renderer
                 gl.glPopClientAttrib();
@@ -1304,7 +1304,7 @@ public class JhvTextRenderer {
                 }
 
                 // Push client attrib bits used by the pipelined quad renderer
-                // final GL2 gl = GLContext.getCurrentGL().getGL2();
+                // final GL2 gl = (GL2) GLContext.getCurrentGL();
                 // gl.glPushClientAttrib((int) GL2.GL_ALL_CLIENT_ATTRIB_BITS);
 
                 if (haveCachedColor) {
@@ -1763,7 +1763,7 @@ public class JhvTextRenderer {
 //      int mVBO_For_ResuableTileTexCoords;
 
         Pipelined_QuadRenderer() {
-//          final GL2 gl = GLContext.getCurrentGL().getGL2();
+//          final GL2 gl = (GL2) GLContext.getCurrentGL();
             mVertCoords = Buffers.newDirectFloatBuffer(kTotalBufferSizeCoordsVerts);
             mTexCoords = Buffers.newDirectFloatBuffer(kTotalBufferSizeCoordsTex);
 /*
@@ -1821,7 +1821,7 @@ public class JhvTextRenderer {
 
         private void drawVertexArrays() {
             if (mOutstandingGlyphsVerticesPipeline > 0) {
-                final GL2 gl = GLContext.getCurrentGL().getGL2();
+                final GL2 gl = (GL2) GLContext.getCurrentGL();
 
                 final JhvTextureRenderer renderer = getBackingStore();
                 renderer.getTexture(); // triggers texture uploads.  Maybe this should be more obvious?
@@ -1875,7 +1875,7 @@ public class JhvTextRenderer {
                 final JhvTextureRenderer renderer = getBackingStore();
                 renderer.getTexture(); // triggers texture uploads.  Maybe this should be more obvious?
 
-                final GL2 gl = GLContext.getCurrentGL().getGL2();
+                final GL2 gl = (GL2) GLContext.getCurrentGL();
                 gl.glBegin(GL2GL3.GL_QUADS);
 
                 try {
@@ -1923,7 +1923,7 @@ public class JhvTextRenderer {
 
         @Override
         public void display(final GLAutoDrawable drawable) {
-            final GL2 gl = GLContext.getCurrentGL().getGL2();
+            final GL2 gl = (GL2) GLContext.getCurrentGL();
             gl.glClear(GL.GL_DEPTH_BUFFER_BIT | GL.GL_COLOR_BUFFER_BIT);
 
             if (packer == null) {
