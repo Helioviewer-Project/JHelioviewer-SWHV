@@ -714,7 +714,7 @@ public class JhvTextRenderer {
         flushGlyphPipeline();
 
         inBeginEndPair = false;
-
+/*
         final GL2 gl = GLContext.getCurrentGL().getGL2();
 
         // Pop client attrib bits used by the pipelined quad renderer
@@ -730,7 +730,7 @@ public class JhvTextRenderer {
                 isExtensionAvailable_GL_VERSION_1_5 = false;
             }
         }
-
+*/
         if (ortho) {
             getBackingStore().endOrthoRendering();
         } else {
@@ -1235,7 +1235,7 @@ public class JhvTextRenderer {
             if (inBeginEndPair) {
                 // Draw any outstanding glyphs
                 flush();
-
+/*
                 final GL2 gl = GLContext.getCurrentGL().getGL2();
 
                 // Pop client attrib bits used by the pipelined quad renderer
@@ -1251,7 +1251,7 @@ public class JhvTextRenderer {
                         isExtensionAvailable_GL_VERSION_1_5 = false;
                     }
                 }
-
+*/
                 if (isOrthoMode) {
                     ((JhvTextureRenderer) oldBackingStore).endOrthoRendering();
                 } else {
@@ -1758,7 +1758,7 @@ public class JhvTextRenderer {
         int mOutstandingGlyphsVerticesPipeline = 0;
         final FloatBuffer mTexCoords;
         final FloatBuffer mVertCoords;
-        boolean usingVBOs;
+//        boolean usingVBOs;
         int mVBO_For_ResuableTileVertices;
         int mVBO_For_ResuableTileTexCoords;
 
@@ -1766,7 +1766,7 @@ public class JhvTextRenderer {
             final GL2 gl = GLContext.getCurrentGL().getGL2();
             mVertCoords = Buffers.newDirectFloatBuffer(kTotalBufferSizeCoordsVerts);
             mTexCoords = Buffers.newDirectFloatBuffer(kTotalBufferSizeCoordsTex);
-
+/*
             usingVBOs = getUseVertexArrays() && is15Available(gl);
 
             if (usingVBOs) {
@@ -1791,6 +1791,7 @@ public class JhvTextRenderer {
                     usingVBOs = false;
                 }
             }
+*/
         }
 
         public void glTexCoord2f(final float v, final float v1) {
