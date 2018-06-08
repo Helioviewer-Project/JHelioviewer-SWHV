@@ -33,7 +33,7 @@ public class GLListener implements GLEventListener {
 
     @Override
     public void init(GLAutoDrawable drawable) { // NEDT
-        GL2 gl = drawable.getGL().getGL2();
+        GL2 gl = (GL2) drawable.getGL();
         GLInfo.update(gl);
         GLInfo.updatePixelScale(surface);
 
@@ -73,7 +73,7 @@ public class GLListener implements GLEventListener {
 
     @Override
     public void dispose(GLAutoDrawable drawable) { // NEDT
-        GL2 gl = drawable.getGL().getGL2();
+        GL2 gl = (GL2) drawable.getGL();
         EventQueue.invokeLater(() -> {
             disposeImpl(gl);
             GLInfo.checkGLErrors(gl, "GLListener.dispose()");
@@ -178,7 +178,7 @@ public class GLListener implements GLEventListener {
             return;
         }
 
-        GL2 gl = drawable.getGL().getGL2();
+        GL2 gl = (GL2) drawable.getGL();
         GLInfo.updatePixelScale(surface);
 
         Layers.prerender(gl);
