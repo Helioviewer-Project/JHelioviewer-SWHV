@@ -8,6 +8,7 @@ import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL2GL3;
 
 public class GLSLTexture {
 
@@ -22,7 +23,7 @@ public class GLSLTexture {
     public void setData(GL2 gl, FloatBuffer position, FloatBuffer coords) {
         hasPoints = false;
         int plen = position.limit() / 3;
-        if (position.limit() != 12 || coords.limit() != 8) {
+        if (plen * 3 != position.limit() || plen != coords.limit() / 2) {
             Log.error("Something is wrong with the vertices or coords from this GLSLTexture");
             return;
         }
@@ -54,6 +55,20 @@ public class GLSLTexture {
 
         bindVBOs(gl);
         gl.glDrawElements(GL2.GL_TRIANGLE_FAN, ivbo.bufferSize, GL2.GL_UNSIGNED_INT, 0);
+        unbindVBOs(gl);
+
+        GLSLShader.unbind(gl);
+    }
+
+    public void renderQuads(GL2 gl, int count) {
+        if (!hasPoints)
+            return;
+
+        GLSLTextureShader.texture.bind(gl);
+        GLSLTextureShader.texture.bindParams(gl);
+
+        bindVBOs(gl);
+        gl.glDrawArrays(GL2GL3.GL_QUADS, 0, count);
         unbindVBOs(gl);
 
         GLSLShader.unbind(gl);
