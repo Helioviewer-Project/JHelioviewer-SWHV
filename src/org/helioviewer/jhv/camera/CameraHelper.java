@@ -10,45 +10,33 @@ import org.helioviewer.jhv.math.Mat4;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.opengl.GLMatrix;
 import org.helioviewer.jhv.opengl.GLSLShape;
 
 import com.jogamp.opengl.GL2;
 
 public class CameraHelper {
 
-    private static final double halfDepth = 3 * Sun.MeanEarthDistance;
+    private static final float halfDepth = (float) (3 * Sun.MeanEarthDistance);
 
     public static void applyPerspectiveLatitudinal(Camera camera, Viewport vp, GL2 gl) {
-        gl.glMatrixMode(GL2.GL_PROJECTION);
-        gl.glLoadIdentity();
-
         double width = camera.getWidth();
-        gl.glOrtho(-width * vp.aspect, width * vp.aspect, -width, width, -1, 1);
-
-        gl.glMatrixMode(GL2.GL_MODELVIEW);
+        GLMatrix.setOrthoProj(-(float) (width * vp.aspect), (float) (width * vp.aspect), - (float) width, (float) width, -1, 1);
 
         Vec2 translation = camera.getCurrentTranslation();
-        Mat4 transformation = Mat4.translation(translation.x, translation.y, 0);
-        gl.glLoadMatrixd(transformation.m, 0);
+        GLMatrix.setTranslateView((float) translation.x, (float) translation.y, 0);
     }
 
     public static void applyPerspective(Camera camera, Viewport vp, GL2 gl, GLSLShape blackCircle) {
-        gl.glMatrixMode(GL2.GL_PROJECTION);
-        gl.glLoadIdentity();
-
         double width = camera.getWidth();
-        gl.glOrtho(-width * vp.aspect, width * vp.aspect, -width, width, -halfDepth, halfDepth);
-
-        gl.glMatrixMode(GL2.GL_MODELVIEW);
+        GLMatrix.setOrthoProj(-(float) (width * vp.aspect), (float) (width * vp.aspect), - (float) width, (float) width, -halfDepth, halfDepth);
 
         Vec2 translation = camera.getCurrentTranslation();
-        Mat4 transformation = Mat4.translation(translation.x, translation.y, 0);
-        gl.glLoadMatrixd(transformation.m, 0);
+        GLMatrix.setTranslateView((float) translation.x, (float) translation.y, 0);
 
         blackCircle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
 
-        transformation = camera.getRotation().toMatrix().translate(translation.x, translation.y, 0);
-        gl.glLoadMatrixd(transformation.m, 0);
+        GLMatrix.setView(camera.getRotation().toMatrix().translate(translation.x, translation.y, 0).getFloatArray());
     }
 
     private static double computeNormalizedX(Viewport vp, double screenX) {
