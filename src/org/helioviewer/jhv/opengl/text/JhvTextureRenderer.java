@@ -642,10 +642,11 @@ class JhvTextureRenderer {
     }
 
     // Infer the internal format if not an intensity texture
-    final int internalFormat = (intensity ? GL2.GL_INTENSITY : 0);
+    // final int internalFormat = (intensity ? GL2.GL_INTENSITY : 0);
+    final int internalFormat = GL2.GL_RGBA; // force for high version OpenGL
     final int imageType =
-      (intensity ? BufferedImage.TYPE_BYTE_GRAY :
-       (alpha ?  BufferedImage.TYPE_INT_ARGB_PRE : BufferedImage.TYPE_INT_RGB));
+//      (intensity ? BufferedImage.TYPE_BYTE_GRAY :
+       (alpha ?  BufferedImage.TYPE_INT_ARGB_PRE : BufferedImage.TYPE_INT_RGB); //);
     image = new BufferedImage(width, height, imageType);
     // Always realllocate the TextureData associated with this
     // BufferedImage; it's just a reference to the contents but we
