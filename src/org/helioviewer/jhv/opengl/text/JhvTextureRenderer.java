@@ -434,7 +434,6 @@ class JhvTextureRenderer {
     final GL2 gl = (GL2) GLContext.getCurrentGL();
     if (ortho) {
       gl.glDisable(GL.GL_DEPTH_TEST);
-      gl.glDisable(GL.GL_CULL_FACE);
 
       GLMatrix.pushProj();
       GLMatrix.setOrthoProj(0, width, 0, height, -1, 1);
@@ -468,7 +467,6 @@ class JhvTextureRenderer {
     texture.disable(gl);
     if (ortho) {
       gl.glEnable(GL.GL_DEPTH_TEST);
-      gl.glEnable(GL.GL_CULL_FACE);
 
       GLMatrix.pop();
       GLMatrix.popProj();
