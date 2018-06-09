@@ -557,15 +557,17 @@ class JhvTextureRenderer {
 
   private void beginRendering(final boolean ortho, final int width, final int height, final boolean disableDepthTestForOrtho) {
     final GL2 gl = (GL2) GLContext.getCurrentGL();
+/*
     final int attribBits =
       GL2.GL_ENABLE_BIT | GL2.GL_TEXTURE_BIT | GL.GL_COLOR_BUFFER_BIT |
       (ortho ? (GL.GL_DEPTH_BUFFER_BIT | GL2.GL_TRANSFORM_BIT) : 0);
     gl.glPushAttrib(attribBits);
     gl.glDisable(GLLightingFunc.GL_LIGHTING);
+*/
     if (ortho) {
-      if (disableDepthTestForOrtho) {
+//    if (disableDepthTestForOrtho) {
         gl.glDisable(GL.GL_DEPTH_TEST);
-      }
+//    }
       gl.glDisable(GL.GL_CULL_FACE);
 
       GLMatrix.pushProj();
@@ -585,12 +587,12 @@ class JhvTextureRenderer {
       gl.glLoadIdentity();
 */
     }
-    gl.glEnable(GL.GL_BLEND);
-    gl.glBlendFunc(GL.GL_ONE, GL.GL_ONE_MINUS_SRC_ALPHA);
+//  gl.glEnable(GL.GL_BLEND);
+//  gl.glBlendFunc(GL.GL_ONE, GL.GL_ONE_MINUS_SRC_ALPHA);
     final Texture texture = getTexture();
     texture.enable(gl);
     texture.bind(gl);
-    gl.glTexEnvi(GL2ES1.GL_TEXTURE_ENV, GL2ES1.GL_TEXTURE_ENV_MODE, GL2ES1.GL_MODULATE);
+//  gl.glTexEnvi(GL2ES1.GL_TEXTURE_ENV, GL2ES1.GL_TEXTURE_ENV_MODE, GL2ES1.GL_MODULATE);
     // Change polygon color to last saved
     gl.glColor4f(r, g, b, a);
     if (smoothingChanged) {
@@ -614,6 +616,9 @@ class JhvTextureRenderer {
     final Texture texture = getTexture();
     texture.disable(gl);
     if (ortho) {
+      gl.glEnable(GL.GL_DEPTH_TEST);
+      gl.glEnable(GL.GL_CULL_FACE);
+
       GLMatrix.pop();
       GLMatrix.popProj();
 /*
@@ -625,7 +630,7 @@ class JhvTextureRenderer {
       gl.glPopMatrix();
 */
     }
-    gl.glPopAttrib();
+//  gl.glPopAttrib();
   }
 
   private void init(final int width, final int height) {
