@@ -122,15 +122,6 @@ class JhvTextureRenderer {
     return image.getHeight();
   }
 
-  /** Returns the size of the backing store of this renderer in a
-      newly-allocated {@link java.awt.Dimension Dimension} object.
-
-      @return the size of the backing store of this renderer
-  */
-  public Dimension getSize() {
-    return getSize(null);
-  }
-
   /** Returns the size of the backing store of this renderer. Uses the
       {@link java.awt.Dimension Dimension} object if one is supplied,
       or allocates a new one if null is passed.
@@ -183,15 +174,6 @@ class JhvTextureRenderer {
   public void setSmoothing(final boolean smoothing) {
     this.smoothing = smoothing;
     smoothingChanged = true;
-  }
-
-  /** Returns whether smoothing is enabled for the OpenGL texture; see
-      {@link #setSmoothing setSmoothing}. Defaults to true.
-
-      @return whether smoothing is enabled for the OpenGL texture
-  */
-  public boolean getSmoothing() {
-    return smoothing;
   }
 
   /** Creates a {@link java.awt.Graphics2D Graphics2D} instance for
@@ -304,94 +286,6 @@ class JhvTextureRenderer {
   */
   public void begin3DRendering() throws GLException {
     beginRendering(false, 0, 0);
-  }
-
-  /** Draws an orthographically projected rectangle containing all of
-      the underlying texture to the specified location on the
-      screen. All (x, y) coordinates are specified relative to the
-      lower left corner of either the texture image or the current
-      OpenGL drawable. This method is equivalent to
-      <code>drawOrthoRect(screenx, screeny, 0, 0, getWidth(),
-      getHeight());</code>.
-
-      @param screenx the on-screen x coordinate at which to draw the rectangle
-      @param screeny the on-screen y coordinate (relative to lower left) at
-        which to draw the rectangle
-
-      @throws GLException If an OpenGL context is not current when this method is called
-  */
-  public void drawOrthoRect(final int screenx, final int screeny) throws GLException {
-    drawOrthoRect(screenx, screeny, 0, 0, getWidth(), getHeight());
-  }
-
-  /** Draws an orthographically projected rectangle of the underlying
-      texture to the specified location on the screen. All (x, y)
-      coordinates are specified relative to the lower left corner of
-      either the texture image or the current OpenGL drawable.
-
-      @param screenx the on-screen x coordinate at which to draw the rectangle
-      @param screeny the on-screen y coordinate (relative to lower left) at
-        which to draw the rectangle
-      @param texturex the x coordinate of the pixel in the texture of
-        the lower left portion of the rectangle to draw
-      @param texturey the y coordinate of the pixel in the texture
-        (relative to lower left) of the lower left portion of the
-        rectangle to draw
-      @param width the width of the rectangle to draw
-      @param height the height of the rectangle to draw
-
-      @throws GLException If an OpenGL context is not current when this method is called
-  */
-  private void drawOrthoRect(final int screenx, final int screeny,
-                             final int texturex, final int texturey,
-                             final int width, final int height) throws GLException {
-    draw3DRect(screenx, screeny, 0, texturex, texturey, width, height, 1);
-  }
-
-  /** Draws a rectangle of the underlying texture to the specified 3D
-      location. In the current coordinate system, the lower left
-      corner of the rectangle is placed at (x, y, z), and the upper
-      right corner is placed at (x + width * scaleFactor, y + height *
-      scaleFactor, z). The lower left corner of the sub-rectangle of
-      the texture is (texturex, texturey) and the upper right corner
-      is (texturex + width, texturey + height). For back-face culling
-      purposes, the rectangle is drawn with counterclockwise
-      orientation of the vertices when viewed from the front.
-
-      @param x the x coordinate at which to draw the rectangle
-      @param y the y coordinate at which to draw the rectangle
-      @param z the z coordinate at which to draw the rectangle
-      @param texturex the x coordinate of the pixel in the texture of
-        the lower left portion of the rectangle to draw
-      @param texturey the y coordinate of the pixel in the texture
-        (relative to lower left) of the lower left portion of the
-        rectangle to draw
-      @param width the width in texels of the rectangle to draw
-      @param height the height in texels of the rectangle to draw
-      @param scaleFactor the scale factor to apply (multiplicatively)
-        to the size of the drawn rectangle
-
-      @throws GLException If an OpenGL context is not current when this method is called
-  */
-  public void draw3DRect(final float x, final float y, final float z,
-                         final int texturex, final int texturey,
-                         final int width, final int height,
-                         final float scaleFactor) throws GLException {
-    final GL2 gl = (GL2) GLContext.getCurrentGL();
-    final Texture texture = getTexture();
-    final TextureCoords coords = texture.getSubImageTexCoords(texturex, texturey,
-                                                        texturex + width,
-                                                        texturey + height);
-    gl.glBegin(GL2GL3.GL_QUADS);
-    gl.glTexCoord2f(coords.left(), coords.bottom());
-    gl.glVertex3f(x, y, z);
-    gl.glTexCoord2f(coords.right(), coords.bottom());
-    gl.glVertex3f(x + width * scaleFactor, y, z);
-    gl.glTexCoord2f(coords.right(), coords.top());
-    gl.glVertex3f(x + width * scaleFactor, y + height * scaleFactor, z);
-    gl.glTexCoord2f(coords.left(), coords.top());
-    gl.glVertex3f(x, y + height * scaleFactor, z);
-    gl.glEnd();
   }
 
   /** Convenience method which assists in rendering portions of the
@@ -551,7 +445,7 @@ class JhvTextureRenderer {
       }
       return true;
     }
-
     return false;
   }
+
 }
