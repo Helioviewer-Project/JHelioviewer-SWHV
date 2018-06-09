@@ -1499,21 +1499,20 @@ public class JhvTextRenderer {
                 mPipelinedQuadRenderer.glVertex3f(x + (width * scaleFactor), y,
                                                   z);
 
-                mPipelinedQuadRenderer.glTexCoord2f(tx1, ty2);
-                mPipelinedQuadRenderer.glVertex3f(x,
+                mPipelinedQuadRenderer.glTexCoord2f(tx2, ty2);
+                mPipelinedQuadRenderer.glVertex3f(x + (width * scaleFactor),
                                                   y + (height * scaleFactor), z);
-
-                mPipelinedQuadRenderer.glTexCoord2f(tx1, ty2);
-                mPipelinedQuadRenderer.glVertex3f(x,
-                                                  y + (height * scaleFactor), z);
-
-                mPipelinedQuadRenderer.glTexCoord2f(tx2, ty1);
-                mPipelinedQuadRenderer.glVertex3f(x + (width * scaleFactor), y,
-                                                  z);
 
                 mPipelinedQuadRenderer.glTexCoord2f(tx2, ty2);
                 mPipelinedQuadRenderer.glVertex3f(x + (width * scaleFactor),
                                                   y + (height * scaleFactor), z);
+
+                mPipelinedQuadRenderer.glTexCoord2f(tx1, ty2);
+                mPipelinedQuadRenderer.glVertex3f(x,
+                                                  y + (height * scaleFactor), z);
+
+                mPipelinedQuadRenderer.glTexCoord2f(tx1, ty1);
+                mPipelinedQuadRenderer.glVertex3f(x, y, z);
 
             } catch (final Exception e) {
                 e.printStackTrace();
