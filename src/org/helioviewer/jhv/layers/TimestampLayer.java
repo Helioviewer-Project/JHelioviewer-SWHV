@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -67,9 +66,9 @@ public class TimestampLayer extends AbstractLayer {
 
         JhvTextRenderer renderer = GLText.getRenderer(size);
         renderer.beginRendering(vp.width, vp.height, true);
-        renderer.setColor(Color.BLACK);
+        renderer.setColor(0, 0, 0, 1);
         renderer.draw(text, delta, delta);
-        renderer.setColor(Color.WHITE);
+        renderer.setColor(1, 1, 1, 1);
         renderer.draw(text, delta + 1, delta + 1);
         renderer.endRendering();
     }

@@ -432,6 +432,7 @@ public class JhvTextRenderer {
         @param color the new color to use for rendering text
         @throws GLException If an OpenGL context is not current when this method is called
     */
+/*
     public void setColor(final Color color) throws GLException {
         final boolean noNeedForFlush = (haveCachedColor && color.equals(cachedColor));
 
@@ -443,7 +444,7 @@ public class JhvTextRenderer {
         haveCachedColor = true;
         cachedColor = color;
     }
-
+*/
     /** Changes the current color of this TextRenderer to the supplied
         one, where each component ranges from 0.0f - 1.0f. The alpha
         component, if used, does not need to be premultiplied into the
@@ -475,6 +476,10 @@ public class JhvTextRenderer {
         cachedG = g;
         cachedB = b;
         cachedA = a;
+        textColor[0] = r;
+        textColor[1] = g;
+        textColor[2] = b;
+        textColor[3] = a;
         cachedColor = null;
     }
 
@@ -1763,7 +1768,7 @@ public class JhvTextRenderer {
     }
 
     private static final GLSLTexture glslTexture = new GLSLTexture();
-    private static final float[] defaultColor = { 1, 1, 1, 1 };
+    private final float[] textColor = { 1, 1, 1, 1 };
 
     class Pipelined_QuadRenderer {
         int mOutstandingGlyphsVerticesPipeline = 0;
@@ -1842,7 +1847,7 @@ public class JhvTextRenderer {
 
                 glslTexture.init(gl);
                 glslTexture.setData(gl, mVertCoords, mTexCoords);
-                glslTexture.renderQuads(gl, defaultColor, mOutstandingGlyphsVerticesPipeline);
+                glslTexture.renderQuads(gl, textColor, mOutstandingGlyphsVerticesPipeline);
                 glslTexture.dispose(gl);
 /*
                 gl.glEnableClientState(GLPointerFunc.GL_VERTEX_ARRAY);

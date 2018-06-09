@@ -405,6 +405,7 @@ class JhvTextureRenderer {
       @throws GLException If an OpenGL context is not current when this method is called
   */
   public void setColor(final float r, final float g, final float b, final float a) throws GLException {
+/*
     final GL2 gl = (GL2) GLContext.getCurrentGL();
     this.r = r * a;
     this.g = g * a;
@@ -412,6 +413,7 @@ class JhvTextureRenderer {
     this.a = a;
 
     gl.glColor4f(this.r, this.g, this.b, this.a);
+*/
   }
 
   private float[] compArray;
@@ -594,7 +596,7 @@ class JhvTextureRenderer {
     texture.bind(gl);
 //  gl.glTexEnvi(GL2ES1.GL_TEXTURE_ENV, GL2ES1.GL_TEXTURE_ENV_MODE, GL2ES1.GL_MODULATE);
     // Change polygon color to last saved
-    gl.glColor4f(r, g, b, a);
+//  gl.glColor4f(r, g, b, a);
     if (smoothingChanged) {
       smoothingChanged = false;
       if (smoothing) {
