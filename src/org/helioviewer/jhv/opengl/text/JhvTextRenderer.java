@@ -118,8 +118,6 @@ import org.helioviewer.jhv.opengl.GLSLTexture;
 */
 public class JhvTextRenderer {
 
-    // These are occasionally useful for more in-depth debugging
-    private static final boolean DISABLE_GLYPH_CACHE = false;
     private static final boolean DRAW_BBOXES = false;
 
     private static final int kSize = 256;
@@ -659,87 +657,6 @@ public class JhvTextRenderer {
         }
     }
 
-    private void draw3D_ROBUST(final CharSequence str, final float x, final float y, final float z,
-                               final float scaleFactor) {
-        String curStr;
-        if (str instanceof String) {
-            curStr = (String) str;
-        } else {
-            curStr = str.toString();
-        }
-
-        // Look up the string on the backing store
-        Rect rect = stringLocations.get(curStr);
-
-        if (rect == null) {
-            // Rasterize this string and place it on the backing store
-            // Graphics2D g = getGraphics2D();
-            final Rectangle2D origBBox = preNormalize(renderDelegate.getBounds(curStr, font, getFontRenderContext()));
-            final Rectangle2D bbox = normalize(origBBox);
-            final Point origin = new Point((int) -bbox.getMinX(),
-                                     (int) -bbox.getMinY());
-            rect = new Rect(0, 0, (int) bbox.getWidth(),
-                            (int) bbox.getHeight(),
-                            new TextData(curStr, origin, origBBox, -1));
-
-            packer.add(rect);
-            stringLocations.put(curStr, rect);
-
-            // Re-fetch the Graphics2D in case the addition of the rectangle
-            // caused the old backing store to be thrown away
-            Graphics2D g = getGraphics2D();
-
-            // OK, should now have an (x, y) for this rectangle; rasterize
-            // the String
-            final int strx = rect.x() + origin.x;
-            final int stry = rect.y() + origin.y;
-
-            // Clear out the area we're going to draw into
-            g.setComposite(AlphaComposite.Clear);
-            g.fillRect(rect.x(), rect.y(), rect.w(), rect.h());
-            g.setComposite(AlphaComposite.Src);
-
-            // Draw the string
-            renderDelegate.draw(g, curStr, strx, stry);
-
-            if (DRAW_BBOXES) {
-                final TextData data = (TextData) rect.getUserData();
-                // Draw a bounding box on the backing store
-                g.drawRect(strx - data.origOriginX(),
-                           stry - data.origOriginY(),
-                           (int) data.origRect().getWidth(),
-                           (int) data.origRect().getHeight());
-                g.drawRect(strx - data.origin().x,
-                           stry - data.origin().y,
-                           rect.w(),
-                           rect.h());
-            }
-
-            // Mark this region of the TextureRenderer as dirty
-            getBackingStore().markDirty(rect.x(), rect.y(), rect.w(),
-                                        rect.h());
-        }
-
-        // OK, now draw the portion of the backing store to the screen
-        final JhvTextureRenderer renderer = getBackingStore();
-
-        // NOTE that the rectangles managed by the packer have their
-        // origin at the upper-left but the TextureRenderer's origin is
-        // at its lower left!!!
-        final TextData data = (TextData) rect.getUserData();
-        data.markUsed();
-
-        final Rectangle2D origRect = data.origRect();
-
-        // Align the leftmost point of the baseline to the (x, y, z) coordinate requested
-        renderer.draw3DRect(x - (scaleFactor * data.origOriginX()),
-                            y - (scaleFactor * ((float) origRect.getHeight() - data.origOriginY())), z,
-                            rect.x() + (data.origin().x - data.origOriginX()),
-                            renderer.getHeight() - rect.y() - (int) origRect.getHeight() -
-                              (data.origin().y - data.origOriginY()),
-                            (int) origRect.getWidth(), (int) origRect.getHeight(), scaleFactor);
-    }
-
     /** Class supporting more full control over the process of rendering
         the bitmapped text. Allows customization of whether the backing
         store text bitmap is full-color or intensity only, the size of
@@ -1130,14 +1047,14 @@ public class JhvTextRenderer {
     class Glyph {
         // If this Glyph represents an individual unicode glyph, this
         // is its unicode ID. If it represents a String, this is -1.
-        private int unicodeID;
+        private final int unicodeID;
         // If the above field isn't -1, then these fields are used.
         // The glyph code in the font
-        private int glyphCode;
+        private final int glyphCode;
         // The GlyphProducer which created us
-        private GlyphProducer producer;
+        private final GlyphProducer producer;
         // The advance of this glyph
-        private float advance;
+        private final float advance;
         // The GlyphVector for this single character; this is passed
         // in during construction but cleared during the upload
         // process
@@ -1145,12 +1062,6 @@ public class JhvTextRenderer {
         // The rectangle of this glyph on the backing store, or null
         // if it has been cleared due to space pressure
         private Rect glyphRectForTextureMapping;
-        // If this Glyph represents a String, this is the sequence of
-        // characters
-        private String str;
-        // Whether we need a valid advance when rendering this string
-        // (i.e., whether it has other single glyphs coming after it)
-        private boolean needAdvance;
 
         // Creates a Glyph representing an individual Unicode character
         public Glyph(final int unicodeID,
@@ -1163,14 +1074,6 @@ public class JhvTextRenderer {
             this.advance = advance;
             this.singleUnicodeGlyphVector = singleUnicodeGlyphVector;
             this.producer = producer;
-        }
-
-        // Creates a Glyph representing a sequence of characters, with
-        // an indication of whether additional single glyphs are being
-        // rendered after it
-        public Glyph(final String str, final boolean needAdvance) {
-            this.str = str;
-            this.needAdvance = needAdvance;
         }
 
         /** Returns this glyph's unicode ID */
@@ -1190,20 +1093,6 @@ public class JhvTextRenderer {
 
         /** Draws this glyph and returns the (x) advance for this glyph */
         public float draw3D(final float inX, final float inY, final float z, final float scaleFactor) {
-            if (str != null) {
-                draw3D_ROBUST(str, inX, inY, z, scaleFactor);
-                if (!needAdvance) {
-                    return 0;
-                }
-                // Compute and return the advance for this string
-                final GlyphVector gv = font.createGlyphVector(getFontRenderContext(), str);
-                float totalAdvance = 0;
-                for (int i = 0; i < gv.getNumGlyphs(); i++) {
-                    totalAdvance += gv.getGlyphMetrics(i).getAdvance();
-                }
-                return totalAdvance;
-            }
-
             // This is the code path taken for individual glyphs
             if (glyphRectForTextureMapping == null) {
                 upload();
@@ -1241,29 +1130,26 @@ public class JhvTextRenderer {
                 final float tx2 = xScale * (texturex + width) / renderer.getWidth();
                 final float ty2 = yScale * (1.0f -
                                       ((float) (texturey + height) / (float) renderer.getHeight()));
-
+                // A
                 mPipelinedQuadRenderer.glTexCoord2f(tx1, ty1);
                 mPipelinedQuadRenderer.glVertex3f(x, y, z);
-
+                // B
                 mPipelinedQuadRenderer.glTexCoord2f(tx2, ty1);
-                mPipelinedQuadRenderer.glVertex3f(x + (width * scaleFactor), y,
-                                                  z);
-
+                mPipelinedQuadRenderer.glVertex3f(x + (width * scaleFactor), y, z);
+                // C
                 mPipelinedQuadRenderer.glTexCoord2f(tx2, ty2);
                 mPipelinedQuadRenderer.glVertex3f(x + (width * scaleFactor),
                                                   y + (height * scaleFactor), z);
-
-                mPipelinedQuadRenderer.glTexCoord2f(tx2, ty2);
-                mPipelinedQuadRenderer.glVertex3f(x + (width * scaleFactor),
-                                                  y + (height * scaleFactor), z);
-
-                mPipelinedQuadRenderer.glTexCoord2f(tx1, ty2);
-                mPipelinedQuadRenderer.glVertex3f(x,
-                                                  y + (height * scaleFactor), z);
-
+                // A
                 mPipelinedQuadRenderer.glTexCoord2f(tx1, ty1);
                 mPipelinedQuadRenderer.glVertex3f(x, y, z);
-
+                // C
+                mPipelinedQuadRenderer.glTexCoord2f(tx2, ty2);
+                mPipelinedQuadRenderer.glVertex3f(x + (width * scaleFactor),
+                                                  y + (height * scaleFactor), z);
+                // D
+                mPipelinedQuadRenderer.glTexCoord2f(tx1, ty2);
+                mPipelinedQuadRenderer.glVertex3f(x, y + (height * scaleFactor), z);
             } catch (final Exception e) {
                 e.printStackTrace();
             }
@@ -1359,12 +1245,6 @@ public class JhvTextRenderer {
                 fullRunGlyphVector = font.createGlyphVector(getFontRenderContext(), iter);
                 fullGlyphVectorCache.put(inString.toString(), fullRunGlyphVector);
             }
-            final boolean complex = (fullRunGlyphVector.getLayoutFlags() != 0);
-            if (complex || DISABLE_GLYPH_CACHE) {
-                // Punt to the robust version of the renderer
-                glyphsOutput.add(new Glyph(inString.toString(), false));
-                return glyphsOutput;
-            }
 
             final int lengthInGlyphs = fullRunGlyphVector.getNumGlyphs();
             int i = 0;
@@ -1379,17 +1259,6 @@ public class JhvTextRenderer {
                 if (glyph != null) {
                     glyphsOutput.add(glyph);
                     i++;
-                } else {
-                    // Assemble a run of characters that don't fit in
-                    // the cache
-                    final StringBuilder buf = new StringBuilder();
-                    while (i < lengthInGlyphs &&
-                           getGlyph(inString, fullRunGlyphVector.getGlyphMetrics(i), i) == null) {
-                        buf.append(inString.charAt(i++));
-                    }
-                    glyphsOutput.add(new Glyph(buf.toString(),
-                                               // Any more glyphs after this run?
-                                               i < lengthInGlyphs));
                 }
             }
             return glyphsOutput;
