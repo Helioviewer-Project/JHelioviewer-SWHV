@@ -40,9 +40,6 @@
 package org.helioviewer.jhv.opengl.text;
 
 import com.jogamp.common.nio.Buffers;
-import com.jogamp.common.util.InterruptSource;
-import com.jogamp.common.util.PropertyAccess;
-import com.jogamp.opengl.util.*;
 import com.jogamp.opengl.util.packrect.*;
 import com.jogamp.opengl.util.texture.*;
 
@@ -50,14 +47,11 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 
 // For debugging purposes
-import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.RenderingHints;
-import java.awt.event.*;
 import java.awt.font.*;
 import java.awt.geom.*;
 import java.nio.*;
@@ -66,13 +60,8 @@ import java.util.*;
 
 import com.jogamp.opengl.*;
 //import com.jogamp.opengl.fixedfunc.GLPointerFunc;
-import com.jogamp.opengl.glu.*;
-import com.jogamp.opengl.awt.*;
-
-import jogamp.opengl.Debug;
 
 import org.helioviewer.jhv.opengl.GLSLTexture;
-
 
 /** Renders bitmapped Java 2D text into an OpenGL window with high
     performance, full Unicode support, and a simple API. Performs
@@ -128,12 +117,6 @@ import org.helioviewer.jhv.opengl.GLSLTexture;
     @author Kenneth Russell
 */
 public class JhvTextRenderer {
-    private static final boolean DEBUG;
-
-    static {
-        Debug.initSingleton();
-        DEBUG = PropertyAccess.isPropertyDefined("jogl.debug.TextRenderer", true);
-    }
 
     // These are occasionally useful for more in-depth debugging
     private static final boolean DISABLE_GLYPH_CACHE = false;
@@ -180,15 +163,7 @@ public class JhvTextRenderer {
     private int beginRenderingWidth;
     private int beginRenderingHeight;
 
-    // For debugging only
-    private Frame dbgFrame;
-
-    // Debugging purposes only
-    private boolean debugged;
     private Pipelined_QuadRenderer mPipelinedQuadRenderer;
-
-    //emzic: added boolean flag
-    private boolean useVertexArrays = true;
 
     // Whether GL_LINEAR filtering is enabled for the backing store
     private boolean smoothing = true;
@@ -505,10 +480,6 @@ public class JhvTextRenderer {
         cachedBackingStore = null;
         cachedGraphics = null;
         cachedFontRenderContext = null;
-
-        if (dbgFrame != null) {
-            dbgFrame.dispose();
-        }
     }
 
     //----------------------------------------------------------------------
@@ -586,18 +557,13 @@ public class JhvTextRenderer {
     private void beginRendering(final boolean ortho, final int width, final int height) {
         final GL2 gl = (GL2) GLContext.getCurrentGL();
 
-        if (DEBUG && !debugged) {
-            debug(gl);
-        }
-
         inBeginEndPair = true;
         isOrthoMode = ortho;
         beginRenderingWidth = width;
         beginRenderingHeight = height;
 
         if (ortho) {
-            getBackingStore().beginOrthoRendering(width, height
-            );
+            getBackingStore().beginOrthoRendering(width, height);
         } else {
             getBackingStore().begin3DRendering();
         }
@@ -617,10 +583,6 @@ public class JhvTextRenderer {
         // Disable future attempts to use mipmapping if TextureRenderer
         // doesn't support it
         if (mipmap && !getBackingStore().isUsingAutoMipmapGeneration()) {
-            if (DEBUG) {
-                System.err.println("Disabled mipmapping in TextRenderer");
-            }
-
             mipmap = false;
         }
     }
@@ -636,23 +598,7 @@ public class JhvTextRenderer {
         flushGlyphPipeline();
 
         inBeginEndPair = false;
-/*
-        final GL2 gl = (GL2) GLContext.getCurrentGL();
 
-        // Pop client attrib bits used by the pipelined quad renderer
-        gl.glPopClientAttrib();
-
-        // The OpenGL spec is unclear about whether this changes the
-        // buffer bindings, so preemptively zero out the GL_ARRAY_BUFFER
-        // binding
-        if (getUseVertexArrays() && is15Available(gl)) {
-            try {
-                gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
-            } catch (final Exception e) {
-                isExtensionAvailable_GL_VERSION_1_5 = false;
-            }
-        }
-*/
         if (ortho) {
             getBackingStore().endOrthoRendering();
         } else {
@@ -661,11 +607,6 @@ public class JhvTextRenderer {
 
         if (++numRenderCycles >= CYCLES_PER_FLUSH) {
             numRenderCycles = 0;
-
-            if (DEBUG) {
-                System.err.println("Clearing unused entries in endRendering()");
-            }
-
             clearUnusedEntries();
         }
     }
@@ -700,18 +641,7 @@ public class JhvTextRenderer {
         final float frag = packer.verticalFragmentationRatio();
 
         if (!deadRects.isEmpty() && (frag > MAX_VERTICAL_FRAGMENTATION)) {
-            if (DEBUG) {
-                System.err.println(
-                                   "Compacting TextRenderer backing store due to vertical fragmentation " +
-                                   frag);
-            }
-
             packer.compact();
-        }
-
-        if (DEBUG) {
-            getBackingStore().markDirty(0, 0, getBackingStore().getWidth(),
-                                        getBackingStore().getHeight());
         }
     }
 
@@ -808,33 +738,6 @@ public class JhvTextRenderer {
                             renderer.getHeight() - rect.y() - (int) origRect.getHeight() -
                               (data.origin().y - data.origOriginY()),
                             (int) origRect.getWidth(), (int) origRect.getHeight(), scaleFactor);
-    }
-
-    //----------------------------------------------------------------------
-    // Debugging functionality
-    //
-    private void debug(final GL gl) {
-        dbgFrame = new Frame("TextRenderer Debug Output");
-
-        final GLCanvas dbgCanvas = new GLCanvas(new GLCapabilities(gl.getGLProfile()));
-        dbgCanvas.setSharedContext(GLContext.getCurrent());
-        dbgCanvas.addGLEventListener(new DebugListener(gl, dbgFrame));
-        dbgFrame.add(dbgCanvas);
-
-        final FPSAnimator anim = new FPSAnimator(dbgCanvas, 10);
-        dbgFrame.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosing(final WindowEvent e) {
-                    // Run this on another thread than the AWT event queue to
-                    // make sure the call to Animator.stop() completes before
-                    // exiting
-                    new InterruptSource.Thread(null, anim::stop).start();
-                }
-            });
-        dbgFrame.setSize(kSize, kSize);
-        dbgFrame.setVisible(true);
-        anim.start();
-        debugged = true;
     }
 
     /** Class supporting more full control over the process of rendering
@@ -1063,11 +966,6 @@ public class JhvTextRenderer {
             // for now, let's just be more efficient
             JhvTextureRenderer renderer = new JhvTextureRenderer(w, h, true, mipmap);
             renderer.setSmoothing(smoothing);
-
-            if (DEBUG) {
-                System.err.println(" TextRenderer allocating backing store " +
-                                   w + " x " + h);
-            }
             return renderer;
         }
 
@@ -1093,22 +991,13 @@ public class JhvTextRenderer {
             // very quickly to its maximum size, at least with the TextFlow
             // demo when the text is being continually re-laid out.
             if (attemptNumber == 0) {
-                if (DEBUG) {
-                    System.err.println(
-                        "Clearing unused entries in preExpand(): attempt number " +
-                        attemptNumber);
-                }
-
                 if (inBeginEndPair) {
                     // Draw any outstanding glyphs
                     flush();
                 }
-
                 clearUnusedEntries();
-
                 return true;
             }
-
             return false;
         }
 
@@ -1118,14 +1007,7 @@ public class JhvTextRenderer {
             packer.clear();
             stringLocations.clear();
             mGlyphProducer.clearAllCacheEntries();
-
-            if (DEBUG) {
-                System.err.println(
-                                   " *** Cleared all text because addition failed ***");
-            }
-
             return attemptNumber == 0;
-
         }
 
         @Override
@@ -1661,14 +1543,6 @@ public class JhvTextRenderer {
         }
 
         private void draw() {
-            if (useVertexArrays) {
-                drawVertexArrays();
-            } else {
-                drawIMMEDIATE();
-            }
-        }
-
-        private void drawVertexArrays() {
             if (mOutstandingGlyphsVerticesPipeline > 0) {
                 final GL2 gl = (GL2) GLContext.getCurrentGL();
 
@@ -1686,118 +1560,6 @@ public class JhvTextRenderer {
                 mOutstandingGlyphsVerticesPipeline = 0;
             }
         }
-
-        private void drawIMMEDIATE() {
-            if (mOutstandingGlyphsVerticesPipeline > 0) {
-                final JhvTextureRenderer renderer = getBackingStore();
-                renderer.getTexture(); // triggers texture uploads.  Maybe this should be more obvious?
-
-                final GL2 gl = (GL2) GLContext.getCurrentGL();
-                gl.glBegin(GL2GL3.GL_QUADS);
-
-                try {
-                    final int numberOfQuads = mOutstandingGlyphsVerticesPipeline / 4;
-                    mVertCoords.rewind();
-                    mTexCoords.rewind();
-
-                    for (int i = 0; i < numberOfQuads; i++) {
-                        gl.glTexCoord2f(mTexCoords.get(), mTexCoords.get());
-                        gl.glVertex3f(mVertCoords.get(), mVertCoords.get(),
-                                      mVertCoords.get());
-
-                        gl.glTexCoord2f(mTexCoords.get(), mTexCoords.get());
-                        gl.glVertex3f(mVertCoords.get(), mVertCoords.get(),
-                                      mVertCoords.get());
-
-                        gl.glTexCoord2f(mTexCoords.get(), mTexCoords.get());
-                        gl.glVertex3f(mVertCoords.get(), mVertCoords.get(),
-                                      mVertCoords.get());
-
-                        gl.glTexCoord2f(mTexCoords.get(), mTexCoords.get());
-                        gl.glVertex3f(mVertCoords.get(), mVertCoords.get(),
-                                      mVertCoords.get());
-                    }
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    gl.glEnd();
-                    mVertCoords.rewind();
-                    mTexCoords.rewind();
-                    mOutstandingGlyphsVerticesPipeline = 0;
-                }
-            }
-        }
-    }
-
-    class DebugListener implements GLEventListener {
-        private GLU glu;
-        private Frame frame;
-
-        DebugListener(final GL gl, final Frame frame) {
-            this.glu = GLU.createGLU(gl);
-            this.frame = frame;
-        }
-
-        @Override
-        public void display(final GLAutoDrawable drawable) {
-            final GL2 gl = (GL2) GLContext.getCurrentGL();
-            gl.glClear(GL.GL_DEPTH_BUFFER_BIT | GL.GL_COLOR_BUFFER_BIT);
-
-            if (packer == null) {
-                return;
-            }
-
-            final JhvTextureRenderer rend = getBackingStore();
-            final int w = rend.getWidth();
-            final int h = rend.getHeight();
-            rend.beginOrthoRendering(w, h);
-            rend.drawOrthoRect(0, 0);
-            rend.endOrthoRendering();
-
-            if ((frame.getWidth() != w) || (frame.getHeight() != h)) {
-                EventQueue.invokeLater(() -> frame.setSize(w, h));
-            }
-        }
-
-        @Override
-        public void dispose(final GLAutoDrawable drawable) {
-            glu=null;
-            frame=null;
-        }
-
-        // Unused methods
-        @Override
-        public void init(final GLAutoDrawable drawable) {
-        }
-
-        @Override
-        public void reshape(final GLAutoDrawable drawable, final int x, final int y, final int width,
-                            final int height) {
-        }
-
-        public void displayChanged(final GLAutoDrawable drawable,
-                                   final boolean modeChanged, final boolean deviceChanged) {
-        }
-    }
-
-    /**
-     * Sets whether vertex arrays are being used internally for
-     * rendering, or whether text is rendered using the OpenGL
-     * immediate mode commands. This is provided as a concession for
-     * certain graphics cards which have poor vertex array
-     * performance. Defaults to true.
-     */
-    public void setUseVertexArrays(final boolean useVertexArrays) {
-        this.useVertexArrays = useVertexArrays;
-    }
-
-    /**
-     * Indicates whether vertex arrays are being used internally for
-     * rendering, or whether text is rendered using the OpenGL
-     * immediate mode commands. Defaults to true.
-     */
-    public final boolean getUseVertexArrays() {
-        return useVertexArrays;
     }
 
     /**
