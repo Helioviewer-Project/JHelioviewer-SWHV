@@ -40,7 +40,6 @@
 
 package org.helioviewer.jhv.opengl.text;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -48,9 +47,6 @@ import java.awt.Rectangle;
 import java.awt.image.*;
 
 import com.jogamp.opengl.*;
-import com.jogamp.opengl.fixedfunc.GLLightingFunc;
-import com.jogamp.opengl.fixedfunc.GLMatrixFunc;
-import com.jogamp.opengl.glu.gl2.*;
 
 import com.jogamp.opengl.util.texture.*;
 import com.jogamp.opengl.util.texture.awt.*;
@@ -77,9 +73,6 @@ class JhvTextureRenderer {
   // Whether we have an alpha channel in the (RGB/A) backing store
   private final boolean alpha;
 
-  // Whether we're using only a GL_INTENSITY backing store
-  private final boolean intensity;
-
   // Whether we're attempting to use automatic mipmap generation support
   private boolean mipmap;
 
@@ -96,27 +89,6 @@ class JhvTextureRenderer {
   private boolean mustReallocateTexture;
   private Rectangle dirtyRegion;
 
-  private final GLUgl2 glu = new GLUgl2();
-
-  // Current color
-  private float r = 1.0f;
-  private float g = 1.0f;
-  private float b = 1.0f;
-  private float a = 1.0f;
-
-  /** Creates a new renderer with backing store of the specified width
-      and height. If <CODE>alpha</CODE> is true, allocates an alpha
-      channel in the backing store image. No mipmap support is
-      requested.
-
-      @param width the width of the texture to render into
-      @param height the height of the texture to render into
-      @param alpha whether to allocate an alpha channel for the texture
-  */
-  JhvTextureRenderer(final int width, final int height, final boolean alpha) {
-    this(width, height, alpha, false);
-  }
-
   /** Creates a new renderer with backing store of the specified width
       and height. If <CODE>alpha</CODE> is true, allocates an alpha channel in the
       backing store image. If <CODE>mipmap</CODE> is true, attempts to use OpenGL's
@@ -129,34 +101,9 @@ class JhvTextureRenderer {
       @param mipmap whether to attempt use of automatic mipmap generation
   */
   JhvTextureRenderer(final int width, final int height, final boolean alpha, final boolean mipmap) {
-    this(width, height, alpha, false, mipmap);
-  }
-
-  // Internal constructor to avoid confusion since alpha only makes
-  // sense when intensity is not set
-  private JhvTextureRenderer(final int width, final int height, final boolean alpha, final boolean intensity, final boolean mipmap) {
     this.alpha = alpha;
-    this.intensity = intensity;
     this.mipmap = mipmap;
     init(width, height);
-  }
-
-  /** Creates a new renderer with a special kind of backing store
-      which acts only as an alpha channel. No mipmap support is
-      requested. Internally, this associates a GL_INTENSITY OpenGL
-      texture with the backing store. */
-  public static JhvTextureRenderer createAlphaOnlyRenderer(final int width, final int height) {
-    return createAlphaOnlyRenderer(width, height, false);
-  }
-
-  /** Creates a new renderer with a special kind of backing store
-      which acts only as an alpha channel. If <CODE>mipmap</CODE> is
-      true, attempts to use OpenGL's automatic mipmap generation for
-      better smoothing when rendering the TextureRenderer's contents
-      at a distance. Internally, this associates a GL_INTENSITY OpenGL
-      texture with the backing store. */
-  public static JhvTextureRenderer createAlphaOnlyRenderer(final int width, final int height, final boolean mipmap) {
-    return new JhvTextureRenderer(width, height, false, true, mipmap);
   }
 
   /** Returns the width of the backing store of this renderer.
@@ -193,7 +140,7 @@ class JhvTextureRenderer {
 
       @return the size of the backing store of this renderer
   */
-  public Dimension getSize(Dimension d) {
+  private Dimension getSize(Dimension d) {
     if (d == null)
       d = new Dimension();
     d.setSize(image.getWidth(), image.getHeight());
@@ -210,7 +157,7 @@ class JhvTextureRenderer {
       @param height the new height of the backing store of this renderer
       @throws GLException If an OpenGL context is not current when this method is called
   */
-  public void setSize(final int width, final int height) throws GLException {
+  private void setSize(final int width, final int height) throws GLException {
     init(width, height);
   }
 
@@ -339,29 +286,7 @@ class JhvTextureRenderer {
       @throws GLException If an OpenGL context is not current when this method is called
   */
   public void beginOrthoRendering(final int width, final int height) throws GLException {
-    beginOrthoRendering(width, height, true);
-  }
-
-  /** Convenience method which assists in rendering portions of the
-      OpenGL texture to the screen, if the application intends to draw
-      them as a flat overlay on to the screen. Pushes OpenGL state
-      bits (GL_ENABLE_BIT, GL_DEPTH_BUFFER_BIT and GL_TRANSFORM_BIT);
-      disables the depth test (if the "disableDepthTest" argument is
-      true), back-face culling, and lighting; enables the texture in
-      this renderer; and sets up the viewing matrices for orthographic
-      rendering where the coordinates go from (0, 0) at the lower left
-      to (width, height) at the upper right. {@link
-      #endOrthoRendering} must be used in conjunction with this method
-      to restore all OpenGL states.
-
-      @param width the width of the current on-screen OpenGL drawable
-      @param height the height of the current on-screen OpenGL drawable
-      @param disableDepthTest whether the depth test should be disabled
-
-      @throws GLException If an OpenGL context is not current when this method is called
-  */
-  public void beginOrthoRendering(final int width, final int height, final boolean disableDepthTest) throws GLException {
-    beginRendering(true, width, height, disableDepthTest);
+    beginRendering(true, width, height);
   }
 
   /** Convenience method which assists in rendering portions of the
@@ -378,59 +303,7 @@ class JhvTextureRenderer {
       @throws GLException If an OpenGL context is not current when this method is called
   */
   public void begin3DRendering() throws GLException {
-    beginRendering(false, 0, 0, false);
-  }
-
-  /** Changes the color of the polygons, and therefore the drawn
-      images, this TextureRenderer produces. Use of this method is
-      optional. The TextureRenderer uses the GL_MODULATE texture
-      environment mode, which causes the portions of the rendered
-      texture to be multiplied by the color of the rendered
-      polygons. The polygon color can be varied to achieve effects
-      like tinting of the overall output or fading in and out by
-      changing the alpha of the color. <P>
-
-      Each component ranges from 0.0f - 1.0f. The alpha component, if
-      used, does not need to be premultiplied into the color channels
-      as described in the documentation for {@link
-      com.jogamp.opengl.util.texture.Texture Texture}, although
-      premultiplied colors are used internally. The default color is
-      opaque white.
-
-      @param r the red component of the new color
-      @param g the green component of the new color
-      @param b the blue component of the new color
-      @param a the alpha component of the new color, 0.0f = completely
-        transparent, 1.0f = completely opaque
-      @throws GLException If an OpenGL context is not current when this method is called
-  */
-  public void setColor(final float r, final float g, final float b, final float a) throws GLException {
-/*
-    final GL2 gl = (GL2) GLContext.getCurrentGL();
-    this.r = r * a;
-    this.g = g * a;
-    this.b = b * a;
-    this.a = a;
-
-    gl.glColor4f(this.r, this.g, this.b, this.a);
-*/
-  }
-
-  private float[] compArray;
-  /** Changes the current color of this TextureRenderer to the
-      supplied one. The default color is opaque white. See {@link
-      #setColor(float,float,float,float) setColor} for more details.
-
-      @param color the new color to use for rendering
-      @throws GLException If an OpenGL context is not current when this method is called
-  */
-  public void setColor(final Color color) throws GLException {
-    // Get color's RGBA components as floats in the range [0,1].
-    if (compArray == null) {
-      compArray = new float[4];
-    }
-    color.getRGBComponents(compArray);
-    setColor(compArray[0], compArray[1], compArray[2], compArray[3]);
+    beginRendering(false, 0, 0);
   }
 
   /** Draws an orthographically projected rectangle containing all of
@@ -469,9 +342,9 @@ class JhvTextureRenderer {
 
       @throws GLException If an OpenGL context is not current when this method is called
   */
-  public void drawOrthoRect(final int screenx, final int screeny,
-                            final int texturex, final int texturey,
-                            final int width, final int height) throws GLException {
+  private void drawOrthoRect(final int screenx, final int screeny,
+                             final int texturex, final int texturey,
+                             final int width, final int height) throws GLException {
     draw3DRect(screenx, screeny, 0, texturex, texturey, width, height, 1);
   }
 
@@ -557,46 +430,22 @@ class JhvTextureRenderer {
   // Internals only below this point
   //
 
-  private void beginRendering(final boolean ortho, final int width, final int height, final boolean disableDepthTestForOrtho) {
+  private void beginRendering(final boolean ortho, final int width, final int height) {
     final GL2 gl = (GL2) GLContext.getCurrentGL();
-/*
-    final int attribBits =
-      GL2.GL_ENABLE_BIT | GL2.GL_TEXTURE_BIT | GL.GL_COLOR_BUFFER_BIT |
-      (ortho ? (GL.GL_DEPTH_BUFFER_BIT | GL2.GL_TRANSFORM_BIT) : 0);
-    gl.glPushAttrib(attribBits);
-    gl.glDisable(GLLightingFunc.GL_LIGHTING);
-*/
     if (ortho) {
-//    if (disableDepthTestForOrtho) {
-        gl.glDisable(GL.GL_DEPTH_TEST);
-//    }
+      gl.glDisable(GL.GL_DEPTH_TEST);
       gl.glDisable(GL.GL_CULL_FACE);
 
       GLMatrix.pushProj();
       GLMatrix.setOrthoProj(0, width, 0, height, -1, 1);
       GLMatrix.push();
       GLMatrix.setIdentityView();
-/*
-      gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);
-      gl.glPushMatrix();
-      gl.glLoadIdentity();
-      glu.gluOrtho2D(0, width, 0, height);
-      gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
-      gl.glPushMatrix();
-      gl.glLoadIdentity();
-      gl.glMatrixMode(GL.GL_TEXTURE);
-      gl.glPushMatrix();
-      gl.glLoadIdentity();
-*/
     }
-//  gl.glEnable(GL.GL_BLEND);
-//  gl.glBlendFunc(GL.GL_ONE, GL.GL_ONE_MINUS_SRC_ALPHA);
+
     final Texture texture = getTexture();
     texture.enable(gl);
     texture.bind(gl);
-//  gl.glTexEnvi(GL2ES1.GL_TEXTURE_ENV, GL2ES1.GL_TEXTURE_ENV_MODE, GL2ES1.GL_MODULATE);
-    // Change polygon color to last saved
-//  gl.glColor4f(r, g, b, a);
+
     if (smoothingChanged) {
       smoothingChanged = false;
       if (smoothing) {
@@ -623,16 +472,7 @@ class JhvTextureRenderer {
 
       GLMatrix.pop();
       GLMatrix.popProj();
-/*
-      gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);
-      gl.glPopMatrix();
-      gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
-      gl.glPopMatrix();
-      gl.glMatrixMode(GL.GL_TEXTURE);
-      gl.glPopMatrix();
-*/
     }
-//  gl.glPopAttrib();
   }
 
   private void init(final int width, final int height) {
@@ -643,12 +483,8 @@ class JhvTextureRenderer {
       image = null;
     }
 
-    // Infer the internal format if not an intensity texture
-    // final int internalFormat = (intensity ? GL2.GL_INTENSITY : 0);
     final int internalFormat = GL2.GL_RGBA; // force for high version OpenGL
-    final int imageType =
-//      (intensity ? BufferedImage.TYPE_BYTE_GRAY :
-       (alpha ?  BufferedImage.TYPE_INT_ARGB_PRE : BufferedImage.TYPE_INT_RGB); //);
+    final int imageType = (alpha ?  BufferedImage.TYPE_INT_ARGB_PRE : BufferedImage.TYPE_INT_RGB);
     image = new BufferedImage(width, height, imageType);
     // Always realllocate the TextureData associated with this
     // BufferedImage; it's just a reference to the contents but we

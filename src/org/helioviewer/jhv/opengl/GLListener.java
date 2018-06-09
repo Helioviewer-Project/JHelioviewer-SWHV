@@ -136,7 +136,7 @@ public class GLListener implements GLEventListener {
         for (Viewport vp : Display.getViewports()) {
             if (vp != null) {
                 gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-                CameraHelper.applyPerspectiveLatitudinal(camera, vp, gl);
+                CameraHelper.applyPerspectiveLatitudinal(camera, vp);
                 Layers.renderScale(camera, vp, gl);
                 ImageViewerGui.getAnnotateInteraction().drawAnnotations(vp, gl);
             }

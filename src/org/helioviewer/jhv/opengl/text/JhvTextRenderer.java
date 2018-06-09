@@ -139,7 +139,7 @@ public class JhvTextRenderer {
     private static final boolean DISABLE_GLYPH_CACHE = false;
     private static final boolean DRAW_BBOXES = false;
 
-    static final int kSize = 256;
+    private static final int kSize = 256;
 
     // Every certain number of render cycles, flush the strings which
     // haven't been used recently
@@ -148,17 +148,13 @@ public class JhvTextRenderer {
     // The amount of vertical dead space on the backing store before we
     // force a compaction
     private static final float MAX_VERTICAL_FRAGMENTATION = 0.7f;
-    static final int kQuadsPerBuffer = 100;
-    static final int kCoordsPerVertVerts = 3;
-    static final int kCoordsPerVertTex = 2;
-    static final int kVertsPerQuad = 4;
-    static final int kTotalBufferSizeVerts = kQuadsPerBuffer * kVertsPerQuad;
-    static final int kTotalBufferSizeCoordsVerts = kQuadsPerBuffer * kVertsPerQuad * kCoordsPerVertVerts;
-    static final int kTotalBufferSizeCoordsTex = kQuadsPerBuffer * kVertsPerQuad * kCoordsPerVertTex;
-    static final int kTotalBufferSizeBytesVerts = kTotalBufferSizeCoordsVerts * 4;
-    static final int kTotalBufferSizeBytesTex = kTotalBufferSizeCoordsTex * 4;
-    static final int kSizeInBytes_OneVertices_VertexData = kCoordsPerVertVerts * 4;
-    static final int kSizeInBytes_OneVertices_TexData = kCoordsPerVertTex * 4;
+    private static final int kQuadsPerBuffer = 100;
+    private static final int kCoordsPerVertVerts = 3;
+    private static final int kCoordsPerVertTex = 2;
+    private static final int kVertsPerQuad = 4;
+    private static final int kTotalBufferSizeVerts = kQuadsPerBuffer * kVertsPerQuad;
+    private static final int kTotalBufferSizeCoordsVerts = kQuadsPerBuffer * kVertsPerQuad * kCoordsPerVertVerts;
+    private static final int kTotalBufferSizeCoordsTex = kQuadsPerBuffer * kVertsPerQuad * kCoordsPerVertTex;
     private final Font font;
     private final boolean antialiased;
     private final boolean useFractionalMetrics;
@@ -183,30 +179,16 @@ public class JhvTextRenderer {
     private boolean isOrthoMode;
     private int beginRenderingWidth;
     private int beginRenderingHeight;
-    private boolean beginRenderingDepthTestDisabled;
-
-    // For resetting the color after disposal of the old backing store
-    private boolean haveCachedColor;
-    private float cachedR;
-    private float cachedG;
-    private float cachedB;
-    private float cachedA;
-    private Color cachedColor;
-    private boolean needToResetColor;
 
     // For debugging only
     private Frame dbgFrame;
 
     // Debugging purposes only
     private boolean debugged;
-    Pipelined_QuadRenderer mPipelinedQuadRenderer;
+    private Pipelined_QuadRenderer mPipelinedQuadRenderer;
 
     //emzic: added boolean flag
     private boolean useVertexArrays = true;
-
-    //emzic: added boolean flag
-    private boolean isExtensionAvailable_GL_VERSION_1_5;
-    private boolean checkFor_isExtensionAvailable_GL_VERSION_1_5;
 
     // Whether GL_LINEAR filtering is enabled for the backing store
     private boolean smoothing = true;
@@ -333,7 +315,7 @@ public class JhvTextRenderer {
         {@link java.awt.font.GlyphVector#getPixelBounds getPixelBounds},
         etc.) the returned bounds correspond to, although every effort
         is made to ensure an accurate bound. */
-    public Rectangle2D getBounds(final CharSequence str) {
+    private Rectangle2D getBounds(final CharSequence str) {
         // FIXME: this should be more optimized and use the glyph cache
         final Rect r = stringLocations.get(str);
 
@@ -361,32 +343,12 @@ public class JhvTextRenderer {
         transient and may become invalidated between {@link
         #beginRendering beginRendering} / {@link #endRendering
         endRendering} pairs. */
-    public FontRenderContext getFontRenderContext() {
+    private FontRenderContext getFontRenderContext() {
         if (cachedFontRenderContext == null) {
             cachedFontRenderContext = getGraphics2D().getFontRenderContext();
         }
 
         return cachedFontRenderContext;
-    }
-
-    /** Begins rendering with this {@link JhvTextRenderer TextRenderer}
-        into the current OpenGL drawable, pushing the projection and
-        modelview matrices and some state bits and setting up a
-        two-dimensional orthographic projection with (0, 0) as the
-        lower-left coordinate and (width, height) as the upper-right
-        coordinate. Binds and enables the internal OpenGL texture
-        object, sets the texture environment mode to GL_MODULATE, and
-        changes the current color to the last color set with this
-        TextRenderer via {@link #setColor setColor}. This method
-        disables the depth test and is equivalent to
-        beginRendering(width, height, true).
-
-        @param width the width of the current on-screen OpenGL drawable
-        @param height the height of the current on-screen OpenGL drawable
-        @throws com.jogamp.opengl.GLException If an OpenGL context is not current when this method is called
-    */
-    public void beginRendering(final int width, final int height) throws GLException {
-        beginRendering(width, height, true);
     }
 
     /** Begins rendering with this {@link JhvTextRenderer TextRenderer}
@@ -407,7 +369,7 @@ public class JhvTextRenderer {
     */
     public void beginRendering(final int width, final int height, final boolean disableDepthTest)
         throws GLException {
-        beginRendering(true, width, height, disableDepthTest);
+        beginRendering(true, width, height);
     }
 
     /** Begins rendering of 2D text in 3D with this {@link JhvTextRenderer
@@ -423,28 +385,9 @@ public class JhvTextRenderer {
         @throws GLException If an OpenGL context is not current when this method is called
     */
     public void begin3DRendering() throws GLException {
-        beginRendering(false, 0, 0, false);
+        beginRendering(false, 0, 0);
     }
 
-    /** Changes the current color of this TextRenderer to the supplied
-        one. The default color is opaque white.
-
-        @param color the new color to use for rendering text
-        @throws GLException If an OpenGL context is not current when this method is called
-    */
-/*
-    public void setColor(final Color color) throws GLException {
-        final boolean noNeedForFlush = (haveCachedColor && color.equals(cachedColor));
-
-        if (!noNeedForFlush) {
-            flushGlyphPipeline();
-        }
-
-        getBackingStore().setColor(color);
-        haveCachedColor = true;
-        cachedColor = color;
-    }
-*/
     /** Changes the current color of this TextRenderer to the supplied
         one, where each component ranges from 0.0f - 1.0f. The alpha
         component, if used, does not need to be premultiplied into the
@@ -462,25 +405,11 @@ public class JhvTextRenderer {
     */
     public void setColor(final float r, final float g, final float b, final float a)
         throws GLException {
-        final boolean noNeedForFlush = (haveCachedColor && (cachedColor == null) &&
-                                  (r == cachedR) && (g == cachedG) && (b == cachedB) &&
-                                  (a == cachedA));
-
-        if (!noNeedForFlush) {
-            flushGlyphPipeline();
-        }
-
-        getBackingStore().setColor(r, g, b, a);
-        haveCachedColor = true;
-        cachedR = r;
-        cachedG = g;
-        cachedB = b;
-        cachedA = a;
+        flushGlyphPipeline();
         textColor[0] = r;
         textColor[1] = g;
         textColor[2] = b;
         textColor[3] = a;
-        cachedColor = null;
     }
 
     /** Draws the supplied CharSequence at the desired location using
@@ -517,8 +446,8 @@ public class JhvTextRenderer {
         @param scaleFactor a uniform scale factor applied to the width and height of the drawn rectangle
         @throws GLException If an OpenGL context is not current when this method is called
     */
-    public void draw3D(final CharSequence str, final float x, final float y, final float z,
-                       final float scaleFactor) {
+    private void draw3D(final CharSequence str, final float x, final float y, final float z,
+                        final float scaleFactor) {
         internal_draw3D(str, x, y, z, scaleFactor);
     }
 
@@ -654,8 +583,7 @@ public class JhvTextRenderer {
         return cachedGraphics;
     }
 
-    private void beginRendering(final boolean ortho, final int width, final int height,
-                                final boolean disableDepthTestForOrtho) {
+    private void beginRendering(final boolean ortho, final int width, final int height) {
         final GL2 gl = (GL2) GLContext.getCurrentGL();
 
         if (DEBUG && !debugged) {
@@ -666,11 +594,10 @@ public class JhvTextRenderer {
         isOrthoMode = ortho;
         beginRenderingWidth = width;
         beginRenderingHeight = height;
-        beginRenderingDepthTestDisabled = disableDepthTestForOrtho;
 
         if (ortho) {
-            getBackingStore().beginOrthoRendering(width, height,
-                                                  disableDepthTestForOrtho);
+            getBackingStore().beginOrthoRendering(width, height
+            );
         } else {
             getBackingStore().begin3DRendering();
         }
@@ -685,16 +612,6 @@ public class JhvTextRenderer {
             gl.glGetIntegerv(GL.GL_MAX_TEXTURE_SIZE, sz, 0);
             packer.setMaxSize(sz[0], sz[0]);
             haveMaxSize = true;
-        }
-
-        if (needToResetColor && haveCachedColor) {
-            if (cachedColor == null) {
-                getBackingStore().setColor(cachedR, cachedG, cachedB, cachedA);
-            } else {
-                getBackingStore().setColor(cachedColor);
-            }
-
-            needToResetColor = false;
         }
 
         // Disable future attempts to use mipmapping if TextureRenderer
@@ -777,13 +694,6 @@ public class JhvTextRenderer {
             if (unicodeToClearFromCache > 0) {
                 mGlyphProducer.clearCacheEntry(unicodeToClearFromCache);
             }
-
-            //      if (DEBUG) {
-            //        Graphics2D g = getGraphics2D();
-            //        g.setComposite(AlphaComposite.Clear);
-            //        g.fillRect(r.x(), r.y(), r.w(), r.h());
-            //        g.setComposite(AlphaComposite.Src);
-            //      }
         }
 
         // If we removed dead rectangles this cycle, try to do a compaction
@@ -937,10 +847,6 @@ public class JhvTextRenderer {
         using the color white, which is modulated by the set color
         during the rendering process. */
     public interface RenderDelegate {
-        /** Indicates whether the backing store of this TextRenderer
-            should be intensity-only (the default) or full-color. */
-        boolean intensityOnly();
-
         /** Computes the bounds of the given String relative to the
             origin. */
         Rectangle2D getBounds(String str, Font font,
@@ -1155,20 +1061,13 @@ public class JhvTextRenderer {
             // whether we're likely to need to support a full RGBA backing
             // store (i.e., non-default Paint, foreground color, etc.), but
             // for now, let's just be more efficient
-            JhvTextureRenderer renderer;
-
-            if (renderDelegate.intensityOnly()) {
-                renderer = JhvTextureRenderer.createAlphaOnlyRenderer(w, h, mipmap);
-            } else {
-                renderer = new JhvTextureRenderer(w, h, true, mipmap);
-            }
+            JhvTextureRenderer renderer = new JhvTextureRenderer(w, h, true, mipmap);
             renderer.setSmoothing(smoothing);
 
             if (DEBUG) {
                 System.err.println(" TextRenderer allocating backing store " +
                                    w + " x " + h);
             }
-
             return renderer;
         }
 
@@ -1240,23 +1139,6 @@ public class JhvTextRenderer {
             if (inBeginEndPair) {
                 // Draw any outstanding glyphs
                 flush();
-/*
-                final GL2 gl = (GL2) GLContext.getCurrentGL();
-
-                // Pop client attrib bits used by the pipelined quad renderer
-                gl.glPopClientAttrib();
-
-                // The OpenGL spec is unclear about whether this changes the
-                // buffer bindings, so preemptively zero out the GL_ARRAY_BUFFER
-                // binding
-                if (getUseVertexArrays() && is15Available(gl)) {
-                    try {
-                        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
-                    } catch (final Exception e) {
-                        isExtensionAvailable_GL_VERSION_1_5 = false;
-                    }
-                }
-*/
                 if (isOrthoMode) {
                     ((JhvTextureRenderer) oldBackingStore).endOrthoRendering();
                 } else {
@@ -1303,34 +1185,15 @@ public class JhvTextRenderer {
             if (inBeginEndPair) {
                 if (isOrthoMode) {
                     ((JhvTextureRenderer) newBackingStore).beginOrthoRendering(beginRenderingWidth,
-                                                                            beginRenderingHeight, beginRenderingDepthTestDisabled);
+                                                                            beginRenderingHeight);
                 } else {
                     ((JhvTextureRenderer) newBackingStore).begin3DRendering();
                 }
-
-                // Push client attrib bits used by the pipelined quad renderer
-                // final GL2 gl = (GL2) GLContext.getCurrentGL();
-                // gl.glPushClientAttrib((int) GL2.GL_ALL_CLIENT_ATTRIB_BITS);
-
-                if (haveCachedColor) {
-                    if (cachedColor == null) {
-                        ((JhvTextureRenderer) newBackingStore).setColor(cachedR,
-                                                                     cachedG, cachedB, cachedA);
-                    } else {
-                        ((JhvTextureRenderer) newBackingStore).setColor(cachedColor);
-                    }
-                }
-            } else {
-                needToResetColor = true;
             }
         }
     }
 
     public static class DefaultRenderDelegate implements RenderDelegate {
-        @Override
-        public boolean intensityOnly() {
-            return true;
-        }
 
         @Override
         public Rectangle2D getBounds(final CharSequence str, final Font font,
@@ -1774,40 +1637,10 @@ public class JhvTextRenderer {
         int mOutstandingGlyphsVerticesPipeline = 0;
         final FloatBuffer mTexCoords;
         final FloatBuffer mVertCoords;
-//      boolean usingVBOs;
-//      int mVBO_For_ResuableTileVertices;
-//      int mVBO_For_ResuableTileTexCoords;
 
         Pipelined_QuadRenderer() {
-//          final GL2 gl = (GL2) GLContext.getCurrentGL();
             mVertCoords = Buffers.newDirectFloatBuffer(kTotalBufferSizeCoordsVerts);
             mTexCoords = Buffers.newDirectFloatBuffer(kTotalBufferSizeCoordsTex);
-/*
-            usingVBOs = getUseVertexArrays() && is15Available(gl);
-
-            if (usingVBOs) {
-                try {
-                    final int[] vbos = new int[2];
-                    gl.glGenBuffers(2, IntBuffer.wrap(vbos));
-
-                    mVBO_For_ResuableTileVertices = vbos[0];
-                    mVBO_For_ResuableTileTexCoords = vbos[1];
-
-                    gl.glBindBuffer(GL.GL_ARRAY_BUFFER,
-                                    mVBO_For_ResuableTileVertices);
-                    gl.glBufferData(GL.GL_ARRAY_BUFFER, kTotalBufferSizeBytesVerts,
-                                    null, GL2ES2.GL_STREAM_DRAW); // stream draw because this is a single quad use pipeline
-
-                    gl.glBindBuffer(GL.GL_ARRAY_BUFFER,
-                                    mVBO_For_ResuableTileTexCoords);
-                    gl.glBufferData(GL.GL_ARRAY_BUFFER, kTotalBufferSizeBytesTex,
-                                    null, GL2ES2.GL_STREAM_DRAW); // stream draw because this is a single quad use pipeline
-                } catch (final Exception e) {
-                    isExtensionAvailable_GL_VERSION_1_5 = false;
-                    usingVBOs = false;
-                }
-            }
-*/
         }
 
         public void glTexCoord2f(final float v, final float v1) {
@@ -1849,39 +1682,7 @@ public class JhvTextRenderer {
                 glslTexture.setData(gl, mVertCoords, mTexCoords);
                 glslTexture.renderQuads(gl, textColor, mOutstandingGlyphsVerticesPipeline);
                 glslTexture.dispose(gl);
-/*
-                gl.glEnableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
 
-                if (usingVBOs) {
-                    gl.glBindBuffer(GL.GL_ARRAY_BUFFER,
-                                    mVBO_For_ResuableTileVertices);
-                    gl.glBufferSubData(GL.GL_ARRAY_BUFFER, 0,
-                                       mOutstandingGlyphsVerticesPipeline * kSizeInBytes_OneVertices_VertexData,
-                                       mVertCoords); // upload only the new stuff
-                    gl.glVertexPointer(3, GL.GL_FLOAT, 0, 0);
-                } else {
-                    gl.glVertexPointer(3, GL.GL_FLOAT, 0, mVertCoords);
-                }
-
-                gl.glEnableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
-
-                if (usingVBOs) {
-                    gl.glBindBuffer(GL.GL_ARRAY_BUFFER,
-                                    mVBO_For_ResuableTileTexCoords);
-                    gl.glBufferSubData(GL.GL_ARRAY_BUFFER, 0,
-                                       mOutstandingGlyphsVerticesPipeline * kSizeInBytes_OneVertices_TexData,
-                                       mTexCoords); // upload only the new stuff
-                    gl.glTexCoordPointer(2, GL.GL_FLOAT, 0, 0);
-                } else {
-                    gl.glTexCoordPointer(2, GL.GL_FLOAT, 0, mTexCoords);
-                }
-
-                gl.glDrawArrays(GL2GL3.GL_QUADS, 0,
-                                mOutstandingGlyphsVerticesPipeline);
-
-                mVertCoords.rewind();
-                mTexCoords.rewind();
-*/
                 mOutstandingGlyphsVerticesPipeline = 0;
             }
         }
@@ -2019,13 +1820,5 @@ public class JhvTextRenderer {
     public boolean getSmoothing() {
         return smoothing;
     }
-/*
-    private boolean is15Available(final GL gl) {
-        if (!checkFor_isExtensionAvailable_GL_VERSION_1_5) {
-            isExtensionAvailable_GL_VERSION_1_5 = gl.isExtensionAvailable(GLExtensions.VERSION_1_5);
-            checkFor_isExtensionAvailable_GL_VERSION_1_5 = true;
-        }
-        return isExtensionAvailable_GL_VERSION_1_5;
-    }
-*/
+
 }
