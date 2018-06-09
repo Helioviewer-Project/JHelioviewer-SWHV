@@ -6,7 +6,6 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.ImageLayers;
-import org.helioviewer.jhv.math.Mat4;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -19,7 +18,7 @@ public class CameraHelper {
 
     private static final float halfDepth = (float) (3 * Sun.MeanEarthDistance);
 
-    public static void applyPerspectiveLatitudinal(Camera camera, Viewport vp, GL2 gl) {
+    public static void applyPerspectiveLatitudinal(Camera camera, Viewport vp) {
         double width = camera.getWidth();
         GLMatrix.setOrthoProj(-(float) (width * vp.aspect), (float) (width * vp.aspect), - (float) width, (float) width, -1, 1);
 
