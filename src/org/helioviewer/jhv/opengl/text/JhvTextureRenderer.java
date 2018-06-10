@@ -276,9 +276,7 @@ class JhvTextureRenderer {
       OpenGL state (GL_ENABLE_BIT); disables lighting; and enables the
       texture in this renderer. Unlike {@link #beginOrthoRendering
       beginOrthoRendering}, does not modify the depth test, back-face
-      culling, lighting, or the modelview or projection matrices. The
-      user is responsible for setting up the view matrices for correct
-      results of {@link #draw3DRect draw3DRect}. {@link
+      culling, lighting, or the modelview or projection matrices. {@link
       #end3DRendering} must be used in conjunction with this method to
       restore all OpenGL states.
 
