@@ -43,7 +43,7 @@ public class GLText {
         rectangle.dispose(gl);
         for (int i = 0; i < SIZE; i++) {
             if (renderer[i] != null) {
-                renderer[i].dispose();
+                renderer[i].dispose(gl);
                 renderer[i] = null;
             }
         }

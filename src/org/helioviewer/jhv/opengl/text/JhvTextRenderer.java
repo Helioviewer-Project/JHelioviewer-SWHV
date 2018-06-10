@@ -472,12 +472,13 @@ public class JhvTextRenderer {
 
         @throws GLException If an OpenGL context is not current when this method is called
     */
-    public void dispose() throws GLException {
+    public void dispose(GL2 gl) throws GLException {
         packer.dispose();
         packer = null;
         cachedBackingStore = null;
         cachedGraphics = null;
         cachedFontRenderContext = null;
+        glslTexture.dispose(gl);
     }
 
     //----------------------------------------------------------------------
@@ -734,7 +735,6 @@ public class JhvTextRenderer {
         @Override
         public char last() {
             mCurrentIndex = Math.max(0, mLength - 1);
-
             return current();
         }
 
@@ -743,28 +743,24 @@ public class JhvTextRenderer {
             if ((mLength == 0) || (mCurrentIndex >= mLength)) {
                 return CharacterIterator.DONE;
             }
-
             return mSequence.charAt(mCurrentIndex);
         }
 
         @Override
         public char next() {
             mCurrentIndex++;
-
             return current();
         }
 
         @Override
         public char previous() {
             mCurrentIndex = Math.max(mCurrentIndex - 1, 0);
-
             return current();
         }
 
         @Override
         public char setIndex(final int position) {
             mCurrentIndex = position;
-
             return current();
         }
 
@@ -787,7 +783,6 @@ public class JhvTextRenderer {
         public Object clone() {
             final CharSequenceIterator iter = new CharSequenceIterator(mSequence);
             iter.mCurrentIndex = mCurrentIndex;
-
             return iter;
         }
 
@@ -796,9 +791,7 @@ public class JhvTextRenderer {
             if (mLength == 0) {
                 return CharacterIterator.DONE;
             }
-
             mCurrentIndex = 0;
-
             return current();
         }
     }
@@ -979,7 +972,6 @@ public class JhvTextRenderer {
             final JhvTextureRenderer newRenderer = (JhvTextureRenderer) newBackingStore;
             newRenderer.markDirty(0, 0, newRenderer.getWidth(),
                                   newRenderer.getHeight());
-
             // Re-enter the begin / end pair if necessary
             if (inBeginEndPair) {
                 if (isOrthoMode) {
@@ -1424,7 +1416,6 @@ public class JhvTextRenderer {
                 glslTexture.init(gl);
                 glslTexture.setData(gl, mVertCoords, mTexCoords);
                 glslTexture.renderQuads(gl, textColor, mOutstandingGlyphsVerticesPipeline);
-                glslTexture.dispose(gl);
 
                 mOutstandingGlyphsVerticesPipeline = 0;
             }
