@@ -8,8 +8,8 @@ public class Quat {
 
     public static final Quat ZERO = new Quat();
 
-    private final double a;
-    private final Vec3 u;
+    final double a;
+    final Vec3 u;
 
     public static Quat createRotation(double angle, Vec3 v) {
         if (angle == 0.)

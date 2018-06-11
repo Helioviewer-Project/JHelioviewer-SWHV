@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.opengl;
+package org.helioviewer.jhv.math;
 
 import java.nio.FloatBuffer;
 
@@ -6,7 +6,7 @@ import org.helioviewer.jhv.base.BufferUtils;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 
-public class GLMatrix {
+public class Transform {
 
     private static final FloatBuffer fb = BufferUtils.newFloatBuffer(16);
 
@@ -59,7 +59,7 @@ public class GLMatrix {
         view.popMatrix();
     }
 
-    static FloatBuffer get() {
+    public static FloatBuffer get() {
         proj.mulOrthoAffine(view, projView);
         projView.get(fb);
         return fb;

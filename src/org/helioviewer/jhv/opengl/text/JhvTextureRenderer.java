@@ -51,7 +51,7 @@ import com.jogamp.opengl.*;
 import com.jogamp.opengl.util.texture.*;
 import com.jogamp.opengl.util.texture.awt.*;
 
-import org.helioviewer.jhv.opengl.GLMatrix;
+import org.helioviewer.jhv.math.Transform;
 
 /** Provides the ability to render into an OpenGL {@link
     com.jogamp.opengl.util.texture.Texture Texture} using the Java 2D
@@ -327,10 +327,10 @@ class JhvTextureRenderer {
     if (ortho) {
       gl.glDisable(GL.GL_DEPTH_TEST);
 
-      GLMatrix.pushProj();
-      GLMatrix.setOrthoProj(0, width, 0, height, -1, 1);
-      GLMatrix.push();
-      GLMatrix.setIdentityView();
+      Transform.pushProj();
+      Transform.setOrthoProj(0, width, 0, height, -1, 1);
+      Transform.push();
+      Transform.setIdentityView();
     }
 
     final Texture texture = getTexture();
@@ -360,8 +360,8 @@ class JhvTextureRenderer {
     if (ortho) {
       gl.glEnable(GL.GL_DEPTH_TEST);
 
-      GLMatrix.pop();
-      GLMatrix.popProj();
+      Transform.pop();
+      Transform.popProj();
     }
   }
 
