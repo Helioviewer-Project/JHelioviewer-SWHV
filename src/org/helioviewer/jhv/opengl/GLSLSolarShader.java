@@ -80,7 +80,7 @@ public class GLSLSolarShader extends GLSLShader {
 
     private final float[] rect = new float[4];
     private final float[] diffRect = new float[4];
-    private final float[] viewport = new float[2];
+    private final float[] viewport = new float[3];
     private final float[] viewportOffset = new float[2];
 
     private GLSLSolarShader(String vertex, String fragment) {
@@ -219,7 +219,8 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform2fv(viewportOffsetRef, 1, viewportOffset, 0);
         viewport[0] = width;
         viewport[1] = height;
-        gl.glUniform2fv(viewportRef, 1, viewport, 0);
+        viewport[2] = height / width;
+        gl.glUniform3fv(viewportRef, 1, viewport, 0);
     }
 
     public void bindCutOffRadius(GL2 gl, double innerCutOffRadius, double outerCutOffRadius) {

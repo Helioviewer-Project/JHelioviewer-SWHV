@@ -1,4 +1,4 @@
-void get_lati_texcoord(const float ln, const float lt, const float cr, const vec4 scrpos, const vec4 rect, out vec2 texcoord) {
+void get_lati_texcoord(const float ln, const float lt, const float cr, const vec2 scrpos, const vec4 rect, out vec2 texcoord) {
     float theta = scrpos.y * PI;
     float phi = PI + ln + scrpos.x * TWOPI;
 
@@ -37,7 +37,7 @@ void main(void) {
     vec4 color;
     vec2 texcoord;
 
-    vec4 scrpos = getScrPos();
+    vec2 scrpos = getScrPos();
     get_lati_texcoord(hgln, hglt, crota, scrpos, rect, texcoord);
     if (isdifference == NODIFFERENCE) {
         color = getColor(texcoord, texcoord, 1);

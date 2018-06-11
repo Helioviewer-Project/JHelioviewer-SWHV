@@ -1,4 +1,4 @@
-void get_polar_texcoord(const float cr, const vec4 scrpos, const vec4 rect, out vec2 texcoord, out float radius) {
+void get_polar_texcoord(const float cr, const vec2 scrpos, const vec4 rect, out vec2 texcoord, out float radius) {
     float theta = -(scrpos.x * TWOPI + PI / 2. - cr);
     float start = polarRadii.x;
     float end = polarRadii.y;
@@ -28,7 +28,7 @@ void main(void) {
     vec2 texcoord;
     float radius;
 
-    vec4 scrpos = getScrPos();
+    vec2 scrpos = getScrPos();
     get_polar_texcoord(crota, scrpos, rect, texcoord, radius);
     if (isdifference == NODIFFERENCE) {
         color = getColor(texcoord, texcoord, radius);
