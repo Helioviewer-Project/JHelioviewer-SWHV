@@ -57,7 +57,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         Position viewpoint = camera.getViewpoint();
 
         Transform.pushView();
-        Transform.mulViewInverse(viewpoint.toQuat());
+        Transform.rotateViewInverse(viewpoint.toQuat());
         {
             Set<Map.Entry<LoadPosition, Position>> positions = Display.getUpdateViewpoint().getPositions();
             if (!positions.isEmpty()) {
