@@ -129,7 +129,7 @@ public class GridLayer extends AbstractLayer {
         double pixelsPerSolarRadius = textScale * pixFactor;
 
         Transform.pushView();
-        Transform.mulViewInverse(gridType.toQuat(viewpoint));
+        Transform.rotateViewInverse(gridType.toQuat(viewpoint));
         {
             gridLine.render(gl, vp.aspect, thickness);
             if (showLabels) {
@@ -141,7 +141,7 @@ public class GridLayer extends AbstractLayer {
         if (showRadial) {
             boolean far = viewpoint.distance > 100 * Sun.MeanEarthDistance;
             Transform.pushView();
-            Transform.mulViewInverse(viewpoint.toQuat());
+            Transform.rotateViewInverse(viewpoint.toQuat());
             {
                 if (far) {
                     radialCircleLineFar.render(gl, vp.aspect, thickness);
@@ -210,7 +210,7 @@ public class GridLayer extends AbstractLayer {
 
     private void drawEarthCircles(GL2 gl, double aspect, double factor, Quat q) {
         Transform.pushView();
-        Transform.mulViewInverse(q);
+        Transform.rotateViewInverse(q);
         {
             earthCircleLine.render(gl, aspect, thicknessEarth);
             earthPoint.renderPoints(gl, factor);
