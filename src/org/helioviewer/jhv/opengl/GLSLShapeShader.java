@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.opengl;
 
+import org.helioviewer.jhv.math.Transform;
+
 import com.jogamp.opengl.GL2;
 
 class GLSLShapeShader extends GLSLShader {
@@ -47,7 +49,7 @@ class GLSLShapeShader extends GLSLShader {
     }
 
     void bindParams(GL2 gl) {
-        gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, GLMatrix.get());
+        gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, Transform.get());
         gl.glUniform1fv(factorRef, 1, factor, 0);
     }
 

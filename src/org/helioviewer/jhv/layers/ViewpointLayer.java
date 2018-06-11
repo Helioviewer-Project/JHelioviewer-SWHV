@@ -18,10 +18,10 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.io.LoadPosition;
 import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.FOVShape;
 import org.helioviewer.jhv.opengl.GLInfo;
-import org.helioviewer.jhv.opengl.GLMatrix;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.time.JHVDate;
@@ -56,8 +56,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         double pixFactor = vp.height / (2 * camera.getWidth());
         Position viewpoint = camera.getViewpoint();
 
-        GLMatrix.push();
-        GLMatrix.mulView(viewpoint.toQuat().toMatrixTranspose().getFloatArray());
+        Transform.push();
+        Transform.mulView(viewpoint.toQuat().toMatrixTranspose().getFloatArray());
         {
             Set<Map.Entry<LoadPosition, Position>> positions = Display.getUpdateViewpoint().getPositions();
             if (!positions.isEmpty()) {
@@ -65,7 +65,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             }
             fov.render(gl, viewpoint.distance, vp.aspect, pixFactor, false);
         }
-        GLMatrix.pop();
+        Transform.pop();
     }
 
     private static final int MOUSE_OFFSET_X = 25;

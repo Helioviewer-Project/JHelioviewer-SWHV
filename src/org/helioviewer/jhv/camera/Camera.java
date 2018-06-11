@@ -6,8 +6,8 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.math.Mat4;
 import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec2;
-import org.helioviewer.jhv.opengl.GLMatrix;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.time.JHVDate;
 import org.json.JSONArray;
@@ -35,17 +35,17 @@ public class Camera {
     private static final float halfDepth = (float) (3 * Sun.MeanEarthDistance);
 
     public void applyPerspectiveLatitudinal(double aspect) {
-        GLMatrix.setOrthoProj(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), - (float) cameraWidth, (float) cameraWidth, -1, 1);
-        GLMatrix.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
+        Transform.setOrthoProj(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), - (float) cameraWidth, (float) cameraWidth, -1, 1);
+        Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
     }
 
     public void applyPerspective(double aspect, GL2 gl, GLSLShape blackCircle) {
-        GLMatrix.setOrthoProj(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), - (float) cameraWidth, (float) cameraWidth, -halfDepth, halfDepth);
-        GLMatrix.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
+        Transform.setOrthoProj(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), - (float) cameraWidth, (float) cameraWidth, -halfDepth, halfDepth);
+        Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
 
         blackCircle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
 
-        GLMatrix.mulView(rotation.toMatrix().getFloatArray());
+        Transform.mulView(rotation.toMatrix().getFloatArray());
     }
 
     public float[] getTransformationInverse(double aspect) {

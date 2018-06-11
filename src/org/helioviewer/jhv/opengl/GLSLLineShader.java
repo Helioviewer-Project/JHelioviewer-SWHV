@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.opengl;
 
+import org.helioviewer.jhv.math.Transform;
+
 import com.jogamp.opengl.GL2;
 
 class GLSLLineShader extends GLSLShader {
@@ -57,7 +59,7 @@ class GLSLLineShader extends GLSLShader {
     }
 
     void bindParams(GL2 gl) {
-        gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, GLMatrix.get());
+        gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, Transform.get());
         gl.glUniform1fv(thicknessRef, 1, thickness, 0);
         gl.glUniform1fv(aspectRef, 1, aspect, 0);
         // gl.glUniform1iv(miterRef, 1, miter, 0);

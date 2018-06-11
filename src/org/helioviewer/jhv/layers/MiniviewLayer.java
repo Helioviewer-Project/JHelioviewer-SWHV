@@ -16,8 +16,8 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.helioviewer.jhv.opengl.GLMatrix;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.json.JSONObject;
 
@@ -64,13 +64,13 @@ public class MiniviewLayer extends AbstractLayer {
 
     public static void renderBackground(Camera camera, Viewport vp, GL2 gl) {
         gl.glDepthRange(0, 0);
-        GLMatrix.push();
-        GLMatrix.mulView(camera.getViewpoint().toQuat().toMatrixTranspose().getFloatArray());
+        Transform.push();
+        Transform.mulView(camera.getViewpoint().toQuat().toMatrixTranspose().getFloatArray());
         {
             rectangle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
             circle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
         }
-        GLMatrix.pop();
+        Transform.pop();
         gl.glDepthRange(0, 1);
     }
 

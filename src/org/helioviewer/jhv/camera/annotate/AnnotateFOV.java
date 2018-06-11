@@ -8,10 +8,10 @@ import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.FOVShape;
 import org.helioviewer.jhv.opengl.GLInfo;
-import org.helioviewer.jhv.opengl.GLMatrix;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -67,14 +67,14 @@ public class AnnotateFOV extends AbstractAnnotateable {
         double dx = (p1.x - p0.x) / 2;
         double dy = (p1.y - p0.y) / 2;
 
-        GLMatrix.push();
-        GLMatrix.mulView(viewpoint.toQuat().toMatrixTranspose().getFloatArray());
+        Transform.push();
+        Transform.mulView(viewpoint.toQuat().toMatrixTranspose().getFloatArray());
         {
             fov.setCenter(p0.x + dx, p0.y + dy);
             fov.setTAngles(dx / viewpoint.distance, dy / viewpoint.distance);
             fov.render(gl, viewpoint.distance, vp.aspect, pointFactor, active);
         }
-        GLMatrix.pop();
+        Transform.pop();
     }
 
     @Override
