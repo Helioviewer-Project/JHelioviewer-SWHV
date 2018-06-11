@@ -48,7 +48,7 @@ public class GLMatrix {
     }
 
     public static void mulView(float[] m) {
-        view.mul(mul.set(m));
+        view.mulAffine(mul.set(m));
     }
 
     public static void push() {

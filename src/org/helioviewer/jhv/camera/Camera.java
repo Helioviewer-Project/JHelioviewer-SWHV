@@ -45,7 +45,7 @@ public class Camera {
 
         blackCircle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
 
-        GLMatrix.setView(rotation.toMatrix().translate(currentTranslation.x, currentTranslation.y, 0).getFloatArray());
+        GLMatrix.mulView(rotation.toMatrix().getFloatArray());
     }
 
     public float[] getTransformationInverse(double aspect) {
