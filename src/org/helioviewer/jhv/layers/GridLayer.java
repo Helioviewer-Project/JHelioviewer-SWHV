@@ -128,20 +128,20 @@ public class GridLayer extends AbstractLayer {
 
         double pixelsPerSolarRadius = textScale * pixFactor;
 
-        Transform.push();
-        Transform.mulView(gridType.toQuat(viewpoint).toMatrixTranspose().getFloatArray());
+        Transform.pushView();
+        Transform.mulViewInverse(gridType.toQuat(viewpoint));
         {
             gridLine.render(gl, vp.aspect, thickness);
             if (showLabels) {
                 drawGridText(gl, (int) pixelsPerSolarRadius);
             }
         }
-        Transform.pop();
+        Transform.popView();
 
         if (showRadial) {
             boolean far = viewpoint.distance > 100 * Sun.MeanEarthDistance;
-            Transform.push();
-            Transform.mulView(viewpoint.toQuat().toMatrixTranspose().getFloatArray());
+            Transform.pushView();
+            Transform.mulViewInverse(viewpoint.toQuat());
             {
                 if (far) {
                     radialCircleLineFar.render(gl, vp.aspect, thickness);
@@ -157,7 +157,7 @@ public class GridLayer extends AbstractLayer {
                         drawRadialGridText(gl, radialLabels, pixelsPerSolarRadius * RADIAL_UNIT, R_LABEL_POS);
                 }
             }
-            Transform.pop();
+            Transform.popView();
         }
     }
 
@@ -209,13 +209,13 @@ public class GridLayer extends AbstractLayer {
     }
 
     private void drawEarthCircles(GL2 gl, double aspect, double factor, Quat q) {
-        Transform.push();
-        Transform.mulView(q.toMatrixTranspose().getFloatArray());
+        Transform.pushView();
+        Transform.mulViewInverse(q);
         {
             earthCircleLine.render(gl, aspect, thicknessEarth);
             earthPoint.renderPoints(gl, factor);
         }
-        Transform.pop();
+        Transform.popView();
     }
 
     private static void drawRadialGridText(GL2 gl, ArrayList<GridLabel> labels, double size, float[] labelPos) {
@@ -250,7 +250,7 @@ public class GridLayer extends AbstractLayer {
         gl.glEnable(GL2.GL_CULL_FACE);
 
         for (GridLabel lonLabel : lonLabels) {
-            Transform.push();
+            Transform.pushView();
             {
                 Transform.translateView(lonLabel.x, 0, lonLabel.y);
                 Transform.rotateView(lonLabel.theta, 0, 1, 0);
@@ -258,7 +258,7 @@ public class GridLayer extends AbstractLayer {
                 renderer.draw3D(lonLabel.txt, 0, 0, 0, textScaleFactor);
                 renderer.flush();
             }
-            Transform.pop();
+            Transform.popView();
         }
         renderer.end3DRendering();
     }

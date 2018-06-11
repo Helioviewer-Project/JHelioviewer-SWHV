@@ -64,13 +64,13 @@ public class MiniviewLayer extends AbstractLayer {
 
     public static void renderBackground(Camera camera, Viewport vp, GL2 gl) {
         gl.glDepthRange(0, 0);
-        Transform.push();
-        Transform.mulView(camera.getViewpoint().toQuat().toMatrixTranspose().getFloatArray());
+        Transform.pushView();
+        Transform.mulViewInverse(camera.getViewpoint().toQuat());
         {
             rectangle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
             circle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
         }
-        Transform.pop();
+        Transform.popView();
         gl.glDepthRange(0, 1);
     }
 

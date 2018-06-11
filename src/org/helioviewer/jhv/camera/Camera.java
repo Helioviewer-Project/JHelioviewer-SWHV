@@ -35,17 +35,17 @@ public class Camera {
     private static final float halfDepth = (float) (3 * Sun.MeanEarthDistance);
 
     public void applyPerspectiveLatitudinal(double aspect) {
-        Transform.setOrthoProj(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), - (float) cameraWidth, (float) cameraWidth, -1, 1);
+        Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), - (float) cameraWidth, (float) cameraWidth, -1, 1);
         Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
     }
 
     public void applyPerspective(double aspect, GL2 gl, GLSLShape blackCircle) {
-        Transform.setOrthoProj(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), - (float) cameraWidth, (float) cameraWidth, -halfDepth, halfDepth);
+        Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), - (float) cameraWidth, (float) cameraWidth, -halfDepth, halfDepth);
         Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
 
         blackCircle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
 
-        Transform.mulView(rotation.toMatrix().getFloatArray());
+        Transform.mulView(rotation);
     }
 
     public float[] getTransformationInverse(double aspect) {
