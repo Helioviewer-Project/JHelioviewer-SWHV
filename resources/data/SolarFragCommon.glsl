@@ -31,7 +31,7 @@ uniform vec3 sharpen;
 uniform mat4 cameraTransformationInverse;
 uniform vec4 cameraDifferenceRotationQuat;
 uniform vec4 diffcameraDifferenceRotationQuat;
-uniform vec2 viewport;
+uniform vec3 viewport;
 uniform vec2 viewportOffset;
 uniform vec3 cutOffDirection;
 uniform float cutOffValue;
@@ -102,10 +102,10 @@ float intersectPlanediff(vec4 vecin) {
     return -dot(altnormal.xy, vecin.xy) / altnormal.z;
 }
 
-vec4 getScrPos() {
-    float iaspect = viewport.y / viewport.x;
-    vec2 normalizedScreenpos = 2. * ((gl_FragCoord.xy - viewportOffset) / viewport - .5);
-    vec4 scrpos = cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.) * vec4(iaspect, 1., 1., 1.) + .5;
-    clamp_texcoord(scrpos.xy);
+vec2 getScrPos() {
+    vec2 normalizedScreenpos = 2. * ((gl_FragCoord.xy - viewportOffset) / viewport.xy - .5);
+    vec4 up1 = cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
+    vec2 scrpos = vec2(viewport.z * up1.x, up1.y) + .5;
+    clamp_texcoord(scrpos);
     return scrpos;
 }
