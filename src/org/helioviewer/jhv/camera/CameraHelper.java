@@ -9,34 +9,8 @@ import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
-import org.helioviewer.jhv.opengl.GLMatrix;
-import org.helioviewer.jhv.opengl.GLSLShape;
-
-import com.jogamp.opengl.GL2;
 
 public class CameraHelper {
-
-    private static final float halfDepth = (float) (3 * Sun.MeanEarthDistance);
-
-    public static void applyPerspectiveLatitudinal(Camera camera, Viewport vp) {
-        double width = camera.getWidth();
-        GLMatrix.setOrthoProj(-(float) (width * vp.aspect), (float) (width * vp.aspect), - (float) width, (float) width, -1, 1);
-
-        Vec2 translation = camera.getCurrentTranslation();
-        GLMatrix.setTranslateView((float) translation.x, (float) translation.y, 0);
-    }
-
-    public static void applyPerspective(Camera camera, Viewport vp, GL2 gl, GLSLShape blackCircle) {
-        double width = camera.getWidth();
-        GLMatrix.setOrthoProj(-(float) (width * vp.aspect), (float) (width * vp.aspect), - (float) width, (float) width, -halfDepth, halfDepth);
-
-        Vec2 translation = camera.getCurrentTranslation();
-        GLMatrix.setTranslateView((float) translation.x, (float) translation.y, 0);
-
-        blackCircle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
-
-        GLMatrix.setView(camera.getRotation().toMatrix().translate(translation.x, translation.y, 0).getFloatArray());
-    }
 
     private static double computeNormalizedX(Viewport vp, double screenX) {
         return 2. * ((screenX - vp.x) / vp.width - 0.5);
