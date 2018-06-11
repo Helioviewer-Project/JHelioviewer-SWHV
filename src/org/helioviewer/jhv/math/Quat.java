@@ -59,7 +59,7 @@ public class Quat {
     private Quat() {
         this(1, new Vec3(0., 0., 0.));
     }
-
+/*
     public Mat4 toMatrix() {
         double w = a, w2 = w * w;
         double x = u.x, x2 = x * x;
@@ -83,7 +83,7 @@ public class Quat {
                         2 * x * z + 2 * w * y, 2 * y * z - 2 * w * x, w2 - x2 - y2 + z2,     0,
                         0,                     0,                     0,                     w2 + x2 + y2 + z2);
     }
-/*
+
     public double getAngle() {
         return a;
     }
