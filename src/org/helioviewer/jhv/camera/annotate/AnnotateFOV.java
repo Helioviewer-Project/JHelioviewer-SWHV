@@ -67,14 +67,14 @@ public class AnnotateFOV extends AbstractAnnotateable {
         double dx = (p1.x - p0.x) / 2;
         double dy = (p1.y - p0.y) / 2;
 
-        Transform.push();
-        Transform.mulView(viewpoint.toQuat().toMatrixTranspose().getFloatArray());
+        Transform.pushView();
+        Transform.mulViewInverse(viewpoint.toQuat());
         {
             fov.setCenter(p0.x + dx, p0.y + dy);
             fov.setTAngles(dx / viewpoint.distance, dy / viewpoint.distance);
             fov.render(gl, viewpoint.distance, vp.aspect, pointFactor, active);
         }
-        Transform.pop();
+        Transform.popView();
     }
 
     @Override

@@ -11,12 +11,15 @@ varying float frag_direction;
 uniform float aspect;
 uniform float thickness;
 uniform int miter;
-uniform mat4 ModelViewProjectionMatrix;
+
+uniform mat4 projection;
+uniform mat4 view;
 
 // https://mattdesl.svbtle.com/drawing-lines-is-hard
 void main() {
   vec2 aspectVec = vec2(aspect, 1.);
 
+  mat4 ModelViewProjectionMatrix = projection * view;
   vec4 previousProjected = ModelViewProjectionMatrix * vec4(previousLine, 1.0);
   vec4 currentProjected = ModelViewProjectionMatrix * vec4(line, 1.0);
   vec4 nextProjected = ModelViewProjectionMatrix * vec4(nextLine, 1.0);

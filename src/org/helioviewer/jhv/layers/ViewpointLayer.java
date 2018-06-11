@@ -56,8 +56,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         double pixFactor = vp.height / (2 * camera.getWidth());
         Position viewpoint = camera.getViewpoint();
 
-        Transform.push();
-        Transform.mulView(viewpoint.toQuat().toMatrixTranspose().getFloatArray());
+        Transform.pushView();
+        Transform.mulViewInverse(viewpoint.toQuat());
         {
             Set<Map.Entry<LoadPosition, Position>> positions = Display.getUpdateViewpoint().getPositions();
             if (!positions.isEmpty()) {
@@ -65,7 +65,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             }
             fov.render(gl, viewpoint.distance, vp.aspect, pixFactor, false);
         }
-        Transform.pop();
+        Transform.popView();
     }
 
     private static final int MOUSE_OFFSET_X = 25;

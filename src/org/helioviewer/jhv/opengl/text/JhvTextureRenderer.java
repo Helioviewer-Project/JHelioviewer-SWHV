@@ -327,9 +327,9 @@ class JhvTextureRenderer {
     if (ortho) {
       gl.glDisable(GL.GL_DEPTH_TEST);
 
-      Transform.pushProj();
-      Transform.setOrthoProj(0, width, 0, height, -1, 1);
-      Transform.push();
+      Transform.pushProjection();
+      Transform.setOrthoProjection(0, width, 0, height, -1, 1);
+      Transform.pushView();
       Transform.setIdentityView();
     }
 
@@ -360,8 +360,8 @@ class JhvTextureRenderer {
     if (ortho) {
       gl.glEnable(GL.GL_DEPTH_TEST);
 
-      Transform.pop();
-      Transform.popProj();
+      Transform.popView();
+      Transform.popProjection();
     }
   }
 
