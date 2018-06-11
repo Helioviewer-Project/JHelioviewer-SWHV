@@ -47,11 +47,7 @@ public class Transform {
         view.rotate((float) (Math.PI / 180.) * ang, x, y, z);
     }
 
-    public static void mulView(float[] m) {
-        view.mulAffine(mul.set(m));
-    }
-
-    public static void mulView(Quat q) {
+    public static void rotateView(Quat q) {
         float w = (float) q.a, w2 = w * w;
         float x = (float) q.u.x, x2 = x * x;
         float y = (float) q.u.y, y2 = y * y;
@@ -63,7 +59,7 @@ public class Transform {
                                0,                     0,                     0,                     w2 + x2 + y2 + z2));
     }
 
-    public static void mulViewInverse(Quat q) {
+    public static void rotateViewInverse(Quat q) {
         float w = (float) q.a, w2 = w * w;
         float x = (float) q.u.x, x2 = x * x;
         float y = (float) q.u.y, y2 = y * y;
