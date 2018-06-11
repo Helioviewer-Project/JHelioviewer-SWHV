@@ -4,6 +4,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.math.Mat4;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.opengl.GLMatrix;
@@ -45,6 +46,11 @@ public class Camera {
         blackCircle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
 
         GLMatrix.setView(rotation.toMatrix().translate(currentTranslation.x, currentTranslation.y, 0).getFloatArray());
+    }
+
+    public float[] getTransformationInverse(double aspect) {
+        // do clipping planes matter?
+        return Mat4.orthoInverse(-cameraWidth * aspect, cameraWidth * aspect, -cameraWidth, cameraWidth, 0, 0).translate(-currentTranslation.x, -currentTranslation.y, 0).getFloatArray();
     }
 ////
 

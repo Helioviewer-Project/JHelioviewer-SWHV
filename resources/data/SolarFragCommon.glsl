@@ -103,8 +103,9 @@ float intersectPlanediff(vec4 vecin) {
 }
 
 vec4 getScrPos() {
-    vec2 normalizedScreenpos = 2. * vec2(viewport.y / viewport.x, 1.) * ((gl_FragCoord.xy - viewportOffset) / viewport - .5);
-    vec4 scrpos = cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.) + .5;
+    float iaspect = viewport.y / viewport.x;
+    vec2 normalizedScreenpos = 2. * ((gl_FragCoord.xy - viewportOffset) / viewport - .5);
+    vec4 scrpos = cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.) * vec4(iaspect, 1., 1., 1.) + .5;
     clamp_texcoord(scrpos.xy);
     return scrpos;
 }
