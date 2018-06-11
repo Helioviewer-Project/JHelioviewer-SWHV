@@ -19,7 +19,6 @@ import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DownloadViewTask;
 import org.helioviewer.jhv.io.LoadRemoteTask;
 import org.helioviewer.jhv.math.IcoSphere;
-import org.helioviewer.jhv.math.Mat4;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.opengl.GLImage;
@@ -192,10 +191,6 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         _render(camera, vp, gl, depthScale);
     }
 
-    private static Mat4 getOrthoMatrixInverse(double width, double aspect) {
-        return Mat4.orthoInverse(-width * aspect, width * aspect, -width, width, 0, 0); // do clipping planes matter?
-    }
-
     private void _render(Camera camera, Viewport vp, GL2 gl, double[] depthrange) {
         if (imageData == null) {
             return;
@@ -210,13 +205,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         {
             glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
             shader.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height);
-
-            Mat4 vpmi = getOrthoMatrixInverse(camera.getWidth(), vp.aspect);
-            if (Display.mode == Display.DisplayMode.Orthographic)
-                vpmi.translate(-camera.getCurrentTranslation().x, -camera.getCurrentTranslation().y, 0);
-            else
-                vpmi.translate(-camera.getCurrentTranslation().x / vp.aspect, -camera.getCurrentTranslation().y, 0);
-            shader.bindMatrix(gl, vpmi.getFloatArray());
+            shader.bindMatrix(gl, camera.getTransformationInverse(vp.aspect));
 
             Quat q = Quat.rotate(camera.getCurrentDragRotation(), imageData.getViewpoint().toQuat());
             shader.bindCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, imageData.getMetaData().getCenterRotation()));
