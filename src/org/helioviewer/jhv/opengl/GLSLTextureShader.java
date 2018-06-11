@@ -2,6 +2,8 @@ package org.helioviewer.jhv.opengl;
 
 import com.jogamp.opengl.GL2;
 
+import org.helioviewer.jhv.math.Transform;
+
 class GLSLTextureShader extends GLSLShader {
 
     static final GLSLTextureShader texture = new GLSLTextureShader("/data/TextureVertex.glsl", "/data/TextureFrag.glsl");
@@ -45,7 +47,7 @@ class GLSLTextureShader extends GLSLShader {
     }
 
     void bindParams(GL2 gl) {
-        gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, GLMatrix.get());
+        gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, Transform.get());
         gl.glUniform4fv(colorRef, 1, color, 0);
     }
 

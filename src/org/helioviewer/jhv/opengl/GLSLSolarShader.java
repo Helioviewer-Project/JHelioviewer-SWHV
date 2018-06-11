@@ -2,6 +2,7 @@ package org.helioviewer.jhv.opengl;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Transform;
 
 import com.jogamp.opengl.GL2;
 
@@ -148,7 +149,7 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindMatrix(GL2 gl, float[] matrix) {
-        gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, GLMatrix.get());
+        gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, Transform.get());
         gl.glUniformMatrix4fv(cameraTransformationInverseRef, 1, false, matrix, 0);
     }
 
