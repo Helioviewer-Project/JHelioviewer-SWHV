@@ -5,7 +5,6 @@ import java.awt.EventQueue;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.export.ExportMovie;
@@ -118,7 +117,7 @@ public class GLListener implements GLEventListener {
         for (Viewport vp : Display.getViewports()) {
             if (vp != null) {
                 gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-                CameraHelper.applyPerspective(camera, vp, gl, blackCircle);
+                camera.applyPerspective(vp.aspect, gl, blackCircle);
                 Layers.render(camera, vp, gl);
                 ImageViewerGui.getAnnotateInteraction().drawAnnotations(vp, gl);
             }
@@ -136,7 +135,7 @@ public class GLListener implements GLEventListener {
         for (Viewport vp : Display.getViewports()) {
             if (vp != null) {
                 gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-                CameraHelper.applyPerspectiveLatitudinal(camera, vp);
+                camera.applyPerspectiveLatitudinal(vp.aspect);
                 Layers.renderScale(camera, vp, gl);
                 ImageViewerGui.getAnnotateInteraction().drawAnnotations(vp, gl);
             }
@@ -166,7 +165,7 @@ public class GLListener implements GLEventListener {
             miniCamera.timeChanged(Movie.getTime());
 
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            CameraHelper.applyPerspective(miniCamera, vp, gl, blackCircle);
+            miniCamera.applyPerspective(vp.aspect, gl, blackCircle);
             Layers.renderMiniview(miniCamera, vp, gl);
         }
     }

@@ -13,6 +13,7 @@ uniform float thickness;
 uniform int miter;
 uniform mat4 ModelViewProjectionMatrix;
 
+// https://mattdesl.svbtle.com/drawing-lines-is-hard
 void main() {
   vec2 aspectVec = vec2(aspect, 1.);
 

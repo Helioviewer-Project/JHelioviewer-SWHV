@@ -6,9 +6,13 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.opengl.GLMatrix;
+import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.time.JHVDate;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.jogamp.opengl.GL2;
 
 public class Camera {
 
@@ -25,6 +29,24 @@ public class Camera {
     private boolean tracking;
 
     private Position viewpoint = Sun.StartEarth;
+
+////
+    private static final float halfDepth = (float) (3 * Sun.MeanEarthDistance);
+
+    public void applyPerspectiveLatitudinal(double aspect) {
+        GLMatrix.setOrthoProj(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), - (float) cameraWidth, (float) cameraWidth, -1, 1);
+        GLMatrix.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
+    }
+
+    public void applyPerspective(double aspect, GL2 gl, GLSLShape blackCircle) {
+        GLMatrix.setOrthoProj(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), - (float) cameraWidth, (float) cameraWidth, -halfDepth, halfDepth);
+        GLMatrix.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
+
+        blackCircle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
+
+        GLMatrix.setView(rotation.toMatrix().translate(currentTranslation.x, currentTranslation.y, 0).getFloatArray());
+    }
+////
 
     private void updateCamera(JHVDate time) {
         viewpoint = Display.getUpdateViewpoint().update(time);
@@ -56,10 +78,6 @@ public class Camera {
 
     public Position getViewpoint() {
         return viewpoint;
-    }
-
-    public Quat getRotation() {
-        return rotation;
     }
 
     public Vec2 getCurrentTranslation() {

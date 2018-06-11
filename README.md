@@ -51,15 +51,6 @@ References:
 - Information about JPEG 2000:
   http://wiki.helioviewer.org/wiki/JPEG_2000
 
-JHelioviewer is based on two separate projects:
-
-- The JPEG2000 encoding/decoding algorithms are provided by the Kakadu SDK:
-  http://www.kakadusoftware.com/
-
-- The Java application has its origins in the J2KViewer project:
-  http://dltj.org/2006/10/gsoc-jpip/
-
-
 Report a Problem or Idea
 ------------------------
 
