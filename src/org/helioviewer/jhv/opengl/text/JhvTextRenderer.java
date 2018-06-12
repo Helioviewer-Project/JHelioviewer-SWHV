@@ -132,7 +132,7 @@ public class JhvTextRenderer {
     private static final int kQuadsPerBuffer = 100;
     private static final int kCoordsPerVertVerts = 3;
     private static final int kCoordsPerVertTex = 2;
-    private static final int kVertsPerQuad = 4;
+    private static final int kVertsPerQuad = 6;
     private static final int kTotalBufferSizeVerts = kQuadsPerBuffer * kVertsPerQuad;
     private static final int kTotalBufferSizeCoordsVerts = kQuadsPerBuffer * kVertsPerQuad * kCoordsPerVertVerts;
     private static final int kTotalBufferSizeCoordsTex = kQuadsPerBuffer * kVertsPerQuad * kCoordsPerVertTex;

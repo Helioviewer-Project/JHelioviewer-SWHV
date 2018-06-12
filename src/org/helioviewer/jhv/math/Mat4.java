@@ -266,11 +266,11 @@ public class Mat4 {
     public static Mat4 translation(Vec3 t) {
         return new Mat4(1, 0, 0, t.x, 0, 1, 0, t.y, 0, 0, 1, t.z, 0, 0, 0, 1);
     }
-*/
+
     public static Mat4 translation(double x, double y, double z) {
         return new Mat4(1, 0, 0, x, 0, 1, 0, y, 0, 0, 1, z, 0, 0, 0, 1);
     }
-/*
+
     public Mat4 scale(Vec3 s) {
         m[0] *= s.x;
         m[5] *= s.y;
