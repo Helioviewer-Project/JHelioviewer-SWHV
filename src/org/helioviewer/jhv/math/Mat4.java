@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.math;
 
-public class Mat4 {
-
+class Mat4 {
+/*
     //  0 4 8 12 1 5 9 13 2 6 10 14 3 7 11 15
     public final double[] m = new double[16];
 
@@ -26,11 +26,11 @@ public class Mat4 {
 
     private Mat4() {
     }
-/*
+
     public Mat4(Mat4 mat) {
         set(mat);
     }
-*/
+
     public float[] getFloatArray() {
         float[] arr = new float[16];
         for (int i = 0; i < 16; i++) {
@@ -38,7 +38,7 @@ public class Mat4 {
         }
         return arr;
     }
-/*
+
     public void setIdentity() {
         set(identity());
     }
@@ -184,7 +184,7 @@ public class Mat4 {
 
         return inverse;
     }
-*/
+
     //
     // public GL3DMat4 inverse() {
     // GL3DMat4 I = new GL3DMat4();
@@ -248,21 +248,21 @@ public class Mat4 {
     // }
     // return I;
     // }
-/*
+
     public Mat4 translate(Vec3 t) {
         m[12] += t.x;
         m[13] += t.y;
         m[14] += t.z;
         return this;
     }
-*/
+
     public Mat4 translate(double x, double y, double z) {
         m[12] += x;
         m[13] += y;
         m[14] += z;
         return this;
     }
-/*
+
     public static Mat4 translation(Vec3 t) {
         return new Mat4(1, 0, 0, t.x, 0, 1, 0, t.y, 0, 0, 1, t.z, 0, 0, 0, 1);
     }
@@ -413,11 +413,11 @@ public class Mat4 {
     public static Mat4 ortho(double l, double r, double b, double t, double n, double f) {
         return new Mat4(2. / (r - l), 0., 0., -(r + l) / (r - l), 0., 2 / (t - b), 0., -(t + b) / (t - b), 0., 0., -2. / (f - n), -(f + n) / (f - n), 0., 0., 0., 1.);
     }
-*/
+
     public static Mat4 orthoInverse(double l, double r, double b, double t, double n, double f) {
         return new Mat4((r - l) * 0.5, 0., 0., -(r + l) * 0.5, 0., (t - b) * 0.5, 0., (t + b) * 0.5, 0., 0., (n - f) * 0.5, -(f + n) * 0.5, 0., 0., 0., 1.);
     }
-/*
+
     public static Mat4 perspective(double fov, double aspect, double n, double f) {
         double t = Math.tan(Math.toRadians(fov * 0.5)) * n;
         double b = -t;
@@ -440,7 +440,7 @@ public class Mat4 {
     public Mat4 copy() {
         return new Mat4(this);
     }
-*/
+
     @Override
     public String toString() {
         String format = "%01.02f";
@@ -461,5 +461,5 @@ public class Mat4 {
                String.format(format + ", ", m[11]) +
                String.format(format + ", \n", m[15]);
     }
-
+*/
 }

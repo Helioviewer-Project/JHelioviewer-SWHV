@@ -14,7 +14,6 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.MathUtils;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.opengl.GLSLLine;
@@ -124,7 +123,7 @@ public class GridLayer extends AbstractLayer {
 
         Position viewpoint = camera.getViewpoint();
         double pixFactor = vp.height / (2 * camera.getWidth());
-        drawEarthCircles(gl, vp.aspect, pixFactor, Sun.getEarth(viewpoint.time).toQuat());
+        drawEarthCircles(gl, vp.aspect, pixFactor, Sun.getEarth(viewpoint.time));
 
         double pixelsPerSolarRadius = textScale * pixFactor;
 
@@ -207,9 +206,9 @@ public class GridLayer extends AbstractLayer {
         renderer.end3DRendering();
     }
 
-    private void drawEarthCircles(GL2 gl, double aspect, double factor, Quat q) {
+    private void drawEarthCircles(GL2 gl, double aspect, double factor, Position p) {
         Transform.pushView();
-        Transform.rotateViewInverse(q);
+        Transform.rotateViewInverse(p.toQuat());
         {
             earthCircleLine.render(gl, aspect, thicknessEarth);
             earthPoint.renderPoints(gl, factor);
