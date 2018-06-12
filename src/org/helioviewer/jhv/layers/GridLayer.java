@@ -198,7 +198,6 @@ public class GridLayer extends AbstractLayer {
                 String label = formatter2.format(scale.getInterpolatedXValue(1. / GridMath.FLAT_STEPS_THETA * i));
                 renderer.draw3D(label, start, 0, 0, textScaleFactor);
             }
-            renderer.flush();
             for (int i = 0; i <= GridMath.FLAT_STEPS_RADIAL; i++) {
                 String label = formatter2.format(scale.getInterpolatedYValue(1. / GridMath.FLAT_STEPS_RADIAL * i));
                 float start = -h / 2 + i * h / GridMath.FLAT_STEPS_RADIAL;
