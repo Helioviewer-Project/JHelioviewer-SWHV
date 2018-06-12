@@ -4,7 +4,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.layers.Movie;
-import org.helioviewer.jhv.math.Mat4;
+import org.helioviewer.jhv.math.Mat4f;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec2;
@@ -35,12 +35,12 @@ public class Camera {
     private static final float halfDepth = (float) (3 * Sun.MeanEarthDistance);
 
     public void applyPerspectiveLatitudinal(double aspect) {
-        Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), - (float) cameraWidth, (float) cameraWidth, -1, 1);
+        Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -1, 1);
         Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
     }
 
     public void applyPerspective(double aspect, GL2 gl, GLSLShape blackCircle) {
-        Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), - (float) cameraWidth, (float) cameraWidth, -halfDepth, halfDepth);
+        Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -halfDepth, halfDepth);
         Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
 
         blackCircle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
@@ -49,8 +49,8 @@ public class Camera {
     }
 
     public float[] getTransformationInverse(double aspect) {
-        // do clipping planes matter?
-        return Mat4.orthoInverse(-cameraWidth * aspect, cameraWidth * aspect, -cameraWidth, cameraWidth, 0, 0).translate(-currentTranslation.x, -currentTranslation.y, 0).getFloatArray();
+        return Mat4f.orthoInverse(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -1, 1)
+                    .translate(-(float) currentTranslation.x, -(float) currentTranslation.y, 0).m;
     }
 ////
 
