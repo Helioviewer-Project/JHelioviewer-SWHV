@@ -6,10 +6,11 @@ import com.jogamp.opengl.GL2;
 
 public class VBO {
 
-    private int bufferID = -1;
-    private int attribRef = -1;
     private final int buffer_type;
-    private int vec_len = 1;
+    private final int attribRef;
+    private final int vec_len;
+
+    private int bufferID = -1;
     public int bufferSize = -1;
 
     private VBO(int _buffer_type, int _attribRef, int _vec_len) {
