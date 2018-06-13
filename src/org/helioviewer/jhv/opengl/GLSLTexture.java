@@ -1,9 +1,7 @@
 package org.helioviewer.jhv.opengl;
 
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
-import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.common.nio.Buffers;
@@ -15,7 +13,6 @@ public class GLSLTexture {
     private final int[] vboAttribLens = { 3, 2 };
 
     private final VBO[] vbos = new VBO[2];
-    private VBO ivbo;
     private int count;
     private boolean inited = false;
 
@@ -28,20 +25,7 @@ public class GLSLTexture {
         }
         vbos[0].bindBufferData(gl, position, Buffers.SIZEOF_FLOAT);
         vbos[1].bindBufferData(gl, coords, Buffers.SIZEOF_FLOAT);
-
-        IntBuffer indexBuffer = gen_indices(plen);
-        ivbo.bindBufferData(gl, indexBuffer, Buffers.SIZEOF_INT);
-
         count = plen;
-    }
-
-    private static IntBuffer gen_indices(int plen) {
-        IntBuffer indicesBuffer = BufferUtils.newIntBuffer(plen);
-        for (int j = 0; j < plen; j++) {
-            indicesBuffer.put(j);
-        }
-        indicesBuffer.rewind();
-        return indicesBuffer;
     }
 
     public void render(GL2 gl, int mode, float[] color, int toDraw) {
@@ -63,14 +47,12 @@ public class GLSLTexture {
         for (VBO vbo : vbos) {
             vbo.bindArray(gl);
         }
-        ivbo.bindArray(gl);
     }
 
     private void unbindVBOs(GL2 gl) {
         for (VBO vbo : vbos) {
             vbo.unbindArray(gl);
         }
-        ivbo.unbindArray(gl);
     }
 
     private void initVBOs(GL2 gl) {
@@ -78,8 +60,6 @@ public class GLSLTexture {
             vbos[i] = VBO.gen_float_VBO(vboAttribRefs[i], vboAttribLens[i]);
             vbos[i].init(gl);
         }
-        ivbo = VBO.gen_index_VBO();
-        ivbo.init(gl);
     }
 
     private void disposeVBOs(GL2 gl) {
@@ -88,10 +68,6 @@ public class GLSLTexture {
                 vbos[i].dispose(gl);
                 vbos[i] = null;
             }
-        }
-        if (ivbo != null) {
-            ivbo.dispose(gl);
-            ivbo = null;
         }
     }
 
