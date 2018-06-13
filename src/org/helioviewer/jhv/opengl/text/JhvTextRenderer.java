@@ -1415,7 +1415,7 @@ public class JhvTextRenderer {
 
                 glslTexture.init(gl);
                 glslTexture.setData(gl, mVertCoords, mTexCoords);
-                glslTexture.renderQuads(gl, textColor, mOutstandingGlyphsVerticesPipeline);
+                glslTexture.render(gl, GL2.GL_TRIANGLES, textColor, mOutstandingGlyphsVerticesPipeline);
 
                 mOutstandingGlyphsVerticesPipeline = 0;
             }
