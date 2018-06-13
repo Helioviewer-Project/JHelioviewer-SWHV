@@ -18,7 +18,7 @@ public interface UpdateViewpoint {
     void clear();
     void setLoadPosition(LoadPosition _loadPosition);
     void unsetLoadPosition(LoadPosition _loadPosition);
-    Set<Map.Entry<LoadPosition, Position>> getPositions();
+    Set<Map.Entry<LoadPosition, PositionCache>> getPositions();
 
     UpdateViewpoint observer = new Observer();
     UpdateViewpoint earth = new Earth();
@@ -28,7 +28,7 @@ public interface UpdateViewpoint {
 
     abstract class AbstractUpdateViewpoint implements UpdateViewpoint {
 
-        private final Set<Map.Entry<LoadPosition, Position>> positions = Collections.emptySet();
+        private final Set<Map.Entry<LoadPosition, PositionCache>> positions = Collections.emptySet();
 
         @Override
         public void clear() {
@@ -43,7 +43,7 @@ public interface UpdateViewpoint {
         }
 
         @Override
-        public Set<Map.Entry<LoadPosition, Position>> getPositions() {
+        public Set<Map.Entry<LoadPosition, PositionCache>> getPositions() {
             return positions;
         }
 
@@ -78,7 +78,7 @@ public interface UpdateViewpoint {
     class Equatorial extends AbstractUpdateViewpoint {
 
         private static final double distance = 2 * Sun.MeanEarthDistance / Math.tan(0.5 * Math.PI / 180);
-        private final HashMap<LoadPosition, Position> loadMap = new HashMap<>();
+        private final HashMap<LoadPosition, PositionCache> loadMap = new HashMap<>();
 
         @Override
         public void clear() {
@@ -87,8 +87,8 @@ public interface UpdateViewpoint {
 
         @Override
         public void setLoadPosition(LoadPosition loadPosition) {
-            Position p = Sun.getEarth(Movie.getTime());
-            loadMap.put(loadPosition, new Position(p.time, p.distance, 0, /* -? */ p.lat));
+//            Position p = Sun.getEarth(Movie.getTime());
+            loadMap.put(loadPosition, new PositionCache());//new Position(p.time, p.distance, 0, /* -? */ p.lat));
         }
 
         @Override
@@ -97,7 +97,7 @@ public interface UpdateViewpoint {
         }
 
         @Override
-        public Set<Map.Entry<LoadPosition, Position>> getPositions() {
+        public Set<Map.Entry<LoadPosition, PositionCache>> getPositions() {
             return loadMap.entrySet();
         }
 
@@ -113,8 +113,11 @@ public interface UpdateViewpoint {
             }
 
             for (LoadPosition loadPosition : loadMap.keySet()) {
-                if (loadPosition.isLoaded())
-                    loadMap.put(loadPosition, loadPosition.getInterpolated(time.milli, layerStart, layerEnd));
+                if (loadPosition.isLoaded()) {
+                    long start = layerStart, end = layerEnd;
+                    PositionCache cache = loadMap.get(loadPosition);
+                    cache.computeIfAbsent(time.milli, k -> loadPosition.getInterpolated(k, start, end));
+                }
             }
 
             double elon = Sun.getEarth(time).lon;
