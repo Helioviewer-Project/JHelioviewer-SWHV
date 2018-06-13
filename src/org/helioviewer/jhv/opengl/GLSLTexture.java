@@ -16,13 +16,13 @@ public class GLSLTexture {
 
     private final VBO[] vbos = new VBO[2];
     private VBO ivbo;
-    private boolean hasPoints = false;
+    private int count;
     private boolean inited = false;
 
     public void setData(GL2 gl, FloatBuffer position, FloatBuffer coords) {
-        hasPoints = false;
-        int plen = position.limit() / 3;
-        if (plen * 3 != position.limit() || plen != coords.limit() / 2) {
+        count = 0;
+        int plen = position.limit() / vboAttribLens[0];
+        if (plen * vboAttribLens[0] != position.limit() || plen != coords.limit() / vboAttribLens[1]) {
             Log.error("Something is wrong with the vertices or coords from this GLSLTexture");
             return;
         }
@@ -32,7 +32,7 @@ public class GLSLTexture {
         IntBuffer indexBuffer = gen_indices(plen);
         ivbo.bindBufferData(gl, indexBuffer, Buffers.SIZEOF_INT);
 
-        hasPoints = true;
+        count = plen;
     }
 
     private static IntBuffer gen_indices(int plen) {
@@ -44,8 +44,8 @@ public class GLSLTexture {
         return indicesBuffer;
     }
 
-    public void render(GL2 gl, float[] color) {
-        if (!hasPoints)
+    public void render(GL2 gl, int mode, float[] color, int toDraw) {
+        if (toDraw > count)
             return;
 
         GLSLTextureShader.texture.bind(gl);
@@ -53,22 +53,7 @@ public class GLSLTexture {
         GLSLTextureShader.texture.bindParams(gl);
 
         bindVBOs(gl);
-        gl.glDrawElements(GL2.GL_TRIANGLE_FAN, ivbo.bufferSize, GL2.GL_UNSIGNED_INT, 0);
-        unbindVBOs(gl);
-
-        GLSLShader.unbind(gl);
-    }
-
-    public void renderQuads(GL2 gl, float[] color, int count) {
-        if (!hasPoints)
-            return;
-
-        GLSLTextureShader.texture.bind(gl);
-        GLSLTextureShader.texture.setColor(color);
-        GLSLTextureShader.texture.bindParams(gl);
-
-        bindVBOs(gl);
-        gl.glDrawArrays(GL2.GL_TRIANGLES, 0, count);
+        gl.glDrawArrays(mode, 0, toDraw);
         unbindVBOs(gl);
 
         GLSLShader.unbind(gl);
