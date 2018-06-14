@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.components;
+package org.helioviewer.jhv.gui.components.timeselector;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
