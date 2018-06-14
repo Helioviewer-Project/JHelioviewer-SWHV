@@ -1,16 +1,15 @@
 package org.helioviewer.jhv.camera;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
-import javax.swing.Box;
 import javax.swing.JCheckBox;
 
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.object.SpaceObjectContainer;
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.components.timeselector.DateTimePanel;
+import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorListener;
+import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
 import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.time.JHVDate;
@@ -19,11 +18,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 @SuppressWarnings("serial")
-class CameraOptionPanelExpert extends CameraOptionPanel implements TimespanListener {
+class CameraOptionPanelExpert extends CameraOptionPanel implements TimespanListener, TimeSelectorListener {
 
     private final JCheckBox syncCheckBox;
-    private final DateTimePanel startPanel = new DateTimePanel("Start");
-    private final DateTimePanel endPanel = new DateTimePanel("End");
+    private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
 
     private final UpdateViewpoint uv;
     private final SpaceObjectContainer container;
@@ -52,6 +50,7 @@ class CameraOptionPanelExpert extends CameraOptionPanel implements TimespanListe
             ja = new JSONArray(new String[] { "Earth" });
 
         uv = _uv;
+        timeSelectorPanel.setTime(start, end);
 
         c.gridy = 0;
         container = new SpaceObjectContainer(ja, uv, frame, exclusive, start, end);
@@ -62,16 +61,10 @@ class CameraOptionPanelExpert extends CameraOptionPanel implements TimespanListe
         syncCheckBox.addActionListener(e -> timespanChanged(Movie.getStartTime(), Movie.getEndTime()));
         add(syncCheckBox, c);
 
+        timeSelectorPanel.setTime(start, end);
+        timeSelectorPanel.addListener(this);
         c.gridy = 2;
-        startPanel.setTime(start);
-        startPanel.addListener(e -> request());
-        startPanel.add(Box.createRigidArea(new Dimension(40, 0)));
-        add(startPanel, c);
-        c.gridy = 3;
-        endPanel.setTime(end);
-        endPanel.addListener(e -> request());
-        endPanel.add(Box.createRigidArea(new Dimension(40, 0)));
-        add(endPanel, c);
+        add(timeSelectorPanel, c);
 
         ComponentUtils.smallVariant(this);
     }
@@ -90,14 +83,17 @@ class CameraOptionPanelExpert extends CameraOptionPanel implements TimespanListe
     @Override
     public void timespanChanged(long start, long end) {
         boolean notSync = !syncCheckBox.isSelected();
-        startPanel.setVisible(notSync);
-        endPanel.setVisible(notSync);
+        timeSelectorPanel.setVisible(notSync);
         if (notSync)
             return;
 
-        startPanel.setTime(start);
-        endPanel.setTime(end);
-        request();
+        timeSelectorPanel.setTime(start, end);
+    }
+
+    @Override
+    public void timeSelectionChanged(long start, long end) {
+        container.setTime(start, end);
+        uv.setTime(start, end);
     }
 
     JSONObject toJson() {
@@ -105,18 +101,11 @@ class CameraOptionPanelExpert extends CameraOptionPanel implements TimespanListe
         boolean sync = syncCheckBox.isSelected();
         jo.put("syncInterval", sync);
         if (!sync) {
-            jo.put("startTime", new JHVDate(startPanel.getTime()));
-            jo.put("endTime", new JHVDate(endPanel.getTime()));
+            jo.put("startTime", new JHVDate(timeSelectorPanel.getStartTime()));
+            jo.put("endTime", new JHVDate(timeSelectorPanel.getEndTime()));
         }
         jo.put("objects", container.toJson());
         return jo;
-    }
-
-    private void request() {
-        long start = startPanel.getTime();
-        long end = endPanel.getTime();
-        container.setTime(start, end);
-        uv.setTime(start, end);
     }
 
 }

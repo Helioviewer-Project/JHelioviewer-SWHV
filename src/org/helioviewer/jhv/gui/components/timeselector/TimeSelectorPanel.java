@@ -2,6 +2,7 @@ package org.helioviewer.jhv.gui.components.timeselector;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.HashSet;
 
 import javax.swing.JPanel;
 
@@ -13,6 +14,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 @SuppressWarnings("serial")
 public class TimeSelectorPanel extends JPanel {
 
+    private final HashSet<TimeSelectorListener> listeners = new HashSet<>();
     private final DateTimePanel startDateTimePanel = new DateTimePanel("Start");
     private final DateTimePanel endDateTimePanel = new DateTimePanel("End");
     private final JHVCarringtonPicker carrington = new JHVCarringtonPicker();
@@ -57,6 +59,10 @@ public class TimeSelectorPanel extends JPanel {
         carrington.setTime(start);
         startDateTimePanel.setTime(start);
         endDateTimePanel.setTime(end);
+
+        for (TimeSelectorListener l : listeners) {
+            l.timeSelectionChanged(start, end);
+        }
     }
 
     public long getStartTime() {
@@ -65,6 +71,14 @@ public class TimeSelectorPanel extends JPanel {
 
     public long getEndTime() {
         return endDateTimePanel.getTime();
+    }
+
+    public void addListener(TimeSelectorListener l) {
+        listeners.add(l);
+    }
+
+    public void removeListener(TimeSelectorListener l) {
+        listeners.remove(l);
     }
 
 }
