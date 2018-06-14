@@ -1,12 +1,10 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 import javax.annotation.Nullable;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSlider;
 
 import org.helioviewer.jhv.camera.Camera;

@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.Component;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
