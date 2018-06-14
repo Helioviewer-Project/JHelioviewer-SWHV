@@ -38,12 +38,12 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
     private final FOVShape fov = new FOVShape(thickness);
     private final GLSLShape planets = new GLSLShape();
-    private final CameraOptionsPanel optionPanel;
+    private final CameraOptionsPanel optionsPanel;
 
     private String timeString = null;
 
     public ViewpointLayer(JSONObject jo) {
-        optionPanel = new CameraOptionsPanel(jo);
+        optionsPanel = new CameraOptionsPanel(jo);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         if (!isVisible[vp.idx])
             return;
 
-        double tan = Math.tan(optionPanel.getFOVAngle()) / 2;
+        double tan = Math.tan(optionsPanel.getFOVAngle()) / 2;
         fov.setTAngles(tan, tan);
         double pixFactor = vp.height / (2 * camera.getWidth());
         Position viewpoint = camera.getViewpoint();
@@ -159,8 +159,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     }
 
     @Override
-    public LayerOptionPanel getOptionPanel() {
-        return optionPanel;
+    public Component getOptionsPanel() {
+        return optionsPanel;
     }
 
     @Override
@@ -199,7 +199,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
     @Override
     public void serialize(JSONObject jo) {
-        optionPanel.serialize(jo);
+        optionsPanel.serialize(jo);
     }
 
     private void renderPlanets(GL2 gl, Set<Map.Entry<LoadPosition, Position>> positions, double pointFactor) {

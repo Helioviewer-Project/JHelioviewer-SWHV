@@ -39,7 +39,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     private final GLImage glImage = new GLImage();
     private final VBO positionVBO = VBO.gen_float_VBO(GLSLSolarShader.positionRef, 3);
     private final VBO indexVBO = VBO.gen_index_VBO();
-    private final ImageLayerOptions optionPanel;
+    private final ImageLayerOptions optionsPanel;
 
     private boolean removed;
     private LoadRemoteTask worker;
@@ -71,7 +71,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
                     glImage.fromJson(imageParams);
             }
         }
-        optionPanel = new ImageLayerOptions(this);
+        optionsPanel = new ImageLayerOptions(this);
     }
 
     public void load(APIRequest req) {
@@ -124,9 +124,9 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         view = _view;
         worker = null; // drop reference
 
-        optionPanel.getRunningDifferencePanel().downloadVisible(!isLocal());
+        optionsPanel.getRunningDifferencePanel().downloadVisible(!isLocal());
         setEnabled(true); // enable optionsPanel
-        ImageViewerGui.getLayersPanel().setOptionPanel(this);
+        ImageViewerGui.getLayersPanel().setOptionsPanel(this);
 
         view.setDataHandler(this);
         CameraHelper.zoomToFit(Display.getMiniCamera());
@@ -137,7 +137,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         if (Display.multiview) {
             ImageLayers.arrangeMultiView(true);
         }
-        optionPanel.setLUT(view.getDefaultLUT());
+        optionsPanel.setLUT(view.getDefaultLUT());
     }
 
     private void unsetView() {
@@ -239,8 +239,8 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     }
 
     @Override
-    public LayerOptionPanel getOptionPanel() {
-        return optionPanel;
+    public Component getOptionsPanel() {
+        return optionsPanel;
     }
 
     @Override
@@ -357,11 +357,11 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     }
 
     public void doneDownloadView() {
-        optionPanel.getRunningDifferencePanel().done();
+        optionsPanel.getRunningDifferencePanel().done();
     }
 
     public void progressDownloadView(int percent) {
-        optionPanel.getRunningDifferencePanel().setValue(percent);
+        optionsPanel.getRunningDifferencePanel().setValue(percent);
     }
 
 }

@@ -20,7 +20,7 @@ import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
 @SuppressWarnings("serial")
-class GridLayerOptions extends LayerOptionPanel {
+class GridLayerOptions extends JPanel {
 
     private static final double min = 5, max = 90;
 
