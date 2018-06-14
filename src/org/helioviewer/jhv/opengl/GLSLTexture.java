@@ -29,7 +29,7 @@ public class GLSLTexture {
     }
 
     public void render(GL2 gl, int mode, float[] color, int toDraw) {
-        if (toDraw > count)
+        if (count == 0 || toDraw > count)
             return;
 
         GLSLTextureShader.texture.bind(gl);

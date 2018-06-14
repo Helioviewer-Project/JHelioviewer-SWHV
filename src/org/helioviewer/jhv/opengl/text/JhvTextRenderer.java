@@ -61,6 +61,7 @@ import java.util.*;
 import com.jogamp.opengl.*;
 //import com.jogamp.opengl.fixedfunc.GLPointerFunc;
 
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.GLSLTexture;
 
 /** Renders bitmapped Java 2D text into an OpenGL window with high
@@ -874,7 +875,7 @@ public class JhvTextRenderer {
             // whether we're likely to need to support a full RGBA backing
             // store (i.e., non-default Paint, foreground color, etc.), but
             // for now, let's just be more efficient
-            JhvTextureRenderer renderer = new JhvTextureRenderer(w, h, true, mipmap);
+            JhvTextureRenderer renderer = new JhvTextureRenderer(MathUtils.nextPowerOfTwo(w), MathUtils.nextPowerOfTwo(h), true, mipmap);
             renderer.setSmoothing(smoothing);
             return renderer;
         }
