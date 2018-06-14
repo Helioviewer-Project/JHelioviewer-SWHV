@@ -29,6 +29,7 @@ import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
+import org.helioviewer.jhv.layers.LayerOptionPanel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.selector.cellrenderer.RendererEnabled;
 import org.helioviewer.jhv.layers.selector.cellrenderer.RendererLoading;
@@ -148,7 +149,7 @@ public class LayersPanel extends JPanel {
 
         grid.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
-                setOptionsPanel((Layer) grid.getValueAt(grid.getSelectedRow(), 0));
+                setOptionPanel((Layer) grid.getValueAt(grid.getSelectedRow(), 0));
             }
         });
 
@@ -190,7 +191,7 @@ public class LayersPanel extends JPanel {
                     layer.setEnabled(!layer.isEnabled());
                     model.updateCell(row, col);
                     if (grid.getSelectedRow() == row)
-                        setOptionsPanel(layer);
+                        setOptionPanel(layer);
                     Display.render(1);
                 } else if (col == TITLE_COL && layer instanceof ImageLayer) {
                     Layers.setActiveImageLayer((ImageLayer) layer);
@@ -237,13 +238,24 @@ public class LayersPanel extends JPanel {
         return rowHeight;
     }
 
-    public void setOptionsPanel(Layer layer) {
-        optionsPanelWrapper.removeAll();
-        Component optionsPanel = layer == null ? null : layer.getOptionsPanel();
-        if (optionsPanel != null) {
-            ComponentUtils.setEnabled(optionsPanel, layer.isEnabled());
-            optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
+    private LayerOptionPanel currentOptionPanel;
+
+    public void setOptionPanel(Layer layer) {
+        LayerOptionPanel newOptionPanel = layer == null ? null : layer.getOptionPanel();
+        //if (currentOptionPanel == newOptionPanel) <- ImageLayer
+        //    return;
+
+        if (currentOptionPanel != null) {
+            currentOptionPanel.deactivate();
+            optionsPanelWrapper.remove(currentOptionPanel);
         }
+
+        if (newOptionPanel != null) {
+            newOptionPanel.activate();
+            ComponentUtils.setEnabled(newOptionPanel, layer.isEnabled());
+            optionsPanelWrapper.add(newOptionPanel, BorderLayout.CENTER);
+        }
+        currentOptionPanel = newOptionPanel;
         revalidate();
         repaint();
     }

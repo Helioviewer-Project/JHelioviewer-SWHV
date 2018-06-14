@@ -11,6 +11,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.layers.LayerOptionPanel;
 import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.GLSLLine;
@@ -26,7 +27,7 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
 
     private static final double thickness = 0.004;
 
-    private final PfssLayerOptions optionsPanel;
+    private final PfssLayerOptions optionPanel;
     private final PfssLine pfssLine = new PfssLine();
     private final GLSLLine glslLine = new GLSLLine();
     private PfssData previousPfssData;
@@ -41,14 +42,14 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
             fixedColor = jo.optBoolean("fixedColor", fixedColor);
             radius = MathUtils.clip(jo.optDouble("radius", radius), 1.1, PfssSettings.MAX_RADIUS);
         }
-        optionsPanel = new PfssLayerOptions(detail, fixedColor, radius);
+        optionPanel = new PfssLayerOptions(detail, fixedColor, radius);
     }
 
     @Override
     public void serialize(JSONObject jo) {
-        jo.put("detail", optionsPanel.getDetail());
-        jo.put("fixedColor", optionsPanel.getFixedColor());
-        jo.put("radius", optionsPanel.getRadius());
+        jo.put("detail", optionPanel.getDetail());
+        jo.put("fixedColor", optionPanel.getFixedColor());
+        jo.put("radius", optionPanel.getRadius());
     }
 
     @Override
@@ -70,8 +71,8 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
     }
 
     @Override
-    public Component getOptionsPanel() {
-        return optionsPanel;
+    public LayerOptionPanel getOptionPanel() {
+        return optionPanel;
     }
 
     @Override
@@ -133,9 +134,9 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
     private double lastRadius;
 
     private void renderData(GL2 gl, PfssData data, double aspect) {
-        int detail = optionsPanel.getDetail();
-        boolean fixedColor = optionsPanel.getFixedColor();
-        double radius = optionsPanel.getRadius();
+        int detail = optionPanel.getDetail();
+        boolean fixedColor = optionPanel.getFixedColor();
+        double radius = optionPanel.getRadius();
 
         if (data != previousPfssData || lastDetail != detail || lastFixedColor != fixedColor || lastRadius != radius) {
             lastDetail = detail;
