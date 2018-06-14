@@ -16,7 +16,7 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.CadencePanel;
 import org.helioviewer.jhv.gui.components.ImageSelectorPanel;
-import org.helioviewer.jhv.gui.components.TimeSelectorPanel;
+import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
 import org.helioviewer.jhv.gui.interfaces.ObservationSelector;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.layers.ImageLayer;

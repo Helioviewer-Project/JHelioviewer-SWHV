@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.components;
+package org.helioviewer.jhv.gui.components.timeselector;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -9,7 +9,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.gui.components.base.TimeTextField;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;

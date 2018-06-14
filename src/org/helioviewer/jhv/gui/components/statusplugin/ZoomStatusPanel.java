@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.components.statusplugins;
+package org.helioviewer.jhv.gui.components.statusplugin;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.display.Display;

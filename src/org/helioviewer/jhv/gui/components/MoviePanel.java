@@ -37,6 +37,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.ObservationSelector;
 import org.helioviewer.jhv.input.KeyShortcuts;
