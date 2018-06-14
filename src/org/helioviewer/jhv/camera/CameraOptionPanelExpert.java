@@ -4,6 +4,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.object.SpaceObjectContainer;
@@ -18,7 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 @SuppressWarnings("serial")
-class CameraOptionPanelExpert extends CameraOptionPanel implements TimespanListener, TimeSelectorListener {
+class CameraOptionPanelExpert extends JPanel implements TimespanListener, TimeSelectorListener {
 
     private final JCheckBox syncCheckBox;
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
@@ -69,13 +70,11 @@ class CameraOptionPanelExpert extends CameraOptionPanel implements TimespanListe
         ComponentUtils.smallVariant(this);
     }
 
-    @Override
     void activate() {
         Movie.addTimespanListener(this);
         timespanChanged(Movie.getStartTime(), Movie.getEndTime());
     }
 
-    @Override
     void deactivate() {
         Movie.removeTimespanListener(this);
     }

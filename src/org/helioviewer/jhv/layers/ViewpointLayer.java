@@ -145,9 +145,10 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     public void setEnabled(boolean _enabled) {
         super.setEnabled(_enabled);
 
-        if (enabled)
+        if (enabled) {
             ImageViewerGui.getInputController().addPlugin(this);
-        else {
+            optionsPanel.syncViewpoint();
+        } else {
             ImageViewerGui.getInputController().removePlugin(this);
             Display.setViewpointUpdate(UpdateViewpoint.observer);
         }
