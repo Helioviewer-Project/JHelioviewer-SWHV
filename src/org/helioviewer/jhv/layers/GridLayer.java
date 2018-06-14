@@ -66,7 +66,7 @@ public class GridLayer extends AbstractLayer {
     private final ArrayList<GridLabel> radialLabels;
     private final ArrayList<GridLabel> radialLabelsFar;
 
-    private final Component optionsPanel;
+    private final LayerOptionPanel optionPanel;
 
     @Override
     public void serialize(JSONObject jo) {
@@ -97,7 +97,7 @@ public class GridLayer extends AbstractLayer {
             deserialize(jo);
         else
             setEnabled(true);
-        optionsPanel = new GridLayerOptions(this);
+        optionPanel = new GridLayerOptions(this);
 
         latLabels = GridLabel.makeLatLabels(latStep);
         lonLabels = GridLabel.makeLonLabels(gridType, lonStep);
@@ -304,8 +304,8 @@ public class GridLayer extends AbstractLayer {
     }
 
     @Override
-    public Component getOptionsPanel() {
-        return optionsPanel;
+    public LayerOptionPanel getOptionPanel() {
+        return optionPanel;
     }
 
     @Override

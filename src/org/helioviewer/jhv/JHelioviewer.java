@@ -123,7 +123,7 @@ public class JHelioviewer {
 
             // set left pane width to fit max of ViewpointLayer and ImageLayer options width
             JComponent leftPane = ImageViewerGui.getLeftScrollPane();
-            ImageViewerGui.getLayersPanel().setOptionsPanel(Layers.getViewpointLayer());
+            ImageViewerGui.getLayersPanel().setOptionPanel(Layers.getViewpointLayer());
             frame.pack();
             int viewpointLayerWidth = leftPane.getPreferredSize().width; // wider on Mac
             ImageLayer dummy = ImageLayer.create(null);

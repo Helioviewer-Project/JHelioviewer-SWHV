@@ -14,9 +14,10 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.layers.LayerOptionPanel;
 
 @SuppressWarnings("serial")
-class PfssLayerOptions extends JPanel {
+class PfssLayerOptions extends LayerOptionPanel {
 
     private int detail;
     private boolean fixedColor;

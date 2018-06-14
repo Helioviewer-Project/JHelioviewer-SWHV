@@ -34,7 +34,7 @@ public class MiniviewLayer extends AbstractLayer {
     private static final GLSLShape circle = new GLSLShape();
     private static final GLSLShape rectangle = new GLSLShape();
 
-    private final JPanel optionsPanel;
+    private final LayerOptionPanel optionPanel;
     private Viewport miniViewport = new Viewport(0, 0, 0, 100, 100);
 
     @Override
@@ -47,7 +47,7 @@ public class MiniviewLayer extends AbstractLayer {
             scale = MathUtils.clip(jo.optInt("scale", scale), MIN_SCALE, MAX_SCALE);
         else
             setEnabled(true);
-        optionsPanel = optionsPanel();
+        optionPanel = optionPanel();
         reshapeViewport();
     }
 
@@ -80,8 +80,8 @@ public class MiniviewLayer extends AbstractLayer {
     }
 
     @Override
-    public Component getOptionsPanel() {
-        return optionsPanel;
+    public LayerOptionPanel getOptionPanel() {
+        return optionPanel;
     }
 
     @Override
@@ -118,8 +118,10 @@ public class MiniviewLayer extends AbstractLayer {
         return miniViewport;
     }
 
-    private JPanel optionsPanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
+    private LayerOptionPanel optionPanel() {
+        LayerOptionPanel panel = new LayerOptionPanel();
+        panel.setLayout(new GridBagLayout());
+
         JSlider slider = new JSlider(JSlider.HORIZONTAL, MIN_SCALE, MAX_SCALE, scale);
         slider.addChangeListener(e -> {
             scale = slider.getValue();

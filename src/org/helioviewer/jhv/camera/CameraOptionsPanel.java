@@ -21,13 +21,14 @@ import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
+import org.helioviewer.jhv.layers.LayerOptionPanel;
 import org.helioviewer.jhv.math.MathUtils;
 import org.json.JSONObject;
 
 import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
-public class CameraOptionsPanel extends JPanel {
+public class CameraOptionsPanel extends LayerOptionPanel {
 
     private enum CameraMode {
         Observer(UpdateViewpoint.observer), Earth(UpdateViewpoint.earth),
