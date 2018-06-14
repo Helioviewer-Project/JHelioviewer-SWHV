@@ -19,8 +19,8 @@ public class LoadPosition extends JHVWorker<Position[], Void> {
     private final LoadPositionFire receiver;
     private final SpaceObject target;
     private final String frame;
-    private final long start;
-    private final long end;
+    public final long start;
+    public final long end;
 
     private Position[] position = new Position[0];
     private String report = null;
@@ -39,7 +39,7 @@ public class LoadPosition extends JHVWorker<Position[], Void> {
     @Override
     protected Position[] backgroundWork() {
         long deltat = 60, span = (end - start) / 1000;
-        long max = 100000;
+        long max = 10000;
 
         if (span / deltat > max)
             deltat = span / max;
