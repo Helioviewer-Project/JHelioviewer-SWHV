@@ -30,7 +30,7 @@ import com.jidesoft.swing.JideButton;
 public class CameraOptionsPanel extends JPanel {
 
     private enum CameraMode {
-        Earth(UpdateViewpoint.earth), Equatorial(UpdateViewpoint.equatorial), Other(UpdateViewpoint.expert);
+        Observer(UpdateViewpoint.observer), Earth(UpdateViewpoint.earth), Equatorial(UpdateViewpoint.equatorial), Other(UpdateViewpoint.expert);
 
         final JRadioButton radio;
         final UpdateViewpoint update;
@@ -73,7 +73,7 @@ public class CameraOptionsPanel extends JPanel {
         equatorialOptionPanel = new CameraOptionPanelExpert(joEquatorial, UpdateViewpoint.equatorial, "HEEQ", false);
 
         double fovMin = 0, fovMax = 180;
-        currentMode = CameraMode.Earth;
+        currentMode = CameraMode.Observer;
         if (jo != null) {
             fovAngle = MathUtils.clip(jo.optDouble("fovAngle", fovAngle), fovMin, fovMax);
             try {
