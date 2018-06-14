@@ -57,6 +57,8 @@ public class Display implements ActionListener, JHVEventHighlightListener {
 
     public static void setViewpointUpdate(UpdateViewpoint update) {
         updateViewpoint = update;
+        camera.reset();
+        miniCamera.reset();
     }
 
     public static UpdateViewpoint getUpdateViewpoint() {

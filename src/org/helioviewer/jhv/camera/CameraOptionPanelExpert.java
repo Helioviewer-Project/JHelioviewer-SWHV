@@ -25,9 +25,10 @@ class CameraOptionPanelExpert extends CameraOptionPanel implements TimespanListe
     private final DateTimePanel startPanel = new DateTimePanel("Start");
     private final DateTimePanel endPanel = new DateTimePanel("End");
 
+    private final UpdateViewpoint uv;
     private final SpaceObjectContainer container;
 
-    CameraOptionPanelExpert(JSONObject jo, UpdateViewpoint uv, String frame, boolean exclusive) {
+    CameraOptionPanelExpert(JSONObject jo, UpdateViewpoint _uv, String frame, boolean exclusive) {
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 1;
@@ -49,6 +50,8 @@ class CameraOptionPanelExpert extends CameraOptionPanel implements TimespanListe
         }
         if (ja == null)
             ja = new JSONArray(new String[] { "Earth" });
+
+        uv = _uv;
 
         c.gridy = 0;
         container = new SpaceObjectContainer(ja, uv, frame, exclusive, start, end);
@@ -110,7 +113,10 @@ class CameraOptionPanelExpert extends CameraOptionPanel implements TimespanListe
     }
 
     private void request() {
-        container.setTime(startPanel.getTime(), endPanel.getTime());
+        long start = startPanel.getTime();
+        long end = endPanel.getTime();
+        container.setTime(start, end);
+        uv.setTime(start, end);
     }
 
 }

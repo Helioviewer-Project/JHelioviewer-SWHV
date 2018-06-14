@@ -94,27 +94,14 @@ public class LoadPosition extends JHVWorker<Position[], Void> {
         return position.length > 0;
     }
 
-    private long interpolateTime(long t, long startTime, long endTime) {
-        long pStart = position[0].time.milli;
-        long pEnd = position[position.length - 1].time.milli;
-        if (startTime == endTime)
-            return pEnd;
-        else {
-            double f = (t - startTime) / (double) (endTime - startTime); //!
-            return (long) (pStart + f * (pEnd - pStart) + .5);
-        }
-    }
-
-    public Position getInterpolated(long t, long startTime, long endTime) {
-        long time = interpolateTime(t, startTime, endTime);
-        double dist, hgln, hglt;
+    public Position getInterpolated(long time) {
         long tstart = position[0].time.milli;
         long tend = position[position.length - 1].time.milli;
-        if (tstart == tend) {
-            dist = position[0].distance;
-            hgln = position[0].lon;
-            hglt = position[0].lat;
-        } else {
+        if (time <= tstart || tstart == tend)
+            return position[0];
+        else if (time >= tend)
+            return position[position.length - 1];
+        else {
             double interpolatedIndex = (time - tstart) / (double) (tend - tstart) * position.length;
             int i = (int) interpolatedIndex;
             i = MathUtils.clip(i, 0, position.length - 1);
@@ -124,15 +111,15 @@ public class LoadPosition extends JHVWorker<Position[], Void> {
             tend = position[inext].time.milli;
 
             double alpha = tend == tstart ? 1. : ((time - tstart) / (double) (tend - tstart)) % 1.;
-            dist = (1. - alpha) * position[i].distance + alpha * position[inext].distance;
-            hgln = (1. - alpha) * position[i].lon + alpha * position[inext].lon;
-            hglt = (1. - alpha) * position[i].lat + alpha * position[inext].lat;
+            double dist = (1. - alpha) * position[i].distance + alpha * position[inext].distance;
+            double hgln = (1. - alpha) * position[i].lon + alpha * position[inext].lon;
+            double hglt = (1. - alpha) * position[i].lat + alpha * position[inext].lat;
+            return new Position(new JHVDate(time), dist, hgln, hglt);
         }
-        return new Position(new JHVDate(time), dist, hgln, hglt);
     }
 
-    public Position getRelativeInterpolated(long t, long startTime, long endTime) {
-        Position p = getInterpolated(t, startTime, endTime);
+    public Position getRelativeInterpolated(long time) {
+        Position p = getInterpolated(time);
         double elon = Sun.getEarth(p.time /*!*/).lon;
         return new Position(p.time, p.distance, elon - p.lon, p.lat);
     }

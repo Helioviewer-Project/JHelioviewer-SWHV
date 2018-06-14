@@ -10,12 +10,13 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.time.JHVDate;
-import org.helioviewer.jhv.view.View;
 
 public interface UpdateViewpoint {
 
     Position update(JHVDate time);
     void clear();
+    void setTime(long _start, long _end);
+    long interpolateTime(long time);
     void setLoadPosition(LoadPosition _loadPosition);
     void unsetLoadPosition(LoadPosition _loadPosition);
     Set<Map.Entry<LoadPosition, Position>> getPositions();
@@ -29,9 +30,28 @@ public interface UpdateViewpoint {
     abstract class AbstractUpdateViewpoint implements UpdateViewpoint {
 
         private final Set<Map.Entry<LoadPosition, Position>> positions = Collections.emptySet();
+        private long start;
+        private long end;
 
         @Override
         public void clear() {
+        }
+
+        @Override
+        public void setTime(long _start, long _end) {
+            start = _start;
+            end = _end;
+        }
+
+        @Override
+        public long interpolateTime(long time) {
+            long mstart = Movie.getStartTime();
+            long mend = Movie.getEndTime();
+            if (mstart == mend)
+                return end;
+
+            double f = (time - mstart) / (double) (mend - mstart);
+            return (long) (start + f * (end - start) + .5);
         }
 
         @Override
@@ -103,22 +123,15 @@ public interface UpdateViewpoint {
 
         @Override
         public Position update(JHVDate time) {
-            long layerStart = 0, layerEnd = 0;
-            // Active layer times
-            ImageLayer layer = Layers.getActiveImageLayer();
-            if (layer != null) {
-                View view = layer.getView();
-                layerStart = view.getFirstTime().milli;
-                layerEnd = view.getLastTime().milli;
-            }
-
+            long t = interpolateTime(time.milli);
             for (LoadPosition loadPosition : loadMap.keySet()) {
                 if (loadPosition.isLoaded())
-                    loadMap.put(loadPosition, loadPosition.getInterpolated(time.milli, layerStart, layerEnd));
+                    loadMap.put(loadPosition, loadPosition.getInterpolated(t));
             }
 
-            double elon = Sun.getEarth(time).lon;
-            return new Position(time, distance, elon, Math.PI / 2);
+            JHVDate itime = new JHVDate(t);
+            double elon = Sun.getEarth(itime).lon;
+            return new Position(itime, distance, elon, Math.PI / 2);
         }
     }
 
@@ -145,16 +158,7 @@ public interface UpdateViewpoint {
         public Position update(JHVDate time) {
             if (loadPosition == null || !loadPosition.isLoaded())
                 return Sun.getEarth(time);
-
-            long layerStart = 0, layerEnd = 0;
-            // Active layer times
-            ImageLayer layer = Layers.getActiveImageLayer();
-            if (layer != null) {
-                View view = layer.getView();
-                layerStart = view.getFirstTime().milli;
-                layerEnd = view.getLastTime().milli;
-            }
-            return loadPosition.getRelativeInterpolated(time.milli, layerStart, layerEnd);
+            return loadPosition.getRelativeInterpolated(interpolateTime(time.milli));
         }
 
     }
