@@ -48,7 +48,9 @@ public class CameraOptionsPanel extends JPanel {
     private final ButtonGroup modeGroup = new ButtonGroup();
     private final CameraOptionPanelExpert expertOptionPanel;
     private final CameraOptionPanelExpert equatorialOptionPanel;
-    private CameraOptionPanel currentOptionPanel;
+
+    private CameraMode currentMode = CameraMode.Earth;
+    private CameraOptionPanelExpert currentOptionPanel;
 
     private static final String explanation = "<b>Observer</b>: view from observer.\nCamera time defined by timestamps of the master layer.\n\n" +
                                               "<b>Earth</b>: view from Earth.\nCamera time defined by timestamps of the master layer.\n\n" +
@@ -107,8 +109,10 @@ public class CameraOptionsPanel extends JPanel {
             if (mode == CameraMode.Earth)
                 radio.setSelected(true);
             radio.addItemListener(e -> {
-                if (radio.isSelected())
-                    changeCamera(mode);
+                if (radio.isSelected()) {
+                    currentMode = mode;
+                    syncViewpoint();
+                }
             });
             radioPanel.add(radio);
             modeGroup.add(radio);
@@ -147,7 +151,7 @@ public class CameraOptionsPanel extends JPanel {
         jo.put("equatorial", equatorialOptionPanel.toJson());
     }
 
-    private void switchOptionsPanel(CameraOptionPanel newOptionPanel) {
+    private void switchOptionsPanel(CameraOptionPanelExpert newOptionPanel) {
         if (currentOptionPanel == newOptionPanel)
             return;
 
@@ -173,15 +177,15 @@ public class CameraOptionsPanel extends JPanel {
         repaint();
     }
 
-    private void changeCamera(CameraMode mode) {
-        CameraOptionPanel panel = null;
-        if (mode == CameraMode.Other)
+    public void syncViewpoint() {
+        CameraOptionPanelExpert panel = null;
+        if (currentMode == CameraMode.Other)
             panel = expertOptionPanel;
-        else if (mode == CameraMode.Equatorial)
+        else if (currentMode == CameraMode.Equatorial)
             panel = equatorialOptionPanel;
         switchOptionsPanel(panel);
 
-        Display.setViewpointUpdate(mode.update);
+        Display.setViewpointUpdate(currentMode.update);
     }
 
 }
