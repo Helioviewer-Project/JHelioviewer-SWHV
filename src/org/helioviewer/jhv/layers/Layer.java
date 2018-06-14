@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.layers;
 
+import java.awt.Component;
+
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.camera.Camera;
@@ -24,7 +26,7 @@ public interface Layer {
 
     void remove(GL2 gl);
 
-    LayerOptionPanel getOptionPanel();
+    Component getOptionsPanel();
 
     String getName();
 

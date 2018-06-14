@@ -28,7 +28,7 @@ public class TimestampLayer extends AbstractLayer {
     private static final int MAX_SCALE = 200;
     private int scale = 100;
 
-    private final LayerOptionPanel optionPanel;
+    private final JPanel optionsPanel;
 
     @Override
     public void serialize(JSONObject jo) {
@@ -38,7 +38,7 @@ public class TimestampLayer extends AbstractLayer {
     public TimestampLayer(JSONObject jo) {
         if (jo != null)
             scale = MathUtils.clip(jo.optInt("scale", scale), MIN_SCALE, MAX_SCALE);
-        optionPanel = optionPanel();
+        optionsPanel = optionsPanel();
     }
 
     @Override
@@ -83,8 +83,8 @@ public class TimestampLayer extends AbstractLayer {
     }
 
     @Override
-    public LayerOptionPanel getOptionPanel() {
-        return optionPanel;
+    public Component getOptionsPanel() {
+        return optionsPanel;
     }
 
     @Override
@@ -107,10 +107,8 @@ public class TimestampLayer extends AbstractLayer {
     public void dispose(GL2 gl) {
     }
 
-    private LayerOptionPanel optionPanel() {
-        LayerOptionPanel panel = new LayerOptionPanel();
-        panel.setLayout(new GridBagLayout());
-
+    private JPanel optionsPanel() {
+        JPanel panel = new JPanel(new GridBagLayout());
         JSlider slider = new JSlider(JSlider.HORIZONTAL, MIN_SCALE, MAX_SCALE, scale);
         slider.addChangeListener(e -> {
             scale = slider.getValue();

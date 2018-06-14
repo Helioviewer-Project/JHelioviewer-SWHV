@@ -35,7 +35,6 @@ import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.AbstractLayer;
-import org.helioviewer.jhv.layers.LayerOptionPanel;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.math.MathUtils;
@@ -55,7 +54,7 @@ import com.jogamp.opengl.GL2;
 public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEventHandler {
 
     private static final SWEKPopupController controller = new SWEKPopupController(ImageViewerGui.getGLComponent());
-    private final LayerOptionPanel optionPanel;
+    private final JPanel optionsPanel;
 
     private static final int DIVPOINTS = 10;
     private static final double LINEWIDTH = 0.002;
@@ -76,7 +75,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             icons = jo.optBoolean("icons", icons);
         else
             setEnabled(true);
-        optionPanel = optionPanel();
+        optionsPanel = optionsPanel();
     }
 
     @Override
@@ -493,8 +492,8 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     }
 
     @Override
-    public LayerOptionPanel getOptionPanel() {
-        return optionPanel;
+    public Component getOptionsPanel() {
+        return optionsPanel;
     }
 
     @Override
@@ -579,10 +578,8 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         requestEvents(true, Movie.getStartTime(), Movie.getEndTime());
     }
 
-    private LayerOptionPanel optionPanel() {
-        LayerOptionPanel panel = new LayerOptionPanel();
-        panel.setLayout(new GridBagLayout());
-
+    private JPanel optionsPanel() {
+        JPanel panel = new JPanel(new GridBagLayout());
         JCheckBox check = new JCheckBox("Icons", icons);
         check.setHorizontalTextPosition(SwingConstants.LEFT);
         check.addActionListener(e -> {
