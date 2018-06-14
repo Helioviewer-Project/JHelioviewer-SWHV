@@ -15,13 +15,13 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
-public class DateTimePanel extends JPanel implements ActionListener, JHVCalendarListener {
+class DateTimePanel extends JPanel implements ActionListener, JHVCalendarListener {
 
     private final HashSet<ActionListener> listeners = new HashSet<>();
     private final JHVCalendarDatePicker datePicker = new JHVCalendarDatePicker();
     private final TimeTextField timePicker = new TimeTextField();
 
-    public DateTimePanel(String text) {
+    DateTimePanel(String text) {
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
         JLabel label = new JLabel(text, JLabel.RIGHT);
@@ -34,20 +34,20 @@ public class DateTimePanel extends JPanel implements ActionListener, JHVCalendar
         timePicker.addActionListener(this);
     }
 
-    public long getTime() {
+    long getTime() {
         return datePicker.getTime() + timePicker.getTime();
     }
 
-    public void setTime(long time) {
+    void setTime(long time) {
         datePicker.setTime(TimeUtils.floorDay(time));
         timePicker.setText(TimeUtils.formatTime(TimeUtils.floorSec(time)));
     }
 
-    public void addListener(ActionListener l) {
+    void addListener(ActionListener l) {
         listeners.add(l);
     }
 
-    public void removeListener(ActionListener l) {
+    void removeListener(ActionListener l) {
         listeners.remove(l);
     }
 
