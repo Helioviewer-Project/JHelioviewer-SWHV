@@ -4,7 +4,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 import javax.swing.BorderFactory;
-import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.gui.ComponentUtils;
