@@ -49,7 +49,7 @@ public class CameraOptionsPanel extends JPanel {
     private final CameraOptionPanelExpert expertOptionPanel;
     private final CameraOptionPanelExpert equatorialOptionPanel;
 
-    private CameraMode currentMode = CameraMode.Earth;
+    private CameraMode currentMode;
     private CameraOptionPanelExpert currentOptionPanel;
 
     private static final String explanation = "<b>Observer</b>: view from observer.\nCamera time defined by timestamps of the master layer.\n\n" +
@@ -73,16 +73,18 @@ public class CameraOptionsPanel extends JPanel {
         equatorialOptionPanel = new CameraOptionPanelExpert(joEquatorial, UpdateViewpoint.equatorial, "HEEQ", false);
 
         double fovMin = 0, fovMax = 180;
+        currentMode = CameraMode.Earth;
         if (jo != null) {
             fovAngle = MathUtils.clip(jo.optDouble("fovAngle", fovAngle), fovMin, fovMax);
             try {
-                CameraMode.valueOf(jo.optString("mode")).radio.setSelected(true);
+                currentMode = CameraMode.valueOf(jo.optString("mode"));
             } catch (Exception ignore) {
             }
             JSONObject jc = jo.optJSONObject("camera");
             if (jc != null)
                 Display.getCamera().fromJson(jc);
         }
+        currentMode.radio.setSelected(true);
 
         JPanel fovPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
         fovPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
@@ -106,8 +108,6 @@ public class CameraOptionsPanel extends JPanel {
         radioPanel.add(new JLabel("View", JLabel.RIGHT));
         for (CameraMode mode : CameraMode.values()) {
             JRadioButton radio = mode.radio;
-            if (mode == CameraMode.Earth)
-                radio.setSelected(true);
             radio.addItemListener(e -> {
                 if (radio.isSelected()) {
                     currentMode = mode;
@@ -137,6 +137,8 @@ public class CameraOptionsPanel extends JPanel {
         add(radioPanel, c);
 
         ComponentUtils.smallVariant(this);
+
+        syncViewpoint();
     }
 
     public double getFOVAngle() {
