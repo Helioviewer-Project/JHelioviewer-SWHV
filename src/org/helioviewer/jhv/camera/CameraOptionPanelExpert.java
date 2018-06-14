@@ -95,6 +95,10 @@ class CameraOptionPanelExpert extends JPanel implements TimespanListener, TimeSe
         uv.setTime(start, end);
     }
 
+    boolean isDownloading() {
+        return container.isDownloading();
+    }
+
     JSONObject toJson() {
         JSONObject jo = new JSONObject();
         boolean sync = syncCheckBox.isSelected();

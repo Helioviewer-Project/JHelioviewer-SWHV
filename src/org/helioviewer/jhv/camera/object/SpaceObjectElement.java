@@ -56,6 +56,10 @@ class SpaceObjectElement implements LoadPositionFire {
         }
     }
 
+    boolean isDownloading() {
+        return load == null ? false : !load.isLoaded();
+    }
+
     boolean isSelected() {
         return selected;
     }

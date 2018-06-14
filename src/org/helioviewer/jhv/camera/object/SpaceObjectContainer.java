@@ -108,6 +108,14 @@ public class SpaceObjectContainer extends JScrollPane {
             element.load(uv, frame, startTime, endTime);
     }
 
+    public boolean isDownloading() {
+        for (SpaceObjectElement element : model.getSelected()) {
+            if (element.isDownloading())
+                return true;
+        }
+        return false;
+    }
+
     private void selectElement(SpaceObjectElement element) {
         if (exclusive) {
             for (SpaceObjectElement e : model.getSelected())
