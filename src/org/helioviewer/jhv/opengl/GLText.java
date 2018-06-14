@@ -12,7 +12,7 @@ import com.jogamp.opengl.GL2;
 public class GLText {
 
     private static final int MIN = 10;
-    private static final int MAX = 112;
+    private static final int MAX = 144;
     private static final int STEP = 1;
     private static final int SIZE = (MAX - MIN) / STEP + 1;
     private static final JhvTextRenderer[] renderer = new JhvTextRenderer[SIZE];
