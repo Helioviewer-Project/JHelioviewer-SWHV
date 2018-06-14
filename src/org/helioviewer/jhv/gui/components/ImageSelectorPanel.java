@@ -46,13 +46,12 @@ public class ImageSelectorPanel extends JPanel implements DataSourcesListener {
 
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
         if (item != null) { // valid
-            long startTime = item.end - 2 * TimeUtils.DAY_IN_MILLIS;
-            long endTime = item.end;
-            selector.setStartTime(startTime);
-            selector.setEndTime(endTime);
+            long start = item.end - 2 * TimeUtils.DAY_IN_MILLIS;
+            long end = item.end;
+            selector.setTime(start, end);
 
             if (first && Boolean.parseBoolean(Settings.getProperty("startup.loadmovie"))) {
-                load(null, startTime, endTime, selector.getCadence());
+                load(null, start, end, selector.getCadence());
                 first = false;
             }
         }

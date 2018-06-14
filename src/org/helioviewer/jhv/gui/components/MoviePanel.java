@@ -381,13 +381,8 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
     }
 
     @Override
-    public void setStartTime(long time) {
-        timeSelectorPanel.setStartTime(time);
-    }
-
-    @Override
-    public void setEndTime(long time) {
-        timeSelectorPanel.setEndTime(time);
+    public void setTime(long start, long end) {
+        timeSelectorPanel.setTime(start, end);
     }
 
     @Override
@@ -412,10 +407,10 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
     }
 
     private boolean checkSanity() {
-        long startTime = getStartTime();
-        long endTime = getEndTime();
-        if (startTime > endTime) {
-            setStartTime(endTime);
+        long start = getStartTime();
+        long end = getEndTime();
+        if (start > end) {
+            setTime(end, end);
             JOptionPane.showMessageDialog(null, "End date is before start date", "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
@@ -423,8 +418,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
     }
 
     public void syncLayersSpan(long start, long end) {
-        setStartTime(start);
-        setEndTime(end);
+        setTime(start, end);
         syncLayersSpan();
     }
 
@@ -434,8 +428,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
     }
 
     private void shiftLayersSpan(long shift) {
-        setStartTime(getStartTime() + shift);
-        setEndTime(getEndTime() + shift);
+        setTime(getStartTime() + shift, getEndTime() + shift);
         ImageLayers.shiftLayersSpan(shift);
     }
 

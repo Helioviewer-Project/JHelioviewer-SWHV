@@ -104,8 +104,7 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
         APIRequest req;
         if (layer != null && (req = layer.getAPIRequest()) != null) {
             imageSelectorPanel.setupLayer(req);
-            timeSelectorPanel.setStartTime(req.startTime);
-            timeSelectorPanel.setEndTime(req.endTime);
+            timeSelectorPanel.setTime(req.startTime, req.endTime);
             cadencePanel.setCadence(req.cadence);
         }
 
@@ -128,13 +127,8 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
     }
 
     @Override
-    public void setStartTime(long time) {
-        timeSelectorPanel.setStartTime(time);
-    }
-
-    @Override
-    public void setEndTime(long time) {
-        timeSelectorPanel.setEndTime(time);
+    public void setTime(long start, long end) {
+        timeSelectorPanel.setTime(start, end);
     }
 
     @Override
@@ -149,10 +143,10 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
 
     @Override
     public void load(String server, int sourceId) {
-        long startTime = getStartTime();
-        long endTime = getEndTime();
-        if (startTime > endTime) {
-            setStartTime(endTime);
+        long start = getStartTime();
+        long end = getEndTime();
+        if (start > end) {
+            setTime(end, end);
             JOptionPane.showMessageDialog(null, "End date is before start date", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
