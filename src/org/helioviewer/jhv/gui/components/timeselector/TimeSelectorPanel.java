@@ -9,7 +9,6 @@ import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.gui.components.calendar.JHVCarringtonPicker;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.json.JSONObject;
 
 @SuppressWarnings("serial")
 public class TimeSelectorPanel extends JPanel {
@@ -66,18 +65,6 @@ public class TimeSelectorPanel extends JPanel {
 
     public long getEndTime() {
         return endDateTimePanel.getTime();
-    }
-
-    public void serialize(JSONObject jo) {
-        jo.put("startTime", new JHVDate(getStartTime()));
-        jo.put("endTime", new JHVDate(getEndTime()));
-    }
-
-    public void deserialize(JSONObject jo) {
-        long t = System.currentTimeMillis();
-        long start = TimeUtils.optParse(jo.optString("startTime"), t - 2 * TimeUtils.DAY_IN_MILLIS);
-        long end = TimeUtils.optParse(jo.optString("endTime"), t);
-        setTime(start, end);
     }
 
 }

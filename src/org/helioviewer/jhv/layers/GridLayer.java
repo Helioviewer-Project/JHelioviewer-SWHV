@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.layers;
 
+import java.awt.Component;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
