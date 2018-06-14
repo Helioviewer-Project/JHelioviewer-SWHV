@@ -8,6 +8,10 @@ public class FloatArray {
     private int len = 0;
     private float[] arr = new float[4 * 128];
 
+    public int length() {
+        return len;
+    }
+
     public void put4f(float[] c) {
         put4f(c[0], c[1], c[2], c[3]);
     }
