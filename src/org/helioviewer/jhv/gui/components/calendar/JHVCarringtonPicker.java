@@ -86,7 +86,6 @@ public class JHVCarringtonPicker extends JPanel {
         if (crPopup != null) {
             crPopup.hide();
             crPopup = null;
-            informAllJHVCalendarListeners();
         }
     }
 

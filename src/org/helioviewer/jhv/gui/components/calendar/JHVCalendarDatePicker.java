@@ -47,14 +47,14 @@ public class JHVCalendarDatePicker extends JPanel {
         textField.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                setDateFromTextField();
+                setDateFromTextField(true);
             }
         });
         textField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    setDateFromTextField();
+                    setDateFromTextField(true);
                 }
             }
         });
@@ -66,7 +66,7 @@ public class JHVCalendarDatePicker extends JPanel {
             }
         });
         calPopupButton.addActionListener(e -> {
-            setDateFromTextField();
+            setDateFromTextField(false);
             if (calPopup == null) {
                 calPopupButton.requestFocus();
                 showCalPopup();
@@ -98,13 +98,14 @@ public class JHVCalendarDatePicker extends JPanel {
         }
     }
 
-    private void setDateFromTextField() {
+    private void setDateFromTextField(boolean propagate) {
         try {
             setTime(TimeUtils.parseDate(textField.getText()));
         } catch (Exception e) {
             setTextField();
         }
-        informAllJHVCalendarListeners();
+        if (propagate)
+            informAllJHVCalendarListeners();
     }
 
     private void setDateFromCalendar() {
