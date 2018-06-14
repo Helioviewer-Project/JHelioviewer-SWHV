@@ -183,6 +183,11 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     }
 
     @Override
+    public boolean isDownloading() {
+        return optionsPanel.isDownloading();
+    }
+
+    @Override
     public boolean isDeletable() {
         return false;
     }

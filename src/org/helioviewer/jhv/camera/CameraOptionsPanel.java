@@ -179,6 +179,10 @@ public class CameraOptionsPanel extends JPanel {
         repaint();
     }
 
+    public boolean isDownloading() {
+        return expertOptionPanel.isDownloading() || equatorialOptionPanel.isDownloading();
+    }
+
     public void syncViewpoint() {
         CameraOptionPanelExpert panel = null;
         if (currentMode == CameraMode.Other)
