@@ -1,9 +1,11 @@
 package org.helioviewer.jhv.layers;
 
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSlider;
 
 import javax.annotation.Nullable;

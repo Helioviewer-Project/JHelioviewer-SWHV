@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.swek;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.astronomy.Position;

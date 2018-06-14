@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins.pfss;
 
+import java.awt.Component;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
