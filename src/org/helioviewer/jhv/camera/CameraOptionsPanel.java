@@ -30,8 +30,7 @@ import com.jidesoft.swing.JideButton;
 public class CameraOptionsPanel extends JPanel {
 
     private enum CameraMode {
-        Observer(UpdateViewpoint.observer), Earth(UpdateViewpoint.earth),
-        Equatorial(UpdateViewpoint.equatorial), Other(UpdateViewpoint.expert);
+        Earth(UpdateViewpoint.earth), Equatorial(UpdateViewpoint.equatorial), Other(UpdateViewpoint.expert);
 
         final JRadioButton radio;
         final UpdateViewpoint update;
@@ -105,7 +104,7 @@ public class CameraOptionsPanel extends JPanel {
         radioPanel.add(new JLabel("View", JLabel.RIGHT));
         for (CameraMode mode : CameraMode.values()) {
             JRadioButton radio = mode.radio;
-            if (mode == CameraMode.Observer)
+            if (mode == CameraMode.Earth)
                 radio.setSelected(true);
             radio.addItemListener(e -> {
                 if (radio.isSelected())
@@ -134,10 +133,6 @@ public class CameraOptionsPanel extends JPanel {
         add(radioPanel, c);
 
         ComponentUtils.smallVariant(this);
-    }
-
-    public static void resetViewpoint() {
-        CameraMode.Observer.radio.setSelected(true);
     }
 
     public double getFOVAngle() {
@@ -184,11 +179,9 @@ public class CameraOptionsPanel extends JPanel {
             panel = expertOptionPanel;
         else if (mode == CameraMode.Equatorial)
             panel = equatorialOptionPanel;
+        switchOptionsPanel(panel);
 
         Display.setViewpointUpdate(mode.update);
-        Display.getCamera().reset();
-        Display.getMiniCamera().reset();
-        switchOptionsPanel(panel);
     }
 
 }
