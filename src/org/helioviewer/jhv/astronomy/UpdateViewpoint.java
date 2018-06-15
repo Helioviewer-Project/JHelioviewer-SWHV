@@ -1,25 +1,24 @@
 package org.helioviewer.jhv.astronomy;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.Iterator;
 
 import org.helioviewer.jhv.io.LoadPosition;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.TimeUtils;
 
 public interface UpdateViewpoint {
 
     Position update(JHVDate time);
     void clear();
-    void setTime(long _start, long _end);
-    long interpolateTime(long time);
     void setLoadPosition(LoadPosition _loadPosition);
     void unsetLoadPosition(LoadPosition _loadPosition);
-    Set<Map.Entry<LoadPosition, Position>> getPositions();
+    Collection<LoadPosition> getLoadPositions();
 
     UpdateViewpoint observer = new Observer();
     UpdateViewpoint earth = new Earth();
@@ -29,29 +28,10 @@ public interface UpdateViewpoint {
 
     abstract class AbstractUpdateViewpoint implements UpdateViewpoint {
 
-        private final Set<Map.Entry<LoadPosition, Position>> positions = Collections.emptySet();
-        private long start;
-        private long end;
+        private final Collection<LoadPosition> loadPositions = Collections.emptySet();
 
         @Override
         public void clear() {
-        }
-
-        @Override
-        public void setTime(long _start, long _end) {
-            start = _start;
-            end = _end;
-        }
-
-        @Override
-        public long interpolateTime(long time) {
-            long mstart = Movie.getStartTime();
-            long mend = Movie.getEndTime();
-            if (mstart == mend)
-                return end;
-
-            double f = (time - mstart) / (double) (mend - mstart);
-            return (long) (start + f * (end - start) + .5);
         }
 
         @Override
@@ -63,8 +43,8 @@ public interface UpdateViewpoint {
         }
 
         @Override
-        public Set<Map.Entry<LoadPosition, Position>> getPositions() {
-            return positions;
+        public Collection<LoadPosition> getLoadPositions() {
+            return loadPositions;
         }
 
         @Override
@@ -98,7 +78,7 @@ public interface UpdateViewpoint {
     class Equatorial extends AbstractUpdateViewpoint {
 
         private static final double distance = 2 * Sun.MeanEarthDistance / Math.tan(0.5 * Math.PI / 180);
-        private final HashMap<LoadPosition, Position> loadMap = new HashMap<>();
+        private final HashMap<SpaceObject, LoadPosition> loadMap = new HashMap<>();
 
         @Override
         public void clear() {
@@ -107,29 +87,30 @@ public interface UpdateViewpoint {
 
         @Override
         public void setLoadPosition(LoadPosition loadPosition) {
-            Position p = Sun.getEarth(Movie.getTime());
-            loadMap.put(loadPosition, new Position(p.time, p.distance, 0, /* -? */ p.lat));
+            loadMap.put(loadPosition.getTarget(), loadPosition);
         }
 
         @Override
         public void unsetLoadPosition(LoadPosition loadPosition) {
-            loadMap.remove(loadPosition);
+            loadMap.remove(loadPosition.getTarget());
         }
 
         @Override
-        public Set<Map.Entry<LoadPosition, Position>> getPositions() {
-            return loadMap.entrySet();
+        public Collection<LoadPosition> getLoadPositions() {
+            return loadMap.values();
         }
 
         @Override
         public Position update(JHVDate time) {
-            long t = interpolateTime(time.milli);
-            for (LoadPosition loadPosition : loadMap.keySet()) {
-                if (loadPosition.isLoaded())
-                    loadMap.put(loadPosition, loadPosition.getInterpolated(t));
+            JHVDate itime = time;
+            Iterator<LoadPosition> it = getLoadPositions().iterator();
+            if (it.hasNext()) {
+                LoadPosition loadPosition = it.next();
+                if (loadPosition.isLoaded()) {
+                    long t = loadPosition.interpolateTime(time.milli, Movie.getStartTime(), Movie.getEndTime());
+                    itime = new JHVDate(TimeUtils.floorSec(t));
+                }
             }
-
-            JHVDate itime = new JHVDate(t);
             double elon = Sun.getEarth(itime).lon;
             return new Position(itime, distance, elon, Math.PI / 2);
         }
@@ -158,7 +139,7 @@ public interface UpdateViewpoint {
         public Position update(JHVDate time) {
             if (loadPosition == null || !loadPosition.isLoaded())
                 return Sun.getEarth(time);
-            return loadPosition.getRelativeInterpolated(interpolateTime(time.milli));
+            return loadPosition.getRelativeInterpolated(time.milli, Movie.getStartTime(), Movie.getEndTime());
         }
 
     }

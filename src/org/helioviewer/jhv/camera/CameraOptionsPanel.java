@@ -194,4 +194,9 @@ public class CameraOptionsPanel extends JPanel {
         Display.setViewpointUpdate(currentMode.update);
     }
 
+    public void deactivate() {
+        expertOptionPanel.deactivate();
+        equatorialOptionPanel.deactivate();
+    }
+
 }
