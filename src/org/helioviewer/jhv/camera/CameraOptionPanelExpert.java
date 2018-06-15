@@ -24,10 +24,9 @@ class CameraOptionPanelExpert extends JPanel implements TimespanListener, TimeSe
     private final JCheckBox syncCheckBox;
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
 
-    private final UpdateViewpoint uv;
     private final SpaceObjectContainer container;
 
-    CameraOptionPanelExpert(JSONObject jo, UpdateViewpoint _uv, String frame, boolean exclusive) {
+    CameraOptionPanelExpert(JSONObject jo, UpdateViewpoint uv, String frame, boolean exclusive) {
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 1;
@@ -50,9 +49,6 @@ class CameraOptionPanelExpert extends JPanel implements TimespanListener, TimeSe
         if (ja == null)
             ja = new JSONArray(new String[] { "Earth" });
 
-        uv = _uv;
-        timeSelectorPanel.setTime(start, end);
-
         c.gridy = 0;
         container = new SpaceObjectContainer(ja, uv, frame, exclusive, start, end);
         add(container, c);
@@ -62,9 +58,9 @@ class CameraOptionPanelExpert extends JPanel implements TimespanListener, TimeSe
         syncCheckBox.addActionListener(e -> timespanChanged(Movie.getStartTime(), Movie.getEndTime()));
         add(syncCheckBox, c);
 
+        c.gridy = 2;
         timeSelectorPanel.setTime(start, end);
         timeSelectorPanel.addListener(this);
-        c.gridy = 2;
         add(timeSelectorPanel, c);
 
         ComponentUtils.smallVariant(this);
@@ -92,7 +88,6 @@ class CameraOptionPanelExpert extends JPanel implements TimespanListener, TimeSe
     @Override
     public void timeSelectionChanged(long start, long end) {
         container.setTime(start, end);
-        uv.setTime(start, end);
     }
 
     boolean isDownloading() {
