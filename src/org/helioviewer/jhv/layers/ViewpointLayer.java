@@ -234,13 +234,13 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             if (!loadPosition.isLoaded())
                 continue;
 
-            t = time;
             float[] color = loadPosition.getTarget().getColor();
 
-            FloatArray tmp = new FloatArray();
-            loadPosition.getInterpolatedArray(tmp, t, start, end);
-            float[] v = tmp.get();
-            BufferUtils.put4f(planetPosition, v[0], v[1], v[2], planetSize);
+            Vec3 v = loadPosition.getInterpolatedHG(time, start, end);
+            float x = (float) (v.x * Math.cos(v.z) * Math.cos(v.y));
+            float y = (float) (v.x * Math.cos(v.z) * Math.sin(v.y));
+            float z = (float) (v.x * Math.sin(v.z));
+            BufferUtils.put4f(planetPosition, x, y, z, planetSize);
             planetColor.put(color);
 
             t = start;

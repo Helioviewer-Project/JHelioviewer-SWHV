@@ -12,10 +12,6 @@ public class FloatArray {
         return len;
     }
 
-    public float[] get() {
-        return arr;
-    }
-
     public void put4f(float[] c) {
         put4f(c[0], c[1], c[2], c[3]);
     }
