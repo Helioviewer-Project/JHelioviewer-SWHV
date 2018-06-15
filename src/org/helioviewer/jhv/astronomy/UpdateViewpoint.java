@@ -112,7 +112,7 @@ public interface UpdateViewpoint {
                 }
             }
             double elon = Sun.getEarth(itime).lon;
-            return new Position(itime, distance, elon, Math.PI / 2);
+            return new Position(itime, distance, elon + Math.PI / 2, Math.PI / 2);
         }
     }
 

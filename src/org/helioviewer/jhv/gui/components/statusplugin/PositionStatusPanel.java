@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.gui.components.statusplugin;
 
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
@@ -45,7 +46,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
                 double d = camera.getViewpoint().distance;
                 double px = (180 / Math.PI) * Math.atan2(v.x, d);
                 double py = (180 / Math.PI) * Math.atan2(v.y, d);
-                double pa = MathUtils.mapTo0To360((180 / Math.PI) * Math.atan2(v.y, v.x) - 90); // w.r.t. axis
+                double pa = MathUtils.mapTo0To360((180 / Math.PI) * Math.atan2(v.y, v.x) - (Display.getUpdateViewpoint() != UpdateViewpoint.equatorial ? 90 : 0)); // w.r.t. axis
 
                 setText(formatOrtho(coord, r, pa, px, py));
             }
