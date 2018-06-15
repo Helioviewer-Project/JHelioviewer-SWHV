@@ -8,8 +8,10 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.base.FloatArray;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.JHVDate;
 import org.json.JSONObject;
@@ -19,8 +21,8 @@ public class LoadPosition extends JHVWorker<Position[], Void> {
     private final LoadPositionFire receiver;
     private final SpaceObject target;
     private final String frame;
-    public final long start;
-    public final long end;
+    private final long start;
+    private final long end;
 
     private Position[] position = new Position[0];
     private String report = null;
@@ -94,14 +96,27 @@ public class LoadPosition extends JHVWorker<Position[], Void> {
         return position.length > 0;
     }
 
-    public Position getInterpolated(long time) {
+    public long interpolateTime(long t, long start, long end) {
+        long pStart = position[0].time.milli;
+        long pEnd = position[position.length - 1].time.milli;
+        if (start == end)
+            return pEnd;
+        else {
+            double f = (t - start) / (double) (end - start); //!
+            return (long) (pStart + f * (pEnd - pStart) + .5);
+        }
+    }
+
+    public Position getInterpolated(long t, long startTime, long endTime) {
+        long time = interpolateTime(t, startTime, endTime);
+        double dist, hgln, hglt;
         long tstart = position[0].time.milli;
         long tend = position[position.length - 1].time.milli;
-        if (time <= tstart || tstart == tend)
-            return position[0];
-        else if (time >= tend)
-            return position[position.length - 1];
-        else {
+        if (tstart == tend) {
+            dist = position[0].distance;
+            hgln = position[0].lon;
+            hglt = position[0].lat;
+        } else {
             double interpolatedIndex = (time - tstart) / (double) (tend - tstart) * position.length;
             int i = (int) interpolatedIndex;
             i = MathUtils.clip(i, 0, position.length - 1);
@@ -111,17 +126,76 @@ public class LoadPosition extends JHVWorker<Position[], Void> {
             tend = position[inext].time.milli;
 
             double alpha = tend == tstart ? 1. : ((time - tstart) / (double) (tend - tstart)) % 1.;
-            double dist = (1. - alpha) * position[i].distance + alpha * position[inext].distance;
-            double hgln = (1. - alpha) * position[i].lon + alpha * position[inext].lon;
-            double hglt = (1. - alpha) * position[i].lat + alpha * position[inext].lat;
-            return new Position(new JHVDate(time), dist, hgln, hglt);
+            dist = (1. - alpha) * position[i].distance + alpha * position[inext].distance;
+            hgln = (1. - alpha) * position[i].lon + alpha * position[inext].lon;
+            hglt = (1. - alpha) * position[i].lat + alpha * position[inext].lat;
         }
+        return new Position(new JHVDate(time), dist, hgln, hglt);
     }
 
-    public Position getRelativeInterpolated(long time) {
-        Position p = getInterpolated(time);
+    public Vec3 getInterpolatedHG(long t, long startTime, long endTime) {
+        long time = interpolateTime(t, startTime, endTime);
+        double dist, hgln, hglt;
+        long tstart = position[0].time.milli;
+        long tend = position[position.length - 1].time.milli;
+        if (tstart == tend) {
+            dist = position[0].distance;
+            hgln = position[0].lon;
+            hglt = position[0].lat;
+        } else {
+            double interpolatedIndex = (time - tstart) / (double) (tend - tstart) * position.length;
+            int i = (int) interpolatedIndex;
+            i = MathUtils.clip(i, 0, position.length - 1);
+            int inext = Math.min(i + 1, position.length - 1);
+
+            tstart = position[i].time.milli;
+            tend = position[inext].time.milli;
+
+            double alpha = tend == tstart ? 1. : ((time - tstart) / (double) (tend - tstart)) % 1.;
+            dist = (1. - alpha) * position[i].distance + alpha * position[inext].distance;
+            hgln = (1. - alpha) * position[i].lon + alpha * position[inext].lon;
+            hglt = (1. - alpha) * position[i].lat + alpha * position[inext].lat;
+        }
+        return new Vec3(dist, hgln, hglt);
+    }
+
+    public void getInterpolatedArray(FloatArray array, long t, long startTime, long endTime) {
+        long time = interpolateTime(t, startTime, endTime);
+        double dist, hgln, hglt;
+        long tstart = position[0].time.milli;
+        long tend = position[position.length - 1].time.milli;
+        if (tstart == tend) {
+            dist = position[0].distance;
+            hgln = position[0].lon;
+            hglt = position[0].lat;
+        } else {
+            double interpolatedIndex = (time - tstart) / (double) (tend - tstart) * position.length;
+            int i = (int) interpolatedIndex;
+            i = MathUtils.clip(i, 0, position.length - 1);
+            int inext = Math.min(i + 1, position.length - 1);
+
+            tstart = position[i].time.milli;
+            tend = position[inext].time.milli;
+
+            double alpha = tend == tstart ? 1. : ((time - tstart) / (double) (tend - tstart)) % 1.;
+            dist = (1. - alpha) * position[i].distance + alpha * position[inext].distance;
+            hgln = (1. - alpha) * position[i].lon + alpha * position[inext].lon;
+            hglt = (1. - alpha) * position[i].lat + alpha * position[inext].lat;
+        }
+        array.put3f((float) (dist * Math.cos(hglt) * Math.cos(hgln)),
+                    (float) (dist * Math.cos(hglt) * Math.sin(hgln)),
+                    (float) (dist * Math.sin(hglt)));
+    }
+
+    public Position getRelativeInterpolated(long t, long startTime, long endTime) {
+        Position p = getInterpolated(t, startTime, endTime);
         double elon = Sun.getEarth(p.time /*!*/).lon;
         return new Position(p.time, p.distance, elon - p.lon, p.lat);
+    }
+
+    @Override
+    public String toString() {
+        return "LoadPosition " + target + " " + new JHVDate(start) + " " + new JHVDate(end);
     }
 
 }

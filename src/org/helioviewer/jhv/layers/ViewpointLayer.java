@@ -3,14 +3,14 @@ package org.helioviewer.jhv.layers;
 import java.awt.Component;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
+import java.util.Collection;
 
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.FloatArray;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.CameraOptionsPanel;
@@ -23,6 +23,7 @@ import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.FOVShape;
 import org.helioviewer.jhv.opengl.GLInfo;
+import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.time.JHVDate;
@@ -34,10 +35,13 @@ import com.jogamp.newt.event.MouseListener;
 
 public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
-    private static final double thickness = 0.002;
+    private static final long ORBIT_DELTA_INTERPOLATE = 3 * 60 * 1000;
+    private static final double fovThickness = 0.002;
+    private static final double orbitThickness = 0.002;
     private static final float planetSize = 5f;
 
-    private final FOVShape fov = new FOVShape(thickness);
+    private final FOVShape fov = new FOVShape(fovThickness);
+    private final GLSLLine orbits = new GLSLLine();
     private final GLSLShape planets = new GLSLShape();
     private final CameraOptionsPanel optionsPanel;
 
@@ -60,9 +64,9 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         Transform.pushView();
         Transform.rotateViewInverse(viewpoint.toQuat());
         {
-            Set<Map.Entry<LoadPosition, Position>> positions = Display.getUpdateViewpoint().getPositions();
-            if (!positions.isEmpty()) {
-                renderPlanets(gl, positions, 1);
+            Collection<LoadPosition> loadPositions = Display.getUpdateViewpoint().getLoadPositions();
+            if (!loadPositions.isEmpty()) {
+                renderPlanets(gl, loadPositions, vp.aspect);
             }
             fov.render(gl, viewpoint.distance, vp.aspect, pixFactor, false);
         }
@@ -81,8 +85,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        Set<Map.Entry<LoadPosition, Position>> positions = Display.getUpdateViewpoint().getPositions();
-        if (!positions.isEmpty()) {
+        Collection<LoadPosition> loadPositions = Display.getUpdateViewpoint().getLoadPositions();
+        if (!loadPositions.isEmpty()) {
             mouseX = e.getX();
             mouseY = e.getY();
             Camera camera = Display.getCamera();
@@ -90,16 +94,21 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             if (v == null)
                 return;
 
-            double width = camera.getWidth(), minDist = 10;
+            long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
+
+            double width = camera.getWidth(), minDist = 5;
             String name = null;
-            for (Map.Entry<LoadPosition, Position> entry : positions) {
-                Position p = entry.getValue();
-                double deltaX = Math.abs(p.distance * Math.cos(p.lon) - v.x);
-                double deltaY = Math.abs(p.distance * Math.sin(p.lon) - v.y);
+            for (LoadPosition loadPosition : loadPositions) {
+                if (!loadPosition.isLoaded())
+                    continue;
+
+                Vec3 p = loadPosition.getInterpolatedHG(time, start, end);
+                double deltaX = Math.abs(p.x * Math.cos(p.y) - v.x);
+                double deltaY = Math.abs(p.x * Math.sin(p.y) - v.y);
                 double dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY) / width;
                 if (dist < minDist) {
                     minDist = dist;
-                    name = entry.getKey().getTarget().toString();
+                    name = loadPosition.getTarget().toString();
                 }
             }
             if (!text.isEmpty()) {
@@ -158,6 +167,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     public void remove(GL2 gl) {
         dispose(gl);
         ImageViewerGui.getInputController().removePlugin(this);
+        optionsPanel.deactivate();
     }
 
     @Override
@@ -195,12 +205,14 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     @Override
     public void init(GL2 gl) {
         fov.init(gl);
+        orbits.init(gl);
         planets.init(gl);
     }
 
     @Override
     public void dispose(GL2 gl) {
         fov.dispose(gl);
+        orbits.dispose(gl);
         planets.dispose(gl);
     }
 
@@ -209,28 +221,54 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         optionsPanel.serialize(jo);
     }
 
-    private void renderPlanets(GL2 gl, Set<Map.Entry<LoadPosition, Position>> positions, double pointFactor) {
-        int size = positions.size();
+    private void renderPlanets(GL2 gl, Collection<LoadPosition> loadPositions, double aspect) {
+        int size = loadPositions.size();
         FloatBuffer planetPosition = BufferUtils.newFloatBuffer(4 * size);
         FloatBuffer planetColor = BufferUtils.newFloatBuffer(4 * size);
+        FloatArray orbitPosition = new FloatArray();
+        FloatArray orbitColor = new FloatArray();
 
-        for (Map.Entry<LoadPosition, Position> entry : positions) {
-            Position p = entry.getValue();
-            double theta = p.lat;
-            double phi = p.lon;
+        long t, time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
 
-            double y = p.distance * Math.cos(theta) * Math.sin(phi);
-            double x = p.distance * Math.cos(theta) * Math.cos(phi);
-            double z = p.distance * Math.sin(theta);
+        for (LoadPosition loadPosition : loadPositions) {
+            if (!loadPosition.isLoaded())
+                continue;
 
-            BufferUtils.put4f(planetPosition, (float) x, (float) y, (float) z, planetSize * GLInfo.pixelScale[0]);
-            planetColor.put(entry.getKey().getTarget().getColor());
+            t = time;
+            float[] color = loadPosition.getTarget().getColor();
+
+            FloatArray tmp = new FloatArray();
+            loadPosition.getInterpolatedArray(tmp, t, start, end);
+            float[] v = tmp.get();
+            BufferUtils.put4f(planetPosition, v[0], v[1], v[2], planetSize);
+            planetColor.put(color);
+
+            t = start;
+            loadPosition.getInterpolatedArray(orbitPosition, t, start, end);
+            orbitColor.put4f(BufferUtils.colorNull);
+            orbitPosition.repeat3f();
+            orbitColor.put4f(color);
+
+            while (t < time) {
+                t += ORBIT_DELTA_INTERPOLATE;
+                if (t > time)
+                    t = time;
+                loadPosition.getInterpolatedArray(orbitPosition, t, start, end);
+                orbitColor.put4f(color);
+            }
+            orbitPosition.repeat3f();
+            orbitColor.put4f(BufferUtils.colorNull);
         }
+
+        if (orbitPosition.length() >= 2 * 3) {
+            orbits.setData(gl, orbitPosition.toBuffer(), orbitColor.toBuffer());
+            orbits.render(gl, aspect, orbitThickness);
+         }
 
         planetPosition.rewind();
         planetColor.rewind();
         planets.setData(gl, planetPosition, planetColor);
-        planets.renderPoints(gl, pointFactor);
+        planets.renderPoints(gl, GLInfo.pixelScale[0]);
     }
 
 }
