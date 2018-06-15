@@ -222,6 +222,10 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         optionsPanel.serialize(jo);
     }
 
+    private static long getStep(double dist) { // decrease interpolation step proportionally with distance, stop at 3au
+        return (long) (ORBIT_DELTA * (dist > 3 ? 3 : dist));
+    }
+
     private void renderPlanets(GL2 gl, Collection<LoadPosition> loadPositions, double aspect) {
         int size = loadPositions.size();
         FloatBuffer planetPosition = BufferUtils.newFloatBuffer(4 * size);
@@ -250,14 +254,14 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             orbitPosition.repeat3f();
             orbitColor.put4f(color);
 
-            long delta = (long) (ORBIT_DELTA * v.x); // decrease interpolation step proportionally with distance
+            long delta = getStep(v.x);
             while (t < time) {
                 t += delta;
                 if (t > time)
                     t = time;
                 double dist = loadPosition.getInterpolatedArray(orbitPosition, t, start, end);
                 orbitColor.put4f(color);
-                delta = (long) (ORBIT_DELTA * dist);
+                delta = getStep(dist);
             }
             orbitPosition.repeat3f();
             orbitColor.put4f(BufferUtils.colorNull);
