@@ -148,7 +148,7 @@ public class InteractionAnnotate extends Interaction {
         activeIndex = -1;
     }
 
-    private Annotateable generate(JSONObject jo) {
+    private static Annotateable generate(JSONObject jo) {
         try {
             return AnnotationMode.valueOf(jo.getString("type")).generate(jo);
         } catch (Exception e) {

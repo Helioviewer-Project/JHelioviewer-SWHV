@@ -40,7 +40,6 @@
 
 package org.helioviewer.jhv.opengl.text;
 
-import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
@@ -120,47 +119,6 @@ class JhvTextureRenderer {
   */
   public int getHeight() {
     return image.getHeight();
-  }
-
-  /** Returns the size of the backing store of this renderer. Uses the
-      {@link java.awt.Dimension Dimension} object if one is supplied,
-      or allocates a new one if null is passed.
-
-      @param d a {@link java.awt.Dimension Dimension} object in which
-        to store the results, or null to allocate a new one
-
-      @return the size of the backing store of this renderer
-  */
-  private Dimension getSize(Dimension d) {
-    if (d == null)
-      d = new Dimension();
-    d.setSize(image.getWidth(), image.getHeight());
-    return d;
-  }
-
-  /** Sets the size of the backing store of this renderer. This may
-      cause the OpenGL texture object associated with this renderer to
-      be invalidated; it is not recommended to cache this texture
-      object outside this class but to instead call {@link #getTexture
-      getTexture} when it is needed.
-
-      @param width the new width of the backing store of this renderer
-      @param height the new height of the backing store of this renderer
-      @throws GLException If an OpenGL context is not current when this method is called
-  */
-  private void setSize(final int width, final int height) throws GLException {
-    init(width, height);
-  }
-
-  /** Sets the size of the backing store of this renderer. This may
-      cause the OpenGL texture object associated with this renderer to
-      be invalidated.
-
-      @param d the new size of the backing store of this renderer
-      @throws GLException If an OpenGL context is not current when this method is called
-  */
-  public void setSize(final Dimension d) throws GLException {
-    setSize(d.width, d.height);
   }
 
   /** Sets whether smoothing is enabled for the OpenGL texture; if so,
