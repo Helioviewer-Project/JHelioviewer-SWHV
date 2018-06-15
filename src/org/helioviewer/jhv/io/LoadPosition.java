@@ -126,9 +126,27 @@ public class LoadPosition extends JHVWorker<Position[], Void> {
             tend = position[inext].time.milli;
 
             double alpha = tend == tstart ? 1. : ((time - tstart) / (double) (tend - tstart)) % 1.;
-            dist = (1. - alpha) * position[i].distance + alpha * position[inext].distance;
-            hgln = (1. - alpha) * position[i].lon + alpha * position[inext].lon;
-            hglt = (1. - alpha) * position[i].lat + alpha * position[inext].lat;
+
+            double xi = position[i].distance * Math.cos(position[i].lat) * Math.cos(position[i].lon);
+            double yi = position[i].distance * Math.cos(position[i].lat) * Math.sin(position[i].lon);
+            double zi = position[i].distance * Math.sin(position[i].lat);
+
+            double xin = position[inext].distance * Math.cos(position[inext].lat) * Math.cos(position[inext].lon);
+            double yin = position[inext].distance * Math.cos(position[inext].lat) * Math.sin(position[inext].lon);
+            double zin = position[inext].distance * Math.sin(position[inext].lat);
+
+            double ix = (1. - alpha) * xi + alpha * xin;
+            double iy = (1. - alpha) * yi + alpha * yin;
+            double iz = (1. - alpha) * zi + alpha * zin;
+
+            dist = Math.sqrt(ix * ix + iy * iy + iz * iz);
+            if (dist == 0) {
+                hgln = 0;
+                hglt = 0;
+            } else {
+                hgln = Math.atan2(iy, ix);
+                hglt = Math.asin(iz / dist);
+            }
         }
         return new Position(new JHVDate(time), dist, hgln, hglt);
     }
@@ -152,14 +170,32 @@ public class LoadPosition extends JHVWorker<Position[], Void> {
             tend = position[inext].time.milli;
 
             double alpha = tend == tstart ? 1. : ((time - tstart) / (double) (tend - tstart)) % 1.;
-            dist = (1. - alpha) * position[i].distance + alpha * position[inext].distance;
-            hgln = (1. - alpha) * position[i].lon + alpha * position[inext].lon;
-            hglt = (1. - alpha) * position[i].lat + alpha * position[inext].lat;
+
+            double xi = position[i].distance * Math.cos(position[i].lat) * Math.cos(position[i].lon);
+            double yi = position[i].distance * Math.cos(position[i].lat) * Math.sin(position[i].lon);
+            double zi = position[i].distance * Math.sin(position[i].lat);
+
+            double xin = position[inext].distance * Math.cos(position[inext].lat) * Math.cos(position[inext].lon);
+            double yin = position[inext].distance * Math.cos(position[inext].lat) * Math.sin(position[inext].lon);
+            double zin = position[inext].distance * Math.sin(position[inext].lat);
+
+            double ix = (1. - alpha) * xi + alpha * xin;
+            double iy = (1. - alpha) * yi + alpha * yin;
+            double iz = (1. - alpha) * zi + alpha * zin;
+
+            dist = Math.sqrt(ix * ix + iy * iy + iz * iz);
+            if (dist == 0) {
+                hgln = 0;
+                hglt = 0;
+            } else {
+                hgln = Math.atan2(iy, ix);
+                hglt = Math.asin(iz / dist);
+            }
         }
         return new Vec3(dist, hgln, hglt);
     }
 
-    public void getInterpolatedArray(FloatArray array, long t, long startTime, long endTime) {
+    public double getInterpolatedArray(FloatArray array, long t, long startTime, long endTime) {
         long time = interpolateTime(t, startTime, endTime);
         double dist, hgln, hglt;
         long tstart = position[0].time.milli;
@@ -168,6 +204,9 @@ public class LoadPosition extends JHVWorker<Position[], Void> {
             dist = position[0].distance;
             hgln = position[0].lon;
             hglt = position[0].lat;
+            array.put3f((float) (dist * Math.cos(hglt) * Math.cos(hgln)),
+                        (float) (dist * Math.cos(hglt) * Math.sin(hgln)),
+                        (float) (dist * Math.sin(hglt)));
         } else {
             double interpolatedIndex = (time - tstart) / (double) (tend - tstart) * position.length;
             int i = (int) interpolatedIndex;
@@ -179,12 +218,20 @@ public class LoadPosition extends JHVWorker<Position[], Void> {
 
             double alpha = tend == tstart ? 1. : ((time - tstart) / (double) (tend - tstart)) % 1.;
             dist = (1. - alpha) * position[i].distance + alpha * position[inext].distance;
-            hgln = (1. - alpha) * position[i].lon + alpha * position[inext].lon;
-            hglt = (1. - alpha) * position[i].lat + alpha * position[inext].lat;
+
+            double xi = position[i].distance * Math.cos(position[i].lat) * Math.cos(position[i].lon);
+            double yi = position[i].distance * Math.cos(position[i].lat) * Math.sin(position[i].lon);
+            double zi = position[i].distance * Math.sin(position[i].lat);
+
+            double xin = position[inext].distance * Math.cos(position[inext].lat) * Math.cos(position[inext].lon);
+            double yin = position[inext].distance * Math.cos(position[inext].lat) * Math.sin(position[inext].lon);
+            double zin = position[inext].distance * Math.sin(position[inext].lat);
+
+            array.put3f((float) ((1. - alpha) * xi + alpha * xin),
+                        (float) ((1. - alpha) * yi + alpha * yin),
+                        (float) ((1. - alpha) * zi + alpha * zin));
         }
-        array.put3f((float) (dist * Math.cos(hglt) * Math.cos(hgln)),
-                    (float) (dist * Math.cos(hglt) * Math.sin(hgln)),
-                    (float) (dist * Math.sin(hglt)));
+        return dist;
     }
 
     public Position getRelativeInterpolated(long t, long startTime, long endTime) {

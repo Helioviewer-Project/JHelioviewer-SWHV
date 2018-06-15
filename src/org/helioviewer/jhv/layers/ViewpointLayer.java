@@ -8,6 +8,7 @@ import java.util.Collection;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.FloatArray;
@@ -35,7 +36,7 @@ import com.jogamp.newt.event.MouseListener;
 
 public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
-    private static final long ORBIT_DELTA_INTERPOLATE = 3 * 60 * 1000;
+    private static final double ORBIT_DELTA = 10 * 60 * 1000 * Sun.MeanEarthDistanceInv;
     private static final double fovThickness = 0.002;
     private static final double orbitThickness = 0.002;
     private static final float planetSize = 5f;
@@ -249,12 +250,14 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             orbitPosition.repeat3f();
             orbitColor.put4f(color);
 
+            long delta = (long) (ORBIT_DELTA * v.x); // decrease interpolation step proportionally with distance
             while (t < time) {
-                t += ORBIT_DELTA_INTERPOLATE;
+                t += delta;
                 if (t > time)
                     t = time;
-                loadPosition.getInterpolatedArray(orbitPosition, t, start, end);
+                double dist = loadPosition.getInterpolatedArray(orbitPosition, t, start, end);
                 orbitColor.put4f(color);
+                delta = (long) (ORBIT_DELTA * dist);
             }
             orbitPosition.repeat3f();
             orbitColor.put4f(BufferUtils.colorNull);
@@ -263,7 +266,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         if (orbitPosition.length() >= 2 * 3) {
             orbits.setData(gl, orbitPosition.toBuffer(), orbitColor.toBuffer());
             orbits.render(gl, aspect, orbitThickness);
-         }
+        }
 
         planetPosition.rewind();
         planetColor.rewind();
