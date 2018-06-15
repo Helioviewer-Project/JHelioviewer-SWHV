@@ -36,7 +36,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener {
     private final Component component;
     private final Camera camera;
 
-    private static Cursor lastCursor;
+    private Cursor lastCursor;
 
     static JHVRelatedEvents mouseOverJHVEvent = null;
     static int mouseOverX;

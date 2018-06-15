@@ -53,7 +53,7 @@ import com.jogamp.opengl.GL2;
 // has to be public for state
 public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEventHandler {
 
-    private static final SWEKPopupController controller = new SWEKPopupController(ImageViewerGui.getGLComponent());
+    private final SWEKPopupController controller = new SWEKPopupController(ImageViewerGui.getGLComponent());
     private final JPanel optionsPanel;
 
     private static final int DIVPOINTS = 10;
@@ -429,7 +429,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     private static final int MOUSE_OFFSET_X = 25;
     private static final int MOUSE_OFFSET_Y = 25;
 
-    private static void drawText(Viewport vp, GL2 gl, JHVRelatedEvents mouseOverJHVEvent, int x, int y) {
+    private void drawText(Viewport vp, GL2 gl, JHVRelatedEvents mouseOverJHVEvent, int x, int y) {
         ArrayList<String> txts = new ArrayList<>();
         for (JHVEventParameter p : mouseOverJHVEvent.getClosestTo(controller.currentTime).getSimpleVisibleEventParameters()) {
             String name = p.getParameterName();
@@ -551,8 +551,8 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         iconCacheId.clear();
     }
 
-    private static long startTime = Movie.getTime().milli;
-    private static long endTime = startTime;
+    private long startTime = Movie.getTime().milli;
+    private long endTime = startTime;
 
     private void requestEvents(boolean force, long start, long end) {
         if (force || start < startTime || end > endTime) {
