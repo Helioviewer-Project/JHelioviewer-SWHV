@@ -108,7 +108,7 @@ public class LoadPosition extends JHVWorker<Position[], Void> {
         }
     }
 
-    public Position getInterpolated(long t, long startTime, long endTime) {
+    private Position getInterpolated(long t, long startTime, long endTime) {
         long time = interpolateTime(t, startTime, endTime);
         double dist, hgln, hglt;
         long tstart = position[0].time.milli;
