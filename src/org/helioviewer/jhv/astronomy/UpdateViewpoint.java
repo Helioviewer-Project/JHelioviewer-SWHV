@@ -10,6 +10,7 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.position.LoadPosition;
 import org.helioviewer.jhv.position.Position;
+import org.helioviewer.jhv.position.PositionResponse;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -106,9 +107,9 @@ public interface UpdateViewpoint {
             JHVDate itime = time;
             Iterator<LoadPosition> it = getLoadPositions().iterator();
             if (it.hasNext()) {
-                LoadPosition loadPosition = it.next();
-                if (loadPosition.isLoaded()) {
-                    long t = loadPosition.interpolateTime(time.milli, Movie.getStartTime(), Movie.getEndTime());
+                PositionResponse response = it.next().getResponse();
+                if (response != null) {
+                    long t = response.interpolateTime(time.milli, Movie.getStartTime(), Movie.getEndTime());
                     itime = new JHVDate(TimeUtils.floorSec(t));
                 }
             }
@@ -138,9 +139,10 @@ public interface UpdateViewpoint {
 
         @Override
         public Position update(JHVDate time) {
-            if (loadPosition == null || !loadPosition.isLoaded())
+            PositionResponse response;
+            if (loadPosition == null || (response = loadPosition.getResponse()) == null)
                 return Sun.getEarth(time);
-            return loadPosition.getRelativeInterpolated(time.milli, Movie.getStartTime(), Movie.getEndTime());
+            return response.getRelativeInterpolated(time.milli, Movie.getStartTime(), Movie.getEndTime());
         }
 
     }
