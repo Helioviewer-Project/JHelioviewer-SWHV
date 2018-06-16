@@ -37,7 +37,6 @@ public class PositionResponse {
             throw new Exception("Empty response");
 
         position = new PositionCartesian[len];
-
         for (int i = 0; i < len; i++) {
             JSONObject posObject = res.getJSONObject(i);
             Iterator<String> iterKeys = posObject.keys();
