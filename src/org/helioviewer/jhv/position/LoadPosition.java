@@ -8,7 +8,6 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.base.FloatArray;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.log.Log;
@@ -218,7 +217,7 @@ public class LoadPosition extends JHVWorker<PositionCartesian[], Void> {
         return new Vec3(dist, hgln, hglt);
     }
 
-    public double getInterpolatedArray(FloatArray array, long t, long startTime, long endTime) {
+    public double getInterpolated(float[] xyz, long t, long startTime, long endTime) {
         long time = interpolateTime(t, startTime, endTime);
         long tstart = position[0].milli;
         long tend = position[position.length - 1].milli;
@@ -242,7 +241,10 @@ public class LoadPosition extends JHVWorker<PositionCartesian[], Void> {
             y = (1. - alpha) * position[i].y + alpha * position[inext].y;
             z = (1. - alpha) * position[i].z + alpha * position[inext].z;
         }
-        array.put3f((float) x, (float) y, (float) z);
+        xyz[0] = (float) x;
+        xyz[1] = (float) y;
+        xyz[2] = (float) z;
+
         return Math.sqrt(x * x + y * y + z * z);
     }
 

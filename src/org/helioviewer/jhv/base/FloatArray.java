@@ -27,6 +27,10 @@ public class FloatArray {
         len += 4;
     }
 
+    public void put3f(float[] c) {
+        put3f(c[0], c[1], c[2]);
+    }
+
     public void put3f(float x, float y, float z) {
         int length = arr.length;
         if (len + 3 >= length)
