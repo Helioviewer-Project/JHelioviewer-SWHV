@@ -234,38 +234,39 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         FloatArray orbitPosition = new FloatArray();
         FloatArray orbitColor = new FloatArray();
 
-        long t, time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
+        float[] xyz = new float[3];
+        long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
 
         for (LoadPosition loadPosition : loadPositions) {
             if (!loadPosition.isLoaded())
                 continue;
 
             float[] color = loadPosition.getTarget().getColor();
+            long t = start;
 
-            Vec3 v = loadPosition.getInterpolatedHG(time, start, end);
-            float x = (float) (v.x * Math.cos(v.z) * Math.cos(v.y));
-            float y = (float) (v.x * Math.cos(v.z) * Math.sin(v.y));
-            float z = (float) (v.x * Math.sin(v.z));
-            BufferUtils.put4f(planetPosition, x, y, z, planetSize);
-            planetColor.put(color);
-
-            t = start;
-            loadPosition.getInterpolatedArray(orbitPosition, t, start, end);
+            double dist = loadPosition.getInterpolated(xyz, t, start, end);
+            orbitPosition.put3f(xyz);
             orbitColor.put4f(BufferUtils.colorNull);
             orbitPosition.repeat3f();
             orbitColor.put4f(color);
 
-            long delta = getStep(v.x);
+            long delta = getStep(dist);
             while (t < time) {
                 t += delta;
                 if (t > time)
                     t = time;
-                double dist = loadPosition.getInterpolatedArray(orbitPosition, t, start, end);
+                dist = loadPosition.getInterpolated(xyz, t, start, end);
+                orbitPosition.put3f(xyz);
                 orbitColor.put4f(color);
                 delta = getStep(dist);
             }
             orbitPosition.repeat3f();
             orbitColor.put4f(BufferUtils.colorNull);
+
+            loadPosition.getInterpolated(xyz, time, start, end);
+            planetPosition.put(xyz);
+            planetPosition.put(planetSize);
+            planetColor.put(color);
         }
 
         if (orbitPosition.length() >= 2 * 3) {
