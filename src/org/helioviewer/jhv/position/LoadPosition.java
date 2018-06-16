@@ -15,6 +15,7 @@ import org.json.JSONObject;
 
 public class LoadPosition extends JHVWorker<PositionResponse, Void> {
 
+    private static final int MAX_POINTS = 10000;
     private static final String baseURL = "http://swhv.oma.be/position?";
     private static final String observer = "SUN";
 
@@ -41,10 +42,8 @@ public class LoadPosition extends JHVWorker<PositionResponse, Void> {
     @Override
     protected PositionResponse backgroundWork() {
         long deltat = 60, span = (end - start) / 1000;
-        long max = 10000;
-
-        if (span / deltat > max)
-            deltat = span / max;
+        if (span / deltat > MAX_POINTS)
+            deltat = span / MAX_POINTS;
 
         try (NetClient nc = NetClient.of(getURL(target, frame, start, end, deltat), true)) {
             JSONObject result = JSONUtils.get(nc.getReader());
