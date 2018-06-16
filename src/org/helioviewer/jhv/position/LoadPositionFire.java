@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.io;
+package org.helioviewer.jhv.position;
 
 public interface LoadPositionFire {
 

@@ -1,8 +1,8 @@
 package org.helioviewer.jhv.opengl;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Transform;
+import org.helioviewer.jhv.position.Position;
 
 import com.jogamp.opengl.GL2;
 

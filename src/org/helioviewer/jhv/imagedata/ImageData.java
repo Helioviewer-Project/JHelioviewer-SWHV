@@ -3,10 +3,10 @@ package org.helioviewer.jhv.imagedata;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.position.Position;
 
 public abstract class ImageData {
 

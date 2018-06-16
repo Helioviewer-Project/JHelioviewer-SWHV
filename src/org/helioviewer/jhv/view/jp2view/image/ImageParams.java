@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.view.jp2view.image;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.imagedata.SubImage;
+import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.view.jp2view.image.ResolutionSet.ResolutionLevel;
 
 public class ImageParams {

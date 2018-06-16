@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.nio.FloatBuffer;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.FloatArray;
 import org.helioviewer.jhv.camera.Camera;
@@ -12,6 +11,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.position.Position;
 
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.GL2;

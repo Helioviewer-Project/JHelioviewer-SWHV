@@ -1,8 +1,7 @@
-package org.helioviewer.jhv.io;
+package org.helioviewer.jhv.position;
 
 import java.util.Iterator;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.time.JHVDate;

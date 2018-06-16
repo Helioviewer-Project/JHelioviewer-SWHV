@@ -5,10 +5,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.helioviewer.jhv.io.LoadPosition;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.position.LoadPosition;
+import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 
