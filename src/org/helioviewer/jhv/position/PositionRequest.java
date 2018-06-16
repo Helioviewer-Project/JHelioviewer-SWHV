@@ -20,9 +20,9 @@ class PositionRequest {
     private final long endTime;
     private final long deltat;
 
-    public final String url;
+    final String url;
 
-    public PositionRequest(SpaceObject _target, String _frame, long _startTime, long _endTime, long _deltat) {
+    PositionRequest(SpaceObject _target, String _frame, long _startTime, long _endTime, long _deltat) {
         target = _target;
         frame = _frame;
         startTime = _startTime;
@@ -47,7 +47,7 @@ class PositionRequest {
         return 42;
     }
 
-    public static Position[] parseResponse(JSONObject jo) throws Exception {
+    static Position[] parseResponse(JSONObject jo) throws Exception {
         JSONArray res = jo.getJSONArray("result");
         int len = res.length();
         Position[] ret = new Position[len];
