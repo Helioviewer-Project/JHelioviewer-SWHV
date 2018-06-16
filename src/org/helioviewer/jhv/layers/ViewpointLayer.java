@@ -36,7 +36,8 @@ import com.jogamp.newt.event.MouseListener;
 
 public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
-    private static final double ORBIT_DELTA = 10 * 60 * 1000 * Sun.MeanEarthDistanceInv;
+    private static final double DELTA_ORBIT = 10 * 60 * 1000 * Sun.MeanEarthDistanceInv;
+    private static final double DELTA_CUTOFF = 3 * Sun.MeanEarthDistance;
     private static final double fovThickness = 0.002;
     private static final double orbitThickness = 0.002;
     private static final float planetSize = 5f;
@@ -223,7 +224,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     }
 
     private static long getStep(double dist) { // decrease interpolation step proportionally with distance, stop at 3au
-        return (long) (ORBIT_DELTA * (dist > 3 ? 3 : dist));
+        return (long) (DELTA_ORBIT * (dist > DELTA_CUTOFF ? DELTA_CUTOFF : dist));
     }
 
     private void renderPlanets(GL2 gl, Collection<LoadPosition> loadPositions, double aspect) {
