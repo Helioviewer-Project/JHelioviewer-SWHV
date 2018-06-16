@@ -1,14 +1,15 @@
-package org.helioviewer.jhv.io;
+package org.helioviewer.jhv.position;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.FloatArray;
+import org.helioviewer.jhv.io.JSONUtils;
+import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec3;

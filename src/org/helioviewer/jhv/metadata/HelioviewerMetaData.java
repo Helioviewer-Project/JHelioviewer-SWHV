@@ -3,12 +3,12 @@ package org.helioviewer.jhv.metadata;
 import java.util.Locale;
 
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.time.JHVDate;
 
 public class HelioviewerMetaData extends AbstractMetaData {

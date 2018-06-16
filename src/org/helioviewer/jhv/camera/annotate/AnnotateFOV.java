@@ -2,7 +2,6 @@ package org.helioviewer.jhv.camera.annotate;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
@@ -12,6 +11,7 @@ import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.FOVShape;
 import org.helioviewer.jhv.opengl.GLInfo;
+import org.helioviewer.jhv.position.Position;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;

@@ -7,7 +7,6 @@ import java.util.Collection;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.BufferUtils;
@@ -18,7 +17,6 @@ import org.helioviewer.jhv.camera.CameraOptionsPanel;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.io.LoadPosition;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec3;
@@ -27,6 +25,8 @@ import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
+import org.helioviewer.jhv.position.LoadPosition;
+import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.time.JHVDate;
 import org.json.JSONObject;
 
