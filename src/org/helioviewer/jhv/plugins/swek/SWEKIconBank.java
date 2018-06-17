@@ -1,19 +1,29 @@
 package org.helioviewer.jhv.plugins.swek;
 
+import java.awt.GraphicsEnvironment;
+import java.awt.Transparency;
 import java.net.URL;
 import java.util.HashMap;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 import javax.swing.ImageIcon;
 
 class SWEKIconBank {
 
     private static final HashMap<String, ImageIcon> iconBank = new HashMap<>();
+    private static final ImageIcon blank = new ImageIcon(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(32, 32, Transparency.OPAQUE));
 
-    @Nullable
-    public static ImageIcon getIcon(String iconName) {
-        ImageIcon tempIcon = iconBank.get(iconName);
-        return tempIcon == null ? iconBank.get("Other") : tempIcon;
+    @Nonnull
+    static ImageIcon getIcon(String iconName) {
+        ImageIcon icon = iconBank.get(iconName);
+        icon = icon == null ? iconBank.get("Other") : icon;
+        icon = icon == null ? blank : icon;
+        return icon;
+    }
+
+    @Nonnull
+    static ImageIcon getBlankIcon() {
+        return blank;
     }
 
     private static ImageIcon getImageIcon(String path) throws Exception {
@@ -23,7 +33,7 @@ class SWEKIconBank {
         return new ImageIcon(url);
     }
 
-    public static void init() {
+    static void init() {
         try {
             iconBank.put("ActiveRegion", getImageIcon("/images/EventIcons/ar_icon.png"));
             iconBank.put("CoronalDimming", getImageIcon("/images/EventIcons/cd_icon.png"));

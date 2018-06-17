@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 
@@ -55,7 +56,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         return color;
     }
 
-    @Nullable
+    @Nonnull
     public ImageIcon getIcon() {
         return supplier.getGroup().getIcon();
     }

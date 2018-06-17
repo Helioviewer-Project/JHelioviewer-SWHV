@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 
@@ -98,16 +99,16 @@ class SWEKConfig {
         return group;
     }
 
-    @Nullable
+    @Nonnull
     private static ImageIcon parseEventIcon(JSONObject obj) {
         String eventIconValue = obj.getString("icon");
         try {
             URI eventIconURI = new URI(eventIconValue);
             return eventIconURI.getScheme().equals("iconbank") ? SWEKIconBank.getIcon(eventIconURI.getHost()) : SWEKIconBank.getIcon("Other");
         } catch (URISyntaxException e) {
-            Log.info("Could not parse the URI " + eventIconValue + ", null icon returned");
+            Log.info("Could not parse the URI " + eventIconValue);
         }
-        return null;
+        return SWEKIconBank.getBlankIcon();
     }
 
     private static String parseEventName(JSONObject obj) {

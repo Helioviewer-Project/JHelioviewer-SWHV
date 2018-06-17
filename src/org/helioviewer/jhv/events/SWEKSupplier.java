@@ -2,6 +2,9 @@ package org.helioviewer.jhv.events;
 
 import java.util.HashMap;
 
+import javax.annotation.Nonnull;
+import javax.swing.ImageIcon;
+
 import org.helioviewer.jhv.events.gui.SWEKTreeModelElement;
 import org.helioviewer.jhv.events.gui.filter.FilterDialog;
 
@@ -75,6 +78,12 @@ public class SWEKSupplier extends SWEKTreeModelElement {
             group.setSelected(groupSelected);
         }
         SWEKDownloadManager.activateSupplier(this, activate);
+    }
+
+    @Nonnull
+    @Override
+    public ImageIcon getIcon() {
+        return group.getIcon();
     }
 
 }
