@@ -8,7 +8,6 @@ import org.helioviewer.jhv.events.gui.filter.FilterDialog;
 public abstract class SWEKTreeModelElement {
 
     private boolean selected;
-    protected ImageIcon icon;
     protected String name;
     protected FilterDialog filterDialog;
 
@@ -18,11 +17,6 @@ public abstract class SWEKTreeModelElement {
 
     public void setSelected(boolean _selected) {
         selected = _selected;
-    }
-
-    @Nullable
-    public ImageIcon getIcon() {
-        return icon;
     }
 
     public String getName() {
@@ -35,5 +29,7 @@ public abstract class SWEKTreeModelElement {
     }
 
     public abstract void activate(boolean _activate);
+
+    public abstract ImageIcon getIcon();
 
 }

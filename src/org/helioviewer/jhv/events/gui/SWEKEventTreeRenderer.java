@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.events.gui.filter.FilterDialog;
 import org.helioviewer.jhv.gui.ComponentUtils;
 
@@ -65,9 +66,8 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
         JPanel leaf = new JPanel(new BorderLayout());
         leaf.setOpaque(false);
 
-        ImageIcon icon = element.getIcon();
-        if (icon != null) {
-            leaf.add(new TreeLabel(icon), BorderLayout.LINE_START);
+        if (element instanceof SWEKGroup) {
+            leaf.add(new TreeLabel(element.getIcon()), BorderLayout.LINE_START);
         }
 
         JCheckBox checkBox = new JCheckBox(element.getName());

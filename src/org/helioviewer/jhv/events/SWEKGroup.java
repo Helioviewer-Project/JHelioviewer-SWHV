@@ -3,6 +3,7 @@ package org.helioviewer.jhv.events;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 
@@ -13,12 +14,13 @@ public class SWEKGroup extends SWEKTreeModelElement {
     private static List<SWEKRelatedEvents> swekrelEvents;
     private final List<SWEKParameter> parameterList;
 
+    private final ImageIcon icon;
     private final boolean containsParameterFilter;
 
     private List<SWEKSupplier> suppliers;
     private HashMap<String, String> databaseFields;
 
-    public SWEKGroup(String _name, List<SWEKParameter> _parameterList, ImageIcon _icon) {
+    public SWEKGroup(String _name, List<SWEKParameter> _parameterList, @Nonnull ImageIcon _icon) {
         name = _name.intern();
         parameterList = _parameterList;
         icon = _icon;
@@ -111,6 +113,12 @@ public class SWEKGroup extends SWEKTreeModelElement {
             supplier.setSelected(activate);
             SWEKDownloadManager.activateSupplier(supplier, activate);
         }
+    }
+
+    @Nonnull
+    @Override
+    public ImageIcon getIcon() {
+        return icon;
     }
 
 }
