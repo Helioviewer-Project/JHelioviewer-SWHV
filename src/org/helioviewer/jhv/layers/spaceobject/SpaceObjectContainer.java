@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.camera.object;
+package org.helioviewer.jhv.layers.spaceobject;
 
 import java.awt.Color;
 import java.awt.Component;

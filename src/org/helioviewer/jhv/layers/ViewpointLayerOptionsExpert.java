@@ -7,7 +7,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
-import org.helioviewer.jhv.camera.object.SpaceObjectContainer;
+import org.helioviewer.jhv.layers.spaceobject.SpaceObjectContainer;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorListener;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
