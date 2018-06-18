@@ -13,7 +13,6 @@ import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.FloatArray;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.camera.CameraOptionsPanel;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -46,12 +45,12 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     private final FOVShape fov = new FOVShape(fovThickness);
     private final GLSLLine orbits = new GLSLLine();
     private final GLSLShape planets = new GLSLShape();
-    private final CameraOptionsPanel optionsPanel;
+    private final ViewpointLayerOptions optionsPanel;
 
     private String timeString = null;
 
     public ViewpointLayer(JSONObject jo) {
-        optionsPanel = new CameraOptionsPanel(jo);
+        optionsPanel = new ViewpointLayerOptions(jo);
     }
 
     @Override

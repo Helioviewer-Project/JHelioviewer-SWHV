@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.camera;
+package org.helioviewer.jhv.layers;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -19,14 +19,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 @SuppressWarnings("serial")
-class CameraOptionPanelExpert extends JPanel implements TimespanListener, TimeSelectorListener {
+class ViewpointLayerOptionsExpert extends JPanel implements TimespanListener, TimeSelectorListener {
 
     private final JCheckBox syncCheckBox;
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
 
     private final SpaceObjectContainer container;
 
-    CameraOptionPanelExpert(JSONObject jo, UpdateViewpoint uv, String frame, boolean exclusive) {
+    ViewpointLayerOptionsExpert(JSONObject jo, UpdateViewpoint uv, String frame, boolean exclusive) {
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 1;
