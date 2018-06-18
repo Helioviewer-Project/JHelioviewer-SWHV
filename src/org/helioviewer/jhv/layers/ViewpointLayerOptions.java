@@ -14,6 +14,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
+import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
@@ -70,8 +71,8 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
             joExpert = jo.optJSONObject("expert");
             joEquatorial = jo.optJSONObject("equatorial");
         }
-        expertOptionPanel = new ViewpointLayerOptionsExpert(joExpert, UpdateViewpoint.expert, "HEEQ", true);
-        equatorialOptionPanel = new ViewpointLayerOptionsExpert(joEquatorial, UpdateViewpoint.equatorial, "HEEQ", false);
+        expertOptionPanel = new ViewpointLayerOptionsExpert(joExpert, UpdateViewpoint.expert, Frame.HEEQ, true);
+        equatorialOptionPanel = new ViewpointLayerOptionsExpert(joEquatorial, UpdateViewpoint.equatorial, Frame.HCI, false);
 
         double fovMin = 0, fovMax = 180;
         currentMode = CameraMode.Observer;
@@ -128,12 +129,11 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
         c.anchor = GridBagConstraints.CENTER;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
-        c.weightx = 1;
+        c.weightx = 1.;
+        c.weighty = 1.;
 
-        c.weighty = 0;
         c.gridy = 0;
         add(fovPanel, c);
-        c.weighty = 1;
         c.gridy = 1;
         add(radioPanel, c);
 
@@ -166,7 +166,6 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
             GridBagConstraints c = new GridBagConstraints();
             c.weightx = 1;
             c.weighty = 1;
-            c.gridwidth = 2;
             c.fill = GridBagConstraints.BOTH;
             c.gridx = 0;
             c.gridy = 2;

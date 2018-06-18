@@ -15,6 +15,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 
+import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
@@ -35,11 +36,11 @@ public class SpaceObjectContainer extends JScrollPane {
 
     private final SpaceObjectModel model = new SpaceObjectModel();
 
-    private String frame;
+    private Frame frame;
     private long startTime;
     private long endTime;
 
-    public SpaceObjectContainer(JSONArray ja, UpdateViewpoint _uv, String _frame, boolean _exclusive, long _startTime, long _endTime) {
+    public SpaceObjectContainer(JSONArray ja, UpdateViewpoint _uv, Frame _frame, boolean _exclusive, long _startTime, long _endTime) {
         uv = _uv;
         exclusive = _exclusive;
 
@@ -99,8 +100,8 @@ public class SpaceObjectContainer extends JScrollPane {
             selectElement(element);
     }
 
-    public void setFrame(String _frame) {
-        if (frame.equals(_frame))
+    public void setFrame(Frame _frame) {
+        if (frame == _frame)
             return;
 
         frame = _frame;

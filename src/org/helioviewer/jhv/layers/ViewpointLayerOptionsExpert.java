@@ -1,11 +1,17 @@
 package org.helioviewer.jhv.layers;
 
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 
+import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorListener;
@@ -19,24 +25,25 @@ import org.json.JSONObject;
 @SuppressWarnings("serial")
 class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener {
 
+    private final SpaceObjectContainer container;
     private final JCheckBox syncCheckBox;
+    private final ButtonGroup modeGroup = new ButtonGroup();
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
 
-    private final SpaceObjectContainer container;
+    private Frame frame;
 
-    ViewpointLayerOptionsExpert(JSONObject jo, UpdateViewpoint uv, String frame, boolean exclusive) {
-        setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-        c.weightx = 1;
-        c.weighty = 0;
-        c.gridx = 0;
-        c.fill = GridBagConstraints.BOTH;
+    ViewpointLayerOptionsExpert(JSONObject jo, UpdateViewpoint uv, Frame _frame, boolean exclusive) {
+        frame = _frame;
 
         boolean sync = true;
         JSONArray ja = null;
         long start = Movie.getStartTime();
         long end = Movie.getEndTime();
         if (jo != null) {
+            try {
+                frame = Frame.valueOf(jo.optString("frame"));
+            } catch (Exception ignore) {
+            }
             ja = jo.optJSONArray("objects");
             sync = jo.optBoolean("syncInterval", sync);
             if (!sync) {
@@ -47,18 +54,44 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         if (ja == null)
             ja = new JSONArray(new String[] { "Earth" });
 
-        c.gridy = 0;
         container = new SpaceObjectContainer(ja, uv, frame, exclusive, start, end);
-        add(container, c);
 
-        c.gridy = 1;
+        JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+        radioPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+        radioPanel.add(new JLabel("Frame", JLabel.RIGHT));
+        for (Frame f : Frame.values()) {
+            JRadioButton radio = new JRadioButton(f.toString(), frame == f);
+            radio.addItemListener(e -> {
+                if (radio.isSelected()) {
+                    frame = f;
+                    container.setFrame(frame);
+                }
+            });
+            radioPanel.add(radio);
+            modeGroup.add(radio);
+        }
+
         syncCheckBox = new JCheckBox("Use movie time interval", sync);
         syncCheckBox.addActionListener(e -> setTimespan(Movie.getStartTime(), Movie.getEndTime()));
-        add(syncCheckBox, c);
 
-        c.gridy = 2;
         timeSelectorPanel.setTime(start, end);
         timeSelectorPanel.addListener(this);
+        ComponentUtils.setEnabled(timeSelectorPanel, !sync);
+
+        setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.weightx = 1.;
+        c.weighty = 1.;
+        c.gridx = 0;
+        c.fill = GridBagConstraints.BOTH;
+
+        c.gridy = 0;
+        add(container, c);
+        c.gridy = 1;
+        add(radioPanel, c);
+        c.gridy = 2;
+        add(syncCheckBox, c);
+        c.gridy = 3;
         add(timeSelectorPanel, c);
 
         ComponentUtils.smallVariant(this);
@@ -66,10 +99,9 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
 
     void setTimespan(long start, long end) {
         boolean notSync = !syncCheckBox.isSelected();
-        timeSelectorPanel.setVisible(notSync);
+        ComponentUtils.setEnabled(timeSelectorPanel, notSync);
         if (notSync)
             return;
-
         timeSelectorPanel.setTime(start, end);
     }
 
@@ -84,6 +116,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
 
     JSONObject toJson() {
         JSONObject jo = new JSONObject();
+        jo.put("frame", frame);
         boolean sync = syncCheckBox.isSelected();
         jo.put("syncInterval", sync);
         if (!sync) {
