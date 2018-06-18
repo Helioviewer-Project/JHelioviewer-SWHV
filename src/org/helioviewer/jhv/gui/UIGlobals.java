@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
 
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.ToolTipManager;
@@ -55,9 +56,13 @@ public class UIGlobals {
             defaultFont = "HelveticaNeue";
             defaultSize -= 1;
 
-            closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.CLOSED_HAND_MAC).getImage(), new Point(5, 1), IconBank.getIcon(JHVIcon.CLOSED_HAND_MAC).toString());
+            ImageIcon cursor = IconBank.getIcon(JHVIcon.CLOSED_HAND_MAC);
+            cursor = cursor == null ? IconBank.getBlank() : cursor;
+            closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursor.getImage(), new Point(5, 1), cursor.toString());
         } else {
-            closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(16, 8), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
+            ImageIcon cursor = IconBank.getIcon(JHVIcon.CLOSED_HAND);
+            cursor = cursor == null ? IconBank.getBlank() : cursor;
+            closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursor.getImage(), new Point(16, 8), cursor.toString());
         }
         openHandCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
 

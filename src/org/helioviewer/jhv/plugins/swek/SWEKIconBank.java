@@ -1,29 +1,23 @@
 package org.helioviewer.jhv.plugins.swek;
 
-import java.awt.GraphicsEnvironment;
-import java.awt.Transparency;
 import java.net.URL;
 import java.util.HashMap;
 
 import javax.annotation.Nonnull;
 import javax.swing.ImageIcon;
 
+import org.helioviewer.jhv.gui.IconBank;
+
 class SWEKIconBank {
 
     private static final HashMap<String, ImageIcon> iconBank = new HashMap<>();
-    private static final ImageIcon blank = new ImageIcon(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(32, 32, Transparency.OPAQUE));
 
     @Nonnull
     static ImageIcon getIcon(String iconName) {
         ImageIcon icon = iconBank.get(iconName);
         icon = icon == null ? iconBank.get("Other") : icon;
-        icon = icon == null ? blank : icon;
+        icon = icon == null ? IconBank.getBlank() : icon;
         return icon;
-    }
-
-    @Nonnull
-    static ImageIcon getBlankIcon() {
-        return blank;
     }
 
     private static ImageIcon getImageIcon(String path) throws Exception {
