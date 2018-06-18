@@ -2,6 +2,7 @@ package org.helioviewer.jhv.plugins;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -23,12 +24,12 @@ class PluginsListEntry extends JPanel implements MouseListener, HyperlinkListene
     private final PluginsList list;
 
     private final JLabel enableLabel = new JLabel();
-    private final JTextPane pane = new JTextPane();
 
     PluginsListEntry(PluginContainer _plugin, PluginsList _list) {
         plugin = _plugin;
         list = _list;
 
+        JTextPane pane = new JTextPane();
         pane.setContentType("text/html");
         pane.setText("<b>" + plugin.getName() + "</b><br/>" + plugin.getDescription() + " <a href=''>More...</a>");
         pane.setEditable(false);
@@ -51,19 +52,15 @@ class PluginsListEntry extends JPanel implements MouseListener, HyperlinkListene
     @Override
     public void setBackground(Color c) {
         super.setBackground(c);
-        if (pane != null)
-            pane.setBackground(c);
-        if (enableLabel != null)
-            enableLabel.setBackground(c);
+        for (Component comp : getComponents())
+            comp.setBackground(null);
     }
 
     @Override
     public void setForeground(Color c) {
         super.setForeground(c);
-        if (pane != null)
-            pane.setForeground(c);
-        if (enableLabel != null)
-            enableLabel.setForeground(c);
+        for (Component comp : getComponents())
+            comp.setForeground(null);
     }
 
     private void updateEnableLabel() {
