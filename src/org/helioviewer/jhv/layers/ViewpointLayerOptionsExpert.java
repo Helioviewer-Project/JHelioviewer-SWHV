@@ -88,11 +88,13 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         c.gridy = 0;
         add(container, c);
         c.gridy = 1;
-        add(radioPanel, c);
-        c.gridy = 2;
         add(syncCheckBox, c);
-        c.gridy = 3;
+        c.gridy = 2;
         add(timeSelectorPanel, c);
+        if (!exclusive) {
+            c.gridy = 3;
+            add(radioPanel, c);
+        }
 
         ComponentUtils.smallVariant(this);
     }
