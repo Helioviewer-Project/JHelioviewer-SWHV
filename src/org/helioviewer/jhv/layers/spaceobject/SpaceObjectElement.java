@@ -3,6 +3,7 @@ package org.helioviewer.jhv.layers.spaceobject;
 import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
@@ -28,7 +29,7 @@ class SpaceObjectElement implements LoadPositionFire {
         return object;
     }
 
-    void load(UpdateViewpoint uv, String frame, long startTime, long endTime) {
+    void load(UpdateViewpoint uv, Frame frame, long startTime, long endTime) {
         selected = true;
 
         if (load != null) {
