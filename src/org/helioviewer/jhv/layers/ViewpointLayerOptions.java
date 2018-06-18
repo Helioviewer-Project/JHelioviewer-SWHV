@@ -28,7 +28,7 @@ import org.json.JSONObject;
 import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
-class ViewpointLayerOptions extends JPanel {
+class ViewpointLayerOptions extends JPanel implements TimespanListener {
 
     private enum CameraMode {
         Observer(UpdateViewpoint.observer), Earth(UpdateViewpoint.earth), Equatorial(UpdateViewpoint.equatorial), Other(UpdateViewpoint.expert);
@@ -159,13 +159,10 @@ class ViewpointLayerOptions extends JPanel {
             return;
 
         if (currentOptionPanel != null) {
-            currentOptionPanel.deactivate();
             remove(currentOptionPanel);
         }
 
         if (newOptionPanel != null) {
-            newOptionPanel.activate();
-
             GridBagConstraints c = new GridBagConstraints();
             c.weightx = 1;
             c.weighty = 1;
@@ -195,9 +192,19 @@ class ViewpointLayerOptions extends JPanel {
         Display.setViewpointUpdate(currentMode.update);
     }
 
+    void activate() {
+        Movie.addTimespanListener(this);
+        timespanChanged(Movie.getStartTime(), Movie.getEndTime());
+    }
+
     void deactivate() {
-        expertOptionPanel.deactivate();
-        equatorialOptionPanel.deactivate();
+        Movie.removeTimespanListener(this);
+    }
+
+    @Override
+    public void timespanChanged(long start, long end) {
+        expertOptionPanel.setTimespan(start, end);
+        equatorialOptionPanel.setTimespan(start, end);
     }
 
 }

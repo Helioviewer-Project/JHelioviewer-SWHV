@@ -551,8 +551,8 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         iconCacheId.clear();
     }
 
-    private long startTime = Movie.getTime().milli;
-    private long endTime = startTime;
+    private long startTime = Movie.getStartTime();
+    private long endTime = Movie.getEndTime();
 
     private void requestEvents(boolean force, long start, long end) {
         if (force || start < startTime || end > endTime) {
