@@ -34,12 +34,10 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
     private enum CameraMode {
         Observer(UpdateViewpoint.observer), Earth(UpdateViewpoint.earth), Equatorial(UpdateViewpoint.equatorial), Other(UpdateViewpoint.expert);
 
-        final JRadioButton radio;
         final UpdateViewpoint update;
 
         CameraMode(UpdateViewpoint _update) {
             update = _update;
-            radio = new JRadioButton(toString());
         }
     }
 
@@ -83,7 +81,6 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
             if (jc != null)
                 Display.getCamera().fromJson(jc);
         }
-        cameraMode.radio.setSelected(true);
 
         JPanel fovPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
         fovPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
@@ -107,7 +104,7 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
         radioPanel.add(new JLabel("View", JLabel.RIGHT));
         ButtonGroup modeGroup = new ButtonGroup();
         for (CameraMode mode : CameraMode.values()) {
-            JRadioButton radio = mode.radio;
+            JRadioButton radio = new JRadioButton(mode.toString(), mode == cameraMode);
             radio.addItemListener(e -> {
                 if (radio.isSelected()) {
                     cameraMode = mode;

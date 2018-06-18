@@ -60,7 +60,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         radioPanel.add(new JLabel("Frame", JLabel.RIGHT));
         ButtonGroup modeGroup = new ButtonGroup();
         for (Frame f : Frame.values()) {
-            JRadioButton radio = new JRadioButton(f.toString(), frame == f);
+            JRadioButton radio = new JRadioButton(f.toString(), f == frame);
             radio.addItemListener(e -> {
                 if (radio.isSelected()) {
                     frame = f;
