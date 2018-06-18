@@ -20,6 +20,7 @@ import org.helioviewer.jhv.events.SWEKRelatedOn;
 import org.helioviewer.jhv.events.SWEKSource;
 import org.helioviewer.jhv.events.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
+import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.log.Log;
@@ -108,7 +109,7 @@ class SWEKConfig {
         } catch (URISyntaxException e) {
             Log.info("Could not parse the URI " + eventIconValue);
         }
-        return SWEKIconBank.getBlankIcon();
+        return IconBank.getBlank();
     }
 
     private static String parseEventName(JSONObject obj) {
