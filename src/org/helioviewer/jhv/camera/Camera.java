@@ -32,7 +32,8 @@ public class Camera {
     private Position viewpoint = Sun.StartEarth;
 
 ////
-    private static final float halfDepth = (float) (3 * Sun.MeanEarthDistance);
+    private static final float depthClose = (float) (3 * Sun.MeanEarthDistance);
+    private static final float depthFar = (float) (50 * Sun.MeanEarthDistance);
 
     public void applyPerspectiveLatitudinal(double aspect) {
         Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -1, 1);
@@ -40,7 +41,8 @@ public class Camera {
     }
 
     public void applyPerspective(double aspect, GL2 gl, GLSLShape blackCircle) {
-        Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -halfDepth, halfDepth);
+        float depth = viewpoint.distance > depthClose ? depthFar : depthClose;
+        Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -depth, depth);
         Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
 
         blackCircle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
