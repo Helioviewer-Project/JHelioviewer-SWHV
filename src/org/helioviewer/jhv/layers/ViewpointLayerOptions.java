@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.camera;
+package org.helioviewer.jhv.layers;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -15,6 +15,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.Buttons;
@@ -27,7 +28,7 @@ import org.json.JSONObject;
 import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
-public class CameraOptionsPanel extends JPanel {
+class ViewpointLayerOptions extends JPanel {
 
     private enum CameraMode {
         Observer(UpdateViewpoint.observer), Earth(UpdateViewpoint.earth), Equatorial(UpdateViewpoint.equatorial), Other(UpdateViewpoint.expert);
@@ -46,11 +47,11 @@ public class CameraOptionsPanel extends JPanel {
     private double fovAngle = Camera.INITFOV / Math.PI * 180;
 
     private final ButtonGroup modeGroup = new ButtonGroup();
-    private final CameraOptionPanelExpert expertOptionPanel;
-    private final CameraOptionPanelExpert equatorialOptionPanel;
+    private final ViewpointLayerOptionsExpert expertOptionPanel;
+    private final ViewpointLayerOptionsExpert equatorialOptionPanel;
 
     private CameraMode currentMode;
-    private CameraOptionPanelExpert currentOptionPanel;
+    private ViewpointLayerOptionsExpert currentOptionPanel;
 
     private static final String explanation = "<b>Observer</b>: view from observer.\nCamera time defined by timestamps of the master layer.\n\n" +
                                               "<b>Earth</b>: view from Earth.\nCamera time defined by timestamps of the master layer.\n\n" +
@@ -59,7 +60,7 @@ public class CameraOptionsPanel extends JPanel {
                                               "<b>Other</b>: view from selected object.\n" +
                                               "If \"Use movie time interval\" is unselected, the camera time is interpolated in the configured time interval.";
 
-    public CameraOptionsPanel(JSONObject jo) {
+    ViewpointLayerOptions(JSONObject jo) {
         setLayout(new GridBagLayout());
 
         // create panels before potential camera change
@@ -69,8 +70,8 @@ public class CameraOptionsPanel extends JPanel {
             joExpert = jo.optJSONObject("expert");
             joEquatorial = jo.optJSONObject("equatorial");
         }
-        expertOptionPanel = new CameraOptionPanelExpert(joExpert, UpdateViewpoint.expert, "HEEQ", true);
-        equatorialOptionPanel = new CameraOptionPanelExpert(joEquatorial, UpdateViewpoint.equatorial, "HEEQ", false);
+        expertOptionPanel = new ViewpointLayerOptionsExpert(joExpert, UpdateViewpoint.expert, "HEEQ", true);
+        equatorialOptionPanel = new ViewpointLayerOptionsExpert(joEquatorial, UpdateViewpoint.equatorial, "HEEQ", false);
 
         double fovMin = 0, fovMax = 180;
         currentMode = CameraMode.Observer;
@@ -141,11 +142,11 @@ public class CameraOptionsPanel extends JPanel {
         syncViewpoint();
     }
 
-    public double getFOVAngle() {
+    double getFOVAngle() {
         return fovAngle * (Math.PI / 180.);
     }
 
-    public void serialize(JSONObject jo) {
+    void serialize(JSONObject jo) {
         jo.put("mode", modeGroup.getSelection().getActionCommand());
         jo.put("camera", Display.getCamera().toJson());
         jo.put("fovAngle", fovAngle);
@@ -153,7 +154,7 @@ public class CameraOptionsPanel extends JPanel {
         jo.put("equatorial", equatorialOptionPanel.toJson());
     }
 
-    private void switchOptionsPanel(CameraOptionPanelExpert newOptionPanel) {
+    private void switchOptionsPanel(ViewpointLayerOptionsExpert newOptionPanel) {
         if (currentOptionPanel == newOptionPanel)
             return;
 
@@ -179,12 +180,12 @@ public class CameraOptionsPanel extends JPanel {
         repaint();
     }
 
-    public boolean isDownloading() {
+    boolean isDownloading() {
         return expertOptionPanel.isDownloading() || equatorialOptionPanel.isDownloading();
     }
 
-    public void syncViewpoint() {
-        CameraOptionPanelExpert panel = null;
+    void syncViewpoint() {
+        ViewpointLayerOptionsExpert panel = null;
         if (currentMode == CameraMode.Other)
             panel = expertOptionPanel;
         else if (currentMode == CameraMode.Equatorial)
@@ -194,7 +195,7 @@ public class CameraOptionsPanel extends JPanel {
         Display.setViewpointUpdate(currentMode.update);
     }
 
-    public void deactivate() {
+    void deactivate() {
         expertOptionPanel.deactivate();
         equatorialOptionPanel.deactivate();
     }
