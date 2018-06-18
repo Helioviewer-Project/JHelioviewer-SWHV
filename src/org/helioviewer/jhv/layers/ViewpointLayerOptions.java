@@ -40,18 +40,15 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
         CameraMode(UpdateViewpoint _update) {
             update = _update;
             radio = new JRadioButton(toString());
-            radio.setActionCommand(toString());
         }
-
     }
 
     private double fovAngle = Camera.INITFOV / Math.PI * 180;
 
-    private final ButtonGroup modeGroup = new ButtonGroup();
     private final ViewpointLayerOptionsExpert expertOptionPanel;
     private final ViewpointLayerOptionsExpert equatorialOptionPanel;
 
-    private CameraMode currentMode;
+    private CameraMode cameraMode;
     private ViewpointLayerOptionsExpert currentOptionPanel;
 
     private static final String explanation = "<b>Observer</b>: view from observer.\nCamera time defined by timestamps of the master layer.\n\n" +
@@ -75,18 +72,18 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
         equatorialOptionPanel = new ViewpointLayerOptionsExpert(joEquatorial, UpdateViewpoint.equatorial, Frame.HCI, false);
 
         double fovMin = 0, fovMax = 180;
-        currentMode = CameraMode.Observer;
+        cameraMode = CameraMode.Observer;
         if (jo != null) {
             fovAngle = MathUtils.clip(jo.optDouble("fovAngle", fovAngle), fovMin, fovMax);
             try {
-                currentMode = CameraMode.valueOf(jo.optString("mode"));
+                cameraMode = CameraMode.valueOf(jo.optString("mode"));
             } catch (Exception ignore) {
             }
             JSONObject jc = jo.optJSONObject("camera");
             if (jc != null)
                 Display.getCamera().fromJson(jc);
         }
-        currentMode.radio.setSelected(true);
+        cameraMode.radio.setSelected(true);
 
         JPanel fovPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
         fovPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
@@ -108,11 +105,12 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
         JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
         radioPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
         radioPanel.add(new JLabel("View", JLabel.RIGHT));
+        ButtonGroup modeGroup = new ButtonGroup();
         for (CameraMode mode : CameraMode.values()) {
             JRadioButton radio = mode.radio;
             radio.addItemListener(e -> {
                 if (radio.isSelected()) {
-                    currentMode = mode;
+                    cameraMode = mode;
                     syncViewpoint();
                 }
             });
@@ -147,7 +145,7 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
     }
 
     void serialize(JSONObject jo) {
-        jo.put("mode", modeGroup.getSelection().getActionCommand());
+        jo.put("mode", cameraMode);
         jo.put("camera", Display.getCamera().toJson());
         jo.put("fovAngle", fovAngle);
         jo.put("expert", expertOptionPanel.toJson());
@@ -182,13 +180,13 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
 
     void syncViewpoint() {
         ViewpointLayerOptionsExpert panel = null;
-        if (currentMode == CameraMode.Other)
+        if (cameraMode == CameraMode.Other)
             panel = expertOptionPanel;
-        else if (currentMode == CameraMode.Equatorial)
+        else if (cameraMode == CameraMode.Equatorial)
             panel = equatorialOptionPanel;
         switchOptionsPanel(panel);
 
-        Display.setViewpointUpdate(currentMode.update);
+        Display.setViewpointUpdate(cameraMode.update);
     }
 
     void activate() {

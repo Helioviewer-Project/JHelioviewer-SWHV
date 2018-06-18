@@ -27,7 +27,6 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
 
     private final SpaceObjectContainer container;
     private final JCheckBox syncCheckBox;
-    private final ButtonGroup modeGroup = new ButtonGroup();
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
 
     private Frame frame;
@@ -59,6 +58,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
         radioPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
         radioPanel.add(new JLabel("Frame", JLabel.RIGHT));
+        ButtonGroup modeGroup = new ButtonGroup();
         for (Frame f : Frame.values()) {
             JRadioButton radio = new JRadioButton(f.toString(), frame == f);
             radio.addItemListener(e -> {
