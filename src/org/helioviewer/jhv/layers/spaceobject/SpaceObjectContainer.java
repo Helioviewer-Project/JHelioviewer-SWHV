@@ -221,8 +221,10 @@ public class SpaceObjectContainer extends JScrollPane {
             JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             if (value instanceof SpaceObjectElement) {
                 SpaceObjectElement element = (SpaceObjectElement) value;
-                label.setText(element.getStatus());
-                label.setBorder(((SpaceObjectElement) value).getObject().getBorder());
+                String status = element.getStatus();
+                label.setText(status);
+                label.setToolTipText(status);
+                label.setBorder(element.getObject().getBorder());
             }
             return label;
         }
