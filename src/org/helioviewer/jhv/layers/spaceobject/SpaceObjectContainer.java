@@ -31,18 +31,19 @@ public class SpaceObjectContainer extends JScrollPane {
     private static final int STATUS_COL = 2;
 
     private final UpdateViewpoint uv;
-    private final String frame;
     private final boolean exclusive;
 
     private final SpaceObjectModel model = new SpaceObjectModel();
 
+    private String frame;
     private long startTime;
     private long endTime;
 
     public SpaceObjectContainer(JSONArray ja, UpdateViewpoint _uv, String _frame, boolean _exclusive, long _startTime, long _endTime) {
         uv = _uv;
-        frame = _frame;
         exclusive = _exclusive;
+
+        frame = _frame;
         startTime = _startTime;
         endTime = _endTime;
 
@@ -96,6 +97,15 @@ public class SpaceObjectContainer extends JScrollPane {
         SpaceObjectElement element = model.elementOf(object);
         if (element != null) // found
             selectElement(element);
+    }
+
+    public void setFrame(String _frame) {
+        if (frame.equals(_frame))
+            return;
+
+        frame = _frame;
+        for (SpaceObjectElement element : model.getSelected())
+            element.load(uv, frame, startTime, endTime);
     }
 
     public void setTime(long _startTime, long _endTime) {
