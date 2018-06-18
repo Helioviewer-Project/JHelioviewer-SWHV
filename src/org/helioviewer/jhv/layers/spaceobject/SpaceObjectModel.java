@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.camera.object;
+package org.helioviewer.jhv.layers.spaceobject;
 
 import java.util.ArrayList;
 import java.util.List;
