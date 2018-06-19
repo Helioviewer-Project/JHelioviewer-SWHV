@@ -180,7 +180,7 @@ class J2KReader implements Runnable {
                         res = socket.send(stepQuerys[currentStep], cache, currentStep);
 
                     //if (res == null)
-                    //    System.out.println(">> hit " + viewRef.getURI() + " " + currentStep + " " + level);
+                    //    System.out.println(">> hit " + view.getURI() + " " + currentStep + " " + level);
 
                     // react if query complete
                     if (res == null || res.isResponseComplete()) {
