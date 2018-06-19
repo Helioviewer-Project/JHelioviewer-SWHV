@@ -117,7 +117,7 @@ public class GLListener implements GLEventListener {
         for (Viewport vp : Display.getViewports()) {
             if (vp != null) {
                 gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-                camera.applyPerspective(vp.aspect, gl, blackCircle);
+                camera.projectionOrtho(vp.aspect, gl, blackCircle);
                 Layers.render(camera, vp, gl);
                 ImageViewerGui.getAnnotateInteraction().drawAnnotations(vp, gl);
             }
@@ -135,7 +135,7 @@ public class GLListener implements GLEventListener {
         for (Viewport vp : Display.getViewports()) {
             if (vp != null) {
                 gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-                camera.applyPerspectiveLatitudinal(vp.aspect);
+                camera.projectionOrtho2D(vp.aspect);
                 Layers.renderScale(camera, vp, gl);
                 ImageViewerGui.getAnnotateInteraction().drawAnnotations(vp, gl);
             }
@@ -165,7 +165,7 @@ public class GLListener implements GLEventListener {
             miniCamera.timeChanged(Movie.getTime());
 
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            miniCamera.applyPerspective(vp.aspect, gl, blackCircle);
+            miniCamera.projectionOrtho2D(vp.aspect);
             Layers.renderMiniview(miniCamera, vp, gl);
         }
     }
