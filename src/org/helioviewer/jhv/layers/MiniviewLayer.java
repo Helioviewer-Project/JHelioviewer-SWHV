@@ -63,7 +63,6 @@ public class MiniviewLayer extends AbstractLayer {
     }
 
     public static void renderBackground(Camera camera, Viewport vp, GL2 gl) {
-        gl.glDepthRange(0, 0);
         Transform.pushView();
         Transform.rotateViewInverse(camera.getViewpoint().toQuat());
         {
@@ -71,7 +70,6 @@ public class MiniviewLayer extends AbstractLayer {
             circle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
         }
         Transform.popView();
-        gl.glDepthRange(0, 1);
     }
 
     @Override
