@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.Timer;
 
-import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.base.scale.Transform;
 import org.helioviewer.jhv.camera.Camera;
@@ -51,20 +50,6 @@ public class Display implements ActionListener, JHVEventHighlightListener {
         //CameraHelper.zoomToFit(miniCamera);
         miniCamera.reset();
         camera.reset();
-    }
-
-    private static UpdateViewpoint updateViewpoint = UpdateViewpoint.observer;
-
-    public static void setViewpointUpdate(UpdateViewpoint update) {
-        updateViewpoint = update;
-        camera.reset();
-        miniCamera.reset();
-    }
-
-    public static UpdateViewpoint getUpdateViewpoint() {
-        if (mode == DisplayMode.Orthographic)
-            return updateViewpoint;
-        return UpdateViewpoint.earthFixedDistance;
     }
 
     static int glWidth = 1;

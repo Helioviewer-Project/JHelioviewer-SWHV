@@ -183,7 +183,7 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
             panel = equatorialOptionPanel;
         switchOptionsPanel(panel);
 
-        Display.setViewpointUpdate(cameraMode.update);
+        Display.getCamera().setViewpointUpdate(cameraMode.update);
     }
 
     void activate() {

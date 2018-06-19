@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.math.Mat4f;
@@ -30,6 +31,7 @@ public class Camera {
     private boolean tracking;
 
     private Position viewpoint = Sun.StartEarth;
+    private UpdateViewpoint updateViewpoint = UpdateViewpoint.observer;
 
 ////
     public void projectionOrtho2D(double aspect) {
@@ -54,7 +56,7 @@ public class Camera {
 ////
 
     private void updateCamera(JHVDate time) {
-        viewpoint = Display.getUpdateViewpoint().update(time);
+        viewpoint = Display.mode == Display.DisplayMode.Orthographic ? updateViewpoint.update(time) : UpdateViewpoint.earthFixedDistance.update(time);
         updateRotation();
         updateWidth();
     }
@@ -83,6 +85,15 @@ public class Camera {
 
     public Position getViewpoint() {
         return viewpoint;
+    }
+
+    public UpdateViewpoint getUpdateViewpoint() {
+        return updateViewpoint;
+    }
+
+    public void setViewpointUpdate(UpdateViewpoint _updateViewpoint) {
+        updateViewpoint = _updateViewpoint;
+        reset();
     }
 
     public Vec2 getCurrentTranslation() {
