@@ -66,7 +66,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         Transform.pushView();
         Transform.rotateViewInverse(viewpoint.toQuat());
         {
-            Collection<LoadPosition> loadPositions = Display.getUpdateViewpoint().getLoadPositions();
+            Collection<LoadPosition> loadPositions = camera.getUpdateViewpoint().getLoadPositions();
             if (!loadPositions.isEmpty()) {
                 renderPlanets(gl, loadPositions, vp.aspect);
             }
@@ -87,11 +87,11 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        Collection<LoadPosition> loadPositions = Display.getUpdateViewpoint().getLoadPositions();
+        Camera camera = Display.getCamera();
+        Collection<LoadPosition> loadPositions = camera.getUpdateViewpoint().getLoadPositions();
         if (!loadPositions.isEmpty()) {
             mouseX = e.getX();
             mouseY = e.getY();
-            Camera camera = Display.getCamera();
             Vec3 v = CameraHelper.getVectorFromPlane(camera, Display.getActiveViewport(), mouseX, mouseY, Quat.ZERO, true);
             if (v == null)
                 return;
@@ -164,7 +164,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         } else {
             ImageViewerGui.getInputController().removePlugin(this);
             optionsPanel.deactivate();
-            Display.setViewpointUpdate(UpdateViewpoint.observer);
+            Display.getCamera().setViewpointUpdate(UpdateViewpoint.observer);
         }
     }
 
