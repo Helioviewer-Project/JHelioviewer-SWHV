@@ -16,7 +16,6 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.math.MathUtils;
-import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.json.JSONObject;
@@ -62,14 +61,9 @@ public class MiniviewLayer extends AbstractLayer {
     public void render(Camera camera, Viewport vp, GL2 gl) {
     }
 
-    public static void renderBackground(Camera camera, Viewport vp, GL2 gl) {
-        Transform.pushView();
-        Transform.rotateViewInverse(camera.getViewpoint().toQuat());
-        {
-            rectangle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
-            circle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
-        }
-        Transform.popView();
+    public static void renderBackground(GL2 gl) {
+        rectangle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
+        circle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
     }
 
     @Override
