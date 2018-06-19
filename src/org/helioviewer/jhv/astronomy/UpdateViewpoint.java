@@ -24,7 +24,7 @@ public interface UpdateViewpoint {
 
     UpdateViewpoint observer = new Observer();
     UpdateViewpoint earth = new Earth();
-    UpdateViewpoint earthFixedDistance = new EarthFixedDistance();
+    UpdateViewpoint fixedDistance = new FixedDistance();
     UpdateViewpoint equatorial = new Equatorial();
     UpdateViewpoint expert = new Expert();
 
@@ -69,11 +69,10 @@ public interface UpdateViewpoint {
         }
     }
 
-    class EarthFixedDistance extends AbstractUpdateViewpoint {
+    class FixedDistance extends AbstractUpdateViewpoint {
         @Override
         public Position update(JHVDate time) {
-            double elon = Sun.getEarth(time).lon;
-            return new Position(time, Sun.MeanEarthDistance, elon, 0);
+            return new Position(time, Sun.MeanEarthDistance, 0, 0);
         }
     }
 
