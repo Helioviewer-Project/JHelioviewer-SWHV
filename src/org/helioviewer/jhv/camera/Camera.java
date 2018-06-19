@@ -32,12 +32,12 @@ public class Camera {
     private Position viewpoint = Sun.StartEarth;
 
 ////
-    public void applyPerspectiveLatitudinal(double aspect) {
+    public void projectionOrtho2D(double aspect) {
         Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -1, 1);
         Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
     }
 
-    public void applyPerspective(double aspect, GL2 gl, GLSLShape blackCircle) {
+    public void projectionOrtho(double aspect, GL2 gl, GLSLShape blackCircle) {
         float depth = (float) viewpoint.distance; // problematic with far objects behind Sun
         Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -depth, depth);
         Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
