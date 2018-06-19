@@ -91,9 +91,10 @@ public class Camera {
         return updateViewpoint;
     }
 
-    public void setViewpointUpdate(UpdateViewpoint _updateViewpoint) {
+    public Camera setViewpointUpdate(UpdateViewpoint _updateViewpoint) {
         updateViewpoint = _updateViewpoint;
         reset();
+        return this;
     }
 
     public Vec2 getCurrentTranslation() {
