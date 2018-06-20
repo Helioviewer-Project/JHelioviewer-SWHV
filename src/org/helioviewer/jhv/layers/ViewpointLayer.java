@@ -274,7 +274,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         }
 
         if (orbitPosition.length() >= 2 * 3) {
-            orbits.setData(gl, orbitPosition.toBuffer(), orbitColor.toBuffer());
+            orbits.setData(gl, orbitPosition, orbitColor);
             orbits.render(gl, aspect, orbitThickness);
         }
 

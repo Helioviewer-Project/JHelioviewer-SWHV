@@ -55,10 +55,10 @@ void main() {
   }
 
   vec2 normal = vec2(-dir.y, dir.x);
-  normal *= len/2.;
+  normal *= len / 2.;
   normal.x /= aspect;
 
-  vec4 offset = vec4(-normal*direction, 0.0, 0.0);
+  vec4 offset = vec4(-normal * direction, 0.0, 0.0);
   gl_Position = currentProjected + offset;
   frag_linecolor = linecolor;
   frag_direction = direction;

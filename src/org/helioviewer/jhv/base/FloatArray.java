@@ -1,12 +1,11 @@
 package org.helioviewer.jhv.base;
 
-import java.nio.FloatBuffer;
 import java.util.Arrays;
 
 public class FloatArray {
 
     private int len = 0;
-    private float[] arr = new float[4 * 128];
+    private float[] arr = new float[4 * 256];
 
     public int length() {
         return len;
@@ -47,11 +46,8 @@ public class FloatArray {
         put3f(arr[len - 3], arr[len - 2], arr[len - 1]);
     }
 
-    public FloatBuffer toBuffer() {
-        FloatBuffer buf = BufferUtils.newFloatBuffer(len);
-        buf.put(arr, 0, len);
-        buf.rewind();
-        return buf;
+    public float[] toArray() {
+        return arr;
     }
 
 }

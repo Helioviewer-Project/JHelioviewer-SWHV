@@ -84,7 +84,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         FloatArray col = new FloatArray();
 
         drawRectangle(camera, vp, toSpherical(p0), toSpherical(p1), pos, col, color);
-        line.setData(gl, pos.toBuffer(), col.toBuffer());
+        line.setData(gl, pos, col);
         line.render(gl, vp.aspect, thickness);
     }
 

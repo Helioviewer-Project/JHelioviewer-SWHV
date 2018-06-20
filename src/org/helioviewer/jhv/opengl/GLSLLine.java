@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.FloatArray;
 import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.common.nio.Buffers;
@@ -27,6 +28,17 @@ public class GLSLLine {
             return;
         }
         setBufferData(gl, points, colors, plen);
+        hasPoints = true;
+    }
+
+    public void setData(GL2 gl, FloatArray points, FloatArray colors) {
+        hasPoints = false;
+        int plen = points.length() / 3;
+        if (plen != colors.length() / 4 || plen < 2) {
+            Log.error("Something is wrong with the vertices or colors from this GLLine");
+            return;
+        }
+        setBufferData(gl, points.toArray(), colors.toArray(), plen);
         hasPoints = true;
     }
 
@@ -106,6 +118,55 @@ public class GLSLLine {
     }
 
     private void setBufferData(GL2 gl, FloatBuffer points, FloatBuffer colors, int plen) {
+        FloatBuffer previousLineBuffer = BufferUtils.newFloatBuffer(3 * 2 * plen);
+        FloatBuffer lineBuffer = BufferUtils.newFloatBuffer(3 * 2 * plen);
+        FloatBuffer nextLineBuffer = BufferUtils.newFloatBuffer(3 * 2 * plen);
+        FloatBuffer directionBuffer = BufferUtils.newFloatBuffer(2 * 2 * plen);
+        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4 * 2 * plen);
+
+        int dir = -1;
+        for (int i = 0; i < 2 * plen; i++) {
+            directionBuffer.put(dir);
+            directionBuffer.put(-dir);
+        }
+
+        addPoint(previousLineBuffer, points, 0, 3);
+        addPoint(lineBuffer, points, 0, 3);
+        addPoint(nextLineBuffer, points, 3, 3);
+        addPoint(colorBuffer, colors, 0, 4);
+        for (int i = 1; i < plen - 1; i++) {
+            addPoint(previousLineBuffer, points, 3 * (i - 1), 3);
+            addPoint(lineBuffer, points, 3 * i, 3);
+            addPoint(nextLineBuffer, points, 3 * (i + 1), 3);
+            addPoint(colorBuffer, colors, 4 * i, 4);
+        }
+        addPoint(previousLineBuffer, points, 3 * (plen - 2), 3);
+        addPoint(lineBuffer, points, 3 * (plen - 1), 3);
+        addPoint(nextLineBuffer, points, 3 * (plen - 1), 3);
+        addPoint(colorBuffer, colors, 4 * (plen - 1), 4);
+
+        previousLineBuffer.rewind();
+        lineBuffer.rewind();
+        nextLineBuffer.rewind();
+        directionBuffer.rewind();
+        colorBuffer.rewind();
+
+        vbos[0].bindBufferData(gl, previousLineBuffer, Buffers.SIZEOF_FLOAT);
+        vbos[1].bindBufferData(gl, lineBuffer, Buffers.SIZEOF_FLOAT);
+        vbos[2].bindBufferData(gl, nextLineBuffer, Buffers.SIZEOF_FLOAT);
+        vbos[3].bindBufferData(gl, directionBuffer, Buffers.SIZEOF_FLOAT);
+        vbos[4].bindBufferData(gl, colorBuffer, Buffers.SIZEOF_FLOAT);
+
+        IntBuffer indexBuffer = gen_indices(plen);
+        ivbo.bindBufferData(gl, indexBuffer, Buffers.SIZEOF_INT);
+    }
+
+    private static void addPoint(FloatBuffer to, float[] from, int start, int n) {
+        to.put(from, start, n);
+        to.put(from, start, n);
+    }
+
+    private void setBufferData(GL2 gl, float[] points, float[] colors, int plen) {
         FloatBuffer previousLineBuffer = BufferUtils.newFloatBuffer(3 * 2 * plen);
         FloatBuffer lineBuffer = BufferUtils.newFloatBuffer(3 * 2 * plen);
         FloatBuffer nextLineBuffer = BufferUtils.newFloatBuffer(3 * 2 * plen);

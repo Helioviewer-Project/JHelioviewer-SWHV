@@ -79,7 +79,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
         FloatArray col = new FloatArray();
 
         drawCircle(camera, vp, p0, p1, pos, col, color);
-        line.setData(gl, pos.toBuffer(), col.toBuffer());
+        line.setData(gl, pos, col);
         line.render(gl, vp.aspect, thickness);
     }
 
