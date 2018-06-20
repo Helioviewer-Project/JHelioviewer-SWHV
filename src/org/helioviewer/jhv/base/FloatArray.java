@@ -14,7 +14,7 @@ public class FloatArray {
     public void put4f(float[] a) {
         int length = arr.length;
         if (len + 4 >= length)
-            arr = Arrays.copyOf(arr, 2 * length);
+            arr = Arrays.copyOf(arr, 4 * length);
         arr[len]     = a[0];
         arr[len + 1] = a[1];
         arr[len + 2] = a[2];
@@ -25,7 +25,7 @@ public class FloatArray {
     public void put3f(float[] a) {
         int length = arr.length;
         if (len + 3 >= length)
-            arr = Arrays.copyOf(arr, 2 * length);
+            arr = Arrays.copyOf(arr, 4 * length);
         arr[len]     = a[0];
         arr[len + 1] = a[1];
         arr[len + 2] = a[2];
