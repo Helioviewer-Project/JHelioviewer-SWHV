@@ -173,7 +173,6 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     }
 
     private static final double[] depth = { 1., 1., 0., 1. };
-    private static final double[] depthMini = { 0., 0., 0., 0. };
     private static final double[] depthScale = { 1., 1., 1., 1. };
 
     @Override
@@ -183,7 +182,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     @Override
     public void renderMiniview(Camera camera, Viewport vp, GL2 gl) {
-        _render(camera, vp, gl, depthMini);
+        _render(camera, vp, gl, depth);
     }
 
     @Override
