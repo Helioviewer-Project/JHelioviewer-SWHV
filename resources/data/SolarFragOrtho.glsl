@@ -2,19 +2,21 @@ void main(void) {
     vec2 normalizedScreenpos = 2. * ((gl_FragCoord.xy - viewportOffset) / viewport.xy - 0.5);
     vec4 up1 = cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
 
-    float radius2 = dot(up1.xy, up1.xy);
-    vec3 hitPoint = vec3(up1.x, up1.y, sqrt(1. - radius2));
-    vec3 rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
+    float factor, radius2 = dot(up1.xy, up1.xy);
+    vec3 hitPoint, rotatedHitPoint;
 
-    if (radius2 >= 1. || rotatedHitPoint.z <= 0.) {
+    if (radius2 < 1.) {
+        hitPoint = vec3(up1.x, up1.y, sqrt(1. - radius2));
+        rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
+        factor = 1.;
+    } else
+        factor = sqrt(radius2);
+
+    if (rotatedHitPoint.z <= 0.) { // off-limb or back
         hitPoint = vec3(up1.x, up1.y, intersectPlane(cameraDifferenceRotationQuat, up1));
         rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
     }
 
-    float factor = 1.;
-    if (radius2 >= 1.) {
-        factor = sqrt(radius2);
-    }
     vec2 texcoord = vec2((rotatedHitPoint.x - rect.x) * rect.z, (-rotatedHitPoint.y - rect.y) * rect.w);
     clamp_texcoord(texcoord);
 
