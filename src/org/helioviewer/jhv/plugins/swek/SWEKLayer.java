@@ -159,7 +159,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         interPolatedDraw(lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, q, pos, col, color);
         interPolatedDraw(lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, q, pos, col, color);
 
-        glslLine.setData(gl, pos.toBuffer(), col.toBuffer());
+        glslLine.setData(gl, pos, col);
         glslLine.render(gl, vp.aspect, LINEWIDTH_CACTUS);
 
         if (icons) {
@@ -248,7 +248,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             oldBoundaryPoint3d = new float[] { points[3 * i], points[3 * i + 1], points[3 * i + 2] };
         }
 
-        glslLine.setData(gl, pos.toBuffer(), col.toBuffer());
+        glslLine.setData(gl, pos, col);
         glslLine.render(gl, vp.aspect, evtr.isHighlighted() ? LINEWIDTH_HIGHLIGHT : LINEWIDTH);
     }
 
@@ -382,7 +382,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         pos.put3f(x, y, 0);
         col.put4f(BufferUtils.colorNull);
 
-        glslLine.setData(gl, pos.toBuffer(), col.toBuffer());
+        glslLine.setData(gl, pos, col);
         glslLine.render(gl, vp.aspect, LINEWIDTH_CACTUS);
 
         if (icons) {

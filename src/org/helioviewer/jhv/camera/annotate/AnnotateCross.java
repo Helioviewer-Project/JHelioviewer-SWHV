@@ -83,7 +83,7 @@ public class AnnotateCross extends AbstractAnnotateable {
         FloatArray col = new FloatArray();
 
         drawCross(camera, vp, toSpherical(startPoint), pos, col, color);
-        line.setData(gl, pos.toBuffer(), col.toBuffer());
+        line.setData(gl, pos, col);
 //      gl.glDisable(GL2.GL_DEPTH_TEST);
         line.render(gl, vp.aspect, thickness);
 //      gl.glEnable(GL2.GL_DEPTH_TEST);
