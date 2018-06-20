@@ -75,28 +75,21 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
     return texture1D(lut, v) * color;
 }
 
-void clamp_texcoord(vec2 texcoord) {
+void clamp_texcoord(const vec2 texcoord) {
     if (texcoord.x < 0. || texcoord.y < 0. || texcoord.x > 1. || texcoord.y > 1.)
         discard;
 }
 
-vec3 rotate_vector_inverse(vec4 quat, vec3 vec) {
+vec3 rotate_vector_inverse(const vec4 quat, const vec3 vec) {
     return vec + 2. * cross(cross(vec, quat.xyz) + quat.w * vec, quat.xyz);
 }
 
-vec3 rotate_vector(vec4 quat, vec3 vec) {
+vec3 rotate_vector(const vec4 quat, const vec3 vec) {
     return vec + 2. * cross(quat.xyz, cross(quat.xyz, vec) + quat.w * vec);
 }
 
-float intersectPlane(vec4 vecin) {
-    vec3 altnormal = rotate_vector(cameraDifferenceRotationQuat, vec3(0., 0., 1.));
-    if (altnormal.z < 0.)
-        discard;
-    return -dot(altnormal.xy, vecin.xy) / altnormal.z;
-}
-
-float intersectPlanediff(vec4 vecin) {
-    vec3 altnormal = rotate_vector(diffcameraDifferenceRotationQuat, vec3(0., 0., 1.));
+float intersectPlane(const vec4 quat, vec4 vecin) {
+    vec3 altnormal = rotate_vector(quat, vec3(0., 0., 1.));
     if (altnormal.z < 0.)
         discard;
     return -dot(altnormal.xy, vecin.xy) / altnormal.z;

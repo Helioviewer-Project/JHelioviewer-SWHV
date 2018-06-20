@@ -166,7 +166,10 @@ public class GLListener implements GLEventListener {
 
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             miniCamera.projectionOrtho2D(vp.aspect);
+
+            gl.glDisable(GL2.GL_DEPTH_TEST);
             Layers.renderMiniview(miniCamera, vp, gl);
+            gl.glEnable(GL2.GL_DEPTH_TEST);
         }
     }
 
