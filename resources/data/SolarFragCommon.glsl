@@ -90,7 +90,7 @@ vec3 rotate_vector(const vec4 quat, const vec3 vec) {
 
 float intersectPlane(const vec4 quat, vec4 vecin) {
     vec3 altnormal = rotate_vector(quat, vec3(0., 0., 1.));
-    if (altnormal.z < 0.)
+    if (altnormal.z <= 0.)
         discard;
     return -dot(altnormal.xy, vecin.xy) / altnormal.z;
 }
