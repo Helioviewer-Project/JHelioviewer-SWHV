@@ -6,11 +6,9 @@ attribute float direction;
 attribute vec4 linecolor;
 
 varying vec4 frag_linecolor;
-varying float frag_direction;
 
 uniform float aspect;
 uniform float thickness;
-uniform int miter;
 
 uniform mat4 projection;
 uniform mat4 view;
@@ -33,25 +31,8 @@ void main() {
   vec2 dir = vec2(0.0);
   if (currentScreen == previousScreen) {
     dir = normalize(nextScreen - currentScreen);
-  } else if (currentScreen == nextScreen) {
-    dir = normalize(currentScreen - previousScreen);
   } else {
-    vec2 dirA = normalize(currentScreen - previousScreen);
-/*    if (miter == 1) {
-      vec2 dirB = normalize(nextScreen - currentScreen);
-      vec2 tangent = normalize(dirA + dirB);
-      vec2 perp = vec2(-dirA.y, dirA.x);
-      vec2 miter = vec2(-tangent.y, tangent.x);
-      dir = tangent;
-
-        float scalar = dot(miter, perp);
-        if (scalar < 0.2) // 1/5
-            len = thickness;
-        else
-            len = thickness / scalar;
-    } else {*/
-      dir = dirA;
-//    }
+    dir = normalize(currentScreen - previousScreen);
   }
 
   vec2 normal = vec2(-dir.y, dir.x);
@@ -61,5 +42,4 @@ void main() {
   vec4 offset = vec4(-normal * direction, 0.0, 0.0);
   gl_Position = currentProjected + offset;
   frag_linecolor = linecolor;
-  frag_direction = direction;
 }
