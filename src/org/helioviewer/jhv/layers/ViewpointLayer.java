@@ -63,16 +63,24 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         double pixFactor = vp.height / (2 * camera.getWidth());
         Position viewpoint = camera.getViewpoint();
 
+        boolean far = viewpoint.distance > 100 * Sun.MeanEarthDistance;
+
         Transform.pushView();
         Transform.rotateViewInverse(viewpoint.toQuat());
+
+        if (!far)
+            fov.render(gl, viewpoint.distance, vp.aspect, pixFactor, false);
+
         Transform.pushProjection();
         camera.projectionOrthoFar(vp.aspect);
+
+        if (far)
+            fov.render(gl, viewpoint.distance, vp.aspect, pixFactor, false);
         {
             Collection<LoadPosition> loadPositions = camera.getUpdateViewpoint().getLoadPositions();
             if (!loadPositions.isEmpty()) {
                 renderPlanets(gl, loadPositions, vp.aspect);
             }
-            fov.render(gl, viewpoint.distance, vp.aspect, pixFactor, false);
         }
         Transform.popProjection();
         Transform.popView();
