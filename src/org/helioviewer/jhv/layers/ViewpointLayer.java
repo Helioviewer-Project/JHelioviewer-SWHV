@@ -72,7 +72,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             fov.render(gl, viewpoint.distance, vp.aspect, pixFactor, false);
 
         Transform.pushProjection();
-        camera.projectionOrthoFar(vp.aspect);
+        //camera.projectionOrthoFar(vp.aspect);
+        camera.projectionPerspective(vp.aspect);
 
         if (far)
             fov.render(gl, viewpoint.distance, vp.aspect, pixFactor, false);

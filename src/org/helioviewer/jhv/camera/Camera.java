@@ -59,6 +59,13 @@ public class Camera {
     public void projectionOrthoFar(double aspect) {
         Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -depthFar, depthFar);
     }
+
+    public void projectionPerspective(double aspect) {
+        Transform.setPerspectiveProjection((float) fov, (float) aspect, -depthFar, depthFar);
+        Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, -(float) viewpoint.distance);
+        Transform.rotateView(currentDragRotation);
+    }
+
 ////
 
     private void updateCamera(JHVDate time) {

@@ -144,7 +144,8 @@ public class GridLayer extends AbstractLayer {
             {
                 if (far) {
                     Transform.pushProjection();
-                    camera.projectionOrthoFar(vp.aspect);
+                    //camera.projectionOrthoFar(vp.aspect);
+                    camera.projectionPerspective(vp.aspect);
                     radialCircleLineFar.render(gl, vp.aspect, thickness);
                     radialThickLineFar.render(gl, vp.aspect, 3 * thickness);
                     if (showLabels)
