@@ -118,8 +118,10 @@ public class GLListener implements GLEventListener {
             if (vp != null) {
                 gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
                 camera.projectionOrtho(vp.aspect, gl, blackCircle);
+
                 Layers.render(camera, vp, gl);
                 ImageViewerGui.getAnnotateInteraction().drawAnnotations(vp, gl);
+                Layers.renderFloat(camera, vp, gl);
             }
         }
     }
@@ -136,16 +138,9 @@ public class GLListener implements GLEventListener {
             if (vp != null) {
                 gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
                 camera.projectionOrtho2D(vp.aspect);
+
                 Layers.renderScale(camera, vp, gl);
                 ImageViewerGui.getAnnotateInteraction().drawAnnotations(vp, gl);
-            }
-        }
-    }
-
-    public static void renderFloatScene(Camera camera, GL2 gl) {
-        for (Viewport vp : Display.getViewports()) {
-            if (vp != null) {
-                gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
                 Layers.renderFloat(camera, vp, gl);
             }
         }
@@ -154,6 +149,8 @@ public class GLListener implements GLEventListener {
     private static void renderFullFloatScene(Camera camera, GL2 gl) {
         Viewport vp = Display.fullViewport;
         gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
+        camera.projectionOrtho2D(vp.aspect);
+
         Layers.renderFullFloat(camera, vp, gl);
     }
 
@@ -195,8 +192,6 @@ public class GLListener implements GLEventListener {
             renderMiniview(gl);
         } else
             renderSceneScale(camera, gl);
-
-        renderFloatScene(camera, gl);
         renderFullFloatScene(camera, gl);
 
         ImageViewerGui.getZoomStatusPanel().update(camera.getWidth(), camera.getViewpoint().distance);
