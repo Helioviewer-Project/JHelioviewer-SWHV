@@ -3,7 +3,7 @@ void main(void) {
     vec4 up1 = cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
 
     float factor, radius2 = dot(up1.xy, up1.xy);
-    vec3 hitPoint, rotatedHitPoint;
+    vec3 hitPoint = vec3(0.), rotatedHitPoint = vec3(0.);
 
     if (radius2 < 1.) {
         hitPoint = vec3(up1.x, up1.y, sqrt(1. - radius2));
