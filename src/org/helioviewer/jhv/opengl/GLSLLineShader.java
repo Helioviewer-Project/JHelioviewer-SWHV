@@ -15,11 +15,9 @@ class GLSLLineShader extends GLSLShader {
 
     private int projectionRef;
     private int viewRef;
-    // private int miterRef;
     private int thicknessRef;
     private int aspectRef;
 
-    // private final int[] miter = { 1 };
     private final float[] thickness = { 0.005f };
     private final float[] aspect = { 1 };
 
@@ -56,7 +54,6 @@ class GLSLLineShader extends GLSLShader {
         linecolorRef = gl.glGetAttribLocation(progID, "linecolor");
 
         aspectRef = gl.glGetUniformLocation(progID, "aspect");
-        // miterRef = gl.glGetUniformLocation(progID, "miter");
         thicknessRef = gl.glGetUniformLocation(progID, "thickness");
     }
 
@@ -65,7 +62,6 @@ class GLSLLineShader extends GLSLShader {
         gl.glUniformMatrix4fv(viewRef, 1, false, Transform.getView());
         gl.glUniform1fv(thicknessRef, 1, thickness, 0);
         gl.glUniform1fv(aspectRef, 1, aspect, 0);
-        // gl.glUniform1iv(miterRef, 1, miter, 0);
     }
 
     void setAspect(double _aspect) {
