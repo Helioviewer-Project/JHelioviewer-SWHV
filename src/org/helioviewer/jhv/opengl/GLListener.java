@@ -149,7 +149,7 @@ public class GLListener implements GLEventListener {
     private static void renderFullFloatScene(Camera camera, GL2 gl) {
         Viewport vp = Display.fullViewport;
         gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-        camera.projectionOrtho2D(vp.aspect);
+        // camera.projectionOrtho2D(vp.aspect); not needed currently
 
         Layers.renderFullFloat(camera, vp, gl);
     }
