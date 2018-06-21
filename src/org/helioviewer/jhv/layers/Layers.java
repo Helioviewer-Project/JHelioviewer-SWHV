@@ -167,7 +167,6 @@ public class Layers extends AbstractTableModel implements Reorderable {
     }
 
     public static void renderMiniview(Camera camera, Viewport miniview, GL2 gl) {
-        MiniviewLayer.renderBackground(gl);
         for (Layer layer : layers) {
             layer.renderMiniview(camera, miniview, gl);
         }
