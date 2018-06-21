@@ -94,8 +94,7 @@ public class Vec3 {
     }
 
     public final double length2() {
-        double len = length();
-        return len * len;
+        return x * x + y * y + z * z;
     }
 
     public final void normalize() {
