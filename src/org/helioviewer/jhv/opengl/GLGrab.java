@@ -58,7 +58,6 @@ public class GLGrab {
         } else {
             GLListener.renderSceneScale(camera, gl);
         }
-        GLListener.renderFloatScene(camera, gl);
         fbo.unbind(gl);
 
         fbo.use(gl, fboTex);
