@@ -65,6 +65,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
         Transform.pushView();
         Transform.rotateViewInverse(viewpoint.toQuat());
+        Transform.pushProjection();
+        camera.projectionOrthoFar(vp.aspect);
         {
             Collection<LoadPosition> loadPositions = camera.getUpdateViewpoint().getLoadPositions();
             if (!loadPositions.isEmpty()) {
@@ -72,6 +74,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             }
             fov.render(gl, viewpoint.distance, vp.aspect, pixFactor, false);
         }
+        Transform.popProjection();
         Transform.popView();
     }
 

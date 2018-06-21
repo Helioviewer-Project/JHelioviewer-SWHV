@@ -34,14 +34,16 @@ public class Camera {
     private UpdateViewpoint updateViewpoint = UpdateViewpoint.observer;
 
 ////
+    private static final float depthClose = (float) (32 * Sun.Radius); // bit more than LASCO C3
+    private static final float depthFar = (float) (50 * Sun.MeanEarthDistance); // bit further than Pluto
+
     public void projectionOrtho2D(double aspect) {
         Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -1, 1);
         Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
     }
 
     public void projectionOrtho(double aspect, GL2 gl, GLSLShape blackCircle) {
-        float depth = (float) viewpoint.distance; // problematic with far objects behind Sun
-        Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -depth, depth);
+        Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -depthClose, depthClose);
         Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
 
         blackCircle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
@@ -52,6 +54,10 @@ public class Camera {
     public float[] getTransformationInverse(double aspect) {
         return Mat4f.orthoInverse(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -1, 1)
                     .translate(-(float) currentTranslation.x, -(float) currentTranslation.y, 0).m;
+    }
+
+    public void projectionOrthoFar(double aspect) {
+        Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -depthFar, depthFar);
     }
 ////
 

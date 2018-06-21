@@ -143,16 +143,17 @@ public class GridLayer extends AbstractLayer {
             Transform.rotateViewInverse(viewpoint.toQuat());
             {
                 if (far) {
+                    Transform.pushProjection();
+                    camera.projectionOrthoFar(vp.aspect);
                     radialCircleLineFar.render(gl, vp.aspect, thickness);
                     radialThickLineFar.render(gl, vp.aspect, 3 * thickness);
+                    if (showLabels)
+                        drawRadialGridText(gl, radialLabelsFar, pixelsPerSolarRadius * RADIAL_UNIT_FAR, R_LABEL_POS_FAR);
+                    Transform.popProjection();
                 } else {
                     radialCircleLine.render(gl, vp.aspect, thickness);
                     radialThickLine.render(gl, vp.aspect, 3 * thickness);
-                }
-                if (showLabels) {
-                    if (far)
-                        drawRadialGridText(gl, radialLabelsFar, pixelsPerSolarRadius * RADIAL_UNIT_FAR, R_LABEL_POS_FAR);
-                    else
+                    if (showLabels)
                         drawRadialGridText(gl, radialLabels, pixelsPerSolarRadius * RADIAL_UNIT, R_LABEL_POS);
                 }
             }

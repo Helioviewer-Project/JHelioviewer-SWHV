@@ -19,6 +19,10 @@ public class Transform {
         proj.setOrtho(left, right, bottom, top, zNear, zFar);
     }
 
+    public static void setPerspectiveProjection(float fovy, float aspect, float zNear, float zFar) {
+        proj.setPerspective(fovy, aspect, zNear, zFar);
+    }
+
     public static void pushProjection() {
         proj.pushMatrix();
     }
