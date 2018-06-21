@@ -1,6 +1,8 @@
 package org.helioviewer.jhv.camera;
 
+import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 
@@ -16,7 +18,12 @@ public class InteractionRotate extends Interaction {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        currentRotationStartPoint = CameraHelper.getVectorFromSphereTrackball(camera, Display.getActiveViewport(), e.getX(), e.getY());
+        currentRotationStartPoint = CameraHelper.getVectorFromSphereTrackball(camera, Display.getActiveViewport(), e.getX(), e.getY(), Sun.Radius2);
+        double len2 = currentRotationStartPoint.length2();
+        if (len2 > Sun.Radius2) {
+            double w = camera.getWidth();
+            currentRotationStartPoint = CameraHelper.getVectorFromSphereTrackball(camera, Display.getActiveViewport(), e.getX(), e.getY(), w * w);
+        }
     }
 
     @Override
@@ -24,7 +31,9 @@ public class InteractionRotate extends Interaction {
         if (currentRotationStartPoint == null) // freak crash
             return;
 
-        Vec3 currentRotationEndPoint = CameraHelper.getVectorFromSphereTrackball(camera, Display.getActiveViewport(), e.getX(), e.getY());
+        double len2 = currentRotationStartPoint.length2();
+        Vec3 currentRotationEndPoint = CameraHelper.getVectorFromSphereTrackball(camera, Display.getActiveViewport(), e.getX(), e.getY(), len2);
+
         camera.rotateCurrentDragRotation(Quat.calcRotation(currentRotationStartPoint, currentRotationEndPoint));
         Display.display();
     }

@@ -32,16 +32,13 @@ public class CameraHelper {
         return computeNormalizedY(vp, screenY) * width - translation.y;
     }
 
-    public static Vec3 getVectorFromSphereTrackball(Camera camera, Viewport vp, double screenX, double screenY) {
+    static Vec3 getVectorFromSphereTrackball(Camera camera, Viewport vp, double screenX, double screenY, double refRadius2) {
         double up1x = computeUpX(camera, vp, screenX);
         double up1y = computeUpY(camera, vp, screenY);
         double radius2 = up1x * up1x + up1y * up1y;
 
-        Vec3 hitPoint;
-        if (radius2 <= 0.5 * Sun.Radius2)
-            hitPoint = new Vec3(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
-        else
-            hitPoint = new Vec3(up1x, up1y, 0.5 * Sun.Radius2 / Math.sqrt(radius2));
+        double z = radius2 <= 0.5 * refRadius2 ? Math.sqrt(refRadius2 - radius2) : 0.5 * refRadius2 / Math.sqrt(radius2);
+        Vec3 hitPoint = new Vec3(up1x, up1y, z);
         return camera.getCurrentDragRotation().rotateInverseVector(hitPoint);
     }
 
