@@ -15,6 +15,7 @@ import org.helioviewer.jhv.threads.CancelTask;
 
 class SpaceObjectElement implements LoadPositionFire {
 
+    private final SpaceObject observer;
     private final SpaceObject target;
     private final SpaceObjectModel model;
 
@@ -22,7 +23,8 @@ class SpaceObjectElement implements LoadPositionFire {
     private String status;
     private LoadPosition load;
 
-    SpaceObjectElement(SpaceObject _target, SpaceObjectModel _model) {
+    SpaceObjectElement(SpaceObject _observer, SpaceObject _target, SpaceObjectModel _model) {
+        observer = _observer;
         target = _target;
         model = _model;
     }
@@ -36,7 +38,7 @@ class SpaceObjectElement implements LoadPositionFire {
             fireLoaded(null);
         }
 
-        load = new LoadPosition(this, target, frame, startTime, endTime);
+        load = new LoadPosition(this, observer, target, frame, startTime, endTime);
         uv.setLoadPosition(load);
         JHVGlobals.getExecutorService().execute(load);
         JHVGlobals.getReaperService().schedule(new CancelTask(load), 120, TimeUnit.SECONDS);

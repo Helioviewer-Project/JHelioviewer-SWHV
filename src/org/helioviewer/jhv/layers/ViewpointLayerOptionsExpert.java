@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import org.helioviewer.jhv.astronomy.Frame;
+import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorListener;
@@ -31,7 +32,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
 
     private Frame frame;
 
-    ViewpointLayerOptionsExpert(JSONObject jo, UpdateViewpoint uv, Frame _frame, boolean exclusive) {
+    ViewpointLayerOptionsExpert(JSONObject jo, UpdateViewpoint uv, SpaceObject observer, Frame _frame, boolean exclusive) {
         frame = _frame;
 
         boolean sync = true;
@@ -53,7 +54,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         if (ja == null)
             ja = new JSONArray(new String[] { "Earth" });
 
-        container = new SpaceObjectContainer(ja, uv, frame, exclusive, start, end);
+        container = new SpaceObjectContainer(ja, uv, observer, frame, exclusive, start, end);
 
         JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
         radioPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
