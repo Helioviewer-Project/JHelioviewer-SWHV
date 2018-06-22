@@ -18,6 +18,8 @@ public class SpaceObject {
     private final float[] color;
     private final Border border;
 
+    public static final SpaceObject Sol = new SpaceObject("SUN", "Sun", 1, new float[] { Color.YELLOW.getRed() / 255f, Color.YELLOW.getGreen() / 255f, Color.YELLOW.getBlue() / 255f, 1 }, JHVTableCellRenderer.cellEmphasisBorder);
+
     private static final LinkedHashMap<String, SpaceObject> objectMap = new LinkedHashMap<String, SpaceObject>() {
         {
             put("Mercury", new SpaceObject("Mercury", "Mercury", 2439700 / Sun.RadiusMeter, new float[] { Color.GRAY.getRed() / 255f, Color.GRAY.getGreen() / 255f, Color.GRAY.getBlue() / 255f, 1 }, JHVTableCellRenderer.cellBorder));

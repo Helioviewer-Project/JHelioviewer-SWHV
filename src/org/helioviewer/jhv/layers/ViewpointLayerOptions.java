@@ -15,6 +15,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import org.helioviewer.jhv.astronomy.Frame;
+import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
@@ -66,8 +67,8 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
             joExpert = jo.optJSONObject("expert");
             joEquatorial = jo.optJSONObject("equatorial");
         }
-        expertOptionPanel = new ViewpointLayerOptionsExpert(joExpert, UpdateViewpoint.expert, Frame.HEEQ, true);
-        equatorialOptionPanel = new ViewpointLayerOptionsExpert(joEquatorial, UpdateViewpoint.equatorial, Frame.HCI, false);
+        expertOptionPanel = new ViewpointLayerOptionsExpert(joExpert, UpdateViewpoint.expert, SpaceObject.Sol, Frame.HEEQ, true);
+        equatorialOptionPanel = new ViewpointLayerOptionsExpert(joEquatorial, UpdateViewpoint.equatorial, SpaceObject.Sol, Frame.HCI, false);
 
         double fovMin = 0, fovMax = 180;
         cameraMode = CameraMode.Observer;

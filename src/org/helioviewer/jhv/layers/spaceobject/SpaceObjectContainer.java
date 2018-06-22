@@ -33,16 +33,16 @@ public class SpaceObjectContainer extends JScrollPane {
 
     private final UpdateViewpoint uv;
     private final boolean exclusive;
-
-    private final SpaceObjectModel model = new SpaceObjectModel();
+    private final SpaceObjectModel model;
 
     private Frame frame;
     private long startTime;
     private long endTime;
 
-    public SpaceObjectContainer(JSONArray ja, UpdateViewpoint _uv, Frame _frame, boolean _exclusive, long _startTime, long _endTime) {
+    public SpaceObjectContainer(JSONArray ja, UpdateViewpoint _uv, SpaceObject observer, Frame _frame, boolean _exclusive, long _startTime, long _endTime) {
         uv = _uv;
         exclusive = _exclusive;
+        model = new SpaceObjectModel(observer);
 
         frame = _frame;
         startTime = _startTime;
