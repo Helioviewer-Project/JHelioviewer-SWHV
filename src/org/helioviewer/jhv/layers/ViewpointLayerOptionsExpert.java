@@ -75,8 +75,8 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         syncCheckBox.addActionListener(e -> setTimespan(Movie.getStartTime(), Movie.getEndTime()));
 
         timeSelectorPanel.setTime(start, end);
+        timeSelectorPanel.setVisible(!sync);
         timeSelectorPanel.addListener(this);
-        ComponentUtils.setEnabled(timeSelectorPanel, !sync);
 
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -101,7 +101,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
 
     void setTimespan(long start, long end) {
         boolean notSync = !syncCheckBox.isSelected();
-        ComponentUtils.setEnabled(timeSelectorPanel, notSync);
+        timeSelectorPanel.setVisible(notSync);
         if (notSync)
             return;
         timeSelectorPanel.setTime(start, end);
