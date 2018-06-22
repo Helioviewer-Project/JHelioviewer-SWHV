@@ -1,8 +1,11 @@
 package org.helioviewer.jhv.astronomy;
 
 import java.awt.Color;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 import javax.swing.border.Border;
@@ -19,12 +22,14 @@ public class SpaceObject {
     private final Border border;
 
     public static final SpaceObject Sol = new SpaceObject("SUN", "Sun", 1, new float[] { Color.YELLOW.getRed() / 255f, Color.YELLOW.getGreen() / 255f, Color.YELLOW.getBlue() / 255f, 1 }, JHVTableCellRenderer.cellEmphasisBorder);
+    public static final SpaceObject Earth = new SpaceObject("Earth", "Earth", 6371000 / Sun.RadiusMeter, new float[] { Color.BLUE.getRed() / 255f, Color.BLUE.getGreen() / 255f, Color.BLUE.getBlue() / 255f, 1 }, JHVTableCellRenderer.cellBorder);
 
-    private static final LinkedHashMap<String, SpaceObject> objectMap = new LinkedHashMap<String, SpaceObject>() {
+    private static final Map<String, SpaceObject> objectMap = Collections.unmodifiableMap(new LinkedHashMap<String, SpaceObject>() {
         {
+            put("Sun", Sol);
             put("Mercury", new SpaceObject("Mercury", "Mercury", 2439700 / Sun.RadiusMeter, new float[] { Color.GRAY.getRed() / 255f, Color.GRAY.getGreen() / 255f, Color.GRAY.getBlue() / 255f, 1 }, JHVTableCellRenderer.cellBorder));
             put("Venus", new SpaceObject("Venus", "Venus", 6051800 / Sun.RadiusMeter, new float[] { 181 / 255f, 110 / 255f, 26 / 255f, 1 }, JHVTableCellRenderer.cellBorder));
-            put("Earth", new SpaceObject("Earth", "Earth", 6371000 / Sun.RadiusMeter, new float[] { Color.BLUE.getRed() / 255f, Color.BLUE.getGreen() / 255f, Color.BLUE.getBlue() / 255f, 1 }, JHVTableCellRenderer.cellBorder));
+            put("Earth", Earth);
             put("Moon", new SpaceObject("Moon", "Moon", 1737400 / Sun.RadiusMeter, new float[] { Color.LIGHT_GRAY.getRed() / 255f, Color.LIGHT_GRAY.getGreen() / 255f, Color.LIGHT_GRAY.getBlue() / 255f, 1 }, JHVTableCellRenderer.cellBorder));
             put("Mars", new SpaceObject("Mars%20Barycenter", "Mars", 3389500 / Sun.RadiusMeter, new float[] { 135 / 255f, 37 / 255f, 18 / 255f, 1 }, JHVTableCellRenderer.cellBorder));
             put("Jupiter", new SpaceObject("Jupiter%20Barycenter", "Jupiter", 69911000 / Sun.RadiusMeter, new float[] { 168 / 255f, 172 / 255f, 180 / 255f, 1 }, JHVTableCellRenderer.cellBorder));
@@ -45,10 +50,12 @@ public class SpaceObject {
             put("Parker Solar Probe", new SpaceObject("SPP", "Parker Solar Probe", 2 / Sun.RadiusMeter, new float[] { Color.WHITE.getRed() / 255f, Color.WHITE.getGreen() / 255f, Color.WHITE.getBlue() / 255f, 1 }, JHVTableCellRenderer.cellBorder));
             put("PROBA-3", new SpaceObject("PROBA3", "PROBA-3", 2 / Sun.RadiusMeter, new float[] { Color.WHITE.getRed() / 255f, Color.WHITE.getGreen() / 255f, Color.WHITE.getBlue() / 255f, 1 }, JHVTableCellRenderer.cellBorder));
         }
-    };
+    });
 
-    public static Collection<SpaceObject> getObjects() {
-        return objectMap.values();
+    public static List<SpaceObject> getTargets(SpaceObject observer) {
+        ArrayList<SpaceObject> list = new ArrayList<>(objectMap.values());
+        list.remove(observer);
+        return list;
     }
 
     @Nullable
