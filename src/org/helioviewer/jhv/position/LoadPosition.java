@@ -25,6 +25,7 @@ public class LoadPosition extends JHVWorker<PositionResponse, Void> {
     private final Frame frame;
     private final long start;
     private final long end;
+    private final long deltat;
 
     private PositionResponse response;
     private String report;
@@ -36,6 +37,12 @@ public class LoadPosition extends JHVWorker<PositionResponse, Void> {
         frame = _frame;
         start = _start;
         end = _end;
+
+        long dt = 60, span = (end - start) / 1000;
+        if (span / dt > MAX_POINTS)
+            dt = span / MAX_POINTS;
+        deltat = dt;
+
         receiver.fireLoaded("Loading...");
         setThreadName("MAIN--PositionLoad");
     }
@@ -43,11 +50,7 @@ public class LoadPosition extends JHVWorker<PositionResponse, Void> {
     @Nullable
     @Override
     protected PositionResponse backgroundWork() {
-        long deltat = 60, span = (end - start) / 1000;
-        if (span / deltat > MAX_POINTS)
-            deltat = span / MAX_POINTS;
-
-        try (NetClient nc = NetClient.of(getURL(observer, target, frame, start, end, deltat), true)) {
+        try (NetClient nc = NetClient.of(toString(), true)) {
             JSONObject result = JSONUtils.get(nc.getReader());
             if (nc.isSuccessful())
                 return new PositionResponse(result);
@@ -82,9 +85,10 @@ public class LoadPosition extends JHVWorker<PositionResponse, Void> {
         }
     }
 
-    private static String getURL(SpaceObject _observer, SpaceObject _target, Frame _frame, long _start, long _end, long _deltat) {
-        return baseURL + "ref=" + _frame + "&observer=" + _observer + "&target=" + _target.getUrlName() +
-               "&utc=" + TimeUtils.format(_start) + "&utc_end=" + TimeUtils.format(_end) + "&deltat=" + _deltat;
+    @Override
+    public String toString() {
+        return baseURL + "ref=" + frame + "&observer=" + observer.getUrlName() + "&target=" + target.getUrlName() +
+               "&utc=" + TimeUtils.format(start) + "&utc_end=" + TimeUtils.format(end) + "&deltat=" + deltat;
     }
 
     public SpaceObject getTarget() {
