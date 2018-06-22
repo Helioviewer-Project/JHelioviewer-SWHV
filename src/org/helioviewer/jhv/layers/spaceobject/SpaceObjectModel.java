@@ -29,7 +29,7 @@ class SpaceObjectModel extends AbstractTableModel {
     @Nullable
     SpaceObjectElement elementOf(SpaceObject object) {
         for (SpaceObjectElement element : elements) {
-            if (element.getObject() == object)
+            if (element.isTarget(object))
                 return element;
         }
         return null;
