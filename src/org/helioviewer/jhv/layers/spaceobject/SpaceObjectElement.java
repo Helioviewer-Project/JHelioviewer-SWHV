@@ -2,6 +2,8 @@ package org.helioviewer.jhv.layers.spaceobject;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.border.Border;
+
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.SpaceObject;
@@ -13,20 +15,16 @@ import org.helioviewer.jhv.threads.CancelTask;
 
 class SpaceObjectElement implements LoadPositionFire {
 
-    private final SpaceObject object;
+    private final SpaceObject target;
     private final SpaceObjectModel model;
 
     private boolean selected;
     private String status;
     private LoadPosition load;
 
-    SpaceObjectElement(SpaceObject _object, SpaceObjectModel _model) {
-        object = _object;
+    SpaceObjectElement(SpaceObject _target, SpaceObjectModel _model) {
+        target = _target;
         model = _model;
-    }
-
-    SpaceObject getObject() {
-        return object;
     }
 
     void load(UpdateViewpoint uv, Frame frame, long startTime, long endTime) {
@@ -38,7 +36,7 @@ class SpaceObjectElement implements LoadPositionFire {
             fireLoaded(null);
         }
 
-        load = new LoadPosition(this, object, frame, startTime, endTime);
+        load = new LoadPosition(this, target, frame, startTime, endTime);
         uv.setLoadPosition(load);
         JHVGlobals.getExecutorService().execute(load);
         JHVGlobals.getReaperService().schedule(new CancelTask(load), 120, TimeUnit.SECONDS);
@@ -57,12 +55,20 @@ class SpaceObjectElement implements LoadPositionFire {
         }
     }
 
+    boolean isTarget(SpaceObject _target) {
+        return target.equals(_target);
+    }
+
     boolean isDownloading() {
         return load != null && !load.isDone();
     }
 
     boolean isSelected() {
         return selected;
+    }
+
+    Border getBorder() {
+        return target.getBorder();
     }
 
     String getStatus() {
@@ -78,7 +84,7 @@ class SpaceObjectElement implements LoadPositionFire {
 
     @Override
     public String toString() {
-        return object.toString();
+        return target.toString();
     }
 
 }

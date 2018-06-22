@@ -91,11 +91,11 @@ public class SpaceObjectContainer extends JScrollPane {
         uv.clear();
         int len = ja.length();
         for (int i = 0; i < len; i++)
-            selectObject(SpaceObject.get(ja.optString(i, "Earth")));
+            selectTarget(SpaceObject.get(ja.optString(i, "Earth")));
     }
 
-    private void selectObject(SpaceObject object) {
-        SpaceObjectElement element = model.elementOf(object);
+    private void selectTarget(SpaceObject target) {
+        SpaceObjectElement element = model.elementOf(target);
         if (element != null) // found
             selectElement(element);
     }
@@ -163,7 +163,7 @@ public class SpaceObjectContainer extends JScrollPane {
             if (value instanceof SpaceObjectElement) {
                 SpaceObjectElement element = (SpaceObjectElement) value;
                 label.setText(element.toString());
-                label.setBorder(((SpaceObjectElement) value).getObject().getBorder());
+                label.setBorder(element.getBorder());
             }
             return label;
         }
@@ -184,7 +184,7 @@ public class SpaceObjectContainer extends JScrollPane {
             if (value instanceof SpaceObjectElement) {
                 SpaceObjectElement element = (SpaceObjectElement) value;
                 checkBox.setSelected(element.isSelected());
-                checkBox.setBorder(element.getObject().getBorder());
+                checkBox.setBorder(element.getBorder());
             }
             checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
             return checkBox;
@@ -207,7 +207,7 @@ public class SpaceObjectContainer extends JScrollPane {
             if (value instanceof SpaceObjectElement) {
                 SpaceObjectElement element = (SpaceObjectElement) value;
                 radio.setSelected(element.isSelected());
-                radio.setBorder(element.getObject().getBorder());
+                radio.setBorder(element.getBorder());
             }
             radio.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
             return radio;
@@ -224,7 +224,7 @@ public class SpaceObjectContainer extends JScrollPane {
                 String status = element.getStatus();
                 label.setText(status);
                 label.setToolTipText(status);
-                label.setBorder(element.getObject().getBorder());
+                label.setBorder(element.getBorder());
             }
             return label;
         }
