@@ -3,6 +3,7 @@ package org.helioviewer.jhv.opengl;
 import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.display.Viewport;
 
 import com.jogamp.opengl.GL2;
 
@@ -116,11 +117,11 @@ public class FOVShape {
         line.setData(gl, linePosition, lineColor);
     }
 
-    public void render(GL2 gl, double distance, double aspect, double pointFactor, boolean highlight) {
+    public void render(GL2 gl, Viewport vp, double distance, double pointFactor, boolean highlight) {
         computeCenter(gl, highlight);
         point.renderPoints(gl, pointFactor);
         computeLine(gl, distance, highlight);
-        line.render(gl, aspect, thickness);
+        line.render(gl, vp, thickness);
     }
 
     public void init(GL2 gl) {
