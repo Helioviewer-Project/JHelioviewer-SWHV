@@ -369,21 +369,11 @@ public class JhvTextRenderer {
         com.jogamp.opengl.util.texture.Texture Texture}, although
         premultiplied colors are used internally. The default color is
         opaque white.
-
-        @param r the red component of the new color
-        @param g the green component of the new color
-        @param b the blue component of the new color
-        @param a the alpha component of the new color, 0.0f = completely
-        transparent, 1.0f = completely opaque
-        @throws GLException If an OpenGL context is not current when this method is called
     */
-    public void setColor(final float r, final float g, final float b, final float a)
+    public void setColor(float[] color)
         throws GLException {
         flushGlyphPipeline();
-        textColor[0] = r;
-        textColor[1] = g;
-        textColor[2] = b;
-        textColor[3] = a;
+        textColor = color;
     }
 
     /** Draws the supplied CharSequence at the desired location using
@@ -590,9 +580,6 @@ public class JhvTextRenderer {
     /**
      * emzic: here the call to glBindBuffer crashes on certain graphicscard/driver combinations
      * this is why the ugly try-catch block has been added, which falls back to the old textrenderer
-     *
-     * @param ortho
-     * @throws GLException
      */
     private void endRendering(final boolean ortho) throws GLException {
         flushGlyphPipeline();
@@ -1375,7 +1362,7 @@ public class JhvTextRenderer {
     }
 
     private static final GLSLTexture glslTexture = new GLSLTexture();
-    private final float[] textColor = { 1, 1, 1, 1 };
+    private float[] textColor = { 1, 1, 1, 1 };
 
     class Pipelined_QuadRenderer {
         int mOutstandingGlyphsVerticesPipeline = 0;

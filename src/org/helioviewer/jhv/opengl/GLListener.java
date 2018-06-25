@@ -39,12 +39,7 @@ public class GLListener implements GLEventListener {
         gl.glDisable(GL2.GL_TEXTURE_1D);
         gl.glDisable(GL2.GL_TEXTURE_2D);
 
-        if (drawable.getChosenGLCapabilities().getNumSamples() != 0)
-            gl.glEnable(GL2.GL_MULTISAMPLE);
-        else {
-            gl.glEnable(GL2.GL_LINE_SMOOTH);
-            gl.glHint(GL2.GL_LINE_SMOOTH_HINT, GL2.GL_NICEST);
-        }
+        gl.glEnable(GL2.GL_MULTISAMPLE);
 
         gl.glEnable(GL2.GL_BLEND);
         gl.glBlendFunc(GL2.GL_ONE, GL2.GL_ONE_MINUS_SRC_ALPHA);
