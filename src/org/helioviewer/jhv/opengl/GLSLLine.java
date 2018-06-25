@@ -118,9 +118,9 @@ public class GLSLLine {
     }
 
     private void setBufferData(GL2 gl, FloatBuffer points, FloatBuffer colors, int plen) {
-        FloatBuffer previousLineBuffer = BufferUtils.newFloatBuffer(3 * 2 * plen);
-        FloatBuffer lineBuffer = BufferUtils.newFloatBuffer(3 * 2 * plen);
-        FloatBuffer nextLineBuffer = BufferUtils.newFloatBuffer(3 * 2 * plen);
+        FloatBuffer previousBuffer = BufferUtils.newFloatBuffer(3 * 2 * plen);
+        FloatBuffer currentBuffer = BufferUtils.newFloatBuffer(3 * 2 * plen);
+        FloatBuffer nextBuffer = BufferUtils.newFloatBuffer(3 * 2 * plen);
         FloatBuffer directionBuffer = BufferUtils.newFloatBuffer(2 * 2 * plen);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4 * 2 * plen);
 
@@ -130,30 +130,30 @@ public class GLSLLine {
             directionBuffer.put(-dir);
         }
 
-        addPoint(previousLineBuffer, points, 0, 3);
-        addPoint(lineBuffer, points, 0, 3);
-        addPoint(nextLineBuffer, points, 3, 3);
+        addPoint(previousBuffer, points, 0, 3);
+        addPoint(currentBuffer, points, 0, 3);
+        addPoint(nextBuffer, points, 3, 3);
         addPoint(colorBuffer, colors, 0, 4);
         for (int i = 1; i < plen - 1; i++) {
-            addPoint(previousLineBuffer, points, 3 * (i - 1), 3);
-            addPoint(lineBuffer, points, 3 * i, 3);
-            addPoint(nextLineBuffer, points, 3 * (i + 1), 3);
+            addPoint(previousBuffer, points, 3 * (i - 1), 3);
+            addPoint(currentBuffer, points, 3 * i, 3);
+            addPoint(nextBuffer, points, 3 * (i + 1), 3);
             addPoint(colorBuffer, colors, 4 * i, 4);
         }
-        addPoint(previousLineBuffer, points, 3 * (plen - 2), 3);
-        addPoint(lineBuffer, points, 3 * (plen - 1), 3);
-        addPoint(nextLineBuffer, points, 3 * (plen - 1), 3);
+        addPoint(previousBuffer, points, 3 * (plen - 2), 3);
+        addPoint(currentBuffer, points, 3 * (plen - 1), 3);
+        addPoint(nextBuffer, points, 3 * (plen - 1), 3);
         addPoint(colorBuffer, colors, 4 * (plen - 1), 4);
 
-        previousLineBuffer.rewind();
-        lineBuffer.rewind();
-        nextLineBuffer.rewind();
+        previousBuffer.rewind();
+        currentBuffer.rewind();
+        nextBuffer.rewind();
         directionBuffer.rewind();
         colorBuffer.rewind();
 
-        vbos[0].bindBufferData(gl, previousLineBuffer, Buffers.SIZEOF_FLOAT);
-        vbos[1].bindBufferData(gl, lineBuffer, Buffers.SIZEOF_FLOAT);
-        vbos[2].bindBufferData(gl, nextLineBuffer, Buffers.SIZEOF_FLOAT);
+        vbos[0].bindBufferData(gl, previousBuffer, Buffers.SIZEOF_FLOAT);
+        vbos[1].bindBufferData(gl, currentBuffer, Buffers.SIZEOF_FLOAT);
+        vbos[2].bindBufferData(gl, nextBuffer, Buffers.SIZEOF_FLOAT);
         vbos[3].bindBufferData(gl, directionBuffer, Buffers.SIZEOF_FLOAT);
         vbos[4].bindBufferData(gl, colorBuffer, Buffers.SIZEOF_FLOAT);
 
@@ -167,9 +167,9 @@ public class GLSLLine {
     }
 
     private void setBufferData(GL2 gl, float[] points, float[] colors, int plen) {
-        FloatBuffer previousLineBuffer = BufferUtils.newFloatBuffer(3 * 2 * plen);
-        FloatBuffer lineBuffer = BufferUtils.newFloatBuffer(3 * 2 * plen);
-        FloatBuffer nextLineBuffer = BufferUtils.newFloatBuffer(3 * 2 * plen);
+        FloatBuffer previousBuffer = BufferUtils.newFloatBuffer(3 * 2 * plen);
+        FloatBuffer currentBuffer = BufferUtils.newFloatBuffer(3 * 2 * plen);
+        FloatBuffer nextBuffer = BufferUtils.newFloatBuffer(3 * 2 * plen);
         FloatBuffer directionBuffer = BufferUtils.newFloatBuffer(2 * 2 * plen);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4 * 2 * plen);
 
@@ -179,30 +179,30 @@ public class GLSLLine {
             directionBuffer.put(-dir);
         }
 
-        addPoint(previousLineBuffer, points, 0, 3);
-        addPoint(lineBuffer, points, 0, 3);
-        addPoint(nextLineBuffer, points, 3, 3);
+        addPoint(previousBuffer, points, 0, 3);
+        addPoint(currentBuffer, points, 0, 3);
+        addPoint(nextBuffer, points, 3, 3);
         addPoint(colorBuffer, colors, 0, 4);
         for (int i = 1; i < plen - 1; i++) {
-            addPoint(previousLineBuffer, points, 3 * (i - 1), 3);
-            addPoint(lineBuffer, points, 3 * i, 3);
-            addPoint(nextLineBuffer, points, 3 * (i + 1), 3);
+            addPoint(previousBuffer, points, 3 * (i - 1), 3);
+            addPoint(currentBuffer, points, 3 * i, 3);
+            addPoint(nextBuffer, points, 3 * (i + 1), 3);
             addPoint(colorBuffer, colors, 4 * i, 4);
         }
-        addPoint(previousLineBuffer, points, 3 * (plen - 2), 3);
-        addPoint(lineBuffer, points, 3 * (plen - 1), 3);
-        addPoint(nextLineBuffer, points, 3 * (plen - 1), 3);
+        addPoint(previousBuffer, points, 3 * (plen - 2), 3);
+        addPoint(currentBuffer, points, 3 * (plen - 1), 3);
+        addPoint(nextBuffer, points, 3 * (plen - 1), 3);
         addPoint(colorBuffer, colors, 4 * (plen - 1), 4);
 
-        previousLineBuffer.rewind();
-        lineBuffer.rewind();
-        nextLineBuffer.rewind();
+        previousBuffer.rewind();
+        currentBuffer.rewind();
+        nextBuffer.rewind();
         directionBuffer.rewind();
         colorBuffer.rewind();
 
-        vbos[0].bindBufferData(gl, previousLineBuffer, Buffers.SIZEOF_FLOAT);
-        vbos[1].bindBufferData(gl, lineBuffer, Buffers.SIZEOF_FLOAT);
-        vbos[2].bindBufferData(gl, nextLineBuffer, Buffers.SIZEOF_FLOAT);
+        vbos[0].bindBufferData(gl, previousBuffer, Buffers.SIZEOF_FLOAT);
+        vbos[1].bindBufferData(gl, currentBuffer, Buffers.SIZEOF_FLOAT);
+        vbos[2].bindBufferData(gl, nextBuffer, Buffers.SIZEOF_FLOAT);
         vbos[3].bindBufferData(gl, directionBuffer, Buffers.SIZEOF_FLOAT);
         vbos[4].bindBufferData(gl, colorBuffer, Buffers.SIZEOF_FLOAT);
 
@@ -212,8 +212,8 @@ public class GLSLLine {
 
     public void init(GL2 gl) {
         if (!inited) {
-            vboAttribRefs = new int[] { GLSLLineShader.previousLineRef, GLSLLineShader.lineRef, GLSLLineShader.nextLineRef,
-                    GLSLLineShader.directionRef, GLSLLineShader.linecolorRef };
+            vboAttribRefs = new int[] { GLSLLineShader.previousRef, GLSLLineShader.currentRef, GLSLLineShader.nextRef,
+                    GLSLLineShader.directionRef, GLSLLineShader.colorRef };
             initVBOs(gl);
             inited = true;
         }

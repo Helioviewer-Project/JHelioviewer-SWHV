@@ -6,7 +6,7 @@ import org.helioviewer.jhv.math.Transform;
 
 class GLSLTextureShader extends GLSLShader {
 
-    static final GLSLTextureShader texture = new GLSLTextureShader("/data/TextureVertex.glsl", "/data/TextureFrag.glsl");
+    static final GLSLTextureShader texture = new GLSLTextureShader("/glsl/texture.vert", "/glsl/texture.frag");
     static int positionRef = 0;
     static int coordRef = 1;
 
