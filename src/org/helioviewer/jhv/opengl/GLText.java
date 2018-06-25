@@ -3,6 +3,7 @@ package org.helioviewer.jhv.opengl;
 import java.awt.Font;
 import java.util.List;
 
+import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
@@ -17,8 +18,7 @@ public class GLText {
     private static final int SIZE = (MAX - MIN) / STEP + 1;
     private static final JhvTextRenderer[] renderer = new JhvTextRenderer[SIZE];
 
-    private static final float[] col = { 0.33f, 0.33f, 0.33f, 0.9f };
-    private static final GLSLShape rectangle = new GLSLShape();
+    public static final float[] shadowColor = { 0.1f, 0.1f, 0.1f, 0.75f };
 
     public static JhvTextRenderer getRenderer(int size) {
         size *= GLInfo.pixelScale[1];
@@ -40,7 +40,6 @@ public class GLText {
     }
 
     public static void dispose(GL2 gl) {
-        rectangle.dispose(gl);
         for (int i = 0; i < SIZE; i++) {
             if (renderer[i] != null) {
                 renderer[i].dispose(gl);
@@ -49,7 +48,7 @@ public class GLText {
         }
     }
 
-    public static final int TEXT_SIZE_NORMAL = 12;
+    private static final int TEXT_SIZE_NORMAL = 12;
 
     private static final int LEFT_MARGIN_TEXT = 10;
     private static final int RIGHT_MARGIN_TEXT = 10;
@@ -84,18 +83,15 @@ public class GLText {
         if (h + pt_y - fontSize - TOP_MARGIN_TEXT > vp.height) {
             textInit_y -= (int) (h + pt_y - fontSize - TOP_MARGIN_TEXT - vp.height);
         }
-        float left = textInit_x - LEFT_MARGIN_TEXT;
-        float bottom = textInit_y - fontSize - TOP_MARGIN_TEXT;
-
-        renderer.beginRendering(vp.width, vp.height, true);
-
-        rectangle.init(gl);
-        GLHelper.initRectangleFront(gl, rectangle, left, bottom - vp.height, w, h, col);
-        rectangle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
-        rectangle.dispose(gl);
+        // float left = textInit_x - LEFT_MARGIN_TEXT;
+        // float bottom = textInit_y - fontSize - TOP_MARGIN_TEXT;
 
         int deltaY = 0;
+        renderer.beginRendering(vp.width, vp.height, true);
         for (String txt : txts) {
+            renderer.setColor(shadowColor);
+            renderer.draw(txt, textInit_x + 2, vp.height - textInit_y - 2 - deltaY);
+            renderer.setColor(BufferUtils.colorWhite);
             renderer.draw(txt, textInit_x, vp.height - textInit_y - deltaY);
             deltaY += (int) (fontSize * 1.1);
         }

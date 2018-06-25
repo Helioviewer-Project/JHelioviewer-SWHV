@@ -9,6 +9,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 
+import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
@@ -66,10 +67,10 @@ public class TimestampLayer extends AbstractLayer {
 
         JhvTextRenderer renderer = GLText.getRenderer(size);
         renderer.beginRendering(vp.width, vp.height, true);
-        renderer.setColor(0, 0, 0, 1);
+        renderer.setColor(GLText.shadowColor);
+        renderer.draw(text, delta + 2, delta - 2);
+        renderer.setColor(BufferUtils.colorWhite);
         renderer.draw(text, delta, delta);
-        renderer.setColor(1, 1, 1, 1);
-        renderer.draw(text, delta + 1, delta + 1);
         renderer.endRendering();
     }
 
