@@ -6,12 +6,12 @@ import com.jogamp.opengl.GL2;
 
 class GLSLLineShader extends GLSLShader {
 
-    static final GLSLLineShader line = new GLSLLineShader("/data/LineVertex.glsl", "/data/LineFrag.glsl");
-    static int previousLineRef = 0;
-    static int lineRef = 1;
-    static int nextLineRef = 2;
+    static final GLSLLineShader line = new GLSLLineShader("/glsl/line.vert", "/glsl/line.frag");
+    static int previousRef = 0;
+    static int currentRef = 1;
+    static int nextRef = 2;
     static int directionRef = 3;
-    static int linecolorRef = 4;
+    static int colorRef = 4;
 
     private int projectionRef;
     private int viewRef;
@@ -47,11 +47,12 @@ class GLSLLineShader extends GLSLShader {
     protected void _after_init(GL2 gl) {
         projectionRef = gl.glGetUniformLocation(progID, "projection");
         viewRef = gl.glGetUniformLocation(progID, "view");
-        previousLineRef = gl.glGetAttribLocation(progID, "previousLine");
-        lineRef = gl.glGetAttribLocation(progID, "line");
-        nextLineRef = gl.glGetAttribLocation(progID, "nextLine");
+
+        previousRef = gl.glGetAttribLocation(progID, "previous");
+        currentRef = gl.glGetAttribLocation(progID, "current");
+        nextRef = gl.glGetAttribLocation(progID, "next");
         directionRef = gl.glGetAttribLocation(progID, "direction");
-        linecolorRef = gl.glGetAttribLocation(progID, "linecolor");
+        colorRef = gl.glGetAttribLocation(progID, "color");
 
         aspectRef = gl.glGetUniformLocation(progID, "aspect");
         thicknessRef = gl.glGetUniformLocation(progID, "thickness");
