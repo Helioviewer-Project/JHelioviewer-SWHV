@@ -1,7 +1,7 @@
 #version 120
 varying vec4 frag_color;
 
-void main() {
+void main(void) {
     vec2 coord = 2. * gl_PointCoord - vec2(1.);
     float radius = length(coord);
     if (radius > 1.)
