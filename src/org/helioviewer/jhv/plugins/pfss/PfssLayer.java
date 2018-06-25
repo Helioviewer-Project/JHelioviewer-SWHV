@@ -58,7 +58,7 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
 
         PfssData pfssData = PfssPlugin.getPfsscache().getNearestData(Movie.getTime().milli);
         if (pfssData != null) {
-            renderData(gl, pfssData, vp.aspect);
+            renderData(gl, vp, pfssData);
             previousPfssData = pfssData;
         }
     }
@@ -132,7 +132,7 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
     private boolean lastFixedColor;
     private double lastRadius;
 
-    private void renderData(GL2 gl, PfssData data, double aspect) {
+    private void renderData(GL2 gl, Viewport vp, PfssData data) {
         int detail = optionsPanel.getDetail();
         boolean fixedColor = optionsPanel.getFixedColor();
         double radius = optionsPanel.getRadius();
@@ -147,7 +147,7 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
             timeString = data.dateObs.toString();
             ImageViewerGui.getLayers().fireTimeUpdated(this);
         }
-        glslLine.render(gl, aspect, thickness);
+        glslLine.render(gl, vp, thickness);
     }
 
 }

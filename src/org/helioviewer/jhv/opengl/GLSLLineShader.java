@@ -16,10 +16,13 @@ class GLSLLineShader extends GLSLShader {
     private int projectionRef;
     private int viewRef;
     private int thicknessRef;
-    private int aspectRef;
+
+    private int viewportRef;
+    private int viewportOffsetRef;
 
     private final float[] thickness = { 0.005f };
-    private final float[] aspect = { 1 };
+    private final float[] viewport = new float[3];
+    private final float[] viewportOffset = new float[2];
 
     private GLSLLineShader(String vertex, String fragment) {
         super(vertex, fragment);
@@ -54,19 +57,25 @@ class GLSLLineShader extends GLSLShader {
         directionRef = gl.glGetAttribLocation(progID, "direction");
         colorRef = gl.glGetAttribLocation(progID, "color");
 
-        aspectRef = gl.glGetUniformLocation(progID, "aspect");
         thicknessRef = gl.glGetUniformLocation(progID, "thickness");
+        viewportRef = gl.glGetUniformLocation(progID, "viewport");
+        viewportOffsetRef = gl.glGetUniformLocation(progID, "viewportOffset");
     }
 
     void bindParams(GL2 gl) {
         gl.glUniformMatrix4fv(projectionRef, 1, false, Transform.getProjection());
         gl.glUniformMatrix4fv(viewRef, 1, false, Transform.getView());
         gl.glUniform1fv(thicknessRef, 1, thickness, 0);
-        gl.glUniform1fv(aspectRef, 1, aspect, 0);
     }
 
-    void setAspect(double _aspect) {
-        aspect[0] = (float) _aspect;
+    void bindViewport(GL2 gl, float offsetX, float offsetY, float width, float height) {
+        viewportOffset[0] = offsetX;
+        viewportOffset[1] = offsetY;
+        gl.glUniform2fv(viewportOffsetRef, 1, viewportOffset, 0);
+        viewport[0] = width;
+        viewport[1] = height;
+        viewport[2] = height / width;
+        gl.glUniform3fv(viewportRef, 1, viewport, 0);
     }
 
     void setThickness(double _thickness) {

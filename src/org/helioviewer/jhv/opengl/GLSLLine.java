@@ -5,6 +5,7 @@ import java.nio.IntBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.FloatArray;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.common.nio.Buffers;
@@ -42,13 +43,13 @@ public class GLSLLine {
         hasPoints = true;
     }
 
-    public void render(GL2 gl, double aspect, double thickness) {
+    public void render(GL2 gl, Viewport vp, double thickness) {
         if (!hasPoints)
             return;
 
         GLSLLineShader.line.bind(gl);
-        GLSLLineShader.line.setAspect(aspect);
         GLSLLineShader.line.setThickness(thickness);
+        GLSLLineShader.line.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height);
         GLSLLineShader.line.bindParams(gl);
 
         bindVBOs(gl);

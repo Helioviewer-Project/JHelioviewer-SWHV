@@ -69,17 +69,17 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         Transform.rotateViewInverse(viewpoint.toQuat());
 
         if (!far)
-            fov.render(gl, viewpoint.distance, vp.aspect, pixFactor, false);
+            fov.render(gl, vp, viewpoint.distance, pixFactor, false);
 
         Transform.pushProjection();
         camera.projectionOrthoFar(vp.aspect);
 
         if (far)
-            fov.render(gl, viewpoint.distance, vp.aspect, pixFactor, false);
+            fov.render(gl, vp, viewpoint.distance, pixFactor, false);
         {
             Collection<LoadPosition> loadPositions = camera.getUpdateViewpoint().getLoadPositions();
             if (!loadPositions.isEmpty()) {
-                renderPlanets(gl, loadPositions, vp.aspect);
+                renderPlanets(gl, vp, loadPositions);
             }
         }
         Transform.popProjection();
@@ -241,7 +241,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         return (long) (DELTA_ORBIT * (dist > DELTA_CUTOFF ? DELTA_CUTOFF : dist));
     }
 
-    private void renderPlanets(GL2 gl, Collection<LoadPosition> loadPositions, double aspect) {
+    private void renderPlanets(GL2 gl, Viewport vp, Collection<LoadPosition> loadPositions) {
         int size = loadPositions.size();
         FloatBuffer planetPosition = BufferUtils.newFloatBuffer(4 * size);
         FloatBuffer planetColor = BufferUtils.newFloatBuffer(4 * size);
@@ -286,7 +286,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
         if (orbitPosition.length() >= 2 * 3) {
             orbits.setData(gl, orbitPosition, orbitColor);
-            orbits.render(gl, aspect, orbitThickness);
+            orbits.render(gl, vp, orbitThickness);
         }
 
         planetPosition.rewind();

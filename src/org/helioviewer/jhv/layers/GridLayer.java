@@ -119,18 +119,18 @@ public class GridLayer extends AbstractLayer {
         }
 
         if (showAxis)
-            axesLine.render(gl, vp.aspect, thicknessAxes);
+            axesLine.render(gl, vp, thicknessAxes);
 
         Position viewpoint = camera.getViewpoint();
         double pixFactor = vp.height / (2 * camera.getWidth());
-        drawEarthCircles(gl, vp.aspect, pixFactor, Sun.getEarth(viewpoint.time));
+        drawEarthCircles(gl, vp, pixFactor, Sun.getEarth(viewpoint.time));
 
         double pixelsPerSolarRadius = textScale * pixFactor;
 
         Transform.pushView();
         Transform.rotateViewInverse(gridType.toQuat(viewpoint));
         {
-            gridLine.render(gl, vp.aspect, thickness);
+            gridLine.render(gl, vp, thickness);
             if (showLabels) {
                 drawGridText(gl, (int) pixelsPerSolarRadius);
             }
@@ -145,14 +145,14 @@ public class GridLayer extends AbstractLayer {
                 if (far) {
                     Transform.pushProjection();
                     camera.projectionOrthoFar(vp.aspect);
-                    radialCircleLineFar.render(gl, vp.aspect, thickness);
-                    radialThickLineFar.render(gl, vp.aspect, 3 * thickness);
+                    radialCircleLineFar.render(gl, vp, thickness);
+                    radialThickLineFar.render(gl, vp, 3 * thickness);
                     if (showLabels)
                         drawRadialGridText(gl, radialLabelsFar, pixelsPerSolarRadius * RADIAL_UNIT_FAR, R_LABEL_POS_FAR);
                     Transform.popProjection();
                 } else {
-                    radialCircleLine.render(gl, vp.aspect, thickness);
-                    radialThickLine.render(gl, vp.aspect, 3 * thickness);
+                    radialCircleLine.render(gl, vp, thickness);
+                    radialThickLine.render(gl, vp, 3 * thickness);
                     if (showLabels)
                         drawRadialGridText(gl, radialLabels, pixelsPerSolarRadius * RADIAL_UNIT, R_LABEL_POS);
                 }
@@ -179,7 +179,7 @@ public class GridLayer extends AbstractLayer {
             GridMath.initFlatGrid(gl, flatLine, vp.aspect);
             previousAspect = vp.aspect;
         }
-        flatLine.render(gl, vp.aspect, thickness);
+        flatLine.render(gl, vp, thickness);
     }
 
     private static void drawGridTextFlat(int size, GridScale scale, Viewport vp) {
@@ -207,11 +207,11 @@ public class GridLayer extends AbstractLayer {
         renderer.end3DRendering();
     }
 
-    private void drawEarthCircles(GL2 gl, double aspect, double factor, Position p) {
+    private void drawEarthCircles(GL2 gl, Viewport vp, double factor, Position p) {
         Transform.pushView();
         Transform.rotateViewInverse(p.toQuat());
         {
-            earthCircleLine.render(gl, aspect, thicknessEarth);
+            earthCircleLine.render(gl, vp, thicknessEarth);
             earthPoint.renderPoints(gl, factor);
         }
         Transform.popView();

@@ -7,8 +7,8 @@ attribute vec4 color;
 
 varying vec4 frag_color;
 
-uniform float aspect;
 uniform float thickness;
+uniform vec3 viewport;
 
 uniform mat4 projection;
 uniform mat4 view;
@@ -27,7 +27,7 @@ void main(void) {
         dir = normalize(currentProjected.xy - previousProjected.xy);
     }
 
-    vec2 normal = vec2(dir.y / aspect, -dir.x);
+    vec2 normal = vec2(dir.y * viewport.z, -dir.x);
     normal *= currentProjected.w * thickness / 2.;
 
     vec4 offset = vec4(normal * direction, 0., 0.);

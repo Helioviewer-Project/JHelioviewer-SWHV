@@ -160,7 +160,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         interPolatedDraw(lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, q, pos, col, color);
 
         glslLine.setData(gl, pos, col);
-        glslLine.render(gl, vp.aspect, LINEWIDTH_CACTUS);
+        glslLine.render(gl, vp, LINEWIDTH_CACTUS);
 
         if (icons) {
             bindTexture(gl, evtr.getSupplier().getGroup());
@@ -249,7 +249,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         }
 
         glslLine.setData(gl, pos, col);
-        glslLine.render(gl, vp.aspect, evtr.isHighlighted() ? LINEWIDTH_HIGHLIGHT : LINEWIDTH);
+        glslLine.render(gl, vp, evtr.isHighlighted() ? LINEWIDTH_HIGHLIGHT : LINEWIDTH);
     }
 
     private void drawIcon(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
@@ -383,7 +383,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         col.put4f(BufferUtils.colorNull);
 
         glslLine.setData(gl, pos, col);
-        glslLine.render(gl, vp.aspect, LINEWIDTH_CACTUS);
+        glslLine.render(gl, vp, LINEWIDTH_CACTUS);
 
         if (icons) {
             bindTexture(gl, evtr.getSupplier().getGroup());

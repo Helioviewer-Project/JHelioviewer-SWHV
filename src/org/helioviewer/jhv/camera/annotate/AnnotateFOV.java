@@ -72,7 +72,7 @@ public class AnnotateFOV extends AbstractAnnotateable {
         {
             fov.setCenter(p0.x + dx, p0.y + dy);
             fov.setTAngles(dx / viewpoint.distance, dy / viewpoint.distance);
-            fov.render(gl, viewpoint.distance, vp.aspect, pointFactor, active);
+            fov.render(gl, vp, viewpoint.distance, pointFactor, active);
         }
         Transform.popView();
     }
