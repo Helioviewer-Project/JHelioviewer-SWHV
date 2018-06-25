@@ -14,17 +14,17 @@ uniform mat4 projection;
 uniform mat4 view;
 
 // https://mattdesl.svbtle.com/drawing-lines-is-hard
-void main() {
+void main(void) {
     mat4 ModelViewProjectionMatrix = projection * view;
     vec4 previousProjected = ModelViewProjectionMatrix * vec4(previous, 1.);
     vec4 currentProjected = ModelViewProjectionMatrix * vec4(current, 1.);
 
-    vec4 dir;
+    vec2 dir;
     if (currentProjected == previousProjected) {
         vec4 nextProjected = ModelViewProjectionMatrix * vec4(next, 1.);
-        dir = normalize(nextProjected - currentProjected);
+        dir = normalize(nextProjected.xy - currentProjected.xy);
     } else {
-        dir = normalize(currentProjected - previousProjected);
+        dir = normalize(currentProjected.xy - previousProjected.xy);
     }
 
     vec2 normal = vec2(dir.y / aspect, -dir.x);

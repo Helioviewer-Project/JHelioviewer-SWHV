@@ -7,7 +7,7 @@ varying vec2 texCoord;
 uniform mat4 projection;
 uniform mat4 view;
 
-void main() {
+void main(void) {
     mat4 ModelViewProjectionMatrix = projection * view;
     gl_Position = ModelViewProjectionMatrix * vec4(position, 1.);
     texCoord = coord;

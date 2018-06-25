@@ -95,8 +95,8 @@ float intersectPlane(const vec4 quat, vec4 vecin) {
     return -dot(altnormal.xy, vecin.xy) / altnormal.z;
 }
 
-vec2 getScrPos() {
-    vec2 normalizedScreenpos = 2. * ((gl_FragCoord.xy - viewportOffset) / viewport.xy - .5);
+vec2 getScrPos(void) {
+    vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - viewportOffset) / viewport.xy - 1.;
     vec4 up1 = cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
     vec2 scrpos = vec2(viewport.z * up1.x, up1.y) + .5;
     clamp_texcoord(scrpos);
