@@ -4,7 +4,7 @@ import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
-import org.helioviewer.jhv.opengl.GLSLLine;
+import org.helioviewer.jhv.opengl.GLSLPolyline;
 import org.helioviewer.jhv.plugins.pfss.data.PfssData;
 
 import com.jogamp.opengl.GL2;
@@ -16,8 +16,8 @@ class PfssLine {
     private static final float[] insideFieldColor = BufferUtils.colorBlue;
 
     private final float[] brightColor = new float[4];
-    private FloatBuffer vertices = BufferUtils.newFloatBuffer(0);
-    private FloatBuffer colors = BufferUtils.newFloatBuffer(0);
+    private FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(0);
+    private FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(0);
 
     private void computeBrightColor(double b) {
         if (b > 0) {
@@ -36,9 +36,9 @@ class PfssLine {
         return (buf.get(idx) + 32768.) * (2. / 65535.) - 1.;
     }
 
-    public void calculatePositions(GL2 gl, PfssData data, int detail, boolean fixedColor, double radius, GLSLLine glslLine) {
-        vertices.clear();
-        colors.clear();
+    public void calculatePositions(GL2 gl, PfssData data, int detail, boolean fixedColor, double radius, GLSLPolyline line) {
+        vertexBuffer.clear();
+        colorBuffer.clear();
 
         int pointsPerLine = data.pointsPerLine;
         double cphi = data.cphi;
@@ -52,12 +52,12 @@ class PfssLine {
         int numberOfLines = dlength / pointsPerLine;
 
         int vlength = 3 * (dlength + 2 * numberOfLines);
-        if (vlength != vertices.capacity())
-            vertices = BufferUtils.newFloatBuffer(vlength);
+        if (vlength != vertexBuffer.capacity())
+            vertexBuffer = BufferUtils.newFloatBuffer(vlength);
 
         int clength = 4 * (dlength + 2 * numberOfLines);
-        if (clength != colors.capacity())
-            colors = BufferUtils.newFloatBuffer(clength);
+        if (clength != colorBuffer.capacity())
+            colorBuffer = BufferUtils.newFloatBuffer(clength);
 
         float[] oneColor = loopColor;
         for (int i = 0; i < dlength; i++) {
@@ -75,8 +75,8 @@ class PfssLine {
                 double r = Math.sqrt(x * x + y * y + z * z);
 
                 if (i % pointsPerLine == 0) { // start line
-                    BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
-                    colors.put(BufferUtils.colorNull);
+                    BufferUtils.put3f(vertexBuffer, (float) x, (float) z, (float) -y);
+                    colorBuffer.put(BufferUtils.colorNull);
 
                     if (fixedColor) {
                         double xo = 3. * decode(flinex, i + pointsPerLine - 1);
@@ -94,19 +94,19 @@ class PfssLine {
                     }
                 }
 
-                BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
-                colors.put(r > radius ? BufferUtils.colorNull : (fixedColor ? oneColor : brightColor));
+                BufferUtils.put3f(vertexBuffer, (float) x, (float) z, (float) -y);
+                colorBuffer.put(r > radius ? BufferUtils.colorNull : (fixedColor ? oneColor : brightColor));
 
                 if (i % pointsPerLine == pointsPerLine - 1) { // end line
-                    BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
-                    colors.put(BufferUtils.colorNull);
+                    BufferUtils.put3f(vertexBuffer, (float) x, (float) z, (float) -y);
+                    colorBuffer.put(BufferUtils.colorNull);
                 }
             }
         }
 
-        vertices.rewind();
-        colors.rewind();
-        glslLine.setData(gl, vertices, colors);
+        vertexBuffer.rewind();
+        colorBuffer.rewind();
+        line.setData(gl, vertexBuffer, colorBuffer);
     }
 
 }
