@@ -41,7 +41,7 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.helioviewer.jhv.opengl.GLSLLine;
+import org.helioviewer.jhv.opengl.GLSLPolyline;
 import org.helioviewer.jhv.opengl.GLSLTexture;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.GLTexture;
@@ -57,9 +57,9 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     private final JPanel optionsPanel;
 
     private static final int DIVPOINTS = 10;
-    private static final double LINEWIDTH = 0.002;
-    private static final double LINEWIDTH_HIGHLIGHT = 0.003;
-    private static final double LINEWIDTH_CACTUS = 0.003;
+    private static final double LINEWIDTH = 2;
+    private static final double LINEWIDTH_HIGHLIGHT = 3;
+    private static final double LINEWIDTH_CACTUS = 3;
 
     private static final HashMap<String, GLTexture> iconCacheId = new HashMap<>();
     private static final double ICON_SIZE = 0.1;
@@ -67,7 +67,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
     private boolean icons = true;
 
-    private final GLSLLine glslLine = new GLSLLine();
+    private final GLSLPolyline glslLine = new GLSLPolyline();
     private final GLSLTexture glslTexture = new GLSLTexture();
 
     public SWEKLayer(JSONObject jo) {
@@ -159,7 +159,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         interPolatedDraw(lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, q, pos, col, color);
         interPolatedDraw(lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, q, pos, col, color);
 
-        glslLine.setData(gl, pos, col);
+        glslLine.setData(gl, pos.toBuffer(), col.toBuffer());
         glslLine.render(gl, vp, LINEWIDTH_CACTUS);
 
         if (icons) {
@@ -248,7 +248,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             oldBoundaryPoint3d = new float[] { points[3 * i], points[3 * i + 1], points[3 * i + 2] };
         }
 
-        glslLine.setData(gl, pos, col);
+        glslLine.setData(gl, pos.toBuffer(), col.toBuffer());
         glslLine.render(gl, vp, evtr.isHighlighted() ? LINEWIDTH_HIGHLIGHT : LINEWIDTH);
     }
 
@@ -382,7 +382,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         pos.put3f(x, y, 0);
         col.put4f(BufferUtils.colorNull);
 
-        glslLine.setData(gl, pos, col);
+        glslLine.setData(gl, pos.toBuffer(), col.toBuffer());
         glslLine.render(gl, vp, LINEWIDTH_CACTUS);
 
         if (icons) {
