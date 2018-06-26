@@ -63,16 +63,21 @@ public class AnnotateCircle extends AbstractAnnotateable {
                 }
                 pos.put3f((float) vx.x, (float) vx.y, (float) vx.z);
                 col.put4f(color);
+                if (i == SUBDIVISIONS) {
+                    pos.put3f((float) vx.x, (float) vx.y, (float) vx.z);
+                    col.put4f(BufferUtils.colorNull);
+                }
             } else {
                 vx.y = -vx.y;
                 if (i == 0) {
                     GLHelper.drawVertex(camera, vp, vx, previous, pos, col, BufferUtils.colorNull);
                 }
                 previous = GLHelper.drawVertex(camera, vp, vx, previous, pos, col, color);
+                if (i == SUBDIVISIONS) {
+                    GLHelper.drawVertex(camera, vp, vx, previous, pos, col, BufferUtils.colorNull);
+                }
             }
         }
-        pos.repeat3f();
-        col.put4f(BufferUtils.colorNull);
     }
 
     @Override
