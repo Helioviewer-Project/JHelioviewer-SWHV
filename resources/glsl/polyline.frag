@@ -1,4 +1,4 @@
-#version 330
+#version 330 core
 
 /* \brief Fragment GLSL shader that demonstrates how perform pass through fragment shader.
  * This file is a part of shader-3dcurve example (https://github.com/vicrucann/shader-3dcurve).
@@ -8,6 +8,8 @@
  * \copyright MIT license
 */
 
+out vec4 FragColor;
+
 in VertexData{
     vec2 mTexCoord;
     vec4 mColor;
@@ -15,5 +17,5 @@ in VertexData{
 
 void main(void)
 {
-    gl_FragColor = VertexIn.mColor;
+    FragColor = VertexIn.mColor;
 }

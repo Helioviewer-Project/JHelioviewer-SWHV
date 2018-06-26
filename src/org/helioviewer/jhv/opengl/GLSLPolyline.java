@@ -12,7 +12,7 @@ import com.jogamp.opengl.GL3;
 public class GLSLPolyline {
 
     private int[] vboAttribRefs;
-    private final int[] vboAttribLens = { 4, 4 };
+    private final int[] vboAttribLens = { 3, 4 };
 
     private final VBO[] vbos = new VBO[2];
     private int count;
@@ -21,7 +21,7 @@ public class GLSLPolyline {
     public void setData(GL2 gl, FloatBuffer points, FloatBuffer colors) {
         count = 0;
         int plen = points.limit() / vboAttribLens[0];
-        if (plen * vboAttribLens[0] != points.limit() || points.limit() != colors.limit()) {
+        if (plen * vboAttribLens[0] != points.limit() || plen != colors.limit() / vboAttribLens[1]) {
             Log.error("Something is wrong with the vertices or colors from this GLSLPolyline");
             return;
         }
@@ -34,13 +34,13 @@ public class GLSLPolyline {
         if (count == 0)
             return;
 
-        GLSLLineShader.line.bind(gl);
-        GLSLLineShader.line.setThickness(thickness);
-        GLSLLineShader.line.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height);
-        GLSLLineShader.line.bindParams(gl);
+        GLSLPolylineShader.polyline.bind(gl);
+        GLSLPolylineShader.polyline.setThickness(thickness);
+        GLSLPolylineShader.polyline.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height);
+        GLSLPolylineShader.polyline.bindParams(gl);
 
         bindVBOs(gl);
-        gl.glDrawArrays(GL3.GL_LINES_ADJACENCY, 0, count);
+        gl.glDrawArrays(GL3.GL_LINE_STRIP_ADJACENCY, 0, count);
         unbindVBOs(gl);
 
         GLSLShader.unbind(gl);
@@ -76,7 +76,7 @@ public class GLSLPolyline {
 
     public void init(GL2 gl) {
         if (!inited) {
-            vboAttribRefs = new int[] { GLSLPolylineShader.vertexRef, GLSLShapeShader.colorRef };
+            vboAttribRefs = new int[] { GLSLPolylineShader.vertexRef, GLSLPolylineShader.colorRef };
             initVBOs(gl);
             inited = true;
         }

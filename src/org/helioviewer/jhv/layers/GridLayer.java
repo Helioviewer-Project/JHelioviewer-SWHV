@@ -16,6 +16,7 @@ import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.opengl.GLSLLine;
+import org.helioviewer.jhv.opengl.GLSLPolyline;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
@@ -35,7 +36,7 @@ public class GridLayer extends AbstractLayer {
 
     // height of text in solar radii
     private static final float textScale = GridLabel.textScale;
-    private static final double thickness = 0.002;
+    private static final double thickness = 2;
     private static final double thicknessEarth = 0.002;
     private static final double thicknessAxes = 0.005;
 
@@ -59,7 +60,7 @@ public class GridLayer extends AbstractLayer {
     private final GLSLLine radialCircleLineFar = new GLSLLine();
     private final GLSLLine radialThickLineFar = new GLSLLine();
     private final GLSLLine flatLine = new GLSLLine();
-    private final GLSLLine gridLine = new GLSLLine();
+    private final GLSLPolyline gridLine = new GLSLPolyline();
 
     private ArrayList<GridLabel> latLabels;
     private ArrayList<GridLabel> lonLabels;
