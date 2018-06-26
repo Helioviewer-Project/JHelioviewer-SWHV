@@ -6,7 +6,7 @@ import org.helioviewer.jhv.math.Transform;
 
 class GLSLTextureShader extends GLSLShader {
 
-    static final GLSLTextureShader texture = new GLSLTextureShader("/glsl/texture.vert", "/glsl/texture.frag");
+    static final GLSLTextureShader texture = new GLSLTextureShader("/glsl/texture.vert", null, "/glsl/texture.frag");
     static int positionRef = 0;
     static int coordRef = 1;
 
@@ -16,8 +16,8 @@ class GLSLTextureShader extends GLSLShader {
 
     private float[] color = { 1, 1, 1, 1 };
 
-    private GLSLTextureShader(String vertex, String fragment) {
-        super(vertex, fragment);
+    private GLSLTextureShader(String vertex, String geometry, String fragment) {
+        super(vertex, geometry, fragment);
     }
 
     public static void init(GL2 gl) {

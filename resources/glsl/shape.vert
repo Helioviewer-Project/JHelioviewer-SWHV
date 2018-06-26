@@ -1,8 +1,9 @@
-#version 120
-attribute vec4 position;
-attribute vec4 color;
+#version 150 core
 
-varying vec4 frag_color;
+in vec4 position;
+in vec4 color;
+
+out vec4 frag_color;
 
 uniform float factor;
 

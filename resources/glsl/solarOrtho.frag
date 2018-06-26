@@ -46,5 +46,5 @@ void main(void) {
             discard;
         }
     }
-    gl_FragColor = getColor(texcoord, difftexcoord, factor);
+    FragColor = getColor(texcoord, difftexcoord, factor);
 }

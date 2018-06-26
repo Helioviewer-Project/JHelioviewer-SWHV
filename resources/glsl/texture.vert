@@ -1,8 +1,9 @@
-#version 120
-attribute vec3 position;
-attribute vec2 coord;
+#version 150 core
 
-varying vec2 texCoord;
+in vec3 position;
+in vec2 coord;
+
+out vec2 texCoord;
 
 uniform mat4 projection;
 uniform mat4 view;

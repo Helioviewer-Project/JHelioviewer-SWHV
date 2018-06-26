@@ -6,7 +6,7 @@ import com.jogamp.opengl.GL2;
 
 class GLSLLineShader extends GLSLShader {
 
-    static final GLSLLineShader line = new GLSLLineShader("/glsl/line.vert", "/glsl/line.frag");
+    static final GLSLLineShader line = new GLSLLineShader("/glsl/line.vert", null, "/glsl/line.frag");
     static int previousRef = 0;
     static int currentRef = 1;
     static int nextRef = 2;
@@ -24,8 +24,8 @@ class GLSLLineShader extends GLSLShader {
     private final float[] viewport = new float[3];
     private final float[] viewportOffset = new float[2];
 
-    private GLSLLineShader(String vertex, String fragment) {
-        super(vertex, fragment);
+    private GLSLLineShader(String vertex, String geometry, String fragment) {
+        super(vertex, geometry, fragment);
     }
 
     public static void init(GL2 gl) {

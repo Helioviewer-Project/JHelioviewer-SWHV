@@ -1,5 +1,6 @@
-#version 120
-attribute vec4 position;
+#version 150 core
+
+in vec4 position;
 
 uniform int isdisc;
 

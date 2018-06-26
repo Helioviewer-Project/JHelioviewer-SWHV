@@ -116,7 +116,7 @@ public class GLHelper {
     }
 */
     public static GLWindow createGLWindow() {
-        GLProfile profile = GLProfile.getDefault();
+        GLProfile profile = GLProfile.getGL2GL3();
         GLCapabilities capabilities = getGLCapabilities(profile);
         GLWindow window = GLWindow.create(capabilities);
 
