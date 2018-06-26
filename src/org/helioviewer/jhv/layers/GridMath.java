@@ -128,61 +128,81 @@ class GridMath {
 
     static void initRadialCircles(GL2 gl, GLSLPolyline radialCircleLine, GLSLPolyline radialThickLine, double unit, double step) {
         int no_lines = (int) Math.ceil(360 / step);
-        int no_points = (END_RADIUS - START_RADIUS + 1 - TENS_RADIUS) * (SUBDIVISIONS + 3) + 4 * no_lines;
+        int no_points = (END_RADIUS - START_RADIUS + 1 - TENS_RADIUS) * (SUBDIVISIONS + 3) + 8 * no_lines;
         FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(no_points * 3);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
         FloatBuffer vertexThick = BufferUtils.newFloatBuffer(TENS_RADIUS * (SUBDIVISIONS + 3) * 3);
         FloatBuffer colorThick = BufferUtils.newFloatBuffer(TENS_RADIUS * (SUBDIVISIONS + 3) * 4);
 
-        Vec3 v = new Vec3();
         for (int i = START_RADIUS; i <= END_RADIUS; i++) {
             for (int j = 0; j <= SUBDIVISIONS; j++) {
-                v.x = i * unit * Math.cos(2 * Math.PI * j / SUBDIVISIONS);
-                v.y = i * unit * Math.sin(2 * Math.PI * j / SUBDIVISIONS);
-                v.z = 0.;
+                float x = (float) (i * unit * Math.cos(2 * Math.PI * j / SUBDIVISIONS));
+                float y = (float) (i * unit * Math.sin(2 * Math.PI * j / SUBDIVISIONS));
+
                 if (i % 10 == 0) {
                     if (j == 0) {
-                        BufferUtils.put3f(vertexThick, v);
+                        BufferUtils.put3f(vertexThick, x, y, 0);
                         colorThick.put(BufferUtils.colorNull);
                     }
-                    BufferUtils.put3f(vertexThick, v);
+                    BufferUtils.put3f(vertexThick, x, y, 0);
                     colorThick.put(radialLineColor);
                     if (j == SUBDIVISIONS) {
-                        BufferUtils.put3f(vertexThick, v);
+                        BufferUtils.put3f(vertexThick, x, y, 0);
                         colorThick.put(BufferUtils.colorNull);
                     }
                 } else {
                     if (j == 0) {
-                        BufferUtils.put3f(vertexBuffer, v);
+                        BufferUtils.put3f(vertexBuffer, x, y, 0);
                         colorBuffer.put(BufferUtils.colorNull);
                     }
-                    BufferUtils.put3f(vertexBuffer, v);
+                    BufferUtils.put3f(vertexBuffer, x, y, 0);
                     colorBuffer.put(radialLineColor);
                     if (j == SUBDIVISIONS) {
-                        BufferUtils.put3f(vertexBuffer, v);
+                        BufferUtils.put3f(vertexBuffer, x, y, 0);
                         colorBuffer.put(BufferUtils.colorNull);
                     }
                 }
             }
         }
 
+        Vec3 rotv, v = new Vec3();
         double i = 0;
         for (int j = 0; j < no_lines; j++) {
             i += step;
             Quat q = Quat.createRotation((Math.PI / 180) * i, Vec3.ZAxis);
 
             v.set(START_RADIUS * unit, 0, 0);
-            Vec3 rotv1 = q.rotateVector(v);
-            BufferUtils.put3f(vertexBuffer, rotv1);
+            rotv = q.rotateVector(v);
+            BufferUtils.put3f(vertexBuffer, rotv);
             colorBuffer.put(BufferUtils.colorNull);
-            BufferUtils.put3f(vertexBuffer, rotv1);
+            BufferUtils.put3f(vertexBuffer, rotv);
+            colorBuffer.put(radialLineColor);
+
+            v.set((START_RADIUS + (END_RADIUS - START_RADIUS) / 5.) * unit, 0, 0);
+            rotv = q.rotateVector(v);
+            BufferUtils.put3f(vertexBuffer, rotv);
+            colorBuffer.put(radialLineColor);
+
+            v.set((START_RADIUS + 2 * (END_RADIUS - START_RADIUS) / 5.) * unit, 0, 0);
+            rotv = q.rotateVector(v);
+            BufferUtils.put3f(vertexBuffer, rotv);
+            colorBuffer.put(radialLineColor);
+
+            v.set((START_RADIUS + 3 * (END_RADIUS - START_RADIUS) / 5.) * unit, 0, 0);
+            rotv = q.rotateVector(v);
+            BufferUtils.put3f(vertexBuffer, rotv);
+            colorBuffer.put(radialLineColor);
+
+            v.set((START_RADIUS + 4 * (END_RADIUS - START_RADIUS) / 5.) * unit, 0, 0);
+            rotv = q.rotateVector(v);
+            BufferUtils.put3f(vertexBuffer, rotv);
             colorBuffer.put(radialLineColor);
 
             v.set(END_RADIUS * unit, 0, 0);
-            Vec3 rotv2 = q.rotateVector(v);
-            BufferUtils.put3f(vertexBuffer, rotv2);
+            rotv = q.rotateVector(v);
+            BufferUtils.put3f(vertexBuffer, rotv);
             colorBuffer.put(radialLineColor);
-            BufferUtils.put3f(vertexBuffer, rotv2);
+            BufferUtils.put3f(vertexBuffer, rotv);
             colorBuffer.put(BufferUtils.colorNull);
         }
         vertexBuffer.rewind();
