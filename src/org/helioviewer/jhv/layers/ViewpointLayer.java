@@ -21,7 +21,7 @@ import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.FOVShape;
 import org.helioviewer.jhv.opengl.GLInfo;
-import org.helioviewer.jhv.opengl.GLSLLine;
+import org.helioviewer.jhv.opengl.GLSLPolyline;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.position.LoadPosition;
@@ -38,12 +38,12 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
     private static final double DELTA_ORBIT = 10 * 60 * 1000 * Sun.MeanEarthDistanceInv;
     private static final double DELTA_CUTOFF = 3 * Sun.MeanEarthDistance;
-    private static final double fovThickness = 0.002;
-    private static final double orbitThickness = 0.002;
+    private static final double fovThickness = 2;
+    private static final double orbitThickness = 2;
     private static final float planetSize = 5f;
 
     private final FOVShape fov = new FOVShape(fovThickness);
-    private final GLSLLine orbits = new GLSLLine();
+    private final GLSLPolyline orbits = new GLSLPolyline();
     private final GLSLShape planets = new GLSLShape();
     private final ViewpointLayerOptions optionsPanel;
 
@@ -285,7 +285,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         }
 
         if (orbitPosition.length() >= 2 * 3) {
-            orbits.setData(gl, orbitPosition, orbitColor);
+            orbits.setData(gl, orbitPosition.toBuffer(), orbitColor.toBuffer());
             orbits.render(gl, vp, orbitThickness);
         }
 

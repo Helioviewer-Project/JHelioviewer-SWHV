@@ -131,7 +131,7 @@ class GridMath {
         int no_points = (END_RADIUS - START_RADIUS + 1 - TENS_RADIUS) * (SUBDIVISIONS + 3) + 4 * no_lines;
         FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(no_points * 3);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
-        FloatBuffer positionThick = BufferUtils.newFloatBuffer(TENS_RADIUS * (SUBDIVISIONS + 3) * 3);
+        FloatBuffer vertexThick = BufferUtils.newFloatBuffer(TENS_RADIUS * (SUBDIVISIONS + 3) * 3);
         FloatBuffer colorThick = BufferUtils.newFloatBuffer(TENS_RADIUS * (SUBDIVISIONS + 3) * 4);
 
         Vec3 v = new Vec3();
@@ -142,13 +142,13 @@ class GridMath {
                 v.z = 0.;
                 if (i % 10 == 0) {
                     if (j == 0) {
-                        BufferUtils.put3f(positionThick, v);
+                        BufferUtils.put3f(vertexThick, v);
                         colorThick.put(BufferUtils.colorNull);
                     }
-                    BufferUtils.put3f(positionThick, v);
+                    BufferUtils.put3f(vertexThick, v);
                     colorThick.put(radialLineColor);
                     if (j == SUBDIVISIONS) {
-                        BufferUtils.put3f(positionThick, v);
+                        BufferUtils.put3f(vertexThick, v);
                         colorThick.put(BufferUtils.colorNull);
                     }
                 } else {
@@ -187,11 +187,11 @@ class GridMath {
         }
         vertexBuffer.rewind();
         colorBuffer.rewind();
-        positionThick.rewind();
+        vertexThick.rewind();
         colorThick.rewind();
 
         radialCircleLine.setData(gl, vertexBuffer, colorBuffer);
-        radialThickLine.setData(gl, positionThick, colorThick);
+        radialThickLine.setData(gl, vertexThick, colorThick);
     }
 
     static void initFlatGrid(GL2 gl, GLSLPolyline flatLine, double aspect) {
