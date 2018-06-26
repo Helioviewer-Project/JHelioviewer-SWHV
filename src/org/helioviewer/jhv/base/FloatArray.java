@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.base;
 
+import java.nio.FloatBuffer;
 import java.util.Arrays;
 
 public class FloatArray {
@@ -48,6 +49,13 @@ public class FloatArray {
 
     public float[] toArray() {
         return arr;
+    }
+
+    public FloatBuffer toBuffer() {
+        FloatBuffer buf = BufferUtils.newFloatBuffer(len);
+        buf.put(arr, 0, len);
+        buf.rewind();
+        return buf;
     }
 
 }

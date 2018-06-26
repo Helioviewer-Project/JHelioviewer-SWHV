@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.camera.annotate;
 
+import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.FloatArray;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
@@ -8,14 +9,14 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.helioviewer.jhv.opengl.GLSLLine;
+import org.helioviewer.jhv.opengl.GLSLPolyline;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
 public class AnnotateRectangle extends AbstractAnnotateable {
 
-    private final GLSLLine line = new GLSLLine();
+    private final GLSLPolyline line = new GLSLPolyline();
 
     public AnnotateRectangle(JSONObject jo) {
         super(jo);
@@ -61,13 +62,22 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
             Vec3 pc = toCart(y, z);
             if (Display.mode == Display.DisplayMode.Orthographic) {
+                if (i == 0) {
+                    pos.put3f((float) pc.x, (float) pc.y, (float) pc.z);
+                    col.put4f(BufferUtils.colorNull);
+                }
                 pos.put3f((float) pc.x, (float) pc.y, (float) pc.z);
                 col.put4f(color);
             } else {
                 pc.y = -pc.y;
+                if (i == 0) {
+                    GLHelper.drawVertex(camera, vp, pc, previous, pos, col, BufferUtils.colorNull);
+                }
                 previous = GLHelper.drawVertex(camera, vp, pc, previous, pos, col, color);
             }
         }
+        pos.repeat3f();
+        col.put4f(BufferUtils.colorNull);
     }
 
     @Override
@@ -84,7 +94,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         FloatArray col = new FloatArray();
 
         drawRectangle(camera, vp, toSpherical(p0), toSpherical(p1), pos, col, color);
-        line.setData(gl, pos, col);
+        line.setData(gl, pos.toBuffer(), col.toBuffer());
         line.render(gl, vp, thickness);
     }
 
