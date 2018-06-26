@@ -15,7 +15,6 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec2;
-import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLPolyline;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
@@ -36,9 +35,9 @@ public class GridLayer extends AbstractLayer {
 
     // height of text in solar radii
     private static final float textScale = GridLabel.textScale;
-    private static final double thickness = 2;
-    private static final double thicknessEarth = 0.002;
-    private static final double thicknessAxes = 0.005;
+    private static final double thickness = 1;
+    private static final double thicknessEarth = 2;
+    private static final double thicknessAxes = 5;
 
     private static final DecimalFormat formatter2 = MathUtils.numberFormatter("0", 2);
 
@@ -53,13 +52,13 @@ public class GridLayer extends AbstractLayer {
     private boolean showRadial = false;
 
     private final GLSLShape earthPoint = new GLSLShape();
-    private final GLSLLine axesLine = new GLSLLine();
-    private final GLSLLine earthCircleLine = new GLSLLine();
-    private final GLSLLine radialCircleLine = new GLSLLine();
-    private final GLSLLine radialThickLine = new GLSLLine();
-    private final GLSLLine radialCircleLineFar = new GLSLLine();
-    private final GLSLLine radialThickLineFar = new GLSLLine();
-    private final GLSLLine flatLine = new GLSLLine();
+    private final GLSLPolyline axesLine = new GLSLPolyline();
+    private final GLSLPolyline earthCircleLine = new GLSLPolyline();
+    private final GLSLPolyline radialCircleLine = new GLSLPolyline();
+    private final GLSLPolyline radialThickLine = new GLSLPolyline();
+    private final GLSLPolyline radialCircleLineFar = new GLSLPolyline();
+    private final GLSLPolyline radialThickLineFar = new GLSLPolyline();
+    private final GLSLPolyline flatLine = new GLSLPolyline();
     private final GLSLPolyline gridLine = new GLSLPolyline();
 
     private ArrayList<GridLabel> latLabels;
