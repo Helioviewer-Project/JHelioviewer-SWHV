@@ -41,48 +41,48 @@ class GridMath {
 
     static void initAxes(GL2 gl, GLSLPolyline axesLine) {
         int plen = 8;
-        FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(plen * 3);
+        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(plen * 3);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(plen * 4);
 
-        BufferUtils.put3f(positionBuffer, 0, -AXIS_STOP, 0);
+        BufferUtils.put3f(vertexBuffer, 0, -AXIS_STOP, 0);
         colorBuffer.put(BufferUtils.colorNull);
-        BufferUtils.put3f(positionBuffer, 0, -AXIS_STOP, 0);
+        BufferUtils.put3f(vertexBuffer, 0, -AXIS_STOP, 0);
         colorBuffer.put(axisSouthColor);
-        BufferUtils.put3f(positionBuffer, 0, -AXIS_START, 0);
+        BufferUtils.put3f(vertexBuffer, 0, -AXIS_START, 0);
         colorBuffer.put(axisSouthColor);
 
-        BufferUtils.put3f(positionBuffer, 0, -AXIS_START, 0);
+        BufferUtils.put3f(vertexBuffer, 0, -AXIS_START, 0);
         colorBuffer.put(BufferUtils.colorNull);
-        BufferUtils.put3f(positionBuffer, 0, AXIS_START, 0);
-        colorBuffer.put(BufferUtils.colorNull);
-
-        BufferUtils.put3f(positionBuffer, 0, AXIS_START, 0);
-        colorBuffer.put(axisNorthColor);
-        BufferUtils.put3f(positionBuffer, 0, AXIS_STOP, 0);
-        colorBuffer.put(axisNorthColor);
-        BufferUtils.put3f(positionBuffer, 0, AXIS_STOP, 0);
+        BufferUtils.put3f(vertexBuffer, 0, AXIS_START, 0);
         colorBuffer.put(BufferUtils.colorNull);
 
-        positionBuffer.rewind();
+        BufferUtils.put3f(vertexBuffer, 0, AXIS_START, 0);
+        colorBuffer.put(axisNorthColor);
+        BufferUtils.put3f(vertexBuffer, 0, AXIS_STOP, 0);
+        colorBuffer.put(axisNorthColor);
+        BufferUtils.put3f(vertexBuffer, 0, AXIS_STOP, 0);
+        colorBuffer.put(BufferUtils.colorNull);
+
+        vertexBuffer.rewind();
         colorBuffer.rewind();
-        axesLine.setData(gl, positionBuffer, colorBuffer);
+        axesLine.setData(gl, vertexBuffer, colorBuffer);
     }
 
     static void initEarthPoint(GL2 gl, GLSLShape earthPoint) {
-        FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(4);
+        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(4);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4);
 
-        BufferUtils.put4f(positionBuffer, 0, 0, (float) (EARTH_CIRCLE_RADIUS + 0.006), earthPointSize);
+        BufferUtils.put4f(vertexBuffer, 0, 0, (float) (EARTH_CIRCLE_RADIUS + 0.006), earthPointSize);
         colorBuffer.put(earthLineColor);
 
-        positionBuffer.rewind();
+        vertexBuffer.rewind();
         colorBuffer.rewind();
-        earthPoint.setData(gl, positionBuffer, colorBuffer);
+        earthPoint.setData(gl, vertexBuffer, colorBuffer);
     }
 
     static void initEarthCircles(GL2 gl, GLSLPolyline earthCircleLine) {
         int no_points = 2 * (SUBDIVISIONS + 3);
-        FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(no_points * 3);
+        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(no_points * 3);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
 
         Vec3 rotv = new Vec3(), v = new Vec3();
@@ -93,14 +93,14 @@ class GridMath {
             v.z = 0.;
             rotv = q.rotateVector(v);
             if (i == 0) {
-                BufferUtils.put3f(positionBuffer, rotv);
+                BufferUtils.put3f(vertexBuffer, rotv);
                 colorBuffer.put(BufferUtils.colorNull);
             }
-            BufferUtils.put3f(positionBuffer, rotv);
+            BufferUtils.put3f(vertexBuffer, rotv);
             colorBuffer.put(earthLineColor);
         }
 
-        BufferUtils.put3f(positionBuffer, rotv);
+        BufferUtils.put3f(vertexBuffer, rotv);
         colorBuffer.put(BufferUtils.colorNull);
 
         v = new Vec3();
@@ -111,25 +111,25 @@ class GridMath {
             v.z = 0.;
             rotv = q.rotateVector(v);
             if (i == 0) {
-                BufferUtils.put3f(positionBuffer, rotv);
+                BufferUtils.put3f(vertexBuffer, rotv);
                 colorBuffer.put(BufferUtils.colorNull);
             }
-            BufferUtils.put3f(positionBuffer, rotv);
+            BufferUtils.put3f(vertexBuffer, rotv);
             colorBuffer.put(earthLineColor);
         }
 
-        BufferUtils.put3f(positionBuffer, rotv);
+        BufferUtils.put3f(vertexBuffer, rotv);
         colorBuffer.put(BufferUtils.colorNull);
 
-        positionBuffer.rewind();
+        vertexBuffer.rewind();
         colorBuffer.rewind();
-        earthCircleLine.setData(gl, positionBuffer, colorBuffer);
+        earthCircleLine.setData(gl, vertexBuffer, colorBuffer);
     }
 
     static void initRadialCircles(GL2 gl, GLSLPolyline radialCircleLine, GLSLPolyline radialThickLine, double unit, double step) {
         int no_lines = (int) Math.ceil(360 / step);
         int no_points = (END_RADIUS - START_RADIUS + 1 - TENS_RADIUS) * (SUBDIVISIONS + 3) + 4 * no_lines;
-        FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(no_points * 3);
+        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(no_points * 3);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
         FloatBuffer positionThick = BufferUtils.newFloatBuffer(TENS_RADIUS * (SUBDIVISIONS + 3) * 3);
         FloatBuffer colorThick = BufferUtils.newFloatBuffer(TENS_RADIUS * (SUBDIVISIONS + 3) * 4);
@@ -153,13 +153,13 @@ class GridMath {
                     }
                 } else {
                     if (j == 0) {
-                        BufferUtils.put3f(positionBuffer, v);
+                        BufferUtils.put3f(vertexBuffer, v);
                         colorBuffer.put(BufferUtils.colorNull);
                     }
-                    BufferUtils.put3f(positionBuffer, v);
+                    BufferUtils.put3f(vertexBuffer, v);
                     colorBuffer.put(radialLineColor);
                     if (j == SUBDIVISIONS) {
-                        BufferUtils.put3f(positionBuffer, v);
+                        BufferUtils.put3f(vertexBuffer, v);
                         colorBuffer.put(BufferUtils.colorNull);
                     }
                 }
@@ -173,24 +173,24 @@ class GridMath {
 
             v.set(START_RADIUS * unit, 0, 0);
             Vec3 rotv1 = q.rotateVector(v);
-            BufferUtils.put3f(positionBuffer, rotv1);
+            BufferUtils.put3f(vertexBuffer, rotv1);
             colorBuffer.put(BufferUtils.colorNull);
-            BufferUtils.put3f(positionBuffer, rotv1);
+            BufferUtils.put3f(vertexBuffer, rotv1);
             colorBuffer.put(radialLineColor);
 
             v.set(END_RADIUS * unit, 0, 0);
             Vec3 rotv2 = q.rotateVector(v);
-            BufferUtils.put3f(positionBuffer, rotv2);
+            BufferUtils.put3f(vertexBuffer, rotv2);
             colorBuffer.put(radialLineColor);
-            BufferUtils.put3f(positionBuffer, rotv2);
+            BufferUtils.put3f(vertexBuffer, rotv2);
             colorBuffer.put(BufferUtils.colorNull);
         }
-        positionBuffer.rewind();
+        vertexBuffer.rewind();
         colorBuffer.rewind();
         positionThick.rewind();
         colorThick.rewind();
 
-        radialCircleLine.setData(gl, positionBuffer, colorBuffer);
+        radialCircleLine.setData(gl, vertexBuffer, colorBuffer);
         radialThickLine.setData(gl, positionThick, colorThick);
     }
 
@@ -199,15 +199,15 @@ class GridMath {
         float h = 1;
 
         int plen = 4 * ((FLAT_STEPS_THETA + 1) + (FLAT_STEPS_RADIAL + 1));
-        FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(plen * 3);
+        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(plen * 3);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(plen * 4);
 
         for (int i = 0; i <= FLAT_STEPS_THETA; i++) {
             float start = -w / 2 + i * w / FLAT_STEPS_THETA;
-            BufferUtils.put3f(positionBuffer, start, -h / 2, 0);
+            BufferUtils.put3f(vertexBuffer, start, -h / 2, 0);
             colorBuffer.put(BufferUtils.colorNull);
 
-            BufferUtils.put3f(positionBuffer, start, -h / 2, 0);
+            BufferUtils.put3f(vertexBuffer, start, -h / 2, 0);
             if (i == FLAT_STEPS_THETA / 2) {
                 colorBuffer.put(color2);
                 colorBuffer.put(color2);
@@ -215,17 +215,17 @@ class GridMath {
                 colorBuffer.put(color1);
                 colorBuffer.put(color1);
             }
-            BufferUtils.put3f(positionBuffer, start, h / 2, 0);
+            BufferUtils.put3f(vertexBuffer, start, h / 2, 0);
 
-            BufferUtils.put3f(positionBuffer, start, h / 2, 0);
+            BufferUtils.put3f(vertexBuffer, start, h / 2, 0);
             colorBuffer.put(BufferUtils.colorNull);
         }
         for (int i = 0; i <= FLAT_STEPS_RADIAL; i++) {
             float start = -h / 2 + i * h / FLAT_STEPS_RADIAL;
-            BufferUtils.put3f(positionBuffer, -w / 2, start, 0);
+            BufferUtils.put3f(vertexBuffer, -w / 2, start, 0);
             colorBuffer.put(BufferUtils.colorNull);
 
-            BufferUtils.put3f(positionBuffer, -w / 2, start, 0);
+            BufferUtils.put3f(vertexBuffer, -w / 2, start, 0);
             if (i == FLAT_STEPS_RADIAL / 2) {
                 colorBuffer.put(color2);
                 colorBuffer.put(color2);
@@ -233,14 +233,14 @@ class GridMath {
                 colorBuffer.put(color1);
                 colorBuffer.put(color1);
             }
-            BufferUtils.put3f(positionBuffer, w / 2, start, 0);
+            BufferUtils.put3f(vertexBuffer, w / 2, start, 0);
 
-            BufferUtils.put3f(positionBuffer, w / 2, start, 0);
+            BufferUtils.put3f(vertexBuffer, w / 2, start, 0);
             colorBuffer.put(BufferUtils.colorNull);
         }
-        positionBuffer.rewind();
+        vertexBuffer.rewind();
         colorBuffer.rewind();
-        flatLine.setData(gl, positionBuffer, colorBuffer);
+        flatLine.setData(gl, vertexBuffer, colorBuffer);
     }
 
     static void initGrid(GL2 gl, GLSLPolyline gridLine, double lonstepDegrees, double latstepDegrees) {
