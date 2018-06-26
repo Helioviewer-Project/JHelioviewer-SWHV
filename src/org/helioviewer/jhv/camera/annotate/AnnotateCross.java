@@ -60,16 +60,21 @@ public class AnnotateCross extends AbstractAnnotateable {
                 }
                 pos.put3f((float) pc.x, (float) pc.y, (float) pc.z);
                 col.put4f(color);
+                if (i == SUBDIVISIONS) {
+                    pos.put3f((float) pc.x, (float) pc.y, (float) pc.z);
+                    col.put4f(BufferUtils.colorNull);
+                }
             } else {
                 pc.y = -pc.y;
                 if (i == 0) {
                     GLHelper.drawVertex(camera, vp, pc, previous, pos, col, BufferUtils.colorNull);
                 }
                 previous = GLHelper.drawVertex(camera, vp, pc, previous, pos, col, color);
+                if (i == SUBDIVISIONS) {
+                    GLHelper.drawVertex(camera, vp, pc, previous, pos, col, BufferUtils.colorNull);
+                }
             }
         }
-        pos.repeat3f();
-        col.put4f(BufferUtils.colorNull);
     }
 
     @Override
