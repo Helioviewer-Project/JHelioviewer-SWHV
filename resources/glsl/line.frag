@@ -1,5 +1,7 @@
-#version 120
-varying vec4 frag_color;
+#version 150 core
+
+in vec4 frag_color;
+out vec4 FragColor;
 
 //uniform vec3 viewport;
 //uniform vec2 viewportOffset;
@@ -10,5 +12,5 @@ void main(void) {
 
     // vec2 ndcPos = 2. * (gl_FragCoord.xy - viewportOffset) / viewport.xy - 1.;
 
-    gl_FragColor = frag_color;
+    FragColor = frag_color;
 }
