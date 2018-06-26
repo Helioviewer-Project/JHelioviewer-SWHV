@@ -1,11 +1,12 @@
-#version 120
-attribute vec3 previous;
-attribute vec3 current;
-attribute vec3 next;
-attribute float direction;
-attribute vec4 color;
+#version 150 core
 
-varying vec4 frag_color;
+in vec3 previous;
+in vec3 current;
+in vec3 next;
+in float direction;
+in vec4 color;
+
+out vec4 frag_color;
 
 uniform float thickness;
 uniform vec3 viewport;

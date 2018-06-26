@@ -1,10 +1,13 @@
-#version 120
+#version 150 core
+
 #define NODIFFERENCE 0
 #define PI 3.1415926535897932384626433832795
 #define TWOPI 2.*PI
 
 #define BOOST 1. / (0.2 * 2.)
 #define FSIZE 3
+
+out vec4 FragColor;
 
 uniform sampler2D image;
 uniform int isdifference;
@@ -39,7 +42,7 @@ uniform vec2 cutOffRadius;
 uniform vec2 polarRadii;
 
 float fetch(sampler2D tex, vec2 coord, vec3 bright) {
-    return /*pow(texture2D(tex, coord).r, bright.z)*/ texture2D(tex, coord).r * bright.y + bright.x;
+    return /*pow(texture2D(tex, coord).r, bright.z)*/ texture(tex, coord).r * bright.y + bright.x;
 }
 
 vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
@@ -72,7 +75,7 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
     }
     v = mix(v, conv, sharpen.z);
 
-    return texture1D(lut, v) * color;
+    return texture(lut, v) * color;
 }
 
 void clamp_texcoord(const vec2 texcoord) {

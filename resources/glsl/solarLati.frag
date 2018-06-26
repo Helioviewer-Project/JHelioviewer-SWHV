@@ -47,5 +47,5 @@ void main(void) {
         get_lati_texcoord(hglnDiff, hgltDiff, crotaDiff, scrpos, differencerect, difftexcoord);
         color = getColor(texcoord, difftexcoord, 1);
     }
-    gl_FragColor = color;
+    FragColor = color;
 }
