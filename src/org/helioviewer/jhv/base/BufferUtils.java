@@ -36,22 +36,15 @@ public class BufferUtils {
     }
 
     public static void put3f(FloatBuffer buf, float x, float y, float z) {
-        buf.put(x);
-        buf.put(y);
-        buf.put(z);
+        buf.put(x).put(y).put(z);
     }
 
     public static void put3f(FloatBuffer buf, Vec3 v) {
-        buf.put((float) v.x);
-        buf.put((float) v.y);
-        buf.put((float) v.z);
+        buf.put((float) v.x).put((float) v.y).put((float) v.z);
     }
 
     public static void put4f(FloatBuffer buf, float x, float y, float z, float w) {
-        buf.put(x);
-        buf.put(y);
-        buf.put(z);
-        buf.put(w);
+        buf.put(x).put(y).put(z).put(w);
     }
 
 }
