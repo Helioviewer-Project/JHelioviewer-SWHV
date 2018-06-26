@@ -7,7 +7,6 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
-import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLPolyline;
 import org.helioviewer.jhv.opengl.GLSLShape;
 
@@ -40,11 +39,13 @@ class GridMath {
     static final int FLAT_STEPS_THETA = 24;
     static final int FLAT_STEPS_RADIAL = 10;
 
-    static void initAxes(GL2 gl, GLSLLine axesLine) {
-        int plen = 6;
+    static void initAxes(GL2 gl, GLSLPolyline axesLine) {
+        int plen = 8;
         FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(plen * 3);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(plen * 4);
 
+        BufferUtils.put3f(positionBuffer, 0, -AXIS_STOP, 0);
+        colorBuffer.put(BufferUtils.colorNull);
         BufferUtils.put3f(positionBuffer, 0, -AXIS_STOP, 0);
         colorBuffer.put(axisSouthColor);
         BufferUtils.put3f(positionBuffer, 0, -AXIS_START, 0);
@@ -59,6 +60,8 @@ class GridMath {
         colorBuffer.put(axisNorthColor);
         BufferUtils.put3f(positionBuffer, 0, AXIS_STOP, 0);
         colorBuffer.put(axisNorthColor);
+        BufferUtils.put3f(positionBuffer, 0, AXIS_STOP, 0);
+        colorBuffer.put(BufferUtils.colorNull);
 
         positionBuffer.rewind();
         colorBuffer.rewind();
@@ -77,7 +80,7 @@ class GridMath {
         earthPoint.setData(gl, positionBuffer, colorBuffer);
     }
 
-    static void initEarthCircles(GL2 gl, GLSLLine earthCircleLine) {
+    static void initEarthCircles(GL2 gl, GLSLPolyline earthCircleLine) {
         int no_points = 2 * (SUBDIVISIONS + 3);
         FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(no_points * 3);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
@@ -123,7 +126,7 @@ class GridMath {
         earthCircleLine.setData(gl, positionBuffer, colorBuffer);
     }
 
-    static void initRadialCircles(GL2 gl, GLSLLine radialCircleLine, GLSLLine radialThickLine, double unit, double step) {
+    static void initRadialCircles(GL2 gl, GLSLPolyline radialCircleLine, GLSLPolyline radialThickLine, double unit, double step) {
         int no_lines = (int) Math.ceil(360 / step);
         int no_points = (END_RADIUS - START_RADIUS + 1 - TENS_RADIUS) * (SUBDIVISIONS + 3) + 4 * no_lines;
         FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(no_points * 3);
@@ -191,7 +194,7 @@ class GridMath {
         radialThickLine.setData(gl, positionThick, colorThick);
     }
 
-    static void initFlatGrid(GL2 gl, GLSLLine flatLine, double aspect) {
+    static void initFlatGrid(GL2 gl, GLSLPolyline flatLine, double aspect) {
         float w = (float) aspect;
         float h = 1;
 
