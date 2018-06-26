@@ -9,7 +9,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.helioviewer.jhv.opengl.GLSLLine;
+import org.helioviewer.jhv.opengl.GLSLPolyline;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -18,7 +18,7 @@ public class AnnotateCross extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 2;
 
-    private final GLSLLine line = new GLSLLine();
+    private final GLSLPolyline line = new GLSLPolyline();
 
     public AnnotateCross(JSONObject jo) {
         super(jo);
@@ -63,7 +63,7 @@ public class AnnotateCross extends AbstractAnnotateable {
             } else {
                 pc.y = -pc.y;
                 if (i == 0) {
-                    previous = GLHelper.drawVertex(camera, vp, pc, previous, pos, col, BufferUtils.colorNull);
+                    GLHelper.drawVertex(camera, vp, pc, previous, pos, col, BufferUtils.colorNull);
                 }
                 previous = GLHelper.drawVertex(camera, vp, pc, previous, pos, col, color);
             }
@@ -83,7 +83,7 @@ public class AnnotateCross extends AbstractAnnotateable {
         FloatArray col = new FloatArray();
 
         drawCross(camera, vp, toSpherical(startPoint), pos, col, color);
-        line.setData(gl, pos, col);
+        line.setData(gl, pos.toBuffer(), col.toBuffer());
 //      gl.glDisable(GL2.GL_DEPTH_TEST);
         line.render(gl, vp, thickness);
 //      gl.glEnable(GL2.GL_DEPTH_TEST);

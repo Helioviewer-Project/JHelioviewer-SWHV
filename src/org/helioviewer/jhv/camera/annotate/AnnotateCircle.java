@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.camera.annotate;
 
+import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.FloatArray;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
@@ -8,7 +9,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.helioviewer.jhv.opengl.GLSLLine;
+import org.helioviewer.jhv.opengl.GLSLPolyline;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -17,7 +18,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 90;
 
-    private final GLSLLine line = new GLSLLine();
+    private final GLSLPolyline line = new GLSLPolyline();
 
     public AnnotateCircle(JSONObject jo) {
         super(jo);
@@ -56,13 +57,22 @@ public class AnnotateCircle extends AbstractAnnotateable {
             vx.y = center.y + cosr * u.y + sinr * v.y;
             vx.z = center.z + cosr * u.z + sinr * v.z;
             if (Display.mode == Display.DisplayMode.Orthographic) {
+                if (i == 0) {
+                    pos.put3f((float) vx.x, (float) vx.y, (float) vx.z);
+                    col.put4f(BufferUtils.colorNull);
+                }
                 pos.put3f((float) vx.x, (float) vx.y, (float) vx.z);
                 col.put4f(color);
             } else {
                 vx.y = -vx.y;
+                if (i == 0) {
+                    GLHelper.drawVertex(camera, vp, vx, previous, pos, col, BufferUtils.colorNull);
+                }
                 previous = GLHelper.drawVertex(camera, vp, vx, previous, pos, col, color);
             }
         }
+        pos.repeat3f();
+        col.put4f(BufferUtils.colorNull);
     }
 
     @Override
@@ -79,7 +89,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
         FloatArray col = new FloatArray();
 
         drawCircle(camera, vp, p0, p1, pos, col, color);
-        line.setData(gl, pos, col);
+        line.setData(gl, pos.toBuffer(), col.toBuffer());
         line.render(gl, vp, thickness);
     }
 
