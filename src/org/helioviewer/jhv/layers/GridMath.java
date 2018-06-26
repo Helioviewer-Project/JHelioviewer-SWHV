@@ -8,6 +8,7 @@ import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLSLLine;
+import org.helioviewer.jhv.opengl.GLSLPolyline;
 import org.helioviewer.jhv.opengl.GLSLShape;
 
 import com.jogamp.opengl.GL2;
@@ -239,13 +240,13 @@ class GridMath {
         flatLine.setData(gl, positionBuffer, colorBuffer);
     }
 
-    static void initGrid(GL2 gl, GLSLLine gridLine, double lonstepDegrees, double latstepDegrees) {
+    static void initGrid(GL2 gl, GLSLPolyline gridLine, double lonstepDegrees, double latstepDegrees) {
         int no_lon_steps = ((int) Math.ceil(360 / lonstepDegrees)) / 2 + 1;
         int no_lat_steps = ((int) Math.ceil(180 / latstepDegrees)) / 2;
         int HALFDIVISIONS = SUBDIVISIONS / 2;
 
         int no_points = 2 * (no_lat_steps + no_lon_steps) * (HALFDIVISIONS + 3);
-        FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(no_points * 3);
+        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(no_points * 3);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
 
         Vec3 v = new Vec3();
@@ -261,13 +262,13 @@ class GridMath {
                     Vec3 rotv = q.rotateVector(v);
 
                     if (i == 0) {
-                        BufferUtils.put3f(positionBuffer, rotv);
+                        BufferUtils.put3f(vertexBuffer, rotv);
                         colorBuffer.put(BufferUtils.colorNull);
                     }
-                    BufferUtils.put3f(positionBuffer, rotv);
+                    BufferUtils.put3f(vertexBuffer, rotv);
                     colorBuffer.put(i % 2 == 0 ? color1 : color2);
                     if (i == HALFDIVISIONS) {
-                        BufferUtils.put3f(positionBuffer, rotv);
+                        BufferUtils.put3f(vertexBuffer, rotv);
                         colorBuffer.put(BufferUtils.colorNull);
                     }
                 }
@@ -284,22 +285,22 @@ class GridMath {
                     v.z = GRID_RADIUS * Math.sqrt(1. - scale * scale) * Math.cos(2 * Math.PI * i / HALFDIVISIONS);
 
                     if (i == 0) {
-                        BufferUtils.put3f(positionBuffer, v);
+                        BufferUtils.put3f(vertexBuffer, v);
                         colorBuffer.put(BufferUtils.colorNull);
                     }
-                    BufferUtils.put3f(positionBuffer, v);
+                    BufferUtils.put3f(vertexBuffer, v);
                     colorBuffer.put(i % 2 == 0 ? color1 : color2);
                     if (i == HALFDIVISIONS) {
-                        BufferUtils.put3f(positionBuffer, v);
+                        BufferUtils.put3f(vertexBuffer, v);
                         colorBuffer.put(BufferUtils.colorNull);
                     }
                 }
             }
         }
 
-        positionBuffer.rewind();
+        vertexBuffer.rewind();
         colorBuffer.rewind();
-        gridLine.setData(gl, positionBuffer, colorBuffer);
+        gridLine.setData(gl, vertexBuffer, colorBuffer);
     }
 
 }

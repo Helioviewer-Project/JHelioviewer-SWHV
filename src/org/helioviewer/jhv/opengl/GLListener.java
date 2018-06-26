@@ -56,8 +56,10 @@ public class GLListener implements GLEventListener {
 
         gl.glEnable(GL2.GL_VERTEX_PROGRAM_POINT_SIZE);
         gl.glEnable(GL2.GL_POINT_SPRITE);
+
         GLSLSolarShader.init(gl);
         GLSLLineShader.init(gl);
+        GLSLPolylineShader.init(gl);
         GLSLShapeShader.init(gl);
         GLSLTextureShader.init(gl);
 
@@ -81,6 +83,7 @@ public class GLListener implements GLEventListener {
 
         GLSLSolarShader.dispose(gl);
         GLSLLineShader.dispose(gl);
+        GLSLPolylineShader.dispose(gl);
         GLSLShapeShader.dispose(gl);
         GLSLTextureShader.dispose(gl);
     }
@@ -191,6 +194,7 @@ public class GLListener implements GLEventListener {
         renderFullFloatScene(camera, gl);
 
         ImageViewerGui.getZoomStatusPanel().update(camera.getWidth(), camera.getViewpoint().distance);
+        // GLInfo.checkGLErrors(gl, "GLListener.display()");
     }
 
 }
