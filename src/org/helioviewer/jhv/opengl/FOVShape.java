@@ -17,10 +17,10 @@ public class FOVShape {
 
     private final FloatBuffer pointPosition = BufferUtils.newFloatBuffer(4);
     private final FloatBuffer pointColor = BufferUtils.newFloatBuffer(4);
-    private final FloatBuffer linePosition = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2)) * 3);
-    private final FloatBuffer lineColor = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2)) * 4);
+    private final FloatBuffer linePosition = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2) + 1) * 3);
+    private final FloatBuffer lineColor = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2) + 1) * 4);
 
-    private final GLSLLine line = new GLSLLine();
+    private final GLSLPolyline line = new GLSLPolyline();
     private final GLSLShape point = new GLSLShape();
 
     private double centerX = 0;
@@ -110,6 +110,10 @@ public class FOVShape {
             }
             BufferUtils.put3f(linePosition, (float) x, (float) y, (float) z);
             lineColor.put(i % 2 == 0 ? color : BufferUtils.colorWhite);
+            if (i == SUBDIVISIONS) {
+                BufferUtils.put3f(linePosition, (float) x, (float) y, (float) z);
+                lineColor.put(BufferUtils.colorNull);
+            }
         }
 
         linePosition.rewind();
