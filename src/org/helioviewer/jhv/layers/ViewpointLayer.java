@@ -37,11 +37,11 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
     private static final double DELTA_ORBIT = 10 * 60 * 1000 * Sun.MeanEarthDistanceInv;
     private static final double DELTA_CUTOFF = 3 * Sun.MeanEarthDistance;
-    private static final double fovThickness = 2;
-    private static final double orbitThickness = 2;
-    private static final float planetSize = 5f;
+    private static final double LINEWIDTH_FOV = 1;
+    private static final double LINEWIDTH_ORBIT = 1;
+    private static final float SIZE_PLANET = 5;
 
-    private final FOVShape fov = new FOVShape(fovThickness);
+    private final FOVShape fov = new FOVShape(LINEWIDTH_FOV);
     private final GLSLPolyline orbits = new GLSLPolyline();
     private final GLSLShape planets = new GLSLShape();
     private final ViewpointLayerOptions optionsPanel;
@@ -279,13 +279,13 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
             response.getInterpolated(xyz, time, start, end);
             planetPosition.put(xyz);
-            planetPosition.put(planetSize);
+            planetPosition.put(SIZE_PLANET);
             planetColor.put(color);
         }
 
         if (orbitPosition.length() >= 2 * 3) {
             orbits.setData(gl, orbitPosition.toBuffer(), orbitColor.toBuffer());
-            orbits.render(gl, vp, orbitThickness);
+            orbits.render(gl, vp, LINEWIDTH_ORBIT);
         }
 
         planetPosition.rewind();

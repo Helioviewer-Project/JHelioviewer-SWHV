@@ -17,7 +17,7 @@ import com.jogamp.opengl.GL2;
 
 public class AnnotateFOV extends AbstractAnnotateable {
 
-    private final FOVShape fov = new FOVShape(thickness);
+    private final FOVShape fov = new FOVShape(LINEWIDTH);
 
     public AnnotateFOV(JSONObject jo) {
         super(jo);

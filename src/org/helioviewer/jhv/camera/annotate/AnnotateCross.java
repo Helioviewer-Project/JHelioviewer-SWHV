@@ -87,7 +87,7 @@ public class AnnotateCross extends AbstractAnnotateable {
         drawCross(camera, vp, toSpherical(startPoint), pos, col, color);
         line.setData(gl, pos.toBuffer(), col.toBuffer());
 //      gl.glDisable(GL2.GL_DEPTH_TEST);
-        line.render(gl, vp, thickness);
+        line.render(gl, vp, LINEWIDTH);
 //      gl.glEnable(GL2.GL_DEPTH_TEST);
     }
 
