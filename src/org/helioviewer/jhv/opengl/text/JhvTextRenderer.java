@@ -565,7 +565,7 @@ public class JhvTextRenderer {
             // Query OpenGL for the maximum texture size and set it in the
             // RectanglePacker to keep it from expanding too large
             final int[] sz = new int[1];
-            gl.glGetIntegerv(GL.GL_MAX_TEXTURE_SIZE, sz, 0);
+            gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_SIZE, sz, 0);
             packer.setMaxSize(sz[0], sz[0]);
             haveMaxSize = true;
         }
