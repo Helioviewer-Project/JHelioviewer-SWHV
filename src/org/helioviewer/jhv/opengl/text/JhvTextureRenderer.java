@@ -283,7 +283,7 @@ class JhvTextureRenderer {
   private void beginRendering(final boolean ortho, final int width, final int height) {
     final GL2 gl = (GL2) GLContext.getCurrentGL();
     if (ortho) {
-      gl.glDisable(GL.GL_DEPTH_TEST);
+      gl.glDisable(GL2.GL_DEPTH_TEST);
 
       Transform.pushProjection();
       Transform.setOrthoProjection(0, width, 0, height, -1, 1);
@@ -298,15 +298,15 @@ class JhvTextureRenderer {
     if (smoothingChanged) {
       smoothingChanged = false;
       if (smoothing) {
-        texture.setTexParameteri(gl, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+        texture.setTexParameteri(gl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
         if (mipmap) {
-          texture.setTexParameteri(gl, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR_MIPMAP_LINEAR);
+          texture.setTexParameteri(gl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR_MIPMAP_LINEAR);
         } else {
-          texture.setTexParameteri(gl, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+          texture.setTexParameteri(gl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
         }
       } else {
-        texture.setTexParameteri(gl, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
-        texture.setTexParameteri(gl, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
+        texture.setTexParameteri(gl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST);
+        texture.setTexParameteri(gl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
       }
     }
   }
@@ -316,7 +316,7 @@ class JhvTextureRenderer {
     final Texture texture = getTexture();
     texture.disable(gl);
     if (ortho) {
-      gl.glEnable(GL.GL_DEPTH_TEST);
+      gl.glEnable(GL2.GL_DEPTH_TEST);
 
       Transform.popView();
       Transform.popProjection();
@@ -375,7 +375,7 @@ class JhvTextureRenderer {
 
   // Returns true if the texture was newly allocated, false if not
   private boolean ensureTexture() {
-    final GL gl = GLContext.getCurrentGL();
+    final GL2 gl = (GL2) GLContext.getCurrentGL();
     if (mustReallocateTexture) {
       if (texture != null) {
         texture.destroy(gl);
@@ -396,8 +396,8 @@ class JhvTextureRenderer {
 
       if (!smoothing) {
         // The TextureIO classes default to GL_LINEAR filtering
-        texture.setTexParameteri(gl, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
-        texture.setTexParameteri(gl, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
+        texture.setTexParameteri(gl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST);
+        texture.setTexParameteri(gl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
       }
       return true;
     }
