@@ -58,9 +58,8 @@ class GLSLPolylineShader extends GLSLShader {
         gl.glUniform1fv(miterLimitRef, 1, miterLimit, 0);
     }
 
-    void bindViewport(GL2 gl, float offsetX, float offsetY, float width, float height) {
-        viewport[0] = width;
-        viewport[1] = height;
+    void bindViewport(GL2 gl, double aspect) {
+        viewport[0] = (float) aspect;
         gl.glUniform2fv(viewportRef, 1, viewport, 0);
     }
 

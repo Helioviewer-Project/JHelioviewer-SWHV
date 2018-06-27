@@ -24,7 +24,7 @@ import com.jogamp.opengl.GL2;
 // has to be public for state
 public class PfssLayer extends AbstractLayer implements TimespanListener {
 
-    private static final double LINEWIDTH = 1;
+    private static final double LINEWIDTH = 0.002;
 
     private final PfssLayerOptions optionsPanel;
     private final PfssLine pfssLine = new PfssLine();
