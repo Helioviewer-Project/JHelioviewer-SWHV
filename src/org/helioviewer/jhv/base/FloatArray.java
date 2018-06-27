@@ -47,10 +47,6 @@ public class FloatArray {
         put3f(arr[len - 3], arr[len - 2], arr[len - 1]);
     }
 
-    public float[] toArray() {
-        return arr;
-    }
-
     public FloatBuffer toBuffer() {
         FloatBuffer buf = BufferUtils.newFloatBuffer(len);
         buf.put(arr, 0, len);
