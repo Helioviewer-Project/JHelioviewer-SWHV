@@ -17,7 +17,7 @@ class GLSLPolylineShader extends GLSLShader {
     private int viewportRef;
     private int miterLimitRef;
 
-    private final float[] thickness = { 5f };
+    private final float[] thickness = { 5 };
     private final float[] viewport = new float[2];
     private final float[] miterLimit = { 0.1f };
 

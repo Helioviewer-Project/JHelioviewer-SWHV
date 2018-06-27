@@ -10,7 +10,6 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.FOVShape;
-import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.position.Position;
 import org.json.JSONObject;
 
@@ -60,7 +59,7 @@ public class AnnotateFOV extends AbstractAnnotateable {
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
 
-        double pointFactor = GLInfo.pixelScale[0] / (2 * camera.getFOV());
+        double pointFactor = vp.height / (2 * camera.getWidth()) / 4;
         Position viewpoint = camera.getViewpoint();
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
