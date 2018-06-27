@@ -429,7 +429,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     private static final int MOUSE_OFFSET_X = 25;
     private static final int MOUSE_OFFSET_Y = 25;
 
-    private void drawText(Viewport vp, GL2 gl, JHVRelatedEvents mouseOverJHVEvent, int x, int y) {
+    private void drawText(Viewport vp, JHVRelatedEvents mouseOverJHVEvent, int x, int y) {
         ArrayList<String> txts = new ArrayList<>();
         for (JHVEventParameter p : mouseOverJHVEvent.getClosestTo(controller.currentTime).getSimpleVisibleEventParameters()) {
             String name = p.getParameterName();
@@ -437,7 +437,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                 txts.add(p.getParameterDisplayName() + " : " + p.getSimpleDisplayParameterValue());
             }
         }
-        GLText.drawText(gl, vp, txts, x + MOUSE_OFFSET_X, y + MOUSE_OFFSET_Y);
+        GLText.drawText(vp, txts, x + MOUSE_OFFSET_X, y + MOUSE_OFFSET_Y);
     }
 
     @Override
@@ -481,7 +481,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     @Override
     public void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
         if (SWEKPopupController.mouseOverJHVEvent != null) {
-            drawText(vp, gl, SWEKPopupController.mouseOverJHVEvent, SWEKPopupController.mouseOverX, SWEKPopupController.mouseOverY);
+            drawText(vp, SWEKPopupController.mouseOverJHVEvent, SWEKPopupController.mouseOverX, SWEKPopupController.mouseOverY);
         }
     }
 

@@ -92,7 +92,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
     @Override
     public void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
-        GLText.drawText(gl, vp, text, mouseX + MOUSE_OFFSET_X, mouseY + MOUSE_OFFSET_Y);
+        GLText.drawText(vp, text, mouseX + MOUSE_OFFSET_X, mouseY + MOUSE_OFFSET_Y);
     }
 
     @Override

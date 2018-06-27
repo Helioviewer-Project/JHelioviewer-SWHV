@@ -19,13 +19,13 @@ public class Vec3 {
         y = _y;
         z = _z;
     }
-
+/*
     public Vec3(Vec2 vec) {
         x = vec.x;
         y = vec.y;
         z = 0;
     }
-
+*/
     public Vec3(Vec3 vec) {
         x = vec.x;
         y = vec.y;
@@ -124,7 +124,7 @@ public class Vec3 {
             z = 0;
         }
     }
-
+/*
     public final double[] toArray() {
         return new double[] { x, y, z };
     }
@@ -143,7 +143,7 @@ public class Vec3 {
         }
         return arr;
     }
-
+*/
     @Override
     public String toString() {
         return toJson().toString();
