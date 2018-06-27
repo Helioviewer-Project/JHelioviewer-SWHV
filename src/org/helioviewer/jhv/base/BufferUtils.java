@@ -18,6 +18,7 @@ public class BufferUtils {
     public static final float[] colorBlue = {Color.BLUE.getRed() / 255f, Color.BLUE.getGreen() / 255f, Color.BLUE.getBlue() / 255f, 1};
     public static final float[] colorWhite = {Color.WHITE.getRed() / 255f, Color.WHITE.getGreen() / 255f, Color.WHITE.getBlue() / 255f, 1};
     public static final float[] colorYellow = {Color.YELLOW.getRed() / 255f, Color.YELLOW.getGreen() / 255f, Color.YELLOW.getBlue() / 255f, 1};
+    public static final float[] colorDarkGray = {Color.DARK_GRAY.getRed() / 255f, Color.DARK_GRAY.getGreen() / 255f, Color.DARK_GRAY.getBlue() / 255f, 1f};
 
     public static ByteBuffer newByteBuffer(int len) {
         return ByteBuffer.allocateDirect(len).order(ByteOrder.nativeOrder());
