@@ -20,7 +20,6 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.FOVShape;
-import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLSLPolyline;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
@@ -292,7 +291,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         planetPosition.rewind();
         planetColor.rewind();
         planets.setData(gl, planetPosition, planetColor);
-        planets.renderPoints(gl, GLInfo.pixelScale[0]);
+        planets.renderPoints(gl, 1);
     }
 
 }
