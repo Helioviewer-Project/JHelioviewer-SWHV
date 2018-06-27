@@ -19,7 +19,7 @@ abstract class AbstractAnnotateable implements Annotateable {
     static final float[] dragColor = BufferUtils.colorYellow;
     static final float[] baseColor = BufferUtils.colorBlue;
 
-    static final double thickness = 2;
+    static final double LINEWIDTH = 1;
     static final double radius = Sun.Radius * 1.01;
 
     Vec3 startPoint;

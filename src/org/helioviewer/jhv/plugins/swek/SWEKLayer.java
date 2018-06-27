@@ -57,9 +57,9 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     private final JPanel optionsPanel;
 
     private static final int DIVPOINTS = 10;
-    private static final double LINEWIDTH = 2;
-    private static final double LINEWIDTH_HIGHLIGHT = 3;
-    private static final double LINEWIDTH_CACTUS = 3;
+    private static final double LINEWIDTH = 1;
+    private static final double LINEWIDTH_HIGHLIGHT = 1.5;
+    private static final double LINEWIDTH_CACTUS = 1;
 
     private static final HashMap<String, GLTexture> iconCacheId = new HashMap<>();
     private static final double ICON_SIZE = 0.1;
