@@ -68,7 +68,7 @@ public class FOVShape {
             x = -bw + 2 * bw / SUBDIVISIONS * i + centerX;
             y = bh + centerY;
             z = computeZ(x, y);
-            if (i == 0) {
+            if (i == 0) { // first
                 BufferUtils.put3f(linePosition, (float) x, (float) y, (float) z);
                 lineColor.put(BufferUtils.colorNull);
             }
@@ -80,10 +80,6 @@ public class FOVShape {
             x = bw + centerX;
             y = bh - 2 * bh / SUBDIVISIONS * i + centerY;
             z = computeZ(x, y);
-            if (i == 0) {
-                BufferUtils.put3f(linePosition, (float) x, (float) y, (float) z);
-                lineColor.put(BufferUtils.colorNull);
-            }
             BufferUtils.put3f(linePosition, (float) x, (float) y, (float) z);
             lineColor.put(i % 2 == 0 ? color : BufferUtils.colorWhite);
         }
@@ -92,10 +88,6 @@ public class FOVShape {
             x = bw - 2 * bw / SUBDIVISIONS * i + centerX;
             y = -bh + centerY;
             z = computeZ(x, y);
-            if (i == 0) {
-                BufferUtils.put3f(linePosition, (float) x, (float) y, (float) z);
-                lineColor.put(BufferUtils.colorNull);
-            }
             BufferUtils.put3f(linePosition, (float) x, (float) y, (float) z);
             lineColor.put(i % 2 == 0 ? color : BufferUtils.colorWhite);
         }
@@ -104,13 +96,9 @@ public class FOVShape {
             x = -bw + centerX;
             y = -bh + 2 * bh / SUBDIVISIONS * i + centerY;
             z = computeZ(x, y);
-            if (i == 0) {
-                BufferUtils.put3f(linePosition, (float) x, (float) y, (float) z);
-                lineColor.put(BufferUtils.colorNull);
-            }
             BufferUtils.put3f(linePosition, (float) x, (float) y, (float) z);
             lineColor.put(i % 2 == 0 ? color : BufferUtils.colorWhite);
-            if (i == SUBDIVISIONS) {
+            if (i == SUBDIVISIONS) { // last
                 BufferUtils.put3f(linePosition, (float) x, (float) y, (float) z);
                 lineColor.put(BufferUtils.colorNull);
             }
