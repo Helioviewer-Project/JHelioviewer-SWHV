@@ -30,8 +30,7 @@ public class GLSLSolarShader extends GLSLShader {
     public static final GLSLSolarShader polar = new GLSLSolarShader("/glsl/solar.vert", null, "/glsl/solarPolar.frag");
     public static final GLSLSolarShader logpolar = new GLSLSolarShader("/glsl/solar.vert", null, "/glsl/solarLogPolar.frag");
 
-    private int projectionRef;
-    private int viewRef;
+    private int refModelViewProjectionMatrix;
 
     private int isDiffRef;
     private int isDiscRef;
@@ -98,8 +97,7 @@ public class GLSLSolarShader extends GLSLShader {
 
     @Override
     protected void _after_init(GL2 gl) {
-        projectionRef = gl.glGetUniformLocation(progID, "projection");
-        viewRef = gl.glGetUniformLocation(progID, "view");
+        refModelViewProjectionMatrix = gl.glGetUniformLocation(progID, "ModelViewProjectionMatrix");
 
         isDiffRef = gl.glGetUniformLocation(progID, "isdifference");
         isDiscRef = gl.glGetUniformLocation(progID, "isdisc");
@@ -151,8 +149,7 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindMatrix(GL2 gl, float[] matrix) {
-        gl.glUniformMatrix4fv(projectionRef, 1, false, Transform.getProjection());
-        gl.glUniformMatrix4fv(viewRef, 1, false, Transform.getView());
+        gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, Transform.get());
         gl.glUniformMatrix4fv(cameraTransformationInverseRef, 1, false, matrix, 0);
     }
 

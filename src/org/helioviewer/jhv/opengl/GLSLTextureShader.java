@@ -10,8 +10,7 @@ class GLSLTextureShader extends GLSLShader {
     static int positionRef = 0;
     static int coordRef = 1;
 
-    private int projectionRef;
-    private int viewRef;
+    private int refModelViewProjectionMatrix;
     private int colorRef;
 
     private float[] color = { 1, 1, 1, 1 };
@@ -40,8 +39,7 @@ class GLSLTextureShader extends GLSLShader {
 
     @Override
     protected void _after_init(GL2 gl) {
-        projectionRef = gl.glGetUniformLocation(progID, "projection");
-        viewRef = gl.glGetUniformLocation(progID, "view");
+        refModelViewProjectionMatrix = gl.glGetUniformLocation(progID, "ModelViewProjectionMatrix");
         positionRef = gl.glGetAttribLocation(progID, "position");
         coordRef = gl.glGetAttribLocation(progID, "coord");
         colorRef = gl.glGetUniformLocation(progID, "color");
@@ -49,8 +47,7 @@ class GLSLTextureShader extends GLSLShader {
     }
 
     void bindParams(GL2 gl) {
-        gl.glUniformMatrix4fv(projectionRef, 1, false, Transform.getProjection());
-        gl.glUniformMatrix4fv(viewRef, 1, false, Transform.getView());
+        gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, Transform.get());
         gl.glUniform4fv(colorRef, 1, color, 0);
     }
 

@@ -10,15 +10,13 @@ class GLSLPolylineShader extends GLSLShader {
     static int vertexRef = 0;
     static int colorRef = 1;
 
-    private int projectionRef;
-    private int viewRef;
-
+    private int refModelViewProjectionMatrix;
     private int thicknessRef;
     private int viewportRef;
     private int miterLimitRef;
 
     private final float[] thickness = { 5 };
-    private final float[] viewport = new float[2];
+    private final float[] viewport = { 1, 1 };
     private final float[] miterLimit = { 0.1f };
 
     private GLSLPolylineShader(String vertex, String geometry, String fragment) {
@@ -45,9 +43,7 @@ class GLSLPolylineShader extends GLSLShader {
 
     @Override
     protected void _after_init(GL2 gl) {
-        projectionRef = gl.glGetUniformLocation(progID, "projection");
-        viewRef = gl.glGetUniformLocation(progID, "view");
-
+        refModelViewProjectionMatrix = gl.glGetUniformLocation(progID, "ModelViewProjectionMatrix");
         vertexRef = gl.glGetAttribLocation(progID, "Vertex");
         colorRef = gl.glGetAttribLocation(progID, "Color");
 
@@ -57,8 +53,7 @@ class GLSLPolylineShader extends GLSLShader {
     }
 
     void bindParams(GL2 gl) {
-        gl.glUniformMatrix4fv(projectionRef, 1, false, Transform.getProjection());
-        gl.glUniformMatrix4fv(viewRef, 1, false, Transform.getView());
+        gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, Transform.get());
         gl.glUniform1fv(thicknessRef, 1, thickness, 0);
         gl.glUniform1fv(miterLimitRef, 1, miterLimit, 0);
     }
