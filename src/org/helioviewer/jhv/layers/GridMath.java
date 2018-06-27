@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.Color;
 import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.astronomy.Sun;
@@ -16,7 +15,7 @@ class GridMath {
 
     private static final int SUBDIVISIONS = 360;
 
-    private static final float[] radialLineColor = {Color.DARK_GRAY.getRed() / 255f, Color.DARK_GRAY.getGreen() / 255f, Color.DARK_GRAY.getBlue() / 255f, 1f};
+    private static final float[] radialLineColor = BufferUtils.colorDarkGray;
     private static final float[] axisNorthColor = BufferUtils.colorRed;
     private static final float[] axisSouthColor = BufferUtils.colorBlue;
     private static final float[] earthLineColor = BufferUtils.colorYellow;
@@ -240,7 +239,6 @@ class GridMath {
                     BufferUtils.put3f(vertexBuffer, v, start, 0);
                     colorBuffer.put(BufferUtils.colorNull);
                 }
-
             }
         }
         vertexBuffer.rewind();
@@ -282,7 +280,6 @@ class GridMath {
                 }
             }
         }
-
         for (int j = 0; j < no_lat_steps; j++) {
             for (int k = -1; k <= 1; k += 2) {
                 rotation = latstepDegrees * j * k;
@@ -305,7 +302,6 @@ class GridMath {
                 }
             }
         }
-
         vertexBuffer.rewind();
         colorBuffer.rewind();
         gridLine.setData(gl, vertexBuffer, colorBuffer);
