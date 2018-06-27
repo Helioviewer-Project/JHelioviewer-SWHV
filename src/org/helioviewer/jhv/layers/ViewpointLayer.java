@@ -37,8 +37,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
     private static final double DELTA_ORBIT = 10 * 60 * 1000 * Sun.MeanEarthDistanceInv;
     private static final double DELTA_CUTOFF = 3 * Sun.MeanEarthDistance;
-    private static final double LINEWIDTH_FOV = 1;
-    private static final double LINEWIDTH_ORBIT = 1;
+    private static final double LINEWIDTH_FOV = 0.002;
+    private static final double LINEWIDTH_ORBIT = 0.002;
     private static final float SIZE_PLANET = 5;
 
     private final FOVShape fov = new FOVShape(LINEWIDTH_FOV);
