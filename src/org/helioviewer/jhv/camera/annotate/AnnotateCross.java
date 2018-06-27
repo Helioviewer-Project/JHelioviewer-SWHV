@@ -47,12 +47,9 @@ public class AnnotateCross extends AbstractAnnotateable {
 
     private static void interpolatedDraw(Camera camera, Viewport vp, Vec3 p1s, Vec3 p2s, FloatArray pos, FloatArray col, float[] color) {
         Vec2 previous = null;
-        for (double i = 0; i <= SUBDIVISIONS; i++) {
-            double t = i / SUBDIVISIONS;
-            double y = (1 - t) * p1s.y + t * p2s.y;
-            double z = (1 - t) * p1s.z + t * p2s.z;
+        for (int i = 0; i <= SUBDIVISIONS; i++) {
+            Vec3 pc = interpolate(i / (double) SUBDIVISIONS, p1s, p2s);
 
-            Vec3 pc = toCart(y, z);
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 if (i == 0) {
                     pos.put3f((float) pc.x, (float) pc.y, (float) pc.z);
