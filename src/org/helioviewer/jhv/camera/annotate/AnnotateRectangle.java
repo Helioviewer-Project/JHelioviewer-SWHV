@@ -51,11 +51,8 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         point1 = bp;
         point2 = p2;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
-            double t = i / (double) SUBDIVISIONS;
-            double y = (1 - t) * point1.y + t * point2.y;
-            double z = (1 - t) * point1.z + t * point2.z;
+            Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
 
-            Vec3 pc = toCart(y, z);
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 if (i == 0) { // first
                     pos.put3f((float) pc.x, (float) pc.y, (float) pc.z);
@@ -75,11 +72,8 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         point1 = p2;
         point2 = ep;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
-            double t = i / (double) SUBDIVISIONS;
-            double y = (1 - t) * point1.y + t * point2.y;
-            double z = (1 - t) * point1.z + t * point2.z;
+            Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
 
-            Vec3 pc = toCart(y, z);
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 pos.put3f((float) pc.x, (float) pc.y, (float) pc.z);
                 col.put4f(color);
@@ -92,11 +86,8 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         point1 = ep;
         point2 = p4;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
-            double t = i / (double) SUBDIVISIONS;
-            double y = (1 - t) * point1.y + t * point2.y;
-            double z = (1 - t) * point1.z + t * point2.z;
+            Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
 
-            Vec3 pc = toCart(y, z);
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 pos.put3f((float) pc.x, (float) pc.y, (float) pc.z);
                 col.put4f(color);
@@ -109,11 +100,8 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         point1 = p4;
         point2 = bp;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
-            double t = i / (double) SUBDIVISIONS;
-            double y = (1 - t) * point1.y + t * point2.y;
-            double z = (1 - t) * point1.z + t * point2.z;
+            Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
 
-            Vec3 pc = toCart(y, z);
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 pos.put3f((float) pc.x, (float) pc.y, (float) pc.z);
                 col.put4f(color);
