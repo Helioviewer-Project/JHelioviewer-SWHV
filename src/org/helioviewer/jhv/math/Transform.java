@@ -8,8 +8,7 @@ import org.joml.Matrix4fStack;
 
 public class Transform {
 
-    private static final FloatBuffer fbProj = BufferUtils.newFloatBuffer(16);
-    private static final FloatBuffer fbView = BufferUtils.newFloatBuffer(16);
+    private static final FloatBuffer fb = BufferUtils.newFloatBuffer(16);
 
     private static final Matrix4fStack proj = new Matrix4fStack(2);
     private static final Matrix4fStack view = new Matrix4fStack(3);
@@ -17,10 +16,6 @@ public class Transform {
 
     public static void setOrthoProjection(float left, float right, float bottom, float top, float zNear, float zFar) {
         proj.setOrtho(left, right, bottom, top, zNear, zFar);
-    }
-
-    public static void setPerspectiveProjection(float fovy, float aspect, float zNear, float zFar) {
-        proj.setPerspective(fovy, aspect, zNear, zFar);
     }
 
     public static void pushProjection() {
@@ -83,14 +78,10 @@ public class Transform {
         view.popMatrix();
     }
 
-    public static FloatBuffer getProjection() {
-        proj.get(fbProj);
-        return fbProj;
-    }
-
-    public static FloatBuffer getView() {
-        view.get(fbView);
-        return fbView;
+    public static FloatBuffer get() {
+        proj.mulOrthoAffine(view, mul); // assumes ortho
+        mul.get(fb);
+        return fb;
     }
 
 }

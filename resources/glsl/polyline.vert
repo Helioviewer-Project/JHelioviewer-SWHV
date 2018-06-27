@@ -8,8 +8,7 @@
  * \copyright MIT license
 */
 
-uniform mat4 projection;
-uniform mat4 view;
+uniform mat4 ModelViewProjectionMatrix;
 
 layout(location = 0) in vec4 Vertex;
 layout(location = 1) in vec4 Color;
@@ -21,7 +20,5 @@ out VertexData{
 void main(void)
 {
     VertexOut.mColor = Color;
-
-    mat4 ModelViewProjectionMatrix = projection * view;
     gl_Position = ModelViewProjectionMatrix * Vertex;
 }
