@@ -26,6 +26,8 @@ class GridMath {
 
     private static final float earthPointSize = 0.01f;
 
+    private static final int LINEAR_STEPS = 7;
+
     private static final float AXIS_START = (float) (1. * Sun.Radius);
     private static final float AXIS_STOP = (float) (1.2 * Sun.Radius);
 
@@ -128,7 +130,7 @@ class GridMath {
 
     static void initRadialCircles(GL2 gl, GLSLPolyline radialCircleLine, GLSLPolyline radialThickLine, double unit, double step) {
         int no_lines = (int) Math.ceil(360 / step);
-        int no_points = (END_RADIUS - START_RADIUS + 1 - TENS_RADIUS) * (SUBDIVISIONS + 3) + 8 * no_lines;
+        int no_points = (END_RADIUS - START_RADIUS + 1 - TENS_RADIUS) * (SUBDIVISIONS + 3) + (LINEAR_STEPS + 3) * no_lines;
         FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(no_points * 3);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
         FloatBuffer vertexThick = BufferUtils.newFloatBuffer(TENS_RADIUS * (SUBDIVISIONS + 3) * 3);
@@ -171,39 +173,21 @@ class GridMath {
             i += step;
             Quat q = Quat.createRotation((Math.PI / 180) * i, Vec3.ZAxis);
 
-            v.set(START_RADIUS * unit, 0, 0);
-            rotv = q.rotateVector(v);
-            BufferUtils.put3f(vertexBuffer, rotv);
-            colorBuffer.put(BufferUtils.colorNull);
-            BufferUtils.put3f(vertexBuffer, rotv);
-            colorBuffer.put(radialLineColor);
+            for (int k = 0; k <= LINEAR_STEPS; k++) {
+                v.set((START_RADIUS + k * (END_RADIUS - START_RADIUS) / (double) LINEAR_STEPS) * unit, 0, 0);
+                rotv = q.rotateVector(v);
 
-            v.set((START_RADIUS + (END_RADIUS - START_RADIUS) / 5.) * unit, 0, 0);
-            rotv = q.rotateVector(v);
-            BufferUtils.put3f(vertexBuffer, rotv);
-            colorBuffer.put(radialLineColor);
-
-            v.set((START_RADIUS + 2 * (END_RADIUS - START_RADIUS) / 5.) * unit, 0, 0);
-            rotv = q.rotateVector(v);
-            BufferUtils.put3f(vertexBuffer, rotv);
-            colorBuffer.put(radialLineColor);
-
-            v.set((START_RADIUS + 3 * (END_RADIUS - START_RADIUS) / 5.) * unit, 0, 0);
-            rotv = q.rotateVector(v);
-            BufferUtils.put3f(vertexBuffer, rotv);
-            colorBuffer.put(radialLineColor);
-
-            v.set((START_RADIUS + 4 * (END_RADIUS - START_RADIUS) / 5.) * unit, 0, 0);
-            rotv = q.rotateVector(v);
-            BufferUtils.put3f(vertexBuffer, rotv);
-            colorBuffer.put(radialLineColor);
-
-            v.set(END_RADIUS * unit, 0, 0);
-            rotv = q.rotateVector(v);
-            BufferUtils.put3f(vertexBuffer, rotv);
-            colorBuffer.put(radialLineColor);
-            BufferUtils.put3f(vertexBuffer, rotv);
-            colorBuffer.put(BufferUtils.colorNull);
+                if (k == 0) {
+                    BufferUtils.put3f(vertexBuffer, rotv);
+                    colorBuffer.put(BufferUtils.colorNull);
+                }
+                BufferUtils.put3f(vertexBuffer, rotv);
+                colorBuffer.put(radialLineColor);
+                if (k == LINEAR_STEPS) {
+                    BufferUtils.put3f(vertexBuffer, rotv);
+                    colorBuffer.put(BufferUtils.colorNull);
+                }
+            }
         }
         vertexBuffer.rewind();
         colorBuffer.rewind();
@@ -215,48 +199,49 @@ class GridMath {
     }
 
     static void initFlatGrid(GL2 gl, GLSLPolyline flatLine, double aspect) {
-        float w = (float) aspect;
-        float h = 1;
+        double w = aspect;
+        double h = 1;
 
-        int plen = 4 * ((FLAT_STEPS_THETA + 1) + (FLAT_STEPS_RADIAL + 1));
+        int plen = (LINEAR_STEPS + 3) * (FLAT_STEPS_THETA + 1 + FLAT_STEPS_RADIAL + 1);
         FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(plen * 3);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(plen * 4);
 
         for (int i = 0; i <= FLAT_STEPS_THETA; i++) {
-            float start = -w / 2 + i * w / FLAT_STEPS_THETA;
-            BufferUtils.put3f(vertexBuffer, start, -h / 2, 0);
-            colorBuffer.put(BufferUtils.colorNull);
+            float start = (float) (-w / 2 + i * w / FLAT_STEPS_THETA);
 
-            BufferUtils.put3f(vertexBuffer, start, -h / 2, 0);
-            if (i == FLAT_STEPS_THETA / 2) {
-                colorBuffer.put(color2);
-                colorBuffer.put(color2);
-            } else {
-                colorBuffer.put(color1);
-                colorBuffer.put(color1);
+            for (int k = 0; k <= LINEAR_STEPS; k++) {
+                float v = (float) (-h / 2 + k * h / (double) LINEAR_STEPS);
+
+                if (k == 0) {
+                    BufferUtils.put3f(vertexBuffer, start, v, 0);
+                    colorBuffer.put(BufferUtils.colorNull);
+                }
+                BufferUtils.put3f(vertexBuffer, start, v, 0);
+                colorBuffer.put(i == FLAT_STEPS_THETA / 2 ? color2 : color1);
+                if (k == LINEAR_STEPS) {
+                    BufferUtils.put3f(vertexBuffer, start, v, 0);
+                    colorBuffer.put(BufferUtils.colorNull);
+                }
             }
-            BufferUtils.put3f(vertexBuffer, start, h / 2, 0);
-
-            BufferUtils.put3f(vertexBuffer, start, h / 2, 0);
-            colorBuffer.put(BufferUtils.colorNull);
         }
         for (int i = 0; i <= FLAT_STEPS_RADIAL; i++) {
-            float start = -h / 2 + i * h / FLAT_STEPS_RADIAL;
-            BufferUtils.put3f(vertexBuffer, -w / 2, start, 0);
-            colorBuffer.put(BufferUtils.colorNull);
+            float start = (float) (-h / 2 + i * h / FLAT_STEPS_RADIAL);
 
-            BufferUtils.put3f(vertexBuffer, -w / 2, start, 0);
-            if (i == FLAT_STEPS_RADIAL / 2) {
-                colorBuffer.put(color2);
-                colorBuffer.put(color2);
-            } else {
-                colorBuffer.put(color1);
-                colorBuffer.put(color1);
+            for (int k = 0; k <= LINEAR_STEPS; k++) {
+                float v = (float) (-w / 2 + k * w / (double) LINEAR_STEPS);
+
+                if (k == 0) {
+                    BufferUtils.put3f(vertexBuffer, v, start, 0);
+                    colorBuffer.put(BufferUtils.colorNull);
+                }
+                BufferUtils.put3f(vertexBuffer, v, start, 0);
+                colorBuffer.put(i == FLAT_STEPS_RADIAL / 2 ? color2 : color1);
+                if (k == LINEAR_STEPS) {
+                    BufferUtils.put3f(vertexBuffer, v, start, 0);
+                    colorBuffer.put(BufferUtils.colorNull);
+                }
+
             }
-            BufferUtils.put3f(vertexBuffer, w / 2, start, 0);
-
-            BufferUtils.put3f(vertexBuffer, w / 2, start, 0);
-            colorBuffer.put(BufferUtils.colorNull);
         }
         vertexBuffer.rewind();
         colorBuffer.rewind();
