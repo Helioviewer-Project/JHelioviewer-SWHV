@@ -10,15 +10,10 @@ import com.jogamp.opengl.GL2;
 public class FOVShape {
 
     private static final int SUBDIVISIONS = 24;
+    private static final float SIZE_POINT = 0.01f;
     private static final double epsilon = 0.006;
-    private static final float pointSize = 0.01f;
 
     private final double thickness;
-
-    private final FloatBuffer pointPosition = BufferUtils.newFloatBuffer(4);
-    private final FloatBuffer pointColor = BufferUtils.newFloatBuffer(4);
-    private final FloatBuffer linePosition = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2) + 1) * 3);
-    private final FloatBuffer lineColor = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2) + 1) * 4);
 
     private final GLSLPolyline line = new GLSLPolyline();
     private final GLSLShape point = new GLSLShape();
@@ -45,12 +40,14 @@ public class FOVShape {
     }
 
     private void computeCenter(GL2 gl, boolean highlight) {
-        BufferUtils.put4f(pointPosition, (float) centerX, (float) centerY, (float) centerZ, pointSize);
-        pointColor.put(highlight ? BufferUtils.colorRed : BufferUtils.colorBlue);
+        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(4);
+        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4);
+        BufferUtils.put4f(vertexBuffer, (float) centerX, (float) centerY, (float) centerZ, SIZE_POINT);
+        colorBuffer.put(highlight ? BufferUtils.colorRed : BufferUtils.colorBlue);
 
-        pointPosition.rewind();
-        pointColor.rewind();
-        point.setData(gl, pointPosition, pointColor);
+        vertexBuffer.rewind();
+        colorBuffer.rewind();
+        point.setData(gl, vertexBuffer, colorBuffer);
     }
 
     private static double computeZ(double x, double y) {
@@ -64,49 +61,52 @@ public class FOVShape {
         double bh = distance * tanY;
         float[] color = highlight ? BufferUtils.colorRed : BufferUtils.colorBlue;
 
+        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2) + 1) * 3);
+        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2) + 1) * 4);
+
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             x = -bw + 2 * bw / SUBDIVISIONS * i + centerX;
             y = bh + centerY;
             z = computeZ(x, y);
             if (i == 0) { // first
-                BufferUtils.put3f(linePosition, (float) x, (float) y, (float) z);
-                lineColor.put(BufferUtils.colorNull);
+                BufferUtils.put3f(vertexBuffer, (float) x, (float) y, (float) z);
+                colorBuffer.put(BufferUtils.colorNull);
             }
-            BufferUtils.put3f(linePosition, (float) x, (float) y, (float) z);
-            lineColor.put(i % 2 == 0 ? color : BufferUtils.colorWhite);
+            BufferUtils.put3f(vertexBuffer, (float) x, (float) y, (float) z);
+            colorBuffer.put(i % 2 == 0 ? color : BufferUtils.colorWhite);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             x = bw + centerX;
             y = bh - 2 * bh / SUBDIVISIONS * i + centerY;
             z = computeZ(x, y);
-            BufferUtils.put3f(linePosition, (float) x, (float) y, (float) z);
-            lineColor.put(i % 2 == 0 ? color : BufferUtils.colorWhite);
+            BufferUtils.put3f(vertexBuffer, (float) x, (float) y, (float) z);
+            colorBuffer.put(i % 2 == 0 ? color : BufferUtils.colorWhite);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             x = bw - 2 * bw / SUBDIVISIONS * i + centerX;
             y = -bh + centerY;
             z = computeZ(x, y);
-            BufferUtils.put3f(linePosition, (float) x, (float) y, (float) z);
-            lineColor.put(i % 2 == 0 ? color : BufferUtils.colorWhite);
+            BufferUtils.put3f(vertexBuffer, (float) x, (float) y, (float) z);
+            colorBuffer.put(i % 2 == 0 ? color : BufferUtils.colorWhite);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             x = -bw + centerX;
             y = -bh + 2 * bh / SUBDIVISIONS * i + centerY;
             z = computeZ(x, y);
-            BufferUtils.put3f(linePosition, (float) x, (float) y, (float) z);
-            lineColor.put(i % 2 == 0 ? color : BufferUtils.colorWhite);
+            BufferUtils.put3f(vertexBuffer, (float) x, (float) y, (float) z);
+            colorBuffer.put(i % 2 == 0 ? color : BufferUtils.colorWhite);
             if (i == SUBDIVISIONS) { // last
-                BufferUtils.put3f(linePosition, (float) x, (float) y, (float) z);
-                lineColor.put(BufferUtils.colorNull);
+                BufferUtils.put3f(vertexBuffer, (float) x, (float) y, (float) z);
+                colorBuffer.put(BufferUtils.colorNull);
             }
         }
 
-        linePosition.rewind();
-        lineColor.rewind();
-        line.setData(gl, linePosition, lineColor);
+        vertexBuffer.rewind();
+        colorBuffer.rewind();
+        line.setData(gl, vertexBuffer, colorBuffer);
     }
 
     public void render(GL2 gl, Viewport vp, double distance, double pointFactor, boolean highlight) {

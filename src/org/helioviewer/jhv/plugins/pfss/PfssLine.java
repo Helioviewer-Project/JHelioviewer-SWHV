@@ -16,8 +16,6 @@ class PfssLine {
     private static final float[] insideFieldColor = BufferUtils.colorBlue;
 
     private final float[] brightColor = new float[4];
-    private FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(0);
-    private FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(0);
 
     private void computeBrightColor(double b) {
         if (b > 0) {
@@ -37,9 +35,6 @@ class PfssLine {
     }
 
     public void calculatePositions(GL2 gl, PfssData data, int detail, boolean fixedColor, double radius, GLSLPolyline line) {
-        vertexBuffer.clear();
-        colorBuffer.clear();
-
         int pointsPerLine = data.pointsPerLine;
         double cphi = data.cphi;
         double sphi = data.sphi;
@@ -51,13 +46,8 @@ class PfssLine {
         int dlength = flinex.capacity();
         int numberOfLines = dlength / pointsPerLine;
 
-        int vlength = 3 * (dlength + 2 * numberOfLines);
-        if (vlength != vertexBuffer.capacity())
-            vertexBuffer = BufferUtils.newFloatBuffer(vlength);
-
-        int clength = 4 * (dlength + 2 * numberOfLines);
-        if (clength != colorBuffer.capacity())
-            colorBuffer = BufferUtils.newFloatBuffer(clength);
+        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(3 * (dlength + 2 * numberOfLines));
+        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4 * (dlength + 2 * numberOfLines));
 
         float[] oneColor = loopColor;
         for (int i = 0; i < dlength; i++) {
