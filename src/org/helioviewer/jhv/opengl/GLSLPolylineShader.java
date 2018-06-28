@@ -17,7 +17,7 @@ class GLSLPolylineShader extends GLSLShader {
 
     private final float[] thickness = { 5 };
     private final float[] viewport = { 1, 1 };
-    private final float[] miterLimit = { 0.1f };
+    private final float[] miterLimit = { 0.75f };
 
     private GLSLPolylineShader(String vertex, String geometry, String fragment) {
         super(vertex, geometry, fragment);

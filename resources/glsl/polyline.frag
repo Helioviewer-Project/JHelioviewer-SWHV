@@ -1,5 +1,7 @@
 #version 330 core
 
+precision mediump float;
+
 /* \brief Fragment GLSL shader that demonstrates how perform pass through fragment shader.
  * This file is a part of shader-3dcurve example (https://github.com/vicrucann/shader-3dcurve).
 
@@ -11,7 +13,7 @@
 out vec4 FragColor;
 
 in VertexData{
-    vec2 mTexCoord;
+//    vec2 mTexCoord;
     vec4 mColor;
 } VertexIn;
 
