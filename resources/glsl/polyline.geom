@@ -34,6 +34,15 @@ float toZValue(vec4 vertex)
     return (vertex.z/vertex.w);
 }
 
+vec2 safe_normalize(vec2 v)
+{
+    float len = length(v);
+    if (len == 0)
+        return vec2(0, 1); // arbitrary
+    else
+        return v / len;
+}
+
 void drawSegment(vec2 points[4], vec4 colors[4], float zValues[4])
 {
     vec2 p0 = points[0];
@@ -51,9 +60,9 @@ void drawSegment(vec2 points[4], vec4 colors[4], float zValues[4])
 */
 
     /* determine the direction of each of the 3 segments (previous, current, next) */
-    vec2 v0 = normalize( p1 - p0 );
-    vec2 v1 = normalize( p2 - p1 );
-    vec2 v2 = normalize( p3 - p2 );
+    vec2 v0 = safe_normalize( p1 - p0 );
+    vec2 v1 = safe_normalize( p2 - p1 );
+    vec2 v2 = safe_normalize( p3 - p2 );
 
     /* determine the normal of each of the 3 segments (previous, current, next) */
     vec2 n0 = vec2( -v0.y, v0.x );
