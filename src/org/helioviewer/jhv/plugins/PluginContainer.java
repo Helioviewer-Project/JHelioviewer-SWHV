@@ -9,7 +9,7 @@ class PluginContainer {
     private final Plugin plugin;
     private boolean active;
 
-    public PluginContainer(Plugin _plugin) {
+    PluginContainer(Plugin _plugin) {
         plugin = _plugin;
         active = getActive();
         if (active)

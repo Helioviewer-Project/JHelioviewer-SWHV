@@ -140,7 +140,7 @@ public class Vec2 {
         return new Vec2(this);
     }
 */
-    public boolean isApproxEqual(Vec2 vec, double tolerance) {
+    private boolean isApproxEqual(Vec2 vec, double tolerance) {
         return Math.abs(x - vec.x) <= tolerance && Math.abs(y - vec.y) <= tolerance;
     }
 /*

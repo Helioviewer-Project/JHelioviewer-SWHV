@@ -197,8 +197,7 @@ class GridMath {
         radialThickLine.setData(gl, vertexThick, colorThick);
     }
 
-    static void initFlatGrid(GL2 gl, GLSLPolyline flatLine, double aspect) {
-        double w = aspect;
+    static void initFlatGrid(GL2 gl, GLSLPolyline flatLine, double w) {
         double h = 1;
 
         int plen = (LINEAR_STEPS + 3) * (FLAT_STEPS_THETA + 1 + FLAT_STEPS_RADIAL + 1);

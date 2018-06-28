@@ -43,7 +43,7 @@ import java.awt.image.WritableRaster;
  * @version $Id: GenericWritableRaster.java,v 1.0 Jun 13, 2010 12:27:45 AM haraldk Exp$
  */
 class GenericWritableRaster extends WritableRaster {
-    public GenericWritableRaster(SampleModel model, DataBuffer buffer, Point origin) {
+    GenericWritableRaster(SampleModel model, DataBuffer buffer, Point origin) {
         super(model, buffer, origin);
     }
 
