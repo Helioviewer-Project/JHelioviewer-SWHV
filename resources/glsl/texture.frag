@@ -1,5 +1,7 @@
 #version 150 core
 
+precision mediump float;
+
 uniform vec4 color;
 uniform sampler2D image;
 
