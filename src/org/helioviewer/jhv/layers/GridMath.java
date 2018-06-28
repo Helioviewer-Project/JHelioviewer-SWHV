@@ -25,7 +25,7 @@ class GridMath {
 
     private static final float earthPointSize = 0.01f;
 
-    private static final int LINEAR_STEPS = 7;
+    private static final int LINEAR_STEPS = 1;
 
     private static final float AXIS_START = (float) (1. * Sun.Radius);
     private static final float AXIS_STOP = (float) (1.2 * Sun.Radius);
@@ -197,18 +197,16 @@ class GridMath {
         radialThickLine.setData(gl, vertexThick, colorThick);
     }
 
-    static void initFlatGrid(GL2 gl, GLSLPolyline flatLine, double w) {
-        double h = 1;
-
+    static void initFlatGrid(GL2 gl, GLSLPolyline flatLine, double aspect) {
         int plen = (LINEAR_STEPS + 3) * (FLAT_STEPS_THETA + 1 + FLAT_STEPS_RADIAL + 1);
         FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(plen * 3);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(plen * 4);
 
         for (int i = 0; i <= FLAT_STEPS_THETA; i++) {
-            float start = (float) (-w / 2 + i * w / FLAT_STEPS_THETA);
+            float start = (float) (aspect * (-0.5 + i / (double) FLAT_STEPS_THETA));
 
             for (int k = 0; k <= LINEAR_STEPS; k++) {
-                float v = (float) (-h / 2 + k * h / (double) LINEAR_STEPS);
+                float v = (float) (-0.5 + k / (double) LINEAR_STEPS);
 
                 if (k == 0) {
                     BufferUtils.put3f(vertexBuffer, start, v, 0);
@@ -223,10 +221,10 @@ class GridMath {
             }
         }
         for (int i = 0; i <= FLAT_STEPS_RADIAL; i++) {
-            float start = (float) (-h / 2 + i * h / FLAT_STEPS_RADIAL);
+            float start = (float) (-0.5 + i / (double) FLAT_STEPS_RADIAL);
 
             for (int k = 0; k <= LINEAR_STEPS; k++) {
-                float v = (float) (-w / 2 + k * w / (double) LINEAR_STEPS);
+                float v = (float) (aspect * (-0.5 + k / (double) LINEAR_STEPS));
 
                 if (k == 0) {
                     BufferUtils.put3f(vertexBuffer, v, start, 0);
