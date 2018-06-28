@@ -159,6 +159,9 @@ void main(void)
     colors[2] = VertexIn[2].mColor;
     colors[3] = VertexIn[3].mColor;
 
+    if (colors[1].a == 0 || colors[2].a == 0)
+        return;
+
     // screen coords
     vec2 points[4];
     points[0] = toScreenSpace(Points[0]);
