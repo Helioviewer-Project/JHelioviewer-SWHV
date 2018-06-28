@@ -18,7 +18,7 @@ import com.jogamp.opengl.GL2;
 
 public class Camera {
 
-    private static final double EPSX = 5e-8;
+    private static final double EPSX = 0;//5e-8;
     private static final double EPSY = 0;
 
     public static final double INITFOV = 1. * Math.PI / 180.;
