@@ -17,7 +17,5 @@ in VertexData{
 
 void main(void)
 {
-    if (VertexIn.mColor.a == 0.)
-        discard;
     FragColor = VertexIn.mColor;
 }
