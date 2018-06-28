@@ -28,7 +28,7 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
 
     private final JTree tree;
 
-    public SWEKEventTreeRenderer(JTree _tree) {
+    SWEKEventTreeRenderer(JTree _tree) {
         tree = _tree;
     }
 

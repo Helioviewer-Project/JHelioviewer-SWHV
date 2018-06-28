@@ -43,7 +43,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener {
     static int mouseOverY;
     long currentTime;
 
-    public SWEKPopupController(Component _component) {
+    SWEKPopupController(Component _component) {
         component = _component;
         camera = Display.getCamera();
     }

@@ -26,7 +26,7 @@ public class Vec3 {
         z = 0;
     }
 */
-    public Vec3(Vec3 vec) {
+    private Vec3(Vec3 vec) {
         x = vec.x;
         y = vec.y;
         z = vec.z;
@@ -78,7 +78,7 @@ public class Vec3 {
         return new Vec3(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x);
     }
 
-    public final boolean isApproxEqual(Vec3 vec, double tolerance) {
+    private boolean isApproxEqual(Vec3 vec, double tolerance) {
         return Math.abs(x - vec.x) <= tolerance && Math.abs(y - vec.y) <= tolerance && Math.abs(z - vec.z) <= tolerance;
     }
 

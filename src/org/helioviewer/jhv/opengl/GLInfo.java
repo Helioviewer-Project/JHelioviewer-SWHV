@@ -14,8 +14,8 @@ public class GLInfo {
     public static final int GLSAMPLES = 4;
     private static final String[] crashOptions = { "OK", "Crash" };
 
-    public static int[] pixelScale = { 1, 1 };
-    public static float[] pixelScaleFloat = { 1, 1 };
+    public static final int[] pixelScale = { 1, 1 };
+    public static final float[] pixelScaleFloat = { 1, 1 };
 
     static int maxTextureSize;
 

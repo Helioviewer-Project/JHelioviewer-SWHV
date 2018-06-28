@@ -164,9 +164,6 @@ public class JhvTextRenderer {
 
     private Pipelined_QuadRenderer mPipelinedQuadRenderer;
 
-    // Whether GL_LINEAR filtering is enabled for the backing store
-    private boolean smoothing = true;
-
     /** Creates a new TextRenderer with the given font, using no
         antialiasing or fractional metrics, and the default
         RenderDelegate. Equivalent to <code>TextRenderer(font, false,
@@ -655,7 +652,7 @@ public class JhvTextRenderer {
         closely-cropped rectangle around the text, and renders text
         using the color white, which is modulated by the set color
         during the rendering process. */
-    public interface RenderDelegate {
+    interface RenderDelegate {
         /** Computes the bounds of the given String relative to the
             origin. */
         Rectangle2D getBounds(String str, Font font,
@@ -714,7 +711,7 @@ public class JhvTextRenderer {
             initFromCharSequence(sequence);
         }
 
-        public void initFromCharSequence(final CharSequence sequence) {
+        void initFromCharSequence(final CharSequence sequence) {
             mSequence = sequence;
             mLength = mSequence.length();
             mCurrentIndex = 0;
@@ -863,6 +860,8 @@ public class JhvTextRenderer {
             // store (i.e., non-default Paint, foreground color, etc.), but
             // for now, let's just be more efficient
             JhvTextureRenderer renderer = new JhvTextureRenderer(MathUtils.nextPowerOfTwo(w), MathUtils.nextPowerOfTwo(h), true, mipmap);
+            // Whether GL_LINEAR filtering is enabled for the backing store
+            boolean smoothing = true;
             renderer.setSmoothing(smoothing);
             return renderer;
         }
@@ -1044,7 +1043,7 @@ public class JhvTextRenderer {
         private Rect glyphRectForTextureMapping;
 
         // Creates a Glyph representing an individual Unicode character
-        public Glyph(final int unicodeID,
+        Glyph(final int unicodeID,
                      final int glyphCode,
                      final float advance,
                      final GlyphVector singleUnicodeGlyphVector,
@@ -1057,22 +1056,22 @@ public class JhvTextRenderer {
         }
 
         /** Returns this glyph's unicode ID */
-        public int getUnicodeID() {
+        int getUnicodeID() {
             return unicodeID;
         }
 
         /** Returns this glyph's (font-specific) glyph code */
-        public int getGlyphCode() {
+        int getGlyphCode() {
             return glyphCode;
         }
 
         /** Returns the advance for this glyph */
-        public float getAdvance() {
+        float getAdvance() {
             return advance;
         }
 
         /** Draws this glyph and returns the (x) advance for this glyph */
-        public float draw3D(final float inX, final float inY, final float z, final float scaleFactor) {
+        float draw3D(final float inX, final float inY, final float z, final float scaleFactor) {
             // This is the code path taken for individual glyphs
             if (glyphRectForTextureMapping == null) {
                 upload();
@@ -1137,7 +1136,7 @@ public class JhvTextRenderer {
         }
 
         /** Notifies this glyph that it's been cleared out of the cache */
-        public void clear() {
+        void clear() {
             glyphRectForTextureMapping = null;
         }
 
@@ -1216,7 +1215,7 @@ public class JhvTextRenderer {
             clearAllCacheEntries();
         }
 
-        public List<Glyph> getGlyphs(final CharSequence inString) {
+        List<Glyph> getGlyphs(final CharSequence inString) {
             glyphsOutput.clear();
             GlyphVector fullRunGlyphVector;
             fullRunGlyphVector = fullGlyphVectorCache.get(inString.toString());
@@ -1244,7 +1243,7 @@ public class JhvTextRenderer {
             return glyphsOutput;
         }
 
-        public void clearCacheEntry(final int unicodeID) {
+        void clearCacheEntry(final int unicodeID) {
             final int glyphID = unicodes2Glyphs[unicodeID];
             if (glyphID != undefined) {
                 final Glyph glyph = glyphCache[glyphID];
@@ -1256,18 +1255,18 @@ public class JhvTextRenderer {
             unicodes2Glyphs[unicodeID] = undefined;
         }
 
-        public void clearAllCacheEntries() {
+        void clearAllCacheEntries() {
             for (int i = 0; i < unicodes2Glyphs.length; i++) {
                 clearCacheEntry(i);
             }
         }
 
-        public void register(final Glyph glyph) {
+        void register(final Glyph glyph) {
             unicodes2Glyphs[glyph.getUnicodeID()] = glyph.getGlyphCode();
             glyphCache[glyph.getGlyphCode()] = glyph;
         }
 
-        public float getGlyphPixelWidth(final char unicodeID) {
+        float getGlyphPixelWidth(final char unicodeID) {
             final Glyph glyph = getGlyph(unicodeID);
             if (glyph != null) {
                 return glyph.getAdvance();
@@ -1353,7 +1352,7 @@ public class JhvTextRenderer {
             }
         }
 
-        public static Character valueOf(final char c) {
+        static Character valueOf(final char c) {
             if (c <= 127) { // must cache
                 return CharacterCache.cache[c];
             }
@@ -1374,18 +1373,14 @@ public class JhvTextRenderer {
             mTexCoords = Buffers.newDirectFloatBuffer(kTotalBufferSizeCoordsTex);
         }
 
-        public void glTexCoord2f(final float v, final float v1) {
-            mTexCoords.put(v);
-            mTexCoords.put(v1);
+        void glTexCoord2f(final float v, final float v1) {
+            mTexCoords.put(v).put(v1);
         }
 
-        public void glVertex3f(final float inX, final float inY, final float inZ) {
-            mVertCoords.put(inX);
-            mVertCoords.put(inY);
-            mVertCoords.put(inZ);
+        void glVertex3f(final float inX, final float inY, final float inZ) {
+            mVertCoords.put(inX).put(inY).put(inZ);
 
             mOutstandingGlyphsVerticesPipeline++;
-
             if (mOutstandingGlyphsVerticesPipeline >= kTotalBufferSizeVerts) {
                 this.draw();
             }
@@ -1408,27 +1403,6 @@ public class JhvTextRenderer {
                 mOutstandingGlyphsVerticesPipeline = 0;
             }
         }
-    }
-
-    /**
-     * Sets whether smoothing (i.e., GL_LINEAR filtering) is enabled
-     * in the backing TextureRenderer of this TextRenderer. A few
-     * graphics cards do not behave well when this is enabled,
-     * resulting in fuzzy text. Defaults to true.
-     */
-    public void setSmoothing(final boolean smoothing) {
-        this.smoothing = smoothing;
-        getBackingStore().setSmoothing(smoothing);
-    }
-
-    /**
-     * Indicates whether smoothing is enabled in the backing
-     * TextureRenderer of this TextRenderer. A few graphics cards do
-     * not behave well when this is enabled, resulting in fuzzy text.
-     * Defaults to true.
-     */
-    public boolean getSmoothing() {
-        return smoothing;
     }
 
 }

@@ -30,7 +30,7 @@ public interface RasterFactory {
     /**
      * Generic implementation that should work for any JRE, and creates a custom subclass of {@link WritableRaster}.
      */
-    final class GenericRasterFactory implements RasterFactory {
+    class GenericRasterFactory implements RasterFactory {
         @Override
         public WritableRaster createRaster(SampleModel model, DataBuffer buffer, Point origin) {
             return new GenericWritableRaster(model, buffer, origin);
@@ -41,7 +41,7 @@ public interface RasterFactory {
      * Sun/Oracle JRE-specific implementation that creates {@code sun.awt.image.SunWritableRaster}.
      * Callers must catch {@link LinkageError}.
      */
-    final class SunRasterFactory implements RasterFactory {
+    class SunRasterFactory implements RasterFactory {
         private final Constructor<WritableRaster> factoryMethod = getFactoryMethod();
 
         @SuppressWarnings("unchecked")
