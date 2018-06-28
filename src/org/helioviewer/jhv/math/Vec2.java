@@ -15,11 +15,16 @@ public class Vec2 {
         y = _y;
     }
 
+    public void set(double _x, double _y) {
+        x = _x;
+        y = _y;
+    }
+/*
     public void clear() {
         x = 0;
         y = 0;
     }
-/*
+
     public Vec2(Vec2 vector) {
         this.x = vector.x;
         this.y = vector.y;
