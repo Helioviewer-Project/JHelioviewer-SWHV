@@ -10,7 +10,7 @@ import org.helioviewer.jhv.math.MathUtils;
 class GridLabel {
 
     // height of text in solar radii
-    static final float textScale = (float) (0.06 * Sun.Radius);
+    static final float textScale = (float) (0.07 * Sun.Radius);
 
     private static final DecimalFormat formatter1 = MathUtils.numberFormatter("0", 1);
 
@@ -41,7 +41,7 @@ class GridLabel {
     }
 
     static ArrayList<GridLabel> makeLatLabels(double latStep) {
-        double size = Sun.Radius * 1.06;
+        double size = Sun.Radius * 1.08;
         // adjust for font size in horizontal and vertical direction (centering the text approximately)
         double horizontalAdjustment = textScale / 2.;
         double verticalAdjustment = textScale / 3.;
@@ -73,7 +73,7 @@ class GridLabel {
     }
 
     static ArrayList<GridLabel> makeLonLabels(GridType gridType, double lonStep) {
-        double size = Sun.Radius * 1.03;
+        double size = Sun.Radius * 1.04;
 
         ArrayList<GridLabel> labels = new ArrayList<>();
         for (double theta = 0; theta <= 180.; theta += lonStep) {
