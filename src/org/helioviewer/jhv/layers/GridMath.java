@@ -136,32 +136,22 @@ class GridMath {
         FloatBuffer colorThick = BufferUtils.newFloatBuffer(TENS_RADIUS * (SUBDIVISIONS + 3) * 4);
 
         for (int i = START_RADIUS; i <= END_RADIUS; i++) {
+            FloatBuffer vertexTarget = i % 10 == 0 ? vertexThick : vertexBuffer;
+            FloatBuffer colorTarget = i % 10 == 0 ? colorThick : colorBuffer;
+
             for (int j = 0; j <= SUBDIVISIONS; j++) {
                 float x = (float) (i * unit * Math.cos(2 * Math.PI * j / SUBDIVISIONS));
                 float y = (float) (i * unit * Math.sin(2 * Math.PI * j / SUBDIVISIONS));
 
-                if (i % 10 == 0) {
-                    if (j == 0) {
-                        BufferUtils.put3f(vertexThick, x, y, 0);
-                        colorThick.put(BufferUtils.colorNull);
-                    }
-                    BufferUtils.put3f(vertexThick, x, y, 0);
-                    colorThick.put(radialLineColor);
-                    if (j == SUBDIVISIONS) {
-                        BufferUtils.put3f(vertexThick, x, y, 0);
-                        colorThick.put(BufferUtils.colorNull);
-                    }
-                } else {
-                    if (j == 0) {
-                        BufferUtils.put3f(vertexBuffer, x, y, 0);
-                        colorBuffer.put(BufferUtils.colorNull);
-                    }
-                    BufferUtils.put3f(vertexBuffer, x, y, 0);
-                    colorBuffer.put(radialLineColor);
-                    if (j == SUBDIVISIONS) {
-                        BufferUtils.put3f(vertexBuffer, x, y, 0);
-                        colorBuffer.put(BufferUtils.colorNull);
-                    }
+                if (j == 0) {
+                    BufferUtils.put3f(vertexTarget, x, y, 0);
+                    colorTarget.put(BufferUtils.colorNull);
+                }
+                BufferUtils.put3f(vertexTarget, x, y, 0);
+                colorTarget.put(radialLineColor);
+                if (j == SUBDIVISIONS) {
+                    BufferUtils.put3f(vertexTarget, x, y, 0);
+                    colorTarget.put(BufferUtils.colorNull);
                 }
             }
         }
