@@ -31,7 +31,7 @@ public class GLText {
 
         if (renderer[idx] == null) {
             Font font = UIGlobals.UIFontRoboto.deriveFont((float) (idx * STEP + MIN));
-            renderer[idx] = new JhvTextRenderer(font, true, true, null, true);
+            renderer[idx] = new JhvTextRenderer(font, true, true, null);
             // precache for grid text
             renderer[idx].draw3D("-0123456789.", 0, 0, 0, 0);
         }

@@ -69,17 +69,6 @@ class JhvTextureRenderer {
   // would need to be split up into multiple callbacks run from the
   // appropriate threads, which would be somewhat unfortunate.
 
-  // Whether we have an alpha channel in the (RGB/A) backing store
-  private final boolean alpha;
-
-  // Whether we're attempting to use automatic mipmap generation support
-  private boolean mipmap;
-
-  // Whether smoothing is enabled for the OpenGL texture (switching
-  // between GL_LINEAR and GL_NEAREST filtering)
-  private boolean smoothing = true;
-  private boolean smoothingChanged;
-
   // The backing store itself
   private BufferedImage image;
 
@@ -89,19 +78,11 @@ class JhvTextureRenderer {
   private Rectangle dirtyRegion;
 
   /** Creates a new renderer with backing store of the specified width
-      and height. If <CODE>alpha</CODE> is true, allocates an alpha channel in the
-      backing store image. If <CODE>mipmap</CODE> is true, attempts to use OpenGL's
-      automatic mipmap generation for better smoothing when rendering
-      the TextureRenderer's contents at a distance.
-
+      and height.
       @param width the width of the texture to render into
       @param height the height of the texture to render into
-      @param alpha whether to allocate an alpha channel for the texture
-      @param mipmap whether to attempt use of automatic mipmap generation
   */
-  JhvTextureRenderer(final int width, final int height, final boolean alpha, final boolean mipmap) {
-    this.alpha = alpha;
-    this.mipmap = mipmap;
+  JhvTextureRenderer(final int width, final int height) {
     init(width, height);
   }
 
@@ -119,19 +100,6 @@ class JhvTextureRenderer {
   */
   public int getHeight() {
     return image.getHeight();
-  }
-
-  /** Sets whether smoothing is enabled for the OpenGL texture; if so,
-      uses GL_LINEAR interpolation for the minification and
-      magnification filters. Defaults to true. Changes to this setting
-      will not take effect until the next call to {@link
-      #beginOrthoRendering beginOrthoRendering}.
-
-      @param smoothing whether smoothing is enabled for the OpenGL texture
-  */
-  public void setSmoothing(final boolean smoothing) {
-    this.smoothing = smoothing;
-    smoothingChanged = true;
   }
 
   /** Creates a {@link java.awt.Graphics2D Graphics2D} instance for
@@ -267,15 +235,6 @@ class JhvTextureRenderer {
     endRendering(false);
   }
 
-  /** Indicates whether automatic mipmap generation is in use for this
-      TextureRenderer. The result of this method may change from true
-      to false if it is discovered during allocation of the
-      TextureRenderer's backing store that automatic mipmap generation
-      is not supported at the OpenGL level. */
-  public boolean isUsingAutoMipmapGeneration() {
-    return mipmap;
-  }
-
   //----------------------------------------------------------------------
   // Internals only below this point
   //
@@ -294,21 +253,6 @@ class JhvTextureRenderer {
     final Texture texture = getTexture();
     texture.enable(gl);
     texture.bind(gl);
-
-    if (smoothingChanged) {
-      smoothingChanged = false;
-      if (smoothing) {
-        texture.setTexParameteri(gl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
-        if (mipmap) {
-          texture.setTexParameteri(gl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR_MIPMAP_LINEAR);
-        } else {
-          texture.setTexParameteri(gl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
-        }
-      } else {
-        texture.setTexParameteri(gl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST);
-        texture.setTexParameteri(gl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
-      }
-    }
   }
 
   private void endRendering(final boolean ortho) {
@@ -332,13 +276,13 @@ class JhvTextureRenderer {
     }
 
     final int internalFormat = GL2.GL_RGBA; // force for high version OpenGL
-    final int imageType = (alpha ?  BufferedImage.TYPE_INT_ARGB_PRE : BufferedImage.TYPE_INT_RGB);
+    final int imageType = BufferedImage.TYPE_INT_ARGB_PRE;
     image = new BufferedImage(width, height, imageType);
     // Always realllocate the TextureData associated with this
     // BufferedImage; it's just a reference to the contents but we
     // need it in order to update sub-regions of the underlying
     // texture
-    textureData = new AWTTextureData(gl.getGLProfile(), internalFormat, 0, mipmap, image);
+    textureData = new AWTTextureData(gl.getGLProfile(), internalFormat, 0, true, image);
     // For now, always reallocate the underlying OpenGL texture when
     // the backing store size changes
     mustReallocateTexture = true;
@@ -369,7 +313,9 @@ class JhvTextureRenderer {
       // OpenGL and Java 2D actually line up correctly for
       // updateSubImage calls, so we don't need to do any argument
       // conversion here (i.e., flipping the Y coordinate).
-      texture.updateSubImage(GLContext.getCurrentGL(), textureData, 0, x, y, x, y, width, height);
+      final GL2 gl = (GL2) GLContext.getCurrentGL();
+      texture.updateSubImage(gl, textureData, 0, x, y, x, y, width, height);
+      gl.glGenerateMipmap(GL2.GL_TEXTURE_2D);
     }
   }
 
@@ -386,19 +332,12 @@ class JhvTextureRenderer {
 
     if (texture == null) {
       texture = TextureIO.newTexture(textureData);
-      if (mipmap && !texture.isUsingAutoMipmapGeneration()) {
-        // Only try this once
-        texture.destroy(gl);
-        mipmap = false;
-        textureData.setMipmap(false);
-        texture = TextureIO.newTexture(textureData);
-      }
-
-      if (!smoothing) {
-        // The TextureIO classes default to GL_LINEAR filtering
-        texture.setTexParameteri(gl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST);
-        texture.setTexParameteri(gl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
-      }
+      texture.setTexParameteri(gl, GL2.GL_TEXTURE_BASE_LEVEL, 0);
+      texture.setTexParameteri(gl, GL2.GL_TEXTURE_MAX_LEVEL, 3);
+      texture.setTexParameteri(gl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR_MIPMAP_LINEAR);
+      texture.setTexParameteri(gl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
+      texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
+      texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
       return true;
     }
     return false;
