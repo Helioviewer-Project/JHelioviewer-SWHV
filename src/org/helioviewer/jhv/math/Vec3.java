@@ -19,13 +19,7 @@ public class Vec3 {
         y = _y;
         z = _z;
     }
-/*
-    public Vec3(Vec2 vec) {
-        x = vec.x;
-        y = vec.y;
-        z = 0;
-    }
-*/
+
     private Vec3(Vec3 vec) {
         x = vec.x;
         y = vec.y;
@@ -33,37 +27,15 @@ public class Vec3 {
     }
 
     public Vec3() {
-        this(ZERO);
-    }
-
-    public final void set(double _x, double _y, double _z) {
-        x = _x;
-        y = _y;
-        z = _z;
+        x = 0;
+        y = 0;
+        z = 0;
     }
 
     public final void add(Vec3 vec) {
         x += vec.x;
         y += vec.y;
         z += vec.z;
-    }
-
-    public static Vec3 add(Vec3 vec1, Vec3 vec2) {
-        return new Vec3(vec1.x + vec2.x, vec1.y + vec2.y, vec1.z + vec2.z);
-    }
-
-    public static Vec3 subtract(Vec3 vec1, Vec3 vec2) {
-        return new Vec3(vec1.x - vec2.x, vec1.y - vec2.y, vec1.z - vec2.z);
-    }
-
-    public final void multiply(double s) {
-        x *= s;
-        y *= s;
-        z *= s;
-    }
-
-    public static Vec3 multiply(Vec3 vec1, Vec3 vec2) {
-        return new Vec3(vec1.x * vec2.x, vec1.y * vec2.y, vec1.z * vec2.z);
     }
 
     public static Vec3 multiply(Vec3 vec1, double s) {
@@ -124,26 +96,7 @@ public class Vec3 {
             z = 0;
         }
     }
-/*
-    public final double[] toArray() {
-        return new double[] { x, y, z };
-    }
 
-    public final Vec2 toVec2() {
-        return new Vec2(x, y);
-    }
-
-    public static double[] toArray(Vec3[] vecs) {
-        double[] arr = new double[vecs.length * 3];
-        for (int i = 0; i < vecs.length; i++) {
-            Vec3 v = vecs[i];
-            arr[i * 3] = v.x;
-            arr[i * 3 + 1] = v.y;
-            arr[i * 3 + 2] = v.z;
-        }
-        return arr;
-    }
-*/
     @Override
     public String toString() {
         return toJson().toString();

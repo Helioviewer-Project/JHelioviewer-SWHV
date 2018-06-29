@@ -156,15 +156,15 @@ class GridMath {
             }
         }
 
-        Vec3 rotv, v = new Vec3();
+        Vec3 v = new Vec3();
         double i = 0;
         for (int j = 0; j < no_lines; j++) {
             i += step;
             Quat q = Quat.createRotation((Math.PI / 180) * i, Vec3.ZAxis);
 
             for (int k = 0; k <= LINEAR_STEPS; k++) {
-                v.set((START_RADIUS + k * (END_RADIUS - START_RADIUS) / (double) LINEAR_STEPS) * unit, 0, 0);
-                rotv = q.rotateVector(v);
+                v.x = (START_RADIUS + k * (END_RADIUS - START_RADIUS) / (double) LINEAR_STEPS) * unit;
+                Vec3 rotv = q.rotateVector(v);
 
                 if (k == 0) {
                     BufferUtils.put3f(vertexBuffer, rotv);
@@ -194,7 +194,6 @@ class GridMath {
 
         for (int i = 0; i <= FLAT_STEPS_THETA; i++) {
             float start = (float) (aspect * (-0.5 + i / (double) FLAT_STEPS_THETA));
-
             for (int k = 0; k <= LINEAR_STEPS; k++) {
                 float v = (float) (-0.5 + k / (double) LINEAR_STEPS);
 
@@ -212,7 +211,6 @@ class GridMath {
         }
         for (int i = 0; i <= FLAT_STEPS_RADIAL; i++) {
             float start = (float) (-0.5 + i / (double) FLAT_STEPS_RADIAL);
-
             for (int k = 0; k <= LINEAR_STEPS; k++) {
                 float v = (float) (aspect * (-0.5 + k / (double) LINEAR_STEPS));
 
