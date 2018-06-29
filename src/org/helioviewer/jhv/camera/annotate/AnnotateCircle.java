@@ -39,9 +39,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
         double r = Math.sqrt(1 - cosf * cosf);
         // P = center + r cos(A) (bp x ep) + r sin(A) ep
 
-        Vec3 center = Vec3.multiply(bp, cosf);
-        center.multiply(radius);
-
+        Vec3 center = Vec3.multiply(bp, cosf * radius);
         Vec3 u = Vec3.cross(bp, ep);
         u.normalize();
         Vec3 v = Vec3.cross(bp, u);

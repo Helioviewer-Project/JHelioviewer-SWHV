@@ -57,7 +57,7 @@ public class Quat {
     }
 
     private Quat() {
-        this(1, new Vec3(0., 0., 0.));
+        this(1, new Vec3());
     }
 /*
     public Mat4 toMatrix() {

@@ -18,16 +18,13 @@ import com.jogamp.opengl.GL2;
 
 public class Camera {
 
-    private static final double EPSX = 0;//5e-8;
-    private static final double EPSY = 0;
-
     public static final double INITFOV = 1. * Math.PI / 180.;
     private static final double MIN_FOV = INITFOV * 0.1;
     private static final double MAX_FOV = INITFOV * 30;
     private double fov = INITFOV;
 
     private Quat rotation = Quat.ZERO;
-    private final Vec2 currentTranslation = new Vec2(EPSX, EPSY);
+    private final Vec2 currentTranslation = new Vec2(0, 0);
     private Quat currentDragRotation = Quat.ZERO;
     private double cameraWidth = 1;
 
@@ -84,7 +81,8 @@ public class Camera {
     }
 
     public void reset() {
-        currentTranslation.set(EPSX, EPSY);
+        currentTranslation.x = 0;
+        currentTranslation.y = 0;
         currentDragRotation = Quat.ZERO;
 
         updateCamera(Movie.getTime());
