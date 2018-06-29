@@ -37,10 +37,7 @@ float toZValue(vec4 vertex)
 vec2 safe_normalize(vec2 v)
 {
     float len = length(v);
-    if (len == 0)
-        return vec2(0, 1); // arbitrary
-    else
-        return v / len;
+    return len == 0 ? vec2(0, 1) /* arbitrary */ : v / len;
 }
 
 void drawSegment(vec2 points[4], vec4 colors[4], float zValues[4])
