@@ -333,7 +333,7 @@ class JhvTextureRenderer {
     if (texture == null) {
       texture = TextureIO.newTexture(textureData);
       texture.setTexParameteri(gl, GL2.GL_TEXTURE_BASE_LEVEL, 0);
-      texture.setTexParameteri(gl, GL2.GL_TEXTURE_MAX_LEVEL, 3);
+      texture.setTexParameteri(gl, GL2.GL_TEXTURE_MAX_LEVEL, 15);
       texture.setTexParameteri(gl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR_MIPMAP_LINEAR);
       texture.setTexParameteri(gl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
       texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
