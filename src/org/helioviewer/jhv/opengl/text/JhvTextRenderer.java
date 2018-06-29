@@ -141,8 +141,6 @@ public class JhvTextRenderer {
     private final boolean antialiased;
     private final boolean useFractionalMetrics;
 
-    // Whether we're attempting to use automatic mipmap generation support
-    private boolean mipmap;
     private RectanglePacker packer;
     private boolean haveMaxSize;
     private final RenderDelegate renderDelegate;
@@ -164,55 +162,12 @@ public class JhvTextRenderer {
 
     private Pipelined_QuadRenderer mPipelinedQuadRenderer;
 
-    /** Creates a new TextRenderer with the given font, using no
-        antialiasing or fractional metrics, and the default
-        RenderDelegate. Equivalent to <code>TextRenderer(font, false,
-        false)</code>.
-
-        @param font the font to render with
-    */
-    public JhvTextRenderer(final Font font) {
-        this(font, false, false, null, false);
-    }
-
-    /** Creates a new TextRenderer with the given font, using no
-        antialiasing or fractional metrics, and the default
-        RenderDelegate. If <CODE>mipmap</CODE> is true, attempts to use
-        OpenGL's automatic mipmap generation for better smoothing when
-        rendering the TextureRenderer's contents at a distance.
-        Equivalent to <code>TextRenderer(font, false, false)</code>.
-
-        @param font the font to render with
-        @param mipmap whether to attempt use of automatic mipmap generation
-    */
-    public JhvTextRenderer(final Font font, final boolean mipmap) {
-        this(font, false, false, null, mipmap);
-    }
-
-    /** Creates a new TextRenderer with the given Font, specified font
-        properties, and default RenderDelegate. The
-        <code>antialiased</code> and <code>useFractionalMetrics</code>
-        flags provide control over the same properties at the Java 2D
-        level. No mipmap support is requested. Equivalent to
-        <code>TextRenderer(font, antialiased, useFractionalMetrics,
-        null)</code>.
-
-        @param font the font to render with
-        @param antialiased whether to use antialiased fonts
-        @param useFractionalMetrics whether to use fractional font
-        metrics at the Java 2D level
-    */
-    public JhvTextRenderer(final Font font, final boolean antialiased,
-                        final boolean useFractionalMetrics) {
-        this(font, antialiased, useFractionalMetrics, null, false);
-    }
-
     /** Creates a new TextRenderer with the given Font, specified font
         properties, and given RenderDelegate. The
         <code>antialiased</code> and <code>useFractionalMetrics</code>
         flags provide control over the same properties at the Java 2D
         level. The <code>renderDelegate</code> provides more control
-        over the text rendered. No mipmap support is requested.
+        over the text rendered.
 
         @param font the font to render with
         @param antialiased whether to use antialiased fonts
@@ -222,34 +177,10 @@ public class JhvTextRenderer {
         text's bitmap, or null to use the default one
     */
     public JhvTextRenderer(final Font font, final boolean antialiased,
-                        final boolean useFractionalMetrics, final RenderDelegate renderDelegate) {
-        this(font, antialiased, useFractionalMetrics, renderDelegate, false);
-    }
-
-    /** Creates a new TextRenderer with the given Font, specified font
-        properties, and given RenderDelegate. The
-        <code>antialiased</code> and <code>useFractionalMetrics</code>
-        flags provide control over the same properties at the Java 2D
-        level. The <code>renderDelegate</code> provides more control
-        over the text rendered. If <CODE>mipmap</CODE> is true, attempts
-        to use OpenGL's automatic mipmap generation for better smoothing
-        when rendering the TextureRenderer's contents at a distance.
-
-        @param font the font to render with
-        @param antialiased whether to use antialiased fonts
-        @param useFractionalMetrics whether to use fractional font
-        metrics at the Java 2D level
-        @param renderDelegate the render delegate to use to draw the
-        text's bitmap, or null to use the default one
-        @param mipmap whether to attempt use of automatic mipmap generation
-    */
-    public JhvTextRenderer(final Font font, final boolean antialiased,
-                        final boolean useFractionalMetrics, RenderDelegate renderDelegate,
-                        final boolean mipmap) {
+                        final boolean useFractionalMetrics, RenderDelegate renderDelegate) {
         this.font = font;
         this.antialiased = antialiased;
         this.useFractionalMetrics = useFractionalMetrics;
-        this.mipmap = mipmap;
 
         // FIXME: consider adjusting the size based on font size
         // (it will already automatically resize if necessary)
@@ -566,12 +497,6 @@ public class JhvTextRenderer {
             packer.setMaxSize(sz[0], sz[0]);
             haveMaxSize = true;
         }
-
-        // Disable future attempts to use mipmapping if TextureRenderer
-        // doesn't support it
-        if (mipmap && !getBackingStore().isUsingAutoMipmapGeneration()) {
-            mipmap = false;
-        }
     }
 
     /**
@@ -859,11 +784,7 @@ public class JhvTextRenderer {
             // whether we're likely to need to support a full RGBA backing
             // store (i.e., non-default Paint, foreground color, etc.), but
             // for now, let's just be more efficient
-            JhvTextureRenderer renderer = new JhvTextureRenderer(MathUtils.nextPowerOfTwo(w), MathUtils.nextPowerOfTwo(h), true, mipmap);
-            // Whether GL_LINEAR filtering is enabled for the backing store
-            boolean smoothing = true;
-            renderer.setSmoothing(smoothing);
-            return renderer;
+            return new JhvTextureRenderer(MathUtils.nextPowerOfTwo(w), MathUtils.nextPowerOfTwo(h));
         }
 
         @Override
