@@ -13,7 +13,7 @@ import com.jogamp.opengl.GL2;
 
 class GridMath {
 
-    private static final int SUBDIVISIONS = 360;
+    private static final int SUBDIVISIONS = 180;
 
     private static final float[] radialLineColor = BufferUtils.colorDarkGray;
     private static final float[] axisNorthColor = BufferUtils.colorRed;
