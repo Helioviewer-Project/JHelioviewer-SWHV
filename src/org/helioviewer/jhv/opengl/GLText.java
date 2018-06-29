@@ -19,6 +19,7 @@ public class GLText {
     private static final JhvTextRenderer[] renderer = new JhvTextRenderer[SIZE];
 
     public static final float[] shadowColor = { 0.1f, 0.1f, 0.1f, 0.75f };
+    public static final int[] shadowOffset = { 2, -2 };
 
     public static JhvTextRenderer getRenderer(int size) {
         size *= GLInfo.pixelScale[1];
@@ -47,12 +48,12 @@ public class GLText {
         }
     }
 
-    private static final int TEXT_SIZE_NORMAL = 12;
+    private static final int TEXT_SIZE_NORMAL = 14;
 
-    private static final int LEFT_MARGIN_TEXT = 10;
-    private static final int RIGHT_MARGIN_TEXT = 10;
-    private static final int TOP_MARGIN_TEXT = 5;
-    private static final int BOTTOM_MARGIN_TEXT = 5;
+    private static final int LEFT_MARGIN_TEXT = 0;//10;
+    private static final int RIGHT_MARGIN_TEXT = 0;//10;
+    private static final int TOP_MARGIN_TEXT = 0;//5;
+    private static final int BOTTOM_MARGIN_TEXT = 0;//5;
 
     public static void drawText(Viewport vp, List<String> txts, int pt_x, int pt_y) {
         if (txts.isEmpty())
@@ -89,7 +90,7 @@ public class GLText {
         renderer.beginRendering(vp.width, vp.height, true);
         for (String txt : txts) {
             renderer.setColor(shadowColor);
-            renderer.draw(txt, textInit_x + 2, vp.height - textInit_y - 2 - deltaY);
+            renderer.draw(txt, textInit_x + shadowOffset[0], vp.height - textInit_y + shadowOffset[1] - deltaY);
             renderer.setColor(BufferUtils.colorWhite);
             renderer.draw(txt, textInit_x, vp.height - textInit_y - deltaY);
             deltaY += (int) (fontSize * 1.1);
