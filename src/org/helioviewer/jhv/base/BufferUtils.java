@@ -44,6 +44,10 @@ public class BufferUtils {
         buf.put((float) v.x).put((float) v.y).put((float) v.z);
     }
 
+    public static void put4f(FloatBuffer buf, Vec3 v) {
+        buf.put((float) v.x).put((float) v.y).put((float) v.z).put(1);
+    }
+
     public static void put4f(FloatBuffer buf, float x, float y, float z, float w) {
         buf.put(x).put(y).put(z).put(w);
     }

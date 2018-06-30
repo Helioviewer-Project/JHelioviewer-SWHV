@@ -9,7 +9,7 @@ import com.jogamp.opengl.GL2;
 
 public class GLSLTexture {
 
-    private final int[] vboAttribLens = { 3, 2 };
+    private final int[] vboAttribLens = { 4, 2 };
     private final VBO[] vbos = new VBO[2];
 
     private int count;
