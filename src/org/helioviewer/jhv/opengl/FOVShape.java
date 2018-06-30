@@ -10,7 +10,7 @@ import com.jogamp.opengl.GL2;
 public class FOVShape {
 
     private static final int SUBDIVISIONS = 24;
-    private static final float SIZE_POINT = 0.01f;
+    private static final float SIZE_POINT = 0.02f;
     private static final double epsilon = 0.006;
 
     private final double thickness;

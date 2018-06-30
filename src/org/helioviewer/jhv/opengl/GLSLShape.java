@@ -33,7 +33,7 @@ public class GLSLShape {
             return;
 
         GLSLShapeShader.point.bind(gl);
-        GLSLShapeShader.point.setFactor(GLInfo.pixelScale[0] * factor);
+        GLSLShapeShader.point.setFactor(factor);
         GLSLShapeShader.point.bindParams(gl);
 
         bindVBOs(gl);
