@@ -125,8 +125,6 @@ public class GLSLShader {
         if (geometryID != -1)
             gl.glAttachShader(progID, geometryID);
         gl.glAttachShader(progID, fragmentID);
-
-        bindAttribs(gl);
         gl.glLinkProgram(progID);
 
         int[] params = { 0 };
@@ -155,9 +153,6 @@ public class GLSLShader {
             gl.glDetachShader(progID, fragmentID);
             gl.glDeleteShader(fragmentID);
         }
-    }
-
-    protected void bindAttribs(GL2 gl) {
     }
 
 }

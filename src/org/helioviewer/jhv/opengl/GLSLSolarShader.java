@@ -8,8 +8,6 @@ import com.jogamp.opengl.GL2;
 
 public class GLSLSolarShader extends GLSLShader {
 
-    public static final int positionRef = 0;
-
     private static final float[] blurKernel;
     private static final float[] offsets = { -1.2004377f, 0, 1.2004377f };
 
@@ -264,11 +262,6 @@ public class GLSLSolarShader extends GLSLShader {
         polarRadii[0] = (float) start;
         polarRadii[1] = (float) stop;
         gl.glUniform2fv(polarRadiiRef, 1, polarRadii, 0);
-    }
-
-    @Override
-    protected void bindAttribs(GL2 gl) {
-        gl.glBindAttribLocation(progID, positionRef, "position");
     }
 
 }
