@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
 import javax.annotation.Nullable;
 
@@ -18,27 +16,23 @@ import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DownloadViewTask;
 import org.helioviewer.jhv.io.LoadRemoteTask;
-import org.helioviewer.jhv.math.IcoSphere;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.opengl.GLImage.DifferenceMode;
 import org.helioviewer.jhv.opengl.GLSLShader;
+import org.helioviewer.jhv.opengl.GLSLSolar;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
-import org.helioviewer.jhv.opengl.VBO;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.view.AbstractView;
 import org.helioviewer.jhv.view.View;
 import org.json.JSONObject;
 
-import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 
 public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     private final GLImage glImage = new GLImage();
-    private final VBO positionVBO = VBO.gen_float_VBO(0, 4);
-    private final VBO indexVBO = VBO.gen_index_VBO();
     private final ImageLayerOptions optionsPanel;
 
     private boolean removed;
@@ -97,15 +91,6 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     @Override
     public void init(GL2 gl) {
         glImage.init(gl);
-
-        FloatBuffer positionBuffer = IcoSphere.IcoSphere.a;
-        IntBuffer indexBuffer = IcoSphere.IcoSphere.b;
-
-        positionVBO.init(gl);
-        positionVBO.bindBufferData(gl, positionBuffer, Buffers.SIZEOF_FLOAT);
-
-        indexVBO.init(gl);
-        indexVBO.bindBufferData(gl, indexBuffer, Buffers.SIZEOF_INT);
     }
 
     @Override
@@ -218,21 +203,15 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
             shader.bindPolarRadii(gl, scale.getYstart(), scale.getYstop());
 
-            positionVBO.bindArray(gl);
-            indexVBO.bindArray(gl);
-            {
-                if (shader == GLSLSolarShader.ortho) {
-                    shader.bindIsDisc(gl, 1);
-                    gl.glDepthRange(depthrange[2], depthrange[3]);
-                    gl.glDrawElements(GL2.GL_TRIANGLES, indexVBO.bufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
-                    shader.bindIsDisc(gl, 0);
-                }
-                gl.glDepthRange(depthrange[0], depthrange[1]);
-                gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (indexVBO.bufferSize - 6) * Buffers.SIZEOF_INT);
-                gl.glDepthRange(0, 1);
+            if (shader == GLSLSolarShader.ortho) {
+                shader.bindIsDisc(gl, 1);
+                gl.glDepthRange(depthrange[2], depthrange[3]);
+                GLSLSolar.renderDisc(gl);
+                shader.bindIsDisc(gl, 0);
             }
-            indexVBO.unbindArray(gl);
-            positionVBO.unbindArray(gl);
+            gl.glDepthRange(depthrange[0], depthrange[1]);
+            GLSLSolar.render(gl);
+            gl.glDepthRange(0, 1);
         }
         GLSLShader.unbind(gl);
     }
@@ -260,8 +239,6 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     @Override
     public void dispose(GL2 gl) {
-        positionVBO.dispose(gl);
-        indexVBO.dispose(gl);
         glImage.dispose(gl);
     }
 

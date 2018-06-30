@@ -57,6 +57,7 @@ public class GLListener implements GLEventListener {
         gl.glEnable(GL2.GL_VERTEX_PROGRAM_POINT_SIZE);
         gl.glEnable(GL2.GL_POINT_SPRITE);
 
+        GLSLSolar.init(gl);
         GLSLSolarShader.init(gl);
         GLSLPolylineShader.init(gl);
         GLSLShapeShader.init(gl);
@@ -80,6 +81,7 @@ public class GLListener implements GLEventListener {
         blackCircle.dispose(gl);
         GLText.dispose(gl);
 
+        GLSLSolar.dispose(gl);
         GLSLSolarShader.dispose(gl);
         GLSLPolylineShader.dispose(gl);
         GLSLShapeShader.dispose(gl);
