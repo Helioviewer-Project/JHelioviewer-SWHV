@@ -20,12 +20,6 @@ public class Vec3 {
         z = _z;
     }
 
-    private Vec3(Vec3 vec) {
-        x = vec.x;
-        y = vec.y;
-        z = vec.z;
-    }
-
     public Vec3() {
         x = 0;
         y = 0;
