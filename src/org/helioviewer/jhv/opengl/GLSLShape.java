@@ -9,7 +9,6 @@ import com.jogamp.opengl.GL2;
 
 public class GLSLShape {
 
-    private int[] vboAttribRefs;
     private final int[] vboAttribLens = { 4, 4 };
 
     private final VBO[] vbos = new VBO[2];
@@ -70,8 +69,8 @@ public class GLSLShape {
     }
 
     private void initVBOs(GL2 gl) {
-        for (int i = 0; i < vboAttribRefs.length; i++) {
-            vbos[i] = VBO.gen_float_VBO(vboAttribRefs[i], vboAttribLens[i]);
+        for (int i = 0; i < vboAttribLens.length; i++) {
+            vbos[i] = VBO.gen_float_VBO(i, vboAttribLens[i]);
             vbos[i].init(gl);
         }
     }
@@ -87,7 +86,6 @@ public class GLSLShape {
 
     public void init(GL2 gl) {
         if (!inited) {
-            vboAttribRefs = new int[] { GLSLShapeShader.positionRef, GLSLShapeShader.colorRef };
             initVBOs(gl);
             inited = true;
         }
