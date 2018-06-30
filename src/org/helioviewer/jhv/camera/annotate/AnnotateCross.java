@@ -52,13 +52,13 @@ public class AnnotateCross extends AbstractAnnotateable {
 
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 if (i == 0) {
-                    pos.put3f((float) pc.x, (float) pc.y, (float) pc.z);
+                    pos.put4f(pc);
                     col.put4f(BufferUtils.colorNull);
                 }
-                pos.put3f((float) pc.x, (float) pc.y, (float) pc.z);
+                pos.put4f(pc);
                 col.put4f(color);
                 if (i == SUBDIVISIONS) {
-                    pos.put3f((float) pc.x, (float) pc.y, (float) pc.z);
+                    pos.put4f(pc);
                     col.put4f(BufferUtils.colorNull);
                 }
             } else {

@@ -114,13 +114,13 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             Vec3 res = q.rotateInverseVector(v);
 
             if (i == 0) {
-                pos.put3f((float) res.x, (float) res.y, (float) res.z);
+                pos.put4f(res);
                 col.put4f(BufferUtils.colorNull);
             }
-            pos.put3f((float) res.x, (float) res.y, (float) res.z);
+            pos.put4f(res);
             col.put4f(color);
         }
-        pos.repeat3f();
+        pos.repeat4f();
         col.put4f(BufferUtils.colorNull);
     }
 
@@ -227,10 +227,10 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                         float y = -(float) (ynew / r);
                         float z =  (float) (znew / r);
                         if (j == 0) {
-                            pos.put3f(x, y, z);
+                            pos.put4f(x, y, z, 1);
                             col.put4f(BufferUtils.colorNull);
                         }
-                        pos.put3f(x, y, z);
+                        pos.put4f(x, y, z, 1);
                         col.put4f(color);
                     } else {
                         pt.x = xnew / r;
@@ -242,7 +242,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                         previous = GLHelper.drawVertex(camera, vp, pt, previous, pos, col, color);
                     }
                 }
-                pos.repeat3f();
+                pos.repeat4f();
                 col.put4f(BufferUtils.colorNull);
             }
             oldBoundaryPoint3d = new float[] { points[3 * i], points[3 * i + 1], points[3 * i + 2] };
@@ -333,53 +333,53 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
         x = (float) (scale.getXValueInv(thetaStart) * vp.aspect);
         y = (float) scale.getYValueInv(distSunBegin);
-        pos.put3f(x, y, 0);
+        pos.put4f(x, y, 0, 1);
         col.put4f(BufferUtils.colorNull);
-        pos.put3f(x, y, 0);
+        pos.repeat4f();
         col.put4f(color);
 
         y = (float) scale.getYValueInv(distSun + 0.05);
-        pos.put3f(x, y, 0);
+        pos.put4f(x, y, 0, 1);
         col.put4f(color);
-        pos.put3f(x, y, 0);
+        pos.repeat4f();
         col.put4f(BufferUtils.colorNull);
 
         x = (float) (scale.getXValueInv(principalAngleDegree) * vp.aspect);
         y = (float) scale.getYValueInv(distSunBegin);
-        pos.put3f(x, y, 0);
+        pos.put4f(x, y, 0, 1);
         col.put4f(BufferUtils.colorNull);
-        pos.put3f(x, y, 0);
+        pos.repeat4f();
         col.put4f(color);
 
         y = (float) scale.getYValueInv(distSun + 0.05);
-        pos.put3f(x, y, 0);
+        pos.put4f(x, y, 0, 1);
         col.put4f(color);
-        pos.put3f(x, y, 0);
+        pos.repeat4f();
         col.put4f(BufferUtils.colorNull);
 
         x = (float) (scale.getXValueInv(thetaEnd) * vp.aspect);
         y = (float) scale.getYValueInv(distSunBegin);
-        pos.put3f(x, y, 0);
+        pos.put4f(x, y, 0, 1);
         col.put4f(BufferUtils.colorNull);
-        pos.put3f(x, y, 0);
+        pos.repeat4f();
         col.put4f(color);
 
         y = (float) scale.getYValueInv(distSun + 0.05);
-        pos.put3f(x, y, 0);
+        pos.put4f(x, y, 0, 1);
         col.put4f(color);
-        pos.put3f(x, y, 0);
+        pos.repeat4f();
         col.put4f(BufferUtils.colorNull);
 
         y = (float) scale.getYValueInv(distSun);
-        pos.put3f(x, y, 0);
+        pos.put4f(x, y, 0, 1);
         col.put4f(BufferUtils.colorNull);
-        pos.put3f(x, y, 0);
+        pos.repeat4f();
         col.put4f(color);
 
         x = (float) (scale.getXValueInv(thetaStart) * vp.aspect);
-        pos.put3f(x, y, 0);
+        pos.put4f(x, y, 0, 1);
         col.put4f(color);
-        pos.put3f(x, y, 0);
+        pos.repeat4f();
         col.put4f(BufferUtils.colorNull);
 
         glslLine.setData(gl, pos.toBuffer(), col.toBuffer());

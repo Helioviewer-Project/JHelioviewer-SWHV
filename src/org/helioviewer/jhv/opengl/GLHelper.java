@@ -74,32 +74,32 @@ public class GLHelper {
         if (previous != null && Math.abs(previous.x - tf.x) > 0.5) {
             if (tf.x <= 0 && previous.x >= 0) {
                 x = (float) (0.5 * vp.aspect);
-                pos.put3f(x, y, 0);
+                pos.put4f(x, y, 0, 1);
                 col.put4f(color);
 
-                pos.put3f(x, y, 0);
+                pos.put4f(x, y, 0, 1);
                 col.put4f(BufferUtils.colorNull);
-                pos.put3f(-x, y, 0);
+                pos.put4f(-x, y, 0, 1);
                 col.put4f(BufferUtils.colorNull);
 
-                pos.put3f(-x, y, 0);
+                pos.put4f(-x, y, 0, 1);
                 col.put4f(color);
             } else if (tf.x >= 0 && previous.x <= 0) {
                 x = (float) (-0.5 * vp.aspect);
-                pos.put3f(x, y, 0);
+                pos.put4f(x, y, 0, 1);
                 col.put4f(color);
 
-                pos.put3f(x, y, 0);
+                pos.put4f(x, y, 0, 1);
                 col.put4f(BufferUtils.colorNull);
-                pos.put3f(-x, y, 0);
+                pos.put4f(-x, y, 0, 1);
                 col.put4f(BufferUtils.colorNull);
 
-                pos.put3f(-x, y, 0);
+                pos.put4f(-x, y, 0, 1);
                 col.put4f(color);
             }
         }
         x = (float) (tf.x * vp.aspect);
-        pos.put3f(x, y, 0);
+        pos.put4f(x, y, 0, 1);
         col.put4f(color);
         return tf;
     }
