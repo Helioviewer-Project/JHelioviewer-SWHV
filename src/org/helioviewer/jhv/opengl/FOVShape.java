@@ -61,7 +61,7 @@ public class FOVShape {
         double bh = distance * tanY;
         float[] color = highlight ? BufferUtils.colorRed : BufferUtils.colorBlue;
 
-        int no_points = 4 * (SUBDIVISIONS + 2) + 1;
+        int no_points = 4 * (SUBDIVISIONS + 1) + 2;
         FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(no_points * 4);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
 
