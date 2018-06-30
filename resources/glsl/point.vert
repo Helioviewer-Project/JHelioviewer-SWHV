@@ -1,15 +1,15 @@
-#version 150 core
+#version 330 core
 
 uniform mat4 ModelViewProjectionMatrix;
 uniform float factor;
 
-in vec4 position;
-in vec4 color;
+layout(location = 0) in vec4 Vertex;
+layout(location = 1) in vec4 Color;
 
 out vec4 frag_color;
 
 void main(void) {
-    gl_Position = ModelViewProjectionMatrix * vec4(position.xyz, 1.);
-    gl_PointSize = position.w * factor;
-    frag_color = color;
+    gl_Position = ModelViewProjectionMatrix * vec4(Vertex.xyz, 1.);
+    gl_PointSize = Vertex.w * factor;
+    frag_color = Color;
 }
