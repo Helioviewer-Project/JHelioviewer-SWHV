@@ -7,8 +7,6 @@ import org.helioviewer.jhv.math.Transform;
 class GLSLTextureShader extends GLSLShader {
 
     static final GLSLTextureShader texture = new GLSLTextureShader("/glsl/texture.vert", null, "/glsl/texture.frag");
-    static int positionRef = 0;
-    static int coordRef = 1;
 
     private int refModelViewProjectionMatrix;
     private int colorRef;
@@ -40,8 +38,6 @@ class GLSLTextureShader extends GLSLShader {
     @Override
     protected void _after_init(GL2 gl) {
         refModelViewProjectionMatrix = gl.glGetUniformLocation(progID, "ModelViewProjectionMatrix");
-        positionRef = gl.glGetAttribLocation(progID, "position");
-        coordRef = gl.glGetAttribLocation(progID, "coord");
         colorRef = gl.glGetUniformLocation(progID, "color");
         setTextureUnit(gl, "image", 0);
     }
