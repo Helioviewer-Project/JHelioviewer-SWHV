@@ -1,14 +1,10 @@
-#version 150 core
+#version 330 core
 
 uniform mat4 ModelViewProjectionMatrix;
 uniform int isdisc;
 
-in vec4 position;
+layout(location = 0) in vec4 Vertex;
 
 void main(void) {
-    vec4 v = position;
-    if (isdisc == 1) {
-        v = ModelViewProjectionMatrix * v;
-    }
-    gl_Position = v;
+    gl_Position = isdisc == 1 ? ModelViewProjectionMatrix * Vertex : Vertex;
 }
