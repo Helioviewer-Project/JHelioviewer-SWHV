@@ -46,7 +46,7 @@ class PfssLine {
         int dlength = flinex.capacity();
         int numberOfLines = dlength / pointsPerLine;
 
-        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(3 * (dlength + 2 * numberOfLines));
+        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(4 * (dlength + 2 * numberOfLines));
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4 * (dlength + 2 * numberOfLines));
 
         float[] oneColor = loopColor;
@@ -65,7 +65,7 @@ class PfssLine {
                 double r = Math.sqrt(x * x + y * y + z * z);
 
                 if (i % pointsPerLine == 0) { // start line
-                    BufferUtils.put3f(vertexBuffer, (float) x, (float) z, (float) -y);
+                    BufferUtils.put4f(vertexBuffer, (float) x, (float) z, (float) -y, 1);
                     colorBuffer.put(BufferUtils.colorNull);
 
                     if (fixedColor) {
@@ -84,11 +84,11 @@ class PfssLine {
                     }
                 }
 
-                BufferUtils.put3f(vertexBuffer, (float) x, (float) z, (float) -y);
+                BufferUtils.put4f(vertexBuffer, (float) x, (float) z, (float) -y, 1);
                 colorBuffer.put(r > radius ? BufferUtils.colorNull : (fixedColor ? oneColor : brightColor));
 
                 if (i % pointsPerLine == pointsPerLine - 1) { // end line
-                    BufferUtils.put3f(vertexBuffer, (float) x, (float) z, (float) -y);
+                    BufferUtils.put4f(vertexBuffer, (float) x, (float) z, (float) -y, 1);
                     colorBuffer.put(BufferUtils.colorNull);
                 }
             }

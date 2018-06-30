@@ -248,6 +248,9 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         FloatArray orbitColor = new FloatArray();
 
         float[] xyz = new float[3];
+        float[] xyzw = new float[4];
+        xyzw[3] = 1;
+
         long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
 
         for (LoadPosition loadPosition : loadPositions) {
@@ -258,10 +261,10 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             float[] color = loadPosition.getTarget().getColor();
             long t = start;
 
-            double dist = response.getInterpolated(xyz, t, start, end);
-            orbitPosition.put3f(xyz);
+            double dist = response.getInterpolated(xyzw, t, start, end);
+            orbitPosition.put4f(xyzw);
             orbitColor.put4f(BufferUtils.colorNull);
-            orbitPosition.repeat3f();
+            orbitPosition.repeat4f();
             orbitColor.put4f(color);
 
             long delta = getStep(dist);
@@ -269,12 +272,12 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
                 t += delta;
                 if (t > time)
                     t = time;
-                dist = response.getInterpolated(xyz, t, start, end);
-                orbitPosition.put3f(xyz);
+                dist = response.getInterpolated(xyzw, t, start, end);
+                orbitPosition.put4f(xyzw);
                 orbitColor.put4f(color);
                 delta = getStep(dist);
             }
-            orbitPosition.repeat3f();
+            orbitPosition.repeat4f();
             orbitColor.put4f(BufferUtils.colorNull);
 
             response.getInterpolated(xyz, time, start, end);
