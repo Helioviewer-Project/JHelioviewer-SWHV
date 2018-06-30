@@ -61,18 +61,19 @@ public class FOVShape {
         double bh = distance * tanY;
         float[] color = highlight ? BufferUtils.colorRed : BufferUtils.colorBlue;
 
-        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2) + 1) * 3);
-        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer((4 * (SUBDIVISIONS + 2) + 1) * 4);
+        int no_points = 4 * (SUBDIVISIONS + 2) + 1;
+        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(no_points * 4);
+        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             x = -bw + 2 * bw / SUBDIVISIONS * i + centerX;
             y = bh + centerY;
             z = computeZ(x, y);
             if (i == 0) { // first
-                BufferUtils.put3f(vertexBuffer, (float) x, (float) y, (float) z);
+                BufferUtils.put4f(vertexBuffer, (float) x, (float) y, (float) z, 1);
                 colorBuffer.put(BufferUtils.colorNull);
             }
-            BufferUtils.put3f(vertexBuffer, (float) x, (float) y, (float) z);
+            BufferUtils.put4f(vertexBuffer, (float) x, (float) y, (float) z, 1);
             colorBuffer.put(i % 2 == 0 ? color : BufferUtils.colorWhite);
         }
 
@@ -80,7 +81,7 @@ public class FOVShape {
             x = bw + centerX;
             y = bh - 2 * bh / SUBDIVISIONS * i + centerY;
             z = computeZ(x, y);
-            BufferUtils.put3f(vertexBuffer, (float) x, (float) y, (float) z);
+            BufferUtils.put4f(vertexBuffer, (float) x, (float) y, (float) z, 1);
             colorBuffer.put(i % 2 == 0 ? color : BufferUtils.colorWhite);
         }
 
@@ -88,7 +89,7 @@ public class FOVShape {
             x = bw - 2 * bw / SUBDIVISIONS * i + centerX;
             y = -bh + centerY;
             z = computeZ(x, y);
-            BufferUtils.put3f(vertexBuffer, (float) x, (float) y, (float) z);
+            BufferUtils.put4f(vertexBuffer, (float) x, (float) y, (float) z, 1);
             colorBuffer.put(i % 2 == 0 ? color : BufferUtils.colorWhite);
         }
 
@@ -96,10 +97,10 @@ public class FOVShape {
             x = -bw + centerX;
             y = -bh + 2 * bh / SUBDIVISIONS * i + centerY;
             z = computeZ(x, y);
-            BufferUtils.put3f(vertexBuffer, (float) x, (float) y, (float) z);
+            BufferUtils.put4f(vertexBuffer, (float) x, (float) y, (float) z, 1);
             colorBuffer.put(i % 2 == 0 ? color : BufferUtils.colorWhite);
             if (i == SUBDIVISIONS) { // last
-                BufferUtils.put3f(vertexBuffer, (float) x, (float) y, (float) z);
+                BufferUtils.put4f(vertexBuffer, (float) x, (float) y, (float) z, 1);
                 colorBuffer.put(BufferUtils.colorNull);
             }
         }

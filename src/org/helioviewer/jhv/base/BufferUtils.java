@@ -36,14 +36,6 @@ public class BufferUtils {
         return newByteBuffer(2 * len).asShortBuffer();
     }
 
-    public static void put3f(FloatBuffer buf, float x, float y, float z) {
-        buf.put(x).put(y).put(z);
-    }
-
-    public static void put3f(FloatBuffer buf, Vec3 v) {
-        buf.put((float) v.x).put((float) v.y).put((float) v.z);
-    }
-
     public static void put4f(FloatBuffer buf, Vec3 v) {
         buf.put((float) v.x).put((float) v.y).put((float) v.z).put(1);
     }

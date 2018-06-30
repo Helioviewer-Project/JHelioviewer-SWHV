@@ -55,10 +55,10 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 if (i == 0) { // first
-                    pos.put3f((float) pc.x, (float) pc.y, (float) pc.z);
+                    pos.put4f(pc);
                     col.put4f(BufferUtils.colorNull);
                 }
-                pos.put3f((float) pc.x, (float) pc.y, (float) pc.z);
+                pos.put4f(pc);
                 col.put4f(color);
             } else {
                 pc.y = -pc.y;
@@ -75,7 +75,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
 
             if (Display.mode == Display.DisplayMode.Orthographic) {
-                pos.put3f((float) pc.x, (float) pc.y, (float) pc.z);
+                pos.put4f(pc);
                 col.put4f(color);
             } else {
                 pc.y = -pc.y;
@@ -89,7 +89,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
 
             if (Display.mode == Display.DisplayMode.Orthographic) {
-                pos.put3f((float) pc.x, (float) pc.y, (float) pc.z);
+                pos.put4f(pc);
                 col.put4f(color);
             } else {
                 pc.y = -pc.y;
@@ -103,10 +103,10 @@ public class AnnotateRectangle extends AbstractAnnotateable {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
 
             if (Display.mode == Display.DisplayMode.Orthographic) {
-                pos.put3f((float) pc.x, (float) pc.y, (float) pc.z);
+                pos.put4f(pc);
                 col.put4f(color);
                 if (i == SUBDIVISIONS) { // last
-                    pos.put3f((float) pc.x, (float) pc.y, (float) pc.z);
+                    pos.put4f(pc);
                     col.put4f(BufferUtils.colorNull);
                 }
             } else {

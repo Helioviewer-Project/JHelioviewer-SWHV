@@ -42,26 +42,26 @@ class GridMath {
 
     static void initAxes(GL2 gl, GLSLPolyline axesLine) {
         int plen = 8;
-        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(plen * 3);
+        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(plen * 4);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(plen * 4);
 
-        BufferUtils.put3f(vertexBuffer, 0, -AXIS_STOP, 0);
+        BufferUtils.put4f(vertexBuffer, 0, -AXIS_STOP, 0, 1);
         colorBuffer.put(BufferUtils.colorNull);
-        BufferUtils.put3f(vertexBuffer, 0, -AXIS_STOP, 0);
+        BufferUtils.put4f(vertexBuffer, 0, -AXIS_STOP, 0, 1);
         colorBuffer.put(axisSouthColor);
-        BufferUtils.put3f(vertexBuffer, 0, -AXIS_START, 0);
+        BufferUtils.put4f(vertexBuffer, 0, -AXIS_START, 0, 1);
         colorBuffer.put(axisSouthColor);
 
-        BufferUtils.put3f(vertexBuffer, 0, -AXIS_START, 0);
+        BufferUtils.put4f(vertexBuffer, 0, -AXIS_START, 0, 1);
         colorBuffer.put(BufferUtils.colorNull);
-        BufferUtils.put3f(vertexBuffer, 0, AXIS_START, 0);
+        BufferUtils.put4f(vertexBuffer, 0, AXIS_START, 0, 1);
         colorBuffer.put(BufferUtils.colorNull);
 
-        BufferUtils.put3f(vertexBuffer, 0, AXIS_START, 0);
+        BufferUtils.put4f(vertexBuffer, 0, AXIS_START, 0, 1);
         colorBuffer.put(axisNorthColor);
-        BufferUtils.put3f(vertexBuffer, 0, AXIS_STOP, 0);
+        BufferUtils.put4f(vertexBuffer, 0, AXIS_STOP, 0, 1);
         colorBuffer.put(axisNorthColor);
-        BufferUtils.put3f(vertexBuffer, 0, AXIS_STOP, 0);
+        BufferUtils.put4f(vertexBuffer, 0, AXIS_STOP, 0, 1);
         colorBuffer.put(BufferUtils.colorNull);
 
         vertexBuffer.rewind();
@@ -83,7 +83,7 @@ class GridMath {
 
     static void initEarthCircles(GL2 gl, GLSLPolyline earthCircleLine) {
         int no_points = 2 * (SUBDIVISIONS + 3);
-        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(no_points * 3);
+        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(no_points * 4);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
 
         Vec3 rotv = new Vec3(), v = new Vec3();
@@ -94,14 +94,13 @@ class GridMath {
             v.z = 0.;
             rotv = q.rotateVector(v);
             if (i == 0) {
-                BufferUtils.put3f(vertexBuffer, rotv);
+                BufferUtils.put4f(vertexBuffer, rotv);
                 colorBuffer.put(BufferUtils.colorNull);
             }
-            BufferUtils.put3f(vertexBuffer, rotv);
+            BufferUtils.put4f(vertexBuffer, rotv);
             colorBuffer.put(earthLineColor);
         }
-
-        BufferUtils.put3f(vertexBuffer, rotv);
+        BufferUtils.put4f(vertexBuffer, rotv);
         colorBuffer.put(BufferUtils.colorNull);
 
         v = new Vec3();
@@ -112,14 +111,13 @@ class GridMath {
             v.z = 0.;
             rotv = q.rotateVector(v);
             if (i == 0) {
-                BufferUtils.put3f(vertexBuffer, rotv);
+                BufferUtils.put4f(vertexBuffer, rotv);
                 colorBuffer.put(BufferUtils.colorNull);
             }
-            BufferUtils.put3f(vertexBuffer, rotv);
+            BufferUtils.put4f(vertexBuffer, rotv);
             colorBuffer.put(earthLineColor);
         }
-
-        BufferUtils.put3f(vertexBuffer, rotv);
+        BufferUtils.put4f(vertexBuffer, rotv);
         colorBuffer.put(BufferUtils.colorNull);
 
         vertexBuffer.rewind();
@@ -130,10 +128,11 @@ class GridMath {
     static void initRadialCircles(GL2 gl, GLSLPolyline radialCircleLine, GLSLPolyline radialThickLine, double unit, double step) {
         int no_lines = (int) Math.ceil(360 / step);
         int no_points = (END_RADIUS - START_RADIUS + 1 - TENS_RADIUS) * (SUBDIVISIONS + 3) + (LINEAR_STEPS + 3) * no_lines;
-        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(no_points * 3);
+        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(no_points * 4);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
-        FloatBuffer vertexThick = BufferUtils.newFloatBuffer(TENS_RADIUS * (SUBDIVISIONS + 3) * 3);
-        FloatBuffer colorThick = BufferUtils.newFloatBuffer(TENS_RADIUS * (SUBDIVISIONS + 3) * 4);
+        int no_points_thick = TENS_RADIUS * (SUBDIVISIONS + 3);
+        FloatBuffer vertexThick = BufferUtils.newFloatBuffer(no_points_thick * 4);
+        FloatBuffer colorThick = BufferUtils.newFloatBuffer(no_points_thick * 4);
 
         for (int i = START_RADIUS; i <= END_RADIUS; i++) {
             FloatBuffer vertexTarget = i % 10 == 0 ? vertexThick : vertexBuffer;
@@ -144,13 +143,13 @@ class GridMath {
                 float y = (float) (i * unit * Math.sin(2 * Math.PI * j / SUBDIVISIONS));
 
                 if (j == 0) {
-                    BufferUtils.put3f(vertexTarget, x, y, 0);
+                    BufferUtils.put4f(vertexTarget, x, y, 0, 1);
                     colorTarget.put(BufferUtils.colorNull);
                 }
-                BufferUtils.put3f(vertexTarget, x, y, 0);
+                BufferUtils.put4f(vertexTarget, x, y, 0, 1);
                 colorTarget.put(radialLineColor);
                 if (j == SUBDIVISIONS) {
-                    BufferUtils.put3f(vertexTarget, x, y, 0);
+                    BufferUtils.put4f(vertexTarget, x, y, 0, 1);
                     colorTarget.put(BufferUtils.colorNull);
                 }
             }
@@ -167,13 +166,13 @@ class GridMath {
                 Vec3 rotv = q.rotateVector(v);
 
                 if (k == 0) {
-                    BufferUtils.put3f(vertexBuffer, rotv);
+                    BufferUtils.put4f(vertexBuffer, rotv);
                     colorBuffer.put(BufferUtils.colorNull);
                 }
-                BufferUtils.put3f(vertexBuffer, rotv);
+                BufferUtils.put4f(vertexBuffer, rotv);
                 colorBuffer.put(radialLineColor);
                 if (k == LINEAR_STEPS) {
-                    BufferUtils.put3f(vertexBuffer, rotv);
+                    BufferUtils.put4f(vertexBuffer, rotv);
                     colorBuffer.put(BufferUtils.colorNull);
                 }
             }
@@ -189,7 +188,7 @@ class GridMath {
 
     static void initFlatGrid(GL2 gl, GLSLPolyline flatLine, double aspect) {
         int plen = (LINEAR_STEPS + 3) * (FLAT_STEPS_THETA + 1 + FLAT_STEPS_RADIAL + 1);
-        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(plen * 3);
+        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(plen * 4);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(plen * 4);
 
         for (int i = 0; i <= FLAT_STEPS_THETA; i++) {
@@ -198,13 +197,13 @@ class GridMath {
                 float v = (float) (-0.5 + k / (double) LINEAR_STEPS);
 
                 if (k == 0) {
-                    BufferUtils.put3f(vertexBuffer, start, v, 0);
+                    BufferUtils.put4f(vertexBuffer, start, v, 0, 1);
                     colorBuffer.put(BufferUtils.colorNull);
                 }
-                BufferUtils.put3f(vertexBuffer, start, v, 0);
+                BufferUtils.put4f(vertexBuffer, start, v, 0, 1);
                 colorBuffer.put(i == FLAT_STEPS_THETA / 2 ? color2 : color1);
                 if (k == LINEAR_STEPS) {
-                    BufferUtils.put3f(vertexBuffer, start, v, 0);
+                    BufferUtils.put4f(vertexBuffer, start, v, 0, 1);
                     colorBuffer.put(BufferUtils.colorNull);
                 }
             }
@@ -215,13 +214,13 @@ class GridMath {
                 float v = (float) (aspect * (-0.5 + k / (double) LINEAR_STEPS));
 
                 if (k == 0) {
-                    BufferUtils.put3f(vertexBuffer, v, start, 0);
+                    BufferUtils.put4f(vertexBuffer, v, start, 0, 1);
                     colorBuffer.put(BufferUtils.colorNull);
                 }
-                BufferUtils.put3f(vertexBuffer, v, start, 0);
+                BufferUtils.put4f(vertexBuffer, v, start, 0, 1);
                 colorBuffer.put(i == FLAT_STEPS_RADIAL / 2 ? color2 : color1);
                 if (k == LINEAR_STEPS) {
-                    BufferUtils.put3f(vertexBuffer, v, start, 0);
+                    BufferUtils.put4f(vertexBuffer, v, start, 0, 1);
                     colorBuffer.put(BufferUtils.colorNull);
                 }
             }
@@ -237,7 +236,7 @@ class GridMath {
         int HALFDIVISIONS = SUBDIVISIONS / 2;
 
         int no_points = 2 * (no_lat_steps + no_lon_steps) * (HALFDIVISIONS + 3);
-        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(no_points * 3);
+        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(no_points * 4);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
 
         Vec3 v = new Vec3();
@@ -253,13 +252,13 @@ class GridMath {
                     Vec3 rotv = q.rotateVector(v);
 
                     if (i == 0) {
-                        BufferUtils.put3f(vertexBuffer, rotv);
+                        BufferUtils.put4f(vertexBuffer, rotv);
                         colorBuffer.put(BufferUtils.colorNull);
                     }
-                    BufferUtils.put3f(vertexBuffer, rotv);
+                    BufferUtils.put4f(vertexBuffer, rotv);
                     colorBuffer.put(i % 2 == 0 ? color1 : color2);
                     if (i == HALFDIVISIONS) {
-                        BufferUtils.put3f(vertexBuffer, rotv);
+                        BufferUtils.put4f(vertexBuffer, rotv);
                         colorBuffer.put(BufferUtils.colorNull);
                     }
                 }
@@ -275,13 +274,13 @@ class GridMath {
                     v.z = GRID_RADIUS * Math.sqrt(1. - scale * scale) * Math.cos(2 * Math.PI * i / HALFDIVISIONS);
 
                     if (i == 0) {
-                        BufferUtils.put3f(vertexBuffer, v);
+                        BufferUtils.put4f(vertexBuffer, v);
                         colorBuffer.put(BufferUtils.colorNull);
                     }
-                    BufferUtils.put3f(vertexBuffer, v);
+                    BufferUtils.put4f(vertexBuffer, v);
                     colorBuffer.put(i % 2 == 0 ? color1 : color2);
                     if (i == HALFDIVISIONS) {
-                        BufferUtils.put3f(vertexBuffer, v);
+                        BufferUtils.put4f(vertexBuffer, v);
                         colorBuffer.put(BufferUtils.colorNull);
                     }
                 }

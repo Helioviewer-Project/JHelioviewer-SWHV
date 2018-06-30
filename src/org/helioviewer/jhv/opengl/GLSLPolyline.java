@@ -11,7 +11,7 @@ import com.jogamp.opengl.GL3;
 
 public class GLSLPolyline {
 
-    private final int[] vboAttribLens = { 3, 4 };
+    private final int[] vboAttribLens = { 4, 4 };
     private final VBO[] vbos = new VBO[2];
 
     private int count;
