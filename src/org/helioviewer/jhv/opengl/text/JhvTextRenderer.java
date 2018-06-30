@@ -131,7 +131,7 @@ public class JhvTextRenderer {
     // force a compaction
     private static final float MAX_VERTICAL_FRAGMENTATION = 0.7f;
     private static final int kQuadsPerBuffer = 100;
-    private static final int kCoordsPerVertVerts = 3;
+    private static final int kCoordsPerVertVerts = 4;
     private static final int kCoordsPerVertTex = 2;
     private static final int kVertsPerQuad = 6;
     private static final int kTotalBufferSizeVerts = kQuadsPerBuffer * kVertsPerQuad;
@@ -1032,24 +1032,22 @@ public class JhvTextRenderer {
                                       ((float) (texturey + height) / (float) renderer.getHeight()));
                 // A
                 mPipelinedQuadRenderer.glTexCoord2f(tx1, ty1);
-                mPipelinedQuadRenderer.glVertex3f(x, y, z);
+                mPipelinedQuadRenderer.glVertex4f(x, y, z, 1);
                 // B
                 mPipelinedQuadRenderer.glTexCoord2f(tx2, ty1);
-                mPipelinedQuadRenderer.glVertex3f(x + (width * scaleFactor), y, z);
+                mPipelinedQuadRenderer.glVertex4f(x + (width * scaleFactor), y, z, 1);
                 // C
                 mPipelinedQuadRenderer.glTexCoord2f(tx2, ty2);
-                mPipelinedQuadRenderer.glVertex3f(x + (width * scaleFactor),
-                                                  y + (height * scaleFactor), z);
+                mPipelinedQuadRenderer.glVertex4f(x + (width * scaleFactor), y + (height * scaleFactor), z, 1);
                 // A
                 mPipelinedQuadRenderer.glTexCoord2f(tx1, ty1);
-                mPipelinedQuadRenderer.glVertex3f(x, y, z);
+                mPipelinedQuadRenderer.glVertex4f(x, y, z, 1);
                 // C
                 mPipelinedQuadRenderer.glTexCoord2f(tx2, ty2);
-                mPipelinedQuadRenderer.glVertex3f(x + (width * scaleFactor),
-                                                  y + (height * scaleFactor), z);
+                mPipelinedQuadRenderer.glVertex4f(x + (width * scaleFactor), y + (height * scaleFactor), z, 1);
                 // D
                 mPipelinedQuadRenderer.glTexCoord2f(tx1, ty2);
-                mPipelinedQuadRenderer.glVertex3f(x, y + (height * scaleFactor), z);
+                mPipelinedQuadRenderer.glVertex4f(x, y + (height * scaleFactor), z, 1);
             } catch (final Exception e) {
                 e.printStackTrace();
             }
@@ -1294,12 +1292,12 @@ public class JhvTextRenderer {
             mTexCoords = Buffers.newDirectFloatBuffer(kTotalBufferSizeCoordsTex);
         }
 
-        void glTexCoord2f(final float v, final float v1) {
+        void glTexCoord2f(float v, float v1) {
             mTexCoords.put(v).put(v1);
         }
 
-        void glVertex3f(final float inX, final float inY, final float inZ) {
-            mVertCoords.put(inX).put(inY).put(inZ);
+        void glVertex4f(float x, float y, float z, float w) {
+            mVertCoords.put(x).put(y).put(z).put(w);
 
             mOutstandingGlyphsVerticesPipeline++;
             if (mOutstandingGlyphsVerticesPipeline >= kTotalBufferSizeVerts) {

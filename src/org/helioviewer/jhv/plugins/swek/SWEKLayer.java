@@ -128,7 +128,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     private final float texCoord2[][] = { { 1, 1 }, { 1, 0 }, { 0, 0 }, { 0, 1 } };
     private final FloatBuffer texBuf1 = BufferUtils.newFloatBuffer(8);
     private final FloatBuffer texBuf2 = BufferUtils.newFloatBuffer(8);
-    private final FloatBuffer vexBuf = BufferUtils.newFloatBuffer(12);
+    private final FloatBuffer vexBuf = BufferUtils.newFloatBuffer(16);
 
     private void drawCactusArc(Viewport vp, GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
         double angularWidthDegree = SWEKData.readCMEAngularWidthDegree(evt);
@@ -182,7 +182,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                     v.x = r * Math.cos(theta);
                     v.y = r * Math.sin(theta);
                     Vec3 res = q.rotateInverseVector(v);
-                    BufferUtils.put3f(vexBuf, res);
+                    BufferUtils.put4f(vexBuf, res);
                 }
             }
             vexBuf.rewind();
@@ -278,10 +278,10 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
         vexBuf.rewind();
         {
-            BufferUtils.put3f(vexBuf, (float) (theta + width2), (float) (r - height2), 0);
-            BufferUtils.put3f(vexBuf, (float) (theta + width2), (float) (r + height2), 0);
-            BufferUtils.put3f(vexBuf, (float) (theta - width2), (float) (r + height2), 0);
-            BufferUtils.put3f(vexBuf, (float) (theta - width2), (float) (r - height2), 0);
+            BufferUtils.put4f(vexBuf, (float) (theta + width2), (float) (r - height2), 0, 1);
+            BufferUtils.put4f(vexBuf, (float) (theta + width2), (float) (r + height2), 0, 1);
+            BufferUtils.put4f(vexBuf, (float) (theta - width2), (float) (r + height2), 0, 1);
+            BufferUtils.put4f(vexBuf, (float) (theta - width2), (float) (r - height2), 0, 1);
         }
         vexBuf.rewind();
 
@@ -415,10 +415,10 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
         vexBuf.rewind();
         {
-            BufferUtils.put3f(vexBuf, p3);
-            BufferUtils.put3f(vexBuf, p2);
-            BufferUtils.put3f(vexBuf, p1);
-            BufferUtils.put3f(vexBuf, p0);
+            BufferUtils.put4f(vexBuf, p3);
+            BufferUtils.put4f(vexBuf, p2);
+            BufferUtils.put4f(vexBuf, p1);
+            BufferUtils.put4f(vexBuf, p0);
         }
         vexBuf.rewind();
 
