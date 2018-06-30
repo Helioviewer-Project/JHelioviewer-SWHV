@@ -11,7 +11,6 @@ public class VBO {
     private final int vec_len;
 
     private int bufferID = -1;
-    public int bufferSize = -1;
 
     private VBO(int _buffer_type, int _attribRef, int _vec_len) {
         attribRef = _attribRef;
@@ -52,13 +51,11 @@ public class VBO {
     public void dispose(GL2 gl) {
         gl.glDeleteBuffers(1, new int[] { bufferID }, 0);
         bufferID = -1;
-        bufferSize = -1;
     }
 
-    public void bindBufferData(GL2 gl, Buffer buffer, int buf_sizeof) {
+    public void bindBufferData4(GL2 gl, Buffer buffer) {
         gl.glBindBuffer(buffer_type, bufferID);
-        bufferSize = buffer.limit();
-        gl.glBufferData(buffer_type, bufferSize * buf_sizeof, buffer, GL2.GL_STATIC_DRAW);
+        gl.glBufferData(buffer_type, 4 * buffer.limit(), buffer, GL2.GL_STATIC_DRAW);
         gl.glBindBuffer(buffer_type, 0);
     }
 

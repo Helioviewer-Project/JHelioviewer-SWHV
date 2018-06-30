@@ -4,7 +4,6 @@ import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.log.Log;
 
-import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 
 public class GLSLShape {
@@ -22,8 +21,8 @@ public class GLSLShape {
             Log.error("Something is wrong with the vertices or colors from this GLShape");
             return;
         }
-        vbos[0].bindBufferData(gl, points, Buffers.SIZEOF_FLOAT);
-        vbos[1].bindBufferData(gl, colors, Buffers.SIZEOF_FLOAT);
+        vbos[0].bindBufferData4(gl, points);
+        vbos[1].bindBufferData4(gl, colors);
         count = plen;
     }
 

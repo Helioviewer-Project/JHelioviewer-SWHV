@@ -4,7 +4,6 @@ import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.log.Log;
 
-import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 
 public class GLSLTexture {
@@ -22,8 +21,8 @@ public class GLSLTexture {
             Log.error("Something is wrong with the vertices or coords from this GLSLTexture");
             return;
         }
-        vbos[0].bindBufferData(gl, position, Buffers.SIZEOF_FLOAT);
-        vbos[1].bindBufferData(gl, coords, Buffers.SIZEOF_FLOAT);
+        vbos[0].bindBufferData4(gl, position);
+        vbos[1].bindBufferData4(gl, coords);
         count = plen;
     }
 
