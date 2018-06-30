@@ -11,7 +11,6 @@ import com.jogamp.opengl.GL3;
 
 public class GLSLPolyline {
 
-    private int[] vboAttribRefs;
     private final int[] vboAttribLens = { 3, 4 };
 
     private final VBO[] vbos = new VBO[2];
@@ -59,8 +58,8 @@ public class GLSLPolyline {
     }
 
     private void initVBOs(GL2 gl) {
-        for (int i = 0; i < vboAttribRefs.length; i++) {
-            vbos[i] = VBO.gen_float_VBO(vboAttribRefs[i], vboAttribLens[i]);
+        for (int i = 0; i < vboAttribLens.length; i++) {
+            vbos[i] = VBO.gen_float_VBO(i, vboAttribLens[i]);
             vbos[i].init(gl);
         }
     }
@@ -76,7 +75,6 @@ public class GLSLPolyline {
 
     public void init(GL2 gl) {
         if (!inited) {
-            vboAttribRefs = new int[] { GLSLPolylineShader.vertexRef, GLSLPolylineShader.colorRef };
             initVBOs(gl);
             inited = true;
         }
