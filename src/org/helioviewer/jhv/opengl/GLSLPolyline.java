@@ -5,7 +5,6 @@ import java.nio.FloatBuffer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.log.Log;
 
-import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL3;
 
@@ -24,8 +23,8 @@ public class GLSLPolyline {
             Log.error("Something is wrong with the vertices or colors from this GLSLPolyline");
             return;
         }
-        vbos[0].bindBufferData(gl, points, Buffers.SIZEOF_FLOAT);
-        vbos[1].bindBufferData(gl, colors, Buffers.SIZEOF_FLOAT);
+        vbos[0].bindBufferData4(gl, points);
+        vbos[1].bindBufferData4(gl, colors);
         count = plen;
     }
 
