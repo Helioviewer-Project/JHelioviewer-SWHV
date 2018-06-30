@@ -23,7 +23,7 @@ class GridMath {
     private static final float[] color1 = BufferUtils.colorRed;
     private static final float[] color2 = BufferUtils.colorGreen;
 
-    private static final float earthPointSize = 0.01f;
+    private static final float earthPointSize = 0.02f;
 
     private static final int LINEAR_STEPS = 1;
 
