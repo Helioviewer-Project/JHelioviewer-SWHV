@@ -7,8 +7,6 @@ import com.jogamp.opengl.GL2;
 class GLSLPolylineShader extends GLSLShader {
 
     static final GLSLPolylineShader polyline = new GLSLPolylineShader("/glsl/polyline.vert", "/glsl/polyline.geom", "/glsl/polyline.frag");
-    static int vertexRef = 0;
-    static int colorRef = 1;
 
     private int refModelViewProjectionMatrix;
     private int thicknessRef;
@@ -44,9 +42,6 @@ class GLSLPolylineShader extends GLSLShader {
     @Override
     protected void _after_init(GL2 gl) {
         refModelViewProjectionMatrix = gl.glGetUniformLocation(progID, "ModelViewProjectionMatrix");
-        vertexRef = gl.glGetAttribLocation(progID, "Vertex");
-        colorRef = gl.glGetAttribLocation(progID, "Color");
-
         thicknessRef = gl.glGetUniformLocation(progID, "Thickness");
         viewportRef = gl.glGetUniformLocation(progID, "Viewport");
         miterLimitRef = gl.glGetUniformLocation(progID, "MiterLimit");
