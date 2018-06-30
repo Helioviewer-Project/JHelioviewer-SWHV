@@ -37,7 +37,7 @@ import com.jogamp.opengl.GL2;
 public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     private final GLImage glImage = new GLImage();
-    private final VBO positionVBO = VBO.gen_float_VBO(0, 3);
+    private final VBO positionVBO = VBO.gen_float_VBO(0, 4);
     private final VBO indexVBO = VBO.gen_index_VBO();
     private final ImageLayerOptions optionsPanel;
 
