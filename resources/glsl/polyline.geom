@@ -8,9 +8,10 @@
  * \copyright MIT license
 */
 
-uniform float Thickness;
+#define MiterLimit 0.75
+
 uniform vec2 Viewport;
-uniform float MiterLimit;
+uniform float Thickness;
 
 layout(lines_adjacency) in;
 layout(triangle_strip, max_vertices = 7) out;
