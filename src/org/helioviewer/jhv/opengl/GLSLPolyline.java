@@ -34,7 +34,7 @@ public class GLSLPolyline {
 
         GLSLPolylineShader.polyline.bind(gl);
         GLSLPolylineShader.polyline.setThickness(thickness);
-        GLSLPolylineShader.polyline.bindViewport(gl, vp.aspect);
+        GLSLPolylineShader.polyline.setViewport(vp.aspect);
         GLSLPolylineShader.polyline.bindParams(gl);
 
         bindVBOs(gl);
