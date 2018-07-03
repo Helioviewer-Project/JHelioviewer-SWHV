@@ -258,15 +258,11 @@ class JhvTextureRenderer {
       Transform.setIdentityView();
     }
 
-    final Texture texture = getTexture();
-    texture.enable(gl);
-    texture.bind(gl);
+    getTexture().bind(gl);
   }
 
   private void endRendering(final boolean ortho) {
     final GL2 gl = (GL2) GLContext.getCurrentGL();
-    final Texture texture = getTexture();
-    texture.disable(gl);
     if (ortho) {
       gl.glEnable(GL2.GL_DEPTH_TEST);
 
