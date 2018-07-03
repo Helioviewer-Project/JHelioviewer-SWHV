@@ -73,33 +73,41 @@ class JhvTextureRenderer {
   private BufferedImage image;
 
   private Texture texture;
-  private AWTTextureData textureData;
+  private final AWTTextureData textureData;
   private boolean mustReallocateTexture;
   private Rectangle dirtyRegion;
+
+  private final int width;
+  private final int height;
 
   /** Creates a new renderer with backing store of the specified width
       and height.
       @param width the width of the texture to render into
       @param height the height of the texture to render into
   */
-  JhvTextureRenderer(final int width, final int height) {
-    init(width, height);
+  JhvTextureRenderer(int _width, int _height) {
+    width = _width;
+    height = _height;
+    int internalFormat = GL2.GL_RGBA; // force for high version OpenGL
+    int imageType = BufferedImage.TYPE_INT_ARGB_PRE;
+    image = new BufferedImage(width, height, imageType);
+    // Always reallocate the TextureData associated with this
+    // BufferedImage; it's just a reference to the contents but we
+    // need it in order to update sub-regions of the underlying
+    // texture
+    final GL2 gl = (GL2) GLContext.getCurrentGL();
+    textureData = new AWTTextureData(gl.getGLProfile(), internalFormat, 0, true, image);
+    // For now, always reallocate the underlying OpenGL texture when
+    // the backing store size changes
+    mustReallocateTexture = true;
   }
 
-  /** Returns the width of the backing store of this renderer.
-
-      @return the width of the backing store of this renderer
-  */
   public int getWidth() {
-    return image.getWidth();
+    return width;
   }
 
-  /** Returns the height of the backing store of this renderer.
-
-      @return the height of the backing store of this renderer
-  */
   public int getHeight() {
-    return image.getHeight();
+    return height;
   }
 
   /** Creates a {@link java.awt.Graphics2D Graphics2D} instance for
@@ -265,27 +273,6 @@ class JhvTextureRenderer {
       Transform.popView();
       Transform.popProjection();
     }
-  }
-
-  private void init(final int width, final int height) {
-    final GL2 gl = (GL2) GLContext.getCurrentGL();
-    // Discard previous BufferedImage if any
-    if (image != null) {
-      image.flush();
-      image = null;
-    }
-
-    final int internalFormat = GL2.GL_RGBA; // force for high version OpenGL
-    final int imageType = BufferedImage.TYPE_INT_ARGB_PRE;
-    image = new BufferedImage(width, height, imageType);
-    // Always realllocate the TextureData associated with this
-    // BufferedImage; it's just a reference to the contents but we
-    // need it in order to update sub-regions of the underlying
-    // texture
-    textureData = new AWTTextureData(gl.getGLProfile(), internalFormat, 0, true, image);
-    // For now, always reallocate the underlying OpenGL texture when
-    // the backing store size changes
-    mustReallocateTexture = true;
   }
 
   /** Synchronizes the specified region of the backing store down to
