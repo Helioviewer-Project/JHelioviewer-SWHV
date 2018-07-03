@@ -416,7 +416,6 @@ public class JhvTextRenderer {
         return new Rectangle2D.Double(minX, minY, maxX - minX, maxY - minY);
     }
 
-
     private Rectangle2D normalize(final Rectangle2D src) {
         // Give ourselves a boundary around each entity on the backing
         // store in order to prevent bleeding of nearby Strings due to
@@ -443,7 +442,6 @@ public class JhvTextRenderer {
                 cachedGraphics = null;
                 cachedFontRenderContext = null;
             }
-
             cachedBackingStore = renderer;
         }
 
@@ -455,7 +453,6 @@ public class JhvTextRenderer {
 
         if (cachedGraphics == null) {
             cachedGraphics = renderer.createGraphics();
-
             // Set up composite, font and rendering hints
             cachedGraphics.setComposite(AlphaComposite.Src);
             cachedGraphics.setColor(Color.WHITE);
@@ -931,6 +928,8 @@ public class JhvTextRenderer {
 
     // A temporary to prevent excessive garbage creation
     private final char[] singleUnicode = new char[1];
+    private final float[] txcArray = new float[12];
+    private final float[] vtxArray = new float[24];
 
     /** A Glyph represents either a single unicode glyph or a
         substring of characters to be drawn. The reason for the dual
@@ -1030,24 +1029,52 @@ public class JhvTextRenderer {
                 final float tx2 = xScale * (texturex + width) / renderer.getWidth();
                 final float ty2 = yScale * (1.0f -
                                       ((float) (texturey + height) / (float) renderer.getHeight()));
+
                 // A
-                mPipelinedQuadRenderer.glTexCoord2f(tx1, ty1);
-                mPipelinedQuadRenderer.glVertex4f(x, y, z, 1);
+                txcArray[0] = tx1;
+                txcArray[1] = ty1;
+                vtxArray[0] = x;
+                vtxArray[1] = y;
+                vtxArray[2] = z;
+                vtxArray[3] = 1;
                 // B
-                mPipelinedQuadRenderer.glTexCoord2f(tx2, ty1);
-                mPipelinedQuadRenderer.glVertex4f(x + (width * scaleFactor), y, z, 1);
+                txcArray[2] = tx2;
+                txcArray[3] = ty1;
+                vtxArray[4] = x + (width * scaleFactor);
+                vtxArray[5] = y;
+                vtxArray[6] = z;
+                vtxArray[7] = 1;
                 // C
-                mPipelinedQuadRenderer.glTexCoord2f(tx2, ty2);
-                mPipelinedQuadRenderer.glVertex4f(x + (width * scaleFactor), y + (height * scaleFactor), z, 1);
+                txcArray[4] = tx2;
+                txcArray[5] = ty2;
+                vtxArray[8] = x + (width * scaleFactor);
+                vtxArray[9] = y + (height * scaleFactor);
+                vtxArray[10] = z;
+                vtxArray[11] = 1;
                 // A
-                mPipelinedQuadRenderer.glTexCoord2f(tx1, ty1);
-                mPipelinedQuadRenderer.glVertex4f(x, y, z, 1);
+                txcArray[6] = tx1;
+                txcArray[7] = ty1;
+                vtxArray[12] = x;
+                vtxArray[13] = y;
+                vtxArray[14] = z;
+                vtxArray[15] = 1;
                 // C
-                mPipelinedQuadRenderer.glTexCoord2f(tx2, ty2);
-                mPipelinedQuadRenderer.glVertex4f(x + (width * scaleFactor), y + (height * scaleFactor), z, 1);
+                txcArray[8] = tx2;
+                txcArray[9] = ty2;
+                vtxArray[16] = x + (width * scaleFactor);
+                vtxArray[17] = y + (height * scaleFactor);
+                vtxArray[18] = z;
+                vtxArray[19] = 1;
                 // D
-                mPipelinedQuadRenderer.glTexCoord2f(tx1, ty2);
-                mPipelinedQuadRenderer.glVertex4f(x, y + (height * scaleFactor), z, 1);
+                txcArray[10] = tx1;
+                txcArray[11] = ty2;
+                vtxArray[20] = x;
+                vtxArray[21] = y + (height * scaleFactor);
+                vtxArray[22] = z;
+                vtxArray[23] = 1;
+
+                mPipelinedQuadRenderer.glTexCoord2f(txcArray);
+                mPipelinedQuadRenderer.glVertex4f(vtxArray);
             } catch (final Exception e) {
                 e.printStackTrace();
             }
@@ -1292,14 +1319,13 @@ public class JhvTextRenderer {
             mTexCoords = Buffers.newDirectFloatBuffer(kTotalBufferSizeCoordsTex);
         }
 
-        void glTexCoord2f(float v, float v1) {
-            mTexCoords.put(v).put(v1);
+        void glTexCoord2f(float[] array) {
+            mTexCoords.put(array);
         }
 
-        void glVertex4f(float x, float y, float z, float w) {
-            mVertCoords.put(x).put(y).put(z).put(w);
-
-            mOutstandingGlyphsVerticesPipeline++;
+        void glVertex4f(float[] array) {
+            mVertCoords.put(array);
+            mOutstandingGlyphsVerticesPipeline += kVertsPerQuad;
             if (mOutstandingGlyphsVerticesPipeline >= kTotalBufferSizeVerts) {
                 this.draw();
             }
@@ -1309,8 +1335,8 @@ public class JhvTextRenderer {
             if (mOutstandingGlyphsVerticesPipeline > 0) {
                 final GL2 gl = (GL2) GLContext.getCurrentGL();
 
-                final JhvTextureRenderer renderer = getBackingStore();
-                renderer.getTexture(); // triggers texture uploads.  Maybe this should be more obvious?
+                //final JhvTextureRenderer renderer = getBackingStore();
+                //renderer.getTexture(); // triggers texture uploads.  Maybe this should be more obvious?
 
                 mVertCoords.rewind();
                 mTexCoords.rewind();
