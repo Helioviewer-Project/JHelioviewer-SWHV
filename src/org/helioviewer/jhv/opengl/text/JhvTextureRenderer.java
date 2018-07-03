@@ -308,8 +308,8 @@ class JhvTextureRenderer {
 
   // Returns true if the texture was newly allocated, false if not
   private boolean ensureTexture() {
-    final GL2 gl = (GL2) GLContext.getCurrentGL();
     if (mustReallocateTexture) {
+      final GL2 gl = (GL2) GLContext.getCurrentGL();
       if (texture != null) {
         texture.destroy(gl);
         texture = null;
@@ -318,6 +318,7 @@ class JhvTextureRenderer {
     }
 
     if (texture == null) {
+      final GL2 gl = (GL2) GLContext.getCurrentGL();
       texture = TextureIO.newTexture(textureData);
       texture.setTexParameteri(gl, GL2.GL_TEXTURE_BASE_LEVEL, 0);
       texture.setTexParameteri(gl, GL2.GL_TEXTURE_MAX_LEVEL, 15);
