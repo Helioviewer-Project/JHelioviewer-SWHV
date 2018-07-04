@@ -58,7 +58,6 @@ import java.text.*;
 import java.util.*;
 
 import com.jogamp.opengl.*;
-//import com.jogamp.opengl.fixedfunc.GLPointerFunc;
 
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.GLSLTexture;
@@ -160,7 +159,7 @@ public class JhvTextRenderer {
     int beginRenderingWidth;
     int beginRenderingHeight;
 
-    Pipelined_QuadRenderer mPipelinedQuadRenderer;
+    final Pipelined_QuadRenderer mPipelinedQuadRenderer;
 
     /**
      * Creates a new TextRenderer with the given Font, specified font
@@ -177,8 +176,7 @@ public class JhvTextRenderer {
      * @param renderDelegate       the render delegate to use to draw the
      *                             text's bitmap, or null to use the default one
      */
-    public JhvTextRenderer(final Font font, final boolean antialiased,
-                           final boolean useFractionalMetrics, RenderDelegate renderDelegate) {
+    public JhvTextRenderer(Font font, boolean antialiased, boolean useFractionalMetrics, RenderDelegate renderDelegate) {
         this.font = font;
         this.antialiased = antialiased;
         this.useFractionalMetrics = useFractionalMetrics;
@@ -190,10 +188,10 @@ public class JhvTextRenderer {
         if (renderDelegate == null) {
             renderDelegate = new DefaultRenderDelegate();
         }
-
         this.renderDelegate = renderDelegate;
 
         mGlyphProducer = new GlyphProducer(font.getNumGlyphs());
+        mPipelinedQuadRenderer = new Pipelined_QuadRenderer();
     }
 
     /**
@@ -201,7 +199,7 @@ public class JhvTextRenderer {
      * was rendered at the origin. See {@link #getBounds(CharSequence)
      * getBounds(CharSequence)}.
      */
-    public Rectangle2D getBounds(final String str) {
+    public Rectangle2D getBounds(String str) {
         return getBounds((CharSequence) str);
     }
 
@@ -222,22 +220,17 @@ public class JhvTextRenderer {
      * etc.) the returned bounds correspond to, although every effort
      * is made to ensure an accurate bound.
      */
-    private Rectangle2D getBounds(final CharSequence str) {
+    private Rectangle2D getBounds(CharSequence str) {
         // FIXME: this should be more optimized and use the glyph cache
-        final Rect r = stringLocations.get(str);
-
+        Rect r = stringLocations.get(str);
         if (r != null) {
-            final TextData data = (TextData) r.getUserData();
-
+            TextData data = (TextData) r.getUserData();
             // Reconstitute the Java 2D results based on the cached values
-            return new Rectangle2D.Double(-data.origin().x, -data.origin().y,
-                    r.w(), r.h());
+            return new Rectangle2D.Double(-data.origin().x, -data.origin().y, r.w(), r.h());
         }
-
         // Must return a Rectangle compatible with the layout algorithm --
         // must be idempotent
-        return normalize(renderDelegate.getBounds(str, font,
-                getFontRenderContext()));
+        return normalize(renderDelegate.getBounds(str, font, getFontRenderContext()));
     }
 
     /**
@@ -258,7 +251,6 @@ public class JhvTextRenderer {
         if (cachedFontRenderContext == null) {
             cachedFontRenderContext = getGraphics2D().getFontRenderContext();
         }
-
         return cachedFontRenderContext;
     }
 
@@ -279,8 +271,7 @@ public class JhvTextRenderer {
      * @param disableDepthTest whether to disable the depth test
      * @throws GLException If an OpenGL context is not current when this method is called
      */
-    public void beginRendering(final int width, final int height, final boolean disableDepthTest)
-            throws GLException {
+    public void beginRendering(int width, int height, boolean disableDepthTest) throws GLException {
         beginRendering(true, width, height);
     }
 
@@ -310,9 +301,8 @@ public class JhvTextRenderer {
      * premultiplied colors are used internally. The default color is
      * opaque white.
      */
-    public void setColor(float[] color)
-            throws GLException {
-        flushGlyphPipeline();
+    public void setColor(float[] color) throws GLException {
+        flush();
         textColor = color;
     }
 
@@ -328,7 +318,7 @@ public class JhvTextRenderer {
      * @param y   the y coordinate at which to draw
      * @throws GLException If an OpenGL context is not current when this method is called
      */
-    public void draw(final CharSequence str, final int x, final int y) throws GLException {
+    public void draw(CharSequence str, int x, int y) throws GLException {
         draw3D(str, x, y, 0, 1);
     }
 
@@ -337,7 +327,7 @@ public class JhvTextRenderer {
      * renderer's current color. See {@link #draw(CharSequence, int,
      * int) draw(CharSequence, int, int)}.
      */
-    public void draw(final String str, final int x, final int y) throws GLException {
+    public void draw(String str, int x, int y) throws GLException {
         draw3D(str, x, y, 0, 1);
     }
 
@@ -354,8 +344,7 @@ public class JhvTextRenderer {
      * @param scaleFactor a uniform scale factor applied to the width and height of the drawn rectangle
      * @throws GLException If an OpenGL context is not current when this method is called
      */
-    private void draw3D(final CharSequence str, final float x, final float y, final float z,
-                        final float scaleFactor) {
+    private void draw3D(CharSequence str, float x, float y, float z, float scaleFactor) {
         internal_draw3D(str, x, y, z, scaleFactor);
     }
 
@@ -365,14 +354,14 @@ public class JhvTextRenderer {
      * float, float, float, float) draw3D(CharSequence, float, float,
      * float, float)}.
      */
-    public void draw3D(final String str, final float x, final float y, final float z, final float scaleFactor) {
+    public void draw3D(String str, float x, float y, float z, float scaleFactor) {
         internal_draw3D(str, x, y, z, scaleFactor);
     }
 
     /**
      * Returns the pixel width of the given character.
      */
-    public float getCharWidth(final char inChar) {
+    public float getCharWidth(char inChar) {
         return mGlyphProducer.getGlyphPixelWidth(inChar);
     }
 
@@ -384,7 +373,7 @@ public class JhvTextRenderer {
      * draw().
      */
     public void flush() {
-        flushGlyphPipeline();
+        mPipelinedQuadRenderer.draw();
     }
 
     /**
@@ -429,19 +418,19 @@ public class JhvTextRenderer {
     // Internals only below this point
     //
 
-    static Rectangle2D preNormalize(final Rectangle2D src) {
+    static Rectangle2D preNormalize(Rectangle2D src) {
         // Need to round to integer coordinates
         // Also give ourselves a little slop around the reported
         // bounds of glyphs because it looks like neither the visual
         // nor the pixel bounds works perfectly well
-        final int minX = (int) Math.floor(src.getMinX()) - 1;
-        final int minY = (int) Math.floor(src.getMinY()) - 1;
-        final int maxX = (int) Math.ceil(src.getMaxX()) + 1;
-        final int maxY = (int) Math.ceil(src.getMaxY()) + 1;
+        int minX = (int) Math.floor(src.getMinX()) - 1;
+        int minY = (int) Math.floor(src.getMinY()) - 1;
+        int maxX = (int) Math.ceil(src.getMaxX()) + 1;
+        int maxY = (int) Math.ceil(src.getMaxY()) + 1;
         return new Rectangle2D.Double(minX, minY, maxX - minX, maxY - minY);
     }
 
-    Rectangle2D normalize(final Rectangle2D src) {
+    Rectangle2D normalize(Rectangle2D src) {
         // Give ourselves a boundary around each entity on the backing
         // store in order to prevent bleeding of nearby Strings due to
         // the fact that we use linear filtering
@@ -449,7 +438,7 @@ public class JhvTextRenderer {
         // NOTE that this boundary is quite heuristic and is related
         // to how far away in 3D we may view the text --
         // heuristically, 1.5% of the font's height
-        final int boundary = (int) Math.max(1, 0.015 * font.getSize());
+        int boundary = (int) Math.max(1, 0.015 * font.getSize());
 
         return new Rectangle2D.Double((int) Math.floor(src.getMinX() - boundary),
                 (int) Math.floor(src.getMinY() - boundary),
@@ -458,8 +447,7 @@ public class JhvTextRenderer {
     }
 
     JhvTextureRenderer getBackingStore() {
-        final JhvTextureRenderer renderer = (JhvTextureRenderer) packer.getBackingStore();
-
+        JhvTextureRenderer renderer = (JhvTextureRenderer) packer.getBackingStore();
         if (renderer != cachedBackingStore) {
             // Backing store changed since last time; discard any cached Graphics2D
             if (cachedGraphics != null) {
@@ -469,13 +457,11 @@ public class JhvTextRenderer {
             }
             cachedBackingStore = renderer;
         }
-
         return cachedBackingStore;
     }
 
     Graphics2D getGraphics2D() {
-        final JhvTextureRenderer renderer = getBackingStore();
-
+        JhvTextureRenderer renderer = getBackingStore();
         if (cachedGraphics == null) {
             cachedGraphics = renderer.createGraphics();
             // Set up composite, font and rendering hints
@@ -483,20 +469,14 @@ public class JhvTextRenderer {
             cachedGraphics.setColor(Color.WHITE);
             cachedGraphics.setFont(font);
             cachedGraphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                    (antialiased ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON
-                            : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF));
+                    (antialiased ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF));
             cachedGraphics.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
-                    (useFractionalMetrics
-                            ? RenderingHints.VALUE_FRACTIONALMETRICS_ON
-                            : RenderingHints.VALUE_FRACTIONALMETRICS_OFF));
+                    (useFractionalMetrics ? RenderingHints.VALUE_FRACTIONALMETRICS_ON : RenderingHints.VALUE_FRACTIONALMETRICS_OFF));
         }
-
         return cachedGraphics;
     }
 
-    private void beginRendering(final boolean ortho, final int width, final int height) {
-        final GL2 gl = (GL2) GLContext.getCurrentGL();
-
+    private void beginRendering(boolean ortho, int width, int height) {
         inBeginEndPair = true;
         isOrthoMode = ortho;
         beginRenderingWidth = width;
@@ -508,28 +488,21 @@ public class JhvTextRenderer {
             getBackingStore().begin3DRendering();
         }
 
-        // Push client attrib bits used by the pipelined quad renderer
-        // gl.glPushClientAttrib((int) GL2.GL_ALL_CLIENT_ATTRIB_BITS);
-
         if (!haveMaxSize) {
             // Query OpenGL for the maximum texture size and set it in the
             // RectanglePacker to keep it from expanding too large
-            final int[] sz = new int[1];
+            int[] sz = new int[1];
+            GL2 gl = (GL2) GLContext.getCurrentGL();
             gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_SIZE, sz, 0);
             packer.setMaxSize(sz[0], sz[0]);
             haveMaxSize = true;
         }
     }
 
-    /**
-     * emzic: here the call to glBindBuffer crashes on certain graphicscard/driver combinations
-     * this is why the ugly try-catch block has been added, which falls back to the old textrenderer
-     */
-    private void endRendering(final boolean ortho) throws GLException {
-        flushGlyphPipeline();
+    private void endRendering(boolean ortho) throws GLException {
+        flush();
 
         inBeginEndPair = false;
-
         if (ortho) {
             getBackingStore().endOrthoRendering();
         } else {
@@ -543,13 +516,12 @@ public class JhvTextRenderer {
     }
 
     void clearUnusedEntries() {
-        final List<Rect> deadRects = new ArrayList<>();
+        List<Rect> deadRects = new ArrayList<>();
 
         // Iterate through the contents of the backing store, removing
         // text strings that haven't been used recently
         packer.visit(rect -> {
-            final TextData data = (TextData) rect.getUserData();
-
+            TextData data = (TextData) rect.getUserData();
             if (data.used()) {
                 data.clearUsed();
             } else {
@@ -557,36 +529,27 @@ public class JhvTextRenderer {
             }
         });
 
-        for (final Rect r : deadRects) {
+        for (Rect r : deadRects) {
             packer.remove(r);
             stringLocations.remove(((TextData) r.getUserData()).string());
 
-            final int unicodeToClearFromCache = ((TextData) r.getUserData()).unicodeID;
-
+            int unicodeToClearFromCache = ((TextData) r.getUserData()).unicodeID;
             if (unicodeToClearFromCache > 0) {
                 mGlyphProducer.clearCacheEntry(unicodeToClearFromCache);
             }
         }
 
         // If we removed dead rectangles this cycle, try to do a compaction
-        final float frag = packer.verticalFragmentationRatio();
-
+        float frag = packer.verticalFragmentationRatio();
         if (!deadRects.isEmpty() && (frag > MAX_VERTICAL_FRAGMENTATION)) {
             packer.compact();
         }
     }
 
-    private void internal_draw3D(final CharSequence str, float x, final float y, final float z,
-                                 final float scaleFactor) {
-        for (final Glyph glyph : mGlyphProducer.getGlyphs(str)) {
-            final float advance = glyph.draw3D(x, y, z, scaleFactor);
+    private void internal_draw3D(CharSequence str, float x, float y, float z, float scaleFactor) {
+        for (Glyph glyph : mGlyphProducer.getGlyphs(str)) {
+            float advance = glyph.draw3D(x, y, z, scaleFactor);
             x += advance * scaleFactor;
-        }
-    }
-
-    private void flushGlyphPipeline() {
-        if (mPipelinedQuadRenderer != null) {
-            mPipelinedQuadRenderer.draw();
         }
     }
 
@@ -606,15 +569,13 @@ public class JhvTextRenderer {
          * Computes the bounds of the given String relative to the
          * origin.
          */
-        Rectangle2D getBounds(String str, Font font,
-                              FontRenderContext frc);
+        Rectangle2D getBounds(String str, Font font, FontRenderContext frc);
 
         /**
          * Computes the bounds of the given character sequence relative
          * to the origin.
          */
-        Rectangle2D getBounds(CharSequence str, Font font,
-                              FontRenderContext frc);
+        Rectangle2D getBounds(CharSequence str, Font font, FontRenderContext frc);
 
         /**
          * Computes the bounds of the given GlyphVector, already
@@ -654,8 +615,7 @@ public class JhvTextRenderer {
          * state to that desired each time this method is called, in
          * particular those states which are not the defaults.
          */
-        void drawGlyphVector(Graphics2D graphics, GlyphVector str,
-                             int x, int y);
+        void drawGlyphVector(Graphics2D graphics, GlyphVector str, int x, int y);
     }
 
     private static class CharSequenceIterator implements CharacterIterator {
@@ -666,11 +626,11 @@ public class JhvTextRenderer {
         CharSequenceIterator() {
         }
 
-        CharSequenceIterator(final CharSequence sequence) {
+        CharSequenceIterator(CharSequence sequence) {
             initFromCharSequence(sequence);
         }
 
-        void initFromCharSequence(final CharSequence sequence) {
+        void initFromCharSequence(CharSequence sequence) {
             mSequence = sequence;
             mLength = mSequence.length();
             mCurrentIndex = 0;
@@ -703,7 +663,7 @@ public class JhvTextRenderer {
         }
 
         @Override
-        public char setIndex(final int position) {
+        public char setIndex(int position) {
             mCurrentIndex = position;
             return current();
         }
@@ -725,7 +685,7 @@ public class JhvTextRenderer {
 
         @Override
         public Object clone() {
-            final CharSequenceIterator iter = new CharSequenceIterator(mSequence);
+            CharSequenceIterator iter = new CharSequenceIterator(mSequence);
             iter.mCurrentIndex = mCurrentIndex;
             return iter;
         }
@@ -813,7 +773,7 @@ public class JhvTextRenderer {
         private Graphics2D g;
 
         @Override
-        public Object allocateBackingStore(final int w, final int h) {
+        public Object allocateBackingStore(int w, int h) {
             // FIXME: should consider checking Font's attributes to see
             // whether we're likely to need to support a full RGBA backing
             // store (i.e., non-default Paint, foreground color, etc.), but
@@ -822,12 +782,12 @@ public class JhvTextRenderer {
         }
 
         @Override
-        public void deleteBackingStore(final Object backingStore) {
+        public void deleteBackingStore(Object backingStore) {
             ((JhvTextureRenderer) backingStore).dispose();
         }
 
         @Override
-        public boolean preExpand(final Rect cause, final int attemptNumber) {
+        public boolean preExpand(Rect cause, int attemptNumber) {
             // Only try this one time; clear out potentially obsolete entries
             // NOTE: this heuristic and the fact that it clears the used bit
             // of all entries seems to cause cycling of entries in some
@@ -854,7 +814,7 @@ public class JhvTextRenderer {
         }
 
         @Override
-        public boolean additionFailed(final Rect cause, final int attemptNumber) {
+        public boolean additionFailed(Rect cause, int attemptNumber) {
             // Heavy hammer -- might consider doing something different
             packer.clear();
             stringLocations.clear();
@@ -868,7 +828,7 @@ public class JhvTextRenderer {
         }
 
         @Override
-        public void beginMovement(final Object oldBackingStore, final Object newBackingStore) {
+        public void beginMovement(Object oldBackingStore, Object newBackingStore) {
             // Exit the begin / end pair if necessary
             if (inBeginEndPair) {
                 // Draw any outstanding glyphs
@@ -880,16 +840,14 @@ public class JhvTextRenderer {
                 }
             }
 
-            final JhvTextureRenderer newRenderer = (JhvTextureRenderer) newBackingStore;
+            JhvTextureRenderer newRenderer = (JhvTextureRenderer) newBackingStore;
             g = newRenderer.createGraphics();
         }
 
         @Override
-        public void move(final Object oldBackingStore, final Rect oldLocation,
-                         final Object newBackingStore, final Rect newLocation) {
-            final JhvTextureRenderer oldRenderer = (JhvTextureRenderer) oldBackingStore;
-            final JhvTextureRenderer newRenderer = (JhvTextureRenderer) newBackingStore;
-
+        public void move(Object oldBackingStore, Rect oldLocation, Object newBackingStore, Rect newLocation) {
+            JhvTextureRenderer oldRenderer = (JhvTextureRenderer) oldBackingStore;
+            JhvTextureRenderer newRenderer = (JhvTextureRenderer) newBackingStore;
             if (oldRenderer == newRenderer) {
                 // Movement on the same backing store -- easy case
                 g.copyArea(oldLocation.x(), oldLocation.y(), oldLocation.w(),
@@ -897,7 +855,7 @@ public class JhvTextRenderer {
                         newLocation.y() - oldLocation.y());
             } else {
                 // Need to draw from the old renderer's image into the new one
-                final Image img = oldRenderer.getImage();
+                Image img = oldRenderer.getImage();
                 g.drawImage(img, newLocation.x(), newLocation.y(),
                         newLocation.x() + newLocation.w(),
                         newLocation.y() + newLocation.h(), oldLocation.x(),
@@ -907,18 +865,16 @@ public class JhvTextRenderer {
         }
 
         @Override
-        public void endMovement(final Object oldBackingStore, final Object newBackingStore) {
+        public void endMovement(Object oldBackingStore, Object newBackingStore) {
             g.dispose();
 
             // Sync the whole surface
-            final JhvTextureRenderer newRenderer = (JhvTextureRenderer) newBackingStore;
-            newRenderer.markDirty(0, 0, newRenderer.getWidth(),
-                    newRenderer.getHeight());
+            JhvTextureRenderer newRenderer = (JhvTextureRenderer) newBackingStore;
+            newRenderer.markDirty(0, 0, newRenderer.getWidth(), newRenderer.getHeight());
             // Re-enter the begin / end pair if necessary
             if (inBeginEndPair) {
                 if (isOrthoMode) {
-                    ((JhvTextureRenderer) newBackingStore).beginOrthoRendering(beginRenderingWidth,
-                            beginRenderingHeight);
+                    ((JhvTextureRenderer) newBackingStore).beginOrthoRendering(beginRenderingWidth, beginRenderingHeight);
                 } else {
                     ((JhvTextureRenderer) newBackingStore).begin3DRendering();
                 }
@@ -929,32 +885,27 @@ public class JhvTextRenderer {
     public static class DefaultRenderDelegate implements RenderDelegate {
 
         @Override
-        public Rectangle2D getBounds(final CharSequence str, final Font font,
-                                     final FontRenderContext frc) {
-            return getBounds(font.createGlyphVector(frc,
-                    new CharSequenceIterator(str)),
-                    frc);
+        public Rectangle2D getBounds(CharSequence str, Font font, FontRenderContext frc) {
+            return getBounds(font.createGlyphVector(frc, new CharSequenceIterator(str)), frc);
         }
 
         @Override
-        public Rectangle2D getBounds(final String str, final Font font,
-                                     final FontRenderContext frc) {
+        public Rectangle2D getBounds(String str, Font font, FontRenderContext frc) {
             return getBounds(font.createGlyphVector(frc, str), frc);
         }
 
         @Override
-        public Rectangle2D getBounds(final GlyphVector gv, final FontRenderContext frc) {
+        public Rectangle2D getBounds(GlyphVector gv, FontRenderContext frc) {
             return gv.getVisualBounds();
         }
 
         @Override
-        public void drawGlyphVector(final Graphics2D graphics, final GlyphVector str,
-                                    final int x, final int y) {
+        public void drawGlyphVector(Graphics2D graphics, GlyphVector str, int x, int y) {
             graphics.drawGlyphVector(str, x, y);
         }
 
         @Override
-        public void draw(final Graphics2D graphics, final String str, final int x, final int y) {
+        public void draw(Graphics2D graphics, String str, int x, int y) {
             graphics.drawString(str, x, y);
         }
     }
@@ -1001,11 +952,7 @@ public class JhvTextRenderer {
         private Rect glyphRectForTextureMapping;
 
         // Creates a Glyph representing an individual Unicode character
-        Glyph(final int unicodeID,
-              final int glyphCode,
-              final float advance,
-              final GlyphVector singleUnicodeGlyphVector,
-              final GlyphProducer producer) {
+        Glyph(int unicodeID, int glyphCode, float advance, GlyphVector singleUnicodeGlyphVector, GlyphProducer producer) {
             this.unicodeID = unicodeID;
             this.glyphCode = glyphCode;
             this.advance = advance;
@@ -1037,36 +984,32 @@ public class JhvTextRenderer {
         /**
          * Draws this glyph and returns the (x) advance for this glyph
          */
-        float draw3D(final float inX, final float inY, final float z, final float scaleFactor) {
+        float draw3D(float inX, float inY, float z, float scaleFactor) {
             // This is the code path taken for individual glyphs
             if (glyphRectForTextureMapping == null) {
                 upload();
             }
 
             try {
-                if (mPipelinedQuadRenderer == null) {
-                    mPipelinedQuadRenderer = new Pipelined_QuadRenderer();
-                }
-
-                final JhvTextureRenderer renderer = getBackingStore();
-                final Rect rect = glyphRectForTextureMapping;
-                final TextData data = (TextData) rect.getUserData();
+                JhvTextureRenderer renderer = getBackingStore();
+                Rect rect = glyphRectForTextureMapping;
+                TextData data = (TextData) rect.getUserData();
                 data.markUsed();
 
-                final Rectangle2D origRect = data.origRect();
+                Rectangle2D origRect = data.origRect();
 
-                final float x = inX - (scaleFactor * data.origOriginX());
-                final float y = inY - (scaleFactor * ((float) origRect.getHeight() - data.origOriginY()));
+                float x = inX - (scaleFactor * data.origOriginX());
+                float y = inY - (scaleFactor * ((float) origRect.getHeight() - data.origOriginY()));
 
-                final int texturex = rect.x() + (data.origin().x - data.origOriginX());
-                final int texturey = renderer.getHeight() - rect.y() - (int) origRect.getHeight() - (data.origin().y - data.origOriginY());
-                final int width = (int) origRect.getWidth();
-                final int height = (int) origRect.getHeight();
+                int texturex = rect.x() + (data.origin().x - data.origOriginX());
+                int texturey = renderer.getHeight() - rect.y() - (int) origRect.getHeight() - (data.origin().y - data.origOriginY());
+                int width = (int) origRect.getWidth();
+                int height = (int) origRect.getHeight();
 
-                final float tx1 = texturex / (float) renderer.getWidth();
-                final float ty1 = 1f - texturey / (float) renderer.getHeight();
-                final float tx2 = (texturex + width) / (float) renderer.getWidth();
-                final float ty2 = 1f - (texturey + height) / (float) renderer.getHeight();
+                float tx1 = texturex / (float) renderer.getWidth();
+                float ty1 = 1f - texturey / (float) renderer.getHeight();
+                float tx2 = (texturex + width) / (float) renderer.getWidth();
+                float ty2 = 1f - (texturey + height) / (float) renderer.getHeight();
 
                 // A
                 txcArray[0] = tx1;
@@ -1113,7 +1056,7 @@ public class JhvTextRenderer {
 
                 mPipelinedQuadRenderer.glTexCoord2f(txcArray);
                 mPipelinedQuadRenderer.glVertex4f(vtxArray);
-            } catch (final Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return advance;
@@ -1127,21 +1070,18 @@ public class JhvTextRenderer {
         }
 
         private void upload() {
-            final GlyphVector gv = getGlyphVector();
-            final Rectangle2D origBBox = preNormalize(renderDelegate.getBounds(gv, getFontRenderContext()));
-            final Rectangle2D bbox = normalize(origBBox);
-            final Point origin = new Point((int) -bbox.getMinX(),
-                    (int) -bbox.getMinY());
-            final Rect rect = new Rect(0, 0, (int) bbox.getWidth(),
-                    (int) bbox.getHeight(),
-                    new TextData(null, origin, origBBox, unicodeID));
+            GlyphVector gv = getGlyphVector();
+            Rectangle2D origBBox = preNormalize(renderDelegate.getBounds(gv, getFontRenderContext()));
+            Rectangle2D bbox = normalize(origBBox);
+            Point origin = new Point((int) -bbox.getMinX(), (int) -bbox.getMinY());
+            Rect rect = new Rect(0, 0, (int) bbox.getWidth(), (int) bbox.getHeight(), new TextData(null, origin, origBBox, unicodeID));
             packer.add(rect);
             glyphRectForTextureMapping = rect;
-            final Graphics2D g = getGraphics2D();
+            Graphics2D g = getGraphics2D();
             // OK, should now have an (x, y) for this rectangle; rasterize
             // the glyph
-            final int strx = rect.x() + origin.x;
-            final int stry = rect.y() + origin.y;
+            int strx = rect.x() + origin.x;
+            int stry = rect.y() + origin.y;
 
             // Clear out the area we're going to draw into
             g.setComposite(AlphaComposite.Clear);
@@ -1152,7 +1092,7 @@ public class JhvTextRenderer {
             renderDelegate.drawGlyphVector(g, gv, strx, stry);
 
             if (DRAW_BBOXES) {
-                final TextData data = (TextData) rect.getUserData();
+                TextData data = (TextData) rect.getUserData();
                 // Draw a bounding box on the backing store
                 g.drawRect(strx - data.origOriginX(),
                         stry - data.origOriginY(),
@@ -1165,14 +1105,13 @@ public class JhvTextRenderer {
             }
 
             // Mark this region of the TextureRenderer as dirty
-            getBackingStore().markDirty(rect.x(), rect.y(), rect.w(),
-                    rect.h());
+            getBackingStore().markDirty(rect.x(), rect.y(), rect.w(), rect.h());
             // Re-register ourselves with our producer
             producer.register(this);
         }
 
         private GlyphVector getGlyphVector() {
-            final GlyphVector gv = singleUnicodeGlyphVector;
+            GlyphVector gv = singleUnicodeGlyphVector;
             if (gv != null) {
                 singleUnicodeGlyphVector = null; // Don't need this anymore
                 return gv;
@@ -1195,13 +1134,13 @@ public class JhvTextRenderer {
         // We re-use this for each incoming string
         final CharSequenceIterator iter = new CharSequenceIterator();
 
-        GlyphProducer(final int fontLengthInGlyphs) {
+        GlyphProducer(int fontLengthInGlyphs) {
             unicodes2Glyphs = new int[512];
             glyphCache = new Glyph[fontLengthInGlyphs];
             clearAllCacheEntries();
         }
 
-        List<Glyph> getGlyphs(final CharSequence inString) {
+        List<Glyph> getGlyphs(CharSequence inString) {
             glyphsOutput.clear();
             GlyphVector fullRunGlyphVector;
             fullRunGlyphVector = fullGlyphVectorCache.get(inString.toString());
@@ -1211,16 +1150,16 @@ public class JhvTextRenderer {
                 fullGlyphVectorCache.put(inString.toString(), fullRunGlyphVector);
             }
 
-            final int lengthInGlyphs = fullRunGlyphVector.getNumGlyphs();
+            int lengthInGlyphs = fullRunGlyphVector.getNumGlyphs();
             int i = 0;
             while (i < lengthInGlyphs) {
-                final Character letter = CharacterCache.valueOf(inString.charAt(i));
+                Character letter = CharacterCache.valueOf(inString.charAt(i));
                 GlyphMetrics metrics = glyphMetricsCache.get(letter);
                 if (metrics == null) {
                     metrics = fullRunGlyphVector.getGlyphMetrics(i);
                     glyphMetricsCache.put(letter, metrics);
                 }
-                final Glyph glyph = getGlyph(inString, metrics, i);
+                Glyph glyph = getGlyph(inString, metrics, i);
                 if (glyph != null) {
                     glyphsOutput.add(glyph);
                     i++;
@@ -1229,10 +1168,10 @@ public class JhvTextRenderer {
             return glyphsOutput;
         }
 
-        void clearCacheEntry(final int unicodeID) {
-            final int glyphID = unicodes2Glyphs[unicodeID];
+        void clearCacheEntry(int unicodeID) {
+            int glyphID = unicodes2Glyphs[unicodeID];
             if (glyphID != undefined) {
-                final Glyph glyph = glyphCache[glyphID];
+                Glyph glyph = glyphCache[glyphID];
                 if (glyph != null) {
                     glyph.clear();
                 }
@@ -1247,13 +1186,13 @@ public class JhvTextRenderer {
             }
         }
 
-        void register(final Glyph glyph) {
+        void register(Glyph glyph) {
             unicodes2Glyphs[glyph.getUnicodeID()] = glyph.getGlyphCode();
             glyphCache[glyph.getGlyphCode()] = glyph;
         }
 
-        float getGlyphPixelWidth(final char unicodeID) {
-            final Glyph glyph = getGlyph(unicodeID);
+        float getGlyphPixelWidth(char unicodeID) {
+            Glyph glyph = getGlyph(unicodeID);
             if (glyph != null) {
                 return glyph.getAdvance();
             }
@@ -1263,64 +1202,54 @@ public class JhvTextRenderer {
             if (null == fontRenderContext) { // FIXME: Never initialized!
                 throw new InternalError("fontRenderContext never initialized!");
             }
-            final GlyphVector gv = font.createGlyphVector(fontRenderContext,
-                    singleUnicode);
+            GlyphVector gv = font.createGlyphVector(fontRenderContext, singleUnicode);
             return gv.getGlyphMetrics(0).getAdvance();
         }
 
         // Returns a glyph object for this single glyph. Returns null
         // if the unicode or glyph ID would be out of bounds of the
         // glyph cache.
-        private Glyph getGlyph(final CharSequence inString,
-                               final GlyphMetrics glyphMetrics,
-                               final int index) {
-            final char unicodeID = inString.charAt(index);
-
+        private Glyph getGlyph(CharSequence inString, GlyphMetrics glyphMetrics, int index) {
+            char unicodeID = inString.charAt(index);
             if (unicodeID >= unicodes2Glyphs.length) {
                 return null;
             }
 
-            final int glyphID = unicodes2Glyphs[unicodeID];
+            int glyphID = unicodes2Glyphs[unicodeID];
             if (glyphID != undefined) {
                 return glyphCache[glyphID];
             }
 
             // Must fabricate the glyph
             singleUnicode[0] = unicodeID;
-            final GlyphVector gv = font.createGlyphVector(getFontRenderContext(), singleUnicode);
+            GlyphVector gv = font.createGlyphVector(getFontRenderContext(), singleUnicode);
             return getGlyph(unicodeID, gv, glyphMetrics);
         }
 
         // It's unclear whether this variant might produce less
         // optimal results than if we can see the entire GlyphVector
         // for the incoming string
-        private Glyph getGlyph(final int unicodeID) {
+        private Glyph getGlyph(int unicodeID) {
             if (unicodeID >= unicodes2Glyphs.length) {
                 return null;
             }
 
-            final int glyphID = unicodes2Glyphs[unicodeID];
+            int glyphID = unicodes2Glyphs[unicodeID];
             if (glyphID != undefined) {
                 return glyphCache[glyphID];
             }
             singleUnicode[0] = (char) unicodeID;
-            final GlyphVector gv = font.createGlyphVector(getFontRenderContext(), singleUnicode);
+            GlyphVector gv = font.createGlyphVector(getFontRenderContext(), singleUnicode);
             return getGlyph(unicodeID, gv, gv.getGlyphMetrics(0));
         }
 
-        private Glyph getGlyph(final int unicodeID,
-                               final GlyphVector singleUnicodeGlyphVector,
-                               final GlyphMetrics metrics) {
-            final int glyphCode = singleUnicodeGlyphVector.getGlyphCode(0);
+        private Glyph getGlyph(int unicodeID, GlyphVector singleUnicodeGlyphVector, GlyphMetrics metrics) {
+            int glyphCode = singleUnicodeGlyphVector.getGlyphCode(0);
             // Have seen huge glyph codes (65536) coming out of some fonts in some Unicode situations
             if (glyphCode >= glyphCache.length) {
                 return null;
             }
-            final Glyph glyph = new Glyph(unicodeID,
-                    glyphCode,
-                    metrics.getAdvance(),
-                    singleUnicodeGlyphVector,
-                    this);
+            Glyph glyph = new Glyph(unicodeID, glyphCode, metrics.getAdvance(), singleUnicodeGlyphVector, this);
             register(glyph);
             return glyph;
         }
@@ -1338,7 +1267,7 @@ public class JhvTextRenderer {
             }
         }
 
-        static Character valueOf(final char c) {
+        static Character valueOf(char c) {
             if (c <= 127) { // must cache
                 return CharacterCache.cache[c];
             }
