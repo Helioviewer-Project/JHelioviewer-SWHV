@@ -41,7 +41,6 @@ package org.helioviewer.jhv.opengl.text;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.util.packrect.*;
-import com.jogamp.opengl.util.texture.*;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -1003,10 +1002,7 @@ public class JhvTextRenderer {
                 }
 
                 final JhvTextureRenderer renderer = getBackingStore();
-                // Handles case where NPOT texture is used for backing store
-                final TextureCoords wholeImageTexCoords = renderer.getTexture().getImageTexCoords();
-                final float xScale = wholeImageTexCoords.right();
-                final float yScale = wholeImageTexCoords.bottom();
+                renderer.getTexture(); // sync
 
                 final Rect rect = glyphRectForTextureMapping;
                 final TextData data = (TextData) rect.getUserData();
@@ -1018,17 +1014,14 @@ public class JhvTextRenderer {
                 final float y = inY - (scaleFactor * ((float) origRect.getHeight() - data.origOriginY()));
 
                 final int texturex = rect.x() + (data.origin().x - data.origOriginX());
-                final int texturey = renderer.getHeight() - rect.y() - (int) origRect.getHeight() -
-                    (data.origin().y - data.origOriginY());
+                final int texturey = renderer.getHeight() - rect.y() - (int) origRect.getHeight() - (data.origin().y - data.origOriginY());
                 final int width = (int) origRect.getWidth();
                 final int height = (int) origRect.getHeight();
 
-                final float tx1 = xScale * texturex / renderer.getWidth();
-                final float ty1 = yScale * (1.0f -
-                                      ((float) texturey / (float) renderer.getHeight()));
-                final float tx2 = xScale * (texturex + width) / renderer.getWidth();
-                final float ty2 = yScale * (1.0f -
-                                      ((float) (texturey + height) / (float) renderer.getHeight()));
+                final float tx1 = texturex / (float) renderer.getWidth();
+                final float ty1 = 1f - texturey / (float) renderer.getHeight();
+                final float tx2 = (texturex + width) / (float) renderer.getWidth();
+                final float ty2 = 1f - (texturey + height) / (float) renderer.getHeight();
 
                 // A
                 txcArray[0] = tx1;
@@ -1331,7 +1324,7 @@ public class JhvTextRenderer {
             }
         }
 
-        private void draw() {
+        void draw() {
             if (mOutstandingGlyphsVerticesPipeline > 0) {
                 final GL2 gl = (GL2) GLContext.getCurrentGL();
 
