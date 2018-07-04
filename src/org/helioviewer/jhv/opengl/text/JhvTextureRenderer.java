@@ -291,10 +291,8 @@ class JhvTextureRenderer {
      */
     private void upload(GL2 gl, int x, int y, int width, int height) throws GLException {
         gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, 4);
-        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_ROWS, y);
-        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_PIXELS, x);
         gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, imageWidth);
-        gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, x, y, width, height, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, imageBuffer);
+        gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, x, y, width, height, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, imageBuffer.position(y * imageWidth + x));
         gl.glGenerateMipmap(GL2.GL_TEXTURE_2D);
     }
 
