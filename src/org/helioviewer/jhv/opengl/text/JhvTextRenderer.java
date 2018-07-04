@@ -63,59 +63,60 @@ import com.jogamp.opengl.*;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.GLSLTexture;
 
-/** Renders bitmapped Java 2D text into an OpenGL window with high
-    performance, full Unicode support, and a simple API. Performs
-    appropriate caching of text rendering results in an OpenGL texture
-    internally to avoid repeated font rasterization. The caching is
-    completely automatic, does not require any user intervention, and
-    has no visible controls in the public API. <P>
-
-    Using the {@link JhvTextRenderer TextRenderer} is simple. Add a
-    "<code>TextRenderer renderer;</code>" field to your {@link
-    com.jogamp.opengl.GLEventListener GLEventListener}. In your {@link
-    com.jogamp.opengl.GLEventListener#init init} method, add:
-
-    <PRE>
-    renderer = new TextRenderer(new Font("SansSerif", Font.BOLD, 36));
-    </PRE>
-
-    <P> In the {@link com.jogamp.opengl.GLEventListener#display display} method of your
-    {@link com.jogamp.opengl.GLEventListener GLEventListener}, add:
-    <PRE>
-    renderer.beginRendering(drawable.getWidth(), drawable.getHeight());
-    // optionally set the color
-    renderer.setColor(1.0f, 0.2f, 0.2f, 0.8f);
-    renderer.draw("Text to draw", xPosition, yPosition);
-    // ... more draw commands, color changes, etc.
-    renderer.endRendering();
-    </PRE>
-
-    Unless you are sharing textures and display lists between OpenGL
-    contexts, you do not need to call the {@link #dispose dispose}
-    method of the TextRenderer; the OpenGL resources it uses
-    internally will be cleaned up automatically when the OpenGL
-    context is destroyed. <P>
-
-    <b>Note</b> that the TextRenderer may cause the vertex and texture
-    coordinate array buffer bindings to change, or to be unbound. This
-    is important to note if you are using Vertex Buffer Objects (VBOs)
-    in your application. <P>
-
-    Internally, the renderer uses a rectangle packing algorithm to
-    pack both glyphs and full Strings' rendering results (which are
-    variable size) onto a larger OpenGL texture. The internal backing
-    store is maintained using a {@link
-    com.jogamp.opengl.util.awt.TextureRenderer TextureRenderer}. A least
-    recently used (LRU) algorithm is used to discard previously
-    rendered strings; the specific algorithm is undefined, but is
-    currently implemented by flushing unused Strings' rendering
-    results every few hundred rendering cycles, where a rendering
-    cycle is defined as a pair of calls to {@link #beginRendering
-    beginRendering} / {@link #endRendering endRendering}.
-
-    @author John Burkey
-    @author Kenneth Russell
-*/
+/**
+ * Renders bitmapped Java 2D text into an OpenGL window with high
+ * performance, full Unicode support, and a simple API. Performs
+ * appropriate caching of text rendering results in an OpenGL texture
+ * internally to avoid repeated font rasterization. The caching is
+ * completely automatic, does not require any user intervention, and
+ * has no visible controls in the public API. <P>
+ * <p>
+ * Using the {@link JhvTextRenderer TextRenderer} is simple. Add a
+ * "<code>TextRenderer renderer;</code>" field to your {@link
+ * com.jogamp.opengl.GLEventListener GLEventListener}. In your {@link
+ * com.jogamp.opengl.GLEventListener#init init} method, add:
+ *
+ * <PRE>
+ * renderer = new TextRenderer(new Font("SansSerif", Font.BOLD, 36));
+ * </PRE>
+ *
+ * <P> In the {@link com.jogamp.opengl.GLEventListener#display display} method of your
+ * {@link com.jogamp.opengl.GLEventListener GLEventListener}, add:
+ * <PRE>
+ * renderer.beginRendering(drawable.getWidth(), drawable.getHeight());
+ * // optionally set the color
+ * renderer.setColor(1.0f, 0.2f, 0.2f, 0.8f);
+ * renderer.draw("Text to draw", xPosition, yPosition);
+ * // ... more draw commands, color changes, etc.
+ * renderer.endRendering();
+ * </PRE>
+ * <p>
+ * Unless you are sharing textures and display lists between OpenGL
+ * contexts, you do not need to call the {@link #dispose dispose}
+ * method of the TextRenderer; the OpenGL resources it uses
+ * internally will be cleaned up automatically when the OpenGL
+ * context is destroyed. <P>
+ *
+ * <b>Note</b> that the TextRenderer may cause the vertex and texture
+ * coordinate array buffer bindings to change, or to be unbound. This
+ * is important to note if you are using Vertex Buffer Objects (VBOs)
+ * in your application. <P>
+ * <p>
+ * Internally, the renderer uses a rectangle packing algorithm to
+ * pack both glyphs and full Strings' rendering results (which are
+ * variable size) onto a larger OpenGL texture. The internal backing
+ * store is maintained using a {@link
+ * com.jogamp.opengl.util.awt.TextureRenderer TextureRenderer}. A least
+ * recently used (LRU) algorithm is used to discard previously
+ * rendered strings; the specific algorithm is undefined, but is
+ * currently implemented by flushing unused Strings' rendering
+ * results every few hundred rendering cycles, where a rendering
+ * cycle is defined as a pair of calls to {@link #beginRendering
+ * beginRendering} / {@link #endRendering endRendering}.
+ *
+ * @author John Burkey
+ * @author Kenneth Russell
+ */
 public class JhvTextRenderer {
 
     private static final boolean DRAW_BBOXES = false;
@@ -136,47 +137,48 @@ public class JhvTextRenderer {
     private static final int kTotalBufferSizeVerts = kQuadsPerBuffer * kVertsPerQuad;
     private static final int kTotalBufferSizeCoordsVerts = kQuadsPerBuffer * kVertsPerQuad * kCoordsPerVertVerts;
     private static final int kTotalBufferSizeCoordsTex = kQuadsPerBuffer * kVertsPerQuad * kCoordsPerVertTex;
-    private final Font font;
+    final Font font;
     private final boolean antialiased;
     private final boolean useFractionalMetrics;
 
-    private RectanglePacker packer;
+    RectanglePacker packer;
     private boolean haveMaxSize;
-    private final RenderDelegate renderDelegate;
+    final RenderDelegate renderDelegate;
     private JhvTextureRenderer cachedBackingStore;
     private Graphics2D cachedGraphics;
     private FontRenderContext cachedFontRenderContext;
-    private final Map<String, Rect> stringLocations = new HashMap<>();
-    private final GlyphProducer mGlyphProducer;
+    final Map<String, Rect> stringLocations = new HashMap<>();
+    final GlyphProducer mGlyphProducer;
 
     private int numRenderCycles;
 
     // Need to keep track of whether we're in a beginRendering() /
     // endRendering() cycle so we can re-enter the exact same state if
     // we have to reallocate the backing store
-    private boolean inBeginEndPair;
-    private boolean isOrthoMode;
-    private int beginRenderingWidth;
-    private int beginRenderingHeight;
+    boolean inBeginEndPair;
+    boolean isOrthoMode;
+    int beginRenderingWidth;
+    int beginRenderingHeight;
 
-    private Pipelined_QuadRenderer mPipelinedQuadRenderer;
+    Pipelined_QuadRenderer mPipelinedQuadRenderer;
 
-    /** Creates a new TextRenderer with the given Font, specified font
-        properties, and given RenderDelegate. The
-        <code>antialiased</code> and <code>useFractionalMetrics</code>
-        flags provide control over the same properties at the Java 2D
-        level. The <code>renderDelegate</code> provides more control
-        over the text rendered.
-
-        @param font the font to render with
-        @param antialiased whether to use antialiased fonts
-        @param useFractionalMetrics whether to use fractional font
-        metrics at the Java 2D level
-        @param renderDelegate the render delegate to use to draw the
-        text's bitmap, or null to use the default one
-    */
+    /**
+     * Creates a new TextRenderer with the given Font, specified font
+     * properties, and given RenderDelegate. The
+     * <code>antialiased</code> and <code>useFractionalMetrics</code>
+     * flags provide control over the same properties at the Java 2D
+     * level. The <code>renderDelegate</code> provides more control
+     * over the text rendered.
+     *
+     * @param font                 the font to render with
+     * @param antialiased          whether to use antialiased fonts
+     * @param useFractionalMetrics whether to use fractional font
+     *                             metrics at the Java 2D level
+     * @param renderDelegate       the render delegate to use to draw the
+     *                             text's bitmap, or null to use the default one
+     */
     public JhvTextRenderer(final Font font, final boolean antialiased,
-                        final boolean useFractionalMetrics, RenderDelegate renderDelegate) {
+                           final boolean useFractionalMetrics, RenderDelegate renderDelegate) {
         this.font = font;
         this.antialiased = antialiased;
         this.useFractionalMetrics = useFractionalMetrics;
@@ -194,28 +196,32 @@ public class JhvTextRenderer {
         mGlyphProducer = new GlyphProducer(font.getNumGlyphs());
     }
 
-    /** Returns the bounding rectangle of the given String, assuming it
-        was rendered at the origin. See {@link #getBounds(CharSequence)
-        getBounds(CharSequence)}. */
+    /**
+     * Returns the bounding rectangle of the given String, assuming it
+     * was rendered at the origin. See {@link #getBounds(CharSequence)
+     * getBounds(CharSequence)}.
+     */
     public Rectangle2D getBounds(final String str) {
         return getBounds((CharSequence) str);
     }
 
-    /** Returns the bounding rectangle of the given CharSequence,
-        assuming it was rendered at the origin. The coordinate system of
-        the returned rectangle is Java 2D's, with increasing Y
-        coordinates in the downward direction. The relative coordinate
-        (0, 0) in the returned rectangle corresponds to the baseline of
-        the leftmost character of the rendered string, in similar
-        fashion to the results returned by, for example, {@link
-        java.awt.font.GlyphVector#getVisualBounds}. Most applications
-        will use only the width and height of the returned Rectangle for
-        the purposes of centering or justifying the String. It is not
-        specified which Java 2D bounds ({@link
-        java.awt.font.GlyphVector#getVisualBounds getVisualBounds},
-        {@link java.awt.font.GlyphVector#getPixelBounds getPixelBounds},
-        etc.) the returned bounds correspond to, although every effort
-        is made to ensure an accurate bound. */
+    /**
+     * Returns the bounding rectangle of the given CharSequence,
+     * assuming it was rendered at the origin. The coordinate system of
+     * the returned rectangle is Java 2D's, with increasing Y
+     * coordinates in the downward direction. The relative coordinate
+     * (0, 0) in the returned rectangle corresponds to the baseline of
+     * the leftmost character of the rendered string, in similar
+     * fashion to the results returned by, for example, {@link
+     * java.awt.font.GlyphVector#getVisualBounds}. Most applications
+     * will use only the width and height of the returned Rectangle for
+     * the purposes of centering or justifying the String. It is not
+     * specified which Java 2D bounds ({@link
+     * java.awt.font.GlyphVector#getVisualBounds getVisualBounds},
+     * {@link java.awt.font.GlyphVector#getPixelBounds getPixelBounds},
+     * etc.) the returned bounds correspond to, although every effort
+     * is made to ensure an accurate bound.
+     */
     private Rectangle2D getBounds(final CharSequence str) {
         // FIXME: this should be more optimized and use the glyph cache
         final Rect r = stringLocations.get(str);
@@ -225,26 +231,30 @@ public class JhvTextRenderer {
 
             // Reconstitute the Java 2D results based on the cached values
             return new Rectangle2D.Double(-data.origin().x, -data.origin().y,
-                                          r.w(), r.h());
+                    r.w(), r.h());
         }
 
         // Must return a Rectangle compatible with the layout algorithm --
         // must be idempotent
         return normalize(renderDelegate.getBounds(str, font,
-                                                  getFontRenderContext()));
+                getFontRenderContext()));
     }
 
-    /** Returns the Font this renderer is using. */
+    /**
+     * Returns the Font this renderer is using.
+     */
     public Font getFont() {
         return font;
     }
 
-    /** Returns a FontRenderContext which can be used for external
-        text-related size computations. This object should be considered
-        transient and may become invalidated between {@link
-        #beginRendering beginRendering} / {@link #endRendering
-        endRendering} pairs. */
-    private FontRenderContext getFontRenderContext() {
+    /**
+     * Returns a FontRenderContext which can be used for external
+     * text-related size computations. This object should be considered
+     * transient and may become invalidated between {@link
+     * #beginRendering beginRendering} / {@link #endRendering
+     * endRendering} pairs.
+     */
+    FontRenderContext getFontRenderContext() {
         if (cachedFontRenderContext == null) {
             cachedFontRenderContext = getGraphics2D().getFontRenderContext();
         }
@@ -252,144 +262,160 @@ public class JhvTextRenderer {
         return cachedFontRenderContext;
     }
 
-    /** Begins rendering with this {@link JhvTextRenderer TextRenderer}
-        into the current OpenGL drawable, pushing the projection and
-        modelview matrices and some state bits and setting up a
-        two-dimensional orthographic projection with (0, 0) as the
-        lower-left coordinate and (width, height) as the upper-right
-        coordinate. Binds and enables the internal OpenGL texture
-        object, sets the texture environment mode to GL_MODULATE, and
-        changes the current color to the last color set with this
-        TextRenderer via {@link #setColor setColor}. Disables the depth
-        test if the disableDepthTest argument is true.
-
-        @param width the width of the current on-screen OpenGL drawable
-        @param height the height of the current on-screen OpenGL drawable
-        @param disableDepthTest whether to disable the depth test
-        @throws GLException If an OpenGL context is not current when this method is called
-    */
+    /**
+     * Begins rendering with this {@link JhvTextRenderer TextRenderer}
+     * into the current OpenGL drawable, pushing the projection and
+     * modelview matrices and some state bits and setting up a
+     * two-dimensional orthographic projection with (0, 0) as the
+     * lower-left coordinate and (width, height) as the upper-right
+     * coordinate. Binds and enables the internal OpenGL texture
+     * object, sets the texture environment mode to GL_MODULATE, and
+     * changes the current color to the last color set with this
+     * TextRenderer via {@link #setColor setColor}. Disables the depth
+     * test if the disableDepthTest argument is true.
+     *
+     * @param width            the width of the current on-screen OpenGL drawable
+     * @param height           the height of the current on-screen OpenGL drawable
+     * @param disableDepthTest whether to disable the depth test
+     * @throws GLException If an OpenGL context is not current when this method is called
+     */
     public void beginRendering(final int width, final int height, final boolean disableDepthTest)
-        throws GLException {
+            throws GLException {
         beginRendering(true, width, height);
     }
 
-    /** Begins rendering of 2D text in 3D with this {@link JhvTextRenderer
-        TextRenderer} into the current OpenGL drawable. Assumes the end
-        user is responsible for setting up the modelview and projection
-        matrices, and will render text using the {@link #draw3D draw3D}
-        method. This method pushes some OpenGL state bits, binds and
-        enables the internal OpenGL texture object, sets the texture
-        environment mode to GL_MODULATE, and changes the current color
-        to the last color set with this TextRenderer via {@link
-        #setColor setColor}.
-
-        @throws GLException If an OpenGL context is not current when this method is called
-    */
+    /**
+     * Begins rendering of 2D text in 3D with this {@link JhvTextRenderer
+     * TextRenderer} into the current OpenGL drawable. Assumes the end
+     * user is responsible for setting up the modelview and projection
+     * matrices, and will render text using the {@link #draw3D draw3D}
+     * method. This method pushes some OpenGL state bits, binds and
+     * enables the internal OpenGL texture object, sets the texture
+     * environment mode to GL_MODULATE, and changes the current color
+     * to the last color set with this TextRenderer via {@link
+     * #setColor setColor}.
+     *
+     * @throws GLException If an OpenGL context is not current when this method is called
+     */
     public void begin3DRendering() throws GLException {
         beginRendering(false, 0, 0);
     }
 
-    /** Changes the current color of this TextRenderer to the supplied
-        one, where each component ranges from 0.0f - 1.0f. The alpha
-        component, if used, does not need to be premultiplied into the
-        color channels as described in the documentation for {@link
-        com.jogamp.opengl.util.texture.Texture Texture}, although
-        premultiplied colors are used internally. The default color is
-        opaque white.
-    */
+    /**
+     * Changes the current color of this TextRenderer to the supplied
+     * one, where each component ranges from 0.0f - 1.0f. The alpha
+     * component, if used, does not need to be premultiplied into the
+     * color channels as described in the documentation for {@link
+     * com.jogamp.opengl.util.texture.Texture Texture}, although
+     * premultiplied colors are used internally. The default color is
+     * opaque white.
+     */
     public void setColor(float[] color)
-        throws GLException {
+            throws GLException {
         flushGlyphPipeline();
         textColor = color;
     }
 
-    /** Draws the supplied CharSequence at the desired location using
-        the renderer's current color. The baseline of the leftmost
-        character is at position (x, y) specified in OpenGL coordinates,
-        where the origin is at the lower-left of the drawable and the Y
-        coordinate increases in the upward direction.
-
-        @param str the string to draw
-        @param x the x coordinate at which to draw
-        @param y the y coordinate at which to draw
-        @throws GLException If an OpenGL context is not current when this method is called
-    */
+    /**
+     * Draws the supplied CharSequence at the desired location using
+     * the renderer's current color. The baseline of the leftmost
+     * character is at position (x, y) specified in OpenGL coordinates,
+     * where the origin is at the lower-left of the drawable and the Y
+     * coordinate increases in the upward direction.
+     *
+     * @param str the string to draw
+     * @param x   the x coordinate at which to draw
+     * @param y   the y coordinate at which to draw
+     * @throws GLException If an OpenGL context is not current when this method is called
+     */
     public void draw(final CharSequence str, final int x, final int y) throws GLException {
         draw3D(str, x, y, 0, 1);
     }
 
-    /** Draws the supplied String at the desired location using the
-        renderer's current color. See {@link #draw(CharSequence, int,
-        int) draw(CharSequence, int, int)}. */
+    /**
+     * Draws the supplied String at the desired location using the
+     * renderer's current color. See {@link #draw(CharSequence, int,
+     * int) draw(CharSequence, int, int)}.
+     */
     public void draw(final String str, final int x, final int y) throws GLException {
         draw3D(str, x, y, 0, 1);
     }
 
-    /** Draws the supplied CharSequence at the desired 3D location using
-        the renderer's current color. The baseline of the leftmost
-        character is placed at position (x, y, z) in the current
-        coordinate system.
-
-        @param str the string to draw
-        @param x the x coordinate at which to draw
-        @param y the y coordinate at which to draw
-        @param z the z coordinate at which to draw
-        @param scaleFactor a uniform scale factor applied to the width and height of the drawn rectangle
-        @throws GLException If an OpenGL context is not current when this method is called
-    */
+    /**
+     * Draws the supplied CharSequence at the desired 3D location using
+     * the renderer's current color. The baseline of the leftmost
+     * character is placed at position (x, y, z) in the current
+     * coordinate system.
+     *
+     * @param str         the string to draw
+     * @param x           the x coordinate at which to draw
+     * @param y           the y coordinate at which to draw
+     * @param z           the z coordinate at which to draw
+     * @param scaleFactor a uniform scale factor applied to the width and height of the drawn rectangle
+     * @throws GLException If an OpenGL context is not current when this method is called
+     */
     private void draw3D(final CharSequence str, final float x, final float y, final float z,
                         final float scaleFactor) {
         internal_draw3D(str, x, y, z, scaleFactor);
     }
 
-    /** Draws the supplied String at the desired 3D location using the
-        renderer's current color. See {@link #draw3D(CharSequence,
-        float, float, float, float) draw3D(CharSequence, float, float,
-        float, float)}. */
+    /**
+     * Draws the supplied String at the desired 3D location using the
+     * renderer's current color. See {@link #draw3D(CharSequence,
+     * float, float, float, float) draw3D(CharSequence, float, float,
+     * float, float)}.
+     */
     public void draw3D(final String str, final float x, final float y, final float z, final float scaleFactor) {
         internal_draw3D(str, x, y, z, scaleFactor);
     }
 
-    /** Returns the pixel width of the given character. */
+    /**
+     * Returns the pixel width of the given character.
+     */
     public float getCharWidth(final char inChar) {
         return mGlyphProducer.getGlyphPixelWidth(inChar);
     }
 
-    /** Causes the TextRenderer to flush any internal caches it may be
-        maintaining and draw its rendering results to the screen. This
-        should be called after each call to draw() if you are setting
-        OpenGL state such as the modelview matrix between calls to
-        draw(). */
+    /**
+     * Causes the TextRenderer to flush any internal caches it may be
+     * maintaining and draw its rendering results to the screen. This
+     * should be called after each call to draw() if you are setting
+     * OpenGL state such as the modelview matrix between calls to
+     * draw().
+     */
     public void flush() {
         flushGlyphPipeline();
     }
 
-    /** Ends a render cycle with this {@link JhvTextRenderer TextRenderer}.
-        Restores the projection and modelview matrices as well as
-        several OpenGL state bits. Should be paired with {@link
-        #beginRendering beginRendering}.
-
-        @throws GLException If an OpenGL context is not current when this method is called
-    */
+    /**
+     * Ends a render cycle with this {@link JhvTextRenderer TextRenderer}.
+     * Restores the projection and modelview matrices as well as
+     * several OpenGL state bits. Should be paired with {@link
+     * #beginRendering beginRendering}.
+     *
+     * @throws GLException If an OpenGL context is not current when this method is called
+     */
     public void endRendering() throws GLException {
         endRendering(true);
     }
 
-    /** Ends a 3D render cycle with this {@link JhvTextRenderer TextRenderer}.
-        Restores several OpenGL state bits. Should be paired with {@link
-        #begin3DRendering begin3DRendering}.
-
-        @throws GLException If an OpenGL context is not current when this method is called
-    */
+    /**
+     * Ends a 3D render cycle with this {@link JhvTextRenderer TextRenderer}.
+     * Restores several OpenGL state bits. Should be paired with {@link
+     * #begin3DRendering begin3DRendering}.
+     *
+     * @throws GLException If an OpenGL context is not current when this method is called
+     */
     public void end3DRendering() throws GLException {
         endRendering(false);
     }
 
-    /** Disposes of all resources this TextRenderer is using. It is not
-        valid to use the TextRenderer after this method is called.
-
-        @throws GLException If an OpenGL context is not current when this method is called
-    */
+    /**
+     * Disposes of all resources this TextRenderer is using. It is not
+     * valid to use the TextRenderer after this method is called.
+     *
+     * @throws GLException If an OpenGL context is not current when this method is called
+     */
     public void dispose(GL2 gl) throws GLException {
         packer.dispose();
         packer = null;
@@ -403,7 +429,7 @@ public class JhvTextRenderer {
     // Internals only below this point
     //
 
-    private static Rectangle2D preNormalize(final Rectangle2D src) {
+    static Rectangle2D preNormalize(final Rectangle2D src) {
         // Need to round to integer coordinates
         // Also give ourselves a little slop around the reported
         // bounds of glyphs because it looks like neither the visual
@@ -415,7 +441,7 @@ public class JhvTextRenderer {
         return new Rectangle2D.Double(minX, minY, maxX - minX, maxY - minY);
     }
 
-    private Rectangle2D normalize(final Rectangle2D src) {
+    Rectangle2D normalize(final Rectangle2D src) {
         // Give ourselves a boundary around each entity on the backing
         // store in order to prevent bleeding of nearby Strings due to
         // the fact that we use linear filtering
@@ -426,12 +452,12 @@ public class JhvTextRenderer {
         final int boundary = (int) Math.max(1, 0.015 * font.getSize());
 
         return new Rectangle2D.Double((int) Math.floor(src.getMinX() - boundary),
-                                      (int) Math.floor(src.getMinY() - boundary),
-                                      (int) Math.ceil(src.getWidth() + 2 * boundary),
-                                      (int) Math.ceil(src.getHeight()) + 2 * boundary);
+                (int) Math.floor(src.getMinY() - boundary),
+                (int) Math.ceil(src.getWidth() + 2 * boundary),
+                (int) Math.ceil(src.getHeight()) + 2 * boundary);
     }
 
-    private JhvTextureRenderer getBackingStore() {
+    JhvTextureRenderer getBackingStore() {
         final JhvTextureRenderer renderer = (JhvTextureRenderer) packer.getBackingStore();
 
         if (renderer != cachedBackingStore) {
@@ -447,7 +473,7 @@ public class JhvTextRenderer {
         return cachedBackingStore;
     }
 
-    private Graphics2D getGraphics2D() {
+    Graphics2D getGraphics2D() {
         final JhvTextureRenderer renderer = getBackingStore();
 
         if (cachedGraphics == null) {
@@ -457,12 +483,12 @@ public class JhvTextRenderer {
             cachedGraphics.setColor(Color.WHITE);
             cachedGraphics.setFont(font);
             cachedGraphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                                            (antialiased ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON
-                                             : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF));
+                    (antialiased ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                            : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF));
             cachedGraphics.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
-                                            (useFractionalMetrics
-                                             ? RenderingHints.VALUE_FRACTIONALMETRICS_ON
-                                             : RenderingHints.VALUE_FRACTIONALMETRICS_OFF));
+                    (useFractionalMetrics
+                            ? RenderingHints.VALUE_FRACTIONALMETRICS_ON
+                            : RenderingHints.VALUE_FRACTIONALMETRICS_OFF));
         }
 
         return cachedGraphics;
@@ -516,7 +542,7 @@ public class JhvTextRenderer {
         }
     }
 
-    private void clearUnusedEntries() {
+    void clearUnusedEntries() {
         final List<Rect> deadRects = new ArrayList<>();
 
         // Iterate through the contents of the backing store, removing
@@ -564,58 +590,70 @@ public class JhvTextRenderer {
         }
     }
 
-    /** Class supporting more full control over the process of rendering
-        the bitmapped text. Allows customization of whether the backing
-        store text bitmap is full-color or intensity only, the size of
-        each individual rendered text rectangle, and the contents of
-        each individual rendered text string. The default implementation
-        of this interface uses an intensity-only texture, a
-        closely-cropped rectangle around the text, and renders text
-        using the color white, which is modulated by the set color
-        during the rendering process. */
+    /**
+     * Class supporting more full control over the process of rendering
+     * the bitmapped text. Allows customization of whether the backing
+     * store text bitmap is full-color or intensity only, the size of
+     * each individual rendered text rectangle, and the contents of
+     * each individual rendered text string. The default implementation
+     * of this interface uses an intensity-only texture, a
+     * closely-cropped rectangle around the text, and renders text
+     * using the color white, which is modulated by the set color
+     * during the rendering process.
+     */
     interface RenderDelegate {
-        /** Computes the bounds of the given String relative to the
-            origin. */
+        /**
+         * Computes the bounds of the given String relative to the
+         * origin.
+         */
         Rectangle2D getBounds(String str, Font font,
                               FontRenderContext frc);
 
-        /** Computes the bounds of the given character sequence relative
-            to the origin. */
+        /**
+         * Computes the bounds of the given character sequence relative
+         * to the origin.
+         */
         Rectangle2D getBounds(CharSequence str, Font font,
                               FontRenderContext frc);
 
-        /** Computes the bounds of the given GlyphVector, already
-            assumed to have been created for a particular Font,
-            relative to the origin. */
+        /**
+         * Computes the bounds of the given GlyphVector, already
+         * assumed to have been created for a particular Font,
+         * relative to the origin.
+         */
         Rectangle2D getBounds(GlyphVector gv, FontRenderContext frc);
 
-        /** Render the passed character sequence at the designated
-            location using the supplied Graphics2D instance. The
-            surrounding region will already have been cleared to the RGB
-            color (0, 0, 0) with zero alpha. The initial drawing context
-            of the passed Graphics2D will be set to use
-            AlphaComposite.Src, the color white, the Font specified in the
-            TextRenderer's constructor, and the rendering hints specified
-            in the TextRenderer constructor.  Changes made by the end user
-            may be visible in successive calls to this method, but are not
-            guaranteed to be preserved.  Implementors of this method
-            should reset the Graphics2D's state to that desired each time
-            this method is called, in particular those states which are
-            not the defaults. */
+        /**
+         * Render the passed character sequence at the designated
+         * location using the supplied Graphics2D instance. The
+         * surrounding region will already have been cleared to the RGB
+         * color (0, 0, 0) with zero alpha. The initial drawing context
+         * of the passed Graphics2D will be set to use
+         * AlphaComposite.Src, the color white, the Font specified in the
+         * TextRenderer's constructor, and the rendering hints specified
+         * in the TextRenderer constructor.  Changes made by the end user
+         * may be visible in successive calls to this method, but are not
+         * guaranteed to be preserved.  Implementors of this method
+         * should reset the Graphics2D's state to that desired each time
+         * this method is called, in particular those states which are
+         * not the defaults.
+         */
         void draw(Graphics2D graphics, String str, int x, int y);
 
-        /** Render the passed GlyphVector at the designated location using
-            the supplied Graphics2D instance. The surrounding region will
-            already have been cleared to the RGB color (0, 0, 0) with zero
-            alpha. The initial drawing context of the passed Graphics2D
-            will be set to use AlphaComposite.Src, the color white, the
-            Font specified in the TextRenderer's constructor, and the
-            rendering hints specified in the TextRenderer constructor.
-            Changes made by the end user may be visible in successive
-            calls to this method, but are not guaranteed to be preserved.
-            Implementors of this method should reset the Graphics2D's
-            state to that desired each time this method is called, in
-            particular those states which are not the defaults. */
+        /**
+         * Render the passed GlyphVector at the designated location using
+         * the supplied Graphics2D instance. The surrounding region will
+         * already have been cleared to the RGB color (0, 0, 0) with zero
+         * alpha. The initial drawing context of the passed Graphics2D
+         * will be set to use AlphaComposite.Src, the color white, the
+         * Font specified in the TextRenderer's constructor, and the
+         * rendering hints specified in the TextRenderer constructor.
+         * Changes made by the end user may be visible in successive
+         * calls to this method, but are not guaranteed to be preserved.
+         * Implementors of this method should reset the Graphics2D's
+         * state to that desired each time this method is called, in
+         * particular those states which are not the defaults.
+         */
         void drawGlyphVector(Graphics2D graphics, GlyphVector str,
                              int x, int y);
     }
@@ -855,16 +893,16 @@ public class JhvTextRenderer {
             if (oldRenderer == newRenderer) {
                 // Movement on the same backing store -- easy case
                 g.copyArea(oldLocation.x(), oldLocation.y(), oldLocation.w(),
-                           oldLocation.h(), newLocation.x() - oldLocation.x(),
-                           newLocation.y() - oldLocation.y());
+                        oldLocation.h(), newLocation.x() - oldLocation.x(),
+                        newLocation.y() - oldLocation.y());
             } else {
                 // Need to draw from the old renderer's image into the new one
                 final Image img = oldRenderer.getImage();
                 g.drawImage(img, newLocation.x(), newLocation.y(),
-                            newLocation.x() + newLocation.w(),
-                            newLocation.y() + newLocation.h(), oldLocation.x(),
-                            oldLocation.y(), oldLocation.x() + oldLocation.w(),
-                            oldLocation.y() + oldLocation.h(), null);
+                        newLocation.x() + newLocation.w(),
+                        newLocation.y() + newLocation.h(), oldLocation.x(),
+                        oldLocation.y(), oldLocation.x() + oldLocation.w(),
+                        oldLocation.y() + oldLocation.h(), null);
             }
         }
 
@@ -875,12 +913,12 @@ public class JhvTextRenderer {
             // Sync the whole surface
             final JhvTextureRenderer newRenderer = (JhvTextureRenderer) newBackingStore;
             newRenderer.markDirty(0, 0, newRenderer.getWidth(),
-                                  newRenderer.getHeight());
+                    newRenderer.getHeight());
             // Re-enter the begin / end pair if necessary
             if (inBeginEndPair) {
                 if (isOrthoMode) {
                     ((JhvTextureRenderer) newBackingStore).beginOrthoRendering(beginRenderingWidth,
-                                                                            beginRenderingHeight);
+                            beginRenderingHeight);
                 } else {
                     ((JhvTextureRenderer) newBackingStore).begin3DRendering();
                 }
@@ -894,8 +932,8 @@ public class JhvTextRenderer {
         public Rectangle2D getBounds(final CharSequence str, final Font font,
                                      final FontRenderContext frc) {
             return getBounds(font.createGlyphVector(frc,
-                                                    new CharSequenceIterator(str)),
-                             frc);
+                    new CharSequenceIterator(str)),
+                    frc);
         }
 
         @Override
@@ -926,21 +964,22 @@ public class JhvTextRenderer {
     //
 
     // A temporary to prevent excessive garbage creation
-    private final char[] singleUnicode = new char[1];
-    private final float[] txcArray = new float[12];
-    private final float[] vtxArray = new float[24];
+    final char[] singleUnicode = new char[1];
+    final float[] txcArray = new float[12];
+    final float[] vtxArray = new float[24];
 
-    /** A Glyph represents either a single unicode glyph or a
-        substring of characters to be drawn. The reason for the dual
-        behavior is so that we can take in a sequence of unicode
-        characters and partition them into runs of individual glyphs,
-        but if we encounter complex text and/or unicode sequences we
-        don't understand, we can render them using the
-        string-by-string method. <P>
-
-        Glyphs need to be able to re-upload themselves to the backing
-        store on demand as we go along in the render sequence.
-    */
+    /**
+     * A Glyph represents either a single unicode glyph or a
+     * substring of characters to be drawn. The reason for the dual
+     * behavior is so that we can take in a sequence of unicode
+     * characters and partition them into runs of individual glyphs,
+     * but if we encounter complex text and/or unicode sequences we
+     * don't understand, we can render them using the
+     * string-by-string method. <P>
+     * <p>
+     * Glyphs need to be able to re-upload themselves to the backing
+     * store on demand as we go along in the render sequence.
+     */
 
     class Glyph {
         // If this Glyph represents an individual unicode glyph, this
@@ -963,10 +1002,10 @@ public class JhvTextRenderer {
 
         // Creates a Glyph representing an individual Unicode character
         Glyph(final int unicodeID,
-                     final int glyphCode,
-                     final float advance,
-                     final GlyphVector singleUnicodeGlyphVector,
-                     final GlyphProducer producer) {
+              final int glyphCode,
+              final float advance,
+              final GlyphVector singleUnicodeGlyphVector,
+              final GlyphProducer producer) {
             this.unicodeID = unicodeID;
             this.glyphCode = glyphCode;
             this.advance = advance;
@@ -974,22 +1013,30 @@ public class JhvTextRenderer {
             this.producer = producer;
         }
 
-        /** Returns this glyph's unicode ID */
+        /**
+         * Returns this glyph's unicode ID
+         */
         int getUnicodeID() {
             return unicodeID;
         }
 
-        /** Returns this glyph's (font-specific) glyph code */
+        /**
+         * Returns this glyph's (font-specific) glyph code
+         */
         int getGlyphCode() {
             return glyphCode;
         }
 
-        /** Returns the advance for this glyph */
+        /**
+         * Returns the advance for this glyph
+         */
         float getAdvance() {
             return advance;
         }
 
-        /** Draws this glyph and returns the (x) advance for this glyph */
+        /**
+         * Draws this glyph and returns the (x) advance for this glyph
+         */
         float draw3D(final float inX, final float inY, final float z, final float scaleFactor) {
             // This is the code path taken for individual glyphs
             if (glyphRectForTextureMapping == null) {
@@ -1072,7 +1119,9 @@ public class JhvTextRenderer {
             return advance;
         }
 
-        /** Notifies this glyph that it's been cleared out of the cache */
+        /**
+         * Notifies this glyph that it's been cleared out of the cache
+         */
         void clear() {
             glyphRectForTextureMapping = null;
         }
@@ -1082,10 +1131,10 @@ public class JhvTextRenderer {
             final Rectangle2D origBBox = preNormalize(renderDelegate.getBounds(gv, getFontRenderContext()));
             final Rectangle2D bbox = normalize(origBBox);
             final Point origin = new Point((int) -bbox.getMinX(),
-                                     (int) -bbox.getMinY());
+                    (int) -bbox.getMinY());
             final Rect rect = new Rect(0, 0, (int) bbox.getWidth(),
-                                 (int) bbox.getHeight(),
-                                 new TextData(null, origin, origBBox, unicodeID));
+                    (int) bbox.getHeight(),
+                    new TextData(null, origin, origBBox, unicodeID));
             packer.add(rect);
             glyphRectForTextureMapping = rect;
             final Graphics2D g = getGraphics2D();
@@ -1106,18 +1155,18 @@ public class JhvTextRenderer {
                 final TextData data = (TextData) rect.getUserData();
                 // Draw a bounding box on the backing store
                 g.drawRect(strx - data.origOriginX(),
-                           stry - data.origOriginY(),
-                           (int) data.origRect().getWidth(),
-                           (int) data.origRect().getHeight());
+                        stry - data.origOriginY(),
+                        (int) data.origRect().getWidth(),
+                        (int) data.origRect().getHeight());
                 g.drawRect(strx - data.origin().x,
-                           stry - data.origin().y,
-                           rect.w(),
-                           rect.h());
+                        stry - data.origin().y,
+                        rect.w(),
+                        rect.h());
             }
 
             // Mark this region of the TextureRenderer as dirty
             getBackingStore().markDirty(rect.x(), rect.y(), rect.w(),
-                                        rect.h());
+                    rect.h());
             // Re-register ourselves with our producer
             producer.register(this);
         }
@@ -1211,11 +1260,11 @@ public class JhvTextRenderer {
 
             // Have to do this the hard / uncached way
             singleUnicode[0] = unicodeID;
-            if( null == fontRenderContext ) { // FIXME: Never initialized!
+            if (null == fontRenderContext) { // FIXME: Never initialized!
                 throw new InternalError("fontRenderContext never initialized!");
             }
             final GlyphVector gv = font.createGlyphVector(fontRenderContext,
-                                                                    singleUnicode);
+                    singleUnicode);
             return gv.getGlyphMetrics(0).getAdvance();
         }
 
@@ -1268,10 +1317,10 @@ public class JhvTextRenderer {
                 return null;
             }
             final Glyph glyph = new Glyph(unicodeID,
-                                    glyphCode,
-                                    metrics.getAdvance(),
-                                    singleUnicodeGlyphVector,
-                                    this);
+                    glyphCode,
+                    metrics.getAdvance(),
+                    singleUnicodeGlyphVector,
+                    this);
             register(glyph);
             return glyph;
         }
@@ -1297,8 +1346,8 @@ public class JhvTextRenderer {
         }
     }
 
-    private static final GLSLTexture glslTexture = new GLSLTexture();
-    private float[] textColor = { 1, 1, 1, 1 };
+    static final GLSLTexture glslTexture = new GLSLTexture();
+    float[] textColor = {1, 1, 1, 1};
 
     class Pipelined_QuadRenderer {
         int mOutstandingGlyphsVerticesPipeline = 0;
