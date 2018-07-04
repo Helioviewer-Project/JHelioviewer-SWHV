@@ -44,259 +44,258 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.image.*;
+import java.nio.IntBuffer;
 
 import com.jogamp.opengl.*;
 
-import com.jogamp.opengl.util.texture.*;
-import com.jogamp.opengl.util.texture.awt.*;
-
 import org.helioviewer.jhv.math.Transform;
+import org.helioviewer.jhv.opengl.GLTexture;
 
-/** Provides the ability to render into an OpenGL {@link
-    com.jogamp.opengl.util.texture.Texture Texture} using the Java 2D
-    APIs. This renderer class uses an internal Java 2D image (of
-    unspecified type) for its backing store and flushes portions of
-    that image to an OpenGL texture on demand. The resulting OpenGL
-    texture can then be mapped on to a polygon for display. */
+/**
+ * Provides the ability to render into an OpenGL {@link
+ * com.jogamp.opengl.util.texture.Texture Texture} using the Java 2D
+ * APIs. This renderer class uses an internal Java 2D image (of
+ * unspecified type) for its backing store and flushes portions of
+ * that image to an OpenGL texture on demand. The resulting OpenGL
+ * texture can then be mapped on to a polygon for display.
+ */
 
 class JhvTextureRenderer {
-  // For now, we supply only a BufferedImage back-end for this
-  // renderer. In theory we could use the Java 2D/JOGL bridge to fully
-  // accelerate the rendering paths, but there are restrictions on
-  // what work can be done where; for example, Graphics2D-related work
-  // must not be done on the Queue Flusher Thread, but JOGL's
-  // OpenGL-related work must be. This implies that the user's code
-  // would need to be split up into multiple callbacks run from the
-  // appropriate threads, which would be somewhat unfortunate.
+    // For now, we supply only a BufferedImage back-end for this
+    // renderer. In theory we could use the Java 2D/JOGL bridge to fully
+    // accelerate the rendering paths, but there are restrictions on
+    // what work can be done where; for example, Graphics2D-related work
+    // must not be done on the Queue Flusher Thread, but JOGL's
+    // OpenGL-related work must be. This implies that the user's code
+    // would need to be split up into multiple callbacks run from the
+    // appropriate threads, which would be somewhat unfortunate.
 
-  // The backing store itself
-  private BufferedImage image;
+    // The backing store itself
+    private BufferedImage image;
+    private IntBuffer imageBuffer;
 
-  private Texture texture;
-  private final AWTTextureData textureData;
-  private Rectangle dirtyRegion;
+    private final GLTexture tex;
+    private Rectangle dirtyRegion;
 
-  private final int width;
-  private final int height;
+    private final int imageWidth;
+    private final int imageHeight;
 
-  /** Creates a new renderer with backing store of the specified width
-      and height.
-      @param width the width of the texture to render into
-      @param height the height of the texture to render into
-  */
-  JhvTextureRenderer(int _width, int _height) {
-    width = _width;
-    height = _height;
-    int internalFormat = GL2.GL_RGBA; // force for high version OpenGL
-    int imageType = BufferedImage.TYPE_INT_ARGB_PRE;
-    image = new BufferedImage(width, height, imageType);
-    // Always reallocate the TextureData associated with this
-    // BufferedImage; it's just a reference to the contents but we
-    // need it in order to update sub-regions of the underlying
-    // texture
-    final GL2 gl = (GL2) GLContext.getCurrentGL();
-    textureData = new AWTTextureData(gl.getGLProfile(), internalFormat, 0, true, image);
+    /**
+     * Creates a new renderer with backing store of the specified width
+     * and height.
+     *
+     * @param width  the width of the texture to render into
+     * @param height the height of the texture to render into
+     */
+    JhvTextureRenderer(int width, int height) {
+        imageWidth = width;
+        imageHeight = height;
 
-    texture = TextureIO.newTexture(textureData);
-    texture.setTexParameteri(gl, GL2.GL_TEXTURE_BASE_LEVEL, 0);
-    texture.setTexParameteri(gl, GL2.GL_TEXTURE_MAX_LEVEL, 15);
-    texture.setTexParameteri(gl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR_MIPMAP_LINEAR);
-    texture.setTexParameteri(gl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
-    texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
-    texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
-  }
+        image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB_PRE);
+        imageBuffer = IntBuffer.wrap(((DataBufferInt) image.getRaster().getDataBuffer()).getData());
 
-  public int getWidth() {
-    return width;
-  }
-
-  public int getHeight() {
-    return height;
-  }
-
-  /** Creates a {@link java.awt.Graphics2D Graphics2D} instance for
-      rendering to the backing store of this renderer. The returned
-      object should be disposed of using the normal {@link
-      java.awt.Graphics#dispose() Graphics.dispose()} method once it
-      is no longer being used.
-
-      @return a new {@link java.awt.Graphics2D Graphics2D} object for
-        rendering into the backing store of this renderer
-  */
-  public Graphics2D createGraphics() {
-    return image.createGraphics();
-  }
-
-  /** Returns the underlying Java 2D {@link java.awt.Image Image}
-      being rendered into. */
-  public Image getImage() {
-    return image;
-  }
-
-  /** Marks the given region of the TextureRenderer as dirty. This
-      region, and any previously set dirty regions, will be
-      automatically synchronized with the underlying Texture during
-      the next {@link #getTexture getTexture} operation, at which
-      point the dirty region will be cleared. It is not necessary for
-      an OpenGL context to be current when this method is called.
-
-      @param x the x coordinate (in Java 2D coordinates -- relative to
-        upper left) of the region to update
-      @param y the y coordinate (in Java 2D coordinates -- relative to
-        upper left) of the region to update
-      @param width the width of the region to update
-      @param height the height of the region to update
-  */
-  public void markDirty(final int x, final int y, final int width, final int height) {
-    final Rectangle curRegion = new Rectangle(x, y, width, height);
-    if (dirtyRegion == null) {
-      dirtyRegion = curRegion;
-    } else {
-      dirtyRegion.add(curRegion);
-    }
-  }
-
-  /** Returns the underlying OpenGL Texture object associated with
-      this renderer, synchronizing any dirty regions of the
-      TextureRenderer with the underlying OpenGL texture.
-
-      @throws GLException If an OpenGL context is not current when this method is called
-  */
-  public Texture getTexture() throws GLException {
-    if (dirtyRegion != null) {
-      sync(dirtyRegion.x, dirtyRegion.y, dirtyRegion.width, dirtyRegion.height);
-      dirtyRegion = null;
-    }
-    return texture;
-  }
-
-  /** Disposes all resources associated with this renderer. It is not
-      valid to use this renderer after calling this method.
-
-      @throws GLException If an OpenGL context is not current when this method is called
-  */
-  public void dispose() throws GLException {
-    if (texture != null) {
-      texture.destroy(GLContext.getCurrentGL());
-      texture = null;
-    }
-    if (image != null) {
-      image.flush();
-      image = null;
-    }
-  }
-
-  /** Convenience method which assists in rendering portions of the
-      OpenGL texture to the screen, if the application intends to draw
-      them as a flat overlay on to the screen. Pushes OpenGL state
-      bits (GL_ENABLE_BIT, GL_DEPTH_BUFFER_BIT and GL_TRANSFORM_BIT);
-      disables the depth test, back-face culling, and lighting;
-      enables the texture in this renderer; and sets up the viewing
-      matrices for orthographic rendering where the coordinates go
-      from (0, 0) at the lower left to (width, height) at the upper
-      right. Equivalent to beginOrthoRendering(width, height, true).
-      {@link #endOrthoRendering} must be used in conjunction with this
-      method to restore all OpenGL states.
-
-      @param width the width of the current on-screen OpenGL drawable
-      @param height the height of the current on-screen OpenGL drawable
-
-      @throws GLException If an OpenGL context is not current when this method is called
-  */
-  public void beginOrthoRendering(final int width, final int height) throws GLException {
-    beginRendering(true, width, height);
-  }
-
-  /** Convenience method which assists in rendering portions of the
-      OpenGL texture to the screen as 2D quads in 3D space. Pushes
-      OpenGL state (GL_ENABLE_BIT); disables lighting; and enables the
-      texture in this renderer. Unlike {@link #beginOrthoRendering
-      beginOrthoRendering}, does not modify the depth test, back-face
-      culling, lighting, or the modelview or projection matrices. {@link
-      #end3DRendering} must be used in conjunction with this method to
-      restore all OpenGL states.
-
-      @throws GLException If an OpenGL context is not current when this method is called
-  */
-  public void begin3DRendering() throws GLException {
-    beginRendering(false, 0, 0);
-  }
-
-  /** Convenience method which assists in rendering portions of the
-      OpenGL texture to the screen, if the application intends to draw
-      them as a flat overlay on to the screen. Must be used if {@link
-      #beginOrthoRendering} is used to set up the rendering stage for
-      this overlay.
-
-      @throws GLException If an OpenGL context is not current when this method is called
-  */
-  public void endOrthoRendering() throws GLException {
-    endRendering(true);
-  }
-
-  /** Convenience method which assists in rendering portions of the
-      OpenGL texture to the screen as 2D quads in 3D space. Must be
-      used if {@link #begin3DRendering} is used to set up the
-      rendering stage for this overlay.
-
-      @throws GLException If an OpenGL context is not current when this method is called
-  */
-  public void end3DRendering() throws GLException {
-    endRendering(false);
-  }
-
-  //----------------------------------------------------------------------
-  // Internals only below this point
-  //
-
-  private void beginRendering(final boolean ortho, final int width, final int height) {
-    final GL2 gl = (GL2) GLContext.getCurrentGL();
-    if (ortho) {
-      gl.glDisable(GL2.GL_DEPTH_TEST);
-
-      Transform.pushProjection();
-      Transform.setOrthoProjection(0, width, 0, height, -1, 1);
-      Transform.pushView();
-      Transform.setIdentityView();
+        GL2 gl = (GL2) GLContext.getCurrentGL();
+        tex = new GLTexture(gl);
+        tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_BASE_LEVEL, 0);
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAX_LEVEL, 15);
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR_MIPMAP_LINEAR);
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
+        gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, GL2.GL_RGBA, imageWidth, imageHeight, 0, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, null);
     }
 
-    getTexture().bind(gl);
-  }
-
-  private void endRendering(final boolean ortho) {
-    final GL2 gl = (GL2) GLContext.getCurrentGL();
-    if (ortho) {
-      gl.glEnable(GL2.GL_DEPTH_TEST);
-
-      Transform.popView();
-      Transform.popProjection();
+    public int getWidth() {
+        return imageWidth;
     }
-  }
 
-  /** Synchronizes the specified region of the backing store down to
-      the underlying OpenGL texture. If {@link #markDirty markDirty}
-      is used instead to indicate the regions that are out of sync,
-      this method does not need to be called.
+    public int getHeight() {
+        return imageHeight;
+    }
 
-      @param x the x coordinate (in Java 2D coordinates -- relative to
-        upper left) of the region to update
-      @param y the y coordinate (in Java 2D coordinates -- relative to
-        upper left) of the region to update
-      @param width the width of the region to update
-      @param height the height of the region to update
+    /**
+     * Creates a {@link java.awt.Graphics2D Graphics2D} instance for
+     * rendering to the backing store of this renderer. The returned
+     * object should be disposed of using the normal {@link
+     * java.awt.Graphics#dispose() Graphics.dispose()} method once it
+     * is no longer being used.
+     *
+     * @return a new {@link java.awt.Graphics2D Graphics2D} object for
+     * rendering into the backing store of this renderer
+     */
+    public Graphics2D createGraphics() {
+        return image.createGraphics();
+    }
 
-      @throws GLException If an OpenGL context is not current when this method is called
-  */
-  private void sync(final int x, final int y, final int width, final int height) throws GLException {
-    // Update specified region.
-    // NOTE that because BufferedImage-based TextureDatas now don't
-    // do anything to their contents, the coordinate systems for
-    // OpenGL and Java 2D actually line up correctly for
-    // updateSubImage calls, so we don't need to do any argument
-    // conversion here (i.e., flipping the Y coordinate).
-    final GL2 gl = (GL2) GLContext.getCurrentGL();
-    texture.updateSubImage(gl, textureData, 0, x, y, x, y, width, height);
-    gl.glGenerateMipmap(GL2.GL_TEXTURE_2D);
-  }
+    /**
+     * Returns the underlying Java 2D {@link java.awt.Image Image}
+     * being rendered into.
+     */
+    public Image getImage() {
+        return image;
+    }
+
+    /**
+     * Marks the given region of the TextureRenderer as dirty. This
+     * region, and any previously set dirty regions, will be
+     * automatically synchronized with the underlying Texture during
+     * the next {@link #getTexture getTexture} operation, at which
+     * point the dirty region will be cleared. It is not necessary for
+     * an OpenGL context to be current when this method is called.
+     *
+     * @param x      the x coordinate (in Java 2D coordinates -- relative to
+     *               upper left) of the region to update
+     * @param y      the y coordinate (in Java 2D coordinates -- relative to
+     *               upper left) of the region to update
+     * @param width  the width of the region to update
+     * @param height the height of the region to update
+     */
+    public void markDirty(int x, int y, int width, int height) {
+        Rectangle curRegion = new Rectangle(x, y, width, height);
+        if (dirtyRegion == null) {
+            dirtyRegion = curRegion;
+        } else {
+            dirtyRegion.add(curRegion);
+        }
+    }
+
+    /**
+     * Returns the underlying OpenGL Texture object associated with
+     * this renderer, synchronizing any dirty regions of the
+     * TextureRenderer with the underlying OpenGL texture.
+     *
+     * @throws GLException If an OpenGL context is not current when this method is called
+     */
+    public void bind(GL2 gl) throws GLException {
+        tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
+        if (dirtyRegion != null) {
+            upload(gl, dirtyRegion.x, dirtyRegion.y, dirtyRegion.width, dirtyRegion.height);
+            dirtyRegion = null;
+        }
+    }
+
+    /**
+     * Disposes all resources associated with this renderer. It is not
+     * valid to use this renderer after calling this method.
+     *
+     * @throws GLException If an OpenGL context is not current when this method is called
+     */
+    public void dispose() throws GLException {
+        tex.delete((GL2) GLContext.getCurrentGL());
+        imageBuffer = null;
+        image = null;
+    }
+
+    /**
+     * Convenience method which assists in rendering portions of the
+     * OpenGL texture to the screen, if the application intends to draw
+     * them as a flat overlay on to the screen. Pushes OpenGL state
+     * bits (GL_ENABLE_BIT, GL_DEPTH_BUFFER_BIT and GL_TRANSFORM_BIT);
+     * disables the depth test, back-face culling, and lighting;
+     * enables the texture in this renderer; and sets up the viewing
+     * matrices for orthographic rendering where the coordinates go
+     * from (0, 0) at the lower left to (width, height) at the upper
+     * right. Equivalent to beginOrthoRendering(width, height, true).
+     * {@link #endOrthoRendering} must be used in conjunction with this
+     * method to restore all OpenGL states.
+     *
+     * @param width  the width of the current on-screen OpenGL drawable
+     * @param height the height of the current on-screen OpenGL drawable
+     * @throws GLException If an OpenGL context is not current when this method is called
+     */
+    public void beginOrthoRendering(int width, int height) throws GLException {
+        beginRendering(true, width, height);
+    }
+
+    /**
+     * Convenience method which assists in rendering portions of the
+     * OpenGL texture to the screen as 2D quads in 3D space. Pushes
+     * OpenGL state (GL_ENABLE_BIT); disables lighting; and enables the
+     * texture in this renderer. Unlike {@link #beginOrthoRendering
+     * beginOrthoRendering}, does not modify the depth test, back-face
+     * culling, lighting, or the modelview or projection matrices. {@link
+     * #end3DRendering} must be used in conjunction with this method to
+     * restore all OpenGL states.
+     *
+     * @throws GLException If an OpenGL context is not current when this method is called
+     */
+    public void begin3DRendering() throws GLException {
+        beginRendering(false, 0, 0);
+    }
+
+    /**
+     * Convenience method which assists in rendering portions of the
+     * OpenGL texture to the screen, if the application intends to draw
+     * them as a flat overlay on to the screen. Must be used if {@link
+     * #beginOrthoRendering} is used to set up the rendering stage for
+     * this overlay.
+     *
+     * @throws GLException If an OpenGL context is not current when this method is called
+     */
+    public void endOrthoRendering() throws GLException {
+        endRendering(true);
+    }
+
+    /**
+     * Convenience method which assists in rendering portions of the
+     * OpenGL texture to the screen as 2D quads in 3D space. Must be
+     * used if {@link #begin3DRendering} is used to set up the
+     * rendering stage for this overlay.
+     *
+     * @throws GLException If an OpenGL context is not current when this method is called
+     */
+    public void end3DRendering() throws GLException {
+        endRendering(false);
+    }
+
+    //----------------------------------------------------------------------
+    // Internals only below this point
+    //
+
+    private void beginRendering(boolean ortho, int width, int height) {
+        if (ortho) {
+            GL2 gl = (GL2) GLContext.getCurrentGL();
+            gl.glDisable(GL2.GL_DEPTH_TEST);
+
+            Transform.pushProjection();
+            Transform.setOrthoProjection(0, width, 0, height, -1, 1);
+            Transform.pushView();
+            Transform.setIdentityView();
+        }
+    }
+
+    private void endRendering(boolean ortho) {
+        if (ortho) {
+            GL2 gl = (GL2) GLContext.getCurrentGL();
+            gl.glEnable(GL2.GL_DEPTH_TEST);
+
+            Transform.popView();
+            Transform.popProjection();
+        }
+    }
+
+    /**
+     * Synchronizes the specified region of the backing store down to
+     * the underlying OpenGL texture. If {@link #markDirty markDirty}
+     * is used instead to indicate the regions that are out of sync,
+     * this method does not need to be called.
+     *
+     * @param x      the x coordinate (in Java 2D coordinates -- relative to
+     *               upper left) of the region to update
+     * @param y      the y coordinate (in Java 2D coordinates -- relative to
+     *               upper left) of the region to update
+     * @param width  the width of the region to update
+     * @param height the height of the region to update
+     * @throws GLException If an OpenGL context is not current when this method is called
+     */
+    private void upload(GL2 gl, int x, int y, int width, int height) throws GLException {
+        gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, 4);
+        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_ROWS, x);
+        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_PIXELS, y);
+        gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, imageWidth);
+        gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, x, y, width, height, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, imageBuffer);
+        gl.glGenerateMipmap(GL2.GL_TEXTURE_2D);
+    }
 
 }
