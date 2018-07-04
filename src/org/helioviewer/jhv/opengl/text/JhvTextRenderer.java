@@ -729,7 +729,7 @@ public class JhvTextRenderer {
 
         private boolean used; // Whether this text was used recently
 
-        TextData(final String str, final Point origin, final Rectangle2D origRect, final int unicodeID) {
+        TextData(String str, Point origin, Rectangle2D origRect, int unicodeID) {
             this.str = str;
             this.origin = origin;
             this.origRect = origRect;
@@ -1002,8 +1002,6 @@ public class JhvTextRenderer {
                 }
 
                 final JhvTextureRenderer renderer = getBackingStore();
-                renderer.getTexture(); // sync
-
                 final Rect rect = glyphRectForTextureMapping;
                 final TextData data = (TextData) rect.getUserData();
                 data.markUsed();
@@ -1326,13 +1324,11 @@ public class JhvTextRenderer {
 
         void draw() {
             if (mOutstandingGlyphsVerticesPipeline > 0) {
-                final GL2 gl = (GL2) GLContext.getCurrentGL();
-
-                //final JhvTextureRenderer renderer = getBackingStore();
-                //renderer.getTexture(); // triggers texture uploads.  Maybe this should be more obvious?
-
                 mVertCoords.rewind();
                 mTexCoords.rewind();
+
+                GL2 gl = (GL2) GLContext.getCurrentGL();
+                getBackingStore().bind(gl);
 
                 glslTexture.init(gl);
                 glslTexture.setData(gl, mVertCoords, mTexCoords);

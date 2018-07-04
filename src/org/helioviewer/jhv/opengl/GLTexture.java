@@ -62,6 +62,9 @@ public class GLTexture {
 
         int bitsPerPixel = source.getBitsPerPixel();
         gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, bitsPerPixel >> 3);
+        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_ROWS, 0);
+        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_PIXELS, 0);
+        gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, w);
 
         ImageFormat imageFormat = source.getImageFormat();
         int inputGLFormat = mapImageFormatToInputGLFormat(imageFormat);
@@ -109,6 +112,9 @@ public class GLTexture {
         }
 
         gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, mapDataBufferTypeToGLAlign(rawBuffer.getDataType()));
+        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_ROWS, 0);
+        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_PIXELS, 0);
+        gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, w);
         genTexture2D(gl, mapTypeToInternalGLFormat(source.getType()), w, h, mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(rawBuffer.getDataType()), buffer);
     }
 
