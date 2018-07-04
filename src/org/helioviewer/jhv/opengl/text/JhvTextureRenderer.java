@@ -74,7 +74,6 @@ class JhvTextureRenderer {
 
   private Texture texture;
   private final AWTTextureData textureData;
-  private boolean mustReallocateTexture;
   private Rectangle dirtyRegion;
 
   private final int width;
@@ -97,9 +96,14 @@ class JhvTextureRenderer {
     // texture
     final GL2 gl = (GL2) GLContext.getCurrentGL();
     textureData = new AWTTextureData(gl.getGLProfile(), internalFormat, 0, true, image);
-    // For now, always reallocate the underlying OpenGL texture when
-    // the backing store size changes
-    mustReallocateTexture = true;
+
+    texture = TextureIO.newTexture(textureData);
+    texture.setTexParameteri(gl, GL2.GL_TEXTURE_BASE_LEVEL, 0);
+    texture.setTexParameteri(gl, GL2.GL_TEXTURE_MAX_LEVEL, 15);
+    texture.setTexParameteri(gl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR_MIPMAP_LINEAR);
+    texture.setTexParameteri(gl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
+    texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
+    texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
   }
 
   public int getWidth() {
@@ -163,8 +167,6 @@ class JhvTextureRenderer {
       sync(dirtyRegion.x, dirtyRegion.y, dirtyRegion.width, dirtyRegion.height);
       dirtyRegion = null;
     }
-
-    ensureTexture();
     return texture;
   }
 
@@ -286,45 +288,15 @@ class JhvTextureRenderer {
       @throws GLException If an OpenGL context is not current when this method is called
   */
   private void sync(final int x, final int y, final int width, final int height) throws GLException {
-    // Force allocation if necessary
-    final boolean canSkipUpdate = ensureTexture();
-
-    if (!canSkipUpdate) {
-      // Update specified region.
-      // NOTE that because BufferedImage-based TextureDatas now don't
-      // do anything to their contents, the coordinate systems for
-      // OpenGL and Java 2D actually line up correctly for
-      // updateSubImage calls, so we don't need to do any argument
-      // conversion here (i.e., flipping the Y coordinate).
-      final GL2 gl = (GL2) GLContext.getCurrentGL();
-      texture.updateSubImage(gl, textureData, 0, x, y, x, y, width, height);
-      gl.glGenerateMipmap(GL2.GL_TEXTURE_2D);
-    }
-  }
-
-  // Returns true if the texture was newly allocated, false if not
-  private boolean ensureTexture() {
-    if (mustReallocateTexture) {
-      final GL2 gl = (GL2) GLContext.getCurrentGL();
-      if (texture != null) {
-        texture.destroy(gl);
-        texture = null;
-      }
-      mustReallocateTexture = false;
-    }
-
-    if (texture == null) {
-      final GL2 gl = (GL2) GLContext.getCurrentGL();
-      texture = TextureIO.newTexture(textureData);
-      texture.setTexParameteri(gl, GL2.GL_TEXTURE_BASE_LEVEL, 0);
-      texture.setTexParameteri(gl, GL2.GL_TEXTURE_MAX_LEVEL, 15);
-      texture.setTexParameteri(gl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR_MIPMAP_LINEAR);
-      texture.setTexParameteri(gl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
-      texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
-      texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
-      return true;
-    }
-    return false;
+    // Update specified region.
+    // NOTE that because BufferedImage-based TextureDatas now don't
+    // do anything to their contents, the coordinate systems for
+    // OpenGL and Java 2D actually line up correctly for
+    // updateSubImage calls, so we don't need to do any argument
+    // conversion here (i.e., flipping the Y coordinate).
+    final GL2 gl = (GL2) GLContext.getCurrentGL();
+    texture.updateSubImage(gl, textureData, 0, x, y, x, y, width, height);
+    gl.glGenerateMipmap(GL2.GL_TEXTURE_2D);
   }
 
 }
