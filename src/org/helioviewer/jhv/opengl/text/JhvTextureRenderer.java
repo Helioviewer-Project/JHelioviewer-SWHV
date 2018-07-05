@@ -1,55 +1,16 @@
-/*
- * Copyright (c) 2006 Sun Microsystems, Inc. All Rights Reserved.
- * Copyright (c) 2010 JogAmp Community. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistribution of source code must retain the above copyright
- *   notice, this list of conditions and the following disclaimer.
- *
- * - Redistribution in binary form must reproduce the above copyright
- *   notice, this list of conditions and the following disclaimer in the
- *   documentation and/or other materials provided with the distribution.
- *
- * Neither the name of Sun Microsystems, Inc. or the names of
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * This software is provided "AS IS," without a warranty of any kind. ALL
- * EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES,
- * INCLUDING ANY IMPLIED WARRANTY OF MERCHANTABILITY, FITNESS FOR A
- * PARTICULAR PURPOSE OR NON-INFRINGEMENT, ARE HEREBY EXCLUDED. SUN
- * MICROSYSTEMS, INC. ("SUN") AND ITS LICENSORS SHALL NOT BE LIABLE FOR
- * ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, MODIFYING OR
- * DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. IN NO EVENT WILL SUN OR
- * ITS LICENSORS BE LIABLE FOR ANY LOST REVENUE, PROFIT OR DATA, OR FOR
- * DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL, INCIDENTAL OR PUNITIVE
- * DAMAGES, HOWEVER CAUSED AND REGARDLESS OF THE THEORY OF LIABILITY,
- * ARISING OUT OF THE USE OF OR INABILITY TO USE THIS SOFTWARE, EVEN IF
- * SUN HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
- *
- * You acknowledge that this software is not designed or intended for use
- * in the design, construction, operation or maintenance of any nuclear
- * facility.
- *
- * Sun gratefully acknowledges that this software was originally authored
- * and developed by Kenneth Bradley Russell and Christopher John Kline.
- */
-
 package org.helioviewer.jhv.opengl.text;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
-import java.awt.image.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.nio.IntBuffer;
 
-import com.jogamp.opengl.*;
-
-import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.opengl.GLTexture;
+
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLContext;
 
 /**
  * Provides the ability to render into an OpenGL {@link
@@ -160,7 +121,7 @@ class JhvTextureRenderer {
         }
     }
 
-    void bind(GL2 gl) throws GLException {
+    void bind(GL2 gl) {
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
         if (dirtyRegion != null) {
             upload(gl, dirtyRegion.x, dirtyRegion.y, dirtyRegion.width, dirtyRegion.height);
@@ -171,35 +132,11 @@ class JhvTextureRenderer {
     /**
      * Disposes all resources associated with this renderer. It is not
      * valid to use this renderer after calling this method.
-     *
-     * @throws GLException If an OpenGL context is not current when this method is called
      */
-    void dispose() throws GLException {
+    void dispose() {
         tex.delete((GL2) GLContext.getCurrentGL());
         imageBuffer = null;
         image = null;
-    }
-
-    static void beginRendering(boolean ortho, int width, int height) {
-        if (ortho) {
-            GL2 gl = (GL2) GLContext.getCurrentGL();
-            gl.glDisable(GL2.GL_DEPTH_TEST);
-
-            Transform.pushProjection();
-            Transform.setOrthoProjection(0, width, 0, height, -1, 1);
-            Transform.pushView();
-            Transform.setIdentityView();
-        }
-    }
-
-    static void endRendering(boolean ortho) {
-        if (ortho) {
-            GL2 gl = (GL2) GLContext.getCurrentGL();
-            gl.glEnable(GL2.GL_DEPTH_TEST);
-
-            Transform.popView();
-            Transform.popProjection();
-        }
     }
 
     /**
@@ -214,9 +151,8 @@ class JhvTextureRenderer {
      *               upper left) of the region to update
      * @param width  the width of the region to update
      * @param height the height of the region to update
-     * @throws GLException If an OpenGL context is not current when this method is called
      */
-    private void upload(GL2 gl, int x, int y, int width, int height) throws GLException {
+    private void upload(GL2 gl, int x, int y, int width, int height) {
         gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, 4);
         gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, imageWidth);
         gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, x, y, width, height, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, imageBuffer.position(y * imageWidth + x));
