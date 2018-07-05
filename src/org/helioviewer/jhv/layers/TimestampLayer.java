@@ -66,7 +66,7 @@ public class TimestampLayer extends AbstractLayer {
             size *= 2;
 
         JhvTextRenderer renderer = GLText.getRenderer(size);
-        renderer.beginRendering(vp.width, vp.height, true);
+        renderer.beginRendering(vp.width, vp.height);
         renderer.setColor(GLText.shadowColor);
         renderer.draw(text, delta + GLText.shadowOffset[0], delta + GLText.shadowOffset[1]);
         renderer.setColor(BufferUtils.colorWhite);
