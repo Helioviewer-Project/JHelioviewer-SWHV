@@ -268,10 +268,9 @@ public class JhvTextRenderer {
      *
      * @param width            the width of the current on-screen OpenGL drawable
      * @param height           the height of the current on-screen OpenGL drawable
-     * @param disableDepthTest whether to disable the depth test
      * @throws GLException If an OpenGL context is not current when this method is called
      */
-    public void beginRendering(int width, int height, boolean disableDepthTest) throws GLException {
+    public void beginRendering(int width, int height) throws GLException {
         beginRendering(true, width, height);
     }
 
@@ -307,62 +306,19 @@ public class JhvTextRenderer {
     }
 
     /**
-     * Draws the supplied CharSequence at the desired location using
-     * the renderer's current color. The baseline of the leftmost
-     * character is at position (x, y) specified in OpenGL coordinates,
-     * where the origin is at the lower-left of the drawable and the Y
-     * coordinate increases in the upward direction.
-     *
-     * @param str the string to draw
-     * @param x   the x coordinate at which to draw
-     * @param y   the y coordinate at which to draw
-     * @throws GLException If an OpenGL context is not current when this method is called
-     */
-    public void draw(CharSequence str, int x, int y) throws GLException {
-        draw3D(str, x, y, 0, 1);
-    }
-
-    /**
      * Draws the supplied String at the desired location using the
-     * renderer's current color. See {@link #draw(CharSequence, int,
-     * int) draw(CharSequence, int, int)}.
+     * renderer's current color.
      */
     public void draw(String str, int x, int y) throws GLException {
         draw3D(str, x, y, 0, 1);
     }
 
     /**
-     * Draws the supplied CharSequence at the desired 3D location using
-     * the renderer's current color. The baseline of the leftmost
-     * character is placed at position (x, y, z) in the current
-     * coordinate system.
-     *
-     * @param str         the string to draw
-     * @param x           the x coordinate at which to draw
-     * @param y           the y coordinate at which to draw
-     * @param z           the z coordinate at which to draw
-     * @param scaleFactor a uniform scale factor applied to the width and height of the drawn rectangle
-     * @throws GLException If an OpenGL context is not current when this method is called
-     */
-    private void draw3D(CharSequence str, float x, float y, float z, float scaleFactor) {
-        internal_draw3D(str, x, y, z, scaleFactor);
-    }
-
-    /**
      * Draws the supplied String at the desired 3D location using the
-     * renderer's current color. See {@link #draw3D(CharSequence,
-     * float, float, float, float) draw3D(CharSequence, float, float,
-     * float, float)}.
+     * renderer's current color.
      */
     public void draw3D(String str, float x, float y, float z, float scaleFactor) {
         internal_draw3D(str, x, y, z, scaleFactor);
-    }
-
-    /**
-     * Returns the pixel width of the given character.
-     */
-    public float getCharWidth(char inChar) {
-        return mGlyphProducer.getGlyphPixelWidth(inChar);
     }
 
     /**

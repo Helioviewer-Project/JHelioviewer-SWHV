@@ -87,7 +87,7 @@ public class GLText {
         // float bottom = textInit_y - fontSize - TOP_MARGIN_TEXT;
 
         int deltaY = 0;
-        renderer.beginRendering(vp.width, vp.height, true);
+        renderer.beginRendering(vp.width, vp.height);
         for (String txt : txts) {
             renderer.setColor(shadowColor);
             renderer.draw(txt, textInit_x + shadowOffset[0], vp.height - textInit_y + shadowOffset[1] - deltaY);
