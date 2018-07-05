@@ -482,11 +482,7 @@ public class JhvTextRenderer {
         beginRenderingWidth = width;
         beginRenderingHeight = height;
 
-        if (ortho) {
-            getBackingStore().beginOrthoRendering(width, height);
-        } else {
-            getBackingStore().begin3DRendering();
-        }
+        JhvTextureRenderer.beginRendering(ortho, width, height);
 
         if (!haveMaxSize) {
             // Query OpenGL for the maximum texture size and set it in the
@@ -503,11 +499,7 @@ public class JhvTextRenderer {
         flush();
 
         inBeginEndPair = false;
-        if (ortho) {
-            getBackingStore().endOrthoRendering();
-        } else {
-            getBackingStore().end3DRendering();
-        }
+        JhvTextureRenderer.endRendering(ortho);
 
         if (++numRenderCycles >= CYCLES_PER_FLUSH) {
             numRenderCycles = 0;
@@ -833,11 +825,7 @@ public class JhvTextRenderer {
             if (inBeginEndPair) {
                 // Draw any outstanding glyphs
                 flush();
-                if (isOrthoMode) {
-                    ((JhvTextureRenderer) oldBackingStore).endOrthoRendering();
-                } else {
-                    ((JhvTextureRenderer) oldBackingStore).end3DRendering();
-                }
+                JhvTextureRenderer.endRendering(isOrthoMode);
             }
 
             JhvTextureRenderer newRenderer = (JhvTextureRenderer) newBackingStore;
@@ -873,11 +861,7 @@ public class JhvTextRenderer {
             newRenderer.markDirty(0, 0, newRenderer.getWidth(), newRenderer.getHeight());
             // Re-enter the begin / end pair if necessary
             if (inBeginEndPair) {
-                if (isOrthoMode) {
-                    ((JhvTextureRenderer) newBackingStore).beginOrthoRendering(beginRenderingWidth, beginRenderingHeight);
-                } else {
-                    ((JhvTextureRenderer) newBackingStore).begin3DRendering();
-                }
+                JhvTextureRenderer.beginRendering(isOrthoMode, beginRenderingWidth, beginRenderingHeight);
             }
         }
     }

@@ -106,11 +106,11 @@ class JhvTextureRenderer {
         gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, GL2.GL_RGBA, imageWidth, imageHeight, 0, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, null);
     }
 
-    public int getWidth() {
+    int getWidth() {
         return imageWidth;
     }
 
-    public int getHeight() {
+    int getHeight() {
         return imageHeight;
     }
 
@@ -124,7 +124,7 @@ class JhvTextureRenderer {
      * @return a new {@link java.awt.Graphics2D Graphics2D} object for
      * rendering into the backing store of this renderer
      */
-    public Graphics2D createGraphics() {
+    Graphics2D createGraphics() {
         return image.createGraphics();
     }
 
@@ -132,7 +132,7 @@ class JhvTextureRenderer {
      * Returns the underlying Java 2D {@link java.awt.Image Image}
      * being rendered into.
      */
-    public Image getImage() {
+    Image getImage() {
         return image;
     }
 
@@ -140,7 +140,7 @@ class JhvTextureRenderer {
      * Marks the given region of the TextureRenderer as dirty. This
      * region, and any previously set dirty regions, will be
      * automatically synchronized with the underlying Texture during
-     * the next {@link #getTexture getTexture} operation, at which
+     * the next bind operation, at which
      * point the dirty region will be cleared. It is not necessary for
      * an OpenGL context to be current when this method is called.
      *
@@ -151,7 +151,7 @@ class JhvTextureRenderer {
      * @param width  the width of the region to update
      * @param height the height of the region to update
      */
-    public void markDirty(int x, int y, int width, int height) {
+    void markDirty(int x, int y, int width, int height) {
         Rectangle curRegion = new Rectangle(x, y, width, height);
         if (dirtyRegion == null) {
             dirtyRegion = curRegion;
@@ -160,14 +160,7 @@ class JhvTextureRenderer {
         }
     }
 
-    /**
-     * Returns the underlying OpenGL Texture object associated with
-     * this renderer, synchronizing any dirty regions of the
-     * TextureRenderer with the underlying OpenGL texture.
-     *
-     * @throws GLException If an OpenGL context is not current when this method is called
-     */
-    public void bind(GL2 gl) throws GLException {
+    void bind(GL2 gl) throws GLException {
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
         if (dirtyRegion != null) {
             upload(gl, dirtyRegion.x, dirtyRegion.y, dirtyRegion.width, dirtyRegion.height);
@@ -181,79 +174,13 @@ class JhvTextureRenderer {
      *
      * @throws GLException If an OpenGL context is not current when this method is called
      */
-    public void dispose() throws GLException {
+    void dispose() throws GLException {
         tex.delete((GL2) GLContext.getCurrentGL());
         imageBuffer = null;
         image = null;
     }
 
-    /**
-     * Convenience method which assists in rendering portions of the
-     * OpenGL texture to the screen, if the application intends to draw
-     * them as a flat overlay on to the screen. Pushes OpenGL state
-     * bits (GL_ENABLE_BIT, GL_DEPTH_BUFFER_BIT and GL_TRANSFORM_BIT);
-     * disables the depth test, back-face culling, and lighting;
-     * enables the texture in this renderer; and sets up the viewing
-     * matrices for orthographic rendering where the coordinates go
-     * from (0, 0) at the lower left to (width, height) at the upper
-     * right. Equivalent to beginOrthoRendering(width, height, true).
-     * {@link #endOrthoRendering} must be used in conjunction with this
-     * method to restore all OpenGL states.
-     *
-     * @param width  the width of the current on-screen OpenGL drawable
-     * @param height the height of the current on-screen OpenGL drawable
-     * @throws GLException If an OpenGL context is not current when this method is called
-     */
-    public void beginOrthoRendering(int width, int height) throws GLException {
-        beginRendering(true, width, height);
-    }
-
-    /**
-     * Convenience method which assists in rendering portions of the
-     * OpenGL texture to the screen as 2D quads in 3D space. Pushes
-     * OpenGL state (GL_ENABLE_BIT); disables lighting; and enables the
-     * texture in this renderer. Unlike {@link #beginOrthoRendering
-     * beginOrthoRendering}, does not modify the depth test, back-face
-     * culling, lighting, or the modelview or projection matrices. {@link
-     * #end3DRendering} must be used in conjunction with this method to
-     * restore all OpenGL states.
-     *
-     * @throws GLException If an OpenGL context is not current when this method is called
-     */
-    public void begin3DRendering() throws GLException {
-        beginRendering(false, 0, 0);
-    }
-
-    /**
-     * Convenience method which assists in rendering portions of the
-     * OpenGL texture to the screen, if the application intends to draw
-     * them as a flat overlay on to the screen. Must be used if {@link
-     * #beginOrthoRendering} is used to set up the rendering stage for
-     * this overlay.
-     *
-     * @throws GLException If an OpenGL context is not current when this method is called
-     */
-    public void endOrthoRendering() throws GLException {
-        endRendering(true);
-    }
-
-    /**
-     * Convenience method which assists in rendering portions of the
-     * OpenGL texture to the screen as 2D quads in 3D space. Must be
-     * used if {@link #begin3DRendering} is used to set up the
-     * rendering stage for this overlay.
-     *
-     * @throws GLException If an OpenGL context is not current when this method is called
-     */
-    public void end3DRendering() throws GLException {
-        endRendering(false);
-    }
-
-    //----------------------------------------------------------------------
-    // Internals only below this point
-    //
-
-    private void beginRendering(boolean ortho, int width, int height) {
+    static void beginRendering(boolean ortho, int width, int height) {
         if (ortho) {
             GL2 gl = (GL2) GLContext.getCurrentGL();
             gl.glDisable(GL2.GL_DEPTH_TEST);
@@ -265,7 +192,7 @@ class JhvTextureRenderer {
         }
     }
 
-    private void endRendering(boolean ortho) {
+    static void endRendering(boolean ortho) {
         if (ortho) {
             GL2 gl = (GL2) GLContext.getCurrentGL();
             gl.glEnable(GL2.GL_DEPTH_TEST);
