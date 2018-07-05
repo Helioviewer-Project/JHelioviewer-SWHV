@@ -39,28 +39,34 @@
  */
 package org.helioviewer.jhv.opengl.text;
 
-import com.jogamp.common.nio.Buffers;
-import com.jogamp.opengl.util.packrect.*;
-
 import java.awt.AlphaComposite;
 import java.awt.Color;
-
-// For debugging purposes
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.RenderingHints;
-import java.awt.font.*;
-import java.awt.geom.*;
-import java.nio.*;
-import java.text.*;
-import java.util.*;
-
-import com.jogamp.opengl.*;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphMetrics;
+import java.awt.font.GlyphVector;
+import java.awt.geom.Rectangle2D;
+import java.nio.FloatBuffer;
+import java.text.CharacterIterator;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.opengl.GLSLTexture;
+
+import com.jogamp.common.nio.Buffers;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLContext;
+import com.jogamp.opengl.util.packrect.BackingStoreManager;
+import com.jogamp.opengl.util.packrect.Rect;
+import com.jogamp.opengl.util.packrect.RectanglePacker;
 
 /**
  * Renders bitmapped Java 2D text into an OpenGL window with high
@@ -268,9 +274,8 @@ public class JhvTextRenderer {
      *
      * @param width            the width of the current on-screen OpenGL drawable
      * @param height           the height of the current on-screen OpenGL drawable
-     * @throws GLException If an OpenGL context is not current when this method is called
      */
-    public void beginRendering(int width, int height) throws GLException {
+    public void beginRendering(int width, int height) {
         beginRendering(true, width, height);
     }
 
@@ -284,10 +289,8 @@ public class JhvTextRenderer {
      * environment mode to GL_MODULATE, and changes the current color
      * to the last color set with this TextRenderer via {@link
      * #setColor setColor}.
-     *
-     * @throws GLException If an OpenGL context is not current when this method is called
      */
-    public void begin3DRendering() throws GLException {
+    public void begin3DRendering() {
         beginRendering(false, 0, 0);
     }
 
@@ -300,7 +303,7 @@ public class JhvTextRenderer {
      * premultiplied colors are used internally. The default color is
      * opaque white.
      */
-    public void setColor(float[] color) throws GLException {
+    public void setColor(float[] color) {
         flush();
         textColor = color;
     }
@@ -309,7 +312,7 @@ public class JhvTextRenderer {
      * Draws the supplied String at the desired location using the
      * renderer's current color.
      */
-    public void draw(String str, int x, int y) throws GLException {
+    public void draw(String str, int x, int y) {
         draw3D(str, x, y, 0, 1);
     }
 
@@ -337,10 +340,8 @@ public class JhvTextRenderer {
      * Restores the projection and modelview matrices as well as
      * several OpenGL state bits. Should be paired with {@link
      * #beginRendering beginRendering}.
-     *
-     * @throws GLException If an OpenGL context is not current when this method is called
      */
-    public void endRendering() throws GLException {
+    public void endRendering() {
         endRendering(true);
     }
 
@@ -348,20 +349,16 @@ public class JhvTextRenderer {
      * Ends a 3D render cycle with this {@link JhvTextRenderer TextRenderer}.
      * Restores several OpenGL state bits. Should be paired with {@link
      * #begin3DRendering begin3DRendering}.
-     *
-     * @throws GLException If an OpenGL context is not current when this method is called
      */
-    public void end3DRendering() throws GLException {
+    public void end3DRendering() {
         endRendering(false);
     }
 
     /**
      * Disposes of all resources this TextRenderer is using. It is not
      * valid to use the TextRenderer after this method is called.
-     *
-     * @throws GLException If an OpenGL context is not current when this method is called
      */
-    public void dispose(GL2 gl) throws GLException {
+    public void dispose(GL2 gl) {
         packer.dispose();
         packer = null;
         cachedBackingStore = null;
@@ -438,7 +435,7 @@ public class JhvTextRenderer {
         beginRenderingWidth = width;
         beginRenderingHeight = height;
 
-        JhvTextureRenderer.beginRendering(ortho, width, height);
+        internal_beginRendering(ortho, width, height);
 
         if (!haveMaxSize) {
             // Query OpenGL for the maximum texture size and set it in the
@@ -451,15 +448,37 @@ public class JhvTextRenderer {
         }
     }
 
-    private void endRendering(boolean ortho) throws GLException {
+    private void endRendering(boolean ortho) {
         flush();
 
         inBeginEndPair = false;
-        JhvTextureRenderer.endRendering(ortho);
+        internal_endRendering(ortho);
 
         if (++numRenderCycles >= CYCLES_PER_FLUSH) {
             numRenderCycles = 0;
             clearUnusedEntries();
+        }
+    }
+
+    static void internal_beginRendering(boolean ortho, int width, int height) {
+        if (ortho) {
+            GL2 gl = (GL2) GLContext.getCurrentGL();
+            gl.glDisable(GL2.GL_DEPTH_TEST);
+
+            Transform.pushProjection();
+            Transform.setOrthoProjection(0, width, 0, height, -1, 1);
+            Transform.pushView();
+            Transform.setIdentityView();
+        }
+    }
+
+    static void internal_endRendering(boolean ortho) {
+        if (ortho) {
+            GL2 gl = (GL2) GLContext.getCurrentGL();
+            gl.glEnable(GL2.GL_DEPTH_TEST);
+
+            Transform.popView();
+            Transform.popProjection();
         }
     }
 
@@ -513,11 +532,6 @@ public class JhvTextRenderer {
      * during the rendering process.
      */
     interface RenderDelegate {
-        /**
-         * Computes the bounds of the given String relative to the
-         * origin.
-         */
-        Rectangle2D getBounds(String str, Font font, FontRenderContext frc);
 
         /**
          * Computes the bounds of the given character sequence relative
@@ -530,24 +544,7 @@ public class JhvTextRenderer {
          * assumed to have been created for a particular Font,
          * relative to the origin.
          */
-        Rectangle2D getBounds(GlyphVector gv, FontRenderContext frc);
-
-        /**
-         * Render the passed character sequence at the designated
-         * location using the supplied Graphics2D instance. The
-         * surrounding region will already have been cleared to the RGB
-         * color (0, 0, 0) with zero alpha. The initial drawing context
-         * of the passed Graphics2D will be set to use
-         * AlphaComposite.Src, the color white, the Font specified in the
-         * TextRenderer's constructor, and the rendering hints specified
-         * in the TextRenderer constructor.  Changes made by the end user
-         * may be visible in successive calls to this method, but are not
-         * guaranteed to be preserved.  Implementors of this method
-         * should reset the Graphics2D's state to that desired each time
-         * this method is called, in particular those states which are
-         * not the defaults.
-         */
-        void draw(Graphics2D graphics, String str, int x, int y);
+        Rectangle2D getBounds(GlyphVector gv);
 
         /**
          * Render the passed GlyphVector at the designated location using
@@ -722,10 +719,6 @@ public class JhvTextRenderer {
 
         @Override
         public Object allocateBackingStore(int w, int h) {
-            // FIXME: should consider checking Font's attributes to see
-            // whether we're likely to need to support a full RGBA backing
-            // store (i.e., non-default Paint, foreground color, etc.), but
-            // for now, let's just be more efficient
             return new JhvTextureRenderer(MathUtils.nextPowerOfTwo(w), MathUtils.nextPowerOfTwo(h));
         }
 
@@ -781,7 +774,7 @@ public class JhvTextRenderer {
             if (inBeginEndPair) {
                 // Draw any outstanding glyphs
                 flush();
-                JhvTextureRenderer.endRendering(isOrthoMode);
+                internal_endRendering(isOrthoMode);
             }
 
             JhvTextureRenderer newRenderer = (JhvTextureRenderer) newBackingStore;
@@ -817,7 +810,7 @@ public class JhvTextRenderer {
             newRenderer.markDirty(0, 0, newRenderer.getWidth(), newRenderer.getHeight());
             // Re-enter the begin / end pair if necessary
             if (inBeginEndPair) {
-                JhvTextureRenderer.beginRendering(isOrthoMode, beginRenderingWidth, beginRenderingHeight);
+                internal_beginRendering(isOrthoMode, beginRenderingWidth, beginRenderingHeight);
             }
         }
     }
@@ -826,16 +819,11 @@ public class JhvTextRenderer {
 
         @Override
         public Rectangle2D getBounds(CharSequence str, Font font, FontRenderContext frc) {
-            return getBounds(font.createGlyphVector(frc, new CharSequenceIterator(str)), frc);
+            return getBounds(font.createGlyphVector(frc, new CharSequenceIterator(str)));
         }
 
         @Override
-        public Rectangle2D getBounds(String str, Font font, FontRenderContext frc) {
-            return getBounds(font.createGlyphVector(frc, str), frc);
-        }
-
-        @Override
-        public Rectangle2D getBounds(GlyphVector gv, FontRenderContext frc) {
+        public Rectangle2D getBounds(GlyphVector gv) {
             return gv.getVisualBounds();
         }
 
@@ -844,10 +832,6 @@ public class JhvTextRenderer {
             graphics.drawGlyphVector(str, x, y);
         }
 
-        @Override
-        public void draw(Graphics2D graphics, String str, int x, int y) {
-            graphics.drawString(str, x, y);
-        }
     }
 
     //----------------------------------------------------------------------
@@ -1004,7 +988,7 @@ public class JhvTextRenderer {
 
         private void upload() {
             GlyphVector gv = getGlyphVector();
-            Rectangle2D origBBox = preNormalize(renderDelegate.getBounds(gv, getFontRenderContext()));
+            Rectangle2D origBBox = preNormalize(renderDelegate.getBounds(gv));
             Rectangle2D bbox = normalize(origBBox);
             Point origin = new Point((int) -bbox.getMinX(), (int) -bbox.getMinY());
             Rect rect = new Rect(0, 0, (int) bbox.getWidth(), (int) bbox.getHeight(), new TextData(null, origin, origBBox, unicodeID));
