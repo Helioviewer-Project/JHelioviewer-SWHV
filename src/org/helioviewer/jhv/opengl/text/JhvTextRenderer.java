@@ -915,13 +915,6 @@ public class JhvTextRenderer {
         }
 
         /**
-         * Returns the advance for this glyph
-         */
-        float getAdvance() {
-            return advance;
-        }
-
-        /**
          * Draws this glyph and returns the (x) advance for this glyph
          */
         float draw3D(float inX, float inY, float z, float scaleFactor) {
@@ -1063,7 +1056,6 @@ public class JhvTextRenderer {
 
     class GlyphProducer {
         static final int undefined = -2;
-        final FontRenderContext fontRenderContext = null; // FIXME: Never initialized!
         final List<Glyph> glyphsOutput = new ArrayList<>();
         final HashMap<String, GlyphVector> fullGlyphVectorCache = new HashMap<>();
         final HashMap<Character, GlyphMetrics> glyphMetricsCache = new HashMap<>();
@@ -1131,21 +1123,6 @@ public class JhvTextRenderer {
             glyphCache[glyph.getGlyphCode()] = glyph;
         }
 
-        float getGlyphPixelWidth(char unicodeID) {
-            Glyph glyph = getGlyph(unicodeID);
-            if (glyph != null) {
-                return glyph.getAdvance();
-            }
-
-            // Have to do this the hard / uncached way
-            singleUnicode[0] = unicodeID;
-            if (null == fontRenderContext) { // FIXME: Never initialized!
-                throw new InternalError("fontRenderContext never initialized!");
-            }
-            GlyphVector gv = font.createGlyphVector(fontRenderContext, singleUnicode);
-            return gv.getGlyphMetrics(0).getAdvance();
-        }
-
         // Returns a glyph object for this single glyph. Returns null
         // if the unicode or glyph ID would be out of bounds of the
         // glyph cache.
@@ -1164,23 +1141,6 @@ public class JhvTextRenderer {
             singleUnicode[0] = unicodeID;
             GlyphVector gv = font.createGlyphVector(getFontRenderContext(), singleUnicode);
             return getGlyph(unicodeID, gv, glyphMetrics);
-        }
-
-        // It's unclear whether this variant might produce less
-        // optimal results than if we can see the entire GlyphVector
-        // for the incoming string
-        private Glyph getGlyph(int unicodeID) {
-            if (unicodeID >= unicodes2Glyphs.length) {
-                return null;
-            }
-
-            int glyphID = unicodes2Glyphs[unicodeID];
-            if (glyphID != undefined) {
-                return glyphCache[glyphID];
-            }
-            singleUnicode[0] = (char) unicodeID;
-            GlyphVector gv = font.createGlyphVector(getFontRenderContext(), singleUnicode);
-            return getGlyph(unicodeID, gv, gv.getGlyphMetrics(0));
         }
 
         private Glyph getGlyph(int unicodeID, GlyphVector singleUnicodeGlyphVector, GlyphMetrics metrics) {
