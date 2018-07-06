@@ -36,7 +36,6 @@ public class GLSLShape {
 
         bindVBOs(gl);
         gl.glDrawArrays(GL2.GL_POINTS, 0, count);
-        unbindVBOs(gl);
 
         GLSLShader.unbind(gl);
     }
@@ -50,7 +49,6 @@ public class GLSLShape {
 
         bindVBOs(gl);
         gl.glDrawArrays(mode, 0, count);
-        unbindVBOs(gl);
 
         GLSLShader.unbind(gl);
     }
@@ -58,12 +56,6 @@ public class GLSLShape {
     private void bindVBOs(GL2 gl) {
         for (VBO vbo : vbos) {
             vbo.bindArray(gl);
-        }
-    }
-
-    private void unbindVBOs(GL2 gl) {
-        for (VBO vbo : vbos) {
-            vbo.unbindArray(gl);
         }
     }
 

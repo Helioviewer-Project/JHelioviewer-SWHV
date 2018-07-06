@@ -35,11 +35,6 @@ class VBO {
         }
     }
 
-    void unbindArray(GL2 gl) {
-        if (attribRef != -1)
-            gl.glDisableVertexAttribArray(attribRef);
-    }
-
     void init(GL2 gl) {
         bufferID = generate(gl);
     }

@@ -36,7 +36,6 @@ public class GLSLTexture {
 
         bindVBOs(gl);
         gl.glDrawArrays(mode, 0, toDraw);
-        unbindVBOs(gl);
 
         GLSLShader.unbind(gl);
     }
@@ -44,12 +43,6 @@ public class GLSLTexture {
     private void bindVBOs(GL2 gl) {
         for (VBO vbo : vbos) {
             vbo.bindArray(gl);
-        }
-    }
-
-    private void unbindVBOs(GL2 gl) {
-        for (VBO vbo : vbos) {
-            vbo.unbindArray(gl);
         }
     }
 
