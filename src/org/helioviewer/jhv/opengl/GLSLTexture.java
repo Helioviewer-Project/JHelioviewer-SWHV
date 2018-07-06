@@ -21,8 +21,8 @@ public class GLSLTexture {
             Log.error("Something is wrong with the vertices or coords from this GLSLTexture");
             return;
         }
-        vbos[0].bindBufferData4(gl, position);
-        vbos[1].bindBufferData4(gl, coords);
+        vbos[0].setData4(gl, position);
+        vbos[1].setData4(gl, coords);
         count = plen;
     }
 
