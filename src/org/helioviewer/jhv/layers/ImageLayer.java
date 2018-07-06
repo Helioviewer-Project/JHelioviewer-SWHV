@@ -203,6 +203,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
             shader.bindPolarRadii(gl, scale.getYstart(), scale.getYstop());
 
+            GLSLSolar.bindVBOs(gl);
             if (shader == GLSLSolarShader.ortho) {
                 shader.bindIsDisc(gl, 1);
                 gl.glDepthRange(depthrange[2], depthrange[3]);
