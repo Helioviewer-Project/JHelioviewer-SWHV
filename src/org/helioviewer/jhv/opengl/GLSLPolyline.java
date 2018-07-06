@@ -23,8 +23,8 @@ public class GLSLPolyline {
             Log.error("Something is wrong with the vertices or colors from this GLSLPolyline");
             return;
         }
-        vbos[0].bindBufferData4(gl, points);
-        vbos[1].bindBufferData4(gl, colors);
+        vbos[0].setData4(gl, points);
+        vbos[1].setData4(gl, colors);
         count = plen;
     }
 

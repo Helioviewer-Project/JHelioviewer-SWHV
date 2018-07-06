@@ -57,11 +57,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.opengl.GLSLTexture;
 
-import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLContext;
 import com.jogamp.opengl.util.packrect.BackingStoreManager;
@@ -153,7 +153,7 @@ public class JhvTextRenderer {
     private Graphics2D cachedGraphics;
     private FontRenderContext cachedFontRenderContext;
     final Map<String, Rect> stringLocations = new HashMap<>();
-    final GlyphProducer mGlyphProducer;
+    final GlyphProducer glyphProducer;
 
     private int numRenderCycles;
 
@@ -165,7 +165,7 @@ public class JhvTextRenderer {
     int beginRenderingWidth;
     int beginRenderingHeight;
 
-    final Pipelined_QuadRenderer mPipelinedQuadRenderer;
+    final Pipelined_QuadRenderer pipelinedQuadRenderer;
 
     /**
      * Creates a new TextRenderer with the given Font, specified font
@@ -196,8 +196,8 @@ public class JhvTextRenderer {
         }
         this.renderDelegate = renderDelegate;
 
-        mGlyphProducer = new GlyphProducer(font.getNumGlyphs());
-        mPipelinedQuadRenderer = new Pipelined_QuadRenderer();
+        glyphProducer = new GlyphProducer(font.getNumGlyphs());
+        pipelinedQuadRenderer = new Pipelined_QuadRenderer();
     }
 
     /**
@@ -332,7 +332,7 @@ public class JhvTextRenderer {
      * draw().
      */
     public void flush() {
-        mPipelinedQuadRenderer.draw();
+        pipelinedQuadRenderer.draw();
     }
 
     /**
@@ -502,7 +502,7 @@ public class JhvTextRenderer {
 
             int unicodeToClearFromCache = ((TextData) r.getUserData()).unicodeID;
             if (unicodeToClearFromCache > 0) {
-                mGlyphProducer.clearCacheEntry(unicodeToClearFromCache);
+                glyphProducer.clearCacheEntry(unicodeToClearFromCache);
             }
         }
 
@@ -514,7 +514,7 @@ public class JhvTextRenderer {
     }
 
     private void internal_draw3D(CharSequence str, float x, float y, float z, float scaleFactor) {
-        for (Glyph glyph : mGlyphProducer.getGlyphs(str)) {
+        for (Glyph glyph : glyphProducer.getGlyphs(str)) {
             float advance = glyph.draw3D(x, y, z, scaleFactor);
             x += advance * scaleFactor;
         }
@@ -759,7 +759,7 @@ public class JhvTextRenderer {
             // Heavy hammer -- might consider doing something different
             packer.clear();
             stringLocations.clear();
-            mGlyphProducer.clearAllCacheEntries();
+            glyphProducer.clearAllCacheEntries();
             return attemptNumber == 0;
         }
 
@@ -840,8 +840,8 @@ public class JhvTextRenderer {
 
     // A temporary to prevent excessive garbage creation
     final char[] singleUnicode = new char[1];
-    final float[] txcArray = new float[12];
-    final float[] vtxArray = new float[24];
+    final float[] texArray = new float[12];
+    final float[] vertArray = new float[24];
 
     /**
      * A Glyph represents either a single unicode glyph or a
@@ -929,50 +929,50 @@ public class JhvTextRenderer {
                 float ty2 = 1f - (texturey + height) / (float) renderer.getHeight();
 
                 // A
-                txcArray[0] = tx1;
-                txcArray[1] = ty1;
-                vtxArray[0] = x;
-                vtxArray[1] = y;
-                vtxArray[2] = z;
-                vtxArray[3] = 1;
+                texArray[0] = tx1;
+                texArray[1] = ty1;
+                vertArray[0] = x;
+                vertArray[1] = y;
+                vertArray[2] = z;
+                vertArray[3] = 1;
                 // B
-                txcArray[2] = tx2;
-                txcArray[3] = ty1;
-                vtxArray[4] = x + (width * scaleFactor);
-                vtxArray[5] = y;
-                vtxArray[6] = z;
-                vtxArray[7] = 1;
+                texArray[2] = tx2;
+                texArray[3] = ty1;
+                vertArray[4] = x + (width * scaleFactor);
+                vertArray[5] = y;
+                vertArray[6] = z;
+                vertArray[7] = 1;
                 // C
-                txcArray[4] = tx2;
-                txcArray[5] = ty2;
-                vtxArray[8] = x + (width * scaleFactor);
-                vtxArray[9] = y + (height * scaleFactor);
-                vtxArray[10] = z;
-                vtxArray[11] = 1;
+                texArray[4] = tx2;
+                texArray[5] = ty2;
+                vertArray[8] = x + (width * scaleFactor);
+                vertArray[9] = y + (height * scaleFactor);
+                vertArray[10] = z;
+                vertArray[11] = 1;
                 // A
-                txcArray[6] = tx1;
-                txcArray[7] = ty1;
-                vtxArray[12] = x;
-                vtxArray[13] = y;
-                vtxArray[14] = z;
-                vtxArray[15] = 1;
+                texArray[6] = tx1;
+                texArray[7] = ty1;
+                vertArray[12] = x;
+                vertArray[13] = y;
+                vertArray[14] = z;
+                vertArray[15] = 1;
                 // C
-                txcArray[8] = tx2;
-                txcArray[9] = ty2;
-                vtxArray[16] = x + (width * scaleFactor);
-                vtxArray[17] = y + (height * scaleFactor);
-                vtxArray[18] = z;
-                vtxArray[19] = 1;
+                texArray[8] = tx2;
+                texArray[9] = ty2;
+                vertArray[16] = x + (width * scaleFactor);
+                vertArray[17] = y + (height * scaleFactor);
+                vertArray[18] = z;
+                vertArray[19] = 1;
                 // D
-                txcArray[10] = tx1;
-                txcArray[11] = ty2;
-                vtxArray[20] = x;
-                vtxArray[21] = y + (height * scaleFactor);
-                vtxArray[22] = z;
-                vtxArray[23] = 1;
+                texArray[10] = tx1;
+                texArray[11] = ty2;
+                vertArray[20] = x;
+                vertArray[21] = y + (height * scaleFactor);
+                vertArray[22] = z;
+                vertArray[23] = 1;
 
-                mPipelinedQuadRenderer.glTexCoord2f(txcArray);
-                mPipelinedQuadRenderer.glVertex4f(vtxArray);
+                pipelinedQuadRenderer.glTexCoord2f(texArray);
+                pipelinedQuadRenderer.glVertex4f(vertArray);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1163,40 +1163,34 @@ public class JhvTextRenderer {
     float[] textColor = {1, 1, 1, 1};
 
     class Pipelined_QuadRenderer {
-        int mOutstandingGlyphsVerticesPipeline = 0;
-        final FloatBuffer mTexCoords;
-        final FloatBuffer mVertCoords;
-
-        Pipelined_QuadRenderer() {
-            mVertCoords = Buffers.newDirectFloatBuffer(kTotalBufferSizeCoordsVerts);
-            mTexCoords = Buffers.newDirectFloatBuffer(kTotalBufferSizeCoordsTex);
-        }
+        private int outstandingGlyphsVerticesPipeline = 0;
+        private final FloatBuffer texCoords = BufferUtils.newFloatBuffer(kTotalBufferSizeCoordsTex);
+        private final FloatBuffer vertCoords = BufferUtils.newFloatBuffer(kTotalBufferSizeCoordsVerts);
 
         void glTexCoord2f(float[] array) {
-            mTexCoords.put(array);
+            texCoords.put(array);
         }
 
         void glVertex4f(float[] array) {
-            mVertCoords.put(array);
-            mOutstandingGlyphsVerticesPipeline += kVertsPerQuad;
-            if (mOutstandingGlyphsVerticesPipeline >= kTotalBufferSizeVerts) {
+            vertCoords.put(array);
+            outstandingGlyphsVerticesPipeline += kVertsPerQuad;
+            if (outstandingGlyphsVerticesPipeline >= kTotalBufferSizeVerts) {
                 this.draw();
             }
         }
 
         void draw() {
-            if (mOutstandingGlyphsVerticesPipeline > 0) {
-                mVertCoords.rewind();
-                mTexCoords.rewind();
+            if (outstandingGlyphsVerticesPipeline > 0) {
+                vertCoords.rewind();
+                texCoords.rewind();
 
                 GL2 gl = (GL2) GLContext.getCurrentGL();
                 getBackingStore().bind(gl);
 
                 glslTexture.init(gl);
-                glslTexture.setData(gl, mVertCoords, mTexCoords);
-                glslTexture.render(gl, GL2.GL_TRIANGLES, textColor, mOutstandingGlyphsVerticesPipeline);
-
-                mOutstandingGlyphsVerticesPipeline = 0;
+                glslTexture.setData(gl, vertCoords, texCoords);
+                glslTexture.render(gl, GL2.GL_TRIANGLES, textColor, outstandingGlyphsVerticesPipeline);
+                outstandingGlyphsVerticesPipeline = 0;
             }
         }
     }
