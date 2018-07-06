@@ -50,7 +50,7 @@ class VBO {
         bufferLength = -1;
     }
 
-    void bindBufferData4(GL2 gl, Buffer buffer) {
+    void setData4(GL2 gl, Buffer buffer) {
         gl.glBindBuffer(bufferType, bufferID);
         int length = 4 * buffer.limit();
         if (length != bufferLength) {

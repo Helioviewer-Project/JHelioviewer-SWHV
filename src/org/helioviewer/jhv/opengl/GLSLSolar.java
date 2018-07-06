@@ -40,9 +40,9 @@ public class GLSLSolar {
 
     static void init(GL2 gl) {
         positionVBO.init(gl);
-        positionVBO.bindBufferData4(gl, positionBuffer);
+        positionVBO.setData4(gl, positionBuffer);
         indexVBO.init(gl);
-        indexVBO.bindBufferData4(gl, indexBuffer);
+        indexVBO.setData4(gl, indexBuffer);
     }
 
     static void dispose(GL2 gl) {
