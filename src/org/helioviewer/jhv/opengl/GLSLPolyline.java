@@ -39,7 +39,6 @@ public class GLSLPolyline {
 
         bindVBOs(gl);
         gl.glDrawArrays(GL3.GL_LINE_STRIP_ADJACENCY, 0, count);
-        unbindVBOs(gl);
 
         GLSLShader.unbind(gl);
     }
@@ -47,12 +46,6 @@ public class GLSLPolyline {
     private void bindVBOs(GL2 gl) {
         for (VBO vbo : vbos) {
             vbo.bindArray(gl);
-        }
-    }
-
-    private void unbindVBOs(GL2 gl) {
-        for (VBO vbo : vbos) {
-            vbo.unbindArray(gl);
         }
     }
 
