@@ -45,10 +45,7 @@ public class FloatArray {
     }
 
     public FloatBuffer toBuffer() {
-        FloatBuffer buf = BufferUtils.newFloatBuffer(len);
-        buf.put(arr, 0, len);
-        buf.rewind();
-        return buf;
+        return FloatBuffer.wrap(arr, 0, len);
     }
 
 }
