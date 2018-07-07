@@ -165,8 +165,6 @@ public class JhvTextRenderer {
     int beginRenderingWidth;
     int beginRenderingHeight;
 
-    final Pipelined_QuadRenderer pipelinedQuadRenderer;
-
     /**
      * Creates a new TextRenderer with the given Font, specified font
      * properties, and given RenderDelegate. The
@@ -179,10 +177,8 @@ public class JhvTextRenderer {
      * @param antialiased          whether to use antialiased fonts
      * @param useFractionalMetrics whether to use fractional font
      *                             metrics at the Java 2D level
-     * @param renderDelegate       the render delegate to use to draw the
-     *                             text's bitmap, or null to use the default one
      */
-    public JhvTextRenderer(Font font, boolean antialiased, boolean useFractionalMetrics, RenderDelegate renderDelegate) {
+    public JhvTextRenderer(Font font, boolean antialiased, boolean useFractionalMetrics) {
         this.font = font;
         this.antialiased = antialiased;
         this.useFractionalMetrics = useFractionalMetrics;
@@ -190,14 +186,8 @@ public class JhvTextRenderer {
         // FIXME: consider adjusting the size based on font size
         // (it will already automatically resize if necessary)
         packer = new RectanglePacker(new Manager(), kSize, kSize);
-
-        if (renderDelegate == null) {
-            renderDelegate = new DefaultRenderDelegate();
-        }
-        this.renderDelegate = renderDelegate;
-
+        renderDelegate = new DefaultRenderDelegate();
         glyphProducer = new GlyphProducer(font.getNumGlyphs());
-        pipelinedQuadRenderer = new Pipelined_QuadRenderer();
     }
 
     /**
@@ -332,7 +322,7 @@ public class JhvTextRenderer {
      * draw().
      */
     public void flush() {
-        pipelinedQuadRenderer.draw();
+        drawVertices();
     }
 
     /**
@@ -815,7 +805,7 @@ public class JhvTextRenderer {
         }
     }
 
-    public static class DefaultRenderDelegate implements RenderDelegate {
+    private static class DefaultRenderDelegate implements RenderDelegate {
 
         @Override
         public Rectangle2D getBounds(CharSequence str, Font font, FontRenderContext frc) {
@@ -884,23 +874,17 @@ public class JhvTextRenderer {
             this.producer = producer;
         }
 
-        /**
-         * Returns this glyph's unicode ID
-         */
+        // Returns this glyph's unicode ID
         int getUnicodeID() {
             return unicodeID;
         }
 
-        /**
-         * Returns this glyph's (font-specific) glyph code
-         */
+        // Returns this glyph's (font-specific) glyph code
         int getGlyphCode() {
             return glyphCode;
         }
 
-        /**
-         * Draws this glyph and returns the (x) advance for this glyph
-         */
+        // Draws this glyph and returns the (x) advance for this glyph
         float draw3D(float inX, float inY, float z, float scaleFactor) {
             // This is the code path taken for individual glyphs
             if (glyphRectForTextureMapping == null) {
@@ -971,17 +955,14 @@ public class JhvTextRenderer {
                 vertArray[22] = z;
                 vertArray[23] = 1;
 
-                pipelinedQuadRenderer.glTexCoord2f(texArray);
-                pipelinedQuadRenderer.glVertex4f(vertArray);
+                pushVertices(texArray, vertArray);
             } catch (Exception e) {
                 e.printStackTrace();
             }
             return advance;
         }
 
-        /**
-         * Notifies this glyph that it's been cleared out of the cache
-         */
+        // Notifies this glyph that it's been cleared out of the cache
         void clear() {
             glyphRectForTextureMapping = null;
         }
@@ -1159,39 +1140,34 @@ public class JhvTextRenderer {
         }
     }
 
-    static final GLSLTexture glslTexture = new GLSLTexture();
-    float[] textColor = {1, 1, 1, 1};
+    private static final GLSLTexture glslTexture = new GLSLTexture();
+    private float[] textColor = {1, 1, 1, 1};
 
-    class Pipelined_QuadRenderer {
-        private int outstandingGlyphsVerticesPipeline = 0;
-        private final FloatBuffer texCoords = BufferUtils.newFloatBuffer(kTotalBufferSizeCoordsTex);
-        private final FloatBuffer vertCoords = BufferUtils.newFloatBuffer(kTotalBufferSizeCoordsVerts);
+    private int outstandingGlyphsVerticesPipeline = 0;
+    private final FloatBuffer texCoords = BufferUtils.newFloatBuffer(kTotalBufferSizeCoordsTex);
+    private final FloatBuffer vertCoords = BufferUtils.newFloatBuffer(kTotalBufferSizeCoordsVerts);
 
-        void glTexCoord2f(float[] array) {
-            texCoords.put(array);
+    void pushVertices(float[] _texArray, float[] _vertArray) {
+        texCoords.put(_texArray);
+        vertCoords.put(_vertArray);
+        outstandingGlyphsVerticesPipeline += kVertsPerQuad;
+        if (outstandingGlyphsVerticesPipeline >= kTotalBufferSizeVerts) {
+            drawVertices();
         }
+    }
 
-        void glVertex4f(float[] array) {
-            vertCoords.put(array);
-            outstandingGlyphsVerticesPipeline += kVertsPerQuad;
-            if (outstandingGlyphsVerticesPipeline >= kTotalBufferSizeVerts) {
-                this.draw();
-            }
-        }
+    private void drawVertices() {
+        if (outstandingGlyphsVerticesPipeline > 0) {
+            vertCoords.rewind();
+            texCoords.rewind();
 
-        void draw() {
-            if (outstandingGlyphsVerticesPipeline > 0) {
-                vertCoords.rewind();
-                texCoords.rewind();
+            GL2 gl = (GL2) GLContext.getCurrentGL();
+            getBackingStore().bind(gl);
 
-                GL2 gl = (GL2) GLContext.getCurrentGL();
-                getBackingStore().bind(gl);
-
-                glslTexture.init(gl);
-                glslTexture.setData(gl, vertCoords, texCoords);
-                glslTexture.render(gl, GL2.GL_TRIANGLES, textColor, outstandingGlyphsVerticesPipeline);
-                outstandingGlyphsVerticesPipeline = 0;
-            }
+            glslTexture.init(gl);
+            glslTexture.setData(gl, vertCoords, texCoords);
+            glslTexture.render(gl, GL2.GL_TRIANGLES, textColor, outstandingGlyphsVerticesPipeline);
+            outstandingGlyphsVerticesPipeline = 0;
         }
     }
 
