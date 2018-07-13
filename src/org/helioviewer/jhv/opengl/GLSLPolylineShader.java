@@ -12,8 +12,8 @@ class GLSLPolylineShader extends GLSLShader {
     private int thicknessRef;
     private int viewportRef;
 
-    private final float[] thickness = { 5 };
-    private final float[] viewport = { 1, 1 };
+    private final float[] thickness = {5};
+    private final float[] viewport = {1, 1};
 
     private GLSLPolylineShader(String vertex, String geometry, String fragment) {
         super(vertex, geometry, fragment);
@@ -25,16 +25,6 @@ class GLSLPolylineShader extends GLSLShader {
 
     public static void dispose(GL2 gl) {
         polyline._dispose(gl);
-    }
-
-    @Override
-    protected void _dispose(GL2 gl) {
-        super._dispose(gl);
-    }
-
-    @Override
-    protected void _init(GL2 gl, boolean f) {
-        super._init(gl, f);
     }
 
     @Override

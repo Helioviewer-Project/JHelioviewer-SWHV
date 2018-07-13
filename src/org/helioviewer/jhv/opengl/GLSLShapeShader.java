@@ -12,7 +12,7 @@ class GLSLShapeShader extends GLSLShader {
     private int refModelViewProjectionMatrix;
     private int factorRef;
 
-    private final float[] factor = { 1 };
+    private final float[] factor = {1};
 
     private GLSLShapeShader(String vertex, String geometry, String fragment) {
         super(vertex, geometry, fragment);
@@ -26,16 +26,6 @@ class GLSLShapeShader extends GLSLShader {
     public static void dispose(GL2 gl) {
         point._dispose(gl);
         shape._dispose(gl);
-    }
-
-    @Override
-    protected void _dispose(GL2 gl) {
-        super._dispose(gl);
-    }
-
-    @Override
-    protected void _init(GL2 gl, boolean f) {
-        super._init(gl, f);
     }
 
     @Override

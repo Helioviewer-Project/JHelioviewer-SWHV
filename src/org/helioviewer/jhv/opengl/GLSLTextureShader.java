@@ -11,7 +11,7 @@ class GLSLTextureShader extends GLSLShader {
     private int refModelViewProjectionMatrix;
     private int colorRef;
 
-    private float[] color = { 1, 1, 1, 1 };
+    private float[] color = {1, 1, 1, 1};
 
     private GLSLTextureShader(String vertex, String geometry, String fragment) {
         super(vertex, geometry, fragment);
@@ -23,16 +23,6 @@ class GLSLTextureShader extends GLSLShader {
 
     public static void dispose(GL2 gl) {
         texture._dispose(gl);
-    }
-
-    @Override
-    protected void _dispose(GL2 gl) {
-        super._dispose(gl);
-    }
-
-    @Override
-    protected void _init(GL2 gl, boolean f) {
-        super._init(gl, f);
     }
 
     @Override
