@@ -1,12 +1,13 @@
-#version 150 core
+#version 330 core
 
 precision mediump float;
+
+layout(location = 0) out vec4 FragColor;
 
 uniform vec4 color;
 uniform sampler2D image;
 
 in vec2 frag_coord;
-out vec4 FragColor;
 
 /*
 // from http://www.java-gaming.org/index.php?topic=35123.0

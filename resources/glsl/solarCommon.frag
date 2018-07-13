@@ -1,4 +1,4 @@
-#version 150 core
+#version 330 core
 
 #define NODIFFERENCE 0
 #define PI 3.1415926535897932384626433832795
@@ -7,7 +7,7 @@
 #define BOOST 1. / (0.2 * 2.)
 #define FSIZE 3
 
-out vec4 FragColor;
+layout(location = 0) out vec4 FragColor;
 
 uniform sampler2D image;
 uniform int isdifference;

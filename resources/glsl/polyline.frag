@@ -10,14 +10,13 @@ precision mediump float;
  * \copyright MIT license
 */
 
-out vec4 FragColor;
+layout(location = 0) out vec4 FragColor;
 
-in VertexData{
+in VertexData {
 //    vec2 mTexCoord;
     vec4 mColor;
 } VertexIn;
 
-void main(void)
-{
+void main(void) {
     FragColor = VertexIn.mColor;
 }
