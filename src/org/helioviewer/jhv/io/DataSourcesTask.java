@@ -15,7 +15,7 @@ import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 
-public class DataSourcesTask extends JHVWorker<Void, Void> {
+class DataSourcesTask extends JHVWorker<Void, Void> {
 
     private final Validator validator;
     private final DataSourcesParser parser;
