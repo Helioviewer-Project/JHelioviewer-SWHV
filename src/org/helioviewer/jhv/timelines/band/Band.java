@@ -30,7 +30,7 @@ public class Band extends AbstractTimelineLayer {
     private final BandType bandType;
     private final BandOptionPanel optionsPanel;
 
-    private Color graphColor = Color.BLACK;
+    private Color graphColor;
     private final YAxis yAxis;
     private final ArrayList<GraphPolyline> graphPolylines = new ArrayList<>();
     private final RequestCache requestCache = new RequestCache();

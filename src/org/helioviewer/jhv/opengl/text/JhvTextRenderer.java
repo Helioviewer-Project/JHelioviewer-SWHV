@@ -55,7 +55,6 @@ import java.text.CharacterIterator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.math.MathUtils;
@@ -152,7 +151,6 @@ public class JhvTextRenderer {
     private JhvTextureRenderer cachedBackingStore;
     private Graphics2D cachedGraphics;
     private FontRenderContext cachedFontRenderContext;
-    final Map<String, Rect> stringLocations = new HashMap<>();
     final GlyphProducer glyphProducer;
 
     private int numRenderCycles;
@@ -217,21 +215,11 @@ public class JhvTextRenderer {
      * is made to ensure an accurate bound.
      */
     private Rectangle2D getBounds(CharSequence str) {
-        // FIXME: this should be more optimized and use the glyph cache
-        Rect r = stringLocations.get(str);
-        if (r != null) {
-            TextData data = (TextData) r.getUserData();
-            // Reconstitute the Java 2D results based on the cached values
-            return new Rectangle2D.Double(-data.origin().x, -data.origin().y, r.w(), r.h());
-        }
-        // Must return a Rectangle compatible with the layout algorithm --
-        // must be idempotent
+        // Must return a Rectangle compatible with the layout algorithm - must be idempotent
         return normalize(renderDelegate.getBounds(str, font, getFontRenderContext()));
     }
 
-    /**
-     * Returns the Font this renderer is using.
-     */
+    // Returns the Font this renderer is using
     public Font getFont() {
         return font;
     }
@@ -488,8 +476,6 @@ public class JhvTextRenderer {
 
         for (Rect r : deadRects) {
             packer.remove(r);
-            stringLocations.remove(((TextData) r.getUserData()).string());
-
             int unicodeToClearFromCache = ((TextData) r.getUserData()).unicodeID;
             if (unicodeToClearFromCache > 0) {
                 glyphProducer.clearCacheEntry(unicodeToClearFromCache);
@@ -637,12 +623,7 @@ public class JhvTextRenderer {
 
     // Data associated with each rectangle of text
     static class TextData {
-        // Back-pointer to String this TextData describes, if it
-        // represents a String rather than a single glyph
-        private final String str;
-
-        // If this TextData represents a single glyph, this is its
-        // unicode ID
+        // If this TextData represents a single glyph, this is its unicode ID
         final int unicodeID;
 
         // The following must be defined and used VERY precisely. This is
@@ -662,15 +643,10 @@ public class JhvTextRenderer {
 
         private boolean used; // Whether this text was used recently
 
-        TextData(String str, Point origin, Rectangle2D origRect, int unicodeID) {
-            this.str = str;
+        TextData(Point origin, Rectangle2D origRect, int unicodeID) {
             this.origin = origin;
             this.origRect = origRect;
             this.unicodeID = unicodeID;
-        }
-
-        String string() {
-            return str;
         }
 
         Point origin() {
@@ -748,7 +724,6 @@ public class JhvTextRenderer {
         public boolean additionFailed(Rect cause, int attemptNumber) {
             // Heavy hammer -- might consider doing something different
             packer.clear();
-            stringLocations.clear();
             glyphProducer.clearAllCacheEntries();
             return attemptNumber == 0;
         }
@@ -972,7 +947,7 @@ public class JhvTextRenderer {
             Rectangle2D origBBox = preNormalize(renderDelegate.getBounds(gv));
             Rectangle2D bbox = normalize(origBBox);
             Point origin = new Point((int) -bbox.getMinX(), (int) -bbox.getMinY());
-            Rect rect = new Rect(0, 0, (int) bbox.getWidth(), (int) bbox.getHeight(), new TextData(null, origin, origBBox, unicodeID));
+            Rect rect = new Rect(0, 0, (int) bbox.getWidth(), (int) bbox.getHeight(), new TextData(origin, origBBox, unicodeID));
             packer.add(rect);
             glyphRectForTextureMapping = rect;
             Graphics2D g = getGraphics2D();
