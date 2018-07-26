@@ -73,8 +73,8 @@ import com.jogamp.opengl.util.packrect.RectanglePacker;
  * appropriate caching of text rendering results in an OpenGL texture
  * internally to avoid repeated font rasterization. The caching is
  * completely automatic, does not require any user intervention, and
- * has no visible controls in the public API. <P>
- * <p>
+ * has no visible controls in the public API.
+ *
  * Using the {@link JhvTextRenderer TextRenderer} is simple. Add a
  * "<code>TextRenderer renderer;</code>" field to your {@link
  * com.jogamp.opengl.GLEventListener GLEventListener}. In your {@link
@@ -84,7 +84,7 @@ import com.jogamp.opengl.util.packrect.RectanglePacker;
  * renderer = new TextRenderer(new Font("SansSerif", Font.BOLD, 36));
  * </PRE>
  *
- * <P> In the {@link com.jogamp.opengl.GLEventListener#display display} method of your
+ * In the {@link com.jogamp.opengl.GLEventListener#display display} method of your
  * {@link com.jogamp.opengl.GLEventListener GLEventListener}, add:
  * <PRE>
  * renderer.beginRendering(drawable.getWidth(), drawable.getHeight());
@@ -94,18 +94,18 @@ import com.jogamp.opengl.util.packrect.RectanglePacker;
  * // ... more draw commands, color changes, etc.
  * renderer.endRendering();
  * </PRE>
- * <p>
+ *
  * Unless you are sharing textures and display lists between OpenGL
  * contexts, you do not need to call the {@link #dispose dispose}
  * method of the TextRenderer; the OpenGL resources it uses
  * internally will be cleaned up automatically when the OpenGL
- * context is destroyed. <P>
+ * context is destroyed.
  *
  * <b>Note</b> that the TextRenderer may cause the vertex and texture
  * coordinate array buffer bindings to change, or to be unbound. This
  * is important to note if you are using Vertex Buffer Objects (VBOs)
- * in your application. <P>
- * <p>
+ * in your application.
+ *
  * Internally, the renderer uses a rectangle packing algorithm to
  * pack both glyphs and full Strings' rendering results (which are
  * variable size) onto a larger OpenGL texture. The internal backing
@@ -799,9 +799,7 @@ public class JhvTextRenderer {
 
     }
 
-    //----------------------------------------------------------------------
     // Glyph-by-glyph rendering support
-    //
 
     // A temporary to prevent excessive garbage creation
     final char[] singleUnicode = new char[1];
@@ -815,8 +813,7 @@ public class JhvTextRenderer {
      * characters and partition them into runs of individual glyphs,
      * but if we encounter complex text and/or unicode sequences we
      * don't understand, we can render them using the
-     * string-by-string method. <P>
-     * <p>
+     * string-by-string method.
      * Glyphs need to be able to re-upload themselves to the backing
      * store on demand as we go along in the render sequence.
      */
@@ -866,74 +863,71 @@ public class JhvTextRenderer {
                 upload();
             }
 
-            try {
-                JhvTextureRenderer renderer = getBackingStore();
-                Rect rect = glyphRectForTextureMapping;
-                TextData data = (TextData) rect.getUserData();
-                data.markUsed();
+            JhvTextureRenderer renderer = getBackingStore();
+            Rect rect = glyphRectForTextureMapping;
+            TextData data = (TextData) rect.getUserData();
+            data.markUsed();
 
-                Rectangle2D origRect = data.origRect();
+            Rectangle2D origRect = data.origRect();
 
-                float x = inX - (scaleFactor * data.origOriginX());
-                float y = inY - (scaleFactor * ((float) origRect.getHeight() - data.origOriginY()));
+            float x = inX - (scaleFactor * data.origOriginX());
+            float y = inY - (scaleFactor * ((float) origRect.getHeight() - data.origOriginY()));
 
-                int texturex = rect.x() + (data.origin().x - data.origOriginX());
-                int texturey = renderer.getHeight() - rect.y() - (int) origRect.getHeight() - (data.origin().y - data.origOriginY());
-                int width = (int) origRect.getWidth();
-                int height = (int) origRect.getHeight();
+            int texturex = rect.x() + (data.origin().x - data.origOriginX());
+            int texturey = renderer.getHeight() - rect.y() - (int) origRect.getHeight() - (data.origin().y - data.origOriginY());
+            int width = (int) origRect.getWidth();
+            int height = (int) origRect.getHeight();
 
-                float tx1 = texturex / (float) renderer.getWidth();
-                float ty1 = 1f - texturey / (float) renderer.getHeight();
-                float tx2 = (texturex + width) / (float) renderer.getWidth();
-                float ty2 = 1f - (texturey + height) / (float) renderer.getHeight();
+            float tx1 = texturex / (float) renderer.getWidth();
+            float ty1 = 1f - texturey / (float) renderer.getHeight();
+            float tx2 = (texturex + width) / (float) renderer.getWidth();
+            float ty2 = 1f - (texturey + height) / (float) renderer.getHeight();
 
-                // A
-                texArray[0] = tx1;
-                texArray[1] = ty1;
-                vertArray[0] = x;
-                vertArray[1] = y;
-                vertArray[2] = z;
-                vertArray[3] = 1;
-                // B
-                texArray[2] = tx2;
-                texArray[3] = ty1;
-                vertArray[4] = x + (width * scaleFactor);
-                vertArray[5] = y;
-                vertArray[6] = z;
-                vertArray[7] = 1;
-                // C
-                texArray[4] = tx2;
-                texArray[5] = ty2;
-                vertArray[8] = x + (width * scaleFactor);
-                vertArray[9] = y + (height * scaleFactor);
-                vertArray[10] = z;
-                vertArray[11] = 1;
-                // A
-                texArray[6] = tx1;
-                texArray[7] = ty1;
-                vertArray[12] = x;
-                vertArray[13] = y;
-                vertArray[14] = z;
-                vertArray[15] = 1;
-                // C
-                texArray[8] = tx2;
-                texArray[9] = ty2;
-                vertArray[16] = x + (width * scaleFactor);
-                vertArray[17] = y + (height * scaleFactor);
-                vertArray[18] = z;
-                vertArray[19] = 1;
-                // D
-                texArray[10] = tx1;
-                texArray[11] = ty2;
-                vertArray[20] = x;
-                vertArray[21] = y + (height * scaleFactor);
-                vertArray[22] = z;
-                vertArray[23] = 1;
+            // A
+            texArray[0] = tx1;
+            texArray[1] = ty1;
+            vertArray[0] = x;
+            vertArray[1] = y;
+            vertArray[2] = z;
+            vertArray[3] = 1;
+            // B
+            texArray[2] = tx2;
+            texArray[3] = ty1;
+            vertArray[4] = x + (width * scaleFactor);
+            vertArray[5] = y;
+            vertArray[6] = z;
+            vertArray[7] = 1;
+            // C
+            texArray[4] = tx2;
+            texArray[5] = ty2;
+            vertArray[8] = x + (width * scaleFactor);
+            vertArray[9] = y + (height * scaleFactor);
+            vertArray[10] = z;
+            vertArray[11] = 1;
+            // A
+            texArray[6] = tx1;
+            texArray[7] = ty1;
+            vertArray[12] = x;
+            vertArray[13] = y;
+            vertArray[14] = z;
+            vertArray[15] = 1;
+            // C
+            texArray[8] = tx2;
+            texArray[9] = ty2;
+            vertArray[16] = x + (width * scaleFactor);
+            vertArray[17] = y + (height * scaleFactor);
+            vertArray[18] = z;
+            vertArray[19] = 1;
+            // D
+            texArray[10] = tx1;
+            texArray[11] = ty2;
+            vertArray[20] = x;
+            vertArray[21] = y + (height * scaleFactor);
+            vertArray[22] = z;
+            vertArray[23] = 1;
 
-                pushVertices(texArray, vertArray);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            pushVertices(texArray, vertArray);
+
             return advance;
         }
 
@@ -1096,8 +1090,6 @@ public class JhvTextRenderer {
     }
 
     private static class CharacterCache {
-        private CharacterCache() {
-        }
 
         static final Character cache[] = new Character[127 + 1];
 
@@ -1109,7 +1101,7 @@ public class JhvTextRenderer {
 
         static Character valueOf(char c) {
             if (c <= 127) { // must cache
-                return CharacterCache.cache[c];
+                return cache[c];
             }
             return c;
         }
