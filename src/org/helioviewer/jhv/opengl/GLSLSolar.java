@@ -16,10 +16,6 @@ public class GLSLSolar {
     private static final VBO positionVBO = VBO.gen_float_VBO(0, 4);
     private static final VBO indexVBO = VBO.gen_index_VBO();
 
-    public static void renderDisc(GL2 gl) {
-        gl.glDrawElements(GL2.GL_TRIANGLES, indexSize - 6, GL2.GL_UNSIGNED_INT, 0);
-    }
-
     public static void render(GL2 gl) {
         gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, 4 * (indexSize - 6));
     }
