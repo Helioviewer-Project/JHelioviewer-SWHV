@@ -157,25 +157,22 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         glImage.streamImage(gl, imageData, prevImageData, baseImageData);
     }
 
-    private static final double[] depth = { 1., 1., 0., 1. };
-    private static final double[] depthScale = { 1., 1., 1., 1. };
-
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
-        _render(camera, vp, gl, depth);
+        _render(camera, vp, gl);
     }
 
     @Override
     public void renderMiniview(Camera camera, Viewport vp, GL2 gl) {
-        _render(camera, vp, gl, depth);
+        _render(camera, vp, gl);
     }
 
     @Override
     public void renderScale(Camera camera, Viewport vp, GL2 gl) {
-        _render(camera, vp, gl, depthScale);
+        _render(camera, vp, gl);
     }
 
-    private void _render(Camera camera, Viewport vp, GL2 gl, double[] depthrange) {
+    private void _render(Camera camera, Viewport vp, GL2 gl) {
         if (imageData == null) {
             return;
         }
@@ -203,16 +200,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
             shader.bindPolarRadii(gl, scale.getYstart(), scale.getYstop());
 
-            GLSLSolar.bindVBOs(gl);
-            if (shader == GLSLSolarShader.ortho) {
-                shader.bindIsDisc(gl, 1);
-                gl.glDepthRange(depthrange[2], depthrange[3]);
-                GLSLSolar.render(gl);
-                shader.bindIsDisc(gl, 0);
-            }
-            gl.glDepthRange(depthrange[0], depthrange[1]);
             GLSLSolar.render(gl);
-            gl.glDepthRange(0, 1);
         }
         GLSLShader.unbind(gl);
     }
