@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.opengl;
 
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.position.Position;
 
 import com.jogamp.opengl.GL2;
@@ -27,8 +26,6 @@ public class GLSLSolarShader extends GLSLShader {
     public static final GLSLSolarShader lati = new GLSLSolarShader("/glsl/solar.vert", null, "/glsl/solarLati.frag");
     public static final GLSLSolarShader polar = new GLSLSolarShader("/glsl/solar.vert", null, "/glsl/solarPolar.frag");
     public static final GLSLSolarShader logpolar = new GLSLSolarShader("/glsl/solar.vert", null, "/glsl/solarLogPolar.frag");
-
-    private int refModelViewProjectionMatrix;
 
     private int isDiffRef;
     private int isDiscRef;
@@ -95,8 +92,6 @@ public class GLSLSolarShader extends GLSLShader {
 
     @Override
     protected void _after_init(GL2 gl) {
-        refModelViewProjectionMatrix = gl.glGetUniformLocation(progID, "ModelViewProjectionMatrix");
-
         isDiffRef = gl.glGetUniformLocation(progID, "isdifference");
         isDiscRef = gl.glGetUniformLocation(progID, "isdisc");
 
@@ -147,7 +142,6 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindMatrix(GL2 gl, float[] matrix) {
-        gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, Transform.get());
         gl.glUniformMatrix4fv(cameraTransformationInverseRef, 1, false, matrix, 0);
     }
 
