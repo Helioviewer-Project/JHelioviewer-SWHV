@@ -9,10 +9,11 @@ void main(void) {
         hitPoint = vec3(up1.x, up1.y, sqrt(1. - radius2));
         rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
         factor = 1.;
-    } else if (isdisc == 1) { // for on-disc render pass
-        discard;
-    } else
+        gl_FragDepth = gl_FragCoord.z;
+    } else {
         factor = sqrt(radius2);
+        gl_FragDepth = 1;
+    }
 
     if (rotatedHitPoint.z <= 0.) { // off-limb or back
         hitPoint = vec3(up1.x, up1.y, intersectPlane(cameraDifferenceRotationQuat, up1));

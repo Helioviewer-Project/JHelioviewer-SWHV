@@ -10,7 +10,6 @@
 layout(location = 0) out vec4 FragColor;
 
 uniform sampler2D image;
-uniform int isdisc;
 uniform int isdifference;
 uniform int enhanced;
 uniform sampler2D differenceImage;

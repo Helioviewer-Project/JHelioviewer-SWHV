@@ -28,7 +28,6 @@ public class GLSLSolarShader extends GLSLShader {
     public static final GLSLSolarShader logpolar = new GLSLSolarShader("/glsl/solar.vert", null, "/glsl/solarLogPolar.frag");
 
     private int isDiffRef;
-    private int isDiscRef;
 
     private int hgltRef;
     private int hglnRef;
@@ -93,7 +92,6 @@ public class GLSLSolarShader extends GLSLShader {
     @Override
     protected void _after_init(GL2 gl) {
         isDiffRef = gl.glGetUniformLocation(progID, "isdifference");
-        isDiscRef = gl.glGetUniformLocation(progID, "isdisc");
 
         hgltRef = gl.glGetUniformLocation(progID, "hglt");
         hglnRef = gl.glGetUniformLocation(progID, "hgln");
@@ -167,11 +165,6 @@ public class GLSLSolarShader extends GLSLShader {
         diffRect[2] = (float) diffXScale;
         diffRect[3] = (float) diffYScale;
         gl.glUniform4fv(diffRectRef, 1, diffRect, 0);
-    }
-
-    public void bindIsDisc(GL2 gl, int _isDisc) {
-        isDisc[0] = _isDisc;
-        gl.glUniform1iv(isDiscRef, 1, isDisc, 0);
     }
 
     public void bindColor(GL2 gl, float red, float green, float blue, double alpha, double blend) {
