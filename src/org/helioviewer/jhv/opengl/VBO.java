@@ -40,7 +40,7 @@ class VBO {
     }
 
     void dispose(GL2 gl) {
-        gl.glDeleteBuffers(1, new int[] { bufferID }, 0);
+        gl.glDeleteBuffers(1, new int[]{bufferID}, 0);
         bufferID = -1;
         bufferLength = -1;
     }

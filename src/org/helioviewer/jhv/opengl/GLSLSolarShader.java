@@ -55,7 +55,6 @@ public class GLSLSolarShader extends GLSLShader {
     private int diffCameraDifferenceRotationQuatRef;
 
     private final int[] isDiff = new int[1];
-    private final int[] isDisc = new int[1];
 
     private final float[] hglt = new float[1];
     private final float[] hgln = new float[1];
