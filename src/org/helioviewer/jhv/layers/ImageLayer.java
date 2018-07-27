@@ -207,7 +207,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
             if (shader == GLSLSolarShader.ortho) {
                 shader.bindIsDisc(gl, 1);
                 gl.glDepthRange(depthrange[2], depthrange[3]);
-                GLSLSolar.renderDisc(gl);
+                GLSLSolar.render(gl);
                 shader.bindIsDisc(gl, 0);
             }
             gl.glDepthRange(depthrange[0], depthrange[1]);

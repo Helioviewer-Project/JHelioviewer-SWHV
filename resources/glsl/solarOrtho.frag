@@ -9,6 +9,8 @@ void main(void) {
         hitPoint = vec3(up1.x, up1.y, sqrt(1. - radius2));
         rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
         factor = 1.;
+    } else if (isdisc == 1) { // for on-disc render pass
+        discard;
     } else
         factor = sqrt(radius2);
 
