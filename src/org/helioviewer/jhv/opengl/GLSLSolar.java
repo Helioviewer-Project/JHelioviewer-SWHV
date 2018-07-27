@@ -15,10 +15,11 @@ public class GLSLSolar {
     private static final VBO vertexVBO = VBO.gen_float_VBO(0, 4);
 
     public static void render(GL2 gl) {
+        bindVBOs(gl);
         gl.glDrawArrays(GL2.GL_TRIANGLES, 0, vertexSize);
     }
 
-    public static void bindVBOs(GL2 gl) {
+    private static void bindVBOs(GL2 gl) {
         vertexVBO.bindArray(gl);
     }
 
