@@ -38,7 +38,7 @@ public class GLTexture {
     }
 
     public void delete(GL2 gl) {
-        gl.glDeleteTextures(1, new int[] { texID }, 0);
+        gl.glDeleteTextures(1, new int[]{texID}, 0);
         texID = prev_width = -1;
     }
 
@@ -93,20 +93,20 @@ public class GLTexture {
         Buffer buffer;
 
         switch (rawBuffer.getDataType()) {
-        case DataBuffer.TYPE_BYTE:
-            buffer = ByteBuffer.wrap(((DataBufferByte) rawBuffer).getData());
-            break;
-        case DataBuffer.TYPE_USHORT:
-            buffer = ShortBuffer.wrap(((DataBufferUShort) rawBuffer).getData());
-            break;
-        case DataBuffer.TYPE_SHORT:
-            buffer = ShortBuffer.wrap(((DataBufferShort) rawBuffer).getData());
-            break;
-        case DataBuffer.TYPE_INT:
-            buffer = IntBuffer.wrap(((DataBufferInt) rawBuffer).getData());
-            break;
-        default:
-            buffer = null;
+            case DataBuffer.TYPE_BYTE:
+                buffer = ByteBuffer.wrap(((DataBufferByte) rawBuffer).getData());
+                break;
+            case DataBuffer.TYPE_USHORT:
+                buffer = ShortBuffer.wrap(((DataBufferUShort) rawBuffer).getData());
+                break;
+            case DataBuffer.TYPE_SHORT:
+                buffer = ShortBuffer.wrap(((DataBufferShort) rawBuffer).getData());
+                break;
+            case DataBuffer.TYPE_INT:
+                buffer = IntBuffer.wrap(((DataBufferInt) rawBuffer).getData());
+                break;
+            default:
+                buffer = null;
         }
 
         gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, mapDataBufferTypeToGLAlign(rawBuffer.getDataType()));
@@ -126,8 +126,7 @@ public class GLTexture {
      * Internal function to map the application internal image formats to OpenGL
      * image formats, used for saving the texture.
      *
-     * @param imageFormat
-     *            Application internal image format
+     * @param imageFormat Application internal image format
      * @return OpenGL memory image format
      */
     private static int mapImageFormatToInternalGLFormat(ImageFormat imageFormat) {
@@ -148,8 +147,7 @@ public class GLTexture {
      * Internal function to map the application internal image formats to OpenGL
      * image formats, used for transferring the texture.
      *
-     * @param imageFormat
-     *            Application internal image format
+     * @param imageFormat Application internal image format
      * @return OpenGL input image format
      */
     private static int mapImageFormatToInputGLFormat(ImageFormat imageFormat) {
@@ -169,8 +167,7 @@ public class GLTexture {
      * Internal function to map BufferedImage image formats to OpenGL image
      * formats, used for saving the texture.
      *
-     * @param type
-     *            BufferedImage internal image format
+     * @param type BufferedImage internal image format
      * @return OpenGL memory image format
      */
     private static int mapTypeToInternalGLFormat(int type) {
@@ -184,8 +181,7 @@ public class GLTexture {
      * Internal function to map BufferedImage image formats to OpenGL image
      * formats, used for transferring the texture.
      *
-     * @param type
-     *            BufferedImage internal image format
+     * @param type BufferedImage internal image format
      * @return OpenGL input image format
      */
     private static int mapTypeToInputGLFormat(int type) {
@@ -206,20 +202,19 @@ public class GLTexture {
      * Internal function to map the number of bits per pixel to OpenGL types,
      * used for transferring the texture.
      *
-     * @param bitsPerPixel
-     *            Bits per pixel of the input data
+     * @param bitsPerPixel Bits per pixel of the input data
      * @return OpenGL type to use
      */
     private static int mapBitsPerPixelToGLType(int bitsPerPixel) {
         switch (bitsPerPixel) {
-        case 8:
-            return GL2.GL_UNSIGNED_BYTE;
-        case 16:
-            return GL2.GL_UNSIGNED_SHORT;
-        case 32:
-            return GL2.GL_UNSIGNED_INT_8_8_8_8_REV;
-        default:
-            return 0;
+            case 8:
+                return GL2.GL_UNSIGNED_BYTE;
+            case 16:
+                return GL2.GL_UNSIGNED_SHORT;
+            case 32:
+                return GL2.GL_UNSIGNED_INT_8_8_8_8_REV;
+            default:
+                return 0;
         }
     }
 
@@ -227,22 +222,21 @@ public class GLTexture {
      * Internal function to map the type of the a DataBuffer to OpenGL types,
      * used for transferring the texture.
      *
-     * @param dataBufferType
-     *            DataBuffer type of the input data
+     * @param dataBufferType DataBuffer type of the input data
      * @return OpenGL type to use
      */
     private static int mapDataBufferTypeToGLType(int dataBufferType) {
         switch (dataBufferType) {
-        case DataBuffer.TYPE_BYTE:
-            return GL2.GL_UNSIGNED_BYTE;
-        case DataBuffer.TYPE_SHORT:
-            return GL2.GL_SHORT;
-        case DataBuffer.TYPE_USHORT:
-            return GL2.GL_UNSIGNED_SHORT;
-        case DataBuffer.TYPE_INT:
-            return GL2.GL_UNSIGNED_INT_8_8_8_8_REV;
-        default:
-            return 0;
+            case DataBuffer.TYPE_BYTE:
+                return GL2.GL_UNSIGNED_BYTE;
+            case DataBuffer.TYPE_SHORT:
+                return GL2.GL_SHORT;
+            case DataBuffer.TYPE_USHORT:
+                return GL2.GL_UNSIGNED_SHORT;
+            case DataBuffer.TYPE_INT:
+                return GL2.GL_UNSIGNED_INT_8_8_8_8_REV;
+            default:
+                return 0;
         }
     }
 
@@ -250,22 +244,21 @@ public class GLTexture {
      * Internal function to map the type of the a DataBuffer to OpenGL aligns,
      * used for reading input data.
      *
-     * @param dataBufferType
-     *            DataBuffer type of the input data
+     * @param dataBufferType DataBuffer type of the input data
      * @return OpenGL type to use
      */
     private static int mapDataBufferTypeToGLAlign(int dataBufferType) {
         switch (dataBufferType) {
-        case DataBuffer.TYPE_BYTE:
-            return 1;
-        case DataBuffer.TYPE_SHORT:
-            return 2;
-        case DataBuffer.TYPE_USHORT:
-            return 2;
-        case DataBuffer.TYPE_INT:
-            return 4;
-        default:
-            return 0;
+            case DataBuffer.TYPE_BYTE:
+                return 1;
+            case DataBuffer.TYPE_SHORT:
+                return 2;
+            case DataBuffer.TYPE_USHORT:
+                return 2;
+            case DataBuffer.TYPE_INT:
+                return 4;
+            default:
+                return 0;
         }
     }
 

@@ -7,9 +7,9 @@ import com.jogamp.opengl.GL2;
 public class GLSLSolar {
 
     private static final float R = 32; // > C3
-    private static final FloatBuffer vertexBuffer = FloatBuffer.wrap(new float[] {
-        -R, -R, 0, 1, R, R, 0, 1, -R, R, 0, 1,
-        R, R, 0, 1, -R, -R, 0, 1, R, -R, 0, 1
+    private static final FloatBuffer vertexBuffer = FloatBuffer.wrap(new float[]{
+            -R, -R, 0, 1, R, R, 0, 1, -R, R, 0, 1,
+            R, R, 0, 1, -R, -R, 0, 1, R, -R, 0, 1
     });
     private static final int vertexSize = vertexBuffer.limit();
     private static final VBO vertexVBO = VBO.gen_float_VBO(0, 4);
