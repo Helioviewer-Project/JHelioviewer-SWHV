@@ -158,21 +158,17 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, GL2 gl) {
-        _render(camera, vp, gl);
-    }
-
-    @Override
     public void renderMiniview(Camera camera, Viewport vp, GL2 gl) {
-        _render(camera, vp, gl);
+        render(camera, vp, gl);
     }
 
     @Override
     public void renderScale(Camera camera, Viewport vp, GL2 gl) {
-        _render(camera, vp, gl);
+        render(camera, vp, gl);
     }
 
-    private void _render(Camera camera, Viewport vp, GL2 gl) {
+    @Override
+    public void render(Camera camera, Viewport vp, GL2 gl) {
         if (imageData == null) {
             return;
         }

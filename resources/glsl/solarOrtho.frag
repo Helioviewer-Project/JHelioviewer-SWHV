@@ -12,7 +12,7 @@ void main(void) {
         gl_FragDepth = gl_FragCoord.z;
     } else {
         factor = sqrt(radius2);
-        gl_FragDepth = 1;
+        gl_FragDepth = 1.;
     }
 
     if (rotatedHitPoint.z <= 0.) { // off-limb or back
