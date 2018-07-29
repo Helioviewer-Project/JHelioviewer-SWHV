@@ -134,10 +134,10 @@ public class JhvTextRenderer {
     // The amount of vertical dead space on the backing store before we
     // force a compaction
     private static final float MAX_VERTICAL_FRAGMENTATION = 0.7f;
-    private static final int kQuadsPerBuffer = 100;
     private static final int kCoordsPerVertVerts = 4;
     private static final int kCoordsPerVertTex = 2;
     private static final int kVertsPerQuad = 6;
+    private static final int kQuadsPerBuffer = kVertsPerQuad * 32;
     private static final int kTotalBufferSizeVerts = kQuadsPerBuffer * kVertsPerQuad;
     private static final int kTotalBufferSizeCoordsVerts = kQuadsPerBuffer * kVertsPerQuad * kCoordsPerVertVerts;
     private static final int kTotalBufferSizeCoordsTex = kQuadsPerBuffer * kVertsPerQuad * kCoordsPerVertTex;
@@ -803,8 +803,8 @@ public class JhvTextRenderer {
 
     // A temporary to prevent excessive garbage creation
     final char[] singleUnicode = new char[1];
-    final float[] texArray = new float[12];
-    final float[] vertArray = new float[24];
+    final float[] texArray = new float[kVertsPerQuad * 2];
+    final float[] vertArray = new float[kVertsPerQuad * 4];
 
     /**
      * A Glyph represents either a single unicode glyph or a
