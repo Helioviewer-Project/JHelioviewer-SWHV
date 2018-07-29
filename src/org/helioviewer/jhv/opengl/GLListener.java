@@ -64,7 +64,7 @@ public class GLListener implements GLEventListener {
         GLSLTextureShader.init(gl);
 
         blackCircle.init(gl);
-        GLHelper.initCircleFront(gl, blackCircle, 0, 0, 0.996, 360, BufferUtils.colorBlack);
+        GLHelper.initCircleFront(gl, blackCircle, 0, 0, 0.999, 360, BufferUtils.colorBlack);
     }
 
     @Override
