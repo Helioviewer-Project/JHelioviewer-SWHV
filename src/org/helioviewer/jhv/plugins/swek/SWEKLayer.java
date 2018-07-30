@@ -124,8 +124,8 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         col.put4f(BufferUtils.colorNull);
     }
 
-    private final float texCoord1[][] = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
-    private final float texCoord2[][] = { { 1, 1 }, { 1, 0 }, { 0, 0 }, { 0, 1 } };
+    private final float texCoord1[][] = {{0, 0}, {1, 0}, {1, 1}, {0, 1}};
+    private final float texCoord2[][] = {{1, 1}, {1, 0}, {0, 0}, {0, 1}};
     private final FloatBuffer texBuf1 = BufferUtils.newFloatBuffer(8);
     private final FloatBuffer texBuf2 = BufferUtils.newFloatBuffer(8);
     private final FloatBuffer vexBuf = BufferUtils.newFloatBuffer(16);
@@ -144,7 +144,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
         Quat q = evt.getPositionInformation().getEarth().toQuat();
         Color c = evtr.getColor();
-        float[] color = { c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, 1 };
+        float[] color = {c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, 1};
 
         double thetaStart = principalAngle - angularWidth / 2.;
         double thetaEnd = principalAngle + angularWidth / 2.;
@@ -200,7 +200,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         }
 
         Color c = evtr.getColor();
-        float[] color = { c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, 1 };
+        float[] color = {c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, 1};
 
         // draw bounds
         Vec3 pt = new Vec3();
@@ -220,9 +220,9 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                     double r = Math.sqrt(xnew * xnew + ynew * ynew + znew * znew);
 
                     if (Display.mode == Display.DisplayMode.Orthographic) {
-                        float x =  (float) (xnew / r);
+                        float x = (float) (xnew / r);
                         float y = -(float) (ynew / r);
-                        float z =  (float) (znew / r);
+                        float z = (float) (znew / r);
                         if (j == 0) {
                             pos.put4f(x, y, z, 1);
                             col.put4f(BufferUtils.colorNull);
@@ -242,7 +242,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                 pos.repeat4f();
                 col.put4f(BufferUtils.colorNull);
             }
-            oldBoundaryPoint3d = new float[] { points[3 * i], points[3 * i + 1], points[3 * i + 2] };
+            oldBoundaryPoint3d = new float[]{points[3 * i], points[3 * i + 1], points[3 * i + 2]};
         }
 
         glslLine.setData(gl, pos.toBuffer(), col.toBuffer());
@@ -258,7 +258,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         if (pt != null) {
             Color c = evtr.getColor();
             float alpha = 0.6f;
-            float[] color = { c.getRed() / 255f * alpha, c.getGreen() / 255f * alpha, c.getBlue() / 255f * alpha, alpha };
+            float[] color = {c.getRed() / 255f * alpha, c.getGreen() / 255f * alpha, c.getBlue() / 255f * alpha, alpha};
 
             bindTexture(gl, evtr.getSupplier().getGroup());
             if (evtr.isHighlighted()) {
@@ -296,7 +296,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
             Color c = evtr.getColor();
             float alpha = 0.6f;
-            float[] color = { c.getRed() / 255f * alpha, c.getGreen() / 255f * alpha, c.getBlue() / 255f * alpha, alpha };
+            float[] color = {c.getRed() / 255f * alpha, c.getGreen() / 255f * alpha, c.getBlue() / 255f * alpha, alpha};
 
             bindTexture(gl, evtr.getSupplier().getGroup());
             if (evtr.isHighlighted()) {
@@ -319,7 +319,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         double thetaEnd = MathUtils.mapTo0To360(principalAngleDegree + angularWidthDegree / 2.);
 
         Color c = evtr.getColor();
-        float[] color = { c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, 1 };
+        float[] color = {c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, 1};
         float x, y;
 
         FloatArray pos = new FloatArray();

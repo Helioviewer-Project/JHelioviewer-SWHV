@@ -136,7 +136,6 @@ public class GLTexture {
             case Single16:
                 return GL2.GL_R16;
             case ARGB32:
-            case RGB24:
                 return GL2.GL_RGBA;
             default:
                 throw new IllegalArgumentException("Format is not supported");
@@ -156,7 +155,6 @@ public class GLTexture {
             case Single16:
                 return GL2.GL_RED;
             case ARGB32:
-            case RGB24:
                 return GL2.GL_BGRA;
             default:
                 throw new IllegalArgumentException("Format is not supported");

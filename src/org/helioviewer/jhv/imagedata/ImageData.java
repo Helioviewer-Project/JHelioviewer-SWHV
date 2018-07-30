@@ -11,25 +11,26 @@ import org.helioviewer.jhv.position.Position;
 public abstract class ImageData {
 
     public enum ImageFormat {
-        Single8, Single16, RGB24, ARGB32
+        Single8, Single16, ARGB32
     }
 
-    final int width;
-    final int height;
+    private final int width;
+    private final int height;
     private final int bpp;
     private final double gamma;
-    Buffer buffer;
+    private final Buffer buffer;
 
     private Region region;
     private MetaData metaData;
     private Position viewpoint;
     private boolean uploaded = false;
 
-    ImageData(int _width, int _height, int _bpp, double _gamma) {
+    ImageData(int _width, int _height, int _bpp, double _gamma, Buffer _buffer) {
         width = _width;
         height = _height;
         bpp = _bpp;
         gamma = _gamma;
+        buffer = _buffer;
     }
 
     public int getHeight() {
