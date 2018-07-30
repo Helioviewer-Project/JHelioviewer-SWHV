@@ -60,13 +60,9 @@ public class GLTexture {
             return;
         }
 
-        int bitsPerPixel = source.getBitsPerPixel();
-        gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, bitsPerPixel >> 3);
-        gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, w);
-
         ImageFormat imageFormat = source.getImageFormat();
         int inputGLFormat = mapImageFormatToInputGLFormat(imageFormat);
-        int bppGLType = mapBitsPerPixelToGLType(bitsPerPixel);
+        int bppGLType = mapBitsPerPixelToGLType(imageFormat.bpp);
 
         if (w != prev_width || h != prev_height || prev_inputGLFormat != inputGLFormat || prev_bppGLType != bppGLType) {
             int internalGLFormat = mapImageFormatToInternalGLFormat(imageFormat);
@@ -78,6 +74,8 @@ public class GLTexture {
             prev_bppGLType = bppGLType;
         }
 
+        gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, imageFormat.bpp >> 3);
+        gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, w);
         gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, source.getBuffer());
     }
 
@@ -131,9 +129,9 @@ public class GLTexture {
      */
     private static int mapImageFormatToInternalGLFormat(ImageFormat imageFormat) {
         switch (imageFormat) {
-            case Single8:
+            case Gray8:
                 return GL2.GL_R8;
-            case Single16:
+            case Gray16:
                 return GL2.GL_R16;
             case ARGB32:
                 return GL2.GL_RGBA;
@@ -151,8 +149,8 @@ public class GLTexture {
      */
     private static int mapImageFormatToInputGLFormat(ImageFormat imageFormat) {
         switch (imageFormat) {
-            case Single8:
-            case Single16:
+            case Gray8:
+            case Gray16:
                 return GL2.GL_RED;
             case ARGB32:
                 return GL2.GL_BGRA;

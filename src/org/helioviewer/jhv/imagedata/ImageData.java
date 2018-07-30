@@ -8,28 +8,33 @@ import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.position.Position;
 
-public abstract class ImageData {
+public class ImageData {
 
     public enum ImageFormat {
-        Single8, Single16, ARGB32
+        Gray8(8), Gray16(16), ARGB32(32);
+
+        public final int bpp;
+
+        ImageFormat(int _bpp) {
+            bpp = _bpp;
+        }
     }
 
     private final int width;
     private final int height;
-    private final int bpp;
-    private final double gamma;
+    private final ImageFormat format;
     private final Buffer buffer;
 
+    private double gamma = 1.;
     private Region region;
     private MetaData metaData;
     private Position viewpoint;
     private boolean uploaded = false;
 
-    ImageData(int _width, int _height, int _bpp, double _gamma, Buffer _buffer) {
+    public ImageData(int _width, int _height, ImageFormat _format,  Buffer _buffer) {
         width = _width;
         height = _height;
-        bpp = _bpp;
-        gamma = _gamma;
+        format = _format;
         buffer = _buffer;
     }
 
@@ -41,8 +46,8 @@ public abstract class ImageData {
         return width;
     }
 
-    public int getBitsPerPixel() {
-        return bpp;
+    public void setGamma(double _gamma) {
+        gamma = _gamma;
     }
 
     public double getGamma() {
@@ -53,7 +58,9 @@ public abstract class ImageData {
         return buffer;
     }
 
-    public abstract ImageFormat getImageFormat();
+    public ImageFormat getImageFormat() {
+        return format;
+    }
 
     public Region getRegion() {
         return region;
