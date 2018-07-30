@@ -8,7 +8,7 @@
  * \copyright MIT license
 */
 
-#define MiterLimit 0.75
+#define MiterLimit 0.1
 
 uniform vec2 Viewport;
 uniform float Thickness;
