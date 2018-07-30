@@ -170,20 +170,17 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                 sz = ICON_SIZE_HIGHLIGHTED;
             }
 
-            vexBuf.rewind();
-            {
-                Vec3 v = new Vec3();
-                for (float[] el : texCoord1) {
-                    double deltatheta = sz / distSun * (el[1] * 2 - 1);
-                    double deltar = sz * (el[0] * 2 - 1);
-                    double r = distSun + deltar;
-                    double theta = principalAngle + deltatheta;
+            Vec3 v = new Vec3();
+            for (float[] el : texCoord1) {
+                double deltatheta = sz / distSun * (el[1] * 2 - 1);
+                double deltar = sz * (el[0] * 2 - 1);
+                double r = distSun + deltar;
+                double theta = principalAngle + deltatheta;
 
-                    v.x = r * Math.cos(theta);
-                    v.y = r * Math.sin(theta);
-                    Vec3 res = q.rotateInverseVector(v);
-                    BufferUtils.put4f(vexBuf, res);
-                }
+                v.x = r * Math.cos(theta);
+                v.y = r * Math.sin(theta);
+                Vec3 res = q.rotateInverseVector(v);
+                BufferUtils.put4f(vexBuf, res);
             }
             vexBuf.rewind();
 
@@ -276,13 +273,10 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         double width2 = width / 4.;
         double height2 = height / 4.;
 
-        vexBuf.rewind();
-        {
-            BufferUtils.put4f(vexBuf, (float) (theta + width2), (float) (r - height2), 0, 1);
-            BufferUtils.put4f(vexBuf, (float) (theta + width2), (float) (r + height2), 0, 1);
-            BufferUtils.put4f(vexBuf, (float) (theta - width2), (float) (r + height2), 0, 1);
-            BufferUtils.put4f(vexBuf, (float) (theta - width2), (float) (r - height2), 0, 1);
-        }
+        BufferUtils.put4f(vexBuf, (float) (theta + width2), (float) (r - height2), 0, 1);
+        BufferUtils.put4f(vexBuf, (float) (theta + width2), (float) (r + height2), 0, 1);
+        BufferUtils.put4f(vexBuf, (float) (theta - width2), (float) (r + height2), 0, 1);
+        BufferUtils.put4f(vexBuf, (float) (theta - width2), (float) (r - height2), 0, 1);
         vexBuf.rewind();
 
         glslTexture.setData(gl, vexBuf, texBuf2);
@@ -413,13 +407,10 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         p2.add(targetDir);
         p3.add(targetDir);
 
-        vexBuf.rewind();
-        {
-            BufferUtils.put4f(vexBuf, p3);
-            BufferUtils.put4f(vexBuf, p2);
-            BufferUtils.put4f(vexBuf, p1);
-            BufferUtils.put4f(vexBuf, p0);
-        }
+        BufferUtils.put4f(vexBuf, p3);
+        BufferUtils.put4f(vexBuf, p2);
+        BufferUtils.put4f(vexBuf, p1);
+        BufferUtils.put4f(vexBuf, p0);
         vexBuf.rewind();
 
         glslTexture.setData(gl, vexBuf, texBuf2);
