@@ -9,7 +9,6 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.image.NIOImageFactory;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
-import org.helioviewer.jhv.imagedata.Single8ImageData;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -65,18 +64,16 @@ class RadioJP2Data implements ImageDataHandler {
 
     @Override
     public void handleData(ImageData imageData) {
-        if (imageData instanceof Single8ImageData) {
-            int w = imageData.getWidth();
-            int h = imageData.getHeight();
-            if (w < 1 || h < 1) {
-                Log.error("width: " + w + " height: " + h);
-                return;
-            }
-
-            region = imageData.getRegion();
-            bufferedImage = NIOImageFactory.createIndexed(imageData.getBuffer(), w, h, RadioData.getColorModel());
-            DrawController.drawRequest();
+        int w = imageData.getWidth();
+        int h = imageData.getHeight();
+        if (w < 1 || h < 1) {
+            Log.error("width: " + w + " height: " + h);
+            return;
         }
+
+        region = imageData.getRegion();
+        bufferedImage = NIOImageFactory.createIndexed(imageData.getBuffer(), w, h, RadioData.getColorModel());
+        DrawController.drawRequest();
     }
 
     void requestData(TimeAxis xAxis) {

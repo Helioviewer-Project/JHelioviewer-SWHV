@@ -14,8 +14,7 @@ import nom.tam.util.Cursor;
 
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.imagedata.ImageData;
-import org.helioviewer.jhv.imagedata.Single8ImageData;
-import org.helioviewer.jhv.imagedata.Single16ImageData;
+import org.helioviewer.jhv.imagedata.ImageData.ImageFormat;
 import org.helioviewer.jhv.log.Log;
 
 class FITSImage {
@@ -60,7 +59,7 @@ class FITSImage {
                 for (int j = 0; j < height; j++) {
                     System.arraycopy(data2D[j], 0, data, width * (height - 1 - j), width);
                 }
-                imageData = new Single8ImageData(width, height, ByteBuffer.wrap(data));
+                imageData = new ImageData(width, height, ImageFormat.Gray8, ByteBuffer.wrap(data));
                 break;
             }
             case BasicHDU.BITPIX_SHORT: {
@@ -85,7 +84,8 @@ class FITSImage {
                         data[width * (height - 1 - j) + i] = scale.get(data2D[j][i] - min);
                     }
                 }
-                imageData = new Single16ImageData(width, height, scale.getGamma(), ShortBuffer.wrap(data));
+                imageData = new ImageData(width, height, ImageFormat.Gray16, ShortBuffer.wrap(data));
+                imageData.setGamma(scale.getGamma());
                 break;
             }
             case BasicHDU.BITPIX_INT: {
@@ -110,7 +110,8 @@ class FITSImage {
                         data[width * (height - 1 - j) + i] = scale.get(data2D[j][i] - min);
                     }
                 }
-                imageData = new Single16ImageData(width, height, scale.getGamma(), ShortBuffer.wrap(data));
+                imageData = new ImageData(width, height, ImageFormat.Gray16, ShortBuffer.wrap(data));
+                imageData.setGamma(scale.getGamma());
                 break;
             }
             case BasicHDU.BITPIX_FLOAT: {
@@ -135,7 +136,7 @@ class FITSImage {
                         data[width * (height - 1 - j) + i] = (short) (scale * Math.pow(data2D[j][i] - min, GAMMA));
                     }
                 }
-                imageData = new Single16ImageData(width, height, 1, ShortBuffer.wrap(data));
+                imageData = new ImageData(width, height, ImageFormat.Gray16, ShortBuffer.wrap(data));
                 break;
             }
         }
