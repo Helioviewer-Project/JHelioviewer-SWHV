@@ -19,20 +19,14 @@ class VBO {
         numComponents = _numComponents;
     }
 
-    static VBO gen_index_VBO() {
-        return new VBO(GL2.GL_ELEMENT_ARRAY_BUFFER, -1, -1);
-    }
-
     static VBO gen_float_VBO(int _attribRef, int _numComponents) {
         return new VBO(GL2.GL_ARRAY_BUFFER, _attribRef, _numComponents);
     }
 
     void bindArray(GL2 gl) {
         gl.glBindBuffer(bufferType, bufferID);
-        if (attribRef != -1) {
-            gl.glEnableVertexAttribArray(attribRef);
-            gl.glVertexAttribPointer(attribRef, numComponents, GL2.GL_FLOAT, false, 0, 0);
-        }
+        gl.glEnableVertexAttribArray(attribRef);
+        gl.glVertexAttribPointer(attribRef, numComponents, GL2.GL_FLOAT, false, 0, 0);
     }
 
     void init(GL2 gl) {
@@ -48,10 +42,7 @@ class VBO {
     void setData4(GL2 gl, Buffer buffer) {
         gl.glBindBuffer(bufferType, bufferID);
         int length = 4 * buffer.limit();
-        if (length != bufferLength) {
-            bufferLength = length;
-            gl.glBufferData(bufferType, length, null, GL2.GL_STATIC_DRAW);
-        }
+        gl.glBufferData(bufferType, length, null, GL2.GL_STATIC_DRAW); // https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
         gl.glBufferSubData(bufferType, 0, length, buffer);
     }
 
