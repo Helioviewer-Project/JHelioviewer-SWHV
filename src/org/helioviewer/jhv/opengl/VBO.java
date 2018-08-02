@@ -11,7 +11,6 @@ class VBO {
     private final int numComponents;
 
     private int bufferID = -1;
-    private int bufferLength = -1;
 
     private VBO(int _bufferType, int _attribRef, int _numComponents) {
         attribRef = _attribRef;
@@ -36,7 +35,6 @@ class VBO {
     void dispose(GL2 gl) {
         gl.glDeleteBuffers(1, new int[]{bufferID}, 0);
         bufferID = -1;
-        bufferLength = -1;
     }
 
     void setData4(GL2 gl, Buffer buffer) {

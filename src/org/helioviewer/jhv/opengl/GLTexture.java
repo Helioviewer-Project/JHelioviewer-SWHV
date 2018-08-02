@@ -20,6 +20,7 @@ import com.jogamp.opengl.GL2;
 public class GLTexture {
 
     private int texID;
+    private PBO pbo;
 
     private int prev_width = -1;
     private int prev_height = -1;
@@ -30,6 +31,7 @@ public class GLTexture {
         int[] tmp = new int[1];
         gl.glGenTextures(1, tmp, 0);
         texID = tmp[0];
+        pbo = new PBO(gl);
     }
 
     public void bind(GL2 gl, int target, int unit) {
@@ -40,6 +42,7 @@ public class GLTexture {
     public void delete(GL2 gl) {
         gl.glDeleteTextures(1, new int[]{texID}, 0);
         texID = prev_width = -1;
+        pbo.dispose(gl);
     }
 
     private static void genTexture2D(GL2 gl, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
@@ -76,7 +79,11 @@ public class GLTexture {
 
         gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, imageFormat.bpp >> 3);
         gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, w);
-        gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, source.getBuffer());
+
+        pbo.bind(gl);
+        pbo.setData(gl, source.getBuffer(), imageFormat.bpp / 8);
+        gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, 0); // https://www.khronos.org/opengl/wiki/Synchronization#Implicit_synchronization
+        pbo.unbind(gl);
     }
 
     public static void copyBufferedImage2D(GL2 gl, BufferedImage source) {
