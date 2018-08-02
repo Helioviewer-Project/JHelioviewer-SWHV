@@ -45,9 +45,9 @@ public class GLImage {
     private static final LUT gray = LUT.get("Gray");
 
     public void streamImage(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
-        tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
         if (!imageData.getUploaded()) {
             imageData.setUploaded(true);
+            tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
             tex.copyImageData2D(gl, imageData);
         }
 
