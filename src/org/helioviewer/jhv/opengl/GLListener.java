@@ -172,6 +172,8 @@ public class GLListener implements GLEventListener {
         }
 
         GL2 gl = (GL2) drawable.getGL();
+        gl.glFinish();
+
         GLInfo.updatePixelScale(surface);
 
         Layers.prerender(gl);
