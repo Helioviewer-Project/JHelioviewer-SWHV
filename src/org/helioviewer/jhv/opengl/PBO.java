@@ -6,14 +6,10 @@ import com.jogamp.opengl.GL2;
 
 class PBO {
 
-    private int bufferID = -1;
+    private int[] bufferID;
 
-    public PBO(GL2 gl) {
-        bufferID = generate(gl);
-    }
-
-    void bind(GL2 gl) {
-        gl.glBindBuffer(GL2.GL_PIXEL_UNPACK_BUFFER, bufferID);
+    void bind(GL2 gl, int idx) {
+        gl.glBindBuffer(GL2.GL_PIXEL_UNPACK_BUFFER, bufferID[idx]);
     }
 
     void unbind(GL2 gl) {
@@ -21,8 +17,7 @@ class PBO {
     }
 
     void dispose(GL2 gl) {
-        gl.glDeleteBuffers(1, new int[]{bufferID}, 0);
-        bufferID = -1;
+        gl.glDeleteBuffers(bufferID.length, bufferID, 0);
     }
 
     void setData(GL2 gl, Buffer buffer, int elementSize) {
@@ -31,10 +26,9 @@ class PBO {
         gl.glBufferSubData(GL2.GL_PIXEL_UNPACK_BUFFER, 0, length, buffer);
     }
 
-    private static int generate(GL2 gl) {
-        int[] tmpId = new int[1];
-        gl.glGenBuffers(1, tmpId, 0);
-        return tmpId[0];
+    void generate(GL2 gl, int count) {
+        bufferID = new int[count];
+        gl.glGenBuffers(count, bufferID, 0);
     }
 
 }
