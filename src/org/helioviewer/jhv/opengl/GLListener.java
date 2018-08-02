@@ -22,8 +22,6 @@ import com.jogamp.opengl.GLEventListener;
 public class GLListener implements GLEventListener {
 
     private final ScalableSurface surface;
-    private boolean reshaped;
-
     private static final GLSLShape blackCircle = new GLSLShape();
 
     public GLListener(ScalableSurface _surface) {
@@ -101,7 +99,6 @@ public class GLListener implements GLEventListener {
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) { // NEDT
         EventQueue.invokeLater(() -> {
-            reshaped = true;
             Display.setGLSize(x, y, width, height);
             Display.reshapeAll();
             Layers.getMiniviewLayer().reshapeViewport();
@@ -111,7 +108,6 @@ public class GLListener implements GLEventListener {
 
     public static void renderScene(Camera camera, GL2 gl) {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-
         for (Viewport vp : Display.getViewports()) {
             if (vp != null) {
                 gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
@@ -148,7 +144,6 @@ public class GLListener implements GLEventListener {
         Viewport vp = Display.fullViewport;
         gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
         // camera.projectionOrtho2D(vp.aspect); not needed currently
-
         Layers.renderFullFloat(camera, vp, gl);
     }
 
@@ -171,7 +166,7 @@ public class GLListener implements GLEventListener {
 
     @Override
     public void display(GLAutoDrawable drawable) { // NEDT
-        if (!reshaped || !EventQueue.isDispatchThread()) { // seldom
+        if (!EventQueue.isDispatchThread()) { // seldom
             EventQueue.invokeLater(Display::display);
             return;
         }
