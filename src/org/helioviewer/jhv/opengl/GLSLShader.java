@@ -90,7 +90,7 @@ public class GLSLShader {
         gl.glUniform1i(id, texunit);
     }
 
-    private int attachShader(GL2 gl, ShaderType type, String text) {
+    private static int attachShader(GL2 gl, ShaderType type, String text) {
         int iID = gl.glCreateShader(type.glType);
 
         String[] akProgramText = new String[1];
