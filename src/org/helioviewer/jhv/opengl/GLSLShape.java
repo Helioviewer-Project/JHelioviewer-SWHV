@@ -55,14 +55,14 @@ public class GLSLShape {
 
     private void bindVBOs(GL2 gl) {
         for (VBO vbo : vbos) {
-            vbo.bindArray(gl);
+            vbo.bind(gl);
         }
     }
 
     private void initVBOs(GL2 gl) {
         for (int i = 0; i < attribLens.length; i++) {
             vbos[i] = new VBO(i, attribLens[i]);
-            vbos[i].init(gl);
+            vbos[i].generate(gl);
         }
     }
 
