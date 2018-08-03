@@ -67,7 +67,7 @@ public class GLTexture {
 
         ImageFormat imageFormat = source.getImageFormat();
         int inputGLFormat = mapImageFormatToInputGLFormat(imageFormat);
-        int bppGLType = mapBitsPerPixelToGLType(imageFormat.bpp);
+        int bppGLType = mapBytesPerPixelToGLType(imageFormat.bytes);
 
         if (w != prev_width || h != prev_height || prev_inputGLFormat != inputGLFormat || prev_bppGLType != bppGLType) {
             int internalGLFormat = mapImageFormatToInternalGLFormat(imageFormat);
@@ -79,11 +79,11 @@ public class GLTexture {
             prev_bppGLType = bppGLType;
         }
 
-        gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, imageFormat.bpp >> 3);
+        gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, imageFormat.bytes);
         gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, w);
 
         pbo.bind(gl, pbo_idx);
-        pbo.setData(gl, source.getBuffer(), imageFormat.bpp / 8);
+        pbo.setData(gl, source.getBuffer(), imageFormat.bytes);
         gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, 0); // https://www.khronos.org/opengl/wiki/Synchronization#Implicit_synchronization
         pbo.unbind(gl);
         pbo_idx = (pbo_idx + 1) % PBO_COUNT;
@@ -205,19 +205,16 @@ public class GLTexture {
     }
 
     /**
-     * Internal function to map the number of bits per pixel to OpenGL types,
+     * Internal function to map the number of bytes per pixel to OpenGL types,
      * used for transferring the texture.
-     *
-     * @param bitsPerPixel Bits per pixel of the input data
-     * @return OpenGL type to use
      */
-    private static int mapBitsPerPixelToGLType(int bitsPerPixel) {
-        switch (bitsPerPixel) {
-            case 8:
+    private static int mapBytesPerPixelToGLType(int bytesPerPixel) {
+        switch (bytesPerPixel) {
+            case 1:
                 return GL2.GL_UNSIGNED_BYTE;
-            case 16:
+            case 2:
                 return GL2.GL_UNSIGNED_SHORT;
-            case 32:
+            case 4:
                 return GL2.GL_UNSIGNED_INT_8_8_8_8_REV;
             default:
                 return 0;

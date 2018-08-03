@@ -11,12 +11,12 @@ import org.helioviewer.jhv.position.Position;
 public class ImageData {
 
     public enum ImageFormat {
-        Gray8(8), Gray16(16), ARGB32(32);
+        Gray8(1), Gray16(2), ARGB32(4);
 
-        public final int bpp;
+        public final int bytes;
 
-        ImageFormat(int _bpp) {
-            bpp = _bpp;
+        ImageFormat(int _bytes) {
+            bytes = _bytes;
         }
     }
 
