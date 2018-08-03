@@ -12,7 +12,7 @@ public class GLSLSolar {
             -1, 1, 0, 1,
             1, 1, 0, 1
     });
-    private static final VBO vertexVBO = VBO.gen_float_VBO(0, 4);
+    private static final VBO vertexVBO = new VBO(0, 4);
 
     public static void render(GL2 gl) {
         vertexVBO.bindArray(gl);
@@ -25,7 +25,7 @@ public class GLSLSolar {
     }
 
     static void dispose(GL2 gl) {
-        vertexVBO.dispose(gl);
+        vertexVBO.delete(gl);
     }
 
 }

@@ -6,42 +6,36 @@ import com.jogamp.opengl.GL2;
 
 class VBO {
 
-    private final int bufferType;
     private final int attribRef;
-    private final int numComponents;
+    private final int attribLen;
 
     private int bufferID = -1;
 
-    private VBO(int _bufferType, int _attribRef, int _numComponents) {
+    VBO(int _attribRef, int _attribLen) {
         attribRef = _attribRef;
-        bufferType = _bufferType;
-        numComponents = _numComponents;
-    }
-
-    static VBO gen_float_VBO(int _attribRef, int _numComponents) {
-        return new VBO(GL2.GL_ARRAY_BUFFER, _attribRef, _numComponents);
+        attribLen = _attribLen;
     }
 
     void bindArray(GL2 gl) {
-        gl.glBindBuffer(bufferType, bufferID);
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, bufferID);
         gl.glEnableVertexAttribArray(attribRef);
-        gl.glVertexAttribPointer(attribRef, numComponents, GL2.GL_FLOAT, false, 0, 0);
+        gl.glVertexAttribPointer(attribRef, attribLen, GL2.GL_FLOAT, false, 0, 0);
     }
 
     void init(GL2 gl) {
         bufferID = generate(gl);
     }
 
-    void dispose(GL2 gl) {
+    void delete(GL2 gl) {
         gl.glDeleteBuffers(1, new int[]{bufferID}, 0);
         bufferID = -1;
     }
 
     void setData4(GL2 gl, Buffer buffer) {
-        gl.glBindBuffer(bufferType, bufferID);
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, bufferID);
         int length = 4 * buffer.limit();
-        gl.glBufferData(bufferType, length, null, GL2.GL_STATIC_DRAW); // https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
-        gl.glBufferSubData(bufferType, 0, length, buffer);
+        gl.glBufferData(GL2.GL_ARRAY_BUFFER, length, null, GL2.GL_STATIC_DRAW); // https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
+        gl.glBufferSubData(GL2.GL_ARRAY_BUFFER, 0, length, buffer);
     }
 
     private static int generate(GL2 gl) {

@@ -16,7 +16,7 @@ class PBO {
         gl.glBindBuffer(GL2.GL_PIXEL_UNPACK_BUFFER, 0);
     }
 
-    void dispose(GL2 gl) {
+    void delete(GL2 gl) {
         gl.glDeleteBuffers(bufferID.length, bufferID, 0);
     }
 

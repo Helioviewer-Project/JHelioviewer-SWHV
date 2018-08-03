@@ -10,21 +10,21 @@ import com.jogamp.opengl.GL3;
 
 public class GLSLPolyline {
 
-    private final int[] vboAttribLens = {4, 4};
+    private final int[] attribLens = {4, 4};
     private final VBO[] vbos = new VBO[2];
 
     private int count;
     private boolean inited = false;
 
-    public void setData(GL2 gl, FloatBuffer points, FloatBuffer colors) {
+    public void setData(GL2 gl, FloatBuffer position, FloatBuffer color) {
         count = 0;
-        int plen = points.limit() / vboAttribLens[0];
-        if (plen * vboAttribLens[0] != points.limit() || plen != colors.limit() / vboAttribLens[1]) {
+        int plen = position.limit() / attribLens[0];
+        if (plen * attribLens[0] != position.limit() || plen != color.limit() / attribLens[1]) {
             Log.error("Something is wrong with the vertices or colors from this GLSLPolyline");
             return;
         }
-        vbos[0].setData4(gl, points);
-        vbos[1].setData4(gl, colors);
+        vbos[0].setData4(gl, position);
+        vbos[1].setData4(gl, color);
         count = plen;
     }
 
@@ -50,8 +50,8 @@ public class GLSLPolyline {
     }
 
     private void initVBOs(GL2 gl) {
-        for (int i = 0; i < vboAttribLens.length; i++) {
-            vbos[i] = VBO.gen_float_VBO(i, vboAttribLens[i]);
+        for (int i = 0; i < attribLens.length; i++) {
+            vbos[i] = new VBO(i, attribLens[i]);
             vbos[i].init(gl);
         }
     }
@@ -59,7 +59,7 @@ public class GLSLPolyline {
     private void disposeVBOs(GL2 gl) {
         for (int i = 0; i < vbos.length; i++) {
             if (vbos[i] != null) {
-                vbos[i].dispose(gl);
+                vbos[i].delete(gl);
                 vbos[i] = null;
             }
         }

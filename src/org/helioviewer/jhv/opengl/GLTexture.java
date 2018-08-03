@@ -19,10 +19,11 @@ import com.jogamp.opengl.GL2;
 
 public class GLTexture {
 
-    private int texID;
-    private int idx;
-    private PBO pbo = new PBO();
+    private static final int PBO_COUNT = 2;
+    private final PBO pbo = new PBO();
+    private int pbo_idx;
 
+    private int texID;
     private int prev_width = -1;
     private int prev_height = -1;
     private int prev_inputGLFormat = -1;
@@ -32,7 +33,7 @@ public class GLTexture {
         int[] tmp = new int[1];
         gl.glGenTextures(1, tmp, 0);
         texID = tmp[0];
-        pbo.generate(gl, 2);
+        pbo.generate(gl, PBO_COUNT);
     }
 
     public void bind(GL2 gl, int target, int unit) {
@@ -43,7 +44,7 @@ public class GLTexture {
     public void delete(GL2 gl) {
         gl.glDeleteTextures(1, new int[]{texID}, 0);
         texID = prev_width = -1;
-        pbo.dispose(gl);
+        pbo.delete(gl);
     }
 
     private static void genTexture2D(GL2 gl, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
@@ -81,11 +82,11 @@ public class GLTexture {
         gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, imageFormat.bpp >> 3);
         gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, w);
 
-        pbo.bind(gl, idx);
+        pbo.bind(gl, pbo_idx);
         pbo.setData(gl, source.getBuffer(), imageFormat.bpp / 8);
         gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, 0); // https://www.khronos.org/opengl/wiki/Synchronization#Implicit_synchronization
         pbo.unbind(gl);
-        idx = (idx + 1) % 2;
+        pbo_idx = (pbo_idx + 1) % PBO_COUNT;
     }
 
     public static void copyBufferedImage2D(GL2 gl, BufferedImage source) {
