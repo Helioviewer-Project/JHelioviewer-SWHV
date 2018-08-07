@@ -40,9 +40,7 @@
 
 \PassOptionsToPackage{unicode=true}{hyperref} % options for packages loaded elsewhere
 \PassOptionsToPackage{hyphens}{url}
-$if(colorlinks)$
-\PassOptionsToPackage{dvipsnames,svgnames*,x11names*,table}{xcolor}
-$endif$
+\PassOptionsToPackage{dvipsnames,svgnames*,table}{xcolor}
 %
 \documentclass[$if(fontsize)$$fontsize$,$endif$$if(lang)$$babel-lang$,$endif$$if(papersize)$$papersize$paper,$else$a4paper,$endif$$if(beamer)$ignorenonframetext,$if(handout)$handout,$endif$$if(aspectratio)$aspectratio=$aspectratio$,$endif$$endif$$for(classoption)$$classoption$$sep$,$endfor$,tablecaptionabove]{scrbook}
 $if(beamer)$
@@ -179,9 +177,6 @@ $if(subject)$
 $endif$
 $if(keywords)$
             pdfkeywords={$for(keywords)$$keywords$$sep$, $endfor$},
-$endif$
-$if(tags)$
-            pdfkeywords={$for(tags)$$tags$$sep$, $endfor$},
 $endif$
 $if(colorlinks)$
             colorlinks=true,
@@ -425,10 +420,7 @@ $endif$
 %
 % colors
 %
-$if(colorlinks)$
-$else$
-\usepackage[dvipsnames,svgnames*,x11names*,table]{xcolor}
-$endif$
+\usepackage[]{xcolor}
 
 %
 % listing colors
@@ -549,14 +541,15 @@ $if(tables)$
 \arrayrulecolor{table-rule-color}     % color of \toprule, \midrule, \bottomrule
 \setlength\heavyrulewidth{0.3ex}      % thickness of \toprule, \bottomrule
 \renewcommand{\arraystretch}{1.3}     % spacing (padding)
-\rowcolors{3}{}{table-row-color!100}  % row color
 
 % Reset rownum counter so that each table
 % starts with the same row colors.
 % https://tex.stackexchange.com/questions/170637/restarting-rowcolors
 \let\oldlongtable\longtable
 \let\endoldlongtable\endlongtable
-\renewenvironment{longtable}{\oldlongtable} {
+\renewenvironment{longtable}{
+\rowcolors{3}{}{table-row-color!100}  % row color
+\oldlongtable} {
 \endoldlongtable
 \global\rownum=0\relax}
 
@@ -585,16 +578,21 @@ $endif$
 $if(listings)$
 \lstdefinestyle{eisvogel_listing_style}{
   language         = java,
+$if(listings-disable-line-numbers)$
+  xleftmargin      = 0.6em,
+  framexleftmargin = 0.4em,
+$else$
   numbers          = left,
+  xleftmargin      = 2.7em,
+  framexleftmargin = 2.5em,
+$endif$
   backgroundcolor  = \color{listing-background},
   basicstyle       = \color{listing-text-color}\small\ttfamily{}\linespread{1.15}, % print whole listing small
-  xleftmargin      = 2.7em,
   breaklines       = true,
   frame            = single,
   framesep         = 0.6mm,
   rulecolor        = \color{listing-rule},
   frameround       = ffff,
-  framexleftmargin = 2.5em,
   tabsize          = 4,
   numberstyle      = \color{listing-numbers},
   aboveskip        = 1.0em,
@@ -643,18 +641,21 @@ $endif$
 %
 % header and footer
 %
+$if(disable-header-and-footer)$
+$else$
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhead{}
 \fancyfoot{}
-\lhead{$title$}
-\chead{}
-\rhead{$date$}
-\lfoot{$for(author)$$author$$sep$, $endfor$}
-\cfoot{}
-\rfoot{\thepage}
+\lhead{$if(header-left)$$header-left$$else$$title$$endif$}
+\chead{$if(header-center)$$header-center$$else$$endif$}
+\rhead{$if(header-right)$$header-right$$else$$date$$endif$}
+\lfoot{$if(footer-left)$$footer-left$$else$$for(author)$$author$$sep$, $endfor$$endif$}
+\cfoot{$if(footer-center)$$footer-center$$else$$endif$}
+\rfoot{$if(footer-right)$$footer-right$$else$\thepage$endif$}
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
+$endif$
 
 %%
 %% end added
