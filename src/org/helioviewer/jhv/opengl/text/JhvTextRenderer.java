@@ -56,6 +56,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Transform;
@@ -483,8 +485,7 @@ public class JhvTextRenderer {
         }
 
         // If we removed dead rectangles this cycle, try to do a compaction
-        float frag = packer.verticalFragmentationRatio();
-        if (!deadRects.isEmpty() && (frag > MAX_VERTICAL_FRAGMENTATION)) {
+        if (!deadRects.isEmpty() && packer.verticalFragmentationRatio() > MAX_VERTICAL_FRAGMENTATION) {
             packer.compact();
         }
     }
@@ -605,7 +606,7 @@ public class JhvTextRenderer {
         }
 
         @Override
-        public Object clone() {
+        public CharSequenceIterator clone() {
             CharSequenceIterator iter = new CharSequenceIterator(mSequence);
             iter.mCurrentIndex = mCurrentIndex;
             return iter;
@@ -1060,6 +1061,7 @@ public class JhvTextRenderer {
         // Returns a glyph object for this single glyph. Returns null
         // if the unicode or glyph ID would be out of bounds of the
         // glyph cache.
+        @Nullable
         private Glyph getGlyph(CharSequence inString, GlyphMetrics glyphMetrics, int index) {
             char unicodeID = inString.charAt(index);
             if (unicodeID >= unicodes2Glyphs.length) {
@@ -1077,6 +1079,7 @@ public class JhvTextRenderer {
             return getGlyph(unicodeID, gv, glyphMetrics);
         }
 
+        @Nullable
         private Glyph getGlyph(int unicodeID, GlyphVector singleUnicodeGlyphVector, GlyphMetrics metrics) {
             int glyphCode = singleUnicodeGlyphVector.getGlyphCode(0);
             // Have seen huge glyph codes (65536) coming out of some fonts in some Unicode situations

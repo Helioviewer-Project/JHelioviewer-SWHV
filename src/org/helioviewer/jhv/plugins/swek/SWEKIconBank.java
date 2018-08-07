@@ -16,8 +16,7 @@ class SWEKIconBank {
     static ImageIcon getIcon(String iconName) {
         ImageIcon icon = iconBank.get(iconName);
         icon = icon == null ? iconBank.get("Other") : icon;
-        icon = icon == null ? IconBank.getBlank() : icon;
-        return icon;
+        return icon == null ? IconBank.getBlank() : icon;
     }
 
     private static ImageIcon getImageIcon(String path) throws Exception {
