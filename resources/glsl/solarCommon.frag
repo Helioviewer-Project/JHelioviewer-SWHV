@@ -1,5 +1,7 @@
 #version 330 core
 
+precision mediump float;
+
 #define NODIFFERENCE 0
 #define PI 3.1415926535897932384626433832795
 #define TWOPI 2.*PI
