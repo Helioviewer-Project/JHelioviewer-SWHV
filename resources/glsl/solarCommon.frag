@@ -5,14 +5,13 @@
 #define TWOPI 2.*PI
 
 #define BOOST 1. / (0.2 * 2.)
-#define FSIZE 3
 
 layout(location = 0) out vec4 FragColor;
 
 uniform sampler2D image;
 uniform int isdifference;
 uniform int enhanced;
-uniform sampler2D differenceImage;
+uniform sampler2D diffImage;
 
 uniform vec4 rect;
 uniform vec4 differencerect;
@@ -27,10 +26,6 @@ uniform float hgltDiff;
 uniform float crota;
 uniform float crotaDiff;
 
-uniform float blurKernel[FSIZE * FSIZE];
-uniform float offset[FSIZE];
-uniform vec3 sharpen;
-
 uniform mat4 cameraTransformationInverse;
 uniform vec4 cameraDifferenceRotationQuat;
 uniform vec4 diffcameraDifferenceRotationQuat;
@@ -40,6 +35,26 @@ uniform vec3 cutOffDirection;
 uniform float cutOffValue;
 uniform vec2 cutOffRadius;
 uniform vec2 polarRadii;
+
+uniform vec3 sharpen;
+
+#define FSIZE 3
+#define FSIZE2 FSIZE * FSIZE
+// float[] bc = { 0.06136f, 0.24477f, 0.38774f, 0.24477f, 0.06136f };
+// http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
+const float[] bc = float[](.30613, .38774, .30613);
+const float[] blurKernel = float[](
+    bc[0] * bc[0], bc[0] * bc[1], bc[0] * bc[2],
+    bc[1] * bc[0], bc[1] * bc[1], bc[1] * bc[2],
+    bc[2] * bc[0], bc[2] * bc[1], bc[2] * bc[2]
+);
+
+const float[] bo = float[](-1.2004377, 0, 1.2004377);
+const vec2[] blurOffset = vec2[](
+    vec2(bo[0], bo[0]), vec2(bo[1], bo[0]), vec2(bo[2], bo[0]),
+    vec2(bo[0], bo[1]), vec2(bo[1], bo[1]), vec2(bo[2], bo[1]),
+    vec2(bo[0], bo[2]), vec2(bo[1], bo[2]), vec2(bo[2], bo[2])
+);
 
 float fetch(sampler2D tex, vec2 coord, vec3 bright) {
     return /*pow(texture2D(tex, coord).r, bright.z)*/ texture(tex, coord).r * bright.y + bright.x;
@@ -55,20 +70,15 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
     float conv = 0.;
     if (isdifference == NODIFFERENCE) {
         v = fetch(image, texcoord, b);
-        for (int j = 0; j < FSIZE; j++) {
-            for (int i = 0; i < FSIZE; i++) {
-                conv += fetch(image, texcoord + vec2(offset[i], offset[j]) * sharpen.xy, b) * blurKernel[FSIZE * j + i];
-            }
+        for (int i = 0; i < FSIZE2; i++) {
+            conv += fetch(image, texcoord + blurOffset[i] * sharpen.xy, b) * blurKernel[i];
         }
     } else {
-        v = fetch(image, texcoord, b) - fetch(differenceImage, difftexcoord, b);
+        v = fetch(image, texcoord, b) - fetch(diffImage, difftexcoord, b);
         float diff;
-        for (int j = 0; j < FSIZE; j++) {
-            for (int i = 0; i < FSIZE; i++) {
-                diff = fetch(image, texcoord + vec2(offset[i], offset[j]) * sharpen.xy, b) -
-                       fetch(differenceImage, difftexcoord + vec2(offset[i], offset[j]) * sharpen.xy, b);
-                conv += diff * blurKernel[FSIZE * j + i];
-            }
+        for (int i = 0; i < FSIZE; i++) {
+            diff = fetch(image, texcoord + blurOffset[i] * sharpen.xy, b) - fetch(diffImage, difftexcoord + blurOffset[i] * sharpen.xy, b);
+            conv += diff * blurKernel[i];
         }
         v = v * BOOST + 0.5;
         conv = conv * BOOST + 0.5;
