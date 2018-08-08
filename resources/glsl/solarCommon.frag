@@ -41,7 +41,7 @@ uniform vec2 polarRadii;
 uniform vec3 sharpen;
 
 #define FSIZE 3 * 3
-// float[] bc = { 0.06136f, 0.24477f, 0.38774f, 0.24477f, 0.06136f };
+// float[] bc = { 0.06136, 0.24477, 0.38774, 0.24477, 0.06136 }
 // http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
 const float[] bc = float[](.30613, .38774, .30613);
 const float[] blurKernel = float[](
@@ -50,18 +50,18 @@ const float[] blurKernel = float[](
     bc[2] * bc[0], bc[2] * bc[1], bc[2] * bc[2]
 );
 
-const float[] bo = float[](-1.2004377, 0, 1.2004377);
+const float[] bo = float[](-1.2004377, 0., 1.2004377);
 const vec2[] blurOffset = vec2[](
     vec2(bo[0], bo[0]), vec2(bo[1], bo[0]), vec2(bo[2], bo[0]),
     vec2(bo[0], bo[1]), vec2(bo[1], bo[1]), vec2(bo[2], bo[1]),
     vec2(bo[0], bo[2]), vec2(bo[1], bo[2]), vec2(bo[2], bo[2])
 );
 
-float fetch(sampler2D tex, vec2 coord, vec3 bright) {
+float fetch(const sampler2D tex, const vec2 coord, const vec3 bright) {
     return /*pow(texture2D(tex, coord).r, bright.z)*/ texture(tex, coord).r * bright.y + bright.x;
 }
 
-vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
+vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) {
     vec3 b = brightness;
     if (enhanced == 1) {
         b.y *= factor * factor * factor;

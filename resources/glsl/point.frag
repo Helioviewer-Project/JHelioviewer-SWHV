@@ -13,6 +13,6 @@ void main(void) {
         discard;
 
     float delta = fwidth(radius);
-    float alpha = smoothstep(1 - delta, 1, radius);
+    float alpha = smoothstep(1. - delta, 1., radius);
     FragColor = mix(frag_color, vec4(0.), alpha);
 }
