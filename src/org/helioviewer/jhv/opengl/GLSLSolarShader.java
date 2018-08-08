@@ -7,21 +7,6 @@ import com.jogamp.opengl.GL2;
 
 public class GLSLSolarShader extends GLSLShader {
 
-    private static final float[] blurKernel;
-    private static final float[] offsets = { -1.2004377f, 0, 1.2004377f };
-
-    static {
-        // float[] v = { 0.06136f, 0.24477f, 0.38774f, 0.24477f, 0.06136f };
-        // http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
-        float[] v = { .30613f, .38774f, .30613f };
-
-        blurKernel = new float[] {
-            v[0] * v[0], v[0] * v[1], v[0] * v[2],
-            v[1] * v[0], v[1] * v[1], v[1] * v[2],
-            v[2] * v[0], v[2] * v[1], v[2] * v[2],
-        };
-    }
-
     public static final GLSLSolarShader ortho = new GLSLSolarShader("/glsl/solar.vert", null, "/glsl/solarOrtho.frag");
     public static final GLSLSolarShader lati = new GLSLSolarShader("/glsl/solar.vert", null, "/glsl/solarLati.frag");
     public static final GLSLSolarShader polar = new GLSLSolarShader("/glsl/solar.vert", null, "/glsl/solarPolar.frag");
@@ -122,12 +107,9 @@ public class GLSLSolarShader extends GLSLShader {
         int offsetRef = gl.glGetUniformLocation(progID, "offset");
 
         bind(gl);
-        gl.glUniform1fv(blurKernelRef, blurKernel.length, blurKernel, 0);
-        gl.glUniform1fv(offsetRef, offsets.length, offsets, 0);
-
         setTextureUnit(gl, "image", 0);
         setTextureUnit(gl, "lut", 1);
-        setTextureUnit(gl, "differenceImage", 2);
+        setTextureUnit(gl, "diffImage", 2);
         unbind(gl);
     }
 
