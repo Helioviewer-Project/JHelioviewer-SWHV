@@ -38,8 +38,7 @@ uniform vec2 polarRadii;
 
 uniform vec3 sharpen;
 
-#define FSIZE 3
-#define FSIZE2 FSIZE * FSIZE
+#define FSIZE 3 * 3
 // float[] bc = { 0.06136f, 0.24477f, 0.38774f, 0.24477f, 0.06136f };
 // http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
 const float[] bc = float[](.30613, .38774, .30613);
@@ -70,16 +69,16 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
     float conv = 0.;
     if (isdifference == NODIFFERENCE) {
         v = fetch(image, texcoord, b);
-        for (int i = 0; i < FSIZE2; i++) {
+        for (int i = 0; i < FSIZE; i++) {
             conv += fetch(image, texcoord + blurOffset[i] * sharpen.xy, b) * blurKernel[i];
         }
     } else {
         v = fetch(image, texcoord, b) - fetch(diffImage, difftexcoord, b);
-        float diff;
-        for (int i = 0; i < FSIZE2; i++) {
+        v = v * BOOST + 0.5;
+
+        for (int i = 0; i < FSIZE; i++) {
             conv += (fetch(image, texcoord + blurOffset[i] * sharpen.xy, b) - fetch(diffImage, difftexcoord + blurOffset[i] * sharpen.xy, b)) * blurKernel[i];
         }
-        v = v * BOOST + 0.5;
         conv = conv * BOOST + 0.5;
     }
     v = mix(v, conv, sharpen.z);
