@@ -64,7 +64,7 @@ public class GLImage {
         shader.bindBrightness(gl, brightOffset, brightScale * imageData.getMetaData().getResponseFactor(), imageData.getGamma());
         shader.bindColor(gl, red, green, blue, opacity, blend);
         shader.bindEnhanced(gl, enhanced);
-        shader.bindSharpen(gl, sharpen, 1. / imageData.getWidth(), 1. / imageData.getHeight(), 1);
+        shader.bindSharpen(gl, sharpen, 1. / imageData.getWidth(), 1. / imageData.getHeight());
 
         applyLUT(gl);
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);

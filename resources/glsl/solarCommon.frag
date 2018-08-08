@@ -76,9 +76,8 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
     } else {
         v = fetch(image, texcoord, b) - fetch(diffImage, difftexcoord, b);
         float diff;
-        for (int i = 0; i < FSIZE; i++) {
-            diff = fetch(image, texcoord + blurOffset[i] * sharpen.xy, b) - fetch(diffImage, difftexcoord + blurOffset[i] * sharpen.xy, b);
-            conv += diff * blurKernel[i];
+        for (int i = 0; i < FSIZE2; i++) {
+            conv += (fetch(image, texcoord + blurOffset[i] * sharpen.xy, b) - fetch(diffImage, difftexcoord + blurOffset[i] * sharpen.xy, b)) * blurKernel[i];
         }
         v = v * BOOST + 0.5;
         conv = conv * BOOST + 0.5;
