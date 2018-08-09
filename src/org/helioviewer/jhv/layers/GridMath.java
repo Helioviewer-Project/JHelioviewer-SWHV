@@ -30,8 +30,8 @@ class GridMath {
     private static final float AXIS_START = (float) (1. * Sun.Radius);
     private static final float AXIS_STOP = (float) (1.2 * Sun.Radius);
 
-    private static final double EARTH_CIRCLE_RADIUS = Sun.Radius;
     private static final double GRID_RADIUS = Sun.Radius;
+    private static final double EARTH_CIRCLE_RADIUS = GRID_RADIUS * 1.006;
 
     private static final int TENS_RADIUS = 3;
     private static final int END_RADIUS = TENS_RADIUS * 10;
@@ -73,7 +73,7 @@ class GridMath {
         FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(4);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4);
 
-        BufferUtils.put4f(vertexBuffer, 0, 0, (float) (EARTH_CIRCLE_RADIUS + 0.006), earthPointSize);
+        BufferUtils.put4f(vertexBuffer, 0, 0, (float) EARTH_CIRCLE_RADIUS, earthPointSize);
         colorBuffer.put(earthLineColor);
 
         vertexBuffer.rewind();
