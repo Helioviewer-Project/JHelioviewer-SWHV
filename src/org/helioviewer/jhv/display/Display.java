@@ -191,7 +191,7 @@ public class Display implements ActionListener, JHVEventHighlightListener {
 
     public static void handleData(long milli) { // special for ImageLayer.handleData
         if (ImageLayers.getSyncedImageLayers(milli)) {
-            ImageViewerGui.getGLComponent().repaint(); // asap
+            ImageViewerGui.getGLWindow().display(); // asap
             toDisplay = false;
         }
     }
@@ -199,7 +199,7 @@ public class Display implements ActionListener, JHVEventHighlightListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (toDisplay) {
-            ImageViewerGui.getGLComponent().repaint(); // asap
+            ImageViewerGui.getGLWindow().display(); // asap
             toDisplay = false;
         }
         if (renderFactor != -1) {

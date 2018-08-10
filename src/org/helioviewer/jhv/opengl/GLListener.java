@@ -166,8 +166,7 @@ public class GLListener implements GLEventListener {
 
     @Override
     public void display(GLAutoDrawable drawable) { // NEDT
-        if (!EventQueue.isDispatchThread()) { // seldom
-            EventQueue.invokeLater(Display::display);
+        if (!EventQueue.isDispatchThread()) { // via reshape(), reject
             return;
         }
 
