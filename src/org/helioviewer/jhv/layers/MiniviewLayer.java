@@ -62,8 +62,8 @@ public class MiniviewLayer extends AbstractLayer {
     }
 
     public static void renderBackground(GL2 gl) {
-        rectangle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
-        circle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
+        rectangle.renderShape(gl, GL2.GL_TRIANGLE_STRIP);
+        circle.renderShape(gl, GL2.GL_TRIANGLE_STRIP);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class MiniviewLayer extends AbstractLayer {
     @Override
     public void init(GL2 gl) {
         circle.init(gl);
-        GLHelper.initCircleFront(gl, circle, 0, 0, 1, 36, colorCircle);
+        GLHelper.initCircleFront(gl, circle, 0, 0, 1, 18, colorCircle);
         rectangle.init(gl);
         GLHelper.initRectangleFront(gl, rectangle, -30, -30, 60, 60, colorRectangle);
     }

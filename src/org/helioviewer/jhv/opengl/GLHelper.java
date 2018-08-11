@@ -24,11 +24,14 @@ import com.jogamp.opengl.GLProfile;
 public class GLHelper {
 
     public static void initCircleFront(GL2 gl, GLSLShape circle, double x, double y, double r, int segments, float[] color) {
-        FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(4 * (segments + 1));
-        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4 * (segments + 1));
+        int no_points = 2 * 4 * (segments + 1);
+        FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(no_points);
+        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points);
         for (int i = 0; i <= segments; ++i) {
-            double t = -2 * Math.PI * i / segments; // + for backside
+            double t = 2 * Math.PI * i / segments;
             BufferUtils.put4f(positionBuffer, (float) (x + Math.sin(t) * r), (float) (y + Math.cos(t) * r), 0, 1);
+            colorBuffer.put(color);
+            BufferUtils.put4f(positionBuffer, (float) x, (float) y, 0, 1);
             colorBuffer.put(color);
         }
         positionBuffer.rewind();
@@ -43,10 +46,10 @@ public class GLHelper {
         float x1 = (float) (x0 + w);
         float y1 = (float) (y0 + h);
 
-        BufferUtils.put4f(positionBuffer, (float) x0, (float) -y0, 0, 1); // x0 -y0 backside
-        BufferUtils.put4f(positionBuffer, (float) x0,         -y1, 0, 1); // x1 -y0
-        BufferUtils.put4f(positionBuffer,         x1,         -y1, 0, 1); // x1 -y1
-        BufferUtils.put4f(positionBuffer,         x1, (float) -y0, 0, 1); // x0 -y1
+        BufferUtils.put4f(positionBuffer, (float) x0, (float) y0, 0, 1);
+        BufferUtils.put4f(positionBuffer,         x1, (float) y0, 0, 1);
+        BufferUtils.put4f(positionBuffer, (float) x0,         y1, 0, 1);
+        BufferUtils.put4f(positionBuffer,         x1,         y1, 0, 1);
 
         for (int i = 0; i < vertices; i++)
             colorBuffer.put(color);
