@@ -163,11 +163,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         if (icons) {
             bindTexture(gl, evtr.getSupplier().getGroup());
 
-            double sz = ICON_SIZE;
-            if (evtr.isHighlighted()) {
-                sz = ICON_SIZE_HIGHLIGHTED;
-            }
-
+            double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
             Vec3 v = new Vec3();
             for (float[] el : texCoord) {
                 double deltatheta = sz / distSun * (el[0] * 2 - 1);
@@ -259,11 +255,8 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             float[] color = {c.getRed() / 255f * alpha, c.getGreen() / 255f * alpha, c.getBlue() / 255f * alpha, alpha};
 
             bindTexture(gl, evtr.getSupplier().getGroup());
-            if (evtr.isHighlighted()) {
-                drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED, color);
-            } else {
-                drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE, ICON_SIZE, color);
-            }
+            double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
+            drawImage3d(gl, pt.x, pt.y, pt.z, sz, sz, color);
         }
     }
 
@@ -297,11 +290,8 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             float[] color = {c.getRed() / 255f * alpha, c.getGreen() / 255f * alpha, c.getBlue() / 255f * alpha, alpha};
 
             bindTexture(gl, evtr.getSupplier().getGroup());
-            if (evtr.isHighlighted()) {
-                drawImageScale(gl, tf.x * vp.aspect, tf.y, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED, color);
-            } else {
-                drawImageScale(gl, tf.x * vp.aspect, tf.y, ICON_SIZE, ICON_SIZE, color);
-            }
+            double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
+            drawImageScale(gl, tf.x * vp.aspect, tf.y, sz, sz, color);
         }
     }
 
@@ -379,11 +369,8 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
         if (icons) {
             bindTexture(gl, evtr.getSupplier().getGroup());
-            if (evtr.isHighlighted()) {
-                drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED, color);
-            } else {
-                drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), ICON_SIZE, ICON_SIZE, color);
-            }
+            double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
+            drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), sz, sz, color);
         }
     }
 
