@@ -46,7 +46,7 @@ public class Camera {
         Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -depthClose, depthClose);
         Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
 
-        blackCircle.renderShape(gl, GL2.GL_TRIANGLE_FAN);
+        blackCircle.renderShape(gl, GL2.GL_TRIANGLE_STRIP);
 
         Transform.rotateView(rotation);
     }
