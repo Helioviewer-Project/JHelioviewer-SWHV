@@ -101,7 +101,7 @@ vec3 rotate_vector(const vec4 quat, const vec3 vec) {
     return vec + 2. * cross(quat.xyz, cross(quat.xyz, vec) + quat.w * vec);
 }
 
-float intersectPlane(const vec4 quat, vec4 vecin) {
+float intersectPlane(const vec4 quat, const vec4 vecin) {
     vec3 altnormal = rotate_vector(quat, vec3(0., 0., 1.));
     if (altnormal.z <= 0.)
         discard;

@@ -25,7 +25,7 @@ import org.helioviewer.jhv.view.jp2view.kakadu.KakaduConstants;
 class J2KRender implements Runnable {
 
     private static final int MAX_INACTIVE_LAYERS = 200;
-    private static final int[] firstComponent = { 0 };
+    private static final int[] firstComponent = {0};
 
     private static final ThreadLocal<int[]> localArray = ThreadLocal.withInitial(() -> new int[KakaduConstants.MAX_RENDER_SAMPLES]);
     private static final ThreadLocal<Kdu_thread_env> localThread = ThreadLocal.withInitial(J2KRender::createThreadEnv);
@@ -54,9 +54,10 @@ class J2KRender implements Runnable {
         int numComponents = view.getNumComponents(frame);
 
         Kdu_ilayer_ref ilayer;
+        Kdu_dims empty = new Kdu_dims();
         if (numComponents < 3) {
             // alpha tbd
-            ilayer = compositor.Add_primitive_ilayer(frame, firstComponent, Kdu_global.KDU_WANT_CODESTREAM_COMPONENTS, new Kdu_dims(), new Kdu_dims());
+            ilayer = compositor.Add_primitive_ilayer(frame, firstComponent, Kdu_global.KDU_WANT_CODESTREAM_COMPONENTS, empty, empty);
         } else {
             ilayer = compositor.Add_ilayer(frame, new Kdu_dims(), new Kdu_dims());
         }
@@ -67,7 +68,7 @@ class J2KRender implements Runnable {
         requestedRegion.From_u32(subImage.x, subImage.y, subImage.width, subImage.height);
         compositor.Set_buffer_surface(requestedRegion);
 
-        Kdu_compositor_buf compositorBuf = compositor.Get_composition_buffer(new Kdu_dims(), true);
+        Kdu_compositor_buf compositorBuf = compositor.Get_composition_buffer(empty, true); // modifies empty
         Kdu_dims actualRegion = compositorBuf.Get_rendering_region();
         Kdu_coords actualPos = actualRegion.Access_pos();
         int actualX = actualPos.Get_x(), actualY = actualPos.Get_y();
@@ -85,6 +86,7 @@ class J2KRender implements Runnable {
 
         int[] intArray = localArray.get();
         Kdu_dims newRegion = new Kdu_dims();
+        Kdu_dims theRegion = new Kdu_dims();
         while (compositor.Process(KakaduConstants.MAX_RENDER_SAMPLES, newRegion)) {
             Kdu_coords newSize = newRegion.Access_size();
             int newWidth = newSize.Get_x();
@@ -93,7 +95,6 @@ class J2KRender implements Runnable {
                 continue;
 
             Kdu_coords newOffset = newRegion.Access_pos();
-            Kdu_dims theRegion = new Kdu_dims();
             theRegion.From_u32(newOffset.Get_x() - actualX, newOffset.Get_y() - actualY, newWidth, intArray.length / newWidth);
 
             while (!(theRegion = theRegion.Intersection(newRegion)).Is_empty()) { // slide with buffer top to bottom
@@ -178,7 +179,7 @@ class J2KRender implements Runnable {
         // System.out.println(">>>> compositor create " + krc + " " + Thread.currentThread().getName());
         krc.Create(jpx, KakaduConstants.CODESTREAM_CACHE_THRESHOLD);
         krc.Set_surface_initialization_mode(false);
-        krc.Set_quality_limiting(new Kdu_quality_limiter(1f/256), -1, -1);
+        krc.Set_quality_limiting(new Kdu_quality_limiter(1f / 256), -1, -1);
         return krc;
     }
 
