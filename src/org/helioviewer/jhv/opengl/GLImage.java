@@ -47,13 +47,13 @@ public class GLImage {
     public void streamImage(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
         if (!imageData.getUploaded()) {
             imageData.setUploaded(true);
-            tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
+            tex.bind(gl);
             tex.copyImageData2D(gl, imageData);
         }
 
         ImageData prevFrame = isBaseDiff() ? baseImageData : prevImageData;
         if (diffMode != DifferenceMode.None && prevFrame != null) {
-            diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
+            diffTex.bind(gl);
             diffTex.copyImageData2D(gl, prevFrame);
         }
     }
@@ -67,7 +67,10 @@ public class GLImage {
         shader.bindSharpen(gl, sharpen, 1. / imageData.getWidth(), 1. / imageData.getHeight());
 
         applyLUT(gl);
-        tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
+        tex.bind(gl);
+        shader.bindIsDiff(gl, diffMode.ordinal());
+        if (diffMode != DifferenceMode.None)
+            diffTex.bind(gl);
     }
 
     private boolean isBaseDiff() {
@@ -77,10 +80,6 @@ public class GLImage {
     private void applyRegion(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLSolarShader shader) {
         Region r = imageData.getRegion();
         shader.bindRect(gl, r.llx, r.lly, 1. / r.width, 1. / r.height);
-
-        shader.bindIsDiff(gl, diffMode.ordinal());
-        if (diffMode != DifferenceMode.None)
-            diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
 
         Region diffRegion = null;
         if (prevImageData != null && !isBaseDiff()) {
@@ -105,7 +104,7 @@ public class GLImage {
     }
 
     private void applyLUT(GL2 gl) {
-        lutTex.bind(gl, GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE1);
+        lutTex.bind(gl);
 
         LUT currlut = diffMode == DifferenceMode.None ? lut : gray;
         if (lutChanged || lastLut != currlut || invertLUT != lastInverted) {
@@ -120,9 +119,9 @@ public class GLImage {
     }
 
     public void init(GL2 gl) {
-        tex = new GLTexture(gl);
-        lutTex = new GLTexture(gl);
-        diffTex = new GLTexture(gl);
+        tex = new GLTexture(gl, GL2.GL_TEXTURE_2D, GLTexture.Unit.ZERO);
+        lutTex = new GLTexture(gl, GL2.GL_TEXTURE_1D, GLTexture.Unit.ONE);
+        diffTex = new GLTexture(gl, GL2.GL_TEXTURE_2D, GLTexture.Unit.TWO);
 
         lutChanged = true;
     }

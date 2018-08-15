@@ -104,9 +104,9 @@ public class GLSLSolarShader extends GLSLShader {
         diffCameraDifferenceRotationQuatRef = gl.glGetUniformLocation(progID, "diffcameraDifferenceRotationQuat");
 
         bind(gl);
-        setTextureUnit(gl, "image", 0);
-        setTextureUnit(gl, "lut", 1);
-        setTextureUnit(gl, "diffImage", 2);
+        setTextureUnit(gl, "image", GLTexture.Unit.ZERO);
+        setTextureUnit(gl, "lut", GLTexture.Unit.ONE);
+        setTextureUnit(gl, "diffImage", GLTexture.Unit.TWO);
         unbind(gl);
     }
 
