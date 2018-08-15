@@ -76,18 +76,13 @@ public class GLSLShader {
         gl.glUseProgram(0);
     }
 
-    protected final void setTextureUnit(GL2 gl, String texname, int texunit) {
-        int[] params = { 0 };
-        gl.glGetProgramiv(progID, GL2.GL_LINK_STATUS, params, 0);
-        if (params[0] != 1) {
-            Log.error("Error: setTextureUnit needs program to be linked");
-        }
+    protected final void setTextureUnit(GL2 gl, String texname, GLTexture.Unit unit) {
         int id = gl.glGetUniformLocation(progID, texname);
         if (id == -1) {
             Log.error("Warning: Invalid texture " + texname);
             return;
         }
-        gl.glUniform1i(id, texunit);
+        gl.glUniform1i(id, unit.ordinal());
     }
 
     private static int attachShader(GL2 gl, ShaderType type, String text) {

@@ -100,13 +100,13 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             icon.paintIcon(null, graph, 0, 0);
             graph.dispose();
 
-            tex = new GLTexture(gl);
-            tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
+            tex = new GLTexture(gl, GL2.GL_TEXTURE_2D, GLTexture.Unit.ZERO);
+            tex.bind(gl);
 
             GLTexture.copyBufferedImage2D(gl, bi);
             iconCacheId.put(key, tex);
         }
-        tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
+        tex.bind(gl);
     }
 
     private static void interPolatedDraw(int mres, double r_start, double r_end, double t_start, double t_end, Quat q, FloatArray pos, FloatArray col, float[] color) {

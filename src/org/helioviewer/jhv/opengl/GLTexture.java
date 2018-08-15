@@ -19,24 +19,34 @@ import com.jogamp.opengl.GL2;
 
 public class GLTexture {
 
+    public enum Unit {
+        ZERO, ONE, TWO
+    }
+
     private static final int PBO_COUNT = 2;
     private final PBO pbo = new PBO();
     private int pbo_idx;
 
     private int texID;
+    private int unit;
+    private int target;
+
     private int prev_width = -1;
     private int prev_height = -1;
     private int prev_inputGLFormat = -1;
     private int prev_bppGLType = -1;
 
-    public GLTexture(GL2 gl) {
+    public GLTexture(GL2 gl, int _target, Unit _unit) {
         int[] tmp = new int[1];
         gl.glGenTextures(1, tmp, 0);
         texID = tmp[0];
+        target = _target;
+        unit = GL2.GL_TEXTURE0 + _unit.ordinal();
+
         pbo.generate(gl, PBO_COUNT);
     }
 
-    public void bind(GL2 gl, int target, int unit) {
+    public void bind(GL2 gl) {
         gl.glActiveTexture(unit);
         gl.glBindTexture(target, texID);
     }

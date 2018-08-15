@@ -56,8 +56,8 @@ class JhvTextureRenderer {
         imageBuffer = IntBuffer.wrap(((DataBufferInt) image.getRaster().getDataBuffer()).getData());
 
         GL2 gl = (GL2) GLContext.getCurrentGL();
-        tex = new GLTexture(gl);
-        tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
+        tex = new GLTexture(gl, GL2.GL_TEXTURE_2D, GLTexture.Unit.ZERO);
+        tex.bind(gl);
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_BASE_LEVEL, 0);
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAX_LEVEL, 15);
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR_MIPMAP_LINEAR);
@@ -122,7 +122,7 @@ class JhvTextureRenderer {
     }
 
     void bind(GL2 gl) {
-        tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
+        tex.bind(gl);
         if (dirtyRegion != null) {
             upload(gl, dirtyRegion.x, dirtyRegion.y, dirtyRegion.width, dirtyRegion.height);
             dirtyRegion = null;
