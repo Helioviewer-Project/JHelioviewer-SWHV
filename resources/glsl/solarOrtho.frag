@@ -36,7 +36,7 @@ void main(void) {
     vec2 difftexcoord;
     if (isdifference != NODIFFERENCE) {
         vec3 diffrotatedHitPoint = rotate_vector_inverse(diffcameraDifferenceRotationQuat, hitPoint);
-        if (radius2 >= 1. && diffrotatedHitPoint.z <= 0.) {
+        if (radius2 >= 1. || diffrotatedHitPoint.z <= 0.) {
             hitPoint = vec3(up1.x, up1.y, intersectPlane(diffcameraDifferenceRotationQuat, up1));
             diffrotatedHitPoint = rotate_vector_inverse(diffcameraDifferenceRotationQuat, hitPoint);
         }
