@@ -17,7 +17,6 @@ public class GLSLSolar {
     public static void render(GL2 gl) {
         vao.bind(gl);
         gl.glDrawArrays(GL2.GL_TRIANGLE_STRIP, 0, 4);
-        vao.unbind(gl);
     }
 
     static void init(GL2 gl) {

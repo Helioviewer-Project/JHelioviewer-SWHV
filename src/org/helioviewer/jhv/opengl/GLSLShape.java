@@ -17,7 +17,7 @@ public class GLSLShape extends GLSLArrays {
     public void setData(GL2 gl, FloatBuffer position, FloatBuffer color) {
         int plen = position.limit() / attribLens[0];
         if (plen * attribLens[0] != position.limit() || plen != color.limit() / attribLens[1]) {
-            Log.error("Something is wrong with the vertices or colors from this GLShape");
+            Log.error("Something is wrong with the attributes of this GLShape");
             return;
         }
         vaos[0].setData4(gl, position);
@@ -35,7 +35,6 @@ public class GLSLShape extends GLSLArrays {
 
         bindVAOs(gl);
         gl.glDrawArrays(GL2.GL_POINTS, 0, count);
-        unbindVAOs(gl);
 
         GLSLShader.unbind(gl);
     }
@@ -49,7 +48,6 @@ public class GLSLShape extends GLSLArrays {
 
         bindVAOs(gl);
         gl.glDrawArrays(mode, 0, count);
-        unbindVAOs(gl);
 
         GLSLShader.unbind(gl);
     }

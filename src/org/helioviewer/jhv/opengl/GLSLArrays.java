@@ -40,10 +40,4 @@ class GLSLArrays {
         }
     }
 
-    protected void unbindVAOs(GL2 gl) {
-        for (VAO vao : vaos) {
-            vao.bind(gl);
-        }
-    }
-
 }

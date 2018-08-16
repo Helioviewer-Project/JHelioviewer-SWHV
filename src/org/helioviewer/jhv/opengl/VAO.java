@@ -20,6 +20,7 @@ class VAO {
         int[] tmpId = new int[1];
         gl.glGenBuffers(1, tmpId, 0);
         bufferID = tmpId[0];
+        gl.glEnableVertexAttribArray(attribRef);
     }
 
     void delete(GL2 gl) {
@@ -29,12 +30,7 @@ class VAO {
 
     void bind(GL2 gl) {
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, bufferID);
-        gl.glEnableVertexAttribArray(attribRef);
         gl.glVertexAttribPointer(attribRef, attribLen, GL2.GL_FLOAT, false, 0, 0);
-    }
-
-    void unbind(GL2 gl) {
-        gl.glDisableVertexAttribArray(attribRef);
     }
 
     void setData4(GL2 gl, Buffer buffer) {
