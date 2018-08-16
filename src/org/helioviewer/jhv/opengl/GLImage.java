@@ -119,9 +119,9 @@ public class GLImage {
     }
 
     public void init(GL2 gl) {
-        tex = new GLTexture(gl, GL2.GL_TEXTURE_2D, GLTexture.Unit.ZERO);
-        lutTex = new GLTexture(gl, GL2.GL_TEXTURE_1D, GLTexture.Unit.ONE);
-        diffTex = new GLTexture(gl, GL2.GL_TEXTURE_2D, GLTexture.Unit.TWO);
+        tex = new GLTexture(gl, GL2.GL_TEXTURE_2D, GLTexture.Unit.ONE);
+        lutTex = new GLTexture(gl, GL2.GL_TEXTURE_1D, GLTexture.Unit.TWO);
+        diffTex = new GLTexture(gl, GL2.GL_TEXTURE_2D, GLTexture.Unit.THREE);
 
         lutChanged = true;
     }

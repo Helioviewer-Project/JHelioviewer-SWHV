@@ -1,7 +1,7 @@
 #version 140
 
-in vec4 Vertex;
+uniform samplerBuffer vertexBuffer;
 
 void main(void) {
-    gl_Position = Vertex;
+    gl_Position = texelFetch(vertexBuffer, gl_VertexID);
 }
