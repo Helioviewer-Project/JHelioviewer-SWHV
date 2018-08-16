@@ -1,43 +1,54 @@
 package org.helioviewer.jhv.opengl;
 
-import java.nio.Buffer;
-
 import com.jogamp.opengl.GL2;
 
 class VAO {
 
-    private final int attribRef;
-    private final int attribLen;
+    protected final int[] attribLens;
+    protected final VBO[] vbos;
 
-    private int bufferID = -1;
+    private int vaoID = -1;
+    private boolean inited = false;
 
-    VAO(int _attribRef, int _attribLen) {
-        attribRef = _attribRef;
-        attribLen = _attribLen;
+    VAO(int[] lens) {
+        attribLens = lens;
+        vbos = new VBO[lens.length];
     }
 
-    void generate(GL2 gl) {
-        int[] tmpId = new int[1];
-        gl.glGenBuffers(1, tmpId, 0);
-        bufferID = tmpId[0];
-        gl.glEnableVertexAttribArray(attribRef);
+    public void init(GL2 gl) {
+        if (!inited) {
+            inited = true;
+
+            int[] tmpId = new int[1];
+            gl.glGenVertexArrays(1, tmpId, 0);
+            vaoID = tmpId[0];
+
+            gl.glBindVertexArray(vaoID);
+            for (int i = 0; i < attribLens.length; i++) {
+                vbos[i] = new VBO(gl);
+                vbos[i].bind(gl);
+                gl.glEnableVertexAttribArray(i);
+                gl.glVertexAttribPointer(i, attribLens[i], GL2.GL_FLOAT, false, 0, 0);
+            }
+        }
     }
 
-    void delete(GL2 gl) {
-        gl.glDeleteBuffers(1, new int[]{bufferID}, 0);
-        bufferID = -1;
+    public void dispose(GL2 gl) {
+        if (inited) {
+            inited = false;
+
+            gl.glDeleteVertexArrays(1, new int[]{vaoID}, 0);
+            vaoID = -1;
+
+            for (int i = 0; i < vbos.length; i++) {
+                vbos[i].delete(gl);
+                vbos[i] = null;
+            }
+        }
     }
 
-    void bind(GL2 gl) {
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, bufferID);
-        gl.glVertexAttribPointer(attribRef, attribLen, GL2.GL_FLOAT, false, 0, 0);
-    }
-
-    void setData4(GL2 gl, Buffer buffer) {
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, bufferID);
-        int length = 4 * buffer.limit();
-        gl.glBufferData(GL2.GL_ARRAY_BUFFER, length, null, GL2.GL_STATIC_DRAW); // https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
-        gl.glBufferSubData(GL2.GL_ARRAY_BUFFER, 0, length, buffer);
+    protected void bindVAO(GL2 gl) {
+        gl.glBindVertexArray(vaoID);
     }
 
 }

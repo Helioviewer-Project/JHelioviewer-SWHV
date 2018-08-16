@@ -24,6 +24,8 @@ public class GLListener implements GLEventListener {
     private final ScalableSurface surface;
     private static final GLSLShape blackCircle = new GLSLShape();
 
+    public static final GLSLSolar glslSolar = new GLSLSolar();
+
     public GLListener(ScalableSurface _surface) {
         surface = _surface;
     }
@@ -55,7 +57,7 @@ public class GLListener implements GLEventListener {
         gl.glEnable(GL2.GL_VERTEX_PROGRAM_POINT_SIZE);
         gl.glEnable(GL2.GL_POINT_SPRITE);
 
-        GLSLSolar.init(gl);
+        glslSolar.init(gl);
         GLSLSolarShader.init(gl);
         GLSLPolylineShader.init(gl);
         GLSLShapeShader.init(gl);
@@ -79,7 +81,7 @@ public class GLListener implements GLEventListener {
         blackCircle.dispose(gl);
         GLText.dispose(gl);
 
-        GLSLSolar.dispose(gl);
+        glslSolar.dispose(gl);
         GLSLSolarShader.dispose(gl);
         GLSLPolylineShader.dispose(gl);
         GLSLShapeShader.dispose(gl);

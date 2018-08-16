@@ -8,7 +8,7 @@ import org.helioviewer.jhv.log.Log;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL3;
 
-public class GLSLPolyline extends GLSLArrays {
+public class GLSLPolyline extends VAO {
 
     private int count;
 
@@ -22,8 +22,8 @@ public class GLSLPolyline extends GLSLArrays {
             Log.error("Something is wrong with the attributes of this GLSLPolyline");
             return;
         }
-        vaos[0].setData4(gl, position);
-        vaos[1].setData4(gl, color);
+        vbos[0].setData4(gl, position);
+        vbos[1].setData4(gl, color);
         count = plen;
     }
 
@@ -36,7 +36,7 @@ public class GLSLPolyline extends GLSLArrays {
         GLSLPolylineShader.polyline.setViewport(vp.aspect);
         GLSLPolylineShader.polyline.bindParams(gl);
 
-        bindVAOs(gl);
+        bindVAO(gl);
         gl.glDrawArrays(GL3.GL_LINE_STRIP_ADJACENCY, 0, count);
 
         GLSLShader.unbind(gl);

@@ -6,7 +6,7 @@ import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.opengl.GL2;
 
-public class GLSLTexture extends GLSLArrays {
+public class GLSLTexture extends VAO {
 
     private int count;
 
@@ -20,8 +20,8 @@ public class GLSLTexture extends GLSLArrays {
             Log.error("Something is wrong with the attributes of this GLSLTexture");
             return;
         }
-        vaos[0].setData4(gl, position);
-        vaos[1].setData4(gl, coord);
+        vbos[0].setData4(gl, position);
+        vbos[1].setData4(gl, coord);
         count = plen;
     }
 
@@ -33,7 +33,7 @@ public class GLSLTexture extends GLSLArrays {
         GLSLTextureShader.texture.setColor(color);
         GLSLTextureShader.texture.bindParams(gl);
 
-        bindVAOs(gl);
+        bindVAO(gl);
         gl.glDrawArrays(mode, 0, toDraw);
 
         GLSLShader.unbind(gl);
