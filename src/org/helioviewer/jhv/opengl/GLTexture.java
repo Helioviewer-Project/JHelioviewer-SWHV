@@ -20,7 +20,7 @@ import com.jogamp.opengl.GL2;
 public class GLTexture {
 
     public enum Unit {
-        ZERO, ONE, TWO, THREE
+        ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN
     }
 
     private int texID;

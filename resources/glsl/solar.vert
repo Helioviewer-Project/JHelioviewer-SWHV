@@ -1,7 +1,7 @@
 #version 140
 
-uniform samplerBuffer attribBuffer;
+uniform samplerBuffer vertexBuffer;
 
 void main(void) {
-    gl_Position = texelFetch(attribBuffer, gl_VertexID);
+    gl_Position = texelFetch(vertexBuffer, gl_VertexID);
 }

@@ -14,7 +14,7 @@ public class GLSLSolar extends VTAO {
     });
 
     GLSLSolar() {
-        super(new int[]{4});
+        super(GL2.GL_TEXTURE0 + GLTexture.Unit.THREE.ordinal(), new int[]{4});
     }
 
     public void render(GL2 gl) {

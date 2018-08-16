@@ -1,4 +1,4 @@
-#version 330 core
+#version 140
 
 precision mediump float;
 
@@ -8,7 +8,7 @@ precision mediump float;
 
 #define BOOST 1. / (0.2 * 2.)
 
-layout(location = 0) out vec4 FragColor;
+out vec4 FragColor;
 
 uniform sampler2D image;
 uniform int isdifference;

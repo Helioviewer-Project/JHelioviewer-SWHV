@@ -7,12 +7,14 @@ class VTAO {
     protected final int[] attribLens;
     protected final VTBO[] vtbos;
 
+    private final int targetOffset;
     private int vaoID = -1;
     private boolean inited = false;
 
-    VTAO(int[] lens) {
-        attribLens = lens;
-        vtbos = new VTBO[lens.length];
+    VTAO(int _targetOffset, int[] _attribLens) {
+        targetOffset = _targetOffset;
+        attribLens = _attribLens;
+        vtbos = new VTBO[attribLens.length];
     }
 
     public void init(GL2 gl) {
@@ -25,7 +27,7 @@ class VTAO {
 
             gl.glBindVertexArray(vaoID);
             for (int i = 0; i < attribLens.length; i++) {
-                vtbos[i] = new VTBO(gl, GL2.GL_TEXTURE0 + 3, attribLens[i]);
+                vtbos[i] = new VTBO(gl, targetOffset + i, attribLens[i]);
                 gl.glEnableVertexAttribArray(i);
                 gl.glVertexAttribPointer(i, attribLens[i], GL2.GL_FLOAT, false, 0, 0);
             }
