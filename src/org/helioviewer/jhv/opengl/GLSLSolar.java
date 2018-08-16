@@ -12,20 +12,21 @@ public class GLSLSolar {
             -1, 1, 0, 1,
             1, 1, 0, 1
     });
-    private static final VBO vertexVBO = new VBO(0, 4);
+    private static final VAO vao = new VAO(0, 4);
 
     public static void render(GL2 gl) {
-        vertexVBO.bind(gl);
+        vao.bind(gl);
         gl.glDrawArrays(GL2.GL_TRIANGLE_STRIP, 0, 4);
+        vao.unbind(gl);
     }
 
     static void init(GL2 gl) {
-        vertexVBO.generate(gl);
-        vertexVBO.setData4(gl, vertexBuffer);
+        vao.generate(gl);
+        vao.setData4(gl, vertexBuffer);
     }
 
     static void dispose(GL2 gl) {
-        vertexVBO.delete(gl);
+        vao.delete(gl);
     }
 
 }

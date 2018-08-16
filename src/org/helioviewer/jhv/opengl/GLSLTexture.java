@@ -6,23 +6,22 @@ import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.opengl.GL2;
 
-public class GLSLTexture {
-
-    private final int[] attribLens = {4, 2};
-    private final VBO[] vbos = new VBO[2];
+public class GLSLTexture extends GLSLArrays {
 
     private int count;
-    private boolean inited = false;
+
+    public GLSLTexture() {
+        super(new int[]{4, 2});
+    }
 
     public void setData(GL2 gl, FloatBuffer position, FloatBuffer coord) {
-        count = 0;
         int plen = position.limit() / attribLens[0];
         if (plen * attribLens[0] != position.limit() || plen != coord.limit() / attribLens[1]) {
             Log.error("Something is wrong with the vertices or coords from this GLSLTexture");
             return;
         }
-        vbos[0].setData4(gl, position);
-        vbos[1].setData4(gl, coord);
+        vaos[0].setData4(gl, position);
+        vaos[1].setData4(gl, coord);
         count = plen;
     }
 
@@ -34,46 +33,11 @@ public class GLSLTexture {
         GLSLTextureShader.texture.setColor(color);
         GLSLTextureShader.texture.bindParams(gl);
 
-        bindVBOs(gl);
+        bindVAOs(gl);
         gl.glDrawArrays(mode, 0, toDraw);
+        unbindVAOs(gl);
 
         GLSLShader.unbind(gl);
-    }
-
-    private void bindVBOs(GL2 gl) {
-        for (VBO vbo : vbos) {
-            vbo.bind(gl);
-        }
-    }
-
-    private void initVBOs(GL2 gl) {
-        for (int i = 0; i < attribLens.length; i++) {
-            vbos[i] = new VBO(i, attribLens[i]);
-            vbos[i].generate(gl);
-        }
-    }
-
-    private void disposeVBOs(GL2 gl) {
-        for (int i = 0; i < vbos.length; i++) {
-            if (vbos[i] != null) {
-                vbos[i].delete(gl);
-                vbos[i] = null;
-            }
-        }
-    }
-
-    public void init(GL2 gl) {
-        if (!inited) {
-            initVBOs(gl);
-            inited = true;
-        }
-    }
-
-    public void dispose(GL2 gl) {
-        if (inited) {
-            disposeVBOs(gl);
-            inited = false;
-        }
     }
 
 }
