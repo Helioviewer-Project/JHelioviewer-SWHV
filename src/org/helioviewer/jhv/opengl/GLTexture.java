@@ -24,8 +24,8 @@ public class GLTexture {
     }
 
     private int texID;
-    private int unit;
-    private int target;
+    private final int unit;
+    private final int target;
 
     private int prev_width = -1;
     private int prev_height = -1;

@@ -4,14 +4,14 @@ import java.nio.Buffer;
 
 import com.jogamp.opengl.GL2;
 
-class VBO {
+class VAO {
 
     private final int attribRef;
     private final int attribLen;
 
     private int bufferID = -1;
 
-    VBO(int _attribRef, int _attribLen) {
+    VAO(int _attribRef, int _attribLen) {
         attribRef = _attribRef;
         attribLen = _attribLen;
     }
@@ -31,6 +31,10 @@ class VBO {
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, bufferID);
         gl.glEnableVertexAttribArray(attribRef);
         gl.glVertexAttribPointer(attribRef, attribLen, GL2.GL_FLOAT, false, 0, 0);
+    }
+
+    void unbind(GL2 gl) {
+        gl.glDisableVertexAttribArray(attribRef);
     }
 
     void setData4(GL2 gl, Buffer buffer) {
