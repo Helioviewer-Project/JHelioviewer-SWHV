@@ -31,8 +31,6 @@ class GLSLTextureShader extends GLSLShader {
         colorRef = gl.glGetUniformLocation(progID, "color");
         bind(gl);
         setTextureUnit(gl, "image", GLTexture.Unit.ZERO);
-        setTextureUnit(gl, "vertexBuffer", GLTexture.Unit.FOUR);
-        setTextureUnit(gl, "coordBuffer", GLTexture.Unit.FIVE);
         unbind(gl);
     }
 

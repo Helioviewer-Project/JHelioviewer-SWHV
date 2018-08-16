@@ -6,12 +6,12 @@ import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.opengl.GL2;
 
-public class GLSLTexture extends VTAO {
+public class GLSLTexture extends VAO {
 
     private int count;
 
     public GLSLTexture() {
-        super(GL2.GL_TEXTURE0 + GLTexture.Unit.FOUR.ordinal(), new int[]{4, 2});
+        super(new int[]{4, 2});
     }
 
     public void setData(GL2 gl, FloatBuffer position, FloatBuffer coord) {
@@ -20,8 +20,8 @@ public class GLSLTexture extends VTAO {
             Log.error("Something is wrong with the attributes of this GLSLTexture");
             return;
         }
-        vtbos[0].setData4(gl, position);
-        vtbos[1].setData4(gl, coord);
+        vbos[0].setData4(gl, position);
+        vbos[1].setData4(gl, coord);
         count = plen;
     }
 
@@ -33,7 +33,7 @@ public class GLSLTexture extends VTAO {
         GLSLTextureShader.texture.setColor(color);
         GLSLTextureShader.texture.bindParams(gl);
 
-        bind(gl);
+        bindVAO(gl);
         gl.glDrawArrays(mode, 0, toDraw);
 
         GLSLShader.unbind(gl);

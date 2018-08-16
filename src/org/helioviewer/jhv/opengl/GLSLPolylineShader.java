@@ -6,7 +6,7 @@ import com.jogamp.opengl.GL2;
 
 class GLSLPolylineShader extends GLSLShader {
 
-    static final GLSLPolylineShader polyline = new GLSLPolylineShader("/glsl/polyline.vert", "/glsl/polyline.geom", "/glsl/polyline.frag");
+    static final GLSLPolylineShader polyline = new GLSLPolylineShader("/glsl/line.vert", null, "/glsl/line.frag");
 
     private int refModelViewProjectionMatrix;
     private int thicknessRef;
@@ -30,8 +30,13 @@ class GLSLPolylineShader extends GLSLShader {
     @Override
     protected void _after_init(GL2 gl) {
         refModelViewProjectionMatrix = gl.glGetUniformLocation(progID, "ModelViewProjectionMatrix");
-        thicknessRef = gl.glGetUniformLocation(progID, "Thickness");
-        viewportRef = gl.glGetUniformLocation(progID, "Viewport");
+        thicknessRef = gl.glGetUniformLocation(progID, "thickness");
+        viewportRef = gl.glGetUniformLocation(progID, "viewport");
+
+        bind(gl);
+        setTextureUnit(gl, "vertexBuffer", GLTexture.Unit.ZERO);
+        setTextureUnit(gl, "colorBuffer", GLTexture.Unit.ONE);
+        unbind(gl);
     }
 
     void bindParams(GL2 gl) {

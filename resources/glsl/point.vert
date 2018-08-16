@@ -1,10 +1,10 @@
-#version 330 core
+#version 140
 
 uniform mat4 ModelViewProjectionMatrix;
 uniform float factor;
 
-layout(location = 0) in vec4 Vertex;
-layout(location = 1) in vec4 Color;
+in vec4 Vertex;
+in vec4 Color;
 
 out vec4 frag_color;
 

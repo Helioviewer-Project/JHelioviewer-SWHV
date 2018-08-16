@@ -8,13 +8,15 @@ class VTBO {
 
     private final int bufferID;
     private final int textureID;
+    private final int target;
 
-    VTBO(GL2 gl, int target, int size) {
+    VTBO(GL2 gl, int _target, int size) {
         int[] tmpId = new int[1];
         gl.glGenBuffers(1, tmpId, 0);
         bufferID = tmpId[0];
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, bufferID);
 
+        target = _target;
         gl.glGenTextures(1, tmpId, 0);
         textureID = tmpId[0];
         gl.glActiveTexture(target);
@@ -32,6 +34,11 @@ class VTBO {
         int length = 4 * buffer.limit();
         gl.glBufferData(GL2.GL_ARRAY_BUFFER, length, null, GL2.GL_STATIC_DRAW); // https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
         gl.glBufferSubData(GL2.GL_ARRAY_BUFFER, 0, length, buffer);
+    }
+
+    void bind(GL2 gl) {
+        gl.glActiveTexture(target);
+        gl.glBindTexture(GL2.GL_TEXTURE_BUFFER, textureID);
     }
 
     private static int mapSizeToInternalFormat(int size) {
