@@ -20,8 +20,8 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.opengl.GLImage.DifferenceMode;
+import org.helioviewer.jhv.opengl.GLListener;
 import org.helioviewer.jhv.opengl.GLSLShader;
-import org.helioviewer.jhv.opengl.GLSLSolar;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.view.AbstractView;
@@ -196,7 +196,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
             shader.bindPolarRadii(gl, scale.getYstart(), scale.getYstop());
 
-            GLSLSolar.render(gl);
+            GLListener.glslSolar.render(gl);
         }
         GLSLShader.unbind(gl);
     }

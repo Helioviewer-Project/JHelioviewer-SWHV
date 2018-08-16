@@ -6,7 +6,7 @@ import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.opengl.GL2;
 
-public class GLSLShape extends GLSLArrays {
+public class GLSLShape extends VAO {
 
     private int count;
 
@@ -20,8 +20,8 @@ public class GLSLShape extends GLSLArrays {
             Log.error("Something is wrong with the attributes of this GLShape");
             return;
         }
-        vaos[0].setData4(gl, position);
-        vaos[1].setData4(gl, color);
+        vbos[0].setData4(gl, position);
+        vbos[1].setData4(gl, color);
         count = plen;
     }
 
@@ -33,7 +33,7 @@ public class GLSLShape extends GLSLArrays {
         GLSLShapeShader.point.setFactor(factor);
         GLSLShapeShader.point.bindParams(gl);
 
-        bindVAOs(gl);
+        bindVAO(gl);
         gl.glDrawArrays(GL2.GL_POINTS, 0, count);
 
         GLSLShader.unbind(gl);
@@ -46,7 +46,7 @@ public class GLSLShape extends GLSLArrays {
         GLSLShapeShader.shape.bind(gl);
         GLSLShapeShader.shape.bindParams(gl);
 
-        bindVAOs(gl);
+        bindVAO(gl);
         gl.glDrawArrays(mode, 0, count);
 
         GLSLShader.unbind(gl);
