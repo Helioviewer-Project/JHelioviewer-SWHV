@@ -107,6 +107,7 @@ public class GLSLSolarShader extends GLSLShader {
         setTextureUnit(gl, "image", GLTexture.Unit.ZERO);
         setTextureUnit(gl, "lut", GLTexture.Unit.ONE);
         setTextureUnit(gl, "diffImage", GLTexture.Unit.TWO);
+        setTextureUnit(gl, "attribBuffer", GLTexture.Unit.THREE);
         unbind(gl);
     }
 
