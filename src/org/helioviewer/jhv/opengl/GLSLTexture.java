@@ -17,7 +17,7 @@ public class GLSLTexture extends GLSLArrays {
     public void setData(GL2 gl, FloatBuffer position, FloatBuffer coord) {
         int plen = position.limit() / attribLens[0];
         if (plen * attribLens[0] != position.limit() || plen != coord.limit() / attribLens[1]) {
-            Log.error("Something is wrong with the vertices or coords from this GLSLTexture");
+            Log.error("Something is wrong with the attributes of this GLSLTexture");
             return;
         }
         vaos[0].setData4(gl, position);
@@ -35,7 +35,6 @@ public class GLSLTexture extends GLSLArrays {
 
         bindVAOs(gl);
         gl.glDrawArrays(mode, 0, toDraw);
-        unbindVAOs(gl);
 
         GLSLShader.unbind(gl);
     }

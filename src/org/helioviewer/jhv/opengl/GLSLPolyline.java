@@ -19,7 +19,7 @@ public class GLSLPolyline extends GLSLArrays {
     public void setData(GL2 gl, FloatBuffer position, FloatBuffer color) {
         int plen = position.limit() / attribLens[0];
         if (plen * attribLens[0] != position.limit() || plen != color.limit() / attribLens[1]) {
-            Log.error("Something is wrong with the vertices or colors from this GLSLPolyline");
+            Log.error("Something is wrong with the attributes of this GLSLPolyline");
             return;
         }
         vaos[0].setData4(gl, position);
@@ -38,7 +38,6 @@ public class GLSLPolyline extends GLSLArrays {
 
         bindVAOs(gl);
         gl.glDrawArrays(GL3.GL_LINE_STRIP_ADJACENCY, 0, count);
-        unbindVAOs(gl);
 
         GLSLShader.unbind(gl);
     }
