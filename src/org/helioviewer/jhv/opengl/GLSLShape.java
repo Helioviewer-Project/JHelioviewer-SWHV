@@ -8,20 +8,22 @@ import com.jogamp.opengl.GL2;
 
 public class GLSLShape extends VAO {
 
+    private final int attribLens0 = 4;
+    private final int attribLens1 = 4;
     private int count;
 
     public GLSLShape() {
-        super(new int[]{4, 4});
+        super(2, new VAA[]{new VAA(0, 4, 0, 0), new VAA(1, 4, 0, 0)});
     }
 
     public void setData(GL2 gl, FloatBuffer position, FloatBuffer color) {
-        int plen = position.limit() / attribLens[0];
-        if (plen * attribLens[0] != position.limit() || plen != color.limit() / attribLens[1]) {
+        int plen = position.limit() / attribLens0;
+        if (plen * attribLens0 != position.limit() || plen != color.limit() / attribLens1) {
             Log.error("Something is wrong with the attributes of this GLShape");
             return;
         }
-        vbos[0].setData4(gl, position);
-        vbos[1].setData4(gl, color);
+        vbo[0].setData4(gl, position);
+        vbo[1].setData4(gl, color);
         count = plen;
     }
 
@@ -33,7 +35,7 @@ public class GLSLShape extends VAO {
         GLSLShapeShader.point.setFactor(factor);
         GLSLShapeShader.point.bindParams(gl);
 
-        bindVAO(gl);
+        bind(gl);
         gl.glDrawArrays(GL2.GL_POINTS, 0, count);
 
         GLSLShader.unbind(gl);
@@ -46,7 +48,7 @@ public class GLSLShape extends VAO {
         GLSLShapeShader.shape.bind(gl);
         GLSLShapeShader.shape.bindParams(gl);
 
-        bindVAO(gl);
+        bind(gl);
         gl.glDrawArrays(mode, 0, count);
 
         GLSLShader.unbind(gl);

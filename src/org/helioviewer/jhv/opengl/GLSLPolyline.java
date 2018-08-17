@@ -10,21 +10,23 @@ import com.jogamp.opengl.GL3;
 
 public class GLSLPolyline extends VAO {
 
+    private final int attribLens0 = 4;
+    private final int attribLens1 = 4;
     private int count;
 
     public GLSLPolyline() {
-        super(new int[]{4, 4});
+        super(2, new VAA[]{new VAA(0, 4, 0, 1), new VAA(1, 4, 0, 1), new VAA(2, 4, 16, 1), new VAA(3, 4, 16, 1)});
     }
 
     public void setData(GL2 gl, FloatBuffer position, FloatBuffer color) {
-        int plen = position.limit() / attribLens[0];
-        if (plen * attribLens[0] != position.limit() || plen != color.limit() / attribLens[1]) {
+        int plen = position.limit() / attribLens0;
+        if (plen * attribLens0 != position.limit() || plen != color.limit() / attribLens1) {
             Log.error("Something is wrong with the attributes of this GLSLPolyline");
             return;
         }
-        vbos[0].setData4(gl, position);
-        vbos[1].setData4(gl, color);
-        count = plen;
+        vbo[0].setData4(gl, position);
+        vbo[1].setData4(gl, color);
+        count = plen - 1;
     }
 
     public void render(GL2 gl, Viewport vp, double thickness) {
@@ -36,8 +38,8 @@ public class GLSLPolyline extends VAO {
         GLSLPolylineShader.polyline.setViewport(vp.aspect);
         GLSLPolylineShader.polyline.bindParams(gl);
 
-        bindVAO(gl);
-        gl.glDrawArrays(GL3.GL_LINE_STRIP_ADJACENCY, 0, count);
+        bind(gl);
+        gl.glDrawArraysInstanced(GL2.GL_TRIANGLE_STRIP, 0, 4, count);
 
         GLSLShader.unbind(gl);
     }
