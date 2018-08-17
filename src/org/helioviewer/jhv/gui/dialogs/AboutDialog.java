@@ -18,6 +18,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.io.FileUtils;
+import org.helioviewer.jhv.opengl.GLInfo;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
@@ -38,21 +39,21 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
     @Override
     public JComponent createContentPanel() {
         String text = "<center>This software was built using several components including:</center><ul>" +
-            "<li><a href=\"http://www.kakadusoftware.com\">Kakadu</a> JPEG2000 Toolkit, ©2015, <a href=Kakadu.txt>licensed</a> from NewSouth Innovations Ltd.</li>" +
-            "<li><a href=\"https://jogamp.org\">JogAmp</a> libraries for Java 3D Graphics.</li>" +
-            "<li><a href=\"https://github.com/stleary/JSON-java\">JSON</a> in Java library.</li>" +
-            "<li>JSON <a href=\"https://github.com/everit-org/json-schema\">Schema Validator</a> library.</li>" +
-            "<li><a href=\"http://www.ehcache.org\">Ehcache</a> library.</li>" +
-            "<li><a href=\"https://github.com/xerial/sqlite-jdbc\">Xerial</a> SQLite JDBC driver.</li>" +
-            "<li><a href=\"http://jcodec.org\">JCodec</a>, a pure Java video codec library.</li>" +
-            "<li><a href=\"http://www.star.bristol.ac.uk/%7Embt/jsamp/index.html\">JSAMP</a> toolkit for the Simple Applications Messaging Protocol.</li>" +
-            "<li><a href=\"http://www.ocpsoft.org/prettytime/nlp\">PrettyTime NLP</a>, a human time parsing library.</li>" +
-            "<li><a href=\"https://github.com/jidesoft/jide-oss\">JIDE Common Layer</a>, ©2002-2017, JIDE Software, Inc.</li>" +
-            "<li><a href=\"https://github.com/google/guava\">Guava</a>, Google Core Libraries for Java.</li>" +
-            "<li><a href=\"https://github.com/square/okio\">Okio</a> and <a href=\"https://github.com/square/okhttp\">OkHttp</a> libraries by Square, Inc.</li>" +
-            "<li><a href=\"http://nom-tam-fits.github.io/nom-tam-fits\">FITS</a> in Java public domain library.</li>" +
-            "<li><a href=\"http://logging.apache.org/log4j/index.html\">log4j</a> logging library.</li>" +
-            "<li><a href=\"https://github.com/haraldk/TwelveMonkeys/blob/master/sandbox/sandbox-common/src/main/java/com/twelvemonkeys/image/MappedImageFactory.java\">MappedImageFactory</a>, ©2010, Harald Kuhr.</li>";
+                "<li><a href=\"http://www.kakadusoftware.com\">Kakadu</a> JPEG2000 Toolkit, ©2015, <a href=Kakadu.txt>licensed</a> from NewSouth Innovations Ltd.</li>" +
+                "<li><a href=\"https://jogamp.org\">JogAmp</a> libraries for Java 3D Graphics.</li>" +
+                "<li><a href=\"https://github.com/stleary/JSON-java\">JSON</a> in Java library.</li>" +
+                "<li>JSON <a href=\"https://github.com/everit-org/json-schema\">Schema Validator</a> library.</li>" +
+                "<li><a href=\"http://www.ehcache.org\">Ehcache</a> library.</li>" +
+                "<li><a href=\"https://github.com/xerial/sqlite-jdbc\">Xerial</a> SQLite JDBC driver.</li>" +
+                "<li><a href=\"http://jcodec.org\">JCodec</a>, a pure Java video codec library.</li>" +
+                "<li><a href=\"http://www.star.bristol.ac.uk/%7Embt/jsamp/index.html\">JSAMP</a> toolkit for the Simple Applications Messaging Protocol.</li>" +
+                "<li><a href=\"http://www.ocpsoft.org/prettytime/nlp\">PrettyTime NLP</a>, a human time parsing library.</li>" +
+                "<li><a href=\"https://github.com/jidesoft/jide-oss\">JIDE Common Layer</a>, ©2002-2017, JIDE Software, Inc.</li>" +
+                "<li><a href=\"https://github.com/google/guava\">Guava</a>, Google Core Libraries for Java.</li>" +
+                "<li><a href=\"https://github.com/square/okio\">Okio</a> and <a href=\"https://github.com/square/okhttp\">OkHttp</a> libraries by Square, Inc.</li>" +
+                "<li><a href=\"http://nom-tam-fits.github.io/nom-tam-fits\">FITS</a> in Java public domain library.</li>" +
+                "<li><a href=\"http://logging.apache.org/log4j/index.html\">log4j</a> logging library.</li>" +
+                "<li><a href=\"https://github.com/haraldk/TwelveMonkeys/blob/master/sandbox/sandbox-common/src/main/java/com/twelvemonkeys/image/MappedImageFactory.java\">MappedImageFactory</a>, ©2010, Harald Kuhr.</li>";
 
         JTextPane pane = new JTextPane();
         pane.setContentType("text/html");
@@ -67,6 +68,7 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
     @Override
     public JComponent createBannerPanel() {
         String text = "<center><b><big>" + JHVGlobals.programName + "</big><br/>Version " + JHVGlobals.version + '.' + JHVGlobals.revision + "</b><br/>" +
+                "<small>" + JHVGlobals.versionDetail + "<br/>" + GLInfo.glVersion + "</small><br/><br/>" +
                 "©2018 <a href='http://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br/>" +
                 "Part of the ESA/NASA Helioviewer Project<br/>" +
                 "Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)<br/><br/>" +

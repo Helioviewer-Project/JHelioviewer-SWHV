@@ -12,38 +12,32 @@ import com.jogamp.opengl.glu.GLU;
 public class GLInfo {
 
     public static final int GLSAMPLES = 4;
-    private static final String[] crashOptions = { "OK", "Crash" };
+    private static final String[] crashOptions = {"OK", "Crash"};
 
-    public static final int[] pixelScale = { 1, 1 };
-    public static final float[] pixelScaleFloat = { 1, 1 };
+    public static final int[] pixelScale = {1, 1};
+    public static final float[] pixelScaleFloat = {1, 1};
+    public static String glVersion = "";
 
     static int maxTextureSize;
 
-    private static boolean first = true;
-
     public static void update(GL2 gl) {
-        if (first) {
-            first = false;
+        glVersion = "OpenGL " + gl.glGetString(GL2.GL_VERSION);
+        Log.info("GLInfo > " + glVersion);
+        // Log.debug("GLInfo > Extensions: " + gl.glGetString(GL2.GL_EXTENSIONS));
 
-            Log.info("GLInfo > Version string: " + gl.glGetString(GL2.GL_VERSION));
-            // Log.debug("GLInfo > Extensions: " + gl.glGetString(GL2.GL_EXTENSIONS));
+        if (!gl.isExtensionAvailable("GL_VERSION_3_3")) {
+            String err = "OpenGL 3.3 not supported. JHelioviewer is not able to run.";
+            Log.error("GLInfo > " + err);
 
-            if (!gl.isExtensionAvailable("GL_VERSION_3_3")) {
-                String err = "OpenGL 3.3 not supported. JHelioviewer is not able to run.";
-                Log.error("GLInfo > " + err);
+            if (1 == JOptionPane.showOptionDialog(null, err, "Fatal Error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, crashOptions, crashOptions[0]))
+                throw new GLException(err);
+            else
+                System.exit(-1);
+        }
 
-                if (1 == JOptionPane.showOptionDialog(null, err, "Fatal Error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, crashOptions, crashOptions[0]))
-                    throw new GLException(err);
-                else
-                    System.exit(-1);
-            }
-
-            int[] out = { 0 };
-            gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_SIZE, out, 0);
-            maxTextureSize = out[0];
-            // Log.debug("GLInfo > max texture size: " + out[0]);
-        } else
-            Log.debug("GLInfo.update()");
+        int[] out = {0};
+        gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_SIZE, out, 0);
+        maxTextureSize = out[0];
     }
 
     public static void updatePixelScale(ScalableSurface surface) {
