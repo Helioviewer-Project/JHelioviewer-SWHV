@@ -14,18 +14,18 @@ public class GLSLSolar extends VAO {
     });
 
     GLSLSolar() {
-        super(new int[]{4});
+        super(1, new VAA[]{new VAA(0, 4, 0, 0)});
     }
 
     public void render(GL2 gl) {
-        bindVAO(gl);
+        bind(gl);
         gl.glDrawArrays(GL2.GL_TRIANGLE_STRIP, 0, 4);
     }
 
     @Override
     public void init(GL2 gl) {
         super.init(gl);
-        vbos[0].setData4(gl, vertexBuffer);
+        vbo[0].setData4(gl, vertexBuffer);
     }
 
 }
