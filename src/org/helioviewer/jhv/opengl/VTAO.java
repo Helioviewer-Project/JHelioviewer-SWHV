@@ -28,8 +28,6 @@ class VTAO {
             gl.glBindVertexArray(vaoID);
             for (int i = 0; i < attribLens.length; i++) {
                 vtbos[i] = new VTBO(gl, unitOffset + i, attribLens[i]);
-                gl.glEnableVertexAttribArray(i);
-                gl.glVertexAttribPointer(i, attribLens[i], GL2.GL_FLOAT, false, 0, 0);
             }
         }
     }
