@@ -6,7 +6,7 @@ import com.jogamp.opengl.GL2;
 
 class GLSLPolylineShader extends GLSLShader {
 
-    static final GLSLPolylineShader polyline = new GLSLPolylineShader("/glsl/line.vert", null, "/glsl/line.frag");
+    static final GLSLPolylineShader polyline = new GLSLPolylineShader("/glsl/line.vert", "/glsl/line.frag");
 
     private int refModelViewProjectionMatrix;
     private int thicknessRef;
@@ -15,8 +15,8 @@ class GLSLPolylineShader extends GLSLShader {
     private final float[] thickness = {5};
     private final float[] viewport = {1, 1, 1, 1};
 
-    private GLSLPolylineShader(String vertex, String geometry, String fragment) {
-        super(vertex, geometry, fragment);
+    private GLSLPolylineShader(String vertex, String fragment) {
+        super(vertex, fragment);
     }
 
     public static void init(GL2 gl) {
