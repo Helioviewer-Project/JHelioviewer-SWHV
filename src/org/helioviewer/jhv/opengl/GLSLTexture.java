@@ -8,17 +8,17 @@ import com.jogamp.opengl.GL2;
 
 public class GLSLTexture extends VAO {
 
-    private final int attribLens0 = 4;
-    private final int attribLens1 = 2;
+    private static final int elems0 = 4;
+    private static final int elems1 = 2;
     private int count;
 
     public GLSLTexture() {
-        super(2, new VAA[]{new VAA(0, 4, 0, 0), new VAA(1, 2, 0, 0)});
+        super(2, new VAA[]{new VAA(0, elems0, 0, 0), new VAA(1, elems1, 0, 0)});
     }
 
     public void setData(GL2 gl, FloatBuffer position, FloatBuffer coord) {
-        int plen = position.limit() / attribLens0;
-        if (plen * attribLens0 != position.limit() || plen != coord.limit() / attribLens1) {
+        int plen = position.limit() / elems0;
+        if (plen * elems0 != position.limit() || plen != coord.limit() / elems1) {
             Log.error("Something is wrong with the attributes of this GLSLTexture");
             return;
         }

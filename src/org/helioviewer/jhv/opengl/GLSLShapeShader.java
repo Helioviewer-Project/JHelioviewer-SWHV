@@ -6,16 +6,16 @@ import com.jogamp.opengl.GL2;
 
 class GLSLShapeShader extends GLSLShader {
 
-    static final GLSLShapeShader point = new GLSLShapeShader("/glsl/point.vert", null, "/glsl/point.frag");
-    static final GLSLShapeShader shape = new GLSLShapeShader("/glsl/shape.vert", null, "/glsl/shape.frag");
+    static final GLSLShapeShader point = new GLSLShapeShader("/glsl/point.vert", "/glsl/point.frag");
+    static final GLSLShapeShader shape = new GLSLShapeShader("/glsl/shape.vert", "/glsl/shape.frag");
 
     private int refModelViewProjectionMatrix;
     private int factorRef;
 
     private final float[] factor = {1};
 
-    private GLSLShapeShader(String vertex, String geometry, String fragment) {
-        super(vertex, geometry, fragment);
+    private GLSLShapeShader(String vertex, String fragment) {
+        super(vertex, fragment);
     }
 
     public static void init(GL2 gl) {
