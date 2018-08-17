@@ -2,12 +2,11 @@
 
 precision mediump float;
 
+in vec2 fragCoord;
 out vec4 FragColor;
 
 uniform vec4 color;
 uniform sampler2D image;
-
-in vec2 frag_coord;
 
 /*
 // from http://www.java-gaming.org/index.php?topic=35123.0
@@ -51,6 +50,6 @@ vec4 textureBicubic(sampler2D sampler, vec2 texCoords){
 */
 
 void main(void) {
-//    FragColor = color * textureBicubic(image, frag_coord);
-    FragColor = color * texture(image, frag_coord);
+//    FragColor = color * textureBicubic(image, fragCoord);
+    FragColor = color * texture(image, fragCoord);
 }

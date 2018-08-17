@@ -1,6 +1,6 @@
 #version 140
 
-out vec4 frag_color;
+out vec4 fragColor;
 
 uniform float thickness;
 uniform vec2 viewport;
@@ -26,5 +26,5 @@ void main(void) {
     pos[3] = pos[1] + v0;
 
     gl_Position = vec4(pos[gl_VertexID & 0x3], current.z, 1);
-    frag_color = texelFetch(colorBuffer, gl_InstanceID);
+    fragColor = texelFetch(colorBuffer, gl_InstanceID);
 }

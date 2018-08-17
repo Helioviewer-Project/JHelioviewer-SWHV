@@ -3,13 +3,14 @@
 uniform mat4 ModelViewProjectionMatrix;
 uniform float factor;
 
-in vec4 Vertex;
-in vec4 Color;
+uniform samplerBuffer vertexBuffer;
+uniform samplerBuffer colorBuffer;
 
-out vec4 frag_color;
+out vec4 fragColor;
 
 void main(void) {
-    gl_Position = ModelViewProjectionMatrix * vec4(Vertex.xyz, 1.);
-    gl_PointSize = Vertex.w * factor;
-    frag_color = Color;
+    vec4 texel = texelFetch(vertexBuffer, gl_VertexID);
+    gl_Position = ModelViewProjectionMatrix * vec4(texel.xyz, 1.);
+    gl_PointSize = texel.w * factor;
+    fragColor = texelFetch(colorBuffer, gl_VertexID);
 }

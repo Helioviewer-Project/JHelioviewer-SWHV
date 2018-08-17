@@ -32,6 +32,14 @@ class GLSLShapeShader extends GLSLShader {
     protected void _after_init(GL2 gl) {
         refModelViewProjectionMatrix = gl.glGetUniformLocation(progID, "ModelViewProjectionMatrix");
         factorRef = gl.glGetUniformLocation(progID, "factor");
+
+        point.bind(gl);
+        setTextureUnit(gl, "vertexBuffer", GLTexture.Unit.ZERO);
+        setTextureUnit(gl, "colorBuffer", GLTexture.Unit.ONE);
+        shape.bind(gl);
+        setTextureUnit(gl, "vertexBuffer", GLTexture.Unit.ZERO);
+        setTextureUnit(gl, "colorBuffer", GLTexture.Unit.ONE);
+        unbind(gl);
     }
 
     void bindParams(GL2 gl) {

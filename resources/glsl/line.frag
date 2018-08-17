@@ -1,10 +1,10 @@
 #version 140
 
-in vec4 frag_color;
+in vec4 fragColor;
 out vec4 FragColor;
 
 void main(void) {
-    if (frag_color.a == 0.)
+    if (fragColor.a == 0.)
         discard;
-     FragColor = frag_color;
+     FragColor = fragColor;
 }

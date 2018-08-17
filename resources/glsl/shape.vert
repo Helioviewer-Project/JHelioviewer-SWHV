@@ -2,12 +2,12 @@
 
 uniform mat4 ModelViewProjectionMatrix;
 
-in vec4 Vertex;
-in vec4 Color;
+uniform samplerBuffer vertexBuffer;
+uniform samplerBuffer colorBuffer;
 
-out vec4 frag_color;
+out vec4 fragColor;
 
 void main(void) {
-    gl_Position = ModelViewProjectionMatrix * Vertex;
-    frag_color = Color;
+    gl_Position = ModelViewProjectionMatrix * texelFetch(vertexBuffer, gl_VertexID);
+    fragColor = texelFetch(colorBuffer, gl_VertexID);
 }
