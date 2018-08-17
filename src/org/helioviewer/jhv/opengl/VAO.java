@@ -4,15 +4,15 @@ import com.jogamp.opengl.GL2;
 
 class VAO {
 
-    protected final int[] attribLens;
-    protected final VBO[] vbos;
+    protected final VBO[] vbo;
+    private final VAA[] vaa;
 
     private int vaoID = -1;
     private boolean inited = false;
 
-    VAO(int[] lens) {
-        attribLens = lens;
-        vbos = new VBO[lens.length];
+    VAO(int nvbo, VAA[] _vaa) {
+        vbo = new VBO[nvbo];
+        vaa = _vaa;
     }
 
     public void init(GL2 gl) {
@@ -23,12 +23,14 @@ class VAO {
             gl.glGenVertexArrays(1, tmpId, 0);
             vaoID = tmpId[0];
 
+            for (int i = 0; i < vbo.length; i++) {
+                vbo[i] = new VBO(gl);
+            }
+
             gl.glBindVertexArray(vaoID);
-            for (int i = 0; i < attribLens.length; i++) {
-                vbos[i] = new VBO(gl);
-                vbos[i].bind(gl);
-                gl.glEnableVertexAttribArray(i);
-                gl.glVertexAttribPointer(i, attribLens[i], GL2.GL_FLOAT, false, 0, 0);
+            for (int i = 0; i < vaa.length; i++) {
+                vbo[i % vbo.length].bind(gl);
+                vaa[i].enable(gl);
             }
         }
     }
@@ -40,14 +42,14 @@ class VAO {
             gl.glDeleteVertexArrays(1, new int[]{vaoID}, 0);
             vaoID = -1;
 
-            for (int i = 0; i < vbos.length; i++) {
-                vbos[i].delete(gl);
-                vbos[i] = null;
+            for (int i = 0; i < vbo.length; i++) {
+                vbo[i].delete(gl);
+                vbo[i] = null;
             }
         }
     }
 
-    protected void bindVAO(GL2 gl) {
+    protected void bind(GL2 gl) {
         gl.glBindVertexArray(vaoID);
     }
 

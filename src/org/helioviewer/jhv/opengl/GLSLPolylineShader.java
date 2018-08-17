@@ -6,14 +6,14 @@ import com.jogamp.opengl.GL2;
 
 class GLSLPolylineShader extends GLSLShader {
 
-    static final GLSLPolylineShader polyline = new GLSLPolylineShader("/glsl/polyline.vert", "/glsl/polyline.geom", "/glsl/polyline.frag");
+    static final GLSLPolylineShader polyline = new GLSLPolylineShader("/glsl/line.vert", null, "/glsl/line.frag");
 
     private int refModelViewProjectionMatrix;
     private int thicknessRef;
     private int viewportRef;
 
     private final float[] thickness = {5};
-    private final float[] viewport = {1, 1};
+    private final float[] viewport = {1, 1, 1, 1};
 
     private GLSLPolylineShader(String vertex, String geometry, String fragment) {
         super(vertex, geometry, fragment);
@@ -30,13 +30,13 @@ class GLSLPolylineShader extends GLSLShader {
     @Override
     protected void _after_init(GL2 gl) {
         refModelViewProjectionMatrix = gl.glGetUniformLocation(progID, "ModelViewProjectionMatrix");
-        thicknessRef = gl.glGetUniformLocation(progID, "Thickness");
-        viewportRef = gl.glGetUniformLocation(progID, "Viewport");
+        thicknessRef = gl.glGetUniformLocation(progID, "thickness");
+        viewportRef = gl.glGetUniformLocation(progID, "viewport");
     }
 
     void bindParams(GL2 gl) {
         gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, Transform.get());
-        gl.glUniform2fv(viewportRef, 1, viewport, 0);
+        gl.glUniform4fv(viewportRef, 1, viewport, 0);
         gl.glUniform1fv(thicknessRef, 1, thickness, 0);
     }
 
