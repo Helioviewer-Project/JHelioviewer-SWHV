@@ -3,28 +3,46 @@
 out vec4 fragColor;
 
 uniform float thickness;
-uniform vec2 viewport;
+uniform vec4 viewport;
 
 uniform mat4 ModelViewProjectionMatrix;
 
 uniform samplerBuffer vertexBuffer;
 uniform samplerBuffer colorBuffer;
 
+// https://forums.developer.apple.com/thread/86098
 void main(void) {
-    vec4 current = ModelViewProjectionMatrix * texelFetch(vertexBuffer, gl_InstanceID);
-    vec4 next = ModelViewProjectionMatrix * texelFetch(vertexBuffer, gl_InstanceID + 1);
+    vec4 cpos = ModelViewProjectionMatrix * texelFetch(vertexBuffer, gl_InstanceID);
+    vec4 npos = ModelViewProjectionMatrix * texelFetch(vertexBuffer, gl_InstanceID + 1);
 
-    vec4 v = next - current;
-    vec2 p0 = current.xy;
-    vec2 v0 = v.xy;
-    vec2 v1 = thickness * normalize(v0) * mat2(0, -1, 1, 0);
+    vec4 ccol = texelFetch(colorBuffer, gl_InstanceID);
+    vec4 ncol = texelFetch(colorBuffer, gl_InstanceID + 1);
 
-    vec2 pos[4];
-    pos[0] = p0 + v1;
-    pos[1] = p0 - v1;
-    pos[2] = pos[0] + v0;
-    pos[3] = pos[1] + v0;
+    if (cpos == npos) {
+        gl_Position = cpos;
+        fragColor = ccol;
+        return;
+    }
 
-    gl_Position = vec4(pos[gl_VertexID & 0x3], current.z, 1);
-    fragColor = texelFetch(colorBuffer, gl_InstanceID);
+    cpos *= viewport;
+    npos *= viewport;
+
+    vec4 v0 = thickness * normalize(npos - cpos);
+    vec4 v1 = vec4(-v0.y, v0.x, 0, 0);
+
+    vec4 pos[4];
+    pos[0] = cpos + v1;
+    pos[1] = cpos - v1;
+    pos[2] = npos + v1;
+    pos[3] = npos - v1;
+
+    vec4 col[4];
+    col[0] = ccol;
+    col[1] = ccol;
+    col[2] = ncol;
+    col[3] = ncol;
+
+    int idx = gl_VertexID & 0x3;
+    gl_Position = pos[idx] / viewport;
+    fragColor = col[idx];
 }

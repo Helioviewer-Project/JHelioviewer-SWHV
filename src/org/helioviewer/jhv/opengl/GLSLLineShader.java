@@ -13,7 +13,7 @@ class GLSLLineShader extends GLSLShader {
     private int viewportRef;
 
     private final float[] thickness = {5};
-    private final float[] viewport = {1, 1};
+    private final float[] viewport = {1, 1, 1, 1};
 
     private GLSLLineShader(String vertex, String fragment) {
         super(vertex, fragment);
@@ -41,7 +41,7 @@ class GLSLLineShader extends GLSLShader {
 
     void bindParams(GL2 gl) {
         gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, Transform.get());
-        gl.glUniform2fv(viewportRef, 1, viewport, 0);
+        gl.glUniform4fv(viewportRef, 1, viewport, 0);
         gl.glUniform1fv(thicknessRef, 1, thickness, 0);
     }
 
