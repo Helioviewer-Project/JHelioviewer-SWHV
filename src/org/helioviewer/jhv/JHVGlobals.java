@@ -34,6 +34,7 @@ public class JHVGlobals {
     public static String version = "2.-1.-1";
     public static String revision = "-1";
     public static String userAgent = "JHV/SWHV-";
+    public static String versionDetail = "";
 
     public static final AlphanumComparator alphanumComparator = new AlphanumComparator(true);
 
@@ -87,12 +88,13 @@ public class JHVGlobals {
                 version = mainAttributes.getValue("version");
                 revision = mainAttributes.getValue("revision");
                 userAgent += version + '.' + revision + " (" +
-                         System.getProperty("os.arch") + ' ' + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ") " +
-                         System.getProperty("java.vendor") + " JRE " + System.getProperty("java.version");
+                        System.getProperty("os.arch") + ' ' + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ") " +
+                        System.getProperty("java.vendor") + " JRE " + System.getProperty("java.version");
+                versionDetail = String.format("%s %.1fGB %dCPU", userAgent, Runtime.getRuntime().maxMemory() / (1024 * 1024 * 1024.), Runtime.getRuntime().availableProcessors());
 
                 System.setProperty("jhv.version", version);
                 System.setProperty("jhv.revision", revision);
-                Log.info(String.format("Running %s on %.1fGB %dCPU", userAgent, Runtime.getRuntime().maxMemory() / (1024 * 1024 * 1024.), Runtime.getRuntime().availableProcessors()));
+                Log.info(versionDetail);
             } catch (IOException e) {
                 Log.error("JHVGlobals.determineVersionAndRevision > Error while reading version and revision from manifest in jar file: " + jarPath, e);
             }
@@ -138,7 +140,7 @@ public class JHVGlobals {
 
     public static final HyperOpenURL hyperOpenURL = new HyperOpenURL();
 
-    private static class HyperOpenURL implements HyperlinkListener  {
+    private static class HyperOpenURL implements HyperlinkListener {
 
         @Override
         public void hyperlinkUpdate(HyperlinkEvent e) {
@@ -167,10 +169,10 @@ public class JHVGlobals {
                 File jarParent = new File(JHVGlobals.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getCanonicalFile().getParentFile();
                 if (jarParent != null) {
                     String[] cmd = {
-                        jarParent.getParent() + "/Helpers/terminal-notifier.app/Contents/MacOS/terminal-notifier",
-                        "-message", '"' + msg + '"',
-                        "-execute", "open " + '"' + openURL + '"',
-                        "-title", "JHelioviewer"
+                            jarParent.getParent() + "/Helpers/terminal-notifier.app/Contents/MacOS/terminal-notifier",
+                            "-message", '"' + msg + '"',
+                            "-execute", "open " + '"' + openURL + '"',
+                            "-title", "JHelioviewer"
                     };
                     Log.info("JHVGlobals.displayNotification " + Arrays.toString(cmd));
                     Runtime.getRuntime().exec(cmd);
