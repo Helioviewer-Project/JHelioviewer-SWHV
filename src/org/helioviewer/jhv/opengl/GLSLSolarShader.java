@@ -124,10 +124,10 @@ public class GLSLSolarShader extends GLSLShader {
         bind(gl);
         gl.glUniform1fv(blurKernelRef, blurKernel.length, blurKernel, 0);
         gl.glUniform1fv(offsetRef, offsets.length, offsets, 0);
-        setTextureUnit(gl, "vertexBuffer", GLTexture.Unit.ZERO);
-        setTextureUnit(gl, "image", GLTexture.Unit.ONE);
-        setTextureUnit(gl, "lut", GLTexture.Unit.TWO);
-        setTextureUnit(gl, "diffImage", GLTexture.Unit.THREE);
+        setTextureUnit(gl, "image", GLTexture.Unit.ZERO);
+        setTextureUnit(gl, "lut", GLTexture.Unit.ONE);
+        setTextureUnit(gl, "diffImage", GLTexture.Unit.TWO);
+        setTextureUnit(gl, "vertexBuffer", GLTexture.Unit.THREE);
         unbind(gl);
     }
 

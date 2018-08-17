@@ -34,11 +34,11 @@ class GLSLShapeShader extends GLSLShader {
         factorRef = gl.glGetUniformLocation(progID, "factor");
 
         point.bind(gl);
-        setTextureUnit(gl, "vertexBuffer", GLTexture.Unit.ZERO);
-        setTextureUnit(gl, "colorBuffer", GLTexture.Unit.ONE);
+        setTextureUnit(gl, "vertexBuffer", GLTexture.Unit.THREE);
+        setTextureUnit(gl, "colorBuffer", GLTexture.Unit.FOUR);
         shape.bind(gl);
-        setTextureUnit(gl, "vertexBuffer", GLTexture.Unit.ZERO);
-        setTextureUnit(gl, "colorBuffer", GLTexture.Unit.ONE);
+        setTextureUnit(gl, "vertexBuffer", GLTexture.Unit.THREE);
+        setTextureUnit(gl, "colorBuffer", GLTexture.Unit.FOUR);
         unbind(gl);
     }
 

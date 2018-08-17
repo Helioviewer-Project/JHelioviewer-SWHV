@@ -34,8 +34,8 @@ class GLSLLineShader extends GLSLShader {
         viewportRef = gl.glGetUniformLocation(progID, "viewport");
 
         bind(gl);
-        setTextureUnit(gl, "vertexBuffer", GLTexture.Unit.ZERO);
-        setTextureUnit(gl, "colorBuffer", GLTexture.Unit.ONE);
+        setTextureUnit(gl, "vertexBuffer", GLTexture.Unit.THREE);
+        setTextureUnit(gl, "colorBuffer", GLTexture.Unit.FOUR);
         unbind(gl);
     }
 

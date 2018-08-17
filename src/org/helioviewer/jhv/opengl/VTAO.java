@@ -4,6 +4,8 @@ import com.jogamp.opengl.GL2;
 
 class VTAO {
 
+    private static final int unitOffset = GL2.GL_TEXTURE0 + GLTexture.Unit.THREE.ordinal();
+
     protected final int[] attribLens;
     protected final VTBO[] vtbos;
 
@@ -25,7 +27,7 @@ class VTAO {
 
             gl.glBindVertexArray(vaoID);
             for (int i = 0; i < attribLens.length; i++) {
-                vtbos[i] = new VTBO(gl, GL2.GL_TEXTURE0 + i, attribLens[i]);
+                vtbos[i] = new VTBO(gl, unitOffset + i, attribLens[i]);
                 gl.glEnableVertexAttribArray(i);
                 gl.glVertexAttribPointer(i, attribLens[i], GL2.GL_FLOAT, false, 0, 0);
             }
