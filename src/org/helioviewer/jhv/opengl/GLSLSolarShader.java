@@ -22,10 +22,10 @@ public class GLSLSolarShader extends GLSLShader {
         };
     }
 
-    public static final GLSLSolarShader ortho = new GLSLSolarShader("/glsl/solar.vert", null, "/glsl/solarOrtho.frag");
-    public static final GLSLSolarShader lati = new GLSLSolarShader("/glsl/solar.vert", null, "/glsl/solarLati.frag");
-    public static final GLSLSolarShader polar = new GLSLSolarShader("/glsl/solar.vert", null, "/glsl/solarPolar.frag");
-    public static final GLSLSolarShader logpolar = new GLSLSolarShader("/glsl/solar.vert", null, "/glsl/solarLogPolar.frag");
+    public static final GLSLSolarShader ortho = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarOrtho.frag");
+    public static final GLSLSolarShader lati = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarLati.frag");
+    public static final GLSLSolarShader polar = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarPolar.frag");
+    public static final GLSLSolarShader logpolar = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarLogPolar.frag");
 
     private int isDiffRef;
 
@@ -77,8 +77,8 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] viewport = new float[3];
     private final float[] viewportOffset = new float[2];
 
-    private GLSLSolarShader(String vertex, String geometry, String fragment) {
-        super(vertex, geometry, fragment);
+    private GLSLSolarShader(String vertex, String fragment) {
+        super(vertex, fragment);
     }
 
     public static void init(GL2 gl) {

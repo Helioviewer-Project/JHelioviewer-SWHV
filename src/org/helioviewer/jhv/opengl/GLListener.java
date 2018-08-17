@@ -58,9 +58,9 @@ public class GLListener implements GLEventListener {
         gl.glEnable(GL2.GL_POINT_SPRITE);
 
         glslSolar.init(gl);
-        GLSLSolarShader.init(gl);
-        GLSLPolylineShader.init(gl);
+        GLSLLineShader.init(gl);
         GLSLShapeShader.init(gl);
+        GLSLSolarShader.init(gl);
         GLSLTextureShader.init(gl);
 
         blackCircle.init(gl);
@@ -82,9 +82,9 @@ public class GLListener implements GLEventListener {
         GLText.dispose(gl);
 
         glslSolar.dispose(gl);
-        GLSLSolarShader.dispose(gl);
-        GLSLPolylineShader.dispose(gl);
+        GLSLLineShader.dispose(gl);
         GLSLShapeShader.dispose(gl);
+        GLSLSolarShader.dispose(gl);
         GLSLTextureShader.dispose(gl);
     }
 

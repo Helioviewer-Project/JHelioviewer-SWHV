@@ -6,13 +6,12 @@ import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLException;
 
 public class GLSLShader {
 
     private enum ShaderType {
-        vertex(GL2.GL_VERTEX_SHADER), fragment(GL2.GL_FRAGMENT_SHADER), geometry(GL3.GL_GEOMETRY_SHADER);
+        vertex(GL2.GL_VERTEX_SHADER), fragment(GL2.GL_FRAGMENT_SHADER);
 
         final int glType;
 
@@ -22,17 +21,14 @@ public class GLSLShader {
     }
 
     private int vertexID;
-    private int geometryID = -1;
     private int fragmentID;
     protected int progID;
 
     private final String vertex;
-    private final String geometry;
     private final String fragment;
 
-    GLSLShader(String _vertex, String _geometry, String _fragment) {
+    GLSLShader(String _vertex, String _fragment) {
         vertex = _vertex;
-        geometry = _geometry;
         fragment = _fragment;
     }
 
@@ -40,11 +36,6 @@ public class GLSLShader {
         try {
             String vertexText = FileUtils.streamToString(FileUtils.getResource(vertex));
             vertexID = attachShader(gl, ShaderType.vertex, vertexText);
-
-            if (geometry != null) {
-                String geometryText = FileUtils.streamToString(FileUtils.getResource(geometry));
-                geometryID = attachShader(gl, ShaderType.geometry, geometryText);
-            }
 
             String fragmentCommonText = common ? FileUtils.streamToString(FileUtils.getResource("/glsl/solarCommon.frag")) : "";
             String fragmentText = fragmentCommonText + FileUtils.streamToString(FileUtils.getResource(fragment));
@@ -62,8 +53,6 @@ public class GLSLShader {
 
     protected void _dispose(GL2 gl) {
         gl.glDeleteShader(vertexID);
-        if (geometryID != -1)
-            gl.glDeleteShader(geometryID);
         gl.glDeleteShader(fragmentID);
         gl.glDeleteProgram(progID);
     }
@@ -117,8 +106,6 @@ public class GLSLShader {
     private void initializeProgram(GL2 gl, boolean cleanUp) {
         progID = gl.glCreateProgram();
         gl.glAttachShader(progID, vertexID);
-        if (geometryID != -1)
-            gl.glAttachShader(progID, geometryID);
         gl.glAttachShader(progID, fragmentID);
         gl.glLinkProgram(progID);
 
@@ -141,10 +128,6 @@ public class GLSLShader {
         if (cleanUp) {
             gl.glDetachShader(progID, vertexID);
             gl.glDeleteShader(vertexID);
-            if (geometryID != -1) {
-                gl.glDetachShader(progID, geometryID);
-                gl.glDeleteShader(geometryID);
-            }
             gl.glDetachShader(progID, fragmentID);
             gl.glDeleteShader(fragmentID);
         }

@@ -6,7 +6,7 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
-import org.helioviewer.jhv.opengl.GLSLPolyline;
+import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 
 import com.jogamp.opengl.GL2;
@@ -40,7 +40,7 @@ class GridMath {
     static final int FLAT_STEPS_THETA = 24;
     static final int FLAT_STEPS_RADIAL = 10;
 
-    static void initAxes(GL2 gl, GLSLPolyline axesLine) {
+    static void initAxes(GL2 gl, GLSLLine axesLine) {
         int plen = 8;
         FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(plen * 4);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(plen * 4);
@@ -81,7 +81,7 @@ class GridMath {
         earthPoint.setData(gl, vertexBuffer, colorBuffer);
     }
 
-    static void initEarthCircles(GL2 gl, GLSLPolyline earthCircleLine) {
+    static void initEarthCircles(GL2 gl, GLSLLine earthCircleLine) {
         int no_points = 2 * (SUBDIVISIONS + 3);
         FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(no_points * 4);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
@@ -125,7 +125,7 @@ class GridMath {
         earthCircleLine.setData(gl, vertexBuffer, colorBuffer);
     }
 
-    static void initRadialCircles(GL2 gl, GLSLPolyline radialCircleLine, GLSLPolyline radialThickLine, double unit, double step) {
+    static void initRadialCircles(GL2 gl, GLSLLine radialCircleLine, GLSLLine radialThickLine, double unit, double step) {
         int no_lines = (int) Math.ceil(360 / step);
         int no_points = (END_RADIUS - START_RADIUS + 1 - TENS_RADIUS) * (SUBDIVISIONS + 3) + (LINEAR_STEPS + 3) * no_lines;
         FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(no_points * 4);
@@ -186,7 +186,7 @@ class GridMath {
         radialThickLine.setData(gl, vertexThick, colorThick);
     }
 
-    static void initFlatGrid(GL2 gl, GLSLPolyline flatLine, double aspect) {
+    static void initFlatGrid(GL2 gl, GLSLLine flatLine, double aspect) {
         int plen = (LINEAR_STEPS + 3) * (FLAT_STEPS_THETA + 1 + FLAT_STEPS_RADIAL + 1);
         FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(plen * 4);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(plen * 4);
@@ -230,7 +230,7 @@ class GridMath {
         flatLine.setData(gl, vertexBuffer, colorBuffer);
     }
 
-    static void initGrid(GL2 gl, GLSLPolyline gridLine, double lonstepDegrees, double latstepDegrees) {
+    static void initGrid(GL2 gl, GLSLLine gridLine, double lonstepDegrees, double latstepDegrees) {
         int no_lon_steps = ((int) Math.ceil(360 / lonstepDegrees)) / 2 + 1;
         int no_lat_steps = ((int) Math.ceil(180 / latstepDegrees)) / 2;
         int HALFDIVISIONS = SUBDIVISIONS / 2;

@@ -20,7 +20,7 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.FOVShape;
-import org.helioviewer.jhv.opengl.GLSLPolyline;
+import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.position.LoadPosition;
@@ -42,7 +42,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     private static final float SIZE_PLANET = 10;
 
     private final FOVShape fov = new FOVShape(LINEWIDTH_FOV);
-    private final GLSLPolyline orbits = new GLSLPolyline();
+    private final GLSLLine orbits = new GLSLLine();
     private final GLSLShape planets = new GLSLShape();
     private final ViewpointLayerOptions optionsPanel;
 

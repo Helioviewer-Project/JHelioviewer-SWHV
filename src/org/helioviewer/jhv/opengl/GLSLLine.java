@@ -7,11 +7,11 @@ import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.opengl.GL2;
 
-public class GLSLPolyline extends VTAO {
+public class GLSLLine extends VTAO {
 
     private int count;
 
-    public GLSLPolyline() {
+    public GLSLLine() {
         super(new int[]{4, 4});
     }
 
@@ -30,10 +30,10 @@ public class GLSLPolyline extends VTAO {
         if (count == 0)
             return;
 
-        GLSLPolylineShader.polyline.bind(gl);
-        GLSLPolylineShader.polyline.setThickness(thickness);
-        GLSLPolylineShader.polyline.setViewport(vp.aspect);
-        GLSLPolylineShader.polyline.bindParams(gl);
+        GLSLLineShader.line.bind(gl);
+        GLSLLineShader.line.setThickness(thickness);
+        GLSLLineShader.line.setViewport(vp.aspect);
+        GLSLLineShader.line.bindParams(gl);
 
         bind(gl);
         gl.glDrawArraysInstanced(GL2.GL_TRIANGLE_STRIP, 0, 4, count);
