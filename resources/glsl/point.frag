@@ -2,9 +2,8 @@
 
 precision mediump float;
 
-layout(location = 0) out vec4 FragColor;
-
-in vec4 frag_color;
+in vec4 fragColor;
+out vec4 outColor;
 
 void main(void) {
     vec2 coord = 2. * gl_PointCoord - vec2(1.);
@@ -14,5 +13,5 @@ void main(void) {
 
     float delta = fwidth(radius);
     float alpha = smoothstep(1. - delta, 1., radius);
-    FragColor = mix(frag_color, vec4(0.), alpha);
+    outColor = mix(fragColor, vec4(0.), alpha);
 }
