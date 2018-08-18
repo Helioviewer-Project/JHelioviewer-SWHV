@@ -1,11 +1,12 @@
 #version 330 core
 
-layout(location = 0) out vec4 FragColor;
+precision mediump float;
 
 in vec4 fragColor;
+out vec4 outColor;
 
 void main(void) {
     if (fragColor.a == 0.)
         discard;
-    FragColor = fragColor;
+    outColor = fragColor;
 }
