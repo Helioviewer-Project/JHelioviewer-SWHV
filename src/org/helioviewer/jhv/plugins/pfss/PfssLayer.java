@@ -13,7 +13,7 @@ import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.math.MathUtils;
-import org.helioviewer.jhv.opengl.GLSLPolyline;
+import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.plugins.pfss.data.PfssData;
 import org.helioviewer.jhv.plugins.pfss.data.PfssNewDataLoader;
 import org.helioviewer.jhv.threads.CancelTask;
@@ -28,7 +28,7 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
 
     private final PfssLayerOptions optionsPanel;
     private final PfssLine pfssLine = new PfssLine();
-    private final GLSLPolyline line = new GLSLPolyline();
+    private final GLSLLine line = new GLSLLine();
     private PfssData previousPfssData;
 
     public PfssLayer(JSONObject jo) {

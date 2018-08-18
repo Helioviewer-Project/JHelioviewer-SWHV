@@ -41,7 +41,7 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.helioviewer.jhv.opengl.GLSLPolyline;
+import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLTexture;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.GLTexture;
@@ -70,7 +70,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
     private boolean icons = true;
 
-    private final GLSLPolyline glslLine = new GLSLPolyline();
+    private final GLSLLine glslLine = new GLSLLine();
     private final GLSLTexture glslTexture = new GLSLTexture();
 
     public SWEKLayer(JSONObject jo) {

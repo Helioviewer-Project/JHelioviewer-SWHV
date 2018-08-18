@@ -59,7 +59,7 @@ public class GLListener implements GLEventListener {
 
         glslSolar.init(gl);
         GLSLSolarShader.init(gl);
-        GLSLPolylineShader.init(gl);
+        GLSLLineShader.init(gl);
         GLSLShapeShader.init(gl);
         GLSLTextureShader.init(gl);
 
@@ -83,7 +83,7 @@ public class GLListener implements GLEventListener {
 
         glslSolar.dispose(gl);
         GLSLSolarShader.dispose(gl);
-        GLSLPolylineShader.dispose(gl);
+        GLSLLineShader.dispose(gl);
         GLSLShapeShader.dispose(gl);
         GLSLTextureShader.dispose(gl);
     }

@@ -15,7 +15,7 @@ public class FOVShape {
 
     private final double thickness;
 
-    private final GLSLPolyline line = new GLSLPolyline();
+    private final GLSLLine line = new GLSLLine();
     private final GLSLShape point = new GLSLShape();
 
     private double centerX = 0;
