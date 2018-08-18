@@ -2,6 +2,7 @@ package org.helioviewer.jhv.opengl;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
@@ -23,10 +24,10 @@ import com.jogamp.opengl.GLProfile;
 
 public class GLHelper {
 
-    public static void initCircleFront(GL2 gl, GLSLShape circle, double x, double y, double r, int segments, float[] color) {
+    public static void initCircleFront(GL2 gl, GLSLShape circle, double x, double y, double r, int segments, byte[] color) {
         int no_points = 2 * 4 * (segments + 1);
         FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(no_points);
-        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points);
+        ByteBuffer colorBuffer = BufferUtils.newByteBuffer(no_points);
         for (int i = 0; i <= segments; ++i) {
             double t = 2 * Math.PI * i / segments;
             BufferUtils.put4f(positionBuffer, (float) (x + Math.sin(t) * r), (float) (y + Math.cos(t) * r), 0, 1);
@@ -39,10 +40,10 @@ public class GLHelper {
         circle.setData(gl, positionBuffer, colorBuffer);
     }
 
-    public static void initRectangleFront(GL2 gl, GLSLShape rectangle, double x0, double y0, double w, double h, float[] color) {
+    public static void initRectangleFront(GL2 gl, GLSLShape rectangle, double x0, double y0, double w, double h, byte[] color) {
         int vertices = 4;
         FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(4 * vertices);
-        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4 * vertices);
+        ByteBuffer colorBuffer = BufferUtils.newByteBuffer(4 * vertices);
         float x1 = (float) (x0 + w);
         float y1 = (float) (y0 + h);
 

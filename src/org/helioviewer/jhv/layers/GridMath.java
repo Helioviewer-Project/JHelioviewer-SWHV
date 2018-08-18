@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.layers;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.astronomy.Sun;
@@ -19,6 +20,7 @@ class GridMath {
     private static final float[] axisNorthColor = BufferUtils.colorRed;
     private static final float[] axisSouthColor = BufferUtils.colorBlue;
     private static final float[] earthLineColor = BufferUtils.colorYellow;
+    private static final byte[] earthLineColorByte = BufferUtils.colorYellowByte;
 
     private static final float[] color1 = BufferUtils.colorRed;
     private static final float[] color2 = BufferUtils.colorGreen;
@@ -71,10 +73,10 @@ class GridMath {
 
     static void initEarthPoint(GL2 gl, GLSLShape earthPoint) {
         FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(4);
-        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4);
+        ByteBuffer colorBuffer = BufferUtils.newByteBuffer(4);
 
         BufferUtils.put4f(vertexBuffer, 0, 0, (float) EARTH_CIRCLE_RADIUS, earthPointSize);
-        colorBuffer.put(earthLineColor);
+        colorBuffer.put(earthLineColorByte);
 
         vertexBuffer.rewind();
         colorBuffer.rewind();
