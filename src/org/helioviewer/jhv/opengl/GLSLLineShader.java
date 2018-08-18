@@ -4,9 +4,9 @@ import org.helioviewer.jhv.math.Transform;
 
 import com.jogamp.opengl.GL2;
 
-class GLSLPolylineShader extends GLSLShader {
+class GLSLLineShader extends GLSLShader {
 
-    static final GLSLPolylineShader polyline = new GLSLPolylineShader("/glsl/line.vert", "/glsl/line.frag");
+    static final GLSLLineShader line = new GLSLLineShader("/glsl/line.vert", "/glsl/line.frag");
 
     private int refModelViewProjectionMatrix;
     private int thicknessRef;
@@ -15,16 +15,16 @@ class GLSLPolylineShader extends GLSLShader {
     private final float[] thickness = {5};
     private final float[] viewport = {1, 1, 1, 1};
 
-    private GLSLPolylineShader(String vertex, String fragment) {
+    private GLSLLineShader(String vertex, String fragment) {
         super(vertex, fragment);
     }
 
     public static void init(GL2 gl) {
-        polyline._init(gl, false);
+        line._init(gl, false);
     }
 
     public static void dispose(GL2 gl) {
-        polyline._dispose(gl);
+        line._dispose(gl);
     }
 
     @Override
