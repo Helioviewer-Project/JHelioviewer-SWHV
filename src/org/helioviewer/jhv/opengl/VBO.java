@@ -22,9 +22,9 @@ class VBO {
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, bufferID);
     }
 
-    void setData4(GL2 gl, Buffer buffer) {
+    void setData(GL2 gl, Buffer buffer, int size) {
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, bufferID);
-        int length = 4 * buffer.limit();
+        int length = size * buffer.limit();
         gl.glBufferData(GL2.GL_ARRAY_BUFFER, length, null, GL2.GL_STATIC_DRAW); // https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
         gl.glBufferSubData(GL2.GL_ARRAY_BUFFER, 0, length, buffer);
     }

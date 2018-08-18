@@ -14,7 +14,7 @@ public class GLSLSolar extends VAO {
     });
 
     GLSLSolar() {
-        super(1, new VAA[]{new VAA(0, 4, 0, 0)});
+        super(1, new VAA[]{new VAA(0, 4, false, 0, 0)});
     }
 
     public void render(GL2 gl) {
@@ -25,7 +25,7 @@ public class GLSLSolar extends VAO {
     @Override
     public void init(GL2 gl) {
         super.init(gl);
-        vbo[0].setData4(gl, vertexBuffer);
+        vbo[0].setData(gl, vertexBuffer, 4);
     }
 
 }
