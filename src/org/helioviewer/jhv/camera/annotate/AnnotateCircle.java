@@ -9,7 +9,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.helioviewer.jhv.opengl.GLSLPolyline;
+import org.helioviewer.jhv.opengl.GLSLLine;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -18,7 +18,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 90;
 
-    private final GLSLPolyline line = new GLSLPolyline();
+    private final GLSLLine line = new GLSLLine();
 
     public AnnotateCircle(JSONObject jo) {
         super(jo);
