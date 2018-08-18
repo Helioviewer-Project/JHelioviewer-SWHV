@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -243,7 +244,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     private void renderPlanets(GL2 gl, Viewport vp, Collection<LoadPosition> loadPositions) {
         int size = loadPositions.size();
         FloatBuffer planetPosition = BufferUtils.newFloatBuffer(4 * size);
-        FloatBuffer planetColor = BufferUtils.newFloatBuffer(4 * size);
+        ByteBuffer planetColor = BufferUtils.newByteBuffer(4 * size);
         FloatArray orbitPosition = new FloatArray();
         FloatArray orbitColor = new FloatArray();
 
@@ -283,7 +284,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             response.getInterpolated(xyz, time, start, end);
             planetPosition.put(xyz);
             planetPosition.put(SIZE_PLANET);
-            planetColor.put(color);
+            planetColor.put(/*color*/BufferUtils.colorYellowByte);
         }
 
         if (orbitPosition.length() >= 2 * 3) {
