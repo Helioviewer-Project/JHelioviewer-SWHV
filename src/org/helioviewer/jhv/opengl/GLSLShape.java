@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.opengl;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.log.Log;
@@ -13,17 +14,17 @@ public class GLSLShape extends VAO {
     private int count;
 
     public GLSLShape() {
-        super(2, new VAA[]{new VAA(0, size0, false, 0, 0), new VAA(1, size1, false, 0, 0)});
+        super(2, new VAA[]{new VAA(0, size0, false, 0, 0), new VAA(1, size1, true, 0, 0)});
     }
 
-    public void setData(GL2 gl, FloatBuffer position, FloatBuffer color) {
+    public void setData(GL2 gl, FloatBuffer position, ByteBuffer color) {
         int plen = position.limit() / size0;
         if (plen * size0 != position.limit() || plen != color.limit() / size1) {
             Log.error("Something is wrong with the attributes of this GLShape");
             return;
         }
         vbo[0].setData(gl, position, 4);
-        vbo[1].setData(gl, color, 4);
+        vbo[1].setData(gl, color, 1);
         count = plen;
     }
 
