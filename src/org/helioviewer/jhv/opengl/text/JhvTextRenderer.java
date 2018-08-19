@@ -50,7 +50,6 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphMetrics;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
-import java.nio.FloatBuffer;
 import java.text.CharacterIterator;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,6 +57,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Transform;
@@ -804,8 +804,6 @@ public class JhvTextRenderer {
 
     // A temporary to prevent excessive garbage creation
     final char[] singleUnicode = new char[1];
-    final float[] texArray = new float[kVertsPerQuad * 2];
-    final float[] vertArray = new float[kVertsPerQuad * 4];
 
     /**
      * A Glyph represents either a single unicode glyph or a
@@ -885,49 +883,28 @@ public class JhvTextRenderer {
             float ty2 = 1f - (texturey + height) / (float) renderer.getHeight();
 
             // A
-            texArray[0] = tx1;
-            texArray[1] = ty1;
-            vertArray[0] = x;
-            vertArray[1] = y;
-            vertArray[2] = z;
-            vertArray[3] = 1;
+            texCoords.put2f(tx1, ty1);
+            vertCoords.put4f(x, y, z, 1);
             // B
-            texArray[2] = tx2;
-            texArray[3] = ty1;
-            vertArray[4] = x + (width * scaleFactor);
-            vertArray[5] = y;
-            vertArray[6] = z;
-            vertArray[7] = 1;
+            texCoords.put2f(tx2, ty1);
+            vertCoords.put4f(x + (width * scaleFactor), y, z, 1);
             // C
-            texArray[4] = tx2;
-            texArray[5] = ty2;
-            vertArray[8] = x + (width * scaleFactor);
-            vertArray[9] = y + (height * scaleFactor);
-            vertArray[10] = z;
-            vertArray[11] = 1;
+            texCoords.put2f(tx2, ty2);
+            vertCoords.put4f(x + (width * scaleFactor), y + (height * scaleFactor), z, 1);
             // A
-            texArray[6] = tx1;
-            texArray[7] = ty1;
-            vertArray[12] = x;
-            vertArray[13] = y;
-            vertArray[14] = z;
-            vertArray[15] = 1;
+            texCoords.put2f(tx1, ty1);
+            vertCoords.put4f(x, y, z, 1);
             // C
-            texArray[8] = tx2;
-            texArray[9] = ty2;
-            vertArray[16] = x + (width * scaleFactor);
-            vertArray[17] = y + (height * scaleFactor);
-            vertArray[18] = z;
-            vertArray[19] = 1;
+            texCoords.put2f(tx2, ty2);
+            vertCoords.put4f(x + (width * scaleFactor), y + (height * scaleFactor), z, 1);
             // D
-            texArray[10] = tx1;
-            texArray[11] = ty2;
-            vertArray[20] = x;
-            vertArray[21] = y + (height * scaleFactor);
-            vertArray[22] = z;
-            vertArray[23] = 1;
+            texCoords.put2f(tx1, ty2);
+            vertCoords.put4f(x, y + (height * scaleFactor), z, 1);
 
-            pushVertices(texArray, vertArray);
+            outstandingGlyphsVerticesPipeline += kVertsPerQuad;
+            if (outstandingGlyphsVerticesPipeline >= kTotalBufferSizeVerts) {
+                drawVertices();
+            }
 
             return advance;
         }
@@ -1114,30 +1091,20 @@ public class JhvTextRenderer {
     private float[] textColor = BufferUtils.colorWhiteFloat;
 
     private int outstandingGlyphsVerticesPipeline = 0;
-    private final FloatBuffer texCoords = BufferUtils.newFloatBuffer(kTotalBufferSizeCoordsTex);
-    private final FloatBuffer vertCoords = BufferUtils.newFloatBuffer(kTotalBufferSizeCoordsVerts);
-
-    void pushVertices(float[] _texArray, float[] _vertArray) {
-        texCoords.put(_texArray);
-        vertCoords.put(_vertArray);
-        outstandingGlyphsVerticesPipeline += kVertsPerQuad;
-        if (outstandingGlyphsVerticesPipeline >= kTotalBufferSizeVerts) {
-            drawVertices();
-        }
-    }
+    private final Buf texCoords = new Buf(4 * kTotalBufferSizeCoordsTex);
+    private final Buf vertCoords = new Buf(4 * kTotalBufferSizeCoordsVerts);
 
     private void drawVertices() {
         if (outstandingGlyphsVerticesPipeline > 0) {
-            vertCoords.rewind();
-            texCoords.rewind();
-
             GL2 gl = (GL2) GLContext.getCurrentGL();
             getBackingStore().bind(gl);
 
             glslTexture.init(gl);
-            glslTexture.setData(gl, vertCoords, texCoords);
+            glslTexture.setData(gl, vertCoords.toBuffer().asFloatBuffer(), texCoords.toBuffer().asFloatBuffer());
             glslTexture.render(gl, GL2.GL_TRIANGLES, textColor, outstandingGlyphsVerticesPipeline);
             outstandingGlyphsVerticesPipeline = 0;
+            vertCoords.clear();
+            texCoords.clear();
         }
     }
 
