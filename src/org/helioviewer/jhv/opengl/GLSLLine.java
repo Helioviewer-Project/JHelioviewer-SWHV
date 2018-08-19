@@ -15,7 +15,9 @@ public class GLSLLine extends VAO {
     private int count;
 
     public GLSLLine() {
-        super(2, new VAA[]{new VAA(0, size0, false, 0, 1), new VAA(1, size1, true, 0, 1), new VAA(2, size0, false, 16, 1), new VAA(3, size1, true, 4, 1)});
+        super(2, new VAA[]{
+                new VAA(0, size0, false, 0, 0, 1), new VAA(1, size1, true, 0, 0, 1),
+                new VAA(2, size0, false, 0, 16, 1), new VAA(3, size1, true, 0, 4, 1)});
     }
 
     public void setData(GL2 gl, FloatBuffer position, ByteBuffer color) {

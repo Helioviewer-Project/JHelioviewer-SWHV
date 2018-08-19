@@ -30,7 +30,7 @@ class VBO2 {
         int length = buffer.limit();
         gl.glBufferData(GL2.GL_ARRAY_BUFFER, length, null, GL2.GL_STATIC_DRAW); // https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
         gl.glBufferSubData(GL2.GL_ARRAY_BUFFER, 0, length, buffer);
-        buf.clear();
+        buf.rewind();
     }
 
 }

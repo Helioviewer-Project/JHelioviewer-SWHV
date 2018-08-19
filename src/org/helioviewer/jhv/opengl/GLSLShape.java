@@ -11,10 +11,11 @@ public class GLSLShape extends VAO {
 
     private static final int size0 = 4;
     private static final int size1 = 4;
+    private static final int stride = 4 * (size0 + size1);
     private int count;
 
     public GLSLShape() {
-        super(2, new VAA[]{new VAA(0, size0, false, 0, 0), new VAA(1, size1, true, 0, 0)});
+        super(2, new VAA[]{new VAA(0, size0, false, 0, 0, 0), new VAA(1, size1, true, 0, 0, 0)});
     }
 
     public void setData(GL2 gl, FloatBuffer position, ByteBuffer color) {
