@@ -76,7 +76,7 @@ import com.jogamp.opengl.util.packrect.RectanglePacker;
  * internally to avoid repeated font rasterization. The caching is
  * completely automatic, does not require any user intervention, and
  * has no visible controls in the public API.
- *
+ * <p>
  * Using the {@link JhvTextRenderer TextRenderer} is simple. Add a
  * "<code>TextRenderer renderer;</code>" field to your {@link
  * com.jogamp.opengl.GLEventListener GLEventListener}. In your {@link
@@ -85,7 +85,7 @@ import com.jogamp.opengl.util.packrect.RectanglePacker;
  * <PRE>
  * renderer = new TextRenderer(new Font("SansSerif", Font.BOLD, 36));
  * </PRE>
- *
+ * <p>
  * In the {@link com.jogamp.opengl.GLEventListener#display display} method of your
  * {@link com.jogamp.opengl.GLEventListener GLEventListener}, add:
  * <PRE>
@@ -96,7 +96,7 @@ import com.jogamp.opengl.util.packrect.RectanglePacker;
  * // ... more draw commands, color changes, etc.
  * renderer.endRendering();
  * </PRE>
- *
+ * <p>
  * Unless you are sharing textures and display lists between OpenGL
  * contexts, you do not need to call the {@link #dispose dispose}
  * method of the TextRenderer; the OpenGL resources it uses
@@ -107,7 +107,7 @@ import com.jogamp.opengl.util.packrect.RectanglePacker;
  * coordinate array buffer bindings to change, or to be unbound. This
  * is important to note if you are using Vertex Buffer Objects (VBOs)
  * in your application.
- *
+ * <p>
  * Internally, the renderer uses a rectangle packing algorithm to
  * pack both glyphs and full Strings' rendering results (which are
  * variable size) onto a larger OpenGL texture. The internal backing
@@ -252,8 +252,8 @@ public class JhvTextRenderer {
      * TextRenderer via {@link #setColor setColor}. Disables the depth
      * test if the disableDepthTest argument is true.
      *
-     * @param width            the width of the current on-screen OpenGL drawable
-     * @param height           the height of the current on-screen OpenGL drawable
+     * @param width  the width of the current on-screen OpenGL drawable
+     * @param height the height of the current on-screen OpenGL drawable
      */
     public void beginRendering(int width, int height) {
         beginRendering(true, width, height);
@@ -882,24 +882,12 @@ public class JhvTextRenderer {
             float tx2 = (texturex + width) / (float) renderer.getWidth();
             float ty2 = 1f - (texturey + height) / (float) renderer.getHeight();
 
-            // A
-            texCoords.put2f(tx1, ty1);
-            vertCoords.put4f(x, y, z, 1);
-            // B
-            texCoords.put2f(tx2, ty1);
-            vertCoords.put4f(x + (width * scaleFactor), y, z, 1);
-            // C
-            texCoords.put2f(tx2, ty2);
-            vertCoords.put4f(x + (width * scaleFactor), y + (height * scaleFactor), z, 1);
-            // A
-            texCoords.put2f(tx1, ty1);
-            vertCoords.put4f(x, y, z, 1);
-            // C
-            texCoords.put2f(tx2, ty2);
-            vertCoords.put4f(x + (width * scaleFactor), y + (height * scaleFactor), z, 1);
-            // D
-            texCoords.put2f(tx1, ty2);
-            vertCoords.put4f(x, y + (height * scaleFactor), z, 1);
+            vexBuf.put4f(x, y, z, 1).put2f(tx1, ty1); // A
+            vexBuf.put4f(x + (width * scaleFactor), y, z, 1).put2f(tx2, ty1); // B
+            vexBuf.put4f(x + (width * scaleFactor), y + (height * scaleFactor), z, 1).put2f(tx2, ty2); // C
+            vexBuf.put4f(x, y, z, 1).put2f(tx1, ty1); // A
+            vexBuf.put4f(x + (width * scaleFactor), y + (height * scaleFactor), z, 1).put2f(tx2, ty2); // C
+            vexBuf.put4f(x, y + (height * scaleFactor), z, 1).put2f(tx1, ty2); // D
 
             outstandingGlyphsVerticesPipeline += kVertsPerQuad;
             if (outstandingGlyphsVerticesPipeline >= kTotalBufferSizeVerts) {
@@ -1091,8 +1079,7 @@ public class JhvTextRenderer {
     private float[] textColor = BufferUtils.colorWhiteFloat;
 
     private int outstandingGlyphsVerticesPipeline = 0;
-    private final Buf texCoords = new Buf(4 * kTotalBufferSizeCoordsTex);
-    private final Buf vertCoords = new Buf(4 * kTotalBufferSizeCoordsVerts);
+    private final Buf vexBuf = new Buf(4 * (kTotalBufferSizeCoordsVerts + kTotalBufferSizeCoordsTex));
 
     private void drawVertices() {
         if (outstandingGlyphsVerticesPipeline > 0) {
@@ -1100,11 +1087,10 @@ public class JhvTextRenderer {
             getBackingStore().bind(gl);
 
             glslTexture.init(gl);
-            glslTexture.setData(gl, vertCoords.toBuffer().asFloatBuffer(), texCoords.toBuffer().asFloatBuffer());
+            glslTexture.setData(gl, vexBuf);
             glslTexture.render(gl, GL2.GL_TRIANGLES, textColor, outstandingGlyphsVerticesPipeline);
             outstandingGlyphsVerticesPipeline = 0;
-            vertCoords.clear();
-            texCoords.clear();
+            vexBuf.clear();
         }
     }
 

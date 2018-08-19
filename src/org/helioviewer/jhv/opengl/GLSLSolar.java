@@ -1,20 +1,19 @@
 package org.helioviewer.jhv.opengl;
 
-import java.nio.FloatBuffer;
+import org.helioviewer.jhv.base.Buf;
 
 import com.jogamp.opengl.GL2;
 
-public class GLSLSolar extends VAO {
+public class GLSLSolar extends VAO2 {
 
-    private static final FloatBuffer vertexBuffer = FloatBuffer.wrap(new float[]{
-            -1, -1, 0, 1,
-            1, -1, 0, 1,
-            -1, 1, 0, 1,
-            1, 1, 0, 1
-    });
+    private static final Buf vexBuf = new Buf(4 * 16)
+            .put4f(-1, -1, 0, 1)
+            .put4f(1, -1, 0, 1)
+            .put4f(-1, 1, 0, 1)
+            .put4f(1, 1, 0, 1);
 
     GLSLSolar() {
-        super(1, new VAA[]{new VAA(0, 4, false, 0, 0)});
+        super(new VAA2[]{new VAA2(0, 4, false, 0, 0, 0)});
     }
 
     public void render(GL2 gl) {
@@ -25,7 +24,7 @@ public class GLSLSolar extends VAO {
     @Override
     public void init(GL2 gl) {
         super.init(gl);
-        vbo[0].setData(gl, vertexBuffer, 4);
+        vbo.setData(gl, vexBuf.toBuffer());
     }
 
 }
