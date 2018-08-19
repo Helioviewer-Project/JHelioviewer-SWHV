@@ -16,14 +16,13 @@ class GridMath {
 
     private static final int SUBDIVISIONS = 180;
 
-    private static final float[] radialLineColor = BufferUtils.colorDarkGray;
-    private static final float[] axisNorthColor = BufferUtils.colorRed;
-    private static final float[] axisSouthColor = BufferUtils.colorBlue;
-    private static final float[] earthLineColor = BufferUtils.colorYellow;
-    private static final byte[] earthLineColorByte = BufferUtils.colorYellowByte;
+    private static final byte[] radialLineColor = BufferUtils.colorDarkGray;
+    private static final byte[] axisNorthColor = BufferUtils.colorRed;
+    private static final byte[] axisSouthColor = BufferUtils.colorBlue;
+    private static final byte[] earthLineColor = BufferUtils.colorYellow;
 
-    private static final float[] color1 = BufferUtils.colorRed;
-    private static final float[] color2 = BufferUtils.colorGreen;
+    private static final byte[] color1 = BufferUtils.colorRed;
+    private static final byte[] color2 = BufferUtils.colorGreen;
 
     private static final float earthPointSize = 0.02f;
 
@@ -45,7 +44,7 @@ class GridMath {
     static void initAxes(GL2 gl, GLSLLine axesLine) {
         int plen = 8;
         FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(plen * 4);
-        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(plen * 4);
+        ByteBuffer colorBuffer = BufferUtils.newByteBuffer(plen * 4);
 
         BufferUtils.put4f(vertexBuffer, 0, -AXIS_STOP, 0, 1);
         colorBuffer.put(BufferUtils.colorNull);
@@ -76,7 +75,7 @@ class GridMath {
         ByteBuffer colorBuffer = BufferUtils.newByteBuffer(4);
 
         BufferUtils.put4f(vertexBuffer, 0, 0, (float) EARTH_CIRCLE_RADIUS, earthPointSize);
-        colorBuffer.put(earthLineColorByte);
+        colorBuffer.put(earthLineColor);
 
         vertexBuffer.rewind();
         colorBuffer.rewind();
@@ -86,7 +85,7 @@ class GridMath {
     static void initEarthCircles(GL2 gl, GLSLLine earthCircleLine) {
         int no_points = 2 * (SUBDIVISIONS + 3);
         FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(no_points * 4);
-        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
+        ByteBuffer colorBuffer = BufferUtils.newByteBuffer(no_points * 4);
 
         Vec3 rotv = new Vec3(), v = new Vec3();
         Quat q = Quat.createRotation(Math.PI / 2, Vec3.XAxis);
@@ -131,14 +130,14 @@ class GridMath {
         int no_lines = (int) Math.ceil(360 / step);
         int no_points = (END_RADIUS - START_RADIUS + 1 - TENS_RADIUS) * (SUBDIVISIONS + 3) + (LINEAR_STEPS + 3) * no_lines;
         FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(no_points * 4);
-        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
+        ByteBuffer colorBuffer = BufferUtils.newByteBuffer(no_points * 4);
         int no_points_thick = TENS_RADIUS * (SUBDIVISIONS + 3);
         FloatBuffer vertexThick = BufferUtils.newFloatBuffer(no_points_thick * 4);
-        FloatBuffer colorThick = BufferUtils.newFloatBuffer(no_points_thick * 4);
+        ByteBuffer colorThick = BufferUtils.newByteBuffer(no_points_thick * 4);
 
         for (int i = START_RADIUS; i <= END_RADIUS; i++) {
             FloatBuffer vertexTarget = i % 10 == 0 ? vertexThick : vertexBuffer;
-            FloatBuffer colorTarget = i % 10 == 0 ? colorThick : colorBuffer;
+            ByteBuffer colorTarget = i % 10 == 0 ? colorThick : colorBuffer;
 
             for (int j = 0; j <= SUBDIVISIONS; j++) {
                 float x = (float) (i * unit * Math.cos(2 * Math.PI * j / SUBDIVISIONS));
@@ -191,7 +190,7 @@ class GridMath {
     static void initFlatGrid(GL2 gl, GLSLLine flatLine, double aspect) {
         int plen = (LINEAR_STEPS + 3) * (FLAT_STEPS_THETA + 1 + FLAT_STEPS_RADIAL + 1);
         FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(plen * 4);
-        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(plen * 4);
+        ByteBuffer colorBuffer = BufferUtils.newByteBuffer(plen * 4);
 
         for (int i = 0; i <= FLAT_STEPS_THETA; i++) {
             float start = (float) (aspect * (-0.5 + i / (double) FLAT_STEPS_THETA));
@@ -239,7 +238,7 @@ class GridMath {
 
         int no_points = 2 * (no_lat_steps + no_lon_steps) * (HALFDIVISIONS + 3);
         FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(no_points * 4);
-        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
+        ByteBuffer colorBuffer = BufferUtils.newByteBuffer(no_points * 4);
 
         Vec3 v = new Vec3();
         double rotation;

@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.camera.annotate;
 
 import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.ByteArray;
 import org.helioviewer.jhv.base.FloatArray;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
@@ -34,7 +35,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
         line.dispose(gl);
     }
 
-    private static void drawCircle(Camera camera, Viewport vp, Vec3 bp, Vec3 ep, FloatArray pos, FloatArray col, float[] color) {
+    private static void drawCircle(Camera camera, Viewport vp, Vec3 bp, Vec3 ep, FloatArray pos, ByteArray col, byte[] color) {
         double cosf = Vec3.dot(bp, ep);
         double r = Math.sqrt(1 - cosf * cosf);
         // P = center + r cos(A) (bp x ep) + r sin(A) ep
@@ -57,13 +58,13 @@ public class AnnotateCircle extends AbstractAnnotateable {
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 if (i == 0) {
                     pos.put4f(vx);
-                    col.put4f(BufferUtils.colorNull);
+                    col.put4b(BufferUtils.colorNull);
                 }
                 pos.put4f(vx);
-                col.put4f(color);
+                col.put4b(color);
                 if (i == SUBDIVISIONS) {
                     pos.put4f(vx);
-                    col.put4f(BufferUtils.colorNull);
+                    col.put4b(BufferUtils.colorNull);
                 }
             } else {
                 vx.y = -vx.y;
@@ -84,12 +85,12 @@ public class AnnotateCircle extends AbstractAnnotateable {
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
 
-        float[] color = dragged ? dragColor : (active ? activeColor : baseColor);
+        byte[] color = dragged ? dragColor : (active ? activeColor : baseColor);
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
 
         FloatArray pos = new FloatArray();
-        FloatArray col = new FloatArray();
+        ByteArray col = new ByteArray();
 
         drawCircle(camera, vp, p0, p1, pos, col, color);
         line.setData(gl, pos.toBuffer(), col.toBuffer());

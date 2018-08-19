@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.ByteArray;
 import org.helioviewer.jhv.base.FloatArray;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -246,7 +247,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         FloatBuffer planetPosition = BufferUtils.newFloatBuffer(4 * size);
         ByteBuffer planetColor = BufferUtils.newByteBuffer(4 * size);
         FloatArray orbitPosition = new FloatArray();
-        FloatArray orbitColor = new FloatArray();
+        ByteArray orbitColor = new ByteArray();
 
         float[] xyz = new float[3];
         float[] xyzw = new float[4];
@@ -259,14 +260,14 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             if (response == null)
                 continue;
 
-            float[] color = loadPosition.getTarget().getColor();
+            byte[] color = loadPosition.getTarget().getColor();
             long t = start;
 
             double dist = response.getInterpolated(xyzw, t, start, end);
             orbitPosition.put4f(xyzw);
-            orbitColor.put4f(BufferUtils.colorNull);
+            orbitColor.put4b(BufferUtils.colorNull);
             orbitPosition.repeat4f();
-            orbitColor.put4f(color);
+            orbitColor.put4b(color);
 
             long delta = getStep(dist);
             while (t < time) {
@@ -275,16 +276,16 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
                     t = time;
                 dist = response.getInterpolated(xyzw, t, start, end);
                 orbitPosition.put4f(xyzw);
-                orbitColor.put4f(color);
+                orbitColor.put4b(color);
                 delta = getStep(dist);
             }
             orbitPosition.repeat4f();
-            orbitColor.put4f(BufferUtils.colorNull);
+            orbitColor.put4b(BufferUtils.colorNull);
 
             response.getInterpolated(xyz, time, start, end);
             planetPosition.put(xyz);
             planetPosition.put(SIZE_PLANET);
-            planetColor.put(/*color*/BufferUtils.colorYellowByte);
+            planetColor.put(color);
         }
 
         if (orbitPosition.length() >= 2 * 3) {

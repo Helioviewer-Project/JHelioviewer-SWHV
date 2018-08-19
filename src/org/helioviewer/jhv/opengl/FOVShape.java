@@ -44,7 +44,7 @@ public class FOVShape {
         FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(4);
         ByteBuffer colorBuffer = BufferUtils.newByteBuffer(4);
         BufferUtils.put4f(vertexBuffer, (float) centerX, (float) centerY, (float) centerZ, SIZE_POINT);
-        colorBuffer.put(highlight ? BufferUtils.colorRedByte : BufferUtils.colorBlueByte);
+        colorBuffer.put(highlight ? BufferUtils.colorRed : BufferUtils.colorBlue);
 
         vertexBuffer.rewind();
         colorBuffer.rewind();
@@ -60,11 +60,11 @@ public class FOVShape {
         double x, y, z;
         double bw = distance * tanX;
         double bh = distance * tanY;
-        float[] color = highlight ? BufferUtils.colorRed : BufferUtils.colorBlue;
+        byte[] color = highlight ? BufferUtils.colorRed : BufferUtils.colorBlue;
 
         int no_points = 4 * (SUBDIVISIONS + 1) + 2;
         FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(no_points * 4);
-        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
+        ByteBuffer colorBuffer = BufferUtils.newByteBuffer(no_points * 4);
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             x = -bw + 2 * bw / SUBDIVISIONS * i + centerX;

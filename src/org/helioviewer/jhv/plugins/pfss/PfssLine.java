@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins.pfss;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
@@ -11,23 +12,25 @@ import com.jogamp.opengl.GL2;
 
 class PfssLine {
 
-    private static final float[] openFieldColor = BufferUtils.colorRed;
-    private static final float[] loopColor = BufferUtils.colorWhite;
-    private static final float[] insideFieldColor = BufferUtils.colorBlue;
+    private static final byte[] openFieldColor = BufferUtils.colorRed;
+    private static final byte[] loopColor = BufferUtils.colorWhite;
+    private static final byte[] insideFieldColor = BufferUtils.colorBlue;
 
-    private final float[] brightColor = new float[4];
+    private final byte[] brightColor = new byte[4];
 
     private void computeBrightColor(double b) {
         if (b > 0) {
-            brightColor[0] = 1;
-            brightColor[1] = (float) (1. - b);
-            brightColor[2] = (float) (1. - b);
+            byte bb = (byte) (255 * (1. - b));
+            brightColor[0] = (byte) 255;
+            brightColor[1] = bb;
+            brightColor[2] = bb;
         } else {
-            brightColor[0] = (float) (1. + b);
-            brightColor[1] = (float) (1. + b);
-            brightColor[2] = 1;
+            byte bb = (byte) (255 * (1. + b));
+            brightColor[0] = bb;
+            brightColor[1] = bb;
+            brightColor[2] = (byte) 255;
         }
-        brightColor[3] = 1;
+        brightColor[3] = (byte) 255;
     }
 
     private static double decode(ShortBuffer buf, int idx) {
@@ -47,9 +50,9 @@ class PfssLine {
         int numberOfLines = dlength / pointsPerLine;
 
         FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(4 * (dlength + 2 * numberOfLines));
-        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4 * (dlength + 2 * numberOfLines));
+        ByteBuffer colorBuffer = BufferUtils.newByteBuffer(4 * (dlength + 2 * numberOfLines));
 
-        float[] oneColor = loopColor;
+        byte[] oneColor = loopColor;
         for (int i = 0; i < dlength; i++) {
             if (i / pointsPerLine % 9 <= detail) {
                 double x = 3. * decode(flinex, i);

@@ -1111,7 +1111,7 @@ public class JhvTextRenderer {
     }
 
     private static final GLSLTexture glslTexture = new GLSLTexture();
-    private float[] textColor = {1, 1, 1, 1};
+    private float[] textColor = BufferUtils.colorWhiteFloat;
 
     private int outstandingGlyphsVerticesPipeline = 0;
     private final FloatBuffer texCoords = BufferUtils.newFloatBuffer(kTotalBufferSizeCoordsTex);

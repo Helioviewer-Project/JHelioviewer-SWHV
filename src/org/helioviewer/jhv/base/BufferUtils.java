@@ -11,22 +11,34 @@ import org.helioviewer.jhv.math.Vec3;
 
 public class BufferUtils {
 
-    public static final float[] colorNull = {0, 0, 0, 0};
-    public static final float[] colorBlack = {0, 0, 0, 1};
-    public static final byte[] colorBlackByte = {(byte) Color.BLACK.getRed(), (byte) Color.BLACK.getGreen(), (byte) Color.BLACK.getBlue(), (byte) 255};
+    public static byte[] colorBytes(Color c) {
+        return new byte[]{(byte) c.getRed(), (byte) c.getGreen(), (byte) c.getBlue(), (byte) 255};
+    }
 
-    public static final float[] colorRed = {Color.RED.getRed() / 255f, Color.RED.getGreen() / 255f, Color.RED.getBlue() / 255f, 1};
-    public static final byte[] colorRedByte = {(byte) Color.RED.getRed(), (byte) Color.RED.getGreen(), (byte) Color.RED.getBlue(), (byte) 255};
+    public static byte[] colorBytes(Color c, double alpha) {
+        return new byte[]{(byte) (c.getRed() * alpha), (byte) (c.getGreen() * alpha), (byte) (c.getBlue() * alpha), (byte) (255 * alpha)};
+    }
 
-    public static final float[] colorGreen = {Color.GREEN.getRed() / 255f, Color.GREEN.getGreen() / 255f, Color.GREEN.getBlue() / 255f, 1};
-    public static final float[] colorBlue = {Color.BLUE.getRed() / 255f, Color.BLUE.getGreen() / 255f, Color.BLUE.getBlue() / 255f, 1};
-    public static final byte[] colorBlueByte = {(byte) Color.BLUE.getRed(), (byte) Color.BLUE.getGreen(), (byte) Color.BLUE.getBlue(), (byte) 255};
+    public static float[] colorFloat(Color c) {
+        return new float[]{c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, 1};
+    }
 
-    public static final float[] colorWhite = {Color.WHITE.getRed() / 255f, Color.WHITE.getGreen() / 255f, Color.WHITE.getBlue() / 255f, 1};
-    public static final float[] colorYellow = {Color.YELLOW.getRed() / 255f, Color.YELLOW.getGreen() / 255f, Color.YELLOW.getBlue() / 255f, 1};
-    public static final byte[] colorYellowByte = {(byte) Color.YELLOW.getRed(), (byte) Color.YELLOW.getGreen(), (byte) Color.YELLOW.getBlue(), (byte) 255};
+    public static float[] colorFloat(Color c, double alpha) {
+        return new float[]{(float) (c.getRed() * alpha / 255), (float) (c.getGreen() * alpha / 255), (float) (c.getBlue() * alpha / 255), (float) alpha};
+    }
 
-    public static final float[] colorDarkGray = {Color.DARK_GRAY.getRed() / 255f, Color.DARK_GRAY.getGreen() / 255f, Color.DARK_GRAY.getBlue() / 255f, 1f};
+    public static final byte[] colorNull = {0, 0, 0, 0};
+    public static final byte[] colorBlack = colorBytes(Color.BLACK);
+    public static final byte[] colorRed = colorBytes(Color.RED);
+    public static final byte[] colorGreen = colorBytes(Color.GREEN);
+    public static final byte[] colorBlue = colorBytes(Color.BLUE);
+    public static final byte[] colorWhite = colorBytes(Color.WHITE);
+    public static final byte[] colorYellow = colorBytes(Color.YELLOW);
+    public static final byte[] colorGray = colorBytes(Color.GRAY);
+    public static final byte[] colorDarkGray = colorBytes(Color.DARK_GRAY);
+    public static final byte[] colorLightGray = colorBytes(Color.LIGHT_GRAY);
+
+    public static final float[] colorWhiteFloat = {1, 1, 1, 1};
 
     public static ByteBuffer newByteBuffer(int len) {
         return ByteBuffer.allocateDirect(len).order(ByteOrder.nativeOrder());

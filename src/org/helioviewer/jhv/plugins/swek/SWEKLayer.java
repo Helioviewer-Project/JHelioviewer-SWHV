@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.swek;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
@@ -18,6 +17,7 @@ import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.ByteArray;
 import org.helioviewer.jhv.base.FloatArray;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.base.scale.Transform;
@@ -61,6 +61,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     private static final double LINEWIDTH_HIGHLIGHT = 2 * LINEWIDTH;
 
     private static final HashMap<String, GLTexture> iconCacheId = new HashMap<>();
+    private static final double ICON_ALPHA = 0.6;
     private static final double ICON_SIZE = 0.1;
     private static final double ICON_SIZE_HIGHLIGHTED = 0.16;
 
@@ -109,7 +110,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         tex.bind(gl);
     }
 
-    private static void interPolatedDraw(int mres, double r_start, double r_end, double t_start, double t_end, Quat q, FloatArray pos, FloatArray col, float[] color) {
+    private static void interPolatedDraw(int mres, double r_start, double r_end, double t_start, double t_end, Quat q, FloatArray pos, ByteArray col, byte[] color) {
         Vec3 v = new Vec3();
         for (int i = 0; i <= mres; i++) {
             double alpha = 1. - i / (double) mres;
@@ -122,13 +123,13 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
             if (i == 0) {
                 pos.put4f(res);
-                col.put4f(BufferUtils.colorNull);
+                col.put4b(BufferUtils.colorNull);
             }
             pos.put4f(res);
-            col.put4f(color);
+            col.put4b(color);
         }
         pos.repeat4f();
-        col.put4f(BufferUtils.colorNull);
+        col.put4b(BufferUtils.colorNull);
     }
 
     private void drawCactusArc(Viewport vp, GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
@@ -144,14 +145,13 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         int angularResolution = (int) (angularWidthDegree / 4);
 
         Quat q = evt.getPositionInformation().getEarth().toQuat();
-        Color c = evtr.getColor();
-        float[] color = {c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, 1};
+        byte[] color = BufferUtils.colorBytes(evtr.getColor());
 
         double thetaStart = principalAngle - angularWidth / 2.;
         double thetaEnd = principalAngle + angularWidth / 2.;
 
         FloatArray pos = new FloatArray();
-        FloatArray col = new FloatArray();
+        ByteArray col = new ByteArray();
 
         interPolatedDraw(angularResolution, distSun, distSun, thetaStart, principalAngle, q, pos, col, color);
         interPolatedDraw(angularResolution, distSun, distSun, principalAngle, thetaEnd, q, pos, col, color);
@@ -164,8 +164,6 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         glslLine.render(gl, vp, evtr.isHighlighted() ? LINEWIDTH_HIGHLIGHT : LINEWIDTH);
 
         if (icons) {
-            bindTexture(gl, evtr.getSupplier().getGroup());
-
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
             Vec3 v = new Vec3();
             for (float[] el : texCoord) {
@@ -181,8 +179,9 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             }
             vexBuf.rewind();
 
+            bindTexture(gl, evtr.getSupplier().getGroup());
             glslTexture.setData(gl, vexBuf, texBuf);
-            glslTexture.render(gl, GL2.GL_TRIANGLE_STRIP, color, 4);
+            glslTexture.render(gl, GL2.GL_TRIANGLE_STRIP, BufferUtils.colorFloat(evtr.getColor()), 4);
         }
     }
 
@@ -196,9 +195,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             return;
         }
 
-        Color c = evtr.getColor();
-        float[] color = {c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, 1};
-
+        byte[] color = BufferUtils.colorBytes(evtr.getColor());
         // draw bounds
         Vec3 pt = new Vec3();
         float[] oldBoundaryPoint3d = new float[0];
@@ -206,7 +203,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         int plen = points.length / 3;
 
         FloatArray pos = new FloatArray();
-        FloatArray col = new FloatArray();
+        ByteArray col = new ByteArray();
         for (int i = 0; i < plen; i++) {
             if (oldBoundaryPoint3d.length != 0) {
                 for (int j = 0; j <= DIVPOINTS; j++) {
@@ -222,10 +219,10 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                         float z = (float) (znew / r);
                         if (j == 0) {
                             pos.put4f(x, y, z, 1);
-                            col.put4f(BufferUtils.colorNull);
+                            col.put4b(BufferUtils.colorNull);
                         }
                         pos.put4f(x, y, z, 1);
-                        col.put4f(color);
+                        col.put4b(color);
                     } else {
                         pt.x = xnew / r;
                         pt.y = ynew / r;
@@ -237,7 +234,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                     }
                 }
                 pos.repeat4f();
-                col.put4f(BufferUtils.colorNull);
+                col.put4b(BufferUtils.colorNull);
             }
             oldBoundaryPoint3d = new float[]{points[3 * i], points[3 * i + 1], points[3 * i + 2]};
         }
@@ -253,13 +250,9 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
         Vec3 pt = pi.centralPoint();
         if (pt != null) {
-            Color c = evtr.getColor();
-            float alpha = 0.6f;
-            float[] color = {c.getRed() / 255f * alpha, c.getGreen() / 255f * alpha, c.getBlue() / 255f * alpha, alpha};
-
-            bindTexture(gl, evtr.getSupplier().getGroup());
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
-            drawImage3d(gl, pt.x, pt.y, pt.z, sz, sz, color);
+            bindTexture(gl, evtr.getSupplier().getGroup());
+            drawImage3d(gl, pt.x, pt.y, pt.z, sz, sz, BufferUtils.colorFloat(evtr.getColor(), ICON_ALPHA));
         }
     }
 
@@ -288,13 +281,9 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             pt = viewpoint.toQuat().rotateVector(pt);
             Vec2 tf = xform.transform(viewpoint, pt, scale);
 
-            Color c = evtr.getColor();
-            float alpha = 0.6f;
-            float[] color = {c.getRed() / 255f * alpha, c.getGreen() / 255f * alpha, c.getBlue() / 255f * alpha, alpha};
-
-            bindTexture(gl, evtr.getSupplier().getGroup());
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
-            drawImageScale(gl, tf.x * vp.aspect, tf.y, sz, sz, color);
+            bindTexture(gl, evtr.getSupplier().getGroup());
+            drawImageScale(gl, tf.x * vp.aspect, tf.y, sz, sz, BufferUtils.colorFloat(evtr.getColor(), ICON_ALPHA));
         }
     }
 
@@ -309,71 +298,70 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         double thetaStart = MathUtils.mapTo0To360(principalAngleDegree - angularWidthDegree / 2.);
         double thetaEnd = MathUtils.mapTo0To360(principalAngleDegree + angularWidthDegree / 2.);
 
-        Color c = evtr.getColor();
-        float[] color = {c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, 1};
+        byte[] color = BufferUtils.colorBytes(evtr.getColor());
         float x, y;
 
         FloatArray pos = new FloatArray();
-        FloatArray col = new FloatArray();
+        ByteArray col = new ByteArray();
 
         x = (float) (scale.getXValueInv(thetaStart) * vp.aspect);
         y = (float) scale.getYValueInv(distSunBegin);
         pos.put4f(x, y, 0, 1);
-        col.put4f(BufferUtils.colorNull);
+        col.put4b(BufferUtils.colorNull);
         pos.repeat4f();
-        col.put4f(color);
+        col.put4b(color);
 
         y = (float) scale.getYValueInv(distSun + 0.05);
         pos.put4f(x, y, 0, 1);
-        col.put4f(color);
+        col.put4b(color);
         pos.repeat4f();
-        col.put4f(BufferUtils.colorNull);
+        col.put4b(BufferUtils.colorNull);
 
         x = (float) (scale.getXValueInv(principalAngleDegree) * vp.aspect);
         y = (float) scale.getYValueInv(distSunBegin);
         pos.put4f(x, y, 0, 1);
-        col.put4f(BufferUtils.colorNull);
+        col.put4b(BufferUtils.colorNull);
         pos.repeat4f();
-        col.put4f(color);
+        col.put4b(color);
 
         y = (float) scale.getYValueInv(distSun + 0.05);
         pos.put4f(x, y, 0, 1);
-        col.put4f(color);
+        col.put4b(color);
         pos.repeat4f();
-        col.put4f(BufferUtils.colorNull);
+        col.put4b(BufferUtils.colorNull);
 
         x = (float) (scale.getXValueInv(thetaEnd) * vp.aspect);
         y = (float) scale.getYValueInv(distSunBegin);
         pos.put4f(x, y, 0, 1);
-        col.put4f(BufferUtils.colorNull);
+        col.put4b(BufferUtils.colorNull);
         pos.repeat4f();
-        col.put4f(color);
+        col.put4b(color);
 
         y = (float) scale.getYValueInv(distSun + 0.05);
         pos.put4f(x, y, 0, 1);
-        col.put4f(color);
+        col.put4b(color);
         pos.repeat4f();
-        col.put4f(BufferUtils.colorNull);
+        col.put4b(BufferUtils.colorNull);
 
         y = (float) scale.getYValueInv(distSun);
         pos.put4f(x, y, 0, 1);
-        col.put4f(BufferUtils.colorNull);
+        col.put4b(BufferUtils.colorNull);
         pos.repeat4f();
-        col.put4f(color);
+        col.put4b(color);
 
         x = (float) (scale.getXValueInv(thetaStart) * vp.aspect);
         pos.put4f(x, y, 0, 1);
-        col.put4f(color);
+        col.put4b(color);
         pos.repeat4f();
-        col.put4f(BufferUtils.colorNull);
+        col.put4b(BufferUtils.colorNull);
 
         glslLine.setData(gl, pos.toBuffer(), col.toBuffer());
         glslLine.render(gl, vp, evtr.isHighlighted() ? LINEWIDTH_HIGHLIGHT : LINEWIDTH);
 
         if (icons) {
-            bindTexture(gl, evtr.getSupplier().getGroup());
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
-            drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), sz, sz, color);
+            bindTexture(gl, evtr.getSupplier().getGroup());
+            drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), sz, sz, BufferUtils.colorFloat(evtr.getColor()));
         }
     }
 
