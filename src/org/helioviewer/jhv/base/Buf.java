@@ -19,22 +19,28 @@ public class Buf {
         buf = Unpooled.directBuffer(len);
     }
 
+    public void put2f(float[] f) {
+        put2f(f[0], f[1]);
+    }
+
     public void put2f(float x, float y) {
         buf.writeFloatLE(x);
         buf.writeFloatLE(y);
         floats += 2;
     }
 
-    public void put4f(Vec3 v) {
+    public Buf put4f(Vec3 v) {
         put4f((float) v.x, (float) v.y, (float) v.z, 1);
+        return this;
     }
 
-    public void put4f(float x, float y, float z, float w) {
+    public Buf put4f(float x, float y, float z, float w) {
         last[0] = x;
         last[1] = y;
         last[2] = z;
         last[3] = w;
         repeat4f();
+        return this;
     }
 
     public void repeat4f() {
@@ -52,6 +58,16 @@ public class Buf {
 
     public void clear() {
         buf.setIndex(0, 0);
+        floats = 0;
+        bytes = 0;
+    }
+
+    public int getFloats() {
+        return floats;
+    }
+
+    public int getBytes4() {
+        return bytes;
     }
 
     public ByteBuffer toBuffer() {
