@@ -19,6 +19,10 @@ public class BufferUtils {
         return new byte[]{(byte) (c.getRed() * alpha), (byte) (c.getGreen() * alpha), (byte) (c.getBlue() * alpha), (byte) (255 * alpha)};
     }
 
+    public static byte[] colorBytes(int r, int g, int b) {
+        return new byte[]{(byte) r, (byte) g, (byte) b, (byte) 255};
+    }
+
     public static float[] colorFloat(Color c) {
         return new float[]{c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, 1};
     }
