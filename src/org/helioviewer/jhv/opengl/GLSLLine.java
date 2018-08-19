@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.opengl;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.display.Viewport;
@@ -14,17 +15,17 @@ public class GLSLLine extends VAO {
     private int count;
 
     public GLSLLine() {
-        super(2, new VAA[]{new VAA(0, size0, false, 0, 1), new VAA(1, size1, false, 0, 1), new VAA(2, size0, false, 16, 1), new VAA(3, size1, false, 16, 1)});
+        super(2, new VAA[]{new VAA(0, size0, false, 0, 1), new VAA(1, size1, true, 0, 1), new VAA(2, size0, false, 16, 1), new VAA(3, size1, true, 4, 1)});
     }
 
-    public void setData(GL2 gl, FloatBuffer position, FloatBuffer color) {
+    public void setData(GL2 gl, FloatBuffer position, ByteBuffer color) {
         int plen = position.limit() / size0;
         if (plen * size0 != position.limit() || plen != color.limit() / size1) {
             Log.error("Something is wrong with the attributes of this GLSLPolyline");
             return;
         }
         vbo[0].setData(gl, position, 4);
-        vbo[1].setData(gl, color, 4);
+        vbo[1].setData(gl, color, 1);
         count = plen - 1;
     }
 

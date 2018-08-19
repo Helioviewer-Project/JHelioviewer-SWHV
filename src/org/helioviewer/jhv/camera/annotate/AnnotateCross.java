@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.camera.annotate;
 
 import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.ByteArray;
 import org.helioviewer.jhv.base.FloatArray;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
@@ -34,7 +35,7 @@ public class AnnotateCross extends AbstractAnnotateable {
         line.dispose(gl);
     }
 
-    private static void drawCross(Camera camera, Viewport vp, Vec3 bp, FloatArray pos, FloatArray col, float[] color) {
+    private static void drawCross(Camera camera, Viewport vp, Vec3 bp, FloatArray pos, ByteArray col, byte[] color) {
         double delta = 2.5 * Math.PI / 180;
         Vec3 p1 = new Vec3(radius, bp.y + delta, bp.z);
         Vec3 p2 = new Vec3(radius, bp.y - delta, bp.z);
@@ -45,7 +46,7 @@ public class AnnotateCross extends AbstractAnnotateable {
         interpolatedDraw(camera, vp, p3, p4, pos, col, color);
     }
 
-    private static void interpolatedDraw(Camera camera, Viewport vp, Vec3 p1s, Vec3 p2s, FloatArray pos, FloatArray col, float[] color) {
+    private static void interpolatedDraw(Camera camera, Viewport vp, Vec3 p1s, Vec3 p2s, FloatArray pos, ByteArray col, byte[] color) {
         Vec2 previous = null;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, p1s, p2s);
@@ -53,13 +54,13 @@ public class AnnotateCross extends AbstractAnnotateable {
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 if (i == 0) {
                     pos.put4f(pc);
-                    col.put4f(BufferUtils.colorNull);
+                    col.put4b(BufferUtils.colorNull);
                 }
                 pos.put4f(pc);
-                col.put4f(color);
+                col.put4b(color);
                 if (i == SUBDIVISIONS) {
                     pos.put4f(pc);
-                    col.put4f(BufferUtils.colorNull);
+                    col.put4b(BufferUtils.colorNull);
                 }
             } else {
                 pc.y = -pc.y;
@@ -79,10 +80,9 @@ public class AnnotateCross extends AbstractAnnotateable {
         if (startPoint == null)
             return;
 
-        float[] color = active ? activeColor : baseColor;
-
+        byte[] color = active ? activeColor : baseColor;
         FloatArray pos = new FloatArray();
-        FloatArray col = new FloatArray();
+        ByteArray col = new ByteArray();
 
         drawCross(camera, vp, toSpherical(startPoint), pos, col, color);
         line.setData(gl, pos.toBuffer(), col.toBuffer());

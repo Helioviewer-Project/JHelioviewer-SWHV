@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.camera.annotate;
 
 import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.ByteArray;
 import org.helioviewer.jhv.base.FloatArray;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
@@ -34,7 +35,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         line.dispose(gl);
     }
 
-    private static void drawRectangle(Camera camera, Viewport vp, Vec3 bp, Vec3 ep, FloatArray pos, FloatArray col, float[] color) {
+    private static void drawRectangle(Camera camera, Viewport vp, Vec3 bp, Vec3 ep, FloatArray pos, ByteArray col, byte[] color) {
         if (bp.z * ep.z < 0) {
             if (ep.z < bp.z && bp.z > Math.PI / 2)
                 ep.z += 2 * Math.PI;
@@ -56,10 +57,10 @@ public class AnnotateRectangle extends AbstractAnnotateable {
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 if (i == 0) { // first
                     pos.put4f(pc);
-                    col.put4f(BufferUtils.colorNull);
+                    col.put4b(BufferUtils.colorNull);
                 }
                 pos.put4f(pc);
-                col.put4f(color);
+                col.put4b(color);
             } else {
                 pc.y = -pc.y;
                 if (i == 0) {
@@ -76,7 +77,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 pos.put4f(pc);
-                col.put4f(color);
+                col.put4b(color);
             } else {
                 pc.y = -pc.y;
                 previous = GLHelper.drawVertex(camera, vp, pc, previous, pos, col, color);
@@ -90,7 +91,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 pos.put4f(pc);
-                col.put4f(color);
+                col.put4b(color);
             } else {
                 pc.y = -pc.y;
                 previous = GLHelper.drawVertex(camera, vp, pc, previous, pos, col, color);
@@ -104,10 +105,10 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 pos.put4f(pc);
-                col.put4f(color);
+                col.put4b(color);
                 if (i == SUBDIVISIONS) { // last
                     pos.put4f(pc);
-                    col.put4f(BufferUtils.colorNull);
+                    col.put4b(BufferUtils.colorNull);
                 }
             } else {
                 pc.y = -pc.y;
@@ -125,12 +126,12 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
 
-        float[] color = dragged ? dragColor : (active ? activeColor : baseColor);
+        byte[] color = dragged ? dragColor : (active ? activeColor : baseColor);
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
 
         FloatArray pos = new FloatArray();
-        FloatArray col = new FloatArray();
+        ByteArray col = new ByteArray();
 
         drawRectangle(camera, vp, toSpherical(p0), toSpherical(p1), pos, col, color);
         line.setData(gl, pos.toBuffer(), col.toBuffer());

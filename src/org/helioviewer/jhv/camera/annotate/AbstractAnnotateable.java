@@ -15,9 +15,9 @@ import org.json.JSONObject;
 
 abstract class AbstractAnnotateable implements Annotateable {
 
-    static final float[] activeColor = BufferUtils.colorRed;
-    static final float[] dragColor = BufferUtils.colorYellow;
-    static final float[] baseColor = BufferUtils.colorBlue;
+    static final byte[] activeColor = BufferUtils.colorRed;
+    static final byte[] dragColor = BufferUtils.colorYellow;
+    static final byte[] baseColor = BufferUtils.colorBlue;
 
     static final double LINEWIDTH = 0.002;
     static final double radius = Sun.Radius * 1.01;
