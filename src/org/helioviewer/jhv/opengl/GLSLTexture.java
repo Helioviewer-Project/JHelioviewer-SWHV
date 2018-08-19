@@ -22,7 +22,7 @@ public class GLSLTexture extends VAO2 {
             Log.error("Something is wrong with the attributes of this GLSLTexture");
             return;
         }
-        vbo.setData(gl, buf.toBuffer());
+        vbo.setData(gl, buf);
         count = plen;
     }
 

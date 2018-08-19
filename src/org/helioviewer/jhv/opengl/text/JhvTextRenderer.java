@@ -1090,7 +1090,6 @@ public class JhvTextRenderer {
             glslTexture.setData(gl, vexBuf);
             glslTexture.render(gl, GL2.GL_TRIANGLES, textColor, outstandingGlyphsVerticesPipeline);
             outstandingGlyphsVerticesPipeline = 0;
-            vexBuf.clear();
         }
     }
 

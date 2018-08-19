@@ -24,7 +24,7 @@ public class GLSLSolar extends VAO2 {
     @Override
     public void init(GL2 gl) {
         super.init(gl);
-        vbo.setData(gl, vexBuf.toBuffer());
+        vbo.setData(gl, vexBuf);
     }
 
 }
