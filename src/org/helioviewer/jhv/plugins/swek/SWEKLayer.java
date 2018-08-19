@@ -5,7 +5,6 @@ import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.image.BufferedImage;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -16,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.ByteArray;
 import org.helioviewer.jhv.base.FloatArray;
@@ -66,8 +66,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     private static final double ICON_SIZE_HIGHLIGHTED = 0.16;
 
     private static final float texCoord[][] = {{0, 1}, {1, 1}, {0, 0}, {1, 0}};
-    private final FloatBuffer texBuf = BufferUtils.newFloatBuffer(8);
-    private final FloatBuffer vexBuf = BufferUtils.newFloatBuffer(16);
+    private final Buf vexBuf = new Buf(4 * (16 + 8));
 
     private boolean icons = true;
 
@@ -80,10 +79,6 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         else
             setEnabled(true);
         optionsPanel = optionsPanel();
-
-        for (float[] tc : texCoord)
-            texBuf.put(tc);
-        texBuf.rewind();
     }
 
     @Override
@@ -174,14 +169,13 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
                 v.x = r * Math.cos(theta);
                 v.y = r * Math.sin(theta);
-                Vec3 res = q.rotateInverseVector(v);
-                BufferUtils.put4f(vexBuf, res);
+                vexBuf.put4f(q.rotateInverseVector(v)).put2f(el);
             }
-            vexBuf.rewind();
 
             bindTexture(gl, evtr.getSupplier().getGroup());
-            glslTexture.setData(gl, vexBuf, texBuf);
+            glslTexture.setData(gl, vexBuf);
             glslTexture.render(gl, GL2.GL_TRIANGLE_STRIP, BufferUtils.colorFloat(evtr.getColor()), 4);
+            vexBuf.clear();
         }
     }
 
@@ -260,14 +254,14 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         double width2 = width / 4.;
         double height2 = height / 4.;
 
-        BufferUtils.put4f(vexBuf, (float) (theta - width2), (float) (r - height2), 0, 1);
-        BufferUtils.put4f(vexBuf, (float) (theta + width2), (float) (r - height2), 0, 1);
-        BufferUtils.put4f(vexBuf, (float) (theta - width2), (float) (r + height2), 0, 1);
-        BufferUtils.put4f(vexBuf, (float) (theta + width2), (float) (r + height2), 0, 1);
-        vexBuf.rewind();
+        vexBuf.put4f((float) (theta - width2), (float) (r - height2), 0, 1).put2f(texCoord[0]);
+        vexBuf.put4f((float) (theta + width2), (float) (r - height2), 0, 1).put2f(texCoord[1]);
+        vexBuf.put4f((float) (theta - width2), (float) (r + height2), 0, 1).put2f(texCoord[2]);
+        vexBuf.put4f((float) (theta + width2), (float) (r + height2), 0, 1).put2f(texCoord[3]);
 
-        glslTexture.setData(gl, vexBuf, texBuf);
+        glslTexture.setData(gl, vexBuf);
         glslTexture.render(gl, GL2.GL_TRIANGLE_STRIP, color, 4);
+        vexBuf.clear();
     }
 
     private void drawIconScale(Camera camera, Viewport vp, GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Transform xform) {
@@ -375,22 +369,22 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
         Quat q = Quat.rotate(Quat.createRotation(Math.atan2(x, z), Vec3.YAxis), Quat.createRotation(-Math.asin(y / targetDir.length()), Vec3.XAxis));
         Vec3 p0 = q.rotateVector(new Vec3(-width2, -height2, 0));
-        Vec3 p1 = q.rotateVector(new Vec3( width2, -height2, 0));
-        Vec3 p2 = q.rotateVector(new Vec3(-width2,  height2, 0));
-        Vec3 p3 = q.rotateVector(new Vec3( width2,  height2, 0));
+        Vec3 p1 = q.rotateVector(new Vec3(width2, -height2, 0));
+        Vec3 p2 = q.rotateVector(new Vec3(-width2, height2, 0));
+        Vec3 p3 = q.rotateVector(new Vec3(width2, height2, 0));
         p0.add(targetDir);
         p1.add(targetDir);
         p2.add(targetDir);
         p3.add(targetDir);
 
-        BufferUtils.put4f(vexBuf, p0);
-        BufferUtils.put4f(vexBuf, p1);
-        BufferUtils.put4f(vexBuf, p2);
-        BufferUtils.put4f(vexBuf, p3);
-        vexBuf.rewind();
+        vexBuf.put4f(p0).put2f(texCoord[0]);
+        vexBuf.put4f(p1).put2f(texCoord[1]);
+        vexBuf.put4f(p2).put2f(texCoord[2]);
+        vexBuf.put4f(p3).put2f(texCoord[3]);
 
-        glslTexture.setData(gl, vexBuf, texBuf);
+        glslTexture.setData(gl, vexBuf);
         glslTexture.render(gl, GL2.GL_TRIANGLE_STRIP, color, 4);
+        vexBuf.clear();
     }
 
     private static final int MOUSE_OFFSET_X = 25;
