@@ -13,7 +13,7 @@ public class GLSLTexture extends VAO2 {
     private int count;
 
     public GLSLTexture() {
-        super(new VAA2[]{new VAA2(0, size0, false, stride, 0, 0), new VAA2(1, size1, false, stride, 4 * size0, 0)});
+        super(new VAA[]{new VAA(0, size0, false, stride, 0, 0), new VAA(1, size1, false, stride, 4 * size0, 0)});
     }
 
     public void setData(GL2 gl, Buf buf) {

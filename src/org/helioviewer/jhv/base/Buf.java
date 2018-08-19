@@ -52,18 +52,18 @@ public class Buf {
         bytes++;
     }
 
-    public void clear() {
-        buf.setIndex(0, 0);
-        floats = 0;
-        bytes = 0;
-    }
-
     public int getFloats() {
         return floats;
     }
 
     public int getBytes4() {
         return bytes;
+    }
+
+    public void rewind() {
+        buf.setIndex(0, 0);
+        floats = 0;
+        bytes = 0;
     }
 
     public ByteBuffer toBuffer() {

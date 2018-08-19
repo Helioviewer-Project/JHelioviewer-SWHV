@@ -13,7 +13,7 @@ public class GLSLSolar extends VAO2 {
             .put4f(1, 1, 0, 1);
 
     GLSLSolar() {
-        super(new VAA2[]{new VAA2(0, 4, false, 0, 0, 0)});
+        super(new VAA[]{new VAA(0, 4, false, 0, 0, 0)});
     }
 
     public void render(GL2 gl) {

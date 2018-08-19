@@ -4,13 +4,13 @@ import com.jogamp.opengl.GL2;
 
 class VAO2 {
 
-    private final VAA2[] vaa;
+    private final VAA[] vaa;
 
     private int vaoID = -1;
     private boolean inited;
     protected VBO2 vbo;
 
-    VAO2(VAA2[] _vaa) {
+    VAO2(VAA[] _vaa) {
         vaa = _vaa;
     }
 
