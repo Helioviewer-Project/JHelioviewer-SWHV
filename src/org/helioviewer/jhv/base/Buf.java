@@ -24,8 +24,7 @@ public class Buf {
     }
 
     public void put2f(float x, float y) {
-        buf.writeFloatLE(x);
-        buf.writeFloatLE(y);
+        buf.writeFloatLE(x).writeFloatLE(y);
         floats += 2;
     }
 
@@ -44,10 +43,7 @@ public class Buf {
     }
 
     public void repeat4f() {
-        buf.writeFloatLE(last[0]);
-        buf.writeFloatLE(last[1]);
-        buf.writeFloatLE(last[2]);
-        buf.writeFloatLE(last[3]);
+        buf.writeFloatLE(last[0]).writeFloatLE(last[1]).writeFloatLE(last[2]).writeFloatLE(last[3]);
         floats += 4;
     }
 
