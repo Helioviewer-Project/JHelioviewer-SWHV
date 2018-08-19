@@ -27,15 +27,15 @@ public class SpaceObject {
         {
             put("Sun", Sol);
             put("Mercury", new SpaceObject("Mercury", "Mercury", 2439700 / Sun.RadiusMeter, BufferUtils.colorGray, JHVTableCellRenderer.cellBorder));
-            put("Venus", new SpaceObject("Venus", "Venus", 6051800 / Sun.RadiusMeter, new byte[]{(byte) 181, (byte) 110, (byte) 26, (byte) 255}, JHVTableCellRenderer.cellBorder));
+            put("Venus", new SpaceObject("Venus", "Venus", 6051800 / Sun.RadiusMeter, BufferUtils.colorBytes(181, 110, 26), JHVTableCellRenderer.cellBorder));
             put("Earth", new SpaceObject("Earth", "Earth", 6371000 / Sun.RadiusMeter, BufferUtils.colorBlue, JHVTableCellRenderer.cellBorder));
             put("Moon", new SpaceObject("Moon", "Moon", 1737400 / Sun.RadiusMeter, BufferUtils.colorLightGray, JHVTableCellRenderer.cellBorder));
-            put("Mars", new SpaceObject("Mars%20Barycenter", "Mars", 3389500 / Sun.RadiusMeter, new byte[]{(byte) 135, (byte) 37, (byte) 18, (byte) 255}, JHVTableCellRenderer.cellBorder));
-            put("Jupiter", new SpaceObject("Jupiter%20Barycenter", "Jupiter", 69911000 / Sun.RadiusMeter, new byte[]{(byte) 168, (byte) 172, (byte) 180, (byte) 255}, JHVTableCellRenderer.cellBorder));
-            put("Saturn", new SpaceObject("Saturn%20Barycenter", "Saturn", 58232000 / Sun.RadiusMeter, new byte[]{(byte) 208, (byte) 198, (byte) 173, (byte) 255}, JHVTableCellRenderer.cellBorder));
-            put("Uranus", new SpaceObject("Uranus%20Barycenter", "Uranus", 25362000 / Sun.RadiusMeter, new byte[]{(byte) 201, (byte) 239, (byte) 242, (byte) 255}, JHVTableCellRenderer.cellBorder));
-            put("Neptune", new SpaceObject("Neptune%20Barycenter", "Neptune", 24622000 / Sun.RadiusMeter, new byte[]{(byte) 124, (byte) 157, (byte) 226, (byte) 255}, JHVTableCellRenderer.cellBorder));
-            put("Pluto", new SpaceObject("Pluto%20Barycenter", "Pluto", 1195000 / Sun.RadiusMeter, new byte[]{(byte) 205, (byte) 169, (byte) 140, (byte) 255}, JHVTableCellRenderer.cellEmphasisBorder));
+            put("Mars", new SpaceObject("Mars%20Barycenter", "Mars", 3389500 / Sun.RadiusMeter, BufferUtils.colorBytes(135, 37, 18), JHVTableCellRenderer.cellBorder));
+            put("Jupiter", new SpaceObject("Jupiter%20Barycenter", "Jupiter", 69911000 / Sun.RadiusMeter, BufferUtils.colorBytes(168, 172, 180), JHVTableCellRenderer.cellBorder));
+            put("Saturn", new SpaceObject("Saturn%20Barycenter", "Saturn", 58232000 / Sun.RadiusMeter, BufferUtils.colorBytes(208, 198, 173), JHVTableCellRenderer.cellBorder));
+            put("Uranus", new SpaceObject("Uranus%20Barycenter", "Uranus", 25362000 / Sun.RadiusMeter, BufferUtils.colorBytes(201, 239, 242), JHVTableCellRenderer.cellBorder));
+            put("Neptune", new SpaceObject("Neptune%20Barycenter", "Neptune", 24622000 / Sun.RadiusMeter, BufferUtils.colorBytes(124, 157, 226), JHVTableCellRenderer.cellBorder));
+            put("Pluto", new SpaceObject("Pluto%20Barycenter", "Pluto", 1195000 / Sun.RadiusMeter, BufferUtils.colorBytes(205, 169, 140), JHVTableCellRenderer.cellEmphasisBorder));
 
             put("Comet 67P", new SpaceObject("CHURYUMOV-GERASIMENKO", "Comet 67P", 2200 / Sun.RadiusMeter, BufferUtils.colorWhite, JHVTableCellRenderer.cellEmphasisBorder));
 
