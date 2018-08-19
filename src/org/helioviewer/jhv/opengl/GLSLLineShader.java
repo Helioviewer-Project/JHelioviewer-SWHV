@@ -12,7 +12,7 @@ class GLSLLineShader extends GLSLShader {
     private int thicknessRef;
     private int viewportRef;
 
-    private final float[] thickness = {5};
+    private final float[] thickness = {0.05f};
     private final float[] viewport = {1, 1, 1, 1};
 
     private GLSLLineShader(String vertex, String fragment) {
@@ -25,6 +25,14 @@ class GLSLLineShader extends GLSLShader {
 
     public static void dispose(GL2 gl) {
         line._dispose(gl);
+    }
+
+    @Override
+    protected void bindAttribs(GL2 gl) {
+        gl.glBindAttribLocation(progID, 0, "Vertex");
+        gl.glBindAttribLocation(progID, 1, "Color");
+        gl.glBindAttribLocation(progID, 2, "NextVertex");
+        gl.glBindAttribLocation(progID, 3, "NextColor");
     }
 
     @Override

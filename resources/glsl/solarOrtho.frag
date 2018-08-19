@@ -49,5 +49,5 @@ void main(void) {
             discard;
         }
     }
-    FragColor = getColor(texcoord, difftexcoord, factor);
+    outColor = getColor(texcoord, difftexcoord, factor);
 }

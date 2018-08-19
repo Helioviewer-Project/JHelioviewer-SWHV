@@ -38,5 +38,5 @@ void main(void) {
         get_polar_texcoord(crotaDiff, scrpos, differencerect, difftexcoord, diffradius);
         color = getColor(texcoord, difftexcoord, radius);
     }
-    FragColor = color;
+    outColor = color;
 }

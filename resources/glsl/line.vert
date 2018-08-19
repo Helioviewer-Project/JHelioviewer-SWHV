@@ -1,16 +1,15 @@
-#version 330 core
+#version 140
 
+in vec4 Vertex;
+in vec4 Color;
+in vec4 NextVertex;
+in vec4 NextColor;
 out vec4 fragColor;
 
 uniform float thickness;
 uniform vec4 viewport;
 
 uniform mat4 ModelViewProjectionMatrix;
-
-layout(location = 0) in vec4 Vertex;
-layout(location = 1) in vec4 Color;
-layout(location = 2) in vec4 NextVertex;
-layout(location = 3) in vec4 NextColor;
 
 // https://forums.developer.apple.com/thread/86098
 void main(void) {

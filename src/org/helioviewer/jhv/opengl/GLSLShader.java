@@ -48,6 +48,9 @@ public class GLSLShader {
         }
     }
 
+    protected void bindAttribs(GL2 gl) {
+    }
+
     protected void _after_init(GL2 gl) {
     }
 
@@ -107,6 +110,8 @@ public class GLSLShader {
         progID = gl.glCreateProgram();
         gl.glAttachShader(progID, vertexID);
         gl.glAttachShader(progID, fragmentID);
+
+        bindAttribs(gl);
         gl.glLinkProgram(progID);
 
         int[] params = { 0 };
