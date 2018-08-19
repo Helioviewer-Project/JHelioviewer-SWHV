@@ -175,7 +175,6 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             bindTexture(gl, evtr.getSupplier().getGroup());
             glslTexture.setData(gl, vexBuf);
             glslTexture.render(gl, GL2.GL_TRIANGLE_STRIP, BufferUtils.colorFloat(evtr.getColor()), 4);
-            vexBuf.clear();
         }
     }
 
@@ -261,7 +260,6 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
         glslTexture.setData(gl, vexBuf);
         glslTexture.render(gl, GL2.GL_TRIANGLE_STRIP, color, 4);
-        vexBuf.clear();
     }
 
     private void drawIconScale(Camera camera, Viewport vp, GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Transform xform) {
@@ -384,7 +382,6 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
         glslTexture.setData(gl, vexBuf);
         glslTexture.render(gl, GL2.GL_TRIANGLE_STRIP, color, 4);
-        vexBuf.clear();
     }
 
     private static final int MOUSE_OFFSET_X = 25;
