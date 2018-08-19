@@ -7,6 +7,22 @@ import com.jogamp.opengl.GL2;
 
 public class GLSLSolarShader extends GLSLShader {
 
+    // float[] bc = { 0.06136, 0.24477, 0.38774, 0.24477, 0.06136 }
+    // http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
+    private static final float[] bc = new float[]{.30613f, .38774f, .30613f};
+    private static final float[] blurKernel = new float[]{
+        bc[0] * bc[0], bc[0] * bc[1], bc[0] * bc[2],
+        bc[1] * bc[0], bc[1] * bc[1], bc[1] * bc[2],
+        bc[2] * bc[0], bc[2] * bc[1], bc[2] * bc[2]
+    };
+
+    private static final float[] bo = new float[]{-1.2004377f, 0, 1.2004377f};
+    private static final float[] blurOffset = new float[]{
+        bo[0], bo[0], /**/ bo[1], bo[0], /**/ bo[2], bo[0],
+        bo[0], bo[1], /**/ bo[1], bo[1], /**/ bo[2], bo[1],
+        bo[0], bo[2], /**/ bo[1], bo[2], /**/ bo[2], bo[2]
+    };
+
     public static final GLSLSolarShader ortho = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarOrtho.frag");
     public static final GLSLSolarShader lati = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarLati.frag");
     public static final GLSLSolarShader polar = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarPolar.frag");
@@ -74,6 +90,11 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     @Override
+    protected void bindAttribs(GL2 gl) {
+        gl.glBindAttribLocation(progID, 0, "Vertex");
+    }
+
+    @Override
     protected void _after_init(GL2 gl) {
         isDiffRef = gl.glGetUniformLocation(progID, "isdifference");
 
@@ -103,7 +124,13 @@ public class GLSLSolarShader extends GLSLShader {
         cameraDifferenceRotationQuatRef = gl.glGetUniformLocation(progID, "cameraDifferenceRotationQuat");
         diffCameraDifferenceRotationQuatRef = gl.glGetUniformLocation(progID, "diffcameraDifferenceRotationQuat");
 
+        int blurKernelRef = gl.glGetUniformLocation(progID, "blurKernel");
+        int blurOffsetRef = gl.glGetUniformLocation(progID, "blurOffset");
+
         bind(gl);
+        gl.glUniform1fv(blurKernelRef, blurKernel.length, blurKernel, 0);
+        gl.glUniform2fv(blurOffsetRef, blurOffset.length / 2, blurOffset, 0);
+
         setTextureUnit(gl, "image", GLTexture.Unit.ZERO);
         setTextureUnit(gl, "lut", GLTexture.Unit.ONE);
         setTextureUnit(gl, "diffImage", GLTexture.Unit.TWO);
