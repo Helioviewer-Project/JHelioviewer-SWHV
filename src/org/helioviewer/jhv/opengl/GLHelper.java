@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.ByteArray;
 import org.helioviewer.jhv.base.FloatArray;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
@@ -68,7 +69,7 @@ public class GLHelper {
         return new Dimension((int) (x / GLInfo.pixelScaleFloat[0]), (int) (y / GLInfo.pixelScaleFloat[1]));
     }
 
-    public static Vec2 drawVertex(Camera camera, Viewport vp, Vec3 current, Vec2 previous, FloatArray pos, FloatArray col, float[] color) {
+    public static Vec2 drawVertex(Camera camera, Viewport vp, Vec3 current, Vec2 previous, FloatArray pos, ByteArray col, byte[] color) {
         Position viewpoint = camera.getViewpoint();
         Vec3 pt = viewpoint.toQuat().rotateVector(current);
         Vec2 tf = Display.mode.xform.transform(viewpoint, pt, Display.mode.scale);
@@ -79,32 +80,32 @@ public class GLHelper {
             if (tf.x <= 0 && previous.x >= 0) {
                 x = (float) (0.5 * vp.aspect);
                 pos.put4f(x, y, 0, 1);
-                col.put4f(color);
+                col.put4b(color);
 
                 pos.put4f(x, y, 0, 1);
-                col.put4f(BufferUtils.colorNull);
+                col.put4b(BufferUtils.colorNull);
                 pos.put4f(-x, y, 0, 1);
-                col.put4f(BufferUtils.colorNull);
+                col.put4b(BufferUtils.colorNull);
 
                 pos.put4f(-x, y, 0, 1);
-                col.put4f(color);
+                col.put4b(color);
             } else if (tf.x >= 0 && previous.x <= 0) {
                 x = (float) (-0.5 * vp.aspect);
                 pos.put4f(x, y, 0, 1);
-                col.put4f(color);
+                col.put4b(color);
 
                 pos.put4f(x, y, 0, 1);
-                col.put4f(BufferUtils.colorNull);
+                col.put4b(BufferUtils.colorNull);
                 pos.put4f(-x, y, 0, 1);
-                col.put4f(BufferUtils.colorNull);
+                col.put4b(BufferUtils.colorNull);
 
                 pos.put4f(-x, y, 0, 1);
-                col.put4f(color);
+                col.put4b(color);
             }
         }
         x = (float) (tf.x * vp.aspect);
         pos.put4f(x, y, 0, 1);
-        col.put4f(color);
+        col.put4b(color);
         return tf;
     }
 /*
