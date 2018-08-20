@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.Buf;
-import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
@@ -257,7 +257,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             long t = start;
 
             double dist = response.getInterpolated(xyzw, t, start, end);
-            orbitBuf.put4f(xyzw[0], xyzw[1], xyzw[2], xyzw[3]).put4b(BufferUtils.colorNull);
+            orbitBuf.put4f(xyzw[0], xyzw[1], xyzw[2], xyzw[3]).put4b(Colors.Null);
             orbitBuf.repeat4f().put4b(color);
 
             long delta = getStep(dist);
@@ -269,7 +269,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
                 orbitBuf.put4f(xyzw[0], xyzw[1], xyzw[2], xyzw[3]).put4b(color);
                 delta = getStep(dist);
             }
-            orbitBuf.repeat4f().put4b(BufferUtils.colorNull);
+            orbitBuf.repeat4f().put4b(Colors.Null);
 
             response.getInterpolated(xyz, time, start, end);
             planetBuf.put4f(xyz[0], xyz[1], xyz[2], SIZE_PLANET).put4b(color);

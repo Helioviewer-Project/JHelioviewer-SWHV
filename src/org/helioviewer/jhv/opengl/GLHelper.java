@@ -4,7 +4,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 
 import org.helioviewer.jhv.base.Buf;
-import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
@@ -66,16 +66,16 @@ public class GLHelper {
                 x = (float) (0.5 * vp.aspect);
                 vexBuf.put4f(x, y, 0, 1).put4b(color);
 
-                vexBuf.put4f(x, y, 0, 1).put4b(BufferUtils.colorNull);
-                vexBuf.put4f(-x, y, 0, 1).put4b(BufferUtils.colorNull);
+                vexBuf.put4f(x, y, 0, 1).put4b(Colors.Null);
+                vexBuf.put4f(-x, y, 0, 1).put4b(Colors.Null);
 
                 vexBuf.put4f(-x, y, 0, 1).put4b(color);
             } else if (tf.x >= 0 && previous.x <= 0) {
                 x = (float) (-0.5 * vp.aspect);
                 vexBuf.put4f(x, y, 0, 1).put4b(color);
 
-                vexBuf.put4f(x, y, 0, 1).put4b(BufferUtils.colorNull);
-                vexBuf.put4f(-x, y, 0, 1).put4b(BufferUtils.colorNull);
+                vexBuf.put4f(x, y, 0, 1).put4b(Colors.Null);
+                vexBuf.put4f(-x, y, 0, 1).put4b(Colors.Null);
 
                 vexBuf.put4f(-x, y, 0, 1).put4b(color);
             }
