@@ -144,7 +144,7 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
             lastFixedColor = fixedColor;
             lastRadius = radius;
 
-            pfssLine.calculatePositions(gl, data, detail, fixedColor, radius, lineBuf);
+            pfssLine.calculatePositions(data, detail, fixedColor, radius, lineBuf);
             line.setData(gl, lineBuf);
 
             timeString = data.dateObs.toString();
