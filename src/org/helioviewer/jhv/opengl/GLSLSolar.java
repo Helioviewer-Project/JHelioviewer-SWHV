@@ -6,12 +6,6 @@ import com.jogamp.opengl.GL2;
 
 public class GLSLSolar extends VAO {
 
-    private static final Buf vexBuf = new Buf(4 * 16)
-            .put4f(-1, -1, 0, 1)
-            .put4f(1, -1, 0, 1)
-            .put4f(-1, 1, 0, 1)
-            .put4f(1, 1, 0, 1);
-
     GLSLSolar() {
         super(new VAA[]{new VAA(0, 4, false, 0, 0, 0)});
     }
@@ -24,6 +18,7 @@ public class GLSLSolar extends VAO {
     @Override
     public void init(GL2 gl) {
         super.init(gl);
+        Buf vexBuf = new Buf(4 * 16).put4f(-1, -1, 0, 1).put4f(1, -1, 0, 1).put4f(-1, 1, 0, 1).put4f(1, 1, 0, 1);
         vbo.setData(gl, vexBuf);
     }
 
