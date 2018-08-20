@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -10,6 +8,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
+import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.ByteArray;
 import org.helioviewer.jhv.base.FloatArray;
@@ -46,6 +45,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     private final FOVShape fov = new FOVShape(LINEWIDTH_FOV);
     private final GLSLLine orbits = new GLSLLine();
     private final GLSLShape planets = new GLSLShape();
+    private final Buf planetBuf = new Buf(8 * GLSLShape.stride);
+
     private final ViewpointLayerOptions optionsPanel;
 
     private String timeString = null;
@@ -243,9 +244,6 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     }
 
     private void renderPlanets(GL2 gl, Viewport vp, Collection<LoadPosition> loadPositions) {
-        int size = loadPositions.size();
-        FloatBuffer planetPosition = BufferUtils.newFloatBuffer(4 * size);
-        ByteBuffer planetColor = BufferUtils.newByteBuffer(4 * size);
         FloatArray orbitPosition = new FloatArray();
         ByteArray orbitColor = new ByteArray();
 
@@ -283,9 +281,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             orbitColor.put4b(BufferUtils.colorNull);
 
             response.getInterpolated(xyz, time, start, end);
-            planetPosition.put(xyz);
-            planetPosition.put(SIZE_PLANET);
-            planetColor.put(color);
+            planetBuf.put4f(xyz[0], xyz[1], xyz[2], SIZE_PLANET).put4b(color);
         }
 
         if (orbitPosition.length() >= 2 * 3) {
@@ -293,9 +289,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             orbits.render(gl, vp, LINEWIDTH_ORBIT);
         }
 
-        planetPosition.rewind();
-        planetColor.rewind();
-        planets.setData(gl, planetPosition, planetColor);
+        planets.setData(gl, planetBuf);
         planets.renderPoints(gl, 1);
     }
 

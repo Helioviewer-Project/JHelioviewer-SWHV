@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
@@ -71,15 +72,9 @@ class GridMath {
     }
 
     static void initEarthPoint(GL2 gl, GLSLShape earthPoint) {
-        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(4);
-        ByteBuffer colorBuffer = BufferUtils.newByteBuffer(4);
-
-        BufferUtils.put4f(vertexBuffer, 0, 0, (float) EARTH_CIRCLE_RADIUS, earthPointSize);
-        colorBuffer.put(earthLineColor);
-
-        vertexBuffer.rewind();
-        colorBuffer.rewind();
-        earthPoint.setData(gl, vertexBuffer, colorBuffer);
+        Buf vexBuf = new Buf(GLSLShape.stride);
+        vexBuf.put4f(0, 0, (float) EARTH_CIRCLE_RADIUS, earthPointSize).put4b(earthLineColor);
+        earthPoint.setData(gl, vexBuf);
     }
 
     static void initEarthCircles(GL2 gl, GLSLLine earthCircleLine) {

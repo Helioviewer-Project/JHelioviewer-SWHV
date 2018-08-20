@@ -66,7 +66,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     private static final double ICON_SIZE_HIGHLIGHTED = 0.16;
 
     private static final float texCoord[][] = {{0, 1}, {1, 1}, {0, 0}, {1, 0}};
-    private final Buf vexBuf = new Buf(4 * (16 + 8));
+    private final Buf vexBuf = new Buf(4 * GLSLTexture.stride);
 
     private boolean icons = true;
 
