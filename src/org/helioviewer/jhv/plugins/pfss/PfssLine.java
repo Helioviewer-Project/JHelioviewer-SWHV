@@ -1,9 +1,8 @@
 package org.helioviewer.jhv.plugins.pfss;
 
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
+import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.plugins.pfss.data.PfssData;
@@ -37,7 +36,7 @@ class PfssLine {
         return (buf.get(idx) + 32768.) * (2. / 65535.) - 1.;
     }
 
-    public void calculatePositions(GL2 gl, PfssData data, int detail, boolean fixedColor, double radius, GLSLLine line) {
+    public void calculatePositions(GL2 gl, PfssData data, int detail, boolean fixedColor, double radius, Buf lineBuf) {
         int pointsPerLine = data.pointsPerLine;
         double cphi = data.cphi;
         double sphi = data.sphi;
@@ -45,12 +44,7 @@ class PfssLine {
         ShortBuffer fliney = data.fliney;
         ShortBuffer flinez = data.flinez;
         ShortBuffer flines = data.flines;
-
         int dlength = flinex.capacity();
-        int numberOfLines = dlength / pointsPerLine;
-
-        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(4 * (dlength + 2 * numberOfLines));
-        ByteBuffer colorBuffer = BufferUtils.newByteBuffer(4 * (dlength + 2 * numberOfLines));
 
         byte[] oneColor = loopColor;
         for (int i = 0; i < dlength; i++) {
@@ -68,8 +62,7 @@ class PfssLine {
                 double r = Math.sqrt(x * x + y * y + z * z);
 
                 if (i % pointsPerLine == 0) { // start line
-                    BufferUtils.put4f(vertexBuffer, (float) x, (float) z, (float) -y, 1);
-                    colorBuffer.put(BufferUtils.colorNull);
+                    lineBuf.put4f((float) x, (float) z, (float) -y, 1).put4b(BufferUtils.colorNull);
 
                     if (fixedColor) {
                         double xo = 3. * decode(flinex, i + pointsPerLine - 1);
@@ -87,19 +80,14 @@ class PfssLine {
                     }
                 }
 
-                BufferUtils.put4f(vertexBuffer, (float) x, (float) z, (float) -y, 1);
-                colorBuffer.put(r > radius ? BufferUtils.colorNull : (fixedColor ? oneColor : brightColor));
+                lineBuf.put4f((float) x, (float) z, (float) -y, 1);
+                lineBuf.put4b(r > radius ? BufferUtils.colorNull : (fixedColor ? oneColor : brightColor));
 
                 if (i % pointsPerLine == pointsPerLine - 1) { // end line
-                    BufferUtils.put4f(vertexBuffer, (float) x, (float) z, (float) -y, 1);
-                    colorBuffer.put(BufferUtils.colorNull);
+                    lineBuf.put4f((float) x, (float) z, (float) -y, 1).put4b(BufferUtils.colorNull);
                 }
             }
         }
-
-        vertexBuffer.rewind();
-        colorBuffer.rewind();
-        line.setData(gl, vertexBuffer, colorBuffer);
     }
 
 }

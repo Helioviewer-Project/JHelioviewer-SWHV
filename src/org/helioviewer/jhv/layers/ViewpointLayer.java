@@ -10,8 +10,6 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.BufferUtils;
-import org.helioviewer.jhv.base.ByteArray;
-import org.helioviewer.jhv.base.FloatArray;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
@@ -44,6 +42,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
     private final FOVShape fov = new FOVShape(LINEWIDTH_FOV);
     private final GLSLLine orbits = new GLSLLine();
+    private final Buf orbitBuf = new Buf(32 * GLSLLine.stride);
     private final GLSLShape planets = new GLSLShape();
     private final Buf planetBuf = new Buf(8 * GLSLShape.stride);
 
@@ -244,15 +243,11 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     }
 
     private void renderPlanets(GL2 gl, Viewport vp, Collection<LoadPosition> loadPositions) {
-        FloatArray orbitPosition = new FloatArray();
-        ByteArray orbitColor = new ByteArray();
-
         float[] xyz = new float[3];
         float[] xyzw = new float[4];
         xyzw[3] = 1;
 
         long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
-
         for (LoadPosition loadPosition : loadPositions) {
             PositionResponse response = loadPosition.getResponse();
             if (response == null)
@@ -262,10 +257,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             long t = start;
 
             double dist = response.getInterpolated(xyzw, t, start, end);
-            orbitPosition.put4f(xyzw);
-            orbitColor.put4b(BufferUtils.colorNull);
-            orbitPosition.repeat4f();
-            orbitColor.put4b(color);
+            orbitBuf.put4f(xyzw[0], xyzw[1], xyzw[2], xyzw[3]).put4b(BufferUtils.colorNull);
+            orbitBuf.repeat4f().put4b(color);
 
             long delta = getStep(dist);
             while (t < time) {
@@ -273,21 +266,17 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
                 if (t > time)
                     t = time;
                 dist = response.getInterpolated(xyzw, t, start, end);
-                orbitPosition.put4f(xyzw);
-                orbitColor.put4b(color);
+                orbitBuf.put4f(xyzw[0], xyzw[1], xyzw[2], xyzw[3]).put4b(color);
                 delta = getStep(dist);
             }
-            orbitPosition.repeat4f();
-            orbitColor.put4b(BufferUtils.colorNull);
+            orbitBuf.repeat4f().put4b(BufferUtils.colorNull);
 
             response.getInterpolated(xyz, time, start, end);
             planetBuf.put4f(xyz[0], xyz[1], xyz[2], SIZE_PLANET).put4b(color);
         }
 
-        if (orbitPosition.length() >= 2 * 3) {
-            orbits.setData(gl, orbitPosition.toBuffer(), orbitColor.toBuffer());
-            orbits.render(gl, vp, LINEWIDTH_ORBIT);
-        }
+        orbits.setData(gl, orbitBuf);
+        orbits.render(gl, vp, LINEWIDTH_ORBIT);
 
         planets.setData(gl, planetBuf);
         planets.renderPoints(gl, 1);
