@@ -4,7 +4,7 @@ import org.helioviewer.jhv.base.Buf;
 
 import com.jogamp.opengl.GL2;
 
-public class GLSLSolar extends VAO2 {
+public class GLSLSolar extends VAO {
 
     private static final Buf vexBuf = new Buf(4 * 16)
             .put4f(-1, -1, 0, 1)

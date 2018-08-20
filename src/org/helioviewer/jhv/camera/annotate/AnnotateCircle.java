@@ -1,8 +1,7 @@
 package org.helioviewer.jhv.camera.annotate;
 
+import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.BufferUtils;
-import org.helioviewer.jhv.base.ByteArray;
-import org.helioviewer.jhv.base.FloatArray;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
@@ -20,6 +19,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
     private static final int SUBDIVISIONS = 90;
 
     private final GLSLLine line = new GLSLLine();
+    private final Buf lineBuf = new Buf((SUBDIVISIONS + 3) * GLSLLine.stride);
 
     public AnnotateCircle(JSONObject jo) {
         super(jo);
@@ -35,7 +35,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
         line.dispose(gl);
     }
 
-    private static void drawCircle(Camera camera, Viewport vp, Vec3 bp, Vec3 ep, FloatArray pos, ByteArray col, byte[] color) {
+    private void drawCircle(Camera camera, Viewport vp, Vec3 bp, Vec3 ep, byte[] color) {
         double cosf = Vec3.dot(bp, ep);
         double r = Math.sqrt(1 - cosf * cosf);
         // P = center + r cos(A) (bp x ep) + r sin(A) ep
@@ -57,23 +57,20 @@ public class AnnotateCircle extends AbstractAnnotateable {
             vx.z = center.z + cosr * u.z + sinr * v.z;
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 if (i == 0) {
-                    pos.put4f(vx);
-                    col.put4b(BufferUtils.colorNull);
+                    lineBuf.put4f(vx).put4b(BufferUtils.colorNull);
                 }
-                pos.put4f(vx);
-                col.put4b(color);
+                lineBuf.put4f(vx).put4b(color);
                 if (i == SUBDIVISIONS) {
-                    pos.put4f(vx);
-                    col.put4b(BufferUtils.colorNull);
+                    lineBuf.put4f(vx).put4b(BufferUtils.colorNull);
                 }
             } else {
                 vx.y = -vx.y;
                 if (i == 0) {
-                    GLHelper.drawVertex(camera, vp, vx, previous, pos, col, BufferUtils.colorNull);
+                    GLHelper.drawVertex(camera, vp, vx, previous, lineBuf, BufferUtils.colorNull);
                 }
-                previous = GLHelper.drawVertex(camera, vp, vx, previous, pos, col, color);
+                previous = GLHelper.drawVertex(camera, vp, vx, previous, lineBuf, color);
                 if (i == SUBDIVISIONS) {
-                    GLHelper.drawVertex(camera, vp, vx, previous, pos, col, BufferUtils.colorNull);
+                    GLHelper.drawVertex(camera, vp, vx, previous, lineBuf, BufferUtils.colorNull);
                 }
             }
         }
@@ -89,11 +86,8 @@ public class AnnotateCircle extends AbstractAnnotateable {
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
 
-        FloatArray pos = new FloatArray();
-        ByteArray col = new ByteArray();
-
-        drawCircle(camera, vp, p0, p1, pos, col, color);
-        line.setData(gl, pos.toBuffer(), col.toBuffer());
+        drawCircle(camera, vp, p0, p1, color);
+        line.setData(gl, lineBuf);
         line.render(gl, vp, LINEWIDTH);
     }
 

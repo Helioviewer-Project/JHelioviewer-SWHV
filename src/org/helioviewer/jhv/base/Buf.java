@@ -29,8 +29,7 @@ public class Buf {
     }
 
     public Buf put4f(Vec3 v) {
-        put4f((float) v.x, (float) v.y, (float) v.z, 1);
-        return this;
+        return put4f((float) v.x, (float) v.y, (float) v.z, 1);
     }
 
     public Buf put4f(float x, float y, float z, float w) {
@@ -38,13 +37,13 @@ public class Buf {
         last[1] = y;
         last[2] = z;
         last[3] = w;
-        repeat4f();
-        return this;
+        return repeat4f();
     }
 
-    public void repeat4f() {
+    public Buf repeat4f() {
         buf.writeFloatLE(last[0]).writeFloatLE(last[1]).writeFloatLE(last[2]).writeFloatLE(last[3]);
         floats += 4;
+        return this;
     }
 
     public void put4b(byte[] b) {
