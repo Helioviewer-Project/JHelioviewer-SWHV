@@ -26,8 +26,8 @@ class VAO {
             vbo.bind(gl);
 
             gl.glBindVertexArray(vaoID);
-            for (int i = 0; i < vaa.length; i++) {
-                vaa[i].enable(gl);
+            for (VAA avaa : vaa) {
+                avaa.enable(gl);
             }
         }
     }
