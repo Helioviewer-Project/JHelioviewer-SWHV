@@ -1,8 +1,7 @@
 package org.helioviewer.jhv.camera.annotate;
 
+import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.BufferUtils;
-import org.helioviewer.jhv.base.ByteArray;
-import org.helioviewer.jhv.base.FloatArray;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
@@ -20,6 +19,7 @@ public class AnnotateCross extends AbstractAnnotateable {
     private static final int SUBDIVISIONS = 2;
 
     private final GLSLLine line = new GLSLLine();
+    private final Buf lineBuf = new Buf(2 * (SUBDIVISIONS + 3) * GLSLLine.stride);
 
     public AnnotateCross(JSONObject jo) {
         super(jo);
@@ -35,41 +35,38 @@ public class AnnotateCross extends AbstractAnnotateable {
         line.dispose(gl);
     }
 
-    private static void drawCross(Camera camera, Viewport vp, Vec3 bp, FloatArray pos, ByteArray col, byte[] color) {
+    private void drawCross(Camera camera, Viewport vp, Vec3 bp, byte[] color) {
         double delta = 2.5 * Math.PI / 180;
         Vec3 p1 = new Vec3(radius, bp.y + delta, bp.z);
         Vec3 p2 = new Vec3(radius, bp.y - delta, bp.z);
         Vec3 p3 = new Vec3(radius, bp.y, bp.z + delta);
         Vec3 p4 = new Vec3(radius, bp.y, bp.z - delta);
 
-        interpolatedDraw(camera, vp, p1, p2, pos, col, color);
-        interpolatedDraw(camera, vp, p3, p4, pos, col, color);
+        interpolatedDraw(camera, vp, p1, p2, color);
+        interpolatedDraw(camera, vp, p3, p4, color);
     }
 
-    private static void interpolatedDraw(Camera camera, Viewport vp, Vec3 p1s, Vec3 p2s, FloatArray pos, ByteArray col, byte[] color) {
+    private void interpolatedDraw(Camera camera, Viewport vp, Vec3 p1s, Vec3 p2s, byte[] color) {
         Vec2 previous = null;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, p1s, p2s);
 
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 if (i == 0) {
-                    pos.put4f(pc);
-                    col.put4b(BufferUtils.colorNull);
+                    lineBuf.put4f(pc).put4b(BufferUtils.colorNull);
                 }
-                pos.put4f(pc);
-                col.put4b(color);
+                lineBuf.put4f(pc).put4b(color);
                 if (i == SUBDIVISIONS) {
-                    pos.put4f(pc);
-                    col.put4b(BufferUtils.colorNull);
+                    lineBuf.put4f(pc).put4b(BufferUtils.colorNull);
                 }
             } else {
                 pc.y = -pc.y;
                 if (i == 0) {
-                    GLHelper.drawVertex(camera, vp, pc, previous, pos, col, BufferUtils.colorNull);
+                    GLHelper.drawVertex(camera, vp, pc, previous, lineBuf, BufferUtils.colorNull);
                 }
-                previous = GLHelper.drawVertex(camera, vp, pc, previous, pos, col, color);
+                previous = GLHelper.drawVertex(camera, vp, pc, previous, lineBuf, color);
                 if (i == SUBDIVISIONS) {
-                    GLHelper.drawVertex(camera, vp, pc, previous, pos, col, BufferUtils.colorNull);
+                    GLHelper.drawVertex(camera, vp, pc, previous, lineBuf, BufferUtils.colorNull);
                 }
             }
         }
@@ -81,11 +78,9 @@ public class AnnotateCross extends AbstractAnnotateable {
             return;
 
         byte[] color = active ? activeColor : baseColor;
-        FloatArray pos = new FloatArray();
-        ByteArray col = new ByteArray();
+        drawCross(camera, vp, toSpherical(startPoint), color);
 
-        drawCross(camera, vp, toSpherical(startPoint), pos, col, color);
-        line.setData(gl, pos.toBuffer(), col.toBuffer());
+        line.setData(gl, lineBuf);
 //      gl.glDisable(GL2.GL_DEPTH_TEST);
         line.render(gl, vp, LINEWIDTH);
 //      gl.glEnable(GL2.GL_DEPTH_TEST);

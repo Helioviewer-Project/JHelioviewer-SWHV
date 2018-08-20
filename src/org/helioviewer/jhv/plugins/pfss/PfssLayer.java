@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -29,6 +30,7 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
     private final PfssLayerOptions optionsPanel;
     private final PfssLine pfssLine = new PfssLine();
     private final GLSLLine line = new GLSLLine();
+    private final Buf lineBuf = new Buf(32 * GLSLLine.stride); // typically 145152
     private PfssData previousPfssData;
 
     public PfssLayer(JSONObject jo) {
@@ -142,7 +144,8 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
             lastFixedColor = fixedColor;
             lastRadius = radius;
 
-            pfssLine.calculatePositions(gl, data, detail, fixedColor, radius, line);
+            pfssLine.calculatePositions(gl, data, detail, fixedColor, radius, lineBuf);
+            line.setData(gl, lineBuf);
 
             timeString = data.dateObs.toString();
             ImageViewerGui.getLayers().fireTimeUpdated(this);

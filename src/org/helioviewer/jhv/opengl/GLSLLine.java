@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.opengl;
 
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-
+import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.log.Log;
 
@@ -12,22 +10,22 @@ public class GLSLLine extends VAO {
 
     private static final int size0 = 4;
     private static final int size1 = 4;
+    public static final int stride = 4 * size0 + size1;
     private int count;
 
     public GLSLLine() {
-        super(2, new VAA[]{
-                new VAA(0, size0, false, 0, 0, 1), new VAA(1, size1, true, 0, 0, 1),
-                new VAA(2, size0, false, 0, 16, 1), new VAA(3, size1, true, 0, 4, 1)});
+        super(new VAA[]{
+                new VAA(0, size0, false, stride, 0, 1), new VAA(1, size1, true, stride, 4 * size0, 1),
+                new VAA(2, size0, false, stride, stride, 1), new VAA(3, size1, true, stride, stride + 4 * size0, 1)});
     }
 
-    public void setData(GL2 gl, FloatBuffer position, ByteBuffer color) {
-        int plen = position.limit() / size0;
-        if (plen * size0 != position.limit() || plen != color.limit() / size1) {
-            Log.error("Something is wrong with the attributes of this GLSLPolyline");
+    public void setData(GL2 gl, Buf buf) {
+        int plen = buf.getFloats() / size0;
+        if (plen * size0 != buf.getFloats() || plen != buf.getBytes4()) {
+            Log.error("Something is wrong with the attributes of this GLSLLine");
             return;
         }
-        vbo[0].setData(gl, position, 4);
-        vbo[1].setData(gl, color, 1);
+        vbo.setData(gl, buf);
         count = plen - 1;
     }
 

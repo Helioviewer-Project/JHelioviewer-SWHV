@@ -1,8 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-
 import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.display.Viewport;
@@ -18,6 +15,7 @@ public class FOVShape {
     private final double thickness;
 
     private final GLSLLine line = new GLSLLine();
+    private final Buf lineBuf = new Buf((4 * (SUBDIVISIONS + 1) + 2) * GLSLLine.stride);
     private final GLSLShape point = new GLSLShape();
     private final Buf pointBuf = new Buf(GLSLShape.stride);
 
@@ -59,53 +57,45 @@ public class FOVShape {
         double bh = distance * tanY;
         byte[] color = highlight ? BufferUtils.colorRed : BufferUtils.colorBlue;
 
-        int no_points = 4 * (SUBDIVISIONS + 1) + 2;
-        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(no_points * 4);
-        ByteBuffer colorBuffer = BufferUtils.newByteBuffer(no_points * 4);
-
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             x = -bw + 2 * bw / SUBDIVISIONS * i + centerX;
             y = bh + centerY;
             z = computeZ(x, y);
             if (i == 0) { // first
-                BufferUtils.put4f(vertexBuffer, (float) x, (float) y, (float) z, 1);
-                colorBuffer.put(BufferUtils.colorNull);
+                lineBuf.put4f((float) x, (float) y, (float) z, 1).put4b(BufferUtils.colorNull);
             }
-            BufferUtils.put4f(vertexBuffer, (float) x, (float) y, (float) z, 1);
-            colorBuffer.put(i % 2 == 0 ? color : BufferUtils.colorWhite);
+            lineBuf.put4f((float) x, (float) y, (float) z, 1);
+            lineBuf.put4b(i % 2 == 0 ? color : BufferUtils.colorWhite);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             x = bw + centerX;
             y = bh - 2 * bh / SUBDIVISIONS * i + centerY;
             z = computeZ(x, y);
-            BufferUtils.put4f(vertexBuffer, (float) x, (float) y, (float) z, 1);
-            colorBuffer.put(i % 2 == 0 ? color : BufferUtils.colorWhite);
+            lineBuf.put4f((float) x, (float) y, (float) z, 1);
+            lineBuf.put4b(i % 2 == 0 ? color : BufferUtils.colorWhite);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             x = bw - 2 * bw / SUBDIVISIONS * i + centerX;
             y = -bh + centerY;
             z = computeZ(x, y);
-            BufferUtils.put4f(vertexBuffer, (float) x, (float) y, (float) z, 1);
-            colorBuffer.put(i % 2 == 0 ? color : BufferUtils.colorWhite);
+            lineBuf.put4f((float) x, (float) y, (float) z, 1);
+            lineBuf.put4b(i % 2 == 0 ? color : BufferUtils.colorWhite);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             x = -bw + centerX;
             y = -bh + 2 * bh / SUBDIVISIONS * i + centerY;
             z = computeZ(x, y);
-            BufferUtils.put4f(vertexBuffer, (float) x, (float) y, (float) z, 1);
-            colorBuffer.put(i % 2 == 0 ? color : BufferUtils.colorWhite);
+            lineBuf.put4f((float) x, (float) y, (float) z, 1);
+            lineBuf.put4b(i % 2 == 0 ? color : BufferUtils.colorWhite);
             if (i == SUBDIVISIONS) { // last
-                BufferUtils.put4f(vertexBuffer, (float) x, (float) y, (float) z, 1);
-                colorBuffer.put(BufferUtils.colorNull);
+                lineBuf.put4f((float) x, (float) y, (float) z, 1).put4b(BufferUtils.colorNull);
             }
         }
 
-        vertexBuffer.rewind();
-        colorBuffer.rewind();
-        line.setData(gl, vertexBuffer, colorBuffer);
+        line.setData(gl, lineBuf);
     }
 
     public void render(GL2 gl, Viewport vp, double distance, double pointFactor, boolean highlight) {
