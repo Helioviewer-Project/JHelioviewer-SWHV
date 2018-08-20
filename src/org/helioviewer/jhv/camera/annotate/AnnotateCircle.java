@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.camera.annotate;
 
 import org.helioviewer.jhv.base.Buf;
-import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
@@ -57,20 +57,20 @@ public class AnnotateCircle extends AbstractAnnotateable {
             vx.z = center.z + cosr * u.z + sinr * v.z;
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 if (i == 0) {
-                    lineBuf.put4f(vx).put4b(BufferUtils.colorNull);
+                    lineBuf.put4f(vx).put4b(Colors.Null);
                 }
                 lineBuf.put4f(vx).put4b(color);
                 if (i == SUBDIVISIONS) {
-                    lineBuf.put4f(vx).put4b(BufferUtils.colorNull);
+                    lineBuf.put4f(vx).put4b(Colors.Null);
                 }
             } else {
                 vx.y = -vx.y;
                 if (i == 0) {
-                    GLHelper.drawVertex(camera, vp, vx, previous, lineBuf, BufferUtils.colorNull);
+                    GLHelper.drawVertex(camera, vp, vx, previous, lineBuf, Colors.Null);
                 }
                 previous = GLHelper.drawVertex(camera, vp, vx, previous, lineBuf, color);
                 if (i == SUBDIVISIONS) {
-                    GLHelper.drawVertex(camera, vp, vx, previous, lineBuf, BufferUtils.colorNull);
+                    GLHelper.drawVertex(camera, vp, vx, previous, lineBuf, Colors.Null);
                 }
             }
         }

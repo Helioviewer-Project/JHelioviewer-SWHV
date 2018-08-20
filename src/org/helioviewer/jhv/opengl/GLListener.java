@@ -2,7 +2,7 @@ package org.helioviewer.jhv.opengl;
 
 import java.awt.EventQueue;
 
-import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
@@ -64,7 +64,7 @@ public class GLListener implements GLEventListener {
         GLSLTextureShader.init(gl);
 
         blackCircle.init(gl);
-        GLHelper.initCircleFront(gl, blackCircle, 0, 0, 0.9998, 180, BufferUtils.colorBlack);
+        GLHelper.initCircleFront(gl, blackCircle, 0, 0, 0.9998, 180, Colors.Black);
     }
 
     @Override

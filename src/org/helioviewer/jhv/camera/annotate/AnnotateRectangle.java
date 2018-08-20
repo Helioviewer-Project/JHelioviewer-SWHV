@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.camera.annotate;
 
 import org.helioviewer.jhv.base.Buf;
-import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
@@ -56,13 +56,13 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 if (i == 0) { // first
-                    lineBuf.put4f(pc).put4b(BufferUtils.colorNull);
+                    lineBuf.put4f(pc).put4b(Colors.Null);
                 }
                 lineBuf.put4f(pc).put4b(color);
             } else {
                 pc.y = -pc.y;
                 if (i == 0) {
-                    GLHelper.drawVertex(camera, vp, pc, previous, lineBuf, BufferUtils.colorNull);
+                    GLHelper.drawVertex(camera, vp, pc, previous, lineBuf, Colors.Null);
                 }
                 previous = GLHelper.drawVertex(camera, vp, pc, previous, lineBuf, color);
             }
@@ -102,13 +102,13 @@ public class AnnotateRectangle extends AbstractAnnotateable {
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 lineBuf.put4f(pc).put4b(color);
                 if (i == SUBDIVISIONS) { // last
-                    lineBuf.put4f(pc).put4b(BufferUtils.colorNull);
+                    lineBuf.put4f(pc).put4b(Colors.Null);
                 }
             } else {
                 pc.y = -pc.y;
                 previous = GLHelper.drawVertex(camera, vp, pc, previous, lineBuf, color);
                 if (i == SUBDIVISIONS) {
-                    GLHelper.drawVertex(camera, vp, pc, previous, lineBuf, BufferUtils.colorNull);
+                    GLHelper.drawVertex(camera, vp, pc, previous, lineBuf, Colors.Null);
                 }
             }
         }

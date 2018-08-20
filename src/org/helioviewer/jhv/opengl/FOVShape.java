@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.opengl;
 
 import org.helioviewer.jhv.base.Buf;
-import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Viewport;
 
 import com.jogamp.opengl.GL2;
@@ -42,7 +42,7 @@ public class FOVShape {
 
     private void computeCenter(GL2 gl, boolean highlight) {
         pointBuf.put4f((float) centerX, (float) centerY, (float) centerZ, SIZE_POINT);
-        pointBuf.put4b(highlight ? BufferUtils.colorRed : BufferUtils.colorBlue);
+        pointBuf.put4b(highlight ? Colors.Red : Colors.Blue);
         point.setData(gl, pointBuf);
     }
 
@@ -55,17 +55,17 @@ public class FOVShape {
         double x, y, z;
         double bw = distance * tanX;
         double bh = distance * tanY;
-        byte[] color = highlight ? BufferUtils.colorRed : BufferUtils.colorBlue;
+        byte[] color = highlight ? Colors.Red : Colors.Blue;
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             x = -bw + 2 * bw / SUBDIVISIONS * i + centerX;
             y = bh + centerY;
             z = computeZ(x, y);
             if (i == 0) { // first
-                lineBuf.put4f((float) x, (float) y, (float) z, 1).put4b(BufferUtils.colorNull);
+                lineBuf.put4f((float) x, (float) y, (float) z, 1).put4b(Colors.Null);
             }
             lineBuf.put4f((float) x, (float) y, (float) z, 1);
-            lineBuf.put4b(i % 2 == 0 ? color : BufferUtils.colorWhite);
+            lineBuf.put4b(i % 2 == 0 ? color : Colors.White);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
@@ -73,7 +73,7 @@ public class FOVShape {
             y = bh - 2 * bh / SUBDIVISIONS * i + centerY;
             z = computeZ(x, y);
             lineBuf.put4f((float) x, (float) y, (float) z, 1);
-            lineBuf.put4b(i % 2 == 0 ? color : BufferUtils.colorWhite);
+            lineBuf.put4b(i % 2 == 0 ? color : Colors.White);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
@@ -81,7 +81,7 @@ public class FOVShape {
             y = -bh + centerY;
             z = computeZ(x, y);
             lineBuf.put4f((float) x, (float) y, (float) z, 1);
-            lineBuf.put4b(i % 2 == 0 ? color : BufferUtils.colorWhite);
+            lineBuf.put4b(i % 2 == 0 ? color : Colors.White);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
@@ -89,9 +89,9 @@ public class FOVShape {
             y = -bh + 2 * bh / SUBDIVISIONS * i + centerY;
             z = computeZ(x, y);
             lineBuf.put4f((float) x, (float) y, (float) z, 1);
-            lineBuf.put4b(i % 2 == 0 ? color : BufferUtils.colorWhite);
+            lineBuf.put4b(i % 2 == 0 ? color : Colors.White);
             if (i == SUBDIVISIONS) { // last
-                lineBuf.put4f((float) x, (float) y, (float) z, 1).put4b(BufferUtils.colorNull);
+                lineBuf.put4f((float) x, (float) y, (float) z, 1).put4b(Colors.Null);
             }
         }
 
