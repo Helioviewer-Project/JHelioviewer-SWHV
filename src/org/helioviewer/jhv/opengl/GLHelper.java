@@ -2,9 +2,8 @@ package org.helioviewer.jhv.opengl;
 
 import java.awt.Dimension;
 import java.awt.Point;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 
+import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.ByteArray;
 import org.helioviewer.jhv.base.FloatArray;
@@ -27,38 +26,26 @@ public class GLHelper {
 
     public static void initCircleFront(GL2 gl, GLSLShape circle, double x, double y, double r, int segments, byte[] color) {
         int no_points = 2 * 4 * (segments + 1);
-        FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(no_points);
-        ByteBuffer colorBuffer = BufferUtils.newByteBuffer(no_points);
+        Buf vexBuf = new Buf(no_points * GLSLShape.stride);
         for (int i = 0; i <= segments; ++i) {
             double t = 2 * Math.PI * i / segments;
-            BufferUtils.put4f(positionBuffer, (float) (x + Math.sin(t) * r), (float) (y + Math.cos(t) * r), 0, 1);
-            colorBuffer.put(color);
-            BufferUtils.put4f(positionBuffer, (float) x, (float) y, 0, 1);
-            colorBuffer.put(color);
+            vexBuf.put4f((float) (x + Math.sin(t) * r), (float) (y + Math.cos(t) * r), 0, 1).put4b(color);
+            vexBuf.put4f((float) x, (float) y, 0, 1).put4b(color);
         }
-        positionBuffer.rewind();
-        colorBuffer.rewind();
-        circle.setData(gl, positionBuffer, colorBuffer);
+        circle.setData(gl, vexBuf);
     }
 
     public static void initRectangleFront(GL2 gl, GLSLShape rectangle, double x0, double y0, double w, double h, byte[] color) {
-        int vertices = 4;
-        FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(4 * vertices);
-        ByteBuffer colorBuffer = BufferUtils.newByteBuffer(4 * vertices);
+        Buf vexBuf = new Buf(4 * GLSLShape.stride);
         float x1 = (float) (x0 + w);
         float y1 = (float) (y0 + h);
 
-        BufferUtils.put4f(positionBuffer, (float) x0, (float) y0, 0, 1);
-        BufferUtils.put4f(positionBuffer,         x1, (float) y0, 0, 1);
-        BufferUtils.put4f(positionBuffer, (float) x0,         y1, 0, 1);
-        BufferUtils.put4f(positionBuffer,         x1,         y1, 0, 1);
+        vexBuf.put4f((float) x0, (float) y0, 0, 1).put4b(color);
+        vexBuf.put4f(x1, (float) y0, 0, 1).put4b(color);
+        vexBuf.put4f((float) x0, y1, 0, 1).put4b(color);
+        vexBuf.put4f(x1, y1, 0, 1).put4b(color);
 
-        for (int i = 0; i < vertices; i++)
-            colorBuffer.put(color);
-
-        positionBuffer.rewind();
-        colorBuffer.rewind();
-        rectangle.setData(gl, positionBuffer, colorBuffer);
+        rectangle.setData(gl, vexBuf);
     }
 
     public static Point GL2AWTPoint(int x, int y) {
@@ -108,18 +95,18 @@ public class GLHelper {
         col.put4b(color);
         return tf;
     }
-/*
-    public static GLCanvas createGLCanvas() {
-        GLProfile profile = GLProfile.getDefault();
-        GLCapabilities capabilities = getGLCapabilities(profile);
-        GLCanvas canvas = new GLCanvas(capabilities);
+    /*
+        public static GLCanvas createGLCanvas() {
+            GLProfile profile = GLProfile.getDefault();
+            GLCapabilities capabilities = getGLCapabilities(profile);
+            GLCanvas canvas = new GLCanvas(capabilities);
 
-        // GUI events can lead to context destruction and invalidation of GL objects and state
-        canvas.setSharedAutoDrawable(getSharedDrawable(profile, capabilities));
+            // GUI events can lead to context destruction and invalidation of GL objects and state
+            canvas.setSharedAutoDrawable(getSharedDrawable(profile, capabilities));
 
-        return canvas;
-    }
-*/
+            return canvas;
+        }
+    */
     public static GLWindow createGLWindow() {
         GLProfile profile = GLProfile.getGL2GL3();
         GLCapabilities capabilities = getGLCapabilities(profile);

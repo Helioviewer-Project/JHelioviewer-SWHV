@@ -3,6 +3,7 @@ package org.helioviewer.jhv.opengl;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
+import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.display.Viewport;
 
@@ -18,6 +19,7 @@ public class FOVShape {
 
     private final GLSLLine line = new GLSLLine();
     private final GLSLShape point = new GLSLShape();
+    private final Buf pointBuf = new Buf(GLSLShape.stride);
 
     private double centerX = 0;
     private double centerY = 0;
@@ -41,14 +43,9 @@ public class FOVShape {
     }
 
     private void computeCenter(GL2 gl, boolean highlight) {
-        FloatBuffer vertexBuffer = BufferUtils.newFloatBuffer(4);
-        ByteBuffer colorBuffer = BufferUtils.newByteBuffer(4);
-        BufferUtils.put4f(vertexBuffer, (float) centerX, (float) centerY, (float) centerZ, SIZE_POINT);
-        colorBuffer.put(highlight ? BufferUtils.colorRed : BufferUtils.colorBlue);
-
-        vertexBuffer.rewind();
-        colorBuffer.rewind();
-        point.setData(gl, vertexBuffer, colorBuffer);
+        pointBuf.put4f((float) centerX, (float) centerY, (float) centerZ, SIZE_POINT);
+        pointBuf.put4b(highlight ? BufferUtils.colorRed : BufferUtils.colorBlue);
+        point.setData(gl, pointBuf);
     }
 
     private static double computeZ(double x, double y) {

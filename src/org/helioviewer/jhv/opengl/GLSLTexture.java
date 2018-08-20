@@ -9,7 +9,8 @@ public class GLSLTexture extends VAO2 {
 
     private static final int size0 = 4;
     private static final int size1 = 2;
-    private static final int stride = 4 * (size0 + size1);
+    public static final int stride = 4 * (size0 + size1);
+
     private int count;
 
     public GLSLTexture() {
