@@ -61,6 +61,7 @@ import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Transform;
+import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLSLTexture;
 
 import com.jogamp.opengl.GL2;
@@ -418,12 +419,8 @@ public class JhvTextRenderer {
         internal_beginRendering(ortho, width, height);
 
         if (!haveMaxSize) {
-            // Query OpenGL for the maximum texture size and set it in the
-            // RectanglePacker to keep it from expanding too large
-            int[] sz = new int[1];
-            GL2 gl = (GL2) GLContext.getCurrentGL();
-            gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_SIZE, sz, 0);
-            packer.setMaxSize(sz[0], sz[0]);
+            // Set the maximum texture size in the RectanglePacker to keep it from expanding too large
+            packer.setMaxSize(GLInfo.maxTextureSize, GLInfo.maxTextureSize);
             haveMaxSize = true;
         }
     }
