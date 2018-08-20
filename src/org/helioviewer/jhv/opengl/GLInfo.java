@@ -18,7 +18,7 @@ public class GLInfo {
     public static final float[] pixelScaleFloat = {1, 1};
     public static String glVersion = "";
 
-    static int maxTextureSize;
+    public static int maxTextureSize;
 
     public static void update(GL2 gl) {
         glVersion = "OpenGL " + gl.glGetString(GL2.GL_VERSION);
