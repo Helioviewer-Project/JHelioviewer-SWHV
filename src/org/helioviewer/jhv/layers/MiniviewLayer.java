@@ -11,7 +11,7 @@ import javax.swing.JSlider;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
@@ -30,8 +30,8 @@ public class MiniviewLayer extends AbstractLayer {
     private static final int MAX_SCALE = 15;
     private int scale = 10;
 
-    private static final byte[] colorCircle = BufferUtils.colorBytes(Color.RED, 0.2);
-    private static final byte[] colorRectangle = BufferUtils.colorBytes(Color.GREEN, 0.2);
+    private static final byte[] colorCircle = Colors.bytes(Color.RED, 0.2);
+    private static final byte[] colorRectangle = Colors.bytes(Color.GREEN, 0.2);
     private static final GLSLShape circle = new GLSLShape();
     private static final GLSLShape rectangle = new GLSLShape();
 

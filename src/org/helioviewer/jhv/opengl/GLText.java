@@ -3,7 +3,7 @@ package org.helioviewer.jhv.opengl;
 import java.awt.Font;
 import java.util.List;
 
-import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
@@ -91,7 +91,7 @@ public class GLText {
         for (String txt : txts) {
             renderer.setColor(shadowColor);
             renderer.draw(txt, textInit_x + shadowOffset[0], vp.height - textInit_y + shadowOffset[1] - deltaY);
-            renderer.setColor(BufferUtils.colorWhiteFloat);
+            renderer.setColor(Colors.WhiteFloat);
             renderer.draw(txt, textInit_x, vp.height - textInit_y - deltaY);
             deltaY += (int) (fontSize * 1.1);
         }

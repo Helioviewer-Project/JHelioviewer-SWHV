@@ -3,17 +3,16 @@ package org.helioviewer.jhv.plugins.pfss;
 import java.nio.ShortBuffer;
 
 import org.helioviewer.jhv.base.Buf;
-import org.helioviewer.jhv.base.BufferUtils;
-import org.helioviewer.jhv.opengl.GLSLLine;
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.plugins.pfss.data.PfssData;
 
 import com.jogamp.opengl.GL2;
 
 class PfssLine {
 
-    private static final byte[] openFieldColor = BufferUtils.colorRed;
-    private static final byte[] loopColor = BufferUtils.colorWhite;
-    private static final byte[] insideFieldColor = BufferUtils.colorBlue;
+    private static final byte[] openFieldColor = Colors.Red;
+    private static final byte[] loopColor = Colors.White;
+    private static final byte[] insideFieldColor = Colors.Blue;
 
     private final byte[] brightColor = new byte[4];
 
@@ -62,7 +61,7 @@ class PfssLine {
                 double r = Math.sqrt(x * x + y * y + z * z);
 
                 if (i % pointsPerLine == 0) { // start line
-                    lineBuf.put4f((float) x, (float) z, (float) -y, 1).put4b(BufferUtils.colorNull);
+                    lineBuf.put4f((float) x, (float) z, (float) -y, 1).put4b(Colors.Null);
 
                     if (fixedColor) {
                         double xo = 3. * decode(flinex, i + pointsPerLine - 1);
@@ -81,10 +80,10 @@ class PfssLine {
                 }
 
                 lineBuf.put4f((float) x, (float) z, (float) -y, 1);
-                lineBuf.put4b(r > radius ? BufferUtils.colorNull : (fixedColor ? oneColor : brightColor));
+                lineBuf.put4b(r > radius ? Colors.Null : (fixedColor ? oneColor : brightColor));
 
                 if (i % pointsPerLine == pointsPerLine - 1) { // end line
-                    lineBuf.put4f((float) x, (float) z, (float) -y, 1).put4b(BufferUtils.colorNull);
+                    lineBuf.put4f((float) x, (float) z, (float) -y, 1).put4b(Colors.Null);
                 }
             }
         }

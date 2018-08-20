@@ -58,7 +58,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.Buf;
-import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.opengl.GLSLTexture;
@@ -1076,7 +1076,7 @@ public class JhvTextRenderer {
     }
 
     private static final GLSLTexture glslTexture = new GLSLTexture();
-    private float[] textColor = BufferUtils.colorWhiteFloat;
+    private float[] textColor = Colors.WhiteFloat;
 
     private int outstandingGlyphsVerticesPipeline = 0;
     private final Buf vexBuf = new Buf(4 * (kTotalBufferSizeCoordsVerts + kTotalBufferSizeCoordsTex));

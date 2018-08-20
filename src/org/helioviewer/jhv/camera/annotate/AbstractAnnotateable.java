@@ -3,7 +3,7 @@ package org.helioviewer.jhv.camera.annotate;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.scale.GridType;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -15,9 +15,9 @@ import org.json.JSONObject;
 
 abstract class AbstractAnnotateable implements Annotateable {
 
-    static final byte[] activeColor = BufferUtils.colorRed;
-    static final byte[] dragColor = BufferUtils.colorYellow;
-    static final byte[] baseColor = BufferUtils.colorBlue;
+    static final byte[] activeColor = Colors.Red;
+    static final byte[] dragColor = Colors.Yellow;
+    static final byte[] baseColor = Colors.Blue;
 
     static final double LINEWIDTH = 0.002;
     static final double radius = Sun.Radius * 1.01;
