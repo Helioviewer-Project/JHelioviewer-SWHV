@@ -6,8 +6,6 @@ import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.plugins.pfss.data.PfssData;
 
-import com.jogamp.opengl.GL2;
-
 class PfssLine {
 
     private static final byte[] openFieldColor = Colors.Red;
@@ -35,7 +33,7 @@ class PfssLine {
         return (buf.get(idx) + 32768.) * (2. / 65535.) - 1.;
     }
 
-    public void calculatePositions(GL2 gl, PfssData data, int detail, boolean fixedColor, double radius, Buf lineBuf) {
+    public void calculatePositions(PfssData data, int detail, boolean fixedColor, double radius, Buf lineBuf) {
         int pointsPerLine = data.pointsPerLine;
         double cphi = data.cphi;
         double sphi = data.sphi;
