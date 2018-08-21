@@ -50,6 +50,7 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphMetrics;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
+import java.nio.FloatBuffer;
 import java.text.CharacterIterator;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,7 +58,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.base.Buf;
+import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Transform;
@@ -879,12 +880,18 @@ public class JhvTextRenderer {
             float tx2 = (texturex + width) / (float) renderer.getWidth();
             float ty2 = 1f - (texturey + height) / (float) renderer.getHeight();
 
-            vexBuf.put4f(x, y, z, 1).put2f(tx1, ty1); // A
-            vexBuf.put4f(x + (width * scaleFactor), y, z, 1).put2f(tx2, ty1); // B
-            vexBuf.put4f(x + (width * scaleFactor), y + (height * scaleFactor), z, 1).put2f(tx2, ty2); // C
-            vexBuf.put4f(x, y, z, 1).put2f(tx1, ty1); // A
-            vexBuf.put4f(x + (width * scaleFactor), y + (height * scaleFactor), z, 1).put2f(tx2, ty2); // C
-            vexBuf.put4f(x, y + (height * scaleFactor), z, 1).put2f(tx1, ty2); // D
+            BufferUtils.put4f(vexBuf, x, y, z, 1); // A
+            BufferUtils.put2f(vexBuf, tx1, ty1);
+            BufferUtils.put4f(vexBuf, x + (width * scaleFactor), y, z, 1); // B
+            BufferUtils.put2f(vexBuf, tx2, ty1);
+            BufferUtils.put4f(vexBuf, x + (width * scaleFactor), y + (height * scaleFactor), z, 1); // C
+            BufferUtils.put2f(vexBuf, tx2, ty2);
+            BufferUtils.put4f(vexBuf, x, y, z, 1); // A
+            BufferUtils.put2f(vexBuf, tx1, ty1);
+            BufferUtils.put4f(vexBuf, x + (width * scaleFactor), y + (height * scaleFactor), z, 1); // C
+            BufferUtils.put2f(vexBuf, tx2, ty2);
+            BufferUtils.put4f(vexBuf, x, y + (height * scaleFactor), z, 1); // D
+            BufferUtils.put2f(vexBuf, tx1, ty2);
 
             outstandingGlyphsVerticesPipeline += kVertsPerQuad;
             if (outstandingGlyphsVerticesPipeline >= kTotalBufferSizeVerts) {
@@ -1076,13 +1083,14 @@ public class JhvTextRenderer {
     private float[] textColor = Colors.WhiteFloat;
 
     private int outstandingGlyphsVerticesPipeline = 0;
-    private final Buf vexBuf = new Buf(4 * (kTotalBufferSizeCoordsVerts + kTotalBufferSizeCoordsTex));
+    private final FloatBuffer vexBuf = BufferUtils.newFloatBuffer(kTotalBufferSizeCoordsVerts + kTotalBufferSizeCoordsTex);
 
     private void drawVertices() {
         if (outstandingGlyphsVerticesPipeline > 0) {
             GL2 gl = (GL2) GLContext.getCurrentGL();
             getBackingStore().bind(gl);
 
+            vexBuf.rewind();
             glslTexture.init(gl);
             glslTexture.setData(gl, vexBuf);
             glslTexture.render(gl, GL2.GL_TRIANGLES, textColor, outstandingGlyphsVerticesPipeline);

@@ -19,15 +19,6 @@ public class Buf {
         buf = Unpooled.directBuffer(len);
     }
 
-    public void put2f(float[] f) {
-        put2f(f[0], f[1]);
-    }
-
-    public void put2f(float x, float y) {
-        buf.writeFloatLE(x).writeFloatLE(y);
-        floats += 2;
-    }
-
     public Buf put4f(Vec3 v) {
         return put4f((float) v.x, (float) v.y, (float) v.z, 1);
     }
