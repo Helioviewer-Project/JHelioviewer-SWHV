@@ -40,8 +40,6 @@ public class GLSLLine extends VAO {
 
         bind(gl);
         gl.glDrawArraysInstanced(GL2.GL_TRIANGLE_STRIP, 0, 4, count);
-
-        GLSLShader.unbind(gl);
     }
 
 }

@@ -38,8 +38,6 @@ public class GLSLTexture extends VAO {
 
         bind(gl);
         gl.glDrawArrays(mode, 0, toDraw);
-
-        GLSLShader.unbind(gl);
     }
 
 }

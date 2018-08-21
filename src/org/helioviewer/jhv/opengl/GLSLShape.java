@@ -37,8 +37,6 @@ public class GLSLShape extends VAO {
 
         bind(gl);
         gl.glDrawArrays(GL2.GL_POINTS, 0, count);
-
-        GLSLShader.unbind(gl);
     }
 
     public void renderShape(GL2 gl, int mode) {
@@ -50,8 +48,6 @@ public class GLSLShape extends VAO {
 
         bind(gl);
         gl.glDrawArrays(mode, 0, count);
-
-        GLSLShader.unbind(gl);
     }
 
 }

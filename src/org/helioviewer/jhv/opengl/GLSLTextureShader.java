@@ -33,11 +33,11 @@ class GLSLTextureShader extends GLSLShader {
 
     @Override
     protected void _after_init(GL2 gl) {
+        bind(gl);
         refModelViewProjectionMatrix = gl.glGetUniformLocation(progID, "ModelViewProjectionMatrix");
         colorRef = gl.glGetUniformLocation(progID, "color");
-        bind(gl);
+
         setTextureUnit(gl, "image", GLTexture.Unit.ZERO);
-        unbind(gl);
     }
 
     void bindParams(GL2 gl) {

@@ -36,6 +36,7 @@ class GLSLShapeShader extends GLSLShader {
 
     @Override
     protected void _after_init(GL2 gl) {
+        bind(gl);
         refModelViewProjectionMatrix = gl.glGetUniformLocation(progID, "ModelViewProjectionMatrix");
         factorRef = gl.glGetUniformLocation(progID, "factor");
     }
