@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.opengl;
 
-import org.helioviewer.jhv.base.Buf;
+import java.nio.FloatBuffer;
+
 import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.opengl.GL2;
@@ -17,9 +18,9 @@ public class GLSLTexture extends VAO {
         super(new VAA[]{new VAA(0, size0, false, stride, 0, 0), new VAA(1, size1, false, stride, 4 * size0, 0)});
     }
 
-    public void setData(GL2 gl, Buf buf) {
-        int plen = buf.getFloats() / (size0 + size1);
-        if (plen * (size0 + size1) != buf.getFloats()) {
+    public void setData(GL2 gl, FloatBuffer buf) {
+        int plen = buf.limit() / (size0 + size1);
+        if (plen * (size0 + size1) != buf.limit()) {
             Log.error("Something is wrong with the attributes of this GLSLTexture");
             return;
         }
