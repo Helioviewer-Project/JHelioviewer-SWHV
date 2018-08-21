@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.opengl;
 
 import java.nio.Buffer;
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.base.Buf;
@@ -27,7 +26,7 @@ class VBO {
     }
 
     void setData(GL2 gl, Buf buf) {
-        ByteBuffer buffer = buf.toBuffer();
+        Buffer buffer = buf.toBuffer();
         bufferData(gl, buffer.limit(), GL2.GL_STATIC_DRAW, buffer);
         buf.rewind();
     }

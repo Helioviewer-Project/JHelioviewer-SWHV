@@ -1,22 +1,32 @@
 package org.helioviewer.jhv.base;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
-
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.util.Arrays;
 
 import org.helioviewer.jhv.math.Vec3;
 
 public class Buf {
 
-    private final ByteBuf buf;
-    private final float[] last = new float[4];
+    private final byte[] byteLast = new byte[16];
+    private final FloatBuffer bufferLast = ByteBuffer.wrap(byteLast).order(ByteOrder.nativeOrder()).asFloatBuffer();
 
+    private byte[] array;
+    private ByteBuffer buffer;
+    private int length;
     private int floats;
     private int bytes;
 
-    public Buf(int len) {
-        buf = Unpooled.directBuffer(len);
+    public Buf(int size) {
+        array = new byte[size < 16 ? 16 : size];
+        buffer = ByteBuffer.wrap(array);
+    }
+
+    private void realloc(int size) {
+        array = Arrays.copyOf(array, size);
+        buffer = ByteBuffer.wrap(array);
     }
 
     public Buf put4f(Vec3 v) {
@@ -24,21 +34,31 @@ public class Buf {
     }
 
     public Buf put4f(float x, float y, float z, float w) {
-        last[0] = x;
-        last[1] = y;
-        last[2] = z;
-        last[3] = w;
+        bufferLast.put(0, x).put(1, y).put(2, z).put(3, w);
         return repeat4f();
     }
 
     public Buf repeat4f() {
-        buf.writeFloatLE(last[0]).writeFloatLE(last[1]).writeFloatLE(last[2]).writeFloatLE(last[3]);
+        int size = array.length;
+        if (length + 16 >= size)
+            realloc(2 * size);
+
+        System.arraycopy(byteLast, 0, array, length, 16);
+        length += 16;
         floats += 4;
         return this;
     }
 
     public void put4b(byte[] b) {
-        buf.writeBytes(b, 0, 4);
+        int size = array.length;
+        if (length + 4 >= size)
+            realloc(2 * size);
+
+        array[length]     = b[0];
+        array[length + 1] = b[1];
+        array[length + 2] = b[2];
+        array[length + 3] = b[3];
+        length += 4;
         bytes++;
     }
 
@@ -51,13 +71,13 @@ public class Buf {
     }
 
     public void rewind() {
-        buf.setIndex(0, 0);
+        length = 0;
         floats = 0;
         bytes = 0;
     }
 
-    public ByteBuffer toBuffer() {
-        return buf.nioBuffer();
+    public Buffer toBuffer() {
+        return buffer.limit(length);
     }
 
 }
