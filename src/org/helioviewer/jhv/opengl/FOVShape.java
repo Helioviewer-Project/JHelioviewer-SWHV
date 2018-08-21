@@ -14,9 +14,9 @@ public class FOVShape {
 
     private final double thickness;
 
-    private final GLSLLine line = new GLSLLine();
+    private final GLSLLine line = new GLSLLine(true);
     private final Buf lineBuf = new Buf((4 * (SUBDIVISIONS + 1) + 2) * GLSLLine.stride);
-    private final GLSLShape point = new GLSLShape();
+    private final GLSLShape point = new GLSLShape(true);
     private final Buf pointBuf = new Buf(GLSLShape.stride);
 
     private double centerX = 0;

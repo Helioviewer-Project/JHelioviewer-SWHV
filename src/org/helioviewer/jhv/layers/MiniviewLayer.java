@@ -32,8 +32,8 @@ public class MiniviewLayer extends AbstractLayer {
 
     private static final byte[] colorCircle = Colors.bytes(Color.RED, 0.2);
     private static final byte[] colorRectangle = Colors.bytes(Color.GREEN, 0.2);
-    private static final GLSLShape circle = new GLSLShape();
-    private static final GLSLShape rectangle = new GLSLShape();
+    private static final GLSLShape circle = new GLSLShape(false);
+    private static final GLSLShape rectangle = new GLSLShape(false);
 
     private final JPanel optionsPanel;
     private Viewport miniViewport = new Viewport(0, 0, 0, 100, 100);

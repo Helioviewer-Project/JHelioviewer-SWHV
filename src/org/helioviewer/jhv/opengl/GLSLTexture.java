@@ -15,7 +15,7 @@ public class GLSLTexture extends VAO {
     private int count;
 
     public GLSLTexture() {
-        super(new VAA[]{new VAA(0, size0, false, stride, 0, 0), new VAA(1, size1, false, stride, 4 * size0, 0)});
+        super(true, new VAA[]{new VAA(0, size0, false, stride, 0, 0), new VAA(1, size1, false, stride, 4 * size0, 0)});
     }
 
     public void setData(GL2 gl, FloatBuffer buf) {

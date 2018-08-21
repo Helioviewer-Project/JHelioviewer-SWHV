@@ -13,8 +13,8 @@ public class GLSLLine extends VAO {
     public static final int stride = 4 * size0 + size1;
     private int count;
 
-    public GLSLLine() {
-        super(new VAA[]{
+    public GLSLLine(boolean _dynamic) {
+        super(_dynamic, new VAA[]{
                 new VAA(0, size0, false, stride, 0, 1), new VAA(1, size1, true, stride, 4 * size0, 1),
                 new VAA(2, size0, false, stride, stride, 1), new VAA(3, size1, true, stride, stride + 4 * size0, 1)});
     }

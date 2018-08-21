@@ -7,7 +7,7 @@ import com.jogamp.opengl.GL2;
 public class GLSLSolar extends VAO {
 
     GLSLSolar() {
-        super(new VAA[]{new VAA(0, 4, false, 0, 0, 0)});
+        super(false, new VAA[]{new VAA(0, 4, false, 0, 0, 0)});
     }
 
     public void render(GL2 gl) {

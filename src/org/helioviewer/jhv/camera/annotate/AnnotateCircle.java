@@ -18,7 +18,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 90;
 
-    private final GLSLLine line = new GLSLLine();
+    private final GLSLLine line = new GLSLLine(true);
     private final Buf lineBuf = new Buf((SUBDIVISIONS + 3) * GLSLLine.stride);
 
     public AnnotateCircle(JSONObject jo) {

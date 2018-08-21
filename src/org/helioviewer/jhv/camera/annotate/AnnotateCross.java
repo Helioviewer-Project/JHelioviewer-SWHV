@@ -18,7 +18,7 @@ public class AnnotateCross extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 2;
 
-    private final GLSLLine line = new GLSLLine();
+    private final GLSLLine line = new GLSLLine(true);
     private final Buf lineBuf = new Buf(2 * (SUBDIVISIONS + 3) * GLSLLine.stride);
 
     public AnnotateCross(JSONObject jo) {
