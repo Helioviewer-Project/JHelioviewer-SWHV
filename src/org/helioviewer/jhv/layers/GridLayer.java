@@ -54,15 +54,15 @@ public class GridLayer extends AbstractLayer {
     private boolean showLabels = true;
     private boolean showRadial = false;
 
-    private final GLSLShape earthPoint = new GLSLShape();
-    private final GLSLLine axesLine = new GLSLLine();
-    private final GLSLLine earthCircleLine = new GLSLLine();
-    private final GLSLLine radialCircleLine = new GLSLLine();
-    private final GLSLLine radialThickLine = new GLSLLine();
-    private final GLSLLine radialCircleLineFar = new GLSLLine();
-    private final GLSLLine radialThickLineFar = new GLSLLine();
-    private final GLSLLine flatLine = new GLSLLine();
-    private final GLSLLine gridLine = new GLSLLine();
+    private final GLSLShape earthPoint = new GLSLShape(false);
+    private final GLSLLine axesLine = new GLSLLine(false);
+    private final GLSLLine earthCircleLine = new GLSLLine(false);
+    private final GLSLLine radialCircleLine = new GLSLLine(false);
+    private final GLSLLine radialThickLine = new GLSLLine(false);
+    private final GLSLLine radialCircleLineFar = new GLSLLine(false);
+    private final GLSLLine radialThickLineFar = new GLSLLine(false);
+    private final GLSLLine flatLine = new GLSLLine(false);
+    private final GLSLLine gridLine = new GLSLLine(false);
 
     private ArrayList<GridLabel> latLabels;
     private ArrayList<GridLabel> lonLabels;

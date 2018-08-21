@@ -18,7 +18,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 12;
 
-    private final GLSLLine line = new GLSLLine();
+    private final GLSLLine line = new GLSLLine(true);
     private final Buf lineBuf = new Buf((4 * (SUBDIVISIONS + 1) + 2) * GLSLLine.stride);
 
     public AnnotateRectangle(JSONObject jo) {

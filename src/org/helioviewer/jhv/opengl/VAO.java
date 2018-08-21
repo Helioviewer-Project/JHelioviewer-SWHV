@@ -5,12 +5,14 @@ import com.jogamp.opengl.GL2;
 class VAO {
 
     private final VAA[] vaa;
+    private final boolean dynamic;
 
     private int vaoID = -1;
     private boolean inited;
     protected VBO vbo;
 
-    VAO(VAA[] _vaa) {
+    VAO(boolean _dynamic, VAA[] _vaa) {
+        dynamic = _dynamic;
         vaa = _vaa;
     }
 
@@ -22,7 +24,7 @@ class VAO {
             gl.glGenVertexArrays(1, tmpId, 0);
             vaoID = tmpId[0];
 
-            vbo = new VBO(gl);
+            vbo = new VBO(gl, dynamic);
             vbo.bind(gl);
 
             gl.glBindVertexArray(vaoID);

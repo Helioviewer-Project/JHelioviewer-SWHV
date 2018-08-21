@@ -29,7 +29,7 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
 
     private final PfssLayerOptions optionsPanel;
     private final PfssLine pfssLine = new PfssLine();
-    private final GLSLLine line = new GLSLLine();
+    private final GLSLLine glslLine = new GLSLLine(true);
     private final Buf lineBuf = new Buf(32 * GLSLLine.stride); // typically 145152
     private PfssData previousPfssData;
 
@@ -117,12 +117,12 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
 
     @Override
     public void init(GL2 gl) {
-        line.init(gl);
+        glslLine.init(gl);
     }
 
     @Override
     public void dispose(GL2 gl) {
-        line.dispose(gl);
+        glslLine.dispose(gl);
     }
 
     @Override
@@ -145,12 +145,12 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
             lastRadius = radius;
 
             pfssLine.calculatePositions(data, detail, fixedColor, radius, lineBuf);
-            line.setData(gl, lineBuf);
+            glslLine.setData(gl, lineBuf);
 
             timeString = data.dateObs.toString();
             ImageViewerGui.getLayers().fireTimeUpdated(this);
         }
-        line.render(gl, vp, LINEWIDTH);
+        glslLine.render(gl, vp, LINEWIDTH);
     }
 
 }
