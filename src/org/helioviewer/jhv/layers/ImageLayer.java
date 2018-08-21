@@ -21,7 +21,6 @@ import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.opengl.GLImage.DifferenceMode;
 import org.helioviewer.jhv.opengl.GLListener;
-import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.view.AbstractView;
@@ -175,30 +174,27 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         if (!isVisible[vp.idx])
             return;
 
-        GLSLSolarShader shader = Display.mode.shader;
         GridScale scale = Display.mode.scale;
-
+        GLSLSolarShader shader = Display.mode.shader;
         shader.bind(gl);
-        {
-            glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
-            shader.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height);
-            shader.bindMatrix(gl, camera.getTransformationInverse(vp.aspect));
 
-            Quat q = Quat.rotate(camera.getCurrentDragRotation(), imageData.getViewpoint().toQuat());
-            shader.bindCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, imageData.getMetaData().getCenterRotation()));
+        glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
+        shader.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height);
+        shader.bindMatrix(gl, camera.getTransformationInverse(vp.aspect));
 
-            DifferenceMode diffMode = glImage.getDifferenceMode();
-            if (diffMode == DifferenceMode.Base) {
-                shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, baseImageData.getMetaData().getCenterRotation()));
-            } else if (diffMode == DifferenceMode.Running) {
-                shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, prevImageData.getMetaData().getCenterRotation()));
-            }
+        Quat q = Quat.rotate(camera.getCurrentDragRotation(), imageData.getViewpoint().toQuat());
+        shader.bindCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, imageData.getMetaData().getCenterRotation()));
 
-            shader.bindPolarRadii(gl, scale.getYstart(), scale.getYstop());
-
-            GLListener.glslSolar.render(gl);
+        DifferenceMode diffMode = glImage.getDifferenceMode();
+        if (diffMode == DifferenceMode.Base) {
+            shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, baseImageData.getMetaData().getCenterRotation()));
+        } else if (diffMode == DifferenceMode.Running) {
+            shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, prevImageData.getMetaData().getCenterRotation()));
         }
-        GLSLShader.unbind(gl);
+
+        shader.bindPolarRadii(gl, scale.getYstart(), scale.getYstop());
+
+        GLListener.glslSolar.render(gl);
     }
 
     @Override

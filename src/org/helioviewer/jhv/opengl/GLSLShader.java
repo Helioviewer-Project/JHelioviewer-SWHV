@@ -20,6 +20,8 @@ public class GLSLShader {
         }
     }
 
+    private static int boundID; // track state
+
     private int vertexID;
     private int fragmentID;
     protected int progID;
@@ -61,11 +63,10 @@ public class GLSLShader {
     }
 
     public final void bind(GL2 gl) {
-        gl.glUseProgram(progID);
-    }
-
-    public static void unbind(GL2 gl) {
-        gl.glUseProgram(0);
+        if (progID != boundID) {
+            boundID = progID;
+            gl.glUseProgram(progID);
+        }
     }
 
     protected final void setTextureUnit(GL2 gl, String texname, GLTexture.Unit unit) {

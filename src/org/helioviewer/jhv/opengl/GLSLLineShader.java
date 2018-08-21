@@ -37,6 +37,7 @@ class GLSLLineShader extends GLSLShader {
 
     @Override
     protected void _after_init(GL2 gl) {
+        bind(gl);
         refModelViewProjectionMatrix = gl.glGetUniformLocation(progID, "ModelViewProjectionMatrix");
         thicknessRef = gl.glGetUniformLocation(progID, "thickness");
         viewportRef = gl.glGetUniformLocation(progID, "viewport");

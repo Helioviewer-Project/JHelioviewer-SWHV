@@ -96,6 +96,8 @@ public class GLSLSolarShader extends GLSLShader {
 
     @Override
     protected void _after_init(GL2 gl) {
+        bind(gl);
+
         isDiffRef = gl.glGetUniformLocation(progID, "isdifference");
 
         hgltRef = gl.glGetUniformLocation(progID, "hglt");
@@ -127,14 +129,12 @@ public class GLSLSolarShader extends GLSLShader {
         int blurKernelRef = gl.glGetUniformLocation(progID, "blurKernel");
         int blurOffsetRef = gl.glGetUniformLocation(progID, "blurOffset");
 
-        bind(gl);
         gl.glUniform1fv(blurKernelRef, blurKernel.length, blurKernel, 0);
         gl.glUniform2fv(blurOffsetRef, blurOffset.length / 2, blurOffset, 0);
 
         setTextureUnit(gl, "image", GLTexture.Unit.ZERO);
         setTextureUnit(gl, "lut", GLTexture.Unit.ONE);
         setTextureUnit(gl, "diffImage", GLTexture.Unit.TWO);
-        unbind(gl);
     }
 
     public static void dispose(GL2 gl) {
