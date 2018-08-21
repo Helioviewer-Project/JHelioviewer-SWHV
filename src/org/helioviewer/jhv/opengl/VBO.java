@@ -30,7 +30,7 @@ class VBO {
     void setData(GL2 gl, Buf buf) {
         Buffer buffer = buf.toBuffer();
         bufferData(gl, buffer.limit(), buffer);
-        buf.rewind();
+        buf.clear();
     }
 
     void setData(GL2 gl, FloatBuffer buffer) {
