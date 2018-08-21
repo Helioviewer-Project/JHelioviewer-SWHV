@@ -70,7 +70,7 @@ public class Buf {
         return bytes;
     }
 
-    public void rewind() {
+    public void clear() {
         length = 0;
         floats = 0;
         bytes = 0;
