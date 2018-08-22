@@ -45,6 +45,7 @@ public class InteractionAnnotate extends Interaction {
     private final HashSet<Annotateable> removed = new HashSet<>();
     private final HashSet<Annotateable> added = new HashSet<>();
 
+    private static final double LINEWIDTH = 0.002;
     private final GLSLLine annsLine = new GLSLLine(true);
     private final Buf annsBuf = new Buf(3276 * GLSLLine.stride);
     private final GLSLLine transLine = new GLSLLine(true);
@@ -89,23 +90,28 @@ public class InteractionAnnotate extends Interaction {
         Annotateable activeAnn = activeIndex >= 0 && activeIndex < anns.size() ? anns.get(activeIndex) : null;
 
         for (Annotateable ann : anns) {
-            ann.render(camera, vp, gl, ann == activeAnn);
+            ann.render(camera, vp, ann == activeAnn, annsBuf);
         }
         if (newAnnotateable != null) {
-            newAnnotateable.render(camera, vp, gl, false);
+            newAnnotateable.render(camera, vp, false, annsBuf);
         }
 
         Transform.pushView();
         Transform.rotateViewInverse(camera.getViewpoint().toQuat());
         {
             for (Annotateable ann : anns) {
-                ann.renderTransformed(camera, vp, gl, ann == activeAnn);
+                ann.renderTransformed(camera, vp, gl, ann == activeAnn, transBuf);
             }
             if (newAnnotateable != null) {
-                newAnnotateable.renderTransformed(camera, vp, gl, false);
+                newAnnotateable.renderTransformed(camera, vp, gl, false, transBuf);
             }
         }
         Transform.popView();
+
+        annsLine.setData(gl, annsBuf);
+        annsLine.render(gl, vp, LINEWIDTH);
+        transLine.setData(gl, transBuf);
+        transLine.render(gl, vp, LINEWIDTH);
     }
 
     public void zoom() {

@@ -9,7 +9,6 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.helioviewer.jhv.opengl.GLSLLine;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -18,21 +17,16 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 12;
 
-    private final GLSLLine line = new GLSLLine(true);
-    private final Buf lineBuf = new Buf((4 * (SUBDIVISIONS + 1) + 2) * GLSLLine.stride);
-
     public AnnotateRectangle(JSONObject jo) {
         super(jo);
     }
 
     @Override
     public void init(GL2 gl) {
-        line.init(gl);
     }
 
     @Override
     public void dispose(GL2 gl) {
-        line.dispose(gl);
     }
 
     private static void drawRectangle(Camera camera, Viewport vp, Vec3 bp, Vec3 ep, Buf buf, byte[] color) {
@@ -111,7 +105,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, GL2 gl, boolean active) {
+    public void render(Camera camera, Viewport vp, boolean active, Buf buf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
@@ -120,13 +114,11 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
 
-        drawRectangle(camera, vp, toSpherical(p0), toSpherical(p1), lineBuf, color);
-        line.setData(gl, lineBuf);
-        line.render(gl, vp, LINEWIDTH);
+        drawRectangle(camera, vp, toSpherical(p0), toSpherical(p1), buf, color);
     }
 
     @Override
-    public void renderTransformed(Camera camera, Viewport vp, GL2 gl, boolean active) {
+    public void renderTransformed(Camera camera, Viewport vp, GL2 gl, boolean active, Buf buf) {
     }
 
     @Override

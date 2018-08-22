@@ -9,7 +9,6 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.helioviewer.jhv.opengl.GLSLLine;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -18,21 +17,16 @@ public class AnnotateCross extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 2;
 
-    private final GLSLLine line = new GLSLLine(true);
-    private final Buf lineBuf = new Buf(2 * (SUBDIVISIONS + 3) * GLSLLine.stride);
-
     public AnnotateCross(JSONObject jo) {
         super(jo);
     }
 
     @Override
     public void init(GL2 gl) {
-        line.init(gl);
     }
 
     @Override
     public void dispose(GL2 gl) {
-        line.dispose(gl);
     }
 
     private static void drawCross(Camera camera, Viewport vp, Vec3 bp, Buf buf, byte[] color) {
@@ -73,20 +67,16 @@ public class AnnotateCross extends AbstractAnnotateable {
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, GL2 gl, boolean active) {
+    public void render(Camera camera, Viewport vp, boolean active, Buf buf) {
         if (startPoint == null)
             return;
 
         byte[] color = active ? activeColor : baseColor;
-        drawCross(camera, vp, toSpherical(startPoint), lineBuf, color);
-        line.setData(gl, lineBuf);
-//      gl.glDisable(GL2.GL_DEPTH_TEST);
-        line.render(gl, vp, LINEWIDTH);
-//      gl.glEnable(GL2.GL_DEPTH_TEST);
+        drawCross(camera, vp, toSpherical(startPoint), buf, color);
     }
 
     @Override
-    public void renderTransformed(Camera camera, Viewport vp, GL2 gl, boolean active) {
+    public void renderTransformed(Camera camera, Viewport vp, GL2 gl, boolean active, Buf buf) {
     }
 
     @Override

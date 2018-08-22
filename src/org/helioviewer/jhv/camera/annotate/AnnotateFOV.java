@@ -2,6 +2,7 @@ package org.helioviewer.jhv.camera.annotate;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
@@ -53,11 +54,11 @@ public class AnnotateFOV extends AbstractAnnotateable {
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, GL2 gl, boolean active) {
+    public void render(Camera camera, Viewport vp, boolean active, Buf buf) {
     }
 
     @Override
-    public void renderTransformed(Camera camera, Viewport vp, GL2 gl, boolean active) {
+    public void renderTransformed(Camera camera, Viewport vp, GL2 gl, boolean active, Buf buf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
