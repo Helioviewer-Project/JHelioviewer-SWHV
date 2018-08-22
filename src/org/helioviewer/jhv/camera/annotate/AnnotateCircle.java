@@ -35,7 +35,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
         line.dispose(gl);
     }
 
-    private void drawCircle(Camera camera, Viewport vp, Vec3 bp, Vec3 ep, byte[] color) {
+    private static void drawCircle(Camera camera, Viewport vp, Vec3 bp, Vec3 ep, Buf buf, byte[] color) {
         double cosf = Vec3.dot(bp, ep);
         double r = Math.sqrt(1 - cosf * cosf);
         // P = center + r cos(A) (bp x ep) + r sin(A) ep
@@ -57,20 +57,20 @@ public class AnnotateCircle extends AbstractAnnotateable {
             vx.z = center.z + cosr * u.z + sinr * v.z;
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 if (i == 0) {
-                    lineBuf.put4f(vx).put4b(Colors.Null);
+                    buf.put4f(vx).put4b(Colors.Null);
                 }
-                lineBuf.put4f(vx).put4b(color);
+                buf.put4f(vx).put4b(color);
                 if (i == SUBDIVISIONS) {
-                    lineBuf.put4f(vx).put4b(Colors.Null);
+                    buf.put4f(vx).put4b(Colors.Null);
                 }
             } else {
                 vx.y = -vx.y;
                 if (i == 0) {
-                    GLHelper.drawVertex(camera, vp, vx, previous, lineBuf, Colors.Null);
+                    GLHelper.drawVertex(camera, vp, vx, previous, buf, Colors.Null);
                 }
-                previous = GLHelper.drawVertex(camera, vp, vx, previous, lineBuf, color);
+                previous = GLHelper.drawVertex(camera, vp, vx, previous, buf, color);
                 if (i == SUBDIVISIONS) {
-                    GLHelper.drawVertex(camera, vp, vx, previous, lineBuf, Colors.Null);
+                    GLHelper.drawVertex(camera, vp, vx, previous, buf, Colors.Null);
                 }
             }
         }
@@ -86,7 +86,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
 
-        drawCircle(camera, vp, p0, p1, color);
+        drawCircle(camera, vp, p0, p1, lineBuf, color);
         line.setData(gl, lineBuf);
         line.render(gl, vp, LINEWIDTH);
     }

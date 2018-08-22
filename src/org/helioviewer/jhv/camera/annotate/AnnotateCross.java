@@ -35,38 +35,38 @@ public class AnnotateCross extends AbstractAnnotateable {
         line.dispose(gl);
     }
 
-    private void drawCross(Camera camera, Viewport vp, Vec3 bp, byte[] color) {
+    private static void drawCross(Camera camera, Viewport vp, Vec3 bp, Buf buf, byte[] color) {
         double delta = 2.5 * Math.PI / 180;
         Vec3 p1 = new Vec3(radius, bp.y + delta, bp.z);
         Vec3 p2 = new Vec3(radius, bp.y - delta, bp.z);
         Vec3 p3 = new Vec3(radius, bp.y, bp.z + delta);
         Vec3 p4 = new Vec3(radius, bp.y, bp.z - delta);
 
-        interpolatedDraw(camera, vp, p1, p2, color);
-        interpolatedDraw(camera, vp, p3, p4, color);
+        interpolatedDraw(camera, vp, p1, p2, buf, color);
+        interpolatedDraw(camera, vp, p3, p4, buf, color);
     }
 
-    private void interpolatedDraw(Camera camera, Viewport vp, Vec3 p1s, Vec3 p2s, byte[] color) {
+    private static void interpolatedDraw(Camera camera, Viewport vp, Vec3 p1s, Vec3 p2s, Buf buf, byte[] color) {
         Vec2 previous = null;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, p1s, p2s);
 
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 if (i == 0) {
-                    lineBuf.put4f(pc).put4b(Colors.Null);
+                    buf.put4f(pc).put4b(Colors.Null);
                 }
-                lineBuf.put4f(pc).put4b(color);
+                buf.put4f(pc).put4b(color);
                 if (i == SUBDIVISIONS) {
-                    lineBuf.put4f(pc).put4b(Colors.Null);
+                    buf.put4f(pc).put4b(Colors.Null);
                 }
             } else {
                 pc.y = -pc.y;
                 if (i == 0) {
-                    GLHelper.drawVertex(camera, vp, pc, previous, lineBuf, Colors.Null);
+                    GLHelper.drawVertex(camera, vp, pc, previous, buf, Colors.Null);
                 }
-                previous = GLHelper.drawVertex(camera, vp, pc, previous, lineBuf, color);
+                previous = GLHelper.drawVertex(camera, vp, pc, previous, buf, color);
                 if (i == SUBDIVISIONS) {
-                    GLHelper.drawVertex(camera, vp, pc, previous, lineBuf, Colors.Null);
+                    GLHelper.drawVertex(camera, vp, pc, previous, buf, Colors.Null);
                 }
             }
         }
@@ -78,8 +78,7 @@ public class AnnotateCross extends AbstractAnnotateable {
             return;
 
         byte[] color = active ? activeColor : baseColor;
-        drawCross(camera, vp, toSpherical(startPoint), color);
-
+        drawCross(camera, vp, toSpherical(startPoint), lineBuf, color);
         line.setData(gl, lineBuf);
 //      gl.glDisable(GL2.GL_DEPTH_TEST);
         line.render(gl, vp, LINEWIDTH);
