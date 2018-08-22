@@ -14,6 +14,8 @@ public interface Annotateable {
 
     void render(Camera camera, Viewport vp, GL2 gl, boolean active);
 
+    void renderTransformed(Camera camera, Viewport vp, GL2 gl, boolean active);
+
     void mousePressed(Camera camera, int x, int y);
 
     void mouseDragged(Camera camera, int x, int y);

@@ -3,6 +3,7 @@ package org.helioviewer.jhv.camera;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.camera.annotate.AnnotateCircle;
 import org.helioviewer.jhv.camera.annotate.AnnotateCross;
 import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
@@ -10,6 +11,8 @@ import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.math.Transform;
+import org.helioviewer.jhv.opengl.GLSLLine;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -41,6 +44,11 @@ public class InteractionAnnotate extends Interaction {
     private final ArrayList<Annotateable> anns = new ArrayList<>();
     private final HashSet<Annotateable> removed = new HashSet<>();
     private final HashSet<Annotateable> added = new HashSet<>();
+
+    private final GLSLLine annsLine = new GLSLLine(true);
+    private final Buf annsBuf = new Buf(3276 * GLSLLine.stride);
+    private final GLSLLine transLine = new GLSLLine(true);
+    private final Buf transBuf = new Buf(512 * GLSLLine.stride);
 
     private Annotateable newAnnotateable = null;
     private AnnotationMode mode = AnnotationMode.Rectangle;
@@ -75,13 +83,29 @@ public class InteractionAnnotate extends Interaction {
             newAnnotateable.init(gl);
         }
 
+        if (newAnnotateable == null && anns.isEmpty())
+            return;
+
         Annotateable activeAnn = activeIndex >= 0 && activeIndex < anns.size() ? anns.get(activeIndex) : null;
+
         for (Annotateable ann : anns) {
             ann.render(camera, vp, gl, ann == activeAnn);
         }
         if (newAnnotateable != null) {
             newAnnotateable.render(camera, vp, gl, false);
         }
+
+        Transform.pushView();
+        Transform.rotateViewInverse(camera.getViewpoint().toQuat());
+        {
+            for (Annotateable ann : anns) {
+                ann.renderTransformed(camera, vp, gl, ann == activeAnn);
+            }
+            if (newAnnotateable != null) {
+                newAnnotateable.renderTransformed(camera, vp, gl, false);
+            }
+        }
+        Transform.popView();
     }
 
     public void zoom() {
@@ -177,6 +201,16 @@ public class InteractionAnnotate extends Interaction {
                 add(generate(ja.getJSONObject(i)));
             }
         }
+    }
+
+    public void init(GL2 gl) {
+        annsLine.init(gl);
+        transLine.init(gl);
+    }
+
+    public void dispose(GL2 gl) {
+        annsLine.dispose(gl);
+        transLine.dispose(gl);
     }
 
 }
