@@ -10,6 +10,9 @@ import org.helioviewer.jhv.math.Vec3;
 
 public class Buf {
 
+    private static final int chunk = 1024;
+    private int multiplier = 1;
+
     private final byte[] byteLast = new byte[16];
     private final FloatBuffer bufferLast = ByteBuffer.wrap(byteLast).order(ByteOrder.nativeOrder()).asFloatBuffer();
 
@@ -24,9 +27,12 @@ public class Buf {
         buffer = ByteBuffer.wrap(array);
     }
 
-    private void realloc(int size) {
-        array = Arrays.copyOf(array, size);
-        buffer = ByteBuffer.wrap(array);
+    private void ensure(int nbytes) {
+        int size = array.length;
+        if (length + nbytes > size) {
+            array = Arrays.copyOf(array, size + chunk * multiplier++);
+            buffer = ByteBuffer.wrap(array);
+        }
     }
 
     public Buf put4f(Vec3 v) {
@@ -39,10 +45,7 @@ public class Buf {
     }
 
     public Buf repeat4f() {
-        int size = array.length;
-        if (length + 16 >= size)
-            realloc(2 * size);
-
+        ensure(16);
         System.arraycopy(byteLast, 0, array, length, 16);
         length += 16;
         floats += 4;
@@ -50,10 +53,7 @@ public class Buf {
     }
 
     public void put4b(byte[] b) {
-        int size = array.length;
-        if (length + 4 >= size)
-            realloc(2 * size);
-
+        ensure(4);
         array[length]     = b[0];
         array[length + 1] = b[1];
         array[length + 2] = b[2];

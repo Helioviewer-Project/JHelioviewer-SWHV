@@ -42,7 +42,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
     private final FOVShape fov = new FOVShape(LINEWIDTH_FOV);
     private final GLSLLine orbits = new GLSLLine(true);
-    private final Buf orbitBuf = new Buf(32 * GLSLLine.stride);
+    private final Buf orbitBuf = new Buf(3276 * GLSLLine.stride); // pre-allocate 64k
     private final GLSLShape planets = new GLSLShape(true);
     private final Buf planetBuf = new Buf(8 * GLSLShape.stride);
 

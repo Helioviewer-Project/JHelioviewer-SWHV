@@ -30,7 +30,7 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
     private final PfssLayerOptions optionsPanel;
     private final PfssLine pfssLine = new PfssLine();
     private final GLSLLine glslLine = new GLSLLine(true);
-    private final Buf lineBuf = new Buf(32 * GLSLLine.stride); // typically 145152
+    private final Buf lineBuf = new Buf(3276 * GLSLLine.stride); // pre-allocate 64k
     private PfssData previousPfssData;
 
     public PfssLayer(JSONObject jo) {
