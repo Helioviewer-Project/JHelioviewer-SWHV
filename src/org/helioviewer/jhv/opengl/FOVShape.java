@@ -26,8 +26,7 @@ public class FOVShape {
         centerZ = computeZ(centerX, centerY);
     }
 
-    public void putCenter(boolean highlight, Buf buf) {
-        byte[] color = highlight ? Colors.Red : Colors.Blue;
+    public void putCenter(Buf buf, byte[] color) {
         buf.put4f((float) centerX, (float) centerY, (float) centerZ, SIZE_POINT).put4b(color);
     }
 
@@ -36,11 +35,10 @@ public class FOVShape {
         return n > 0 ? epsilon + Math.sqrt(n) : epsilon;
     }
 
-    public void putLine(double distance, boolean highlight, Buf buf) {
+    public void putLine(double distance, Buf buf, byte[] color) {
         double x, y, z;
         double bw = distance * tanX;
         double bh = distance * tanY;
-        byte[] color = highlight ? Colors.Red : Colors.Blue;
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             x = -bw + 2 * bw / SUBDIVISIONS * i + centerX;

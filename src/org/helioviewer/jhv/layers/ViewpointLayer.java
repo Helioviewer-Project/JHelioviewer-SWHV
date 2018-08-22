@@ -41,6 +41,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     private static final float SIZE_PLANET = 10;
 
     private final FOVShape fov = new FOVShape();
+    private final byte[] fovColor = Colors.Blue;
     private final GLSLLine fovLine = new GLSLLine(true);
     private final Buf fovBuf = new Buf((4 * (FOVShape.SUBDIVISIONS + 1) + 2) * GLSLLine.stride);
     private final GLSLShape center = new GLSLShape(true);
@@ -75,13 +76,13 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         Transform.rotateViewInverse(viewpoint.toQuat());
 
         if (!far)
-            fovRender(gl, vp, viewpoint.distance, pixFactor, false);
+            fovRender(gl, vp, viewpoint.distance, pixFactor);
 
         Transform.pushProjection();
         camera.projectionOrthoFar(vp.aspect);
 
         if (far)
-            fovRender(gl, vp, viewpoint.distance, pixFactor, false);
+            fovRender(gl, vp, viewpoint.distance, pixFactor);
         {
             Collection<LoadPosition> loadPositions = camera.getUpdateViewpoint().getLoadPositions();
             if (!loadPositions.isEmpty()) {
@@ -92,12 +93,12 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         Transform.popView();
     }
 
-    private void fovRender(GL2 gl, Viewport vp, double distance, double pointFactor, boolean highlight) {
-        fov.putCenter(highlight, centerBuf);
+    private void fovRender(GL2 gl, Viewport vp, double distance, double pointFactor) {
+        fov.putCenter(centerBuf, fovColor);
         center.setData(gl, centerBuf);
         center.renderPoints(gl, pointFactor);
 
-        fov.putLine(distance, highlight, fovBuf);
+        fov.putLine(distance, fovBuf, fovColor);
         fovLine.setData(gl, fovBuf);
         fovLine.render(gl, vp, LINEWIDTH_FOV);
     }
