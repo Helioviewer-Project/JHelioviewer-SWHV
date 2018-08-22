@@ -9,7 +9,7 @@ public interface Annotateable {
 
     void render(Camera camera, Viewport vp, boolean active, Buf buf);
 
-    void renderTransformed(Camera camera, Viewport vp, boolean active, Buf lineBuf, Buf centerBuf);
+    void renderTransformed(Camera camera, boolean active, Buf lineBuf, Buf centerBuf);
 
     void mousePressed(Camera camera, int x, int y);
 

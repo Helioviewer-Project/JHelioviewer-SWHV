@@ -7,10 +7,8 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.FOVShape;
-import org.helioviewer.jhv.position.Position;
 import org.json.JSONObject;
 
 public class AnnotateFOV extends AbstractAnnotateable {
@@ -31,22 +29,22 @@ public class AnnotateFOV extends AbstractAnnotateable {
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
 
-        Position viewpoint = camera.getViewpoint();
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
         double dx = (p1.x - p0.x) / 2;
         double dy = (p1.y - p0.y) / 2;
 
         camera.setCurrentTranslation(-(p0.x + dx), -(p0.y + dy));
-        camera.setFOV(2 * Math.atan2(Math.sqrt(dx * dx + dy * dy), viewpoint.distance));
+        camera.setFOV(2 * Math.atan2(Math.sqrt(dx * dx + dy * dy), camera.getViewpoint().distance));
     }
 
     @Override
-    public void renderTransformed(Camera camera, Viewport vp, boolean active, Buf lineBuf, Buf centerBuf) {
+    public void renderTransformed(Camera camera, boolean active, Buf lineBuf, Buf centerBuf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
 
+        byte[] color = dragged ? dragColor : (active ? activeColor : baseColor);
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
         double dx = (p1.x - p0.x) / 2;
@@ -56,8 +54,8 @@ public class AnnotateFOV extends AbstractAnnotateable {
         fov.setCenter(p0.x + dx, p0.y + dy);
         fov.setTAngles(dx / distance, dy / distance);
 
-        fov.putCenter(active, centerBuf);
-        fov.putLine(distance, active, lineBuf);
+        fov.putCenter(centerBuf, color);
+        fov.putLine(distance, lineBuf, color);
     }
 
     @Override

@@ -73,7 +73,7 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Override
-    public void renderTransformed(Camera camera, Viewport vp, boolean active, Buf lineBuf, Buf centerBuf) {
+    public void renderTransformed(Camera camera, boolean active, Buf lineBuf, Buf centerBuf) {
     }
 
     @Override
