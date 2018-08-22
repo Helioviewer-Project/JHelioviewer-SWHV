@@ -141,7 +141,7 @@ public class JhvTextRenderer {
     private static final int kCoordsPerVertVerts = 4;
     private static final int kCoordsPerVertTex = 2;
     private static final int kVertsPerQuad = 6;
-    private static final int kQuadsPerBuffer = kVertsPerQuad * 20;
+    private static final int kQuadsPerBuffer = 100;
     private static final int kTotalBufferSizeVerts = kQuadsPerBuffer * kVertsPerQuad;
     private static final int kTotalBufferSizeCoordsVerts = kQuadsPerBuffer * kVertsPerQuad * kCoordsPerVertVerts;
     private static final int kTotalBufferSizeCoordsTex = kQuadsPerBuffer * kVertsPerQuad * kCoordsPerVertTex;
@@ -1079,7 +1079,7 @@ public class JhvTextRenderer {
         }
     }
 
-    private static final GLSLTexture glslTexture = new GLSLTexture();
+    private final GLSLTexture glslTexture = new GLSLTexture();
     private float[] textColor = Colors.WhiteFloat;
 
     private int outstandingGlyphsVerticesPipeline = 0;
