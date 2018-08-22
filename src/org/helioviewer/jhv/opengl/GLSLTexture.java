@@ -27,7 +27,7 @@ public class GLSLTexture extends VAO {
         count = plen;
     }
 
-    public void render(GL2 gl, int mode, float[] color, int toDraw) {
+    public void render(GL2 gl, int mode, float[] color, int first, int toDraw) {
         if (count == 0 || toDraw > count)
             return;
 
@@ -36,7 +36,7 @@ public class GLSLTexture extends VAO {
         GLSLTextureShader.texture.bindParams(gl);
 
         bind(gl);
-        gl.glDrawArrays(mode, 0, toDraw);
+        gl.glDrawArrays(mode, first, toDraw);
     }
 
 }
