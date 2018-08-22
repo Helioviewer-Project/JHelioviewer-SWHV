@@ -3,15 +3,19 @@ package org.helioviewer.jhv.camera.annotate;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.scale.GridType;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.jogamp.opengl.GL2;
 
 abstract class AbstractAnnotateable implements Annotateable {
 
@@ -65,6 +69,14 @@ abstract class AbstractAnnotateable implements Annotateable {
         } else {
             return Display.mode.xform.transformInverse(frame, Display.mode.scale.mouseToGrid(x, y, Display.getActiveViewport(), camera, GridType.Viewpoint));
         }
+    }
+
+    @Override
+    public void render(Camera camera, Viewport vp, boolean active, Buf buf) {
+    }
+
+    @Override
+    public void renderTransformed(Camera camera, Viewport vp, GL2 gl, boolean active, Buf buf) {
     }
 
     @Override

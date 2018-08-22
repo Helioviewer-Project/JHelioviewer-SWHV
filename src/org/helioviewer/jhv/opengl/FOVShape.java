@@ -2,32 +2,18 @@ package org.helioviewer.jhv.opengl;
 
 import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.display.Viewport;
-
-import com.jogamp.opengl.GL2;
 
 public class FOVShape {
 
-    private static final int SUBDIVISIONS = 24;
+    public static final int SUBDIVISIONS = 24;
     private static final float SIZE_POINT = 0.02f;
     private static final double epsilon = 0.006;
-
-    private final double thickness;
-
-    private final GLSLLine line = new GLSLLine(true);
-    private final Buf lineBuf = new Buf((4 * (SUBDIVISIONS + 1) + 2) * GLSLLine.stride);
-    private final GLSLShape point = new GLSLShape(true);
-    private final Buf pointBuf = new Buf(GLSLShape.stride);
 
     private double centerX = 0;
     private double centerY = 0;
     private double centerZ = computeZ(centerX, centerY);
     private double tanX;
     private double tanY;
-
-    public FOVShape(double _thickness) {
-        thickness = _thickness;
-    }
 
     public void setTAngles(double _tanX, double _tanY) {
         tanX = _tanX;
@@ -40,7 +26,7 @@ public class FOVShape {
         centerZ = computeZ(centerX, centerY);
     }
 
-    private void computeCenter(boolean highlight, Buf buf) {
+    public void putCenter(boolean highlight, Buf buf) {
         byte[] color = highlight ? Colors.Red : Colors.Blue;
         buf.put4f((float) centerX, (float) centerY, (float) centerZ, SIZE_POINT).put4b(color);
     }
@@ -50,7 +36,7 @@ public class FOVShape {
         return n > 0 ? epsilon + Math.sqrt(n) : epsilon;
     }
 
-    private void computeLine(double distance, boolean highlight, Buf buf) {
+    public void putLine(double distance, boolean highlight, Buf buf) {
         double x, y, z;
         double bw = distance * tanX;
         double bh = distance * tanY;
@@ -93,26 +79,6 @@ public class FOVShape {
                 buf.put4f((float) x, (float) y, (float) z, 1).put4b(Colors.Null);
             }
         }
-    }
-
-    public void render(GL2 gl, Viewport vp, double distance, double pointFactor, boolean highlight) {
-        computeCenter(highlight, pointBuf);
-        point.setData(gl, pointBuf);
-        point.renderPoints(gl, pointFactor);
-
-        computeLine(distance, highlight, lineBuf);
-        line.setData(gl, lineBuf);
-        line.render(gl, vp, thickness);
-    }
-
-    public void init(GL2 gl) {
-        line.init(gl);
-        point.init(gl);
-    }
-
-    public void dispose(GL2 gl) {
-        line.dispose(gl);
-        point.dispose(gl);
     }
 
 }

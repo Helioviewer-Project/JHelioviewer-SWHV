@@ -84,10 +84,6 @@ public class AnnotateCircle extends AbstractAnnotateable {
     }
 
     @Override
-    public void renderTransformed(Camera camera, Viewport vp, GL2 gl, boolean active, Buf buf) {
-    }
-
-    @Override
     public void mousePressed(Camera camera, int x, int y) {
         Vec3 pt = computePoint(camera, x, y);
         if (pt != null)
