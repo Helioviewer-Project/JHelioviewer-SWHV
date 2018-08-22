@@ -11,22 +11,12 @@ import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL2;
-
 public class AnnotateCross extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 2;
 
     public AnnotateCross(JSONObject jo) {
         super(jo);
-    }
-
-    @Override
-    public void init(GL2 gl) {
-    }
-
-    @Override
-    public void dispose(GL2 gl) {
     }
 
     private static void drawCross(Camera camera, Viewport vp, Vec3 bp, Buf buf, byte[] color) {

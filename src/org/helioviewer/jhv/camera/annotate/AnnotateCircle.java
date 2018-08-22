@@ -11,22 +11,12 @@ import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL2;
-
 public class AnnotateCircle extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 90;
 
     public AnnotateCircle(JSONObject jo) {
         super(jo);
-    }
-
-    @Override
-    public void init(GL2 gl) {
-    }
-
-    @Override
-    public void dispose(GL2 gl) {
     }
 
     private static void drawCircle(Camera camera, Viewport vp, Vec3 bp, Vec3 ep, Buf buf, byte[] color) {

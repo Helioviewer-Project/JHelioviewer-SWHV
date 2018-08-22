@@ -15,15 +15,12 @@ import org.helioviewer.jhv.math.Vec3;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL2;
-
 abstract class AbstractAnnotateable implements Annotateable {
 
     static final byte[] activeColor = Colors.Red;
     static final byte[] dragColor = Colors.Yellow;
     static final byte[] baseColor = Colors.Blue;
 
-    static final double LINEWIDTH = 0.002;
     static final double radius = Sun.Radius * 1.01;
 
     Vec3 startPoint;
@@ -76,7 +73,7 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Override
-    public void renderTransformed(Camera camera, Viewport vp, GL2 gl, boolean active, Buf lineBuf, Buf centerBuf) {
+    public void renderTransformed(Camera camera, Viewport vp, boolean active, Buf lineBuf, Buf centerBuf) {
     }
 
     @Override

@@ -10,12 +10,8 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.FOVShape;
-import org.helioviewer.jhv.opengl.GLSLLine;
-import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.position.Position;
 import org.json.JSONObject;
-
-import com.jogamp.opengl.GL2;
 
 public class AnnotateFOV extends AbstractAnnotateable {
 
@@ -23,14 +19,6 @@ public class AnnotateFOV extends AbstractAnnotateable {
 
     public AnnotateFOV(JSONObject jo) {
         super(jo);
-    }
-
-    @Override
-    public void init(GL2 gl) {
-    }
-
-    @Override
-    public void dispose(GL2 gl) {
     }
 
     @Nullable
@@ -54,12 +42,11 @@ public class AnnotateFOV extends AbstractAnnotateable {
     }
 
     @Override
-    public void renderTransformed(Camera camera, Viewport vp, GL2 gl, boolean active, Buf lineBuf, Buf centerBuf) {
+    public void renderTransformed(Camera camera, Viewport vp, boolean active, Buf lineBuf, Buf centerBuf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
 
-        double pointFactor = vp.height / (2 * camera.getWidth()) / 4;
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
         double dx = (p1.x - p0.x) / 2;
