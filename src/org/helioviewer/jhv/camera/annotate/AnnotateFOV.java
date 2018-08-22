@@ -10,6 +10,8 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.FOVShape;
+import org.helioviewer.jhv.opengl.GLSLLine;
+import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.position.Position;
 import org.json.JSONObject;
 
@@ -17,7 +19,12 @@ import com.jogamp.opengl.GL2;
 
 public class AnnotateFOV extends AbstractAnnotateable {
 
-    private final FOVShape fov = new FOVShape(LINEWIDTH);
+    private final FOVShape fov = new FOVShape();
+
+    private final GLSLLine fovLine = new GLSLLine(true);
+    private final Buf fovBuf = new Buf((4 * (FOVShape.SUBDIVISIONS + 1) + 2) * GLSLLine.stride);
+    private final GLSLShape center = new GLSLShape(true);
+    private final Buf centerBuf = new Buf(GLSLShape.stride);
 
     public AnnotateFOV(JSONObject jo) {
         super(jo);
@@ -25,12 +32,14 @@ public class AnnotateFOV extends AbstractAnnotateable {
 
     @Override
     public void init(GL2 gl) {
-        fov.init(gl);
+        fovLine.init(gl);
+        center.init(gl);
     }
 
     @Override
     public void dispose(GL2 gl) {
-        fov.dispose(gl);
+        fovLine.dispose(gl);
+        center.dispose(gl);
     }
 
     @Nullable
@@ -54,10 +63,6 @@ public class AnnotateFOV extends AbstractAnnotateable {
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, boolean active, Buf buf) {
-    }
-
-    @Override
     public void renderTransformed(Camera camera, Viewport vp, GL2 gl, boolean active, Buf buf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
@@ -72,8 +77,16 @@ public class AnnotateFOV extends AbstractAnnotateable {
 
         fov.setCenter(p0.x + dx, p0.y + dy);
         fov.setTAngles(dx / distance, dy / distance);
-        fov.render(gl, vp, distance, pointFactor, active);
+
+        fov.putCenter(active, centerBuf);
+        center.setData(gl, centerBuf);
+        center.renderPoints(gl, pointFactor);
+
+        fov.putLine(distance, active, fovBuf);
+        fovLine.setData(gl, fovBuf);
+        fovLine.render(gl, vp, LINEWIDTH);
     }
+
 
     @Override
     public void mousePressed(Camera camera, int x, int y) {

@@ -40,7 +40,12 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     private static final double LINEWIDTH_ORBIT = 0.002;
     private static final float SIZE_PLANET = 10;
 
-    private final FOVShape fov = new FOVShape(LINEWIDTH_FOV);
+    private final FOVShape fov = new FOVShape();
+    private final GLSLLine fovLine = new GLSLLine(true);
+    private final Buf fovBuf = new Buf((4 * (FOVShape.SUBDIVISIONS + 1) + 2) * GLSLLine.stride);
+    private final GLSLShape center = new GLSLShape(true);
+    private final Buf centerBuf = new Buf(GLSLShape.stride);
+
     private final GLSLLine orbits = new GLSLLine(true);
     private final Buf orbitBuf = new Buf(3276 * GLSLLine.stride); // pre-allocate 64k
     private final GLSLShape planets = new GLSLShape(true);
@@ -70,13 +75,13 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         Transform.rotateViewInverse(viewpoint.toQuat());
 
         if (!far)
-            fov.render(gl, vp, viewpoint.distance, pixFactor, false);
+            fovRender(gl, vp, viewpoint.distance, pixFactor, false);
 
         Transform.pushProjection();
         camera.projectionOrthoFar(vp.aspect);
 
         if (far)
-            fov.render(gl, vp, viewpoint.distance, pixFactor, false);
+            fovRender(gl, vp, viewpoint.distance, pixFactor, false);
         {
             Collection<LoadPosition> loadPositions = camera.getUpdateViewpoint().getLoadPositions();
             if (!loadPositions.isEmpty()) {
@@ -85,6 +90,16 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         }
         Transform.popProjection();
         Transform.popView();
+    }
+
+    private void fovRender(GL2 gl, Viewport vp, double distance, double pointFactor, boolean highlight) {
+        fov.putCenter(highlight, centerBuf);
+        center.setData(gl, centerBuf);
+        center.renderPoints(gl, pointFactor);
+
+        fov.putLine(distance, highlight, fovBuf);
+        fovLine.setData(gl, fovBuf);
+        fovLine.render(gl, vp, LINEWIDTH_FOV);
     }
 
     private static final int MOUSE_OFFSET_X = 25;
@@ -221,14 +236,16 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
     @Override
     public void init(GL2 gl) {
-        fov.init(gl);
+        fovLine.init(gl);
+        center.init(gl);
         orbits.init(gl);
         planets.init(gl);
     }
 
     @Override
     public void dispose(GL2 gl) {
-        fov.dispose(gl);
+        fovLine.dispose(gl);
+        center.dispose(gl);
         orbits.dispose(gl);
         planets.dispose(gl);
     }
