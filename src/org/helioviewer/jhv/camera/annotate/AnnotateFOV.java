@@ -21,25 +21,16 @@ public class AnnotateFOV extends AbstractAnnotateable {
 
     private final FOVShape fov = new FOVShape();
 
-    private final GLSLLine fovLine = new GLSLLine(true);
-    private final Buf fovBuf = new Buf((4 * (FOVShape.SUBDIVISIONS + 1) + 2) * GLSLLine.stride);
-    private final GLSLShape center = new GLSLShape(true);
-    private final Buf centerBuf = new Buf(GLSLShape.stride);
-
     public AnnotateFOV(JSONObject jo) {
         super(jo);
     }
 
     @Override
     public void init(GL2 gl) {
-        fovLine.init(gl);
-        center.init(gl);
     }
 
     @Override
     public void dispose(GL2 gl) {
-        fovLine.dispose(gl);
-        center.dispose(gl);
     }
 
     @Nullable
@@ -63,7 +54,7 @@ public class AnnotateFOV extends AbstractAnnotateable {
     }
 
     @Override
-    public void renderTransformed(Camera camera, Viewport vp, GL2 gl, boolean active, Buf buf) {
+    public void renderTransformed(Camera camera, Viewport vp, GL2 gl, boolean active, Buf lineBuf, Buf centerBuf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
@@ -79,14 +70,8 @@ public class AnnotateFOV extends AbstractAnnotateable {
         fov.setTAngles(dx / distance, dy / distance);
 
         fov.putCenter(active, centerBuf);
-        center.setData(gl, centerBuf);
-        center.renderPoints(gl, pointFactor);
-
-        fov.putLine(distance, active, fovBuf);
-        fovLine.setData(gl, fovBuf);
-        fovLine.render(gl, vp, LINEWIDTH);
+        fov.putLine(distance, active, lineBuf);
     }
-
 
     @Override
     public void mousePressed(Camera camera, int x, int y) {

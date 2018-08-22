@@ -13,6 +13,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.opengl.GLSLLine;
+import org.helioviewer.jhv.opengl.GLSLShape;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -50,6 +51,8 @@ public class InteractionAnnotate extends Interaction {
     private final Buf annsBuf = new Buf(3276 * GLSLLine.stride);
     private final GLSLLine transLine = new GLSLLine(true);
     private final Buf transBuf = new Buf(512 * GLSLLine.stride);
+    private final GLSLShape center = new GLSLShape(true);
+    private final Buf centerBuf = new Buf(8 * GLSLShape.stride);
 
     private Annotateable newAnnotateable = null;
     private AnnotationMode mode = AnnotationMode.Rectangle;
@@ -95,23 +98,26 @@ public class InteractionAnnotate extends Interaction {
         if (newAnnotateable != null) {
             newAnnotateable.render(camera, vp, false, annsBuf);
         }
+        annsLine.setData(gl, annsBuf);
+        annsLine.render(gl, vp, LINEWIDTH);
 
         Transform.pushView();
         Transform.rotateViewInverse(camera.getViewpoint().toQuat());
         {
             for (Annotateable ann : anns) {
-                ann.renderTransformed(camera, vp, gl, ann == activeAnn, transBuf);
+                ann.renderTransformed(camera, vp, gl, ann == activeAnn, transBuf, centerBuf);
             }
             if (newAnnotateable != null) {
-                newAnnotateable.renderTransformed(camera, vp, gl, false, transBuf);
+                newAnnotateable.renderTransformed(camera, vp, gl, false, transBuf, centerBuf);
             }
+            transLine.setData(gl, transBuf);
+            transLine.render(gl, vp, LINEWIDTH);
+
+            double pointFactor = vp.height / (2 * camera.getWidth()) / 4;
+            center.setData(gl, centerBuf);
+            center.renderPoints(gl, pointFactor);
         }
         Transform.popView();
-
-        annsLine.setData(gl, annsBuf);
-        annsLine.render(gl, vp, LINEWIDTH);
-        transLine.setData(gl, transBuf);
-        transLine.render(gl, vp, LINEWIDTH);
     }
 
     public void zoom() {
@@ -212,11 +218,13 @@ public class InteractionAnnotate extends Interaction {
     public void init(GL2 gl) {
         annsLine.init(gl);
         transLine.init(gl);
+        center.init(gl);
     }
 
     public void dispose(GL2 gl) {
         annsLine.dispose(gl);
         transLine.dispose(gl);
+        center.dispose(gl);
     }
 
 }
