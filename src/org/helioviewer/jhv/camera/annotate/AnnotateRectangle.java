@@ -11,22 +11,12 @@ import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL2;
-
 public class AnnotateRectangle extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 12;
 
     public AnnotateRectangle(JSONObject jo) {
         super(jo);
-    }
-
-    @Override
-    public void init(GL2 gl) {
-    }
-
-    @Override
-    public void dispose(GL2 gl) {
     }
 
     private static void drawRectangle(Camera camera, Viewport vp, Vec3 bp, Vec3 ep, Buf buf, byte[] color) {

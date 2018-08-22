@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.camera;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.camera.annotate.AnnotateCircle;
@@ -43,8 +42,6 @@ public class InteractionAnnotate extends Interaction {
     }
 
     private final ArrayList<Annotateable> anns = new ArrayList<>();
-    private final HashSet<Annotateable> removed = new HashSet<>();
-    private final HashSet<Annotateable> added = new HashSet<>();
 
     private static final double LINEWIDTH = 0.002;
     private final GLSLLine annsLine = new GLSLLine(true);
@@ -62,31 +59,14 @@ public class InteractionAnnotate extends Interaction {
         super(_camera);
     }
 
-    private void add(Annotateable ann) {
-        anns.add(ann);
-        added.add(ann);
-    }
-
     private void remove() {
         if (activeIndex >= 0 && activeIndex < anns.size()) {
-            removed.add(anns.remove(activeIndex));
+            anns.remove(activeIndex);
             activeIndex = anns.size() - 1;
         }
     }
 
     public void drawAnnotations(Viewport vp, GL2 gl) {
-        for (Annotateable ann : removed) {
-            ann.dispose(gl);
-        }
-        removed.clear();
-        for (Annotateable ann : added) {
-            ann.init(gl);
-        }
-        added.clear();
-        if (newAnnotateable != null) {
-            newAnnotateable.init(gl);
-        }
-
         if (newAnnotateable == null && anns.isEmpty())
             return;
 
@@ -105,10 +85,10 @@ public class InteractionAnnotate extends Interaction {
         Transform.rotateViewInverse(camera.getViewpoint().toQuat());
         {
             for (Annotateable ann : anns) {
-                ann.renderTransformed(camera, vp, gl, ann == activeAnn, transBuf, centerBuf);
+                ann.renderTransformed(camera, vp, ann == activeAnn, transBuf, centerBuf);
             }
             if (newAnnotateable != null) {
-                newAnnotateable.renderTransformed(camera, vp, gl, false, transBuf, centerBuf);
+                newAnnotateable.renderTransformed(camera, vp, false, transBuf, centerBuf);
             }
             transLine.setData(gl, transBuf);
             transLine.render(gl, vp, LINEWIDTH);
@@ -147,7 +127,7 @@ public class InteractionAnnotate extends Interaction {
     private void finishAnnotateable() {
         if (newAnnotateable != null && newAnnotateable.beingDragged()) {
             newAnnotateable.mouseReleased();
-            add(newAnnotateable);
+            anns.add(newAnnotateable);
             activeIndex = anns.size() - 1;
         }
         newAnnotateable = null;
@@ -179,7 +159,6 @@ public class InteractionAnnotate extends Interaction {
 
     public void clear() {
         newAnnotateable = null;
-        removed.addAll(anns);
         anns.clear();
         activeIndex = -1;
     }
@@ -210,7 +189,7 @@ public class InteractionAnnotate extends Interaction {
             activeIndex = jo.optInt("activeIndex", activeIndex);
             int len = ja.length();
             for (int i = 0; i < len; i++) {
-                add(generate(ja.getJSONObject(i)));
+                anns.add(generate(ja.getJSONObject(i)));
             }
         }
     }

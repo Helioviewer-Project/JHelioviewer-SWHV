@@ -5,17 +5,11 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL2;
-
 public interface Annotateable {
-
-    void init(GL2 gl);
-
-    void dispose(GL2 gl);
 
     void render(Camera camera, Viewport vp, boolean active, Buf buf);
 
-    void renderTransformed(Camera camera, Viewport vp, GL2 gl, boolean active, Buf lineBuf, Buf centerBuf);
+    void renderTransformed(Camera camera, Viewport vp, boolean active, Buf lineBuf, Buf centerBuf);
 
     void mousePressed(Camera camera, int x, int y);
 
