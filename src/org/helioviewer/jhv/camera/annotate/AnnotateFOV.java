@@ -7,7 +7,6 @@ import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.FOVShape;
 import org.helioviewer.jhv.position.Position;
@@ -55,25 +54,24 @@ public class AnnotateFOV extends AbstractAnnotateable {
 
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl, boolean active) {
+    }
+
+    @Override
+    public void renderTransformed(Camera camera, Viewport vp, GL2 gl, boolean active) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
 
         double pointFactor = vp.height / (2 * camera.getWidth()) / 4;
-        Position viewpoint = camera.getViewpoint();
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
         double dx = (p1.x - p0.x) / 2;
         double dy = (p1.y - p0.y) / 2;
+        double distance = camera.getViewpoint().distance;
 
-        Transform.pushView();
-        Transform.rotateViewInverse(viewpoint.toQuat());
-        {
-            fov.setCenter(p0.x + dx, p0.y + dy);
-            fov.setTAngles(dx / viewpoint.distance, dy / viewpoint.distance);
-            fov.render(gl, vp, viewpoint.distance, pointFactor, active);
-        }
-        Transform.popView();
+        fov.setCenter(p0.x + dx, p0.y + dy);
+        fov.setTAngles(dx / distance, dy / distance);
+        fov.render(gl, vp, distance, pointFactor, active);
     }
 
     @Override
