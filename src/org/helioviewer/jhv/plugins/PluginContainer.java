@@ -34,7 +34,7 @@ class PluginContainer {
 
     private boolean getActive() {
         String p = Settings.getProperty("plugins." + this + ".active");
-        return p == null ? true : Boolean.valueOf(p);
+        return p == null ? true : Boolean.parseBoolean(p);
     }
 
     public void toggleActive() {
