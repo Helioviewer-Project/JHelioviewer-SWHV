@@ -18,8 +18,9 @@ public class BlendPanel implements FilterDetails {
         slider = new JSlider(JSlider.HORIZONTAL, 0, 100, (int) (layer.getGLImage().getBlend() * 100));
         label = new JLabel(LevelsPanel.align3(slider.getValue()), JLabel.RIGHT);
         slider.addChangeListener(e -> {
-            layer.getGLImage().setBlend(slider.getValue() / 100.);
-            label.setText(LevelsPanel.align3(slider.getValue())); // additivity
+            int value = slider.getValue();
+            layer.getGLImage().setBlend(value / 100.);
+            label.setText(LevelsPanel.align3(value)); // additivity
             Display.display();
         });
         WheelSupport.installMouseWheelSupport(slider);

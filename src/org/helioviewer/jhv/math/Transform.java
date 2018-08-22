@@ -26,10 +26,6 @@ public class Transform {
         proj.popMatrix();
     }
 
-    public static void setView(float[] m) {
-        view.set(m);
-    }
-
     public static void setIdentityView() {
         view.identity();
     }

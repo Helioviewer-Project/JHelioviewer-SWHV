@@ -18,8 +18,9 @@ public class SharpenPanel implements FilterDetails {
         slider = new JSlider(JSlider.HORIZONTAL, -100, 100, (int) (layer.getGLImage().getSharpen() * 100));
         label = new JLabel(LevelsPanel.align3(slider.getValue()), JLabel.RIGHT);
         slider.addChangeListener(e -> {
-            layer.getGLImage().setSharpen(slider.getValue() / 100.);
-            label.setText(LevelsPanel.align3(slider.getValue()));
+            int value = slider.getValue();
+            layer.getGLImage().setSharpen(value / 100.);
+            label.setText(LevelsPanel.align3(value));
             Display.display();
         });
         WheelSupport.installMouseWheelSupport(slider);
