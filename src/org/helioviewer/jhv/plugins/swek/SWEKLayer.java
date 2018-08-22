@@ -5,7 +5,6 @@ import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.image.BufferedImage;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -17,7 +16,6 @@ import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Buf;
-import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.base.scale.Transform;
@@ -75,7 +73,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     private final Buf bufThick = new Buf(64 * GLSLLine.stride); // pre-allocate
 
     private final GLSLTexture glslTexture = new GLSLTexture();
-    private final FloatBuffer texBuf = BufferUtils.newFloatBuffer(16 + 8);
+    private final Buf texBuf = new Buf(4 * GLSLTexture.stride);
 
     public SWEKLayer(JSONObject jo) {
         if (jo != null)
@@ -164,10 +162,8 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
                 v.x = r * Math.cos(theta);
                 v.y = r * Math.sin(theta);
-                BufferUtils.put4f(texBuf, q.rotateInverseVector(v));
-                BufferUtils.put2f(texBuf, el);
+                texBuf.put4f(q.rotateInverseVector(v)).put2f(el);
             }
-            texBuf.rewind();
 
             bindTexture(gl, evtr.getSupplier().getGroup());
             glslTexture.setData(gl, texBuf);
@@ -244,15 +240,10 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         p2.add(targetDir);
         p3.add(targetDir);
 
-        BufferUtils.put4f(texBuf, p0);
-        BufferUtils.put2f(texBuf, texCoord[0]);
-        BufferUtils.put4f(texBuf, p1);
-        BufferUtils.put2f(texBuf, texCoord[1]);
-        BufferUtils.put4f(texBuf, p2);
-        BufferUtils.put2f(texBuf, texCoord[2]);
-        BufferUtils.put4f(texBuf, p3);
-        BufferUtils.put2f(texBuf, texCoord[3]);
-        texBuf.rewind();
+        texBuf.put4f(p0).put2f(texCoord[0]);
+        texBuf.put4f(p1).put2f(texCoord[1]);
+        texBuf.put4f(p2).put2f(texCoord[2]);
+        texBuf.put4f(p3).put2f(texCoord[3]);
 
         glslTexture.setData(gl, texBuf);
         glslTexture.render(gl, GL2.GL_TRIANGLE_STRIP, color, 4);
@@ -275,15 +266,10 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         double width2 = width / 4.;
         double height2 = height / 4.;
 
-        BufferUtils.put4f(texBuf, (float) (theta - width2), (float) (r - height2), 0, 1);
-        BufferUtils.put2f(texBuf, texCoord[0]);
-        BufferUtils.put4f(texBuf, (float) (theta + width2), (float) (r - height2), 0, 1);
-        BufferUtils.put2f(texBuf, texCoord[1]);
-        BufferUtils.put4f(texBuf, (float) (theta - width2), (float) (r + height2), 0, 1);
-        BufferUtils.put2f(texBuf, texCoord[2]);
-        BufferUtils.put4f(texBuf, (float) (theta + width2), (float) (r + height2), 0, 1);
-        BufferUtils.put2f(texBuf, texCoord[3]);
-        texBuf.rewind();
+        texBuf.put4f((float) (theta - width2), (float) (r - height2), 0, 1).put2f(texCoord[0]);
+        texBuf.put4f((float) (theta + width2), (float) (r - height2), 0, 1).put2f(texCoord[1]);
+        texBuf.put4f((float) (theta - width2), (float) (r + height2), 0, 1).put2f(texCoord[2]);
+        texBuf.put4f((float) (theta + width2), (float) (r + height2), 0, 1).put2f(texCoord[3]);
 
         glslTexture.setData(gl, texBuf);
         glslTexture.render(gl, GL2.GL_TRIANGLE_STRIP, color, 4);
@@ -361,7 +347,6 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), sz, sz, Colors.floats(evtr.getColor()));
         }
     }
-
 
     private static final int MOUSE_OFFSET_X = 25;
     private static final int MOUSE_OFFSET_Y = 25;
