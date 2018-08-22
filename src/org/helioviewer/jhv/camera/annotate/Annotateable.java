@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.camera.annotate;
 
+import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.json.JSONObject;
@@ -12,9 +13,9 @@ public interface Annotateable {
 
     void dispose(GL2 gl);
 
-    void render(Camera camera, Viewport vp, GL2 gl, boolean active);
+    void render(Camera camera, Viewport vp, boolean active, Buf buf);
 
-    void renderTransformed(Camera camera, Viewport vp, GL2 gl, boolean active);
+    void renderTransformed(Camera camera, Viewport vp, GL2 gl, boolean active, Buf buf);
 
     void mousePressed(Camera camera, int x, int y);
 

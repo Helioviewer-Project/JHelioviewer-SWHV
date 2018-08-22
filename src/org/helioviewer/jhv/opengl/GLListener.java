@@ -65,6 +65,7 @@ public class GLListener implements GLEventListener {
 
         blackCircle.init(gl);
         GLHelper.initCircleFront(gl, blackCircle, 0, 0, 0.9998, 180, Colors.Black);
+        ImageViewerGui.getAnnotateInteraction().init(gl);
     }
 
     @Override
@@ -78,6 +79,7 @@ public class GLListener implements GLEventListener {
 
     private static void disposeImpl(GL2 gl) {
         Layers.dispose(gl);
+        ImageViewerGui.getAnnotateInteraction().dispose(gl);
         blackCircle.dispose(gl);
         GLText.dispose(gl);
 
