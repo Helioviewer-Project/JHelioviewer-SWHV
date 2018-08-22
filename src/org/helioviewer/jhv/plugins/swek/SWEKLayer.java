@@ -109,7 +109,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         tex.bind(gl);
     }
 
-    private void interPolatedDraw(int mres, double r_start, double r_end, double t_start, double t_end, Quat q, Buf buf, byte[] color) {
+    private static void interPolatedDraw(int mres, double r_start, double r_end, double t_start, double t_end, Quat q, Buf buf, byte[] color) {
         Vec3 v = new Vec3();
         for (int i = 0; i <= mres; i++) {
             double alpha = 1. - i / (double) mres;

@@ -40,10 +40,9 @@ public class FOVShape {
         centerZ = computeZ(centerX, centerY);
     }
 
-    private void computeCenter(GL2 gl, boolean highlight) {
-        pointBuf.put4f((float) centerX, (float) centerY, (float) centerZ, SIZE_POINT);
-        pointBuf.put4b(highlight ? Colors.Red : Colors.Blue);
-        point.setData(gl, pointBuf);
+    private void computeCenter(boolean highlight, Buf buf) {
+        byte[] color = highlight ? Colors.Red : Colors.Blue;
+        buf.put4f((float) centerX, (float) centerY, (float) centerZ, SIZE_POINT).put4b(color);
     }
 
     private static double computeZ(double x, double y) {
@@ -51,7 +50,7 @@ public class FOVShape {
         return n > 0 ? epsilon + Math.sqrt(n) : epsilon;
     }
 
-    private void computeLine(GL2 gl, double distance, boolean highlight) {
+    private void computeLine(double distance, boolean highlight, Buf buf) {
         double x, y, z;
         double bw = distance * tanX;
         double bh = distance * tanY;
@@ -62,46 +61,47 @@ public class FOVShape {
             y = bh + centerY;
             z = computeZ(x, y);
             if (i == 0) { // first
-                lineBuf.put4f((float) x, (float) y, (float) z, 1).put4b(Colors.Null);
+                buf.put4f((float) x, (float) y, (float) z, 1).put4b(Colors.Null);
             }
-            lineBuf.put4f((float) x, (float) y, (float) z, 1);
-            lineBuf.put4b(i % 2 == 0 ? color : Colors.White);
+            buf.put4f((float) x, (float) y, (float) z, 1);
+            buf.put4b(i % 2 == 0 ? color : Colors.White);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             x = bw + centerX;
             y = bh - 2 * bh / SUBDIVISIONS * i + centerY;
             z = computeZ(x, y);
-            lineBuf.put4f((float) x, (float) y, (float) z, 1);
-            lineBuf.put4b(i % 2 == 0 ? color : Colors.White);
+            buf.put4f((float) x, (float) y, (float) z, 1);
+            buf.put4b(i % 2 == 0 ? color : Colors.White);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             x = bw - 2 * bw / SUBDIVISIONS * i + centerX;
             y = -bh + centerY;
             z = computeZ(x, y);
-            lineBuf.put4f((float) x, (float) y, (float) z, 1);
-            lineBuf.put4b(i % 2 == 0 ? color : Colors.White);
+            buf.put4f((float) x, (float) y, (float) z, 1);
+            buf.put4b(i % 2 == 0 ? color : Colors.White);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             x = -bw + centerX;
             y = -bh + 2 * bh / SUBDIVISIONS * i + centerY;
             z = computeZ(x, y);
-            lineBuf.put4f((float) x, (float) y, (float) z, 1);
-            lineBuf.put4b(i % 2 == 0 ? color : Colors.White);
+            buf.put4f((float) x, (float) y, (float) z, 1);
+            buf.put4b(i % 2 == 0 ? color : Colors.White);
             if (i == SUBDIVISIONS) { // last
-                lineBuf.put4f((float) x, (float) y, (float) z, 1).put4b(Colors.Null);
+                buf.put4f((float) x, (float) y, (float) z, 1).put4b(Colors.Null);
             }
         }
-
-        line.setData(gl, lineBuf);
     }
 
     public void render(GL2 gl, Viewport vp, double distance, double pointFactor, boolean highlight) {
-        computeCenter(gl, highlight);
+        computeCenter(highlight, pointBuf);
+        point.setData(gl, pointBuf);
         point.renderPoints(gl, pointFactor);
-        computeLine(gl, distance, highlight);
+
+        computeLine(distance, highlight, lineBuf);
+        line.setData(gl, lineBuf);
         line.render(gl, vp, thickness);
     }
 
