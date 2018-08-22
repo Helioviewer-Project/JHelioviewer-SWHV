@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.opengl;
 
 import java.nio.Buffer;
-import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.base.Buf;
 
@@ -29,15 +28,11 @@ class VBO {
 
     void setData(GL2 gl, Buf buf) {
         Buffer buffer = buf.toBuffer();
-        bufferData(gl, buffer.limit(), buffer.capacity(), buffer);
+        setBufferData(gl, buffer.limit(), buffer.capacity(), buffer);
         buf.clear();
     }
 
-    void setData(GL2 gl, FloatBuffer buffer) {
-        bufferData(gl, 4 * buffer.limit(), 4 * buffer.capacity(), buffer);
-    }
-
-    private void bufferData(GL2 gl, int limit, int capacity, Buffer buffer) {
+    private void setBufferData(GL2 gl, int limit, int capacity, Buffer buffer) {
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, bufferID);
         gl.glBufferData(GL2.GL_ARRAY_BUFFER, capacity, null, usage); // https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
         gl.glBufferSubData(GL2.GL_ARRAY_BUFFER, 0, limit, buffer);

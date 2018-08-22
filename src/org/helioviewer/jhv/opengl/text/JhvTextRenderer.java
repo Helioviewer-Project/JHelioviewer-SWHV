@@ -137,13 +137,9 @@ public class JhvTextRenderer {
     // The amount of vertical dead space on the backing store before we
     // force a compaction
     private static final float MAX_VERTICAL_FRAGMENTATION = 0.7f;
-    //private static final int kCoordsPerVertVerts = 4;
-    //private static final int kCoordsPerVertTex = 2;
     private static final int kVertsPerQuad = 6;
     private static final int kQuadsPerBuffer = 100;
     private static final int kTotalBufferSizeVerts = kQuadsPerBuffer * kVertsPerQuad;
-    //private static final int kTotalBufferSizeCoordsVerts = kQuadsPerBuffer * kVertsPerQuad * kCoordsPerVertVerts;
-    //private static final int kTotalBufferSizeCoordsTex = kQuadsPerBuffer * kVertsPerQuad * kCoordsPerVertTex;
     final Font font;
     private final boolean antialiased;
     private final boolean useFractionalMetrics;
