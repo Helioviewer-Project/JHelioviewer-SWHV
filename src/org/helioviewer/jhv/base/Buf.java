@@ -52,6 +52,19 @@ public class Buf {
         return this;
     }
 
+    public Buf put2f(float[] f) {
+        return put2f(f[0], f[1]);
+    }
+
+    public Buf put2f(float f0, float f1) {
+        ensure(8);
+        bufferLast.put(0, bufferLast.get(2)).put(1, bufferLast.get(3)).put(2, f0).put(3, f1);
+        System.arraycopy(byteLast, 8, array, length, 8);
+        length += 8;
+        floats += 2;
+        return this;
+    }
+
     public void put4b(byte[] b) {
         ensure(4);
         array[length]     = b[0];
