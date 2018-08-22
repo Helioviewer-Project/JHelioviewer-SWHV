@@ -70,7 +70,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     private boolean icons = true;
 
     private final GLSLLine glslLine = new GLSLLine(true);
-    private final Buf lineBuf = new Buf(32 * GLSLLine.stride);
+    private final Buf lineBuf = new Buf(512 * GLSLLine.stride); // pre-allocate
     private final GLSLTexture glslTexture = new GLSLTexture();
     private final FloatBuffer texBuf = BufferUtils.newFloatBuffer(16 + 8);
 
