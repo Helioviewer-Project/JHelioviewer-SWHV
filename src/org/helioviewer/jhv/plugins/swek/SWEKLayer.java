@@ -59,7 +59,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     private static final double LINEWIDTH_HIGHLIGHT = 2 * LINEWIDTH;
 
     private static final HashMap<String, GLTexture> iconCacheId = new HashMap<>();
-    private static final double ICON_ALPHA = 0.6;
+    private static final double ICON_ALPHA = 0.7;
     private static final double ICON_SIZE = 0.1;
     private static final double ICON_SIZE_HIGHLIGHTED = 0.16;
 
@@ -73,7 +73,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     private final Buf bufThick = new Buf(64 * GLSLLine.stride); // pre-allocate
 
     private final GLSLTexture glslTexture = new GLSLTexture();
-    private final Buf texBuf = new Buf(4 * GLSLTexture.stride);
+    private final Buf texBuf = new Buf(8 * GLSLTexture.stride);
 
     public SWEKLayer(JSONObject jo) {
         if (jo != null)
@@ -126,7 +126,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         buf.repeat4f().put4b(Colors.Null);
     }
 
-    private void drawCactusArc(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
+    private void drawCactusArc(JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
         double angularWidthDegree = SWEKData.readCMEAngularWidthDegree(evt);
         double angularWidth = Math.toRadians(angularWidthDegree);
         double principalAngleDegree = SWEKData.readCMEPrincipalAngleDegree(evt);
@@ -164,10 +164,6 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                 v.y = r * Math.sin(theta);
                 texBuf.put4f(q.rotateInverseVector(v)).put2f(el);
             }
-
-            bindTexture(gl, evtr.getSupplier().getGroup());
-            glslTexture.setData(gl, texBuf);
-            glslTexture.render(gl, GL2.GL_TRIANGLE_STRIP, Colors.floats(evtr.getColor()), 4);
         }
     }
 
@@ -222,15 +218,14 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         }
     }
 
-    private void drawImage3d(GL2 gl, double x, double y, double z, double width, double height, float[] color) {
+    private void drawImage3d(double x, double y, double z, double width, double height) {
         y = -y;
+
+        Vec3 targetDir = new Vec3(x, y, z);
+        Quat q = Quat.rotate(Quat.createRotation(Math.atan2(x, z), Vec3.YAxis), Quat.createRotation(-Math.asin(y / targetDir.length()), Vec3.XAxis));
 
         double width2 = width / 2.;
         double height2 = height / 2.;
-
-        Vec3 targetDir = new Vec3(x, y, z);
-
-        Quat q = Quat.rotate(Quat.createRotation(Math.atan2(x, z), Vec3.YAxis), Quat.createRotation(-Math.asin(y / targetDir.length()), Vec3.XAxis));
         Vec3 p0 = q.rotateVector(new Vec3(-width2, -height2, 0));
         Vec3 p1 = q.rotateVector(new Vec3(width2, -height2, 0));
         Vec3 p2 = q.rotateVector(new Vec3(-width2, height2, 0));
@@ -244,12 +239,9 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         texBuf.put4f(p1).put2f(texCoord[1]);
         texBuf.put4f(p2).put2f(texCoord[2]);
         texBuf.put4f(p3).put2f(texCoord[3]);
-
-        glslTexture.setData(gl, texBuf);
-        glslTexture.render(gl, GL2.GL_TRIANGLE_STRIP, color, 4);
     }
 
-    private void drawIcon(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
+    private void drawIcon(JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -257,12 +249,11 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         Vec3 pt = pi.centralPoint();
         if (pt != null) {
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
-            bindTexture(gl, evtr.getSupplier().getGroup());
-            drawImage3d(gl, pt.x, pt.y, pt.z, sz, sz, Colors.floats(evtr.getColor(), ICON_ALPHA));
+            drawImage3d(pt.x, pt.y, pt.z, sz, sz);
         }
     }
 
-    private void drawImageScale(GL2 gl, double theta, double r, double width, double height, float[] color) {
+    private void drawImageScale(double theta, double r, double width, double height) {
         double width2 = width / 4.;
         double height2 = height / 4.;
 
@@ -270,12 +261,9 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         texBuf.put4f((float) (theta + width2), (float) (r - height2), 0, 1).put2f(texCoord[1]);
         texBuf.put4f((float) (theta - width2), (float) (r + height2), 0, 1).put2f(texCoord[2]);
         texBuf.put4f((float) (theta + width2), (float) (r + height2), 0, 1).put2f(texCoord[3]);
-
-        glslTexture.setData(gl, texBuf);
-        glslTexture.render(gl, GL2.GL_TRIANGLE_STRIP, color, 4);
     }
 
-    private void drawIconScale(Camera camera, Viewport vp, GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Transform xform) {
+    private void drawIconScale(Camera camera, Viewport vp, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Transform xform) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -287,12 +275,11 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             Vec2 tf = xform.transform(viewpoint, pt, scale);
 
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
-            bindTexture(gl, evtr.getSupplier().getGroup());
-            drawImageScale(gl, tf.x * vp.aspect, tf.y, sz, sz, Colors.floats(evtr.getColor(), ICON_ALPHA));
+            drawImageScale(tf.x * vp.aspect, tf.y, sz, sz);
         }
     }
 
-    private void drawCactusArcScale(Viewport vp, GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp, GridScale scale) {
+    private void drawCactusArcScale(Viewport vp, JHVRelatedEvents evtr, JHVEvent evt, long timestamp, GridScale scale) {
         double angularWidthDegree = SWEKData.readCMEAngularWidthDegree(evt);
         double principalAngleDegree = SWEKData.readCMEPrincipalAngleDegree(evt) - 90;
         double speed = SWEKData.readCMESpeed(evt);
@@ -343,8 +330,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
         if (icons) {
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
-            bindTexture(gl, evtr.getSupplier().getGroup());
-            drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), sz, sz, Colors.floats(evtr.getColor()));
+            drawImageScale(scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), sz, sz);
         }
     }
 
@@ -369,43 +355,57 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         lineThick.render(gl, vp, LINEWIDTH_HIGHLIGHT);
     }
 
+    private void renderIcons(GL2 gl, ArrayList<JHVRelatedEvents> evs) {
+        glslTexture.setData(gl, texBuf);
+        int idx = 0;
+        for (JHVRelatedEvents evtr : evs) {
+            bindTexture(gl, evtr.getSupplier().getGroup());
+            glslTexture.render(gl, GL2.GL_TRIANGLE_STRIP, Colors.floats(evtr.getColor(), ICON_ALPHA) , idx, 4);
+            idx += 4;
+        }
+    }
+
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (isVisible[vp.idx]) {
-            for (JHVRelatedEvents evtr : SWEKData.getActiveEvents(controller.currentTime)) {
+            ArrayList<JHVRelatedEvents> evs = SWEKData.getActiveEvents(controller.currentTime);
+            for (JHVRelatedEvents evtr : evs) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
                 if (evt.isCactus()) {
-                    drawCactusArc(gl, evtr, evt, controller.currentTime);
+                    drawCactusArc(evtr, evt, controller.currentTime);
                 } else {
                     drawPolygon(camera, vp, evtr, evt);
                     if (icons) {
-                        gl.glDisable(GL2.GL_DEPTH_TEST);
-                        drawIcon(gl, evtr, evt);
-                        gl.glEnable(GL2.GL_DEPTH_TEST);
+                        drawIcon(evtr, evt);
                     }
                 }
             }
             renderEvents(vp, gl);
+            if (icons) {
+                renderIcons(gl, evs);
+            }
         }
     }
 
     @Override
     public void renderScale(Camera camera, Viewport vp, GL2 gl) {
         if (isVisible[vp.idx]) {
-            for (JHVRelatedEvents evtr : SWEKData.getActiveEvents(controller.currentTime)) {
+            ArrayList<JHVRelatedEvents> evs = SWEKData.getActiveEvents(controller.currentTime);
+            for (JHVRelatedEvents evtr : evs) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
                 if (evt.isCactus() && (Display.mode == Display.DisplayMode.LogPolar || Display.mode == Display.DisplayMode.Polar)) {
-                    drawCactusArcScale(vp, gl, evtr, evt, controller.currentTime, Display.mode.scale);
+                    drawCactusArcScale(vp, evtr, evt, controller.currentTime, Display.mode.scale);
                 } else {
                     drawPolygon(camera, vp, evtr, evt);
                     if (icons) {
-                        gl.glDisable(GL2.GL_DEPTH_TEST);
-                        drawIconScale(camera, vp, gl, evtr, evt, Display.mode.scale, Display.mode.xform);
-                        gl.glEnable(GL2.GL_DEPTH_TEST);
+                        drawIconScale(camera, vp, evtr, evt, Display.mode.scale, Display.mode.xform);
                     }
                 }
             }
             renderEvents(vp, gl);
+            if (icons) {
+                renderIcons(gl, evs);
+            }
         }
     }
 
