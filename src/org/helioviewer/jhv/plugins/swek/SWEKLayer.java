@@ -69,8 +69,11 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
     private boolean icons = true;
 
-    private final GLSLLine glslLine = new GLSLLine(true);
-    private final Buf lineBuf = new Buf(512 * GLSLLine.stride); // pre-allocate
+    private final GLSLLine lineEvent = new GLSLLine(true);
+    private final Buf bufEvent = new Buf(512 * GLSLLine.stride); // pre-allocate
+    private final GLSLLine lineThick = new GLSLLine(true);
+    private final Buf bufThick = new Buf(64 * GLSLLine.stride); // pre-allocate
+
     private final GLSLTexture glslTexture = new GLSLTexture();
     private final FloatBuffer texBuf = BufferUtils.newFloatBuffer(16 + 8);
 
@@ -106,7 +109,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         tex.bind(gl);
     }
 
-    private void interPolatedDraw(int mres, double r_start, double r_end, double t_start, double t_end, Quat q, byte[] color) {
+    private void interPolatedDraw(int mres, double r_start, double r_end, double t_start, double t_end, Quat q, Buf buf, byte[] color) {
         Vec3 v = new Vec3();
         for (int i = 0; i <= mres; i++) {
             double alpha = 1. - i / (double) mres;
@@ -118,14 +121,14 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             Vec3 res = q.rotateInverseVector(v);
 
             if (i == 0) {
-                lineBuf.put4f(res).put4b(Colors.Null);
+                buf.put4f(res).put4b(Colors.Null);
             }
-            lineBuf.put4f(res).put4b(color);
+            buf.put4f(res).put4b(color);
         }
-        lineBuf.repeat4f().put4b(Colors.Null);
+        buf.repeat4f().put4b(Colors.Null);
     }
 
-    private void drawCactusArc(Viewport vp, GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
+    private void drawCactusArc(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
         double angularWidthDegree = SWEKData.readCMEAngularWidthDegree(evt);
         double angularWidth = Math.toRadians(angularWidthDegree);
         double principalAngleDegree = SWEKData.readCMEPrincipalAngleDegree(evt);
@@ -138,20 +141,17 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         int angularResolution = (int) (angularWidthDegree / 4);
 
         Quat q = evt.getPositionInformation().getEarth().toQuat();
-        byte[] color = Colors.bytes(evtr.getColor());
-
         double thetaStart = principalAngle - angularWidth / 2.;
         double thetaEnd = principalAngle + angularWidth / 2.;
 
-        interPolatedDraw(angularResolution, distSun, distSun, thetaStart, principalAngle, q, color);
-        interPolatedDraw(angularResolution, distSun, distSun, principalAngle, thetaEnd, q, color);
+        Buf buf = evtr.isHighlighted() ? bufThick : bufEvent;
+        byte[] color = Colors.bytes(evtr.getColor());
 
-        interPolatedDraw(lineResolution, distSunBegin, distSun + 0.05, thetaStart, thetaStart, q, color);
-        interPolatedDraw(lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, q, color);
-        interPolatedDraw(lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, q, color);
-
-        glslLine.setData(gl, lineBuf);
-        glslLine.render(gl, vp, evtr.isHighlighted() ? LINEWIDTH_HIGHLIGHT : LINEWIDTH);
+        interPolatedDraw(angularResolution, distSun, distSun, thetaStart, principalAngle, q, buf, color);
+        interPolatedDraw(angularResolution, distSun, distSun, principalAngle, thetaEnd, q, buf, color);
+        interPolatedDraw(lineResolution, distSunBegin, distSun + 0.05, thetaStart, thetaStart, q, buf, color);
+        interPolatedDraw(lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, q, buf, color);
+        interPolatedDraw(lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, q, buf, color);
 
         if (icons) {
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
@@ -175,7 +175,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         }
     }
 
-    private void drawPolygon(Camera camera, Viewport vp, GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
+    private void drawPolygon(Camera camera, Viewport vp, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -185,7 +185,9 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             return;
         }
 
+        Buf buf = evtr.isHighlighted() ? bufThick : bufEvent;
         byte[] color = Colors.bytes(evtr.getColor());
+
         // draw bounds
         Vec3 pt = new Vec3();
         float[] oldBoundaryPoint3d = new float[0];
@@ -205,26 +207,55 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                         float y = -(float) (ynew / r);
                         float z = (float) (znew / r);
                         if (j == 0) {
-                            lineBuf.put4f(x, y, z, 1).put4b(Colors.Null);
+                            buf.put4f(x, y, z, 1).put4b(Colors.Null);
                         }
-                        lineBuf.put4f(x, y, z, 1).put4b(color);
+                        buf.put4f(x, y, z, 1).put4b(color);
                     } else {
                         pt.x = xnew / r;
                         pt.y = ynew / r;
                         pt.z = znew / r;
                         if (j == 0) {
-                            previous = GLHelper.drawVertex(camera, vp, pt, previous, lineBuf, Colors.Null);
+                            previous = GLHelper.drawVertex(camera, vp, pt, previous, buf, Colors.Null);
                         }
-                        previous = GLHelper.drawVertex(camera, vp, pt, previous, lineBuf, color);
+                        previous = GLHelper.drawVertex(camera, vp, pt, previous, buf, color);
                     }
                 }
-                lineBuf.repeat4f().put4b(Colors.Null);
+                buf.repeat4f().put4b(Colors.Null);
             }
             oldBoundaryPoint3d = new float[]{points[3 * i], points[3 * i + 1], points[3 * i + 2]};
         }
+    }
 
-        glslLine.setData(gl, lineBuf);
-        glslLine.render(gl, vp, evtr.isHighlighted() ? LINEWIDTH_HIGHLIGHT : LINEWIDTH);
+    private void drawImage3d(GL2 gl, double x, double y, double z, double width, double height, float[] color) {
+        y = -y;
+
+        double width2 = width / 2.;
+        double height2 = height / 2.;
+
+        Vec3 targetDir = new Vec3(x, y, z);
+
+        Quat q = Quat.rotate(Quat.createRotation(Math.atan2(x, z), Vec3.YAxis), Quat.createRotation(-Math.asin(y / targetDir.length()), Vec3.XAxis));
+        Vec3 p0 = q.rotateVector(new Vec3(-width2, -height2, 0));
+        Vec3 p1 = q.rotateVector(new Vec3(width2, -height2, 0));
+        Vec3 p2 = q.rotateVector(new Vec3(-width2, height2, 0));
+        Vec3 p3 = q.rotateVector(new Vec3(width2, height2, 0));
+        p0.add(targetDir);
+        p1.add(targetDir);
+        p2.add(targetDir);
+        p3.add(targetDir);
+
+        BufferUtils.put4f(texBuf, p0);
+        BufferUtils.put2f(texBuf, texCoord[0]);
+        BufferUtils.put4f(texBuf, p1);
+        BufferUtils.put2f(texBuf, texCoord[1]);
+        BufferUtils.put4f(texBuf, p2);
+        BufferUtils.put2f(texBuf, texCoord[2]);
+        BufferUtils.put4f(texBuf, p3);
+        BufferUtils.put2f(texBuf, texCoord[3]);
+        texBuf.rewind();
+
+        glslTexture.setData(gl, texBuf);
+        glslTexture.render(gl, GL2.GL_TRIANGLE_STRIP, color, 4);
     }
 
     private void drawIcon(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
@@ -286,45 +317,43 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         double thetaStart = MathUtils.mapTo0To360(principalAngleDegree - angularWidthDegree / 2.);
         double thetaEnd = MathUtils.mapTo0To360(principalAngleDegree + angularWidthDegree / 2.);
 
+        Buf buf = evtr.isHighlighted() ? bufThick : bufEvent;
         byte[] color = Colors.bytes(evtr.getColor());
 
         float x = (float) (scale.getXValueInv(thetaStart) * vp.aspect);
         float y = (float) scale.getYValueInv(distSunBegin);
-        lineBuf.put4f(x, y, 0, 1).put4b(Colors.Null);
-        lineBuf.repeat4f().put4b(color);
+        buf.put4f(x, y, 0, 1).put4b(Colors.Null);
+        buf.repeat4f().put4b(color);
 
         y = (float) scale.getYValueInv(distSun + 0.05);
-        lineBuf.put4f(x, y, 0, 1).put4b(color);
-        lineBuf.repeat4f().put4b(Colors.Null);
+        buf.put4f(x, y, 0, 1).put4b(color);
+        buf.repeat4f().put4b(Colors.Null);
 
         x = (float) (scale.getXValueInv(principalAngleDegree) * vp.aspect);
         y = (float) scale.getYValueInv(distSunBegin);
-        lineBuf.put4f(x, y, 0, 1).put4b(Colors.Null);
-        lineBuf.repeat4f().put4b(color);
+        buf.put4f(x, y, 0, 1).put4b(Colors.Null);
+        buf.repeat4f().put4b(color);
 
         y = (float) scale.getYValueInv(distSun + 0.05);
-        lineBuf.put4f(x, y, 0, 1).put4b(color);
-        lineBuf.repeat4f().put4b(Colors.Null);
+        buf.put4f(x, y, 0, 1).put4b(color);
+        buf.repeat4f().put4b(Colors.Null);
 
         x = (float) (scale.getXValueInv(thetaEnd) * vp.aspect);
         y = (float) scale.getYValueInv(distSunBegin);
-        lineBuf.put4f(x, y, 0, 1).put4b(Colors.Null);
-        lineBuf.repeat4f().put4b(color);
+        buf.put4f(x, y, 0, 1).put4b(Colors.Null);
+        buf.repeat4f().put4b(color);
 
         y = (float) scale.getYValueInv(distSun + 0.05);
-        lineBuf.put4f(x, y, 0, 1).put4b(color);
-        lineBuf.repeat4f().put4b(Colors.Null);
+        buf.put4f(x, y, 0, 1).put4b(color);
+        buf.repeat4f().put4b(Colors.Null);
 
         y = (float) scale.getYValueInv(distSun);
-        lineBuf.put4f(x, y, 0, 1).put4b(Colors.Null);
-        lineBuf.repeat4f().put4b(color);
+        buf.put4f(x, y, 0, 1).put4b(Colors.Null);
+        buf.repeat4f().put4b(color);
 
         x = (float) (scale.getXValueInv(thetaStart) * vp.aspect);
-        lineBuf.put4f(x, y, 0, 1).put4b(color);
-        lineBuf.repeat4f().put4b(Colors.Null);
-
-        glslLine.setData(gl, lineBuf);
-        glslLine.render(gl, vp, evtr.isHighlighted() ? LINEWIDTH_HIGHLIGHT : LINEWIDTH);
+        buf.put4f(x, y, 0, 1).put4b(color);
+        buf.repeat4f().put4b(Colors.Null);
 
         if (icons) {
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
@@ -333,37 +362,6 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         }
     }
 
-    private void drawImage3d(GL2 gl, double x, double y, double z, double width, double height, float[] color) {
-        y = -y;
-
-        double width2 = width / 2.;
-        double height2 = height / 2.;
-
-        Vec3 targetDir = new Vec3(x, y, z);
-
-        Quat q = Quat.rotate(Quat.createRotation(Math.atan2(x, z), Vec3.YAxis), Quat.createRotation(-Math.asin(y / targetDir.length()), Vec3.XAxis));
-        Vec3 p0 = q.rotateVector(new Vec3(-width2, -height2, 0));
-        Vec3 p1 = q.rotateVector(new Vec3(width2, -height2, 0));
-        Vec3 p2 = q.rotateVector(new Vec3(-width2, height2, 0));
-        Vec3 p3 = q.rotateVector(new Vec3(width2, height2, 0));
-        p0.add(targetDir);
-        p1.add(targetDir);
-        p2.add(targetDir);
-        p3.add(targetDir);
-
-        BufferUtils.put4f(texBuf, p0);
-        BufferUtils.put2f(texBuf, texCoord[0]);
-        BufferUtils.put4f(texBuf, p1);
-        BufferUtils.put2f(texBuf, texCoord[1]);
-        BufferUtils.put4f(texBuf, p2);
-        BufferUtils.put2f(texBuf, texCoord[2]);
-        BufferUtils.put4f(texBuf, p3);
-        BufferUtils.put2f(texBuf, texCoord[3]);
-        texBuf.rewind();
-
-        glslTexture.setData(gl, texBuf);
-        glslTexture.render(gl, GL2.GL_TRIANGLE_STRIP, color, 4);
-    }
 
     private static final int MOUSE_OFFSET_X = 25;
     private static final int MOUSE_OFFSET_Y = 25;
@@ -379,15 +377,22 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         GLText.drawText(vp, txts, x + MOUSE_OFFSET_X, y + MOUSE_OFFSET_Y);
     }
 
+    private void renderEvents(Viewport vp, GL2 gl) {
+        lineEvent.setData(gl, bufEvent);
+        lineThick.setData(gl, bufThick);
+        lineEvent.render(gl, vp, LINEWIDTH);
+        lineThick.render(gl, vp, LINEWIDTH_HIGHLIGHT);
+    }
+
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (isVisible[vp.idx]) {
             for (JHVRelatedEvents evtr : SWEKData.getActiveEvents(controller.currentTime)) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
                 if (evt.isCactus()) {
-                    drawCactusArc(vp, gl, evtr, evt, controller.currentTime);
+                    drawCactusArc(gl, evtr, evt, controller.currentTime);
                 } else {
-                    drawPolygon(camera, vp, gl, evtr, evt);
+                    drawPolygon(camera, vp, evtr, evt);
                     if (icons) {
                         gl.glDisable(GL2.GL_DEPTH_TEST);
                         drawIcon(gl, evtr, evt);
@@ -395,6 +400,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                     }
                 }
             }
+            renderEvents(vp, gl);
         }
     }
 
@@ -406,7 +412,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                 if (evt.isCactus() && (Display.mode == Display.DisplayMode.LogPolar || Display.mode == Display.DisplayMode.Polar)) {
                     drawCactusArcScale(vp, gl, evtr, evt, controller.currentTime, Display.mode.scale);
                 } else {
-                    drawPolygon(camera, vp, gl, evtr, evt);
+                    drawPolygon(camera, vp, evtr, evt);
                     if (icons) {
                         gl.glDisable(GL2.GL_DEPTH_TEST);
                         drawIconScale(camera, vp, gl, evtr, evt, Display.mode.scale, Display.mode.xform);
@@ -414,6 +420,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                     }
                 }
             }
+            renderEvents(vp, gl);
         }
     }
 
@@ -471,14 +478,15 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
     @Override
     public void init(GL2 gl) {
-        glslLine.init(gl);
+        lineEvent.init(gl);
+        lineThick.init(gl);
         glslTexture.init(gl);
     }
 
     @Override
     public void dispose(GL2 gl) {
-        glslLine.dispose(gl);
-        glslTexture.dispose(gl);
+        lineEvent.dispose(gl);
+        lineThick.dispose(gl);
         for (GLTexture el : iconCacheId.values())
             el.delete(gl);
         iconCacheId.clear();
