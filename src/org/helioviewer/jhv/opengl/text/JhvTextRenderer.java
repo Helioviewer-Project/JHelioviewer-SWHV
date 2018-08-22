@@ -50,7 +50,6 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphMetrics;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
-import java.nio.FloatBuffer;
 import java.text.CharacterIterator;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,7 +57,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Transform;
@@ -138,13 +137,13 @@ public class JhvTextRenderer {
     // The amount of vertical dead space on the backing store before we
     // force a compaction
     private static final float MAX_VERTICAL_FRAGMENTATION = 0.7f;
-    private static final int kCoordsPerVertVerts = 4;
-    private static final int kCoordsPerVertTex = 2;
+    //private static final int kCoordsPerVertVerts = 4;
+    //private static final int kCoordsPerVertTex = 2;
     private static final int kVertsPerQuad = 6;
     private static final int kQuadsPerBuffer = 100;
     private static final int kTotalBufferSizeVerts = kQuadsPerBuffer * kVertsPerQuad;
-    private static final int kTotalBufferSizeCoordsVerts = kQuadsPerBuffer * kVertsPerQuad * kCoordsPerVertVerts;
-    private static final int kTotalBufferSizeCoordsTex = kQuadsPerBuffer * kVertsPerQuad * kCoordsPerVertTex;
+    //private static final int kTotalBufferSizeCoordsVerts = kQuadsPerBuffer * kVertsPerQuad * kCoordsPerVertVerts;
+    //private static final int kTotalBufferSizeCoordsTex = kQuadsPerBuffer * kVertsPerQuad * kCoordsPerVertTex;
     final Font font;
     private final boolean antialiased;
     private final boolean useFractionalMetrics;
@@ -880,18 +879,12 @@ public class JhvTextRenderer {
             float tx2 = (texturex + width) / (float) renderer.getWidth();
             float ty2 = 1f - (texturey + height) / (float) renderer.getHeight();
 
-            BufferUtils.put4f(vexBuf, x, y, z, 1); // A
-            BufferUtils.put2f(vexBuf, tx1, ty1);
-            BufferUtils.put4f(vexBuf, x + (width * scaleFactor), y, z, 1); // B
-            BufferUtils.put2f(vexBuf, tx2, ty1);
-            BufferUtils.put4f(vexBuf, x + (width * scaleFactor), y + (height * scaleFactor), z, 1); // C
-            BufferUtils.put2f(vexBuf, tx2, ty2);
-            BufferUtils.put4f(vexBuf, x, y, z, 1); // A
-            BufferUtils.put2f(vexBuf, tx1, ty1);
-            BufferUtils.put4f(vexBuf, x + (width * scaleFactor), y + (height * scaleFactor), z, 1); // C
-            BufferUtils.put2f(vexBuf, tx2, ty2);
-            BufferUtils.put4f(vexBuf, x, y + (height * scaleFactor), z, 1); // D
-            BufferUtils.put2f(vexBuf, tx1, ty2);
+            vexBuf.put4f(x, y, z, 1).put2f(tx1, ty1); // A
+            vexBuf.put4f(x + (width * scaleFactor), y, z, 1).put2f(tx2, ty1); // B
+            vexBuf.put4f(x + (width * scaleFactor), y + (height * scaleFactor), z, 1).put2f(tx2, ty2); // C
+            vexBuf.put4f(x, y, z, 1).put2f(tx1, ty1); // A
+            vexBuf.put4f(x + (width * scaleFactor), y + (height * scaleFactor), z, 1).put2f(tx2, ty2); // C
+            vexBuf.put4f(x, y + (height * scaleFactor), z, 1).put2f(tx1, ty2); // D
 
             outstandingGlyphsVerticesPipeline += kVertsPerQuad;
             if (outstandingGlyphsVerticesPipeline >= kTotalBufferSizeVerts) {
@@ -1083,14 +1076,13 @@ public class JhvTextRenderer {
     private float[] textColor = Colors.WhiteFloat;
 
     private int outstandingGlyphsVerticesPipeline = 0;
-    private final FloatBuffer vexBuf = BufferUtils.newFloatBuffer(kTotalBufferSizeCoordsVerts + kTotalBufferSizeCoordsTex);
+    private final Buf vexBuf = new Buf(kQuadsPerBuffer * GLSLTexture.stride);
 
     private void drawVertices() {
         if (outstandingGlyphsVerticesPipeline > 0) {
             GL2 gl = (GL2) GLContext.getCurrentGL();
             getBackingStore().bind(gl);
 
-            vexBuf.rewind();
             glslTexture.init(gl);
             glslTexture.setData(gl, vexBuf);
             glslTexture.render(gl, GL2.GL_TRIANGLES, textColor, outstandingGlyphsVerticesPipeline);
