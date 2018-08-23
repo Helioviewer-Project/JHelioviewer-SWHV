@@ -11,12 +11,9 @@ public class MathUtils {
      * Returns the integer, x, closest on the number line such that
      * min(_side1,_side2) <= x <= max(_side1,_side2).
      *
-     * @param _val
-     *            the value to squeee into the interval
-     * @param _side1
-     *            one side of the interval
-     * @param _side2
-     *            the other side of the interval
+     * @param _val   the value to squeee into the interval
+     * @param _side1 one side of the interval
+     * @param _side2 the other side of the interval
      * @return the closest value within the interval
      */
     public static int squeezeToInterval(int _val, int _side1, int _side2) {
@@ -34,8 +31,7 @@ public class MathUtils {
     /**
      * Takes and returns the maximum value from the given args.
      *
-     * @param _is
-     *            the values to compare
+     * @param _is the values to compare
      * @return the maximum of the given values
      */
     public static int max(int... _is) {
@@ -49,8 +45,7 @@ public class MathUtils {
     /**
      * Takes and returns the minimum value from the given args.
      *
-     * @param _is
-     *            the values to compare
+     * @param _is the values to compare
      * @return the minimum of the given values
      */
     public static int min(int... _is) {

@@ -31,8 +31,8 @@ public class ChannelMixerPanel implements FilterDetails {
 
         ActionListener listener = e -> {
             layer.getGLImage().setColor(redCheckBox.isSelected() ? 1 : 0,
-                                        greenCheckBox.isSelected() ? 1 : 0,
-                                        blueCheckBox.isSelected() ? 1 : 0);
+                    greenCheckBox.isSelected() ? 1 : 0,
+                    blueCheckBox.isSelected() ? 1 : 0);
             Display.display();
         };
         redCheckBox.addActionListener(listener);

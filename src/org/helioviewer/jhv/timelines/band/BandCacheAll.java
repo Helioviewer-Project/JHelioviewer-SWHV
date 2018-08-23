@@ -53,12 +53,12 @@ class BandCacheAll implements BandCache {
                 max = Math.max(dv.val, max);
             }
         }
-        return new float[] { min, max };
+        return new float[]{min, max};
     }
 
     @Override
     public void createPolyLines(Rectangle graphArea, TimeAxis timeAxis, YAxis yAxis,
-            ArrayList<GraphPolyline> graphPolylines) {
+                                ArrayList<GraphPolyline> graphPolylines) {
 
         ArrayList<Integer> tvalues = new ArrayList<>();
         ArrayList<Integer> tdates = new ArrayList<>();

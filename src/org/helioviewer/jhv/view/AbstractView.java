@@ -26,7 +26,7 @@ public class AbstractView implements View {
 
     protected ImageData imageData;
     protected LUT builtinLUT;
-    protected MetaData metaData[] = { new PixelBasedMetaData(1, 1, 0) };
+    protected MetaData metaData[] = {new PixelBasedMetaData(1, 1, 0)};
     protected int maxFrame = 0;
 
     public AbstractView(URI _uri, APIRequest _request) {

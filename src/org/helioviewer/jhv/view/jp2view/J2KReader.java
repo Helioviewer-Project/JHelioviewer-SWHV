@@ -148,7 +148,7 @@ class J2KReader implements Runnable {
                 String[] stepQuerys;
                 String fSiz = params.resolution.width + "," + params.resolution.height;
                 if (singleFrame) {
-                    stepQuerys = new String[] { createQuery(fSiz, frame) };
+                    stepQuerys = new String[]{createQuery(fSiz, frame)};
                     currentStep = frame;
                 } else {
                     stepQuerys = createMultiQuery(fSiz, numFrames);
@@ -223,7 +223,7 @@ class J2KReader implements Runnable {
                     params.priority = false;
                     readerSignal.signal(params);
                 }
-             } catch (KduException | IOException e) {
+            } catch (KduException | IOException e) {
                 // e.printStackTrace();
                 try {
                     socket.close();

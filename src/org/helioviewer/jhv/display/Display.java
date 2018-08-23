@@ -73,7 +73,7 @@ public class Display implements ActionListener, JHVEventHighlightListener {
         return miniCamera;
     }
 
-    private static final Viewport[] viewports = { new Viewport(0, 0, 0, 100, 100), null, null, null };
+    private static final Viewport[] viewports = {new Viewport(0, 0, 0, 100, 100), null, null, null};
     private static int activeViewport = 0;
 
     public static Viewport fullViewport = new Viewport(-1, 0, 0, 100, 100);
@@ -116,18 +116,18 @@ public class Display implements ActionListener, JHVEventHighlightListener {
 
         int ct = countActiveLayers();
         switch (ct) {
-        case 2:
-            reshape2();
-            break;
-        case 3:
-            reshape3();
-            break;
-        case 4:
-            reshape4();
-            break;
-        default:
-            reshape();
-            break;
+            case 2:
+                reshape2();
+                break;
+            case 3:
+                reshape3();
+                break;
+            case 4:
+                reshape4();
+                break;
+            default:
+                reshape();
+                break;
         }
     }
 

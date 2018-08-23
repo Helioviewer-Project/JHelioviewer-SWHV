@@ -106,7 +106,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         lastNodeSeen = null;
         exportFitsButton.setEnabled(false);
 
-        DefaultTableModel fitsModel = new DefaultTableModel(new Object[0][0], new Object[] { "FITS Keyword", "Value" }) {
+        DefaultTableModel fitsModel = new DefaultTableModel(new Object[0][0], new Object[]{"FITS Keyword", "Value"}) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -123,10 +123,10 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
 
         HelioviewerMetaData m = (HelioviewerMetaData) metaData;
         basicArea.setText("Observatory: " + m.getObservatory() + '\n' +
-                          "Instrument: " + m.getInstrument() + '\n' +
-                          "Detector: " + m.getDetector() + '\n' +
-                          "Measurement: " + m.getMeasurement() + '\n' +
-                          "Observation Date: " + m.getViewpoint().time);
+                "Instrument: " + m.getInstrument() + '\n' +
+                "Detector: " + m.getDetector() + '\n' +
+                "Measurement: " + m.getMeasurement() + '\n' +
+                "Observation Date: " + m.getViewpoint().time);
         basicArea.setCaretPosition(0);
 
         try {
@@ -174,7 +174,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
                 break;
             default:
                 if ("fits".equals(lastNodeSeen))
-                    fitsModel.addRow(new Object[] { nodeName, nodeValue });
+                    fitsModel.addRow(new Object[]{nodeName, nodeValue});
                 else
                     hvSB.append(nodeName).append(": ").append(nodeValue).append('\n');
                 break;
@@ -193,13 +193,12 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
 
     /**
      * A method that gets the value of a node element.
-     *
+     * <p>
      * If the node itself has children and no text value, an empty string is
      * returned. This is maybe an overkill for our purposes now, but takes into
      * account the possibility of nested tags.
      *
-     * @param elem
-     *            Node to read
+     * @param elem Node to read
      * @return value of the node
      */
     private static String getElementValue(Node elem) {

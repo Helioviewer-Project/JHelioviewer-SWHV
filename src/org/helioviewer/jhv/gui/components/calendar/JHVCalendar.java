@@ -30,7 +30,7 @@ import com.jidesoft.swing.JideButton;
  * 1. All days of a month are displayed corresponding to the weekdays,
  * 2. All month of a year are displayed,
  * 3. A period of 12 years is displayed.
- *
+ * <p>
  * This component acts as a subcomponent of the {@link JHVCalendarDatePicker}
  * too. It represents the content of the popup window of the
  * JHVCalendarDatePicker.
@@ -57,7 +57,6 @@ class JHVCalendar extends JPanel {
         add(navigationPanel, BorderLayout.NORTH);
         add(selectionPanel, BorderLayout.CENTER);
         add(new BottomPanel(), BorderLayout.SOUTH);
-        // show data in visual components
         updateDateDisplay();
     }
 
@@ -70,23 +69,22 @@ class JHVCalendar extends JPanel {
     /**
      * Changes the view and the corresponding controller.
      *
-     * @param newMode
-     *            Defines which view has to be displayed.
+     * @param newMode Defines which view has to be displayed.
      */
     private void changeDisplayMode(DisplayMode newMode) {
         // memorize the selected date
         Date date = calendarViewController.getDate();
         // change the view controller
         switch (newMode) {
-        case DAYS:
-            calendarViewController = new DayViewController();
-            break;
-        case MONTHS:
-            calendarViewController = new MonthViewController();
-            break;
-        case YEARS:
-            calendarViewController = new YearViewController();
-            break;
+            case DAYS:
+                calendarViewController = new DayViewController();
+                break;
+            case MONTHS:
+                calendarViewController = new MonthViewController();
+                break;
+            case YEARS:
+                calendarViewController = new YearViewController();
+                break;
         }
         // set memorized date
         calendarViewController.setDate(date);
@@ -107,8 +105,7 @@ class JHVCalendar extends JPanel {
     /**
      * Sets the current date to the calendar component.
      *
-     * @param date
-     *            Selected date of the calendar component.
+     * @param date Selected date of the calendar component.
      */
     public void setDate(Date date) {
         // set date
@@ -179,8 +176,7 @@ class JHVCalendar extends JPanel {
         /**
          * Sets the text of the button which changes the view.
          *
-         * @param text
-         *            text to display on the button.
+         * @param text text to display on the button.
          */
         void setSelectButtonText(String text) {
             selectButton.setText(text);
@@ -205,16 +201,16 @@ class JHVCalendar extends JPanel {
             } else if (e.getSource() == selectButton) {
                 // change the view mode and the corresponding controller
                 switch (displayMode) {
-                case DAYS:
-                    changeDisplayMode(DisplayMode.MONTHS);
-                    updateDateDisplay();
-                    break;
-                case MONTHS:
-                    changeDisplayMode(DisplayMode.YEARS);
-                    updateDateDisplay();
-                    break;
-                default:
-                    break;
+                    case DAYS:
+                        changeDisplayMode(DisplayMode.MONTHS);
+                        updateDateDisplay();
+                        break;
+                    case MONTHS:
+                        changeDisplayMode(DisplayMode.YEARS);
+                        updateDateDisplay();
+                        break;
+                    default:
+                        break;
                 }
             } else if (e.getSource() == quickForwardButton) {
                 // increase current date by using the view controller of the
@@ -298,17 +294,17 @@ class JHVCalendar extends JPanel {
                         calendarViewController.setDateOfCellValue(table.getValueAt(row, col));
 
                         switch (displayMode) {
-                        case YEARS:
-                            changeDisplayMode(DisplayMode.MONTHS);
-                            updateDateDisplay();
-                            break;
-                        case MONTHS:
-                            changeDisplayMode(DisplayMode.DAYS);
-                            updateDateDisplay();
-                            break;
-                        case DAYS:
-                            informAllJHVCalendarListeners();
-                            break;
+                            case YEARS:
+                                changeDisplayMode(DisplayMode.MONTHS);
+                                updateDateDisplay();
+                                break;
+                            case MONTHS:
+                                changeDisplayMode(DisplayMode.DAYS);
+                                updateDateDisplay();
+                                break;
+                            case DAYS:
+                                informAllJHVCalendarListeners();
+                                break;
                         }
                     }
                 }
@@ -332,16 +328,12 @@ class JHVCalendar extends JPanel {
         /**
          * Displays the passed data in the grid.
          *
-         * @param data
-         *            Data to display in the table. If this parameter is null
-         *            the method will do nothing.
-         * @param columnNames
-         *            Column names which will be displayed in the header, too.
-         *            If this parameter is null the method will do nothing.
-         * @param selectedCell
-         *            Defines the cell which has to be selected.
-         * @param showHeader
-         *            true if the header should be displayed; false if not.
+         * @param data         Data to display in the table. If this parameter is null
+         *                     the method will do nothing.
+         * @param columnNames  Column names which will be displayed in the header, too.
+         *                     If this parameter is null the method will do nothing.
+         * @param selectedCell Defines the cell which has to be selected.
+         * @param showHeader   true if the header should be displayed; false if not.
          */
         void fillGrid(Object[][] data, String[] columnNames, Point selectedCell, boolean showHeader) {
             // check if valid data is available
@@ -372,8 +364,7 @@ class JHVCalendar extends JPanel {
          * false if the cell value is null or the user clicked in an empty table
          * space where no cell is located; otherwise the method returns true.
          *
-         * @return boolean value if cell is unequal null and user clicked inside
-         *         a cell.
+         * @return boolean value if cell is unequal null and user clicked inside a cell.
          */
         boolean isValidCellSelected(Point point) {
             int row = table.getSelectedRow();

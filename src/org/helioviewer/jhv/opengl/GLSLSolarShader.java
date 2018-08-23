@@ -11,16 +11,16 @@ public class GLSLSolarShader extends GLSLShader {
     // http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
     private static final float[] bc = new float[]{.30613f, .38774f, .30613f};
     private static final float[] blurKernel = new float[]{
-        bc[0] * bc[0], bc[0] * bc[1], bc[0] * bc[2],
-        bc[1] * bc[0], bc[1] * bc[1], bc[1] * bc[2],
-        bc[2] * bc[0], bc[2] * bc[1], bc[2] * bc[2]
+            bc[0] * bc[0], bc[0] * bc[1], bc[0] * bc[2],
+            bc[1] * bc[0], bc[1] * bc[1], bc[1] * bc[2],
+            bc[2] * bc[0], bc[2] * bc[1], bc[2] * bc[2]
     };
 
     private static final float[] bo = new float[]{-1.2004377f, 0, 1.2004377f};
     private static final float[] blurOffset = new float[]{
-        bo[0], bo[0], /**/ bo[1], bo[0], /**/ bo[2], bo[0],
-        bo[0], bo[1], /**/ bo[1], bo[1], /**/ bo[2], bo[1],
-        bo[0], bo[2], /**/ bo[1], bo[2], /**/ bo[2], bo[2]
+            bo[0], bo[0], /**/ bo[1], bo[0], /**/ bo[2], bo[0],
+            bo[0], bo[1], /**/ bo[1], bo[1], /**/ bo[2], bo[1],
+            bo[0], bo[2], /**/ bo[1], bo[2], /**/ bo[2], bo[2]
     };
 
     public static final GLSLSolarShader ortho = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarOrtho.frag");

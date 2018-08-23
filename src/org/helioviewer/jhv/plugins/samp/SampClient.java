@@ -52,7 +52,7 @@ class SampClient extends HubConnector {
         addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("image.load.fits", harmless)) {
             @Nullable
             @Override
-            public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
+            public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
                     Object url = msg.getParam("url");
                     if (url != null)
@@ -67,7 +67,7 @@ class SampClient extends HubConnector {
         addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("table.load.fits", harmless)) {
             @Nullable
             @Override
-            public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
+            public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
                     if ("SSA".equals(c.getMetadata(senderId).getName())) {
                         Object url = msg.getParam("url");
@@ -83,7 +83,7 @@ class SampClient extends HubConnector {
         addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("jhv.load.image", harmless)) {
             @Nullable
             @Override
-            public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
+            public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
                     Object url = msg.getParam("url");
                     if (url != null)
@@ -97,7 +97,7 @@ class SampClient extends HubConnector {
         addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("jhv.load.request", harmless)) {
             @Nullable
             @Override
-            public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
+            public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
                     Object url = msg.getParam("url");
                     if (url != null)
@@ -111,7 +111,7 @@ class SampClient extends HubConnector {
         addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("jhv.load.state", harmless)) {
             @Nullable
             @Override
-            public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
+            public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
                     Object url = msg.getParam("url");
                     if (url != null)

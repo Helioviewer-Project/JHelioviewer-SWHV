@@ -27,9 +27,8 @@ public class ClipBoardCopier implements ClipboardOwner {
 
     /**
      * Set the content of the clipboard
-     * 
-     * @param data
-     *            content to write to the clipboard
+     *
+     * @param data content to write to the clipboard
      */
     public void setString(String data) {
         StringSelection stringSelection = new StringSelection(data);
@@ -38,7 +37,7 @@ public class ClipBoardCopier implements ClipboardOwner {
 
     /**
      * Read the current content from the clipboard.
-     * 
+     *
      * @return clipboard content
      */
     public static String getString() {

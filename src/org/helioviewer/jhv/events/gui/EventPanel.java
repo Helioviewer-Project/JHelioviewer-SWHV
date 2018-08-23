@@ -96,7 +96,7 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
             }
     }
 
-    private static class MyTreeCellEditor extends DefaultTreeCellEditor  {
+    private static class MyTreeCellEditor extends DefaultTreeCellEditor {
 
         MyTreeCellEditor(JTree tree, DefaultTreeCellRenderer renderer) {
             super(tree, renderer);

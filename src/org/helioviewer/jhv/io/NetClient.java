@@ -7,16 +7,23 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import okio.BufferedSource;
 
 public interface NetClient extends AutoCloseable {
 
     boolean isSuccessful();
+
     InputStream getStream();
+
     Reader getReader();
+
     BufferedSource getSource();
+
     long getContentLength();
-    @Override void close() throws IOException;
+
+    @Override
+    void close() throws IOException;
 
     enum NetCache {
         CACHE, NETWORK, BYPASS

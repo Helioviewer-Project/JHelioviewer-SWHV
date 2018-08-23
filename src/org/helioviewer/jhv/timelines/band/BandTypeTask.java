@@ -17,7 +17,7 @@ public class BandTypeTask extends JHVWorker<Void, Void> {
     @Nullable
     @Override
     protected Void backgroundWork() {
-       try {
+        try {
             BandType.loadBandTypes(JSONUtils.get(TimelineSettings.baseURL).getJSONArray("objects"));
         } catch (Exception e) {
             Log.error("Error loading bandtypes", e);

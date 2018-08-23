@@ -28,7 +28,7 @@ class SystemProperties {
             JOptionPane optionPane = new JOptionPane();
             optionPane.setMessage("Please install Java 64-bit to run JHelioviewer.");
             optionPane.setMessageType(JOptionPane.ERROR_MESSAGE);
-            optionPane.setOptions(new String[] { "Quit JHelioviewer" });
+            optionPane.setOptions(new String[]{"Quit JHelioviewer"});
             optionPane.createDialog(null, "JHelioviewer: Java 64-bit required").setVisible(true);
             System.exit(1);
         }

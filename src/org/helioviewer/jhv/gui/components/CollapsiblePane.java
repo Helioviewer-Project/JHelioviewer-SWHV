@@ -14,7 +14,7 @@ import org.helioviewer.jhv.gui.UIGlobals;
 
 /**
  * Panel managing a collapsible area.
- *
+ * <p>
  * This panel consists of a toggle button and one arbitrary component. Clicking
  * the toggle button will toggle the visibility of the component.
  */

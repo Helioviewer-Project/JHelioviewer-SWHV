@@ -52,7 +52,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
             }
         }
         if (ja == null)
-            ja = new JSONArray(new String[] { "Earth" });
+            ja = new JSONArray(new String[]{"Earth"});
 
         container = new SpaceObjectContainer(ja, uv, observer, frame, exclusive, start, end);
 

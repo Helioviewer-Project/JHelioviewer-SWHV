@@ -10,15 +10,15 @@ public enum GridType {
 
     public Quat toQuat(Position viewpoint) {
         switch (this) {
-        case Viewpoint:
-            return viewpoint.toQuat();
-        case Stonyhurst:
-            double elon = Sun.getEarth(viewpoint.time).lon;
-            return new Quat(0, elon);
-        case HCI:
-            return Sun.getHCI(viewpoint.time);
-        default: // Carrington
-            return Quat.ZERO;
+            case Viewpoint:
+                return viewpoint.toQuat();
+            case Stonyhurst:
+                double elon = Sun.getEarth(viewpoint.time).lon;
+                return new Quat(0, elon);
+            case HCI:
+                return Sun.getHCI(viewpoint.time);
+            default: // Carrington
+                return Quat.ZERO;
         }
     }
 

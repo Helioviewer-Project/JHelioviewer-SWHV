@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 
 /**
  * Panel managing multiple {@link CollapsiblePane}s.
- *
+ * <p>
  * This panel hides the use of the {@link CollapsiblePane} and allows accessing
  * the children of the {@link CollapsiblePane} directly.
  */

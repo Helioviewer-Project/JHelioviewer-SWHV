@@ -29,6 +29,7 @@
 package org.helioviewer.jhv.base.image;
 
 //import java.awt.GraphicsConfiguration;
+
 import java.awt.Point;
 import java.awt.image.*;
 import java.io.IOException;
@@ -53,30 +54,30 @@ public class MappedImageFactory {
 
     private MappedImageFactory() {
     }
-/*
-    public static BufferedImage copyImage(BufferedImage bi) throws IOException {
-        BufferedImage ret = createCompatible(bi.getWidth(), bi.getHeight(), bi.getType());
-        bi.copyData(ret.getRaster());
-        return ret;
-    }
-*/
+    /*
+        public static BufferedImage copyImage(BufferedImage bi) throws IOException {
+            BufferedImage ret = createCompatible(bi.getWidth(), bi.getHeight(), bi.getType());
+            bi.copyData(ret.getRaster());
+            return ret;
+        }
+    */
     public static BufferedImage createCompatible(int width, int height, int type) throws IOException {
         BufferedImage temp = new BufferedImage(1, 1, type);
         return createCompatible(width, height, temp.getSampleModel().createCompatibleSampleModel(width, height), temp.getColorModel());
     }
-/*
-    public static BufferedImage createCompatible(int width, int height, GraphicsConfiguration configuration, int transparency) throws IOException {
-        return createCompatible(width, height, configuration.getColorModel(transparency));
-    }
+    /*
+        public static BufferedImage createCompatible(int width, int height, GraphicsConfiguration configuration, int transparency) throws IOException {
+            return createCompatible(width, height, configuration.getColorModel(transparency));
+        }
 
-    public static BufferedImage createCompatible(int width, int height, ImageTypeSpecifier type) throws IOException {
-        return createCompatible(width, height, type.getSampleModel(width, height), type.getColorModel());
-    }
+        public static BufferedImage createCompatible(int width, int height, ImageTypeSpecifier type) throws IOException {
+            return createCompatible(width, height, type.getSampleModel(width, height), type.getColorModel());
+        }
 
-    private static BufferedImage createCompatible(int width, int height, ColorModel cm) throws IOException {
-        return createCompatible(width, height, cm.createCompatibleSampleModel(width, height), cm);
-    }
-*/
+        private static BufferedImage createCompatible(int width, int height, ColorModel cm) throws IOException {
+            return createCompatible(width, height, cm.createCompatibleSampleModel(width, height), cm);
+        }
+    */
     private static BufferedImage createCompatible(int width, int height, SampleModel sm, ColorModel cm) throws IOException {
         DataBuffer buffer = MappedFileBuffer.create(sm.getTransferType(), width * height * sm.getNumDataElements(), 1);
         return new BufferedImage(cm, RasterFactory.factory.createRaster(sm, buffer, new Point()), cm.isAlphaPremultiplied(), null);

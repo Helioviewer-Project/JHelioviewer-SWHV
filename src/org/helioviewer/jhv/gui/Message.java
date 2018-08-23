@@ -33,12 +33,9 @@ public class Message {
      * A central error handler. Displays an error message in a JOptionDialog and
      * exits if the flag is set.
      *
-     * @param _title
-     *            title of the error message.
-     * @param _msg
-     *            the message which has to be displayed.
-     * @param _exitImmediately
-     *            the program exits when the value true will be passed.
+     * @param _title           title of the error message.
+     * @param _msg             the message which has to be displayed.
+     * @param _exitImmediately the program exits when the value true will be passed.
      */
     public static void err(String _title, Object _msg, boolean _exitImmediately) {
         if (Thread.currentThread().isInterrupted())
@@ -53,11 +50,9 @@ public class Message {
 
     /**
      * A central warning handler. Displays a warning message in a JOptionDialog.
-     * 
-     * @param _title
-     *            title of the warning message.
-     * @param _msg
-     *            the message which has to be displayed.
+     *
+     * @param _title title of the warning message.
+     * @param _msg   the message which has to be displayed.
      */
     public static void warn(String _title, Object _msg) {
         if (Thread.currentThread().isInterrupted())

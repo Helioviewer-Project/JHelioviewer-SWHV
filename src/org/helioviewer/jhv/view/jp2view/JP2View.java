@@ -187,27 +187,27 @@ public class JP2View extends AbstractView {
     public JHVDate getNextTime(AnimationMode mode, int deltaT) {
         int next = targetFrame + 1;
         switch (mode) {
-        case Stop:
-            if (next > maxFrame) {
-                return null;
-            }
-            break;
-        case Swing:
-            if (targetFrame == maxFrame) {
-                Movie.setAnimationMode(AnimationMode.SwingDown);
+            case Stop:
+                if (next > maxFrame) {
+                    return null;
+                }
+                break;
+            case Swing:
+                if (targetFrame == maxFrame) {
+                    Movie.setAnimationMode(AnimationMode.SwingDown);
+                    return metaData[targetFrame - 1].getViewpoint().time;
+                }
+                break;
+            case SwingDown:
+                if (targetFrame == 0) {
+                    Movie.setAnimationMode(AnimationMode.Swing);
+                    return metaData[1].getViewpoint().time;
+                }
                 return metaData[targetFrame - 1].getViewpoint().time;
-            }
-            break;
-        case SwingDown:
-            if (targetFrame == 0) {
-                Movie.setAnimationMode(AnimationMode.Swing);
-                return metaData[1].getViewpoint().time;
-            }
-            return metaData[targetFrame - 1].getViewpoint().time;
-        default: // Loop
-            if (next > maxFrame) {
-                return metaData[0].getViewpoint().time;
-            }
+            default: // Loop
+                if (next > maxFrame) {
+                    return metaData[0].getViewpoint().time;
+                }
         }
         return metaData[next].getViewpoint().time;
     }

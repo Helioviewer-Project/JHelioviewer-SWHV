@@ -35,11 +35,11 @@ public enum MaterialDesign {
     MDI_SHARE_VARIANT("mdi-share-variant", '\uf497'),
     MDI_SKIP_BACKWARD("mdi-skip-backward", '\uf4ab'),
     MDI_SKIP_FORWARD("mdi-skip-forward", '\uf4ac'),
-//    MDI_SLACK("mdi-slack", '\uf4b1'),
+    // MDI_SLACK("mdi-slack", '\uf4b1'),
     MDI_STEP_BACKWARD("mdi-step-backward", '\uf4d5'),
     MDI_STEP_FORWARD("mdi-step-forward", '\uf4d7'),
     MDI_SYNC("mdi-sync", '\uf4e6'),
-//    MDI_UPLOAD("mdi-upload", '\uf552'),
+    // MDI_UPLOAD("mdi-upload", '\uf552'),
     MDI_VECTOR_CIRCLE_VARIANT("mdi-vector-circle-variant", '\uf557'),
     MDI_WEATHER_SUNNY("mdi-weather-sunny", '\uf599'),
     MDI_WHITE_BALANCE_SUNNY("mdi-white-balance-sunny", '\uf5a8');

@@ -8,11 +8,11 @@ import org.helioviewer.jhv.base.Regex;
 
 /**
  * Representing a gimp gradient consisting of several GimpGradientSegments
- * 
+ * <p>
  * Inspired by --- Read Gimp .ggr gradient files. Ned Batchelder,
  * http://nedbatchelder.com This code is in the public domain. --- and see in
  * gimp source code app/core/gimpgradient.c
- * 
+ *
  * @author Helge Dietert
  */
 class GimpGradient {
@@ -27,7 +27,7 @@ class GimpGradient {
 
     /**
      * Give back the name
-     * 
+     *
      * @return name form the file
      */
     public String getName() {
@@ -36,9 +36,8 @@ class GimpGradient {
 
     /**
      * Interpolates the color according to the gradient
-     * 
-     * @param x
-     *            point along the gradient scaled as [0,1)
+     *
+     * @param x point along the gradient scaled as [0,1)
      * @return rgb integer for that point
      */
     public int getGradientColor(double x) throws Exception {
@@ -53,7 +52,7 @@ class GimpGradient {
     /**
      * Creates a gimp gradient with the data from the stream expected in the
      * gimp gradient file format
-     * 
+     *
      * @param ggr
      */
     GimpGradient(BufferedReader ggr) throws Exception {

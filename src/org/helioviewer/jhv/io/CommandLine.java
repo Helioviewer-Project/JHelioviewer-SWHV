@@ -16,9 +16,9 @@ public class CommandLine {
     public static void setArguments(String[] args) {
         arguments = args;
         usageMessage = "The following command-line options are available: \n\n" +
-        "-load    file location\n"         + "       Load or request a supported file at program start. The option can be used multiple times.\n\n" +
-        "-request request file location\n" + "       Load a request file and issue a request at program start. The option can be used multiple times.\n\n" +
-        "-state   state file\n"            + "       Load state file.";
+                "-load    file location\n" + "       Load or request a supported file at program start. The option can be used multiple times.\n\n" +
+                "-request request file location\n" + "       Load a request file and issue a request at program start. The option can be used multiple times.\n\n" +
+                "-state   state file\n" + "       Load state file.";
     }
 
     public static void load() {
@@ -66,11 +66,10 @@ public class CommandLine {
 
     /**
      * Method that looks for options in the command line.
-     * 
-     * @param param
-     *            name of the option.
+     *
+     * @param param name of the option.
      * @return the values associated to the option.
-     * */
+     */
     private static List<String> getOptionValues(String param) {
         ArrayList<String> values = new ArrayList<>();
         if (arguments != null) {

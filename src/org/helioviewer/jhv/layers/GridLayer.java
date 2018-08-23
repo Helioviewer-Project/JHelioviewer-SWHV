@@ -30,8 +30,8 @@ public class GridLayer extends AbstractLayer {
     private static final double RADIAL_STEP = 15;
     private static final double RADIAL_UNIT_FAR = Sun.MeanEarthDistance / 10;
     private static final double RADIAL_STEP_FAR = 45;
-    private static final float[] R_LABEL_POS = { (float) (2 * RADIAL_UNIT), (float) (8 * RADIAL_UNIT), (float) (24 * RADIAL_UNIT) };
-    private static final float[] R_LABEL_POS_FAR = { (float) (2 * RADIAL_UNIT_FAR), (float) (8 * RADIAL_UNIT_FAR), (float) (24 * RADIAL_UNIT_FAR) };
+    private static final float[] R_LABEL_POS = {(float) (2 * RADIAL_UNIT), (float) (8 * RADIAL_UNIT), (float) (24 * RADIAL_UNIT)};
+    private static final float[] R_LABEL_POS_FAR = {(float) (2 * RADIAL_UNIT_FAR), (float) (8 * RADIAL_UNIT_FAR), (float) (24 * RADIAL_UNIT_FAR)};
 
     // height of text in solar radii
     private static final float textScale = GridLabel.textScale;

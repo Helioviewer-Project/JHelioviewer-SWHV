@@ -8,7 +8,7 @@ import java.util.GregorianCalendar;
 /**
  * Class manages a calendar view which shows the a period of 12 years. Each
  * number of a year of this 12 years is shown separately.
- * 
+ *
  * @author Stephan Pagel
  */
 public class YearViewController implements CalendarViewController {

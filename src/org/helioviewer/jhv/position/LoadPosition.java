@@ -88,7 +88,7 @@ public class LoadPosition extends JHVWorker<PositionResponse, Void> {
     @Override
     public String toString() {
         return baseURL + "ref=" + frame + "&observer=" + observer.getUrlName() + "&target=" + target.getUrlName() +
-               "&utc=" + TimeUtils.format(start) + "&utc_end=" + TimeUtils.format(end) + "&deltat=" + deltat;
+                "&utc=" + TimeUtils.format(start) + "&utc_end=" + TimeUtils.format(end) + "&deltat=" + deltat;
     }
 
     public SpaceObject getTarget() {

@@ -231,7 +231,7 @@ class FITSImage {
         String nl = System.getProperty("line.separator");
         StringBuilder builder = new StringBuilder("<meta>").append(nl).append("<fits>").append(nl);
 
-        for (Cursor<String, HeaderCard> iter = header.iterator(); iter.hasNext();) {
+        for (Cursor<String, HeaderCard> iter = header.iterator(); iter.hasNext(); ) {
             HeaderCard headerCard = iter.next();
             if (headerCard.getValue() != null) {
                 builder.append('<').append(headerCard.getKey()).append('>').append(headerCard.getValue()).append("</").append(headerCard.getKey()).append('>').append(nl);

@@ -9,7 +9,7 @@ import java.util.GregorianCalendar;
 
 /**
  * Class manages a calendar view which shows all days of a month.
- * 
+ *
  * @author Stephan Pagel
  */
 public class DayViewController implements CalendarViewController {

@@ -47,7 +47,7 @@ public abstract class ExtensionFileFilter extends FileFilter {
     private static class ImageTypesFilter extends ExtensionFileFilter {
 
         ImageTypesFilter() {
-            extensions = new String[] { "jpg", "jpeg", "png", "fts", "fits", "jp2", "jpx" };
+            extensions = new String[]{"jpg", "jpeg", "png", "fts", "fits", "jp2", "jpx"};
         }
 
         @Override
@@ -60,7 +60,7 @@ public abstract class ExtensionFileFilter extends FileFilter {
     private static class JsonFilter extends ExtensionFileFilter {
 
         JsonFilter() {
-            extensions = new String[] { "json" };
+            extensions = new String[]{"json"};
         }
 
         @Override
@@ -73,7 +73,7 @@ public abstract class ExtensionFileFilter extends FileFilter {
     private static class JhvFilter extends ExtensionFileFilter {
 
         JhvFilter() {
-            extensions = new String[] { "jhv", "jhvz" };
+            extensions = new String[]{"jhv", "jhvz"};
         }
 
         @Override

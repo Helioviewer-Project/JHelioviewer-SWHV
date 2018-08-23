@@ -19,7 +19,7 @@ import org.everit.json.schema.Validator;
 public class DataSources {
 
     static final Set<String> SupportedObservatories = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-        "SOHO", "SDO", "STEREO_A", "STEREO_B", "PROBA2", "ROB-USET", "ROB-Humain", "NSO-GONG", "NSO-SOLIS", "Kanzelhoehe", "NRH", "Yohkoh", "Hinode", "TRACE"
+            "SOHO", "SDO", "STEREO_A", "STEREO_B", "PROBA2", "ROB-USET", "ROB-Humain", "NSO-GONG", "NSO-SOLIS", "Kanzelhoehe", "NRH", "Yohkoh", "Hinode", "TRACE"
     )));
 
     private static final Map<String, Map<String, String>> serverSettings = Collections.unmodifiableMap(new LinkedHashMap<String, Map<String, String>>() {

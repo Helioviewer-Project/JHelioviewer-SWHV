@@ -14,11 +14,11 @@ import org.helioviewer.jhv.gui.UIGlobals;
 /**
  * Class used for displaying information and statuses in a panel at the very
  * bottom of JHV.
- *
+ * <p>
  * The class manages two different areas in the panel, one at the lower left and
  * one at the lower right corner. New plugins can be placed at one of the two
  * areas.
- *
+ * <p>
  * In addition, a status text can be displayed in the lower left corner.
  */
 @SuppressWarnings("serial")
@@ -42,11 +42,9 @@ public class StatusPanel extends JPanel {
     /**
      * Default constructor
      *
-     * @param leftMargin
-     *            left margin. If greater zero, the status text will be
-     *            displayed here.
-     * @param rightMargin
-     *            right margin
+     * @param leftMargin  left margin. If greater zero, the status text will be
+     *                    displayed here.
+     * @param rightMargin right margin
      */
     public StatusPanel(int leftMargin, int rightMargin) {
         super(new BorderLayout());
@@ -71,10 +69,8 @@ public class StatusPanel extends JPanel {
     /**
      * Adds a new plugin to the status panel.
      *
-     * @param newPlugin
-     *            Plugin to add
-     * @param alignment
-     *            Alignment of the new plugin, can be either LEFT or RIGHT
+     * @param newPlugin Plugin to add
+     * @param alignment Alignment of the new plugin, can be either LEFT or RIGHT
      */
     public void addPlugin(StatusPlugin newPlugin, Alignment alignment) {
         if (alignment == Alignment.LEFT) {
@@ -91,8 +87,7 @@ public class StatusPanel extends JPanel {
     /**
      * Removes a plugin from the status panel.
      *
-     * @param oldPlugin
-     *            Plugin to remove
+     * @param oldPlugin Plugin to remove
      */
     public void removePlugin(StatusPlugin oldPlugin) {
         leftPanel.remove(oldPlugin);
