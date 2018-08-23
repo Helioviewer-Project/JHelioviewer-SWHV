@@ -62,7 +62,7 @@ public class Camera {
 ////
 
     private void updateCamera(JHVDate time) {
-        viewpoint = Display.mode == Display.DisplayMode.Orthographic ? updateViewpoint.update(time) : UpdateViewpoint.fixedDistance.update(time);
+        viewpoint = Display.mode == Display.DisplayMode.Orthographic ? updateViewpoint.update(time) : UpdateViewpoint.earthFixedDistance.update(time);
         updateRotation();
         updateWidth();
     }
