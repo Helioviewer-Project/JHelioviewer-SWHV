@@ -3,6 +3,7 @@ package org.helioviewer.jhv.view.jp2view.io.jpip;
 /**
  * The class <code>JPIPConstants</code> is used to define several JPIP global
  * constants.
+ *
  * @author Juan Pablo Garcia Ortiz
  */
 public class JPIPConstants {

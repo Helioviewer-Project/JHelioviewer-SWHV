@@ -21,7 +21,7 @@ import org.helioviewer.jhv.threads.JHVWorker;
 
 /**
  * Popup displaying informations about a HEK event.
- *
+ * <p>
  * This panel is a JDialog, so that it can be displayed on top of an GLCanvas,
  * which is not possible for other swing components.
  */

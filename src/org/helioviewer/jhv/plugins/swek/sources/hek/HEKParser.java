@@ -145,8 +145,7 @@ class HEKParser {
      * Parse a string of the format
      * "POLYGON((0.745758 77.471192,0.667026 75.963757,...,0.691115 69.443955,0.767379 71.565051,0.745758 77.471192))"
      *
-     * @param value
-     *            the value to parse
+     * @param value the value to parse
      * @return a list of JHV points
      */
     private static List<Vec3> parsePolygon(String value) {
@@ -171,8 +170,7 @@ class HEKParser {
     /**
      * Parses a point of the format POINT(0.716676950817756 73.6104596659652).
      *
-     * @param value
-     *            the point to parse
+     * @param value the point to parse
      * @return The Vec3 or null if it could not be parsed.
      */
     @Nullable
@@ -187,8 +185,7 @@ class HEKParser {
      * Parses a string of the format "0.716676950817756 73.6104596659652" to a
      * GL3DVec3
      *
-     * @param value
-     *            the string to parse
+     * @param value the string to parse
      * @return the Vec3 or null of it could not be parsed
      */
     @Nullable

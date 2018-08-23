@@ -128,7 +128,7 @@ public class KakaduSource {
         return lut;
     }
 
-    private static final long[] xmlFilter = { Kdu_global.jp2_xml_4cc };
+    private static final long[] xmlFilter = {Kdu_global.jp2_xml_4cc};
 
     public void extractMetaData(MetaData[] metaDataList) throws Exception {
         Jpx_meta_manager metaManager = jpxSrc.Access_meta_manager();

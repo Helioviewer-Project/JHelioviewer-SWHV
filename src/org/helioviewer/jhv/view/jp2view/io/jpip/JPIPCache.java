@@ -23,7 +23,7 @@ public class JPIPCache extends Kdu_cache {
     private JPIPStream scan(int frame) throws KduException {
         int flags = Kdu_global.KDU_CACHE_SCAN_START | Kdu_global.KDU_CACHE_SCAN_FIX_CODESTREAM;
         int klassID[] = new int[1];
-        long codestreamID[] = { frame };
+        long codestreamID[] = {frame};
         long binID[] = new long[1];
         int binLen[] = new int[1];
         boolean complete[] = new boolean[1];

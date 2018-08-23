@@ -49,7 +49,7 @@ class DownloadThread extends JHVWorker<EVEResponse, Void> {
 
     private static String buildRequest(Interval interval, BandType type) {
         return type.getBaseURL() + "start_date=" + TimeUtils.formatDate(interval.start) + "&end_date=" + TimeUtils.formatDate(interval.end) +
-               "&timeline=" + type.getName();
+                "&timeline=" + type.getName();
     }
 
 }

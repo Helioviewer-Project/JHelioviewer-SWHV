@@ -29,7 +29,7 @@ public class ImageParams {
 
         ImageParams p = (ImageParams) o;
         return frame == p.frame && factor == p.factor &&
-               viewpoint.equals(p.viewpoint) && subImage.equals(p.subImage) && resolution.equals(p.resolution);
+                viewpoint.equals(p.viewpoint) && subImage.equals(p.subImage) && resolution.equals(p.resolution);
     }
 
     @Override
