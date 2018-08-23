@@ -54,7 +54,7 @@ class GLSLLineShader extends GLSLShader {
     }
 
     void setThickness(double _thickness) {
-        thickness[0] = (float) _thickness;
+        thickness[0] = (float) (0.5 * _thickness);
     }
 
 }
