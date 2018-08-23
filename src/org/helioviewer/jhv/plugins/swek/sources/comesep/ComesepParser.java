@@ -19,8 +19,8 @@ class ComesepParser {
 
             String lowKey = key.toLowerCase(Locale.ENGLISH);
             if (!(lowKey.equals("atearliest") || lowKey.equals("atlatest") ||
-                  lowKey.equals("begin_time_value") || lowKey.equals("end_time_value") ||
-                  lowKey.startsWith("liftoff"))) {
+                    lowKey.equals("begin_time_value") || lowKey.equals("end_time_value") ||
+                    lowKey.startsWith("liftoff"))) {
                 String value = result.optString(key).trim();
                 if (!value.isEmpty()) {
                     if (lowKey.equals("atstrongest")) {

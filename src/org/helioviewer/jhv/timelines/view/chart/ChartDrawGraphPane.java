@@ -443,18 +443,18 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         Point p = e.getPoint();
 
         switch (dragMode) {
-        case CHART:
-            setCursor(UIGlobals.openHandCursor);
-            if (mousePressedPosition != null && mouseDragPosition != null) {
-                DrawController.moveX(mousePressedPosition.x - p.x);
-                DrawController.moveAllAxes(p.y - mousePressedPosition.y);
-            }
-            break;
-        case MOVIELINE:
-            DrawController.setMovieFrame(p);
-            break;
-        default:
-            break;
+            case CHART:
+                setCursor(UIGlobals.openHandCursor);
+                if (mousePressedPosition != null && mouseDragPosition != null) {
+                    DrawController.moveX(mousePressedPosition.x - p.x);
+                    DrawController.moveAllAxes(p.y - mousePressedPosition.y);
+                }
+                break;
+            case MOVIELINE:
+                DrawController.setMovieFrame(p);
+                break;
+            default:
+                break;
         }
         dragMode = DragMode.NODRAG;
         mousePressedPosition = null;
@@ -467,16 +467,16 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         mouseDragPosition = p;
         if (mousePressedPosition != null) {
             switch (dragMode) {
-            case CHART:
-                setCursor(UIGlobals.closedHandCursor);
-                DrawController.moveX(mousePressedPosition.x - p.x);
-                DrawController.moveY(p, p.y - mousePressedPosition.y);
-                break;
-            case MOVIELINE:
-                DrawController.setMovieFrame(p);
-                break;
-            default:
-                break;
+                case CHART:
+                    setCursor(UIGlobals.closedHandCursor);
+                    DrawController.moveX(mousePressedPosition.x - p.x);
+                    DrawController.moveY(p, p.y - mousePressedPosition.y);
+                    break;
+                case MOVIELINE:
+                    DrawController.setMovieFrame(p);
+                    break;
+                default:
+                    break;
             }
         }
         mousePressedPosition = p;

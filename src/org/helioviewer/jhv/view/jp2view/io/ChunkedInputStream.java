@@ -24,26 +24,21 @@ import javax.annotation.Nonnull;
 public class ChunkedInputStream extends TransferInputStream {
 
     private int totalLength = 0;
-
-    /** The last chunk length */
+    // The last chunk length
     private int chunkLength = 0;
-
-    /** True if we've reached the end of stream */
+    // True if we've reached the end of stream
     private boolean eof = false;
-
-    /** True if this stream is closed */
+    // True if this stream is closed
     private boolean closed = false;
-
-    /** The base input stream */
+    // The base input stream
     private final InputStream in;
 
     private final byte[] tmpRead = new byte[1];
 
     /**
      * Constructs a new object with a <code>InputStream</code> base object.
-     * 
-     * @param _in
-     *            A <code>InputStream</code> object as a base stream.
+     *
+     * @param _in A <code>InputStream</code> object as a base stream.
      */
     public ChunkedInputStream(InputStream _in) {
         in = _in;
@@ -57,7 +52,7 @@ public class ChunkedInputStream extends TransferInputStream {
 
     /**
      * This kind of stream does not support marking.
-     * 
+     *
      * @return <code>False</code>
      */
     @Override
@@ -68,7 +63,7 @@ public class ChunkedInputStream extends TransferInputStream {
     /**
      * Reads the next byte of the chunked content. It will return -1 if there are
      * no more chunks to decode.
-     * 
+     *
      * @return The next byte read, or -1 is there is no more data.
      * @throws IOException
      */
@@ -126,7 +121,7 @@ public class ChunkedInputStream extends TransferInputStream {
     }
 
     @Override
-    public int read (@Nonnull byte[] b) throws IOException {
+    public int read(@Nonnull byte[] b) throws IOException {
         return read(b, 0, b.length);
     }
 

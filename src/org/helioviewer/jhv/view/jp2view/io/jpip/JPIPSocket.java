@@ -32,7 +32,7 @@ public class JPIPSocket extends HTTPSocket {
      */
     private String jpipPath;
 
-    private static final String[] cnewParams = { "cid", "transport", "host", "path", "port", "auxport" };
+    private static final String[] cnewParams = {"cid", "transport", "host", "path", "port", "auxport"};
 
     public JPIPSocket(URI uri, JPIPCache cache) throws KduException, IOException {
         super(uri);

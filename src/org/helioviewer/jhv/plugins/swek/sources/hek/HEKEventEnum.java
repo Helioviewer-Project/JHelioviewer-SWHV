@@ -8,10 +8,9 @@ enum HEKEventEnum {
             "Flare", "Flare", "FL"), SUNSPOT("Sunspot", "Sunspot", "SS"), EMERGING_FLUX("EmergingFlux", "Emerging Flux", "EF"), ERUPTION(
             "Eruption", "Eruption", "ER"), UNKNOWN("Unknown", "Unknown", "UK");
 
-    /** The abbreviation of the HEKEvent */
+    // The abbreviation of the HEKEvent
     private final String eventAbbreviation;
-
-    /** The name of the SWEK Event */
+    // The name of the SWEK Event
     private final String swekEventName;
 
     HEKEventEnum(String _hekEventName, String _swekEventName, String _eventAbbreviation) {

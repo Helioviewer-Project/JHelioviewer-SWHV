@@ -25,22 +25,22 @@ public class JPIPCacheManager {
     public static void init() {
         ExpiryPolicy<Object, Object> expiryPolicy = ExpiryPolicyBuilder.timeToIdleExpiration(Duration.ofDays(7));
         PersistentCacheManager streamManager = CacheManagerBuilder.newCacheManagerBuilder()
-                                               .with(CacheManagerBuilder.persistence(JHVGlobals.jpipStreamCacheDir))
-                                               .withCache("JPIPStream", CacheConfigurationBuilder
-                                                                        .newCacheConfigurationBuilder(Long.class, JPIPStream.class,
-                                                                        ResourcePoolsBuilder.newResourcePoolsBuilder()
-                                                                        .disk(8, MemoryUnit.GB, true))
-                                                                        .withExpiry(expiryPolicy))
-                                               .build(true);
+                .with(CacheManagerBuilder.persistence(JHVGlobals.jpipStreamCacheDir))
+                .withCache("JPIPStream", CacheConfigurationBuilder
+                        .newCacheConfigurationBuilder(Long.class, JPIPStream.class,
+                                ResourcePoolsBuilder.newResourcePoolsBuilder()
+                                        .disk(8, MemoryUnit.GB, true))
+                        .withExpiry(expiryPolicy))
+                .build(true);
         PersistentCacheManager levelManager = CacheManagerBuilder.newCacheManagerBuilder()
-                                              .with(CacheManagerBuilder.persistence(JHVGlobals.jpipLevelCacheDir))
-                                              .withCache("JPIPLevel", CacheConfigurationBuilder
-                                                                      .newCacheConfigurationBuilder(Long.class, Integer.class,
-                                                                      ResourcePoolsBuilder.newResourcePoolsBuilder()
-                                                                      .heap(10000, EntryUnit.ENTRIES)
-                                                                      .disk(10, MemoryUnit.MB, true))
-                                                                      .withExpiry(expiryPolicy))
-                                              .build(true);
+                .with(CacheManagerBuilder.persistence(JHVGlobals.jpipLevelCacheDir))
+                .withCache("JPIPLevel", CacheConfigurationBuilder
+                        .newCacheConfigurationBuilder(Long.class, Integer.class,
+                                ResourcePoolsBuilder.newResourcePoolsBuilder()
+                                        .heap(10000, EntryUnit.ENTRIES)
+                                        .disk(10, MemoryUnit.MB, true))
+                        .withExpiry(expiryPolicy))
+                .build(true);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
                 streamManager.close();

@@ -9,7 +9,7 @@ import java.util.GregorianCalendar;
 
 /**
  * Class manages a calendar view which shows the months of a year.
- * 
+ *
  * @author Stephan Pagel
  */
 public class MonthViewController implements CalendarViewController {

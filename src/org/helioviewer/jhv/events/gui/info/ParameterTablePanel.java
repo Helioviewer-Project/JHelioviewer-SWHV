@@ -53,28 +53,28 @@ class ParameterTablePanel extends JPanel implements MouseListener, MouseMotionLi
 
     private static class WrappedTable extends JTable {
 
-            @Override
-            public void columnMarginChanged(ChangeEvent e) {
-                updateRowHeights();
+        @Override
+        public void columnMarginChanged(ChangeEvent e) {
+            updateRowHeights();
+        }
+
+        // don't delete
+        // @Override
+        // public void tableChanged(TableModelEvent e) {
+        //     updateRowHeights();
+        // }
+
+        private void updateRowHeights() {
+            int rows = getRowCount();
+            for (int i = 0; i < rows; i++) {
+                Component comp = prepareRenderer(getCellRenderer(i, 1), i, 1);
+
+                int height;
+                Dimension dim = comp.getPreferredSize();
+                if (dim != null /* satisfy coverity */ && (height = dim.height + rowMargin) > rowHeight)
+                    setRowHeight(i, height);
             }
-
-            // don't delete
-            // @Override
-            // public void tableChanged(TableModelEvent e) {
-            //     updateRowHeights();
-            // }
-
-            private void updateRowHeights()  {
-                int rows = getRowCount();
-                for (int i = 0; i < rows; i++) {
-                    Component comp = prepareRenderer(getCellRenderer(i, 1), i, 1);
-
-                    int height;
-                    Dimension dim = comp.getPreferredSize();
-                    if (dim != null /* satisfy coverity */ && (height = dim.height + rowMargin) > rowHeight)
-                        setRowHeight(i, height);
-                }
-            }
+        }
 
     }
 
