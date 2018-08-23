@@ -253,9 +253,7 @@ public class GridLayer extends AbstractLayer {
         for (GridLabel lonLabel : lonLabels) {
             Transform.pushView();
             {
-                Transform.translateView(lonLabel.x, 0, lonLabel.y);
-                Transform.rotateView(lonLabel.theta, 0, 1, 0);
-
+                Transform.mulView(lonLabel.m);
                 renderer.draw3D(lonLabel.txt, 0, 0, 0, textScaleFactor);
                 renderer.flush();
             }

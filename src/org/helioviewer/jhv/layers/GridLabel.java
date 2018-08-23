@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.scale.GridType;
 import org.helioviewer.jhv.math.MathUtils;
+import org.joml.Matrix4f;
 
 class GridLabel {
 
@@ -13,17 +14,18 @@ class GridLabel {
     static final float textScale = (float) (0.07 * Sun.Radius);
 
     private static final DecimalFormat formatter1 = MathUtils.numberFormatter("0", 1);
+    private static final Matrix4f identity = new Matrix4f();
 
     final String txt;
     final float x;
     final float y;
-    final float theta;
+    final Matrix4f m;
 
-    private GridLabel(String _txt, float _x, float _y, float _theta) {
+    private GridLabel(String _txt, float _x, float _y, Matrix4f _m) {
         txt = _txt;
         x = _x;
         y = _y;
-        theta = _theta;
+        m = _m;
     }
 
     static ArrayList<GridLabel> makeRadialLabels(double delta, double radialStep) {
@@ -37,7 +39,7 @@ class GridLabel {
             double angle = -phi * Math.PI / 180. + delta;
             float x = (float) (Math.sin(angle) * size - horizontalAdjustment);
             float y = (float) (Math.cos(angle) * size - verticalAdjustment);
-            labels.add(new GridLabel(txt, x, y, 0));
+            labels.add(new GridLabel(txt, x, y, identity));
         }
         return labels;
     }
@@ -56,11 +58,11 @@ class GridLabel {
 
             x = (float) (Math.sin(angle) * size);
             y = (float) (Math.cos(angle) * size - verticalAdjustment);
-            labels.add(new GridLabel(txt, x, y, 0));
+            labels.add(new GridLabel(txt, x, y, identity));
             if (phi != 90) {
                 x = (float) (-Math.sin(angle) * size - horizontalAdjustment);
                 y = (float) (Math.cos(angle) * size - verticalAdjustment);
-                labels.add(new GridLabel(txt, x, y, 0));
+                labels.add(new GridLabel(txt, x, y, identity));
             }
         }
         for (double phi = -latStep; phi >= -90; phi -= latStep) {
@@ -70,11 +72,11 @@ class GridLabel {
 
             x = (float) (Math.sin(angle) * size);
             y = (float) (Math.cos(angle) * size - verticalAdjustment);
-            labels.add(new GridLabel(txt, x, y, 0));
+            labels.add(new GridLabel(txt, x, y, identity));
             if (phi != -90) {
                 x = (float) (-Math.sin(angle) * size - horizontalAdjustment);
                 y = (float) (Math.cos(angle) * size - verticalAdjustment);
-                labels.add(new GridLabel(txt, x, y, 0));
+                labels.add(new GridLabel(txt, x, y, identity));
             }
         }
         return labels;
@@ -90,7 +92,10 @@ class GridLabel {
             float x = (float) (Math.cos(angle) * size);
             float y = (float) (Math.sin(angle) * size);
 
-            labels.add(new GridLabel(txt, x, y, (float) theta));
+            Matrix4f m = new Matrix4f();
+            m.translation(x, 0, y);
+            m.rotateTranslation((float) (theta * Math.PI / 180.), 0, 1, 0, m);
+            labels.add(new GridLabel(txt, x, y, m));
         }
         for (double theta = -lonStep; theta > -180.; theta -= lonStep) {
             String txt = gridType == GridType.Carrington ? formatter1.format(theta + 360) : formatter1.format(theta);
@@ -98,7 +103,10 @@ class GridLabel {
             float x = (float) (Math.cos(angle) * size);
             float y = (float) (Math.sin(angle) * size);
 
-            labels.add(new GridLabel(txt, x, y, (float) theta));
+            Matrix4f m = new Matrix4f();
+            m.translation(x, 0, y);
+            m.rotateTranslation((float) (theta * Math.PI / 180.), 0, 1, 0, m);
+            labels.add(new GridLabel(txt, x, y, m));
         }
         return labels;
     }
