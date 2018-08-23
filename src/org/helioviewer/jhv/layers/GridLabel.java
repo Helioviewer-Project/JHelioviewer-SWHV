@@ -33,40 +33,48 @@ class GridLabel {
 
         ArrayList<GridLabel> labels = new ArrayList<>();
         for (double phi = 0; phi < 360; phi += radialStep) {
-            double angle = -phi * Math.PI / 180. + delta;
             String txt = formatter1.format(phi);
-            labels.add(new GridLabel(txt, (float) (Math.sin(angle) * size - horizontalAdjustment), (float) (Math.cos(angle) * size - verticalAdjustment), 0));
+            double angle = -phi * Math.PI / 180. + delta;
+            float x = (float) (Math.sin(angle) * size - horizontalAdjustment);
+            float y = (float) (Math.cos(angle) * size - verticalAdjustment);
+            labels.add(new GridLabel(txt, x, y, 0));
         }
         return labels;
     }
 
     static ArrayList<GridLabel> makeLatLabels(double latStep) {
-        double size = Sun.Radius * 1.08;
+        double size = Sun.Radius * 1.1;
         // adjust for font size in horizontal and vertical direction (centering the text approximately)
         double horizontalAdjustment = textScale / 2.;
         double verticalAdjustment = textScale / 3.;
 
         ArrayList<GridLabel> labels = new ArrayList<>();
         for (double phi = 0; phi <= 90; phi += latStep) {
-            double angle = (90 - phi) * Math.PI / 180.;
             String txt = formatter1.format(phi);
+            double angle = (90 - phi) * Math.PI / 180.;
+            float x, y;
 
-            labels.add(new GridLabel(txt, (float) (Math.sin(angle) * size),
-                    (float) (Math.cos(angle) * size - verticalAdjustment), 0));
+            x = (float) (Math.sin(angle) * size);
+            y = (float) (Math.cos(angle) * size - verticalAdjustment);
+            labels.add(new GridLabel(txt, x, y, 0));
             if (phi != 90) {
-                labels.add(new GridLabel(txt, (float) (-Math.sin(angle) * size - horizontalAdjustment),
-                        (float) (Math.cos(angle) * size - verticalAdjustment), 0));
+                x = (float) (-Math.sin(angle) * size - horizontalAdjustment);
+                y = (float) (Math.cos(angle) * size - verticalAdjustment);
+                labels.add(new GridLabel(txt, x, y, 0));
             }
         }
         for (double phi = -latStep; phi >= -90; phi -= latStep) {
-            double angle = (90 - phi) * Math.PI / 180.;
             String txt = formatter1.format(phi);
+            double angle = (90 - phi) * Math.PI / 180.;
+            float x, y;
 
-            labels.add(new GridLabel(txt, (float) (Math.sin(angle) * size),
-                    (float) (Math.cos(angle) * size - verticalAdjustment), 0));
+            x = (float) (Math.sin(angle) * size);
+            y = (float) (Math.cos(angle) * size - verticalAdjustment);
+            labels.add(new GridLabel(txt, x, y, 0));
             if (phi != -90) {
-                labels.add(new GridLabel(txt, (float) (-Math.sin(angle) * size - horizontalAdjustment),
-                        (float) (Math.cos(angle) * size - verticalAdjustment), 0));
+                x = (float) (-Math.sin(angle) * size - horizontalAdjustment);
+                y = (float) (Math.cos(angle) * size - verticalAdjustment);
+                labels.add(new GridLabel(txt, x, y, 0));
             }
         }
         return labels;
@@ -77,14 +85,20 @@ class GridLabel {
 
         ArrayList<GridLabel> labels = new ArrayList<>();
         for (double theta = 0; theta <= 180.; theta += lonStep) {
-            double angle = (90 - theta) * Math.PI / 180.;
             String txt = formatter1.format(theta);
-            labels.add(new GridLabel(txt, (float) (Math.cos(angle) * size), (float) (Math.sin(angle) * size), (float) theta));
+            double angle = (90 - theta) * Math.PI / 180.;
+            float x = (float) (Math.cos(angle) * size);
+            float y = (float) (Math.sin(angle) * size);
+
+            labels.add(new GridLabel(txt, x, y, (float) theta));
         }
         for (double theta = -lonStep; theta > -180.; theta -= lonStep) {
-            double angle = (90 - theta) * Math.PI / 180.;
             String txt = gridType == GridType.Carrington ? formatter1.format(theta + 360) : formatter1.format(theta);
-            labels.add(new GridLabel(txt, (float) (Math.cos(angle) * size), (float) (Math.sin(angle) * size), (float) theta));
+            double angle = (90 - theta) * Math.PI / 180.;
+            float x = (float) (Math.cos(angle) * size);
+            float y = (float) (Math.sin(angle) * size);
+
+            labels.add(new GridLabel(txt, x, y, (float) theta));
         }
         return labels;
     }
