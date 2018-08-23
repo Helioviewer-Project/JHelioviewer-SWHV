@@ -84,7 +84,6 @@ public class GLHelper {
         vexBuf.put4f(x, y, 0, 1).put4b(color);
         return tf;
     }
-
     /*
         public static GLCanvas createGLCanvas() {
             GLProfile profile = GLProfile.getDefault();
@@ -101,10 +100,8 @@ public class GLHelper {
         GLProfile profile = GLProfile.getGL2GL3();
         GLCapabilities capabilities = getGLCapabilities(profile);
         GLWindow window = GLWindow.create(capabilities);
-
         // GUI events can lead to context destruction and invalidation of GL objects and state
         window.setSharedAutoDrawable(getSharedDrawable(profile, capabilities));
-
         return window;
     }
 
