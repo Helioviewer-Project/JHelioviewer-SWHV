@@ -14,7 +14,7 @@ import org.helioviewer.jhv.io.APIRequest;
 @SuppressWarnings("serial")
 public class CadencePanel extends JPanel {
 
-    private static final String[] timeStepUnitStrings = { "sec", "min", "hours", "days", "get all" };
+    private static final String[] timeStepUnitStrings = {"sec", "min", "hours", "days", "get all"};
 
     private final JSpinner spinnerCadence = new JSpinner(new SpinnerNumberModel(1, 1, 1000000, 1));
     private final JComboBox<String> comboUnit = new JComboBox<>(timeStepUnitStrings);
@@ -37,16 +37,16 @@ public class CadencePanel extends JPanel {
         int value = (Integer) spinnerCadence.getValue();
 
         switch (comboUnit.getSelectedIndex()) {
-        case 1: // min
-            return value * 60;
-        case 2: // hour
-            return value * 3600;
-        case 3: // day
-            return value * 86400;
-        case 4:
-            return APIRequest.CADENCE_ANY;
-        default:
-            return value;
+            case 1: // min
+                return value * 60;
+            case 2: // hour
+                return value * 3600;
+            case 3: // day
+                return value * 86400;
+            case 4:
+                return APIRequest.CADENCE_ANY;
+            default:
+                return value;
         }
     }
 

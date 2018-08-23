@@ -48,8 +48,8 @@ abstract class AbstractAnnotateable implements Annotateable {
 
     private static Vec3 toCart(double y, double z) {
         return new Vec3(radius * Math.sin(y) * Math.sin(z),
-                        radius * Math.cos(y),
-                        radius * Math.sin(y) * Math.cos(z));
+                radius * Math.cos(y),
+                radius * Math.sin(y) * Math.cos(z));
     }
 
     static Vec3 interpolate(double t, Vec3 point1, Vec3 point2) {

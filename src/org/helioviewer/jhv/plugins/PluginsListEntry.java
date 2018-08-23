@@ -78,7 +78,7 @@ class PluginsListEntry extends JPanel implements MouseListener, HyperlinkListene
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             if (e.getURL() == null) {
                 String text = "<center><p><big><b>" + plugin.getName() + "</b></big></p><p><b>Plug-in description</b><br/>" + plugin.getDescription() +
-                              "</p><p><b>Plug-in license information</b><br/>" + plugin.getAboutLicenseText();
+                        "</p><p><b>Plug-in license information</b><br/>" + plugin.getAboutLicenseText();
                 new TextDialog("About", text, false).showDialog();
             } else {
                 JHVGlobals.openURL(e.getURL().toString());

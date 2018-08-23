@@ -121,7 +121,7 @@ public class DataSourcesTree extends JTree {
         return null; // disable builtin search
     }
 
-    private static DefaultMutableTreeNode copyNode(DefaultMutableTreeNode src){
+    private static DefaultMutableTreeNode copyNode(DefaultMutableTreeNode src) {
         DefaultMutableTreeNode copy = new DefaultMutableTreeNode(src.getUserObject());
         if (src.isLeaf()) {
             return copy;
@@ -230,7 +230,7 @@ public class DataSourcesTree extends JTree {
         public void resetRowSelection() {
             super.resetRowSelection();
             if (selectedPath != null && selection == null)
-                selection = new TreePath[] { selectedPath };
+                selection = new TreePath[]{selectedPath};
         }
 
         @Override

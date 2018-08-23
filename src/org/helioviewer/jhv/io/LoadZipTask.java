@@ -38,7 +38,7 @@ class LoadZipTask extends JHVWorker<Void, Void> {
             try (FileSystem zipfs = FileSystems.newFileSystem(URI.create("jar:" + uri), new HashMap<>())) {
                 for (Path root : zipfs.getRootDirectories()) {
                     try (DirectoryStream<Path> stream = Files.newDirectoryStream(root, "*.jhv")) {
-                        for (Path entry: stream) {
+                        for (Path entry : stream) {
                             Path ext = Paths.get(tmpDir + entry);
                             exclude.add(ext);
                             Files.copy(entry, ext, StandardCopyOption.REPLACE_EXISTING);
@@ -46,7 +46,7 @@ class LoadZipTask extends JHVWorker<Void, Void> {
                         }
                     }
                     try (DirectoryStream<Path> stream = Files.newDirectoryStream(root, "*.json")) {
-                        for (Path entry: stream) {
+                        for (Path entry : stream) {
                             Path ext = Paths.get(tmpDir + entry);
                             exclude.add(ext);
                             Files.copy(entry, ext, StandardCopyOption.REPLACE_EXISTING);
@@ -54,7 +54,7 @@ class LoadZipTask extends JHVWorker<Void, Void> {
                         }
                     }
                     try (DirectoryStream<Path> stream = Files.newDirectoryStream(root)) {
-                        for (Path entry: stream) {
+                        for (Path entry : stream) {
                             Path ext = Paths.get(tmpDir + entry);
                             if (exclude.contains(ext))
                                 continue;

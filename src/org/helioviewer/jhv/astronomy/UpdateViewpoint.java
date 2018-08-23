@@ -17,9 +17,13 @@ import org.helioviewer.jhv.time.TimeUtils;
 public interface UpdateViewpoint {
 
     Position update(JHVDate time);
+
     void clear();
+
     void setLoadPosition(LoadPosition _loadPosition);
+
     void unsetLoadPosition(LoadPosition _loadPosition);
+
     Collection<LoadPosition> getLoadPositions();
 
     UpdateViewpoint observer = new Observer();

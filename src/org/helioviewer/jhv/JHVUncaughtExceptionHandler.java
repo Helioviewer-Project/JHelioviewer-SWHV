@@ -66,9 +66,9 @@ class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
         report.putClientProperty(JTextPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
         report.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 10));
         report.setText("Fatal error detected." +
-                       "<p>Please email this report at <a href='mailto:" + JHVGlobals.emailAddress + "'>" + JHVGlobals.emailAddress + "</a> " +
-                       "or use it to open an issue at <a href='" + BUG_URL + "'>" + BUG_URL + "</a>.<br/>" +
-                       "This report was sent to swhv.oma.be.");
+                "<p>Please email this report at <a href='mailto:" + JHVGlobals.emailAddress + "'>" + JHVGlobals.emailAddress + "</a> " +
+                "or use it to open an issue at <a href='" + BUG_URL + "'>" + BUG_URL + "</a>.<br/>" +
+                "This report was sent to swhv.oma.be.");
         objects.add(report);
 
         JLabel copyToClipboard = new JLabel("<html><a href=''>Click here to copy the error report to the clipboard.");
@@ -94,7 +94,7 @@ class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
         JOptionPane optionPane = new JOptionPane();
         optionPane.setMessage(objects.toArray());
         optionPane.setMessageType(JOptionPane.ERROR_MESSAGE);
-        optionPane.setOptions(new String[] { "Quit JHelioviewer", "Continue" });
+        optionPane.setOptions(new String[]{"Quit JHelioviewer", "Continue"});
         JDialog dialog = optionPane.createDialog(null, "JHelioviewer: Fatal Error");
 
         dialog.setVisible(true);

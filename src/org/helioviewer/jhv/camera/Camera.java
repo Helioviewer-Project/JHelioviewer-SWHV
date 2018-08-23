@@ -33,7 +33,7 @@ public class Camera {
     private Position viewpoint = Sun.StartEarth;
     private UpdateViewpoint updateViewpoint = UpdateViewpoint.observer;
 
-////
+    ////
     private static final float depthClose = (float) (32 * Sun.Radius); // bit more than LASCO C3
     private static final float depthFar = (float) (50 * Sun.MeanEarthDistance); // bit further than Pluto
 
@@ -53,7 +53,7 @@ public class Camera {
 
     public float[] getTransformationInverse(double aspect) {
         return Mat4f.orthoInverse(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -1, 1)
-                    .translate(-(float) currentTranslation.x, -(float) currentTranslation.y, 0).m;
+                .translate(-(float) currentTranslation.x, -(float) currentTranslation.y, 0).m;
     }
 
     public void projectionOrthoFar(double aspect) {

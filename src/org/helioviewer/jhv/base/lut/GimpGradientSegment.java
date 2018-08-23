@@ -4,10 +4,10 @@ import java.awt.Color;
 
 /**
  * Representing a gimp segment. used by
- * 
- * @see GimpGradient also compare with app/core/gimpgradient.c from gimp source
- *      code
+ *
  * @author Helge Dietert
+ * @see GimpGradient also compare with app/core/gimpgradient.c from gimp source
+ * code
  */
 class GimpGradientSegment {
     final double leftStop;
@@ -28,33 +28,20 @@ class GimpGradientSegment {
 
     /**
      * Creates a gimp gradient segment with the given parameters
-     * 
-     * @param leftStop
-     *            Position of left stoppoint
-     * @param midStop
-     *            Position of middle stoppoint
-     * @param rightStop
-     *            Position of right stoppoint
-     * @param rl
-     *            R of left stop point
-     * @param gl
-     *            G of left stop point
-     * @param bl
-     *            B of left stop point
-     * @param al
-     *            A of left stop point
-     * @param rr
-     *            R of right stop point
-     * @param gr
-     *            G of right stop point
-     * @param br
-     *            B of right stop point
-     * @param ar
-     *            A of right stop point
-     * @param blendingType
-     *            Blending function type
-     * @param blendingColor
-     *            Blending function color
+     *
+     * @param leftStop      Position of left stoppoint
+     * @param midStop       Position of middle stoppoint
+     * @param rightStop     Position of right stoppoint
+     * @param rl            R of left stop point
+     * @param gl            G of left stop point
+     * @param bl            B of left stop point
+     * @param al            A of left stop point
+     * @param rr            R of right stop point
+     * @param gr            G of right stop point
+     * @param br            B of right stop point
+     * @param ar            A of right stop point
+     * @param blendingType  Blending function type
+     * @param blendingColor Blending function color
      */
     GimpGradientSegment(double leftStop, double midStop, double rightStop, double rl, double gl, double bl, double al, double rr, double gr, double br, double ar, int blendingType, int blendingColor/*, int blendingColorLeft, int blendingColorRight*/) {
         this.leftStop = leftStop;
@@ -76,9 +63,8 @@ class GimpGradientSegment {
 
     /**
      * Gives back the color for point x within this segment
-     * 
-     * @param x
-     *            Point in segment
+     *
+     * @param x Point in segment
      * @return Color according to gradient
      */
     public int getGradientColor(double x) throws Exception {
@@ -147,9 +133,8 @@ class GimpGradientSegment {
 
     /**
      * Internal function (approximate double) to set the colors
-     * 
-     * @param x
-     *            value
+     *
+     * @param x value
      * @return approximated as byte
      */
     private static int appD(double x) {

@@ -18,16 +18,16 @@ import okio.Okio;
 public class NetFileCache {
 
     private static final LoadingCache<URI, URI> cache = CacheBuilder.newBuilder().maximumSize(512).
-        build(new CacheLoader<URI, URI>() {
-            @Override
-            public URI load(@Nonnull URI uri) throws IOException {
-                File f = File.createTempFile("jhv", null, JHVGlobals.fileCacheDir);
-                try (NetClient nc = NetClient.of(uri, false, NetClient.NetCache.BYPASS); BufferedSink sink = Okio.buffer(Okio.sink(f))) {
-                    sink.writeAll(nc.getSource());
+            build(new CacheLoader<URI, URI>() {
+                @Override
+                public URI load(@Nonnull URI uri) throws IOException {
+                    File f = File.createTempFile("jhv", null, JHVGlobals.fileCacheDir);
+                    try (NetClient nc = NetClient.of(uri, false, NetClient.NetCache.BYPASS); BufferedSink sink = Okio.buffer(Okio.sink(f))) {
+                        sink.writeAll(nc.getSource());
+                    }
+                    return f.toURI();
                 }
-                return f.toURI();
-            }
-    });
+            });
 
     public static URI get(URI uri) throws IOException {
         try {

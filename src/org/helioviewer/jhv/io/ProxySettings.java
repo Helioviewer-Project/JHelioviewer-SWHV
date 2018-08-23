@@ -16,8 +16,8 @@ public class ProxySettings {
     public static final Proxy proxy;
 
     static {
-        String[] httpVars = { "http.proxyHost", "http.proxyPort", "http.proxyUser", "http.proxyPassword" };
-        String[] socksVars = { "socksProxyHost", "socksProxyPort", "java.net.socks.username", "java.net.socks.password" };
+        String[] httpVars = {"http.proxyHost", "http.proxyPort", "http.proxyUser", "http.proxyPassword"};
+        String[] socksVars = {"socksProxyHost", "socksProxyPort", "java.net.socks.username", "java.net.socks.password"};
 
         Proxy _proxy = detectProxy(httpVars[0], httpVars[1], Proxy.Type.HTTP);
         if (_proxy == null)
@@ -34,7 +34,7 @@ public class ProxySettings {
                     String[] vars = proxy.type() == Proxy.Type.HTTP ? httpVars : socksVars;
                     String host = System.getProperty(vars[0]);
                     if (getRequestingHost().equalsIgnoreCase(host)) {
-                    // if (getRequestorType() == RequestorType.PROXY)
+                        // if (getRequestorType() == RequestorType.PROXY)
                         String port = System.getProperty(vars[1]);
                         String user = System.getProperty(vars[2]);
                         String pass = System.getProperty(vars[3]);
@@ -71,6 +71,7 @@ public class ProxySettings {
         return null;
     }
 
-    public static void init() {}
+    public static void init() {
+    }
 
 }

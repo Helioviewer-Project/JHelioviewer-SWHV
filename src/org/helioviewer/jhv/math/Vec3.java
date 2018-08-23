@@ -97,7 +97,7 @@ public class Vec3 {
     }
 
     public JSONArray toJson() {
-        return new JSONArray(new double[] { x, y, z });
+        return new JSONArray(new double[]{x, y, z});
     }
 
     public static Vec3 fromJson(JSONArray ja) {

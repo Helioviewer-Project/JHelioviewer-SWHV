@@ -76,7 +76,7 @@ class BandCacheMinute implements BandCache {
                 }
             }
         }
-        return new float[] { min, max };
+        return new float[]{min, max};
     }
 
     @Override

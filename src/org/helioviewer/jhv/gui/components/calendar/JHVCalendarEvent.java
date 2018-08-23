@@ -8,14 +8,13 @@ import java.util.EventObject;
  * component-specific action occurs (such as a date has been selected). The
  * event is passed to every JHVActionListener object that registered to receive
  * such events using the component's addJHVActionListener method.
- * 
+ *
  * @author Stephan Pagel
  */
 @SuppressWarnings("serial")
 public class JHVCalendarEvent extends EventObject {
     /**
-     * @param _source
-     *            The object on which the Event initially occurred.
+     * @param _source The object on which the Event initially occurred.
      */
     public JHVCalendarEvent(Object _source) {
         super(_source);

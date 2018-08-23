@@ -93,7 +93,7 @@ class OSXAdapter implements InvocationHandler {
             // Create a proxy object around this handler that can be reflectively added as an Apple ApplicationListener
             ClassLoader classLoader = OSXAdapter.class.getClassLoader();
             if (classLoader != null) { // impossible
-                Object osxAdapterProxy = Proxy.newProxyInstance(classLoader, new Class<?>[] { applicationListenerClass }, adapter);
+                Object osxAdapterProxy = Proxy.newProxyInstance(classLoader, new Class<?>[]{applicationListenerClass}, adapter);
                 addListenerMethod.invoke(macOSXApplication, osxAdapterProxy);
             }
         } catch (ClassNotFoundException e) {

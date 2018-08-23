@@ -57,8 +57,8 @@ public class DataSourcesParser {
                 long end = TimeUtils.parseSQL(json.getString("end"));
                 String description = json.getString("description") + " [" + TimeUtils.formatDate(start) + " : " + TimeUtils.formatDate(end) + ']';
                 DataSourcesTree.SourceItem item = new DataSourcesTree.SourceItem(server, mergeNames(str, name),
-                                                                                 description, sourceId, start, end,
-                                                                                 json.optBoolean("default", false));
+                        description, sourceId, start, end,
+                        json.optBoolean("default", false));
                 DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(item, false);
                 parentNode.add(treeNode);
 

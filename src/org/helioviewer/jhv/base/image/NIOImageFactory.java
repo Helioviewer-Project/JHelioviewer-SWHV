@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.base.image;
 
 //import java.awt.GraphicsConfiguration;
+
 import java.awt.Point;
 import java.awt.image.*;
 import java.nio.Buffer;
@@ -27,15 +28,16 @@ public class NIOImageFactory {
         BufferedImage temp = new BufferedImage(1, 1, type);
         return createCompatible(width, height, temp.getSampleModel().createCompatibleSampleModel(width, height), temp.getColorModel());
     }
-/*
-    public static BufferedImage createCompatible(int width, int height, GraphicsConfiguration configuration, int transparency) {
-        return createCompatible(width, height, configuration.getColorModel(transparency));
-    }
 
-    private static BufferedImage createCompatible(int width, int height, ColorModel cm) {
-        return createCompatible(width, height, cm.createCompatibleSampleModel(width, height), cm);
-    }
-*/
+    /*
+        public static BufferedImage createCompatible(int width, int height, GraphicsConfiguration configuration, int transparency) {
+            return createCompatible(width, height, configuration.getColorModel(transparency));
+        }
+
+        private static BufferedImage createCompatible(int width, int height, ColorModel cm) {
+            return createCompatible(width, height, cm.createCompatibleSampleModel(width, height), cm);
+        }
+    */
     private static BufferedImage createCompatible(int width, int height, SampleModel sm, ColorModel cm) {
         DataBuffer buffer = NIODataBuffer.create(sm.getTransferType(), width * height * sm.getNumDataElements(), 1);
         return new BufferedImage(cm, RasterFactory.factory.createRaster(sm, buffer, new Point()), cm.isAlphaPremultiplied(), null);

@@ -34,7 +34,7 @@ class RadioOptionsPanel extends JPanel {
 
         JButton availabilityButton = new JButton("Available data");
         availabilityButton.addActionListener(e -> JHVGlobals.openURL(DataSources.getServerSetting("ROB", "availability.images") +
-                                                                     "#IID" + APIRequest.CallistoID));
+                "#IID" + APIRequest.CallistoID));
         c.anchor = GridBagConstraints.EAST;
         c.gridx = 1;
         c.gridy = 0;

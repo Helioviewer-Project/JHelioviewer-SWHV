@@ -107,8 +107,8 @@ public class HelioviewerMetaData extends AbstractMetaData {
         if (detector.equalsIgnoreCase("C3"))
             innerRadius *= 1.07;
         if (instrument.equals("MDI") || instrument.equals("HMI") ||
-            observatory.equals("Kanzelhoehe") || observatory.equals("ROB-USET") ||
-            observatory.equals("NSO-GONG") || observatory.equals("NSO-SOLIS"))
+                observatory.equals("Kanzelhoehe") || observatory.equals("ROB-USET") ||
+                observatory.equals("NSO-GONG") || observatory.equals("NSO-SOLIS"))
             outerRadius = 1;
     }
 
@@ -272,7 +272,7 @@ public class HelioviewerMetaData extends AbstractMetaData {
     @Override
     public Region roiToRegion(SubImage roi, double factorX, double factorY) {
         return new Region(roi.x * factorX * unitPerPixelX - sunPositionX, roi.y * factorY * unitPerPixelY - sunPositionY,
-                          roi.width * factorX * unitPerPixelX, roi.height * factorY * unitPerPixelY);
+                roi.width * factorX * unitPerPixelX, roi.height * factorY * unitPerPixelY);
     }
 
     public String getDetector() {

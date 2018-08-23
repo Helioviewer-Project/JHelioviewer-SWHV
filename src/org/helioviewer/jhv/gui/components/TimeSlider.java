@@ -24,7 +24,7 @@ import org.helioviewer.jhv.view.View;
 
 /**
  * Extension of JSlider displaying the caching status on the track.
- *
+ * <p>
  * This element provides its own look and feel. Therefore, it is independent
  * from the global look and feel.
  */
@@ -165,7 +165,7 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
             if (layer == null) {
                 g.setColor(notCachedColor);
                 g.drawLine(trackRect.x, y, trackRect.x + trackRect.width, y);
-            } else if ((view = layer.getView()).isComplete()){
+            } else if ((view = layer.getView()).isComplete()) {
                 g.setColor(completeCachedColor);
                 g.drawLine(trackRect.x, y, trackRect.x + trackRect.width, y);
             } else {

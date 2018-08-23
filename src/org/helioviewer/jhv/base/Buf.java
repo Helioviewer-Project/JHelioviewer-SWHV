@@ -67,7 +67,7 @@ public class Buf {
 
     public void put4b(byte[] b) {
         ensure(4);
-        array[length]     = b[0];
+        array[length] = b[0];
         array[length + 1] = b[1];
         array[length + 2] = b[2];
         array[length + 3] = b[3];

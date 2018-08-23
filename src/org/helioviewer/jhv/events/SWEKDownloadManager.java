@@ -17,15 +17,15 @@ import org.helioviewer.jhv.events.gui.filter.FilterManager;
 import org.helioviewer.jhv.events.gui.filter.FilterManagerListener;
 import org.helioviewer.jhv.threads.JHVThread;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class SWEKDownloadManager implements FilterManagerListener {
 
     private static final int NUMBER_THREADS = 8;
     private static final long SIXHOURS = 1000 * 60 * 60 * 6;
     private static final ExecutorService downloadEventPool = new ThreadPoolExecutor(NUMBER_THREADS, NUMBER_THREADS, 10000L, TimeUnit.MILLISECONDS,
-                                                                                    new PriorityBlockingQueue<>(2048, new ComparePriority()),
-                                                                                    new JHVThread.NamedThreadFactory("SWEK Download"),
-                                                                                    new ThreadPoolExecutor.DiscardPolicy()) {
+            new PriorityBlockingQueue<>(2048, new ComparePriority()),
+            new JHVThread.NamedThreadFactory("SWEK Download"),
+            new ThreadPoolExecutor.DiscardPolicy()) {
         @Override
         protected void afterExecute(Runnable r, Throwable t) {
             super.afterExecute(r, t);
@@ -43,7 +43,7 @@ public class SWEKDownloadManager implements FilterManagerListener {
     private static void stopDownloadSupplier(SWEKSupplier supplier, boolean keepActive) {
         ArrayList<SWEKDownloadWorker> workerList = supplierMap.get(supplier);
         if (workerList != null) {
-            for (Iterator<SWEKDownloadWorker> it = workerList.iterator(); it.hasNext();) {
+            for (Iterator<SWEKDownloadWorker> it = workerList.iterator(); it.hasNext(); ) {
                 SWEKDownloadWorker worker = it.next();
                 if (worker.getSupplier() == supplier) {
                     worker.stopWorker();

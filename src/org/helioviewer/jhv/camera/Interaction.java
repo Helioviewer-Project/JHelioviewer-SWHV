@@ -12,7 +12,7 @@ import com.jogamp.newt.event.MouseListener;
 public class Interaction implements MouseListener, KeyListener {
 
     final Camera camera;
-    private static final Timer wheelTimer = new Timer(1000/2, e -> Display.render(1));
+    private static final Timer wheelTimer = new Timer(1000 / 2, e -> Display.render(1));
 
     Interaction(Camera _camera) {
         camera = _camera;

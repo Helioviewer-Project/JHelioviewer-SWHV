@@ -21,14 +21,14 @@ public class BandType {
 
         YAxisScale generateScale(String _label) {
             switch (this) {
-            case LOGARITHMIC:
-                return new YAxisLogScale(_label);
-            case LINEAR:
-                return new YAxisIdentityScale(_label);
-            case POSITIVELINEAR:
-                return new YAxisPositiveIdentityScale(_label);
-            default:
-                return new YAxisIdentityScale(_label);
+                case LOGARITHMIC:
+                    return new YAxisLogScale(_label);
+                case LINEAR:
+                    return new YAxisIdentityScale(_label);
+                case POSITIVELINEAR:
+                    return new YAxisPositiveIdentityScale(_label);
+                default:
+                    return new YAxisIdentityScale(_label);
             }
         }
     }

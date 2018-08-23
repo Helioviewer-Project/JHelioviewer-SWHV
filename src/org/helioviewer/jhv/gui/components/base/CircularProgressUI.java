@@ -46,7 +46,7 @@ public class CircularProgressUI extends BasicProgressBarUI {
     private void doPaint(Graphics g1, double degree) {
         Rectangle r = progressBar.getBounds();
         double sz = Math.min(r.width, r.height) * (1 - 3 * THICK_FACTOR);
-        double cx = r.width  * .5;
+        double cx = r.width * .5;
         double cy = r.height * .5;
         double or = sz * .5;
         double ir = or * .5;

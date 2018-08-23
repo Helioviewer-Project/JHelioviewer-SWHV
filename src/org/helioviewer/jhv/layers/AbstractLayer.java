@@ -8,7 +8,7 @@ import com.jogamp.opengl.GL2;
 public abstract class AbstractLayer implements Layer {
 
     protected boolean enabled;
-    protected final boolean[] isVisible = { false, false, false, false };
+    protected final boolean[] isVisible = {false, false, false, false};
 
     @Override
     public void setEnabled(boolean _enabled) {

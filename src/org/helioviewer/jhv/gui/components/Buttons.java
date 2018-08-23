@@ -6,9 +6,9 @@ import org.helioviewer.jhv.gui.UIGlobals;
 
 public class Buttons {
 
-    private static String uc2ent(MaterialDesign ...uc) {
+    private static String uc2ent(MaterialDesign... uc) {
         StringBuilder out = new StringBuilder();
-        for (MaterialDesign c: uc)
+        for (MaterialDesign c : uc)
             out.append(c.code);
         return out.toString();
     }
@@ -28,24 +28,24 @@ public class Buttons {
     public static final String skipForward = String.valueOf(MaterialDesign.MDI_SKIP_FORWARD.code);
 
     public static final String chevronRight = "<html><font face='Material Design Icons' size=4>" +
-        uc2ent(MaterialDesign.MDI_CHEVRON_RIGHT) + "</font>&nbsp;";
+            uc2ent(MaterialDesign.MDI_CHEVRON_RIGHT) + "</font>&nbsp;";
     public static final String chevronDown = "<html><font face='Material Design Icons' size=4>" +
-        uc2ent(MaterialDesign.MDI_CHEVRON_DOWN) + "</font>&nbsp;";
+            uc2ent(MaterialDesign.MDI_CHEVRON_DOWN) + "</font>&nbsp;";
 
     public static final String optionsRight = "<html>Options<font face='Material Design Icons' size=4>" +
-        uc2ent(MaterialDesign.MDI_CHEVRON_RIGHT);
+            uc2ent(MaterialDesign.MDI_CHEVRON_RIGHT);
     public static final String optionsDown = "<html>Options<font face='Material Design Icons' size=4>" +
-        uc2ent(MaterialDesign.MDI_CHEVRON_DOWN);
+            uc2ent(MaterialDesign.MDI_CHEVRON_DOWN);
 
     public static final String newLayer = "<html><font face='Material Design Icons' size=4>" +
-        uc2ent(MaterialDesign.MDI_PLUS_CIRCLE) + "</font>&nbsp;New Layer";
+            uc2ent(MaterialDesign.MDI_PLUS_CIRCLE) + "</font>&nbsp;New Layer";
     public static final String syncLayers = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
-        uc2ent(MaterialDesign.MDI_SYNC) + "</font>&nbsp;Sync";
+            uc2ent(MaterialDesign.MDI_SYNC) + "</font>&nbsp;Sync";
 
     public static final String lock = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
-        uc2ent(MaterialDesign.MDI_LOCK) + "</font>&nbsp;";
+            uc2ent(MaterialDesign.MDI_LOCK) + "</font>&nbsp;";
     public static final String unlock = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
-        uc2ent(MaterialDesign.MDI_LOCK_OPEN) + "</font>&nbsp;";
+            uc2ent(MaterialDesign.MDI_LOCK_OPEN) + "</font>&nbsp;";
 
     public static final String info = button(MaterialDesign.MDI_INFORMATION_VARIANT);
     public static final String download = button(MaterialDesign.MDI_DOWNLOAD);
@@ -65,7 +65,7 @@ public class Buttons {
 
     // toolbar
 
-    public static String toolBar(MaterialDesign ...uc) {
+    public static String toolBar(MaterialDesign... uc) {
         return "<html><center><font face='Material Design Icons' size=5>" + uc2ent(uc) + "</font>";
     }
 

@@ -40,9 +40,9 @@ public class JulianDay {
         iypmy = (long) (iy + my);
 
         return (double) ((1461L * (iypmy + 4800L)) / 4L
-                 + (367L * (long) (im - 2 - 12 * my)) / 12L
-                 - (3L * ((iypmy + 4900L) / 100L)) / 4L
-                 + (long) id - 2432076L);
+                + (367L * (long) (im - 2 - 12 * my)) / 12L
+                - (3L * ((iypmy + 4900L) / 100L)) / 4L
+                + (long) id - 2432076L);
     }
 
     /* Minimum and maximum allowed JD */
@@ -89,7 +89,7 @@ public class JulianDay {
         im = (int) (k + 2L - 12L * l);
         iy = (int) (100L * (n - 49L) + i + l);
 
-        return new double[] {iy, im, id, f};
+        return new double[]{iy, im, id, f};
     }
 
 }

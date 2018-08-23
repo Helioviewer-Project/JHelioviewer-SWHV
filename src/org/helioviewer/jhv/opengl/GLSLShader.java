@@ -91,7 +91,7 @@ public class GLSLShader {
         gl.glShaderSource(iID, iCount, akProgramText, aiLength, 0);
         gl.glCompileShader(iID);
 
-        int[] params = { 0 };
+        int[] params = {0};
         gl.glGetShaderiv(iID, GL2.GL_COMPILE_STATUS, params, 0);
         if (params[0] != 1) {
             Log.error("shader compile status: " + params[0]);
@@ -115,7 +115,7 @@ public class GLSLShader {
         bindAttribs(gl);
         gl.glLinkProgram(progID);
 
-        int[] params = { 0 };
+        int[] params = {0};
         gl.glGetProgramiv(progID, GL2.GL_LINK_STATUS, params, 0);
         if (params[0] != 1) {
             Log.error("link status: " + params[0]);

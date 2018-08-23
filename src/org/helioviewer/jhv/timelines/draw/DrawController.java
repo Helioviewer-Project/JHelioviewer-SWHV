@@ -34,7 +34,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     private static long latestMovieTime = Long.MIN_VALUE;
     private static boolean locked;
 
-    private static final Timer layersTimer = new Timer(1000/2, e -> {
+    private static final Timer layersTimer = new Timer(1000 / 2, e -> {
         long start = TimeUtils.ceilSec(selectedAxis.start);
         long end = TimeUtils.floorSec(selectedAxis.end);
         MoviePanel.getInstance().syncLayersSpan(start, end);
@@ -203,7 +203,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     }
 
     private static void createGraphArea() {
-        int nrPropagatedAxes =  Math.max(0, TimelineLayers.getNumberOfPropagationAxes());
+        int nrPropagatedAxes = Math.max(0, TimelineLayers.getNumberOfPropagationAxes());
         int height = graphSize.height - (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE + DrawConstants.GRAPH_BOTTOM_AXIS_SPACE * (nrPropagatedAxes + 1));
         int nrRightAxes = Math.max(0, TimelineLayers.getNumberOfYAxes() - 1);
         int width = graphSize.width - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + nrRightAxes * DrawConstants.RIGHT_AXIS_WIDTH);

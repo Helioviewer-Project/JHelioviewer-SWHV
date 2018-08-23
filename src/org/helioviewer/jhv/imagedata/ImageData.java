@@ -31,7 +31,7 @@ public class ImageData {
     private Position viewpoint;
     private boolean uploaded = false;
 
-    public ImageData(int _width, int _height, ImageFormat _format,  Buffer _buffer) {
+    public ImageData(int _width, int _height, ImageFormat _format, Buffer _buffer) {
         width = _width;
         height = _height;
         format = _format;

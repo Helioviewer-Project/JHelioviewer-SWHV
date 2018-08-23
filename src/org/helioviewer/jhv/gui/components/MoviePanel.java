@@ -137,6 +137,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
                 return false;
             }
         };
+
         protected abstract boolean isInternal();
 
         protected abstract Dimension getSize();
@@ -522,7 +523,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
 
     // only for Layers
     public static void setPlayState(boolean play) {
-       if (play) {
+        if (play) {
             playButton.setText(Buttons.pause);
             playButton.setToolTipText("Pause movie");
         } else {

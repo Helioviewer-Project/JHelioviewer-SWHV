@@ -28,18 +28,18 @@ class DrawControllerOptionsPanel extends JPanel {
         setLayout(new BorderLayout());
 
         ZoomItem[] items = {
-            new ZoomItem(ZOOM.CUSTOM, 0),
-            new ZoomItem(ZOOM.All, 0),
-            new ZoomItem(ZOOM.Movie, 0),
-            new ZoomItem(ZOOM.Year, 1),
-            new ZoomItem(ZOOM.Month, 6),
-            new ZoomItem(ZOOM.Month, 3),
-            new ZoomItem(ZOOM.Carrington, 1),
-            new ZoomItem(ZOOM.Day, 7),
-            new ZoomItem(ZOOM.Day, 3),
-            new ZoomItem(ZOOM.Hour, 12),
-            new ZoomItem(ZOOM.Hour, 6),
-            new ZoomItem(ZOOM.Hour, 1)
+                new ZoomItem(ZOOM.CUSTOM, 0),
+                new ZoomItem(ZOOM.All, 0),
+                new ZoomItem(ZOOM.Movie, 0),
+                new ZoomItem(ZOOM.Year, 1),
+                new ZoomItem(ZOOM.Month, 6),
+                new ZoomItem(ZOOM.Month, 3),
+                new ZoomItem(ZOOM.Carrington, 1),
+                new ZoomItem(ZOOM.Day, 7),
+                new ZoomItem(ZOOM.Day, 3),
+                new ZoomItem(ZOOM.Hour, 12),
+                new ZoomItem(ZOOM.Hour, 6),
+                new ZoomItem(ZOOM.Hour, 1)
         };
         zoomCombo = new JComboBox<>(items);
         zoomCombo.addActionListener(e -> {
@@ -75,22 +75,22 @@ class DrawControllerOptionsPanel extends JPanel {
             String plural = number > 1 ? "s" : "";
 
             switch (zoom) {
-            case All:
-                return "Maximum interval";
-            case Hour:
-                return number + " hour" + plural;
-            case Day:
-                return number + " day" + plural;
-            case Month:
-                return number + " month" + plural;
-            case Year:
-                return number + " year" + plural;
-            case Carrington:
-                return "Carrington rotation" + plural;
-            case Movie:
-                return "Movie interval";
-            default:
-                break;
+                case All:
+                    return "Maximum interval";
+                case Hour:
+                    return number + " hour" + plural;
+                case Day:
+                    return number + " day" + plural;
+                case Month:
+                    return number + " month" + plural;
+                case Year:
+                    return number + " year" + plural;
+                case Carrington:
+                    return "Carrington rotation" + plural;
+                case Movie:
+                    return "Movie interval";
+                default:
+                    break;
             }
             return "Custom interval";
         }
@@ -101,29 +101,29 @@ class DrawControllerOptionsPanel extends JPanel {
         TimeAxis availableInterval = DrawController.availableAxis;
 
         switch (zoom) {
-        case All:
-            DrawController.setSelectedInterval(availableInterval.start, availableInterval.end);
-            break;
-        case Day:
-            computeZoomInterval(selectedInterval.end, TimeUtils.DAY_IN_MILLIS * value);
-            break;
-        case Hour:
-            computeZoomInterval(selectedInterval.end, 60 * 60 * 1000L * value);
-            break;
-        case Month:
-            computeZoomInterval(selectedInterval.end, (long) (30.6001 * TimeUtils.DAY_IN_MILLIS * value));
-            break;
-        case Year:
-            computeZoomInterval(selectedInterval.end, (long) (365.25 * TimeUtils.DAY_IN_MILLIS * value));
-            break;
-        case Carrington:
-            computeZoomInterval(selectedInterval.end, (long) (Carrington.CR_SYNODIC_MEAN * TimeUtils.DAY_IN_MILLIS * value));
-            break;
-        case Movie:
-            DrawController.setSelectedInterval(Movie.getStartTime(), Movie.getEndTime());
-            break;
-        case CUSTOM:
-            break;
+            case All:
+                DrawController.setSelectedInterval(availableInterval.start, availableInterval.end);
+                break;
+            case Day:
+                computeZoomInterval(selectedInterval.end, TimeUtils.DAY_IN_MILLIS * value);
+                break;
+            case Hour:
+                computeZoomInterval(selectedInterval.end, 60 * 60 * 1000L * value);
+                break;
+            case Month:
+                computeZoomInterval(selectedInterval.end, (long) (30.6001 * TimeUtils.DAY_IN_MILLIS * value));
+                break;
+            case Year:
+                computeZoomInterval(selectedInterval.end, (long) (365.25 * TimeUtils.DAY_IN_MILLIS * value));
+                break;
+            case Carrington:
+                computeZoomInterval(selectedInterval.end, (long) (Carrington.CR_SYNODIC_MEAN * TimeUtils.DAY_IN_MILLIS * value));
+                break;
+            case Movie:
+                DrawController.setSelectedInterval(Movie.getStartTime(), Movie.getEndTime());
+                break;
+            case CUSTOM:
+                break;
         }
     }
 

@@ -153,11 +153,11 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
             }
 
             Object[][] tableData = {
-                { "Proxy username", Settings.getProperty("proxy.username") },
-                { "Proxy password", pass },
+                    {"Proxy username", Settings.getProperty("proxy.username")},
+                    {"Proxy password", pass},
             };
 
-            model = new DefaultTableModel(tableData, new String[] { "Description", "Value" }) {
+            model = new DefaultTableModel(tableData, new String[]{"Description", "Value"}) {
                 @Override
                 public boolean isCellEditable(int row, int column) {
                     return column == 1;
@@ -179,7 +179,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
                         return super.getCellEditor(row, column);
                 }
             };
-            grid.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer () {
+            grid.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer() {
                 @Override
                 public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                     if (row == 1 && column == 1) {

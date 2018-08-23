@@ -2,13 +2,10 @@ package org.helioviewer.jhv;
 
 import java.io.File;
 
-/**
- * An enum containing all the directories mapped in a system independent way. If
- * a new directory is required, just add it here and it will be created at
- * startup.
- */
+// An enum containing all the directories mapped in a system independent way. If
+// a new directory is required, just add it here and it will be created at startup.
 public enum JHVDirectory {
-    /** The home directory. */
+    // The home directory
     HOME {
         private final String path = System.getProperty("user.home");
 
@@ -33,7 +30,7 @@ public enum JHVDirectory {
             return new File(getPath());
         }
     },
-    /** The JHV state directory. */
+    // The JHV state directory
     STATES {
         @Override
         public String getPath() {
@@ -45,7 +42,7 @@ public enum JHVDirectory {
             return new File(getPath());
         }
     },
-    /** The exports directory (movies, screenshots, meta data). */
+    // The exports directory (movies, screenshots, meta data)
     EXPORTS {
         @Override
         public String getPath() {
@@ -57,7 +54,7 @@ public enum JHVDirectory {
             return new File(getPath());
         }
     },
-    /** The log directory. */
+    // The log directory
     LOGS {
         @Override
         public String getPath() {
@@ -69,7 +66,7 @@ public enum JHVDirectory {
             return new File(getPath());
         }
     },
-    /** The log settings directory. */
+    // The log settings directory
     SETTINGS {
         @Override
         public String getPath() {
@@ -81,7 +78,7 @@ public enum JHVDirectory {
             return new File(getPath());
         }
     },
-    /** The remote files directory. */
+    // The remote files directory
     REMOTEFILES {
         @Override
         public String getPath() {
@@ -93,7 +90,7 @@ public enum JHVDirectory {
             return new File(getPath());
         }
     },
-    /** Directory of automatically loaded GIMP gradient files. */
+    // Directory of automatically loaded GIMP gradient files
     COLOR_PLUGINS {
         @Override
         public String getPath() {
@@ -127,11 +124,10 @@ public enum JHVDirectory {
             return new File(getPath());
         }
     };
-
-    /** A String representation of the path of the directory. */
+    // A String representation of the path of the directory
     public abstract String getPath();
 
-    /** A File representation of the path of the directory. */
+    // A File representation of the path of the directory
     public abstract File getFile();
 
 }

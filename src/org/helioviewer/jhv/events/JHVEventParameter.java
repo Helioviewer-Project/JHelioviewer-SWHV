@@ -9,13 +9,11 @@ public class JHVEventParameter {
 
     private static final NumberFormat numFormatter = new DecimalFormat("0.###E0");
 
-    /** The name of the parameter */
+    // The name of the parameter
     private final String parameterName;
-
-    /** How the parameter is displayed */
+    // How the parameter is displayed
     private final String parameterDisplayName;
-
-    /** The value of the parameter */
+    // The value of the parameter
     private final String parameterValue;
 
     private String parameterDisplayValue;

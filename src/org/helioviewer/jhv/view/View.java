@@ -26,33 +26,44 @@ public interface View {
     void render(Camera camera, Viewport vp, double factor);
 
     URI getURI();
+
     boolean isLocal();
+
     String getName();
 
     @Nullable
     LUT getDefaultLUT();
 
     boolean isMultiFrame();
+
     int getCurrentFrameNumber();
+
     int getMaximumFrameNumber();
+
     int getCurrentFramerate();
 
     void setDataHandler(ImageDataHandler dataHandler);
 
     boolean isDownloading();
+
     boolean isComplete();
 
     AtomicBoolean getFrameCacheStatus(int frame);
 
     JHVDate getFrameTime(int frame);
+
     JHVDate getFirstTime();
+
     JHVDate getLastTime();
 
     // <!- only for Layers
     @Nullable
     JHVDate getNextTime(AnimationMode mode, int deltaT);
+
     void setFrame(JHVDate time);
+
     JHVDate getFrameTime(JHVDate time);
+
     MetaData getMetaData(JHVDate time);
     // -->
 

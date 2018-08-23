@@ -12,8 +12,8 @@ import com.jidesoft.icons.IconsFactory;
 public class IconBank {
 
     private static final ImageIcon blank = new ImageIcon(GraphicsEnvironment.getLocalGraphicsEnvironment().
-                                                         getDefaultScreenDevice().getDefaultConfiguration().
-                                                         createCompatibleImage(32, 32, Transparency.OPAQUE));
+            getDefaultScreenDevice().getDefaultConfiguration().
+            createCompatibleImage(32, 32, Transparency.OPAQUE));
 
     // The enum has all the icons, you supply these enums to the getIcon method
     public enum JHVIcon {

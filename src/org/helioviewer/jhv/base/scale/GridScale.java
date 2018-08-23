@@ -12,13 +12,21 @@ import org.helioviewer.jhv.position.Position;
 public interface GridScale {
 
     double getInterpolatedXValue(double v);
+
     double getInterpolatedYValue(double v);
+
     double getXValueInv(double v);
+
     double getYValueInv(double v);
+
     double getYstart();
+
     double getYstop();
+
     void set(double _xStart, double _xStop, double _yStart, double _yStop);
+
     Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridType gridType);
+
     Vec2 mouseToGridInv(int px, int py, Viewport vp, Camera camera);
 
     GridScale polar = new GridScaleIdentity(0, 360, 0, 0);

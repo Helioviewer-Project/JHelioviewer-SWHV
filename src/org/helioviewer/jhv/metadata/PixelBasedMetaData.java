@@ -23,7 +23,7 @@ public class PixelBasedMetaData extends AbstractMetaData {
     @Override
     public Region roiToRegion(SubImage roi, double factorX, double factorY) {
         return new Region(roi.x * factorX * unitPerPixelX - 0.5, roi.y * factorY * unitPerPixelY - 0.5,
-                          roi.width * factorX * unitPerPixelX, roi.height * factorY * unitPerPixelY);
+                roi.width * factorX * unitPerPixelX, roi.height * factorY * unitPerPixelY);
     }
 
 }

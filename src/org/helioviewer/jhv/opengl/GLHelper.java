@@ -84,6 +84,7 @@ public class GLHelper {
         vexBuf.put4f(x, y, 0, 1).put4b(color);
         return tf;
     }
+
     /*
         public static GLCanvas createGLCanvas() {
             GLProfile profile = GLProfile.getDefault();

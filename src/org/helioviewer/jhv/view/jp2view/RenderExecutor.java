@@ -16,8 +16,8 @@ class RenderExecutor {
     private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<>(1);
     // no need to intercept exceptions
     private final ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue,
-                                                                    new JHVThread.NamedThreadFactory("Render"),
-                                                                    new ThreadPoolExecutor.DiscardPolicy());
+            new JHVThread.NamedThreadFactory("Render"),
+            new ThreadPoolExecutor.DiscardPolicy());
 
     void execute(JP2View view, Camera camera, Viewport vp, int frame, double factor) {
         // order is important, this will signal reader

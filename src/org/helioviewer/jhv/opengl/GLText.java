@@ -18,8 +18,8 @@ public class GLText {
     private static final int SIZE = (MAX - MIN) / STEP + 1;
     private static final JhvTextRenderer[] renderer = new JhvTextRenderer[SIZE];
 
-    public static final float[] shadowColor = { 0.1f, 0.1f, 0.1f, 0.75f };
-    public static final int[] shadowOffset = { 2, -2 };
+    public static final float[] shadowColor = {0.1f, 0.1f, 0.1f, 0.75f};
+    public static final int[] shadowOffset = {2, -2};
 
     public static JhvTextRenderer getRenderer(int size) {
         size *= GLInfo.pixelScale[1];

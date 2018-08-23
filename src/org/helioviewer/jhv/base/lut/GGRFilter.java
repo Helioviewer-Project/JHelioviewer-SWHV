@@ -6,13 +6,12 @@ import javax.swing.filechooser.FileFilter;
 
 /**
  * Filter for gimp gradient files ggr
- * 
+ *
  * @author Helge Dietert
- * 
  */
 class GGRFilter extends FileFilter implements java.io.FileFilter {
 
-    private static final String[] extensions = { "ggr" };
+    private static final String[] extensions = {"ggr"};
 
     @Override
     public boolean accept(File f) {

@@ -9,6 +9,7 @@ import org.helioviewer.jhv.position.Position;
 public interface Transform {
 
     Vec2 transform(Position viewpoint, Vec3 pt, GridScale scale);
+
     Vec3 transformInverse(Quat frame, Vec2 pt);
 
     Transform transformpolar = new TransformPolar();

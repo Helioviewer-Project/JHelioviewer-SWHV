@@ -89,7 +89,7 @@ public class JHVEventCache {
     private static void checkAssociation(JHVEvent event) {
         int uid = event.getUniqueID();
         JHVRelatedEvents rEvent = relEvents.get(uid);
-        for (Iterator<JHVAssociation> iterator = assocs.iterator(); iterator.hasNext();) {
+        for (Iterator<JHVAssociation> iterator = assocs.iterator(); iterator.hasNext(); ) {
             JHVAssociation tocheck = iterator.next();
             if (tocheck.left == uid && relEvents.containsKey(tocheck.right)) {
                 merge(rEvent, relEvents.get(tocheck.right));

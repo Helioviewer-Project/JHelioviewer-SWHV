@@ -360,7 +360,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         int idx = 0;
         for (JHVRelatedEvents evtr : evs) {
             bindTexture(gl, evtr.getSupplier().getGroup());
-            glslTexture.render(gl, GL2.GL_TRIANGLE_STRIP, Colors.floats(evtr.getColor(), ICON_ALPHA) , idx, 4);
+            glslTexture.render(gl, GL2.GL_TRIANGLE_STRIP, Colors.floats(evtr.getColor(), ICON_ALPHA), idx, 4);
             idx += 4;
         }
     }
