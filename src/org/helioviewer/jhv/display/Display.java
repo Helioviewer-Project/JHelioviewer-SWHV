@@ -63,7 +63,7 @@ public class Display implements ActionListener, JHVEventHighlightListener {
     }
 
     private static final Camera camera = new Camera();
-    private static final Camera miniCamera = new Camera().setViewpointUpdate(UpdateViewpoint.fixedDistance);
+    private static final Camera miniCamera = new Camera().setViewpointUpdate(UpdateViewpoint.earthFixedDistance);
 
     public static Camera getCamera() {
         return camera;
