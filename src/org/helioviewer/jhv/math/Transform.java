@@ -34,12 +34,8 @@ public class Transform {
         view.translation(x, y, z);
     }
 
-    public static void translateView(float x, float y, float z) {
-        view.translate(x, y, z);
-    }
-
-    public static void rotateView(float ang, float x, float y, float z) { // degrees, axis normalized
-        view.rotate((float) (Math.PI / 180.) * ang, x, y, z);
+    public static void mulView(Matrix4f m) {
+        view.mulAffine(m);
     }
 
     public static void rotateView(Quat q) {
