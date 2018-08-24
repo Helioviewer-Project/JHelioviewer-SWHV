@@ -180,10 +180,12 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         Buf buf = evtr.isHighlighted() ? bufThick : bufEvent;
         byte[] color = Colors.bytes(evtr.getColor());
 
-        // draw bounds
+        Position viewpoint = camera.getViewpoint();
         Vec3 pt = new Vec3();
-        float[] oldBoundaryPoint3d = new float[0];
         Vec2 previous = null;
+
+        // draw bounds
+        float[] oldBoundaryPoint3d = new float[0];
         int plen = points.length / 3;
         for (int i = 0; i < plen; i++) {
             if (oldBoundaryPoint3d.length != 0) {
@@ -207,9 +209,9 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                         pt.y = ynew / r;
                         pt.z = znew / r;
                         if (j == 0) {
-                            previous = GLHelper.drawVertex(camera, vp, pt, previous, buf, Colors.Null);
+                            previous = GLHelper.drawVertex(viewpoint, vp, pt, previous, buf, Colors.Null);
                         }
-                        previous = GLHelper.drawVertex(camera, vp, pt, previous, buf, color);
+                        previous = GLHelper.drawVertex(viewpoint, vp, pt, previous, buf, color);
                     }
                 }
                 buf.repeat4f().put4b(Colors.Null);
