@@ -9,6 +9,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
+import org.helioviewer.jhv.position.Position;
 import org.json.JSONObject;
 
 public class AnnotateCross extends AbstractAnnotateable {
@@ -26,11 +27,12 @@ public class AnnotateCross extends AbstractAnnotateable {
         Vec3 p3 = new Vec3(radius, bp.y, bp.z + delta);
         Vec3 p4 = new Vec3(radius, bp.y, bp.z - delta);
 
-        interpolatedDraw(camera, vp, p1, p2, buf, color);
-        interpolatedDraw(camera, vp, p3, p4, buf, color);
+        Position viewpoint = camera.getViewpoint();
+        interpolatedDraw(viewpoint, vp, p1, p2, buf, color);
+        interpolatedDraw(viewpoint, vp, p3, p4, buf, color);
     }
 
-    private static void interpolatedDraw(Camera camera, Viewport vp, Vec3 p1s, Vec3 p2s, Buf buf, byte[] color) {
+    private static void interpolatedDraw(Position viewpoint, Viewport vp, Vec3 p1s, Vec3 p2s, Buf buf, byte[] color) {
         Vec2 previous = null;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, p1s, p2s);
@@ -46,11 +48,11 @@ public class AnnotateCross extends AbstractAnnotateable {
             } else {
                 pc.y = -pc.y;
                 if (i == 0) {
-                    GLHelper.drawVertex(camera, vp, pc, previous, buf, Colors.Null);
+                    GLHelper.drawVertex(viewpoint, vp, pc, previous, buf, Colors.Null);
                 }
-                previous = GLHelper.drawVertex(camera, vp, pc, previous, buf, color);
+                previous = GLHelper.drawVertex(viewpoint, vp, pc, previous, buf, color);
                 if (i == SUBDIVISIONS) {
-                    GLHelper.drawVertex(camera, vp, pc, previous, buf, Colors.Null);
+                    GLHelper.drawVertex(viewpoint, vp, pc, previous, buf, Colors.Null);
                 }
             }
         }

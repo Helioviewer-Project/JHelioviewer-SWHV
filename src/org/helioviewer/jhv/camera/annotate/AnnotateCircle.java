@@ -9,6 +9,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
+import org.helioviewer.jhv.position.Position;
 import org.json.JSONObject;
 
 public class AnnotateCircle extends AbstractAnnotateable {
@@ -29,8 +30,9 @@ public class AnnotateCircle extends AbstractAnnotateable {
         u.normalize();
         Vec3 v = Vec3.cross(bp, u);
 
-        Vec2 previous = null;
+        Position viewpoint = camera.getViewpoint();
         Vec3 vx = new Vec3();
+        Vec2 previous = null;
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             double t = i * 2. * Math.PI / SUBDIVISIONS;
@@ -50,11 +52,11 @@ public class AnnotateCircle extends AbstractAnnotateable {
             } else {
                 vx.y = -vx.y;
                 if (i == 0) {
-                    GLHelper.drawVertex(camera, vp, vx, previous, buf, Colors.Null);
+                    GLHelper.drawVertex(viewpoint, vp, vx, previous, buf, Colors.Null);
                 }
-                previous = GLHelper.drawVertex(camera, vp, vx, previous, buf, color);
+                previous = GLHelper.drawVertex(viewpoint, vp, vx, previous, buf, color);
                 if (i == SUBDIVISIONS) {
-                    GLHelper.drawVertex(camera, vp, vx, previous, buf, Colors.Null);
+                    GLHelper.drawVertex(viewpoint, vp, vx, previous, buf, Colors.Null);
                 }
             }
         }

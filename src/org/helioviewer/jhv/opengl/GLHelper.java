@@ -5,7 +5,6 @@ import java.awt.Point;
 
 import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
@@ -54,9 +53,8 @@ public class GLHelper {
         return new Dimension((int) (x / GLInfo.pixelScaleFloat[0]), (int) (y / GLInfo.pixelScaleFloat[1]));
     }
 
-    public static Vec2 drawVertex(Camera camera, Viewport vp, Vec3 current, Vec2 previous, Buf vexBuf, byte[] color) {
-        Position viewpoint = camera.getViewpoint();
-        Vec3 pt = viewpoint.toQuat().rotateVector(current);
+    public static Vec2 drawVertex(Position viewpoint, Viewport vp, Vec3 vertex, Vec2 previous, Buf vexBuf, byte[] color) {
+        Vec3 pt = viewpoint.toQuat().rotateVector(vertex);
         Vec2 tf = Display.mode.xform.transform(viewpoint, pt, Display.mode.scale);
 
         float x;

@@ -9,6 +9,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
+import org.helioviewer.jhv.position.Position;
 import org.json.JSONObject;
 
 public class AnnotateRectangle extends AbstractAnnotateable {
@@ -29,9 +30,10 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
         Vec3 p2 = new Vec3(radius, ep.y, bp.z);
         Vec3 p4 = new Vec3(radius, bp.y, ep.z);
-
-        Vec2 previous = null;
         Vec3 point1, point2;
+
+        Position viewpoint = camera.getViewpoint();
+        Vec2 previous = null;
 
         point1 = bp;
         point2 = p2;
@@ -45,9 +47,9 @@ public class AnnotateRectangle extends AbstractAnnotateable {
             } else {
                 pc.y = -pc.y;
                 if (i == 0) {
-                    GLHelper.drawVertex(camera, vp, pc, previous, buf, Colors.Null);
+                    GLHelper.drawVertex(viewpoint, vp, pc, previous, buf, Colors.Null);
                 }
-                previous = GLHelper.drawVertex(camera, vp, pc, previous, buf, color);
+                previous = GLHelper.drawVertex(viewpoint, vp, pc, previous, buf, color);
             }
         }
 
@@ -59,7 +61,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
                 buf.put4f(pc).put4b(color);
             } else {
                 pc.y = -pc.y;
-                previous = GLHelper.drawVertex(camera, vp, pc, previous, buf, color);
+                previous = GLHelper.drawVertex(viewpoint, vp, pc, previous, buf, color);
             }
         }
 
@@ -71,7 +73,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
                 buf.put4f(pc).put4b(color);
             } else {
                 pc.y = -pc.y;
-                previous = GLHelper.drawVertex(camera, vp, pc, previous, buf, color);
+                previous = GLHelper.drawVertex(viewpoint, vp, pc, previous, buf, color);
             }
         }
 
@@ -86,9 +88,9 @@ public class AnnotateRectangle extends AbstractAnnotateable {
                 }
             } else {
                 pc.y = -pc.y;
-                previous = GLHelper.drawVertex(camera, vp, pc, previous, buf, color);
+                previous = GLHelper.drawVertex(viewpoint, vp, pc, previous, buf, color);
                 if (i == SUBDIVISIONS) {
-                    GLHelper.drawVertex(camera, vp, pc, previous, buf, Colors.Null);
+                    GLHelper.drawVertex(viewpoint, vp, pc, previous, buf, Colors.Null);
                 }
             }
         }
