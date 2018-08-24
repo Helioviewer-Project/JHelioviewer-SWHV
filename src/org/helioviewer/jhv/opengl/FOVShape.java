@@ -6,7 +6,7 @@ import org.helioviewer.jhv.base.Colors;
 public class FOVShape {
 
     public static final int SUBDIVISIONS = 24;
-    private static final float SIZE_POINT = 0.02f;
+    private static final float SIZE_POINT = 0.01f;
     private static final double epsilon = 0.006;
 
     private double centerX = 0;

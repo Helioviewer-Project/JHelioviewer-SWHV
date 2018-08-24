@@ -46,7 +46,7 @@ class GLSLLineShader extends GLSLShader {
     void bindParams(GL2 gl, double aspect, double _thickness) {
         viewport[0] = (float) aspect;
         gl.glUniform4fv(viewportRef, 1, viewport, 0);
-        thickness[0] = (float) (0.5 * _thickness * 5);
+        thickness[0] = (float) (0.5 * _thickness);
         gl.glUniform1fv(thicknessRef, 1, thickness, 0);
     }
 

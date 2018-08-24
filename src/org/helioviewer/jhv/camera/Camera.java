@@ -40,15 +40,18 @@ public class Camera {
     public void projectionOrtho2D(double aspect) {
         Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -1, 1);
         Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
+        Transform.cacheMVP();
     }
 
     public void projectionOrtho(double aspect, GL2 gl, GLSLShape blackCircle) {
         Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -depthClose, depthClose);
         Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
+        Transform.cacheMVP();
 
         blackCircle.renderShape(gl, GL2.GL_TRIANGLE_STRIP);
 
         Transform.rotateView(rotation);
+        Transform.cacheMVP();
     }
 
     public float[] getTransformationInverse(double aspect) {
