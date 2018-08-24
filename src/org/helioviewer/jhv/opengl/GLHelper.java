@@ -65,18 +65,16 @@ public class GLHelper {
             if (tf.x <= 0 && previous.x >= 0) {
                 x = (float) (0.5 * vp.aspect);
                 vexBuf.put4f(x, y, 0, 1).put4b(color);
-
                 vexBuf.put4f(x, y, 0, 1).put4b(Colors.Null);
-                vexBuf.put4f(-x, y, 0, 1).put4b(Colors.Null);
 
+                vexBuf.put4f(-x, y, 0, 1).put4b(Colors.Null);
                 vexBuf.put4f(-x, y, 0, 1).put4b(color);
             } else if (tf.x >= 0 && previous.x <= 0) {
                 x = (float) (-0.5 * vp.aspect);
                 vexBuf.put4f(x, y, 0, 1).put4b(color);
-
                 vexBuf.put4f(x, y, 0, 1).put4b(Colors.Null);
-                vexBuf.put4f(-x, y, 0, 1).put4b(Colors.Null);
 
+                vexBuf.put4f(-x, y, 0, 1).put4b(Colors.Null);
                 vexBuf.put4f(-x, y, 0, 1).put4b(color);
             }
         }

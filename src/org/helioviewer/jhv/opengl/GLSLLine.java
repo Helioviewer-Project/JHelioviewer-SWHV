@@ -20,15 +20,14 @@ public class GLSLLine extends VAO {
     }
 
     public void setData(GL2 gl, Buf buf) {
-        int plen = buf.getFloats() / size0;
-        if (plen == 0)
+        if ((count = buf.getFloats() / size0) == 0)
             return;
-        if (plen * size0 != buf.getFloats() || plen != buf.getBytes4()) {
+        if (count * size0 != buf.getFloats() || count != buf.getBytes4()) {
             Log.error("Something is wrong with the attributes of this GLSLLine");
             return;
         }
         vbo.setData(gl, buf);
-        count = plen - 1;
+        count--;
     }
 
     public void render(GL2 gl, Viewport vp, double thickness) {
