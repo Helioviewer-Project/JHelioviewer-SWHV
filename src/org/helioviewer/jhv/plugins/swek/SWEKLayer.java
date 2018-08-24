@@ -369,6 +369,9 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (isVisible[vp.idx]) {
             ArrayList<JHVRelatedEvents> evs = SWEKData.getActiveEvents(controller.currentTime);
+            if (evs.isEmpty())
+                return;
+
             for (JHVRelatedEvents evtr : evs) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
                 if (evt.isCactus()) {
@@ -391,6 +394,9 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     public void renderScale(Camera camera, Viewport vp, GL2 gl) {
         if (isVisible[vp.idx]) {
             ArrayList<JHVRelatedEvents> evs = SWEKData.getActiveEvents(controller.currentTime);
+            if (evs.isEmpty())
+                return;
+
             for (JHVRelatedEvents evtr : evs) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
                 if (evt.isCactus() && (Display.mode == Display.DisplayMode.LogPolar || Display.mode == Display.DisplayMode.Polar)) {

@@ -8,10 +8,12 @@ import com.jogamp.opengl.GL2;
 
 class VBO {
 
+    private final int target;
     private final int bufferID;
     private final int usage;
 
-    VBO(GL2 gl, boolean dynamic) {
+    VBO(GL2 gl, int _target, boolean dynamic) {
+        target = _target;
         int[] tmpId = new int[1];
         gl.glGenBuffers(1, tmpId, 0);
         bufferID = tmpId[0];
@@ -23,7 +25,7 @@ class VBO {
     }
 
     void bind(GL2 gl) {
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, bufferID);
+        gl.glBindBuffer(target, bufferID);
     }
 
     void setData(GL2 gl, Buf buf) {
@@ -33,9 +35,9 @@ class VBO {
     }
 
     private void setBufferData(GL2 gl, int limit, int capacity, Buffer buffer) {
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, bufferID);
-        gl.glBufferData(GL2.GL_ARRAY_BUFFER, capacity, null, usage); // https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
-        gl.glBufferSubData(GL2.GL_ARRAY_BUFFER, 0, limit, buffer);
+        gl.glBindBuffer(target, bufferID);
+        gl.glBufferData(target, capacity, null, usage); // https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
+        gl.glBufferSubData(target, 0, limit, buffer);
     }
 
 }

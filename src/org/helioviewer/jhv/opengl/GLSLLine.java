@@ -21,6 +21,8 @@ public class GLSLLine extends VAO {
 
     public void setData(GL2 gl, Buf buf) {
         int plen = buf.getFloats() / size0;
+        if (plen == 0)
+            return;
         if (plen * size0 != buf.getFloats() || plen != buf.getBytes4()) {
             Log.error("Something is wrong with the attributes of this GLSLLine");
             return;
@@ -34,9 +36,8 @@ public class GLSLLine extends VAO {
             return;
 
         GLSLLineShader.line.bind(gl);
-        GLSLLineShader.line.setThickness(thickness);
-        GLSLLineShader.line.setViewport(vp.aspect);
-        GLSLLineShader.line.bindParams(gl);
+        GLSLLineShader.line.bindParams(gl, vp.aspect, thickness);
+        GLSLLineShader.line.bindMVP(gl);
 
         bind(gl);
         gl.glDrawArraysInstanced(GL2.GL_TRIANGLE_STRIP, 0, 4, count);

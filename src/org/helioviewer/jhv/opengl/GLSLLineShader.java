@@ -43,18 +43,15 @@ class GLSLLineShader extends GLSLShader {
         viewportRef = gl.glGetUniformLocation(progID, "viewport");
     }
 
-    void bindParams(GL2 gl) {
-        gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, Transform.get());
+    void bindParams(GL2 gl, double aspect, double _thickness) {
+        viewport[0] = (float) aspect;
         gl.glUniform4fv(viewportRef, 1, viewport, 0);
+        thickness[0] = (float) (0.5 * _thickness * 5);
         gl.glUniform1fv(thicknessRef, 1, thickness, 0);
     }
 
-    void setViewport(double aspect) {
-        viewport[0] = (float) aspect;
-    }
-
-    void setThickness(double _thickness) {
-        thickness[0] = (float) (0.5 * _thickness);
+    void bindMVP(GL2 gl) {
+        gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, Transform.get());
     }
 
 }

@@ -26,7 +26,7 @@ class VAO {
             gl.glGenVertexArrays(1, tmpId, 0);
             vaoID = tmpId[0];
 
-            vbo = new VBO(gl, dynamic);
+            vbo = new VBO(gl, GL2.GL_ARRAY_BUFFER, dynamic);
             vbo.bind(gl);
 
             gl.glBindVertexArray(vaoID);

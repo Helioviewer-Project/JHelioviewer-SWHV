@@ -41,13 +41,13 @@ class GLSLShapeShader extends GLSLShader {
         factorRef = gl.glGetUniformLocation(progID, "factor");
     }
 
-    void bindParams(GL2 gl) {
-        gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, Transform.get());
+    void bindParams(GL2 gl, double _factor) {
+        factor[0] = (float) _factor;
         gl.glUniform1fv(factorRef, 1, factor, 0);
     }
 
-    void setFactor(double _factor) {
-        factor[0] = (float) _factor;
+    void bindMVP(GL2 gl) {
+        gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, Transform.get());
     }
 
 }
