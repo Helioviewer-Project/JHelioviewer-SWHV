@@ -40,7 +40,7 @@ void main(void) {
     col[2] = NextColor;
     col[3] = NextColor;
 
-    int idx = gl_VertexID & 0x3;
+    int idx = gl_VertexID; // & 0x3
     gl_Position = pos[idx] / viewport;
     fragColor = col[idx];
 }
