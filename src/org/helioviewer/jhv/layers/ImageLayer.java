@@ -176,7 +176,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
         GridScale scale = Display.mode.scale;
         GLSLSolarShader shader = Display.mode.shader;
-        shader.bind(gl);
+        shader.use(gl);
 
         glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
         shader.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height);
