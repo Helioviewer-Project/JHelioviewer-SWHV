@@ -19,6 +19,8 @@ public class GLSLTexture extends VAO {
 
     public void setData(GL2 gl, Buf buf) {
         int plen = buf.getFloats() / (size0 + size1);
+        if (plen == 0)
+            return;
         if (plen * (size0 + size1) != buf.getFloats()) {
             Log.error("Something is wrong with the attributes of this GLSLTexture");
             return;
@@ -32,8 +34,8 @@ public class GLSLTexture extends VAO {
             return;
 
         GLSLTextureShader.texture.bind(gl);
-        GLSLTextureShader.texture.setColor(color);
-        GLSLTextureShader.texture.bindParams(gl);
+        GLSLTextureShader.texture.bindParams(gl, color);
+        GLSLTextureShader.texture.bindMVP(gl);
 
         bind(gl);
         gl.glDrawArrays(mode, first, toDraw);

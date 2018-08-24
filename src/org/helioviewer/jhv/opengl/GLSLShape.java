@@ -19,6 +19,8 @@ public class GLSLShape extends VAO {
 
     public void setData(GL2 gl, Buf buf) {
         int plen = buf.getFloats() / size0;
+        if (plen == 0)
+            return;
         if (plen * size0 != buf.getFloats() || plen != buf.getBytes4()) {
             Log.error("Something is wrong with the attributes of this GLSLShape");
             return;
@@ -32,8 +34,8 @@ public class GLSLShape extends VAO {
             return;
 
         GLSLShapeShader.point.bind(gl);
-        GLSLShapeShader.point.setFactor(factor);
-        GLSLShapeShader.point.bindParams(gl);
+        GLSLShapeShader.point.bindParams(gl, factor);
+        GLSLShapeShader.point.bindMVP(gl);
 
         bind(gl);
         gl.glDrawArrays(GL2.GL_POINTS, 0, count);
@@ -44,7 +46,7 @@ public class GLSLShape extends VAO {
             return;
 
         GLSLShapeShader.shape.bind(gl);
-        GLSLShapeShader.shape.bindParams(gl);
+        GLSLShapeShader.shape.bindMVP(gl);
 
         bind(gl);
         gl.glDrawArrays(mode, 0, count);

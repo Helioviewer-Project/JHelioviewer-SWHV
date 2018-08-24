@@ -11,8 +11,6 @@ class GLSLTextureShader extends GLSLShader {
     private int refModelViewProjectionMatrix;
     private int colorRef;
 
-    private float[] color = {1, 1, 1, 1};
-
     private GLSLTextureShader(String vertex, String fragment) {
         super(vertex, fragment);
     }
@@ -40,13 +38,12 @@ class GLSLTextureShader extends GLSLShader {
         setTextureUnit(gl, "image", GLTexture.Unit.ZERO);
     }
 
-    void bindParams(GL2 gl) {
-        gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, Transform.get());
+    void bindParams(GL2 gl, float[] color) {
         gl.glUniform4fv(colorRef, 1, color, 0);
     }
 
-    void setColor(float[] _color) {
-        color = _color;
+    void bindMVP(GL2 gl) {
+        gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, Transform.get());
     }
 
 }
