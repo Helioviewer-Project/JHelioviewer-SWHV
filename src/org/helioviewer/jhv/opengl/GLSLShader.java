@@ -8,7 +8,7 @@ import org.helioviewer.jhv.log.Log;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLException;
 
-public class GLSLShader {
+abstract class GLSLShader {
 
     private enum ShaderType {
         vertex(GL2.GL_VERTEX_SHADER), fragment(GL2.GL_FRAGMENT_SHADER);
@@ -44,17 +44,16 @@ public class GLSLShader {
             fragmentID = attachShader(gl, ShaderType.fragment, fragmentText);
 
             initializeProgram(gl, true);
-            _after_init(gl);
+            bind(gl);
+            initUniforms(gl);
         } catch (Exception e) {
             throw new GLException("Cannot load shader", e);
         }
     }
 
-    protected void bindAttribs(GL2 gl) {
-    }
+    protected abstract void bindAttribLocations(GL2 gl);
 
-    protected void _after_init(GL2 gl) {
-    }
+    protected abstract void initUniforms(GL2 gl);
 
     protected void _dispose(GL2 gl) {
         gl.glDeleteShader(vertexID);
@@ -112,7 +111,7 @@ public class GLSLShader {
         gl.glAttachShader(progID, vertexID);
         gl.glAttachShader(progID, fragmentID);
 
-        bindAttribs(gl);
+        bindAttribLocations(gl);
         gl.glLinkProgram(progID);
 
         int[] params = {0};

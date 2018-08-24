@@ -28,7 +28,7 @@ class GLSLLineShader extends GLSLShader {
     }
 
     @Override
-    protected void bindAttribs(GL2 gl) {
+    protected void bindAttribLocations(GL2 gl) {
         gl.glBindAttribLocation(progID, 0, "Vertex");
         gl.glBindAttribLocation(progID, 1, "Color");
         gl.glBindAttribLocation(progID, 2, "NextVertex");
@@ -36,8 +36,7 @@ class GLSLLineShader extends GLSLShader {
     }
 
     @Override
-    protected void _after_init(GL2 gl) {
-        bind(gl);
+    protected void initUniforms(GL2 gl) {
         refModelViewProjectionMatrix = gl.glGetUniformLocation(progID, "ModelViewProjectionMatrix");
         thicknessRef = gl.glGetUniformLocation(progID, "thickness");
         viewportRef = gl.glGetUniformLocation(progID, "viewport");

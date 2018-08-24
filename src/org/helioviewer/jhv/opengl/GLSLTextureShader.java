@@ -24,14 +24,13 @@ class GLSLTextureShader extends GLSLShader {
     }
 
     @Override
-    protected void bindAttribs(GL2 gl) {
+    protected void bindAttribLocations(GL2 gl) {
         gl.glBindAttribLocation(progID, 0, "Vertex");
         gl.glBindAttribLocation(progID, 1, "Coord");
     }
 
     @Override
-    protected void _after_init(GL2 gl) {
-        bind(gl);
+    protected void initUniforms(GL2 gl) {
         refModelViewProjectionMatrix = gl.glGetUniformLocation(progID, "ModelViewProjectionMatrix");
         colorRef = gl.glGetUniformLocation(progID, "color");
 
