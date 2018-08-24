@@ -74,9 +74,11 @@ public class InteractionAnnotate extends Interaction {
 
         for (Annotateable ann : anns) {
             ann.render(camera, vp, ann == activeAnn, annsBuf);
+            ann.renderTransformed(camera, ann == activeAnn, transBuf, centerBuf);
         }
         if (newAnnotateable != null) {
             newAnnotateable.render(camera, vp, false, annsBuf);
+            newAnnotateable.renderTransformed(camera, false, transBuf, centerBuf);
         }
         annsLine.setData(gl, annsBuf);
         annsLine.render(gl, vp, LINEWIDTH);
@@ -84,12 +86,6 @@ public class InteractionAnnotate extends Interaction {
         Transform.pushView();
         Transform.rotateViewInverse(camera.getViewpoint().toQuat());
         {
-            for (Annotateable ann : anns) {
-                ann.renderTransformed(camera, ann == activeAnn, transBuf, centerBuf);
-            }
-            if (newAnnotateable != null) {
-                newAnnotateable.renderTransformed(camera, false, transBuf, centerBuf);
-            }
             transLine.setData(gl, transBuf);
             transLine.render(gl, vp, LINEWIDTH);
 

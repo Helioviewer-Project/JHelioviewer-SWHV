@@ -34,7 +34,7 @@ public class GLSLLine extends VAO {
         if (count == 0)
             return;
 
-        GLSLLineShader.line.bind(gl);
+        GLSLLineShader.line.use(gl);
         GLSLLineShader.line.bindParams(gl, vp.aspect, thickness);
         GLSLLineShader.line.bindMVP(gl);
 

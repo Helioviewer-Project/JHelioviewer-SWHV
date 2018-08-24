@@ -20,11 +20,11 @@ abstract class GLSLShader {
         }
     }
 
-    private static int boundID; // track state
+    private static int usedID; // track state
 
+    protected int progID;
     private int vertexID;
     private int fragmentID;
-    protected int progID;
 
     private final String vertex;
     private final String fragment;
@@ -34,7 +34,7 @@ abstract class GLSLShader {
         fragment = _fragment;
     }
 
-    protected void _init(GL2 gl, boolean common) {
+    protected final void _init(GL2 gl, boolean common) {
         try {
             String vertexText = FileUtils.streamToString(FileUtils.getResource(vertex));
             vertexID = attachShader(gl, ShaderType.vertex, vertexText);
@@ -44,29 +44,29 @@ abstract class GLSLShader {
             fragmentID = attachShader(gl, ShaderType.fragment, fragmentText);
 
             initializeProgram(gl, true);
-            bind(gl);
+            use(gl);
             initUniforms(gl);
         } catch (Exception e) {
             throw new GLException("Cannot load shader", e);
         }
     }
 
-    protected abstract void bindAttribLocations(GL2 gl);
-
-    protected abstract void initUniforms(GL2 gl);
-
-    protected void _dispose(GL2 gl) {
+    protected final void _dispose(GL2 gl) {
         gl.glDeleteShader(vertexID);
         gl.glDeleteShader(fragmentID);
         gl.glDeleteProgram(progID);
     }
 
-    public final void bind(GL2 gl) {
-        if (progID != boundID) {
-            boundID = progID;
+    public final void use(GL2 gl) {
+        if (progID != usedID) {
+            usedID = progID;
             gl.glUseProgram(progID);
         }
     }
+
+    protected abstract void bindAttribLocations(GL2 gl);
+
+    protected abstract void initUniforms(GL2 gl);
 
     protected final void setTextureUnit(GL2 gl, String texname, GLTexture.Unit unit) {
         int id = gl.glGetUniformLocation(progID, texname);

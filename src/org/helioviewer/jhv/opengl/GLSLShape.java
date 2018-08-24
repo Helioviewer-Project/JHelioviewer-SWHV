@@ -31,7 +31,7 @@ public class GLSLShape extends VAO {
         if (count == 0)
             return;
 
-        GLSLShapeShader.point.bind(gl);
+        GLSLShapeShader.point.use(gl);
         GLSLShapeShader.point.bindParams(gl, factor);
         GLSLShapeShader.point.bindMVP(gl);
 
@@ -43,7 +43,7 @@ public class GLSLShape extends VAO {
         if (count == 0)
             return;
 
-        GLSLShapeShader.shape.bind(gl);
+        GLSLShapeShader.shape.use(gl);
         GLSLShapeShader.shape.bindMVP(gl);
 
         bind(gl);

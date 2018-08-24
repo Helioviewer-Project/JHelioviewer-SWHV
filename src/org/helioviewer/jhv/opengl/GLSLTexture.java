@@ -31,7 +31,7 @@ public class GLSLTexture extends VAO {
         if (count == 0 || toDraw > count)
             return;
 
-        GLSLTextureShader.texture.bind(gl);
+        GLSLTextureShader.texture.use(gl);
         GLSLTextureShader.texture.bindParams(gl, color);
         GLSLTextureShader.texture.bindMVP(gl);
 
