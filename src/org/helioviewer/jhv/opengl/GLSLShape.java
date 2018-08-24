@@ -18,15 +18,13 @@ public class GLSLShape extends VAO {
     }
 
     public void setData(GL2 gl, Buf buf) {
-        int plen = buf.getFloats() / size0;
-        if (plen == 0)
+        if ((count = buf.getFloats() / size0) == 0)
             return;
-        if (plen * size0 != buf.getFloats() || plen != buf.getBytes4()) {
+        if (count * size0 != buf.getFloats() || count != buf.getBytes4()) {
             Log.error("Something is wrong with the attributes of this GLSLShape");
             return;
         }
         vbo.setData(gl, buf);
-        count = plen;
     }
 
     public void renderPoints(GL2 gl, double factor) {

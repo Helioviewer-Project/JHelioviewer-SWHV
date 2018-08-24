@@ -18,15 +18,13 @@ public class GLSLTexture extends VAO {
     }
 
     public void setData(GL2 gl, Buf buf) {
-        int plen = buf.getFloats() / (size0 + size1);
-        if (plen == 0)
+        if ((count = buf.getFloats() / (size0 + size1)) == 0)
             return;
-        if (plen * (size0 + size1) != buf.getFloats()) {
+        if (count * (size0 + size1) != buf.getFloats()) {
             Log.error("Something is wrong with the attributes of this GLSLTexture");
             return;
         }
         vbo.setData(gl, buf);
-        count = plen;
     }
 
     public void render(GL2 gl, int mode, float[] color, int first, int toDraw) {
