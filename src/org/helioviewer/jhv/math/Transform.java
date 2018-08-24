@@ -9,21 +9,37 @@ import org.joml.Matrix4fStack;
 public class Transform {
 
     private static final FloatBuffer fb = BufferUtils.newFloatBuffer(16);
+    private static final FloatBuffer mvp = BufferUtils.newFloatBuffer(16);
 
     private static final Matrix4fStack proj = new Matrix4fStack(2);
     private static final Matrix4fStack view = new Matrix4fStack(3);
     private static final Matrix4f mul = new Matrix4f();
 
-    public static void setOrthoProjection(float left, float right, float bottom, float top, float zNear, float zFar) {
-        proj.setOrtho(left, right, bottom, top, zNear, zFar);
-    }
+    private static int projDepth;
+    private static int viewDepth;
 
     public static void pushProjection() {
         proj.pushMatrix();
+        projDepth++;
     }
 
     public static void popProjection() {
         proj.popMatrix();
+        projDepth--;
+    }
+
+    public static void pushView() {
+        view.pushMatrix();
+        viewDepth++;
+    }
+
+    public static void popView() {
+        view.popMatrix();
+        viewDepth--;
+    }
+
+    public static void setOrthoProjection(float left, float right, float bottom, float top, float zNear, float zFar) {
+        proj.setOrtho(left, right, bottom, top, zNear, zFar);
     }
 
     public static void setIdentityView() {
@@ -62,15 +78,18 @@ public class Transform {
                                0,                     0,                     0,                     w2 + x2 + y2 + z2));
     }
 
-    public static void pushView() {
-        view.pushMatrix();
-    }
-
-    public static void popView() {
-        view.popMatrix();
+    public static void cacheMVP() {
+        proj.mulOrthoAffine(view, mul); // assumes ortho
+        mul.get(mvp);
     }
 
     public static FloatBuffer get() {
+        if (projDepth == 0 && viewDepth == 0) {
+            //System.out.println(">> hit");
+            //Thread.dumpStack();
+            return mvp;
+        }
+
         proj.mulOrthoAffine(view, mul); // assumes ortho
         mul.get(fb);
         return fb;

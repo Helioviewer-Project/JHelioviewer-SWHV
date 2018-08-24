@@ -22,7 +22,7 @@ class GridMath {
     private static final byte[] color1 = Colors.Red;
     private static final byte[] color2 = Colors.Green;
 
-    private static final float earthPointSize = 0.02f;
+    private static final float earthPointSize = 0.01f;
 
     private static final int LINEAR_STEPS = 1;
 
