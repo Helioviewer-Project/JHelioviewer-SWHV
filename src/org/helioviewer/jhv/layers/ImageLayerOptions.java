@@ -22,6 +22,7 @@ class ImageLayerOptions extends JPanel {
         BlendPanel blendPanel = new BlendPanel(layer);
         ChannelMixerPanel channelMixerPanel = new ChannelMixerPanel(layer);
         lutPanel = new LUTPanel(layer);
+        SplitPanel splitPanel = new SplitPanel(layer);
         LevelsPanel levelsPanel = new LevelsPanel(layer);
         SharpenPanel sharpenPanel = new SharpenPanel(layer);
 
@@ -42,6 +43,8 @@ class ImageLayerOptions extends JPanel {
         addToGridBag(c, opacityPanel);
         c.gridy++;
         addToGridBag(c, blendPanel);
+        c.gridy++;
+        addToGridBag(c, splitPanel);
         c.gridy++;
         addToGridBag(c, sharpenPanel);
         c.gridy++;

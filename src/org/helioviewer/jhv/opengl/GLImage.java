@@ -27,6 +27,8 @@ public class GLImage {
     private float green = 1;
     private float blue = 1;
 
+    private double splitLeft = 0;
+    private double splitRight = 1;
     private double brightOffset = 0;
     private double brightScale = 1;
     private double opacity = 1;
@@ -61,6 +63,7 @@ public class GLImage {
     public void applyFilters(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLSolarShader shader) {
         applyRegion(gl, imageData, prevImageData, baseImageData, shader);
 
+        shader.bindSplit(gl, splitLeft, splitRight);
         shader.bindBrightness(gl, brightOffset, brightScale * imageData.getMetaData().getResponseFactor(), imageData.getGamma());
         shader.bindColor(gl, red, green, blue, opacity, blend);
         shader.bindEnhanced(gl, enhanced);
@@ -135,9 +138,22 @@ public class GLImage {
             diffTex.delete(gl);
     }
 
+    public void setSplit(double left, double right) {
+        splitLeft = MathUtils.clip(left, 0, 1);
+        splitRight = MathUtils.clip(right, splitLeft, 1);
+    }
+
     public void setBrightness(double offset, double scale) {
         brightOffset = MathUtils.clip(offset, -1, 2);
         brightScale = MathUtils.clip(scale, 0, 2 - brightOffset);
+    }
+
+    public double getSplitLeft() {
+        return splitLeft;
+    }
+
+    public double getSplitRight() {
+        return splitRight;
     }
 
     public double getBrightOffset() {
@@ -226,6 +242,7 @@ public class GLImage {
         setSharpen(jo.optDouble("sharpen", sharpen));
         setOpacity(jo.optDouble("opacity", opacity));
         setBlend(jo.optDouble("blend", blend));
+        setSplit(jo.optDouble("splitLeft", splitLeft), jo.optDouble("splitRight", splitRight));
         setBrightness(jo.optDouble("brightOffset", brightOffset), jo.optDouble("brightScale", brightScale));
         enhanced = jo.optBoolean("enhanced", false);
         String strDiffMode = jo.optString("differenceMode", diffMode.toString());
@@ -247,6 +264,8 @@ public class GLImage {
         jo.put("sharpen", sharpen);
         jo.put("opacity", opacity);
         jo.put("blend", blend);
+        jo.put("splitLeft", splitLeft);
+        jo.put("splitRight", splitRight);
         jo.put("brightOffset", brightOffset);
         jo.put("brightScale", brightScale);
         jo.put("enhanced", enhanced);
