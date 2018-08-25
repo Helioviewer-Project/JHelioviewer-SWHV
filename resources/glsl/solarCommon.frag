@@ -21,6 +21,8 @@ uniform sampler1D lut;
 uniform vec3 brightness;
 uniform vec4 color;
 
+uniform vec2 split;
+
 uniform float hgln;
 uniform float hglt;
 uniform float hglnDiff;
@@ -75,7 +77,7 @@ vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) 
 }
 
 void clamp_texcoord(const vec2 texcoord) {
-    if (texcoord.x < 0. || texcoord.y < 0. || texcoord.x > 1. || texcoord.y > 1.)
+    if (texcoord.x < split[0] || texcoord.y < 0. || texcoord.x > split[1] || texcoord.y > 1.)
         discard;
 }
 
