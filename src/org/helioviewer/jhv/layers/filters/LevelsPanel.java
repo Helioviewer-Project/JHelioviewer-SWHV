@@ -37,7 +37,7 @@ public class LevelsPanel implements FilterDetails {
         return "\u2007" + value + '%';
     }
 
-    private static String format(int low, int high) {
+    static String format(int low, int high) {
         return align3(low) + '\n' + align3(high);
     }
 
