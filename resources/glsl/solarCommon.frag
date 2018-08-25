@@ -77,7 +77,12 @@ vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) 
 }
 
 void clamp_texcoord(const vec2 texcoord) {
-    if (texcoord.x < split[0] || texcoord.y < 0. || texcoord.x > split[1] || texcoord.y > 1.)
+    if (texcoord.x < 0. || texcoord.y < 0. || texcoord.x > 1. || texcoord.y > 1.)
+        discard;
+}
+
+void clamp_coord(const vec2 coord) {
+    if (coord.x < split[0] || coord.x > split[1])
         discard;
 }
 

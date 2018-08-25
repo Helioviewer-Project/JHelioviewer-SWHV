@@ -21,6 +21,7 @@ void main(void) {
     }
 
     vec2 texcoord = vec2((rotatedHitPoint.x - rect.x) * rect.z, (-rotatedHitPoint.y - rect.y) * rect.w);
+    clamp_coord(texcoord);
     clamp_texcoord(texcoord);
 
     float geometryFlatDist = abs(dot(rotatedHitPoint, cutOffDirection));
