@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.view.jp2view;
 
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
+import java.nio.ByteOrder;
 
 import javax.annotation.Nullable;
 
@@ -22,12 +22,14 @@ import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.view.jp2view.image.ImageParams;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduConstants;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+
 class J2KRender implements Runnable {
 
     private static final int MAX_INACTIVE_LAYERS = 200;
     private static final int[] firstComponent = {0};
 
-    private static final ThreadLocal<int[]> localArray = ThreadLocal.withInitial(() -> new int[KakaduConstants.MAX_RENDER_SAMPLES]);
     private static final ThreadLocal<Kdu_thread_env> localThread = ThreadLocal.withInitial(J2KRender::createThreadEnv);
     private static final ThreadLocal<Kdu_region_compositor> localCompositor = new ThreadLocal<>();
 
@@ -75,18 +77,14 @@ class J2KRender implements Runnable {
         Kdu_coords actualSize = actualRegion.Access_size();
         int actualWidth = actualSize.Get_x(), actualHeight = actualSize.Get_y();
 
-        int[] intBuffer = null;
-        byte[] byteBuffer = null;
+        int[] rowGap = new int[1];
+        long addr = compositorBuf.Get_buf(rowGap, false);
+        ByteBuf kduBuffer = Unpooled.wrappedBuffer(addr, 4 * (actualX + actualWidth + rowGap[0]) * (actualY + actualHeight), false);
 
-        if (numComponents < 3) {
-            byteBuffer = new byte[actualWidth * actualHeight];
-        } else {
-            intBuffer = new int[actualWidth * actualHeight];
-        }
+        int bufferLength = numComponents < 3 ? actualWidth * actualHeight : 4 * actualWidth * actualHeight;
+        byte[] jhvBuffer = new byte[bufferLength];
 
-        int[] intArray = localArray.get();
         Kdu_dims newRegion = new Kdu_dims();
-        Kdu_dims theRegion = new Kdu_dims();
         while (compositor.Process(KakaduConstants.MAX_RENDER_SAMPLES, newRegion)) {
             Kdu_coords newSize = newRegion.Access_size();
             int newWidth = newSize.Get_x();
@@ -95,40 +93,30 @@ class J2KRender implements Runnable {
                 continue;
 
             Kdu_coords newOffset = newRegion.Access_pos();
-            theRegion.From_u32(newOffset.Get_x() - actualX, newOffset.Get_y() - actualY, newWidth, intArray.length / newWidth);
+            int dstIdx = newOffset.Get_x() + newOffset.Get_y() * actualWidth;
+            int srcIdx = 0;
 
-            while (!(theRegion = theRegion.Intersection(newRegion)).Is_empty()) { // slide with buffer top to bottom
-                compositorBuf.Get_region(theRegion, intArray);
-
-                Kdu_coords theOffset = theRegion.Access_pos();
-                int yOff = theOffset.Get_y();
-                int dstIdx = theOffset.Get_x() + yOff * actualWidth;
-                int height = theRegion.Access_size().Get_y();
-
-                if (numComponents < 3) {
-                    for (int row = 0, srcIdx = 0; row < height; row++, dstIdx += actualWidth, srcIdx += newWidth) {
-                        for (int col = 0; col < newWidth; ++col) {
-                            byteBuffer[dstIdx + col] = (byte) (intArray[srcIdx + col] & 0xFF);
-                        }
-                    }
-                } else {
-                    for (int row = 0, srcIdx = 0; row < height; row++, dstIdx += actualWidth, srcIdx += newWidth) {
-                        System.arraycopy(intArray, srcIdx, intBuffer, dstIdx, newWidth);
+            if (numComponents < 3) {
+                for (int row = 0; row < newHeight; row++, dstIdx += actualWidth, srcIdx += newWidth) {
+                    for (int col = 0; col < newWidth; ++col) {
+                        jhvBuffer[dstIdx + col] = kduBuffer.getByte(4 * (srcIdx + col));
                     }
                 }
-                theOffset.Set_y(yOff + height);
+            } else {
+                for (int row = 0; row < newHeight; row++, dstIdx += actualWidth, srcIdx += newWidth) {
+                    kduBuffer.getBytes(4 * srcIdx, jhvBuffer, 4 * dstIdx, 4 * newWidth);
+                }
             }
         }
 
+        kduBuffer.release();
         compositorBuf.Native_destroy();
         compositor.Remove_ilayer(ilayer, discard);
 
-        ImageData data;
-        if (numComponents < 3) {
-            data = new ImageData(actualWidth, actualHeight, ImageFormat.Gray8, ByteBuffer.wrap(byteBuffer));
-        } else {
-            data = new ImageData(actualWidth, actualHeight, ImageFormat.ARGB32, IntBuffer.wrap(intBuffer));
-        }
+        ByteBuffer buffer = ByteBuffer.wrap(jhvBuffer).order(ByteOrder.nativeOrder());
+        ImageFormat format = numComponents < 3 ? ImageFormat.Gray8 : ImageFormat.ARGB32;
+        ImageData data = new ImageData(actualWidth, actualHeight, format, buffer);
+
         view.setDataFromRender(params, data);
     }
 
