@@ -22,8 +22,7 @@ import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.view.jp2view.image.ImageParams;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduConstants;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
+import org.lwjgl.system.MemoryUtil;
 
 class J2KRender implements Runnable {
 
@@ -72,17 +71,19 @@ class J2KRender implements Runnable {
 
         Kdu_compositor_buf compositorBuf = compositor.Get_composition_buffer(empty, true); // modifies empty
         Kdu_dims actualRegion = compositorBuf.Get_rendering_region();
+
         Kdu_coords actualPos = actualRegion.Access_pos();
         int actualX = actualPos.Get_x(), actualY = actualPos.Get_y();
+
         Kdu_coords actualSize = actualRegion.Access_size();
         int actualWidth = actualSize.Get_x(), actualHeight = actualSize.Get_y();
 
         int[] rowGap = new int[1];
         long addr = compositorBuf.Get_buf(rowGap, false);
-        ByteBuf kduBuffer = Unpooled.wrappedBuffer(addr, 4 * (actualX + actualWidth + rowGap[0]) * (actualY + actualHeight), false);
+        ByteBuffer kduBuffer = MemoryUtil.memByteBufferSafe(addr, 4 * (actualX + actualWidth) * (actualY + actualHeight));
 
         int bufferLength = numComponents < 3 ? actualWidth * actualHeight : 4 * actualWidth * actualHeight;
-        byte[] jhvBuffer = new byte[bufferLength];
+        ByteBuffer jhvBuffer = ByteBuffer.wrap(new byte[bufferLength]).order(ByteOrder.nativeOrder());
 
         Kdu_dims newRegion = new Kdu_dims();
         while (compositor.Process(KakaduConstants.MAX_RENDER_SAMPLES, newRegion)) {
@@ -93,29 +94,33 @@ class J2KRender implements Runnable {
                 continue;
 
             Kdu_coords newOffset = newRegion.Access_pos();
-            int dstIdx = newOffset.Get_x() + newOffset.Get_y() * actualWidth;
+            int newX = newOffset.Get_x() - actualX;
+            int newY = newOffset.Get_y() - actualY;
+
+            int dstIdx = newX + newY * actualWidth;
             int srcIdx = 0;
 
             if (numComponents < 3) {
                 for (int row = 0; row < newHeight; row++, dstIdx += actualWidth, srcIdx += newWidth) {
                     for (int col = 0; col < newWidth; ++col) {
-                        jhvBuffer[dstIdx + col] = kduBuffer.getByte(4 * (srcIdx + col));
+                        jhvBuffer.put(dstIdx + col, kduBuffer.get(4 * (srcIdx + col)));
                     }
                 }
             } else {
                 for (int row = 0; row < newHeight; row++, dstIdx += actualWidth, srcIdx += newWidth) {
-                    kduBuffer.getBytes(4 * srcIdx, jhvBuffer, 4 * dstIdx, 4 * newWidth);
+                    for (int col = 0; col < newWidth; ++col) {
+                        for (int idx = 0; idx < 4; ++idx)
+                            jhvBuffer.put(4 * (dstIdx + col) + idx, kduBuffer.get(4 * (srcIdx + col) + idx));
+                    }
                 }
             }
         }
 
-        kduBuffer.release();
         compositorBuf.Native_destroy();
         compositor.Remove_ilayer(ilayer, discard);
 
-        ByteBuffer buffer = ByteBuffer.wrap(jhvBuffer).order(ByteOrder.nativeOrder());
         ImageFormat format = numComponents < 3 ? ImageFormat.Gray8 : ImageFormat.ARGB32;
-        ImageData data = new ImageData(actualWidth, actualHeight, format, buffer);
+        ImageData data = new ImageData(actualWidth, actualHeight, format, jhvBuffer);
 
         view.setDataFromRender(params, data);
     }
