@@ -76,13 +76,13 @@ vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) 
     return texture(lut, v) * color;
 }
 
-void clamp_texcoord(const vec2 texcoord) {
+void clamp_texture(const vec2 texcoord) {
     if (texcoord.x < 0. || texcoord.y < 0. || texcoord.x > 1. || texcoord.y > 1.)
         discard;
 }
 
 void clamp_coord(const vec2 coord) {
-    if (coord.x < split[0] || coord.x > split[1])
+    if (coord.x < split.x || coord.y < 0. || coord.x > split.y || coord.y > 1.)
         discard;
 }
 
@@ -105,6 +105,6 @@ vec2 getScrPos(void) {
     vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - viewportOffset) / viewport.xy - 1.;
     vec4 up1 = cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
     vec2 scrpos = vec2(viewport.z * up1.x, up1.y) + .5;
-    clamp_texcoord(scrpos);
+    clamp_coord(scrpos);
     return scrpos;
 }
