@@ -27,9 +27,9 @@ void get_lati_texcoord(const float ln, const float lt, const float cr, const vec
     vec3 xcartrot = crotm * xcart;
     if (xcartrot.x < 0.)
         discard;
+
     texcoord = vec2(rect.w * (xcartrot.y - rect.x), rect.w * (xcartrot.z - rect.y));
-    clamp_coord(scrpos);
-    clamp_texcoord(texcoord);
+    clamp_texture(texcoord);
 }
 
 void main(void) {

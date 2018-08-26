@@ -22,7 +22,6 @@ void main(void) {
 
     vec2 texcoord = vec2((rotatedHitPoint.x - rect.x) * rect.z, (-rotatedHitPoint.y - rect.y) * rect.w);
     clamp_coord(texcoord);
-    clamp_texcoord(texcoord);
 
     float geometryFlatDist = abs(dot(rotatedHitPoint, cutOffDirection));
     vec3 cutOffDirectionAlt = vec3(-cutOffDirection.y, cutOffDirection.x, 0.);
@@ -43,7 +42,7 @@ void main(void) {
         }
 
         difftexcoord = vec2((diffrotatedHitPoint.x - differencerect.x) * differencerect.z, (-diffrotatedHitPoint.y - differencerect.y) * differencerect.w);
-        clamp_texcoord(difftexcoord);
+        clamp_coord(difftexcoord);
 
         float diffrotatedHitPointRad = length(diffrotatedHitPoint.xy);
         if (diffrotatedHitPointRad > cutOffRadius.y || diffrotatedHitPointRad < cutOffRadius.x) {
