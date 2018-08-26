@@ -98,7 +98,7 @@ public class ImageData {
     private static final double BRIGHTNESS_F2 = 128 + 64 + 32;
 
     public double getAutoBrightness() {
-        if (!(buffer instanceof ByteBuffer))
+        if (format != ImageFormat.Gray8 || !(buffer instanceof ByteBuffer))
             return 1;
 
         int len = buffer.capacity();
