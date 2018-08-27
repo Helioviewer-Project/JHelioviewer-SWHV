@@ -80,10 +80,9 @@ class J2KRender implements Runnable {
 
         int[] rowGap = new int[1];
         long addr = compositorBuf.Get_buf(rowGap, false);
-        ByteBuffer kduBuffer = MemoryUtil.memByteBufferSafe(addr, 4 * (actualX + actualWidth) * (actualY + actualHeight));
 
         int bufferLength = numComponents < 3 ? actualWidth * actualHeight : 4 * actualWidth * actualHeight;
-        ByteBuffer jhvBuffer = ByteBuffer.wrap(new byte[bufferLength]).order(ByteOrder.nativeOrder());
+        byte[] byteBuffer = new byte[bufferLength];
 
         Kdu_dims newRegion = new Kdu_dims();
         while (compositor.Process(KakaduConstants.MAX_RENDER_SAMPLES, newRegion)) {
@@ -103,26 +102,23 @@ class J2KRender implements Runnable {
             if (numComponents < 3) {
                 for (int row = 0; row < newHeight; row++, dstIdx += actualWidth, srcIdx += newWidth) {
                     for (int col = 0; col < newWidth; ++col) {
-                        jhvBuffer.put(dstIdx + col, kduBuffer.get(4 * (srcIdx + col)));
+                        byteBuffer[dstIdx + col] = MemoryUtil.memGetByte(addr + 4 * (srcIdx + col));
                     }
                 }
             } else {
                 for (int row = 0; row < newHeight; row++, dstIdx += actualWidth, srcIdx += newWidth) {
                     for (int col = 0; col < newWidth; ++col) {
                         for (int idx = 0; idx < 4; ++idx)
-                            jhvBuffer.put(4 * (dstIdx + col) + idx, kduBuffer.get(4 * (srcIdx + col) + idx));
+                            byteBuffer[4 * (dstIdx + col) + idx] = MemoryUtil.memGetByte(addr + 4 * (srcIdx + col) + idx);
                     }
                 }
             }
         }
-
-        compositorBuf.Native_destroy();
-        compositor.Remove_ilayer(ilayer, discard);
-
         ImageFormat format = numComponents < 3 ? ImageFormat.Gray8 : ImageFormat.ARGB32;
-        ImageData data = new ImageData(actualWidth, actualHeight, format, jhvBuffer);
-
+        ImageData data = new ImageData(actualWidth, actualHeight, format, ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder()));
         view.setDataFromRender(params, data);
+
+        compositor.Remove_ilayer(ilayer, discard);
     }
 
     @Override
