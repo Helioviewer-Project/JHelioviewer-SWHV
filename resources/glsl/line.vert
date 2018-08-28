@@ -6,8 +6,8 @@ in vec4 NextVertex;
 in vec4 NextColor;
 out vec4 fragColor;
 
+uniform float aspect;
 uniform float thickness;
-uniform vec4 viewport;
 
 uniform mat4 ModelViewProjectionMatrix;
 
@@ -22,11 +22,8 @@ void main(void) {
         return;
     }
 
-    cpos *= viewport;
-    npos *= viewport;
-
     vec4 v0 = thickness * normalize(npos - cpos);
-    vec4 v1 = vec4(-v0.y, v0.x, 0, 0);
+    vec4 v1 = vec4(-v0.y / aspect, v0.x, 0, 0);
 
     vec4 pos[4];
     pos[0] = cpos + v1;
@@ -41,6 +38,6 @@ void main(void) {
     col[3] = NextColor;
 
     int idx = gl_VertexID; // & 0x3
-    gl_Position = pos[idx] / viewport;
+    gl_Position = pos[idx];
     fragColor = col[idx];
 }

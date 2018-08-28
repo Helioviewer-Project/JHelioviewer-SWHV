@@ -9,11 +9,11 @@ class GLSLLineShader extends GLSLShader {
     static final GLSLLineShader line = new GLSLLineShader("/glsl/line.vert", "/glsl/line.frag");
 
     private int refModelViewProjectionMatrix;
+    private int aspectRef;
     private int thicknessRef;
-    private int viewportRef;
 
+    private final float[] aspect = {1};
     private final float[] thickness = {0.05f};
-    private final float[] viewport = {1, 1, 1, 1};
 
     private GLSLLineShader(String vertex, String fragment) {
         super(vertex, fragment);
@@ -38,13 +38,13 @@ class GLSLLineShader extends GLSLShader {
     @Override
     protected void initUniforms(GL2 gl) {
         refModelViewProjectionMatrix = gl.glGetUniformLocation(progID, "ModelViewProjectionMatrix");
+        aspectRef = gl.glGetUniformLocation(progID, "aspect");
         thicknessRef = gl.glGetUniformLocation(progID, "thickness");
-        viewportRef = gl.glGetUniformLocation(progID, "viewport");
     }
 
-    void bindParams(GL2 gl, double aspect, double _thickness) {
-        viewport[0] = (float) aspect;
-        gl.glUniform4fv(viewportRef, 1, viewport, 0);
+    void bindParams(GL2 gl, double _aspect, double _thickness) {
+        aspect[0] = (float) _aspect;
+        gl.glUniform1fv(aspectRef, 1, aspect, 0);
         thickness[0] = (float) (0.5 * _thickness);
         gl.glUniform1fv(thicknessRef, 1, thickness, 0);
     }

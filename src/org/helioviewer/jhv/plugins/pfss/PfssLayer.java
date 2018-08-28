@@ -25,7 +25,7 @@ import com.jogamp.opengl.GL2;
 // has to be public for state
 public class PfssLayer extends AbstractLayer implements TimespanListener {
 
-    private static final double LINEWIDTH = 0.002;
+    private static final double LINEWIDTH = 2 * GLSLLine.LINEWIDTH_BASIC;
 
     private final PfssLayerOptions optionsPanel;
     private final PfssLine pfssLine = new PfssLine();
@@ -150,7 +150,7 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
             timeString = data.dateObs.toString();
             ImageViewerGui.getLayers().fireTimeUpdated(this);
         }
-        glslLine.render(gl, vp, LINEWIDTH);
+        glslLine.render(gl, vp.aspect, LINEWIDTH);
     }
 
 }

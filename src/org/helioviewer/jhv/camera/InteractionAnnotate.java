@@ -43,7 +43,7 @@ public class InteractionAnnotate extends Interaction {
 
     private final ArrayList<Annotateable> anns = new ArrayList<>();
 
-    private static final double LINEWIDTH = 0.002;
+    private static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
     private final GLSLLine annsLine = new GLSLLine(true);
     private final Buf annsBuf = new Buf(3276 * GLSLLine.stride); // pre-allocate 64kB
     private final GLSLLine transLine = new GLSLLine(true);
@@ -81,13 +81,13 @@ public class InteractionAnnotate extends Interaction {
             newAnnotateable.renderTransformed(camera, false, transBuf, centerBuf);
         }
         annsLine.setData(gl, annsBuf);
-        annsLine.render(gl, vp, LINEWIDTH);
+        annsLine.render(gl, vp.aspect, LINEWIDTH);
 
         Transform.pushView();
         Transform.rotateViewInverse(camera.getViewpoint().toQuat());
         {
             transLine.setData(gl, transBuf);
-            transLine.render(gl, vp, LINEWIDTH);
+            transLine.render(gl, vp.aspect, LINEWIDTH);
 
             double pointFactor = vp.height / (2 * camera.getWidth()) / 4;
             center.setData(gl, centerBuf);
