@@ -105,6 +105,10 @@ public class GLHelper {
         GLCapabilities capabilities = new GLCapabilities(profile);
         capabilities.setSampleBuffers(true);
         capabilities.setNumSamples(GLInfo.GLSAMPLES);
+        capabilities.setRedBits(8);
+        capabilities.setGreenBits(8);
+        capabilities.setBlueBits(8);
+        capabilities.setAlphaBits(8);
         return capabilities;
     }
 
