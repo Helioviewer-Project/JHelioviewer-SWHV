@@ -55,7 +55,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     private final JPanel optionsPanel;
 
     private static final int DIVPOINTS = 10;
-    private static final double LINEWIDTH = 0.002;
+    private static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
     private static final double LINEWIDTH_HIGHLIGHT = 2 * LINEWIDTH;
 
     private static final HashMap<String, GLTexture> iconCacheId = new HashMap<>();
@@ -353,8 +353,8 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     private void renderEvents(Viewport vp, GL2 gl) {
         lineEvent.setData(gl, bufEvent);
         lineThick.setData(gl, bufThick);
-        lineEvent.render(gl, vp, LINEWIDTH);
-        lineThick.render(gl, vp, LINEWIDTH_HIGHLIGHT);
+        lineEvent.render(gl, vp.aspect, LINEWIDTH);
+        lineThick.render(gl, vp.aspect, LINEWIDTH_HIGHLIGHT);
     }
 
     private void renderIcons(GL2 gl, ArrayList<JHVRelatedEvents> evs) {

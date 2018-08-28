@@ -1,12 +1,13 @@
 package org.helioviewer.jhv.opengl;
 
 import org.helioviewer.jhv.base.Buf;
-import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.opengl.GL2;
 
 public class GLSLLine extends VAO {
+
+    public static final double LINEWIDTH_BASIC = 0.002;
 
     private static final int size0 = 4;
     private static final int size1 = 4;
@@ -30,12 +31,12 @@ public class GLSLLine extends VAO {
         count--;
     }
 
-    public void render(GL2 gl, Viewport vp, double thickness) {
+    public void render(GL2 gl, double aspect, double thickness) {
         if (count == 0)
             return;
 
         GLSLLineShader.line.use(gl);
-        GLSLLineShader.line.bindParams(gl, vp.aspect, thickness);
+        GLSLLineShader.line.bindParams(gl, aspect, thickness);
         GLSLLineShader.line.bindMVP(gl);
 
         bind(gl);
