@@ -6,24 +6,24 @@ in vec4 NextVertex;
 in vec4 NextColor;
 out vec4 fragColor;
 
-uniform float aspect;
+uniform float iaspect;
 uniform float thickness;
 
 uniform mat4 ModelViewProjectionMatrix;
 
 // https://forums.developer.apple.com/thread/86098
 void main(void) {
-    vec4 cpos = ModelViewProjectionMatrix * Vertex;
-    vec4 npos = ModelViewProjectionMatrix * NextVertex;
-
-    if (cpos == npos) {
-        gl_Position = cpos;
+    if (Vertex == NextVertex) {
+        gl_Position = ModelViewProjectionMatrix * Vertex;
         fragColor = Color;
         return;
     }
 
+    vec4 cpos = ModelViewProjectionMatrix * Vertex;
+    vec4 npos = ModelViewProjectionMatrix * NextVertex;
+
     vec4 v0 = thickness * normalize(npos - cpos);
-    vec4 v1 = vec4(-v0.y / aspect, v0.x, 0, 0);
+    vec4 v1 = vec4(-v0.y * iaspect, v0.x, 0, 0);
 
     vec4 pos[4];
     pos[0] = cpos + v1;
