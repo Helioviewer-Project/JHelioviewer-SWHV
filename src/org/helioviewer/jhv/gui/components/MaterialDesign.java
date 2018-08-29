@@ -46,7 +46,7 @@ public enum MaterialDesign {
 
     public final char code;
 
-    MaterialDesign(String _description, char _code) {
+    private MaterialDesign(String _description, char _code) {
         code = _code;
     }
 

@@ -10,7 +10,7 @@ public enum SWEKOperand {
     public final String representation;
     public final String encodedRepresentation;
 
-    SWEKOperand(String _representation) {
+    private SWEKOperand(String _representation) {
         representation = _representation;
 
         String encode;
