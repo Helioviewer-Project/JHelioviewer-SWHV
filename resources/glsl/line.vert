@@ -37,7 +37,7 @@ void main(void) {
     col[0] = Color;
     col[1] = NextColor;
 
-    int idx = (gl_VertexID & 0x2) >> 1;
+    int idx = (gl_VertexID >> 1) & 0x1;
     gl_Position = pos[idx] + dir[gl_VertexID & 0x1] * off;
     fragColor = col[idx];
 }

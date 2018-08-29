@@ -98,6 +98,7 @@ public interface UpdateViewpoint {
 
         @Override
         public void unsetLoadPosition(LoadPosition loadPosition) {
+            loadPosition.stop();
             loadMap.remove(loadPosition.getTarget());
         }
 
@@ -138,6 +139,7 @@ public interface UpdateViewpoint {
 
         @Override
         public void unsetLoadPosition(LoadPosition _loadPosition) {
+            loadPosition.stop();
             loadPosition = null;
         }
 

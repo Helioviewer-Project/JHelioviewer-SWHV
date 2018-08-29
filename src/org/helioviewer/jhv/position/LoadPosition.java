@@ -2,14 +2,17 @@ package org.helioviewer.jhv.position;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.log.Log;
+import org.helioviewer.jhv.threads.CancelTask;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONObject;
@@ -35,7 +38,7 @@ public class LoadPosition extends JHVWorker<PositionResponse, Void> {
     private static final int MAX_POINTS = 10000;
     private static final String baseURL = "http://swhv.oma.be/position?";
 
-    private final LoadPositionFire receiver;
+    private final StatusReceiver receiver;
     private final SpaceObject observer;
     private final SpaceObject target;
     private final Frame frame;
@@ -46,7 +49,7 @@ public class LoadPosition extends JHVWorker<PositionResponse, Void> {
     private PositionResponse response;
     private String report;
 
-    public LoadPosition(LoadPositionFire _receiver, SpaceObject _observer, SpaceObject _target, Frame _frame, long _start, long _end) {
+    private LoadPosition(StatusReceiver _receiver, SpaceObject _observer, SpaceObject _target, Frame _frame, long _start, long _end) {
         receiver = _receiver;
         observer = _observer;
         target = _target;
@@ -59,7 +62,7 @@ public class LoadPosition extends JHVWorker<PositionResponse, Void> {
             dt = span / MAX_POINTS;
         deltat = dt;
 
-        receiver.fireLoaded("Loading...");
+        receiver.setStatus("Loading...");
         setThreadName("MAIN--PositionLoad");
     }
 
@@ -85,16 +88,16 @@ public class LoadPosition extends JHVWorker<PositionResponse, Void> {
     @Override
     protected void done() {
         if (isCancelled()) {
-            receiver.fireLoaded("Cancelled");
+            receiver.setStatus("Cancelled");
             return;
         }
 
         if (report != null)
-            receiver.fireLoaded(report);
+            receiver.setStatus(report);
         else {
             try {
                 response = get();
-                receiver.fireLoaded("Loaded");
+                receiver.setStatus("Loaded");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -105,6 +108,22 @@ public class LoadPosition extends JHVWorker<PositionResponse, Void> {
     public String toString() {
         return baseURL + "ref=" + frame + "&observer=" + observer.getUrlName() + "&target=" + target.getUrlName() +
                 "&utc=" + TimeUtils.format(start) + "&utc_end=" + TimeUtils.format(end) + "&deltat=" + deltat;
+    }
+
+    public static LoadPosition execute(StatusReceiver _receiver, SpaceObject _observer, SpaceObject _target, Frame _frame, long _start, long _end) {
+        LoadPosition load = new LoadPosition(_receiver, _observer, _target, _frame, _start, _end);
+        JHVGlobals.getExecutorService().execute(load);
+        JHVGlobals.getReaperService().schedule(new CancelTask(load), 120, TimeUnit.SECONDS);
+        return load;
+    }
+
+    public void stop() {
+        cancel(true);
+        receiver.setStatus(null);
+    }
+
+    public boolean isDownloading() {
+        return !isDone();
     }
 
     public SpaceObject getTarget() {
