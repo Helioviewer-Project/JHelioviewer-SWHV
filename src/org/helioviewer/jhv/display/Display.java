@@ -33,7 +33,7 @@ public class Display implements ActionListener, JHVEventHighlightListener {
         public final Transform xform;
         public final JRadioButtonMenuItem radio;
 
-        DisplayMode(GLSLSolarShader _shader, GridScale _scale, Transform _xform) {
+        private DisplayMode(GLSLSolarShader _shader, GridScale _scale, Transform _xform) {
             shader = _shader;
             scale = _scale;
             xform = _xform;

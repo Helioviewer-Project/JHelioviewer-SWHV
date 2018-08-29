@@ -15,7 +15,7 @@ abstract class GLSLShader {
 
         final int glType;
 
-        ShaderType(int _glType) {
+        private ShaderType(int _glType) {
             glType = _glType;
         }
     }

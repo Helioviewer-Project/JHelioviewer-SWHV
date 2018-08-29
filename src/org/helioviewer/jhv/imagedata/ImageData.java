@@ -15,7 +15,7 @@ public class ImageData {
 
         public final int bytes;
 
-        ImageFormat(int _bytes) {
+        private ImageFormat(int _bytes) {
             bytes = _bytes;
         }
     }
