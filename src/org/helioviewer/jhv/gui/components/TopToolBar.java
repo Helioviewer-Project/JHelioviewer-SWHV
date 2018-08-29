@@ -81,7 +81,7 @@ public class TopToolBar extends JToolBar {
 
         final Interaction interaction;
 
-        private InteractionMode(Interaction _interaction) {
+        InteractionMode(Interaction _interaction) {
             interaction = _interaction;
         }
     }
