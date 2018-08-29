@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+import javax.swing.JSeparator;
 import javax.swing.border.Border;
 
 import org.helioviewer.jhv.base.Colors;
@@ -55,6 +56,17 @@ public class SpaceObject {
         ArrayList<SpaceObject> list = new ArrayList<>(objectMap.values());
         list.remove(observer);
         return list;
+    }
+
+    public static List<Object> getTargetsSeparated(SpaceObject observer) {
+        List<SpaceObject> list = getTargets(observer);
+        ArrayList<Object> newList = new ArrayList<>(list.size());
+        for (SpaceObject object : list) {
+            newList.add(object);
+            if (object.border == JHVTableCellRenderer.cellEmphasisBorder)
+                newList.add(new JSeparator());
+        }
+        return newList;
     }
 
     @Nullable

@@ -17,6 +17,7 @@ import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorListener;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
+import org.helioviewer.jhv.layers.spaceobject.SpaceObjectComboBox;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectContainer;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -27,6 +28,7 @@ import org.json.JSONObject;
 class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener {
 
     private final SpaceObjectContainer container;
+    private final SpaceObjectComboBox objectCombo;
     private final JCheckBox syncCheckBox;
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
 
@@ -54,8 +56,12 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         if (ja == null)
             ja = new JSONArray(new String[]{"Earth"});
 
+        // if exclusive
+        objectCombo = new SpaceObjectComboBox(ja, uv, observer, frame, start, end);
+
         container = new SpaceObjectContainer(ja, exclusive, uv, observer, frame, start, end);
 
+        // if !exclusive
         JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
         radioPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
         radioPanel.add(new JLabel("Frame", JLabel.RIGHT));
@@ -87,15 +93,13 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         c.fill = GridBagConstraints.BOTH;
 
         c.gridy = 0;
+        add(exclusive ? objectCombo : radioPanel, c);
+        c.gridy++;
         add(container, c);
-        c.gridy = 1;
+        c.gridy++;
         add(syncCheckBox, c);
-        c.gridy = 2;
+        c.gridy++;
         add(timeSelectorPanel, c);
-        if (!exclusive) {
-            c.gridy = 3;
-            add(radioPanel, c);
-        }
 
         ComponentUtils.smallVariant(this);
     }
@@ -111,10 +115,11 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
     @Override
     public void timeSelectionChanged(long start, long end) {
         container.setTime(start, end);
+        objectCombo.setTime(start, end);
     }
 
     boolean isDownloading() {
-        return container.isDownloading();
+        return objectCombo.isDownloading() || container.isDownloading();
     }
 
     JSONObject toJson() {
