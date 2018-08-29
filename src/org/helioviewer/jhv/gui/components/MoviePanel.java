@@ -61,7 +61,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
 
         final long shift;
 
-        private ShiftUnit(long _shift) {
+        ShiftUnit(long _shift) {
             shift = _shift;
         }
     }
@@ -73,7 +73,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         private final String str;
         final int secPerSecond;
 
-        private SpeedUnit(String _str, int s) {
+        SpeedUnit(String _str, int s) {
             str = _str;
             secPerSecond = s;
         }

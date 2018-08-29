@@ -22,9 +22,9 @@ public class LoadPosition extends JHVWorker<PositionResponse, Void> {
     public enum AberationCorrection {
         NONE("NONE"), LT("LT"), LTS("LT%2BS"), CN("CN"), CNS("CN%2BS"), XLT("XLT"), XLTS("XLT%2BS"), XCN("XCN"), XCNS("XCN%2BS");
 
-        private String abcorr;
+        private final String abcorr;
 
-        private AberationCorrection(String _abcorr) {
+        AberationCorrection(String _abcorr) {
             abcorr = _abcorr;
         }
 
@@ -35,32 +35,29 @@ public class LoadPosition extends JHVWorker<PositionResponse, Void> {
 
     }
 
+    static String toUrl(SpaceObject _observer, SpaceObject _target, Frame _frame, long _start, long _end) {
+        long dt = 60, span = (_end - _start) / 1000;
+        if (span / dt > MAX_POINTS)
+            dt = span / MAX_POINTS;
+        return baseURL + "ref=" + _frame + "&observer=" + _observer.getUrlName() + "&target=" + _target.getUrlName() +
+              "&utc=" + TimeUtils.format(_start) + "&utc_end=" + TimeUtils.format(_end) + "&deltat=" + dt;
+
+    }
+
     private static final int MAX_POINTS = 10000;
     private static final String baseURL = "http://swhv.oma.be/position?";
 
     private final StatusReceiver receiver;
-    private final SpaceObject observer;
     private final SpaceObject target;
-    private final Frame frame;
-    private final long start;
-    private final long end;
-    private final long deltat;
+    private final String url;
 
     private PositionResponse response;
     private String report;
 
-    private LoadPosition(StatusReceiver _receiver, SpaceObject _observer, SpaceObject _target, Frame _frame, long _start, long _end) {
+    LoadPosition(StatusReceiver _receiver, SpaceObject _target, String _url) {
         receiver = _receiver;
-        observer = _observer;
         target = _target;
-        frame = _frame;
-        start = _start;
-        end = _end;
-
-        long dt = 60, span = (end - start) / 1000;
-        if (span / dt > MAX_POINTS)
-            dt = span / MAX_POINTS;
-        deltat = dt;
+        url = _url;
 
         receiver.setStatus("Loading...");
         setThreadName("MAIN--PositionLoad");
@@ -69,7 +66,7 @@ public class LoadPosition extends JHVWorker<PositionResponse, Void> {
     @Nullable
     @Override
     protected PositionResponse backgroundWork() {
-        try (NetClient nc = NetClient.of(toString(), true)) {
+        try (NetClient nc = NetClient.of(url, true)) {
             JSONObject result = JSONUtils.get(nc.getReader());
             if (nc.isSuccessful())
                 return new PositionResponse(result);
@@ -106,15 +103,7 @@ public class LoadPosition extends JHVWorker<PositionResponse, Void> {
 
     @Override
     public String toString() {
-        return baseURL + "ref=" + frame + "&observer=" + observer.getUrlName() + "&target=" + target.getUrlName() +
-                "&utc=" + TimeUtils.format(start) + "&utc_end=" + TimeUtils.format(end) + "&deltat=" + deltat;
-    }
-
-    public static LoadPosition execute(StatusReceiver _receiver, SpaceObject _observer, SpaceObject _target, Frame _frame, long _start, long _end) {
-        LoadPosition load = new LoadPosition(_receiver, _observer, _target, _frame, _start, _end);
-        JHVGlobals.getExecutorService().execute(load);
-        JHVGlobals.getReaperService().schedule(new CancelTask(load), 120, TimeUnit.SECONDS);
-        return load;
+        return url;
     }
 
     public void stop() {
@@ -124,6 +113,10 @@ public class LoadPosition extends JHVWorker<PositionResponse, Void> {
 
     public boolean isDownloading() {
         return !isDone();
+    }
+
+    boolean isFailed() {
+        return response == null && isDone();
     }
 
     public SpaceObject getTarget() {

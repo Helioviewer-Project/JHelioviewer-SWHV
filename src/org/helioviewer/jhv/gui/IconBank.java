@@ -21,7 +21,7 @@ public class IconBank {
 
         final String fname;
 
-        private JHVIcon(String _fname) {
+        JHVIcon(String _fname) {
             fname = _fname;
         }
 

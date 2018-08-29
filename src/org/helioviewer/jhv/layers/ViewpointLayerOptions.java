@@ -37,7 +37,7 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
 
         final UpdateViewpoint update;
 
-        private CameraMode(UpdateViewpoint _update) {
+        CameraMode(UpdateViewpoint _update) {
             update = _update;
         }
     }

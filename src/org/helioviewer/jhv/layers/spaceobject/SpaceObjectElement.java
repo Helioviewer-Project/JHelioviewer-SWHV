@@ -7,6 +7,7 @@ import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.position.LoadPosition;
+import org.helioviewer.jhv.position.LoadPositionSet;
 import org.helioviewer.jhv.position.StatusReceiver;
 
 class SpaceObjectElement implements StatusReceiver {
@@ -30,7 +31,7 @@ class SpaceObjectElement implements StatusReceiver {
             uv.unsetLoadPosition(load);
         }
 
-        load = LoadPosition.execute(this, observer, target, frame, startTime, endTime);
+        load = LoadPositionSet.add(this, observer, target, frame, startTime, endTime);
         uv.setLoadPosition(load);
     }
 

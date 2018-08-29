@@ -27,7 +27,7 @@ public class InteractionAnnotate extends Interaction {
 
         private final Class<? extends Annotateable> clazz;
 
-        private AnnotationMode(Class<? extends Annotateable> _clazz) {
+        AnnotationMode(Class<? extends Annotateable> _clazz) {
             clazz = _clazz;
         }
 

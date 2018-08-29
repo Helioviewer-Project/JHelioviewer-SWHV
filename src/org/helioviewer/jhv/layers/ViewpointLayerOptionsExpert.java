@@ -54,7 +54,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         if (ja == null)
             ja = new JSONArray(new String[]{"Earth"});
 
-        container = new SpaceObjectContainer(ja, uv, observer, frame, exclusive, start, end);
+        container = new SpaceObjectContainer(ja, exclusive, uv, observer, frame, start, end);
 
         JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
         radioPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));

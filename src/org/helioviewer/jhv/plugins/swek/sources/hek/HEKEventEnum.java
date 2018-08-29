@@ -13,7 +13,7 @@ enum HEKEventEnum {
     // The name of the SWEK Event
     private final String swekEventName;
 
-    private HEKEventEnum(String _hekEventName, String _swekEventName, String _eventAbbreviation) {
+    HEKEventEnum(String _hekEventName, String _swekEventName, String _eventAbbreviation) {
         eventAbbreviation = _eventAbbreviation;
         swekEventName = _swekEventName;
     }
