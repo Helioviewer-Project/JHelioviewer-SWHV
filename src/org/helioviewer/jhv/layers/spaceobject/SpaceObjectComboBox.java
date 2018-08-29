@@ -41,6 +41,8 @@ public class SpaceObjectComboBox extends JPanel implements ActionListener, Statu
         startTime = _startTime;
         endTime = _endTime;
 
+        uv.clear();
+
         comboBox = new JSeparatorComboBox(SpaceObject.getTargetsSeparated(observer).toArray());
         comboBox.addActionListener(this);
         comboBox.setSelectedItem(SpaceObject.get(ja.optString(0, "Earth")));
@@ -65,11 +67,8 @@ public class SpaceObjectComboBox extends JPanel implements ActionListener, Statu
     @Override
     public void actionPerformed(ActionEvent e) {
         SpaceObject target = (SpaceObject) comboBox.getSelectedItem();
-        if (load != null) {
-            uv.unsetLoadPosition(load);
-        }
         load = LoadPosition.execute(this, observer, target, frame, startTime, endTime);
-        uv.setLoadPosition(load);
+        uv.setObserver(load);
         // System.out.println(">>> " + load);
     }
 
@@ -77,7 +76,6 @@ public class SpaceObjectComboBox extends JPanel implements ActionListener, Statu
     public void setStatus(String status) {
         label.setText(status);
         label.setToolTipText(status);
-        //model.refresh(this);
         Display.getCamera().refresh();
     }
 

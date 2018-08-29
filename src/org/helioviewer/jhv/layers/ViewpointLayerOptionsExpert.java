@@ -34,7 +34,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
 
     private Frame frame;
 
-    ViewpointLayerOptionsExpert(JSONObject jo, UpdateViewpoint uv, SpaceObject observer, Frame _frame, boolean exclusive) {
+    ViewpointLayerOptionsExpert(JSONObject jo, boolean viewFrom, UpdateViewpoint uv, SpaceObject observer, Frame _frame) {
         frame = _frame;
 
         boolean sync = true;
@@ -56,15 +56,15 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         if (ja == null)
             ja = new JSONArray(new String[]{"Earth"});
 
-        // if exclusive
+        // if viewFrom
         objectCombo = new SpaceObjectComboBox(ja, uv, observer, frame, start, end);
 
-        container = new SpaceObjectContainer(ja, exclusive, uv, observer, frame, start, end);
+        container = new SpaceObjectContainer(ja, uv, observer, frame, start, end);
 
-        // if !exclusive
-        JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
-        radioPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-        radioPanel.add(new JLabel("Frame", JLabel.RIGHT));
+        // if !viewFrom
+        JPanel framePanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+        framePanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+        framePanel.add(new JLabel("Frame", JLabel.RIGHT));
         ButtonGroup modeGroup = new ButtonGroup();
         for (Frame f : Frame.values()) {
             JRadioButton radio = new JRadioButton(f.toString(), f == frame);
@@ -74,7 +74,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
                     container.setFrame(frame);
                 }
             });
-            radioPanel.add(radio);
+            framePanel.add(radio);
             modeGroup.add(radio);
         }
 
@@ -93,7 +93,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         c.fill = GridBagConstraints.BOTH;
 
         c.gridy = 0;
-        add(exclusive ? objectCombo : radioPanel, c);
+        add(viewFrom ? objectCombo : framePanel, c);
         c.gridy++;
         add(container, c);
         c.gridy++;
@@ -132,6 +132,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
             jo.put("endTime", new JHVDate(timeSelectorPanel.getEndTime()));
         }
         jo.put("objects", container.toJson());
+        // also SpaceObjectComboBox
         return jo;
     }
 

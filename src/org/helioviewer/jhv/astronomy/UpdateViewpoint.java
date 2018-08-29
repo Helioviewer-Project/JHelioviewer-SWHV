@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.astronomy;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -20,9 +19,11 @@ public interface UpdateViewpoint {
 
     void clear();
 
-    void setLoadPosition(LoadPosition _loadPosition);
+    void addLoader(LoadPosition _loadPosition);
 
-    void unsetLoadPosition(LoadPosition _loadPosition);
+    void removeLoader(LoadPosition _loadPosition);
+
+    void setObserver(LoadPosition _loadPosition);
 
     Collection<LoadPosition> getLoadPositions();
 
@@ -34,23 +35,33 @@ public interface UpdateViewpoint {
 
     abstract class AbstractUpdateViewpoint implements UpdateViewpoint {
 
-        private final Collection<LoadPosition> loadPositions = Collections.emptySet();
+        protected final HashMap<SpaceObject, LoadPosition> loadMap = new HashMap<>();
 
         @Override
         public void clear() {
+            for (LoadPosition load : loadMap.values())
+                load.stop();
+            loadMap.clear();
         }
 
         @Override
-        public void setLoadPosition(LoadPosition _loadPosition) {
+        public void addLoader(LoadPosition loadPosition) {
+            loadMap.put(loadPosition.getTarget(), loadPosition);
         }
 
         @Override
-        public void unsetLoadPosition(LoadPosition _loadPosition) {
+        public void removeLoader(LoadPosition loadPosition) {
+            loadPosition.stop();
+            loadMap.remove(loadPosition.getTarget());
+        }
+
+        @Override
+        public void setObserver(LoadPosition _loadPosition) {
         }
 
         @Override
         public Collection<LoadPosition> getLoadPositions() {
-            return loadPositions;
+            return loadMap.values();
         }
 
         @Override
@@ -84,28 +95,6 @@ public interface UpdateViewpoint {
     class Equatorial extends AbstractUpdateViewpoint {
 
         private static final double distance = 2 * Sun.MeanEarthDistance / Math.tan(0.5 * Math.PI / 180);
-        private final HashMap<SpaceObject, LoadPosition> loadMap = new HashMap<>();
-
-        @Override
-        public void clear() {
-            loadMap.clear();
-        }
-
-        @Override
-        public void setLoadPosition(LoadPosition loadPosition) {
-            loadMap.put(loadPosition.getTarget(), loadPosition);
-        }
-
-        @Override
-        public void unsetLoadPosition(LoadPosition loadPosition) {
-            loadPosition.stop();
-            loadMap.remove(loadPosition.getTarget());
-        }
-
-        @Override
-        public Collection<LoadPosition> getLoadPositions() {
-            return loadMap.values();
-        }
 
         @Override
         public Position update(JHVDate time) {
@@ -125,28 +114,31 @@ public interface UpdateViewpoint {
 
     class Expert extends AbstractUpdateViewpoint {
 
-        private LoadPosition loadPosition;
+        private LoadPosition observerLoader;
 
         @Override
         public void clear() {
-            loadPosition = null;
+            super.clear();
+            unsetObserver();
         }
 
         @Override
-        public void setLoadPosition(LoadPosition _loadPosition) {
-            loadPosition = _loadPosition;
+        public void setObserver(LoadPosition _observerLoader) {
+            unsetObserver();
+            observerLoader = _observerLoader;
         }
 
-        @Override
-        public void unsetLoadPosition(LoadPosition _loadPosition) {
-            loadPosition.stop();
-            loadPosition = null;
+        private void unsetObserver() {
+            if (observerLoader != null) {
+                observerLoader.stop();
+                observerLoader = null;
+            }
         }
 
         @Override
         public Position update(JHVDate time) {
             PositionResponse response;
-            if (loadPosition == null || (response = loadPosition.getResponse()) == null)
+            if (observerLoader == null || (response = observerLoader.getResponse()) == null)
                 return Sun.getEarth(time);
             return response.getRelativeInterpolated(time.milli, Movie.getStartTime(), Movie.getEndTime());
         }

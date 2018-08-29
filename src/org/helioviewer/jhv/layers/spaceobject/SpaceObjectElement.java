@@ -27,18 +27,17 @@ class SpaceObjectElement implements StatusReceiver {
         selected = true;
 
         if (load != null) {
-            uv.unsetLoadPosition(load);
+            uv.removeLoader(load);
         }
-
         load = LoadPosition.execute(this, observer, target, frame, startTime, endTime);
-        uv.setLoadPosition(load);
+        uv.addLoader(load);
     }
 
     void unload(UpdateViewpoint uv) {
         selected = false;
 
         if (load != null) {
-            uv.unsetLoadPosition(load);
+            uv.removeLoader(load);
             load = null;
             Display.display();
         }

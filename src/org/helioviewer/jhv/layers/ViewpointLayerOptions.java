@@ -67,8 +67,8 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
             joExpert = jo.optJSONObject("expert");
             joEquatorial = jo.optJSONObject("equatorial");
         }
-        expertOptionPanel = new ViewpointLayerOptionsExpert(joExpert, UpdateViewpoint.expert, SpaceObject.Sol, Frame.HEEQ, true);
-        equatorialOptionPanel = new ViewpointLayerOptionsExpert(joEquatorial, UpdateViewpoint.equatorial, SpaceObject.Sol, Frame.HCI, false);
+        expertOptionPanel = new ViewpointLayerOptionsExpert(joExpert, true, UpdateViewpoint.expert, SpaceObject.Sol, Frame.HEEQ);
+        equatorialOptionPanel = new ViewpointLayerOptionsExpert(joEquatorial, false, UpdateViewpoint.equatorial, SpaceObject.Sol, Frame.HCI);
 
         double fovMin = 0, fovMax = 180;
         cameraMode = CameraMode.Observer;

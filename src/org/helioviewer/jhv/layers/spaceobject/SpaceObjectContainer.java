@@ -10,7 +10,6 @@ import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -31,7 +30,6 @@ public class SpaceObjectContainer extends JScrollPane {
     private static final int OBJECT_COL = 1;
     private static final int STATUS_COL = 2;
 
-    private final boolean exclusive;
     private final UpdateViewpoint uv;
     private final SpaceObject observer;
     private final SpaceObjectModel model;
@@ -40,8 +38,7 @@ public class SpaceObjectContainer extends JScrollPane {
     private long startTime;
     private long endTime;
 
-    public SpaceObjectContainer(JSONArray ja, boolean _exclusive, UpdateViewpoint _uv, SpaceObject _observer, Frame _frame, long _startTime, long _endTime) {
-        exclusive = _exclusive;
+    public SpaceObjectContainer(JSONArray ja, UpdateViewpoint _uv, SpaceObject _observer, Frame _frame, long _startTime, long _endTime) {
         uv = _uv;
         observer = _observer;
         frame = _frame;
@@ -58,10 +55,7 @@ public class SpaceObjectContainer extends JScrollPane {
         grid.setColumnSelectionAllowed(false);
         grid.setIntercellSpacing(new Dimension(0, 0));
 
-        if (exclusive)
-            grid.getColumnModel().getColumn(SELECTED_COL).setCellRenderer(new SelectedExclusiveRenderer());
-        else
-            grid.getColumnModel().getColumn(SELECTED_COL).setCellRenderer(new SelectedRenderer());
+        grid.getColumnModel().getColumn(SELECTED_COL).setCellRenderer(new SelectedRenderer());
         grid.getColumnModel().getColumn(SELECTED_COL).setPreferredWidth(ICON_WIDTH + 8);
         grid.getColumnModel().getColumn(SELECTED_COL).setMaxWidth(ICON_WIDTH + 8);
         grid.getColumnModel().getColumn(OBJECT_COL).setCellRenderer(new ObjectRenderer());
@@ -123,16 +117,10 @@ public class SpaceObjectContainer extends JScrollPane {
 
 
     private void selectElement(SpaceObjectElement element) {
-        if (exclusive) {
-            for (SpaceObjectElement e : model.getSelected())
-                e.unload(uv);
+        if (element.isSelected())
+            element.unload(uv);
+        else
             element.load(uv, observer, frame, startTime, endTime);
-        } else {
-            if (element.isSelected())
-                element.unload(uv);
-            else
-                element.load(uv, observer, frame, startTime, endTime);
-        }
     }
 
     public boolean isDownloading() {
@@ -191,29 +179,6 @@ public class SpaceObjectContainer extends JScrollPane {
             }
             checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
             return checkBox;
-        }
-
-    }
-
-    private static class SelectedExclusiveRenderer extends JHVTableCellRenderer {
-
-        private final JRadioButton radio = new JRadioButton();
-
-        SelectedExclusiveRenderer() {
-            setHorizontalAlignment(CENTER);
-            radio.putClientProperty("JComponent.sizeVariant", "small");
-            radio.setBorderPainted(true);
-        }
-
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            if (value instanceof SpaceObjectElement) {
-                SpaceObjectElement element = (SpaceObjectElement) value;
-                radio.setSelected(element.isSelected());
-                radio.setBorder(element.getBorder());
-            }
-            radio.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
-            return radio;
         }
 
     }
