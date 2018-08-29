@@ -31,22 +31,24 @@ public class SpaceObjectContainer extends JScrollPane {
     private static final int OBJECT_COL = 1;
     private static final int STATUS_COL = 2;
 
-    private final UpdateViewpoint uv;
     private final boolean exclusive;
+    private final UpdateViewpoint uv;
+    private final SpaceObject observer;
     private final SpaceObjectModel model;
 
     private Frame frame;
     private long startTime;
     private long endTime;
 
-    public SpaceObjectContainer(JSONArray ja, UpdateViewpoint _uv, SpaceObject observer, Frame _frame, boolean _exclusive, long _startTime, long _endTime) {
-        uv = _uv;
+    public SpaceObjectContainer(JSONArray ja, boolean _exclusive, UpdateViewpoint _uv, SpaceObject _observer, Frame _frame, long _startTime, long _endTime) {
         exclusive = _exclusive;
-        model = new SpaceObjectModel(observer);
-
+        uv = _uv;
+        observer = _observer;
         frame = _frame;
         startTime = _startTime;
         endTime = _endTime;
+
+        model = new SpaceObjectModel(observer);
 
         JTable grid = new JTable(model);
         grid.setTableHeader(null);
@@ -106,7 +108,7 @@ public class SpaceObjectContainer extends JScrollPane {
 
         frame = _frame;
         for (SpaceObjectElement element : model.getSelected())
-            element.load(uv, frame, startTime, endTime);
+            element.load(uv, observer, frame, startTime, endTime);
     }
 
     public void setTime(long _startTime, long _endTime) {
@@ -116,7 +118,21 @@ public class SpaceObjectContainer extends JScrollPane {
         startTime = _startTime;
         endTime = _endTime;
         for (SpaceObjectElement element : model.getSelected())
-            element.load(uv, frame, startTime, endTime);
+            element.load(uv, observer, frame, startTime, endTime);
+    }
+
+
+    private void selectElement(SpaceObjectElement element) {
+        if (exclusive) {
+            for (SpaceObjectElement e : model.getSelected())
+                e.unload(uv);
+            element.load(uv, observer, frame, startTime, endTime);
+        } else {
+            if (element.isSelected())
+                element.unload(uv);
+            else
+                element.load(uv, observer, frame, startTime, endTime);
+        }
     }
 
     public boolean isDownloading() {
@@ -125,19 +141,6 @@ public class SpaceObjectContainer extends JScrollPane {
                 return true;
         }
         return false;
-    }
-
-    private void selectElement(SpaceObjectElement element) {
-        if (exclusive) {
-            for (SpaceObjectElement e : model.getSelected())
-                e.unload(uv);
-            element.load(uv, frame, startTime, endTime);
-        } else {
-            if (element.isSelected())
-                element.unload(uv);
-            else
-                element.load(uv, frame, startTime, endTime);
-        }
     }
 
     private int rowHeight = -1;
