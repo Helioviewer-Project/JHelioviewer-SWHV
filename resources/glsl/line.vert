@@ -19,25 +19,25 @@ void main(void) {
         return;
     }
 
-    vec4 cpos = ModelViewProjectionMatrix * Vertex;
-    vec4 npos = ModelViewProjectionMatrix * NextVertex;
+    vec4 curr = ModelViewProjectionMatrix * Vertex;
+    vec4 next = ModelViewProjectionMatrix * NextVertex;
 
-    vec4 v0 = thickness * normalize(npos - cpos);
-    vec4 v1 = vec4(-v0.y * iaspect, v0.x, 0, 0);
+    vec4 d = normalize(next - curr);
+    vec4 off = thickness * vec4(-d.y * iaspect, d.x, 0, 0);
 
-    vec4 pos[4];
-    pos[0] = cpos + v1;
-    pos[1] = cpos - v1;
-    pos[2] = npos + v1;
-    pos[3] = npos - v1;
+    float dir[2];
+    dir[0] = 1;
+    dir[1] = -1;
 
-    vec4 col[4];
+    vec4 pos[2];
+    pos[0] = curr;
+    pos[1] = next;
+
+    vec4 col[2];
     col[0] = Color;
-    col[1] = Color;
-    col[2] = NextColor;
-    col[3] = NextColor;
+    col[1] = NextColor;
 
-    int idx = gl_VertexID; // & 0x3
-    gl_Position = pos[idx];
+    int idx = (gl_VertexID & 0x2) >> 1;
+    gl_Position = pos[idx] + dir[gl_VertexID & 0x1] * off;
     fragColor = col[idx];
 }
