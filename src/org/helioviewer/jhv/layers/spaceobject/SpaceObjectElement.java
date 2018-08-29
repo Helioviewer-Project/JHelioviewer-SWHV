@@ -11,7 +11,6 @@ import org.helioviewer.jhv.position.StatusReceiver;
 
 class SpaceObjectElement implements StatusReceiver {
 
-    private final SpaceObject observer;
     private final SpaceObject target;
     private final SpaceObjectModel model;
 
@@ -19,13 +18,12 @@ class SpaceObjectElement implements StatusReceiver {
     private String status;
     private LoadPosition load;
 
-    SpaceObjectElement(SpaceObject _observer, SpaceObject _target, SpaceObjectModel _model) {
-        observer = _observer;
+    SpaceObjectElement(SpaceObject _target, SpaceObjectModel _model) {
         target = _target;
         model = _model;
     }
 
-    void load(UpdateViewpoint uv, Frame frame, long startTime, long endTime) {
+    void load(UpdateViewpoint uv, SpaceObject observer, Frame frame, long startTime, long endTime) {
         selected = true;
 
         if (load != null) {
