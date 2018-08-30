@@ -32,7 +32,7 @@ public class SpaceObjectComboBox extends JPanel implements ActionListener, Statu
 
     private LoadPosition load;
 
-    public SpaceObjectComboBox(JSONArray ja, UpdateViewpoint _uv, SpaceObject _observer, Frame _frame, long _startTime, long _endTime) {
+    public SpaceObjectComboBox(JSONArray ja, boolean activate, UpdateViewpoint _uv, SpaceObject _observer, Frame _frame, long _startTime, long _endTime) {
         setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
 
         uv = _uv;
@@ -41,11 +41,11 @@ public class SpaceObjectComboBox extends JPanel implements ActionListener, Statu
         startTime = _startTime;
         endTime = _endTime;
 
-        uv.clear();
-
         comboBox = new JSeparatorComboBox(SpaceObject.getTargetsSeparated(observer).toArray());
         comboBox.addActionListener(this);
-        comboBox.setSelectedItem(SpaceObject.get(ja.optString(0, "Earth")));
+
+        if (activate)
+            comboBox.setSelectedItem(SpaceObject.get(ja.optString(0, "Earth")));
 
         add(comboBox);
         add(label);

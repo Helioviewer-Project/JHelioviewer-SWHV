@@ -38,7 +38,7 @@ public class SpaceObjectContainer extends JScrollPane {
     private long startTime;
     private long endTime;
 
-    public SpaceObjectContainer(JSONArray ja, UpdateViewpoint _uv, SpaceObject _observer, Frame _frame, long _startTime, long _endTime) {
+    public SpaceObjectContainer(JSONArray ja, boolean activate, UpdateViewpoint _uv, SpaceObject _observer, Frame _frame, long _startTime, long _endTime) {
         uv = _uv;
         observer = _observer;
         frame = _frame;
@@ -84,10 +84,11 @@ public class SpaceObjectContainer extends JScrollPane {
         setPreferredSize(new Dimension(-1, getGridRowHeight(grid) * NUMBEROFVISIBLEROWS + 1));
         grid.setRowHeight(getGridRowHeight(grid));
 
-        uv.clear();
-        int len = ja.length();
-        for (int i = 0; i < len; i++)
-            selectTarget(SpaceObject.get(ja.optString(i, "Earth")));
+        if (activate) {
+            int len = ja.length();
+            for (int i = 0; i < len; i++)
+                selectTarget(SpaceObject.get(ja.optString(i, "Earth")));
+        }
     }
 
     private void selectTarget(SpaceObject target) {

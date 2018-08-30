@@ -56,10 +56,11 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         if (ja == null)
             ja = new JSONArray(new String[]{"Earth"});
 
-        // if viewFrom
-        objectCombo = new SpaceObjectComboBox(ja, uv, observer, frame, start, end);
 
-        container = new SpaceObjectContainer(ja, uv, observer, frame, start, end);
+        uv.clear();
+        // if viewFrom
+        objectCombo = new SpaceObjectComboBox(ja, viewFrom, uv, observer, frame, start, end);
+        container = new SpaceObjectContainer(ja, !viewFrom, uv, observer, frame, start, end);
 
         // if !viewFrom
         JPanel framePanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
