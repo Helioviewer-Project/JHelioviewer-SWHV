@@ -37,7 +37,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     private static final double DELTA_ORBIT = 10 * 60 * 1000 * Sun.MeanEarthDistanceInv;
     private static final double DELTA_CUTOFF = 3 * Sun.MeanEarthDistance;
     private static final double LINEWIDTH_FOV = GLSLLine.LINEWIDTH_BASIC;
-    private static final double LINEWIDTH_ORBIT = GLSLLine.LINEWIDTH_BASIC;
+    private static final double LINEWIDTH_ORBIT = 2 * GLSLLine.LINEWIDTH_BASIC;
     private static final float SIZE_PLANET = 10;
 
     private final FOVShape fov = new FOVShape();
@@ -260,11 +260,9 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         return (long) (DELTA_ORBIT * (dist > DELTA_CUTOFF ? DELTA_CUTOFF : dist));
     }
 
-    private void renderPlanets(GL2 gl, Viewport vp, Collection<LoadPosition> loadPositions) {
-        float[] xyz = new float[3];
-        float[] xyzw = new float[4];
-        xyzw[3] = 1;
+    private final float[] xyzw = {0, 0, 0, 1};
 
+    private void renderPlanets(GL2 gl, Viewport vp, Collection<LoadPosition> loadPositions) {
         long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
         for (LoadPosition loadPosition : loadPositions) {
             PositionResponse response = loadPosition.getResponse();
@@ -288,9 +286,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
                 delta = getStep(dist);
             }
             orbitBuf.repeat4f().put4b(Colors.Null);
-
-            response.getInterpolated(xyz, time, start, end);
-            planetBuf.put4f(xyz[0], xyz[1], xyz[2], SIZE_PLANET).put4b(color);
+            planetBuf.put4f(xyzw[0], xyzw[1], xyzw[2], SIZE_PLANET).put4b(color);
         }
 
         orbits.setData(gl, orbitBuf);
