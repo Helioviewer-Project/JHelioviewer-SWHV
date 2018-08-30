@@ -22,7 +22,7 @@ public class LoadPosition extends JHVWorker<PositionResponse, Void> {
     public enum AberationCorrection {
         NONE("NONE"), LT("LT"), LTS("LT%2BS"), CN("CN"), CNS("CN%2BS"), XLT("XLT"), XLTS("XLT%2BS"), XCN("XCN"), XCNS("XCN%2BS");
 
-        private String abcorr;
+        private final String abcorr;
 
         AberationCorrection(String _abcorr) {
             abcorr = _abcorr;
