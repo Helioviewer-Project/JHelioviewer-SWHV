@@ -37,7 +37,7 @@ public class GLSLSolarShader extends GLSLShader {
     private int crotaRef;
     private int crotaDiffRef;
 
-    private int trimRef;
+    private int slitRef;
     private int brightRef;
     private int colorRef;
     private int sharpenRef;
@@ -65,7 +65,7 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] hglnDiff = new float[1];
     private final float[] crotaDiff = new float[1];
 
-    private final float[] trim = new float[2];
+    private final float[] slit = new float[2];
     private final float[] bright = new float[3];
     private final float[] color = new float[4];
     private final float[] sharpen = new float[3];
@@ -110,7 +110,7 @@ public class GLSLSolarShader extends GLSLShader {
         polarRadiiRef = gl.glGetUniformLocation(progID, "polarRadii");
 
         sharpenRef = gl.glGetUniformLocation(progID, "sharpen");
-        trimRef = gl.glGetUniformLocation(progID, "trim");
+        slitRef = gl.glGetUniformLocation(progID, "slit");
         brightRef = gl.glGetUniformLocation(progID, "brightness");
         colorRef = gl.glGetUniformLocation(progID, "color");
         cutOffRadiusRef = gl.glGetUniformLocation(progID, "cutOffRadius");
@@ -181,10 +181,10 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform4fv(colorRef, 1, color, 0);
     }
 
-    public void bindTrim(GL2 gl, double left, double right) {
-        trim[0] = (float) left;
-        trim[1] = (float) right;
-        gl.glUniform2fv(trimRef, 1, trim, 0);
+    public void bindSlit(GL2 gl, double left, double right) {
+        slit[0] = (float) left;
+        slit[1] = (float) right;
+        gl.glUniform2fv(slitRef, 1, slit, 0);
     }
 
     public void bindBrightness(GL2 gl, double offset, double scale, double gamma) {

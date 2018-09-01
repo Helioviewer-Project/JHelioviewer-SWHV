@@ -83,12 +83,12 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
         if (far)
             fovRender(gl, vp, viewpoint.distance, pixFactor);
-        {
-            Collection<LoadPosition> loadPositions = camera.getUpdateViewpoint().getLoadPositions();
-            if (!loadPositions.isEmpty()) {
-                renderPlanets(gl, vp, loadPositions);
-            }
+
+        Collection<LoadPosition> loadPositions = camera.getUpdateViewpoint().getLoadPositions();
+        if (!loadPositions.isEmpty()) {
+            renderPlanets(gl, vp, loadPositions);
         }
+
         Transform.popProjection();
         Transform.popView();
     }

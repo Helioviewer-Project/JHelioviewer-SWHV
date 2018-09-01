@@ -27,8 +27,8 @@ public class GLImage {
     private float green = 1;
     private float blue = 1;
 
-    private double trimLeft = 0;
-    private double trimRight = 1;
+    private double slitLeft = 0;
+    private double slitRight = 1;
     private double brightOffset = 0;
     private double brightScale = 1;
     private double opacity = 1;
@@ -63,7 +63,7 @@ public class GLImage {
     public void applyFilters(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLSolarShader shader) {
         applyRegion(gl, imageData, prevImageData, baseImageData, shader);
 
-        shader.bindTrim(gl, trimLeft, trimRight);
+        shader.bindSlit(gl, slitLeft, slitRight);
         shader.bindBrightness(gl, brightOffset, brightScale * imageData.getMetaData().getResponseFactor(), imageData.getGamma());
         shader.bindColor(gl, red, green, blue, opacity, blend);
         shader.bindEnhanced(gl, enhanced);
@@ -138,9 +138,9 @@ public class GLImage {
             diffTex.delete(gl);
     }
 
-    public void setTrim(double left, double right) {
-        trimLeft = MathUtils.clip(left, 0, 1);
-        trimRight = MathUtils.clip(right, trimLeft, 1);
+    public void setSlit(double left, double right) {
+        slitLeft = MathUtils.clip(left, 0, 1);
+        slitRight = MathUtils.clip(right, slitLeft, 1);
     }
 
     public void setBrightness(double offset, double scale) {
@@ -148,12 +148,12 @@ public class GLImage {
         brightScale = MathUtils.clip(scale, 0, 2 - brightOffset);
     }
 
-    public double getTrimLeft() {
-        return trimLeft;
+    public double getSlitLeft() {
+        return slitLeft;
     }
 
-    public double getTrimRight() {
-        return trimRight;
+    public double getSlitRight() {
+        return slitRight;
     }
 
     public double getBrightOffset() {
@@ -242,7 +242,7 @@ public class GLImage {
         setSharpen(jo.optDouble("sharpen", sharpen));
         setOpacity(jo.optDouble("opacity", opacity));
         setBlend(jo.optDouble("blend", blend));
-        setTrim(jo.optDouble("trimLeft", trimLeft), jo.optDouble("trimRight", trimRight));
+        setSlit(jo.optDouble("slitLeft", slitLeft), jo.optDouble("slitRight", slitRight));
         setBrightness(jo.optDouble("brightOffset", brightOffset), jo.optDouble("brightScale", brightScale));
         enhanced = jo.optBoolean("enhanced", false);
         String strDiffMode = jo.optString("differenceMode", diffMode.toString());
@@ -264,8 +264,8 @@ public class GLImage {
         jo.put("sharpen", sharpen);
         jo.put("opacity", opacity);
         jo.put("blend", blend);
-        jo.put("trimLeft", trimLeft);
-        jo.put("trimRight", trimRight);
+        jo.put("slitLeft", slitLeft);
+        jo.put("slitRight", slitRight);
         jo.put("brightOffset", brightOffset);
         jo.put("brightScale", brightScale);
         jo.put("enhanced", enhanced);
