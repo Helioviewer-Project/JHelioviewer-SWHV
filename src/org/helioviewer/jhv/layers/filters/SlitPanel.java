@@ -13,14 +13,14 @@ import org.helioviewer.jhv.layers.ImageLayer;
 
 import com.jidesoft.swing.RangeSlider;
 
-public class TrimPanel implements FilterDetails {
+public class SlitPanel implements FilterDetails {
 
     private final RangeSlider slider;
     private final JTextArea label;
 
-    public TrimPanel(ImageLayer layer) {
-        int left = (int) (layer.getGLImage().getTrimLeft() * 100);
-        int right = (int) (layer.getGLImage().getTrimRight() * 100);
+    public SlitPanel(ImageLayer layer) {
+        int left = (int) (layer.getGLImage().getSlitLeft() * 100);
+        int right = (int) (layer.getGLImage().getSlitRight() * 100);
 
         slider = new RangeSlider(0, 100, left, right);
         slider.addMouseListener(new MouseAdapter() {
@@ -43,7 +43,7 @@ public class TrimPanel implements FilterDetails {
         slider.addChangeListener(e -> {
             int lo = slider.getLowValue();
             int hi = slider.getHighValue();
-            layer.getGLImage().setTrim(lo / 100., hi / 100.);
+            layer.getGLImage().setSlit(lo / 100., hi / 100.);
             label.setText(LevelsPanel.format(lo, hi));
             Display.display();
         });
@@ -52,7 +52,7 @@ public class TrimPanel implements FilterDetails {
 
     @Override
     public Component getTitle() {
-        return new JLabel("Trim", JLabel.RIGHT);
+        return new JLabel("Slit", JLabel.RIGHT);
     }
 
     @Override
