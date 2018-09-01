@@ -11,7 +11,6 @@ import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
@@ -20,6 +19,7 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.XMLUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.components.base.WrappedTable;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
@@ -41,7 +41,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
     private final JideSplitPane content = new JideSplitPane(JideSplitPane.VERTICAL_SPLIT);
     private final JButton exportFitsButton = new JButton("Export FITS Header as XML");
 
-    private final JTable fitsTable = new JTable();
+    private final WrappedTable fitsTable = new WrappedTable();
     private final JTextArea basicArea = new JTextArea();
     private final JTextArea hvArea = new JTextArea();
 
@@ -114,6 +114,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         };
         fitsTable.setModel(fitsModel);
         fitsTable.setRowSorter(new TableRowSorter<>(fitsModel));
+        fitsTable.getColumnModel().getColumn(1).setCellRenderer(new WrappedTable.WrappedTextRenderer());
 
         MetaData metaData = layer.getMetaData();
         if (!(metaData instanceof HelioviewerMetaData)) {

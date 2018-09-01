@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.events.gui.info;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -11,17 +10,15 @@ import java.awt.event.MouseMotionListener;
 import java.util.regex.Matcher;
 
 import javax.annotation.Nullable;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.event.ChangeEvent;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.events.JHVEventParameter;
+import org.helioviewer.jhv.gui.components.base.WrappedTable;
 
 @SuppressWarnings("serial")
 class ParameterTablePanel extends JPanel implements MouseListener, MouseMotionListener {
@@ -37,7 +34,7 @@ class ParameterTablePanel extends JPanel implements MouseListener, MouseMotionLi
         table.getColumnModel().getColumn(0).setMaxWidth(180);
         table.getColumnModel().getColumn(0).setPreferredWidth(180);
         table.getColumnModel().getColumn(1).setPreferredWidth(200);
-        table.getColumnModel().getColumn(1).setCellRenderer(new WrappedTextRenderer());
+        table.getColumnModel().getColumn(1).setCellRenderer(new WrappedTable.WrappedTextRenderer());
         table.setPreferredScrollableViewportSize(new Dimension(table.getWidth(), 150));
         // table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
@@ -49,44 +46,6 @@ class ParameterTablePanel extends JPanel implements MouseListener, MouseMotionLi
         table.addMouseListener(this);
 
         add(new JScrollPane(table), BorderLayout.CENTER);
-    }
-
-    private static class WrappedTable extends JTable {
-
-        @Override
-        public void columnMarginChanged(ChangeEvent e) {
-            updateRowHeights();
-        }
-
-        // don't delete
-        // @Override
-        // public void tableChanged(TableModelEvent e) {
-        //     updateRowHeights();
-        // }
-
-        private void updateRowHeights() {
-            int rows = getRowCount();
-            for (int i = 0; i < rows; i++) {
-                Component comp = prepareRenderer(getCellRenderer(i, 1), i, 1);
-
-                int height;
-                Dimension dim = comp.getPreferredSize();
-                if (dim != null /* satisfy coverity */ && (height = dim.height + rowMargin) > rowHeight)
-                    setRowHeight(i, height);
-            }
-        }
-
-    }
-
-    private static class WrappedTextRenderer extends DefaultTableCellRenderer {
-
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            label.setText(String.format("<html><div width=%d>%s</div><html>", table.getColumnModel().getColumn(column).getWidth(), value));
-            return label;
-        }
-
     }
 
     @Nullable
