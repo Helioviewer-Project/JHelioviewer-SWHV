@@ -119,6 +119,9 @@ public class HelioviewerMetaData extends AbstractMetaData {
         detector = m.getString("DETECTOR").orElse("");
         measurement = m.getString("WAVELNTH").orElse("");
 
+        if (measurement.endsWith("."))
+            measurement = measurement.substring(0, measurement.length() - 1);
+
         if (instrument.contains("VSM")) {
             fullName = "NSO-SOLIS " + measurement;
         } else if (instrument.contains("HMI")) {
@@ -142,6 +145,9 @@ public class HelioviewerMetaData extends AbstractMetaData {
             fullName = instrument + ' ' + measurement;
         } else if (instrument.equals("XRT")) {
             measurement = m.getString("EC_FW1_").orElse("") + ' ' + m.getString("EC_FW2_").orElse("");
+            fullName = instrument + ' ' + measurement;
+        } else if (instrument.equals("GOES-R Series Solar Ultraviolet Imager")) {
+            instrument = "SUVI";
             fullName = instrument + ' ' + measurement;
         } else {
             fullName = instrument + ' ' + measurement;
@@ -189,7 +195,7 @@ public class HelioviewerMetaData extends AbstractMetaData {
     }
 
     private Quat retrieveCenterRotation(MetaDataContainer m) {
-        if (instrument.equals("AIA") || instrument.equals("SWAP")) {
+        if (instrument.equals("AIA") || instrument.equals("SWAP") || instrument.equals("SUVI")) {
             crota = m.getDouble("CROTA").map(Math::toRadians).orElse(Double.NaN);
             if (Double.isNaN(crota))
                 crota = m.getDouble("CROTA1").map(Math::toRadians).orElse(Double.NaN);
