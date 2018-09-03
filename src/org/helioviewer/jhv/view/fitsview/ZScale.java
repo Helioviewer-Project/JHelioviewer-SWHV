@@ -2,7 +2,11 @@ package org.helioviewer.jhv.view.fitsview;
 
 import java.util.Arrays;
 
-class ZMax {
+// Copyright (C) 1999-2018
+// Smithsonian Astrophysical Observatory, Cambridge, MA, USA
+// transcribed from tksao/frame/fitsdata.C
+
+class ZScale {
 
     private static final short GOOD_PIXEL = 0;
     private static final short BAD_PIXEL = 1;

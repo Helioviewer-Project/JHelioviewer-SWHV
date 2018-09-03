@@ -125,7 +125,7 @@ class FITSImage {
             float[] zLow = {0};
             float[] zHigh = {0};
             float[] zMax = {0};
-            ZMax.zscale(sampleData, 0.25f, zLow, zHigh, zMax);
+            ZScale.zscale(sampleData, 0.25f, zLow, zHigh, zMax);
 
             switch (bpp) {
                 case BasicHDU.BITPIX_SHORT: {
