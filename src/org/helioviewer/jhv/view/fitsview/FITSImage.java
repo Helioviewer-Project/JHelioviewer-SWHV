@@ -20,6 +20,7 @@ import org.helioviewer.jhv.log.Log;
 class FITSImage {
 
     private static final double GAMMA = 1 / 2.2;
+    private static final long BLANK = 0; // marker in case doesn't exist, very unlikely value
 
     String xml;
     ImageData imageData;
@@ -47,20 +48,20 @@ class FITSImage {
 
     private short getValue(short[][] data2D, int j, int i, long blank) {
         short v = data2D[j][i];
-        return v == blank ? 0 : v;
+        return blank != BLANK && v == blank ? 0 : v;
     }
 
     private int getValue(int[][] data2D, int j, int i, long blank) {
         int v = data2D[j][i];
-        return v == blank ? 0 : v;
+        return blank != BLANK && v == blank ? 0 : v;
     }
 
     private float getValue(float[][] data2D, int j, int i, long blank) {
         float v = data2D[j][i];
-        return v == blank || Float.isNaN(v) ? 0 : v;
+        return blank != BLANK && v == blank || Float.isNaN(v) ? 0 : v;
     }
 
-    private float[] sampleImage(int bpp, int width, int height, Object data) throws Exception {
+    private float[] sampleImage(int bpp, int width, int height, Object data, long blank) throws Exception {
         int stepW = (width / 1024) * 8;
         int stepH = (height / 1024) * 8;
         float[] sampleData = new float[(width / stepW) * (height / stepH)];
@@ -71,7 +72,7 @@ class FITSImage {
                 short[][] data2D = (short[][]) data;
                 for (int j = 0; j < height; j += stepH) {
                     for (int i = 0; i < width; i += stepW)
-                        sampleData[k++] = data2D[j][i];
+                        sampleData[k++] = getValue(data2D, j, i, blank);
                 }
                 break;
             }
@@ -79,7 +80,7 @@ class FITSImage {
                 int[][] data2D = (int[][]) data;
                 for (int j = 0; j < height; j += stepH) {
                     for (int i = 0; i < width; i += stepW)
-                        sampleData[k++] = data2D[j][i];
+                        sampleData[k++] = getValue(data2D, j, i, blank);
                 }
                 break;
             }
@@ -87,7 +88,7 @@ class FITSImage {
                 float[][] data2D = (float[][]) data;
                 for (int j = 0; j < height; j += stepH) {
                     for (int i = 0; i < width; i += stepW)
-                        sampleData[k++] = data2D[j][i];
+                        sampleData[k++] = getValue(data2D, j, i, blank);
                 }
                 break;
             }
@@ -104,9 +105,8 @@ class FITSImage {
         int height = axes[0];
         int width = axes[1];
 
-        int bpp = hdu.getBitPix();
         Object pixelData = hdu.getKernel();
-
+        int bpp = hdu.getBitPix();
         if (bpp == BasicHDU.BITPIX_BYTE) {
             byte[][] data2D = (byte[][]) pixelData;
             byte[] byteData = new byte[width * height];
@@ -115,7 +115,13 @@ class FITSImage {
             }
             imageData = new ImageData(width, height, ImageFormat.Gray8, ByteBuffer.wrap(byteData));
         } else {
-            float[] sampleData = sampleImage(bpp, width, height, pixelData);
+            long blank = BLANK;
+            try {
+                blank = hdu.getBlankValue();
+            } catch (Exception ignore) {
+            }
+
+            float[] sampleData = sampleImage(bpp, width, height, pixelData, blank);
             float[] zLow = {0};
             float[] zHigh = {0};
             float[] zMax = {0};
@@ -131,7 +137,8 @@ class FITSImage {
                     short[] data = new short[width * height];
                     for (int j = 0; j < height; j++) {
                         for (int i = 0; i < width; i++) {
-                            data[width * (height - 1 - j) + i] = scale.get(data2D[j][i] - min);
+                            short v = getValue(data2D, j, i, blank);
+                            data[width * (height - 1 - j) + i] = scale.get(v - min);
                         }
                     }
                     imageData = new ImageData(width, height, ImageFormat.Gray16, ShortBuffer.wrap(data));
@@ -147,7 +154,8 @@ class FITSImage {
                     short[] data = new short[width * height];
                     for (int j = 0; j < height; j++) {
                         for (int i = 0; i < width; i++) {
-                            data[width * (height - 1 - j) + i] = scale.get(data2D[j][i] - min);
+                            int v = getValue(data2D, j, i, blank);
+                            data[width * (height - 1 - j) + i] = scale.get(v - min);
                         }
                     }
                     imageData = new ImageData(width, height, ImageFormat.Gray16, ShortBuffer.wrap(data));
@@ -163,7 +171,8 @@ class FITSImage {
                     short[] data = new short[width * height];
                     for (int j = 0; j < height; j++) {
                         for (int i = 0; i < width; i++) {
-                            data[width * (height - 1 - j) + i] = (short) (scale * Math.pow(data2D[j][i] - min, GAMMA));
+                            float v = getValue(data2D, j, i, blank);
+                            data[width * (height - 1 - j) + i] = (short) (scale * Math.pow(v - min, GAMMA));
                         }
                     }
                     imageData = new ImageData(width, height, ImageFormat.Gray16, ShortBuffer.wrap(data));
