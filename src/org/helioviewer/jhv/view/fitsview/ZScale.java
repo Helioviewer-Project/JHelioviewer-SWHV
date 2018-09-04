@@ -291,8 +291,9 @@ class ZScale {
             zLow[0] = zmin;
             zHigh[0] = zmax;
         } else {
-            if (zContrast > 0)
+            /*if (zContrast > 0) */ {
                 zslope[0] = zslope[0] / zContrast;
+            }
             zLow[0] = ZSMAX(zmin, median - (center_pixel - 1) * zslope[0]);
             zHigh[0] = ZSMIN(zmax, median + (npix - center_pixel) * zslope[0]);
         }
