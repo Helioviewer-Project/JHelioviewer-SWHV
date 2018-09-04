@@ -20,7 +20,7 @@ public class FITSView extends AbstractView {
             throw new Exception("Could not read FITS: " + uri);
 
         xml = fits.xml;
-        HelioviewerMetaData m = new XMLMetaDataContainer(xml).getHVMetaData(0);
+        HelioviewerMetaData m = new XMLMetaDataContainer(xml).getHVMetaData(0, false);
         metaData[0] = m;
 
         int w = m.getPixelWidth();

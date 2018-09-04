@@ -35,8 +35,8 @@ public class XMLMetaDataContainer implements MetaDataContainer {
         return null;
     }
 
-    public HelioviewerMetaData getHVMetaData(int i) {
-        return new HelioviewerMetaData(this, i);
+    public HelioviewerMetaData getHVMetaData(int i, boolean normalizeResponse) {
+        return new HelioviewerMetaData(this, i, normalizeResponse);
     }
 
     @Override

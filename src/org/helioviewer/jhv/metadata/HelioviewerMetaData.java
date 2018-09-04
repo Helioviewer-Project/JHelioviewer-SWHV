@@ -34,7 +34,7 @@ public class HelioviewerMetaData extends AbstractMetaData {
         return centerRotation;
     }
 
-    public HelioviewerMetaData(MetaDataContainer m, int frame) {
+    public HelioviewerMetaData(MetaDataContainer m, int frame, boolean normalizeResponse) {
         frameNumber = frame;
 
         identifyObservation(m);
@@ -52,7 +52,8 @@ public class HelioviewerMetaData extends AbstractMetaData {
         retrieveOcculterRadii(m);
         retrieveOcculterLinearCutOff(m);
 
-        retrieveResponse();
+        if (normalizeResponse)
+            retrieveResponse();
     }
 
     private void retrieveResponse() {
