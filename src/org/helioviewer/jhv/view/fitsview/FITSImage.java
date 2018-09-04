@@ -3,6 +3,7 @@ package org.helioviewer.jhv.view.fitsview;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
+import java.util.Arrays;
 
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Fits;
@@ -20,7 +21,10 @@ import org.helioviewer.jhv.log.Log;
 class FITSImage {
 
     private static final double GAMMA = 1 / 2.2;
-    private static final long BLANK = 0; // marker in case doesn't exist, very unlikely value
+
+    private static final long BLANK = 0; // in case it doesn't exist, very unlikely value
+    private static final int MARKER = -2147483648;
+    private static final int MAX_LUT = 1024 * 1024;
 
     String xml;
     ImageData imageData;
@@ -46,22 +50,19 @@ class FITSImage {
         }
     }
 
-    private short getValue(short[][] data2D, int j, int i, long blank) {
-        short v = data2D[j][i];
-        return blank != BLANK && v == blank ? 0 : v;
+    private static int getValue(short v, long blank) {
+        return blank != BLANK && v == blank ? MARKER : v;
     }
 
-    private int getValue(int[][] data2D, int j, int i, long blank) {
-        int v = data2D[j][i];
-        return blank != BLANK && v == blank ? 0 : v;
+    private static int getValue(int v, long blank) {
+        return blank != BLANK && v == blank ? MARKER : v;
     }
 
-    private float getValue(float[][] data2D, int j, int i, long blank) {
-        float v = data2D[j][i];
-        return blank != BLANK && v == blank || Float.isNaN(v) ? 0 : v;
+    private static float getValue(float v, long blank) {
+        return blank != BLANK && v == blank || Float.isNaN(v) ? MARKER : v;
     }
 
-    private float[] sampleImage(int bpp, int width, int height, Object data, long blank) throws Exception {
+    private static float[] sampleImage(int bpp, int width, int height, Object data, long blank) throws Exception {
         int stepW = (width / 1024) * 8;
         int stepH = (height / 1024) * 8;
         float[] sampleData = new float[(width / stepW) * (height / stepH)];
@@ -71,31 +72,40 @@ class FITSImage {
             case BasicHDU.BITPIX_SHORT: {
                 short[][] data2D = (short[][]) data;
                 for (int j = 0; j < height; j += stepH) {
-                    for (int i = 0; i < width; i += stepW)
-                        sampleData[k++] = getValue(data2D, j, i, blank);
+                    for (int i = 0; i < width; i += stepW) {
+                        int v = getValue(data2D[j][i], blank);
+                        if (v != MARKER)
+                            sampleData[k++] = v;
+                    }
                 }
                 break;
             }
             case BasicHDU.BITPIX_INT: {
                 int[][] data2D = (int[][]) data;
                 for (int j = 0; j < height; j += stepH) {
-                    for (int i = 0; i < width; i += stepW)
-                        sampleData[k++] = getValue(data2D, j, i, blank);
+                    for (int i = 0; i < width; i += stepW) {
+                        int v = getValue(data2D[j][i], blank);
+                        if (v != MARKER)
+                            sampleData[k++] = v;
+                    }
                 }
                 break;
             }
             case BasicHDU.BITPIX_FLOAT: {
                 float[][] data2D = (float[][]) data;
                 for (int j = 0; j < height; j += stepH) {
-                    for (int i = 0; i < width; i += stepW)
-                        sampleData[k++] = getValue(data2D, j, i, blank);
+                    for (int i = 0; i < width; i += stepW) {
+                        float v = getValue(data2D[j][i], blank);
+                        if (v != MARKER)
+                            sampleData[k++] = v;
+                    }
                 }
                 break;
             }
             default:
                 throw new Exception("Bits per pixel not supported: " + bpp);
         }
-        return sampleData;
+        return Arrays.copyOf(sampleData, k);
     }
 
     private void readHDU(BasicHDU<?> hdu) throws Exception {
@@ -127,18 +137,29 @@ class FITSImage {
             float[] zMax = {0};
             ZScale.zscale(sampleData, sampleData.length, zLow, zHigh, zMax);
 
+            long min = (long) zLow[0];
+            long max = (long) zMax[0];
+            if (min >= max) {
+                Log.debug("min > max :" + min + ' ' + max);
+                max = min + 1;
+            }
+            long lutSize = max - min;
+            if (lutSize > MAX_LUT) {
+                Log.debug("Pixel scaling LUT too big: " + min + ' ' + max);
+                lutSize = MAX_LUT;
+            }
+            // System.out.println(">>> " + min + " " + max);
+
             switch (bpp) {
                 case BasicHDU.BITPIX_SHORT: {
                     short[][] data2D = (short[][]) pixelData;
-                    int min = (int) zLow[0];
-                    int max = (int) zMax[0];
 
-                    PixScale scale = new PowScale(min, max, GAMMA);
+                    PixScale scale = new PowScale(lutSize, GAMMA);
                     short[] data = new short[width * height];
                     for (int j = 0; j < height; j++) {
                         for (int i = 0; i < width; i++) {
-                            short v = getValue(data2D, j, i, blank);
-                            data[width * (height - 1 - j) + i] = scale.get(v - min);
+                            int v = getValue(data2D[j][i], blank);
+                            data[width * (height - 1 - j) + i] = v == MARKER ? scale.get(0) : scale.get(v - min);
                         }
                     }
                     imageData = new ImageData(width, height, ImageFormat.Gray16, ShortBuffer.wrap(data));
@@ -147,15 +168,13 @@ class FITSImage {
                 }
                 case BasicHDU.BITPIX_INT: {
                     int[][] data2D = (int[][]) pixelData;
-                    int min = (int) zLow[0];
-                    int max = (int) zMax[0];
 
-                    PixScale scale = new PowScale(min, max, GAMMA);
+                    PixScale scale = new PowScale(lutSize, GAMMA);
                     short[] data = new short[width * height];
                     for (int j = 0; j < height; j++) {
                         for (int i = 0; i < width; i++) {
-                            int v = getValue(data2D, j, i, blank);
-                            data[width * (height - 1 - j) + i] = scale.get(v - min);
+                            int v = getValue(data2D[j][i], blank);
+                            data[width * (height - 1 - j) + i] = v == MARKER ? scale.get(0) : scale.get(v - min);
                         }
                     }
                     imageData = new ImageData(width, height, ImageFormat.Gray16, ShortBuffer.wrap(data));
@@ -164,15 +183,13 @@ class FITSImage {
                 }
                 case BasicHDU.BITPIX_FLOAT: {
                     float[][] data2D = (float[][]) pixelData;
-                    float min = zLow[0];
-                    float max = zMax[0];
 
-                    double scale = 65535. / (max == min ? 1 : max - min);
+                    double scale = 65535. / lutSize;
                     short[] data = new short[width * height];
                     for (int j = 0; j < height; j++) {
                         for (int i = 0; i < width; i++) {
-                            float v = getValue(data2D, j, i, blank);
-                            data[width * (height - 1 - j) + i] = (short) (scale * Math.pow(v - min, GAMMA));
+                            float v = getValue(data2D[j][i], blank);
+                            data[width * (height - 1 - j) + i] = v == MARKER ? 0 : (short) (scale * Math.pow(v - min, GAMMA));
                         }
                     }
                     imageData = new ImageData(width, height, ImageFormat.Gray16, ShortBuffer.wrap(data));
@@ -186,14 +203,13 @@ class FITSImage {
 
     private abstract static class PixScale {
 
-        protected static final int MAX_LUT = 1024 * 1024;
         protected short[] lut;
 
-        short get(int v) {
+        short get(long v) {
             if (v < 0)
                 return lut[0];
             else if (v < lut.length)
-                return lut[v];
+                return lut[(int) v];
             else
                 return lut[lut.length - 1];
         }
@@ -204,15 +220,10 @@ class FITSImage {
 
     private static class LinScale extends PixScale {
 
-        LinScale(int min, int max) {
-            int diff = max > min ? max - min : 1;
-            if (diff > MAX_LUT) {
-                Log.debug("Pixel scaling LUT too big: " + diff);
-                diff = MAX_LUT;
-            }
-            double scale = 65535. / diff;
+        LinScale(long size) {
+            double scale = 65535. / size;
 
-            lut = new short[diff + 1];
+            lut = new short[(int) (size + 1)];
             for (int i = 0; i < lut.length; i++)
                 lut[i] = (short) (scale * i + .5);
         }
@@ -224,18 +235,12 @@ class FITSImage {
 
     }
 
-
     private static class LogScale extends PixScale {
 
-        LogScale(int min, int max) {
-            int diff = max > min ? max - min : 1;
-            if (diff > MAX_LUT) {
-                Log.debug("Pixel scaling LUT too big: " + diff);
-                diff = MAX_LUT;
-            }
-            double scale = 65535. / Math.log1p(diff);
+        LogScale(long size) {
+            double scale = 65535. / Math.log1p(size);
 
-            lut = new short[diff + 1];
+            lut = new short[(int) (size + 1)];
             for (int i = 0; i < lut.length; i++)
                 lut[i] = (short) (scale * Math.log1p(i) + .5);
         }
@@ -249,15 +254,10 @@ class FITSImage {
 
     private static class PowScale extends PixScale {
 
-        PowScale(int min, int max, double p) {
-            int diff = max > min ? max - min : 1;
-            if (diff > MAX_LUT) {
-                Log.debug("Pixel scaling LUT too big: " + diff);
-                diff = MAX_LUT;
-            }
-            double scale = 65535. / Math.pow(diff, p);
+        PowScale(long size, double p) {
+            double scale = 65535. / Math.pow(size, p);
 
-            lut = new short[diff + 1];
+            lut = new short[(int) (size + 1)];
             for (int i = 0; i < lut.length; i++)
                 lut[i] = (short) (scale * Math.pow(i, p) + .5);
         }
