@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 // Copyright (C) 1999-2018
 // Smithsonian Astrophysical Observatory, Cambridge, MA, USA
-// transcribed from tksao/frame/fitsdata.C
+// transcribed from SAOImageDS9/tksao/frame/fitsdata.C
 
 class ZScale {
 
@@ -21,6 +21,8 @@ class ZScale {
     private static final float ZSKREJ = 2.5f;
     // maximum number of fitline iterations
     private static final int ZSMAX_ITERATIONS = 5;
+
+    private static final float zContrast = 0.25f;
 
     private static int ZSMAX(int a, int b) {
         return a > b ? a : b;
@@ -48,16 +50,14 @@ class ZScale {
 
     // flattenData -- Compute and subtract the fitted line from the data array,
     // returned the flattened data in FLAT.
-    private static void zFlattenData(float[] sampleData, float[] flat, float[] x, float z0, float dz) {
-        int npix = sampleData.length;
+    private static void zFlattenData(float[] sampleData, float[] flat, float[] x, int npix, float z0, float dz) {
         for (int i = 0; i < npix; i++)
             flat[i] = sampleData[i] - (x[i] * dz + z0);
     }
 
     // computeSigma -- Compute the root mean square deviation from the
     // mean of a flattened array.  Ignore rejected pixels.
-    private static void zComputeSigma(float[] a, short[] badpix, float[] mean, float[] sigma) {
-        int npix = a.length;
+    private static void zComputeSigma(float[] a, short[] badpix, int npix, float[] mean, float[] sigma) {
         int ngoodpix = 0;
         double sum = 0.0;
         double sumsq = 0.0;
@@ -100,9 +100,8 @@ class ZScale {
     // produces a more stringent rejection criteria which takes advantage of the
     // fact that bad pixels tend to be clumped.  The number of pixels left in the
     // fit is returned as the function value.
-    private static int zRejectPixels(float[] sampleData, float[] flat, float[] normx, short[] badpix,
+    private static int zRejectPixels(float[] sampleData, float[] flat, float[] normx, short[] badpix, int npix,
                                      double[] sumxsqr, double[] sumxz, double[] sumx, double[] sumz, float threshold, int ngrow) {
-        int npix = sampleData.length;
         int ngoodpix = npix;
         float lcut = -threshold;
         float hcut = threshold;
@@ -146,8 +145,7 @@ class ZScale {
     // next iteration does not decrease the number of pixels in the fit, or when
     // there are no pixels left.  The number of pixels left after pixel rejection
     // is returned as the function value.
-    private static int zFitLine(float[] sampleData, float[] zstart, float[] zslope, float krej, int ngrow, int maxiter) {
-        int npix = sampleData.length;
+    private static int zFitLine(float[] sampleData, int npix, float[] zstart, float[] zslope, float krej, int ngrow, int maxiter) {
         float xscale;
         if (npix <= 0)
             return (0);
@@ -210,7 +208,7 @@ class ZScale {
             last_ngoodpix = ngoodpix;
 
             // Subtract the fitted line from the data array
-            zFlattenData(sampleData, flat, normx, z0, dz);
+            zFlattenData(sampleData, flat, normx, npix, z0, dz);
 
             // Compute the k-sigma rejection threshold.  In principle this
             // could be more efficiently computed using the matrix sums
@@ -218,11 +216,11 @@ class ZScale {
             // numerical stability with that approach.
             float[] mean = {0};
             float[] sigma = {0};
-            zComputeSigma(flat, badpix, mean, sigma);
+            zComputeSigma(flat, badpix, npix, mean, sigma);
             float threshold = sigma[0] * krej;
 
             // Detect and reject pixels further than ksigma from the fitted line.
-            ngoodpix = zRejectPixels(sampleData, flat, normx, badpix, sumxsqr, sumxz, sumx, sumz, threshold, ngrow);
+            ngoodpix = zRejectPixels(sampleData, flat, normx, badpix, npix, sumxsqr, sumxz, sumx, sumz, threshold, ngrow);
 
             // Solve for the coefficients of the fitted line.  Note that after
             // pixel rejection the sum of the X values need no longer be zero.
@@ -260,8 +258,7 @@ class ZScale {
     // of the fitted line is divided by the user-supplied contrast factor and the
     // final Z1 and Z2 are computed, taking the origin of the fitted line at the
     // median value.
-    static void zscale(float[] sample, float zContrast, float[] zLow, float[] zHigh, float[] zMax) {
-        int npix = sample.length;
+    static void zscale(float[] sample, int npix, float[] zLow, float[] zHigh, float[] zMax) {
         int center_pixel = ZSMAX(1, (npix + 1) / 2);
 
         // Sort the sample, compute the minimum, maximum, and median pixel values
@@ -289,7 +286,7 @@ class ZScale {
         float[] zstart = {0};
         float[] zslope = {0};
 
-        int ngoodpix = zFitLine(sample, zstart, zslope, ZSKREJ, ngrow, ZSMAX_ITERATIONS);
+        int ngoodpix = zFitLine(sample, npix, zstart, zslope, ZSKREJ, ngrow, ZSMAX_ITERATIONS);
         if (ngoodpix < minpix) {
             zLow[0] = zmin;
             zHigh[0] = zmax;
