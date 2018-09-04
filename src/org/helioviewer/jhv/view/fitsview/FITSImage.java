@@ -3,7 +3,6 @@ package org.helioviewer.jhv.view.fitsview;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
-import java.util.Arrays;
 
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Fits;
@@ -50,11 +49,11 @@ class FITSImage {
         }
     }
 
-    private static int getValue(short v, long blank) {
+    private static float getValue(short v, long blank) {
         return blank != BLANK && v == blank ? MARKER : v;
     }
 
-    private static int getValue(int v, long blank) {
+    private static float getValue(int v, long blank) {
         return blank != BLANK && v == blank ? MARKER : v;
     }
 
@@ -62,50 +61,58 @@ class FITSImage {
         return blank != BLANK && v == blank || Float.isNaN(v) ? MARKER : v;
     }
 
-    private static float[] sampleImage(int bpp, int width, int height, Object data, long blank) throws Exception {
-        int stepW = (width / 1024) * 8;
-        int stepH = (height / 1024) * 8;
-        float[] sampleData = new float[(width / stepW) * (height / stepH)];
+    private static float[] getMinMax(int bpp, int width, int height, Object data, long blank) {
+        float min = Float.MAX_VALUE;
+        float max = -Float.MAX_VALUE;
 
-        int k = 0;
         switch (bpp) {
             case BasicHDU.BITPIX_SHORT: {
                 short[][] data2D = (short[][]) data;
-                for (int j = 0; j < height; j += stepH) {
-                    for (int i = 0; i < width; i += stepW) {
-                        int v = getValue(data2D[j][i], blank);
-                        if (v != MARKER)
-                            sampleData[k++] = v;
+                for (int j = 0; j < height; j++) {
+                    for (int i = 0; i < width; i++) {
+                        float v = getValue(data2D[j][i], blank);
+                        if (v != MARKER) {
+                            if (v > max)
+                                max = v;
+                            if (v < min)
+                                min = v;
+                        }
                     }
                 }
                 break;
             }
             case BasicHDU.BITPIX_INT: {
                 int[][] data2D = (int[][]) data;
-                for (int j = 0; j < height; j += stepH) {
-                    for (int i = 0; i < width; i += stepW) {
-                        int v = getValue(data2D[j][i], blank);
-                        if (v != MARKER)
-                            sampleData[k++] = v;
+                for (int j = 0; j < height; j++) {
+                    for (int i = 0; i < width; i++) {
+                        float v = getValue(data2D[j][i], blank);
+                        if (v != MARKER) {
+                            if (v > max)
+                                max = v;
+                            if (v < min)
+                                min = v;
+                        }
                     }
                 }
                 break;
             }
             case BasicHDU.BITPIX_FLOAT: {
                 float[][] data2D = (float[][]) data;
-                for (int j = 0; j < height; j += stepH) {
-                    for (int i = 0; i < width; i += stepW) {
+                for (int j = 0; j < height; j++) {
+                    for (int i = 0; i < width; i++) {
                         float v = getValue(data2D[j][i], blank);
-                        if (v != MARKER)
-                            sampleData[k++] = v;
+                        if (v != MARKER) {
+                            if (v > max)
+                                max = v;
+                            if (v < min)
+                                min = v;
+                        }
                     }
                 }
                 break;
             }
-            default:
-                throw new Exception("Bits per pixel not supported: " + bpp);
         }
-        return Arrays.copyOf(sampleData, k);
+        return new float[]{min, max};
     }
 
     private void readHDU(BasicHDU<?> hdu) throws Exception {
@@ -115,8 +122,11 @@ class FITSImage {
         int height = axes[0];
         int width = axes[1];
 
-        Object pixelData = hdu.getKernel();
         int bpp = hdu.getBitPix();
+        if (bpp != BasicHDU.BITPIX_BYTE && bpp != BasicHDU.BITPIX_SHORT && bpp != BasicHDU.BITPIX_INT && bpp != BasicHDU.BITPIX_FLOAT)
+            throw new Exception("Bits per pixel not supported: " + bpp);
+
+        Object pixelData = hdu.getKernel();
         if (bpp == BasicHDU.BITPIX_BYTE) {
             byte[][] data2D = (byte[][]) pixelData;
             byte[] byteData = new byte[width * height];
@@ -131,24 +141,17 @@ class FITSImage {
             } catch (Exception ignore) {
             }
 
-            float[] sampleData = sampleImage(bpp, width, height, pixelData, blank);
-            float[] zLow = {0};
-            float[] zHigh = {0};
-            float[] zMax = {0};
-            ZScale.zscale(sampleData, sampleData.length, zLow, zHigh, zMax);
-
-            long min = (long) zLow[0];
-            long max = (long) zMax[0];
-            if (min >= max) {
-                Log.debug("min > max :" + min + ' ' + max);
-                max = min + 1;
+            float[] minmax = getMinMax(bpp, width, height, pixelData, blank);
+            if (minmax[0] >= minmax[1]) {
+                Log.debug("min >= max :" + minmax[0] + ' ' + minmax[1]);
+                minmax[1] = minmax[0] + 1;
             }
-            long lutSize = max - min;
+            long lutSize = (long) (minmax[1] - minmax[0]);
             if (lutSize > MAX_LUT) {
-                Log.debug("Pixel scaling LUT too big: " + min + ' ' + max);
+                Log.debug("Pixel scaling LUT too big: " + minmax[0] + ' ' + minmax[1]);
                 lutSize = MAX_LUT;
             }
-            // System.out.println(">>> " + min + " " + max);
+            // System.out.println(">>> " + minmax[0] + ' ' + minmax[1]);
 
             switch (bpp) {
                 case BasicHDU.BITPIX_SHORT: {
@@ -158,8 +161,8 @@ class FITSImage {
                     short[] data = new short[width * height];
                     for (int j = 0; j < height; j++) {
                         for (int i = 0; i < width; i++) {
-                            int v = getValue(data2D[j][i], blank);
-                            data[width * (height - 1 - j) + i] = v == MARKER ? scale.get(0) : scale.get(v - min);
+                            float v = getValue(data2D[j][i], blank);
+                            data[width * (height - 1 - j) + i] = v == MARKER ? scale.get(0) : scale.get((int) (v - minmax[0]));
                         }
                     }
                     imageData = new ImageData(width, height, ImageFormat.Gray16, ShortBuffer.wrap(data));
@@ -173,8 +176,8 @@ class FITSImage {
                     short[] data = new short[width * height];
                     for (int j = 0; j < height; j++) {
                         for (int i = 0; i < width; i++) {
-                            int v = getValue(data2D[j][i], blank);
-                            data[width * (height - 1 - j) + i] = v == MARKER ? scale.get(0) : scale.get(v - min);
+                            float v = getValue(data2D[j][i], blank);
+                            data[width * (height - 1 - j) + i] = v == MARKER ? scale.get(0) : scale.get((int) (v - minmax[0]));
                         }
                     }
                     imageData = new ImageData(width, height, ImageFormat.Gray16, ShortBuffer.wrap(data));
@@ -189,14 +192,12 @@ class FITSImage {
                     for (int j = 0; j < height; j++) {
                         for (int i = 0; i < width; i++) {
                             float v = getValue(data2D[j][i], blank);
-                            data[width * (height - 1 - j) + i] = v == MARKER ? 0 : (short) (scale * Math.pow(v - min, GAMMA));
+                            data[width * (height - 1 - j) + i] = v == MARKER ? 0 : (short) (scale * Math.pow(v - minmax[0], GAMMA));
                         }
                     }
                     imageData = new ImageData(width, height, ImageFormat.Gray16, ShortBuffer.wrap(data));
                     break;
                 }
-                default:
-                    throw new Exception("Bits per pixel not supported: " + bpp);
             }
         }
     }
