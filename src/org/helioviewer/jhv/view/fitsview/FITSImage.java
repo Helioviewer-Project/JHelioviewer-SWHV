@@ -162,7 +162,7 @@ class FITSImage {
 
     private void readHDU(BasicHDU<?> hdu) throws Exception {
         int[] axes = hdu.getAxes();
-        if (axes.length != 2)
+        if (axes == null || axes.length != 2)
             throw new Exception("Only 2D FITS files supported");
         int height = axes[0];
         int width = axes[1];
@@ -172,6 +172,9 @@ class FITSImage {
             throw new Exception("Bits per pixel not supported: " + bpp);
 
         Object pixelData = hdu.getKernel();
+        if (pixelData == null)
+            throw new Exception("Cannot retrieve pixel data");
+
         if (bpp == BasicHDU.BITPIX_BYTE) {
             byte[][] data2D = (byte[][]) pixelData;
             byte[] byteData = new byte[width * height];
