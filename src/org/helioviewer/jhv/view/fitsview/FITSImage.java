@@ -58,7 +58,52 @@ class FITSImage {
     }
 
     private static float getValue(float v, long blank) {
-        return blank != BLANK && v == blank || Float.isNaN(v) ? MARKER : v;
+        return (blank != BLANK && v == blank) || Float.isNaN(v) ? MARKER : v;
+    }
+
+    private static float[] sampleImage(int bpp, int width, int height, Object data, long blank, int[] npix) {
+        int stepW = 4 * width / 1024;
+        int stepH = 4 * height / 1024;
+        float[] sampleData = new float[(width / stepW) * (height / stepH)];
+
+        int k = 0;
+        switch (bpp) {
+            case BasicHDU.BITPIX_SHORT: {
+                short[][] data2D = (short[][]) data;
+                for (int j = 0; j < height; j += stepH) {
+                    for (int i = 0; i < width; i += stepW) {
+                        float v = getValue(data2D[j][i], blank);
+                        if (v != MARKER)
+                            sampleData[k++] = v;
+                    }
+                }
+                break;
+            }
+            case BasicHDU.BITPIX_INT: {
+                int[][] data2D = (int[][]) data;
+                for (int j = 0; j < height; j += stepH) {
+                    for (int i = 0; i < width; i += stepW) {
+                        float v = getValue(data2D[j][i], blank);
+                        if (v != MARKER)
+                            sampleData[k++] = v;
+                    }
+                }
+                break;
+            }
+            case BasicHDU.BITPIX_FLOAT: {
+                float[][] data2D = (float[][]) data;
+                for (int j = 0; j < height; j += stepH) {
+                    for (int i = 0; i < width; i += stepW) {
+                        float v = getValue(data2D[j][i], blank);
+                        if (v != MARKER)
+                            sampleData[k++] = v;
+                    }
+                }
+                break;
+            }
+        }
+        npix[0] = k;
+        return sampleData;
     }
 
     private static float[] getMinMax(int bpp, int width, int height, Object data, long blank) {
@@ -141,7 +186,17 @@ class FITSImage {
             } catch (Exception ignore) {
             }
 
-            float[] minmax = getMinMax(bpp, width, height, pixelData, blank);
+            int[] npix = {0};
+            float[] sampleData = sampleImage(bpp, width, height, pixelData, blank, npix);
+
+            float[] zLow = {0};
+            float[] zHigh = {0};
+            float[] zMax = {0};
+            ZScale.zscale(sampleData, npix[0], zLow, zHigh, zMax);
+            // System.out.println(">>> " + npix[0] + " " + zLow[0] + " " + zMax[0]);
+
+            float[] minmax = {zLow[0], zMax[0]};
+            // float[] minmax = getMinMax(bpp, width, height, pixelData, blank);
             if (minmax[0] >= minmax[1]) {
                 Log.debug("min >= max :" + minmax[0] + ' ' + minmax[1]);
                 minmax[1] = minmax[0] + 1;
