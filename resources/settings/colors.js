@@ -85,7 +85,7 @@
   "color":"SDO-AIA 193 Å"},
  {"instrument":"SUVI",
   "measurement":"284",
-  "color":"SOHO EIT 284 Å"},
+  "color":"SDO-AIA 335 Å"},
  {"instrument":"SUVI",
   "measurement":"304",
   "color":"SDO-AIA 304 Å"},
