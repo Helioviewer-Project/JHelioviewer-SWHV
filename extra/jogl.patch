@@ -22,6 +22,131 @@ diff -ur jogl-v2.3.2-orig/src/jogl/classes/jogamp/opengl/macosx/cgl/MacOSXCGLCon
  
                                    // If v-sync is disabled, frames will be drawn as quickly as possible w/o delay,
                                    // while still synchronizing w/ CALayer.
+diff -ur jogl-v2.3.2-orig/src/nativewindow/classes/jogamp/nativewindow/jawt/macosx/MacOSXJAWTWindow.java jogl-v2.3.2/src/nativewindow/classes/jogamp/nativewindow/jawt/macosx/MacOSXJAWTWindow.java
+--- jogl-v2.3.2-orig/src/nativewindow/classes/jogamp/nativewindow/jawt/macosx/MacOSXJAWTWindow.java	2015-10-10 03:08:14.000000000 +0200
++++ jogl-v2.3.2/src/nativewindow/classes/jogamp/nativewindow/jawt/macosx/MacOSXJAWTWindow.java	2018-09-06 00:14:28.000000000 +0200
+@@ -95,12 +95,12 @@
+       offscreenSurfaceDrawable=0;
+       offscreenSurfaceDrawableSet=false;
+       if( isOffscreenLayerSurfaceEnabled() ) {
+-          if(0 != windowHandle) {
+-              OSXUtil.DestroyNSWindow(windowHandle);
+-          }
+           OSXUtil.RunOnMainThread(false, true /* kickNSApp */, new Runnable() {
+               @Override
+               public void run() {
++                  if(0 != windowHandle) {
++                      OSXUtil.DestroyNSWindow(windowHandle);
++                  }
+                   if( 0 != jawtSurfaceLayersHandle) {
+                       // null rootSurfaceLayer OK
+                       UnsetJAWTRootSurfaceLayer0(jawtSurfaceLayersHandle, rootSurfaceLayer);
+@@ -309,7 +309,7 @@
+          * The actual surface/ca-layer shall be created/attached
+          * by the upper framework (JOGL) since they require more information.
+          */
+-        String errMsg = null;
++/*        String errMsg = null;
+         if(0 == drawable) {
+             windowHandle = OSXUtil.CreateNSWindow(0, 0, 64, 64);
+             if(0 == windowHandle) {
+@@ -327,12 +327,39 @@
+                 setChosenCapabilities(caps);
+             }
+         }
+-        if(null == errMsg) {
++        if(null == errMsg)*/ {
+             jawtSurfaceLayersHandle = GetJAWTSurfaceLayersHandle0(dsi.getBuffer());
+             OSXUtil.RunOnMainThread(false, false, new Runnable() {
+                     @Override
+                     public void run() {
+                         String errMsg = null;
++
++                        windowHandle = OSXUtil.CreateNSWindow(0, 0, 64, 64);
++                        if(0 == windowHandle) {
++                            errMsg = "Unable to create dummy NSWindow (layered case)";
++                        } else {
++                            drawable = OSXUtil.GetNSView(windowHandle);
++                            if(0 == drawable) {
++                              errMsg = "Null NSView of NSWindow "+toHexString(windowHandle);
++                            }
++                        }
++                        if(null == errMsg) {
++                            // Fix caps reflecting offscreen! (no GL available here ..)
++                            final Capabilities caps = (Capabilities) getGraphicsConfiguration().getChosenCapabilities().cloneMutable();
++                            caps.setOnscreen(false);
++                            setChosenCapabilities(caps);
++                        }
++
++                        if(null != errMsg) {
++                            if(0 != windowHandle) {
++                                OSXUtil.DestroyNSWindow(windowHandle);
++                                windowHandle = 0;
++                            }
++                            drawable = 0;
++                            unlockSurfaceImpl();
++                            throw new NativeWindowException(errMsg+": "+this);
++                        }
++
+                         if(0 == rootSurfaceLayer && 0 != jawtSurfaceLayersHandle) {
+                             rootSurfaceLayer = OSXUtil.CreateCALayer(bounds.getWidth(), bounds.getHeight(), getPixelScaleX()); // HiDPI: uniform pixel scale
+                             if(0 == rootSurfaceLayer) {
+@@ -354,7 +381,7 @@
+                         }
+                     } } );
+         }
+-        if(null != errMsg) {
++/*        if(null != errMsg) {
+             if(0 != windowHandle) {
+               OSXUtil.DestroyNSWindow(windowHandle);
+               windowHandle = 0;
+@@ -362,7 +389,7 @@
+             drawable = 0;
+             unlockSurfaceImpl();
+             throw new NativeWindowException(errMsg+": "+this);
+-        }
++        } */
+         ret = NativeSurface.LOCK_SUCCESS;
+     }
+ 
+diff -ur jogl-v2.3.2-orig/src/nativewindow/classes/jogamp/nativewindow/macosx/OSXDummyUpstreamSurfaceHook.java jogl-v2.3.2/src/nativewindow/classes/jogamp/nativewindow/macosx/OSXDummyUpstreamSurfaceHook.java
+--- jogl-v2.3.2-orig/src/nativewindow/classes/jogamp/nativewindow/macosx/OSXDummyUpstreamSurfaceHook.java	2015-10-10 03:08:14.000000000 +0200
++++ jogl-v2.3.2/src/nativewindow/classes/jogamp/nativewindow/macosx/OSXDummyUpstreamSurfaceHook.java	2018-09-06 00:13:42.000000000 +0200
+@@ -25,6 +25,9 @@
+ 
+     @Override
+     public final void create(final ProxySurface s) {
++        OSXUtil.RunOnMainThread(true, false, new Runnable() {
++        @Override
++        public void run() {
+         if(0 == nsWindow && 0 == s.getSurfaceHandle()) {
+             nsWindow = OSXUtil.CreateNSWindow(0, 0, 64, 64);
+             if(0 == nsWindow) {
+@@ -38,10 +41,15 @@
+             s.addUpstreamOptionBits( ProxySurface.OPT_PROXY_OWNS_UPSTREAM_SURFACE );
+         }
+         s.addUpstreamOptionBits(ProxySurface.OPT_UPSTREAM_WINDOW_INVISIBLE);
++        }
++        });
+     }
+ 
+     @Override
+     public final void destroy(final ProxySurface s) {
++        OSXUtil.RunOnMainThread(true, false, new Runnable() {
++        @Override
++        public void run() {
+         if( s.containsUpstreamOptionBits( ProxySurface.OPT_PROXY_OWNS_UPSTREAM_SURFACE ) ) {
+             if( 0 == nsWindow || 0 == s.getSurfaceHandle() ) {
+                 throw new InternalError("Owns upstream surface, but no OSX view/window: "+s+", nsWindow 0x"+Long.toHexString(nsWindow));
+@@ -51,6 +59,8 @@
+             s.setSurfaceHandle(0);
+             s.clearUpstreamOptionBits( ProxySurface.OPT_PROXY_OWNS_UPSTREAM_SURFACE );
+         }
++        }
++        });
+     }
+ 
+ }
 diff -ur jogl-v2.3.2-orig/src/nativewindow/native/macosx/OSXmisc.m jogl-v2.3.2/src/nativewindow/native/macosx/OSXmisc.m
 --- jogl-v2.3.2-orig/src/nativewindow/native/macosx/OSXmisc.m	2015-10-10 03:08:14.000000000 +0200
 +++ jogl-v2.3.2/src/nativewindow/native/macosx/OSXmisc.m	2016-06-20 08:47:10.000000000 +0200
@@ -57,7 +182,7 @@ diff -ur jogl-v2.3.2-orig/src/nativewindow/native/macosx/OSXmisc.m jogl-v2.3.2/s
  
 diff -ur jogl-v2.3.2-orig/src/newt/classes/com/jogamp/newt/awt/NewtCanvasAWT.java jogl-v2.3.2/src/newt/classes/com/jogamp/newt/awt/NewtCanvasAWT.java
 --- jogl-v2.3.2-orig/src/newt/classes/com/jogamp/newt/awt/NewtCanvasAWT.java	2015-10-10 03:08:14.000000000 +0200
-+++ jogl-v2.3.2/src/newt/classes/com/jogamp/newt/awt/NewtCanvasAWT.java	2016-10-05 10:06:08.000000000 +0200
++++ jogl-v2.3.2/src/newt/classes/com/jogamp/newt/awt/NewtCanvasAWT.java	2018-05-27 18:21:20.000000000 +0200
 @@ -747,7 +747,7 @@
                  if(DEBUG) {
                      System.err.println("NewtCanvasAWT.reshape: "+x+"/"+y+" "+width+"x"+height);
