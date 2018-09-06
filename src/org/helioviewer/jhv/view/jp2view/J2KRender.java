@@ -30,11 +30,10 @@ import com.google.common.cache.CacheBuilder;
 
 class J2KRender implements Runnable {
 
-    private static final int MAX_INACTIVE_LAYERS = 200;
     private static final int[] firstComponent = {0};
 
     private static final ThreadLocal<Cache<DecodeParams, ImageDataBuffer>> decodeCache =
-            ThreadLocal.withInitial(() -> CacheBuilder.newBuilder().maximumSize(MAX_INACTIVE_LAYERS).build());
+            ThreadLocal.withInitial(() -> CacheBuilder.newBuilder().softValues().build());
     private static final ThreadLocal<Kdu_thread_env> localThread = ThreadLocal.withInitial(J2KRender::createThreadEnv);
     private static final ThreadLocal<Kdu_region_compositor> localCompositor = new ThreadLocal<>();
 
