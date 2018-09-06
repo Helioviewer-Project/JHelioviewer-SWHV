@@ -152,11 +152,6 @@ public class BandType {
     }
 
     @Override
-    public String toString() {
-        return label;
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (!(o instanceof BandType))
             return false;
@@ -167,6 +162,11 @@ public class BandType {
     @Override
     public int hashCode() {
         return name.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return label;
     }
 
 }

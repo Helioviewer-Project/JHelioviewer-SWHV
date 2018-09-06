@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.view.jp2view.image;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 // A class describing the available resolution levels for a given image
@@ -84,8 +85,7 @@ public class ResolutionSet {
 
         @Override
         public int hashCode() {
-            assert false : "hashCode not designed";
-            return 42;
+            return Objects.hash(level, width, height, factorX, factorY);
         }
 
         @Override

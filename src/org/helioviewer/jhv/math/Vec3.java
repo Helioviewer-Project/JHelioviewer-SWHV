@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.math;
 
+import java.util.Objects;
+
 import org.helioviewer.jhv.log.Log;
 import org.json.JSONArray;
 
@@ -91,11 +93,6 @@ public class Vec3 {
         }
     }
 
-    @Override
-    public String toString() {
-        return toJson().toString();
-    }
-
     public JSONArray toJson() {
         return new JSONArray(new double[]{x, y, z});
     }
@@ -115,8 +112,12 @@ public class Vec3 {
 
     @Override
     public int hashCode() {
-        assert false : "hashCode not designed";
-        return 42;
+        return Objects.hash(x, y, z);
+    }
+
+    @Override
+    public String toString() {
+        return toJson().toString();
     }
 
 }

@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.io;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
@@ -61,8 +62,7 @@ public class APIRequest {
 
     @Override
     public int hashCode() {
-        assert false : "hashCode not designed";
-        return 42;
+        return Objects.hash(sourceId, startTime, endTime, cadence, server);
     }
 
     public JSONObject toJson() {

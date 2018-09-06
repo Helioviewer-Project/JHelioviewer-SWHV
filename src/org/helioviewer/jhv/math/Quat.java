@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.math;
 
+import java.util.Objects;
+
 import org.json.JSONArray;
 
 public class Quat {
@@ -236,11 +238,6 @@ public class Quat {
         return new float[] { (float) u.x, (float) u.y, (float) u.z, (float) a };
     }
 
-    @Override
-    public String toString() {
-        return toJson().toString();
-    }
-
     public JSONArray toJson() {
         return new JSONArray(new double[] { a, u.x, u.y, u.z });
     }
@@ -263,8 +260,12 @@ public class Quat {
 
     @Override
     public int hashCode() {
-        assert false : "hashCode not designed";
-        return 42;
+        return Objects.hash(a, u);
+    }
+
+    @Override
+    public String toString() {
+        return toJson().toString();
     }
 
 }
