@@ -14,7 +14,7 @@ import org.json.JSONObject;
 
 class BandCacheAll implements BandCache {
 
-    private final ArrayList<DateVal> datevals = new ArrayList<>();
+    private final ArrayList<DateValue> datevals = new ArrayList<>();
     private boolean hasData;
     private PropagationModel propagationModel;
 
@@ -37,7 +37,7 @@ class BandCacheAll implements BandCache {
         for (int i = 0; i < len; i++) {
             if (datevals.size() >= MAX_SIZE)
                 break;
-            datevals.add(new DateVal(dates[i], values[i]));
+            datevals.add(new DateValue(dates[i], values[i]));
         }
         Collections.sort(datevals);
     }
@@ -47,10 +47,10 @@ class BandCacheAll implements BandCache {
         float min = Float.MAX_VALUE;
         float max = Float.MIN_VALUE;
 
-        for (DateVal dv : datevals) {
-            if (dv.val != Float.MIN_VALUE && timeAxis.start <= dv.date && dv.date <= timeAxis.end) {
-                min = Math.min(dv.val, min);
-                max = Math.max(dv.val, max);
+        for (DateValue dv : datevals) {
+            if (dv.value != Float.MIN_VALUE && timeAxis.start <= dv.milli && dv.milli <= timeAxis.end) {
+                min = Math.min(dv.value, min);
+                max = Math.max(dv.value, max);
             }
         }
         return new float[]{min, max};
@@ -62,10 +62,10 @@ class BandCacheAll implements BandCache {
 
         ArrayList<Integer> tvalues = new ArrayList<>();
         ArrayList<Integer> tdates = new ArrayList<>();
-        for (DateVal dv : datevals) {
-            if (dv.val != Float.MIN_VALUE && timeAxis.start <= dv.date && dv.date <= timeAxis.end) {
-                tdates.add(timeAxis.value2pixel(graphArea.x, graphArea.width, dv.date));
-                tvalues.add(yAxis.value2pixel(graphArea.y, graphArea.height, dv.val));
+        for (DateValue dv : datevals) {
+            if (dv.value != Float.MIN_VALUE && timeAxis.start <= dv.milli && dv.milli <= timeAxis.end) {
+                tdates.add(timeAxis.value2pixel(graphArea.x, graphArea.width, dv.milli));
+                tvalues.add(yAxis.value2pixel(graphArea.y, graphArea.height, dv.value));
             }
         }
         if (!tvalues.isEmpty()) {
@@ -81,42 +81,41 @@ class BandCacheAll implements BandCache {
     @Override
     public void serialize(JSONObject jo, double f) {
         JSONArray ja = new JSONArray();
-        for (DateVal dv : datevals)
+        for (DateValue dv : datevals)
             dv.serialize(ja, f);
         jo.put("data", ja);
     }
 
-    private static class DateVal implements Comparable<DateVal> {
+    private static class DateValue implements Comparable<DateValue> {
 
-        final long date;
-        final float val;
+        final long milli;
+        final float value;
 
-        DateVal(long _date, float _val) {
-            date = _date;
-            val = _val;
+        DateValue(long _milli, float _value) {
+            milli = _milli;
+            value = _value;
         }
 
         void serialize(JSONArray ja, double f) {
-            ja.put(new JSONArray().put(date / 1000).put(val * f));
+            ja.put(new JSONArray().put(milli / 1000).put(value * f));
         }
 
         @Override
-        public int compareTo(@Nonnull DateVal o) {
-            return Long.compare(date, o.date);
+        public int compareTo(@Nonnull DateValue o) {
+            return Long.compare(milli, o.milli);
         }
 
         @Override
         public boolean equals(Object o) {
-            if (!(o instanceof DateVal))
+            if (!(o instanceof DateValue))
                 return false;
-            DateVal d = (DateVal) o;
-            return date == d.date;
+            DateValue d = (DateValue) o;
+            return milli == d.milli;
         }
 
         @Override
         public int hashCode() {
-            assert false : "hashCode not designed";
-            return 42;
+            return (int) (milli ^ (milli >>> 32));
         }
 
     }
