@@ -38,6 +38,13 @@ public class ImageData {
         buffer = _buffer;
     }
 
+    public ImageData(ImageDataBuffer buf) {
+        width = buf.width;
+        height = buf.height;
+        format = buf.format;
+        buffer = buf.buffer;
+    }
+
     public int getHeight() {
         return height;
     }
