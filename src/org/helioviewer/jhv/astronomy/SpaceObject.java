@@ -87,11 +87,6 @@ public class SpaceObject {
     }
 
     @Override
-    public String toString() {
-        return name;
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (!(o instanceof SpaceObject))
             return false;
@@ -102,6 +97,11 @@ public class SpaceObject {
     @Override
     public int hashCode() {
         return urlName.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 
 }
