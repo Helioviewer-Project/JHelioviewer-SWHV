@@ -19,6 +19,7 @@ import kdu_jni.Kdu_thread_env;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageData.ImageFormat;
 import org.helioviewer.jhv.imagedata.SubImage;
+import org.helioviewer.jhv.view.jp2view.image.DecodeParams;
 import org.helioviewer.jhv.view.jp2view.image.ImageParams;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduConstants;
 
@@ -33,18 +34,18 @@ class J2KRender implements Runnable {
     private static final ThreadLocal<Kdu_region_compositor> localCompositor = new ThreadLocal<>();
 
     private final JP2View view;
-    private final ImageParams params;
+    private final ImageParams imageParams;
     private final boolean discard;
     private final boolean abolish;
 
-    J2KRender(JP2View _view, ImageParams _currParams, boolean _discard, boolean _abolish) {
+    J2KRender(JP2View _view, ImageParams _imageParams, boolean _discard, boolean _abolish) {
         view = _view;
-        params = _currParams;
+        imageParams = _imageParams;
         discard = _discard;
         abolish = _abolish;
     }
 
-    private void renderLayer(Kdu_region_compositor compositor) throws KduException {
+    private ImageData renderLayer(Kdu_region_compositor compositor, DecodeParams params) throws KduException {
         if (discard)
             compositor.Refresh();
         else
@@ -114,11 +115,10 @@ class J2KRender implements Runnable {
                 }
             }
         }
-        ImageFormat format = numComponents < 3 ? ImageFormat.Gray8 : ImageFormat.ARGB32;
-        ImageData data = new ImageData(actualWidth, actualHeight, format, ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder()));
-        view.setDataFromRender(params, data);
-
         compositor.Remove_ilayer(ilayer, discard);
+
+        ImageFormat format = numComponents < 3 ? ImageFormat.Gray8 : ImageFormat.ARGB32;
+        return new ImageData(actualWidth, actualHeight, format, ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder()));
     }
 
     @Override
@@ -137,7 +137,8 @@ class J2KRender implements Runnable {
                 krc.Set_thread_env(localThread.get(), null);
                 localCompositor.set(krc);
             }
-            renderLayer(krc);
+            ImageData data = renderLayer(krc, imageParams.decodeParams);
+            view.setDataFromRender(imageParams, data);
         } catch (Exception e) { // reboot the compositor
             if (krc != null)
                 destroyCompositor(krc);

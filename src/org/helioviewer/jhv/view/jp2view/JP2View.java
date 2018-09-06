@@ -27,6 +27,7 @@ import org.helioviewer.jhv.view.AbstractView;
 import org.helioviewer.jhv.view.jp2view.cache.CacheStatus;
 import org.helioviewer.jhv.view.jp2view.cache.CacheStatusLocal;
 import org.helioviewer.jhv.view.jp2view.cache.CacheStatusRemote;
+import org.helioviewer.jhv.view.jp2view.image.DecodeParams;
 import org.helioviewer.jhv.view.jp2view.image.ImageParams;
 import org.helioviewer.jhv.view.jp2view.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPCache;
@@ -272,15 +273,18 @@ public class JP2View extends AbstractView {
         if (isAbolished)
             return;
         EventQueue.invokeLater(() -> {
-            if (params.frame == targetFrame)
+            if (params.decodeParams.frame == targetFrame)
                 executor.execute(this, params, false);
         });
     }
 
-    void setDataFromRender(ImageParams params, ImageData data) {
+    void setDataFromRender(ImageParams imageParams, ImageData data) {
         if (isAbolished)
             return;
 
+        data.setViewpoint(imageParams.viewpoint);
+
+        DecodeParams params = imageParams.decodeParams;
         int frame = params.frame;
         if (frame != trueFrame) {
             trueFrame = frame;
@@ -289,7 +293,6 @@ public class JP2View extends AbstractView {
 
         MetaData m = metaData[frame];
         data.setMetaData(m);
-        data.setViewpoint(params.viewpoint);
         data.setRegion(m.roiToRegion(params.subImage, params.resolution.factorX, params.resolution.factorY));
 
         EventQueue.invokeLater(() -> {
@@ -336,7 +339,7 @@ public class JP2View extends AbstractView {
         boolean frameLevelComplete = status != null && status.get();
         boolean priority = !frameLevelComplete && !Movie.isPlaying();
 
-        ImageParams params = new ImageParams(camera.getViewpoint(), subImage, res, frame, factor, priority);
+        ImageParams params = new ImageParams(priority, camera.getViewpoint(), new DecodeParams(subImage, res, frame, factor));
         if (priority || (!frameLevelComplete && level < currentLevel)) {
             signalReader(params);
         }

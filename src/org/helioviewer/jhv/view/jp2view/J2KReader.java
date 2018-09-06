@@ -134,8 +134,8 @@ class J2KReader implements Runnable {
                     socket = new JPIPSocket(view.getURI(), cache);
                 }
 
-                int frame = params.frame;
-                int level = params.resolution.level;
+                int frame = params.decodeParams.frame;
+                int level = params.decodeParams.resolution.level;
 
                 // choose cache strategy
                 boolean singleFrame = false;
@@ -146,7 +146,7 @@ class J2KReader implements Runnable {
                 // build query based on strategy
                 int currentStep;
                 String[] stepQuerys;
-                String fSiz = params.resolution.width + "," + params.resolution.height;
+                String fSiz = params.decodeParams.resolution.width + "," + params.decodeParams.resolution.height;
                 if (singleFrame) {
                     stepQuerys = new String[]{createQuery(fSiz, frame)};
                     currentStep = frame;

@@ -22,7 +22,7 @@ class RenderExecutor {
     void execute(JP2View view, Camera camera, Viewport vp, int frame, double factor) {
         // order is important, this will signal reader
         ImageParams params = view.calculateParams(camera, vp, frame, factor);
-        AtomicBoolean status = view.getCacheStatus().getFrameStatus(frame, params.resolution.level);
+        AtomicBoolean status = view.getCacheStatus().getFrameStatus(frame, params.decodeParams.resolution.level);
         if (status == null)
             return;
 
