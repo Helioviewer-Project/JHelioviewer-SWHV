@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.base;
 
+import java.util.Objects;
+
 public class Region {
 
     public final double width;
@@ -40,8 +42,7 @@ public class Region {
 
     @Override
     public int hashCode() {
-        assert false : "hashCode not designed";
-        return 42;
+        return Objects.hash(width, height, llx, lly);
     }
 
     @Override

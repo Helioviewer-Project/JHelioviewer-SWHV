@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.math;
 
+import java.util.Objects;
+
 public class Vec2 {
 
     public static final Vec2 NAN_VECTOR = new Vec2(Double.NaN, Double.NaN);
@@ -23,8 +25,7 @@ public class Vec2 {
 
     @Override
     public int hashCode() {
-        assert false : "hashCode not designed";
-        return 42;
+        return Objects.hash(x, y);
     }
 
     @Override
