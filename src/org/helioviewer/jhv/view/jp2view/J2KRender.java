@@ -16,7 +16,7 @@ import kdu_jni.Kdu_quality_limiter;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
 
-import org.helioviewer.jhv.imagedata.ImageData;
+import org.helioviewer.jhv.imagedata.ImageDataBuffer;
 import org.helioviewer.jhv.imagedata.ImageData.ImageFormat;
 import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.view.jp2view.image.DecodeParams;
@@ -25,11 +25,16 @@ import org.helioviewer.jhv.view.jp2view.kakadu.KakaduConstants;
 
 import org.lwjgl.system.MemoryUtil;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 class J2KRender implements Runnable {
 
     private static final int MAX_INACTIVE_LAYERS = 200;
     private static final int[] firstComponent = {0};
 
+    private static final ThreadLocal<Cache<DecodeParams, ImageDataBuffer>> decodeCache =
+            ThreadLocal.withInitial(() -> CacheBuilder.newBuilder().maximumSize(MAX_INACTIVE_LAYERS).build());
     private static final ThreadLocal<Kdu_thread_env> localThread = ThreadLocal.withInitial(J2KRender::createThreadEnv);
     private static final ThreadLocal<Kdu_region_compositor> localCompositor = new ThreadLocal<>();
 
@@ -45,18 +50,18 @@ class J2KRender implements Runnable {
         abolish = _abolish;
     }
 
-    private ImageData renderLayer(Kdu_region_compositor compositor, DecodeParams params) throws KduException {
-        if (discard)
-            compositor.Refresh();
-        else
-            compositor.Cull_inactive_ilayers(MAX_INACTIVE_LAYERS);
+    private ImageDataBuffer renderLayer(DecodeParams params) throws KduException {
+        ImageDataBuffer ret = decodeCache.get().getIfPresent(params);
+        if (ret != null)
+            return ret;
 
         SubImage subImage = params.subImage;
         int frame = params.frame;
         int numComponents = view.getNumComponents(frame);
 
-        Kdu_ilayer_ref ilayer;
+        Kdu_region_compositor compositor = getCompositor();
         Kdu_dims empty = new Kdu_dims();
+        Kdu_ilayer_ref ilayer;
         if (numComponents < 3) {
             // alpha tbd
             ilayer = compositor.Add_primitive_ilayer(frame, firstComponent, Kdu_global.KDU_WANT_CODESTREAM_COMPONENTS, empty, empty);
@@ -115,10 +120,14 @@ class J2KRender implements Runnable {
                 }
             }
         }
-        compositor.Remove_ilayer(ilayer, discard);
+        compositor.Remove_ilayer(ilayer, true);
 
         ImageFormat format = numComponents < 3 ? ImageFormat.Gray8 : ImageFormat.ARGB32;
-        return new ImageData(actualWidth, actualHeight, format, ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder()));
+        ret = new ImageDataBuffer(actualWidth, actualHeight, format, ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder()));
+        if (!discard)
+            decodeCache.get().put(params, ret);
+
+        return ret;
     }
 
     @Override
@@ -128,24 +137,29 @@ class J2KRender implements Runnable {
             return;
         }
 
-        Kdu_region_compositor krc = null;
         try {
-            krc = localCompositor.get();
-            if (krc == null) {
-                Thread.currentThread().setName("Render " + view.getName());
-                krc = createCompositor(view.getSource().getJpxSource());
-                krc.Set_thread_env(localThread.get(), null);
-                localCompositor.set(krc);
-            }
-            ImageData data = renderLayer(krc, imageParams.decodeParams);
+            ImageDataBuffer data = renderLayer(imageParams.decodeParams);
             view.setDataFromRender(imageParams, data);
         } catch (Exception e) { // reboot the compositor
+            Kdu_region_compositor krc = localCompositor.get();
             if (krc != null)
                 destroyCompositor(krc);
             localCompositor.set(null);
             localThread.remove();
             e.printStackTrace();
         }
+    }
+
+    private Kdu_region_compositor getCompositor() throws KduException {
+        Kdu_region_compositor krc = localCompositor.get();
+        if (krc != null)
+            return krc;
+
+        Thread.currentThread().setName("Render " + view.getName());
+        krc = createCompositor(view.getSource().getJpxSource());
+        krc.Set_thread_env(localThread.get(), null);
+        localCompositor.set(krc);
+        return krc;
     }
 
     @Nullable

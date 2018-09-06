@@ -15,6 +15,7 @@ import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageData;
+import org.helioviewer.jhv.imagedata.ImageDataBuffer;
 import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.APIResponse;
@@ -278,10 +279,11 @@ public class JP2View extends AbstractView {
         });
     }
 
-    void setDataFromRender(ImageParams imageParams, ImageData data) {
+    void setDataFromRender(ImageParams imageParams, ImageDataBuffer dataBuffer) {
         if (isAbolished)
             return;
 
+        ImageData data = new ImageData(dataBuffer);
         data.setViewpoint(imageParams.viewpoint);
 
         DecodeParams params = imageParams.decodeParams;
