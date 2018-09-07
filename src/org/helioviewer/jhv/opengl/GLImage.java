@@ -46,20 +46,6 @@ public class GLImage {
 
     private static final LUT gray = LUT.get("Gray");
 
-    public void streamImage(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
-        if (!imageData.getUploaded()) {
-            imageData.setUploaded(true);
-            tex.bind(gl);
-            tex.copyImageData2D(gl, imageData);
-        }
-
-        ImageData prevFrame = isBaseDiff() ? baseImageData : prevImageData;
-        if (diffMode != DifferenceMode.None && prevFrame != null) {
-            diffTex.bind(gl);
-            diffTex.copyImageData2D(gl, prevFrame);
-        }
-    }
-
     public void applyFilters(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLSolarShader shader) {
         applyRegion(gl, imageData, prevImageData, baseImageData, shader);
 
@@ -70,10 +56,13 @@ public class GLImage {
         shader.bindSharpen(gl, sharpen, 1. / imageData.getWidth(), 1. / imageData.getHeight());
 
         applyLUT(gl);
-        tex.bind(gl);
+
+        tex.bind(gl, imageData.getTexID());
         shader.bindIsDiff(gl, diffMode.ordinal());
-        if (diffMode != DifferenceMode.None)
-            diffTex.bind(gl);
+        ImageData prevFrame = isBaseDiff() ? baseImageData : prevImageData;
+        if (diffMode != DifferenceMode.None && prevFrame != null) {
+            diffTex.bind(gl, prevFrame.getTexID());
+        }
     }
 
     private boolean isBaseDiff() {

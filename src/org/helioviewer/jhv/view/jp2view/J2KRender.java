@@ -16,10 +16,10 @@ import kdu_jni.Kdu_quality_limiter;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
 
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.imagedata.ImageDataBuffer;
 import org.helioviewer.jhv.imagedata.ImageData.ImageFormat;
 import org.helioviewer.jhv.imagedata.SubImage;
+import org.helioviewer.jhv.opengl.GLTexture;
 import org.helioviewer.jhv.view.jp2view.image.DecodeParams;
 import org.helioviewer.jhv.view.jp2view.image.ImageParams;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduConstants;
@@ -31,9 +31,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 
-import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GLContext;
-
 class J2KRender implements Runnable {
 
     private static final int[] firstComponent = {0};
@@ -42,12 +39,7 @@ class J2KRender implements Runnable {
         @Override
         public void onRemoval(RemovalNotification<DecodeParams, ImageDataBuffer> removal) {
             System.out.println(">>> removed!");
-            //ImageDataBuffer.vbo.delete(gl);
-            GLContext context = ImageViewerGui.getGLWindow().getContext();
-            context.makeCurrent();
-            GL2 gl = (GL2) context.getGL();
-            gl.glDeleteBuffers(1, new int[]{removal.getValue().bufferID}, 0);
-            context.release();
+            GLTexture.delete(removal.getValue().texID);
         }
     };
 
@@ -107,24 +99,7 @@ class J2KRender implements Runnable {
         long addr = compositorBuf.Get_buf(rowGap, false);
 
         int bufferLength = numComponents < 3 ? actualWidth * actualHeight : 4 * actualWidth * actualHeight;
-//        byte[] byteBuffer = new byte[bufferLength];
-
-        GL2 gl;
-        GLContext context = ImageViewerGui.getGLWindow().getContext();
-
-        context.makeCurrent();
-        gl = (GL2) context.getGL();
-
-        int[] tmpId = new int[1];
-        gl.glGenBuffers(1, tmpId, 0);
-        int bufferID = tmpId[0];
-
-        gl.glBindBuffer(GL2.GL_PIXEL_UNPACK_BUFFER, bufferID);
-        gl.glBufferData(GL2.GL_PIXEL_UNPACK_BUFFER, bufferLength, null, GL2.GL_STATIC_DRAW);
-        ByteBuffer byteBuffer = gl.glMapBufferRange(GL2.GL_PIXEL_UNPACK_BUFFER, 0, bufferLength, GL2.GL_MAP_WRITE_BIT | GL2.GL_MAP_UNSYNCHRONIZED_BIT);
-        gl.glBindBuffer(GL2.GL_PIXEL_UNPACK_BUFFER, 0);
-
-        context.release();
+        ByteBuffer byteBuffer = ByteBuffer.allocate(bufferLength).order(ByteOrder.nativeOrder());
 
         Kdu_dims newRegion = new Kdu_dims();
         while (compositor.Process(KakaduConstants.MAX_RENDER_SAMPLES, newRegion)) {
@@ -158,14 +133,10 @@ class J2KRender implements Runnable {
         }
         compositor.Remove_ilayer(ilayer, true);
 
-        context.makeCurrent();
-        gl.glBindBuffer(GL2.GL_PIXEL_UNPACK_BUFFER, bufferID);
-        gl.glUnmapBuffer(GL2.GL_PIXEL_UNPACK_BUFFER);
-        gl.glBindBuffer(GL2.GL_PIXEL_UNPACK_BUFFER, 0);
-        context.release();
-
         ImageFormat format = numComponents < 3 ? ImageFormat.Gray8 : ImageFormat.ARGB32;
-        ret = new ImageDataBuffer(actualWidth, actualHeight, format, /*ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder())*/null, bufferID);
+        int tex = GLTexture.generate(actualWidth, actualHeight, format, byteBuffer);
+
+        ret = new ImageDataBuffer(actualWidth, actualHeight, format, /*byteBuffer*/ null, tex);
         if (!discard)
             decodeCache.get().put(params, ret);
 

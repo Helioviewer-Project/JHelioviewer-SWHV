@@ -11,11 +11,12 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
-import org.helioviewer.jhv.imagedata.ImageData;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.imagedata.ImageData.ImageFormat;
 import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLContext;
 
 public class GLTexture {
 
@@ -26,11 +27,6 @@ public class GLTexture {
     private int texID;
     private final int unit;
     private final int target;
-
-    private int prev_width = -1;
-    private int prev_height = -1;
-    private int prev_inputGLFormat = -1;
-    private int prev_bppGLType = -1;
 
     public GLTexture(GL2 gl, int _target, Unit _unit) {
         int[] tmp = new int[1];
@@ -45,9 +41,38 @@ public class GLTexture {
         gl.glBindTexture(target, texID);
     }
 
+    public void bind(GL2 gl, int id) {
+        gl.glActiveTexture(unit);
+        gl.glBindTexture(target, id);
+    }
+
     public void delete(GL2 gl) {
         gl.glDeleteTextures(1, new int[]{texID}, 0);
-        texID = prev_width = -1;
+        texID = -1;
+    }
+
+    public static int generate(int w, int h, ImageFormat format, Buffer buffer) {
+        GLContext context = ImageViewerGui.getGLWindow().getContext();
+        context.makeCurrent();
+        GL2 gl = (GL2) context.getGL();
+
+        int[] tex = new int[1];
+        gl.glGenTextures(1, tex, 0);
+
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, tex[0]);
+        copyImageData2D(gl, w, h, format, buffer);
+
+        context.release();
+        return tex[0];
+    }
+
+    public static void delete(int tex) {
+        GLContext context = ImageViewerGui.getGLWindow().getContext();
+        context.makeCurrent();
+        GL2 gl = (GL2) context.getGL();
+
+        gl.glDeleteTextures(1, new int[]{tex}, 0);
+        context.release();
     }
 
     private static void genTexture2D(GL2 gl, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
@@ -60,36 +85,19 @@ public class GLTexture {
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
     }
 
-    public void copyImageData2D(GL2 gl, ImageData source) {
-        int w = source.getWidth();
-        int h = source.getHeight();
+    private static void copyImageData2D(GL2 gl, int w, int h, ImageFormat format, Buffer buffer) {
         if (w <= 0 || h <= 0 || w > GLInfo.maxTextureSize || h > GLInfo.maxTextureSize) {
             Log.error("GLTexture.copyImageData2D: w= " + w + " h=" + h);
             return;
         }
 
-        ImageFormat imageFormat = source.getImageFormat();
-        int inputGLFormat = mapImageFormatToInputGLFormat(imageFormat);
-        int bppGLType = mapBytesPerPixelToGLType(imageFormat.bytes);
+        int inputGLFormat = mapImageFormatToInputGLFormat(format);
+        int bppGLType = mapBytesPerPixelToGLType(format.bytes);
+        int internalGLFormat = mapImageFormatToInternalGLFormat(format);
 
-        if (w != prev_width || h != prev_height || prev_inputGLFormat != inputGLFormat || prev_bppGLType != bppGLType) {
-            int internalGLFormat = mapImageFormatToInternalGLFormat(imageFormat);
-            genTexture2D(gl, internalGLFormat, w, h, inputGLFormat, bppGLType, null);
-
-            prev_width = w;
-            prev_height = h;
-            prev_inputGLFormat = inputGLFormat;
-            prev_bppGLType = bppGLType;
-        }
-
-        gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, imageFormat.bytes);
+        gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, format.bytes);
         gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, w);
-        //gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, source.getBuffer());
-
-        int bufferID = source.getBufferID();
-        gl.glBindBuffer(GL2.GL_PIXEL_UNPACK_BUFFER, bufferID);
-        gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, 0);
-        gl.glBindBuffer(GL2.GL_PIXEL_UNPACK_BUFFER, 0);
+        genTexture2D(gl, internalGLFormat, w, h, inputGLFormat, bppGLType, buffer);
     }
 
     public static void copyBufferedImage2D(GL2 gl, BufferedImage source) {

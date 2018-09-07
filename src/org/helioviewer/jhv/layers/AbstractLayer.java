@@ -59,10 +59,6 @@ public abstract class AbstractLayer implements Layer {
     }
 
     @Override
-    public void prerender(GL2 gl) {
-    }
-
-    @Override
     public void renderFloat(Camera camera, Viewport vp, GL2 gl) {
     }
 

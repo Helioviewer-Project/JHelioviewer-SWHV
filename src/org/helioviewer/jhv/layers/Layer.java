@@ -22,8 +22,6 @@ public interface Layer {
 
     void renderMiniview(Camera camera, Viewport vp, GL2 gl);
 
-    void prerender(GL2 gl);
-
     void remove(GL2 gl);
 
     Component getOptionsPanel();

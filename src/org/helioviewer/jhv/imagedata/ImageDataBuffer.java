@@ -8,14 +8,14 @@ public class ImageDataBuffer {
     final int height;
     final ImageData.ImageFormat format;
     final Buffer buffer;
-    public final int bufferID;
+    public final int texID;
 
-    public ImageDataBuffer(int _width, int _height, ImageData.ImageFormat _format, Buffer _buffer, int _bufferID) {
+    public ImageDataBuffer(int _width, int _height, ImageData.ImageFormat _format, Buffer _buffer, int _texID) {
         width = _width;
         height = _height;
         format = _format;
         buffer = _buffer;
-        bufferID = _bufferID;
+        texID = _texID;
     }
 
 }

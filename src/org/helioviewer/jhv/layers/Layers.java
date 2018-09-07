@@ -137,9 +137,6 @@ public class Layers extends AbstractTableModel implements Reorderable {
     public static void prerender(GL2 gl) {
         removeLayers(gl);
         initLayers(gl);
-        for (Layer layer : layers) {
-            layer.prerender(gl);
-        }
     }
 
     public static void render(Camera camera, Viewport vp, GL2 gl) {

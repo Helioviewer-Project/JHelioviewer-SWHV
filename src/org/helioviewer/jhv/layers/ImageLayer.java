@@ -149,14 +149,6 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     }
 
     @Override
-    public void prerender(GL2 gl) {
-        if (imageData == null) {
-            return;
-        }
-        glImage.streamImage(gl, imageData, prevImageData, baseImageData);
-    }
-
-    @Override
     public void renderMiniview(Camera camera, Viewport vp, GL2 gl) {
         render(camera, vp, gl);
     }
