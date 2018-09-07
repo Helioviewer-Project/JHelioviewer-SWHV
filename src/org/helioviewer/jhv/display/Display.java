@@ -171,18 +171,18 @@ public class Display implements ActionListener, JHVEventHighlightListener {
         viewports[3] = new Viewport(3, w / 2, h / 2, w / 2, h / 2);
     }
 
-    private static double renderFactor = -1;
     private static boolean toDisplay = false;
+    private static boolean toRender = false;
 
     public static void start() {
         new Timer(1000 / 60, instance).start();
     }
 
-    public static void render(double f) {
+    public static void render() {
         if (ImageLayers.getNumEnabledImageLayers() == 0)
             toDisplay = true;
         else
-            renderFactor = f;
+            toRender = true;
     }
 
     public static void display() {
@@ -202,9 +202,9 @@ public class Display implements ActionListener, JHVEventHighlightListener {
             ImageViewerGui.getGLWindow().display(); // asap
             toDisplay = false;
         }
-        if (renderFactor != -1) {
-            ImageLayers.setRender(camera, renderFactor);
-            renderFactor = -1;
+        if (toRender) {
+            ImageLayers.render(camera);
+            toRender = false;
         }
     }
 

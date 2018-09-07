@@ -38,8 +38,6 @@ public class JHVGlobals {
 
     public static final AlphanumComparator alphanumComparator = new AlphanumComparator(true);
 
-    public static final int hiDpiCutoff = 1024;
-
     private static final ExecutorService executorService = JHVExecutor.createJHVWorkersExecutorService("MAIN", 10);
     private static final ScheduledExecutorService reaperService = JHVExecutor.createReaperService();
 

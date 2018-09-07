@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 
 import kdu_jni.KduException;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.camera.Camera;
@@ -320,7 +319,6 @@ public class JP2View extends AbstractView {
         if (Movie.isRecording()) { // all bets are off
             res = cacheStatus.getResolutionSet(frame).getResolutionLevel(0);
             subImage = new SubImage(0, 0, res.width, res.height, res.width, res.height);
-            factor = 1;
         } else {
             MetaData m = metaData[frame];
             Region mr = m.getPhysicalRegion();
@@ -329,11 +327,6 @@ public class JP2View extends AbstractView {
 
             res = cacheStatus.getResolutionSet(frame).getNextResolutionLevel(totalHeight, totalHeight);
             subImage = new SubImage(0, 0, res.width, res.height, res.width, res.height);
-
-            int maxDim = Math.max(res.width, res.height);
-            if (maxDim > JHVGlobals.hiDpiCutoff && Movie.isPlaying()) {
-                factor = Math.min(factor, 0.5);
-            }
         }
 
         int level = res.level;
@@ -341,7 +334,7 @@ public class JP2View extends AbstractView {
         boolean frameLevelComplete = status != null && status.get();
         boolean priority = !frameLevelComplete && !Movie.isPlaying();
 
-        ImageParams params = new ImageParams(priority, camera.getViewpoint(), new DecodeParams(subImage, res, frame, factor));
+        ImageParams params = new ImageParams(priority, camera.getViewpoint(), new DecodeParams(subImage, res, frame, 1));
         if (priority || (!frameLevelComplete && level < currentLevel)) {
             signalReader(params);
         }

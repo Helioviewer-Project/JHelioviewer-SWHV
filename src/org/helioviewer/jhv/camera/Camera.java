@@ -80,7 +80,7 @@ public class Camera {
 
     public void refresh() {
         updateCamera(Movie.getTime());
-        Display.render(1);
+        Display.render();
     }
 
     public void reset() {
@@ -90,7 +90,7 @@ public class Camera {
 
         updateCamera(Movie.getTime());
         CameraHelper.zoomToFit(this);
-        Display.render(1);
+        Display.render();
     }
 
     public Position getViewpoint() {

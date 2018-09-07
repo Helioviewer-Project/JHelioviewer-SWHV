@@ -22,12 +22,12 @@ import org.astrogrid.samp.SampUtils;
 
 public class ImageLayers {
 
-    public static void setRender(Camera camera, double factor) {
+    public static void render(Camera camera) {
         int i;
         Viewport[] vp = Display.getViewports();
         for (ImageLayer layer : Layers.getImageLayers()) {
             if ((i = layer.isVisibleIdx()) != -1 && vp[i] != null)
-                layer.getView().render(camera, vp[i], factor);
+                layer.getView().render(camera, vp[i], 1);
         }
     }
 
@@ -47,7 +47,7 @@ public class ImageLayers {
             }
         }
         Display.reshapeAll();
-        Display.render(1);
+        Display.render();
     }
 
     @Nullable

@@ -17,7 +17,7 @@ public class ZoomFOVAnnotationAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         ImageViewerGui.getAnnotateInteraction().zoom();
-        Display.render(1);
+        Display.render();
     }
 
 }

@@ -99,7 +99,6 @@ public class Movie implements ActionListener {
     public static void pause() {
         frameTimer.stop();
         MoviePanel.setPlayState(false);
-        Display.render(1); /* ! force update for on the fly resolution change */
     }
 
     public static void toggle() {
@@ -157,7 +156,7 @@ public class Movie implements ActionListener {
         for (ImageLayer layer : Layers.getImageLayers()) {
             layer.getView().setFrame(dateTime);
         }
-        Display.render(1);
+        Display.render();
 
         Layers.getViewpointLayer().fireTimeUpdated(camera.getViewpoint().time); // !
         for (TimeListener listener : timeListeners) {

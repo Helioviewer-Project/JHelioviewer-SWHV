@@ -106,7 +106,7 @@ public class GLListener implements GLEventListener {
             Display.setGLSize(x, y, width, height);
             Display.reshapeAll();
             Layers.getMiniviewLayer().reshapeViewport();
-            Display.render(1);
+            Display.render();
         });
     }
 

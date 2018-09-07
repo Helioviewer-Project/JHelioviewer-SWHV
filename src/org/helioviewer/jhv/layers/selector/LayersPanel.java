@@ -191,7 +191,7 @@ public class LayersPanel extends JPanel {
                     model.updateCell(row, col);
                     if (grid.getSelectedRow() == row)
                         setOptionsPanel(layer);
-                    Display.render(1);
+                    Display.render();
                 } else if (col == TITLE_COL && layer instanceof ImageLayer) {
                     Layers.setActiveImageLayer((ImageLayer) layer);
                     grid.repaint(); // multiple rows involved
