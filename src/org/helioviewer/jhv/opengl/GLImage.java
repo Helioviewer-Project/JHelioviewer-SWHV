@@ -64,7 +64,7 @@ public class GLImage {
         applyRegion(gl, imageData, prevImageData, baseImageData, shader);
 
         shader.bindSlit(gl, slitLeft, slitRight);
-        shader.bindBrightness(gl, brightOffset, brightScale * imageData.getMetaData().getResponseFactor(), imageData.getGamma());
+        shader.bindBrightness(gl, brightOffset, brightScale * imageData.getMetaData().getResponseFactor(), 1);
         shader.bindColor(gl, red, green, blue, opacity, blend);
         shader.bindEnhanced(gl, enhanced);
         shader.bindSharpen(gl, sharpen, 1. / imageData.getWidth(), 1. / imageData.getHeight());

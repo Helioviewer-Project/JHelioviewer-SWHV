@@ -25,7 +25,6 @@ public class ImageData {
     private final ImageFormat format;
     private final Buffer buffer;
 
-    private double gamma = 1.;
     private Region region;
     private MetaData metaData;
     private Position viewpoint;
@@ -51,14 +50,6 @@ public class ImageData {
 
     public int getWidth() {
         return width;
-    }
-
-    public void setGamma(double _gamma) {
-        gamma = _gamma;
-    }
-
-    public double getGamma() {
-        return gamma;
     }
 
     public Buffer getBuffer() {
