@@ -16,6 +16,7 @@ import kdu_jni.Kdu_quality_limiter;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
 
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.imagedata.ImageDataBuffer;
 import org.helioviewer.jhv.imagedata.ImageData.ImageFormat;
 import org.helioviewer.jhv.imagedata.SubImage;
@@ -27,13 +28,32 @@ import org.lwjgl.system.MemoryUtil;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
+
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLContext;
 
 class J2KRender implements Runnable {
 
     private static final int[] firstComponent = {0};
 
+    private static final RemovalListener<DecodeParams, ImageDataBuffer> removalListener = new RemovalListener<DecodeParams, ImageDataBuffer>() {
+        @Override
+        public void onRemoval(RemovalNotification<DecodeParams, ImageDataBuffer> removal) {
+            System.out.println(">>> removed!");
+            //ImageDataBuffer.vbo.delete(gl);
+            GLContext context = ImageViewerGui.getGLWindow().getContext();
+            context.makeCurrent();
+            GL2 gl = (GL2) context.getGL();
+            gl.glDeleteBuffers(1, new int[]{removal.getValue().bufferID}, 0);
+            context.release();
+        }
+    };
+
     private static final ThreadLocal<Cache<DecodeParams, ImageDataBuffer>> decodeCache =
-            ThreadLocal.withInitial(() -> CacheBuilder.newBuilder().softValues().build());
+            ThreadLocal.withInitial(() -> CacheBuilder.newBuilder().softValues().removalListener(removalListener).build());
+
     private static final ThreadLocal<Kdu_thread_env> localThread = ThreadLocal.withInitial(J2KRender::createThreadEnv);
     private static final ThreadLocal<Kdu_region_compositor> localCompositor = new ThreadLocal<>();
 
@@ -65,7 +85,7 @@ class J2KRender implements Runnable {
             // alpha tbd
             ilayer = compositor.Add_primitive_ilayer(frame, firstComponent, Kdu_global.KDU_WANT_CODESTREAM_COMPONENTS, empty, empty);
         } else {
-            ilayer = compositor.Add_ilayer(frame, new Kdu_dims(), new Kdu_dims());
+            ilayer = compositor.Add_ilayer(frame, empty, empty);
         }
 
         compositor.Set_scale(false, false, false, 1f / (1 << params.resolution.level), (float) params.factor);
@@ -87,7 +107,24 @@ class J2KRender implements Runnable {
         long addr = compositorBuf.Get_buf(rowGap, false);
 
         int bufferLength = numComponents < 3 ? actualWidth * actualHeight : 4 * actualWidth * actualHeight;
-        byte[] byteBuffer = new byte[bufferLength];
+//        byte[] byteBuffer = new byte[bufferLength];
+
+        GL2 gl;
+        GLContext context = ImageViewerGui.getGLWindow().getContext();
+
+        context.makeCurrent();
+        gl = (GL2) context.getGL();
+
+        int[] tmpId = new int[1];
+        gl.glGenBuffers(1, tmpId, 0);
+        int bufferID = tmpId[0];
+
+        gl.glBindBuffer(GL2.GL_PIXEL_UNPACK_BUFFER, bufferID);
+        gl.glBufferData(GL2.GL_PIXEL_UNPACK_BUFFER, bufferLength, null, GL2.GL_STATIC_DRAW);
+        ByteBuffer byteBuffer = gl.glMapBufferRange(GL2.GL_PIXEL_UNPACK_BUFFER, 0, bufferLength, GL2.GL_MAP_WRITE_BIT | GL2.GL_MAP_UNSYNCHRONIZED_BIT);
+        gl.glBindBuffer(GL2.GL_PIXEL_UNPACK_BUFFER, 0);
+
+        context.release();
 
         Kdu_dims newRegion = new Kdu_dims();
         while (compositor.Process(KakaduConstants.MAX_RENDER_SAMPLES, newRegion)) {
@@ -107,22 +144,28 @@ class J2KRender implements Runnable {
             if (numComponents < 3) {
                 for (int row = 0; row < newHeight; row++, dstIdx += actualWidth, srcIdx += newWidth) {
                     for (int col = 0; col < newWidth; ++col) {
-                        byteBuffer[dstIdx + col] = MemoryUtil.memGetByte(addr + 4 * (srcIdx + col));
+                        byteBuffer.put(dstIdx + col, MemoryUtil.memGetByte(addr + 4 * (srcIdx + col)));
                     }
                 }
             } else {
                 for (int row = 0; row < newHeight; row++, dstIdx += actualWidth, srcIdx += newWidth) {
                     for (int col = 0; col < newWidth; ++col) {
                         for (int idx = 0; idx < 4; ++idx)
-                            byteBuffer[4 * (dstIdx + col) + idx] = MemoryUtil.memGetByte(addr + 4 * (srcIdx + col) + idx);
+                            byteBuffer.put(4 * (dstIdx + col) + idx, MemoryUtil.memGetByte(addr + 4 * (srcIdx + col) + idx));
                     }
                 }
             }
         }
         compositor.Remove_ilayer(ilayer, true);
 
+        context.makeCurrent();
+        gl.glBindBuffer(GL2.GL_PIXEL_UNPACK_BUFFER, bufferID);
+        gl.glUnmapBuffer(GL2.GL_PIXEL_UNPACK_BUFFER);
+        gl.glBindBuffer(GL2.GL_PIXEL_UNPACK_BUFFER, 0);
+        context.release();
+
         ImageFormat format = numComponents < 3 ? ImageFormat.Gray8 : ImageFormat.ARGB32;
-        ret = new ImageDataBuffer(actualWidth, actualHeight, format, ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder()));
+        ret = new ImageDataBuffer(actualWidth, actualHeight, format, /*ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder())*/null, bufferID);
         if (!discard)
             decodeCache.get().put(params, ret);
 
@@ -210,6 +253,7 @@ class J2KRender implements Runnable {
                 kte.Destroy();
                 localThread.set(null);
             }
+            decodeCache.get().invalidateAll();
         } catch (KduException e) {
             e.printStackTrace();
         }

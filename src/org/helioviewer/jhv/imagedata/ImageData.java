@@ -24,6 +24,7 @@ public class ImageData {
     private final int height;
     private final ImageFormat format;
     private final Buffer buffer;
+    private final int bufferID;
 
     private double gamma = 1.;
     private Region region;
@@ -36,6 +37,7 @@ public class ImageData {
         height = _height;
         format = _format;
         buffer = _buffer;
+        bufferID = 0;
     }
 
     public ImageData(ImageDataBuffer buf) {
@@ -43,6 +45,11 @@ public class ImageData {
         height = buf.height;
         format = buf.format;
         buffer = buf.buffer;
+        bufferID = buf.bufferID;
+    }
+
+    public int getBufferID() {
+        return bufferID;
     }
 
     public int getHeight() {

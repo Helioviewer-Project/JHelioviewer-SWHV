@@ -84,7 +84,12 @@ public class GLTexture {
 
         gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, imageFormat.bytes);
         gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, w);
-        gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, source.getBuffer());
+        //gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, source.getBuffer());
+
+        int bufferID = source.getBufferID();
+        gl.glBindBuffer(GL2.GL_PIXEL_UNPACK_BUFFER, bufferID);
+        gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, 0);
+        gl.glBindBuffer(GL2.GL_PIXEL_UNPACK_BUFFER, 0);
     }
 
     public static void copyBufferedImage2D(GL2 gl, BufferedImage source) {
