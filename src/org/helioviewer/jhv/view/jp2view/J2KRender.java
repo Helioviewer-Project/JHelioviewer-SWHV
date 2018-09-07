@@ -16,10 +16,9 @@ import kdu_jni.Kdu_quality_limiter;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
 
-import org.helioviewer.jhv.imagedata.ImageDataBuffer;
+import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData.ImageFormat;
 import org.helioviewer.jhv.imagedata.SubImage;
-import org.helioviewer.jhv.opengl.GLTexture;
 import org.helioviewer.jhv.view.jp2view.image.DecodeParams;
 import org.helioviewer.jhv.view.jp2view.image.ImageParams;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduConstants;
@@ -35,15 +34,15 @@ class J2KRender implements Runnable {
 
     private static final int[] firstComponent = {0};
 
-    private static final RemovalListener<DecodeParams, ImageDataBuffer> removalListener = new RemovalListener<DecodeParams, ImageDataBuffer>() {
+    private static final RemovalListener<DecodeParams, ImageBuffer> removalListener = new RemovalListener<DecodeParams, ImageBuffer>() {
         @Override
-        public void onRemoval(RemovalNotification<DecodeParams, ImageDataBuffer> removal) {
+        public void onRemoval(RemovalNotification<DecodeParams, ImageBuffer> removal) {
             System.out.println(">>> removed!");
-            GLTexture.delete(removal.getValue().texID);
+            removal.getValue().delete();
         }
     };
 
-    private static final ThreadLocal<Cache<DecodeParams, ImageDataBuffer>> decodeCache =
+    private static final ThreadLocal<Cache<DecodeParams, ImageBuffer>> decodeCache =
             ThreadLocal.withInitial(() -> CacheBuilder.newBuilder().softValues().removalListener(removalListener).build());
 
     private static final ThreadLocal<Kdu_thread_env> localThread = ThreadLocal.withInitial(J2KRender::createThreadEnv);
@@ -61,8 +60,8 @@ class J2KRender implements Runnable {
         abolish = _abolish;
     }
 
-    private ImageDataBuffer renderLayer(DecodeParams params) throws KduException {
-        ImageDataBuffer ret = decodeCache.get().getIfPresent(params);
+    private ImageBuffer renderLayer(DecodeParams params) throws KduException {
+        ImageBuffer ret = decodeCache.get().getIfPresent(params);
         if (ret != null)
             return ret;
 
@@ -99,7 +98,8 @@ class J2KRender implements Runnable {
         long addr = compositorBuf.Get_buf(rowGap, false);
 
         int bufferLength = numComponents < 3 ? actualWidth * actualHeight : 4 * actualWidth * actualHeight;
-        ByteBuffer byteBuffer = ByteBuffer.allocate(bufferLength).order(ByteOrder.nativeOrder());
+        ImageFormat format = numComponents < 3 ? ImageFormat.Gray8 : ImageFormat.ARGB32;
+        ByteBuffer buffer = ByteBuffer.allocate(bufferLength).order(ByteOrder.nativeOrder());
 
         Kdu_dims newRegion = new Kdu_dims();
         while (compositor.Process(KakaduConstants.MAX_RENDER_SAMPLES, newRegion)) {
@@ -119,24 +119,21 @@ class J2KRender implements Runnable {
             if (numComponents < 3) {
                 for (int row = 0; row < newHeight; row++, dstIdx += actualWidth, srcIdx += newWidth) {
                     for (int col = 0; col < newWidth; ++col) {
-                        byteBuffer.put(dstIdx + col, MemoryUtil.memGetByte(addr + 4 * (srcIdx + col)));
+                        buffer.put(dstIdx + col, MemoryUtil.memGetByte(addr + 4 * (srcIdx + col)));
                     }
                 }
             } else {
                 for (int row = 0; row < newHeight; row++, dstIdx += actualWidth, srcIdx += newWidth) {
                     for (int col = 0; col < newWidth; ++col) {
                         for (int idx = 0; idx < 4; ++idx)
-                            byteBuffer.put(4 * (dstIdx + col) + idx, MemoryUtil.memGetByte(addr + 4 * (srcIdx + col) + idx));
+                            buffer.put(4 * (dstIdx + col) + idx, MemoryUtil.memGetByte(addr + 4 * (srcIdx + col) + idx));
                     }
                 }
             }
         }
         compositor.Remove_ilayer(ilayer, true);
 
-        ImageFormat format = numComponents < 3 ? ImageFormat.Gray8 : ImageFormat.ARGB32;
-        int tex = GLTexture.generate(actualWidth, actualHeight, format, byteBuffer);
-
-        ret = new ImageDataBuffer(actualWidth, actualHeight, format, /*byteBuffer*/ null, tex);
+        ret = new ImageBuffer(actualWidth, actualHeight, format, buffer);
         if (!discard)
             decodeCache.get().put(params, ret);
 
@@ -151,7 +148,7 @@ class J2KRender implements Runnable {
         }
 
         try {
-            ImageDataBuffer data = renderLayer(imageParams.decodeParams);
+            ImageBuffer data = renderLayer(imageParams.decodeParams);
             view.setDataFromRender(imageParams, data);
         } catch (Exception e) { // reboot the compositor
             Kdu_region_compositor krc = localCompositor.get();

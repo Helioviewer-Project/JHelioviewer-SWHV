@@ -1,10 +1,8 @@
 package org.helioviewer.jhv.imagedata;
 
 import java.nio.Buffer;
-import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.position.Position;
 
@@ -26,11 +24,9 @@ public class ImageData {
     private final Buffer buffer;
     private final int texID;
 
-    private double gamma = 1.;
     private Region region;
     private MetaData metaData;
     private Position viewpoint;
-    private boolean uploaded = false;
 
     public ImageData(int _width, int _height, ImageFormat _format, Buffer _buffer) {
         width = _width;
@@ -40,7 +36,7 @@ public class ImageData {
         texID = 0;
     }
 
-    public ImageData(ImageDataBuffer buf) {
+    public ImageData(ImageBuffer buf) {
         width = buf.width;
         height = buf.height;
         format = buf.format;
@@ -58,14 +54,6 @@ public class ImageData {
 
     public int getWidth() {
         return width;
-    }
-
-    public void setGamma(double _gamma) {
-        gamma = _gamma;
-    }
-
-    public double getGamma() {
-        return gamma;
     }
 
     public Buffer getBuffer() {
@@ -98,49 +86,6 @@ public class ImageData {
 
     public Position getViewpoint() {
         return viewpoint;
-    }
-
-    public boolean getUploaded() {
-        return uploaded;
-    }
-
-    public void setUploaded(boolean _uploaded) {
-        uploaded = _uploaded;
-    }
-
-    private static final double BRIGHTNESS_F1 = 0.001;
-    private static final double BRIGHTNESS_F2 = 128 + 64 + 32;
-
-    public double getAutoBrightness() {
-        if (format != ImageFormat.Gray8 || !(buffer instanceof ByteBuffer))
-            return 1;
-
-        int len = buffer.capacity();
-        int[] histogram = new int[256];
-        ByteBuffer byteBuffer = (ByteBuffer) buffer;
-        for (int i = 0; i < len; i++) {
-            histogram[getUnsigned(byteBuffer.get(i))]++;
-        }
-
-        long ct = 0;
-        int j;
-        for (j = 255; j >= 0; j--) {
-            ct += histogram[j];
-            if (ct > BRIGHTNESS_F1 * len) {
-                break;
-            }
-        }
-        if (j == 0)
-            return 1;
-
-        double factor = BRIGHTNESS_F2 / j;
-        // System.out.println(">> " + factor + " " + j);
-        factor /= metaData.getResponseFactor();
-        return MathUtils.clip(factor, 0.5, 2);
-    }
-
-    private static int getUnsigned(byte b) {
-        return (b + 256) & 0xFF;
     }
 
 }
