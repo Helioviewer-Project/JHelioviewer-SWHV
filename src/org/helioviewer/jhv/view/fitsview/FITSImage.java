@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.view.fitsview;
 
 import java.net.URI;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
@@ -61,7 +62,7 @@ class FITSImage {
         return (blank != BLANK && v == blank) || Float.isNaN(v) ? MARKER : v;
     }
 
-    private static float[] sampleImage(int bpp, int width, int height, Object data, long blank, int[] npix) {
+    private static float[] sampleImage(int bpp, int width, int height, Object pixelData, long blank, int[] npix) {
         int stepW = 4 * width / 1024;
         int stepH = 4 * height / 1024;
         float[] sampleData = new float[(width / stepW) * (height / stepH)];
@@ -69,10 +70,10 @@ class FITSImage {
         int k = 0;
         switch (bpp) {
             case BasicHDU.BITPIX_SHORT: {
-                short[][] data2D = (short[][]) data;
+                short[][] data = (short[][]) pixelData;
                 for (int j = 0; j < height; j += stepH) {
                     for (int i = 0; i < width; i += stepW) {
-                        float v = getValue(data2D[j][i], blank);
+                        float v = getValue(data[j][i], blank);
                         if (v != MARKER)
                             sampleData[k++] = v;
                     }
@@ -80,10 +81,10 @@ class FITSImage {
                 break;
             }
             case BasicHDU.BITPIX_INT: {
-                int[][] data2D = (int[][]) data;
+                int[][] data = (int[][]) pixelData;
                 for (int j = 0; j < height; j += stepH) {
                     for (int i = 0; i < width; i += stepW) {
-                        float v = getValue(data2D[j][i], blank);
+                        float v = getValue(data[j][i], blank);
                         if (v != MARKER)
                             sampleData[k++] = v;
                     }
@@ -91,10 +92,10 @@ class FITSImage {
                 break;
             }
             case BasicHDU.BITPIX_FLOAT: {
-                float[][] data2D = (float[][]) data;
+                float[][] data = (float[][]) pixelData;
                 for (int j = 0; j < height; j += stepH) {
                     for (int i = 0; i < width; i += stepW) {
-                        float v = getValue(data2D[j][i], blank);
+                        float v = getValue(data[j][i], blank);
                         if (v != MARKER)
                             sampleData[k++] = v;
                     }
@@ -106,16 +107,16 @@ class FITSImage {
         return sampleData;
     }
 
-    private static float[] getMinMax(int bpp, int width, int height, Object data, long blank) {
+    private static float[] getMinMax(int bpp, int width, int height, Object pixelData, long blank) {
         float min = Float.MAX_VALUE;
         float max = -Float.MAX_VALUE;
 
         switch (bpp) {
             case BasicHDU.BITPIX_SHORT: {
-                short[][] data2D = (short[][]) data;
+                short[][] data = (short[][]) pixelData;
                 for (int j = 0; j < height; j++) {
                     for (int i = 0; i < width; i++) {
-                        float v = getValue(data2D[j][i], blank);
+                        float v = getValue(data[j][i], blank);
                         if (v != MARKER) {
                             if (v > max)
                                 max = v;
@@ -127,10 +128,10 @@ class FITSImage {
                 break;
             }
             case BasicHDU.BITPIX_INT: {
-                int[][] data2D = (int[][]) data;
+                int[][] data = (int[][]) pixelData;
                 for (int j = 0; j < height; j++) {
                     for (int i = 0; i < width; i++) {
-                        float v = getValue(data2D[j][i], blank);
+                        float v = getValue(data[j][i], blank);
                         if (v != MARKER) {
                             if (v > max)
                                 max = v;
@@ -142,10 +143,10 @@ class FITSImage {
                 break;
             }
             case BasicHDU.BITPIX_FLOAT: {
-                float[][] data2D = (float[][]) data;
+                float[][] data = (float[][]) pixelData;
                 for (int j = 0; j < height; j++) {
                     for (int i = 0; i < width; i++) {
-                        float v = getValue(data2D[j][i], blank);
+                        float v = getValue(data[j][i], blank);
                         if (v != MARKER) {
                             if (v > max)
                                 max = v;
@@ -175,13 +176,16 @@ class FITSImage {
         if (pixelData == null)
             throw new Exception("Cannot retrieve pixel data");
 
+        Buffer buffer;
+        ImageFormat format;
         if (bpp == BasicHDU.BITPIX_BYTE) {
-            byte[][] data2D = (byte[][]) pixelData;
-            byte[] byteData = new byte[width * height];
+            byte[][] data = (byte[][]) pixelData;
+            byte[] outData = new byte[width * height];
             for (int j = 0; j < height; j++) {
-                System.arraycopy(data2D[j], 0, byteData, width * (height - 1 - j), width);
+                System.arraycopy(data[j], 0, outData, width * (height - 1 - j), width);
             }
-            imageData = new ImageData(width, height, ImageFormat.Gray8, ByteBuffer.wrap(byteData));
+            buffer = ByteBuffer.wrap(outData);
+            format = ImageFormat.Gray8;
         } else {
             long blank = BLANK;
             try {
@@ -211,53 +215,46 @@ class FITSImage {
             }
             // System.out.println(">>> " + minmax[0] + ' ' + minmax[1]);
 
+            short[] outData = new short[width * height];
+            buffer = ShortBuffer.wrap(outData);
+            format = ImageFormat.Gray16;
             switch (bpp) {
                 case BasicHDU.BITPIX_SHORT: {
-                    short[][] data2D = (short[][]) pixelData;
-
-                    PixScale scale = new PowScale(lutSize, GAMMA);
-                    short[] data = new short[width * height];
+                    short[][] data = (short[][]) pixelData;
+                    PixScale scale = new PowScale(lutSize);
                     for (int j = 0; j < height; j++) {
                         for (int i = 0; i < width; i++) {
-                            float v = getValue(data2D[j][i], blank);
-                            data[width * (height - 1 - j) + i] = v == MARKER ? scale.get(0) : scale.get((int) (v - minmax[0]));
+                            float v = getValue(data[j][i], blank);
+                            outData[width * (height - 1 - j) + i] = v == MARKER ? scale.get(0) : scale.get((int) (v - minmax[0]));
                         }
                     }
-                    imageData = new ImageData(width, height, ImageFormat.Gray16, ShortBuffer.wrap(data));
-                    imageData.setGamma(scale.getGamma());
                     break;
                 }
                 case BasicHDU.BITPIX_INT: {
-                    int[][] data2D = (int[][]) pixelData;
-
-                    PixScale scale = new PowScale(lutSize, GAMMA);
-                    short[] data = new short[width * height];
+                    int[][] data = (int[][]) pixelData;
+                    PixScale scale = new PowScale(lutSize);
                     for (int j = 0; j < height; j++) {
                         for (int i = 0; i < width; i++) {
-                            float v = getValue(data2D[j][i], blank);
-                            data[width * (height - 1 - j) + i] = v == MARKER ? scale.get(0) : scale.get((int) (v - minmax[0]));
+                            float v = getValue(data[j][i], blank);
+                            outData[width * (height - 1 - j) + i] = v == MARKER ? scale.get(0) : scale.get((int) (v - minmax[0]));
                         }
                     }
-                    imageData = new ImageData(width, height, ImageFormat.Gray16, ShortBuffer.wrap(data));
-                    imageData.setGamma(scale.getGamma());
                     break;
                 }
                 case BasicHDU.BITPIX_FLOAT: {
-                    float[][] data2D = (float[][]) pixelData;
-
+                    float[][] data = (float[][]) pixelData;
                     double scale = 65535. / lutSize;
-                    short[] data = new short[width * height];
                     for (int j = 0; j < height; j++) {
                         for (int i = 0; i < width; i++) {
-                            float v = getValue(data2D[j][i], blank);
-                            data[width * (height - 1 - j) + i] = v == MARKER ? 0 : (short) (scale * Math.pow(v - minmax[0], GAMMA));
+                            float v = getValue(data[j][i], blank);
+                            outData[width * (height - 1 - j) + i] = v == MARKER ? 0 : (short) (scale * Math.pow(v - minmax[0], GAMMA));
                         }
                     }
-                    imageData = new ImageData(width, height, ImageFormat.Gray16, ShortBuffer.wrap(data));
                     break;
                 }
             }
         }
+        imageData = new ImageData(width, height, format, buffer);
     }
 
     private abstract static class PixScale {
@@ -273,59 +270,33 @@ class FITSImage {
                 return lut[lut.length - 1];
         }
 
-        abstract double getGamma();
-
     }
 
     private static class LinScale extends PixScale {
-
         LinScale(long size) {
             double scale = 65535. / size;
-
             lut = new short[(int) (size + 1)];
             for (int i = 0; i < lut.length; i++)
                 lut[i] = (short) (scale * i + .5);
         }
-
-        @Override
-        double getGamma() {
-            return GAMMA;
-        }
-
     }
 
     private static class LogScale extends PixScale {
-
         LogScale(long size) {
             double scale = 65535. / Math.log1p(size);
-
             lut = new short[(int) (size + 1)];
             for (int i = 0; i < lut.length; i++)
                 lut[i] = (short) (scale * Math.log1p(i) + .5);
         }
-
-        @Override
-        double getGamma() {
-            return 1;
-        }
-
     }
 
     private static class PowScale extends PixScale {
-
-        PowScale(long size, double p) {
-            double scale = 65535. / Math.pow(size, p);
-
+        PowScale(long size) {
+            double scale = 65535. / Math.pow(size, GAMMA);
             lut = new short[(int) (size + 1)];
             for (int i = 0; i < lut.length; i++)
-                lut[i] = (short) (scale * Math.pow(i, p) + .5);
+                lut[i] = (short) (scale * Math.pow(i, GAMMA) + .5);
         }
-
-        @Override
-        double getGamma() {
-            return 1;
-        }
-
     }
 
     private static String getHeaderAsXML(Header header) {
