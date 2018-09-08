@@ -4,8 +4,6 @@ import com.jogamp.opengl.GL2;
 
 class VAO {
 
-    private static int boundID; // track state
-
     private final VAA[] vaa;
     private final boolean dynamic;
 
@@ -47,10 +45,7 @@ class VAO {
     }
 
     protected void bind(GL2 gl) {
-        if (boundID != vaoID) {
-            boundID = vaoID;
-            gl.glBindVertexArray(vaoID);
-        }
+        gl.glBindVertexArray(vaoID);
     }
 
 }

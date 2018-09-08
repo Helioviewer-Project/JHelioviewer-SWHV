@@ -22,8 +22,8 @@ import com.jogamp.opengl.GLEventListener;
 public class GLListener implements GLEventListener {
 
     private final ScalableSurface surface;
-    private static final GLSLShape blackCircle = new GLSLShape(false);
 
+    private static final GLSLShape blackCircle = new GLSLShape(false);
     public static final GLSLSolar glslSolar = new GLSLSolar();
 
     public GLListener(ScalableSurface _surface) {
