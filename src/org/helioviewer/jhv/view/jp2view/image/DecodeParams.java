@@ -33,7 +33,7 @@ public class DecodeParams {
 
     @Override
     public String toString() {
-        return "ImageParams[ " + subImage + ' ' + resolution + " [LayerNum=" + frame + "] " + factor + ']';
+        return "[Frame=" + frame + ' ' + subImage + ' ' + resolution + " Factor=" + factor + ']';
     }
 
 }

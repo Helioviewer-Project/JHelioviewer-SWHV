@@ -32,25 +32,27 @@ public class SimpleImageView extends AbstractView {
         metaData[0] = new PixelBasedMetaData(w, h, 0);
 
         Buffer buffer;
+        ImageFormat format;
         switch (image.getType()) {
             case BufferedImage.TYPE_BYTE_GRAY:
                 buffer = ByteBuffer.wrap(((DataBufferByte) image.getRaster().getDataBuffer()).getData());
-                imageData = new ImageData(w, h, ImageFormat.Gray8, buffer);
+                format = ImageFormat.Gray8;
                 break;
             case BufferedImage.TYPE_USHORT_GRAY:
                 buffer = ShortBuffer.wrap(((DataBufferUShort) image.getRaster().getDataBuffer()).getData());
-                imageData = new ImageData(w, h, ImageFormat.Gray16, buffer);
+                format = ImageFormat.Gray16;
                 break;
             case BufferedImage.TYPE_INT_ARGB_PRE:
                 buffer = IntBuffer.wrap(((DataBufferInt) image.getRaster().getDataBuffer()).getData());
-                imageData = new ImageData(w, h, ImageFormat.ARGB32, buffer);
+                format = ImageFormat.ARGB32;
                 break;
             default:
                 BufferedImage conv = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB_PRE);
                 conv.getGraphics().drawImage(image, 0, 0, null);
                 buffer = IntBuffer.wrap(((DataBufferInt) conv.getRaster().getDataBuffer()).getData());
-                imageData = new ImageData(w, h, ImageFormat.ARGB32, buffer);
+                format = ImageFormat.ARGB32;
         }
+        imageData = new ImageData(w, h, format, buffer);
         imageData.setRegion(metaData[0].getPhysicalRegion());
         imageData.setMetaData(metaData[0]);
     }
