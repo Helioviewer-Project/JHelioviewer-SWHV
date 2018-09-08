@@ -16,7 +16,7 @@ import kdu_jni.Kdu_quality_limiter;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
 
-import org.helioviewer.jhv.imagedata.ImageDataBuffer;
+import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData.ImageFormat;
 import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.view.jp2view.image.DecodeParams;
@@ -32,7 +32,7 @@ class J2KRender implements Runnable {
 
     private static final int[] firstComponent = {0};
 
-    private static final ThreadLocal<Cache<DecodeParams, ImageDataBuffer>> decodeCache =
+    private static final ThreadLocal<Cache<DecodeParams, ImageBuffer>> decodeCache =
             ThreadLocal.withInitial(() -> CacheBuilder.newBuilder().softValues().build());
     private static final ThreadLocal<Kdu_thread_env> localThread = ThreadLocal.withInitial(J2KRender::createThreadEnv);
     private static final ThreadLocal<Kdu_region_compositor> localCompositor = new ThreadLocal<>();
@@ -49,8 +49,8 @@ class J2KRender implements Runnable {
         abolish = _abolish;
     }
 
-    private ImageDataBuffer renderLayer(DecodeParams params) throws KduException {
-        ImageDataBuffer ret = decodeCache.get().getIfPresent(params);
+    private ImageBuffer renderLayer(DecodeParams params) throws KduException {
+        ImageBuffer ret = decodeCache.get().getIfPresent(params);
         if (ret != null)
             return ret;
 
@@ -86,8 +86,8 @@ class J2KRender implements Runnable {
         int[] rowGap = new int[1];
         long addr = compositorBuf.Get_buf(rowGap, false);
 
-        int bufferLength = numComponents < 3 ? actualWidth * actualHeight : 4 * actualWidth * actualHeight;
-        byte[] byteBuffer = new byte[bufferLength];
+        ImageFormat format = numComponents < 3 ? ImageFormat.Gray8 : ImageFormat.ARGB32;
+        byte[] byteBuffer = new byte[actualWidth * actualHeight * format.bytes];
 
         Kdu_dims newRegion = new Kdu_dims();
         while (compositor.Process(KakaduConstants.MAX_RENDER_SAMPLES, newRegion)) {
@@ -121,8 +121,7 @@ class J2KRender implements Runnable {
         }
         compositor.Remove_ilayer(ilayer, true);
 
-        ImageFormat format = numComponents < 3 ? ImageFormat.Gray8 : ImageFormat.ARGB32;
-        ret = new ImageDataBuffer(actualWidth, actualHeight, format, ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder()));
+        ret = new ImageBuffer(actualWidth, actualHeight, format, ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder()));
         if (!discard)
             decodeCache.get().put(params, ret);
 
@@ -137,7 +136,7 @@ class J2KRender implements Runnable {
         }
 
         try {
-            ImageDataBuffer data = renderLayer(imageParams.decodeParams);
+            ImageBuffer data = renderLayer(imageParams.decodeParams);
             view.setDataFromRender(imageParams, data);
         } catch (Exception e) { // reboot the compositor
             Kdu_region_compositor krc = localCompositor.get();

@@ -293,10 +293,6 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         return req == null ? view.getLastTime().milli : req.endTime;
     }
 
-    public double getAutoBrightness() {
-        return imageData == null ? 1 : imageData.getAutoBrightness();
-    }
-
     public boolean isLoadedForState() {
         return worker == null && view.getFrameCacheStatus(view.getMaximumFrameNumber()) != null;
     }
