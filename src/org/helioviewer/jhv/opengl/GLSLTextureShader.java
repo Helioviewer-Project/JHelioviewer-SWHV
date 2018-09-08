@@ -24,17 +24,17 @@ class GLSLTextureShader extends GLSLShader {
     }
 
     @Override
-    protected void bindAttribLocations(GL2 gl) {
-        gl.glBindAttribLocation(progID, 0, "Vertex");
-        gl.glBindAttribLocation(progID, 1, "Coord");
+    protected void bindAttribLocations(GL2 gl, int id) {
+        gl.glBindAttribLocation(id, 0, "Vertex");
+        gl.glBindAttribLocation(id, 1, "Coord");
     }
 
     @Override
-    protected void initUniforms(GL2 gl) {
-        refModelViewProjectionMatrix = gl.glGetUniformLocation(progID, "ModelViewProjectionMatrix");
-        colorRef = gl.glGetUniformLocation(progID, "color");
+    protected void initUniforms(GL2 gl, int id) {
+        refModelViewProjectionMatrix = gl.glGetUniformLocation(id, "ModelViewProjectionMatrix");
+        colorRef = gl.glGetUniformLocation(id, "color");
 
-        setTextureUnit(gl, "image", GLTexture.Unit.ZERO);
+        setTextureUnit(gl, id, "image", GLTexture.Unit.ZERO);
     }
 
     void bindParams(GL2 gl, float[] color) {

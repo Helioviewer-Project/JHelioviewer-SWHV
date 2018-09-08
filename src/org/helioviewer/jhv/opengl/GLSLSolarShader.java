@@ -92,50 +92,50 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     @Override
-    protected void bindAttribLocations(GL2 gl) {
-        gl.glBindAttribLocation(progID, 0, "Vertex");
+    protected void bindAttribLocations(GL2 gl, int id) {
+        gl.glBindAttribLocation(id, 0, "Vertex");
     }
 
     @Override
-    protected void initUniforms(GL2 gl) {
-        isDiffRef = gl.glGetUniformLocation(progID, "isdifference");
+    protected void initUniforms(GL2 gl, int id) {
+        isDiffRef = gl.glGetUniformLocation(id, "isdifference");
 
-        hgltRef = gl.glGetUniformLocation(progID, "hglt");
-        hglnRef = gl.glGetUniformLocation(progID, "hgln");
-        crotaRef = gl.glGetUniformLocation(progID, "crota");
-        hgltDiffRef = gl.glGetUniformLocation(progID, "hgltDiff");
-        hglnDiffRef = gl.glGetUniformLocation(progID, "hglnDiff");
-        crotaDiffRef = gl.glGetUniformLocation(progID, "crotaDiff");
+        hgltRef = gl.glGetUniformLocation(id, "hglt");
+        hglnRef = gl.glGetUniformLocation(id, "hgln");
+        crotaRef = gl.glGetUniformLocation(id, "crota");
+        hgltDiffRef = gl.glGetUniformLocation(id, "hgltDiff");
+        hglnDiffRef = gl.glGetUniformLocation(id, "hglnDiff");
+        crotaDiffRef = gl.glGetUniformLocation(id, "crotaDiff");
 
-        polarRadiiRef = gl.glGetUniformLocation(progID, "polarRadii");
+        polarRadiiRef = gl.glGetUniformLocation(id, "polarRadii");
 
-        sharpenRef = gl.glGetUniformLocation(progID, "sharpen");
-        slitRef = gl.glGetUniformLocation(progID, "slit");
-        brightRef = gl.glGetUniformLocation(progID, "brightness");
-        colorRef = gl.glGetUniformLocation(progID, "color");
-        cutOffRadiusRef = gl.glGetUniformLocation(progID, "cutOffRadius");
-        cutOffDirectionRef = gl.glGetUniformLocation(progID, "cutOffDirection");
-        cutOffValueRef = gl.glGetUniformLocation(progID, "cutOffValue");
-        enhancedRef = gl.glGetUniformLocation(progID, "enhanced");
+        sharpenRef = gl.glGetUniformLocation(id, "sharpen");
+        slitRef = gl.glGetUniformLocation(id, "slit");
+        brightRef = gl.glGetUniformLocation(id, "brightness");
+        colorRef = gl.glGetUniformLocation(id, "color");
+        cutOffRadiusRef = gl.glGetUniformLocation(id, "cutOffRadius");
+        cutOffDirectionRef = gl.glGetUniformLocation(id, "cutOffDirection");
+        cutOffValueRef = gl.glGetUniformLocation(id, "cutOffValue");
+        enhancedRef = gl.glGetUniformLocation(id, "enhanced");
 
-        rectRef = gl.glGetUniformLocation(progID, "rect");
-        diffRectRef = gl.glGetUniformLocation(progID, "differencerect");
-        viewportRef = gl.glGetUniformLocation(progID, "viewport");
-        viewportOffsetRef = gl.glGetUniformLocation(progID, "viewportOffset");
+        rectRef = gl.glGetUniformLocation(id, "rect");
+        diffRectRef = gl.glGetUniformLocation(id, "differencerect");
+        viewportRef = gl.glGetUniformLocation(id, "viewport");
+        viewportOffsetRef = gl.glGetUniformLocation(id, "viewportOffset");
 
-        cameraTransformationInverseRef = gl.glGetUniformLocation(progID, "cameraTransformationInverse");
-        cameraDifferenceRotationQuatRef = gl.glGetUniformLocation(progID, "cameraDifferenceRotationQuat");
-        diffCameraDifferenceRotationQuatRef = gl.glGetUniformLocation(progID, "diffcameraDifferenceRotationQuat");
+        cameraTransformationInverseRef = gl.glGetUniformLocation(id, "cameraTransformationInverse");
+        cameraDifferenceRotationQuatRef = gl.glGetUniformLocation(id, "cameraDifferenceRotationQuat");
+        diffCameraDifferenceRotationQuatRef = gl.glGetUniformLocation(id, "diffcameraDifferenceRotationQuat");
 
-        int blurKernelRef = gl.glGetUniformLocation(progID, "blurKernel");
-        int blurOffsetRef = gl.glGetUniformLocation(progID, "blurOffset");
+        int blurKernelRef = gl.glGetUniformLocation(id, "blurKernel");
+        int blurOffsetRef = gl.glGetUniformLocation(id, "blurOffset");
 
         gl.glUniform1fv(blurKernelRef, blurKernel.length, blurKernel, 0);
         gl.glUniform2fv(blurOffsetRef, blurOffset.length / 2, blurOffset, 0);
 
-        setTextureUnit(gl, "image", GLTexture.Unit.ZERO);
-        setTextureUnit(gl, "lut", GLTexture.Unit.ONE);
-        setTextureUnit(gl, "diffImage", GLTexture.Unit.TWO);
+        setTextureUnit(gl, id, "image", GLTexture.Unit.ZERO);
+        setTextureUnit(gl, id, "lut", GLTexture.Unit.ONE);
+        setTextureUnit(gl, id, "diffImage", GLTexture.Unit.TWO);
     }
 
     public static void dispose(GL2 gl) {

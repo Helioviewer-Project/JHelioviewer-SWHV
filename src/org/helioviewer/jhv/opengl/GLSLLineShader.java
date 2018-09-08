@@ -28,18 +28,18 @@ class GLSLLineShader extends GLSLShader {
     }
 
     @Override
-    protected void bindAttribLocations(GL2 gl) {
-        gl.glBindAttribLocation(progID, 0, "Vertex");
-        gl.glBindAttribLocation(progID, 1, "Color");
-        gl.glBindAttribLocation(progID, 2, "NextVertex");
-        gl.glBindAttribLocation(progID, 3, "NextColor");
+    protected void bindAttribLocations(GL2 gl, int id) {
+        gl.glBindAttribLocation(id, 0, "Vertex");
+        gl.glBindAttribLocation(id, 1, "Color");
+        gl.glBindAttribLocation(id, 2, "NextVertex");
+        gl.glBindAttribLocation(id, 3, "NextColor");
     }
 
     @Override
-    protected void initUniforms(GL2 gl) {
-        refModelViewProjectionMatrix = gl.glGetUniformLocation(progID, "ModelViewProjectionMatrix");
-        iaspectRef = gl.glGetUniformLocation(progID, "iaspect");
-        thicknessRef = gl.glGetUniformLocation(progID, "thickness");
+    protected void initUniforms(GL2 gl, int id) {
+        refModelViewProjectionMatrix = gl.glGetUniformLocation(id, "ModelViewProjectionMatrix");
+        iaspectRef = gl.glGetUniformLocation(id, "iaspect");
+        thicknessRef = gl.glGetUniformLocation(id, "thickness");
     }
 
     void bindParams(GL2 gl, double aspect, double _thickness) {
