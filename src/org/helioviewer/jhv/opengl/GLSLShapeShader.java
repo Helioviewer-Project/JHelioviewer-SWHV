@@ -29,15 +29,15 @@ class GLSLShapeShader extends GLSLShader {
     }
 
     @Override
-    protected void bindAttribLocations(GL2 gl) {
-        gl.glBindAttribLocation(progID, 0, "Vertex");
-        gl.glBindAttribLocation(progID, 1, "Color");
+    protected void bindAttribLocations(GL2 gl, int id) {
+        gl.glBindAttribLocation(id, 0, "Vertex");
+        gl.glBindAttribLocation(id, 1, "Color");
     }
 
     @Override
-    protected void initUniforms(GL2 gl) {
-        refModelViewProjectionMatrix = gl.glGetUniformLocation(progID, "ModelViewProjectionMatrix");
-        factorRef = gl.glGetUniformLocation(progID, "factor");
+    protected void initUniforms(GL2 gl, int id) {
+        refModelViewProjectionMatrix = gl.glGetUniformLocation(id, "ModelViewProjectionMatrix");
+        factorRef = gl.glGetUniformLocation(id, "factor");
     }
 
     void bindParams(GL2 gl, double _factor) {

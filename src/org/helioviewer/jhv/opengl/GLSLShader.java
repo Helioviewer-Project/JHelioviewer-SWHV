@@ -22,7 +22,7 @@ abstract class GLSLShader {
 
     private static int usedID; // track state
 
-    protected int progID;
+    private int progID;
     private int vertexID;
     private int fragmentID;
 
@@ -43,9 +43,9 @@ abstract class GLSLShader {
             String fragmentText = fragmentCommonText + FileUtils.streamToString(FileUtils.getResource(fragment));
             fragmentID = attachShader(gl, ShaderType.fragment, fragmentText);
 
-            initializeProgram(gl, true);
+            progID = initializeProgram(gl, true);
             use(gl);
-            initUniforms(gl);
+            initUniforms(gl, progID);
         } catch (Exception e) {
             throw new GLException("Cannot load shader", e);
         }
@@ -64,21 +64,20 @@ abstract class GLSLShader {
         }
     }
 
-    protected abstract void bindAttribLocations(GL2 gl);
+    protected abstract void bindAttribLocations(GL2 gl, int id);
 
-    protected abstract void initUniforms(GL2 gl);
+    protected abstract void initUniforms(GL2 gl, int id);
 
-    protected final void setTextureUnit(GL2 gl, String texname, GLTexture.Unit unit) {
-        int id = gl.glGetUniformLocation(progID, texname);
-        if (id == -1) {
+    protected static void setTextureUnit(GL2 gl, int id, String texname, GLTexture.Unit unit) {
+        int loc = gl.glGetUniformLocation(id, texname);
+        if (loc != -1)
+            gl.glUniform1i(loc, unit.ordinal());
+        else
             Log.error("Warning: Invalid texture " + texname);
-            return;
-        }
-        gl.glUniform1i(id, unit.ordinal());
     }
 
     private static int attachShader(GL2 gl, ShaderType type, String text) {
-        int iID = gl.glCreateShader(type.glType);
+        int id = gl.glCreateShader(type.glType);
 
         String[] akProgramText = new String[1];
         akProgramText[0] = text;
@@ -87,55 +86,60 @@ abstract class GLSLShader {
         aiLength[0] = akProgramText[0].length();
         int iCount = 1;
 
-        gl.glShaderSource(iID, iCount, akProgramText, aiLength, 0);
-        gl.glCompileShader(iID);
+        gl.glShaderSource(id, iCount, akProgramText, aiLength, 0);
+        gl.glCompileShader(id);
 
         int[] params = {0};
-        gl.glGetShaderiv(iID, GL2.GL_COMPILE_STATUS, params, 0);
+        gl.glGetShaderiv(id, GL2.GL_COMPILE_STATUS, params, 0);
         if (params[0] != 1) {
-            Log.error("shader compile status: " + params[0]);
-            gl.glGetShaderiv(iID, GL2.GL_INFO_LOG_LENGTH, params, 0);
+            Log.error("Shader compile status: " + params[0]);
+            gl.glGetShaderiv(id, GL2.GL_INFO_LOG_LENGTH, params, 0);
+            if (params[0] > 0) {
+                byte[] infoLog = new byte[params[0]];
+                gl.glGetShaderInfoLog(id, params[0], params, 0, infoLog, 0);
 
-            byte[] abInfoLog = new byte[params[0]];
-            gl.glGetShaderInfoLog(iID, params[0], params, 0, abInfoLog, 0);
-
-            String log = new String(abInfoLog, StandardCharsets.UTF_8);
-            Log.error(log);
-            throw new GLException("Cannot compile " + type + " shader: " + log);
+                String log = new String(infoLog, StandardCharsets.UTF_8);
+                Log.error(log);
+                throw new GLException("Cannot compile " + type + " shader: " + log);
+            } else
+                throw new GLException("Cannot compile " + type + " shader: unknown reason");
         }
-        return iID;
+        return id;
     }
 
-    private void initializeProgram(GL2 gl, boolean cleanUp) {
-        progID = gl.glCreateProgram();
-        gl.glAttachShader(progID, vertexID);
-        gl.glAttachShader(progID, fragmentID);
+    private int initializeProgram(GL2 gl, boolean cleanUp) {
+        int id = gl.glCreateProgram();
+        gl.glAttachShader(id, vertexID);
+        gl.glAttachShader(id, fragmentID);
 
-        bindAttribLocations(gl);
-        gl.glLinkProgram(progID);
+        bindAttribLocations(gl, id);
+        gl.glLinkProgram(id);
 
         int[] params = {0};
-        gl.glGetProgramiv(progID, GL2.GL_LINK_STATUS, params, 0);
+        gl.glGetProgramiv(id, GL2.GL_LINK_STATUS, params, 0);
         if (params[0] != 1) {
-            Log.error("link status: " + params[0]);
-            gl.glGetProgramiv(progID, GL2.GL_INFO_LOG_LENGTH, params, 0);
+            Log.error("Shader link status: " + params[0]);
+            gl.glGetProgramiv(id, GL2.GL_INFO_LOG_LENGTH, params, 0);
+            if (params[0] > 0) {
+                byte[] infoLog = new byte[params[0]];
+                gl.glGetProgramInfoLog(id, params[0], params, 0, infoLog, 0);
 
-            byte[] abInfoLog = new byte[params[0]];
-            gl.glGetProgramInfoLog(progID, params[0], params, 0, abInfoLog, 0);
-
-            String log = new String(abInfoLog, StandardCharsets.UTF_8);
-            Log.error(log);
-            throw new GLException("Cannot link shaders : " + log);
+                String log = new String(infoLog, StandardCharsets.UTF_8);
+                Log.error(log);
+                throw new GLException("Cannot link shader: " + log);
+            } else
+                throw new GLException("Cannot link shader: unknown reason");
         }
 
-        gl.glValidateProgram(progID);
+        gl.glValidateProgram(id);
 
         if (cleanUp) {
-            gl.glDetachShader(progID, vertexID);
+            gl.glDetachShader(id, vertexID);
             gl.glDeleteShader(vertexID);
-            gl.glDetachShader(progID, fragmentID);
+            gl.glDetachShader(id, fragmentID);
             gl.glDeleteShader(fragmentID);
         }
+        return id;
     }
 
 }
