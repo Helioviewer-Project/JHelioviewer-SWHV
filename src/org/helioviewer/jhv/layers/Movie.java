@@ -159,7 +159,10 @@ public class Movie implements ActionListener {
         }
         Display.render(1);
 
-        Layers.getViewpointLayer().fireTimeUpdated(camera.getViewpoint().time); // !
+        ViewpointLayer viewpointLayer = Layers.getViewpointLayer();
+        if (viewpointLayer != null)
+            viewpointLayer.fireTimeUpdated(camera.getViewpoint().time); // !
+
         for (TimeListener listener : timeListeners) {
             listener.timeChanged(lastTimestamp.milli);
         }
