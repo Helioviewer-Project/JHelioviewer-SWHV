@@ -50,7 +50,6 @@ public class Buttons {
     public static final String info = button(MaterialDesign.MDI_INFORMATION_VARIANT);
     public static final String download = button(MaterialDesign.MDI_DOWNLOAD);
 
-    public static final String brightness = button(MaterialDesign.MDI_BRIGHTNESS_AUTO);
     public static final String invert = button(MaterialDesign.MDI_INVERT_COLORS);
     public static final String corona = button(MaterialDesign.MDI_WHITE_BALANCE_SUNNY);
 

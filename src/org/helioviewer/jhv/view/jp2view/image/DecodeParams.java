@@ -22,7 +22,6 @@ public class DecodeParams {
     public boolean equals(Object o) {
         if (!(o instanceof DecodeParams))
             return false;
-
         DecodeParams p = (DecodeParams) o;
         return frame == p.frame && factor == p.factor && subImage.equals(p.subImage) && resolution.equals(p.resolution);
     }
