@@ -171,7 +171,7 @@ public interface GridScale {
         public Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridType gridType) {
             Vec3 p = CameraHelper.getVectorFromSphere(camera, vp, px, py, Quat.ZERO, true);
             if (p == null)
-                return Vec2.NAN_VECTOR;
+                return Vec2.NAN;
 
             if (gridType != GridType.Viewpoint) {
                 Position viewpoint = camera.getViewpoint();
