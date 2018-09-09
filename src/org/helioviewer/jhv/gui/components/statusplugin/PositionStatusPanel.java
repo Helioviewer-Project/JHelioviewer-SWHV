@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.gui.components.statusplugin;
 
+import javax.annotation.Nonnull;
+
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.Camera;
@@ -20,28 +22,30 @@ import com.jogamp.newt.event.MouseListener;
 @SuppressWarnings("serial")
 public class PositionStatusPanel extends StatusPanel.StatusPlugin implements MouseListener {
 
-    private static final String nullCoordStr = "---\u00B0,---\u00B0";
+    private static final String nanOrtho = "---\u00B0,---\u00B0";
+    private static final String nanLati = "---\u00B0,---\u00B0";
+    private static final String nanPolar = "---\u00B0,---\u2299";
 
     private final Camera camera;
 
     public PositionStatusPanel() {
-        setText(formatOrtho(null, 0, 0, 0, 0));
+        setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0));
         camera = Display.getCamera();
     }
 
     private void update(int x, int y) {
         Viewport vp = Display.getActiveViewport();
         GridLayer gridLayer = Layers.getGridLayer();
-        Vec2 coord = gridLayer == null ? Vec2.ZERO : gridLayer.gridPoint(camera, vp, x, y);
+        Vec2 coord = gridLayer == null ? Vec2.NAN : gridLayer.gridPoint(camera, vp, x, y);
 
         if (Display.mode == Display.DisplayMode.Latitudinal) {
-            setText(String.format("(\u03C6,\u03B8) : (%.2f\u00B0,%.2f\u00B0)", coord.x, coord.y));
+            setText(formatLati(coord));
         } else if (Display.mode == Display.DisplayMode.Polar || Display.mode == Display.DisplayMode.LogPolar) {
-            setText(String.format("(\u03B8,\u03c1) : (%.2f\u00B0,%.2fR\u2299)", coord.x, coord.y));
+            setText(formatPolar(coord));
         } else {
             Vec3 v = CameraHelper.getVectorFromSphereOrPlane(camera, vp, x, y, camera.getCurrentDragRotation());
             if (v == null) {
-                setText(formatOrtho(null, 0, 0, 0, 0));
+                setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0));
             } else {
                 double r = Math.sqrt(v.x * v.x + v.y * v.y);
 
@@ -69,10 +73,28 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
             return String.format("%.2fau", r * Sun.MeanEarthDistanceInv);
     }
 
-    private static String formatOrtho(Vec2 coord, double r, double pa, double px, double py) {
+    private static String formatLati(@Nonnull Vec2 coord) {
         String coordStr;
-        if (coord == null || Double.isNaN(coord.x) || Double.isNaN(coord.y))
-            coordStr = nullCoordStr;
+        if (Double.isNaN(coord.x) || Double.isNaN(coord.y))
+            coordStr = nanLati;
+        else
+            coordStr = String.format("%.2f\u00B0,%.2f\u00B0", coord.x, coord.y);
+        return String.format("(\u03C6,\u03B8) : (%s)", coordStr);
+    }
+
+    private static String formatPolar(@Nonnull Vec2 coord) {
+        String coordStr;
+        if (Double.isNaN(coord.x) || Double.isNaN(coord.y))
+            coordStr = nanPolar;
+        else
+            coordStr = String.format("%.2f\u00B0,%.2fR\u2299", coord.x, coord.y);
+        return String.format("(\u03B8,\u03c1) : (%s)", coordStr);
+    }
+
+    private static String formatOrtho(@Nonnull Vec2 coord, double r, double pa, double px, double py) {
+        String coordStr;
+        if (Double.isNaN(coord.x) || Double.isNaN(coord.y))
+            coordStr = nanOrtho;
         else
             coordStr = String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
         return String.format("(\u03C6,\u03B8) : (%s) | (\u03c1,\u03c8) : (%s,%6.2f\u00B0) | (x,y) : (%s,%s)", coordStr, formatR(r), pa, formatXY(px), formatXY(py));

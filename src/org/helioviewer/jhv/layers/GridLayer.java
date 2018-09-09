@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
@@ -108,6 +109,7 @@ public class GridLayer extends AbstractLayer {
         radialLabelsFar = GridLabel.makeRadialLabels(Math.PI / 2, RADIAL_STEP_FAR);
     }
 
+    @Nonnull
     public Vec2 gridPoint(Camera camera, Viewport vp, int x, int y) {
         return Display.mode.scale.mouseToGrid(x, y, vp, camera, gridType);
     }
