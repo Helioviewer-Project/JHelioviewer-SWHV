@@ -65,7 +65,7 @@ class J2KRender implements Runnable {
             // alpha tbd
             ilayer = compositor.Add_primitive_ilayer(frame, firstComponent, Kdu_global.KDU_WANT_CODESTREAM_COMPONENTS, empty, empty);
         } else {
-            ilayer = compositor.Add_ilayer(frame, new Kdu_dims(), new Kdu_dims());
+            ilayer = compositor.Add_ilayer(frame, empty, empty);
         }
 
         compositor.Set_scale(false, false, false, 1f / (1 << params.resolution.level), (float) params.factor);
@@ -209,6 +209,7 @@ class J2KRender implements Runnable {
                 kte.Destroy();
                 localThread.set(null);
             }
+            decodeCache.get().invalidateAll();
         } catch (KduException e) {
             e.printStackTrace();
         }
