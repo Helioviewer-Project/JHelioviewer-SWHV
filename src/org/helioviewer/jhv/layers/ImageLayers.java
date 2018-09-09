@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.layers;
 
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageData;
@@ -22,12 +21,12 @@ import org.astrogrid.samp.SampUtils;
 
 public class ImageLayers {
 
-    public static void setRender(Camera camera, double factor) {
+    public static void setRender(int serialNo, double factor) {
         int i;
         Viewport[] vp = Display.getViewports();
         for (ImageLayer layer : Layers.getImageLayers()) {
             if ((i = layer.isVisibleIdx()) != -1 && vp[i] != null)
-                layer.getView().render(camera, vp[i], factor);
+                layer.getView().render(serialNo, vp[i], factor);
         }
     }
 
@@ -68,10 +67,10 @@ public class ImageLayers {
         return ct;
     }
 
-    public static boolean getSyncedImageLayers(long milli) {
+    public static boolean getSyncedImageLayers(int serialNo) {
         for (ImageLayer layer : Layers.getImageLayers()) {
             ImageData id;
-            if (layer.isEnabled() && (id = layer.getImageData()) != null && milli != id.getViewpoint().time.milli)
+            if (layer.isEnabled() && (id = layer.getImageData()) != null && serialNo != id.getSerial())
                 return false;
         }
         return true;

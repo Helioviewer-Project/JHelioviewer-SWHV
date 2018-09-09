@@ -2,13 +2,12 @@ package org.helioviewer.jhv.imagedata;
 
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.position.Position;
 
 public class ImageData {
 
+    private int serialNo;
     private Region region;
     private MetaData metaData;
-    private Position viewpoint;
     private boolean uploaded = false;
 
     private final ImageBuffer imageBuffer;
@@ -21,28 +20,28 @@ public class ImageData {
         return imageBuffer;
     }
 
+    public int getSerial() {
+        return serialNo;
+    }
+
+    public void setSerial(int _serialNo) {
+        serialNo = _serialNo;
+    }
+
     public Region getRegion() {
         return region;
     }
 
-    public void setRegion(Region r) {
-        region = r;
-    }
-
-    public void setMetaData(MetaData m) {
-        metaData = m;
+    public void setRegion(Region _region) {
+        region = _region;
     }
 
     public MetaData getMetaData() {
         return metaData;
     }
 
-    public void setViewpoint(Position p) {
-        viewpoint = p;
-    }
-
-    public Position getViewpoint() {
-        return viewpoint;
+    public void setMetaData(MetaData _metaData) {
+        metaData = _metaData;
     }
 
     public boolean getUploaded() {
