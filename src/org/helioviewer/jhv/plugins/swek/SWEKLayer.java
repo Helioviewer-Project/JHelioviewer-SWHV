@@ -101,7 +101,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             tex = new GLTexture(gl, GL2.GL_TEXTURE_2D, GLTexture.Unit.ZERO);
             tex.bind(gl);
 
-            GLTexture.copyBufferedImage2D(gl, bi);
+            GLTexture.copyBufferedImage(gl, bi);
             iconCacheId.put(key, tex);
         }
         tex.bind(gl);

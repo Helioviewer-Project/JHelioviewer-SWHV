@@ -11,8 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
-import org.helioviewer.jhv.imagedata.ImageData;
-import org.helioviewer.jhv.imagedata.ImageData.ImageFormat;
+import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.opengl.GL2;
@@ -60,20 +59,20 @@ public class GLTexture {
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
     }
 
-    public void copyImageData2D(GL2 gl, ImageData source) {
-        int w = source.getWidth();
-        int h = source.getHeight();
-        if (w <= 0 || h <= 0 || w > GLInfo.maxTextureSize || h > GLInfo.maxTextureSize) {
+    public void copyImageBuffer(GL2 gl, ImageBuffer imageBuffer) {
+        int w = imageBuffer.width;
+        int h = imageBuffer.height;
+        if (w < 1 || h < 1 || w > GLInfo.maxTextureSize || h > GLInfo.maxTextureSize) {
             Log.error("GLTexture.copyImageData2D: w= " + w + " h=" + h);
             return;
         }
 
-        ImageFormat imageFormat = source.getImageFormat();
-        int inputGLFormat = mapImageFormatToInputGLFormat(imageFormat);
-        int bppGLType = mapBytesPerPixelToGLType(imageFormat.bytes);
+        ImageBuffer.Format format = imageBuffer.format;
+        int inputGLFormat = mapImageFormatToInputGLFormat(format);
+        int bppGLType = mapBytesPerPixelToGLType(format.bytes);
 
         if (w != prev_width || h != prev_height || prev_inputGLFormat != inputGLFormat || prev_bppGLType != bppGLType) {
-            int internalGLFormat = mapImageFormatToInternalGLFormat(imageFormat);
+            int internalGLFormat = mapImageFormatToInternalGLFormat(format);
             genTexture2D(gl, internalGLFormat, w, h, inputGLFormat, bppGLType, null);
 
             prev_width = w;
@@ -82,15 +81,15 @@ public class GLTexture {
             prev_bppGLType = bppGLType;
         }
 
-        gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, imageFormat.bytes);
+        gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, format.bytes);
         gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, w);
-        gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, source.getBuffer());
+        gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, imageBuffer.buffer);
     }
 
-    public static void copyBufferedImage2D(GL2 gl, BufferedImage source) {
+    public static void copyBufferedImage(GL2 gl, BufferedImage source) {
         int w = source.getWidth();
         int h = source.getHeight();
-        if (w <= 0 || h <= 0 || w > GLInfo.maxTextureSize || h > GLInfo.maxTextureSize) {
+        if (w < 1 || h < 1 || w > GLInfo.maxTextureSize || h > GLInfo.maxTextureSize) {
             Log.error("GLTexture.copyBufferedImage2D: w= " + w + " h=" + h);
             return;
         }
@@ -128,15 +127,9 @@ public class GLTexture {
         gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
     }
 
-    /**
-     * Internal function to map the application internal image formats to OpenGL
-     * image formats, used for saving the texture.
-     *
-     * @param imageFormat Application internal image format
-     * @return OpenGL memory image format
-     */
-    private static int mapImageFormatToInternalGLFormat(ImageFormat imageFormat) {
-        switch (imageFormat) {
+    // Map application image format to OpenGL OpenGL memory image format
+    private static int mapImageFormatToInternalGLFormat(ImageBuffer.Format format) {
+        switch (format) {
             case Gray8:
                 return GL2.GL_R8;
             case Gray16:
@@ -144,26 +137,20 @@ public class GLTexture {
             case ARGB32:
                 return GL2.GL_RGBA;
             default:
-                throw new IllegalArgumentException("Format is not supported");
+                throw new IllegalArgumentException("Format not supported");
         }
     }
 
-    /**
-     * Internal function to map the application internal image formats to OpenGL
-     * image formats, used for transferring the texture.
-     *
-     * @param imageFormat Application internal image format
-     * @return OpenGL input image format
-     */
-    private static int mapImageFormatToInputGLFormat(ImageFormat imageFormat) {
-        switch (imageFormat) {
+    // Map application image format to OpenGL input image format
+    private static int mapImageFormatToInputGLFormat(ImageBuffer.Format format) {
+        switch (format) {
             case Gray8:
             case Gray16:
                 return GL2.GL_RED;
             case ARGB32:
                 return GL2.GL_BGRA;
             default:
-                throw new IllegalArgumentException("Format is not supported");
+                throw new IllegalArgumentException("Format not supported");
         }
     }
 

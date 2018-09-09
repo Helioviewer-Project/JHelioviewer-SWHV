@@ -4,12 +4,22 @@ import java.nio.Buffer;
 
 public class ImageBuffer {
 
-    final int width;
-    final int height;
-    final ImageData.ImageFormat format;
-    final Buffer buffer;
+    public enum Format {
+        Gray8(1), Gray16(2), ARGB32(4);
 
-    public ImageBuffer(int _width, int _height, ImageData.ImageFormat _format, Buffer _buffer) {
+        public final int bytes;
+
+        Format(int _bytes) {
+            bytes = _bytes;
+        }
+    }
+
+    public final int width;
+    public final int height;
+    public final Format format;
+    public final Buffer buffer;
+
+    public ImageBuffer(int _width, int _height, Format _format, Buffer _buffer) {
         width = _width;
         height = _height;
         format = _format;

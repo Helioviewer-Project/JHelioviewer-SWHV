@@ -50,13 +50,13 @@ public class GLImage {
         if (!imageData.getUploaded()) {
             imageData.setUploaded(true);
             tex.bind(gl);
-            tex.copyImageData2D(gl, imageData);
+            tex.copyImageBuffer(gl, imageData.getImageBuffer());
         }
 
         ImageData prevFrame = isBaseDiff() ? baseImageData : prevImageData;
         if (diffMode != DifferenceMode.None && prevFrame != null) {
             diffTex.bind(gl);
-            diffTex.copyImageData2D(gl, prevFrame);
+            diffTex.copyImageBuffer(gl, prevFrame.getImageBuffer());
         }
     }
 
@@ -67,7 +67,7 @@ public class GLImage {
         shader.bindBrightness(gl, brightOffset, brightScale * imageData.getMetaData().getResponseFactor(), 1);
         shader.bindColor(gl, red, green, blue, opacity, blend);
         shader.bindEnhanced(gl, enhanced);
-        shader.bindSharpen(gl, sharpen, 1. / imageData.getWidth(), 1. / imageData.getHeight());
+        shader.bindSharpen(gl, sharpen, 1. / imageData.getImageBuffer().width, 1. / imageData.getImageBuffer().height);
 
         applyLUT(gl);
         tex.bind(gl);
