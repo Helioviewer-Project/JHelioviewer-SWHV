@@ -127,7 +127,7 @@ public class GLTexture {
         gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
     }
 
-    // Map application image format to OpenGL OpenGL memory image format
+    // Map application image format to OpenGL memory image format
     private static int mapImageFormatToInternalGLFormat(ImageBuffer.Format format) {
         switch (format) {
             case Gray8:
