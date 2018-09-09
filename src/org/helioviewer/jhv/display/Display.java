@@ -189,12 +189,14 @@ public class Display implements ActionListener, JHVEventHighlightListener {
         toDisplay = true;
     }
 
-    public static void handleData(long milli) { // special for ImageLayer.handleData
-        if (ImageLayers.getSyncedImageLayers(milli)) {
+    public static void handleData(int serial) { // special for ImageLayer.handleData
+        if (ImageLayers.getSyncedImageLayers(serial)) {
             ImageViewerGui.getGLWindow().display(); // asap
             toDisplay = false;
         }
     }
+
+    private static int serialNo;
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -203,7 +205,7 @@ public class Display implements ActionListener, JHVEventHighlightListener {
             toDisplay = false;
         }
         if (renderFactor != -1) {
-            ImageLayers.setRender(camera, renderFactor);
+            ImageLayers.setRender(serialNo++, renderFactor);
             renderFactor = -1;
         }
     }

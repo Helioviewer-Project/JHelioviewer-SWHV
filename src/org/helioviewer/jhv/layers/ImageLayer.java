@@ -254,7 +254,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     public void handleData(ImageData newImageData) {
         setImageData(newImageData);
         ImageViewerGui.getLayers().fireTimeUpdated(this);
-        Display.handleData(imageData.getViewpoint().time.milli);
+        Display.handleData(imageData.getSerial());
     }
 
     @Override

@@ -12,7 +12,7 @@ import kdu_jni.KduException;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
-import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
@@ -266,8 +266,8 @@ public class JP2View extends AbstractView {
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, double factor) {
-        executor.execute(this, camera, vp, targetFrame, factor);
+    public void render(int serialNo, Viewport vp, double factor) {
+        executor.execute(this, serialNo, vp, targetFrame, factor);
     }
 
     void signalRenderFromReader(ImageParams params) {
@@ -284,7 +284,7 @@ public class JP2View extends AbstractView {
             return;
 
         ImageData data = new ImageData(imageBuffer);
-        data.setViewpoint(imageParams.viewpoint);
+        data.setSerial(imageParams.serialNo);
 
         DecodeParams params = imageParams.decodeParams;
         int frame = params.frame;
@@ -313,7 +313,7 @@ public class JP2View extends AbstractView {
     }
 
     // Recalculates the image parameters used within the jp2-package
-    ImageParams calculateParams(Camera camera, Viewport vp, int frame, double factor) {
+    ImageParams calculateParams(int serialNo, Viewport vp, int frame, double factor) {
         ResolutionLevel res;
         SubImage subImage;
 
@@ -324,7 +324,7 @@ public class JP2View extends AbstractView {
         } else {
             MetaData m = metaData[frame];
             Region mr = m.getPhysicalRegion();
-            double pixFactor = vp.height / (2 * camera.getWidth());
+            double pixFactor = vp.height / (2 * Display.getCamera().getWidth()); //!
             int totalHeight = (int) (mr.height * pixFactor + .5);
 
             res = cacheStatus.getResolutionSet(frame).getNextResolutionLevel(totalHeight, totalHeight);
@@ -341,7 +341,7 @@ public class JP2View extends AbstractView {
         boolean frameLevelComplete = status != null && status.get();
         boolean priority = !frameLevelComplete && !Movie.isPlaying();
 
-        ImageParams params = new ImageParams(priority, camera.getViewpoint(), new DecodeParams(subImage, res, frame, factor));
+        ImageParams params = new ImageParams(priority, serialNo, new DecodeParams(subImage, res, frame, factor));
         if (priority || (!frameLevelComplete && level < currentLevel)) {
             signalReader(params);
         }
