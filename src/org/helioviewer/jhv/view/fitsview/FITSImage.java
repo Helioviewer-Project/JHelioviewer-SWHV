@@ -14,8 +14,8 @@ import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
 
 import org.helioviewer.jhv.io.NetClient;
+import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
-import org.helioviewer.jhv.imagedata.ImageData.ImageFormat;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.log.Log;
 
@@ -223,7 +223,7 @@ class FITSImage {
             throw new Exception("Cannot retrieve pixel data");
 
         Buffer buffer;
-        ImageFormat format;
+        ImageBuffer.Format format;
         if (bpp == BasicHDU.BITPIX_BYTE) {
             byte[][] data = (byte[][]) pixelData;
             byte[] outData = new byte[width * height];
@@ -231,7 +231,7 @@ class FITSImage {
                 System.arraycopy(data[j], 0, outData, width * (height - 1 - j), width);
             }
             buffer = ByteBuffer.wrap(outData);
-            format = ImageFormat.Gray8;
+            format = ImageBuffer.Format.Gray8;
         } else {
             long blank = BLANK;
             try {
@@ -263,7 +263,7 @@ class FITSImage {
 
             short[] outData = new short[width * height];
             buffer = ShortBuffer.wrap(outData);
-            format = ImageFormat.Gray16;
+            format = ImageBuffer.Format.Gray16;
             switch (bpp) {
                 case BasicHDU.BITPIX_SHORT: {
                     short[][] data = (short[][]) pixelData;
@@ -322,7 +322,7 @@ class FITSImage {
                 }
             }
         }
-        imageData = new ImageData(width, height, format, buffer);
+        imageData = new ImageData(new ImageBuffer(width, height, format, buffer));
     }
 
     private abstract static class PixScale {

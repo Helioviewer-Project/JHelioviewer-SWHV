@@ -17,7 +17,6 @@ import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
 
 import org.helioviewer.jhv.imagedata.ImageBuffer;
-import org.helioviewer.jhv.imagedata.ImageData.ImageFormat;
 import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.view.jp2view.image.DecodeParams;
 import org.helioviewer.jhv.view.jp2view.image.ImageParams;
@@ -86,7 +85,7 @@ class J2KRender implements Runnable {
         int[] rowGap = new int[1];
         long addr = compositorBuf.Get_buf(rowGap, false);
 
-        ImageFormat format = numComponents < 3 ? ImageFormat.Gray8 : ImageFormat.ARGB32;
+        ImageBuffer.Format format = numComponents < 3 ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.ARGB32;
         byte[] byteBuffer = new byte[actualWidth * actualHeight * format.bytes];
 
         Kdu_dims newRegion = new Kdu_dims();
