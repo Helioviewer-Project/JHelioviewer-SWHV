@@ -25,8 +25,10 @@ public class ImageLayers {
         int i;
         Viewport[] vp = Display.getViewports();
         for (ImageLayer layer : Layers.getImageLayers()) {
-            if ((i = layer.isVisibleIdx()) != -1 && vp[i] != null)
-                layer.getView().render(serialNo, vp[i], factor);
+            if ((i = layer.isVisibleIdx()) != -1 && vp[i] != null) {
+                double pixFactor = vp[i].height / (2 * Display.getCamera().getWidth());
+                layer.getView().render(serialNo, pixFactor, factor);
+            }
         }
     }
 

@@ -6,7 +6,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.lut.LUT;
-import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.MetaData;
@@ -22,7 +21,7 @@ public interface View {
 
     void abolish();
 
-    void render(int serialNo, Viewport vp, double factor);
+    void render(int serialNo, double pixFactor, double factor);
 
     URI getURI();
 

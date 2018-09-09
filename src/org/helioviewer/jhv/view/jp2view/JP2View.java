@@ -12,8 +12,6 @@ import kdu_jni.KduException;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
-import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.SubImage;
@@ -266,8 +264,8 @@ public class JP2View extends AbstractView {
     }
 
     @Override
-    public void render(int serialNo, Viewport vp, double factor) {
-        executor.execute(this, serialNo, vp, targetFrame, factor);
+    public void render(int serialNo, double pixFactor, double factor) {
+        executor.execute(this, serialNo, targetFrame, pixFactor, factor);
     }
 
     void signalRenderFromReader(ImageParams params) {
@@ -313,7 +311,7 @@ public class JP2View extends AbstractView {
     }
 
     // Recalculates the image parameters used within the jp2-package
-    ImageParams calculateParams(int serialNo, Viewport vp, int frame, double factor) {
+    ImageParams calculateParams(int serialNo, int frame, double pixFactor, double factor) {
         ResolutionLevel res;
         SubImage subImage;
 
@@ -324,7 +322,6 @@ public class JP2View extends AbstractView {
         } else {
             MetaData m = metaData[frame];
             Region mr = m.getPhysicalRegion();
-            double pixFactor = vp.height / (2 * Display.getCamera().getWidth()); //!
             int totalHeight = (int) (mr.height * pixFactor + .5);
 
             res = cacheStatus.getResolutionSet(frame).getNextResolutionLevel(totalHeight, totalHeight);

@@ -6,7 +6,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.lut.LUT;
-import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.io.APIRequest;
@@ -67,7 +66,7 @@ public class AbstractView implements View {
     }
 
     @Override
-    public void render(int serialNo, Viewport vp, double factor) {
+    public void render(int serialNo, double pixFactor, double factor) {
         if (imageData != null) {
             imageData.setSerial(serialNo);
             if (dataHandler != null) {

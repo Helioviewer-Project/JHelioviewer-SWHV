@@ -6,7 +6,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.view.jp2view.image.ImageParams;
 
@@ -18,9 +17,9 @@ class RenderExecutor {
             new JHVThread.NamedThreadFactory("Render"),
             new ThreadPoolExecutor.DiscardPolicy());
 
-    void execute(JP2View view, int serialNo, Viewport vp, int frame, double factor) {
+    void execute(JP2View view, int serialNo, int frame, double pixFactor, double factor) {
         // order is important, this will signal reader
-        ImageParams params = view.calculateParams(serialNo, vp, frame, factor);
+        ImageParams params = view.calculateParams(serialNo, frame, pixFactor, factor);
         AtomicBoolean status = view.getCacheStatus().getFrameStatus(frame, params.decodeParams.resolution.level);
         if (status == null)
             return;
