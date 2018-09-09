@@ -74,6 +74,10 @@ public class Camera {
         rotation = Quat.rotate(currentDragRotation, viewpoint.toQuat());
     }
 
+    public Quat getRotation() {
+        return rotation;
+    }
+
     private void updateWidth() {
         cameraWidth = viewpoint.distance * Math.tan(0.5 * fov);
     }
