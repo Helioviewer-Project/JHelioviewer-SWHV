@@ -27,8 +27,8 @@ import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.samp.SampPlugin;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
-import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPCacheManager;
-import org.helioviewer.jhv.view.jp2view.kakadu.KakaduMessageSystem;
+import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCacheManager;
+import org.helioviewer.jhv.view.j2k.kakadu.KakaduMessageSystem;
 
 import nom.tam.fits.FitsFactory;
 
