@@ -66,7 +66,7 @@ public class AbstractView implements View {
     }
 
     @Override
-    public void render(int serialNo, double pixFactor, double factor) {
+    public void decode(int serialNo, double pixFactor, double factor) {
         if (imageData != null) {
             imageData.setSerial(serialNo);
             if (dataHandler != null) {

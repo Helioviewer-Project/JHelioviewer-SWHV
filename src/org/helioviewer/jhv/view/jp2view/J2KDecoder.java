@@ -20,35 +20,38 @@ import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.view.jp2view.image.DecodeParams;
 import org.helioviewer.jhv.view.jp2view.image.ImageParams;
-import org.helioviewer.jhv.view.jp2view.kakadu.KakaduConstants;
 
 import org.lwjgl.system.MemoryUtil;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
-class J2KRender implements Runnable {
+class J2KDecoder implements Runnable {
 
+    // Maximum of samples to process per rendering iteration
+    private static final int MAX_RENDER_SAMPLES = 256 * 1024;
+    // The amount of cache to allocate to each codestream
+    private static final int CODESTREAM_CACHE_THRESHOLD = 1024 * 1024;
     private static final int[] firstComponent = {0};
 
     private static final ThreadLocal<Cache<DecodeParams, ImageBuffer>> decodeCache =
             ThreadLocal.withInitial(() -> CacheBuilder.newBuilder().softValues().build());
-    private static final ThreadLocal<Kdu_thread_env> localThread = ThreadLocal.withInitial(J2KRender::createThreadEnv);
+    private static final ThreadLocal<Kdu_thread_env> localThread = ThreadLocal.withInitial(J2KDecoder::createThreadEnv);
     private static final ThreadLocal<Kdu_region_compositor> localCompositor = new ThreadLocal<>();
 
-    private final JP2View view;
+    private final J2KView view;
     private final ImageParams imageParams;
     private final boolean discard;
     private final boolean abolish;
 
-    J2KRender(JP2View _view, ImageParams _imageParams, boolean _discard, boolean _abolish) {
+    J2KDecoder(J2KView _view, ImageParams _imageParams, boolean _discard, boolean _abolish) {
         view = _view;
         imageParams = _imageParams;
         discard = _discard;
         abolish = _abolish;
     }
 
-    private ImageBuffer renderLayer(DecodeParams params) throws KduException {
+    private ImageBuffer decodeLayer(DecodeParams params) throws KduException {
         ImageBuffer ret = decodeCache.get().getIfPresent(params);
         if (ret != null)
             return ret;
@@ -89,7 +92,7 @@ class J2KRender implements Runnable {
         byte[] byteBuffer = new byte[actualWidth * actualHeight * format.bytes];
 
         Kdu_dims newRegion = new Kdu_dims();
-        while (compositor.Process(KakaduConstants.MAX_RENDER_SAMPLES, newRegion)) {
+        while (compositor.Process(MAX_RENDER_SAMPLES, newRegion)) {
             Kdu_coords newSize = newRegion.Access_size();
             int newWidth = newSize.Get_x();
             int newHeight = newSize.Get_y();
@@ -135,8 +138,8 @@ class J2KRender implements Runnable {
         }
 
         try {
-            ImageBuffer data = renderLayer(imageParams.decodeParams);
-            view.setDataFromRender(imageParams, data);
+            ImageBuffer data = decodeLayer(imageParams.decodeParams);
+            view.setDataFromDecoder(imageParams, data);
         } catch (Exception e) { // reboot the compositor
             Kdu_region_compositor krc = localCompositor.get();
             if (krc != null)
@@ -152,7 +155,7 @@ class J2KRender implements Runnable {
         if (krc != null)
             return krc;
 
-        Thread.currentThread().setName("Render " + view.getName());
+        Thread.currentThread().setName("Decoder " + view.getName());
         krc = createCompositor(view.getSource().getJpxSource());
         krc.Set_thread_env(localThread.get(), null);
         localCompositor.set(krc);
@@ -178,7 +181,7 @@ class J2KRender implements Runnable {
     private static Kdu_region_compositor createCompositor(Jpx_source jpx) throws KduException {
         Kdu_region_compositor krc = new Kdu_region_compositor();
         // System.out.println(">>>> compositor create " + krc + " " + Thread.currentThread().getName());
-        krc.Create(jpx, KakaduConstants.CODESTREAM_CACHE_THRESHOLD);
+        krc.Create(jpx, CODESTREAM_CACHE_THRESHOLD);
         krc.Set_surface_initialization_mode(false);
         krc.Set_quality_limiting(new Kdu_quality_limiter(1f / 256), -1, -1);
         return krc;

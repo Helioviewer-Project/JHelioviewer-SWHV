@@ -33,7 +33,7 @@ import org.helioviewer.jhv.view.jp2view.io.jpip.JPIPCache;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduSource;
 
 // This class is responsible for reading and decoding of JPEG2000 images
-public class JP2View extends AbstractView {
+public class J2KView extends AbstractView {
 
     private int targetFrame = 0;
     private int trueFrame = 0;
@@ -44,14 +44,14 @@ public class JP2View extends AbstractView {
 
     private final long cacheKey[];
 
-    private final RenderExecutor executor = new RenderExecutor();
+    private final DecodeExecutor executor = new DecodeExecutor();
     private final CacheStatus cacheStatus;
     private final KakaduSource kduSource;
 
     private J2KReader reader;
     private JPIPCache jpipCache;
 
-    public JP2View(URI _uri, APIRequest _request, APIResponse _response) throws Exception {
+    public J2KView(URI _uri, APIRequest _request, APIResponse _response) throws Exception {
         super(_uri, _request);
 
         long frames[] = _response == null ? null : _response.getFrames();
@@ -264,11 +264,11 @@ public class JP2View extends AbstractView {
     }
 
     @Override
-    public void render(int serialNo, double pixFactor, double factor) {
+    public void decode(int serialNo, double pixFactor, double factor) {
         executor.execute(this, serialNo, targetFrame, pixFactor, factor);
     }
 
-    void signalRenderFromReader(ImageParams params) {
+    void signalDecoderFromReader(ImageParams params) {
         if (isAbolished)
             return;
         EventQueue.invokeLater(() -> {
@@ -277,7 +277,7 @@ public class JP2View extends AbstractView {
         });
     }
 
-    void setDataFromRender(ImageParams imageParams, ImageBuffer imageBuffer) {
+    void setDataFromDecoder(ImageParams imageParams, ImageBuffer imageBuffer) {
         if (isAbolished)
             return;
 

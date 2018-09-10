@@ -12,7 +12,7 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.fits.FITSView;
-import org.helioviewer.jhv.view.jp2view.JP2View;
+import org.helioviewer.jhv.view.jp2view.J2KView;
 import org.helioviewer.jhv.view.simpleimage.SimpleImageView;
 
 class LoadViewTask extends JHVWorker<View, Void> {
@@ -67,7 +67,7 @@ class LoadViewTask extends JHVWorker<View, Void> {
             } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
                 return new SimpleImageView(uri, req);
             } else {
-                return new JP2View(uri, req, res);
+                return new J2KView(uri, req, res);
             }
         } catch (InterruptedException ignore) {
             // nothing

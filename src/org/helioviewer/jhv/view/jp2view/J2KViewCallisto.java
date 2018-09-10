@@ -10,9 +10,9 @@ import org.helioviewer.jhv.view.jp2view.image.DecodeParams;
 import org.helioviewer.jhv.view.jp2view.image.ImageParams;
 import org.helioviewer.jhv.view.jp2view.image.ResolutionSet.ResolutionLevel;
 
-public class JP2ViewCallisto extends JP2View {
+public class J2KViewCallisto extends J2KView {
 
-    public JP2ViewCallisto(URI _uri, APIRequest _request, APIResponse _response) throws Exception {
+    public J2KViewCallisto(URI _uri, APIRequest _request, APIResponse _response) throws Exception {
         super(_uri, _request, _response);
     }
 

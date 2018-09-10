@@ -26,7 +26,7 @@ import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis.YAxisPositiveIdentityScale;
-import org.helioviewer.jhv.view.jp2view.JP2ViewCallisto;
+import org.helioviewer.jhv.view.jp2view.J2KViewCallisto;
 import org.json.JSONObject;
 
 import com.google.common.cache.Cache;
@@ -40,8 +40,8 @@ public class RadioData extends AbstractTimelineLayer {
     private static final int MAX_AMOUNT_OF_DAYS = 3;
     private static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 4;
 
-    private static final RemovalListener<Long, RadioJP2Data> removalListener = removed -> removed.getValue().removeData();
-    private static final Cache<Long, RadioJP2Data> cache = CacheBuilder.newBuilder().maximumSize(DAYS_IN_CACHE).removalListener(removalListener).build();
+    private static final RemovalListener<Long, RadioJ2KData> removalListener = removed -> removed.getValue().removeData();
+    private static final Cache<Long, RadioJ2KData> cache = CacheBuilder.newBuilder().maximumSize(DAYS_IN_CACHE).removalListener(removalListener).build();
 
     private final RadioOptionsPanel optionsPanel;
     private static IndexColorModel colorModel;
@@ -71,7 +71,7 @@ public class RadioData extends AbstractTimelineLayer {
 
     static void setLUT(LUT lut) {
         colorModel = createIndexColorModelFromLUT(lut);
-        for (RadioJP2Data data : cache.asMap().values()) {
+        for (RadioJ2KData data : cache.asMap().values()) {
             data.changeColormap(colorModel);
         }
         DrawController.drawRequest();
@@ -97,7 +97,7 @@ public class RadioData extends AbstractTimelineLayer {
 
     private static int isDownloading;
 
-    private class RadioJPXDownload extends JHVWorker<RadioJP2Data, Void> {
+    private class RadioJPXDownload extends JHVWorker<RadioJ2KData, Void> {
 
         private final long date;
 
@@ -110,11 +110,11 @@ public class RadioData extends AbstractTimelineLayer {
 
         @Nullable
         @Override
-        protected RadioJP2Data backgroundWork() {
+        protected RadioJ2KData backgroundWork() {
             try {
                 APIRequest req = new APIRequest("ROB", APIRequest.CallistoID, date, date, APIRequest.CADENCE_ANY);
                 URI uri = new URI(req.toFileRequest());
-                return new RadioJP2Data(new JP2ViewCallisto(NetFileCache.get(uri), req, null), req.startTime);
+                return new RadioJ2KData(new J2KViewCallisto(NetFileCache.get(uri), req, null), req.startTime);
             } catch (Exception e) {
                 Log.error("An error occured while opening the remote file: " + e.getMessage());
             }
@@ -126,7 +126,7 @@ public class RadioData extends AbstractTimelineLayer {
             isDownloading--;
             Timelines.getLayers().downloadFinished(RadioData.this);
             try {
-                RadioJP2Data data = get();
+                RadioJ2KData data = get();
                 if (data != null) {
                     cache.put(date, data);
                     data.requestData(DrawController.selectedAxis);
@@ -182,7 +182,7 @@ public class RadioData extends AbstractTimelineLayer {
 
     @Override
     public boolean hasData() {
-        for (RadioJP2Data data : cache.asMap().values()) {
+        for (RadioJ2KData data : cache.asMap().values()) {
             if (data.hasData()) {
                 return true;
             }
@@ -198,8 +198,8 @@ public class RadioData extends AbstractTimelineLayer {
     @Override
     public void fetchData(TimeAxis selectedAxis) {
         if (enabled && selectedAxis.end - selectedAxis.start <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS) {
-            for (RadioJP2Data jp2Data : cache.asMap().values()) {
-                jp2Data.requestData(selectedAxis);
+            for (RadioJ2KData data : cache.asMap().values()) {
+                data.requestData(selectedAxis);
             }
             requestAndOpenIntervals(selectedAxis.start);
         }
@@ -212,7 +212,7 @@ public class RadioData extends AbstractTimelineLayer {
 
         if (timeAxis.end - timeAxis.start <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS) {
             drawString(g, graphArea, timeAxis, "No data available");
-            for (RadioJP2Data data : cache.asMap().values()) {
+            for (RadioJ2KData data : cache.asMap().values()) {
                 data.draw(g, graphArea, timeAxis);
             }
         } else {
