@@ -15,29 +15,29 @@ import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
-import org.helioviewer.jhv.view.jp2view.JP2ViewCallisto;
+import org.helioviewer.jhv.view.jp2view.J2KViewCallisto;
 import org.helioviewer.jhv.view.jp2view.image.ResolutionSet;
 
-class RadioJP2Data implements ImageDataHandler {
+class RadioJ2KData implements ImageDataHandler {
 
-    private JP2ViewCallisto view;
+    private J2KViewCallisto view;
 
     private final long startDate;
     private final long endDate;
     private final double startFreq;
     private final double endFreq;
-    private final int jp2Width;
-    private final int jp2Height;
+    private final int j2kWidth;
+    private final int j2kHeight;
     private final boolean willDraw;
 
     private BufferedImage bufferedImage;
     private Region region;
 
-    RadioJP2Data(JP2ViewCallisto _view, long start) throws Exception {
+    RadioJ2KData(J2KViewCallisto _view, long start) throws Exception {
         try {
             ResolutionSet.ResolutionLevel resLevel = _view.getResolutionLevel(0, 0);
-            jp2Width = resLevel.width;
-            jp2Height = resLevel.height;
+            j2kWidth = resLevel.width;
+            j2kHeight = resLevel.height;
 
             XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer(_view.getXMLMetaData());
             endFreq = hvMetaData.getRequiredDouble("STARTFRQ");
@@ -83,17 +83,17 @@ class RadioJP2Data implements ImageDataHandler {
             Rectangle roi = getROI(xAxis);
             if (decodingNeeded && roi.width > 0 && roi.height > 0) {
                 view.setRegion(roi);
-                view.render(0, 1, last_resolution);
+                view.decode(0, 1, last_resolution);
             }
         }
     }
 
     private double computeResolution(int height, TimeAxis xAxis) {
-        double pixPerTime = jp2Width / (double) (endDate - startDate);
+        double pixPerTime = j2kWidth / (double) (endDate - startDate);
         int width = (int) ((xAxis.end - xAxis.start) * pixPerTime + 0.5);
-        double pct = Math.min(width / (double) jp2Width, 1);
+        double pct = Math.min(width / (double) j2kWidth, 1);
 
-        double visibleImagePercentage = pct * height / jp2Height;
+        double visibleImagePercentage = pct * height / j2kHeight;
         if (visibleImagePercentage <= 0.03125)
             return 1;
         if (visibleImagePercentage <= 0.0625)
@@ -125,7 +125,7 @@ class RadioJP2Data implements ImageDataHandler {
             visibleEndFreq = RadioData.yAxis.end;
         }
 
-        double pixPerFreq = jp2Height / (endFreq - startFreq);
+        double pixPerFreq = j2kHeight / (endFreq - startFreq);
         int y0 = (int) ((endFreq - visibleEndFreq) * pixPerFreq + 0.5);
         int height = (int) ((visibleEndFreq - visibleStartFreq) * pixPerFreq + 0.5);
 
@@ -151,7 +151,7 @@ class RadioJP2Data implements ImageDataHandler {
         }
         first = false;
 
-        double pixPerTime = jp2Width / (double) (endDate - startDate);
+        double pixPerTime = j2kWidth / (double) (endDate - startDate);
         int x0 = (int) ((newVisibleStart - startDate) * pixPerTime + 0.5);
         int width = (int) ((newVisibleEnd - newVisibleStart) * pixPerTime + 0.5);
 
@@ -173,11 +173,11 @@ class RadioJP2Data implements ImageDataHandler {
             int sy0 = 0;
             int sx1 = bufferedImage.getWidth();
             int sy1 = bufferedImage.getHeight();
-            long imStart = (long) (startDate + (endDate - startDate) * region.llx / jp2Width);
-            long imEnd = (long) (startDate + (endDate - startDate) * region.urx / jp2Width);
+            long imStart = (long) (startDate + (endDate - startDate) * region.llx / j2kWidth);
+            long imEnd = (long) (startDate + (endDate - startDate) * region.urx / j2kWidth);
 
-            double freqimStart = (startFreq + (endFreq - startFreq) * region.lly / jp2Height);
-            double freqimEnd = (startFreq + (endFreq - startFreq) * region.ury / jp2Height);
+            double freqimStart = (startFreq + (endFreq - startFreq) * region.lly / j2kHeight);
+            double freqimEnd = (startFreq + (endFreq - startFreq) * region.ury / j2kHeight);
 
             int dx0 = xAxis.value2pixel(ga.x, ga.width, imStart);
             int dx1 = xAxis.value2pixel(ga.x, ga.width, imEnd);

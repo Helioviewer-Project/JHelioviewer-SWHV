@@ -22,7 +22,7 @@ class J2KReader implements Runnable {
 
     private final BooleanSignal readerSignal = new BooleanSignal(false);
 
-    private final JP2View view;
+    private final J2KView view;
     private final JPIPCache cache;
     private final Thread myThread;
 
@@ -31,7 +31,7 @@ class J2KReader implements Runnable {
 
     private JPIPSocket socket;
 
-    J2KReader(JP2View _view) throws KduException, IOException {
+    J2KReader(J2KView _view) throws KduException, IOException {
         view = _view;
 
         cache = view.getJPIPCache();
@@ -192,7 +192,7 @@ class J2KReader implements Runnable {
                             JPIPCacheManager.put(key, level, stream);
                         cacheStatus.setFrameComplete(view.getSource(), currentStep, level); // tell the cache status
                         if (singleFrame)
-                            view.signalRenderFromReader(params); // refresh current image
+                            view.signalDecoderFromReader(params); // refresh current image
                     } else {
                         cacheStatus.setFramePartial(view.getSource(), currentStep); // tell the cache status
                     }

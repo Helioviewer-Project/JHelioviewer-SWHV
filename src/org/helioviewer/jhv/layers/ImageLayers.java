@@ -21,13 +21,13 @@ import org.astrogrid.samp.SampUtils;
 
 public class ImageLayers {
 
-    public static void setRender(int serialNo, double factor) {
+    public static void decode(int serialNo, double factor) {
         int i;
         Viewport[] vp = Display.getViewports();
         for (ImageLayer layer : Layers.getImageLayers()) {
             if ((i = layer.isVisibleIdx()) != -1 && vp[i] != null) {
                 double pixFactor = vp[i].height / (2 * Display.getCamera().getWidth());
-                layer.getView().render(serialNo, pixFactor, factor);
+                layer.getView().decode(serialNo, pixFactor, factor);
             }
         }
     }

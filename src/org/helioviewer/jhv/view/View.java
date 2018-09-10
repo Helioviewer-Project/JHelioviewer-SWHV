@@ -21,7 +21,7 @@ public interface View {
 
     void abolish();
 
-    void render(int serialNo, double pixFactor, double factor);
+    void decode(int serialNo, double pixFactor, double factor);
 
     URI getURI();
 

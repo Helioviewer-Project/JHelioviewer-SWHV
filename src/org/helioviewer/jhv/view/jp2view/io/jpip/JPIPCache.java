@@ -6,8 +6,6 @@ import kdu_jni.KduException;
 import kdu_jni.Kdu_cache;
 import kdu_jni.Kdu_global;
 
-import org.helioviewer.jhv.view.jp2view.kakadu.KakaduConstants;
-
 public class JPIPCache extends Kdu_cache {
 
     public boolean isDataBinCompleted(int klassID, long streamID, long binID) throws KduException {

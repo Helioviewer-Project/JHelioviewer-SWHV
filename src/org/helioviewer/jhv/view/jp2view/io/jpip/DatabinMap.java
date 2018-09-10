@@ -4,8 +4,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.helioviewer.jhv.view.jp2view.kakadu.KakaduConstants;
-
 @SuppressWarnings("serial")
 public class DatabinMap {
 
