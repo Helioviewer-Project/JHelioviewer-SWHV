@@ -103,10 +103,7 @@ public class JHVGlobals {
         }
     }
 
-    /*
-     * Attempts to create the necessary directories if they do not exist. It
-     * gets its list of directories to create from the JHVDirectory class.
-     */
+    // Attempts to create the necessary directories if they do not exist
     public static void createDirs() {
         JHVDirectory[] dirs = JHVDirectory.values();
         for (JHVDirectory dir : dirs) {
@@ -135,8 +132,6 @@ public class JHVGlobals {
     public static File fileCacheDir;
     public static File clientCacheDir;
     public static File exportCacheDir;
-    public static final File jpipStreamCacheDir = new File(JHVDirectory.CACHE.getFile(), "JPIPStream");
-    public static final File jpipLevelCacheDir = new File(JHVDirectory.CACHE.getFile(), "JPIPLevel");
 
     public static final HyperOpenURL hyperOpenURL = new HyperOpenURL();
 

@@ -12,7 +12,7 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.fits.FITSView;
-import org.helioviewer.jhv.view.jp2view.J2KView;
+import org.helioviewer.jhv.view.j2k.J2KView;
 import org.helioviewer.jhv.view.simpleimage.SimpleImageView;
 
 class LoadViewTask extends JHVWorker<View, Void> {

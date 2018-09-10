@@ -26,7 +26,7 @@ import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis.YAxisPositiveIdentityScale;
-import org.helioviewer.jhv.view.jp2view.J2KViewCallisto;
+import org.helioviewer.jhv.view.j2k.J2KViewCallisto;
 import org.json.JSONObject;
 
 import com.google.common.cache.Cache;
