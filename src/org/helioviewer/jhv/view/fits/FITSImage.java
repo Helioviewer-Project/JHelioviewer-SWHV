@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.fitsview;
+package org.helioviewer.jhv.view.fits;
 
 import java.net.URI;
 import java.nio.Buffer;
