@@ -51,12 +51,12 @@ class FITSImage {
         }
     }
 
-    private static float getValue(long v, long blank) {
+    private static float getInteger(long v, long blank) {
         return blank != BLANK && v == blank ? MARKER : v;
     }
 
-    private static float getValue(double v, long blank) {
-        return (blank != BLANK && v == blank) || Double.isFinite(v) ? MARKER : (float) v;
+    private static float getFloat(double v, long blank) {
+        return (blank != BLANK && v == blank) || !Double.isFinite(v) ? MARKER : (float) v;
     }
 
     private static float[] sampleImage(int bpp, int width, int height, Object pixelData, long blank, int[] npix) {
@@ -70,7 +70,7 @@ class FITSImage {
                 short[][] data = (short[][]) pixelData;
                 for (int j = 0; j < height; j += stepH) {
                     for (int i = 0; i < width; i += stepW) {
-                        float v = getValue(data[j][i], blank);
+                        float v = getInteger(data[j][i], blank);
                         if (v != MARKER)
                             sampleData[k++] = v;
                     }
@@ -81,7 +81,7 @@ class FITSImage {
                 int[][] data = (int[][]) pixelData;
                 for (int j = 0; j < height; j += stepH) {
                     for (int i = 0; i < width; i += stepW) {
-                        float v = getValue(data[j][i], blank);
+                        float v = getInteger(data[j][i], blank);
                         if (v != MARKER)
                             sampleData[k++] = v;
                     }
@@ -92,7 +92,7 @@ class FITSImage {
                 long[][] data = (long[][]) pixelData;
                 for (int j = 0; j < height; j += stepH) {
                     for (int i = 0; i < width; i += stepW) {
-                        float v = getValue(data[j][i], blank);
+                        float v = getInteger(data[j][i], blank);
                         if (v != MARKER)
                             sampleData[k++] = v;
                     }
@@ -103,7 +103,7 @@ class FITSImage {
                 float[][] data = (float[][]) pixelData;
                 for (int j = 0; j < height; j += stepH) {
                     for (int i = 0; i < width; i += stepW) {
-                        float v = getValue(data[j][i], blank);
+                        float v = getFloat(data[j][i], blank);
                         if (v != MARKER)
                             sampleData[k++] = v;
                     }
@@ -114,7 +114,7 @@ class FITSImage {
                 double[][] data = (double[][]) pixelData;
                 for (int j = 0; j < height; j += stepH) {
                     for (int i = 0; i < width; i += stepW) {
-                        float v = getValue(data[j][i], blank);
+                        float v = getFloat(data[j][i], blank);
                         if (v != MARKER)
                             sampleData[k++] = v;
                     }
@@ -135,7 +135,7 @@ class FITSImage {
                 short[][] data = (short[][]) pixelData;
                 for (int j = 0; j < height; j++) {
                     for (int i = 0; i < width; i++) {
-                        float v = getValue(data[j][i], blank);
+                        float v = getInteger(data[j][i], blank);
                         if (v != MARKER) {
                             if (v > max)
                                 max = v;
@@ -150,7 +150,7 @@ class FITSImage {
                 int[][] data = (int[][]) pixelData;
                 for (int j = 0; j < height; j++) {
                     for (int i = 0; i < width; i++) {
-                        float v = getValue(data[j][i], blank);
+                        float v = getInteger(data[j][i], blank);
                         if (v != MARKER) {
                             if (v > max)
                                 max = v;
@@ -165,7 +165,7 @@ class FITSImage {
                 long[][] data = (long[][]) pixelData;
                 for (int j = 0; j < height; j++) {
                     for (int i = 0; i < width; i++) {
-                        float v = getValue(data[j][i], blank);
+                        float v = getInteger(data[j][i], blank);
                         if (v != MARKER) {
                             if (v > max)
                                 max = v;
@@ -180,7 +180,7 @@ class FITSImage {
                 float[][] data = (float[][]) pixelData;
                 for (int j = 0; j < height; j++) {
                     for (int i = 0; i < width; i++) {
-                        float v = getValue(data[j][i], blank);
+                        float v = getFloat(data[j][i], blank);
                         if (v != MARKER) {
                             if (v > max)
                                 max = v;
@@ -195,7 +195,7 @@ class FITSImage {
                 double[][] data = (double[][]) pixelData;
                 for (int j = 0; j < height; j++) {
                     for (int i = 0; i < width; i++) {
-                        float v = getValue(data[j][i], blank);
+                        float v = getFloat(data[j][i], blank);
                         if (v != MARKER) {
                             if (v > max)
                                 max = v;
@@ -270,7 +270,7 @@ class FITSImage {
                     PixScale scale = new PowScale(lutSize);
                     for (int j = 0; j < height; j++) {
                         for (int i = 0; i < width; i++) {
-                            float v = getValue(data[j][i], blank);
+                            float v = getInteger(data[j][i], blank);
                             outData[width * (height - 1 - j) + i] = v == MARKER ? scale.get(0) : scale.get((int) (v - minmax[0]));
                         }
                     }
@@ -281,7 +281,7 @@ class FITSImage {
                     PixScale scale = new PowScale(lutSize);
                     for (int j = 0; j < height; j++) {
                         for (int i = 0; i < width; i++) {
-                            float v = getValue(data[j][i], blank);
+                            float v = getInteger(data[j][i], blank);
                             outData[width * (height - 1 - j) + i] = v == MARKER ? scale.get(0) : scale.get((int) (v - minmax[0]));
                         }
                     }
@@ -292,7 +292,7 @@ class FITSImage {
                     PixScale scale = new PowScale(lutSize);
                     for (int j = 0; j < height; j++) {
                         for (int i = 0; i < width; i++) {
-                            float v = getValue(data[j][i], blank);
+                            float v = getInteger(data[j][i], blank);
                             outData[width * (height - 1 - j) + i] = v == MARKER ? scale.get(0) : scale.get((int) (v - minmax[0]));
                         }
                     }
@@ -303,7 +303,7 @@ class FITSImage {
                     double scale = 65535. / Math.pow(lutSize, GAMMA);
                     for (int j = 0; j < height; j++) {
                         for (int i = 0; i < width; i++) {
-                            float v = getValue(data[j][i], blank);
+                            float v = getFloat(data[j][i], blank);
                             outData[width * (height - 1 - j) + i] = v == MARKER ? 0 : (short) (MathUtils.clip(scale * Math.pow(v - minmax[0], GAMMA) + .5, 0, 65535));
                         }
                     }
@@ -314,7 +314,7 @@ class FITSImage {
                     double scale = 65535. / Math.log1p(lutSize);
                     for (int j = 0; j < height; j++) {
                         for (int i = 0; i < width; i++) {
-                            float v = getValue(data[j][i], blank);
+                            float v = getFloat(data[j][i], blank);
                             outData[width * (height - 1 - j) + i] = v == MARKER ? 0 : (short) (MathUtils.clip(scale * Math.log1p(v - minmax[0]) + .5, 0, 65535));
                         }
                     }
