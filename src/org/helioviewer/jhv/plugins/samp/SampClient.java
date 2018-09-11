@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins.samp;
 
+import java.awt.EventQueue;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
@@ -55,8 +56,10 @@ class SampClient extends HubConnector {
             public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
                     Object url = msg.getParam("url");
-                    if (url != null)
-                        Load.fits.get(new URI(url.toString()));
+                    if (url != null) {
+                        URI uri = new URI(url.toString());
+                        EventQueue.invokeLater(() -> Load.fits.get(uri));
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -71,8 +74,10 @@ class SampClient extends HubConnector {
                 try {
                     if ("SSA".equals(c.getMetadata(senderId).getName())) {
                         Object url = msg.getParam("url");
-                        if (url != null)
-                            Load.fits.get(new URI(url.toString()));
+                        if (url != null) {
+                            URI uri = new URI(url.toString());
+                            EventQueue.invokeLater(() -> Load.fits.get(uri));
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -86,8 +91,10 @@ class SampClient extends HubConnector {
             public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
                     Object url = msg.getParam("url");
-                    if (url != null)
-                        Load.image.get(new URI(url.toString()));
+                    if (url != null) {
+                        URI uri = new URI(url.toString());
+                        EventQueue.invokeLater(() -> Load.image.get(uri));
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -100,8 +107,10 @@ class SampClient extends HubConnector {
             public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
                     Object url = msg.getParam("url");
-                    if (url != null)
-                        Load.request.get(new URI(url.toString()));
+                    if (url != null) {
+                        URI uri = new URI(url.toString());
+                        EventQueue.invokeLater(() -> Load.request.get(uri));
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -114,8 +123,10 @@ class SampClient extends HubConnector {
             public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
                     Object url = msg.getParam("url");
-                    if (url != null)
-                        Load.state.get(new URI(url.toString()));
+                    if (url != null) {
+                        URI uri = new URI(url.toString());
+                        EventQueue.invokeLater(() -> Load.state.get(uri));
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
