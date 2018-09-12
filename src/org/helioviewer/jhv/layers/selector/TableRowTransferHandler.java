@@ -30,6 +30,10 @@ class TableRowTransferHandler extends TransferHandler {
         grid = table;
     }
 
+    private boolean isOurs(TransferHandler.TransferSupport info) {
+        return info.getComponent() == grid && info.isDrop() && info.isDataFlavorSupported(DataFlavor.stringFlavor);
+    }
+
     private void createImageOfRow(int rowIndex) {
         int w = grid.getWidth();
         int h = grid.getRowHeight();
@@ -65,10 +69,9 @@ class TableRowTransferHandler extends TransferHandler {
 
     @Override
     public boolean canImport(TransferHandler.TransferSupport info) {
-        boolean b = info.getComponent() == grid && info.isDrop() && info.isDataFlavorSupported(DataFlavor.stringFlavor);
-        Cursor mcursor = Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(10, 10), "DnD");
-        grid.setCursor(b ? mcursor : DragSource.DefaultMoveNoDrop);
-        return b;
+        boolean ours = isOurs(info);
+        grid.setCursor(ours ? Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(10, 10), "DnD") : DragSource.DefaultMoveNoDrop);
+        return ours;
     }
 
     @Override
@@ -78,8 +81,8 @@ class TableRowTransferHandler extends TransferHandler {
 
     @Override
     public boolean importData(TransferHandler.TransferSupport info) {
-        TransferHandler.DropLocation idl = info.getDropLocation();
-        if (idl instanceof JTable.DropLocation) {
+        TransferHandler.DropLocation idl;
+        if (isOurs(info) && (idl = info.getDropLocation()) instanceof JTable.DropLocation) {
             int index = ((JTable.DropLocation) idl).getRow();
             int max = grid.getModel().getRowCount();
             if (index < 0 || index > max)
