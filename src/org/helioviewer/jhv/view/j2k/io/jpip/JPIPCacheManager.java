@@ -25,14 +25,12 @@ public class JPIPCacheManager {
     private static Cache<Long, Integer> levelCache;
 
     public static void init() {
-        // delete old versions
-        try {
-            FileUtils.deleteDir(new File(JHVDirectory.CACHE.getFile(), "JPIPStream"));
-        } catch (Exception ignore) {
-        }
-        try {
-            FileUtils.deleteDir(new File(JHVDirectory.CACHE.getFile(), "JPIPLevel"));
-        } catch (Exception ignore) {
+        String[] oldDirs = {"JPIPStream", "JPIPLevel"};
+        for (String dir : oldDirs) { // delete old versions
+            try {
+                FileUtils.deleteDir(new File(JHVDirectory.CACHE.getFile(), dir));
+            } catch (Exception ignore) {
+            }
         }
 
         File streamCacheDir = new File(JHVDirectory.CACHE.getFile(), "JPIPStream-2");
