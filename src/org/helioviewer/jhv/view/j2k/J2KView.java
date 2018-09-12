@@ -10,7 +10,6 @@ import javax.annotation.Nullable;
 import kdu_jni.KduException;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
@@ -310,8 +309,7 @@ public class J2KView extends AbstractView {
             reader.signalReader(params);
     }
 
-    // Recalculates the image parameters used within the jp2-package
-    ImageParams calculateParams(int serialNo, int frame, double pixFactor, double factor) {
+    private DecodeParams getDecodeParams(int frame, double pixFactor, double factor) {
         ResolutionLevel res;
         SubImage subImage;
 
@@ -321,10 +319,9 @@ public class J2KView extends AbstractView {
             factor = 1;
         } else {
             MetaData m = metaData[frame];
-            Region mr = m.getPhysicalRegion();
-            int totalHeight = (int) (mr.height * pixFactor + .5);
+            int reqHeight = (int) (m.getPhysicalRegion().height * pixFactor + .5);
 
-            res = cacheStatus.getResolutionSet(frame).getNextResolutionLevel(totalHeight, totalHeight);
+            res = cacheStatus.getResolutionSet(frame).getNextResolutionLevel(reqHeight, reqHeight);
             subImage = new SubImage(0, 0, res.width, res.height, res.width, res.height);
 
             int maxDim = Math.max(res.width, res.height);
@@ -332,13 +329,18 @@ public class J2KView extends AbstractView {
                 factor = Math.min(factor, 0.5);
             }
         }
+        return new DecodeParams(subImage, res, frame, factor);
+    }
 
-        int level = res.level;
+    ImageParams calculateParams(int serialNo, int frame, double pixFactor, double factor) {
+        DecodeParams decodeParams = getDecodeParams(frame, pixFactor, factor);
+
+        int level = decodeParams.resolution.level;
         AtomicBoolean status = cacheStatus.getFrameStatus(frame, level);
         boolean frameLevelComplete = status != null && status.get();
         boolean priority = !frameLevelComplete && !Movie.isPlaying();
 
-        ImageParams params = new ImageParams(priority, serialNo, new DecodeParams(subImage, res, frame, factor));
+        ImageParams params = new ImageParams(priority, serialNo, decodeParams);
         if (priority || (!frameLevelComplete && level < currentLevel)) {
             signalReader(params);
         }
