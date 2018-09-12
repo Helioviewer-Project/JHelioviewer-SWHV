@@ -32,7 +32,7 @@ public class JHVEventCache {
 
         cacheEventHandlers.add(handler);
 
-        Map<SWEKSupplier, List<Interval>> missingIntervals = get(startDate, endDate, newStartDate, newEndDate).getMissingIntervals();
+        Map<SWEKSupplier, List<Interval>> missingIntervals = getMissingIntervals(startDate, endDate, newStartDate, newEndDate);
         for (Map.Entry<SWEKSupplier, List<Interval>> entry : missingIntervals.entrySet()) {
             SWEKSupplier eventType = entry.getKey();
             for (Interval missing : entry.getValue()) {
@@ -48,9 +48,9 @@ public class JHVEventCache {
         }
     }
 
-    public static void intervalsNotDownloaded(SWEKSupplier eventType, Interval interval) {
+    static void intervalNotDownloaded(SWEKSupplier eventType, Interval interval) {
         downloadedCache.get(eventType).removeRequestedInterval(interval.start, interval.end);
-        get(interval.start, interval.end, interval.start, interval.end);
+        // getMissingIntervals(interval.start, interval.end, interval.start, interval.end); side-effect?
     }
 
     public static void supplierActivated(SWEKSupplier supplier) {
@@ -134,29 +134,30 @@ public class JHVEventCache {
         }
     }
 
-    public static JHVEventCacheResult get(long startDate, long endDate) {
-        return get(startDate, endDate, startDate, endDate);
-    }
-
-    private static JHVEventCacheResult get(long startDate, long endDate, long extendedStart, long extendedEnd) {
-        HashMap<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsResult = new HashMap<>();
-        HashMap<SWEKSupplier, List<Interval>> missingIntervals = new HashMap<>();
-
+    public static Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> getEvents(long startDate, long endDate) {
+        HashMap<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> result = new HashMap<>();
         for (SWEKSupplier evt : activeEventTypes) {
             SortedMap<SortedDateInterval, JHVRelatedEvents> sortedEvents = events.get(evt);
             if (sortedEvents != null) {
                 long delta = TimeUtils.DAY_IN_MILLIS * 30L;
                 SortedDateInterval first = new SortedDateInterval(startDate - delta, startDate - delta);
                 SortedDateInterval second = new SortedDateInterval(endDate + delta, endDate + delta);
-                eventsResult.put(evt, sortedEvents.subMap(first, second));
+                result.put(evt, sortedEvents.subMap(first, second));
             }
+        }
+        return result;
+    }
+
+    private static Map<SWEKSupplier, List<Interval>> getMissingIntervals(long startDate, long endDate, long extendedStart, long extendedEnd) {
+        HashMap<SWEKSupplier, List<Interval>> missingIntervals = new HashMap<>();
+        for (SWEKSupplier evt : activeEventTypes) {
             List<Interval> missing = downloadedCache.get(evt).getMissingIntervals(startDate, endDate);
             if (!missing.isEmpty()) {
                 missing = downloadedCache.get(evt).adaptRequestCache(extendedStart, extendedEnd);
                 missingIntervals.put(evt, missing);
             }
         }
-        return new JHVEventCacheResult(eventsResult, missingIntervals);
+        return missingIntervals;
     }
 
     public static void removeSupplier(SWEKSupplier supplier, boolean keepActive) {

@@ -47,7 +47,7 @@ public class SWEKDownloadManager implements FilterManagerListener {
                 SWEKDownloadWorker worker = it.next();
                 if (worker.getSupplier() == supplier) {
                     worker.stopWorker();
-                    JHVEventCache.intervalsNotDownloaded(supplier, worker.getRequestInterval());
+                    JHVEventCache.intervalNotDownloaded(supplier, worker.getRequestInterval());
                     it.remove();
                 }
             }
@@ -59,9 +59,9 @@ public class SWEKDownloadManager implements FilterManagerListener {
         JHVEventCache.removeSupplier(supplier, keepActive);
     }
 
-    public static void workerForcedToStop(SWEKDownloadWorker worker) {
+    static void workerForcedToStop(SWEKDownloadWorker worker) {
         removeFromDownloaderMap(worker);
-        JHVEventCache.intervalsNotDownloaded(worker.getSupplier(), worker.getRequestInterval());
+        JHVEventCache.intervalNotDownloaded(worker.getSupplier(), worker.getRequestInterval());
     }
 
     public static void workerFinished(SWEKDownloadWorker worker) {
@@ -111,7 +111,7 @@ public class SWEKDownloadManager implements FilterManagerListener {
         }
     }
 
-    public static void startDownloadSupplier(SWEKSupplier supplier, Interval interval) {
+    static void startDownloadSupplier(SWEKSupplier supplier, Interval interval) {
         List<SWEKParam> params = defineParameters(supplier);
         for (Interval intt : Interval.splitInterval(interval, 2)) {
             if (intt.start < System.currentTimeMillis() + SIXHOURS) {
