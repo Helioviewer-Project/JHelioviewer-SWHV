@@ -16,7 +16,7 @@ class SWEKData {
 
     static ArrayList<JHVRelatedEvents> getActiveEvents(long timestamp) {
         ArrayList<JHVRelatedEvents> activeEvents = new ArrayList<>();
-        Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = JHVEventCache.get(Movie.getStartTime(), Movie.getEndTime()).getAvailableEvents();
+        Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = JHVEventCache.getEvents(Movie.getStartTime(), Movie.getEndTime());
         for (SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap : events.values()) {
             for (JHVRelatedEvents evr : eventMap.values()) {
                 if (evr.getStart() <= timestamp && timestamp <= evr.getEnd()) {
