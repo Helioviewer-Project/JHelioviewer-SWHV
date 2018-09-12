@@ -42,7 +42,7 @@ public class JHVEventCache {
         handler.newEventsReceived();
     }
 
-    public static void fireEventCacheChanged() {
+    static void fireEventCacheChanged() {
         for (JHVEventHandler handler : cacheEventHandlers) {
             handler.cacheUpdated();
         }
@@ -53,7 +53,7 @@ public class JHVEventCache {
         // getMissingIntervals(interval.start, interval.end, interval.start, interval.end); side-effect?
     }
 
-    public static void supplierActivated(SWEKSupplier supplier) {
+    static void supplierActivated(SWEKSupplier supplier) {
         activeEventTypes.add(supplier);
         downloadedCache.putIfAbsent(supplier, new RequestCache());
         fireEventCacheChanged();
@@ -121,7 +121,7 @@ public class JHVEventCache {
         }
     }
 
-    public static void add(JHVAssociation association) {
+    static void add(JHVAssociation association) {
         if (relEvents.containsKey(association.left) && relEvents.containsKey(association.right)) {
             JHVRelatedEvents ll = relEvents.get(association.left);
             JHVRelatedEvents rr = relEvents.get(association.right);
@@ -160,7 +160,7 @@ public class JHVEventCache {
         return missingIntervals;
     }
 
-    public static void removeSupplier(SWEKSupplier supplier, boolean keepActive) {
+    static void removeSupplier(SWEKSupplier supplier, boolean keepActive) {
         downloadedCache.put(supplier, new RequestCache());
         events.remove(supplier);
         relEvents.entrySet().removeIf(entry -> entry.getValue().getSupplier() == supplier);
@@ -170,7 +170,7 @@ public class JHVEventCache {
         fireEventCacheChanged();
     }
 
-    public static List<Interval> getAllRequestIntervals(SWEKSupplier eventType) {
+    static List<Interval> getAllRequestIntervals(SWEKSupplier eventType) {
         return downloadedCache.get(eventType).getAllRequestIntervals();
     }
 
