@@ -146,8 +146,9 @@ public class JHVEventCache {
             SortedMap<SortedDateInterval, JHVRelatedEvents> sortedEvents = events.get(evt);
             if (sortedEvents != null) {
                 long delta = TimeUtils.DAY_IN_MILLIS * 30L;
-                SortedMap<SortedDateInterval, JHVRelatedEvents> submap = sortedEvents.subMap(new SortedDateInterval(startDate - delta, startDate - delta), new SortedDateInterval(endDate + delta, endDate + delta));
-                eventsResult.put(evt, submap);
+                SortedDateInterval first = new SortedDateInterval(startDate - delta, startDate - delta);
+                SortedDateInterval second = new SortedDateInterval(endDate + delta, endDate + delta);
+                eventsResult.put(evt, sortedEvents.subMap(first, second));
             }
             List<Interval> missing = downloadedCache.get(evt).getMissingIntervals(startDate, endDate);
             if (!missing.isEmpty()) {
