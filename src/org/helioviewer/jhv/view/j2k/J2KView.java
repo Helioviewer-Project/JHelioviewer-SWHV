@@ -273,7 +273,7 @@ public class J2KView extends AbstractView {
             return;
         EventQueue.invokeLater(() -> {
             if (params.decodeParams.frame == targetFrame)
-                executor.execute(this, params, false);
+                executor.execute(this, params, true);
         });
     }
 

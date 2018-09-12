@@ -24,12 +24,12 @@ class DecodeExecutor {
         if (status == null)
             return;
 
-        execute(view, params, !status.get());
+        execute(view, params, status.get());
     }
 
-    void execute(J2KView view, ImageParams params, boolean discard) {
+    void execute(J2KView view, ImageParams params, boolean keep) {
         blockingQueue.poll();
-        executor.execute(new J2KDecoder(view, params, discard, false));
+        executor.execute(new J2KDecoder(view, params, keep, false));
     }
 
     void abolish() {

@@ -41,13 +41,13 @@ class J2KDecoder implements Runnable {
 
     private final J2KView view;
     private final ImageParams imageParams;
-    private final boolean discard;
+    private final boolean keep;
     private final boolean abolish;
 
-    J2KDecoder(J2KView _view, ImageParams _imageParams, boolean _discard, boolean _abolish) {
+    J2KDecoder(J2KView _view, ImageParams _imageParams, boolean _keep, boolean _abolish) {
         view = _view;
         imageParams = _imageParams;
-        discard = _discard;
+        keep = _keep;
         abolish = _abolish;
     }
 
@@ -124,7 +124,7 @@ class J2KDecoder implements Runnable {
         compositor.Remove_ilayer(ilayer, true);
 
         ret = new ImageBuffer(actualWidth, actualHeight, format, ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder()));
-        if (!discard)
+        if (keep)
             decodeCache.get().put(params, ret);
 
         return ret;
