@@ -6,6 +6,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
 
 import javax.annotation.Nullable;
@@ -357,7 +358,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         lineThick.render(gl, vp.aspect, LINEWIDTH_HIGHLIGHT);
     }
 
-    private void renderIcons(GL2 gl, ArrayList<JHVRelatedEvents> evs) {
+    private void renderIcons(GL2 gl, List<JHVRelatedEvents> evs) {
         glslTexture.setData(gl, texBuf);
         int idx = 0;
         for (JHVRelatedEvents evtr : evs) {
@@ -373,7 +374,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (isVisible[vp.idx]) {
-            ArrayList<JHVRelatedEvents> evs = SWEKData.getActiveEvents(controller.currentTime);
+            List<JHVRelatedEvents> evs = SWEKData.getActiveEvents(controller.currentTime);
             if (evs.isEmpty())
                 return;
 
@@ -398,7 +399,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     @Override
     public void renderScale(Camera camera, Viewport vp, GL2 gl) {
         if (isVisible[vp.idx]) {
-            ArrayList<JHVRelatedEvents> evs = SWEKData.getActiveEvents(controller.currentTime);
+            List<JHVRelatedEvents> evs = SWEKData.getActiveEvents(controller.currentTime);
             if (evs.isEmpty())
                 return;
 

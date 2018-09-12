@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.events;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -135,6 +136,9 @@ public class JHVEventCache {
     }
 
     public static Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> getEvents(long startDate, long endDate) {
+        if (activeEventTypes.isEmpty())
+            return Collections.emptyMap();
+
         HashMap<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> result = new HashMap<>();
         for (SWEKSupplier evt : activeEventTypes) {
             SortedMap<SortedDateInterval, JHVRelatedEvents> sortedEvents = events.get(evt);

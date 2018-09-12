@@ -1,6 +1,8 @@
 package org.helioviewer.jhv.plugins.swek;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
@@ -14,9 +16,12 @@ import org.helioviewer.jhv.layers.Movie;
 
 class SWEKData {
 
-    static ArrayList<JHVRelatedEvents> getActiveEvents(long timestamp) {
-        ArrayList<JHVRelatedEvents> activeEvents = new ArrayList<>();
+    static List<JHVRelatedEvents> getActiveEvents(long timestamp) {
         Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = JHVEventCache.getEvents(Movie.getStartTime(), Movie.getEndTime());
+        if (events.isEmpty())
+            return Collections.emptyList();
+
+        ArrayList<JHVRelatedEvents> activeEvents = new ArrayList<>();
         for (SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap : events.values()) {
             for (JHVRelatedEvents evr : eventMap.values()) {
                 if (evr.getStart() <= timestamp && timestamp <= evr.getEnd()) {

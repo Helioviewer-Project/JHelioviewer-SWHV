@@ -3,7 +3,7 @@ package org.helioviewer.jhv.plugins.swek;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Point;
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -115,7 +115,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        ArrayList<JHVRelatedEvents> eventsToDraw = SWEKData.getActiveEvents(currentTime);
+        List<JHVRelatedEvents> eventsToDraw = SWEKData.getActiveEvents(currentTime);
         if (eventsToDraw.isEmpty())
             return;
 
