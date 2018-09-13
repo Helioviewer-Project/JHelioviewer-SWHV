@@ -4,8 +4,8 @@ import javax.annotation.Nonnull;
 
 public class SortedInterval implements Comparable<SortedInterval> {
 
-    public long start;
-    public long end;
+    public final long start;
+    public final long end;
 
     public SortedInterval(long _start, long _end) {
         start = _start;

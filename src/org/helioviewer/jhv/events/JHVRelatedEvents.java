@@ -20,11 +20,11 @@ public class JHVRelatedEvents implements ClickableDrawable {
     private static final HashSet<JHVEventHighlightListener> listeners = new HashSet<>();
 
     private final ArrayList<JHVEvent> events = new ArrayList<>();
-    private final SortedInterval interval = new SortedInterval(Long.MAX_VALUE, Long.MIN_VALUE);
     private final ArrayList<JHVAssociation> associations = new ArrayList<>();
-
     private final SWEKSupplier supplier;
     private final Color color;
+
+    private SortedInterval interval;
     private boolean highlighted;
 
     JHVRelatedEvents(JHVEvent event, Map<SWEKSupplier, SortedMap<SortedInterval, JHVRelatedEvents>> eventsMap) {
@@ -35,8 +35,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         events.add(event);
         eventsMap.putIfAbsent(supplier, new TreeMap<>());
 
-        interval.start = event.start;
-        interval.end = event.end;
+        interval = new SortedInterval(event.start, event.end);
         eventsMap.get(supplier).put(interval, this);
     }
 
@@ -66,11 +65,10 @@ public class JHVRelatedEvents implements ClickableDrawable {
         associations.addAll(found.associations);
 
         eventsMap.putIfAbsent(supplier, new TreeMap<>());
-        eventsMap.get(supplier).remove(interval);
-        eventsMap.get(supplier).remove(found.interval);
 
-        interval.start = Math.min(interval.start, found.interval.start);
-        interval.end = Math.max(interval.end, found.interval.end);
+        eventsMap.get(supplier).remove(found.interval);
+        eventsMap.get(supplier).remove(interval);
+        interval = new SortedInterval(Math.min(interval.start, found.interval.start), Math.max(interval.end, found.interval.end));
         eventsMap.get(supplier).put(interval, this);
     }
 
@@ -178,10 +176,9 @@ public class JHVRelatedEvents implements ClickableDrawable {
         }
 
         eventsMap.putIfAbsent(supplier, new TreeMap<>());
-        eventsMap.get(supplier).remove(interval);
 
-        interval.start = start;
-        interval.end = end;
+        eventsMap.get(supplier).remove(interval);
+        interval = new SortedInterval(start, end);
         eventsMap.get(supplier).put(interval, this);
     }
 
