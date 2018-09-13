@@ -20,14 +20,14 @@ public class JHVRelatedEvents implements ClickableDrawable {
     private static final HashSet<JHVEventHighlightListener> listeners = new HashSet<>();
 
     private final ArrayList<JHVEvent> events = new ArrayList<>();
-    private final SortedDateInterval interval = new SortedDateInterval(Long.MAX_VALUE, Long.MIN_VALUE);
+    private final SortedInterval interval = new SortedInterval(Long.MAX_VALUE, Long.MIN_VALUE);
     private final ArrayList<JHVAssociation> associations = new ArrayList<>();
 
     private final SWEKSupplier supplier;
     private final Color color;
     private boolean highlighted;
 
-    JHVRelatedEvents(JHVEvent event, Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
+    JHVRelatedEvents(JHVEvent event, Map<SWEKSupplier, SortedMap<SortedInterval, JHVRelatedEvents>> eventsMap) {
         supplier = event.getSupplier();
         color = JHVCacheColors.getNextColor();
         highlighted = false;
@@ -61,7 +61,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         return supplier.getGroup().getIcon();
     }
 
-    void merge(JHVRelatedEvents found, Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
+    void merge(JHVRelatedEvents found, Map<SWEKSupplier, SortedMap<SortedInterval, JHVRelatedEvents>> eventsMap) {
         events.addAll(found.events);
         associations.addAll(found.associations);
 
@@ -152,7 +152,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         return nEvents;
     }
 
-    void swapEvent(JHVEvent event, Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
+    void swapEvent(JHVEvent event, Map<SWEKSupplier, SortedMap<SortedInterval, JHVRelatedEvents>> eventsMap) {
         int eid = event.getUniqueID();
         int i = 0;
         while (events.get(i).getUniqueID() != eid) {
@@ -163,7 +163,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         resetTime(eventsMap);
     }
 
-    private void resetTime(Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
+    private void resetTime(Map<SWEKSupplier, SortedMap<SortedInterval, JHVRelatedEvents>> eventsMap) {
         long start = Long.MAX_VALUE;
         long end = Long.MIN_VALUE;
         for (JHVEvent evt : events) {

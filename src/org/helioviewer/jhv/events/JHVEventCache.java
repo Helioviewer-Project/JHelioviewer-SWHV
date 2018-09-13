@@ -18,7 +18,7 @@ public class JHVEventCache {
     private static final double factor = 0.2;
 
     private static final HashSet<JHVEventHandler> cacheEventHandlers = new HashSet<>();
-    private static final HashMap<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = new HashMap<>();
+    private static final HashMap<SWEKSupplier, SortedMap<SortedInterval, JHVRelatedEvents>> events = new HashMap<>();
     private static final HashMap<Integer, JHVRelatedEvents> relEvents = new HashMap<>();
     private static final HashSet<SWEKSupplier> activeEventTypes = new HashSet<>();
     private static final HashMap<SWEKSupplier, RequestCache> downloadedCache = new HashMap<>();
@@ -135,17 +135,17 @@ public class JHVEventCache {
         }
     }
 
-    public static Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> getEvents(long startDate, long endDate) {
+    public static Map<SWEKSupplier, SortedMap<SortedInterval, JHVRelatedEvents>> getEvents(long startDate, long endDate) {
         if (activeEventTypes.isEmpty())
             return Collections.emptyMap();
 
-        HashMap<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> result = new HashMap<>();
+        HashMap<SWEKSupplier, SortedMap<SortedInterval, JHVRelatedEvents>> result = new HashMap<>();
         for (SWEKSupplier evt : activeEventTypes) {
-            SortedMap<SortedDateInterval, JHVRelatedEvents> sortedEvents = events.get(evt);
+            SortedMap<SortedInterval, JHVRelatedEvents> sortedEvents = events.get(evt);
             if (sortedEvents != null) {
                 long delta = TimeUtils.DAY_IN_MILLIS * 30L;
-                SortedDateInterval first = new SortedDateInterval(startDate - delta, startDate - delta);
-                SortedDateInterval second = new SortedDateInterval(endDate + delta, endDate + delta);
+                SortedInterval first = new SortedInterval(startDate - delta, startDate - delta);
+                SortedInterval second = new SortedInterval(endDate + delta, endDate + delta);
                 result.put(evt, sortedEvents.subMap(first, second));
             }
         }
