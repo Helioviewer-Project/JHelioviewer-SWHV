@@ -2,14 +2,14 @@ package org.helioviewer.jhv.events;
 
 import javax.annotation.Nonnull;
 
-public class SortedDateInterval implements Comparable<SortedDateInterval> {
+public class SortedInterval implements Comparable<SortedInterval> {
 
     public long start;
     public long end;
     private final int id;
     private static int id_gen = Integer.MIN_VALUE;
 
-    public SortedDateInterval(long _start, long _end) {
+    public SortedInterval(long _start, long _end) {
         start = _start;
         end = _end;
         id = id_gen++;
@@ -17,17 +17,18 @@ public class SortedDateInterval implements Comparable<SortedDateInterval> {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof SortedDateInterval && compareTo((SortedDateInterval) o) == 0;
+        return o instanceof SortedInterval && compareTo((SortedInterval) o) == 0;
     }
 
     @Override
     public int hashCode() {
-        assert false : "hashCode not designed";
-        return 42;
+        int result = (int) (start ^ (start >>> 32));
+        result = 31 * result + (int) (end ^ (end >>> 32));
+        return 31 * result + id;
     }
 
     @Override
-    public int compareTo(@Nonnull SortedDateInterval o2) {
+    public int compareTo(@Nonnull SortedInterval o2) {
         if (start < o2.start) {
             return -1;
         }

@@ -10,19 +10,19 @@ import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.events.JHVEventParameter;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
-import org.helioviewer.jhv.events.SortedDateInterval;
+import org.helioviewer.jhv.events.SortedInterval;
 import org.helioviewer.jhv.events.SWEKSupplier;
 import org.helioviewer.jhv.layers.Movie;
 
 class SWEKData {
 
     static List<JHVRelatedEvents> getActiveEvents(long timestamp) {
-        Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = JHVEventCache.getEvents(Movie.getStartTime(), Movie.getEndTime());
+        Map<SWEKSupplier, SortedMap<SortedInterval, JHVRelatedEvents>> events = JHVEventCache.getEvents(Movie.getStartTime(), Movie.getEndTime());
         if (events.isEmpty())
             return Collections.emptyList();
 
         ArrayList<JHVRelatedEvents> activeEvents = new ArrayList<>();
-        for (SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap : events.values()) {
+        for (SortedMap<SortedInterval, JHVRelatedEvents> eventMap : events.values()) {
             for (JHVRelatedEvents evr : eventMap.values()) {
                 if (evr.getStart() <= timestamp && timestamp <= evr.getEnd()) {
                     activeEvents.add(evr);
