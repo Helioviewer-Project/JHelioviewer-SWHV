@@ -68,6 +68,10 @@ public class TimeAxis {
             start = TimeUtils.MINIMAL_DATE.milli;
             end = TimeUtils.MINIMAL_DATE.milli + intervalLength;
         }
+        if (start > end) {
+            start = end;
+            Thread.dumpStack();
+        }
     }
 
 }
