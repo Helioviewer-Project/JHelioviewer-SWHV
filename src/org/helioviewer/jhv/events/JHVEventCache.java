@@ -15,7 +15,8 @@ import org.helioviewer.jhv.time.TimeUtils;
 
 public class JHVEventCache {
 
-    private static final double factor = 0.2;
+    private static final double FACTOR = 0.2;
+    private static final long DELTAT_GET = TimeUtils.DAY_IN_MILLIS * 1L;
 
     private static final HashSet<JHVEventHandler> cacheEventHandlers = new HashSet<>();
     private static final HashMap<SWEKSupplier, SortedMap<Interval, JHVRelatedEvents>> events = new HashMap<>();
@@ -27,7 +28,7 @@ public class JHVEventCache {
     private static JHVRelatedEvents lastHighlighted = null;
 
     public static void requestForInterval(long start, long end, JHVEventHandler handler) {
-        long deltaT = Math.max((long) ((end - start) * factor), TimeUtils.DAY_IN_MILLIS);
+        long deltaT = Math.max((long) ((end - start) * FACTOR), TimeUtils.DAY_IN_MILLIS);
         long newStart = start - deltaT;
         long newEnd = end + deltaT;
 
@@ -139,14 +140,14 @@ public class JHVEventCache {
         if (activeEventTypes.isEmpty())
             return Collections.emptyMap();
 
+        Interval first = new Interval(start - DELTAT_GET, start - DELTAT_GET);
+        Interval last = new Interval(end + DELTAT_GET, end + DELTAT_GET);
+
         HashMap<SWEKSupplier, SortedMap<Interval, JHVRelatedEvents>> result = new HashMap<>();
         for (SWEKSupplier evt : activeEventTypes) {
             SortedMap<Interval, JHVRelatedEvents> sortedEvents = events.get(evt);
             if (sortedEvents != null) {
-                long delta = TimeUtils.DAY_IN_MILLIS * 30L;
-                Interval first = new Interval(start - delta, start - delta);
-                Interval second = new Interval(end + delta, end + delta);
-                result.put(evt, sortedEvents.subMap(first, second));
+                result.put(evt, sortedEvents.subMap(first, last));
             }
         }
         return result;
