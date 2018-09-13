@@ -53,8 +53,10 @@ public class JPIPCacheManager {
                         .withExpiry(expiryPolicy))
                 .build(true);
 
-        hook = new Thread(JPIPCacheManager::close);
-        Runtime.getRuntime().addShutdownHook(hook);
+        if (hook == null) {
+            hook = new Thread(JPIPCacheManager::close);
+            Runtime.getRuntime().addShutdownHook(hook);
+        }
 
         streamCache = streamManager.getCache("JPIPStream", Long.class, JPIPStream.class);
         levelCache = levelManager.getCache("JPIPLevel", Long.class, Integer.class);
@@ -105,7 +107,6 @@ public class JPIPCacheManager {
     }
 
     public static void clear() {
-        Runtime.getRuntime().removeShutdownHook(hook);
         close();
         try {
             levelManager.destroy();
