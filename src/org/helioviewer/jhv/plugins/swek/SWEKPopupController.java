@@ -159,13 +159,10 @@ class SWEKPopupController extends MouseAdapter implements TimeListener {
                 }
             } else {
                 Vec2 tf = null;
-                Vec2 mousepos;
                 if ((Display.mode == Display.DisplayMode.LogPolar || Display.mode == Display.DisplayMode.Polar) && evt.isCactus()) {
                     double principalAngle = SWEKData.readCMEPrincipalAngleDegree(evt) - 90;
                     double distSun = computeDistSun(evt);
-
                     tf = new Vec2(Display.mode.scale.getXValueInv(principalAngle), Display.mode.scale.getYValueInv(distSun));
-                    mousepos = Display.mode.scale.mouseToGridInv(mouseOverX, mouseOverY, vp, camera);
                 } else {
                     Vec3 pt = pi.centralPoint();
                     if (pt != null) {
@@ -173,10 +170,10 @@ class SWEKPopupController extends MouseAdapter implements TimeListener {
                         pt = viewpoint.toQuat().rotateVector(pt);
                         tf = Display.mode.xform.transform(viewpoint, pt, Display.mode.scale);
                     }
-                    mousepos = Display.mode.scale.mouseToGridInv(mouseOverX, mouseOverY, vp, camera);
                 }
 
                 if (tf != null) {
+                    Vec2 mousepos = Display.mode.scale.mouseToGridInv(mouseOverX, mouseOverY, vp, camera);
                     double deltaX = Math.abs(tf.x - mousepos.x);
                     double deltaY = Math.abs(tf.y - mousepos.y);
                     if (deltaX < 0.02 && deltaY < 0.02) {
