@@ -12,6 +12,8 @@ public class Interval implements Comparable<Interval> {
     public final long end;
 
     public Interval(long _start, long _end) {
+        if (_end < _start)
+            throw new IllegalArgumentException("End cannot be earlier than start");
         start = _start;
         end = _end;
     }
