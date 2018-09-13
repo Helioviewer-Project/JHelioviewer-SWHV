@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.base.scale;
 
+import javax.annotation.Nonnull;
+
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Viewport;
@@ -25,8 +27,10 @@ public interface GridScale {
 
     void set(double _xStart, double _xStop, double _yStart, double _yStop);
 
+    @Nonnull
     Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridType gridType);
 
+    @Nonnull
     Vec2 mouseToGridInv(int px, int py, Viewport vp, Camera camera);
 
     GridScale polar = new GridScaleIdentity(0, 360, 0, 0);
@@ -83,6 +87,7 @@ public interface GridScale {
             return yStop;
         }
 
+        @Nonnull
         @Override
         public Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridType gridType) {
             double x = CameraHelper.computeUpX(camera, vp, px) / vp.aspect + 0.5;
@@ -90,6 +95,7 @@ public interface GridScale {
             return new Vec2(getInterpolatedXValue(x), getInterpolatedYValue(y));
         }
 
+        @Nonnull
         @Override
         public Vec2 mouseToGridInv(int px, int py, Viewport vp, Camera camera) {
             double x = CameraHelper.computeUpX(camera, vp, px) / vp.aspect;
@@ -167,6 +173,7 @@ public interface GridScale {
             super(_xStart, _xStop, _yStart, _yStop);
         }
 
+        @Nonnull
         @Override
         public Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridType gridType) {
             Vec3 p = CameraHelper.getVectorFromSphere(camera, vp, px, py, Quat.ZERO, true);
