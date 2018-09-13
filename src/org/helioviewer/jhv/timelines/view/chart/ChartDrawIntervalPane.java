@@ -24,7 +24,7 @@ import org.helioviewer.jhv.timelines.draw.DrawListener;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 
 @SuppressWarnings("serial")
-public class ChartDrawIntervalPane extends JComponent implements DrawListener, MouseListener, MouseMotionListener {
+class ChartDrawIntervalPane extends JComponent implements DrawListener, MouseListener, MouseMotionListener {
 
     private final Calendar calendar = Calendar.getInstance();
 
