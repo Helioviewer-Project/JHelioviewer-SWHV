@@ -16,7 +16,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 public class JHVEventCache {
 
     private static final double FACTOR = 0.2;
-    private static final long DELTAT_GET = TimeUtils.DAY_IN_MILLIS * 1L;
+    private static final long DELTAT_GET = TimeUtils.DAY_IN_MILLIS;
 
     private static final HashSet<JHVEventHandler> cacheEventHandlers = new HashSet<>();
     private static final HashMap<SWEKSupplier, SortedMap<Interval, JHVRelatedEvents>> events = new HashMap<>();
