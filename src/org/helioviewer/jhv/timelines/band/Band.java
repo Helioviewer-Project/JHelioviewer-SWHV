@@ -208,7 +208,7 @@ public class Band extends AbstractTimelineLayer {
 
     @Override
     public void fetchData(TimeAxis selectedAxis) {
-        dataProvider.updateBand(this, selectedAxis.start, selectedAxis.end);
+        dataProvider.updateBand(this, selectedAxis.start(), selectedAxis.end());
         updateGraphsData();
     }
 

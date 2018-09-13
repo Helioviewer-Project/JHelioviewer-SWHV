@@ -4,12 +4,20 @@ import org.helioviewer.jhv.time.TimeUtils;
 
 public class TimeAxis {
 
-    public long start;
-    public long end;
+    private long start;
+    private long end;
 
     public TimeAxis(long _min, long _max) {
         start = _min;
         end = _max;
+    }
+
+    public long start() {
+        return start;
+    }
+
+    public long end() {
+        return end;
     }
 
     public int value2pixel(int x0, int w, long val) {

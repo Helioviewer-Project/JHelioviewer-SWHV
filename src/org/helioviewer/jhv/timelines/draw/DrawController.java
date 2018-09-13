@@ -35,8 +35,8 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     private static boolean locked;
 
     private static final Timer layersTimer = new Timer(1000 / 2, e -> {
-        long start = TimeUtils.ceilSec(selectedAxis.start);
-        long end = TimeUtils.floorSec(selectedAxis.end);
+        long start = TimeUtils.ceilSec(selectedAxis.start());
+        long end = TimeUtils.floorSec(selectedAxis.end());
         MoviePanel.getInstance().syncLayersSpan(start, end);
     });
 
@@ -49,8 +49,8 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
 
     public static void saveState(JSONObject jo) {
         JSONObject js = new JSONObject();
-        js.put("startTime", TimeUtils.format(selectedAxis.start));
-        js.put("endTime", TimeUtils.format(selectedAxis.end));
+        js.put("startTime", TimeUtils.format(selectedAxis.start()));
+        js.put("endTime", TimeUtils.format(selectedAxis.end()));
         jo.put("selectedAxis", js);
         jo.put("locked", locked);
     }
@@ -184,12 +184,11 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
         if (locked)
             layersTimer.restart();
 
-        long diff = selectedAxis.end - selectedAxis.start;
-        long availableStart = selectedAxis.start - diff;
-        long availableEnd = selectedAxis.end + diff;
+        long diff = selectedAxis.end() - selectedAxis.start();
+        long availableStart = selectedAxis.start() - diff;
+        long availableEnd = selectedAxis.end() + diff;
         Interval availableInterval = Interval.makeCompleteDay(availableStart, availableEnd);
-        availableAxis.start = availableInterval.start;
-        availableAxis.end = availableInterval.end;
+        availableAxis.set(availableInterval.start, availableInterval.end);
 
         for (TimelineLayer tl : TimelineLayers.get()) {
             tl.fetchData(selectedAxis);

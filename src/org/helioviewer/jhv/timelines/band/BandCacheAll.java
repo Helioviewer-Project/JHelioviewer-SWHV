@@ -48,7 +48,7 @@ class BandCacheAll implements BandCache {
         float max = Float.MIN_VALUE;
 
         for (DateValue dv : datevals) {
-            if (dv.value != Float.MIN_VALUE && timeAxis.start <= dv.milli && dv.milli <= timeAxis.end) {
+            if (dv.value != Float.MIN_VALUE && timeAxis.start() <= dv.milli && dv.milli <= timeAxis.end()) {
                 min = Math.min(dv.value, min);
                 max = Math.max(dv.value, max);
             }
@@ -63,7 +63,7 @@ class BandCacheAll implements BandCache {
         ArrayList<Integer> tvalues = new ArrayList<>();
         ArrayList<Integer> tdates = new ArrayList<>();
         for (DateValue dv : datevals) {
-            if (dv.value != Float.MIN_VALUE && timeAxis.start <= dv.milli && dv.milli <= timeAxis.end) {
+            if (dv.value != Float.MIN_VALUE && timeAxis.start() <= dv.milli && dv.milli <= timeAxis.end()) {
                 tdates.add(timeAxis.value2pixel(graphArea.x, graphArea.width, dv.milli));
                 tvalues.add(yAxis.value2pixel(graphArea.y, graphArea.height, dv.value));
             }
