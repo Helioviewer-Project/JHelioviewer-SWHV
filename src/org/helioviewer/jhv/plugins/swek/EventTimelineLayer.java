@@ -12,12 +12,12 @@ import java.util.SortedMap;
 import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 
+import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.events.JHVEventHandler;
 import org.helioviewer.jhv.events.JHVEventParameter;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.events.SWEKSupplier;
-import org.helioviewer.jhv.events.SortedInterval;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
@@ -66,7 +66,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
         if (!enabled)
             return;
 
-        Map<SWEKSupplier, SortedMap<SortedInterval, JHVRelatedEvents>> events = JHVEventCache.getEvents(xAxis.start, xAxis.end);
+        Map<SWEKSupplier, SortedMap<Interval, JHVRelatedEvents>> events = JHVEventCache.getEvents(xAxis.start, xAxis.end);
         if (events.isEmpty())
             return;
 
@@ -74,7 +74,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
         int nrLines = 0;
 
         eventUnderMouse = null;
-        for (SortedMap<SortedInterval, JHVRelatedEvents> eventMap : events.values()) {
+        for (SortedMap<Interval, JHVRelatedEvents> eventMap : events.values()) {
             for (JHVRelatedEvents event : eventMap.values()) {
                 long eventStart = event.getStart();
                 long eventEnd = event.getEnd();
