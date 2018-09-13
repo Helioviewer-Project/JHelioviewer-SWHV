@@ -30,15 +30,12 @@ public class SampClient extends HubConnector {
     private static final SampClient instance = new SampClient(DefaultClientProfile.getProfile());
 
     public static void init() {
-        if (startHub) {
-            Hub[] runningHubs = Hub.getRunningHubs();
-            if (runningHubs.length == 0) {
-                try {
-                    Hub.checkExternalHubAvailability();
-                    Hub.runExternalHub(HubServiceMode.CLIENT_GUI);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        if (startHub && Hub.getRunningHubs().length == 0) {
+            try {
+                Hub.checkExternalHubAvailability();
+                Hub.runExternalHub(HubServiceMode.CLIENT_GUI);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
