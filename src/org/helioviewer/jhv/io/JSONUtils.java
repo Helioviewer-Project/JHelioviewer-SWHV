@@ -30,7 +30,7 @@ public class JSONUtils {
     }
 
     public static JSONObject get(URI uri) throws IOException, JSONException {
-        NetClient nc = null; //! try-with-resources fails to work inexplicably for LMSAL
+        NetClient nc = null; //! try-with-resources inexplicably fails to work for LMSAL
         try {
             nc = NetClient.of(uri);
             return get(nc.getReader());
@@ -41,7 +41,7 @@ public class JSONUtils {
     }
 
     public static JSONObject get(String uri) throws IOException, JSONException {
-        NetClient nc = null; //! try-with-resources fails to work inexplicably for LMSAL
+        NetClient nc = null; //! try-with-resources inexplicably fails to work for LMSAL
         try {
             nc = NetClient.of(uri);
             return get(nc.getReader());

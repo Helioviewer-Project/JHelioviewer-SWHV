@@ -12,10 +12,6 @@ public class Vec2 {
         y = _y;
     }
 
-    private boolean isApproxEqual(Vec2 vec, double tolerance) {
-        return Math.abs(x - vec.x) <= tolerance && Math.abs(y - vec.y) <= tolerance;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Vec2))
