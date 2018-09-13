@@ -42,7 +42,8 @@ import com.jidesoft.dialog.StandardDialog;
 public class PreferencesDialog extends StandardDialog implements ShowableDialog {
 
     private final JLabel labelCache = new JLabel("The image cache currently uses 0.0GB on disk.");
-    private JCheckBox loadDefaultMovie;
+    private JCheckBox defaultMovie;
+    private JCheckBox sampHub;
     private JCheckBox normalizeRadius;
     private JCheckBox normalizeAIA;
     private DefaultsSelectionPanel defaultsPanel;
@@ -108,7 +109,8 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
     }
 
     private void saveSettings() {
-        Settings.setProperty("startup.loadmovie", Boolean.toString(loadDefaultMovie.isSelected()));
+        Settings.setProperty("startup.loadmovie", Boolean.toString(defaultMovie.isSelected()));
+        Settings.setProperty("startup.sampHub", Boolean.toString(sampHub.isSelected()));
         Settings.setProperty("display.normalize", Boolean.toString(normalizeRadius.isSelected()));
         Settings.setProperty("display.normalizeAIA", Boolean.toString(normalizeAIA.isSelected()));
         defaultsPanel.setSettings();
@@ -123,8 +125,11 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         combo.addActionListener(e -> Settings.setProperty("default.server", (String) Objects.requireNonNull(combo.getSelectedItem())));
         row1.add(combo);
 
-        loadDefaultMovie = new JCheckBox("Load default movie at start-up", Boolean.parseBoolean(Settings.getProperty("startup.loadmovie")));
-        row1.add(loadDefaultMovie);
+        defaultMovie = new JCheckBox("Load default movie at start-up", Boolean.parseBoolean(Settings.getProperty("startup.loadmovie")));
+        row1.add(defaultMovie);
+
+        sampHub = new JCheckBox("Start SAMP hub", Boolean.parseBoolean(Settings.getProperty("startup.sampHub")));
+        row1.add(sampHub);
 
         JPanel row2 = new JPanel(new FlowLayout(FlowLayout.LEADING));
         normalizeAIA = new JCheckBox("Normalize SDO/AIA brightness (needs restart)", Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA")));

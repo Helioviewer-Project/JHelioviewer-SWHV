@@ -18,6 +18,7 @@ public class Settings {
     private static final Properties defaults = new Properties() {
         {
             setProperty("startup.loadmovie", "true");
+            setProperty("startup.sampHub", "true");
             setProperty("display.normalizeAIA", "true");
             setProperty("display.normalize", "false");
             setProperty("timeout.read", "120000");
