@@ -13,7 +13,7 @@ import org.helioviewer.jhv.log.Log;
 
 public class EventDatabaseThread extends Thread {
 
-    private static final int CURRENT_VERSION_SCHEMA = 8;
+    private static final int CURRENT_VERSION_SCHEMA = 9;
     private static Connection connection;
 
     public EventDatabaseThread(Runnable r, String name) {
