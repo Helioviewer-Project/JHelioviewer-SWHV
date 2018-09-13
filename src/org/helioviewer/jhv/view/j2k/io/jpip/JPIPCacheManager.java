@@ -31,7 +31,7 @@ public class JPIPCacheManager {
     private static Thread hook;
 
     public static void init() {
-        deleteDirs("JPIPLevel", "JPIPStream");// delete old versions
+        deleteDirs("JPIPLevel", "JPIPStream"); // delete old versions
 
         ExpiryPolicy<Object, Object> expiryPolicy = ExpiryPolicyBuilder.timeToIdleExpiration(Duration.ofDays(7));
 
