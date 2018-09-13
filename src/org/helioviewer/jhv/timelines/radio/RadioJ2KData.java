@@ -90,7 +90,7 @@ class RadioJ2KData implements ImageDataHandler {
 
     private double computeResolution(int height, TimeAxis xAxis) {
         double pixPerTime = j2kWidth / (double) (endDate - startDate);
-        int width = (int) ((xAxis.end - xAxis.start) * pixPerTime + 0.5);
+        int width = (int) ((xAxis.end() - xAxis.start()) * pixPerTime + 0.5);
         double pct = Math.min(width / (double) j2kWidth, 1);
 
         double visibleImagePercentage = pct * height / j2kHeight;
@@ -129,8 +129,8 @@ class RadioJ2KData implements ImageDataHandler {
         int y0 = (int) ((endFreq - visibleEndFreq) * pixPerFreq + 0.5);
         int height = (int) ((visibleEndFreq - visibleStartFreq) * pixPerFreq + 0.5);
 
-        long visibleStart = Math.max(startDate, xAxis.start);
-        long visibleEnd = Math.min(endDate, xAxis.end);
+        long visibleStart = Math.max(startDate, xAxis.start());
+        long visibleEnd = Math.min(endDate, xAxis.end());
         double resolution = computeResolution(height, xAxis);
 
         if (last_resolution == resolution && y0 == last_y0 && height == last_height && visibleStart >= last_padded_start && visibleEnd <= last_padded_end) {
@@ -139,9 +139,9 @@ class RadioJ2KData implements ImageDataHandler {
         }
         decodingNeeded = true;
 
-        long ilen = xAxis.end - xAxis.start;
-        long padded_start = xAxis.start - ilen;
-        long padded_end = xAxis.end + ilen;
+        long ilen = xAxis.end() - xAxis.start();
+        long padded_start = xAxis.start() - ilen;
+        long padded_end = xAxis.end() + ilen;
 
         long newVisibleStart = startDate;
         long newVisibleEnd = endDate;

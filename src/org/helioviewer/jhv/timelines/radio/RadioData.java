@@ -197,11 +197,11 @@ public class RadioData extends AbstractTimelineLayer {
 
     @Override
     public void fetchData(TimeAxis selectedAxis) {
-        if (enabled && selectedAxis.end - selectedAxis.start <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS) {
+        if (enabled && selectedAxis.end() - selectedAxis.start() <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS) {
             for (RadioJ2KData data : cache.asMap().values()) {
                 data.requestData(selectedAxis);
             }
-            requestAndOpenIntervals(selectedAxis.start);
+            requestAndOpenIntervals(selectedAxis.start());
         }
     }
 
@@ -210,7 +210,7 @@ public class RadioData extends AbstractTimelineLayer {
         if (!enabled)
             return;
 
-        if (timeAxis.end - timeAxis.start <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS) {
+        if (timeAxis.end() - timeAxis.start() <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS) {
             drawString(g, graphArea, timeAxis, "No data available");
             for (RadioJ2KData data : cache.asMap().values()) {
                 data.draw(g, graphArea, timeAxis);
@@ -244,8 +244,8 @@ public class RadioData extends AbstractTimelineLayer {
     }
 
     static void drawString(Graphics2D g, Rectangle ga, TimeAxis xAxis, String text) {
-        int dx0 = xAxis.value2pixel(ga.x, ga.width, xAxis.start);
-        int dx1 = xAxis.value2pixel(ga.x, ga.width, xAxis.end);
+        int dx0 = xAxis.value2pixel(ga.x, ga.width, xAxis.start());
+        int dx1 = xAxis.value2pixel(ga.x, ga.width, xAxis.end());
         int dwidth = dx1 - dx0;
         g.setColor(Color.GRAY);
         g.fillRect(dx0, ga.y, dwidth, ga.height);

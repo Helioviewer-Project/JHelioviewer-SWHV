@@ -57,8 +57,8 @@ class BandCacheMinute implements BandCache {
         float min = Float.MAX_VALUE;
         float max = Float.MIN_VALUE;
 
-        long keyEnd = date2key(timeAxis.end);
-        long key = date2key(timeAxis.start);
+        long keyEnd = date2key(timeAxis.end());
+        long key = date2key(timeAxis.start());
         while (key <= keyEnd) {
             DataChunk cache = cacheMap.get(key);
             key++;
@@ -70,7 +70,7 @@ class BandCacheMinute implements BandCache {
 
             for (int i = 0; i < values.length; i++) {
                 float value = values[i];
-                if (value != Float.MIN_VALUE && timeAxis.start <= dates[i] && dates[i] <= timeAxis.end) {
+                if (value != Float.MIN_VALUE && timeAxis.start() <= dates[i] && dates[i] <= timeAxis.end()) {
                     min = Math.min(value, min);
                     max = Math.max(value, max);
                 }
@@ -81,19 +81,20 @@ class BandCacheMinute implements BandCache {
 
     @Override
     public void createPolyLines(Rectangle graphArea, TimeAxis timeAxis, YAxis yAxis, ArrayList<GraphPolyline> graphPolylines) {
-        long keyEnd = date2key(propagationModel.getSunTime(timeAxis.end));
-        long key = date2key(propagationModel.getSunTime(timeAxis.start));
+        long keyEnd = date2key(propagationModel.getSunTime(timeAxis.end()));
+        long key = date2key(propagationModel.getSunTime(timeAxis.start()));
         int level = 0;
         double factor = 1;
         double elsz = 1. * MILLIS_PER_CHUNK / CHUNKED_SIZE * factor;
-        double noelements = (timeAxis.end - timeAxis.start) / elsz;
+        long aWidth = timeAxis.end() - timeAxis.start();
+        double noelements = aWidth / elsz;
 
         double graphWidth = graphArea.width * GLInfo.pixelScaleFloat[0];
         while (level < MAX_LEVEL - 1 && noelements > graphWidth) {
             level++;
             factor *= FACTOR_STEP;
             elsz = 1. * MILLIS_PER_CHUNK / CHUNKED_SIZE * factor;
-            noelements = (timeAxis.end - timeAxis.start) / elsz;
+            noelements = aWidth / elsz;
         }
         ArrayList<Integer> tvalues = new ArrayList<>();
         ArrayList<Integer> tdates = new ArrayList<>();

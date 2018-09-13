@@ -239,23 +239,23 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private static void drawHorizontalLabels(Graphics2D g, Rectangle graphArea, TimeAxis xAxis, int ht, TimelineLayer tl) {
-        Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(xAxis.start), g);
+        Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(xAxis.start()), g);
         int tickTextWidth = (int) tickTextBounds.getWidth();
         int tickTextHeight = (int) tickTextBounds.getHeight() + ht * DrawConstants.GRAPH_BOTTOM_AXIS_SPACE;
         int horizontalTickCount = Math.max(2, (graphArea.width - tickTextWidth * 2) / tickTextWidth);
         long start, end;
         if (tl == null) {
-            start = xAxis.start;
-            end = xAxis.end;
+            start = xAxis.start();
+            end = xAxis.end();
         } else {
-            start = tl.getInsituTime(xAxis.start);
-            end = tl.getInsituTime(xAxis.end);
+            start = tl.getInsituTime(xAxis.start());
+            end = tl.getInsituTime(xAxis.end());
         }
-        long tickDifferenceHorizontal = (xAxis.end - xAxis.start) / (horizontalTickCount - 1);
+        long tickDifferenceHorizontal = (xAxis.end() - xAxis.start()) / (horizontalTickCount - 1);
 
         long previousDate = Long.MIN_VALUE;
         for (int i = 0; i < horizontalTickCount; ++i) {
-            long tickValue = xAxis.start + i * tickDifferenceHorizontal;
+            long tickValue = xAxis.start() + i * tickDifferenceHorizontal;
             if (tl != null) {
                 tickValue = tl.getInsituTime(tickValue);
             }

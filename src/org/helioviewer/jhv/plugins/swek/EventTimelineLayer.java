@@ -44,7 +44,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
 
     @Override
     public void fetchData(TimeAxis selectedAxis) {
-        JHVEventCache.requestForInterval(selectedAxis.start - TimeUtils.DAY_IN_MILLIS * 3, selectedAxis.end, this);
+        JHVEventCache.requestForInterval(selectedAxis.start() - TimeUtils.DAY_IN_MILLIS * 3, selectedAxis.end(), this);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
     @Override
     public void cacheUpdated() {
         TimeAxis xAxis = DrawController.selectedAxis;
-        JHVEventCache.requestForInterval(xAxis.start, xAxis.end, this);
+        JHVEventCache.requestForInterval(xAxis.start(), xAxis.end(), this);
         if (enabled)
             DrawController.drawRequest();
     }
@@ -66,7 +66,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
         if (!enabled)
             return;
 
-        Map<SWEKSupplier, SortedMap<Interval, JHVRelatedEvents>> events = JHVEventCache.getEvents(xAxis.start, xAxis.end);
+        Map<SWEKSupplier, SortedMap<Interval, JHVRelatedEvents>> events = JHVEventCache.getEvents(xAxis.start(), xAxis.end());
         if (events.isEmpty())
             return;
 

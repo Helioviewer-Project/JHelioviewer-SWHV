@@ -102,22 +102,22 @@ class DrawControllerOptionsPanel extends JPanel {
 
         switch (zoom) {
             case All:
-                DrawController.setSelectedInterval(availableInterval.start, availableInterval.end);
+                DrawController.setSelectedInterval(availableInterval.start(), availableInterval.end());
                 break;
             case Day:
-                computeZoomInterval(selectedInterval.end, TimeUtils.DAY_IN_MILLIS * value);
+                computeZoomInterval(selectedInterval.end(), TimeUtils.DAY_IN_MILLIS * value);
                 break;
             case Hour:
-                computeZoomInterval(selectedInterval.end, 60 * 60 * 1000L * value);
+                computeZoomInterval(selectedInterval.end(), 60 * 60 * 1000L * value);
                 break;
             case Month:
-                computeZoomInterval(selectedInterval.end, (long) (30.6001 * TimeUtils.DAY_IN_MILLIS * value));
+                computeZoomInterval(selectedInterval.end(), (long) (30.6001 * TimeUtils.DAY_IN_MILLIS * value));
                 break;
             case Year:
-                computeZoomInterval(selectedInterval.end, (long) (365.25 * TimeUtils.DAY_IN_MILLIS * value));
+                computeZoomInterval(selectedInterval.end(), (long) (365.25 * TimeUtils.DAY_IN_MILLIS * value));
                 break;
             case Carrington:
-                computeZoomInterval(selectedInterval.end, (long) (Carrington.CR_SYNODIC_MEAN * TimeUtils.DAY_IN_MILLIS * value));
+                computeZoomInterval(selectedInterval.end(), (long) (Carrington.CR_SYNODIC_MEAN * TimeUtils.DAY_IN_MILLIS * value));
                 break;
             case Movie:
                 DrawController.setSelectedInterval(Movie.getStartTime(), Movie.getEndTime());

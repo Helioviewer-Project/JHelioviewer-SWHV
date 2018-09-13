@@ -69,9 +69,10 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
     }
 
     private void computeIntervalBorderPositions(TimeAxis availableInterval, TimeAxis selectedInterval) {
-        double diffMin = (availableInterval.end - availableInterval.start) / (double) TimeUtils.MINUTE_IN_MILLIS;
-        long start = Math.round((selectedInterval.start - availableInterval.start) / (double) TimeUtils.MINUTE_IN_MILLIS);
-        long end = Math.round((selectedInterval.end - availableInterval.start) / (double) TimeUtils.MINUTE_IN_MILLIS);
+        long aWidth = availableInterval.end() - availableInterval.start();
+        double diffMin = aWidth == 0 ? 1 : aWidth / (double) TimeUtils.MINUTE_IN_MILLIS;
+        long start = Math.round((selectedInterval.start() - availableInterval.start()) / (double) TimeUtils.MINUTE_IN_MILLIS);
+        long end = Math.round((selectedInterval.end() - availableInterval.start()) / (double) TimeUtils.MINUTE_IN_MILLIS);
         int availableIntervalSpace = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1;
 
         leftIntervalBorderPosition = (int) ((start / diffMin) * availableIntervalSpace) + DrawConstants.GRAPH_LEFT_SPACE;
@@ -96,21 +97,22 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
         long movieStart = Movie.getStartTime();
         long movieEnd = Movie.getEndTime();
 
-        if (movieEnd < availableInterval.start || movieStart > availableInterval.end) {
+        if (movieEnd < availableInterval.start() || movieStart > availableInterval.end()) {
             return;
         }
 
         int availableIntervalWidth = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1;
-        double ratioX = availableIntervalWidth / (double) (availableInterval.end - availableInterval.start);
+        long aWidth = availableInterval.end() - availableInterval.start();
+        double ratioX = availableIntervalWidth / (double) (aWidth == 0 ? 1 : aWidth);
 
         int min = DrawConstants.GRAPH_LEFT_SPACE;
-        if (movieStart >= availableInterval.start) {
-            min += (int) ((movieStart - availableInterval.start) * ratioX);
+        if (movieStart >= availableInterval.start()) {
+            min += (int) ((movieStart - availableInterval.start()) * ratioX);
         }
 
         int max = DrawConstants.GRAPH_LEFT_SPACE + availableIntervalWidth;
-        if (movieEnd >= availableInterval.start) {
-            max = DrawConstants.GRAPH_LEFT_SPACE + (int) ((movieEnd - availableInterval.start) * ratioX);
+        if (movieEnd >= availableInterval.start()) {
+            max = DrawConstants.GRAPH_LEFT_SPACE + (int) ((movieEnd - availableInterval.start()) * ratioX);
         }
 
         int offset = 7;
@@ -153,27 +155,24 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
     }
 
     private void drawLabels(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval) {
-        if (availableInterval.start > availableInterval.end) {
-            return;
-        }
-
-        int tickTextWidth = (int) g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(availableInterval.start), g).getWidth();
+        int tickTextWidth = (int) g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(availableInterval.start()), g).getWidth();
         int availableIntervalWidth = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1;
         int maxTicks = Math.max(2, (availableIntervalWidth - tickTextWidth * 2) / tickTextWidth);
-        double ratioX = availableIntervalWidth / (double) (availableInterval.end - availableInterval.start);
+        long aWidth = availableInterval.end() - availableInterval.start();
+        double ratioX = availableIntervalWidth / (double) (aWidth == 0 ? 1 : aWidth);
 
-        long ts = availableInterval.start + TimeUtils.DAY_IN_MILLIS * 366 * 3;
-        if (availableInterval.start <= ts && ts <= availableInterval.end) {
+        long ts = availableInterval.start() + TimeUtils.DAY_IN_MILLIS * 366 * 3;
+        if (availableInterval.start() <= ts && ts <= availableInterval.end()) {
             drawLabelsYear(g, availableInterval, selectedInterval, maxTicks, availableIntervalWidth, ratioX);
             return;
         }
-        ts = availableInterval.start + TimeUtils.DAY_IN_MILLIS * 31 * 3;
-        if (availableInterval.start <= ts && ts <= availableInterval.end) {
+        ts = availableInterval.start() + TimeUtils.DAY_IN_MILLIS * 31 * 3;
+        if (availableInterval.start() <= ts && ts <= availableInterval.end()) {
             drawLabelsMonth(g, availableInterval, selectedInterval, maxTicks, availableIntervalWidth, ratioX);
             return;
         }
-        ts = availableInterval.start + TimeUtils.DAY_IN_MILLIS * 3;
-        if (availableInterval.start <= ts && ts <= availableInterval.end) {
+        ts = availableInterval.start() + TimeUtils.DAY_IN_MILLIS * 3;
+        if (availableInterval.start() <= ts && ts <= availableInterval.end()) {
             drawLabelsDay(g, availableInterval, selectedInterval, maxTicks, availableIntervalWidth, ratioX);
             return;
         }
@@ -182,12 +181,12 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
     }
 
     private void drawLabelsTime(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, int maxTicks, int availableIntervalWidth, double ratioX) {
-        long timeDiff = availableInterval.end - availableInterval.start;
+        long timeDiff = availableInterval.end() - availableInterval.start();
         double ratioTime = timeDiff / (double) maxTicks;
         int day = -1;
 
         for (int i = 0; i < maxTicks; ++i) {
-            long tickValue = availableInterval.start + (long) (i * ratioTime);
+            long tickValue = availableInterval.start() + (long) (i * ratioTime);
             calendar.setTimeInMillis(tickValue);
             int currentday = calendar.get(Calendar.DAY_OF_MONTH);
 
@@ -203,7 +202,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
     }
 
     private void drawLabelsDay(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, int maxTicks, int availableIntervalWidth, double ratioX) {
-        calendar.setTimeInMillis(availableInterval.start);
+        calendar.setTimeInMillis(availableInterval.start());
 
         int startYear = calendar.get(Calendar.YEAR);
         int startMonth = calendar.get(Calendar.MONTH);
@@ -211,7 +210,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
 
         calendar.set(startYear, startMonth, startDay, 0, 0, 0);
         long ts = calendar.getTimeInMillis();
-        if (!(availableInterval.start <= ts && ts <= availableInterval.end)) {
+        if (!(availableInterval.start() <= ts && ts <= availableInterval.end())) {
             calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
 
@@ -219,7 +218,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
         startMonth = calendar.get(Calendar.MONTH);
         startDay = calendar.get(Calendar.DAY_OF_MONTH);
 
-        long diffMillis = availableInterval.end - calendar.getTimeInMillis();
+        long diffMillis = availableInterval.end() - calendar.getTimeInMillis();
         int numberOfDays = (int) Math.round(diffMillis / (double) TimeUtils.DAY_IN_MILLIS);
         int tickCount = Math.min(numberOfDays, maxTicks);
         double ratioDays = Math.ceil(numberOfDays / (double) tickCount);
@@ -234,21 +233,21 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
     }
 
     private void drawLabelsMonth(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, int maxTicks, int availableIntervalWidth, double ratioX) {
-        calendar.setTimeInMillis(availableInterval.start);
+        calendar.setTimeInMillis(availableInterval.start());
 
         int startYear = calendar.get(Calendar.YEAR);
         int startMonth = calendar.get(Calendar.MONTH);
 
         calendar.set(startYear, startMonth, 1, 0, 0, 0);
         long ts = calendar.getTimeInMillis();
-        if (!(availableInterval.start <= ts && ts <= availableInterval.end)) {
+        if (!(availableInterval.start() <= ts && ts <= availableInterval.end())) {
             calendar.add(Calendar.MONTH, 1);
         }
 
         startYear = calendar.get(Calendar.YEAR);
         startMonth = calendar.get(Calendar.MONTH);
 
-        calendar.setTimeInMillis(availableInterval.end);
+        calendar.setTimeInMillis(availableInterval.end());
         int endYear = calendar.get(Calendar.YEAR);
         int endMonth = calendar.get(Calendar.MONTH);
 
@@ -269,17 +268,17 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
     }
 
     private void drawLabelsYear(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, int maxTicks, int availableIntervalWidth, double ratioX) {
-        calendar.setTimeInMillis(availableInterval.start);
+        calendar.setTimeInMillis(availableInterval.start());
 
         int startYear = calendar.get(Calendar.YEAR);
 
         calendar.set(startYear, Calendar.JANUARY, 1, 0, 0, 0);
         long ts = calendar.getTimeInMillis();
-        if (!(availableInterval.start <= ts && ts <= availableInterval.end)) {
+        if (!(availableInterval.start() <= ts && ts <= availableInterval.end())) {
             startYear++;
         }
 
-        calendar.setTimeInMillis(availableInterval.end);
+        calendar.setTimeInMillis(availableInterval.end());
         int endYear = calendar.get(Calendar.YEAR);
 
         int hticks = Math.min(Math.max(endYear - startYear + 1, 2), maxTicks);
@@ -295,8 +294,8 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
 
     private void drawLabel(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, String tickText, int availableIntervalWidth, long date, double ratioX) {
         int textWidth = (int) g.getFontMetrics().getStringBounds(tickText, g).getWidth();
-        int x = DrawConstants.GRAPH_LEFT_SPACE + (int) ((date - availableInterval.start) * ratioX);
-        if (selectedInterval.start <= date && date <= selectedInterval.end) {
+        int x = DrawConstants.GRAPH_LEFT_SPACE + (int) ((date - availableInterval.start()) * ratioX);
+        if (selectedInterval.start() <= date && date <= selectedInterval.end()) {
             g.setColor(DrawConstants.AVAILABLE_INTERVAL_BACKGROUND_COLOR);
         } else {
             g.setColor(DrawConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
