@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.math;
 
-import java.util.Objects;
-
 import org.json.JSONArray;
 
 public class Quat {
@@ -255,12 +253,15 @@ public class Quat {
         if (!(o instanceof Quat))
             return false;
         Quat q = (Quat) o;
-        return a == q.a && u.equals(q.u);
+        return Double.doubleToLongBits(a) == Double.doubleToLongBits(q.a) && u.equals(q.u);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(a, u);
+        int result = 1;
+        long tmp = Double.doubleToLongBits(a);
+        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
+        return 31 * result + u.hashCode();
     }
 
     @Override
