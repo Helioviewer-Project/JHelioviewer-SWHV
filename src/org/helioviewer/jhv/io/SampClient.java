@@ -18,22 +18,27 @@ import org.astrogrid.samp.client.HubConnection;
 import org.astrogrid.samp.client.HubConnector;
 import org.astrogrid.samp.hub.Hub;
 import org.astrogrid.samp.hub.HubServiceMode;
+
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.layers.ImageLayers;
 
 public class SampClient extends HubConnector {
 
     private static final String MTYPE_VIEW_DATA = "jhv.vso.load";
+    private static final boolean startHub = Boolean.parseBoolean(Settings.getProperty("startup.sampHub"));
     private static final SampClient instance = new SampClient(DefaultClientProfile.getProfile());
 
     public static void init() {
-        Hub[] runningHubs = Hub.getRunningHubs();
-        if (runningHubs.length == 0) {
-            try {
-                Hub.checkExternalHubAvailability();
-                Hub.runExternalHub(HubServiceMode.CLIENT_GUI);
-            } catch (IOException e) {
-                e.printStackTrace();
+        if (startHub) {
+            Hub[] runningHubs = Hub.getRunningHubs();
+            if (runningHubs.length == 0) {
+                try {
+                    Hub.checkExternalHubAvailability();
+                    Hub.runExternalHub(HubServiceMode.CLIENT_GUI);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
