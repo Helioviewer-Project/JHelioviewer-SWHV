@@ -29,21 +29,21 @@ public class TimeAxis {
     }
 
     void move(int w, double pixelDistance) {
-        double diff = (double) (end - start) / w;
-        move(pixelDistance * diff);
+        long diff = (long) (pixelDistance * (end - start) / w);
+        move(diff);
     }
 
-    void move(double diff) {
+    void move(long diff) {
         start += diff;
         end += diff;
         adaptBounds();
     }
 
     void zoom(int x0, int w, int x, double factor) {
-        double multiplier = (end - start) * factor / w;
+        double multiplier = factor * (end - start) / w;
         double ratio = (x - x0) / (double) w;
-        start -= multiplier * ratio;
-        end += multiplier * (1. - ratio);
+        start -= (long) (multiplier * ratio);
+        end += (long) (multiplier * (1. - ratio));
         adaptBounds();
     }
 
@@ -66,6 +66,7 @@ public class TimeAxis {
         }
         if (start < TimeUtils.MINIMAL_DATE.milli) {
             start = TimeUtils.MINIMAL_DATE.milli;
+            end = TimeUtils.MINIMAL_DATE.milli + intervalLength;
         }
     }
 
