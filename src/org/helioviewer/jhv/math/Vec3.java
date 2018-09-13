@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.math;
 
-import java.util.Objects;
-
 import org.helioviewer.jhv.log.Log;
 import org.json.JSONArray;
 
@@ -44,10 +42,6 @@ public class Vec3 {
 
     public static Vec3 cross(Vec3 u, Vec3 v) {
         return new Vec3(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x);
-    }
-
-    private boolean isApproxEqual(Vec3 vec, double tolerance) {
-        return Math.abs(x - vec.x) <= tolerance && Math.abs(y - vec.y) <= tolerance && Math.abs(z - vec.z) <= tolerance;
     }
 
     public final double length() {
@@ -107,12 +101,24 @@ public class Vec3 {
 
     @Override
     public final boolean equals(Object o) {
-        return o instanceof Vec3 && isApproxEqual((Vec3) o, 0.0);
+        if (!(o instanceof Vec3))
+            return false;
+        Vec3 v = (Vec3) o;
+        return Double.doubleToLongBits(x) == Double.doubleToLongBits(v.x) &&
+               Double.doubleToLongBits(y) == Double.doubleToLongBits(v.y) &&
+               Double.doubleToLongBits(z) == Double.doubleToLongBits(v.z);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(x, y, z);
+        int result = 1;
+        long tmp = Double.doubleToLongBits(x);
+        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
+        tmp = Double.doubleToLongBits(y);
+        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
+        tmp = Double.doubleToLongBits(z);
+        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
+        return result;
     }
 
     @Override

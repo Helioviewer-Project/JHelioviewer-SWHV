@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.math;
 
-import java.util.Objects;
-
 public class Vec2 {
 
     public static final Vec2 NAN = new Vec2(Double.NaN, Double.NaN);
@@ -20,12 +18,21 @@ public class Vec2 {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof Vec2 && isApproxEqual((Vec2) o, 0);
+        if (!(o instanceof Vec2))
+            return false;
+        Vec2 v = (Vec2) o;
+        return Double.doubleToLongBits(x) == Double.doubleToLongBits(v.x) &&
+               Double.doubleToLongBits(y) == Double.doubleToLongBits(v.y);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(x, y);
+        int result = 1;
+        long tmp = Double.doubleToLongBits(x);
+        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
+        tmp = Double.doubleToLongBits(y);
+        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
+        return result;
     }
 
     @Override
