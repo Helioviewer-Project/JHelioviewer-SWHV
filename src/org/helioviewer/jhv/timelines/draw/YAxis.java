@@ -2,8 +2,8 @@ package org.helioviewer.jhv.timelines.draw;
 
 public class YAxis {
 
-    public double start;
-    public double end;
+    private double start;
+    private double end;
 
     private final YAxisScale scale;
 
@@ -21,6 +21,14 @@ public class YAxis {
         scale = _scale;
         scaledMinBound = scale(UNSCALED_MIN_BOUND);
         scaledMaxBound = scale(UNSCALED_MAX_BOUND);
+    }
+
+    public double start() {
+        return start;
+    }
+
+    public double end() {
+        return end;
     }
 
     public void reset(double _start, double _end) {

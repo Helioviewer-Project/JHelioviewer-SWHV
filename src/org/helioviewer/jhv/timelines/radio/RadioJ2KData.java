@@ -116,14 +116,8 @@ class RadioJ2KData implements ImageDataHandler {
     private int last_height = -1;
 
     private Rectangle getROI(TimeAxis xAxis) {
-        double visibleStartFreq = startFreq;
-        double visibleEndFreq = endFreq;
-        if (visibleStartFreq < RadioData.yAxis.start) {
-            visibleStartFreq = RadioData.yAxis.start;
-        }
-        if (visibleEndFreq > RadioData.yAxis.end) {
-            visibleEndFreq = RadioData.yAxis.end;
-        }
+        double visibleStartFreq = Math.max(startFreq, RadioData.yAxis.start());
+        double visibleEndFreq = Math.min(endFreq, RadioData.yAxis.end());
 
         double pixPerFreq = j2kHeight / (endFreq - startFreq);
         int y0 = (int) ((endFreq - visibleEndFreq) * pixPerFreq + 0.5);
