@@ -27,11 +27,6 @@ public class SampClient extends HubConnector {
     private static final SampClient instance = new SampClient(DefaultClientProfile.getProfile());
 
     public static void init() {
-    }
-
-    private SampClient(ClientProfile _profile) {
-        super(_profile);
-
         Hub[] runningHubs = Hub.getRunningHubs();
         if (runningHubs.length == 0) {
             try {
@@ -41,6 +36,10 @@ public class SampClient extends HubConnector {
                 e.printStackTrace();
             }
         }
+    }
+
+    private SampClient(ClientProfile _profile) {
+        super(_profile);
 
         HashMap<String, String> meta = new HashMap<>();
         meta.put("samp.name", "JHelioviewer");
