@@ -12,6 +12,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 
+import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.events.gui.info.SWEKEventInformationDialog;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 
@@ -24,10 +25,10 @@ public class JHVRelatedEvents implements ClickableDrawable {
     private final SWEKSupplier supplier;
     private final Color color;
 
-    private SortedInterval interval;
+    private Interval interval;
     private boolean highlighted;
 
-    JHVRelatedEvents(JHVEvent event, Map<SWEKSupplier, SortedMap<SortedInterval, JHVRelatedEvents>> eventsMap) {
+    JHVRelatedEvents(JHVEvent event, Map<SWEKSupplier, SortedMap<Interval, JHVRelatedEvents>> eventsMap) {
         supplier = event.getSupplier();
         color = JHVCacheColors.getNextColor();
         highlighted = false;
@@ -35,7 +36,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         events.add(event);
         eventsMap.putIfAbsent(supplier, new TreeMap<>());
 
-        interval = new SortedInterval(event.start, event.end);
+        interval = new Interval(event.start, event.end);
         eventsMap.get(supplier).put(interval, this);
     }
 
@@ -60,7 +61,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         return supplier.getGroup().getIcon();
     }
 
-    void merge(JHVRelatedEvents found, Map<SWEKSupplier, SortedMap<SortedInterval, JHVRelatedEvents>> eventsMap) {
+    void merge(JHVRelatedEvents found, Map<SWEKSupplier, SortedMap<Interval, JHVRelatedEvents>> eventsMap) {
         events.addAll(found.events);
         associations.addAll(found.associations);
 
@@ -68,7 +69,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
 
         eventsMap.get(supplier).remove(found.interval);
         eventsMap.get(supplier).remove(interval);
-        interval = new SortedInterval(Math.min(interval.start, found.interval.start), Math.max(interval.end, found.interval.end));
+        interval = new Interval(Math.min(interval.start, found.interval.start), Math.max(interval.end, found.interval.end));
         eventsMap.get(supplier).put(interval, this);
     }
 
@@ -150,7 +151,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         return nEvents;
     }
 
-    void swapEvent(JHVEvent event, Map<SWEKSupplier, SortedMap<SortedInterval, JHVRelatedEvents>> eventsMap) {
+    void swapEvent(JHVEvent event, Map<SWEKSupplier, SortedMap<Interval, JHVRelatedEvents>> eventsMap) {
         int eid = event.getUniqueID();
         int i = 0;
         while (events.get(i).getUniqueID() != eid) {
@@ -161,7 +162,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         resetTime(eventsMap);
     }
 
-    private void resetTime(Map<SWEKSupplier, SortedMap<SortedInterval, JHVRelatedEvents>> eventsMap) {
+    private void resetTime(Map<SWEKSupplier, SortedMap<Interval, JHVRelatedEvents>> eventsMap) {
         long start = Long.MAX_VALUE;
         long end = Long.MIN_VALUE;
         for (JHVEvent evt : events) {
@@ -178,7 +179,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         eventsMap.putIfAbsent(supplier, new TreeMap<>());
 
         eventsMap.get(supplier).remove(interval);
-        interval = new SortedInterval(start, end);
+        interval = new Interval(start, end);
         eventsMap.get(supplier).put(interval, this);
     }
 
