@@ -66,7 +66,6 @@ public class TimeAxis {
         }
         if (start < TimeUtils.MINIMAL_DATE.milli) {
             start = TimeUtils.MINIMAL_DATE.milli;
-            end = TimeUtils.MINIMAL_DATE.milli + intervalLength;
         }
     }
 
