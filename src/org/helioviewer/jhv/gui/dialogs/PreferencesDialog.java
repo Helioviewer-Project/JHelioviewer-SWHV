@@ -41,7 +41,7 @@ import com.jidesoft.dialog.StandardDialog;
 @SuppressWarnings("serial")
 public class PreferencesDialog extends StandardDialog implements ShowableDialog {
 
-    private final JLabel labelCache = new JLabel("The image cache currently uses 0.0GB.");
+    private final JLabel labelCache = new JLabel("The image cache currently uses 0.0GB on disk.");
     private JCheckBox loadDefaultMovie;
     private JCheckBox normalizeRadius;
     private JCheckBox normalizeAIA;
@@ -101,7 +101,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
 
     @Override
     public void showDialog() {
-        labelCache.setText(String.format("The image cache currently uses %.1fGB.", JPIPCacheManager.getSize() / (1024 * 1024 * 1024.)));
+        labelCache.setText(String.format("The image cache currently uses %.1fGB on disk.", JPIPCacheManager.getSize() / (1024 * 1024 * 1024.)));
         pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
         setVisible(true);
@@ -133,7 +133,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         row2.add(normalizeRadius);
 
         JPanel row3 = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        JButton clearCache = new JButton("Clear");
+        JButton clearCache = new JButton("Clear Cache");
         clearCache.addActionListener(e -> {
             JPIPCacheManager.clear();
             setVisible(false);
