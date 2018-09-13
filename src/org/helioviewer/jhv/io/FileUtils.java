@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.concurrent.atomic.AtomicLong;
 
 import okio.Okio;
 import okio.BufferedSource;
@@ -27,6 +28,19 @@ public class FileUtils {
         try (BufferedSource buffer = Okio.buffer(Okio.source(is))) {
             return buffer.readString(StandardCharsets.UTF_8);
         }
+    }
+
+    public static long diskUsage(File dir) throws IOException {
+        final AtomicLong size = new AtomicLong(0);
+
+        Files.walkFileTree(dir.toPath(), new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                size.addAndGet(attrs.size());
+                return FileVisitResult.CONTINUE;
+            }
+        });
+        return size.get();
     }
 
     private static final SimpleFileVisitor<Path> nukeVisitor = new SimpleFileVisitor<Path>() {

@@ -33,6 +33,7 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.io.DataSources;
+import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCacheManager;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
@@ -40,6 +41,7 @@ import com.jidesoft.dialog.StandardDialog;
 @SuppressWarnings("serial")
 public class PreferencesDialog extends StandardDialog implements ShowableDialog {
 
+    private final JLabel labelCache = new JLabel("The image cache currently uses 0.0GB.");
     private JCheckBox loadDefaultMovie;
     private JCheckBox normalizeRadius;
     private JCheckBox normalizeAIA;
@@ -99,6 +101,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
 
     @Override
     public void showDialog() {
+        labelCache.setText(String.format("The image cache currently uses %.1fGB.", JPIPCacheManager.getSize() / (1024 * 1024 * 1024.)));
         pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
         setVisible(true);
@@ -129,9 +132,19 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         normalizeRadius = new JCheckBox("Normalize solar radius (needs restart)", Boolean.parseBoolean(Settings.getProperty("display.normalize")));
         row2.add(normalizeRadius);
 
+        JPanel row3 = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        JButton clearCache = new JButton("Clear");
+        clearCache.addActionListener(e -> {
+            JPIPCacheManager.clear();
+            setVisible(false);
+        });
+        row3.add(labelCache);
+        row3.add(clearCache);
+
         JPanel paramsPanel = new JPanel(new GridLayout(0, 1));
         paramsPanel.add(row1);
         paramsPanel.add(row2);
+        paramsPanel.add(row3);
 
         return paramsPanel;
     }

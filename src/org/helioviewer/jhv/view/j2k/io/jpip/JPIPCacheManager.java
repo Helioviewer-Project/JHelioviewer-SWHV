@@ -21,31 +21,21 @@ import org.ehcache.config.units.MemoryUnit;
 
 public class JPIPCacheManager {
 
-    private static Cache<Long, JPIPStream> streamCache;
+    private static final File levelCacheDir = new File(JHVDirectory.CACHE.getFile(), "JPIPLevel-2");
+    private static final File streamCacheDir = new File(JHVDirectory.CACHE.getFile(), "JPIPStream-2");
+
+    private static PersistentCacheManager levelManager;
+    private static PersistentCacheManager streamManager;
     private static Cache<Long, Integer> levelCache;
+    private static Cache<Long, JPIPStream> streamCache;
+    private static Thread hook;
 
     public static void init() {
-        String[] oldDirs = {"JPIPStream", "JPIPLevel"};
-        for (String dir : oldDirs) { // delete old versions
-            try {
-                FileUtils.deleteDir(new File(JHVDirectory.CACHE.getFile(), dir));
-            } catch (Exception ignore) {
-            }
-        }
-
-        File streamCacheDir = new File(JHVDirectory.CACHE.getFile(), "JPIPStream-2");
-        File levelCacheDir = new File(JHVDirectory.CACHE.getFile(), "JPIPLevel-2");
+        deleteDirs("JPIPLevel", "JPIPStream");// delete old versions
 
         ExpiryPolicy<Object, Object> expiryPolicy = ExpiryPolicyBuilder.timeToIdleExpiration(Duration.ofDays(7));
-        PersistentCacheManager streamManager = CacheManagerBuilder.newCacheManagerBuilder()
-                .with(CacheManagerBuilder.persistence(streamCacheDir))
-                .withCache("JPIPStream", CacheConfigurationBuilder
-                        .newCacheConfigurationBuilder(Long.class, JPIPStream.class,
-                                ResourcePoolsBuilder.newResourcePoolsBuilder()
-                                        .disk(8, MemoryUnit.GB, true))
-                        .withExpiry(expiryPolicy))
-                .build(true);
-        PersistentCacheManager levelManager = CacheManagerBuilder.newCacheManagerBuilder()
+
+        levelManager = CacheManagerBuilder.newCacheManagerBuilder()
                 .with(CacheManagerBuilder.persistence(levelCacheDir))
                 .withCache("JPIPLevel", CacheConfigurationBuilder
                         .newCacheConfigurationBuilder(Long.class, Integer.class,
@@ -54,13 +44,17 @@ public class JPIPCacheManager {
                                         .disk(10, MemoryUnit.MB, true))
                         .withExpiry(expiryPolicy))
                 .build(true);
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                streamManager.close();
-                levelManager.close();
-            } catch (Exception ignore) {
-            }
-        }));
+        streamManager = CacheManagerBuilder.newCacheManagerBuilder()
+                .with(CacheManagerBuilder.persistence(streamCacheDir))
+                .withCache("JPIPStream", CacheConfigurationBuilder
+                        .newCacheConfigurationBuilder(Long.class, JPIPStream.class,
+                                ResourcePoolsBuilder.newResourcePoolsBuilder()
+                                        .disk(8, MemoryUnit.GB, true))
+                        .withExpiry(expiryPolicy))
+                .build(true);
+
+        hook = new Thread(JPIPCacheManager::close);
+        Runtime.getRuntime().addShutdownHook(hook);
 
         streamCache = streamManager.getCache("JPIPStream", Long.class, JPIPStream.class);
         levelCache = levelManager.getCache("JPIPLevel", Long.class, Integer.class);
@@ -90,6 +84,47 @@ public class JPIPCacheManager {
                 e.printStackTrace();
             }
         }
+    }
+
+    private static void deleteDirs(String... dirs) {
+        for (String dir : dirs) { // delete old versions
+            try {
+                FileUtils.deleteDir(new File(JHVDirectory.CACHE.getFile(), dir));
+            } catch (Exception ignore) {
+            }
+        }
+    }
+
+    private static void close() {
+        try {
+            streamManager.close();
+            levelManager.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void clear() {
+        Runtime.getRuntime().removeShutdownHook(hook);
+        close();
+        try {
+            levelManager.destroy();
+            streamManager.destroy();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        init();
+    }
+
+    public static long getSize() {
+        long size = 0;
+        try {
+            size += FileUtils.diskUsage(levelCacheDir);
+            size += FileUtils.diskUsage(streamCacheDir);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return size;
     }
 
 }
