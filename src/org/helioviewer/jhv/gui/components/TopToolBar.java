@@ -28,6 +28,7 @@ import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.jhv.gui.actions.ZoomInAction;
 import org.helioviewer.jhv.gui.actions.ZoomOneToOneAction;
 import org.helioviewer.jhv.gui.actions.ZoomOutAction;
+import org.helioviewer.jhv.io.SampClient;
 import org.helioviewer.jhv.layers.ImageLayers;
 
 import com.jidesoft.swing.JideButton;
@@ -60,6 +61,7 @@ public class TopToolBar extends JToolBar {
         }
     }
 
+    private final ButtonText SAMP = new ButtonText(Buttons.samp, "SAMP", "Send SAMP message");
     private final ButtonText CUTOUT = new ButtonText(Buttons.cutOut, "SDO Cut-out", "SDO cut-out service");
     private final ButtonText PROJECTION = new ButtonText(Buttons.projection, "Projection", "Projection");
     private final ButtonText OFFDISK = new ButtonText(Buttons.offDisk, "Corona", "Toggle off-disk corona");
@@ -279,6 +281,10 @@ public class TopToolBar extends JToolBar {
         addButton(cutOut);
 
         add(new JToolBar.Separator(dim));
+
+        JideButton samp = toolButton(SAMP);
+        samp.addActionListener(e -> SampClient.notifyRequestData());
+        //addButton(samp);
 
         for (Map.Entry<ButtonText, ActionListener> entry : pluginButtons.entrySet()) {
             JideButton b = toolButton(entry.getKey());

@@ -17,6 +17,7 @@ import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ProxySettings;
+import org.helioviewer.jhv.io.SampClient;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.log.Log;
@@ -25,7 +26,6 @@ import org.helioviewer.jhv.metadata.AIAResponse;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
-import org.helioviewer.jhv.plugins.samp.SampPlugin;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.view.j2k.kakadu.KakaduMessageSystem;
@@ -115,7 +115,6 @@ public class JHelioviewer {
                     PluginManager.getSingletonInstance().addPlugin(new EVEPlugin());
                     PluginManager.getSingletonInstance().addPlugin(new SWEKPlugin());
                     PluginManager.getSingletonInstance().addPlugin(new PfssPlugin());
-                    PluginManager.getSingletonInstance().addPlugin(new SampPlugin());
                 }
             } catch (Exception e) {
                 Log.error("Plugin load error", e);
@@ -140,6 +139,7 @@ public class JHelioviewer {
 
             DataSources.loadSources();
             CommandLine.load();
+            SampClient.init();
 
             new JHVUpdate(false).check();
         });
