@@ -6,13 +6,10 @@ public class SortedInterval implements Comparable<SortedInterval> {
 
     public long start;
     public long end;
-    private final int id;
-    private static int id_gen = Integer.MIN_VALUE;
 
     public SortedInterval(long _start, long _end) {
         start = _start;
         end = _end;
-        id = id_gen++;
     }
 
     @Override
@@ -23,8 +20,7 @@ public class SortedInterval implements Comparable<SortedInterval> {
     @Override
     public int hashCode() {
         int result = (int) (start ^ (start >>> 32));
-        result = 31 * result + (int) (end ^ (end >>> 32));
-        return 31 * result + id;
+        return 31 * result + (int) (end ^ (end >>> 32));
     }
 
     @Override
@@ -35,10 +31,7 @@ public class SortedInterval implements Comparable<SortedInterval> {
         if (start == o2.start && end < o2.end) {
             return -1;
         }
-        if (start == o2.start && end == o2.end && o2.id < id) {
-            return -1;
-        }
-        if (start == o2.start && end == o2.end && o2.id == id) {
+        if (start == o2.start && end == o2.end) {
             return 0;
         }
         return 1;
