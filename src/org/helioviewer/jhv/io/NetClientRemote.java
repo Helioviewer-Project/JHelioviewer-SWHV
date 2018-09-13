@@ -25,6 +25,10 @@ import okio.BufferedSource;
 
 class NetClientRemote implements NetClient {
 
+//    static {
+//        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
+//    }
+
     private static final int cacheSize = 512 * 1024 * 1024;
     private static final CacheControl noStore = new CacheControl.Builder().noStore().build();
     private static final OkHttpClient client = new OkHttpClient.Builder()
