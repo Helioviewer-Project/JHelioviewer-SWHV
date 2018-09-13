@@ -68,6 +68,7 @@ public class Buttons {
         return "<html><center><font face='Material Design Icons' size=5>" + uc2ent(uc) + "</font>";
     }
 
+    public static final String samp = toolBar(MaterialDesign.MDI_SHARE_VARIANT);
     public static final String cutOut = toolBar(MaterialDesign.MDI_VECTOR_CIRCLE_VARIANT);
     public static final String projection = toolBar(MaterialDesign.MDI_CUBE_OUTLINE);
     public static final String offDisk = toolBar(MaterialDesign.MDI_WEATHER_SUNNY);

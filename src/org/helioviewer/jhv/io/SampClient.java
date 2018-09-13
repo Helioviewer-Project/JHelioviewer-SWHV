@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.samp;
+package org.helioviewer.jhv.io;
 
 import java.awt.EventQueue;
 import java.io.IOException;
@@ -13,19 +13,23 @@ import org.astrogrid.samp.Message;
 import org.astrogrid.samp.Metadata;
 import org.astrogrid.samp.client.AbstractMessageHandler;
 import org.astrogrid.samp.client.ClientProfile;
+import org.astrogrid.samp.client.DefaultClientProfile;
 import org.astrogrid.samp.client.HubConnection;
 import org.astrogrid.samp.client.HubConnector;
 import org.astrogrid.samp.hub.Hub;
 import org.astrogrid.samp.hub.HubServiceMode;
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.layers.ImageLayers;
 
-class SampClient extends HubConnector {
+public class SampClient extends HubConnector {
 
     private static final String MTYPE_VIEW_DATA = "jhv.vso.load";
+    private static final SampClient instance = new SampClient(DefaultClientProfile.getProfile());
 
-    SampClient(ClientProfile _profile) {
+    public static void init() {
+    }
+
+    private SampClient(ClientProfile _profile) {
         super(_profile);
 
         Hub[] runningHubs = Hub.getRunningHubs();
@@ -138,11 +142,11 @@ class SampClient extends HubConnector {
         setAutoconnect(10);
     }
 
-    void notifyRequestData() {
+    public static void notifyRequestData() {
         Message msg = new Message(MTYPE_VIEW_DATA);
         ImageLayers.getSAMPMessage(msg);
         try {
-            HubConnection c = getConnection();
+            HubConnection c = instance.getConnection();
             if (c != null)
                 c.notifyAll(msg);
         } catch (Exception e) {
