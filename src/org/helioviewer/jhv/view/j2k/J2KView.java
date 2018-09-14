@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 
 import kdu_jni.KduException;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
@@ -33,6 +32,8 @@ import org.helioviewer.jhv.view.j2k.kakadu.KakaduSource;
 
 // This class is responsible for reading and decoding of JPEG2000 images
 public class J2KView extends AbstractView {
+
+    private static final int HIRES_CUTOFF = 1280;
 
     private int targetFrame = 0;
     private int trueFrame = 0;
@@ -325,7 +326,7 @@ public class J2KView extends AbstractView {
             subImage = new SubImage(0, 0, res.width, res.height, res.width, res.height);
 
             int maxDim = Math.max(res.width, res.height);
-            if (maxDim > JHVGlobals.hiDpiCutoff && Movie.isPlaying()) {
+            if (maxDim > HIRES_CUTOFF && Movie.isPlaying()) {
                 factor = Math.min(factor, 0.5);
             }
         }

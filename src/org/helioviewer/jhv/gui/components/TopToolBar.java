@@ -43,13 +43,13 @@ public class TopToolBar extends JToolBar {
         ICONANDTEXT, ICONONLY
     }
 
-    public static class ButtonText {
+    static class ButtonText {
 
         private final String icon;
         private final String text;
         final String tip;
 
-        public ButtonText(String _icon, String _text, String _tip) {
+        ButtonText(String _icon, String _text, String _tip) {
             icon = _icon;
             text = _text;
             tip = _tip;

@@ -22,7 +22,7 @@ class PluginsList extends JPanel {
     PluginsList() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        for (PluginContainer plugin : PluginManager.getSingletonInstance().getPlugins())
+        for (PluginContainer plugin : PluginManager.getPlugins())
             pluginsMap.put(plugin.getName(), new PluginsListEntry(plugin, this));
 
         boolean first = true;
@@ -39,8 +39,7 @@ class PluginsList extends JPanel {
     }
 
     void selectItem(String name) {
-        // deselect all
-        for (PluginsListEntry entry : pluginsMap.values()) {
+        for (PluginsListEntry entry : pluginsMap.values()) { // deselect all
             entry.setForeground(foregroundColor);
             entry.setBackground(backgroundColor);
         }

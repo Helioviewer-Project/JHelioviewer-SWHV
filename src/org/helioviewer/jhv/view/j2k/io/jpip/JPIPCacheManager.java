@@ -99,8 +99,8 @@ public class JPIPCacheManager {
 
     private static void close() {
         try {
-            streamManager.close();
             levelManager.close();
+            streamManager.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

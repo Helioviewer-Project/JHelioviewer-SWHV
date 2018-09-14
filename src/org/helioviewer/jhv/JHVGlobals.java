@@ -38,8 +38,6 @@ public class JHVGlobals {
 
     public static final AlphanumComparator alphanumComparator = new AlphanumComparator(true);
 
-    public static final int hiDpiCutoff = 1024;
-
     private static final ExecutorService executorService = JHVExecutor.createJHVWorkersExecutorService("MAIN", 10);
     private static final ScheduledExecutorService reaperService = JHVExecutor.createReaperService();
 
@@ -136,14 +134,12 @@ public class JHVGlobals {
     public static final HyperOpenURL hyperOpenURL = new HyperOpenURL();
 
     private static class HyperOpenURL implements HyperlinkListener {
-
         @Override
         public void hyperlinkUpdate(HyperlinkEvent e) {
             if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                 openURL(e.getURL().toString());
             }
         }
-
     }
 
     public static void openURL(String url) {

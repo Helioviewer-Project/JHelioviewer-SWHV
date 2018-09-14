@@ -64,7 +64,7 @@ public class State {
 
         saveTimelineState(main);
         JSONObject plugins = new JSONObject();
-        PluginManager.getSingletonInstance().saveState(plugins);
+        PluginManager.saveState(plugins);
         main.put("plugins", plugins);
 
         return new JSONObject().put("org.helioviewer.jhv.state", main);
@@ -199,7 +199,7 @@ public class State {
             loadLayers(jo);
             JSONObject plugins = jo.optJSONObject("plugins");
             if (plugins != null)
-                PluginManager.getSingletonInstance().loadState(plugins);
+                PluginManager.loadState(plugins);
         } catch (Exception e) {
             e.printStackTrace();
         }

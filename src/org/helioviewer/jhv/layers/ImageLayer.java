@@ -174,7 +174,6 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         if (!isVisible[vp.idx])
             return;
 
-        GridScale scale = Display.mode.scale;
         GLSLSolarShader shader = Display.mode.shader;
         shader.use(gl);
 
@@ -192,6 +191,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
             shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, prevImageData.getMetaData().getCenterRotation()));
         }
 
+        GridScale scale = Display.mode.scale;
         shader.bindPolarRadii(gl, scale.getYstart(), scale.getYstop());
 
         GLListener.glslSolar.render(gl);
