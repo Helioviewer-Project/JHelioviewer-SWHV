@@ -30,7 +30,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCacheManager;
@@ -49,7 +49,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
     private DefaultsSelectionPanel defaultsPanel;
 
     public PreferencesDialog() {
-        super(ImageViewerGui.getMainFrame(), "Preferences", true);
+        super(JHVFrame.getFrame(), "Preferences", true);
         setResizable(false);
     }
 
@@ -104,7 +104,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
     public void showDialog() {
         labelCache.setText(String.format("The image cache currently uses %.1fGB on disk.", JPIPCacheManager.getSize() / (1024 * 1024 * 1024.)));
         pack();
-        setLocationRelativeTo(ImageViewerGui.getMainFrame());
+        setLocationRelativeTo(JHVFrame.getFrame());
         setVisible(true);
     }
 

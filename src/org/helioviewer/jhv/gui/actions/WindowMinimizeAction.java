@@ -7,7 +7,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.input.KeyShortcuts;
 
@@ -24,9 +24,9 @@ public class WindowMinimizeAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        int state = ImageViewerGui.getMainFrame().getExtendedState();
+        int state = JHVFrame.getFrame().getExtendedState();
         state ^= JFrame.ICONIFIED;
-        ImageViewerGui.getMainFrame().setExtendedState(state);
+        JHVFrame.getFrame().setExtendedState(state);
     }
 
 }

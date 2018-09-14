@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
@@ -43,11 +43,11 @@ public class State {
         JSONObject main = new JSONObject();
         main.put("time", Movie.getTime());
         main.put("play", Movie.isPlaying());
-        main.put("multiview", ImageViewerGui.getToolBar().getMultiviewButton().isSelected());
+        main.put("multiview", JHVFrame.getToolBar().getMultiviewButton().isSelected());
         main.put("projection", Display.mode);
-        main.put("tracking", ImageViewerGui.getToolBar().getTrackingButton().isSelected());
-        main.put("showCorona", ImageViewerGui.getToolBar().getShowCoronaButton().isSelected());
-        main.put("annotations", ImageViewerGui.getAnnotateInteraction().toJson());
+        main.put("tracking", JHVFrame.getToolBar().getTrackingButton().isSelected());
+        main.put("showCorona", JHVFrame.getToolBar().getShowCoronaButton().isSelected());
+        main.put("annotations", JHVFrame.getAnnotateInteraction().toJson());
 
         JSONArray ja = new JSONArray();
         for (Layer layer : Layers.getLayers()) {
@@ -146,7 +146,7 @@ public class State {
                     Object obj = json2Object(jo);
                     if (obj instanceof Layer) {
                         Layer layer = (Layer) obj;
-                        ImageViewerGui.getLayers().add(layer);
+                        JHVFrame.getLayers().add(layer);
                         layer.setEnabled(jo.optBoolean("enabled", false));
                     }
                 } catch (Exception e) { // don't stop for a broken one
@@ -177,12 +177,12 @@ public class State {
             }
         }
 
-        ImageViewerGui.getAnnotateInteraction().fromJson(data.optJSONObject("annotations"));
-        ImageViewerGui.getToolBar().getMultiviewButton().setSelected(data.optBoolean("multiview", ImageViewerGui.getToolBar().getMultiviewButton().isSelected()));
-        ImageViewerGui.getToolBar().getShowCoronaButton().setSelected(data.optBoolean("showCorona", ImageViewerGui.getToolBar().getShowCoronaButton().isSelected()));
+        JHVFrame.getAnnotateInteraction().fromJson(data.optJSONObject("annotations"));
+        JHVFrame.getToolBar().getMultiviewButton().setSelected(data.optBoolean("multiview", JHVFrame.getToolBar().getMultiviewButton().isSelected()));
+        JHVFrame.getToolBar().getShowCoronaButton().setSelected(data.optBoolean("showCorona", JHVFrame.getToolBar().getShowCoronaButton().isSelected()));
 
         JHVDate time = new JHVDate(TimeUtils.optParse(data.optString("time"), Movie.getTime().milli));
-        boolean tracking = data.optBoolean("tracking", ImageViewerGui.getToolBar().getTrackingButton().isSelected());
+        boolean tracking = data.optBoolean("tracking", JHVFrame.getToolBar().getTrackingButton().isSelected());
         boolean play = data.optBoolean("play", false);
         LoadState loadStateTask = new LoadState(newlist, masterLayer, time, tracking, play);
         JHVGlobals.getExecutorService().execute(loadStateTask);
@@ -245,7 +245,7 @@ public class State {
             if (masterLayer != null)
                 Layers.setActiveImageLayer(masterLayer);
             Movie.setTime(time);
-            ImageViewerGui.getToolBar().getTrackingButton().setSelected(tracking);
+            JHVFrame.getToolBar().getTrackingButton().setSelected(tracking);
             if (play)
                 Movie.play();
         }

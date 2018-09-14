@@ -16,7 +16,7 @@ import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.threads.JHVWorker;
 
 /**
@@ -42,7 +42,7 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
     private final DataCollapsiblePanelModel model;
 
     public SWEKEventInformationDialog(JHVRelatedEvents revent, JHVEvent _event) {
-        super(ImageViewerGui.getMainFrame(), revent.getSupplier().getGroup().getName());
+        super(JHVFrame.getFrame(), revent.getSupplier().getGroup().getName());
         event = _event;
 
         rEvent = revent;

@@ -10,7 +10,7 @@ import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ExtensionFileFilter;
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.io.Load;
@@ -28,7 +28,7 @@ public class OpenLocalFileAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        FileDialog fileDialog = new FileDialog(ImageViewerGui.getMainFrame(), "Choose a file", FileDialog.LOAD);
+        FileDialog fileDialog = new FileDialog(JHVFrame.getFrame(), "Choose a file", FileDialog.LOAD);
         // does not work on Windows
         fileDialog.setFilenameFilter(ExtensionFileFilter.Image);
         fileDialog.setMultipleMode(true);

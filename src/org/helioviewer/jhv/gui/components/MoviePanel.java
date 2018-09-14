@@ -33,7 +33,7 @@ import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
@@ -370,7 +370,7 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
         addLayerPanel.add(syncButton, BorderLayout.EAST);
         add(addLayerPanel);
 
-        add(ImageViewerGui.getLayersPanel());
+        add(JHVFrame.getLayersPanel());
 
         setEnabledState(false);
         ComponentUtils.smallVariant(this);

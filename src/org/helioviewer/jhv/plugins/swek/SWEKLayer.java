@@ -31,7 +31,7 @@ import org.helioviewer.jhv.events.JHVPositionInformation;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.TimespanListener;
@@ -52,7 +52,7 @@ import com.jogamp.opengl.GL2;
 // has to be public for state
 public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEventHandler {
 
-    private final SWEKPopupController controller = new SWEKPopupController(ImageViewerGui.getGLComponent());
+    private final SWEKPopupController controller = new SWEKPopupController(JHVFrame.getGLComponent());
     private final JPanel optionsPanel;
 
     private static final int DIVPOINTS = 10;
@@ -454,9 +454,9 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
             Movie.addTimeListener(controller);
             controller.timeChanged(Movie.getTime().milli);
-            ImageViewerGui.getInputController().addPlugin(controller);
+            JHVFrame.getInputController().addPlugin(controller);
         } else {
-            ImageViewerGui.getInputController().removePlugin(controller);
+            JHVFrame.getInputController().removePlugin(controller);
             Movie.removeTimeListener(controller);
             Movie.removeTimespanListener(this);
         }

@@ -14,7 +14,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec3;
@@ -186,11 +186,11 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         super.setEnabled(_enabled);
 
         if (enabled) {
-            ImageViewerGui.getInputController().addPlugin(this);
+            JHVFrame.getInputController().addPlugin(this);
             optionsPanel.activate();
             optionsPanel.syncViewpoint();
         } else {
-            ImageViewerGui.getInputController().removePlugin(this);
+            JHVFrame.getInputController().removePlugin(this);
             optionsPanel.deactivate();
             Display.getCamera().setViewpointUpdate(UpdateViewpoint.observer);
         }
@@ -199,7 +199,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     @Override
     public void remove(GL2 gl) {
         dispose(gl);
-        ImageViewerGui.getInputController().removePlugin(this);
+        JHVFrame.getInputController().removePlugin(this);
         optionsPanel.deactivate();
     }
 
@@ -221,8 +221,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
     public void fireTimeUpdated(JHVDate time) {
         timeString = time.toString();
-        ImageViewerGui.getCarringtonStatusPanel().update(time);
-        ImageViewerGui.getLayers().fireTimeUpdated(this);
+        JHVFrame.getCarringtonStatusPanel().update(time);
+        JHVFrame.getLayers().fireTimeUpdated(this);
     }
 
     @Override

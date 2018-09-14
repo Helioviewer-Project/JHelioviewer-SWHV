@@ -5,7 +5,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.dialogs.CloseButtonPanel;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
@@ -16,7 +16,7 @@ import com.jidesoft.dialog.StandardDialog;
 public class PluginsDialog extends StandardDialog implements ShowableDialog {
 
     public PluginsDialog() {
-        super(ImageViewerGui.getMainFrame(), "Plug-in Manager", true);
+        super(JHVFrame.getFrame(), "Plug-in Manager", true);
         setResizable(false);
     }
 
@@ -41,7 +41,7 @@ public class PluginsDialog extends StandardDialog implements ShowableDialog {
     @Override
     public void showDialog() {
         pack();
-        setLocationRelativeTo(ImageViewerGui.getMainFrame());
+        setLocationRelativeTo(JHVFrame.getFrame());
         setVisible(true);
     }
 

@@ -5,7 +5,7 @@ import java.util.HashSet;
 import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
@@ -16,42 +16,42 @@ public class InputController implements MouseListener, KeyListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        ImageViewerGui.getCurrentInteraction().mouseClicked(e);
+        JHVFrame.getCurrentInteraction().mouseClicked(e);
         for (MouseListener listener : mouseListeners)
             listener.mouseClicked(e);
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        ImageViewerGui.getCurrentInteraction().mouseEntered(e);
+        JHVFrame.getCurrentInteraction().mouseEntered(e);
         for (MouseListener listener : mouseListeners)
             listener.mouseEntered(e);
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-        ImageViewerGui.getCurrentInteraction().mouseExited(e);
+        JHVFrame.getCurrentInteraction().mouseExited(e);
         for (MouseListener listener : mouseListeners)
             listener.mouseExited(e);
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        ImageViewerGui.getCurrentInteraction().mousePressed(e);
+        JHVFrame.getCurrentInteraction().mousePressed(e);
         for (MouseListener listener : mouseListeners)
             listener.mousePressed(e);
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        ImageViewerGui.getCurrentInteraction().mouseReleased(e);
+        JHVFrame.getCurrentInteraction().mouseReleased(e);
         for (MouseListener listener : mouseListeners)
             listener.mouseReleased(e);
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        ImageViewerGui.getCurrentInteraction().mouseDragged(e);
+        JHVFrame.getCurrentInteraction().mouseDragged(e);
         for (MouseListener listener : mouseListeners)
             listener.mouseDragged(e);
     }
@@ -60,21 +60,21 @@ public class InputController implements MouseListener, KeyListener {
     public void mouseMoved(MouseEvent e) {
         Display.setActiveViewport(e.getX(), e.getY());
 
-        ImageViewerGui.getCurrentInteraction().mouseMoved(e);
+        JHVFrame.getCurrentInteraction().mouseMoved(e);
         for (MouseListener listener : mouseListeners)
             listener.mouseMoved(e);
     }
 
     @Override
     public void mouseWheelMoved(MouseEvent e) {
-        ImageViewerGui.getCurrentInteraction().mouseWheelMoved(e);
+        JHVFrame.getCurrentInteraction().mouseWheelMoved(e);
         for (MouseListener listener : mouseListeners)
             listener.mouseWheelMoved(e);
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        ImageViewerGui.getCurrentInteraction().keyPressed(e);
+        JHVFrame.getCurrentInteraction().keyPressed(e);
         for (KeyListener listener : keyListeners)
             listener.keyPressed(e);
     }
@@ -100,7 +100,7 @@ public class InputController implements MouseListener, KeyListener {
         if (KeyShortcuts.handleKeyStroke(keyStroke, e.getSource(), java.awt.event.KeyEvent.KEY_PRESSED))
             return;
 
-        ImageViewerGui.getCurrentInteraction().keyReleased(e);
+        JHVFrame.getCurrentInteraction().keyReleased(e);
         for (KeyListener listener : keyListeners)
             listener.keyReleased(e);
     }

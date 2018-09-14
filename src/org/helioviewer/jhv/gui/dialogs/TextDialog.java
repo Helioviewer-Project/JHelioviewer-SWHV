@@ -7,7 +7,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
 import com.jidesoft.dialog.ButtonPanel;
@@ -19,7 +19,7 @@ public class TextDialog extends StandardDialog implements ShowableDialog {
     private final String text;
 
     public TextDialog(String title, String _text, boolean resizable) {
-        super(ImageViewerGui.getMainFrame(), title, true);
+        super(JHVFrame.getFrame(), title, true);
         setResizable(resizable);
         text = _text.replace("\n", "<br/>");
     }
@@ -51,7 +51,7 @@ public class TextDialog extends StandardDialog implements ShowableDialog {
     @Override
     public void showDialog() {
         pack();
-        setLocationRelativeTo(ImageViewerGui.getMainFrame());
+        setLocationRelativeTo(JHVFrame.getFrame());
         setVisible(true);
     }
 

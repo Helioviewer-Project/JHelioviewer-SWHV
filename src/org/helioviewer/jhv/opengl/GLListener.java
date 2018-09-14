@@ -8,7 +8,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.export.ExportMovie;
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MiniviewLayer;
@@ -65,7 +65,7 @@ public class GLListener implements GLEventListener {
 
         blackCircle.init(gl);
         GLHelper.initCircleFront(gl, blackCircle, 0, 0, 0.9998, 180, Colors.Black);
-        ImageViewerGui.getAnnotateInteraction().init(gl);
+        JHVFrame.getAnnotateInteraction().init(gl);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class GLListener implements GLEventListener {
 
     private static void disposeImpl(GL2 gl) {
         Layers.dispose(gl);
-        ImageViewerGui.getAnnotateInteraction().dispose(gl);
+        JHVFrame.getAnnotateInteraction().dispose(gl);
         blackCircle.dispose(gl);
         GLText.dispose(gl);
 
@@ -120,7 +120,7 @@ public class GLListener implements GLEventListener {
                 camera.projectionOrtho(vp.aspect, gl, blackCircle);
 
                 Layers.render(camera, vp, gl);
-                ImageViewerGui.getAnnotateInteraction().drawAnnotations(vp, gl);
+                JHVFrame.getAnnotateInteraction().drawAnnotations(vp, gl);
                 Layers.renderFloat(camera, vp, gl);
             }
         }
@@ -140,7 +140,7 @@ public class GLListener implements GLEventListener {
                 camera.projectionOrtho2D(vp.aspect);
 
                 Layers.renderScale(camera, vp, gl);
-                ImageViewerGui.getAnnotateInteraction().drawAnnotations(vp, gl);
+                JHVFrame.getAnnotateInteraction().drawAnnotations(vp, gl);
                 Layers.renderFloat(camera, vp, gl);
             }
         }
@@ -195,7 +195,7 @@ public class GLListener implements GLEventListener {
             renderSceneScale(camera, gl);
         renderFullFloatScene(camera, gl);
 
-        ImageViewerGui.getZoomStatusPanel().update(camera.getWidth(), camera.getViewpoint().distance);
+        JHVFrame.getZoomStatusPanel().update(camera.getWidth(), camera.getViewpoint().distance);
         // GLInfo.checkGLErrors(gl, "GLListener.display()");
     }
 

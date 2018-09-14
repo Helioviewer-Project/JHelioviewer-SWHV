@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.TimespanListener;
@@ -148,7 +148,7 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
             glslLine.setData(gl, lineBuf);
 
             timeString = data.dateObs.toString();
-            ImageViewerGui.getLayers().fireTimeUpdated(this);
+            JHVFrame.getLayers().fireTimeUpdated(this);
         }
         glslLine.render(gl, vp.aspect, LINEWIDTH);
     }
