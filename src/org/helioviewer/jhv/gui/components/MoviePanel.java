@@ -501,9 +501,9 @@ public class MoviePanel extends JPanel implements ObservationSelector {
     }
 
     public static void setFrameSlider(int frame) {
-        timeSlider.setValueIsAdjusting(true);
+        timeSlider.setAllowFrame(false);
         timeSlider.setValue(frame);
-        timeSlider.setValueIsAdjusting(false);
+        timeSlider.setAllowFrame(true);
     }
 
     // only for Layers
