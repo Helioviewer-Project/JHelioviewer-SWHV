@@ -53,7 +53,6 @@ import java.awt.geom.Rectangle2D;
 import java.text.CharacterIterator;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -456,8 +455,7 @@ public class JhvTextRenderer {
     }
 
     void clearUnusedEntries() {
-        List<Rect> deadRects = new ArrayList<>();
-
+        ArrayList<Rect> deadRects = new ArrayList<>();
         // Iterate through the contents of the backing store, removing
         // text strings that haven't been used recently
         packer.visit(rect -> {
@@ -476,7 +474,6 @@ public class JhvTextRenderer {
                 glyphProducer.clearCacheEntry(unicodeToClearFromCache);
             }
         }
-
         // If we removed dead rectangles this cycle, try to do a compaction
         if (!deadRects.isEmpty() && packer.verticalFragmentationRatio() > MAX_VERTICAL_FRAGMENTATION) {
             packer.compact();
@@ -949,7 +946,6 @@ public class JhvTextRenderer {
 
     class GlyphProducer {
         static final int undefined = -2;
-        final List<Glyph> glyphsOutput = new ArrayList<>();
         final HashMap<String, GlyphVector> fullGlyphVectorCache = new HashMap<>();
         final HashMap<Character, GlyphMetrics> glyphMetricsCache = new HashMap<>();
         // The mapping from unicode character to font-specific glyph ID
@@ -965,10 +961,8 @@ public class JhvTextRenderer {
             clearAllCacheEntries();
         }
 
-        List<Glyph> getGlyphs(CharSequence inString) {
-            glyphsOutput.clear();
-            GlyphVector fullRunGlyphVector;
-            fullRunGlyphVector = fullGlyphVectorCache.get(inString.toString());
+        Glyph[] getGlyphs(CharSequence inString) {
+            GlyphVector fullRunGlyphVector = fullGlyphVectorCache.get(inString.toString());
             if (fullRunGlyphVector == null) {
                 iter.initFromCharSequence(inString);
                 fullRunGlyphVector = font.createGlyphVector(getFontRenderContext(), iter);
@@ -976,17 +970,22 @@ public class JhvTextRenderer {
             }
 
             int lengthInGlyphs = fullRunGlyphVector.getNumGlyphs();
+            System.out.println(">>> " + lengthInGlyphs);
+            Glyph[] glyphsOutput = new Glyph[lengthInGlyphs];
             int i = 0;
-            while (i < lengthInGlyphs) {
-                Character letter = CharacterCache.valueOf(inString.charAt(i));
+            while (i < lengthInGlyphs) { // may loop forever
+                char unicodeID = inString.charAt(i);
+
+                Character letter = CharacterCache.valueOf(unicodeID);
                 GlyphMetrics metrics = glyphMetricsCache.get(letter);
                 if (metrics == null) {
                     metrics = fullRunGlyphVector.getGlyphMetrics(i);
                     glyphMetricsCache.put(letter, metrics);
                 }
-                Glyph glyph = getGlyph(inString, metrics, i);
+
+                Glyph glyph = getGlyph(unicodeID, metrics);
                 if (glyph != null) {
-                    glyphsOutput.add(glyph);
+                    glyphsOutput[i] = glyph;
                     i++;
                 }
             }
@@ -1020,8 +1019,7 @@ public class JhvTextRenderer {
         // if the unicode or glyph ID would be out of bounds of the
         // glyph cache.
         @Nullable
-        private Glyph getGlyph(CharSequence inString, GlyphMetrics glyphMetrics, int index) {
-            char unicodeID = inString.charAt(index);
+        private Glyph getGlyph(char unicodeID, GlyphMetrics glyphMetrics) {
             if (unicodeID >= unicodes2Glyphs.length) {
                 return null;
             }
