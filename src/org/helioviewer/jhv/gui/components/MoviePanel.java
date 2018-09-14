@@ -26,8 +26,6 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSpinner;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.display.Display;
@@ -54,7 +52,7 @@ import com.jidesoft.swing.JideSplitButton;
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
-public class MoviePanel extends JPanel implements ChangeListener, ObservationSelector {
+public class MoviePanel extends JPanel implements ObservationSelector {
 
     private enum ShiftUnit {
         Day(TimeUtils.DAY_IN_MILLIS), Week(7 * TimeUtils.DAY_IN_MILLIS), Rotation(Math.round(Carrington.CR_SYNODIC_MEAN * TimeUtils.DAY_IN_MILLIS));
@@ -174,10 +172,8 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
     }
 
     public static void unsetMovie() {
-        timeSlider.removeChangeListener(instance);
         timeSlider.setMaximum(0);
-        timeSlider.addChangeListener(instance);
-        // timeSlider.repaint();
+        timeSlider.repaint();
         setEnabledState(false);
 
         clickRecordButton();
@@ -185,10 +181,8 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
     }
 
     public static void setMovie(View view) {
-        timeSlider.removeChangeListener(instance);
         timeSlider.setMaximum(view.getMaximumFrameNumber());
-        timeSlider.addChangeListener(instance);
-        // timeSlider.repaint();
+        timeSlider.repaint();
         setEnabledState(true);
 
         recordButton.setEnabled(true);
@@ -212,8 +206,6 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
 
         // Time slider
         timeSlider = new TimeSlider(TimeSlider.HORIZONTAL, 0, 0, 0);
-        timeSlider.addChangeListener(this);
-
         timeSlider.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "RIGHT_ARROW");
         timeSlider.getActionMap().put("RIGHT_ARROW", getNextFrameAction());
         timeSlider.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "LEFT_ARROW");
@@ -509,16 +501,9 @@ public class MoviePanel extends JPanel implements ChangeListener, ObservationSel
     }
 
     public static void setFrameSlider(int frame) {
-        // update just UI, tbd
-        timeSlider.removeChangeListener(instance);
+        timeSlider.setValueIsAdjusting(true);
         timeSlider.setValue(frame);
-        timeSlider.addChangeListener(instance);
-    }
-
-    @Override
-    public void stateChanged(ChangeEvent e) {
-        if (!timeSlider.getValueIsAdjusting())
-            Movie.setFrame(timeSlider.getValue());
+        timeSlider.setValueIsAdjusting(false);
     }
 
     // only for Layers

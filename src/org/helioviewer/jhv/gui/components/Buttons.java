@@ -64,7 +64,7 @@ public class Buttons {
 
     // toolbar
 
-    public static String toolBar(MaterialDesign... uc) {
+    private static String toolBar(MaterialDesign... uc) {
         return "<html><center><font face='Material Design Icons' size=5>" + uc2ent(uc) + "</font>";
     }
 

@@ -74,8 +74,8 @@ public class JHVFrame {
     private static TopToolBar toolBar;
     private static MenuBar menuBar;
 
-    public static JFrame prepareGui() {
-        mainFrame = createMainFrame();
+    public static JFrame prepare() {
+        mainFrame = createFrame();
         menuBar = new MenuBar();
         mainFrame.setJMenuBar(menuBar);
 
@@ -138,7 +138,7 @@ public class JHVFrame {
         return mainFrame;
     }
 
-    private static JFrame createMainFrame() {
+    private static JFrame createFrame() {
         JFrame frame = new JFrame(JHVGlobals.programName);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter() {

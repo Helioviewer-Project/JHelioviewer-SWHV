@@ -315,7 +315,7 @@ public class TopToolBar extends JToolBar {
         revalidate();
         repaint();
     }
-
+/*
     public void addPluginButton(ButtonText text, ActionListener a) {
         pluginButtons.put(text, a);
         recreate();
@@ -325,7 +325,7 @@ public class TopToolBar extends JToolBar {
         pluginButtons.remove(text);
         recreate();
     }
-
+*/
     private void maybeShowPopup(MouseEvent me) {
         if (me.isPopupTrigger() || me.getButton() == MouseEvent.BUTTON3) {
             JPopupMenu popUpMenu = new JPopupMenu();
