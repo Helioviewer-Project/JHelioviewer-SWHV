@@ -18,7 +18,7 @@ import javax.swing.table.TableRowSorter;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.XMLUtils;
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.base.WrappedTable;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -46,7 +46,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
     private final JTextArea hvArea = new JTextArea();
 
     public MetaDataDialog() {
-        super(ImageViewerGui.getMainFrame(), "Image Information");
+        super(JHVFrame.getFrame(), "Image Information");
 
         setInitFocusedComponent(fitsTable);
         SearchableUtils.installSearchable(fitsTable);
@@ -97,7 +97,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
     public void showDialog() {
         pack();
         content.setDividerLocation(1, 600);
-        setLocationRelativeTo(ImageViewerGui.getMainFrame());
+        setLocationRelativeTo(JHVFrame.getFrame());
         setVisible(true);
     }
 

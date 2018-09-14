@@ -4,7 +4,7 @@ import java.util.concurrent.ExecutorService;
 
 import javax.swing.JMenuItem;
 
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.plugins.eve.lines.EVEDataProvider;
 import org.helioviewer.jhv.threads.JHVExecutor;
@@ -28,15 +28,15 @@ public class EVEPlugin implements Plugin {
     public void installPlugin() {
         tl.installTimelines();
         executorService.execute(new BandTypeTask());
-        ImageViewerGui.getMenuBar().getMenu(0).add(newItem, 1);
-        ImageViewerGui.getMenuBar().getMenu(0).add(openItem, 3);
+        JHVFrame.getMenuBar().getMenu(0).add(newItem, 1);
+        JHVFrame.getMenuBar().getMenu(0).add(openItem, 3);
     }
 
     @Override
     public void uninstallPlugin() {
         tl.uninstallTimelines();
-        ImageViewerGui.getMenuBar().getMenu(0).remove(newItem);
-        ImageViewerGui.getMenuBar().getMenu(0).remove(openItem);
+        JHVFrame.getMenuBar().getMenu(0).remove(newItem);
+        JHVFrame.getMenuBar().getMenu(0).remove(openItem);
     }
 
     @Override

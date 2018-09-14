@@ -44,7 +44,7 @@ import org.helioviewer.jhv.opengl.GLListener;
 import com.jogamp.newt.awt.NewtCanvasAWT;
 import com.jogamp.newt.opengl.GLWindow;
 
-public class ImageViewerGui {
+public class JHVFrame {
 
     private static JFrame mainFrame;
     private static JScrollPane leftScrollPane;
@@ -177,7 +177,7 @@ public class ImageViewerGui {
         }
     }
 
-    public static JFrame getMainFrame() {
+    public static JFrame getFrame() {
         return mainFrame;
     }
 

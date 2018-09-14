@@ -15,7 +15,7 @@ import javax.swing.event.HyperlinkListener;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.opengl.GLInfo;
@@ -27,7 +27,7 @@ import com.jidesoft.dialog.StandardDialog;
 public class AboutDialog extends StandardDialog implements ShowableDialog, HyperlinkListener {
 
     public AboutDialog() {
-        super(ImageViewerGui.getMainFrame(), "About JHelioviewer", true);
+        super(JHVFrame.getFrame(), "About JHelioviewer", true);
         setResizable(false);
     }
 
@@ -95,7 +95,7 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
     @Override
     public void showDialog() {
         pack();
-        setLocationRelativeTo(ImageViewerGui.getMainFrame());
+        setLocationRelativeTo(JHVFrame.getFrame());
         setVisible(true);
     }
 

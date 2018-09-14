@@ -13,7 +13,7 @@ import org.helioviewer.jhv.camera.Camera;
 //import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.events.JHVEventHighlightListener;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 
@@ -191,7 +191,7 @@ public class Display implements ActionListener, JHVEventHighlightListener {
 
     public static void handleData(int serial) { // special for ImageLayer.handleData
         if (ImageLayers.getSyncedImageLayers(serial)) {
-            ImageViewerGui.getGLWindow().display(); // asap
+            JHVFrame.getGLWindow().display(); // asap
             toDisplay = false;
         }
     }
@@ -201,7 +201,7 @@ public class Display implements ActionListener, JHVEventHighlightListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (toDisplay) {
-            ImageViewerGui.getGLWindow().display(); // asap
+            JHVFrame.getGLWindow().display(); // asap
             toDisplay = false;
         }
         if (decodeFactor != -1) {

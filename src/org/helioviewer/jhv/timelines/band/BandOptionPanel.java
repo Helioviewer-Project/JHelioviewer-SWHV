@@ -19,7 +19,7 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -47,7 +47,7 @@ class BandOptionPanel extends JPanel {
         pickColor.setMargin(new Insets(0, 0, 0, 0));
         pickColor.setToolTipText("Change the color of the current line");
         pickColor.addActionListener(e -> {
-            Color newColor = JColorChooser.showDialog(ImageViewerGui.getMainFrame(), "Choose Line Color", band.getDataColor());
+            Color newColor = JColorChooser.showDialog(JHVFrame.getFrame(), "Choose Line Color", band.getDataColor());
             if (newColor != null) {
                 band.setDataColor(newColor);
             }

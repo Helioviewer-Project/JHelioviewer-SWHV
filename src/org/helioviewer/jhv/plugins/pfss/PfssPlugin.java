@@ -8,7 +8,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.plugins.pfss.data.PfssCache;
 import org.helioviewer.jhv.threads.JHVThread;
@@ -48,12 +48,12 @@ public class PfssPlugin implements Plugin {
     @Override
     public void installPlugin() {
         downloads = 0;
-        ImageViewerGui.getLayers().add(layer);
+        JHVFrame.getLayers().add(layer);
     }
 
     @Override
     public void uninstallPlugin() {
-        ImageViewerGui.getLayers().remove(layer);
+        JHVFrame.getLayers().remove(layer);
         pfssCache.clear();
     }
 

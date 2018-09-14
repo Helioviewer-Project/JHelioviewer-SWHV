@@ -9,7 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.timelines.TimelineSettings;
 
@@ -22,7 +22,7 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
     private final TimelineDataPanel observationPanel = new TimelineDataPanel();
 
     public TimelineDialog() {
-        super(ImageViewerGui.getMainFrame(), "New Layer", true);
+        super(JHVFrame.getFrame(), "New Layer", true);
         setResizable(false);
     }
 
@@ -79,7 +79,7 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
     public void showDialog() {
         observationPanel.updateGroupValues();
         pack();
-        setLocationRelativeTo(ImageViewerGui.getMainFrame());
+        setLocationRelativeTo(JHVFrame.getFrame());
         pack(); // weird
         setVisible(true);
     }

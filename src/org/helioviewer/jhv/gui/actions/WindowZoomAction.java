@@ -5,7 +5,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 
 @SuppressWarnings("serial")
 public class WindowZoomAction extends AbstractAction {
@@ -16,9 +16,9 @@ public class WindowZoomAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        int state = ImageViewerGui.getMainFrame().getExtendedState();
+        int state = JHVFrame.getFrame().getExtendedState();
         state ^= JFrame.MAXIMIZED_BOTH;
-        ImageViewerGui.getMainFrame().setExtendedState(state);
+        JHVFrame.getFrame().setExtendedState(state);
     }
 
 }

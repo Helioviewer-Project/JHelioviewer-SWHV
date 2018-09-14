@@ -19,7 +19,7 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.actions.ClearAnnotationsAction;
 import org.helioviewer.jhv.gui.actions.ResetCameraAction;
 import org.helioviewer.jhv.gui.actions.SDOCutOutAction;
@@ -78,8 +78,8 @@ public class TopToolBar extends JToolBar {
     private final ButtonText ZOOMIN = new ButtonText(Buttons.zoomIn, "Zoom In", "Zoom in");
 
     private enum InteractionMode {
-        PAN(ImageViewerGui.getPanInteraction()), ROTATE(ImageViewerGui.getRotateInteraction()),
-        AXIS(ImageViewerGui.getAxisInteraction()), ANNOTATE(ImageViewerGui.getAnnotateInteraction());
+        PAN(JHVFrame.getPanInteraction()), ROTATE(JHVFrame.getRotateInteraction()),
+        AXIS(JHVFrame.getAxisInteraction()), ANNOTATE(JHVFrame.getAnnotateInteraction());
 
         final Interaction interaction;
 
@@ -214,7 +214,7 @@ public class TopToolBar extends JToolBar {
             JRadioButtonMenuItem item = new JRadioButtonMenuItem(mode.toString());
             if (mode == AnnotationMode.Rectangle)
                 item.setSelected(true);
-            item.addActionListener(e -> ImageViewerGui.getAnnotateInteraction().setMode(mode));
+            item.addActionListener(e -> JHVFrame.getAnnotateInteraction().setMode(mode));
             annotateGroup.add(item);
             annotatePopup.add(item);
         }
@@ -295,7 +295,7 @@ public class TopToolBar extends JToolBar {
 
     private static void setActiveInteractionMode(InteractionMode mode) {
         Settings.setProperty("display.interaction", mode.toString());
-        ImageViewerGui.setCurrentInteraction(mode.interaction);
+        JHVFrame.setCurrentInteraction(mode.interaction);
     }
 
     private void addButton(JideButton b) {

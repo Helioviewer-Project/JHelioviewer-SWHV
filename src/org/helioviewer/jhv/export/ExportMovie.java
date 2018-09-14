@@ -12,7 +12,7 @@ import org.helioviewer.jhv.base.image.MappedImageFactory;
 import org.helioviewer.jhv.base.image.NIOImageFactory;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.MoviePanel.RecordMode;
 import org.helioviewer.jhv.layers.FrameListener;
@@ -50,7 +50,7 @@ public class ExportMovie implements FrameListener {
     }
 
     private void exportMovieFinish(GL2 gl) {
-        ImageViewerGui.getGLListener().detachExport();
+        JHVFrame.getGLListener().detachExport();
         MoviePanel.setEnabledOptions(true);
 
         try {
@@ -107,7 +107,7 @@ public class ExportMovie implements FrameListener {
         MoviePanel.setEnabledOptions(false);
 
         grabber = new GLGrab(canvasWidth, canvasHeight);
-        ImageViewerGui.getGLListener().attachExport(instance);
+        JHVFrame.getGLListener().attachExport(instance);
 
         String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + TimeUtils.formatFilename(System.currentTimeMillis());
         if (mode == RecordMode.SHOT) {

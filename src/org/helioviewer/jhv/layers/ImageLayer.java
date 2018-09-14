@@ -10,7 +10,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.io.APIRequest;
@@ -40,7 +40,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     public static ImageLayer create(JSONObject jo) {
         ImageLayer imageLayer = new ImageLayer(jo);
-        ImageViewerGui.getLayers().add(imageLayer);
+        JHVFrame.getLayers().add(imageLayer);
         return imageLayer;
     }
 
@@ -75,12 +75,12 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
             worker.cancel(true);
         worker = new LoadRemoteTask(this, req);
         JHVGlobals.getExecutorService().execute(worker);
-        ImageViewerGui.getLayersPanel().refresh(); // give feedback asap
+        JHVFrame.getLayersPanel().refresh(); // give feedback asap
     }
 
     public void unload() {
         if (view.getURI() == null)
-            ImageViewerGui.getLayers().remove(this);
+            JHVFrame.getLayers().remove(this);
         if (worker != null) {
             worker.cancel(true);
             worker = null;
@@ -110,7 +110,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
         optionsPanel.getRunningDifferencePanel().downloadVisible(!isLocal());
         setEnabled(true); // enable optionsPanel
-        ImageViewerGui.getLayersPanel().setOptionsPanel(this);
+        JHVFrame.getLayersPanel().setOptionsPanel(this);
 
         view.setDataHandler(this);
         CameraHelper.zoomToFit(Display.getMiniCamera());
@@ -253,7 +253,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     @Override
     public void handleData(ImageData newImageData) {
         setImageData(newImageData);
-        ImageViewerGui.getLayers().fireTimeUpdated(this);
+        JHVFrame.getLayers().fireTimeUpdated(this);
         Display.handleData(imageData.getSerial());
     }
 
