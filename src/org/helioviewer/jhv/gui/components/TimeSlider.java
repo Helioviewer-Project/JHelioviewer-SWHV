@@ -35,6 +35,7 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
     private JLabel label;
     private boolean dirty;
     private boolean wasPlaying;
+    private boolean allowSetFrame;
 
     public TimeSlider(int _orientation, int min, int max, int value) {
         super(_orientation, min, max, value);
@@ -58,6 +59,10 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
 
     void setLabel(JLabel _label) {
         label = _label;
+    }
+
+    void setAllowFrame(boolean _allowSetFrame) {
+        allowSetFrame = _allowSetFrame;
     }
 
     // Overrides updateUI, to keep own SliderUI
@@ -87,7 +92,7 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
     @Override
     public void setValue(int n) {
         super.setValue(n);
-        if (!getValueIsAdjusting())
+        if (allowSetFrame)
             Movie.setFrame(n);
     }
 
