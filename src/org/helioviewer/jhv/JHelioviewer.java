@@ -105,7 +105,7 @@ public class JHelioviewer {
 
             Log.info("Start main window");
             ExitHooks.attach();
-            JFrame frame = JHVFrame.prepareGui();
+            JFrame frame = JHVFrame.prepare();
 
             try {
                 if (args.length != 0 && args[0].equals("--exclude-plugins")) {

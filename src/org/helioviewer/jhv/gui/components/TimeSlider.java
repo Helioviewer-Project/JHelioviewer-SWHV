@@ -85,6 +85,13 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
     }
 
     @Override
+    public void setValue(int n) {
+        super.setValue(n);
+        if (!getValueIsAdjusting())
+            Movie.setFrame(n);
+    }
+
+    @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (e.getWheelRotation() < 0)
             Movie.nextFrame();
