@@ -58,7 +58,7 @@ public class Buf {
 
     public Buf put2f(float f0, float f1) {
         ensure(8);
-        bufferLast.put(0, bufferLast.get(2)).put(1, bufferLast.get(3)).put(2, f0).put(3, f1);
+        bufferLast/*.put(0, bufferLast.get(2)).put(1, bufferLast.get(3))*/.put(2, f0).put(3, f1); // don't do repeat4f() after put2f()
         System.arraycopy(byteLast, 8, array, length, 8);
         length += 8;
         floats += 2;
