@@ -39,7 +39,6 @@ class PluginsListEntry extends JPanel implements MouseListener, HyperlinkListene
 
         updateEnableLabel();
 
-        // general
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         add(pane, BorderLayout.LINE_START);

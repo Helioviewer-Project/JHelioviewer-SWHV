@@ -7,26 +7,17 @@ import org.json.JSONObject;
 
 public class PluginManager {
 
-    private static final PluginManager singletonInstance = new PluginManager();
+    private static final HashMap<Plugin, PluginContainer> plugins = new HashMap<>();
 
-    private final HashMap<Plugin, PluginContainer> plugins = new HashMap<>();
-
-    private PluginManager() {
-    }
-
-    public static PluginManager getSingletonInstance() {
-        return singletonInstance;
-    }
-
-    public Collection<PluginContainer> getPlugins() {
+    public static Collection<PluginContainer> getPlugins() {
         return plugins.values();
     }
 
-    public void addPlugin(Plugin plugin) {
+    public static void addPlugin(Plugin plugin) {
         plugins.put(plugin, new PluginContainer(plugin));
     }
 
-    public void loadState(JSONObject jo) {
+    public static void loadState(JSONObject jo) {
         for (String classname : jo.keySet()) {
             for (Plugin plugin : plugins.keySet()) {
                 if (classname.equals(plugin.getClass().getName())) {
@@ -39,7 +30,7 @@ public class PluginManager {
         }
     }
 
-    public void saveState(JSONObject jo) {
+    public static void saveState(JSONObject jo) {
         for (Plugin plugin : plugins.keySet()) {
             JSONObject po = new JSONObject();
             plugin.saveState(po);
