@@ -480,10 +480,34 @@ public class JhvTextRenderer {
         }
     }
 
+    private final HashMap<String, GlyphVector> glyphVectorCache = new HashMap<>();
+    private final HashMap<Character, GlyphMetrics> glyphMetricsCache = new HashMap<>();
+    private final CharSequenceIterator iter = new CharSequenceIterator();
+
     private void internal_draw3D(CharSequence str, float x, float y, float z, float scaleFactor) {
-        for (Glyph glyph : glyphProducer.getGlyphs(str)) {
-            float advance = glyph.draw3D(x, y, z, scaleFactor);
-            x += advance * scaleFactor;
+        GlyphVector glyphVector = glyphVectorCache.get(str.toString());
+        if (glyphVector == null) {
+            iter.initFromCharSequence(str);
+            glyphVector = font.createGlyphVector(getFontRenderContext(), iter);
+            glyphVectorCache.put(str.toString(), glyphVector);
+        }
+
+        int lengthInGlyphs = glyphVector.getNumGlyphs();
+        int i = 0;
+        while (i < lengthInGlyphs) { // may loop forever
+            char unicodeID = str.charAt(i);
+            GlyphMetrics glyphMetrics = glyphMetricsCache.get(unicodeID);
+            if (glyphMetrics == null) {
+                glyphMetrics = glyphVector.getGlyphMetrics(i);
+                glyphMetricsCache.put(unicodeID, glyphMetrics);
+            }
+
+            Glyph glyph = glyphProducer.getGlyph(unicodeID, glyphMetrics);
+            if (glyph != null) {
+                float advance = glyph.draw3D(x, y, z, scaleFactor);
+                x += advance * scaleFactor;
+                i++;
+            }
         }
     }
 
@@ -946,50 +970,15 @@ public class JhvTextRenderer {
 
     class GlyphProducer {
         static final int undefined = -2;
-        final HashMap<String, GlyphVector> fullGlyphVectorCache = new HashMap<>();
-        final HashMap<Character, GlyphMetrics> glyphMetricsCache = new HashMap<>();
         // The mapping from unicode character to font-specific glyph ID
         final int[] unicodes2Glyphs;
         // The mapping from glyph ID to Glyph
         final Glyph[] glyphCache;
-        // We re-use this for each incoming string
-        final CharSequenceIterator iter = new CharSequenceIterator();
 
         GlyphProducer(int fontLengthInGlyphs) {
             unicodes2Glyphs = new int[512];
             glyphCache = new Glyph[fontLengthInGlyphs];
             clearAllCacheEntries();
-        }
-
-        Glyph[] getGlyphs(CharSequence inString) {
-            GlyphVector fullRunGlyphVector = fullGlyphVectorCache.get(inString.toString());
-            if (fullRunGlyphVector == null) {
-                iter.initFromCharSequence(inString);
-                fullRunGlyphVector = font.createGlyphVector(getFontRenderContext(), iter);
-                fullGlyphVectorCache.put(inString.toString(), fullRunGlyphVector);
-            }
-
-            int lengthInGlyphs = fullRunGlyphVector.getNumGlyphs();
-            System.out.println(">>> " + lengthInGlyphs);
-            Glyph[] glyphsOutput = new Glyph[lengthInGlyphs];
-            int i = 0;
-            while (i < lengthInGlyphs) { // may loop forever
-                char unicodeID = inString.charAt(i);
-
-                Character letter = CharacterCache.valueOf(unicodeID);
-                GlyphMetrics metrics = glyphMetricsCache.get(letter);
-                if (metrics == null) {
-                    metrics = fullRunGlyphVector.getGlyphMetrics(i);
-                    glyphMetricsCache.put(letter, metrics);
-                }
-
-                Glyph glyph = getGlyph(unicodeID, metrics);
-                if (glyph != null) {
-                    glyphsOutput[i] = glyph;
-                    i++;
-                }
-            }
-            return glyphsOutput;
         }
 
         void clearCacheEntry(int unicodeID) {
@@ -1019,7 +1008,7 @@ public class JhvTextRenderer {
         // if the unicode or glyph ID would be out of bounds of the
         // glyph cache.
         @Nullable
-        private Glyph getGlyph(char unicodeID, GlyphMetrics glyphMetrics) {
+        Glyph getGlyph(char unicodeID, GlyphMetrics glyphMetrics) {
             if (unicodeID >= unicodes2Glyphs.length) {
                 return null;
             }
@@ -1048,31 +1037,13 @@ public class JhvTextRenderer {
         }
     }
 
-    private static class CharacterCache {
-
-        static final Character cache[] = new Character[127 + 1];
-
-        static {
-            for (int i = 0; i < cache.length; i++) {
-                cache[i] = (char) i;
-            }
-        }
-
-        static Character valueOf(char c) {
-            if (c <= 127) { // must cache
-                return cache[c];
-            }
-            return c;
-        }
-    }
-
     private final GLSLTexture glslTexture = new GLSLTexture();
     private float[] textColor = Colors.WhiteFloat;
 
-    private int outstandingGlyphsVerticesPipeline = 0;
-    private final Buf vexBuf = new Buf(kQuadsPerBuffer * kVertsPerQuad * GLSLTexture.stride); // 14400
+    int outstandingGlyphsVerticesPipeline = 0;
+    final Buf vexBuf = new Buf(kQuadsPerBuffer * kVertsPerQuad * GLSLTexture.stride); // 14400
 
-    private void drawVertices() {
+    void drawVertices() {
         if (outstandingGlyphsVerticesPipeline > 0) {
             GL2 gl = (GL2) GLContext.getCurrentGL();
             getBackingStore().bind(gl);
