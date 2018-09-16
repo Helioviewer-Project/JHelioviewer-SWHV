@@ -273,27 +273,26 @@ public class J2KView extends AbstractView {
             return;
         EventQueue.invokeLater(() -> {
             if (params.decodeParams.frame == targetFrame)
-                executor.execute(this, params, true);
+                executor.execute(this, params.decodeParams, true);
         });
     }
 
-    void setDataFromDecoder(ImageParams imageParams, ImageBuffer imageBuffer) {
+    void setDataFromDecoder(DecodeParams decodeParams, ImageBuffer imageBuffer) {
         if (isAbolished)
             return;
 
-        ImageData data = new ImageData(imageBuffer);
-        data.setSerial(imageParams.serialNo);
-
-        DecodeParams params = imageParams.decodeParams;
-        int frame = params.frame;
+        int frame = decodeParams.frame;
         if (frame != trueFrame) {
             trueFrame = frame;
             ++fpsCount;
         }
 
+        ImageData data = new ImageData(imageBuffer);
+        data.setSerial(decodeParams.serialNo);
+
         MetaData m = metaData[frame];
         data.setMetaData(m);
-        data.setRegion(m.roiToRegion(params.subImage, params.resolution.factorX, params.resolution.factorY));
+        data.setRegion(m.roiToRegion(decodeParams.subImage, decodeParams.resolution.factorX, decodeParams.resolution.factorY));
 
         EventQueue.invokeLater(() -> {
             if (dataHandler != null)
@@ -310,7 +309,7 @@ public class J2KView extends AbstractView {
             reader.signalReader(params);
     }
 
-    private DecodeParams getDecodeParams(int frame, double pixFactor, double factor) {
+    private DecodeParams getDecodeParams(int serialNo, int frame, double pixFactor, double factor) {
         ResolutionLevel res;
         SubImage subImage;
 
@@ -330,18 +329,18 @@ public class J2KView extends AbstractView {
                 factor = Math.min(factor, 0.5);
             }
         }
-        return new DecodeParams(subImage, res, frame, factor);
+        return new DecodeParams(serialNo, subImage, res, frame, factor);
     }
 
     ImageParams calculateParams(int serialNo, int frame, double pixFactor, double factor) {
-        DecodeParams decodeParams = getDecodeParams(frame, pixFactor, factor);
+        DecodeParams decodeParams = getDecodeParams(serialNo, frame, pixFactor, factor);
 
         int level = decodeParams.resolution.level;
         AtomicBoolean status = cacheStatus.getFrameStatus(frame, level);
         boolean frameLevelComplete = status != null && status.get();
         boolean priority = !frameLevelComplete && !Movie.isPlaying();
 
-        ImageParams params = new ImageParams(priority, serialNo, decodeParams);
+        ImageParams params = new ImageParams(priority, decodeParams);
         if (priority || (!frameLevelComplete && level < currentLevel)) {
             signalReader(params);
         }

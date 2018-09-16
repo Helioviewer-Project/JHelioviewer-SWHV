@@ -27,7 +27,7 @@ public class J2KViewCallisto extends J2KView {
         ResolutionLevel res = getResolutionLevel(frame, 0);
         SubImage subImage = new SubImage(region.x, region.y, region.width, region.height, res.width, res.height);
 
-        ImageParams params = new ImageParams(true, serialNo, new DecodeParams(subImage, res, frame, factor));
+        ImageParams params = new ImageParams(true, new DecodeParams(serialNo, subImage, res, frame, factor));
         signalReader(params);
 
         return params;
