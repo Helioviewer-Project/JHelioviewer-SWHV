@@ -4,12 +4,10 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.view.j2k.image.DecodeParams;
-import org.helioviewer.jhv.view.j2k.image.ImageParams;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -23,16 +21,6 @@ class DecodeExecutor {
     private final ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue,
             new JHVThread.NamedThreadFactory("Decoder"),
             new ThreadPoolExecutor.DiscardPolicy());
-
-    void execute(J2KView view, int serialNo, int frame, double pixFactor, double factor) {
-        // order is important, this will signal reader
-        ImageParams params = view.calculateParams(serialNo, frame, pixFactor, factor);
-        AtomicBoolean status = view.getCacheStatus().getFrameStatus(frame, params.decodeParams.resolution.level);
-        if (status == null)
-            return;
-
-        execute(view, params.decodeParams, status.get());
-    }
 
     void execute(J2KView view, DecodeParams decodeParams, boolean keep) {
         blockingQueue.poll();
