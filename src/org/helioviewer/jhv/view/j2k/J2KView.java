@@ -265,7 +265,13 @@ public class J2KView extends AbstractView {
 
     @Override
     public void decode(int serialNo, double pixFactor, double factor) {
-        executor.execute(this, serialNo, targetFrame, pixFactor, factor);
+        // order is important, this will signal reader
+        ImageParams params = calculateParams(serialNo, targetFrame, pixFactor, factor);
+        AtomicBoolean status = cacheStatus.getFrameStatus(targetFrame, params.decodeParams.resolution.level);
+        if (status == null)
+            return;
+
+        executor.execute(this, params.decodeParams, status.get());
     }
 
     void signalDecoderFromReader(ImageParams params) {
