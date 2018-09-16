@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.helioviewer.jhv.threads.JHVThread;
+import org.helioviewer.jhv.view.j2k.image.DecodeParams;
 import org.helioviewer.jhv.view.j2k.image.ImageParams;
 
 class DecodeExecutor {
@@ -24,10 +25,10 @@ class DecodeExecutor {
         if (status == null)
             return;
 
-        execute(view, params, status.get());
+        execute(view, params.decodeParams, status.get());
     }
 
-    void execute(J2KView view, ImageParams params, boolean keep) {
+    void execute(J2KView view, DecodeParams params, boolean keep) {
         blockingQueue.poll();
         executor.execute(new J2KDecoder(view, params, keep, false));
     }

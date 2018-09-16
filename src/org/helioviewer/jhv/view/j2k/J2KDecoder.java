@@ -19,7 +19,6 @@ import kdu_jni.Kdu_thread_env;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.view.j2k.image.DecodeParams;
-import org.helioviewer.jhv.view.j2k.image.ImageParams;
 
 import org.lwjgl.system.MemoryUtil;
 
@@ -40,13 +39,13 @@ class J2KDecoder implements Runnable {
     private static final ThreadLocal<Kdu_region_compositor> localCompositor = new ThreadLocal<>();
 
     private final J2KView view;
-    private final ImageParams imageParams;
+    private final DecodeParams decodeParams;
     private final boolean keep;
     private final boolean abolish;
 
-    J2KDecoder(J2KView _view, ImageParams _imageParams, boolean _keep, boolean _abolish) {
+    J2KDecoder(J2KView _view, DecodeParams _decodeParams, boolean _keep, boolean _abolish) {
         view = _view;
-        imageParams = _imageParams;
+        decodeParams = _decodeParams;
         keep = _keep;
         abolish = _abolish;
     }
@@ -138,8 +137,8 @@ class J2KDecoder implements Runnable {
         }
 
         try {
-            ImageBuffer data = decodeLayer(imageParams.decodeParams);
-            view.setDataFromDecoder(imageParams, data);
+            ImageBuffer data = decodeLayer(decodeParams);
+            view.setDataFromDecoder(decodeParams, data);
         } catch (Exception e) { // reboot the compositor
             Kdu_region_compositor krc = localCompositor.get();
             if (krc != null)
