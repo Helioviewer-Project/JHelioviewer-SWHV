@@ -12,6 +12,7 @@ import org.helioviewer.jhv.events.SWEKParam;
 import org.helioviewer.jhv.events.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.io.JSONUtils;
+import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,6 +34,11 @@ public class ComesepHandler extends SWEKHandler {
 
                 long start = result.getLong("atearliest") * 1000;
                 long end = result.getLong("atlatest") * 1000;
+                if (end < start) {
+                    Log.error("Event end before start: " + result);
+                    continue;
+                }
+
                 if (result.has("liftoffduration_value")) {
                     long cactusLiftOff = result.getLong("liftoffduration_value");
                     end += cactusLiftOff * 60000;
@@ -46,7 +52,6 @@ public class ComesepHandler extends SWEKHandler {
             }
             EventDatabase.dump_event2db(event2db_list, supplier);
         } catch (Exception e) {
-            e.printStackTrace();
             return false;
         }
         return true;

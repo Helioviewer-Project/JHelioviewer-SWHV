@@ -21,6 +21,7 @@ import org.helioviewer.jhv.events.SWEKOperand;
 import org.helioviewer.jhv.events.SWEKParam;
 import org.helioviewer.jhv.events.SWEKSupplier;
 import org.helioviewer.jhv.io.JSONUtils;
+import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,6 +45,11 @@ public class HEKHandler extends SWEKHandler {
 
                 long start = TimeUtils.parse(result.getString("event_starttime"));
                 long end = TimeUtils.parse(result.getString("event_endtime"));
+                if (end < start) {
+                    Log.error("Event end before start: " + result);
+                    continue;
+                }
+
                 long archiv = TimeUtils.parse(result.getString("kb_archivdate"));
                 String uid = result.getString("kb_archivid");
 
