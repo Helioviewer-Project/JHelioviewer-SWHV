@@ -33,9 +33,7 @@ public class J2KViewCallisto extends J2KView {
 
     @Override
     protected void signalReader(DecodeParams decodeParams) {
-        if (reader != null) {
-            reader.signalReader(new ImageParams(true, decodeParams));
-        }
+        reader.signalReader(new ImageParams(true, decodeParams));
     }
 
 }
