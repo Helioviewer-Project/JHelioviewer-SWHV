@@ -44,7 +44,7 @@ public class J2KView extends AbstractView {
 
     private final long cacheKey[];
 
-    private final DecodeExecutor executor = new DecodeExecutor();
+    private final DecodeExecutor decoder = new DecodeExecutor();
     private final KakaduSource kduSource;
     private JPIPCache jpipCache;
 
@@ -141,7 +141,7 @@ public class J2KView extends AbstractView {
         isAbolished = true;
 
         new Thread(() -> {
-            executor.abolish();
+            decoder.abolish();
             if (reader != null) {
                 reader.abolish();
                 reader = null;
@@ -269,7 +269,7 @@ public class J2KView extends AbstractView {
         if (reader != null && !decodeParams.complete) {
             signalReader(decodeParams);
         }
-        executor.decode(this, decodeParams);
+        decoder.decode(this, decodeParams);
     }
 
     protected DecodeParams getDecodeParams(int serialNo, int frame, double pixFactor, double factor) {
@@ -314,7 +314,7 @@ public class J2KView extends AbstractView {
         EventQueue.invokeLater(() -> {
             if (params.decodeParams.frame == targetFrame) {
                 // params.decodeParams.complete = true;
-                executor.decode(this, params.decodeParams);
+                decoder.decode(this, params.decodeParams);
             }
         });
     }
@@ -329,7 +329,7 @@ public class J2KView extends AbstractView {
             ++fpsCount;
         }
 
-        executor.addToCache(decodeParams, imageBuffer);
+        decoder.addToCache(decodeParams, imageBuffer);
 
         ImageData data = new ImageData(imageBuffer);
         data.setSerial(decodeParams.serialNo);
