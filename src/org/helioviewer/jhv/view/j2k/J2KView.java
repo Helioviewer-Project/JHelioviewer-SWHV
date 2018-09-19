@@ -267,7 +267,7 @@ public class J2KView extends AbstractView {
     public void decode(int serialNo, double pixFactor, double factor) {
         DecodeParams decodeParams = getDecodeParams(serialNo, targetFrame, pixFactor, factor);
         signalReader(decodeParams);
-        executor.execute(this, decodeParams, decodeParams.complete);
+        executor.execute(this, decodeParams);
     }
 
     protected DecodeParams getDecodeParams(int serialNo, int frame, double pixFactor, double factor) {
@@ -290,7 +290,7 @@ public class J2KView extends AbstractView {
                 factor = Math.min(factor, 0.5);
             }
         }
-        AtomicBoolean status = cacheStatus.getFrameStatus(frame, res.level);
+        AtomicBoolean status = cacheStatus.getFrameStatus(frame, res.level); // before signalling to reader
         return new DecodeParams(serialNo, status != null && status.get(), subImage, res, frame, factor);
     }
 
@@ -313,8 +313,10 @@ public class J2KView extends AbstractView {
         if (isAbolished)
             return;
         EventQueue.invokeLater(() -> {
-            if (params.decodeParams.frame == targetFrame)
-                executor.execute(this, params.decodeParams, true);
+            if (params.decodeParams.frame == targetFrame) {
+                // params.decodeParams.complete = true;
+                executor.execute(this, params.decodeParams);
+            }
         });
     }
 
@@ -327,6 +329,9 @@ public class J2KView extends AbstractView {
             trueFrame = frame;
             ++fpsCount;
         }
+
+        if (decodeParams.complete)
+            executor.addToCache(decodeParams, imageBuffer);
 
         ImageData data = new ImageData(imageBuffer);
         data.setSerial(decodeParams.serialNo);
