@@ -25,29 +25,19 @@ public class JSONUtils {
         }
     }
 
-    public static JSONObject get(Reader in) {
+    public static JSONObject get(Reader in) throws JSONException {
         return new JSONObject(new JSONTokener(in));
     }
 
     public static JSONObject get(URI uri) throws IOException, JSONException {
-        NetClient nc = null; //! try-with-resources inexplicably fails to work for LMSAL
-        try {
-            nc = NetClient.of(uri);
+        try (NetClient nc = NetClient.of(uri)) {
             return get(nc.getReader());
-        } finally {
-            if (nc != null)
-                nc.close();
         }
     }
 
     public static JSONObject get(String uri) throws IOException, JSONException {
-        NetClient nc = null; //! try-with-resources inexplicably fails to work for LMSAL
-        try {
-            nc = NetClient.of(uri);
+        try (NetClient nc = NetClient.of(uri)) {
             return get(nc.getReader());
-        } finally {
-            if (nc != null)
-                nc.close();
         }
     }
 
