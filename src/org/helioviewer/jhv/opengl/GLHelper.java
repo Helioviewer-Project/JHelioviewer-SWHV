@@ -93,11 +93,16 @@ public class GLHelper {
         }
     */
     public static GLWindow createGLWindow() {
-        GLProfile profile = GLProfile.getGL2GL3();
-        GLCapabilities capabilities = getGLCapabilities(profile);
-        GLWindow window = GLWindow.create(capabilities);
-        // GUI events can lead to context destruction and invalidation of GL objects and state
-        window.setSharedAutoDrawable(getSharedDrawable(profile, capabilities));
+        GLWindow window = null;
+        try {
+            GLProfile profile = GLProfile.get(GLProfile.GL3);
+            GLCapabilities capabilities = getGLCapabilities(profile);
+            window = GLWindow.create(capabilities);
+            // GUI events can lead to context destruction and invalidation of GL objects and state
+            window.setSharedAutoDrawable(getSharedDrawable(profile, capabilities));
+        } catch (Exception e) {
+            GLInfo.glVersionError(e.getMessage());
+        }
         return window;
     }
 

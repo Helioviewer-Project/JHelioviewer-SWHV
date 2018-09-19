@@ -2,6 +2,7 @@ package org.helioviewer.jhv.opengl;
 
 import javax.swing.JOptionPane;
 
+import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.nativewindow.ScalableSurface;
@@ -20,19 +21,22 @@ public class GLInfo {
 
     public static int maxTextureSize;
 
+    static void glVersionError(String err) {
+        Log.error("GLInfo > " + err);
+
+        if (1 == JOptionPane.showOptionDialog(null, Message.formatMessage(err + "\n\nJHelioviewer is not able to run."), "OpenGL Fatal Error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, crashOptions, crashOptions[0]))
+            throw new GLException(err);
+        else
+            System.exit(-1);
+    }
+
     public static void update(GL2 gl) {
         glVersion = "OpenGL " + gl.glGetString(GL2.GL_VERSION);
         Log.info("GLInfo > " + glVersion);
         // Log.debug("GLInfo > Extensions: " + gl.glGetString(GL2.GL_EXTENSIONS));
 
         if (!gl.isExtensionAvailable("GL_VERSION_3_1")) {
-            String err = "OpenGL 3.1 not supported. JHelioviewer is not able to run.";
-            Log.error("GLInfo > " + err);
-
-            if (1 == JOptionPane.showOptionDialog(null, err, "Fatal Error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, crashOptions, crashOptions[0]))
-                throw new GLException(err);
-            else
-                System.exit(-1);
+            glVersionError("OpenGL 3.1 not supported.");
         }
 
         int[] out = {0};
