@@ -266,7 +266,9 @@ public class J2KView extends AbstractView {
     @Override
     public void decode(int serialNo, double pixFactor, double factor) {
         DecodeParams decodeParams = getDecodeParams(serialNo, targetFrame, pixFactor, factor);
-        signalReader(decodeParams);
+        if (reader != null && !decodeParams.complete) {
+            signalReader(decodeParams);
+        }
         executor.execute(this, decodeParams);
     }
 
@@ -295,16 +297,13 @@ public class J2KView extends AbstractView {
     }
 
     protected void signalReader(DecodeParams decodeParams) {
-        if (reader != null) {
-            boolean complete = decodeParams.complete;
-            int level = decodeParams.resolution.level;
-            boolean priority = !complete && !Movie.isPlaying();
+        int level = decodeParams.resolution.level;
+        boolean priority = !Movie.isPlaying();
 
-            if (priority || (!complete && level < currentLevel)) {
-                reader.signalReader(new ImageParams(priority, decodeParams));
-            }
-            currentLevel = level;
+        if (priority || level < currentLevel) {
+            reader.signalReader(new ImageParams(priority, decodeParams));
         }
+        currentLevel = level;
     }
 
     private int currentLevel = 10000;
