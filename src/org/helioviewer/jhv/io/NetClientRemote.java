@@ -6,8 +6,8 @@ import java.io.Reader;
 import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
-//import java.util.logging.Level;
-//import java.util.logging.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 
@@ -21,13 +21,14 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import okio.BufferedSource;
 
 class NetClientRemote implements NetClient {
 
-//    static {
-//        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
-//    }
+    static {
+        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
+    }
 
     private static final int cacheSize = 512 * 1024 * 1024;
     private static final CacheControl noStore = new CacheControl.Builder().noStore().build();
@@ -38,7 +39,8 @@ class NetClientRemote implements NetClient {
             //.addInterceptor(new LoggingInterceptor())
             .build();
 
-    private final Response response;
+    private final ResponseBody responseBody;
+    private final boolean isSuccessful;
 
     NetClientRemote(URI uri, boolean allowError, NetCache cache) throws IOException {
         HttpUrl url = HttpUrl.get(uri);
@@ -53,11 +55,14 @@ class NetClientRemote implements NetClient {
         Request request = builder.build();
         //System.out.println(">>> " + url);
 
-        response = client.newCall(request).execute();
-        if (!allowError && !response.isSuccessful()) {
+        Response response = client.newCall(request).execute();
+        isSuccessful = response.isSuccessful();
+        if (!allowError && !isSuccessful) {
+            String msg = response.toString();
             response.close();
-            throw new IOException(response.toString());
+            throw new IOException(msg);
         }
+        responseBody = response.body();
 
         //if (response.cacheResponse() != null)
         //    System.out.println(">>> cached response: " + url);
@@ -65,32 +70,34 @@ class NetClientRemote implements NetClient {
 
     @Override
     public boolean isSuccessful() {
-        return response.isSuccessful();
+        return isSuccessful;
     }
 
     @Override
     public InputStream getStream() {
-        return response.body().byteStream();
+        return responseBody.byteStream();
     }
 
     @Override
     public Reader getReader() {
-        return response.body().charStream();
+        return responseBody.charStream();
     }
 
     @Override
     public BufferedSource getSource() {
-        return response.body().source();
+        return responseBody.source();
     }
 
     @Override
     public long getContentLength() {
-        return response.body().contentLength();
+        return responseBody.contentLength();
     }
 
     @Override
     public void close() {
-        response.close();
+        if (responseBody != null) {
+            responseBody.close();
+        }
     }
 
     private static class LoggingInterceptor implements Interceptor {
