@@ -27,7 +27,7 @@ import org.helioviewer.jhv.gui.components.MenuBar;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.SideContentPane;
 import org.helioviewer.jhv.gui.components.StatusPanel;
-import org.helioviewer.jhv.gui.components.TopToolBar;
+import org.helioviewer.jhv.gui.components.ToolBar;
 import org.helioviewer.jhv.gui.components.statusplugin.CarringtonStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugin.FramerateStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugin.PositionStatusPanel;
@@ -71,7 +71,7 @@ public class JHVFrame {
     private static InteractionAnnotate annotateInteraction;
     private static Interaction currentInteraction;
 
-    private static TopToolBar toolBar;
+    private static ToolBar toolBar;
     private static MenuBar menuBar;
 
     public static JFrame prepare() {
@@ -130,7 +130,7 @@ public class JHVFrame {
         statusPanel.addPlugin(framerateStatus, StatusPanel.Alignment.LEFT);
         statusPanel.addPlugin(positionStatus, StatusPanel.Alignment.RIGHT);
 
-        toolBar = new TopToolBar();
+        toolBar = new ToolBar();
         mainFrame.add(toolBar, BorderLayout.PAGE_START);
         mainFrame.add(midSplitPane, BorderLayout.CENTER);
         mainFrame.add(statusPanel, BorderLayout.PAGE_END);
@@ -253,7 +253,7 @@ public class JHVFrame {
         return annotateInteraction;
     }
 
-    public static TopToolBar getToolBar() {
+    public static ToolBar getToolBar() {
         return toolBar;
     }
 
