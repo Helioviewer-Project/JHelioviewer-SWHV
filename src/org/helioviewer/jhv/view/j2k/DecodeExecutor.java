@@ -33,7 +33,13 @@ class DecodeExecutor {
     }
 
     void addToCache(DecodeParams decodeParams, ImageBuffer imageBuffer) {
-        decodeCache.put(decodeParams, imageBuffer);
+        if (decodeParams.complete) {
+            try {
+                decodeCache.get(decodeParams, () -> imageBuffer);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     void abolish() {
