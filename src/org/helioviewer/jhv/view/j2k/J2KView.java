@@ -330,8 +330,7 @@ public class J2KView extends AbstractView {
             ++fpsCount;
         }
 
-        if (decodeParams.complete)
-            executor.addToCache(decodeParams, imageBuffer);
+        executor.addToCache(decodeParams, imageBuffer);
 
         ImageData data = new ImageData(imageBuffer);
         data.setSerial(decodeParams.serialNo);
