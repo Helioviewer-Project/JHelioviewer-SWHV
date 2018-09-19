@@ -3,11 +3,11 @@ package org.helioviewer.jhv.gui.components;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionListener;
+//import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.LinkedHashMap;
-import java.util.Map;
+//import java.util.LinkedHashMap;
+//import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -88,7 +88,7 @@ public class TopToolBar extends JToolBar {
         }
     }
 
-    private final LinkedHashMap<ButtonText, ActionListener> pluginButtons = new LinkedHashMap<>();
+//  private final LinkedHashMap<ButtonText, ActionListener> pluginButtons = new LinkedHashMap<>();
 
     private static JideButton toolButton(ButtonText text) {
         JideButton b = new JideButton(text.toString());
@@ -285,12 +285,12 @@ public class TopToolBar extends JToolBar {
         JideButton samp = toolButton(SAMP);
         samp.addActionListener(e -> SampClient.notifyRequestData());
         //addButton(samp);
-
+/*
         for (Map.Entry<ButtonText, ActionListener> entry : pluginButtons.entrySet()) {
             JideButton b = toolButton(entry.getKey());
             b.addActionListener(entry.getValue());
             addButton(b);
-        }
+        } */
     }
 
     private static void setActiveInteractionMode(InteractionMode mode) {
