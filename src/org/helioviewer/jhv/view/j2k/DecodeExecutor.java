@@ -22,7 +22,7 @@ class DecodeExecutor {
             new JHVThread.NamedThreadFactory("Decoder"),
             new ThreadPoolExecutor.DiscardPolicy());
 
-    void execute(J2KView view, DecodeParams decodeParams) {
+    void decode(J2KView view, DecodeParams decodeParams) {
         blockingQueue.poll();
 
         ImageBuffer imageBuffer = decodeCache.getIfPresent(decodeParams);

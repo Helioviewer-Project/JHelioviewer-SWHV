@@ -269,7 +269,7 @@ public class J2KView extends AbstractView {
         if (reader != null && !decodeParams.complete) {
             signalReader(decodeParams);
         }
-        executor.execute(this, decodeParams);
+        executor.decode(this, decodeParams);
     }
 
     protected DecodeParams getDecodeParams(int serialNo, int frame, double pixFactor, double factor) {
@@ -314,7 +314,7 @@ public class J2KView extends AbstractView {
         EventQueue.invokeLater(() -> {
             if (params.decodeParams.frame == targetFrame) {
                 // params.decodeParams.complete = true;
-                executor.execute(this, params.decodeParams);
+                executor.decode(this, params.decodeParams);
             }
         });
     }
