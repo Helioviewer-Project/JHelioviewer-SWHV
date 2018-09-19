@@ -266,14 +266,53 @@ public class J2KView extends AbstractView {
     @Override
     public void decode(int serialNo, double pixFactor, double factor) {
         DecodeParams decodeParams = getDecodeParams(serialNo, targetFrame, pixFactor, factor);
-        signalReader(decodeParams);
-
         AtomicBoolean status = cacheStatus.getFrameStatus(targetFrame, decodeParams.resolution.level);
+        boolean frameLevelComplete = status != null && status.get();
+
+        signalReader(frameLevelComplete, decodeParams);
+
         if (status == null)
             return;
 
-        executor.execute(this, decodeParams, status.get());
+        executor.execute(this, decodeParams, frameLevelComplete);
     }
+
+    protected DecodeParams getDecodeParams(int serialNo, int frame, double pixFactor, double factor) {
+        ResolutionLevel res;
+        SubImage subImage;
+
+        if (Movie.isRecording()) { // all bets are off
+            res = cacheStatus.getResolutionSet(frame).getResolutionLevel(0);
+            subImage = new SubImage(0, 0, res.width, res.height, res.width, res.height);
+            factor = 1;
+        } else {
+            MetaData m = metaData[frame];
+            int reqHeight = (int) (m.getPhysicalRegion().height * pixFactor + .5);
+
+            res = cacheStatus.getResolutionSet(frame).getNextResolutionLevel(reqHeight, reqHeight);
+            subImage = new SubImage(0, 0, res.width, res.height, res.width, res.height);
+
+            int maxDim = Math.max(res.width, res.height);
+            if (maxDim > HIRES_CUTOFF && Movie.isPlaying()) {
+                factor = Math.min(factor, 0.5);
+            }
+        }
+        return new DecodeParams(serialNo, subImage, res, frame, factor);
+    }
+
+    protected void signalReader(boolean frameLevelComplete, DecodeParams decodeParams) {
+        if (reader != null) {
+            boolean priority = !frameLevelComplete && !Movie.isPlaying();
+
+            int level = decodeParams.resolution.level;
+            if (priority || (!frameLevelComplete && level < currentLevel)) {
+                reader.signalReader(new ImageParams(priority, decodeParams));
+            }
+            currentLevel = level;
+        }
+    }
+
+    private int currentLevel = 10000;
 
     void signalDecoderFromReader(ImageParams params) {
         if (isAbolished)
@@ -310,45 +349,6 @@ public class J2KView extends AbstractView {
     KakaduSource getSource() {
         return kduSource;
     }
-
-    protected DecodeParams getDecodeParams(int serialNo, int frame, double pixFactor, double factor) {
-        ResolutionLevel res;
-        SubImage subImage;
-
-        if (Movie.isRecording()) { // all bets are off
-            res = cacheStatus.getResolutionSet(frame).getResolutionLevel(0);
-            subImage = new SubImage(0, 0, res.width, res.height, res.width, res.height);
-            factor = 1;
-        } else {
-            MetaData m = metaData[frame];
-            int reqHeight = (int) (m.getPhysicalRegion().height * pixFactor + .5);
-
-            res = cacheStatus.getResolutionSet(frame).getNextResolutionLevel(reqHeight, reqHeight);
-            subImage = new SubImage(0, 0, res.width, res.height, res.width, res.height);
-
-            int maxDim = Math.max(res.width, res.height);
-            if (maxDim > HIRES_CUTOFF && Movie.isPlaying()) {
-                factor = Math.min(factor, 0.5);
-            }
-        }
-        return new DecodeParams(serialNo, subImage, res, frame, factor);
-    }
-
-    protected void signalReader(DecodeParams decodeParams) {
-        if (reader != null) {
-            int level = decodeParams.resolution.level;
-            AtomicBoolean status = cacheStatus.getFrameStatus(decodeParams.frame, level);
-            boolean frameLevelComplete = status != null && status.get();
-            boolean priority = !frameLevelComplete && !Movie.isPlaying();
-
-            if (priority || (!frameLevelComplete && level < currentLevel)) {
-                reader.signalReader(new ImageParams(priority, decodeParams));
-            }
-            currentLevel = level;
-        }
-    }
-
-    private int currentLevel = 10000;
 
     @Override
     public AtomicBoolean getFrameCacheStatus(int frame) {
