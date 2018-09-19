@@ -45,11 +45,11 @@ public class J2KView extends AbstractView {
     private final long cacheKey[];
 
     private final DecodeExecutor executor = new DecodeExecutor();
-    private final CacheStatus cacheStatus;
     private final KakaduSource kduSource;
-
-    protected J2KReader reader;
     private JPIPCache jpipCache;
+
+    protected final CacheStatus cacheStatus;
+    protected J2KReader reader;
 
     public J2KView(URI _uri, APIRequest _request, APIResponse _response) throws Exception {
         super(_uri, _request);
@@ -266,15 +266,8 @@ public class J2KView extends AbstractView {
     @Override
     public void decode(int serialNo, double pixFactor, double factor) {
         DecodeParams decodeParams = getDecodeParams(serialNo, targetFrame, pixFactor, factor);
-        AtomicBoolean status = cacheStatus.getFrameStatus(targetFrame, decodeParams.resolution.level);
-        boolean frameLevelComplete = status != null && status.get();
-
-        signalReader(frameLevelComplete, decodeParams);
-
-        if (status == null)
-            return;
-
-        executor.execute(this, decodeParams, frameLevelComplete);
+        signalReader(decodeParams);
+        executor.execute(this, decodeParams, decodeParams.complete);
     }
 
     protected DecodeParams getDecodeParams(int serialNo, int frame, double pixFactor, double factor) {
@@ -297,15 +290,17 @@ public class J2KView extends AbstractView {
                 factor = Math.min(factor, 0.5);
             }
         }
-        return new DecodeParams(serialNo, subImage, res, frame, factor);
+        AtomicBoolean status = cacheStatus.getFrameStatus(frame, res.level);
+        return new DecodeParams(serialNo, status != null && status.get(), subImage, res, frame, factor);
     }
 
-    protected void signalReader(boolean frameLevelComplete, DecodeParams decodeParams) {
+    protected void signalReader(DecodeParams decodeParams) {
         if (reader != null) {
-            boolean priority = !frameLevelComplete && !Movie.isPlaying();
-
+            boolean complete = decodeParams.complete;
             int level = decodeParams.resolution.level;
-            if (priority || (!frameLevelComplete && level < currentLevel)) {
+            boolean priority = !complete && !Movie.isPlaying();
+
+            if (priority || (!complete && level < currentLevel)) {
                 reader.signalReader(new ImageParams(priority, decodeParams));
             }
             currentLevel = level;
