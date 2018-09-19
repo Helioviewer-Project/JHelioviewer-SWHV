@@ -22,20 +22,24 @@ class DecodeExecutor {
             new JHVThread.NamedThreadFactory("Decoder"),
             new ThreadPoolExecutor.DiscardPolicy());
 
-    void execute(J2KView view, DecodeParams decodeParams, boolean keep) {
+    void execute(J2KView view, DecodeParams decodeParams) {
         blockingQueue.poll();
 
         ImageBuffer imageBuffer = decodeCache.getIfPresent(decodeParams);
         if (imageBuffer == null)
-            executor.execute(new J2KDecoder(view, decodeCache, decodeParams, keep, false));
+            executor.execute(new J2KDecoder(view, decodeParams, false));
         else
             view.setDataFromDecoder(decodeParams, imageBuffer);
+    }
+
+    void addToCache(DecodeParams decodeParams, ImageBuffer imageBuffer) {
+        decodeCache.put(decodeParams, imageBuffer);
     }
 
     void abolish() {
         try {
             blockingQueue.poll();
-            executor.execute(new J2KDecoder(null, null, null, false, true));
+            executor.execute(new J2KDecoder(null, null, true));
             executor.shutdown();
             decodeCache.invalidateAll();
             while (!executor.awaitTermination(1000L, TimeUnit.MILLISECONDS)) ;
