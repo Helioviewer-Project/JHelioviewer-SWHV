@@ -26,10 +26,10 @@ class DecodeExecutor {
         blockingQueue.poll();
 
         ImageBuffer imageBuffer = decodeCache.getIfPresent(decodeParams);
-        if (imageBuffer != null)
-            view.setDataFromDecoder(decodeParams, imageBuffer);
-        else
+        if (imageBuffer == null)
             executor.execute(new J2KDecoder(view, decodeCache, decodeParams, keep, false));
+        else
+            view.setDataFromDecoder(decodeParams, imageBuffer);
     }
 
     void abolish() {
@@ -37,8 +37,8 @@ class DecodeExecutor {
             blockingQueue.poll();
             executor.execute(new J2KDecoder(null, null, null, false, true));
             executor.shutdown();
-            while (!executor.awaitTermination(1000L, TimeUnit.MILLISECONDS)) ;
             decodeCache.invalidateAll();
+            while (!executor.awaitTermination(1000L, TimeUnit.MILLISECONDS)) ;
         } catch (Exception ignore) {
         }
     }
