@@ -34,6 +34,7 @@ public class UIGlobals {
             String laf = UIManager.getSystemLookAndFeelClassName();
             UIManager.setLookAndFeel(laf);
             if (laf.contains("gtk") || laf.contains("nimbus") || laf.contains("synth")) { // crash due to uninitialized defaults
+                UIManager.getDefaults().put("SliderUI", "javax.swing.plaf.basic.BasicSliderUI");
                 UIManager.getDefaults().put("RangeSliderUI", "com.jidesoft.plaf.basic.BasicRangeSliderUI");
                 if (laf.contains("synth"))
                     UIManager.getDefaults().put("textHighlight", new ColorUIResource(255, 255, 255));
