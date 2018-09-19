@@ -35,7 +35,7 @@ import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
-public class TopToolBar extends JToolBar {
+public class ToolBar extends JToolBar {
 
     private static DisplayMode displayMode = DisplayMode.ICONANDTEXT;
 
@@ -102,7 +102,7 @@ public class TopToolBar extends JToolBar {
         return b;
     }
 
-    public TopToolBar() {
+    public ToolBar() {
         setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
         setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
         setRollover(true);
