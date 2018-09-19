@@ -73,8 +73,8 @@ class J2KDecoder implements Runnable {
         Kdu_coords actualSize = actualRegion.Access_size();
         int actualWidth = actualSize.Get_x(), actualHeight = actualSize.Get_y();
 
-        int[] rowGap = new int[1];
-        long addr = compositorBuf.Get_buf(rowGap, false);
+        int[] srcStride = new int[1];
+        long addr = compositorBuf.Get_buf(srcStride, false);
 
         ImageBuffer.Format format = numComponents < 3 ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.ARGB32;
         byte[] byteBuffer = new byte[actualWidth * actualHeight * format.bytes];
@@ -95,13 +95,13 @@ class J2KDecoder implements Runnable {
             int srcIdx = 0;
 
             if (numComponents < 3) {
-                for (int row = 0; row < newHeight; row++, dstIdx += actualWidth, srcIdx += newWidth) {
+                for (int row = 0; row < newHeight; row++, dstIdx += actualWidth, srcIdx += srcStride[0]) {
                     for (int col = 0; col < newWidth; ++col) {
                         byteBuffer[dstIdx + col] = MemoryUtil.memGetByte(addr + 4 * (srcIdx + col));
                     }
                 }
             } else {
-                for (int row = 0; row < newHeight; row++, dstIdx += actualWidth, srcIdx += newWidth) {
+                for (int row = 0; row < newHeight; row++, dstIdx += actualWidth, srcIdx += srcStride[0]) {
                     for (int col = 0; col < newWidth; ++col) {
                         for (int idx = 0; idx < 4; ++idx)
                             byteBuffer[4 * (dstIdx + col) + idx] = MemoryUtil.memGetByte(addr + 4 * (srcIdx + col) + idx);
