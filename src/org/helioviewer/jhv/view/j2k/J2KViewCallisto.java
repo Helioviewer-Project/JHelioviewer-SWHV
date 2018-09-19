@@ -23,13 +23,16 @@ public class J2KViewCallisto extends J2KView {
     private Rectangle region;
 
     @Override
-    ImageParams calculateParams(int serialNo, int frame, double pixFactor, double factor) {
+    protected DecodeParams getDecodeParams(int serialNo, int frame, double pixFactor, double factor) {
         ResolutionLevel res = getResolutionLevel(frame, 0);
         SubImage subImage = new SubImage(region.x, region.y, region.width, region.height, res.width, res.height);
+        return new DecodeParams(serialNo, subImage, res, frame, factor);
+    }
 
-        ImageParams params = new ImageParams(true, new DecodeParams(serialNo, subImage, res, frame, factor));
+    @Override
+    protected ImageParams calculateParams(DecodeParams decodeParams) {
+        ImageParams params = new ImageParams(true, decodeParams);
         signalReader(params);
-
         return params;
     }
 

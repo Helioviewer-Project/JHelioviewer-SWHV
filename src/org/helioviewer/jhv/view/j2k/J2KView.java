@@ -266,12 +266,13 @@ public class J2KView extends AbstractView {
     @Override
     public void decode(int serialNo, double pixFactor, double factor) {
         // order is important, this will signal reader
-        ImageParams params = calculateParams(serialNo, targetFrame, pixFactor, factor);
-        AtomicBoolean status = cacheStatus.getFrameStatus(targetFrame, params.decodeParams.resolution.level);
+        DecodeParams decodeParams = getDecodeParams(serialNo, targetFrame, pixFactor, factor);
+        ImageParams params = calculateParams(decodeParams);
+        AtomicBoolean status = cacheStatus.getFrameStatus(targetFrame, decodeParams.resolution.level);
         if (status == null)
             return;
 
-        executor.execute(this, params.decodeParams, status.get());
+        executor.execute(this, decodeParams, status.get());
     }
 
     void signalDecoderFromReader(ImageParams params) {
@@ -315,7 +316,7 @@ public class J2KView extends AbstractView {
             reader.signalReader(params);
     }
 
-    private DecodeParams getDecodeParams(int serialNo, int frame, double pixFactor, double factor) {
+    protected DecodeParams getDecodeParams(int serialNo, int frame, double pixFactor, double factor) {
         ResolutionLevel res;
         SubImage subImage;
 
@@ -338,11 +339,9 @@ public class J2KView extends AbstractView {
         return new DecodeParams(serialNo, subImage, res, frame, factor);
     }
 
-    ImageParams calculateParams(int serialNo, int frame, double pixFactor, double factor) {
-        DecodeParams decodeParams = getDecodeParams(serialNo, frame, pixFactor, factor);
-
+    protected ImageParams calculateParams(DecodeParams decodeParams) {
         int level = decodeParams.resolution.level;
-        AtomicBoolean status = cacheStatus.getFrameStatus(frame, level);
+        AtomicBoolean status = cacheStatus.getFrameStatus(decodeParams.frame, level);
         boolean frameLevelComplete = status != null && status.get();
         boolean priority = !frameLevelComplete && !Movie.isPlaying();
 
