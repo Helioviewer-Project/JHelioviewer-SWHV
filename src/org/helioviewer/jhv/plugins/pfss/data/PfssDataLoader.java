@@ -28,7 +28,7 @@ class PfssDataLoader extends JHVWorker<PfssData, Void> {
     @Override
     protected PfssData backgroundWork() {
         try (NetClient nc = NetClient.of(url); Fits fits = new Fits(nc.getStream())) {
-            BasicHDU<?> hdus[] = fits.read();
+            BasicHDU<?>[] hdus = fits.read();
             if (hdus == null || hdus.length < 2 || !(hdus[1] instanceof BinaryTableHDU))
                 throw new Exception("Could not read FITS: " + url);
 

@@ -36,7 +36,7 @@ class JPIPSegment implements Serializable {
     public int length;
 
     // The segment data
-    public byte data[];
+    public byte[] data;
 
     // Indicates if this segment is the last one (when there is a data segment stream)
     public boolean isFinal;
