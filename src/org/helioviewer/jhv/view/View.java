@@ -8,8 +8,8 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.time.JHVDate;
 
 public interface View {
@@ -22,7 +22,7 @@ public interface View {
 
     void abolish();
 
-    void decode(Quat q, double pixFactor, double factor);
+    void decode(Position viewpoint, double pixFactor, double factor);
 
     URI getURI();
 

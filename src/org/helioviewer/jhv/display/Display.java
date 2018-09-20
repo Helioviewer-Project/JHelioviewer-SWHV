@@ -15,8 +15,8 @@ import org.helioviewer.jhv.events.JHVEventHighlightListener;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.ImageLayers;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
+import org.helioviewer.jhv.position.Position;
 
 public class Display implements ActionListener, JHVEventHighlightListener {
 
@@ -190,8 +190,8 @@ public class Display implements ActionListener, JHVEventHighlightListener {
         toDisplay = true;
     }
 
-    public static void handleData(Quat q) { // sync between image layers, special for ImageLayer.handleData
-        if (ImageLayers.getSyncedImageLayers(q)) {
+    public static void handleData(Position viewpoint) { // sync between layers, special for ImageLayer.handleData
+        if (ImageLayers.getSyncedImageLayers(viewpoint)) {
             JHVFrame.getGLWindow().display(); // asap
             toDisplay = false;
         }

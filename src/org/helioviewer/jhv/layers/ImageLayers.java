@@ -5,9 +5,9 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.time.TimeUtils;
 
 ///
@@ -25,13 +25,13 @@ public class ImageLayers {
     public static void decode(double factor) {
         Viewport[] vp = Display.getViewports();
         double cameraWidth = Display.getCamera().getWidth();
-        Quat q = Display.getCamera().getViewpoint().toQuat();
+        Position viewpoint = Display.getCamera().getViewpoint();
 
         for (ImageLayer layer : Layers.getImageLayers()) {
             int i;
             if ((i = layer.isVisibleIdx()) != -1 && vp[i] != null) {
                 double pixFactor = vp[i].height / (2 * cameraWidth);
-                layer.getView().decode(q, pixFactor, factor);
+                layer.getView().decode(viewpoint, pixFactor, factor);
             }
         }
     }
@@ -73,10 +73,10 @@ public class ImageLayers {
         return ct;
     }
 
-    public static boolean getSyncedImageLayers(Quat q) {
+    public static boolean getSyncedImageLayers(Position viewpoint) {
         for (ImageLayer layer : Layers.getImageLayers()) {
             ImageData id;
-            if (layer.isEnabled() && (id = layer.getImageData()) != null && q != id.getCameraRotation() /* deliberate on reference */)
+            if (layer.isEnabled() && (id = layer.getImageData()) != null && viewpoint != id.getViewpoint() /* deliberate on reference */)
                 return false;
         }
         return true;

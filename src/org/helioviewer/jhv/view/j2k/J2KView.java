@@ -17,9 +17,9 @@ import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.APIResponse;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.log.Log;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
+import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.view.AbstractView;
 import org.helioviewer.jhv.view.j2k.cache.CacheStatus;
@@ -264,15 +264,15 @@ public class J2KView extends AbstractView {
     }
 
     @Override
-    public void decode(Quat q, double pixFactor, double factor) {
-        DecodeParams decodeParams = getDecodeParams(q, targetFrame, pixFactor, factor);
+    public void decode(Position viewpoint, double pixFactor, double factor) {
+        DecodeParams decodeParams = getDecodeParams(viewpoint, targetFrame, pixFactor, factor);
         if (reader != null && !decodeParams.complete) {
             signalReader(decodeParams);
         }
         decoder.decode(this, decodeParams);
     }
 
-    protected DecodeParams getDecodeParams(Quat q, int frame, double pixFactor, double factor) {
+    protected DecodeParams getDecodeParams(Position viewpoint, int frame, double pixFactor, double factor) {
         ResolutionLevel res;
         SubImage subImage;
 
@@ -293,7 +293,7 @@ public class J2KView extends AbstractView {
             }
         }
         AtomicBoolean status = cacheStatus.getFrameStatus(frame, res.level); // before signalling to reader
-        return new DecodeParams(q, status != null && status.get(), subImage, res, frame, factor);
+        return new DecodeParams(viewpoint, status != null && status.get(), subImage, res, frame, factor);
     }
 
     protected void signalReader(DecodeParams decodeParams) {
@@ -332,7 +332,7 @@ public class J2KView extends AbstractView {
         decoder.addToCache(decodeParams, imageBuffer);
 
         ImageData data = new ImageData(imageBuffer);
-        data.setCameraRotation(decodeParams.q);
+        data.setViewpoint(decodeParams.viewpoint);
 
         MetaData m = metaData[frame];
         data.setMetaData(m);
