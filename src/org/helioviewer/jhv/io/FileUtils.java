@@ -31,7 +31,7 @@ public class FileUtils {
     }
 
     public static long diskUsage(File dir) throws IOException {
-        final AtomicLong size = new AtomicLong(0);
+        AtomicLong size = new AtomicLong(0);
 
         Files.walkFileTree(dir.toPath(), new SimpleFileVisitor<Path>() {
             @Override
