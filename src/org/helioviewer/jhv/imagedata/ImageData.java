@@ -1,12 +1,12 @@
 package org.helioviewer.jhv.imagedata;
 
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.position.Position;
 
 public class ImageData {
 
-    private Quat q;
+    private Position viewpoint;
     private Region region;
     private MetaData metaData;
     private boolean uploaded = false;
@@ -21,12 +21,12 @@ public class ImageData {
         return imageBuffer;
     }
 
-    public Quat getCameraRotation() {
-        return q;
+    public Position getViewpoint() {
+        return viewpoint;
     }
 
-    public void setCameraRotation(Quat _q) {
-        q = _q;
+    public void setViewpoint(Position _viewpoint) {
+        viewpoint = _viewpoint;
     }
 
     public Region getRegion() {
