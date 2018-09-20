@@ -38,10 +38,6 @@ public class J2KView extends AbstractView {
     private int targetFrame = 0;
     private int trueFrame = 0;
 
-    private int fps;
-    private int fpsCount;
-    private long fpsTime = System.currentTimeMillis();
-
     private final long[] cacheKey;
 
     private final DecodeExecutor decoder = new DecodeExecutor();
@@ -161,19 +157,6 @@ public class J2KView extends AbstractView {
         } finally {
             jpipCache = null;
         }
-    }
-
-    @Override
-    public int getCurrentFramerate() {
-        long currentTime = System.currentTimeMillis();
-        long delta = currentTime - fpsTime;
-
-        if (delta > 1000) {
-            fps = (int) (1000 * fpsCount / (double) delta + .5);
-            fpsCount = 0;
-            fpsTime = currentTime;
-        }
-        return fps;
     }
 
     @Override
@@ -323,18 +306,14 @@ public class J2KView extends AbstractView {
         if (isAbolished)
             return;
 
-        int frame = decodeParams.frame;
-        if (frame != trueFrame) {
-            trueFrame = frame;
-            ++fpsCount;
-        }
+        trueFrame = decodeParams.frame;
 
         decoder.addToCache(decodeParams, imageBuffer);
 
         ImageData data = new ImageData(imageBuffer);
         data.setViewpoint(decodeParams.viewpoint);
 
-        MetaData m = metaData[frame];
+        MetaData m = metaData[trueFrame];
         data.setMetaData(m);
         data.setRegion(m.roiToRegion(decodeParams.subImage, decodeParams.resolution.factorX, decodeParams.resolution.factorY));
 

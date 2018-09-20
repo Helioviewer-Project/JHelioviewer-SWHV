@@ -3,9 +3,7 @@ package org.helioviewer.jhv.gui.components.statusplugin;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
-import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.opengl.GLListener;
 
 @SuppressWarnings("serial")
 public class FramerateStatusPanel extends StatusPanel.StatusPlugin implements LazyComponent {
@@ -19,12 +17,7 @@ public class FramerateStatusPanel extends StatusPanel.StatusPlugin implements La
 
     @Override
     public void lazyRepaint() {
-        int f = 0;
-        ImageLayer layer;
-        if (Movie.isPlaying() && (layer = Layers.getActiveImageLayer()) != null) {
-            f = layer.getView().getCurrentFramerate();
-        }
-
+        int f = GLListener.getFramerate();
         if (f != fps) {
             fps = f;
             setText("fps: " + fps);
