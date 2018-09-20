@@ -9,10 +9,10 @@ import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
+import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.time.JHVDate;
 
 public class AbstractView implements View {
@@ -67,9 +67,9 @@ public class AbstractView implements View {
     }
 
     @Override
-    public void decode(Quat q, double pixFactor, double factor) {
+    public void decode(Position viewpoint, double pixFactor, double factor) {
         if (imageData != null) {
-            imageData.setCameraRotation(q);
+            imageData.setViewpoint(viewpoint);
             if (dataHandler != null) {
                 dataHandler.handleData(imageData);
             }
