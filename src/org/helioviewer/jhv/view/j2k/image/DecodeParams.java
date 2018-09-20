@@ -36,8 +36,7 @@ public class DecodeParams {
         result = 31 * result + resolution.hashCode();
         result = 31 * result + frame;
         long tmp = Double.doubleToLongBits(factor);
-        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
-        return result;
+        return 31 * result + (int) (tmp ^ (tmp >>> 32));
     }
 
     @Override

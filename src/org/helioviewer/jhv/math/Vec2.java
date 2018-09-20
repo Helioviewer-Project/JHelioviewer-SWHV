@@ -27,8 +27,7 @@ public class Vec2 {
         long tmp = Double.doubleToLongBits(x);
         result = 31 * result + (int) (tmp ^ (tmp >>> 32));
         tmp = Double.doubleToLongBits(y);
-        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
-        return result;
+        return 31 * result + (int) (tmp ^ (tmp >>> 32));
     }
 
     @Override
