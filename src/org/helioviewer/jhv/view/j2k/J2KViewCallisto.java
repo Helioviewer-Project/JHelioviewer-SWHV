@@ -8,7 +8,7 @@ import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.APIResponse;
 import org.helioviewer.jhv.view.j2k.image.DecodeParams;
-import org.helioviewer.jhv.view.j2k.image.ImageParams;
+import org.helioviewer.jhv.view.j2k.image.ReadParams;
 import org.helioviewer.jhv.view.j2k.image.ResolutionSet.ResolutionLevel;
 
 public class J2KViewCallisto extends J2KView {
@@ -33,7 +33,7 @@ public class J2KViewCallisto extends J2KView {
 
     @Override
     protected void signalReader(DecodeParams decodeParams) { // not used
-        reader.signalReader(new ImageParams(true, decodeParams));
+        reader.signalReader(new ReadParams(true, decodeParams));
     }
 
 }
