@@ -22,6 +22,9 @@ import org.helioviewer.jhv.view.j2k.image.DecodeParams;
 
 import org.lwjgl.system.MemoryUtil;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 class J2KDecoder implements Runnable {
 
     // Maximum of samples to process per rendering iteration
@@ -30,6 +33,7 @@ class J2KDecoder implements Runnable {
     private static final int CODESTREAM_CACHE_THRESHOLD = 1024 * 1024;
     private static final int[] firstComponent = {0};
 
+    private static final ThreadLocal<Cache<DecodeParams, ImageBuffer>> decodeCache = ThreadLocal.withInitial(() -> CacheBuilder.newBuilder().softValues().build());
     private static final ThreadLocal<Kdu_thread_env> localThread = ThreadLocal.withInitial(J2KDecoder::createThreadEnv);
     private static final ThreadLocal<Kdu_region_compositor> localCompositor = new ThreadLocal<>();
 
@@ -44,6 +48,10 @@ class J2KDecoder implements Runnable {
     }
 
     private ImageBuffer decodeLayer(DecodeParams params) throws KduException {
+        ImageBuffer imageBuffer = decodeCache.get().getIfPresent(decodeParams);
+        if (imageBuffer != null)
+            return imageBuffer;
+
         SubImage subImage = params.subImage;
         int frame = params.frame;
         int numComponents = view.getNumComponents(frame);
@@ -111,7 +119,11 @@ class J2KDecoder implements Runnable {
         }
         compositor.Remove_ilayer(ilayer, true);
 
-        return new ImageBuffer(actualWidth, actualHeight, format, ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder()));
+        imageBuffer = new ImageBuffer(actualWidth, actualHeight, format, ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder()));
+        if (decodeParams.complete) {
+            decodeCache.get().put(decodeParams, imageBuffer);
+        }
+        return imageBuffer;
     }
 
     @Override
@@ -195,6 +207,7 @@ class J2KDecoder implements Runnable {
                 kte.Destroy();
                 localThread.set(null);
             }
+            decodeCache.get().invalidateAll();
         } catch (KduException e) {
             e.printStackTrace();
         }
