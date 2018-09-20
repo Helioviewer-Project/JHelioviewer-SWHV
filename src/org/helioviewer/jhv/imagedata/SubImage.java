@@ -46,8 +46,7 @@ public class SubImage {
         result = 31 * result + x;
         result = 31 * result + y;
         result = 31 * result + width;
-        result = 31 * result + height;
-        return result;
+        return 31 * result + height;
     }
 
     @Override

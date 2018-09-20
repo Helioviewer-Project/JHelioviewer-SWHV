@@ -168,7 +168,7 @@ public class JHVFrame {
                 try {
                     Class<?> fullScreenUtilities = Class.forName("com.apple.eawt.FullScreenUtilities");
                     Method setWindowCanFullScreen = fullScreenUtilities.getMethod("setWindowCanFullScreen", Window.class, boolean.class);
-                    setWindowCanFullScreen.invoke(fullScreenUtilities, window, true);
+                    setWindowCanFullScreen.invoke(fullScreenUtilities, window, Boolean.TRUE);
                 } catch (Exception e) {
                     Log.error("Fullscreen utilities not available");
                     e.printStackTrace();

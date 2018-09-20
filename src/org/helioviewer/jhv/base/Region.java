@@ -51,8 +51,7 @@ public class Region {
         tmp = Double.doubleToLongBits(llx);
         result = 31 * result + (int) (tmp ^ (tmp >>> 32));
         tmp = Double.doubleToLongBits(lly);
-        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
-        return result;
+        return 31 * result + (int) (tmp ^ (tmp >>> 32));
     }
 
     @Override
