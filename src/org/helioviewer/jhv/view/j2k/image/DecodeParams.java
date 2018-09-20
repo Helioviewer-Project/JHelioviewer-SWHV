@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.view.j2k.image;
 
-import java.util.Objects;
-
 import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.position.Position;
 
@@ -24,16 +22,22 @@ public class DecodeParams {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(Object o) { // viewpoint, complete don't participate
         if (!(o instanceof DecodeParams))
             return false;
         DecodeParams p = (DecodeParams) o;
-        return frame == p.frame && factor == p.factor && subImage.equals(p.subImage) && resolution.equals(p.resolution); // viewpoint, complete don't participate
+        return frame == p.frame && factor == p.factor && subImage.equals(p.subImage) && resolution.equals(p.resolution);
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(frame, factor, subImage, resolution); // viewpoint, complete don't participate
+    public int hashCode() { // viewpoint, complete don't participate
+        int result = 1;
+        result = 31 * result + subImage.hashCode();
+        result = 31 * result + resolution.hashCode();
+        result = 31 * result + frame;
+        long tmp = Double.doubleToLongBits(factor);
+        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
+        return result;
     }
 
     @Override
