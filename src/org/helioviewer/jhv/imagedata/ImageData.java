@@ -6,7 +6,6 @@ import org.helioviewer.jhv.metadata.MetaData;
 
 public class ImageData {
 
-    private int serialNo;
     private Quat q;
     private Region region;
     private MetaData metaData;
@@ -22,16 +21,11 @@ public class ImageData {
         return imageBuffer;
     }
 
-    public int getSerial() {
-        return serialNo;
-    }
-
-    public Quat getRotation() {
+    public Quat getCameraRotation() {
         return q;
     }
 
-    public void setViewParams(int _serialNo, Quat _q) {
-        serialNo = _serialNo;
+    public void setCameraRotation(Quat _q) {
         q = _q;
     }
 

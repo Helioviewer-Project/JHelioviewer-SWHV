@@ -181,7 +181,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         shader.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height);
         shader.bindMatrix(gl, camera.getTransformationInverse(vp.aspect));
 
-        Quat q = Quat.rotate(camera.getCurrentDragRotation(), imageData.getRotation()); // sync with camera at decode command moment
+        Quat q = Quat.rotate(camera.getCurrentDragRotation(), imageData.getCameraRotation()); // sync with camera at decode command moment
         shader.bindCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, imageData.getMetaData().getCenterRotation()));
 
         DifferenceMode diffMode = glImage.getDifferenceMode();
@@ -254,7 +254,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     public void handleData(ImageData newImageData) {
         setImageData(newImageData);
         JHVFrame.getLayers().fireTimeUpdated(this);
-        Display.handleData(imageData.getSerial());
+        Display.handleData(imageData.getCameraRotation());
     }
 
     @Override

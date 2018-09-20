@@ -264,15 +264,15 @@ public class J2KView extends AbstractView {
     }
 
     @Override
-    public void decode(int serialNo, Quat q, double pixFactor, double factor) {
-        DecodeParams decodeParams = getDecodeParams(serialNo, q, targetFrame, pixFactor, factor);
+    public void decode(Quat q, double pixFactor, double factor) {
+        DecodeParams decodeParams = getDecodeParams(q, targetFrame, pixFactor, factor);
         if (reader != null && !decodeParams.complete) {
             signalReader(decodeParams);
         }
         decoder.decode(this, decodeParams);
     }
 
-    protected DecodeParams getDecodeParams(int serialNo, Quat q, int frame, double pixFactor, double factor) {
+    protected DecodeParams getDecodeParams(Quat q, int frame, double pixFactor, double factor) {
         ResolutionLevel res;
         SubImage subImage;
 
@@ -293,7 +293,7 @@ public class J2KView extends AbstractView {
             }
         }
         AtomicBoolean status = cacheStatus.getFrameStatus(frame, res.level); // before signalling to reader
-        return new DecodeParams(serialNo, q, status != null && status.get(), subImage, res, frame, factor);
+        return new DecodeParams(q, status != null && status.get(), subImage, res, frame, factor);
     }
 
     protected void signalReader(DecodeParams decodeParams) {
@@ -332,7 +332,7 @@ public class J2KView extends AbstractView {
         decoder.addToCache(decodeParams, imageBuffer);
 
         ImageData data = new ImageData(imageBuffer);
-        data.setViewParams(decodeParams.serialNo, decodeParams.q);
+        data.setCameraRotation(decodeParams.q);
 
         MetaData m = metaData[frame];
         data.setMetaData(m);

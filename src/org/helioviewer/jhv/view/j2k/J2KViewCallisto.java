@@ -25,11 +25,11 @@ public class J2KViewCallisto extends J2KView {
     private Rectangle region;
 
     @Override
-    protected DecodeParams getDecodeParams(int serialNo, Quat q, int frame, double pixFactor, double factor) {
+    protected DecodeParams getDecodeParams(Quat q, int frame, double pixFactor, double factor) {
         ResolutionLevel res = getResolutionLevel(frame, 0);
         SubImage subImage = new SubImage(region.x, region.y, region.width, region.height, res.width, res.height);
         AtomicBoolean status = cacheStatus.getFrameStatus(frame, res.level);
-        return new DecodeParams(serialNo, q, status != null && status.get(), subImage, res, frame, factor);
+        return new DecodeParams(q, status != null && status.get(), subImage, res, frame, factor);
     }
 
     @Override

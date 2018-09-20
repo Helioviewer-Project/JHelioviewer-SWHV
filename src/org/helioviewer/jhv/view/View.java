@@ -22,7 +22,7 @@ public interface View {
 
     void abolish();
 
-    void decode(int serialNo, Quat q, double pixFactor, double factor);
+    void decode(Quat q, double pixFactor, double factor);
 
     URI getURI();
 
