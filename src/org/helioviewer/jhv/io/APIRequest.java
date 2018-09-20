@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.io;
 
 import java.io.IOException;
-import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
@@ -62,7 +61,12 @@ public class APIRequest {
 
     @Override
     public int hashCode() {
-        return Objects.hash(sourceId, startTime, endTime, cadence, server);
+        int result = 1;
+        result = 31 * result + sourceId;
+        result = 31 * result + cadence;
+        result = 31 * result + (int) (startTime ^ (startTime >>> 32));
+        result = 31 * result + (int) (endTime ^ (endTime >>> 32));
+        return 31 * result + server.hashCode();
     }
 
     public JSONObject toJson() {
