@@ -192,6 +192,7 @@ public class Display implements ActionListener, JHVEventHighlightListener {
 
     public static void handleData(Position viewpoint) { // sync between layers, special for ImageLayer.handleData
         if (ImageLayers.getSyncedImageLayers(viewpoint)) {
+            camera.updateCamera(viewpoint); // sync all layers
             JHVFrame.getGLWindow().display(); // asap
             toDisplay = false;
         }
