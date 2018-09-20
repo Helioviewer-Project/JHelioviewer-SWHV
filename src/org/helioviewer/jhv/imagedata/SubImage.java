@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.imagedata;
 
-import java.util.Objects;
-
 import org.helioviewer.jhv.math.MathUtils;
 
 public class SubImage {
@@ -44,7 +42,12 @@ public class SubImage {
 
     @Override
     public int hashCode() {
-        return Objects.hash(x, y, width, height);
+        int result = 1;
+        result = 31 * result + x;
+        result = 31 * result + y;
+        result = 31 * result + width;
+        result = 31 * result + height;
+        return result;
     }
 
     @Override
