@@ -87,11 +87,6 @@ public class AbstractView implements View {
     }
 
     @Override
-    public int getCurrentFramerate() {
-        return 0;
-    }
-
-    @Override
     public boolean isMultiFrame() {
         return maxFrame > 0;
     }

@@ -195,8 +195,25 @@ public class GLListener implements GLEventListener {
             renderSceneScale(camera, gl);
         renderFullFloatScene(camera, gl);
 
+        fpsCount++;
         JHVFrame.getZoomStatusPanel().update(camera.getWidth(), camera.getViewpoint().distance);
         // GLInfo.checkGLErrors(gl, "GLListener.display()");
+    }
+
+    private static int fps;
+    private static int fpsCount;
+    private static long fpsTime = System.currentTimeMillis();
+
+    public static int getFramerate() {
+        long currentTime = System.currentTimeMillis();
+        long delta = currentTime - fpsTime;
+
+        if (delta > 1000) {
+            fps = (int) (1000 * fpsCount / (double) delta + .5);
+            fpsCount = 0;
+            fpsTime = currentTime;
+        }
+        return fps;
     }
 
 }

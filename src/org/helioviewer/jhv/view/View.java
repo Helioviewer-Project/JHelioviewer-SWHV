@@ -39,8 +39,6 @@ public interface View {
 
     int getMaximumFrameNumber();
 
-    int getCurrentFramerate();
-
     void setDataHandler(ImageDataHandler dataHandler);
 
     boolean isDownloading();
