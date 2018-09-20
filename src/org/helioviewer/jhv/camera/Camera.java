@@ -64,6 +64,12 @@ public class Camera {
     }
 ////
 
+    public void updateCamera(Position _viewpoint) { // for layers sync
+        viewpoint = _viewpoint;
+        updateRotation();
+        updateWidth();
+    }
+
     private void updateCamera(JHVDate time) {
         viewpoint = Display.mode == Display.DisplayMode.Orthographic ? updateViewpoint.update(time) : UpdateViewpoint.earthFixedDistance.update(time);
         updateRotation();
