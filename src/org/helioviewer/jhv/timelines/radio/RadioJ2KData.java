@@ -83,7 +83,7 @@ class RadioJ2KData implements ImageDataHandler {
             Rectangle roi = getROI(xAxis);
             if (decodingNeeded && roi.width > 0 && roi.height > 0) {
                 view.setRegion(roi);
-                view.decode(0, 1, last_resolution);
+                view.decode(0, null, 1, last_resolution);
             }
         }
     }

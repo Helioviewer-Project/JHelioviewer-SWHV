@@ -5,6 +5,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -22,12 +23,14 @@ import org.astrogrid.samp.SampUtils;
 public class ImageLayers {
 
     public static void decode(int serialNo, double factor) {
-        int i;
         Viewport[] vp = Display.getViewports();
+        double cameraWidth = Display.getCamera().getWidth();
+        Quat q = Display.getCamera().getViewpoint().toQuat();
         for (ImageLayer layer : Layers.getImageLayers()) {
+            int i;
             if ((i = layer.isVisibleIdx()) != -1 && vp[i] != null) {
-                double pixFactor = vp[i].height / (2 * Display.getCamera().getWidth());
-                layer.getView().decode(serialNo, pixFactor, factor);
+                double pixFactor = vp[i].height / (2 * cameraWidth);
+                layer.getView().decode(serialNo, q, pixFactor, factor);
             }
         }
     }

@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.APIResponse;
+import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.view.j2k.image.DecodeParams;
 import org.helioviewer.jhv.view.j2k.image.ReadParams;
 import org.helioviewer.jhv.view.j2k.image.ResolutionSet.ResolutionLevel;
@@ -24,11 +25,11 @@ public class J2KViewCallisto extends J2KView {
     private Rectangle region;
 
     @Override
-    protected DecodeParams getDecodeParams(int serialNo, int frame, double pixFactor, double factor) {
+    protected DecodeParams getDecodeParams(int serialNo, Quat q, int frame, double pixFactor, double factor) {
         ResolutionLevel res = getResolutionLevel(frame, 0);
         SubImage subImage = new SubImage(region.x, region.y, region.width, region.height, res.width, res.height);
         AtomicBoolean status = cacheStatus.getFrameStatus(frame, res.level);
-        return new DecodeParams(serialNo, status != null && status.get(), subImage, res, frame, factor);
+        return new DecodeParams(serialNo, q, status != null && status.get(), subImage, res, frame, factor);
     }
 
     @Override
