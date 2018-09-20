@@ -42,7 +42,7 @@ public class J2KView extends AbstractView {
     private int fpsCount;
     private long fpsTime = System.currentTimeMillis();
 
-    private final long cacheKey[];
+    private final long[] cacheKey;
 
     private final DecodeExecutor decoder = new DecodeExecutor();
     private final KakaduSource kduSource;
@@ -54,7 +54,7 @@ public class J2KView extends AbstractView {
     public J2KView(URI _uri, APIRequest _request, APIResponse _response) throws Exception {
         super(_uri, _request);
 
-        long frames[] = _response == null ? null : _response.getFrames();
+        long[] frames = _response == null ? null : _response.getFrames();
         if (frames != null) {
             long key = request == null ? 0 : ((long) request.sourceId) << 32;
             int len = frames.length;

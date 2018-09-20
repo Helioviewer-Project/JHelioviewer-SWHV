@@ -131,7 +131,7 @@ public class ChunkedInputStream extends TransferInputStream {
             try {
                 if (!eof) {
                     // read and discard the remainder of the message
-                    byte buf[] = new byte[1024];
+                    byte[] buf = new byte[1024];
                     while (read(buf) >= 0) ;
                 }
             } finally {

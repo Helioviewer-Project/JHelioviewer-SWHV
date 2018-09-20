@@ -19,7 +19,7 @@ public class JulianDay {
     /* Earliest year allowed (4800BC) */
     private static final int IYMIN = -4799;
     /* Month lengths in days */
-    private static final int mtab[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    private static final int[] mtab = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
     public static double cal2mjd(int iy, int im, int id) {
         int my;

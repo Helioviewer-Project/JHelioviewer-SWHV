@@ -62,7 +62,7 @@ public class HTTPSocket {
             if (line.isEmpty())
                 return res;
 
-            String parts[] = Regex.HttpField.split(line);
+            String[] parts = Regex.HttpField.split(line);
             if (parts.length != 2)
                 throw new ProtocolException("Invalid HTTP header field: " + line);
             res.setHeader(parts[0], parts[1]);

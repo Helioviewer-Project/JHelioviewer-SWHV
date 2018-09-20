@@ -127,7 +127,7 @@ public class HelioviewerMetaData extends AbstractMetaData {
             fullName = "NSO-SOLIS " + measurement;
         } else if (instrument.contains("HMI")) {
             measurement = m.getString("CONTENT").orElse("");
-            String str[] = measurement.split(" ", 2);
+            String[] str = measurement.split(" ", 2);
             fullName = "HMI " + str[0].toLowerCase(Locale.ENGLISH);
         } else if (detector.equals("C2") || detector.equals("C3")) {
             measurement = m.getString("FILTER").orElse("") + ' ' + m.getString("POLAR").orElse("");
