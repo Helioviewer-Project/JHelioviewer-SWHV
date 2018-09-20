@@ -8,7 +8,7 @@ import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.j2k.cache.CacheStatus;
 import org.helioviewer.jhv.view.j2k.concurrency.BooleanSignal;
-import org.helioviewer.jhv.view.j2k.image.ImageParams;
+import org.helioviewer.jhv.view.j2k.image.ReadParams;
 import org.helioviewer.jhv.view.j2k.io.jpip.DatabinMap;
 import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCache;
 import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCacheManager;
@@ -64,7 +64,7 @@ class J2KReader implements Runnable {
         }
     }
 
-    void signalReader(ImageParams params) {
+    void signalReader(ReadParams params) {
         readerSignal.signal(params);
     }
 
@@ -118,7 +118,7 @@ class J2KReader implements Runnable {
         CacheStatus cacheStatus = view.getCacheStatus();
 
         while (!isAbolished) {
-            ImageParams params;
+            ReadParams params;
             // wait for signal
             try {
                 view.setDownloading(false);

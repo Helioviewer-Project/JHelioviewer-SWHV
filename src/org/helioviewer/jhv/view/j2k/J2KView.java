@@ -25,7 +25,7 @@ import org.helioviewer.jhv.view.j2k.cache.CacheStatus;
 import org.helioviewer.jhv.view.j2k.cache.CacheStatusLocal;
 import org.helioviewer.jhv.view.j2k.cache.CacheStatusRemote;
 import org.helioviewer.jhv.view.j2k.image.DecodeParams;
-import org.helioviewer.jhv.view.j2k.image.ImageParams;
+import org.helioviewer.jhv.view.j2k.image.ReadParams;
 import org.helioviewer.jhv.view.j2k.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCache;
 import org.helioviewer.jhv.view.j2k.kakadu.KakaduSource;
@@ -301,14 +301,14 @@ public class J2KView extends AbstractView {
         boolean priority = !Movie.isPlaying();
 
         if (priority || level < currentLevel) {
-            reader.signalReader(new ImageParams(priority, decodeParams));
+            reader.signalReader(new ReadParams(priority, decodeParams));
         }
         currentLevel = level;
     }
 
     private int currentLevel = 10000;
 
-    void signalDecoderFromReader(ImageParams params) {
+    void signalDecoderFromReader(ReadParams params) {
         if (isAbolished)
             return;
         EventQueue.invokeLater(() -> {

@@ -1,11 +1,11 @@
 package org.helioviewer.jhv.view.j2k.image;
 
-public class ImageParams {
+public class ReadParams {
 
     public boolean priority;
     public final DecodeParams decodeParams;
 
-    public ImageParams(boolean _priority, DecodeParams _decodeParams) {
+    public ReadParams(boolean _priority, DecodeParams _decodeParams) {
         priority = _priority;
         decodeParams = _decodeParams;
     }

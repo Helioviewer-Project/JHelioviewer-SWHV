@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.view.j2k.concurrency;
 
-import org.helioviewer.jhv.view.j2k.image.ImageParams;
+import org.helioviewer.jhv.view.j2k.image.ReadParams;
 
 /*
  * Very simple way of signaling between threads. Has no sense of ownership and
@@ -15,18 +15,16 @@ public class BooleanSignal {
     private final Object lock = new Object();
 
     private boolean isSignaled;
-    private ImageParams params;
+    private ReadParams params;
 
     public BooleanSignal(boolean _initialVal) {
         isSignaled = _initialVal;
     }
 
-    /*
-     * Used to wait for a signal. Waits until the flag is set, then it resets
-     * the flag and returns. The waiting thread can be interrupted and that
-     * exception is thrown immediately.
-     */
-    public ImageParams waitForSignal() throws InterruptedException {
+    // Used to wait for a signal. Waits until the flag is set, then it resets
+    // the flag and returns. The waiting thread can be interrupted and that
+    // exception is thrown immediately.
+    public ReadParams waitForSignal() throws InterruptedException {
         synchronized (lock) {
             while (!isSignaled) {
                 lock.wait();
@@ -36,11 +34,9 @@ public class BooleanSignal {
         }
     }
 
-    /*
-     * Sets the isSignaled flag and wakes up one waiting thread. Doesn't bother
-     * to notifyAll since the first thread woken up resets the flag anyway.
-     */
-    public void signal(ImageParams newParams) {
+    // Sets the isSignaled flag and wakes up one waiting thread. Doesn't bother
+    // to notifyAll since the first thread woken up resets the flag anyway.
+    public void signal(ReadParams newParams) {
         synchronized (lock) {
             isSignaled = true;
             params = newParams;

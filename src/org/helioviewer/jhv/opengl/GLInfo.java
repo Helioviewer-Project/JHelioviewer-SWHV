@@ -23,7 +23,6 @@ public class GLInfo {
 
     static void glVersionError(String err) {
         Log.error("GLInfo > " + err);
-
         if (1 == JOptionPane.showOptionDialog(null, Message.formatMessage(err + "\n\nJHelioviewer is not able to run."), "OpenGL Fatal Error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, crashOptions, crashOptions[0]))
             throw new GLException(err);
         else
@@ -34,7 +33,6 @@ public class GLInfo {
         glVersion = "OpenGL " + gl.glGetString(GL2.GL_VERSION);
         Log.info("GLInfo > " + glVersion);
         // Log.debug("GLInfo > Extensions: " + gl.glGetString(GL2.GL_EXTENSIONS));
-
         if (!gl.isExtensionAvailable("GL_VERSION_3_1")) {
             glVersionError("OpenGL 3.1 not supported.");
         }
