@@ -67,9 +67,9 @@ public class AbstractView implements View {
     }
 
     @Override
-    public void decode(int serialNo, Quat q, double pixFactor, double factor) {
+    public void decode(Quat q, double pixFactor, double factor) {
         if (imageData != null) {
-            imageData.setViewParams(serialNo, q);
+            imageData.setCameraRotation(q);
             if (dataHandler != null) {
                 dataHandler.handleData(imageData);
             }

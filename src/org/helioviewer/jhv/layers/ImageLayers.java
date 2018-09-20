@@ -22,15 +22,16 @@ import org.astrogrid.samp.SampUtils;
 
 public class ImageLayers {
 
-    public static void decode(int serialNo, double factor) {
+    public static void decode(double factor) {
         Viewport[] vp = Display.getViewports();
         double cameraWidth = Display.getCamera().getWidth();
         Quat q = Display.getCamera().getViewpoint().toQuat();
+
         for (ImageLayer layer : Layers.getImageLayers()) {
             int i;
             if ((i = layer.isVisibleIdx()) != -1 && vp[i] != null) {
                 double pixFactor = vp[i].height / (2 * cameraWidth);
-                layer.getView().decode(serialNo, q, pixFactor, factor);
+                layer.getView().decode(q, pixFactor, factor);
             }
         }
     }
@@ -72,10 +73,10 @@ public class ImageLayers {
         return ct;
     }
 
-    public static boolean getSyncedImageLayers(int serialNo) {
+    public static boolean getSyncedImageLayers(Quat q) {
         for (ImageLayer layer : Layers.getImageLayers()) {
             ImageData id;
-            if (layer.isEnabled() && (id = layer.getImageData()) != null && serialNo != id.getSerial())
+            if (layer.isEnabled() && (id = layer.getImageData()) != null && q != id.getCameraRotation() /* deliberate on reference */)
                 return false;
         }
         return true;

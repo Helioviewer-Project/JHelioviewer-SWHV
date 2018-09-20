@@ -15,6 +15,7 @@ import org.helioviewer.jhv.events.JHVEventHighlightListener;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.ImageLayers;
+import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 
 public class Display implements ActionListener, JHVEventHighlightListener {
@@ -189,14 +190,12 @@ public class Display implements ActionListener, JHVEventHighlightListener {
         toDisplay = true;
     }
 
-    public static void handleData(int serial) { // special for ImageLayer.handleData
-        if (ImageLayers.getSyncedImageLayers(serial)) {
+    public static void handleData(Quat q) { // sync between image layers, special for ImageLayer.handleData
+        if (ImageLayers.getSyncedImageLayers(q)) {
             JHVFrame.getGLWindow().display(); // asap
             toDisplay = false;
         }
     }
-
-    private static int serialNo;
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -205,7 +204,7 @@ public class Display implements ActionListener, JHVEventHighlightListener {
             toDisplay = false;
         }
         if (decodeFactor != -1) {
-            ImageLayers.decode(serialNo++, decodeFactor);
+            ImageLayers.decode(decodeFactor);
             decodeFactor = -1;
         }
     }
