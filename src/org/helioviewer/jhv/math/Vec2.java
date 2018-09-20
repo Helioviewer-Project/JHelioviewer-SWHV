@@ -18,7 +18,7 @@ public class Vec2 {
             return false;
         Vec2 v = (Vec2) o;
         return Double.doubleToLongBits(x) == Double.doubleToLongBits(v.x) &&
-               Double.doubleToLongBits(y) == Double.doubleToLongBits(v.y);
+                Double.doubleToLongBits(y) == Double.doubleToLongBits(v.y);
     }
 
     @Override

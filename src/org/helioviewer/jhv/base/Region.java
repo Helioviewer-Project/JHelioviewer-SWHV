@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.base;
 
-import java.util.Objects;
-
 public class Region {
 
     public final double width;
@@ -12,7 +10,7 @@ public class Region {
     public final double urx;
     public final double ury;
     public final double ulx;
-    public final double uly;
+    // public final double uly;
 
     public Region(double newLLX, double newLLY, double newWidth, double newHeight) {
         width = newWidth;
@@ -25,7 +23,7 @@ public class Region {
         ury = lly + height;
 
         ulx = llx;
-        uly = lly + height;
+        // uly = lly + height;
     }
 
     public static Region scale(Region r, double f) {
@@ -37,12 +35,24 @@ public class Region {
         if (!(o instanceof Region))
             return false;
         Region r = (Region) o;
-        return width == r.width && height == r.height && llx == r.llx && lly == r.lly;
+        return Double.doubleToLongBits(width) == Double.doubleToLongBits(r.width) &&
+                Double.doubleToLongBits(height) == Double.doubleToLongBits(r.height) &&
+                Double.doubleToLongBits(llx) == Double.doubleToLongBits(r.llx) &&
+                Double.doubleToLongBits(lly) == Double.doubleToLongBits(r.lly);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(width, height, llx, lly);
+        int result = 1;
+        long tmp = Double.doubleToLongBits(width);
+        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
+        tmp = Double.doubleToLongBits(height);
+        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
+        tmp = Double.doubleToLongBits(llx);
+        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
+        tmp = Double.doubleToLongBits(lly);
+        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
+        return result;
     }
 
     @Override

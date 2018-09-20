@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.position;
 
-import java.util.Objects;
-
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.time.JHVDate;
 
@@ -31,12 +29,22 @@ public class Position {
         if (!(o instanceof Position))
             return false;
         Position p = (Position) o;
-        return distance == p.distance && lon == p.lon && lat == p.lat && time.equals(p.time);
+        return Double.doubleToLongBits(distance) == Double.doubleToLongBits(p.distance) &&
+                Double.doubleToLongBits(lon) == Double.doubleToLongBits(p.lon) &&
+                Double.doubleToLongBits(lat) == Double.doubleToLongBits(p.lat) &&
+                time.equals(p.time);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(distance, lon, lat, time);
+        int result = 1;
+        long tmp = Double.doubleToLongBits(distance);
+        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
+        tmp = Double.doubleToLongBits(lon);
+        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
+        tmp = Double.doubleToLongBits(lat);
+        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
+        return 31 * result + time.hashCode();
     }
 
     @Override

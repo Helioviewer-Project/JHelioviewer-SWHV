@@ -105,8 +105,8 @@ public class Vec3 {
             return false;
         Vec3 v = (Vec3) o;
         return Double.doubleToLongBits(x) == Double.doubleToLongBits(v.x) &&
-               Double.doubleToLongBits(y) == Double.doubleToLongBits(v.y) &&
-               Double.doubleToLongBits(z) == Double.doubleToLongBits(v.z);
+                Double.doubleToLongBits(y) == Double.doubleToLongBits(v.y) &&
+                Double.doubleToLongBits(z) == Double.doubleToLongBits(v.z);
     }
 
     @Override
