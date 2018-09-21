@@ -20,7 +20,7 @@ public class FramerateStatusPanel extends StatusPanel.StatusPlugin implements La
         int f = GLListener.getFramerate();
         if (f != fps) {
             fps = f;
-            setText("fps: " + fps);
+            setText((fps < 10 ? "fps:   " : "fps: ") + fps);
         }
     }
 
