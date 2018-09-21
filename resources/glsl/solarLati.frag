@@ -1,4 +1,4 @@
-void get_lati_texcoord(const float ln, const float lt, const float cr[3], const vec2 scrpos, const vec4 rect, out vec2 texcoord) {
+void get_lati_texcoord(const float ln, const float lt[2], const float cr[3], const vec2 scrpos, const vec4 rect, out vec2 texcoord) {
     float theta = scrpos.y * PI;
     float phi = PI + ln + scrpos.x * TWOPI;
 
@@ -19,12 +19,14 @@ void get_lati_texcoord(const float ln, const float lt, const float cr[3], const 
     );
     mat3 crotm = crot * rot;
     */
+    float slt = lt[0];
+    float clt = lt[1];
     float scr = cr[1];
     float ccr = cr[2];
-    mat3 crotm = mat3(
-              cos(lt),   0.,       sin(lt),
-       -scr * sin(lt),  ccr, scr * cos(lt),
-       -ccr * sin(lt), -scr, ccr * cos(lt)
+    mat3 crotm = mat3( // should be pre-computed
+              clt,   0.,       slt,
+       -scr * slt,  ccr, scr * clt,
+       -ccr * slt, -scr, ccr * clt
     );
     vec3 xcartrot = crotm * xcart;
     if (xcartrot.x < 0.)
