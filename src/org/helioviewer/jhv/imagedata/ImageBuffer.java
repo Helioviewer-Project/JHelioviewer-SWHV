@@ -1,8 +1,12 @@
 package org.helioviewer.jhv.imagedata;
 
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.ShortBuffer;
 
 public class ImageBuffer {
+
+    private static final int BAD_PIXEL = -1000;
 
     public enum Format {
         Gray8(1), Gray16(2), ARGB32(4);
@@ -24,6 +28,18 @@ public class ImageBuffer {
         height = _height;
         format = _format;
         buffer = _buffer;
+    }
+
+    int getPixel(int x, int y) {
+        if (x < 0 || x > width - 1 || y < 0 || y > height - 1)
+            return BAD_PIXEL;
+
+        int idx = x + y * width;
+        if (buffer instanceof ByteBuffer)
+            return (((ByteBuffer) buffer).get(idx) + 256) & 0xFF;
+        if (buffer instanceof ShortBuffer)
+            return (((ShortBuffer) buffer).get(idx) + 65536) & 0xFFFF;
+        return BAD_PIXEL;
     }
 
 }
