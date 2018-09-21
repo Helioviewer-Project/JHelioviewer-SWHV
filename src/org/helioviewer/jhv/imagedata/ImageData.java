@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.imagedata;
 
+import javax.annotation.Nonnull;
+
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.position.Position;
@@ -17,10 +19,12 @@ public class ImageData {
         imageBuffer = _imageBuffer;
     }
 
+    @Nonnull
     public ImageBuffer getImageBuffer() {
         return imageBuffer;
     }
 
+    @Nonnull
     public Position getViewpoint() {
         return viewpoint;
     }
@@ -29,6 +33,7 @@ public class ImageData {
         viewpoint = _viewpoint;
     }
 
+    @Nonnull
     public Region getRegion() {
         return region;
     }
@@ -37,6 +42,7 @@ public class ImageData {
         region = _region;
     }
 
+    @Nonnull
     public MetaData getMetaData() {
         return metaData;
     }
