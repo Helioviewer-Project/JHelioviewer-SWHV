@@ -10,7 +10,9 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ClipBoardCopier;
 import org.helioviewer.jhv.gui.components.StatusPanel;
+import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.layers.GridLayer;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec2;
@@ -22,6 +24,7 @@ import com.jogamp.newt.event.MouseListener;
 @SuppressWarnings("serial")
 public class PositionStatusPanel extends StatusPanel.StatusPlugin implements MouseListener {
 
+    private static final int BAD_PIXEL = -1000;
     private static final String nanOrtho = "---\u00B0,---\u00B0";
     private static final String nanLati = "---\u00B0,---\u00B0";
     private static final String nanPolar = "---\u00B0,---\u2299";
@@ -29,7 +32,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
     private final Camera camera;
 
     public PositionStatusPanel() {
-        setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0));
+        setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0, BAD_PIXEL));
         camera = Display.getCamera();
     }
 
@@ -45,7 +48,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         } else {
             Vec3 v = CameraHelper.getVectorFromSphereOrPlane(camera, vp, x, y, camera.getCurrentDragRotation());
             if (v == null) {
-                setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0));
+                setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0, BAD_PIXEL));
             } else {
                 double r = Math.sqrt(v.x * v.x + v.y * v.y);
 
@@ -54,7 +57,14 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
                 double py = (180 / Math.PI) * Math.atan2(v.y, d);
                 double pa = MathUtils.mapTo0To360((180 / Math.PI) * Math.atan2(v.y, v.x) - (camera.getUpdateViewpoint() != UpdateViewpoint.equatorial ? 90 : 0)); // w.r.t. axis
 
-                setText(formatOrtho(coord, r, pa, px, py));
+                int value = BAD_PIXEL;
+                ImageLayer layer = Layers.getActiveImageLayer();
+                ImageData id;
+                if (layer != null && (id = layer.getImageData()) != null) {
+                    value = id.getPixel(v.x, v.y);
+                }
+
+                setText(formatOrtho(coord, r, pa, px, py, value));
             }
         }
     }
@@ -91,13 +101,13 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         return String.format("(\u03B8,\u03c1) : (%s)", coordStr);
     }
 
-    private static String formatOrtho(@Nonnull Vec2 coord, double r, double pa, double px, double py) {
+    private static String formatOrtho(@Nonnull Vec2 coord, double r, double pa, double px, double py, int value) {
         String coordStr;
         if (Double.isNaN(coord.x) || Double.isNaN(coord.y))
             coordStr = nanOrtho;
         else
             coordStr = String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
-        return String.format("(\u03C6,\u03B8) : (%s) | (\u03c1,\u03c8) : (%s,%6.2f\u00B0) | (x,y) : (%s,%s)", coordStr, formatR(r), pa, formatXY(px), formatXY(py));
+        return String.format("(\u03C6,\u03B8) : (%s) | (\u03c1,\u03c8) : (%s,%6.2f\u00B0) | (x,y) : (%s,%s) %d", coordStr, formatR(r), pa, formatXY(px), formatXY(py), value);
     }
 
     @Override
