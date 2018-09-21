@@ -80,23 +80,29 @@ public class GLImage {
         return diffMode == DifferenceMode.Base;
     }
 
-    private void applyRegion(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLSolarShader shader) {
+    private MetaData bindParams(GL2 gl, ImageData imageData, GLSLSolarShader shader) {
         Region r = imageData.getRegion();
         shader.bindRect(gl, r.llx, r.lly, 1. / r.width, 1. / r.height);
-
-        Region diffRegion = null;
-        if (prevImageData != null && !isBaseDiff()) {
-            diffRegion = prevImageData.getRegion();
-            shader.bindAnglesDiff(gl, prevImageData.getMetaData().getViewpoint(), prevImageData.getMetaData().getCROTA());
-        } else if (baseImageData != null && isBaseDiff()) {
-            diffRegion = baseImageData.getRegion();
-            shader.bindAnglesDiff(gl, baseImageData.getMetaData().getViewpoint(), baseImageData.getMetaData().getCROTA());
-        }
-        if (diffRegion != null)
-            shader.bindDiffRect(gl, diffRegion.llx, diffRegion.lly, 1. / diffRegion.width, 1. / diffRegion.height);
-
         MetaData metaData = imageData.getMetaData();
         shader.bindAngles(gl, metaData.getViewpoint(), metaData.getCROTA());
+        return metaData;
+    }
+
+    private void bindParamsDiff(GL2 gl, ImageData imageData, GLSLSolarShader shader) {
+        Region r = imageData.getRegion();
+        shader.bindDiffRect(gl, r.llx, r.lly, 1. / r.width, 1. / r.height);
+        MetaData metaData = imageData.getMetaData();
+        shader.bindAnglesDiff(gl, metaData.getViewpoint(), metaData.getCROTA());
+    }
+
+    private void applyRegion(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLSolarShader shader) {
+        if (prevImageData != null && !isBaseDiff()) {
+            bindParamsDiff(gl, prevImageData, shader);
+        } else if (baseImageData != null && isBaseDiff()) {
+            bindParamsDiff(gl, baseImageData, shader);
+        }
+
+        MetaData metaData = bindParams(gl, imageData, shader);
         shader.bindCutOffRadius(gl, metaData.getInnerCutOffRadius(), Display.getShowCorona() ? metaData.getOuterCutOffRadius() : 1);
         if (metaData.getCutOffValue() > 0) {
             Vec3 cdir = metaData.getCutOffDirection();
