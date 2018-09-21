@@ -60,10 +60,10 @@ public class GLSLSolarShader extends GLSLShader {
 
     private final float[] hglt = new float[1];
     private final float[] hgln = new float[1];
-    private final float[] crota = new float[1];
+    private final float[] crota = new float[3];
     private final float[] hgltDiff = new float[1];
     private final float[] hglnDiff = new float[1];
-    private final float[] crotaDiff = new float[1];
+    private final float[] crotaDiff = new float[3];
 
     private final float[] slit = new float[2];
     private final float[] bright = new float[3];
@@ -184,7 +184,7 @@ public class GLSLSolarShader extends GLSLShader {
     public void bindSlit(GL2 gl, double left, double right) {
         slit[0] = (float) left;
         slit[1] = (float) right;
-        gl.glUniform2fv(slitRef, 1, slit, 0);
+        gl.glUniform1fv(slitRef, 2, slit, 0);
     }
 
     public void bindBrightness(GL2 gl, double offset, double scale, double gamma) {
@@ -239,22 +239,26 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform3fv(cutOffDirectionRef, 1, cutOffDirection, 0);
     }
 
-    public void bindAngles(GL2 gl, Position viewpoint, double _crota) {
+    public void bindAngles(GL2 gl, Position viewpoint, double _crota, double scrota, double ccrota) {
         hglt[0] = (float) viewpoint.lat;
         hgln[0] = (float) ((viewpoint.lon + 2. * Math.PI) % (2. * Math.PI));
         gl.glUniform1fv(hgltRef, 1, hglt, 0);
         gl.glUniform1fv(hglnRef, 1, hgln, 0);
         crota[0] = (float) _crota;
-        gl.glUniform1fv(crotaRef, 1, crota, 0);
+        crota[1] = (float) scrota;
+        crota[2] = (float) ccrota;
+        gl.glUniform1fv(crotaRef, 3, crota, 0);
     }
 
-    public void bindAnglesDiff(GL2 gl, Position viewpoint, double _crota) {
+    public void bindAnglesDiff(GL2 gl, Position viewpoint, double _crota, double scrota, double ccrota) {
         hgltDiff[0] = (float) viewpoint.lat;
         hglnDiff[0] = (float) ((viewpoint.lon + 2. * Math.PI) % (2. * Math.PI));
         gl.glUniform1fv(hgltDiffRef, 1, hgltDiff, 0);
         gl.glUniform1fv(hglnDiffRef, 1, hglnDiff, 0);
         crotaDiff[0] = (float) _crota;
-        gl.glUniform1fv(crotaDiffRef, 1, crotaDiff, 0);
+        crotaDiff[1] = (float) scrota;
+        crotaDiff[2] = (float) ccrota;
+        gl.glUniform1fv(crotaDiffRef, 3, crotaDiff, 0);
     }
 
     public void bindPolarRadii(GL2 gl, double start, double stop) {
