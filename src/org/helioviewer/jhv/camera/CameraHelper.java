@@ -64,7 +64,7 @@ public class CameraHelper {
         if (correctDrag)
             altnormal = currentDragRotation.rotateVector(Vec3.ZAxis);
 
-        if (altnormal.z == 0)
+        if (altnormal.z <= 0)
             return null;
 
         double up1x = computeUpX(camera, vp, screenX);
