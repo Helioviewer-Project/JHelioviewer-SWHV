@@ -24,7 +24,7 @@ import org.helioviewer.jhv.opengl.GLImage.DifferenceMode;
 import org.helioviewer.jhv.opengl.GLListener;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.time.JHVDate;
-import org.helioviewer.jhv.view.AbstractView;
+import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.View;
 import org.json.JSONObject;
 
@@ -37,7 +37,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     private boolean removed;
     private LoadRemoteTask worker;
-    private View view = new AbstractView(null, null);
+    private View view = new BaseView(null, null);
 
     public static ImageLayer create(JSONObject jo) {
         ImageLayer imageLayer = new ImageLayer(jo);

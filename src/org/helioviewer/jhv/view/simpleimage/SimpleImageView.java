@@ -16,9 +16,9 @@ import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
-import org.helioviewer.jhv.view.AbstractView;
+import org.helioviewer.jhv.view.BaseView;
 
-public class SimpleImageView extends AbstractView {
+public class SimpleImageView extends BaseView {
 
     public SimpleImageView(URI _uri, APIRequest _request) throws Exception {
         super(_uri, _request);
