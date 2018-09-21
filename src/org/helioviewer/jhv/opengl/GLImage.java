@@ -84,7 +84,7 @@ public class GLImage {
         Region r = imageData.getRegion();
         shader.bindRect(gl, r.llx, r.lly, 1. / r.width, 1. / r.height);
         MetaData metaData = imageData.getMetaData();
-        shader.bindAngles(gl, metaData.getViewpoint(), metaData.getCROTA());
+        shader.bindAngles(gl, metaData.getViewpoint(), metaData.getCROTA(), metaData.getSCROTA(), metaData.getCCROTA());
         return metaData;
     }
 
@@ -92,7 +92,7 @@ public class GLImage {
         Region r = imageData.getRegion();
         shader.bindDiffRect(gl, r.llx, r.lly, 1. / r.width, 1. / r.height);
         MetaData metaData = imageData.getMetaData();
-        shader.bindAnglesDiff(gl, metaData.getViewpoint(), metaData.getCROTA());
+        shader.bindAnglesDiff(gl, metaData.getViewpoint(), metaData.getCROTA(), metaData.getSCROTA(), metaData.getCCROTA());
     }
 
     private void applyRegion(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLSolarShader shader) {

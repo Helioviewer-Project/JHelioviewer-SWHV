@@ -21,14 +21,14 @@ uniform sampler1D lut;
 uniform vec3 brightness;
 uniform vec4 color;
 
-uniform vec2 slit;
+uniform float slit[2];
 
 uniform float hgln;
 uniform float hglt;
 uniform float hglnDiff;
 uniform float hgltDiff;
-uniform float crota;
-uniform float crotaDiff;
+uniform float crota[3];
+uniform float crotaDiff[3];
 
 uniform mat4 cameraTransformationInverse;
 uniform vec4 cameraDifferenceRotationQuat;
@@ -82,7 +82,7 @@ void clamp_texture(const vec2 texcoord) {
 }
 
 void clamp_coord(const vec2 coord) {
-    if (coord.x < slit.x || coord.y < 0. || coord.x > slit.y || coord.y > 1.)
+    if (coord.x < slit[0] || coord.y < 0. || coord.x > slit[1] || coord.y > 1.)
         discard;
 }
 
