@@ -124,10 +124,11 @@ public class JHVFrame {
         PositionStatusPanel positionStatus = new PositionStatusPanel();
         inputController.addPlugin(positionStatus);
 
-        StatusPanel statusPanel = new StatusPanel(leftScrollPane.getPreferredSize().width, 5);
+        StatusPanel statusPanel = new StatusPanel(5, 5);
+        statusPanel.addPlugin(framerateStatus, StatusPanel.Alignment.LEFT);
+        statusPanel.addLeftSpacer(leftScrollPane.getPreferredSize().width - 5);
         statusPanel.addPlugin(zoomStatus, StatusPanel.Alignment.LEFT);
         statusPanel.addPlugin(carringtonStatus, StatusPanel.Alignment.LEFT);
-        statusPanel.addPlugin(framerateStatus, StatusPanel.Alignment.LEFT);
         statusPanel.addPlugin(positionStatus, StatusPanel.Alignment.RIGHT);
 
         toolBar = new ToolBar();
