@@ -84,10 +84,9 @@ public class ImageLayers {
 
     public static double getLargestPhysicalHeight() {
         double size = 0;
-        MetaData m;
         for (ImageLayer layer : Layers.getImageLayers()) {
-            if (layer.isEnabled() && (m = layer.getMetaData()) != null) {
-                double newSize = m.getPhysicalRegion().height;
+            if (layer.isEnabled()) {
+                double newSize = layer.getMetaData().getPhysicalRegion().height;
                 if (newSize > size)
                     size = newSize;
             }
@@ -97,10 +96,9 @@ public class ImageLayers {
 
     public static double getLargestPhysicalSize() {
         double size = 0;
-        MetaData m;
         for (ImageLayer layer : Layers.getImageLayers()) {
-            if (layer.isEnabled() && (m = layer.getMetaData()) != null) {
-                Region r = m.getPhysicalRegion();
+            if (layer.isEnabled()) {
+                Region r = layer.getMetaData().getPhysicalRegion();
                 double newSize = Math.sqrt(r.height * r.height + r.width * r.width);
                 if (newSize > size)
                     size = newSize;
@@ -129,8 +127,8 @@ public class ImageLayers {
 
     public static String getSDOCutoutString() {
         StringBuilder str = new StringBuilder("&wavelengths=");
-        MetaData m;
         for (ImageLayer layer : Layers.getImageLayers()) {
+            MetaData m;
             if (layer.isEnabled() && (m = layer.getMetaData()) instanceof HelioviewerMetaData) {
                 HelioviewerMetaData hm = (HelioviewerMetaData) m;
                 if (hm.getObservatory().contains("SDO") && hm.getInstrument().contains("AIA"))
