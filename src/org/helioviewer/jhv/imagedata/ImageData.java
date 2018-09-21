@@ -15,7 +15,7 @@ public class ImageData {
 
     private final ImageBuffer imageBuffer;
 
-    public ImageData(ImageBuffer _imageBuffer) {
+    public ImageData(@Nonnull ImageBuffer _imageBuffer) {
         imageBuffer = _imageBuffer;
     }
 
@@ -29,7 +29,7 @@ public class ImageData {
         return viewpoint;
     }
 
-    public void setViewpoint(Position _viewpoint) {
+    public void setViewpoint(@Nonnull Position _viewpoint) {
         viewpoint = _viewpoint;
     }
 
@@ -38,7 +38,7 @@ public class ImageData {
         return region;
     }
 
-    public void setRegion(Region _region) {
+    public void setRegion(@Nonnull Region _region) {
         region = _region;
     }
 
@@ -47,7 +47,7 @@ public class ImageData {
         return metaData;
     }
 
-    public void setMetaData(MetaData _metaData) {
+    public void setMetaData(@Nonnull MetaData _metaData) {
         metaData = _metaData;
     }
 
@@ -57,6 +57,19 @@ public class ImageData {
 
     public void setUploaded(boolean _uploaded) {
         uploaded = _uploaded;
+    }
+
+    public int getPixel(double x, double y) {
+        double ccr = metaData.getCCROTA();
+        double scr = -metaData.getSCROTA();
+        double xr = x * ccr - y * scr;
+        double yr = x * scr + y * ccr;
+        double xf = metaData.xPixelFactor(xr);
+        double yf = metaData.yPixelFactor(yr);
+
+        int ix = (int) (xf * (imageBuffer.width - 1) + .5);
+        int iy = (int) (yf * (imageBuffer.height - 1) + .5);
+        return imageBuffer.getPixel(ix, iy);
     }
 
 }

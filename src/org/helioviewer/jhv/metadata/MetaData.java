@@ -25,9 +25,9 @@ public interface MetaData {
 
     double getCROTA();
 
-    double getSinCROTA();
+    double getSCROTA();
 
-    double getCosCROTA();
+    double getCCROTA();
 
     double getInnerCutOffRadius();
 

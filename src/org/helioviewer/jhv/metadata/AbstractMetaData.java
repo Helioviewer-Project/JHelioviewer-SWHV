@@ -25,8 +25,8 @@ abstract class AbstractMetaData implements MetaData {
     double outerRadius = Double.MAX_VALUE;
 
     double crota = 0;
-    double sinCrota = 0;
-    double cosCrota = 1;
+    double scrota = 0;
+    double ccrota = 1;
 
     // Serves only for LASCO cutOff edges
     double cutOffValue = -1;
@@ -102,12 +102,12 @@ abstract class AbstractMetaData implements MetaData {
     }
 
     @Override
-    public double getSinCROTA() {
-        return sinCrota;
+    public double getSCROTA() {
+        return scrota;
     }
     @Override
-    public double getCosCROTA() {
-        return cosCrota;
+    public double getCCROTA() {
+        return ccrota;
     }
 
     @Override
