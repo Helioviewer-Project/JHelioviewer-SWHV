@@ -4,11 +4,12 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
+import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.position.Position;
 
-abstract class AbstractMetaData implements MetaData {
+class BaseMetaData implements MetaData {
 
     int frameNumber = 0;
     Region region;
@@ -108,6 +109,13 @@ abstract class AbstractMetaData implements MetaData {
     @Override
     public double getCCROTA() {
         return ccrota;
+    }
+
+    @Nonnull
+    @Override
+    public Region roiToRegion(@Nonnull SubImage roi, double factorX, double factorY) {
+        return new Region(roi.x * factorX * unitPerPixelX + region.llx, roi.y * factorY * unitPerPixelY + region.lly,
+                roi.width * factorX * unitPerPixelX, roi.height * factorY * unitPerPixelY);
     }
 
     @Override
