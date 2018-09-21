@@ -24,9 +24,9 @@ import com.jogamp.newt.event.MouseListener;
 @SuppressWarnings("serial")
 public class PositionStatusPanel extends StatusPanel.StatusPlugin implements MouseListener {
 
-    private static final String nanOrtho = "---\u00B0,---\u00B0";
-    private static final String nanLati = "---\u00B0,---\u00B0";
-    private static final String nanPolar = "---\u00B0,---\u2299";
+    private static final String nanOrtho = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
+    private static final String nanLati = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
+    private static final String nanPolar = String.format("%7s\u00B0,%7s\u2299", "--", "--");
 
     private final Camera camera;
 
@@ -70,16 +70,16 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
 
     private static String formatXY(double p) {
         if (Math.abs(p) < 0.5)
-            return String.format("%+5d\u2033", (int) Math.round(3600 * p));
+            return String.format("%+7d\u2033", (int) Math.round(3600 * p));
         else
-            return String.format("%+.2f\u00B0", p);
+            return String.format("%+7.2f\u00B0", p);
     }
 
     private static String formatR(double r) {
         if (r < 32 * Sun.Radius)
-            return String.format("%.2fR\u2299", r);
+            return String.format("%7.2fR\u2299", r);
         else
-            return String.format("%.2fau", r * Sun.MeanEarthDistanceInv);
+            return String.format("%7.2fau", r * Sun.MeanEarthDistanceInv);
     }
 
     private static String formatLati(@Nonnull Vec2 coord) {
@@ -87,7 +87,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         if (Double.isNaN(coord.x) || Double.isNaN(coord.y))
             coordStr = nanLati;
         else
-            coordStr = String.format("%.2f\u00B0,%.2f\u00B0", coord.x, coord.y);
+            coordStr = String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
         return String.format("(\u03C6,\u03B8) : (%s)", coordStr);
     }
 
@@ -96,7 +96,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         if (Double.isNaN(coord.x) || Double.isNaN(coord.y))
             coordStr = nanPolar;
         else
-            coordStr = String.format("%.2f\u00B0,%.2fR\u2299", coord.x, coord.y);
+            coordStr = String.format("%+7.2f\u00B0,%s", coord.x, formatR(coord.y));
         return String.format("(\u03B8,\u03c1) : (%s)", coordStr);
     }
 
@@ -106,8 +106,8 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
             coordStr = nanOrtho;
         else
             coordStr = String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
-        String valueStr = value == ImageData.BAD_PIXEL ? "------" : String.format("%6d", value);
-        return String.format("(\u03C6,\u03B8) : (%s) | (\u03c1,\u03c8) : (%s,%6.2f\u00B0) | (x,y) : (%s,%s) | %s", coordStr, formatR(r), pa, formatXY(px), formatXY(py), valueStr);
+        String valueStr = value == ImageData.BAD_PIXEL ? String.format("%7s", "--") : String.format("%7d", value);
+        return String.format("(\u03C6,\u03B8) : (%s) | (\u03c1,\u03c8) : (%s,%+7.2f\u00B0) | (x,y) : (%s,%s) | %s", coordStr, formatR(r), pa, formatXY(px), formatXY(py), valueStr);
     }
 
     @Override
