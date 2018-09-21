@@ -15,7 +15,7 @@ import org.helioviewer.jhv.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.time.JHVDate;
 
-public class AbstractView implements View {
+public class BaseView implements View {
 
     private static final AtomicBoolean fullCache = new AtomicBoolean(true);
 
@@ -28,7 +28,7 @@ public class AbstractView implements View {
     protected MetaData[] metaData = {new PixelBasedMetaData(1, 1, 0)};
     protected int maxFrame = 0;
 
-    public AbstractView(URI _uri, APIRequest _request) {
+    public BaseView(URI _uri, APIRequest _request) {
         uri = _uri;
         request = _request;
         isLocal = uri != null && "file".equals(uri.getScheme());

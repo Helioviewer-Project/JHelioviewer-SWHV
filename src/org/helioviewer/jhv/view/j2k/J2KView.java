@@ -21,7 +21,7 @@ import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.time.JHVDate;
-import org.helioviewer.jhv.view.AbstractView;
+import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.j2k.cache.CacheStatus;
 import org.helioviewer.jhv.view.j2k.cache.CacheStatusLocal;
 import org.helioviewer.jhv.view.j2k.cache.CacheStatusRemote;
@@ -31,7 +31,7 @@ import org.helioviewer.jhv.view.j2k.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCache;
 import org.helioviewer.jhv.view.j2k.kakadu.KakaduSource;
 
-public class J2KView extends AbstractView {
+public class J2KView extends BaseView {
 
     private static final int HIRES_CUTOFF = 1280;
 

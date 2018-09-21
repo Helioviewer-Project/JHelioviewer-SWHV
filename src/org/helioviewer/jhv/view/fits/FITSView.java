@@ -6,9 +6,9 @@ import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
-import org.helioviewer.jhv.view.AbstractView;
+import org.helioviewer.jhv.view.BaseView;
 
-public class FITSView extends AbstractView {
+public class FITSView extends BaseView {
 
     private final String xml;
 
