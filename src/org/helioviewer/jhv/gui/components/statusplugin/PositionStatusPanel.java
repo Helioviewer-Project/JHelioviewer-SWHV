@@ -27,6 +27,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
     private static final String nanOrtho = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
     private static final String nanLati = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
     private static final String nanPolar = String.format("%7s\u00B0,%7s\u2299", "--", "--");
+    private static final String nanValue = String.format("%7s", "--");
 
     private final Camera camera;
 
@@ -83,30 +84,18 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
     }
 
     private static String formatLati(@Nonnull Vec2 coord) {
-        String coordStr;
-        if (Double.isNaN(coord.x) || Double.isNaN(coord.y))
-            coordStr = nanLati;
-        else
-            coordStr = String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
+        String coordStr = coord == Vec2.NAN ? nanLati : String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
         return String.format("(\u03C6,\u03B8) : (%s)", coordStr);
     }
 
     private static String formatPolar(@Nonnull Vec2 coord) {
-        String coordStr;
-        if (Double.isNaN(coord.x) || Double.isNaN(coord.y))
-            coordStr = nanPolar;
-        else
-            coordStr = String.format("%+7.2f\u00B0,%s", coord.x, formatR(coord.y));
+        String coordStr = coord == Vec2.NAN ? nanPolar : String.format("%+7.2f\u00B0,%s", coord.x, formatR(coord.y));
         return String.format("(\u03B8,\u03c1) : (%s)", coordStr);
     }
 
     private static String formatOrtho(@Nonnull Vec2 coord, double r, double pa, double px, double py, int value) {
-        String coordStr;
-        if (Double.isNaN(coord.x) || Double.isNaN(coord.y))
-            coordStr = nanOrtho;
-        else
-            coordStr = String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
-        String valueStr = value == ImageData.BAD_PIXEL ? String.format("%7s", "--") : String.format("%7d", value);
+        String coordStr = coord == Vec2.NAN ? nanOrtho : String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
+        String valueStr = value == ImageData.BAD_PIXEL ? nanValue : String.format("%7d", value);
         return String.format("(\u03C6,\u03B8) : (%s) | (\u03c1,\u03c8) : (%s,%+7.2f\u00B0) | (x,y) : (%s,%s) | %s", coordStr, formatR(r), pa, formatXY(px), formatXY(py), valueStr);
     }
 
