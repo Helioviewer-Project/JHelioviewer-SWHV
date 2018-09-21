@@ -59,13 +59,20 @@ public class StatusPanel extends JPanel {
             addLeftSpacer(10);
         } else {
             rightPanel.add(newPlugin, 0);
+            addRightSpacer(10);
         }
     }
 
-    public void addLeftSpacer(int width) {
+    private void addLeftSpacer(int width) {
         JPanel spacer = new JPanel();
         spacer.setPreferredSize(new Dimension(width, 0));
         leftPanel.add(spacer);
+    }
+
+    private void addRightSpacer(int width) {
+        JPanel spacer = new JPanel();
+        spacer.setPreferredSize(new Dimension(width, 0));
+        rightPanel.add(spacer, 0);
     }
 
     public void removePlugin(StatusPlugin oldPlugin) {
