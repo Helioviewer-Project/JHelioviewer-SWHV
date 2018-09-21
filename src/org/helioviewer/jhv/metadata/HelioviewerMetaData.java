@@ -13,7 +13,7 @@ import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.time.JHVDate;
 
-public class HelioviewerMetaData extends AbstractMetaData {
+public class HelioviewerMetaData extends BaseMetaData {
 
     private static final boolean normalizeAIA = Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA"));
     private static final boolean normalizeRadius = Boolean.parseBoolean(Settings.getProperty("display.normalize"));
