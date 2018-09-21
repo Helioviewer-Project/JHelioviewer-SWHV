@@ -2,6 +2,8 @@ package org.helioviewer.jhv.metadata;
 
 import java.util.Locale;
 
+import javax.annotation.Nonnull;
+
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
@@ -22,13 +24,12 @@ public class HelioviewerMetaData extends AbstractMetaData {
     private String observatory = "";
     private String fullName = "";
 
-    private double unitPerPixelX = 1;
-    private double unitPerPixelY = 1;
     private double sunPositionX = 0;
     private double sunPositionY = 0;
 
     private final Quat centerRotation;
 
+    @Nonnull
     @Override
     public Quat getCenterRotation() {
         return centerRotation;
@@ -276,8 +277,9 @@ public class HelioviewerMetaData extends AbstractMetaData {
         return Sun.RadiusFactor_6562;
     }
 
+    @Nonnull
     @Override
-    public Region roiToRegion(SubImage roi, double factorX, double factorY) {
+    public Region roiToRegion(@Nonnull SubImage roi, double factorX, double factorY) {
         return new Region(roi.x * factorX * unitPerPixelX - sunPositionX, roi.y * factorY * unitPerPixelY - sunPositionY,
                 roi.width * factorX * unitPerPixelX, roi.height * factorY * unitPerPixelY);
     }

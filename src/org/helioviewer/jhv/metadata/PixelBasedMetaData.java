@@ -1,13 +1,12 @@
 package org.helioviewer.jhv.metadata;
 
+import javax.annotation.Nonnull;
+
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.imagedata.SubImage;
 
 public class PixelBasedMetaData extends AbstractMetaData {
-
-    private final double unitPerPixelX;
-    private final double unitPerPixelY;
 
     public PixelBasedMetaData(int newW, int newH, int frame) {
         frameNumber = frame;
@@ -20,8 +19,9 @@ public class PixelBasedMetaData extends AbstractMetaData {
         unitPerPixelY = Sun.Radius / pixelH;
     }
 
+    @Nonnull
     @Override
-    public Region roiToRegion(SubImage roi, double factorX, double factorY) {
+    public Region roiToRegion(@Nonnull SubImage roi, double factorX, double factorY) {
         return new Region(roi.x * factorX * unitPerPixelX - 0.5, roi.y * factorY * unitPerPixelY - 0.5,
                 roi.width * factorX * unitPerPixelX, roi.height * factorY * unitPerPixelY);
     }

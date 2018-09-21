@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.metadata;
 
+import javax.annotation.Nonnull;
+
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.math.Quat;
@@ -10,6 +12,7 @@ public interface MetaData {
 
     int getFrameNumber();
 
+    @Nonnull
     Region getPhysicalRegion();
 
     int getPixelWidth();
@@ -28,12 +31,20 @@ public interface MetaData {
 
     double getCutOffValue();
 
+    @Nonnull
     Vec3 getCutOffDirection();
 
+    @Nonnull
     Position getViewpoint();
 
+    @Nonnull
     Quat getCenterRotation();
 
-    Region roiToRegion(SubImage roi, double factorX, double factorY);
+    @Nonnull
+    Region roiToRegion(@Nonnull SubImage roi, double factorX, double factorY);
+
+    double xPixelFactor(double xPoint);
+
+    double yPixelFactor(double yPoint);
 
 }

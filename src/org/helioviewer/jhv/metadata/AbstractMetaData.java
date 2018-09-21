@@ -1,18 +1,22 @@
 package org.helioviewer.jhv.metadata;
 
+import javax.annotation.Nonnull;
+
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.position.Position;
 
-public abstract class AbstractMetaData implements MetaData {
+abstract class AbstractMetaData implements MetaData {
 
     int frameNumber = 0;
     Region region;
 
     int pixelW;
     int pixelH;
+    double unitPerPixelX = 1;
+    double unitPerPixelY = 1;
     double unitPerArcsec = Double.NaN;
     double responseFactor = 1;
 
@@ -30,6 +34,7 @@ public abstract class AbstractMetaData implements MetaData {
         return frameNumber;
     }
 
+    @Nonnull
     @Override
     public Region getPhysicalRegion() {
         return region;
@@ -55,6 +60,7 @@ public abstract class AbstractMetaData implements MetaData {
         return responseFactor;
     }
 
+    @Nonnull
     @Override
     public Position getViewpoint() {
         return viewpoint;
@@ -75,11 +81,13 @@ public abstract class AbstractMetaData implements MetaData {
         return cutOffValue;
     }
 
+    @Nonnull
     @Override
     public Vec3 getCutOffDirection() {
         return cutOffDirection;
     }
 
+    @Nonnull
     @Override
     public Quat getCenterRotation() {
         return viewpoint.toQuat();
@@ -88,6 +96,16 @@ public abstract class AbstractMetaData implements MetaData {
     @Override
     public double getCROTA() {
         return crota;
+    }
+
+    @Override
+    public double xPixelFactor(double xPoint) {
+        return (xPoint - region.llx) / unitPerPixelX / pixelW;
+    }
+
+    @Override
+    public double yPixelFactor(double yPoint) {
+        return 1 - (yPoint - region.lly) / unitPerPixelY / pixelH;
     }
 
 }
