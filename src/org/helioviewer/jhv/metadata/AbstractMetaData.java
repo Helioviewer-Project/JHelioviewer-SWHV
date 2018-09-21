@@ -23,7 +23,10 @@ abstract class AbstractMetaData implements MetaData {
     Position viewpoint = Sun.StartEarth;
     double innerRadius = 0;
     double outerRadius = Double.MAX_VALUE;
-    double crota;
+
+    double crota = 0;
+    double sinCrota = 0;
+    double cosCrota = 1;
 
     // Serves only for LASCO cutOff edges
     double cutOffValue = -1;
@@ -96,6 +99,15 @@ abstract class AbstractMetaData implements MetaData {
     @Override
     public double getCROTA() {
         return crota;
+    }
+
+    @Override
+    public double getSinCROTA() {
+        return sinCrota;
+    }
+    @Override
+    public double getCosCROTA() {
+        return cosCrota;
     }
 
     @Override
