@@ -90,6 +90,7 @@ public class UIGlobals {
         UIFontSmallBold = font.deriveFont(map);
 
         UIFontMono = new Font("Monospaced", Font.PLAIN, defaultSize);
+        UIFontMonoSmall = new Font("Monospaced", Font.PLAIN, defaultSize - 2);
 
         try (InputStream is = FileUtils.getResource("/fonts/RobotoCondensed-Regular.ttf")) {
             UIFontRoboto = Font.createFont(Font.TRUETYPE_FONT, is);
@@ -124,6 +125,7 @@ public class UIGlobals {
     public static Font UIFontSmallBold;
 
     public static Font UIFontMono;
+    public static Font UIFontMonoSmall;
 
     public static Font UIFontMDI;
     public static Font UIFontRoboto;

@@ -8,6 +8,8 @@ import org.helioviewer.jhv.position.Position;
 
 public class ImageData {
 
+    public static final int BAD_PIXEL = Integer.MIN_VALUE;
+
     private Position viewpoint;
     private Region region;
     private MetaData metaData;

@@ -24,7 +24,6 @@ import com.jogamp.newt.event.MouseListener;
 @SuppressWarnings("serial")
 public class PositionStatusPanel extends StatusPanel.StatusPlugin implements MouseListener {
 
-    private static final int BAD_PIXEL = -1000;
     private static final String nanOrtho = "---\u00B0,---\u00B0";
     private static final String nanLati = "---\u00B0,---\u00B0";
     private static final String nanPolar = "---\u00B0,---\u2299";
@@ -32,7 +31,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
     private final Camera camera;
 
     public PositionStatusPanel() {
-        setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0, BAD_PIXEL));
+        setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0, ImageData.BAD_PIXEL));
         camera = Display.getCamera();
     }
 
@@ -48,7 +47,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         } else {
             Vec3 v = CameraHelper.getVectorFromSphereOrPlane(camera, vp, x, y, camera.getCurrentDragRotation());
             if (v == null) {
-                setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0, BAD_PIXEL));
+                setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0, ImageData.BAD_PIXEL));
             } else {
                 double r = Math.sqrt(v.x * v.x + v.y * v.y);
 
@@ -57,7 +56,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
                 double py = (180 / Math.PI) * Math.atan2(v.y, d);
                 double pa = MathUtils.mapTo0To360((180 / Math.PI) * Math.atan2(v.y, v.x) - (camera.getUpdateViewpoint() != UpdateViewpoint.equatorial ? 90 : 0)); // w.r.t. axis
 
-                int value = BAD_PIXEL;
+                int value = ImageData.BAD_PIXEL;
                 ImageLayer layer = Layers.getActiveImageLayer();
                 ImageData id;
                 if (layer != null && (id = layer.getImageData()) != null) {
@@ -107,7 +106,8 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
             coordStr = nanOrtho;
         else
             coordStr = String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
-        return String.format("(\u03C6,\u03B8) : (%s) | (\u03c1,\u03c8) : (%s,%6.2f\u00B0) | (x,y) : (%s,%s) %d", coordStr, formatR(r), pa, formatXY(px), formatXY(py), value);
+        String valueStr = value == ImageData.BAD_PIXEL ? "------" : String.format("%6d", value);
+        return String.format("(\u03C6,\u03B8) : (%s) | (\u03c1,\u03c8) : (%s,%6.2f\u00B0) | (x,y) : (%s,%s) | %s", coordStr, formatR(r), pa, formatXY(px), formatXY(py), valueStr);
     }
 
     @Override
