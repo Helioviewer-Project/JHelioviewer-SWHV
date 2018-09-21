@@ -2,6 +2,7 @@ package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVGlobals;
@@ -227,7 +228,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     private ImageData prevImageData;
     private ImageData baseImageData;
 
-    private void setImageData(ImageData newImageData) {
+    private void setImageData(@Nonnull ImageData newImageData) {
         int frame = newImageData.getMetaData().getFrameNumber();
         if (frame == 0) {
             baseImageData = newImageData;
@@ -242,10 +243,12 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         imageData = newImageData;
     }
 
+    @Nullable
     public ImageData getImageData() {
         return imageData;
     }
 
+    @Nonnull
     public MetaData getMetaData() { //!
         return imageData == null ? view.getMetaData(new JHVDate(0)) : imageData.getMetaData();
     }
