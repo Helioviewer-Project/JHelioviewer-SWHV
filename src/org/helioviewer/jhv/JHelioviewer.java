@@ -76,7 +76,7 @@ public class JHelioviewer {
         System.setProperty("newt.window.icons", "null,null");
         System.setProperty("org.sqlite.tmpdir", JHVGlobals.libCacheDir.toString());
         System.setProperty("org.lwjgl.system.SharedLibraryExtractPath", JHVGlobals.libCacheDir.toString());
-        // if (true) throw new RuntimeException("This is a Sentry test");
+        // if (true) throw new RuntimeException("This is a Sentry test. Please ignore.");
 
         FitsFactory.setUseHierarch(true);
 
