@@ -127,8 +127,8 @@ public class JHVFrame {
         StatusPanel statusPanel = new StatusPanel(5, 5);
         statusPanel.addPlugin(framerateStatus, StatusPanel.Alignment.LEFT);
         statusPanel.addPlugin(positionStatus, StatusPanel.Alignment.RIGHT);
-        statusPanel.addPlugin(carringtonStatus, StatusPanel.Alignment.RIGHT);
         statusPanel.addPlugin(zoomStatus, StatusPanel.Alignment.RIGHT);
+        statusPanel.addPlugin(carringtonStatus, StatusPanel.Alignment.RIGHT);
 
         toolBar = new ToolBar();
         mainFrame.add(toolBar, BorderLayout.PAGE_START);

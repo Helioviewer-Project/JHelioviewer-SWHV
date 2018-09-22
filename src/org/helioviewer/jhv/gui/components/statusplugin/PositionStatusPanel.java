@@ -85,18 +85,18 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
 
     private static String formatLati(@Nonnull Vec2 coord) {
         String coordStr = coord == Vec2.NAN ? nanLati : String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
-        return String.format("(\u03C6,\u03B8) : (%s)", coordStr);
+        return String.format("(\u03C6,\u03B8):(%s)", coordStr);
     }
 
     private static String formatPolar(@Nonnull Vec2 coord) {
         String coordStr = coord == Vec2.NAN ? nanPolar : String.format("%+7.2f\u00B0,%s", coord.x, formatR(coord.y));
-        return String.format("(\u03B8,\u03c1) : (%s)", coordStr);
+        return String.format("(\u03B8,\u03c1):(%s)", coordStr);
     }
 
     private static String formatOrtho(@Nonnull Vec2 coord, double r, double pa, double px, double py, int value) {
         String coordStr = coord == Vec2.NAN ? nanOrtho : String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
         String valueStr = value == ImageData.BAD_PIXEL ? nanValue : String.format("%7d", value);
-        return String.format("(\u03c1,\u03c8) : (%s,%+7.2f\u00B0) | (\u03C6,\u03B8) : (%s) | (x,y) : (%s,%s) | %s", formatR(r), pa, coordStr, formatXY(px), formatXY(py), valueStr);
+        return String.format("(\u03c1,\u03c8):(%s,%+7.2f\u00B0) | (\u03C6,\u03B8):(%s) | (x,y):(%s,%s) | %s", formatR(r), pa, coordStr, formatXY(px), formatXY(py), valueStr);
     }
 
     @Override

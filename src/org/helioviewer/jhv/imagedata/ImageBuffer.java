@@ -29,7 +29,7 @@ public class ImageBuffer {
     }
 
     int getPixel(int x, int y) {
-        if (x < 0 || x > width - 1 || y < 0 || y > height - 1)
+        if (x < 0 || x > width - 1 || y < 0 || y > height - 1 || format == Format.ARGB32)
             return ImageData.BAD_PIXEL;
 
         int idx = x + y * width;

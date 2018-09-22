@@ -20,9 +20,9 @@ public class ZoomStatusPanel extends StatusPanel.StatusPlugin implements LazyCom
 
     private static String formatFOV(double r) {
         if (r < 2 * 32 * Sun.Radius)
-            return String.format("%5.2fR\u2299", r);
+            return String.format("%6.2fR\u2299", r);
         else
-            return String.format("%.2fau", r * Sun.MeanEarthDistanceInv);
+            return String.format("%6.2fau", r * Sun.MeanEarthDistanceInv);
     }
 
     public void update(double _cameraWidth, double _distance) {
@@ -34,7 +34,7 @@ public class ZoomStatusPanel extends StatusPanel.StatusPlugin implements LazyCom
     @Override
     public void lazyRepaint() {
         if (dirty) {
-            setText(String.format("FOV: %s | D\u2299: %6.3fau", formatFOV(2 * cameraWidth), distance * Sun.MeanEarthDistanceInv));
+            setText(String.format("FOV: %s | D\u2299: %7.3fau", formatFOV(2 * cameraWidth), distance * Sun.MeanEarthDistanceInv));
             dirty = false;
         }
     }

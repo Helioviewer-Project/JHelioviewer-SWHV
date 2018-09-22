@@ -35,7 +35,7 @@ public class HelioviewerMetaData extends BaseMetaData {
         return centerRotation;
     }
 
-    public HelioviewerMetaData(MetaDataContainer m, int frame, boolean normalizeResponse) {
+    public HelioviewerMetaData(@Nonnull MetaDataContainer m, int frame, boolean normalizeResponse) {
         frameNumber = frame;
 
         identifyObservation(m);
@@ -287,22 +287,27 @@ public class HelioviewerMetaData extends BaseMetaData {
                 roi.width * factorX * unitPerPixelX, roi.height * factorY * unitPerPixelY);
     }
 
+    @Nonnull
     public String getDetector() {
         return detector;
     }
 
+    @Nonnull
     public String getInstrument() {
         return instrument;
     }
 
+    @Nonnull
     public String getMeasurement() {
         return measurement;
     }
 
+    @Nonnull
     public String getObservatory() {
         return observatory;
     }
 
+    @Nonnull
     public String getFullName() {
         return fullName;
     }
