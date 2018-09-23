@@ -117,7 +117,6 @@ public class JHVFrame {
         midSplitPane.setLeftComponent(leftScrollPane);
         midSplitPane.setRightComponent(mainContentPanel);
 
-        // STATUS PANEL
         zoomStatus = new ZoomStatusPanel();
         carringtonStatus = new CarringtonStatusPanel();
         framerateStatus = new FramerateStatusPanel();
