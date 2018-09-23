@@ -27,12 +27,11 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
     private static final String nanOrtho = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
     private static final String nanLati = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
     private static final String nanPolar = String.format("%7s\u00B0,%7s\u2299", "--", "--");
-    private static final String nanValue = String.format("%7s", "--");
 
     private final Camera camera;
 
     public PositionStatusPanel() {
-        setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0, ImageData.BAD_PIXEL));
+        setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0, ImageData.nanValue));
         camera = Display.getCamera();
     }
 
@@ -46,9 +45,10 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         } else if (Display.mode == Display.DisplayMode.Polar || Display.mode == Display.DisplayMode.LogPolar) {
             setText(formatPolar(coord));
         } else {
+            String valueStr = ImageData.nanValue;
             Vec3 v = CameraHelper.getVectorFromSphereOrPlane(camera, vp, x, y, camera.getCurrentDragRotation());
             if (v == null) {
-                setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0, ImageData.BAD_PIXEL));
+                setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0, valueStr));
             } else {
                 double r = Math.sqrt(v.x * v.x + v.y * v.y);
 
@@ -57,14 +57,13 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
                 double py = (180 / Math.PI) * Math.atan2(v.y, d);
                 double pa = MathUtils.mapTo0To360((180 / Math.PI) * Math.atan2(v.y, v.x) - (camera.getUpdateViewpoint() != UpdateViewpoint.equatorial ? 90 : 0)); // w.r.t. axis
 
-                int value = ImageData.BAD_PIXEL;
                 ImageLayer layer = Layers.getActiveImageLayer();
                 ImageData id;
                 if (layer != null && (id = layer.getImageData()) != null) {
-                    value = id.getPixel(v.x, v.y);
+                    valueStr = id.getPixelString(v.x, v.y);
                 }
 
-                setText(formatOrtho(coord, r, pa, px, py, value));
+                setText(formatOrtho(coord, r, pa, px, py, valueStr));
             }
         }
     }
@@ -93,9 +92,8 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         return String.format("(\u03B8,\u03c1):(%s)", coordStr);
     }
 
-    private static String formatOrtho(@Nonnull Vec2 coord, double r, double pa, double px, double py, int value) {
+    private static String formatOrtho(@Nonnull Vec2 coord, double r, double pa, double px, double py, String valueStr) {
         String coordStr = coord == Vec2.NAN ? nanOrtho : String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
-        String valueStr = value == ImageData.BAD_PIXEL ? nanValue : String.format("%7d", value);
         return String.format("(\u03c1,\u03c8):(%s,%+7.2f\u00B0) | (\u03C6,\u03B8):(%s) | (x,y):(%s,%s) | %s", formatR(r), pa, coordStr, formatXY(px), formatXY(py), valueStr);
     }
 

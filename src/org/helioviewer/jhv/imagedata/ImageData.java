@@ -8,7 +8,8 @@ import org.helioviewer.jhv.position.Position;
 
 public class ImageData {
 
-    public static final int BAD_PIXEL = Integer.MIN_VALUE;
+    static final int BAD_PIXEL = Integer.MIN_VALUE;
+    public static final String nanValue = String.format("%7s", "--");
 
     private Position viewpoint;
     private Region region;
@@ -61,7 +62,7 @@ public class ImageData {
         uploaded = _uploaded;
     }
 
-    public int getPixel(double x, double y) {
+    private int getPixel(double x, double y) {
         double ccr = metaData.getCCROTA();
         double scr = -metaData.getSCROTA();
         double xr = x * ccr - y * scr;
@@ -72,6 +73,13 @@ public class ImageData {
         int ix = (int) (xf * (imageBuffer.width - 1) + .5);
         int iy = (int) (yf * (imageBuffer.height - 1) + .5);
         return imageBuffer.getPixel(ix, iy);
+    }
+
+    public String getPixelString(double x, double y) {
+        int v = getPixel(x, y);
+        if (v == ImageBuffer.BAD_PIXEL)
+            return nanValue;
+        return String.format("%7d", v);
     }
 
 }

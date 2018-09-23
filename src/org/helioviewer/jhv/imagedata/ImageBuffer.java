@@ -6,6 +6,8 @@ import java.nio.ShortBuffer;
 
 public class ImageBuffer {
 
+    static final int BAD_PIXEL = Integer.MIN_VALUE;
+
     public enum Format {
         Gray8(1), Gray16(2), ARGB32(4);
 
@@ -30,14 +32,14 @@ public class ImageBuffer {
 
     int getPixel(int x, int y) {
         if (x < 0 || x > width - 1 || y < 0 || y > height - 1 || format == Format.ARGB32)
-            return ImageData.BAD_PIXEL;
+            return BAD_PIXEL;
 
         int idx = x + y * width;
         if (buffer instanceof ByteBuffer)
             return (((ByteBuffer) buffer).get(idx) + 256) & 0xFF;
         if (buffer instanceof ShortBuffer)
             return (((ShortBuffer) buffer).get(idx) + 65536) & 0xFFFF;
-        return ImageData.BAD_PIXEL;
+        return BAD_PIXEL;
     }
 
 }
