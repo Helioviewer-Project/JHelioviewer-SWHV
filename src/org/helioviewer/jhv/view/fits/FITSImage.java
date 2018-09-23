@@ -16,12 +16,11 @@ import nom.tam.util.Cursor;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
+import org.helioviewer.jhv.imagedata.PixScale;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.log.Log;
 
 class FITSImage {
-
-    private static final double GAMMA = 1 / 2.2;
 
     private static final long BLANK = 0; // in case it doesn't exist, very unlikely value
     private static final float MARKER = -2147483648;
@@ -267,7 +266,7 @@ class FITSImage {
             switch (bpp) {
                 case BasicHDU.BITPIX_SHORT: {
                     short[][] data = (short[][]) pixelData;
-                    PixScale scale = new PowScale(lutSize);
+                    PixScale scale = new PixScale.PowScale(lutSize);
                     for (int j = 0; j < height; j++) {
                         for (int i = 0; i < width; i++) {
                             float v = getInteger(data[j][i], blank);
@@ -278,7 +277,7 @@ class FITSImage {
                 }
                 case BasicHDU.BITPIX_INT: {
                     int[][] data = (int[][]) pixelData;
-                    PixScale scale = new PowScale(lutSize);
+                    PixScale scale = new PixScale.PowScale(lutSize);
                     for (int j = 0; j < height; j++) {
                         for (int i = 0; i < width; i++) {
                             float v = getInteger(data[j][i], blank);
@@ -289,7 +288,7 @@ class FITSImage {
                 }
                 case BasicHDU.BITPIX_LONG: {
                     long[][] data = (long[][]) pixelData;
-                    PixScale scale = new PowScale(lutSize);
+                    PixScale scale = new PixScale.PowScale(lutSize);
                     for (int j = 0; j < height; j++) {
                         for (int i = 0; i < width; i++) {
                             float v = getInteger(data[j][i], blank);
@@ -300,11 +299,11 @@ class FITSImage {
                 }
                 case BasicHDU.BITPIX_FLOAT: {
                     float[][] data = (float[][]) pixelData;
-                    double scale = 65535. / Math.pow(lutSize, GAMMA);
+                    double scale = 65535. / Math.pow(lutSize, PixScale.GAMMA);
                     for (int j = 0; j < height; j++) {
                         for (int i = 0; i < width; i++) {
                             float v = getFloat(data[j][i], blank);
-                            outData[width * (height - 1 - j) + i] = v == MARKER ? 0 : (short) (MathUtils.clip(scale * Math.pow(v - minmax[0], GAMMA) + .5, 0, 65535));
+                            outData[width * (height - 1 - j) + i] = v == MARKER ? 0 : (short) (MathUtils.clip(scale * Math.pow(v - minmax[0], PixScale.GAMMA) + .5, 0, 65535));
                         }
                     }
                     break;
@@ -323,48 +322,6 @@ class FITSImage {
             }
         }
         imageData = new ImageData(new ImageBuffer(width, height, format, buffer));
-    }
-
-    private abstract static class PixScale {
-
-        protected short[] lut;
-
-        short get(long v) {
-            if (v < 0)
-                return lut[0];
-            else if (v < lut.length)
-                return lut[(int) v];
-            else
-                return lut[lut.length - 1];
-        }
-
-    }
-
-    private static class LinScale extends PixScale {
-        LinScale(long size) {
-            double scale = 65535. / size;
-            lut = new short[(int) (size + 1)];
-            for (int i = 0; i < lut.length; i++)
-                lut[i] = (short) (scale * i + .5);
-        }
-    }
-
-    private static class LogScale extends PixScale {
-        LogScale(long size) {
-            double scale = 65535. / Math.log1p(size);
-            lut = new short[(int) (size + 1)];
-            for (int i = 0; i < lut.length; i++)
-                lut[i] = (short) (scale * Math.log1p(i) + .5);
-        }
-    }
-
-    private static class PowScale extends PixScale {
-        PowScale(long size) {
-            double scale = 65535. / Math.pow(size, GAMMA);
-            lut = new short[(int) (size + 1)];
-            for (int i = 0; i < lut.length; i++)
-                lut[i] = (short) (scale * Math.pow(i, GAMMA) + .5);
-        }
     }
 
     private static String getHeaderAsXML(Header header) {
