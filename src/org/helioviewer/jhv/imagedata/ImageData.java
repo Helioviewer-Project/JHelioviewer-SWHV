@@ -54,6 +54,7 @@ public class ImageData {
 
     public void setMetaData(@Nonnull MetaData _metaData) {
         metaData = _metaData;
+        unit = metaData.getUnit();
     }
 
     public boolean getUploaded() {
@@ -64,9 +65,8 @@ public class ImageData {
         uploaded = _uploaded;
     }
 
-    public void setPhysical(@Nonnull float[] _physLUT, @Nonnull String _unit) {
+    public void setPhysicalLUT(@Nonnull float[] _physLUT) {
         physLUT = _physLUT;
-        unit = _unit;
     }
 
     private int getPixel(double x, double y) {
@@ -96,7 +96,7 @@ public class ImageData {
             ret = String.format("%9d", (int) v);
         else
             ret = String.format("%9.2f", v);
-        return ret + unit;
+        return physLUT == null ? ret : ret + unit;
     }
 
 }
