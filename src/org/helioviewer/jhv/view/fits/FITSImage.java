@@ -21,7 +21,6 @@ class FITSImage {
 
     private static final double GAMMA = 1 / 2.2;
     private static final long BLANK = 0; // in case it doesn't exist, very unlikely value
-    private static final float MARKER = -2147483648;
     private static final int MAX_LUT = 1024 * 1024;
 
     String xml;
@@ -70,7 +69,7 @@ class FITSImage {
                 v = ((double[][]) pixelData)[j][i];
                 break;
         }
-        return (blank != BLANK && v == blank) || !Double.isFinite(v) ? MARKER : (float) (bzero + v * bscale);
+        return (blank != BLANK && v == blank) || !Double.isFinite(v) ? ImageData.BAD_PIXEL : (float) (bzero + v * bscale);
     }
 
     private static float[] sampleImage(int bpp, int width, int height, Object pixelData, long blank, double bzero, double bscale, int[] npix) {
@@ -82,7 +81,7 @@ class FITSImage {
         for (int j = 0; j < height; j += stepH) {
             for (int i = 0; i < width; i += stepW) {
                 float v = getValue(bpp, i, j, pixelData, blank, bzero, bscale);
-                if (v != MARKER)
+                if (v != ImageData.BAD_PIXEL)
                     sampleData[k++] = v;
             }
         }
@@ -97,7 +96,7 @@ class FITSImage {
         for (int j = 0; j < height; j++) {
             for (int i = 0; i < width; i++) {
                 float v = getValue(bpp, i, j, pixelData, blank, bzero, bscale);
-                if (v != MARKER) {
+                if (v != ImageData.BAD_PIXEL) {
                     if (v > max)
                         max = v;
                     if (v < min)
@@ -164,8 +163,8 @@ class FITSImage {
                     for (int i = 0; i < width; i++) {
                         float v = getValue(bpp, i, j, pixelData, blank, bzero, bscale);
                         int p = (int) MathUtils.clip(scale * (v - minmax[0]) + .5, 0, 65535);
-                        lut[p] = v == MARKER ? 0 : v;
-                        outData[width * (height - 1 - j) + i] = v == MARKER ? 0 : (short) p;
+                        lut[p] = v;
+                        outData[width * (height - 1 - j) + i] = v == ImageData.BAD_PIXEL ? 0 : (short) p;
                     }
                 }
                 break;
@@ -179,8 +178,8 @@ class FITSImage {
                     for (int i = 0; i < width; i++) {
                         float v = getValue(bpp, i, j, pixelData, blank, bzero, bscale);
                         int p = (int) MathUtils.clip(scale * Math.pow(v - minmax[0], GAMMA) + .5, 0, 65535);
-                        lut[p] = v == MARKER ? 0 : v;
-                        outData[width * (height - 1 - j) + i] = v == MARKER ? 0 : (short) p;
+                        lut[p] = v;
+                        outData[width * (height - 1 - j) + i] = v == ImageData.BAD_PIXEL ? 0 : (short) p;
                     }
                 }
                 break;
@@ -191,8 +190,8 @@ class FITSImage {
                     for (int i = 0; i < width; i++) {
                         float v = getValue(bpp, i, j, pixelData, blank, bzero, bscale);
                         int p = (int) MathUtils.clip(scale * Math.log1p(v - minmax[0]) + .5, 0, 65535);
-                        lut[p] = v == MARKER ? 0 : v;
-                        outData[width * (height - 1 - j) + i] = v == MARKER ? 0 : (short) p;
+                        lut[p] = v;
+                        outData[width * (height - 1 - j) + i] = v == ImageData.BAD_PIXEL ? 0 : (short) p;
                     }
                 }
                 break;
