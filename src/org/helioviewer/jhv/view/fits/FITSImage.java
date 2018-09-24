@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.view.fits;
 
 import java.net.URI;
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
 import nom.tam.fits.BasicHDU;
@@ -110,6 +108,10 @@ class FITSImage {
         return new float[]{min, max};
     }
 
+    private String parseUnit(String unit) {
+        return unit == null ? "" : unit.replace(" m-2", "/m\u00B2").replace(" sr-1", "/sr");
+    }
+
     private void readHDU(BasicHDU<?> hdu) throws Exception {
         int[] axes = hdu.getAxes();
         if (axes == null || axes.length != 2)
@@ -154,13 +156,16 @@ class FITSImage {
         // System.out.println(">>> " + minmax[0] + ' ' + minmax[1]);
 
         short[] outData = new short[width * height];
+        float[] lut = new float[65536];
         switch (bpp) {
             case BasicHDU.BITPIX_BYTE: {
                 double scale = 65535. / lutSize;
                 for (int j = 0; j < height; j++) {
                     for (int i = 0; i < width; i++) {
                         float v = getValue(bpp, i, j, pixelData, blank, bzero, bscale);
-                        outData[width * (height - 1 - j) + i] = v == MARKER ? 0 : (short) (MathUtils.clip(scale * (v - minmax[0]) + .5, 0, 65535));
+                        int p = (int) MathUtils.clip(scale * (v - minmax[0]) + .5, 0, 65535);
+                        lut[p] = v == MARKER ? 0 : v;
+                        outData[width * (height - 1 - j) + i] = v == MARKER ? 0 : (short) p;
                     }
                 }
                 break;
@@ -173,7 +178,9 @@ class FITSImage {
                 for (int j = 0; j < height; j++) {
                     for (int i = 0; i < width; i++) {
                         float v = getValue(bpp, i, j, pixelData, blank, bzero, bscale);
-                        outData[width * (height - 1 - j) + i] = v == MARKER ? 0 : (short) (MathUtils.clip(scale * Math.pow(v - minmax[0], GAMMA) + .5, 0, 65535));
+                        int p = (int) MathUtils.clip(scale * Math.pow(v - minmax[0], GAMMA) + .5, 0, 65535);
+                        lut[p] = v == MARKER ? 0 : v;
+                        outData[width * (height - 1 - j) + i] = v == MARKER ? 0 : (short) p;
                     }
                 }
                 break;
@@ -183,13 +190,16 @@ class FITSImage {
                 for (int j = 0; j < height; j++) {
                     for (int i = 0; i < width; i++) {
                         float v = getValue(bpp, i, j, pixelData, blank, bzero, bscale);
-                        outData[width * (height - 1 - j) + i] = v == MARKER ? 0 : (short) (MathUtils.clip(scale * Math.log1p(v - minmax[0]) + .5, 0, 65535));
+                        int p = (int) MathUtils.clip(scale * Math.log1p(v - minmax[0]) + .5, 0, 65535);
+                        lut[p] = v == MARKER ? 0 : v;
+                        outData[width * (height - 1 - j) + i] = v == MARKER ? 0 : (short) p;
                     }
                 }
                 break;
             }
         }
         imageData = new ImageData(new ImageBuffer(width, height, ImageBuffer.Format.Gray16, ShortBuffer.wrap(outData)));
+        imageData.setPhysical(lut, parseUnit(hdu.getBUnit()));
     }
 
     private static String getHeaderAsXML(Header header) {
