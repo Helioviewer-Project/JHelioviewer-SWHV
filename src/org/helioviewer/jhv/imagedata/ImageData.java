@@ -9,6 +9,7 @@ import org.helioviewer.jhv.position.Position;
 public class ImageData {
 
     public static final String nanValue = String.format("%9s", "--");
+    public static final int BAD_PIXEL = Integer.MIN_VALUE;
 
     private Position viewpoint;
     private Region region;
@@ -83,15 +84,18 @@ public class ImageData {
 
     @Nonnull
     public String getPixelString(double x, double y) {
-        int v = getPixel(x, y);
+        float v = getPixel(x, y);
+        if (physLUT != null && v != BAD_PIXEL) {
+            v = physLUT[(int) v];
+        }
 
         String ret;
-        if (v == ImageBuffer.BAD_PIXEL)
+        if (v == BAD_PIXEL)
             ret = nanValue;
-        else if (physLUT != null)
-            ret = String.format("%9.2f", physLUT[v]);
+        else if (v == (int) v)
+            ret = String.format("%9d", (int) v);
         else
-            ret = String.format("%9d", v);
+            ret = String.format("%9.2f", v);
         return ret + unit;
     }
 
