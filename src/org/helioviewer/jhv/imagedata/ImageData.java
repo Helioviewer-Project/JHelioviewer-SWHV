@@ -8,12 +8,14 @@ import org.helioviewer.jhv.position.Position;
 
 public class ImageData {
 
-    public static final String nanValue = String.format("%7s", "--");
+    public static final String nanValue = String.format("%9s", "--");
 
     private Position viewpoint;
     private Region region;
     private MetaData metaData;
-    private boolean uploaded = false;
+    private boolean uploaded;
+    private float[] physLUT;
+    private String unit = "";
 
     private final ImageBuffer imageBuffer;
 
@@ -61,6 +63,11 @@ public class ImageData {
         uploaded = _uploaded;
     }
 
+    public void setPhysical(@Nonnull float[] _physLUT, @Nonnull String _unit) {
+        physLUT = _physLUT;
+        unit = _unit;
+    }
+
     private int getPixel(double x, double y) {
         double ccr = metaData.getCCROTA();
         double scr = -metaData.getSCROTA();
@@ -77,9 +84,15 @@ public class ImageData {
     @Nonnull
     public String getPixelString(double x, double y) {
         int v = getPixel(x, y);
+
+        String ret;
         if (v == ImageBuffer.BAD_PIXEL)
-            return nanValue;
-        return String.format("%7d", v);
+            ret = nanValue;
+        else if (physLUT != null)
+            ret = String.format("%9.2f", physLUT[v]);
+        else
+            ret = String.format("%9d", v);
+        return ret + unit;
     }
 
 }
