@@ -13,6 +13,7 @@ class BaseMetaData implements MetaData {
 
     int frameNumber = 0;
     Region region;
+    String unit = "";
 
     int pixelW;
     int pixelH;
@@ -126,6 +127,11 @@ class BaseMetaData implements MetaData {
     @Override
     public double yPixelFactor(double yPoint) {
         return 1 - (yPoint - region.lly) / unitPerPixelY / pixelH;
+    }
+
+    @Nonnull
+    public String getUnit() {
+        return unit;
     }
 
 }

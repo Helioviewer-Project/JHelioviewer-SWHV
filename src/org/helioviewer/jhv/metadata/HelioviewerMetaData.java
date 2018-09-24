@@ -53,8 +53,15 @@ public class HelioviewerMetaData extends BaseMetaData {
         retrieveOcculterRadii(m);
         retrieveOcculterLinearCutOff(m);
 
+        retrieveUnit(m);
+
         if (normalizeResponse)
             retrieveResponse();
+    }
+
+    private void retrieveUnit(MetaDataContainer m) {
+        unit = m.getString("BUNIT").orElse("");
+        unit = unit.replace(" m-2", "/m\u00B2").replace(" sr-1", "/sr");
     }
 
     private void retrieveResponse() {

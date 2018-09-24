@@ -107,10 +107,6 @@ class FITSImage {
         return new float[]{min, max};
     }
 
-    private String parseUnit(String unit) {
-        return unit == null ? "" : unit.replace(" m-2", "/m\u00B2").replace(" sr-1", "/sr");
-    }
-
     private void readHDU(BasicHDU<?> hdu) throws Exception {
         int[] axes = hdu.getAxes();
         if (axes == null || axes.length != 2)
@@ -198,7 +194,7 @@ class FITSImage {
             }
         }
         imageData = new ImageData(new ImageBuffer(width, height, ImageBuffer.Format.Gray16, ShortBuffer.wrap(outData)));
-        imageData.setPhysical(lut, parseUnit(hdu.getBUnit()));
+        imageData.setPhysicalLUT(lut);
     }
 
     private static String getHeaderAsXML(Header header) {

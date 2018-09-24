@@ -51,4 +51,7 @@ public interface MetaData {
 
     double yPixelFactor(double yPoint);
 
+    @Nonnull
+    String getUnit();
+
 }
