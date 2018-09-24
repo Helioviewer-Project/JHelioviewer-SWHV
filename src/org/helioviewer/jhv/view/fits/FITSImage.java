@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.view.fits;
 
 import java.net.URI;
+import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
 import nom.tam.fits.BasicHDU;
@@ -50,9 +51,6 @@ class FITSImage {
     private static float getValue(int bpp, int i, int j, Object pixelData, long blank, double bzero, double bscale) {
         double v = 0;
         switch (bpp) {
-            case BasicHDU.BITPIX_BYTE:
-                v = ((byte[][]) pixelData)[j][i];
-                break;
             case BasicHDU.BITPIX_SHORT:
                 v = ((short[][]) pixelData)[j][i];
                 break;
@@ -125,6 +123,16 @@ class FITSImage {
         } catch (Exception ignore) {
         }
 
+        if (bpp == BasicHDU.BITPIX_BYTE) {
+            byte[][] inData = (byte[][]) pixelData;
+            byte[] outData = new byte[width * height];
+            for (int j = 0; j < height; j++) {
+                System.arraycopy(inData[j], 0, outData, width * (height - 1 - j), width);
+            }
+            imageData = new ImageData(new ImageBuffer(width, height, ImageBuffer.Format.Gray8, ByteBuffer.wrap(outData)));
+            return;
+        }
+
         double bzero = hdu.getBZero();
         double bscale = hdu.getBScale();
 
@@ -153,18 +161,6 @@ class FITSImage {
         short[] outData = new short[width * height];
         float[] lut = new float[65536];
         switch (bpp) {
-            case BasicHDU.BITPIX_BYTE: {
-                double scale = 65535. / lutSize;
-                for (int j = 0; j < height; j++) {
-                    for (int i = 0; i < width; i++) {
-                        float v = getValue(bpp, i, j, pixelData, blank, bzero, bscale);
-                        int p = (int) MathUtils.clip(scale * (v - minmax[0]) + .5, 0, 65535);
-                        lut[p] = v;
-                        outData[width * (height - 1 - j) + i] = v == ImageData.BAD_PIXEL ? 0 : (short) p;
-                    }
-                }
-                break;
-            }
             case BasicHDU.BITPIX_SHORT:
             case BasicHDU.BITPIX_INT:
             case BasicHDU.BITPIX_LONG:
