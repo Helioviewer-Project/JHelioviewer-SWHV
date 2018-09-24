@@ -8,7 +8,6 @@ import org.helioviewer.jhv.position.Position;
 
 public class ImageData {
 
-    static final int BAD_PIXEL = Integer.MIN_VALUE;
     public static final String nanValue = String.format("%7s", "--");
 
     private Position viewpoint;
@@ -75,6 +74,7 @@ public class ImageData {
         return imageBuffer.getPixel(ix, iy);
     }
 
+    @Nonnull
     public String getPixelString(double x, double y) {
         int v = getPixel(x, y);
         if (v == ImageBuffer.BAD_PIXEL)

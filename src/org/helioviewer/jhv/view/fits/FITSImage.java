@@ -16,12 +16,12 @@ import nom.tam.util.Cursor;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
-import org.helioviewer.jhv.imagedata.PixScale;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.log.Log;
 
 class FITSImage {
 
+    private static final double GAMMA = 1 / 2.2;
     private static final long BLANK = 0; // in case it doesn't exist, very unlikely value
     private static final float MARKER = -2147483648;
     private static final int MAX_LUT = 1024 * 1024;
@@ -50,160 +50,61 @@ class FITSImage {
         }
     }
 
-    private static float getInteger(long v, long blank) {
-        return blank != BLANK && v == blank ? MARKER : v;
+    private static float getValue(int bpp, int i, int j, Object pixelData, long blank, double bzero, double bscale) {
+        double v = 0;
+        switch (bpp) {
+            case BasicHDU.BITPIX_BYTE:
+                v = ((byte[][]) pixelData)[j][i];
+                break;
+            case BasicHDU.BITPIX_SHORT:
+                v = ((short[][]) pixelData)[j][i];
+                break;
+            case BasicHDU.BITPIX_INT:
+                v = ((int[][]) pixelData)[j][i];
+                break;
+            case BasicHDU.BITPIX_LONG:
+                v = ((long[][]) pixelData)[j][i];
+                break;
+            case BasicHDU.BITPIX_FLOAT:
+                v = ((float[][]) pixelData)[j][i];
+                break;
+            case BasicHDU.BITPIX_DOUBLE:
+                v = ((double[][]) pixelData)[j][i];
+                break;
+        }
+        return (blank != BLANK && v == blank) || !Double.isFinite(v) ? MARKER : (float) (bzero + v * bscale);
     }
 
-    private static float getFloat(double v, long blank) {
-        return (blank != BLANK && v == blank) || !Double.isFinite(v) ? MARKER : (float) v;
-    }
-
-    private static float[] sampleImage(int bpp, int width, int height, Object pixelData, long blank, int[] npix) {
+    private static float[] sampleImage(int bpp, int width, int height, Object pixelData, long blank, double bzero, double bscale, int[] npix) {
         int stepW = 4 * width / 1024;
         int stepH = 4 * height / 1024;
         float[] sampleData = new float[(width / stepW) * (height / stepH)];
 
         int k = 0;
-        switch (bpp) {
-            case BasicHDU.BITPIX_SHORT: {
-                short[][] data = (short[][]) pixelData;
-                for (int j = 0; j < height; j += stepH) {
-                    for (int i = 0; i < width; i += stepW) {
-                        float v = getInteger(data[j][i], blank);
-                        if (v != MARKER)
-                            sampleData[k++] = v;
-                    }
-                }
-                break;
-            }
-            case BasicHDU.BITPIX_INT: {
-                int[][] data = (int[][]) pixelData;
-                for (int j = 0; j < height; j += stepH) {
-                    for (int i = 0; i < width; i += stepW) {
-                        float v = getInteger(data[j][i], blank);
-                        if (v != MARKER)
-                            sampleData[k++] = v;
-                    }
-                }
-                break;
-            }
-            case BasicHDU.BITPIX_LONG: {
-                long[][] data = (long[][]) pixelData;
-                for (int j = 0; j < height; j += stepH) {
-                    for (int i = 0; i < width; i += stepW) {
-                        float v = getInteger(data[j][i], blank);
-                        if (v != MARKER)
-                            sampleData[k++] = v;
-                    }
-                }
-                break;
-            }
-            case BasicHDU.BITPIX_FLOAT: {
-                float[][] data = (float[][]) pixelData;
-                for (int j = 0; j < height; j += stepH) {
-                    for (int i = 0; i < width; i += stepW) {
-                        float v = getFloat(data[j][i], blank);
-                        if (v != MARKER)
-                            sampleData[k++] = v;
-                    }
-                }
-                break;
-            }
-            case BasicHDU.BITPIX_DOUBLE: {
-                double[][] data = (double[][]) pixelData;
-                for (int j = 0; j < height; j += stepH) {
-                    for (int i = 0; i < width; i += stepW) {
-                        float v = getFloat(data[j][i], blank);
-                        if (v != MARKER)
-                            sampleData[k++] = v;
-                    }
-                }
-                break;
+        for (int j = 0; j < height; j += stepH) {
+            for (int i = 0; i < width; i += stepW) {
+                float v = getValue(bpp, i, j, pixelData, blank, bzero, bscale);
+                if (v != MARKER)
+                    sampleData[k++] = v;
             }
         }
         npix[0] = k;
         return sampleData;
     }
 
-    private static float[] getMinMax(int bpp, int width, int height, Object pixelData, long blank) {
+    private static float[] getMinMax(int bpp, int width, int height, Object pixelData, long blank, double bzero, double bscale) {
         float min = Float.MAX_VALUE;
         float max = -Float.MAX_VALUE;
 
-        switch (bpp) {
-            case BasicHDU.BITPIX_SHORT: {
-                short[][] data = (short[][]) pixelData;
-                for (int j = 0; j < height; j++) {
-                    for (int i = 0; i < width; i++) {
-                        float v = getInteger(data[j][i], blank);
-                        if (v != MARKER) {
-                            if (v > max)
-                                max = v;
-                            if (v < min)
-                                min = v;
-                        }
-                    }
+        for (int j = 0; j < height; j++) {
+            for (int i = 0; i < width; i++) {
+                float v = getValue(bpp, i, j, pixelData, blank, bzero, bscale);
+                if (v != MARKER) {
+                    if (v > max)
+                        max = v;
+                    if (v < min)
+                        min = v;
                 }
-                break;
-            }
-            case BasicHDU.BITPIX_INT: {
-                int[][] data = (int[][]) pixelData;
-                for (int j = 0; j < height; j++) {
-                    for (int i = 0; i < width; i++) {
-                        float v = getInteger(data[j][i], blank);
-                        if (v != MARKER) {
-                            if (v > max)
-                                max = v;
-                            if (v < min)
-                                min = v;
-                        }
-                    }
-                }
-                break;
-            }
-            case BasicHDU.BITPIX_LONG: {
-                long[][] data = (long[][]) pixelData;
-                for (int j = 0; j < height; j++) {
-                    for (int i = 0; i < width; i++) {
-                        float v = getInteger(data[j][i], blank);
-                        if (v != MARKER) {
-                            if (v > max)
-                                max = v;
-                            if (v < min)
-                                min = v;
-                        }
-                    }
-                }
-                break;
-            }
-            case BasicHDU.BITPIX_FLOAT: {
-                float[][] data = (float[][]) pixelData;
-                for (int j = 0; j < height; j++) {
-                    for (int i = 0; i < width; i++) {
-                        float v = getFloat(data[j][i], blank);
-                        if (v != MARKER) {
-                            if (v > max)
-                                max = v;
-                            if (v < min)
-                                min = v;
-                        }
-                    }
-                }
-                break;
-            }
-            case BasicHDU.BITPIX_DOUBLE: {
-                double[][] data = (double[][]) pixelData;
-                for (int j = 0; j < height; j++) {
-                    for (int i = 0; i < width; i++) {
-                        float v = getFloat(data[j][i], blank);
-                        if (v != MARKER) {
-                            if (v > max)
-                                max = v;
-                            if (v < min)
-                                min = v;
-                        }
-                    }
-                }
-                break;
             }
         }
         return new float[]{min, max};
@@ -221,107 +122,74 @@ class FITSImage {
         if (pixelData == null)
             throw new Exception("Cannot retrieve pixel data");
 
-        Buffer buffer;
-        ImageBuffer.Format format;
-        if (bpp == BasicHDU.BITPIX_BYTE) {
-            byte[][] data = (byte[][]) pixelData;
-            byte[] outData = new byte[width * height];
-            for (int j = 0; j < height; j++) {
-                System.arraycopy(data[j], 0, outData, width * (height - 1 - j), width);
-            }
-            buffer = ByteBuffer.wrap(outData);
-            format = ImageBuffer.Format.Gray8;
-        } else {
-            long blank = BLANK;
-            try {
-                blank = hdu.getBlankValue();
-            } catch (Exception ignore) {
-            }
+        long blank = BLANK;
+        try {
+            blank = hdu.getBlankValue();
+        } catch (Exception ignore) {
+        }
 
-            int[] npix = {0};
-            float[] sampleData = sampleImage(bpp, width, height, pixelData, blank, npix);
+        double bzero = hdu.getBZero();
+        double bscale = hdu.getBScale();
 
-            float[] zLow = {0};
-            float[] zHigh = {0};
-            float[] zMax = {0};
-            ZScale.zscale(sampleData, npix[0], zLow, zHigh, zMax);
-            // System.out.println(">>> " + npix[0] + " " + zLow[0] + " " + zMax[0]);
+        int[] npix = {0};
+        float[] sampleData = sampleImage(bpp, width, height, pixelData, blank, bzero, bscale, npix);
 
-            float[] minmax = {zLow[0], zMax[0]};
-            // float[] minmax = getMinMax(bpp, width, height, pixelData, blank);
-            if (minmax[0] >= minmax[1]) {
-                Log.debug("min >= max :" + minmax[0] + ' ' + minmax[1]);
-                minmax[1] = minmax[0] + 1;
+        float[] zLow = {0};
+        float[] zHigh = {0};
+        float[] zMax = {0};
+        ZScale.zscale(sampleData, npix[0], zLow, zHigh, zMax);
+        // System.out.println(">>> " + npix[0] + " " + zLow[0] + " " + zMax[0]);
+
+        float[] minmax = {zLow[0], zMax[0]};
+        //float[] minmax = getMinMax(bpp, width, height, pixelData, blank, bzero, bscale);
+        if (minmax[0] >= minmax[1]) {
+            Log.debug("min >= max :" + minmax[0] + ' ' + minmax[1]);
+            minmax[1] = minmax[0] + 1;
+        }
+        long lutSize = (long) (minmax[1] - minmax[0]);
+        if (lutSize > MAX_LUT) {
+            Log.debug("Pixel scaling LUT too big: " + minmax[0] + ' ' + minmax[1]);
+            lutSize = MAX_LUT;
+        }
+        // System.out.println(">>> " + minmax[0] + ' ' + minmax[1]);
+
+        short[] outData = new short[width * height];
+        switch (bpp) {
+            case BasicHDU.BITPIX_BYTE: {
+                double scale = 65535. / lutSize;
+                for (int j = 0; j < height; j++) {
+                    for (int i = 0; i < width; i++) {
+                        float v = getValue(bpp, i, j, pixelData, blank, bzero, bscale);
+                        outData[width * (height - 1 - j) + i] = v == MARKER ? 0 : (short) (MathUtils.clip(scale * (v - minmax[0]) + .5, 0, 65535));
+                    }
+                }
+                break;
             }
-            long lutSize = (long) (minmax[1] - minmax[0]);
-            if (lutSize > MAX_LUT) {
-                Log.debug("Pixel scaling LUT too big: " + minmax[0] + ' ' + minmax[1]);
-                lutSize = MAX_LUT;
+            case BasicHDU.BITPIX_SHORT:
+            case BasicHDU.BITPIX_INT:
+            case BasicHDU.BITPIX_LONG:
+            case BasicHDU.BITPIX_FLOAT: {
+                double scale = 65535. / Math.pow(lutSize, GAMMA);
+                for (int j = 0; j < height; j++) {
+                    for (int i = 0; i < width; i++) {
+                        float v = getValue(bpp, i, j, pixelData, blank, bzero, bscale);
+                        outData[width * (height - 1 - j) + i] = v == MARKER ? 0 : (short) (MathUtils.clip(scale * Math.pow(v - minmax[0], GAMMA) + .5, 0, 65535));
+                    }
+                }
+                break;
             }
-            // System.out.println(">>> " + minmax[0] + ' ' + minmax[1]);
-
-            short[] outData = new short[width * height];
-            buffer = ShortBuffer.wrap(outData);
-            format = ImageBuffer.Format.Gray16;
-            switch (bpp) {
-                case BasicHDU.BITPIX_SHORT: {
-                    short[][] data = (short[][]) pixelData;
-                    PixScale scale = new PixScale.PowScale(lutSize);
-                    for (int j = 0; j < height; j++) {
-                        for (int i = 0; i < width; i++) {
-                            float v = getInteger(data[j][i], blank);
-                            outData[width * (height - 1 - j) + i] = v == MARKER ? scale.get(0) : scale.get((int) (v - minmax[0]));
-                        }
+            case BasicHDU.BITPIX_DOUBLE: {
+                double scale = 65535. / Math.log1p(lutSize);
+                for (int j = 0; j < height; j++) {
+                    for (int i = 0; i < width; i++) {
+                        float v = getValue(bpp, i, j, pixelData, blank, bzero, bscale);
+                        outData[width * (height - 1 - j) + i] = v == MARKER ? 0 : (short) (MathUtils.clip(scale * Math.log1p(v - minmax[0]) + .5, 0, 65535));
                     }
-                    break;
                 }
-                case BasicHDU.BITPIX_INT: {
-                    int[][] data = (int[][]) pixelData;
-                    PixScale scale = new PixScale.PowScale(lutSize);
-                    for (int j = 0; j < height; j++) {
-                        for (int i = 0; i < width; i++) {
-                            float v = getInteger(data[j][i], blank);
-                            outData[width * (height - 1 - j) + i] = v == MARKER ? scale.get(0) : scale.get((int) (v - minmax[0]));
-                        }
-                    }
-                    break;
-                }
-                case BasicHDU.BITPIX_LONG: {
-                    long[][] data = (long[][]) pixelData;
-                    PixScale scale = new PixScale.PowScale(lutSize);
-                    for (int j = 0; j < height; j++) {
-                        for (int i = 0; i < width; i++) {
-                            float v = getInteger(data[j][i], blank);
-                            outData[width * (height - 1 - j) + i] = v == MARKER ? scale.get(0) : scale.get((int) (v - minmax[0]));
-                        }
-                    }
-                    break;
-                }
-                case BasicHDU.BITPIX_FLOAT: {
-                    float[][] data = (float[][]) pixelData;
-                    double scale = 65535. / Math.pow(lutSize, PixScale.GAMMA);
-                    for (int j = 0; j < height; j++) {
-                        for (int i = 0; i < width; i++) {
-                            float v = getFloat(data[j][i], blank);
-                            outData[width * (height - 1 - j) + i] = v == MARKER ? 0 : (short) (MathUtils.clip(scale * Math.pow(v - minmax[0], PixScale.GAMMA) + .5, 0, 65535));
-                        }
-                    }
-                    break;
-                }
-                case BasicHDU.BITPIX_DOUBLE: {
-                    double[][] data = (double[][]) pixelData;
-                    double scale = 65535. / Math.log1p(lutSize);
-                    for (int j = 0; j < height; j++) {
-                        for (int i = 0; i < width; i++) {
-                            float v = getFloat(data[j][i], blank);
-                            outData[width * (height - 1 - j) + i] = v == MARKER ? 0 : (short) (MathUtils.clip(scale * Math.log1p(v - minmax[0]) + .5, 0, 65535));
-                        }
-                    }
-                    break;
-                }
+                break;
             }
         }
-        imageData = new ImageData(new ImageBuffer(width, height, format, buffer));
+        imageData = new ImageData(new ImageBuffer(width, height, ImageBuffer.Format.Gray16, ShortBuffer.wrap(outData)));
     }
 
     private static String getHeaderAsXML(Header header) {
