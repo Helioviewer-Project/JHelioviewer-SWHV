@@ -1,13 +1,10 @@
 package org.helioviewer.jhv.opengl;
 
-import javax.swing.JOptionPane;
-
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.nativewindow.ScalableSurface;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GLException;
 import com.jogamp.opengl.glu.GLU;
 
 public class GLInfo {
@@ -23,10 +20,7 @@ public class GLInfo {
 
     static void glVersionError(String err) {
         Log.error("GLInfo > " + err);
-        if (1 == JOptionPane.showOptionDialog(null, Message.formatMessage(err + "\n\nJHelioviewer is not able to run."), "OpenGL Fatal Error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, crashOptions, crashOptions[0]))
-            throw new GLException(err);
-        else
-            System.exit(-1);
+        Message.err("OpenGL fatal error, JHelioviewer is not able to run:\n", Message.formatMessage(err), true);
     }
 
     public static void update(GL2 gl) {
