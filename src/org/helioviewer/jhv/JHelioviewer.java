@@ -2,7 +2,9 @@ package org.helioviewer.jhv;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -43,7 +45,7 @@ public class JHelioviewer {
             return;
         }
 
-        if (GraphicsEnvironment.isHeadless())
+        if (isHeadless())
             throw new Exception("This application cannot run in a headless configuration.");
 
         // Uncaught runtime errors are displayed in a dialog box in addition
@@ -144,6 +146,19 @@ public class JHelioviewer {
 
             new JHVUpdate(false).check();
         });
+    }
+
+    private static boolean isHeadless() {
+        if (GraphicsEnvironment.isHeadless()) {
+            return true;
+        }
+        try {
+            GraphicsDevice[] screens = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
+            return screens == null || screens.length == 0;
+        } catch (HeadlessException e) {
+            e.printStackTrace();
+            return true;
+        }
     }
 
 }
