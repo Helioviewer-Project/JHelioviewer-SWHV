@@ -83,20 +83,29 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
         if (filterDialog != null) {
             JideButton filterButton = new JideButton("Filter");
             filterButton.addActionListener(e -> filterDialog.setVisible(true));
-            filterButton.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    Point pressedLocation = e.getLocationOnScreen();
-                    Point windowLocation = new Point(pressedLocation.x, pressedLocation.y - filterDialog.getSize().height);
-                    filterDialog.setLocation(windowLocation);
-                }
-            });
+            filterButton.addMouseListener(new FilterMouseAdapter(filterDialog));
             leaf.add(filterButton, BorderLayout.LINE_END);
             leaf.setPreferredSize(new Dimension(250, -1)); //!
         }
 
         ComponentUtils.smallVariant(leaf);
         return leaf;
+    }
+
+    private static class FilterMouseAdapter extends MouseAdapter {
+
+        private final FilterDialog filterDialog;
+
+        public FilterMouseAdapter(FilterDialog _filterDialog) {
+            filterDialog = _filterDialog;
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            Point pressedLocation = e.getLocationOnScreen();
+            Point windowLocation = new Point(pressedLocation.x, pressedLocation.y - filterDialog.getSize().height);
+            filterDialog.setLocation(windowLocation);
+        }
     }
 
 }

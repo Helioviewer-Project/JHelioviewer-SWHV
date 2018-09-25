@@ -80,7 +80,7 @@ public class GLImage {
         return diffMode == DifferenceMode.Base;
     }
 
-    private MetaData bindParams(GL2 gl, ImageData imageData, GLSLSolarShader shader) {
+    private static MetaData bindParams(GL2 gl, ImageData imageData, GLSLSolarShader shader) {
         Region r = imageData.getRegion();
         shader.bindRect(gl, r.llx, r.lly, 1. / r.width, 1. / r.height);
         MetaData metaData = imageData.getMetaData();
@@ -88,7 +88,7 @@ public class GLImage {
         return metaData;
     }
 
-    private void bindParamsDiff(GL2 gl, ImageData imageData, GLSLSolarShader shader) {
+    private static void bindParamsDiff(GL2 gl, ImageData imageData, GLSLSolarShader shader) {
         Region r = imageData.getRegion();
         shader.bindDiffRect(gl, r.llx, r.lly, 1. / r.width, 1. / r.height);
         MetaData metaData = imageData.getMetaData();
