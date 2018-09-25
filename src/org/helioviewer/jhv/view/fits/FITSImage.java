@@ -22,7 +22,6 @@ class FITSImage {
 
     private static final double GAMMA = 1 / 2.2;
     private static final long BLANK = 0; // in case it doesn't exist, very unlikely value
-    private static final int MAX_LUT = 1024 * 1024;
 
     String xml;
     ImageData imageData;
@@ -48,37 +47,38 @@ class FITSImage {
         }
     }
 
-    private static float getValue(int bpp, int i, int j, Object pixelData, long blank, double bzero, double bscale) {
-        double v = 0;
+    private static float getValue(int bpp, Object lineData, int i, long blank, double bzero, double bscale) {
+        double v = ImageData.BAD_PIXEL;
         switch (bpp) {
             case BasicHDU.BITPIX_SHORT:
-                v = ((short[][]) pixelData)[j][i];
+                v = ((short[]) lineData)[i];
                 break;
             case BasicHDU.BITPIX_INT:
-                v = ((int[][]) pixelData)[j][i];
+                v = ((int[]) lineData)[i];
                 break;
             case BasicHDU.BITPIX_LONG:
-                v = ((long[][]) pixelData)[j][i];
+                v = ((long[]) lineData)[i];
                 break;
             case BasicHDU.BITPIX_FLOAT:
-                v = ((float[][]) pixelData)[j][i];
+                v = ((float[]) lineData)[i];
                 break;
             case BasicHDU.BITPIX_DOUBLE:
-                v = ((double[][]) pixelData)[j][i];
+                v = ((double[]) lineData)[i];
                 break;
         }
         return (blank != BLANK && v == blank) || !Double.isFinite(v) ? ImageData.BAD_PIXEL : (float) (bzero + v * bscale);
     }
 
-    private static float[] sampleImage(int bpp, int width, int height, Object pixelData, long blank, double bzero, double bscale, int[] npix) {
+    private static float[] sampleImage(int bpp, int width, int height, Object[] pixelData, long blank, double bzero, double bscale, int[] npix) {
         int stepW = 4 * width / 1024;
         int stepH = 4 * height / 1024;
         float[] sampleData = new float[(width / stepW) * (height / stepH)];
 
         int k = 0;
         for (int j = 0; j < height; j += stepH) {
+            Object lineData = pixelData[j];
             for (int i = 0; i < width; i += stepW) {
-                float v = getValue(bpp, i, j, pixelData, blank, bzero, bscale);
+                float v = getValue(bpp, lineData, i, blank, bzero, bscale);
                 if (v != ImageData.BAD_PIXEL)
                     sampleData[k++] = v;
             }
@@ -87,13 +87,14 @@ class FITSImage {
         return sampleData;
     }
 
-    private static float[] getMinMax(int bpp, int width, int height, Object pixelData, long blank, double bzero, double bscale) {
+    private static float[] getMinMax(int bpp, int width, int height, Object[] pixelData, long blank, double bzero, double bscale) {
         float min = Float.MAX_VALUE;
         float max = -Float.MAX_VALUE;
 
         for (int j = 0; j < height; j++) {
+            Object lineData = pixelData[j];
             for (int i = 0; i < width; i++) {
-                float v = getValue(bpp, i, j, pixelData, blank, bzero, bscale);
+                float v = getValue(bpp, pixelData, i, blank, bzero, bscale);
                 if (v != ImageData.BAD_PIXEL) {
                     if (v > max)
                         max = v;
@@ -113,9 +114,10 @@ class FITSImage {
         int width = axes[1];
 
         int bpp = hdu.getBitPix();
-        Object pixelData = hdu.getKernel();
-        if (pixelData == null)
+        Object kernel = hdu.getKernel();
+        if (!(kernel instanceof Object[]))
             throw new Exception("Cannot retrieve pixel data");
+        Object[] pixelData = (Object[]) kernel;
 
         long blank = BLANK;
         try {
@@ -151,11 +153,7 @@ class FITSImage {
             Log.debug("min >= max :" + minmax[0] + ' ' + minmax[1]);
             minmax[1] = minmax[0] + 1;
         }
-        long lutSize = (long) (minmax[1] - minmax[0]);
-        if (lutSize > MAX_LUT) {
-            Log.debug("Pixel scaling LUT too big: " + minmax[0] + ' ' + minmax[1]);
-            lutSize = MAX_LUT;
-        }
+        double range = minmax[1] - minmax[0];
         // System.out.println(">>> " + minmax[0] + ' ' + minmax[1]);
 
         short[] outData = new short[width * height];
@@ -165,10 +163,11 @@ class FITSImage {
             case BasicHDU.BITPIX_INT:
             case BasicHDU.BITPIX_LONG:
             case BasicHDU.BITPIX_FLOAT: {
-                double scale = 65535. / Math.pow(lutSize, GAMMA);
+                double scale = 65535. / Math.pow(range, GAMMA);
                 for (int j = 0; j < height; j++) {
+                    Object lineData = pixelData[j];
                     for (int i = 0; i < width; i++) {
-                        float v = getValue(bpp, i, j, pixelData, blank, bzero, bscale);
+                        float v = getValue(bpp, lineData, i, blank, bzero, bscale);
                         int p = (int) MathUtils.clip(scale * Math.pow(v - minmax[0], GAMMA) + .5, 0, 65535);
                         lut[p] = v;
                         outData[width * (height - 1 - j) + i] = v == ImageData.BAD_PIXEL ? 0 : (short) p;
@@ -177,10 +176,11 @@ class FITSImage {
                 break;
             }
             case BasicHDU.BITPIX_DOUBLE: {
-                double scale = 65535. / Math.log1p(lutSize);
+                double scale = 65535. / Math.log1p(range);
                 for (int j = 0; j < height; j++) {
+                    Object lineData = pixelData[j];
                     for (int i = 0; i < width; i++) {
-                        float v = getValue(bpp, i, j, pixelData, blank, bzero, bscale);
+                        float v = getValue(bpp, lineData, i, blank, bzero, bscale);
                         int p = (int) MathUtils.clip(scale * Math.log1p(v - minmax[0]) + .5, 0, 65535);
                         lut[p] = v;
                         outData[width * (height - 1 - j) + i] = v == ImageData.BAD_PIXEL ? 0 : (short) p;
