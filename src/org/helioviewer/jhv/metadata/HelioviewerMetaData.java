@@ -6,6 +6,7 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.math.Quat;
@@ -61,7 +62,7 @@ public class HelioviewerMetaData extends BaseMetaData {
 
     private void retrieveUnit(MetaDataContainer m) {
         unit = m.getString("BUNIT").orElse("");
-        unit = unit.replace(" m-2", "/m\u00B2").replace(" sr-1", "/sr");
+        unit = unit.replace("-1", "\u207B\u00B9").replace("-2", "\u207B\u00B2").replace("-3", "\u207B\u00B3").replace(" ", "");
     }
 
     private void retrieveResponse() {
