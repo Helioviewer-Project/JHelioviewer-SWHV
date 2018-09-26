@@ -55,6 +55,9 @@ public class ImageData {
     public void setMetaData(@Nonnull MetaData _metaData) {
         metaData = _metaData;
         unit = metaData.getUnit();
+        float[] lut = metaData.getPhysicalLUT();
+        if (lut != null)
+            setPhysicalLUT(lut);
     }
 
     public boolean getUploaded() {

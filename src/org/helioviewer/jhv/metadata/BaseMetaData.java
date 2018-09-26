@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.metadata;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
@@ -14,6 +15,7 @@ class BaseMetaData implements MetaData {
     int frameNumber = 0;
     Region region;
     String unit = "";
+    float[] physLUT;
 
     int pixelW;
     int pixelH;
@@ -130,8 +132,15 @@ class BaseMetaData implements MetaData {
     }
 
     @Nonnull
+    @Override
     public String getUnit() {
         return unit;
+    }
+
+    @Nullable
+    @Override
+    public float[] getPhysicalLUT() {
+        return physLUT;
     }
 
 }

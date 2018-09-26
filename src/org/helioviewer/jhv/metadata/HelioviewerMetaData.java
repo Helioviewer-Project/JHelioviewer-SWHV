@@ -1,14 +1,15 @@
 package org.helioviewer.jhv.metadata;
 
 import java.util.Locale;
+import java.util.Optional;
 
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.imagedata.SubImage;
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.position.Position;
@@ -63,6 +64,19 @@ public class HelioviewerMetaData extends BaseMetaData {
     private void retrieveUnit(MetaDataContainer m) {
         unit = m.getString("BUNIT").orElse("");
         unit = unit.replace("-1", "\u207B\u00B9").replace("-2", "\u207B\u00B2").replace("-3", "\u207B\u00B3").replace(" ", "");
+
+        // a linear physical LUT
+        Optional<Double> mZero = m.getDouble("HV_ZERO");
+        Optional<Double> mScale = m.getDouble("HV_SCALE");
+        Optional<Double> mDatamax = m.getDouble("DATAMAX");
+        if (mZero.isPresent() && mScale.isPresent() && mDatamax.isPresent()) {
+            double zero = mZero.get();
+            double scale = mScale.get();
+            int size = MathUtils.clip((int) Math.ceil(mDatamax.get()) + 1, 0, 65535);
+            physLUT = new float[size];
+            for (int i = 0; i < size; i++)
+                physLUT[i] = (float) (zero + i * scale);
+        }
     }
 
     private void retrieveResponse() {
