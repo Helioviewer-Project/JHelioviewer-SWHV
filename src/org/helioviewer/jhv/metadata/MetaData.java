@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.metadata;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.imagedata.SubImage;
@@ -53,5 +54,8 @@ public interface MetaData {
 
     @Nonnull
     String getUnit();
+
+    @Nullable
+    float[] getPhysicalLUT();
 
 }
