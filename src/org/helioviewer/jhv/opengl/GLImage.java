@@ -8,7 +8,6 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec2;
-import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.json.JSONObject;
 

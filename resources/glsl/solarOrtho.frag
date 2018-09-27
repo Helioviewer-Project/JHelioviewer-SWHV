@@ -20,6 +20,12 @@ void main(void) {
         rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
     }
 
+    if (sector[0] != 0) {
+        float theta = atan(rotatedHitPoint.y, rotatedHitPoint.x);
+        if (theta < sector[1] || theta > sector[2])
+            discard;
+    }
+
     vec2 texcoord = vec2((rotatedHitPoint.x - rect.x) * rect.z, (-rotatedHitPoint.y - rect.y) * rect.w);
     clamp_coord(texcoord);
 
