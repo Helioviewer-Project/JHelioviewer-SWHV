@@ -257,7 +257,7 @@ public class HelioviewerMetaData extends BaseMetaData {
             double sunX = m.getDouble("CRPIX1").orElse((pixelW + 1) / 2.) - .5;
             double sunY = m.getDouble("CRPIX2").orElse((pixelH + 1) / 2.) - .5;
 
-            if (instrument.equals("XRT")) { // until CRVALx of all datasets can be tested
+            if (instrument.equals("XRT") || instrument.equals("Euhforia")) { // until CRVALx of all datasets can be tested
                 double crval1 = m.getDouble("CRVAL1").orElse(0.) / arcsecPerPixelX;
                 double crval2 = m.getDouble("CRVAL2").orElse(0.) / arcsecPerPixelY;
 
