@@ -37,6 +37,7 @@ public class GLSLSolarShader extends GLSLShader {
     private int crotaRef;
     private int crotaDiffRef;
 
+    private int sectorRef;
     private int radiiRef;
     private int polarRadiiRef;
     private int cutOffDirectionRef;
@@ -66,6 +67,7 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] hglnDiff = new float[1];
     private final float[] crotaDiff = new float[3];
 
+    private final float[] sector = new float[3];
     private final float[] radii = new float[2];
     private final float[] polarRadii = new float[2];
     private final float[] cutOffDirection = new float[2];
@@ -109,6 +111,7 @@ public class GLSLSolarShader extends GLSLShader {
         hglnDiffRef = gl.glGetUniformLocation(id, "hglnDiff");
         crotaDiffRef = gl.glGetUniformLocation(id, "crotaDiff");
 
+        sectorRef = gl.glGetUniformLocation(id, "sector");
         radiiRef = gl.glGetUniformLocation(id, "radii");
         polarRadiiRef = gl.glGetUniformLocation(id, "polarRadii");
         cutOffDirectionRef = gl.glGetUniformLocation(id, "cutOffDirection");
@@ -256,6 +259,13 @@ public class GLSLSolarShader extends GLSLShader {
         crotaDiff[1] = (float) scrota;
         crotaDiff[2] = (float) ccrota;
         gl.glUniform1fv(crotaDiffRef, 3, crotaDiff, 0);
+    }
+
+    public void bindSector(GL2 gl, double sector0, double sector1) {
+        sector[0] = sector0 == sector1 ? 0 : 1;
+        sector[1] = (float) sector0;
+        sector[2] = (float) sector1;
+        gl.glUniform1fv(sectorRef, 3, sector, 0);
     }
 
     public void bindRadii(GL2 gl, double innerRadius, double outerRadius) {

@@ -55,6 +55,7 @@ public class HelioviewerMetaData extends BaseMetaData {
 
         retrieveOcculterRadii(m);
         retrieveOcculterLinearCutOff(m);
+        retrieveSector(m);
 
         retrieveUnit(m);
 
@@ -62,8 +63,13 @@ public class HelioviewerMetaData extends BaseMetaData {
             retrieveResponse();
     }
 
+    private void retrieveSector(MetaDataContainer m) {
+        sector0 = m.getDouble("HV_SECT0").map(Math::toRadians).orElse(sector0);
+        sector1 = m.getDouble("HV_SECT1").map(Math::toRadians).orElse(sector1);
+    }
+
     private void retrieveUnit(MetaDataContainer m) {
-        unit = m.getString("BUNIT").orElse("");
+        unit = m.getString("BUNIT").orElse(unit);
         unit = unit.replace("-1", "\u207B\u00B9").replace("-2", "\u207B\u00B2").replace("-3", "\u207B\u00B3").replace(" ", "");
 
         // a linear physical LUT
