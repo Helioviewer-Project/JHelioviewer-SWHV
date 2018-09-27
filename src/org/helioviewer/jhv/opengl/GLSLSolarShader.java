@@ -37,14 +37,15 @@ public class GLSLSolarShader extends GLSLShader {
     private int crotaRef;
     private int crotaDiffRef;
 
+    private int radiiRef;
+    private int polarRadiiRef;
+    private int cutOffDirectionRef;
+    private int cutOffValueRef;
+
     private int slitRef;
     private int brightRef;
     private int colorRef;
     private int sharpenRef;
-    private int cutOffRadiusRef;
-    private int cutOffDirectionRef;
-    private int cutOffValueRef;
-    private int polarRadiiRef;
     private int enhancedRef;
 
     private int rectRef;
@@ -65,14 +66,15 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] hglnDiff = new float[1];
     private final float[] crotaDiff = new float[3];
 
+    private final float[] radii = new float[2];
+    private final float[] polarRadii = new float[2];
+    private final float[] cutOffDirection = new float[3];
+    private final float[] cutOffValue = new float[1];
+
     private final float[] slit = new float[2];
     private final float[] bright = new float[3];
     private final float[] color = new float[4];
     private final float[] sharpen = new float[3];
-    private final float[] cutOffRadius = new float[2];
-    private final float[] cutOffDirection = new float[3];
-    private final float[] cutOffValue = new float[1];
-    private final float[] polarRadii = new float[2];
     private final int[] enhanced = new int[1];
 
     private final float[] rect = new float[4];
@@ -107,15 +109,15 @@ public class GLSLSolarShader extends GLSLShader {
         hglnDiffRef = gl.glGetUniformLocation(id, "hglnDiff");
         crotaDiffRef = gl.glGetUniformLocation(id, "crotaDiff");
 
+        radiiRef = gl.glGetUniformLocation(id, "radii");
         polarRadiiRef = gl.glGetUniformLocation(id, "polarRadii");
+        cutOffDirectionRef = gl.glGetUniformLocation(id, "cutOffDirection");
+        cutOffValueRef = gl.glGetUniformLocation(id, "cutOffValue");
 
         sharpenRef = gl.glGetUniformLocation(id, "sharpen");
         slitRef = gl.glGetUniformLocation(id, "slit");
         brightRef = gl.glGetUniformLocation(id, "brightness");
         colorRef = gl.glGetUniformLocation(id, "color");
-        cutOffRadiusRef = gl.glGetUniformLocation(id, "cutOffRadius");
-        cutOffDirectionRef = gl.glGetUniformLocation(id, "cutOffDirection");
-        cutOffValueRef = gl.glGetUniformLocation(id, "cutOffValue");
         enhancedRef = gl.glGetUniformLocation(id, "enhanced");
 
         rectRef = gl.glGetUniformLocation(id, "rect");
@@ -221,12 +223,6 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform3fv(viewportRef, 1, viewport, 0);
     }
 
-    public void bindCutOffRadius(GL2 gl, double innerCutOffRadius, double outerCutOffRadius) {
-        cutOffRadius[0] = (float) innerCutOffRadius;
-        cutOffRadius[1] = (float) outerCutOffRadius;
-        gl.glUniform2fv(cutOffRadiusRef, 1, cutOffRadius, 0);
-    }
-
     public void bindCutOffValue(GL2 gl, double val) {
         cutOffValue[0] = (float) val;
         gl.glUniform1fv(cutOffValueRef, 1, cutOffValue, 0);
@@ -263,10 +259,16 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform1fv(crotaDiffRef, 3, crotaDiff, 0);
     }
 
+    public void bindRadii(GL2 gl, double innerRadius, double outerRadius) {
+        radii[0] = (float) innerRadius;
+        radii[1] = (float) outerRadius;
+        gl.glUniform1fv(radiiRef, 2, radii, 0);
+    }
+
     public void bindPolarRadii(GL2 gl, double start, double stop) {
         polarRadii[0] = (float) start;
         polarRadii[1] = (float) stop;
-        gl.glUniform2fv(polarRadiiRef, 1, polarRadii, 0);
+        gl.glUniform1fv(polarRadiiRef, 2, polarRadii, 0);
     }
 
 }

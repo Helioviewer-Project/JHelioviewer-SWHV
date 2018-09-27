@@ -74,12 +74,12 @@ class BaseMetaData implements MetaData {
     }
 
     @Override
-    public double getInnerCutOffRadius() {
+    public double getInnerRadius() {
         return innerRadius;
     }
 
     @Override
-    public double getOuterCutOffRadius() {
+    public double getOuterRadius() {
         return outerRadius;
     }
 

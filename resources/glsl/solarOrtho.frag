@@ -28,7 +28,7 @@ void main(void) {
     float geometryFlatDistAlt = abs(dot(rotatedHitPoint, cutOffDirectionAlt));
 
     float rotatedHitPointRad = length(rotatedHitPoint.xy);
-    if (rotatedHitPointRad > cutOffRadius.y || rotatedHitPointRad < cutOffRadius.x ||
+    if (rotatedHitPointRad > radii[1] || rotatedHitPointRad < radii[0] ||
         (cutOffValue >= 0. && (geometryFlatDist > cutOffValue || geometryFlatDistAlt > cutOffValue))) {
         discard;
     }
@@ -45,7 +45,7 @@ void main(void) {
         clamp_coord(difftexcoord);
 
         float diffrotatedHitPointRad = length(diffrotatedHitPoint.xy);
-        if (diffrotatedHitPointRad > cutOffRadius.y || diffrotatedHitPointRad < cutOffRadius.x) {
+        if (diffrotatedHitPointRad > radii[1] || diffrotatedHitPointRad < radii[0]) {
             discard;
         }
     }
