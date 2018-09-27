@@ -1,8 +1,7 @@
 void get_polar_texcoord(const float cr, const vec2 scrpos, const vec4 rect, out vec2 texcoord, out float radius) {
     float theta = -(scrpos.x * TWOPI + PI / 2. - cr);
-    float start = polarRadii.x;
-    float end = polarRadii.y;
-    float interpolated = start + scrpos.y * (end - start);
+    float interpolated = polarRadii[0] + scrpos.y * (polarRadii[1] - polarRadii[0]);
+
     if (cutOffValue >= 0.) {
         vec3 dpos = vec3(sin(theta), cos(theta), 0.) * interpolated;
         vec3 cutOffDirectionAlt = vec3(-cutOffDirection.y, cutOffDirection.x, 0.);
@@ -12,7 +11,7 @@ void get_polar_texcoord(const float cr, const vec2 scrpos, const vec4 rect, out 
             discard;
     }
 
-    if (interpolated > cutOffRadius.y || interpolated < cutOffRadius.x)
+    if (interpolated > radii[1] || interpolated < radii[0])
         discard;
 
     texcoord = rect.zw * (-rect.xy + vec2(cos(theta), sin(theta)) * interpolated);

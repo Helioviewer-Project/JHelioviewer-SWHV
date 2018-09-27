@@ -30,9 +30,9 @@ public interface MetaData {
 
     double getCCROTA();
 
-    double getInnerCutOffRadius();
+    double getInnerRadius();
 
-    double getOuterCutOffRadius();
+    double getOuterRadius();
 
     double getCutOffValue();
 

@@ -35,10 +35,11 @@ uniform vec4 cameraDifferenceRotationQuat;
 uniform vec4 diffcameraDifferenceRotationQuat;
 uniform vec3 viewport;
 uniform vec2 viewportOffset;
+
+uniform float radii[2];
+uniform float polarRadii[2];
 uniform vec3 cutOffDirection;
 uniform float cutOffValue;
-uniform vec2 cutOffRadius;
-uniform vec2 polarRadii;
 
 #define FSIZE 3 * 3
 uniform vec3 sharpen;

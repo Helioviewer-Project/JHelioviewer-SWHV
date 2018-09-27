@@ -103,7 +103,7 @@ public class GLImage {
         }
 
         MetaData metaData = bindParams(gl, imageData, shader);
-        shader.bindCutOffRadius(gl, metaData.getInnerCutOffRadius(), Display.getShowCorona() ? metaData.getOuterCutOffRadius() : 1);
+        shader.bindRadii(gl, metaData.getInnerRadius(), Display.getShowCorona() ? metaData.getOuterRadius() : 1);
         if (metaData.getCutOffValue() > 0) {
             Vec3 cdir = metaData.getCutOffDirection();
             shader.bindCutOffDirection(gl, cdir.x, cdir.y, 0);

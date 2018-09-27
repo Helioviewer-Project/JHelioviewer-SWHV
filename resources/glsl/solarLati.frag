@@ -37,8 +37,9 @@ void get_lati_texcoord(const float ln, const float lt[2], const float cr[3], con
 }
 
 void main(void) {
-    if (cutOffRadius.x > 1.)
+    if (radii[0] > 1.) // coronagraphs
         discard;
+
     vec4 color;
     vec2 texcoord;
 
