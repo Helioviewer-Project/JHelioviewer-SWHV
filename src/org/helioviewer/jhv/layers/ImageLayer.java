@@ -191,10 +191,6 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         } else if (diffMode == DifferenceMode.Running) {
             shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, prevImageData.getMetaData().getCenterRotation()));
         }
-
-        GridScale scale = Display.mode.scale;
-        shader.bindPolarRadii(gl, scale.getYstart(), scale.getYstop());
-
         GLListener.glslSolar.render(gl);
     }
 

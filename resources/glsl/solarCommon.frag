@@ -36,6 +36,7 @@ uniform vec4 diffcameraDifferenceRotationQuat;
 uniform vec3 viewport;
 uniform vec2 viewportOffset;
 
+uniform float sector[3];
 uniform float radii[2];
 uniform float polarRadii[2];
 uniform vec2 cutOffDirection;

@@ -31,6 +31,10 @@ public interface MetaData {
 
     double getCCROTA();
 
+    double getSector0();
+
+    double getSector1();
+
     double getInnerRadius();
 
     double getOuterRadius();

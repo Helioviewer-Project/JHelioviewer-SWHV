@@ -33,6 +33,9 @@ class BaseMetaData implements MetaData {
     double scrota = 0;
     double ccrota = 1;
 
+    double sector0 = 0;
+    double sector1 = 0;
+
     // Serves only for LASCO cutOff edges
     double cutOffValue = -1;
     Vec2 cutOffDirection = Vec2.ZERO;
@@ -110,9 +113,20 @@ class BaseMetaData implements MetaData {
     public double getSCROTA() {
         return scrota;
     }
+
     @Override
     public double getCCROTA() {
         return ccrota;
+    }
+
+    @Override
+    public double getSector0() {
+        return sector0;
+    }
+
+    @Override
+    public double getSector1() {
+        return sector1;
     }
 
     @Nonnull

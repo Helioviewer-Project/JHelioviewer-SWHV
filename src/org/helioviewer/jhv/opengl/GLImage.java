@@ -105,6 +105,8 @@ public class GLImage {
 
         MetaData metaData = bindParams(gl, imageData, shader);
         shader.bindRadii(gl, metaData.getInnerRadius(), Display.getShowCorona() ? metaData.getOuterRadius() : 1);
+        shader.bindPolarRadii(gl, Display.mode.scale.getYstart(), Display.mode.scale.getYstop());
+        shader.bindSector(gl, metaData.getSector0(), metaData.getSector1());
         if (metaData.getCutOffValue() > 0) {
             Vec2 cdir = metaData.getCutOffDirection();
             shader.bindCutOffDirection(gl, cdir.x, cdir.y);
