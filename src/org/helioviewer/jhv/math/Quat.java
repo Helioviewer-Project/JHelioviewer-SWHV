@@ -232,8 +232,11 @@ public class Quat {
         return new Vec3(vvx, vvy, vvz);
     }
 
-    public float[] getFloatArray() {
-        return new float[] { (float) u.x, (float) u.y, (float) u.z, (float) a };
+    public void setFloatArray(float[] arr) {
+        arr[0] = (float) u.x;
+        arr[1] = (float) u.y;
+        arr[2] = (float) u.z;
+        arr[3] = (float) a;
     }
 
     public JSONArray toJson() {
