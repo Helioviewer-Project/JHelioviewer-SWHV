@@ -4,8 +4,10 @@ void get_polar_texcoord(const float cr, const vec2 scrpos, const vec4 rect, out 
         discard;
 
     float theta = -(scrpos.x * TWOPI + PI / 2. - cr);
+    vec2 pos = vec2(cos(theta), sin(theta)) * interpolated;
+
     if (cutOffValue >= 0.) {
-        vec2 dpos = vec2(sin(theta), cos(theta)) * interpolated;
+        vec2 dpos = pos.yx;
         vec2 cutOffDirectionAlt = vec2(-cutOffDirection.y, cutOffDirection.x);
         float geometryFlatDist = abs(dot(dpos, cutOffDirection));
         float geometryFlatDistAlt = abs(dot(dpos, cutOffDirectionAlt));
@@ -13,7 +15,7 @@ void get_polar_texcoord(const float cr, const vec2 scrpos, const vec4 rect, out 
             discard;
     }
 
-    texcoord = rect.zw * (-rect.xy + vec2(cos(theta), sin(theta)) * interpolated);
+    texcoord = rect.zw * (pos - rect.xy);
     clamp_texture(texcoord);
 
     radius = 1.;
