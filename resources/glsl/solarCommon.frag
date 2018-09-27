@@ -38,7 +38,7 @@ uniform vec2 viewportOffset;
 
 uniform float radii[2];
 uniform float polarRadii[2];
-uniform vec3 cutOffDirection;
+uniform vec2 cutOffDirection;
 uniform float cutOffValue;
 
 #define FSIZE 3 * 3

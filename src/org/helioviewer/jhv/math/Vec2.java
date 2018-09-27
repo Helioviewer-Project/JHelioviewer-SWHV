@@ -2,6 +2,7 @@ package org.helioviewer.jhv.math;
 
 public class Vec2 {
 
+    public static final Vec2 ZERO = new Vec2(0, 0);
     public static final Vec2 NAN = new Vec2(Double.NaN, Double.NaN);
 
     public double x;

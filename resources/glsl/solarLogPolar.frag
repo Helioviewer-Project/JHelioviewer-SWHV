@@ -3,8 +3,8 @@ void get_polar_texcoord(const float cr, const vec2 scrpos, const vec4 rect, out 
     float interpolated = exp(polarRadii[0] + scrpos.y * (polarRadii[1] - polarRadii[0]));
 
     if (cutOffValue >= 0.) {
-        vec3 dpos = vec3(sin(theta), cos(theta), 0.) * interpolated;
-        vec3 cutOffDirectionAlt = vec3(-cutOffDirection.y, cutOffDirection.x, 0.);
+        vec2 dpos = vec2(sin(theta), cos(theta)) * interpolated;
+        vec2 cutOffDirectionAlt = vec2(-cutOffDirection.y, cutOffDirection.x);
         float geometryFlatDist = abs(dot(dpos, cutOffDirection));
         float geometryFlatDistAlt = abs(dot(dpos, cutOffDirectionAlt));
         if (geometryFlatDist > cutOffValue || geometryFlatDistAlt > cutOffValue)

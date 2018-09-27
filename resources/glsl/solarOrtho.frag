@@ -23,9 +23,9 @@ void main(void) {
     vec2 texcoord = vec2((rotatedHitPoint.x - rect.x) * rect.z, (-rotatedHitPoint.y - rect.y) * rect.w);
     clamp_coord(texcoord);
 
-    float geometryFlatDist = abs(dot(rotatedHitPoint, cutOffDirection));
-    vec3 cutOffDirectionAlt = vec3(-cutOffDirection.y, cutOffDirection.x, 0.);
-    float geometryFlatDistAlt = abs(dot(rotatedHitPoint, cutOffDirectionAlt));
+    float geometryFlatDist = abs(dot(rotatedHitPoint.xy, cutOffDirection));
+    vec2 cutOffDirectionAlt = vec2(-cutOffDirection.y, cutOffDirection.x);
+    float geometryFlatDistAlt = abs(dot(rotatedHitPoint.xy, cutOffDirectionAlt));
 
     float rotatedHitPointRad = length(rotatedHitPoint.xy);
     if (rotatedHitPointRad > radii[1] || rotatedHitPointRad < radii[0] ||

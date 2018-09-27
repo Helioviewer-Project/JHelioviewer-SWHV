@@ -7,6 +7,7 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.position.Position;
 
@@ -34,7 +35,7 @@ class BaseMetaData implements MetaData {
 
     // Serves only for LASCO cutOff edges
     double cutOffValue = -1;
-    Vec3 cutOffDirection = Vec3.ZERO;
+    Vec2 cutOffDirection = Vec2.ZERO;
 
     @Override
     public int getFrameNumber() {
@@ -90,7 +91,7 @@ class BaseMetaData implements MetaData {
 
     @Nonnull
     @Override
-    public Vec3 getCutOffDirection() {
+    public Vec2 getCutOffDirection() {
         return cutOffDirection;
     }
 

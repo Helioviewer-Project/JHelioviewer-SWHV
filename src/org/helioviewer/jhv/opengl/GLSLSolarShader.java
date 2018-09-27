@@ -68,7 +68,7 @@ public class GLSLSolarShader extends GLSLShader {
 
     private final float[] radii = new float[2];
     private final float[] polarRadii = new float[2];
-    private final float[] cutOffDirection = new float[3];
+    private final float[] cutOffDirection = new float[2];
     private final float[] cutOffValue = new float[1];
 
     private final float[] slit = new float[2];
@@ -228,11 +228,10 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform1fv(cutOffValueRef, 1, cutOffValue, 0);
     }
 
-    public void bindCutOffDirection(GL2 gl, double x, double y, double z) {
+    public void bindCutOffDirection(GL2 gl, double x, double y) {
         cutOffDirection[0] = (float) x;
         cutOffDirection[1] = (float) y;
-        cutOffDirection[2] = (float) z;
-        gl.glUniform3fv(cutOffDirectionRef, 1, cutOffDirection, 0);
+        gl.glUniform2fv(cutOffDirectionRef, 1, cutOffDirection, 0);
     }
 
     public void bindAngles(GL2 gl, Position viewpoint, double _crota, double scrota, double ccrota) {
