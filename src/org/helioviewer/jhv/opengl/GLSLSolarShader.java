@@ -84,6 +84,8 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] viewport = new float[3];
     private final float[] viewportOffset = new float[2];
 
+    private final float[] quatArray = new float[4];
+
     private GLSLSolarShader(String vertex, String fragment) {
         super(vertex, fragment);
     }
@@ -155,11 +157,13 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindCameraDifferenceRotationQuat(GL2 gl, Quat quat) {
-        gl.glUniform4fv(cameraDifferenceRotationQuatRef, 1, quat.getFloatArray(), 0);
+        quat.setFloatArray(quatArray);
+        gl.glUniform4fv(cameraDifferenceRotationQuatRef, 1, quatArray, 0);
     }
 
     public void bindDiffCameraDifferenceRotationQuat(GL2 gl, Quat quat) {
-        gl.glUniform4fv(diffCameraDifferenceRotationQuatRef, 1, quat.getFloatArray(), 0);
+        quat.setFloatArray(quatArray);
+        gl.glUniform4fv(diffCameraDifferenceRotationQuatRef, 1, quatArray, 0);
     }
 
     public void bindRect(GL2 gl, double xOffset, double yOffset, double xScale, double yScale) {
