@@ -37,6 +37,8 @@ public class Camera {
     private static final float depthClose = (float) (32 * Sun.Radius); // bit more than LASCO C3
     private static final float depthFar = (float) (50 * Sun.MeanEarthDistance); // bit further than Pluto
 
+    private final float[] invProj = new float[16];
+
     public void projectionOrtho2D(double aspect) {
         Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -1, 1);
         Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
@@ -55,8 +57,9 @@ public class Camera {
     }
 
     public float[] getTransformationInverse(double aspect) {
-        return Mat4f.orthoInverse(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -1, 1)
-                .translate(-(float) currentTranslation.x, -(float) currentTranslation.y, 0).m;
+        Mat4f.orthoInverse(invProj, -(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -1, 1);
+        Mat4f.translate(invProj, -(float) currentTranslation.x, -(float) currentTranslation.y, 0);
+        return invProj;
     }
 
     public void projectionOrthoFar(double aspect) {
