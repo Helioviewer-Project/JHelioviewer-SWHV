@@ -14,9 +14,10 @@ void main(void) {
         factor = sqrt(radius2);
         gl_FragDepth = 1.;
     }
+    bool onDisk = radius2 <= 1;
 
     if (rotatedHitPoint.z <= 0.) { // off-limb or back
-        hitPoint = vec3(up1.x, up1.y, intersectPlane(cameraDifferenceRotationQuat, up1));
+        hitPoint = vec3(up1.x, up1.y, intersectPlane(cameraDifferenceRotationQuat, up1, onDisk));
         rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
     }
 
@@ -42,8 +43,8 @@ void main(void) {
     vec2 difftexcoord;
     if (isdifference != NODIFFERENCE) {
         vec3 diffrotatedHitPoint = rotate_vector_inverse(diffcameraDifferenceRotationQuat, hitPoint);
-        if (radius2 >= 1. || diffrotatedHitPoint.z <= 0.) {
-            hitPoint = vec3(up1.x, up1.y, intersectPlane(diffcameraDifferenceRotationQuat, up1));
+        if (/*radius2 >= 1. ||*/ diffrotatedHitPoint.z <= 0.) {
+            hitPoint = vec3(up1.x, up1.y, intersectPlane(diffcameraDifferenceRotationQuat, up1, onDisk));
             diffrotatedHitPoint = rotate_vector_inverse(diffcameraDifferenceRotationQuat, hitPoint);
         }
 
