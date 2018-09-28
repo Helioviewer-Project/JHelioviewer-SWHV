@@ -34,8 +34,8 @@ public class Camera {
     private UpdateViewpoint updateViewpoint = UpdateViewpoint.observer;
 
     ////
-    private static final float depthClose = (float) (32 * Sun.Radius); // bit more than LASCO C3
-    private static final float depthFar = (float) (50 * Sun.MeanEarthDistance); // bit further than Pluto
+    private static final float clipNarrow = (float) (32 * Sun.Radius); // bit more than LASCO C3
+    private static final float clipWide = (float) (50 * Sun.MeanEarthDistance); // bit further than Pluto
 
     private final float[] invProj = new float[16];
 
@@ -46,7 +46,7 @@ public class Camera {
     }
 
     public void projectionOrtho(double aspect, GL2 gl, GLSLShape blackCircle) {
-        Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -depthClose, depthClose);
+        Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -clipNarrow, clipNarrow);
         Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
         Transform.cacheMVP();
 
@@ -57,13 +57,13 @@ public class Camera {
     }
 
     public float[] getTransformationInverse(double aspect) {
-        Mat4f.orthoInverse(invProj, -(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -1, 1);
+        Mat4f.orthoInverse(invProj, -(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -clipWide, clipWide);
         Mat4f.translate(invProj, -(float) currentTranslation.x, -(float) currentTranslation.y, 0);
         return invProj;
     }
 
     public void projectionOrthoFar(double aspect) {
-        Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -depthFar, depthFar);
+        Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -clipWide, clipWide);
     }
 ////
 
