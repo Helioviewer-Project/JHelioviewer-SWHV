@@ -11,6 +11,7 @@ precision mediump float;
 out vec4 outColor;
 
 uniform sampler2D image;
+uniform int calculateDepth;
 uniform int isdifference;
 uniform int enhanced;
 uniform sampler2D diffImage;

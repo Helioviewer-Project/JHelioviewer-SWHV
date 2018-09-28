@@ -61,6 +61,9 @@ public class HelioviewerMetaData extends BaseMetaData {
 
         if (normalizeResponse)
             retrieveResponse();
+
+        if (instrument.equals("Euhforia"))
+            calculateDepth = true;
     }
 
     private void retrieveSector(MetaDataContainer m) {

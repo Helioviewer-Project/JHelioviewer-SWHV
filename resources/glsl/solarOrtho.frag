@@ -19,6 +19,9 @@ void main(void) {
     if (rotatedHitPoint.z <= 0.) { // off-limb or back
         hitPoint = vec3(up1.x, up1.y, intersectPlane(cameraDifferenceRotationQuat, up1, onDisk));
         rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
+
+        if (calculateDepth != 0) // intersecting Eufhoria planes
+            gl_FragDepth = 0.5 - hitPoint.z / up1.z;
     }
 
     if (sector[0] != 0) {

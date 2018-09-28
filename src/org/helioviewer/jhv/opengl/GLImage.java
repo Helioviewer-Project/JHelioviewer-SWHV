@@ -103,6 +103,7 @@ public class GLImage {
         }
 
         MetaData metaData = bindParams(gl, imageData, shader);
+        shader.bindCalculateDepth(gl, metaData.getCalculateDepth());
         shader.bindRadii(gl, metaData.getInnerRadius(), Display.getShowCorona() ? metaData.getOuterRadius() : 1);
         shader.bindSector(gl, metaData.getSector0(), metaData.getSector1());
         if (metaData.getCutOffValue() > 0) {

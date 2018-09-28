@@ -48,6 +48,7 @@ public class GLSLSolarShader extends GLSLShader {
     private int colorRef;
     private int sharpenRef;
     private int enhancedRef;
+    private int calculateDepthRef;
 
     private int rectRef;
     private int diffRectRef;
@@ -78,6 +79,7 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] color = new float[4];
     private final float[] sharpen = new float[3];
     private final int[] enhanced = new int[1];
+    private final int[] calculateDepth = new int[1];
 
     private final float[] rect = new float[4];
     private final float[] diffRect = new float[4];
@@ -124,6 +126,7 @@ public class GLSLSolarShader extends GLSLShader {
         brightRef = gl.glGetUniformLocation(id, "brightness");
         colorRef = gl.glGetUniformLocation(id, "color");
         enhancedRef = gl.glGetUniformLocation(id, "enhanced");
+        calculateDepthRef = gl.glGetUniformLocation(id, "calculateDepth");
 
         rectRef = gl.glGetUniformLocation(id, "rect");
         diffRectRef = gl.glGetUniformLocation(id, "differencerect");
@@ -213,6 +216,11 @@ public class GLSLSolarShader extends GLSLShader {
     public void bindEnhanced(GL2 gl, boolean _enhanced) {
         enhanced[0] = _enhanced ? 1 : 0;
         gl.glUniform1iv(enhancedRef, 1, enhanced, 0);
+    }
+
+    public void bindCalculateDepth(GL2 gl, boolean _calculateDepth) {
+        calculateDepth[0] = _calculateDepth ? 1 : 0;
+        gl.glUniform1iv(calculateDepthRef, 1, calculateDepth, 0);
     }
 
     public void bindIsDiff(GL2 gl, int _isDiff) {
