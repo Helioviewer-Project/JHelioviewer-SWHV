@@ -17,6 +17,8 @@ class BaseMetaData implements MetaData {
     String unit = "";
     float[] physLUT;
 
+    boolean calculateDepth;
+
     int pixelW;
     int pixelH;
     double unitPerPixelX = 1;
@@ -155,6 +157,11 @@ class BaseMetaData implements MetaData {
     @Override
     public float[] getPhysicalLUT() {
         return physLUT;
+    }
+
+    @Override
+    public boolean getCalculateDepth() {
+        return calculateDepth;
     }
 
 }
