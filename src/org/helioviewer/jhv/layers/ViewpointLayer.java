@@ -38,7 +38,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     private static final double DELTA_CUTOFF = 3 * Sun.MeanEarthDistance;
     private static final double LINEWIDTH_FOV = GLSLLine.LINEWIDTH_BASIC;
     private static final double LINEWIDTH_ORBIT = 2 * GLSLLine.LINEWIDTH_BASIC;
-    private static final float SIZE_PLANET = 10;
+    private static final float SIZE_PLANET = 5;
 
     private final FOVShape fov = new FOVShape();
     private final byte[] fovColor = Colors.Blue;
@@ -86,7 +86,9 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
         Collection<LoadPosition> loadPositions = camera.getUpdateViewpoint().getLoadPositions();
         if (!loadPositions.isEmpty()) {
-            renderPlanets(gl, vp, loadPositions);
+            gl.glDisable(GL2.GL_DEPTH_TEST);
+            renderPlanets(gl, vp, loadPositions, pixFactor);
+            gl.glEnable(GL2.GL_DEPTH_TEST);
         }
 
         Transform.popProjection();
@@ -262,7 +264,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
     private final float[] xyzw = {0, 0, 0, 1};
 
-    private void renderPlanets(GL2 gl, Viewport vp, Collection<LoadPosition> loadPositions) {
+    private void renderPlanets(GL2 gl, Viewport vp, Collection<LoadPosition> loadPositions, double pointFactor) {
         long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
         for (LoadPosition loadPosition : loadPositions) {
             PositionResponse response = loadPosition.getResponse();
@@ -293,7 +295,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         orbits.render(gl, vp.aspect, LINEWIDTH_ORBIT);
 
         planets.setData(gl, planetBuf);
-        planets.renderPoints(gl, 1);
+        planets.renderPoints(gl, pointFactor);
     }
 
 }
