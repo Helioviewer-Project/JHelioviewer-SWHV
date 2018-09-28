@@ -57,7 +57,7 @@ public class Camera {
     }
 
     public float[] getTransformationInverse(double aspect) {
-        Mat4f.orthoInverse(invProj, -(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -clipWide, clipWide);
+        Mat4f.orthoInverse(invProj, -(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -1, 1);
         Mat4f.translate(invProj, -(float) currentTranslation.x, -(float) currentTranslation.y, 0);
         return invProj;
     }

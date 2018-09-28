@@ -21,7 +21,7 @@ void main(void) {
         rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
 
         if (calculateDepth != 0) // intersecting Eufhoria planes
-            gl_FragDepth = 0.5 - hitPoint.z / up1.z;
+            gl_FragDepth = 0.5 - hitPoint.z * MAX_DEPTH_FACTOR;
     }
 
     if (sector[0] != 0) {

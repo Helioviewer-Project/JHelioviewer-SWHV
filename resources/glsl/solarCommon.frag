@@ -4,7 +4,9 @@ precision mediump float;
 
 #define NODIFFERENCE 0
 #define PI 3.1415926535897932384626433832795
-#define TWOPI 2.*PI
+#define TWOPI (2. * PI)
+
+#define MAX_DEPTH_FACTOR 1. / (2. * 50. * 215.09151684811678)
 
 #define BOOST 1. / (0.2 * 2.)
 
