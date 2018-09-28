@@ -177,9 +177,11 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         GLSLSolarShader shader = Display.mode.shader;
         shader.use(gl);
 
+        shader.bindPolarRadii(gl, Display.mode.scale.getYstart(), Display.mode.scale.getYstop()); // independent
+        shader.bindMatrix(gl, camera.getTransformationInverse(vp.aspect)); // viewport dependent
+        shader.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height); // viewport dependent
+
         glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
-        shader.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height);
-        shader.bindMatrix(gl, camera.getTransformationInverse(vp.aspect));
 
         Quat q = Quat.rotate(camera.getCurrentDragRotation(), imageData.getViewpoint().toQuat()); // sync with camera at decode command moment
         shader.bindCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, imageData.getMetaData().getCenterRotation()));
