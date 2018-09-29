@@ -70,7 +70,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         double pixFactor = vp.height / (2 * camera.getWidth());
         Position viewpoint = camera.getViewpoint();
 
-        boolean far = viewpoint.distance > 100 * Sun.MeanEarthDistance;
+        boolean far = Camera.useWideProjection(viewpoint.distance);
 
         Transform.pushView();
         Transform.rotateViewInverse(viewpoint.toQuat());
@@ -79,7 +79,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             fovRender(gl, vp, viewpoint.distance, pixFactor);
 
         Transform.pushProjection();
-        camera.projectionOrthoFar(vp.aspect);
+        camera.projectionOrthoWide(vp.aspect);
 
         if (far)
             fovRender(gl, vp, viewpoint.distance, pixFactor);

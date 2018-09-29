@@ -39,6 +39,10 @@ public class Camera {
 
     private final float[] invProj = new float[16];
 
+    public static boolean useWideProjection(double distance) {
+        return distance > 100 * Sun.MeanEarthDistance;
+    }
+
     public void projectionOrtho2D(double aspect) {
         Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -1, 1);
         Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
@@ -62,7 +66,7 @@ public class Camera {
         return invProj;
     }
 
-    public void projectionOrthoFar(double aspect) {
+    public void projectionOrthoWide(double aspect) {
         Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -clipWide, clipWide);
     }
 ////

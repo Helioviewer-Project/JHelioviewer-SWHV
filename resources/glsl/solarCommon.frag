@@ -6,8 +6,8 @@ precision mediump float;
 #define PI 3.1415926535897932384626433832795
 #define TWOPI (2. * PI)
 
-#define DEPTH_SCALE_CLOSE 1. / (2. * 32.)
-#define DEPTH_SCALE_FAR   1. / (2. * 50. * 215.09151684811678)
+#define CLIP_SCALE_NARROW 1. / (2. * 32.)
+#define CLIP_SCALE_WIDE   1. / (2. * 50. * 215.09151684811678)
 
 #define BOOST 1. / (0.2 * 2.)
 
