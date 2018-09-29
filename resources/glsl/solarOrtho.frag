@@ -10,7 +10,7 @@ void main(void) {
         rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
         factor = 1.;
         gl_FragDepth = gl_FragCoord.z;
-        // gl_FragDepth = 0.5 - hitPoint.z * DEPTH_SCALE_CLOSE; needs more grid subdivisions
+        // gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_NARROW; needs more grid subdivisions
     } else {
         factor = sqrt(radius2);
         gl_FragDepth = 1.;
@@ -22,7 +22,7 @@ void main(void) {
         rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
 
         if (calculateDepth != 0) // intersecting Eufhoria planes
-            gl_FragDepth = 0.5 - hitPoint.z * DEPTH_SCALE_FAR;
+            gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_WIDE;
     }
 
     if (sector[0] != 0) {
