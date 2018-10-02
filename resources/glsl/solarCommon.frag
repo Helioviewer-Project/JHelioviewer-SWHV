@@ -100,13 +100,6 @@ vec3 rotate_vector(const vec4 quat, const vec3 vec) {
     return vec + 2. * cross(quat.xyz, cross(quat.xyz, vec) + quat.w * vec);
 }
 
-float intersectPlane(const vec4 quat, const vec4 vecin, bool hideBack) {
-    vec3 altnormal = rotate_vector(quat, vec3(0., 0., 1.));
-    if (hideBack && altnormal.z <= 0.)
-        discard;
-    return -dot(altnormal.xy, vecin.xy) / altnormal.z;
-}
-
 vec2 getScrPos(void) {
     vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - viewportOffset) / viewport.xy - 1.;
     vec4 up1 = cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);

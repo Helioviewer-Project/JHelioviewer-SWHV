@@ -1,11 +1,22 @@
+
+float intersectPlane(const vec4 quat, const vec4 vecin, bool hideBack) {
+    vec3 altnormal = rotate_vector(quat, vec3(0., 0., 1.));
+    if (hideBack && altnormal.z <= 0.)
+        discard;
+    return -dot(altnormal.xy, vecin.xy) / altnormal.z;
+}
+
 void main(void) {
     vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - viewportOffset) / viewport.xy - 1.;
     vec4 up1 = cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
 
-    float factor, radius2 = dot(up1.xy, up1.xy);
+    float radius2 = dot(up1.xy, up1.xy);
+    bool onDisk = radius2 <= 1;
+
+    float factor;
     vec3 hitPoint = vec3(0.), rotatedHitPoint = vec3(0.);
 
-    if (radius2 < 1.) {
+    if (onDisk) {
         hitPoint = vec3(up1.x, up1.y, sqrt(1. - radius2));
         rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
         factor = 1.;
@@ -15,7 +26,6 @@ void main(void) {
         factor = sqrt(radius2);
         gl_FragDepth = 1.;
     }
-    bool onDisk = radius2 <= 1;
 
     if (rotatedHitPoint.z <= 0.) { // off-limb or back
         hitPoint = vec3(up1.x, up1.y, intersectPlane(cameraDifferenceRotationQuat, up1, onDisk));
