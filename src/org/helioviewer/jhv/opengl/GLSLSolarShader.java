@@ -207,9 +207,9 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindSharpen(GL2 gl, double weight, double pixelWidth, double pixelHeight) {
-        sharpen[0] = (float) (pixelWidth);
-        sharpen[1] = (float) (pixelHeight);
-        sharpen[2] = (float) (-2 * weight); // used for mix
+        sharpen[0] = (float) pixelWidth;
+        sharpen[1] = (float) pixelHeight;
+        sharpen[2] = -2 * (float) weight; // used for mix
         gl.glUniform3fv(sharpenRef, 1, sharpen, 0);
     }
 

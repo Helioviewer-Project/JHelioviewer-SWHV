@@ -18,8 +18,8 @@ class FilterPanelFactory {
 
     private static String getSpinnerFormat(double minimumValue, double maximumValue) {
         StringBuilder spinnerFormat = new StringBuilder("0");
-        String minString = (new BigDecimal(minimumValue, new MathContext(12))).stripTrailingZeros().toPlainString();
-        String maxString = (new BigDecimal(maximumValue, new MathContext(12))).stripTrailingZeros().toPlainString();
+        String minString = new BigDecimal(minimumValue, new MathContext(12)).stripTrailingZeros().toPlainString();
+        String maxString = new BigDecimal(maximumValue, new MathContext(12)).stripTrailingZeros().toPlainString();
         int integerPlacesMin = minString.indexOf('.');
         int decimalPlacesMin = minString.length() - integerPlacesMin - 1;
         int integerPlacesMax = maxString.indexOf('.');
