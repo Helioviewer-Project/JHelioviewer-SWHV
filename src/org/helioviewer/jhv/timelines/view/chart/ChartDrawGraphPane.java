@@ -321,8 +321,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             }
             int decade = (int) Math.floor(Math.log10(end - start));
             double step = Math.pow(10, decade);
-            double startv = (Math.floor(start / step)) * step;
-            double endv = (Math.ceil(end / step)) * step;
+            double startv = Math.floor(start / step) * step;
+            double endv = Math.ceil(end / step) * step;
             if ((endv - startv) / step < 5) {
                 step /= 2;
             }
