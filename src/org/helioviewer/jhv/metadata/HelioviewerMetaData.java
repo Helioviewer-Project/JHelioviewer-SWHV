@@ -98,7 +98,7 @@ public class HelioviewerMetaData extends BaseMetaData {
     // magic
     private void retrieveOcculterLinearCutOff(MetaDataContainer m) {
         if (detector.equalsIgnoreCase("C2")) {
-            double maskRotation = -Math.toRadians(m.getDouble("CROTA").orElse(0.));
+            double maskRotation = -Math.toRadians(m.getDouble("CROTA").orElse(0.)); // C2 JP2 already rotated
             cutOffValue = -region.ulx;
             cutOffDirection = new Vec2(Math.sin(maskRotation) / 0.9625, Math.cos(maskRotation) / 0.9625);
         }/* else if (instrument.equalsIgnoreCase("SWAP")) {
@@ -211,30 +211,22 @@ public class HelioviewerMetaData extends BaseMetaData {
         if (observatory.equals("SOHO"))
             distanceObs *= Sun.L1Factor;
 
-        double stonyhurstLatitude = m.getDouble("HGLT_OBS").map(Math::toRadians).orElse(Double.NaN);
-        if (Double.isNaN(stonyhurstLatitude))
-            stonyhurstLatitude = m.getDouble("CRLT_OBS").map(Math::toRadians).orElse(Double.NaN);
-        if (Double.isNaN(stonyhurstLatitude))
-            stonyhurstLatitude = m.getDouble("REF_B0").map(Math::toRadians).orElse(Double.NaN);
-        double theta = Double.isNaN(stonyhurstLatitude) ? p.lat : stonyhurstLatitude;
+        double theta = m.getDouble("HGLT_OBS").map(Math::toRadians).orElse(
+                       m.getDouble("CRLT_OBS").map(Math::toRadians).orElse(
+                       m.getDouble("REF_B0").map(Math::toRadians).orElse(p.lat)));
 
-        double stonyhurstLongitude = m.getDouble("HGLN_OBS").map(Math::toRadians).orElse(Double.NaN);
-        if (Double.isNaN(stonyhurstLongitude))
-            stonyhurstLongitude = m.getDouble("CRLN_OBS").map(v -> Math.toRadians(v) + p.lon).orElse(Double.NaN);
-        if (Double.isNaN(stonyhurstLongitude))
-            stonyhurstLongitude = m.getDouble("REF_L0").map(v -> Math.toRadians(v) + p.lon).orElse(Double.NaN);
-        double phi = Double.isNaN(stonyhurstLongitude) ? p.lon : p.lon - stonyhurstLongitude;
+        double phi = m.getDouble("HGLN_OBS").map(v -> p.lon - Math.toRadians(v)).orElse(
+                     m.getDouble("CRLN_OBS").map(v -> -Math.toRadians(v)).orElse(
+                     m.getDouble("REF_L0").map(v -> -Math.toRadians(v)).orElse(p.lon)));
 
         viewpoint = new Position(dateObs, distanceObs, phi, theta);
     }
 
     private Quat retrieveCenterRotation(MetaDataContainer m) {
         if (instrument.equals("AIA") || instrument.equals("HMI") || instrument.equals("SWAP") || instrument.equals("SUVI")) {
-            crota = m.getDouble("CROTA").map(Math::toRadians).orElse(Double.NaN);
-            if (Double.isNaN(crota))
-                crota = m.getDouble("CROTA1").map(Math::toRadians).orElse(Double.NaN);
-            if (Double.isNaN(crota))
-                crota = m.getDouble("CROTA2").map(Math::toRadians).orElse(0.);
+            crota = Math.toRadians(m.getDouble("CROTA").orElse(
+                                   m.getDouble("CROTA1").orElse(
+                                   m.getDouble("CROTA2").orElse(0.))));
 
             scrota = Math.sin(crota);
             ccrota = Math.cos(crota);
