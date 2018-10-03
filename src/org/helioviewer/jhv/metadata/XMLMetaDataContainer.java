@@ -11,7 +11,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import com.google.common.primitives.Doubles;
-import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 
 public class XMLMetaDataContainer implements MetaDataContainer {
 
@@ -45,8 +45,8 @@ public class XMLMetaDataContainer implements MetaDataContainer {
     }
 
     @Override
-    public Optional<Integer> getInteger(String key) {
-        return getString(key).map(Ints::tryParse);
+    public Optional<Long> getLong(String key) {
+        return getString(key).map(Longs::tryParse);
     }
 
     @Override
@@ -60,8 +60,8 @@ public class XMLMetaDataContainer implements MetaDataContainer {
     }
 
     @Override
-    public int getRequiredInteger(String key) {
-        return getInteger(key).orElseThrow(() -> new MetaDataException(key));
+    public long getRequiredLong(String key) {
+        return getLong(key).orElseThrow(() -> new MetaDataException(key));
     }
 
     @Override

@@ -236,12 +236,12 @@ public class HelioviewerMetaData extends BaseMetaData {
     }
 
     private void retrievePixelParameters(MetaDataContainer m) {
-        if (m.getInteger("ZNAXIS").isPresent()) {
-            pixelW = m.getRequiredInteger("ZNAXIS1");
-            pixelH = m.getRequiredInteger("ZNAXIS2");
+        if (m.getLong("ZNAXIS").isPresent()) {
+            pixelW = (int) m.getRequiredLong("ZNAXIS1");
+            pixelH = (int) m.getRequiredLong("ZNAXIS2");
         } else {
-            pixelW = m.getRequiredInteger("NAXIS1");
-            pixelH = m.getRequiredInteger("NAXIS2");
+            pixelW = (int) m.getRequiredLong("NAXIS1");
+            pixelH = (int) m.getRequiredLong("NAXIS2");
         }
 
         if (instrument.equals("CALLISTO")) { // pixel based

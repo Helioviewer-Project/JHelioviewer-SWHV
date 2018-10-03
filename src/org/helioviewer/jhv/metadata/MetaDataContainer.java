@@ -6,13 +6,13 @@ interface MetaDataContainer {
 
     Optional<String> getString(String key);
 
-    Optional<Integer> getInteger(String key);
+    Optional<Long> getLong(String key);
 
     Optional<Double> getDouble(String key);
 
     String getRequiredString(String key);
 
-    int getRequiredInteger(String key);
+    long getRequiredLong(String key);
 
     double getRequiredDouble(String key);
 
