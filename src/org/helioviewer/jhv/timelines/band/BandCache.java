@@ -1,11 +1,8 @@
 package org.helioviewer.jhv.timelines.band;
 
-import java.awt.Rectangle;
-import java.util.ArrayList;
+import java.util.List;
 
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
-import org.helioviewer.jhv.timelines.draw.YAxis;
-import org.helioviewer.jhv.timelines.propagation.PropagationModel;
 import org.json.JSONObject;
 
 interface BandCache {
@@ -14,16 +11,12 @@ interface BandCache {
 
     void addToCache(float[] values, long[] dates);
 
-    void createPolyLines(Rectangle graphArea, TimeAxis timeAxis, YAxis yAxis, ArrayList<GraphPolyline> graphPolylines);
+    List<List<DateValue>> getValues(double graphWidth, TimeAxis timeAxis);
 
     float getValue(long ts);
 
     void serialize(JSONObject jo, double f);
 
     float[] getBounds(TimeAxis timeAxis);
-
-    PropagationModel getPropagationModel();
-
-    void setPropagationModel(PropagationModel pm);
 
 }

@@ -12,6 +12,7 @@ import java.util.Map;
 import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.interval.RequestCache;
+import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
@@ -28,15 +29,18 @@ public class Band extends AbstractTimelineLayer {
     private static final BandDataProvider dataProvider = EVEPlugin.eveDataprovider;
 
     private final BandType bandType;
+    private final BandCache bandCache;
     private final BandOptionPanel optionsPanel;
+    private final RequestCache requestCache = new RequestCache();
+
+    private final YAxis yAxis;
 
     private Color graphColor;
-    private final YAxis yAxis;
-    private final ArrayList<GraphPolyline> graphPolylines = new ArrayList<>();
-    private final RequestCache requestCache = new RequestCache();
     private int[] warnLevels;
     private String[] warnLabels;
-    private final BandCache bandCache;
+
+    private final ArrayList<GraphPolyline> graphPolylines = new ArrayList<>();
+    private PropagationModel propagationModel = new PropagationModelRadial(0);
 
     public Band(BandType _bandType) {
         if (_bandType.getBandCacheType().equals("BandCacheAll")) {
@@ -44,7 +48,6 @@ public class Band extends AbstractTimelineLayer {
         } else {
             bandCache = new BandCacheMinute();
         }
-        bandCache.setPropagationModel(new PropagationModelRadial(0));
         bandType = _bandType;
         optionsPanel = new BandOptionPanel(this);
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getScale(bandType.getUnitLabel()));
@@ -158,7 +161,7 @@ public class Band extends AbstractTimelineLayer {
 
         g.setColor(graphColor);
         for (GraphPolyline line : graphPolylines) {
-            g.drawPolyline(line.xPoints, line.yPoints, line.yPoints.length);
+            g.drawPolyline(line.xPoints(), line.yPoints(), line.length());
         }
         for (int j = 0; j < warnLevels.length; j++) {
             g.drawLine(graphArea.x, warnLevels[j], graphArea.x + graphArea.width, warnLevels[j]);
@@ -177,7 +180,19 @@ public class Band extends AbstractTimelineLayer {
             Rectangle graphArea = DrawController.getGraphArea();
             updateWarnLevels(graphArea);
             graphPolylines.clear();
-            bandCache.createPolyLines(graphArea, DrawController.selectedAxis, yAxis, graphPolylines);
+
+            TimeAxis timeAxis = DrawController.selectedAxis;
+            for (List<DateValue> list : bandCache.getValues(graphArea.width * GLInfo.pixelScaleFloat[0], DrawController.selectedAxis)) {
+                if (!list.isEmpty()) {
+                    IntArray dates = new IntArray(list.size());
+                    IntArray values = new IntArray(list.size());
+                    for (DateValue dv : list) {
+                        dates.put(timeAxis.value2pixel(graphArea.x, graphArea.width, dv.milli));
+                        values.put(yAxis.value2pixel(graphArea.y, graphArea.height, dv.value));
+                    }
+                    graphPolylines.add(new GraphPolyline(dates, values));
+                }
+            }
         }
     }
 
@@ -240,16 +255,16 @@ public class Band extends AbstractTimelineLayer {
 
     @Override
     public boolean isPropagated() {
-        return bandCache.getPropagationModel().isPropagated();
+        return propagationModel.isPropagated();
     }
 
     @Override
     public long getInsituTime(long time) {
-        return bandCache.getPropagationModel().getInsituTime(time);
+        return propagationModel.getInsituTime(time);
     }
 
-    public void setPropagationModel(PropagationModel pm) {
-        bandCache.setPropagationModel(pm);
+    public void setPropagationModel(PropagationModel _propagationModel) {
+        propagationModel = _propagationModel;
         DrawController.graphAreaChanged();
     }
 
