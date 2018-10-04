@@ -9,7 +9,7 @@ import org.json.JSONObject;
 
 class BandCacheAll implements BandCache {
 
-    private final ArrayList<DateValue> datevals = new ArrayList<>();
+    private final List<DateValue> datevals = new ArrayList<>();
     private boolean hasData;
 
     @Override
@@ -52,7 +52,7 @@ class BandCacheAll implements BandCache {
 
     @Override
     public List<List<DateValue>> getValues(double graphWidth, long start, long end) {
-        ArrayList<DateValue> list = new ArrayList<>();
+        List<DateValue> list = new ArrayList<>();
         for (DateValue dv : datevals) {
             if (dv.value != Float.MIN_VALUE && start <= dv.milli && dv.milli <= end) {
                 list.add(dv);
