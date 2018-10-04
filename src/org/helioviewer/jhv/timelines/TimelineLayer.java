@@ -61,6 +61,6 @@ public interface TimelineLayer {
 
     boolean isPropagated();
 
-    long getInsituTime(long time);
+    long getTimelineTime(long ts);
 
 }
