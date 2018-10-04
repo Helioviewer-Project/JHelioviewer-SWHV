@@ -1,16 +1,13 @@
 package org.helioviewer.jhv.timelines.band;
 
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
-import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
-import org.helioviewer.jhv.timelines.draw.YAxis;
-import org.helioviewer.jhv.timelines.propagation.PropagationModel;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -24,7 +21,6 @@ class BandCacheMinute implements BandCache {
     private static final int FACTOR_STEP = 2;
 
     private boolean hasData;
-    private PropagationModel propagationModel;
 
     private final HashMap<Long, DataChunk> cacheMap = new HashMap<>();
 
@@ -80,24 +76,24 @@ class BandCacheMinute implements BandCache {
     }
 
     @Override
-    public void createPolyLines(Rectangle graphArea, TimeAxis timeAxis, YAxis yAxis, ArrayList<GraphPolyline> graphPolylines) {
-        long keyEnd = date2key(propagationModel.getSunTime(timeAxis.end()));
-        long key = date2key(propagationModel.getSunTime(timeAxis.start()));
+    public List<List<DateValue>> getValues(double graphWidth, TimeAxis timeAxis) {
+        long keyEnd = date2key(timeAxis.end());
+        long key = date2key(timeAxis.start());
         int level = 0;
         double factor = 1;
         double elsz = 1. * MILLIS_PER_CHUNK / CHUNKED_SIZE * factor;
         long aWidth = timeAxis.end() - timeAxis.start();
         double noelements = aWidth / elsz;
 
-        double graphWidth = graphArea.width * GLInfo.pixelScaleFloat[0];
         while (level < MAX_LEVEL - 1 && noelements > graphWidth) {
             level++;
             factor *= FACTOR_STEP;
             elsz = 1. * MILLIS_PER_CHUNK / CHUNKED_SIZE * factor;
             noelements = aWidth / elsz;
         }
-        ArrayList<Integer> tvalues = new ArrayList<>();
-        ArrayList<Integer> tdates = new ArrayList<>();
+
+        ArrayList<List<DateValue>> ret = new ArrayList<>();
+        ArrayList<DateValue> list = new ArrayList<>();
         while (key <= keyEnd) {
             DataChunk cache = cacheMap.get(key);
             key++;
@@ -109,25 +105,22 @@ class BandCacheMinute implements BandCache {
             int i = 0;
             while (i < values.length) {
                 float value = values[i];
-                if (value <= Float.MIN_VALUE && !tvalues.isEmpty()) {
-                    graphPolylines.add(new GraphPolyline(tdates, tvalues));
-                    tvalues.clear();
-                    tdates.clear();
+                if (value <= Float.MIN_VALUE) {
+                    ret.add(list);
+                    list = new ArrayList<>();
                 } else if (value > Float.MIN_VALUE) {
-                    tdates.add(timeAxis.value2pixel(graphArea.x, graphArea.width, propagationModel.getSunTime(dates[i])));
-                    tvalues.add(yAxis.value2pixel(graphArea.y, graphArea.height, value));
+                    list.add(new DateValue(dates[i], value));
                 }
                 i++;
             }
         }
-        if (!tvalues.isEmpty()) {
-            graphPolylines.add(new GraphPolyline(tdates, tvalues));
-        }
+        ret.add(list);
+
+        return ret;
     }
 
     @Override
-    public float getValue(long _ts) {
-        long ts = propagationModel.getInsituTime(_ts);
+    public float getValue(long ts) {
         long key = date2key(ts);
         DataChunk cache = cacheMap.get(key);
         if (cache != null) {
@@ -202,16 +195,6 @@ class BandCacheMinute implements BandCache {
                 ja.put(new JSONArray().put(d[i] / 1000).put(f * v[i]));
         }
 
-    }
-
-    @Override
-    public void setPropagationModel(PropagationModel pm) {
-        propagationModel = pm;
-    }
-
-    @Override
-    public PropagationModel getPropagationModel() {
-        return propagationModel;
     }
 
 }

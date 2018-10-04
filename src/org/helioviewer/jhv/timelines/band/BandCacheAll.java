@@ -1,12 +1,10 @@
 package org.helioviewer.jhv.timelines.band;
 
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
-import org.helioviewer.jhv.timelines.draw.YAxis;
-import org.helioviewer.jhv.timelines.propagation.PropagationModel;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -14,7 +12,6 @@ class BandCacheAll implements BandCache {
 
     private final ArrayList<DateValue> datevals = new ArrayList<>();
     private boolean hasData;
-    private PropagationModel propagationModel;
 
     @Override
     public boolean hasData() {
@@ -55,20 +52,14 @@ class BandCacheAll implements BandCache {
     }
 
     @Override
-    public void createPolyLines(Rectangle graphArea, TimeAxis timeAxis, YAxis yAxis,
-                                ArrayList<GraphPolyline> graphPolylines) {
-
-        ArrayList<Integer> tvalues = new ArrayList<>();
-        ArrayList<Integer> tdates = new ArrayList<>();
+    public List<List<DateValue>> getValues(double graphWidth, TimeAxis timeAxis) {
+        ArrayList<DateValue> list = new ArrayList<>();
         for (DateValue dv : datevals) {
             if (dv.value != Float.MIN_VALUE && timeAxis.start() <= dv.milli && dv.milli <= timeAxis.end()) {
-                tdates.add(timeAxis.value2pixel(graphArea.x, graphArea.width, dv.milli));
-                tvalues.add(yAxis.value2pixel(graphArea.y, graphArea.height, dv.value));
+                list.add(dv);
             }
         }
-        if (!tvalues.isEmpty()) {
-            graphPolylines.add(new GraphPolyline(tdates, tvalues));
-        }
+        return Collections.singletonList(list);
     }
 
     @Override
@@ -82,16 +73,6 @@ class BandCacheAll implements BandCache {
         for (DateValue dv : datevals)
             dv.serialize(ja, f);
         jo.put("data", ja);
-    }
-
-    @Override
-    public PropagationModel getPropagationModel() {
-        return propagationModel;
-    }
-
-    @Override
-    public void setPropagationModel(PropagationModel pm) {
-        propagationModel = pm;
     }
 
 }

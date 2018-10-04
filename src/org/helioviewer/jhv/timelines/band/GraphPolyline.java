@@ -1,20 +1,25 @@
 package org.helioviewer.jhv.timelines.band;
 
-import java.util.List;
-
 class GraphPolyline {
 
-    public final int[] xPoints;
-    public final int[] yPoints;
+    private final IntArray xPoints;
+    private final IntArray yPoints;
 
-    GraphPolyline(List<Integer> dates, List<Integer> values) {
-        int llen = dates.size();
-        xPoints = new int[llen];
-        yPoints = new int[llen];
-        for (int j = 0; j < llen; j++) {
-            xPoints[j] = dates.get(j);
-            yPoints[j] = values.get(j);
-        }
+    GraphPolyline(IntArray _xPoints, IntArray _yPoints) {
+        xPoints = _xPoints;
+        yPoints = _yPoints;
+    }
+
+    int[] xPoints() {
+        return xPoints.array();
+    }
+
+    int[] yPoints() {
+        return yPoints.array();
+    }
+
+    int length() {
+        return xPoints.length();
     }
 
 }
