@@ -70,7 +70,11 @@ public class Band extends AbstractTimelineLayer {
         JSONObject jo = new JSONObject();
         jo.put("timeline", toString());
 
-        float[] bounds = bandCache.getBounds(DrawController.selectedAxis.start(), DrawController.selectedAxis.end());
+        TimeAxis timeAxis = DrawController.selectedAxis;
+        long start = propagationModel.getInsituTime(timeAxis.start());
+        long end = propagationModel.getInsituTime(timeAxis.end());
+        float[] bounds = bandCache.getBounds(start, end);
+
         double multiplier = bounds[0] == 0 ? 1 : bounds[0];
         jo.put("multiplier", multiplier);
         bandCache.serialize(jo, 1 / multiplier);
@@ -92,7 +96,10 @@ public class Band extends AbstractTimelineLayer {
 
     @Override
     public void zoomToFitAxis() {
-        float[] bounds = bandCache.getBounds(DrawController.selectedAxis.start(), DrawController.selectedAxis.end());
+        TimeAxis timeAxis = DrawController.selectedAxis;
+        long start = propagationModel.getInsituTime(timeAxis.start());
+        long end = propagationModel.getInsituTime(timeAxis.end());
+        float[] bounds = bandCache.getBounds(start, end);
         if (bounds[0] == bounds[1]) {
             resetAxis();
             return;
@@ -182,12 +189,14 @@ public class Band extends AbstractTimelineLayer {
             graphPolylines.clear();
 
             TimeAxis timeAxis = DrawController.selectedAxis;
-            for (List<DateValue> list : bandCache.getValues(graphArea.width * GLInfo.pixelScaleFloat[0], timeAxis.start(), timeAxis.end())) {
+            long start = propagationModel.getInsituTime(timeAxis.start());
+            long end = propagationModel.getInsituTime(timeAxis.end());
+            for (List<DateValue> list : bandCache.getValues(graphArea.width * GLInfo.pixelScaleFloat[0], start, end)) {
                 if (!list.isEmpty()) {
                     IntArray dates = new IntArray(list.size());
                     IntArray values = new IntArray(list.size());
                     for (DateValue dv : list) {
-                        dates.put(timeAxis.value2pixel(graphArea.x, graphArea.width, dv.milli));
+                        dates.put(timeAxis.value2pixel(graphArea.x, graphArea.width, propagationModel.getSunTime(dv.milli)));
                         values.put(yAxis.value2pixel(graphArea.y, graphArea.height, dv.value));
                     }
                     graphPolylines.add(new GraphPolyline(dates, values));
@@ -198,7 +207,7 @@ public class Band extends AbstractTimelineLayer {
 
     @Override
     public String getStringValue(long ts) {
-        float val = bandCache.getValue(ts);
+        float val = bandCache.getValue(propagationModel.getInsituTime(ts));
         if (val == Float.MIN_VALUE) {
             return "--";
         } else if (bandType.getName().contains("XRSB")) {
