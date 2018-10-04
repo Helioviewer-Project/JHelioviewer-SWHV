@@ -44,7 +44,7 @@
 $if(dir)$$if(latex-dir-rtl)$
 \PassOptionsToPackage{RTLdocument}{bidi}
 $endif$$endif$%
-\documentclass[$if(fontsize)$$fontsize$,$endif$$if(lang)$$babel-lang$,$endif$$if(papersize)$$papersize$paper,$else$a4paper,$endif$$if(beamer)$ignorenonframetext,$if(handout)$handout,$endif$$if(aspectratio)$aspectratio=$aspectratio$,$endif$$endif$$for(classoption)$$classoption$$sep$,$endfor$,tablecaptionabove]{scrbook}
+\documentclass[$if(fontsize)$$fontsize$,$endif$$if(lang)$$babel-lang$,$endif$$if(papersize)$$papersize$paper,$else$a4paper,$endif$$if(beamer)$ignorenonframetext,$if(handout)$handout,$endif$$if(aspectratio)$aspectratio=$aspectratio$,$endif$$endif$$for(classoption)$$classoption$$sep$,$endfor$,tablecaptionabove]{$if(book)$scrbook$else$scrartcl$endif$}
 $if(beamer)$
 $if(background-image)$
 \usebackgroundtemplate{%
@@ -244,6 +244,10 @@ $if(geometry)$
 \usepackage[margin=2.5cm,includehead=true,includefoot=true,centering,$for(geometry)$$geometry$$sep$,$endfor$]{geometry}
 $else$
 \usepackage[margin=2.5cm,includehead=true,includefoot=true,centering]{geometry}
+$endif$
+$if(logo)$
+\usepackage[export]{adjustbox}
+\usepackage{graphicx}
 $endif$
 $if(beamer)$
 \newif\ifbibliography
@@ -524,11 +528,11 @@ $endif$
 %
 % heading color
 %
-\definecolor{heading-color}{RGB}{40,40,40}
-\addtokomafont{section}{\color{heading-color}}
+%\definecolor{heading-color}{RGB}{40,40,40}
+%\addtokomafont{section}{\color{heading-color}}
 % When using the classes report, scrreprt, book, 
 % scrbook or memoir, uncomment the following line.
-\addtokomafont{chapter}{\color{heading-color}}
+%\addtokomafont{chapter}{\color{heading-color}}
 
 %
 % variables for title and author
@@ -694,9 +698,6 @@ $endif$
 \noindent
 
 { \setstretch{1.4}
-$if(logo)$
-\includegraphics[width=$logowidth$\textwidth]{$logo$}
-$endif$
 \vfill
 \noindent {\huge \textbf{\textsf{$title$}}}
 $if(subtitle)$
@@ -708,6 +709,11 @@ $endif$
 {\Large \textsf{$for(author)$$author$$sep$, $endfor$}
 \vfill
 }
+
+$if(logo)$
+\noindent
+\includegraphics[width=$if(logo-width)$$logo-width$$else$100$endif$pt, left]{$logo$}
+$endif$
 
 \textsf{$date$}}
 \end{flushleft}
