@@ -6,19 +6,20 @@ subject: Space Weather HelioViewer
 date: 2018-04-xx
 geometry: margin=1in
 papersize: A4
+book: true
 toc: true
 colorlinks: true
-mainfont: "Georgia"
+mainfont: "Source Serif Pro"
 monofont: "Source Code Pro"
 sansfont: "Source Sans Pro"
-fontsize: 11pt
+fontsize: 10pt
 titlepage: true
 titlepage-color: "0088cc"
 titlepage-text-color: "ffffff"
 titlepage-rule-color: "ffffff"
 titlepage-rule-height: 5
 logo: hvLogo.png
-logowidth: 0.1
+logo-width: 45
 ...
 \frenchspacing
 
