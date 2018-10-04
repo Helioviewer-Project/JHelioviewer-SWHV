@@ -114,6 +114,7 @@ public class GLHelper {
         capabilities.setGreenBits(8);
         capabilities.setBlueBits(8);
         capabilities.setAlphaBits(8);
+        capabilities.setDepthBits(32);
         return capabilities;
     }
 
