@@ -47,8 +47,8 @@ public abstract class AbstractTimelineLayer implements TimelineLayer {
     }
 
     @Override
-    public long getInsituTime(long time) {
-        return time;
+    public long getTimelineTime(long ts) {
+        return ts;
     }
 
 }

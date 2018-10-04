@@ -231,8 +231,10 @@ public class Band extends AbstractTimelineLayer {
     }
 
     @Override
-    public void fetchData(TimeAxis selectedAxis) {
-        dataProvider.updateBand(this, selectedAxis.start(), selectedAxis.end());
+    public void fetchData(TimeAxis timeAxis) {
+        long start = propagationModel.getInsituTime(timeAxis.start());
+        long end = propagationModel.getInsituTime(timeAxis.end());
+        dataProvider.updateBand(this, start, end);
         updateGraphsData();
     }
 
@@ -268,8 +270,8 @@ public class Band extends AbstractTimelineLayer {
     }
 
     @Override
-    public long getInsituTime(long time) {
-        return propagationModel.getInsituTime(time);
+    public long getTimelineTime(long ts) {
+        return propagationModel.getInsituTime(ts);
     }
 
     public void setPropagationModel(PropagationModel _propagationModel) {
