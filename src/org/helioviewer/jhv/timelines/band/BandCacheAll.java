@@ -4,8 +4,6 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import javax.annotation.Nonnull;
-
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.timelines.propagation.PropagationModel;
@@ -84,40 +82,6 @@ class BandCacheAll implements BandCache {
         for (DateValue dv : datevals)
             dv.serialize(ja, f);
         jo.put("data", ja);
-    }
-
-    private static class DateValue implements Comparable<DateValue> {
-
-        final long milli;
-        final float value;
-
-        DateValue(long _milli, float _value) {
-            milli = _milli;
-            value = _value;
-        }
-
-        void serialize(JSONArray ja, double f) {
-            ja.put(new JSONArray().put(milli / 1000).put(value * f));
-        }
-
-        @Override
-        public int compareTo(@Nonnull DateValue o) {
-            return Long.compare(milli, o.milli);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (!(o instanceof DateValue))
-                return false;
-            DateValue d = (DateValue) o;
-            return milli == d.milli;
-        }
-
-        @Override
-        public int hashCode() {
-            return (int) (milli ^ (milli >>> 32));
-        }
-
     }
 
     @Override
