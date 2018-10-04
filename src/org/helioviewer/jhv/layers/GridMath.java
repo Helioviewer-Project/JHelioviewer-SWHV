@@ -12,7 +12,7 @@ import com.jogamp.opengl.GL2;
 
 class GridMath {
 
-    private static final int SUBDIVISIONS = 180;
+    private static final int SUBDIVISIONS = 360;
 
     private static final byte[] radialLineColor = Colors.DarkGray;
     private static final byte[] axisNorthColor = Colors.Red;
@@ -29,7 +29,7 @@ class GridMath {
     private static final float AXIS_START = (float) (1. * Sun.Radius);
     private static final float AXIS_STOP = (float) (1.2 * Sun.Radius);
 
-    private static final double GRID_RADIUS = Sun.Radius;
+    private static final double GRID_RADIUS = Sun.Radius + GridLayer.LINEWIDTH; // avoid intersecting solar surface
     private static final double EARTH_CIRCLE_RADIUS = GRID_RADIUS * 1.006;
 
     private static final int TENS_RADIUS = 3;
@@ -70,8 +70,9 @@ class GridMath {
         Vec3 rotv = new Vec3(), v = new Vec3();
         Quat q = Quat.createRotation(Math.PI / 2, Vec3.XAxis);
         for (int i = 0; i <= SUBDIVISIONS; i++) {
-            v.x = EARTH_CIRCLE_RADIUS * Math.cos(2 * Math.PI * i / SUBDIVISIONS);
-            v.y = EARTH_CIRCLE_RADIUS * Math.sin(2 * Math.PI * i / SUBDIVISIONS);
+            double a = 2 * Math.PI * i / SUBDIVISIONS;
+            v.x = EARTH_CIRCLE_RADIUS * Math.cos(a);
+            v.y = EARTH_CIRCLE_RADIUS * Math.sin(a);
             v.z = 0.;
             rotv = q.rotateVector(v);
             if (i == 0) {
@@ -84,8 +85,9 @@ class GridMath {
         v = new Vec3();
         q = Quat.createRotation(Math.PI / 2, Vec3.YAxis);
         for (int i = 0; i <= SUBDIVISIONS; i++) {
-            v.x = EARTH_CIRCLE_RADIUS * Math.cos(2 * Math.PI * i / SUBDIVISIONS);
-            v.y = EARTH_CIRCLE_RADIUS * Math.sin(2 * Math.PI * i / SUBDIVISIONS);
+            double a = 2 * Math.PI * i / SUBDIVISIONS;
+            v.x = EARTH_CIRCLE_RADIUS * Math.cos(a);
+            v.y = EARTH_CIRCLE_RADIUS * Math.sin(a);
             v.z = 0.;
             rotv = q.rotateVector(v);
             if (i == 0) {
@@ -109,8 +111,9 @@ class GridMath {
             Buf targetBuf = i % 10 == 0 ? thickBuf : circleBuf;
 
             for (int j = 0; j <= SUBDIVISIONS; j++) {
-                float x = (float) (i * unit * Math.cos(2 * Math.PI * j / SUBDIVISIONS));
-                float y = (float) (i * unit * Math.sin(2 * Math.PI * j / SUBDIVISIONS));
+                double a = 2 * Math.PI * j / SUBDIVISIONS;
+                float x = (float) (i * unit * Math.cos(a));
+                float y = (float) (i * unit * Math.sin(a));
 
                 if (j == 0) {
                     targetBuf.put4f(x, y, 0, 1).put4b(Colors.Null);
@@ -198,8 +201,9 @@ class GridMath {
                 rotation = lonstepDegrees * j * k;
                 Quat q = Quat.createRotation(Math.PI / 2 + Math.PI + (Math.PI / 180) * rotation, Vec3.YAxis);
                 for (int i = 0; i <= HALFDIVISIONS; i++) {
-                    v.x = GRID_RADIUS * Math.cos(-Math.PI / 2 + Math.PI * i / HALFDIVISIONS);
-                    v.y = GRID_RADIUS * Math.sin(-Math.PI / 2 + Math.PI * i / HALFDIVISIONS);
+                    double a = -Math.PI / 2 + Math.PI * i / HALFDIVISIONS;
+                    v.x = GRID_RADIUS * Math.cos(a);
+                    v.y = GRID_RADIUS * Math.sin(a);
                     v.z = 0.;
                     Vec3 rotv = q.rotateVector(v);
 
@@ -216,11 +220,12 @@ class GridMath {
         for (int j = 0; j < no_lat_steps; j++) {
             for (int k = -1; k <= 1; k += 2) {
                 rotation = latstepDegrees * j * k;
+                double scale = Math.cos((Math.PI / 180.) * (90 - rotation));
                 for (int i = 0; i <= HALFDIVISIONS; i++) {
-                    double scale = Math.cos((Math.PI / 180.) * (90 - rotation));
+                    double a = 2 * Math.PI * i / HALFDIVISIONS;
                     v.y = GRID_RADIUS * scale;
-                    v.x = GRID_RADIUS * Math.sqrt(1. - scale * scale) * Math.sin(2 * Math.PI * i / HALFDIVISIONS);
-                    v.z = GRID_RADIUS * Math.sqrt(1. - scale * scale) * Math.cos(2 * Math.PI * i / HALFDIVISIONS);
+                    v.x = GRID_RADIUS * Math.sqrt(1. - scale * scale) * Math.sin(a);
+                    v.z = GRID_RADIUS * Math.sqrt(1. - scale * scale) * Math.cos(a);
 
                     if (i == 0) {
                         vexBuf.put4f(v).put4b(Colors.Null);
