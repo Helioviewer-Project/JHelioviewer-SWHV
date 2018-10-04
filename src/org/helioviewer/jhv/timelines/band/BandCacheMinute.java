@@ -76,7 +76,6 @@ class BandCacheMinute implements BandCache {
 
     @Override
     public List<List<DateValue>> getValues(double graphWidth, long start, long end) {
-
         int level = 0;
         double factor = 1;
         double elsz = 1. * MILLIS_PER_CHUNK / CHUNKED_SIZE * factor;
@@ -90,8 +89,8 @@ class BandCacheMinute implements BandCache {
             noelements = aWidth / elsz;
         }
 
-        ArrayList<List<DateValue>> ret = new ArrayList<>();
-        ArrayList<DateValue> list = new ArrayList<>();
+        List<List<DateValue>> ret = new ArrayList<>();
+        List<DateValue> list = new ArrayList<>();
 
         long key = date2key(start);
         long keyEnd = date2key(end);
