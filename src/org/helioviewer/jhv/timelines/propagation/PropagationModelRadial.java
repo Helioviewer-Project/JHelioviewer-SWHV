@@ -1,15 +1,17 @@
 package org.helioviewer.jhv.timelines.propagation;
 
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.math.MathUtils;
 
 public class PropagationModelRadial implements PropagationModel {
 
     private final boolean isPropagated;
     private final double radiusMilli;
 
-    public PropagationModelRadial(double speed) {
+    public PropagationModelRadial(double _speed) { // km/s
+        double speed = MathUtils.clip(_speed * 1e3, 0, Sun.CLIGHT); // m/s
         isPropagated = speed > 0;
-        radiusMilli = isPropagated ? Sun.RadiusMeter / speed : 0; // km/s = m/msec
+        radiusMilli = isPropagated ? Sun.RadiusMeter / speed * 1e3 : 0;
     }
 
     @Override
