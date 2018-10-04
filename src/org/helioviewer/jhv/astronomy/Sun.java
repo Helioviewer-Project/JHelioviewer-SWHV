@@ -13,6 +13,8 @@ import com.google.common.cache.LoadingCache;
 
 public class Sun {
 
+    public static final double CLIGHT = 299792458;
+
     // http://asa.usno.navy.mil/static/files/2016/Astronomical_Constants_2016.pdf
     private static final double SunEarthMassRatio = 332946.0487;
     // https://en.wikipedia.org/wiki/Lagrangian_point#L1
@@ -22,7 +24,6 @@ public class Sun {
     public static final double Radius2 = Radius * Radius;
     public static final double RadiusMeter = 695508 * 1e3; // photospheric: Allen, SolO
     public static final double RadiusKMeterInv = 1 / 695508.;
-    static final double RadiusMilli = RadiusMeter / 299792458 * 1e3;
 
     private static final double MeanEarthDistanceMeter = 149597870.7 * 1e3;
     public static final double MeanEarthDistance = MeanEarthDistanceMeter / RadiusMeter;
