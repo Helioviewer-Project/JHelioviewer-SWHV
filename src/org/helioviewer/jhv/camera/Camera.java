@@ -19,7 +19,7 @@ import com.jogamp.opengl.GL2;
 public class Camera {
 
     public static final double INITFOV = 1. * Math.PI / 180.;
-    private static final double MIN_FOV = INITFOV * 0.1;
+    private static final double MIN_FOV = INITFOV / 60;
     private static final double MAX_FOV = INITFOV * 30;
     private double fov = INITFOV;
 
