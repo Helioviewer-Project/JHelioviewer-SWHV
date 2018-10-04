@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -38,12 +37,12 @@ class BandCacheAll implements BandCache {
     }
 
     @Override
-    public float[] getBounds(TimeAxis timeAxis) {
+    public float[] getBounds(long start, long end) {
         float min = Float.MAX_VALUE;
         float max = Float.MIN_VALUE;
 
         for (DateValue dv : datevals) {
-            if (dv.value != Float.MIN_VALUE && timeAxis.start() <= dv.milli && dv.milli <= timeAxis.end()) {
+            if (dv.value != Float.MIN_VALUE && start <= dv.milli && dv.milli <= end) {
                 min = Math.min(dv.value, min);
                 max = Math.max(dv.value, max);
             }
@@ -52,10 +51,10 @@ class BandCacheAll implements BandCache {
     }
 
     @Override
-    public List<List<DateValue>> getValues(double graphWidth, TimeAxis timeAxis) {
+    public List<List<DateValue>> getValues(double graphWidth, long start, long end) {
         ArrayList<DateValue> list = new ArrayList<>();
         for (DateValue dv : datevals) {
-            if (dv.value != Float.MIN_VALUE && timeAxis.start() <= dv.milli && dv.milli <= timeAxis.end()) {
+            if (dv.value != Float.MIN_VALUE && start <= dv.milli && dv.milli <= end) {
                 list.add(dv);
             }
         }

@@ -70,7 +70,7 @@ public class Band extends AbstractTimelineLayer {
         JSONObject jo = new JSONObject();
         jo.put("timeline", toString());
 
-        float[] bounds = bandCache.getBounds(DrawController.selectedAxis);
+        float[] bounds = bandCache.getBounds(DrawController.selectedAxis.start(), DrawController.selectedAxis.end());
         double multiplier = bounds[0] == 0 ? 1 : bounds[0];
         jo.put("multiplier", multiplier);
         bandCache.serialize(jo, 1 / multiplier);
@@ -92,7 +92,7 @@ public class Band extends AbstractTimelineLayer {
 
     @Override
     public void zoomToFitAxis() {
-        float[] bounds = bandCache.getBounds(DrawController.selectedAxis);
+        float[] bounds = bandCache.getBounds(DrawController.selectedAxis.start(), DrawController.selectedAxis.end());
         if (bounds[0] == bounds[1]) {
             resetAxis();
             return;
@@ -182,7 +182,7 @@ public class Band extends AbstractTimelineLayer {
             graphPolylines.clear();
 
             TimeAxis timeAxis = DrawController.selectedAxis;
-            for (List<DateValue> list : bandCache.getValues(graphArea.width * GLInfo.pixelScaleFloat[0], DrawController.selectedAxis)) {
+            for (List<DateValue> list : bandCache.getValues(graphArea.width * GLInfo.pixelScaleFloat[0], timeAxis.start(), timeAxis.end())) {
                 if (!list.isEmpty()) {
                     IntArray dates = new IntArray(list.size());
                     IntArray values = new IntArray(list.size());

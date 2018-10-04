@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
-import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -49,12 +48,12 @@ class BandCacheMinute implements BandCache {
     }
 
     @Override
-    public float[] getBounds(TimeAxis timeAxis) {
+    public float[] getBounds(long start, long end) {
         float min = Float.MAX_VALUE;
         float max = Float.MIN_VALUE;
 
-        long keyEnd = date2key(timeAxis.end());
-        long key = date2key(timeAxis.start());
+        long key = date2key(start);
+        long keyEnd = date2key(end);
         while (key <= keyEnd) {
             DataChunk cache = cacheMap.get(key);
             key++;
@@ -66,7 +65,7 @@ class BandCacheMinute implements BandCache {
 
             for (int i = 0; i < values.length; i++) {
                 float value = values[i];
-                if (value != Float.MIN_VALUE && timeAxis.start() <= dates[i] && dates[i] <= timeAxis.end()) {
+                if (value != Float.MIN_VALUE && start <= dates[i] && dates[i] <= end /* ? */) {
                     min = Math.min(value, min);
                     max = Math.max(value, max);
                 }
@@ -76,13 +75,12 @@ class BandCacheMinute implements BandCache {
     }
 
     @Override
-    public List<List<DateValue>> getValues(double graphWidth, TimeAxis timeAxis) {
-        long keyEnd = date2key(timeAxis.end());
-        long key = date2key(timeAxis.start());
+    public List<List<DateValue>> getValues(double graphWidth, long start, long end) {
+
         int level = 0;
         double factor = 1;
         double elsz = 1. * MILLIS_PER_CHUNK / CHUNKED_SIZE * factor;
-        long aWidth = timeAxis.end() - timeAxis.start();
+        long aWidth = end - start;
         double noelements = aWidth / elsz;
 
         while (level < MAX_LEVEL - 1 && noelements > graphWidth) {
@@ -94,6 +92,9 @@ class BandCacheMinute implements BandCache {
 
         ArrayList<List<DateValue>> ret = new ArrayList<>();
         ArrayList<DateValue> list = new ArrayList<>();
+
+        long key = date2key(start);
+        long keyEnd = date2key(end);
         while (key <= keyEnd) {
             DataChunk cache = cacheMap.get(key);
             key++;
