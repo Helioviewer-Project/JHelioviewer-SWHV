@@ -20,8 +20,7 @@ void main(void) {
         hitPoint = vec3(up1.x, up1.y, sqrt(1. - radius2));
         rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
         factor = 1.;
-        gl_FragDepth = gl_FragCoord.z;
-        // gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_NARROW; needs more grid subdivisions
+        gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_NARROW;
     } else {
         factor = sqrt(radius2);
         gl_FragDepth = 1.;
