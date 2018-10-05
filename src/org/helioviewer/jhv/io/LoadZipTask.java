@@ -15,7 +15,6 @@ import java.util.HashSet;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVWorker;
 

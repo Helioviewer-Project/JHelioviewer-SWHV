@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.timelines.propagation;
 
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.math.MathUtils;
 
 public class PropagationModelRadial implements PropagationModel {
@@ -21,16 +22,20 @@ public class PropagationModelRadial implements PropagationModel {
 
     @Override
     public long getInsituTime(long ts) {
-        return isPropagated ? ts + (long) (radiusMilli * getInsituDistance(ts) + .5) : ts;
+        return isPropagated ? ts + (long) (radiusMilli * getInsituDistance(ts) - getRSShift() + .5) : ts;
     }
 
     @Override
     public long getSunTime(long ts) {
-        return isPropagated ? ts - (long) (radiusMilli * getInsituDistance(ts) + .5) : ts;
+        return isPropagated ? ts - (long) (radiusMilli * getInsituDistance(ts) - getRSShift() + .5) : ts;
     }
 
     private static double getInsituDistance(long ts) {
         return Sun.getEarthDistance(ts) * Sun.L1Factor;
+    }
+
+    private static double getRSShift() {
+        return Display.getCamera().getViewpoint().distance * Sun.RadiusMilli;
     }
 
 }
