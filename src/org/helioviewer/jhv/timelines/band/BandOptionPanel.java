@@ -9,7 +9,6 @@ import java.io.BufferedWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.NumberFormat;
 
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -21,6 +20,7 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.Buttons;
+import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineSettings;
@@ -81,13 +81,11 @@ class BandOptionPanel extends JPanel {
 
         c.gridx = 3;
         c.anchor = GridBagConstraints.EAST;
-        NumberFormat integerFormat = NumberFormat.getIntegerInstance();
-        integerFormat.setGroupingUsed(false);
-        JFormattedTextField propagationField = new JFormattedTextField(integerFormat);
-        propagationField.setValue(0);
+        JFormattedTextField propagationField = new JFormattedTextField(new TerminatedFormatterFactory("%.3f", " km/s", 0, 299792.458));
+        propagationField.setValue(0.);
         propagationField.setColumns(10);
         propagationField.addPropertyChangeListener("value", e -> {
-            double speed = ((Number) propagationField.getValue()).doubleValue();
+            double speed = (Double) propagationField.getValue();
             band.setPropagationModel(new PropagationModelRadial(speed));
         });
         add(propagationField, c);
