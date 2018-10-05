@@ -22,12 +22,12 @@ public class PropagationModelRadial implements PropagationModel {
 
     @Override
     public long getInsituTime(long ts) {
-        return isPropagated ? ts + (long) (radiusMilli * getInsituDistance(ts) - getRSShift() + .5) : ts;
+        return isPropagated ? (long) (ts + radiusMilli * getInsituDistance(ts) - getRSShift() + .5) : ts;
     }
 
     @Override
-    public long getSunTime(long ts) {
-        return isPropagated ? ts - (long) (radiusMilli * getInsituDistance(ts) - getRSShift() + .5) : ts;
+    public long getViewpointTime(long ts) {
+        return isPropagated ? (long) (ts - radiusMilli * getInsituDistance(ts) + getRSShift() + .5) : ts;
     }
 
     private static double getInsituDistance(long ts) {
