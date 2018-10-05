@@ -196,7 +196,7 @@ public class Band extends AbstractTimelineLayer {
                     IntArray dates = new IntArray(list.size());
                     IntArray values = new IntArray(list.size());
                     for (DateValue dv : list) {
-                        dates.put(timeAxis.value2pixel(graphArea.x, graphArea.width, propagationModel.getSunTime(dv.milli)));
+                        dates.put(timeAxis.value2pixel(graphArea.x, graphArea.width, propagationModel.getViewpointTime(dv.milli)));
                         values.put(yAxis.value2pixel(graphArea.y, graphArea.height, dv.value));
                     }
                     graphPolylines.add(new GraphPolyline(dates, values));

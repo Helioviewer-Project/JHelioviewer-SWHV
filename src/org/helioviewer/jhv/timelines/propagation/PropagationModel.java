@@ -6,6 +6,6 @@ public interface PropagationModel {
 
     long getInsituTime(long ts);
 
-    long getSunTime(long ts);
+    long getViewpointTime(long ts);
 
 }
