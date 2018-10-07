@@ -86,7 +86,7 @@ class FITSImage {
         npix[0] = k;
         return sampleData;
     }
-
+/*
     private static float[] getMinMax(int bpp, int width, int height, Object[] pixelData, long blank, double bzero, double bscale) {
         float min = Float.MAX_VALUE;
         float max = -Float.MAX_VALUE;
@@ -94,7 +94,7 @@ class FITSImage {
         for (int j = 0; j < height; j++) {
             Object lineData = pixelData[j];
             for (int i = 0; i < width; i++) {
-                float v = getValue(bpp, pixelData, i, blank, bzero, bscale);
+                float v = getValue(bpp, lineData, i, blank, bzero, bscale);
                 if (v != ImageData.BAD_PIXEL) {
                     if (v > max)
                         max = v;
@@ -105,7 +105,7 @@ class FITSImage {
         }
         return new float[]{min, max};
     }
-
+*/
     private void readHDU(BasicHDU<?> hdu) throws Exception {
         int[] axes = hdu.getAxes();
         if (axes == null || axes.length != 2)
