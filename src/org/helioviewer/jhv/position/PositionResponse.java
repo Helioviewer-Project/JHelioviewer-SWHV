@@ -56,11 +56,12 @@ public class PositionResponse {
     }
 
     public long interpolateTime(long t, long start, long end) {
-        if (start == end)
+        if (start >= end)
             return positionEnd;
         else {
             double f = (t - start) / (double) (end - start); //!
-            return (long) (positionStart + f * (positionEnd - positionStart) + .5);
+            long time = (long) (positionStart + f * (positionEnd - positionStart) + .5);
+            return MathUtils.clip(time, positionStart, positionEnd);
         }
     }
 
