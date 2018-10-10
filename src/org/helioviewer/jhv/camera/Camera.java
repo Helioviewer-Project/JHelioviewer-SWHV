@@ -44,13 +44,13 @@ public class Camera {
     }
 
     public void projectionOrtho2D(double aspect) {
-        Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -1, 1);
+        Transform.setOrthoSymmetricProjection(2 * (float) (cameraWidth * aspect), 2 * (float) cameraWidth, -1, 1);
         Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
         Transform.cacheMVP();
     }
 
     public void projectionOrtho(double aspect, GL2 gl, GLSLShape blackCircle) {
-        Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -clipNarrow, clipNarrow);
+        Transform.setOrthoSymmetricProjection(2 * (float) (cameraWidth * aspect), 2 * (float) cameraWidth, -clipNarrow, clipNarrow);
         Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
         Transform.cacheMVP();
 
@@ -61,13 +61,13 @@ public class Camera {
     }
 
     public float[] getTransformationInverse(double aspect) {
-        Mat4f.orthoInverse(invProj, -(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -1, 1);
+        Mat4f.orthoSymmetricInverse(invProj, 2 * (float) (cameraWidth * aspect), 2 * (float) cameraWidth, -1, 1);
         Mat4f.translate(invProj, -(float) currentTranslation.x, -(float) currentTranslation.y, 0);
         return invProj;
     }
 
     public void projectionOrthoWide(double aspect) {
-        Transform.setOrthoProjection(-(float) (cameraWidth * aspect), (float) (cameraWidth * aspect), -(float) cameraWidth, (float) cameraWidth, -clipWide, clipWide);
+        Transform.setOrthoSymmetricProjection(2 * (float) (cameraWidth * aspect), 2 * (float) cameraWidth, -clipWide, clipWide);
     }
 ////
 
