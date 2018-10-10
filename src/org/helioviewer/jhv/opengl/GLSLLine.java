@@ -7,7 +7,7 @@ import com.jogamp.opengl.GL2;
 
 public class GLSLLine extends VAO {
 
-    public static final double LINEWIDTH_BASIC = 0.0015;
+    public static final double LINEWIDTH_BASIC = 0.002;
 
     private static final int size0 = 4;
     private static final int size1 = 4;
