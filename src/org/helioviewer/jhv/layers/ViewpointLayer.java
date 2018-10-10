@@ -67,7 +67,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
         double tan = Math.tan(optionsPanel.getFOVAngle()) / 2;
         fov.setTAngles(tan, tan);
-        double pixFactor = vp.height / (2 * camera.getWidth());
+        double pixFactor = CameraHelper.getPixelFactor(camera, vp);
         Position viewpoint = camera.getViewpoint();
 
         boolean far = Camera.useWideProjection(viewpoint.distance);
@@ -128,7 +128,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
             long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
 
-            double width = camera.getWidth(), minDist = 5;
+            double width = camera.getCameraWidth() / 2, minDist = 5; // TBD
             String name = null;
             for (LoadPosition loadPosition : loadPositions) {
                 PositionResponse response = loadPosition.getResponse();

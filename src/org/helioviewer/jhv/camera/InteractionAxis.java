@@ -21,8 +21,8 @@ public class InteractionAxis extends Interaction {
         currentRotationStartPoint = CameraHelper.getVectorFromSphereTrackball(camera, Display.getActiveViewport(), e.getX(), e.getY(), Sun.Radius2);
         double len2 = currentRotationStartPoint.length2();
         if (len2 > Sun.Radius2) {
-            double w = camera.getWidth();
-            currentRotationStartPoint = CameraHelper.getVectorFromSphereTrackball(camera, Display.getActiveViewport(), e.getX(), e.getY(), w * w);
+            double r = 0.5 * camera.getCameraWidth();
+            currentRotationStartPoint = CameraHelper.getVectorFromSphereTrackball(camera, Display.getActiveViewport(), e.getX(), e.getY(), r * r);
         }
     }
 
