@@ -42,6 +42,10 @@ public class Transform {
         proj.setOrtho(left, right, bottom, top, zNear, zFar);
     }
 
+    public static void setOrthoSymmetricProjection(float width, float height, float zNear, float zFar) {
+        proj.setOrthoSymmetric(width, height, zNear, zFar);
+    }
+
     public static void setIdentityView() {
         view.identity();
     }

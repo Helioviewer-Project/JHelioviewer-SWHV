@@ -22,8 +22,8 @@ public class Mat4f {
         m[15] = M15;
     }
 
-    public static void orthoInverse(float[] m, float l, float r, float b, float t, float n, float f) {
-        set(m, (r - l) * 0.5f, 0, 0, -(r + l) * 0.5f, 0, (t - b) * 0.5f, 0, (t + b) * 0.5f, 0, 0, (n - f) * 0.5f, -(f + n) * 0.5f, 0, 0, 0, 1);
+    public static void orthoSymmetricInverse(float[] m, float width, float height, float near, float far) {
+        set(m, width * 0.5f, 0, 0, 0, 0, height * 0.5f, 0, 0, 0, 0, (near - far) * 0.5f, -(near + far) * 0.5f, 0, 0, 0, 1);
     }
 
     public static void translate(float[] m, float x, float y, float z) {
