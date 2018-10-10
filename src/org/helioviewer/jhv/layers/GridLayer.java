@@ -11,6 +11,7 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.base.scale.GridType;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.MathUtils;
@@ -127,8 +128,8 @@ public class GridLayer extends AbstractLayer {
             axesLine.render(gl, vp.aspect, LINEWIDTH_AXES);
 
         Position viewpoint = camera.getViewpoint();
-        float ztext = (float) (camera.getWidth() * PLANETEXT_Z);
-        double pixFactor = vp.height / (2 * camera.getWidth());
+        float ztext = 0; //(float) (camera.getWidth() * PLANETEXT_Z);
+        double pixFactor = CameraHelper.getPixelFactor(camera, vp);
         drawEarthCircles(gl, vp, pixFactor, Sun.getEarth(viewpoint.time));
 
         double pixelsPerSolarRadius = textScale * pixFactor;
@@ -171,7 +172,7 @@ public class GridLayer extends AbstractLayer {
     public void renderScale(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.idx])
             return;
-        int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
+        int pixelsPerSolarRadius = (int) (textScale * CameraHelper.getPixelFactor(camera, vp));
         drawGridFlat(gl, vp);
         if (showLabels) {
             drawGridTextFlat(pixelsPerSolarRadius, Display.mode.scale, vp);

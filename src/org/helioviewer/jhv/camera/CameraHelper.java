@@ -13,23 +13,27 @@ import org.helioviewer.jhv.math.Vec3;
 public class CameraHelper {
 
     private static double computeNormalizedX(Viewport vp, double screenX) {
-        return 2. * ((screenX - vp.x) / vp.width - 0.5);
+        return (screenX - vp.x) / vp.width - 0.5;
     }
 
     private static double computeNormalizedY(Viewport vp, double screenY) {
-        return -2. * ((screenY - vp.yAWT) / vp.height - 0.5);
+        return 0.5 - (screenY - vp.yAWT) / vp.height;
     }
 
     public static double computeUpX(Camera camera, Viewport vp, double screenX) {
-        double width = camera.getWidth();
+        double width = camera.getCameraWidth();
         Vec2 translation = camera.getCurrentTranslation();
         return computeNormalizedX(vp, screenX) * width * vp.aspect - translation.x;
     }
 
     public static double computeUpY(Camera camera, Viewport vp, double screenY) {
-        double width = camera.getWidth();
+        double width = camera.getCameraWidth();
         Vec2 translation = camera.getCurrentTranslation();
         return computeNormalizedY(vp, screenY) * width - translation.y;
+    }
+
+    public static double getPixelFactor(Camera camera, Viewport vp) {
+        return vp.height / camera.getCameraWidth();
     }
 
     static Vec3 getVectorFromSphereTrackball(Camera camera, Viewport vp, double screenX, double screenY, double refRadius2) {

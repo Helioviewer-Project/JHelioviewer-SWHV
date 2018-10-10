@@ -3,6 +3,7 @@ package org.helioviewer.jhv.camera;
 import java.util.ArrayList;
 
 import org.helioviewer.jhv.base.Buf;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.annotate.AnnotateCircle;
 import org.helioviewer.jhv.camera.annotate.AnnotateCross;
 import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
@@ -89,7 +90,7 @@ public class InteractionAnnotate extends Interaction {
             transLine.setData(gl, transBuf);
             transLine.render(gl, vp.aspect, LINEWIDTH);
 
-            double pointFactor = vp.height / (2 * camera.getWidth()) / 4;
+            double pointFactor = CameraHelper.getPixelFactor(camera, vp) / 4;
             center.setData(gl, centerBuf);
             center.renderPoints(gl, pointFactor);
         }

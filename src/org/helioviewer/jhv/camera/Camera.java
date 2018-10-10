@@ -44,13 +44,13 @@ public class Camera {
     }
 
     public void projectionOrtho2D(double aspect) {
-        Transform.setOrthoSymmetricProjection(2 * (float) (cameraWidth * aspect), 2 * (float) cameraWidth, -1, 1);
+        Transform.setOrthoSymmetricProjection((float) (cameraWidth * aspect), (float) cameraWidth, -1, 1);
         Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
         Transform.cacheMVP();
     }
 
     public void projectionOrtho(double aspect, GL2 gl, GLSLShape blackCircle) {
-        Transform.setOrthoSymmetricProjection(2 * (float) (cameraWidth * aspect), 2 * (float) cameraWidth, -clipNarrow, clipNarrow);
+        Transform.setOrthoSymmetricProjection((float) (cameraWidth * aspect), (float) cameraWidth, -clipNarrow, clipNarrow);
         Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
         Transform.cacheMVP();
 
@@ -61,13 +61,13 @@ public class Camera {
     }
 
     public float[] getTransformationInverse(double aspect) {
-        Mat4f.orthoSymmetricInverse(invProj, 2 * (float) (cameraWidth * aspect), 2 * (float) cameraWidth, -1, 1);
+        Mat4f.orthoSymmetricInverse(invProj, (float) (cameraWidth * aspect), (float) cameraWidth, -1, 1);
         Mat4f.translate(invProj, -(float) currentTranslation.x, -(float) currentTranslation.y, 0);
         return invProj;
     }
 
     public void projectionOrthoWide(double aspect) {
-        Transform.setOrthoSymmetricProjection(2 * (float) (cameraWidth * aspect), 2 * (float) cameraWidth, -clipWide, clipWide);
+        Transform.setOrthoSymmetricProjection((float) (cameraWidth * aspect), (float) cameraWidth, -clipWide, clipWide);
     }
 ////
 
@@ -82,7 +82,7 @@ public class Camera {
     }
 
     private void updateWidth() {
-        cameraWidth = viewpoint.distance * Math.tan(0.5 * fov);
+        cameraWidth = 2 * viewpoint.distance * Math.tan(0.5 * fov);
     }
 
     public void refresh() {
@@ -158,7 +158,7 @@ public class Camera {
         return tracking;
     }
 
-    public double getWidth() {
+    public double getCameraWidth() {
         return cameraWidth;
     }
 

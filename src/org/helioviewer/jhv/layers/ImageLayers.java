@@ -1,6 +1,8 @@
 package org.helioviewer.jhv.layers;
 
 import org.helioviewer.jhv.base.Region;
+import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageData;
@@ -23,14 +25,14 @@ import org.astrogrid.samp.SampUtils;
 public class ImageLayers {
 
     public static void decode(double factor) {
+        Camera camera = Display.getCamera();
         Viewport[] vp = Display.getViewports();
-        double cameraWidth = Display.getCamera().getWidth();
-        Position viewpoint = Display.getCamera().getViewpoint();
+        Position viewpoint = camera.getViewpoint();
 
         for (ImageLayer layer : Layers.getImageLayers()) {
             int i;
             if ((i = layer.isVisibleIdx()) != -1 && vp[i] != null) {
-                double pixFactor = vp[i].height / (2 * cameraWidth);
+                double pixFactor = CameraHelper.getPixelFactor(camera, vp[i]);
                 layer.getView().decode(viewpoint, pixFactor, factor);
             }
         }
