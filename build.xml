@@ -54,7 +54,8 @@
             <compilerarg line="-XDcompilePolicy=simple"/>
             <compilerarg value="-processorpath"/>
             <compilerarg pathref="processorpath.ref"/>
-            <compilerarg value="-Xplugin:ErrorProne -Xep:DeadException:ERROR -Xep:ReferenceEquality:OFF" />
+            <!-- ReferenceEquality - crashes, CatchAndPrintStackTrace - not interesting -->
+            <compilerarg value="-Xplugin:ErrorProne -Xep:DeadException:ERROR -Xep:ReferenceEquality:OFF -Xep:CatchAndPrintStackTrace:OFF" />
             <classpath>
                 <fileset refid="libfiles"/>
             </classpath>
