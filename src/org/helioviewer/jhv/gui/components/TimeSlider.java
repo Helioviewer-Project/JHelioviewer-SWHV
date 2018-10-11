@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.plaf.basic.BasicSliderUI;
 
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -22,9 +23,8 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.view.View;
 
-/**
+/*
  * Extension of JSlider displaying the caching status on the track.
- * <p>
  * This element provides its own look and feel. Therefore, it is independent
  * from the global look and feel.
  */
@@ -146,9 +146,9 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
      */
     private static class TimeSliderUI extends BasicSliderUI {
 
-        private static final Color notCachedColor = Color.LIGHT_GRAY;
-        private static final Color partialCachedColor = Color.GRAY;
-        private static final Color completeCachedColor = Color.BLACK;
+        private static final Color notCachedColor = UIGlobals.backColor;
+        private static final Color partialCachedColor = UIGlobals.midColor;
+        private static final Color completeCachedColor = UIGlobals.foreColor;
 
         private static final BasicStroke thickStroke = new BasicStroke(4);
 
@@ -158,7 +158,7 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
 
         @Override
         public void paintThumb(Graphics g) {
-            g.setColor(Color.BLACK);
+            g.setColor(UIGlobals.foreColor);
             g.drawRect(thumbRect.x, thumbRect.y, thumbRect.width - 1, thumbRect.height - 1);
 
             int x = thumbRect.x + (thumbRect.width - 1) / 2;
