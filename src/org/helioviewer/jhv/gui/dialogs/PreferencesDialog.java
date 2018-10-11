@@ -138,7 +138,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         c.anchor = GridBagConstraints.BASELINE_TRAILING;
         c.gridx = 0;
         c.gridy = 0;
-        row2.add(new JLabel("At startup", JLabel.RIGHT), c);
+        row2.add(new JLabel("At start-up", JLabel.RIGHT), c);
 
         c.anchor = GridBagConstraints.BASELINE_LEADING;
         c.gridx = 1;
