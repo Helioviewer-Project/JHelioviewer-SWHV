@@ -282,16 +282,18 @@ public class ToolBar extends JToolBar {
 
         add(new JToolBar.Separator(dim));
 
-        JideButton samp = toolButton(SAMP);
-        samp.addActionListener(e -> SampClient.notifyRequestData());
-        //addButton(samp);
+        if (Boolean.parseBoolean(Settings.getProperty("startup.sampHub"))) {
+            JideButton samp = toolButton(SAMP);
+            samp.addActionListener(e -> SampClient.notifyRequestData());
+            addButton(samp);
+        }
 /*
         for (Map.Entry<ButtonText, ActionListener> entry : pluginButtons.entrySet()) {
             JideButton b = toolButton(entry.getKey());
             b.addActionListener(entry.getValue());
             addButton(b);
-        } */
-    }
+        }
+*/  }
 
     private static void setActiveInteractionMode(InteractionMode mode) {
         Settings.setProperty("display.interaction", mode.toString());
