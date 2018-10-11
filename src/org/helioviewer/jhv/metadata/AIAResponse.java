@@ -2,52 +2,47 @@ package org.helioviewer.jhv.metadata;
 
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.HashMap;
 
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.json.JSONObject;
 
-@SuppressWarnings("serial")
+import com.google.common.collect.ImmutableMap;
+
 public class AIAResponse {
     /*
         // https://github.com/mjpauly/aia/blob/master/mov_img.py
         private static final HashMap<String, Double> STANDARD_INT = new HashMap<String, Double>() {
-            {
-                put("131", 6.99685);
-                put("171", 4.99803);
-                put("193", 2.9995);
-                put("211", 4.99801);
-                put("304", 4.99941);
-                put("335", 6.99734);
-                put("94", 4.99803);
-            }
-        };
+        private static final ImmutableMap<String, Double> STANDARD_INT = new ImmutableMap.Builder<String, Double>().
+                put("131", 6.99685).
+                put("171", 4.99803).
+                put("193", 2.9995).
+                put("211", 4.99801).
+                put("304", 4.99941).
+                put("335", 6.99734).
+                put("94", 4.99803).
+                build();
 
-        private static final HashMap<String, Double> MAX = new HashMap<String, Double>() {
-            {
-                put("131", 1200.);
-                put("171", 6000.);
-                put("193", 6000.);
-                put("211", 13000.);
-                put("304", 2000.);
-                put("335", 1000.);
-                put("94",  50.);
-            }
-        };
+        private static final ImmutableMap<String, Double> MAX = new ImmutableMap.Builder<String, Double>().
+                put("131", 1200.).
+                put("171", 6000.).
+                put("193", 6000.).
+                put("211", 13000.).
+                put("304", 2000.).
+                put("335", 1000.).
+                put("94",  50.).
+                build();
     */
     // https://github.com/Helioviewer-Project/jp2gen/blob/master/idl/sdo/aia/hvs_version5_aia.pro
-    private static final HashMap<String, Double> HV_MAX = new HashMap<String, Double>() {
-        {
-            put("131", 500.);
-            put("171", 14000.);
-            put("193", 2500.);
-            put("211", 1500.);
-            put("304", 250.);
-            put("335", 80.);
-            put("94", 30.);
-        }
-    };
+    private static final ImmutableMap<String, Double> HV_MAX = new ImmutableMap.Builder<String, Double>().
+            put("131", 500.).
+            put("171", 14000.).
+            put("193", 2500.).
+            put("211", 1500.).
+            put("304", 250.).
+            put("335", 80.).
+            put("94", 30.).
+            build();
 
 //    private static final HashMap<String, Double> LMSAL_MAX = new HashMap<>();
 //    private static final String extPath = "https://raw.githubusercontent.com/mjpauly/aia/master/aia_rescaling_data.json";
