@@ -280,13 +280,14 @@ public class ToolBar extends JToolBar {
         cutOut.addActionListener(new SDOCutOutAction());
         addButton(cutOut);
 
-        add(new JToolBar.Separator(dim));
-
         if (Boolean.parseBoolean(Settings.getProperty("startup.sampHub"))) {
             JideButton samp = toolButton(SAMP);
             samp.addActionListener(e -> SampClient.notifyRequestData());
             addButton(samp);
         }
+
+        add(new JToolBar.Separator(dim));
+
 /*
         for (Map.Entry<ButtonText, ActionListener> entry : pluginButtons.entrySet()) {
             JideButton b = toolButton(entry.getKey());
