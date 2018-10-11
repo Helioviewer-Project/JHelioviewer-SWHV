@@ -134,12 +134,13 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
 
         JPanel row2 = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-        c.anchor = GridBagConstraints.BASELINE_LEADING;
 
+        c.anchor = GridBagConstraints.BASELINE_TRAILING;
         c.gridx = 0;
         c.gridy = 0;
         row2.add(new JLabel("At startup", JLabel.RIGHT), c);
 
+        c.anchor = GridBagConstraints.BASELINE_LEADING;
         c.gridx = 1;
         defaultMovie = new JCheckBox("Load default movie", Boolean.parseBoolean(Settings.getProperty("startup.loadmovie")));
         row2.add(defaultMovie, c);
@@ -148,16 +149,18 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         sampHub = new JCheckBox("Load SAMP hub", Boolean.parseBoolean(Settings.getProperty("startup.sampHub")));
         row2.add(sampHub, c);
 
+        c.anchor = GridBagConstraints.BASELINE_TRAILING;
         c.gridx = 0;
         c.gridy = 1;
-        row2.add(new JLabel("Normalize", JLabel.RIGHT), c);
+        row2.add(new JLabel("Normalize (after restart)", JLabel.RIGHT), c);
 
+        c.anchor = GridBagConstraints.BASELINE_LEADING;
         c.gridx = 1;
-        normalizeRadius = new JCheckBox("Solar radius (needs restart)", Boolean.parseBoolean(Settings.getProperty("display.normalize")));
+        normalizeRadius = new JCheckBox("Solar radius", Boolean.parseBoolean(Settings.getProperty("display.normalize")));
         row2.add(normalizeRadius, c);
 
         c.gridx = 2;
-        normalizeAIA = new JCheckBox("SDO/AIA brightness (needs restart)", Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA")));
+        normalizeAIA = new JCheckBox("SDO/AIA brightness", Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA")));
         row2.add(normalizeAIA, c);
 
         JPanel row3 = new JPanel(new FlowLayout(FlowLayout.LEADING));
