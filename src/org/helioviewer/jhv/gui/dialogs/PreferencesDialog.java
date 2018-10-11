@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.nio.charset.StandardCharsets;
@@ -41,7 +43,7 @@ import com.jidesoft.dialog.StandardDialog;
 @SuppressWarnings("serial")
 public class PreferencesDialog extends StandardDialog implements ShowableDialog {
 
-    private final JLabel labelCache = new JLabel("The image cache currently uses 0.0GB on disk.");
+    private final JLabel labelCache = new JLabel("The image cache currently uses 0.0GB on disk.", JLabel.RIGHT);
 
     private void setLabelCache() {
         labelCache.setText(String.format("The image cache currently uses %.1fGB on disk.", JPIPCacheManager.getSize() / (1024 * 1024 * 1024.)));
@@ -130,37 +132,47 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         combo.addActionListener(e -> Settings.setProperty("default.server", (String) Objects.requireNonNull(combo.getSelectedItem())));
         row1.add(combo);
 
-        JPanel row2 = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        row2.add(new JLabel("Start-up", JLabel.RIGHT));
+        JPanel row2 = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.BASELINE_LEADING;
 
+        c.gridx = 0;
+        c.gridy = 0;
+        row2.add(new JLabel("At startup", JLabel.RIGHT), c);
+
+        c.gridx = 1;
         defaultMovie = new JCheckBox("Load default movie", Boolean.parseBoolean(Settings.getProperty("startup.loadmovie")));
-        row2.add(defaultMovie);
+        row2.add(defaultMovie, c);
 
+        c.gridx = 2;
         sampHub = new JCheckBox("Load SAMP hub", Boolean.parseBoolean(Settings.getProperty("startup.sampHub")));
-        row2.add(sampHub);
+        row2.add(sampHub, c);
+
+        c.gridx = 0;
+        c.gridy = 1;
+        row2.add(new JLabel("Normalize", JLabel.RIGHT), c);
+
+        c.gridx = 1;
+        normalizeRadius = new JCheckBox("Solar radius (needs restart)", Boolean.parseBoolean(Settings.getProperty("display.normalize")));
+        row2.add(normalizeRadius, c);
+
+        c.gridx = 2;
+        normalizeAIA = new JCheckBox("SDO/AIA brightness (needs restart)", Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA")));
+        row2.add(normalizeAIA, c);
 
         JPanel row3 = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        row3.add(new JLabel("Normalize", JLabel.RIGHT));
-
-        normalizeRadius = new JCheckBox("Solar radius (needs restart)", Boolean.parseBoolean(Settings.getProperty("display.normalize")));
-        row3.add(normalizeRadius);
-        normalizeAIA = new JCheckBox("SDO/AIA brightness (needs restart)", Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA")));
-        row3.add(normalizeAIA);
-
-        JPanel row4 = new JPanel(new FlowLayout(FlowLayout.LEADING));
         JButton clearCache = new JButton("Clear Cache");
         clearCache.addActionListener(e -> {
             JPIPCacheManager.clear();
             setLabelCache();
         });
-        row4.add(labelCache);
-        row4.add(clearCache);
+        row3.add(labelCache);
+        row3.add(clearCache);
 
         JPanel paramsPanel = new JPanel(new GridLayout(0, 1));
         paramsPanel.add(row1);
         paramsPanel.add(row2);
         paramsPanel.add(row3);
-        paramsPanel.add(row4);
 
         return paramsPanel;
     }
