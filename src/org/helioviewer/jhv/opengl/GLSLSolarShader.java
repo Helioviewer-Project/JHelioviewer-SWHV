@@ -9,15 +9,15 @@ public class GLSLSolarShader extends GLSLShader {
 
     // float[] bc = { 0.06136, 0.24477, 0.38774, 0.24477, 0.06136 }
     // http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
-    private static final float[] bc = new float[]{.30613f, .38774f, .30613f};
-    private static final float[] blurKernel = new float[]{
+    private static final float[] bc = {.30613f, .38774f, .30613f};
+    private static final float[] blurKernel = {
             bc[0] * bc[0], bc[0] * bc[1], bc[0] * bc[2],
             bc[1] * bc[0], bc[1] * bc[1], bc[1] * bc[2],
             bc[2] * bc[0], bc[2] * bc[1], bc[2] * bc[2]
     };
 
-    private static final float[] bo = new float[]{-1.2004377f, 0, 1.2004377f};
-    private static final float[] blurOffset = new float[]{
+    private static final float[] bo = {-1.2004377f, 0, 1.2004377f};
+    private static final float[] blurOffset = {
             bo[0], bo[0], /**/ bo[1], bo[0], /**/ bo[2], bo[0],
             bo[0], bo[1], /**/ bo[1], bo[1], /**/ bo[2], bo[1],
             bo[0], bo[2], /**/ bo[1], bo[2], /**/ bo[2], bo[2]
