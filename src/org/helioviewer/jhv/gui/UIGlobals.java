@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui;
 
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Font;
@@ -49,7 +50,12 @@ public class UIGlobals {
             JPopupMenu.setDefaultLightWeightPopupEnabled(false);
         }
 
-        Font font = new JLabel().getFont();
+        JLabel label = new JLabel();
+        foreColor = label.getForeground();
+        backColor = label.getBackground();
+        midColor = new Color((foreColor.getRed() + backColor.getRed()) / 2, (foreColor.getGreen() + backColor.getGreen()) / 2, (foreColor.getBlue() + backColor.getBlue()) / 2);
+
+        Font font = label.getFont();
         int defaultSize = font.getSize();
 
         String defaultFont = "SansSerif";
@@ -132,6 +138,10 @@ public class UIGlobals {
 
     public static Cursor openHandCursor;
     public static Cursor closedHandCursor;
+
+    public static Color foreColor;
+    public static Color backColor;
+    public static Color midColor;
 
     public static final boolean canBrowse = Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE);
     public static final int menuShortcutMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();

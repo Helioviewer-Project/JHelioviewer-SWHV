@@ -6,30 +6,23 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 
-import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
+
+import org.helioviewer.jhv.gui.UIGlobals;
 
 @SuppressWarnings("serial")
 class CollapsiblePaneButton extends JToggleButton {
 
-    private final Color color;
-    private final Color bright;
-    private final Color dark;
+    private static final Color color = UIGlobals.backColor;
+    private static final Color bright = brighter(color, 0.85);
+    private static final Color dark = darker(color, 0.9);
 
     CollapsiblePaneButton() {
-        Color c = new JPanel().getBackground();
-        if (c == null) // synth laf
-            c = Color.GRAY;
-        color = c;
-
         setContentAreaFilled(false);
         setFocusPainted(false);
         setBorderPainted(false);
         setHorizontalAlignment(SwingConstants.LEFT);
-
-        bright = brighter(color, 0.85);
-        dark = darker(color, 0.9);
     }
 
     private static Color brighter(Color c, double FACTOR) {
