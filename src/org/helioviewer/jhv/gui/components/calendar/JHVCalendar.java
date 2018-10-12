@@ -8,8 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashSet;
 
 import javax.swing.BoxLayout;
@@ -41,7 +39,6 @@ class JHVCalendar extends JPanel {
         DAYS, MONTHS, YEARS
     }
 
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private final HashSet<JHVCalendarListener> listeners = new HashSet<>();
     private final NavigationPanel navigationPanel = new NavigationPanel();
     private final SelectionPanel selectionPanel = new SelectionPanel();
@@ -71,8 +68,8 @@ class JHVCalendar extends JPanel {
      * @param newMode Defines which view has to be displayed.
      */
     private void changeDisplayMode(DisplayMode newMode) {
-        // memorize the selected date
-        Date date = calendarViewController.getDate();
+        // memorize the selected time
+        long time = calendarViewController.getTime();
         // change the view controller
         switch (newMode) {
             case DAYS:
@@ -85,36 +82,30 @@ class JHVCalendar extends JPanel {
                 calendarViewController = new YearViewController();
                 break;
         }
-        // set memorized date
-        calendarViewController.setDate(date);
+        // set memorized time
+        calendarViewController.setTime(time);
         // memorize current view mode
         displayMode = newMode;
     }
 
-    // Updates the data which has to be displayed at the visual components
+    // Updates the data which has to be displayed by the visual components
     private void updateDateDisplay() {
         // fill grid with data
-        selectionPanel.fillGrid(calendarViewController.getGridData(), calendarViewController.getGridColumnHeader(), calendarViewController.getCorrespondingCellOfCurrentDate(), displayMode == DisplayMode.DAYS);
+        selectionPanel.fillGrid(calendarViewController.getGridData(), calendarViewController.getGridColumnHeader(), calendarViewController.getCorrespondingCellOfCurrentTime(), displayMode == DisplayMode.DAYS);
         // enable or disable buttons
         navigationPanel.updateButtonsVisibility();
         // refresh button text
         navigationPanel.setSelectButtonText(calendarViewController.getSelectionButtonText());
     }
 
-    /**
-     * Sets the current date to the calendar component.
-     *
-     * @param date Selected date of the calendar component.
-     */
-    public void setDate(Date date) {
-        // set date
-        calendarViewController.setDate(date);
-        // update visual components
+    // Sets the current time to the calendar component
+    void setTime(long milli) {
+        calendarViewController.setTime(milli);
         updateDateDisplay();
     }
 
     public long getTime() {
-        return TimeUtils.floorDay(calendarViewController.getDate().getTime());
+        return TimeUtils.floorDay(calendarViewController.getTime());
     }
 
     public void addJHVCalendarListener(JHVCalendarListener l) {
@@ -125,9 +116,7 @@ class JHVCalendar extends JPanel {
         listeners.remove(l);
     }
 
-    /**
-     * Informs all listener of this class by passing the corresponding event.
-     */
+    // Informs all listener of this class by passing the corresponding event
     private void informAllJHVCalendarListeners() {
         JHVCalendarEvent e = new JHVCalendarEvent(this);
         for (JHVCalendarListener l : listeners) {
@@ -187,14 +176,11 @@ class JHVCalendar extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == forwardButton) {
-                // depending on the current view controller the next date period
-                // will be shown
+                // depending on the current view controller the next date period will be shown
                 calendarViewController.moveForward();
                 updateDateDisplay();
             } else if (e.getSource() == backButton) {
-                // depending on the current view controller the previous date
-                // period
-                // will be shown
+                // depending on the current view controller the previous date period will be shown
                 calendarViewController.moveBack();
                 updateDateDisplay();
             } else if (e.getSource() == selectButton) {
@@ -212,8 +198,7 @@ class JHVCalendar extends JPanel {
                         break;
                 }
             } else if (e.getSource() == quickForwardButton) {
-                // increase current date by using the view controller of the
-                // next higher period control.
+                // increase current date by using the view controller of the next higher period control
                 CalendarViewController cvc = null;
 
                 if (displayMode == DisplayMode.DAYS) {
@@ -223,13 +208,12 @@ class JHVCalendar extends JPanel {
                 }
 
                 if (cvc != null) {
-                    cvc.setDate(calendarViewController.getDate());
-                    calendarViewController.setDate(cvc.moveForward());
+                    cvc.setTime(calendarViewController.getTime());
+                    calendarViewController.setTime(cvc.moveForward());
                     updateDateDisplay();
                 }
             } else if (e.getSource() == quickBackButton) {
-                // reduce current date by using the view controller of the next
-                // higher period control.
+                // reduce current date by using the view controller of the next higher period control
                 CalendarViewController cvc = null;
 
                 if (displayMode == DisplayMode.DAYS) {
@@ -239,17 +223,15 @@ class JHVCalendar extends JPanel {
                 }
 
                 if (cvc != null) {
-                    cvc.setDate(calendarViewController.getDate());
-                    calendarViewController.setDate(cvc.moveBack());
+                    cvc.setTime(calendarViewController.getTime());
+                    calendarViewController.setTime(cvc.moveBack());
                     updateDateDisplay();
                 }
             }
         }
 
-        /**
-         * Sets the quick forward button and the quick back button visible or
-         * not depending on the current display mode.
-         */
+        // Sets the quick forward button and the quick back button visible or
+        // not depending on the current display mode.
         void updateButtonsVisibility() {
             quickForwardButton.setVisible(displayMode != DisplayMode.YEARS);
             quickBackButton.setVisible(displayMode != DisplayMode.YEARS);
@@ -257,10 +239,7 @@ class JHVCalendar extends JPanel {
 
     }
 
-    /**
-     * Panel which acts as a container of the grid which displays the period of
-     * the current view controller.
-     */
+    // Panel which acts as a container of the grid which displays the period of the current view controller
     private class SelectionPanel extends JPanel {
 
         final JTable table;
@@ -268,20 +247,18 @@ class JHVCalendar extends JPanel {
 
         SelectionPanel() {
             setLayout(new BorderLayout());
-            // create table
-            table = new JTable();
 
-            // allow for individual cell selection and turn off grid lines.
+            table = new JTable();
+            // allow for individual cell selection and turn off grid lines
             table.setCellSelectionEnabled(true);
             table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             table.setShowGrid(false);
-
             // avoid reordering and resizing of columns
             table.getTableHeader().setReorderingAllowed(false);
             table.getTableHeader().setResizingAllowed(false);
 
             table.addMouseListener(new MouseAdapter() {
-                // when a cell which contains valid data was clicked, the view controller and view mode will be changed.
+                // when a cell which contains valid data was clicked, the view controller and view mode will be changed
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if (e.getButton() == MouseEvent.BUTTON1 && isValidCellSelected(e.getPoint())) {
@@ -290,7 +267,7 @@ class JHVCalendar extends JPanel {
                         if (row == -1 || col == -1)
                             return;
 
-                        calendarViewController.setDateOfCellValue(table.getValueAt(row, col));
+                        calendarViewController.setTimeOfCellValue(table.getValueAt(row, col));
 
                         switch (displayMode) {
                             case YEARS:
@@ -374,18 +351,13 @@ class JHVCalendar extends JPanel {
             return table.getModel().getValueAt(row, col) != null && table.rowAtPoint(point) >= 0;
         }
 
-        /**
-         * Sets the size of the table to the size of the available space.
-         */
+        // Sets the size of the table to the size of the available space
         void resizeTableSpace() {
             table.setSize(new Dimension(contentPane.getWidth() - 4, contentPane.getHeight()));
             table.setPreferredSize(new Dimension(contentPane.getWidth() - 4, contentPane.getHeight()));
         }
 
-        /**
-         * Computes the height of the rows so they will fit to the whole height
-         * of the the table.
-         */
+        // Computes the height of the rows so they will fit to the whole height of the the table
         void resizeTableRowHeight() {
             int headerHeight = 0;
             if (displayMode == DisplayMode.DAYS)
@@ -397,10 +369,8 @@ class JHVCalendar extends JPanel {
                 table.setRowHeight(rowHeight);
         }
 
-        /**
-         * Sets the size of the columns so all columns will have the same size
-         * and all columns will fit into the space of the table component.
-         */
+        // Sets the size of the columns so all columns will have the same size
+        // and all columns will fit into the space of the table component.
         void resizeTableColumnWidth() {
             JTableHeader tableHeader = table.getTableHeader();
             int columnCount = tableHeader.getColumnModel().getColumnCount();
@@ -411,10 +381,7 @@ class JHVCalendar extends JPanel {
 
     }
 
-    /**
-     * Table cell renderer for the used JTable. This renderer displays all cell
-     * entries centered.
-     */
+    // Table cell renderer for the used JTable. This renderer displays all cell entries centered.
     private static class CenterTableCellRenderer extends DefaultTableCellRenderer {
 
         CenterTableCellRenderer() {
@@ -423,23 +390,19 @@ class JHVCalendar extends JPanel {
 
     }
 
-    /**
-     * Panel which acts as a container of the button which displays the current
-     * date and allows to set the current date to the calendar component.
-     */
+    // Panel which acts as a container of the button which displays the current
+    // date and allows to set the current date to the calendar component.
     private class BottomPanel extends JPanel {
 
         BottomPanel() {
-            // set basic layout
             setLayout(new FlowLayout(FlowLayout.CENTER, 2, 2));
-            // set up button
-            JHVButton dateButton = new JHVButton("Today is " + dateFormat.format(new Date()));
+
+            JHVButton dateButton = new JHVButton("Today is " + TimeUtils.formatDate(System.currentTimeMillis()));
             // set the calendar component to the current date
             dateButton.addActionListener(e -> {
                 changeDisplayMode(DisplayMode.DAYS);
-                setDate(new Date());
+                setTime(System.currentTimeMillis());
             });
-            // add label to component
             add(dateButton);
         }
 

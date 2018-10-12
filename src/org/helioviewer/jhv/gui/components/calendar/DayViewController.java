@@ -4,7 +4,6 @@ import java.awt.Point;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
@@ -22,18 +21,18 @@ public class DayViewController implements CalendarViewController {
         calendar.setMinimalDaysInFirstWeek(1);
     }
 
-    // A period of one month will be added to the current date.
+    // A period of one month will be added to the current time
     @Override
-    public Date moveForward() {
+    public long moveForward() {
         calendar.add(Calendar.MONTH, 1);
-        return calendar.getTime();
+        return calendar.getTimeInMillis();
     }
 
-    // A period of one month will be removed from the current date
+    // A period of one month will be removed from the current time
     @Override
-    public Date moveBack() {
+    public long moveBack() {
         calendar.add(Calendar.MONTH, -1);
-        return calendar.getTime();
+        return calendar.getTimeInMillis();
     }
 
     @Override
@@ -51,12 +50,12 @@ public class DayViewController implements CalendarViewController {
     }
 
     @Override
-    public Point getCorrespondingCellOfCurrentDate() {
+    public Point getCorrespondingCellOfCurrentTime() {
         return new Point(calendar.get(Calendar.WEEK_OF_MONTH) - 1, calendar.get(Calendar.DAY_OF_WEEK) - 1);
     }
 
     @Override
-    public void setDateOfCellValue(Object value) {
+    public void setTimeOfCellValue(Object value) {
         if (value instanceof Integer) {
             calendar.set(Calendar.DAY_OF_MONTH, (Integer) value);
         }
@@ -87,13 +86,13 @@ public class DayViewController implements CalendarViewController {
     }
 
     @Override
-    public Date getDate() {
-        return calendar.getTime();
+    public void setTime(long milli) {
+        calendar.setTimeInMillis(milli);
     }
 
     @Override
-    public void setDate(Date date) {
-        calendar.setTime(date);
+    public long getTime() {
+        return calendar.getTimeInMillis();
     }
 
 }
