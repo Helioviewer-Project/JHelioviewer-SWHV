@@ -3,12 +3,11 @@ package org.helioviewer.jhv.timelines.draw;
 import java.awt.Color;
 import java.awt.Font;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.math.MathUtils;
 
-@SuppressWarnings("DateFormatConstant")
 public class DrawConstants {
 
     public static final int GRAPH_LEFT_SPACE = 50;
@@ -33,16 +32,16 @@ public class DrawConstants {
     public static final Color MOVIE_FRAME_COLOR = Color.BLACK;
     public static final Color MOVIE_INTERVAL_COLOR = Color.LIGHT_GRAY;
 
-    public static final SimpleDateFormat FULL_DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd\nHH:mm:ss");
-    public static final SimpleDateFormat FULL_DATE_TIME_FORMAT_NO_SEC = new SimpleDateFormat("yyyy-MM-dd\nHH:mm");
-    public static final SimpleDateFormat FULL_DATE_TIME_FORMAT_REVERSE = new SimpleDateFormat("HH:mm:ss\nyyyy-MM-dd");
+    public static final DateTimeFormatter FULL_DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd\nHH:mm:ss");
+    public static final DateTimeFormatter FULL_DATE_TIME_FORMAT_NO_SEC = DateTimeFormatter.ofPattern("yyyy-MM-dd\nHH:mm");
+    public static final DateTimeFormatter FULL_DATE_TIME_FORMAT_REVERSE = DateTimeFormatter.ofPattern("HH:mm:ss\nyyyy-MM-dd");
 
-    public static final SimpleDateFormat HOUR_TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
-    public static final SimpleDateFormat HOUR_TIME_FORMAT_NO_SEC = new SimpleDateFormat("HH:mm");
+    public static final DateTimeFormatter HOUR_TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
+    public static final DateTimeFormatter HOUR_TIME_FORMAT_NO_SEC = DateTimeFormatter.ofPattern("HH:mm");
 
-    public static final SimpleDateFormat DAY_MONTH_YEAR_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-    public static final SimpleDateFormat MONTH_YEAR_TIME_FORMAT = new SimpleDateFormat("MMM yyyy");
-    public static final SimpleDateFormat YEAR_ONLY_TIME_FORMAT = new SimpleDateFormat("yyyy");
+    public static final DateTimeFormatter DAY_MONTH_YEAR_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    public static final DateTimeFormatter MONTH_YEAR_TIME_FORMAT = DateTimeFormatter.ofPattern("MMM yyyy");
+    public static final DateTimeFormatter YEAR_ONLY_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy");
 
     public static final int EVENT_OFFSET = 3;
 
