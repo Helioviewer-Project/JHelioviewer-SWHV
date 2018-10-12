@@ -9,12 +9,12 @@ import java.awt.event.MouseListener;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.components.Buttons;
+import org.helioviewer.jhv.gui.components.base.HTMLPane;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
 
 @SuppressWarnings("serial")
@@ -29,13 +29,10 @@ class PluginsListEntry extends JPanel implements MouseListener, HyperlinkListene
         plugin = _plugin;
         list = _list;
 
-        JTextPane pane = new JTextPane();
-        pane.setContentType("text/html");
+        HTMLPane pane = new HTMLPane();
         pane.setText("<b>" + plugin.getName() + "</b><br/>" + plugin.getDescription() + " <a href=''>More...</a>");
-        pane.setEditable(false);
         pane.setOpaque(false);
         pane.addHyperlinkListener(this);
-        pane.putClientProperty(JTextPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 
         updateEnableLabel();
 
