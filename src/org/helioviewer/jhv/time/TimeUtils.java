@@ -49,28 +49,32 @@ public class TimeUtils {
         return milli - milli % DAY_IN_MILLIS;
     }
 
+    public static String format(DateTimeFormatter formatter, long milli) {
+        return formatter.format(Instant.ofEpochMilli(milli).atOffset(ZERO));
+    }
+
     public static String format(long milli) {
-        return DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(Instant.ofEpochMilli(milli).atOffset(ZERO));
-    }
-
-    public static String formatZ(long milli) {
-        return DateTimeFormatter.ISO_INSTANT.format(Instant.ofEpochMilli(milli));
-    }
-
-    public static String formatSQL(long milli) {
-        return sqlFormatter.format(Instant.ofEpochMilli(milli).atOffset(ZERO));
+        return format(DateTimeFormatter.ISO_LOCAL_DATE_TIME, milli);
     }
 
     public static String formatDate(long milli) {
-        return DateTimeFormatter.ISO_LOCAL_DATE.format(Instant.ofEpochMilli(milli).atOffset(ZERO));
+        return format(DateTimeFormatter.ISO_LOCAL_DATE, milli);
     }
 
     public static String formatTime(long milli) {
-        return DateTimeFormatter.ISO_LOCAL_TIME.format(Instant.ofEpochMilli(milli).atOffset(ZERO));
+        return format(DateTimeFormatter.ISO_LOCAL_TIME, milli);
+    }
+
+    public static String formatZ(long milli) {
+        return format(DateTimeFormatter.ISO_INSTANT, milli);
+    }
+
+    public static String formatSQL(long milli) {
+        return format(sqlFormatter, milli);
     }
 
     public static String formatFilename(long milli) {
-        return fileFormatter.format(Instant.ofEpochMilli(milli).atOffset(ZERO));
+        return format(fileFormatter, milli);
     }
 
     public static long parse(String date) {
