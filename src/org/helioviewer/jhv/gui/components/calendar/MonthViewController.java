@@ -2,9 +2,11 @@ package org.helioviewer.jhv.gui.components.calendar;
 
 import java.awt.Point;
 import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+
+import org.helioviewer.jhv.time.TimeUtils;
 
 /**
  * Class manages a calendar view which shows the months of a year.
@@ -13,8 +15,9 @@ import java.util.GregorianCalendar;
  */
 public class MonthViewController implements CalendarViewController {
 
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy");
+
     private final Calendar calendar = new GregorianCalendar();
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy");
 
     /**
      * {@inheritDoc}
@@ -43,7 +46,7 @@ public class MonthViewController implements CalendarViewController {
      */
     @Override
     public String getSelectionButtonText() {
-        return dateFormat.format(calendar.getTime());
+        return TimeUtils.format(formatter, calendar.getTimeInMillis());
     }
 
     /**
