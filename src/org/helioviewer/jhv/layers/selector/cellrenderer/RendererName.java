@@ -16,10 +16,10 @@ public class RendererName extends JHVTableCellRenderer {
             setText(layerName);
             if (layer == Layers.getActiveImageLayer()) {
                 setToolTipText(layerName + " (master)");
-                setFont(UIGlobals.UIFontBold);
+                setFont(UIGlobals.uiFontBold);
             } else {
                 setToolTipText(null);
-                setFont(UIGlobals.UIFont);
+                setFont(UIGlobals.uiFont);
             }
         }
         setBorder(cellBorder);

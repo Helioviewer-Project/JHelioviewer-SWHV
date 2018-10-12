@@ -46,8 +46,8 @@ public class DrawConstants {
 
     public static final int EVENT_OFFSET = 3;
 
-    public static final Font font = UIGlobals.UIFontSmall;
-    public static final Font fontBold = UIGlobals.UIFontSmallBold;
+    public static final Font font = UIGlobals.uiFontSmall;
+    public static final Font fontBold = UIGlobals.uiFontSmallBold;
 
     public static final DecimalFormat valueFormatter = MathUtils.numberFormatter("0", 4);
 

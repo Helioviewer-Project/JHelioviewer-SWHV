@@ -21,7 +21,7 @@ public class StatusPanel extends JPanel {
     public static class StatusPlugin extends JLabel {
 
         protected StatusPlugin() {
-            setFont(UIGlobals.UIFontMonoSmall);
+            setFont(UIGlobals.uiFontMonoSmall);
         }
 
     }

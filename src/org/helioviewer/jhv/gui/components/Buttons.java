@@ -14,7 +14,7 @@ public class Buttons {
     }
 
     public static Font getMaterialFont(float size) {
-        return UIGlobals.UIFontMDI.deriveFont(size);
+        return UIGlobals.uiFontMDI.deriveFont(size);
     }
 
     public static final String close = String.valueOf(MaterialDesign.MDI_CLOSE.code);
