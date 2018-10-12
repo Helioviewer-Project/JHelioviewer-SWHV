@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.gui.components.calendar;
 
 import java.awt.Point;
-import java.util.Date;
 
 /**
  * Interface which defines basic methods to manage the calendar view.
@@ -11,18 +10,18 @@ import java.util.Date;
  */
 interface CalendarViewController {
     /**
-     * Adds to the current selected date a defined time span.
+     * Adds to the current selected time a defined time span.
      *
-     * @return new date where time span is added.
+     * @return new time where time span is added.
      */
-    Date moveForward();
+    long moveForward();
 
     /**
-     * Removes from the current selected date a defined time span.
+     * Removes from the current selected time a defined time span.
      *
-     * @return new date where time span is removed.
+     * @return new time where time span is removed.
      */
-    Date moveBack();
+    long moveBack();
 
     /**
      * Returns the header text for the current view.
@@ -32,8 +31,8 @@ interface CalendarViewController {
     String getSelectionButtonText();
 
     /**
-     * Returns the data which belongs to the calendar view an the current
-     * selected date.
+     * Returns the data which belongs to the calendar view of the current
+     * selected time.
      *
      * @return data which can be displayed in a table grid.
      */
@@ -48,34 +47,32 @@ interface CalendarViewController {
 
     /**
      * Returns the coordinates of the cell inside the table of the current
-     * selected date.
+     * selected time.
      *
      * @return coordinate of the cell inside the table. The x coordinate
      * represents the row index, the y coordinate represents the column
      * index.
      */
-    Point getCorrespondingCellOfCurrentDate();
+    Point getCorrespondingCellOfCurrentTime();
 
     /**
-     * Sets the current date by a given object value.
+     * Sets the current time by a given object value.
      *
-     * @param value object which indicates the new date.
+     * @param value object which indicates the new time.
      * @see #getGridData()
      */
-    void setDateOfCellValue(Object value);
+    void setTimeOfCellValue(Object value);
 
     /**
-     * Sets the current selected date.
-     *
-     * @param date new selected date.
+     * Sets the current selected time.
      */
-    void setDate(Date date);
+    void setTime(long milli);
 
     /**
-     * Returns the current selected date.
+     * Returns the current selected time.
      *
-     * @return selected date.
+     * @return selected time.
      */
-    Date getDate();
+    long getTime();
 
 }

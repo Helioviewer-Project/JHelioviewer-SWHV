@@ -110,12 +110,10 @@ public class JHVCalendarDatePicker extends JPanel {
         informAllJHVCalendarListeners();
     }
 
-    /**
-     * Opens an new popup window where the user can select a date.
-     */
+    // Opens an new popup window where the user can select a date
     private void showCalPopup() {
         // set up the popup content
-        jhvCalendar.setDate(calendar.getTime());
+        jhvCalendar.setTime(calendar.getTimeInMillis());
 
         // get position for popup
         int x = textField.getLocationOnScreen().x;
@@ -163,10 +161,8 @@ public class JHVCalendarDatePicker extends JPanel {
         textField.setText(TimeUtils.formatDate(calendar.getTimeInMillis()));
     }
 
-    /**
-     * Override the setEnabled method in order to keep the containing
-     * components' enabledState synced with the enabledState of this component.
-     */
+    // Override the setEnabled method in order to keep the containing
+    // components' enabledState synced with the enabledState of this component.
     @Override
     public void setEnabled(boolean enabled) {
         textField.setEnabled(enabled);
