@@ -16,6 +16,8 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.UIGlobals;
+import org.helioviewer.jhv.gui.components.base.HTMLPane;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.opengl.GLInfo;
@@ -55,20 +57,19 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
                 "<li><a href=\"http://logging.apache.org/log4j/index.html\">log4j</a> logging library.</li>" +
                 "<li><a href=\"https://github.com/haraldk/TwelveMonkeys/blob/master/sandbox/sandbox-common/src/main/java/com/twelvemonkeys/image/MappedImageFactory.java\">MappedImageFactory</a>, ©2010, Harald Kuhr.</li>";
 
-        JTextPane pane = new JTextPane();
-        pane.setContentType("text/html");
+        HTMLPane pane = new HTMLPane();
         pane.setText(text);
-        pane.setEditable(false);
         pane.addHyperlinkListener(this);
-        pane.putClientProperty(JTextPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
         pane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         return new JScrollPane(pane);
     }
 
     @Override
     public JComponent createBannerPanel() {
-        String text = "<center><b><big>" + JHVGlobals.programName + "</big><br/>Version " + JHVGlobals.version + '.' + JHVGlobals.revision + "</b><br/>" +
-                "<small>" + JHVGlobals.versionDetail + "<br/>" + GLInfo.glVersion + "</small><br/><br/>" +
+        int fontSize = UIGlobals.UIFont.getSize();
+        String text = "<center><b><span style='font-size:" + (fontSize + 3) + "pt'>" + JHVGlobals.programName + "</span><br/>" +
+                "Version " + JHVGlobals.version + '.' + JHVGlobals.revision + "</b><br/>" +
+                "<span style='font-size:" + (fontSize - 3) + "pt'>" + JHVGlobals.versionDetail + "<br/>" + GLInfo.glVersion + "</span><br/><br/>" +
                 "©2018 <a href='http://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br/>" +
                 "Part of the ESA/NASA Helioviewer Project<br/>" +
                 "Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)<br/><br/>" +
@@ -77,12 +78,9 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
                 "<a href='http://www.jhelioviewer.org'>www.jhelioviewer.org</a><br/><br/>" +
                 "Contact: <a href='mailto:Daniel.Mueller@esa.int'>Daniel.Mueller@esa.int</a>";
 
-        JTextPane pane = new JTextPane();
-        pane.setContentType("text/html");
+        HTMLPane pane = new HTMLPane();
         pane.setText(text);
-        pane.setEditable(false);
         pane.addHyperlinkListener(this);
-        pane.putClientProperty(JTextPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
         pane.setOpaque(false);
 
         JPanel banner = new JPanel(new BorderLayout());
