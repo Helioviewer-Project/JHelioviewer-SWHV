@@ -21,10 +21,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
-import javax.swing.JTextPane;
 
 import org.apache.log4j.NDC;
 import org.helioviewer.jhv.gui.ClipBoardCopier;
+import org.helioviewer.jhv.gui.components.base.HTMLPane;
 import org.helioviewer.jhv.log.Log;
 
 class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
@@ -58,12 +58,9 @@ class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
     private static void showErrorDialog(String msg) {
         ArrayList<Object> objects = new ArrayList<>();
 
-        JTextPane report = new JTextPane();
-        report.setContentType("text/html");
-        report.setEditable(false);
+        HTMLPane report = new HTMLPane();
         report.setOpaque(false);
         report.addHyperlinkListener(JHVGlobals.hyperOpenURL);
-        report.putClientProperty(JTextPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
         report.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 10));
         report.setText("Fatal error detected." +
                 "<p>Please email this report at <a href='mailto:" + JHVGlobals.emailAddress + "'>" + JHVGlobals.emailAddress + "</a> " +

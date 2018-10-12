@@ -4,10 +4,10 @@ import javax.annotation.Nullable;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.components.base.HTMLPane;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
 import com.jidesoft.dialog.ButtonPanel;
@@ -21,7 +21,7 @@ public class TextDialog extends StandardDialog implements ShowableDialog {
     public TextDialog(String title, String _text, boolean resizable) {
         super(JHVFrame.getFrame(), title, true);
         setResizable(resizable);
-        text = _text.replace("\n", "<br/>");
+        text = _text;
     }
 
     @Override
@@ -31,14 +31,10 @@ public class TextDialog extends StandardDialog implements ShowableDialog {
 
     @Override
     public JComponent createContentPanel() {
-        JTextPane pane = new JTextPane();
-        pane.setContentType("text/html");
+        HTMLPane pane = new HTMLPane();
         pane.setText(text);
-        pane.setEditable(false);
         pane.addHyperlinkListener(JHVGlobals.hyperOpenURL);
-        pane.putClientProperty(JTextPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
         pane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
         return new JScrollPane(pane);
     }
 

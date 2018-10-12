@@ -136,7 +136,7 @@ public class JHVGlobals {
     private static class HyperOpenURL implements HyperlinkListener {
         @Override
         public void hyperlinkUpdate(HyperlinkEvent e) {
-            if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+            if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED && e.getURL() != null) {
                 openURL(e.getURL().toString());
             }
         }
