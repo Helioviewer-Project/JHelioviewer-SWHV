@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -126,6 +127,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         JPanel settings = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
+        c.insets = new Insets(0, 2, 0, 2);
 
         c.gridx = 0;
         c.gridy = 0;
