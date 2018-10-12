@@ -81,33 +81,33 @@ public class UIGlobals {
         map.put(TextAttribute.SIZE, defaultSize);
 
         font = new Font(map);
-        UIFont = font;
+        uiFont = font;
 
         map.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD);
         map.put(TextAttribute.SIZE, defaultSize);
-        UIFontBold = font.deriveFont(map);
+        uiFontBold = font.deriveFont(map);
 
         map.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_REGULAR);
         map.put(TextAttribute.SIZE, defaultSize - 2);
-        UIFontSmall = font.deriveFont(map);
+        uiFontSmall = font.deriveFont(map);
 
         map.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD);
         map.put(TextAttribute.SIZE, defaultSize - 2);
-        UIFontSmallBold = font.deriveFont(map);
+        uiFontSmallBold = font.deriveFont(map);
 
-        UIFontMono = new Font("Monospaced", Font.PLAIN, defaultSize);
-        UIFontMonoSmall = new Font("Monospaced", Font.PLAIN, defaultSize - 2);
+        uiFontMono = new Font("Monospaced", Font.PLAIN, defaultSize);
+        uiFontMonoSmall = new Font("Monospaced", Font.PLAIN, defaultSize - 2);
 
         try (InputStream is = FileUtils.getResource("/fonts/RobotoCondensed-Regular.ttf")) {
-            UIFontRoboto = Font.createFont(Font.TRUETYPE_FONT, is);
-            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(UIFontRoboto);
+            uiFontRoboto = Font.createFont(Font.TRUETYPE_FONT, is);
+            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(uiFontRoboto);
         } catch (Exception e) {
             Log.warn("Font not loaded correctly, fallback to default");
-            UIFontRoboto = new Font("SansSerif", Font.PLAIN, defaultSize);
+            uiFontRoboto = new Font("SansSerif", Font.PLAIN, defaultSize);
         }
         try (InputStream is = FileUtils.getResource("/fonts/materialdesignicons-webfont.ttf")) {
-            UIFontMDI = Font.createFont(Font.TRUETYPE_FONT, is);
-            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(UIFontMDI);
+            uiFontMDI = Font.createFont(Font.TRUETYPE_FONT, is);
+            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(uiFontMDI);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -124,17 +124,17 @@ public class UIGlobals {
         }
     }
 
-    public static Font UIFont;
-    public static Font UIFontBold;
+    public static Font uiFont;
+    public static Font uiFontBold;
 
-    public static Font UIFontSmall;
-    public static Font UIFontSmallBold;
+    public static Font uiFontSmall;
+    public static Font uiFontSmallBold;
 
-    public static Font UIFontMono;
-    public static Font UIFontMonoSmall;
+    public static Font uiFontMono;
+    public static Font uiFontMonoSmall;
 
-    public static Font UIFontMDI;
-    public static Font UIFontRoboto;
+    public static Font uiFontMDI;
+    public static Font uiFontRoboto;
 
     public static Cursor openHandCursor;
     public static Cursor closedHandCursor;

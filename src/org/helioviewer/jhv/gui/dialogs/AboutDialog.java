@@ -65,10 +65,11 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
 
     @Override
     public JComponent createBannerPanel() {
-        int fontSize = UIGlobals.UIFont.getSize();
-        String text = "<center><b><span style='font-size:" + (fontSize + 3) + "pt'>" + JHVGlobals.programName + "</span><br/>" +
+        int delta = 3;
+        int fontSize = UIGlobals.uiFont.getSize();
+        String text = "<center><b><span style='font-size:" + (fontSize + delta) + "pt'>" + JHVGlobals.programName + "</span><br/>" +
                 "Version " + JHVGlobals.version + '.' + JHVGlobals.revision + "</b><br/>" +
-                "<span style='font-size:" + (fontSize - 3) + "pt'>" + JHVGlobals.versionDetail + "<br/>" + GLInfo.glVersion + "</span><br/><br/>" +
+                "<span style='font-size:" + (fontSize - delta) + "pt'>" + JHVGlobals.versionDetail + "<br/>" + GLInfo.glVersion + "</span><br/><br/>" +
                 "©2018 <a href='http://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br/>" +
                 "Part of the ESA/NASA Helioviewer Project<br/>" +
                 "Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)<br/><br/>" +

@@ -104,7 +104,7 @@ public class JHelioviewer {
         }
 
         EventQueue.invokeLater(() -> {
-            UIGlobals.setUIFont(UIGlobals.UIFont);
+            UIGlobals.setUIFont(UIGlobals.uiFont);
 
             Log.info("Start main window");
             ExitHooks.attach();
