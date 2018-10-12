@@ -100,7 +100,7 @@ public class MenuBar extends JMenuBar {
         helpMenu.add(new OpenURLinBrowserAction("Open Website", "http://www.jhelioviewer.org"));
         helpMenu.add(new CheckUpdateAction());
         helpMenu.addSeparator();
-        helpMenu.add(new OpenURLinBrowserAction("Report a Bug/Feature Request", "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues"));
+        helpMenu.add(new OpenURLinBrowserAction("Report Bug/Request Feature", "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues"));
 
         add(helpMenu);
     }

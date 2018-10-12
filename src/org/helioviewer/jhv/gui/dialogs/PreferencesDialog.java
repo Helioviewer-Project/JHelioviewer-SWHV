@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -124,58 +123,61 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
     }
 
     private JPanel createParametersPanel() {
-        JPanel row1 = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        row1.add(new JLabel("Preferred server", JLabel.RIGHT));
+        JPanel settings = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH;
 
+        c.gridx = 0;
+        c.gridy = 0;
+        settings.add(new JLabel("Preferred server:", JLabel.RIGHT), c);
+
+        c.gridx = 1;
+        c.gridy = 0;
         JComboBox<String> combo = new JComboBox<>(DataSources.getServers().toArray(new String[0]));
         combo.setSelectedItem(Settings.getProperty("default.server"));
         combo.addActionListener(e -> Settings.setProperty("default.server", (String) Objects.requireNonNull(combo.getSelectedItem())));
-        row1.add(combo);
+        settings.add(combo, c);
 
-        JPanel row2 = new JPanel(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-
-        c.anchor = GridBagConstraints.BASELINE_TRAILING;
-        c.gridx = 0;
-        c.gridy = 0;
-        row2.add(new JLabel("At start-up", JLabel.RIGHT), c);
-
-        c.anchor = GridBagConstraints.BASELINE_LEADING;
-        c.gridx = 1;
-        defaultMovie = new JCheckBox("Load default movie", Boolean.parseBoolean(Settings.getProperty("startup.loadmovie")));
-        row2.add(defaultMovie, c);
-
-        c.gridx = 2;
-        sampHub = new JCheckBox("Load SAMP hub", Boolean.parseBoolean(Settings.getProperty("startup.sampHub")));
-        row2.add(sampHub, c);
-
-        c.anchor = GridBagConstraints.BASELINE_TRAILING;
         c.gridx = 0;
         c.gridy = 1;
-        row2.add(new JLabel("Normalize (after restart)", JLabel.RIGHT), c);
+        settings.add(new JLabel("At start-up:", JLabel.RIGHT), c);
 
-        c.anchor = GridBagConstraints.BASELINE_LEADING;
         c.gridx = 1;
+        c.gridy = 1;
+        defaultMovie = new JCheckBox("Load default movie", Boolean.parseBoolean(Settings.getProperty("startup.loadmovie")));
+        settings.add(defaultMovie, c);
+
+        c.gridx = 1;
+        c.gridy = 2;
+        sampHub = new JCheckBox("Load SAMP hub", Boolean.parseBoolean(Settings.getProperty("startup.sampHub")));
+        settings.add(sampHub, c);
+
+        c.gridx = 0;
+        c.gridy = 3;
+        settings.add(new JLabel("Normalize (after restart):", JLabel.RIGHT), c);
+
+        c.gridx = 1;
+        c.gridy = 3;
         normalizeRadius = new JCheckBox("Solar radius", Boolean.parseBoolean(Settings.getProperty("display.normalize")));
-        row2.add(normalizeRadius, c);
+        settings.add(normalizeRadius, c);
 
-        c.gridx = 2;
+        c.gridx = 1;
+        c.gridy = 4;
         normalizeAIA = new JCheckBox("SDO/AIA brightness", Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA")));
-        row2.add(normalizeAIA, c);
+        settings.add(normalizeAIA, c);
 
-        JPanel row3 = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        JPanel cache = new JPanel(new FlowLayout(FlowLayout.LEADING));
         JButton clearCache = new JButton("Clear Cache");
         clearCache.addActionListener(e -> {
             JPIPCacheManager.clear();
             setLabelCache();
         });
-        row3.add(labelCache);
-        row3.add(clearCache);
+        cache.add(labelCache);
+        cache.add(clearCache);
 
-        JPanel paramsPanel = new JPanel(new GridLayout(0, 1));
-        paramsPanel.add(row1);
-        paramsPanel.add(row2);
-        paramsPanel.add(row3);
+        JPanel paramsPanel = new JPanel(new BorderLayout());
+        paramsPanel.add(settings, BorderLayout.PAGE_START);
+        paramsPanel.add(cache, BorderLayout.PAGE_END);
 
         return paramsPanel;
     }
