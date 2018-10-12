@@ -20,8 +20,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.events.gui.filter.FilterDialog;
 import org.helioviewer.jhv.gui.ComponentUtils;
-
-import com.jidesoft.swing.JideButton;
+import org.helioviewer.jhv.gui.components.base.JHVButton;
 
 @SuppressWarnings("serial")
 class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
@@ -81,7 +80,7 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
 
         FilterDialog filterDialog = element.getFilterDialog();
         if (filterDialog != null) {
-            JideButton filterButton = new JideButton("Filter");
+            JHVButton filterButton = new JHVButton("Filter");
             filterButton.addActionListener(e -> filterDialog.setVisible(true));
             filterButton.addMouseListener(new FilterMouseAdapter(filterDialog));
             leaf.add(filterButton, BorderLayout.LINE_END);

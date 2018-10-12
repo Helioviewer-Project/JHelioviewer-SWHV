@@ -21,13 +21,12 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.Buttons;
+import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
 import org.helioviewer.jhv.math.MathUtils;
 import org.json.JSONObject;
-
-import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
 class ViewpointLayerOptions extends JPanel implements TimespanListener {
@@ -116,7 +115,7 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
             modeGroup.add(radio);
         }
 
-        JideButton info = new JideButton(Buttons.info);
+        JHVButton info = new JHVButton(Buttons.info);
         info.setToolTipText("Show viewpoint info");
         info.addActionListener(e -> new TextDialog("Viewpoint options information", explanation, false).showDialog());
         radioPanel.add(info);

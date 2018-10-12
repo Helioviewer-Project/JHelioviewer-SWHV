@@ -10,9 +10,8 @@ import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.base.lut.LUTComboBox;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.Buttons;
+import org.helioviewer.jhv.gui.components.base.JHVToggleButton;
 import org.helioviewer.jhv.layers.ImageLayer;
-
-import com.jidesoft.swing.JideToggleButton;
 
 public class LUTPanel implements FilterDetails {
 
@@ -21,7 +20,7 @@ public class LUTPanel implements FilterDetails {
 
     public LUTPanel(ImageLayer layer) {
         lutCombo = new LUTComboBox();
-        JideToggleButton invertButton = new JideToggleButton(Buttons.invert, layer.getGLImage().getInvertLUT());
+        JHVToggleButton invertButton = new JHVToggleButton(Buttons.invert, layer.getGLImage().getInvertLUT());
         invertButton.setToolTipText("Invert color table");
 
         ActionListener listener = e -> {
@@ -31,7 +30,7 @@ public class LUTPanel implements FilterDetails {
         lutCombo.addActionListener(listener);
         invertButton.addActionListener(listener);
 
-        JideToggleButton enhanceButton = new JideToggleButton(Buttons.corona, layer.getGLImage().getEnhanced());
+        JHVToggleButton enhanceButton = new JHVToggleButton(Buttons.corona, layer.getGLImage().getEnhanced());
         enhanceButton.setToolTipText("Enhance off-disk corona");
         enhanceButton.addActionListener(e -> {
             layer.getGLImage().setEnhanced(enhanceButton.isSelected());
