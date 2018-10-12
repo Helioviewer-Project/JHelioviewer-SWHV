@@ -21,16 +21,15 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
+import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.time.TimeUtils;
 
-import com.jidesoft.swing.JideButton;
-
-/**
+/*
  * This component allows to select a date. There are 3 different views:
  * 1. All days of a month are displayed corresponding to the weekdays,
  * 2. All month of a year are displayed,
  * 3. A period of 12 years is displayed.
- * <p>
+ *
  * This component acts as a subcomponent of the {@link JHVCalendarDatePicker}
  * too. It represents the content of the popup window of the
  * JHVCalendarDatePicker.
@@ -142,11 +141,11 @@ class JHVCalendar extends JPanel {
      */
     private class NavigationPanel extends JPanel implements ActionListener {
 
-        private final JideButton quickForwardButton = new JideButton(">>");
-        private final JideButton quickBackButton = new JideButton("<<");
-        private final JideButton forwardButton = new JideButton(">");
-        private final JideButton backButton = new JideButton("<");
-        private final JideButton selectButton = new JideButton();
+        private final JHVButton quickForwardButton = new JHVButton(">>");
+        private final JHVButton quickBackButton = new JHVButton("<<");
+        private final JHVButton forwardButton = new JHVButton(">");
+        private final JHVButton backButton = new JHVButton("<");
+        private final JHVButton selectButton = new JHVButton();
 
         NavigationPanel() {
             setLayout(new BorderLayout());
@@ -434,7 +433,7 @@ class JHVCalendar extends JPanel {
             // set basic layout
             setLayout(new FlowLayout(FlowLayout.CENTER, 2, 2));
             // set up button
-            JideButton dateButton = new JideButton("Today is " + dateFormat.format(new Date()));
+            JHVButton dateButton = new JHVButton("Today is " + dateFormat.format(new Date()));
             // set the calendar component to the current date
             dateButton.addActionListener(e -> {
                 changeDisplayMode(DisplayMode.DAYS);

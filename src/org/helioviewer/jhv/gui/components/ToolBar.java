@@ -28,11 +28,12 @@ import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.jhv.gui.actions.ZoomInAction;
 import org.helioviewer.jhv.gui.actions.ZoomOneToOneAction;
 import org.helioviewer.jhv.gui.actions.ZoomOutAction;
+import org.helioviewer.jhv.gui.components.base.JHVButton;
+import org.helioviewer.jhv.gui.components.base.JHVToggleButton;
 import org.helioviewer.jhv.io.SampClient;
 import org.helioviewer.jhv.layers.ImageLayers;
 
 import com.jidesoft.swing.JideButton;
-import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
 public class ToolBar extends JToolBar {
@@ -90,14 +91,14 @@ public class ToolBar extends JToolBar {
 
 //  private final LinkedHashMap<ButtonText, ActionListener> pluginButtons = new LinkedHashMap<>();
 
-    private static JideButton toolButton(ButtonText text) {
-        JideButton b = new JideButton(text.toString());
+    private static JHVButton toolButton(ButtonText text) {
+        JHVButton b = new JHVButton(text.toString());
         b.setToolTipText(text.tip);
         return b;
     }
 
-    private static JideToggleButton toolToggleButton(ButtonText text) {
-        JideToggleButton b = new JideToggleButton(text.toString());
+    private static JHVToggleButton toolToggleButton(ButtonText text) {
+        JHVToggleButton b = new JHVToggleButton(text.toString());
         b.setToolTipText(text.tip);
         return b;
     }
@@ -126,19 +127,19 @@ public class ToolBar extends JToolBar {
         setDisplayMode(displayMode);
     }
 
-    private JideToggleButton multiviewButton;
-    private JideToggleButton coronaButton;
-    private JideToggleButton trackingButton;
+    private JHVToggleButton multiviewButton;
+    private JHVToggleButton coronaButton;
+    private JHVToggleButton trackingButton;
 
-    public JideToggleButton getMultiviewButton() {
+    public JHVToggleButton getMultiviewButton() {
         return multiviewButton;
     }
 
-    public JideToggleButton getShowCoronaButton() {
+    public JHVToggleButton getShowCoronaButton() {
         return coronaButton;
     }
 
-    public JideToggleButton getTrackingButton() {
+    public JHVToggleButton getTrackingButton() {
         return trackingButton;
     }
 
@@ -152,15 +153,15 @@ public class ToolBar extends JToolBar {
         Dimension dim = new Dimension(32, 32);
 
         // Zoom
-        JideButton zoomIn = toolButton(ZOOMIN);
+        JHVButton zoomIn = toolButton(ZOOMIN);
         zoomIn.addActionListener(new ZoomInAction());
-        JideButton zoomOut = toolButton(ZOOMOUT);
+        JHVButton zoomOut = toolButton(ZOOMOUT);
         zoomOut.addActionListener(new ZoomOutAction());
-        JideButton zoomFit = toolButton(ZOOMFIT);
+        JHVButton zoomFit = toolButton(ZOOMFIT);
         zoomFit.addActionListener(new ZoomFitAction());
-        JideButton zoomOne = toolButton(ZOOMONE);
+        JHVButton zoomOne = toolButton(ZOOMONE);
         zoomOne.addActionListener(new ZoomOneToOneAction());
-        JideButton resetCamera = toolButton(RESETCAMERA);
+        JHVButton resetCamera = toolButton(RESETCAMERA);
         resetCamera.addActionListener(new ResetCameraAction());
 
         addButton(zoomIn);
@@ -174,13 +175,13 @@ public class ToolBar extends JToolBar {
         // Interaction
         ButtonGroup group = new ButtonGroup();
 
-        JideToggleButton pan = toolToggleButton(PAN);
+        JHVToggleButton pan = toolToggleButton(PAN);
         pan.addActionListener(e -> setActiveInteractionMode(InteractionMode.PAN));
-        JideToggleButton rotate = toolToggleButton(ROTATE);
+        JHVToggleButton rotate = toolToggleButton(ROTATE);
         rotate.addActionListener(e -> setActiveInteractionMode(InteractionMode.ROTATE));
-        JideToggleButton axis = toolToggleButton(AXIS);
+        JHVToggleButton axis = toolToggleButton(AXIS);
         axis.addActionListener(e -> setActiveInteractionMode(InteractionMode.AXIS));
-        JideToggleButton annotate = toolToggleButton(ANNOTATE);
+        JHVToggleButton annotate = toolToggleButton(ANNOTATE);
         annotate.addActionListener(e -> setActiveInteractionMode(InteractionMode.ANNOTATE));
 
         group.add(pan);
@@ -256,7 +257,7 @@ public class ToolBar extends JToolBar {
         });
         addButton(multiviewButton);
 
-        JideButton projectionButton = toolButton(PROJECTION);
+        JHVButton projectionButton = toolButton(PROJECTION);
         addButton(projectionButton);
 
         JPopupMenu projectionPopup = new JPopupMenu();
@@ -276,12 +277,12 @@ public class ToolBar extends JToolBar {
 
         add(new JToolBar.Separator(dim));
 
-        JideButton cutOut = toolButton(CUTOUT);
+        JHVButton cutOut = toolButton(CUTOUT);
         cutOut.addActionListener(new SDOCutOutAction());
         addButton(cutOut);
 
         if (Boolean.parseBoolean(Settings.getProperty("startup.sampHub"))) {
-            JideButton samp = toolButton(SAMP);
+            JHVButton samp = toolButton(SAMP);
             samp.addActionListener(e -> SampClient.notifyRequestData());
             addButton(samp);
         }
@@ -290,7 +291,7 @@ public class ToolBar extends JToolBar {
 
 /*
         for (Map.Entry<ButtonText, ActionListener> entry : pluginButtons.entrySet()) {
-            JideButton b = toolButton(entry.getKey());
+            JHVButton b = toolButton(entry.getKey());
             b.addActionListener(entry.getValue());
             addButton(b);
         }

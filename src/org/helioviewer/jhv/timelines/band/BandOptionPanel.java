@@ -20,14 +20,13 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.Buttons;
+import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineSettings;
 import org.helioviewer.jhv.timelines.propagation.PropagationModelRadial;
 import org.json.JSONObject;
-
-import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
 class BandOptionPanel extends JPanel {
@@ -62,7 +61,7 @@ class BandOptionPanel extends JPanel {
 
         c.gridx = 2;
         c.anchor = GridBagConstraints.EAST;
-        JideButton downloadButton = new JideButton(Buttons.download);
+        JHVButton downloadButton = new JHVButton(Buttons.download);
         downloadButton.setToolTipText("Download selected layer");
         downloadButton.addActionListener(e -> {
             String fileName = JHVDirectory.REMOTEFILES.getPath() + band.getBandType().getName() + "__" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".json";

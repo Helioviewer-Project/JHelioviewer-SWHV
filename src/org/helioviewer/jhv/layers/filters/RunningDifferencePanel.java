@@ -14,16 +14,15 @@ import javax.swing.JRadioButton;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.CircularProgressUI;
+import org.helioviewer.jhv.gui.components.base.JHVButton;
+import org.helioviewer.jhv.gui.components.base.JHVToggleButton;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.opengl.GLImage;
 
-import com.jidesoft.swing.JideButton;
-import com.jidesoft.swing.JideToggleButton;
-
 public class RunningDifferencePanel implements FilterDetails {
 
-    private final JideToggleButton downloadButton = new JideToggleButton(Buttons.download);
+    private final JHVToggleButton downloadButton = new JHVToggleButton(Buttons.download);
     private final JProgressBar progressBar = new JProgressBar();
     private final JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
     private final JPanel buttonPanel = new JPanel();
@@ -43,7 +42,7 @@ public class RunningDifferencePanel implements FilterDetails {
         }
 
         MetaDataDialog metaDialog = new MetaDataDialog();
-        JideButton metaButton = new JideButton(Buttons.info);
+        JHVButton metaButton = new JHVButton(Buttons.info);
         metaButton.setToolTipText("Show metadata of selected layer");
         metaButton.addActionListener(e -> {
             metaDialog.setMetaData(layer);

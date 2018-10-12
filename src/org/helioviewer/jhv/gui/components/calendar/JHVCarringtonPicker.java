@@ -14,17 +14,16 @@ import javax.swing.Popup;
 import javax.swing.PopupFactory;
 
 import org.helioviewer.jhv.astronomy.Carrington;
+import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
-
-import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
 public class JHVCarringtonPicker extends JPanel {
 
     private final HashSet<JHVCalendarListener> listeners = new HashSet<>();
 
-    private final JideButton crPopupButton = new JideButton("CR");
+    private final JHVButton crPopupButton = new JHVButton("CR");
     private final JHVCarrington carringtonPanel = new JHVCarrington();
     private Popup crPopup = null;
     private long time;
