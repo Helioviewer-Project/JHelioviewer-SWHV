@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Properties;
 
 import javax.swing.BorderFactory;
@@ -128,7 +127,6 @@ class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
             System.err.println("Runtime exception");
             System.err.println(stackTrace);
             msg += "Uncaught Exception in " + JHVGlobals.userAgent;
-            msg += "\nDate: " + new Date();
             msg += "\nThread: " + t;
             msg += "\nMessage: " + e.getMessage();
             msg += "\nStacktrace:\n";
