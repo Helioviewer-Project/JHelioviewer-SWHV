@@ -239,7 +239,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private static void drawHorizontalLabels(Graphics2D g, Rectangle graphArea, TimeAxis xAxis, int ht, TimelineLayer tl) {
-        Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(xAxis.start()), g);
+        String tickText = TimeUtils.format(DrawConstants.FULL_DATE_TIME_FORMAT, xAxis.start());
+        Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(tickText, g);
         int tickTextWidth = (int) tickTextBounds.getWidth();
         int tickTextHeight = (int) tickTextBounds.getHeight() + ht * DrawConstants.GRAPH_BOTTOM_AXIS_SPACE;
         int horizontalTickCount = Math.max(2, (graphArea.width - tickTextWidth * 2) / tickTextWidth);
@@ -261,17 +262,16 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             }
 
             int x = value2pixel(graphArea.x, graphArea.width, tickValue, start, end);
-            String tickText;
             if (previousDate == Long.MIN_VALUE) {
-                tickText = DrawConstants.FULL_DATE_TIME_FORMAT_REVERSE.format(tickValue);
+                tickText = TimeUtils.format(DrawConstants.FULL_DATE_TIME_FORMAT_REVERSE, tickValue);
             } else {
                 long tickDayNumber = tickValue / TimeUtils.DAY_IN_MILLIS;
                 long prevDayNumber = previousDate / TimeUtils.DAY_IN_MILLIS;
 
                 if (tickDayNumber == prevDayNumber) {
-                    tickText = DrawConstants.HOUR_TIME_FORMAT.format(tickValue);
+                    tickText = TimeUtils.format(DrawConstants.HOUR_TIME_FORMAT, tickValue);
                 } else {
-                    tickText = DrawConstants.FULL_DATE_TIME_FORMAT_REVERSE.format(tickValue);
+                    tickText = TimeUtils.format(DrawConstants.FULL_DATE_TIME_FORMAT_REVERSE, tickValue);
                 }
             }
 
