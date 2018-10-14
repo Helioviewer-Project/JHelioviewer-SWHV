@@ -20,7 +20,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         super(jo);
     }
 
-    private static void drawRectangle(Camera camera, Viewport vp, Vec3 bp, Vec3 ep, Buf buf, byte[] color) {
+    private static void drawRectangle(Position viewpoint, Viewport vp, Vec3 bp, Vec3 ep, Buf buf, byte[] color) {
         if (bp.z * ep.z < 0) {
             if (ep.z < bp.z && bp.z > Math.PI / 2)
                 ep.z += 2 * Math.PI;
@@ -31,8 +31,6 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         Vec3 p2 = new Vec3(radius, ep.y, bp.z);
         Vec3 p4 = new Vec3(radius, bp.y, ep.z);
         Vec3 point1, point2;
-
-        Position viewpoint = camera.getViewpoint();
         Vec2 previous = null;
 
         point1 = bp;
@@ -97,7 +95,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, boolean active, Buf buf) {
+    public void render(Position viewpoint, Viewport vp, boolean active, Buf buf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
@@ -106,7 +104,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
 
-        drawRectangle(camera, vp, toSpherical(p0), toSpherical(p1), buf, color);
+        drawRectangle(viewpoint, vp, toSpherical(p0), toSpherical(p1), buf, color);
     }
 
     @Override

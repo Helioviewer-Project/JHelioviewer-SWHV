@@ -12,6 +12,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.position.Position;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -69,11 +70,11 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, boolean active, Buf buf) {
+    public void render(Position viewpoint, Viewport vp, boolean active, Buf buf) {
     }
 
     @Override
-    public void renderTransformed(Camera camera, boolean active, Buf lineBuf, Buf centerBuf) {
+    public void renderTransformed(Position viewpoint, boolean active, Buf lineBuf, Buf centerBuf) {
     }
 
     @Override

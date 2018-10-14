@@ -20,7 +20,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
         super(jo);
     }
 
-    private static void drawCircle(Camera camera, Viewport vp, Vec3 bp, Vec3 ep, Buf buf, byte[] color) {
+    private static void drawCircle(Position viewpoint, Viewport vp, Vec3 bp, Vec3 ep, Buf buf, byte[] color) {
         double cosf = Vec3.dot(bp, ep);
         double r = Math.sqrt(1 - cosf * cosf);
         // P = center + r cos(A) (bp x ep) + r sin(A) ep
@@ -30,7 +30,6 @@ public class AnnotateCircle extends AbstractAnnotateable {
         u.normalize();
         Vec3 v = Vec3.cross(bp, u);
 
-        Position viewpoint = camera.getViewpoint();
         Vec3 vx = new Vec3();
         Vec2 previous = null;
 
@@ -63,7 +62,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, boolean active, Buf buf) {
+    public void render(Position viewpoint, Viewport vp, boolean active, Buf buf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
@@ -72,7 +71,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
 
-        drawCircle(camera, vp, p0, p1, buf, color);
+        drawCircle(viewpoint, vp, p0, p1, buf, color);
     }
 
     @Override

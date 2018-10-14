@@ -14,6 +14,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
+import org.helioviewer.jhv.position.Position;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -71,21 +72,22 @@ public class InteractionAnnotate extends Interaction {
         if (newAnnotateable == null && anns.isEmpty())
             return;
 
+        Position viewpoint = camera.getViewpoint();
         Annotateable activeAnn = activeIndex >= 0 && activeIndex < anns.size() ? anns.get(activeIndex) : null;
 
         for (Annotateable ann : anns) {
-            ann.render(camera, vp, ann == activeAnn, annsBuf);
-            ann.renderTransformed(camera, ann == activeAnn, transBuf, centerBuf);
+            ann.render(viewpoint, vp, ann == activeAnn, annsBuf);
+            ann.renderTransformed(viewpoint, ann == activeAnn, transBuf, centerBuf);
         }
         if (newAnnotateable != null) {
-            newAnnotateable.render(camera, vp, false, annsBuf);
-            newAnnotateable.renderTransformed(camera, false, transBuf, centerBuf);
+            newAnnotateable.render(viewpoint, vp, false, annsBuf);
+            newAnnotateable.renderTransformed(viewpoint, false, transBuf, centerBuf);
         }
         annsLine.setData(gl, annsBuf);
         annsLine.render(gl, vp.aspect, LINEWIDTH);
 
         Transform.pushView();
-        Transform.rotateViewInverse(camera.getViewpoint().toQuat());
+        Transform.rotateViewInverse(viewpoint.toQuat());
         {
             transLine.setData(gl, transBuf);
             transLine.render(gl, vp.aspect, LINEWIDTH);

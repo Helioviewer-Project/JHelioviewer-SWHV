@@ -9,6 +9,7 @@ import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.FOVShape;
+import org.helioviewer.jhv.position.Position;
 import org.json.JSONObject;
 
 public class AnnotateFOV extends AbstractAnnotateable {
@@ -39,7 +40,7 @@ public class AnnotateFOV extends AbstractAnnotateable {
     }
 
     @Override
-    public void renderTransformed(Camera camera, boolean active, Buf lineBuf, Buf centerBuf) {
+    public void renderTransformed(Position viewpoint, boolean active, Buf lineBuf, Buf centerBuf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
@@ -49,13 +50,12 @@ public class AnnotateFOV extends AbstractAnnotateable {
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
         double dx = (p1.x - p0.x) / 2;
         double dy = (p1.y - p0.y) / 2;
-        double distance = camera.getViewpoint().distance;
 
         fov.setCenter(p0.x + dx, p0.y + dy);
-        fov.setTAngles(dx / distance, dy / distance);
+        fov.setTAngles(dx / viewpoint.distance, dy / viewpoint.distance);
 
         fov.putCenter(centerBuf, color);
-        fov.putLine(distance, lineBuf, color);
+        fov.putLine(viewpoint.distance, lineBuf, color);
     }
 
     @Override
