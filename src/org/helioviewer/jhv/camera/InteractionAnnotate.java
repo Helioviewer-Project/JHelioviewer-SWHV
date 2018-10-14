@@ -88,7 +88,6 @@ public class InteractionAnnotate extends Interaction {
 
         Transform.pushView();
         Transform.rotateViewInverse(viewpoint.toQuat());
-
         boolean far = Camera.useWideProjection(viewpoint.distance);
         if (far) {
             Transform.pushProjection();
@@ -105,7 +104,6 @@ public class InteractionAnnotate extends Interaction {
         if (far) {
             Transform.popProjection();
         }
-
         Transform.popView();
     }
 

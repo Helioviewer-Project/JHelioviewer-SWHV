@@ -12,13 +12,6 @@ public class FOVShape {
     private double centerX = 0;
     private double centerY = 0;
     private double centerZ = computeZ(centerX, centerY);
-    private double tanX;
-    private double tanY;
-
-    public void setTAngles(double _tanX, double _tanY) {
-        tanX = _tanX;
-        tanY = _tanY;
-    }
 
     public void setCenter(double _centerX, double _centerY) {
         centerX = _centerX;
@@ -35,10 +28,8 @@ public class FOVShape {
         return n > 0 ? epsilon + Math.sqrt(n) : epsilon;
     }
 
-    public void putLine(double distance, Buf buf, byte[] color) {
+    public void putLine(double bw, double bh, Buf buf, byte[] color) {
         double x, y, z;
-        double bw = distance * tanX;
-        double bh = distance * tanY;
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             x = -bw + 2 * bw / SUBDIVISIONS * i + centerX;
