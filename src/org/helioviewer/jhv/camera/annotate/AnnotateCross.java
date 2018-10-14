@@ -20,14 +20,13 @@ public class AnnotateCross extends AbstractAnnotateable {
         super(jo);
     }
 
-    private static void drawCross(Camera camera, Viewport vp, Vec3 bp, Buf buf, byte[] color) {
+    private static void drawCross(Position viewpoint, Viewport vp, Vec3 bp, Buf buf, byte[] color) {
         double delta = 2.5 * Math.PI / 180;
         Vec3 p1 = new Vec3(radius, bp.y + delta, bp.z);
         Vec3 p2 = new Vec3(radius, bp.y - delta, bp.z);
         Vec3 p3 = new Vec3(radius, bp.y, bp.z + delta);
         Vec3 p4 = new Vec3(radius, bp.y, bp.z - delta);
 
-        Position viewpoint = camera.getViewpoint();
         interpolatedDraw(viewpoint, vp, p1, p2, buf, color);
         interpolatedDraw(viewpoint, vp, p3, p4, buf, color);
     }
@@ -59,12 +58,12 @@ public class AnnotateCross extends AbstractAnnotateable {
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, boolean active, Buf buf) {
+    public void render(Position viewpoint, Viewport vp, boolean active, Buf buf) {
         if (startPoint == null)
             return;
 
         byte[] color = active ? activeColor : baseColor;
-        drawCross(camera, vp, toSpherical(startPoint), buf, color);
+        drawCross(viewpoint, vp, toSpherical(startPoint), buf, color);
     }
 
     @Override
