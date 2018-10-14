@@ -32,8 +32,8 @@ public class AnnotateFOV extends AbstractAnnotateable {
 
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
-        double dx = (p1.x - p0.x) / 2;
-        double dy = (p1.y - p0.y) / 2;
+        double dx = 0.5 * (p1.x - p0.x);
+        double dy = 0.5 * (p1.y - p0.y);
 
         camera.setCurrentTranslation(-(p0.x + dx), -(p0.y + dy));
         camera.setFOV(2 * Math.atan2(Math.sqrt(dx * dx + dy * dy), camera.getViewpoint().distance));
@@ -48,14 +48,12 @@ public class AnnotateFOV extends AbstractAnnotateable {
         byte[] color = dragged ? dragColor : (active ? activeColor : baseColor);
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
-        double dx = (p1.x - p0.x) / 2;
-        double dy = (p1.y - p0.y) / 2;
+        double dx = 0.5 * (p1.x - p0.x);
+        double dy = 0.5 * (p1.y - p0.y);
 
         fov.setCenter(p0.x + dx, p0.y + dy);
-        fov.setTAngles(dx / viewpoint.distance, dy / viewpoint.distance);
-
         fov.putCenter(centerBuf, color);
-        fov.putLine(viewpoint.distance, lineBuf, color);
+        fov.putLine(dx, dy, lineBuf, color);
     }
 
     @Override

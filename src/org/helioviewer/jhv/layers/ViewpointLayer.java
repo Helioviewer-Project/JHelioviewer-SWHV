@@ -65,24 +65,19 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         if (!isVisible[vp.idx])
             return;
 
-        double tan = Math.tan(optionsPanel.getFOVAngle()) / 2;
-        fov.setTAngles(tan, tan);
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
         Position viewpoint = camera.getViewpoint();
-
-        boolean far = Camera.useWideProjection(viewpoint.distance);
+        double halfSide = 0.5 * viewpoint.distance * Math.tan(optionsPanel.getFOVAngle());
 
         Transform.pushView();
         Transform.rotateViewInverse(viewpoint.toQuat());
+        boolean far = Camera.useWideProjection(viewpoint.distance);
+        if (far) {
+            Transform.pushProjection();
+            camera.projectionOrthoWide(vp.aspect);
+        }
 
-        if (!far)
-            fovRender(gl, vp, viewpoint.distance, pixFactor);
-
-        Transform.pushProjection();
-        camera.projectionOrthoWide(vp.aspect);
-
-        if (far)
-            fovRender(gl, vp, viewpoint.distance, pixFactor);
+        fovRender(gl, vp, halfSide, pixFactor);
 
         Collection<LoadPosition> loadPositions = camera.getUpdateViewpoint().getLoadPositions();
         if (!loadPositions.isEmpty()) {
@@ -91,16 +86,18 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             gl.glEnable(GL2.GL_DEPTH_TEST);
         }
 
-        Transform.popProjection();
+        if (far) {
+            Transform.popProjection();
+        }
         Transform.popView();
     }
 
-    private void fovRender(GL2 gl, Viewport vp, double distance, double pointFactor) {
+    private void fovRender(GL2 gl, Viewport vp, double halfSide, double pointFactor) {
         fov.putCenter(centerBuf, fovColor);
         center.setData(gl, centerBuf);
         center.renderPoints(gl, pointFactor);
 
-        fov.putLine(distance, fovBuf, fovColor);
+        fov.putLine(halfSide, halfSide, fovBuf, fovColor);
         fovLine.setData(gl, fovBuf);
         fovLine.render(gl, vp.aspect, LINEWIDTH_FOV);
     }
