@@ -88,14 +88,24 @@ public class InteractionAnnotate extends Interaction {
 
         Transform.pushView();
         Transform.rotateViewInverse(viewpoint.toQuat());
-        {
-            transLine.setData(gl, transBuf);
-            transLine.render(gl, vp.aspect, LINEWIDTH);
 
-            double pointFactor = CameraHelper.getPixelFactor(camera, vp) / 4;
-            center.setData(gl, centerBuf);
-            center.renderPoints(gl, pointFactor);
+        boolean far = Camera.useWideProjection(viewpoint.distance);
+        if (far) {
+            Transform.pushProjection();
+            camera.projectionOrthoWide(vp.aspect);
         }
+
+        transLine.setData(gl, transBuf);
+        transLine.render(gl, vp.aspect, LINEWIDTH);
+
+        double pixFactor = CameraHelper.getPixelFactor(camera, vp);
+        center.setData(gl, centerBuf);
+        center.renderPoints(gl, pixFactor);
+
+        if (far) {
+            Transform.popProjection();
+        }
+
         Transform.popView();
     }
 
