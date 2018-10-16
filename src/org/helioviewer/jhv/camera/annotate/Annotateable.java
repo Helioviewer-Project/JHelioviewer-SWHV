@@ -8,9 +8,9 @@ import org.json.JSONObject;
 
 public interface Annotateable {
 
-    void render(Position viewpoint, Viewport vp, boolean active, Buf buf);
+    void draw(Position viewpoint, Viewport vp, boolean active, Buf buf);
 
-    void renderTransformed(Position viewpoint, boolean active, Buf lineBuf, Buf centerBuf);
+    void drawTransformed(boolean active, Buf lineBuf, Buf centerBuf);
 
     void mousePressed(Camera camera, int x, int y);
 
