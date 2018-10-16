@@ -143,10 +143,6 @@ public class Camera {
         updateWidth();
     }
 
-    public double getFOV() {
-        return fov;
-    }
-
     public void setTrackingMode(boolean _tracking) {
         if (tracking != _tracking) {
             tracking = _tracking;

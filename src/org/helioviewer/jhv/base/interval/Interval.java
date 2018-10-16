@@ -18,12 +18,12 @@ public class Interval implements Comparable<Interval> {
         end = _end;
     }
 
-    public boolean containsInclusive(Interval other) {
-        return containsPointInclusive(other.start) && containsPointInclusive(other.end);
-    }
-
     public boolean containsPointInclusive(long time) {
         return time >= start && time <= end;
+    }
+/*
+    public boolean containsInclusive(Interval other) {
+        return containsPointInclusive(other.start) && containsPointInclusive(other.end);
     }
 
     public boolean overlaps(Interval otherInterval) {
@@ -34,11 +34,9 @@ public class Interval implements Comparable<Interval> {
         return containsPointInclusive(other.start) || containsPointInclusive(other.end) || other.containsPointInclusive(start) || other.containsPointInclusive(end);
     }
 
-    /**
-     * Returns the value that is as close as possible to the given value, but
-     * still contained in the interval. If the given value is outside the
-     * interval, the the interval's closest 'edge' is returned.
-     */
+    // Returns the value that is as close as possible to the given value, but
+    // still contained in the interval. If the given value is outside the
+    // interval, the the interval's closest 'edge' is returned.
     public long squeeze(long value) {
         if (containsPointInclusive(value)) {
             return value;
@@ -48,7 +46,7 @@ public class Interval implements Comparable<Interval> {
         }
         return end;
     }
-
+*/
     public static Interval makeCompleteDay(long start, long end) {
         long now = System.currentTimeMillis();
         if (end > now) {

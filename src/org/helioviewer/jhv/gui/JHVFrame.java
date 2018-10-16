@@ -60,7 +60,6 @@ public class JHVFrame {
 
     private static ZoomStatusPanel zoomStatus;
     private static CarringtonStatusPanel carringtonStatus;
-    private static FramerateStatusPanel framerateStatus;
 
     private static LayersPanel layersPanel;
     private static Layers layers;
@@ -119,7 +118,7 @@ public class JHVFrame {
 
         zoomStatus = new ZoomStatusPanel();
         carringtonStatus = new CarringtonStatusPanel();
-        framerateStatus = new FramerateStatusPanel();
+        FramerateStatusPanel framerateStatus = new FramerateStatusPanel();
         PositionStatusPanel positionStatus = new PositionStatusPanel();
         inputController.addPlugin(positionStatus);
 
@@ -214,10 +213,6 @@ public class JHVFrame {
 
     public static CarringtonStatusPanel getCarringtonStatusPanel() {
         return carringtonStatus;
-    }
-
-    public static FramerateStatusPanel getFramerateStatusPanel() {
-        return framerateStatus;
     }
 
     public static Layers getLayers() {

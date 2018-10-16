@@ -4,8 +4,6 @@ import org.json.JSONArray;
 
 public class Quat {
 
-    private static final double EPSILON = 0.000001;
-
     public static final Quat ZERO = new Quat();
 
     final double a;
