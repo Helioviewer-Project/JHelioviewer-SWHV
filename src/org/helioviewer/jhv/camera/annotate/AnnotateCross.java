@@ -58,7 +58,7 @@ public class AnnotateCross extends AbstractAnnotateable {
     }
 
     @Override
-    public void render(Position viewpoint, Viewport vp, boolean active, Buf buf) {
+    public void draw(Position viewpoint, Viewport vp, boolean active, Buf buf) {
         if (startPoint == null)
             return;
 

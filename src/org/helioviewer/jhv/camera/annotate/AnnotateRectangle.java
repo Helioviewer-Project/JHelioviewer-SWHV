@@ -95,7 +95,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
     }
 
     @Override
-    public void render(Position viewpoint, Viewport vp, boolean active, Buf buf) {
+    public void draw(Position viewpoint, Viewport vp, boolean active, Buf buf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;

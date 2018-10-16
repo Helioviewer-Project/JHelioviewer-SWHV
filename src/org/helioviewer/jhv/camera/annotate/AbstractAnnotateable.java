@@ -70,11 +70,11 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Override
-    public void render(Position viewpoint, Viewport vp, boolean active, Buf buf) {
+    public void draw(Position viewpoint, Viewport vp, boolean active, Buf buf) {
     }
 
     @Override
-    public void renderTransformed(Position viewpoint, boolean active, Buf lineBuf, Buf centerBuf) {
+    public void drawTransformed(boolean active, Buf lineBuf, Buf centerBuf) {
     }
 
     @Override

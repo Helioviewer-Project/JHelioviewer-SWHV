@@ -3,7 +3,6 @@ package org.helioviewer.jhv.camera;
 import java.util.ArrayList;
 
 import org.helioviewer.jhv.base.Buf;
-import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.annotate.AnnotateCircle;
 import org.helioviewer.jhv.camera.annotate.AnnotateCross;
 import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
@@ -76,12 +75,12 @@ public class InteractionAnnotate extends Interaction {
         Annotateable activeAnn = activeIndex >= 0 && activeIndex < anns.size() ? anns.get(activeIndex) : null;
 
         for (Annotateable ann : anns) {
-            ann.render(viewpoint, vp, ann == activeAnn, annsBuf);
-            ann.renderTransformed(viewpoint, ann == activeAnn, transBuf, centerBuf);
+            ann.draw(viewpoint, vp, ann == activeAnn, annsBuf);
+            ann.drawTransformed(ann == activeAnn, transBuf, centerBuf);
         }
         if (newAnnotateable != null) {
-            newAnnotateable.render(viewpoint, vp, false, annsBuf);
-            newAnnotateable.renderTransformed(viewpoint, false, transBuf, centerBuf);
+            newAnnotateable.draw(viewpoint, vp, false, annsBuf);
+            newAnnotateable.drawTransformed(false, transBuf, centerBuf);
         }
         annsLine.setData(gl, annsBuf);
         annsLine.render(gl, vp.aspect, LINEWIDTH);
