@@ -159,7 +159,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
     private static JComboBox<SpeedUnit> speedUnitComboBox;
     private static JComboBox<AnimationMode> animationModeComboBox;
 
-    private static final JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+    private static final JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
     private static final JPanel recordPanel = new JPanel(new GridBagLayout());
 
     private static MoviePanel instance;
@@ -218,7 +218,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
 
         JPanel secondLine = new JPanel(new BorderLayout());
         // Control buttons
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 1, 0));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 1, 0));
         int small = 18, big = 26;
 
         JideSplitButton shiftBackButton = new JideSplitButton(Buttons.skipBackward);
@@ -261,13 +261,13 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         advancedButton.addActionListener(e -> setAdvanced(!isAdvanced));
         buttonPanel.add(advancedButton);
 
-        secondLine.add(buttonPanel, BorderLayout.WEST);
+        secondLine.add(buttonPanel, BorderLayout.LINE_START);
 
         // Current frame number
         JLabel frameNumberLabel = new JLabel((timeSlider.getValue() + 1) + "/" + (timeSlider.getMaximum() + 1), JLabel.RIGHT);
         frameNumberLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         timeSlider.setLabel(frameNumberLabel);
-        secondLine.add(frameNumberLabel, BorderLayout.EAST);
+        secondLine.add(frameNumberLabel, BorderLayout.LINE_END);
 
         // Speed
         modePanel.add(new JLabel("Play", JLabel.RIGHT));
@@ -299,7 +299,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
 
         // Record
         GridBagConstraints c = new GridBagConstraints();
-        c.anchor = GridBagConstraints.WEST;
+        c.anchor = GridBagConstraints.LINE_START;
         c.weightx = 1;
         c.weighty = 1;
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -358,8 +358,8 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         syncButton.addActionListener(e -> syncLayersSpan());
 
         JPanel addLayerPanel = new JPanel(new BorderLayout());
-        addLayerPanel.add(addLayerButton, BorderLayout.WEST);
-        addLayerPanel.add(syncButton, BorderLayout.EAST);
+        addLayerPanel.add(addLayerButton, BorderLayout.LINE_START);
+        addLayerPanel.add(syncButton, BorderLayout.LINE_END);
         add(addLayerPanel);
 
         add(JHVFrame.getLayersPanel());

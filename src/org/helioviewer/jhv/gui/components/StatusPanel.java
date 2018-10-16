@@ -26,8 +26,8 @@ public class StatusPanel extends JPanel {
 
     }
 
-    private final JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-    private final JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    private final JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+    private final JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 
     public enum Alignment {
         LEFT, RIGHT
@@ -37,8 +37,8 @@ public class StatusPanel extends JPanel {
         super(new BorderLayout());
         setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
 
-        add(leftPanel, BorderLayout.WEST);
-        add(rightPanel, BorderLayout.EAST);
+        add(leftPanel, BorderLayout.LINE_START);
+        add(rightPanel, BorderLayout.LINE_END);
 
         if (leftMargin != 0) {
             JPanel spacer = new JPanel();

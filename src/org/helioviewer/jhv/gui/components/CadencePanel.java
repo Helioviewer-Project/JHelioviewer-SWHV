@@ -20,7 +20,7 @@ public class CadencePanel extends JPanel {
     private final JComboBox<String> comboUnit = new JComboBox<>(timeStepUnitStrings);
 
     public CadencePanel() {
-        setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 0));
+        setLayout(new FlowLayout(FlowLayout.TRAILING, 5, 0));
 
         setCadence(APIRequest.CADENCE_DEFAULT);
         spinnerCadence.setPreferredSize(new Dimension(50, spinnerCadence.getPreferredSize().height));

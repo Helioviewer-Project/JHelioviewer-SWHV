@@ -26,7 +26,7 @@ public class TimelineDataPanel extends JPanel {
         comboBoxGroup.addActionListener(e -> updateGroupValues());
 
         GridBagConstraints c = new GridBagConstraints();
-        c.anchor = GridBagConstraints.WEST;
+        c.anchor = GridBagConstraints.LINE_START;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1;
 

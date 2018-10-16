@@ -60,7 +60,7 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
         eventDescriptionConstraint.gridy = 0;
         eventDescriptionConstraint.weightx = 1;
         eventDescriptionConstraint.weighty = 0;
-        eventDescriptionConstraint.anchor = GridBagConstraints.WEST;
+        eventDescriptionConstraint.anchor = GridBagConstraints.LINE_START;
         eventDescriptionConstraint.fill = GridBagConstraints.BOTH;
 
         add(new EventDescriptionPanel(revent, event), eventDescriptionConstraint);
@@ -106,7 +106,7 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
         gc.gridy = 0;
         gc.fill = GridBagConstraints.BOTH;
         gc.weightx = 1;
-        gc.anchor = GridBagConstraints.NORTH;
+        gc.anchor = GridBagConstraints.PAGE_START;
         gc.weighty = standardParameters.isExpanded() ? 1 : 0;
         allTablePanel.add(standardParameters, gc);
 
@@ -140,7 +140,7 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
 
     private DataCollapsiblePanel createRelatedEventsCollapsiblePane(String relation, JHVRelatedEvents rEvents, ArrayList<JHVEvent> relations) {
         JPanel allPrecedingEvents = new JPanel();
-        allPrecedingEvents.setLayout(new BoxLayout(allPrecedingEvents, BoxLayout.Y_AXIS));
+        allPrecedingEvents.setLayout(new BoxLayout(allPrecedingEvents, BoxLayout.PAGE_AXIS));
         for (JHVEvent ev : relations) {
             allPrecedingEvents.add(createEventPanel(rEvents, ev));
         }
@@ -149,7 +149,7 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
 
     private DataCollapsiblePanel createOtherRelatedEventsCollapsiblePane(String relation, ArrayList<JHVRelatedEvents> rEvents) {
         JPanel allPrecedingEvents = new JPanel();
-        allPrecedingEvents.setLayout(new BoxLayout(allPrecedingEvents, BoxLayout.Y_AXIS));
+        allPrecedingEvents.setLayout(new BoxLayout(allPrecedingEvents, BoxLayout.PAGE_AXIS));
         for (JHVRelatedEvents rev : rEvents) {
             ArrayList<JHVEvent> evs = rev.getEvents();
             if (!evs.isEmpty()) {
@@ -182,7 +182,7 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
         c.fill = GridBagConstraints.NONE;
         c.weightx = 0;
         c.weighty = 0;
-        c.anchor = GridBagConstraints.EAST;
+        c.anchor = GridBagConstraints.LINE_END;
         eventAndButtonPanel.add(detailsButton, c);
 
         return eventAndButtonPanel;

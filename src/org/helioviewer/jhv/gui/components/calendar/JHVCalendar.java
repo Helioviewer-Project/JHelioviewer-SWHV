@@ -50,9 +50,9 @@ class JHVCalendar extends JPanel {
         setLayout(new BorderLayout());
         setMinimumSize(new Dimension(250, 200));
         // add sub components
-        add(navigationPanel, BorderLayout.NORTH);
+        add(navigationPanel, BorderLayout.PAGE_START);
         add(selectionPanel, BorderLayout.CENTER);
-        add(new BottomPanel(), BorderLayout.SOUTH);
+        add(new BottomPanel(), BorderLayout.PAGE_END);
         updateDateDisplay();
     }
 
@@ -139,20 +139,20 @@ class JHVCalendar extends JPanel {
         NavigationPanel() {
             setLayout(new BorderLayout());
 
-            JPanel forwardButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
+            JPanel forwardButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 2, 2));
             forwardButtonPanel.add(forwardButton);
             forwardButtonPanel.add(quickForwardButton);
 
             JPanel selectionButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 2, 2));
             selectionButtonPanel.add(selectButton);
 
-            JPanel backButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 2));
+            JPanel backButtonPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 2, 2));
             backButtonPanel.add(quickBackButton);
             backButtonPanel.add(backButton);
 
-            add(forwardButtonPanel, BorderLayout.EAST);
+            add(forwardButtonPanel, BorderLayout.LINE_END);
             add(selectionButtonPanel, BorderLayout.CENTER);
-            add(backButtonPanel, BorderLayout.WEST);
+            add(backButtonPanel, BorderLayout.LINE_START);
 
             quickForwardButton.addActionListener(this);
             quickBackButton.addActionListener(this);
@@ -287,14 +287,14 @@ class JHVCalendar extends JPanel {
             });
 
             // place table on form
-            JPanel headerPane = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 0));
+            JPanel headerPane = new JPanel(new FlowLayout(FlowLayout.LEADING, 2, 0));
             headerPane.add(table.getTableHeader());
 
-            JPanel tablePane = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 0));
+            JPanel tablePane = new JPanel(new FlowLayout(FlowLayout.LEADING, 2, 0));
             tablePane.add(table);
 
             contentPane = new JPanel();
-            contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+            contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
             contentPane.add(headerPane);
             contentPane.add(tablePane);

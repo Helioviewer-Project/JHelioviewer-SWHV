@@ -48,19 +48,19 @@ class PfssLayerOptions extends JPanel {
         c0.gridy = 0;
 
         c0.gridx = 0;
-        c0.anchor = GridBagConstraints.EAST;
+        c0.anchor = GridBagConstraints.LINE_END;
         add(new JLabel("Detail", JLabel.RIGHT), c0);
 
         c0.gridx = 1;
-        c0.anchor = GridBagConstraints.WEST;
+        c0.anchor = GridBagConstraints.LINE_START;
         add(levelSpinner, c0);
 
         c0.gridx = 2;
-        c0.anchor = GridBagConstraints.EAST;
+        c0.anchor = GridBagConstraints.LINE_END;
         add(new JLabel("Radius", JLabel.RIGHT), c0);
 
         c0.gridx = 3;
-        c0.anchor = GridBagConstraints.WEST;
+        c0.anchor = GridBagConstraints.LINE_START;
         add(radiusSpinner, c0);
 
         JCheckBox fixedColors = new JCheckBox("Fixed colors", fixedColor);
@@ -70,7 +70,7 @@ class PfssLayerOptions extends JPanel {
         });
 
         c0.gridx = 4;
-        c0.anchor = GridBagConstraints.WEST;
+        c0.anchor = GridBagConstraints.LINE_START;
         add(fixedColors, c0);
 
         JButton availabilityButton = new JButton("Available data");
@@ -78,7 +78,7 @@ class PfssLayerOptions extends JPanel {
         availabilityButton.addActionListener(e -> JHVGlobals.openURL(PfssSettings.availabilityURL));
 
         c0.gridy = 1;
-        c0.anchor = GridBagConstraints.WEST;
+        c0.anchor = GridBagConstraints.LINE_START;
         c0.gridx = 4;
         add(availabilityButton, c0);
 

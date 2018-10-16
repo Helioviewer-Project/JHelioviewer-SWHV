@@ -44,7 +44,7 @@ class GridLayerOptions extends JPanel {
         c0.gridy = 0;
 
         c0.gridx = 1;
-        c0.anchor = GridBagConstraints.EAST;
+        c0.anchor = GridBagConstraints.LINE_END;
         JCheckBox axis = new JCheckBox("Solar axis", grid.getShowAxis());
         axis.setHorizontalTextPosition(SwingConstants.LEFT);
         axis.addActionListener(e -> {
@@ -54,7 +54,7 @@ class GridLayerOptions extends JPanel {
         add(axis, c0);
 
         c0.gridx = 3;
-        c0.anchor = GridBagConstraints.EAST;
+        c0.anchor = GridBagConstraints.LINE_END;
         JCheckBox labels = new JCheckBox("Grid labels", grid.getShowLabels());
         labels.setHorizontalTextPosition(SwingConstants.LEFT);
         labels.addActionListener(e -> {
@@ -66,7 +66,7 @@ class GridLayerOptions extends JPanel {
         c0.gridy = 1;
 
         c0.gridx = 1;
-        c0.anchor = GridBagConstraints.EAST;
+        c0.anchor = GridBagConstraints.LINE_END;
         JCheckBox radial = new JCheckBox("Radial grid", grid.getShowRadial());
         radial.setHorizontalTextPosition(SwingConstants.LEFT);
         radial.addActionListener(e -> {
@@ -76,35 +76,35 @@ class GridLayerOptions extends JPanel {
         add(radial, c0);
 
         c0.gridx = 2;
-        c0.anchor = GridBagConstraints.EAST;
+        c0.anchor = GridBagConstraints.LINE_END;
         add(new JLabel("Grid type", JLabel.RIGHT), c0);
         c0.gridx = 3;
-        c0.anchor = GridBagConstraints.WEST;
+        c0.anchor = GridBagConstraints.LINE_START;
         createGridTypeBox();
         add(gridTypeBox, c0);
 
         c0.gridy = 2;
 
         c0.gridx = 0;
-        c0.anchor = GridBagConstraints.EAST;
+        c0.anchor = GridBagConstraints.LINE_END;
         add(new JLabel("Longitude", JLabel.RIGHT), c0);
 
         JFormattedTextField fx = ((JSpinner.DefaultEditor) gridResolutionXSpinner.getEditor()).getTextField();
         fx.setFormatterFactory(new TerminatedFormatterFactory("%.1f", "\u00B0", min, max));
 
         c0.gridx = 1;
-        c0.anchor = GridBagConstraints.WEST;
+        c0.anchor = GridBagConstraints.LINE_START;
         add(gridResolutionXSpinner, c0);
 
         c0.gridx = 2;
-        c0.anchor = GridBagConstraints.EAST;
+        c0.anchor = GridBagConstraints.LINE_END;
         add(new JLabel("Latitude", JLabel.RIGHT), c0);
 
         JFormattedTextField fy = ((JSpinner.DefaultEditor) gridResolutionYSpinner.getEditor()).getTextField();
         fy.setFormatterFactory(new TerminatedFormatterFactory("%.1f", "\u00B0", min, max));
 
         c0.gridx = 3;
-        c0.anchor = GridBagConstraints.WEST;
+        c0.anchor = GridBagConstraints.LINE_START;
         add(gridResolutionYSpinner, c0);
 
         ComponentUtils.smallVariant(this);

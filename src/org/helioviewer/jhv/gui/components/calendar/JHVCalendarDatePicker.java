@@ -72,7 +72,7 @@ public class JHVCalendarDatePicker extends JPanel {
             }
         });
 
-        add(calPopupButton, BorderLayout.EAST);
+        add(calPopupButton, BorderLayout.LINE_END);
         add(textField, BorderLayout.CENTER);
 
         jhvCalendar.setPreferredSize(jhvCalendar.getMinimumSize());

@@ -124,12 +124,12 @@ public class TimelinePanel extends JPanel {
         addLayerButton.addActionListener(e -> new NewLayerAction().actionPerformed(new ActionEvent(addLayerButton, 0, "")));
 
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
-        addLayerButtonWrapper.add(addLayerButton, BorderLayout.WEST);
-        addLayerButtonWrapper.add(DrawController.getOptionsPanel(), BorderLayout.EAST);
+        addLayerButtonWrapper.add(addLayerButton, BorderLayout.LINE_START);
+        addLayerButtonWrapper.add(DrawController.getOptionsPanel(), BorderLayout.LINE_END);
 
         JPanel jspContainer = new JPanel(new BorderLayout());
         jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
-        jspContainer.add(jsp, BorderLayout.SOUTH);
+        jspContainer.add(jsp, BorderLayout.PAGE_END);
         add(jspContainer, gc);
 
         grid.setTableHeader(null);

@@ -20,7 +20,7 @@ public class SWEKPlugin implements Plugin {
     private static final EventTimelineLayer etl = new EventTimelineLayer(null);
 
     public SWEKPlugin() {
-        swekPanel.setLayout(new BoxLayout(swekPanel, BoxLayout.Y_AXIS));
+        swekPanel.setLayout(new BoxLayout(swekPanel, BoxLayout.PAGE_AXIS));
         for (SWEKGroup group : SWEKConfig.load()) {
             swekPanel.add(new EventPanel(group));
         }
