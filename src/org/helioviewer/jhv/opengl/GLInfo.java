@@ -10,7 +10,6 @@ import com.jogamp.opengl.glu.GLU;
 public class GLInfo {
 
     public static final int GLSAMPLES = 4;
-    private static final String[] crashOptions = {"OK", "Crash"};
 
     public static final int[] pixelScale = {1, 1};
     public static final float[] pixelScaleFloat = {1, 1};
