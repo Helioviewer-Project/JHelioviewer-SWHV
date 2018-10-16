@@ -98,7 +98,7 @@ class EventDescriptionPanel extends JPanel implements MouseListener {
         GridBagConstraints shortPanelLabelConstraint = new GridBagConstraints();
         shortPanelLabelConstraint.weightx = 0;
         shortPanelLabelConstraint.weighty = 0;
-        shortPanelLabelConstraint.anchor = GridBagConstraints.NORTHWEST;
+        shortPanelLabelConstraint.anchor = GridBagConstraints.FIRST_LINE_START;
         shortPanelLabelConstraint.gridy = y;
 
         shortPanelLabelConstraint.gridx = 0;

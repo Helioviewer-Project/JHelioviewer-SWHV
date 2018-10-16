@@ -20,7 +20,7 @@ class PluginsList extends JPanel {
     private final TreeMap<String, PluginsListEntry> pluginsMap = new TreeMap<>();
 
     PluginsList() {
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
         for (PluginContainer plugin : PluginManager.getPlugins())
             pluginsMap.put(plugin.getName(), new PluginsListEntry(plugin, this));

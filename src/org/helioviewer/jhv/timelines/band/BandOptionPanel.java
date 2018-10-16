@@ -41,7 +41,7 @@ class BandOptionPanel extends JPanel {
         c.fill = GridBagConstraints.NONE;
 
         c.gridx = 0;
-        c.anchor = GridBagConstraints.WEST;
+        c.anchor = GridBagConstraints.LINE_START;
         JButton pickColor = new JButton("Line color");
         pickColor.setMargin(new Insets(0, 0, 0, 0));
         pickColor.setToolTipText("Change the color of the current line");
@@ -54,13 +54,13 @@ class BandOptionPanel extends JPanel {
         add(pickColor, c);
 
         c.gridx = 1;
-        c.anchor = GridBagConstraints.EAST;
+        c.anchor = GridBagConstraints.LINE_END;
         JButton availabilityButton = new JButton("Available data");
         availabilityButton.addActionListener(e -> JHVGlobals.openURL(TimelineSettings.availabilityURL + '#' + band.getBandType().getName()));
         add(availabilityButton, c);
 
         c.gridx = 2;
-        c.anchor = GridBagConstraints.EAST;
+        c.anchor = GridBagConstraints.LINE_END;
         JHVButton downloadButton = new JHVButton(Buttons.download);
         downloadButton.setToolTipText("Download selected layer");
         downloadButton.addActionListener(e -> {
@@ -79,7 +79,7 @@ class BandOptionPanel extends JPanel {
         add(downloadButton, c);
 
         c.gridx = 3;
-        c.anchor = GridBagConstraints.EAST;
+        c.anchor = GridBagConstraints.LINE_END;
         JFormattedTextField propagationField = new JFormattedTextField(new TerminatedFormatterFactory("%.3f", " km/s", 0, 299792.458));
         propagationField.setValue(0.);
         propagationField.setColumns(10);

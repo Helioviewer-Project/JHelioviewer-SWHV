@@ -118,13 +118,13 @@ public class TimestampLayer extends AbstractLayer {
         WheelSupport.installMouseWheelSupport(slider);
 
         GridBagConstraints c0 = new GridBagConstraints();
-        c0.anchor = GridBagConstraints.EAST;
+        c0.anchor = GridBagConstraints.LINE_END;
         c0.weightx = 1.;
         c0.weighty = 1.;
         c0.gridy = 0;
         c0.gridx = 0;
         panel.add(new JLabel("Size", JLabel.RIGHT), c0);
-        c0.anchor = GridBagConstraints.WEST;
+        c0.anchor = GridBagConstraints.LINE_START;
         c0.gridx = 1;
         panel.add(slider, c0);
 

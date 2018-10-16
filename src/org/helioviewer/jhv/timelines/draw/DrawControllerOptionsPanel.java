@@ -54,7 +54,7 @@ class DrawControllerOptionsPanel extends JPanel {
         });
 
         add(lockButton, BorderLayout.CENTER);
-        add(zoomCombo, BorderLayout.EAST);
+        add(zoomCombo, BorderLayout.LINE_END);
 
         ComponentUtils.smallVariant(this);
     }
