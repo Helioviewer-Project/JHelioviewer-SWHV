@@ -3,7 +3,7 @@ title: SWHV CCN2 Design Document
 subtitle: ROB-SWHV(7186)-DDF2 v1.3
 author: SWHV Team
 subject: Space Weather HelioViewer
-date: 2018-04-xx
+date: 2018-10-17
 geometry: margin=1in
 papersize: A4
 book: true
@@ -18,8 +18,9 @@ titlepage-color: "0088cc"
 titlepage-text-color: "ffffff"
 titlepage-rule-color: "ffffff"
 titlepage-rule-height: 5
+listings-disable-line-numbers: true
 logo: hvLogo.png
-logo-width: 45
+logo-width: 40
 ...
 \frenchspacing
 
@@ -37,7 +38,7 @@ logo-width: 45
 # Introduction
 
 +---------------------+------------------------------------------------------------------------------------------+
-|Contributing authors | Roman Bolzern (FHNW), Bram Bourgoignie (ROB), Bogdan Nicula (ROB), Freek Verstringe (ROB)|
+|Contributing authors | Roman Bolzern (FHNW), Bram Bourgoignie (ROB), Silvan Laube (FHNW), Bogdan Nicula (ROB), Freek Verstringe (ROB)|
 +---------------------+------------------------------------------------------------------------------------------+
 |Approved by          | Bogdan Nicula (ROB)                                                                      |
 +---------------------+------------------------------------------------------------------------------------------+
@@ -53,12 +54,12 @@ logo-width: 45
 +------------+--------------------------------------------------------------------+
 | 2018-04-04 | Version 1.2 (Clarify document structure, more server design notes) |
 +------------+--------------------------------------------------------------------+
-| 2018-04-xx | Version 1.3 (Complete JHelioviewer design notes)                   |
+| 2018-10-17 | Version 1.3 (Complete the sections about CCN2 work)                   |
 +------------+--------------------------------------------------------------------+
 
 ## Purpose & Scope
 
-This document (SWHV-DDF2) is the design study report of the work performed during the CCN2 phase of "Space Weather Helioviewer" project (Contract No. 4000107325/12/NL/AK, "High Performance Distributed Solar Imaging and Processing System" ESTEC/ITT AO/1-7186/12/NL/GLC). It focuses on the detailed explanation of the changes for several software components that need to be implemented or were already implemented by the time this document was made available for review.
+This document (SWHV-DDF2) is the design study report of the work performed during the CCN2 phase of "Space Weather Helioviewer" project (Contract No. 4000107325/12/NL/AK, "High Performance Distributed Solar Imaging and Processing System" ESTEC/ITT AO/1-7186/12/NL/GLC). It focuses on the detailed explanation of the changes for several software components.
 
 ## Applicable Documents
 
@@ -70,13 +71,15 @@ This document (SWHV-DDF2) is the design study report of the work performed durin
 
 # Work Logic
 
-The current system architecture is presented in Chapter 3, the interfaces of the JHelioviewer client are presented in Chapter 4, the current design of JHelioviewer is presented in Chapter 5, while the Chapter 6 presents the identified tasks for the CCN2 phase, together with a proposed implementation. For several tasks, at the time of the current version of this document (MS6), the work was already performed, therefore the present tense is used. For the work to be performed for the MS7, the future tense is used.
+In the following JHelioviewer and SWHV are used interchangeably. They refer to the Java client of the Helioviewer system available at <https://github.com/Helioviewer-Project/JHelioviewer-SWHV> and subject of this project. The term JHV3D refers to a similar software, outcome of SRE-SM/JHV3 "Time-Dependent 3-D Visualisation of Solar Data" project, available at <https://github.com/Helioviewer-Project/JHelioviewer>. A big part of the work performed during the CCN2 phase was merging of ideas from JHV3D into SWHV.
+
+The current system architecture is presented in Chapter 3, the interfaces of the JHelioviewer client are presented in Chapter 4, the current design of JHelioviewer is presented in Chapter 5, while the Chapter 6 presents the identified tasks for the CCN2 phase.
 
 Chapter 7 presents a traceability matrix for the tasks, as well as the assigned priority and the milestone for delivery. Features already delivered will be subjected to refinement and refactoring as new functionality becomes available in the client-server system.
 
 # System Architecture #
 
-The following figure depicts the architecture of the Helioviewer System as installed on the ROB server. For the purpose of this project, the focus is on the interaction between the JHelioviewer client and the Helioviewer server.
+The following figure depicts the architecture of the Helioviewer system as installed on the ROB server. For the purpose of this project, the focus is on the interaction between the JHelioviewer client and the Helioviewer server.
 
 ![Helioviewer system architecture][architecture]
 
@@ -86,12 +89,13 @@ The following servers are included:
 
 - HTTP server (e.g., Apache or `nginx`) to serve static files, to proxy HTTP requests, and to run various services:
   - Image services API (<https://github.com/Helioviewer-Project/api>): It lists the available image datasets and commands the creation of JPX movies on demand. It includes a facility to ingest new images files. Metadata about the image files is stored in a MySQL database.
-  - Timeline services API: This is an adapter brokering between the JHelioviewer client and the backend timeline storage services (ODI and STAFF backend -- <http://www.staff.oma.be>). It lists the available timeline datasets and serves the data in a JSON format.
+  - Timeline services API: This is an adapter brokering between the JHelioviewer client and the backend timeline storage services (ODI -- <http://lund.irf.se/odi/> and STAFF backend -- <http://www.staff.oma.be>). It lists the available timeline datasets and serves the data in a JSON format.
   - A PFSS dataset, static FITS files produced regularly out of GONG magnetograms. The JHelioviewer client retrieves them on demand, based on monthly listings (e.g., <http://swhv.oma.be/magtest/pfss/2018/01/list.txt>).
   - COMESEP service which subscribes to the COMESEP alert system (not part of this project), stores the alerts and makes them available to the JHelioviewer server in a JSON format.
   - The Helioviewer web client (<https://github.com/Helioviewer-Project/helioviewer.org>), not relevant for this project.
 - The `esajpip` server (<https://github.com/Helioviewer-Project/esajpip-SWHV>), which delivers the JPEG2000 data streams to the JHelioviewer client using the JPIP protocol, built on top of the HTTP network protocol.
 - The `GeometryService` server (<https://github.com/Helioviewer-Project/GeometryService>) implements a set of high precision celestial computation services based on NASA's Navigation and Ancillary Information Facility (NAIF) SPICE Toolkit and communicates with the JHelioviewer client using a JSON format.
+- The `PropagationService` server (<https://github.com/Helioviewer-Project/PropagationService>) is currently a mock-up server with the aim in aiding the correlation of in-situ data with remote sensing data.
 - The HEK server (maintained by LMSAL <https://www.lmsal.com/hek/>, not part of this project) which serves JSON formatted heliophysics events out of HER. JHelioviewer retrieves a curated list of space weather focused events.
 
 To ensure encapsulation, reproducibility, and full configuration control, the services which are part of this project are currently being containerized at <https://gitlab.com/SWHV/SWHV-COMBINED>.
@@ -112,6 +116,10 @@ The open-source alternative for the creation of JPEG2000 files is the `fits2img`
 
 While ingesting new datasets during the SWHV project, it became apparent that the metadata in the FITS headers of some datasets is lacking or is defective. A FITS-to-FITS conversion stage is needed for those datasets to adjust the metadata to the needs of the Helioviewer system. At <https://github.com/bogdanni/hv-HEP/blob/master/HEP-0010.md> there is a summary of those needs.
 
+The following new datasets were added in the course of the project: Kanzelhoehe H-alpha,  NSO-GONG farside, NSO-GONG H-alpha, NSO-GONG magnetogram, NSO-SOLIS Azimuth, NSO-SOLIS CoreFluxDens, NSO-SOLIS CoreWingInt, NSO-SOLIS FillFactor, NSO-SOLIS Inclination, NSO-SOLIS Intensity 1083Å, NSO-SOLIS Intensity 6302Å, NSO-SOLIS Strength, ROB-USET H-alpha.
+
+In addition, daily radio spectrograms are created from the Callisto network observations. The data files are downloaded from the e-Callisto network website and merged into a composite dataset in order to ensure good 24-hour coverage. The data values are calibrated to correct for instrument sensitivity in frequency and time. During this operation the values are also normalized and transformed to fit into fixed time and frequency bins, covering fixed time and frequency ranges. When multiple values contribute to one bin of the overall image, an average is taken as the final value. An averaging procedure was implemented in order to reduce the noise. It only involves approximately the highest 10% of the signal. This allows reducing the noise sufficiently, while still being able to have enough contrast. The data is written to a temporary FITS file with keywords indicating the frequency and time ranges, frequency and time bin sizes. The composite image is then transformed into a JPEG2000 image file (size 86400×380), one per day.
+
 ### JPEG2000 Files Handling ###
 
 The image data is encoded using the JPEG2000 coding standards. The JPEG2000 data consists of compressed data codestreams organized using *markers* according to a specific syntax, and several file formats, such as JP2 and JPX, which are organized using *boxes* encapsulating the codestreams of compressed image data organized in *packets* and the associated information.
@@ -120,7 +128,7 @@ In order to ensure the communication between the server and the client, the Heli
 
 The JPEG2000 standards have a high degree of sophistication and versatility. In order to encourage the proliferation of Helioviewer image datasets, it should be possible to generate those files with standard conforming software other than the proprietary Kakadu software currently used. It becomes therefore necessary to validate the full structure of Helioviewer image files formally and automatically. A verification system based on Schematron[^schematron] XML schemas was developed. This procedure is able to verify the structure of JPEG2000 file and codestream, including the associated information such as the Helioviewer specific XML metadata, ensuring the end-to-end compatibility with the Helioviewer system.
 
-Before the SWHV project, both the server and the client side software were derived from the Kakadu Software toolkit (<http://kakadusoftware.com>). Much of the server side usage of the Kakadu software can be now replaced with the `fits2img` and `hvJP2K` (<https://github.com/Helioviewer-Project/hvJP2K>) packages. If the server does not handle files produced by IDL, no server side use of Kakadu software is necessary.
+Before the SWHV project, both the server and the client-side software were derived from the Kakadu Software toolkit (<http://kakadusoftware.com>). Much of the server-side usage of the Kakadu software can be now replaced with the `fits2img` and `hvJP2K` (<https://github.com/Helioviewer-Project/hvJP2K>) packages. If the server does not handle files produced by IDL, no server side use of Kakadu software is necessary.
 
 `hvJP2K` consists in the following tools:
 
@@ -161,7 +169,7 @@ For the starting points on the photosphere, an equally spaced `theta`--`phi` gri
 
 The algorithm to compute the field lines uses an Adams–Bashforth explicit method (third order precision) that requires less evaluations of the vector field than the more commonly used fourth order precision Runge-Kutta methods. This is mainly done because the evaluation of the vector field at a given point is relatively slow.
 
-The resulting FITS files consist of `BINARY TABLE`s with four columns `FIELDLINEx`, `FIELDLINEy`, `FIELDLINEz`, `FIELDLINEs`. The first three are mapped to unsigned shorts and can be converted to Cartesian coordinates using the formula 3 × (value × 2 / 65535 − 1) (on the client side one needs to add 32768). The `FIELDLINEs` value encodes the strength and, by the sign, the radial direction of the field. This encoding was chosen for a compact representation.
+The resulting FITS files consist of `BINARY TABLE`s with four columns `FIELDLINEx`, `FIELDLINEy`, `FIELDLINEz`, `FIELDLINEs`. The first three are mapped to unsigned shorts and can be converted to Cartesian coordinates using the formula 3 × (value × 2 / 65535 - 1) (on the client side one needs to add 32768). The `FIELDLINEs` value encodes the strength and, by the sign, the radial direction of the field. This encoding was chosen for a compact representation.
 
 The field strength is mapped in the default JHelioviewer display as blue (negative radial) or red (positive radial); the lesser the color saturation, the weaker the field. In order to better see the direction of the field, points of the field lines beyond 2.4 solar radii have red or blue colors without blending with white.
 
@@ -229,17 +237,19 @@ The response is a JSON file with the keys:
 - `multiplier`: the multiplier that needs to be applied to the values;
 - `data`: a list of `[timestamp,value]` pairs. The values have to be multiplied by the `multiplier`.
 
-The `multiplier` parameter allows for sending scaled data to the client when necessary. The values of many datasets are rather small numbers when expressed in standard units like W/m^2, thus scaling them allows for more floating-point precision in the response to the client.
+The `multiplier` parameter allows for sending scaled data to the client when necessary. The values of many datasets are rather small numbers when expressed in standard units like W/m², thus scaling them allows for more floating-point precision in the response to the client.
 
 The timestamps are with respect to Unix epoch. There is a guarantee that the data is sent ordered by timestamp.
 
-The timeline API is implemented on the server side as several PHP scripts that forward the data requests to the relevant backend timeline storage service and format the JSON response for the JHelioviewer client.
+The timeline API is implemented on the server side as several PHP scripts that forward the data requests to the relevant backend timeline storage service and format the JSON response for the JHelioviewer client. The current backend services are based on ODI and STAFF.
 
 ## HEK Services API ##
 
 This API is described at <http://solar.stanford.edu/hekwiki/ApplicationProgrammingInterface>.
 
-## Geometry Services API ##
+A similar API was implemented for the COMESEP alert caching server.
+
+## GeometryService API ##
 
 The `GeometryService` is a REST network service which can return JSON and MessagePack (<https://msgpack.org>) encoded responses. For example, given the following request:
 
@@ -267,21 +277,45 @@ the server returns the following JSON response:
 }
 ```
 
-This is a list of UTC timestamps and coordinates indicating the geometric position of the camera (the STEREO Ahead spacecraft in this example). The first coordinate is the distance to Sun, the second and third coordinates are the Stonyhurst heliographic longitude and latitude of the given object. At the moment, the following locations are available: all JPL DE430 ephemeris locations (solar system planets, Pluto, the Moon), comet 67P/Churyumov-Gerasimenko. Also available are the following spacecraft trajectories (existing or planned): SOHO, STEREO, SDO, PROBA-2, PROBA-3, Solar Orbiter, Parker Solar Probe.
+This is a list of UTC timestamps and coordinates indicating the geometric position of the camera (the STEREO Ahead spacecraft in this example). The first coordinate is the distance to Sun, the second and third coordinates are the Stonyhurst heliographic longitude and latitude of the given object.
+
+At the moment, the following locations are available: all JPL DE430 ephemeris locations (solar system planets, Pluto, the Moon), comet 67P/Churyumov-Gerasimenko. Also available are the following spacecraft trajectories (existing or planned): SOHO, STEREO, SDO, PROBA-2, PROBA-3, Solar Orbiter, Parker Solar Probe. Several reference frames often used in the heliophysics domain are known.
 
 The following functions are implemented:
 
-- `position` and `state` (in km and km/s); representations (`kind`): `rectangular`, `latitudinal`, `radec`, `spherical`, `cylindrical`;
-- `transform` -- transform between several reference frames used in heliophysics; representations (`kind`): `matrix`, `angle` (Euler, rad), `quaternion`;
+- `position` and `state` (in km, km/s, and/or radian) of `target` relative to `observer` in `ref` reference frame, optionally corrected for `abcorr` (`NONE` - geometric, default, `LT`, `LT%2BS`, `CN`, `CN%2BS`, `XLT`, `XLT%2BS`, `XCN`, `XCN%2BS`, see SPICE documentation); representations (`kind`): `rectangular` (default), `latitudinal`, `radec`, `spherical`, `cylindrical`;
+
+- `transform` -- transform between `from_ref` reference frame and `to_ref` reference frame; representations (`kind`): `matrix` (default), `angle` (Euler, radian), `quaternion` (SPICE format);
+
 - `utc2scs` and `scs2utc` -- transform between UTC and spacecraft OBET (Solar Orbiter supported).
+
+Other arguments:
+
+- `utc` - start of time range
+- `utc_end` (optional) - end of time range
+- `deltat` (optional) - time step in seconds
 
 There is a guarantee that the data is sent ordered by UTC timestamps.
 
 This service is used to support the Viewpoint functionality of JHelioviewer.
 
+## PropagationService API ##
+
+The `PropagationService` is a REST network service which returns JSON encoded responses. It is currently just a mock-up and handles only the case of radial propagation with a fixed speed. It uses the `GeometryService`.
+
+The following function is implemented:
+
+- `propagate`
+    - Arguments:
+        - `name` (ignored) - quantity
+        - `utc` - start of time range
+        - `utc_end` (optional) - end of time range
+        - `deltat` (optional) - time step
+    - Returns: rectangular coordinates position of SOHO in HEEQ reference frame in km and fixed propagation speed of 1000km/s.
+
 ## SAMP ##
 
-The SAMP messages supported by JHelioviewer are:
+The incoming SAMP messages supported by JHelioviewer are:
 
 - `image.load.fits` -- specific FITS image;
 - `table.load.fits` -- only for ESA SOHO Science Archive tool, as JHelioviewer does not support FITS tables yet;
@@ -292,19 +326,387 @@ The SAMP messages supported by JHelioviewer are:
 
 Those messages have as parameter an URI to load. Both local and remote URIs are supported. An example of SAMP Web Profile usage is at <http://swhv.oma.be/test/samp/>.
 
+In addition, JHelioviewer can broadcast information about the loaded image layers. Two clients of this functionality use the information to load the corresponding science data from virtual solar observatories into the SolarSoft and SunPy environments. They are available in the source tree in the directories `extra/samp/idl` and `extra/samp/python`, respectively.
+
+The broadcasted SAMP message has the following form:
+
+- Message: `jhv.vso.load`
+- Arguments:
+    - timestamp (string) - date of the currently viewed frame coded in ISO8601 format (e.g., 2017-08-28T14:33:28)
+    - start (string) - start date of the currently viewed sequence coded in ISO8601 format (e.g., 2017-08-28T14:33:28)
+    - end (string) - end date of the currently viewed sequence coded in ISO8601 format (e.g., 2017-08-28T14:33:28)
+    - cadence (SAMP long) - number of milliseconds between each frame
+    - cutout.set (SAMP boolean) - whether or not only a part of the sun is visible:
+        0: the full Sun is visible
+        1: only a cutout of the Sun is visible
+    - cutout.x0 (SAMP float, arcsec, optional) - x-position of the currently viewed part of the Sun
+    - cutout.y0 (SAMP float, arcsec, optional) - y-position of the currently viewed part of the Sun
+    - cutout.w (SAMP float, arcsec, optional) - width of the currently viewed part of the Sun
+    - cutout.h (SAMP float, arcsec, optional) - height of the currently viewed part of the Sun
+    - layers (list of map) - the different layers currently displayed. The parameters of each layer are stored as a key-value pair with the following keys:
+        - observatory (string, required)
+        - instrument (string, required)
+        - detector (string, optional)
+        - measurement (string, optional)
+        - timestamp (string, ISO8601 date, required)
+
+        The keys which are set depend on the selected instrument.
+- Return Values: None
+- Description: Broadcasts information about all the currently visible layers in JHelioviewer including the current timestamp. Receiving applications can use this information to load the raw data from VSO, for example.
+
+Example:
+
+```
+{
+samp.mtype=jhv.vso.load, 
+samp.params={
+    cutout.h=2460.524544, cutout.w=2460.524544, start=2017-09-24,
+layers=[
+    {observatory=SDO, instrument=AIA, detector=, measurement=304, timestamp=2017-09-24T19:53:05}, 
+    {observatory=SDO, instrument=AIA, detector=, measurement=171, timestamp=2017-09-24T19:52:45},
+    {observatory=SDO, instrument=AIA, detector=, measurement=193, timestamp=2017-09-24T19:52:28}],
+    cutout.set=1, cutout.x0=3.3579912600000625, end=2017-09-26, cutout.y0=1.1773994400000447, cadence=1800000, timestamp=2017-09-24T19:52:28}}
+```
+
 ## File Formats ##
 
 Many of the file formats supported by JHelioviewer are based on the JSON format. All files can be either local on the user's computer or can be loaded over HTTP. JPX data can additionally be loaded over the JPIP protocol. Files can be loaded at start-up via the command line interface.
 
 ### State File ###
 
+JSON document specifying with high accuracy the program state. Most of the fields have direct correspondence to the user interface, thus they are self-documenting. Natural language specification for time is supported. Most of the fields are optional with sensible defaults.
+
 ```json
-{"org.helioviewer.jhv.state": {...}}
+{
+  "org.helioviewer.jhv.state": {
+    "play": false,
+    "multiview": false,
+    "showCorona": true,
+    "imageLayers": [
+      {
+        "data": {
+          "APIRequest": {
+            "sourceId": 13,
+            "server": "IAS",
+            "startTime": "2017-09-24T10:52:57",
+            "endTime": "2017-09-26T10:52:57",
+            "cadence": 1800
+          },
+          "imageParams": {
+            "slitLeft": 0,
+            "enhanced": true,
+            "sharpen": 0.5,
+            "differenceMode": "None",
+            "color": {
+              "red": true,
+              "green": false,
+              "blue": false
+            },
+            "invert": false,
+            "brightScale": 1,
+            "blend": 0,
+            "brightOffset": 0,
+            "slitRight": 1,
+            "opacity": 1
+          }
+        },
+        "name": "AIA 304",
+        "className": "org.helioviewer.jhv.layers.ImageLayer",
+        "enabled": true
+      },
+      {
+        "data": {
+          "APIRequest": {
+            "sourceId": 10,
+            "server": "IAS",
+            "startTime": "2017-09-24T10:52:57",
+            "endTime": "2017-09-26T10:52:57",
+            "cadence": 1800
+          },
+          "imageParams": {
+            "slitLeft": 0,
+            "enhanced": true,
+            "sharpen": 0.5,
+            "differenceMode": "None",
+            "color": {
+              "red": false,
+              "green": true,
+              "blue": false
+            },
+            "invert": false,
+            "brightScale": 1,
+            "blend": 0,
+            "brightOffset": 0,
+            "slitRight": 1,
+            "opacity": 1
+          }
+        },
+        "name": "AIA 171",
+        "className": "org.helioviewer.jhv.layers.ImageLayer",
+        "enabled": true
+      },
+      {
+        "data": {
+          "APIRequest": {
+            "sourceId": 11,
+            "server": "IAS",
+            "startTime": "2017-09-24T10:52:57",
+            "endTime": "2017-09-26T10:52:57",
+            "cadence": 1800
+          },
+          "imageParams": {
+            "slitLeft": 0,
+            "enhanced": true,
+            "sharpen": 0.5,
+            "differenceMode": "None",
+            "color": {
+              "red": false,
+              "green": false,
+              "blue": true
+            },
+            "invert": false,
+            "brightScale": 1,
+            "blend": 0,
+            "brightOffset": 0,
+            "slitRight": 1,
+            "opacity": 1
+          }
+        },
+        "name": "AIA 193",
+        "className": "org.helioviewer.jhv.layers.ImageLayer",
+        "enabled": true,
+        "master": true
+      }
+    ],
+    "timelines": [
+      {
+        "data": {
+          "colormap": "Spectral"
+        },
+        "name": "Callisto Radiogram",
+        "className": "org.helioviewer.jhv.timelines.radio.RadioData",
+        "enabled": false
+      },
+      {
+        "data": {},
+        "name": "SWEK Events",
+        "className": "org.helioviewer.jhv.plugins.swek.EventTimelineLayer",
+        "enabled": true
+      },
+      {
+        "data": {
+          "bandType": {
+            "baseUrl": "http://swhv.oma.be/datasets/odi_read_data.php?",
+            "unitLabel": "W/m^2",
+            "name": "GOES_XRSB_ODI",
+            "range": [
+              1e-07,
+              0.001
+            ],
+            "scale": "logarithmic",
+            "label": "GOES XRS-B (longwave)",
+            "warnLevels": [
+              {
+                "warnLabel": "B",
+                "warnValue": 1e-07
+              },
+              {
+                "warnLabel": "C",
+                "warnValue": 1e-06
+              },
+              {
+                "warnLabel": "M",
+                "warnValue": 1e-05
+              },
+              {
+                "warnLabel": "X",
+                "warnValue": 0.0001
+              }
+            ],
+            "group": "GROUP_SWHV"
+          },
+          "color": {
+            "r": 80,
+            "b": 80,
+            "g": 80
+          }
+        },
+        "name": "GOES XRS-B (longwave)",
+        "className": "org.helioviewer.jhv.timelines.band.Band",
+        "enabled": true
+      }
+    ],
+    "plugins": {
+      "org.helioviewer.jhv.plugins.pfss.PfssPlugin": {},
+      "org.helioviewer.jhv.plugins.swek.SWEKPlugin": {
+        "Active Region": {
+          "NOAA SWPC": false,
+          "SPoCA": false
+        },
+        "Flare": {
+          "NOAA SWPC": false
+        },
+        "Filament": {
+          "AAFDCC": false
+        },
+        "Eruption": {
+          "Eruption Patrol": false
+        },
+        "Emerging Flux": {
+          "EFRM": false
+        },
+        "Coronal Hole": {
+          "SPoCA": false
+        },
+        "Coronal Wave": {
+          "Halo CME": false
+        },
+        "Flare Trigger": {
+          "Flare Detective": false
+        },
+        "COMESEP": {
+          "Solar Demon": false,
+          "Drag Based Model": false,
+          "Geomag24": false,
+          "CACTus": false,
+          "SEP Forecast": false,
+          "Flaremail": false,
+          "cgft": false,
+          "GLE Alert": false
+        },
+        "Coronal Dimming": {
+          "Coronal Dimming Module": false,
+          "Halo CME": false
+        },
+        "Coronal Mass Ejection": {
+          "CACTus": false
+        },
+        "Sunspot": {
+          "EGSO SFC": false
+        },
+        "Filament Eruption": {
+          "Halo CME": false
+        }
+      },
+      "org.helioviewer.jhv.plugins.eve.EVEPlugin": {
+        "selectedAxis": {
+          "startTime": "2017-09-24T10:52:57",
+          "endTime": "2017-09-26T10:52:57"
+        },
+        "locked": false
+      }
+    },
+    "layers": [
+      {
+        "data": {
+          "showLabels": true,
+          "lonStep": 15,
+          "latStep": 20,
+          "showRadial": false,
+          "showAxis": true,
+          "type": "Viewpoint"
+        },
+        "name": "Grid",
+        "className": "org.helioviewer.jhv.layers.GridLayer",
+        "enabled": true
+      },
+      {
+        "data": {
+          "mode": "Observer",
+          "expert": {
+            "syncInterval": true,
+            "objects": [
+              "Earth"
+            ],
+            "frame": "HEEQ"
+          },
+          "fovAngle": 1,
+          "camera": {
+            "translationX": 0.9308824978512158,
+            "translationY": -0.0579670419907351,
+            "fov": 0.006023977858680044,
+            "dragRotation": [
+              1,
+              0,
+              0,
+              0
+            ]
+          },
+          "equatorial": {
+            "syncInterval": true,
+            "objects": [
+              "Earth"
+            ],
+            "frame": "HCI"
+          }
+        },
+        "name": "Viewpoint",
+        "className": "org.helioviewer.jhv.layers.ViewpointLayer",
+        "enabled": false
+      },
+      {
+        "data": {
+          "scale": 100
+        },
+        "name": "Timestamp",
+        "className": "org.helioviewer.jhv.layers.TimestampLayer",
+        "enabled": false
+      },
+      {
+        "data": {
+          "scale": 10
+        },
+        "name": "Miniview",
+        "className": "org.helioviewer.jhv.layers.MiniviewLayer",
+        "enabled": true
+      },
+      {
+        "data": {
+          "icons": true
+        },
+        "name": "SWEK Events",
+        "className": "org.helioviewer.jhv.plugins.swek.SWEKLayer",
+        "enabled": true
+      },
+      {
+        "data": {
+          "fixedColor": false,
+          "detail": 0,
+          "radius": 2.5
+        },
+        "name": "PFSS Model",
+        "className": "org.helioviewer.jhv.plugins.pfss.PfssLayer",
+        "enabled": false
+      }
+    ],
+    "annotations": {
+      "annotateables": [
+        {
+          "endPoint": [
+            -0.6444571138969956,
+            -0.5251132039160703,
+            0.5558157531237797
+          ],
+          "startPoint": [
+            -1.2173078818054361,
+            0.6410472878975405,
+            -0
+          ],
+          "type": "FOV"
+        }
+      ],
+      "activeIndex": 0
+    },
+    "time": "2017-09-24T19:52:28",
+    "projection": "Orthographic",
+    "tracking": false
+  }
+}
 ```
 
 ### Image Request File ###
 
-JSON document specifying image requests to the default server in a simple manner as in the example below. Natural language specification of time is supported (as is the case for the state file) and, besides the `dataset` field, all fields are optional with sensible defaults.
+JSON document specifying image requests to the default server in a simple manner as in the example below. Natural language specification for time is supported and, besides the `dataset` field, all fields are optional with sensible defaults.
 
 Example:
 
@@ -350,7 +752,7 @@ WCS metadata is used to place image data at the correct viewpoint (time and posi
 
 # JHelioviewer Design #
 
-In contrast to the 31k lines of code to implement all its many features, the core JHelioviewer design is very simple and can probably be expressed in a couple of thousands of lines of code. The principle of separation of concerns is applied throughout. Objects are asked to update themselves, they proceed to do so independently, and they report back when done. There are essentially no locks and no data structures synchronized between threads.
+In contrast to the 31k lines of code to implement all its many features, the core JHelioviewer design is very simple and can probably be expressed in a couple of thousands of lines of code. The principle of separation of concerns is applied throughout. Objects are asked to update themselves, they proceed to do so independently, and they report back when done. There are essentially no locks and few data structures are concurrently accessed by threads.
 
 The program is driven via three timers:
 
@@ -374,14 +776,13 @@ SWHV inherited `DownloadStream`, a thin wrapper over the Java `URLConnection`. T
 
 JHV3D implements a download manager on top of the Apache HTTP Client library. This download manager handles also the JPIP protocol.
 
-SWHV currently re-implements all HTTP protocol functionality, with the exception of JPIP protocol, on top of the `OkHTTP3` network library. Possible future work may consist in replacing the various download thread pools with the `OkHTTP3` asynchronous API and therefore the use of the thread pool provided by the library.
+SWHV implements all HTTP protocol functionality, with the exception of JPIP protocol, on top of the `OkHTTP3` network library. Possible future work may consist in replacing the various download thread pools with the `OkHTTP3` asynchronous API and therefore the use of the thread pool provided by the library.
 
 Re-implementing the JPIP protocol on top of the high-level `OkHTTP3` library appears more difficult. It is not clear if a re-implementation is beneficial in the context of how the `esajpip` server handles the connections with the clients. The current low-level access into the network software stack is useful for achieving high data throughput between the JPIP client and server.
 
 **T2. Helioviewer v2 API (SWHV-CCN2-20100-02)**
 
-Both SWHV and JHV3D implement the version 2 of the Helioviewer API. The `getClosestToMidpoint` API call was added for the benefit of JHV3D request of data, and this call is linked to the JHV3D approach for the acquisition of data. It shall be studied if the approach is beneficial for SWHV and thus if this API is useful for SWHV. This has ramifications
-with regard to playback and JPEG2000 caching. The `esajpip` server was modified to allow multiple ranges of frame requests in a single JPIP request, which may be a possible substitute.
+Both SWHV and JHV3D implement the version 2 of the Helioviewer API. The `getClosestToMidpoint` API call was added for the benefit of JHV3D request of data, and this call is linked to the JHV3D approach for the acquisition of data. It shall be studied if the approach is beneficial for SWHV and thus if this API is useful for SWHV. This has ramifications with regard to playback and JPEG2000 caching. The `esajpip` server was modified to allow multiple ranges of frame requests in a single JPIP request, which may be a possible substitute.
 
 SWHV supports both versions of API and has implemented the validation of server responses against a JSON schema. This functionality is also available as a separate standalone program (<https://github.com/Helioviewer-Project/DataSourcesChecker>).
 
@@ -389,32 +790,39 @@ SWHV supports both versions of API and has implemented the validation of server 
 
 This deals with memory and disk caching of JPEG2000 data and is intimately linked with the playback and how the JPIP protocol is handled.
 
-SWHV abandoned the concept of downloading regions out of the JPEG2000 frames, but still tries to minimize the resolution levels requested, such that, if the highest resolutions are never requested, they are never downloaded. Note, however, that recording movies forces the decoding of the full resolution of frames and therefore the download of the entire codestream.
+SWHV abandoned the concept of downloading regions of interest from the JPIP server, but still tries to minimize the resolution levels requested, such that, if the highest resolutions are never requested, they are never downloaded. Note, however, that recording movies forces the decoding of the full resolution of frames and therefore the download of the entire codestream.
 
 Remote streams are cached by SWHV in Kakadu `KduCache` objects in memory. This is a concern for memory usage, therefore saving the codestream data to disk and limiting the `KduCache` size seems beneficial. However, SWHV was demonstrated to be capable of playing back streams of 10000 frames. This is the limit accepted by the ROB server, GSFC and IAS servers are limited to 1000 frames per stream.
 
 Another concern is that the data of already downloaded frames cannot be reused between streams, for example when extending or shifting the temporal navigation of datasets. Having the capability of reusing already downloaded data is of high importance.
 
-The approach taken by JHV3D is described in \[2\]. Note the limitations in the Kakadu API and documentation. It is possible that there are alternatives to the JHV3D approach.
+SWHV implements JPEG2000 disk persistence by extracting the codestream data from the Kakadu `KduCache` and then stores it using Ehcache3 (<http://www.ehcache.org>). The process is performed as needed after the data for a resolution level of a frame is completely received. Higher resolution levels overwrite lower ones. The caching is cross-server under the assumption of immutability and idempotence (Callisto spectrogram data is treated differently, it is requested over HTTP and it is cached at the level of JP2 files). The `sourceId` and timestamp of observation are combined to generate unique identifiers. The memory overhead is minimal because only the disk cache tier of Ehcache is used.
+
+The memory codestream cache is handled by Kakadu's `KduCache` as before. Given the cache tiers (memory, off-heap, disk, and even clustered) capabilities of the Ehcache 3 library used, it is probably possible now to restrict the size of `KduCache` objects, although, in practice until now, it never seemed to pose a problem.
 
 **T4. Plugin interface (SWHV-CCN2-20100-04)**
 
-Historically, plugins were implemented as standalone libraries to be loaded by the program to augment functionality. They necessitated a relatively limited support from the main program. As the functionality of the program becomes more complex and the expectations of integration between the parts higher, it is unclear if this approach is sustainable
-and if keeping programming interfaces too stable impedes progress.
+Historically, plugins were implemented as standalone libraries to be loaded by the program to augment functionality. They necessitated a relatively limited support from the main program. As the functionality of the program becomes more complex and the expectations of integration between the parts higher, it is unclear if this approach is sustainable and if keeping programming interfaces too stable impedes progress. The current plugins are so integrated with the main program that they represent merely GUI elements which can be optionally disabled for a more streamlined appearance.
 
-As part of implementing the SAMP plugin functionality, SWHV currently has simple interfaces for adding data layers and for loading state.
+As a consequence of implementing the SAMP functionality, SWHV has simple programming interfaces for adding data layers and for loading state.
 
 **T5. Playback engine: Extract portable ideas from JHV3D (SWHV-CCN2-20100-05)**
 
-SWHV operates in a fully asynchronous manner and can achieve high frame rates with low CPU utilization. This topic deals on how the time and data flows are distributed within system and is closely linked to how Kakadu is used for decoding the JPEG2000 data. It is unclear whether there are advantages to the JHV3D approach. On a superficial level, SWHV appears to reach about 50% the CPU utilization of JHV3D with uncached decoded data and as little as 5% with cached decoded data.
+SWHV operates in a fully asynchronous manner and can achieve high frame rates with low CPU utilization. This topic deals on how the time and data flows are distributed within the program and is closely linked to how Kakadu is used for decoding the JPEG2000 data. It is unclear whether there are advantages to the JHV3D approach. On a superficial level, SWHV appears to reach about half the CPU utilization of JHV3D with uncached decoded data and less than 5% with cached decoded data.
+
+During the CCN2 period, significant progress was made by moving the cache of the decoded image data in Java memory and out of the `Kdu_region_compositor`. The cache uses soft references, thus the decoded image data fills the JVM heap which has a fixed size established at startup. When the maximum heap size is reached, the garbage collector eagerly collects the buffers not referenced elsewhere in the program. The effect is an automatic trade-off between memory and CPU usage for already decoded image data. This also leads to a potentially dramatic drop of the total memory used by the application since the JHV-side caching uses one byte per pixel (for color-mapped layers) compared to the four bytes per pixel of `Kdu_region_compositor`. Other benefits include a performance increase due to reduced need for copies between Kakadu native buffers and JVM memory, and the cache adaptation to the JVM heap size. The benefits scale with the available JVM heap and with the number of loaded image layers. Some test cases achieved significant reductions both in CPU and memory usage.
+
+Additionally, the decoded image data is now copied to Java memory directly from the Kakadu native buffer for up to 40% CPU reduction for this task and further reduction of the Java buffers used.
+
+Some experiments with texture data upload into OpenGL directly from the decoding thread were conducted. Such an approach would shift the decoded image data cache from the JVM heap to OpenGL, i.e., process memory or texture buffers inside GPU memory, as decided by OpenGL. The disadvantages are: duplicated code paths for radio data which needs the image data into Java memory, difficult OpenGL buffers handling, and more sophisticated OpenGL context handling. The latter can be approached by migration of the OpenGL context between threads or, alternatively, multiple contexts. The first approach leads to thread contention for the context, which blocks the rendering pipeline and thus may introduce stuttering at high frame rates, while the second approach leads to OpenGL context switch overhead. The experiments concluded that this may be useful only for many loaded layers.
 
 **T6. Handling of transparency (SWHV-CCN2-20100-06)**
 
-SWHV currently uses alpha-premultiplied color blending. The default compositing of the layers is at the middle between the ADD and OVER operators and an extra setting named "Blend" was added to control the variable level of additivity and opacity.
+SWHV uses alpha-premultiplied color blending. The default compositing of the layers is at the middle between the ADD and OVER operators and an extra setting named "Blend" was added to control the variable level of additivity and opacity.
 
 **T7. Installation (SWHV-CCN2-20100-07)**
 
-The installation procedures of SWHV are derived from the previous versions. The install4j procedure of JHV3D is currently ported, but lightly tested and not deployed. In light of the announced Oracle approach to the release of future versions of Java, this is an essential feature.
+The installation procedures of SWHV are derived from the previous versions. The install4j procedure of JHV3D is currently ported, but lightly tested and not deployed. As of the Java 11 release, the approach to the release of Java changed in several ways. For example, there is no runtime environment anymore and the expectation is that a tailored modular distribution is carved out from the Java Development Kit. Preserving the capability to automatically generate the distribution packages for all three supported platforms from the macOS environment is a concern in the new context. If the current monolithic install4j procedure was adopted, it would lead to a 10× increase of distribution packages.
 
 **T8. Telemetry (SWHV-CCN2-20100-08)**
 
@@ -428,19 +836,17 @@ SWHV preliminary version at:
 
 <https://github.com/Helioviewer-Project/JHelioviewer-SWHV/blob/master/CONTRIBUTING.md>
 
-From the list above, T1, T2, T3, T5 can be identified as possible candidates for further allocation of manpower in the next phase of merging of ideas. The current estimation is that T5 is too difficult and invasive to be tackled during the current project and the benefits are uncertain. From the remaining tasks, T3 has the highest priority and any remaining parts of T1 and T2 can be tackled as needed in an integrated manner.
-
 ## WP20200 -- Improve Core Functionality
 
 The following tasks were identified:
 
 1.  **(SWHV-CCN2-20200-01)** Study how to improve the temporal navigation jointly for image and timeline data at both short and long timescales.
 
-This is highly dependent on the JPEG2000 data caching. However, the work proceeded independently as the caching is essentially an optimization. Time selection for the image layers was brought to the forefront and it became possible to use the timelines panel to temporally navigate jointly with the image layers.
+Time selection for the image layers was brought to the forefront and it became possible to use the interaction with time range of the timelines panel to temporally navigate jointly with the image layers. This is achieved by reloading as necessary the image layers for the time range of the timelines panel. The capability to cach the JPEG2000 codestream data improved the user experience.
 
 2.  **(SWHV-CCN2-20200-02)** Save and restore program state.
 
-This is implemented as a JSON document preserving with high fidelity the state of the program. The annotation save/restore will have to be implemented using the format for feature location specified by Solar Orbiter SOC (Solar Orbiter Feature Triplet).
+This is implemented as a JSON document preserving with high fidelity the state of the program.
 
 3.  **(SWHV-CCN2-20200-03)** Improve command line interface.
 
@@ -457,11 +863,11 @@ The following command-line options are now available:
 
 4.  **(SWHV-CCN2-20200-04)** On disk caching of JP2 code-stream data.
 
-This shall be tackled in WP20150.
+This was tackled in WP20150.
 
 5.  **(SWHV-CCN2-20200-05)** Specific event filtering, now that the filtering is not done anymore server side.
 
-This is implemented on HEK derived events for NOAA SWPC flares on the GOES intensity values and for CACTus CME detections on the radial linear velocity.
+This is implemented on HEK derived events for NOAA SWPC flares on the GOES intensity values and for CACTus CME detections on the radial linear velocity. The implementation relies on event filtering in the SQL database that is used as event cache.
 
 6.  **(SWHV-CCN2-20200-06)** Proxy support.
 
@@ -477,25 +883,35 @@ This is implemented by the draft Solar Orbiter User Requirements Document (ROB-S
 
 2.  **(SWHV-CCN2-20300-02)** Publish ROB ephemeris server on Helioviewer GitHub and collaborate with Solar Orbiter MADAWG for maintaining a coherent data (kernel) tree.
 
-This is implemented by:
-
-<https://github.com/Helioviewer-Project/GeometryService>
+This is implemented by the `GeometryService`.
 
 3.  **(SWHV-CCN2-20300-03)** Build propagation server incorporating several propagation models, enabling correlation of in-situ data with remote sensing data.
 
-This will be implemented with an RPC server built on the Spyne toolkit (<http://spyne.io>, the same as the `GeometryService` service). The SWHV client will query a timestamp and a propagation model, the service will return a modified timestamp.
+This is implemented by the `PropagationService`, a mock-up RPC server built on the Spyne toolkit (<http://spyne.io>, the same as the `GeometryService` service).
 
 4.  **(SWHV-CCN2-20300-04)** Test with and integrate ACE, DSCVR or other current in-situ datasets identified as relevant today for space weather forecasters.
 
-Once the propagation server is implemented, the specified datasets will be integrated.
+The considered use-case is measurements of phenomena propagating radially slower than speed of light. 
+
+This is how one user imagines this feature would work:
+
+> The user sees in the SWAP movie a flare and dimming on the Sun and wonders if this has arrived at the Earth/L1. They open a GOES X-ray timeline to see the flare timing and then open an ACE solar wind timeline to see the arrival. They will now put in the textbox reasonable differences from 20h to 5d and see if there is a match of the flare timeline and of the solar wind disturbance. A slightly more natural way to do this would be to put in propagation speeds. From the SWAP movie one can get at least a rough feeling if this is a slow eruption (300 km/s) or a fast one (2000 km/s). The user fills in a guess for a speed, the system calculates the delta-t in sec and we see the two timelines.
+
+A textbox was added in the timeline options panel where one can set a propagation speed (0 meaning disabled). The location is the calculated Sun-Earth L1 point. When that speed is different from zero, another time-scale (in the timeline color) appears under the timelines panel time-scale (in black).
+
+Therefore the displayed time-scale has the following meaning:
+
+* the colored time-scale is time of observation;
+* when speed is 0, the time of the timelines panel (black time) is disconnected from image layers time → time is UTC at an undefined location (most likely Earth);
+* when speed is not 0, timelines panel time (black time) is the time determined by the image layers viewpoint, there is an additional speed-of-light propagation from Sun to the viewpoint → time is UTC at the viewpoint (according to viewpoint settings, may be different than Earth). 
 
 5.  **(SWHV-CCN2-20300-05)** Plot the sub-spacecraft point on the solar surface (both radially and w.r.t. magnetic connectivity, i.e., Parker spiral).
 
-This is implemented using existing functionality. The magnetic connectivity aspect will need to be tackled together with the implementation of the Solar Orbiter requirements, therefore is out of scope.
+This is implemented using existing functionality. The sub-spacecraft point is the center of the FOV indicated when the Viewpoint layer is activated. The magnetic connectivity aspect will need to be tackled together with the implementation of the Solar Orbiter requirements, therefore is out of scope.
 
 6.  **(SWHV-CCN2-20300-06)** Build on annotations to indicate instruments fields of view. Add ability to drag and show their centers. Optionally distort according to differential rotation. Distortion of solar images is outside of the resources for this CCN.
 
-This will be implemented once the annotation functionality has full location awareness.
+Arbitrary FOV annotations can be drawn and their centers are indicated. There is functionality to automatically zoom to the size of the current FOV annotation. Dragging and distortion are not implemented.
 
 ## WP20400 -- Enable Server Interoperability
 
@@ -510,15 +926,13 @@ This will be implemented by combining the `hvJP2K` package functionality splitti
 This is implemented by modifying the validation functionality of the `hvJP2K` package to use a current `jpylyzer` package release.
 
 3.  **(SWHV-CCN2-20400-03)** Cache JP2 headers in database at insertion time.
+4.  **(SWHV-CCN2-20400-04)** Build JPX from database headers.
 
-The purpose of this task is to reduce the server latency between the user selecting a dataset and the server making available the prepared JPX file to the `esajpip` server. While merge functionality of `hvJP2K` can be 10× faster than the Kakadu similar functionality, it is limited by I/O operations necessary to parse the JP2 files. Parsing the JP2
-ahead of the time and storing the necessary information in the database together with the record of each file can possibly reduce this latency.
+The purpose of those two tasks is to reduce the server latency between the user selecting a dataset and the server making available the prepared JPX file to the `esajpip` server. While merge functionality of `hvJP2K` can be 10× faster than the Kakadu similar functionality, it is limited by I/O operations necessary to parse the JP2 files. Parsing the JP2 ahead of the time and storing the necessary information in the database together with the record of each file can possibly reduce this latency.
 
 Other means to achieve a reduction in this latency is by changing the way SWHV requests the datasets to always request entire days.
 
-4.  **(SWHV-CCN2-20400-04)** Build JPX from database headers.
-
-The JPX merging of the `hvJP2K` package will be updated to accept externally produced JP2 headers.
+This is implemented by two new programs part of the `hvJP2K` package (`hv_jpx_merge_to_db` and `hv_jpx_merge_from_db`) which store the extracted JP2 headers into an SQLite3 database and can generate JPX files from those stored headers.
 
 5.  **(SWHV-CCN2-20400-05)** Support GSFC for the adoption of the `hvJP2K` tools, especially in the areas of transcoding and verification of the JP2 files.
 
@@ -532,7 +946,7 @@ This is an ongoing activity.
 
 **(SWHV-CCN2-20500-01)** The tasks of this WP are an ongoing activity.
 
-Currently the support for 32bit operating systems was removed in order to avoid the incidence of out-of-memory crashes and virtual address exhaustion, especially during movie creation. The software is supported under Windows, macOS and Linux for Oracle Java 8 64bit.
+The support for 32bit operating systems was removed in order to avoid the incidence of out-of-memory crashes and virtual address exhaustion, especially during movie creation. The software is supported under Windows, macOS and Linux for Oracle Java 8 64bit.
 
 The software is also tested under later versions of OpenJDK. There are several illegal reflective accesses from JOGL into the now modularized Java frameworks, some of them OS-specific. Currently manifesting as warnings, it will be very difficult to fix those for future Java versions where they will become errors.
 
@@ -544,19 +958,21 @@ The following tasks were identified:
 
 1.  **(SWHV-CCN2-21200-01)** Study and design a SAMP plugin; implement a prototype version based on a use case that will allow to estimate the time needed to produce an operational version.
 
-The SAMP plugin is implemented and integrated in SWHV. It allows sending the loaded image layers to a SunPy script in order to load the original FITS files via VSO onto the user's computer. It also allows receiving compatible data from any external SAMP-aware program or web page (<http://swhv.oma.be/test/samp/>).
+SAMP capabilities were integrated into SWHV. It is possible to send information about the loaded image layers to SunPy or SolarSoft scripts in order to load the original FITS files via VSO onto the user's computer. It is also possible to receive compatible data from any external SAMP-aware program or web page (<http://swhv.oma.be/test/samp/>).
 
 2.  **(SWHV-CCN2-21200-02)** Explore how to implement a new VSO plugin, including use case and time estimates.
 
 In view of the above SAMP capabilities, direct VSO capabilities are better handled by a community wide effort such as SunPy which incorporates solar physics data web services such as VSO, JSOC and others.
 
-However, the IDL-to-Java bridge will be investigated in order to enable the interoperability between IDL and SWHV via the SAMP protocol.
+Therefore, the VSO connection is achieved over the SAMP protocol via SunPy or SolarSoft (for which an additional IDL-Java bridge is necessary). Compared with direct VSO capabilities, this solution is better in the sense that the best use of the science data retrieved this way is within an environment made for data analysis such as SunPy or SolarSoft.
 
 3.  **(SWHV-CCN2-21200-03)** Explore ways to improve and/or integrate FITS, NetCDF, VOTable formats.
 
-SWHV has improved support FITS files and can support CDF (not NetCDF) format using the <https://github.com/mbtaylor/jcdf> library and VOTable format using the <https://github.com/aschaaff/savot> library.
+SWHV has improved support FITS files and can support CDF (not NetCDF) format using the <https://github.com/mbtaylor/jcdf> library and VOTable format using the <https://github.com/aschaaff/savot> library. 
 
-This will be limited to known use cases exhibiting data calibration and known standard metadata.
+The FITS support improvements include compressed and remote files, more supported instruments, more data-types, physical units, the BLANK keyword, better pixel scaling including the port of ZMax autoscaling algorithm of SAOImage DS9 (better results for EUV observations). SWHV can now display the value of the pixel under the mouse pointer in physical values.
+
+This support is limited to known use cases exhibiting data calibration and known standard metadata.
 
 ## WP21300 -- Investigate JPIP Alternatives
 
