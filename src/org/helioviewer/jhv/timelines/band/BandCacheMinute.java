@@ -40,10 +40,12 @@ class BandCacheMinute implements BandCache {
         if (len > 0) {
             hasData = true;
         }
+
+        boolean max = yAxis.preferMax();
         for (int i = 0; i < len; i++) {
             long key = date2key(dates[i]);
             DataChunk cache = cacheMap.computeIfAbsent(key, DataChunk::new);
-            cache.setValue((int) ((dates[i] % MILLIS_PER_CHUNK) / MILLIS_PER_TICK), yAxis.clip(values[i]));
+            cache.setValue(max, (int) ((dates[i] % MILLIS_PER_CHUNK) / MILLIS_PER_TICK), yAxis.clip(values[i]));
         }
     }
 
@@ -167,14 +169,14 @@ class BandCacheMinute implements BandCache {
             }
         }
 
-        void setValue(int minuteOfDay, float value) {
+        void setValue(boolean max, int minuteOfDay, float value) {
             int factor = 1;
             for (int i = 0; i < values.length; i++) {
                 int idx = minuteOfDay / factor;
                 if (idx >= values[i].length) {
                     idx = values[i].length - 1;
                 }
-                values[i][idx] = Math.max(values[i][idx], value);
+                values[i][idx] = max ? Math.max(values[i][idx], value) : value;
                 factor *= FACTOR_STEP;
             }
 
