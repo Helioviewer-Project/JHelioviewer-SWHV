@@ -170,8 +170,8 @@ public class ImageLayers {
             return;
 
         msg.addParam("timestamp", Movie.getTime().toString());
-        msg.addParam("start", TimeUtils.formatDate(Movie.getStartTime()));
-        msg.addParam("end", TimeUtils.formatDate(Movie.getEndTime()));
+        msg.addParam("start", TimeUtils.format(Movie.getStartTime()));
+        msg.addParam("end", TimeUtils.format(Movie.getEndTime()));
         msg.addParam("cadence", SampUtils.encodeLong(activeLayer.getAPIRequest().cadence * 1000L));
         msg.addParam("cutout.set", SampUtils.encodeBoolean(true));
 
