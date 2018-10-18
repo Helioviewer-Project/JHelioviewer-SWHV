@@ -51,7 +51,7 @@ public class Band extends AbstractTimelineLayer {
         }
         bandType = _bandType;
         optionsPanel = new BandOptionPanel(this);
-        yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getScale(bandType.getUnitLabel()));
+        yAxis = new YAxis(bandType.getMin(), bandType.getMax(), YAxis.generateScale(bandType.getScale(), bandType.getUnitLabel()));
         graphColor = BandColors.getNextColor();
         fillWarnLevels();
     }

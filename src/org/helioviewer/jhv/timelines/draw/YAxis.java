@@ -127,19 +127,27 @@ public class YAxis {
         return scale.invScale(val);
     }
 
-    public enum Scale {
+    public static YAxisScale generateScale(String scaleString, String label) {
+        try {
+            return Scale.valueOf(scaleString.toUpperCase()).generateScale(label);
+        } catch (Exception e) {
+            return new YAxisIdentityScale(label);
+        }
+    }
+
+    private enum Scale {
         LOGARITHMIC, LINEAR, POSITIVELINEAR;
 
-        public YAxisScale generateScale(String _label) {
+        YAxisScale generateScale(String label) {
             switch (this) {
                 case LOGARITHMIC:
-                    return new YAxisLogScale(_label);
+                    return new YAxisLogScale(label);
                 case LINEAR:
-                    return new YAxisIdentityScale(_label);
+                    return new YAxisIdentityScale(label);
                 case POSITIVELINEAR:
-                    return new YAxisPositiveIdentityScale(_label);
+                    return new YAxisPositiveIdentityScale(label);
                 default:
-                    return new YAxisIdentityScale(_label);
+                    return new YAxisIdentityScale(label);
             }
         }
     }
