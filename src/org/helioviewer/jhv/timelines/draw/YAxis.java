@@ -107,6 +107,10 @@ public class YAxis {
         end = invScale(newScaledMax);
     }
 
+    public boolean preferMax() {
+        return scale.preferMax();
+    }
+
     public float clip(float val) {
         return scale.clip(val);
     }
@@ -120,6 +124,8 @@ public class YAxis {
     }
 
     public interface YAxisScale {
+
+        boolean preferMax();
 
         float clip(float val);
 
@@ -141,6 +147,11 @@ public class YAxis {
 
         public YAxisLogScale(String _label) {
             label = "log(" + fixupUnit(_label) + ')';
+        }
+
+        @Override
+        public boolean preferMax() {
+            return true;
         }
 
         @Override
@@ -173,6 +184,11 @@ public class YAxis {
         }
 
         @Override
+        public boolean preferMax() {
+            return false;
+        }
+
+        @Override
         public float clip(float val) {
             return MathUtils.clip(val, DISCARD_LEVEL_LINEAR_LOW, DISCARD_LEVEL_HIGH);
         }
@@ -200,6 +216,11 @@ public class YAxis {
 
         public YAxisPositiveIdentityScale(String _label) {
             label = fixupUnit(_label);
+        }
+
+        @Override
+        public boolean preferMax() {
+            return true;
         }
 
         @Override
