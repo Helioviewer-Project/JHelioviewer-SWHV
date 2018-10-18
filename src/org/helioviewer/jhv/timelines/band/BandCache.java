@@ -2,13 +2,14 @@ package org.helioviewer.jhv.timelines.band;
 
 import java.util.List;
 
+import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.json.JSONObject;
 
 interface BandCache {
 
     boolean hasData();
 
-    void addToCache(float[] values, long[] dates);
+    void addToCache(YAxis yAxis, float[] values, long[] dates);
 
     float[] getBounds(long start, long end);
 

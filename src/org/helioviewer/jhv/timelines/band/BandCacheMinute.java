@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.helioviewer.jhv.time.TimeUtils;
+import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -32,7 +33,7 @@ class BandCacheMinute implements BandCache {
     }
 
     @Override
-    public void addToCache(float[] values, long[] dates) {
+    public void addToCache(YAxis yAxis, float[] values, long[] dates) {
         int len = values.length;
         if (len > 0) {
             hasData = true;
@@ -40,7 +41,7 @@ class BandCacheMinute implements BandCache {
         for (int i = 0; i < len; i++) {
             long key = date2key(dates[i]);
             DataChunk cache = cacheMap.computeIfAbsent(key, DataChunk::new);
-            cache.setValue((int) ((dates[i] % MILLIS_PER_CHUNK) / MILLIS_PER_TICK), values[i]);
+            cache.setValue((int) ((dates[i] % MILLIS_PER_CHUNK) / MILLIS_PER_TICK), yAxis.clip(values[i]));
         }
     }
 

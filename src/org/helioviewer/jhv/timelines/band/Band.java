@@ -254,7 +254,7 @@ public class Band extends AbstractTimelineLayer {
     }
 
     public void addToCache(float[] values, long[] dates) {
-        bandCache.addToCache(values, dates);
+        bandCache.addToCache(yAxis, values, dates);
         updateGraphsData();
         DrawController.drawRequest();
     }

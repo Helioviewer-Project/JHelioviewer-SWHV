@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -18,7 +19,7 @@ class BandCacheAll implements BandCache {
     }
 
     @Override
-    public void addToCache(float[] values, long[] dates) {
+    public void addToCache(YAxis yAxis, float[] values, long[] dates) {
         int len = values.length;
         if (len > 0) {
             hasData = true;
@@ -31,7 +32,7 @@ class BandCacheAll implements BandCache {
         for (int i = 0; i < len; i++) {
             if (datevals.size() >= MAX_SIZE)
                 break;
-            datevals.add(new DateValue(dates[i], values[i]));
+            datevals.add(new DateValue(dates[i], yAxis.clip(values[i])));
         }
         Collections.sort(datevals);
     }
