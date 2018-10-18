@@ -6,32 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.helioviewer.jhv.timelines.draw.YAxis.Scale;
 import org.helioviewer.jhv.timelines.draw.YAxis.YAxisScale;
-import org.helioviewer.jhv.timelines.draw.YAxis.YAxisLogScale;
-import org.helioviewer.jhv.timelines.draw.YAxis.YAxisPositiveIdentityScale;
-import org.helioviewer.jhv.timelines.draw.YAxis.YAxisIdentityScale;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class BandType {
-
-    private enum Scale {
-        LOGARITHMIC, LINEAR, POSITIVELINEAR;
-
-        YAxisScale generateScale(String _label) {
-            switch (this) {
-                case LOGARITHMIC:
-                    return new YAxisLogScale(_label);
-                case LINEAR:
-                    return new YAxisIdentityScale(_label);
-                case POSITIVELINEAR:
-                    return new YAxisPositiveIdentityScale(_label);
-                default:
-                    return new YAxisIdentityScale(_label);
-            }
-        }
-    }
 
     private static final HashMap<String, List<BandType>> groups = new HashMap<>();
 

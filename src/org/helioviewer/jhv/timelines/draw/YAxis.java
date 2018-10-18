@@ -127,6 +127,23 @@ public class YAxis {
         return scale.invScale(val);
     }
 
+    public enum Scale {
+        LOGARITHMIC, LINEAR, POSITIVELINEAR;
+
+        public YAxisScale generateScale(String _label) {
+            switch (this) {
+                case LOGARITHMIC:
+                    return new YAxisLogScale(_label);
+                case LINEAR:
+                    return new YAxisIdentityScale(_label);
+                case POSITIVELINEAR:
+                    return new YAxisPositiveIdentityScale(_label);
+                default:
+                    return new YAxisIdentityScale(_label);
+            }
+        }
+    }
+
     public interface YAxisScale {
 
         boolean preferMax();
@@ -151,7 +168,7 @@ public class YAxis {
 
         private final String label;
 
-        public YAxisLogScale(String _label) {
+        YAxisLogScale(String _label) {
             label = "log(" + fixupUnit(_label) + ')';
         }
 
