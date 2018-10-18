@@ -6,9 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.helioviewer.jhv.timelines.draw.YAxis.Scale;
-import org.helioviewer.jhv.timelines.draw.YAxis.YAxisScale;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -53,7 +50,7 @@ public class BandType {
     private final Map<String, Double> warnLevels;
     private double min = 0;
     private double max = 1;
-    private Scale scale = Scale.LINEAR;
+    private String scale = "linear";
     private String bandCacheType = "BandCacheMinute";
 
     private final JSONObject json;
@@ -76,10 +73,7 @@ public class BandType {
             max = range.optDouble(1, max);
         }
 
-        try {
-            scale = Scale.valueOf(jo.optString("scale", scale.toString()).toUpperCase());
-        } catch (Exception ignore) {
-        }
+        scale = jo.optString("scale", scale);
 
         JSONArray warn = jo.optJSONArray("warnLevels");
         HashMap<String, Double> warnHelp = new HashMap<>();
@@ -108,6 +102,10 @@ public class BandType {
         return bandCacheType;
     }
 
+    public String getScale() {
+        return scale;
+    }
+
     public String getUnitLabel() {
         return unitLabel;
     }
@@ -122,10 +120,6 @@ public class BandType {
 
     public double getMax() {
         return max;
-    }
-
-    public YAxisScale getScale(String _label) {
-        return scale.generateScale(_label);
     }
 
     public String getBaseURL() {
