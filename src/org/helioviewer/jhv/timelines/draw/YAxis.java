@@ -133,8 +133,8 @@ public class YAxis {
 
         @Override
         public double scale(double val) {
-            if (val < DrawConstants.DISCARD_LEVEL_LOW) {
-                return Math.log10(DrawConstants.DISCARD_LEVEL_LOW);
+            if (val < DrawConstants.DISCARD_LEVEL_LOG_LOW) {
+                return Math.log10(DrawConstants.DISCARD_LEVEL_LOG_LOW);
             }
             if (val > DrawConstants.DISCARD_LEVEL_HIGH) {
                 return Math.log10(DrawConstants.DISCARD_LEVEL_HIGH);
@@ -163,8 +163,8 @@ public class YAxis {
 
         @Override
         public double scale(double val) {
-            if (val < 0) {
-                return 0;
+            if (val < DrawConstants.DISCARD_LEVEL_LINEAR_LOW) {
+                return DrawConstants.DISCARD_LEVEL_LINEAR_LOW;
             }
             if (val > DrawConstants.DISCARD_LEVEL_HIGH) {
                 return DrawConstants.DISCARD_LEVEL_HIGH;
