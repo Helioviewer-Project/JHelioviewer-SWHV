@@ -27,6 +27,7 @@ import org.json.JSONObject;
 public class Band extends AbstractTimelineLayer {
 
     private static final BandDataProvider dataProvider = EVEPlugin.eveDataprovider;
+    private static final int SUPER_SAMPLE = 1; // 8 for dots
 
     private final BandType bandType;
     private final BandCache bandCache;
@@ -167,9 +168,18 @@ public class Band extends AbstractTimelineLayer {
             return;
 
         g.setColor(graphColor);
-        for (GraphPolyline line : graphPolylines) {
+        for (GraphPolyline line : graphPolylines) { // polylines
             g.drawPolyline(line.xPoints(), line.yPoints(), line.length());
         }
+
+//      for (GraphPolyline line : graphPolylines) { // dots
+//          int length = line.length();
+//          int[] xPoints = line.xPoints();
+//          int[] yPoints = line.yPoints();
+//          for (int i = 0; i < length; i++)
+//              g.drawLine(xPoints[i], yPoints[i], xPoints[i], yPoints[i]);
+//      }
+
         for (int j = 0; j < warnLevels.length; j++) {
             g.drawLine(graphArea.x, warnLevels[j], graphArea.x + graphArea.width, warnLevels[j]);
             g.drawString(warnLabels[j], graphArea.x, warnLevels[j] - 2);
@@ -191,7 +201,7 @@ public class Band extends AbstractTimelineLayer {
             TimeAxis timeAxis = DrawController.selectedAxis;
             long start = propagationModel.getInsituTime(timeAxis.start());
             long end = propagationModel.getInsituTime(timeAxis.end());
-            for (List<DateValue> list : bandCache.getValues(graphArea.width * GLInfo.pixelScaleFloat[0], start, end)) {
+            for (List<DateValue> list : bandCache.getValues(SUPER_SAMPLE * GLInfo.pixelScaleFloat[0] * graphArea.width, start, end)) {
                 if (!list.isEmpty()) {
                     IntArray dates = new IntArray(list.size());
                     IntArray values = new IntArray(list.size());
