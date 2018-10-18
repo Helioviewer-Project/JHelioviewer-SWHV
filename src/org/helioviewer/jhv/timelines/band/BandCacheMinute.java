@@ -41,7 +41,7 @@ class BandCacheMinute implements BandCache {
         for (int i = 0; i < len; i++) {
             long key = date2key(dates[i]);
             DataChunk cache = cacheMap.computeIfAbsent(key, DataChunk::new);
-            if (values[i] > DrawConstants.DISCARD_LEVEL_LOW && values[i] < DrawConstants.DISCARD_LEVEL_HIGH) {
+            if (values[i] > DrawConstants.DISCARD_LEVEL_LINEAR_LOW && values[i] < DrawConstants.DISCARD_LEVEL_HIGH) {
                 cache.setValue((int) ((dates[i] % MILLIS_PER_CHUNK) / MILLIS_PER_TICK), values[i]);
             }
         }
