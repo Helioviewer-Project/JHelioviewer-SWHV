@@ -12,8 +12,6 @@ import org.json.JSONObject;
 
 class BandCacheMinute implements BandCache {
 
-    private static final float MARKER = -Float.MAX_VALUE;
-
     private static final long DAYS_PER_CHUNK = 8;
     private static final long MILLIS_PER_TICK = 60000;
     private static final long CHUNKED_SIZE = TimeUtils.DAY_IN_MILLIS / MILLIS_PER_TICK * DAYS_PER_CHUNK;
@@ -67,7 +65,7 @@ class BandCacheMinute implements BandCache {
 
             for (int i = 0; i < values.length; i++) {
                 float value = values[i];
-                if (value != MARKER && start <= dates[i] && dates[i] <= end /* ? */) {
+                if (value != Band.MARKER && start <= dates[i] && dates[i] <= end /* ? */) {
                     min = Math.min(value, min);
                     max = Math.max(value, max);
                 }
@@ -107,7 +105,7 @@ class BandCacheMinute implements BandCache {
             int i = 0;
             while (i < values.length) {
                 float value = values[i];
-                if (value == MARKER) {
+                if (value == Band.MARKER) {
                     ret.add(list);
                     list = new ArrayList<>();
                 } else {
@@ -117,7 +115,6 @@ class BandCacheMinute implements BandCache {
             }
         }
         ret.add(list);
-
         return ret;
     }
 
@@ -134,7 +131,7 @@ class BandCacheMinute implements BandCache {
                 return cache.getValues(0)[idx];
             }
         }
-        return 1;
+        return Band.MARKER;
     }
 
     @Override
@@ -154,7 +151,7 @@ class BandCacheMinute implements BandCache {
             int factor = 1;
             for (int i = 0; i < MAX_LEVEL; i++) {
                 values[i] = new float[(int) CHUNKED_SIZE / factor];
-                Arrays.fill(values[i], MARKER);
+                Arrays.fill(values[i], Band.MARKER);
                 dates[i] = new long[(int) CHUNKED_SIZE / factor];
                 factor *= FACTOR_STEP;
             }

@@ -10,8 +10,6 @@ import org.json.JSONObject;
 
 class BandCacheAll implements BandCache {
 
-    private static final float MARKER = -Float.MAX_VALUE;
-
     private final List<DateValue> datevals = new ArrayList<>();
     private boolean hasData;
 
@@ -45,7 +43,7 @@ class BandCacheAll implements BandCache {
         float max = Float.NEGATIVE_INFINITY;
 
         for (DateValue dv : datevals) {
-            if (dv.value != MARKER && start <= dv.milli && dv.milli <= end) {
+            if (dv.value != Band.MARKER && start <= dv.milli && dv.milli <= end) {
                 min = Math.min(dv.value, min);
                 max = Math.max(dv.value, max);
             }
@@ -57,7 +55,7 @@ class BandCacheAll implements BandCache {
     public List<List<DateValue>> getValues(double graphWidth, long start, long end) {
         List<DateValue> list = new ArrayList<>();
         for (DateValue dv : datevals) {
-            if (dv.value != MARKER && start <= dv.milli && dv.milli <= end) {
+            if (dv.value != Band.MARKER && start <= dv.milli && dv.milli <= end) {
                 list.add(dv);
             }
         }
@@ -66,7 +64,7 @@ class BandCacheAll implements BandCache {
 
     @Override
     public float getValue(long ts) {
-        return 1;
+        return Band.MARKER;
     }
 
     @Override
