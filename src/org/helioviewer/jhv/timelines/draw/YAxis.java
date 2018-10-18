@@ -1,11 +1,17 @@
 package org.helioviewer.jhv.timelines.draw;
 
+import org.helioviewer.jhv.math.MathUtils;
+
 public class YAxis {
 
     private double start;
     private double end;
 
     private final YAxisScale scale;
+
+    private static final double DISCARD_LEVEL_LINEAR_LOW = -100;
+    private static final double DISCARD_LEVEL_LOG_LOW = 1e-10;
+    private static final double DISCARD_LEVEL_HIGH = 1e7; // solar wind temp, xray flux: 1e4;
 
     private static final double ZOOMSTEP_PERCENTAGE = 0.02;
     private static final float UNSCALED_MIN_BOUND = Float.MIN_VALUE;
@@ -133,13 +139,7 @@ public class YAxis {
 
         @Override
         public double scale(double val) {
-            if (val < DrawConstants.DISCARD_LEVEL_LOG_LOW) {
-                return Math.log10(DrawConstants.DISCARD_LEVEL_LOG_LOW);
-            }
-            if (val > DrawConstants.DISCARD_LEVEL_HIGH) {
-                return Math.log10(DrawConstants.DISCARD_LEVEL_HIGH);
-            }
-            return Math.log10(val);
+            return Math.log10(MathUtils.clip(val, DISCARD_LEVEL_LOG_LOW, DISCARD_LEVEL_HIGH));
         }
 
         @Override
@@ -163,13 +163,7 @@ public class YAxis {
 
         @Override
         public double scale(double val) {
-            if (val < DrawConstants.DISCARD_LEVEL_LINEAR_LOW) {
-                return DrawConstants.DISCARD_LEVEL_LINEAR_LOW;
-            }
-            if (val > DrawConstants.DISCARD_LEVEL_HIGH) {
-                return DrawConstants.DISCARD_LEVEL_HIGH;
-            }
-            return val;
+            return MathUtils.clip(val, DISCARD_LEVEL_LINEAR_LOW, DISCARD_LEVEL_HIGH);
         }
 
         @Override
@@ -194,13 +188,7 @@ public class YAxis {
 
         @Override
         public double scale(double val) {
-            if (val < 0) {
-                return 0;
-            }
-            if (val > DrawConstants.DISCARD_LEVEL_HIGH) {
-                return DrawConstants.DISCARD_LEVEL_HIGH;
-            }
-            return val;
+            return MathUtils.clip(val, 0, DISCARD_LEVEL_HIGH);
         }
 
         @Override
