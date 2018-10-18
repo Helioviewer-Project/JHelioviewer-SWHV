@@ -9,9 +9,9 @@ public class YAxis {
 
     private final YAxisScale scale;
 
-    private static final double DISCARD_LEVEL_LINEAR_LOW = -100;
-    private static final double DISCARD_LEVEL_LOG_LOW = 1e-10;
-    private static final double DISCARD_LEVEL_HIGH = 1e7; // solar wind temp, xray flux: 1e4;
+    private static final float DISCARD_LEVEL_LINEAR_LOW = -100;
+    private static final float DISCARD_LEVEL_LOG_LOW = 1e-10f;
+    private static final float DISCARD_LEVEL_HIGH = 1e7f; // solar wind temp, xray flux: 1e4;
 
     private static final double ZOOMSTEP_PERCENTAGE = 0.02;
     private static final float UNSCALED_MIN_BOUND = Float.MIN_VALUE;
@@ -107,15 +107,21 @@ public class YAxis {
         end = invScale(newScaledMax);
     }
 
-    public double scale(double maxValue) {
-        return scale.scale(maxValue);
+    public float clip(float val) {
+        return scale.clip(val);
     }
 
-    private double invScale(double maxValue) {
-        return scale.invScale(maxValue);
+    public double scale(double val) {
+        return scale.scale(val);
+    }
+
+    private double invScale(double val) {
+        return scale.invScale(val);
     }
 
     public interface YAxisScale {
+
+        float clip(float val);
 
         double scale(double val);
 
@@ -138,8 +144,13 @@ public class YAxis {
         }
 
         @Override
+        public float clip(float val) {
+            return MathUtils.clip(val, DISCARD_LEVEL_LOG_LOW, DISCARD_LEVEL_HIGH);
+        }
+
+        @Override
         public double scale(double val) {
-            return Math.log10(MathUtils.clip(val, DISCARD_LEVEL_LOG_LOW, DISCARD_LEVEL_HIGH));
+            return Math.log10(val);
         }
 
         @Override
@@ -162,8 +173,13 @@ public class YAxis {
         }
 
         @Override
-        public double scale(double val) {
+        public float clip(float val) {
             return MathUtils.clip(val, DISCARD_LEVEL_LINEAR_LOW, DISCARD_LEVEL_HIGH);
+        }
+
+        @Override
+        public double scale(double val) {
+            return val;
         }
 
         @Override
@@ -187,8 +203,13 @@ public class YAxis {
         }
 
         @Override
-        public double scale(double val) {
+        public float clip(float val) {
             return MathUtils.clip(val, 0, DISCARD_LEVEL_HIGH);
+        }
+
+        @Override
+        public double scale(double val) {
+            return val;
         }
 
         @Override
