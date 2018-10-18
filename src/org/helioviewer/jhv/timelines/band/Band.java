@@ -76,7 +76,11 @@ public class Band extends AbstractTimelineLayer {
         long end = propagationModel.getObservationTime(timeAxis.end());
         float[] bounds = bandCache.getBounds(start, end);
 
-        double multiplier = bounds[0] == 0 ? 1 : bounds[0];
+        double multiplier = 1;
+        if (Float.isFinite(bounds[0]) && Float.isFinite(bounds[1]) && bounds[0] != 0) {
+            multiplier = bounds[0];
+        }
+
         jo.put("multiplier", multiplier);
         bandCache.serialize(jo, 1 / multiplier);
         bandType.serialize(jo);
@@ -100,13 +104,14 @@ public class Band extends AbstractTimelineLayer {
         TimeAxis timeAxis = DrawController.selectedAxis;
         long start = propagationModel.getObservationTime(timeAxis.start());
         long end = propagationModel.getObservationTime(timeAxis.end());
+
         float[] bounds = bandCache.getBounds(start, end);
         if (bounds[0] == bounds[1]) {
             resetAxis();
             return;
         }
 
-        if (bounds[0] != Float.MIN_VALUE && bounds[1] != Float.MIN_VALUE) {
+        if (Float.isFinite(bounds[0]) && Float.isFinite(bounds[1])) {
             yAxis.reset(bounds[0], bounds[1]);
             updateGraphsData();
         }

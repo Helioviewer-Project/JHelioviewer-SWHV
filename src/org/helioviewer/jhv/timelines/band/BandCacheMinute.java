@@ -12,6 +12,8 @@ import org.json.JSONObject;
 
 class BandCacheMinute implements BandCache {
 
+    private static final float MARKER = -Float.MAX_VALUE;
+
     private static final long DAYS_PER_CHUNK = 8;
     private static final long MILLIS_PER_TICK = 60000;
     private static final long CHUNKED_SIZE = TimeUtils.DAY_IN_MILLIS / MILLIS_PER_TICK * DAYS_PER_CHUNK;
@@ -47,8 +49,8 @@ class BandCacheMinute implements BandCache {
 
     @Override
     public float[] getBounds(long start, long end) {
-        float min = Float.MAX_VALUE;
-        float max = Float.MIN_VALUE;
+        float min = Float.POSITIVE_INFINITY;
+        float max = Float.NEGATIVE_INFINITY;
 
         long key = date2key(start);
         long keyEnd = date2key(end);
@@ -63,7 +65,7 @@ class BandCacheMinute implements BandCache {
 
             for (int i = 0; i < values.length; i++) {
                 float value = values[i];
-                if (value != Float.MIN_VALUE && start <= dates[i] && dates[i] <= end /* ? */) {
+                if (value != MARKER && start <= dates[i] && dates[i] <= end /* ? */) {
                     min = Math.min(value, min);
                     max = Math.max(value, max);
                 }
@@ -103,10 +105,10 @@ class BandCacheMinute implements BandCache {
             int i = 0;
             while (i < values.length) {
                 float value = values[i];
-                if (value <= Float.MIN_VALUE) {
+                if (value == MARKER) {
                     ret.add(list);
                     list = new ArrayList<>();
-                } else if (value > Float.MIN_VALUE) {
+                } else {
                     list.add(new DateValue(dates[i], value));
                 }
                 i++;
@@ -130,7 +132,7 @@ class BandCacheMinute implements BandCache {
                 return cache.getValues(0)[idx];
             }
         }
-        return Float.MIN_VALUE;
+        return 1;
     }
 
     @Override
@@ -150,7 +152,7 @@ class BandCacheMinute implements BandCache {
             int factor = 1;
             for (int i = 0; i < MAX_LEVEL; i++) {
                 values[i] = new float[(int) CHUNKED_SIZE / factor];
-                Arrays.fill(values[i], Float.MIN_VALUE);
+                Arrays.fill(values[i], MARKER);
                 dates[i] = new long[(int) CHUNKED_SIZE / factor];
                 factor *= FACTOR_STEP;
             }
