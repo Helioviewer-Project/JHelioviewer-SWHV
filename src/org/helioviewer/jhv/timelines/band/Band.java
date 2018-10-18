@@ -26,6 +26,8 @@ import org.json.JSONObject;
 
 public class Band extends AbstractTimelineLayer {
 
+    static final float MARKER = -Float.MAX_VALUE;
+
     private static final BandDataProvider dataProvider = EVEPlugin.eveDataprovider;
     private static final int SUPER_SAMPLE = 1; // 8 for dots
 
@@ -223,7 +225,7 @@ public class Band extends AbstractTimelineLayer {
     @Override
     public String getStringValue(long ts) {
         float val = bandCache.getValue(propagationModel.getObservationTime(ts));
-        if (val == Float.MIN_VALUE) {
+        if (val == MARKER) {
             return "--";
         } else if (bandType.getName().contains("XRSB")) {
             return GOESLevel.getStringValue(val);
