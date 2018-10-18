@@ -223,7 +223,7 @@ public class Band extends AbstractTimelineLayer {
     @Override
     public String getStringValue(long ts) {
         float val = bandCache.getValue(propagationModel.getObservationTime(ts));
-        if (val == YAxis.MARKER) {
+        if (val == YAxis.BLANK) {
             return "--";
         } else if (bandType.getName().contains("XRSB")) {
             return GOESLevel.getStringValue(val);

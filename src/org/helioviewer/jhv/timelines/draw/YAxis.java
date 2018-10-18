@@ -2,7 +2,7 @@ package org.helioviewer.jhv.timelines.draw;
 
 public class YAxis {
 
-    public static final float MARKER = -Float.MAX_VALUE;
+    public static final float BLANK = -Float.MAX_VALUE;
 
     private double start;
     private double end;
@@ -116,7 +116,7 @@ public class YAxis {
     }
 
     public float clip(float val) {
-        return min <= val && val <= max ? val : MARKER;
+        return min <= val && val <= max ? val : BLANK;
     }
 
     public double scale(double val) {
