@@ -118,8 +118,12 @@ public interface UpdateViewpoint {
                     itime = new JHVDate(TimeUtils.floorSec(t));
                 }
             }
+
             double elon = Sun.getEarth(itime).lon;
-            return new Position(itime, distance, elon + Math.PI / 2, Math.PI / 2);
+            ImageLayer layer = Layers.getActiveImageLayer();
+            double lon = layer == null ? elon : layer.getView().getMetaData(time).getViewpoint().lon;
+
+            return new Position(itime, distance, lon + Math.PI / 2, Math.PI / 2);
         }
     }
 
