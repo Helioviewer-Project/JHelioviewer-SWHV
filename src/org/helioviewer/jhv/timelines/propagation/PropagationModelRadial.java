@@ -21,21 +21,21 @@ public class PropagationModelRadial implements PropagationModel {
     }
 
     @Override
-    public long getInsituTime(long ts) {
-        return isPropagated ? (long) (ts + radiusMilli * getInsituDistance(ts) - getRSShift() + .5) : ts;
+    public long getObservationTime(long ts) {
+        return isPropagated ? (long) (ts + radiusMilli * getObservationDistance(ts) - getRSShift() + .5) : ts;
     }
 
     @Override
     public long getViewpointTime(long ts) {
-        return isPropagated ? (long) (ts - radiusMilli * getInsituDistance(ts) + getRSShift() + .5) : ts;
+        return isPropagated ? (long) (ts - radiusMilli * getObservationDistance(ts) + getRSShift() + .5) : ts;
     }
 
-    private static double getInsituDistance(long ts) {
+    private static double getObservationDistance(long ts) {
         return Sun.getEarthDistance(ts) * Sun.L1Factor;
     }
 
     private static double getRSShift() {
-        return Display.getCamera().getViewpoint().distance * Sun.RadiusMilli;
+        return Sun.RadiusMilli * Display.getCamera().getViewpoint().distance;
     }
 
 }

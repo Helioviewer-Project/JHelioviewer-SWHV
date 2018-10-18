@@ -72,8 +72,8 @@ public class Band extends AbstractTimelineLayer {
         jo.put("timeline", toString());
 
         TimeAxis timeAxis = DrawController.selectedAxis;
-        long start = propagationModel.getInsituTime(timeAxis.start());
-        long end = propagationModel.getInsituTime(timeAxis.end());
+        long start = propagationModel.getObservationTime(timeAxis.start());
+        long end = propagationModel.getObservationTime(timeAxis.end());
         float[] bounds = bandCache.getBounds(start, end);
 
         double multiplier = bounds[0] == 0 ? 1 : bounds[0];
@@ -98,8 +98,8 @@ public class Band extends AbstractTimelineLayer {
     @Override
     public void zoomToFitAxis() {
         TimeAxis timeAxis = DrawController.selectedAxis;
-        long start = propagationModel.getInsituTime(timeAxis.start());
-        long end = propagationModel.getInsituTime(timeAxis.end());
+        long start = propagationModel.getObservationTime(timeAxis.start());
+        long end = propagationModel.getObservationTime(timeAxis.end());
         float[] bounds = bandCache.getBounds(start, end);
         if (bounds[0] == bounds[1]) {
             resetAxis();
@@ -199,8 +199,8 @@ public class Band extends AbstractTimelineLayer {
             graphPolylines.clear();
 
             TimeAxis timeAxis = DrawController.selectedAxis;
-            long start = propagationModel.getInsituTime(timeAxis.start());
-            long end = propagationModel.getInsituTime(timeAxis.end());
+            long start = propagationModel.getObservationTime(timeAxis.start());
+            long end = propagationModel.getObservationTime(timeAxis.end());
             for (List<DateValue> list : bandCache.getValues(SUPER_SAMPLE * GLInfo.pixelScaleFloat[0] * graphArea.width, start, end)) {
                 if (!list.isEmpty()) {
                     IntArray dates = new IntArray(list.size());
@@ -217,7 +217,7 @@ public class Band extends AbstractTimelineLayer {
 
     @Override
     public String getStringValue(long ts) {
-        float val = bandCache.getValue(propagationModel.getInsituTime(ts));
+        float val = bandCache.getValue(propagationModel.getObservationTime(ts));
         if (val == Float.MIN_VALUE) {
             return "--";
         } else if (bandType.getName().contains("XRSB")) {
@@ -242,8 +242,8 @@ public class Band extends AbstractTimelineLayer {
 
     @Override
     public void fetchData(TimeAxis timeAxis) {
-        long start = propagationModel.getInsituTime(timeAxis.start());
-        long end = propagationModel.getInsituTime(timeAxis.end());
+        long start = propagationModel.getObservationTime(timeAxis.start());
+        long end = propagationModel.getObservationTime(timeAxis.end());
         dataProvider.updateBand(this, start, end);
         updateGraphsData();
     }
@@ -280,8 +280,8 @@ public class Band extends AbstractTimelineLayer {
     }
 
     @Override
-    public long getTimelineTime(long ts) {
-        return propagationModel.getInsituTime(ts);
+    public long getObservationTime(long ts) {
+        return propagationModel.getObservationTime(ts);
     }
 
     public void setPropagationModel(PropagationModel _propagationModel) {

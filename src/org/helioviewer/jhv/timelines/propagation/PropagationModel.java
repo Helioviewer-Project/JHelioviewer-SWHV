@@ -4,7 +4,7 @@ public interface PropagationModel {
 
     boolean isPropagated();
 
-    long getInsituTime(long ts);
+    long getObservationTime(long ts);
 
     long getViewpointTime(long ts);
 

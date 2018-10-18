@@ -249,8 +249,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             start = xAxis.start();
             end = xAxis.end();
         } else {
-            start = tl.getTimelineTime(xAxis.start());
-            end = tl.getTimelineTime(xAxis.end());
+            start = tl.getObservationTime(xAxis.start());
+            end = tl.getObservationTime(xAxis.end());
         }
         long tickDifferenceHorizontal = (xAxis.end() - xAxis.start()) / (horizontalTickCount - 1);
 
@@ -258,7 +258,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         for (int i = 0; i < horizontalTickCount; ++i) {
             long tickValue = xAxis.start() + i * tickDifferenceHorizontal;
             if (tl != null) {
-                tickValue = tl.getTimelineTime(tickValue);
+                tickValue = tl.getObservationTime(tickValue);
             }
 
             int x = value2pixel(graphArea.x, graphArea.width, tickValue, start, end);
@@ -267,7 +267,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             } else {
                 long tickDayNumber = tickValue / TimeUtils.DAY_IN_MILLIS;
                 long prevDayNumber = previousDate / TimeUtils.DAY_IN_MILLIS;
-
                 if (tickDayNumber == prevDayNumber) {
                     tickText = TimeUtils.format(DrawConstants.HOUR_TIME_FORMAT, tickValue);
                 } else {
@@ -288,7 +287,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 tickTextBounds = g.getFontMetrics().getStringBounds(line, g);
                 tickTextWidth = (int) tickTextBounds.getWidth();
                 int xl = x - (tickTextWidth / 2);
-
                 int xend = (int) DrawController.getGraphSize().getWidth() - DrawConstants.GRAPH_RIGHT_SPACE - tickTextWidth;
                 if (xl > xend) {
                     xl = xend;
