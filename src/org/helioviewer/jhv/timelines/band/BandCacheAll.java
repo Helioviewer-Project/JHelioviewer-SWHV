@@ -53,13 +53,18 @@ class BandCacheAll implements BandCache {
 
     @Override
     public List<List<DateValue>> getValues(double graphWidth, long start, long end) {
+        List<List<DateValue>> ret = new ArrayList<>();
         List<DateValue> list = new ArrayList<>();
         for (DateValue dv : datevals) {
-            if (dv.value != YAxis.BLANK && start <= dv.milli && dv.milli <= end) {
+            if (dv.value == YAxis.BLANK) {
+                ret.add(list);
+                list = new ArrayList<>();
+            } else if (start <= dv.milli && dv.milli <= end){
                 list.add(dv);
             }
         }
-        return Collections.singletonList(list);
+        ret.add(list);
+        return ret;
     }
 
     @Override
