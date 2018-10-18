@@ -65,7 +65,7 @@ class BandCacheMinute implements BandCache {
 
             for (int i = 0; i < values.length; i++) {
                 float value = values[i];
-                if (value != Band.MARKER && start <= dates[i] && dates[i] <= end /* ? */) {
+                if (value != YAxis.MARKER && start <= dates[i] && dates[i] <= end /* ? */) {
                     min = Math.min(value, min);
                     max = Math.max(value, max);
                 }
@@ -105,7 +105,7 @@ class BandCacheMinute implements BandCache {
             int i = 0;
             while (i < values.length) {
                 float value = values[i];
-                if (value == Band.MARKER) {
+                if (value == YAxis.MARKER) {
                     ret.add(list);
                     list = new ArrayList<>();
                 } else {
@@ -131,7 +131,7 @@ class BandCacheMinute implements BandCache {
                 return cache.getValues(0)[idx];
             }
         }
-        return Band.MARKER;
+        return YAxis.MARKER;
     }
 
     @Override
@@ -151,7 +151,7 @@ class BandCacheMinute implements BandCache {
             int factor = 1;
             for (int i = 0; i < MAX_LEVEL; i++) {
                 values[i] = new float[(int) CHUNKED_SIZE / factor];
-                Arrays.fill(values[i], Band.MARKER);
+                Arrays.fill(values[i], YAxis.MARKER);
                 dates[i] = new long[(int) CHUNKED_SIZE / factor];
                 factor *= FACTOR_STEP;
             }

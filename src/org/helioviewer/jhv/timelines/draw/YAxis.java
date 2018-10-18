@@ -1,8 +1,8 @@
 package org.helioviewer.jhv.timelines.draw;
 
-import org.helioviewer.jhv.math.MathUtils;
-
 public class YAxis {
+
+    public static final float MARKER = -Float.MAX_VALUE;
 
     private double start;
     private double end;
@@ -14,8 +14,9 @@ public class YAxis {
     private static final float DISCARD_LEVEL_HIGH = 1e7f; // solar wind temp, xray flux: 1e4;
 
     private static final double ZOOMSTEP_PERCENTAGE = 0.02;
-    private static final float UNSCALED_MIN_BOUND = -Float.MAX_VALUE;
-    private static final float UNSCALED_MAX_BOUND = Float.MAX_VALUE;
+
+    private final float min;
+    private final float max;
 
     private final double scaledMinBound;
     private final double scaledMaxBound;
@@ -25,8 +26,11 @@ public class YAxis {
         start = _start;
         end = _end;
         scale = _scale;
-        scaledMinBound = scale(clip(UNSCALED_MIN_BOUND));
-        scaledMaxBound = scale(clip(UNSCALED_MAX_BOUND));
+
+        min = scale.getMin();
+        max = scale.getMax();
+        scaledMinBound = scale(min);
+        scaledMaxBound = scale(max);
     }
 
     public double start() {
@@ -112,7 +116,7 @@ public class YAxis {
     }
 
     public float clip(float val) {
-        return scale.clip(val);
+        return min <= val && val <= max ? val : MARKER;
     }
 
     public double scale(double val) {
@@ -127,7 +131,9 @@ public class YAxis {
 
         boolean preferMax();
 
-        float clip(float val);
+        float getMin();
+
+        float getMax();
 
         double scale(double val);
 
@@ -155,8 +161,13 @@ public class YAxis {
         }
 
         @Override
-        public float clip(float val) {
-            return MathUtils.clip(val, DISCARD_LEVEL_LOG_LOW, DISCARD_LEVEL_HIGH);
+        public float getMin() {
+            return DISCARD_LEVEL_LOG_LOW;
+        }
+
+        @Override
+        public float getMax() {
+            return DISCARD_LEVEL_HIGH;
         }
 
         @Override
@@ -189,8 +200,13 @@ public class YAxis {
         }
 
         @Override
-        public float clip(float val) {
-            return MathUtils.clip(val, DISCARD_LEVEL_LINEAR_LOW, DISCARD_LEVEL_HIGH);
+        public float getMin() {
+            return DISCARD_LEVEL_LINEAR_LOW;
+        }
+
+        @Override
+        public float getMax() {
+            return DISCARD_LEVEL_HIGH;
         }
 
         @Override
@@ -224,8 +240,13 @@ public class YAxis {
         }
 
         @Override
-        public float clip(float val) {
-            return MathUtils.clip(val, 0, DISCARD_LEVEL_HIGH);
+        public float getMin() {
+            return 0;
+        }
+
+        @Override
+        public float getMax() {
+            return DISCARD_LEVEL_HIGH;
         }
 
         @Override
