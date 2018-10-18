@@ -50,8 +50,4 @@ public class DrawConstants {
 
     public static final DecimalFormat valueFormatter = MathUtils.numberFormatter("0", 4);
 
-    public static final double DISCARD_LEVEL_LINEAR_LOW = -100;
-    public static final double DISCARD_LEVEL_LOG_LOW = 1e-10;
-    public static final double DISCARD_LEVEL_HIGH = 1e7; // solar wind temp, xray flux: 1e4;
-
 }
