@@ -14,7 +14,7 @@ public class YAxis {
     private static final float DISCARD_LEVEL_HIGH = 1e7f; // solar wind temp, xray flux: 1e4;
 
     private static final double ZOOMSTEP_PERCENTAGE = 0.02;
-    private static final float UNSCALED_MIN_BOUND = Float.MIN_VALUE;
+    private static final float UNSCALED_MIN_BOUND = -Float.MAX_VALUE;
     private static final float UNSCALED_MAX_BOUND = Float.MAX_VALUE;
 
     private final double scaledMinBound;
@@ -25,8 +25,8 @@ public class YAxis {
         start = _start;
         end = _end;
         scale = _scale;
-        scaledMinBound = scale(UNSCALED_MIN_BOUND);
-        scaledMaxBound = scale(UNSCALED_MAX_BOUND);
+        scaledMinBound = scale(clip(UNSCALED_MIN_BOUND));
+        scaledMaxBound = scale(clip(UNSCALED_MAX_BOUND));
     }
 
     public double start() {
