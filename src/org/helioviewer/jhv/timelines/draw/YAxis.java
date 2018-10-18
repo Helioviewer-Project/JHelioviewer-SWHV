@@ -119,12 +119,16 @@ public class YAxis {
 
     }
 
+    private static String fixupUnit(String unit) {
+        return unit.replace("^2", "\u00B2").replace("^3", "\u00B3");
+    }
+
     public static class YAxisLogScale implements YAxisScale {
 
         private final String label;
 
         public YAxisLogScale(String _label) {
-            label = "log(" + _label.replace("^2", "\u00B2") + ')';
+            label = "log(" + fixupUnit(_label) + ')';
         }
 
         @Override
@@ -154,7 +158,7 @@ public class YAxis {
         private final String label;
 
         public YAxisIdentityScale(String _label) {
-            label = _label.replace("^2", "\u00B2");
+            label = fixupUnit(_label);
         }
 
         @Override
@@ -185,7 +189,7 @@ public class YAxis {
         private final String label;
 
         public YAxisPositiveIdentityScale(String _label) {
-            label = _label.replace("^2", "\u00B2");
+            label = fixupUnit(_label);
         }
 
         @Override
