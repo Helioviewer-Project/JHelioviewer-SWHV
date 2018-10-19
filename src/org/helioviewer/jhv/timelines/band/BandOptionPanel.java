@@ -82,7 +82,7 @@ class BandOptionPanel extends JPanel {
         c.anchor = GridBagConstraints.LINE_END;
         JFormattedTextField propagationField = new JFormattedTextField(new TerminatedFormatterFactory("%.3f", "km/s", 0, 299792.458));
         propagationField.setValue(0.);
-        propagationField.setColumns(14);
+        propagationField.setColumns(10);
         propagationField.addPropertyChangeListener("value", e -> {
             double speed = (Double) propagationField.getValue();
             band.setPropagationModel(new PropagationModelRadial(speed));
