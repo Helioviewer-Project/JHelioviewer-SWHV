@@ -35,6 +35,7 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.io.DataSources;
+import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCacheManager;
 
 import com.jidesoft.dialog.ButtonPanel;
@@ -171,8 +172,12 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         JPanel cache = new JPanel(new FlowLayout(FlowLayout.LEADING));
         JButton clearCache = new JButton("Clear Cache");
         clearCache.addActionListener(e -> {
-            JPIPCacheManager.clear();
-            setLabelCache();
+            try {
+                JPIPCacheManager.clear();
+                setLabelCache();
+            } catch (Exception ex) {
+                Log.error("JPIP cache clear error", ex);
+            }
         });
         cache.add(labelCache);
         cache.add(clearCache);
