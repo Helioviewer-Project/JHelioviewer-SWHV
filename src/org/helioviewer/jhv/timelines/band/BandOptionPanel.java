@@ -77,7 +77,7 @@ class BandOptionPanel extends JPanel {
             }).start();
         });
         add(downloadButton, c);
-
+        /*
         c.gridx = 3;
         c.anchor = GridBagConstraints.LINE_END;
         JFormattedTextField propagationField = new JFormattedTextField(new TerminatedFormatterFactory("%.3f", "km/s", 0, 299792.458));
@@ -87,7 +87,7 @@ class BandOptionPanel extends JPanel {
             double speed = (Double) propagationField.getValue();
             band.setPropagationModel(new PropagationModelRadial(speed));
         });
-        add(propagationField, c);
+        add(propagationField, c); */
         ComponentUtils.smallVariant(this);
     }
 
