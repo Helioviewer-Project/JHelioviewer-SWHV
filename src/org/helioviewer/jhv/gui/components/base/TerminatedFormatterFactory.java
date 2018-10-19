@@ -1,13 +1,13 @@
 package org.helioviewer.jhv.gui.components.base;
 
+import java.text.ParseException;
+
 import javax.swing.JFormattedTextField;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.text.DefaultFormatter;
-import java.text.ParseException;
 
 import org.helioviewer.jhv.math.MathUtils;
-import org.helioviewer.jhv.log.Log;
 
 @SuppressWarnings("serial")
 public class TerminatedFormatterFactory extends AbstractFormatterFactory {
@@ -51,7 +51,7 @@ public class TerminatedFormatterFactory extends AbstractFormatterFactory {
 
                 try {
                     value = Double.valueOf(string);
-                } catch (NumberFormatException e) {
+                } catch (Exception e) {
                     throw new ParseException("Could not parse number: " + string, 0);
                 }
             }
@@ -59,8 +59,12 @@ public class TerminatedFormatterFactory extends AbstractFormatterFactory {
         }
 
         @Override
-        public String valueToString(Object value) {
-            return String.format(format, value) + terminator;
+        public String valueToString(Object value) throws ParseException {
+            try {
+                return String.format(format, value) + terminator;
+            } catch (Exception e) {
+                throw new ParseException("Could not convert object: " + value, 0);
+            }
         }
 
         @Override
