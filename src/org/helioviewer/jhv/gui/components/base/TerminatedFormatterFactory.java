@@ -4,6 +4,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.text.DefaultFormatter;
+import java.text.ParseException;
 
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.log.Log;
@@ -37,25 +38,21 @@ public class TerminatedFormatterFactory extends AbstractFormatterFactory {
                 _max = _min;
             min = _min;
             max = _max;
+            setOverwriteMode(false);
         }
 
         @Override
-        public Object stringToValue(String string) {
-            double value = 0.;
-            if (string != null && !string.isEmpty()) {
+        public Object stringToValue(String string) throws ParseException {
+            double value = 0;
+            if (string != null) {
                 int t = string.indexOf(terminator);
-                if (t > 0) {
-                    try {
-                        value = Double.valueOf(string.substring(0, t));
-                    } catch (NumberFormatException e) {
-                        Log.warn("Could not parse number");
-                    }
-                } else {
-                    try {
-                        value = Double.valueOf(string);
-                    } catch (NumberFormatException e) {
-                        Log.warn("Could not parse number");
-                    }
+                if (t > 0)
+                    string = string.substring(0, t);
+
+                try {
+                    value = Double.valueOf(string);
+                } catch (NumberFormatException e) {
+                    throw new ParseException("Could not parse number: " + string, 0);
                 }
             }
             return MathUtils.clip(value, min, max);
