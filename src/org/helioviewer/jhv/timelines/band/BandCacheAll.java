@@ -59,7 +59,7 @@ class BandCacheAll implements BandCache {
             if (dv.value == YAxis.BLANK) {
                 ret.add(list);
                 list = new ArrayList<>();
-            } else if (start <= dv.milli && dv.milli <= end){
+            } else if (start <= dv.milli && dv.milli <= end) {
                 list.add(dv);
             }
         }
