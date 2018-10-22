@@ -983,7 +983,7 @@ This is implemented by the `GeometryService`.
 
 This is implemented by the `PropagationService`, a mock-up RPC server built on the Spyne toolkit (<http://spyne.io>, the same as the `GeometryService` service).
 
-4.  **(SWHV-CCN2-20300-04)** Test with and integrate ACE, DSCVR or other current in-situ datasets identified as relevant today for space weather forecasters.
+4.  **(SWHV-CCN2-20300-04)** Test with and integrate ACE, DSCOVR or other current in-situ datasets identified as relevant today for space weather forecasters.
 
 The considered use-case is measurements of phenomena propagating radially slower than speed of light.
 
@@ -998,6 +998,8 @@ Therefore the displayed time-scale has the following meaning:
 * the colored time-scale is time of observation;
 * when speed is 0, the time of the timelines panel (black time) is disconnected from image layers time → time is UTC at an undefined location (most likely Earth);
 * when speed is not 0, timelines panel time (black time) is the time determined by the image layers viewpoint, there is an additional speed-of-light propagation from Sun to the viewpoint → time is UTC at the viewpoint (according to viewpoint settings, may be different than Earth).
+
+Several DSCOVR in-situ timeline datasets were integrated. They were identified as highest priority for the space weather forecasters. The added datasets are the interplanetary magnetic field Bz, Bt, and Phi and the solar wind density, radial speed, and temperature.
 
 5.  **(SWHV-CCN2-20300-05)** Plot the sub-spacecraft point on the solar surface (both radially and w.r.t. magnetic connectivity, i.e., Parker spiral).
 
