@@ -54,7 +54,9 @@ logo-width: 40
 +------------+--------------------------------------------------------------------+
 | 2018-04-04 | Version 1.2 (Clarify document structure, more server design notes) |
 +------------+--------------------------------------------------------------------+
-| 2018-10-17 | Version 1.3 (Complete the sections about CCN2 work)                   |
+| 2018-10-17 | Version 1.3 (Complete the sections about CCN2 work)                |
++------------+--------------------------------------------------------------------+
+| 2018-11-21 | Version 1.4 (Complete JHV design notes for FAR))                   |
 +------------+--------------------------------------------------------------------+
 
 ## Purpose & Scope
@@ -277,7 +279,9 @@ the server returns the following JSON response:
 }
 ```
 
-This is a list of UTC timestamps and coordinates indicating the geometric position of the camera (the STEREO Ahead spacecraft in this example). The first coordinate is the distance to Sun, the second and third coordinates are the Stonyhurst heliographic longitude and latitude of the given object.
+This is a list of UTC timestamps and coordinates indicating the geometric position of the STEREO Ahead spacecraft in this example. The first coordinate is the distance to Sun, the second and third coordinates are the Stonyhurst heliographic longitude and latitude of the given object.
+
+The maximum number of points accepted for computation is 1e6 and the Python code distributes the computation to the available number of processors in the computer using Python multi-processing because the SPICE library is not re-entrant.
 
 At the moment, the following locations are available: all JPL DE430 ephemeris locations (solar system planets, Pluto, the Moon), comet 67P/Churyumov-Gerasimenko. Also available are the following spacecraft trajectories (existing or planned): SOHO, STEREO, SDO, PROBA-2, PROBA-3, Solar Orbiter, Parker Solar Probe. Several reference frames often used in the heliophysics domain are known.
 
@@ -358,11 +362,11 @@ Example:
 
 ```
 {
-samp.mtype=jhv.vso.load, 
+samp.mtype=jhv.vso.load,
 samp.params={
     cutout.h=2460.524544, cutout.w=2460.524544, start=2017-09-24,
 layers=[
-    {observatory=SDO, instrument=AIA, detector=, measurement=304, timestamp=2017-09-24T19:53:05}, 
+    {observatory=SDO, instrument=AIA, detector=, measurement=304, timestamp=2017-09-24T19:53:05},
     {observatory=SDO, instrument=AIA, detector=, measurement=171, timestamp=2017-09-24T19:52:45},
     {observatory=SDO, instrument=AIA, detector=, measurement=193, timestamp=2017-09-24T19:52:28}],
     cutout.set=1, cutout.x0=3.3579912600000625, end=2017-09-26, cutout.y0=1.1773994400000447, cadence=1800000, timestamp=2017-09-24T19:52:28}}
@@ -762,6 +766,96 @@ The program is driven via three timers:
 
 The design description will be expanded in a future version of this document.
 
+### Coordinates
+
+Distances are expressed in units of solar radii (photometric, Allen). This is for numerical stability and to ease the expression of some computations. Additionally, this unit helps with the limited precision of the OpenGL depth. On ingestion, the program can optionally normalize the apparent solar radius observed in various EUV wavelengths to the photometric reference. This is done to match the synthetic elements drawn independently, such as the grid, to the data. The program is able to display elements at distances up to about 10755$R_\odot$ from the Sun, which is beyond the aphelion of Pluto.
+
+Orientation is expressed in latitudinal form (latitude, longitude in radian) with respect to a Carrington reference frame for ease of expression of rotations as quaternions. Computations of rotations are performed using quaternions for performance and numerical stability reasons. The interaction with OpenGL is done using matrices since, besides rotation, it involves projection and translation.
+
+Together with a timestamp, the distance to Sun and the orientation constitute the fundamental concept of `Viewpoint`. One important viewpoint is Earth's. This is computed using an algorithm translated from SolarSoft `get_sun` (derived from Meuus, "Astronomy with a PC", ed. 2, tbc).
+
+Viewpoints can be computed at various timestamps using the `UpdateViewpoint`. Several forms are provided:
+
+- `Observer` takes the closest in time from the metadata of the master layer, see the Metadata section.
+- `Earth` computes the viewpoint with the algorithm mentioned above.
+- `EarthFixedDistance` is as above but with the distance fixed at 1au (it is used for the latitudinal and polar projections).
+- `Equatorial` is a viewpoint looking from above the solar North pole at a distance (~229au) that for a field-of-view angle of 1˚ makes visible objects up to 2au far from the Sun, the longitude is derived from the closest in time metadata of the master layer such that the Earth appears on the right hand side.
+- `Other` in UI, `Expert` in code are viewpoints which are computed from the responses to requests to the `GeometryService`. A maximum of 10000 points are requested to the server and interpolation is used as needed for the intermediate timestamps.
+
+### Camera
+
+The computed `Viewpoint` is used in setting up of the `Camera`, which intermediates to the rest of the program and to OpenGL.
+
+One important task of `Camera` is to set up the projection matrix which is always a variant of an orthographic projection with the Sun at depth 0. In the orthographic display mode, there are two types of projection matrices, one with deep clipping planes (range [-10755$R_\odot$,+10755$R_\odot$]), appropriate for far viewing distances such of the `Equatorial` viewpoint, and one with more shallow clipping planes (range [-32$R_\odot$,+32$R_\odot$], a bit more than LASCO C3 FOV), appropriate for the normal solar observations. This duality is necessary for the preservation of precision in the OpenGL depth buffer.
+
+Another important task of `Camera` is to set up the model-view matrix based on the orientation of the `Viewpoint` and on the rotation and the translation due to the user interaction with the image canvas. When image data draw commands are issued, a difference rotation with respect to the image metadata is computed, configured and used in the shader programs. For other drawn elements, the camera orientation may be saved, the camera may be rotated as desired, the draw command issued, and then the camera orientation may be restored.
+
+Functionality to translate from the two-dimensional coordinates of the image canvas to the three-dimensional internal coordinates is available in `CameraHelper`.
+
+### Metadata
+
+Metadata about the observations is extracted from the incoming image data format. It is currently possible to extract it either from the JPEG2000 formatted streams or from the FITS formatted streams. In the JPEG2000 streams it was derived from the original FITS header and inserted as XML at the moment of creation of the JP2 and JPX files while, for FITS streams, it is part of the format and it is transformed by the program to XML in order to use the same parsing code.
+
+A discussion about the necessary metadata components is at <https://github.com/bogdanni/hv-HEP/blob/master/HEP-0010.md>.
+
+If the necessary metadata can be derived, it is made available to the rest of the program in `HelioviewerMetaData` structures. For image formats without metadata, or when the metadata is not present or its parsing fails, a default metadata structure is built corresponding to the Earth viewpoint at 2000-01-01T00:00:00.
+
+### View
+
+A `View` is a representation of the incoming image data stream which knows how to read the stream and to decode it into pixel data which can be drawn. There are several specializations:
+
+- `SimpleImageView` reads image streams via Java `ImageIO` API; metadata is not available.
+- `FITSView` deals with FITS streams and uses the `nom-tam-fits` library (<https://github.com/nom-tam-fits/nom-tam-fits>).
+- `J2KView` deals with JPEG2000 streams and it is the most complex, as it has to implement both the image decoding via the Kakadu library and to implement the JPIP streaming protocol.
+
+`SimpleImageView` uses the `ImageIO` API capabilities for reading remote streams, while `FITSView` uses the `NetClient` interface of JHelioviewer. `J2KViewCallisto` is a specialization of `J2KView` which uses the `NetClient` interface to read JP2 files over HTTP, cache them locally and decode them as local files.
+
+The two major components of `J2KView` are:
+
+- `J2KReader` implements a minimal HTTP client and a minimal JPIP-over-HTTP streaming client. It fills the memory cache of `JPIPCache` (an extension of Kakadu `KduCache`) from which the image decoding takes place. Once the entirety of the data for a resolution level for a frame is available, it is extracted from the memory cache and it is sent via `JPIPCacheManager` into the disk persistence layer provided by the `Ehcache` library. The `sourceId` of the dataset and the timestamp of the frame is combined to form universal identifiers. `J2KReader` is also used to fill the cache indicator of the UI time slider via the `CacheStatus` interface. `J2KReader` is implemented as a thread that receives from `J2KView` commands to read. It tries to read requested data first via the `JPIPCacheManager` before constructing and issuing a request to the JPIP server if not available in the persistent disk cache. Once all data is read, the HTTP connection is closed and the `J2KReader` stops listening for commands.
+
+- `J2KDecoder` is in charge for forwarding commands to `Kdu_region_compositor` to decode image data out of `KduCache` (wrapped by `JPIPCache`). The commands are issued by `J2KView` over a queue of size one to a `DecodeExecutor` which handles just one thread at a time. If a command is already queued, it is removed from the queue to make place for the most recent one. The `J2KDecoder` thread manages instances of `Kdu_thread_env` and `Kdu_region_compositor` in thread local storage. On demand, those are created, re-created (as a result of exceptions raised by the Kakadu native code during decoding), and destroyed. The `Kdu_thread_env` object is used to distribute the decoding work of the native code over all CPUs. The resulting bytes of `Kdu_compositor_buf` in native memory are copied one-by-one using `LWJGL` `MemoryUtil.memGetByte`, which was found to have the highest performance and to reduce the amount of necessary buffers. `J2KDecoder` also manages a `Guava Cache` of soft references to the already decoded image data and, if the decode command received corresponds to an item in the cache, it immediately returns that instead of entering the Kakadu processing.
+
+The decoded pixel data together with the associated information such as the metadata is constructed into `ImageData` structures which are handed over to the `ImageDataHandler`, i.e., `ImageLayer`.
+
+### Layer
+
+A `Layer` is an interface to an object that knows how to draw itself on the image canvas. The program orders them in a `Layers` list and represents them in the user interface via a `LayersPanel` list selector where the user can interact with them (add, remove, select, made invisible). The layers in the list are drawn in order from the top to the bottom of the list selector. Each layer has a panel of options visible under the list selector when the layer is selected. Those options are used to configure the draw commands.
+
+A special group of layers is made of `ImageLayer`. Those can be re-ordered in the list by the user via drag-and-drop. Additional layers include `ViewpointLayer`, `GridLayer`, `TimestampLayer`, `MiniviewLayer`, `SWEKLayer`, and `PfssLayer`. The names correspond to user visible functionalities.
+
+The most sophisticated type of layer is the `ImageLayer`. This is because it implements the core functionality for image display and because it allows for the replacement of the underlying `View`.
+
+The same concept is used for timelines, where several of `TimelineLayer` are organized in a `TimelineLayers` list and are represented in the user interface via `TimelinePanel` list selector. Specializations are `Band` for plots, `RadioData` for Callisto spectrograms, and `EventTimelineLayer` for events.
+
+## Drawing
+
+The image canvas is implemented using a JOGL NEWT `GLWindow` encapsulated within a `NewtCanvasAWT` which integrates into the rest of the Swing interface.
+
+The drawing on the image canvas is done entirely using GLSL programs. The following interfaces are available:
+
+- `GLSLSolar` handles `solarOrtho`, `solarLati`, `solarPolar`, and `solarLogPolar` shaders to draw image data, and it is used exclusively by `ImageLayer`.
+- `GLSLLine` handles the `line` shaders to draw lines.
+- `GLSLShape` handles the `shape` and `point` shaders to draw shapes and points.
+- `GLSLTexture` handles `texture` shaders to superimpose texture data such as event icons, and it is used by `JhvTextRenderer` to draw text rendered into cached textures.
+
+Besides the drawing done by layers, annotations can be drawn by `InteractionAnnotate`.
+
+Matrices compatible with the OpenGL representation are maintained by the `Transform` class which implements projection and model-view matrix stacks and a simple cache of the result of the multiplication of the top of the stacks matrices. The stacks can be pushed and poped similarly to the traditional OpenGL fixed-function matrix stack and are queried at configuration time by the draw commands.
+
+## Input
+
+The input to the image canvas is received by the `GLWindow` from the JOGL NEWT input system. The events arrive on the NEWT Event Dispatch Thread and are re-issued on the AWT Event Dispatch Thread such that all computations in response to user interaction, which includes interaction with the Swing components, are performed on the Swing thread. The event dispatch to the interested subscribers is mediated by the `InputController`. The available interactions are
+
+- `InteractionAnnotate` - draw annotations, possibly interactively, on the image canvas;
+- `InteractionAxis` - rotate around the current `Viewpoint` axis;
+- `InteractionPan` - translate camera origin;
+- `InteractionRotate` - free rotation around camera origin.
+
+## Network I/O
+
+Besides the implementation specific for the JPIP network client, all the rest of network I/O is done via `NetClient`, which provides an interface implemented on top of `Okio` and `OkHTTP`, transparent to the actual location -- remote or local -- of the requested resource. All the remote APIs are REST and the implemented functionality is that of the HTTP GET request. The caching functionality of `OkHTTP` can be used or can be bypassed. An additional local cache where direct access to the cached files is possible is provided by `NetFileCache`.
+
 # CCN2 Tasks #
 
 ## WP20100 -- Study SWHV and JHV3D and WP20150 -- Merge JHV3D Ideas
@@ -891,7 +985,7 @@ This is implemented by the `PropagationService`, a mock-up RPC server built on t
 
 4.  **(SWHV-CCN2-20300-04)** Test with and integrate ACE, DSCVR or other current in-situ datasets identified as relevant today for space weather forecasters.
 
-The considered use-case is measurements of phenomena propagating radially slower than speed of light. 
+The considered use-case is measurements of phenomena propagating radially slower than speed of light.
 
 This is how one user imagines this feature would work:
 
@@ -903,7 +997,7 @@ Therefore the displayed time-scale has the following meaning:
 
 * the colored time-scale is time of observation;
 * when speed is 0, the time of the timelines panel (black time) is disconnected from image layers time → time is UTC at an undefined location (most likely Earth);
-* when speed is not 0, timelines panel time (black time) is the time determined by the image layers viewpoint, there is an additional speed-of-light propagation from Sun to the viewpoint → time is UTC at the viewpoint (according to viewpoint settings, may be different than Earth). 
+* when speed is not 0, timelines panel time (black time) is the time determined by the image layers viewpoint, there is an additional speed-of-light propagation from Sun to the viewpoint → time is UTC at the viewpoint (according to viewpoint settings, may be different than Earth).
 
 5.  **(SWHV-CCN2-20300-05)** Plot the sub-spacecraft point on the solar surface (both radially and w.r.t. magnetic connectivity, i.e., Parker spiral).
 
@@ -968,7 +1062,7 @@ Therefore, the VSO connection is achieved over the SAMP protocol via SunPy or So
 
 3.  **(SWHV-CCN2-21200-03)** Explore ways to improve and/or integrate FITS, NetCDF, VOTable formats.
 
-SWHV has improved support FITS files and can support CDF (not NetCDF) format using the <https://github.com/mbtaylor/jcdf> library and VOTable format using the <https://github.com/aschaaff/savot> library. 
+SWHV has improved support FITS files and can support CDF (not NetCDF) format using the <https://github.com/mbtaylor/jcdf> library and VOTable format using the <https://github.com/aschaaff/savot> library.
 
 The FITS support improvements include compressed and remote files, more supported instruments, more data-types, physical units, the BLANK keyword, better pixel scaling including the port of ZMax autoscaling algorithm of SAOImage DS9 (better results for EUV observations). SWHV can now display the value of the pixel under the mouse pointer in physical values.
 
