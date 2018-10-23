@@ -254,7 +254,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     public void handleData(ImageData newImageData) {
         setImageData(newImageData);
         JHVFrame.getLayers().fireTimeUpdated(this);
-        Display.handleData(imageData.getViewpoint());
+        MovieDisplay.handleData(imageData.getViewpoint());
     }
 
     @Override

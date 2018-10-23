@@ -16,8 +16,8 @@ import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.TransferHandler;
 
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.MovieDisplay;
 
 // Handles DnD row reordering
 @SuppressWarnings("serial")
@@ -108,7 +108,7 @@ class TableRowTransferHandler extends TransferHandler {
         if (act == TransferHandler.MOVE || act == TransferHandler.NONE) {
             grid.setCursor(Cursor.getDefaultCursor());
         }
-        Display.display();
+        MovieDisplay.display();
     }
 
 }

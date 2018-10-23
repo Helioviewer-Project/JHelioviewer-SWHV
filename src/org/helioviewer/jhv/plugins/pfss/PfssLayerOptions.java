@@ -11,9 +11,9 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.layers.MovieDisplay;
 
 @SuppressWarnings("serial")
 class PfssLayerOptions extends JPanel {
@@ -31,14 +31,14 @@ class PfssLayerOptions extends JPanel {
         JSpinner levelSpinner = new JSpinner(new SpinnerNumberModel(detail, 0, PfssSettings.MAX_DETAIL, 1));
         levelSpinner.addChangeListener(e -> {
             detail = (Integer) levelSpinner.getValue();
-            Display.display();
+            MovieDisplay.display();
         });
         WheelSupport.installMouseWheelSupport(levelSpinner);
 
         JSpinner radiusSpinner = new JSpinner(new SpinnerNumberModel(radius, 1.099999999999999, PfssSettings.MAX_RADIUS, 0.1));
         radiusSpinner.addChangeListener(e -> {
             radius = (Double) radiusSpinner.getValue();
-            Display.display();
+            MovieDisplay.display();
         });
         WheelSupport.installMouseWheelSupport(levelSpinner);
 
@@ -66,7 +66,7 @@ class PfssLayerOptions extends JPanel {
         JCheckBox fixedColors = new JCheckBox("Fixed colors", fixedColor);
         fixedColors.addActionListener(e -> {
             fixedColor = fixedColors.isSelected();
-            Display.display();
+            MovieDisplay.display();
         });
 
         c0.gridx = 4;

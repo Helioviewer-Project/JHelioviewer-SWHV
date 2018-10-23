@@ -10,6 +10,7 @@ import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.input.KeyShortcuts;
+import org.helioviewer.jhv.layers.MovieDisplay;
 
 @SuppressWarnings("serial")
 public class ZoomFitAction extends AbstractAction {
@@ -25,7 +26,7 @@ public class ZoomFitAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         CameraHelper.zoomToFit(Display.getCamera());
-        Display.render(1);
+        MovieDisplay.render(1);
     }
 
 }

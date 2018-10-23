@@ -4,8 +4,8 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.layers.MovieDisplay;
 
 @SuppressWarnings("serial")
 public class ZoomFOVAnnotationAction extends AbstractAction {
@@ -17,7 +17,7 @@ public class ZoomFOVAnnotationAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         JHVFrame.getAnnotateInteraction().zoom();
-        Display.render(1);
+        MovieDisplay.render(1);
     }
 
 }

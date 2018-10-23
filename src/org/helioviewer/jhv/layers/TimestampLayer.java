@@ -113,7 +113,7 @@ public class TimestampLayer extends AbstractLayer {
         JSlider slider = new JSlider(JSlider.HORIZONTAL, MIN_SCALE, MAX_SCALE, scale);
         slider.addChangeListener(e -> {
             scale = slider.getValue();
-            Display.display();
+            MovieDisplay.display();
         });
         WheelSupport.installMouseWheelSupport(slider);
 
