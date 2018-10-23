@@ -8,7 +8,6 @@ import javax.swing.Timer;
 import org.helioviewer.jhv.events.JHVEventHighlightListener;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.position.Position;
 
 public class MovieDisplay implements ActionListener, JHVEventHighlightListener {
 
@@ -29,12 +28,6 @@ public class MovieDisplay implements ActionListener, JHVEventHighlightListener {
 
     static void setFPS(int fps) {
         timer.setDelay(1000 / fps);
-    }
-
-    static void handleData(Position viewpoint) { // sync between layers, special for ImageLayer.handleData
-        if (ImageLayers.getSyncedImageLayers(viewpoint)) {
-            JHVFrame.getGLWindow().display(); // asap
-        }
     }
 
     public static void render(double decodeFactor) {

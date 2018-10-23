@@ -75,13 +75,13 @@ public class ImageLayers {
         return ct;
     }
 
-    static boolean getSyncedImageLayers(Position viewpoint) {
+    static void displaySynced(Position viewpoint) {
         for (ImageLayer layer : Layers.getImageLayers()) {
             ImageData id;
             if (layer.isEnabled() && (id = layer.getImageData()) != null && viewpoint != id.getViewpoint() /* deliberate on reference */)
-                return false;
+                return;
         }
-        return true;
+        MovieDisplay.display();
     }
 
     public static double getLargestPhysicalHeight() {
