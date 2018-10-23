@@ -5,9 +5,9 @@ import java.awt.Component;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.MovieDisplay;
 
 public class SharpenPanel implements FilterDetails {
 
@@ -21,7 +21,7 @@ public class SharpenPanel implements FilterDetails {
             int value = slider.getValue();
             layer.getGLImage().setSharpen(value / 100.);
             label.setText(LevelsPanel.align3(value));
-            Display.display();
+            MovieDisplay.display();
         });
         WheelSupport.installMouseWheelSupport(slider);
     }

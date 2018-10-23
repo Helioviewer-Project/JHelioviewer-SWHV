@@ -13,6 +13,7 @@ import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MiniviewLayer;
 import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.layers.MovieDisplay;
 
 import com.jogamp.nativewindow.ScalableSurface;
 import com.jogamp.opengl.GL2;
@@ -108,7 +109,7 @@ public class GLListener implements GLEventListener {
             MiniviewLayer miniview = Layers.getMiniviewLayer();
             if (miniview != null)
                 miniview.reshapeViewport();
-            Display.render(1);
+            MovieDisplay.render(1);
         });
     }
 

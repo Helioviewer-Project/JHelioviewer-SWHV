@@ -32,6 +32,7 @@ import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.gui.components.base.JHVToggleButton;
 import org.helioviewer.jhv.io.SampClient;
 import org.helioviewer.jhv.layers.ImageLayers;
+import org.helioviewer.jhv.layers.MovieDisplay;
 
 import com.jidesoft.swing.JideButton;
 
@@ -243,7 +244,7 @@ public class ToolBar extends JToolBar {
         coronaButton.setSelected(Display.getShowCorona());
         coronaButton.addItemListener(e -> {
             Display.setShowCorona(coronaButton.isSelected());
-            Display.display();
+            MovieDisplay.display();
         });
         addButton(coronaButton);
 

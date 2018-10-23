@@ -118,7 +118,7 @@ public class MiniviewLayer extends AbstractLayer {
         slider.addChangeListener(e -> {
             scale = slider.getValue();
             reshapeViewport();
-            Display.display();
+            MovieDisplay.display();
         });
         WheelSupport.installMouseWheelSupport(slider);
 

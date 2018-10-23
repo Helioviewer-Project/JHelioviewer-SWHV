@@ -90,7 +90,7 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
         fovSpinner.setMaximumSize(new Dimension(6, 22));
         fovSpinner.addChangeListener(e -> {
             fovAngle = (Double) fovSpinner.getValue();
-            Display.display();
+            MovieDisplay.display();
         });
 
         JFormattedTextField f = ((JSpinner.DefaultEditor) fovSpinner.getEditor()).getTextField();

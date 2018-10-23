@@ -1,25 +1,16 @@
 package org.helioviewer.jhv.display;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.Timer;
 
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.base.scale.Transform;
 import org.helioviewer.jhv.camera.Camera;
 //import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.events.JHVEventHighlightListener;
-import org.helioviewer.jhv.events.JHVRelatedEvents;
-import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.ImageLayers;
-import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
-import org.helioviewer.jhv.position.Position;
 
-public class Display implements ActionListener, JHVEventHighlightListener {
+public class Display {
 
     public static final double CAMERA_ZOOM_MULTIPLIER_WHEEL = 2.;
     public static final double CAMERA_ZOOM_MULTIPLIER_BUTTON = 2.;
@@ -173,50 +164,6 @@ public class Display implements ActionListener, JHVEventHighlightListener {
         viewports[3] = new Viewport(3, w / 2, h / 2, w / 2, h / 2);
     }
 
-    public static boolean isPlaying() {
-        return timer.isRunning();
-    }
-
-    public static void play() {
-        timer.restart();
-    }
-
-    public static void pause() {
-        timer.stop();
-    }
-
-    public static void setFPS(int fps) {
-        timer.setDelay(1000 / fps);
-    }
-
-    public static void render(double decodeFactor) {
-        if (ImageLayers.getNumEnabledImageLayers() == 0)
-            display();
-        else
-            ImageLayers.decode(decodeFactor);
-    }
-
-    public static void display() {
-        if (JHVFrame.getGLWindow() != null)
-            JHVFrame.getGLWindow().display(); // asap
-    }
-
-    public static void handleData(Position viewpoint) { // sync between layers, special for ImageLayer.handleData
-        if (ImageLayers.getSyncedImageLayers(viewpoint)) {
-            JHVFrame.getGLWindow().display(); // asap
-        }
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Movie.actionPerformed();
-    }
-
-    @Override
-    public void eventHightChanged() {
-        display();
-    }
-
     private static boolean showCorona = true;
 
     public static void setShowCorona(boolean _showCorona) {
@@ -225,13 +172,6 @@ public class Display implements ActionListener, JHVEventHighlightListener {
 
     public static boolean getShowCorona() {
         return showCorona;
-    }
-
-    private static final Display instance = new Display();
-    private static Timer timer = new Timer(1000 / 20, instance);
-
-    private Display() {
-        JHVRelatedEvents.addHighlightListener(this);
     }
 
 }

@@ -1,10 +1,6 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.HashSet;
-
-import javax.swing.Timer;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
@@ -15,11 +11,6 @@ import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.View.AnimationMode;
 
 public class Movie {
-
-    private static final Movie instance = new Movie();
-
-    private Movie() {
-    }
 
     static void setMaster(ImageLayer layer) {
         View view;
@@ -71,7 +62,7 @@ public class Movie {
 
     private static int deltaT;
 
-    public static void actionPerformed() {
+    static void advanceFrame() {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
             JHVDate nextTime = layer.getView().getNextTime(animationMode, deltaT);
@@ -83,21 +74,21 @@ public class Movie {
     }
 
     public static boolean isPlaying() {
-        return Display.isPlaying();
+        return MovieDisplay.isPlaying();
     }
 
     public static void play() {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null && layer.getView().isMultiFrame()) {
-            Display.play();
+            MovieDisplay.play();
             MoviePanel.setPlayState(true);
         }
     }
 
     public static void pause() {
-        Display.pause();
+        MovieDisplay.pause();
         MoviePanel.setPlayState(false);
-        Display.render(1); /* ! force update for on the fly resolution change */
+        MovieDisplay.render(1); /* ! force update for on the fly resolution change */
     }
 
     public static void toggle() {
@@ -155,7 +146,7 @@ public class Movie {
         for (ImageLayer layer : Layers.getImageLayers()) {
             layer.getView().setFrame(dateTime);
         }
-        Display.render(1);
+        MovieDisplay.render(1);
 
         ViewpointLayer viewpointLayer = Layers.getViewpointLayer();
         if (viewpointLayer != null)
@@ -207,12 +198,12 @@ public class Movie {
     }
 
     public static void setDesiredRelativeSpeed(int fps) {
-        Display.setFPS(fps);
+        MovieDisplay.setFPS(fps);
         deltaT = 0;
     }
 
     public static void setDesiredAbsoluteSpeed(int sec) {
-        Display.setFPS(20);
+        MovieDisplay.setFPS(20);
         deltaT = (int) (sec / 20.);
     }
 

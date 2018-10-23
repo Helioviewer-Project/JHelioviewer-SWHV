@@ -54,7 +54,7 @@ public class ImageLayers {
             }
         }
         Display.reshapeAll();
-        Display.render(1);
+        MovieDisplay.render(1);
     }
 
     @Nullable

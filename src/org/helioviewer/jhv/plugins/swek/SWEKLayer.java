@@ -34,6 +34,7 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
@@ -508,7 +509,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     @Override
     public void newEventsReceived() {
         if (enabled)
-            Display.display();
+            MovieDisplay.display();
     }
 
     @Override
@@ -522,7 +523,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         check.setHorizontalTextPosition(SwingConstants.LEFT);
         check.addActionListener(e -> {
             icons = !icons;
-            Display.display();
+            MovieDisplay.display();
         });
 
         GridBagConstraints c0 = new GridBagConstraints();
