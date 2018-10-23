@@ -15,6 +15,7 @@ import org.helioviewer.jhv.events.JHVEventHighlightListener;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.ImageLayers;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.position.Position;
 
@@ -172,42 +173,43 @@ public class Display implements ActionListener, JHVEventHighlightListener {
         viewports[3] = new Viewport(3, w / 2, h / 2, w / 2, h / 2);
     }
 
-    private static double decodeFactor = -1;
-    private static boolean toDisplay = false;
-
-    public static void start() {
-        new Timer(1000 / 60, instance).start();
+    public static boolean isPlaying() {
+        return timer.isRunning();
     }
 
-    public static void render(double f) {
+    public static void play() {
+        timer.restart();
+    }
+
+    public static void pause() {
+        timer.stop();
+    }
+
+    public static void setFPS(int fps) {
+        timer.setDelay(1000 / fps);
+    }
+
+    public static void render(double decodeFactor) {
         if (ImageLayers.getNumEnabledImageLayers() == 0)
-            toDisplay = true;
+            display();
         else
-            decodeFactor = f;
+            ImageLayers.decode(decodeFactor);
     }
 
     public static void display() {
-        toDisplay = true;
+        if (JHVFrame.getGLWindow() != null)
+            JHVFrame.getGLWindow().display(); // asap
     }
 
     public static void handleData(Position viewpoint) { // sync between layers, special for ImageLayer.handleData
         if (ImageLayers.getSyncedImageLayers(viewpoint)) {
-            // camera.updateCamera(viewpoint); // sync all layers
             JHVFrame.getGLWindow().display(); // asap
-            toDisplay = false;
         }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (toDisplay) {
-            JHVFrame.getGLWindow().display(); // asap
-            toDisplay = false;
-        }
-        if (decodeFactor != -1) {
-            ImageLayers.decode(decodeFactor);
-            decodeFactor = -1;
-        }
+        Movie.actionPerformed();
     }
 
     @Override
@@ -226,6 +228,7 @@ public class Display implements ActionListener, JHVEventHighlightListener {
     }
 
     private static final Display instance = new Display();
+    private static Timer timer = new Timer(1000 / 20, instance);
 
     private Display() {
         JHVRelatedEvents.addHighlightListener(this);

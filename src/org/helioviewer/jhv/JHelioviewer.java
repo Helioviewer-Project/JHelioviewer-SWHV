@@ -138,7 +138,7 @@ public class JHelioviewer {
             frame.setVisible(true);
 
             UITimer.start();
-            Display.start();
+            //Display.start();
 
             DataSources.loadSources();
             CommandLine.load();
