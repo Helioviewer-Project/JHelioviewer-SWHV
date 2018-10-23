@@ -78,6 +78,11 @@ public class JHVFrame {
         menuBar = new MenuBar();
         mainFrame.setJMenuBar(menuBar);
 
+        glWindow = GLHelper.createGLWindow(); // before camera
+        glWindow.setTitle(mainFrame.getTitle());
+        glListener = new GLListener(glWindow);
+        glWindow.addGLEventListener(glListener);
+
         Camera camera = Display.getCamera();
         panInteraction = new InteractionPan(camera);
         rotationInteraction = new InteractionRotate(camera);
@@ -96,11 +101,6 @@ public class JHVFrame {
         leftScrollPane.setFocusable(false);
         leftScrollPane.setBorder(null);
         leftScrollPane.getVerticalScrollBar().setUnitIncrement(layersPanel.getGridRowHeight());
-
-        glWindow = GLHelper.createGLWindow();
-        glWindow.setTitle(mainFrame.getTitle());
-        glListener = new GLListener(glWindow);
-        glWindow.addGLEventListener(glListener);
 
         inputController = new InputController();
         glWindow.addMouseListener(new NEWTMouseAdapter(inputController));

@@ -38,8 +38,7 @@ public class MovieDisplay implements ActionListener, JHVEventHighlightListener {
     }
 
     public static void display() {
-        if (JHVFrame.getGLWindow() != null) //!
-            JHVFrame.getGLWindow().display(); // asap
+        JHVFrame.getGLWindow().display(); // asap
     }
 
     @Override
