@@ -39,6 +39,7 @@ public class J2KView extends BaseView {
     private int trueFrame = 0;
 
     private final long[] cacheKey;
+    private final JHVDate[] dates;
 
     private final DecodeExecutor decoder = new DecodeExecutor();
     private final KakaduSource kduSource;
@@ -79,18 +80,20 @@ public class J2KView extends BaseView {
             kduSource = new KakaduSource(jpipCache, uri);
             maxFrame = kduSource.getNumberLayers() - 1;
             metaData = new MetaData[maxFrame + 1];
+            dates = new JHVDate[maxFrame + 1];
 
             kduSource.extractMetaData(metaData);
             for (int i = 0; i <= maxFrame; i++) {
                 if (metaData[i] == null)
                     metaData[i] = new PixelBasedMetaData(256, 256, i); // tbd real size
+                dates[i] = metaData[i].getViewpoint().time;
             }
 
             if (frames != null) {
                 if (maxFrame + 1 != frames.length)
                     Log.warn(uri + ": expected " + (maxFrame + 1) + "frames, got " + frames.length);
                 for (int i = 0; i < Math.min(maxFrame + 1, frames.length); i++) {
-                    JHVDate d = getFrameTime(i);
+                    JHVDate d = dates[i];
                     if (d.milli != frames[i] * 1000) {
                         cacheKey[i] = 0; // uncacheable
                         Log.warn(uri + "[" + i + "]: expected " + d + ", got " + new JHVDate(frames[i]));
@@ -178,26 +181,26 @@ public class J2KView extends BaseView {
             case Swing:
                 if (targetFrame == maxFrame) {
                     Movie.setAnimationMode(AnimationMode.SwingDown);
-                    return metaData[targetFrame - 1].getViewpoint().time;
+                    return dates[targetFrame - 1];
                 }
                 break;
             case SwingDown:
                 if (targetFrame == 0) {
                     Movie.setAnimationMode(AnimationMode.Swing);
-                    return metaData[1].getViewpoint().time;
+                    return dates[1];
                 }
-                return metaData[targetFrame - 1].getViewpoint().time;
+                return dates[targetFrame - 1];
             default: // Loop
                 if (next > maxFrame) {
-                    return metaData[0].getViewpoint().time;
+                    return dates[0];
                 }
         }
-        return metaData[next].getViewpoint().time;
+        return dates[next];
     }
 
     @Override
     public void setFrame(JHVDate time) {
-        int frame = getFrameNumber(time);
+        int frame = getFrameNumber(time.milli);
         if (frame != targetFrame) {
             if (frame > cacheStatus.getPartialUntil())
                 return;
@@ -205,12 +208,12 @@ public class J2KView extends BaseView {
         }
     }
 
-    private int getFrameNumber(JHVDate time) {
+    private int getFrameNumber(long milli) {
         int frame = -1;
         long lastDiff, currentDiff = -Long.MAX_VALUE;
         do {
             lastDiff = currentDiff;
-            currentDiff = metaData[++frame].getViewpoint().time.milli - time.milli;
+            currentDiff = dates[++frame].milli - milli;
         } while (currentDiff < 0 && frame < maxFrame);
         return -lastDiff < currentDiff ? frame - 1 : frame;
     }
@@ -222,17 +225,17 @@ public class J2KView extends BaseView {
         } else if (frame > maxFrame) {
             frame = maxFrame;
         }
-        return metaData[frame].getViewpoint().time;
+        return dates[frame];
     }
 
     @Override
     public JHVDate getFrameTime(JHVDate time) {
-        return metaData[getFrameNumber(time)].getViewpoint().time;
+        return dates[getFrameNumber(time.milli)];
     }
 
     @Override
     public MetaData getMetaData(JHVDate time) {
-        return metaData[getFrameNumber(time)];
+        return metaData[getFrameNumber(time.milli)];
     }
 
     private volatile boolean isDownloading;

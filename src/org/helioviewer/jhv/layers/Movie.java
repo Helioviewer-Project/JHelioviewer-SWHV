@@ -204,7 +204,7 @@ public class Movie {
 
     public static void setDesiredAbsoluteSpeed(int sec) {
         MovieDisplay.setFPS(20);
-        deltaT = (int) (sec / 20.);
+        deltaT = 1000 / 20 * sec;
     }
 
     private static AnimationMode animationMode = AnimationMode.Loop;
