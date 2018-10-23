@@ -24,7 +24,7 @@ import org.astrogrid.samp.SampUtils;
 
 public class ImageLayers {
 
-    public static void decode(double factor) {
+    static void decode(double factor) {
         Camera camera = Display.getCamera();
         Viewport[] vp = Display.getViewports();
         Position viewpoint = camera.getViewpoint();
@@ -66,7 +66,7 @@ public class ImageLayers {
         return null;
     }
 
-    public static int getNumEnabledImageLayers() {
+    static int getNumEnabledImageLayers() {
         int ct = 0;
         for (ImageLayer layer : Layers.getImageLayers()) {
             if (layer.isEnabled())
@@ -75,7 +75,7 @@ public class ImageLayers {
         return ct;
     }
 
-    public static boolean getSyncedImageLayers(Position viewpoint) {
+    static boolean getSyncedImageLayers(Position viewpoint) {
         for (ImageLayer layer : Layers.getImageLayers()) {
             ImageData id;
             if (layer.isEnabled() && (id = layer.getImageData()) != null && viewpoint != id.getViewpoint() /* deliberate on reference */)

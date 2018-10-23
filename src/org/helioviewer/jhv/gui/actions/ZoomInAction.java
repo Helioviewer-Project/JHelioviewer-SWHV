@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.input.KeyShortcuts;
@@ -24,7 +25,7 @@ public class ZoomInAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Display.getCamera().zoom(-Display.CAMERA_ZOOM_MULTIPLIER_BUTTON);
+        Display.getCamera().zoom(-Camera.ZOOM_MULTIPLIER_BUTTON);
         MovieDisplay.render(1);
     }
 
