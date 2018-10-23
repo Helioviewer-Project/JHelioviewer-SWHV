@@ -12,9 +12,6 @@ import org.helioviewer.jhv.opengl.GLSLSolarShader;
 
 public class Display {
 
-    public static final double CAMERA_ZOOM_MULTIPLIER_WHEEL = 2.;
-    public static final double CAMERA_ZOOM_MULTIPLIER_BUTTON = 2.;
-
     public enum DisplayMode {
         Orthographic(GLSLSolarShader.ortho, GridScale.ortho, Transform.transformlatitudinal),
         Latitudinal(GLSLSolarShader.lati, GridScale.lati, Transform.transformlatitudinal),
