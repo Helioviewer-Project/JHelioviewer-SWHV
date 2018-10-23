@@ -264,10 +264,9 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         secondLine.add(buttonPanel, BorderLayout.LINE_START);
 
         // Current frame number
-        JLabel frameNumberLabel = new JLabel((timeSlider.getValue() + 1) + "/" + (timeSlider.getMaximum() + 1), JLabel.RIGHT);
-        frameNumberLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
-        timeSlider.setLabel(frameNumberLabel);
-        secondLine.add(frameNumberLabel, BorderLayout.LINE_END);
+        JLabel frameNumberPanel = timeSlider.getFrameNumberPanel();
+        frameNumberPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
+        secondLine.add(frameNumberPanel, BorderLayout.LINE_END);
 
         // Speed
         modePanel.add(new JLabel("Play", JLabel.RIGHT));

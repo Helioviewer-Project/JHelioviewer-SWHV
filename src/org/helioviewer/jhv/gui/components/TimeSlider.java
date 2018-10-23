@@ -23,16 +23,14 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.view.View;
 
-/*
- * Extension of JSlider displaying the caching status on the track.
- * This element provides its own look and feel. Therefore, it is independent
- * from the global look and feel.
- */
+// Extension of JSlider displaying the caching status on the track.
+// This element provides its own look and feel. Therefore, it is independent
+// from the global look and feel.
 @SuppressWarnings("serial")
 public class TimeSlider extends JSlider implements LazyComponent, MouseListener, MouseMotionListener, MouseWheelListener {
 
     private final TimeSliderUI sliderUI;
-    private JLabel label;
+    private final JLabel frameNumberLabel;
     private boolean dirty;
     private boolean wasPlaying;
     private boolean allowSetFrame;
@@ -55,10 +53,12 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
         addMouseMotionListener(this);
         addMouseWheelListener(this);
         UITimer.register(this);
+
+        frameNumberLabel = new JLabel((getValue() + 1) + "/" + (getMaximum() + 1), JLabel.RIGHT);
     }
 
-    void setLabel(JLabel _label) {
-        label = _label;
+    JLabel getFrameNumberPanel() {
+        return frameNumberLabel;
     }
 
     void setAllowFrame(boolean _allowSetFrame) {
@@ -84,7 +84,7 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
     public void lazyRepaint() {
         if (dirty) {
             super.repaint();
-            label.setText((getValue() + 1) + "/" + (getMaximum() + 1));
+            frameNumberLabel.setText((getValue() + 1) + "/" + (getMaximum() + 1));
             dirty = false;
         }
     }
@@ -140,10 +140,8 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
             Movie.play();
     }
 
-    /**
-     * Extension of BasicSliderUI overriding some drawing functions.
-     * All functions for size calculations stay the same.
-     */
+    // Extension of BasicSliderUI overriding some drawing functions.
+    // All functions for size calculations stay the same.
     private static class TimeSliderUI extends BasicSliderUI {
 
         private static final Color notCachedColor = UIGlobals.backColor;

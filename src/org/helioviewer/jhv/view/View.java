@@ -18,6 +18,7 @@ public interface View {
         Loop, Stop, Swing, SwingDown
     }
 
+    @Nullable
     APIRequest getAPIRequest();
 
     void abolish();
