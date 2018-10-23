@@ -57,6 +57,7 @@ public class BaseView implements View {
         }
     }
 
+    @Nullable
     @Override
     public APIRequest getAPIRequest() {
         return request;

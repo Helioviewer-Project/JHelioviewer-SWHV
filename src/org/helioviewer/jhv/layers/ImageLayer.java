@@ -267,14 +267,17 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         return view.isLocal();
     }
 
+    @Nonnull
     public GLImage getGLImage() {
         return glImage;
     }
 
+    @Nonnull
     public View getView() {
         return view;
     }
 
+    @Nullable
     public APIRequest getAPIRequest() {
         return view.getAPIRequest();
     }
