@@ -758,10 +758,9 @@ WCS metadata is used to place image data at the correct viewpoint (time and posi
 
 In contrast to the 31k lines of code to implement all its many features, the core JHelioviewer design is very simple and can probably be expressed in a couple of thousands of lines of code. The principle of separation of concerns is applied throughout. Objects are asked to update themselves, they proceed to do so independently, and they report back when done. There are essentially no locks and few data structures are concurrently accessed by threads.
 
-The program is driven via three timers:
+The program is driven via two timers:
 
-- `Displayer` beats at constant 60 Hz and coalesces requests for decoding the image layers and refreshing the image canvas;
-- `Movie` beats at a configurable frequency (default 20 Hz) and is responsible for setting the program time (i.e., frame advance);
+- `MovieDisplay` beats at a configurable frequency (default 20 Hz) and is responsible for setting the program time (i.e., frame advance);
 - `UITimer` beats at constant 10 Hz and commands the refresh of the Swing UI components that need to change together with the movie frame; additionally, it commands the refresh of the timeline canvas.
 
 The design description will be expanded in a future version of this document.
