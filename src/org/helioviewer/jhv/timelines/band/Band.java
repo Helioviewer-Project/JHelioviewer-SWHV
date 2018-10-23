@@ -77,7 +77,7 @@ public class Band extends AbstractTimelineLayer {
         float[] bounds = bandCache.getBounds(start, end);
 
         double multiplier = 1;
-        if (Float.isFinite(bounds[0]) && Float.isFinite(bounds[1]) && bounds[0] != 0) {
+        if (bounds[0] != 0 && Float.isFinite(bounds[0]) && Float.isFinite(bounds[1])) {
             multiplier = bounds[0];
         }
 

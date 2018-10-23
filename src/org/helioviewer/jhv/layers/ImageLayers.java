@@ -30,12 +30,30 @@ public class ImageLayers {
         Position viewpoint = camera.getViewpoint();
 
         for (ImageLayer layer : Layers.getImageLayers()) {
-            int i;
-            if ((i = layer.isVisibleIdx()) != -1 && vp[i] != null) {
+            int i = layer.isVisibleIdx();
+            if (i != -1 && vp[i] != null) {
                 double pixFactor = CameraHelper.getPixelFactor(camera, vp[i]);
                 layer.getView().decode(viewpoint, pixFactor, factor);
             }
         }
+    }
+
+    static int getNumEnabledImageLayers() {
+        int ct = 0;
+        for (ImageLayer layer : Layers.getImageLayers()) {
+            if (layer.isEnabled())
+                ct++;
+        }
+        return ct;
+    }
+
+    static void displaySynced(Position viewpoint) { // coalesce layers
+        for (ImageLayer layer : Layers.getImageLayers()) {
+            ImageData id;
+            if (layer.isEnabled() && (id = layer.getImageData()) != null && viewpoint != id.getViewpoint() /* deliberate on reference */)
+                return;
+        }
+        MovieDisplay.display();
     }
 
     public static void arrangeMultiView(boolean multiview) {
@@ -64,24 +82,6 @@ public class ImageLayers {
                 return layer;
         }
         return null;
-    }
-
-    static int getNumEnabledImageLayers() {
-        int ct = 0;
-        for (ImageLayer layer : Layers.getImageLayers()) {
-            if (layer.isEnabled())
-                ct++;
-        }
-        return ct;
-    }
-
-    static void displaySynced(Position viewpoint) {
-        for (ImageLayer layer : Layers.getImageLayers()) {
-            ImageData id;
-            if (layer.isEnabled() && (id = layer.getImageData()) != null && viewpoint != id.getViewpoint() /* deliberate on reference */)
-                return;
-        }
-        MovieDisplay.display();
     }
 
     public static double getLargestPhysicalHeight() {
