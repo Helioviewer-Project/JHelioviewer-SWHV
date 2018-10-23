@@ -4,6 +4,7 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Mat4f;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Transform;
@@ -87,7 +88,7 @@ public class Camera {
 
     public void refresh() {
         updateCamera(Movie.getTime());
-        Display.render(1);
+        MovieDisplay.render(1);
     }
 
     public void reset() {
@@ -97,7 +98,7 @@ public class Camera {
 
         updateCamera(Movie.getTime());
         CameraHelper.zoomToFit(this);
-        Display.render(1);
+        MovieDisplay.render(1);
     }
 
     public Position getViewpoint() {

@@ -8,8 +8,8 @@ import org.helioviewer.jhv.camera.annotate.AnnotateCross;
 import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
 import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
@@ -119,14 +119,14 @@ public class InteractionAnnotate extends Interaction {
         if (!newAnnotateable.isDraggable()) {
             finishAnnotateable();
         }
-        Display.display();
+        MovieDisplay.display();
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
         if (newAnnotateable != null && newAnnotateable.isDraggable()) {
             newAnnotateable.mouseDragged(camera, e.getX(), e.getY());
-            Display.display();
+            MovieDisplay.display();
         }
     }
 
@@ -137,7 +137,7 @@ public class InteractionAnnotate extends Interaction {
             activeIndex = anns.size() - 1;
         }
         newAnnotateable = null;
-        Display.display();
+        MovieDisplay.display();
     }
 
     @Override
@@ -151,11 +151,11 @@ public class InteractionAnnotate extends Interaction {
 
         if (code == KeyEvent.VK_BACK_SPACE || code == KeyEvent.VK_DELETE) {
             remove();
-            Display.display();
+            MovieDisplay.display();
         } else if (code == KeyEvent.VK_N && activeIndex >= 0) {
             activeIndex++;
             activeIndex %= anns.size();
-            Display.display();
+            MovieDisplay.display();
         }
     }
 

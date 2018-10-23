@@ -9,6 +9,7 @@ import javax.swing.KeyStroke;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.input.KeyShortcuts;
+import org.helioviewer.jhv.layers.MovieDisplay;
 
 @SuppressWarnings("serial")
 public class ZoomOutAction extends AbstractAction {
@@ -24,7 +25,7 @@ public class ZoomOutAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         Display.getCamera().zoom(+Display.CAMERA_ZOOM_MULTIPLIER_BUTTON);
-        Display.display();
+        MovieDisplay.display();
     }
 
 }

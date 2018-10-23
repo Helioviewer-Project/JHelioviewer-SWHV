@@ -143,11 +143,11 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             }
             if (!text.isEmpty()) {
                 text.clear();
-                Display.display();
+                MovieDisplay.display();
             }
             if (minDist < 0.01) {
                 text.add(name);
-                Display.display();
+                MovieDisplay.display();
             }
         }
     }

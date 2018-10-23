@@ -116,7 +116,7 @@ public class Layers extends AbstractTableModel implements Reorderable {
 
         int row = layers.indexOf(layer);
         fireTableRowsInserted(row, row);
-        Display.display(); // e.g., PFSS layer
+        MovieDisplay.display(); // e.g., PFSS layer
     }
 
     public void remove(Layer layer) {
@@ -131,7 +131,7 @@ public class Layers extends AbstractTableModel implements Reorderable {
 
         if (row >= 0)
             fireTableRowsDeleted(row, row);
-        Display.display();
+        MovieDisplay.display();
     }
 
     public static void prerender(GL2 gl) {

@@ -3,6 +3,7 @@ package org.helioviewer.jhv.camera;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 
@@ -36,7 +37,7 @@ public class InteractionAxis extends Interaction {
 
         Vec3 axis = camera.getUpdateViewpoint() == UpdateViewpoint.equatorial ? Vec3.ZAxis : Vec3.YAxis;
         camera.rotateCurrentDragRotation(Quat.calcRotation(currentRotationStartPoint, currentRotationEndPoint).twist(axis));
-        Display.display();
+        MovieDisplay.display();
     }
 
 }

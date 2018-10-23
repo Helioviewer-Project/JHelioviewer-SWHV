@@ -11,13 +11,13 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.CircularProgressUI;
 import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.gui.components.base.JHVToggleButton;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.GLImage;
 
 public class RunningDifferencePanel implements FilterDetails {
@@ -35,7 +35,7 @@ public class RunningDifferencePanel implements FilterDetails {
                 item.setSelected(true);
             item.addActionListener(e -> {
                 layer.getGLImage().setDifferenceMode(mode);
-                Display.display();
+                MovieDisplay.display();
             });
             modeGroup.add(item);
             modePanel.add(item);

@@ -2,8 +2,8 @@ package org.helioviewer.jhv.plugins.pfss.data;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.io.NetClient;
+import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.JHVDate;
@@ -68,7 +68,7 @@ class PfssDataLoader extends JHVWorker<PfssData, Void> {
                 PfssData pfssData = get();
                 if (pfssData != null) {
                     PfssPlugin.getPfsscache().putData(url, pfssData);
-                    Display.display();
+                    MovieDisplay.display(); //!
                 }
             } catch (Exception e) {
                 e.printStackTrace();

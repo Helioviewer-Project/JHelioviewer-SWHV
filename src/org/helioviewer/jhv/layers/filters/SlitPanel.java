@@ -7,9 +7,9 @@ import java.awt.event.MouseEvent;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.MovieDisplay;
 
 import com.jidesoft.swing.RangeSlider;
 
@@ -45,7 +45,7 @@ public class SlitPanel implements FilterDetails {
             int hi = slider.getHighValue();
             layer.getGLImage().setSlit(lo / 100., hi / 100.);
             label.setText(LevelsPanel.format(lo, hi));
-            Display.display();
+            MovieDisplay.display();
         });
         WheelSupport.installMouseWheelSupport(slider);
     }

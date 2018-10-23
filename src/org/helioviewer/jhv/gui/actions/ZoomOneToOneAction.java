@@ -12,6 +12,7 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.metadata.MetaData;
 
 @SuppressWarnings("serial")
@@ -35,7 +36,7 @@ public class ZoomOneToOneAction extends AbstractAction {
             double fov = 2. * Math.atan2(0.5 * m.getPhysicalRegion().height * imageFraction, camera.getViewpoint().distance);
             camera.setFOV(fov);
 
-            Display.render(1);
+            MovieDisplay.render(1);
         }
     }
 

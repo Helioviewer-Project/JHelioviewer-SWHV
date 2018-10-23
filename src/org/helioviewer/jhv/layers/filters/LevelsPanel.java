@@ -7,9 +7,9 @@ import java.awt.event.MouseEvent;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.MovieDisplay;
 
 import com.jidesoft.swing.RangeSlider;
 
@@ -64,7 +64,7 @@ public class LevelsPanel implements FilterDetails {
             int hi = slider.getHighValue();
             layer.getGLImage().setBrightness(lo / 100., (hi - lo) / 100.);
             label.setText(format(lo, hi));
-            Display.display();
+            MovieDisplay.display();
         });
         WheelSupport.installMouseWheelSupport(slider);
     }

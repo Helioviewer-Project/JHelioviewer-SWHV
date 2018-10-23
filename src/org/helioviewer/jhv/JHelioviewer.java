@@ -11,7 +11,6 @@ import java.util.TimeZone;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.gui.UIGlobals;
@@ -138,7 +137,6 @@ public class JHelioviewer {
             frame.setVisible(true);
 
             UITimer.start();
-            //Display.start();
 
             DataSources.loadSources();
             CommandLine.load();
