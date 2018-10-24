@@ -52,10 +52,8 @@ class ParameterTablePanel extends JPanel implements MouseListener, MouseMotionLi
     private static String extractURL(JTable table, int col, int row) {
         Object value = table.getValueAt(row, col);
         if (value instanceof String) {
-            String strValue = (String) value;
-            Matcher m = Regex.HREF.matcher(strValue);
-            String url = m.find() ? m.group(1) : strValue;
-            return Regex.WEB_URL.matcher(url).matches() ? url : null;
+            Matcher m = Regex.HREF.matcher((String) value);
+            return m.find() ? m.group(1) : null;
         }
         return null;
     }
