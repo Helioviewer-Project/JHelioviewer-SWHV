@@ -1,9 +1,9 @@
 ---
 title: SWHV CCN2 Design Document
-subtitle: ROB-SWHV(7186)-DDF2 v1.3
+subtitle: ROB-SWHV(7186)-DDF2 v1.4
 author: SWHV Team
 subject: Space Weather HelioViewer
-date: 2018-10-17
+date: 2018-11-21
 geometry: margin=1in
 papersize: A4
 book: true
@@ -134,14 +134,14 @@ Before the SWHV project, both the server and the client-side software were deriv
 
 `hvJP2K` consists in the following tools:
 
-- `hv_jp2_decode` -- replacement for `kdu_expand`, sufficient for the web client image tile decoding;
-- `hv_jp2_encode` -- proto-replacement for `fits2img`, not yet capable of emitting conforming JP2 files;
-- `hv_jp2_transcode` -- wrapper for `kdu_transcode`, it can output JP2 format and can reparse the XML metadata to ensure conformity;
-- `hv_jp2_verify` -- verify the conformity of JP2 file format to ensure end-to-end compatibility;
-- `hv_jpx_merge` -- standalone replacement for `kdu_merge`, it can create JPX movies out of JP2 files;
-- `hv_jpx_mergec` -- client for `hv_jpx_merged`, written in C;
-- `hv_jpx_merged` -- Unix domain sockets threaded server for JPX merging functionality, it avoids the startup overhead of `hv_jpx_merge`;
-- `hv_jpx_split` -- split JPX movies into standalone JP2 files.
+- `hv_jp2_decode`: replacement for `kdu_expand`, sufficient for the web client image tile decoding;
+- `hv_jp2_encode`: proto-replacement for `fits2img`, not yet capable of emitting conforming JP2 files;
+- `hv_jp2_transcode`: wrapper for `kdu_transcode`, it can output JP2 format and can reparse the XML metadata to ensure conformity;
+- `hv_jp2_verify`: verify the conformity of JP2 file format to ensure end-to-end compatibility;
+- `hv_jpx_merge`: standalone replacement for `kdu_merge`, it can create JPX movies out of JP2 files;
+- `hv_jpx_mergec`: client for `hv_jpx_merged`, written in C;
+- `hv_jpx_merged`: Unix domain sockets threaded server for JPX merging functionality, it avoids the startup overhead of `hv_jpx_merge`;
+- `hv_jpx_split`: split JPX movies into standalone JP2 files.
 
 This software is mainly written in Python and is based on the `glymur`[^glymur] and `jpylyzer`[^jpylyzer] open source libraries.
 
@@ -185,9 +185,9 @@ The image services API is documented together with some examples at <https://api
 
 The API endpoints used by JHelioviewer are:
 
-- `getDataSources` -- to retrieve the list of available datasets which is then used by JHelioviewer to populate the "New Layer" UI elements for each server;
-- `getJPX` -- to request a time series of JP2 images as one JPX file;
-- `getJP2Image` -- to request one JP2 image.
+- `getDataSources`: retrieve the list of available datasets which is then used by JHelioviewer to populate the "New Layer" UI elements for each server;
+- `getJPX`: request a time series of JP2 images as one JPX file;
+- `getJP2Image`: to request one JP2 image.
 
 The API server reacts to the `getJPX` call by querying its database of image metadata, constructing a list of filenames to be used, passing the list to the program that will create the JPX file (`kdu_merge` or `hv_jpx_merge`), and making the resulting JPX file available to the `esajpip` server. Finally, the server sends back to the client a JSON response which contains the JPIP URI to use. The client connects to that URI and starts interacting with the JPIP server.
 
@@ -206,13 +206,13 @@ The timeline API is a REST service and consists of three parts.
 
 1. **Dataset Query API**: The client requests the description of the available datasets. The description includes group and label names to be used client-side, server-side name and units. It is available at <http://swhv.oma.be/datasets/index.php> and will list all datasets available and the corresponding groups. The response will be a JSON file with 2 keys:
     - `groups`: the list of groups visible in the client, it has 2 keys:
-        - `key`: a unique identifier
-        - `groupLabel`: the name of the group
+        - `key`: a unique identifier;
+        - `groupLabel`: the name of the group.
     - `objects`: the list of datasets with keys:
-        - `baseUrl`: the base URL of where to request the dataset
-        - `group`: the group identifier to which the dataset belongs
-        - `label`: the label of the dataset
-        - `name`: the unique identifier of the dataset
+        - `baseUrl`: the base URL of where to request the dataset;
+        - `group`: the group identifier to which the dataset belongs;
+        - `label`: the label of the dataset;
+        - `name`: the unique identifier of the dataset.
 
 1. **Data Availability API**: The server returns `coverage` as an array of disjoint time intervals, in increasing order. The coverage intervals are defined as containing data samples no further apart than five times the regular cadence. A similarly defined parameter demarcates the data gaps in the responses to the Data Request API.
 
@@ -270,12 +270,16 @@ the server returns the following JSON response:
 
 ```json
 {
-"result": [
-   { "2014-04-12T20:23:35.000": [143356392.01232576,2.712634949777619,0.12486990461569629]},
-   { "2014-04-13T02:23:35.000": [143359318.57914788,2.7129759257313513,0.12473463991365513]},
-   { "2014-04-13T08:23:35.000": [143362256.29411626,2.7133174795109087,0.12459673837570125]},
-   { "2014-04-13T14:23:35.000": [143365205.0945752,2.713659603829239,0.12445620339056596]}
- ]
+	"result": [
+		{ "2014-04-12T20:23:35.000":
+			[143356392.01232576,2.712634949777619,0.12486990461569629]},
+		{ "2014-04-13T02:23:35.000":
+			[143359318.57914788,2.7129759257313513,0.12473463991365513]},
+		{ "2014-04-13T08:23:35.000":
+			[143362256.29411626,2.7133174795109087,0.12459673837570125]},
+		{ "2014-04-13T14:23:35.000":
+			[143365205.0945752,2.713659603829239,0.12445620339056596]}
+	]
 }
 ```
 
@@ -289,15 +293,15 @@ The following functions are implemented:
 
 - `position` and `state` (in km, km/s, and/or radian) of `target` relative to `observer` in `ref` reference frame, optionally corrected for `abcorr` (`NONE` - geometric, default, `LT`, `LT%2BS`, `CN`, `CN%2BS`, `XLT`, `XLT%2BS`, `XCN`, `XCN%2BS`, see SPICE documentation); representations (`kind`): `rectangular` (default), `latitudinal`, `radec`, `spherical`, `cylindrical`;
 
-- `transform` -- transform between `from_ref` reference frame and `to_ref` reference frame; representations (`kind`): `matrix` (default), `angle` (Euler, radian), `quaternion` (SPICE format);
+- `transform` between `from_ref` reference frame and `to_ref` reference frame; representations (`kind`): `matrix` (default), `angle` (Euler, radian), `quaternion` (SPICE format);
 
-- `utc2scs` and `scs2utc` -- transform between UTC and spacecraft OBET (Solar Orbiter supported).
+- `utc2scs` and `scs2utc`: transform between UTC and spacecraft OBET (Solar Orbiter supported).
 
 Other arguments:
 
-- `utc` - start of time range
-- `utc_end` (optional) - end of time range
-- `deltat` (optional) - time step in seconds
+- `utc`: start of time range;
+- `utc_end` (optional): end of time range;
+- `deltat` (optional): time step in seconds.
 
 There is a guarantee that the data is sent ordered by UTC timestamps.
 
@@ -311,22 +315,22 @@ The following function is implemented:
 
 - `propagate`
     - Arguments:
-        - `name` (ignored) - quantity
-        - `utc` - start of time range
-        - `utc_end` (optional) - end of time range
-        - `deltat` (optional) - time step
+        - `name` (ignored): quantity;
+        - `utc`: start of time range;
+        - `utc_end` (optional): end of time range;
+        - `deltat` (optional): time step.
     - Returns: rectangular coordinates position of SOHO in HEEQ reference frame in km and fixed propagation speed of 1000km/s.
 
 ## SAMP ##
 
 The incoming SAMP messages supported by JHelioviewer are:
 
-- `image.load.fits` -- specific FITS image;
-- `table.load.fits` -- only for ESA SOHO Science Archive tool, as JHelioviewer does not support FITS tables yet;
-- `jhv.load.image` -- any image type supported by JHelioviewer, type determined by filename extension;
-- `jhv.load.request` -- image request file;
-- `jhv.load.timeline` -- timeline request file;
-- `jhv.load.state` -- state file.
+- `image.load.fits`: specific FITS image;
+- `table.load.fits`: only for ESA SOHO Science Archive tool, as JHelioviewer does not support FITS tables yet;
+- `jhv.load.image`: any image type supported by JHelioviewer, type determined by filename extension;
+- `jhv.load.request`: image request file;
+- `jhv.load.timeline`: timeline request file;
+- `jhv.load.state`: state file.
 
 Those messages have as parameter an URI to load. Both local and remote URIs are supported. An example of SAMP Web Profile usage is at <http://swhv.oma.be/test/samp/>.
 
@@ -336,40 +340,44 @@ The broadcasted SAMP message has the following form:
 
 - Message: `jhv.vso.load`
 - Arguments:
-    - timestamp (string) - date of the currently viewed frame coded in ISO8601 format (e.g., 2017-08-28T14:33:28)
-    - start (string) - start date of the currently viewed sequence coded in ISO8601 format (e.g., 2017-08-28T14:33:28)
-    - end (string) - end date of the currently viewed sequence coded in ISO8601 format (e.g., 2017-08-28T14:33:28)
-    - cadence (SAMP long) - number of milliseconds between each frame
-    - cutout.set (SAMP boolean) - whether or not only a part of the sun is visible:
-        0: the full Sun is visible
-        1: only a cutout of the Sun is visible
-    - cutout.x0 (SAMP float, arcsec, optional) - x-position of the currently viewed part of the Sun
-    - cutout.y0 (SAMP float, arcsec, optional) - y-position of the currently viewed part of the Sun
-    - cutout.w (SAMP float, arcsec, optional) - width of the currently viewed part of the Sun
-    - cutout.h (SAMP float, arcsec, optional) - height of the currently viewed part of the Sun
-    - layers (list of map) - the different layers currently displayed. The parameters of each layer are stored as a key-value pair with the following keys:
-        - observatory (string, required)
-        - instrument (string, required)
-        - detector (string, optional)
-        - measurement (string, optional)
-        - timestamp (string, ISO8601 date, required)
+	- timestamp (string): date of the currently viewed frame coded in ISO8601 format (e.g., 2017-08-28T14:33:28);
+    - start (string): start date of the currently viewed sequence coded in ISO8601 format (e.g., 2017-08-28T14:33:28);
+    - end (string): end date of the currently viewed sequence coded in ISO8601 format (e.g., 2017-08-28T14:33:28);
+    - cadence (SAMP long): number of milliseconds between each frame;
+    - cutout.set (SAMP boolean): whether or not only a part of the sun is visible:
+        - 0: the full Sun is visible;
+        - 1: only a cutout of the Sun is visible.
+	- cutout.x0 (SAMP float, arcsec, optional): x-position of the currently viewed part of the Sun;
+    - cutout.y0 (SAMP float, arcsec, optional): y-position of the currently viewed part of the Sun;
+    - cutout.w (SAMP float, arcsec, optional): width of the currently viewed part of the Sun;
+    - cutout.h (SAMP float, arcsec, optional): height of the currently viewed part of the Sun;
+    - layers (list of map): the different layers currently displayed. The parameters of each layer are stored as a key-value pair with the following keys:
+        - observatory (string, required);
+        - instrument (string, required);
+        - detector (string, optional);
+        - measurement (string, optional);
+        - timestamp (string, ISO8601 date, required).
 
         The keys which are set depend on the selected instrument.
-- Return Values: None
+- Return Values: None.
 - Description: Broadcasts information about all the currently visible layers in JHelioviewer including the current timestamp. Receiving applications can use this information to load the raw data from VSO, for example.
 
 Example:
 
 ```
 {
-samp.mtype=jhv.vso.load,
-samp.params={
-    cutout.h=2460.524544, cutout.w=2460.524544, start=2017-09-24,
-layers=[
-    {observatory=SDO, instrument=AIA, detector=, measurement=304, timestamp=2017-09-24T19:53:05},
-    {observatory=SDO, instrument=AIA, detector=, measurement=171, timestamp=2017-09-24T19:52:45},
-    {observatory=SDO, instrument=AIA, detector=, measurement=193, timestamp=2017-09-24T19:52:28}],
-    cutout.set=1, cutout.x0=3.3579912600000625, end=2017-09-26, cutout.y0=1.1773994400000447, cadence=1800000, timestamp=2017-09-24T19:52:28}}
+	samp.mtype=jhv.vso.load,
+	samp.params={
+		timestamp=2017-09-24T19:52:28, start=2017-09-24T00:00:00, end=2017-09-26T00:00:00,
+    	cutout.set=1, cutout.h=2460.524544, cutout.w=2460.524544, cutout.x0=3.3579912600000625, cutout.y0=1.1773994400000447,
+    	cadence=1800000,
+		layers=[
+    		{observatory=SDO, instrument=AIA, detector=, measurement=304, timestamp=2017-09-24T19:53:05},
+	    	{observatory=SDO, instrument=AIA, detector=, measurement=171, timestamp=2017-09-24T19:52:45},
+    		{observatory=SDO, instrument=AIA, detector=, measurement=193, timestamp=2017-09-24T19:52:28}
+    	],
+     }
+}
 ```
 
 ## File Formats ##
@@ -809,7 +817,7 @@ A `View` is a representation of the incoming image data stream which knows how t
 - `FITSView` deals with FITS streams and uses the `nom-tam-fits` library (<https://github.com/nom-tam-fits/nom-tam-fits>).
 - `J2KView` deals with JPEG2000 streams and it is the most complex, as it has to implement both the image decoding via the Kakadu library and to implement the JPIP streaming protocol.
 
-`SimpleImageView` uses the `ImageIO` API capabilities for reading remote streams, while `FITSView` uses the `NetClient` interface of JHelioviewer. `J2KViewCallisto` is a specialization of `J2KView` which uses the `NetClient` interface to read JP2 files over HTTP, cache them locally and decode them as local files.
+`SimpleImageView` uses the `ImageIO` API capabilities for reading remote streams, while `FITSView` uses the `NetClient` interface of JHelioviewer. `J2KViewCallisto` is a specialization of `J2KView` which uses the `NetClient` interface to read JP2 files over HTTP, then cache and decode them as local files.
 
 The two major components of `J2KView` are:
 
@@ -821,7 +829,7 @@ The decoded pixel data together with the associated information such as the meta
 
 ### Layer
 
-A `Layer` is an interface to an object that knows how to draw itself on the image canvas. The program orders them in a `Layers` list and represents them in the user interface via a `LayersPanel` list selector where the user can interact with them (add, remove, select, made invisible). The layers in the list are drawn in order from the top to the bottom of the list selector. Each layer has a panel of options visible under the list selector when the layer is selected. Those options are used to configure the draw commands.
+A `Layer` is an interface to an object that knows how to fetch its data and to draw itself on the image canvas. The program orders them in a `Layers` list and represents them in the user interface via a `LayersPanel` list selector where the user can interact with them (add, remove, select, made invisible). The layers in the list are drawn in order from the top to the bottom of the list selector. Each layer has a panel of options visible under the list selector when the layer is selected. Those options are used to configure the draw commands.
 
 A special group of layers is made of `ImageLayer`. Those can be re-ordered in the list by the user via drag-and-drop. Additional layers include `ViewpointLayer`, `GridLayer`, `TimestampLayer`, `MiniviewLayer`, `SWEKLayer`, and `PfssLayer`. The names correspond to user visible functionalities.
 
@@ -848,10 +856,10 @@ Matrices compatible with the OpenGL representation are maintained by the `Transf
 
 The input to the image canvas is received by the `GLWindow` from the JOGL NEWT input system. The events arrive on the NEWT Event Dispatch Thread and are re-issued on the AWT Event Dispatch Thread such that all computations in response to user interaction, which includes interaction with the Swing components, are performed on the Swing thread. The event dispatch to the interested subscribers is mediated by the `InputController`. The available interactions are
 
-- `InteractionAnnotate` - draw annotations, possibly interactively, on the image canvas;
-- `InteractionAxis` - rotate around the current `Viewpoint` axis;
-- `InteractionPan` - translate camera origin;
-- `InteractionRotate` - free rotation around camera origin.
+- `InteractionAnnotate`: draw annotations, possibly interactively, on the image canvas;
+- `InteractionAxis`: rotate around the current `Viewpoint` axis;
+- `InteractionPan`: translate camera origin;
+- `InteractionRotate`: free rotation around camera origin.
 
 ## Network I/O
 
@@ -861,15 +869,15 @@ Besides the implementation specific for the JPIP network client, all the rest of
 
 An important insight for high performance plotting is that plots can be requested for short and long time ranges, and, for the latter case, an excess of data points make for an illegible plot. Therefore, a multi-resolution approach for the time dimension is beneficial.
 
-For the Callisto spectrograms which are 2D, this is supported directly by using the JPEG2000 format for the data, with daily images having on the *x*-axis the second of the day, and on the *y*-axis the frequency bin.
+For the Callisto spectrograms which are 2D, this approach is supported by using the JPEG2000 format for the data, with daily images having on the *x*-axis the second of the day, and on the *y*-axis the frequency bin.
 
-The 1D timelines are cached in data structures which are pyramids of time resolutions. The highest resolution has one-minute bins and the lower resolutions are obtained by decimation. Depending on the nature of the dataset, several types of data are supported, namely linear, strictly positive, and logarithmic. For the latter two, the time decimation is performed by taking the maximum in the time bin to be decimated, as the user is likely to be interested in data peaks, e.g., flares.
+The 1D timelines are cached in data structures which are pyramids of time resolutions. The highest resolution has one-minute bins and the lower resolutions are obtained by decimation. Depending on the nature of the dataset, several types of data are supported, namely linear, strictly positive linear, and logarithmic. For the latter two, the time decimation is performed by taking the maximum in the time bin to be decimated, as the user is likely to be interested in data peaks, e.g., flares.
 
 ## Events
 
 Supported event sources are HEK and COMESEP. The interface to the COMESEP caching server is similar to the interface to the HEK and the format was designed to be similar, namely JSON structures with parameters. Since the user can view a large variety of events over long time ranges, significant effort was put into reducing the memory usage as Java objects have a high memory overhead. This was done by pruning some of the parameters and extensive use of interned strings.
 
-The event data is cached into an SQLite database, with the JSON structures inserted as gzip-compressed blobs. The last two weeks' worth of data can be updated to allow for server-side corrections. Some of the parameters are also available for query, allowing to implement filtering of some event types on the value of some parameters.
+The event data is cached into an SQLite database, with the JSON structures inserted as gzip-compressed blobs. The last two weeks' worth of data can be updated to allow for server-side corrections. Some of the parameters are also available for query, allowing to implement filtering of some event types on the value of those parameters.
 
 # CCN2 Tasks #
 
