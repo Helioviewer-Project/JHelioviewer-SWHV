@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.base.Regex;
+import org.apache.commons.validator.routines.UrlValidator;
 
 public class JHVEvent {
 
@@ -108,10 +108,11 @@ public class JHVEvent {
         allParametersArray = new ArrayList<>();
         visibleParameters = visibleParametersArray.toArray(new JHVEventParameter[0]);
 
+        UrlValidator urlValidator = UrlValidator.getInstance();
         // maybe should be configured
         ArrayList<JHVEventParameter> simpleVisibleParametersArray = new ArrayList<>();
         for (JHVEventParameter param : visibleParametersArray) {
-            if (!Regex.WEB_URL.matcher(param.getParameterValue()).matches())
+            if (!urlValidator.isValid(param.getParameterValue()))
                 simpleVisibleParametersArray.add(param);
         }
         simpleVisibleParameters = simpleVisibleParametersArray.toArray(new JHVEventParameter[0]);

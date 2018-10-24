@@ -5,6 +5,8 @@ import java.text.NumberFormat;
 
 import org.helioviewer.jhv.base.Regex;
 
+import org.apache.commons.validator.routines.UrlValidator;
+
 public class JHVEventParameter {
 
     private static final NumberFormat numFormatter = new DecimalFormat("0.###E0");
@@ -88,7 +90,7 @@ public class JHVEventParameter {
             String result = numFormatter.format(Double.parseDouble(value));
             return result.contains("E0") ? result.substring(0, result.length() - 2) : result;
         } else {
-            if (Regex.WEB_URL.matcher(value).matches())
+            if (UrlValidator.getInstance().isValid(value))
                 return "<a href=\"" + value + "\">Open URL</a>";
             return value;
         }
