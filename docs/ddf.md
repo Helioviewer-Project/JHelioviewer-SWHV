@@ -270,16 +270,16 @@ the server returns the following JSON response:
 
 ```json
 {
-	"result": [
-		{ "2014-04-12T20:23:35.000":
-			[143356392.01232576,2.712634949777619,0.12486990461569629]},
-		{ "2014-04-13T02:23:35.000":
-			[143359318.57914788,2.7129759257313513,0.12473463991365513]},
-		{ "2014-04-13T08:23:35.000":
-			[143362256.29411626,2.7133174795109087,0.12459673837570125]},
-		{ "2014-04-13T14:23:35.000":
-			[143365205.0945752,2.713659603829239,0.12445620339056596]}
-	]
+  "result": [
+    { "2014-04-12T20:23:35.000":
+	  [143356392.01232576,2.712634949777619,0.12486990461569629]},
+	{ "2014-04-13T02:23:35.000":
+	  [143359318.57914788,2.7129759257313513,0.12473463991365513]},
+	{ "2014-04-13T08:23:35.000":
+	  [143362256.29411626,2.7133174795109087,0.12459673837570125]},
+	{ "2014-04-13T14:23:35.000":
+	  [143365205.0945752,2.713659603829239,0.12445620339056596]}
+  ]
 }
 ```
 
@@ -366,17 +366,17 @@ Example:
 
 ```
 {
-	samp.mtype=jhv.vso.load,
-	samp.params={
-		timestamp=2017-09-24T19:52:28, start=2017-09-24T00:00:00, end=2017-09-26T00:00:00,
-    	cutout.set=1, cutout.h=2460.524544, cutout.w=2460.524544, cutout.x0=3.3579912600000625, cutout.y0=1.1773994400000447,
-    	cadence=1800000,
-		layers=[
-    		{observatory=SDO, instrument=AIA, detector=, measurement=304, timestamp=2017-09-24T19:53:05},
-	    	{observatory=SDO, instrument=AIA, detector=, measurement=171, timestamp=2017-09-24T19:52:45},
-    		{observatory=SDO, instrument=AIA, detector=, measurement=193, timestamp=2017-09-24T19:52:28}
-    	],
-     }
+  samp.mtype=jhv.vso.load,
+  samp.params={
+	timestamp=2017-09-24T19:52:28, start=2017-09-24T00:00:00, end=2017-09-26T00:00:00,
+    cutout.set=1, cutout.h=2460.524544, cutout.w=2460.524544, cutout.x0=3.3579912600000625, cutout.y0=1.1773994400000447,
+    cadence=1800000,
+	layers=[
+      {observatory=SDO, instrument=AIA, detector=, measurement=304, timestamp=2017-09-24T19:53:05},
+	  {observatory=SDO, instrument=AIA, detector=, measurement=171, timestamp=2017-09-24T19:52:45},
+      {observatory=SDO, instrument=AIA, detector=, measurement=193, timestamp=2017-09-24T19:52:28}
+    ]
+  }
 }
 ```
 
@@ -764,7 +764,7 @@ WCS metadata is used to place image data at the correct viewpoint (time and posi
 
 # JHelioviewer Design #
 
-In contrast to the 32k lines of code to implement all its many features, the core JHelioviewer design is very simple and can probably be expressed in a couple of thousands of lines of code. The program is structured in a manner amenable to performance and tries to balance CPU and memory usage with long lasting network and computation operations by using caches and high performance algorithms and data structures. The principle of separation of concerns is applied throughout. Objects are asked to update themselves, they proceed to do so independently, and they report back when done. There are essentially no locks and few data structures are concurrently accessed by threads.
+In contrast to the 32k lines of code to implement all its many features, the core JHelioviewer design is very simple and can probably be expressed in a couple of thousands of lines of code. The program is structured in a manner amenable to performance and to remain responsive while performing long lasting network and computation operations by using threads, caches, and high performance algorithms and data structures. The principle of separation of concerns is applied throughout. Objects are asked to update themselves, they proceed to do so independently, and they report back when done. There are essentially no locks and few data structures are concurrently accessed by threads.
 
 The program is driven via two timers:
 
@@ -781,23 +781,23 @@ Distances are expressed in units of solar radii (photometric, Allen). This is fo
 
 Orientation is expressed in latitudinal form (latitude, longitude in radian) with respect to a Carrington reference frame for ease of expression of rotations as quaternions. Computations of rotations are performed using quaternions for performance and numerical stability reasons. The interaction with OpenGL is done using matrices since, besides rotation, it involves projection and translation.
 
-Together with a timestamp, the distance to Sun and the orientation constitute the fundamental concept of `Viewpoint`. One important viewpoint is Earth's. This is computed using an algorithm translated from SolarSoft `get_sun` (derived from Meuus, "Astronomy with a PC", ed. 2, tbc).
+Together with a timestamp, the distance to Sun and the orientation constitute the fundamental concept of `Viewpoint`. One important viewpoint is Earth's. This is computed using an algorithm translated from the SolarSoft `get_sun` function (derived from Meuus, "Astronomy with a PC", ed. 2, tbc).
 
 Viewpoints can be computed at various timestamps using the `UpdateViewpoint`. Several forms are provided:
 
 - `Observer` takes the closest in time from the metadata of the master layer, see the Metadata section.
 - `Earth` computes the viewpoint with the algorithm mentioned above.
 - `EarthFixedDistance` is as above but with the distance fixed at 1au (it is used for the latitudinal and polar projections).
-- `Equatorial` is a viewpoint looking from above the solar North pole at a distance (~229au) that for a field-of-view angle of 1˚ makes visible objects up to 2au far from the Sun, the longitude is derived from the closest in time metadata of the master layer such that the Earth appears on the right-hand side.
+- `Equatorial` is a viewpoint looking from above the solar North pole at a distance (~229au) such that, for a field-of-view angle of 1˚, objects up to 2au far from the Sun are visible, the longitude is derived from the closest in time metadata of the master layer such that the Earth appears on the right-hand side.
 - `Other` (in UI, `Expert` in code) are viewpoints which are computed from the responses to requests to the `GeometryService`. A maximum of 10000 points are requested to the server and interpolation is used as needed for the intermediate timestamps.
 
 ### Camera
 
 The computed `Viewpoint` is used in setting up of the `Camera`, which intermediates to the rest of the program and to OpenGL.
 
-One important task of `Camera` is to set up the projection matrix which is always a variant of an orthographic projection with the Sun at depth 0. In the orthographic display mode, there are two types of projection matrices, one with deep clipping planes (range [-10755$R_\odot$,+10755$R_\odot$]), appropriate for far viewing distances such of the `Equatorial` viewpoint, and one with more shallow clipping planes (range [-32$R_\odot$,+32$R_\odot$], a bit more than LASCO C3 FOV), appropriate for the normal solar observations. This duality is necessary for the preservation of precision in the OpenGL depth buffer.
+One important task of `Camera` is to set up the projection matrix. The projection is always a variant of an orthographic projection with the Sun at depth 0. In the orthographic display mode, there are two types of projection matrices, one with deep clipping planes (range [-10755$R_\odot$,+10755$R_\odot$]), appropriate for far viewing distances such of the `Equatorial` viewpoint, and one with more shallow clipping planes (range [-32$R_\odot$,+32$R_\odot$], a bit more than LASCO C3 FOV), appropriate for the normal solar observations. This duality is necessary for the preservation of precision in the OpenGL depth buffer.
 
-Another important task of `Camera` is to set up the model-view matrix based on the orientation of the `Viewpoint` and on the rotation and the translation due to the user interaction with the image canvas. When image data draw commands are issued, a difference rotation with respect to the image metadata is computed, configured and used in the shader programs. For other drawn elements, the camera orientation may be saved, the camera may be rotated as desired, the draw command issued, and then the camera orientation may be restored.
+Another important task of `Camera` is to set up the model-view matrix. This is based on the orientation of the `Viewpoint` and on the rotation and the translation due to the user interaction with the image canvas. When image data draw commands are issued, a difference rotation with respect to the image metadata is computed, configured and used in the shader programs. For other drawn elements, the camera orientation may be saved, the camera may be rotated as desired, the draw command issued, and then the camera orientation may be restored.
 
 Functionality to translate from the two-dimensional coordinates of the image canvas to the three-dimensional internal coordinates is available in `CameraHelper`.
 
@@ -823,7 +823,7 @@ The two major components of `J2KView` are:
 
 - `J2KReader` implements a minimal HTTP client and a minimal JPIP-over-HTTP streaming client. It fills the memory cache of `JPIPCache` (an extension of Kakadu `KduCache`) from which the image decoding takes place. Once the entirety of the data for a resolution level for a frame is available, it is extracted from the memory cache and it is sent via `JPIPCacheManager` into the disk persistence layer provided by the `Ehcache` library. The `sourceId` of the dataset and the timestamp of the frame is combined to form universal identifiers. `J2KReader` is also used to fill the cache indicator of the UI time slider via the `CacheStatus` interface. `J2KReader` is implemented as a thread that receives from `J2KView` commands to read. It tries to read requested data first via the `JPIPCacheManager` before constructing and issuing a request to the JPIP server if not available in the persistent disk cache. Once all data is read, the HTTP connection is closed and the `J2KReader` stops listening for commands.
 
-- `J2KDecoder` is in charge for forwarding commands to `Kdu_region_compositor` to decode image data out of `KduCache` (wrapped by `JPIPCache`). The commands are issued by `J2KView` over a queue of size one to a `DecodeExecutor` which handles just one thread at a time. If a command is already queued, it is removed from the queue to make place for the most recent one. The `J2KDecoder` thread manages instances of `Kdu_thread_env` and `Kdu_region_compositor` in thread local storage. On demand, those are created, re-created (as a result of exceptions raised by the Kakadu native code during decoding), and destroyed. The `Kdu_thread_env` object is used to distribute the decoding work of the native code over all CPUs. The resulting bytes of `Kdu_compositor_buf` in native memory are copied one-by-one using `LWJGL` `MemoryUtil.memGetByte`, which was found to have the highest performance and to reduce the size of necessary memory buffers. `J2KDecoder` also manages a `Guava Cache` of soft references to the already decoded image data and, if the decode command received corresponds to an item in the cache, it immediately returns that instead of entering the Kakadu processing.
+- `J2KDecoder` is in charge for forwarding commands to `Kdu_region_compositor` to decode image data out of `KduCache` (wrapped by `JPIPCache`). The commands are issued by `J2KView` over a queue of size one to a `DecodeExecutor` which handles just one thread at a time. If a command is already queued, it is removed from the queue to make place for the most recent one. The `J2KDecoder` thread manages instances of `Kdu_thread_env` and `Kdu_region_compositor` in thread local storage. On demand, those are created, re-created (as a result of exceptions raised by the Kakadu native code during decoding), and destroyed. The `Kdu_thread_env` object is used to distribute the decoding work of the native code over all CPUs. The resulting bytes of `Kdu_compositor_buf` in native memory are copied one-by-one using `LWJGL` `MemoryUtil.memGetByte`, which was found to have the highest performance and to reduce the size of necessary memory buffers. `J2KDecoder` also manages a `Guava Cache` of soft references to the already decoded image data and, if the decode command received corresponds to an item in the cache, it immediately returns that item instead of entering the Kakadu processing.
 
 The decoded pixel data together with the associated information such as the metadata is constructed into `ImageData` structures which are handed over to the `ImageDataHandler`, i.e., `ImageLayer`.
 
@@ -835,7 +835,7 @@ A special group of layers is made of `ImageLayer`. Those can be re-ordered in th
 
 The most sophisticated type of layer is the `ImageLayer`. This is because it implements the core functionality for image display and because it allows for the replacement of the underlying `View`.
 
-The same concept is used for timelines, where several of `TimelineLayer` are organized in a `TimelineLayers` list and are represented in the user interface via `TimelinePanel` list selector. Specializations are `Band` for plots, `RadioData` for Callisto spectrograms, and `EventTimelineLayer` for events.
+The same concept is used for timelines, where several of `TimelineLayer` are organized in a `TimelineLayers` list and are represented in the user interface via the `TimelinePanel` list selector. Specializations are `Band` for plots, `RadioData` for Callisto spectrograms, and `EventTimelineLayer` for events.
 
 ## Drawing
 
@@ -852,9 +852,9 @@ Besides the drawing done by layers, annotations can be drawn by `InteractionAnno
 
 Matrices compatible with the OpenGL representation are maintained by the `Transform` class which implements projection and model-view matrix stacks and a simple cache of the result of the multiplication of the top of the matrix stacks. The stacks can be pushed and popped similarly to the traditional OpenGL fixed-function matrix stacks and are queried at configuration time by the draw commands.
 
-## Input
+## User Input
 
-The input to the image canvas is received by the `GLWindow` from the JOGL NEWT input system. The events arrive on the NEWT Event Dispatch Thread and are re-issued on the AWT Event Dispatch Thread such that all computations in response to user interaction, which includes interaction with the Swing components, are performed on the Swing thread. The event dispatch to the interested subscribers is mediated by the `InputController`. The available interactions are
+The user input (mouse movements and keyboard strokes) to the image canvas is received by the `GLWindow` from the JOGL NEWT input system. The events arrive on the NEWT Event Dispatch Thread and are re-issued on the AWT Event Dispatch Thread such that all computations in response to user interaction are performed on the Swing thread. The event dispatch to the interested subscribers is mediated by the `InputController`. The available interactions are
 
 - `InteractionAnnotate`: draw annotations, possibly interactively, on the image canvas;
 - `InteractionAxis`: rotate around the current `Viewpoint` axis;
