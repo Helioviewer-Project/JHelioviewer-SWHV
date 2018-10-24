@@ -118,7 +118,7 @@ The open-source alternative for the creation of JPEG2000 files is the `fits2img`
 
 While ingesting new datasets during the SWHV project, it became apparent that the metadata in the FITS headers of some datasets is lacking or is defective. A FITS-to-FITS conversion stage is needed for those datasets to adjust the metadata to the needs of the Helioviewer system. At <https://github.com/bogdanni/hv-HEP/blob/master/HEP-0010.md> there is a summary of those needs.
 
-The following new datasets were added in the course of the project: Kanzelhoehe H-alpha,  NSO-GONG farside, NSO-GONG H-alpha, NSO-GONG magnetogram, NSO-SOLIS Azimuth, NSO-SOLIS CoreFluxDens, NSO-SOLIS CoreWingInt, NSO-SOLIS FillFactor, NSO-SOLIS Inclination, NSO-SOLIS Intensity 1083Å, NSO-SOLIS Intensity 6302Å, NSO-SOLIS Strength, ROB-USET H-alpha.
+The following new datasets were added in the course of the project: Kanzelhoehe H-alpha,  NSO-GONG far side, NSO-GONG H-alpha, NSO-GONG magnetogram, NSO-SOLIS Azimuth, NSO-SOLIS CoreFluxDens, NSO-SOLIS CoreWingInt, NSO-SOLIS FillFactor, NSO-SOLIS Inclination, NSO-SOLIS Intensity 1083Å, NSO-SOLIS Intensity 6302Å, NSO-SOLIS Strength, ROB-USET H-alpha.
 
 In addition, daily radio spectrograms are created from the Callisto network observations. The data files are downloaded from the e-Callisto network website and merged into a composite dataset in order to ensure good 24-hour coverage. The data values are calibrated to correct for instrument sensitivity in frequency and time. During this operation the values are also normalized and transformed to fit into fixed time and frequency bins, covering fixed time and frequency ranges. When multiple values contribute to one bin of the overall image, an average is taken as the final value. An averaging procedure was implemented in order to reduce the noise. It only involves approximately the highest 10% of the signal. This allows reducing the noise sufficiently, while still being able to have enough contrast. The data is written to a temporary FITS file with keywords indicating the frequency and time ranges, frequency and time bin sizes. The composite image is then transformed into a JPEG2000 image file (size 86400×380), one per day.
 
@@ -130,7 +130,7 @@ In order to ensure the communication between the server and the client, the Heli
 
 The JPEG2000 standards have a high degree of sophistication and versatility. In order to encourage the proliferation of Helioviewer image datasets, it should be possible to generate those files with standard conforming software other than the proprietary Kakadu software currently used. It becomes therefore necessary to validate the full structure of Helioviewer image files formally and automatically. A verification system based on Schematron[^schematron] XML schemas was developed. This procedure is able to verify the structure of JPEG2000 file and codestream, including the associated information such as the Helioviewer specific XML metadata, ensuring the end-to-end compatibility with the Helioviewer system.
 
-Before the SWHV project, both the server and the client-side software were derived from the Kakadu Software toolkit (<http://kakadusoftware.com>). Much of the server-side usage of the Kakadu software can be now replaced with the `fits2img` and `hvJP2K` (<https://github.com/Helioviewer-Project/hvJP2K>) packages. If the server does not handle files produced by IDL, no server side use of Kakadu software is necessary.
+Before the SWHV project, both the server and the client-side software were derived from the Kakadu Software toolkit (<http://kakadusoftware.com>). Much of the server-side usage of the Kakadu software can be now replaced with the `fits2img` and `hvJP2K` (<https://github.com/Helioviewer-Project/hvJP2K>) packages. If the server does not handle files produced by IDL, no server-side use of Kakadu software is necessary.
 
 `hvJP2K` consists in the following tools:
 
@@ -756,14 +756,16 @@ WCS metadata is used to place image data at the correct viewpoint (time and posi
 
 # JHelioviewer Design #
 
-In contrast to the 31k lines of code to implement all its many features, the core JHelioviewer design is very simple and can probably be expressed in a couple of thousands of lines of code. The principle of separation of concerns is applied throughout. Objects are asked to update themselves, they proceed to do so independently, and they report back when done. There are essentially no locks and few data structures are concurrently accessed by threads.
+In contrast to the 32k lines of code to implement all its many features, the core JHelioviewer design is very simple and can probably be expressed in a couple of thousands of lines of code. The program is structured in a manner amenable to performance and tries to balance CPU and memory usage with long lasting network and computation operations by using caches and high performance algorithms and data structures. The principle of separation of concerns is applied throughout. Objects are asked to update themselves, they proceed to do so independently, and they report back when done. There are essentially no locks and few data structures are concurrently accessed by threads.
 
 The program is driven via two timers:
 
-- `MovieDisplay` beats at a configurable frequency (default 20 Hz) and is responsible for setting the program time (i.e., frame advance);
+- `MovieDisplay` beats at a configurable frequency (default 20 Hz) and commands the setting of the program time (i.e., frame advance);
 - `UITimer` beats at constant 10 Hz and commands the refresh of the Swing UI components that need to change together with the movie frame; additionally, it commands the refresh of the timeline canvas.
 
-The design description will be expanded in a future version of this document.
+Various parts of the program can request to refresh the image canvas and a balance has to be found between avoiding excessive redraws and avoiding CPU wake-ups when idle.
+
+## Concepts
 
 ### Coordinates
 
@@ -778,8 +780,8 @@ Viewpoints can be computed at various timestamps using the `UpdateViewpoint`. Se
 - `Observer` takes the closest in time from the metadata of the master layer, see the Metadata section.
 - `Earth` computes the viewpoint with the algorithm mentioned above.
 - `EarthFixedDistance` is as above but with the distance fixed at 1au (it is used for the latitudinal and polar projections).
-- `Equatorial` is a viewpoint looking from above the solar North pole at a distance (~229au) that for a field-of-view angle of 1˚ makes visible objects up to 2au far from the Sun, the longitude is derived from the closest in time metadata of the master layer such that the Earth appears on the right hand side.
-- `Other` in UI, `Expert` in code are viewpoints which are computed from the responses to requests to the `GeometryService`. A maximum of 10000 points are requested to the server and interpolation is used as needed for the intermediate timestamps.
+- `Equatorial` is a viewpoint looking from above the solar North pole at a distance (~229au) that for a field-of-view angle of 1˚ makes visible objects up to 2au far from the Sun, the longitude is derived from the closest in time metadata of the master layer such that the Earth appears on the right-hand side.
+- `Other` (in UI, `Expert` in code) are viewpoints which are computed from the responses to requests to the `GeometryService`. A maximum of 10000 points are requested to the server and interpolation is used as needed for the intermediate timestamps.
 
 ### Camera
 
@@ -797,7 +799,7 @@ Metadata about the observations is extracted from the incoming image data format
 
 A discussion about the necessary metadata components is at <https://github.com/bogdanni/hv-HEP/blob/master/HEP-0010.md>.
 
-If the necessary metadata can be derived, it is made available to the rest of the program in `HelioviewerMetaData` structures. For image formats without metadata, or when the metadata is not present or its parsing fails, a default metadata structure is built corresponding to the Earth viewpoint at 2000-01-01T00:00:00.
+If the necessary metadata can be derived, it is made available to the rest of the program in `HelioviewerMetaData` structures. For image formats without metadata, or when the metadata is not present, or its parsing fails, a default metadata structure is built corresponding to the Earth viewpoint at 2000-01-01T00:00:00.
 
 ### View
 
@@ -813,7 +815,7 @@ The two major components of `J2KView` are:
 
 - `J2KReader` implements a minimal HTTP client and a minimal JPIP-over-HTTP streaming client. It fills the memory cache of `JPIPCache` (an extension of Kakadu `KduCache`) from which the image decoding takes place. Once the entirety of the data for a resolution level for a frame is available, it is extracted from the memory cache and it is sent via `JPIPCacheManager` into the disk persistence layer provided by the `Ehcache` library. The `sourceId` of the dataset and the timestamp of the frame is combined to form universal identifiers. `J2KReader` is also used to fill the cache indicator of the UI time slider via the `CacheStatus` interface. `J2KReader` is implemented as a thread that receives from `J2KView` commands to read. It tries to read requested data first via the `JPIPCacheManager` before constructing and issuing a request to the JPIP server if not available in the persistent disk cache. Once all data is read, the HTTP connection is closed and the `J2KReader` stops listening for commands.
 
-- `J2KDecoder` is in charge for forwarding commands to `Kdu_region_compositor` to decode image data out of `KduCache` (wrapped by `JPIPCache`). The commands are issued by `J2KView` over a queue of size one to a `DecodeExecutor` which handles just one thread at a time. If a command is already queued, it is removed from the queue to make place for the most recent one. The `J2KDecoder` thread manages instances of `Kdu_thread_env` and `Kdu_region_compositor` in thread local storage. On demand, those are created, re-created (as a result of exceptions raised by the Kakadu native code during decoding), and destroyed. The `Kdu_thread_env` object is used to distribute the decoding work of the native code over all CPUs. The resulting bytes of `Kdu_compositor_buf` in native memory are copied one-by-one using `LWJGL` `MemoryUtil.memGetByte`, which was found to have the highest performance and to reduce the amount of necessary buffers. `J2KDecoder` also manages a `Guava Cache` of soft references to the already decoded image data and, if the decode command received corresponds to an item in the cache, it immediately returns that instead of entering the Kakadu processing.
+- `J2KDecoder` is in charge for forwarding commands to `Kdu_region_compositor` to decode image data out of `KduCache` (wrapped by `JPIPCache`). The commands are issued by `J2KView` over a queue of size one to a `DecodeExecutor` which handles just one thread at a time. If a command is already queued, it is removed from the queue to make place for the most recent one. The `J2KDecoder` thread manages instances of `Kdu_thread_env` and `Kdu_region_compositor` in thread local storage. On demand, those are created, re-created (as a result of exceptions raised by the Kakadu native code during decoding), and destroyed. The `Kdu_thread_env` object is used to distribute the decoding work of the native code over all CPUs. The resulting bytes of `Kdu_compositor_buf` in native memory are copied one-by-one using `LWJGL` `MemoryUtil.memGetByte`, which was found to have the highest performance and to reduce the size of necessary memory buffers. `J2KDecoder` also manages a `Guava Cache` of soft references to the already decoded image data and, if the decode command received corresponds to an item in the cache, it immediately returns that instead of entering the Kakadu processing.
 
 The decoded pixel data together with the associated information such as the metadata is constructed into `ImageData` structures which are handed over to the `ImageDataHandler`, i.e., `ImageLayer`.
 
@@ -840,7 +842,7 @@ The drawing on the image canvas is done entirely using GLSL programs. The follow
 
 Besides the drawing done by layers, annotations can be drawn by `InteractionAnnotate`.
 
-Matrices compatible with the OpenGL representation are maintained by the `Transform` class which implements projection and model-view matrix stacks and a simple cache of the result of the multiplication of the top of the stacks matrices. The stacks can be pushed and poped similarly to the traditional OpenGL fixed-function matrix stack and are queried at configuration time by the draw commands.
+Matrices compatible with the OpenGL representation are maintained by the `Transform` class which implements projection and model-view matrix stacks and a simple cache of the result of the multiplication of the top of the matrix stacks. The stacks can be pushed and popped similarly to the traditional OpenGL fixed-function matrix stacks and are queried at configuration time by the draw commands.
 
 ## Input
 
@@ -854,6 +856,20 @@ The input to the image canvas is received by the `GLWindow` from the JOGL NEWT i
 ## Network I/O
 
 Besides the implementation specific for the JPIP network client, all the rest of network I/O is done via `NetClient`, which provides an interface implemented on top of `Okio` and `OkHTTP`, transparent to the actual location -- remote or local -- of the requested resource. All the remote APIs are REST and the implemented functionality is that of the HTTP GET request. The caching functionality of `OkHTTP` can be used or can be bypassed. An additional local cache where direct access to the cached files is possible is provided by `NetFileCache`.
+
+## Timelines
+
+An important insight for high performance plotting is that plots can be requested for short and long time ranges, and, for the latter case, an excess of data points make for an illegible plot. Therefore, a multi-resolution approach for the time dimension is beneficial.
+
+For the Callisto spectrograms which are 2D, this is supported directly by using the JPEG2000 format for the data, with daily images having on the *x*-axis the second of the day, and on the *y*-axis the frequency bin.
+
+The 1D timelines are cached in data structures which are pyramids of time resolutions. The highest resolution has one-minute bins and the lower resolutions are obtained by decimation. Depending on the nature of the dataset, several types of data are supported, namely linear, strictly positive, and logarithmic. For the latter two, the time decimation is performed by taking the maximum in the time bin to be decimated, as the user is likely to be interested in data peaks, e.g., flares.
+
+## Events
+
+Supported event sources are HEK and COMESEP. The interface to the COMESEP caching server is similar to the interface to the HEK and the format was designed to be similar, namely JSON structures with parameters. Since the user can view a large variety of events over long time ranges, significant effort was put into reducing the memory usage as Java objects have a high memory overhead. This was done by pruning some of the parameters and extensive use of interned strings.
+
+The event data is cached into an SQLite database, with the JSON structures inserted as gzip-compressed blobs. The last two weeks' worth of data can be updated to allow for server-side corrections. Some of the parameters are also available for query, allowing to implement filtering of some event types on the value of some parameters.
 
 # CCN2 Tasks #
 
@@ -901,7 +917,7 @@ As a consequence of implementing the SAMP functionality, SWHV has simple program
 
 **T5. Playback engine: Extract portable ideas from JHV3D (SWHV-CCN2-20100-05)**
 
-SWHV operates in a fully asynchronous manner and can achieve high frame rates with low CPU utilization. This topic deals on how the time and data flows are distributed within the program and is closely linked to how Kakadu is used for decoding the JPEG2000 data. It is unclear whether there are advantages to the JHV3D approach. On a superficial level, SWHV appears to reach about half the CPU utilization of JHV3D with uncached decoded data and less than 5% with cached decoded data.
+SWHV operates in a fully asynchronous manner and can achieve high frame rates with low CPU utilization. This topic deals on how the time and data flows are distributed within the program and is closely linked to how Kakadu is used for decoding the JPEG2000 data. It is unclear whether there are advantages to the JHV3D approach. On a superficial level, SWHV appears to reach about half the CPU utilization of JHV3D with un-cached decoded data and less than 5% with cached decoded data.
 
 During the CCN2 period, significant progress was made by moving the cache of the decoded image data in Java memory and out of the `Kdu_region_compositor`. The cache uses soft references, thus the decoded image data fills the JVM heap which has a fixed size established at startup. When the maximum heap size is reached, the garbage collector eagerly collects the buffers not referenced elsewhere in the program. The effect is an automatic trade-off between memory and CPU usage for already decoded image data. This also leads to a potentially dramatic drop of the total memory used by the application since the JHV-side caching uses one byte per pixel (for color-mapped layers) compared to the four bytes per pixel of `Kdu_region_compositor`. Other benefits include a performance increase due to reduced need for copies between Kakadu native buffers and JVM memory, and the cache adaptation to the JVM heap size. The benefits scale with the available JVM heap and with the number of loaded image layers. Some test cases achieved significant reductions both in CPU and memory usage.
 
@@ -935,7 +951,7 @@ The following tasks were identified:
 
 1.  **(SWHV-CCN2-20200-01)** Study how to improve the temporal navigation jointly for image and timeline data at both short and long timescales.
 
-Time selection for the image layers was brought to the forefront and it became possible to use the interaction with time range of the timelines panel to temporally navigate jointly with the image layers. This is achieved by reloading as necessary the image layers for the time range of the timelines panel. The capability to cach the JPEG2000 codestream data improved the user experience.
+Time selection for the image layers was brought to the forefront and it became possible to use the interaction with time range of the timelines panel to temporally navigate jointly with the image layers. This is achieved by reloading as necessary the image layers for the time range of the timelines panel. The capability to cache the JPEG2000 codestream data improved the user experience.
 
 2.  **(SWHV-CCN2-20200-02)** Save and restore program state.
 
@@ -992,11 +1008,11 @@ This is how one user imagines this feature would work:
 
 A textbox was added in the timeline options panel where one can set a propagation speed (0 meaning disabled). The location is the calculated Sun-Earth L1 point. When that speed is different from zero, another time-scale (in the timeline color) appears under the timelines panel time-scale (in black).
 
-Therefore the displayed time-scale has the following meaning:
+Therefore, the displayed time-scale has the following meaning:
 
 * the colored time-scale is time of observation;
 * when speed is 0, the time of the timelines panel (black time) is disconnected from image layers time → time is UTC at an undefined location (most likely Earth);
-* when speed is not 0, timelines panel time (black time) is the time determined by the image layers viewpoint, there is an additional speed-of-light propagation from Sun to the viewpoint → time is UTC at the viewpoint (according to viewpoint settings, may be different than Earth).
+* when speed is not 0, timelines panel time (black time) is the time determined by the image layers viewpoint, there is an additional speed-of-light propagation from Sun to the viewpoint → time is UTC at the viewpoint (according to viewpoint settings, may be different from Earth).
 
 Several DSCOVR in-situ timeline datasets were integrated. They were identified as highest priority for the space weather forecasters. The added datasets are the interplanetary magnetic field Bz, Bt, and Phi and the solar wind density, radial speed, and temperature.
 
