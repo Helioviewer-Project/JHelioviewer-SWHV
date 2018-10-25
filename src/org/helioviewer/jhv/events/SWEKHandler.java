@@ -20,20 +20,21 @@ public abstract class SWEKHandler {
             }
         }
 
-        int page = 0;
-        boolean success = true;
-        boolean overmax = true;
-        while (overmax && success) {
-            try {
+        try {
+            int page = 0;
+            boolean success = true;
+            boolean overmax = true;
+            while (overmax && success) {
                 JSONObject eventJSON = JSONUtils.get(createURL(supplier.getGroup(), start, end, params, page));
                 overmax = eventJSON.optBoolean("overmax", false);
                 success = parseRemote(eventJSON, supplier) && parseAssociations(eventJSON);
                 page++;
-            } catch (Exception e) {
-                Log.error("Error loading SWEK", e);
             }
+            return success;
+        } catch (Exception e) {
+            Log.error("Error loading SWEK", e);
         }
-        return success;
+        return false;
     }
 
     protected abstract boolean parseRemote(JSONObject eventJSON, SWEKSupplier supplier);
