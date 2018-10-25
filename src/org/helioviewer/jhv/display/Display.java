@@ -7,7 +7,8 @@ import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.base.scale.Transform;
 import org.helioviewer.jhv.camera.Camera;
 //import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.layers.ImageLayers;
+import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 
 public class Display {
@@ -63,7 +64,7 @@ public class Display {
         return miniCamera;
     }
 
-    private static final Viewport[] viewports = {new Viewport(0, 0, 0, 100, 100), null, null, null};
+    private static Viewport[] viewports = {new Viewport(0, 0, 0, 100, 100)};
     private static int activeViewport = 0;
 
     public static Viewport fullViewport = new Viewport(-1, 0, 0, 100, 100);
@@ -72,8 +73,7 @@ public class Display {
         if (multiview) {
             int len = viewports.length;
             for (int i = 0; i < len; ++i) {
-                Viewport vp = viewports[i];
-                if (vp != null && vp.contains(x, y)) {
+                if (viewports[i].contains(x, y)) {
                     activeViewport = i;
                     break;
                 }
@@ -85,17 +85,23 @@ public class Display {
         return viewports[activeViewport];
     }
 
+    public static Viewport getViewport(int idx) {
+        return viewports[idx];
+    }
+
     public static Viewport[] getViewports() {
         return viewports;
     }
 
-    private static int countActiveLayers() {
+    private static int countEnabledLayers() {
         int ct = 0;
         if (multiview) {
-            int len = viewports.length;
-            for (int i = 0; i < len; ++i) {
-                if (ImageLayers.getImageLayerInViewport(i) != null)
+            for (ImageLayer layer : Layers.getImageLayers()) {
+                if (layer.isEnabled()) {
                     ct++;
+                    if (ct == 4)
+                        break;
+                }
             }
         }
         return ct;
@@ -104,7 +110,7 @@ public class Display {
     public static void reshapeAll() {
         activeViewport = 0;
 
-        int ct = countActiveLayers();
+        int ct = countEnabledLayers();
         switch (ct) {
             case 2:
                 reshape2();
@@ -122,43 +128,25 @@ public class Display {
     }
 
     private static void reshape() {
-        int w = glWidth;
-        int h = glHeight;
-
-        viewports[0] = new Viewport(0, 0, 0, w, h);
-        viewports[1] = null;
-        viewports[2] = null;
-        viewports[3] = null;
+        viewports = new Viewport[]{new Viewport(0, 0, 0, glWidth, glHeight)};
     }
 
     private static void reshape2() {
-        int w = glWidth;
-        int h = glHeight;
-
-        viewports[0] = new Viewport(0, 0, 0, w / 2, h);
-        viewports[1] = new Viewport(1, w / 2, 0, w / 2, h);
-        viewports[2] = null;
-        viewports[3] = null;
+        viewports = new Viewport[]{new Viewport(0, 0, 0, glWidth / 2, glHeight),
+                                   new Viewport(1, glWidth / 2, 0, glWidth / 2, glHeight)};
     }
 
     private static void reshape3() {
-        int w = glWidth;
-        int h = glHeight;
-
-        viewports[0] = new Viewport(0, 0, 0, w / 2, h / 2);
-        viewports[1] = new Viewport(1, w / 2, 0, w / 2, h / 2);
-        viewports[2] = new Viewport(2, 0, h / 2, w, h / 2);
-        viewports[3] = null;
+        viewports = new Viewport[]{new Viewport(0, 0, 0, glWidth / 2, glHeight / 2),
+                                   new Viewport(1, glWidth / 2, 0, glWidth / 2, glHeight / 2),
+                                   new Viewport(2, 0, glHeight / 2, glWidth, glHeight / 2)};
     }
 
     private static void reshape4() {
-        int w = glWidth;
-        int h = glHeight;
-
-        viewports[0] = new Viewport(0, 0, 0, w / 2, h / 2);
-        viewports[1] = new Viewport(1, w / 2, 0, w / 2, h / 2);
-        viewports[2] = new Viewport(2, 0, h / 2, w / 2, h / 2);
-        viewports[3] = new Viewport(3, w / 2, h / 2, w / 2, h / 2);
+        viewports = new Viewport[]{new Viewport(0, 0, 0, glWidth / 2, glHeight / 2),
+                                   new Viewport(1, glWidth / 2, 0, glWidth / 2, glHeight / 2),
+                                   new Viewport(2, 0, glHeight / 2, glWidth / 2, glHeight / 2),
+                                   new Viewport(3, glWidth / 2, glHeight / 2, glWidth / 2, glHeight / 2)};
     }
 
     private static boolean showCorona = true;

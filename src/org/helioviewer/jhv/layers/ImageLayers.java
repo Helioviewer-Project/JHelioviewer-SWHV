@@ -4,7 +4,6 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
@@ -26,13 +25,11 @@ public class ImageLayers {
 
     static void decode(double factor) {
         Camera camera = Display.getCamera();
-        Viewport[] vp = Display.getViewports();
         Position viewpoint = camera.getViewpoint();
-
         for (ImageLayer layer : Layers.getImageLayers()) {
             int i = layer.isVisibleIdx();
-            if (i != -1 && vp[i] != null) {
-                double pixFactor = CameraHelper.getPixelFactor(camera, vp[i]);
+            if (i != -1) {
+                double pixFactor = CameraHelper.getPixelFactor(camera, Display.getViewport(i));
                 layer.getView().decode(viewpoint, pixFactor, factor);
             }
         }
@@ -76,7 +73,7 @@ public class ImageLayers {
     }
 
     @Nullable
-    public static ImageLayer getImageLayerInViewport(int idx) {
+    static ImageLayer getImageLayerInViewport(int idx) {
         for (ImageLayer layer : Layers.getImageLayers()) {
             if (layer.isVisible(idx))
                 return layer;

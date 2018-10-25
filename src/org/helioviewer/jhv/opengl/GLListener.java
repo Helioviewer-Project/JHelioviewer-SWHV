@@ -116,14 +116,12 @@ public class GLListener implements GLEventListener {
     public static void renderScene(Camera camera, GL2 gl) {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         for (Viewport vp : Display.getViewports()) {
-            if (vp != null) {
-                gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-                camera.projectionOrtho(vp.aspect, gl, blackCircle);
+            gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
+            camera.projectionOrtho(vp.aspect, gl, blackCircle);
 
-                Layers.render(camera, vp, gl);
-                JHVFrame.getAnnotateInteraction().drawAnnotations(vp, gl);
-                Layers.renderFloat(camera, vp, gl);
-            }
+            Layers.render(camera, vp, gl);
+            JHVFrame.getAnnotateInteraction().drawAnnotations(vp, gl);
+            Layers.renderFloat(camera, vp, gl);
         }
     }
 
@@ -136,14 +134,12 @@ public class GLListener implements GLEventListener {
 
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         for (Viewport vp : Display.getViewports()) {
-            if (vp != null) {
-                gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-                camera.projectionOrtho2D(vp.aspect);
+            gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
+            camera.projectionOrtho2D(vp.aspect);
 
-                Layers.renderScale(camera, vp, gl);
-                JHVFrame.getAnnotateInteraction().drawAnnotations(vp, gl);
-                Layers.renderFloat(camera, vp, gl);
-            }
+            Layers.renderScale(camera, vp, gl);
+            JHVFrame.getAnnotateInteraction().drawAnnotations(vp, gl);
+            Layers.renderFloat(camera, vp, gl);
         }
     }
 
