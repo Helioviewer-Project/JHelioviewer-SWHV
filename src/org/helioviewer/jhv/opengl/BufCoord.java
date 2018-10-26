@@ -16,18 +16,28 @@ public class BufCoord {
     private final byte[] byteLast = new byte[16];
     private final FloatBuffer bufferLast = ByteBuffer.wrap(byteLast).order(ByteOrder.nativeOrder()).asFloatBuffer();
 
-    private byte[] array;
-    private int length;
-    private int floats;
+    private byte[] arrayVertx;
+    private int lengthVertx;
+    private byte[] arrayCoord;
+    private int lengthCoord;
 
     public BufCoord(int size) {
-        array = new byte[size < 16 ? 16 : size];
+        arrayVertx = new byte[size < 16 ? 16 : size];
+        size /= 2;
+        arrayCoord = new byte[size < 8 ?  8 : size];
     }
 
-    private void ensure(int nbytes) {
-        int size = array.length;
-        if (length + nbytes > size) {
-            array = Arrays.copyOf(array, size + chunk * multiplier++);
+    private void ensureVertx(int nbytes) {
+        int size = arrayVertx.length;
+        if (lengthVertx + nbytes > size) {
+            arrayVertx = Arrays.copyOf(arrayVertx, size + chunk * multiplier++);
+        }
+    }
+
+    private void ensureCoord(int nbytes) {
+        int size = arrayCoord.length;
+        if (lengthCoord + nbytes > size) {
+            arrayCoord = Arrays.copyOf(arrayCoord, size + chunk * multiplier++);
         }
     }
 
@@ -47,32 +57,38 @@ public class BufCoord {
     }
 
     private void put4f(float x, float y, float z, float w) {
-        ensure(16);
+        ensureVertx(16);
         bufferLast.put(0, x).put(1, y).put(2, z).put(3, w);
-        System.arraycopy(byteLast, 0, array, length, 16);
-        length += 16;
-        floats += 4;
+        System.arraycopy(byteLast, 0, arrayVertx, lengthVertx, 16);
+        lengthVertx += 16;
     }
 
     private void put2f(float f0, float f1) {
-        ensure(8);
+        ensureCoord(8);
         bufferLast.put(2, f0).put(3, f1);
-        System.arraycopy(byteLast, 8, array, length, 8);
-        length += 8;
-        floats += 2;
+        System.arraycopy(byteLast, 8, arrayCoord, lengthCoord, 8);
+        lengthCoord += 8;
     }
 
-    public int getFloats() {
-        return floats;
+    public int getVertexLength() {
+        return lengthVertx;
+    }
+
+    public int getCoordLength() {
+        return lengthCoord;
     }
 
     public void clear() {
-        length = 0;
-        floats = 0;
+        lengthVertx = 0;
+        lengthCoord = 0;
     }
 
-    public Buffer toBuffer() {
-        return ByteBuffer.wrap(array).limit(length);
+    public Buffer toVertexBuffer() {
+        return ByteBuffer.wrap(arrayVertx).limit(lengthVertx);
+    }
+
+    public Buffer toCoordBuffer() {
+        return ByteBuffer.wrap(arrayCoord).limit(lengthCoord);
     }
 
 }
