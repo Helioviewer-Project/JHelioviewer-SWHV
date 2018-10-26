@@ -3,7 +3,6 @@ package org.helioviewer.jhv.opengl;
 import java.awt.Dimension;
 import java.awt.Point;
 
-import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
@@ -23,7 +22,7 @@ public class GLHelper {
 
     public static void initCircleFront(GL2 gl, GLSLShape circle, double x, double y, double r, int segments, byte[] color) {
         int no_points = 2 * 4 * (segments + 1);
-        Buf vexBuf = new Buf(no_points * GLSLShape.stride);
+        BufVertex vexBuf = new BufVertex(no_points * GLSLShape.stride);
         for (int i = 0; i <= segments; ++i) {
             double t = 2 * Math.PI * i / segments;
             vexBuf.putVertex((float) (x + Math.sin(t) * r), (float) (y + Math.cos(t) * r), 0, 1, color);
@@ -33,7 +32,7 @@ public class GLHelper {
     }
 
     public static void initRectangleFront(GL2 gl, GLSLShape rectangle, double x0, double y0, double w, double h, byte[] color) {
-        Buf vexBuf = new Buf(4 * GLSLShape.stride);
+        BufVertex vexBuf = new BufVertex(4 * GLSLShape.stride);
         float x1 = (float) (x0 + w);
         float y1 = (float) (y0 + h);
 
@@ -53,7 +52,7 @@ public class GLHelper {
         return new Dimension((int) (x / GLInfo.pixelScaleFloat[0]), (int) (y / GLInfo.pixelScaleFloat[1]));
     }
 
-    public static Vec2 drawVertex(Position viewpoint, Viewport vp, Vec3 vertex, Vec2 previous, Buf vexBuf, byte[] color) {
+    public static Vec2 drawVertex(Position viewpoint, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color) {
         Vec3 pt = viewpoint.toQuat().rotateVector(vertex);
         Vec2 tf = Display.mode.xform.transform(viewpoint, pt, Display.mode.scale);
 

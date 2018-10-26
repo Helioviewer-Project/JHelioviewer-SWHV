@@ -3,7 +3,6 @@ package org.helioviewer.jhv.camera.annotate;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.scale.GridType;
 import org.helioviewer.jhv.camera.Camera;
@@ -12,6 +11,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.position.Position;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -70,11 +70,11 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Override
-    public void draw(Position viewpoint, Viewport vp, boolean active, Buf buf) {
+    public void draw(Position viewpoint, Viewport vp, boolean active, BufVertex buf) {
     }
 
     @Override
-    public void drawTransformed(boolean active, Buf lineBuf, Buf centerBuf) {
+    public void drawTransformed(boolean active, BufVertex lineBuf, BufVertex centerBuf) {
     }
 
     @Override

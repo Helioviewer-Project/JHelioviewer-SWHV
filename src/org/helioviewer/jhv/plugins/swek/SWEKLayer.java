@@ -16,7 +16,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.base.scale.Transform;
@@ -40,6 +39,8 @@ import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.opengl.BufCoord;
+import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLTexture;
@@ -70,12 +71,12 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     private boolean icons = true;
 
     private final GLSLLine lineEvent = new GLSLLine(true);
-    private final Buf bufEvent = new Buf(512 * GLSLLine.stride); // pre-allocate
+    private final BufVertex bufEvent = new BufVertex(512 * GLSLLine.stride); // pre-allocate
     private final GLSLLine lineThick = new GLSLLine(true);
-    private final Buf bufThick = new Buf(64 * GLSLLine.stride); // pre-allocate
+    private final BufVertex bufThick = new BufVertex(64 * GLSLLine.stride); // pre-allocate
 
     private final GLSLTexture glslTexture = new GLSLTexture();
-    private final Buf texBuf = new Buf(8 * GLSLTexture.stride);
+    private final BufCoord texBuf = new BufCoord(8 * GLSLTexture.stride);
 
     public SWEKLayer(JSONObject jo) {
         if (jo != null)
@@ -109,7 +110,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         tex.bind(gl);
     }
 
-    private static void interPolatedDraw(int mres, double r_start, double r_end, double t_start, double t_end, Quat q, Buf buf, byte[] color) {
+    private static void drawInterpolated(int mres, double r_start, double r_end, double t_start, double t_end, Quat q, BufVertex buf, byte[] color) {
         Vec3 v = new Vec3();
         for (int i = 0; i <= mres; i++) {
             double alpha = 1. - i / (double) mres;
@@ -144,14 +145,14 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         double thetaStart = principalAngle - angularWidth / 2.;
         double thetaEnd = principalAngle + angularWidth / 2.;
 
-        Buf buf = evtr.isHighlighted() ? bufThick : bufEvent;
+        BufVertex buf = evtr.isHighlighted() ? bufThick : bufEvent;
         byte[] color = Colors.bytes(evtr.getColor());
 
-        interPolatedDraw(angularResolution, distSun, distSun, thetaStart, principalAngle, q, buf, color);
-        interPolatedDraw(angularResolution, distSun, distSun, principalAngle, thetaEnd, q, buf, color);
-        interPolatedDraw(lineResolution, distSunBegin, distSun + 0.05, thetaStart, thetaStart, q, buf, color);
-        interPolatedDraw(lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, q, buf, color);
-        interPolatedDraw(lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, q, buf, color);
+        drawInterpolated(angularResolution, distSun, distSun, thetaStart, principalAngle, q, buf, color);
+        drawInterpolated(angularResolution, distSun, distSun, principalAngle, thetaEnd, q, buf, color);
+        drawInterpolated(lineResolution, distSunBegin, distSun + 0.05, thetaStart, thetaStart, q, buf, color);
+        drawInterpolated(lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, q, buf, color);
+        drawInterpolated(lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, q, buf, color);
 
         if (icons) {
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
@@ -179,7 +180,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             return;
         }
 
-        Buf buf = evtr.isHighlighted() ? bufThick : bufEvent;
+        BufVertex buf = evtr.isHighlighted() ? bufThick : bufEvent;
         byte[] color = Colors.bytes(evtr.getColor());
 
         Position viewpoint = camera.getViewpoint();
@@ -294,7 +295,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         double thetaStart = MathUtils.mapTo0To360(principalAngleDegree - angularWidthDegree / 2.);
         double thetaEnd = MathUtils.mapTo0To360(principalAngleDegree + angularWidthDegree / 2.);
 
-        Buf buf = evtr.isHighlighted() ? bufThick : bufEvent;
+        BufVertex buf = evtr.isHighlighted() ? bufThick : bufEvent;
         byte[] color = Colors.bytes(evtr.getColor());
 
         float x = (float) (scale.getXValueInv(thetaStart) * vp.aspect);
