@@ -6,7 +6,7 @@ import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.opengl.GL2;
 
-public class GLSLShape extends VAO2 {
+public class GLSLShape extends VAO {
 
     private static final int size0 = 4;
     private static final int size1 = 4;

@@ -4,7 +4,7 @@ import java.nio.Buffer;
 
 import com.jogamp.opengl.GL2;
 
-public class GLSLSolar extends VAO2 {
+public class GLSLSolar extends VAO {
 
     GLSLSolar() {
         super(1, false, new VAA[]{new VAA(0, 4, false, 0, 0, 0)});
