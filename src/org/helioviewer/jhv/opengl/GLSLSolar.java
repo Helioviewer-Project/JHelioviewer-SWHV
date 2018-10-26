@@ -4,10 +4,10 @@ import org.helioviewer.jhv.base.Buf;
 
 import com.jogamp.opengl.GL2;
 
-public class GLSLSolar extends VAO {
+public class GLSLSolar extends VAO2 {
 
     GLSLSolar() {
-        super(false, new VAA[]{new VAA(0, 4, false, 0, 0, 0)});
+        super(1, false, new VAA[]{new VAA(0, 4, false, 0, 0, 0)});
     }
 
     public void render(GL2 gl) {
@@ -19,7 +19,7 @@ public class GLSLSolar extends VAO {
     public void init(GL2 gl) {
         super.init(gl);
         Buf vexBuf = new Buf(4 * 16).put4f(-1, -1, 0, 1).put4f(1, -1, 0, 1).put4f(-1, 1, 0, 1).put4f(1, 1, 0, 1);
-        vbo.setData(gl, vexBuf);
+        vbo[0].setData(gl, vexBuf);
     }
 
 }
