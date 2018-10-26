@@ -38,11 +38,11 @@ public class AnnotateCross extends AbstractAnnotateable {
 
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 if (i == 0) {
-                    buf.put4f(pc).put4b(Colors.Null);
+                    buf.putVertex(pc, Colors.Null);
                 }
-                buf.put4f(pc).put4b(color);
+                buf.putVertex(pc, color);
                 if (i == SUBDIVISIONS) {
-                    buf.put4f(pc).put4b(Colors.Null);
+                    buf.putVertex(pc, Colors.Null);
                 }
             } else {
                 pc.y = -pc.y;

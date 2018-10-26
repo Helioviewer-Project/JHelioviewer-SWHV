@@ -272,8 +272,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             long t = start;
 
             double dist = response.getInterpolated(xyzw, t, start, end);
-            orbitBuf.put4f(xyzw[0], xyzw[1], xyzw[2], xyzw[3]).put4b(Colors.Null);
-            orbitBuf.repeat4f().put4b(color);
+            orbitBuf.putVertex(xyzw[0], xyzw[1], xyzw[2], xyzw[3], Colors.Null);
+            orbitBuf.repeatVertex(color);
 
             long delta = getStep(dist);
             while (t < time) {
@@ -281,11 +281,11 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
                 if (t > time)
                     t = time;
                 dist = response.getInterpolated(xyzw, t, start, end);
-                orbitBuf.put4f(xyzw[0], xyzw[1], xyzw[2], xyzw[3]).put4b(color);
+                orbitBuf.putVertex(xyzw[0], xyzw[1], xyzw[2], xyzw[3], color);
                 delta = getStep(dist);
             }
-            orbitBuf.repeat4f().put4b(Colors.Null);
-            planetBuf.put4f(xyzw[0], xyzw[1], xyzw[2], SIZE_PLANET).put4b(color);
+            orbitBuf.repeatVertex(Colors.Null);
+            planetBuf.putVertex(xyzw[0], xyzw[1], xyzw[2], SIZE_PLANET, color);
         }
 
         orbits.setData(gl, orbitBuf);

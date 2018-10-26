@@ -121,11 +121,11 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             Vec3 res = q.rotateInverseVector(v);
 
             if (i == 0) {
-                buf.put4f(res).put4b(Colors.Null);
+                buf.putVertex(res, Colors.Null);
             }
-            buf.put4f(res).put4b(color);
+            buf.putVertex(res, color);
         }
-        buf.repeat4f().put4b(Colors.Null);
+        buf.repeatVertex(Colors.Null);
     }
 
     private void drawCactusArc(JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
@@ -203,9 +203,9 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                         float y = -(float) (ynew / r);
                         float z = (float) (znew / r);
                         if (j == 0) {
-                            buf.put4f(x, y, z, 1).put4b(Colors.Null);
+                            buf.putVertex(x, y, z, 1, Colors.Null);
                         }
-                        buf.put4f(x, y, z, 1).put4b(color);
+                        buf.putVertex(x, y, z, 1, color);
                     } else {
                         pt.x = xnew / r;
                         pt.y = ynew / r;
@@ -216,7 +216,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                         previous = GLHelper.drawVertex(viewpoint, vp, pt, previous, buf, color);
                     }
                 }
-                buf.repeat4f().put4b(Colors.Null);
+                buf.repeatVertex(Colors.Null);
             }
             oldBoundaryPoint3d = new float[]{points[3 * i], points[3 * i + 1], points[3 * i + 2]};
         }
@@ -299,38 +299,38 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
         float x = (float) (scale.getXValueInv(thetaStart) * vp.aspect);
         float y = (float) scale.getYValueInv(distSunBegin);
-        buf.put4f(x, y, 0, 1).put4b(Colors.Null);
-        buf.repeat4f().put4b(color);
+        buf.putVertex(x, y, 0, 1, Colors.Null);
+        buf.repeatVertex(color);
 
         y = (float) scale.getYValueInv(distSun + 0.05);
-        buf.put4f(x, y, 0, 1).put4b(color);
-        buf.repeat4f().put4b(Colors.Null);
+        buf.putVertex(x, y, 0, 1, color);
+        buf.repeatVertex(Colors.Null);
 
         x = (float) (scale.getXValueInv(principalAngleDegree) * vp.aspect);
         y = (float) scale.getYValueInv(distSunBegin);
-        buf.put4f(x, y, 0, 1).put4b(Colors.Null);
-        buf.repeat4f().put4b(color);
+        buf.putVertex(x, y, 0, 1, Colors.Null);
+        buf.repeatVertex(color);
 
         y = (float) scale.getYValueInv(distSun + 0.05);
-        buf.put4f(x, y, 0, 1).put4b(color);
-        buf.repeat4f().put4b(Colors.Null);
+        buf.putVertex(x, y, 0, 1, color);
+        buf.repeatVertex(Colors.Null);
 
         x = (float) (scale.getXValueInv(thetaEnd) * vp.aspect);
         y = (float) scale.getYValueInv(distSunBegin);
-        buf.put4f(x, y, 0, 1).put4b(Colors.Null);
-        buf.repeat4f().put4b(color);
+        buf.putVertex(x, y, 0, 1, Colors.Null);
+        buf.repeatVertex(color);
 
         y = (float) scale.getYValueInv(distSun + 0.05);
-        buf.put4f(x, y, 0, 1).put4b(color);
-        buf.repeat4f().put4b(Colors.Null);
+        buf.putVertex(x, y, 0, 1, color);
+        buf.repeatVertex(Colors.Null);
 
         y = (float) scale.getYValueInv(distSun);
-        buf.put4f(x, y, 0, 1).put4b(Colors.Null);
-        buf.repeat4f().put4b(color);
+        buf.putVertex(x, y, 0, 1, Colors.Null);
+        buf.repeatVertex(color);
 
         x = (float) (scale.getXValueInv(thetaStart) * vp.aspect);
-        buf.put4f(x, y, 0, 1).put4b(color);
-        buf.repeat4f().put4b(Colors.Null);
+        buf.putVertex(x, y, 0, 1, color);
+        buf.repeatVertex(Colors.Null);
 
         if (icons) {
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;

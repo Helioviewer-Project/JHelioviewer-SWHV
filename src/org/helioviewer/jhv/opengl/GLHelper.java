@@ -26,8 +26,8 @@ public class GLHelper {
         Buf vexBuf = new Buf(no_points * GLSLShape.stride);
         for (int i = 0; i <= segments; ++i) {
             double t = 2 * Math.PI * i / segments;
-            vexBuf.put4f((float) (x + Math.sin(t) * r), (float) (y + Math.cos(t) * r), 0, 1).put4b(color);
-            vexBuf.put4f((float) x, (float) y, 0, 1).put4b(color);
+            vexBuf.putVertex((float) (x + Math.sin(t) * r), (float) (y + Math.cos(t) * r), 0, 1, color);
+            vexBuf.putVertex((float) x, (float) y, 0, 1, color);
         }
         circle.setData(gl, vexBuf);
     }
@@ -37,10 +37,10 @@ public class GLHelper {
         float x1 = (float) (x0 + w);
         float y1 = (float) (y0 + h);
 
-        vexBuf.put4f((float) x0, (float) y0, 0, 1).put4b(color);
-        vexBuf.put4f(x1, (float) y0, 0, 1).put4b(color);
-        vexBuf.put4f((float) x0, y1, 0, 1).put4b(color);
-        vexBuf.put4f(x1, y1, 0, 1).put4b(color);
+        vexBuf.putVertex((float) x0, (float) y0, 0, 1, color);
+        vexBuf.putVertex(x1, (float) y0, 0, 1, color);
+        vexBuf.putVertex((float) x0, y1, 0, 1, color);
+        vexBuf.putVertex(x1, y1, 0, 1, color);
 
         rectangle.setData(gl, vexBuf);
     }
@@ -62,22 +62,22 @@ public class GLHelper {
         if (previous != null && Math.abs(previous.x - tf.x) > 0.5) {
             if (tf.x <= 0 && previous.x >= 0) {
                 x = (float) (0.5 * vp.aspect);
-                vexBuf.put4f(x, y, 0, 1).put4b(color);
-                vexBuf.put4f(x, y, 0, 1).put4b(Colors.Null);
+                vexBuf.putVertex(x, y, 0, 1, color);
+                vexBuf.putVertex(x, y, 0, 1, Colors.Null);
 
-                vexBuf.put4f(-x, y, 0, 1).put4b(Colors.Null);
-                vexBuf.put4f(-x, y, 0, 1).put4b(color);
+                vexBuf.putVertex(-x, y, 0, 1, Colors.Null);
+                vexBuf.putVertex(-x, y, 0, 1, color);
             } else if (tf.x >= 0 && previous.x <= 0) {
                 x = (float) (-0.5 * vp.aspect);
-                vexBuf.put4f(x, y, 0, 1).put4b(color);
-                vexBuf.put4f(x, y, 0, 1).put4b(Colors.Null);
+                vexBuf.putVertex(x, y, 0, 1, color);
+                vexBuf.putVertex(x, y, 0, 1, Colors.Null);
 
-                vexBuf.put4f(-x, y, 0, 1).put4b(Colors.Null);
-                vexBuf.put4f(-x, y, 0, 1).put4b(color);
+                vexBuf.putVertex(-x, y, 0, 1, Colors.Null);
+                vexBuf.putVertex(-x, y, 0, 1, color);
             }
         }
         x = (float) (tf.x * vp.aspect);
-        vexBuf.put4f(x, y, 0, 1).put4b(color);
+        vexBuf.putVertex(x, y, 0, 1, color);
         return tf;
     }
     /*

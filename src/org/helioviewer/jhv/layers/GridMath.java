@@ -42,24 +42,24 @@ class GridMath {
     static void initAxes(GL2 gl, GLSLLine axesLine) {
         Buf vexBuf = new Buf(8 * GLSLLine.stride);
 
-        vexBuf.put4f(0, -AXIS_STOP, 0, 1).put4b(Colors.Null);
-        vexBuf.repeat4f().put4b(axisSouthColor);
+        vexBuf.putVertex(0, -AXIS_STOP, 0, 1, Colors.Null);
+        vexBuf.repeatVertex(axisSouthColor);
 
-        vexBuf.put4f(0, -AXIS_START, 0, 1).put4b(axisSouthColor);
-        vexBuf.repeat4f().put4b(Colors.Null);
+        vexBuf.putVertex(0, -AXIS_START, 0, 1, axisSouthColor);
+        vexBuf.repeatVertex(Colors.Null);
 
-        vexBuf.put4f(0, AXIS_START, 0, 1).put4b(Colors.Null);
-        vexBuf.repeat4f().put4b(axisNorthColor);
+        vexBuf.putVertex(0, AXIS_START, 0, 1, Colors.Null);
+        vexBuf.repeatVertex(axisNorthColor);
 
-        vexBuf.put4f(0, AXIS_STOP, 0, 1).put4b(axisNorthColor);
-        vexBuf.repeat4f().put4b(Colors.Null);
+        vexBuf.putVertex(0, AXIS_STOP, 0, 1, axisNorthColor);
+        vexBuf.repeatVertex(Colors.Null);
 
         axesLine.setData(gl, vexBuf);
     }
 
     static void initEarthPoint(GL2 gl, GLSLShape earthPoint) {
         Buf vexBuf = new Buf(GLSLShape.stride);
-        vexBuf.put4f(0, 0, (float) EARTH_CIRCLE_RADIUS, earthPointSize).put4b(earthLineColor);
+        vexBuf.putVertex(0, 0, (float) EARTH_CIRCLE_RADIUS, earthPointSize, earthLineColor);
         earthPoint.setData(gl, vexBuf);
     }
 
@@ -76,11 +76,11 @@ class GridMath {
             v.z = 0.;
             rotv = q.rotateVector(v);
             if (i == 0) {
-                vexBuf.put4f(rotv).put4b(Colors.Null);
+                vexBuf.putVertex(rotv, Colors.Null);
             }
-            vexBuf.put4f(rotv).put4b(earthLineColor);
+            vexBuf.putVertex(rotv, earthLineColor);
         }
-        vexBuf.put4f(rotv).put4b(Colors.Null);
+        vexBuf.putVertex(rotv, Colors.Null);
 
         v = new Vec3();
         q = Quat.createRotation(Math.PI / 2, Vec3.YAxis);
@@ -91,11 +91,11 @@ class GridMath {
             v.z = 0.;
             rotv = q.rotateVector(v);
             if (i == 0) {
-                vexBuf.put4f(rotv).put4b(Colors.Null);
+                vexBuf.putVertex(rotv, Colors.Null);
             }
-            vexBuf.put4f(rotv).put4b(earthLineColor);
+            vexBuf.putVertex(rotv, earthLineColor);
         }
-        vexBuf.put4f(rotv).put4b(Colors.Null);
+        vexBuf.putVertex(rotv, Colors.Null);
 
         earthCircleLine.setData(gl, vexBuf);
     }
@@ -116,11 +116,11 @@ class GridMath {
                 float y = (float) (i * unit * Math.sin(a));
 
                 if (j == 0) {
-                    targetBuf.put4f(x, y, 0, 1).put4b(Colors.Null);
+                    targetBuf.putVertex(x, y, 0, 1, Colors.Null);
                 }
-                targetBuf.put4f(x, y, 0, 1).put4b(radialLineColor);
+                targetBuf.putVertex(x, y, 0, 1, radialLineColor);
                 if (j == SUBDIVISIONS) {
-                    targetBuf.put4f(x, y, 0, 1).put4b(Colors.Null);
+                    targetBuf.putVertex(x, y, 0, 1, Colors.Null);
                 }
             }
         }
@@ -136,11 +136,11 @@ class GridMath {
                 Vec3 rotv = q.rotateVector(v);
 
                 if (k == 0) {
-                    circleBuf.put4f(rotv).put4b(Colors.Null);
+                    circleBuf.putVertex(rotv, Colors.Null);
                 }
-                circleBuf.put4f(rotv).put4b(radialLineColor);
+                circleBuf.putVertex(rotv, radialLineColor);
                 if (k == LINEAR_STEPS) {
-                    circleBuf.put4f(rotv).put4b(Colors.Null);
+                    circleBuf.putVertex(rotv, Colors.Null);
                 }
             }
         }
@@ -159,12 +159,11 @@ class GridMath {
                 float v = (float) (-0.5 + k / (double) LINEAR_STEPS);
 
                 if (k == 0) {
-                    vexBuf.put4f(start, v, 0, 1).put4b(Colors.Null);
+                    vexBuf.putVertex(start, v, 0, 1, Colors.Null);
                 }
-                vexBuf.put4f(start, v, 0, 1);
-                vexBuf.put4b(i == FLAT_STEPS_THETA / 2 ? color2 : color1);
+                vexBuf.putVertex(start, v, 0, 1, i == FLAT_STEPS_THETA / 2 ? color2 : color1);
                 if (k == LINEAR_STEPS) {
-                    vexBuf.put4f(start, v, 0, 1).put4b(Colors.Null);
+                    vexBuf.putVertex(start, v, 0, 1, Colors.Null);
                 }
             }
         }
@@ -174,12 +173,11 @@ class GridMath {
                 float v = (float) (aspect * (-0.5 + k / (double) LINEAR_STEPS));
 
                 if (k == 0) {
-                    vexBuf.put4f(v, start, 0, 1).put4b(Colors.Null);
+                    vexBuf.putVertex(v, start, 0, 1, Colors.Null);
                 }
-                vexBuf.put4f(v, start, 0, 1);
-                vexBuf.put4b(i == FLAT_STEPS_RADIAL / 2 ? color2 : color1);
+                vexBuf.putVertex(v, start, 0, 1, i == FLAT_STEPS_RADIAL / 2 ? color2 : color1);
                 if (k == LINEAR_STEPS) {
-                    vexBuf.put4f(v, start, 0, 1).put4b(Colors.Null);
+                    vexBuf.putVertex(v, start, 0, 1, Colors.Null);
                 }
             }
         }
@@ -208,11 +206,11 @@ class GridMath {
                     Vec3 rotv = q.rotateVector(v);
 
                     if (i == 0) {
-                        vexBuf.put4f(rotv).put4b(Colors.Null);
+                        vexBuf.putVertex(rotv, Colors.Null);
                     }
-                    vexBuf.put4f(rotv).put4b(i % 2 == 0 ? color1 : color2);
+                    vexBuf.putVertex(rotv, i % 2 == 0 ? color1 : color2);
                     if (i == HALFDIVISIONS) {
-                        vexBuf.put4f(rotv).put4b(Colors.Null);
+                        vexBuf.putVertex(rotv, Colors.Null);
                     }
                 }
             }
@@ -228,11 +226,11 @@ class GridMath {
                     v.z = GRID_RADIUS * Math.sqrt(1. - scale * scale) * Math.cos(a);
 
                     if (i == 0) {
-                        vexBuf.put4f(v).put4b(Colors.Null);
+                        vexBuf.putVertex(v, Colors.Null);
                     }
-                    vexBuf.put4f(v).put4b(i % 2 == 0 ? color1 : color2);
+                    vexBuf.putVertex(v, i % 2 == 0 ? color1 : color2);
                     if (i == HALFDIVISIONS) {
-                        vexBuf.put4f(v).put4b(Colors.Null);
+                        vexBuf.putVertex(v, Colors.Null);
                     }
                 }
             }

@@ -20,7 +20,7 @@ public class FOVShape {
     }
 
     public void putCenter(Buf buf, byte[] color) {
-        buf.put4f((float) centerX, (float) centerY, (float) centerZ, SIZE_POINT).put4b(color);
+        buf.putVertex((float) centerX, (float) centerY, (float) centerZ, SIZE_POINT, color);
     }
 
     private static double computeZ(double x, double y) {
@@ -36,36 +36,32 @@ public class FOVShape {
             y = bh + centerY;
             z = computeZ(x, y);
             if (i == 0) { // first
-                buf.put4f((float) x, (float) y, (float) z, 1).put4b(Colors.Null);
+                buf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
             }
-            buf.put4f((float) x, (float) y, (float) z, 1);
-            buf.put4b(i % 2 == 0 ? color : Colors.White);
+            buf.putVertex((float) x, (float) y, (float) z, 1, i % 2 == 0 ? color : Colors.White);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             x = bw + centerX;
             y = bh - 2 * bh / SUBDIVISIONS * i + centerY;
             z = computeZ(x, y);
-            buf.put4f((float) x, (float) y, (float) z, 1);
-            buf.put4b(i % 2 == 0 ? color : Colors.White);
+            buf.putVertex((float) x, (float) y, (float) z, 1, i % 2 == 0 ? color : Colors.White);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             x = bw - 2 * bw / SUBDIVISIONS * i + centerX;
             y = -bh + centerY;
             z = computeZ(x, y);
-            buf.put4f((float) x, (float) y, (float) z, 1);
-            buf.put4b(i % 2 == 0 ? color : Colors.White);
+            buf.putVertex((float) x, (float) y, (float) z, 1, i % 2 == 0 ? color : Colors.White);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             x = -bw + centerX;
             y = -bh + 2 * bh / SUBDIVISIONS * i + centerY;
             z = computeZ(x, y);
-            buf.put4f((float) x, (float) y, (float) z, 1);
-            buf.put4b(i % 2 == 0 ? color : Colors.White);
+            buf.putVertex((float) x, (float) y, (float) z, 1, i % 2 == 0 ? color : Colors.White);
             if (i == SUBDIVISIONS) { // last
-                buf.put4f((float) x, (float) y, (float) z, 1).put4b(Colors.Null);
+                buf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
             }
         }
     }
