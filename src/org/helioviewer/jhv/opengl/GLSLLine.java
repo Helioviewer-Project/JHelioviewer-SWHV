@@ -6,7 +6,7 @@ import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.opengl.GL2;
 
-public class GLSLLine extends VAO2 {
+public class GLSLLine extends VAO {
 
     public static final double LINEWIDTH_BASIC = 0.002;
 

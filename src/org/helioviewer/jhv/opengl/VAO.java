@@ -5,13 +5,14 @@ import com.jogamp.opengl.GL2;
 class VAO {
 
     private final VAA[] vaa;
-    private final boolean dynamic;
+    protected final VBO[] vbo;
 
+    private final boolean dynamic;
     private int vaoID = -1;
     private boolean inited;
-    protected VBO vbo;
 
-    VAO(boolean _dynamic, VAA[] _vaa) {
+    VAO(int nvbo, boolean _dynamic, VAA[] _vaa) {
+        vbo = new VBO[nvbo];
         dynamic = _dynamic;
         vaa = _vaa;
     }
@@ -24,12 +25,14 @@ class VAO {
             gl.glGenVertexArrays(1, tmpId, 0);
             vaoID = tmpId[0];
 
-            vbo = new VBO(gl, GL2.GL_ARRAY_BUFFER, dynamic);
-            vbo.bind(gl);
+            for (int i = 0; i < vbo.length; i++) {
+                vbo[i] = new VBO(gl, GL2.GL_ARRAY_BUFFER, dynamic);
+            }
 
             gl.glBindVertexArray(vaoID);
-            for (VAA avaa : vaa) {
-                avaa.enable(gl);
+            for (int i = 0; i < vaa.length; i++) {
+                vbo[i % vbo.length].bind(gl); //!
+                vaa[i].enable(gl);
             }
         }
     }
@@ -37,10 +40,13 @@ class VAO {
     public void dispose(GL2 gl) {
         if (inited) {
             inited = false;
-
-            vbo.delete(gl);
             gl.glDeleteVertexArrays(1, new int[]{vaoID}, 0);
             vaoID = -1;
+
+            for (int i = 0; i < vbo.length; i++) {
+                vbo[i].delete(gl);
+                vbo[i] = null;
+            }
         }
     }
 
