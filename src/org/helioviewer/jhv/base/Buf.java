@@ -35,13 +35,29 @@ public class Buf {
         }
     }
 
+    public void putVertex(Vec3 v, byte[] b) {
+        put4f(v);
+        put4b(b);
+    }
+
     public Buf put4f(Vec3 v) {
         return put4f((float) v.x, (float) v.y, (float) v.z, 1);
+    }
+
+    public void putVertex(float x, float y, float z, float w, byte[] b) {
+        put4f(x, y, z, w);
+        put4b(b);
     }
 
     public Buf put4f(float x, float y, float z, float w) {
         bufferLast.put(0, x).put(1, y).put(2, z).put(3, w);
         return repeat4f();
+    }
+
+    public Buf repeatVertex(byte[] b) {
+        repeat4f();
+        put4b(b);
+        return this;
     }
 
     public Buf repeat4f() {
@@ -65,7 +81,7 @@ public class Buf {
         return this;
     }
 
-    public void put4b(byte[] b) {
+    private void put4b(byte[] b) {
         ensure(4);
         array[length] = b[0];
         array[length + 1] = b[1];

@@ -59,7 +59,7 @@ class PfssLine {
                 double r = Math.sqrt(x * x + y * y + z * z);
 
                 if (i % pointsPerLine == 0) { // start line
-                    lineBuf.put4f((float) x, (float) z, (float) -y, 1).put4b(Colors.Null);
+                    lineBuf.putVertex((float) x, (float) z, (float) -y, 1, Colors.Null);
 
                     if (fixedColor) {
                         double xo = 3. * decode(flinex, i + pointsPerLine - 1);
@@ -77,11 +77,10 @@ class PfssLine {
                     }
                 }
 
-                lineBuf.put4f((float) x, (float) z, (float) -y, 1);
-                lineBuf.put4b(r > radius ? Colors.Null : (fixedColor ? oneColor : brightColor));
+                lineBuf.putVertex((float) x, (float) z, (float) -y, 1, r > radius ? Colors.Null : (fixedColor ? oneColor : brightColor));
 
                 if (i % pointsPerLine == pointsPerLine - 1) { // end line
-                    lineBuf.put4f((float) x, (float) z, (float) -y, 1).put4b(Colors.Null);
+                    lineBuf.putVertex((float) x, (float) z, (float) -y, 1, Colors.Null);
                 }
             }
         }

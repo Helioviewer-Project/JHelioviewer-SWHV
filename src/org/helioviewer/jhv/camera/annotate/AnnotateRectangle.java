@@ -39,9 +39,9 @@ public class AnnotateRectangle extends AbstractAnnotateable {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 if (i == 0) { // first
-                    buf.put4f(pc).put4b(Colors.Null);
+                    buf.putVertex(pc, Colors.Null);
                 }
-                buf.put4f(pc).put4b(color);
+                buf.putVertex(pc, color);
             } else {
                 pc.y = -pc.y;
                 if (i == 0) {
@@ -56,7 +56,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
             if (Display.mode == Display.DisplayMode.Orthographic) {
-                buf.put4f(pc).put4b(color);
+                buf.putVertex(pc, color);
             } else {
                 pc.y = -pc.y;
                 previous = GLHelper.drawVertex(viewpoint, vp, pc, previous, buf, color);
@@ -68,7 +68,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
             if (Display.mode == Display.DisplayMode.Orthographic) {
-                buf.put4f(pc).put4b(color);
+                buf.putVertex(pc, color);
             } else {
                 pc.y = -pc.y;
                 previous = GLHelper.drawVertex(viewpoint, vp, pc, previous, buf, color);
@@ -80,9 +80,9 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
             if (Display.mode == Display.DisplayMode.Orthographic) {
-                buf.put4f(pc).put4b(color);
+                buf.putVertex(pc, color);
                 if (i == SUBDIVISIONS) { // last
-                    buf.put4f(pc).put4b(Colors.Null);
+                    buf.putVertex(pc, Colors.Null);
                 }
             } else {
                 pc.y = -pc.y;
