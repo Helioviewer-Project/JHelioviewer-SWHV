@@ -896,12 +896,12 @@ public class JhvTextRenderer {
             float tx2 = (texturex + width) / (float) renderer.getWidth();
             float ty2 = 1f - (texturey + height) / (float) renderer.getHeight();
 
-            vexBuf.put4f(x, y, z, 1).put2f(tx1, ty1); // A
-            vexBuf.put4f(x + (width * scaleFactor), y, z, 1).put2f(tx2, ty1); // B
-            vexBuf.put4f(x + (width * scaleFactor), y + (height * scaleFactor), z, 1).put2f(tx2, ty2); // C
-            vexBuf.put4f(x, y, z, 1).put2f(tx1, ty1); // A
-            vexBuf.put4f(x + (width * scaleFactor), y + (height * scaleFactor), z, 1).put2f(tx2, ty2); // C
-            vexBuf.put4f(x, y + (height * scaleFactor), z, 1).put2f(tx1, ty2); // D
+            vexBuf.putCoord(x, y, z, 1, tx1, ty1); // A
+            vexBuf.putCoord(x + (width * scaleFactor), y, z, 1, tx2, ty1); // B
+            vexBuf.putCoord(x + (width * scaleFactor), y + (height * scaleFactor), z, 1, tx2, ty2); // C
+            vexBuf.putCoord(x, y, z, 1, tx1, ty1); // A
+            vexBuf.putCoord(x + (width * scaleFactor), y + (height * scaleFactor), z, 1, tx2, ty2); // C
+            vexBuf.putCoord(x, y + (height * scaleFactor), z, 1, tx1, ty2); // D
 
             outstandingGlyphsVerticesPipeline += kVertsPerQuad;
             if (outstandingGlyphsVerticesPipeline >= kTotalBufferSizeVerts) {
