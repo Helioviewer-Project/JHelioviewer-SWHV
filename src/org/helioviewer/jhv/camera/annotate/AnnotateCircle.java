@@ -42,11 +42,11 @@ public class AnnotateCircle extends AbstractAnnotateable {
             vx.z = center.z + cosr * u.z + sinr * v.z;
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 if (i == 0) {
-                    buf.put4f(vx).put4b(Colors.Null);
+                    buf.putVertex(vx, Colors.Null);
                 }
-                buf.put4f(vx).put4b(color);
+                buf.putVertex(vx, color);
                 if (i == SUBDIVISIONS) {
-                    buf.put4f(vx).put4b(Colors.Null);
+                    buf.putVertex(vx, Colors.Null);
                 }
             } else {
                 vx.y = -vx.y;
