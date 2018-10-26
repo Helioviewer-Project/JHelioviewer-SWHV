@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.Colors;
 
 public class FOVShape {
@@ -19,7 +18,7 @@ public class FOVShape {
         centerZ = computeZ(centerX, centerY);
     }
 
-    public void putCenter(Buf buf, byte[] color) {
+    public void putCenter(BufVertex buf, byte[] color) {
         buf.putVertex((float) centerX, (float) centerY, (float) centerZ, SIZE_POINT, color);
     }
 
@@ -28,7 +27,7 @@ public class FOVShape {
         return n > 0 ? epsilon + Math.sqrt(n) : epsilon;
     }
 
-    public void putLine(double bw, double bh, Buf buf, byte[] color) {
+    public void putLine(double bw, double bh, BufVertex buf, byte[] color) {
         double x, y, z;
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {

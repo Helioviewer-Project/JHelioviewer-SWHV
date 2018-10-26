@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.camera.annotate;
 
-import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
@@ -8,6 +7,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.position.Position;
 import org.json.JSONObject;
@@ -20,7 +20,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
         super(jo);
     }
 
-    private static void drawCircle(Position viewpoint, Viewport vp, Vec3 bp, Vec3 ep, Buf buf, byte[] color) {
+    private static void drawCircle(Position viewpoint, Viewport vp, Vec3 bp, Vec3 ep, BufVertex buf, byte[] color) {
         double cosf = Vec3.dot(bp, ep);
         double r = Math.sqrt(1 - cosf * cosf);
         // P = center + r cos(A) (bp x ep) + r sin(A) ep
@@ -62,7 +62,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
     }
 
     @Override
-    public void draw(Position viewpoint, Viewport vp, boolean active, Buf buf) {
+    public void draw(Position viewpoint, Viewport vp, boolean active, BufVertex buf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;

@@ -2,8 +2,8 @@ package org.helioviewer.jhv.plugins.pfss;
 
 import java.nio.ShortBuffer;
 
-import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.Colors;
+import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.plugins.pfss.data.PfssData;
 
 class PfssLine {
@@ -33,7 +33,7 @@ class PfssLine {
         return (buf.get(idx) + 32768.) * (2. / 65535.) - 1.;
     }
 
-    public void calculatePositions(PfssData data, int detail, boolean fixedColor, double radius, Buf lineBuf) {
+    public void calculatePositions(PfssData data, int detail, boolean fixedColor, double radius, BufVertex lineBuf) {
         int pointsPerLine = data.pointsPerLine;
         double cphi = data.cphi;
         double sphi = data.sphi;

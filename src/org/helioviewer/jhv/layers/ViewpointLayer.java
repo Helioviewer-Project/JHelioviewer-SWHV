@@ -8,7 +8,6 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
-import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -18,6 +17,7 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.FOVShape;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
@@ -43,14 +43,14 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     private final FOVShape fov = new FOVShape();
     private final byte[] fovColor = Colors.Blue;
     private final GLSLLine fovLine = new GLSLLine(true);
-    private final Buf fovBuf = new Buf((4 * (FOVShape.SUBDIVISIONS + 1) + 2) * GLSLLine.stride);
+    private final BufVertex fovBuf = new BufVertex((4 * (FOVShape.SUBDIVISIONS + 1) + 2) * GLSLLine.stride);
     private final GLSLShape center = new GLSLShape(true);
-    private final Buf centerBuf = new Buf(GLSLShape.stride);
+    private final BufVertex centerBuf = new BufVertex(GLSLShape.stride);
 
     private final GLSLLine orbits = new GLSLLine(true);
-    private final Buf orbitBuf = new Buf(3276 * GLSLLine.stride); // pre-allocate 64k
+    private final BufVertex orbitBuf = new BufVertex(3276 * GLSLLine.stride); // pre-allocate 64k
     private final GLSLShape planets = new GLSLShape(true);
-    private final Buf planetBuf = new Buf(8 * GLSLShape.stride);
+    private final BufVertex planetBuf = new BufVertex(8 * GLSLShape.stride);
 
     private final ViewpointLayerOptions optionsPanel;
 

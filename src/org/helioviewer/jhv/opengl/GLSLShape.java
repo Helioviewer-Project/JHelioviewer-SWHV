@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.opengl.GL2;
@@ -17,7 +16,7 @@ public class GLSLShape extends VAO {
         super(_dynamic, new VAA[]{new VAA(0, size0, false, stride, 0, 0), new VAA(1, size1, true, stride, 4 * size0, 0)});
     }
 
-    public void setData(GL2 gl, Buf buf) {
+    public void setData(GL2 gl, BufVertex buf) {
         if ((count = buf.getFloats() / size0) == 0)
             return;
         if (count * size0 != buf.getFloats() || count != buf.getBytes4()) {
