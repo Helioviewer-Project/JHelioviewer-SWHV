@@ -101,7 +101,8 @@ public class GLHelper {
             // GUI events can lead to context destruction and invalidation of GL objects and state
             window.setSharedAutoDrawable(getSharedDrawable(profile, capabilities));
         } catch (Exception e) {
-            GLInfo.glVersionError(e.getMessage());
+            String msg = e.getMessage();
+            GLInfo.glVersionError(msg == null ? "Unknown OpenGL error." : msg);
         }
         return window;
     }
