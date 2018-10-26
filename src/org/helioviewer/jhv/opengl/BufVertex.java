@@ -16,19 +16,28 @@ public class BufVertex {
     private final byte[] byteLast = new byte[16];
     private final FloatBuffer bufferLast = ByteBuffer.wrap(byteLast).order(ByteOrder.nativeOrder()).asFloatBuffer();
 
-    private byte[] array;
-    private int length;
-    private int floats;
-    private int bytes;
+    private byte[] arrayVertx;
+    private int lengthVertx;
+    private byte[] arrayColor;
+    private int lengthColor;
 
     public BufVertex(int size) {
-        array = new byte[size < 16 ? 16 : size];
+        arrayVertx = new byte[size < 16 ? 16 : size];
+        size /= 4;
+        arrayColor = new byte[size < 4 ? 4 : size];
     }
 
-    private void ensure(int nbytes) {
-        int size = array.length;
-        if (length + nbytes > size) {
-            array = Arrays.copyOf(array, size + chunk * multiplier++);
+    private void ensureVertx(int nbytes) {
+        int size = arrayVertx.length;
+        if (lengthVertx + nbytes > size) {
+            arrayVertx = Arrays.copyOf(arrayVertx, size + chunk * multiplier++);
+        }
+    }
+
+    private void ensureColor(int nbytes) {
+        int size = arrayColor.length;
+        if (lengthColor + nbytes > size) {
+            arrayColor = Arrays.copyOf(arrayColor, size + chunk * multiplier++);
         }
     }
 
@@ -54,38 +63,36 @@ public class BufVertex {
     }
 
     private void repeat4f() {
-        ensure(16);
-        System.arraycopy(byteLast, 0, array, length, 16);
-        length += 16;
-        floats += 4;
+        ensureVertx(16);
+        System.arraycopy(byteLast, 0, arrayVertx, lengthVertx, 16);
+        lengthVertx += 16;
     }
 
     private void put4b(byte[] b) {
-        ensure(4);
-        array[length] = b[0];
-        array[length + 1] = b[1];
-        array[length + 2] = b[2];
-        array[length + 3] = b[3];
-        length += 4;
-        bytes++;
+        ensureColor(4);
+        System.arraycopy(b, 0, arrayColor, lengthColor, 4);
+        lengthColor += 4;
     }
 
-    public int getFloats() {
-        return floats;
+    public int getVertexLength() {
+        return lengthVertx;
     }
 
-    public int getBytes4() {
-        return bytes;
+    public int getColorLength() {
+        return lengthColor;
     }
 
     public void clear() {
-        length = 0;
-        floats = 0;
-        bytes = 0;
+        lengthVertx = 0;
+        lengthColor = 0;
     }
 
-    public Buffer toBuffer() {
-        return ByteBuffer.wrap(array).limit(length);
+    public Buffer toVertexBuffer() {
+        return ByteBuffer.wrap(arrayVertx).limit(lengthVertx);
+    }
+
+    public Buffer toColorBuffer() {
+        return ByteBuffer.wrap(arrayColor).limit(lengthColor);
     }
 
 }

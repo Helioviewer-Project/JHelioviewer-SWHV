@@ -1,10 +1,12 @@
 package org.helioviewer.jhv.opengl;
 
+import java.nio.Buffer;
+
 import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.opengl.GL2;
 
-public class GLSLShape extends VAO {
+public class GLSLShape extends VAO2 {
 
     private static final int size0 = 4;
     private static final int size1 = 4;
@@ -13,17 +15,24 @@ public class GLSLShape extends VAO {
     private int count;
 
     public GLSLShape(boolean _dynamic) {
-        super(_dynamic, new VAA[]{new VAA(0, size0, false, stride, 0, 0), new VAA(1, size1, true, stride, 4 * size0, 0)});
+        super(2, _dynamic, new VAA[]{new VAA(0, size0, false, 0, 0, 0), new VAA(1, size1, true, 0, 0, 0)});
     }
 
     public void setData(GL2 gl, BufVertex buf) {
-        if ((count = buf.getFloats() / size0) == 0)
+        if ((count = buf.getVertexLength() / size0) == 0)
             return;
-        if (count * size0 != buf.getFloats() || count != buf.getBytes4()) {
+        if (count * size0 != buf.getVertexLength() || count != buf.getColorLength()) {
             Log.error("Something is wrong with the attributes of this GLSLShape");
+            count = 0;
             return;
         }
-        vbo.setData(gl, buf);
+
+        Buffer buffer;
+        buffer = buf.toVertexBuffer();
+        vbo[0].setBufferData(gl, buffer.limit(), buffer.capacity(), buffer);
+        buffer = buf.toColorBuffer();
+        vbo[1].setBufferData(gl, buffer.limit(), buffer.capacity(), buffer);
+        buf.clear();
     }
 
     public void renderPoints(GL2 gl, double factor) {
