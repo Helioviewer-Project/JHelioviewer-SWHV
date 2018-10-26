@@ -17,21 +17,18 @@ public class Buf {
     private final FloatBuffer bufferLast = ByteBuffer.wrap(byteLast).order(ByteOrder.nativeOrder()).asFloatBuffer();
 
     private byte[] array;
-    private ByteBuffer buffer;
     private int length;
     private int floats;
     private int bytes;
 
     public Buf(int size) {
         array = new byte[size < 16 ? 16 : size];
-        buffer = ByteBuffer.wrap(array);
     }
 
     private void ensure(int nbytes) {
         int size = array.length;
         if (length + nbytes > size) {
             array = Arrays.copyOf(array, size + chunk * multiplier++);
-            buffer = ByteBuffer.wrap(array);
         }
     }
 
@@ -111,7 +108,7 @@ public class Buf {
     }
 
     public Buffer toBuffer() {
-        return buffer.limit(length);
+        return ByteBuffer.wrap(array).limit(length);
     }
 
 }
