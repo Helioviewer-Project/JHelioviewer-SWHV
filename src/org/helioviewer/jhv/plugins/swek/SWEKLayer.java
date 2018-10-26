@@ -164,7 +164,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
                 v.x = r * Math.cos(theta);
                 v.y = r * Math.sin(theta);
-                texBuf.put4f(q.rotateInverseVector(v)).put2f(el);
+                texBuf.putCoord(q.rotateInverseVector(v), el);
             }
         }
     }
@@ -239,10 +239,10 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         p2.add(targetDir);
         p3.add(targetDir);
 
-        texBuf.put4f(p0).put2f(texCoord[0]);
-        texBuf.put4f(p1).put2f(texCoord[1]);
-        texBuf.put4f(p2).put2f(texCoord[2]);
-        texBuf.put4f(p3).put2f(texCoord[3]);
+        texBuf.putCoord(p0, texCoord[0]);
+        texBuf.putCoord(p1, texCoord[1]);
+        texBuf.putCoord(p2, texCoord[2]);
+        texBuf.putCoord(p3, texCoord[3]);
     }
 
     private void drawIcon(JHVRelatedEvents evtr, JHVEvent evt) {
@@ -261,10 +261,10 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         double width2 = width / 4.;
         double height2 = height / 4.;
 
-        texBuf.put4f((float) (theta - width2), (float) (r - height2), 0, 1).put2f(texCoord[0]);
-        texBuf.put4f((float) (theta + width2), (float) (r - height2), 0, 1).put2f(texCoord[1]);
-        texBuf.put4f((float) (theta - width2), (float) (r + height2), 0, 1).put2f(texCoord[2]);
-        texBuf.put4f((float) (theta + width2), (float) (r + height2), 0, 1).put2f(texCoord[3]);
+        texBuf.putCoord((float) (theta - width2), (float) (r - height2), 0, 1, texCoord[0]);
+        texBuf.putCoord((float) (theta + width2), (float) (r - height2), 0, 1, texCoord[1]);
+        texBuf.putCoord((float) (theta - width2), (float) (r + height2), 0, 1, texCoord[2]);
+        texBuf.putCoord((float) (theta + width2), (float) (r + height2), 0, 1, texCoord[3]);
     }
 
     private void drawIconScale(Camera camera, Viewport vp, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Transform xform) {

@@ -36,12 +36,8 @@ public class Buf {
     }
 
     public void putVertex(Vec3 v, byte[] b) {
-        put4f(v);
+        put4f((float) v.x, (float) v.y, (float) v.z, 1);
         put4b(b);
-    }
-
-    public Buf put4f(Vec3 v) {
-        return put4f((float) v.x, (float) v.y, (float) v.z, 1);
     }
 
     public void putVertex(float x, float y, float z, float w, byte[] b) {
@@ -49,36 +45,45 @@ public class Buf {
         put4b(b);
     }
 
-    public Buf put4f(float x, float y, float z, float w) {
-        bufferLast.put(0, x).put(1, y).put(2, z).put(3, w);
-        return repeat4f();
-    }
-
-    public Buf repeatVertex(byte[] b) {
+    public void repeatVertex(byte[] b) {
         repeat4f();
         put4b(b);
+    }
+
+    public void putCoord(float x, float y, float z, float w, float c0, float c1) {
+        put4f(x, y, z, w);
+        put2f(c0, c1);
+    }
+
+    public void putCoord(float x, float y, float z, float w, float[] c) {
+        put4f(x, y, z, w);
+        put2f(c[0], c[1]);
+    }
+
+    public void putCoord(Vec3 v, float[] c) {
+        put4f((float) v.x, (float) v.y, (float) v.z, 1);
+        put2f(c[0], c[1]);
+    }
+
+    public Buf put4f(float x, float y, float z, float w) {
+        bufferLast.put(0, x).put(1, y).put(2, z).put(3, w);
+        repeat4f();
         return this;
     }
 
-    public Buf repeat4f() {
+    private void repeat4f() {
         ensure(16);
         System.arraycopy(byteLast, 0, array, length, 16);
         length += 16;
         floats += 4;
-        return this;
     }
 
-    public Buf put2f(float[] f) {
-        return put2f(f[0], f[1]);
-    }
-
-    public Buf put2f(float f0, float f1) {
+    private void put2f(float f0, float f1) {
         ensure(8);
         bufferLast/*.put(0, bufferLast.get(2)).put(1, bufferLast.get(3))*/.put(2, f0).put(3, f1); // don't do repeat4f() after put2f()
         System.arraycopy(byteLast, 8, array, length, 8);
         length += 8;
         floats += 2;
-        return this;
     }
 
     private void put4b(byte[] b) {
