@@ -26,12 +26,6 @@ class VBO {
         gl.glBindBuffer(target, bufferID);
     }
 
-    void setData(GL2 gl, BufVertex buf) {
-        Buffer buffer = buf.toBuffer();
-        setBufferData(gl, buffer.limit(), buffer.capacity(), buffer);
-        buf.clear();
-    }
-
     void setBufferData(GL2 gl, int limit, int capacity, Buffer buffer) {
         gl.glBindBuffer(target, bufferID);
         gl.glBufferData(target, capacity, null, usage); // https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
