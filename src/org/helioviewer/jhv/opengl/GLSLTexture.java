@@ -6,7 +6,7 @@ import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.opengl.GL2;
 
-public class GLSLTexture extends VAO {
+public class GLSLTexture extends VAO2 {
 
     private static final int size0 = 4;
     private static final int size1 = 2;
@@ -15,19 +15,23 @@ public class GLSLTexture extends VAO {
     private int count;
 
     public GLSLTexture() {
-        super(true, new VAA[]{new VAA(0, size0, false, stride, 0, 0), new VAA(1, size1, false, stride, 4 * size0, 0)});
+        super(2, true, new VAA[]{new VAA(0, size0, false, 0, 0, 0), new VAA(1, size1, false, 0, 0, 0)});
     }
 
     public void setData(GL2 gl, BufCoord buf) {
-        if ((count = buf.getFloats() / (size0 + size1)) == 0)
+        if ((count = buf.getVertexLength() / size0) == 0)
             return;
-        if (count * (size0 + size1) != buf.getFloats()) {
+        if (count * size0 != buf.getVertexLength() || count != buf.getCoordLength() / size1) {
             Log.error("Something is wrong with the attributes of this GLSLTexture");
+            count = 0;
             return;
         }
 
-        Buffer buffer = buf.toBuffer();
-        vbo.setBufferData(gl, buffer.limit(), buffer.capacity(), buffer);
+        Buffer buffer;
+        buffer = buf.toVertexBuffer();
+        vbo[0].setBufferData(gl, buffer.limit(), buffer.capacity(), buffer);
+        buffer = buf.toCoordBuffer();
+        vbo[1].setBufferData(gl, buffer.limit(), buffer.capacity(), buffer);
         buf.clear();
     }
 
