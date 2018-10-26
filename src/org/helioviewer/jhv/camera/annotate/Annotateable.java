@@ -1,16 +1,16 @@
 package org.helioviewer.jhv.camera.annotate;
 
-import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.position.Position;
 import org.json.JSONObject;
 
 public interface Annotateable {
 
-    void draw(Position viewpoint, Viewport vp, boolean active, Buf buf);
+    void draw(Position viewpoint, Viewport vp, boolean active, BufVertex buf);
 
-    void drawTransformed(boolean active, Buf lineBuf, Buf centerBuf);
+    void drawTransformed(boolean active, BufVertex lineBuf, BufVertex centerBuf);
 
     void mousePressed(Camera camera, int x, int y);
 

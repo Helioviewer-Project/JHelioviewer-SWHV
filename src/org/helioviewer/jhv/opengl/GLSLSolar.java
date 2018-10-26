@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import org.helioviewer.jhv.base.Buf;
-
 import com.jogamp.opengl.GL2;
 
 public class GLSLSolar extends VAO2 {
@@ -18,7 +16,7 @@ public class GLSLSolar extends VAO2 {
     @Override
     public void init(GL2 gl) {
         super.init(gl);
-        Buf vexBuf = new Buf(4 * 16).put4f(-1, -1, 0, 1).put4f(1, -1, 0, 1).put4f(-1, 1, 0, 1).put4f(1, 1, 0, 1);
+        BufVertex vexBuf = new BufVertex(4 * 16).put4f(-1, -1, 0, 1).put4f(1, -1, 0, 1).put4f(-1, 1, 0, 1).put4f(1, 1, 0, 1);
         vbo[0].setData(gl, vexBuf);
     }
 

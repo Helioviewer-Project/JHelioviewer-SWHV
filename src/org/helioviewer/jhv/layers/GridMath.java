@@ -1,10 +1,10 @@
 package org.helioviewer.jhv.layers;
 
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 
@@ -40,7 +40,7 @@ class GridMath {
     static final int FLAT_STEPS_RADIAL = 10;
 
     static void initAxes(GL2 gl, GLSLLine axesLine) {
-        Buf vexBuf = new Buf(8 * GLSLLine.stride);
+        BufVertex vexBuf = new BufVertex(8 * GLSLLine.stride);
 
         vexBuf.putVertex(0, -AXIS_STOP, 0, 1, Colors.Null);
         vexBuf.repeatVertex(axisSouthColor);
@@ -58,14 +58,14 @@ class GridMath {
     }
 
     static void initEarthPoint(GL2 gl, GLSLShape earthPoint) {
-        Buf vexBuf = new Buf(GLSLShape.stride);
+        BufVertex vexBuf = new BufVertex(GLSLShape.stride);
         vexBuf.putVertex(0, 0, (float) EARTH_CIRCLE_RADIUS, earthPointSize, earthLineColor);
         earthPoint.setData(gl, vexBuf);
     }
 
     static void initEarthCircles(GL2 gl, GLSLLine earthCircleLine) {
         int no_points = 2 * (SUBDIVISIONS + 3);
-        Buf vexBuf = new Buf(no_points * GLSLLine.stride);
+        BufVertex vexBuf = new BufVertex(no_points * GLSLLine.stride);
 
         Vec3 rotv = new Vec3(), v = new Vec3();
         Quat q = Quat.createRotation(Math.PI / 2, Vec3.XAxis);
@@ -103,12 +103,12 @@ class GridMath {
     static void initRadialCircles(GL2 gl, GLSLLine radialCircleLine, GLSLLine radialThickLine, double unit, double step) {
         int no_lines = (int) Math.ceil(360 / step);
         int no_points = (END_RADIUS - START_RADIUS + 1 - TENS_RADIUS) * (SUBDIVISIONS + 3) + (LINEAR_STEPS + 3) * no_lines;
-        Buf circleBuf = new Buf(no_points * GLSLLine.stride);
+        BufVertex circleBuf = new BufVertex(no_points * GLSLLine.stride);
         int no_points_thick = TENS_RADIUS * (SUBDIVISIONS + 3);
-        Buf thickBuf = new Buf(no_points_thick * GLSLLine.stride);
+        BufVertex thickBuf = new BufVertex(no_points_thick * GLSLLine.stride);
 
         for (int i = START_RADIUS; i <= END_RADIUS; i++) {
-            Buf targetBuf = i % 10 == 0 ? thickBuf : circleBuf;
+            BufVertex targetBuf = i % 10 == 0 ? thickBuf : circleBuf;
 
             for (int j = 0; j <= SUBDIVISIONS; j++) {
                 double a = 2 * Math.PI * j / SUBDIVISIONS;
@@ -151,7 +151,7 @@ class GridMath {
 
     static void initFlatGrid(GL2 gl, GLSLLine flatLine, double aspect) {
         int no_points = (LINEAR_STEPS + 3) * (FLAT_STEPS_THETA + 1 + FLAT_STEPS_RADIAL + 1);
-        Buf vexBuf = new Buf(no_points * GLSLLine.stride);
+        BufVertex vexBuf = new BufVertex(no_points * GLSLLine.stride);
 
         for (int i = 0; i <= FLAT_STEPS_THETA; i++) {
             float start = (float) (aspect * (-0.5 + i / (double) FLAT_STEPS_THETA));
@@ -190,7 +190,7 @@ class GridMath {
         int no_lat_steps = ((int) Math.ceil(180 / latstepDegrees)) / 2;
         int HALFDIVISIONS = SUBDIVISIONS / 2;
         int no_points = 2 * (no_lat_steps + no_lon_steps) * (HALFDIVISIONS + 3);
-        Buf vexBuf = new Buf(no_points * GLSLLine.stride);
+        BufVertex vexBuf = new BufVertex(no_points * GLSLLine.stride);
 
         Vec3 v = new Vec3();
         double rotation;

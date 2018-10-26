@@ -2,7 +2,6 @@ package org.helioviewer.jhv.camera;
 
 import java.util.ArrayList;
 
-import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.camera.annotate.AnnotateCircle;
 import org.helioviewer.jhv.camera.annotate.AnnotateCross;
 import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
@@ -11,6 +10,7 @@ import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Transform;
+import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.position.Position;
@@ -46,11 +46,11 @@ public class InteractionAnnotate extends Interaction {
 
     private static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
     private final GLSLLine annsLine = new GLSLLine(true);
-    private final Buf annsBuf = new Buf(3276 * GLSLLine.stride); // pre-allocate 64kB
+    private final BufVertex annsBuf = new BufVertex(3276 * GLSLLine.stride); // pre-allocate 64kB
     private final GLSLLine transLine = new GLSLLine(true);
-    private final Buf transBuf = new Buf(512 * GLSLLine.stride); // pre-allocate 5 FOV
+    private final BufVertex transBuf = new BufVertex(512 * GLSLLine.stride); // pre-allocate 5 FOV
     private final GLSLShape center = new GLSLShape(true);
-    private final Buf centerBuf = new Buf(8 * GLSLShape.stride);
+    private final BufVertex centerBuf = new BufVertex(8 * GLSLShape.stride);
 
     private Annotateable newAnnotateable = null;
     private AnnotationMode mode = AnnotationMode.Rectangle;

@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.opengl.GL2;
@@ -20,7 +19,7 @@ public class GLSLLine extends VAO {
                 new VAA(2, size0, false, stride, stride, 1), new VAA(3, size1, true, stride, stride + 4 * size0, 1)});
     }
 
-    public void setData(GL2 gl, Buf buf) {
+    public void setData(GL2 gl, BufVertex buf) {
         if ((count = buf.getFloats() / size0) == 0)
             return;
         if (count * size0 != buf.getFloats() || count != buf.getBytes4()) {

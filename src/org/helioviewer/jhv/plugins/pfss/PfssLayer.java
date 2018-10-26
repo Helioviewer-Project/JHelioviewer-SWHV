@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
@@ -14,6 +13,7 @@ import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.plugins.pfss.data.PfssData;
 import org.helioviewer.jhv.plugins.pfss.data.PfssNewDataLoader;
@@ -30,7 +30,7 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
     private final PfssLayerOptions optionsPanel;
     private final PfssLine pfssLine = new PfssLine();
     private final GLSLLine glslLine = new GLSLLine(true);
-    private final Buf lineBuf = new Buf(3276 * GLSLLine.stride); // pre-allocate 64k
+    private final BufVertex lineBuf = new BufVertex(3276 * GLSLLine.stride); // pre-allocate 64k
     private PfssData previousPfssData;
 
     public PfssLayer(JSONObject jo) {

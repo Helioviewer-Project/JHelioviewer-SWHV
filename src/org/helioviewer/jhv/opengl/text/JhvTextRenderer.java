@@ -56,10 +56,10 @@ import java.util.HashMap;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Transform;
+import org.helioviewer.jhv.opengl.BufCoord;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLSLTexture;
 
@@ -1041,7 +1041,7 @@ public class JhvTextRenderer {
     private float[] textColor = Colors.WhiteFloat;
 
     int outstandingGlyphsVerticesPipeline = 0;
-    final Buf vexBuf = new Buf(kQuadsPerBuffer * kVertsPerQuad * GLSLTexture.stride); // 14400
+    final BufCoord vexBuf = new BufCoord(kQuadsPerBuffer * kVertsPerQuad * GLSLTexture.stride); // 14400
 
     void drawVertices() {
         if (outstandingGlyphsVerticesPipeline > 0) {

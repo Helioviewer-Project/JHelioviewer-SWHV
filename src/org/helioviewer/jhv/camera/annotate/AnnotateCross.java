@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.camera.annotate;
 
-import org.helioviewer.jhv.base.Buf;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
@@ -8,6 +7,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.position.Position;
 import org.json.JSONObject;
@@ -20,7 +20,7 @@ public class AnnotateCross extends AbstractAnnotateable {
         super(jo);
     }
 
-    private static void drawCross(Position viewpoint, Viewport vp, Vec3 bp, Buf buf, byte[] color) {
+    private static void drawCross(Position viewpoint, Viewport vp, Vec3 bp, BufVertex buf, byte[] color) {
         double delta = 2.5 * Math.PI / 180;
         Vec3 p1 = new Vec3(radius, bp.y + delta, bp.z);
         Vec3 p2 = new Vec3(radius, bp.y - delta, bp.z);
@@ -31,7 +31,7 @@ public class AnnotateCross extends AbstractAnnotateable {
         interpolatedDraw(viewpoint, vp, p3, p4, buf, color);
     }
 
-    private static void interpolatedDraw(Position viewpoint, Viewport vp, Vec3 p1s, Vec3 p2s, Buf buf, byte[] color) {
+    private static void interpolatedDraw(Position viewpoint, Viewport vp, Vec3 p1s, Vec3 p2s, BufVertex buf, byte[] color) {
         Vec2 previous = null;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, p1s, p2s);
@@ -58,7 +58,7 @@ public class AnnotateCross extends AbstractAnnotateable {
     }
 
     @Override
-    public void draw(Position viewpoint, Viewport vp, boolean active, Buf buf) {
+    public void draw(Position viewpoint, Viewport vp, boolean active, BufVertex buf) {
         if (startPoint == null)
             return;
 
