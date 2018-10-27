@@ -35,13 +35,17 @@ public class Camera {
     private boolean tracking;
 
     private Position viewpoint = Sun.StartEarth;
-    private UpdateViewpoint updateViewpoint = UpdateViewpoint.observer;
+    private UpdateViewpoint updateViewpoint;
 
     ////
     private static final float clipNarrow = (float) (32 * Sun.Radius); // bit more than LASCO C3
     private static final float clipWide = (float) (50 * Sun.MeanEarthDistance); // bit further than Pluto
 
     private final float[] invProj = new float[16];
+
+    public Camera(UpdateViewpoint _updateViewpoint) {
+        updateViewpoint = _updateViewpoint;
+    }
 
     public static boolean useWideProjection(double distance) {
         return distance > 100 * Sun.MeanEarthDistance;
