@@ -4,10 +4,12 @@ import javax.swing.JOptionPane;
 
 import org.helioviewer.jhv.log.Log;
 
-class SystemProperties {
+public class SystemProperties {
+
+    public static final boolean JAVA9 = Double.parseDouble(System.getProperty("java.specification.version")) >= 1.9;
 
     // Reads the builtin Java properties to determine the platform and set simplified properties used by JHV
-    public static void setPlatform() {
+    static void setPlatform() {
         String javaArch = System.getProperty("sun.arch.data.model");
         System.setProperty("jhv.java.arch", javaArch);
 
