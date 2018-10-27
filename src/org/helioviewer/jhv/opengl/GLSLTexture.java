@@ -19,13 +19,9 @@ public class GLSLTexture extends VAO {
     }
 
     public void setData(GL2 gl, BufCoord buf) {
-        if ((count = buf.getVertexLength() / size0) == 0)
+        count = buf.getCount();
+        if (count == 0)
             return;
-        if (count * size0 != buf.getVertexLength() || count != buf.getCoordLength() / size1) {
-            Log.error("Something is wrong with the attributes of this GLSLTexture");
-            count = 0;
-            return;
-        }
 
         Buffer buffer;
         buffer = buf.toVertexBuffer();
