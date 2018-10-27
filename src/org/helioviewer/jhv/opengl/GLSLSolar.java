@@ -4,12 +4,12 @@ import java.nio.FloatBuffer;
 
 import com.jogamp.opengl.GL2;
 
-public class GLSLSolar extends VAO {
+public class GLSLSolar extends VAO1 {
 
-    private static final float[] vertices = {-1, -1, 0, 1, 1, -1, 0, 1, -1, 1, 0, 1, 1, 1, 0, 1};
+    private static final FloatBuffer vertx = FloatBuffer.wrap(new float[]{-1, -1, 0, 1, 1, -1, 0, 1, -1, 1, 0, 1, 1, 1, 0, 1});
 
     GLSLSolar() {
-        super(1, false, new VAA[]{new VAA(0, 4, false, 0, 0, 0)});
+        super(false, new VAA[]{new VAA(0, 4, false, 0, 0, 0)});
     }
 
     public void render(GL2 gl) {
@@ -20,8 +20,7 @@ public class GLSLSolar extends VAO {
     @Override
     public void init(GL2 gl) {
         super.init(gl);
-        FloatBuffer buffer = FloatBuffer.wrap(vertices);
-        vbo[0].setBufferData(gl, 4 * buffer.limit(), 4 * buffer.capacity(), buffer);
+        vbo.setBufferData(gl, 4 * 16, 4 * 16, vertx);
     }
 
 }
