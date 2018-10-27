@@ -17,21 +17,28 @@ public class BufVertex {
     private final FloatBuffer bufferLast = ByteBuffer.wrap(byteLast).order(ByteOrder.nativeOrder()).asFloatBuffer();
 
     private int count;
+
+    private ByteBuffer vertxBuffer;
     private byte[] arrayVertx;
     private int lengthVertx;
+
+    private ByteBuffer colorBuffer;
     private byte[] arrayColor;
     private int lengthColor;
 
     public BufVertex(int size) {
         arrayVertx = new byte[size < 16 ? 16 : size];
+        vertxBuffer = ByteBuffer.wrap(arrayVertx);
         size /= 4;
         arrayColor = new byte[size < 4 ? 4 : size];
+        colorBuffer = ByteBuffer.wrap(arrayColor);
     }
 
     private void ensureVertx(int nbytes) {
         int size = arrayVertx.length;
         if (lengthVertx + nbytes > size) {
             arrayVertx = Arrays.copyOf(arrayVertx, size + chunk * multiplier++);
+            vertxBuffer = ByteBuffer.wrap(arrayVertx);
         }
     }
 
@@ -39,6 +46,7 @@ public class BufVertex {
         int size = arrayColor.length;
         if (lengthColor + nbytes > size) {
             arrayColor = Arrays.copyOf(arrayColor, size + chunk * multiplier++);
+            colorBuffer = ByteBuffer.wrap(arrayColor);
         }
     }
 
@@ -74,11 +82,11 @@ public class BufVertex {
     }
 
     public Buffer toVertexBuffer() {
-        return ByteBuffer.wrap(arrayVertx).limit(lengthVertx);
+        return vertxBuffer.limit(lengthVertx);
     }
 
     public Buffer toColorBuffer() {
-        return ByteBuffer.wrap(arrayColor).limit(lengthColor);
+        return colorBuffer.limit(lengthColor);
     }
 
 }
