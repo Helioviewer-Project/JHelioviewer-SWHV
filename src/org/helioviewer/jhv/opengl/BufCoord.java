@@ -16,6 +16,7 @@ public class BufCoord {
     private final byte[] byteLast = new byte[16];
     private final FloatBuffer bufferLast = ByteBuffer.wrap(byteLast).order(ByteOrder.nativeOrder()).asFloatBuffer();
 
+    private int count;
     private byte[] arrayVertx;
     private int lengthVertx;
     private byte[] arrayCoord;
@@ -42,45 +43,35 @@ public class BufCoord {
     }
 
     public void putCoord(float x, float y, float z, float w, float c0, float c1) {
-        put4f(x, y, z, w);
-        put2f(c0, c1);
-    }
-
-    public void putCoord(float x, float y, float z, float w, float[] c) {
-        put4f(x, y, z, w);
-        put2f(c[0], c[1]);
-    }
-
-    public void putCoord(Vec3 v, float[] c) {
-        put4f((float) v.x, (float) v.y, (float) v.z, 1);
-        put2f(c[0], c[1]);
-    }
-
-    private void put4f(float x, float y, float z, float w) {
         ensureVertx(16);
         bufferLast.put(0, x).put(1, y).put(2, z).put(3, w);
         System.arraycopy(byteLast, 0, arrayVertx, lengthVertx, 16);
         lengthVertx += 16;
-    }
 
-    private void put2f(float f0, float f1) {
         ensureCoord(8);
-        bufferLast.put(2, f0).put(3, f1);
+        bufferLast.put(2, c0).put(3, c1);
         System.arraycopy(byteLast, 8, arrayCoord, lengthCoord, 8);
         lengthCoord += 8;
+
+        count++;
     }
 
-    public int getVertexLength() {
-        return lengthVertx;
+    public void putCoord(float x, float y, float z, float w, float[] c) {
+        putCoord(x, y, z, w, c[0], c[1]);
     }
 
-    public int getCoordLength() {
-        return lengthCoord;
+    public void putCoord(Vec3 v, float[] c) {
+        putCoord((float) v.x, (float) v.y, (float) v.z, 1, c[0], c[1]);
+    }
+
+    public int getCount() {
+        return count;
     }
 
     public void clear() {
         lengthVertx = 0;
         lengthCoord = 0;
+        count = 0;
     }
 
     public Buffer toVertexBuffer() {
