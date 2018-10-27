@@ -21,7 +21,7 @@ import com.jogamp.opengl.GLProfile;
 public class GLHelper {
 
     public static void initCircleFront(GL2 gl, GLSLShape circle, double x, double y, double r, int segments, byte[] color) {
-        int no_points = 2 * 4 * (segments + 1);
+        int no_points = 2 * (segments + 1);
         BufVertex vexBuf = new BufVertex(no_points * GLSLShape.stride);
         for (int i = 0; i <= segments; ++i) {
             double t = 2 * Math.PI * i / segments;
