@@ -56,10 +56,9 @@ public class BufVertex {
         put4b(b);
     }
 
-    public BufVertex put4f(float x, float y, float z, float w) {
+    private void put4f(float x, float y, float z, float w) {
         bufferLast.put(0, x).put(1, y).put(2, z).put(3, w);
         repeat4f();
-        return this;
     }
 
     private void repeat4f() {
