@@ -72,7 +72,7 @@ public class BufVertex {
     }
 
     public int getCount() {
-        return lengthVertx;
+        return count;
     }
 
     public void clear() {
