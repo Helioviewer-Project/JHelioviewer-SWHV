@@ -16,6 +16,7 @@ public class BufVertex {
     private final byte[] byteLast = new byte[16];
     private final FloatBuffer bufferLast = ByteBuffer.wrap(byteLast).order(ByteOrder.nativeOrder()).asFloatBuffer();
 
+    private int count;
     private byte[] arrayVertx;
     private int lengthVertx;
     private byte[] arrayColor;
@@ -42,48 +43,34 @@ public class BufVertex {
     }
 
     public void putVertex(Vec3 v, byte[] b) {
-        put4f((float) v.x, (float) v.y, (float) v.z, 1);
-        put4b(b);
+        putVertex((float) v.x, (float) v.y, (float) v.z, 1, b);
     }
 
     public void putVertex(float x, float y, float z, float w, byte[] b) {
-        put4f(x, y, z, w);
-        put4b(b);
+        bufferLast.put(0, x).put(1, y).put(2, z).put(3, w);
+        repeatVertex(b);
     }
 
     public void repeatVertex(byte[] b) {
-        repeat4f();
-        put4b(b);
-    }
-
-    private void put4f(float x, float y, float z, float w) {
-        bufferLast.put(0, x).put(1, y).put(2, z).put(3, w);
-        repeat4f();
-    }
-
-    private void repeat4f() {
         ensureVertx(16);
         System.arraycopy(byteLast, 0, arrayVertx, lengthVertx, 16);
         lengthVertx += 16;
-    }
 
-    private void put4b(byte[] b) {
         ensureColor(4);
         System.arraycopy(b, 0, arrayColor, lengthColor, 4);
         lengthColor += 4;
+
+        count++;
     }
 
-    public int getVertexLength() {
+    public int getCount() {
         return lengthVertx;
-    }
-
-    public int getColorLength() {
-        return lengthColor;
     }
 
     public void clear() {
         lengthVertx = 0;
         lengthColor = 0;
+        count = 0;
     }
 
     public Buffer toVertexBuffer() {
