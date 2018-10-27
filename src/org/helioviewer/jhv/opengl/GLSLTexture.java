@@ -2,8 +2,6 @@ package org.helioviewer.jhv.opengl;
 
 import java.nio.Buffer;
 
-import org.helioviewer.jhv.log.Log;
-
 import com.jogamp.opengl.GL2;
 
 public class GLSLTexture extends VAO {

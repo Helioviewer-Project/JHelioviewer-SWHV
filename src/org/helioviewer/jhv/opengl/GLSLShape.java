@@ -2,8 +2,6 @@ package org.helioviewer.jhv.opengl;
 
 import java.nio.Buffer;
 
-import org.helioviewer.jhv.log.Log;
-
 import com.jogamp.opengl.GL2;
 
 public class GLSLShape extends VAO {
@@ -19,13 +17,9 @@ public class GLSLShape extends VAO {
     }
 
     public void setData(GL2 gl, BufVertex buf) {
-        if ((count = buf.getVertexLength() / size0) == 0)
+        count = buf.getCount();
+        if (count == 0)
             return;
-        if (count * size0 != buf.getVertexLength() || count != buf.getColorLength()) {
-            Log.error("Something is wrong with the attributes of this GLSLShape");
-            count = 0;
-            return;
-        }
 
         Buffer buffer;
         buffer = buf.toVertexBuffer();
