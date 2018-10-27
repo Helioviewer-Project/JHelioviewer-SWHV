@@ -1,18 +1,15 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.events.JHVEventHighlightListener;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.gui.JHVFrame;
 
-public class MovieDisplay implements ActionListener, JHVEventHighlightListener {
+public class MovieDisplay implements JHVEventHighlightListener {
 
     private static final MovieDisplay instance = new MovieDisplay();
-    private static final Timer movieTimer = new Timer(1000 / 20, instance);
+    private static final Timer movieTimer = new Timer(1000 / 20, e -> Movie.advanceFrame());
     private static Timer displayTimer;
 
     static boolean isPlaying() {
@@ -40,11 +37,6 @@ public class MovieDisplay implements ActionListener, JHVEventHighlightListener {
 
     public static void display() {
         displayTimer.restart();
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Movie.advanceFrame();
     }
 
     @Override
