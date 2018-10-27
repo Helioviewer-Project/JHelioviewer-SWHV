@@ -1041,7 +1041,7 @@ public class JhvTextRenderer {
     private float[] textColor = Colors.WhiteFloat;
 
     int outstandingGlyphsVerticesPipeline = 0;
-    final BufCoord vexBuf = new BufCoord(kQuadsPerBuffer * kVertsPerQuad * GLSLTexture.stride); // 14400
+    final BufCoord vexBuf = new BufCoord(kTotalBufferSizeVerts);
 
     void drawVertices() {
         if (outstandingGlyphsVerticesPipeline > 0) {
