@@ -75,6 +75,8 @@ public class JHelioviewer {
         Settings.load();
         // Set the platform system properties
         SystemProperties.setPlatform();
+        if (!SystemProperties.JAVA9) // https://stackoverflow.com/questions/34188495/how-can-i-work-around-the-classcastexception-in-java2d-bug-id-7172749
+            System.setProperty("sun.java2d.xrender", "false");
         System.setProperty("newt.window.icons", "null,null");
         System.setProperty("org.sqlite.tmpdir", JHVGlobals.libCacheDir.toString());
         System.setProperty("org.lwjgl.system.SharedLibraryExtractPath", JHVGlobals.libCacheDir.toString());

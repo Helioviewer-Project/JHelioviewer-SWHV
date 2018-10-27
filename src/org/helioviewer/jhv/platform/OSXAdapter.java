@@ -7,11 +7,10 @@ import java.lang.reflect.Proxy;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.SystemProperties;
 import org.helioviewer.jhv.log.Log;
 
 class OSXAdapter implements InvocationHandler {
-
-    static final boolean JAVA9 = Double.parseDouble(System.getProperty("java.specification.version")) >= 1.9;
 
     protected final Object targetObject;
     protected final Method targetMethod;
@@ -131,7 +130,7 @@ class OSXAdapter implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (isCorrectMethod(method, args)) {
             boolean handled = args.length == 1 ? callTarget(args[0]) : callTarget(args[0], args[1]);
-            if (!JAVA9)
+            if (!SystemProperties.JAVA9)
                 setApplicationEventHandled(args[0], handled);
         }
         // All of the ApplicationListener methods are void; return null regardless of what happens

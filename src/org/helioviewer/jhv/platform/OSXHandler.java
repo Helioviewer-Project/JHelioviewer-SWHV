@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 import org.helioviewer.jhv.ExitHooks;
+import org.helioviewer.jhv.SystemProperties;
 import org.helioviewer.jhv.log.Log;
 
 public class OSXHandler {
@@ -13,7 +14,7 @@ public class OSXHandler {
     public static void aboutHandler(Object action) {
         try {
             Method m = action.getClass().getDeclaredMethod("show", (Class[]) null);
-            if (OSXAdapter.JAVA9) {
+            if (SystemProperties.JAVA9) {
                 try {
                     OSXAdapter adapter = new OSXAdapter("handleAbout", action, m);
                     Class<?> handlerClass = Class.forName("java.awt.desktop.AboutHandler");
@@ -33,7 +34,7 @@ public class OSXHandler {
     public static void preferencesHandler(Object action) {
         try {
             Method m = action.getClass().getDeclaredMethod("show", (Class[]) null);
-            if (OSXAdapter.JAVA9) {
+            if (SystemProperties.JAVA9) {
                 try {
                     OSXAdapter adapter = new OSXAdapter("handlePreferences", action, m);
                     Class<?> handlerClass = Class.forName("java.awt.desktop.PreferencesHandler");
@@ -53,7 +54,7 @@ public class OSXHandler {
     public static void quitHandler() {
         try {
             Method m = ExitHooks.class.getDeclaredMethod("exitProgram", (Class[]) null);
-            if (OSXAdapter.JAVA9) {
+            if (SystemProperties.JAVA9) {
                 try {
                     OSXAdapter adapter = new OSXAdapter("handleQuitRequestWith", "", m) {
                         @Override
