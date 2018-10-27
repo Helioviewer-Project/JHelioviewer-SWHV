@@ -53,8 +53,8 @@ public class Display {
         fullViewport = new Viewport(-1, x, y, w, h);
     }
 
-    private static final Camera camera = new Camera();
-    private static final Camera miniCamera = new Camera().setViewpointUpdate(UpdateViewpoint.earthFixedDistance);
+    private static final Camera camera = new Camera(UpdateViewpoint.observer);
+    private static final Camera miniCamera = new Camera(UpdateViewpoint.earthFixedDistance);
 
     public static Camera getCamera() {
         return camera;
