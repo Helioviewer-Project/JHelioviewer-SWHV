@@ -6,11 +6,13 @@ import java.awt.event.FocusEvent;
 import javax.swing.JTextField;
 
 import org.helioviewer.jhv.time.TimeUtils;
+import org.apache.commons.validator.routines.IntegerValidator;
 
 @SuppressWarnings("serial")
 class TimeTextField extends JTextField {
 
     private static final String defaultTime = "00:00:00";
+    private static final IntegerValidator validator = IntegerValidator.getInstance();
 
     TimeTextField() {
         super(defaultTime);
@@ -22,24 +24,32 @@ class TimeTextField extends JTextField {
         });
     }
 
+    private static String fix(String in, int clip) {
+        Integer v = validator.validate(in);
+        if (v == null || v < 0)
+            return "00";
+        if (v < 10)
+            return String.format("%02d", v);
+        if (v > clip)
+            return String.format("%d", clip);
+        return in;
+    }
+
     long getTime() {
-        String time = getText();
+        String[] parts = getText().split(":");
+
+        String h = fix(parts[0], 23);
+        String m = "00";
+        String s = "00";
+        if (parts.length > 1)
+            m = fix(parts[1], 59);
+        if (parts.length > 2)
+            s = fix(parts[2], 59);
+
         try {
-            return TimeUtils.parseTime(time);
-        } catch (Exception e1) {
-            try {
-                return TimeUtils.parseTime(time + ":00");
-            } catch (Exception e2) {
-                try {
-                    return TimeUtils.parseTime(time + ":00:00");
-                } catch (Exception e3) {
-                    try {
-                        return TimeUtils.parseTime(defaultTime);
-                    } catch (Exception e4) {
-                        return 0;
-                    }
-                }
-            }
+            return TimeUtils.parseTime(String.join(":", h, m, s));
+        } catch (Exception e) {
+            return 0;
         }
     }
 
