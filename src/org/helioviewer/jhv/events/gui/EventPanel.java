@@ -2,8 +2,6 @@ package org.helioviewer.jhv.events.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.EventObject;
 
 import javax.swing.BorderFactory;
@@ -23,7 +21,7 @@ import org.helioviewer.jhv.gui.UITimer;
 import org.json.JSONObject;
 
 @SuppressWarnings("serial")
-public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionListener {
+public class EventPanel extends JPanel implements SWEKTreeModelListener {
 
     private final SWEKGroup group;
 
@@ -31,7 +29,7 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
     private final JLayer<JComponent> over = new JLayer<>(null, UITimer.busyIndicator);
 
     // The timer handling the loading animation
-    private final Timer loadingTimer = new Timer(500, this);
+    private final Timer loadingTimer = new Timer(500, e -> over.repaint());
 
     public EventPanel(SWEKGroup _group) {
         group = _group;
@@ -73,11 +71,6 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
             loadingTimer.stop();
             over.setView(null);
         }
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        over.repaint();
     }
 
     public void serialize(JSONObject jo) {

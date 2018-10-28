@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.gui;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.HashSet;
 
 import javax.swing.Timer;
@@ -10,17 +8,13 @@ import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.base.BusyIndicator;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 
-public class UITimer implements ActionListener {
+public class UITimer {
 
-    private static final UITimer instance = new UITimer();
     private static final HashSet<LazyComponent> lazyComponents = new HashSet<>();
     public static final BusyIndicator busyIndicator = new BusyIndicator();
 
-    private UITimer() {
-    }
-
     public static void start() {
-        new Timer(1000 / 10, instance).start();
+        new Timer(1000 / 10, e -> action()).start();
     }
 
     public static void register(LazyComponent lazy) {
@@ -38,8 +32,7 @@ public class UITimer implements ActionListener {
         cacheChanged = true;
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
+    private static void action() {
         BusyIndicator.incrementAngle();
 
         if (cacheChanged) {
