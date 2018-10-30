@@ -136,7 +136,7 @@ Before the SWHV project, both the server and the client-side software were deriv
 
 - `hv_jp2_decode`: replacement for `kdu_expand`, sufficient for the web client image tile decoding;
 - `hv_jp2_encode`: proto-replacement for `fits2img`, not yet capable of emitting conforming JP2 files;
-- `hv_jp2_transcode`: wrapper for `kdu_transcode`, it can output JP2 format and can reparse the XML metadata to ensure conformity;
+- `hv_jp2_transcode`: wrapper for `kdu_transcode`, it can output JP2 format and can re-parse the XML metadata to ensure conformity;
 - `hv_jp2_verify`: verify the conformity of JP2 file format to ensure end-to-end compatibility;
 - `hv_jpx_merge`: standalone replacement for `kdu_merge`, it can create JPX movies out of JP2 files;
 - `hv_jpx_mergec`: client for `hv_jpx_merged`, written in C;
@@ -173,7 +173,7 @@ The algorithm to compute the field lines uses an Adams–Bashforth explicit meth
 
 The resulting FITS files consist of `BINARY TABLE`s with four columns `FIELDLINEx`, `FIELDLINEy`, `FIELDLINEz`, `FIELDLINEs`. The first three are mapped to unsigned shorts and can be converted to Cartesian coordinates using the formula 3 × (value × 2 / 65535 - 1) (on the client side one needs to add 32768). The `FIELDLINEs` value encodes the strength and, by the sign, the radial direction of the field. This encoding was chosen for a compact representation.
 
-The field strength is mapped in the default JHelioviewer display as blue (negative radial) or red (positive radial); the lesser the color saturation, the weaker the field. In order to better see the direction of the field, points of the field lines beyond 2.4 solar radii have red or blue colors without blending with white.
+The field strength is mapped in the default JHelioviewer display as blue (negative radial) or red (positive radial); the lesser the color saturation, the weaker the field. In order to better see the direction of the field, points of the lines beyond 2.4 solar radii have red or blue colors without blending with white.
 
 # JHelioviewer Interfaces #
 
@@ -771,7 +771,7 @@ The program is driven via two timers:
 - `MovieDisplay` beats at a configurable frequency (default 20 Hz) and commands the setting of the program time (i.e., frame advance);
 - `UITimer` beats at constant 10 Hz and commands the refresh of the Swing UI components that need to change together with the movie frame; additionally, it commands the refresh of the timeline canvas.
 
-Various parts of the program can request to refresh the image canvas and a balance has to be found between avoiding excessive redraws and avoiding CPU wake-ups when idle.
+Various parts of the program can request to refresh the image canvas and a balance has to be found between avoiding excessive redraws and avoiding CPU wake-ups when idle. `Interaction` and `MovieDisplay` contain supplemental timers which are started on-demand and are used to limit the rate of user-induced decoding and redraw requests.
 
 ## Concepts
 
@@ -823,7 +823,7 @@ The two major components of `J2KView` are:
 
 - `J2KReader` implements a minimal HTTP client and a minimal JPIP-over-HTTP streaming client. It fills the memory cache of `JPIPCache` (an extension of Kakadu `KduCache`) from which the image decoding takes place. Once the entirety of the data for a resolution level for a frame is available, it is extracted from the memory cache and it is sent via `JPIPCacheManager` into the disk persistence layer provided by the `Ehcache` library. The `sourceId` of the dataset and the timestamp of the frame is combined to form universal identifiers. `J2KReader` is also used to fill the cache indicator of the UI time slider via the `CacheStatus` interface. `J2KReader` is implemented as a thread that receives from `J2KView` commands to read. It tries to read requested data first via the `JPIPCacheManager` before constructing and issuing a request to the JPIP server if not available in the persistent disk cache. Once all data is read, the HTTP connection is closed and the `J2KReader` stops listening for commands.
 
-- `J2KDecoder` is in charge for forwarding commands to `Kdu_region_compositor` to decode image data out of `KduCache` (wrapped by `JPIPCache`). The commands are issued by `J2KView` over a queue of size one to a `DecodeExecutor` which handles just one thread at a time. If a command is already queued, it is removed from the queue to make place for the most recent one. The `J2KDecoder` thread manages instances of `Kdu_thread_env` and `Kdu_region_compositor` in thread local storage. On demand, those are created, re-created (as a result of exceptions raised by the Kakadu native code during decoding), and destroyed. The `Kdu_thread_env` object is used to distribute the decoding work of the native code over all CPUs. The resulting bytes of `Kdu_compositor_buf` in native memory are copied one-by-one using `LWJGL` `MemoryUtil.memGetByte`, which was found to have the highest performance and to reduce the size of necessary memory buffers. `J2KDecoder` also manages a `Guava Cache` of soft references to the already decoded image data and, if the decode command received corresponds to an item in the cache, it immediately returns that item instead of entering the Kakadu processing.
+- `J2KDecoder` is in charge for forwarding commands to `Kdu_region_compositor` to decode image data out of `KduCache` (wrapped by `JPIPCache`). The commands are issued by `J2KView` over a queue of size one to a `DecodeExecutor` which handles just one thread at a time. If a command is already queued, it is removed from the queue to make place for the most recent one. The `J2KDecoder` thread manages instances of `Kdu_thread_env` and `Kdu_region_compositor` in thread local storage. On demand, those are created, re-created (as a result of exceptions raised by the Kakadu native code during decoding), and destroyed. The `Kdu_thread_env` object is used to distribute the decoding work of the native code over all CPUs. The resulting bytes of `Kdu_compositor_buf` in native memory are copied one-by-one using `LWJGL` `MemoryUtil.memGetByte`, which was found to have the highest performance and to reduce the size of necessary memory buffers. `J2KDecoder` also manages a `Guava Cache` of soft references to the already decoded image data and, if the received command to decode corresponds to an item in the cache, it immediately returns that item instead of entering the Kakadu processing.
 
 The decoded pixel data together with the associated information such as the metadata is constructed into `ImageData` structures which are handed over to the `ImageDataHandler`, i.e., `ImageLayer`.
 
@@ -844,7 +844,7 @@ The image canvas is implemented using a JOGL NEWT `GLWindow` encapsulated within
 The drawing on the image canvas is done entirely using GLSL programs. The following interfaces are available:
 
 - `GLSLSolar` handles `solarOrtho`, `solarLati`, `solarPolar`, and `solarLogPolar` shaders to draw image data, and it is used exclusively by `ImageLayer`.
-- `GLSLLine` handles the `line` shaders to draw lines.
+- `GLSLLine` handles the `line` shaders to draw lines using instanced rendering.
 - `GLSLShape` handles the `shape` and `point` shaders to draw shapes and points.
 - `GLSLTexture` handles `texture` shaders to superimpose texture data such as event icons, and it is used by `JhvTextRenderer` to draw text rendered into cached textures.
 
