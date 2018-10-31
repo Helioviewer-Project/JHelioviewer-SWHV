@@ -31,12 +31,14 @@ public class SampClient extends HubConnector {
 
     public static void init() {
         if (startHub && Hub.getRunningHubs().length == 0) {
-            try {
-                Hub.checkExternalHubAvailability();
-                Hub.runExternalHub(HubServiceMode.CLIENT_GUI);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            new Thread(() -> {
+                try {
+                    Hub.checkExternalHubAvailability();
+                    Hub.runHub(HubServiceMode.CLIENT_GUI);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
         }
     }
 
