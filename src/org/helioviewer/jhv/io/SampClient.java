@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.io;
 
 import java.awt.EventQueue;
-import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
@@ -33,9 +32,8 @@ public class SampClient extends HubConnector {
         if (startHub && Hub.getRunningHubs().length == 0) {
             new Thread(() -> {
                 try {
-                    Hub.checkExternalHubAvailability();
                     Hub.runHub(HubServiceMode.CLIENT_GUI);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }).start();
