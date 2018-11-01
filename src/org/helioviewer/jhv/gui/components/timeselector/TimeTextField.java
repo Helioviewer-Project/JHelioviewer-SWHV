@@ -36,7 +36,7 @@ class TimeTextField extends JTextField {
     }
 
     long getTime() {
-        String[] parts = getText().split(":");
+        String[] parts = getText().split(":", 3);
 
         String h = fix(parts[0], 23);
         String m = "00";
