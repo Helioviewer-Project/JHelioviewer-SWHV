@@ -11,6 +11,8 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.PropertyConfigurator;
 import org.helioviewer.jhv.io.FileUtils;
 
+import org.apache.logging.julbridge.JULLog4jBridge;
+
 public class LogSettings {
 
     /**
@@ -36,6 +38,12 @@ public class LogSettings {
 
         BasicConfigurator.configure();
         PropertyConfigurator.configure(settings);
+
+        JULLog4jBridge.assimilate();
+        String[] packages = {"java", "javax", "sun", "com.jidesoft", "org.ocpsoft"};
+        for (String p : packages) {
+            java.util.logging.Logger.getLogger(p).setLevel(java.util.logging.Level.WARNING);
+        }
     }
 
 }
