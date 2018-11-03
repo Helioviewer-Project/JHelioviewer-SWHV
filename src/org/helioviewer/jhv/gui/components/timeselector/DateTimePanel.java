@@ -1,11 +1,12 @@
 package org.helioviewer.jhv.gui.components.timeselector;
 
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashSet;
 
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -22,13 +23,21 @@ class DateTimePanel extends JPanel implements ActionListener, JHVCalendarListene
     private final TimeTextField timePicker = new TimeTextField();
 
     DateTimePanel(String text) {
-        setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+        setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.LINE_START;
+        c.fill = GridBagConstraints.BOTH;
 
+        c.gridx = 0;
         JLabel label = new JLabel(text, JLabel.RIGHT);
         label.setPreferredSize(new Dimension(40, 0));
-        add(label);
-        add(datePicker);
-        add(timePicker);
+        add(label, c);
+
+        c.weightx = 0.5;
+        c.gridx = 1;
+        add(datePicker, c);
+        c.gridx = 2;
+        add(timePicker, c);
 
         datePicker.addJHVCalendarListener(this);
         timePicker.addActionListener(this);
