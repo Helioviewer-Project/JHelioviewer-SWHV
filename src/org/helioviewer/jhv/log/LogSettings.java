@@ -8,6 +8,8 @@ import java.util.Properties;
 import java.util.TimeZone;
 
 import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.helioviewer.jhv.io.FileUtils;
 
@@ -40,9 +42,9 @@ public class LogSettings {
         PropertyConfigurator.configure(settings);
 
         JULLog4jBridge.assimilate();
-        String[] packages = {"java", "javax", "sun", "com.jidesoft", "org.ocpsoft"};
+        String[] packages = {"java", "javax", "sun", "com.jidesoft", "org.ocpsoft", "org.ehcache", "org.terracotta", "org.astrogrid.samp"};
         for (String p : packages) {
-            java.util.logging.Logger.getLogger(p).setLevel(java.util.logging.Level.WARNING);
+            Logger.getLogger(p).setLevel(Level.WARN);
         }
     }
 
