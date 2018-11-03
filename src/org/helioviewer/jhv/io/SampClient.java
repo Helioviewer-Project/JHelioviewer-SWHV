@@ -3,8 +3,10 @@ package org.helioviewer.jhv.io;
 import java.awt.EventQueue;
 import java.net.URI;
 import java.util.Collections;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
 
@@ -23,6 +25,10 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.layers.ImageLayers;
 
 public class SampClient extends HubConnector {
+
+    static {
+        Logger.getLogger("org.astrogrid.samp").setLevel(Level.WARNING);
+    }
 
     private static final String MTYPE_VIEW_DATA = "jhv.vso.load";
     private static final boolean startHub = Boolean.parseBoolean(Settings.getProperty("startup.sampHub"));
