@@ -10,9 +10,9 @@ book: true
 toc: true
 colorlinks: true
 mainfont: "Source Serif Pro"
-monofont: "Source Code Pro"
+romanfont: "Source Serif Pro"
 sansfont: "Source Sans Pro"
-fontsize: 10pt
+monofont: "Source Code Pro"
 titlepage: true
 titlepage-color: "0088cc"
 titlepage-text-color: "ffffff"
@@ -272,13 +272,13 @@ the server returns the following JSON response:
 {
   "result": [
     { "2014-04-12T20:23:35.000":
-	  [143356392.01232576,2.712634949777619,0.12486990461569629]},
-	{ "2014-04-13T02:23:35.000":
-	  [143359318.57914788,2.7129759257313513,0.12473463991365513]},
-	{ "2014-04-13T08:23:35.000":
-	  [143362256.29411626,2.7133174795109087,0.12459673837570125]},
-	{ "2014-04-13T14:23:35.000":
-	  [143365205.0945752,2.713659603829239,0.12445620339056596]}
+      [143356392.01232576,2.712634949777619,0.12486990461569629]},
+    { "2014-04-13T02:23:35.000":
+      [143359318.57914788,2.7129759257313513,0.12473463991365513]},
+    { "2014-04-13T08:23:35.000":
+      [143362256.29411626,2.7133174795109087,0.12459673837570125]},
+    { "2014-04-13T14:23:35.000":
+      [143365205.0945752,2.713659603829239,0.12445620339056596]}
   ]
 }
 ```
@@ -340,14 +340,14 @@ The broadcasted SAMP message has the following form:
 
 - Message: `jhv.vso.load`
 - Arguments:
-	- timestamp (string): date of the currently viewed frame coded in ISO8601 format (e.g., 2017-08-28T14:33:28);
+    - timestamp (string): date of the currently viewed frame coded in ISO8601 format (e.g., 2017-08-28T14:33:28);
     - start (string): start date of the currently viewed sequence coded in ISO8601 format (e.g., 2017-08-28T14:33:28);
     - end (string): end date of the currently viewed sequence coded in ISO8601 format (e.g., 2017-08-28T14:33:28);
     - cadence (SAMP long): number of milliseconds between each frame;
     - cutout.set (SAMP boolean): whether or not only a part of the sun is visible:
         - 0: the full Sun is visible;
         - 1: only a cutout of the Sun is visible.
-	- cutout.x0 (SAMP float, arcsec, optional): x-position of the currently viewed part of the Sun;
+    - cutout.x0 (SAMP float, arcsec, optional): x-position of the currently viewed part of the Sun;
     - cutout.y0 (SAMP float, arcsec, optional): y-position of the currently viewed part of the Sun;
     - cutout.w (SAMP float, arcsec, optional): width of the currently viewed part of the Sun;
     - cutout.h (SAMP float, arcsec, optional): height of the currently viewed part of the Sun;
@@ -368,12 +368,12 @@ Example:
 {
   samp.mtype=jhv.vso.load,
   samp.params={
-	timestamp=2017-09-24T19:52:28, start=2017-09-24T00:00:00, end=2017-09-26T00:00:00,
+    timestamp=2017-09-24T19:52:28, start=2017-09-24T00:00:00, end=2017-09-26T00:00:00,
     cutout.set=1, cutout.h=2460.524544, cutout.w=2460.524544, cutout.x0=3.3579912600000625, cutout.y0=1.1773994400000447,
     cadence=1800000,
-	layers=[
+    layers=[
       {observatory=SDO, instrument=AIA, detector=, measurement=304, timestamp=2017-09-24T19:53:05},
-	  {observatory=SDO, instrument=AIA, detector=, measurement=171, timestamp=2017-09-24T19:52:45},
+      {observatory=SDO, instrument=AIA, detector=, measurement=171, timestamp=2017-09-24T19:52:45},
       {observatory=SDO, instrument=AIA, detector=, measurement=193, timestamp=2017-09-24T19:52:28}
     ]
   }
@@ -764,7 +764,9 @@ WCS metadata is used to place image data at the correct viewpoint (time and posi
 
 # JHelioviewer Design #
 
-In contrast to the 32k lines of code to implement all its many features, the core JHelioviewer design is very simple and can probably be expressed in a couple of thousands of lines of code. The program is structured in a manner amenable to performance and to remain responsive while performing long lasting network and computation operations by using threads, caches, and high performance algorithms and data structures. The principle of separation of concerns is applied throughout. Objects are asked to update themselves, they proceed to do so independently, and they report back when done. There are essentially no locks and few data structures are concurrently accessed by threads.
+In contrast to the 32k lines of code to implement all its many features, the core JHelioviewer design is very simple and can probably be expressed in a couple of thousands of lines of code.
+
+The program is structured in a manner that is amenable to performance. The principle of separation of concerns is applied throughout. Objects are asked to update themselves, they proceed to do so independently, and they report back when done. To remain responsive while performing long lasting network and computation operations, the program uses threads, caches, and high performance algorithms and data structures. There are essentially no locks and few data structures are accessed from concurrent threads.
 
 The program is driven via two timers:
 
@@ -839,7 +841,7 @@ The same concept is used for timelines, where several of `TimelineLayer` are org
 
 ## Drawing
 
-The image canvas is implemented using a JOGL NEWT `GLWindow` encapsulated within a `NewtCanvasAWT` which integrates into the rest of the Swing interface.
+The image canvas is implemented using a JOGL NEWT `GLWindow` encapsulated within a `NewtCanvasAWT` which integrates into the rest of the Swing interface. To handle the situation in which the OpenGL context (`GLContext`) has to be recreated due to events in the underlying windowing system, the `GLWindow` uses a slave context derived from a master context of a dummy drawable. `GLListener` implements the event based mechanism for performing OpenGL rendering (`init()/dispose()/reshape()/display()`). All rendering ensues from `display()` in the AWT Event Dispatch Thread and uses the primary rendering context associated with the `GLWindow` for its lifetime. Similarly for initialization and disposal.
 
 The drawing on the image canvas is done entirely using GLSL programs. The following interfaces are available:
 
