@@ -87,7 +87,7 @@ class BandOptionPanel extends JPanel {
             double speed = (Double) propagationField.getValue();
             band.setPropagationModel(new PropagationModelRadial(speed));
         });
-        //add(propagationField, c);
+        add(propagationField, c);
         ComponentUtils.smallVariant(this);
     }
 
