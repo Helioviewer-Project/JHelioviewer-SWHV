@@ -42,13 +42,13 @@ public class StatusPanel extends JPanel {
 
         if (leftMargin != 0) {
             JPanel spacer = new JPanel();
-            spacer.setPreferredSize(new Dimension(leftMargin, 0));
+            spacer.setPreferredSize(new Dimension(leftMargin, -1));
             leftPanel.add(spacer);
         }
 
         if (rightMargin != 0) {
             JPanel spacer = new JPanel();
-            spacer.setPreferredSize(new Dimension(rightMargin, 0));
+            spacer.setPreferredSize(new Dimension(rightMargin, -1));
             rightPanel.add(spacer);
         }
     }
@@ -65,13 +65,13 @@ public class StatusPanel extends JPanel {
 
     private void addLeftSpacer(int width) {
         JPanel spacer = new JPanel();
-        spacer.setPreferredSize(new Dimension(width, 0));
+        spacer.setPreferredSize(new Dimension(width, -1));
         leftPanel.add(spacer);
     }
 
     private void addRightSpacer(int width) {
         JPanel spacer = new JPanel();
-        spacer.setPreferredSize(new Dimension(width, 0));
+        spacer.setPreferredSize(new Dimension(width, -1));
         rightPanel.add(spacer, 0);
     }
 

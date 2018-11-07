@@ -30,7 +30,7 @@ class DateTimePanel extends JPanel implements ActionListener, JHVCalendarListene
 
         c.gridx = 0;
         JLabel label = new JLabel(text, JLabel.RIGHT);
-        label.setPreferredSize(new Dimension(40, 0));
+        label.setPreferredSize(new Dimension(40, -1));
         add(label, c);
 
         c.weightx = 0.5;
