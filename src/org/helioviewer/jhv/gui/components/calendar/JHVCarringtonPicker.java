@@ -22,9 +22,9 @@ import org.helioviewer.jhv.time.TimeUtils;
 public class JHVCarringtonPicker extends JHVButton implements PopupMenuListener {
 
     private final HashSet<JHVCalendarListener> listeners = new HashSet<>();
-
     private final JPopupMenu popup = new JPopupMenu();
-    private final MenuScroller menuScroller = new MenuScroller(popup);
+    private final MenuScroller scroller = new MenuScroller(popup, 15, 100);
+
     private long time;
 
     public JHVCarringtonPicker() {
@@ -51,12 +51,12 @@ public class JHVCarringtonPicker extends JHVButton implements PopupMenuListener 
     @Override
     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
         int cr = (int) Math.round(Carrington.time2CR(new JHVDate(time)) - Carrington.CR_MINIMAL);
-        menuScroller.keepVisible(cr + 1);
         Component component = popup.getComponent(cr);
         if (component instanceof JMenuItem) {
             ((JMenuItem) component).setSelected(true);
             setTimeFromCarrington(Carrington.CR_start[cr]);
         }
+        scroller.keepVisible(cr + 1);
     }
 
     @Override
