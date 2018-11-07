@@ -846,8 +846,8 @@ The image canvas is implemented using a JOGL NEWT `GLWindow` encapsulated within
 The drawing on the image canvas is done entirely using GLSL programs. The following interfaces are available:
 
 - `GLSLSolar` handles `solarOrtho`, `solarLati`, `solarPolar`, and `solarLogPolar` shaders to draw image data, and it is used exclusively by `ImageLayer`.
-- `GLSLLine` handles the `line` shaders to draw lines using instanced rendering.
-- `GLSLShape` handles the `shape` and `point` shaders to draw shapes and points.
+- `GLSLLine` handles the `line` shaders to use instanced rendering for drawing triangles out of line segments.
+- `GLSLShape` handles the `shape` and `point` shaders to draw polygons and points.
 - `GLSLTexture` handles `texture` shaders to superimpose texture data such as event icons, and it is used by `JhvTextRenderer` to draw text rendered into cached textures.
 
 Besides the drawing done by layers, annotations can be drawn by `InteractionAnnotate`.
