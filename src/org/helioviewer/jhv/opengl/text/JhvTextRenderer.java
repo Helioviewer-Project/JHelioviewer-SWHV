@@ -654,14 +654,21 @@ public class JhvTextRenderer {
         // prevent bleeding of adjacent letters when using GL_LINEAR
         // filtering for rendering. The origin of this rectangle is
         // equivalent to the origin above.
-        private final Rectangle2D origRect;
+        //private final Rectangle2D origRect;
+        private final int origRectWidth;
+        private final int origRectHeight;
+        private final int origRectMinX;
+        private final int origRectMinY;
 
         private boolean used; // Whether this text was used recently
 
-        TextData(Point origin, Rectangle2D origRect, int unicodeID) {
-            this.origin = origin;
-            this.origRect = origRect;
-            this.unicodeID = unicodeID;
+        TextData(Point _origin, Rectangle2D origRect, int _unicodeID) {
+            unicodeID = _unicodeID;
+            origin = _origin;
+            origRectWidth = (int) origRect.getWidth();
+            origRectHeight = (int) origRect.getHeight();
+            origRectMinX = (int) -origRect.getMinX();
+            origRectMinY = (int) -origRect.getMinY();
         }
 
         Point origin() {
@@ -671,15 +678,19 @@ public class JhvTextRenderer {
         // The following three methods are used to locate the glyph
         // within the expanded rectangle coming from normalize()
         int origOriginX() {
-            return (int) -origRect.getMinX();
+            return origRectMinX;
         }
 
         int origOriginY() {
-            return (int) -origRect.getMinY();
+            return origRectMinY;
         }
 
-        Rectangle2D origRect() {
-            return origRect;
+        int origRectWidth() {
+            return origRectWidth;
+        }
+
+        int origRectHeight() {
+            return origRectHeight;
         }
 
         boolean used() {
@@ -881,15 +892,13 @@ public class JhvTextRenderer {
             TextData data = (TextData) rect.getUserData();
             data.markUsed();
 
-            Rectangle2D origRect = data.origRect();
-
+            int width = data.origRectWidth();
+            int height = data.origRectHeight();
             float x = inX - (scaleFactor * data.origOriginX());
-            float y = inY - (scaleFactor * ((float) origRect.getHeight() - data.origOriginY()));
+            float y = inY - (scaleFactor * (height - data.origOriginY()));
 
             int texturex = rect.x() + (data.origin().x - data.origOriginX());
-            int texturey = renderer.getHeight() - rect.y() - (int) origRect.getHeight() - (data.origin().y - data.origOriginY());
-            int width = (int) origRect.getWidth();
-            int height = (int) origRect.getHeight();
+            int texturey = renderer.getHeight() - rect.y() - height - (data.origin().y - data.origOriginY());
 
             float tx1 = texturex / (float) renderer.getWidth();
             float ty1 = 1f - texturey / (float) renderer.getHeight();
@@ -943,8 +952,8 @@ public class JhvTextRenderer {
                 // Draw a bounding box on the backing store
                 g.drawRect(strx - data.origOriginX(),
                         stry - data.origOriginY(),
-                        (int) data.origRect().getWidth(),
-                        (int) data.origRect().getHeight());
+                        data.origRectWidth(),
+                        data.origRectHeight());
                 g.drawRect(strx - data.origin().x,
                         stry - data.origin().y,
                         rect.w(),
