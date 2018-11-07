@@ -83,8 +83,8 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
             JHVButton filterButton = new JHVButton("Filter");
             filterButton.addActionListener(e -> filterDialog.setVisible(true));
             filterButton.addMouseListener(new FilterMouseAdapter(filterDialog));
+            leaf.setPreferredSize(new Dimension(250, filterButton.getPreferredSize().height)); //!
             leaf.add(filterButton, BorderLayout.LINE_END);
-            leaf.setPreferredSize(new Dimension(250, -1)); //!
         }
 
         ComponentUtils.smallVariant(leaf);

@@ -196,7 +196,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
 
         DefaultsSelectionPanel() {
             super(new BorderLayout());
-            setPreferredSize(new Dimension(0, 150));
+            setPreferredSize(new Dimension(-1, 150));
 
             String pass = Settings.getProperty("proxy.password");
             try {

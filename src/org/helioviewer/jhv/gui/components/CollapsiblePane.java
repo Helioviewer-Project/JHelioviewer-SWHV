@@ -32,7 +32,7 @@ public class CollapsiblePane extends JComponent implements ActionListener {
         toggleButton.setSelected(startExpanded);
         toggleButton.setFont(UIGlobals.uiFontSmallBold);
         int height = toggleButton.getFontMetrics(UIGlobals.uiFontSmallBold).getHeight();
-        toggleButton.setPreferredSize(new Dimension(0, height + 4));
+        toggleButton.setPreferredSize(new Dimension(-1, height + 4));
         toggleButton.addActionListener(this);
         add(toggleButton, BorderLayout.PAGE_START);
 
