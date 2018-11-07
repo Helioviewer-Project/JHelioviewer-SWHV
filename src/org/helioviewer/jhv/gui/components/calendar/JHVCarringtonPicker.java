@@ -1,62 +1,69 @@
 package org.helioviewer.jhv.gui.components.calendar;
 
-import java.awt.BorderLayout;
+import java.awt.Component;
 import java.util.HashSet;
 
 import javax.swing.ButtonGroup;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
-
-import javax.swing.JPanel;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.gui.components.base.MenuScroller;
+import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 
-import com.jidesoft.swing.JideSplitButton;
-
 @SuppressWarnings("serial")
-public class JHVCarringtonPicker extends JPanel implements MenuListener {
+public class JHVCarringtonPicker extends JHVButton implements PopupMenuListener {
 
     private final HashSet<JHVCalendarListener> listeners = new HashSet<>();
 
-    private final JideSplitButton crButton = new JideSplitButton("CR");
-    private final MenuScroller menuScroller = new MenuScroller(crButton);
+    private final JPopupMenu popup = new JPopupMenu();
+    private final MenuScroller menuScroller = new MenuScroller(popup);
     private long time;
 
     public JHVCarringtonPicker() {
-        setLayout(new BorderLayout());
-
-        crButton.setAlwaysDropdown(true);
-        crButton.setToolTipText("Select Carrington rotation");
+        setText("CR");
+        setToolTipText("Select Carrington rotation");
 
         ButtonGroup group = new ButtonGroup();
         for (int i = 0; i < Carrington.CR_start.length; i++) {
             JRadioButtonMenuItem item = new JRadioButtonMenuItem(Integer.toString(i + Carrington.CR_MINIMAL));
             item.addActionListener(e -> setTimeFromCarrington(Carrington.CR_start[Integer.valueOf(item.getText()) - Carrington.CR_MINIMAL]));
             group.add(item);
-            crButton.add(item);
+            popup.add(item);
         }
-        crButton.addMenuListener(this);
+        popup.addPopupMenuListener(this);
 
-        add(crButton);
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                popup.show(e.getComponent(), 0, e.getComponent().getHeight());
+            }
+        });
     }
 
     @Override
-    public void menuCanceled(MenuEvent e) {
-    }
-
-    @Override
-    public void menuDeselected(MenuEvent e) {
-    }
-
-    @Override
-    public void menuSelected(MenuEvent e) {
+    public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
         int cr = (int) Math.round(Carrington.time2CR(new JHVDate(time)) - Carrington.CR_MINIMAL);
         menuScroller.keepVisible(cr + 1);
-        crButton.getItem(cr).setSelected(true);
+        Component component = popup.getComponent(cr);
+        if (component instanceof JMenuItem) {
+            ((JMenuItem) component).setSelected(true);
+        }
+    }
+
+    @Override
+    public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+    }
+
+    @Override
+    public void popupMenuCanceled(PopupMenuEvent e) {
     }
 
     public void addJHVCalendarListener(JHVCalendarListener l) {
