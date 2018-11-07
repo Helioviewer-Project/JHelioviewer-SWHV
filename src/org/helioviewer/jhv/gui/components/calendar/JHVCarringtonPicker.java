@@ -55,6 +55,7 @@ public class JHVCarringtonPicker extends JHVButton implements PopupMenuListener 
         Component component = popup.getComponent(cr);
         if (component instanceof JMenuItem) {
             ((JMenuItem) component).setSelected(true);
+            setTimeFromCarrington(Carrington.CR_start[cr]);
         }
     }
 
