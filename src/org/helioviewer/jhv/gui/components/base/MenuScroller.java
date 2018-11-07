@@ -509,25 +509,17 @@ public class MenuScroller {
         }
     }
 
-    private class MenuScrollTimer extends Timer {
-
-        public MenuScrollTimer(final int increment, int interval) {
-            super(interval, e -> {
-                firstIndex += increment;
-                refreshMenu();
-            });
-        }
-
-    }
-
     private class MenuScrollItem extends JMenuItem implements ChangeListener {
 
-        private final MenuScrollTimer timer;
+        private final Timer timer;
 
         public MenuScrollItem(MenuIcon icon, int increment) {
             setIcon(icon);
             setDisabledIcon(icon);
-            timer = new MenuScrollTimer(increment, interval);
+            timer = new Timer(interval, e -> {
+                firstIndex += increment;
+                refreshMenu();
+            });
             addChangeListener(this);
         }
 
