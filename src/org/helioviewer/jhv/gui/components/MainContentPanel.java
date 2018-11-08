@@ -15,11 +15,9 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 
-/*
- * This panel acts as a container for the GUI elements which are shown in the
- * main area of the application. Usually it contains the main image area. Below
- * the main image area plug-ins are able to display their GUI components.
- * */
+// This panel acts as a container for the GUI elements which are shown in the
+// main area of the application. Usually it contains the main image area. Below
+// the main image area plug-ins are able to display their GUI components.
 @SuppressWarnings("serial")
 public class MainContentPanel extends JPanel {
 
@@ -71,12 +69,10 @@ public class MainContentPanel extends JPanel {
         }
     }
 
-    /*
-     * Updates the layout of the container and its sub components. Plug-ins will
-     * be displayed, if available, in separated tabs below the main component
-     * area. An split pane will be provided, if necessary, to readjust the
-     * height of the components.
-     * */
+    // Updates the layout of the container and its sub components. Plug-ins will
+    // be displayed, if available, in separated tabs below the main component
+    // area. An split pane will be provided, if necessary, to readjust the
+    // height of the components.
     private void updateLayout() {
         splitPane.remove(collapsiblePane);
         remove(collapsiblePane);

@@ -74,10 +74,10 @@ public class InteractionAnnotate extends Interaction {
         Position viewpoint = camera.getViewpoint();
         Annotateable activeAnn = activeIndex >= 0 && activeIndex < anns.size() ? anns.get(activeIndex) : null;
 
-        for (Annotateable ann : anns) {
-            ann.draw(viewpoint, vp, ann == activeAnn, annsBuf);
-            ann.drawTransformed(ann == activeAnn, transBuf, centerBuf);
-        }
+        anns.forEach(annotateable -> {
+            annotateable.draw(viewpoint, vp, annotateable == activeAnn, annsBuf);
+            annotateable.drawTransformed(annotateable == activeAnn, transBuf, centerBuf);
+        });
         if (newAnnotateable != null) {
             newAnnotateable.draw(viewpoint, vp, false, annsBuf);
             newAnnotateable.drawTransformed(false, transBuf, centerBuf);
@@ -180,8 +180,7 @@ public class InteractionAnnotate extends Interaction {
 
     public JSONObject toJson() {
         JSONArray ja = new JSONArray();
-        for (Annotateable ann : anns)
-            ja.put(ann.toJson());
+        anns.forEach(annotateable -> ja.put(annotateable.toJson()));
         return new JSONObject().put("activeIndex", activeIndex).put("annotateables", ja);
     }
 

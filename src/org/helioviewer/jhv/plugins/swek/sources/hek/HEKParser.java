@@ -262,14 +262,10 @@ class HEKParser {
             double elon = p.lon;
 
             ArrayList<Vec3> jhvBoundedBox = new ArrayList<>(localHGSBoundedBox.size());
-            for (Vec3 el : localHGSBoundedBox) {
-                jhvBoundedBox.add(convertHGSJHV(el, elon));
-            }
+            localHGSBoundedBox.forEach(el -> jhvBoundedBox.add(convertHGSJHV(el, elon)));
 
             ArrayList<Vec3> jhvBoundCC = new ArrayList<>(localHGSBoundCC.size());
-            for (Vec3 el : localHGSBoundCC) {
-                jhvBoundCC.add(convertHGSJHV(el, elon));
-            }
+            localHGSBoundCC.forEach(el -> jhvBoundCC.add(convertHGSJHV(el, elon)));
 
             Vec3 jhvCentralPoint = null;
             if (localHGSCentralPoint != null) {

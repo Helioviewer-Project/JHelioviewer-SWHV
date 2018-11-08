@@ -40,11 +40,8 @@ public class EVEDataProvider implements BandDataProvider {
     }
 
     private static ArrayList<Interval> getIntervals(Band band, long start, long end) {
-        List<Interval> missingIntervals = band.addRequest(start, end);
         ArrayList<Interval> intervals = new ArrayList<>();
-        for (Interval i : missingIntervals) {
-            intervals.addAll(Interval.splitInterval(i, DOWNLOADER_MAX_DAYS_PER_BLOCK));
-        }
+        band.addRequest(start, end).forEach(interval -> intervals.addAll(Interval.splitInterval(interval, DOWNLOADER_MAX_DAYS_PER_BLOCK)));
         return intervals;
     }
 
@@ -76,10 +73,7 @@ public class EVEDataProvider implements BandDataProvider {
         if (list.isEmpty())
             downloadMap.remove(band);
 
-        List<Future<?>> fjs = futureJobs.get(band);
-        for (Future<?> fj : fjs) {
-            fj.cancel(true);
-        }
+        futureJobs.get(band).forEach(job -> job.cancel(true));
         futureJobs.remove(band);
         Timelines.getLayers().downloadFinished(band);
     }

@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.view.j2k.io.http;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class HTTPMessage {
 
@@ -18,9 +17,7 @@ public class HTTPMessage {
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
-        for (Map.Entry<String, String> entry : headers.entrySet()) {
-            str.append(entry.getKey()).append(": ").append(entry.getValue()).append("\r\n");
-        }
+        headers.forEach((key, value) -> str.append(key).append(": ").append(value).append("\r\n"));
         return str.toString();
     }
 

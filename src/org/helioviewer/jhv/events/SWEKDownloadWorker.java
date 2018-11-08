@@ -31,10 +31,9 @@ class SWEKDownloadWorker implements Runnable {
             ArrayList<JHVAssociation> assocList = EventDatabase.associations2Program(requestInterval.start, requestInterval.end, supplier);
             ArrayList<JHVEvent> eventList = EventDatabase.events2Program(requestInterval.start, requestInterval.end, supplier, params);
             EventQueue.invokeLater(() -> {
-                for (JHVAssociation assoc : assocList)
-                    JHVEventCache.add(assoc);
-                for (JHVEvent event : eventList)
-                    JHVEventCache.add(event);
+                assocList.forEach(JHVEventCache::add);
+                eventList.forEach(JHVEventCache::add);
+
                 JHVEventCache.fireEventCacheChanged();
                 SWEKDownloadManager.workerFinished(this);
             });

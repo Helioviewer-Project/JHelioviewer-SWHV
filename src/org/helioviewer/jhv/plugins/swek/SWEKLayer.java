@@ -486,8 +486,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     public void dispose(GL2 gl) {
         lineEvent.dispose(gl);
         lineThick.dispose(gl);
-        for (GLTexture el : iconCacheId.values())
-            el.delete(gl);
+        iconCacheId.values().forEach(el -> el.delete(gl));
         iconCacheId.clear();
     }
 

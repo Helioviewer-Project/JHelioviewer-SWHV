@@ -11,7 +11,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -129,14 +128,8 @@ public class EventDatabase {
             pstatement.setString(2, eventType.getKey());
             pstatement.executeUpdate();
 
-            String dbName = eventType.getDatabaseName();
-            StringBuilder createtbl = new StringBuilder();
-            createtbl.append("CREATE TABLE ").append(dbName).append(" (");
-            HashMap<String, String> fields = eventType.getGroup().getAllDatabaseFields();
-
-            for (Map.Entry<String, String> entry : fields.entrySet()) {
-                createtbl.append(entry.getKey()).append(' ').append(entry.getValue()).append(" DEFAULT NULL,");
-            }
+            StringBuilder createtbl = new StringBuilder("CREATE TABLE ").append(eventType.getDatabaseName()).append(" (");
+            eventType.getGroup().getAllDatabaseFields().forEach((key, value) -> createtbl.append(key).append(' ').append(value).append(" DEFAULT NULL,"));
             createtbl.append("event_id INTEGER, id INTEGER PRIMARY KEY AUTOINCREMENT, FOREIGN KEY(event_id) REFERENCES events(id), UNIQUE(event_id) ON CONFLICT REPLACE );");
 
             try (Statement statement = connection.createStatement()) {
@@ -413,9 +406,7 @@ public class EventDatabase {
                     assocs.add(new Pair<>(1, 1));
                 } else {
                     ArrayList<JHVEvent> rels = _getOtherRelations(id, type, true, false, true);
-                    for (JHVEvent rel : rels) {
-                        assocs.add(new Pair<>(id, rel.getUniqueID()));
-                    }
+                    rels.forEach(rel -> assocs.add(new Pair<>(id, rel.getUniqueID())));
                 }
             }
             dump_associationint2db(connection, assocs);

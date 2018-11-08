@@ -165,9 +165,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void drawData(Graphics2D fullG, Graphics2D plotG, Rectangle graphArea, TimeAxis xAxis) {
-        for (TimelineLayer tl : TimelineLayers.get()) {
-            tl.draw(plotG, graphArea, xAxis, mousePosition);
-        }
+        TimelineLayers.get().forEach(layer -> layer.draw(plotG, graphArea, xAxis, mousePosition));
         drawLabels(fullG, graphArea, xAxis);
     }
 

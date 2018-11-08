@@ -75,8 +75,7 @@ class BandCacheAll implements BandCache {
     @Override
     public void serialize(JSONObject jo, double f) {
         JSONArray ja = new JSONArray();
-        for (DateValue dv : datevals)
-            dv.serialize(ja, f);
+        datevals.forEach(dv -> dv.serialize(ja, f));
         jo.put("data", ja);
     }
 

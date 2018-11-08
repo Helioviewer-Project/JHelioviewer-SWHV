@@ -39,8 +39,7 @@ class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
         try (InputStream is = JHVUncaughtExceptionHandler.class.getResourceAsStream("/sentry.properties")) {
             Properties p = new Properties();
             p.load(is);
-            for (String key : p.stringPropertyNames())
-                System.setProperty(key, p.getProperty(key));
+            p.stringPropertyNames().forEach(key -> System.setProperty(key, p.getProperty(key)));
         } catch (Exception e) {
             e.printStackTrace();
         }

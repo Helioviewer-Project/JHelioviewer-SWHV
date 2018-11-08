@@ -14,8 +14,7 @@ class SpaceObjectModel extends AbstractTableModel {
     private final ArrayList<SpaceObjectElement> elements = new ArrayList<>();
 
     SpaceObjectModel(SpaceObject observer) {
-        for (SpaceObject target : SpaceObject.getTargets(observer))
-            elements.add(new SpaceObjectElement(target, this));
+        SpaceObject.getTargets(observer).forEach(target -> elements.add(new SpaceObjectElement(target, this)));
     }
 
     List<SpaceObjectElement> getSelected() {
