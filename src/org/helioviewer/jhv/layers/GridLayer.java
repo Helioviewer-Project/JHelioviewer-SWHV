@@ -250,15 +250,15 @@ public class GridLayer extends AbstractLayer {
         renderer.flush();
         gl.glEnable(GL2.GL_CULL_FACE);
 
-        for (GridLabel lonLabel : lonLabels) {
+        lonLabels.forEach(lonLabel -> {
             Transform.pushView();
-            {
-                Transform.mulView(lonLabel.m);
-                renderer.draw3D(lonLabel.txt, 0, 0, 0, textScaleFactor);
-                renderer.flush();
-            }
+
+            Transform.mulView(lonLabel.m);
+            renderer.draw3D(lonLabel.txt, 0, 0, 0, textScaleFactor);
+            renderer.flush();
+
             Transform.popView();
-        }
+        });
         renderer.end3DRendering();
     }
 
