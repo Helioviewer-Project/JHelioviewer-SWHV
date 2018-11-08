@@ -51,8 +51,7 @@ public class TimelineLayers extends AbstractTableModel {
     }
 
     public void clear() {
-        for (TimelineLayer tl : layers)
-            tl.remove();
+        layers.forEach(TimelineLayer::remove);
         layers.clear();
         fireTableDataChanged();
         DrawController.graphAreaChanged();

@@ -217,10 +217,10 @@ public class GridLayer extends AbstractLayer {
     private void drawEarthCircles(GL2 gl, Viewport vp, double factor, Position p) {
         Transform.pushView();
         Transform.rotateViewInverse(p.toQuat());
-        {
-            earthCircleLine.render(gl, vp.aspect, LINEWIDTH_EARTH);
-            earthPoint.renderPoints(gl, factor);
-        }
+
+        earthCircleLine.render(gl, vp.aspect, LINEWIDTH_EARTH);
+        earthPoint.renderPoints(gl, factor);
+
         Transform.popView();
     }
 
@@ -230,10 +230,9 @@ public class GridLayer extends AbstractLayer {
         for (float rsize : labelPos) {
             JhvTextRenderer renderer = GLText.getRenderer((int) (fuzz * rsize * size));
             float textScaleFactor = textScale / renderer.getFont().getSize2D();
+
             renderer.begin3DRendering();
-            for (GridLabel label : labels) {
-                renderer.draw3D(label.txt, rsize * label.x, rsize * label.y, z, fuzz * rsize * textScaleFactor);
-            }
+            labels.forEach(label -> renderer.draw3D(label.txt, rsize * label.x, rsize * label.y, z, fuzz * rsize * textScaleFactor));
             renderer.end3DRendering();
         }
         gl.glEnable(GL2.GL_CULL_FACE);
@@ -247,9 +246,7 @@ public class GridLayer extends AbstractLayer {
         renderer.begin3DRendering();
 
         gl.glDisable(GL2.GL_CULL_FACE);
-        for (GridLabel label : latLabels) {
-            renderer.draw3D(label.txt, label.x, label.y, z, textScaleFactor);
-        }
+        latLabels.forEach(label -> renderer.draw3D(label.txt, label.x, label.y, z, textScaleFactor));
         renderer.flush();
         gl.glEnable(GL2.GL_CULL_FACE);
 

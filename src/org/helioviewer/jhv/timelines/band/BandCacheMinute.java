@@ -137,8 +137,7 @@ class BandCacheMinute implements BandCache {
     @Override
     public void serialize(JSONObject jo, double f) {
         JSONArray ja = new JSONArray();
-        for (DataChunk chunk : cacheMap.values())
-            chunk.serialize(ja, f);
+        cacheMap.values().forEach(chunk -> chunk.serialize(ja, f));
         jo.put("data", ja);
     }
 

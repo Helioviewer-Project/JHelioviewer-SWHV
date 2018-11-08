@@ -33,21 +33,12 @@ public class JHVEventCache {
         long newEnd = end + deltaT;
 
         cacheEventHandlers.add(handler);
-
-        Map<SWEKSupplier, List<Interval>> missingIntervals = getMissingIntervals(start, end, newStart, newEnd);
-        for (Map.Entry<SWEKSupplier, List<Interval>> entry : missingIntervals.entrySet()) {
-            SWEKSupplier eventType = entry.getKey();
-            for (Interval missing : entry.getValue()) {
-                SWEKDownloadManager.startDownloadSupplier(eventType, missing);
-            }
-        }
+        getMissingIntervals(start, end, newStart, newEnd).forEach((key, value) -> value.forEach(interval -> SWEKDownloadManager.startDownloadSupplier(key, interval)));
         handler.newEventsReceived();
     }
 
     static void fireEventCacheChanged() {
-        for (JHVEventHandler handler : cacheEventHandlers) {
-            handler.cacheUpdated();
-        }
+        cacheEventHandlers.forEach(JHVEventHandler::cacheUpdated);
     }
 
     static void intervalNotDownloaded(SWEKSupplier eventType, Interval interval) {

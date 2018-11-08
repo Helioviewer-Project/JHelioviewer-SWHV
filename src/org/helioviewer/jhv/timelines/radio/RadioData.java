@@ -71,9 +71,7 @@ public class RadioData extends AbstractTimelineLayer {
 
     static void setLUT(LUT lut) {
         colorModel = createIndexColorModelFromLUT(lut);
-        for (RadioJ2KData data : cache.asMap().values()) {
-            data.changeColormap(colorModel);
-        }
+        cache.asMap().values().forEach(data -> data.changeColormap(colorModel));
         DrawController.drawRequest();
     }
 
@@ -198,9 +196,7 @@ public class RadioData extends AbstractTimelineLayer {
     @Override
     public void fetchData(TimeAxis selectedAxis) {
         if (enabled && selectedAxis.end() - selectedAxis.start() <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS) {
-            for (RadioJ2KData data : cache.asMap().values()) {
-                data.requestData(selectedAxis);
-            }
+            cache.asMap().values().forEach(data -> data.requestData(selectedAxis));
             requestAndOpenIntervals(selectedAxis.start());
         }
     }
@@ -212,9 +208,7 @@ public class RadioData extends AbstractTimelineLayer {
 
         if (timeAxis.end() - timeAxis.start() <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS) {
             drawString(g, graphArea, timeAxis, "No data available");
-            for (RadioJ2KData data : cache.asMap().values()) {
-                data.draw(g, graphArea, timeAxis);
-            }
+            cache.asMap().values().forEach(data -> data.draw(g, graphArea, timeAxis));
         } else {
             String text1 = "The selected interval is too big.";
             Rectangle2D r1 = g.getFontMetrics().getStringBounds(text1, g);

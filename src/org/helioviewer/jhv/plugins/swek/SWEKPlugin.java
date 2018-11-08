@@ -5,7 +5,6 @@ import java.awt.Component;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.events.gui.EventPanel;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.plugins.Plugin;
@@ -21,9 +20,7 @@ public class SWEKPlugin implements Plugin {
 
     public SWEKPlugin() {
         swekPanel.setLayout(new BoxLayout(swekPanel, BoxLayout.PAGE_AXIS));
-        for (SWEKGroup group : SWEKConfig.load()) {
-            swekPanel.add(new EventPanel(group));
-        }
+        SWEKConfig.load().forEach(group -> swekPanel.add(new EventPanel(group)));
     }
 
     @Override

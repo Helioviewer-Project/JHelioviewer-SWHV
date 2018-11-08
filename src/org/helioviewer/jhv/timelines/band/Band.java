@@ -173,9 +173,7 @@ public class Band extends AbstractTimelineLayer {
             return;
 
         g.setColor(graphColor);
-        for (GraphPolyline line : graphPolylines) { // polylines
-            g.drawPolyline(line.xPoints(), line.yPoints(), line.length());
-        }
+        graphPolylines.forEach(line -> g.drawPolyline(line.xPoints(), line.yPoints(), line.length())); // polylines
 
 //      for (GraphPolyline line : graphPolylines) { // dots
 //          int length = line.length();
