@@ -155,7 +155,7 @@ public class GLListener implements GLEventListener {
         if (miniview != null && miniview.isEnabled()) {
             Viewport vp = miniview.getViewport();
             Camera miniCamera = Display.getMiniCamera();
-            miniCamera.timeChanged(Movie.getTime());
+            // miniCamera.timeChanged(Movie.getTime());
 
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             miniCamera.projectionOrtho2D(vp.aspect);
