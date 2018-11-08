@@ -137,52 +137,36 @@ public class Layers extends AbstractTableModel implements Reorderable {
     public static void prerender(GL2 gl) {
         removeLayers(gl);
         initLayers(gl);
-        for (Layer layer : layers) {
-            layer.prerender(gl);
-        }
+        layers.forEach(layer -> layer.prerender(gl));
     }
 
     public static void render(Camera camera, Viewport vp, GL2 gl) {
-        for (Layer layer : layers) {
-            layer.render(camera, vp, gl);
-        }
+        layers.forEach(layer -> layer.render(camera, vp, gl));
     }
 
     public static void renderScale(Camera camera, Viewport vp, GL2 gl) {
-        for (Layer layer : layers) {
-            layer.renderScale(camera, vp, gl);
-        }
+        layers.forEach(layer -> layer.renderScale(camera, vp, gl));
     }
 
     public static void renderFloat(Camera camera, Viewport vp, GL2 gl) {
-        for (Layer layer : layers) {
-            layer.renderFloat(camera, vp, gl);
-        }
+        layers.forEach(layer -> layer.renderFloat(camera, vp, gl));
     }
 
     public static void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
-        for (Layer layer : layers) {
-            layer.renderFullFloat(camera, vp, gl);
-        }
+        layers.forEach(layer -> layer.renderFullFloat(camera, vp, gl));
     }
 
     public static void renderMiniview(Camera camera, Viewport miniview, GL2 gl) {
-        for (Layer layer : layers) {
-            layer.renderMiniview(camera, miniview, gl);
-        }
+        layers.forEach(layer -> layer.renderMiniview(camera, miniview, gl));
     }
 
     private static void initLayers(GL2 gl) {
-        for (Layer layer : newLayers) {
-            layer.init(gl);
-        }
+        newLayers.forEach(layer -> layer.init(gl));
         newLayers.clear();
     }
 
     private static void removeLayers(GL2 gl) {
-        for (Layer layer : removedLayers) {
-            layer.remove(gl);
-        }
+        removedLayers.forEach(layer -> layer.remove(gl));
         removedLayers.clear();
     }
 
@@ -247,9 +231,7 @@ public class Layers extends AbstractTableModel implements Reorderable {
     }
 
     public static void dispose(GL2 gl) {
-        for (Layer layer : layers) {
-            layer.dispose(gl);
-        }
+        layers.forEach(layer -> layer.dispose(gl));
         newLayers = layers;
         layers = new CompositeList();
     }

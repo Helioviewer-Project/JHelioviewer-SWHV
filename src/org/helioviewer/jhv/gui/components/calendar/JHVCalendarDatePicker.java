@@ -21,11 +21,9 @@ import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.time.TimeUtils;
 
-/*
- * This component allows to select a date or enter a date by hand. It works
- * similar to a combobox apart from that the popup is not a list but represents
- * a {@link JHVCalendar} component.
- */
+// This component allows to select a date or enter a date by hand. It works
+// similar to a combobox apart from that the popup is not a list but represents
+// a {@link JHVCalendar} component.
 @SuppressWarnings("serial")
 public class JHVCalendarDatePicker extends JPanel {
 
@@ -90,9 +88,7 @@ public class JHVCalendarDatePicker extends JPanel {
 
     private void informAllJHVCalendarListeners() {
         JHVCalendarEvent e = new JHVCalendarEvent(this);
-        for (JHVCalendarListener l : listeners) {
-            l.actionPerformed(e);
-        }
+        listeners.forEach(listener -> listener.actionPerformed(e));
     }
 
     private void setDateFromTextField(boolean propagate) {

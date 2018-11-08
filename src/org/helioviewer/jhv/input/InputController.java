@@ -17,43 +17,37 @@ public class InputController implements MouseListener, KeyListener {
     @Override
     public void mouseClicked(MouseEvent e) {
         JHVFrame.getCurrentInteraction().mouseClicked(e);
-        for (MouseListener listener : mouseListeners)
-            listener.mouseClicked(e);
+        mouseListeners.forEach(listener -> listener.mouseClicked(e));
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
         JHVFrame.getCurrentInteraction().mouseEntered(e);
-        for (MouseListener listener : mouseListeners)
-            listener.mouseEntered(e);
+        mouseListeners.forEach(listener -> listener.mouseEntered(e));
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
         JHVFrame.getCurrentInteraction().mouseExited(e);
-        for (MouseListener listener : mouseListeners)
-            listener.mouseExited(e);
+        mouseListeners.forEach(listener -> listener.mouseExited(e));
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
         JHVFrame.getCurrentInteraction().mousePressed(e);
-        for (MouseListener listener : mouseListeners)
-            listener.mousePressed(e);
+        mouseListeners.forEach(listener -> listener.mousePressed(e));
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
         JHVFrame.getCurrentInteraction().mouseReleased(e);
-        for (MouseListener listener : mouseListeners)
-            listener.mouseReleased(e);
+        mouseListeners.forEach(listener -> listener.mouseReleased(e));
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
         JHVFrame.getCurrentInteraction().mouseDragged(e);
-        for (MouseListener listener : mouseListeners)
-            listener.mouseDragged(e);
+        mouseListeners.forEach(listener -> listener.mouseDragged(e));
     }
 
     @Override
@@ -61,22 +55,19 @@ public class InputController implements MouseListener, KeyListener {
         Display.setActiveViewport(e.getX(), e.getY());
 
         JHVFrame.getCurrentInteraction().mouseMoved(e);
-        for (MouseListener listener : mouseListeners)
-            listener.mouseMoved(e);
+        mouseListeners.forEach(listener -> listener.mouseMoved(e));
     }
 
     @Override
     public void mouseWheelMoved(MouseEvent e) {
         JHVFrame.getCurrentInteraction().mouseWheelMoved(e);
-        for (MouseListener listener : mouseListeners)
-            listener.mouseWheelMoved(e);
+        mouseListeners.forEach(listener -> listener.mouseWheelMoved(e));
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
         JHVFrame.getCurrentInteraction().keyPressed(e);
-        for (KeyListener listener : keyListeners)
-            listener.keyPressed(e);
+        keyListeners.forEach(listener -> listener.keyPressed(e));
     }
 
     @Override
@@ -101,8 +92,7 @@ public class InputController implements MouseListener, KeyListener {
             return;
 
         JHVFrame.getCurrentInteraction().keyReleased(e);
-        for (KeyListener listener : keyListeners)
-            listener.keyReleased(e);
+        keyListeners.forEach(listener -> listener.keyReleased(e));
     }
 
     private final HashSet<MouseListener> mouseListeners = new HashSet<>();

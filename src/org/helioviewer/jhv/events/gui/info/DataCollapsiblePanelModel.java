@@ -7,9 +7,7 @@ class DataCollapsiblePanelModel {
     private final HashSet<DataCollapsiblePanelModelListener> listeners = new HashSet<>();
 
     void repackCollapsiblePanels() {
-        for (DataCollapsiblePanelModelListener l : listeners) {
-            l.repack();
-        }
+        listeners.forEach(DataCollapsiblePanelModelListener::repack);
     }
 
     void addListener(DataCollapsiblePanelModelListener listener) {

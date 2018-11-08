@@ -26,15 +26,12 @@ public class FilterDialog extends JDialog implements FocusListener, WindowFocusL
 
         List<FilterPanel> filterPanels = FilterPanelFactory.createFilterPanel(supplier, this, false);
         JPanel filterPanel = new JPanel(new GridLayout(filterPanels.size() + 1, 1));
-        for (FilterPanel afp : filterPanels) {
-            filterPanel.add(afp);
-        }
+        filterPanels.forEach(filterPanel::add);
 
         applyButton.addActionListener(e -> {
             FilterManager.removeFilters(supplier);
-            for (FilterPanel afp : filterPanels) {
-                afp.addFilter();
-            }
+            filterPanels.forEach(FilterPanel::addFilter);
+
             FilterManager.fireFilters(supplier);
             applyButton.setEnabled(false);
         });

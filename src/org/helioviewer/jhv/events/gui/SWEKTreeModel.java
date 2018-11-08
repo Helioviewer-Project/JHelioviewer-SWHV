@@ -17,15 +17,11 @@ public class SWEKTreeModel {
     }
 
     public static void setStartLoading(SWEKGroup group) {
-        for (SWEKTreeModelListener l : listeners) {
-            l.startedDownloadingGroup(group);
-        }
+        listeners.forEach(listener -> listener.startedDownloadingGroup(group));
     }
 
     public static void setStopLoading(SWEKGroup group) {
-        for (SWEKTreeModelListener l : listeners) {
-            l.stoppedDownloadingGroup(group);
-        }
+        listeners.forEach(listener -> listener.stoppedDownloadingGroup(group));
     }
 
 }

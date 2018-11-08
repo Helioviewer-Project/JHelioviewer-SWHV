@@ -22,16 +22,12 @@ import javax.swing.table.TableCellRenderer;
 import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.time.TimeUtils;
 
-/*
- * This component allows to select a date. There are 3 different views:
- * 1. All days of a month are displayed corresponding to the weekdays,
- * 2. All month of a year are displayed,
- * 3. A period of 12 years is displayed.
- *
- * This component acts as a subcomponent of the {@link JHVCalendarDatePicker}
- * too. It represents the content of the popup window of the
- * JHVCalendarDatePicker.
- */
+// This component allows to select a date. There are 3 different views:
+// 1. All days of a month are displayed corresponding to the weekdays,
+// 2. All month of a year are displayed,
+// 3. A period of 12 years is displayed.
+// This component acts as a subcomponent of the {@link JHVCalendarDatePicker}
+// too. It represents the content of the popup window of the JHVCalendarDatePicker.
 @SuppressWarnings("serial")
 class JHVCalendar extends JPanel {
 
@@ -119,9 +115,7 @@ class JHVCalendar extends JPanel {
     // Informs all listener of this class by passing the corresponding event
     private void informAllJHVCalendarListeners() {
         JHVCalendarEvent e = new JHVCalendarEvent(this);
-        for (JHVCalendarListener l : listeners) {
-            l.actionPerformed(e);
-        }
+        listeners.forEach(listener -> listener.actionPerformed(e));
     }
 
     /**

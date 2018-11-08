@@ -55,9 +55,7 @@ public class Movie {
     static void timespanChanged() {
         movieStart = getMovieStart();
         movieEnd = getMovieEnd();
-        for (TimespanListener ll : timespanListeners) {
-            ll.timespanChanged(movieStart, movieEnd);
-        }
+        timespanListeners.forEach(listener -> listener.timespanChanged(movieStart, movieEnd));
     }
 
     private static int deltaT;
@@ -143,25 +141,20 @@ public class Movie {
         Camera camera = Display.getCamera();
         camera.timeChanged(lastTimestamp);
 
-        for (ImageLayer layer : Layers.getImageLayers()) {
-            layer.getView().setFrame(dateTime);
-        }
+        Layers.getImageLayers().forEach(layer -> layer.getView().setFrame(dateTime));
         MovieDisplay.render(1);
 
         ViewpointLayer viewpointLayer = Layers.getViewpointLayer();
         if (viewpointLayer != null)
             viewpointLayer.fireTimeUpdated(camera.getViewpoint().time); // !
 
-        for (TimeListener listener : timeListeners) {
-            listener.timeChanged(lastTimestamp.milli);
-        }
+        timeListeners.forEach(listener -> listener.timeChanged(lastTimestamp.milli));
 
         View view = Layers.getActiveImageLayer().getView(); // should be not null
         int activeFrame = view.getCurrentFrameNumber();
         boolean last = activeFrame == view.getMaximumFrameNumber();
-        for (FrameListener listener : frameListeners) {
-            listener.frameChanged(activeFrame, last);
-        }
+
+        frameListeners.forEach(listener -> listener.frameChanged(activeFrame, last));
 
         MoviePanel.setFrameSlider(activeFrame);
 
