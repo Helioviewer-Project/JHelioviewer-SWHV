@@ -467,13 +467,14 @@ public class JhvTextRenderer {
             }
         });
 
-        for (Rect r : deadRects) {
-            packer.remove(r);
-            int unicodeToClearFromCache = ((TextData) r.getUserData()).unicodeID;
+        deadRects.forEach(rect -> {
+            packer.remove(rect);
+            int unicodeToClearFromCache = ((TextData) rect.getUserData()).unicodeID;
             if (unicodeToClearFromCache > 0) {
                 glyphProducer.clearCacheEntry(unicodeToClearFromCache);
             }
-        }
+        });
+
         // If we removed dead rectangles this cycle, try to do a compaction
         if (!deadRects.isEmpty() && packer.verticalFragmentationRatio() > MAX_VERTICAL_FRAGMENTATION) {
             packer.compact();
