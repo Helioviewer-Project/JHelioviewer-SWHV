@@ -36,9 +36,7 @@ public class FilterManager {
     }
 
     static void fireFilters(SWEKSupplier supplier) {
-        for (FilterManagerListener fml : listeners) {
-            fml.filtersChanged(supplier);
-        }
+        listeners.forEach(listener -> listener.filtersChanged(supplier));
     }
 
     public static Map<SWEKParameter, List<SWEKParam>> getFilter(SWEKSupplier supplier) {

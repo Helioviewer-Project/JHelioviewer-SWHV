@@ -16,7 +16,6 @@ import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import org.helioviewer.jhv.events.SWEKGroup;
-import org.helioviewer.jhv.events.SWEKSupplier;
 import org.helioviewer.jhv.gui.UITimer;
 import org.json.JSONObject;
 
@@ -75,18 +74,14 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener {
 
     public void serialize(JSONObject jo) {
         JSONObject go = new JSONObject();
-        for (SWEKSupplier supplier : group.getSuppliers()) {
-            go.put(supplier.getName(), supplier.isSelected());
-        }
+        group.getSuppliers().forEach(supplier -> go.put(supplier.getName(), supplier.isSelected()));
         jo.put(group.getName(), go);
     }
 
     public void deserialize(JSONObject jo) {
         JSONObject go = jo.optJSONObject(group.getName());
         if (go != null)
-            for (SWEKSupplier supplier : group.getSuppliers()) {
-                supplier.activate(go.optBoolean(supplier.getName(), false));
-            }
+            group.getSuppliers().forEach(supplier -> supplier.activate(go.optBoolean(supplier.getName(), false)));
     }
 
     private static class MyTreeCellEditor extends DefaultTreeCellEditor {

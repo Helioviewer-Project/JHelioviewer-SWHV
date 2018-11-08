@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -98,17 +97,14 @@ public class SWEKDownloadManager implements FilterManagerListener {
     private static List<SWEKParam> defineParameters(SWEKSupplier supplier) {
         List<SWEKParam> params = new ArrayList<>();
         params.add(new SWEKParam("provider", supplier.getSupplierName(), SWEKOperand.EQUALS));
-        Map<SWEKParameter, List<SWEKParam>> paramsPerEventParameter = FilterManager.getFilter(supplier);
-        for (List<SWEKParam> paramPerParameter : paramsPerEventParameter.values()) {
-            params.addAll(paramPerParameter);
-        }
+
+        FilterManager.getFilter(supplier).values().forEach(params::addAll);
+
         return params;
     }
 
     private static void downloadForAllDates(SWEKSupplier supplier) {
-        for (Interval interval : JHVEventCache.getAllRequestIntervals(supplier)) {
-            startDownloadSupplier(supplier, interval);
-        }
+        JHVEventCache.getAllRequestIntervals(supplier).forEach(interval -> startDownloadSupplier(supplier, interval));
     }
 
     static void startDownloadSupplier(SWEKSupplier supplier, Interval interval) {

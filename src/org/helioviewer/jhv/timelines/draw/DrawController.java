@@ -190,9 +190,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
         Interval availableInterval = Interval.makeCompleteDay(availableStart, availableEnd);
         availableAxis.set(availableInterval.start, availableInterval.end);
 
-        for (TimelineLayer tl : TimelineLayers.get()) {
-            tl.fetchData(selectedAxis);
-        }
+        TimelineLayers.get().forEach(timelineLayer -> timelineLayer.fetchData(selectedAxis));
         drawRequest();
     }
 
@@ -279,15 +277,11 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
 
         if (toDraw) {
             toDraw = false;
-            for (DrawListener l : listeners) {
-                l.drawRequest();
-            }
+            listeners.forEach(DrawListener::drawRequest);
         }
         if (drawMovieLine) {
             drawMovieLine = false;
-            for (DrawListener l : listeners) {
-                l.drawMovieLineRequest();
-            }
+            listeners.forEach(DrawListener::drawMovieLineRequest);
         }
     }
 

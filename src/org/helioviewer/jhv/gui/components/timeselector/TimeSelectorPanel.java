@@ -60,9 +60,7 @@ public class TimeSelectorPanel extends JPanel {
         startDateTimePanel.setTime(start);
         endDateTimePanel.setTime(end);
 
-        for (TimeSelectorListener l : listeners) {
-            l.timeSelectionChanged(start, end);
-        }
+        listeners.forEach(listener -> listener.timeSelectionChanged(start, end));
     }
 
     public long getStartTime() {

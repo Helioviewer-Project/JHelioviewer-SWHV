@@ -92,9 +92,7 @@ public class JHVCarringtonPicker extends JHVButton implements PopupMenuListener 
 
     private void informAllJHVCalendarListeners() {
         JHVCalendarEvent e = new JHVCalendarEvent(this);
-        for (JHVCalendarListener l : listeners) {
-            l.actionPerformed(e);
-        }
+        listeners.forEach(listener -> listener.actionPerformed(e));
     }
 
 }

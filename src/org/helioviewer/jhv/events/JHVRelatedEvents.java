@@ -97,9 +97,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
     }
 
     private static void fireHighlightChanged() {
-        for (JHVEventHighlightListener l : listeners) {
-            l.eventHightChanged();
-        }
+        listeners.forEach(JHVEventHighlightListener::eventHightChanged);
     }
 
     public JHVEvent getClosestTo(long timestamp) {

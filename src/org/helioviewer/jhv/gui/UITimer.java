@@ -40,8 +40,7 @@ public class UITimer {
             MoviePanel.getTimeSlider().repaint();
         }
 
-        for (LazyComponent lazy : lazyComponents)
-            lazy.lazyRepaint();
+        lazyComponents.forEach(LazyComponent::lazyRepaint);
     }
 
 }

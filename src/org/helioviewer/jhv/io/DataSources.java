@@ -95,8 +95,7 @@ public class DataSources {
 
     public static void loadSources() {
         Validator validator = Validator.builder().failEarly().build();
-        for (String serverName : serverSettings.keySet())
-            JHVGlobals.getExecutorService().execute(new DataSourcesTask(serverName, validator));
+        serverSettings.keySet().forEach(serverName -> JHVGlobals.getExecutorService().execute(new DataSourcesTask(serverName, validator)));
     }
 
     private static final HashSet<DataSourcesListener> listeners = new HashSet<>();
@@ -110,8 +109,7 @@ public class DataSources {
     }
 
     static void setupSources(DataSourcesParser parser) {
-        for (DataSourcesListener listener : listeners)
-            listener.setupSources(parser);
+        listeners.forEach(listener -> listener.setupSources(parser));
 
         toLoad--;
         if (toLoad == 0)
