@@ -62,7 +62,7 @@ class DateTimePanel extends JPanel implements ActionListener, JHVCalendarListene
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        listeners.forEach(listener -> actionPerformed(e));
+        listeners.forEach(listener -> listener.actionPerformed(e));
     }
 
     @Override
