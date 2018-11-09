@@ -47,12 +47,10 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.font.FontRenderContext;
-import java.awt.font.GlyphMetrics;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
 import java.text.StringCharacterIterator;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import javax.annotation.Nullable;
 
@@ -205,7 +203,7 @@ public class JhvTextRenderer {
      */
     public Rectangle2D getBounds(String str) {
         // Must return a Rectangle compatible with the layout algorithm - must be idempotent
-        return normalize(renderDelegate.getBounds(getGlyphVector(str)));
+        return normalize(renderDelegate.getBounds(font.createGlyphVector(getFontRenderContext(), new StringCharacterIterator(str))));
     }
 
     // Returns the Font this renderer is using
@@ -283,40 +281,17 @@ public class JhvTextRenderer {
         draw3D(str, x, y, 0, 1);
     }
 
-    private final HashMap<String, GlyphVector> glyphVectorCache = new HashMap<>();
-
-    private GlyphVector getGlyphVector(String str) {
-        GlyphVector glyphVector = glyphVectorCache.get(str);
-        if (glyphVector == null) {
-            glyphVector = font.createGlyphVector(getFontRenderContext(), new StringCharacterIterator(str));
-            glyphVectorCache.put(str, glyphVector);
-        }
-        return glyphVector;
-    }
-
-    private final HashMap<Character, GlyphMetrics> glyphMetricsCache = new HashMap<>();
-
     /**
      * Draws the supplied String at the desired 3D location using the
      * renderer's current color.
      */
     public void draw3D(String str, float x, float y, float z, float scaleFactor) {
-        GlyphVector glyphVector = getGlyphVector(str);
-        int lengthInGlyphs = glyphVector.getNumGlyphs();
-        int i = 0;
-        while (i < lengthInGlyphs) { // may loop forever
-            char unicodeID = str.charAt(i);
-            GlyphMetrics glyphMetrics = glyphMetricsCache.get(unicodeID);
-            if (glyphMetrics == null) {
-                glyphMetrics = glyphVector.getGlyphMetrics(i);
-                glyphMetricsCache.put(unicodeID, glyphMetrics);
-            }
-
-            Glyph glyph = glyphProducer.getGlyph(unicodeID, glyphMetrics);
+        int len = str.length();
+        for (int i = 0; i < len; ++i) {
+            Glyph glyph = glyphProducer.getGlyph(str.charAt(i));
             if (glyph != null) {
                 float advance = glyph.draw3D(x, y, z, scaleFactor);
                 x += advance * scaleFactor;
-                i++;
             }
         }
     }
@@ -896,7 +871,7 @@ public class JhvTextRenderer {
         // if the unicode or glyph ID would be out of bounds of the
         // glyph cache.
         @Nullable
-        Glyph getGlyph(char unicodeID, GlyphMetrics glyphMetrics) {
+        Glyph getGlyph(char unicodeID) {
             if (unicodeID >= unicodes2Glyphs.length) {
                 return null;
             }
@@ -908,13 +883,13 @@ public class JhvTextRenderer {
 
             // Must fabricate the glyph
             singleUnicode[0] = unicodeID;
-            GlyphVector singleUnicodeGlyphVector = font.createGlyphVector(getFontRenderContext(), singleUnicode);
-            int glyphCode = singleUnicodeGlyphVector.getGlyphCode(0);
+            GlyphVector gv = font.createGlyphVector(getFontRenderContext(), singleUnicode);
+            int gc = gv.getGlyphCode(0);
             // Have seen huge glyph codes (65536) coming out of some fonts in some Unicode situations
-            if (glyphCode >= glyphCache.length) {
+            if (gc >= glyphCache.length) {
                 return null;
             }
-            Glyph glyph = new Glyph(unicodeID, glyphCode, glyphMetrics.getAdvance(), singleUnicodeGlyphVector);
+            Glyph glyph = new Glyph(unicodeID, gc, gv.getGlyphMetrics(0).getAdvance(), gv);
             register(glyph);
             return glyph;
         }
