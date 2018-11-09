@@ -23,25 +23,25 @@ import org.astrogrid.samp.SampUtils;
 
 public class ImageLayers {
 
-    static void decode(double factor) {
-        Camera camera = Display.getCamera();
-        Position viewpoint = camera.getViewpoint();
-        for (ImageLayer layer : Layers.getImageLayers()) {
-            int i = layer.isVisibleIdx();
-            if (i != -1) {
-                double pixFactor = CameraHelper.getPixelFactor(camera, Display.getViewport(i));
-                layer.getView().decode(viewpoint, pixFactor, factor);
-            }
-        }
-    }
-
-    static int getNumEnabledImageLayers() {
+    static int getNumEnabled() {
         int ct = 0;
         for (ImageLayer layer : Layers.getImageLayers()) {
             if (layer.isEnabled())
                 ct++;
         }
         return ct;
+    }
+
+    static void decode(double factor) {
+        Camera camera = Display.getCamera();
+        Position viewpoint = camera.getViewpoint();
+        Layers.getImageLayers().forEach(layer -> {
+            int i = layer.isVisibleIdx();
+            if (i != -1) {
+                double pixFactor = CameraHelper.getPixelFactor(camera, Display.getViewport(i));
+                layer.getView().decode(viewpoint, pixFactor, factor);
+            }
+        });
     }
 
     static void displaySynced(Position viewpoint) { // coalesce layers
