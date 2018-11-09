@@ -65,11 +65,10 @@ public class BufVertex {
         lengthVertx += 16;
 
         ensureColor(4);
-        arrayColor[lengthColor] = b[0];
-        arrayColor[lengthColor + 1] = b[1];
-        arrayColor[lengthColor + 2] = b[2];
-        arrayColor[lengthColor + 3] = b[3];
-        lengthColor += 4;
+        arrayColor[lengthColor++] = b[0];
+        arrayColor[lengthColor++] = b[1];
+        arrayColor[lengthColor++] = b[2];
+        arrayColor[lengthColor++] = b[3];
 
         count++;
     }

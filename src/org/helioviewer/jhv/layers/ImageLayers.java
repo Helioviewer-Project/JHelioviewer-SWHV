@@ -1,9 +1,16 @@
 package org.helioviewer.jhv.layers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
@@ -11,20 +18,16 @@ import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.time.TimeUtils;
 
-///
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import javax.annotation.Nullable;
-
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.SampUtils;
 
 public class ImageLayers {
 
     static boolean areEnabled() {
-        for (ImageLayer layer : Layers.getImageLayers()) {
+        List<ImageLayer> list = Layers.getImageLayers();
+        int size = list.size();
+        for (int i = 0; i < size; i++) {
+            ImageLayer layer = list.get(i);
             if (layer.isEnabled())
                 return true;
         }
@@ -34,22 +37,26 @@ public class ImageLayers {
     static void decode(double factor) {
         Camera camera = Display.getCamera();
         Position viewpoint = camera.getViewpoint();
-        Layers.getImageLayers().forEach(layer -> {
-            int i = layer.isVisibleIdx();
-            if (i != -1) {
-                double pixFactor = CameraHelper.getPixelFactor(camera, Display.getViewport(i));
+
+        Layers.forEachImageLayer(layer -> {
+            int idx = layer.isVisibleIdx();
+            if (idx != -1) {
+                double pixFactor = CameraHelper.getPixelFactor(camera, Display.getViewport(idx));
                 layer.getView().decode(viewpoint, pixFactor, factor);
             }
         });
     }
 
     static void displaySynced(Position viewpoint) { // coalesce layers
-        for (ImageLayer layer : Layers.getImageLayers()) {
+        List<ImageLayer> list = Layers.getImageLayers();
+        int size = list.size();
+        for (int i = 0; i < size; i++) {
+            ImageLayer layer = list.get(i);
             ImageData id;
             if (layer.isEnabled() && (id = layer.getImageData()) != null && viewpoint != id.getViewpoint() /* deliberate on reference */)
                 return;
         }
-        MovieDisplay.display();
+        JHVFrame.getGLWindow().display(); // display asap
     }
 
     public static void arrangeMultiView(boolean multiview) {
