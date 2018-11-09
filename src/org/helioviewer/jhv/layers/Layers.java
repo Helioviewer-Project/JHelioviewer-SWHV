@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.layers;
 
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -17,50 +16,54 @@ import org.helioviewer.jhv.layers.selector.LayersPanel;
 
 import com.jogamp.opengl.GL2;
 
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial", "unchecked"})
 public class Layers extends AbstractTableModel implements Reorderable {
 
-    private static class CompositeList extends AbstractList<Layer> {
+    private static class LayerList extends ArrayList<Layer> {
 
-        private final ArrayList<ImageLayer> list1 = new ArrayList<>();
-        private final ArrayList<Layer> list2 = new ArrayList<>();
-        final List<ImageLayer> imageLayers = Collections.unmodifiableList(list1);
+        private int imageLayersCount;
 
         @Override
-        public Layer get(int index) {
-            int size = list1.size();
-            if (index < size)
-                return list1.get(index);
-            return list2.get(index - size);
+        public void clear() {
+            super.clear();
+            imageLayersCount = 0;
         }
 
         @Override
         public Layer remove(int index) {
-            int size = list1.size();
-            if (index < size) {
-                return list1.remove(index);
-            }
-            return list2.remove(index - size);
+            Layer ret = super.remove(index);
+            if (ret instanceof ImageLayer)
+                imageLayersCount--;
+            return ret;
         }
 
         @Override
-        public int size() {
-            return list1.size() + list2.size();
+        public boolean remove(Object o) {
+            boolean ret = super.remove(o);
+            if (ret && o instanceof ImageLayer)
+                imageLayersCount--;
+            return ret;
         }
 
         @Override
         public boolean add(Layer e) {
-            if (e instanceof ImageLayer) {
-                return list1.add((ImageLayer) e);
-            }
-            return list2.add(e);
+            if (e instanceof ImageLayer)
+                super.add(imageLayersCount++, e);
+            else
+                super.add(e);
+            return true;
         }
 
         @Override
-        public void add(int index, Layer e) {
-            if (!(e instanceof ImageLayer)) // only for DnD
+        public void add(int index, Layer e) { // only for DnD
+            if (!(e instanceof ImageLayer))
                 return;
-            list1.add(index, (ImageLayer) e);
+            super.add(index, e);
+            imageLayersCount++;
+        }
+
+        int getImageLayersCount() {
+            return imageLayersCount;
         }
 
     }
@@ -76,8 +79,8 @@ public class Layers extends AbstractTableModel implements Reorderable {
         Movie.setMaster(activeLayer);
     }
 
-    private static CompositeList layers = new CompositeList();
-    private static CompositeList newLayers = new CompositeList();
+    private static LayerList layers = new LayerList();
+    private static LayerList newLayers = new LayerList();
     private static final HashSet<Layer> removedLayers = new HashSet<>();
 
     private static GridLayer gridLayer;
@@ -125,8 +128,8 @@ public class Layers extends AbstractTableModel implements Reorderable {
         removedLayers.add(layer);
 
         if (layer == activeLayer) {
-            int size = layers.imageLayers.size();
-            setActiveImageLayer(size == 0 ? null : layers.imageLayers.get(size - 1));
+            int size = layers.getImageLayersCount();
+            setActiveImageLayer(size == 0 ? null : (ImageLayer) layers.get(size - 1));
         }
 
         if (row >= 0)
@@ -233,11 +236,11 @@ public class Layers extends AbstractTableModel implements Reorderable {
     public static void dispose(GL2 gl) {
         layers.forEach(layer -> layer.dispose(gl));
         newLayers = layers;
-        layers = new CompositeList();
+        layers = new LayerList();
     }
 
     public static List<ImageLayer> getImageLayers() {
-        return layers.imageLayers;
+        return Collections.unmodifiableList((List<ImageLayer>) (Object) layers.subList(0, layers.getImageLayersCount()));
     }
 
     public static List<Layer> getLayers() {
@@ -246,7 +249,7 @@ public class Layers extends AbstractTableModel implements Reorderable {
 
     public static void clear() {
         removedLayers.addAll(layers);
-        layers = new CompositeList();
+        layers = new LayerList();
         setActiveImageLayer(null);
     }
 
