@@ -57,9 +57,8 @@ public class State {
         main.put("layers", ja);
 
         JSONArray ji = new JSONArray();
-        for (ImageLayer imageLayer : Layers.getImageLayers()) {
-            ji.put(layer2json(imageLayer, imageLayer == Layers.getActiveImageLayer()));
-        }
+        ImageLayer active = Layers.getActiveImageLayer();
+        Layers.getImageLayers().forEach(layer -> ji.put(layer2json(layer, layer == active)));
         main.put("imageLayers", ji);
 
         saveTimelineState(main);
@@ -130,9 +129,7 @@ public class State {
             }
         }
         Timelines.getLayers().clear();
-        for (TimelineLayer tl : newlist) {
-            Timelines.getLayers().add(tl);
-        }
+        newlist.forEach(layer -> Timelines.getLayers().add(layer));
     }
 
     private static void loadLayers(JSONObject data) {
@@ -240,8 +237,7 @@ public class State {
             if (isCancelled())
                 return;
 
-            for (ImageLayer layer : newlist)
-                layer.unload(); // prune failed layers
+            newlist.forEach(ImageLayer::unload); // prune failed layers
             if (masterLayer != null)
                 Layers.setActiveImageLayer(masterLayer);
             Movie.setTime(time);
