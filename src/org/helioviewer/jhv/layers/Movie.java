@@ -141,7 +141,7 @@ public class Movie {
         Camera camera = Display.getCamera();
         camera.timeChanged(lastTimestamp);
 
-        Layers.getImageLayers().forEach(layer -> layer.getView().setFrame(dateTime));
+        Layers.forEachImageLayer(layer -> layer.getView().setFrame(dateTime));
         MovieDisplay.render(1);
 
         ViewpointLayer viewpointLayer = Layers.getViewpointLayer();

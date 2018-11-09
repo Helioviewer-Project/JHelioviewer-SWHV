@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 import javax.swing.table.AbstractTableModel;
@@ -233,6 +234,11 @@ public class Layers extends AbstractTableModel implements Reorderable {
         layers.forEach(layer -> layer.dispose(gl));
         newLayers = layers;
         layers = new LayerList();
+    }
+
+    public static void forEachImageLayer(Consumer<? super ImageLayer> action) {
+        for (int i = 0; i < layers.imageLayersCount; i++)
+            action.accept((ImageLayer) layers.get(i));
     }
 
     public static List<ImageLayer> getImageLayers() {
