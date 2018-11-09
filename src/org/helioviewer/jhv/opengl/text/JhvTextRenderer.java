@@ -724,10 +724,6 @@ public class JhvTextRenderer {
     }
 
     // Glyph-by-glyph rendering support
-
-    // A temporary to prevent excessive garbage creation
-    final char[] singleUnicode = new char[1];
-
     /**
      * A Glyph represents either a single unicode glyph or a
      * substring of characters to be drawn. The reason for the dual
@@ -747,25 +743,20 @@ public class JhvTextRenderer {
         // If the above field isn't -1, then these fields are used.
         // The glyph code in the font
         private final int glyphCode;
-        // The GlyphProducer which created us
-        private final GlyphProducer producer;
         // The advance of this glyph
         private final float advance;
-        // The GlyphVector for this single character; this is passed
-        // in during construction but cleared during the upload
-        // process
-        private GlyphVector singleUnicodeGlyphVector;
+        // The GlyphVector for this single character
+        private final GlyphVector singleUnicodeGlyphVector;
         // The rectangle of this glyph on the backing store, or null
         // if it has been cleared due to space pressure
         private Rect glyphRectForTextureMapping;
 
         // Creates a Glyph representing an individual Unicode character
-        Glyph(int unicodeID, int glyphCode, float advance, GlyphVector singleUnicodeGlyphVector, GlyphProducer producer) {
+        Glyph(int unicodeID, int glyphCode, float advance, GlyphVector singleUnicodeGlyphVector) {
             this.unicodeID = unicodeID;
             this.glyphCode = glyphCode;
             this.advance = advance;
             this.singleUnicodeGlyphVector = singleUnicodeGlyphVector;
-            this.producer = producer;
         }
 
         // Returns this glyph's unicode ID
@@ -824,7 +815,7 @@ public class JhvTextRenderer {
         }
 
         private void upload() {
-            GlyphVector gv = getGlyphVector();
+            GlyphVector gv = singleUnicodeGlyphVector;
             Rectangle2D origBBox = preNormalize(renderDelegate.getBounds(gv));
             Rectangle2D bbox = normalize(origBBox);
             Point origin = new Point((int) -bbox.getMinX(), (int) -bbox.getMinY());
@@ -857,30 +848,20 @@ public class JhvTextRenderer {
                         rect.w(),
                         rect.h());
             }
-
             // Mark this region of the TextureRenderer as dirty
             getBackingStore().markDirty(rect.x(), rect.y(), rect.w(), rect.h());
-            // Re-register ourselves with our producer
-            producer.register(this);
         }
 
-        private GlyphVector getGlyphVector() {
-            GlyphVector gv = singleUnicodeGlyphVector;
-            if (gv != null) {
-                singleUnicodeGlyphVector = null; // Don't need this anymore
-                return gv;
-            }
-            singleUnicode[0] = (char) unicodeID;
-            return font.createGlyphVector(getFontRenderContext(), singleUnicode);
-        }
     }
 
     class GlyphProducer {
-        static final int undefined = -2;
+        // A temporary to prevent excessive garbage creation
+        private final char[] singleUnicode = new char[1];
+        private static final int undefined = -2;
         // The mapping from unicode character to font-specific glyph ID
-        final int[] unicodes2Glyphs;
+        private final int[] unicodes2Glyphs;
         // The mapping from glyph ID to Glyph
-        final Glyph[] glyphCache;
+        private final Glyph[] glyphCache;
 
         GlyphProducer(int fontLengthInGlyphs) {
             unicodes2Glyphs = new int[512];
@@ -906,7 +887,7 @@ public class JhvTextRenderer {
             }
         }
 
-        void register(Glyph glyph) {
+        private void register(Glyph glyph) {
             unicodes2Glyphs[glyph.getUnicodeID()] = glyph.getGlyphCode();
             glyphCache[glyph.getGlyphCode()] = glyph;
         }
@@ -927,18 +908,13 @@ public class JhvTextRenderer {
 
             // Must fabricate the glyph
             singleUnicode[0] = unicodeID;
-            GlyphVector gv = font.createGlyphVector(getFontRenderContext(), singleUnicode);
-            return getGlyph(unicodeID, gv, glyphMetrics);
-        }
-
-        @Nullable
-        private Glyph getGlyph(int unicodeID, GlyphVector singleUnicodeGlyphVector, GlyphMetrics metrics) {
+            GlyphVector singleUnicodeGlyphVector = font.createGlyphVector(getFontRenderContext(), singleUnicode);
             int glyphCode = singleUnicodeGlyphVector.getGlyphCode(0);
             // Have seen huge glyph codes (65536) coming out of some fonts in some Unicode situations
             if (glyphCode >= glyphCache.length) {
                 return null;
             }
-            Glyph glyph = new Glyph(unicodeID, glyphCode, metrics.getAdvance(), singleUnicodeGlyphVector, this);
+            Glyph glyph = new Glyph(unicodeID, glyphCode, glyphMetrics.getAdvance(), singleUnicodeGlyphVector);
             register(glyph);
             return glyph;
         }
