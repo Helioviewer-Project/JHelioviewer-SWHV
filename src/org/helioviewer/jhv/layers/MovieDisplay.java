@@ -29,10 +29,10 @@ public class MovieDisplay implements JHVEventHighlightListener {
     }
 
     public static void render(double decodeFactor) {
-        if (ImageLayers.getNumEnabled() == 0)
-            display();
-        else
+        if (ImageLayers.areEnabled())
             ImageLayers.decode(decodeFactor);
+        else
+            display();
     }
 
     public static void display() {

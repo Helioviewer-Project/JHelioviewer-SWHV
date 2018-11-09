@@ -21,7 +21,7 @@ public class Layers extends AbstractTableModel implements Reorderable {
 
     private static class LayerList extends ArrayList<Layer> {
 
-        private int imageLayersCount;
+        int imageLayersCount;
 
         @Override
         public void clear() {
@@ -60,10 +60,6 @@ public class Layers extends AbstractTableModel implements Reorderable {
                 return;
             super.add(index, e);
             imageLayersCount++;
-        }
-
-        int getImageLayersCount() {
-            return imageLayersCount;
         }
 
     }
@@ -128,8 +124,8 @@ public class Layers extends AbstractTableModel implements Reorderable {
         removedLayers.add(layer);
 
         if (layer == activeLayer) {
-            int size = layers.getImageLayersCount();
-            setActiveImageLayer(size == 0 ? null : (ImageLayer) layers.get(size - 1));
+            int count = layers.imageLayersCount;
+            setActiveImageLayer(count == 0 ? null : (ImageLayer) layers.get(count - 1));
         }
 
         if (row >= 0)
@@ -240,7 +236,7 @@ public class Layers extends AbstractTableModel implements Reorderable {
     }
 
     public static List<ImageLayer> getImageLayers() {
-        return Collections.unmodifiableList((List<ImageLayer>) (Object) layers.subList(0, layers.getImageLayersCount()));
+        return Collections.unmodifiableList((List<ImageLayer>) (Object) layers.subList(0, layers.imageLayersCount));
     }
 
     public static List<Layer> getLayers() {

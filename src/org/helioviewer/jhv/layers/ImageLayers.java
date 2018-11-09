@@ -23,13 +23,12 @@ import org.astrogrid.samp.SampUtils;
 
 public class ImageLayers {
 
-    static int getNumEnabled() {
-        int ct = 0;
+    static boolean areEnabled() {
         for (ImageLayer layer : Layers.getImageLayers()) {
             if (layer.isEnabled())
-                ct++;
+                return true;
         }
-        return ct;
+        return false;
     }
 
     static void decode(double factor) {
