@@ -205,7 +205,7 @@ public class JhvTextRenderer {
      */
     public Rectangle2D getBounds(String str) {
         // Must return a Rectangle compatible with the layout algorithm - must be idempotent
-        return normalize(renderDelegate.getBounds(str, font, getFontRenderContext()));
+        return normalize(renderDelegate.getBounds(getGlyphVector(str)));
     }
 
     // Returns the Font this renderer is using
@@ -283,12 +283,42 @@ public class JhvTextRenderer {
         draw3D(str, x, y, 0, 1);
     }
 
+    private final HashMap<String, GlyphVector> glyphVectorCache = new HashMap<>();
+
+    private GlyphVector getGlyphVector(String str) {
+        GlyphVector glyphVector = glyphVectorCache.get(str);
+        if (glyphVector == null) {
+            glyphVector = font.createGlyphVector(getFontRenderContext(), new StringCharacterIterator(str));
+            glyphVectorCache.put(str, glyphVector);
+        }
+        return glyphVector;
+    }
+
+    private final HashMap<Character, GlyphMetrics> glyphMetricsCache = new HashMap<>();
+
     /**
      * Draws the supplied String at the desired 3D location using the
      * renderer's current color.
      */
     public void draw3D(String str, float x, float y, float z, float scaleFactor) {
-        internal_draw3D(str, x, y, z, scaleFactor);
+        GlyphVector glyphVector = getGlyphVector(str);
+        int lengthInGlyphs = glyphVector.getNumGlyphs();
+        int i = 0;
+        while (i < lengthInGlyphs) { // may loop forever
+            char unicodeID = str.charAt(i);
+            GlyphMetrics glyphMetrics = glyphMetricsCache.get(unicodeID);
+            if (glyphMetrics == null) {
+                glyphMetrics = glyphVector.getGlyphMetrics(i);
+                glyphMetricsCache.put(unicodeID, glyphMetrics);
+            }
+
+            Glyph glyph = glyphProducer.getGlyph(unicodeID, glyphMetrics);
+            if (glyph != null) {
+                float advance = glyph.draw3D(x, y, z, scaleFactor);
+                x += advance * scaleFactor;
+                i++;
+            }
+        }
     }
 
     /**
@@ -472,35 +502,6 @@ public class JhvTextRenderer {
         }
     }
 
-    private final HashMap<String, GlyphVector> glyphVectorCache = new HashMap<>();
-    private final HashMap<Character, GlyphMetrics> glyphMetricsCache = new HashMap<>();
-
-    private void internal_draw3D(String str, float x, float y, float z, float scaleFactor) {
-        GlyphVector glyphVector = glyphVectorCache.get(str);
-        if (glyphVector == null) {
-            glyphVector = font.createGlyphVector(getFontRenderContext(), new StringCharacterIterator(str));
-            glyphVectorCache.put(str, glyphVector);
-        }
-
-        int lengthInGlyphs = glyphVector.getNumGlyphs();
-        int i = 0;
-        while (i < lengthInGlyphs) { // may loop forever
-            char unicodeID = str.charAt(i);
-            GlyphMetrics glyphMetrics = glyphMetricsCache.get(unicodeID);
-            if (glyphMetrics == null) {
-                glyphMetrics = glyphVector.getGlyphMetrics(i);
-                glyphMetricsCache.put(unicodeID, glyphMetrics);
-            }
-
-            Glyph glyph = glyphProducer.getGlyph(unicodeID, glyphMetrics);
-            if (glyph != null) {
-                float advance = glyph.draw3D(x, y, z, scaleFactor);
-                x += advance * scaleFactor;
-                i++;
-            }
-        }
-    }
-
     /**
      * Class supporting more full control over the process of rendering
      * the bitmapped text. Allows customization of whether the backing
@@ -513,11 +514,6 @@ public class JhvTextRenderer {
      * during the rendering process.
      */
     interface RenderDelegate {
-
-        /**
-         * Computes the bounds of the given string relative to the origin.
-         */
-        Rectangle2D getBounds(String str, Font font, FontRenderContext frc);
 
         /**
          * Computes the bounds of the given GlyphVector, already
@@ -714,11 +710,6 @@ public class JhvTextRenderer {
     }
 
     private static class DefaultRenderDelegate implements RenderDelegate {
-
-        @Override
-        public Rectangle2D getBounds(String str, Font font, FontRenderContext frc) {
-            return getBounds(font.createGlyphVector(frc, new StringCharacterIterator(str)));
-        }
 
         @Override
         public Rectangle2D getBounds(GlyphVector gv) {
