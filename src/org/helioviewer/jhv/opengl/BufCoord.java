@@ -30,13 +30,12 @@ public class BufCoord {
 
     public void putCoord(float x, float y, float z, float w, float c0, float c1) {
         ensure(6);
-        array[length] = x;
-        array[length + 1] = y;
-        array[length + 2] = z;
-        array[length + 3] = w;
-        array[length + 4] = c0;
-        array[length + 5] = c1;
-        length += 6;
+        array[length++] = x;
+        array[length++] = y;
+        array[length++] = z;
+        array[length++] = w;
+        array[length++] = c0;
+        array[length++] = c1;
 
         count++;
     }
