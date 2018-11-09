@@ -58,7 +58,7 @@ public class State {
 
         JSONArray ji = new JSONArray();
         ImageLayer active = Layers.getActiveImageLayer();
-        Layers.getImageLayers().forEach(layer -> ji.put(layer2json(layer, layer == active)));
+        Layers.forEachImageLayer(layer -> ji.put(layer2json(layer, layer == active)));
         main.put("imageLayers", ji);
 
         saveTimelineState(main);
