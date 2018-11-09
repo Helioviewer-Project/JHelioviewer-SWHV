@@ -50,7 +50,7 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphMetrics;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
-import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -187,16 +187,7 @@ public class JhvTextRenderer {
     }
 
     /**
-     * Returns the bounding rectangle of the given String, assuming it
-     * was rendered at the origin. See {@link #getBounds(CharSequence)
-     * getBounds(CharSequence)}.
-     */
-    public Rectangle2D getBounds(String str) {
-        return getBounds((CharSequence) str);
-    }
-
-    /**
-     * Returns the bounding rectangle of the given CharSequence,
+     * Returns the bounding rectangle of the given String,
      * assuming it was rendered at the origin. The coordinate system of
      * the returned rectangle is Java 2D's, with increasing Y
      * coordinates in the downward direction. The relative coordinate
@@ -212,7 +203,7 @@ public class JhvTextRenderer {
      * etc.) the returned bounds correspond to, although every effort
      * is made to ensure an accurate bound.
      */
-    private Rectangle2D getBounds(CharSequence str) {
+    public Rectangle2D getBounds(String str) {
         // Must return a Rectangle compatible with the layout algorithm - must be idempotent
         return normalize(renderDelegate.getBounds(str, font, getFontRenderContext()));
     }
@@ -483,14 +474,12 @@ public class JhvTextRenderer {
 
     private final HashMap<String, GlyphVector> glyphVectorCache = new HashMap<>();
     private final HashMap<Character, GlyphMetrics> glyphMetricsCache = new HashMap<>();
-    private final CharSequenceIterator iter = new CharSequenceIterator();
 
-    private void internal_draw3D(CharSequence str, float x, float y, float z, float scaleFactor) {
-        GlyphVector glyphVector = glyphVectorCache.get(str.toString());
+    private void internal_draw3D(String str, float x, float y, float z, float scaleFactor) {
+        GlyphVector glyphVector = glyphVectorCache.get(str);
         if (glyphVector == null) {
-            iter.initFromCharSequence(str);
-            glyphVector = font.createGlyphVector(getFontRenderContext(), iter);
-            glyphVectorCache.put(str.toString(), glyphVector);
+            glyphVector = font.createGlyphVector(getFontRenderContext(), new StringCharacterIterator(str));
+            glyphVectorCache.put(str, glyphVector);
         }
 
         int lengthInGlyphs = glyphVector.getNumGlyphs();
@@ -526,10 +515,9 @@ public class JhvTextRenderer {
     interface RenderDelegate {
 
         /**
-         * Computes the bounds of the given character sequence relative
-         * to the origin.
+         * Computes the bounds of the given string relative to the origin.
          */
-        Rectangle2D getBounds(CharSequence str, Font font, FontRenderContext frc);
+        Rectangle2D getBounds(String str, Font font, FontRenderContext frc);
 
         /**
          * Computes the bounds of the given GlyphVector, already
@@ -553,88 +541,6 @@ public class JhvTextRenderer {
          * particular those states which are not the defaults.
          */
         void drawGlyphVector(Graphics2D graphics, GlyphVector str, int x, int y);
-    }
-
-    private static class CharSequenceIterator implements CharacterIterator {
-        CharSequence mSequence;
-        int mLength;
-        int mCurrentIndex;
-
-        CharSequenceIterator() {
-        }
-
-        CharSequenceIterator(CharSequence sequence) {
-            initFromCharSequence(sequence);
-        }
-
-        void initFromCharSequence(CharSequence sequence) {
-            mSequence = sequence;
-            mLength = mSequence.length();
-            mCurrentIndex = 0;
-        }
-
-        @Override
-        public char last() {
-            mCurrentIndex = Math.max(0, mLength - 1);
-            return current();
-        }
-
-        @Override
-        public char current() {
-            if ((mLength == 0) || (mCurrentIndex >= mLength)) {
-                return CharacterIterator.DONE;
-            }
-            return mSequence.charAt(mCurrentIndex);
-        }
-
-        @Override
-        public char next() {
-            mCurrentIndex++;
-            return current();
-        }
-
-        @Override
-        public char previous() {
-            mCurrentIndex = Math.max(mCurrentIndex - 1, 0);
-            return current();
-        }
-
-        @Override
-        public char setIndex(int position) {
-            mCurrentIndex = position;
-            return current();
-        }
-
-        @Override
-        public int getBeginIndex() {
-            return 0;
-        }
-
-        @Override
-        public int getEndIndex() {
-            return mLength;
-        }
-
-        @Override
-        public int getIndex() {
-            return mCurrentIndex;
-        }
-
-        @Override
-        public CharSequenceIterator clone() {
-            CharSequenceIterator iter = new CharSequenceIterator(mSequence);
-            iter.mCurrentIndex = mCurrentIndex;
-            return iter;
-        }
-
-        @Override
-        public char first() {
-            if (mLength == 0) {
-                return CharacterIterator.DONE;
-            }
-            mCurrentIndex = 0;
-            return current();
-        }
     }
 
     // Data associated with each rectangle of text
@@ -810,8 +716,8 @@ public class JhvTextRenderer {
     private static class DefaultRenderDelegate implements RenderDelegate {
 
         @Override
-        public Rectangle2D getBounds(CharSequence str, Font font, FontRenderContext frc) {
-            return getBounds(font.createGlyphVector(frc, new CharSequenceIterator(str)));
+        public Rectangle2D getBounds(String str, Font font, FontRenderContext frc) {
+            return getBounds(font.createGlyphVector(frc, new StringCharacterIterator(str)));
         }
 
         @Override
