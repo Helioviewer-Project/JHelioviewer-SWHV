@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.layers;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
@@ -162,12 +162,13 @@ public class Movie {
             notDone = true;
     }
 
-    private static final HashSet<FrameListener> frameListeners = new HashSet<>();
-    private static final HashSet<TimeListener> timeListeners = new HashSet<>();
-    private static final HashSet<TimespanListener> timespanListeners = new HashSet<>();
+    private static final ArrayList<FrameListener> frameListeners = new ArrayList<>();
+    private static final ArrayList<TimeListener> timeListeners = new ArrayList<>();
+    private static final ArrayList<TimespanListener> timespanListeners = new ArrayList<>();
 
     public static void addFrameListener(FrameListener listener) {
-        frameListeners.add(listener);
+        if (!frameListeners.contains(listener))
+            frameListeners.add(listener);
     }
 
     public static void removeFrameListener(FrameListener listener) {
@@ -175,7 +176,8 @@ public class Movie {
     }
 
     public static void addTimeListener(TimeListener listener) {
-        timeListeners.add(listener);
+        if (!timeListeners.contains(listener))
+            timeListeners.add(listener);
     }
 
     public static void removeTimeListener(TimeListener listener) {
@@ -183,7 +185,8 @@ public class Movie {
     }
 
     public static void addTimespanListener(TimespanListener listener) {
-        timespanListeners.add(listener);
+        if (!timespanListeners.contains(listener))
+            timespanListeners.add(listener);
     }
 
     public static void removeTimespanListener(TimespanListener listener) {

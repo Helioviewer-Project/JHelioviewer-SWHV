@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.gui;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 
 import javax.swing.Timer;
 
@@ -10,19 +10,16 @@ import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 
 public class UITimer {
 
-    private static final HashSet<LazyComponent> lazyComponents = new HashSet<>();
+    private static final ArrayList<LazyComponent> lazyComponents = new ArrayList<>();
     public static final BusyIndicator busyIndicator = new BusyIndicator();
 
     public static void start() {
         new Timer(1000 / 10, e -> action()).start();
     }
 
-    public static void register(LazyComponent lazy) {
-        lazyComponents.add(lazy);
-    }
-
-    public static void unregister(LazyComponent lazy) {
-        lazyComponents.remove(lazy);
+    public static void register(LazyComponent component) {
+        if (!lazyComponents.contains(component))
+            lazyComponents.add(component);
     }
 
     private static volatile boolean cacheChanged = false;

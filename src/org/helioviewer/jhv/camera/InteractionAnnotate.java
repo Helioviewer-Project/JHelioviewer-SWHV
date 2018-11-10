@@ -75,8 +75,9 @@ public class InteractionAnnotate extends Interaction {
         Annotateable activeAnn = activeIndex >= 0 && activeIndex < anns.size() ? anns.get(activeIndex) : null;
 
         anns.forEach(annotateable -> {
-            annotateable.draw(viewpoint, vp, annotateable == activeAnn, annsBuf);
-            annotateable.drawTransformed(annotateable == activeAnn, transBuf, centerBuf);
+            boolean active = annotateable == activeAnn;
+            annotateable.draw(viewpoint, vp, active, annsBuf);
+            annotateable.drawTransformed(active, transBuf, centerBuf);
         });
         if (newAnnotateable != null) {
             newAnnotateable.draw(viewpoint, vp, false, annsBuf);

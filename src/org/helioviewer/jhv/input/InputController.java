@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.input;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 
 import javax.swing.KeyStroke;
 
@@ -95,13 +95,13 @@ public class InputController implements MouseListener, KeyListener {
         keyListeners.forEach(listener -> listener.keyReleased(e));
     }
 
-    private final HashSet<MouseListener> mouseListeners = new HashSet<>();
-    private final HashSet<KeyListener> keyListeners = new HashSet<>();
+    private final ArrayList<MouseListener> mouseListeners = new ArrayList<>();
+    private final ArrayList<KeyListener> keyListeners = new ArrayList<>();
 
     public void addPlugin(Object plugin) {
-        if (plugin instanceof MouseListener)
+        if (plugin instanceof MouseListener && !mouseListeners.contains(plugin))
             mouseListeners.add((MouseListener) plugin);
-        if (plugin instanceof KeyListener)
+        if (plugin instanceof KeyListener && !keyListeners.contains(plugin))
             keyListeners.add((KeyListener) plugin);
     }
 

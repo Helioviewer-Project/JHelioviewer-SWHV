@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.io;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
@@ -98,14 +98,11 @@ public class DataSources {
         serverSettings.keySet().forEach(serverName -> JHVGlobals.getExecutorService().execute(new DataSourcesTask(serverName, validator)));
     }
 
-    private static final HashSet<DataSourcesListener> listeners = new HashSet<>();
+    private static final ArrayList<DataSourcesListener> listeners = new ArrayList<>();
 
     public static void addListener(DataSourcesListener listener) {
-        listeners.add(listener);
-    }
-
-    public static void removeListener(DataSourcesListener listener) {
-        listeners.remove(listener);
+        if (!listeners.contains(listener))
+            listeners.add(listener);
     }
 
     static void setupSources(DataSourcesParser parser) {

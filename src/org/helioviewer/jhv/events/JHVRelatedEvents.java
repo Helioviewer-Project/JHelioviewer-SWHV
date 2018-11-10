@@ -3,7 +3,6 @@ package org.helioviewer.jhv.events;
 import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -18,7 +17,7 @@ import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 
 public class JHVRelatedEvents implements ClickableDrawable {
 
-    private static final HashSet<JHVEventHighlightListener> listeners = new HashSet<>();
+    private static final ArrayList<JHVEventHighlightListener> listeners = new ArrayList<>();
 
     private final ArrayList<JHVEvent> events = new ArrayList<>();
     private final ArrayList<JHVAssociation> associations = new ArrayList<>();
@@ -84,12 +83,13 @@ public class JHVRelatedEvents implements ClickableDrawable {
         }
     }
 
-    public static void addHighlightListener(JHVEventHighlightListener l) {
-        listeners.add(l);
+    public static void addHighlightListener(JHVEventHighlightListener listener) {
+        if (!listeners.contains(listener))
+            listeners.add(listener);
     }
 
-    public static void removeHighlightListener(JHVEventHighlightListener l) {
-        listeners.remove(l);
+    public static void removeHighlightListener(JHVEventHighlightListener listener) {
+        listeners.remove(listener);
     }
 
     public boolean isHighlighted() {

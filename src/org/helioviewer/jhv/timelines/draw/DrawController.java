@@ -3,7 +3,7 @@ package org.helioviewer.jhv.timelines.draw;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.util.HashSet;
+import java.util.ArrayList;
 
 import javax.swing.Timer;
 
@@ -27,7 +27,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     public static final TimeAxis availableAxis = new TimeAxis(0, 0);
 
     private static final DrawControllerOptionsPanel optionsPanel = new DrawControllerOptionsPanel();
-    private static final HashSet<DrawListener> listeners = new HashSet<>();
+    private static final ArrayList<DrawListener> listeners = new ArrayList<>();
 
     private static Rectangle graphArea = new Rectangle();
     private static Rectangle graphSize = new Rectangle();
@@ -71,11 +71,8 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     }
 
     public static void addDrawListener(DrawListener listener) {
-        listeners.add(listener);
-    }
-
-    public static void removeDrawListener(DrawListener listener) {
-        listeners.remove(listener);
+        if (!listeners.contains(listener))
+            listeners.add(listener);
     }
 
     public static void setSelectedInterval(long start, long end) {

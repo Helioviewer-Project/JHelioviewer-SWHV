@@ -33,7 +33,7 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener {
     public EventPanel(SWEKGroup _group) {
         group = _group;
         setLayout(new BorderLayout());
-        SWEKTreeModel.addSWEKTreeModelListener(this);
+        SWEKTreeModel.addListener(this);
 
         JTree eventTypeTree = new JTree(new EventPanelModel(group));
         eventTypeTree.setEditable(true);

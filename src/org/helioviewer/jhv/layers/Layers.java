@@ -2,7 +2,6 @@ package org.helioviewer.jhv.layers;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -78,7 +77,7 @@ public class Layers extends AbstractTableModel implements Reorderable {
 
     private static LayerList layers = new LayerList();
     private static LayerList newLayers = new LayerList();
-    private static final HashSet<Layer> removedLayers = new HashSet<>();
+    private static final ArrayList<Layer> removedLayers = new ArrayList<>();
 
     private static GridLayer gridLayer;
     private static ViewpointLayer viewpointLayer;

@@ -2,7 +2,6 @@ package org.helioviewer.jhv.events.gui.filter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -13,14 +12,11 @@ import org.helioviewer.jhv.events.SWEKSupplier;
 public class FilterManager {
 
     private static final Map<SWEKSupplier, Map<SWEKParameter, List<SWEKParam>>> filters = new HashMap<>();
-    private static final HashSet<FilterManagerListener> listeners = new HashSet<>();
+    private static final ArrayList<FilterManagerListener> listeners = new ArrayList<>();
 
-    public static void addFilterManagerListener(FilterManagerListener listener) {
-        listeners.add(listener);
-    }
-
-    public static void removeFilterManagerListener(FilterManagerListener listener) {
-        listeners.remove(listener);
+    public static void addListener(FilterManagerListener listener) {
+        if (!listeners.contains(listener))
+            listeners.add(listener);
     }
 
     static void addFilter(SWEKSupplier supplier, SWEKParameter parameter, SWEKParam filter) {

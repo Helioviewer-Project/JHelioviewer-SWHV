@@ -1,19 +1,16 @@
 package org.helioviewer.jhv.events.gui;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 
 import org.helioviewer.jhv.events.SWEKGroup;
 
 public class SWEKTreeModel {
 
-    private static final HashSet<SWEKTreeModelListener> listeners = new HashSet<>();
+    private static final ArrayList<SWEKTreeModelListener> listeners = new ArrayList<>();
 
-    public static void addSWEKTreeModelListener(SWEKTreeModelListener swekTreeModelListener) {
-        listeners.add(swekTreeModelListener);
-    }
-
-    public static void removeSWEKTreeModelListener(SWEKTreeModelListener swekTreeModelListener) {
-        listeners.remove(swekTreeModelListener);
+    static void addListener(SWEKTreeModelListener listener) {
+        if (!listeners.contains(listener))
+            listeners.add(listener);
     }
 
     public static void setStartLoading(SWEKGroup group) {

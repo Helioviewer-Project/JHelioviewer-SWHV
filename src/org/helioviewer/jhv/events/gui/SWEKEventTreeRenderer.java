@@ -95,7 +95,7 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
 
         private final FilterDialog filterDialog;
 
-        public FilterMouseAdapter(FilterDialog _filterDialog) {
+        FilterMouseAdapter(FilterDialog _filterDialog) {
             filterDialog = _filterDialog;
         }
 
