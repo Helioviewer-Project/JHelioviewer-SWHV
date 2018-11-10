@@ -9,24 +9,7 @@ import org.helioviewer.jhv.gui.JHVFrame;
 public class MovieDisplay implements JHVEventHighlightListener {
 
     private static final MovieDisplay instance = new MovieDisplay();
-    private static final Timer movieTimer = new Timer(1000 / 20, e -> Movie.advanceFrame());
     private static Timer displayTimer;
-
-    static boolean isPlaying() {
-        return movieTimer.isRunning();
-    }
-
-    static void play() {
-        movieTimer.restart();
-    }
-
-    static void pause() {
-        movieTimer.stop();
-    }
-
-    static void setFPS(int fps) {
-        movieTimer.setDelay(1000 / fps);
-    }
 
     public static void render(double decodeFactor) {
         if (ImageLayers.areEnabled())

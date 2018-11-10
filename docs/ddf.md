@@ -770,7 +770,7 @@ The program is structured in a manner that is amenable to performance. The princ
 
 The program is driven via two timers:
 
-- `MovieDisplay` beats at a configurable frequency (default 20 Hz) and commands the setting of the program time (i.e., frame advance);
+- `Movie` beats at a configurable frequency (default 20 Hz) and commands the setting of the program time (i.e., frame advance);
 - `UITimer` beats at constant 10 Hz and commands the refresh of the Swing UI components that need to change together with the movie frame; additionally, it commands the refresh of the timeline canvas.
 
 Various parts of the program can request to refresh the image canvas and a balance has to be found between avoiding excessive redraws and avoiding CPU wake-ups when idle. `Interaction` and `MovieDisplay` contain supplemental timers which are started on-demand and are used to limit the rate of user-induced decoding and redraw requests.
