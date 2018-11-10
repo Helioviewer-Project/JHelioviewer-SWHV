@@ -1,21 +1,18 @@
 package org.helioviewer.jhv.events.gui.info;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 
 class DataCollapsiblePanelModel {
 
-    private final HashSet<DataCollapsiblePanelModelListener> listeners = new HashSet<>();
+    private final ArrayList<DataCollapsiblePanelModelListener> listeners = new ArrayList<>();
+
+    void addListener(DataCollapsiblePanelModelListener listener) {
+        if (!listeners.contains(listener))
+            listeners.add(listener);
+    }
 
     void repackCollapsiblePanels() {
         listeners.forEach(DataCollapsiblePanelModelListener::repack);
-    }
-
-    void addListener(DataCollapsiblePanelModelListener listener) {
-        listeners.add(listener);
-    }
-
-    void removeListener(DataCollapsiblePanelModelListener listener) {
-        listeners.remove(listener);
     }
 
 }

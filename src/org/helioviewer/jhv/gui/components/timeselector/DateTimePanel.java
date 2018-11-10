@@ -5,7 +5,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashSet;
+import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -18,7 +18,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 @SuppressWarnings("serial")
 class DateTimePanel extends JPanel implements ActionListener, JHVCalendarListener {
 
-    private final HashSet<ActionListener> listeners = new HashSet<>();
+    private final ArrayList<ActionListener> listeners = new ArrayList<>();
     private final JHVCalendarDatePicker datePicker = new JHVCalendarDatePicker();
     private final TimeTextField timePicker = new TimeTextField();
 
@@ -52,12 +52,9 @@ class DateTimePanel extends JPanel implements ActionListener, JHVCalendarListene
         timePicker.setText(TimeUtils.formatTime(TimeUtils.floorSec(time)));
     }
 
-    void addListener(ActionListener l) {
-        listeners.add(l);
-    }
-
-    void removeListener(ActionListener l) {
-        listeners.remove(l);
+    void addListener(ActionListener listener) {
+        if (!listeners.contains(listener))
+            listeners.add(listener);
     }
 
     @Override

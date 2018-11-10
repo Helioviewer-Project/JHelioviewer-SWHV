@@ -36,7 +36,7 @@ public class SWEKDownloadManager implements FilterManagerListener {
     private static final SWEKDownloadManager instance = new SWEKDownloadManager();
 
     private SWEKDownloadManager() {
-        FilterManager.addFilterManagerListener(this);
+        FilterManager.addListener(this);
     }
 
     private static void stopDownloadSupplier(SWEKSupplier supplier, boolean keepActive) {

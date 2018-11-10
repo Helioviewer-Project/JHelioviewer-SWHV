@@ -8,7 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.HashSet;
+import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
@@ -35,7 +35,7 @@ class JHVCalendar extends JPanel {
         DAYS, MONTHS, YEARS
     }
 
-    private final HashSet<JHVCalendarListener> listeners = new HashSet<>();
+    private final ArrayList<JHVCalendarListener> listeners = new ArrayList<>();
     private final NavigationPanel navigationPanel = new NavigationPanel();
     private final SelectionPanel selectionPanel = new SelectionPanel();
 
@@ -104,12 +104,9 @@ class JHVCalendar extends JPanel {
         return TimeUtils.floorDay(calendarViewController.getTime());
     }
 
-    public void addJHVCalendarListener(JHVCalendarListener l) {
-        listeners.add(l);
-    }
-
-    public void removeJHVCalendarListener(JHVCalendarListener l) {
-        listeners.remove(l);
+    public void addJHVCalendarListener(JHVCalendarListener listener) {
+        if (!listeners.contains(listener))
+            listeners.add(listener);
     }
 
     // Informs all listener of this class by passing the corresponding event
