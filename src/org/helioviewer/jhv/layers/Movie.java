@@ -2,6 +2,8 @@ package org.helioviewer.jhv.layers;
 
 import java.util.ArrayList;
 
+import javax.swing.Timer;
+
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.MoviePanel;
@@ -59,8 +61,9 @@ public class Movie {
     }
 
     private static int deltaT;
+    private static final Timer movieTimer = new Timer(1000 / 20, e -> advanceFrame());
 
-    static void advanceFrame() {
+    private static void advanceFrame() {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
             JHVDate nextTime = layer.getView().getNextTime(animationMode, deltaT);
@@ -72,19 +75,19 @@ public class Movie {
     }
 
     public static boolean isPlaying() {
-        return MovieDisplay.isPlaying();
+        return movieTimer.isRunning();
     }
 
     public static void play() {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null && layer.getView().isMultiFrame()) {
-            MovieDisplay.play();
+            movieTimer.restart();
             MoviePanel.setPlayState(true);
         }
     }
 
     public static void pause() {
-        MovieDisplay.pause();
+        movieTimer.stop();
         MoviePanel.setPlayState(false);
         MovieDisplay.render(1); /* ! force update for on the fly resolution change */
     }
@@ -194,12 +197,12 @@ public class Movie {
     }
 
     public static void setDesiredRelativeSpeed(int fps) {
-        MovieDisplay.setFPS(fps);
+        movieTimer.setDelay(1000 / fps);
         deltaT = 0;
     }
 
     public static void setDesiredAbsoluteSpeed(int sec) {
-        MovieDisplay.setFPS(20);
+        movieTimer.setDelay(1000 / 20);
         deltaT = 1000 / 20 * sec;
     }
 
