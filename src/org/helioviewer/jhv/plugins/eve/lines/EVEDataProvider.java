@@ -20,7 +20,6 @@ public class EVEDataProvider implements BandDataProvider {
     private static final HashMap<Band, List<Interval>> downloadMap = new HashMap<>();
     private static final HashMap<Band, List<Future<?>>> futureJobs = new HashMap<>();
 
-    @Override
     public void loadBand(JSONObject jo) {
         EVEPlugin.executorService.submit(new LoadThread(jo));
     }
