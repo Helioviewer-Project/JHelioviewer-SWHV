@@ -75,9 +75,4 @@ public class StatusPanel extends JPanel {
         rightPanel.add(spacer, 0);
     }
 
-    public void removePlugin(StatusPlugin oldPlugin) {
-        leftPanel.remove(oldPlugin);
-        rightPanel.remove(oldPlugin);
-    }
-
 }

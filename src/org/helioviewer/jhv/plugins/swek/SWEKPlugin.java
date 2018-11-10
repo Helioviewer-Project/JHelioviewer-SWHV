@@ -16,7 +16,7 @@ public class SWEKPlugin implements Plugin {
     private static final JPanel swekPanel = new JPanel();
 
     private static final SWEKLayer layer = new SWEKLayer(null);
-    private static final EventTimelineLayer etl = new EventTimelineLayer(null);
+    private static final EventTimelineLayer etl = new EventTimelineLayer();
 
     public SWEKPlugin() {
         swekPanel.setLayout(new BoxLayout(swekPanel, BoxLayout.PAGE_AXIS));
