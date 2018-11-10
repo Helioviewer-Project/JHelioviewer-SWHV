@@ -27,7 +27,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 @SuppressWarnings("serial")
 public class JHVCalendarDatePicker extends JPanel {
 
-    private final ArrayList<JHVCalendarListener> listeners = new ArrayList<>();
+    private final ArrayList<CalendarListener> listeners = new ArrayList<>();
     private final Calendar calendar = new GregorianCalendar();
 
     private final JHVCalendar jhvCalendar = new JHVCalendar();
@@ -75,17 +75,16 @@ public class JHVCalendarDatePicker extends JPanel {
 
         jhvCalendar.setPreferredSize(jhvCalendar.getMinimumSize());
         jhvCalendar.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        jhvCalendar.addJHVCalendarListener(e -> hideCalPopup());
+        jhvCalendar.addCalendarListener(this::hideCalPopup);
     }
 
-    public void addJHVCalendarListener(JHVCalendarListener listener) {
+    public void addCalendarListener(CalendarListener listener) {
         if (!listeners.contains(listener))
             listeners.add(listener);
     }
 
-    private void informAllJHVCalendarListeners() {
-        JHVCalendarEvent e = new JHVCalendarEvent(this);
-        listeners.forEach(listener -> listener.actionPerformed(e));
+    private void informCalendarListeners() {
+        listeners.forEach(CalendarListener::calendarAction);
     }
 
     private void setDateFromTextField(boolean propagate) {
@@ -95,12 +94,12 @@ public class JHVCalendarDatePicker extends JPanel {
             setTextField();
         }
         if (propagate)
-            informAllJHVCalendarListeners();
+            informCalendarListeners();
     }
 
     private void setDateFromCalendar() {
         setTime(jhvCalendar.getTime());
-        informAllJHVCalendarListeners();
+        informCalendarListeners();
     }
 
     // Opens an new popup window where the user can select a date

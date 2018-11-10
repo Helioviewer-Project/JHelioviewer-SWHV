@@ -21,7 +21,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 @SuppressWarnings("serial")
 public class JHVCarringtonPicker extends JHVButton implements PopupMenuListener {
 
-    private final ArrayList<JHVCalendarListener> listeners = new ArrayList<>();
+    private final ArrayList<CalendarListener> listeners = new ArrayList<>();
     private final JPopupMenu popup = new JPopupMenu();
     private final MenuScroller scroller = new MenuScroller(popup, 15, 100);
 
@@ -67,14 +67,14 @@ public class JHVCarringtonPicker extends JHVButton implements PopupMenuListener 
     public void popupMenuCanceled(PopupMenuEvent e) {
     }
 
-    public void addJHVCalendarListener(JHVCalendarListener listener) {
+    public void addCalendarListener(CalendarListener listener) {
         if (!listeners.contains(listener))
             listeners.add(listener);
     }
 
     private void setTimeFromCarrington(long _time) {
         setTime(_time);
-        informAllJHVCalendarListeners();
+        informCalendarListeners();
     }
 
     public void setTime(long _time) {
@@ -87,9 +87,8 @@ public class JHVCarringtonPicker extends JHVButton implements PopupMenuListener 
         return time;
     }
 
-    private void informAllJHVCalendarListeners() {
-        JHVCalendarEvent e = new JHVCalendarEvent(this);
-        listeners.forEach(listener -> listener.actionPerformed(e));
+    private void informCalendarListeners() {
+        listeners.forEach(CalendarListener::calendarAction);
     }
 
 }

@@ -10,13 +10,12 @@ import java.util.ArrayList;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.helioviewer.jhv.gui.components.calendar.CalendarListener;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
-import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
-import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
-class DateTimePanel extends JPanel implements ActionListener, JHVCalendarListener {
+class DateTimePanel extends JPanel implements ActionListener, CalendarListener {
 
     private final ArrayList<ActionListener> listeners = new ArrayList<>();
     private final JHVCalendarDatePicker datePicker = new JHVCalendarDatePicker();
@@ -39,7 +38,7 @@ class DateTimePanel extends JPanel implements ActionListener, JHVCalendarListene
         c.gridx = 2;
         add(timePicker, c);
 
-        datePicker.addJHVCalendarListener(this);
+        datePicker.addCalendarListener(this);
         timePicker.addActionListener(this);
     }
 
@@ -63,7 +62,7 @@ class DateTimePanel extends JPanel implements ActionListener, JHVCalendarListene
     }
 
     @Override
-    public void actionPerformed(JHVCalendarEvent e) {
+    public void calendarAction() {
         actionPerformed(new ActionEvent(this, 0, null));
     }
 
