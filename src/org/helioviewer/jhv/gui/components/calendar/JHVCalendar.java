@@ -35,7 +35,7 @@ class JHVCalendar extends JPanel {
         DAYS, MONTHS, YEARS
     }
 
-    private final ArrayList<JHVCalendarListener> listeners = new ArrayList<>();
+    private final ArrayList<CalendarListener> listeners = new ArrayList<>();
     private final NavigationPanel navigationPanel = new NavigationPanel();
     private final SelectionPanel selectionPanel = new SelectionPanel();
 
@@ -58,11 +58,7 @@ class JHVCalendar extends JPanel {
         selectionPanel.resizeTableColumnWidth();
     }
 
-    /**
-     * Changes the view and the corresponding controller.
-     *
-     * @param newMode Defines which view has to be displayed.
-     */
+    // Changes the view and the corresponding controller
     private void changeDisplayMode(DisplayMode newMode) {
         // memorize the selected time
         long time = calendarViewController.getTime();
@@ -104,21 +100,18 @@ class JHVCalendar extends JPanel {
         return TimeUtils.floorDay(calendarViewController.getTime());
     }
 
-    public void addJHVCalendarListener(JHVCalendarListener listener) {
+    public void addCalendarListener(CalendarListener listener) {
         if (!listeners.contains(listener))
             listeners.add(listener);
     }
 
-    // Informs all listener of this class by passing the corresponding event
-    private void informAllJHVCalendarListeners() {
-        JHVCalendarEvent e = new JHVCalendarEvent(this);
-        listeners.forEach(listener -> listener.actionPerformed(e));
+    // Informs all listeners of this class by passing the corresponding event
+    private void informCalendarListeners() {
+        listeners.forEach(CalendarListener::calendarAction);
     }
 
-    /**
-     * Panel which acts as a container for the navigation buttons on the top of
-     * the calendar component.
-     */
+    // Panel which acts as a container for the navigation buttons on the top of
+    // the calendar component
     private class NavigationPanel extends JPanel implements ActionListener {
 
         private final JHVButton quickForwardButton = new JHVButton(">>");
@@ -152,18 +145,12 @@ class JHVCalendar extends JPanel {
             selectButton.addActionListener(this);
         }
 
-        /**
-         * Sets the text of the button which changes the view.
-         *
-         * @param text text to display on the button.
-         */
+        // Sets the text of the button which changes the view
         void setSelectButtonText(String text) {
             selectButton.setText(text);
         }
 
-        /**
-         * Action event for all the buttons of this component.
-         */
+        // Action event for all the buttons of this component
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == forwardButton) {
@@ -270,7 +257,7 @@ class JHVCalendar extends JPanel {
                                 updateDateDisplay();
                                 break;
                             case DAYS:
-                                informAllJHVCalendarListeners();
+                                informCalendarListeners();
                                 break;
                         }
                     }
