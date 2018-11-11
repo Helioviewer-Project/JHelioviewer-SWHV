@@ -34,7 +34,7 @@ public class JHVCarringtonPicker extends JHVButton implements PopupMenuListener 
         ButtonGroup group = new ButtonGroup();
         for (int i = 0; i < Carrington.CR_start.length; i++) {
             JRadioButtonMenuItem item = new JRadioButtonMenuItem(Integer.toString(i + Carrington.CR_MINIMAL));
-            item.addActionListener(e -> setTimeFromCarrington(Carrington.CR_start[Integer.valueOf(item.getText()) - Carrington.CR_MINIMAL]));
+            item.addActionListener(e -> setTimeFromCarrington(Carrington.CR_start[Integer.parseInt(item.getText()) - Carrington.CR_MINIMAL]));
             group.add(item);
             popup.add(item);
         }
