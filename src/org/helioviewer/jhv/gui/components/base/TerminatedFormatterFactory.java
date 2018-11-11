@@ -50,7 +50,7 @@ public class TerminatedFormatterFactory extends AbstractFormatterFactory {
                     string = string.substring(0, t);
 
                 try {
-                    value = Double.valueOf(string);
+                    value = Double.parseDouble(string);
                 } catch (Exception e) {
                     throw new ParseException("Could not parse number: " + string, 0);
                 }
