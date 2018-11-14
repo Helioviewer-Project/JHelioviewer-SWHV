@@ -8,6 +8,7 @@ geometry: margin=1in
 papersize: A4
 book: true
 toc: true
+lof: true
 colorlinks: true
 mainfont: "Source Serif Pro"
 romanfont: "Source Serif Pro"
@@ -26,7 +27,8 @@ logo-width: 40
 
 `id: \exec{git hash-object \file}`
 
-[architecture]: jhv_architecture.pdf
+[hv_architecture]: hv_architecture.pdf
+[swhv_architecture]: swhv_architecture.pdf
 [traceability]: wp_traceability.pdf
 
 [^jpylyzer]: <https://github.com/openpreserve/jpylyzer>
@@ -83,7 +85,7 @@ Chapter 7 presents a traceability matrix for the tasks, as well as the assigned 
 
 The following figure depicts the architecture of the Helioviewer system as installed on the ROB server. For the purpose of this project, the focus is on the interaction between the JHelioviewer client and the Helioviewer server.
 
-![Helioviewer system architecture][architecture]
+![Helioviewer system architecture][hv_architecture]
 
 ## Server Infrastructure ##
 
@@ -765,6 +767,10 @@ WCS metadata is used to place image data at the correct viewpoint (time and posi
 # JHelioviewer Design #
 
 In contrast to the 32k lines of code to implement all its many features, the core JHelioviewer design is very simple and can probably be expressed in a couple of thousands of lines of code.
+
+The following figure presents an outline of the JHelioviewer architecture.
+
+![JHelioviewer architecture outline][swhv_architecture]
 
 The program is structured in a manner that is amenable to performance. The principle of separation of concerns is applied throughout. Objects are asked to update themselves, they proceed to do so independently, and they report back when done. To remain responsive while performing long lasting network and computation operations, the program uses threads, caches, and high performance algorithms and data structures. There are essentially no locks and few data structures are accessed from concurrent threads.
 
