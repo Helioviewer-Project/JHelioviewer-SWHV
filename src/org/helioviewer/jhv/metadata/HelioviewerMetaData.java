@@ -189,18 +189,10 @@ public class HelioviewerMetaData extends BaseMetaData {
     }
 
     private JHVDate retrieveDateTime(MetaDataContainer m) {
-        String observedDate;
-        // DATE-OBS unusable for MDI and early EIT
-        if (instrument.equals("MDI") || instrument.equals("EIT")) {
-            observedDate = m.getRequiredString("DATE_OBS");
-        } else {
-            observedDate = m.getString("DATE-OBS").orElse(null);
-            if (observedDate == null) {
-                observedDate = m.getRequiredString("DATE_OBS");
-                if (instrument.equals("LASCO")) {
-                    observedDate = observedDate.replace('/', '-') + 'T' + m.getRequiredString("TIME_OBS");
-                }
-            }
+        String observedDate = m.getString("DATE_OBS").orElseGet(() -> m.getRequiredString("DATE-OBS")); // DATE-OBS unusable for MDI and early EIT
+        if (instrument.equals("LASCO")) {
+            String observedTime = m.getString("TIME_OBS").orElseGet(() -> m.getRequiredString("TIME-OBS"));
+            observedDate = observedDate.replace('/', '-') + 'T' + observedTime;
         }
         return new JHVDate(observedDate.substring(0, 19)); // truncate
     }
