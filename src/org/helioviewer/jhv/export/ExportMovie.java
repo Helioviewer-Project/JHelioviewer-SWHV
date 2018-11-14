@@ -25,6 +25,9 @@ import com.jogamp.opengl.GL2;
 
 public class ExportMovie implements FrameListener {
 
+    private static final ExportMovie instance = new ExportMovie();
+    private static final ExecutorService encodeExecutor = Executors.newSingleThreadExecutor(new JHVThread.NamedThreadFactory("Movie Encode"));
+
     private static MovieExporter exporter;
     private static GLGrab grabber;
 
@@ -32,12 +35,10 @@ public class ExportMovie implements FrameListener {
     private static boolean stopped;
     private static boolean shallStop;
 
-    private final ExecutorService encodeExecutor = Executors.newSingleThreadExecutor(new JHVThread.NamedThreadFactory("Movie Encode"));
-
     public static BufferedImage EVEImage = null;
     public static int EVEMovieLinePosition = -1;
 
-    public void disposeMovieWriter(boolean keep) {
+    public static void disposeMovieWriter(boolean keep) {
         if (exporter != null) {
             if (keep) {
                 encodeExecutor.execute(new CloseWriter(exporter, true));
@@ -52,6 +53,9 @@ public class ExportMovie implements FrameListener {
     private void exportMovieFinish(GL2 gl) {
         JHVFrame.getGLListener().detachExport();
         MoviePanel.setEnabledOptions(true);
+        if (mode == RecordMode.LOOP) {
+            Movie.removeFrameListener(instance);
+        }
 
         try {
             grabber.dispose(gl);
@@ -140,13 +144,10 @@ public class ExportMovie implements FrameListener {
         if (!stopped) {
             stopped = true;
 
-            if (mode == RecordMode.LOOP)
-                Movie.removeFrameListener(instance);
             if (mode != RecordMode.FREE)
                 MoviePanel.clickRecordButton();
             MovieDisplay.display(); // force detach
         }
-
         Movie.stopRecording();
     }
 
@@ -220,13 +221,7 @@ public class ExportMovie implements FrameListener {
         }
     }
 
-    private static final ExportMovie instance = new ExportMovie();
-
     private ExportMovie() {
-    }
-
-    public static ExportMovie getInstance() {
-        return instance;
     }
 
 }
