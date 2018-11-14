@@ -87,15 +87,31 @@ public class MoviePanel extends JPanel implements ObservationSelector {
     }
 
     private enum RecordSize {
-        H2160 {
+        ORIGINAL {
             @Override
             public String toString() {
-                return "4096×4096";
+                return "On screen";
             }
 
             @Override
             protected Dimension getSize() {
-                return new Dimension(4096, 4096);
+                return GLHelper.GL2AWTDimension(Display.fullViewport.width, Display.fullViewport.height);
+            }
+
+            @Override
+            protected boolean isInternal() {
+                return false;
+            }
+        },
+        H1024 {
+            @Override
+            public String toString() {
+                return "1024×1024";
+            }
+
+            @Override
+            protected Dimension getSize() {
+                return new Dimension(1024, 1024);
             }
 
             @Override
@@ -119,36 +135,20 @@ public class MoviePanel extends JPanel implements ObservationSelector {
                 return true;
             }
         },
-        H1024 {
+        H4096 {
             @Override
             public String toString() {
-                return "1024×1024";
+                return "4096×4096";
             }
 
             @Override
             protected Dimension getSize() {
-                return new Dimension(1024, 1024);
+                return new Dimension(4096, 4096);
             }
 
             @Override
             protected boolean isInternal() {
                 return true;
-            }
-        },
-        ORIGINAL {
-            @Override
-            public String toString() {
-                return "On screen";
-            }
-
-            @Override
-            protected Dimension getSize() {
-                return GLHelper.GL2AWTDimension(Display.fullViewport.width, Display.fullViewport.height);
-            }
-
-            @Override
-            protected boolean isInternal() {
-                return false;
             }
         };
 
@@ -347,7 +347,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         c.gridx = 2;
         recordPanel.add(new JLabel("Size", JLabel.RIGHT), c);
 
-        JComboBox<RecordSize> recordSizeCombo = new JComboBox<>(new RecordSize[]{RecordSize.ORIGINAL, RecordSize.H1024, RecordSize.H1080, RecordSize.H2160});
+        JComboBox<RecordSize> recordSizeCombo = new JComboBox<>(RecordSize.values());
         recordSizeCombo.setSelectedItem(RecordSize.ORIGINAL);
         recordSizeCombo.addActionListener(e -> recordButton.setRecordSize((RecordSize) Objects.requireNonNull(recordSizeCombo.getSelectedItem())));
         c.gridx = 3;
