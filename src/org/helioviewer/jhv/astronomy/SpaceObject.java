@@ -43,7 +43,7 @@ public class SpaceObject {
             put("SDO", new SpaceObject("SDO", "SDO", 2 / Sun.RadiusMeter, Colors.White, JHVTableCellRenderer.cellEmphasisBorder)).
 
             put("Solar Orbiter", new SpaceObject("Solar%20Orbiter", "Solar Orbiter", 2 / Sun.RadiusMeter, Colors.White, JHVTableCellRenderer.cellBorder)).
-            put("Parker Solar Probe", new SpaceObject("SPP", "Parker Solar Probe", 2 / Sun.RadiusMeter, Colors.White, JHVTableCellRenderer.cellBorder)).
+            put("Parker Solar Probe", new SpaceObject("PSP", "Parker Solar Probe", 2 / Sun.RadiusMeter, Colors.White, JHVTableCellRenderer.cellBorder)).
             put("PROBA-3", new SpaceObject("PROBA3", "PROBA-3", 2 / Sun.RadiusMeter, Colors.White, JHVTableCellRenderer.cellBorder)).
             build();
 
