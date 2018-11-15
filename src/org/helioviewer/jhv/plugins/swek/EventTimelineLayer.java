@@ -34,7 +34,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
     private final YAxis yAxis = new YAxis(0, 0, new YAxisIdentityScale("Events"));
     private static EventPlotConfiguration eventUnderMouse;
 
-    public EventTimelineLayer() {
+    public EventTimelineLayer(JSONObject jo) { // arg for state
         cacheUpdated();
     }
 
