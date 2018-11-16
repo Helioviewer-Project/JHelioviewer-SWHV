@@ -36,17 +36,17 @@ class TimeTextField extends JTextField {
     }
 
     long getTime() {
-        String[] parts = getText().split(":", 3);
-
-        String h = fix(parts[0], 23);
-        String m = "00";
-        String s = "00";
-        if (parts.length > 1)
-            m = fix(parts[1], 59);
-        if (parts.length > 2)
-            s = fix(parts[2], 59);
-
         try {
+            String[] parts = getText().split(":", 3);
+            String h = fix(parts[0], 23);
+            String m = "00";
+            String s = "00";
+
+            if (parts.length > 1)
+                m = fix(parts[1], 59);
+            if (parts.length > 2)
+                s = fix(parts[2], 59);
+
             return TimeUtils.parseTime(String.join(":", h, m, s));
         } catch (Exception e) {
             return 0;
