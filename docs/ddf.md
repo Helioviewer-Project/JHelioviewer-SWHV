@@ -3,7 +3,7 @@ title: SWHV CCN2 Design Document
 subtitle: ROB-SWHV(7186)-DDF2 v1.4
 author: SWHV Team
 subject: Space Weather HelioViewer
-date: 2018-11-21
+date: 2018-11-16
 geometry: margin=1in
 papersize: A4
 book: true
@@ -58,7 +58,7 @@ logo-width: 40
 +------------+--------------------------------------------------------------------+
 | 2018-10-17 | Version 1.3 (Complete the sections about CCN2 work)                |
 +------------+--------------------------------------------------------------------+
-| 2018-11-21 | Version 1.4 (Complete JHV design notes for FAR)                    |
+| 2018-11-16 | Version 1.4 (Complete JHV design notes for FAR)                    |
 +------------+--------------------------------------------------------------------+
 
 ## Purpose & Scope
@@ -77,7 +77,7 @@ This document (SWHV-DDF2) is the design study report of the work performed durin
 
 In the following JHelioviewer and SWHV are used interchangeably. They refer to the Java client of the Helioviewer system available at <https://github.com/Helioviewer-Project/JHelioviewer-SWHV> and subject of this project. The term JHV3D refers to a similar software, outcome of SRE-SM/JHV3 "Time-Dependent 3-D Visualisation of Solar Data" project, available at <https://github.com/Helioviewer-Project/JHelioviewer>. A big part of the work performed during the CCN2 phase was merging of ideas from JHV3D into SWHV.
 
-The current system architecture is presented in Chapter 3, the interfaces of the JHelioviewer client are presented in Chapter 4, the current design of JHelioviewer is presented in Chapter 5, while the Chapter 6 presents the identified tasks for the CCN2 phase.
+The current system architecture is presented in Chapter 3, the interfaces of the JHelioviewer client are presented in Chapter 4, the current design of JHelioviewer is presented in Chapter 5, while the Chapter 6 presents the identified tasks for the CCN2 phase, together with the work performed and its rationale.
 
 Chapter 7 presents a traceability matrix for the tasks, as well as the assigned priority and the milestone for delivery. Features already delivered will be subjected to refinement and refactoring as new functionality becomes available in the client-server system.
 
@@ -255,7 +255,7 @@ A similar API was implemented for the COMESEP alert caching server.
 
 ## GeometryService API ##
 
-The `GeometryService` is a REST network service which can return JSON and MessagePack (<https://msgpack.org>) encoded responses. For example, given the following request:
+The `GeometryService` is a REST network service for solar system geometry computations based on the SPICE (<https://naif.jpl.nasa.gov/naif/>), SpiceyPy (<https://github.com/AndrewAnnex/SpiceyPy/>), and Spyne (<http://spyne.io/>) toolkits. It can return JSON and MessagePack (<https://msgpack.org>) encoded responses. For example, given the following request:
 
 ```
 http://swhv.oma.be/position?
@@ -311,7 +311,7 @@ This service is used to support the Viewpoint functionality of JHelioviewer.
 
 ## PropagationService API ##
 
-The `PropagationService` is a REST network service which returns JSON encoded responses. It is currently just a mock-up and handles only the case of radial propagation with a fixed speed. It uses the `GeometryService`.
+The `PropagationService` is a REST network service which returns JSON encoded responses. It is currently just a mock-up and handles only the case of radial propagation with a fixed speed. It uses the `GeometryService` and is built using the Spyne toolkit (<http://spyne.io>).
 
 The following function is implemented:
 
@@ -789,7 +789,7 @@ Distances are expressed in units of solar radii (photometric, Allen). This is fo
 
 Orientation is expressed in latitudinal form (latitude, longitude in radian) with respect to a Carrington reference frame for ease of expression of rotations as quaternions. Computations of rotations are performed using quaternions for performance and numerical stability reasons. The interaction with OpenGL is done using matrices since, besides rotation, it involves projection and translation.
 
-Together with a timestamp, the distance to Sun and the orientation constitute the fundamental concept of `Viewpoint`. One important viewpoint is Earth's. This is computed using an algorithm translated from the SolarSoft `get_sun` function (derived from Meuus, "Astronomy with a PC", ed. 2, tbc).
+Together with a timestamp, the distance to Sun and the orientation constitute the fundamental concept of `Viewpoint`. One important viewpoint is Earth's. This is computed using an algorithm translated from the SolarSoft `get_sun` function (derived from Meuus, "Astronomical Formulae for Calculators").
 
 Viewpoints can be computed at various timestamps using the `UpdateViewpoint`. Several forms are provided:
 
@@ -1004,15 +1004,15 @@ The following tasks were identified:
 
 1.  **(SWHV-CCN2-20300-01)** Consolidate user requirements, taking inputs from instrument teams such as EUI and STIX and the Solar Orbiter Science Operations Working Group (SOWG).
 
-This is implemented by the draft Solar Orbiter User Requirements Document (ROB-SWHV-URD2) to be updated for the end of the project.
+This is implemented by the accompanying Solar Orbiter User Requirements Document (ROB-SWHV-URD2 v1.0).
 
 2.  **(SWHV-CCN2-20300-02)** Publish ROB ephemeris server on Helioviewer GitHub and collaborate with Solar Orbiter MADAWG for maintaining a coherent data (kernel) tree.
 
-This is implemented by the `GeometryService`.
+This is implemented by the `GeometryService` (<https://github.com/Helioviewer-Project/GeometryService>).
 
 3.  **(SWHV-CCN2-20300-03)** Build propagation server incorporating several propagation models, enabling correlation of in-situ data with remote sensing data.
 
-This is implemented by the `PropagationService`, a mock-up RPC server built on the Spyne toolkit (<http://spyne.io>, the same as the `GeometryService` service).
+This is implemented by the `PropagationService` (<https://github.com/Helioviewer-Project/PropagationService>).
 
 4.  **(SWHV-CCN2-20300-04)** Test with and integrate ACE, DSCOVR or other current in-situ datasets identified as relevant today for space weather forecasters.
 
@@ -1030,7 +1030,7 @@ Therefore, the displayed time-scale has the following meaning:
 * when speed is 0, the time of the timelines panel (black time) is disconnected from image layers time → time is UTC at an undefined location (most likely Earth);
 * when speed is not 0, timelines panel time (black time) is the time determined by the image layers viewpoint, there is an additional speed-of-light propagation from Sun to the viewpoint → time is UTC at the viewpoint (according to viewpoint settings, may be different from Earth).
 
-Several DSCOVR in-situ timeline datasets were integrated. They were identified as highest priority for the space weather forecasters. The added datasets are the interplanetary magnetic field Bz, Bt, and Phi and the solar wind density, radial speed, and temperature.
+Several DSCOVR in-situ timeline datasets identified as highest priority for the space weather forecasters were integrated. The added datasets are the interplanetary magnetic field `Bz`, `Bt`, and `Phi` and the solar wind density, radial speed, and temperature.
 
 5.  **(SWHV-CCN2-20300-05)** Plot the sub-spacecraft point on the solar surface (both radially and w.r.t. magnetic connectivity, i.e., Parker spiral).
 
