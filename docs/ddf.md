@@ -907,7 +907,7 @@ Re-implementing the JPIP protocol on top of the high-level `OkHTTP3` library app
 
 **T2. Helioviewer v2 API (SWHV-CCN2-20100-02)**
 
-Both SWHV and JHV3D implement the version 2 of the Helioviewer API. The `getClosestToMidpoint` API call was added for the benefit of JHV3D request of data, and this call is linked to the JHV3D approach for the acquisition of data. It shall be studied if the approach is beneficial for SWHV and thus if this API is useful for SWHV. This has ramifications with regard to playback and JPEG2000 caching. The `esajpip` server was modified to allow multiple ranges of frame requests in a single JPIP request, which may be a possible substitute.
+Both SWHV and JHV3D implement the version 2 of the Helioviewer API. The `getClosestToMidpoint` API call was added for the benefit of JHV3D request of data, and this call is linked to the JHV3D approach for the acquisition of data. It is not certain that this approach is beneficial for SWHV and thus if this API is useful for SWHV. This has ramifications with regard to playback and JPEG2000 caching. The `esajpip` server was modified to allow multiple ranges of frame requests in a single JPIP request, which may be a possible substitute.
 
 SWHV supports both versions of API and has implemented the validation of server responses against a JSON schema. This functionality is also available as a separate standalone program (<https://github.com/Helioviewer-Project/DataSourcesChecker>).
 
