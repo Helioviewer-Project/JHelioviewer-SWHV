@@ -8,19 +8,20 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.Nonnull;
+//import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.log.Log;
+//import org.helioviewer.jhv.log.Log;
 
 import okhttp3.Cache;
 import okhttp3.CacheControl;
 import okhttp3.HttpUrl;
-import okhttp3.Interceptor;
+//import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+//import okhttp3.logging.HttpLoggingInterceptor;
 import okio.BufferedSource;
 
 class NetClientRemote implements NetClient {
@@ -29,12 +30,15 @@ class NetClientRemote implements NetClient {
         Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
     }
 
+    //private static final HttpLoggingInterceptor logging = new HttpLoggingInterceptor(Log::info).setLevel(HttpLoggingInterceptor.Level.HEADERS);
+
     private static final int cacheSize = 512 * 1024 * 1024;
     private static final CacheControl noStore = new CacheControl.Builder().noStore().build();
     private static final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(JHVGlobals.getConnectTimeout(), TimeUnit.MILLISECONDS)
             .readTimeout(JHVGlobals.getReadTimeout(), TimeUnit.MILLISECONDS)
             .cache(new Cache(JHVGlobals.clientCacheDir, cacheSize))
+            //.addInterceptor(logging)
             //.addInterceptor(new LoggingInterceptor())
             .build();
 
@@ -99,8 +103,9 @@ class NetClientRemote implements NetClient {
             responseBody.close();
         }
     }
-
+/*
     private static class LoggingInterceptor implements Interceptor {
+        @Nonnull
         @Override
         public Response intercept(@Nonnull Chain chain) throws IOException {
             long t1 = System.nanoTime();
@@ -109,10 +114,14 @@ class NetClientRemote implements NetClient {
 
             Response r2 = chain.proceed(r1);
             long t2 = System.nanoTime();
-            Log.info(String.format("Received response for %s in %.1fms%n%s", r1.url(), (t2 - t1) / 1e6d, r2.networkResponse().headers()));
+            Log.info(String.format("Received response for %s in %.1fms", r1.url(), (t2 - t1) / 1e6d));
+
+            Response r3 = r2.networkResponse();
+            if (r3 != null)
+                Log.info(String.format("Network headers %s:\n%s", r1.url(), r3.headers()));
 
             return r2;
         }
     }
-
+*/
 }
