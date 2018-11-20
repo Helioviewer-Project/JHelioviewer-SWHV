@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui.dialogs;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
 import java.nio.charset.StandardCharsets;
@@ -11,7 +12,6 @@ import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -19,6 +19,7 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.XMLUtils;
 import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.components.base.HTMLPane;
 import org.helioviewer.jhv.gui.components.base.WrappedTable;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -42,19 +43,14 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
     private final JButton exportFitsButton = new JButton("Export FITS Header as XML");
 
     private final WrappedTable fitsTable = new WrappedTable();
-    private final JTextArea basicArea = new JTextArea();
-    private final JTextArea hvArea = new JTextArea();
+    private final HTMLPane basicArea = new HTMLPane();
+    private final HTMLPane hvArea = new HTMLPane();
 
     public MetaDataDialog() {
         super(JHVFrame.getFrame(), "Image Information");
 
         setInitFocusedComponent(fitsTable);
         SearchableUtils.installSearchable(fitsTable);
-
-        basicArea.setEditable(false);
-        hvArea.setEditable(false);
-        hvArea.setLineWrap(true);
-        hvArea.setWrapStyleWord(true);
 
         content.add(new JScrollPane(basicArea));
         content.add(new JScrollPane(fitsTable));
@@ -96,22 +92,17 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
     @Override
     public void showDialog() {
         pack();
-        content.setDividerLocation(1, 600);
         setLocationRelativeTo(JHVFrame.getFrame());
         setVisible(true);
     }
 
     public void setMetaData(ImageLayer layer) {
         hvArea.setText("");
+        hvArea.setPreferredSize(new Dimension(400, 100));
         lastNodeSeen = null;
         exportFitsButton.setEnabled(false);
 
-        DefaultTableModel fitsModel = new DefaultTableModel(new Object[0][0], new Object[]{"FITS Keyword", "Value"}) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
+        FitsModel fitsModel = new FitsModel();
         fitsTable.setModel(fitsModel);
         fitsTable.setRowSorter(new TableRowSorter<>(fitsModel));
         fitsTable.getColumnModel().getColumn(1).setCellRenderer(new WrappedTable.WrappedTextRenderer());
@@ -123,12 +114,11 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         }
 
         HelioviewerMetaData m = (HelioviewerMetaData) metaData;
-        basicArea.setText("Observatory: " + m.getObservatory() + '\n' +
-                "Instrument: " + m.getInstrument() + '\n' +
-                "Detector: " + m.getDetector() + '\n' +
-                "Measurement: " + m.getMeasurement() + '\n' +
+        basicArea.setText("Observatory: " + m.getObservatory() + "<br/>" +
+                "Instrument: " + m.getInstrument() + "<br/>" +
+                "Detector: " + m.getDetector() + "<br/>" +
+                "Measurement: " + m.getMeasurement() + "<br/>" +
                 "Observation Date: " + m.getViewpoint().time);
-        basicArea.setCaretPosition(0);
 
         try {
             String xml = layer.getView().getXMLMetaData();
@@ -143,7 +133,6 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
             if (root != null)
                 readXMLData(fitsModel, hvSB, root);
             hvArea.setText(hvSB.toString().trim());
-            hvArea.setCaretPosition(0);
 
             String outFileName = JHVDirectory.EXPORTS.getPath() + m.getFullName().replace(' ', '_') + "__" + TimeUtils.formatFilename(m.getViewpoint().time.milli) + ".fits.xml";
             exportFitsButton.setEnabled(true);
@@ -159,6 +148,24 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private static class FitsModel extends DefaultTableModel {
+
+        FitsModel() {
+            super(new String[0][0], new String[]{"FITS Keyword", "Value"});
+        }
+
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+
+        @Override
+        public Class<?> getColumnClass(int column) {
+            return String.class;
+        }
+
     }
 
     private String lastNodeSeen;
@@ -177,7 +184,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
                 if ("fits".equals(lastNodeSeen))
                     fitsModel.addRow(new Object[]{nodeName, nodeValue});
                 else
-                    hvSB.append(nodeName).append(": ").append(nodeValue).append('\n');
+                    hvSB.append(nodeName).append(": ").append(nodeValue).append("<br/>");
                 break;
         }
 

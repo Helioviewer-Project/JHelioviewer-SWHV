@@ -205,7 +205,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
                 pass = null;
             }
 
-            Object[][] tableData = {
+            String[][] tableData = {
                     {"Proxy username", Settings.getProperty("proxy.username")},
                     {"Proxy password", pass},
             };
