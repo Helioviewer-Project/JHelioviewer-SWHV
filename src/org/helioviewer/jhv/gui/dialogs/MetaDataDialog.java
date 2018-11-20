@@ -43,11 +43,16 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
     private final JButton exportFitsButton = new JButton("Export FITS Header as XML");
 
     private final WrappedTable fitsTable = new WrappedTable();
+    private final FitsModel fitsModel = new FitsModel();
     private final HTMLPane basicArea = new HTMLPane();
     private final HTMLPane hvArea = new HTMLPane();
 
     public MetaDataDialog() {
         super(JHVFrame.getFrame(), "Image Information");
+
+        fitsTable.setModel(fitsModel);
+        fitsTable.setRowSorter(new TableRowSorter<>(fitsModel));
+        fitsTable.getColumnModel().getColumn(1).setCellRenderer(new WrappedTable.WrappedTextRenderer());
 
         setInitFocusedComponent(fitsTable);
         SearchableUtils.installSearchable(fitsTable);
@@ -97,15 +102,11 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
     }
 
     public void setMetaData(ImageLayer layer) {
+        fitsModel.setRowCount(0);
         hvArea.setText("");
         hvArea.setPreferredSize(new Dimension(400, 100));
         lastNodeSeen = null;
         exportFitsButton.setEnabled(false);
-
-        FitsModel fitsModel = new FitsModel();
-        fitsTable.setModel(fitsModel);
-        fitsTable.setRowSorter(new TableRowSorter<>(fitsModel));
-        fitsTable.getColumnModel().getColumn(1).setCellRenderer(new WrappedTable.WrappedTextRenderer());
 
         MetaData metaData = layer.getMetaData();
         if (!(metaData instanceof HelioviewerMetaData)) {
@@ -128,10 +129,11 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
             StringBuilder hvSB = new StringBuilder();
             Node root = doc.getDocumentElement().getElementsByTagName("fits").item(0);
             if (root != null)
-                readXMLData(fitsModel, hvSB, root);
+                readXMLData(hvSB, root);
             root = doc.getDocumentElement().getElementsByTagName("helioviewer").item(0);
             if (root != null)
-                readXMLData(fitsModel, hvSB, root);
+                readXMLData(hvSB, root);
+            fitsTable.updateRowHeights();
             hvArea.setText(hvSB.toString().trim());
 
             String outFileName = JHVDirectory.EXPORTS.getPath() + m.getFullName().replace(' ', '_') + "__" + TimeUtils.formatFilename(m.getViewpoint().time.milli) + ".fits.xml";
@@ -170,7 +172,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
 
     private String lastNodeSeen;
 
-    private void readXMLData(DefaultTableModel fitsModel, StringBuilder hvSB, Node node) {
+    private void readXMLData(StringBuilder hvSB, Node node) {
         // get element name and value
         String nodeName = node.getNodeName();
         String nodeValue = getElementValue(node);
@@ -182,7 +184,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
                 break;
             default:
                 if ("fits".equals(lastNodeSeen))
-                    fitsModel.addRow(new Object[]{nodeName, nodeValue});
+                    fitsModel.addRow(new String[]{nodeName, nodeValue});
                 else
                     hvSB.append(nodeName).append(": ").append(nodeValue).append("<br/>");
                 break;
@@ -194,7 +196,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         for (int i = 0; i < len; i++) {
             Node child = children.item(i);
             if (child.getNodeType() == Node.ELEMENT_NODE) {
-                readXMLData(fitsModel, hvSB, child);
+                readXMLData(hvSB, child);
             }
         }
     }
