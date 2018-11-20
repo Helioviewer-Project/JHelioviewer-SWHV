@@ -22,7 +22,7 @@ public class WrappedTable extends JTable {
     //     updateRowHeights();
     // }
 
-    private void updateRowHeights() {
+    public void updateRowHeights() {
         int rows = getRowCount();
         for (int i = 0; i < rows; i++) {
             Component comp = prepareRenderer(getCellRenderer(i, 1), i, 1);
