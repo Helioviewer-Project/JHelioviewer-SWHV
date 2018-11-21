@@ -4,16 +4,13 @@ import javax.swing.JMenuItem;
 
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.plugins.Plugin;
-import org.helioviewer.jhv.plugins.eve.lines.EVEDataProvider;
 import org.helioviewer.jhv.timelines.Timelines;
-import org.helioviewer.jhv.timelines.band.BandTypeTask;
+import org.helioviewer.jhv.timelines.band.BandDataProvider;
 import org.helioviewer.jhv.timelines.gui.NewLayerAction;
 import org.helioviewer.jhv.timelines.gui.OpenLocalFileAction;
 import org.json.JSONObject;
 
 public class EVEPlugin implements Plugin {
-
-    public static final EVEDataProvider eveDataprovider = new EVEDataProvider();
 
     private final Timelines tl = new Timelines();
     private final JMenuItem newItem = new JMenuItem(new NewLayerAction());
@@ -22,7 +19,7 @@ public class EVEPlugin implements Plugin {
     @Override
     public void installPlugin() {
         tl.installTimelines();
-        EVEDataProvider.executorService.execute(new BandTypeTask());
+        BandDataProvider.loadBandTypes();
         JHVFrame.getMenuBar().getMenu(0).add(newItem, 1);
         JHVFrame.getMenuBar().getMenu(0).add(openItem, 3);
     }

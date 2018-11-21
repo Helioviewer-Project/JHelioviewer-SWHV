@@ -13,7 +13,6 @@ import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.interval.RequestCache;
 import org.helioviewer.jhv.opengl.GLInfo;
-import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -26,7 +25,6 @@ import org.json.JSONObject;
 
 public class Band extends AbstractTimelineLayer {
 
-    private static final BandDataProvider dataProvider = EVEPlugin.eveDataprovider;
     private static final int SUPER_SAMPLE = 1; // 8 for dots
 
     private final BandType bandType;
@@ -123,7 +121,7 @@ public class Band extends AbstractTimelineLayer {
 
     @Override
     public void remove() {
-        dataProvider.stopDownloads(this);
+        BandDataProvider.stopDownloads(this);
         BandColors.resetColor(graphColor);
     }
 
@@ -144,7 +142,7 @@ public class Band extends AbstractTimelineLayer {
 
     @Override
     public boolean isDownloading() {
-        return dataProvider.isDownloadActive(this);
+        return BandDataProvider.isDownloadActive(this);
     }
 
     @Override
@@ -247,7 +245,7 @@ public class Band extends AbstractTimelineLayer {
     public void fetchData(TimeAxis timeAxis) {
         long start = propagationModel.getObservationTime(timeAxis.start());
         long end = propagationModel.getObservationTime(timeAxis.end());
-        dataProvider.updateBand(this, start, end);
+        BandDataProvider.updateBand(this, start, end);
         updateGraphsData();
     }
 
