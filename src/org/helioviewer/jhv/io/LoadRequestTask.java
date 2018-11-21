@@ -8,7 +8,7 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
-import org.helioviewer.jhv.plugins.eve.EVEPlugin;
+import org.helioviewer.jhv.plugins.eve.lines.EVEDataProvider;
 import org.helioviewer.jhv.threads.EventDispatchQueue;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.json.JSONArray;
@@ -44,7 +44,7 @@ class LoadRequestTask extends JHVWorker<Void, Void> {
             if (jt != null) {
                 len = jt.length();
                 for (int i = 0; i < len; i++) {
-                    EVEPlugin.eveDataprovider.loadBand(jt.getJSONObject(i));
+                    EVEDataProvider.loadBand(jt.getJSONObject(i));
                 }
             }
         } catch (Exception e) {
