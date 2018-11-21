@@ -38,7 +38,7 @@ public class JHVGlobals {
 
     public static final AlphanumComparator alphanumComparator = new AlphanumComparator(true);
 
-    private static final ExecutorService executorService = JHVExecutor.createJHVWorkersExecutorService("MAIN", 10);
+    private static final ExecutorService executorService = JHVExecutor.createJHVWorkersExecutorService("MAIN", 12);
     private static final ScheduledExecutorService reaperService = JHVExecutor.createReaperService();
 
     public static ExecutorService getExecutorService() {

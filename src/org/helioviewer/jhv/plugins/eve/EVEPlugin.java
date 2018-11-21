@@ -1,13 +1,10 @@
 package org.helioviewer.jhv.plugins.eve;
 
-import java.util.concurrent.ExecutorService;
-
 import javax.swing.JMenuItem;
 
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.plugins.eve.lines.EVEDataProvider;
-import org.helioviewer.jhv.threads.JHVExecutor;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.band.BandTypeTask;
 import org.helioviewer.jhv.timelines.gui.NewLayerAction;
@@ -16,8 +13,6 @@ import org.json.JSONObject;
 
 public class EVEPlugin implements Plugin {
 
-    private static final int MAX_WORKER_THREADS = 12;
-    public static final ExecutorService executorService = JHVExecutor.createJHVWorkersExecutorService("EVE", MAX_WORKER_THREADS);
     public static final EVEDataProvider eveDataprovider = new EVEDataProvider();
 
     private final Timelines tl = new Timelines();
@@ -27,7 +22,7 @@ public class EVEPlugin implements Plugin {
     @Override
     public void installPlugin() {
         tl.installTimelines();
-        executorService.execute(new BandTypeTask());
+        EVEDataProvider.executorService.execute(new BandTypeTask());
         JHVFrame.getMenuBar().getMenu(0).add(newItem, 1);
         JHVFrame.getMenuBar().getMenu(0).add(openItem, 3);
     }
