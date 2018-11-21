@@ -1,26 +1,24 @@
-package org.helioviewer.jhv.plugins.eve.lines;
+package org.helioviewer.jhv.timelines.band;
 
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.timelines.Timelines;
-import org.helioviewer.jhv.timelines.band.Band;
-import org.helioviewer.jhv.timelines.band.BandType;
 import org.json.JSONObject;
 
-class LoadThread extends JHVWorker<EVEResponse, Void> {
+class BandLoadTask extends JHVWorker<BandResponse, Void> {
 
     private final JSONObject jo;
 
-    LoadThread(JSONObject _jo) {
+    BandLoadTask(JSONObject _jo) {
         jo = _jo;
     }
 
     @Nullable
     @Override
-    protected EVEResponse backgroundWork() {
+    protected BandResponse backgroundWork() {
         try {
-            return new EVEResponse(jo);
+            return new BandResponse(jo);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -31,7 +29,7 @@ class LoadThread extends JHVWorker<EVEResponse, Void> {
     protected void done() {
         if (!isCancelled()) {
             try {
-                EVEResponse r = get();
+                BandResponse r = get();
                 if (r != null) {
                     Band band = new Band(r.bandType == null ? BandType.getBandType(r.bandName) : r.bandType);
                     band.addToCache(r.values, r.dates);

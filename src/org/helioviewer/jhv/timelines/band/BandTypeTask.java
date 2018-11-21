@@ -8,7 +8,7 @@ import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.TimelineSettings;
 
-public class BandTypeTask extends JHVWorker<Void, Void> {
+class BandTypeTask extends JHVWorker<Void, Void> {
 
     public BandTypeTask() {
         setThreadName("EVE--LoadSources");

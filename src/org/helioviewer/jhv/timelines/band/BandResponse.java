@@ -1,17 +1,16 @@
-package org.helioviewer.jhv.plugins.eve.lines;
+package org.helioviewer.jhv.timelines.band;
 
-import org.helioviewer.jhv.timelines.band.BandType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-class EVEResponse {
+class BandResponse {
 
     final String bandName;
     final BandType bandType;
     final long[] dates;
     final float[] values;
 
-    EVEResponse(JSONObject jo) {
+    BandResponse(JSONObject jo) {
         JSONObject bo = jo.optJSONObject("bandType");
         bandType = bo == null ? null : new BandType(bo);
         bandName = jo.optString("timeline", "");
