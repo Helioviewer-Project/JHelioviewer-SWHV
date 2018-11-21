@@ -3,10 +3,11 @@ package org.helioviewer.jhv.plugins.eve.lines;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.plugins.eve.EVEPlugin;
+import org.helioviewer.jhv.threads.JHVExecutor;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.band.Band;
@@ -16,12 +17,13 @@ import org.json.JSONObject;
 public class EVEDataProvider implements BandDataProvider {
 
     private static final int DOWNLOADER_MAX_DAYS_PER_BLOCK = 21;
+    public static final ExecutorService executorService = JHVExecutor.createJHVWorkersExecutorService("EVE", 12);
 
     private static final HashMap<Band, List<Interval>> downloadMap = new HashMap<>();
     private static final HashMap<Band, List<Future<?>>> futureJobs = new HashMap<>();
 
     public static void loadBand(JSONObject jo) {
-        EVEPlugin.executorService.submit(new LoadThread(jo));
+        executorService.submit(new LoadThread(jo));
     }
 
     @Override
@@ -50,7 +52,7 @@ public class EVEDataProvider implements BandDataProvider {
         List<Future<?>> fl = futureJobs.computeIfAbsent(band, k -> new ArrayList<>(size));
         for (Interval interval : intervals) {
             dl.add(interval);
-            fl.add(EVEPlugin.executorService.submit(new DownloadThread(band, interval)));
+            fl.add(executorService.submit(new DownloadThread(band, interval)));
         }
     }
 

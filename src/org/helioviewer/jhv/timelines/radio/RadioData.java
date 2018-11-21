@@ -13,11 +13,11 @@ import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.log.Log;
-import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
@@ -88,7 +88,7 @@ public class RadioData extends AbstractTimelineLayer {
         for (int i = 0; i < DAYS_IN_CACHE; i++) {
             long date = end - i * TimeUtils.DAY_IN_MILLIS;
             if (cache.getIfPresent(date) == null) {
-                EVEPlugin.executorService.execute(new RadioJPXDownload(date));
+                JHVGlobals.getExecutorService().execute(new RadioJPXDownload(date));
             }
         }
     }
