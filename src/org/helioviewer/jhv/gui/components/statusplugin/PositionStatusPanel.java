@@ -55,7 +55,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
                 double d = camera.getViewpoint().distance;
                 double px = (180 / Math.PI) * Math.atan2(v.x, d);
                 double py = (180 / Math.PI) * Math.atan2(v.y, d);
-                double pa = MathUtils.mapTo0To360((180 / Math.PI) * Math.atan2(v.y, v.x) - (camera.getUpdateViewpoint() != UpdateViewpoint.equatorial ? 90 : 0)); // w.r.t. axis
+                double pa = MathUtils.mapTo0To360((180 / Math.PI) * Math.atan2(v.y, v.x) - (camera.getUpdateViewpoint() == UpdateViewpoint.equatorial ? 0 : 90)); // w.r.t. axis
 
                 ImageLayer layer = Layers.getActiveImageLayer();
                 ImageData id;

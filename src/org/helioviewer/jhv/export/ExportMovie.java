@@ -50,7 +50,7 @@ public class ExportMovie implements FrameListener {
         }
     }
 
-    private void exportMovieFinish(GL2 gl) {
+    private static void exportMovieFinish(GL2 gl) {
         JHVFrame.getGLListener().detachExport();
         MoviePanel.setEnabledOptions(true);
         if (mode == RecordMode.LOOP) {
@@ -65,7 +65,7 @@ public class ExportMovie implements FrameListener {
         }
     }
 
-    public void handleMovieExport(Camera camera, GL2 gl) {
+    public static void handleMovieExport(Camera camera, GL2 gl) {
         if (stopped) {
             exportMovieFinish(gl);
             return;

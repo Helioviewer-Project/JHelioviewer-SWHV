@@ -182,7 +182,7 @@ public class GLListener implements GLEventListener {
         Camera camera = Display.getCamera();
 
         if (exporter != null)
-            exporter.handleMovieExport(camera, gl);
+            ExportMovie.handleMovieExport(camera, gl);
 
         if (Display.mode == Display.DisplayMode.Orthographic) {
             renderScene(camera, gl);

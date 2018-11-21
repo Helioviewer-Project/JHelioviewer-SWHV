@@ -390,11 +390,7 @@ public class MenuScroller {
      * @see #keepVisible(int)
      */
     public void keepVisible(JMenuItem item) {
-        if (item == null) {
-            keepVisibleIndex = -1;
-        } else {
-            keepVisibleIndex = menu.getComponentIndex(item);
-        }
+        keepVisibleIndex = item == null ? -1 : menu.getComponentIndex(item);
     }
 
     /**
