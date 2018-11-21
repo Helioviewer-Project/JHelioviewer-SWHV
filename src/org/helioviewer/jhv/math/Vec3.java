@@ -26,7 +26,7 @@ public class Vec3 {
         z = 0;
     }
 
-    public final void add(Vec3 vec) {
+    public void add(Vec3 vec) {
         x += vec.x;
         y += vec.y;
         z += vec.z;
@@ -44,7 +44,7 @@ public class Vec3 {
         return new Vec3(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x);
     }
 
-    public final double length() {
+    public double length() {
         double absmax = Math.max(Math.max(Math.abs(x), Math.abs(y)), Math.abs(z));
         if (absmax == 0.0)
             return 0.0;
@@ -55,11 +55,11 @@ public class Vec3 {
         return absmax * Math.sqrt(tmpx * tmpx + tmpy * tmpy + tmpz * tmpz);
     }
 
-    public final double length2() {
+    public double length2() {
         return x * x + y * y + z * z;
     }
 
-    public final void normalize() {
+    public void normalize() {
         double len = Math.sqrt(x * x + y * y + z * z);
         if (len == 0.0)
             return;
@@ -100,7 +100,7 @@ public class Vec3 {
     }
 
     @Override
-    public final boolean equals(Object o) {
+    public boolean equals(Object o) {
         if (!(o instanceof Vec3))
             return false;
         Vec3 v = (Vec3) o;
