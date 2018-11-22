@@ -12,29 +12,37 @@ import com.jogamp.opengl.GL2;
 
 public class GLGrab {
 
-    private static int w;
-    private static int h;
+    public final int w;
+    public final int h;
+    private FBObject fbo;
+    private TextureAttachment fboTex;
 
-    public static void attach(int _w, int _h) {
+    public GLGrab(int _w, int _h) {
         w = _w;
         h = _h;
     }
 
-    public static int getWidth() {
-        return w;
-    }
-
-    public static int getHeight() {
-        return h;
-    }
-
-    public static void renderFrame(Camera camera, GL2 gl, Buffer buffer) {
-        FBObject fbo = new FBObject();
+    private void init(GL2 gl) {
+        fbo = new FBObject();
         fbo.init(gl, w, h, 0);
-        TextureAttachment fboTex = fbo.attachTexture2D(gl, 0, true, GL2.GL_LINEAR, GL2.GL_LINEAR, GL2.GL_CLAMP_TO_EDGE, GL2.GL_CLAMP_TO_EDGE);
+        fboTex = fbo.attachTexture2D(gl, 0, true, GL2.GL_LINEAR, GL2.GL_LINEAR, GL2.GL_CLAMP_TO_EDGE, GL2.GL_CLAMP_TO_EDGE);
 
         fbo.attachRenderbuffer(gl, Type.DEPTH, FBObject.CHOSEN_BITS);
         fbo.reset(gl, fbo.getWidth(), fbo.getHeight(), GLInfo.GLSAMPLES);
+        fbo.unbind(gl);
+    }
+
+    public void dispose(GL2 gl) {
+        if (fbo != null) {
+            fbo.detachAll(gl);
+            fbo.destroy(gl);
+            fboTex.free(gl);
+        }
+    }
+
+    public void renderFrame(Camera camera, GL2 gl, Buffer buffer) {
+        if (fbo == null)
+            init(gl);
 
         int _x = Display.fullViewport.x;
         int _y = Display.fullViewport.yGL;
@@ -60,9 +68,6 @@ public class GLGrab {
         gl.glBindFramebuffer(GL2.GL_FRAMEBUFFER, 0);
 
         fbo.unuse(gl);
-        fbo.detachAll(gl);
-        fbo.destroy(gl);
-        fboTex.free(gl);
 
         Display.setGLSize(_x, _y, _w, _h);
         Display.reshapeAll();
