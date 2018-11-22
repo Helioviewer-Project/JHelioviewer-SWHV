@@ -3,6 +3,7 @@ package org.helioviewer.jhv.timelines.view.chart;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
@@ -61,6 +62,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private DragMode dragMode = DragMode.NODRAG;
 
     public ChartDrawGraphPane() {
+        setPreferredSize(new Dimension(-1, 50));
         setOpaque(true);
         setDoubleBuffered(false);
 
