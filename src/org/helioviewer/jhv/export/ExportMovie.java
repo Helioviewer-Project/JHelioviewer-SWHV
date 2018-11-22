@@ -28,6 +28,7 @@ public class ExportMovie implements FrameListener {
     private static final ExecutorService encodeExecutor = Executors.newSingleThreadExecutor(new JHVThread.NamedThreadFactory("Movie Encode"));
 
     private static MovieExporter exporter;
+    private static GLGrab grabber;
 
     private static RecordMode mode;
     private static boolean shallStop;
@@ -49,16 +50,17 @@ public class ExportMovie implements FrameListener {
 
     public static void handleMovieExport(Camera camera, GL2 gl) {
         try {
-            BufferedImage screen = MappedImageFactory.createCompatible(GLGrab.getWidth(), exporter.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
-            GLGrab.renderFrame(camera, gl, MappedImageFactory.getByteBuffer(screen));
+            BufferedImage screen = MappedImageFactory.createCompatible(grabber.w, exporter.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+            grabber.renderFrame(camera, gl, MappedImageFactory.getByteBuffer(screen));
             BufferedImage eve = EVEImage == null ? null : NIOImageFactory.copyImage(EVEImage);
-            encodeExecutor.execute(new FrameConsumer(exporter, screen, GLGrab.getHeight(), eve, EVEMovieLinePosition));
+            encodeExecutor.execute(new FrameConsumer(exporter, screen, grabber.h, eve, EVEMovieLinePosition));
         } catch (Exception e) {
             e.printStackTrace();
         }
         Movie.grabDone();
 
         if (shallStop) {
+            grabber.dispose(gl);
             stop();
         }
     }
@@ -84,7 +86,7 @@ public class ExportMovie implements FrameListener {
         int exportHeight = mode == RecordMode.SHOT ? canvasHeight + sh : ((canvasHeight + sh) / MACROBLOCK) * MACROBLOCK;
 
         canvasHeight = exportHeight - sh;
-        GLGrab.attach(canvasWidth, canvasHeight);
+        grabber = new GLGrab(canvasWidth, canvasHeight);
 
         String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + TimeUtils.formatFilename(System.currentTimeMillis());
         if (mode == RecordMode.SHOT) {
@@ -112,7 +114,7 @@ public class ExportMovie implements FrameListener {
         }
     }
 
-    public static void stop() {
+    private static void stop() {
         Movie.stopRecording();
         MoviePanel.setEnabledOptions(true);
         MoviePanel.unselectRecordButton();
@@ -132,6 +134,11 @@ public class ExportMovie implements FrameListener {
     public void frameChanged(int frame, boolean last) {
         if (last)
             shallStop = true;
+    }
+
+    public static void shallStop() {
+        shallStop = true;
+        MovieDisplay.display(); // force detach
     }
 
     private static class FrameConsumer implements Runnable {

@@ -441,8 +441,10 @@ public class MoviePanel extends JPanel implements ObservationSelector {
     }
 
     private static void clickRecordButton() {
-        if (recordButton.isSelected())
-            recordButton.doClick();
+        if (recordButton.isSelected()) {
+            recordButton.setSelected(false);
+            recordButton.actionPerformed(null);
+        }
     }
 
     public static void unselectRecordButton() {
@@ -477,7 +479,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
                     fps = ((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue();
                 ExportMovie.start(size.getSize().width, size.getSize().height, size.isInternal(), fps, mode);
             } else {
-                ExportMovie.stop();
+                ExportMovie.shallStop();
             }
         }
 
