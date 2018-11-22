@@ -35,8 +35,7 @@ class ChartDrawIntervalPane extends JComponent implements DrawListener, MouseLis
     private int rightIntervalBorderPosition = -10;
 
     public ChartDrawIntervalPane() {
-        setPreferredSize(new Dimension(getPreferredSize().width, DrawConstants.INTERVAL_SELECTION_HEIGHT));
-        //setSize(getPreferredSize());
+        setPreferredSize(new Dimension(-1, DrawConstants.INTERVAL_SELECTION_HEIGHT));
 
         addMouseListener(this);
         addMouseMotionListener(this);
