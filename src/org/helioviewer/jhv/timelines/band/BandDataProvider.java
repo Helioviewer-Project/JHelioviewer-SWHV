@@ -28,7 +28,7 @@ public class BandDataProvider {
         executorService.execute(new BandLoadTask(jo));
     }
 
-    public static void updateBand(Band band, long start, long end) {
+    static void updateBand(Band band, long start, long end) {
         List<Interval> missingIntervalsNoExtend = band.getMissingDaysInInterval(start, end);
         if (!missingIntervalsNoExtend.isEmpty()) {
             // extend
@@ -67,7 +67,7 @@ public class BandDataProvider {
         Timelines.getLayers().downloadFinished(band);
     }
 
-    public static void stopDownloads(Band band) {
+    static void stopDownloads(Band band) {
         List<Interval> list = downloadMap.get(band);
         if (list == null)
             return;
@@ -79,7 +79,7 @@ public class BandDataProvider {
         Timelines.getLayers().downloadFinished(band);
     }
 
-    public static boolean isDownloadActive(Band band) {
+    static boolean isDownloadActive(Band band) {
         List<Interval> list = downloadMap.get(band);
         return list != null && !list.isEmpty();
     }

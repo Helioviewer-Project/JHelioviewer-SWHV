@@ -507,7 +507,7 @@ public class MenuScroller {
 
         private final Timer timer;
 
-        public MenuScrollItem(MenuIcon icon, int increment) {
+        MenuScrollItem(MenuIcon icon, int increment) {
             setIcon(icon);
             setDisabledIcon(icon);
             timer = new Timer(interval, e -> {
@@ -517,7 +517,7 @@ public class MenuScroller {
             addChangeListener(this);
         }
 
-        public void setInterval(int interval) {
+        void setInterval(int interval) {
             timer.setDelay(interval);
         }
 
