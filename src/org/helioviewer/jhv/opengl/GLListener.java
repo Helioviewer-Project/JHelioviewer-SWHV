@@ -12,6 +12,7 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MiniviewLayer;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
 import com.jogamp.nativewindow.ScalableSurface;
@@ -88,16 +89,6 @@ public class GLListener implements GLEventListener {
         GLSLLineShader.dispose(gl);
         GLSLShapeShader.dispose(gl);
         GLSLTextureShader.dispose(gl);
-    }
-
-    private ExportMovie exporter;
-
-    public void attachExport(ExportMovie me) {
-        exporter = me;
-    }
-
-    public void detachExport() {
-        exporter = null;
     }
 
     @Override
@@ -181,7 +172,7 @@ public class GLListener implements GLEventListener {
 
         Camera camera = Display.getCamera();
 
-        if (exporter != null)
+        if (Movie.isRecording())
             ExportMovie.handleMovieExport(camera, gl);
 
         if (Display.mode == Display.DisplayMode.Orthographic) {

@@ -440,9 +440,14 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         ImageLayers.shiftLayersSpan(shift);
     }
 
-    public static void clickRecordButton() {
+    private static void clickRecordButton() {
         if (recordButton.isSelected())
             recordButton.doClick();
+    }
+
+    public static void unselectRecordButton() {
+        if (recordButton.isSelected())
+            recordButton.setSelected(false);
     }
 
     public static void setEnabledOptions(boolean enabled) {

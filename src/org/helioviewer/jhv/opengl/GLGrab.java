@@ -12,18 +12,12 @@ import com.jogamp.opengl.GL2;
 
 public class GLGrab {
 
-    private static boolean attached;
     private static int w;
     private static int h;
 
     public static void attach(int _w, int _h) {
         w = _w;
         h = _h;
-        attached = true;
-    }
-
-    public static void detach() {
-        attached = false;
     }
 
     public static int getWidth() {
@@ -35,9 +29,6 @@ public class GLGrab {
     }
 
     public static void renderFrame(Camera camera, GL2 gl, Buffer buffer) {
-        if (!attached)
-            return;
-
         FBObject fbo = new FBObject();
         fbo.init(gl, w, h, 0);
         TextureAttachment fboTex = fbo.attachTexture2D(gl, 0, true, GL2.GL_LINEAR, GL2.GL_LINEAR, GL2.GL_CLAMP_TO_EDGE, GL2.GL_CLAMP_TO_EDGE);
