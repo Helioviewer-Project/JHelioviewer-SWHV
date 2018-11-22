@@ -29,7 +29,6 @@ public class ExportMovie implements FrameListener {
     private static final ExecutorService encodeExecutor = Executors.newSingleThreadExecutor(new JHVThread.NamedThreadFactory("Movie Encode"));
 
     private static MovieExporter exporter;
-    private static GLGrab grabber;
 
     private static RecordMode mode;
     private static boolean stopped;
@@ -50,7 +49,8 @@ public class ExportMovie implements FrameListener {
         }
     }
 
-    private static void exportMovieFinish(GL2 gl) {
+    private static void exportMovieFinish() {
+        GLGrab.detach();
         JHVFrame.getGLListener().detachExport();
         MoviePanel.setEnabledOptions(true);
         if (mode == RecordMode.LOOP) {
@@ -58,7 +58,6 @@ public class ExportMovie implements FrameListener {
         }
 
         try {
-            grabber.dispose(gl);
             disposeMovieWriter(true);
         } catch (Exception e) {
             e.printStackTrace();
@@ -67,15 +66,15 @@ public class ExportMovie implements FrameListener {
 
     public static void handleMovieExport(Camera camera, GL2 gl) {
         if (stopped) {
-            exportMovieFinish(gl);
+            exportMovieFinish();
             return;
         }
 
         try {
-            BufferedImage screen = MappedImageFactory.createCompatible(grabber.w, exporter.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
-            grabber.renderFrame(camera, gl, MappedImageFactory.getByteBuffer(screen));
+            BufferedImage screen = MappedImageFactory.createCompatible(GLGrab.getWidth(), exporter.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+            GLGrab.renderFrame(camera, gl, MappedImageFactory.getByteBuffer(screen));
             BufferedImage eve = EVEImage == null ? null : NIOImageFactory.copyImage(EVEImage);
-            encodeExecutor.execute(new FrameConsumer(exporter, screen, grabber.h, eve, EVEMovieLinePosition));
+            encodeExecutor.execute(new FrameConsumer(exporter, screen, GLGrab.getHeight(), eve, EVEMovieLinePosition));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -110,7 +109,7 @@ public class ExportMovie implements FrameListener {
 
         MoviePanel.setEnabledOptions(false);
 
-        grabber = new GLGrab(canvasWidth, canvasHeight);
+        GLGrab.attach(canvasWidth, canvasHeight);
         JHVFrame.getGLListener().attachExport(instance);
 
         String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + TimeUtils.formatFilename(System.currentTimeMillis());
