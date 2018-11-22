@@ -11,7 +11,6 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.image.MappedImageFactory;
 import org.helioviewer.jhv.base.image.NIOImageFactory;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.MoviePanel.RecordMode;
 import org.helioviewer.jhv.layers.FrameListener;
@@ -31,7 +30,6 @@ public class ExportMovie implements FrameListener {
     private static MovieExporter exporter;
 
     private static RecordMode mode;
-    private static boolean stopped;
     private static boolean shallStop;
 
     public static BufferedImage EVEImage = null;
@@ -49,27 +47,7 @@ public class ExportMovie implements FrameListener {
         }
     }
 
-    private static void exportMovieFinish() {
-        GLGrab.detach();
-        JHVFrame.getGLListener().detachExport();
-        MoviePanel.setEnabledOptions(true);
-        if (mode == RecordMode.LOOP) {
-            Movie.removeFrameListener(instance);
-        }
-
-        try {
-            disposeMovieWriter(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public static void handleMovieExport(Camera camera, GL2 gl) {
-        if (stopped) {
-            exportMovieFinish();
-            return;
-        }
-
         try {
             BufferedImage screen = MappedImageFactory.createCompatible(GLGrab.getWidth(), exporter.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
             GLGrab.renderFrame(camera, gl, MappedImageFactory.getByteBuffer(screen));
@@ -80,7 +58,7 @@ public class ExportMovie implements FrameListener {
         }
         Movie.grabDone();
 
-        if (mode == RecordMode.SHOT) {
+        if (shallStop) {
             stop();
         }
     }
@@ -89,6 +67,8 @@ public class ExportMovie implements FrameListener {
 
     public static void start(int _w, int _h, boolean isInternal, int fps, RecordMode _mode) {
         Movie.startRecording();
+        MoviePanel.setEnabledOptions(false);
+        shallStop = false;
 
         int scrw = 1;
         int scrh = 0;
@@ -104,13 +84,7 @@ public class ExportMovie implements FrameListener {
         int exportHeight = mode == RecordMode.SHOT ? canvasHeight + sh : ((canvasHeight + sh) / MACROBLOCK) * MACROBLOCK;
 
         canvasHeight = exportHeight - sh;
-
-        stopped = false;
-
-        MoviePanel.setEnabledOptions(false);
-
         GLGrab.attach(canvasWidth, canvasHeight);
-        JHVFrame.getGLListener().attachExport(instance);
 
         String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + TimeUtils.formatFilename(System.currentTimeMillis());
         if (mode == RecordMode.SHOT) {
@@ -120,7 +94,7 @@ public class ExportMovie implements FrameListener {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
+            shallStop = true;
             MovieDisplay.render(1);
         } else {
             try {
@@ -139,22 +113,23 @@ public class ExportMovie implements FrameListener {
     }
 
     public static void stop() {
-        shallStop = false;
-        if (!stopped) {
-            stopped = true;
-
-            if (mode != RecordMode.FREE)
-                MoviePanel.clickRecordButton();
-            MovieDisplay.display(); // force detach
-        }
         Movie.stopRecording();
+        MoviePanel.setEnabledOptions(true);
+        MoviePanel.unselectRecordButton();
+        if (mode == RecordMode.LOOP) {
+            Movie.removeFrameListener(instance);
+        }
+
+        try {
+            disposeMovieWriter(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // loop mode only
     @Override
     public void frameChanged(int frame, boolean last) {
-        if (shallStop)
-            stop();
         if (last)
             shallStop = true;
     }
