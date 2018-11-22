@@ -233,11 +233,11 @@ public class Band extends AbstractTimelineLayer {
         return yAxis;
     }
 
-    public List<Interval> addRequest(long start, long end) {
+    List<Interval> addRequest(long start, long end) {
         return requestCache.adaptRequestCache(start, end);
     }
 
-    public List<Interval> getMissingDaysInInterval(long start, long end) {
+    List<Interval> getMissingDaysInInterval(long start, long end) {
         return requestCache.getMissingIntervals(start, end);
     }
 
@@ -254,7 +254,7 @@ public class Band extends AbstractTimelineLayer {
         updateGraphsData();
     }
 
-    public void addToCache(float[] values, long[] dates) {
+    void addToCache(float[] values, long[] dates) {
         bandCache.addToCache(yAxis, values, dates);
         updateGraphsData();
         DrawController.drawRequest();
@@ -285,7 +285,7 @@ public class Band extends AbstractTimelineLayer {
         return propagationModel.getObservationTime(ts);
     }
 
-    public void setPropagationModel(PropagationModel _propagationModel) {
+    void setPropagationModel(PropagationModel _propagationModel) {
         propagationModel = _propagationModel;
         DrawController.graphAreaChanged();
     }

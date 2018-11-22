@@ -10,7 +10,7 @@ import org.helioviewer.jhv.timelines.TimelineSettings;
 
 class BandTypeTask extends JHVWorker<Void, Void> {
 
-    public BandTypeTask() {
+    BandTypeTask() {
         setThreadName("EVE--LoadSources");
     }
 

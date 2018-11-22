@@ -24,7 +24,7 @@ public class BandType {
         }
     }
 
-    public static BandType getBandType(String name) {
+    static BandType getBandType(String name) {
         for (List<BandType> list : groups.values()) {
             for (BandType bt : list)
                 if (bt.name.equals(name))
@@ -55,7 +55,7 @@ public class BandType {
 
     private final JSONObject json;
 
-    public BandType(JSONObject jo) {
+    BandType(JSONObject jo) {
         json = jo;
 
         name = jo.optString("name", name);
@@ -90,39 +90,39 @@ public class BandType {
         warnLevels = Collections.unmodifiableMap(warnHelp);
     }
 
-    public void serialize(JSONObject jo) {
+    void serialize(JSONObject jo) {
         jo.put("bandType", json);
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 
-    public String getBandCacheType() {
+    String getBandCacheType() {
         return bandCacheType;
     }
 
-    public String getScale() {
+    String getScale() {
         return scale;
     }
 
-    public String getUnitLabel() {
+    String getUnitLabel() {
         return unitLabel;
     }
 
-    public Map<String, Double> getWarnLevels() {
+    Map<String, Double> getWarnLevels() {
         return warnLevels;
     }
 
-    public double getMin() {
+    double getMin() {
         return min;
     }
 
-    public double getMax() {
+    double getMax() {
         return max;
     }
 
-    public String getBaseURL() {
+    String getBaseURL() {
         return baseURL;
     }
 
