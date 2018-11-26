@@ -96,7 +96,7 @@ public class J2KView extends BaseView {
                     JHVDate d = dates[i];
                     if (d.milli != frames[i] * 1000) {
                         cacheKey[i] = 0; // uncacheable
-                        Log.warn(uri + "[" + i + "]: expected " + d + ", got " + new JHVDate(frames[i]));
+                        Log.warn(uri + "[" + i + "]: expected " + d + ", got " + new JHVDate(frames[i] * 1000));
                     }
                 }
             }
