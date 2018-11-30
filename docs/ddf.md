@@ -93,7 +93,7 @@ The following servers are included:
 
 - HTTP server (e.g., Apache or `nginx`) to serve static files, to proxy HTTP requests, and to run various services:
   - Image services API (<https://github.com/Helioviewer-Project/api>): It lists the available image datasets and commands the creation of JPX movies on demand. It includes a facility to ingest new images files. Metadata about the image files is stored in a MySQL database.
-  - Timeline services API: This is an adapter brokering between the JHelioviewer client and the backend timeline storage services (ODI -- <http://lund.irf.se/odi/> and STAFF backend -- <http://www.staff.oma.be>). It lists the available timeline datasets and serves the data in a JSON format.
+  - Timeline services API: This is an adapter brokering between the JHelioviewer client and the backend timeline storage services (ODI -- <https://spitfire.estec.esa.int/trac/ODI/> and STAFF backend -- <http://www.staff.oma.be>). It lists the available timeline datasets and serves the data in a JSON format.
   - A PFSS dataset, static FITS files produced regularly out of GONG magnetograms. The JHelioviewer client retrieves them on demand, based on monthly listings (e.g., <http://swhv.oma.be/magtest/pfss/2018/01/list.txt>).
   - COMESEP service which subscribes to the COMESEP alert system (not part of this project), stores the alerts and makes them available to the JHelioviewer server in a JSON format.
   - The Helioviewer web client (<https://github.com/Helioviewer-Project/helioviewer.org>), not relevant for this project.
