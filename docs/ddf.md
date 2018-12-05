@@ -796,7 +796,7 @@ Viewpoints can be computed at various timestamps using the `UpdateViewpoint`. Se
 - `Observer` takes the closest in time from the metadata of the master layer, see the Metadata section.
 - `Earth` computes the viewpoint with the algorithm mentioned above.
 - `EarthFixedDistance` is as above but with the distance fixed at 1au (it is used for the latitudinal and polar projections).
-- `Equatorial` is a viewpoint looking from above the solar North pole at a distance (~229au) such that, for a field-of-view angle of 1˚, objects up to 2au far from the Sun are visible, the longitude is derived from the closest in time metadata of the master layer such that the Earth appears on the right-hand side.
+- `Equatorial` is a viewpoint looking from above the solar north pole at a distance (~229au) such that, for a field-of-view angle of 1˚, objects up to 2au far from the Sun are visible, the longitude is derived from the closest in time metadata of the master layer such that the Earth appears on the right-hand side.
 - `Other` (in UI, `Expert` in code) are viewpoints which are computed from the responses to requests to the `GeometryService`. A maximum of 10000 points are requested to the server and interpolation is used as needed for the intermediate timestamps.
 
 ### Camera
@@ -1020,9 +1020,9 @@ The considered use-case is measurements of phenomena propagating radially slower
 
 This is how one user imagines this feature would work:
 
-> The user sees in the SWAP movie a flare and dimming on the Sun and wonders if this has arrived at the Earth/L1. They open a GOES X-ray timeline to see the flare timing and then open an ACE solar wind timeline to see the arrival. They will now put in the textbox reasonable differences from 20h to 5d and see if there is a match of the flare timeline and of the solar wind disturbance. A slightly more natural way to do this would be to put in propagation speeds. From the SWAP movie one can get at least a rough feeling if this is a slow eruption (300 km/s) or a fast one (2000 km/s). The user fills in a guess for a speed, the system calculates the delta-t in sec and we see the two timelines.
+> The user sees in the SWAP movie a flare and dimming on the Sun and wonders if this has arrived at the Earth/L1. They open a GOES X-ray timeline to see the flare timing and then open an ACE solar wind timeline to see the arrival. They will now put in the text box reasonable differences from 20h to 5d and see if there is a match of the flare timeline and of the solar wind disturbance. A slightly more natural way to do this would be to put in propagation speeds. From the SWAP movie one can get at least a rough feeling if this is a slow eruption (300 km/s) or a fast one (2000 km/s). The user fills in a guess for a speed, the system calculates the delta-t in seconds and we see the two timelines.
 
-A textbox was added in the timeline options panel where one can set a propagation speed (0 meaning disabled). The location is the calculated Sun-Earth L1 point. When that speed is different from zero, another time-scale (in the timeline color) appears under the timelines panel time-scale (in black).
+A text box was added in the timeline options panel where one can set a propagation speed (0 meaning disabled). The location is the calculated Sun-Earth L1 point. When that speed is different from zero, another time-scale (in the timeline color) appears under the timelines panel time-scale (in black).
 
 Therefore, the displayed time-scale has the following meaning:
 
@@ -1103,26 +1103,45 @@ This support is limited to known use cases exhibiting data calibration and known
 
 ## WP21300 -- Investigate JPIP Alternatives
 
-**(SWHV-CCN2-21300-01)** For the task of this WP, a first web-based video streaming proof of concept was investigated. The focus lays on the identification and verification of required technical core components.
+### Context
 
-1. __Video support__\
-     The most supported video format by current web browsers is MP4 H.264 (<https://caniuse.com/#feat=mpeg4>), including «fragmented» versions for streaming). All tested platforms support HTML5 video playback of grayscale 8bit interlaced mp4 videos.
+**(SWHV-CCN2-21300-01)** JHelioviewer is a Java application that requires download and installation on a local machine. A (possibly lighter) version on the Web would reach the masses that aren't willing or cannot make the step to install a specific software package. Furthermore, web-based access to JHelioviewer could provide its functionality also to mobile devices. However, this requires an approach based on a JPIP alternative, as JPIP decoding is currently difficult to be implemented in a web-browser. In this context, it was important to investigate how to provide web-access to JHelioviewer functionality using alternatives to JPIP. The work focused on video streaming, as this is the most serious challenge to solve.
 
-1. __Storage__\
-     For the proof of concept, a video tree was built from AIA images, covering one day, with 4 different pixel resolutions (full res 4k down to 512) and 6 different time resolutions, i.e., playback speeds (1x, 2x, 4x, 8x, 16x, 32x). Helioviewer.org provided 2379 JPEG2000 images, from which 6\'035 videos were built. With the current video format, we expect **50TB** of videos, compared to the **57TB** of JPEG2000 images they cover.
+For this WP, a web-based video streaming prototype has been investigated and implemented. It serves as a proof-of-concept to show in which direction web-based streaming of SDO data could go. Our implementation could also pave the way to include "movies" from another spacecraft, including Solar Orbiter. The work focused on the identification and verification of the required technical core components.
 
-1. __Bandwidth__\
-     In full resolution streaming mode, i.e., streaming the full 4k images, only 7MB/sec are required. Yet the tool is built to download with region of interests, with a realistic worst case of **2.5MB/sec** bandwidth required. For mobile devices, bandwidth usage can be throttled down to **0.15MB/sec**.
+The prototype made available to this project is an enhanced version of the code delivered in 2017. It enhanced significantly the frame rate as part of a student project. We provide this version as it represents what we believe to be the best web-based video streaming demonstrator of SDO data available at the moment.
 
-1. __WebGL__\
-     The proof of concept projects 64 videos (8 512px videos in width and height) onto a 3D sphere. While the GPU has no issues, this worst-case performance test shows significant CPU consumption, with the naive implementation slowing down the playback to 10 FPS (frames per second). We are confident though that this can be addressed with improved GPU communication. Practically all devices support WebGL and 4k textures (<https://webglstats.com/webgl/parameter/MAX_TEXTURE_SIZE>)
+### Demonstrator and code location
 
-1. __Decoding__\
-     The decoding speed of MP4 videos proved to be no performance bottleneck at all. Even more, this work can be offloaded to a worker thread, and would therefore be non-blocking. All browsers support web workers (<https://caniuse.com/#feat=webworkers>)
+The demonstrator is available at <http://bit.ly/heliostreamer>. It currently requires the Chrome web-browser and a high-end laptop or preferably a desktop. The full code base is available at <https://github.com/heliostreamer>. It contains both the 2017 and the student-enhanced code.
 
-The proof of concept showed that no criterion from this first evaluation set hinders further investigation into video streaming of AIA images.
+### High-level technological concepts
 
-Further, with the growing support for the Media Source Extensions API (<https://caniuse.com/#feat=mediasource>), close control can be exercised over video playback, chunking and streaming. For caching, IndexedDB seems suitable (<https://caniuse.com/#search=indexeddb>).
+*Video support:* The most supported video format supported by current web browsers is MP4 H.264 (<https://caniuse.com/#feat=mpeg4>), including "fragmented" versions for streaming. All tested platforms support HTML5 video playback of grayscale 8bit interlaced MP4 videos.
+
+*Storage:* For the prototype, a video tree has been built from AIA images, covering one day, with 4 different pixel resolutions (from 4k full resolution down to 512) and 6 different time resolutions, i.e., playback speeds (1×, 2×, 4×, 8×, 16×, 32×). Helioviewer.org provided 2379 JPEG2000 images, from which 6035 videos were built. With the current video format, we expect 50TB of videos, compared to the 57TB of JPEG2000 images they cover.
+
+*Bandwidth:* In full resolution streaming mode, i.e., streaming the full 4k images, only 7MB/sec are required. Yet the tool is built to download with region of interests, with a realistic worst case of 2.5MB/sec bandwidth required. For mobile devices, bandwidth usage can be throttled down to 0.15MB/sec.
+
+*WebGL:* The prototype projects 64 videos (8 512px videos in width and height) onto a 3D sphere. While the GPU has no issues, this worst-case performance test shows significant CPU consumption, with the naive implementation slowing down the playback to 10 frames per second. We are confident though that this can be addressed with improved GPU communication. Practically all devices support WebGL and 4k textures (<https://webglstats.com/webgl/parameter/MAX_TEXTURE_SIZE>).
+
+*Decoding:* The decoding speed of MP4 videos proved to be no performance bottleneck at all. Even more, this work can be offloaded to a worker thread, and would therefore be non-blocking. All browsers support web workers (<https://caniuse.com/#feat=webworkers>).
+
+### Limitations of the current prototype
+
+The design of the current prototype requires a high-end laptop or a desktop to play the videos fluently. Low-end machines or portable devices will require further considerations.
+
+The prototype displays and synchronizes at most 9 video tiles at the same time, because the synchronization is expensive for HTML5-Video elements. However, some viewing angles would require more than 9 tiles to be visible, leading to paused tiles on the sphere. This happens, for instance, when viewing the sphere from the side.
+
+Not all web-browsers behave in the same way. The currently supported browser is Chrome, and further work would be needed to support all the other browsers.
+
+Currently, only short periods of video are available for each playback speed.
+
+### Conclusion
+
+The prototype showed that from this first evaluation no criteria prevents further investigation into video streaming of AIA images.
+
+Furthermore, with the growing support for the Media Source Extensions API (<https://caniuse.com/#feat=mediasource>), close control can be exercised over video playback, chunking and streaming. For caching, `IndexedDB` seems suitable (<https://caniuse.com/#search=indexeddb>).
 
 # Traceability Matrix
 
