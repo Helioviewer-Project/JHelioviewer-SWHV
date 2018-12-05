@@ -1,9 +1,9 @@
 ---
 title: SWHV CCN2 Design Document
-subtitle: ROB-SWHV(7186)-DDF2 v1.4
+subtitle: ROB-SWHV(7186)-DDF2 v1.5
 author: SWHV Team
 subject: Space Weather HelioViewer
-date: 2018-11-16
+date: 2018-12-05
 geometry: margin=1in
 papersize: A4
 book: true
@@ -59,6 +59,8 @@ logo-width: 40
 | 2018-10-17 | Version 1.3 (Complete the sections about CCN2 work)                |
 +------------+--------------------------------------------------------------------+
 | 2018-11-16 | Version 1.4 (Complete JHV design notes for FAR)                    |
++------------+--------------------------------------------------------------------+
+| 2018-12-05 | Version 1.5 (Update WP21300 notes, add section on compilation)     |
 +------------+--------------------------------------------------------------------+
 
 ## Purpose & Scope
@@ -887,6 +889,14 @@ Supported event sources are HEK and COMESEP. The interface to the COMESEP cachin
 
 The event data is cached into an SQLite database, with the JSON structures inserted as gzip-compressed blobs. The last two weeks' worth of data can be updated to allow for server-side corrections. Some of the parameters are also available for query, allowing to implement filtering of some event types on the value of those parameters.
 
+## Compilation & Installation
+
+The program can be built using `ant` or using the `gradle` integration with `ant`. The `release` directory contains another `ant` build script for the generation of distribution packages. In the case of Linux, the distribution package is a tarball containing the Java archive file to be run from the command line. In the case of Windows, the distribution package is an executable installation program build with NSIS (<https://sourceforge.net/projects/nsis/>). In the case of macOS, the distribution package is a DMG image file containing an application bundle, optionally signed with an Apple developer key.
+
+The distribution packages are copied manually to <http://swhv.oma.be/download/> alongside a `VERSION` file which, at program startup, is compared with the builtin version in order to determine the latest available version and possibly alert the user about a newer release.
+
+The version number is in the `MAJOR.MINOR.PATCH.REVISION` format.
+
 # CCN2 Tasks #
 
 ## WP20100 -- Study SWHV and JHV3D and WP20150 -- Merge JHV3D Ideas
@@ -1103,7 +1113,7 @@ This support is limited to known use cases exhibiting data calibration and known
 
 ## WP21300 -- Investigate JPIP Alternatives
 
-### Context
+**Context**
 
 **(SWHV-CCN2-21300-01)** JHelioviewer is a Java application that requires download and installation on a local machine. A (possibly lighter) version on the Web would reach the masses that aren't willing or cannot make the step to install a specific software package. Furthermore, web-based access to JHelioviewer could provide its functionality also to mobile devices. However, this requires an approach based on a JPIP alternative, as JPIP decoding is currently difficult to be implemented in a web-browser. In this context, it was important to investigate how to provide web-access to JHelioviewer functionality using alternatives to JPIP. The work focused on video streaming, as this is the most serious challenge to solve.
 
@@ -1111,11 +1121,11 @@ For this WP, a web-based video streaming prototype has been investigated and imp
 
 The prototype made available to this project is an enhanced version of the code delivered in 2017. It enhanced significantly the frame rate as part of a student project. We provide this version as it represents what we believe to be the best web-based video streaming demonstrator of SDO data available at the moment.
 
-### Demonstrator and code location
+**Demonstrator and code location**
 
 The demonstrator is available at <http://bit.ly/heliostreamer>. It currently requires the Chrome web-browser and a high-end laptop or preferably a desktop. The full code base is available at <https://github.com/heliostreamer>. It contains both the 2017 and the student-enhanced code.
 
-### High-level technological concepts
+**High-level technological concepts**
 
 *Video support:* The most supported video format supported by current web browsers is MP4 H.264 (<https://caniuse.com/#feat=mpeg4>), including "fragmented" versions for streaming. All tested platforms support HTML5 video playback of grayscale 8bit interlaced MP4 videos.
 
@@ -1127,7 +1137,7 @@ The demonstrator is available at <http://bit.ly/heliostreamer>. It currently req
 
 *Decoding:* The decoding speed of MP4 videos proved to be no performance bottleneck at all. Even more, this work can be offloaded to a worker thread, and would therefore be non-blocking. All browsers support web workers (<https://caniuse.com/#feat=webworkers>).
 
-### Limitations of the current prototype
+**Limitations of the current prototype**
 
 The design of the current prototype requires a high-end laptop or a desktop to play the videos fluently. Low-end machines or portable devices will require further considerations.
 
@@ -1137,7 +1147,7 @@ Not all web-browsers behave in the same way. The currently supported browser is 
 
 Currently, only short periods of video are available for each playback speed.
 
-### Conclusion
+**Conclusion**
 
 The prototype showed that from this first evaluation no criteria prevents further investigation into video streaming of AIA images.
 
