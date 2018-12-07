@@ -35,10 +35,11 @@ public class SampClient extends HubConnector {
     private static final SampClient instance = new SampClient(DefaultClientProfile.getProfile());
 
     public static void init() {
-        if (startHub && Hub.getRunningHubs().length == 0) {
+        if (startHub) {
             new Thread(() -> {
                 try {
-                    Hub.runHub(HubServiceMode.CLIENT_GUI);
+                    if (Hub.getRunningHubs().length == 0)
+                        Hub.runHub(HubServiceMode.CLIENT_GUI);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
