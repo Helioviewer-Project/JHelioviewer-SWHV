@@ -123,16 +123,16 @@ public class HelioviewerMetaData extends BaseMetaData {
             } else if (detector.equalsIgnoreCase("C3")) {
                 innerRadius = 4.4 * Sun.Radius;
                 outerRadius = 31.5 * Sun.Radius;
-            } else if (observatory.equalsIgnoreCase("STEREO_A") && detector.equalsIgnoreCase("COR1")) {
+            } else if (observatory.equalsIgnoreCase("STEREO-A") && detector.equalsIgnoreCase("COR1")) {
                 innerRadius = 1.36 * Sun.Radius;
                 outerRadius = 4.5 * Sun.Radius;
-            } else if (observatory.equalsIgnoreCase("STEREO_A") && detector.equalsIgnoreCase("COR2")) {
+            } else if (observatory.equalsIgnoreCase("STEREO-A") && detector.equalsIgnoreCase("COR2")) {
                 innerRadius = 2.4 * Sun.Radius;
                 outerRadius = 15.6 * Sun.Radius;
-            } else if (observatory.equalsIgnoreCase("STEREO_B") && detector.equalsIgnoreCase("COR1")) {
+            } else if (observatory.equalsIgnoreCase("STEREO-B") && detector.equalsIgnoreCase("COR1")) {
                 innerRadius = 1.5 * Sun.Radius;
                 outerRadius = 4.9 * Sun.Radius;
-            } else if (observatory.equalsIgnoreCase("STEREO_B") && detector.equalsIgnoreCase("COR2")) {
+            } else if (observatory.equalsIgnoreCase("STEREO-B") && detector.equalsIgnoreCase("COR2")) {
                 innerRadius = 3.25 * Sun.Radius;
                 outerRadius = 17 * Sun.Radius;
             }
