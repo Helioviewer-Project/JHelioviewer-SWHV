@@ -122,7 +122,7 @@ public class Vec3 {
 
     @Override
     public String toString() {
-        return toJson().toString();
+        return toJson().toString(0); // JSONException
     }
 
 }

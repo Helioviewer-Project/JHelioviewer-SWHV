@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.metadata;
 
-import java.util.Locale;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
@@ -97,11 +96,11 @@ public class HelioviewerMetaData extends BaseMetaData {
 
     // magic
     private void retrieveOcculterLinearCutOff(MetaDataContainer m) {
-        if (detector.equalsIgnoreCase("C2")) {
+        if (detector.equals("C2")) {
             double maskRotation = -Math.toRadians(m.getDouble("CROTA").orElse(0.)); // C2 JP2 already rotated
             cutOffValue = -region.ulx;
             cutOffDirection = new Vec2(Math.sin(maskRotation) / 0.9625, Math.cos(maskRotation) / 0.9625);
-        }/* else if (instrument.equalsIgnoreCase("SWAP")) {
+        }/* else if (instrument.equals("SWAP")) {
             double maskRotation = -Math.toRadians(m.getDouble("SOLAR_EP").orElse(0.));
             cutOffValue = -region.ulx;
             cutOffDirection = new Vec3(Math.sin(maskRotation), Math.cos(maskRotation), 0);
@@ -117,28 +116,28 @@ public class HelioviewerMetaData extends BaseMetaData {
         outerRadius *= Sun.Radius;
 
         if (innerRadius == 0) {
-            if (detector.equalsIgnoreCase("C2")) {
+            if (detector.equals("C2")) {
                 innerRadius = 2.3 * Sun.Radius;
                 outerRadius = 8.0 * Sun.Radius;
-            } else if (detector.equalsIgnoreCase("C3")) {
+            } else if (detector.equals("C3")) {
                 innerRadius = 4.4 * Sun.Radius;
                 outerRadius = 31.5 * Sun.Radius;
-            } else if (observatory.equalsIgnoreCase("STEREO-A") && detector.equalsIgnoreCase("COR1")) {
+            } else if (observatory.equals("STEREO-A") && detector.equals("COR1")) {
                 innerRadius = 1.36 * Sun.Radius;
                 outerRadius = 4.5 * Sun.Radius;
-            } else if (observatory.equalsIgnoreCase("STEREO-A") && detector.equalsIgnoreCase("COR2")) {
+            } else if (observatory.equals("STEREO-A") && detector.equals("COR2")) {
                 innerRadius = 2.4 * Sun.Radius;
                 outerRadius = 15.6 * Sun.Radius;
-            } else if (observatory.equalsIgnoreCase("STEREO-B") && detector.equalsIgnoreCase("COR1")) {
+            } else if (observatory.equals("STEREO-B") && detector.equals("COR1")) {
                 innerRadius = 1.5 * Sun.Radius;
                 outerRadius = 4.9 * Sun.Radius;
-            } else if (observatory.equalsIgnoreCase("STEREO-B") && detector.equalsIgnoreCase("COR2")) {
+            } else if (observatory.equals("STEREO-B") && detector.equals("COR2")) {
                 innerRadius = 3.25 * Sun.Radius;
                 outerRadius = 17 * Sun.Radius;
             }
         }
         // magic
-        if (detector.equalsIgnoreCase("C3"))
+        if (detector.equals("C3"))
             innerRadius *= 1.07;
         if (instrument.equals("MDI") || instrument.equals("HMI") ||
                 observatory.equals("Kanzelhoehe") || observatory.equals("ROB-USET") ||
@@ -161,13 +160,13 @@ public class HelioviewerMetaData extends BaseMetaData {
         } else if (instrument.contains("HMI")) {
             measurement = m.getString("CONTENT").orElse("");
             String[] str = measurement.split(" ", 2);
-            fullName = "HMI " + str[0].toLowerCase(Locale.ENGLISH);
+            fullName = "HMI " + str[0].toLowerCase();
         } else if (detector.equals("C2") || detector.equals("C3")) {
             measurement = m.getString("FILTER").orElse("") + ' ' + m.getString("POLAR").orElse("");
             fullName = "LASCO " + detector;
         } else if (instrument.equals("MDI")) {
             measurement = m.getString("DPC_OBSR").orElse("");
-            fullName = "MDI " + measurement.substring(measurement.indexOf('_') + 1).toLowerCase(Locale.ENGLISH);
+            fullName = "MDI " + measurement.substring(measurement.indexOf('_') + 1).toLowerCase();
         } else if (detector.equals("COR1") || detector.equals("COR2")) {
             observatory = m.getString("OBSRVTRY").orElse("").replace('_', '-');
             fullName = observatory + ' ' + detector;
@@ -269,7 +268,7 @@ public class HelioviewerMetaData extends BaseMetaData {
         if (!normalizeRadius)
             return 1;
 
-        if (measurement.toLowerCase(Locale.ENGLISH).contains("continuum"))
+        if (measurement.toLowerCase().contains("continuum"))
             return Sun.RadiusFactor_6173;
 
         int wv;
