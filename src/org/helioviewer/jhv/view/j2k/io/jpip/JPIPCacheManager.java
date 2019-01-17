@@ -9,9 +9,6 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.io.FileUtils;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-
 import org.ehcache.Cache;
 import org.ehcache.PersistentCacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
@@ -23,11 +20,6 @@ import org.ehcache.config.units.EntryUnit;
 import org.ehcache.config.units.MemoryUnit;
 
 public class JPIPCacheManager {
-
-    static {
-        Logger.getLogger("org.ehcache").setLevel(Level.WARN);
-        Logger.getLogger("org.terracotta").setLevel(Level.WARN);
-    }
 
     private static final File levelCacheDir = new File(JHVDirectory.CACHE.getFile(), "JPIPLevel-2");
     private static final File streamCacheDir = new File(JHVDirectory.CACHE.getFile(), "JPIPStream-2");
