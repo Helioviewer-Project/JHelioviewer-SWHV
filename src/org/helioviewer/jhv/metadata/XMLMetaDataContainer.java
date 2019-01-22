@@ -10,13 +10,11 @@ import org.w3c.dom.CharacterData;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.apache.commons.validator.routines.DoubleValidator;
-import org.apache.commons.validator.routines.LongValidator;
+import com.google.common.primitives.Doubles;
+import com.google.common.primitives.Longs;
 
 public class XMLMetaDataContainer implements MetaDataContainer {
 
-    private final DoubleValidator doubleValidator = DoubleValidator.getInstance();
-    private final LongValidator longValidator = LongValidator.getInstance();
     private final Element meta;
 
     public XMLMetaDataContainer(String xml) throws Exception {
@@ -48,12 +46,12 @@ public class XMLMetaDataContainer implements MetaDataContainer {
 
     @Override
     public Optional<Long> getLong(String key) {
-        return getString(key).map(longValidator::validate);
+        return getString(key).map(Longs::tryParse);
     }
 
     @Override
     public Optional<Double> getDouble(String key) {
-        return getString(key).map(doubleValidator::validate);
+        return getString(key).map(Doubles::tryParse);
     }
 
     @Override
