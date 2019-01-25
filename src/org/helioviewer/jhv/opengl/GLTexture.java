@@ -240,7 +240,6 @@ public class GLTexture {
             case DataBuffer.TYPE_BYTE:
                 return 1;
             case DataBuffer.TYPE_SHORT:
-                return 2;
             case DataBuffer.TYPE_USHORT:
                 return 2;
             case DataBuffer.TYPE_INT:

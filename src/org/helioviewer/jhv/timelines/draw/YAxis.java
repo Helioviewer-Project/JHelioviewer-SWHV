@@ -142,10 +142,9 @@ public class YAxis {
             switch (this) {
                 case LOGARITHMIC:
                     return new YAxisLogScale(label);
-                case LINEAR:
-                    return new YAxisIdentityScale(label);
                 case POSITIVELINEAR:
                     return new YAxisPositiveIdentityScale(label);
+                case LINEAR:
                 default:
                     return new YAxisIdentityScale(label);
             }
