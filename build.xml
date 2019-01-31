@@ -66,6 +66,9 @@
         <copy file="sentry.properties" tofile="${bin}/sentry.properties"/>
         <replace file="${bin}/sentry.properties" token="@@DSN" value="${DSN}"/>
         <replace file="${bin}/sentry.properties" token="@@VERSION" value="${version}"/>
+        <copy file="version.properties" tofile="${bin}/version.properties"/>
+        <replace file="${bin}/version.properties" token="@@VERSION" value="${version}"/>
+        <replace file="${bin}/version.properties" token="@@REVISION" value="${revision}"/>
         <manifestclasspath property="manifest_cp" jarfile="${jarfile}">
             <classpath>
                 <fileset refid="libfiles"/>

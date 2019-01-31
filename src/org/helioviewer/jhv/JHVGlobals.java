@@ -2,17 +2,14 @@ package org.helioviewer.jhv;
 
 import java.awt.Desktop;
 import java.io.File;
-import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.jar.Attributes;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -65,40 +62,24 @@ public class JHVGlobals {
     }
 
     public static void determineVersionAndRevision() {
-        File jarPath;
-        try {
-            jarPath = new File(JHVGlobals.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-        } catch (URISyntaxException e1) {
-            Log.error("JHVGlobals.determineVersionAndRevision > Could not open code source location: " + JHVGlobals.class.getProtectionDomain().getCodeSource().getLocation());
-            Log.warn("JHVGlobals.determineVersionAndRevision > Set version and revision to null.");
-            return;
+        try (InputStream is = JHVGlobals.class.getResourceAsStream("/version.properties")) {
+            Properties p = new Properties();
+            p.load(is);
+            p.stringPropertyNames().forEach(key -> System.setProperty(key, p.getProperty(key)));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        if (jarPath.isFile()) {
-            try (JarFile jarFile = new JarFile(jarPath)) {
-                Manifest manifest = jarFile.getManifest();
-                if (manifest == null) {
-                    Log.warn("JHVGlobals.determineVersionAndRevision > Manifest not found in jar file: " + jarPath + ". Set version and revision to null.");
-                    return;
-                }
+        String v = System.getProperty("jhv.version");
+        String r = System.getProperty("jhv.revision");
+        version = v == null ? version : v;
+        revision = r == null ? revision : r;
 
-                Attributes mainAttributes = manifest.getMainAttributes();
-                version = mainAttributes.getValue("version");
-                revision = mainAttributes.getValue("revision");
-                userAgent += version + '.' + revision + " (" +
-                        System.getProperty("os.arch") + ' ' + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ") " +
-                        System.getProperty("java.vendor") + " JRE " + System.getProperty("java.version");
-                versionDetail = String.format("%s %.1fGB %dCPU", userAgent, Runtime.getRuntime().maxMemory() / (1024 * 1024 * 1024.), Runtime.getRuntime().availableProcessors());
-
-                System.setProperty("jhv.version", version);
-                System.setProperty("jhv.revision", revision);
-                Log.info(versionDetail);
-            } catch (IOException e) {
-                Log.error("JHVGlobals.determineVersionAndRevision > Error while reading version and revision from manifest in jar file: " + jarPath, e);
-            }
-        } else {
-            Log.warn("JHVGlobals.determineVersionAndRevision > Classes are not within a jar file. Set version and revision to null.");
-        }
+        userAgent += version + '.' + revision + " (" +
+                System.getProperty("os.arch") + ' ' + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ") " +
+                System.getProperty("java.vendor") + " JRE " + System.getProperty("java.version");
+        versionDetail = String.format("%s %.1fGB %dCPU", userAgent, Runtime.getRuntime().maxMemory() / (1024 * 1024 * 1024.), Runtime.getRuntime().availableProcessors());
+        Log.info(versionDetail);
     }
 
     // Attempts to create the necessary directories if they do not exist
