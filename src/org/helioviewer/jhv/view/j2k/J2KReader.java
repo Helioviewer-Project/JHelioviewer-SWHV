@@ -170,26 +170,27 @@ class J2KReader implements Runnable {
                         continue;
                     }
 
-                    // receive and add data to cache
-                    long key = view.getCacheKey(currentStep);
-                    JPIPResponse res = null;
-                    JPIPStream stream = JPIPCacheManager.get(key, level);
-                    if (stream != null)
-                        cache.put(currentStep, stream);
-                    else
-                        res = socket.send(stepQuerys[currentStep], cache, currentStep);
+                    boolean downloadComplete = false;
+                    {
+                        long key = view.getCacheKey(currentStep);
+                        JPIPStream stream = JPIPCacheManager.get(key, level);
+                        if (stream != null) {
+                            downloadComplete = true;
+                            cache.put(currentStep, stream);
+                        } else {
+                            JPIPResponse res = socket.send(stepQuerys[currentStep], cache, currentStep);
+                            if (res.isResponseComplete() && (stream = cache.get(currentStep)) != null) { // downloaded
+                                downloadComplete = true;
+                                JPIPCacheManager.put(key, level, stream);
+                            }
+                        }
+                    }
 
-                    //if (res == null)
-                    //    System.out.println(">> hit " + view.getURI() + " " + currentStep + " " + level);
-
-                    // react if query complete
-                    if (res == null || res.isResponseComplete()) {
+                    if (downloadComplete) {
                         // mark query as complete
                         completeSteps++;
                         stepQuerys[currentStep] = null;
 
-                        if (res != null && res.isResponseComplete() && (stream = cache.get(currentStep)) != null) // downloaded
-                            JPIPCacheManager.put(key, level, stream);
                         cacheStatus.setFrameComplete(view.getSource(), currentStep, level); // tell the cache status
                         if (singleFrame)
                             view.signalDecoderFromReader(params); // refresh current image
