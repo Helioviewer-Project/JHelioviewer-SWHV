@@ -56,7 +56,7 @@ public class SourcesDatabase extends Thread {
      /* try {
             ft.get();
         } catch (InterruptedException | ExecutionException e) {
-            e.getCause().printStackTrace();
+            e.printStackTrace();
         } */
     }
 
@@ -105,7 +105,7 @@ public class SourcesDatabase extends Thread {
         try {
             return ft.get();
         } catch (InterruptedException | ExecutionException e) {
-            e.getCause().printStackTrace();
+            e.printStackTrace();
         }
         return -1;
     }

@@ -224,7 +224,7 @@ public class EventDatabase {
         try {
             return ft.get();
         } catch (InterruptedException | ExecutionException e) {
-            e.getCause().printStackTrace();
+            e.printStackTrace();
         }
         return -1;
     }
@@ -306,7 +306,7 @@ public class EventDatabase {
         try {
             return ft.get();
         } catch (InterruptedException | ExecutionException e) {
-            e.getCause().printStackTrace();
+            e.printStackTrace();
         }
         return get_id_init_list(event2db_list.size());
     }
@@ -555,7 +555,7 @@ public class EventDatabase {
         try {
             return ft.get();
         } catch (InterruptedException | ExecutionException e) {
-            e.getCause().printStackTrace();
+            e.printStackTrace();
         }
         return new ArrayList<>();
     }
@@ -649,7 +649,7 @@ public class EventDatabase {
         try {
             return ft.get();
         } catch (InterruptedException | ExecutionException e) {
-            e.getCause().printStackTrace();
+            e.printStackTrace();
         }
         return new ArrayList<>();
     }
@@ -719,7 +719,7 @@ public class EventDatabase {
         try {
             return ft.get();
         } catch (InterruptedException | ExecutionException e) {
-            e.getCause().printStackTrace();
+            e.printStackTrace();
         }
         return new ArrayList<>();
     }
@@ -771,7 +771,7 @@ public class EventDatabase {
         try {
             return ft.get();
         } catch (InterruptedException | ExecutionException e) {
-            e.getCause().printStackTrace();
+            e.printStackTrace();
         }
         return new ArrayList<>();
     }
@@ -896,7 +896,7 @@ public class EventDatabase {
         try {
             evt = ft.get();
         } catch (InterruptedException | ExecutionException e) {
-            e.getCause().printStackTrace();
+            e.printStackTrace();
         }
         return evt;
     }
