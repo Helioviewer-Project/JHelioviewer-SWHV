@@ -17,13 +17,13 @@ public class Settings {
     private static final Path userPath = Paths.get(JHVDirectory.SETTINGS.getPath(), "user.properties");
     private static final Properties defaults = new Properties() {
         {
-            setProperty("startup.loadmovie", "true");
-            setProperty("startup.sampHub", "true");
-            setProperty("display.normalizeAIA", "true");
-            setProperty("display.normalize", "false");
-            setProperty("timeout.read", "120000");
-            setProperty("timeout.connect", "30000");
-            setProperty("update.next", "0");
+            super.setProperty("startup.loadmovie", "true");
+            super.setProperty("startup.sampHub", "true");
+            super.setProperty("display.normalizeAIA", "true");
+            super.setProperty("display.normalize", "false");
+            super.setProperty("timeout.read", "120000");
+            super.setProperty("timeout.connect", "30000");
+            super.setProperty("update.next", "0");
         }
     };
     private static final Properties settings = new Properties(defaults);

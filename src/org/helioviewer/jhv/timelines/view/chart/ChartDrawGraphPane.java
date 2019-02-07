@@ -267,11 +267,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             } else {
                 long tickDayNumber = tickValue / TimeUtils.DAY_IN_MILLIS;
                 long prevDayNumber = previousDate / TimeUtils.DAY_IN_MILLIS;
-                if (tickDayNumber == prevDayNumber) {
-                    tickText = TimeUtils.format(DrawConstants.HOUR_TIME_FORMAT, tickValue);
-                } else {
-                    tickText = TimeUtils.format(DrawConstants.FULL_DATE_TIME_FORMAT_REVERSE, tickValue);
-                }
+                tickText = TimeUtils.format(tickDayNumber == prevDayNumber ? DrawConstants.HOUR_TIME_FORMAT : DrawConstants.FULL_DATE_TIME_FORMAT_REVERSE, tickValue);
             }
 
             if (tl == null) {

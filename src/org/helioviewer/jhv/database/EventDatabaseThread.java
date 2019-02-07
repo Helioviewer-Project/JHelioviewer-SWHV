@@ -56,9 +56,7 @@ public class EventDatabaseThread extends Thread {
                 boolean fexist = f.canRead() && !f.isDirectory();
                 connection = DriverManager.getConnection("jdbc:sqlite:" + filepath);
 
-                if (!fexist) {
-                    createSchema();
-                } else {
+                if (fexist) {
                     String sqlt = "SELECT version, hash from version LIMIT 1";
                     int found_version = -1;
                     int found_hash = -1;
@@ -80,6 +78,8 @@ public class EventDatabaseThread extends Thread {
                         connection = DriverManager.getConnection("jdbc:sqlite:" + filepath);
                         createSchema();
                     }
+                } else {
+                    createSchema();
                 }
             } catch (SQLException e) {
                 Log.error("Could not create database connection" + e);
