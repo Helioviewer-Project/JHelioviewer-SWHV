@@ -44,8 +44,11 @@
         </condition>
 
         <path id="processorpath.ref">
-            <pathelement location="shared/error_prone_core-2.3.2-with-dependencies.jar"/>
+            <pathelement location="shared/error_prone_core-2.3.3-with-dependencies.jar"/>
             <pathelement location="shared/jFormatString-3.0.0.jar"/>
+            <pathelement location="shared/dataflow-2.5.7.jar"/>
+            <pathelement location="shared/javacutil-2.5.7.jar"/>
+            <pathelement location="lib/failureaccess-1.0.1.jar"/>
             <!-- Add annotation processors and Error Prone custom checks here if needed -->
         </path>
 
@@ -54,8 +57,8 @@
             <compilerarg line="-XDcompilePolicy=simple"/>
             <compilerarg value="-processorpath"/>
             <compilerarg pathref="processorpath.ref"/>
-            <!-- ReferenceEquality - crashes, CatchAndPrintStackTrace - not interesting -->
-            <compilerarg value="-Xplugin:ErrorProne -Xep:DeadException:ERROR -Xep:ReferenceEquality:OFF -Xep:CatchAndPrintStackTrace:OFF" />
+            <!-- CatchAndPrintStackTrace - not interesting -->
+            <compilerarg value="-Xplugin:ErrorProne -Xep:DeadException:ERROR -Xep:CatchAndPrintStackTrace:OFF" />
             <classpath>
                 <fileset refid="libfiles"/>
             </classpath>
