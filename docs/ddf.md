@@ -722,19 +722,21 @@ JSON document specifying with high accuracy the program state. Most of the field
 
 ### Image Request File ###
 
-JSON document specifying image requests to the default server in a simple manner as in the example below. Natural language specification for time is supported and, besides the `dataset` field, all fields are optional with sensible defaults.
+JSON document specifying an array of image requests to the default server in a simple manner as in the example below. Natural language specification for time is supported and, besides the `dataset` field, all fields are optional with sensible defaults.
 
 Example:
 
 ```json
 {
-  "org.helioviewer.jhv.request.image": {
-    "observatory":"SDO",
-    "startTime":"yesterday",
-    "endTime":"today",
-    "cadence":1800,
-    "dataset":"AIA 304"
-  }
+  "org.helioviewer.jhv.request.image": [
+    {
+      "observatory":"SDO",
+      "startTime":"yesterday",
+      "endTime":"today",
+      "cadence":1800,
+      "dataset":"AIA 304"
+    }
+  ]
 }
 ```
 
@@ -742,9 +744,10 @@ Example:
 
 ```json
 {
-  "org.helioviewer.jhv.request.timeline": {
-    "bandType": {
-      "baseUrl": "http://swhv.oma.be/datasets/odi_read_data.php?",
+  "org.helioviewer.jhv.request.timeline": [
+    {
+      "bandType": {
+        "baseUrl": "http://swhv.oma.be/datasets/odi_read_data.php?",
         "unitLabel": "W/m^2",
         "name": "GOES_XRSA_ODI",
         "range": [
@@ -754,11 +757,12 @@ Example:
         "scale": "logarithmic",
         "label": "GOES XRS-A (shortwave)",
         "group": "GROUP_SWHV"
-    },
-    "data": [],
-    "multiplier": 1.3000000187446403e-08,
-    "timeline": "GOES_XRSA_ODI"
-  }
+      },
+      "data": [],
+      "multiplier": 1.3000000187446403e-08,
+      "timeline": "GOES_XRSA_ODI"
+    }
+  ]
 }
 ```
 
