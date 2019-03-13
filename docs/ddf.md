@@ -746,20 +746,6 @@ Example:
 {
   "org.helioviewer.jhv.request.timeline": [
     {
-      "bandType": {
-        "baseUrl": "http://swhv.oma.be/datasets/odi_read_data.php?",
-        "unitLabel": "W/m^2",
-        "name": "GOES_XRSA_ODI",
-        "range": [
-          1e-09,
-          0.001
-        ],
-        "scale": "logarithmic",
-        "label": "GOES XRS-A (shortwave)",
-        "group": "GROUP_SWHV"
-      },
-      "data": [],
-      "multiplier": 1.3000000187446403e-08,
       "timeline": "GOES_XRSA_ODI"
     }
   ]
