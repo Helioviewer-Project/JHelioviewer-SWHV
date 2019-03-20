@@ -88,7 +88,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             camera.projectionOrthoWide(vp.aspect);
         }
 
-        fovRender(gl, vp, halfSide, pixFactor);
+        renderFOV(gl, vp, halfSide, pixFactor);
+        renderSpiral(gl, vp, viewpoint, optionsPanel.getSpiralSpeed());
 
         Collection<LoadPosition> loadPositions = camera.getUpdateViewpoint().getLoadPositions();
         if (!loadPositions.isEmpty()) {
@@ -97,15 +98,13 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             gl.glEnable(GL2.GL_DEPTH_TEST);
         }
 
-        renderSpiral(gl, vp, viewpoint, optionsPanel.getSpiralSpeed());
-
         if (far) {
             Transform.popProjection();
         }
         Transform.popView();
     }
 
-    private void fovRender(GL2 gl, Viewport vp, double halfSide, double pointFactor) {
+    private void renderFOV(GL2 gl, Viewport vp, double halfSide, double pointFactor) {
         fov.putCenter(centerBuf, fovColor);
         center.setData(gl, centerBuf);
         center.renderPoints(gl, pointFactor);
@@ -165,8 +164,26 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         }
     }
 
+    private Vec3 spiralControl = null;
+
     @Override
     public void mouseClicked(MouseEvent e) {
+        if (e.isControlDown()) {
+            Vec3 v = CameraHelper.getVectorFromPlane(Display.getCamera(), Display.getActiveViewport(), e.getX(), e.getY(), Quat.ZERO, true);
+            if (v != null) {
+                double lon = 0, lat = 0;
+                double rad = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+                if (rad > 0) {
+                    lon = Math.atan2(v.y, v.x);
+                    // lat = Math.asin(v.z / rad); unneeded
+                }
+                v.x = rad;
+                v.y = lon;
+                v.z = lat;
+            }
+            spiralControl = v;
+            MovieDisplay.display();
+        }
     }
 
     @Override
@@ -323,10 +340,18 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
         double sr = speed * Sun.RadiusKMeterInv / RAD_PER_SEC;
         // control point
-        Position p0 = Sun.getEarth(viewpoint.time);
-        double rad0 = p0.distance;
-        double lon0 = 0;
-        double lat0 = 0;
+        double rad0, lon0, lat0;
+
+        if (spiralControl == null) {
+            Position p0 = Sun.getEarth(viewpoint.time);
+            rad0 = p0.distance;
+            lon0 = 0;
+            lat0 = 0;
+        } else {
+            rad0 = spiralControl.x;
+            lon0 = spiralControl.y;
+            lat0 = 0;
+        }
 
         for (int j = 0; j < SPIRAL_ARMS; j++) {
             double lona = lon0 + j * (2 * Math.PI / SPIRAL_ARMS); // arm longitude
