@@ -15,6 +15,7 @@ import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec3;
@@ -177,7 +178,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
                     lon = Math.atan2(v.y, v.x);
                     // lat = Math.asin(v.z / rad); unneeded
                 }
-                v.x = rad;
+                v.x = MathUtils.clip(rad, 0, SPIRAL_RADIUS);
                 v.y = lon;
                 v.z = lat;
             }
