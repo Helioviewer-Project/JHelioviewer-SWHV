@@ -7,14 +7,16 @@ import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 
+import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.MouseEvent;
 
-public class InteractionAxis extends Interaction {
+class InteractionAxis implements InteractionType {
 
+    private final Camera camera;
     private Vec3 currentRotationStartPoint;
 
-    public InteractionAxis(Camera _camera) {
-        super(_camera);
+    InteractionAxis(Camera _camera) {
+        camera = _camera;
     }
 
     @Override
@@ -38,6 +40,14 @@ public class InteractionAxis extends Interaction {
         Vec3 axis = camera.getUpdateViewpoint() == UpdateViewpoint.equatorial ? Vec3.ZAxis : Vec3.YAxis;
         camera.rotateCurrentDragRotation(Quat.calcRotation(currentRotationStartPoint, currentRotationEndPoint).twist(axis));
         MovieDisplay.display();
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
     }
 
 }

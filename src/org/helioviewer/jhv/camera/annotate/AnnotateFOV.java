@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
+import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -91,7 +91,7 @@ public class AnnotateFOV extends AbstractAnnotateable {
 
     @Override
     public String getType() {
-        return AnnotationMode.FOV.toString();
+        return Interaction.AnnotationMode.FOV.toString();
     }
 
 }

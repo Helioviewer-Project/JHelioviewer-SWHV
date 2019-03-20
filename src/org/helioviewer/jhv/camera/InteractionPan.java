@@ -5,15 +5,17 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Vec2;
 
+import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.MouseEvent;
 
-public class InteractionPan extends Interaction {
+class InteractionPan implements InteractionType {
 
+    private final Camera camera;
     private int lastX;
     private int lastY;
 
-    public InteractionPan(Camera _camera) {
-        super(_camera);
+    InteractionPan(Camera _camera) {
+        camera = _camera;
     }
 
     @Override
@@ -33,6 +35,14 @@ public class InteractionPan extends Interaction {
         double m = 1 / CameraHelper.getPixelFactor(camera, Display.getActiveViewport());
         camera.setCurrentTranslation(pan.x + x * m, pan.y - y * m);
         MovieDisplay.display();
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
     }
 
 }

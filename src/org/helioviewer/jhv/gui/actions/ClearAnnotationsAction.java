@@ -16,7 +16,7 @@ public class ClearAnnotationsAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        JHVFrame.getAnnotateInteraction().clear();
+        JHVFrame.getInteraction().clearAnnotations();
         MovieDisplay.display();
     }
 
