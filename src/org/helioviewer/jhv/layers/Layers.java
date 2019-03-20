@@ -86,7 +86,6 @@ public class Layers extends AbstractTableModel implements Reorderable {
     public Layers() {
         add(new ViewpointLayer(null));
         add(new GridLayer(null));
-        add(new SpiralLayer(null));
         add(new TimestampLayer(null));
         add(new MiniviewLayer(null));
     }

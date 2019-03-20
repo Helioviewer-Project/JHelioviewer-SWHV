@@ -10,11 +10,13 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSlider;
 
 import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorListener;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectContainer;
@@ -29,6 +31,11 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
     private final SpaceObjectContainer container;
     private final JCheckBox syncCheckBox;
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
+
+    private static final int MIN_SPEED_SPIRAL = 200;
+    private static final int MAX_SPEED_SPIRAL = 2000;
+    private int spiralSpeed = 500;
+    private int spiralMult = 0;
 
     private Frame frame;
 
@@ -56,6 +63,27 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
 
         container = new SpaceObjectContainer(ja, exclusive, uv, observer, frame, start, end);
 
+        JCheckBox spiralCheckBox = new JCheckBox("Spiral", false);
+        spiralCheckBox.addActionListener(e -> {
+            spiralMult = spiralCheckBox.isSelected() ? 1 : 0;
+            MovieDisplay.display();
+        });
+
+        JLabel spiralLabel = new JLabel(spiralSpeed + " km/s");
+        JSlider spiralSlider = new JSlider(JSlider.HORIZONTAL, MIN_SPEED_SPIRAL, MAX_SPEED_SPIRAL, spiralSpeed);
+        spiralSlider.addChangeListener(e -> {
+            spiralSpeed = spiralSlider.getValue();
+            spiralLabel.setText(spiralSpeed + " km/s");
+            MovieDisplay.display();
+        });
+        WheelSupport.installMouseWheelSupport(spiralSlider);
+
+        JPanel spiralPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+        spiralPanel.add(spiralCheckBox);
+        spiralPanel.add(spiralSlider);
+        spiralPanel.add(spiralLabel);
+        ComponentUtils.setEnabled(spiralPanel, frame == Frame.HEE);
+
         JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
         radioPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
         radioPanel.add(new JLabel("Frame", JLabel.RIGHT));
@@ -66,6 +94,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
                 if (radio.isSelected()) {
                     frame = f;
                     container.setFrame(frame);
+                    ComponentUtils.setEnabled(spiralPanel, f == Frame.HEE);
                 }
             });
             radioPanel.add(radio);
@@ -95,6 +124,8 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         if (!exclusive) {
             c.gridy = 3;
             add(radioPanel, c);
+            c.gridy = 4;
+            add(spiralPanel, c);
         }
 
         ComponentUtils.smallVariant(this);
@@ -128,6 +159,10 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         }
         jo.put("objects", container.toJson());
         return jo;
+    }
+
+    int getSpiralSpeed() {
+        return spiralMult * spiralSpeed;
     }
 
 }

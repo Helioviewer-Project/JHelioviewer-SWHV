@@ -201,4 +201,8 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
         equatorialOptionPanel.setTimespan(start, end);
     }
 
+    int getSpiralSpeed() {
+        return currentOptionPanel == equatorialOptionPanel ? equatorialOptionPanel.getSpiralSpeed() : 0;
+    }
+
 }

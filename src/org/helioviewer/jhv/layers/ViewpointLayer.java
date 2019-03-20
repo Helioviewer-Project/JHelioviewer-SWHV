@@ -6,6 +6,7 @@ import java.util.Collection;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.Colors;
@@ -38,7 +39,13 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     private static final double DELTA_CUTOFF = 3 * Sun.MeanEarthDistance;
     private static final double LINEWIDTH_FOV = GLSLLine.LINEWIDTH_BASIC;
     private static final double LINEWIDTH_ORBIT = 2 * GLSLLine.LINEWIDTH_BASIC;
+    private static final double LINEWIDTH_SPIRAL = 2 * GLSLLine.LINEWIDTH_BASIC;
     private static final float SIZE_PLANET = 5;
+
+    private static final double RAD_PER_SEC = (2 * Math.PI) / (Carrington.CR_SIDEREAL * 86400);
+    private static final double SPIRAL_RADIUS = 3 * Sun.MeanEarthDistance;
+    private static final int SPIRAL_DIVISIONS = 64;
+    private static final int SPIRAL_ARMS = 9;
 
     private final FOVShape fov = new FOVShape();
     private final byte[] fovColor = Colors.Blue;
@@ -51,6 +58,10 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     private final BufVertex orbitBuf = new BufVertex(3276 * GLSLLine.stride); // pre-allocate 64k
     private final GLSLShape planets = new GLSLShape(true);
     private final BufVertex planetBuf = new BufVertex(8 * GLSLShape.stride);
+
+    private final GLSLLine spiral = new GLSLLine(true);
+    private final BufVertex spiralBuf = new BufVertex(SPIRAL_ARMS * (2 * SPIRAL_DIVISIONS + 1 + 2) * GLSLLine.stride);
+    private final byte[] spiralColor = Colors.Green;
 
     private final ViewpointLayerOptions optionsPanel;
 
@@ -85,6 +96,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
             renderPlanets(gl, vp, loadPositions, pixFactor);
             gl.glEnable(GL2.GL_DEPTH_TEST);
         }
+
+        renderSpiral(gl, vp, viewpoint, optionsPanel.getSpiralSpeed());
 
         if (far) {
             Transform.popProjection();
@@ -240,6 +253,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         center.init(gl);
         orbits.init(gl);
         planets.init(gl);
+        spiral.init(gl);
     }
 
     @Override
@@ -248,6 +262,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         center.dispose(gl);
         orbits.dispose(gl);
         planets.dispose(gl);
+        spiral.dispose(gl);
     }
 
     @Override
@@ -293,6 +308,54 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
         planets.setData(gl, planetBuf);
         planets.renderPoints(gl, pointFactor);
+    }
+
+    private void spiralPutVertex(double rad, double lon, double lat, byte[] color) {
+        float x = (float) (rad * Math.cos(lat) * Math.cos(lon));
+        float y = (float) (rad * Math.cos(lat) * Math.sin(lon));
+        float z = (float) (rad * Math.sin(lat));
+        spiralBuf.putVertex(x, y, z, 1, color);
+    }
+
+    private void renderSpiral(GL2 gl, Viewport vp, Position viewpoint, int speed) {
+        if (speed == 0)
+            return;
+
+        double sr = speed * Sun.RadiusKMeterInv / RAD_PER_SEC;
+        // control point
+        Position p0 = Sun.getEarth(viewpoint.time);
+        double rad0 = p0.distance;
+        double lon0 = 0;
+        double lat0 = 0;
+
+        for (int j = 0; j < SPIRAL_ARMS; j++) {
+            double lona = lon0 + j * (2 * Math.PI / SPIRAL_ARMS); // arm longitude
+            // before control point
+            for (int i = 0; i < SPIRAL_DIVISIONS; i++) {
+                double rad = (Sun.Radius + (rad0 - Sun.Radius) * i / (double) SPIRAL_DIVISIONS);
+                double lon = lona - (rad - rad0) / sr;
+                if (i == 0) {
+                    spiralPutVertex(rad, lon, lat0, Colors.Null);
+                    spiralBuf.repeatVertex(spiralColor);
+                } else {
+                    spiralPutVertex(rad, lon, lat0, spiralColor);
+                }
+            }
+            // after control point
+            for (int i = 0; i <= SPIRAL_DIVISIONS; i++) {
+                double rad = (rad0 + (SPIRAL_RADIUS - rad0) * i / (double) SPIRAL_DIVISIONS);
+                double lon = lona - (rad - rad0) / sr;
+                if (i == SPIRAL_DIVISIONS) {
+                    spiralPutVertex(rad, lon, lat0, spiralColor);
+                    spiralBuf.repeatVertex(Colors.Null);
+                } else {
+                    spiralPutVertex(rad, lon, lat0, spiralColor);
+                }
+            }
+        }
+
+        spiral.setData(gl, spiralBuf);
+        spiral.render(gl, vp.aspect, LINEWIDTH_SPIRAL);
     }
 
 }
