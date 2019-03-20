@@ -176,13 +176,13 @@ class InteractionAnnotate implements InteractionType {
         }
     }
 
-    public void init(GL2 gl) {
+    void init(GL2 gl) {
         annsLine.init(gl);
         transLine.init(gl);
         center.init(gl);
     }
 
-    public void dispose(GL2 gl) {
+    void dispose(GL2 gl) {
         annsLine.dispose(gl);
         transLine.dispose(gl);
         center.dispose(gl);
