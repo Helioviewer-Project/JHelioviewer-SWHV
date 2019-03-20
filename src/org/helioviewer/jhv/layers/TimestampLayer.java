@@ -109,7 +109,6 @@ public class TimestampLayer extends AbstractLayer {
     }
 
     private JPanel optionsPanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
         JSlider slider = new JSlider(JSlider.HORIZONTAL, MIN_SCALE, MAX_SCALE, scale);
         slider.addChangeListener(e -> {
             scale = slider.getValue();
@@ -117,6 +116,7 @@ public class TimestampLayer extends AbstractLayer {
         });
         WheelSupport.installMouseWheelSupport(slider);
 
+        JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints c0 = new GridBagConstraints();
         c0.anchor = GridBagConstraints.LINE_END;
         c0.weightx = 1.;
