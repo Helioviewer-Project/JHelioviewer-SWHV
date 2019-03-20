@@ -2,21 +2,81 @@ package org.helioviewer.jhv.camera;
 
 import javax.swing.Timer;
 
+import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.camera.annotate.AnnotateCircle;
+import org.helioviewer.jhv.camera.annotate.AnnotateCross;
+import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
+import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
+import org.helioviewer.jhv.camera.annotate.Annotateable;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.MovieDisplay;
+import org.json.JSONObject;
 
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
 import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.newt.event.MouseListener;
+import com.jogamp.opengl.GL2;
 
 public class Interaction implements MouseListener, KeyListener {
 
-    final Camera camera;
-    private static final Timer wheelTimer = new Timer(1000 / 2, e -> MovieDisplay.render(1));
+    public enum Mode { PAN, ROTATE, AXIS }
 
-    Interaction(Camera _camera) {
+    public enum AnnotationMode {
+        Rectangle(AnnotateRectangle.class), Circle(AnnotateCircle.class), Cross(AnnotateCross.class), FOV(AnnotateFOV.class);
+
+        private final Class<? extends Annotateable> clazz;
+
+        AnnotationMode(Class<? extends Annotateable> _clazz) {
+            clazz = _clazz;
+        }
+
+        Annotateable generate(JSONObject jo) {
+            try {
+                return clazz.getConstructor(JSONObject.class).newInstance(jo);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return new AnnotateRectangle(jo);
+        }
+    }
+
+    private static final Timer wheelTimer = new Timer(1000 / 2, e -> MovieDisplay.render(1));
+    private final Camera camera;
+    private final InteractionAnnotate interactionAnnotate;
+    private final InteractionAxis interactionAxis;
+    private final InteractionPan interactionPan;
+    private final InteractionRotate interactionRotate;
+
+    private Mode mode = Mode.ROTATE;
+    private AnnotationMode annotationMode = AnnotationMode.Rectangle;
+
+    public Interaction(Camera _camera) {
         camera = _camera;
+        interactionAnnotate = new InteractionAnnotate(camera);
+        interactionAxis = new InteractionAxis(camera);
+        interactionPan = new InteractionPan(camera);
+        interactionRotate = new InteractionRotate(camera);
+
         wheelTimer.setRepeats(false);
+    }
+
+    public void setMode(Mode _mode) {
+        mode = _mode;
+        Settings.setProperty("display.interaction", mode.toString());
+    }
+
+    public Mode getMode() {
+        return mode;
+    }
+
+    public void setAnnotationMode(AnnotationMode _annotationMode) {
+        annotationMode = _annotationMode;
+        // Settings.setProperty("display.interaction.annotation", annotationMode.toString());
+    }
+
+    public AnnotationMode getAnnotationMode() {
+        return annotationMode;
     }
 
     @Override
@@ -69,6 +129,34 @@ public class Interaction implements MouseListener, KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
+    }
+
+    public void clearAnnotations() {
+        interactionAnnotate.clear();
+    }
+
+    public void zoomAnnotations() {
+        interactionAnnotate.zoom();
+    }
+
+    public void initAnnotations(GL2 gl) {
+        interactionAnnotate.init(gl);
+    }
+
+    public void disposeAnnotations(GL2 gl) {
+        interactionAnnotate.dispose(gl);
+    }
+
+    public void drawAnnotations(Viewport vp, GL2 gl) {
+        interactionAnnotate.draw(vp, gl);
+    }
+
+    public JSONObject saveAnnotations() {
+        return interactionAnnotate.toJson();
+    }
+
+    public void loadAnnotations(JSONObject jo) {
+        interactionAnnotate.fromJson(jo);
     }
 
 }

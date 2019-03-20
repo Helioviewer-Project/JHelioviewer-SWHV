@@ -17,7 +17,6 @@ import javax.swing.JToolBar;
 
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.camera.Interaction;
-import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.actions.ClearAnnotationsAction;
@@ -79,16 +78,6 @@ public class ToolBar extends JToolBar {
     private final ButtonText ZOOMOUT = new ButtonText(Buttons.zoomOut, "Zoom Out", "Zoom out");
     private final ButtonText ZOOMIN = new ButtonText(Buttons.zoomIn, "Zoom In", "Zoom in");
 
-    private enum InteractionMode {
-        PAN(JHVFrame.getPanInteraction()), ROTATE(JHVFrame.getRotateInteraction()), AXIS(JHVFrame.getAxisInteraction());
-
-        final Interaction interaction;
-
-        InteractionMode(Interaction _interaction) {
-            interaction = _interaction;
-        }
-    }
-
 //  private final LinkedHashMap<ButtonText, ActionListener> pluginButtons = new LinkedHashMap<>();
 
     private static JHVButton toolButton(ButtonText text) {
@@ -144,9 +133,9 @@ public class ToolBar extends JToolBar {
     }
 
     private void createNewToolBar() {
-        InteractionMode interactionMode = InteractionMode.ROTATE;
+        Interaction.Mode interactionMode = JHVFrame.getInteraction().getMode();
         try {
-            interactionMode = InteractionMode.valueOf(Settings.getProperty("display.interaction").toUpperCase());
+            interactionMode = Interaction.Mode.valueOf(Settings.getProperty("display.interaction").toUpperCase());
         } catch (Exception ignore) {
         }
 
@@ -176,11 +165,11 @@ public class ToolBar extends JToolBar {
         ButtonGroup group = new ButtonGroup();
 
         JHVToggleButton pan = toolToggleButton(PAN);
-        pan.addActionListener(e -> setActiveInteractionMode(InteractionMode.PAN));
+        pan.addActionListener(e -> JHVFrame.getInteraction().setMode(Interaction.Mode.PAN));
         JHVToggleButton rotate = toolToggleButton(ROTATE);
-        rotate.addActionListener(e -> setActiveInteractionMode(InteractionMode.ROTATE));
+        rotate.addActionListener(e -> JHVFrame.getInteraction().setMode(Interaction.Mode.ROTATE));
         JHVToggleButton axis = toolToggleButton(AXIS);
-        axis.addActionListener(e -> setActiveInteractionMode(InteractionMode.AXIS));
+        axis.addActionListener(e -> JHVFrame.getInteraction().setMode(Interaction.Mode.AXIS));
 
         group.add(pan);
         group.add(rotate);
@@ -199,7 +188,7 @@ public class ToolBar extends JToolBar {
             default:
                 rotate.setSelected(true);
         }
-        setActiveInteractionMode(interactionMode);
+        JHVFrame.getInteraction().setMode(interactionMode);
 
         add(new JToolBar.Separator(dim));
 
@@ -249,11 +238,11 @@ public class ToolBar extends JToolBar {
 
         JPopupMenu annotatePopup = new JPopupMenu();
         ButtonGroup annotateGroup = new ButtonGroup();
-        for (AnnotationMode mode : AnnotationMode.values()) {
+        for (Interaction.AnnotationMode mode : Interaction.AnnotationMode.values()) {
             JRadioButtonMenuItem item = new JRadioButtonMenuItem(mode.toString());
-            if (mode == AnnotationMode.Rectangle)
+            if (mode == JHVFrame.getInteraction().getAnnotationMode())
                 item.setSelected(true);
-            item.addActionListener(e -> JHVFrame.getAnnotateInteraction().setMode(mode));
+            item.addActionListener(e -> JHVFrame.getInteraction().setAnnotationMode(mode));
             annotateGroup.add(item);
             annotatePopup.add(item);
         }
@@ -291,11 +280,6 @@ public class ToolBar extends JToolBar {
             addButton(b);
         }
 */  }
-
-    private static void setActiveInteractionMode(InteractionMode mode) {
-        Settings.setProperty("display.interaction", mode.toString());
-        JHVFrame.setCurrentInteraction(mode.interaction);
-    }
 
     private void addButton(JideButton b) {
         b.setFocusPainted(false);

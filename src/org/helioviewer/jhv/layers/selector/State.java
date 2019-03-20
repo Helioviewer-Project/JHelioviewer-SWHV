@@ -47,7 +47,7 @@ public class State {
         main.put("projection", Display.mode);
         main.put("tracking", JHVFrame.getToolBar().getTrackingButton().isSelected());
         main.put("showCorona", JHVFrame.getToolBar().getShowCoronaButton().isSelected());
-        main.put("annotations", JHVFrame.getAnnotateInteraction().toJson());
+        main.put("annotations", JHVFrame.getInteraction().saveAnnotations());
 
         JSONArray ja = new JSONArray();
         for (Layer layer : Layers.getLayers()) {
@@ -174,7 +174,7 @@ public class State {
             }
         }
 
-        JHVFrame.getAnnotateInteraction().fromJson(data.optJSONObject("annotations"));
+        JHVFrame.getInteraction().loadAnnotations(data.optJSONObject("annotations"));
         JHVFrame.getToolBar().getMultiviewButton().setSelected(data.optBoolean("multiview", JHVFrame.getToolBar().getMultiviewButton().isSelected()));
         JHVFrame.getToolBar().getShowCoronaButton().setSelected(data.optBoolean("showCorona", JHVFrame.getToolBar().getShowCoronaButton().isSelected()));
 

@@ -2,12 +2,11 @@ package org.helioviewer.jhv.camera;
 
 import java.util.ArrayList;
 
-import org.helioviewer.jhv.camera.annotate.AnnotateCircle;
-import org.helioviewer.jhv.camera.annotate.AnnotateCross;
 import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
 import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -21,27 +20,9 @@ import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.opengl.GL2;
 
-public class InteractionAnnotate extends Interaction {
+class InteractionAnnotate implements InteractionType {
 
-    public enum AnnotationMode {
-        Rectangle(AnnotateRectangle.class), Circle(AnnotateCircle.class), Cross(AnnotateCross.class), FOV(AnnotateFOV.class);
-
-        private final Class<? extends Annotateable> clazz;
-
-        AnnotationMode(Class<? extends Annotateable> _clazz) {
-            clazz = _clazz;
-        }
-
-        Annotateable generate(JSONObject jo) {
-            try {
-                return clazz.getConstructor(JSONObject.class).newInstance(jo);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return new AnnotateRectangle(jo);
-        }
-    }
-
+    private final Camera camera;
     private final ArrayList<Annotateable> anns = new ArrayList<>();
 
     private static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
@@ -53,11 +34,10 @@ public class InteractionAnnotate extends Interaction {
     private final BufVertex centerBuf = new BufVertex(8 * GLSLShape.stride);
 
     private Annotateable newAnnotateable = null;
-    private AnnotationMode mode = AnnotationMode.Rectangle;
     private int activeIndex = -1;
 
-    public InteractionAnnotate(Camera _camera) {
-        super(_camera);
+    InteractionAnnotate(Camera _camera) {
+        camera = _camera;
     }
 
     private void remove() {
@@ -67,7 +47,7 @@ public class InteractionAnnotate extends Interaction {
         }
     }
 
-    public void drawAnnotations(Viewport vp, GL2 gl) {
+    void draw(Viewport vp, GL2 gl) {
         if (newAnnotateable == null && anns.isEmpty())
             return;
 
@@ -107,7 +87,7 @@ public class InteractionAnnotate extends Interaction {
         Transform.popView();
     }
 
-    public void zoom() {
+    void zoom() {
         Annotateable activeAnn = activeIndex >= 0 && activeIndex < anns.size() ? anns.get(activeIndex) : null;
         if (activeAnn instanceof AnnotateFOV)
             ((AnnotateFOV) activeAnn).zoom(camera);
@@ -115,7 +95,7 @@ public class InteractionAnnotate extends Interaction {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        newAnnotateable = mode.generate(null);
+        newAnnotateable = JHVFrame.getInteraction().getAnnotationMode().generate(null);
         newAnnotateable.mousePressed(camera, e.getX(), e.getY());
         if (!newAnnotateable.isDraggable()) {
             finishAnnotateable();
@@ -160,11 +140,7 @@ public class InteractionAnnotate extends Interaction {
         }
     }
 
-    public void setMode(AnnotationMode newMode) {
-        mode = newMode;
-    }
-
-    public void clear() {
+    void clear() {
         newAnnotateable = null;
         anns.clear();
         activeIndex = -1;
@@ -172,20 +148,20 @@ public class InteractionAnnotate extends Interaction {
 
     private static Annotateable generate(JSONObject jo) {
         try {
-            return AnnotationMode.valueOf(jo.getString("type")).generate(jo);
+            return Interaction.AnnotationMode.valueOf(jo.getString("type")).generate(jo);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return new AnnotateRectangle(jo);
     }
 
-    public JSONObject toJson() {
+    JSONObject toJson() {
         JSONArray ja = new JSONArray();
         anns.forEach(annotateable -> ja.put(annotateable.toJson()));
         return new JSONObject().put("activeIndex", activeIndex).put("annotateables", ja);
     }
 
-    public void fromJson(JSONObject jo) {
+    void fromJson(JSONObject jo) {
         clear();
         if (jo == null)
             return;

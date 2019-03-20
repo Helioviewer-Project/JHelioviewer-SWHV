@@ -2,7 +2,7 @@ package org.helioviewer.jhv.camera.annotate;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
+import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
@@ -110,7 +110,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
 
     @Override
     public String getType() {
-        return AnnotationMode.Circle.toString();
+        return Interaction.AnnotationMode.Circle.toString();
     }
 
 }

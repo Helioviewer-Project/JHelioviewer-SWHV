@@ -16,7 +16,7 @@ public class ZoomFOVAnnotationAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        JHVFrame.getAnnotateInteraction().zoom();
+        JHVFrame.getInteraction().zoomAnnotations();
         MovieDisplay.render(1);
     }
 
