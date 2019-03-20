@@ -65,10 +65,10 @@ public class ToolBar extends JToolBar {
 
     private final ButtonText SAMP = new ButtonText(Buttons.samp, "SAMP", "Send SAMP message");
     private final ButtonText CUTOUT = new ButtonText(Buttons.cutOut, "SDO Cut-out", "SDO cut-out service");
+    private final ButtonText ANNOTATE = new ButtonText(Buttons.annotate, "Annotate", "Annotate");
     private final ButtonText PROJECTION = new ButtonText(Buttons.projection, "Projection", "Projection");
     private final ButtonText OFFDISK = new ButtonText(Buttons.offDisk, "Corona", "Toggle off-disk corona");
     private final ButtonText TRACK = new ButtonText(Buttons.track, "Track", "Track solar rotation");
-    private final ButtonText ANNOTATE = new ButtonText(Buttons.annotate, "Annotate", "Annotate");
     private final ButtonText AXIS = new ButtonText(Buttons.axis, "Axis", "Axis");
     private final ButtonText ROTATE = new ButtonText(Buttons.rotate, "Rotate", "Rotate");
     private final ButtonText PAN = new ButtonText(Buttons.pan, "Pan", "Pan");
@@ -80,8 +80,7 @@ public class ToolBar extends JToolBar {
     private final ButtonText ZOOMIN = new ButtonText(Buttons.zoomIn, "Zoom In", "Zoom in");
 
     private enum InteractionMode {
-        PAN(JHVFrame.getPanInteraction()), ROTATE(JHVFrame.getRotateInteraction()),
-        AXIS(JHVFrame.getAxisInteraction()), ANNOTATE(JHVFrame.getAnnotateInteraction());
+        PAN(JHVFrame.getPanInteraction()), ROTATE(JHVFrame.getRotateInteraction()), AXIS(JHVFrame.getAxisInteraction());
 
         final Interaction interaction;
 
@@ -182,17 +181,13 @@ public class ToolBar extends JToolBar {
         rotate.addActionListener(e -> setActiveInteractionMode(InteractionMode.ROTATE));
         JHVToggleButton axis = toolToggleButton(AXIS);
         axis.addActionListener(e -> setActiveInteractionMode(InteractionMode.AXIS));
-        JHVToggleButton annotate = toolToggleButton(ANNOTATE);
-        annotate.addActionListener(e -> setActiveInteractionMode(InteractionMode.ANNOTATE));
 
         group.add(pan);
         group.add(rotate);
         group.add(axis);
-        group.add(annotate);
         addButton(pan);
         addButton(rotate);
         addButton(axis);
-        addButton(annotate);
 
         switch (interactionMode) {
             case PAN:
@@ -201,37 +196,10 @@ public class ToolBar extends JToolBar {
             case AXIS:
                 axis.setSelected(true);
                 break;
-            case ANNOTATE:
-                annotate.setSelected(true);
-                break;
             default:
                 rotate.setSelected(true);
         }
         setActiveInteractionMode(interactionMode);
-
-        JPopupMenu annotatePopup = new JPopupMenu();
-        ButtonGroup annotateGroup = new ButtonGroup();
-
-        for (AnnotationMode mode : AnnotationMode.values()) {
-            JRadioButtonMenuItem item = new JRadioButtonMenuItem(mode.toString());
-            if (mode == AnnotationMode.Rectangle)
-                item.setSelected(true);
-            item.addActionListener(e -> JHVFrame.getAnnotateInteraction().setMode(mode));
-            annotateGroup.add(item);
-            annotatePopup.add(item);
-        }
-
-        annotatePopup.addSeparator();
-        annotatePopup.add(new ClearAnnotationsAction());
-        annotatePopup.addSeparator();
-        annotatePopup.add(new ZoomFOVAnnotationAction());
-
-        annotate.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                annotatePopup.show(e.getComponent(), 0, e.getComponent().getHeight());
-            }
-        });
 
         add(new JToolBar.Separator(dim));
 
@@ -273,6 +241,32 @@ public class ToolBar extends JToolBar {
             @Override
             public void mousePressed(MouseEvent e) {
                 projectionPopup.show(e.getComponent(), 0, e.getComponent().getHeight());
+            }
+        });
+
+        JHVButton anotateButton = toolButton(ANNOTATE);
+        addButton(anotateButton);
+
+        JPopupMenu annotatePopup = new JPopupMenu();
+        ButtonGroup annotateGroup = new ButtonGroup();
+        for (AnnotationMode mode : AnnotationMode.values()) {
+            JRadioButtonMenuItem item = new JRadioButtonMenuItem(mode.toString());
+            if (mode == AnnotationMode.Rectangle)
+                item.setSelected(true);
+            item.addActionListener(e -> JHVFrame.getAnnotateInteraction().setMode(mode));
+            annotateGroup.add(item);
+            annotatePopup.add(item);
+        }
+
+        annotatePopup.addSeparator();
+        annotatePopup.add(new ClearAnnotationsAction());
+        annotatePopup.addSeparator();
+        annotatePopup.add(new ZoomFOVAnnotationAction());
+
+        anotateButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                annotatePopup.show(e.getComponent(), 0, e.getComponent().getHeight());
             }
         });
 
