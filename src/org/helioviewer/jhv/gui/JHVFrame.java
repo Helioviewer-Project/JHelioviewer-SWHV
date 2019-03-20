@@ -14,12 +14,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Interaction;
-import org.helioviewer.jhv.camera.InteractionAnnotate;
-import org.helioviewer.jhv.camera.InteractionAxis;
-import org.helioviewer.jhv.camera.InteractionPan;
-import org.helioviewer.jhv.camera.InteractionRotate;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.components.MainContentPanel;
@@ -56,6 +51,7 @@ public class JHVFrame {
     private static GLListener glListener;
 
     private static InputController inputController;
+    private static Interaction interaction;
     private static MainContentPanel mainContentPanel;
 
     private static ZoomStatusPanel zoomStatus;
@@ -63,12 +59,6 @@ public class JHVFrame {
 
     private static LayersPanel layersPanel;
     private static Layers layers;
-
-    private static InteractionPan panInteraction;
-    private static InteractionRotate rotationInteraction;
-    private static InteractionAxis axisInteraction;
-    private static InteractionAnnotate annotateInteraction;
-    private static Interaction currentInteraction;
 
     private static ToolBar toolBar;
     private static MenuBar menuBar;
@@ -83,13 +73,6 @@ public class JHVFrame {
         glListener = new GLListener(glWindow);
         glWindow.addGLEventListener(glListener);
 
-        Camera camera = Display.getCamera();
-        panInteraction = new InteractionPan(camera);
-        rotationInteraction = new InteractionRotate(camera);
-        axisInteraction = new InteractionAxis(camera);
-        annotateInteraction = new InteractionAnnotate(camera);
-        currentInteraction = rotationInteraction;
-
         layers = new Layers();
         layersPanel = new LayersPanel(layers);
 
@@ -102,7 +85,8 @@ public class JHVFrame {
         leftScrollPane.setBorder(null);
         leftScrollPane.getVerticalScrollBar().setUnitIncrement(layersPanel.getGridRowHeight());
 
-        inputController = new InputController();
+        interaction = new Interaction(Display.getCamera());
+        inputController = new InputController(interaction);
         glWindow.addMouseListener(new NEWTMouseAdapter(inputController));
         glWindow.addKeyListener(new NEWTKeyAdapter(inputController));
 
@@ -223,28 +207,8 @@ public class JHVFrame {
         return layersPanel;
     }
 
-    public static void setCurrentInteraction(Interaction _currentInteraction) {
-        currentInteraction = _currentInteraction;
-    }
-
-    public static Interaction getCurrentInteraction() {
-        return currentInteraction;
-    }
-
-    public static Interaction getPanInteraction() {
-        return panInteraction;
-    }
-
-    public static Interaction getRotateInteraction() {
-        return rotationInteraction;
-    }
-
-    public static Interaction getAxisInteraction() {
-        return axisInteraction;
-    }
-
-    public static InteractionAnnotate getAnnotateInteraction() {
-        return annotateInteraction;
+    public static Interaction getInteraction() {
+        return interaction;
     }
 
     public static ToolBar getToolBar() {

@@ -6,14 +6,16 @@ import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 
+import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.MouseEvent;
 
-public class InteractionRotate extends Interaction {
+class InteractionRotate implements InteractionType {
 
+    private final Camera camera;
     private Vec3 currentRotationStartPoint;
 
-    public InteractionRotate(Camera _camera) {
-        super(_camera);
+    InteractionRotate(Camera _camera) {
+        camera = _camera;
     }
 
     @Override
@@ -36,6 +38,14 @@ public class InteractionRotate extends Interaction {
 
         camera.rotateCurrentDragRotation(Quat.calcRotation(currentRotationStartPoint, currentRotationEndPoint));
         MovieDisplay.display();
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
     }
 
 }
