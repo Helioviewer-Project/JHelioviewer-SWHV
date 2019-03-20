@@ -50,6 +50,7 @@ public class Interaction implements MouseListener, KeyListener {
 
     private Mode mode = Mode.ROTATE;
     private AnnotationMode annotationMode = AnnotationMode.Rectangle;
+    private boolean annotate = false;
 
     public Interaction(Camera _camera) {
         camera = _camera;
@@ -79,6 +80,16 @@ public class Interaction implements MouseListener, KeyListener {
         return annotationMode;
     }
 
+    private InteractionType getInteractionType() {
+        if (annotate)
+            return interactionAnnotate;
+        else if (mode == Mode.PAN)
+            return interactionPan;
+        else if (mode == Mode.AXIS)
+            return interactionAxis;
+        return interactionRotate;
+    }
+
     @Override
     public void mouseWheelMoved(MouseEvent e) {
         float r = e.getRotation()[1];
@@ -94,10 +105,13 @@ public class Interaction implements MouseListener, KeyListener {
 
     @Override
     public void mouseDragged(MouseEvent e) {
+        getInteractionType().mouseDragged(e);
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        getInteractionType().mouseReleased(e);
+        annotate = false;
     }
 
     @Override
@@ -121,14 +135,23 @@ public class Interaction implements MouseListener, KeyListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
+        if (e.isShiftDown()) {
+            annotate = true;
+        }
+        getInteractionType().mousePressed(e);
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
+        if (e.isShiftDown()) {
+            annotate = true;
+        }
+        getInteractionType().keyPressed(e);
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
+        annotate = false;
     }
 
     public void clearAnnotations() {
