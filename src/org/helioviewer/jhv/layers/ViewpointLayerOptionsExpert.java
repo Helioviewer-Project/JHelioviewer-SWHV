@@ -94,6 +94,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
                 if (radio.isSelected()) {
                     frame = f;
                     container.setFrame(frame);
+                    spiralMult = f == Frame.HEE && spiralCheckBox.isSelected() ? 1 : 0;
                     ComponentUtils.setEnabled(spiralPanel, f == Frame.HEE);
                 }
             });
