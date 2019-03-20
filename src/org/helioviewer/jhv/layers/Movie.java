@@ -33,25 +33,13 @@ public class Movie {
     }
 
     private static long getMovieStart() {
-        long min = Long.MAX_VALUE;
-        for (ImageLayer layer : Layers.getImageLayers()) {
-            long t = layer.getStartTime();
-            if (t < min) {
-                min = t;
-            }
-        }
-        return min == Long.MAX_VALUE ? lastTimestamp.milli : min;
+        ImageLayer layer = Layers.getActiveImageLayer();
+        return layer == null ? lastTimestamp.milli : layer.getStartTime();
     }
 
     private static long getMovieEnd() {
-        long max = Long.MIN_VALUE;
-        for (ImageLayer layer : Layers.getImageLayers()) {
-            long t = layer.getEndTime();
-            if (t > max) {
-                max = t;
-            }
-        }
-        return max == Long.MIN_VALUE ? lastTimestamp.milli : max;
+        ImageLayer layer = Layers.getActiveImageLayer();
+        return layer == null ? lastTimestamp.milli : layer.getEndTime();
     }
 
     static void timespanChanged() {
