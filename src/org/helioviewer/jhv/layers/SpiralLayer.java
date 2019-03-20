@@ -30,12 +30,13 @@ import com.jogamp.opengl.GL2;
 public class SpiralLayer extends AbstractLayer {
 
     private static final double ROT = (2 * Math.PI) / (Carrington.CR_SIDEREAL * 86400);
+    private static final double SPIRAL_RADIUS = 3 * Sun.MeanEarthDistance;
+    private static final int SPIRAL_DIVISIONS = 64;
     private static final int SPIRAL_ARMS = 9;
-    private static final int DIVISIONS = 64;
     private static final double LINEWIDTH_SPIRAL = 2 * GLSLLine.LINEWIDTH_BASIC;
 
     private final GLSLLine spiral = new GLSLLine(true);
-    private final BufVertex spiralBuf = new BufVertex(SPIRAL_ARMS * (2 * DIVISIONS + 1 + 2) * GLSLLine.stride);
+    private final BufVertex spiralBuf = new BufVertex(SPIRAL_ARMS * (2 * SPIRAL_DIVISIONS + 1 + 2) * GLSLLine.stride);
     private final byte[] spiralColor = Colors.Green;
 
     private static final double MIN_SPEED = 200;
@@ -70,7 +71,7 @@ public class SpiralLayer extends AbstractLayer {
             camera.projectionOrthoWide(vp.aspect);
         }
 
-        spiralRender(gl, vp, viewpoint, camera.getCameraWidth());
+        spiralRender(gl, vp, viewpoint);
 
         if (far) {
             Transform.popProjection();
@@ -85,20 +86,19 @@ public class SpiralLayer extends AbstractLayer {
         spiralBuf.putVertex(x, y, z, 1, color);
     }
 
-    private void spiralRender(GL2 gl, Viewport vp, Position viewpoint, double width) {
+    private void spiralRender(GL2 gl, Viewport vp, Position viewpoint) {
         double sr = speed * Sun.RadiusKMeterInv / ROT;
         // control point
         Position p0 = Sun.getEarth(viewpoint.time);
         double rad0 = p0.distance;
         double lon0 = 0;
         double lat0 = 0;
-        width = MathUtils.clip(width, 0, 3 * Sun.MeanEarthDistance);
 
         for (int j = 0; j < SPIRAL_ARMS; j++) {
             double lona = lon0 + j * (2 * Math.PI / SPIRAL_ARMS); // arm longitude
             // before control point
-            for (int i = 0; i < DIVISIONS; i++) {
-                double rad = (Sun.Radius + (rad0 - Sun.Radius) * i / (double) DIVISIONS);
+            for (int i = 0; i < SPIRAL_DIVISIONS; i++) {
+                double rad = (Sun.Radius + (rad0 - Sun.Radius) * i / (double) SPIRAL_DIVISIONS);
                 double lon = lona - (rad - rad0) / sr;
                 if (i == 0) {
                     spiralPutVertex(rad, lon, lat0, Colors.Null);
@@ -108,10 +108,10 @@ public class SpiralLayer extends AbstractLayer {
                 }
             }
             // after control point
-            for (int i = 0; i <= DIVISIONS; i++) {
-                double rad = (rad0 + (width - rad0) * i / (double) DIVISIONS);
+            for (int i = 0; i <= SPIRAL_DIVISIONS; i++) {
+                double rad = (rad0 + (SPIRAL_RADIUS - rad0) * i / (double) SPIRAL_DIVISIONS);
                 double lon = lona - (rad - rad0) / sr;
-                if (i == DIVISIONS) {
+                if (i == SPIRAL_DIVISIONS) {
                     spiralPutVertex(rad, lon, lat0, spiralColor);
                     spiralBuf.repeatVertex(Colors.Null);
                 } else {
