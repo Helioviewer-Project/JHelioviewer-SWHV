@@ -170,17 +170,20 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     @Override
     public void mouseClicked(MouseEvent e) {
         if (e.isControlDown()) {
-            Vec3 v = CameraHelper.getVectorFromPlane(Display.getCamera(), Display.getActiveViewport(), e.getX(), e.getY(), Quat.ZERO, true);
-            if (v != null) {
-                double lon = 0, lat = 0;
-                double rad = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
-                if (rad > 0) {
-                    lon = Math.atan2(v.y, v.x);
-                    // lat = Math.asin(v.z / rad); unneeded
+            Vec3 v = null;
+            if (!e.isShiftDown()) { // ctrl-shift-click to reset control point
+                v = CameraHelper.getVectorFromPlane(Display.getCamera(), Display.getActiveViewport(), e.getX(), e.getY(), Quat.ZERO, true);
+                if (v != null) {
+                    double lon = 0, lat = 0;
+                    double rad = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+                    if (rad > 0) {
+                        lon = Math.atan2(v.y, v.x);
+                        // lat = Math.asin(v.z / rad); unneeded
+                    }
+                    v.x = MathUtils.clip(rad, 0, SPIRAL_RADIUS);
+                    v.y = lon;
+                    v.z = lat;
                 }
-                v.x = MathUtils.clip(rad, 0, SPIRAL_RADIUS);
-                v.y = lon;
-                v.z = lat;
             }
             spiralControl = v;
             MovieDisplay.display();
