@@ -62,21 +62,25 @@ public class ToolBar extends JToolBar {
         }
     }
 
-    private final ButtonText SAMP = new ButtonText(Buttons.samp, "SAMP", "Send SAMP message");
-    private final ButtonText CUTOUT = new ButtonText(Buttons.cutOut, "SDO Cut-out", "SDO cut-out service");
-    private final ButtonText ANNOTATE = new ButtonText(Buttons.annotate, "Annotate", "Annotate");
-    private final ButtonText PROJECTION = new ButtonText(Buttons.projection, "Projection", "Projection");
-    private final ButtonText OFFDISK = new ButtonText(Buttons.offDisk, "Corona", "Toggle off-disk corona");
-    private final ButtonText TRACK = new ButtonText(Buttons.track, "Track", "Track solar rotation");
-    private final ButtonText AXIS = new ButtonText(Buttons.axis, "Axis", "Axis");
-    private final ButtonText ROTATE = new ButtonText(Buttons.rotate, "Rotate", "Rotate");
-    private final ButtonText PAN = new ButtonText(Buttons.pan, "Pan", "Pan");
-    private final ButtonText MULTIVIEW = new ButtonText(Buttons.multiview, "Multiview", "Multiview");
-    private final ButtonText RESETCAMERA = new ButtonText(Buttons.resetCamera, "Reset Camera", "Reset camera position to default");
-    private final ButtonText ZOOMONE = new ButtonText(Buttons.zoomOne, "Actual Size", "Zoom to native resolution");
-    private final ButtonText ZOOMFIT = new ButtonText(Buttons.zoomFit, "Zoom to Fit", "Zoom to fit");
-    private final ButtonText ZOOMOUT = new ButtonText(Buttons.zoomOut, "Zoom Out", "Zoom out");
     private final ButtonText ZOOMIN = new ButtonText(Buttons.zoomIn, "Zoom In", "Zoom in");
+    private final ButtonText ZOOMOUT = new ButtonText(Buttons.zoomOut, "Zoom Out", "Zoom out");
+    private final ButtonText ZOOMFIT = new ButtonText(Buttons.zoomFit, "Zoom to Fit", "Zoom to fit");
+    private final ButtonText ZOOMONE = new ButtonText(Buttons.zoomOne, "Actual Size", "Zoom to native resolution");
+    private final ButtonText RESETCAMERA = new ButtonText(Buttons.resetCamera, "Reset Camera", "Reset camera position to default");
+
+    private final ButtonText PAN = new ButtonText(Buttons.pan, "Pan", "Pan");
+    private final ButtonText ROTATE = new ButtonText(Buttons.rotate, "Rotate", "Rotate");
+    private final ButtonText AXIS = new ButtonText(Buttons.axis, "Axis", "Axis");
+
+    private final ButtonText TRACK = new ButtonText(Buttons.track, "Track", "Track solar rotation");
+    private final ButtonText OFFDISK = new ButtonText(Buttons.offDisk, "Corona", "Toggle off-disk corona");
+
+    private final ButtonText MULTIVIEW = new ButtonText(Buttons.multiview, "Multiview", "Multiview");
+    private final ButtonText PROJECTION = new ButtonText(Buttons.projection, "Projection", "Projection");
+    private final ButtonText ANNOTATION = new ButtonText(Buttons.annotate, "Annotation", "Annotation");
+
+    private final ButtonText CUTOUT = new ButtonText(Buttons.cutOut, "SDO Cut-out", "SDO cut-out service");
+    private final ButtonText SAMP = new ButtonText(Buttons.samp, "SAMP", "Send SAMP message");
 
 //  private final LinkedHashMap<ButtonText, ActionListener> pluginButtons = new LinkedHashMap<>();
 
@@ -233,29 +237,29 @@ public class ToolBar extends JToolBar {
             }
         });
 
-        JHVButton anotateButton = toolButton(ANNOTATE);
-        addButton(anotateButton);
+        JHVButton anotationButton = toolButton(ANNOTATION);
+        addButton(anotationButton);
 
-        JPopupMenu annotatePopup = new JPopupMenu();
-        ButtonGroup annotateGroup = new ButtonGroup();
+        JPopupMenu annotationPopup = new JPopupMenu();
+        ButtonGroup annotationGroup = new ButtonGroup();
         for (Interaction.AnnotationMode mode : Interaction.AnnotationMode.values()) {
             JRadioButtonMenuItem item = new JRadioButtonMenuItem(mode.toString());
             if (mode == JHVFrame.getInteraction().getAnnotationMode())
                 item.setSelected(true);
             item.addActionListener(e -> JHVFrame.getInteraction().setAnnotationMode(mode));
-            annotateGroup.add(item);
-            annotatePopup.add(item);
+            annotationGroup.add(item);
+            annotationPopup.add(item);
         }
 
-        annotatePopup.addSeparator();
-        annotatePopup.add(new ClearAnnotationsAction());
-        annotatePopup.addSeparator();
-        annotatePopup.add(new ZoomFOVAnnotationAction());
+        annotationPopup.addSeparator();
+        annotationPopup.add(new ClearAnnotationsAction());
+        annotationPopup.addSeparator();
+        annotationPopup.add(new ZoomFOVAnnotationAction());
 
-        anotateButton.addMouseListener(new MouseAdapter() {
+        anotationButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                annotatePopup.show(e.getComponent(), 0, e.getComponent().getHeight());
+                annotationPopup.show(e.getComponent(), 0, e.getComponent().getHeight());
             }
         });
 
