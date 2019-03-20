@@ -22,6 +22,7 @@ public class Movie {
         } else
             MoviePanel.setMovie(view);
         setTime(lastTimestamp); // ensure master layer time is used
+        timespanChanged();
     }
 
     public static long getStartTime() {
