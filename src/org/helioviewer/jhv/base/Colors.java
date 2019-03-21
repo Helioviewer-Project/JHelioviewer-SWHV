@@ -24,6 +24,7 @@ public class Colors {
     public static final byte[] Black = bytes(Color.BLACK);
     public static final byte[] Red = bytes(Color.RED);
     public static final byte[] Green = bytes(Color.GREEN);
+    public static final byte[] ReducedGreen = {(byte) 100, (byte) 175, (byte) 100, (byte) 255};
     public static final byte[] Blue = bytes(Color.BLUE);
     public static final byte[] White = bytes(Color.WHITE);
     public static final byte[] Yellow = bytes(Color.YELLOW);
