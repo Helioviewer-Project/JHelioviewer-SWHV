@@ -62,7 +62,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
     private final GLSLLine spiral = new GLSLLine(true);
     private final BufVertex spiralBuf = new BufVertex(SPIRAL_ARMS * (2 * SPIRAL_DIVISIONS + 1 + 2) * GLSLLine.stride);
-    private final byte[] spiralColor = Colors.Green;
+    private final byte[] spiralColor = Colors.ReducedGreen;
 
     private final ViewpointLayerOptions optionsPanel;
 
