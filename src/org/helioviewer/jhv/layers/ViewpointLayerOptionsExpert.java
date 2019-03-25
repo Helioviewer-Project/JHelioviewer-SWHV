@@ -82,7 +82,6 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         spiralPanel.add(spiralCheckBox);
         spiralPanel.add(spiralSlider);
         spiralPanel.add(spiralLabel);
-        ComponentUtils.setEnabled(spiralPanel, frame == Frame.HEE);
 
         JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
         radioPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
@@ -94,8 +93,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
                 if (radio.isSelected()) {
                     frame = f;
                     container.setFrame(frame);
-                    spiralMult = f == Frame.HEE && spiralCheckBox.isSelected() ? 1 : 0;
-                    ComponentUtils.setEnabled(spiralPanel, f == Frame.HEE);
+                    spiralMult = spiralCheckBox.isSelected() ? 1 : 0;
                 }
             });
             radioPanel.add(radio);
@@ -164,6 +162,10 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
 
     int getSpiralSpeed() {
         return spiralMult * spiralSpeed;
+    }
+
+    boolean isFrameInertial() {
+        return frame == Frame.HCI;
     }
 
 }
