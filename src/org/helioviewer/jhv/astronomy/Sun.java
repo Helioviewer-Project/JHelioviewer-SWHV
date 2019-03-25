@@ -132,9 +132,13 @@ public class Sun {
 
     private static final double theta0 = sunRot(JulianDay.milli2mjd(EPOCH.milli));
 
-    public static Quat getHCI(JHVDate time) {
+    public static double getHCILongitude(JHVDate time) {
         // 1.7381339560109783
-        return new Quat(0, sunRot(JulianDay.milli2mjd(time.milli)) + (1.738033457804639 + EpochEarth.lon - theta0));
+        return sunRot(JulianDay.milli2mjd(time.milli)) + (1.738033457804639 + EpochEarth.lon - theta0);
+    }
+
+    public static Quat getHCI(JHVDate time) {
+        return new Quat(0, getHCILongitude(time));
     }
 
     // better precison, to be recovered later

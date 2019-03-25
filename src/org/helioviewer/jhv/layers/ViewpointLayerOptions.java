@@ -205,4 +205,8 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
         return currentOptionPanel == equatorialOptionPanel ? equatorialOptionPanel.getSpiralSpeed() : 0;
     }
 
+    boolean isFrameInertial() {
+        return currentOptionPanel == equatorialOptionPanel && currentOptionPanel.isFrameInertial();
+    }
+
 }

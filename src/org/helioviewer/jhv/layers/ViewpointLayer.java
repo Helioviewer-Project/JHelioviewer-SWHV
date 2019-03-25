@@ -90,7 +90,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         }
 
         renderFOV(gl, vp, halfSide, pixFactor);
-        renderSpiral(gl, vp, viewpoint, optionsPanel.getSpiralSpeed());
+        renderSpiral(gl, vp, viewpoint, optionsPanel.isFrameInertial(), optionsPanel.getSpiralSpeed());
 
         Collection<LoadPosition> loadPositions = camera.getUpdateViewpoint().getLoadPositions();
         if (!loadPositions.isEmpty()) {
@@ -338,18 +338,18 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
         spiralBuf.putVertex(x, y, z, 1, color);
     }
 
-    private void renderSpiral(GL2 gl, Viewport vp, Position viewpoint, int speed) {
+    private void renderSpiral(GL2 gl, Viewport vp, Position viewpoint, boolean inertial, int speed) {
         if (speed == 0)
             return;
 
-        double sr = speed * Sun.RadiusKMeterInv / RAD_PER_SEC;
+        double sr = speed * (Sun.RadiusKMeterInv / RAD_PER_SEC);
         // control point
         double rad0, lon0, lat0;
 
         if (spiralControl == null) {
             Position p0 = Sun.getEarth(viewpoint.time);
             rad0 = p0.distance;
-            lon0 = 0;
+            lon0 = inertial ? Sun.getHCILongitude(viewpoint.time) - p0.lon : 0;
             lat0 = 0;
         } else {
             rad0 = spiralControl.x;
