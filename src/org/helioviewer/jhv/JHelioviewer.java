@@ -144,6 +144,7 @@ public class JHelioviewer {
             leftPane.setMinimumSize(new Dimension(imageLayerWidth, -1));
             dummy.unload();
 
+            JHVFrame.rejig(imageLayerWidth);
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
 
