@@ -32,7 +32,7 @@ import org.json.JSONObject;
 class ViewpointLayerOptions extends JPanel implements TimespanListener {
 
     private enum CameraMode {
-        Observer(UpdateViewpoint.observer), Earth(UpdateViewpoint.earth), Equatorial(UpdateViewpoint.equatorial), Other(UpdateViewpoint.expert);
+        Observer(UpdateViewpoint.observer), Earth(UpdateViewpoint.earth), Heliosphere(UpdateViewpoint.equatorial), Other(UpdateViewpoint.expert);
 
         final UpdateViewpoint update;
 
@@ -179,7 +179,7 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
         ViewpointLayerOptionsExpert panel = null;
         if (cameraMode == CameraMode.Other)
             panel = expertOptionPanel;
-        else if (cameraMode == CameraMode.Equatorial)
+        else if (cameraMode == CameraMode.Heliosphere)
             panel = equatorialOptionPanel;
         switchOptionsPanel(panel);
 
