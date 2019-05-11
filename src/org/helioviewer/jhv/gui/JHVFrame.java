@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.camera.Interaction;
@@ -35,8 +36,6 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLListener;
 
-import com.jidesoft.swing.JideSplitPane;
-
 import com.jogamp.newt.awt.NewtCanvasAWT;
 import com.jogamp.newt.opengl.GLWindow;
 
@@ -54,8 +53,6 @@ public class JHVFrame {
     private static InputController inputController;
     private static Interaction interaction;
     private static MainContentPanel mainContentPanel;
-
-    private static JideSplitPane splitPane;
 
     private static ZoomStatusPanel zoomStatus;
     private static CarringtonStatusPanel carringtonStatus;
@@ -96,14 +93,12 @@ public class JHVFrame {
         glComponent = new NewtCanvasAWT(glWindow);
         mainContentPanel = new MainContentPanel(glComponent);
 
-        splitPane = new JideSplitPane(JideSplitPane.HORIZONTAL_SPLIT);
-        splitPane.setContinuousLayout(true);
-        splitPane.setProportionalLayout(false);
-        splitPane.setDividerSize(2);
-        splitPane.setBorder(null);
+        JSplitPane midSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
+        midSplitPane.setDividerSize(2);
+        midSplitPane.setBorder(null);
 
-        splitPane.addPane(leftScrollPane);
-        splitPane.addPane(mainContentPanel);
+        midSplitPane.setLeftComponent(leftScrollPane);
+        midSplitPane.setRightComponent(mainContentPanel);
 
         zoomStatus = new ZoomStatusPanel();
         carringtonStatus = new CarringtonStatusPanel();
@@ -119,14 +114,10 @@ public class JHVFrame {
 
         toolBar = new ToolBar();
         mainFrame.add(toolBar, BorderLayout.PAGE_START);
-        mainFrame.add(splitPane, BorderLayout.CENTER);
+        mainFrame.add(midSplitPane, BorderLayout.CENTER);
         mainFrame.add(statusPanel, BorderLayout.PAGE_END);
 
         return mainFrame;
-    }
-
-    public static void rejig(int location) {
-        splitPane.setDividerLocation(0, location);
     }
 
     private static JFrame createFrame() {

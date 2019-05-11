@@ -8,13 +8,12 @@ import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
-
-import com.jidesoft.swing.JideSplitPane;
 
 // This panel acts as a container for the GUI elements which are shown in the
 // main area of the application. Usually it contains the main image area. Below
@@ -26,7 +25,7 @@ public class MainContentPanel extends JPanel {
 
     private final ArrayList<MainContentPanelPlugin> pluginList = new ArrayList<>();
 
-    private final JideSplitPane splitPane;
+    private final JSplitPane splitPane;
     private final JPanel pluginContainer;
     private final CollapsiblePane collapsiblePane;
 
@@ -40,13 +39,12 @@ public class MainContentPanel extends JPanel {
         container.setMinimumSize(new Dimension(1, 1));
         container.add(mainComponent, BorderLayout.CENTER);
 
-        splitPane = new JideSplitPane(JideSplitPane.VERTICAL_SPLIT);
-        splitPane.setContinuousLayout(true);
-        splitPane.setProportionalLayout(true); // needed
+        splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
         splitPane.setDividerSize(0);
         splitPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 1));
+        splitPane.setResizeWeight(0.75);
 
-        splitPane.addPane(container);
+        splitPane.setTopComponent(container);
 
         setLayout(new BorderLayout());
         setMinimumSize(new Dimension());
@@ -76,8 +74,8 @@ public class MainContentPanel extends JPanel {
     // area. An split pane will be provided, if necessary, to readjust the
     // height of the components.
     private void updateLayout() {
-        remove(collapsiblePane);
         splitPane.remove(collapsiblePane);
+        remove(collapsiblePane);
         splitPane.setDividerSize(0);
 
         if (pluginList.isEmpty()) {
@@ -86,31 +84,34 @@ public class MainContentPanel extends JPanel {
             return;
         }
 
-        boolean isSelected = collapsiblePane.toggleButton.isSelected();
         boolean onePlugin = pluginList.size() == 1 && pluginList.get(0).getVisualInterfaces().size() == 1;
         collapsiblePane.setTitle(onePlugin ? pluginList.get(0).getTabName() : "Plugins");
 
-        if (isSelected) {
+        if (collapsiblePane.toggleButton.isSelected()) {
             pluginContainer.removeAll();
+
             if (onePlugin) {
                 pluginContainer.add(pluginList.get(0).getVisualInterfaces().get(0), BorderLayout.CENTER);
-            } else {
+
+                splitPane.setBottomComponent(collapsiblePane);
+                splitPane.setDividerSize(DIVIDER_SIZE);
+            } else if (!pluginList.isEmpty()) {
                 JTabbedPane tabbedPane = new JTabbedPane();
                 for (MainContentPanelPlugin plugin : pluginList) {
                     for (JComponent component : plugin.getVisualInterfaces()) {
                         tabbedPane.addTab(plugin.getTabName(), component);
                     }
                 }
+
                 pluginContainer.add(tabbedPane, BorderLayout.CENTER);
+
+                splitPane.setBottomComponent(collapsiblePane);
+                splitPane.setDividerSize(DIVIDER_SIZE);
             }
-            splitPane.addPane(collapsiblePane);
-            splitPane.setDividerSize(DIVIDER_SIZE);
-            splitPane.setProportions(new double[] { .75 });
         } else {
             add(collapsiblePane, BorderLayout.PAGE_END);
         }
-
-        Settings.setProperty("display.plugins", Boolean.toString(isSelected));
+        Settings.setProperty("display.plugins", Boolean.toString(collapsiblePane.toggleButton.isSelected()));
 
         revalidate();
         repaint();
