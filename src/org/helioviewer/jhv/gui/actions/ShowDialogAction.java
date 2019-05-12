@@ -16,10 +16,6 @@ public class ShowDialogAction extends AbstractAction {
         dialog = _dialog;
     }
 
-    public void show() {
-        actionPerformed(new ActionEvent("", 0, null));
-    }
-
     @Override
     public void actionPerformed(ActionEvent e) {
         dialog.showDialog();

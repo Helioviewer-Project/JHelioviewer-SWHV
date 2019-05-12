@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui.components;
 
+import java.awt.Desktop;
 import java.awt.event.KeyEvent;
 
 import javax.swing.JMenu;
@@ -24,7 +25,6 @@ import org.helioviewer.jhv.gui.actions.ZoomOneToOneAction;
 import org.helioviewer.jhv.gui.actions.ZoomOutAction;
 import org.helioviewer.jhv.gui.dialogs.AboutDialog;
 import org.helioviewer.jhv.gui.dialogs.PreferencesDialog;
-import org.helioviewer.jhv.platform.OSXHandler;
 import org.helioviewer.jhv.plugins.PluginsDialog;
 
 // Menu bar of the main window
@@ -40,11 +40,12 @@ public class MenuBar extends JMenuBar {
         fileMenu.add(new SaveStateAction());
         fileMenu.add(new LoadStateAction());
 
+        ExitProgramAction exitAction = new ExitProgramAction();
         if (System.getProperty("jhv.os").equals("mac")) {
-            OSXHandler.quitHandler();
+            Desktop.getDesktop().setQuitHandler((e, response) -> exitAction.actionPerformed(null));
         } else {
             fileMenu.addSeparator();
-            fileMenu.add(new ExitProgramAction());
+            fileMenu.add(exitAction);
         }
         add(fileMenu);
 
@@ -73,7 +74,7 @@ public class MenuBar extends JMenuBar {
 
         ShowDialogAction preferencesAction = new ShowDialogAction("Preferences...", new PreferencesDialog());
         if (System.getProperty("jhv.os").equals("mac")) {
-            OSXHandler.preferencesHandler(preferencesAction);
+            Desktop.getDesktop().setPreferencesHandler(e -> preferencesAction.actionPerformed(null));
             JMenu windowMenu = new JMenu("Window");
             windowMenu.setMnemonic(KeyEvent.VK_W);
             windowMenu.add(new WindowMinimizeAction());
@@ -88,7 +89,7 @@ public class MenuBar extends JMenuBar {
 
         ShowDialogAction aboutAction = new ShowDialogAction("About JHelioviewer...", new AboutDialog());
         if (System.getProperty("jhv.os").equals("mac")) {
-            OSXHandler.aboutHandler(aboutAction);
+            Desktop.getDesktop().setAboutHandler(e -> aboutAction.actionPerformed(null));
         } else {
             helpMenu.add(aboutAction);
         }
