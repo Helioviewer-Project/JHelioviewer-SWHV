@@ -26,9 +26,7 @@ class FilterPanelFactory {
         int decimalPlacesMax = maxString.length() - integerPlacesMax - 1;
         if (integerPlacesMax != -1 && integerPlacesMin != -1) {
             spinnerFormat.append('.');
-            for (int i = 0; i < Math.max(decimalPlacesMax, decimalPlacesMin); i++) {
-                spinnerFormat.append('0');
-            }
+            spinnerFormat.append("0".repeat(Math.max(0, Math.max(decimalPlacesMax, decimalPlacesMin))));
         }
         return spinnerFormat.toString();
     }
