@@ -6,8 +6,6 @@ import org.helioviewer.jhv.log.Log;
 
 public class SystemProperties {
 
-    public static final boolean JAVA9 = Double.parseDouble(System.getProperty("java.specification.version")) >= 1.9;
-
     // Reads the builtin Java properties to determine the platform and set simplified properties used by JHV
     static void setPlatform() {
         String javaArch = System.getProperty("sun.arch.data.model");
