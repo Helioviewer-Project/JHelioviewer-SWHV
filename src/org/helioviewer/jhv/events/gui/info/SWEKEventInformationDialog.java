@@ -194,7 +194,7 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
     }
 
     private void startOtherRelatedEventsWorker() {
-        JHVWorker<ArrayList<JHVEvent>, Void> worker = new JHVWorker<ArrayList<JHVEvent>, Void>() {
+        JHVWorker<ArrayList<JHVEvent>, Void> worker = new JHVWorker<>() {
             @Override
             public ArrayList<JHVEvent> backgroundWork() {
                 return EventDatabase.getOtherRelations(event.getUniqueID(), event.getSupplier(), false, true);

@@ -144,6 +144,6 @@ public class UIGlobals {
     public static Color midColor;
 
     public static final boolean canBrowse = Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE);
-    public static final int menuShortcutMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+    public static final int menuShortcutMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
 }

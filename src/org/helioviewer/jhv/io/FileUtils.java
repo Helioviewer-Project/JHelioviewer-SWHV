@@ -33,7 +33,7 @@ public class FileUtils {
     public static long diskUsage(File dir) throws IOException {
         AtomicLong size = new AtomicLong(0);
 
-        Files.walkFileTree(dir.toPath(), new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(dir.toPath(), new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                 size.addAndGet(attrs.size());
@@ -43,7 +43,7 @@ public class FileUtils {
         return size.get();
     }
 
-    private static final SimpleFileVisitor<Path> nukeVisitor = new SimpleFileVisitor<Path>() {
+    private static final SimpleFileVisitor<Path> nukeVisitor = new SimpleFileVisitor<>() {
 
         private FileVisitResult delete(Path file) throws IOException {
             Files.delete(file);
