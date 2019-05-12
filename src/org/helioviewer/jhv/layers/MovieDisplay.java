@@ -28,7 +28,7 @@ public class MovieDisplay implements JHVEventHighlightListener {
     }
 
     private MovieDisplay() {
-        displayTimer = new Timer(1000 / 120, e -> JHVFrame.getGLWindow().display());
+        displayTimer = new Timer(1000 / 120, e -> JHVFrame.getGLCanvas().display());
         displayTimer.setRepeats(false);
         JHVRelatedEvents.addHighlightListener(this);
     }

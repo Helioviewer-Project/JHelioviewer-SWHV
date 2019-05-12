@@ -1,6 +1,9 @@
 package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -31,10 +34,8 @@ import org.helioviewer.jhv.time.JHVDate;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
-import com.jogamp.newt.event.MouseEvent;
-import com.jogamp.newt.event.MouseListener;
 
-public class ViewpointLayer extends AbstractLayer implements MouseListener {
+public class ViewpointLayer extends AbstractLayer implements MouseListener, MouseMotionListener {
 
     private static final double DELTA_ORBIT = 10 * 60 * 1000 * Sun.MeanEarthDistanceInv;
     private static final double DELTA_CUTOFF = 3 * Sun.MeanEarthDistance;
@@ -208,10 +209,6 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
     @Override
     public void mouseDragged(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseWheelMoved(MouseEvent e) {
     }
 
     @Override

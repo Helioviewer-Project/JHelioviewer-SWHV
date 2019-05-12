@@ -54,7 +54,7 @@ import com.jogamp.opengl.GL2;
 // has to be public for state
 public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEventHandler {
 
-    private final SWEKPopupController controller = new SWEKPopupController(JHVFrame.getGLComponent());
+    private final SWEKPopupController controller = new SWEKPopupController(JHVFrame.getGLCanvas());
     private final JPanel optionsPanel;
 
     private static final int DIVPOINTS = 10;

@@ -1,12 +1,12 @@
 package org.helioviewer.jhv.camera;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Vec2;
-
-import com.jogamp.newt.event.KeyEvent;
-import com.jogamp.newt.event.MouseEvent;
 
 class InteractionPan implements InteractionType {
 

@@ -1,18 +1,20 @@
 package org.helioviewer.jhv.opengl;
 
+import java.awt.geom.AffineTransform;
+
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.log.Log;
 
-import com.jogamp.nativewindow.ScalableSurface;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.glu.GLU;
+
+import com.jogamp.opengl.awt.GLCanvas;
 
 public class GLInfo {
 
     public static final int GLSAMPLES = 4;
 
-    public static final int[] pixelScale = {1, 1};
-    public static final float[] pixelScaleFloat = {1, 1};
+    public static final double[] pixelScale = {1, 1};
     public static String glVersion = "";
 
     public static int maxTextureSize;
@@ -35,10 +37,10 @@ public class GLInfo {
         maxTextureSize = out[0];
     }
 
-    public static void updatePixelScale(ScalableSurface surface) {
-        surface.getCurrentSurfaceScale(pixelScaleFloat);
-        pixelScale[0] = (int) pixelScaleFloat[0];
-        pixelScale[1] = (int) pixelScaleFloat[1];
+    public static void updatePixelScale(GLCanvas canvas) {
+        AffineTransform tx = canvas.getGraphicsConfiguration().getDefaultTransform();
+        pixelScale[0] = tx.getScaleX(); 
+        pixelScale[1] = tx.getScaleY(); 
     }
 
     public static boolean checkGLErrors(GL2 gl, String message) {

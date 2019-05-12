@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import java.awt.EventQueue;
-
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
@@ -15,27 +13,27 @@ import org.helioviewer.jhv.layers.MiniviewLayer;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
-import com.jogamp.nativewindow.ScalableSurface;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.awt.GLCanvas;
 
 public class GLListener implements GLEventListener {
 
-    private final ScalableSurface surface;
+    private final GLCanvas canvas;
 
     private static final GLSLShape blackCircle = new GLSLShape(false);
     public static final GLSLSolar glslSolar = new GLSLSolar();
 
-    public GLListener(ScalableSurface _surface) {
-        surface = _surface;
+    public GLListener(GLCanvas _canvas) {
+        canvas = _canvas;
     }
 
     @Override
-    public void init(GLAutoDrawable drawable) { // NEDT
+    public void init(GLAutoDrawable drawable) {
         GL2 gl = (GL2) drawable.getGL();
         GLInfo.update(gl);
-        GLInfo.updatePixelScale(surface);
+        GLInfo.updatePixelScale(canvas);
 
         gl.glDisable(GL2.GL_TEXTURE_1D);
         gl.glDisable(GL2.GL_TEXTURE_2D);
@@ -70,15 +68,8 @@ public class GLListener implements GLEventListener {
     }
 
     @Override
-    public void dispose(GLAutoDrawable drawable) { // NEDT
+    public void dispose(GLAutoDrawable drawable) {
         GL2 gl = (GL2) drawable.getGL();
-        EventQueue.invokeLater(() -> {
-            disposeImpl(gl);
-            GLInfo.checkGLErrors(gl, "GLListener.dispose()");
-        });
-    }
-
-    private static void disposeImpl(GL2 gl) {
         Layers.dispose(gl);
         JHVFrame.getInteraction().disposeAnnotations(gl);
         blackCircle.dispose(gl);
@@ -89,18 +80,18 @@ public class GLListener implements GLEventListener {
         GLSLLineShader.dispose(gl);
         GLSLShapeShader.dispose(gl);
         GLSLTextureShader.dispose(gl);
+
+        GLInfo.checkGLErrors(gl, "GLListener.dispose()");
     }
 
     @Override
-    public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) { // NEDT
-        EventQueue.invokeLater(() -> {
-            Display.setGLSize(x, y, width, height);
-            Display.reshapeAll();
-            MiniviewLayer miniview = Layers.getMiniviewLayer();
-            if (miniview != null)
-                miniview.reshapeViewport();
-            MovieDisplay.render(1);
-        });
+    public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+        Display.setGLSize(x, y, (int) (canvas.getWidth() * GLInfo.pixelScale[0] + .5), (int) (canvas.getHeight() * GLInfo.pixelScale[1] + .5));
+        Display.reshapeAll();
+        MiniviewLayer miniview = Layers.getMiniviewLayer();
+        if (miniview != null)
+            miniview.reshapeViewport();
+        MovieDisplay.render(1);
     }
 
     public static void renderScene(Camera camera, GL2 gl) {
@@ -159,12 +150,7 @@ public class GLListener implements GLEventListener {
 
     @Override
     public void display(GLAutoDrawable drawable) { // NEDT
-        if (!EventQueue.isDispatchThread()) { // via reshape(), reject
-            return;
-        }
-
-        GLInfo.updatePixelScale(surface);
-
+        GLInfo.updatePixelScale(canvas);
         GL2 gl = (GL2) drawable.getGL();
         gl.glFinish();
 

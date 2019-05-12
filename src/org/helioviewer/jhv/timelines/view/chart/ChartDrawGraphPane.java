@@ -137,9 +137,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private void redrawGraph(Rectangle graphArea) {
         Rectangle graphSize = DrawController.getGraphSize();
-        int sx = GLInfo.pixelScale[0], sy = GLInfo.pixelScale[1];
-        int width = sx * (int) graphSize.getWidth();
-        int height = sy * (int) graphSize.getHeight();
+        double sx = GLInfo.pixelScale[0], sy = GLInfo.pixelScale[1];
+        int width = (int) (sx * graphSize.getWidth() + .5);
+        int height = (int) (sy * graphSize.getHeight() + .5);
 
         if (width > 0 && height > 0) {
             if (width != lastWidth || height != lastHeight) {

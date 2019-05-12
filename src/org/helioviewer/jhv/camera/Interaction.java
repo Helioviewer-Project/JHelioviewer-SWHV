@@ -1,5 +1,13 @@
 package org.helioviewer.jhv.camera;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.Settings;
@@ -12,13 +20,9 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.json.JSONObject;
 
-import com.jogamp.newt.event.KeyEvent;
-import com.jogamp.newt.event.KeyListener;
-import com.jogamp.newt.event.MouseEvent;
-import com.jogamp.newt.event.MouseListener;
 import com.jogamp.opengl.GL2;
 
-public class Interaction implements MouseListener, KeyListener {
+public class Interaction implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 
     public enum Mode { PAN, ROTATE, AXIS }
 
@@ -91,8 +95,8 @@ public class Interaction implements MouseListener, KeyListener {
     }
 
     @Override
-    public void mouseWheelMoved(MouseEvent e) {
-        float r = e.getRotation()[1];
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        double r = e.getPreciseWheelRotation();
         if (r != 0) {
             camera.zoom(-Camera.ZOOM_MULTIPLIER_WHEEL * r);
             if (r > 0) {
@@ -152,6 +156,10 @@ public class Interaction implements MouseListener, KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
         annotate = false;
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
     }
 
     public void clearAnnotations() {

@@ -28,16 +28,13 @@ import org.helioviewer.jhv.gui.components.statusplugin.FramerateStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugin.PositionStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugin.ZoomStatusPanel;
 import org.helioviewer.jhv.input.InputController;
-import org.helioviewer.jhv.input.NEWTKeyAdapter;
-import org.helioviewer.jhv.input.NEWTMouseAdapter;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLListener;
 
-import com.jogamp.newt.awt.NewtCanvasAWT;
-import com.jogamp.newt.opengl.GLWindow;
+import com.jogamp.opengl.awt.GLCanvas;
 
 public class JHVFrame {
 
@@ -46,8 +43,7 @@ public class JHVFrame {
 
     private static SideContentPane leftPane;
 
-    private static GLWindow glWindow;
-    private static NewtCanvasAWT glComponent;
+    private static GLCanvas glCanvas;
     private static GLListener glListener;
 
     private static InputController inputController;
@@ -68,10 +64,10 @@ public class JHVFrame {
         menuBar = new MenuBar();
         mainFrame.setJMenuBar(menuBar);
 
-        glWindow = GLHelper.createGLWindow(); // before camera
-        glWindow.setTitle(mainFrame.getTitle());
-        glListener = new GLListener(glWindow);
-        glWindow.addGLEventListener(glListener);
+        glCanvas = GLHelper.createGLCanvas(); // before camera
+        glCanvas.setMinimumSize(new Dimension(1, 1)); // allow resize
+        glListener = new GLListener(glCanvas);
+        glCanvas.addGLEventListener(glListener);
 
         layers = new Layers();
         layersPanel = new LayersPanel(layers);
@@ -87,11 +83,12 @@ public class JHVFrame {
 
         interaction = new Interaction(Display.getCamera());
         inputController = new InputController(interaction);
-        glWindow.addMouseListener(new NEWTMouseAdapter(inputController));
-        glWindow.addKeyListener(new NEWTKeyAdapter(inputController));
+        glCanvas.addMouseListener(inputController);
+        glCanvas.addMouseMotionListener(inputController);
+        glCanvas.addMouseWheelListener(inputController);
+        glCanvas.addKeyListener(inputController);
 
-        glComponent = new NewtCanvasAWT(glWindow);
-        mainContentPanel = new MainContentPanel(glComponent);
+        mainContentPanel = new MainContentPanel(glCanvas);
 
         JSplitPane midSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
         midSplitPane.setDividerSize(2);
@@ -171,12 +168,8 @@ public class JHVFrame {
         return leftScrollPane;
     }
 
-    public static GLWindow getGLWindow() {
-        return glWindow;
-    }
-
-    public static NewtCanvasAWT getGLComponent() {
-        return glComponent;
+    public static GLCanvas getGLCanvas() {
+        return glCanvas;
     }
 
     public static GLListener getGLListener() {

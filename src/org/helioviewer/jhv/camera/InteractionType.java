@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.camera;
 
-import com.jogamp.newt.event.KeyEvent;
-import com.jogamp.newt.event.MouseEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 
 interface InteractionType {
 

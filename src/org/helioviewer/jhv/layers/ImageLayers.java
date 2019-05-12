@@ -56,7 +56,7 @@ public class ImageLayers {
             if (layer.isEnabled() && (id = layer.getImageData()) != null && viewpoint != id.getViewpoint() /* deliberate on reference */)
                 return;
         }
-        JHVFrame.getGLWindow().display(); // display asap
+        JHVFrame.getGLCanvas().display(); // display asap
     }
 
     public static void arrangeMultiView(boolean multiview) {

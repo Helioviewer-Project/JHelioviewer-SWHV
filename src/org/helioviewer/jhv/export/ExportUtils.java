@@ -49,7 +49,8 @@ class ExportUtils {
             AffineTransform at = AffineTransform.getTranslateInstance(0, frameH);
             at.concatenate(AffineTransform.getScaleInstance(scaleX, scaleY));
             g.setTransform(at);
-            g.drawLine(movieLinePosition * GLInfo.pixelScale[0], 0, movieLinePosition * GLInfo.pixelScale[0], im2.getHeight());
+            int screenMovieLine = (int) (movieLinePosition * GLInfo.pixelScale[0] + .5);
+            g.drawLine(screenMovieLine, 0, screenMovieLine, im2.getHeight());
         }
 
         g.dispose();
