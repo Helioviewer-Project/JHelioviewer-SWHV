@@ -1,5 +1,8 @@
 package org.helioviewer.jhv.camera;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+
 import java.util.ArrayList;
 
 import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
@@ -16,8 +19,6 @@ import org.helioviewer.jhv.position.Position;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.jogamp.newt.event.KeyEvent;
-import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.opengl.GL2;
 
 class InteractionAnnotate implements InteractionType {

@@ -1,14 +1,14 @@
 package org.helioviewer.jhv.camera;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
-
-import com.jogamp.newt.event.KeyEvent;
-import com.jogamp.newt.event.MouseEvent;
 
 class InteractionAxis implements InteractionType {
 

@@ -10,13 +10,12 @@ import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.position.Position;
 
-import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLDrawableFactory;
 import com.jogamp.opengl.GLProfile;
-//import com.jogamp.opengl.awt.GLCanvas;
+import com.jogamp.opengl.awt.GLCanvas;
 
 public class GLHelper {
 
@@ -45,11 +44,11 @@ public class GLHelper {
     }
 
     public static Point GL2AWTPoint(int x, int y) {
-        return new Point((int) (x / GLInfo.pixelScaleFloat[0]), (int) (y / GLInfo.pixelScaleFloat[1]));
+        return new Point((int) (x / GLInfo.pixelScale[0] + .5), (int) (y / GLInfo.pixelScale[1] + .5));
     }
 
     public static Dimension GL2AWTDimension(int x, int y) {
-        return new Dimension((int) (x / GLInfo.pixelScaleFloat[0]), (int) (y / GLInfo.pixelScaleFloat[1]));
+        return new Dimension((int) (x / GLInfo.pixelScale[0] + .5), (int) (y / GLInfo.pixelScale[1] + .5));
     }
 
     public static Vec2 drawVertex(Position viewpoint, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color) {
@@ -79,31 +78,20 @@ public class GLHelper {
         vexBuf.putVertex(x, y, 0, 1, color);
         return tf;
     }
-    /*
-        public static GLCanvas createGLCanvas() {
-            GLProfile profile = GLProfile.getDefault();
-            GLCapabilities capabilities = getGLCapabilities(profile);
-            GLCanvas canvas = new GLCanvas(capabilities);
 
-            // GUI events can lead to context destruction and invalidation of GL objects and state
-            canvas.setSharedAutoDrawable(getSharedDrawable(profile, capabilities));
-
-            return canvas;
-        }
-    */
-    public static GLWindow createGLWindow() {
-        GLWindow window = null;
+    public static GLCanvas createGLCanvas() {
+        GLCanvas canvas = null;
         try {
             GLProfile profile = GLProfile.get(GLProfile.GL3);
             GLCapabilities capabilities = getGLCapabilities(profile);
-            window = GLWindow.create(capabilities);
+            canvas = new GLCanvas(capabilities);
             // GUI events can lead to context destruction and invalidation of GL objects and state
-            window.setSharedAutoDrawable(getSharedDrawable(profile, capabilities));
+            canvas.setSharedAutoDrawable(getSharedDrawable(profile, capabilities));
         } catch (Exception e) {
             String msg = e.getMessage();
             GLInfo.glVersionError(msg == null ? "Unknown OpenGL error." : msg);
         }
-        return window;
+        return canvas;
     }
 
     private static GLCapabilities getGLCapabilities(GLProfile profile) {

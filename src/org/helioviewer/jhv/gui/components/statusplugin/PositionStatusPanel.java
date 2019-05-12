@@ -1,5 +1,9 @@
 package org.helioviewer.jhv.gui.components.statusplugin;
 
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.astronomy.Sun;
@@ -18,11 +22,8 @@ import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 
-import com.jogamp.newt.event.MouseEvent;
-import com.jogamp.newt.event.MouseListener;
-
 @SuppressWarnings("serial")
-public class PositionStatusPanel extends StatusPanel.StatusPlugin implements MouseListener {
+public class PositionStatusPanel extends StatusPanel.StatusPlugin implements MouseListener, MouseMotionListener {
 
     private static final String nanOrtho = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
     private static final String nanLati = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
@@ -105,10 +106,6 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
     @Override
     public void mouseMoved(MouseEvent e) {
         update(e.getX(), e.getY());
-    }
-
-    @Override
-    public void mouseWheelMoved(MouseEvent e) {
     }
 
     @Override
