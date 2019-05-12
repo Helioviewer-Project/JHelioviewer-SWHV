@@ -18,7 +18,7 @@ import okio.Okio;
 public class NetFileCache {
 
     private static final LoadingCache<URI, URI> cache = CacheBuilder.newBuilder().maximumSize(512).
-            build(new CacheLoader<URI, URI>() {
+            build(new CacheLoader<>() {
                 @Override
                 public URI load(@Nonnull URI uri) throws IOException {
                     File f = File.createTempFile("jhv", null, JHVGlobals.fileCacheDir);

@@ -22,10 +22,10 @@ public class PfssData {
         dateObs = _dateObs;
 
         int len = _flinex.length;
-        flinex = (ShortBuffer) BufferUtils.newShortBuffer(len).put(_flinex).rewind();
-        fliney = (ShortBuffer) BufferUtils.newShortBuffer(len).put(_fliney).rewind();
-        flinez = (ShortBuffer) BufferUtils.newShortBuffer(len).put(_flinez).rewind();
-        flines = (ShortBuffer) BufferUtils.newShortBuffer(len).put(_flines).rewind();
+        flinex = BufferUtils.newShortBuffer(len).put(_flinex).rewind();
+        fliney = BufferUtils.newShortBuffer(len).put(_fliney).rewind();
+        flinez = BufferUtils.newShortBuffer(len).put(_flinez).rewind();
+        flines = BufferUtils.newShortBuffer(len).put(_flines).rewind();
 
         pointsPerLine = _pointsPerLine;
 
