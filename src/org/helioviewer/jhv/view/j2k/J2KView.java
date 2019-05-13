@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import kdu_jni.KduException;
@@ -355,6 +356,7 @@ public class J2KView extends BaseView {
     }
 
     // very slow
+    @Nonnull
     @Override
     public String getXMLMetaData() throws Exception {
         return kduSource.extractXMLString(trueFrame);
