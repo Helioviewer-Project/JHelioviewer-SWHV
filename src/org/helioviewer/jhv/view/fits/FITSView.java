@@ -2,6 +2,8 @@ package org.helioviewer.jhv.view.fits;
 
 import java.net.URI;
 
+import javax.annotation.Nonnull;
+
 import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
@@ -30,6 +32,7 @@ public class FITSView extends BaseView {
         imageData.setMetaData(m);
     }
 
+    @Nonnull
     @Override
     public String getXMLMetaData() {
         return xml;

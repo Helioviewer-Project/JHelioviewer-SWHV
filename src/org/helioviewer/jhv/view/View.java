@@ -3,6 +3,7 @@ package org.helioviewer.jhv.view;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.lut.LUT;
@@ -65,6 +66,7 @@ public interface View {
     MetaData getMetaData(JHVDate time);
     // -->
 
+    @Nonnull
     String getXMLMetaData() throws Exception;
 
 }
