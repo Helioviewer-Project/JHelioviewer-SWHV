@@ -34,9 +34,11 @@ public class SimpleImageView extends BaseView {
     public SimpleImageView(URI _uri, APIRequest _request) throws Exception {
         super(_uri, _request);
 
-        BufferedImage image;
+        BufferedImage image = null;
         try (NetClient nc = NetClient.of(uri); ImageInputStream iis = ImageIO.createImageInputStream(nc.getStream())) {
-            image = readImage(iis);
+            image = readStream(iis);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         if (image == null)
             throw new Exception("Could not read image: " + uri);
@@ -89,38 +91,33 @@ public class SimpleImageView extends BaseView {
         return true;
     }
 
-    private BufferedImage readImage(ImageInputStream iis) {
-        BufferedImage ret = null;
-        try {
-            Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
-            if (readers.hasNext()) {
-                // pick the first available ImageReader
-                ImageReader reader = readers.next();
-                // attach source to the reader
-                reader.setInput(iis, true);
-                // read first image
-                ret = reader.read(0);
-                // read metadata of first image
-                IIOMetadata metadata = reader.getImageMetadata(0);
+    private BufferedImage readStream(ImageInputStream iis) throws Exception {
+        Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
+        if (readers.hasNext()) {
+            // pick the first available ImageReader
+            ImageReader reader = readers.next();
+            // attach source to the reader
+            reader.setInput(iis, true);
+            // read metadata of first image
+            IIOMetadata metadata = reader.getImageMetadata(0);
 
-                IIOMetadataNode root = (IIOMetadataNode) metadata.getAsTree("javax_imageio_1.0");
-                Object text = root.getElementsByTagName("TextEntry").item(0);
-                if (text instanceof IIOMetadataNode) {
-                    xml = ((IIOMetadataNode) text).getAttribute("value").trim().replace("&", "&amp;");
-                }
-                /*
-                String[] names = metadata.getMetadataFormatNames();
-                int length = names.length;
-                for (int i = 0; i < length; i++) {
-                    System.out.println("Format name: " + names[i]);
-                    XMLUtils.displayNode(metadata.getAsTree(names[i]), 0);
-                }
-                */
+            IIOMetadataNode root = (IIOMetadataNode) metadata.getAsTree("javax_imageio_1.0");
+            Object text = root.getElementsByTagName("TextEntry").item(0);
+            if (text instanceof IIOMetadataNode) {
+                xml = ((IIOMetadataNode) text).getAttribute("value").trim().replace("&", "&amp;");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            /*
+            String[] names = metadata.getMetadataFormatNames();
+            int length = names.length;
+            for (int i = 0; i < length; i++) {
+                System.out.println("Format name: " + names[i]);
+                XMLUtils.displayNode(metadata.getAsTree(names[i]), 0);
+            }
+            */
+            // read first image
+            return reader.read(0);
         }
-        return ret;
+        return null;
     }
 
 }
