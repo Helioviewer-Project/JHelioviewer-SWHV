@@ -6,6 +6,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Mat4f;
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec2;
@@ -141,13 +142,7 @@ public class Camera {
     }
 
     public void setFOV(double _fov) {
-        if (_fov < MIN_FOV) {
-            fov = MIN_FOV;
-        } else if (_fov > MAX_FOV) {
-            fov = MAX_FOV;
-        } else {
-            fov = _fov;
-        }
+        fov = MathUtils.clip(_fov, MIN_FOV, MAX_FOV);
         updateWidth();
     }
 

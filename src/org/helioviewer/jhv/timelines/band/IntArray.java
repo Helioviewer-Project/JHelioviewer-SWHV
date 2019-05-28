@@ -14,7 +14,7 @@ class IntArray {
     }
 
     IntArray(int size) {
-        array = new int[size < CHUNK ? CHUNK : size];
+        array = new int[Math.max(size, CHUNK)];
     }
 
     void put(int v) {

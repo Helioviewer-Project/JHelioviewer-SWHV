@@ -120,9 +120,9 @@ public class JHVCalendarDatePicker extends JPanel {
 
         // correct position of popup when it does not fit into screen area
         x = x + jhvCalendar.getSize().width > Toolkit.getDefaultToolkit().getScreenSize().width ? Toolkit.getDefaultToolkit().getScreenSize().width - jhvCalendar.getSize().width : x;
-        x = x < 0 ? 0 : x;
+        x = Math.max(x, 0);
         y = y + jhvCalendar.getSize().height > Toolkit.getDefaultToolkit().getScreenSize().height ? textField.getLocationOnScreen().y - jhvCalendar.getSize().height : y;
-        y = y < 0 ? 0 : y;
+        y = Math.max(y, 0);
 
         calPopup.hide();
 

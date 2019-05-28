@@ -27,10 +27,10 @@ public class BufVertex {
     private int lengthColor;
 
     public BufVertex(int size) {
-        arrayVertx = new byte[size < 16 ? 16 : size];
+        arrayVertx = new byte[Math.max(size, 16)];
         vertxBuffer = ByteBuffer.wrap(arrayVertx);
         size /= 4;
-        arrayColor = new byte[size < 4 ? 4 : size];
+        arrayColor = new byte[Math.max(size, 4)];
         colorBuffer = ByteBuffer.wrap(arrayColor);
     }
 
