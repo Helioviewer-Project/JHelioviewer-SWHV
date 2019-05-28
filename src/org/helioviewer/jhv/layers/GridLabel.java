@@ -54,28 +54,24 @@ class GridLabel {
         for (double phi = 0; phi <= 90; phi += latStep) {
             String txt = formatter1.format(phi);
             double angle = (90 - phi) * Math.PI / 180.;
-            float x, y;
+            float x = (float) (Math.sin(angle) * size);
+            float y = (float) (Math.cos(angle) * size - verticalAdjustment);
 
-            x = (float) (Math.sin(angle) * size);
-            y = (float) (Math.cos(angle) * size - verticalAdjustment);
             labels.add(new GridLabel(txt, x, y, identity));
             if (phi != 90) {
                 x = (float) (-Math.sin(angle) * size - horizontalAdjustment);
-                y = (float) (Math.cos(angle) * size - verticalAdjustment);
                 labels.add(new GridLabel(txt, x, y, identity));
             }
         }
         for (double phi = -latStep; phi >= -90; phi -= latStep) {
             String txt = formatter1.format(phi);
             double angle = (90 - phi) * Math.PI / 180.;
-            float x, y;
+            float x = (float) (Math.sin(angle) * size);
+            float y = (float) (Math.cos(angle) * size - verticalAdjustment);
 
-            x = (float) (Math.sin(angle) * size);
-            y = (float) (Math.cos(angle) * size - verticalAdjustment);
             labels.add(new GridLabel(txt, x, y, identity));
             if (phi != -90) {
                 x = (float) (-Math.sin(angle) * size - horizontalAdjustment);
-                y = (float) (Math.cos(angle) * size - verticalAdjustment);
                 labels.add(new GridLabel(txt, x, y, identity));
             }
         }
