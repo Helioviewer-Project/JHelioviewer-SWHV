@@ -127,7 +127,9 @@ public class BandType {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
+        if (this == o)
+            return true;
         if (!(o instanceof BandType))
             return false;
         BandType t = (BandType) o;

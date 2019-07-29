@@ -100,7 +100,9 @@ public class Vec3 {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
+        if (this == o)
+            return true;
         if (!(o instanceof Vec3))
             return false;
         Vec3 v = (Vec3) o;

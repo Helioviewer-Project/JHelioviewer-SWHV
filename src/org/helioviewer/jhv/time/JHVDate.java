@@ -24,7 +24,9 @@ public class JHVDate implements Comparable<JHVDate> {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
+        if (this == o)
+            return true;
         if (!(o instanceof JHVDate))
             return false;
         JHVDate d = (JHVDate) o;

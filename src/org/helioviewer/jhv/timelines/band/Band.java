@@ -261,7 +261,9 @@ public class Band extends AbstractTimelineLayer {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
+        if (this == o)
+            return true;
         return o instanceof Band && o.toString().equals(toString());
     }
 

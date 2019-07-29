@@ -31,7 +31,9 @@ public class Region {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
+        if (this == o)
+            return true;
         if (!(o instanceof Region))
             return false;
         Region r = (Region) o;

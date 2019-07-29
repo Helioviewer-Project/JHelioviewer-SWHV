@@ -74,7 +74,9 @@ public class Interval implements Comparable<Interval> {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
+        if (this == o)
+            return true;
         if (!(o instanceof Interval))
             return false;
         Interval s = (Interval) o;
