@@ -24,7 +24,9 @@ class DateValue implements Comparable<DateValue> {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
+        if (this == o)
+            return true;
         if (!(o instanceof DateValue))
             return false;
         DateValue d = (DateValue) o;

@@ -22,7 +22,9 @@ public class DecodeParams {
     }
 
     @Override
-    public boolean equals(Object o) { // viewpoint, complete don't participate
+    public final boolean equals(Object o) { // viewpoint, complete don't participate
+        if (this == o)
+            return true;
         if (!(o instanceof DecodeParams))
             return false;
         DecodeParams p = (DecodeParams) o;

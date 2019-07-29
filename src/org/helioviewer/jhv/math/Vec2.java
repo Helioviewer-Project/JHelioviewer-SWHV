@@ -14,7 +14,9 @@ public class Vec2 {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
+        if (this == o)
+            return true;
         if (!(o instanceof Vec2))
             return false;
         Vec2 v = (Vec2) o;

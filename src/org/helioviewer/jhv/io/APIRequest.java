@@ -52,7 +52,9 @@ public class APIRequest {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
+        if (this == o)
+            return true;
         if (!(o instanceof APIRequest))
             return false;
         APIRequest r = (APIRequest) o;
