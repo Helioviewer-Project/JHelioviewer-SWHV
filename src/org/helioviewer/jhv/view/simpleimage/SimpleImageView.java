@@ -104,7 +104,9 @@ public class SimpleImageView extends BaseView {
             IIOMetadataNode root = (IIOMetadataNode) metadata.getAsTree("javax_imageio_1.0");
             Object text = root.getElementsByTagName("TextEntry").item(0);
             if (text instanceof IIOMetadataNode) {
-                xml = ((IIOMetadataNode) text).getAttribute("value").trim().replace("&", "&amp;");
+                xml = ((IIOMetadataNode) text).getAttribute("value");
+                if (xml != null)
+                    xml = xml.trim().replace("&", "&amp;");
             }
             /*
             String[] names = metadata.getMetadataFormatNames();

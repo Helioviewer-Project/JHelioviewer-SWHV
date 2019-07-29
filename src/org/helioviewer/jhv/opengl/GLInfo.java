@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.opengl;
 
+import java.awt.GraphicsConfiguration;
 import java.awt.geom.AffineTransform;
 
 import org.helioviewer.jhv.gui.Message;
@@ -38,9 +39,12 @@ public class GLInfo {
     }
 
     public static void updatePixelScale(GLCanvas canvas) {
-        AffineTransform tx = canvas.getGraphicsConfiguration().getDefaultTransform();
-        pixelScale[0] = tx.getScaleX(); 
-        pixelScale[1] = tx.getScaleY(); 
+        GraphicsConfiguration gc = canvas.getGraphicsConfiguration();
+        if (gc != null) {
+            AffineTransform tx = gc.getDefaultTransform();
+            pixelScale[0] = tx.getScaleX(); 
+            pixelScale[1] = tx.getScaleY(); 
+        }
     }
 
     public static boolean checkGLErrors(GL2 gl, String message) {
