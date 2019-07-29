@@ -75,7 +75,9 @@ public class ResolutionSet {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public final boolean equals(Object o) {
+            if (this == o)
+                return true;
             if (!(o instanceof ResolutionLevel))
                 return false;
             ResolutionLevel r = (ResolutionLevel) o;

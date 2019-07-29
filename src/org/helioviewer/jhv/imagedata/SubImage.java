@@ -33,7 +33,9 @@ public class SubImage {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
+        if (this == o)
+            return true;
         if (!(o instanceof SubImage))
             return false;
         SubImage s = (SubImage) o;
