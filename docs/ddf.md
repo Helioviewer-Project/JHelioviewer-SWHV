@@ -1,29 +1,10 @@
+\include{preamble.md}
 ---
 title: SWHV CCN2 Design Document
 subtitle: ROB-SWHV(7186)-DDF2 v1.5
-author: SWHV Team
 subject: Space Weather HelioViewer
 date: 2018-12-05
-geometry: margin=1in
-papersize: A4
-book: true
-toc: true
-lof: true
-colorlinks: true
-mainfont: "Source Serif Pro"
-romanfont: "Source Serif Pro"
-sansfont: "Source Sans Pro"
-monofont: "Source Code Pro"
-titlepage: true
-titlepage-color: "0088cc"
-titlepage-text-color: "ffffff"
-titlepage-rule-color: "ffffff"
-titlepage-rule-height: 5
-listings-disable-line-numbers: true
-logo: hvLogo.png
-logo-width: 40
-...
-\frenchspacing
+---
 
 `id: \exec{git hash-object \file}`
 
