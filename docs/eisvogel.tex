@@ -248,6 +248,14 @@ $endif$
 \definecolor{default-citecolor}{HTML}{4077C0}
 \definecolor{default-urlcolor}{HTML}{4077C0}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+$if(footnotes-pretty)$
+% load footmisc in order to customize footnotes (footmisc has to be loaded before hyperref, cf. https://tex.stackexchange.com/a/169124/144087)
+\usepackage[hang,flushmargin,bottom,multiple]{footmisc}
+\setlength{\footnotemargin}{0.8em} % set space between footnote nr and text
+\setlength{\footnotesep}{\baselineskip} % set space between multiple footnotes
+\setlength{\skip\footins}{0.3cm} % set space between page content and footnote
+\setlength{\footskip}{0.9cm} % set space between footnote and page bottom
+$endif$
 \IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
 \hypersetup{
 $if(title-meta)$
@@ -281,12 +289,11 @@ $if(verbatim-in-note)$
 \VerbatimFootnotes % allow verbatim text in footnotes
 $endif$
 $if(geometry)$
-\usepackage[margin=2.5cm,includehead=true,includefoot=true,centering,$for(geometry)$$geometry$$sep$,$endfor$]{geometry}
+$if(beamer)$
+\geometry{margin=2.5cm,includehead=true,includefoot=true,centering,$for(geometry)$$geometry$$sep$,$endfor$}
 $else$
-  $if(beamer)$
-  $else$
-  \usepackage[margin=2.5cm,includehead=true,includefoot=true,centering]{geometry}
-  $endif$
+\usepackage[margin=2.5cm,includehead=true,includefoot=true,centering,$for(geometry)$$geometry$$sep$,$endfor$]{geometry}
+$endif$
 $endif$
 $if(logo)$
 \usepackage[export]{adjustbox}
@@ -311,6 +318,17 @@ $if(lhs)$
 $endif$
 $if(highlighting-macros)$
 $highlighting-macros$
+
+% Workaround/bugfix from jannick0.
+% See https://github.com/jgm/pandoc/issues/4302#issuecomment-360669013)
+% or https://github.com/Wandmalfarbe/pandoc-latex-template/issues/2
+%
+% Redefine the verbatim environment 'Highlighting' to break long lines (with
+% the help of fvextra). Redefinition is necessary because it is unlikely that
+% pandoc includes fvextra in the default template.
+\usepackage{fvextra}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,fontsize=$if(code-block-font-size)$$code-block-font-size$$else$\small$endif$,commandchars=\\\{\}}
+
 $endif$
 $if(tables)$
 \usepackage{longtable,booktabs}
@@ -331,8 +349,13 @@ $else$
 \makesavenoteenv{longtable}
 $endif$
 $endif$
+% add backlinks to footnote references, cf. https://tex.stackexchange.com/questions/302266/make-footnote-clickable-both-ways
+$if(footnotes-disable-backlinks)$
+$else$
+\usepackage{footnotebackref}
+$endif$
 $if(graphics)$
-\usepackage{graphicx,grffile}
+\usepackage{graphicx}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
 \def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
@@ -428,6 +451,14 @@ $for(bibliography)$
 \addbibresource{$bibliography$}
 $endfor$
 $endif$
+$if(csl-refs)$
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newenvironment{cslreferences}%
+  {$if(csl-hanging-indent)$\setlength{\parindent}{0pt}%
+  \everypar{\setlength{\hangindent}{\cslhangindent}}\ignorespaces$endif$}%
+  {\par}
+$endif$
 
 $if(title)$
 \title{$title$$if(thanks)$\thanks{$thanks$}$endif$}
@@ -501,6 +532,13 @@ $endif$
 $if(titlepage)$
 \usepackage{pagecolor}
 \usepackage{afterpage}
+$if(titlepage-background)$
+\usepackage{tikz}
+$endif$
+$if(geometry)$
+$else$
+\usepackage[margin=2.5cm,includehead=true,includefoot=true,centering]{geometry}
+$endif$
 $endif$
 
 %
@@ -541,30 +579,38 @@ $endif$
 % 'default' option sets the default
 % font family to Source Sans Pro, not \sfdefault.
 %
-$if(mainfont)$
-$else$
-\usepackage[default]{sourcesanspro}
-\usepackage{sourcecodepro}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  $if(fontfamily)$
+  $else$
+  \usepackage[default]{sourcesanspro}
+  \usepackage{sourcecodepro}
+  $endif$
+\else % if not pdftex
+  $if(mainfont)$
+  $else$
+  \usepackage[default]{sourcesanspro}
+  \usepackage{sourcecodepro}
 
-% XeLaTeX specific adjustments for straight quotes: https://tex.stackexchange.com/a/354887
-% This issue is already fixed (see https://github.com/silkeh/latex-sourcecodepro/pull/5) but the
-% fix is still unreleased.
-% TODO: Remove this workaround when the new version of sourcecodepro is released on CTAN.
-\ifxetex
-\makeatletter
-\defaultfontfeatures[\ttfamily]
-  { Numbers   = \sourcecodepro@figurestyle,
-    Scale     = \SourceCodePro@scale,
-    Extension = .otf }
-\setmonofont
-  [ UprightFont    = *-\sourcecodepro@regstyle,
-    ItalicFont     = *-\sourcecodepro@regstyle It,
-    BoldFont       = *-\sourcecodepro@boldstyle,
-    BoldItalicFont = *-\sourcecodepro@boldstyle It ]
-  {SourceCodePro}
-\makeatother
+  % XeLaTeX specific adjustments for straight quotes: https://tex.stackexchange.com/a/354887
+  % This issue is already fixed (see https://github.com/silkeh/latex-sourcecodepro/pull/5) but the
+  % fix is still unreleased.
+  % TODO: Remove this workaround when the new version of sourcecodepro is released on CTAN.
+  \ifxetex
+    \makeatletter
+    \defaultfontfeatures[\ttfamily]
+      { Numbers   = \sourcecodepro@figurestyle,
+        Scale     = \SourceCodePro@scale,
+        Extension = .otf }
+    \setmonofont
+      [ UprightFont    = *-\sourcecodepro@regstyle,
+        ItalicFont     = *-\sourcecodepro@regstyle It,
+        BoldFont       = *-\sourcecodepro@boldstyle,
+        BoldItalicFont = *-\sourcecodepro@boldstyle It ]
+      {SourceCodePro}
+    \makeatother
+  \fi
+  $endif$
 \fi
-$endif$
 
 %
 % heading color
@@ -601,17 +647,12 @@ $if(tables)$
 \setlength\heavyrulewidth{0.3ex}      % thickness of \toprule, \bottomrule
 \renewcommand{\arraystretch}{1.3}     % spacing (padding)
 
+$if(table-use-row-colors)$
+% TODO: This doesn't work anymore. I don't know why.
 % Reset rownum counter so that each table
 % starts with the same row colors.
 % https://tex.stackexchange.com/questions/170637/restarting-rowcolors
-\let\oldlongtable\longtable
-\let\endoldlongtable\endlongtable
-\renewenvironment{longtable}{
-\rowcolors{3}{}{table-row-color!100}  % row color
-\oldlongtable} {
-\endoldlongtable
-\global\rownum=0\relax}
-
+%
 % Unfortunately the colored cells extend beyond the edge of the
 % table because pandoc uses @-expressions (@{}) like so:
 %
@@ -619,6 +660,14 @@ $if(tables)$
 % \end{longtable}
 %
 % https://en.wikibooks.org/wiki/LaTeX/Tables#.40-expressions
+\let\oldlongtable\longtable
+\let\endoldlongtable\endlongtable
+\renewenvironment{longtable}{
+\rowcolors{3}{}{table-row-color!100}  % row color
+\oldlongtable} {
+\endoldlongtable
+\global\rownum=0\relax}
+$endif$
 $endif$
 
 %
@@ -637,17 +686,18 @@ $endif$
 $if(listings)$
 
 %
-% listing colors
+% general listing colors
 %
 \definecolor{listing-background}{HTML}{F7F7F7}
 \definecolor{listing-rule}{HTML}{B3B2B3}
 \definecolor{listing-numbers}{HTML}{B3B2B3}
 \definecolor{listing-text-color}{HTML}{000000}
 \definecolor{listing-keyword}{HTML}{435489}
+\definecolor{listing-keyword-2}{HTML}{1284CA} % additional keywords
+\definecolor{listing-keyword-3}{HTML}{9137CB} % additional keywords
 \definecolor{listing-identifier}{HTML}{435489}
 \definecolor{listing-string}{HTML}{00999A}
 \definecolor{listing-comment}{HTML}{8E8E8E}
-\definecolor{listing-javadoc-comment}{HTML}{006CA9}
 
 \lstdefinestyle{eisvogel_listing_style}{
   language         = java,
@@ -660,7 +710,7 @@ $else$
   framexleftmargin = 2.5em,
 $endif$
   backgroundcolor  = \color{listing-background},
-  basicstyle       = \color{listing-text-color}\small\ttfamily{}\linespread{1.15}, % print whole listing small
+  basicstyle       = \color{listing-text-color}\linespread{1.0}$if(code-block-font-size)$$code-block-font-size$$else$\small$endif$\ttfamily{},
   breaklines       = true,
   frame            = single,
   framesep         = 0.19em,
@@ -672,12 +722,12 @@ $endif$
   belowskip        = 0.1em,
   abovecaptionskip = 0em,
   belowcaptionskip = 1.0em,
-  keywordstyle     = \color{listing-keyword}\bfseries,
-  classoffset      = 0,
+  keywordstyle     = {\color{listing-keyword}\bfseries},
+  keywordstyle     = {[2]\color{listing-keyword-2}\bfseries},
+  keywordstyle     = {[3]\color{listing-keyword-3}\bfseries\itshape},
   sensitive        = true,
   identifierstyle  = \color{listing-identifier},
   commentstyle     = \color{listing-comment},
-  morecomment      = [s][\color{listing-javadoc-comment}]{/**}{*/},
   stringstyle      = \color{listing-string},
   showstringspaces = false,
   escapeinside     = {/*@}{@*/}, % Allow LaTeX inside these special comments
@@ -698,6 +748,44 @@ $endif$
   {”}{{''}}1
 }
 \lstset{style=eisvogel_listing_style}
+
+%
+% Java (Java SE 12, 2019-06-22)
+%
+\lstdefinelanguage{Java}{
+  morekeywords={
+    % normal keywords (without data types)
+    abstract,assert,break,case,catch,class,continue,default,
+    do,else,enum,exports,extends,final,finally,for,if,implements,
+    import,instanceof,interface,module,native,new,package,private,
+    protected,public,requires,return,static,strictfp,super,switch,
+    synchronized,this,throw,throws,transient,try,volatile,while,
+    % var is an identifier
+    var
+  },
+  morekeywords={[2] % data types
+    % primitive data types
+    boolean,byte,char,double,float,int,long,short,
+    % String
+    String,
+    % primitive wrapper types
+    Boolean,Byte,Character,Double,Float,Integer,Long,Short
+    % number types
+    Number,AtomicInteger,AtomicLong,BigDecimal,BigInteger,DoubleAccumulator,DoubleAdder,LongAccumulator,LongAdder,Short,
+    % other
+    Object,Void,void
+  },
+  morekeywords={[3] % literals
+    % reserved words for literal values
+    null,true,false,
+  },
+  sensitive,
+  morecomment  = [l]//,
+  morecomment  = [s]{/*}{*/},
+  morecomment  = [s]{/**}{*/},
+  morestring   = [b]",
+  morestring   = [b]',
+}
 
 \lstdefinelanguage{XML}{
   morestring      = [b]",
@@ -743,7 +831,6 @@ $endif$
 %%
 \usepackage{wasysym}
 \usepackage{pdfpages}
-\usepackage{unicode-math}
 
 \begin{document}
 
@@ -754,10 +841,17 @@ $if(beamer)$
 $else$
 $if(titlepage)$
 \begin{titlepage}
+$if(titlepage-background)$
+\newgeometry{top=2cm, right=4cm, bottom=3cm, left=4cm}
+$else$
 \newgeometry{left=6cm}
+$endif$
 $if(titlepage-color)$
 \definecolor{titlepage-color}{HTML}{$titlepage-color$}
 \newpagecolor{titlepage-color}\afterpage{\restorepagecolor}
+$endif$
+$if(titlepage-background)$
+\tikz[remember picture,overlay] \node[inner sep=0pt] at (current page.center){\includegraphics[width=\paperwidth,height=\paperheight]{$titlepage-background$}};
 $endif$
 \newcommand{\colorRule}[3][black]{\textcolor[HTML]{#1}{\rule{#2}{#3}}}
 \begin{flushleft}
@@ -768,30 +862,48 @@ $endif$
 \par
 \noindent
 
-{ \setstretch{1.4}
-\vfill
-\noindent {\huge \textbf{\textsf{$title$}}}
-$if(subtitle)$
-\vskip 1em
-{\Large \textsf{$subtitle$}}
-$endif$
-\vskip 2em
-\noindent
-{\Large \textsf{$for(author)$$author$$sep$, $endfor$}
-\vfill
+$if(titlepage-background)$
+% The titlepage with a background image has other text spacing and text size
+{
+  \setstretch{2}
+  \vfill
+  \vskip -8em
+  \noindent {\huge \textbf{\textsf{$title$}}}
+  $if(subtitle)$
+  \vskip 1em
+  {\Large \textsf{$subtitle$}}
+  $endif$
+  \vskip 2em
+  \noindent {\Large \textsf{$for(author)$$author$$sep$, $endfor$} \vskip 0.6em \textsf{$date$}}
+  \vfill
 }
+$else$
+{
+  \setstretch{1.4}
+  \vfill
+  \noindent {\huge \textbf{\textsf{$title$}}}
+  $if(subtitle)$
+  \vskip 1em
+  {\Large \textsf{$subtitle$}}
+  $endif$
+  \vskip 2em
+  \noindent {\Large \textsf{$for(author)$$author$$sep$, $endfor$}}
+  \vfill
+}
+$endif$
 
 $if(logo)$
 \noindent
 \includegraphics[width=$if(logo-width)$$logo-width$$else$100$endif$pt, left]{$logo$}
 $endif$
 
-\textsf{$date$}}
-
+$if(titlepage-background)$
+$else$
+\textsf{$date$}
+$endif$
 $if(signaturebox)$
 $signaturebox$
 $endif$
-
 \end{flushleft}
 \end{titlepage}
 \restoregeometry
