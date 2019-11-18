@@ -78,6 +78,7 @@ public class JHelioviewer {
         System.setProperty("sun.awt.noerasebackground", "true");
         System.setProperty("org.sqlite.tmpdir", JHVGlobals.libCacheDir.toString());
         System.setProperty("org.lwjgl.system.SharedLibraryExtractPath", JHVGlobals.libCacheDir.toString());
+        // System.setProperty("jsamp.nosystray", "true");
         // if (true) throw new RuntimeException("This is a Sentry test. Please ignore.");
 
         FitsFactory.setUseHierarch(true);
