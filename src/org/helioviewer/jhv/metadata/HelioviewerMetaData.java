@@ -182,6 +182,8 @@ public class HelioviewerMetaData extends BaseMetaData {
         } else if (instrument.equals("GOES-R Series Solar Ultraviolet Imager")) {
             instrument = "SUVI";
             fullName = instrument + ' ' + measurement;
+        } else if (instrument.equals("COSMO K-Coronagraph")) {
+            fullName = "COSMO KCor";
         } else {
             fullName = instrument + ' ' + measurement;
         }
