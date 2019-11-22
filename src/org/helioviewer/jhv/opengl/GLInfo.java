@@ -29,8 +29,8 @@ public class GLInfo {
         glVersion = "OpenGL " + gl.glGetString(GL2.GL_VERSION);
         Log.info("GLInfo > " + glVersion);
         // Log.debug("GLInfo > Extensions: " + gl.glGetString(GL2.GL_EXTENSIONS));
-        if (!gl.isExtensionAvailable("GL_VERSION_3_1")) {
-            glVersionError("OpenGL 3.1 not supported.");
+        if (!gl.isExtensionAvailable("GL_VERSION_3_3")) {
+            glVersionError("OpenGL 3.3 not supported.");
         }
 
         int[] out = {0};

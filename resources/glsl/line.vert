@@ -1,9 +1,9 @@
-#version 140
+#version 330 core
 
-in vec4 Vertex;
-in vec4 Color;
-in vec4 NextVertex;
-in vec4 NextColor;
+layout(location = 0) in vec4 Vertex;
+layout(location = 1) in vec4 Color;
+layout(location = 2) in vec4 NextVertex;
+layout(location = 3) in vec4 NextColor;
 out vec4 fragColor;
 
 uniform float iaspect;
