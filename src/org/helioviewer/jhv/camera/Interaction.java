@@ -98,7 +98,7 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
     public void mouseWheelMoved(MouseWheelEvent e) {
         double r = e.getPreciseWheelRotation();
         if (r != 0) {
-            camera.zoom(-Camera.ZOOM_MULTIPLIER_WHEEL * r);
+            camera.zoom(Camera.ZOOM_MULTIPLIER_WHEEL * r);
             if (r > 0) {
                 MovieDisplay.render(0.5);
                 wheelTimer.restart();
