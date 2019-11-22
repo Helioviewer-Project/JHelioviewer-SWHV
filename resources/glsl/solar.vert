@@ -1,6 +1,6 @@
-#version 140
+#version 330 core
 
-in vec4 Vertex;
+layout(location = 0) in vec4 Vertex;
 
 void main(void) {
     gl_Position = Vertex;
