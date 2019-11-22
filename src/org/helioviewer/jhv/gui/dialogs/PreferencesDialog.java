@@ -52,10 +52,6 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         labelCache.setText(String.format("The image cache currently uses %.1fGB on disk.", JPIPCacheManager.getSize() / (1024 * 1024 * 1024.)));
     }
 
-    private JCheckBox defaultMovie;
-    private JCheckBox sampHub;
-    private JCheckBox normalizeRadius;
-    private JCheckBox normalizeAIA;
     private DefaultsSelectionPanel defaultsPanel;
 
     public PreferencesDialog() {
@@ -68,30 +64,19 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         AbstractAction close = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                defaultsPanel.saveSettings();
                 setVisible(false);
             }
         };
+        setDefaultAction(close);
         setDefaultCancelAction(close);
 
-        JButton cancelBtn = new JButton(close);
-        cancelBtn.setText("Cancel");
-
-        AbstractAction save = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                saveSettings();
-                setVisible(false);
-            }
-        };
-        setDefaultAction(save);
-
-        JButton okBtn = new JButton(save);
-        okBtn.setText("Save");
-        setInitFocusedComponent(okBtn);
+        JButton closeBtn = new JButton(close);
+        closeBtn.setText("Close");
+        setInitFocusedComponent(closeBtn);
 
         ButtonPanel panel = new ButtonPanel();
-        panel.add(okBtn, ButtonPanel.AFFIRMATIVE_BUTTON);
-        panel.add(cancelBtn, ButtonPanel.CANCEL_BUTTON);
+        panel.add(closeBtn, ButtonPanel.AFFIRMATIVE_BUTTON);
 
         return panel;
     }
@@ -118,14 +103,6 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         setVisible(true);
     }
 
-    private void saveSettings() {
-        Settings.setProperty("startup.loadmovie", Boolean.toString(defaultMovie.isSelected()));
-        Settings.setProperty("startup.sampHub", Boolean.toString(sampHub.isSelected()));
-        Settings.setProperty("display.normalize", Boolean.toString(normalizeRadius.isSelected()));
-        Settings.setProperty("display.normalizeAIA", Boolean.toString(normalizeAIA.isSelected()));
-        defaultsPanel.setSettings();
-    }
-
     private JPanel createParametersPanel() {
         JPanel settings = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -149,12 +126,14 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
 
         c.gridx = 1;
         c.gridy = 1;
-        defaultMovie = new JCheckBox("Load default movie", Boolean.parseBoolean(Settings.getProperty("startup.loadmovie")));
+        JCheckBox defaultMovie = new JCheckBox("Load default movie", Boolean.parseBoolean(Settings.getProperty("startup.loadmovie")));
+        defaultMovie.addActionListener(e -> Settings.setProperty("startup.loadmovie", Boolean.toString(defaultMovie.isSelected())));
         settings.add(defaultMovie, c);
 
         c.gridx = 1;
         c.gridy = 2;
-        sampHub = new JCheckBox("Load SAMP hub", Boolean.parseBoolean(Settings.getProperty("startup.sampHub")));
+        JCheckBox sampHub = new JCheckBox("Load SAMP hub", Boolean.parseBoolean(Settings.getProperty("startup.sampHub")));
+        sampHub.addActionListener(e -> Settings.setProperty("startup.sampHub", Boolean.toString(sampHub.isSelected())));
         settings.add(sampHub, c);
 
         c.gridx = 0;
@@ -163,12 +142,14 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
 
         c.gridx = 1;
         c.gridy = 3;
-        normalizeRadius = new JCheckBox("Solar radius", Boolean.parseBoolean(Settings.getProperty("display.normalize")));
+        JCheckBox normalizeRadius = new JCheckBox("Solar radius", Boolean.parseBoolean(Settings.getProperty("display.normalize")));
+        normalizeRadius.addActionListener(e -> Settings.setProperty("display.normalize", Boolean.toString(normalizeRadius.isSelected())));
         settings.add(normalizeRadius, c);
 
         c.gridx = 1;
         c.gridy = 4;
-        normalizeAIA = new JCheckBox("SDO/AIA brightness", Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA")));
+        JCheckBox normalizeAIA = new JCheckBox("SDO/AIA brightness", Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA")));
+        normalizeAIA.addActionListener(e -> Settings.setProperty("display.normalizeAIA", Boolean.toString(normalizeAIA.isSelected())));
         settings.add(normalizeAIA, c);
 
         c.gridx = 0;
@@ -270,7 +251,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
             add(scrollPane, BorderLayout.CENTER);
         }
 
-        void setSettings() {
+        void saveSettings() {
             Object val0 = model.getValueAt(0, 1);
             if (val0 instanceof String)
                 Settings.setProperty("proxy.username", (String) val0);
