@@ -62,25 +62,22 @@ public class ToolBar extends JToolBar {
         }
     }
 
-    private final ButtonText ZOOMIN = new ButtonText(Buttons.zoomIn, "Zoom In", "Zoom in");
-    private final ButtonText ZOOMOUT = new ButtonText(Buttons.zoomOut, "Zoom Out", "Zoom out");
-    private final ButtonText ZOOMFIT = new ButtonText(Buttons.zoomFit, "Zoom to Fit", "Zoom to fit");
-    private final ButtonText ZOOMONE = new ButtonText(Buttons.zoomOne, "Actual Size", "Zoom to native resolution");
-    private final ButtonText RESETCAMERA = new ButtonText(Buttons.resetCamera, "Reset Camera", "Reset camera position to default");
-
-    private final ButtonText PAN = new ButtonText(Buttons.pan, "Pan", "Pan");
-    private final ButtonText ROTATE = new ButtonText(Buttons.rotate, "Rotate", "Rotate");
-    private final ButtonText AXIS = new ButtonText(Buttons.axis, "Axis", "Axis");
-
-    private final ButtonText TRACK = new ButtonText(Buttons.track, "Track", "Track solar rotation");
-    private final ButtonText OFFDISK = new ButtonText(Buttons.offDisk, "Corona", "Toggle off-disk corona");
-
-    private final ButtonText MULTIVIEW = new ButtonText(Buttons.multiview, "Multiview", "Multiview");
-    private final ButtonText PROJECTION = new ButtonText(Buttons.projection, "Projection", "Projection");
     private final ButtonText ANNOTATION = new ButtonText(Buttons.annotate, "Annotation", "Annotation");
-
+    private final ButtonText AXIS = new ButtonText(Buttons.axis, "Axis", "Axis");
     private final ButtonText CUTOUT = new ButtonText(Buttons.cutOut, "SDO Cut-out", "SDO cut-out service");
+    private final ButtonText MULTIVIEW = new ButtonText(Buttons.multiview, "Multiview", "Multiview");
+    private final ButtonText OFFDISK = new ButtonText(Buttons.offDisk, "Corona", "Toggle off-disk corona");
+    private final ButtonText PAN = new ButtonText(Buttons.pan, "Pan", "Pan");
+    private final ButtonText PROJECTION = new ButtonText(Buttons.projection, "Projection", "Projection");
+    private final ButtonText RESETCAMERA = new ButtonText(Buttons.resetCamera, "Reset Camera", "Reset camera position to default");
+    private final ButtonText ROTATE = new ButtonText(Buttons.rotate, "Rotate", "Rotate");
     private final ButtonText SAMP = new ButtonText(Buttons.samp, "SAMP", "Send SAMP message");
+    private final ButtonText TRACK = new ButtonText(Buttons.track, "Track", "Track solar rotation");
+    private final ButtonText VIEWPOINT = new ButtonText(Buttons.viewpoint, "Viewpoint", "Viewpoint");
+    private final ButtonText ZOOMFIT = new ButtonText(Buttons.zoomFit, "Zoom to Fit", "Zoom to fit");
+    private final ButtonText ZOOMIN = new ButtonText(Buttons.zoomIn, "Zoom In", "Zoom in");
+    private final ButtonText ZOOMONE = new ButtonText(Buttons.zoomOne, "Actual Size", "Zoom to native resolution");
+    private final ButtonText ZOOMOUT = new ButtonText(Buttons.zoomOut, "Zoom Out", "Zoom out");
 
 //  private final LinkedHashMap<ButtonText, ActionListener> pluginButtons = new LinkedHashMap<>();
 
@@ -209,8 +206,6 @@ public class ToolBar extends JToolBar {
         });
         addButton(coronaButton);
 
-        add(new JToolBar.Separator(dim));
-
         multiviewButton = toolToggleButton(MULTIVIEW);
         multiviewButton.setSelected(Display.multiview);
         multiviewButton.addItemListener(e -> {
@@ -218,6 +213,11 @@ public class ToolBar extends JToolBar {
             ImageLayers.arrangeMultiView(Display.multiview);
         });
         addButton(multiviewButton);
+
+        add(new JToolBar.Separator(dim));
+
+        JHVButton viewpointButton = toolButton(VIEWPOINT);
+        addButton(viewpointButton);
 
         JHVButton projectionButton = toolButton(PROJECTION);
         addButton(projectionButton);
