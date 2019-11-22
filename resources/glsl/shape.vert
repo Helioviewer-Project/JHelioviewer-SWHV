@@ -1,7 +1,7 @@
-#version 140
+#version 330 core
 
-in vec4 Vertex;
-in vec4 Color;
+layout(location = 0) in vec4 Vertex;
+layout(location = 1) in vec4 Color;
 out vec4 fragColor;
 
 uniform mat4 ModelViewProjectionMatrix;

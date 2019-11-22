@@ -64,8 +64,6 @@ abstract class GLSLShader {
         }
     }
 
-    protected abstract void bindAttribLocations(GL2 gl, int id);
-
     protected abstract void initUniforms(GL2 gl, int id);
 
     protected static void setTextureUnit(GL2 gl, int id, String texname, GLTexture.Unit unit) {
@@ -112,7 +110,6 @@ abstract class GLSLShader {
         gl.glAttachShader(id, vertexID);
         gl.glAttachShader(id, fragmentID);
 
-        bindAttribLocations(gl, id);
         gl.glLinkProgram(id);
 
         int[] params = {0};

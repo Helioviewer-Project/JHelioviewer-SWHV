@@ -28,14 +28,6 @@ class GLSLLineShader extends GLSLShader {
     }
 
     @Override
-    protected void bindAttribLocations(GL2 gl, int id) {
-        gl.glBindAttribLocation(id, 0, "Vertex");
-        gl.glBindAttribLocation(id, 1, "Color");
-        gl.glBindAttribLocation(id, 2, "NextVertex");
-        gl.glBindAttribLocation(id, 3, "NextColor");
-    }
-
-    @Override
     protected void initUniforms(GL2 gl, int id) {
         refModelViewProjectionMatrix = gl.glGetUniformLocation(id, "ModelViewProjectionMatrix");
         iaspectRef = gl.glGetUniformLocation(id, "iaspect");
