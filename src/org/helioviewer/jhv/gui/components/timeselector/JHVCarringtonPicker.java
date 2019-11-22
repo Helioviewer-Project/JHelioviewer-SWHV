@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.components.calendar;
+package org.helioviewer.jhv.gui.components.timeselector;
 
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
@@ -19,7 +19,7 @@ import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
-public class JHVCarringtonPicker extends JHVButton implements PopupMenuListener {
+class JHVCarringtonPicker extends JHVButton implements PopupMenuListener {
 
     private final ArrayList<CalendarListener> listeners = new ArrayList<>();
     private final JPopupMenu popup = new JPopupMenu();
@@ -27,7 +27,7 @@ public class JHVCarringtonPicker extends JHVButton implements PopupMenuListener 
 
     private long time;
 
-    public JHVCarringtonPicker() {
+    JHVCarringtonPicker() {
         setText("CR");
         setToolTipText("Select Carrington rotation");
 
@@ -67,7 +67,7 @@ public class JHVCarringtonPicker extends JHVButton implements PopupMenuListener 
     public void popupMenuCanceled(PopupMenuEvent e) {
     }
 
-    public void addCalendarListener(CalendarListener listener) {
+    void addCalendarListener(CalendarListener listener) {
         if (!listeners.contains(listener))
             listeners.add(listener);
     }
@@ -77,13 +77,13 @@ public class JHVCarringtonPicker extends JHVButton implements PopupMenuListener 
         informCalendarListeners();
     }
 
-    public void setTime(long _time) {
+    void setTime(long _time) {
         if (_time > TimeUtils.MINIMAL_DATE.milli && _time < TimeUtils.MAXIMAL_DATE.milli) {
             time = _time;
         }
     }
 
-    public long getTime() {
+    long getTime() {
         return time;
     }
 

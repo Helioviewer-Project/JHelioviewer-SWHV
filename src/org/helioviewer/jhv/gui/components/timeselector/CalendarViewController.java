@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.components.calendar;
+package org.helioviewer.jhv.gui.components.timeselector;
 
 import java.awt.Point;
 
