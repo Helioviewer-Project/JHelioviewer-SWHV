@@ -319,7 +319,7 @@ The incoming SAMP messages supported by JHelioviewer are:
 
 Those messages have as parameter an URI to load. Both local and remote URIs are supported. An example of SAMP Web Profile usage is at <http://swhv.oma.be/test/samp/>.
 
-In addition, JHelioviewer can broadcast information about the loaded image layers. Two clients of this functionality use the information to load the corresponding science data from virtual solar observatories into the SolarSoft and SunPy environments. They are available in the source tree in the directories `extra/samp/idl` and `extra/samp/python`, respectively.
+In addition, JHelioviewer can broadcast information about the loaded image layers. Two clients of this functionality use the information to load the corresponding science data from virtual solar observatories into the SolarSoft and SunPy environments. They are available in `examples` of the <https://github.com/Helioviewer-Project/samp4jhv> repository.
 
 The broadcasted SAMP message has the following form:
 
