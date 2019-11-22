@@ -36,7 +36,8 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.log.Log;
-import org.helioviewer.jhv.plugins.PluginsList;
+import org.helioviewer.jhv.plugins.PluginContainer;
+import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCacheManager;
 
 import com.jidesoft.dialog.ButtonPanel;
@@ -170,6 +171,17 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         normalizeAIA = new JCheckBox("SDO/AIA brightness", Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA")));
         settings.add(normalizeAIA, c);
 
+        c.gridx = 0;
+        c.gridy = 5;
+        settings.add(new JLabel("Plugins:", JLabel.RIGHT), c);
+
+        c.gridx = 1;
+        for (PluginContainer plugin : PluginManager.getPlugins()) {
+            JCheckBox plugCheck = new JCheckBox("<html>" + plugin.getName() + "<br/><small>" + plugin.getDescription(), plugin.isActive());
+            plugCheck.addActionListener(e -> plugin.toggleActive());
+            settings.add(plugCheck, c);
+            c.gridy++;
+        }
 
         JPanel cache = new JPanel(new FlowLayout(FlowLayout.LEADING));
         JButton clearCache = new JButton("Clear Cache");
@@ -186,7 +198,6 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
 
         JPanel paramsPanel = new JPanel(new BorderLayout());
         paramsPanel.add(settings, BorderLayout.PAGE_START);
-        paramsPanel.add(new JScrollPane(new PluginsList()));
         paramsPanel.add(cache, BorderLayout.PAGE_END);
 
         return paramsPanel;

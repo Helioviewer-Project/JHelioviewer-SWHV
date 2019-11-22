@@ -4,7 +4,7 @@ import org.helioviewer.jhv.Settings;
 
 // The basic class which manages the interface between JHV and the contained
 // plugin. It manages the current status of the corresponding plug-in.
-class PluginContainer {
+public class PluginContainer {
 
     private final Plugin plugin;
     private boolean active;
