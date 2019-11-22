@@ -67,6 +67,8 @@ class InteractionAnnotate implements InteractionType {
         annsLine.setData(gl, annsBuf);
         annsLine.render(gl, vp.aspect, LINEWIDTH);
 
+        double pixFactor = CameraHelper.getPixelFactor(camera, vp);
+
         Transform.pushView();
         Transform.rotateViewInverse(viewpoint.toQuat());
         boolean far = Camera.useWideProjection(viewpoint.distance);
@@ -78,7 +80,6 @@ class InteractionAnnotate implements InteractionType {
         transLine.setData(gl, transBuf);
         transLine.render(gl, vp.aspect, LINEWIDTH);
 
-        double pixFactor = CameraHelper.getPixelFactor(camera, vp);
         center.setData(gl, centerBuf);
         center.renderPoints(gl, pixFactor);
 

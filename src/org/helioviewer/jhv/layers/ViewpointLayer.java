@@ -23,7 +23,6 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
-import org.helioviewer.jhv.opengl.FOVShape;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
@@ -39,7 +38,6 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
 
     private static final double DELTA_ORBIT = 10 * 60 * 1000 * Sun.MeanEarthDistanceInv;
     private static final double DELTA_CUTOFF = 3 * Sun.MeanEarthDistance;
-    private static final double LINEWIDTH_FOV = GLSLLine.LINEWIDTH_BASIC;
     private static final double LINEWIDTH_ORBIT = 2 * GLSLLine.LINEWIDTH_BASIC;
     private static final double LINEWIDTH_SPIRAL = 2 * GLSLLine.LINEWIDTH_BASIC;
     private static final float SIZE_PLANET = 5;
@@ -48,13 +46,6 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
     private static final double SPIRAL_RADIUS = 3 * Sun.MeanEarthDistance;
     private static final int SPIRAL_DIVISIONS = 64;
     private static final int SPIRAL_ARMS = 9;
-
-    private final FOVShape fov = new FOVShape();
-    private final byte[] fovColor = Colors.Blue;
-    private final GLSLLine fovLine = new GLSLLine(true);
-    private final BufVertex fovBuf = new BufVertex((4 * (FOVShape.SUBDIVISIONS + 1) + 2) * GLSLLine.stride);
-    private final GLSLShape center = new GLSLShape(true);
-    private final BufVertex centerBuf = new BufVertex(GLSLShape.stride);
 
     private final GLSLLine orbits = new GLSLLine(true);
     private final BufVertex orbitBuf = new BufVertex(3276 * GLSLLine.stride); // pre-allocate 64k
@@ -80,7 +71,6 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
 
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
         Position viewpoint = camera.getViewpoint();
-        double halfSide = 0.5 * viewpoint.distance * Math.tan(optionsPanel.getFOVAngle());
 
         Transform.pushView();
         Transform.rotateViewInverse(viewpoint.toQuat());
@@ -90,7 +80,6 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
             camera.projectionOrthoWide(vp.aspect);
         }
 
-        renderFOV(gl, vp, halfSide, pixFactor);
         renderSpiral(gl, vp, viewpoint, optionsPanel.isFrameInertial(), optionsPanel.getSpiralSpeed());
 
         Collection<LoadPosition> loadPositions = camera.getUpdateViewpoint().getLoadPositions();
@@ -104,16 +93,6 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
             Transform.popProjection();
         }
         Transform.popView();
-    }
-
-    private void renderFOV(GL2 gl, Viewport vp, double halfSide, double pointFactor) {
-        fov.putCenter(centerBuf, fovColor);
-        center.setData(gl, centerBuf);
-        center.renderPoints(gl, pointFactor);
-
-        fov.putLine(halfSide, halfSide, fovBuf, fovColor);
-        fovLine.setData(gl, fovBuf);
-        fovLine.render(gl, vp.aspect, LINEWIDTH_FOV);
     }
 
     private static final int MOUSE_OFFSET_X = 25;
@@ -267,8 +246,6 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
 
     @Override
     public void init(GL2 gl) {
-        fovLine.init(gl);
-        center.init(gl);
         orbits.init(gl);
         planets.init(gl);
         spiral.init(gl);
@@ -276,8 +253,6 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
 
     @Override
     public void dispose(GL2 gl) {
-        fovLine.dispose(gl);
-        center.dispose(gl);
         orbits.dispose(gl);
         planets.dispose(gl);
         spiral.dispose(gl);
