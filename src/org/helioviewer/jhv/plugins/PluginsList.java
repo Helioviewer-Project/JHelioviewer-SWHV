@@ -10,7 +10,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
-class PluginsList extends JPanel {
+public class PluginsList extends JPanel {
 
     private static final Color selectionBackgroundColor = new JList<JPanel>().getSelectionBackground();
     private static final Color selectionForegroundColor = new JList<JPanel>().getSelectionForeground();
@@ -19,7 +19,7 @@ class PluginsList extends JPanel {
 
     private final TreeMap<String, PluginsListEntry> pluginsMap = new TreeMap<>();
 
-    PluginsList() {
+    public PluginsList() {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
         for (PluginContainer plugin : PluginManager.getPlugins())
