@@ -10,9 +10,6 @@ import java.util.ArrayList;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.gui.components.calendar.CalendarListener;
-import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
-
 @SuppressWarnings("serial")
 class DateTimePanel extends JPanel implements ActionListener, CalendarListener {
 

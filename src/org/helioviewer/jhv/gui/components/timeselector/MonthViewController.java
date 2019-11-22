@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.components.calendar;
+package org.helioviewer.jhv.gui.components.timeselector;
 
 import java.awt.Point;
 import java.text.DateFormatSymbols;
@@ -8,53 +8,34 @@ import java.util.GregorianCalendar;
 
 import org.helioviewer.jhv.time.TimeUtils;
 
-/**
- * Class manages a calendar view which shows the months of a year.
- *
- * @author Stephan Pagel
- */
-public class MonthViewController implements CalendarViewController {
+// Class manages a calendar view which shows the months of a year.
+class MonthViewController implements CalendarViewController {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy");
 
     private final Calendar calendar = new GregorianCalendar();
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * A period of one year will be added to the current time.
-     */
+    // A period of one year will be added to the current time.
     @Override
     public long moveForward() {
         calendar.add(Calendar.YEAR, 1);
         return calendar.getTimeInMillis();
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * A period of one year will be removed from the current time.
-     */
+    // A period of one year will be removed from the current time.
     @Override
     public long moveBack() {
         calendar.add(Calendar.YEAR, -1);
         return calendar.getTimeInMillis();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getSelectionButtonText() {
         return TimeUtils.format(formatter, calendar.getTimeInMillis());
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The column headers are numbered serially but this numbers represent no
-     * special meaning (except uniqueness).
-     */
+    // The column headers are numbered serially but this numbers represent no
+    // special meaning (except uniqueness).
     @Override
     public String[] getGridColumnHeader() {
         String[] names = new String[4];
@@ -65,11 +46,7 @@ public class MonthViewController implements CalendarViewController {
         return names;
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Returns a 2 dimensional array where all month of a year are placed.
-     */
+    // Returns a 2 dimensional array where all month of a year are placed.
     @Override
     public Object[][] getGridData() {
         // get short names of the months
@@ -84,17 +61,11 @@ public class MonthViewController implements CalendarViewController {
         return data;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Point getCorrespondingCellOfCurrentTime() {
         return new Point(calendar.get(Calendar.MONTH) / 4, calendar.get(Calendar.MONTH) % 4);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setTimeOfCellValue(Object value) {
         if (value instanceof String) {
@@ -108,17 +79,11 @@ public class MonthViewController implements CalendarViewController {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setTime(long milli) {
         calendar.setTimeInMillis(milli);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public long getTime() {
         return calendar.getTimeInMillis();

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.astronomy.Carrington;
-import org.helioviewer.jhv.gui.components.calendar.JHVCarringtonPicker;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 

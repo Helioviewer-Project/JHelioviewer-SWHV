@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.components.calendar;
+package org.helioviewer.jhv.gui.components.timeselector;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -96,11 +96,11 @@ class JHVCalendar extends JPanel {
         updateDateDisplay();
     }
 
-    public long getTime() {
+    long getTime() {
         return calendarViewController.getTime();
     }
 
-    public void addCalendarListener(CalendarListener listener) {
+    void addCalendarListener(CalendarListener listener) {
         if (!listeners.contains(listener))
             listeners.add(listener);
     }

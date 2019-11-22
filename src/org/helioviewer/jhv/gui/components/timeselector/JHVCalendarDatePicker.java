@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.components.calendar;
+package org.helioviewer.jhv.gui.components.timeselector;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -25,7 +25,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 // similar to a combobox apart from that the popup is not a list but represents
 // a {@link JHVCalendar} component.
 @SuppressWarnings("serial")
-public class JHVCalendarDatePicker extends JPanel {
+class JHVCalendarDatePicker extends JPanel {
 
     private final ArrayList<CalendarListener> listeners = new ArrayList<>();
     private final Calendar calendar = new GregorianCalendar();
@@ -35,7 +35,7 @@ public class JHVCalendarDatePicker extends JPanel {
     private final JHVButton calPopupButton = new JHVButton(Buttons.calendar);
     private Popup calPopup = null;
 
-    public JHVCalendarDatePicker() {
+    JHVCalendarDatePicker() {
         setLayout(new BorderLayout());
 
         setTextField();
@@ -78,7 +78,7 @@ public class JHVCalendarDatePicker extends JPanel {
         jhvCalendar.addCalendarListener(this::hideCalPopup);
     }
 
-    public void addCalendarListener(CalendarListener listener) {
+    void addCalendarListener(CalendarListener listener) {
         if (!listeners.contains(listener))
             listeners.add(listener);
     }
@@ -139,15 +139,13 @@ public class JHVCalendarDatePicker extends JPanel {
         }
     }
 
-    // --Commented out by Inspection (22/11/2019, 23:05):private long milliDay;
-
-    public void setTime(long time) {
+    void setTime(long time) {
         if (time > TimeUtils.MINIMAL_DATE.milli && time < TimeUtils.MAXIMAL_DATE.milli)
             calendar.setTimeInMillis(time);
         setTextField();
     }
 
-    public long getTime() {
+    long getTime() {
         return calendar.getTimeInMillis();
     }
 
