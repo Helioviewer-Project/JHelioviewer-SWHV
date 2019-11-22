@@ -38,12 +38,7 @@ public class EVEPlugin implements Plugin {
 
     @Override
     public String getDescription() {
-        return "This plugin visualizes 1D and 2D time series";
-    }
-
-    @Override
-    public String getAboutLicenseText() {
-        return "Mozilla Public License Version 2.0";
+        return "Visualizes 1D and 2D time series";
     }
 
     @Override
