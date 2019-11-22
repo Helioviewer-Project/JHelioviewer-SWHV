@@ -9,16 +9,12 @@ import java.awt.event.MouseListener;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.HTMLPane;
-import org.helioviewer.jhv.gui.dialogs.TextDialog;
 
 @SuppressWarnings("serial")
-class PluginsListEntry extends JPanel implements MouseListener, HyperlinkListener {
+class PluginsListEntry extends JPanel implements MouseListener {
 
     private final PluginContainer plugin;
     private final PluginsList list;
@@ -30,9 +26,8 @@ class PluginsListEntry extends JPanel implements MouseListener, HyperlinkListene
         list = _list;
 
         HTMLPane pane = new HTMLPane();
-        pane.setText("<b>" + plugin.getName() + "</b><br/>" + plugin.getDescription() + " <a href=''>More...</a>");
+        pane.setText("<b>" + plugin.getName() + "</b><br/>" + plugin.getDescription());
         pane.setOpaque(false);
-        pane.addHyperlinkListener(this);
 
         updateEnableLabel();
 
@@ -66,20 +61,6 @@ class PluginsListEntry extends JPanel implements MouseListener, HyperlinkListene
         } else {
             enableLabel.setText(Buttons.plugOff);
             enableLabel.setToolTipText("Enable plug-in");
-        }
-    }
-
-    @Override
-    public void hyperlinkUpdate(HyperlinkEvent e) {
-        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            if (e.getURL() == null) {
-                String text = "<center><b>" + plugin.getName() + "</b>" +
-                        "<p><b>Plug-in description</b><br/>" + plugin.getDescription() + "</p>" +
-                        "<p><b>Plug-in license information</b><br/>" + plugin.getAboutLicenseText();
-                new TextDialog("About", text, false).showDialog();
-            } else {
-                JHVGlobals.openURL(e.getURL().toString());
-            }
         }
     }
 

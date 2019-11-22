@@ -24,10 +24,6 @@ class PluginContainer {
         return plugin.getDescription();
     }
 
-    public String getAboutLicenseText() {
-        return plugin.getAboutLicenseText();
-    }
-
     public boolean isActive() {
         return active;
     }

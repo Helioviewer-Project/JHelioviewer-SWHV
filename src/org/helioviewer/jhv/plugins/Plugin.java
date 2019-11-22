@@ -16,6 +16,4 @@ public interface Plugin {
 
     void loadState(JSONObject jo);
 
-    String getAboutLicenseText();
-
 }

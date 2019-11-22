@@ -59,17 +59,12 @@ public class PfssPlugin implements Plugin {
 
     @Override
     public String getDescription() {
-        return "This plugin visualizes PFSS model data";
+        return "Visualizes PFSS model data";
     }
 
     @Override
     public String getName() {
         return "PFSS Plugin";
-    }
-
-    @Override
-    public String getAboutLicenseText() {
-        return "Mozilla Public License Version 2.0";
     }
 
     @Override

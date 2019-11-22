@@ -46,7 +46,7 @@ public class SWEKPlugin implements Plugin {
 
     @Override
     public String getDescription() {
-        return "This plugin visualizes space weather relevant events";
+        return "Visualizes space weather relevant events";
     }
 
     @Override
@@ -65,11 +65,6 @@ public class SWEKPlugin implements Plugin {
                 ((EventPanel) c).deserialize(jo);
             }
         }
-    }
-
-    @Override
-    public String getAboutLicenseText() {
-        return "Mozilla Public License Version 2.0";
     }
 
 }
