@@ -97,7 +97,7 @@ class JHVCalendar extends JPanel {
     }
 
     public long getTime() {
-        return TimeUtils.floorDay(calendarViewController.getTime());
+        return calendarViewController.getTime();
     }
 
     public void addCalendarListener(CalendarListener listener) {

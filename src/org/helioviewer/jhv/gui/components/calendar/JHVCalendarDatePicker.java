@@ -89,7 +89,7 @@ public class JHVCalendarDatePicker extends JPanel {
 
     private void setDateFromTextField(boolean propagate) {
         try {
-            setTime(TimeUtils.parseDate(textField.getText()));
+            setTime(TimeUtils.optParse(textField.getText(), getTime()));
         } catch (Exception e) {
             setTextField();
         }
@@ -139,6 +139,8 @@ public class JHVCalendarDatePicker extends JPanel {
         }
     }
 
+    // --Commented out by Inspection (22/11/2019, 23:05):private long milliDay;
+
     public void setTime(long time) {
         if (time > TimeUtils.MINIMAL_DATE.milli && time < TimeUtils.MAXIMAL_DATE.milli)
             calendar.setTimeInMillis(time);
@@ -150,7 +152,7 @@ public class JHVCalendarDatePicker extends JPanel {
     }
 
     private void setTextField() {
-        textField.setText(TimeUtils.formatDate(calendar.getTimeInMillis()));
+        textField.setText(TimeUtils.format(getTime()));
     }
 
     // Override the setEnabled method in order to keep the containing
