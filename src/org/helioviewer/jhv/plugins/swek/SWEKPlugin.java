@@ -41,12 +41,12 @@ public class SWEKPlugin implements Plugin {
 
     @Override
     public String getName() {
-        return "Space Weather Event Knowledgebase Plugin";
+        return "Space Weather Event Knowledgebase";
     }
 
     @Override
     public String getDescription() {
-        return "Visualizes space weather relevant events";
+        return "Visualize space weather relevant events";
     }
 
     @Override

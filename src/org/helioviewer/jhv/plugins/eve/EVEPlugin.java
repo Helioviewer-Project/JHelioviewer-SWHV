@@ -33,12 +33,12 @@ public class EVEPlugin implements Plugin {
 
     @Override
     public String getName() {
-        return "Timeline Plugin";
+        return "Timelines";
     }
 
     @Override
     public String getDescription() {
-        return "Visualizes 1D and 2D time series";
+        return "Visualize 1D and 2D time series";
     }
 
     @Override

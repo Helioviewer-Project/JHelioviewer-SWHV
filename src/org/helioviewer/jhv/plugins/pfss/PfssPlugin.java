@@ -59,12 +59,12 @@ public class PfssPlugin implements Plugin {
 
     @Override
     public String getDescription() {
-        return "Visualizes PFSS model data";
+        return "Visualize PFSS model data";
     }
 
     @Override
     public String getName() {
-        return "PFSS Plugin";
+        return "PFSS";
     }
 
     @Override
