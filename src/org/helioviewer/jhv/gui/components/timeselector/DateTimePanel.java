@@ -12,14 +12,12 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.gui.components.calendar.CalendarListener;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
-import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
 class DateTimePanel extends JPanel implements ActionListener, CalendarListener {
 
     private final ArrayList<ActionListener> listeners = new ArrayList<>();
     private final JHVCalendarDatePicker datePicker = new JHVCalendarDatePicker();
-    private final TimeTextField timePicker = new TimeTextField();
 
     DateTimePanel(String text) {
         setLayout(new GridBagLayout());
@@ -32,23 +30,19 @@ class DateTimePanel extends JPanel implements ActionListener, CalendarListener {
         label.setPreferredSize(new Dimension(40, -1));
         add(label, c);
 
-        c.weightx = 0.5;
+        c.weightx = 1;
         c.gridx = 1;
         add(datePicker, c);
-        c.gridx = 2;
-        add(timePicker, c);
 
         datePicker.addCalendarListener(this);
-        timePicker.addActionListener(this);
     }
 
     long getTime() {
-        return datePicker.getTime() + timePicker.getTime();
+        return datePicker.getTime();
     }
 
     void setTime(long time) {
-        datePicker.setTime(TimeUtils.floorDay(time));
-        timePicker.setText(TimeUtils.formatTime(TimeUtils.floorSec(time)));
+        datePicker.setTime(time);
     }
 
     void addListener(ActionListener listener) {

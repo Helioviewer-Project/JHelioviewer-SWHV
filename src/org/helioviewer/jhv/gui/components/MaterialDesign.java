@@ -4,7 +4,6 @@ public enum MaterialDesign {
 
     // https://github.com/aalmiray/ikonli
     MDI_BACKUP_RESTORE("mdi-backup-restore", '\uf06f'),
-    MDI_BINOCULARS("mdi-binoculars", '\uf0a5'),
     MDI_BORDER_ALL("mdi-border-all", '\uf0c7'),
     // MDI_BRIGHTNESS_AUTO("mdi-brightness-auto", '\uf0e1'),
     MDI_CALENDAR("mdi-calendar", '\uf0ed'),
@@ -28,8 +27,6 @@ public enum MaterialDesign {
     MDI_PLAY("mdi-play", '\uf40a'),
     MDI_PLUS_CIRCLE("mdi-plus-circle", '\uf417'),
     MDI_PLUS_ONE("mdi-plus-one", '\uf41b'),
-    MDI_POWER_PLUG("mdi-power-plug", '\uf6a4'),
-    MDI_POWER_PLUG_OFF("mdi-power-plug-off", '\uf6a5'),
     MDI_RECORD("mdi-record", '\uf44a'),
     MDI_ROTATE_3D("mdi-rotate-3d", '\uf464'),
     MDI_SHAPE_POLYGON_PLUS("mdi-shape-polygon-plus", '\uf65e'),

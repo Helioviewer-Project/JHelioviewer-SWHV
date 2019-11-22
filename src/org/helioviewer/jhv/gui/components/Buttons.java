@@ -76,7 +76,6 @@ public class Buttons {
     public static final String rotate = toolBar(MaterialDesign.MDI_ROTATE_3D);
     public static final String samp = toolBar(MaterialDesign.MDI_SHARE_VARIANT);
     public static final String track = toolBar(MaterialDesign.MDI_CROSSHAIRS_GPS);
-    public static final String viewpoint = toolBar(MaterialDesign.MDI_BINOCULARS);
     public static final String zoomFit = toolBar(MaterialDesign.MDI_CROP_LANDSCAPE);
     public static final String zoomIn = toolBar(MaterialDesign.MDI_MAGNIFY_PLUS);
     public static final String zoomOne = toolBar(MaterialDesign.MDI_PLUS_ONE);
