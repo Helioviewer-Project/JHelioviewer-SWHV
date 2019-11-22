@@ -55,9 +55,6 @@ public class Buttons {
 
     public static final String calendar = button(MaterialDesign.MDI_CALENDAR);
 
-    public static final String plugOn = button(MaterialDesign.MDI_POWER_PLUG);
-    public static final String plugOff = button(MaterialDesign.MDI_POWER_PLUG_OFF);
-
     private static String button(MaterialDesign uc) {
         return "<html><span style='font-size:12px'>&nbsp;<font face='Material Design Icons'>" + uc2ent(uc) + "</font>&nbsp;";
     }
