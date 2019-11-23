@@ -25,7 +25,7 @@ import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
-class DateTimePanel extends JPanel {
+class TimePanel extends JPanel {
 
     private final ArrayList<CalendarListener> listeners = new ArrayList<>();
     private final Calendar calendar = new GregorianCalendar();
@@ -35,7 +35,7 @@ class DateTimePanel extends JPanel {
     private final JHVButton calPopupButton = new JHVButton(Buttons.calendar);
     private Popup calPopup = null;
 
-    DateTimePanel(String text) {
+    TimePanel(String text) {
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.LINE_START;
@@ -44,14 +44,14 @@ class DateTimePanel extends JPanel {
         textField.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                setDateFromTextField(true);
+                setTimeFromTextField(true);
             }
         });
         textField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    setDateFromTextField(true);
+                    setTimeFromTextField(true);
                 }
             }
         });
@@ -63,7 +63,7 @@ class DateTimePanel extends JPanel {
             }
         });
         calPopupButton.addActionListener(e -> {
-            setDateFromTextField(false);
+            setTimeFromTextField(false);
             if (calPopup == null) {
                 calPopupButton.requestFocus();
                 showCalPopup();
@@ -71,6 +71,7 @@ class DateTimePanel extends JPanel {
                 hideCalPopup();
             }
         });
+        calPopupButton.setToolTipText("Select date");
 
         JLabel label = new JLabel(text, JLabel.RIGHT);
         label.setPreferredSize(new Dimension(40, -1));
@@ -94,13 +95,13 @@ class DateTimePanel extends JPanel {
         listeners.forEach(CalendarListener::calendarAction);
     }
 
-    private void setDateFromTextField(boolean propagate) {
+    private void setTimeFromTextField(boolean propagate) {
         setTime(TimeUtils.optParse(textField.getText(), getTime()));
         if (propagate)
             informListeners();
     }
 
-    private void setDateFromCalendar() {
+    private void setTimeFromCalendar() {
         setTime(calendarPicker.getTime());
         informListeners();
     }
@@ -140,7 +141,7 @@ class DateTimePanel extends JPanel {
         if (calPopup != null) {
             calPopup.hide();
             calPopup = null;
-            setDateFromCalendar();
+            setTimeFromCalendar();
         }
     }
 

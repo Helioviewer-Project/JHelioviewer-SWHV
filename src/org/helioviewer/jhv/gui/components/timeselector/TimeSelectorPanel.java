@@ -14,16 +14,16 @@ import org.helioviewer.jhv.time.TimeUtils;
 public class TimeSelectorPanel extends JPanel {
 
     private final ArrayList<TimeSelectorListener> listeners = new ArrayList<>();
-    private final DateTimePanel startDateTimePanel = new DateTimePanel("Start");
-    private final DateTimePanel endDateTimePanel = new DateTimePanel("End");
+    private final TimePanel startTimePanel = new TimePanel("Start");
+    private final TimePanel endTimePanel = new TimePanel("End");
     private final CarringtonPicker carringtonPicker = new CarringtonPicker();
 
     public TimeSelectorPanel() {
         long milli = TimeUtils.START.milli;
         setTime(milli - 2 * TimeUtils.DAY_IN_MILLIS, milli);
 
-        startDateTimePanel.addListener(this::dateTimeChanged);
-        endDateTimePanel.addListener(this::dateTimeChanged);
+        startTimePanel.addListener(this::timeChanged);
+        endTimePanel.addListener(this::timeChanged);
         carringtonPicker.addListener(this::carringtonChanged);
 
         setLayout(new GridBagLayout());
@@ -35,18 +35,17 @@ public class TimeSelectorPanel extends JPanel {
         c.gridy = 0;
         c.gridx = 0;
         c.weightx = 1;
-        add(startDateTimePanel, c);
+        add(startTimePanel, c);
         c.gridx = 1;
         c.weightx = 0;
         add(carringtonPicker, c);
-
         c.gridy = 1;
         c.gridx = 0;
         c.weightx = 1;
-        add(endDateTimePanel, c);
+        add(endTimePanel, c);
     }
 
-    private void dateTimeChanged() {
+    private void timeChanged() {
         setTime(getStartTime(), getEndTime());
     }
 
@@ -58,18 +57,18 @@ public class TimeSelectorPanel extends JPanel {
 
     public void setTime(long start, long end) {
         carringtonPicker.setTime(start);
-        startDateTimePanel.setTime(start);
-        endDateTimePanel.setTime(end);
+        startTimePanel.setTime(start);
+        endTimePanel.setTime(end);
 
         listeners.forEach(listener -> listener.timeSelectionChanged(start, end));
     }
 
     public long getStartTime() {
-        return startDateTimePanel.getTime();
+        return startTimePanel.getTime();
     }
 
     public long getEndTime() {
-        return endDateTimePanel.getTime();
+        return endTimePanel.getTime();
     }
 
     public void addListener(TimeSelectorListener listener) {
