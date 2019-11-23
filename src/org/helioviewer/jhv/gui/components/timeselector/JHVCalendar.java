@@ -100,7 +100,7 @@ class JHVCalendar extends JPanel {
         return calendarViewController.getTime();
     }
 
-    void addCalendarListener(CalendarListener listener) {
+    void addListener(CalendarListener listener) {
         if (!listeners.contains(listener))
             listeners.add(listener);
     }

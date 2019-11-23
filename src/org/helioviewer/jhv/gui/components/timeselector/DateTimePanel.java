@@ -5,8 +5,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
@@ -29,8 +27,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 @SuppressWarnings("serial")
 class DateTimePanel extends JPanel {
 
-    private final ActionEvent event = new ActionEvent(this, 0, null);
-    private final ArrayList<ActionListener> actionListeners = new ArrayList<>();
+    private final ArrayList<CalendarListener> listeners = new ArrayList<>();
     private final Calendar calendar = new GregorianCalendar();
 
     private final JHVCalendar jhvCalendar = new JHVCalendar();
@@ -44,7 +41,6 @@ class DateTimePanel extends JPanel {
         c.anchor = GridBagConstraints.LINE_START;
         c.fill = GridBagConstraints.BOTH;
 
-        setTextField();
         textField.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -91,19 +87,15 @@ class DateTimePanel extends JPanel {
 
         jhvCalendar.setPreferredSize(jhvCalendar.getMinimumSize());
         jhvCalendar.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        jhvCalendar.addCalendarListener(this::hideCalPopup);
+        jhvCalendar.addListener(this::hideCalPopup);
     }
 
     private void informListeners() {
-        actionListeners.forEach(listener -> listener.actionPerformed(event));
+        listeners.forEach(CalendarListener::calendarAction);
     }
 
     private void setDateFromTextField(boolean propagate) {
-        try {
-            setTime(TimeUtils.optParse(textField.getText(), getTime()));
-        } catch (Exception e) {
-            setTextField();
-        }
+        setTime(TimeUtils.optParse(textField.getText(), getTime()));
         if (propagate)
             informListeners();
     }
@@ -172,9 +164,9 @@ class DateTimePanel extends JPanel {
         calPopupButton.setEnabled(enabled);
     }
 
-    void addListener(ActionListener listener) {
-        if (!actionListeners.contains(listener))
-            actionListeners.add(listener);
+    void addListener(CalendarListener listener) {
+        if (!listeners.contains(listener))
+            listeners.add(listener);
     }
 
 }

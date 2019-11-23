@@ -67,28 +67,23 @@ class JHVCarringtonPicker extends JHVButton implements PopupMenuListener {
     public void popupMenuCanceled(PopupMenuEvent e) {
     }
 
-    void addCalendarListener(CalendarListener listener) {
-        if (!listeners.contains(listener))
-            listeners.add(listener);
-    }
-
     private void setTimeFromCarrington(long _time) {
         setTime(_time);
-        informCalendarListeners();
+        listeners.forEach(CalendarListener::calendarAction);
     }
 
     void setTime(long _time) {
-        if (_time > TimeUtils.MINIMAL_DATE.milli && _time < TimeUtils.MAXIMAL_DATE.milli) {
+        if (_time > TimeUtils.MINIMAL_DATE.milli && _time < TimeUtils.MAXIMAL_DATE.milli)
             time = _time;
-        }
     }
 
     long getTime() {
         return time;
     }
 
-    private void informCalendarListeners() {
-        listeners.forEach(CalendarListener::calendarAction);
+    void addListener(CalendarListener listener) {
+        if (!listeners.contains(listener))
+            listeners.add(listener);
     }
 
 }

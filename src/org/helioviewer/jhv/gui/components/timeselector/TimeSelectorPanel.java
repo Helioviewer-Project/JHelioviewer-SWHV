@@ -22,9 +22,9 @@ public class TimeSelectorPanel extends JPanel {
         long milli = TimeUtils.START.milli;
         setTime(milli - 2 * TimeUtils.DAY_IN_MILLIS, milli);
 
-        startDateTimePanel.addListener(e -> dateTimePanelChanged());
-        endDateTimePanel.addListener(e -> dateTimePanelChanged());
-        carrington.addCalendarListener(this::setTimeFromCarrington);
+        startDateTimePanel.addListener(this::dateTimeChanged);
+        endDateTimePanel.addListener(this::dateTimeChanged);
+        carrington.addListener(this::carringtonChanged);
 
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -46,11 +46,11 @@ public class TimeSelectorPanel extends JPanel {
         add(endDateTimePanel, c);
     }
 
-    private void dateTimePanelChanged() {
+    private void dateTimeChanged() {
         setTime(getStartTime(), getEndTime());
     }
 
-    private void setTimeFromCarrington() {
+    private void carringtonChanged() {
         long time = carrington.getTime();
         int cr = (int) Math.round(Carrington.time2CR(new JHVDate(time)) - Carrington.CR_MINIMAL) + 1;
         setTime(time, Carrington.CR_start[Math.min(cr, Carrington.CR_start.length - 1)]);
