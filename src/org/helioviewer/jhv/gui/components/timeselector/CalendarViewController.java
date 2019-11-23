@@ -2,12 +2,7 @@ package org.helioviewer.jhv.gui.components.timeselector;
 
 import java.awt.Point;
 
-/**
- * Interface which defines basic methods to manage the calendar view.
- *
- * @author Stephan Pagel
- * @see JHVCalendar
- */
+// Interface which defines basic methods to manage the calendar view.
 interface CalendarViewController {
     /**
      * Adds to the current selected time a defined time span.

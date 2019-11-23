@@ -19,7 +19,7 @@ import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
-class JHVCarringtonPicker extends JHVButton implements PopupMenuListener {
+class CarringtonPicker extends JHVButton implements PopupMenuListener {
 
     private final ArrayList<CalendarListener> listeners = new ArrayList<>();
     private final JPopupMenu popup = new JPopupMenu();
@@ -27,7 +27,7 @@ class JHVCarringtonPicker extends JHVButton implements PopupMenuListener {
 
     private long time;
 
-    JHVCarringtonPicker() {
+    CarringtonPicker() {
         setText("CR");
         setToolTipText("Select Carrington rotation");
 

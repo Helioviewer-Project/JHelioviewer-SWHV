@@ -30,7 +30,7 @@ class DateTimePanel extends JPanel {
     private final ArrayList<CalendarListener> listeners = new ArrayList<>();
     private final Calendar calendar = new GregorianCalendar();
 
-    private final JHVCalendar jhvCalendar = new JHVCalendar();
+    private final CalendarPicker calendarPicker = new CalendarPicker();
     private final JTextField textField = new JTextField();
     private final JHVButton calPopupButton = new JHVButton(Buttons.calendar);
     private Popup calPopup = null;
@@ -85,9 +85,9 @@ class DateTimePanel extends JPanel {
         c.gridx = 2;
         add(calPopupButton, c);
 
-        jhvCalendar.setPreferredSize(jhvCalendar.getMinimumSize());
-        jhvCalendar.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        jhvCalendar.addListener(this::hideCalPopup);
+        calendarPicker.setPreferredSize(calendarPicker.getMinimumSize());
+        calendarPicker.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        calendarPicker.addListener(this::hideCalPopup);
     }
 
     private void informListeners() {
@@ -101,14 +101,14 @@ class DateTimePanel extends JPanel {
     }
 
     private void setDateFromCalendar() {
-        setTime(jhvCalendar.getTime());
+        setTime(calendarPicker.getTime());
         informListeners();
     }
 
     // Opens an new popup window where the user can select a date
     private void showCalPopup() {
         // set up the popup content
-        jhvCalendar.setTime(calendar.getTimeInMillis());
+        calendarPicker.setTime(calendar.getTimeInMillis());
 
         // get position for popup
         int x = textField.getLocationOnScreen().x;
@@ -116,21 +116,23 @@ class DateTimePanel extends JPanel {
 
         // create popup
         PopupFactory factory = PopupFactory.getSharedInstance();
-        calPopup = factory.getPopup(calPopupButton, jhvCalendar, x, y);
+        calPopup = factory.getPopup(calPopupButton, calendarPicker, x, y);
         calPopup.show();
 
-        jhvCalendar.resizeSelectionPanel();
+        calendarPicker.resizeSelectionPanel();
 
         // correct position of popup when it does not fit into screen area
-        x = x + jhvCalendar.getSize().width > Toolkit.getDefaultToolkit().getScreenSize().width ? Toolkit.getDefaultToolkit().getScreenSize().width - jhvCalendar.getSize().width : x;
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension pickerSize = calendarPicker.getSize();
+        x = x + pickerSize.width > screenSize.width ? screenSize.width - pickerSize.width : x;
         x = Math.max(x, 0);
-        y = y + jhvCalendar.getSize().height > Toolkit.getDefaultToolkit().getScreenSize().height ? textField.getLocationOnScreen().y - jhvCalendar.getSize().height : y;
+        y = y + pickerSize.height > screenSize.height ? textField.getLocationOnScreen().y - pickerSize.height : y;
         y = Math.max(y, 0);
 
         calPopup.hide();
 
         // show popup
-        calPopup = factory.getPopup(calPopupButton, jhvCalendar, x, y);
+        calPopup = factory.getPopup(calPopupButton, calendarPicker, x, y);
         calPopup.show();
     }
 
