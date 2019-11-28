@@ -54,7 +54,8 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
                 "<li><a href=\"https://github.com/square/okio\">Okio</a> and <a href=\"https://github.com/square/okhttp\">OkHttp</a> libraries by Square, Inc.</li>" +
                 "<li><a href=\"http://nom-tam-fits.github.io/nom-tam-fits\">FITS</a> in Java public domain library.</li>" +
                 "<li><a href=\"http://logging.apache.org/log4j/index.html\">log4j</a> logging library.</li>" +
-                "<li><a href=\"https://github.com/haraldk/TwelveMonkeys/blob/master/sandbox/sandbox-common/src/main/java/com/twelvemonkeys/image/MappedImageFactory.java\">MappedImageFactory</a>, ©2010, Harald Kuhr.</li>";
+                "<li><a href=\"https://github.com/haraldk/TwelveMonkeys/blob/master/sandbox/sandbox-common/src/main/java/com/twelvemonkeys/image/MappedImageFactory.java\">MappedImageFactory</a>, ©2010, Harald Kuhr.</li>" +
+                "<li><a href=\"https://www.ej-technologies.com/products/install4j/overview.html\">install4j</a>, the multi-platform installer builder.</li>";
 
         HTMLPane pane = new HTMLPane();
         pane.setText(text);
