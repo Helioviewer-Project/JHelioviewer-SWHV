@@ -45,7 +45,7 @@ hs_err_pid*
 .location
 *.new
 availability/
-build/builds
+builds/
 *.DS_Store
 tags
 .ipynb_checkpoints
