@@ -22,6 +22,8 @@ import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.time.TimeUtils;
 
+import com.jidesoft.swing.ButtonStyle;
+
 @SuppressWarnings("serial")
 class TimePanel extends JPanel {
 
@@ -33,17 +35,20 @@ class TimePanel extends JPanel {
     private final JHVButton calendarButton = new JHVButton(Buttons.calendar);
     private Popup calPopup = null;
 
-    TimePanel() {
+    TimePanel(String tip) {
         setLayout(new GridBagLayout());
         setBackground(textField.getBackground());
         setBorder(textField.getBorder());
+
         textField.setBorder(null);
+        textField.setToolTipText(tip);
+        calendarButton.setButtonStyle(ButtonStyle.FLAT_STYLE);
         calendarButton.setMargin(new Insets(0, 0, 0, 0));
-        calendarButton.setToolTipText("Select date");
+        calendarButton.setToolTipText(tip);
 
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.LINE_START;
-        c.fill = GridBagConstraints.HORIZONTAL;;
+        c.fill = GridBagConstraints.HORIZONTAL;
 
         textField.addFocusListener(new FocusAdapter() {
             @Override
