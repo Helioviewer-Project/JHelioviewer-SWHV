@@ -34,8 +34,6 @@ import org.helioviewer.jhv.timelines.view.selector.cellrenderer.RendererLoading;
 import org.helioviewer.jhv.timelines.view.selector.cellrenderer.RendererName;
 import org.helioviewer.jhv.timelines.view.selector.cellrenderer.RendererRemove;
 
-import com.jidesoft.swing.ButtonStyle;
-
 @SuppressWarnings("serial")
 public class TimelinePanel extends JPanel {
 
@@ -120,7 +118,6 @@ public class TimelinePanel extends JPanel {
         jsp.getViewport().setBackground(grid.getBackground());
 
         JHVButton addLayerButton = new JHVButton(Buttons.newLayer);
-        addLayerButton.setButtonStyle(ButtonStyle.FLAT_STYLE);
         addLayerButton.addActionListener(e -> new NewLayerAction().actionPerformed(new ActionEvent(addLayerButton, 0, "")));
 
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());

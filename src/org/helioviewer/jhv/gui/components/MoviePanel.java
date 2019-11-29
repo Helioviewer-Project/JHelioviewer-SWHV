@@ -47,8 +47,6 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.View.AnimationMode;
 
-import com.jidesoft.swing.ButtonStyle;
-
 @SuppressWarnings("serial")
 public class MoviePanel extends JPanel implements ObservationSelector {
 
@@ -324,12 +322,10 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         imageSelectorPanel = new ImageSelectorPanel(this);
 
         addLayerButton = new JHVSplitButton(Buttons.newLayer);
-        addLayerButton.setButtonStyle(ButtonStyle.FLAT_STYLE);
         addLayerButton.setAlwaysDropdown(true);
         addLayerButton.add(imageSelectorPanel);
 
         JHVButton syncButton = new JHVButton(Buttons.syncLayers);
-        syncButton.setButtonStyle(ButtonStyle.FLAT_STYLE);
         syncButton.setToolTipText("Synchronize layers time interval");
         syncButton.addActionListener(e -> syncLayersSpan());
 
