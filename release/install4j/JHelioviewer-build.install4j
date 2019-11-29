@@ -39,7 +39,7 @@
     </launcher>
     <launcher name="Linux_dis" id="296">
       <executable name="jhelioviewer" iconSet="true" executableDir="bin" redirectStderr="false" executableMode="gui" singleInstance="true" dpiAware="false" />
-      <java mainClass="org.helioviewer.jhv.JHelioviewer" vmParameters="-Dapple.laf.useScreenMenuBar=true -Xmx1024m -DraygunTag=release -DjhvVersion=${compiler:sys.version}">
+      <java mainClass="org.helioviewer.jhv.JHelioviewer" vmParameters="-Xms1024m">
         <classPath>
           <directory location="classes" />
           <scanDirectory location="lib" />
@@ -1100,26 +1100,7 @@ return true;</property>
         <launcher id="24" />
       </excludedLaunchers>
       <exclude>
-        <entry location="bin/kdu_a77R.dll" />
-        <entry location="bin/kdu_jniR.dll" />
-        <entry location="bin/kdu_v77R.dll" />
-        <entry location="bin/libkdu_a77R.dylib" />
-        <entry location="bin/libkdu_jniR.jnilib" />
-        <entry location="bin/libkdu_v77R.dylib" />
-        <entry location="bin/msvcr120.dll" />
-        <entry location="lib/gluegen-rt-natives-linux-i586.jar" />
-        <entry location="lib/gluegen-rt-natives-macosx-universal.jar" />
-        <entry location="lib/gluegen-rt-natives-windows-amd64.jar" />
-        <entry location="lib/gluegen-rt-natives-windows-i586.jar" />
-        <entry location="lib/jogl-all-natives-linux-i586.jar" />
-        <entry location="lib/jogl-all-natives-macosx-universal.jar" />
-        <entry location="lib/jogl-all-natives-windows-amd64.jar" />
-        <entry location="lib/jogl-all-natives-windows-i586.jar" />
-        <entry location="lib/native" />
-        <entry location="lib/xuggle-xuggler-5.4-all.jar" />
-        <entry location="lib/xuggle-xuggler-5.4-osx.jar" />
-        <entry location="lib/xuggle-xuggler-5.4-win32.jar" />
-        <entry location="lib/xuggle-xuggler-5.4-win64.jar" />
+        <entry location="Helpers" />
       </exclude>
       <postInstallScript>${compiler:file("./resources/linux-post-install.sh")}</postInstallScript>
     </linuxDeb>
@@ -1128,26 +1109,7 @@ return true;</property>
         <launcher id="24" />
       </excludedLaunchers>
       <exclude>
-        <entry location="bin/kdu_a77R.dll" />
-        <entry location="bin/kdu_jniR.dll" />
-        <entry location="bin/kdu_v77R.dll" />
-        <entry location="bin/libkdu_a77R.dylib" />
-        <entry location="bin/libkdu_jniR.jnilib" />
-        <entry location="bin/libkdu_v77R.dylib" />
-        <entry location="bin/msvcr120.dll" />
-        <entry location="lib/gluegen-rt-natives-linux-i586.jar" />
-        <entry location="lib/gluegen-rt-natives-macosx-universal.jar" />
-        <entry location="lib/gluegen-rt-natives-windows-amd64.jar" />
-        <entry location="lib/gluegen-rt-natives-windows-i586.jar" />
-        <entry location="lib/jogl-all-natives-linux-i586.jar" />
-        <entry location="lib/jogl-all-natives-macosx-universal.jar" />
-        <entry location="lib/jogl-all-natives-windows-amd64.jar" />
-        <entry location="lib/jogl-all-natives-windows-i586.jar" />
-        <entry location="lib/native" />
-        <entry location="lib/xuggle-xuggler-5.4-all.jar" />
-        <entry location="lib/xuggle-xuggler-5.4-osx.jar" />
-        <entry location="lib/xuggle-xuggler-5.4-win32.jar" />
-        <entry location="lib/xuggle-xuggler-5.4-win64.jar" />
+        <entry location="Helpers" />
       </exclude>
       <postInstallScript>${compiler:file("./resources/linux-post-install.sh")}</postInstallScript>
     </linuxRPM>
