@@ -14,8 +14,8 @@ import org.helioviewer.jhv.time.TimeUtils;
 public class TimeSelectorPanel extends JPanel {
 
     private final ArrayList<TimeSelectorListener> listeners = new ArrayList<>();
-    private final TimePanel startTimePanel = new TimePanel("Start");
-    private final TimePanel endTimePanel = new TimePanel("End");
+    private final TimePanel startTimePanel = new TimePanel();
+    private final TimePanel endTimePanel = new TimePanel();
     private final CarringtonPicker carringtonPicker = new CarringtonPicker();
 
     public TimeSelectorPanel() {
@@ -30,19 +30,15 @@ public class TimeSelectorPanel extends JPanel {
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.LINE_START;
         c.fill = GridBagConstraints.HORIZONTAL;
-        c.weighty = 0;
 
-        c.gridy = 0;
-        c.gridx = 0;
         c.weightx = 1;
+        c.gridx = 0;
         add(startTimePanel, c);
         c.gridx = 1;
-        c.weightx = 0;
-        add(carringtonPicker, c);
-        c.gridy = 1;
-        c.gridx = 0;
-        c.weightx = 1;
         add(endTimePanel, c);
+        c.weightx = 0;
+        c.gridx = 2;
+        add(carringtonPicker, c);
     }
 
     private void timeChanged() {
