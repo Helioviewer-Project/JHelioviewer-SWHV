@@ -18,8 +18,6 @@ import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 
-import com.jidesoft.swing.ButtonStyle;
-
 @SuppressWarnings("serial")
 class CarringtonPicker extends JHVButton implements PopupMenuListener {
 
@@ -30,7 +28,6 @@ class CarringtonPicker extends JHVButton implements PopupMenuListener {
     private long time;
 
     CarringtonPicker() {
-        setButtonStyle(ButtonStyle.FLAT_STYLE);
         setText("CR");
         setToolTipText("Select Carrington rotation");
 
