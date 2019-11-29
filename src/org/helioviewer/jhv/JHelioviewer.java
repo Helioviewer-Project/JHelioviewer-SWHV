@@ -15,13 +15,10 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
-import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ProxySettings;
 import org.helioviewer.jhv.io.SampClient;
-import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.log.LogSettings;
 import org.helioviewer.jhv.metadata.AIAResponse;
@@ -124,24 +121,9 @@ public class JHelioviewer {
                 Log.error("Plugin load error", e);
             }
 
-            // set left pane width to fit max of ViewpointLayer and ImageLayer options width
+            frame.pack();
             JComponent leftPane = JHVFrame.getLeftScrollPane();
-
-            MoviePanel.setAdvanced(true);
-            frame.pack();
-            int moviePanelWidth = leftPane.getPreferredSize().width;
-            MoviePanel.setAdvanced(false);
-
-            JHVFrame.getLayersPanel().setOptionsPanel(Layers.getViewpointLayer());
-            frame.pack();
-            int viewpointLayerWidth = Math.max(leftPane.getPreferredSize().width, moviePanelWidth); // wider on Mac
-
-            ImageLayer dummy = ImageLayer.create(null);
-            frame.pack();
-            int imageLayerWidth = Math.max(leftPane.getPreferredSize().width, viewpointLayerWidth); // wider on Windows
-
-            leftPane.setMinimumSize(new Dimension(imageLayerWidth, -1));
-            dummy.unload();
+            leftPane.setMinimumSize(new Dimension(leftPane.getPreferredSize().width + 10, -1));
 
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);

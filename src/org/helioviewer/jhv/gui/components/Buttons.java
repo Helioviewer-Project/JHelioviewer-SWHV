@@ -24,8 +24,6 @@ public class Buttons {
     public static final String forward = String.valueOf(MaterialDesign.MDI_STEP_FORWARD.code);
     public static final String record = String.valueOf(MaterialDesign.MDI_RECORD.code);
     public static final String check = String.valueOf(MaterialDesign.MDI_CHECK.code);
-    public static final String skipBackward = String.valueOf(MaterialDesign.MDI_SKIP_BACKWARD.code);
-    public static final String skipForward = String.valueOf(MaterialDesign.MDI_SKIP_FORWARD.code);
 
     public static final String chevronRight = "<html><font face='Material Design Icons' size=4>" +
             uc2ent(MaterialDesign.MDI_CHEVRON_RIGHT) + "</font>&nbsp;";
@@ -54,6 +52,8 @@ public class Buttons {
     public static final String corona = button(MaterialDesign.MDI_WHITE_BALANCE_SUNNY);
 
     public static final String calendar = button(MaterialDesign.MDI_CALENDAR);
+    public static final String skipBack = button(MaterialDesign.MDI_SKIP_BACKWARD);
+    public static final String skipFore = button(MaterialDesign.MDI_SKIP_FORWARD);
 
     private static String button(MaterialDesign uc) {
         return "<html><span style='font-size:12px'>&nbsp;<font face='Material Design Icons'>" + uc2ent(uc) + "</font>&nbsp;";
