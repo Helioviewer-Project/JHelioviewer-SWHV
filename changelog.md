@@ -14,3 +14,4 @@
 - move plugins options to preferences
 - support KCor dataset (#114)
 - simplify datetime selection and use NLP
+- use install4j for packaging installation
