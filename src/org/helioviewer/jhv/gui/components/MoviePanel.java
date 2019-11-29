@@ -22,10 +22,12 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSpinner;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 
+import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ComponentUtils;
@@ -51,6 +53,16 @@ import com.jidesoft.swing.ButtonStyle;
 
 @SuppressWarnings("serial")
 public class MoviePanel extends JPanel implements ObservationSelector {
+
+    private enum ShiftUnit {
+        Day(TimeUtils.DAY_IN_MILLIS), Week(7 * TimeUtils.DAY_IN_MILLIS), Rotation(Math.round(Carrington.CR_SYNODIC_MEAN * TimeUtils.DAY_IN_MILLIS));
+
+        final long shift;
+
+        ShiftUnit(long _shift) {
+            shift = _shift;
+        }
+    }
 
     // different animation speeds
     private enum SpeedUnit {
@@ -192,6 +204,19 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         recordButton.setEnabled(true);
     }
 
+    private static ButtonGroup createShiftMenu(JHVSplitButton menu) {
+        ButtonGroup group = new ButtonGroup();
+        for (ShiftUnit unit : ShiftUnit.values()) {
+            JRadioButtonMenuItem item = new JRadioButtonMenuItem(unit.toString());
+            item.setActionCommand(unit.toString());
+            if (unit == ShiftUnit.Day)
+                item.setSelected(true);
+            group.add(item);
+            menu.add(item);
+        }
+        return group;
+    }
+
     private MoviePanel() {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
@@ -212,6 +237,13 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 1, 0));
         int small = 18, big = 26;
 
+        JHVSplitButton shiftBackButton = new JHVSplitButton(Buttons.skipBackward);
+        shiftBackButton.setFont(Buttons.getMaterialFont(small));
+        shiftBackButton.setToolTipText("Move time interval backward");
+        ButtonGroup shiftBackGroup = createShiftMenu(shiftBackButton);
+        shiftBackButton.addActionListener(e -> shiftLayersSpan(-ShiftUnit.valueOf(shiftBackGroup.getSelection().getActionCommand()).shift));
+        buttonPanel.add(shiftBackButton);
+
         prevFrameButton = new JHVButton(Buttons.backward);
         prevFrameButton.setFont(Buttons.getMaterialFont(small));
         prevFrameButton.setToolTipText("Step to previous frame");
@@ -229,6 +261,13 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         nextFrameButton.setToolTipText("Step to next frame");
         nextFrameButton.addActionListener(getNextFrameAction());
         buttonPanel.add(nextFrameButton);
+
+        JHVSplitButton shiftForeButton = new JHVSplitButton(Buttons.skipForward);
+        shiftForeButton.setFont(Buttons.getMaterialFont(small));
+        shiftForeButton.setToolTipText("Move time interval forward");
+        ButtonGroup shiftForeGroup = createShiftMenu(shiftForeButton);
+        shiftForeButton.addActionListener(e -> shiftLayersSpan(ShiftUnit.valueOf(shiftForeGroup.getSelection().getActionCommand()).shift));
+        buttonPanel.add(shiftForeButton);
 
         recordButton = new RecordButton(small);
         buttonPanel.add(recordButton);
@@ -394,6 +433,11 @@ public class MoviePanel extends JPanel implements ObservationSelector {
     private void syncLayersSpan() {
         if (checkSanity())
             ImageLayers.syncLayersSpan(getStartTime(), getEndTime(), getCadence());
+    }
+
+    private void shiftLayersSpan(long shift) {
+        setTime(getStartTime() + shift, getEndTime() + shift);
+        ImageLayers.shiftLayersSpan(shift);
     }
 
     private static void clickRecordButton() {
