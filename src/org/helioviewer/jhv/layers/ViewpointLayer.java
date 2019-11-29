@@ -11,10 +11,10 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
+import org.helioviewer.jhv.camera.viewpoint.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;

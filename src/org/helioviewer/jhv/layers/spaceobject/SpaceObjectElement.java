@@ -4,7 +4,7 @@ import javax.swing.border.Border;
 
 import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.SpaceObject;
-import org.helioviewer.jhv.astronomy.UpdateViewpoint;
+import org.helioviewer.jhv.camera.viewpoint.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.position.LoadPosition;
