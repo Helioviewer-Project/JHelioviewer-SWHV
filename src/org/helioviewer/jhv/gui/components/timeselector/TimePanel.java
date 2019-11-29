@@ -1,9 +1,9 @@
 package org.helioviewer.jhv.gui.components.timeselector;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.Popup;
@@ -32,14 +30,20 @@ class TimePanel extends JPanel {
 
     private final CalendarPicker calendarPicker = new CalendarPicker();
     private final JTextField textField = new JTextField();
-    private final JHVButton calPopupButton = new JHVButton(Buttons.calendar);
+    private final JHVButton calendarButton = new JHVButton(Buttons.calendar);
     private Popup calPopup = null;
 
-    TimePanel(String text) {
+    TimePanel() {
         setLayout(new GridBagLayout());
+        setBackground(textField.getBackground());
+        setBorder(textField.getBorder());
+        textField.setBorder(null);
+        calendarButton.setMargin(new Insets(0, 0, 0, 0));
+        calendarButton.setToolTipText("Select date");
+
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.LINE_START;
-        c.fill = GridBagConstraints.BOTH;
+        c.fill = GridBagConstraints.HORIZONTAL;;
 
         textField.addFocusListener(new FocusAdapter() {
             @Override
@@ -56,39 +60,31 @@ class TimePanel extends JPanel {
             }
         });
 
-        calPopupButton.addFocusListener(new FocusAdapter() {
+        calendarButton.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                hideCalPopup();
+                hidePopup();
             }
         });
-        calPopupButton.addActionListener(e -> {
+        calendarButton.addActionListener(e -> {
             setTimeFromTextField(false);
             if (calPopup == null) {
-                calPopupButton.requestFocus();
-                showCalPopup();
+                calendarButton.requestFocus();
+                showPopup();
             } else {
-                hideCalPopup();
+                hidePopup();
             }
         });
-        calPopupButton.setToolTipText("Select date");
 
-        JLabel label = new JLabel(text, JLabel.RIGHT);
-        label.setPreferredSize(new Dimension(40, -1));
-
-        c.weightx = 0;
-        c.gridx = 0;
-        add(label, c);
         c.weightx = 1;
-        c.gridx = 1;
+        c.gridx = 0;
         add(textField, c);
         c.weightx = 0;
-        c.gridx = 2;
-        add(calPopupButton, c);
+        c.gridx = 1;
+        add(calendarButton, c);
 
         calendarPicker.setPreferredSize(calendarPicker.getMinimumSize());
-        calendarPicker.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        calendarPicker.addListener(this::hideCalPopup);
+        calendarPicker.addListener(this::hidePopup);
     }
 
     private void informListeners() {
@@ -107,7 +103,7 @@ class TimePanel extends JPanel {
     }
 
     // Opens an new popup window where the user can select a date
-    private void showCalPopup() {
+    private void showPopup() {
         // set up the popup content
         calendarPicker.setTime(calendar.getTimeInMillis());
 
@@ -117,7 +113,7 @@ class TimePanel extends JPanel {
 
         // create popup
         PopupFactory factory = PopupFactory.getSharedInstance();
-        calPopup = factory.getPopup(calPopupButton, calendarPicker, x, y);
+        calPopup = factory.getPopup(calendarButton, calendarPicker, x, y);
         calPopup.show();
 
         calendarPicker.resizeSelectionPanel();
@@ -133,11 +129,11 @@ class TimePanel extends JPanel {
         calPopup.hide();
 
         // show popup
-        calPopup = factory.getPopup(calPopupButton, calendarPicker, x, y);
+        calPopup = factory.getPopup(calendarButton, calendarPicker, x, y);
         calPopup.show();
     }
 
-    private void hideCalPopup() {
+    private void hidePopup() {
         if (calPopup != null) {
             calPopup.hide();
             calPopup = null;
@@ -164,7 +160,7 @@ class TimePanel extends JPanel {
     @Override
     public void setEnabled(boolean enabled) {
         textField.setEnabled(enabled);
-        calPopupButton.setEnabled(enabled);
+        calendarButton.setEnabled(enabled);
     }
 
     void addListener(CalendarListener listener) {
