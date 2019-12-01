@@ -75,7 +75,7 @@ public class TimeSelectorPanel extends JPanel {
         c.gridx = 0;
         add(backButton, c);
 
-        c.weightx = 0.5;
+        c.weightx = 1;
         c.gridx = 1;
         add(startTimePanel, c);
         c.gridx = 2;
