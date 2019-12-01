@@ -5,10 +5,8 @@ import java.io.InputStream;
 
 import javax.annotation.Nonnull;
 
-/**
- * Input stream with a fixed size. After reading the expected number of bytes
- * this input stream will behave as if the end of the stream has been reached.
- */
+// Input stream with a fixed size. After reading the expected number of bytes
+// this input stream will behave as if the end of the stream has been reached.
 public class FixedSizedInputStream extends TransferInputStream {
 
     private int remainingBytes;
@@ -38,7 +36,7 @@ public class FixedSizedInputStream extends TransferInputStream {
     @Override
     public int read(@Nonnull byte[] b, int off, int len) throws IOException {
         if (remainingBytes > 0) {
-            int bytesRead = in.read(b, off, remainingBytes < len ? remainingBytes : len);
+            int bytesRead = in.read(b, off, Math.min(len, remainingBytes));
             remainingBytes -= bytesRead;
             return bytesRead;
         }

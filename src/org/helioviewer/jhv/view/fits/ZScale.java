@@ -24,26 +24,6 @@ class ZScale {
 
     private static final float zContrast = 0.25f;
 
-    private static int ZSMAX(int a, int b) {
-        return a > b ? a : b;
-    }
-
-    private static float ZSMAX(float a, float b) {
-        return a > b ? a : b;
-    }
-
-    private static int ZSMIN(int a, int b) {
-        return a < b ? a : b;
-    }
-
-    private static float ZSMIN(float a, float b) {
-        return a < b ? a : b;
-    }
-
-    private static int ZSMOD(int a, int b) {
-        return a % b;
-    }
-
     private static int ZSNINT(double a) {
         return (int) (a + 0.5);
     }
@@ -118,7 +98,7 @@ class ZScale {
                     // pixels in the forward direction; mark them for rejection
                     // but do not reject until they have been thresholded.
                     // If this is not done growing will not be symmetric.
-                    for (int j = ZSMAX(0, i - ngrow); j < ZSMIN(npix, i + ngrow); j++) {
+                    for (int j = Math.max(0, i - ngrow); j < Math.min(npix, i + ngrow); j++) {
                         if (badpix[j] != BAD_PIXEL) {
                             if (j <= i) {
                                 double x = normx[j];
@@ -202,7 +182,7 @@ class ZScale {
 
         int ngoodpix = npix;
         int last_ngoodpix;
-        int minpix = ZSMAX(ZSMIN_NPIXELS, (int) (npix * ZSMAX_REJECT));
+        int minpix = Math.max(ZSMIN_NPIXELS, (int) (npix * ZSMAX_REJECT));
 
         for (int niter = 0; niter < maxiter; niter++) {
             last_ngoodpix = ngoodpix;
@@ -259,19 +239,19 @@ class ZScale {
     // final Z1 and Z2 are computed, taking the origin of the fitted line at the
     // median value.
     static void zscale(float[] sample, int npix, float[] zLow, float[] zHigh, float[] zMax) {
-        int center_pixel = ZSMAX(1, (npix + 1) / 2);
+        int center_pixel = Math.max(1, (npix + 1) / 2);
 
         // Sort the sample, compute the minimum, maximum, and median pixel values
         Arrays.sort(sample, 0, npix);
         float zmin = sample[0];
-        float zmax = sample[ZSMAX(npix, 1) - 1];
+        float zmax = sample[Math.max(npix, 1) - 1];
         zMax[0] = zmax;
 
         // The median value is the average of the two central values if there
         // are an even number of pixels in the sample.
         float left = sample[center_pixel - 1];
         float median;
-        if (ZSMOD(npix, 2) == 1 || center_pixel >= npix)
+        if (npix % 2 == 1 || center_pixel >= npix)
             median = left;
         else
             median = (left + sample[center_pixel]) / 2;
@@ -281,8 +261,8 @@ class ZScale {
         // If the user-supplied contrast factor is not 1.0 adjust the scale
         // accordingly and compute zLow and zHigh, the y intercepts at indices 1 and
         // npix.
-        int minpix = ZSMAX(ZSMIN_NPIXELS, (int) (npix * ZSMAX_REJECT));
-        int ngrow = ZSMAX(1, ZSNINT(npix * .01));
+        int minpix = Math.max(ZSMIN_NPIXELS, (int) (npix * ZSMAX_REJECT));
+        int ngrow = Math.max(1, ZSNINT(npix * .01));
         float[] zstart = {0};
         float[] zslope = {0};
 
@@ -295,8 +275,8 @@ class ZScale {
             {
                 zslope[0] = zslope[0] / zContrast;
             }
-            zLow[0] = ZSMAX(zmin, median - (center_pixel - 1) * zslope[0]);
-            zHigh[0] = ZSMIN(zmax, median + (npix - center_pixel) * zslope[0]);
+            zLow[0] = Math.max(zmin, median - (center_pixel - 1) * zslope[0]);
+            zHigh[0] = Math.min(zmax, median + (npix - center_pixel) * zslope[0]);
         }
     }
 
