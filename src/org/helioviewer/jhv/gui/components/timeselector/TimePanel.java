@@ -31,7 +31,7 @@ class TimePanel extends JPanel {
     private final Calendar calendar = new GregorianCalendar();
 
     private final CalendarPicker calendarPicker = new CalendarPicker();
-    private final JTextField textField = new JTextField();
+    private final JTextField textField = new JTextField("2000-01-01T00:00:00");
     private final JHVButton calendarButton = new JHVButton(Buttons.calendar);
     private Popup calPopup = null;
 

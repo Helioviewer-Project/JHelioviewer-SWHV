@@ -2,14 +2,13 @@ package org.helioviewer.jhv.base.lut;
 
 import java.io.BufferedReader;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.helioviewer.jhv.base.Regex;
 
 // Represent a Gimp gradient consisting of several GimpGradientSegments
 class GimpGradient {
 
-    private final List<GimpGradientSegment> segments;
+    private final ArrayList<GimpGradientSegment> segments;
     private final String name;
 
     public String getName() {
