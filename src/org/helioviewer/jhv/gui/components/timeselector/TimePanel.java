@@ -46,10 +46,6 @@ class TimePanel extends JPanel {
         calendarButton.setMargin(new Insets(0, 0, 0, 0));
         calendarButton.setToolTipText(tip);
 
-        GridBagConstraints c = new GridBagConstraints();
-        c.anchor = GridBagConstraints.LINE_START;
-        c.fill = GridBagConstraints.HORIZONTAL;
-
         textField.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -64,7 +60,6 @@ class TimePanel extends JPanel {
                 }
             }
         });
-
         calendarButton.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -80,6 +75,10 @@ class TimePanel extends JPanel {
                 hidePopup();
             }
         });
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.LINE_START;
+        c.fill = GridBagConstraints.HORIZONTAL;
 
         c.weightx = 1;
         c.gridx = 0;
