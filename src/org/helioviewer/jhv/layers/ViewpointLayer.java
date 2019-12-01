@@ -264,7 +264,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
     }
 
     private static long getStep(double dist) { // decrease interpolation step proportionally with distance, stop at 3au
-        return (long) (DELTA_ORBIT * (dist > DELTA_CUTOFF ? DELTA_CUTOFF : dist));
+        return (long) (DELTA_ORBIT * Math.min(dist, DELTA_CUTOFF));
     }
 
     private final float[] xyzw = {0, 0, 0, 1};
