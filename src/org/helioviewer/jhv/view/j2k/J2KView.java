@@ -2,6 +2,7 @@ package org.helioviewer.jhv.view.j2k;
 
 import java.awt.EventQueue;
 import java.io.IOException;
+import java.lang.ref.Cleaner;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -34,6 +35,8 @@ import org.helioviewer.jhv.view.j2k.kakadu.KakaduSource;
 
 public class J2KView extends BaseView {
 
+    private static final Cleaner reaper = Cleaner.create();
+
     private static final int HIRES_CUTOFF = 1280;
 
     private int targetFrame = 0;
@@ -41,6 +44,9 @@ public class J2KView extends BaseView {
 
     private final long[] cacheKey;
     private final JHVDate[] dates;
+
+    private final Abolisher abolisher = new Abolisher();
+    private final Cleaner.Cleanable abolishable = reaper.register(this, abolisher);
 
     private final DecodeExecutor decoder = new DecodeExecutor();
     private final KakaduSource kduSource;
@@ -123,31 +129,26 @@ public class J2KView extends BaseView {
     }
 
     // if instance was built before cancelling
-    @Override
-    protected void finalize() throws Throwable {
-        try {
-            abolish();
-        } finally {
-            super.finalize();
-        }
-    }
+    private class Abolisher implements Runnable {
 
-    private volatile boolean isAbolished = false;
+        @Override
+        public void run() {
+            // decoder and reader abolish may take too long in stressed conditions
+            new Thread(() -> {
+                decoder.abolish();
+                if (reader != null) {
+                    reader.abolish();
+                    reader = null;
+                }
+                kduDestroy();
+            }).start();
+        }
+
+    }
 
     @Override
     public void abolish() {
-        if (isAbolished)
-            return;
-        isAbolished = true;
-
-        new Thread(() -> {
-            decoder.abolish();
-            if (reader != null) {
-                reader.abolish();
-                reader = null;
-            }
-            kduDestroy();
-        }).start();
+        abolishable.clean();
     }
 
     private void kduDestroy() {
@@ -296,8 +297,6 @@ public class J2KView extends BaseView {
     private int currentLevel = 10000;
 
     void signalDecoderFromReader(ReadParams params) {
-        if (isAbolished)
-            return;
         EventQueue.invokeLater(() -> {
             if (params.decodeParams.frame == targetFrame) {
                 // params.decodeParams.complete = true;
@@ -307,9 +306,6 @@ public class J2KView extends BaseView {
     }
 
     void setDataFromDecoder(DecodeParams decodeParams, ImageBuffer imageBuffer) {
-        if (isAbolished)
-            return;
-
         trueFrame = decodeParams.frame;
 
         ImageData data = new ImageData(imageBuffer);
