@@ -45,15 +45,14 @@ public class J2KView extends BaseView {
     private final long[] cacheKey;
     private final JHVDate[] dates;
 
-    private final Abolisher abolisher = new Abolisher();
-    private final Cleaner.Cleanable abolishable = reaper.register(this, abolisher);
+    private final Cleaner.Cleanable abolishable;
 
     private final DecodeExecutor decoder = new DecodeExecutor();
     private final KakaduSource kduSource;
-    private JPIPCache jpipCache;
+    private final JPIPCache jpipCache;
 
     protected final CacheStatus cacheStatus;
-    protected J2KReader reader;
+    protected final J2KReader reader;
 
     public J2KView(URI _uri, APIRequest _request, APIResponse _response) throws Exception {
         super(_uri, _request);
@@ -78,6 +77,8 @@ public class J2KView extends BaseView {
                     reader = new J2KReader(this);
                     break;
                 case "file":
+                    jpipCache = null;
+                    reader = null;
                     // nothing
                     break;
                 default:
@@ -118,6 +119,8 @@ public class J2KView extends BaseView {
                 cacheStatus = new CacheStatusRemote(kduSource, maxFrame);
                 reader.start();
             }
+
+            abolishable = reaper.register(this, new Abolisher(decoder, reader, jpipCache));
         } catch (KduException e) {
             e.printStackTrace();
             throw new IOException("Failed to create Kakadu machinery: " + e.getMessage(), e);
@@ -129,18 +132,34 @@ public class J2KView extends BaseView {
     }
 
     // if instance was built before cancelling
-    private class Abolisher implements Runnable {
+    private static class Abolisher implements Runnable {
+
+        private final DecodeExecutor aDecoder;
+        private final J2KReader aReader;
+        private final JPIPCache aJpipCache;
+
+        Abolisher(DecodeExecutor _decoder, J2KReader _reader, JPIPCache _jpipCache) {
+            aDecoder = _decoder;
+            aReader = _reader;
+            aJpipCache = _jpipCache;
+        }
 
         @Override
         public void run() {
             // decoder and reader abolish may take too long in stressed conditions
             new Thread(() -> {
-                decoder.abolish();
-                if (reader != null) {
-                    reader.abolish();
-                    reader = null;
+                aDecoder.abolish();
+                if (aReader != null) {
+                    aReader.abolish();
                 }
-                kduDestroy();
+                try {
+                    if (aJpipCache != null) {
+                        aJpipCache.Close();
+                        aJpipCache.Native_destroy();
+                    }
+                } catch (KduException e) {
+                    e.printStackTrace();
+                }
             }).start();
         }
 
@@ -149,19 +168,6 @@ public class J2KView extends BaseView {
     @Override
     public void abolish() {
         abolishable.clean();
-    }
-
-    private void kduDestroy() {
-        try {
-            if (jpipCache != null) {
-                jpipCache.Close();
-                jpipCache.Native_destroy();
-            }
-        } catch (KduException e) {
-            e.printStackTrace();
-        } finally {
-            jpipCache = null;
-        }
     }
 
     @Override
