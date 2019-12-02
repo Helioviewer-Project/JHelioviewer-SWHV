@@ -263,7 +263,7 @@ public class J2KView extends BaseView {
         if (reader != null && !decodeParams.complete) {
             signalReader(decodeParams);
         }
-        decoder.decode(this, decodeParams);
+        decoder.decode(decodeParams);
     }
 
     protected DecodeParams getDecodeParams(Position viewpoint, int frame, double pixFactor, double factor) {
@@ -287,7 +287,7 @@ public class J2KView extends BaseView {
             }
         }
         AtomicBoolean status = cacheStatus.getFrameStatus(frame, res.level); // before signalling to reader
-        return new DecodeParams(viewpoint, status != null && status.get(), subImage, res, frame, factor);
+        return new DecodeParams(this, viewpoint, status != null && status.get(), subImage, res, frame, factor);
     }
 
     protected void signalReader(DecodeParams decodeParams) {
@@ -306,7 +306,7 @@ public class J2KView extends BaseView {
         EventQueue.invokeLater(() -> {
             if (params.decodeParams.frame == targetFrame) {
                 // params.decodeParams.complete = true;
-                decoder.decode(this, params.decodeParams);
+                decoder.decode(params.decodeParams);
             }
         });
     }

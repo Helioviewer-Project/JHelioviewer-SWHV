@@ -16,15 +16,15 @@ class DecodeExecutor {
             new JHVThread.NamedThreadFactory("Decoder"),
             new ThreadPoolExecutor.DiscardPolicy());
 
-    void decode(J2KView view, DecodeParams decodeParams) {
+    void decode(DecodeParams decodeParams) {
         blockingQueue.poll();
-        executor.execute(new J2KDecoder(view, decodeParams, false));
+        executor.execute(new J2KDecoder(decodeParams, false));
     }
 
     void abolish() {
         try {
             blockingQueue.poll();
-            executor.execute(new J2KDecoder(null, null, true));
+            executor.execute(new J2KDecoder(null, true));
             executor.shutdown();
             while (!executor.awaitTermination(1000L, TimeUnit.MILLISECONDS)) ;
         } catch (Exception ignore) {

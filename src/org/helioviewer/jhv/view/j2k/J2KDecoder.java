@@ -37,12 +37,10 @@ class J2KDecoder implements Runnable {
     private static final ThreadLocal<Kdu_thread_env> localThread = ThreadLocal.withInitial(J2KDecoder::createThreadEnv);
     private static final ThreadLocal<Kdu_region_compositor> localCompositor = new ThreadLocal<>();
 
-    private final J2KView view;
     private final DecodeParams decodeParams;
     private final boolean abolish;
 
-    J2KDecoder(J2KView _view, DecodeParams _decodeParams, boolean _abolish) {
-        view = _view;
+    J2KDecoder(DecodeParams _decodeParams, boolean _abolish) {
         decodeParams = _decodeParams;
         abolish = _abolish;
     }
@@ -54,9 +52,9 @@ class J2KDecoder implements Runnable {
 
         SubImage subImage = params.subImage;
         int frame = params.frame;
-        int numComponents = view.getNumComponents(frame);
+        int numComponents = params.view.getNumComponents(frame);
 
-        Kdu_region_compositor compositor = getCompositor();
+        Kdu_region_compositor compositor = getCompositor(params.view);
         Kdu_dims empty = new Kdu_dims();
         Kdu_ilayer_ref ilayer;
         if (numComponents < 3) {
@@ -135,7 +133,7 @@ class J2KDecoder implements Runnable {
 
         try {
             ImageBuffer data = decodeLayer(decodeParams);
-            view.setDataFromDecoder(decodeParams, data);
+            decodeParams.view.setDataFromDecoder(decodeParams, data);
         } catch (Exception e) { // reboot the compositor
             Kdu_region_compositor krc = localCompositor.get();
             if (krc != null)
@@ -146,7 +144,7 @@ class J2KDecoder implements Runnable {
         }
     }
 
-    private Kdu_region_compositor getCompositor() throws KduException {
+    private Kdu_region_compositor getCompositor(J2KView view) throws KduException {
         Kdu_region_compositor krc = localCompositor.get();
         if (krc != null)
             return krc;

@@ -2,9 +2,11 @@ package org.helioviewer.jhv.view.j2k.image;
 
 import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.position.Position;
+import org.helioviewer.jhv.view.j2k.J2KView;
 
 public class DecodeParams {
 
+    public final J2KView view;
     public final Position viewpoint; // sync with camera & between layers
     public final boolean complete; // cache the decoded data
     public final SubImage subImage;
@@ -12,7 +14,8 @@ public class DecodeParams {
     public final int frame;
     public final double factor;
 
-    public DecodeParams(Position _viewpoint, boolean _complete, SubImage _roi, ResolutionSet.ResolutionLevel _resolution, int _frame, double _factor) {
+    public DecodeParams(J2KView _view, Position _viewpoint, boolean _complete, SubImage _roi, ResolutionSet.ResolutionLevel _resolution, int _frame, double _factor) {
+        view = _view;
         viewpoint = _viewpoint;
         complete = _complete;
         subImage = _roi;
@@ -28,7 +31,7 @@ public class DecodeParams {
         if (!(o instanceof DecodeParams))
             return false;
         DecodeParams p = (DecodeParams) o;
-        return frame == p.frame && factor == p.factor && subImage.equals(p.subImage) && resolution.equals(p.resolution);
+        return view == p.view && frame == p.frame && factor == p.factor && subImage.equals(p.subImage) && resolution.equals(p.resolution);
     }
 
     @Override
