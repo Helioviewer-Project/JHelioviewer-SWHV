@@ -30,7 +30,10 @@ public class BooleanSignal {
                 lock.wait();
             }
             isSignaled = false;
-            return params;
+            // drop reference to params
+            ReadParams ret = params;
+            params = null;
+            return ret;
         }
     }
 
