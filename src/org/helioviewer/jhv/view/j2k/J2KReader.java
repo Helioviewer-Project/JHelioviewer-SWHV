@@ -23,7 +23,6 @@ class J2KReader implements Runnable {
     private final BooleanSignal readerSignal = new BooleanSignal(false);
 
     private final J2KView view;
-    private final JPIPCache cache;
     private final Thread myThread;
 
     // A boolean flag used for stopping the thread
@@ -34,9 +33,9 @@ class J2KReader implements Runnable {
     J2KReader(J2KView _view) throws KduException, IOException {
         view = _view;
 
-        cache = view.getJPIPCache();
+        JPIPCache cache = view.getJPIPCache();
         socket = new JPIPSocket(view.getURI(), cache);
-        initJPIP();
+        initJPIP(cache);
 
         myThread = new Thread(this, "Reader " + view.getName());
         myThread.setDaemon(true);
@@ -70,7 +69,7 @@ class J2KReader implements Runnable {
 
     private static final int mainHeaderKlass = DatabinMap.getKlass(JPIPConstants.MAIN_HEADER_DATA_BIN_CLASS);
 
-    private void initJPIP() throws IOException {
+    private void initJPIP(JPIPCache cache) throws IOException {
         try {
             JPIPResponse res;
             String req = JPIPQuery.create(JPIPConstants.META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
@@ -114,29 +113,31 @@ class J2KReader implements Runnable {
 
     @Override
     public void run() {
-        int numFrames = view.getMaximumFrameNumber() + 1;
-        CacheStatus cacheStatus = view.getCacheStatus();
-
         while (!isAbolished) {
             ReadParams params;
             // wait for signal
             try {
-                view.setDownloading(false);
                 params = readerSignal.waitForSignal();
-                view.setDownloading(true);
             } catch (InterruptedException e) {
                 continue;
             }
+
+            JPIPCache cache = view.getJPIPCache();
+            CacheStatus cacheStatus = view.getCacheStatus();
+            int numFrames = view.getMaximumFrameNumber() + 1;
+
+            int frame = params.decodeParams.frame;
+            int level = params.decodeParams.resolution.level;
+            int width = params.decodeParams.resolution.width;
+            int height = params.decodeParams.resolution.height;
+
+            view.setDownloading(true);
 
             try {
                 if (socket.isClosed()) {
                     // System.out.println(">>> reconnect");
                     socket = new JPIPSocket(view.getURI(), cache);
                 }
-
-                int frame = params.decodeParams.frame;
-                int level = params.decodeParams.resolution.level;
-
                 // choose cache strategy
                 boolean singleFrame = false;
                 if (numFrames <= 1 /* one frame */ || params.priority) {
@@ -146,7 +147,7 @@ class J2KReader implements Runnable {
                 // build query based on strategy
                 int currentStep;
                 String[] stepQuerys;
-                String fSiz = params.decodeParams.resolution.width + "," + params.decodeParams.resolution.height;
+                String fSiz = width + "," + height;
                 if (singleFrame) {
                     stepQuerys = new String[]{createQuery(fSiz, frame)};
                     currentStep = frame;
@@ -209,16 +210,17 @@ class J2KReader implements Runnable {
                         stopReading = true;
                     }
                 }
+
+                view.setDownloading(false);
+
                 // suicide if fully done
                 if (cacheStatus.isComplete(0)) {
-                    view.setDownloading(false);
                     try {
                         socket.close();
                     } catch (IOException ignore) {
                     }
                     return;
                 }
-
                 // if single frame & not interrupted & incomplete -> signal again to go on reading
                 if (singleFrame && !stopReading && !cacheStatus.isComplete(level)) {
                     params.priority = false;
