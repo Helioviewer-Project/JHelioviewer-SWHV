@@ -22,17 +22,13 @@ class J2KReader implements Runnable {
 
     private final BooleanSignal readerSignal = new BooleanSignal(false);
 
-    private final J2KView view;
     private final Thread myThread;
 
-    // A boolean flag used for stopping the thread
     private volatile boolean isAbolished;
 
     private JPIPSocket socket;
 
-    J2KReader(J2KView _view) throws KduException, IOException {
-        view = _view;
-
+    J2KReader(J2KView view) throws KduException, IOException {
         JPIPCache cache = view.getJPIPCache();
         socket = new JPIPSocket(view.getURI(), cache);
         initJPIP(cache);
@@ -122,6 +118,7 @@ class J2KReader implements Runnable {
                 continue;
             }
 
+            J2KView view = params.decodeParams.view;
             JPIPCache cache = view.getJPIPCache();
             CacheStatus cacheStatus = view.getCacheStatus();
             int numFrames = view.getMaximumFrameNumber() + 1;
