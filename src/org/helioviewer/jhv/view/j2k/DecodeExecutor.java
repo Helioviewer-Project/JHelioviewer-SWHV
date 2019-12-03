@@ -18,13 +18,13 @@ class DecodeExecutor {
 
     void decode(DecodeParams decodeParams) {
         blockingQueue.poll();
-        executor.execute(new J2KDecoder(decodeParams, false));
+        executor.execute(new J2KDecoder(decodeParams));
     }
 
     void abolish() {
         try {
             blockingQueue.poll();
-            executor.execute(new J2KDecoder(null, true));
+            executor.execute(new J2KDecoder(null));
             executor.shutdown();
             while (!executor.awaitTermination(1000L, TimeUnit.MILLISECONDS)) ;
         } catch (Exception ignore) {

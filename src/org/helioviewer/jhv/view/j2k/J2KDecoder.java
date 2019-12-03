@@ -38,11 +38,9 @@ class J2KDecoder implements Runnable {
     private static final ThreadLocal<Kdu_region_compositor> localCompositor = new ThreadLocal<>();
 
     private final DecodeParams decodeParams;
-    private final boolean abolish;
 
-    J2KDecoder(DecodeParams _decodeParams, boolean _abolish) {
+    J2KDecoder(DecodeParams _decodeParams) {
         decodeParams = _decodeParams;
-        abolish = _abolish;
     }
 
     private ImageBuffer decodeLayer(DecodeParams params) throws KduException {
@@ -126,7 +124,7 @@ class J2KDecoder implements Runnable {
 
     @Override
     public void run() {
-        if (abolish) {
+        if (decodeParams == null) {
             abolish();
             return;
         }
