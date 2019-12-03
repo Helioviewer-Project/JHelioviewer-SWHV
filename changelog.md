@@ -3,15 +3,16 @@
 
 ## JHelioviewer 2.16 (pending)
 
-- non-modal annotations (shift+click)
-- draw spiral in heliosphere
-- read Helioviewer metadata from JPG and PNG files
-- switch from NewtCanvasAWT to GLCanvas (full screen is lost)
-- support pixel scale in Windows
-- fractional pixel scale
-- switch to Java 11
-- switch to OpenGL 3.3
-- move plugins options to preferences
-- support KCor dataset (#114)
-- simplify datetime selection and use NLP
-- use install4j for packaging installation
+- Non-modal annotations (shift+click)
+- Draw spiral in heliosphere
+- Read Helioviewer metadata from JPG and PNG files
+- Switch from NewtCanvasAWT to GLCanvas (full screen is lost)
+- Support pixel scale in Windows 10
+- Support fractional pixel scale
+- Switch to Java 11
+- Switch to OpenGL 3.3
+- Move plugins options to preferences
+- Support KCor dataset (#114)
+- Simplify datetime selection and use NLP
+- Request SOLO trajectory backdated 10 years
+- Use install4j for packaging installation
