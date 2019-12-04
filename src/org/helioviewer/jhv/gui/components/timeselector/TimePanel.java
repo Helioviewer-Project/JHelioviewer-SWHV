@@ -96,9 +96,12 @@ class TimePanel extends JPanel {
     }
 
     private void setTimeFromTextField(boolean propagate) {
-        setTime(TimeUtils.optParse(textField.getText(), getTime()));
-        if (propagate)
-            informListeners();
+        String text = textField.getText();
+        if (text != null) { // satisfy coverity
+            setTime(TimeUtils.optParse(text, getTime()));
+            if (propagate)
+                informListeners();
+        }
     }
 
     private void setTimeFromCalendar() {
