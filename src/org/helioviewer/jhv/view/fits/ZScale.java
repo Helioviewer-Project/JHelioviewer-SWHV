@@ -251,7 +251,7 @@ class ZScale {
         // are an even number of pixels in the sample.
         float left = sample[center_pixel - 1];
         float median;
-        if (npix % 2 == 1 || center_pixel >= npix)
+        if ((npix & 1) == 1 || center_pixel >= npix)
             median = left;
         else
             median = (left + sample[center_pixel]) / 2;
