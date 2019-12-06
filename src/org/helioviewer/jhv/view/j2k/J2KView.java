@@ -46,7 +46,6 @@ public class J2KView extends BaseView {
     private final JHVDate[] dates;
 
     private final Cleaner.Cleanable abolishable;
-
     private final DecodeExecutor decoder = new DecodeExecutor();
     private final KakaduSource kduSource;
     private final JPIPCache jpipCache;
@@ -331,6 +330,7 @@ public class J2KView extends BaseView {
         return kduSource;
     }
 
+    @Nullable
     @Override
     public AtomicBoolean getFrameCacheStatus(int frame) {
         return cacheStatus.getFrameStatus(frame, currentLevel);
