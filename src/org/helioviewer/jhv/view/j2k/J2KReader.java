@@ -7,7 +7,6 @@ import kdu_jni.KduException;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.j2k.cache.CacheStatus;
-import org.helioviewer.jhv.view.j2k.concurrency.BooleanSignal;
 import org.helioviewer.jhv.view.j2k.image.ReadParams;
 import org.helioviewer.jhv.view.j2k.io.jpip.DatabinMap;
 import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCache;
@@ -23,9 +22,7 @@ class J2KReader implements Runnable {
     private final BooleanSignal readerSignal = new BooleanSignal(false);
 
     private final Thread myThread;
-
     private volatile boolean isAbolished;
-
     private JPIPSocket socket;
 
     J2KReader(J2KView view) throws KduException, IOException {
@@ -201,7 +198,6 @@ class J2KReader implements Runnable {
                     // select next query based on strategy
                     if (!singleFrame)
                         currentStep++;
-
                     // check whether caching has to be interrupted
                     if (readerSignal.isSignaled() || Thread.interrupted()) {
                         stopReading = true;
