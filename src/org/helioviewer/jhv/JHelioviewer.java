@@ -122,11 +122,10 @@ public class JHelioviewer {
             }
 
             frame.pack();
-            JComponent leftPane = JHVFrame.getLeftScrollPane();
-            leftPane.setMinimumSize(new Dimension(leftPane.getPreferredSize().width + 10, -1));
-
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
+            JComponent leftPane = JHVFrame.getLeftScrollPane();
+            leftPane.setMinimumSize(new Dimension(leftPane.getPreferredSize().width + 10, -1));
 
             UITimer.start();
 
