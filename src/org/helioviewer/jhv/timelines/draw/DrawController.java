@@ -7,7 +7,6 @@ import java.util.ArrayList;
 
 import javax.swing.Timer;
 
-import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.events.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.MoviePanel;
@@ -184,8 +183,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
         long diff = selectedAxis.end() - selectedAxis.start();
         long availableStart = selectedAxis.start() - diff;
         long availableEnd = selectedAxis.end() + diff;
-        Interval availableInterval = Interval.makeCompleteDay(availableStart, availableEnd);
-        availableAxis.set(availableInterval.start, availableInterval.end);
+        availableAxis.set(TimeUtils.floorDay(availableStart), TimeUtils.floorDay(availableEnd) + TimeUtils.DAY_IN_MILLIS);
 
         TimelineLayers.get().forEach(timelineLayer -> timelineLayer.fetchData(selectedAxis));
         drawRequest();
