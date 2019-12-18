@@ -11,7 +11,7 @@ import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MiniviewLayer;
 import org.helioviewer.jhv.layers.Movie;
-import org.helioviewer.jhv.layers.MovieDisplay;
+//import org.helioviewer.jhv.layers.MovieDisplay;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
@@ -91,7 +91,7 @@ public class GLListener implements GLEventListener {
         MiniviewLayer miniview = Layers.getMiniviewLayer();
         if (miniview != null)
             miniview.reshapeViewport();
-        MovieDisplay.render(1);
+        // MovieDisplay.render(1);
     }
 
     public static void renderScene(Camera camera, GL2 gl) {
@@ -149,7 +149,7 @@ public class GLListener implements GLEventListener {
     }
 
     @Override
-    public void display(GLAutoDrawable drawable) { // NEDT
+    public void display(GLAutoDrawable drawable) {
         GLInfo.updatePixelScale(canvas);
         GL2 gl = (GL2) drawable.getGL();
         gl.glFinish();
