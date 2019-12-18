@@ -8,9 +8,6 @@ public class SystemProperties {
 
     // Reads the builtin Java properties to determine the platform and set simplified properties used by JHV
     static void setPlatform() {
-        String javaArch = System.getProperty("sun.arch.data.model");
-        System.setProperty("jhv.java.arch", javaArch);
-
         String os = System.getProperty("os.name");
         String arch = System.getProperty("os.arch");
         if (os == null || arch == null) {
