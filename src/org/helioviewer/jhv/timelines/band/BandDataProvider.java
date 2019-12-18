@@ -17,7 +17,7 @@ public class BandDataProvider {
     private static final int DOWNLOADER_MAX_DAYS_PER_BLOCK = 21;
     private static final ExecutorService executorService = JHVExecutor.createJHVWorkersExecutorService("EVE", 12);
 
-    private static final HashMap<Band, List<Interval>> downloadMap = new HashMap<>();
+    private static final HashMap<Band, List<BandDownloadTask>> downloadMap = new HashMap<>();
     private static final HashMap<Band, List<Future<?>>> futureJobs = new HashMap<>();
 
     public static void loadBandTypes() {
@@ -49,18 +49,20 @@ public class BandDataProvider {
 
     private static void addDownloads(Band band, List<Interval> intervals) {
         int size = intervals.size();
-        List<Interval> dl = downloadMap.computeIfAbsent(band, k -> new ArrayList<>(size));
+        List<BandDownloadTask> dl = downloadMap.computeIfAbsent(band, k -> new ArrayList<>(size));
         List<Future<?>> fl = futureJobs.computeIfAbsent(band, k -> new ArrayList<>(size));
         for (Interval interval : intervals) {
-            dl.add(interval);
-            fl.add(executorService.submit(new BandDownloadTask(band, interval)));
+            BandDownloadTask worker = new BandDownloadTask(band, interval.start, interval.end);
+            dl.add(worker);
+            fl.add(executorService.submit(worker));
         }
     }
 
-    static void downloadFinished(Band band, Interval interval) {
-        List<Interval> list = downloadMap.get(band);
+    static void downloadFinished(BandDownloadTask worker) {
+        Band band = worker.band;
+        List<BandDownloadTask> list = downloadMap.get(band);
         if (list != null) {
-            list.remove(interval);
+            list.remove(worker);
             if (list.isEmpty())
                 downloadMap.remove(band);
         }
@@ -68,7 +70,7 @@ public class BandDataProvider {
     }
 
     static void stopDownloads(Band band) {
-        List<Interval> list = downloadMap.get(band);
+        List<BandDownloadTask> list = downloadMap.get(band);
         if (list == null)
             return;
         if (list.isEmpty())
@@ -80,7 +82,7 @@ public class BandDataProvider {
     }
 
     static boolean isDownloadActive(Band band) {
-        List<Interval> list = downloadMap.get(band);
+        List<BandDownloadTask> list = downloadMap.get(band);
         return list != null && !list.isEmpty();
     }
 
