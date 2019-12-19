@@ -2,7 +2,6 @@ package org.helioviewer.jhv.timelines.band;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
@@ -18,9 +17,7 @@ import org.json.JSONObject;
 
 public class BandDataProvider {
 
-    private static final int DOWNLOADER_MAX_DAYS_PER_BLOCK = 21;
     private static final ExecutorService executorService = JHVExecutor.createJHVWorkersExecutorService("EVE", 12);
-
     private static final HashMap<Band, List<BandDownloadTask>> downloadMap = new HashMap<>();
 
     public static void loadBandTypes() {
@@ -31,21 +28,7 @@ public class BandDataProvider {
         executorService.execute(new BandLoadTask(jo));
     }
 
-    static void updateBand(Band band, long start, long end) {
-        List<Interval> missingIntervalsNoExtend = band.getMissingDaysInInterval(start, end);
-        if (!missingIntervalsNoExtend.isEmpty()) {
-            // extend
-            start -= 7 * TimeUtils.DAY_IN_MILLIS;
-            end += 7 * TimeUtils.DAY_IN_MILLIS;
-
-            ArrayList<Interval> intervals = new ArrayList<>();
-            band.addRequest(start, end).forEach(interval -> intervals.addAll(Interval.splitInterval(interval, DOWNLOADER_MAX_DAYS_PER_BLOCK)));
-            if (!intervals.isEmpty())
-                addDownloads(band, intervals);
-        }
-    }
-
-    private static void addDownloads(Band band, List<Interval> intervals) {
+    static void addDownloads(Band band, List<Interval> intervals) {
         List<BandDownloadTask> workerList = downloadMap.computeIfAbsent(band, k -> new ArrayList<>(intervals.size()));
         for (Interval interval : intervals) {
             BandDownloadTask worker = new BandDownloadTask(band, interval.start, interval.end);
