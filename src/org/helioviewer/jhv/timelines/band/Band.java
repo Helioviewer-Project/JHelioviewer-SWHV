@@ -13,6 +13,7 @@ import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.interval.RequestCache;
 import org.helioviewer.jhv.opengl.GLInfo;
+import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -26,6 +27,7 @@ import org.json.JSONObject;
 public class Band extends AbstractTimelineLayer {
 
     private static final int SUPER_SAMPLE = 1; // 8 for dots
+    private static final int DOWNLOADER_MAX_DAYS_PER_BLOCK = 21;
 
     private final BandType bandType;
     private final BandCache bandCache;
@@ -94,7 +96,7 @@ public class Band extends AbstractTimelineLayer {
     @Override
     public void resetAxis() {
         yAxis.reset(bandType.getMin(), bandType.getMax());
-        updateGraphsData();
+        updateGraph();
     }
 
     @Override
@@ -111,7 +113,7 @@ public class Band extends AbstractTimelineLayer {
 
         if (Float.isFinite(bounds[0]) && Float.isFinite(bounds[1])) {
             yAxis.reset(bounds[0], bounds[1]);
-            updateGraphsData();
+            updateGraph();
         }
     }
 
@@ -193,7 +195,7 @@ public class Band extends AbstractTimelineLayer {
             warnLevels[i] = yAxis.value2pixel(graphArea.y, graphArea.height, unconvertedWarnLevels.get(warnLabels[i]));
     }
 
-    private void updateGraphsData() {
+    private void updateGraph() {
         if (enabled) {
             Rectangle graphArea = DrawController.getGraphArea();
             updateWarnLevels(graphArea);
@@ -233,30 +235,35 @@ public class Band extends AbstractTimelineLayer {
         return yAxis;
     }
 
-    List<Interval> addRequest(long start, long end) {
-        return requestCache.adaptRequestCache(start, end);
-    }
+    private void updateData(long start, long end) {
+        List<Interval> missingIntervals = requestCache.getMissingIntervals(start, end);
+        if (!missingIntervals.isEmpty()) {
+            // extend
+            start -= 7 * TimeUtils.DAY_IN_MILLIS;
+            end += 7 * TimeUtils.DAY_IN_MILLIS;
 
-    List<Interval> getMissingDaysInInterval(long start, long end) {
-        return requestCache.getMissingIntervals(start, end);
+            ArrayList<Interval> intervals = new ArrayList<>();
+            requestCache.adaptRequestCache(start, end).forEach(interval -> intervals.addAll(Interval.splitInterval(interval, DOWNLOADER_MAX_DAYS_PER_BLOCK)));
+            BandDataProvider.addDownloads(this, intervals);
+        }
     }
 
     @Override
     public void fetchData(TimeAxis timeAxis) {
         long start = propagationModel.getObservationTime(timeAxis.start());
         long end = propagationModel.getObservationTime(timeAxis.end());
-        BandDataProvider.updateBand(this, start, end);
-        updateGraphsData();
+        updateData(start, end);
+        updateGraph();
     }
 
     @Override
     public void yaxisChanged() {
-        updateGraphsData();
+        updateGraph();
     }
 
     void addToCache(float[] values, long[] dates) {
         bandCache.addToCache(yAxis, values, dates);
-        updateGraphsData();
+        updateGraph();
         DrawController.drawRequest();
     }
 
