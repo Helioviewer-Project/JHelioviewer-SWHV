@@ -46,7 +46,7 @@ public class SWEKDownloadManager implements FilterManagerListener {
                 SWEKDownloadWorker worker = it.next();
                 if (worker.getSupplier() == supplier) {
                     worker.stopWorker();
-                    JHVEventCache.intervalNotDownloaded(supplier, worker.getRequestInterval());
+                    JHVEventCache.intervalNotDownloaded(supplier, worker.getStart(), worker.getEnd());
                     it.remove();
                 }
             }
@@ -60,7 +60,7 @@ public class SWEKDownloadManager implements FilterManagerListener {
 
     static void workerForcedToStop(SWEKDownloadWorker worker) {
         removeFromDownloaderMap(worker);
-        JHVEventCache.intervalNotDownloaded(worker.getSupplier(), worker.getRequestInterval());
+        JHVEventCache.intervalNotDownloaded(worker.getSupplier(), worker.getStart(), worker.getEnd());
     }
 
     public static void workerFinished(SWEKDownloadWorker worker) {
@@ -109,7 +109,7 @@ public class SWEKDownloadManager implements FilterManagerListener {
         List<SWEKParam> params = defineParameters(supplier);
         for (Interval intt : Interval.splitInterval(interval, 2)) {
             if (intt.start < System.currentTimeMillis() + SIXHOURS) {
-                SWEKDownloadWorker worker = new SWEKDownloadWorker(supplier, intt, params);
+                SWEKDownloadWorker worker = new SWEKDownloadWorker(supplier, intt.start, intt.end, params);
                 SWEKTreeModel.setStartLoading(supplier.getGroup());
                 addToDownloaderMap(worker);
                 downloadEventPool.execute(worker);
@@ -120,7 +120,7 @@ public class SWEKDownloadManager implements FilterManagerListener {
     private static class ComparePriority<T extends SWEKDownloadWorker> implements Comparator<T> {
         @Override
         public int compare(T l1, T l2) {
-            return Long.compare(l2.getRequestInterval().end, l1.getRequestInterval().end);
+            return Long.compare(l2.getEnd(), l1.getEnd());
         }
     }
 

@@ -41,8 +41,8 @@ public class JHVEventCache {
         cacheEventHandlers.forEach(JHVEventHandler::cacheUpdated);
     }
 
-    static void intervalNotDownloaded(SWEKSupplier eventType, Interval interval) {
-        downloadedCache.get(eventType).removeRequestedInterval(interval.start, interval.end);
+    static void intervalNotDownloaded(SWEKSupplier eventType, long start, long end) {
+        downloadedCache.get(eventType).removeRequestedInterval(start, end);
         // getMissingIntervals(interval.start, interval.end, interval.start, interval.end); side-effect?
     }
 
