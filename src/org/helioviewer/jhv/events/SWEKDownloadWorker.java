@@ -4,18 +4,19 @@ import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.database.EventDatabase;
 
 class SWEKDownloadWorker implements Runnable {
 
     private final SWEKSupplier supplier;
+    private final long start;
+    private final long end;
     private final List<SWEKParam> params;
-    private final Interval requestInterval;
 
-    SWEKDownloadWorker(SWEKSupplier _supplier, Interval _interval, List<SWEKParam> _params) {
-        requestInterval = _interval;
+    SWEKDownloadWorker(SWEKSupplier _supplier, long _start, long _end, List<SWEKParam> _params) {
         supplier = _supplier;
+        start = _start;
+        end = _end;
         params = _params;
     }
 
@@ -26,10 +27,10 @@ class SWEKDownloadWorker implements Runnable {
     @Override
     public void run() {
         SWEKSource swekSource = supplier.getSource();
-        boolean success = swekSource.getHandler().remote2db(supplier, requestInterval.start, requestInterval.end, params);
+        boolean success = swekSource.getHandler().remote2db(supplier, start, end, params);
         if (success) {
-            ArrayList<JHVAssociation> assocList = EventDatabase.associations2Program(requestInterval.start, requestInterval.end, supplier);
-            ArrayList<JHVEvent> eventList = EventDatabase.events2Program(requestInterval.start, requestInterval.end, supplier, params);
+            ArrayList<JHVAssociation> assocList = EventDatabase.associations2Program(start, end, supplier);
+            ArrayList<JHVEvent> eventList = EventDatabase.events2Program(start, end, supplier, params);
             EventQueue.invokeLater(() -> {
                 assocList.forEach(JHVEventCache::add);
                 eventList.forEach(JHVEventCache::add);
@@ -37,7 +38,7 @@ class SWEKDownloadWorker implements Runnable {
                 JHVEventCache.fireEventCacheChanged();
                 SWEKDownloadManager.workerFinished(this);
             });
-            EventDatabase.addDaterange2db(requestInterval.start, requestInterval.end, supplier);
+            EventDatabase.addDaterange2db(start, end, supplier);
         } else {
             EventQueue.invokeLater(() -> SWEKDownloadManager.workerForcedToStop(this));
         }
@@ -47,8 +48,12 @@ class SWEKDownloadWorker implements Runnable {
         return supplier;
     }
 
-    Interval getRequestInterval() {
-        return requestInterval;
+    long getStart() {
+        return start;
+    }
+
+    long getEnd() {
+        return end;
     }
 
 }
