@@ -53,8 +53,8 @@ public class J2KView extends BaseView {
     protected final CacheStatus cacheStatus;
     protected final J2KReader reader;
 
-    public J2KView(URI _uri, APIRequest _request, APIResponse _response) throws Exception {
-        super(_uri, _request);
+    public J2KView(APIRequest _request, APIResponse _response, URI _uri) throws Exception {
+        super(_request, _uri);
 
         long[] frames = _response == null ? null : _response.getFrames();
         if (frames != null) {
