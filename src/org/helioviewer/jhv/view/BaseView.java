@@ -29,9 +29,9 @@ public class BaseView implements View {
     protected MetaData[] metaData = {new PixelBasedMetaData(1, 1, 0)};
     protected int maxFrame = 0;
 
-    public BaseView(URI _uri, APIRequest _request) {
-        uri = _uri;
+    public BaseView(APIRequest _request, URI _uri) {
         request = _request;
+        uri = _uri;
         isLocal = uri != null && "file".equals(uri.getScheme());
     }
 

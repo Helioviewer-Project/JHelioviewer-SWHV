@@ -14,8 +14,8 @@ public class FITSView extends BaseView {
 
     private final String xml;
 
-    public FITSView(URI _uri, APIRequest _request) throws Exception {
-        super(_uri, _request);
+    public FITSView(APIRequest _request, URI _uri) throws Exception {
+        super(_request, _uri);
 
         FITSImage fits = new FITSImage(uri);
         if (fits.imageData == null)

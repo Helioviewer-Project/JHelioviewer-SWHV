@@ -14,8 +14,8 @@ import org.helioviewer.jhv.view.j2k.image.ResolutionSet.ResolutionLevel;
 
 public class J2KViewCallisto extends J2KView {
 
-    public J2KViewCallisto(URI _uri, APIRequest _request, APIResponse _response) throws Exception {
-        super(_uri, _request, _response);
+    public J2KViewCallisto(APIRequest _request, APIResponse _response, URI _uri) throws Exception {
+        super(_request, _response, _uri);
     }
 
     public void setRegion(Rectangle r) {

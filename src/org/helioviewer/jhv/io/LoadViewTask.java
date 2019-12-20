@@ -63,11 +63,11 @@ class LoadViewTask extends JHVWorker<View, Void> {
         try {
             String loc = uri.toString().toLowerCase(Locale.ENGLISH);
             if (loc.endsWith(".fits") || loc.endsWith(".fts")) {
-                return new FITSView(uri, req);
+                return new FITSView(req, uri);
             } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
-                return new SimpleImageView(uri, req);
+                return new SimpleImageView(req, uri);
             } else {
-                return new J2KView(uri, req, res);
+                return new J2KView(req, res, uri);
             }
         } catch (InterruptedException ignore) {
             // nothing

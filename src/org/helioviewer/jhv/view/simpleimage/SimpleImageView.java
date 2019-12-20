@@ -32,8 +32,8 @@ public class SimpleImageView extends BaseView {
 
     private String xml;
 
-    public SimpleImageView(URI _uri, APIRequest _request) throws Exception {
-        super(_uri, _request);
+    public SimpleImageView(APIRequest _request, URI _uri) throws Exception {
+        super(_request, _uri);
 
         BufferedImage image = null;
         try (NetClient nc = NetClient.of(uri); ImageInputStream iis = ImageIO.createImageInputStream(nc.getStream())) {

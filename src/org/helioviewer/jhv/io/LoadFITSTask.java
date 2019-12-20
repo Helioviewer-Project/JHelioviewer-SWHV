@@ -21,7 +21,7 @@ class LoadFITSTask extends LoadViewTask {
     @Override
     protected View backgroundWork() {
         try {
-            return new FITSView(uri, null);
+            return new FITSView(null, uri);
         } catch (Exception e) {
             Log.error("An error occured while opening the remote file: ", e);
             Message.err("An error occured while opening the remote file: ", e.getMessage(), false);

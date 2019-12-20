@@ -21,7 +21,7 @@ public interface Load {
             String scheme = uri.getScheme();
             ImageLayer layer = ImageLayer.create(null);
             JHVGlobals.getExecutorService().execute("http".equals(scheme) || "https".equals(scheme) ?
-                    new DownloadViewTask(layer, new BaseView(uri, null)) :
+                    new DownloadViewTask(layer, new BaseView(null, uri)) :
                     new LoadViewTask(layer, uri));
         }
     }
