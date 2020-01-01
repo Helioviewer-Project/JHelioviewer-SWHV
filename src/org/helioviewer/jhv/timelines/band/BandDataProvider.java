@@ -3,14 +3,13 @@ package org.helioviewer.jhv.timelines.band;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.log.Log;
-import org.helioviewer.jhv.threads.JHVExecutor;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
@@ -19,22 +18,21 @@ import org.json.JSONObject;
 
 public class BandDataProvider {
 
-    private static final ExecutorService executorService = JHVExecutor.createJHVWorkersExecutorService("EVE", 12);
     private static final HashMap<Band, List<BandDownloadTask>> downloadMap = new HashMap<>();
 
     public static void loadBandTypes() {
-        executorService.execute(new BandTypeTask());
+        JHVGlobals.getExecutorService().execute(new BandTypeTask());
     }
 
     public static void loadBand(JSONObject jo) {
-        executorService.execute(new BandLoadTask(jo));
+        JHVGlobals.getExecutorService().execute(new BandLoadTask(jo));
     }
 
     static void addDownloads(Band band, List<Interval> intervals) {
         List<BandDownloadTask> workerList = downloadMap.computeIfAbsent(band, k -> new ArrayList<>(intervals.size()));
         for (Interval interval : intervals) {
             BandDownloadTask worker = new BandDownloadTask(band, interval.start, interval.end);
-            executorService.submit(worker);
+            JHVGlobals.getExecutorService().submit(worker);
             workerList.add(worker);
         }
     }
