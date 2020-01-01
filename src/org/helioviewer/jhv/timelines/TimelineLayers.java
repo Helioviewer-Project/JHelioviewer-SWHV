@@ -9,7 +9,7 @@ import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawController;
-import org.helioviewer.jhv.timelines.view.selector.TimelinePanel;
+import org.helioviewer.jhv.timelines.selector.TimelinePanel;
 
 @SuppressWarnings("serial")
 public class TimelineLayers extends AbstractTableModel {

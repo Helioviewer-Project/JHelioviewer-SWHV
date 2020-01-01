@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.timelines.view;
+package org.helioviewer.jhv.timelines.gui;
 
 import java.awt.event.ActionEvent;
 

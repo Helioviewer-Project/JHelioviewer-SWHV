@@ -9,11 +9,11 @@ import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.timelines.chart.PlotPanel;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.radio.RadioData;
-import org.helioviewer.jhv.timelines.view.TimelineDialog;
-import org.helioviewer.jhv.timelines.view.chart.PlotPanel;
-import org.helioviewer.jhv.timelines.view.selector.TimelinePanel;
+import org.helioviewer.jhv.timelines.gui.TimelineDialog;
+import org.helioviewer.jhv.timelines.selector.TimelinePanel;
 import org.json.JSONObject;
 
 public class Timelines implements MainContentPanelPlugin {

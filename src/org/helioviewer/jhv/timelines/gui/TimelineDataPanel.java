@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.timelines.view;
+package org.helioviewer.jhv.timelines.gui;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -21,7 +21,7 @@ public class TimelineDataPanel extends JPanel {
     private final JComboBox<String> comboBoxGroup = new JComboBox<>();
     private final JComboBox<BandType> comboBoxData = new JComboBox<>();
 
-    public TimelineDataPanel() {
+    TimelineDataPanel() {
         setLayout(new GridBagLayout());
         comboBoxGroup.addActionListener(e -> updateGroupValues());
 
