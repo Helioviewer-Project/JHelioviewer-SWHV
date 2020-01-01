@@ -209,7 +209,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         long ts = xAxis.pixel2value(graphArea.x, graphArea.width, mousePosition.x);
         String lbl = '(' + TimeUtils.formatSQL(ts);
         int currWidth = 0;
-        g.setColor(Color.BLACK);
+        g.setColor(DrawConstants.LABEL_TEXT_COLOR);
         g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
         Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(lbl, g);
         currWidth += (int) tickTextBounds.getWidth();
@@ -218,7 +218,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         for (TimelineLayer tl : TimelineLayers.get()) {
             if (tl.isEnabled() && (value = tl.getStringValue(ts)) != null) {
                 lbl = ", ";
-                g.setColor(Color.BLACK);
+                g.setColor(DrawConstants.LABEL_TEXT_COLOR);
                 g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
                 tickTextBounds = g.getFontMetrics().getStringBounds(lbl, g);
                 currWidth += (int) tickTextBounds.getWidth();
@@ -229,7 +229,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 currWidth += (int) tickTextBounds.getWidth();
             }
         }
-        g.setColor(Color.BLACK);
+        g.setColor(DrawConstants.LABEL_TEXT_COLOR);
         lbl = ")";
         g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
     }
