@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.timelines.view.selector.cellrenderer;
+package org.helioviewer.jhv.timelines.selector.cellrenderer;
 
 import java.awt.Component;
 

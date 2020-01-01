@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.timelines.view.chart;
+package org.helioviewer.jhv.timelines.chart;
 
 import java.awt.Color;
 import java.awt.Cursor;

@@ -1,20 +1,16 @@
-package org.helioviewer.jhv.timelines.view.selector.cellrenderer;
+package org.helioviewer.jhv.timelines.selector.cellrenderer;
 
+import java.awt.Color;
 import java.awt.Component;
 
-import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JLayer;
 import javax.swing.JTable;
 
-import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 
 @SuppressWarnings("serial")
-public class RendererLoading extends JHVTableCellRenderer {
-
-    private final JLayer<JComponent> over = new JLayer<>(null, UITimer.busyIndicator);
+public class RendererName extends JHVTableCellRenderer {
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -23,12 +19,17 @@ public class RendererLoading extends JHVTableCellRenderer {
         label.setText(null);
 
         // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
-        if (value instanceof TimelineLayer && ((TimelineLayer) value).isDownloading()) {
-            table.repaint(); // lazy
-
-            over.setForeground(label.getForeground());
-            over.setView(label);
-            return over;
+        if (value instanceof TimelineLayer) {
+            TimelineLayer tl = (TimelineLayer) value;
+            String layerName = tl.getName();
+            if (tl.hasData()) {
+                label.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
+                label.setToolTipText(layerName);
+            } else {
+                label.setForeground(Color.GRAY);
+                label.setToolTipText(layerName + ": No data for selected interval");
+            }
+            label.setText(layerName);
         }
         return label;
     }
