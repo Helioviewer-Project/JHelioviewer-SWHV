@@ -11,7 +11,7 @@ import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.json.JSONObject;
 
-public class SWEKPlugin implements Plugin {
+public class SWEKPlugin extends Plugin {
 
     private static final JPanel swekPanel = new JPanel();
 
@@ -24,7 +24,7 @@ public class SWEKPlugin implements Plugin {
     }
 
     @Override
-    public void installPlugin() {
+    public void install() {
         JHVFrame.getLeftContentPane().add("Space Weather Event Knowledgebase", swekPanel, true);
         JHVFrame.getLeftContentPane().revalidate();
         JHVFrame.getLayers().add(layer);
@@ -32,7 +32,7 @@ public class SWEKPlugin implements Plugin {
     }
 
     @Override
-    public void uninstallPlugin() {
+    public void uninstall() {
         JHVFrame.getLeftContentPane().remove(swekPanel);
         JHVFrame.getLeftContentPane().revalidate();
         JHVFrame.getLayers().remove(layer);

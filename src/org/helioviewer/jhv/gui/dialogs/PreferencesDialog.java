@@ -36,7 +36,7 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.log.Log;
-import org.helioviewer.jhv.plugins.PluginContainer;
+import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCacheManager;
 
@@ -157,7 +157,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         settings.add(new JLabel("Plugins:", JLabel.RIGHT), c);
 
         c.gridx = 1;
-        for (PluginContainer plugin : PluginManager.getPlugins()) {
+        for (Plugin plugin : PluginManager.getPlugins()) {
             JCheckBox plugCheck = new JCheckBox("<html>" + plugin.getName() + "<br/><small>" + plugin.getDescription(), plugin.isActive());
             plugCheck.addActionListener(e -> plugin.toggleActive());
             settings.add(plugCheck, c);
