@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -47,7 +46,8 @@ public class BandType {
     private String baseURL = "";
     private String label = "Unknown";
     private String unitLabel = "unknown";
-    private final Map<String, Double> warnLevels;
+    private String[] warnLabels = new String[0];
+    private double[] warnLevels = new double[0];
     private double min = 0;
     private double max = 1;
     private String scale = "linear";
@@ -76,18 +76,18 @@ public class BandType {
         scale = jo.optString("scale", scale);
 
         JSONArray warn = jo.optJSONArray("warnLevels");
-        HashMap<String, Double> warnHelp = new HashMap<>();
         if (warn != null) {
-            for (Object o : warn) {
-                if (o instanceof JSONObject) {
-                    JSONObject obj = (JSONObject) o;
-                    warnHelp.put(obj.getString("warnLabel"), obj.getDouble("warnValue"));
-                }
+            int len = warn.length();
+            warnLabels = new String[len];
+            warnLevels = new double[len];
+            for (int i = 0; i < len; i++) {
+                JSONObject o = warn.getJSONObject(i);
+                warnLabels[i] = o.getString("warnLabel");
+                warnLevels[i] = o.getDouble("warnValue");
             }
         }
-        bandCacheType = jo.optString("bandCacheType", bandCacheType);
 
-        warnLevels = Collections.unmodifiableMap(warnHelp);
+        bandCacheType = jo.optString("bandCacheType", bandCacheType);
     }
 
     void serialize(JSONObject jo) {
@@ -110,7 +110,11 @@ public class BandType {
         return unitLabel;
     }
 
-    Map<String, Double> getWarnLevels() {
+    String[] getWarnLabels() {
+        return warnLabels;
+    }
+
+    double[] getWarnLevels() {
         return warnLevels;
     }
 
