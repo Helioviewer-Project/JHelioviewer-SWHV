@@ -14,15 +14,11 @@ public class BandType {
 
     private static final HashMap<String, List<BandType>> groups = new HashMap<>();
 
-    static void loadBandTypes(JSONArray jo) {
-        int len = jo.length();
+    static void loadBandTypes(JSONArray ja) {
+        int len = ja.length();
         for (int i = 0; i < len; i++) {
-            BandType bandtype = new BandType(jo.getJSONObject(i));
-            if (groups.containsKey(bandtype.group))
-                groups.get(bandtype.group).add(bandtype);
-            else
-                groups.put(bandtype.group, new ArrayList<>(Collections.singletonList(bandtype)));
-        }
+            new BandType(ja.getJSONObject(i)); // will register BandType in the band groups
+        }    
     }
 
     @Nonnull
@@ -38,7 +34,7 @@ public class BandType {
     @Nonnull
     public static List<BandType> getBandTypes(String group) {
         List<BandType> list = groups.get(group);
-        return list == null ? new ArrayList<>() : list;
+        return list == null ? new ArrayList<>() : Collections.unmodifiableList(list);
     }
 
     @Nonnull
@@ -46,39 +42,42 @@ public class BandType {
         return groups.keySet().toArray(new String[0]);
     }
 
-    private String name = "unknown";
-    private String group = "unknown";
-    private String baseURL = "";
-    private String label = "Unknown";
-    private String unitLabel = "unknown";
-    private String[] warnLabels = new String[0];
-    private double[] warnLevels = new double[0];
-    private double min = 0;
-    private double max = 1;
-    private String scale = "linear";
-    private String bandCacheType = "BandCacheMinute";
+    private final String name;
+    private final String baseURL;
+    private final String label;
+    private final String unitLabel;
+    private final String[] warnLabels;
+    private final double[] warnLevels;
+    private final double min;
+    private final double max;
+    private final String scale;
+    private final String bandCacheType;
 
     private final JSONObject json;
 
     BandType(JSONObject jo) {
         json = jo;
 
-        name = jo.optString("name", name);
-        group = jo.optString("group", group);
-        baseURL = jo.optString("baseUrl", baseURL);
-        label = jo.optString("label", label);
+        name = jo.optString("name", "Unknown");
+        String group = jo.optString("group", "Unknown");
+        baseURL = jo.optString("baseUrl", "");
+        label = jo.optString("label", "Unknown");
 
-        unitLabel = jo.optString("unitLabel", unitLabel);
-        if ("".equals(unitLabel)) // crashes ChartDrawGraphPane.drawVerticalLabels
-            unitLabel = " ";
+        String ul = jo.optString("unitLabel", "unknown");
+        if ("".equals(ul)) // crashes ChartDrawGraphPane.drawVerticalLabels
+            ul = " ";
+        unitLabel = ul;
 
         JSONArray range = jo.optJSONArray("range");
         if (range != null) {
-            min = range.optDouble(0, min);
-            max = range.optDouble(1, max);
+            min = range.optDouble(0, 0);
+            max = range.optDouble(1, 1);
+        } else {
+            min = 0;
+            max = 1;
         }
 
-        scale = jo.optString("scale", scale);
+        scale = jo.optString("scale", "linear");
 
         JSONArray warn = jo.optJSONArray("warnLevels");
         if (warn != null) {
@@ -90,9 +89,14 @@ public class BandType {
                 warnLabels[i] = o.getString("warnLabel");
                 warnLevels[i] = o.getDouble("warnValue");
             }
+        } else {
+            warnLabels = new String[0];
+            warnLevels = new double[0];
         }
 
-        bandCacheType = jo.optString("bandCacheType", bandCacheType);
+        bandCacheType = jo.optString("bandCacheType", "BandCacheMinute");
+
+        groups.computeIfAbsent(group, k -> new ArrayList<>(Collections.singletonList(this))).add(this);
     }
 
     void serialize(JSONObject jo) {
