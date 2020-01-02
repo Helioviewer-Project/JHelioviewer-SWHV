@@ -96,7 +96,7 @@ public class BandType {
 
         bandCacheType = jo.optString("bandCacheType", "BandCacheMinute");
 
-        groups.computeIfAbsent(group, k -> new ArrayList<>(Collections.singletonList(this))).add(this);
+        groups.computeIfAbsent(group, k -> new ArrayList<>()).add(this);
     }
 
     void serialize(JSONObject jo) {
