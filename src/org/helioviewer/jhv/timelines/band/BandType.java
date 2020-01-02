@@ -17,7 +17,8 @@ public class BandType {
     static void loadBandTypes(JSONArray ja) {
         int len = ja.length();
         for (int i = 0; i < len; i++) {
-            new BandType(ja.getJSONObject(i)); // will register BandType in the band groups
+            BandType bandType = new BandType(ja.getJSONObject(i));
+            groups.computeIfAbsent(bandType.group, k -> new ArrayList<>()).add(bandType);
         }    
     }
 
@@ -43,6 +44,7 @@ public class BandType {
     }
 
     private final String name;
+    private final String group;
     private final String baseURL;
     private final String label;
     private final String unitLabel;
@@ -59,7 +61,7 @@ public class BandType {
         json = jo;
 
         name = jo.optString("name", "Unknown");
-        String group = jo.optString("group", "Unknown");
+        group = jo.optString("group", "Unknown");
         baseURL = jo.optString("baseUrl", "");
         label = jo.optString("label", "Unknown");
 
@@ -95,8 +97,6 @@ public class BandType {
         }
 
         bandCacheType = jo.optString("bandCacheType", "BandCacheMinute");
-
-        groups.computeIfAbsent(group, k -> new ArrayList<>()).add(this);
     }
 
     void serialize(JSONObject jo) {
