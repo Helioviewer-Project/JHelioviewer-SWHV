@@ -41,6 +41,10 @@ public class PfssPlugin extends Plugin {
         }
     };
 
+    public PfssPlugin() {
+        super("PFSS", "Visualize PFSS model data");
+    }
+
     public static PfssCache getPfsscache() {
         return pfssCache;
     }
@@ -55,16 +59,6 @@ public class PfssPlugin extends Plugin {
     public void uninstall() {
         JHVFrame.getLayers().remove(layer);
         pfssCache.clear();
-    }
-
-    @Override
-    public String getDescription() {
-        return "Visualize PFSS model data";
-    }
-
-    @Override
-    public String getName() {
-        return "PFSS";
     }
 
     @Override

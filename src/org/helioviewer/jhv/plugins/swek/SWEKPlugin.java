@@ -19,6 +19,7 @@ public class SWEKPlugin extends Plugin {
     private static final EventTimelineLayer etl = new EventTimelineLayer(null);
 
     public SWEKPlugin() {
+        super("Space Weather Event Knowledgebase", "Visualize space weather relevant events");
         swekPanel.setLayout(new BoxLayout(swekPanel, BoxLayout.PAGE_AXIS));
         SWEKConfig.load().forEach(group -> swekPanel.add(new EventPanel(group)));
     }
@@ -37,16 +38,6 @@ public class SWEKPlugin extends Plugin {
         JHVFrame.getLeftContentPane().revalidate();
         JHVFrame.getLayers().remove(layer);
         Timelines.getLayers().remove(etl);
-    }
-
-    @Override
-    public String getName() {
-        return "Space Weather Event Knowledgebase";
-    }
-
-    @Override
-    public String getDescription() {
-        return "Visualize space weather relevant events";
     }
 
     @Override

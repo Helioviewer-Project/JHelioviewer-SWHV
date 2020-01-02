@@ -16,6 +16,10 @@ public class EVEPlugin extends Plugin {
     private final JMenuItem newItem = new JMenuItem(new NewLayerAction());
     private final JMenuItem openItem = new JMenuItem(new OpenLocalFileAction());
 
+    public EVEPlugin() {
+        super("Timelines", "Visualize 1D and 2D time series");
+    }
+
     @Override
     public void install() {
         tl.installTimelines();
@@ -29,16 +33,6 @@ public class EVEPlugin extends Plugin {
         tl.uninstallTimelines();
         JHVFrame.getMenuBar().getMenu(0).remove(newItem);
         JHVFrame.getMenuBar().getMenu(0).remove(openItem);
-    }
-
-    @Override
-    public String getName() {
-        return "Timelines";
-    }
-
-    @Override
-    public String getDescription() {
-        return "Visualize 1D and 2D time series";
     }
 
     @Override

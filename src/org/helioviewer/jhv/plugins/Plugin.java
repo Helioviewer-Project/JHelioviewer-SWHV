@@ -5,18 +5,28 @@ import org.json.JSONObject;
 
 public abstract class Plugin {
 
+    private final String name;
+    private final String description;
     private boolean active;
 
-    public Plugin() {
+    protected Plugin(String _name, String _description) {
+        name = _name;
+        description = _description;
         active = getActive();
     }
 
-    public abstract String getName();
-    public abstract String getDescription();
     public abstract void install();
     public abstract void uninstall();
     public abstract void saveState(JSONObject jo);
     public abstract void loadState(JSONObject jo);
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 
     public boolean isActive() {
         return active;

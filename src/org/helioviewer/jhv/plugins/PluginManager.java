@@ -1,17 +1,17 @@
 package org.helioviewer.jhv.plugins;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import org.json.JSONObject;
 
 public class PluginManager {
 
-    private static final HashSet<Plugin> plugins = new HashSet<>();
+    private static final ArrayList<Plugin> plugins = new ArrayList<>();
 
-    public static Set<Plugin> getPlugins() {
-        return Collections.unmodifiableSet(plugins);
+    public static List<Plugin> getPlugins() {
+        return Collections.unmodifiableList(plugins);
     }
 
     public static void addPlugin(Plugin plugin) {
