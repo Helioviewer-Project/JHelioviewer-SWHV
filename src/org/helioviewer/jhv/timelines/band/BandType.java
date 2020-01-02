@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.timelines.band;
 
+import javax.annotation.Nonnull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,6 +25,7 @@ public class BandType {
         }
     }
 
+    @Nonnull
     static BandType getBandType(String name) {
         for (List<BandType> list : groups.values()) {
             for (BandType bt : list)
@@ -32,11 +35,13 @@ public class BandType {
         return new BandType(new JSONObject());
     }
 
+    @Nonnull
     public static List<BandType> getBandTypes(String group) {
         List<BandType> list = groups.get(group);
         return list == null ? new ArrayList<>() : list;
     }
 
+    @Nonnull
     public static String[] getGroups() {
         return groups.keySet().toArray(new String[0]);
     }
@@ -110,10 +115,12 @@ public class BandType {
         return unitLabel;
     }
 
+    @Nonnull
     String[] getWarnLabels() {
         return warnLabels;
     }
 
+    @Nonnull
     double[] getWarnLevels() {
         return warnLevels;
     }

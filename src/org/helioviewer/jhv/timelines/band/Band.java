@@ -11,6 +11,7 @@ import java.util.List;
 import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.interval.RequestCache;
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
@@ -30,7 +31,7 @@ public class Band extends AbstractTimelineLayer {
 
     private final BandType bandType;
     private final BandCache bandCache;
-    private final BandOptionPanel optionsPanel;
+    private final BandOptionPanel optionsPanel = new BandOptionPanel(this);
     private final RequestCache requestCache = new RequestCache();
 
     private final YAxis yAxis;
@@ -45,7 +46,18 @@ public class Band extends AbstractTimelineLayer {
         bandCache = bandType.getBandCacheType().equals("BandCacheAll") ? new BandCacheAll() : new BandCacheMinute();
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), YAxis.generateScale(bandType.getScale(), bandType.getUnitLabel()));
         warnLevels = new int[bandType.getWarnLevels().length];
-        optionsPanel = new BandOptionPanel(this);
+    }
+
+    public Band(JSONObject jo) { // used by load state
+        this(jo.optJSONObject("bandType") == null ? BandType.getBandType("GOES_XRSB_ODI") : new BandType(jo.getJSONObject("bandType")));
+
+        JSONObject jcolor = jo.optJSONObject("color");
+        if (jcolor != null) {
+            int r = MathUtils.clip(jcolor.optInt("r", 0), 0, 255);
+            int g = MathUtils.clip(jcolor.optInt("g", 0), 0, 255);
+            int b = MathUtils.clip(jcolor.optInt("b", 0), 0, 255);
+            graphColor = new Color(r, g, b);
+        }
     }
 
     JSONObject toJson() {
