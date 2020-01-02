@@ -14,7 +14,7 @@ import org.helioviewer.jhv.plugins.pfss.data.PfssCache;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.json.JSONObject;
 
-public class PfssPlugin implements Plugin {
+public class PfssPlugin extends Plugin {
 
     private static final PfssCache pfssCache = new PfssCache();
     private static final PfssLayer layer = new PfssLayer(null);
@@ -46,13 +46,13 @@ public class PfssPlugin implements Plugin {
     }
 
     @Override
-    public void installPlugin() {
+    public void install() {
         downloads = 0;
         JHVFrame.getLayers().add(layer);
     }
 
     @Override
-    public void uninstallPlugin() {
+    public void uninstall() {
         JHVFrame.getLayers().remove(layer);
         pfssCache.clear();
     }

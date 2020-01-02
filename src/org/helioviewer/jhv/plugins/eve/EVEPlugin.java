@@ -10,14 +10,14 @@ import org.helioviewer.jhv.timelines.gui.NewLayerAction;
 import org.helioviewer.jhv.timelines.gui.OpenLocalFileAction;
 import org.json.JSONObject;
 
-public class EVEPlugin implements Plugin {
+public class EVEPlugin extends Plugin {
 
     private final Timelines tl = new Timelines();
     private final JMenuItem newItem = new JMenuItem(new NewLayerAction());
     private final JMenuItem openItem = new JMenuItem(new OpenLocalFileAction());
 
     @Override
-    public void installPlugin() {
+    public void install() {
         tl.installTimelines();
         BandDataProvider.loadBandTypes();
         JHVFrame.getMenuBar().getMenu(0).add(newItem, 1);
@@ -25,7 +25,7 @@ public class EVEPlugin implements Plugin {
     }
 
     @Override
-    public void uninstallPlugin() {
+    public void uninstall() {
         tl.uninstallTimelines();
         JHVFrame.getMenuBar().getMenu(0).remove(newItem);
         JHVFrame.getMenuBar().getMenu(0).remove(openItem);
