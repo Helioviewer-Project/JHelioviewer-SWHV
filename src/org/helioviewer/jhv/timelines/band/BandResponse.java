@@ -13,7 +13,7 @@ class BandResponse {
     BandResponse(JSONObject jo) {
         JSONObject bo = jo.optJSONObject("bandType");
         bandType = bo == null ? null : new BandType(bo);
-        bandName = jo.optString("timeline", "");
+        bandName = jo.optString("timeline", "Unknown");
 
         double multiplier = jo.optDouble("multiplier", 1);
         JSONArray data = jo.optJSONArray("data");

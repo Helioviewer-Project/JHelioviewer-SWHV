@@ -14,6 +14,7 @@ import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.TimelineSettings;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class BandDataProvider {
@@ -134,7 +135,7 @@ public class BandDataProvider {
 
     }
 
-    private static class BandTypeTask extends JHVWorker<Void, Void> {
+    private static class BandTypeTask extends JHVWorker<JSONArray, Void> {
 
         BandTypeTask() {
             setThreadName("EVE--LoadSources");
@@ -142,9 +143,9 @@ public class BandDataProvider {
 
         @Nullable
         @Override
-        protected Void backgroundWork() {
+        protected JSONArray backgroundWork() {
             try {
-                BandType.loadBandTypes(JSONUtils.get(TimelineSettings.baseURL).getJSONArray("objects"));
+                return JSONUtils.get(TimelineSettings.baseURL).getJSONArray("objects");
             } catch (Exception e) {
                 Log.error("Error downloading band types", e);
             }
@@ -153,7 +154,17 @@ public class BandDataProvider {
 
         @Override
         protected void done() {
-            Timelines.td.getObservationPanel().setupDatasets();
+            if (!isCancelled()) {
+                try {
+                    JSONArray ja = get();
+                    if (ja != null) {
+                        BandType.loadBandTypes(ja);
+                        Timelines.td.getObservationPanel().setupDatasets();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
     }

@@ -61,9 +61,6 @@ public class Band extends AbstractTimelineLayer {
     }
 
     JSONObject toJson() {
-        JSONObject jo = new JSONObject();
-        jo.put("timeline", toString());
-
         TimeAxis timeAxis = DrawController.selectedAxis;
         long start = propagationModel.getObservationTime(timeAxis.start());
         long end = propagationModel.getObservationTime(timeAxis.end());
@@ -74,6 +71,8 @@ public class Band extends AbstractTimelineLayer {
             multiplier = bounds[0];
         }
 
+        JSONObject jo = new JSONObject();
+        jo.put("timeline", toString());
         jo.put("multiplier", multiplier);
         bandCache.serialize(jo, 1 / multiplier);
         bandType.serialize(jo);
