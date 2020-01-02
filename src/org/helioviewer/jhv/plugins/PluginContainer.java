@@ -1,9 +1,8 @@
 package org.helioviewer.jhv.plugins;
 
 import org.helioviewer.jhv.Settings;
+import org.json.JSONObject;
 
-// The basic class which manages the interface between JHV and the contained
-// plugin. It manages the current status of the corresponding plug-in.
 public class PluginContainer {
 
     private final Plugin plugin;
@@ -14,6 +13,14 @@ public class PluginContainer {
         active = getActive();
         if (active)
             plugin.installPlugin();
+    }
+
+    void saveState(JSONObject jo) {
+        plugin.saveState(jo);
+    }
+
+    void loadState(JSONObject jo) {
+        plugin.loadState(jo);
     }
 
     public String getName() {
