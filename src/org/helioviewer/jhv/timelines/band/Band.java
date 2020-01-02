@@ -7,7 +7,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.base.interval.Interval;
@@ -35,36 +34,18 @@ public class Band extends AbstractTimelineLayer {
     private final RequestCache requestCache = new RequestCache();
 
     private final YAxis yAxis;
-
-    private Color graphColor;
-    private int[] warnLevels;
-    private String[] warnLabels;
-
+    private final int[] warnLevels;
     private final ArrayList<GraphPolyline> graphPolylines = new ArrayList<>();
+
+    private Color graphColor = BandColors.getNextColor();
     private PropagationModel propagationModel = new PropagationModelRadial(0);
 
     public Band(BandType _bandType) {
-        if (_bandType.getBandCacheType().equals("BandCacheAll")) {
-            bandCache = new BandCacheAll();
-        } else {
-            bandCache = new BandCacheMinute();
-        }
         bandType = _bandType;
-        optionsPanel = new BandOptionPanel(this);
+        bandCache = bandType.getBandCacheType().equals("BandCacheAll") ? new BandCacheAll() : new BandCacheMinute();
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), YAxis.generateScale(bandType.getScale(), bandType.getUnitLabel()));
-        graphColor = BandColors.getNextColor();
-        fillWarnLevels();
-    }
-
-    private void fillWarnLevels() {
-        Map<String, Double> unconvertedWarnLevels = bandType.getWarnLevels();
-        int i = 0, size = unconvertedWarnLevels.size();
-        warnLevels = new int[size];
-        warnLabels = new String[size];
-        for (String label : unconvertedWarnLevels.keySet()) {
-            warnLabels[i] = label;
-            i++;
-        }
+        warnLevels = new int[bandType.getWarnLevels().length];
+        optionsPanel = new BandOptionPanel(this);
     }
 
     JSONObject toJson() {
@@ -183,22 +164,22 @@ public class Band extends AbstractTimelineLayer {
 //              g.drawLine(xPoints[i], yPoints[i], xPoints[i], yPoints[i]);
 //      }
 
-        for (int j = 0; j < warnLevels.length; j++) {
-            g.drawLine(graphArea.x, warnLevels[j], graphArea.x + graphArea.width, warnLevels[j]);
-            g.drawString(warnLabels[j], graphArea.x, warnLevels[j] - 2);
+        String[] warnLabels = bandType.getWarnLabels();
+        for (int i = 0; i < warnLevels.length; i++) {
+            g.drawLine(graphArea.x, warnLevels[i], graphArea.x + graphArea.width, warnLevels[i]);
+            g.drawString(warnLabels[i], graphArea.x, warnLevels[i] - 2);
         }
-    }
-
-    private void updateWarnLevels(Rectangle graphArea) {
-        Map<String, Double> unconvertedWarnLevels = bandType.getWarnLevels();
-        for (int i = 0; i < warnLabels.length; i++)
-            warnLevels[i] = yAxis.value2pixel(graphArea.y, graphArea.height, unconvertedWarnLevels.get(warnLabels[i]));
     }
 
     private void updateGraph() {
         if (enabled) {
             Rectangle graphArea = DrawController.getGraphArea();
-            updateWarnLevels(graphArea);
+
+            double[] unconvertedWarnLevels = bandType.getWarnLevels();
+            for (int i = 0; i < warnLevels.length; i++) {
+                warnLevels[i] = yAxis.value2pixel(graphArea.y, graphArea.height, unconvertedWarnLevels[i]);
+            }
+
             graphPolylines.clear();
 
             TimeAxis timeAxis = DrawController.selectedAxis;
