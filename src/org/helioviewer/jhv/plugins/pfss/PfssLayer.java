@@ -31,8 +31,9 @@ public class PfssLayer extends AbstractLayer implements TimeListener, TimespanLi
     private final PfssLine pfssLine = new PfssLine();
     private final GLSLLine glslLine = new GLSLLine(true);
     private final BufVertex lineBuf = new BufVertex(3276 * GLSLLine.stride); // pre-allocate 64k
-    private long currentTime;
+
     private PfssData previousPfssData;
+    private long currentTime;
 
     public PfssLayer(JSONObject jo) {
         int detail = 0;
