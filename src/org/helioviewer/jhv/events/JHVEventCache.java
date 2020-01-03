@@ -28,12 +28,8 @@ public class JHVEventCache {
     private static JHVRelatedEvents lastHighlighted = null;
 
     public static void requestForInterval(long start, long end, JHVEventHandler handler) {
-        long deltaT = Math.max((long) ((end - start) * FACTOR), TimeUtils.DAY_IN_MILLIS);
-        long newStart = start - deltaT;
-        long newEnd = end + deltaT;
-
         cacheEventHandlers.add(handler);
-        getMissingIntervals(start, end, newStart, newEnd).forEach((key, value) -> value.forEach(interval -> SWEKDownloadManager.startDownloadSupplier(key, interval)));
+        downloadMissingIntervals(start, end);
         handler.newEventsReceived();
     }
 
@@ -43,7 +39,6 @@ public class JHVEventCache {
 
     static void intervalNotDownloaded(SWEKSupplier eventType, long start, long end) {
         downloadedCache.get(eventType).removeRequestedInterval(start, end);
-        // getMissingIntervals(interval.start, interval.end, interval.start, interval.end); side-effect?
     }
 
     static void supplierActivated(SWEKSupplier supplier) {
@@ -144,16 +139,18 @@ public class JHVEventCache {
         return result;
     }
 
-    private static Map<SWEKSupplier, List<Interval>> getMissingIntervals(long start, long end, long extendedStart, long extendedEnd) {
-        HashMap<SWEKSupplier, List<Interval>> missingIntervals = new HashMap<>();
-        for (SWEKSupplier evt : activeEventTypes) {
-            List<Interval> missing = downloadedCache.get(evt).getMissingIntervals(start, end);
+    private static void downloadMissingIntervals(long start, long end) {
+        long deltaT = Math.max((long) ((end - start) * FACTOR), TimeUtils.DAY_IN_MILLIS);
+        long newStart = start - deltaT;
+        long newEnd = end + deltaT;
+
+        for (SWEKSupplier supplier : activeEventTypes) {
+            RequestCache rc = downloadedCache.get(supplier);
+            List<Interval> missing = rc.getMissingIntervals(start, end);
             if (!missing.isEmpty()) {
-                missing = downloadedCache.get(evt).adaptRequestCache(extendedStart, extendedEnd);
-                missingIntervals.put(evt, missing);
+                SWEKDownloadManager.startDownloadSupplier(supplier, rc.adaptRequestCache(newStart, newEnd));
             }
         }
-        return missingIntervals;
     }
 
     static void removeSupplier(SWEKSupplier supplier, boolean keepActive) {

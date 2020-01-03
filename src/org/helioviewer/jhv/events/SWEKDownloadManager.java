@@ -70,7 +70,7 @@ public class SWEKDownloadManager implements FilterManagerListener {
     public void filtersChanged(SWEKSupplier supplier) {
         stopDownloadSupplier(supplier, true);
         if (supplier.isSelected()) {
-            JHVEventCache.getAllRequestIntervals(supplier).forEach(interval -> startDownloadSupplier(supplier, interval));
+            startDownloadSupplier(supplier, JHVEventCache.getAllRequestIntervals(supplier));
         }
     }
 
@@ -81,14 +81,16 @@ public class SWEKDownloadManager implements FilterManagerListener {
         return params;
     }
 
-    static void startDownloadSupplier(SWEKSupplier supplier, Interval interval) {
+    static void startDownloadSupplier(SWEKSupplier supplier, List<Interval> intervals) {
         List<SWEKParam> params = defineParameters(supplier);
-        for (Interval intt : Interval.splitInterval(interval, 2)) {
-            if (intt.start < System.currentTimeMillis() + SIXHOURS) {
-                SWEKDownloadWorker worker = new SWEKDownloadWorker(supplier, intt.start, intt.end, params);
-                downloadEventPool.execute(worker);
-                workerMap.put(supplier, worker);
-                SWEKTreeModel.setStartLoading(supplier.getGroup());
+        for (Interval interval : intervals) {
+            for (Interval intt : Interval.splitInterval(interval, 2)) {
+                if (intt.start < System.currentTimeMillis() + SIXHOURS) {
+                    SWEKDownloadWorker worker = new SWEKDownloadWorker(supplier, intt.start, intt.end, params);
+                    downloadEventPool.execute(worker);
+                    workerMap.put(supplier, worker);
+                    SWEKTreeModel.setStartLoading(supplier.getGroup());
+                }
             }
         }
     }
