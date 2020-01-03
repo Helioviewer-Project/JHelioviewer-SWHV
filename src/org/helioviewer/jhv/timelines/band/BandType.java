@@ -2,40 +2,37 @@ package org.helioviewer.jhv.timelines.band;
 
 import javax.annotation.Nonnull;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.google.common.collect.LinkedListMultimap;
+
 public class BandType {
 
-    private static final HashMap<String, List<BandType>> groups = new HashMap<>();
+    private static final LinkedListMultimap<String, BandType> groups = LinkedListMultimap.create();
 
     static void loadBandTypes(JSONArray ja) {
         int len = ja.length();
         for (int i = 0; i < len; i++) {
             BandType bandType = new BandType(ja.getJSONObject(i));
-            groups.computeIfAbsent(bandType.group, k -> new ArrayList<>()).add(bandType);
-        }    
+            groups.put(bandType.group, bandType);
+        }
     }
 
     @Nonnull
     static BandType getBandType(String name) {
-        for (List<BandType> list : groups.values()) {
-            for (BandType bt : list)
-                if (bt.name.equals(name))
-                    return bt;
+        for (BandType bt : groups.values()) {
+            if (bt.name.equals(name))
+                return bt;
         }
         return new BandType(new JSONObject());
     }
 
     @Nonnull
     public static List<BandType> getBandTypes(String group) {
-        List<BandType> list = groups.get(group);
-        return list == null ? new ArrayList<>() : Collections.unmodifiableList(list);
+        return groups.get(group);
     }
 
     @Nonnull

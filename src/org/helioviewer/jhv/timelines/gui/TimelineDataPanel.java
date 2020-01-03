@@ -56,15 +56,15 @@ public class TimelineDataPanel extends JPanel {
         if (selectedGroup == null)
             return;
 
-        HashSet<BandType> bandTypesInSelectorModel = new HashSet<>();
+        HashSet<BandType> bandTypesInSelector = new HashSet<>();
         for (TimelineLayer tl : TimelineLayers.get()) {
             if (tl instanceof Band)
-                bandTypesInSelectorModel.add(((Band) tl).getBandType());
+                bandTypesInSelector.add(((Band) tl).getBandType());
         }
 
         DefaultComboBoxModel<BandType> model = new DefaultComboBoxModel<>();
         for (BandType value : BandType.getBandTypes(selectedGroup)) {
-            if (!bandTypesInSelectorModel.contains(value))
+            if (!bandTypesInSelector.contains(value))
                 model.addElement(value);
         }
 
