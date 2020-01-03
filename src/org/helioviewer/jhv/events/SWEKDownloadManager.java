@@ -54,11 +54,11 @@ public class SWEKDownloadManager implements FilterManagerListener {
         JHVEventCache.intervalNotDownloaded(worker.getSupplier(), worker.getStart(), worker.getEnd());
     }
 
-    public static void workerFinished(SWEKDownloadWorker worker) {
+    static void workerFinished(SWEKDownloadWorker worker) {
         removeFromDownloaderMap(worker);
     }
 
-    public static void activateSupplier(SWEKSupplier supplier, boolean active) {
+    static void activateSupplier(SWEKSupplier supplier, boolean active) {
         if (active)
             JHVEventCache.supplierActivated(supplier);
         else
@@ -73,16 +73,12 @@ public class SWEKDownloadManager implements FilterManagerListener {
     }
 
     private static void removeFromDownloaderMap(SWEKDownloadWorker worker) {
-        ArrayList<SWEKDownloadWorker> workerList = supplierMap.get(worker.getSupplier());
+        SWEKSupplier supplier = worker.getSupplier();
+        ArrayList<SWEKDownloadWorker> workerList = supplierMap.get(supplier);
         if (workerList != null)
             workerList.remove(worker);
         if (workerList == null || workerList.isEmpty())
-            SWEKTreeModel.setStopLoading(worker.getSupplier().getGroup());
-    }
-
-    private static void addToDownloaderMap(SWEKDownloadWorker worker) {
-        ArrayList<SWEKDownloadWorker> workerList = supplierMap.computeIfAbsent(worker.getSupplier(), k -> new ArrayList<>());
-        workerList.add(worker);
+            SWEKTreeModel.setStopLoading(supplier.getGroup());
     }
 
     private static List<SWEKParam> defineParameters(SWEKSupplier supplier) {
@@ -101,9 +97,11 @@ public class SWEKDownloadManager implements FilterManagerListener {
         for (Interval intt : Interval.splitInterval(interval, 2)) {
             if (intt.start < System.currentTimeMillis() + SIXHOURS) {
                 SWEKDownloadWorker worker = new SWEKDownloadWorker(supplier, intt.start, intt.end, params);
-                SWEKTreeModel.setStartLoading(supplier.getGroup());
-                addToDownloaderMap(worker);
+                ArrayList<SWEKDownloadWorker> workerList = supplierMap.computeIfAbsent(supplier, k -> new ArrayList<>());
+                workerList.add(worker);
                 downloadEventPool.execute(worker);
+
+                SWEKTreeModel.setStartLoading(supplier.getGroup());
             }
         }
     }
