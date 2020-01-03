@@ -87,11 +87,6 @@ public class SimpleImageView extends BaseView {
         return xml;
     }
 
-    @Override
-    public boolean isComplete() {
-        return true;
-    }
-
     @Nullable
     private BufferedImage readStream(ImageInputStream iis) throws Exception {
         Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
