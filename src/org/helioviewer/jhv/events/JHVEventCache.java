@@ -122,18 +122,18 @@ public class JHVEventCache {
         }
     }
 
-    public static Map<SWEKSupplier, SortedMap<Interval, JHVRelatedEvents>> getEvents(long start, long end) {
+    public static List<JHVRelatedEvents> getEvents(long start, long end) {
         if (activeEventTypes.isEmpty())
-            return Collections.emptyMap();
+            return Collections.emptyList();
 
         Interval first = new Interval(start - DELTAT_GET, start - DELTAT_GET);
         Interval last = new Interval(end + DELTAT_GET, end + DELTAT_GET);
 
-        HashMap<SWEKSupplier, SortedMap<Interval, JHVRelatedEvents>> result = new HashMap<>();
+        ArrayList<JHVRelatedEvents> result = new ArrayList<>();
         for (SWEKSupplier evt : activeEventTypes) {
             SortedMap<Interval, JHVRelatedEvents> sortedEvents = events.get(evt);
             if (sortedEvents != null) {
-                result.put(evt, sortedEvents.subMap(first, last));
+                result.addAll(sortedEvents.subMap(first, last).values());
             }
         }
         return result;

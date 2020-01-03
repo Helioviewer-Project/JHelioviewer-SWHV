@@ -6,18 +6,15 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.SortedMap;
+import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 
-import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.events.JHVEventHandler;
 import org.helioviewer.jhv.events.JHVEventParameter;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
-import org.helioviewer.jhv.events.SWEKSupplier;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
@@ -66,36 +63,34 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
         if (!enabled)
             return;
 
-        Map<SWEKSupplier, SortedMap<Interval, JHVRelatedEvents>> events = JHVEventCache.getEvents(xAxis.start(), xAxis.end());
+        List<JHVRelatedEvents> events = JHVEventCache.getEvents(xAxis.start(), xAxis.end());
         if (events.isEmpty())
             return;
 
         ArrayList<Long> endDates = new ArrayList<>();
         int nrLines = 0;
-
         eventUnderMouse = null;
-        for (SortedMap<Interval, JHVRelatedEvents> eventMap : events.values()) {
-            for (JHVRelatedEvents event : eventMap.values()) {
-                long eventStart = event.getStart();
-                long eventEnd = event.getEnd();
-                int i = 0;
-                while (i < nrLines && endDates.get(i) >= eventStart) {
-                    i++;
-                }
-                if (i == nrLines) {
-                    endDates.add(eventEnd);
-                } else {
-                    endDates.set(i, eventEnd);
-                }
-                int eventPosition = i;
-                nrLines = Math.max(nrLines, endDates.size());
 
-                int x0 = xAxis.value2pixel(graphArea.x, graphArea.width, eventStart);
-                int x1 = xAxis.value2pixel(graphArea.x, graphArea.width, eventEnd);
-                JHVRelatedEvents rEvent = drawEvent(graphArea, event, x0, x1, eventPosition, g, mousePosition);
-                if (rEvent != null) {
-                    eventUnderMouse = new EventPlotConfiguration(rEvent, x0, x1, eventPosition);
-                }
+        for (JHVRelatedEvents event : events) {
+            long eventStart = event.getStart();
+            long eventEnd = event.getEnd();
+            int i = 0;
+            while (i < nrLines && endDates.get(i) >= eventStart) {
+                i++;
+            }
+            if (i == nrLines) {
+                endDates.add(eventEnd);
+            } else {
+                endDates.set(i, eventEnd);
+            }
+            int eventPosition = i;
+            nrLines = Math.max(nrLines, endDates.size());
+
+            int x0 = xAxis.value2pixel(graphArea.x, graphArea.width, eventStart);
+            int x1 = xAxis.value2pixel(graphArea.x, graphArea.width, eventEnd);
+            JHVRelatedEvents rEvent = drawEvent(graphArea, event, x0, x1, eventPosition, g, mousePosition);
+            if (rEvent != null) {
+                eventUnderMouse = new EventPlotConfiguration(rEvent, x0, x1, eventPosition);
             }
         }
 
