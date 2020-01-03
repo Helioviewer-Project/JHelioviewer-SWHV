@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.timelines.band;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -17,9 +15,11 @@ import org.helioviewer.jhv.timelines.TimelineSettings;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.google.common.collect.ArrayListMultimap;
+
 public class BandDataProvider {
 
-    private static final HashMap<Band, List<BandDownloadTask>> downloadMap = new HashMap<>();
+    private static final ArrayListMultimap<Band, BandDownloadTask> workerMap = ArrayListMultimap.create();
 
     public static void loadBandTypes() {
         JHVGlobals.getExecutorService().execute(new BandTypeTask());
@@ -30,21 +30,20 @@ public class BandDataProvider {
     }
 
     static void addDownloads(Band band, List<Interval> intervals) {
-        List<BandDownloadTask> workerList = downloadMap.computeIfAbsent(band, k -> new ArrayList<>(intervals.size()));
         for (Interval interval : intervals) {
             BandDownloadTask worker = new BandDownloadTask(band, interval.start, interval.end);
             JHVGlobals.getExecutorService().submit(worker);
-            workerList.add(worker);
+            workerMap.put(band, worker);
         }
     }
 
     static void stopDownloads(Band band) {
-        downloadMap.get(band).forEach(worker -> worker.cancel(true));
-        downloadMap.remove(band);
+        workerMap.get(band).forEach(worker -> worker.cancel(true));
+        workerMap.removeAll(band);
     }
 
     static boolean isDownloadActive(Band band) {
-        for (BandDownloadTask worker : downloadMap.get(band)) {
+        for (BandDownloadTask worker : workerMap.get(band)) {
             if (!worker.isDone())
                 return true;
         }
