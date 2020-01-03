@@ -3,7 +3,6 @@ package org.helioviewer.jhv.events;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -40,21 +39,13 @@ public class SWEKDownloadManager implements FilterManagerListener {
     }
 
     private static void stopDownloadSupplier(SWEKSupplier supplier, boolean keepActive) {
-        ArrayList<SWEKDownloadWorker> workerList = supplierMap.get(supplier);
-        if (workerList != null) {
-            for (Iterator<SWEKDownloadWorker> it = workerList.iterator(); it.hasNext(); ) {
-                SWEKDownloadWorker worker = it.next();
-                if (worker.getSupplier() == supplier) {
-                    worker.stopWorker();
-                    JHVEventCache.intervalNotDownloaded(supplier, worker.getStart(), worker.getEnd());
-                    it.remove();
-                }
-            }
-            if (workerList.isEmpty()) {
-                SWEKTreeModel.setStopLoading(supplier.getGroup());
-                supplierMap.remove(supplier);
-            }
-        }
+        supplierMap.get(supplier).forEach(worker -> {
+            worker.stopWorker();
+            JHVEventCache.intervalNotDownloaded(supplier, worker.getStart(), worker.getEnd());
+        });
+        supplierMap.remove(supplier);
+        SWEKTreeModel.setStopLoading(supplier.getGroup());
+
         JHVEventCache.removeSupplier(supplier, keepActive);
     }
 
