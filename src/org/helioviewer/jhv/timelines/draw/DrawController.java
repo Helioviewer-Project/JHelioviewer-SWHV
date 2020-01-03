@@ -30,7 +30,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
 
     private static Rectangle graphArea = new Rectangle();
     private static Rectangle graphSize = new Rectangle();
-    private static long latestMovieTime = Long.MIN_VALUE;
+    private static long currentTime;
     private static boolean locked;
 
     private static final Timer layersTimer = new Timer(1000 / 2, e -> {
@@ -218,16 +218,12 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
 
     @Override
     public void timeChanged(long milli) {
-        latestMovieTime = milli;
+        currentTime = milli;
         drawMovieLine = true;
     }
 
     public static int getMovieLinePosition() {
-        if (latestMovieTime == Long.MIN_VALUE) {
-            return -1;
-        }
-
-        int movieLinePosition = selectedAxis.value2pixel(graphArea.x, graphArea.width, latestMovieTime);
+        int movieLinePosition = selectedAxis.value2pixel(graphArea.x, graphArea.width, currentTime);
         if (movieLinePosition < graphArea.x || movieLinePosition > (graphArea.x + graphArea.width)) {
             return -1;
         }
@@ -235,7 +231,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     }
 
     public static void setMovieFrame(Point point) {
-        if (latestMovieTime == Long.MIN_VALUE || !graphArea.contains(point))
+        if (!graphArea.contains(point))
             return;
         Movie.setTime(new JHVDate(selectedAxis.pixel2value(graphArea.x, graphArea.width, point.x)));
     }
