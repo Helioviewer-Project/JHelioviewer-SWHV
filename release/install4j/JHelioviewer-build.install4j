@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="8.0.2" transformSequenceNumber="8">
+<install4j version="8.0.3" transformSequenceNumber="8">
   <directoryPresets config="../release-resources/mac" />
   <application name="JHelioviewer" applicationId="6448-7333-6138-9110" mediaDir="./builds" compression="9" lzmaCompression="true" shortName="JHelioviewer" publisher="ESA JHelioviewer Team" publisherWeb="http://www.jhelioviewer.org" version="2.16.0" allPathsRelative="true" macVolumeId="7ed177551bd348bc" javaMinVersion="11" javaMaxVersion="14" jdkMode="jdk">
-    <codeSigning macEnabled="true" macPkcs12File="~/Certificates.p12" />
+    <codeSigning macEnabled="true" macPkcs12File="~/Certificates.p12" macNotarize="true" appleId="bogdan@nicula.net" />
     <jreBundles jdkProviderId="AdoptOpenJDK" release="openjdk11/jdk-11.0.5+10">
       <modules>
         <module name="java.desktop" />
@@ -1128,5 +1128,4 @@ return true;</property>
     <mediaSet refId="218" />
     <mediaSet refId="270" />
   </buildIds>
-  <buildOptions notarize="true" />
 </install4j>
