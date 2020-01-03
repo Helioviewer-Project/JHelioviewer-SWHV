@@ -152,7 +152,6 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
 
     void activate() {
         Movie.addTimespanListener(this);
-        timespanChanged(Movie.getStartTime(), Movie.getEndTime());
     }
 
     void deactivate() {

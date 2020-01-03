@@ -452,10 +452,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
         if (enabled) {
             Movie.addTimespanListener(this);
-            cacheUpdated();
-
             Movie.addTimeListener(controller);
-            controller.timeChanged(Movie.getTime().milli);
             JHVFrame.getInputController().addPlugin(controller);
         } else {
             JHVFrame.getInputController().removePlugin(controller);

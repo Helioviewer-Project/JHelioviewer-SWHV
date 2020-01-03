@@ -11,6 +11,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -22,8 +23,7 @@ import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-// has to be public for state
-public class PfssLayer extends AbstractLayer implements TimespanListener {
+public class PfssLayer extends AbstractLayer implements TimeListener, TimespanListener { // has to be public for state
 
     private static final double LINEWIDTH = 2 * GLSLLine.LINEWIDTH_BASIC;
 
@@ -31,6 +31,7 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
     private final PfssLine pfssLine = new PfssLine();
     private final GLSLLine glslLine = new GLSLLine(true);
     private final BufVertex lineBuf = new BufVertex(3276 * GLSLLine.stride); // pre-allocate 64k
+    private long currentTime;
     private PfssData previousPfssData;
 
     public PfssLayer(JSONObject jo) {
@@ -58,7 +59,7 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
         if (!isVisible[vp.idx])
             return;
 
-        PfssData pfssData = PfssPlugin.getPfsscache().getNearestData(Movie.getTime().milli);
+        PfssData pfssData = PfssPlugin.getPfsscache().getNearestData(currentTime);
         if (pfssData != null) {
             renderData(gl, vp, pfssData);
             previousPfssData = pfssData;
@@ -94,13 +95,19 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
         super.setEnabled(_enabled);
 
         if (enabled) {
+            Movie.addTimeListener(this);
             Movie.addTimespanListener(this);
-            timespanChanged(Movie.getStartTime(), Movie.getEndTime());
         } else {
+            Movie.removeTimeListener(this);
             Movie.removeTimespanListener(this);
             timeString = null;
             previousPfssData = null;
         }
+    }
+
+    @Override
+    public void timeChanged(long milli) {
+        currentTime = milli;
     }
 
     @Override

@@ -168,8 +168,10 @@ public class Movie {
     }
 
     public static void addTimeListener(TimeListener listener) {
-        if (!timeListeners.contains(listener))
+        if (!timeListeners.contains(listener)) {
             timeListeners.add(listener);
+            listener.timeChanged(lastTimestamp.milli);
+        }
     }
 
     public static void removeTimeListener(TimeListener listener) {
@@ -177,8 +179,10 @@ public class Movie {
     }
 
     public static void addTimespanListener(TimespanListener listener) {
-        if (!timespanListeners.contains(listener))
+        if (!timespanListeners.contains(listener)) {
             timespanListeners.add(listener);
+            listener.timespanChanged(getMovieStart(), getMovieEnd());
+        }
     }
 
     public static void removeTimespanListener(TimespanListener listener) {

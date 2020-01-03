@@ -114,8 +114,8 @@ class SWEKPopupController extends MouseAdapter implements TimeListener {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        List<JHVRelatedEvents> eventsToDraw = SWEKData.getActiveEvents(currentTime);
-        if (eventsToDraw.isEmpty())
+        List<JHVRelatedEvents> activeEvents = SWEKData.getActiveEvents(currentTime);
+        if (activeEvents.isEmpty())
             return;
 
         mouseOverJHVEvent = null;
@@ -124,7 +124,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener {
         mouseOverY = e.getY();
 
         Viewport vp = Display.getActiveViewport();
-        for (JHVRelatedEvents evtr : eventsToDraw) {
+        for (JHVRelatedEvents evtr : activeEvents) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
             JHVPositionInformation pi = evt.getPositionInformation();
             if (pi == null)
