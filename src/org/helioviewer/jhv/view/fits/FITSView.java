@@ -38,9 +38,4 @@ public class FITSView extends BaseView {
         return xml;
     }
 
-    @Override
-    public boolean isComplete() {
-        return true;
-    }
-
 }
