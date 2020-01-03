@@ -36,16 +36,12 @@ class SWEKDownloadWorker implements Runnable {
                 eventList.forEach(JHVEventCache::add);
 
                 JHVEventCache.fireEventCacheChanged();
-                SWEKDownloadManager.workerFinished(this);
+                SWEKDownloadManager.workerFinished(supplier, this);
             });
             EventDatabase.addDaterange2db(start, end, supplier);
         } else {
-            EventQueue.invokeLater(() -> SWEKDownloadManager.workerForcedToStop(this));
+            EventQueue.invokeLater(() -> SWEKDownloadManager.workerForcedToStop(supplier, this));
         }
-    }
-
-    SWEKSupplier getSupplier() {
-        return supplier;
     }
 
     long getStart() {

@@ -48,13 +48,15 @@ public class SWEKDownloadManager implements FilterManagerListener {
         JHVEventCache.removeSupplier(supplier, keepActive);
     }
 
-    static void workerForcedToStop(SWEKDownloadWorker worker) {
-        removeFromDownloaderMap(worker);
-        JHVEventCache.intervalNotDownloaded(worker.getSupplier(), worker.getStart(), worker.getEnd());
+    static void workerForcedToStop(SWEKSupplier supplier, SWEKDownloadWorker worker) {
+        JHVEventCache.intervalNotDownloaded(supplier, worker.getStart(), worker.getEnd());
+        workerFinished(supplier, worker);
     }
 
-    static void workerFinished(SWEKDownloadWorker worker) {
-        removeFromDownloaderMap(worker);
+    static void workerFinished(SWEKSupplier supplier, SWEKDownloadWorker worker) {
+        workerMap.remove(supplier, worker);
+        if (workerMap.get(supplier).isEmpty())
+            SWEKTreeModel.setStopLoading(supplier.getGroup());
     }
 
     static void activateSupplier(SWEKSupplier supplier, boolean active) {
@@ -70,13 +72,6 @@ public class SWEKDownloadManager implements FilterManagerListener {
         if (supplier.isSelected()) {
             JHVEventCache.getAllRequestIntervals(supplier).forEach(interval -> startDownloadSupplier(supplier, interval));
         }
-    }
-
-    private static void removeFromDownloaderMap(SWEKDownloadWorker worker) {
-        SWEKSupplier supplier = worker.getSupplier();
-        workerMap.remove(supplier, worker);
-        if (workerMap.get(supplier).isEmpty())
-            SWEKTreeModel.setStopLoading(supplier.getGroup());
     }
 
     private static List<SWEKParam> defineParameters(SWEKSupplier supplier) {
