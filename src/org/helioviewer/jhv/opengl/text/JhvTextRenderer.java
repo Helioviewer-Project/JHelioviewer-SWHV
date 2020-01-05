@@ -699,6 +699,7 @@ public class JhvTextRenderer {
     }
 
     // Glyph-by-glyph rendering support
+
     /**
      * A Glyph represents either a single unicode glyph or a
      * substring of characters to be drawn. The reason for the dual

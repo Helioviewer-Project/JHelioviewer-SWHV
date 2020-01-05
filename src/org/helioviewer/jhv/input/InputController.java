@@ -26,16 +26,16 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     private MouseEvent synthesizeMouse(MouseEvent e) {
         return new MouseEvent((Component) e.getSource(), e.getID(), e.getWhen(), e.getModifiersEx(),
-                              (int) (e.getX() * GLInfo.pixelScale[0] + .5),
-                              (int) (e.getY() * GLInfo.pixelScale[1] + .5),
-                              e.getClickCount(), e.isPopupTrigger(), e.getButton());
+                (int) (e.getX() * GLInfo.pixelScale[0] + .5),
+                (int) (e.getY() * GLInfo.pixelScale[1] + .5),
+                e.getClickCount(), e.isPopupTrigger(), e.getButton());
     }
 
     private MouseWheelEvent synthesizeMouseWheel(MouseWheelEvent e) {
         return new MouseWheelEvent((Component) e.getSource(), e.getID(), e.getWhen(), e.getModifiersEx(),
-                                   (int) (e.getX() * GLInfo.pixelScale[0] + .5),
-                                   (int) (e.getY() * GLInfo.pixelScale[1] + .5),
-                                   e.getClickCount(),  e.isPopupTrigger(), e.getScrollType(), e.getScrollAmount(), e.getWheelRotation());
+                (int) (e.getX() * GLInfo.pixelScale[0] + .5),
+                (int) (e.getY() * GLInfo.pixelScale[1] + .5),
+                e.getClickCount(), e.isPopupTrigger(), e.getScrollType(), e.getScrollAmount(), e.getWheelRotation());
     }
 
 

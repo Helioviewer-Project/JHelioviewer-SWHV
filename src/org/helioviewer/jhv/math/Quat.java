@@ -57,89 +57,90 @@ public class Quat {
     private Quat() {
         this(1, new Vec3());
     }
-/*
-    public Mat4 toMatrix() {
-        double w = a, w2 = w * w;
-        double x = u.x, x2 = x * x;
-        double y = u.y, y2 = y * y;
-        double z = u.z, z2 = z * z;
 
-        return new Mat4(w2 + x2 - y2 - z2,     2 * x * y - 2 * w * z, 2 * x * z + 2 * w * y, 0,
-                        2 * x * y + 2 * w * z, w2 - x2 + y2 - z2,     2 * y * z - 2 * w * x, 0,
-                        2 * x * z - 2 * w * y, 2 * y * z + 2 * w * x, w2 - x2 - y2 + z2,     0,
-                        0,                     0,                     0,                     w2 + x2 + y2 + z2);
-    }
+    /*
+        public Mat4 toMatrix() {
+            double w = a, w2 = w * w;
+            double x = u.x, x2 = x * x;
+            double y = u.y, y2 = y * y;
+            double z = u.z, z2 = z * z;
 
-    public Mat4 toMatrixTranspose() {
-        double w = a, w2 = w * w;
-        double x = u.x, x2 = x * x;
-        double y = u.y, y2 = y * y;
-        double z = u.z, z2 = z * z;
+            return new Mat4(w2 + x2 - y2 - z2,     2 * x * y - 2 * w * z, 2 * x * z + 2 * w * y, 0,
+                            2 * x * y + 2 * w * z, w2 - x2 + y2 - z2,     2 * y * z - 2 * w * x, 0,
+                            2 * x * z - 2 * w * y, 2 * y * z + 2 * w * x, w2 - x2 - y2 + z2,     0,
+                            0,                     0,                     0,                     w2 + x2 + y2 + z2);
+        }
 
-        return new Mat4(w2 + x2 - y2 - z2,     2 * x * y + 2 * w * z, 2 * x * z - 2 * w * y, 0,
-                        2 * x * y - 2 * w * z, w2 - x2 + y2 - z2,     2 * y * z + 2 * w * x, 0,
-                        2 * x * z + 2 * w * y, 2 * y * z - 2 * w * x, w2 - x2 - y2 + z2,     0,
-                        0,                     0,                     0,                     w2 + x2 + y2 + z2);
-    }
+        public Mat4 toMatrixTranspose() {
+            double w = a, w2 = w * w;
+            double x = u.x, x2 = x * x;
+            double y = u.y, y2 = y * y;
+            double z = u.z, z2 = z * z;
 
-    public double getAngle() {
-        return a;
-    }
+            return new Mat4(w2 + x2 - y2 - z2,     2 * x * y + 2 * w * z, 2 * x * z - 2 * w * y, 0,
+                            2 * x * y - 2 * w * z, w2 - x2 + y2 - z2,     2 * y * z + 2 * w * x, 0,
+                            2 * x * z + 2 * w * y, 2 * y * z - 2 * w * x, w2 - x2 - y2 + z2,     0,
+                            0,                     0,                     0,                     w2 + x2 + y2 + z2);
+        }
 
-    public void clear() {
-        this.a = 1;
-        this.u = new Vec3();
-    }
+        public double getAngle() {
+            return a;
+        }
 
-    public Quat multiply(Quat q) {
-        double a1 = this.a;
-        double x1 = this.u.x;
-        double y1 = this.u.y;
-        double z1 = this.u.z;
-        double a2 = q.a;
-        double x2 = q.u.x;
-        double y2 = q.u.y;
-        double z2 = q.u.z;
+        public void clear() {
+            this.a = 1;
+            this.u = new Vec3();
+        }
 
-        double an = a1 * a2 - x1 * x2 - y1 * y2 - z1 * z2;
-        double x = a1 * x2 + x1 * a2 + y1 * z2 - z1 * y2;
-        double y = a1 * y2 - x1 * z2 + y1 * a2 + z1 * x2;
-        double z = a1 * z2 + x1 * y2 - y1 * x2 + z1 * a2;
-        return new Quat(an, x, y, z);
-    }
+        public Quat multiply(Quat q) {
+            double a1 = this.a;
+            double x1 = this.u.x;
+            double y1 = this.u.y;
+            double z1 = this.u.z;
+            double a2 = q.a;
+            double x2 = q.u.x;
+            double y2 = q.u.y;
+            double z2 = q.u.z;
 
-    public Quat add(Quat q) {
-        this.u.add(q.u);
-        this.a += q.a;
-        return this;
-    }
+            double an = a1 * a2 - x1 * x2 - y1 * y2 - z1 * z2;
+            double x = a1 * x2 + x1 * a2 + y1 * z2 - z1 * y2;
+            double y = a1 * y2 - x1 * z2 + y1 * a2 + z1 * x2;
+            double z = a1 * z2 + x1 * y2 - y1 * x2 + z1 * a2;
+            return new Quat(an, x, y, z);
+        }
 
-    public Quat subtract(Quat q) {
-        this.u.subtract(q.u);
-        this.a -= q.a;
-        return this;
-    }
+        public Quat add(Quat q) {
+            this.u.add(q.u);
+            this.a += q.a;
+            return this;
+        }
 
-    public Quat scale(double s) {
-        this.a *= s;
-        this.u.multiply(s);
-        return this;
-    }
-*/
+        public Quat subtract(Quat q) {
+            this.u.subtract(q.u);
+            this.a -= q.a;
+            return this;
+        }
+
+        public Quat scale(double s) {
+            this.a *= s;
+            this.u.multiply(s);
+            return this;
+        }
+    */
     public static Quat rotate(Quat q1, Quat q2) {
         return new Quat(
-            q1.a * q2.a - q1.u.x * q2.u.x - q1.u.y * q2.u.y - q1.u.z * q2.u.z,
-            q1.a * q2.u.x + q1.u.x * q2.a + q1.u.y * q2.u.z - q1.u.z * q2.u.y,
-            q1.a * q2.u.y + q1.u.y * q2.a + q1.u.z * q2.u.x - q1.u.x * q2.u.z,
-            q1.a * q2.u.z + q1.u.z * q2.a + q1.u.x * q2.u.y - q1.u.y * q2.u.x);
+                q1.a * q2.a - q1.u.x * q2.u.x - q1.u.y * q2.u.y - q1.u.z * q2.u.z,
+                q1.a * q2.u.x + q1.u.x * q2.a + q1.u.y * q2.u.z - q1.u.z * q2.u.y,
+                q1.a * q2.u.y + q1.u.y * q2.a + q1.u.z * q2.u.x - q1.u.x * q2.u.z,
+                q1.a * q2.u.z + q1.u.z * q2.a + q1.u.x * q2.u.y - q1.u.y * q2.u.x);
     }
 
     public static Quat rotateWithConjugate(Quat q1, Quat q2) {
         return new Quat(
-            q1.a * q2.a + q1.u.x * q2.u.x + q1.u.y * q2.u.y + q1.u.z * q2.u.z,
-           -q1.a * q2.u.x + q1.u.x * q2.a - q1.u.y * q2.u.z + q1.u.z * q2.u.y,
-           -q1.a * q2.u.y + q1.u.y * q2.a - q1.u.z * q2.u.x + q1.u.x * q2.u.z,
-           -q1.a * q2.u.z + q1.u.z * q2.a - q1.u.x * q2.u.y + q1.u.y * q2.u.x);
+                q1.a * q2.a + q1.u.x * q2.u.x + q1.u.y * q2.u.y + q1.u.z * q2.u.z,
+                -q1.a * q2.u.x + q1.u.x * q2.a - q1.u.y * q2.u.z + q1.u.z * q2.u.y,
+                -q1.a * q2.u.y + q1.u.y * q2.a - q1.u.z * q2.u.x + q1.u.x * q2.u.z,
+                -q1.a * q2.u.z + q1.u.z * q2.a - q1.u.x * q2.u.y + q1.u.y * q2.u.x);
     }
 /*
     public Quat slerp(Quat r, double t) {
@@ -238,7 +239,7 @@ public class Quat {
     }
 
     public JSONArray toJson() {
-        return new JSONArray(new double[] { a, u.x, u.y, u.z });
+        return new JSONArray(new double[]{a, u.x, u.y, u.z});
     }
 
     public static Quat fromJson(JSONArray ja) {

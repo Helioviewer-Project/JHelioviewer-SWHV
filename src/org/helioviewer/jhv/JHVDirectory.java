@@ -124,6 +124,7 @@ public enum JHVDirectory {
             return new File(getPath());
         }
     };
+
     // A String representation of the path of the directory
     public abstract String getPath();
 
