@@ -132,21 +132,24 @@ public class Display {
     }
 
     private static void reshape2() {
-        viewports = new Viewport[]{new Viewport(0, 0, 0, glWidth / 2, glHeight),
-                                   new Viewport(1, glWidth / 2, 0, glWidth / 2, glHeight)};
+        viewports = new Viewport[]{
+                new Viewport(0, 0, 0, glWidth / 2, glHeight),
+                new Viewport(1, glWidth / 2, 0, glWidth / 2, glHeight)};
     }
 
     private static void reshape3() {
-        viewports = new Viewport[]{new Viewport(0, 0, 0, glWidth / 2, glHeight / 2),
-                                   new Viewport(1, glWidth / 2, 0, glWidth / 2, glHeight / 2),
-                                   new Viewport(2, 0, glHeight / 2, glWidth, glHeight / 2)};
+        viewports = new Viewport[]{
+                new Viewport(0, 0, 0, glWidth / 2, glHeight / 2),
+                new Viewport(1, glWidth / 2, 0, glWidth / 2, glHeight / 2),
+                new Viewport(2, 0, glHeight / 2, glWidth, glHeight / 2)};
     }
 
     private static void reshape4() {
-        viewports = new Viewport[]{new Viewport(0, 0, 0, glWidth / 2, glHeight / 2),
-                                   new Viewport(1, glWidth / 2, 0, glWidth / 2, glHeight / 2),
-                                   new Viewport(2, 0, glHeight / 2, glWidth / 2, glHeight / 2),
-                                   new Viewport(3, glWidth / 2, glHeight / 2, glWidth / 2, glHeight / 2)};
+        viewports = new Viewport[]{
+                new Viewport(0, 0, 0, glWidth / 2, glHeight / 2),
+                new Viewport(1, glWidth / 2, 0, glWidth / 2, glHeight / 2),
+                new Viewport(2, 0, glHeight / 2, glWidth / 2, glHeight / 2),
+                new Viewport(3, glWidth / 2, glHeight / 2, glWidth / 2, glHeight / 2)};
     }
 
     private static boolean showCorona = true;

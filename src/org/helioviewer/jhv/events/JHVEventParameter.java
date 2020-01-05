@@ -26,12 +26,9 @@ public class JHVEventParameter {
      * Creates a JHVEvent parameter with a parameter name, parameter display
      * name and parameter value.
      *
-     * @param _parameterName
-     *            the parameter name
-     * @param _parameterDisplayName
-     *            the parameter display name
-     * @param _parameterValue
-     *            the parameter value
+     * @param _parameterName        the parameter name
+     * @param _parameterDisplayName the parameter display name
+     * @param _parameterValue       the parameter value
      */
     public JHVEventParameter(String _parameterName, String _parameterDisplayName, String _parameterValue) {
         parameterName = _parameterName.intern();

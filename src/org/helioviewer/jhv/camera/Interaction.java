@@ -24,7 +24,7 @@ import com.jogamp.opengl.GL2;
 
 public class Interaction implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 
-    public enum Mode { PAN, ROTATE, AXIS }
+    public enum Mode {PAN, ROTATE, AXIS}
 
     public enum AnnotationMode {
         Rectangle(AnnotateRectangle.class), Circle(AnnotateCircle.class), Cross(AnnotateCross.class), FOV(AnnotateFOV.class);

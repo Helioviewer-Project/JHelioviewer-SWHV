@@ -16,8 +16,11 @@ public abstract class Plugin {
     }
 
     public abstract void install();
+
     public abstract void uninstall();
+
     public abstract void saveState(JSONObject jo);
+
     public abstract void loadState(JSONObject jo);
 
     public String getName() {

@@ -86,6 +86,7 @@ class FITSImage {
         npix[0] = k;
         return sampleData;
     }
+
     /*
         private static float[] getMinMax(int bpp, int width, int height, Object[] pixelData, long blank, double bzero, double bscale) {
             float min = Float.MAX_VALUE;

@@ -37,13 +37,13 @@ public class DataSources {
                     put("schema", "/data/sources_v1.0.json").
                     put("availability.images", "http://swhv2.oma.be/availability/images/availability/availability.html").
                     build()). */
-            put("IAS", new ImmutableMap.Builder<String, String>().
-                    put("API.getDataSources", "https://helioviewer-api.ias.u-psud.fr/v2/getDataSources/?verbose=true&enable=[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]").
-                    put("API.getJP2Image", "https://helioviewer-api.ias.u-psud.fr/v2/getJP2Image/?").
-                    put("API.getJPX", "https://helioviewer-api.ias.u-psud.fr/v2/getJPX/?").
-                    put("label", "Institut d'Astrophysique Spatiale").
-                    put("schema", "/data/sources_v1.0.json").
-                    build()).
+        put("IAS", new ImmutableMap.Builder<String, String>().
+        put("API.getDataSources", "https://helioviewer-api.ias.u-psud.fr/v2/getDataSources/?verbose=true&enable=[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]").
+        put("API.getJP2Image", "https://helioviewer-api.ias.u-psud.fr/v2/getJP2Image/?").
+        put("API.getJPX", "https://helioviewer-api.ias.u-psud.fr/v2/getJPX/?").
+        put("label", "Institut d'Astrophysique Spatiale").
+        put("schema", "/data/sources_v1.0.json").
+        build()).
 /*          put("IAS Test", new ImmutableMap.Builder<String, String>().
                     put("API.getDataSources", "https://inf-helio-test-api.ias.u-psud.fr/v2/getDataSources/?verbose=true&enable=[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]").
                     put("API.getJP2Image", "https://inf-helio-test-api.ias.u-psud.fr/v2/getJP2Image/?").
@@ -51,13 +51,13 @@ public class DataSources {
                     put("label", "Institut d'Astrophysique Spatiale").
                     put("schema", "/data/sources_v1.0.json").
                     build()). */
-            put("GSFC", new ImmutableMap.Builder<String, String>().
-                    put("API.getDataSources", "https://api.helioviewer.org/v2/getDataSources/?verbose=true&enable=[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]").
-                    put("API.getJP2Image", "https://api.helioviewer.org/v2/getJP2Image/?").
-                    put("API.getJPX", "https://api.helioviewer.org/v2/getJPX/?").
-                    put("label", "Goddard Space Flight Center").
-                    put("schema", "/data/sources_v1.0.json").
-                    build()).
+        put("GSFC", new ImmutableMap.Builder<String, String>().
+        put("API.getDataSources", "https://api.helioviewer.org/v2/getDataSources/?verbose=true&enable=[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]").
+        put("API.getJP2Image", "https://api.helioviewer.org/v2/getJP2Image/?").
+        put("API.getJPX", "https://api.helioviewer.org/v2/getJPX/?").
+        put("label", "Goddard Space Flight Center").
+        put("schema", "/data/sources_v1.0.json").
+        build()).
 /*          put("GSFC SCI Test", new ImmutableMap.Builder<String, String>().
                     put("API.getDataSources", "http://helioviewer.sci.gsfc.nasa.gov/api.php?action=getDataSources&verbose=true&enable=[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]").
                     put("API.getJP2Image", "http://helioviewer.sci.gsfc.nasa.gov/api.php?action=getJP2Image&").
@@ -79,7 +79,7 @@ public class DataSources {
                     put("schema", "/data/sources_v1.0.json").
                     put("label", "Localhost").
                     build()). */
-            build();
+        build();
 
     public static Set<String> getServers() {
         return serverSettings.keySet();

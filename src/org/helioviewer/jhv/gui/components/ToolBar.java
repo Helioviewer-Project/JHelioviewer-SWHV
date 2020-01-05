@@ -279,7 +279,8 @@ public class ToolBar extends JToolBar {
             b.addActionListener(entry.getValue());
             addButton(b);
         }
-*/  }
+*/
+    }
 
     private void addButton(JideButton b) {
         b.setFocusPainted(false);
@@ -298,17 +299,18 @@ public class ToolBar extends JToolBar {
         revalidate();
         repaint();
     }
-/*
-    public void addPluginButton(ButtonText text, ActionListener a) {
-        pluginButtons.put(text, a);
-        recreate();
-    }
 
-    public void removePluginButton(ButtonText text) {
-        pluginButtons.remove(text);
-        recreate();
-    }
-*/
+    /*
+        public void addPluginButton(ButtonText text, ActionListener a) {
+            pluginButtons.put(text, a);
+            recreate();
+        }
+
+        public void removePluginButton(ButtonText text) {
+            pluginButtons.remove(text);
+            recreate();
+        }
+    */
     private void maybeShowPopup(MouseEvent me) {
         if (me.isPopupTrigger() || me.getButton() == MouseEvent.BUTTON3) {
             JPopupMenu popUpMenu = new JPopupMenu();

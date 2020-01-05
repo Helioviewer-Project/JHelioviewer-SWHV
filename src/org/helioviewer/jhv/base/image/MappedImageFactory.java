@@ -54,6 +54,7 @@ public class MappedImageFactory {
 
     private MappedImageFactory() {
     }
+
     /*
         public static BufferedImage copyImage(BufferedImage bi) throws IOException {
             BufferedImage ret = createCompatible(bi.getWidth(), bi.getHeight(), bi.getType());
@@ -65,6 +66,7 @@ public class MappedImageFactory {
         BufferedImage temp = new BufferedImage(1, 1, type);
         return createCompatible(width, height, temp.getSampleModel().createCompatibleSampleModel(width, height), temp.getColorModel());
     }
+
     /*
         public static BufferedImage createCompatible(int width, int height, GraphicsConfiguration configuration, int transparency) throws IOException {
             return createCompatible(width, height, configuration.getColorModel(transparency));

@@ -25,8 +25,8 @@ class GimpGradient {
         throw new Exception("Cannot find segment for point " + x);
     }
 
-     // Create Gimp gradient with the data from the stream expected in the
-     // Gimp gradient file format
+    // Create Gimp gradient with the data from the stream expected in the
+    // Gimp gradient file format
     GimpGradient(BufferedReader ggr) throws Exception {
         String ln = ggr.readLine();
         if (!"GIMP Gradient".equals(ln))
@@ -53,7 +53,7 @@ class GimpGradient {
             if (nL.length == 13 || nL.length == 15) {
                 segments.add(new GimpGradientSegment(Double.parseDouble(nL[0]), Double.parseDouble(nL[1]), Double.parseDouble(nL[2]), Double.parseDouble(nL[3]), Double.parseDouble(nL[4]), Double.parseDouble(nL[5]), Double.parseDouble(nL[6]), Double.parseDouble(nL[7]), Double.parseDouble(nL[8]), Double.parseDouble(nL[9]), Double.parseDouble(nL[10]), Integer.parseInt(nL[11]), Integer.parseInt(nL[12])/*, Integer.parseInt(nL[13]), Integer.parseInt(nL[14])*/));
             } else
-                throw new Exception("Parsing error in segment " + i);    
+                throw new Exception("Parsing error in segment " + i);
         }
     }
 

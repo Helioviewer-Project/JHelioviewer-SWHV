@@ -104,7 +104,7 @@ public class SimpleImageView extends BaseView {
         Object text = root.getElementsByTagName("TextEntry").item(0);
         if (text instanceof IIOMetadataNode) {
             xml = ((IIOMetadataNode) text).getAttribute("value");
-            if (xml != null)
+            if (xml != null) // coverity
                 xml = xml.trim().replace("&", "&amp;");
         }
         /*

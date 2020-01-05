@@ -42,8 +42,8 @@ public class GLInfo {
         GraphicsConfiguration gc = canvas.getGraphicsConfiguration();
         if (gc != null) {
             AffineTransform tx = gc.getDefaultTransform();
-            pixelScale[0] = tx.getScaleX(); 
-            pixelScale[1] = tx.getScaleY(); 
+            pixelScale[0] = tx.getScaleX();
+            pixelScale[1] = tx.getScaleY();
         }
     }
 

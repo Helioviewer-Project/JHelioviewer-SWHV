@@ -428,7 +428,6 @@ public class MenuScroller {
 //        dispose();
 //        super.finalize();
 //    }
-
     private void refreshMenu() {
         if (menuItems != null && menuItems.length > 0) {
             firstIndex = Math.max(topFixedCount, firstIndex);
