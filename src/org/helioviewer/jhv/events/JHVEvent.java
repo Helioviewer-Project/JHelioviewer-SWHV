@@ -104,9 +104,9 @@ public class JHVEvent {
     }
 
     public void finishParams() {
-        allParameters = allParametersArray.toArray(new JHVEventParameter[0]);
+        allParameters = allParametersArray.toArray(JHVEventParameter[]::new);
         allParametersArray = new ArrayList<>();
-        visibleParameters = visibleParametersArray.toArray(new JHVEventParameter[0]);
+        visibleParameters = visibleParametersArray.toArray(JHVEventParameter[]::new);
 
         UrlValidator urlValidator = UrlValidator.getInstance();
         // maybe should be configured
@@ -115,7 +115,7 @@ public class JHVEvent {
             if (!urlValidator.isValid(param.getParameterValue()))
                 simpleVisibleParametersArray.add(param);
         }
-        simpleVisibleParameters = simpleVisibleParametersArray.toArray(new JHVEventParameter[0]);
+        simpleVisibleParameters = simpleVisibleParametersArray.toArray(JHVEventParameter[]::new);
 
         visibleParametersArray = new ArrayList<>();
     }

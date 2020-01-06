@@ -7,7 +7,6 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,7 +37,7 @@ class LoadZipTask extends JHVWorker<Void, Void> {
                 for (Path root : zipfs.getRootDirectories()) {
                     try (DirectoryStream<Path> stream = Files.newDirectoryStream(root, "*.jhv")) {
                         for (Path entry : stream) {
-                            Path ext = Paths.get(tmpDir + entry);
+                            Path ext = Path.of(tmpDir + entry);
                             exclude.add(ext);
                             Files.copy(entry, ext, StandardCopyOption.REPLACE_EXISTING);
                             Load.state.get(ext.toUri());
@@ -46,7 +45,7 @@ class LoadZipTask extends JHVWorker<Void, Void> {
                     }
                     try (DirectoryStream<Path> stream = Files.newDirectoryStream(root, "*.json")) {
                         for (Path entry : stream) {
-                            Path ext = Paths.get(tmpDir + entry);
+                            Path ext = Path.of(tmpDir + entry);
                             exclude.add(ext);
                             Files.copy(entry, ext, StandardCopyOption.REPLACE_EXISTING);
                             Load.request.get(ext.toUri());
@@ -54,7 +53,7 @@ class LoadZipTask extends JHVWorker<Void, Void> {
                     }
                     try (DirectoryStream<Path> stream = Files.newDirectoryStream(root)) {
                         for (Path entry : stream) {
-                            Path ext = Paths.get(tmpDir + entry);
+                            Path ext = Path.of(tmpDir + entry);
                             if (exclude.contains(ext))
                                 continue;
                             Files.copy(entry, ext, StandardCopyOption.REPLACE_EXISTING);

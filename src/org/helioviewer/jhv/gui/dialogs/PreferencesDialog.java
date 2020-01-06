@@ -115,7 +115,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
 
         c.gridx = 1;
         c.gridy = 0;
-        JComboBox<String> combo = new JComboBox<>(DataSources.getServers().toArray(new String[0]));
+        JComboBox<String> combo = new JComboBox<>(DataSources.getServers().toArray(String[]::new));
         combo.setSelectedItem(Settings.getProperty("default.server"));
         combo.addActionListener(e -> Settings.setProperty("default.server", (String) Objects.requireNonNull(combo.getSelectedItem())));
         settings.add(combo, c);

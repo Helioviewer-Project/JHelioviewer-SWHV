@@ -3,7 +3,7 @@ package org.helioviewer.jhv.export.jcodec;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 import org.jcodec.codecs.h264.encode.RateControl;
@@ -24,7 +24,7 @@ public class JCodecUtils {
         new Flattern().flattern(movie, optim);
         input.close();
 
-        Files.move(Paths.get(path + "_optim"), Paths.get(path), StandardCopyOption.REPLACE_EXISTING); // doesn't work on DOS
+        Files.move(Path.of(path + "_optim"), Path.of(path), StandardCopyOption.REPLACE_EXISTING); // doesn't work on DOS
     }
 
     public static class JHVRateControl implements RateControl {

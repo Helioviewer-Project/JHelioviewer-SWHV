@@ -8,7 +8,7 @@ import java.awt.Insets;
 import java.io.BufferedWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -68,7 +68,7 @@ class BandOptionPanel extends JPanel {
             JSONObject jo = band.toJson();
 
             new Thread(() -> {
-                try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileName), StandardCharsets.UTF_8)) {
+                try (BufferedWriter writer = Files.newBufferedWriter(Path.of(fileName), StandardCharsets.UTF_8)) {
                     jo.write(writer);
                     EventQueue.invokeLater(() -> JHVGlobals.displayNotification(fileName));
                 } catch (Exception ex) {
