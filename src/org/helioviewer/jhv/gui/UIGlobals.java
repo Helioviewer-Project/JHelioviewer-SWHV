@@ -59,13 +59,15 @@ public class UIGlobals {
         int defaultSize = font.getSize();
 
         String defaultFont = "SansSerif";
-        if (System.getProperty("jhv.os").equals("mac")) { // scrap enormous Lucida Sans
-            defaultFont = "HelveticaNeue";
+        if (System.getProperty("jhv.os").equals("mac")) {
+            defaultFont = "HelveticaNeue"; // scrap enormous Lucida Sans
             defaultSize -= 1;
 
             ImageIcon cursor = IconBank.getIcon(JHVIcon.CLOSED_HAND_MAC);
             cursor = cursor == null ? IconBank.getBlank() : cursor;
             closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursor.getImage(), new Point(5, 1), cursor.toString());
+
+            System.setProperty("apple.laf.useScreenMenuBar", "true"); // proper menu bar
         } else {
             ImageIcon cursor = IconBank.getIcon(JHVIcon.CLOSED_HAND);
             cursor = cursor == null ? IconBank.getBlank() : cursor;
