@@ -44,20 +44,10 @@ public class SWEKGroup extends SWEKTreeModelElement {
         }
         for (SWEKRelatedEvents re : swekrelEvents) {
             if (re.getGroup() == this) {
-                List<SWEKRelatedOn> relon = re.getRelatedOnList();
-
-                for (SWEKRelatedOn swon : relon) {
-                    SWEKParameter p = swon.parameterFrom;
-                    fields.put(p.getParameterName().intern(), swon.dbType);
-                }
+                re.getRelatedOnList().forEach(swon -> fields.put(swon.parameterFrom.getParameterName().intern(), swon.dbType));
             }
             if (re.getRelatedWith() == this) {
-                List<SWEKRelatedOn> relon = re.getRelatedOnList();
-
-                for (SWEKRelatedOn swon : relon) {
-                    SWEKParameter p = swon.parameterWith;
-                    fields.put(p.getParameterName().intern(), swon.dbType);
-                }
+                re.getRelatedOnList().forEach(swon -> fields.put(swon.parameterWith.getParameterName().intern(), swon.dbType));
             }
         }
         databaseFields = fields;

@@ -5,7 +5,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -54,8 +53,7 @@ public class HEKHandler extends SWEKHandler {
                 String uid = result.getString("kb_archivid");
 
                 ArrayList<JHVDatabaseParam> paramList = new ArrayList<>();
-                HashMap<String, String> dbFields = supplier.getGroup().getAllDatabaseFields();
-                for (Map.Entry<String, String> entry : dbFields.entrySet()) {
+                for (Map.Entry<String, String> entry : supplier.getGroup().getAllDatabaseFields().entrySet()) {
                     String dbType = entry.getValue();
                     String fieldName = entry.getKey();
                     String lfieldName = fieldName.toLowerCase(Locale.ENGLISH);

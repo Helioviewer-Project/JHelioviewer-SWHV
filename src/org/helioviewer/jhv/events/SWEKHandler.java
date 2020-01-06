@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.events;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.helioviewer.jhv.base.interval.Interval;
@@ -13,8 +12,7 @@ import org.json.JSONObject;
 public abstract class SWEKHandler {
 
     public boolean remote2db(SWEKSupplier supplier, long start, long end, List<SWEKParam> params) {
-        ArrayList<Interval> range = EventDatabase.db2daterange(supplier);
-        for (Interval interval : range) {
+        for (Interval interval : EventDatabase.db2daterange(supplier)) {
             if (interval.start <= start && interval.end >= end) {
                 return true;
             }

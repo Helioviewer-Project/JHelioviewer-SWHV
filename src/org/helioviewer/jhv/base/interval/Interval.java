@@ -22,6 +22,7 @@ public class Interval implements Comparable<Interval> {
         return time >= start && time <= end;
     }
 
+    @Nonnull
     public static ArrayList<Interval> splitInterval(Interval interval, int days) {
         ArrayList<Interval> intervals = new ArrayList<>();
         long startDate = interval.start;
@@ -36,7 +37,6 @@ public class Interval implements Comparable<Interval> {
                 break;
             }
         }
-
         return intervals;
     }
 
