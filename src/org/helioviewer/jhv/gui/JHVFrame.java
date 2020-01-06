@@ -3,11 +3,9 @@ package org.helioviewer.jhv.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.lang.reflect.Method;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -30,7 +28,6 @@ import org.helioviewer.jhv.gui.components.statusplugin.ZoomStatusPanel;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLListener;
 
@@ -135,25 +132,8 @@ public class JHVFrame {
 
         frame.setMinimumSize(minSize);
         frame.setPreferredSize(new Dimension(maxSize.width - 100, maxSize.height - 100));
-        enableFullScreen(frame);
 
         return frame;
-    }
-
-    private static void enableFullScreen(Window window) {
-        if (System.getProperty("jhv.os").equals("mac")) {
-            System.setProperty("apple.laf.useScreenMenuBar", "true");
-            if (Double.parseDouble(System.getProperty("java.specification.version")) < 1.9) {
-                try {
-                    Class<?> fullScreenUtilities = Class.forName("com.apple.eawt.FullScreenUtilities");
-                    Method setWindowCanFullScreen = fullScreenUtilities.getMethod("setWindowCanFullScreen", Window.class, boolean.class);
-                    setWindowCanFullScreen.invoke(fullScreenUtilities, window, Boolean.TRUE);
-                } catch (Exception e) {
-                    Log.error("Fullscreen utilities not available");
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 
     public static JFrame getFrame() {
