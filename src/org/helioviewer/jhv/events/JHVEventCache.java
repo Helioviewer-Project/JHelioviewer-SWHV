@@ -42,7 +42,7 @@ public class JHVEventCache {
 
     static void supplierActivated(SWEKSupplier supplier) {
         activeEventTypes.add(supplier);
-        downloadedCache.putIfAbsent(supplier, new RequestCache());
+        downloadedCache.computeIfAbsent(supplier, k -> new RequestCache());
         fireEventCacheChanged();
     }
 

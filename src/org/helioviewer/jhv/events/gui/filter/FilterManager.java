@@ -20,11 +20,8 @@ public class FilterManager {
     }
 
     static void addFilter(SWEKSupplier supplier, SWEKParameter parameter, SWEKParam filter) {
-        Map<SWEKParameter, List<SWEKParam>> filteredParameterPerEventType = getFilter(supplier);
-        filters.put(supplier, filteredParameterPerEventType);
-
-        filteredParameterPerEventType.putIfAbsent(parameter, new ArrayList<>());
-        filteredParameterPerEventType.get(parameter).add(filter);
+        Map<SWEKParameter, List<SWEKParam>> filteredParameter = getFilter(supplier);
+        filteredParameter.computeIfAbsent(parameter, k -> new ArrayList<>()).add(filter);
     }
 
     static void removeFilters(SWEKSupplier supplier) {
@@ -36,8 +33,7 @@ public class FilterManager {
     }
 
     public static Map<SWEKParameter, List<SWEKParam>> getFilter(SWEKSupplier supplier) {
-        Map<SWEKParameter, List<SWEKParam>> filter = filters.get(supplier);
-        return filter == null ? new HashMap<>() : filter;
+        return filters.computeIfAbsent(supplier, k -> new HashMap<>());
     }
 /*
     public static boolean isFiltered(SWEKSupplier supplier, SWEKParameter parameter) {
