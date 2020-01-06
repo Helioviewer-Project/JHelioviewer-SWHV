@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.swek.sources.hek;
 
 import java.io.ByteArrayOutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -117,12 +116,7 @@ public class HEKHandler extends SWEKHandler {
 
         for (SWEKParam param : params) {
             if (param.param.toLowerCase().equals("provider")) {
-                String encodedValue;
-                try {
-                    encodedValue = URLEncoder.encode(param.value, StandardCharsets.UTF_8.name());
-                } catch (UnsupportedEncodingException e) {
-                    encodedValue = param.value;
-                }
+                String encodedValue = URLEncoder.encode(param.value, StandardCharsets.UTF_8);
                 baseURL.append("param").append(paramCount).append('=').append("frm_name").append('&').append("op").append(paramCount).append('=').append(param.operand.encodedRepresentation).append('&').append("value").append(paramCount).append('=').append(encodedValue).append('&');
                 paramCount++;
             }
