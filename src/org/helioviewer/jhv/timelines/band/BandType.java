@@ -37,7 +37,7 @@ public class BandType {
 
     @Nonnull
     public static String[] getGroups() {
-        return groups.keySet().toArray(new String[0]);
+        return groups.keySet().toArray(String[]::new);
     }
 
     private final String name;

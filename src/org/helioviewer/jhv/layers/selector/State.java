@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 
 import javax.annotation.Nullable;
@@ -32,7 +32,7 @@ public class State {
 
     public static void save() {
         String fileName = JHVDirectory.STATES.getPath() + "state__" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".jhv";
-        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileName), StandardCharsets.UTF_8)) {
+        try (BufferedWriter writer = Files.newBufferedWriter(Path.of(fileName), StandardCharsets.UTF_8)) {
             toJson().write(writer);
         } catch (IOException e) {
             e.printStackTrace();

@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 
@@ -43,7 +43,7 @@ class JCodecExporter implements MovieExporter {
         height = _height;
         fps = _fps;
 
-        ch = new FileChannelWrapper(FileChannel.open(Paths.get(path), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING));
+        ch = new FileChannelWrapper(FileChannel.open(Path.of(path), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING));
         // Muxer that will store the encoded frames
         muxer = new MP4Muxer(ch, Brand.MP4);
         // Add video track to muxer

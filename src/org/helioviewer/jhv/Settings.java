@@ -5,7 +5,6 @@ import java.io.BufferedWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Properties;
 
 import org.helioviewer.jhv.io.DataSources;
@@ -14,7 +13,7 @@ import org.helioviewer.jhv.log.Log;
 @SuppressWarnings("serial")
 public class Settings {
 
-    private static final Path userPath = Paths.get(JHVDirectory.SETTINGS.getPath(), "user.properties");
+    private static final Path userPath = Path.of(JHVDirectory.SETTINGS.getPath(), "user.properties");
     private static final Properties defaults = new Properties() {
         {
             super.setProperty("startup.loadmovie", "true");
