@@ -142,7 +142,7 @@ class J2KDecoder implements Runnable {
         }
     }
 
-    private Kdu_region_compositor getCompositor(J2KView view) throws KduException {
+    private static Kdu_region_compositor getCompositor(J2KView view) throws KduException {
         Kdu_region_compositor krc = localCompositor.get();
         if (krc != null)
             return krc;
