@@ -33,7 +33,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         highlighted = false;
 
         events.add(event);
-        eventsMap.putIfAbsent(supplier, new TreeMap<>());
+        eventsMap.computeIfAbsent(supplier, k -> new TreeMap<>());
 
         interval = new Interval(event.start, event.end);
         eventsMap.get(supplier).put(interval, this);
@@ -64,10 +64,10 @@ public class JHVRelatedEvents implements ClickableDrawable {
         events.addAll(found.events);
         associations.addAll(found.associations);
 
-        eventsMap.putIfAbsent(supplier, new TreeMap<>());
-
+        eventsMap.computeIfAbsent(supplier, k -> new TreeMap<>());
         eventsMap.get(supplier).remove(found.interval);
         eventsMap.get(supplier).remove(interval);
+
         interval = new Interval(Math.min(interval.start, found.interval.start), Math.max(interval.end, found.interval.end));
         eventsMap.get(supplier).put(interval, this);
     }
@@ -174,9 +174,8 @@ public class JHVRelatedEvents implements ClickableDrawable {
             }
         }
 
-        eventsMap.putIfAbsent(supplier, new TreeMap<>());
+        eventsMap.computeIfAbsent(supplier, k -> new TreeMap<>()).remove(interval);
 
-        eventsMap.get(supplier).remove(interval);
         interval = new Interval(start, end);
         eventsMap.get(supplier).put(interval, this);
     }
