@@ -204,22 +204,22 @@ public class HelioviewerMetaData extends BaseMetaData {
         if (observatory.equals("SOHO"))
             distanceObs *= Sun.L1Factor;
 
-        double theta = m.getDouble("HGLT_OBS").map(Math::toRadians).orElseGet(
-                       () -> m.getDouble("CRLT_OBS").map(Math::toRadians).orElseGet(
-                       () -> m.getDouble("REF_B0").map(Math::toRadians).orElse(p.lat)));
+        double theta = m.getDouble("HGLT_OBS").map(Math::toRadians)
+                .or(() -> m.getDouble("CRLT_OBS").map(Math::toRadians))
+                .or(() -> m.getDouble("REF_B0").map(Math::toRadians)).orElse(p.lat);
 
-        double phi = m.getDouble("HGLN_OBS").map(v -> p.lon - Math.toRadians(v)).orElseGet(
-                     () -> m.getDouble("CRLN_OBS").map(v -> -Math.toRadians(v)).orElseGet(
-                     () -> m.getDouble("REF_L0").map(v -> -Math.toRadians(v)).orElse(p.lon)));
+        double phi = m.getDouble("HGLN_OBS").map(v -> p.lon - Math.toRadians(v))
+                .or(() -> m.getDouble("CRLN_OBS").map(v -> -Math.toRadians(v)))
+                .or(() -> m.getDouble("REF_L0").map(v -> -Math.toRadians(v))).orElse(p.lon);
 
         viewpoint = new Position(dateObs, distanceObs, phi, theta);
     }
 
     private Quat retrieveCenterRotation(MetaDataContainer m) {
         if (instrument.equals("AIA") || instrument.equals("HMI") || instrument.equals("SWAP") || instrument.equals("SUVI")) {
-            crota = Math.toRadians(m.getDouble("CROTA").orElseGet(
-                                   () -> m.getDouble("CROTA1").orElseGet(
-                                   () -> m.getDouble("CROTA2").orElse(0.))));
+            crota = m.getDouble("CROTA").map(Math::toRadians)
+                    .or(() -> m.getDouble("CROTA1").map(Math::toRadians))
+                    .or(() -> m.getDouble("CROTA2").map(Math::toRadians)).orElse(0.);
 
             scrota = Math.sin(crota);
             ccrota = Math.cos(crota);
