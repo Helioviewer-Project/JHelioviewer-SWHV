@@ -70,11 +70,9 @@ public class BaseView implements View {
 
     @Override
     public void decode(Position viewpoint, double pixFactor, double factor) {
-        if (imageData != null) {
+        if (dataHandler != null) {
             imageData.setViewpoint(viewpoint);
-            if (dataHandler != null) {
-                dataHandler.handleData(imageData);
-            }
+            dataHandler.handleData(imageData);
         }
     }
 
@@ -161,7 +159,7 @@ public class BaseView implements View {
 
     @Nonnull
     @Override
-    public String getXMLMetaData() throws Exception {
+    public String getXMLMetaData(int frame) throws Exception {
         return "<meta/>";
     }
 

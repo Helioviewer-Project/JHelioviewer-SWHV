@@ -24,6 +24,7 @@ import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.NetClient;
+import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.view.BaseView;
@@ -70,20 +71,23 @@ public class SimpleImageView extends BaseView {
         }
         imageData = new ImageData(new ImageBuffer(w, h, format, buffer));
 
+        MetaData m;
         try {
-            metaData[0] = new XMLMetaDataContainer(xml).getHVMetaData(0, true);
+            m = new XMLMetaDataContainer(xml).getHVMetaData(0, true);
         } catch (Exception ignore) {
-            metaData[0] = new PixelBasedMetaData(w, h, 0);
+            m = new PixelBasedMetaData(w, h, 0);
             xml = "<meta/>";
         }
 
-        imageData.setRegion(metaData[0].getPhysicalRegion());
-        imageData.setMetaData(metaData[0]);
+        imageData.setRegion(m.getPhysicalRegion());
+        imageData.setMetaData(m);
+
+        metaData[0] = m;
     }
 
     @Nonnull
     @Override
-    public String getXMLMetaData() {
+    public String getXMLMetaData(int frame) {
         return xml;
     }
 
