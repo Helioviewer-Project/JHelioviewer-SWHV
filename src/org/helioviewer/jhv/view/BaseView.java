@@ -102,13 +102,23 @@ public class BaseView implements View {
     }
 
     @Override
-    public void setFrame(JHVDate time) {
+    public JHVDate getFirstTime() {
+        return metaData[0].getViewpoint().time;
+    }
+
+    @Override
+    public JHVDate getLastTime() {
+        return metaData[maxFrame].getViewpoint().time;
     }
 
     @Nullable
     @Override
     public JHVDate getNextTime(AnimationMode mode, int deltaT) {
         return null;
+    }
+
+    @Override
+    public void setNearestFrame(JHVDate time) {
     }
 
     @Override
@@ -124,16 +134,6 @@ public class BaseView implements View {
     @Override
     public JHVDate getHigherTime(JHVDate time) {
         return getLastTime();
-    }
-
-    @Override
-    public JHVDate getFirstTime() {
-        return metaData[0].getViewpoint().time;
-    }
-
-    @Override
-    public JHVDate getLastTime() {
-        return metaData[maxFrame].getViewpoint().time;
     }
 
     @Override

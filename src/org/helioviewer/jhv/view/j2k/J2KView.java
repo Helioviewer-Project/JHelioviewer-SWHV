@@ -176,6 +176,16 @@ public class J2KView extends BaseView {
         return targetFrame;
     }
 
+    @Override
+    public JHVDate getFirstTime() {
+        return dateMap.firstKey();
+    }
+
+    @Override
+    public JHVDate getLastTime() {
+        return dateMap.lastKey();
+    }
+
     // to be accessed only from Layers
     @Nullable
     @Override
@@ -208,23 +218,13 @@ public class J2KView extends BaseView {
     }
 
     @Override
-    public void setFrame(JHVDate time) {
-        int frame = getFrameNumber(time.milli);
+    public void setNearestFrame(JHVDate time) {
+        int frame = getNearestFrame(time);
         if (frame != targetFrame) {
             if (frame > cacheStatus.getPartialUntil())
                 return;
             targetFrame = frame;
         }
-    }
-
-    private int getFrameNumber(long milli) {
-        int frame = -1;
-        long lastDiff, currentDiff = -Long.MAX_VALUE;
-        do {
-            lastDiff = currentDiff;
-            currentDiff = dates[++frame].milli - milli;
-        } while (currentDiff < 0 && frame < maxFrame);
-        return -lastDiff < currentDiff ? frame - 1 : frame;
     }
 
     @Override
@@ -235,6 +235,10 @@ public class J2KView extends BaseView {
             frame = maxFrame;
         }
         return dates[frame];
+    }
+
+    private int getNearestFrame(JHVDate time) {
+        return dateMap.get(getNearestTime(time));
     }
 
     @Override
@@ -263,7 +267,7 @@ public class J2KView extends BaseView {
 
     @Override
     public MetaData getMetaData(JHVDate time) {
-        return metaData[getFrameNumber(time.milli)];
+        return metaData[getNearestFrame(time)];
     }
 
     private volatile boolean isDownloading;
