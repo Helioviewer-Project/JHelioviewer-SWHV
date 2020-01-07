@@ -91,7 +91,7 @@ public class Movie {
     public static void setTime(JHVDate dateTime) {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
-            syncTime(layer.getView().getFrameTime(dateTime));
+            syncTime(layer.getView().getNearestTime(dateTime));
         }
     }
 
@@ -105,14 +105,14 @@ public class Movie {
     public static void nextFrame() {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
-            setFrame(layer.getView().getCurrentFrameNumber() + 1);
+            syncTime(layer.getView().getHigherTime(lastTimestamp));
         }
     }
 
     public static void previousFrame() {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
-            setFrame(layer.getView().getCurrentFrameNumber() - 1);
+            syncTime(layer.getView().getLowerTime(lastTimestamp));
         }
     }
 

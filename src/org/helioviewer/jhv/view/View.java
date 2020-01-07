@@ -62,7 +62,11 @@ public interface View {
 
     void setFrame(JHVDate time);
 
-    JHVDate getFrameTime(JHVDate time);
+    JHVDate getNearestTime(JHVDate time);
+
+    JHVDate getLowerTime(JHVDate time);
+
+    JHVDate getHigherTime(JHVDate time);
 
     MetaData getMetaData(JHVDate time);
     // -->

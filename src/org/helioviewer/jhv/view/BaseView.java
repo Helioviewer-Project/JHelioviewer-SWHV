@@ -112,8 +112,18 @@ public class BaseView implements View {
     }
 
     @Override
-    public JHVDate getFrameTime(JHVDate time) {
+    public JHVDate getNearestTime(JHVDate time) {
         return getFirstTime();
+    }
+
+    @Override
+    public JHVDate getLowerTime(JHVDate time) {
+        return getFirstTime();
+    }
+
+    @Override
+    public JHVDate getHigherTime(JHVDate time) {
+        return getLastTime();
     }
 
     @Override
