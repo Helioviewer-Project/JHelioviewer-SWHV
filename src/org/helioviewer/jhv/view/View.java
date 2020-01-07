@@ -60,7 +60,7 @@ public interface View {
     @Nullable
     JHVDate getNextTime(AnimationMode mode, int deltaT);
 
-    void setFrame(JHVDate time);
+    void setNearestFrame(JHVDate time);
 
     JHVDate getNearestTime(JHVDate time);
 
