@@ -40,7 +40,6 @@ public class J2KView extends BaseView {
     private static final int HIRES_CUTOFF = 1280;
 
     private int targetFrame = 0;
-    private int trueFrame = 0;
 
     private final long[] cacheKey;
     private final JHVDate[] dates;
@@ -311,12 +310,10 @@ public class J2KView extends BaseView {
     }
 
     void setDataFromDecoder(DecodeParams decodeParams, ImageBuffer imageBuffer) {
-        trueFrame = decodeParams.frame;
-
         ImageData data = new ImageData(imageBuffer);
         data.setViewpoint(decodeParams.viewpoint);
 
-        MetaData m = metaData[trueFrame];
+        MetaData m = metaData[decodeParams.frame];
         data.setMetaData(m);
         data.setRegion(m.roiToRegion(decodeParams.subImage, decodeParams.resolution.factorX, decodeParams.resolution.factorY));
 
@@ -324,10 +321,6 @@ public class J2KView extends BaseView {
             if (dataHandler != null)
                 dataHandler.handleData(data);
         });
-    }
-
-    KakaduSource getSource() {
-        return kduSource;
     }
 
     @Nullable
@@ -341,6 +334,13 @@ public class J2KView extends BaseView {
         return cacheStatus.isComplete(currentLevel);
     }
 
+    // very slow
+    @Nonnull
+    @Override
+    public String getXMLMetaData(int frame) throws Exception {
+        return kduSource.extractXMLString(frame);
+    }
+
     public ResolutionLevel getResolutionLevel(int frame, int level) {
         return cacheStatus.getResolutionSet(frame).getResolutionLevel(level);
     }
@@ -349,19 +349,16 @@ public class J2KView extends BaseView {
         return cacheStatus.getResolutionSet(frame).numComps;
     }
 
+    KakaduSource getSource() {
+        return kduSource;
+    }
+
     JPIPCache getJPIPCache() {
         return jpipCache;
     }
 
     CacheStatus getCacheStatus() {
         return cacheStatus;
-    }
-
-    // very slow
-    @Nonnull
-    @Override
-    public String getXMLMetaData() throws Exception {
-        return kduSource.extractXMLString(trueFrame);
     }
 
 }
