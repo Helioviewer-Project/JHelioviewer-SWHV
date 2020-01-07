@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.lang.ref.Cleaner;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.TreeMap;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -43,6 +44,7 @@ public class J2KView extends BaseView {
 
     private final long[] cacheKey;
     private final JHVDate[] dates;
+    private final TreeMap<JHVDate, Integer> dateMap = new TreeMap<>();
 
     private final Cleaner.Cleanable abolishable;
     private final DecodeExecutor decoder = new DecodeExecutor();
@@ -93,6 +95,7 @@ public class J2KView extends BaseView {
                 if (metaData[i] == null)
                     metaData[i] = new PixelBasedMetaData(256, 256, i); // tbd real size
                 dates[i] = metaData[i].getViewpoint().time;
+                dateMap.put(metaData[i].getViewpoint().time, i);
             }
 
             if (frames != null) {
@@ -235,8 +238,27 @@ public class J2KView extends BaseView {
     }
 
     @Override
-    public JHVDate getFrameTime(JHVDate time) {
-        return dates[getFrameNumber(time.milli)];
+    public JHVDate getNearestTime(JHVDate time) {
+        JHVDate c = dateMap.ceilingKey(time);
+        JHVDate f = dateMap.floorKey(time);
+
+        if (f != null && c != null)
+            return time.milli - f.milli < c.milli - time.milli ? f : c;
+        if (f == null && c != null)
+            return c;
+        return f;
+    }
+
+    @Override
+    public JHVDate getLowerTime(JHVDate time) {
+        JHVDate k = dateMap.lowerKey(time);
+        return k == null ? dateMap.firstKey() : k;
+    }
+
+    @Override
+    public JHVDate getHigherTime(JHVDate time) {
+        JHVDate k = dateMap.higherKey(time);
+        return k == null ? dateMap.lastKey() : k;
     }
 
     @Override
