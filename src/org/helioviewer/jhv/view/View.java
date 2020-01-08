@@ -58,7 +58,7 @@ public interface View {
 
     // <!- only for Layers
     @Nullable
-    JHVDate getNextTime(AnimationMode mode, int deltaT);
+    JHVDate getNextTime(AnimationMode mode, JHVDate time);
 
     void setNearestFrame(JHVDate time);
 

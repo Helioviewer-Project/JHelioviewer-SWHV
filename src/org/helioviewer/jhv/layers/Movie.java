@@ -55,7 +55,7 @@ public class Movie {
     private static void advanceFrame() {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
-            JHVDate nextTime = layer.getView().getNextTime(animationMode, deltaT);
+            JHVDate nextTime = layer.getView().getNextTime(animationMode, lastTimestamp);
             if (nextTime == null)
                 pause();
             else

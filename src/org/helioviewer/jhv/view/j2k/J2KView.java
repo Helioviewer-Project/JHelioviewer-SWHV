@@ -189,32 +189,32 @@ public class J2KView extends BaseView {
     // to be accessed only from Layers
     @Nullable
     @Override
-    public JHVDate getNextTime(AnimationMode mode, int deltaT) {
-        int next = targetFrame + 1;
+    public JHVDate getNextTime(AnimationMode mode, JHVDate time) {
+        JHVDate next = mode == AnimationMode.SwingDown ? getLowerTime(time) : getHigherTime(time);
         switch (mode) {
             case Stop:
-                if (next > maxFrame) {
+                if (next.milli == getLastTime().milli && next.milli == time.milli) {
                     return null;
                 }
                 break;
             case Swing:
-                if (targetFrame == maxFrame) {
+                if (next.milli == getLastTime().milli && next.milli == time.milli) {
                     Movie.setAnimationMode(AnimationMode.SwingDown);
-                    return dates[targetFrame - 1];
+                    return getLowerTime(next);
                 }
                 break;
             case SwingDown:
-                if (targetFrame == 0) {
+                if (next.milli == getFirstTime().milli && next.milli == time.milli) {
                     Movie.setAnimationMode(AnimationMode.Swing);
-                    return dates[1];
+                    return getHigherTime(next);
                 }
-                return dates[targetFrame - 1];
+                break;
             default: // Loop
-                if (next > maxFrame) {
-                    return dates[0];
+                if (next.milli == getLastTime().milli && next.milli == time.milli) {
+                    return getFirstTime();
                 }
         }
-        return dates[next];
+        return next;
     }
 
     @Override

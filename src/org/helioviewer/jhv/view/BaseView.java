@@ -113,7 +113,7 @@ public class BaseView implements View {
 
     @Nullable
     @Override
-    public JHVDate getNextTime(AnimationMode mode, int deltaT) {
+    public JHVDate getNextTime(AnimationMode mode, JHVDate time) {
         return null;
     }
 
