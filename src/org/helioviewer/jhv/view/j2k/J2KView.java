@@ -40,7 +40,8 @@ public class J2KView extends BaseView {
 
     private static final int HIRES_CUTOFF = 1280;
 
-    private int targetFrame = 0;
+    private final int maxFrame;
+    private int targetFrame;
 
     private final long[] cacheKey;
     private final JHVDate[] dates;
@@ -172,8 +173,18 @@ public class J2KView extends BaseView {
     }
 
     @Override
+    public boolean isMultiFrame() {
+        return maxFrame > 0;
+    }
+
+    @Override
     public int getCurrentFrameNumber() {
         return targetFrame;
+    }
+
+    @Override
+    public int getMaximumFrameNumber() {
+        return maxFrame;
     }
 
     @Override
