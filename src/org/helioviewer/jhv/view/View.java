@@ -15,10 +15,6 @@ import org.helioviewer.jhv.time.JHVDate;
 
 public interface View {
 
-    enum AnimationMode {
-        Loop, Stop, Swing, SwingDown
-    }
-
     @Nullable
     APIRequest getAPIRequest();
 
@@ -58,7 +54,7 @@ public interface View {
 
     // <!- only for Layers
     @Nullable
-    JHVDate getNextTime(AnimationMode mode, JHVDate time);
+    JHVDate getNextTime(JHVDate.AdvanceMode mode, JHVDate time);
 
     void setNearestFrame(JHVDate time);
 
