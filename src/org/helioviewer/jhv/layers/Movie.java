@@ -1,7 +1,10 @@
 package org.helioviewer.jhv.layers;
 
 import java.util.ArrayList;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
+import javax.annotation.Nullable;
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.camera.Camera;
@@ -13,6 +16,37 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.View;
 
 public class Movie {
+
+    @Nullable
+    private static JHVDate getNextTime(AdvanceMode mode, JHVDate time,
+                                       Supplier<JHVDate> getFirst, Supplier<JHVDate> getLast,
+                                       Function<JHVDate, JHVDate> getLower, Function<JHVDate, JHVDate> getHigher) {
+        JHVDate next = mode == AdvanceMode.SwingDown ? getLower.apply(time) : getHigher.apply(time);
+        switch (mode) {
+            case Stop:
+                if (next.milli == getLast.get().milli && next.milli == time.milli) {
+                    return null;
+                }
+                break;
+            case Swing:
+                if (next.milli == getLast.get().milli && next.milli == time.milli) {
+                    setAdvanceMode(AdvanceMode.SwingDown);
+                    return getLower.apply(next);
+                }
+                break;
+            case SwingDown:
+                if (next.milli == getFirst.get().milli && next.milli == time.milli) {
+                    setAdvanceMode(AdvanceMode.Swing);
+                    return getHigher.apply(next);
+                }
+                break;
+            default: // Loop
+                if (next.milli == getLast.get().milli && next.milli == time.milli) {
+                    return getFirst.get();
+                }
+        }
+        return next;
+    }
 
     static void setMaster(ImageLayer layer) {
         View view;
@@ -55,7 +89,11 @@ public class Movie {
     private static void advanceFrame() {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
-            JHVDate nextTime = layer.getView().getNextTime(advanceMode, lastTimestamp);
+            View view = layer.getView();
+            JHVDate nextTime = getNextTime(advanceMode, lastTimestamp,
+                    view::getFirstTime, view::getLastTime,
+                    view::getLowerTime, view::getHigherTime);
+
             if (nextTime == null)
                 pause();
             else
