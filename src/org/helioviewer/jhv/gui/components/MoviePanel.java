@@ -247,7 +247,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         modePanel.add(new JLabel("Play", JLabel.RIGHT));
 
         int speedMin = 1, speedMax = 60;
-        speedSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(20), Double.valueOf(1), Double.valueOf(speedMax), Double.valueOf(speedMin)));
+        speedSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(Movie.DEF_FPS), Double.valueOf(1), Double.valueOf(speedMax), Double.valueOf(speedMin)));
         speedSpinner.setToolTipText("Maximum " + speedMax + " fps");
         speedSpinner.addChangeListener(e -> updateMovieSpeed());
 
@@ -425,7 +425,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (isSelected()) {
-                int fps = 20;
+                int fps = Movie.DEF_FPS;
                 SpeedUnit unit = (SpeedUnit) Objects.requireNonNull(speedUnitComboBox.getSelectedItem());
                 if (unit == SpeedUnit.FRAMESPERSECOND)
                     fps = ((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue();
