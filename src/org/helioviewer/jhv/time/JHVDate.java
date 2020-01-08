@@ -43,8 +43,4 @@ public class JHVDate implements Comparable<JHVDate> {
         return string;
     }
 
-    public enum AdvanceMode {
-        Loop, Stop, Swing, SwingDown
-    }
-
 }
