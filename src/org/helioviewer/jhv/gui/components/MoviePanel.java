@@ -42,8 +42,8 @@ import org.helioviewer.jhv.gui.interfaces.ObservationSelector;
 import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.layers.Movie.AdvanceMode;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.helioviewer.jhv.time.JHVDate.AdvanceMode;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.View;
 
