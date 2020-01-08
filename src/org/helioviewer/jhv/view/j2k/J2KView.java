@@ -24,6 +24,7 @@ import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVDate.AdvanceMode;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.j2k.cache.CacheStatus;
 import org.helioviewer.jhv.view.j2k.cache.CacheStatusLocal;
@@ -189,8 +190,8 @@ public class J2KView extends BaseView {
     // to be accessed only from Layers
     @Nullable
     @Override
-    public JHVDate getNextTime(AnimationMode mode, JHVDate time) {
-        JHVDate next = mode == AnimationMode.SwingDown ? getLowerTime(time) : getHigherTime(time);
+    public JHVDate getNextTime(AdvanceMode mode, JHVDate time) {
+        JHVDate next = mode == AdvanceMode.SwingDown ? getLowerTime(time) : getHigherTime(time);
         switch (mode) {
             case Stop:
                 if (next.milli == getLastTime().milli && next.milli == time.milli) {
@@ -199,13 +200,13 @@ public class J2KView extends BaseView {
                 break;
             case Swing:
                 if (next.milli == getLastTime().milli && next.milli == time.milli) {
-                    Movie.setAnimationMode(AnimationMode.SwingDown);
+                    Movie.setAdvanceMode(AdvanceMode.SwingDown);
                     return getLowerTime(next);
                 }
                 break;
             case SwingDown:
                 if (next.milli == getFirstTime().milli && next.milli == time.milli) {
-                    Movie.setAnimationMode(AnimationMode.Swing);
+                    Movie.setAdvanceMode(AdvanceMode.Swing);
                     return getHigherTime(next);
                 }
                 break;
