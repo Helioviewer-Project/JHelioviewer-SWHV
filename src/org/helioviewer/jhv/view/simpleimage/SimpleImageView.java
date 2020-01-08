@@ -81,7 +81,6 @@ public class SimpleImageView extends BaseView {
 
         imageData.setRegion(m.getPhysicalRegion());
         imageData.setMetaData(m);
-
         metaData[0] = m;
     }
 

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.camera.Camera;
@@ -24,7 +23,6 @@ public class Movie {
 
     public static final int DEF_FPS = 20;
 
-    @Nullable
     private static JHVDate getNextTime(AdvanceMode mode, JHVDate time,
                                        Supplier<JHVDate> getFirst, Supplier<JHVDate> getLast,
                                        Function<JHVDate, JHVDate> getLower, Function<JHVDate, JHVDate> getHigher) {
