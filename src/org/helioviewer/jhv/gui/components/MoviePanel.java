@@ -258,7 +258,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         WheelSupport.installMouseWheelSupport(speedSpinner);
         modePanel.add(speedSpinner);
 
-        speedUnitComboBox = new JComboBox<>(new SpeedUnit[]{SpeedUnit.FRAMESPERSECOND , SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND});
+        speedUnitComboBox = new JComboBox<>(new SpeedUnit[]{SpeedUnit.FRAMESPERSECOND, SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND});
         speedUnitComboBox.setSelectedItem(SpeedUnit.FRAMESPERSECOND);
         speedUnitComboBox.addActionListener(e -> updateMovieSpeed());
         modePanel.add(speedUnitComboBox);

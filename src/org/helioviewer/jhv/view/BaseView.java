@@ -27,7 +27,6 @@ public class BaseView implements View {
     protected ImageData imageData;
     protected LUT builtinLUT;
     protected MetaData[] metaData = {new PixelBasedMetaData(1, 1, 0)};
-    protected int maxFrame = 0;
 
     public BaseView(APIRequest _request, URI _uri) {
         request = _request;
@@ -88,7 +87,7 @@ public class BaseView implements View {
 
     @Override
     public boolean isMultiFrame() {
-        return maxFrame > 0;
+        return false;
     }
 
     @Override
@@ -98,7 +97,7 @@ public class BaseView implements View {
 
     @Override
     public int getMaximumFrameNumber() {
-        return maxFrame;
+        return 0;
     }
 
     @Override
@@ -108,7 +107,7 @@ public class BaseView implements View {
 
     @Override
     public JHVDate getLastTime() {
-        return metaData[maxFrame].getViewpoint().time;
+        return metaData[0].getViewpoint().time;
     }
 
     @Override

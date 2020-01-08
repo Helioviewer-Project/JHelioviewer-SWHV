@@ -109,7 +109,6 @@ public class Movie {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
             View view = layer.getView();
-
             JHVDate first = view.getFirstTime();
             JHVDate last = view.getLastTime();
             JHVDate nextTime = getNextTime(advanceMode, lastTimestamp,
