@@ -8,9 +8,9 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVDate.AdvanceMode;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.View;
-import org.helioviewer.jhv.view.View.AnimationMode;
 
 public class Movie {
 
@@ -55,7 +55,7 @@ public class Movie {
     private static void advanceFrame() {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
-            JHVDate nextTime = layer.getView().getNextTime(animationMode, lastTimestamp);
+            JHVDate nextTime = layer.getView().getNextTime(advanceMode, lastTimestamp);
             if (nextTime == null)
                 pause();
             else
@@ -199,10 +199,10 @@ public class Movie {
         deltaT = 1000 / 20 * sec;
     }
 
-    private static AnimationMode animationMode = AnimationMode.Loop;
+    private static AdvanceMode advanceMode = AdvanceMode.Loop;
 
-    public static void setAnimationMode(AnimationMode mode) {
-        animationMode = mode;
+    public static void setAdvanceMode(AdvanceMode mode) {
+        advanceMode = mode;
     }
 
     private static boolean recording;

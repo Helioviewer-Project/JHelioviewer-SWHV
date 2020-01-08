@@ -43,9 +43,9 @@ import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.opengl.GLHelper;
+import org.helioviewer.jhv.time.JHVDate.AdvanceMode;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.View;
-import org.helioviewer.jhv.view.View.AnimationMode;
 
 @SuppressWarnings("serial")
 public class MoviePanel extends JPanel implements ObservationSelector {
@@ -159,7 +159,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
     private static JHVButton advancedButton;
     private static JSpinner speedSpinner;
     private static JComboBox<SpeedUnit> speedUnitComboBox;
-    private static JComboBox<AnimationMode> animationModeComboBox;
+    private static JComboBox<AdvanceMode> advanceModeComboBox;
 
     private static final JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
     private static final JPanel recordPanel = new JPanel(new GridBagLayout());
@@ -266,10 +266,10 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         // Animation mode
         modePanel.add(new JLabel("and", JLabel.RIGHT));
 
-        animationModeComboBox = new JComboBox<>(new AnimationMode[]{AnimationMode.Loop, AnimationMode.Stop, AnimationMode.Swing});
-        animationModeComboBox.setPreferredSize(speedUnitComboBox.getPreferredSize());
-        animationModeComboBox.addActionListener(e -> Movie.setAnimationMode((AnimationMode) Objects.requireNonNull(animationModeComboBox.getSelectedItem())));
-        modePanel.add(animationModeComboBox);
+        advanceModeComboBox = new JComboBox<>(new AdvanceMode[]{AdvanceMode.Loop, AdvanceMode.Stop, AdvanceMode.Swing});
+        advanceModeComboBox.setPreferredSize(speedUnitComboBox.getPreferredSize());
+        advanceModeComboBox.addActionListener(e -> Movie.setAdvanceMode((AdvanceMode) Objects.requireNonNull(advanceModeComboBox.getSelectedItem())));
+        modePanel.add(advanceModeComboBox);
 
         // Record
         GridBagConstraints c = new GridBagConstraints();
@@ -446,7 +446,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
     }
 
     private static void setEnabledState(boolean enabled) {
-        animationModeComboBox.setEnabled(enabled);
+        advanceModeComboBox.setEnabled(enabled);
         timeSlider.setEnabled(enabled);
         playButton.setEnabled(enabled);
         nextFrameButton.setEnabled(enabled);
