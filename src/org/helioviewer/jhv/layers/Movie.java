@@ -117,8 +117,8 @@ public class Movie {
             JHVDate last = view.getLastTime();
             JHVDate nextTime = getNextTime(advanceMode, lastTimestamp,
                     () -> first, () -> last,
-                    lastTimestamp -> new JHVDate(Math.max(first.milli, lastTimestamp.milli - deltaT)),
-                    lastTimestamp -> new JHVDate(Math.min(last.milli, lastTimestamp.milli + deltaT)));
+                    time -> new JHVDate(Math.max(first.milli, time.milli - deltaT)),
+                    time -> new JHVDate(Math.min(last.milli, time.milli + deltaT)));
 
             if (nextTime == null)
                 pause();
