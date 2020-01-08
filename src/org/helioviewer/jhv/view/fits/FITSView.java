@@ -4,7 +4,6 @@ import java.net.URI;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
@@ -24,12 +23,10 @@ public class FITSView extends BaseView {
         xml = fits.xml;
 
         HelioviewerMetaData m = new XMLMetaDataContainer(xml).getHVMetaData(0, false);
-        int w = m.getPixelWidth();
-        int h = m.getPixelHeight();
         imageData = fits.imageData;
-        imageData.setRegion(m.roiToRegion(new SubImage(0, 0, w, h, w, h), 1, 1));
-        imageData.setMetaData(m);
 
+        imageData.setRegion(m.getPhysicalRegion());
+        imageData.setMetaData(m);
         metaData[0] = m;
     }
 
