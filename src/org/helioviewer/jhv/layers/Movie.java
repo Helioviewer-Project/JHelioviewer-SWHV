@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.layers;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -87,9 +89,8 @@ public class Movie {
     }
 
     private static int deltaT;
-    private static final Timer movieTimer = new Timer(1000 / 20, e -> advanceFrame());
 
-    private static void advanceFrame() {
+    private static void relativeTimeAdvance() {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
             View view = layer.getView();
@@ -103,6 +104,43 @@ public class Movie {
                 setTime(nextTime);
         }
     }
+
+    private static void absoluteTimeAdvance() {
+        ImageLayer layer = Layers.getActiveImageLayer();
+        if (layer != null) {
+            View view = layer.getView();
+
+            JHVDate first = view.getFirstTime();
+            JHVDate last = view.getLastTime();
+            JHVDate nextTime = getNextTime(advanceMode, lastTimestamp,
+                    () -> first, () -> last,
+                    lastTimestamp -> new JHVDate(Math.max(first.milli, lastTimestamp.milli - deltaT)),
+                    lastTimestamp -> new JHVDate(Math.min(last.milli, lastTimestamp.milli + deltaT)));
+
+            if (nextTime == null)
+                pause();
+            else
+                syncTime(nextTime);
+        }
+    }
+
+    private static class RelativeTimeAdvanceListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            relativeTimeAdvance();
+        }
+    }
+
+    private static class AbsoluteTimeAdvanceListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            absoluteTimeAdvance();
+        }
+    }
+
+    private static final RelativeTimeAdvanceListener relativeTimeAdvanceListener = new RelativeTimeAdvanceListener();
+    private static final AbsoluteTimeAdvanceListener absoluteTimeAdvanceListener = new AbsoluteTimeAdvanceListener();
+    private static final Timer movieTimer = new Timer(1000 / 20, relativeTimeAdvanceListener);
 
     public static boolean isPlaying() {
         return movieTimer.isRunning();
@@ -222,7 +260,7 @@ public class Movie {
     public static void addTimespanListener(TimespanListener listener) {
         if (!timespanListeners.contains(listener)) {
             timespanListeners.add(listener);
-            listener.timespanChanged(getMovieStart(), getMovieEnd());
+            listener.timespanChanged(movieStart, movieEnd);
         }
     }
 
@@ -231,11 +269,15 @@ public class Movie {
     }
 
     public static void setDesiredRelativeSpeed(int fps) {
+        movieTimer.removeActionListener(absoluteTimeAdvanceListener);
+        movieTimer.addActionListener(relativeTimeAdvanceListener);
         movieTimer.setDelay(1000 / fps);
         deltaT = 0;
     }
 
     public static void setDesiredAbsoluteSpeed(int sec) {
+        movieTimer.removeActionListener(relativeTimeAdvanceListener);
+        movieTimer.addActionListener(absoluteTimeAdvanceListener);
         movieTimer.setDelay(1000 / 20);
         deltaT = 1000 / 20 * sec;
     }
