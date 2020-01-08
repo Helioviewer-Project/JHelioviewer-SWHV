@@ -138,13 +138,15 @@ public class KakaduSource {
         Jp2_input_box xmlBox = new Jp2_input_box();
         while ((node = metaManager.Peek_and_clear_touched_nodes(1, xmlFilter, node)).Exists()) {
             if (i == metaDataList.length)
-                return;
+                break;
             if (node.Open_existing(xmlBox)) {
                 metaDataList[i] = new XMLMetaDataContainer(xmlBox2String(xmlBox)).getHVMetaData(i, true);
                 xmlBox.Close();
             }
             i++;
         }
+        if (i != metaDataList.length)
+            throw new Exception("Incomplete metadata: expected " + metaDataList.length + " layers, got " + i);
     }
 
     public String extractXMLString(int frame) throws KduException {
