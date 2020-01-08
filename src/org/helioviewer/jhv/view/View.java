@@ -53,9 +53,6 @@ public interface View {
     JHVDate getLastTime();
 
     // <!- only for Layers
-    @Nullable
-    JHVDate getNextTime(JHVDate.AdvanceMode mode, JHVDate time);
-
     void setNearestFrame(JHVDate time);
 
     JHVDate getNearestTime(JHVDate time);

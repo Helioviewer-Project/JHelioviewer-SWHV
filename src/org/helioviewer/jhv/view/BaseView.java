@@ -111,12 +111,6 @@ public class BaseView implements View {
         return metaData[maxFrame].getViewpoint().time;
     }
 
-    @Nullable
-    @Override
-    public JHVDate getNextTime(JHVDate.AdvanceMode mode, JHVDate time) {
-        return null;
-    }
-
     @Override
     public void setNearestFrame(JHVDate time) {
     }
