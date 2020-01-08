@@ -11,11 +11,14 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.time.JHVDate;
-import org.helioviewer.jhv.time.JHVDate.AdvanceMode;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.View;
 
 public class Movie {
+
+    public enum AdvanceMode {
+        Loop, Stop, Swing, SwingDown
+    }
 
     @Nullable
     private static JHVDate getNextTime(AdvanceMode mode, JHVDate time,
