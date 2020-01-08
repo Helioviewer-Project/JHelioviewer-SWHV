@@ -29,28 +29,30 @@ public class Movie {
                                        Supplier<JHVDate> getFirst, Supplier<JHVDate> getLast,
                                        Function<JHVDate, JHVDate> getLower, Function<JHVDate, JHVDate> getHigher) {
         JHVDate next = mode == AdvanceMode.SwingDown ? getLower.apply(time) : getHigher.apply(time);
-        switch (mode) {
-            case Stop:
-                if (next.milli == getLast.get().milli && next.milli == time.milli) {
-                    return null;
-                }
-                break;
-            case Swing:
-                if (next.milli == getLast.get().milli && next.milli == time.milli) {
-                    setAdvanceMode(AdvanceMode.SwingDown);
-                    return getLower.apply(next);
-                }
-                break;
-            case SwingDown:
-                if (next.milli == getFirst.get().milli && next.milli == time.milli) {
-                    setAdvanceMode(AdvanceMode.Swing);
-                    return getHigher.apply(next);
-                }
-                break;
-            default: // Loop
-                if (next.milli == getLast.get().milli && next.milli == time.milli) {
-                    return getFirst.get();
-                }
+        if (next.milli == time.milli) { // already at the edges
+            switch (mode) {
+                case Stop:
+                    if (next.milli == getLast.get().milli) {
+                        return null;
+                    }
+                    break;
+                case Swing:
+                    if (next.milli == getLast.get().milli) {
+                        setAdvanceMode(AdvanceMode.SwingDown);
+                        return getLower.apply(next);
+                    }
+                    break;
+                case SwingDown:
+                    if (next.milli == getFirst.get().milli) {
+                        setAdvanceMode(AdvanceMode.Swing);
+                        return getHigher.apply(next);
+                    }
+                    break;
+                default: // Loop
+                    if (next.milli == getLast.get().milli) {
+                        return getFirst.get();
+                    }
+            }
         }
         return next;
     }
