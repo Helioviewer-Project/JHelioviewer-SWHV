@@ -21,7 +21,6 @@ import org.helioviewer.jhv.io.APIResponse;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.view.BaseView;
@@ -89,14 +88,15 @@ public class J2KView extends BaseView {
             kduSource = new KakaduSource(jpipCache, uri);
             maxFrame = kduSource.getNumberLayers() - 1;
             metaData = new MetaData[maxFrame + 1];
-            dates = new JHVDate[maxFrame + 1];
 
             kduSource.extractMetaData(metaData);
             for (int i = 0; i <= maxFrame; i++) {
-                if (metaData[i] == null)
-                    metaData[i] = new PixelBasedMetaData(256, 256, i); // tbd real size
-                dates[i] = metaData[i].getViewpoint().time;
                 dateMap.put(metaData[i].getViewpoint().time, i);
+            }
+            dates = dateMap.navigableKeySet().toArray(JHVDate[]::new);
+            for (int i = 0; i <= maxFrame; i++) {
+                if (dates[i] != metaData[i].getViewpoint().time)
+                    throw new Exception("Badly ordered metadata");
             }
 
             if (frames != null) {
