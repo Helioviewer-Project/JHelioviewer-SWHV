@@ -29,6 +29,7 @@ public class ManyView implements View {
 
     private final JHVDateMap<ViewFrame> dateMap = new JHVDateMap<>();
     private final View[] views;
+    private int targetFrame;
 
     public ManyView(View view, View ... _views) {
         views = new View[_views.length + 1];
@@ -92,7 +93,7 @@ public class ManyView implements View {
 
     @Override
     public int getCurrentFrameNumber() {
-        return 0;
+        return targetFrame;
     }
 
     @Override
@@ -125,7 +126,7 @@ public class ManyView implements View {
 
     @Override
     public JHVDate getFrameTime(int frame) {
-        return null;
+        return dateMap.key(frame);
     }
 
     @Override
@@ -139,8 +140,16 @@ public class ManyView implements View {
     }
 
     @Override
-    public void setNearestFrame(JHVDate time) {
-
+    public boolean setNearestFrame(JHVDate time) {
+/*
+        int frame = dateMap.nearestValue(time);
+        if (frame != targetFrame) {
+            if (frame > cacheStatus.getPartialUntil())
+                return;
+            targetFrame = frame;
+        }
+*/
+        return true;
     }
 
     @Override

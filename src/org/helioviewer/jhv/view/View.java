@@ -53,7 +53,7 @@ public interface View {
     JHVDate getLastTime();
 
     // <!- only for Layers
-    void setNearestFrame(JHVDate time);
+    boolean setNearestFrame(JHVDate time);
 
     JHVDate getNearestTime(JHVDate time);
 

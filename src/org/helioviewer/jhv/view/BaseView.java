@@ -111,7 +111,8 @@ public class BaseView implements View {
     }
 
     @Override
-    public void setNearestFrame(JHVDate time) {
+    public boolean setNearestFrame(JHVDate time) {
+        return true;
     }
 
     @Override
