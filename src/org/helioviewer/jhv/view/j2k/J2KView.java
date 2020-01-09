@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.lang.ref.Cleaner;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.TreeMap;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -23,6 +22,7 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVDateMap;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.j2k.cache.CacheStatus;
 import org.helioviewer.jhv.view.j2k.cache.CacheStatusLocal;
@@ -43,8 +43,7 @@ public class J2KView extends BaseView {
     private int targetFrame;
 
     private final long[] cacheKey;
-    private final JHVDate[] dates;
-    private final TreeMap<JHVDate, Integer> dateMap = new TreeMap<>();
+    private final JHVDateMap<Integer> dateMap = new JHVDateMap<>();
 
     private final Cleaner.Cleanable abolishable;
     private final DecodeExecutor decoder = new DecodeExecutor();
@@ -93,9 +92,9 @@ public class J2KView extends BaseView {
             for (int i = 0; i <= maxFrame; i++) {
                 dateMap.put(metaData[i].getViewpoint().time, i);
             }
-            dates = dateMap.navigableKeySet().toArray(JHVDate[]::new);
+            dateMap.index();
             for (int i = 0; i <= maxFrame; i++) {
-                if (dates[i] != metaData[i].getViewpoint().time)
+                if (dateMap.key(i) != metaData[i].getViewpoint().time)
                     throw new Exception("Badly ordered metadata");
             }
 
@@ -103,7 +102,7 @@ public class J2KView extends BaseView {
                 if (maxFrame + 1 != frames.length)
                     Log.warn(uri + ": expected " + (maxFrame + 1) + "frames, got " + frames.length);
                 for (int i = 0; i < Math.min(maxFrame + 1, frames.length); i++) {
-                    JHVDate d = dates[i];
+                    JHVDate d = dateMap.key(i);
                     if (d.milli != frames[i] * 1000) {
                         cacheKey[i] = 0; // uncacheable
                         Log.warn(uri + "[" + i + "]: expected " + d + ", got " + new JHVDate(frames[i] * 1000));
@@ -199,7 +198,7 @@ public class J2KView extends BaseView {
 
     @Override
     public void setNearestFrame(JHVDate time) {
-        int frame = getNearestFrame(time);
+        int frame = dateMap.nearestValue(time);
         if (frame != targetFrame) {
             if (frame > cacheStatus.getPartialUntil())
                 return;
@@ -209,45 +208,27 @@ public class J2KView extends BaseView {
 
     @Override
     public JHVDate getFrameTime(int frame) {
-        if (frame < 0) {
-            frame = 0;
-        } else if (frame > maxFrame) {
-            frame = maxFrame;
-        }
-        return dates[frame];
-    }
-
-    private int getNearestFrame(JHVDate time) {
-        return dateMap.get(getNearestTime(time));
+        return dateMap.key(frame);
     }
 
     @Override
     public JHVDate getNearestTime(JHVDate time) {
-        JHVDate c = dateMap.ceilingKey(time);
-        JHVDate f = dateMap.floorKey(time);
-
-        if (f != null && c != null)
-            return time.milli - f.milli < c.milli - time.milli ? f : c;
-        if (f == null && c != null)
-            return c;
-        return f;
+        return dateMap.nearestKey(time);
     }
 
     @Override
     public JHVDate getLowerTime(JHVDate time) {
-        JHVDate k = dateMap.lowerKey(time);
-        return k == null ? dateMap.firstKey() : k;
+        return dateMap.lowerKey(time);
     }
 
     @Override
     public JHVDate getHigherTime(JHVDate time) {
-        JHVDate k = dateMap.higherKey(time);
-        return k == null ? dateMap.lastKey() : k;
+        return dateMap.higherKey(time);
     }
 
     @Override
     public MetaData getMetaData(JHVDate time) {
-        return metaData[getNearestFrame(time)];
+        return metaData[dateMap.nearestValue(time)];
     }
 
     private volatile boolean isDownloading;
@@ -343,8 +324,8 @@ public class J2KView extends BaseView {
     // very slow
     @Nonnull
     @Override
-    public String getXMLMetaData(int frame) throws Exception {
-        return kduSource.extractXMLString(frame);
+    public String getXMLMetaData(JHVDate time) throws Exception {
+        return kduSource.extractXMLString(dateMap.nearestValue(time));
     }
 
     public ResolutionLevel getResolutionLevel(int frame, int level) {

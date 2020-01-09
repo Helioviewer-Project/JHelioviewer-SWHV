@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
+import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.view.BaseView;
 
 public class FITSView extends BaseView {
@@ -32,7 +33,7 @@ public class FITSView extends BaseView {
 
     @Nonnull
     @Override
-    public String getXMLMetaData(int frame) {
+    public String getXMLMetaData(JHVDate time) {
         return xml;
     }
 
