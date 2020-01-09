@@ -13,6 +13,10 @@ public class JHVDateMap<V> extends TreeMap<JHVDate, V> {
         maxIdx = times.length - 1;
     }
 
+    public int maxIndex() {
+        return maxIdx;
+    }
+
     @Override
     public JHVDate firstKey() {
         return times[0];
