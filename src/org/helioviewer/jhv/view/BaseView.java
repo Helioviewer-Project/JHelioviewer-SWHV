@@ -48,7 +48,7 @@ public class BaseView implements View {
     public String getName() {
         MetaData m = metaData[0];
         if (m instanceof HelioviewerMetaData)
-            return ((HelioviewerMetaData) m).getFullName();
+            return ((HelioviewerMetaData) m).getDisplayName();
         else if (uri == null)
             return "Loading...";
         else {

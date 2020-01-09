@@ -24,7 +24,6 @@ public class HelioviewerMetaData extends BaseMetaData {
     private String detector = "";
     private String measurement = "";
     private String observatory = "";
-    private String fullName = "";
 
     private double sunPositionX = 0;
     private double sunPositionY = 0;
@@ -46,7 +45,7 @@ public class HelioviewerMetaData extends BaseMetaData {
         detector = detector.trim().intern();
         measurement = measurement.trim().intern();
         observatory = observatory.trim().intern();
-        fullName = fullName.trim().intern();
+        displayName = displayName.trim().intern();
 
         retrievePosition(m, retrieveDateTime(m));
         centerRotation = retrieveCenterRotation(m);
@@ -156,36 +155,36 @@ public class HelioviewerMetaData extends BaseMetaData {
             measurement = measurement.substring(0, measurement.length() - 1);
 
         if (instrument.contains("VSM")) {
-            fullName = "NSO-SOLIS " + measurement;
+            displayName = "NSO-SOLIS " + measurement;
         } else if (instrument.contains("HMI")) {
             measurement = m.getString("CONTENT").orElse("");
             String[] str = measurement.split(" ", 2);
-            fullName = "HMI " + str[0].toLowerCase();
+            displayName = "HMI " + str[0].toLowerCase();
         } else if (detector.equals("C2") || detector.equals("C3")) {
             measurement = m.getString("FILTER").orElse("") + ' ' + m.getString("POLAR").orElse("");
-            fullName = "LASCO " + detector;
+            displayName = "LASCO " + detector;
         } else if (instrument.equals("MDI")) {
             measurement = m.getString("DPC_OBSR").orElse("");
-            fullName = "MDI " + measurement.substring(measurement.indexOf('_') + 1).toLowerCase();
+            displayName = "MDI " + measurement.substring(measurement.indexOf('_') + 1).toLowerCase();
         } else if (detector.equals("COR1") || detector.equals("COR2")) {
             observatory = m.getString("OBSRVTRY").orElse("").replace('_', '-');
-            fullName = observatory + ' ' + detector;
+            displayName = observatory + ' ' + detector;
         } else if (detector.equals("EUVI")) {
             observatory = m.getString("OBSRVTRY").orElse("").replace('_', '-');
-            fullName = observatory + ' ' + detector + ' ' + measurement;
+            displayName = observatory + ' ' + detector + ' ' + measurement;
         } else if (instrument.equals("TRACE")) {
             measurement = m.getString("WAVE_LEN").orElse("");
-            fullName = instrument + ' ' + measurement;
+            displayName = instrument + ' ' + measurement;
         } else if (instrument.equals("XRT")) {
             measurement = m.getString("EC_FW1_").orElse("") + ' ' + m.getString("EC_FW2_").orElse("");
-            fullName = instrument + ' ' + measurement;
+            displayName = instrument + ' ' + measurement;
         } else if (instrument.equals("GOES-R Series Solar Ultraviolet Imager")) {
             instrument = "SUVI";
-            fullName = instrument + ' ' + measurement;
+            displayName = instrument + ' ' + measurement;
         } else if (instrument.equals("COSMO K-Coronagraph")) {
-            fullName = "COSMO KCor";
+            displayName = "COSMO KCor";
         } else {
-            fullName = instrument + ' ' + measurement;
+            displayName = instrument + ' ' + measurement;
         }
     }
 
@@ -322,11 +321,6 @@ public class HelioviewerMetaData extends BaseMetaData {
     @Nonnull
     public String getObservatory() {
         return observatory;
-    }
-
-    @Nonnull
-    public String getFullName() {
-        return fullName;
     }
 
 }

@@ -14,6 +14,9 @@ public interface MetaData {
     int getFrameNumber();
 
     @Nonnull
+    String getDisplayName();
+
+    @Nonnull
     Region getPhysicalRegion();
 
     int getPixelWidth();

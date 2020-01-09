@@ -136,7 +136,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
             fitsTable.updateRowHeights();
             hvArea.setText(hvSB.toString().trim());
 
-            String outFileName = JHVDirectory.EXPORTS.getPath() + m.getFullName().replace(' ', '_') + "__" + TimeUtils.formatFilename(m.getViewpoint().time.milli) + ".fits.xml";
+            String outFileName = JHVDirectory.EXPORTS.getPath() + m.getDisplayName().replace(' ', '_') + "__" + TimeUtils.formatFilename(m.getViewpoint().time.milli) + ".fits.xml";
             exportFitsButton.setEnabled(true);
             exportFitsButton.addActionListener(e -> {
                 try (BufferedWriter writer = Files.newBufferedWriter(Path.of(outFileName), StandardCharsets.UTF_8)) {
