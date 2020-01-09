@@ -62,7 +62,6 @@ public class Movie {
             MoviePanel.unsetMovie();
         } else
             MoviePanel.setMovie(view);
-        setTime(lastTimestamp); // ensure master layer time is used
         timespanChanged();
     }
 
