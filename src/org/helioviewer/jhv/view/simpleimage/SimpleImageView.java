@@ -27,6 +27,7 @@ import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
+import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.view.BaseView;
 
 public class SimpleImageView extends BaseView {
@@ -86,7 +87,7 @@ public class SimpleImageView extends BaseView {
 
     @Nonnull
     @Override
-    public String getXMLMetaData(int frame) {
+    public String getXMLMetaData(JHVDate time) {
         return xml;
     }
 

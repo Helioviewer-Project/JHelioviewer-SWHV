@@ -23,32 +23,32 @@ public class Movie {
 
     public static final int DEF_FPS = 20;
 
-    private static JHVDate getNextTime(AdvanceMode mode, JHVDate time,
-                                       Supplier<JHVDate> getFirst, Supplier<JHVDate> getLast,
-                                       Function<JHVDate, JHVDate> getLower, Function<JHVDate, JHVDate> getHigher) {
-        JHVDate next = mode == AdvanceMode.SwingDown ? getLower.apply(time) : getHigher.apply(time);
+    private static JHVDate nextTime(AdvanceMode mode, JHVDate time,
+                                    Supplier<JHVDate> firstTime, Supplier<JHVDate> lastTime,
+                                    Function<JHVDate, JHVDate> lowerTime, Function<JHVDate, JHVDate> higherTime) {
+        JHVDate next = mode == AdvanceMode.SwingDown ? lowerTime.apply(time) : higherTime.apply(time);
         if (next.milli == time.milli) { // already at the edges
             switch (mode) {
                 case Stop:
-                    if (next.milli == getLast.get().milli) {
+                    if (next.milli == lastTime.get().milli) {
                         return null;
                     }
                     break;
                 case Swing:
-                    if (next.milli == getLast.get().milli) {
+                    if (next.milli == lastTime.get().milli) {
                         setAdvanceMode(AdvanceMode.SwingDown);
-                        return getLower.apply(next);
+                        return lowerTime.apply(next);
                     }
                     break;
                 case SwingDown:
-                    if (next.milli == getFirst.get().milli) {
+                    if (next.milli == firstTime.get().milli) {
                         setAdvanceMode(AdvanceMode.Swing);
-                        return getHigher.apply(next);
+                        return higherTime.apply(next);
                     }
                     break;
                 default: // Loop
-                    if (next.milli == getLast.get().milli) {
-                        return getFirst.get();
+                    if (next.milli == lastTime.get().milli) {
+                        return firstTime.get();
                     }
             }
         }
@@ -96,14 +96,14 @@ public class Movie {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
             View view = layer.getView();
-            JHVDate nextTime = getNextTime(advanceMode, lastTimestamp,
+            JHVDate next = nextTime(advanceMode, lastTimestamp,
                     view::getFirstTime, view::getLastTime,
                     view::getLowerTime, view::getHigherTime);
 
-            if (nextTime == null)
+            if (next == null)
                 pause();
             else
-                setTime(nextTime);
+                setTime(next);
         }
     }
 
@@ -113,15 +113,15 @@ public class Movie {
             View view = layer.getView();
             JHVDate first = view.getFirstTime();
             JHVDate last = view.getLastTime();
-            JHVDate nextTime = getNextTime(advanceMode, lastTimestamp,
+            JHVDate next = nextTime(advanceMode, lastTimestamp,
                     () -> first, () -> last,
                     time -> new JHVDate(Math.max(first.milli, time.milli - deltaT)),
                     time -> new JHVDate(Math.min(last.milli, time.milli + deltaT)));
 
-            if (nextTime == null)
+            if (next == null)
                 pause();
             else
-                syncTime(nextTime);
+                syncTime(next);
         }
     }
 
