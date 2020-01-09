@@ -14,7 +14,7 @@ public class LoadRemoteTask extends LoadViewTask {
     private final APIRequest req;
 
     public LoadRemoteTask(ImageLayer _imageLayer, APIRequest _req) {
-        super(_imageLayer, null);
+        super(_imageLayer);
         req = _req;
         setThreadName("MAIN--LoadRemote");
     }
@@ -23,7 +23,8 @@ public class LoadRemoteTask extends LoadViewTask {
     @Override
     protected View backgroundWork() {
         try {
-            return requestAndOpenRemoteFile(req);
+            APIResponse res = APIRequestManager.requestRemoteFile(req);
+            return res == null ? null : loadView(res.getURI(), req, res);
         } catch (IOException e) {
             Log.error("An error occured while opening the remote file: ", e);
             Message.err("An error occured while opening the remote file: ", e.getMessage(), false);
