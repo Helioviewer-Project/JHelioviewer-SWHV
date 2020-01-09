@@ -71,7 +71,7 @@ public class HelioviewerMetaData extends BaseMetaData {
 
     private void retrieveUnit(MetaDataContainer m) {
         unit = m.getString("BUNIT").orElse(unit);
-        unit = unit.replace("-1", "\u207B\u00B9").replace("-2", "\u207B\u00B2").replace("-3", "\u207B\u00B3").replace(" ", "");
+        unit = unit.replace("-1", "\u207B\u00B9").replace("-2", "\u207B\u00B2").replace("-3", "\u207B\u00B3").replace(" ", "").intern();
 
         // a linear physical LUT
         Optional<Double> mZero = m.getDouble("HV_ZERO");
