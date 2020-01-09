@@ -2,6 +2,7 @@ package org.helioviewer.jhv.io;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Locale;
 
 import javax.annotation.Nullable;
@@ -10,6 +11,7 @@ import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVWorker;
+import org.helioviewer.jhv.view.ManyView;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.fits.FITSView;
 import org.helioviewer.jhv.view.j2k.J2KView;
@@ -33,7 +35,14 @@ class LoadViewTask extends JHVWorker<View, Void> {
             if (uriList == null || uriList.length == 0)
                 throw new IOException("Invalid URI list");
 
-            return loadView(uriList[0], null, null);
+            if (uriList.length == 1) {
+                return loadView(uriList[0], null, null);
+            } else {
+                ArrayList<View> views = new ArrayList<>();
+                for (URI uri : uriList)
+                    views.add(loadView(uri, null, null));
+                return new ManyView(views);
+            }
         } catch (IOException e) {
             Log.error("An error occurred while opening the remote file: ", e);
             Message.err("An error occurred while opening the remote file: ", e.getMessage(), false);
