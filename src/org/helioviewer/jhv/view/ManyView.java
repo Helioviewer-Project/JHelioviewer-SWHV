@@ -173,8 +173,8 @@ public class ManyView implements View {
 
     @Nonnull
     @Override
-    public String getXMLMetaData(JHVDate time) throws Exception {
-        return dateMap.nearestValue(time).view.getXMLMetaData(time);
+    public String getXMLMetaData() throws Exception {
+        return dateMap.get(dateMap.key(targetFrame)).view.getXMLMetaData();
     }
 
 }
