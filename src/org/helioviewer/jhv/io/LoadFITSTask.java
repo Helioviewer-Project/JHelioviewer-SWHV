@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.io;
 
-import java.io.IOException;
 import java.net.URI;
 
 import javax.annotation.Nullable;
@@ -23,9 +22,10 @@ class LoadFITSTask extends LoadViewTask {
     protected View backgroundWork() {
         try {
             if (uriList == null || uriList.length == 0)
-                throw new IOException("Invalid URI list");
+                throw new Exception("Invalid URI list");
 
-            return new FITSView(null, uriList[0]);
+            if (uriList.length == 1)
+                return new FITSView(null, uriList[0]);
         } catch (Exception e) {
             Log.error("An error occured while opening the remote file: ", e);
             Message.err("An error occured while opening the remote file: ", e.getMessage(), false);

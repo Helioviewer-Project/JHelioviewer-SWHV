@@ -10,7 +10,7 @@ public interface Load {
 
     void get(URI uri);
 
-    Load image = new Image();
+    Load.Image image = new Image();
     Load request = new Request();
     Load fits = new FITS();
     Load state = new State();
@@ -23,6 +23,10 @@ public interface Load {
             JHVGlobals.getExecutorService().execute("http".equals(scheme) || "https".equals(scheme) ?
                     new DownloadViewTask(layer, new BaseView(null, uri)) :
                     new LoadViewTask(layer, uri));
+        }
+
+        public void getMultiple(URI... uri) {
+            JHVGlobals.getExecutorService().execute(new LoadViewTask(ImageLayer.create(null), uri));
         }
     }
 

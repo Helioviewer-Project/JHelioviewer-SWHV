@@ -1,6 +1,8 @@
 package org.helioviewer.jhv.view;
 
+import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nonnull;
@@ -32,11 +34,11 @@ public class ManyView implements View {
     private final JHVDateMap<Integer> frameMap = new JHVDateMap<>();
     private int targetFrame;
 
-    public ManyView(View view, View... views) {
-        putDates(view);
-        for (int i = 0; i < views.length; i++) {
-            putDates(views[i]);
-        }
+    public ManyView(List<View> views) throws IOException {
+        if (views.isEmpty())
+            throw new IOException("Empty list of views");
+
+        views.forEach(view -> putDates(view));
         dateMap.index();
         for (int i = 0; i <= dateMap.maxIndex(); i++) {
             frameMap.put(dateMap.key(i), i);

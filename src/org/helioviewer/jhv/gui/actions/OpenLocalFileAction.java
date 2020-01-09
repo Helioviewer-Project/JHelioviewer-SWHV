@@ -4,6 +4,8 @@ import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.net.URI;
+import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
@@ -40,9 +42,16 @@ public class OpenLocalFileAction extends AbstractAction {
         if (fileNames.length > 0 && directory != null) {
             // remember the current directory for future
             Settings.setProperty("path.local", directory);
-            for (File fileName : fileNames) {
-                if (fileName.isFile())
-                    Load.image.get(fileName.toURI());
+            if (fileNames.length == 1 && fileNames[0].isFile()) {
+                Load.image.get(fileNames[0].toURI());
+            } else {
+                ArrayList<URI> uris = new ArrayList<>(fileNames.length);
+                for (File fileName : fileNames) {
+                    if (fileName.isFile())
+                        uris.add(fileName.toURI());
+                }
+                if (!uris.isEmpty())
+                    Load.image.getMultiple(uris.toArray(URI[]::new));
             }
         }
     }
