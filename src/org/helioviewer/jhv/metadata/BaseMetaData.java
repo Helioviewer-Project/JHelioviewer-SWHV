@@ -12,38 +12,45 @@ import org.helioviewer.jhv.position.Position;
 
 class BaseMetaData implements MetaData {
 
-    int frameNumber = 0;
-    Region region;
-    String unit = "";
-    float[] physLUT;
+    protected int frameNumber = 0;
+    protected Region region;
+    protected String displayName = "unknown";
+    protected String unit = "";
+    protected float[] physLUT;
 
-    boolean calculateDepth;
+    protected boolean calculateDepth;
 
-    int pixelW;
-    int pixelH;
-    double unitPerPixelX = 1;
-    double unitPerPixelY = 1;
-    double unitPerArcsec = Double.NaN;
-    double responseFactor = 1;
+    protected int pixelW;
+    protected int pixelH;
+    protected double unitPerPixelX = 1;
+    protected double unitPerPixelY = 1;
+    protected double unitPerArcsec = Double.NaN;
+    protected double responseFactor = 1;
 
-    Position viewpoint = Sun.StartEarth;
-    double innerRadius = 0;
-    double outerRadius = Double.MAX_VALUE;
+    protected Position viewpoint = Sun.StartEarth;
+    protected double innerRadius = 0;
+    protected double outerRadius = Double.MAX_VALUE;
 
-    double crota = 0;
-    double scrota = 0;
-    double ccrota = 1;
+    protected double crota = 0;
+    protected double scrota = 0;
+    protected double ccrota = 1;
 
-    double sector0 = 0;
-    double sector1 = 0;
+    protected double sector0 = 0;
+    protected double sector1 = 0;
 
     // Serves only for LASCO cutOff edges
-    double cutOffValue = -1;
-    Vec2 cutOffDirection = Vec2.ZERO;
+    protected double cutOffValue = -1;
+    protected Vec2 cutOffDirection = Vec2.ZERO;
 
     @Override
     public int getFrameNumber() {
         return frameNumber;
+    }
+
+    @Nonnull
+    @Override
+    public String getDisplayName() {
+        return displayName;
     }
 
     @Nonnull
