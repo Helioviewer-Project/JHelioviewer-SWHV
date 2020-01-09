@@ -18,10 +18,10 @@ import org.helioviewer.jhv.view.simpleimage.SimpleImageView;
 class LoadViewTask extends JHVWorker<View, Void> {
 
     private final ImageLayer imageLayer;
-    protected final URI uri;
+    protected final URI[] uriList;
 
-    LoadViewTask(ImageLayer _imageLayer, URI _uri) {
-        uri = _uri;
+    LoadViewTask(ImageLayer _imageLayer, URI... _uriList) {
+        uriList = _uriList;
         imageLayer = _imageLayer;
         setThreadName("MAIN--LoadURI");
     }
@@ -30,7 +30,10 @@ class LoadViewTask extends JHVWorker<View, Void> {
     @Override
     protected View backgroundWork() {
         try {
-            return loadView(uri, null, null);
+            if (uriList == null || uriList.length == 0)
+                throw new IOException("Invalid URI list");
+
+            return loadView(uriList[0], null, null);
         } catch (IOException e) {
             Log.error("An error occurred while opening the remote file: ", e);
             Message.err("An error occurred while opening the remote file: ", e.getMessage(), false);
@@ -55,7 +58,7 @@ class LoadViewTask extends JHVWorker<View, Void> {
     }
 
     @Nullable
-    private static View loadView(URI uri, APIRequest req, APIResponse res) throws IOException {
+    protected static View loadView(URI uri, APIRequest req, APIResponse res) throws IOException {
         if (uri == null || uri.getScheme() == null) {
             throw new IOException("Invalid URI: " + uri);
         }
@@ -76,12 +79,6 @@ class LoadViewTask extends JHVWorker<View, Void> {
             throw new IOException(e);
         }
         return null;
-    }
-
-    @Nullable
-    protected static View requestAndOpenRemoteFile(APIRequest req) throws IOException {
-        APIResponse res = APIRequestManager.requestRemoteFile(req);
-        return res == null ? null : loadView(res.getURI(), req, res);
     }
 
 }
