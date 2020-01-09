@@ -201,7 +201,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     @Override
     public String getName() {
-        return worker != null ? "Loading..." : view.getName();
+        return imageData == null ? "Loading..." : imageData.getMetaData().getDisplayName();
     }
 
     @Nullable

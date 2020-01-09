@@ -80,11 +80,6 @@ public class ManyView implements View {
         return false;
     }
 
-    @Override
-    public String getName() {
-        return dateMap.get(dateMap.firstKey()).view.getName();
-    }
-
     @Nullable
     @Override
     public LUT getDefaultLUT() {
