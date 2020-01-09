@@ -16,7 +16,18 @@ import org.helioviewer.jhv.time.JHVDateMap;
 
 public class ManyView implements View {
 
-    private final JHVDateMap<View> dateMap = new JHVDateMap<>();
+    private static class ViewFrame {
+        final View view;
+        final int frame;
+
+        ViewFrame(View _view, int _frame) {
+            view = _view;
+            frame = _frame;
+        }
+
+    }
+
+    private final JHVDateMap<ViewFrame> dateMap = new JHVDateMap<>();
     private final View[] views;
 
     public ManyView(View view, View ... _views) {
@@ -31,7 +42,7 @@ public class ManyView implements View {
     private View putDates(View v) {
         int m = v.getMaximumFrameNumber();
         for (int i = 0; i <= m; i++) {
-            dateMap.put(v.getFrameTime(i), v);
+            dateMap.put(v.getFrameTime(i), new ViewFrame(v, i));
         }
         return v;
     }
@@ -108,7 +119,8 @@ public class ManyView implements View {
     @Nullable
     @Override
     public AtomicBoolean getFrameCacheStatus(int frame) {
-        return null;
+        ViewFrame viewFrame = dateMap.get(dateMap.key(frame));
+        return viewFrame.view.getFrameCacheStatus(viewFrame.frame);
     }
 
     @Override
@@ -148,13 +160,14 @@ public class ManyView implements View {
 
     @Override
     public MetaData getMetaData(JHVDate time) {
-        return dateMap.nearestValue(time).getMetaData(time);
+        return dateMap.get(time).view.getMetaData(time);
     }
 
     @Nonnull
     @Override
-    public String getXMLMetaData(JHVDate time) throws Exception {
-        return dateMap.nearestValue(time).getXMLMetaData(time);
+    public String getXMLMetaData(int frame) throws Exception {
+        ViewFrame viewFrame = dateMap.get(dateMap.key(frame));
+        return viewFrame.view.getXMLMetaData(viewFrame.frame);
     }
 
 }

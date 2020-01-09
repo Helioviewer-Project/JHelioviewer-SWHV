@@ -122,7 +122,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
                 "Observation Date: " + m.getViewpoint().time);
 
         try {
-            String xml = layer.getView().getXMLMetaData(m.getViewpoint().time);
+            String xml = layer.getView().getXMLMetaData(m.getFrameNumber());
             Document doc = XMLUtils.parse(xml);
 
             // Send xml data to meta data dialog box

@@ -324,8 +324,8 @@ public class J2KView extends BaseView {
     // very slow
     @Nonnull
     @Override
-    public String getXMLMetaData(JHVDate time) throws Exception {
-        return kduSource.extractXMLString(dateMap.nearestValue(time));
+    public String getXMLMetaData(int frame) throws Exception {
+        return kduSource.extractXMLString(frame);
     }
 
     public ResolutionLevel getResolutionLevel(int frame, int level) {
