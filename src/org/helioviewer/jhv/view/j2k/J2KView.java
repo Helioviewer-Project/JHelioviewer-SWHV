@@ -197,13 +197,14 @@ public class J2KView extends BaseView {
     }
 
     @Override
-    public void setNearestFrame(JHVDate time) {
+    public boolean setNearestFrame(JHVDate time) {
         int frame = dateMap.nearestValue(time);
         if (frame != targetFrame) {
             if (frame > cacheStatus.getPartialUntil())
-                return;
+                return false;
             targetFrame = frame;
         }
+        return true;
     }
 
     @Override
