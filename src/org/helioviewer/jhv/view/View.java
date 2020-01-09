@@ -26,8 +26,6 @@ public interface View {
 
     boolean isLocal();
 
-    String getName();
-
     @Nullable
     LUT getDefaultLUT();
 

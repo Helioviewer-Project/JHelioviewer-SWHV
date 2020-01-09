@@ -134,6 +134,10 @@ public class J2KView extends BaseView {
         return frame < 0 || frame >= cacheKey.length ? 0 : cacheKey[frame];
     }
 
+    String getName() {
+        return metaData[0].getDisplayName();
+    }
+
     // if instance was built before cancelling
     private static class Abolisher implements Runnable {
 

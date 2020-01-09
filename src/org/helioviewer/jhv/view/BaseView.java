@@ -45,11 +45,6 @@ public class BaseView implements View {
         return isLocal;
     }
 
-    @Override
-    public String getName() {
-        return metaData[0].getDisplayName();
-    }
-
     @Nullable
     @Override
     public APIRequest getAPIRequest() {
