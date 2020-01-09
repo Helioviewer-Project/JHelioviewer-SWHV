@@ -17,6 +17,7 @@ import org.helioviewer.jhv.time.JHVDateMap;
 public class ManyView implements View {
 
     private static class ViewFrame {
+
         final View view;
         final int frame;
 
@@ -29,14 +30,12 @@ public class ManyView implements View {
 
     private final JHVDateMap<ViewFrame> dateMap = new JHVDateMap<>();
     private final JHVDateMap<Integer> frameMap = new JHVDateMap<>();
-    private final View[] views;
     private int targetFrame;
 
-    public ManyView(View view, View ... _views) {
-        views = new View[_views.length + 1];
-        views[0] = putDates(view);
-        for (int i = 0; i < _views.length; i++) {
-            views[i + 1] = putDates(_views[i]);
+    public ManyView(View view, View ... views) {
+        putDates(view);
+        for (int i = 0; i < views.length; i++) {
+            putDates(views[i]);
         }
         dateMap.index();
         for (int i = 0; i <= dateMap.maxIndex(); i++) {
@@ -60,8 +59,7 @@ public class ManyView implements View {
 
     @Override
     public void abolish() {
-        for (View v : views)
-            v.abolish();
+        dateMap.values().forEach(viewFrame -> viewFrame.view.abolish());
     }
 
     @Override
@@ -81,13 +79,13 @@ public class ManyView implements View {
 
     @Override
     public String getName() {
-        return views[0].getName();
+        return dateMap.get(dateMap.firstKey()).view.getName();
     }
 
     @Nullable
     @Override
     public LUT getDefaultLUT() {
-        return views[0].getDefaultLUT();
+        return dateMap.get(dateMap.firstKey()).view.getDefaultLUT();
     }
 
     @Override
@@ -107,8 +105,7 @@ public class ManyView implements View {
 
     @Override
     public void setDataHandler(ImageDataHandler dataHandler) {
-        for (View v : views)
-            v.setDataHandler(dataHandler);
+        dateMap.values().forEach(viewFrame -> viewFrame.view.setDataHandler(dataHandler));
     }
 
     @Override
