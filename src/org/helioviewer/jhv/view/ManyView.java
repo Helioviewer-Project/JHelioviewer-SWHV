@@ -66,7 +66,7 @@ public class ManyView implements View {
 
     @Override
     public void decode(Position viewpoint, double pixFactor, double factor) {
-
+        dateMap.get(dateMap.key(targetFrame)).view.decode(viewpoint, pixFactor, factor);
     }
 
     @Override
@@ -175,9 +175,8 @@ public class ManyView implements View {
 
     @Nonnull
     @Override
-    public String getXMLMetaData(int frame) throws Exception {
-        ViewFrame viewFrame = dateMap.get(dateMap.key(frame));
-        return viewFrame.view.getXMLMetaData(viewFrame.frame);
+    public String getXMLMetaData(JHVDate time) throws Exception {
+        return dateMap.nearestValue(time).view.getXMLMetaData(time);
     }
 
 }

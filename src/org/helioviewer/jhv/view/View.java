@@ -65,6 +65,6 @@ public interface View {
     // -->
 
     @Nonnull
-    String getXMLMetaData(int frame) throws Exception;
+    String getXMLMetaData(JHVDate time) throws Exception;
 
 }
