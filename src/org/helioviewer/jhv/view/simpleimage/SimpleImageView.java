@@ -75,7 +75,7 @@ public class SimpleImageView extends BaseView {
         try {
             m = new XMLMetaDataContainer(xml).getHVMetaData(0, true);
         } catch (Exception ignore) {
-            m = new PixelBasedMetaData(w, h, 0);
+            m = new PixelBasedMetaData(w, h, 0, uri);
             xml = "<meta/>";
         }
 

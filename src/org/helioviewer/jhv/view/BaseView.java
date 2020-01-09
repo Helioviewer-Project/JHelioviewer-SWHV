@@ -26,12 +26,13 @@ public class BaseView implements View {
 
     protected ImageData imageData;
     protected LUT builtinLUT;
-    protected MetaData[] metaData = {new PixelBasedMetaData(1, 1, 0)};
+    protected MetaData[] metaData = new MetaData[1];
 
     public BaseView(APIRequest _request, URI _uri) {
         request = _request;
         uri = _uri;
         isLocal = uri != null && "file".equals(uri.getScheme());
+        metaData[0] = new PixelBasedMetaData(1, 1, 0, uri);
     }
 
     @Override
@@ -46,15 +47,7 @@ public class BaseView implements View {
 
     @Override
     public String getName() {
-        MetaData m = metaData[0];
-        if (m instanceof HelioviewerMetaData)
-            return ((HelioviewerMetaData) m).getDisplayName();
-        else if (uri == null)
-            return "Loading...";
-        else {
-            String name = uri.getPath();
-            return name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
-        }
+        return metaData[0].getDisplayName();
     }
 
     @Nullable
