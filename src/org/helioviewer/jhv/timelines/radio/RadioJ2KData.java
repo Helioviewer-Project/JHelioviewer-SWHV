@@ -39,7 +39,7 @@ class RadioJ2KData implements ImageDataHandler {
             j2kWidth = resLevel.width;
             j2kHeight = resLevel.height;
 
-            XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer(_view.getXMLMetaData(0));
+            XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer(_view.getXMLMetaData());
             endFreq = hvMetaData.getRequiredDouble("STARTFRQ");
             startFreq = hvMetaData.getRequiredDouble("END-FREQ");
             startDate = TimeUtils.parse(hvMetaData.getRequiredString("DATE-OBS"));
