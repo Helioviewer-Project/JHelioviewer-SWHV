@@ -28,6 +28,7 @@ public class ManyView implements View {
     }
 
     private final JHVDateMap<ViewFrame> dateMap = new JHVDateMap<>();
+    private final JHVDateMap<Integer> frameMap = new JHVDateMap<>();
     private final View[] views;
     private int targetFrame;
 
@@ -38,6 +39,9 @@ public class ManyView implements View {
             views[i + 1] = putDates(_views[i]);
         }
         dateMap.index();
+        for (int i = 0; i <= dateMap.maxIndex(); i++) {
+            frameMap.put(dateMap.key(i), i);
+        }
     }
 
     private View putDates(View v) {
@@ -141,15 +145,12 @@ public class ManyView implements View {
 
     @Override
     public boolean setNearestFrame(JHVDate time) {
-/*
-        int frame = dateMap.nearestValue(time);
-        if (frame != targetFrame) {
-            if (frame > cacheStatus.getPartialUntil())
-                return;
-            targetFrame = frame;
+        ViewFrame viewFrame = dateMap.nearestValue(time);
+        if (viewFrame.view.setNearestFrame(time)) {
+            targetFrame = frameMap.nearestValue(time);
+            return true;
         }
-*/
-        return true;
+        return false;
     }
 
     @Override
@@ -169,7 +170,7 @@ public class ManyView implements View {
 
     @Override
     public MetaData getMetaData(JHVDate time) {
-        return dateMap.get(time).view.getMetaData(time);
+        return dateMap.nearestValue(time).view.getMetaData(time);
     }
 
     @Nonnull
