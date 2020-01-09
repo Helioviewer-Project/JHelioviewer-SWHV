@@ -32,7 +32,7 @@ public class ManyView implements View {
     private final JHVDateMap<Integer> frameMap = new JHVDateMap<>();
     private int targetFrame;
 
-    public ManyView(View view, View ... views) {
+    public ManyView(View view, View... views) {
         putDates(view);
         for (int i = 0; i < views.length; i++) {
             putDates(views[i]);
@@ -41,6 +41,7 @@ public class ManyView implements View {
         for (int i = 0; i <= dateMap.maxIndex(); i++) {
             frameMap.put(dateMap.key(i), i);
         }
+        // unused J2KViews should be abolished by their reaper
     }
 
     private View putDates(View v) {
