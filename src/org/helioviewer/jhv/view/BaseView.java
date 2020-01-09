@@ -163,7 +163,7 @@ public class BaseView implements View {
 
     @Nonnull
     @Override
-    public String getXMLMetaData(int frame) throws Exception {
+    public String getXMLMetaData(JHVDate time) throws Exception {
         return "<meta/>";
     }
 
