@@ -4,8 +4,9 @@ import javax.annotation.Nonnull;
 
 public class JHVDate implements Comparable<JHVDate> {
 
-    private final String string;
     public final long milli;
+    private final int hash;
+    private final String string;
 
     public JHVDate(String date) {
         this(TimeUtils.parse(date));
@@ -15,6 +16,7 @@ public class JHVDate implements Comparable<JHVDate> {
         if (_milli < 0)
             throw new IllegalArgumentException("Argument cannot be negative");
         milli = _milli;
+        hash = (int) (milli ^ (milli >>> 32));
         string = TimeUtils.format(milli);
     }
 
@@ -35,7 +37,7 @@ public class JHVDate implements Comparable<JHVDate> {
 
     @Override
     public int hashCode() {
-        return (int) (milli ^ (milli >>> 32));
+        return hash;
     }
 
     @Override
