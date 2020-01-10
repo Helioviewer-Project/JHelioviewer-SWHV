@@ -5,7 +5,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 @SuppressWarnings("serial")
-public class JHVDateMap<V> extends TreeMap<JHVDate, V> {
+public class TimeMap<V> extends TreeMap<JHVDate, V> {
 
     private HashSet<JHVDate> timeSet;
     private JHVDate[] timeArray;
@@ -71,7 +71,7 @@ public class JHVDateMap<V> extends TreeMap<JHVDate, V> {
         return get(nearestKey(time));
     }
 
-    public V indexValue(int idx) {
+    public V indexedValue(int idx) {
         return get(key(idx));
     }
 
