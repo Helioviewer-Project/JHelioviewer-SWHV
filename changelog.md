@@ -17,3 +17,4 @@
 - Request SOLO trajectory backdated 10 years
 - Use install4j for packaging installation
 - Support setting playback speed in time period per second
+- Play sequence of files as movie

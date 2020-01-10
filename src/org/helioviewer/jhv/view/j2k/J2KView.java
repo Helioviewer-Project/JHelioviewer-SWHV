@@ -43,7 +43,7 @@ public class J2KView extends BaseView {
     private int targetFrame;
 
     private final long[] cacheKey;
-    private final JHVDateMap<Integer> dateMap = new JHVDateMap<>();
+    private final JHVDateMap<Integer> frameMap = new JHVDateMap<>();
 
     private final Cleaner.Cleanable abolishable;
     private final DecodeExecutor decoder = new DecodeExecutor();
@@ -90,13 +90,13 @@ public class J2KView extends BaseView {
 
             kduSource.extractMetaData(metaData);
             for (int i = 0; i <= maxFrame; i++) {
-                dateMap.put(metaData[i].getViewpoint().time, i);
+                frameMap.put(metaData[i].getViewpoint().time, i);
             }
-            dateMap.index();
-            if (dateMap.maxIndex() != maxFrame)
+            frameMap.buildIndex();
+            if (frameMap.maxIndex() != maxFrame)
                 throw new Exception("Duplicated time stamps");
             for (int i = 0; i <= maxFrame; i++) {
-                if (dateMap.key(i) != metaData[i].getViewpoint().time)
+                if (frameMap.key(i) != metaData[i].getViewpoint().time)
                     throw new Exception("Badly ordered metadata");
             }
 
@@ -104,7 +104,7 @@ public class J2KView extends BaseView {
                 if (maxFrame + 1 != frames.length)
                     Log.warn(uri + ": expected " + (maxFrame + 1) + "frames, got " + frames.length);
                 for (int i = 0; i < Math.min(maxFrame + 1, frames.length); i++) {
-                    JHVDate d = dateMap.key(i);
+                    JHVDate d = frameMap.key(i);
                     if (d.milli != frames[i] * 1000) {
                         cacheKey[i] = 0; // uncacheable
                         Log.warn(uri + "[" + i + "]: expected " + d + ", got " + new JHVDate(frames[i] * 1000));
@@ -194,17 +194,17 @@ public class J2KView extends BaseView {
 
     @Override
     public JHVDate getFirstTime() {
-        return dateMap.firstKey();
+        return frameMap.firstKey();
     }
 
     @Override
     public JHVDate getLastTime() {
-        return dateMap.lastKey();
+        return frameMap.lastKey();
     }
 
     @Override
     public boolean setNearestFrame(JHVDate time) {
-        int frame = dateMap.get(dateMap.nearestKey(time));
+        int frame = frameMap.nearestValue(time);
         if (frame != targetFrame) {
             if (frame > cacheStatus.getPartialUntil())
                 return false;
@@ -215,27 +215,27 @@ public class J2KView extends BaseView {
 
     @Override
     public JHVDate getFrameTime(int frame) {
-        return dateMap.key(frame);
+        return frameMap.key(frame);
     }
 
     @Override
     public JHVDate getNearestTime(JHVDate time) {
-        return dateMap.nearestKey(time);
+        return frameMap.nearestKey(time);
     }
 
     @Override
     public JHVDate getLowerTime(JHVDate time) {
-        return dateMap.lowerKey(time);
+        return frameMap.lowerKey(time);
     }
 
     @Override
     public JHVDate getHigherTime(JHVDate time) {
-        return dateMap.higherKey(time);
+        return frameMap.higherKey(time);
     }
 
     @Override
     public MetaData getMetaData(JHVDate time) {
-        return metaData[dateMap.get(dateMap.nearestKey(time))];
+        return metaData[frameMap.nearestValue(time)];
     }
 
     private volatile boolean isDownloading;
