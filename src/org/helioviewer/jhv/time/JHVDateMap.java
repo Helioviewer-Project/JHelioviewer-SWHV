@@ -1,16 +1,21 @@
 package org.helioviewer.jhv.time;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TreeMap;
 
 @SuppressWarnings("serial")
 public class JHVDateMap<V> extends TreeMap<JHVDate, V> {
 
-    private JHVDate[] times;
+    private HashSet<JHVDate> timeSet;
+    private JHVDate[] timeArray;
     private int maxIdx;
 
     public void index() {
-        times = navigableKeySet().toArray(JHVDate[]::new);
-        maxIdx = times.length - 1;
+        Set<JHVDate> keySet = navigableKeySet();
+        timeSet = new HashSet<>(keySet);
+        timeArray = keySet.toArray(JHVDate[]::new);
+        maxIdx = timeArray.length - 1;
     }
 
     public int maxIndex() {
@@ -19,12 +24,12 @@ public class JHVDateMap<V> extends TreeMap<JHVDate, V> {
 
     @Override
     public JHVDate firstKey() {
-        return times[0];
+        return timeArray[0];
     }
 
     @Override
     public JHVDate lastKey() {
-        return times[maxIdx];
+        return timeArray[maxIdx];
     }
 
     public JHVDate key(int idx) {
@@ -33,10 +38,13 @@ public class JHVDateMap<V> extends TreeMap<JHVDate, V> {
         } else if (idx > maxIdx) {
             idx = maxIdx;
         }
-        return times[idx];
+        return timeArray[idx];
     }
 
     public JHVDate nearestKey(JHVDate time) {
+        if (timeSet.contains(time)) // common case
+            return time;
+
         JHVDate c = ceilingKey(time);
         JHVDate f = floorKey(time);
 
@@ -50,13 +58,13 @@ public class JHVDateMap<V> extends TreeMap<JHVDate, V> {
     @Override
     public JHVDate lowerKey(JHVDate time) {
         JHVDate k = super.lowerKey(time);
-        return k == null ? times[0] : k;
+        return k == null ? timeArray[0] : k;
     }
 
     @Override
     public JHVDate higherKey(JHVDate time) {
         JHVDate k = super.higherKey(time);
-        return k == null ? times[maxIdx] : k;
+        return k == null ? timeArray[maxIdx] : k;
     }
 
 }
