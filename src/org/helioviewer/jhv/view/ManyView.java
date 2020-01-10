@@ -14,7 +14,7 @@ import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.time.JHVDate;
-import org.helioviewer.jhv.time.JHVDateMap;
+import org.helioviewer.jhv.time.TimeMap;
 
 public class ManyView implements View {
 
@@ -22,18 +22,18 @@ public class ManyView implements View {
 
         final View view;
         final JHVDate timeView;
-        final int frameView;
-        int frameMany;
+        final int idxView;
+        int idxMany;
 
-        FrameInfo(View _view, JHVDate _timeView, int _frameView) {
+        FrameInfo(View _view, JHVDate _timeView, int _idxView) {
             view = _view;
             timeView = _timeView;
-            frameView = _frameView;
+            idxView = _idxView;
         }
 
     }
 
-    private final JHVDateMap<FrameInfo> frameMap = new JHVDateMap<>();
+    private final TimeMap<FrameInfo> frameMap = new TimeMap<>();
     private int targetFrame;
 
     public ManyView(List<View> views) throws IOException {
@@ -43,7 +43,7 @@ public class ManyView implements View {
         views.forEach(this::putDates);
         frameMap.buildIndex();
         for (int i = 0; i <= frameMap.maxIndex(); i++) {
-            frameMap.indexValue(i).frameMany = i;
+            frameMap.indexedValue(i).idxMany = i;
         }
         // unused J2KViews should be abolished by their reaper
     }
@@ -69,7 +69,7 @@ public class ManyView implements View {
 
     @Override
     public void decode(Position viewpoint, double pixFactor, double factor) {
-        frameMap.indexValue(targetFrame).view.decode(viewpoint, pixFactor, factor);
+        frameMap.indexedValue(targetFrame).view.decode(viewpoint, pixFactor, factor);
     }
 
     @Override
@@ -85,7 +85,7 @@ public class ManyView implements View {
     @Nullable
     @Override
     public LUT getDefaultLUT() {
-        return frameMap.indexValue(0).view.getDefaultLUT();
+        return frameMap.indexedValue(0).view.getDefaultLUT();
     }
 
     @Override
@@ -121,8 +121,8 @@ public class ManyView implements View {
     @Nullable
     @Override
     public AtomicBoolean getFrameCacheStatus(int frame) {
-        FrameInfo frameInfo = frameMap.indexValue(frame);
-        return frameInfo.view.getFrameCacheStatus(frameInfo.frameView);
+        FrameInfo frameInfo = frameMap.indexedValue(frame);
+        return frameInfo.view.getFrameCacheStatus(frameInfo.idxView);
     }
 
     @Override
@@ -144,7 +144,7 @@ public class ManyView implements View {
     public boolean setNearestFrame(JHVDate time) {
         FrameInfo frameInfo = frameMap.nearestValue(time);
         if (frameInfo.view.setNearestFrame(frameInfo.timeView)) {
-            targetFrame = frameInfo.frameMany;
+            targetFrame = frameInfo.idxMany;
             return true;
         }
         return false;
@@ -174,7 +174,7 @@ public class ManyView implements View {
     @Nonnull
     @Override
     public String getXMLMetaData() throws Exception {
-        return frameMap.indexValue(targetFrame).view.getXMLMetaData();
+        return frameMap.indexedValue(targetFrame).view.getXMLMetaData();
     }
 
 }

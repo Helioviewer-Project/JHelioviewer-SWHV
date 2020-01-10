@@ -22,7 +22,7 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.time.JHVDate;
-import org.helioviewer.jhv.time.JHVDateMap;
+import org.helioviewer.jhv.time.TimeMap;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.j2k.cache.CacheStatus;
 import org.helioviewer.jhv.view.j2k.cache.CacheStatusLocal;
@@ -43,7 +43,7 @@ public class J2KView extends BaseView {
     private int targetFrame;
 
     private final long[] cacheKey;
-    private final JHVDateMap<Integer> frameMap = new JHVDateMap<>();
+    private final TimeMap<Integer> frameMap = new TimeMap<>();
 
     private final Cleaner.Cleanable abolishable;
     private final DecodeExecutor decoder = new DecodeExecutor();
