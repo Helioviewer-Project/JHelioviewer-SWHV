@@ -204,7 +204,7 @@ public class J2KView extends BaseView {
 
     @Override
     public boolean setNearestFrame(JHVDate time) {
-        int frame = dateMap.nearestValue(time);
+        int frame = dateMap.get(dateMap.nearestKey(time));
         if (frame != targetFrame) {
             if (frame > cacheStatus.getPartialUntil())
                 return false;
@@ -235,7 +235,7 @@ public class J2KView extends BaseView {
 
     @Override
     public MetaData getMetaData(JHVDate time) {
-        return metaData[dateMap.nearestValue(time)];
+        return metaData[dateMap.get(dateMap.nearestKey(time))];
     }
 
     private volatile boolean isDownloading;

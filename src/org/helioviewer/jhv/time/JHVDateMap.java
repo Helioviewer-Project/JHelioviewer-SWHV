@@ -47,10 +47,6 @@ public class JHVDateMap<V> extends TreeMap<JHVDate, V> {
         return f;
     }
 
-    public V nearestValue(JHVDate time) {
-        return get(nearestKey(time));
-    }
-
     @Override
     public JHVDate lowerKey(JHVDate time) {
         JHVDate k = super.lowerKey(time);
