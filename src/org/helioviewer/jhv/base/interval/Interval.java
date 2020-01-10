@@ -10,12 +10,19 @@ public class Interval implements Comparable<Interval> {
 
     public final long start;
     public final long end;
+    private final int hash;
 
     public Interval(long _start, long _end) {
         if (_end < _start)
             throw new IllegalArgumentException("End cannot be earlier than start");
         start = _start;
         end = _end;
+        hash = computeHash(start, end);
+    }
+
+    private static int computeHash(long a, long b) {
+        int result = (int) (a ^ (a >>> 32));
+        return 31 * result + (int) (b ^ (b >>> 32));
     }
 
     private boolean containsPointInclusive(long time) {
@@ -52,8 +59,7 @@ public class Interval implements Comparable<Interval> {
 
     @Override
     public int hashCode() {
-        int result = (int) (start ^ (start >>> 32));
-        return 31 * result + (int) (end ^ (end >>> 32));
+        return hash;
     }
 
     @Override
