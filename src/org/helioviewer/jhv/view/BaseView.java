@@ -58,6 +58,7 @@ public class BaseView implements View {
     @Override
     public void decode(Position viewpoint, double pixFactor, double factor) {
         if (dataHandler != null) {
+            imageData.setUploaded(false); // force upload for ManyView
             imageData.setViewpoint(viewpoint);
             dataHandler.handleData(imageData);
         }
