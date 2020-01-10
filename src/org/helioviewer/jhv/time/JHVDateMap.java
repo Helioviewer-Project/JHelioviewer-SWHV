@@ -11,15 +11,11 @@ public class JHVDateMap<V> extends TreeMap<JHVDate, V> {
     private JHVDate[] timeArray;
     private int maxIdx;
 
-    public void index() {
+    public void buildIndex() {
         Set<JHVDate> keySet = navigableKeySet();
         timeSet = new HashSet<>(keySet);
         timeArray = keySet.toArray(JHVDate[]::new);
         maxIdx = timeArray.length - 1;
-    }
-
-    public int maxIndex() {
-        return maxIdx;
     }
 
     @Override
@@ -30,6 +26,22 @@ public class JHVDateMap<V> extends TreeMap<JHVDate, V> {
     @Override
     public JHVDate lastKey() {
         return timeArray[maxIdx];
+    }
+
+    @Override
+    public JHVDate lowerKey(JHVDate time) {
+        JHVDate k = super.lowerKey(time);
+        return k == null ? timeArray[0] : k;
+    }
+
+    @Override
+    public JHVDate higherKey(JHVDate time) {
+        JHVDate k = super.higherKey(time);
+        return k == null ? timeArray[maxIdx] : k;
+    }
+
+    public int maxIndex() {
+        return maxIdx;
     }
 
     public JHVDate key(int idx) {
@@ -55,16 +67,12 @@ public class JHVDateMap<V> extends TreeMap<JHVDate, V> {
         return f;
     }
 
-    @Override
-    public JHVDate lowerKey(JHVDate time) {
-        JHVDate k = super.lowerKey(time);
-        return k == null ? timeArray[0] : k;
+    public V nearestValue(JHVDate time) {
+        return get(nearestKey(time));
     }
 
-    @Override
-    public JHVDate higherKey(JHVDate time) {
-        JHVDate k = super.higherKey(time);
-        return k == null ? timeArray[maxIdx] : k;
+    public V indexValue(int idx) {
+        return get(key(idx));
     }
 
 }

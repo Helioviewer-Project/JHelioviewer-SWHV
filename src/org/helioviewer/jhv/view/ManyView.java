@@ -2,7 +2,6 @@ package org.helioviewer.jhv.view;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -19,43 +18,42 @@ import org.helioviewer.jhv.time.JHVDateMap;
 
 public class ManyView implements View {
 
-    private static class ViewFrame {
+    private static class FrameInfo {
 
         final View view;
-        final int frame;
-        final JHVDate time;
+        final JHVDate timeView;
+        final int frameView;
+        int frameMany;
 
-        ViewFrame(View _view, int _frame, JHVDate _time) {
+        FrameInfo(View _view, JHVDate _timeView, int _frameView) {
             view = _view;
-            frame = _frame;
-            time = _time;
+            timeView = _timeView;
+            frameView = _frameView;
         }
 
     }
 
-    private final JHVDateMap<ViewFrame> dateMap = new JHVDateMap<>();
-    private final HashMap<JHVDate, Integer> frameMap = new HashMap<>();
+    private final JHVDateMap<FrameInfo> frameMap = new JHVDateMap<>();
     private int targetFrame;
 
     public ManyView(List<View> views) throws IOException {
         if (views.isEmpty())
             throw new IOException("Empty list of views");
 
-        views.forEach(view -> putDates(view));
-        dateMap.index();
-        for (int i = 0; i <= dateMap.maxIndex(); i++) {
-            frameMap.put(dateMap.key(i), i);
+        views.forEach(this::putDates);
+        frameMap.buildIndex();
+        for (int i = 0; i <= frameMap.maxIndex(); i++) {
+            frameMap.indexValue(i).frameMany = i;
         }
         // unused J2KViews should be abolished by their reaper
     }
 
-    private View putDates(View v) {
+    private void putDates(View v) {
         int m = v.getMaximumFrameNumber();
         for (int i = 0; i <= m; i++) {
             JHVDate t = v.getFrameTime(i);
-            dateMap.put(t, new ViewFrame(v, i, t));
+            frameMap.put(t, new FrameInfo(v, t, i));
         }
-        return v;
     }
 
     @Nullable
@@ -66,12 +64,12 @@ public class ManyView implements View {
 
     @Override
     public void abolish() {
-        dateMap.values().forEach(viewFrame -> viewFrame.view.abolish());
+        frameMap.values().forEach(frameInfo -> frameInfo.view.abolish());
     }
 
     @Override
     public void decode(Position viewpoint, double pixFactor, double factor) {
-        dateMap.get(dateMap.key(targetFrame)).view.decode(viewpoint, pixFactor, factor);
+        frameMap.indexValue(targetFrame).view.decode(viewpoint, pixFactor, factor);
     }
 
     @Override
@@ -87,12 +85,12 @@ public class ManyView implements View {
     @Nullable
     @Override
     public LUT getDefaultLUT() {
-        return dateMap.get(dateMap.firstKey()).view.getDefaultLUT();
+        return frameMap.indexValue(0).view.getDefaultLUT();
     }
 
     @Override
     public boolean isMultiFrame() {
-        return dateMap.maxIndex() > 0;
+        return frameMap.maxIndex() > 0;
     }
 
     @Override
@@ -102,12 +100,12 @@ public class ManyView implements View {
 
     @Override
     public int getMaximumFrameNumber() {
-        return dateMap.maxIndex();
+        return frameMap.maxIndex();
     }
 
     @Override
     public void setDataHandler(ImageDataHandler dataHandler) {
-        dateMap.values().forEach(viewFrame -> viewFrame.view.setDataHandler(dataHandler));
+        frameMap.values().forEach(frameInfo -> frameInfo.view.setDataHandler(dataHandler));
     }
 
     @Override
@@ -123,31 +121,30 @@ public class ManyView implements View {
     @Nullable
     @Override
     public AtomicBoolean getFrameCacheStatus(int frame) {
-        ViewFrame viewFrame = dateMap.get(dateMap.key(frame));
-        return viewFrame.view.getFrameCacheStatus(viewFrame.frame);
+        FrameInfo frameInfo = frameMap.indexValue(frame);
+        return frameInfo.view.getFrameCacheStatus(frameInfo.frameView);
     }
 
     @Override
     public JHVDate getFrameTime(int frame) {
-        return dateMap.key(frame);
+        return frameMap.key(frame);
     }
 
     @Override
     public JHVDate getFirstTime() {
-        return dateMap.firstKey();
+        return frameMap.firstKey();
     }
 
     @Override
     public JHVDate getLastTime() {
-        return dateMap.lastKey();
+        return frameMap.lastKey();
     }
 
     @Override
     public boolean setNearestFrame(JHVDate time) {
-        JHVDate t = dateMap.nearestKey(time);
-        ViewFrame viewFrame = dateMap.get(t);
-        if (viewFrame.view.setNearestFrame(viewFrame.time)) {
-            targetFrame = frameMap.get(t);
+        FrameInfo frameInfo = frameMap.nearestValue(time);
+        if (frameInfo.view.setNearestFrame(frameInfo.timeView)) {
+            targetFrame = frameInfo.frameMany;
             return true;
         }
         return false;
@@ -155,29 +152,29 @@ public class ManyView implements View {
 
     @Override
     public JHVDate getNearestTime(JHVDate time) {
-        return dateMap.nearestKey(time);
+        return frameMap.nearestKey(time);
     }
 
     @Override
     public JHVDate getLowerTime(JHVDate time) {
-        return dateMap.lowerKey(time);
+        return frameMap.lowerKey(time);
     }
 
     @Override
     public JHVDate getHigherTime(JHVDate time) {
-        return dateMap.higherKey(time);
+        return frameMap.higherKey(time);
     }
 
     @Override
     public MetaData getMetaData(JHVDate time) {
-        ViewFrame viewFrame = dateMap.get(dateMap.nearestKey(time));
-        return viewFrame.view.getMetaData(viewFrame.time);
+        FrameInfo frameInfo = frameMap.nearestValue(time);
+        return frameInfo.view.getMetaData(frameInfo.timeView);
     }
 
     @Nonnull
     @Override
     public String getXMLMetaData() throws Exception {
-        return dateMap.get(dateMap.key(targetFrame)).view.getXMLMetaData();
+        return frameMap.indexValue(targetFrame).view.getXMLMetaData();
     }
 
 }
