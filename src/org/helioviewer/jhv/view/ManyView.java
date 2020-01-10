@@ -2,6 +2,7 @@ package org.helioviewer.jhv.view;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -22,16 +23,18 @@ public class ManyView implements View {
 
         final View view;
         final int frame;
+        final JHVDate time;
 
-        ViewFrame(View _view, int _frame) {
+        ViewFrame(View _view, int _frame, JHVDate _time) {
             view = _view;
             frame = _frame;
+            time = _time;
         }
 
     }
 
     private final JHVDateMap<ViewFrame> dateMap = new JHVDateMap<>();
-    private final JHVDateMap<Integer> frameMap = new JHVDateMap<>();
+    private final HashMap<JHVDate, Integer> frameMap = new HashMap<>();
     private int targetFrame;
 
     public ManyView(List<View> views) throws IOException {
@@ -49,7 +52,8 @@ public class ManyView implements View {
     private View putDates(View v) {
         int m = v.getMaximumFrameNumber();
         for (int i = 0; i <= m; i++) {
-            dateMap.put(v.getFrameTime(i), new ViewFrame(v, i));
+            JHVDate t = v.getFrameTime(i);
+            dateMap.put(t, new ViewFrame(v, i, t));
         }
         return v;
     }
@@ -140,9 +144,10 @@ public class ManyView implements View {
 
     @Override
     public boolean setNearestFrame(JHVDate time) {
-        ViewFrame viewFrame = dateMap.nearestValue(time);
-        if (viewFrame.view.setNearestFrame(time)) {
-            targetFrame = frameMap.nearestValue(time);
+        JHVDate t = dateMap.nearestKey(time);
+        ViewFrame viewFrame = dateMap.get(t);
+        if (viewFrame.view.setNearestFrame(viewFrame.time)) {
+            targetFrame = frameMap.get(t);
             return true;
         }
         return false;
@@ -165,7 +170,8 @@ public class ManyView implements View {
 
     @Override
     public MetaData getMetaData(JHVDate time) {
-        return dateMap.nearestValue(time).view.getMetaData(time);
+        ViewFrame viewFrame = dateMap.get(dateMap.nearestKey(time));
+        return viewFrame.view.getMetaData(viewFrame.time);
     }
 
     @Nonnull
