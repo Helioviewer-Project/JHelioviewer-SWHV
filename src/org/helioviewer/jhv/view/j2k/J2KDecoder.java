@@ -159,7 +159,7 @@ class J2KDecoder implements Runnable {
         try {
             Kdu_thread_env kte = new Kdu_thread_env();
             kte.Create();
-            int numThreads = Kdu_global.Kdu_get_num_processors();
+            int numThreads = Math.min(3, Kdu_global.Kdu_get_num_processors()); // one more would squeeze a bit more speed
             for (int i = 1; i < numThreads; i++)
                 kte.Add_thread();
             // System.out.println(">>>> Kdu_thread_env create " + kte);
