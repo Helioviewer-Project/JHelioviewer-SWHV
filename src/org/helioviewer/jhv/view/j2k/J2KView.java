@@ -46,15 +46,16 @@ public class J2KView extends BaseView {
     private final TimeMap<Integer> frameMap = new TimeMap<>();
 
     private final Cleaner.Cleanable abolishable;
-    private final DecodeExecutor decoder = new DecodeExecutor();
+    private final DecodeExecutor executor;
     private final KakaduSource kduSource;
     private final JPIPCache jpipCache;
 
     protected final CacheStatus cacheStatus;
     protected final J2KReader reader;
 
-    public J2KView(APIRequest _request, APIResponse _response, URI _uri) throws Exception {
+    public J2KView(APIRequest _request, APIResponse _response, URI _uri, DecodeExecutor _executor) throws Exception {
         super(_request, _uri);
+        executor = _executor == null ? new DecodeExecutor() : _executor;
 
         long[] frames = _response == null ? null : _response.getFrames();
         if (frames != null) {
@@ -123,7 +124,7 @@ public class J2KView extends BaseView {
                 reader.start();
             }
 
-            abolishable = reaper.register(this, new Abolisher(decoder, reader, jpipCache));
+            abolishable = reaper.register(this, new Abolisher(executor, reader, jpipCache));
         } catch (KduException e) {
             e.printStackTrace();
             throw new IOException("Failed to create Kakadu machinery: " + e.getMessage(), e);
@@ -141,21 +142,21 @@ public class J2KView extends BaseView {
     // if instance was built before cancelling
     private static class Abolisher implements Runnable {
 
-        private final DecodeExecutor aDecoder;
+        private final DecodeExecutor aExecutor;
         private final J2KReader aReader;
         private final JPIPCache aJpipCache;
 
-        Abolisher(DecodeExecutor _decoder, J2KReader _reader, JPIPCache _jpipCache) {
-            aDecoder = _decoder;
+        Abolisher(DecodeExecutor _executor, J2KReader _reader, JPIPCache _jpipCache) {
+            aExecutor = _executor;
             aReader = _reader;
             aJpipCache = _jpipCache;
         }
 
         @Override
         public void run() {
-            // decoder and reader abolish may take too long in stressed conditions
+            // executor and reader abolish may take too long in stressed conditions
             new Thread(() -> {
-                aDecoder.abolish();
+                aExecutor.abolish();
                 if (aReader != null) {
                     aReader.abolish();
                 }
@@ -255,7 +256,7 @@ public class J2KView extends BaseView {
         if (reader != null && !decodeParams.complete) {
             signalReader(decodeParams);
         }
-        decoder.decode(decodeParams);
+        executor.decode(decodeParams);
     }
 
     protected DecodeParams getDecodeParams(Position viewpoint, int frame, double pixFactor, double factor) {
@@ -298,7 +299,7 @@ public class J2KView extends BaseView {
         EventQueue.invokeLater(() -> {
             if (params.decodeParams.frame == targetFrame) {
                 // params.decodeParams.complete = true;
-                decoder.decode(params.decodeParams);
+                executor.decode(params.decodeParams);
             }
         });
     }

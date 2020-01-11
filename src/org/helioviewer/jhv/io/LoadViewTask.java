@@ -79,7 +79,7 @@ class LoadViewTask extends JHVWorker<View, Void> {
             } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
                 return new SimpleImageView(req, uri);
             } else {
-                return new J2KView(req, res, uri);
+                return new J2KView(req, res, uri, null);
             }
         } catch (InterruptedException ignore) {
             // nothing
