@@ -13,6 +13,7 @@ public class DecodeParams {
     public final ResolutionSet.ResolutionLevel resolution;
     public final int frame;
     public final double factor;
+    private final int hash;
 
     public DecodeParams(J2KView _view, Position _viewpoint, boolean _complete, SubImage _roi, ResolutionSet.ResolutionLevel _resolution, int _frame, double _factor) {
         view = _view;
@@ -22,6 +23,17 @@ public class DecodeParams {
         resolution = _resolution;
         frame = _frame;
         factor = _factor;
+        hash = computeHash(view, subImage, resolution, frame, factor);
+    }
+
+    private static int computeHash(J2KView v, SubImage s, ResolutionSet.ResolutionLevel r, int fr, double f) { // viewpoint, complete don't participate
+        int result = 1;
+        result = 31 * result + v.hashCode();
+        result = 31 * result + s.hashCode();
+        result = 31 * result + r.hashCode();
+        result = 31 * result + fr;
+        long tmp = Double.doubleToLongBits(f);
+        return 31 * result + (int) (tmp ^ (tmp >>> 32));
     }
 
     @Override
@@ -35,13 +47,8 @@ public class DecodeParams {
     }
 
     @Override
-    public int hashCode() { // viewpoint, complete don't participate
-        int result = 1;
-        result = 31 * result + subImage.hashCode();
-        result = 31 * result + resolution.hashCode();
-        result = 31 * result + frame;
-        long tmp = Double.doubleToLongBits(factor);
-        return 31 * result + (int) (tmp ^ (tmp >>> 32));
+    public int hashCode() {
+        return hash;
     }
 
     @Override
