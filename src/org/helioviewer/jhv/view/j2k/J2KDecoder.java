@@ -25,6 +25,9 @@ import org.lwjgl.system.MemoryUtil;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
+//import com.google.common.math.StatsAccumulator;
+//import com.google.common.base.Stopwatch;
+
 class J2KDecoder implements Runnable {
 
     // Maximum of samples to process per rendering iteration
@@ -39,6 +42,9 @@ class J2KDecoder implements Runnable {
 
     private final DecodeParams decodeParams;
 
+    //private final Stopwatch sw = Stopwatch.createUnstarted();
+    //private static final ThreadLocal<StatsAccumulator> localAcc = ThreadLocal.withInitial(StatsAccumulator::new);
+
     J2KDecoder(DecodeParams _decodeParams) {
         decodeParams = _decodeParams;
     }
@@ -47,6 +53,8 @@ class J2KDecoder implements Runnable {
         ImageBuffer imageBuffer = decodeCache.get().getIfPresent(decodeParams);
         if (imageBuffer != null)
             return imageBuffer;
+
+        //sw.reset().start();
 
         SubImage subImage = params.subImage;
         int frame = params.frame;
@@ -114,7 +122,12 @@ class J2KDecoder implements Runnable {
             }
         }
         compositor.Remove_ilayer(ilayer, true);
-
+/*
+        StatsAccumulator acc = localAcc.get();
+        acc.add(sw.elapsed().toNanos() / 1e9);
+        if (acc.count() == params.view.getMaximumFrameNumber() + 1)
+            System.out.println(">>> mean: " + acc.mean() + " stdvar: " + acc.sampleStandardDeviation());
+*/
         imageBuffer = new ImageBuffer(actualWidth, actualHeight, format, ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder()));
         if (decodeParams.complete) {
             decodeCache.get().put(decodeParams, imageBuffer);
@@ -159,7 +172,7 @@ class J2KDecoder implements Runnable {
         try {
             Kdu_thread_env kte = new Kdu_thread_env();
             kte.Create();
-            int numThreads = Math.min(3, Kdu_global.Kdu_get_num_processors()); // one more would squeeze a bit more speed
+            int numThreads = Math.min(4, Kdu_global.Kdu_get_num_processors()); // one more would squeeze a bit more speed
             for (int i = 1; i < numThreads; i++)
                 kte.Add_thread();
             // System.out.println(">>>> Kdu_thread_env create " + kte);
