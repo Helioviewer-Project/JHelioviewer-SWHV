@@ -18,6 +18,7 @@ import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.plugins.pfss.data.PfssData;
 import org.helioviewer.jhv.plugins.pfss.data.PfssNewDataLoader;
+import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.threads.CancelTask;
 import org.json.JSONObject;
 
@@ -33,6 +34,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener, TimespanLi
     private final BufVertex lineBuf = new BufVertex(3276 * GLSLLine.stride); // pre-allocate 64k
 
     private PfssData previousPfssData;
+    private JHVDate pfssTime;
     private long currentTime;
 
     public PfssLayer(JSONObject jo) {
@@ -83,12 +85,10 @@ public class PfssLayer extends AbstractLayer implements TimeListener, TimespanLi
         return "PFSS Model";
     }
 
-    private String timeString = null;
-
     @Nullable
     @Override
     public String getTimeString() {
-        return timeString;
+        return pfssTime == null ? null : pfssTime.toString();
     }
 
     @Override
@@ -101,7 +101,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener, TimespanLi
         } else {
             Movie.removeTimeListener(this);
             Movie.removeTimespanListener(this);
-            timeString = null;
+            pfssTime = null;
             previousPfssData = null;
         }
     }
@@ -155,7 +155,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener, TimespanLi
             pfssLine.calculatePositions(data, detail, fixedColor, radius, lineBuf);
             glslLine.setData(gl, lineBuf);
 
-            timeString = data.dateObs.toString();
+            pfssTime = data.dateObs;
             JHVFrame.getLayers().fireTimeUpdated(this);
         }
         glslLine.render(gl, vp.aspect, LINEWIDTH);

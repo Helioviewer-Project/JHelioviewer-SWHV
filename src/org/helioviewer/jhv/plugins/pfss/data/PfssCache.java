@@ -37,7 +37,7 @@ public class PfssCache {
         Long f = map.floorKey(time);
 
         if (f != null && c != null)
-            return Math.abs(f - time) < Math.abs(time - c) ? get(f, map.get(f)) : get(c, map.get(c));
+            return time - f < c - time ? get(f, map.get(f)) : get(c, map.get(c));
         if (f == null && c != null)
             return get(c, map.get(c));
         if (f != null)
