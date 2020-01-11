@@ -5,7 +5,6 @@ import java.nio.ByteOrder;
 
 import javax.annotation.Nullable;
 
-import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
 import kdu_jni.Kdu_compositor_buf;
 import kdu_jni.Kdu_coords;
@@ -32,13 +31,10 @@ class J2KDecoder implements Runnable {
 
     // Maximum of samples to process per rendering iteration
     private static final int MAX_RENDER_SAMPLES = 256 * 1024;
-    // The amount of cache to allocate to each codestream
-    private static final int CODESTREAM_CACHE_THRESHOLD = 1024 * 1024;
     private static final int[] firstComponent = {0};
 
     private static final ThreadLocal<Cache<DecodeParams, ImageBuffer>> decodeCache = ThreadLocal.withInitial(() -> CacheBuilder.newBuilder().softValues().build());
     private static final ThreadLocal<Kdu_thread_env> localThread = ThreadLocal.withInitial(J2KDecoder::createThreadEnv);
-    private static final ThreadLocal<Kdu_region_compositor> localCompositor = new ThreadLocal<>();
 
     private final DecodeParams decodeParams;
 
@@ -60,14 +56,14 @@ class J2KDecoder implements Runnable {
         int frame = params.frame;
         int numComponents = params.view.getNumComponents(frame);
 
-        Kdu_region_compositor compositor = getCompositor(params.view);
+        Kdu_region_compositor compositor = createCompositor(params.view);
+
         Kdu_dims empty = new Kdu_dims();
-        Kdu_ilayer_ref ilayer;
         if (numComponents < 3) {
             // alpha tbd
-            ilayer = compositor.Add_primitive_ilayer(frame, firstComponent, Kdu_global.KDU_WANT_CODESTREAM_COMPONENTS, empty, empty);
+            compositor.Add_primitive_ilayer(frame, firstComponent, Kdu_global.KDU_WANT_CODESTREAM_COMPONENTS, empty, empty);
         } else {
-            ilayer = compositor.Add_ilayer(frame, empty, empty);
+            compositor.Add_ilayer(frame, empty, empty);
         }
 
         compositor.Set_scale(false, false, false, 1f / (1 << params.resolution.level), (float) params.factor);
@@ -121,7 +117,8 @@ class J2KDecoder implements Runnable {
                 }
             }
         }
-        compositor.Remove_ilayer(ilayer, true);
+
+        destroyCompositor(compositor);
 /*
         StatsAccumulator acc = localAcc.get();
         acc.add(sw.elapsed().toNanos() / 1e9);
@@ -143,28 +140,12 @@ class J2KDecoder implements Runnable {
         }
 
         try {
+            Thread.currentThread().setName("Decoder " + decodeParams.view.getName());
             ImageBuffer data = decodeLayer(decodeParams);
             decodeParams.view.setDataFromDecoder(decodeParams, data);
-        } catch (Exception e) { // reboot the compositor
-            Kdu_region_compositor krc = localCompositor.get();
-            if (krc != null)
-                destroyCompositor(krc);
-            localCompositor.set(null);
-            localThread.remove();
+        } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private static Kdu_region_compositor getCompositor(J2KView view) throws KduException {
-        Kdu_region_compositor krc = localCompositor.get();
-        if (krc != null)
-            return krc;
-
-        Thread.currentThread().setName("Decoder " + view.getName());
-        krc = createCompositor(view.getSource().getJpxSource());
-        krc.Set_thread_env(localThread.get(), null);
-        localCompositor.set(krc);
-        return krc;
     }
 
     @Nullable
@@ -172,7 +153,7 @@ class J2KDecoder implements Runnable {
         try {
             Kdu_thread_env kte = new Kdu_thread_env();
             kte.Create();
-            int numThreads = Math.min(4, Kdu_global.Kdu_get_num_processors()); // one more would squeeze a bit more speed
+            int numThreads = Math.min(4, Kdu_global.Kdu_get_num_processors());
             for (int i = 1; i < numThreads; i++)
                 kte.Add_thread();
             // System.out.println(">>>> Kdu_thread_env create " + kte);
@@ -183,12 +164,13 @@ class J2KDecoder implements Runnable {
         return null;
     }
 
-    private static Kdu_region_compositor createCompositor(Jpx_source jpx) throws KduException {
+    private static Kdu_region_compositor createCompositor(J2KView view) throws KduException {
         Kdu_region_compositor krc = new Kdu_region_compositor();
         // System.out.println(">>>> compositor create " + krc + " " + Thread.currentThread().getName());
-        krc.Create(jpx, CODESTREAM_CACHE_THRESHOLD);
+        krc.Create(view.getSource().getJpxSource());
         krc.Set_surface_initialization_mode(false);
         krc.Set_quality_limiting(new Kdu_quality_limiter(1f / 256), -1, -1);
+        krc.Set_thread_env(localThread.get(), null);
         return krc;
     }
 
@@ -206,11 +188,6 @@ class J2KDecoder implements Runnable {
 
     private static void abolish() {
         try {
-            Kdu_region_compositor krc = localCompositor.get();
-            if (krc != null) {
-                destroyCompositor(krc);
-                localCompositor.set(null);
-            }
             Kdu_thread_env kte = localThread.get();
             if (kte != null) {
                 kte.Destroy();
