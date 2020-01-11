@@ -25,7 +25,7 @@ public interface Load {
                     new LoadViewTask(layer, uri));
         }
 
-        public void getMultiple(URI... uri) {
+        public void getAll(URI... uri) {
             JHVGlobals.getExecutorService().execute(new LoadViewTask(ImageLayer.create(null), uri));
         }
     }

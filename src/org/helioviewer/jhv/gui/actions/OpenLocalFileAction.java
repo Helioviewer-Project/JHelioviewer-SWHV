@@ -51,7 +51,7 @@ public class OpenLocalFileAction extends AbstractAction {
                         uris.add(fileName.toURI());
                 }
                 if (!uris.isEmpty())
-                    Load.image.getMultiple(uris.toArray(URI[]::new));
+                    Load.image.getAll(uris.toArray(URI[]::new));
             }
         }
     }
