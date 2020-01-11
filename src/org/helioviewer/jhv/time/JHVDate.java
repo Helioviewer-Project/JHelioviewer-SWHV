@@ -2,11 +2,14 @@ package org.helioviewer.jhv.time;
 
 import javax.annotation.Nonnull;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
 public class JHVDate implements Comparable<JHVDate> {
 
     public final long milli;
     private final int hash;
-    private final String string;
 
     public JHVDate(String date) {
         this(TimeUtils.parse(date));
@@ -17,7 +20,6 @@ public class JHVDate implements Comparable<JHVDate> {
             throw new IllegalArgumentException("Argument cannot be negative");
         milli = _milli;
         hash = (int) (milli ^ (milli >>> 32));
-        string = TimeUtils.format(milli);
     }
 
     @Override
@@ -42,7 +44,18 @@ public class JHVDate implements Comparable<JHVDate> {
 
     @Override
     public String toString() {
-        return string;
+        try {
+            return cache.get(milli);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return getString(milli);
+    }
+
+    private static final LoadingCache<Long, String> cache = CacheBuilder.newBuilder().maximumSize(100000).build(CacheLoader.from(JHVDate::getString));
+
+    private static String getString(long ms) {
+        return TimeUtils.format(ms);
     }
 
 }
