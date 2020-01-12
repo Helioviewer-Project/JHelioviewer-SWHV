@@ -14,6 +14,7 @@ import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.view.ManyView;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.fits.FITSView;
+import org.helioviewer.jhv.view.j2k.DecodeExecutor;
 import org.helioviewer.jhv.view.j2k.J2KView;
 import org.helioviewer.jhv.view.simpleimage.SimpleImageView;
 
@@ -36,11 +37,12 @@ class LoadViewTask extends JHVWorker<View, Void> {
                 throw new IOException("Invalid URI list");
 
             if (uriList.length == 1) {
-                return loadView(uriList[0], null, null);
+                return loadView(uriList[0], null, null, null);
             } else {
+                DecodeExecutor executor = new DecodeExecutor(); // TBD something more elegant
                 ArrayList<View> views = new ArrayList<>();
                 for (URI uri : uriList)
-                    views.add(loadView(uri, null, null));
+                    views.add(loadView(uri, null, null, executor));
                 return new ManyView(views);
             }
         } catch (IOException e) {
@@ -67,7 +69,7 @@ class LoadViewTask extends JHVWorker<View, Void> {
     }
 
     @Nullable
-    protected static View loadView(URI uri, APIRequest req, APIResponse res) throws IOException {
+    protected static View loadView(URI uri, APIRequest req, APIResponse res, DecodeExecutor executor) throws IOException {
         if (uri == null || uri.getScheme() == null) {
             throw new IOException("Invalid URI: " + uri);
         }
@@ -79,7 +81,7 @@ class LoadViewTask extends JHVWorker<View, Void> {
             } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
                 return new SimpleImageView(req, uri);
             } else {
-                return new J2KView(req, res, uri, null);
+                return new J2KView(req, res, uri, executor);
             }
         } catch (InterruptedException ignore) {
             // nothing
