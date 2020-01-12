@@ -57,7 +57,7 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
 
             BufferedSource source = nc.getSource();
             long bytesRead, totalRead = 0;
-            Buffer sinkBuffer = sink.buffer();
+            Buffer sinkBuffer = sink.getBuffer();
             while ((bytesRead = source.read(sinkBuffer, BUFSIZ)) != -1) {
                 totalRead += bytesRead;
                 count++;
