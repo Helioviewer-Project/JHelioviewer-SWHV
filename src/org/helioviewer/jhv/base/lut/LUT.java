@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
@@ -91,7 +92,7 @@ public class LUT {
         }
         // User addons
         File addOnDir = JHVDirectory.COLOR_PLUGINS.getFile();
-        File[] fileList = addOnDir.listFiles(new GGRFilter());
+        File[] fileList = addOnDir.listFiles(ExtensionFileFilter.GGR);
         if (fileList != null)
             for (File f : fileList) {
                 try (InputStream is = Files.newInputStream(f.toPath())) {
