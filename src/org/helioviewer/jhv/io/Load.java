@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.io;
 
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.helioviewer.jhv.JHVGlobals;
@@ -19,11 +20,11 @@ public interface Load {
     class Image implements Load {
         @Override
         public void get(URI uri) {
-            String scheme = uri.getScheme();
-            ImageLayer layer = ImageLayer.create(null);
-            JHVGlobals.getExecutorService().execute("http".equals(scheme) || "https".equals(scheme) ?
-                    new DownloadViewTask(layer, new BaseView(null, uri)) :
-                    new LoadViewTask(layer, uri));
+            try {
+                getAll(FileUtils.listDir(Path.of(uri)));
+            } catch (Exception e) {
+                JHVGlobals.getExecutorService().execute(new DownloadViewTask(ImageLayer.create(null), new BaseView(null, uri)));
+            }
         }
 
         public void getAll(List<URI> uris) {

@@ -4,12 +4,15 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import okio.Okio;
@@ -69,6 +72,12 @@ public class FileUtils {
 
     public static void deleteDir(File dir) throws IOException {
         Files.walkFileTree(dir.toPath(), nukeVisitor);
+    }
+
+    public static List<URI> listDir(Path path) throws IOException {
+        ArrayList<URI> uris = new ArrayList<>();
+        Files.find(path, Integer.MAX_VALUE, (filePath, fileAttr) -> fileAttr.isRegularFile()).forEach(p -> uris.add(p.toUri()));
+        return uris;
     }
 
     private static final String lockSuffix = ".lck";
