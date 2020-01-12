@@ -32,6 +32,8 @@ class J2KDecoder implements Runnable {
     // Maximum of samples to process per rendering iteration
     private static final int MAX_RENDER_SAMPLES = 256 * 1024;
     private static final int[] firstComponent = {0};
+    private static final Kdu_quality_limiter qualityLow = new Kdu_quality_limiter(2f / 256);
+    private static final Kdu_quality_limiter qualityHigh = new Kdu_quality_limiter(1f / 256);
 
     private static final ThreadLocal<Cache<DecodeParams, ImageBuffer>> decodeCache = ThreadLocal.withInitial(() -> CacheBuilder.newBuilder().softValues().build());
     private static final ThreadLocal<Kdu_thread_env> localThread = ThreadLocal.withInitial(J2KDecoder::createThreadEnv);
@@ -56,7 +58,7 @@ class J2KDecoder implements Runnable {
         int frame = params.frame;
         int numComponents = params.view.getNumComponents(frame);
 
-        Kdu_region_compositor compositor = createCompositor(params.view);
+        Kdu_region_compositor compositor = createCompositor(params.view, params.factor < 1 ? qualityLow : qualityHigh);
 
         Kdu_dims empty = new Kdu_dims();
         if (numComponents < 3) {
@@ -164,12 +166,12 @@ class J2KDecoder implements Runnable {
         return null;
     }
 
-    private static Kdu_region_compositor createCompositor(J2KView view) throws KduException {
+    private static Kdu_region_compositor createCompositor(J2KView view, Kdu_quality_limiter quality) throws KduException {
         Kdu_region_compositor krc = new Kdu_region_compositor();
         // System.out.println(">>>> compositor create " + krc + " " + Thread.currentThread().getName());
         krc.Create(view.getSource().getJpxSource());
         krc.Set_surface_initialization_mode(false);
-        krc.Set_quality_limiting(new Kdu_quality_limiter(1f / 256), -1, -1);
+        krc.Set_quality_limiting(quality, -1, -1);
         krc.Set_thread_env(localThread.get(), null);
         return krc;
     }
