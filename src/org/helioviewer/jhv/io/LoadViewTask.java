@@ -40,7 +40,7 @@ class LoadViewTask extends JHVWorker<View, Void> {
                 return loadView(uriList[0], null, null, null);
             } else {
                 DecodeExecutor executor = new DecodeExecutor(); // TBD something more elegant
-                ArrayList<View> views = new ArrayList<>();
+                ArrayList<View> views = new ArrayList<>(uriList.length);
                 for (URI uri : uriList)
                     views.add(loadView(uri, null, null, executor));
                 return new ManyView(views);

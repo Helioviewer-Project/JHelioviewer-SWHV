@@ -40,19 +40,13 @@ public class OpenLocalFileAction extends AbstractAction {
         String directory = fileDialog.getDirectory();
         File[] fileNames = fileDialog.getFiles();
         if (fileNames.length > 0 && directory != null) {
-            // remember the current directory for future
-            Settings.setProperty("path.local", directory);
-            if (fileNames.length == 1 && fileNames[0].isFile()) {
-                Load.image.get(fileNames[0].toURI());
-            } else {
-                ArrayList<URI> uris = new ArrayList<>(fileNames.length);
-                for (File fileName : fileNames) {
-                    if (fileName.isFile())
-                        uris.add(fileName.toURI());
-                }
-                if (!uris.isEmpty())
-                    Load.image.getAll(uris.toArray(URI[]::new));
+            Settings.setProperty("path.local", directory); // remember the current directory for future
+            ArrayList<URI> uris = new ArrayList<>(fileNames.length);
+            for (File f : fileNames) {
+                if (f.isFile() && f.canRead()) // cannot select directories anyway
+                    uris.add(f.toURI());
             }
+            Load.image.getAll(uris);
         }
     }
 
