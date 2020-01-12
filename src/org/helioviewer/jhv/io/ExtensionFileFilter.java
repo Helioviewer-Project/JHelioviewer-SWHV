@@ -8,17 +8,17 @@ import javax.swing.filechooser.FileFilter;
 public class ExtensionFileFilter {
 
     public static final FilenameFilter Image = new Filter(new ExtensionFilter(
-                        new String[]{"jpg", "jpeg", "png", "fts", "fits", "jp2", "jpx"},
-                        "All supported files (\".jpg\", \".jpeg\", \".png\", \".fts\", \".fits\", \".jp2\", \".jpx\")"));
+            new String[]{"jpg", "jpeg", "png", "fts", "fits", "jp2", "jpx"},
+            "All supported files (\".jpg\", \".jpeg\", \".png\", \".fts\", \".fits\", \".jp2\", \".jpx\")"));
     public static final FilenameFilter JHV = new Filter(new ExtensionFilter(
-                        new String[]{"jhv", "jhvz"},
-                        "State files (\".jhv\", \".jhvz\")"));
+            new String[]{"jhv", "jhvz"},
+            "State files (\".jhv\", \".jhvz\")"));
     public static final FilenameFilter JSON = new Filter(new ExtensionFilter(
-                        new String[]{"json"},
-                        "JSON files (\".json\")"));
+            new String[]{"json"},
+            "JSON files (\".json\")"));
     public static final FilenameFilter GGR = new Filter(new ExtensionFilter(
-                        new String[]{"ggr"},
-                        "GIMP gradient files (\".ggr\")"));
+            new String[]{"ggr"},
+            "GIMP gradient files (\".ggr\")"));
 
     private static class Filter implements FilenameFilter {
 
@@ -32,7 +32,7 @@ public class ExtensionFileFilter {
         public boolean accept(File dir, String name) {
             return filter.accept(new File(dir, name));
         }
-    
+
     }
 
     private static class ExtensionFilter extends FileFilter {
