@@ -5,6 +5,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+//import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,7 +47,22 @@ public class SampClient extends HubConnector {
             }).start();
         }
     }
-
+/*
+    @Nullable
+    private static URI[] extractURIs(Message msg) {
+        Map<?, ?> params = msg.getParams();
+        if (params == null)
+            return null;
+        return params.values().stream().map(v -> {
+            try {
+                return new URI(v.toString());
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }).filter(Objects::nonNull).toArray(URI[]::new);
+    }
+*/
     private SampClient(ClientProfile _profile) {
         super(_profile);
 
