@@ -7,8 +7,8 @@ import java.io.File;
 import javax.swing.AbstractAction;
 
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.gui.ExtensionFileFilter;
 import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.io.Load;
 
 @SuppressWarnings("serial")
@@ -22,7 +22,7 @@ public class LoadStateAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         FileDialog fileDialog = new FileDialog(JHVFrame.getFrame(), "Choose a file", FileDialog.LOAD);
         // does not work on Windows
-        fileDialog.setFilenameFilter(ExtensionFileFilter.Jhv);
+        fileDialog.setFilenameFilter(ExtensionFileFilter.JHV);
         fileDialog.setDirectory(JHVDirectory.STATES.getPath());
         fileDialog.setVisible(true);
 
