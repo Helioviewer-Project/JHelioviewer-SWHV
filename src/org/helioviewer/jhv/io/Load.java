@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.io;
 
 import java.net.URI;
+import java.util.List;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -25,8 +26,8 @@ public interface Load {
                     new LoadViewTask(layer, uri));
         }
 
-        public void getAll(URI... uri) {
-            JHVGlobals.getExecutorService().execute(new LoadViewTask(ImageLayer.create(null), uri));
+        public void getAll(List<URI> uris) {
+            JHVGlobals.getExecutorService().execute(new LoadViewTask(ImageLayer.create(null), uris.toArray(URI[]::new)));
         }
     }
 
