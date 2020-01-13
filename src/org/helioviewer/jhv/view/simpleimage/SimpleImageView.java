@@ -69,7 +69,6 @@ public class SimpleImageView extends BaseView {
                 buffer = IntBuffer.wrap(((DataBufferInt) conv.getRaster().getDataBuffer()).getData());
                 format = ImageBuffer.Format.ARGB32;
         }
-        imageData = new ImageData(new ImageBuffer(w, h, format, buffer));
 
         MetaData m;
         try {
@@ -79,8 +78,8 @@ public class SimpleImageView extends BaseView {
             xml = "<meta/>";
         }
 
+        imageData = new ImageData(new ImageBuffer(w, h, format, buffer), m);
         imageData.setRegion(m.getPhysicalRegion());
-        imageData.setMetaData(m);
         metaData[0] = m;
     }
 
