@@ -2,6 +2,7 @@ package org.helioviewer.jhv.metadata;
 
 import java.util.Optional;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.XMLUtils;
@@ -39,21 +40,25 @@ public class XMLMetaDataContainer implements MetaDataContainer {
         return new HelioviewerMetaData(this, i, normalizeResponse);
     }
 
+    @Nonnull
     @Override
     public Optional<String> getString(String key) {
         return Optional.ofNullable(getValueFromXML(key));
     }
 
+    @Nonnull
     @Override
     public Optional<Long> getLong(String key) {
         return getString(key).map(Longs::tryParse);
     }
 
+    @Nonnull
     @Override
     public Optional<Double> getDouble(String key) {
         return getString(key).map(Doubles::tryParse);
     }
 
+    @Nonnull
     @Override
     public String getRequiredString(String key) {
         return getString(key).orElseThrow(() -> new MetaDataException(key));
