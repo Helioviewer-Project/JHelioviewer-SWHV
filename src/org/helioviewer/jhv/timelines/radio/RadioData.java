@@ -31,7 +31,7 @@ import org.json.JSONObject;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
 
 public class RadioData extends AbstractTimelineLayer {
 
@@ -40,8 +40,11 @@ public class RadioData extends AbstractTimelineLayer {
     private static final int MAX_AMOUNT_OF_DAYS = 3;
     private static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 4;
 
-    private static final RemovalListener<Long, RadioJ2KData> removalListener = removed -> removed.getValue().removeData();
-    private static final Cache<Long, RadioJ2KData> cache = CacheBuilder.newBuilder().maximumSize(DAYS_IN_CACHE).removalListener(removalListener).build();
+    private static void removalListener(RemovalNotification<Long, RadioJ2KData> removed) {
+        removed.getValue().removeData();
+    }
+
+    private static final Cache<Long, RadioJ2KData> cache = CacheBuilder.newBuilder().maximumSize(DAYS_IN_CACHE).removalListener(RadioData::removalListener).build();
 
     private final RadioOptionsPanel optionsPanel;
     private static IndexColorModel colorModel;
