@@ -305,12 +305,11 @@ public class J2KView extends BaseView {
     }
 
     void setDataFromDecoder(DecodeParams decodeParams, ImageBuffer imageBuffer) {
-        ImageData data = new ImageData(imageBuffer);
-        data.setViewpoint(decodeParams.viewpoint);
-
         MetaData m = metaData[decodeParams.frame];
-        data.setMetaData(m);
+        ImageData data = new ImageData(imageBuffer, m);
+
         data.setRegion(m.roiToRegion(decodeParams.subImage, decodeParams.resolution.factorX, decodeParams.resolution.factorY));
+        data.setViewpoint(decodeParams.viewpoint);
 
         EventQueue.invokeLater(() -> {
             if (dataHandler != null)

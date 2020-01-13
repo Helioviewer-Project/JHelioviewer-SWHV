@@ -12,15 +12,18 @@ public class ImageData {
 
     private Position viewpoint;
     private Region region;
-    private MetaData metaData;
     private boolean uploaded;
-    private float[] physLUT;
-    private String unit = "";
 
     private final ImageBuffer imageBuffer;
+    private final MetaData metaData;
+    private final String unit;
+    private final float[] physLUT;
 
-    public ImageData(@Nonnull ImageBuffer _imageBuffer) {
+    public ImageData(@Nonnull ImageBuffer _imageBuffer, @Nonnull MetaData _metaData) {
         imageBuffer = _imageBuffer;
+        metaData = _metaData;
+        unit = metaData.getUnit();
+        physLUT = metaData.getPhysicalLUT();
     }
 
     @Nonnull
@@ -49,12 +52,6 @@ public class ImageData {
     @Nonnull
     public MetaData getMetaData() {
         return metaData;
-    }
-
-    public void setMetaData(@Nonnull MetaData _metaData) {
-        metaData = _metaData;
-        unit = metaData.getUnit();
-        physLUT = metaData.getPhysicalLUT();
     }
 
     public boolean getUploaded() {
