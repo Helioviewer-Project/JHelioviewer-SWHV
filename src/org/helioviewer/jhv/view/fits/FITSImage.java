@@ -6,7 +6,6 @@ import java.nio.ShortBuffer;
 import nom.tam.fits.BasicHDU;
 
 import org.helioviewer.jhv.imagedata.ImageBuffer;
-import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.log.Log;
 
@@ -16,7 +15,7 @@ class FITSImage {
     private static final long BLANK = 0; // in case it doesn't exist, very unlikely value
 
     private static float getValue(int bpp, Object lineData, int i, long blank, double bzero, double bscale) {
-        double v = ImageData.BAD_PIXEL;
+        double v = ImageBuffer.BAD_PIXEL;
         switch (bpp) {
             case BasicHDU.BITPIX_SHORT:
                 v = ((short[]) lineData)[i];
@@ -34,7 +33,7 @@ class FITSImage {
                 v = ((double[]) lineData)[i];
                 break;
         }
-        return (blank != BLANK && v == blank) || !Double.isFinite(v) ? ImageData.BAD_PIXEL : (float) (bzero + v * bscale);
+        return (blank != BLANK && v == blank) || !Double.isFinite(v) ? ImageBuffer.BAD_PIXEL : (float) (bzero + v * bscale);
     }
 
     private static float[] sampleImage(int bpp, int width, int height, Object[] pixelData, long blank, double bzero, double bscale, int[] npix) {
@@ -47,7 +46,7 @@ class FITSImage {
             Object lineData = pixelData[j];
             for (int i = 0; i < width; i += stepW) {
                 float v = getValue(bpp, lineData, i, blank, bzero, bscale);
-                if (v != ImageData.BAD_PIXEL)
+                if (v != ImageBuffer.BAD_PIXEL)
                     sampleData[k++] = v;
             }
         }
@@ -76,7 +75,7 @@ class FITSImage {
         }
     */
 
-    static ImageData readHDU(BasicHDU<?> hdu) throws Exception {
+    static ImageBuffer readHDU(BasicHDU<?> hdu) throws Exception {
         int[] axes = hdu.getAxes();
         if (axes == null || axes.length != 2)
             throw new Exception("Only 2D FITS files supported");
@@ -101,7 +100,7 @@ class FITSImage {
             for (int j = 0; j < height; j++) {
                 System.arraycopy(inData[j], 0, outData, width * (height - 1 - j), width);
             }
-            return new ImageData(new ImageBuffer(width, height, ImageBuffer.Format.Gray8, ByteBuffer.wrap(outData)));
+            return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, ByteBuffer.wrap(outData));
         }
 
         double bzero = hdu.getBZero();
@@ -139,7 +138,7 @@ class FITSImage {
                         float v = getValue(bpp, lineData, i, blank, bzero, bscale);
                         int p = (int) MathUtils.clip(scale * Math.pow(v - minmax[0], GAMMA) + .5, 0, 65535);
                         lut[p] = v;
-                        outData[width * (height - 1 - j) + i] = v == ImageData.BAD_PIXEL ? 0 : (short) p;
+                        outData[width * (height - 1 - j) + i] = v == ImageBuffer.BAD_PIXEL ? 0 : (short) p;
                     }
                 }
                 break;
@@ -152,15 +151,13 @@ class FITSImage {
                         float v = getValue(bpp, lineData, i, blank, bzero, bscale);
                         int p = (int) MathUtils.clip(scale * Math.log1p(v - minmax[0]) + .5, 0, 65535);
                         lut[p] = v;
-                        outData[width * (height - 1 - j) + i] = v == ImageData.BAD_PIXEL ? 0 : (short) p;
+                        outData[width * (height - 1 - j) + i] = v == ImageBuffer.BAD_PIXEL ? 0 : (short) p;
                     }
                 }
                 break;
             }
         }
-        ImageData imageData = new ImageData(new ImageBuffer(width, height, ImageBuffer.Format.Gray16, ShortBuffer.wrap(outData)));
-        imageData.setPhysicalLUT(lut);
-        return imageData;
+        return new ImageBuffer(width, height, ImageBuffer.Format.Gray16, ShortBuffer.wrap(outData), lut);
     }
 
 }
