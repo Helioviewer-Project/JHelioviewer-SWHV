@@ -43,14 +43,14 @@ public class CommandLine {
 
     private static List<URI> getURIOptionValues(String param) {
         List<String> opts = getOptionValues(param);
+        List<String> schemes = List.of("jpip", "http", "https", "file");
         ArrayList<URI> uris = new ArrayList<>();
         for (String opt : opts) {
             try {
                 URI uri = new URI(opt);
-                String scheme = uri.getScheme();
-                if ("jpip".equals(scheme) || "http".equals(scheme) || "https".equals(scheme) || "file".equals(scheme))
+                if (schemes.contains(uri.getScheme())) {
                     uris.add(uri);
-                else {
+                } else {
                     File f = new File(opt).getAbsoluteFile();
                     if (f.canRead()) {
                         uris.add(f.toURI());
