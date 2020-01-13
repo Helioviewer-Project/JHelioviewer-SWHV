@@ -7,7 +7,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.lut.LUT;
-import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
@@ -24,7 +23,6 @@ public class BaseView implements View {
     protected final APIRequest request;
     protected final URI uri;
 
-    protected ImageData imageData;
     protected LUT builtinLUT;
     protected MetaData[] metaData = new MetaData[1];
 
@@ -57,11 +55,6 @@ public class BaseView implements View {
 
     @Override
     public void decode(Position viewpoint, double pixFactor, double factor) {
-        if (dataHandler != null) {
-            imageData.setUploaded(false); // force upload for ManyView
-            imageData.setViewpoint(viewpoint);
-            dataHandler.handleData(imageData);
-        }
     }
 
     @Override
