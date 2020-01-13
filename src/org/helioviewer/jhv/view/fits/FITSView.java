@@ -12,6 +12,7 @@ import nom.tam.fits.ImageHDU;
 import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
 
+import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
@@ -46,14 +47,14 @@ public class FITSView extends BaseView {
             for (BasicHDU<?> hdu : hdus) {
                 if (hdu instanceof CompressedImageHDU) {
                     String meta = getHeaderAsXML(hdu.getHeader());
-                    imageData = FITSImage.readHDU(((CompressedImageHDU) hdu).asImageHDU());
+                    imageData = new ImageData(FITSImage.readHDU(((CompressedImageHDU) hdu).asImageHDU()));
                     return meta;
                 }
             }
             for (BasicHDU<?> hdu : hdus) {
                 if (hdu instanceof ImageHDU) {
                     String meta = getHeaderAsXML(hdu.getHeader());
-                    imageData = FITSImage.readHDU(hdu);
+                    imageData = new ImageData(FITSImage.readHDU(hdu));
                     return meta;
                 }
             }
