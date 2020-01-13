@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 
 import kdu_jni.KduException;
 
+import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
@@ -306,9 +307,9 @@ public class J2KView extends BaseView {
 
     void setDataFromDecoder(DecodeParams decodeParams, ImageBuffer imageBuffer) {
         MetaData m = metaData[decodeParams.frame];
-        ImageData data = new ImageData(imageBuffer, m);
+        Region r = m.roiToRegion(decodeParams.subImage, decodeParams.resolution.factorX, decodeParams.resolution.factorY);
+        ImageData data = new ImageData(imageBuffer, m, r);
 
-        data.setRegion(m.roiToRegion(decodeParams.subImage, decodeParams.resolution.factorX, decodeParams.resolution.factorY));
         data.setViewpoint(decodeParams.viewpoint);
 
         EventQueue.invokeLater(() -> {

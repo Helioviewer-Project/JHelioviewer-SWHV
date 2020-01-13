@@ -78,8 +78,7 @@ public class SimpleImageView extends BaseView {
             xml = "<meta/>";
         }
 
-        imageData = new ImageData(new ImageBuffer(w, h, format, buffer), m);
-        imageData.setRegion(m.getPhysicalRegion());
+        imageData = new ImageData(new ImageBuffer(w, h, format, buffer), m, m.getPhysicalRegion());
         metaData[0] = m;
     }
 

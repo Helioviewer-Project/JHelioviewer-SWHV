@@ -22,8 +22,7 @@ public class FITSView extends BaseView {
             throw new Exception("Could not read FITS: " + uri);
 
         HelioviewerMetaData m = new XMLMetaDataContainer(image.xmlHeader).getHVMetaData(0, false);
-        imageData = new ImageData(image.imageBuffer, m);
-        imageData.setRegion(m.getPhysicalRegion());
+        imageData = new ImageData(image.imageBuffer, m, m.getPhysicalRegion());
         metaData[0] = m;
     }
 
