@@ -1,18 +1,10 @@
 package org.helioviewer.jhv.view.fits;
 
-import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
 import nom.tam.fits.BasicHDU;
-import nom.tam.fits.Fits;
-import nom.tam.fits.Header;
-import nom.tam.fits.HeaderCard;
-import nom.tam.fits.ImageHDU;
-import nom.tam.image.compression.hdu.CompressedImageHDU;
-import nom.tam.util.Cursor;
 
-import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.math.MathUtils;
@@ -22,30 +14,6 @@ class FITSImage {
 
     private static final double GAMMA = 1 / 2.2;
     private static final long BLANK = 0; // in case it doesn't exist, very unlikely value
-
-    String xml;
-    ImageData imageData;
-
-    FITSImage(URI uri) throws Exception {
-        try (NetClient nc = NetClient.of(uri); Fits f = new Fits(nc.getStream())) {
-            BasicHDU<?>[] hdus = f.read();
-            // this is cumbersome
-            for (BasicHDU<?> hdu : hdus) {
-                if (hdu instanceof CompressedImageHDU) {
-                    xml = getHeaderAsXML(hdu.getHeader());
-                    readHDU(((CompressedImageHDU) hdu).asImageHDU());
-                    return;
-                }
-            }
-            for (BasicHDU<?> hdu : hdus) {
-                if (hdu instanceof ImageHDU) {
-                    xml = getHeaderAsXML(hdu.getHeader());
-                    readHDU(hdu);
-                    return;
-                }
-            }
-        }
-    }
 
     private static float getValue(int bpp, Object lineData, int i, long blank, double bzero, double bscale) {
         double v = ImageData.BAD_PIXEL;
@@ -107,7 +75,8 @@ class FITSImage {
             return new float[]{min, max};
         }
     */
-    private void readHDU(BasicHDU<?> hdu) throws Exception {
+
+    static ImageData readHDU(BasicHDU<?> hdu) throws Exception {
         int[] axes = hdu.getAxes();
         if (axes == null || axes.length != 2)
             throw new Exception("Only 2D FITS files supported");
@@ -132,8 +101,7 @@ class FITSImage {
             for (int j = 0; j < height; j++) {
                 System.arraycopy(inData[j], 0, outData, width * (height - 1 - j), width);
             }
-            imageData = new ImageData(new ImageBuffer(width, height, ImageBuffer.Format.Gray8, ByteBuffer.wrap(outData)));
-            return;
+            return new ImageData(new ImageBuffer(width, height, ImageBuffer.Format.Gray8, ByteBuffer.wrap(outData)));
         }
 
         double bzero = hdu.getBZero();
@@ -190,22 +158,9 @@ class FITSImage {
                 break;
             }
         }
-        imageData = new ImageData(new ImageBuffer(width, height, ImageBuffer.Format.Gray16, ShortBuffer.wrap(outData)));
+        ImageData imageData = new ImageData(new ImageBuffer(width, height, ImageBuffer.Format.Gray16, ShortBuffer.wrap(outData)));
         imageData.setPhysicalLUT(lut);
-    }
-
-    private static String getHeaderAsXML(Header header) {
-        String nl = System.getProperty("line.separator");
-        StringBuilder builder = new StringBuilder("<meta>").append(nl).append("<fits>").append(nl);
-
-        for (Cursor<String, HeaderCard> iter = header.iterator(); iter.hasNext(); ) {
-            HeaderCard headerCard = iter.next();
-            if (headerCard.getValue() != null) {
-                builder.append('<').append(headerCard.getKey()).append('>').append(headerCard.getValue()).append("</").append(headerCard.getKey()).append('>').append(nl);
-            }
-        }
-        builder.append("</fits>").append(nl).append("</meta>");
-        return builder.toString().replace("&", "&amp;");
+        return imageData;
     }
 
 }
