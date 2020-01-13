@@ -97,7 +97,7 @@ public class J2KView extends BaseView {
             if (frameMap.maxIndex() != maxFrame)
                 throw new Exception("Duplicated time stamps");
             for (int i = 0; i <= maxFrame; i++) {
-                if (frameMap.key(i) != metaData[i].getViewpoint().time)
+                if (frameMap.key(i).milli != metaData[i].getViewpoint().time.milli)
                     throw new Exception("Badly ordered metadata");
             }
 
