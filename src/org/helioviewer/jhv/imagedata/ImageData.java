@@ -9,7 +9,6 @@ import org.helioviewer.jhv.position.Position;
 public class ImageData {
 
     public static final String nanValue = String.format("%9s", "--");
-    public static final int BAD_PIXEL = Integer.MIN_VALUE;
 
     private Position viewpoint;
     private Region region;
@@ -55,9 +54,7 @@ public class ImageData {
     public void setMetaData(@Nonnull MetaData _metaData) {
         metaData = _metaData;
         unit = metaData.getUnit();
-        float[] lut = metaData.getPhysicalLUT();
-        if (lut != null)
-            setPhysicalLUT(lut);
+        physLUT = metaData.getPhysicalLUT();
     }
 
     public boolean getUploaded() {
@@ -68,11 +65,7 @@ public class ImageData {
         uploaded = _uploaded;
     }
 
-    public void setPhysicalLUT(@Nonnull float[] _physLUT) {
-        physLUT = _physLUT;
-    }
-
-    private int getPixel(double x, double y) {
+    private float getPixel(double x, double y) {
         double ccr = metaData.getCCROTA();
         double scr = -metaData.getSCROTA();
         double xr = x * ccr - y * scr;
@@ -82,24 +75,20 @@ public class ImageData {
 
         int ix = (int) (xf * (imageBuffer.width - 1) + .5);
         int iy = (int) (yf * (imageBuffer.height - 1) + .5);
-        return imageBuffer.getPixel(ix, iy);
+        return imageBuffer.getPixel(ix, iy, physLUT);
     }
 
     @Nonnull
     public String getPixelString(double x, double y) {
         float v = getPixel(x, y);
-        if (physLUT != null && v != BAD_PIXEL) {
-            v = physLUT[(int) v];
-        }
-
         String ret;
-        if (v == BAD_PIXEL)
+        if (v == ImageBuffer.BAD_PIXEL)
             ret = nanValue;
         else if (v == (int) v)
             ret = String.format("%9d", (int) v);
         else
             ret = String.format("%9.2f", v);
-        return physLUT == null ? ret : ret + unit;
+        return ret + unit;
     }
 
 }
