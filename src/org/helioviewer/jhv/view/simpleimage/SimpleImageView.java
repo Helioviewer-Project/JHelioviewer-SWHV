@@ -27,11 +27,13 @@ import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
+import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.view.BaseView;
 
 public class SimpleImageView extends BaseView {
 
     private String xml;
+    private final ImageBuffer imageBuffer;
 
     public SimpleImageView(APIRequest _request, URI _uri) throws Exception {
         super(_request, _uri);
@@ -78,8 +80,16 @@ public class SimpleImageView extends BaseView {
             xml = "<meta/>";
         }
 
-        imageData = new ImageData(new ImageBuffer(w, h, format, buffer), m, m.getPhysicalRegion());
+        imageBuffer = new ImageBuffer(w, h, format, buffer);
         metaData[0] = m;
+    }
+
+    @Override
+    public void decode(Position viewpoint, double pixFactor, double factor) {
+        if (dataHandler != null) {
+            ImageData data = new ImageData(imageBuffer, metaData[0], metaData[0].getPhysicalRegion(), viewpoint);
+            dataHandler.handleData(data);
+        }
     }
 
     @Nonnull

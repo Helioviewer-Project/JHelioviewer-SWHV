@@ -10,7 +10,6 @@ public class ImageData {
 
     public static final String nanValue = String.format("%9s", "--");
 
-    private Position viewpoint;
     private boolean uploaded;
 
     private final ImageBuffer imageBuffer;
@@ -18,13 +17,15 @@ public class ImageData {
     private final String unit;
     private final float[] physLUT;
     private final Region region;
+    private final Position viewpoint;
 
-    public ImageData(@Nonnull ImageBuffer _imageBuffer, @Nonnull MetaData _metaData, @Nonnull Region _region) {
+    public ImageData(@Nonnull ImageBuffer _imageBuffer, @Nonnull MetaData _metaData, @Nonnull Region _region, @Nonnull Position _viewpoint) {
         imageBuffer = _imageBuffer;
         metaData = _metaData;
         unit = metaData.getUnit();
         physLUT = metaData.getPhysicalLUT();
         region = _region;
+        viewpoint = _viewpoint;
     }
 
     @Nonnull
@@ -33,12 +34,8 @@ public class ImageData {
     }
 
     @Nonnull
-    public Position getViewpoint() {
-        return viewpoint;
-    }
-
-    public void setViewpoint(@Nonnull Position _viewpoint) {
-        viewpoint = _viewpoint;
+    public MetaData getMetaData() {
+        return metaData;
     }
 
     @Nonnull
@@ -47,8 +44,8 @@ public class ImageData {
     }
 
     @Nonnull
-    public MetaData getMetaData() {
-        return metaData;
+    public Position getViewpoint() {
+        return viewpoint;
     }
 
     public boolean getUploaded() {

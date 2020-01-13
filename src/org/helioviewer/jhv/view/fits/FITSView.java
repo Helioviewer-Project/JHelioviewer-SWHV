@@ -6,8 +6,8 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
+import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.view.BaseView;
 
 public class FITSView extends BaseView {
@@ -21,9 +21,15 @@ public class FITSView extends BaseView {
         if (image == null)
             throw new Exception("Could not read FITS: " + uri);
 
-        HelioviewerMetaData m = new XMLMetaDataContainer(image.xmlHeader).getHVMetaData(0, false);
-        imageData = new ImageData(image.imageBuffer, m, m.getPhysicalRegion());
-        metaData[0] = m;
+        metaData[0] = new XMLMetaDataContainer(image.xmlHeader).getHVMetaData(0, false);
+    }
+
+    @Override
+    public void decode(Position viewpoint, double pixFactor, double factor) {
+        if (dataHandler != null) {
+            ImageData data = new ImageData(image.imageBuffer, metaData[0], metaData[0].getPhysicalRegion(), viewpoint);
+            dataHandler.handleData(data);
+        }
     }
 
     @Nonnull
