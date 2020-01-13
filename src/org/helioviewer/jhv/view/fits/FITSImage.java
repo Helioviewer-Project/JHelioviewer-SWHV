@@ -1,15 +1,52 @@
 package org.helioviewer.jhv.view.fits;
 
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
+import javax.annotation.Nullable;
+
 import nom.tam.fits.BasicHDU;
+import nom.tam.fits.Fits;
+import nom.tam.fits.Header;
+import nom.tam.fits.HeaderCard;
+import nom.tam.fits.ImageHDU;
+import nom.tam.image.compression.hdu.CompressedImageHDU;
+import nom.tam.util.Cursor;
 
 import org.helioviewer.jhv.imagedata.ImageBuffer;
+import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.log.Log;
 
 class FITSImage {
+
+    final String xmlHeader;
+    final ImageBuffer imageBuffer;
+
+    @Nullable
+    static FITSImage get(URI uri) throws Exception {
+        try (NetClient nc = NetClient.of(uri); Fits f = new Fits(nc.getStream())) {
+            BasicHDU<?>[] hdus = f.read();
+            // this is cumbersome
+            for (BasicHDU<?> hdu : hdus) {
+                if (hdu instanceof CompressedImageHDU) {
+                    return new FITSImage(((CompressedImageHDU) hdu).asImageHDU());
+                }
+            }
+            for (BasicHDU<?> hdu : hdus) {
+                if (hdu instanceof ImageHDU) {
+                    return new FITSImage((ImageHDU) hdu);
+                }
+            }
+        }
+        return null;
+    }
+
+    private FITSImage(ImageHDU hdu) throws Exception {
+        xmlHeader = getHeaderAsXML(hdu.getHeader());
+        imageBuffer = readHDU(hdu);
+    }
 
     private static final double GAMMA = 1 / 2.2;
     private static final long BLANK = 0; // in case it doesn't exist, very unlikely value
@@ -17,19 +54,19 @@ class FITSImage {
     private static float getValue(int bpp, Object lineData, int i, long blank, double bzero, double bscale) {
         double v = ImageBuffer.BAD_PIXEL;
         switch (bpp) {
-            case BasicHDU.BITPIX_SHORT:
+            case ImageHDU.BITPIX_SHORT:
                 v = ((short[]) lineData)[i];
                 break;
-            case BasicHDU.BITPIX_INT:
+            case ImageHDU.BITPIX_INT:
                 v = ((int[]) lineData)[i];
                 break;
-            case BasicHDU.BITPIX_LONG:
+            case ImageHDU.BITPIX_LONG:
                 v = ((long[]) lineData)[i];
                 break;
-            case BasicHDU.BITPIX_FLOAT:
+            case ImageHDU.BITPIX_FLOAT:
                 v = ((float[]) lineData)[i];
                 break;
-            case BasicHDU.BITPIX_DOUBLE:
+            case ImageHDU.BITPIX_DOUBLE:
                 v = ((double[]) lineData)[i];
                 break;
         }
@@ -75,7 +112,7 @@ class FITSImage {
         }
     */
 
-    static ImageBuffer readHDU(BasicHDU<?> hdu) throws Exception {
+    private static ImageBuffer readHDU(ImageHDU hdu) throws Exception {
         int[] axes = hdu.getAxes();
         if (axes == null || axes.length != 2)
             throw new Exception("Only 2D FITS files supported");
@@ -94,7 +131,7 @@ class FITSImage {
         } catch (Exception ignore) {
         }
 
-        if (bpp == BasicHDU.BITPIX_BYTE) {
+        if (bpp == ImageHDU.BITPIX_BYTE) {
             byte[][] inData = (byte[][]) pixelData;
             byte[] outData = new byte[width * height];
             for (int j = 0; j < height; j++) {
@@ -127,10 +164,10 @@ class FITSImage {
         short[] outData = new short[width * height];
         float[] lut = new float[65536];
         switch (bpp) {
-            case BasicHDU.BITPIX_SHORT:
-            case BasicHDU.BITPIX_INT:
-            case BasicHDU.BITPIX_LONG:
-            case BasicHDU.BITPIX_FLOAT: {
+            case ImageHDU.BITPIX_SHORT:
+            case ImageHDU.BITPIX_INT:
+            case ImageHDU.BITPIX_LONG:
+            case ImageHDU.BITPIX_FLOAT: {
                 double scale = 65535. / Math.pow(range, GAMMA);
                 for (int j = 0; j < height; j++) {
                     Object lineData = pixelData[j];
@@ -143,7 +180,7 @@ class FITSImage {
                 }
                 break;
             }
-            case BasicHDU.BITPIX_DOUBLE: {
+            case ImageHDU.BITPIX_DOUBLE: {
                 double scale = 65535. / Math.log1p(range);
                 for (int j = 0; j < height; j++) {
                     Object lineData = pixelData[j];
@@ -158,6 +195,23 @@ class FITSImage {
             }
         }
         return new ImageBuffer(width, height, ImageBuffer.Format.Gray16, ShortBuffer.wrap(outData), lut);
+    }
+
+    private static final String nl = System.getProperty("line.separator");
+
+    private static String getHeaderAsXML(Header header) {
+        StringBuilder builder = new StringBuilder("<meta>" + nl + "<fits>" + nl);
+
+        for (Cursor<String, HeaderCard> iter = header.iterator(); iter.hasNext(); ) {
+            HeaderCard headerCard = iter.next();
+            String key = headerCard.getKey();
+            String value = headerCard.getValue();
+            if (value != null) {
+                builder.append('<').append(key).append('>').append(value).append("</").append(key).append('>').append(nl);
+            }
+        }
+        builder.append("</fits>").append(nl).append("</meta>");
+        return builder.toString().replace("&", "&amp;");
     }
 
 }
