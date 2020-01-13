@@ -14,6 +14,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import okio.Okio;
 import okio.BufferedSource;
@@ -75,7 +76,9 @@ public class FileUtils {
     }
 
     public static List<URI> listDir(Path path) throws IOException {
-        return Files.find(path, Integer.MAX_VALUE, (filePath, fileAttr) -> fileAttr.isRegularFile()).map(Path::toUri).collect(Collectors.toList());
+        try (Stream<Path> stream = Files.find(path, Integer.MAX_VALUE, (filePath, fileAttr) -> fileAttr.isRegularFile())) {
+            return stream.map(Path::toUri).collect(Collectors.toList());
+        }
     }
 
     private static final String lockSuffix = ".lck";
