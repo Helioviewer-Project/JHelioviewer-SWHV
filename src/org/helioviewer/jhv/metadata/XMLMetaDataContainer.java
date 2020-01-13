@@ -61,17 +61,17 @@ public class XMLMetaDataContainer implements MetaDataContainer {
     @Nonnull
     @Override
     public String getRequiredString(String key) {
-        return getString(key).orElseThrow(() -> new MetaDataException(key));
+        return getString(key).orElseThrow(() -> new RuntimeException(key + " not found in metadata"));
     }
 
     @Override
     public long getRequiredLong(String key) {
-        return getLong(key).orElseThrow(() -> new MetaDataException(key));
+        return getLong(key).orElseThrow(() -> new RuntimeException(key + " not found in metadata"));
     }
 
     @Override
     public double getRequiredDouble(String key) {
-        return getDouble(key).orElseThrow(() -> new MetaDataException(key));
+        return getDouble(key).orElseThrow(() -> new RuntimeException(key + " not found in metadata"));
     }
 
 }
