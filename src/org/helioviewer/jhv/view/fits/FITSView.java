@@ -12,6 +12,7 @@ import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.view.BaseView;
+import org.helioviewer.jhv.view.DecodeExecutor;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -22,12 +23,12 @@ public class FITSView extends BaseView {
     private static final Cleaner reaper = Cleaner.create();
 
     private final Cleaner.Cleanable abolishable;
-    private final FITSExecutor executor;
+    private final DecodeExecutor executor;
     private final String xml;
 
-    public FITSView(APIRequest _request, URI _uri, FITSExecutor _executor) throws Exception {
+    public FITSView(APIRequest _request, URI _uri, DecodeExecutor _executor) throws Exception {
         super(_request, _uri);
-        executor = _executor == null ? new FITSExecutor() : _executor;
+        executor = _executor == null ? new DecodeExecutor() : _executor;
 
         xml = FITSImage.getHeader(uri);
         if (xml == null)
@@ -40,7 +41,7 @@ public class FITSView extends BaseView {
     public void decode(Position viewpoint, double pixFactor, double factor) {
         ImageBuffer imageBuffer = decodeCache.getIfPresent(this);
         if (imageBuffer == null) {
-            executor.decode(this, viewpoint);
+            executor.decode(new FITSDecoder(this, viewpoint));
         } else {
             ImageData data = new ImageData(imageBuffer, metaData[0], metaData[0].getPhysicalRegion(), viewpoint);
             if (dataHandler != null)
@@ -65,9 +66,9 @@ public class FITSView extends BaseView {
 
     private static class Abolisher implements Runnable {
 
-        private final FITSExecutor aExecutor;
+        private final DecodeExecutor aExecutor;
 
-        Abolisher(FITSExecutor _executor) {
+        Abolisher(DecodeExecutor _executor) {
             aExecutor = _executor;
         }
 

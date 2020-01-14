@@ -25,6 +25,7 @@ import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeMap;
 import org.helioviewer.jhv.view.BaseView;
+import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.j2k.cache.CacheStatus;
 import org.helioviewer.jhv.view.j2k.cache.CacheStatusLocal;
 import org.helioviewer.jhv.view.j2k.cache.CacheStatusRemote;
@@ -47,16 +48,16 @@ public class J2KView extends BaseView {
     private final TimeMap<Integer> frameMap = new TimeMap<>();
 
     private final Cleaner.Cleanable abolishable;
-    private final J2KExecutor executor;
+    private final DecodeExecutor executor;
     private final KakaduSource kduSource;
     private final JPIPCache jpipCache;
 
     protected final CacheStatus cacheStatus;
     protected final J2KReader reader;
 
-    public J2KView(APIRequest _request, APIResponse _response, URI _uri, J2KExecutor _executor) throws Exception {
+    public J2KView(APIRequest _request, APIResponse _response, URI _uri, DecodeExecutor _executor) throws Exception {
         super(_request, _uri);
-        executor = _executor == null ? new J2KExecutor() : _executor;
+        executor = _executor == null ? new DecodeExecutor() : _executor;
 
         long[] frames = _response == null ? null : _response.getFrames();
         if (frames != null) {
@@ -142,11 +143,11 @@ public class J2KView extends BaseView {
 
     private static class Abolisher implements Runnable {
 
-        private final J2KExecutor aExecutor;
+        private final DecodeExecutor aExecutor;
         private final J2KReader aReader;
         private final JPIPCache aJpipCache;
 
-        Abolisher(J2KExecutor _executor, J2KReader _reader, JPIPCache _jpipCache) {
+        Abolisher(DecodeExecutor _executor, J2KReader _reader, JPIPCache _jpipCache) {
             aExecutor = _executor;
             aReader = _reader;
             aJpipCache = _jpipCache;
@@ -256,7 +257,7 @@ public class J2KView extends BaseView {
         if (reader != null && !decodeParams.complete) {
             signalReader(decodeParams);
         }
-        executor.decode(decodeParams);
+        executor.decode(new J2KDecoder(decodeParams));
     }
 
     protected DecodeParams getDecodeParams(Position viewpoint, int frame, double pixFactor, double factor) {
@@ -299,7 +300,7 @@ public class J2KView extends BaseView {
         EventQueue.invokeLater(() -> {
             if (params.decodeParams.frame == targetFrame) {
                 // params.decodeParams.complete = true;
-                executor.decode(params.decodeParams);
+                executor.decode(new J2KDecoder(params.decodeParams));
             }
         });
     }

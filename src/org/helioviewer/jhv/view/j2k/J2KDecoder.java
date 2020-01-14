@@ -136,11 +136,6 @@ class J2KDecoder implements Runnable {
 
     @Override
     public void run() {
-        if (decodeParams == null) {
-            abolish();
-            return;
-        }
-
         try {
             Thread.currentThread().setName("J2KDecoder " + decodeParams.view.getName());
             ImageBuffer data = decodeLayer(decodeParams);
@@ -183,19 +178,6 @@ class J2KDecoder implements Runnable {
             krc.Remove_ilayer(new Kdu_ilayer_ref(), true);
             krc.Set_thread_env(null, null);
             krc.Native_destroy();
-        } catch (KduException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void abolish() {
-        try {
-            Kdu_thread_env kte = localThread.get();
-            if (kte != null) {
-                kte.Destroy();
-                localThread.set(null);
-            }
-            decodeCache.get().invalidateAll();
         } catch (KduException e) {
             e.printStackTrace();
         }

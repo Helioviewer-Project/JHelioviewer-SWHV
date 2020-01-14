@@ -11,11 +11,10 @@ import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVWorker;
+import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.ManyView;
 import org.helioviewer.jhv.view.View;
-import org.helioviewer.jhv.view.fits.FITSExecutor;
 import org.helioviewer.jhv.view.fits.FITSView;
-import org.helioviewer.jhv.view.j2k.J2KExecutor;
 import org.helioviewer.jhv.view.j2k.J2KView;
 import org.helioviewer.jhv.view.simpleimage.SimpleImageView;
 
@@ -38,13 +37,12 @@ class LoadViewTask extends JHVWorker<View, Void> {
                 throw new IOException("Invalid URI list");
 
             if (uriList.length == 1) {
-                return loadView(uriList[0], null, null, null, null);
+                return loadView(uriList[0], null, null, null);
             } else {
-                FITSExecutor fitsExecutor = new FITSExecutor(); // TBD this is annoying
-                J2KExecutor j2kExecutor = new J2KExecutor();
+                DecodeExecutor executor = new DecodeExecutor(); // TBD this is annoying
                 ArrayList<View> views = new ArrayList<>(uriList.length);
                 for (URI uri : uriList)
-                    views.add(loadView(uri, null, null, fitsExecutor, j2kExecutor));
+                    views.add(loadView(uri, null, null, executor));
                 return new ManyView(views);
             }
         } catch (IOException e) {
@@ -71,7 +69,7 @@ class LoadViewTask extends JHVWorker<View, Void> {
     }
 
     @Nullable
-    protected static View loadView(URI uri, APIRequest req, APIResponse res, FITSExecutor fitsExecutor, J2KExecutor j2kExecutor) throws IOException {
+    protected static View loadView(URI uri, APIRequest req, APIResponse res, DecodeExecutor executor) throws IOException {
         if (uri == null || uri.getScheme() == null) {
             throw new IOException("Invalid URI: " + uri);
         }
@@ -79,11 +77,11 @@ class LoadViewTask extends JHVWorker<View, Void> {
         try {
             String loc = uri.toString().toLowerCase(Locale.ENGLISH);
             if (loc.endsWith(".fits") || loc.endsWith(".fts")) {
-                return new FITSView(req, uri, fitsExecutor);
+                return new FITSView(req, uri, executor);
             } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
                 return new SimpleImageView(req, uri);
             } else {
-                return new J2KView(req, res, uri, j2kExecutor);
+                return new J2KView(req, res, uri, executor);
             }
         } catch (InterruptedException ignore) {
             // nothing
