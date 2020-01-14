@@ -16,6 +16,7 @@ class FITSDecoder implements Runnable {
     @Override
     public void run() {
         try {
+            Thread.currentThread().setName("FITSDecoder");
             ImageBuffer imageBuffer = FITSImage.getHDU(view.getURI());
             if (imageBuffer == null)
                 throw new Exception("Could not read FITS: " + view.getURI());
