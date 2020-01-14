@@ -32,7 +32,7 @@ class NetClientRemote implements NetClient {
 
     //private static final HttpLoggingInterceptor logging = new HttpLoggingInterceptor(Log::info).setLevel(HttpLoggingInterceptor.Level.HEADERS);
 
-    private static final int cacheSize = 512 * 1024 * 1024;
+    private static final int cacheSize = 1024 * 1024 * 1024;
     private static final CacheControl noStore = new CacheControl.Builder().noStore().build();
     private static final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(JHVGlobals.getConnectTimeout(), TimeUnit.MILLISECONDS)
