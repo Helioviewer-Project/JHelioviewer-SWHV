@@ -120,7 +120,7 @@ public class J2KView extends BaseView {
                 reader.start();
             }
 
-            reaper.register(this, new Abolisher(reader, jpipCache));
+            reaper.register(this, new J2KAbolisher(reader, jpipCache));
         } catch (KduException e) {
             e.printStackTrace();
             throw new IOException("Failed to create Kakadu machinery: " + e.getMessage(), e);
@@ -135,12 +135,12 @@ public class J2KView extends BaseView {
         return metaData[0].getDisplayName();
     }
 
-    private static class Abolisher implements Runnable {
+    private static class J2KAbolisher implements Runnable {
 
         private final J2KReader aReader;
         private final JPIPCache aJpipCache;
 
-        Abolisher(J2KReader _reader, JPIPCache _jpipCache) {
+        J2KAbolisher(J2KReader _reader, JPIPCache _jpipCache) {
             aReader = _reader;
             aJpipCache = _jpipCache;
         }

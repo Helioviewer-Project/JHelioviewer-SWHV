@@ -21,7 +21,7 @@ public class BaseView implements View {
     private static final AtomicBoolean fullCache = new AtomicBoolean(true);
     protected static final Cleaner reaper = Cleaner.create();
 
-    private final Cleaner.Cleanable decoderAbolishable;
+    private final Cleaner.Cleanable baseAbolishable;
     private final boolean isLocal;
 
     protected final DecodeExecutor executor;
@@ -37,7 +37,7 @@ public class BaseView implements View {
         uri = _uri;
         isLocal = uri != null && "file".equals(uri.getScheme());
         metaData[0] = new PixelBasedMetaData(1, 1, 0, uri);
-        decoderAbolishable = reaper.register(this, new Abolisher(executor));
+        baseAbolishable = reaper.register(this, new BaseAbolisher(executor));
     }
 
     @Override
@@ -152,11 +152,11 @@ public class BaseView implements View {
         return "<meta/>";
     }
 
-    private static class Abolisher implements Runnable {
+    private static class BaseAbolisher implements Runnable {
 
         private final DecodeExecutor aExecutor;
 
-        Abolisher(DecodeExecutor _executor) {
+        BaseAbolisher(DecodeExecutor _executor) {
             aExecutor = _executor;
         }
 
@@ -170,7 +170,7 @@ public class BaseView implements View {
 
     @Override
     public void abolish() {
-        decoderAbolishable.clean();
+        baseAbolishable.clean();
     }
 
 }
