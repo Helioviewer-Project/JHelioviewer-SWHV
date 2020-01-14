@@ -20,13 +20,9 @@ public class DecodeExecutor {
         executor.execute(r);
     }
 
-    public void abolish() {
-        try {
-            blockingQueue.poll();
-            executor.shutdown();
-            while (!executor.awaitTermination(1000L, TimeUnit.MILLISECONDS)) ;
-        } catch (Exception ignore) {
-        }
+    void abolish() {
+        blockingQueue.poll();
+        executor.shutdown();
     }
 
 }
