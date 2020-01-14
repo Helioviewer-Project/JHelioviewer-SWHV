@@ -13,6 +13,7 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.view.ManyView;
 import org.helioviewer.jhv.view.View;
+import org.helioviewer.jhv.view.fits.FITSDecodeExecutor;
 import org.helioviewer.jhv.view.fits.FITSView;
 import org.helioviewer.jhv.view.j2k.DecodeExecutor;
 import org.helioviewer.jhv.view.j2k.J2KView;
@@ -37,12 +38,13 @@ class LoadViewTask extends JHVWorker<View, Void> {
                 throw new IOException("Invalid URI list");
 
             if (uriList.length == 1) {
-                return loadView(uriList[0], null, null, null);
+                return loadView(uriList[0], null, null, null, null);
             } else {
-                DecodeExecutor executor = new DecodeExecutor(); // TBD something more elegant
+                FITSDecodeExecutor fitsExecutor = new FITSDecodeExecutor(); // TBD this is annoying
+                DecodeExecutor j2kExecutor = new DecodeExecutor();
                 ArrayList<View> views = new ArrayList<>(uriList.length);
                 for (URI uri : uriList)
-                    views.add(loadView(uri, null, null, executor));
+                    views.add(loadView(uri, null, null, fitsExecutor, j2kExecutor));
                 return new ManyView(views);
             }
         } catch (IOException e) {
@@ -69,7 +71,7 @@ class LoadViewTask extends JHVWorker<View, Void> {
     }
 
     @Nullable
-    protected static View loadView(URI uri, APIRequest req, APIResponse res, DecodeExecutor executor) throws IOException {
+    protected static View loadView(URI uri, APIRequest req, APIResponse res, FITSDecodeExecutor fitsExecutor, DecodeExecutor j2kExecutor) throws IOException {
         if (uri == null || uri.getScheme() == null) {
             throw new IOException("Invalid URI: " + uri);
         }
@@ -77,11 +79,11 @@ class LoadViewTask extends JHVWorker<View, Void> {
         try {
             String loc = uri.toString().toLowerCase(Locale.ENGLISH);
             if (loc.endsWith(".fits") || loc.endsWith(".fts")) {
-                return new FITSView(req, uri);
+                return new FITSView(req, uri, fitsExecutor);
             } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
                 return new SimpleImageView(req, uri);
             } else {
-                return new J2KView(req, res, uri, executor);
+                return new J2KView(req, res, uri, j2kExecutor);
             }
         } catch (InterruptedException ignore) {
             // nothing
