@@ -25,7 +25,7 @@ public class FITSView extends BaseView {
     public FITSView(DecodeExecutor _executor, APIRequest _request, URI _uri) throws Exception {
         super(_executor, _request, _uri);
 
-        xml = FITSImage.getHeader(uri);
+        xml = FITSImage.getXML(uri);
         if (xml == null)
             throw new Exception("Could not read FITS: " + uri);
         metaData[0] = new XMLMetaDataContainer(xml).getHVMetaData(0, false);
