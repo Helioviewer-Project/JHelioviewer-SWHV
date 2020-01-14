@@ -1,0 +1,17 @@
+package org.helioviewer.jhv.view;
+
+import java.net.URI;
+
+import javax.annotation.Nullable;
+
+import org.helioviewer.jhv.imagedata.ImageBuffer;
+
+public interface URIImageReader {
+
+    @Nullable
+    String readXML(URI uri) throws Exception;
+
+    @Nullable
+    ImageBuffer readImageBuffer(URI uri) throws Exception;
+
+}

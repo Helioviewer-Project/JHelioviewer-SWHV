@@ -21,12 +21,13 @@ import javax.imageio.stream.ImageInputStream;
 //import org.helioviewer.jhv.base.XMLUtils;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.io.NetClient;
+import org.helioviewer.jhv.view.URIImageReader;
 
-// local or network cache
-class SimpleImage {
+// essentially static; local or network cache
+class SimpleImage implements URIImageReader {
 
     @Nullable
-    static String getXML(URI uri) throws Exception {
+    public String readXML(URI uri) throws Exception {
         try (NetClient nc = NetClient.of(uri); ImageInputStream iis = ImageIO.createImageInputStream(nc.getStream())) {
             ImageReader reader = getReader(iis);
             if (reader == null)
@@ -55,7 +56,7 @@ class SimpleImage {
         }
     }
 
-    static ImageBuffer getImageBuffer(URI uri) throws Exception {
+    public ImageBuffer readImageBuffer(URI uri) throws Exception {
         try (NetClient nc = NetClient.of(uri); ImageInputStream iis = ImageIO.createImageInputStream(nc.getStream())) {
             ImageReader reader = getReader(iis);
             if (reader == null)
