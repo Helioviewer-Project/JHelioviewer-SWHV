@@ -22,12 +22,12 @@ public class FITSView extends BaseView {
     private static final Cleaner reaper = Cleaner.create();
 
     private final Cleaner.Cleanable abolishable;
-    private final FITSDecodeExecutor executor;
+    private final FITSExecutor executor;
     private final String xml;
 
-    public FITSView(APIRequest _request, URI _uri, FITSDecodeExecutor _executor) throws Exception {
+    public FITSView(APIRequest _request, URI _uri, FITSExecutor _executor) throws Exception {
         super(_request, _uri);
-        executor = _executor == null ? new FITSDecodeExecutor() : _executor;
+        executor = _executor == null ? new FITSExecutor() : _executor;
 
         xml = FITSImage.getHeader(uri);
         if (xml == null)
@@ -63,12 +63,11 @@ public class FITSView extends BaseView {
         return xml;
     }
 
-    // if instance was built before cancelling
     private static class Abolisher implements Runnable {
 
-        private final FITSDecodeExecutor aExecutor;
+        private final FITSExecutor aExecutor;
 
-        Abolisher(FITSDecodeExecutor _executor) {
+        Abolisher(FITSExecutor _executor) {
             aExecutor = _executor;
         }
 

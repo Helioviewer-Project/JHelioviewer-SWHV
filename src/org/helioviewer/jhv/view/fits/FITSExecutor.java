@@ -9,7 +9,7 @@ import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.threads.JHVThread;
 
-public class FITSDecodeExecutor {
+public class FITSExecutor {
 
     private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<>(1);
     // no need to intercept exceptions

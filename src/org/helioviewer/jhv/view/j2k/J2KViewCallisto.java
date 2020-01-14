@@ -13,7 +13,7 @@ import org.helioviewer.jhv.view.j2k.image.ResolutionSet.ResolutionLevel;
 
 public class J2KViewCallisto extends J2KView {
 
-    public J2KViewCallisto(APIRequest _request, URI _uri, DecodeExecutor _executor) throws Exception {
+    public J2KViewCallisto(APIRequest _request, URI _uri, J2KExecutor _executor) throws Exception {
         super(_request, null, _uri, _executor);
     }
 

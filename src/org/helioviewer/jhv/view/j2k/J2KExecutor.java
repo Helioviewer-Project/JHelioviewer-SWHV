@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.view.j2k.image.DecodeParams;
 
-public class DecodeExecutor {
+public class J2KExecutor {
 
     private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<>(1);
     // no need to intercept exceptions

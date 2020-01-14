@@ -13,9 +13,9 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.view.ManyView;
 import org.helioviewer.jhv.view.View;
-import org.helioviewer.jhv.view.fits.FITSDecodeExecutor;
+import org.helioviewer.jhv.view.fits.FITSExecutor;
 import org.helioviewer.jhv.view.fits.FITSView;
-import org.helioviewer.jhv.view.j2k.DecodeExecutor;
+import org.helioviewer.jhv.view.j2k.J2KExecutor;
 import org.helioviewer.jhv.view.j2k.J2KView;
 import org.helioviewer.jhv.view.simpleimage.SimpleImageView;
 
@@ -40,8 +40,8 @@ class LoadViewTask extends JHVWorker<View, Void> {
             if (uriList.length == 1) {
                 return loadView(uriList[0], null, null, null, null);
             } else {
-                FITSDecodeExecutor fitsExecutor = new FITSDecodeExecutor(); // TBD this is annoying
-                DecodeExecutor j2kExecutor = new DecodeExecutor();
+                FITSExecutor fitsExecutor = new FITSExecutor(); // TBD this is annoying
+                J2KExecutor j2kExecutor = new J2KExecutor();
                 ArrayList<View> views = new ArrayList<>(uriList.length);
                 for (URI uri : uriList)
                     views.add(loadView(uri, null, null, fitsExecutor, j2kExecutor));
@@ -71,7 +71,7 @@ class LoadViewTask extends JHVWorker<View, Void> {
     }
 
     @Nullable
-    protected static View loadView(URI uri, APIRequest req, APIResponse res, FITSDecodeExecutor fitsExecutor, DecodeExecutor j2kExecutor) throws IOException {
+    protected static View loadView(URI uri, APIRequest req, APIResponse res, FITSExecutor fitsExecutor, J2KExecutor j2kExecutor) throws IOException {
         if (uri == null || uri.getScheme() == null) {
             throw new IOException("Invalid URI: " + uri);
         }
