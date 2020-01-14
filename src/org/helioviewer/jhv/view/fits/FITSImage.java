@@ -21,31 +21,46 @@ import org.helioviewer.jhv.log.Log;
 
 class FITSImage {
 
-    final String xmlHeader;
-    final ImageBuffer imageBuffer;
-
     @Nullable
-    static FITSImage get(URI uri) throws Exception {
+    static String getHeader(URI uri) throws Exception {
         try (NetClient nc = NetClient.of(uri); Fits f = new Fits(nc.getStream())) {
             BasicHDU<?>[] hdus = f.read();
             // this is cumbersome
             for (BasicHDU<?> hdu : hdus) {
                 if (hdu instanceof CompressedImageHDU) {
-                    return new FITSImage(((CompressedImageHDU) hdu).asImageHDU());
+                    return readHeader(((CompressedImageHDU) hdu).asImageHDU());
                 }
             }
             for (BasicHDU<?> hdu : hdus) {
                 if (hdu instanceof ImageHDU) {
-                    return new FITSImage((ImageHDU) hdu);
+                    return readHeader((ImageHDU) hdu);
                 }
             }
         }
         return null;
     }
 
-    private FITSImage(ImageHDU hdu) throws Exception {
-        xmlHeader = getHeaderAsXML(hdu.getHeader());
-        imageBuffer = readHDU(hdu);
+    @Nullable
+    static ImageBuffer getHDU(URI uri) throws Exception {
+        try (NetClient nc = NetClient.of(uri); Fits f = new Fits(nc.getStream())) {
+            BasicHDU<?>[] hdus = f.read();
+            // this is cumbersome
+            for (BasicHDU<?> hdu : hdus) {
+                if (hdu instanceof CompressedImageHDU) {
+                    return readHDU(((CompressedImageHDU) hdu).asImageHDU());
+                }
+            }
+            for (BasicHDU<?> hdu : hdus) {
+                if (hdu instanceof ImageHDU) {
+                    return readHDU((ImageHDU) hdu);
+                }
+            }
+        }
+        return null;
+    }
+
+    private static String readHeader(ImageHDU hdu) {
+        return getHeaderAsXML(hdu.getHeader());
     }
 
     private static final double GAMMA = 1 / 2.2;
