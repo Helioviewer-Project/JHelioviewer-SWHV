@@ -17,10 +17,8 @@ import javax.annotation.Nonnull;
  * response.
  */
 
-/**
- * The class <code>ChunkedInputStream</code> allows to decode HTTP chunked
- * responses with a simple format. Does not support internal chunk headers.
- */
+// ChunkedInputStream allows to decode HTTP chunked responses with a simple
+// format. Does not support internal chunk headers.
 public class ChunkedInputStream extends TransferInputStream {
 
     private int totalLength = 0;
@@ -35,11 +33,6 @@ public class ChunkedInputStream extends TransferInputStream {
 
     private final byte[] tmpRead = new byte[1];
 
-    /**
-     * Constructs a new object with a <code>InputStream</code> base object.
-     *
-     * @param _in A <code>InputStream</code> object as a base stream.
-     */
     public ChunkedInputStream(InputStream _in) {
         in = _in;
     }
@@ -50,23 +43,14 @@ public class ChunkedInputStream extends TransferInputStream {
         return totalLength;
     }
 
-    /**
-     * This kind of stream does not support marking.
-     *
-     * @return <code>False</code>
-     */
+    // This kind of stream does not support marking.
     @Override
     public boolean markSupported() {
         return false;
     }
 
-    /**
-     * Reads the next byte of the chunked content. It will return -1 if there are
-     * no more chunks to decode.
-     *
-     * @return The next byte read, or -1 is there is no more data.
-     * @throws IOException
-     */
+    // Reads the next byte of the chunked content. It will return -1 if there are
+    // no more chunks to decode.
     @Override
     public int read() throws IOException {
         int n = read(tmpRead, 0, 1);
