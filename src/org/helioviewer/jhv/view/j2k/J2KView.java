@@ -55,7 +55,7 @@ public class J2KView extends BaseView {
     protected final CacheStatus cacheStatus;
     protected final J2KReader reader;
 
-    public J2KView(APIRequest _request, APIResponse _response, URI _uri, DecodeExecutor _executor) throws Exception {
+    public J2KView(DecodeExecutor _executor, APIRequest _request, URI _uri, APIResponse _response) throws Exception {
         super(_request, _uri);
         executor = _executor == null ? new DecodeExecutor() : _executor;
 

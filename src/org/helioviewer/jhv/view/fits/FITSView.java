@@ -26,7 +26,7 @@ public class FITSView extends BaseView {
     private final DecodeExecutor executor;
     private final String xml;
 
-    public FITSView(APIRequest _request, URI _uri, DecodeExecutor _executor) throws Exception {
+    public FITSView(DecodeExecutor _executor, APIRequest _request, URI _uri) throws Exception {
         super(_request, _uri);
         executor = _executor == null ? new DecodeExecutor() : _executor;
 
