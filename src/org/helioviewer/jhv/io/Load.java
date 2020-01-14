@@ -23,7 +23,7 @@ public interface Load {
             try {
                 getAll(FileUtils.listDir(Path.of(uri)));
             } catch (Exception e) {
-                JHVGlobals.getExecutorService().execute(new DownloadViewTask(ImageLayer.create(null), new BaseView(null, uri)));
+                JHVGlobals.getExecutorService().execute(new DownloadViewTask(ImageLayer.create(null), new BaseView(null, null, uri)));
             }
         }
 

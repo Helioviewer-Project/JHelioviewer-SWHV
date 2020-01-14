@@ -2,7 +2,6 @@ package org.helioviewer.jhv.view.j2k;
 
 import java.awt.EventQueue;
 import java.io.IOException;
-import java.lang.ref.Cleaner;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -37,8 +36,6 @@ import org.helioviewer.jhv.view.j2k.kakadu.KakaduSource;
 
 public class J2KView extends BaseView {
 
-    private static final Cleaner reaper = Cleaner.create();
-
     private static final int HIRES_CUTOFF = 1280;
 
     private final int maxFrame;
@@ -47,8 +44,6 @@ public class J2KView extends BaseView {
     private final long[] cacheKey;
     private final TimeMap<Integer> frameMap = new TimeMap<>();
 
-    private final Cleaner.Cleanable abolishable;
-    private final DecodeExecutor executor;
     private final KakaduSource kduSource;
     private final JPIPCache jpipCache;
 
@@ -56,8 +51,7 @@ public class J2KView extends BaseView {
     protected final J2KReader reader;
 
     public J2KView(DecodeExecutor _executor, APIRequest _request, URI _uri, APIResponse _response) throws Exception {
-        super(_request, _uri);
-        executor = _executor == null ? new DecodeExecutor() : _executor;
+        super(_executor, _request, _uri);
 
         long[] frames = _response == null ? null : _response.getFrames();
         if (frames != null) {
@@ -126,7 +120,7 @@ public class J2KView extends BaseView {
                 reader.start();
             }
 
-            abolishable = reaper.register(this, new Abolisher(executor, reader, jpipCache));
+            reaper.register(this, new Abolisher(reader, jpipCache));
         } catch (KduException e) {
             e.printStackTrace();
             throw new IOException("Failed to create Kakadu machinery: " + e.getMessage(), e);
@@ -143,21 +137,18 @@ public class J2KView extends BaseView {
 
     private static class Abolisher implements Runnable {
 
-        private final DecodeExecutor aExecutor;
         private final J2KReader aReader;
         private final JPIPCache aJpipCache;
 
-        Abolisher(DecodeExecutor _executor, J2KReader _reader, JPIPCache _jpipCache) {
-            aExecutor = _executor;
+        Abolisher(J2KReader _reader, JPIPCache _jpipCache) {
             aReader = _reader;
             aJpipCache = _jpipCache;
         }
 
         @Override
         public void run() {
-            // executor and reader abolish may take too long in stressed conditions
+            // reader abolish may take too long in stressed conditions
             new Thread(() -> {
-                aExecutor.abolish();
                 if (aReader != null) {
                     aReader.abolish();
                 }
@@ -172,11 +163,6 @@ public class J2KView extends BaseView {
             }).start();
         }
 
-    }
-
-    @Override
-    public void abolish() {
-        abolishable.clean();
     }
 
     @Override
