@@ -13,7 +13,7 @@ public class DecodeExecutor {
     private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<>(1);
     // no need to intercept exceptions
     private final ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue,
-            new JHVThread.NamedThreadFactory("Decoder"),
+            new JHVThread.NamedThreadFactory("J2KDecoder"),
             new ThreadPoolExecutor.DiscardPolicy());
 
     void decode(DecodeParams decodeParams) {
