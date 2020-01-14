@@ -24,7 +24,7 @@ public class LoadRemoteTask extends LoadViewTask {
     protected View backgroundWork() {
         try {
             APIResponse res = APIRequestManager.requestRemoteFile(req);
-            return res == null ? null : loadView(res.getURI(), req, res, null);
+            return res == null ? null : loadView(null, req, res.getURI(), res);
         } catch (IOException e) {
             Log.error("An error occured while opening the remote file: ", e);
             Message.err("An error occured while opening the remote file: ", e.getMessage(), false);

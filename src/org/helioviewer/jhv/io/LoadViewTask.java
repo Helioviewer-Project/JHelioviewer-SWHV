@@ -37,12 +37,12 @@ class LoadViewTask extends JHVWorker<View, Void> {
                 throw new IOException("Invalid URI list");
 
             if (uriList.length == 1) {
-                return loadView(uriList[0], null, null, null);
+                return loadView(null, null, uriList[0], null);
             } else {
                 DecodeExecutor executor = new DecodeExecutor(); // TBD this is annoying
                 ArrayList<View> views = new ArrayList<>(uriList.length);
                 for (URI uri : uriList)
-                    views.add(loadView(uri, null, null, executor));
+                    views.add(loadView(executor, null, uri, null));
                 return new ManyView(views);
             }
         } catch (IOException e) {
@@ -69,7 +69,7 @@ class LoadViewTask extends JHVWorker<View, Void> {
     }
 
     @Nullable
-    protected static View loadView(URI uri, APIRequest req, APIResponse res, DecodeExecutor executor) throws IOException {
+    protected static View loadView(DecodeExecutor executor, APIRequest req, URI uri, APIResponse res) throws IOException {
         if (uri == null || uri.getScheme() == null) {
             throw new IOException("Invalid URI: " + uri);
         }
@@ -77,11 +77,11 @@ class LoadViewTask extends JHVWorker<View, Void> {
         try {
             String loc = uri.toString().toLowerCase(Locale.ENGLISH);
             if (loc.endsWith(".fits") || loc.endsWith(".fts")) {
-                return new FITSView(req, uri, executor);
+                return new FITSView(executor, req, uri);
             } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
                 return new SimpleImageView(req, uri);
             } else {
-                return new J2KView(req, res, uri, executor);
+                return new J2KView(executor, req, uri, res);
             }
         } catch (InterruptedException ignore) {
             // nothing
