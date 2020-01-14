@@ -14,8 +14,7 @@ class BooleanSignal {
     private boolean isSignaled;
     private ReadParams params;
 
-    BooleanSignal(boolean _initialVal) {
-        isSignaled = _initialVal;
+    BooleanSignal() {
     }
 
     // Used to wait for a signal. Waits until the flag is set, then it resets

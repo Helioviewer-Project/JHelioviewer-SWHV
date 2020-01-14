@@ -2,7 +2,6 @@ package org.helioviewer.jhv.view.simpleimage;
 
 import java.net.URI;
 
-//import org.helioviewer.jhv.base.XMLUtils;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;

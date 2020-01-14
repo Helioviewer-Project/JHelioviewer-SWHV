@@ -19,7 +19,7 @@ import org.helioviewer.jhv.view.j2k.io.jpip.JPIPStream;
 
 class J2KReader implements Runnable {
 
-    private final BooleanSignal readerSignal = new BooleanSignal(false);
+    private final BooleanSignal readerSignal = new BooleanSignal();
 
     private final Thread myThread;
     private volatile boolean isAbolished;
