@@ -18,12 +18,13 @@ import com.google.common.cache.CacheBuilder;
 public class FITSView extends BaseView {
 
     private static final Cache<FITSView, ImageBuffer> decodeCache = CacheBuilder.newBuilder().weakKeys().softValues().build();
-    private static final FITSDecodeExecutor executor = new FITSDecodeExecutor(); // TBD
 
+    private final FITSDecodeExecutor executor;
     private final String xml;
 
-    public FITSView(APIRequest _request, URI _uri) throws Exception {
+    public FITSView(APIRequest _request, URI _uri, FITSDecodeExecutor _executor) throws Exception {
         super(_request, _uri);
+        executor = _executor == null ? new FITSDecodeExecutor() : _executor;
 
         xml = FITSImage.getHeader(uri);
         if (xml == null)
@@ -54,6 +55,7 @@ public class FITSView extends BaseView {
 
     @Override
     public void abolish() {
+        executor.abolish();
         decodeCache.invalidate(this);
     }
 
