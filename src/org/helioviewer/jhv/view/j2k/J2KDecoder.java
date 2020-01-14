@@ -137,7 +137,7 @@ class J2KDecoder implements Runnable {
     @Override
     public void run() {
         try {
-            Thread.currentThread().setName("J2KDecoder " + decodeParams.view.getName());
+            Thread.currentThread().setName("J2KDecoder");
             ImageBuffer data = decodeLayer(decodeParams);
             decodeParams.view.setDataFromDecoder(decodeParams, data);
         } catch (Exception e) {
