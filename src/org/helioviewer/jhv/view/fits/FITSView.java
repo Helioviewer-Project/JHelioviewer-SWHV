@@ -12,12 +12,9 @@ import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.view.BaseView;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-
 public class FITSView extends BaseView {
 
-    private static final Cache<URI, ImageBuffer> decodeCache = CacheBuilder.newBuilder().softValues().build();
+    private static final FITSDecodeExecutor executor = new FITSDecodeExecutor();
 
     private final String xml;
 
@@ -32,40 +29,19 @@ public class FITSView extends BaseView {
 
     @Override
     public void decode(Position viewpoint, double pixFactor, double factor) {
-        if (dataHandler != null) {
-            ImageBuffer imageBuffer = decodeCache.getIfPresent(uri);
-            if (imageBuffer == null) { // first read or was evicted
-                runDecode(viewpoint);
-            } else {
-                setDataFromDecoder(imageBuffer, viewpoint);
-            }
-        }
+        executor.decode(this, viewpoint);
     }
 
-    private void setDataFromDecoder(ImageBuffer imageBuffer, Position viewpoint) {
+    void setDataFromDecoder(ImageBuffer imageBuffer, Position viewpoint) {
         ImageData data = new ImageData(imageBuffer, metaData[0], metaData[0].getPhysicalRegion(), viewpoint);
-        if (dataHandler != null)
-            dataHandler.handleData(data);
-    }
-
-    private void runDecode(Position viewpoint) {
-        new Thread(() -> {
-            try {
-                ImageBuffer imageBuffer = FITSImage.getHDU(uri);
-                if (imageBuffer == null)
-                    throw new Exception("Could not read FITS: " + uri);
-
-                decodeCache.put(uri, imageBuffer);
-                EventQueue.invokeLater(() -> setDataFromDecoder(imageBuffer, viewpoint));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
+        EventQueue.invokeLater(() -> {
+            if (dataHandler != null)
+                dataHandler.handleData(data);
+        });
     }
 
     @Override
     public void abolish() {
-        decodeCache.invalidate(uri);
     }
 
     @Nonnull
