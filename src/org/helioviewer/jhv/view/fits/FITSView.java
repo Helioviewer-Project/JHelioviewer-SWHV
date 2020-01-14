@@ -12,9 +12,13 @@ import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.view.BaseView;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 public class FITSView extends BaseView {
 
-    private static final FITSDecodeExecutor executor = new FITSDecodeExecutor();
+    private static final Cache<FITSView, ImageBuffer> decodeCache = CacheBuilder.newBuilder().weakKeys().softValues().build();
+    private static final FITSDecodeExecutor executor = new FITSDecodeExecutor(); // TBD
 
     private final String xml;
 
@@ -29,10 +33,18 @@ public class FITSView extends BaseView {
 
     @Override
     public void decode(Position viewpoint, double pixFactor, double factor) {
-        executor.decode(this, viewpoint);
+        ImageBuffer imageBuffer = decodeCache.getIfPresent(this);
+        if (imageBuffer == null) {
+            executor.decode(this, viewpoint);
+        } else {
+            ImageData data = new ImageData(imageBuffer, metaData[0], metaData[0].getPhysicalRegion(), viewpoint);
+            if (dataHandler != null)
+                dataHandler.handleData(data);
+        }
     }
 
     void setDataFromDecoder(ImageBuffer imageBuffer, Position viewpoint) {
+        decodeCache.put(this, imageBuffer);
         ImageData data = new ImageData(imageBuffer, metaData[0], metaData[0].getPhysicalRegion(), viewpoint);
         EventQueue.invokeLater(() -> {
             if (dataHandler != null)
@@ -42,6 +54,7 @@ public class FITSView extends BaseView {
 
     @Override
     public void abolish() {
+        decodeCache.invalidate(this);
     }
 
     @Nonnull

@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.threads.JHVThread;
 
@@ -29,6 +30,34 @@ public class FITSDecodeExecutor {
             while (!executor.awaitTermination(1000L, TimeUnit.MILLISECONDS)) ;
         } catch (Exception ignore) {
         }
+    }
+
+    private static class FITSDecoder implements Runnable {
+
+        private final FITSView view;
+        private final Position viewpoint;
+
+        FITSDecoder(FITSView _view, Position _viewpoint) {
+            view = _view;
+            viewpoint = _viewpoint;
+        }
+
+        @Override
+        public void run() {
+            if (view == null) {
+                return;
+            }
+
+            try {
+                ImageBuffer imageBuffer = FITSImage.getHDU(view.getURI());
+                if (imageBuffer == null)
+                    throw new Exception("Could not read FITS: " + view.getURI());
+                view.setDataFromDecoder(imageBuffer, viewpoint);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
 }
