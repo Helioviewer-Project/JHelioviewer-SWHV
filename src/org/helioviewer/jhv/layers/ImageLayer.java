@@ -144,6 +144,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
             ImageLayers.arrangeMultiView(true);
         }
         dispose(gl);
+        System.gc(); // reclaim memory asap
         removed = true;
     }
 
