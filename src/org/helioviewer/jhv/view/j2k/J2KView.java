@@ -47,16 +47,16 @@ public class J2KView extends BaseView {
     private final TimeMap<Integer> frameMap = new TimeMap<>();
 
     private final Cleaner.Cleanable abolishable;
-    private final DecodeExecutor executor;
+    private final J2KExecutor executor;
     private final KakaduSource kduSource;
     private final JPIPCache jpipCache;
 
     protected final CacheStatus cacheStatus;
     protected final J2KReader reader;
 
-    public J2KView(APIRequest _request, APIResponse _response, URI _uri, DecodeExecutor _executor) throws Exception {
+    public J2KView(APIRequest _request, APIResponse _response, URI _uri, J2KExecutor _executor) throws Exception {
         super(_request, _uri);
-        executor = _executor == null ? new DecodeExecutor() : _executor;
+        executor = _executor == null ? new J2KExecutor() : _executor;
 
         long[] frames = _response == null ? null : _response.getFrames();
         if (frames != null) {
@@ -140,14 +140,13 @@ public class J2KView extends BaseView {
         return metaData[0].getDisplayName();
     }
 
-    // if instance was built before cancelling
     private static class Abolisher implements Runnable {
 
-        private final DecodeExecutor aExecutor;
+        private final J2KExecutor aExecutor;
         private final J2KReader aReader;
         private final JPIPCache aJpipCache;
 
-        Abolisher(DecodeExecutor _executor, J2KReader _reader, JPIPCache _jpipCache) {
+        Abolisher(J2KExecutor _executor, J2KReader _reader, JPIPCache _jpipCache) {
             aExecutor = _executor;
             aReader = _reader;
             aJpipCache = _jpipCache;
