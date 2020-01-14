@@ -162,8 +162,7 @@ public class BaseView implements View {
 
         @Override
         public void run() {
-            // executor abolish may take too long in stressed conditions
-            new Thread(aExecutor::abolish).start();
+            aExecutor.abolish();
         }
 
     }
