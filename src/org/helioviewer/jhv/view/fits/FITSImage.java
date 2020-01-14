@@ -19,10 +19,11 @@ import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.log.Log;
 
+// local or network cache
 class FITSImage {
 
     @Nullable
-    static String getHeader(URI uri) throws Exception {
+    static String getXML(URI uri) throws Exception {
         try (NetClient nc = NetClient.of(uri); Fits f = new Fits(nc.getStream())) {
             BasicHDU<?>[] hdus = f.read();
             // this is cumbersome
@@ -41,7 +42,7 @@ class FITSImage {
     }
 
     @Nullable
-    static ImageBuffer getHDU(URI uri) throws Exception {
+    static ImageBuffer getImageBuffer(URI uri) throws Exception {
         try (NetClient nc = NetClient.of(uri); Fits f = new Fits(nc.getStream())) {
             BasicHDU<?>[] hdus = f.read();
             // this is cumbersome
