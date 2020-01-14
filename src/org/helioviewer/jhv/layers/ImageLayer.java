@@ -36,7 +36,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     private boolean removed;
     private LoadRemoteTask worker;
-    private View view = new BaseView(null, null);
+    private View view = new BaseView(null, null, null);
 
     public static ImageLayer create(JSONObject jo) {
         ImageLayer imageLayer = new ImageLayer(jo);

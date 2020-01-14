@@ -29,14 +29,15 @@ import org.helioviewer.jhv.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.view.BaseView;
+import org.helioviewer.jhv.view.DecodeExecutor;
 
 public class SimpleImageView extends BaseView {
 
     private String xml;
     private final ImageBuffer imageBuffer;
 
-    public SimpleImageView(APIRequest _request, URI _uri) throws Exception {
-        super(_request, _uri);
+    public SimpleImageView(DecodeExecutor _executor, APIRequest _request, URI _uri) throws Exception {
+        super(_executor, _request, _uri);
 
         BufferedImage image = null;
         try (NetClient nc = NetClient.of(uri); ImageInputStream iis = ImageIO.createImageInputStream(nc.getStream())) {

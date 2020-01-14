@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.view;
 
+import java.lang.ref.Cleaner;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -18,19 +19,25 @@ import org.helioviewer.jhv.time.JHVDate;
 public class BaseView implements View {
 
     private static final AtomicBoolean fullCache = new AtomicBoolean(true);
+    protected static final Cleaner reaper = Cleaner.create();
 
+    private final Cleaner.Cleanable decoderAbolishable;
     private final boolean isLocal;
+
+    protected final DecodeExecutor executor;
     protected final APIRequest request;
     protected final URI uri;
 
     protected LUT builtinLUT;
     protected MetaData[] metaData = new MetaData[1];
 
-    public BaseView(APIRequest _request, URI _uri) {
+    public BaseView(DecodeExecutor _executor, APIRequest _request, URI _uri) {
+        executor = _executor == null ? new DecodeExecutor() : _executor;
         request = _request;
         uri = _uri;
         isLocal = uri != null && "file".equals(uri.getScheme());
         metaData[0] = new PixelBasedMetaData(1, 1, 0, uri);
+        decoderAbolishable = reaper.register(this, new Abolisher(executor));
     }
 
     @Override
@@ -47,10 +54,6 @@ public class BaseView implements View {
     @Override
     public APIRequest getAPIRequest() {
         return request;
-    }
-
-    @Override
-    public void abolish() {
     }
 
     @Override
@@ -147,6 +150,27 @@ public class BaseView implements View {
     @Override
     public String getXMLMetaData() throws Exception {
         return "<meta/>";
+    }
+
+    private static class Abolisher implements Runnable {
+
+        private final DecodeExecutor aExecutor;
+
+        Abolisher(DecodeExecutor _executor) {
+            aExecutor = _executor;
+        }
+
+        @Override
+        public void run() {
+            // executor abolish may take too long in stressed conditions
+            new Thread(aExecutor::abolish).start();
+        }
+
+    }
+
+    @Override
+    public void abolish() {
+        decoderAbolishable.clean();
     }
 
 }
