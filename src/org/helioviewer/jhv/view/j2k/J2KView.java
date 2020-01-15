@@ -237,15 +237,6 @@ public class J2KView extends BaseView {
         return isDownloading;
     }
 
-    @Override
-    public void decode(Position viewpoint, double pixFactor, double factor) {
-        DecodeParams decodeParams = getDecodeParams(viewpoint, targetFrame, pixFactor, factor);
-        if (reader != null && !decodeParams.complete) {
-            signalReader(decodeParams);
-        }
-        executor.decode(new J2KDecoder(decodeParams));
-    }
-
     protected DecodeParams getDecodeParams(Position viewpoint, int frame, double pixFactor, double factor) {
         ResolutionLevel res;
         SubImage subImage;
@@ -270,6 +261,8 @@ public class J2KView extends BaseView {
         return new DecodeParams(this, viewpoint, status != null && status.get(), subImage, res, frame, factor);
     }
 
+    private int currentLevel = 10000;
+
     protected void signalReader(DecodeParams decodeParams) {
         int level = decodeParams.resolution.level;
         boolean priority = !Movie.isPlaying();
@@ -280,15 +273,26 @@ public class J2KView extends BaseView {
         currentLevel = level;
     }
 
-    private int currentLevel = 10000;
+    @Override
+    public void decode(Position viewpoint, double pixFactor, double factor) {
+        DecodeParams decodeParams = getDecodeParams(viewpoint, targetFrame, pixFactor, factor);
+        if (reader != null && !decodeParams.complete) {
+            signalReader(decodeParams);
+        }
+        executeDecode(decodeParams);
+    }
 
     void signalDecoderFromReader(ReadParams params) {
         EventQueue.invokeLater(() -> {
             if (params.decodeParams.frame == targetFrame) {
                 // params.decodeParams.complete = true;
-                executor.decode(new J2KDecoder(params.decodeParams));
+                executeDecode(params.decodeParams);
             }
         });
+    }
+
+    private void executeDecode(DecodeParams decodeParams) {
+        executor.decode(new J2KDecoder(decodeParams));
     }
 
     void setDataFromDecoder(DecodeParams decodeParams, ImageBuffer imageBuffer) {

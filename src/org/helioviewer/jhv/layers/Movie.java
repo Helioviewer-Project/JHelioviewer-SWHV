@@ -269,18 +269,16 @@ public class Movie {
     }
 
     public static void setDesiredRelativeSpeed(int fps) {
-        for (ActionListener listener : movieTimer.getActionListeners()) {
+        for (ActionListener listener : movieTimer.getActionListeners())
             movieTimer.removeActionListener(listener);
-        }
         movieTimer.addActionListener(relativeTimeAdvanceListener);
         movieTimer.setDelay(1000 / fps);
         deltaT = 0;
     }
 
     public static void setDesiredAbsoluteSpeed(int sec) {
-        for (ActionListener listener : movieTimer.getActionListeners()) {
+        for (ActionListener listener : movieTimer.getActionListeners())
             movieTimer.removeActionListener(listener);
-        }
         movieTimer.addActionListener(absoluteTimeAdvanceListener);
         movieTimer.setDelay(1000 / DEF_FPS);
         deltaT = 1000 / DEF_FPS * sec;
