@@ -47,11 +47,7 @@ class J2KDecoder implements Runnable {
         decodeParams = _decodeParams;
     }
 
-    private ImageBuffer decodeLayer(DecodeParams params) throws KduException {
-        ImageBuffer imageBuffer = decodeCache.get().getIfPresent(decodeParams);
-        if (imageBuffer != null)
-            return imageBuffer;
-
+    private static ImageBuffer decodeLayer(DecodeParams params) throws KduException {
         //sw.reset().start();
 
         SubImage subImage = params.subImage;
@@ -127,19 +123,21 @@ class J2KDecoder implements Runnable {
         if (acc.count() == params.view.getMaximumFrameNumber() + 1)
             System.out.println(">>> mean: " + acc.mean() + " stdvar: " + acc.sampleStandardDeviation());
 */
-        imageBuffer = new ImageBuffer(actualWidth, actualHeight, format, ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder()));
-        if (decodeParams.complete) {
-            decodeCache.get().put(decodeParams, imageBuffer);
-        }
-        return imageBuffer;
+        return new ImageBuffer(actualWidth, actualHeight, format, ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder()));
     }
 
     @Override
     public void run() {
         try {
             Thread.currentThread().setName("J2KDecoder");
-            ImageBuffer data = decodeLayer(decodeParams);
-            decodeParams.view.setDataFromDecoder(decodeParams, data);
+
+            ImageBuffer imageBuffer = decodeCache.get().getIfPresent(decodeParams);
+            if (imageBuffer == null) {
+                imageBuffer = decodeLayer(decodeParams);
+                if (decodeParams.complete)
+                    decodeCache.get().put(decodeParams, imageBuffer);
+            }
+            decodeParams.view.setDataFromDecoder(decodeParams, imageBuffer);
         } catch (Exception e) {
             e.printStackTrace();
         }
