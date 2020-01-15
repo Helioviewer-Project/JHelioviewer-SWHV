@@ -25,6 +25,7 @@ public class SimpleImageView extends URIView {
             xml = readXml;
             m = new XMLMetaDataContainer(xml).getHVMetaData(0, true);
         }
+        imageRegion = m.roiToRegion(0, 0, m.getPixelWidth(), m.getPixelHeight(), 1, 1);
         metaData[0] = m;
     }
 
