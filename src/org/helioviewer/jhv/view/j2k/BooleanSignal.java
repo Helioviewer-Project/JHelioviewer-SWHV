@@ -14,9 +14,6 @@ class BooleanSignal {
     private boolean isSignaled;
     private ReadParams params;
 
-    BooleanSignal() {
-    }
-
     // Used to wait for a signal. Waits until the flag is set, then it resets
     // the flag and returns. The waiting thread can be interrupted and that
     // exception is thrown immediately.
