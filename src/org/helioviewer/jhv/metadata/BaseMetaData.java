@@ -5,7 +5,6 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.position.Position;
@@ -139,9 +138,9 @@ class BaseMetaData implements MetaData {
 
     @Nonnull
     @Override
-    public Region roiToRegion(@Nonnull SubImage roi, double factorX, double factorY) {
-        return new Region(roi.x * factorX * unitPerPixelX + region.llx, roi.y * factorY * unitPerPixelY + region.lly,
-                roi.width * factorX * unitPerPixelX, roi.height * factorY * unitPerPixelY);
+    public Region roiToRegion(int roiX, int roiY, int roiWidth, int roiHeight, double factorX, double factorY) {
+        return new Region(roiX * factorX * unitPerPixelX + region.llx, roiY * factorY * unitPerPixelY + region.lly,
+                roiWidth * factorX * unitPerPixelX, roiHeight * factorY * unitPerPixelY);
     }
 
     @Override

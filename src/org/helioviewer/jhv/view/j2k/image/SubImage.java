@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.imagedata;
+package org.helioviewer.jhv.view.j2k.image;
 
 import org.helioviewer.jhv.math.MathUtils;
 

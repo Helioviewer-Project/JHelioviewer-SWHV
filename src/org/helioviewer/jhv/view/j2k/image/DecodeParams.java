@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.view.j2k.image;
 
-import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.view.j2k.J2KView;
 
