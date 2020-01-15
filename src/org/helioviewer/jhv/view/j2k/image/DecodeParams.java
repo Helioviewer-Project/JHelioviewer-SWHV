@@ -30,7 +30,7 @@ public class DecodeParams {
         int result = 1;
         result = 31 * result + v.hashCode();
         result = 31 * result + s.hashCode();
-        result = 31 * result + r.hashCode();
+        result = 31 * result + r.level;
         result = 31 * result + fr;
         long tmp = Double.doubleToLongBits(f);
         return 31 * result + (int) (tmp ^ (tmp >>> 32));
@@ -43,7 +43,7 @@ public class DecodeParams {
         if (!(o instanceof DecodeParams))
             return false;
         DecodeParams p = (DecodeParams) o;
-        return view == p.view && frame == p.frame && factor == p.factor && subImage.equals(p.subImage) && resolution.equals(p.resolution);
+        return view == p.view && frame == p.frame && resolution.level == p.resolution.level && factor == p.factor && subImage.equals(p.subImage);
     }
 
     @Override
