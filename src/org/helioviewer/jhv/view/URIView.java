@@ -5,6 +5,7 @@ import java.net.URI;
 
 import javax.annotation.Nonnull;
 
+import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
@@ -19,6 +20,7 @@ public class URIView extends BaseView {
 
     protected URIImageReader reader;
     protected String xml;
+    protected Region imageRegion;
 
     public URIView(DecodeExecutor _executor, APIRequest _request, URI _uri) {
         super(_executor, _request, _uri);
@@ -40,7 +42,7 @@ public class URIView extends BaseView {
     }
 
     private void sendDataToHandler(ImageBuffer imageBuffer, Position viewpoint) {
-        ImageData data = new ImageData(imageBuffer, metaData[0], metaData[0].getPhysicalRegion(), viewpoint);
+        ImageData data = new ImageData(imageBuffer, metaData[0], imageRegion, viewpoint);
         EventQueue.invokeLater(() -> { // decouple from ImageLayers.displaySynced
             if (dataHandler != null)
                 dataHandler.handleData(data);
