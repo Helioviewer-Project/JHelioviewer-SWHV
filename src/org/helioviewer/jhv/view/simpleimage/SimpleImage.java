@@ -24,7 +24,7 @@ import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.view.URIImageReader;
 
 // essentially static; local or network cache
-class SimpleImage implements URIImageReader {
+public class SimpleImage implements URIImageReader {
 
     @Nullable
     public String readXML(URI uri) throws Exception {

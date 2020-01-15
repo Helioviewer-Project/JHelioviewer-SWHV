@@ -21,7 +21,7 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.URIImageReader;
 
 // essentially static; local or network cache
-class FITSImage implements URIImageReader {
+public class FITSImage implements URIImageReader {
 
     @Nullable
     public String readXML(URI uri) throws Exception {

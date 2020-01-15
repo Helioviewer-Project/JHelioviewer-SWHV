@@ -13,10 +13,9 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.ManyView;
+import org.helioviewer.jhv.view.URIView;
 import org.helioviewer.jhv.view.View;
-import org.helioviewer.jhv.view.fits.FITSView;
 import org.helioviewer.jhv.view.j2k.J2KView;
-import org.helioviewer.jhv.view.simpleimage.SimpleImageView;
 
 class LoadViewTask extends JHVWorker<View, Void> {
 
@@ -77,9 +76,9 @@ class LoadViewTask extends JHVWorker<View, Void> {
         try {
             String loc = uri.toString().toLowerCase(Locale.ENGLISH);
             if (loc.endsWith(".fits") || loc.endsWith(".fts")) {
-                return new FITSView(executor, req, uri);
+                return new URIView(executor, req, uri, URIView.URIType.FITS);
             } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
-                return new SimpleImageView(executor, req, uri);
+                return new URIView(executor, req, uri, URIView.URIType.SIMPLE);
             } else {
                 return new J2KView(executor, req, uri, res);
             }
