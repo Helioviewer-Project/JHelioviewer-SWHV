@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
+import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.fits.FITSView;
 
@@ -25,7 +26,7 @@ class LoadFITSTask extends LoadViewTask {
                 throw new Exception("Invalid URI list");
 
             if (uriList.length == 1)
-                return new FITSView(null, null, uriList[0]);
+                return new FITSView(new DecodeExecutor(), null, uriList[0]);
         } catch (Exception e) {
             Log.error("An error occured while opening the remote file: ", e);
             Message.err("An error occured while opening the remote file: ", e.getMessage(), false);

@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
+import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.View;
 
 public class LoadRemoteTask extends LoadViewTask {
@@ -24,7 +25,7 @@ public class LoadRemoteTask extends LoadViewTask {
     protected View backgroundWork() {
         try {
             APIResponse res = APIRequestManager.requestRemoteFile(req);
-            return res == null ? null : loadView(null, req, res.getURI(), res);
+            return res == null ? null : loadView(new DecodeExecutor(), req, res.getURI(), res);
         } catch (IOException e) {
             Log.error("An error occured while opening the remote file: ", e);
             Message.err("An error occured while opening the remote file: ", e.getMessage(), false);

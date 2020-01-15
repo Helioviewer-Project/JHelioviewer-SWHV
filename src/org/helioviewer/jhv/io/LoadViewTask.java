@@ -36,10 +36,10 @@ class LoadViewTask extends JHVWorker<View, Void> {
             if (uriList == null || uriList.length == 0)
                 throw new IOException("Invalid URI list");
 
+            DecodeExecutor executor = new DecodeExecutor();
             if (uriList.length == 1) {
-                return loadView(null, null, uriList[0], null);
+                return loadView(executor, null, uriList[0], null);
             } else {
-                DecodeExecutor executor = new DecodeExecutor(); // TBD this is annoying
                 ArrayList<View> views = new ArrayList<>(uriList.length);
                 for (URI uri : uriList)
                     views.add(loadView(executor, null, uri, null));
