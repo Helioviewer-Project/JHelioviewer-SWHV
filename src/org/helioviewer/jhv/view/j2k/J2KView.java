@@ -14,7 +14,6 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
-import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.APIResponse;
 import org.helioviewer.jhv.layers.Movie;
@@ -31,6 +30,7 @@ import org.helioviewer.jhv.view.j2k.cache.CacheStatusRemote;
 import org.helioviewer.jhv.view.j2k.image.DecodeParams;
 import org.helioviewer.jhv.view.j2k.image.ReadParams;
 import org.helioviewer.jhv.view.j2k.image.ResolutionSet.ResolutionLevel;
+import org.helioviewer.jhv.view.j2k.image.SubImage;
 import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCache;
 import org.helioviewer.jhv.view.j2k.kakadu.KakaduSource;
 
@@ -297,7 +297,8 @@ public class J2KView extends BaseView {
 
     void setDataFromDecoder(DecodeParams decodeParams, ImageBuffer imageBuffer) {
         MetaData m = metaData[decodeParams.frame];
-        Region r = m.roiToRegion(decodeParams.subImage, decodeParams.resolution.factorX, decodeParams.resolution.factorY);
+        SubImage roi = decodeParams.subImage; // should come from decoder, not from params
+        Region r = m.roiToRegion(roi.x, roi.y, roi.width, roi.height, decodeParams.resolution.factorX, decodeParams.resolution.factorY);
         ImageData data = new ImageData(imageBuffer, m, r, decodeParams.viewpoint);
 
         EventQueue.invokeLater(() -> {
