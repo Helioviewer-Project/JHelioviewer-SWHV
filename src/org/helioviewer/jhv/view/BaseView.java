@@ -32,7 +32,7 @@ public class BaseView implements View {
     protected MetaData[] metaData = new MetaData[1];
 
     public BaseView(DecodeExecutor _executor, APIRequest _request, URI _uri) {
-        executor = _executor == null ? new DecodeExecutor() : _executor;
+        executor = _executor;
         request = _request;
         uri = _uri;
         isLocal = uri != null && "file".equals(uri.getScheme());
@@ -162,7 +162,8 @@ public class BaseView implements View {
 
         @Override
         public void run() {
-            aExecutor.abolish();
+            if (aExecutor != null)
+                aExecutor.abolish();
         }
 
     }

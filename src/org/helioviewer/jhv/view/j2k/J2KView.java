@@ -297,7 +297,7 @@ public class J2KView extends BaseView {
 
     void setDataFromDecoder(DecodeParams decodeParams, ImageBuffer imageBuffer) {
         MetaData m = metaData[decodeParams.frame];
-        SubImage roi = decodeParams.subImage; // should come from decoder, not from params
+        SubImage roi = decodeParams.subImage;
         Region r = m.roiToRegion(roi.x, roi.y, roi.width, roi.height, decodeParams.resolution.factorX, decodeParams.resolution.factorY);
         ImageData data = new ImageData(imageBuffer, m, r, decodeParams.viewpoint);
 
