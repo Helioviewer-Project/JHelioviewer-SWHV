@@ -24,6 +24,7 @@ import org.helioviewer.jhv.view.URIImageReader;
 public class FITSImage implements URIImageReader {
 
     @Nullable
+    @Override
     public String readXML(URI uri) throws Exception {
         try (NetClient nc = NetClient.of(uri); Fits f = new Fits(nc.getStream())) {
             BasicHDU<?>[] hdus = f.read();
@@ -43,6 +44,7 @@ public class FITSImage implements URIImageReader {
     }
 
     @Nullable
+    @Override
     public ImageBuffer readImageBuffer(URI uri) throws Exception {
         try (NetClient nc = NetClient.of(uri); Fits f = new Fits(nc.getStream())) {
             BasicHDU<?>[] hdus = f.read();

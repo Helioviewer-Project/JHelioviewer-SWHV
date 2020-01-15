@@ -27,6 +27,7 @@ import org.helioviewer.jhv.view.URIImageReader;
 public class SimpleImage implements URIImageReader {
 
     @Nullable
+    @Override
     public String readXML(URI uri) throws Exception {
         try (NetClient nc = NetClient.of(uri); ImageInputStream iis = ImageIO.createImageInputStream(nc.getStream())) {
             ImageReader reader = getReader(iis);
@@ -56,6 +57,7 @@ public class SimpleImage implements URIImageReader {
         }
     }
 
+    @Override
     public ImageBuffer readImageBuffer(URI uri) throws Exception {
         try (NetClient nc = NetClient.of(uri); ImageInputStream iis = ImageIO.createImageInputStream(nc.getStream())) {
             ImageReader reader = getReader(iis);
