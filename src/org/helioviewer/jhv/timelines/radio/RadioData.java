@@ -26,6 +26,7 @@ import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis.YAxisPositiveIdentityScale;
+import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.j2k.J2KViewCallisto;
 import org.json.JSONObject;
 
@@ -115,7 +116,7 @@ public class RadioData extends AbstractTimelineLayer {
             try {
                 APIRequest req = new APIRequest("ROB", APIRequest.CallistoID, date, date, APIRequest.CADENCE_ANY);
                 URI uri = new URI(req.toFileRequest());
-                return new RadioJ2KData(new J2KViewCallisto(null, req, NetFileCache.get(uri)), req.startTime);
+                return new RadioJ2KData(new J2KViewCallisto(new DecodeExecutor(), req, NetFileCache.get(uri)), req.startTime);
             } catch (Exception e) {
                 Log.error("An error occured while opening the remote file: " + e.getMessage());
             }
