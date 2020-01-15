@@ -29,12 +29,12 @@ public class J2KViewCallisto extends J2KView {
         ResolutionLevel res = getResolutionLevel(frame, 0);
         SubImage subImage = new SubImage(region.x, region.y, region.width, region.height, res.width, res.height);
         AtomicBoolean status = cacheStatus.getFrameStatus(frame, res.level);
-        return new DecodeParams(this, viewpoint, status != null && status.get(), subImage, res, frame, factor);
+        return new DecodeParams(serial, frame, subImage, res, factor, status != null && status.get(), viewpoint);
     }
 
     @Override
     protected void signalReader(DecodeParams decodeParams) { // not used
-        reader.signalReader(new ReadParams(true, decodeParams));
+        reader.signalReader(new ReadParams(this, decodeParams, true));
     }
 
 }

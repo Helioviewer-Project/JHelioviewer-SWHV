@@ -115,7 +115,7 @@ class J2KReader implements Runnable {
                 continue;
             }
 
-            J2KView view = params.decodeParams.view;
+            J2KView view = params.view;
             JPIPCache cache = view.getJPIPCache();
             CacheStatus cacheStatus = view.getCacheStatus();
             int numFrames = view.getMaximumFrameNumber() + 1;
