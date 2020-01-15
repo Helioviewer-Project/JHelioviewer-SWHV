@@ -30,16 +30,18 @@ public class URIView extends BaseView {
         if (imageBuffer == null) {
             executor.decode(new URIDecoder(this, viewpoint));
         } else {
-            ImageData data = new ImageData(imageBuffer, metaData[0], metaData[0].getPhysicalRegion(), viewpoint);
-            if (dataHandler != null)
-                dataHandler.handleData(data);
+            sendDataToHandler(imageBuffer, viewpoint);
         }
     }
 
     void setDataFromDecoder(ImageBuffer imageBuffer, Position viewpoint) {
         decodeCache.put(uri, imageBuffer);
+        sendDataToHandler(imageBuffer, viewpoint);
+    }
+
+    private void sendDataToHandler(ImageBuffer imageBuffer, Position viewpoint) {
         ImageData data = new ImageData(imageBuffer, metaData[0], metaData[0].getPhysicalRegion(), viewpoint);
-        EventQueue.invokeLater(() -> {
+        EventQueue.invokeLater(() -> { // decouple from ImageLayers.displaySynced
             if (dataHandler != null)
                 dataHandler.handleData(data);
         });
