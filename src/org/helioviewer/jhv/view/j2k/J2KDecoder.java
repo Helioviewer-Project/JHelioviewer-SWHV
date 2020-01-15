@@ -38,23 +38,25 @@ class J2KDecoder implements Runnable {
     private static final ThreadLocal<Cache<DecodeParams, ImageBuffer>> decodeCache = ThreadLocal.withInitial(() -> CacheBuilder.newBuilder().softValues().build());
     private static final ThreadLocal<Kdu_thread_env> localThread = ThreadLocal.withInitial(J2KDecoder::createThreadEnv);
 
+    private final J2KView view;
     private final DecodeParams decodeParams;
 
     //private final Stopwatch sw = Stopwatch.createUnstarted();
     //private static final ThreadLocal<StatsAccumulator> localAcc = ThreadLocal.withInitial(StatsAccumulator::new);
 
-    J2KDecoder(DecodeParams _decodeParams) {
+    J2KDecoder(J2KView _view, DecodeParams _decodeParams) {
+        view = _view;
         decodeParams = _decodeParams;
     }
 
-    private static ImageBuffer decodeLayer(DecodeParams params) throws KduException {
+    private static ImageBuffer decodeLayer(J2KView v, DecodeParams params) throws KduException {
         //sw.reset().start();
 
         SubImage subImage = params.subImage;
         int frame = params.frame;
-        int numComponents = params.view.getNumComponents(frame);
+        int numComponents = v.getNumComponents(frame);
 
-        Kdu_region_compositor compositor = createCompositor(params.view, params.factor < 1 ? qualityLow : qualityHigh);
+        Kdu_region_compositor compositor = createCompositor(v, params.factor < 1 ? qualityLow : qualityHigh);
 
         Kdu_dims empty = new Kdu_dims();
         if (numComponents < 3) {
@@ -133,11 +135,11 @@ class J2KDecoder implements Runnable {
 
             ImageBuffer imageBuffer = decodeCache.get().getIfPresent(decodeParams);
             if (imageBuffer == null) {
-                imageBuffer = decodeLayer(decodeParams);
+                imageBuffer = decodeLayer(view, decodeParams);
                 if (decodeParams.complete)
                     decodeCache.get().put(decodeParams, imageBuffer);
             }
-            decodeParams.view.setDataFromDecoder(decodeParams, imageBuffer);
+            view.setDataFromDecoder(decodeParams, imageBuffer);
         } catch (Exception e) {
             e.printStackTrace();
         }

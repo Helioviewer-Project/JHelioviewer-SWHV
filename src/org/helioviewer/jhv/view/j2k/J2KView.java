@@ -36,6 +36,7 @@ import org.helioviewer.jhv.view.j2k.kakadu.KakaduSource;
 
 public class J2KView extends BaseView {
 
+    private static volatile int global_serial;
     private static final int HIRES_CUTOFF = 1280;
 
     private final int maxFrame;
@@ -47,11 +48,13 @@ public class J2KView extends BaseView {
     private final KakaduSource kduSource;
     private final JPIPCache jpipCache;
 
+    protected final int serial;
     protected final CacheStatus cacheStatus;
     protected final J2KReader reader;
 
     public J2KView(DecodeExecutor _executor, APIRequest _request, URI _uri, APIResponse _response) throws Exception {
         super(_executor, _request, _uri);
+        serial = global_serial++;
 
         long[] frames = _response == null ? null : _response.getFrames();
         if (frames != null) {
@@ -258,7 +261,7 @@ public class J2KView extends BaseView {
             }
         }
         AtomicBoolean status = cacheStatus.getFrameStatus(frame, res.level); // before signalling to reader
-        return new DecodeParams(this, viewpoint, status != null && status.get(), subImage, res, frame, factor);
+        return new DecodeParams(serial, frame, subImage, res, factor, status != null && status.get(), viewpoint);
     }
 
     private int currentLevel = 10000;
@@ -268,7 +271,7 @@ public class J2KView extends BaseView {
         boolean priority = !Movie.isPlaying();
 
         if (priority || level < currentLevel) {
-            reader.signalReader(new ReadParams(priority, decodeParams));
+            reader.signalReader(new ReadParams(this, decodeParams, priority));
         }
         currentLevel = level;
     }
@@ -292,7 +295,7 @@ public class J2KView extends BaseView {
     }
 
     private void executeDecode(DecodeParams decodeParams) {
-        executor.decode(new J2KDecoder(decodeParams));
+        executor.decode(new J2KDecoder(this, decodeParams));
     }
 
     void setDataFromDecoder(DecodeParams decodeParams, ImageBuffer imageBuffer) {

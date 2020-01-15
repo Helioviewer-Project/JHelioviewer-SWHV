@@ -1,36 +1,35 @@
 package org.helioviewer.jhv.view.j2k.image;
 
 import org.helioviewer.jhv.position.Position;
-import org.helioviewer.jhv.view.j2k.J2KView;
 
 public class DecodeParams {
 
-    public final J2KView view;
-    public final Position viewpoint; // sync with camera & between layers
-    public final boolean complete; // cache the decoded data
+    public final int serial;
+    public final int frame;
     public final SubImage subImage;
     public final ResolutionSet.ResolutionLevel resolution;
-    public final int frame;
     public final double factor;
+    public final boolean complete; // cache the decoded data
+    public final Position viewpoint; // sync with camera & between layers
     private final int hash;
 
-    public DecodeParams(J2KView _view, Position _viewpoint, boolean _complete, SubImage _roi, ResolutionSet.ResolutionLevel _resolution, int _frame, double _factor) {
-        view = _view;
-        viewpoint = _viewpoint;
-        complete = _complete;
-        subImage = _roi;
-        resolution = _resolution;
+    public DecodeParams(int _serial, int _frame, SubImage _subImage, ResolutionSet.ResolutionLevel _resolution, double _factor, boolean _complete, Position _viewpoint) {
+        serial = _serial;
         frame = _frame;
+        subImage = _subImage;
+        resolution = _resolution;
         factor = _factor;
-        hash = computeHash(view, subImage, resolution, frame, factor);
+        complete = _complete;
+        viewpoint = _viewpoint;
+        hash = computeHash(serial, frame, subImage, resolution, factor);
     }
 
-    private static int computeHash(J2KView v, SubImage s, ResolutionSet.ResolutionLevel r, int fr, double f) { // viewpoint, complete don't participate
+    private static int computeHash(int s, int fr, SubImage si, ResolutionSet.ResolutionLevel r, double f) { // viewpoint, complete don't participate
         int result = 1;
-        result = 31 * result + v.hashCode();
-        result = 31 * result + s.hashCode();
-        result = 31 * result + r.level;
+        result = 31 * result + s;
         result = 31 * result + fr;
+        result = 31 * result + si.hashCode();
+        result = 31 * result + r.level;
         long tmp = Double.doubleToLongBits(f);
         return 31 * result + (int) (tmp ^ (tmp >>> 32));
     }
@@ -42,7 +41,7 @@ public class DecodeParams {
         if (!(o instanceof DecodeParams))
             return false;
         DecodeParams p = (DecodeParams) o;
-        return view == p.view && frame == p.frame && resolution.level == p.resolution.level && factor == p.factor && subImage.equals(p.subImage);
+        return serial == p.serial && frame == p.frame && resolution.level == p.resolution.level && factor == p.factor && subImage.equals(p.subImage);
     }
 
     @Override
