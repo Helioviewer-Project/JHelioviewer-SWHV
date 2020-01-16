@@ -18,6 +18,7 @@ import org.helioviewer.jhv.view.generic.GenericImage;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.util.concurrent.FutureCallback;
 
 public class URIView extends BaseView {
 
@@ -69,15 +70,31 @@ public class URIView extends BaseView {
     public void decode(Position viewpoint, double pixFactor, float factor) {
         ImageBuffer imageBuffer = decodeCache.getIfPresent(uri);
         if (imageBuffer == null) {
-            executor.decode(new URIDecoder(this, viewpoint));
+            executor.decode(new URIDecoder(this), new DecodeCallback(viewpoint));
         } else {
             sendDataToHandler(imageBuffer, viewpoint);
         }
     }
 
-    void setDataFromDecoder(ImageBuffer imageBuffer, Position viewpoint) {
-        decodeCache.put(uri, imageBuffer);
-        sendDataToHandler(imageBuffer, viewpoint);
+    private class DecodeCallback implements FutureCallback<ImageBuffer> {
+
+        private final Position viewpoint;
+
+        DecodeCallback(Position _viewpoint) {
+            viewpoint = _viewpoint;
+        }
+
+        @Override
+        public void onSuccess(ImageBuffer result) {
+            decodeCache.put(uri, result);
+            sendDataToHandler(result, viewpoint);
+        }
+
+        @Override
+        public void onFailure(Throwable t) {
+            t.printStackTrace();
+        }
+
     }
 
     private void sendDataToHandler(ImageBuffer imageBuffer, Position viewpoint) {

@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.Callable;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import kdu_jni.KduException;
@@ -46,6 +47,7 @@ class J2KDecoder implements Callable<ImageBuffer> {
         params = _params;
     }
 
+    @Nonnull
     @Override
     public ImageBuffer call() throws KduException {
         //sw.reset().start();
