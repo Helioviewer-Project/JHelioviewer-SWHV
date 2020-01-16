@@ -25,6 +25,7 @@ import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeMap;
 import org.helioviewer.jhv.view.BaseView;
+import org.helioviewer.jhv.view.DecodeCallback;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.j2k.cache.CacheStatus;
 import org.helioviewer.jhv.view.j2k.cache.CacheStatusLocal;
@@ -38,7 +39,6 @@ import org.helioviewer.jhv.view.j2k.kakadu.KakaduSource;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.util.concurrent.FutureCallback;
 
 public class J2KView extends BaseView {
 
@@ -327,17 +327,17 @@ public class J2KView extends BaseView {
     private void executeDecode(DecodeParams params) {
         ImageBuffer imageBuffer = decodeCache.getIfPresent(params);
         if (imageBuffer == null) {
-            executor.decode(new J2KDecoder(this, params), new DecodeCallback(params));
+            executor.decode(new J2KDecoder(this, params), new J2KCallback(params));
         } else {
             sendDataToHandler(params, imageBuffer);
         }
     }
 
-    private class DecodeCallback implements FutureCallback<ImageBuffer> {
+    private class J2KCallback extends DecodeCallback {
 
         private final DecodeParams params;
 
-        DecodeCallback(DecodeParams _params) {
+        J2KCallback(DecodeParams _params) {
             params = _params;
         }
 
@@ -346,11 +346,6 @@ public class J2KView extends BaseView {
             if (params.complete)
                 decodeCache.put(params, result);
             sendDataToHandler(params, result);
-        }
-
-        @Override
-        public void onFailure(Throwable t) {
-            t.printStackTrace();
         }
 
     }

@@ -9,7 +9,6 @@ import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.threads.JHVThread;
 
-import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 
 public class DecodeExecutor {
@@ -22,7 +21,7 @@ public class DecodeExecutor {
                                     new JHVThread.NamedThreadFactory("Decoder"),
                                     new ThreadPoolExecutor.DiscardPolicy())));
 
-    public void decode(Callable<ImageBuffer> callable, FutureCallback<ImageBuffer> callback) {
+    public void decode(Callable<ImageBuffer> callable, DecodeCallback callback) {
         blockingQueue.poll();
         executor.submit(callable, callback);
     }
