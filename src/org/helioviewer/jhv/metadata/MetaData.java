@@ -23,7 +23,7 @@ public interface MetaData {
 
     double getUnitPerArcsec();
 
-    double getResponseFactor();
+    float getResponseFactor();
 
     float getCROTA();
 
@@ -35,9 +35,9 @@ public interface MetaData {
 
     float getSector1();
 
-    double getInnerRadius();
+    float getInnerRadius();
 
-    double getOuterRadius();
+    float getOuterRadius();
 
     float getCutOffValue();
 

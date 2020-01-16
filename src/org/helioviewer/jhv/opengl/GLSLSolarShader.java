@@ -253,9 +253,9 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform1fv(sectorRef, 3, sector, 0);
     }
 
-    public void bindRadii(GL2 gl, double innerRadius, double outerRadius) {
-        radii[0] = (float) innerRadius;
-        radii[1] = (float) outerRadius;
+    public void bindRadii(GL2 gl, float innerRadius, float outerRadius) {
+        radii[0] = innerRadius;
+        radii[1] = outerRadius;
         gl.glUniform1fv(radiiRef, 2, radii, 0);
     }
 
