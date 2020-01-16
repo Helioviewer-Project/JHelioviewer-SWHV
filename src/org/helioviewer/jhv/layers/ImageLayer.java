@@ -22,7 +22,6 @@ import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.opengl.GLImage.DifferenceMode;
 import org.helioviewer.jhv.opengl.GLListener;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
-import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.View;
@@ -146,7 +145,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
             ImageLayers.arrangeMultiView(true);
         }
         dispose(gl);
-        System.gc(); // reclaim memory asap
+        //System.gc(); // reclaim memory asap
         removed = true;
     }
 
@@ -249,7 +248,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     @Nonnull
     public MetaData getMetaData() { //!
-        return imageData == null ? view.getMetaData(new JHVDate(0)) : imageData.getMetaData();
+        return imageData == null ? view.getMetaData(view.getFirstTime()) : imageData.getMetaData();
     }
 
     @Override
