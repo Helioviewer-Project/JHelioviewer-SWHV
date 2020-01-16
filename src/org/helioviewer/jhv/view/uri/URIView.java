@@ -72,7 +72,7 @@ public class URIView extends BaseView {
     public void decode(Position viewpoint, double pixFactor, float factor) {
         ImageBuffer imageBuffer = decodeCache.getIfPresent(uri);
         if (imageBuffer == null) {
-            executor.decode(new URIDecoder(this), new URICallback(viewpoint));
+            executor.decode(new URIDecoder(uri, reader), new URICallback(viewpoint));
         } else {
             sendDataToHandler(imageBuffer, viewpoint);
         }
@@ -100,10 +100,6 @@ public class URIView extends BaseView {
             if (dataHandler != null)
                 dataHandler.handleData(data);
         });
-    }
-
-    URIImageReader getReader() {
-        return reader;
     }
 
     @Nonnull
