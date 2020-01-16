@@ -1,29 +1,26 @@
 package org.helioviewer.jhv.view;
 
-import org.helioviewer.jhv.imagedata.ImageBuffer;
-import org.helioviewer.jhv.position.Position;
+import java.util.concurrent.Callable;
 
-public class URIDecoder implements Runnable {
+import javax.annotation.Nonnull;
+
+import org.helioviewer.jhv.imagedata.ImageBuffer;
+
+public class URIDecoder implements Callable<ImageBuffer> {
 
     private final URIView view;
-    private final Position viewpoint;
 
-    public URIDecoder(URIView _view, Position _viewpoint) {
+    public URIDecoder(URIView _view) {
         view = _view;
-        viewpoint = _viewpoint;
     }
 
+    @Nonnull
     @Override
-    public void run() {
-        try {
-            Thread.currentThread().setName("URIDecoder");
-            ImageBuffer imageBuffer = view.getReader().readImageBuffer(view.getURI());
-            if (imageBuffer == null)
-                throw new Exception("Could not read: " + view.getURI());
-            view.setDataFromDecoder(imageBuffer, viewpoint);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public ImageBuffer call() throws Exception {
+        ImageBuffer imageBuffer = view.getReader().readImageBuffer(view.getURI());
+        if (imageBuffer == null) // e.g. FITS
+            throw new Exception("Could not read: " + view.getURI());
+        return imageBuffer;
     }
 
 }

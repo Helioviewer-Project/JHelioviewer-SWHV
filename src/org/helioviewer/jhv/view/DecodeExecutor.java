@@ -43,11 +43,6 @@ public class DecodeExecutor {
         Futures.addCallback(futureTask, callback, eqExecutor);
     }
 
-    public void decode(Runnable r) {
-        blockingQueue.poll();
-        executor.execute(r);
-    }
-
     public void abolish() {
         blockingQueue.poll();
         executor.shutdown();
