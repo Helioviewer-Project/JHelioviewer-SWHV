@@ -55,7 +55,6 @@ class J2KDecoder implements Callable<ImageBuffer> {
         SubImage subImage = params.subImage;
         int frame = params.frame;
         int numComponents = view.getNumComponents(frame);
-
         Kdu_region_compositor compositor = createCompositor(view, params.factor < 1 ? qualityLow : qualityHigh);
 
         Kdu_dims empty = new Kdu_dims();
@@ -122,7 +121,7 @@ class J2KDecoder implements Callable<ImageBuffer> {
 /*
         StatsAccumulator acc = localAcc.get();
         acc.add(sw.elapsed().toNanos() / 1e9);
-        if (acc.count() == params.view.getMaximumFrameNumber() + 1)
+        if (params.view.getMaximumFrameNumber() > 0 && acc.count() == params.view.getMaximumFrameNumber() + 1)
             System.out.println(">>> mean: " + acc.mean() + " stdvar: " + acc.sampleStandardDeviation());
 */
         return new ImageBuffer(actualWidth, actualHeight, format, ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder()));
@@ -136,7 +135,6 @@ class J2KDecoder implements Callable<ImageBuffer> {
             int numThreads = Math.min(4, Kdu_global.Kdu_get_num_processors());
             for (int i = 1; i < numThreads; i++)
                 kte.Add_thread();
-            // System.out.println(">>>> Kdu_thread_env create " + kte);
             return kte;
         } catch (KduException e) {
             e.printStackTrace();
@@ -144,10 +142,9 @@ class J2KDecoder implements Callable<ImageBuffer> {
         return null;
     }
 
-    private static Kdu_region_compositor createCompositor(J2KView view, Kdu_quality_limiter quality) throws KduException {
+    private static Kdu_region_compositor createCompositor(J2KView j2k, Kdu_quality_limiter quality) throws KduException {
         Kdu_region_compositor krc = new Kdu_region_compositor();
-        // System.out.println(">>>> compositor create " + krc + " " + Thread.currentThread().getName());
-        krc.Create(view.getSource().getJpxSource());
+        krc.Create(j2k.getSource().getJpxSource());
         krc.Set_surface_initialization_mode(false);
         krc.Set_quality_limiting(quality, -1, -1);
         krc.Set_thread_env(localThread.get(), null);
@@ -156,7 +153,6 @@ class J2KDecoder implements Callable<ImageBuffer> {
 
     private static void destroyCompositor(Kdu_region_compositor krc) {
         try {
-            // System.out.println(">>>> compositor destroy " + krc + " " + Thread.currentThread().getName());
             krc.Halt_processing();
             krc.Remove_ilayer(new Kdu_ilayer_ref(), true);
             krc.Set_thread_env(null, null);
