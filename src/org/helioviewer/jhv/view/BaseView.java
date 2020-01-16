@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.view;
 
-import java.lang.ref.Cleaner;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
