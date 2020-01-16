@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.simpleimage;
+package org.helioviewer.jhv.view.generic;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
@@ -24,7 +24,7 @@ import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.view.URIImageReader;
 
 // essentially static; local or network cache
-public class SimpleImage implements URIImageReader {
+public class GenericImage implements URIImageReader {
 
     @Nullable
     @Override
