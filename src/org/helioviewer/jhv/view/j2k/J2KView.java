@@ -269,7 +269,7 @@ public class J2KView extends BaseView {
         return isDownloading;
     }
 
-    protected DecodeParams getDecodeParams(Position viewpoint, int frame, double pixFactor, double factor) {
+    protected DecodeParams getDecodeParams(Position viewpoint, int frame, double pixFactor, float factor) {
         ResolutionLevel res;
         SubImage subImage;
 
@@ -286,7 +286,7 @@ public class J2KView extends BaseView {
 
             int maxDim = Math.max(res.width, res.height);
             if (maxDim > HIRES_CUTOFF && Movie.isPlaying()) {
-                factor = Math.min(factor, 0.5);
+                factor = Math.min(factor, 0.5f);
             }
         }
         AtomicBoolean status = cacheStatus.getFrameStatus(frame, res.level); // before signalling to reader
@@ -306,7 +306,7 @@ public class J2KView extends BaseView {
     }
 
     @Override
-    public void decode(Position viewpoint, double pixFactor, double factor) {
+    public void decode(Position viewpoint, double pixFactor, float factor) {
         DecodeParams decodeParams = getDecodeParams(viewpoint, targetFrame, pixFactor, factor);
         if (reader != null && !decodeParams.complete) {
             signalReader(decodeParams);

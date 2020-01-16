@@ -100,7 +100,7 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
         if (r != 0) {
             camera.zoom(Camera.ZOOM_MULTIPLIER_WHEEL * r);
             if (r > 0) {
-                MovieDisplay.render(0.5);
+                MovieDisplay.render(0.5f);
                 wheelTimer.restart();
             } else
                 MovieDisplay.display();

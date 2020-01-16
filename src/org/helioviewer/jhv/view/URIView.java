@@ -66,7 +66,7 @@ public class URIView extends BaseView {
     }
 
     @Override
-    public void decode(Position viewpoint, double pixFactor, double factor) {
+    public void decode(Position viewpoint, double pixFactor, float factor) {
         ImageBuffer imageBuffer = decodeCache.getIfPresent(uri);
         if (imageBuffer == null) {
             executor.decode(new URIDecoder(this, viewpoint));

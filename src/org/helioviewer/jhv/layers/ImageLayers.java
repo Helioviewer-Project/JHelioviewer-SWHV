@@ -34,7 +34,7 @@ public class ImageLayers {
         return false;
     }
 
-    static void decode(double factor) {
+    static void decode(float factor) {
         Camera camera = Display.getCamera();
         Position viewpoint = camera.getViewpoint();
 

@@ -25,7 +25,7 @@ public class J2KViewCallisto extends J2KView {
     private Rectangle region;
 
     @Override
-    protected DecodeParams getDecodeParams(Position viewpoint, int frame, double pixFactor, double factor) {
+    protected DecodeParams getDecodeParams(Position viewpoint, int frame, double pixFactor, float factor) {
         ResolutionLevel res = getResolutionLevel(frame, 0);
         SubImage subImage = new SubImage(region.x, region.y, region.width, region.height, res.width, res.height);
         AtomicBoolean status = cacheStatus.getFrameStatus(frame, res.level);
