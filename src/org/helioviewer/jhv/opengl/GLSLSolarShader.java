@@ -211,8 +211,8 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform3fv(viewportRef, 1, viewport, 0);
     }
 
-    public void bindCutOffValue(GL2 gl, double val) {
-        cutOffValue[0] = (float) val;
+    public void bindCutOffValue(GL2 gl, float val) {
+        cutOffValue[0] = val;
         gl.glUniform1fv(cutOffValueRef, 1, cutOffValue, 0);
     }
 
@@ -222,34 +222,34 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform2fv(cutOffDirectionRef, 1, cutOffDirection, 0);
     }
 
-    public void bindAngles(GL2 gl, Position viewpoint, double _crota, double scrota, double ccrota) {
+    public void bindAngles(GL2 gl, Position viewpoint, float _crota, float scrota, float ccrota) {
         hglt[0] = (float) Math.sin(viewpoint.lat);
         hglt[1] = (float) Math.cos(viewpoint.lat);
         gl.glUniform1fv(hgltRef, 2, hglt, 0);
         hgln[0] = (float) ((viewpoint.lon + 2. * Math.PI) % (2. * Math.PI));
         gl.glUniform1fv(hglnRef, 1, hgln, 0);
-        crota[0] = (float) _crota;
-        crota[1] = (float) scrota;
-        crota[2] = (float) ccrota;
+        crota[0] = _crota;
+        crota[1] = scrota;
+        crota[2] = ccrota;
         gl.glUniform1fv(crotaRef, 3, crota, 0);
     }
 
-    public void bindAnglesDiff(GL2 gl, Position viewpoint, double _crota, double scrota, double ccrota) {
+    public void bindAnglesDiff(GL2 gl, Position viewpoint, float _crota, float scrota, float ccrota) {
         hgltDiff[0] = (float) Math.sin(viewpoint.lat);
         hgltDiff[1] = (float) Math.cos(viewpoint.lat);
         gl.glUniform1fv(hgltDiffRef, 2, hgltDiff, 0);
         hglnDiff[0] = (float) ((viewpoint.lon + 2. * Math.PI) % (2. * Math.PI));
         gl.glUniform1fv(hglnDiffRef, 1, hglnDiff, 0);
-        crotaDiff[0] = (float) _crota;
-        crotaDiff[1] = (float) scrota;
-        crotaDiff[2] = (float) ccrota;
+        crotaDiff[0] = _crota;
+        crotaDiff[1] = scrota;
+        crotaDiff[2] = ccrota;
         gl.glUniform1fv(crotaDiffRef, 3, crotaDiff, 0);
     }
 
-    public void bindSector(GL2 gl, double sector0, double sector1) {
+    public void bindSector(GL2 gl, float sector0, float sector1) {
         sector[0] = sector0 == sector1 ? 0 : 1;
-        sector[1] = (float) sector0;
-        sector[2] = (float) sector1;
+        sector[1] = sector0;
+        sector[2] = sector1;
         gl.glUniform1fv(sectorRef, 3, sector, 0);
     }
 

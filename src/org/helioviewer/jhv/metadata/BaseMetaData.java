@@ -30,15 +30,15 @@ class BaseMetaData implements MetaData {
     protected double innerRadius = 0;
     protected double outerRadius = Double.MAX_VALUE;
 
-    protected double crota = 0;
-    protected double scrota = 0;
-    protected double ccrota = 1;
+    protected float crota = 0;
+    protected float scrota = 0;
+    protected float ccrota = 1;
 
-    protected double sector0 = 0;
-    protected double sector1 = 0;
+    protected float sector0 = 0;
+    protected float sector1 = 0;
 
     // Serves only for LASCO cutOff edges
-    protected double cutOffValue = -1;
+    protected float cutOffValue = -1;
     protected Vec2 cutOffDirection = Vec2.ZERO;
 
     @Override
@@ -95,7 +95,7 @@ class BaseMetaData implements MetaData {
     }
 
     @Override
-    public double getCutOffValue() {
+    public float getCutOffValue() {
         return cutOffValue;
     }
 
@@ -112,27 +112,27 @@ class BaseMetaData implements MetaData {
     }
 
     @Override
-    public double getCROTA() {
+    public float getCROTA() {
         return crota;
     }
 
     @Override
-    public double getSCROTA() {
+    public float getSCROTA() {
         return scrota;
     }
 
     @Override
-    public double getCCROTA() {
+    public float getCCROTA() {
         return ccrota;
     }
 
     @Override
-    public double getSector0() {
+    public float getSector0() {
         return sector0;
     }
 
     @Override
-    public double getSector1() {
+    public float getSector1() {
         return sector1;
     }
 
