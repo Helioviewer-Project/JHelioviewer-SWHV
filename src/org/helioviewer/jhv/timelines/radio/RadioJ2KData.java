@@ -52,19 +52,19 @@ class RadioJ2KData implements ImageDataHandler {
             executor = _executor;
             willDraw = startDate == start; // didn't get closest
         } catch (Exception e) {
-            _view.abolish();
             _executor.abolish();
+            _view.abolish();
             throw e;
         }
     }
 
     void removeData() {
         if (view != null) {
+            executor.abolish();
             view.setDataHandler(null);
             view.abolish();
-            view = null;
-            executor.abolish();
             executor = null;
+            view = null;
         }
         bufferedImage = null;
     }

@@ -192,7 +192,8 @@ public class J2KView extends BaseView {
     public void abolish() {
         abolishable.clean();
         for (DecodeParams params : decodeCache.asMap().keySet()) {
-            decodeCache.invalidate(params);
+            if (params.serial == serial)
+                decodeCache.invalidate(params);
         }
     }
 
