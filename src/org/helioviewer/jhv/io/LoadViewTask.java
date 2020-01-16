@@ -19,7 +19,7 @@ import org.helioviewer.jhv.view.j2k.J2KView;
 
 class LoadViewTask extends JHVWorker<View, Void> {
 
-    private final ImageLayer imageLayer;
+    protected final ImageLayer imageLayer;
     protected final URI[] uriList;
 
     LoadViewTask(ImageLayer _imageLayer, URI... _uriList) {
@@ -35,7 +35,7 @@ class LoadViewTask extends JHVWorker<View, Void> {
             if (uriList == null || uriList.length == 0)
                 throw new IOException("Invalid URI list");
 
-            DecodeExecutor executor = new DecodeExecutor();
+            DecodeExecutor executor = imageLayer.getExecutor();
             if (uriList.length == 1) {
                 return loadView(executor, null, uriList[0], null);
             } else {

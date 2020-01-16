@@ -24,6 +24,7 @@ import org.helioviewer.jhv.opengl.GLListener;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.view.BaseView;
+import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.View;
 import org.json.JSONObject;
 
@@ -32,7 +33,8 @@ import com.jogamp.opengl.GL2;
 public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     private final GLImage glImage = new GLImage();
-    private final ImageLayerOptions optionsPanel;
+    private final DecodeExecutor executor = new DecodeExecutor();
+    private final ImageLayerOptions optionsPanel = new ImageLayerOptions(this);
 
     private boolean removed;
     private LoadRemoteTask worker;
@@ -64,7 +66,6 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
                     glImage.fromJson(imageParams);
             }
         }
-        optionsPanel = new ImageLayerOptions(this);
     }
 
     public void load(APIRequest req) {
@@ -144,6 +145,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
             ImageLayers.arrangeMultiView(true);
         }
         dispose(gl);
+        executor.abolish();
         System.gc(); // reclaim memory asap
         removed = true;
     }
@@ -270,6 +272,11 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     @Nonnull
     public GLImage getGLImage() {
         return glImage;
+    }
+
+    @Nonnull
+    public DecodeExecutor getExecutor() {
+        return executor;
     }
 
     @Nonnull

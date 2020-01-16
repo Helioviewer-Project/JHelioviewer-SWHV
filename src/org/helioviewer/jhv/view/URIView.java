@@ -100,7 +100,6 @@ public class URIView extends BaseView {
 
     @Override
     public void abolish() {
-        super.abolish();
         decodeCache.invalidate(uri);
     }
 
