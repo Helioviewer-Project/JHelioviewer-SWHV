@@ -5,7 +5,6 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.position.Position;
 
 public interface MetaData {
@@ -42,8 +41,9 @@ public interface MetaData {
 
     float getCutOffValue();
 
-    @Nonnull
-    Vec2 getCutOffDirection();
+    float getCutOffX();
+
+    float getCutOffY();
 
     @Nonnull
     Position getViewpoint();
