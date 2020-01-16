@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.fits;
+package org.helioviewer.jhv.view.uri.fits;
 
 import java.net.URI;
 import java.nio.ByteBuffer;
@@ -18,7 +18,7 @@ import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.log.Log;
-import org.helioviewer.jhv.view.URIImageReader;
+import org.helioviewer.jhv.view.uri.URIImageReader;
 
 // essentially static; local or network cache
 public class FITSImage implements URIImageReader {

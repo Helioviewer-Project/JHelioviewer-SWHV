@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view;
+package org.helioviewer.jhv.view.uri;
 
 import java.awt.EventQueue;
 import java.net.URI;
@@ -13,8 +13,10 @@ import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.position.Position;
-import org.helioviewer.jhv.view.fits.FITSImage;
-import org.helioviewer.jhv.view.generic.GenericImage;
+import org.helioviewer.jhv.view.BaseView;
+import org.helioviewer.jhv.view.DecodeExecutor;
+import org.helioviewer.jhv.view.uri.fits.FITSImage;
+import org.helioviewer.jhv.view.uri.generic.GenericImage;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;

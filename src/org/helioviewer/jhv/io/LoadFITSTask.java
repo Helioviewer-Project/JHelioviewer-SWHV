@@ -7,8 +7,8 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
-import org.helioviewer.jhv.view.URIView;
 import org.helioviewer.jhv.view.View;
+import org.helioviewer.jhv.view.uri.URIView;
 
 class LoadFITSTask extends LoadViewTask {
 

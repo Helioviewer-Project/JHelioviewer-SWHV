@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.fits;
+package org.helioviewer.jhv.view.uri.fits;
 
 import java.util.Arrays;
 
