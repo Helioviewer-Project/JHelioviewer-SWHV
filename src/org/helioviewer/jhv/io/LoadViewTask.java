@@ -13,9 +13,9 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.ManyView;
-import org.helioviewer.jhv.view.URIView;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.j2k.J2KView;
+import org.helioviewer.jhv.view.uri.URIView;
 
 class LoadViewTask extends JHVWorker<View, Void> {
 
