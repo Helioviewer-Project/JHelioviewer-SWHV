@@ -14,13 +14,13 @@ import org.helioviewer.jhv.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.view.BaseView;
+import org.helioviewer.jhv.view.DecodeCallback;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.uri.fits.FITSImage;
 import org.helioviewer.jhv.view.uri.generic.GenericImage;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.util.concurrent.FutureCallback;
 
 public class URIView extends BaseView {
 
@@ -72,17 +72,17 @@ public class URIView extends BaseView {
     public void decode(Position viewpoint, double pixFactor, float factor) {
         ImageBuffer imageBuffer = decodeCache.getIfPresent(uri);
         if (imageBuffer == null) {
-            executor.decode(new URIDecoder(this), new DecodeCallback(viewpoint));
+            executor.decode(new URIDecoder(this), new URICallback(viewpoint));
         } else {
             sendDataToHandler(imageBuffer, viewpoint);
         }
     }
 
-    private class DecodeCallback implements FutureCallback<ImageBuffer> {
+    private class URICallback extends DecodeCallback {
 
         private final Position viewpoint;
 
-        DecodeCallback(Position _viewpoint) {
+        URICallback(Position _viewpoint) {
             viewpoint = _viewpoint;
         }
 
@@ -90,11 +90,6 @@ public class URIView extends BaseView {
         public void onSuccess(ImageBuffer result) {
             decodeCache.put(uri, result);
             sendDataToHandler(result, viewpoint);
-        }
-
-        @Override
-        public void onFailure(Throwable t) {
-            t.printStackTrace();
         }
 
     }
