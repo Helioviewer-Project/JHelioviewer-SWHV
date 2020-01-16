@@ -7,28 +7,28 @@ public class DecodeParams {
     public final int serial;
     public final int frame;
     public final SubImage subImage;
-    public final ResolutionSet.ResolutionLevel resolution;
+    public final int level;
     public final float factor;
     public final boolean complete; // cache the decoded data
     public final Position viewpoint; // sync with camera & between layers
     private final int hash;
 
-    public DecodeParams(int _serial, int _frame, SubImage _subImage, ResolutionSet.ResolutionLevel _resolution, float _factor, boolean _complete, Position _viewpoint) {
+    public DecodeParams(int _serial, int _frame, SubImage _subImage, int _level, float _factor, boolean _complete, Position _viewpoint) {
         serial = _serial;
         frame = _frame;
         subImage = _subImage;
-        resolution = _resolution;
+        level = _level;
         factor = _factor;
         complete = _complete;
         viewpoint = _viewpoint;
-        hash = computeHash(serial, frame, subImage, resolution, factor);
+        hash = computeHash(serial, frame, subImage, level, factor);
     }
 
-    private static int computeHash(int s, int fr, SubImage si, ResolutionSet.ResolutionLevel r, float f) { // viewpoint, complete don't participate
+    private static int computeHash(int s, int fr, SubImage si, int l, float f) { // viewpoint, complete don't participate
         int result = 31 + s;
         result = 31 * result + fr;
         result = 31 * result + si.hashCode();
-        result = 31 * result + r.level;
+        result = 31 * result + l;
         return 31 * result + Float.floatToRawIntBits(f);
     }
 
@@ -39,7 +39,7 @@ public class DecodeParams {
         if (!(o instanceof DecodeParams))
             return false;
         DecodeParams p = (DecodeParams) o;
-        return serial == p.serial && frame == p.frame && resolution.level == p.resolution.level && factor == p.factor && subImage.equals(p.subImage);
+        return serial == p.serial && frame == p.frame && level == p.level && factor == p.factor && subImage.equals(p.subImage);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class DecodeParams {
 
     @Override
     public String toString() {
-        return "[Frame=" + frame + ' ' + subImage + ' ' + resolution + " Factor=" + factor + ']';
+        return "[Frame=" + frame + ' ' + subImage + " Level=" + level + " Factor=" + factor + ']';
     }
 
 }
