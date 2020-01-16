@@ -56,21 +56,21 @@ public class ImageData {
         uploaded = _uploaded;
     }
 
-    private float getPixel(double x, double y) {
+    private float getPixel(float x, float y) {
         float ccr = metaData.getCCROTA();
         float scr = -metaData.getSCROTA();
-        double xr = x * ccr - y * scr;
-        double yr = x * scr + y * ccr;
-        double xf = metaData.xPixelFactor(xr);
-        double yf = metaData.yPixelFactor(yr);
+        float xr = x * ccr - y * scr;
+        float yr = x * scr + y * ccr;
+        float xf = (float) metaData.xPixelFactor(xr);
+        float yf = (float) metaData.yPixelFactor(yr);
 
-        int ix = (int) (xf * (imageBuffer.width - 1) + .5);
-        int iy = (int) (yf * (imageBuffer.height - 1) + .5);
+        int ix = (int) (xf * (imageBuffer.width - 1) + .5f);
+        int iy = (int) (yf * (imageBuffer.height - 1) + .5f);
         return imageBuffer.getPixel(ix, iy, physLUT);
     }
 
     @Nonnull
-    public String getPixelString(double x, double y) {
+    public String getPixelString(float x, float y) {
         float v = getPixel(x, y);
         String ret;
         if (v == ImageBuffer.BAD_PIXEL)
