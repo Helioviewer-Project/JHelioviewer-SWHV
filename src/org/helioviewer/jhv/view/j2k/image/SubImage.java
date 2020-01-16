@@ -44,8 +44,7 @@ public class SubImage {
 
     @Override
     public int hashCode() {
-        int result = 1;
-        result = 31 * result + x;
+        int result = 31 + x;
         result = 31 * result + y;
         result = 31 * result + width;
         return 31 * result + height;

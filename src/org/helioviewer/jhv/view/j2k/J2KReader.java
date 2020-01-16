@@ -8,6 +8,7 @@ import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.j2k.cache.CacheStatus;
 import org.helioviewer.jhv.view.j2k.image.ReadParams;
+import org.helioviewer.jhv.view.j2k.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.jhv.view.j2k.io.jpip.DatabinMap;
 import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCache;
 import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCacheManager;
@@ -121,9 +122,11 @@ class J2KReader implements Runnable {
             int numFrames = view.getMaximumFrameNumber() + 1;
 
             int frame = params.decodeParams.frame;
-            int level = params.decodeParams.resolution.level;
-            int width = params.decodeParams.resolution.width;
-            int height = params.decodeParams.resolution.height;
+            int level = params.decodeParams.level;
+
+            ResolutionLevel resolution = view.getResolutionLevel(frame, level);
+            int width = resolution.width;
+            int height = resolution.height;
 
             view.setDownloading(true);
 

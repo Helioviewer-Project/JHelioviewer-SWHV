@@ -290,13 +290,13 @@ public class J2KView extends BaseView {
             }
         }
         AtomicBoolean status = cacheStatus.getFrameStatus(frame, res.level); // before signalling to reader
-        return new DecodeParams(serial, frame, subImage, res, factor, status != null && status.get(), viewpoint);
+        return new DecodeParams(serial, frame, subImage, res.level, factor, status != null && status.get(), viewpoint);
     }
 
     private int currentLevel = 10000;
 
     protected void signalReader(DecodeParams decodeParams) {
-        int level = decodeParams.resolution.level;
+        int level = decodeParams.level;
         boolean priority = !Movie.isPlaying();
 
         if (priority || level < currentLevel) {
@@ -339,9 +339,11 @@ public class J2KView extends BaseView {
     }
 
     private void sendDataToHandler(DecodeParams decodeParams, ImageBuffer imageBuffer) {
-        MetaData m = metaData[decodeParams.frame];
+        int frame = decodeParams.frame;
+        MetaData m = metaData[frame];
         SubImage roi = decodeParams.subImage;
-        Region r = m.roiToRegion(roi.x, roi.y, roi.width, roi.height, decodeParams.resolution.factorX, decodeParams.resolution.factorY);
+        ResolutionLevel resolution = getResolutionLevel(frame, decodeParams.level);
+        Region r = m.roiToRegion(roi.x, roi.y, roi.width, roi.height, resolution.factorX, resolution.factorY);
         ImageData data = new ImageData(imageBuffer, m, r, decodeParams.viewpoint);
 
         EventQueue.invokeLater(() -> {
