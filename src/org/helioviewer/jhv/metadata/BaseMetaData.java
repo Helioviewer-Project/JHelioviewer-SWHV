@@ -6,7 +6,6 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.position.Position;
 
 class BaseMetaData implements MetaData {
@@ -39,7 +38,8 @@ class BaseMetaData implements MetaData {
 
     // Serves only for LASCO cutOff edges
     protected float cutOffValue = -1;
-    protected Vec2 cutOffDirection = Vec2.ZERO;
+    protected float cutOffX = 0;
+    protected float cutOffY = 0;
 
     @Override
     public int getFrameNumber() {
@@ -99,10 +99,14 @@ class BaseMetaData implements MetaData {
         return cutOffValue;
     }
 
-    @Nonnull
     @Override
-    public Vec2 getCutOffDirection() {
-        return cutOffDirection;
+    public float getCutOffX() {
+        return cutOffX;
+    }
+
+    @Override
+    public float getCutOffY() {
+        return cutOffValue;
     }
 
     @Nonnull

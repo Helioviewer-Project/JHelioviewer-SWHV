@@ -216,9 +216,9 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform1fv(cutOffValueRef, 1, cutOffValue, 0);
     }
 
-    public void bindCutOffDirection(GL2 gl, double x, double y) {
-        cutOffDirection[0] = (float) x;
-        cutOffDirection[1] = (float) y;
+    public void bindCutOffDirection(GL2 gl, float x, float y) {
+        cutOffDirection[0] = x;
+        cutOffDirection[1] = y;
         gl.glUniform2fv(cutOffDirectionRef, 1, cutOffDirection, 0);
     }
 
