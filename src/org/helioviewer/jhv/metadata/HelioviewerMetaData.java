@@ -89,7 +89,7 @@ public class HelioviewerMetaData extends BaseMetaData {
 
     private void retrieveResponse() {
         if (normalizeAIA && instrument.equals("AIA")) {
-            responseFactor = AIAResponse.get(viewpoint.time.toString().substring(0, 10), measurement);
+            responseFactor = (float) AIAResponse.get(viewpoint.time.toString().substring(0, 10), measurement);
         }
     }
 
@@ -97,53 +97,59 @@ public class HelioviewerMetaData extends BaseMetaData {
     private void retrieveOcculterLinearCutOff(MetaDataContainer m) {
         if (detector.equals("C2")) {
             cutOffValue = (float) -region.ulx;
-            double maskRotation = -Math.toRadians(m.getDouble("CROTA").orElse(0.)); // C2 JP2 already rotated
+            double maskRotation = -m.getDouble("CROTA").map(Math::toRadians).orElse(0.); // C2 JP2 already rotated
             cutOffX = (float) (Math.sin(maskRotation) / 0.9625);
             cutOffY = (float) (Math.cos(maskRotation) / 0.9625);
         }/* else if (instrument.equals("SWAP")) {
             cutOffValue = (float) -region.ulx;
-            double maskRotation = -Math.toRadians(m.getDouble("SOLAR_EP").orElse(0.));
+            double maskRotation = -m.getDouble("SOLAR_EP").map(Math::toRadians).orElse(0.);
             cutOffX = (float) Math.sin(maskRotation);
             cutOffY = (float) Math.cos(maskRotation);
         }*/
     }
 
     private void retrieveOcculterRadii(MetaDataContainer m) {
-        innerRadius = m.getDouble("HV_ROCC_INNER").orElse(innerRadius);
-        outerRadius = m.getDouble("HV_ROCC_OUTER").orElse(outerRadius);
-        innerRadius = m.getDouble("HV_INNER").orElse(innerRadius); // Euhforia
-        outerRadius = m.getDouble("HV_OUTER").orElse(outerRadius);
-        innerRadius *= Sun.Radius;
-        outerRadius *= Sun.Radius;
+        double inner = innerRadius;
+        double outer = outerRadius;
 
-        if (innerRadius == 0) {
+        inner = m.getDouble("HV_ROCC_INNER").orElse(inner);
+        outer = m.getDouble("HV_ROCC_OUTER").orElse(outer);
+        inner = m.getDouble("HV_INNER").orElse(inner); // Euhforia
+        outer = m.getDouble("HV_OUTER").orElse(outer);
+        inner *= Sun.Radius;
+        outer *= Sun.Radius;
+
+        if (inner == 0) {
             if (detector.equals("C2")) {
-                innerRadius = 2.3 * Sun.Radius;
-                outerRadius = 8.0 * Sun.Radius;
+                inner = 2.3 * Sun.Radius;
+                outer = 8.0 * Sun.Radius;
             } else if (detector.equals("C3")) {
-                innerRadius = 4.4 * Sun.Radius;
-                outerRadius = 31.5 * Sun.Radius;
+                inner = 4.4 * Sun.Radius;
+                outer = 31.5 * Sun.Radius;
             } else if (observatory.equals("STEREO-A") && detector.equals("COR1")) {
-                innerRadius = 1.36 * Sun.Radius;
-                outerRadius = 4.5 * Sun.Radius;
+                inner = 1.36 * Sun.Radius;
+                outer = 4.5 * Sun.Radius;
             } else if (observatory.equals("STEREO-A") && detector.equals("COR2")) {
-                innerRadius = 2.4 * Sun.Radius;
-                outerRadius = 15.6 * Sun.Radius;
+                inner = 2.4 * Sun.Radius;
+                outer = 15.6 * Sun.Radius;
             } else if (observatory.equals("STEREO-B") && detector.equals("COR1")) {
-                innerRadius = 1.5 * Sun.Radius;
-                outerRadius = 4.9 * Sun.Radius;
+                inner = 1.5 * Sun.Radius;
+                outer = 4.9 * Sun.Radius;
             } else if (observatory.equals("STEREO-B") && detector.equals("COR2")) {
-                innerRadius = 3.25 * Sun.Radius;
-                outerRadius = 17 * Sun.Radius;
+                inner = 3.25 * Sun.Radius;
+                outer = 17 * Sun.Radius;
             }
         }
         // magic
         if (detector.equals("C3"))
-            innerRadius *= 1.07;
+            inner *= 1.07;
         if (instrument.equals("MDI") || instrument.equals("HMI") ||
                 observatory.equals("Kanzelhoehe") || observatory.equals("ROB-USET") ||
                 observatory.equals("NSO-GONG") || observatory.equals("NSO-SOLIS"))
-            outerRadius = 1;
+            outer = 1;
+
+        innerRadius = (float) inner;
+        outerRadius = (float) outer;
     }
 
     private void identifyObservation(MetaDataContainer m) {

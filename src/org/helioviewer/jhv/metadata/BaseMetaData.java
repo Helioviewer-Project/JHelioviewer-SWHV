@@ -23,11 +23,11 @@ class BaseMetaData implements MetaData {
     protected double unitPerPixelX = 1;
     protected double unitPerPixelY = 1;
     protected double unitPerArcsec = Double.NaN;
-    protected double responseFactor = 1;
+    protected float responseFactor = 1;
 
     protected Position viewpoint = Sun.StartEarth;
-    protected double innerRadius = 0;
-    protected double outerRadius = Double.MAX_VALUE;
+    protected float innerRadius = 0;
+    protected float outerRadius = Float.MAX_VALUE;
 
     protected float crota = 0;
     protected float scrota = 0;
@@ -74,7 +74,7 @@ class BaseMetaData implements MetaData {
     }
 
     @Override
-    public double getResponseFactor() {
+    public float getResponseFactor() {
         return responseFactor;
     }
 
@@ -85,12 +85,12 @@ class BaseMetaData implements MetaData {
     }
 
     @Override
-    public double getInnerRadius() {
+    public float getInnerRadius() {
         return innerRadius;
     }
 
     @Override
-    public double getOuterRadius() {
+    public float getOuterRadius() {
         return outerRadius;
     }
 
@@ -149,12 +149,12 @@ class BaseMetaData implements MetaData {
 
     @Override
     public double xPixelFactor(double xPoint) {
-        return (xPoint - region.llx) / unitPerPixelX / pixelW;
+        return (xPoint - region.llx) * (1 / unitPerPixelX / pixelW);
     }
 
     @Override
     public double yPixelFactor(double yPoint) {
-        return 1 - (yPoint - region.lly) / unitPerPixelY / pixelH;
+        return 1 - (yPoint - region.lly) * (1 / unitPerPixelY / pixelH);
     }
 
     @Nonnull

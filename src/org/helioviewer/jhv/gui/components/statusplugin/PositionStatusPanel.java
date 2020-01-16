@@ -61,7 +61,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
                 ImageLayer layer = Layers.getActiveImageLayer();
                 ImageData id;
                 if (layer != null && (id = layer.getImageData()) != null) {
-                    valueStr = id.getPixelString(v.x, v.y);
+                    valueStr = id.getPixelString((float) v.x, (float) v.y);
                 }
 
                 setText(formatOrtho(coord, r, pa, px, py, valueStr));
