@@ -2,6 +2,7 @@ package org.helioviewer.jhv.view.j2k;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.concurrent.Callable;
 
 import javax.annotation.Nullable;
 
@@ -24,7 +25,7 @@ import org.lwjgl.system.MemoryUtil;
 //import com.google.common.math.StatsAccumulator;
 //import com.google.common.base.Stopwatch;
 
-class J2KDecoder implements Runnable {
+class J2KDecoder implements Callable<ImageBuffer> {
 
     // Maximum of samples to process per rendering iteration
     private static final int MAX_RENDER_SAMPLES = 256 * 1024;
@@ -35,24 +36,25 @@ class J2KDecoder implements Runnable {
     private static final ThreadLocal<Kdu_thread_env> localThread = ThreadLocal.withInitial(J2KDecoder::createThreadEnv);
 
     private final J2KView view;
-    private final DecodeParams decodeParams;
+    private final DecodeParams params;
 
     //private final Stopwatch sw = Stopwatch.createUnstarted();
     //private static final ThreadLocal<StatsAccumulator> localAcc = ThreadLocal.withInitial(StatsAccumulator::new);
 
-    J2KDecoder(J2KView _view, DecodeParams _decodeParams) {
+    J2KDecoder(J2KView _view, DecodeParams _params) {
         view = _view;
-        decodeParams = _decodeParams;
+        params = _params;
     }
 
-    private static ImageBuffer decodeLayer(J2KView v, DecodeParams params) throws KduException {
+    @Override
+    public ImageBuffer call() throws KduException {
         //sw.reset().start();
 
         SubImage subImage = params.subImage;
         int frame = params.frame;
-        int numComponents = v.getNumComponents(frame);
+        int numComponents = view.getNumComponents(frame);
 
-        Kdu_region_compositor compositor = createCompositor(v, params.factor < 1 ? qualityLow : qualityHigh);
+        Kdu_region_compositor compositor = createCompositor(view, params.factor < 1 ? qualityLow : qualityHigh);
 
         Kdu_dims empty = new Kdu_dims();
         if (numComponents < 3) {
@@ -122,17 +124,6 @@ class J2KDecoder implements Runnable {
             System.out.println(">>> mean: " + acc.mean() + " stdvar: " + acc.sampleStandardDeviation());
 */
         return new ImageBuffer(actualWidth, actualHeight, format, ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder()));
-    }
-
-    @Override
-    public void run() {
-        try {
-            Thread.currentThread().setName("J2KDecoder");
-            ImageBuffer imageBuffer = decodeLayer(view, decodeParams);
-            view.setDataFromDecoder(decodeParams, imageBuffer);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Nullable
