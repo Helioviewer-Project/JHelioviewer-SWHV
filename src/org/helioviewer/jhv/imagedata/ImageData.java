@@ -57,8 +57,8 @@ public class ImageData {
     }
 
     private float getPixel(double x, double y) {
-        double ccr = metaData.getCCROTA();
-        double scr = -metaData.getSCROTA();
+        float ccr = metaData.getCCROTA();
+        float scr = -metaData.getSCROTA();
         double xr = x * ccr - y * scr;
         double yr = x * scr + y * ccr;
         double xf = metaData.xPixelFactor(xr);

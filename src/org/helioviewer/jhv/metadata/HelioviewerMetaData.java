@@ -64,8 +64,10 @@ public class HelioviewerMetaData extends BaseMetaData {
     }
 
     private void retrieveSector(MetaDataContainer m) {
-        sector0 = m.getDouble("HV_SECT0").map(Math::toRadians).orElse(sector0);
-        sector1 = m.getDouble("HV_SECT1").map(Math::toRadians).orElse(sector1);
+        double s0 = m.getDouble("HV_SECT0").map(Math::toRadians).orElse(0.);
+        double s1 = m.getDouble("HV_SECT1").map(Math::toRadians).orElse(0.);
+        sector0 = (float) s0;
+        sector1 = (float) s1;
     }
 
     private void retrieveUnit(MetaDataContainer m) {
@@ -96,12 +98,12 @@ public class HelioviewerMetaData extends BaseMetaData {
     private void retrieveOcculterLinearCutOff(MetaDataContainer m) {
         if (detector.equals("C2")) {
             double maskRotation = -Math.toRadians(m.getDouble("CROTA").orElse(0.)); // C2 JP2 already rotated
-            cutOffValue = -region.ulx;
             cutOffDirection = new Vec2(Math.sin(maskRotation) / 0.9625, Math.cos(maskRotation) / 0.9625);
+            cutOffValue = (float) -region.ulx;
         }/* else if (instrument.equals("SWAP")) {
             double maskRotation = -Math.toRadians(m.getDouble("SOLAR_EP").orElse(0.));
-            cutOffValue = -region.ulx;
             cutOffDirection = new Vec3(Math.sin(maskRotation), Math.cos(maskRotation), 0);
+            cutOffValue = (float) -region.ulx;
         }*/
     }
 
@@ -215,13 +217,14 @@ public class HelioviewerMetaData extends BaseMetaData {
 
     private Quat retrieveCenterRotation(MetaDataContainer m) {
         if (instrument.equals("AIA") || instrument.equals("HMI") || instrument.equals("SWAP") || instrument.equals("SUVI")) {
-            crota = m.getDouble("CROTA").map(Math::toRadians)
+            double c = m.getDouble("CROTA").map(Math::toRadians)
                     .or(() -> m.getDouble("CROTA1").map(Math::toRadians))
                     .or(() -> m.getDouble("CROTA2").map(Math::toRadians)).orElse(0.);
 
-            scrota = Math.sin(crota);
-            ccrota = Math.cos(crota);
-            return Quat.rotate(Quat.createRotation(-crota, Vec3.ZAxis), viewpoint.toQuat());
+            crota = (float) c;
+            scrota = (float) Math.sin(crota);
+            ccrota = (float) Math.cos(crota);
+            return Quat.rotate(Quat.createRotation(-c, Vec3.ZAxis), viewpoint.toQuat());
         }
         return viewpoint.toQuat();
     }

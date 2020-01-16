@@ -140,12 +140,12 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
             worker.cancel(true);
             worker = null;
         }
+        executor.abolish();
         unsetView();
         if (Display.multiview) {
             ImageLayers.arrangeMultiView(true);
         }
         dispose(gl);
-        executor.abolish();
         System.gc(); // reclaim memory asap
         removed = true;
     }
