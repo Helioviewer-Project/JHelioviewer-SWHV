@@ -20,7 +20,7 @@ public class DecodeExecutor {
         executor.execute(r);
     }
 
-    void abolish() {
+    public void abolish() {
         blockingQueue.poll();
         executor.shutdown();
     }
