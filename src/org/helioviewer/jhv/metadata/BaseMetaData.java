@@ -106,7 +106,7 @@ class BaseMetaData implements MetaData {
 
     @Override
     public float getCutOffY() {
-        return cutOffValue;
+        return cutOffY;
     }
 
     @Nonnull

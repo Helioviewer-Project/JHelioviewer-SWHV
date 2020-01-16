@@ -121,8 +121,8 @@ class J2KDecoder implements Callable<ImageBuffer> {
 /*
         StatsAccumulator acc = localAcc.get();
         acc.add(sw.elapsed().toNanos() / 1e9);
-        if (params.view.getMaximumFrameNumber() > 0 && acc.count() == params.view.getMaximumFrameNumber() + 1)
-            System.out.println(">>> mean: " + acc.mean() + " stdvar: " + acc.sampleStandardDeviation());
+        if (view.getMaximumFrameNumber() > 0 && acc.count() == view.getMaximumFrameNumber() + 1)
+            System.out.println(">>> mean: " + acc.mean() + " stddev: " + acc.sampleStandardDeviation());
 */
         return new ImageBuffer(actualWidth, actualHeight, format, ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder()));
     }
