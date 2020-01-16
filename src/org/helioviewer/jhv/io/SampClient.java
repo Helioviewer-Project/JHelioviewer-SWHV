@@ -47,22 +47,23 @@ public class SampClient extends HubConnector {
             }).start();
         }
     }
-/*
-    @Nullable
-    private static URI[] extractURIs(Message msg) {
-        Map<?, ?> params = msg.getParams();
-        if (params == null)
-            return null;
-        return params.values().stream().map(v -> {
-            try {
-                return new URI(v.toString());
-            } catch (Exception e) {
-                e.printStackTrace();
+
+    /*
+        @Nullable
+        private static URI[] extractURIs(Message msg) {
+            Map<?, ?> params = msg.getParams();
+            if (params == null)
                 return null;
-            }
-        }).filter(Objects::nonNull).toArray(URI[]::new);
-    }
-*/
+            return params.values().stream().map(v -> {
+                try {
+                    return new URI(v.toString());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }).filter(Objects::nonNull).toArray(URI[]::new);
+        }
+    */
     private SampClient(ClientProfile _profile) {
         super(_profile);
 

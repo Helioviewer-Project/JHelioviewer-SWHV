@@ -21,9 +21,6 @@ import org.helioviewer.jhv.view.j2k.image.SubImage;
 
 import org.lwjgl.system.MemoryUtil;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-
 //import com.google.common.math.StatsAccumulator;
 //import com.google.common.base.Stopwatch;
 
@@ -35,7 +32,6 @@ class J2KDecoder implements Runnable {
     private static final Kdu_quality_limiter qualityLow = new Kdu_quality_limiter(2f / 256);
     private static final Kdu_quality_limiter qualityHigh = new Kdu_quality_limiter(1f / 256);
 
-    private static final ThreadLocal<Cache<DecodeParams, ImageBuffer>> decodeCache = ThreadLocal.withInitial(() -> CacheBuilder.newBuilder().softValues().build());
     private static final ThreadLocal<Kdu_thread_env> localThread = ThreadLocal.withInitial(J2KDecoder::createThreadEnv);
 
     private final J2KView view;
@@ -132,13 +128,7 @@ class J2KDecoder implements Runnable {
     public void run() {
         try {
             Thread.currentThread().setName("J2KDecoder");
-
-            ImageBuffer imageBuffer = decodeCache.get().getIfPresent(decodeParams);
-            if (imageBuffer == null) {
-                imageBuffer = decodeLayer(view, decodeParams);
-                if (decodeParams.complete)
-                    decodeCache.get().put(decodeParams, imageBuffer);
-            }
+            ImageBuffer imageBuffer = decodeLayer(view, decodeParams);
             view.setDataFromDecoder(decodeParams, imageBuffer);
         } catch (Exception e) {
             e.printStackTrace();
