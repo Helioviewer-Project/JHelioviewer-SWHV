@@ -38,6 +38,7 @@ import org.helioviewer.jhv.view.j2k.kakadu.KakaduSource;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.util.concurrent.FutureCallback;
 
 public class J2KView extends BaseView {
 
@@ -323,19 +324,35 @@ public class J2KView extends BaseView {
         });
     }
 
-    private void executeDecode(DecodeParams decodeParams) {
-        ImageBuffer imageBuffer = decodeCache.getIfPresent(decodeParams);
+    private void executeDecode(DecodeParams params) {
+        ImageBuffer imageBuffer = decodeCache.getIfPresent(params);
         if (imageBuffer == null) {
-            executor.decode(new J2KDecoder(this, decodeParams));
+            executor.decode(new J2KDecoder(this, params), new DecodeCallback(params));
         } else {
-            sendDataToHandler(decodeParams, imageBuffer);
+            sendDataToHandler(params, imageBuffer);
         }
     }
 
-    void setDataFromDecoder(DecodeParams decodeParams, ImageBuffer imageBuffer) {
-        if (decodeParams.complete)
-            decodeCache.put(decodeParams, imageBuffer);
-        sendDataToHandler(decodeParams, imageBuffer);
+    private class DecodeCallback implements FutureCallback<ImageBuffer> {
+
+        private final DecodeParams params;
+
+        DecodeCallback(DecodeParams _params) {
+            params = _params;
+        }
+
+        @Override
+        public void onSuccess(ImageBuffer result) {
+            if (params.complete)
+                decodeCache.put(params, result);
+            sendDataToHandler(params, result);
+        }
+
+        @Override
+        public void onFailure(Throwable t) {
+            t.printStackTrace();
+        }
+
     }
 
     private void sendDataToHandler(DecodeParams decodeParams, ImageBuffer imageBuffer) {
