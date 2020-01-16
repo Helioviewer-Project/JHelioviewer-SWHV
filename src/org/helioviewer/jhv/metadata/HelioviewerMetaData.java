@@ -9,7 +9,6 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.time.JHVDate;
@@ -97,13 +96,15 @@ public class HelioviewerMetaData extends BaseMetaData {
     // magic
     private void retrieveOcculterLinearCutOff(MetaDataContainer m) {
         if (detector.equals("C2")) {
+            cutOffValue = (float) -region.ulx;
             double maskRotation = -Math.toRadians(m.getDouble("CROTA").orElse(0.)); // C2 JP2 already rotated
-            cutOffDirection = new Vec2(Math.sin(maskRotation) / 0.9625, Math.cos(maskRotation) / 0.9625);
-            cutOffValue = (float) -region.ulx;
+            cutOffX = (float) (Math.sin(maskRotation) / 0.9625);
+            cutOffY = (float) (Math.cos(maskRotation) / 0.9625);
         }/* else if (instrument.equals("SWAP")) {
-            double maskRotation = -Math.toRadians(m.getDouble("SOLAR_EP").orElse(0.));
-            cutOffDirection = new Vec3(Math.sin(maskRotation), Math.cos(maskRotation), 0);
             cutOffValue = (float) -region.ulx;
+            double maskRotation = -Math.toRadians(m.getDouble("SOLAR_EP").orElse(0.));
+            cutOffX = (float) Math.sin(maskRotation);
+            cutOffY = (float) Math.cos(maskRotation);
         }*/
     }
 
