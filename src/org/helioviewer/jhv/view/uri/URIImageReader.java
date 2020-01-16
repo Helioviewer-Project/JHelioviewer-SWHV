@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view;
+package org.helioviewer.jhv.view.uri;
 
 import java.net.URI;
 
