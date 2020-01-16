@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.lang.ref.Cleaner;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -35,10 +36,15 @@ import org.helioviewer.jhv.view.j2k.image.SubImage;
 import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCache;
 import org.helioviewer.jhv.view.j2k.kakadu.KakaduSource;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 public class J2KView extends BaseView {
 
-    private static volatile int global_serial;
+    private static final AtomicInteger global_serial = new AtomicInteger(0);
     private static final int HIRES_CUTOFF = 1280;
+
+    private static final Cache<DecodeParams, ImageBuffer> decodeCache = CacheBuilder.newBuilder().softValues().build();
 
     private static final Cleaner reaper = Cleaner.create();
     private final Cleaner.Cleanable abolishable;
@@ -56,9 +62,19 @@ public class J2KView extends BaseView {
     protected final CacheStatus cacheStatus;
     protected final J2KReader reader;
 
+    private static int incrementSerial() {
+        while (true) {
+            int existingValue = global_serial.get();
+            int newValue = existingValue + 1;
+            if (global_serial.compareAndSet(existingValue, newValue)) {
+                return newValue;
+            }
+        }
+    }
+
     public J2KView(DecodeExecutor _executor, APIRequest _request, URI _uri, APIResponse _response) throws Exception {
         super(_executor, _request, _uri);
-        serial = global_serial++;
+        serial = incrementSerial();
 
         long[] frames = _response == null ? null : _response.getFrames();
         if (frames != null) {
@@ -175,6 +191,9 @@ public class J2KView extends BaseView {
     @Override
     public void abolish() {
         abolishable.clean();
+        for (DecodeParams params : decodeCache.asMap().keySet()) {
+            decodeCache.invalidate(params);
+        }
     }
 
     @Override
@@ -304,10 +323,21 @@ public class J2KView extends BaseView {
     }
 
     private void executeDecode(DecodeParams decodeParams) {
-        executor.decode(new J2KDecoder(this, decodeParams));
+        ImageBuffer imageBuffer = decodeCache.getIfPresent(decodeParams);
+        if (imageBuffer == null) {
+            executor.decode(new J2KDecoder(this, decodeParams));
+        } else {
+            sendDataToHandler(decodeParams, imageBuffer);
+        }
     }
 
     void setDataFromDecoder(DecodeParams decodeParams, ImageBuffer imageBuffer) {
+        if (decodeParams.complete)
+            decodeCache.put(decodeParams, imageBuffer);
+        sendDataToHandler(decodeParams, imageBuffer);
+    }
+
+    private void sendDataToHandler(DecodeParams decodeParams, ImageBuffer imageBuffer) {
         MetaData m = metaData[decodeParams.frame];
         SubImage roi = decodeParams.subImage;
         Region r = m.roiToRegion(roi.x, roi.y, roi.width, roi.height, decodeParams.resolution.factorX, decodeParams.resolution.factorY);
