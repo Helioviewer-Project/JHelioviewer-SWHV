@@ -14,7 +14,7 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.io.DownloadViewTask;
+import org.helioviewer.jhv.io.DownloadRemoteTask;
 import org.helioviewer.jhv.io.LoadRemoteTask;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.metadata.MetaData;
@@ -306,12 +306,12 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         return worker == null && view.getFrameCacheStatus(view.getMaximumFrameNumber()) != null;
     }
 
-    private DownloadViewTask downloadTask;
+    private DownloadRemoteTask downloadTask;
 
     public void startDownloadView() {
         if (downloadTask != null)
             downloadTask.cancel(true);
-        downloadTask = new DownloadViewTask(this, view);
+        downloadTask = new DownloadRemoteTask(this, view.getAPIRequest(), view.getURI());
         JHVGlobals.getExecutorService().execute(downloadTask);
     }
 

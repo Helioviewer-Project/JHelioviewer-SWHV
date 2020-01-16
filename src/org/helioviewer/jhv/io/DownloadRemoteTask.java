@@ -10,14 +10,13 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.threads.JHVWorker;
-import org.helioviewer.jhv.view.View;
 
 import okio.Buffer;
 import okio.Okio;
 import okio.BufferedSource;
 import okio.BufferedSink;
 
-public class DownloadViewTask extends JHVWorker<Void, Void> {
+public class DownloadRemoteTask extends JHVWorker<Void, Void> {
 
     private static final int BUFSIZ = 1024 * 1024;
 
@@ -25,11 +24,10 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
     private final URI downloadURI;
     private final ImageLayer layer;
 
-    public DownloadViewTask(ImageLayer _layer, View view) {
+    public DownloadRemoteTask(ImageLayer _layer, APIRequest req, URI _uri) {
         layer = _layer;
-        uri = view.getURI();
+        uri = _uri;
 
-        APIRequest req = view.getAPIRequest();
         if (req == null)
             downloadURI = uri;
         else {
@@ -41,7 +39,7 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
             }
             downloadURI = dURI;
         }
-        setThreadName("MAIN--DownloadView");
+        setThreadName("MAIN--DownloadRemote");
     }
 
     @Nullable
