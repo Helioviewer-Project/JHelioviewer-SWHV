@@ -11,7 +11,7 @@ public class MovieDisplay implements JHVEventHighlightListener {
     private static final MovieDisplay instance = new MovieDisplay();
     private static Timer displayTimer;
 
-    public static void render(double decodeFactor) {
+    public static void render(float decodeFactor) {
         if (ImageLayers.areEnabled())
             ImageLayers.decode(decodeFactor);
         else

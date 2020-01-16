@@ -68,7 +68,7 @@ public class ManyView implements View {
     }
 
     @Override
-    public void decode(Position viewpoint, double pixFactor, double factor) {
+    public void decode(Position viewpoint, double pixFactor, float factor) {
         frameMap.indexedValue(targetFrame).view.decode(viewpoint, pixFactor, factor);
     }
 

@@ -8,12 +8,12 @@ public class DecodeParams {
     public final int frame;
     public final SubImage subImage;
     public final ResolutionSet.ResolutionLevel resolution;
-    public final double factor;
+    public final float factor;
     public final boolean complete; // cache the decoded data
     public final Position viewpoint; // sync with camera & between layers
     private final int hash;
 
-    public DecodeParams(int _serial, int _frame, SubImage _subImage, ResolutionSet.ResolutionLevel _resolution, double _factor, boolean _complete, Position _viewpoint) {
+    public DecodeParams(int _serial, int _frame, SubImage _subImage, ResolutionSet.ResolutionLevel _resolution, float _factor, boolean _complete, Position _viewpoint) {
         serial = _serial;
         frame = _frame;
         subImage = _subImage;
@@ -24,14 +24,12 @@ public class DecodeParams {
         hash = computeHash(serial, frame, subImage, resolution, factor);
     }
 
-    private static int computeHash(int s, int fr, SubImage si, ResolutionSet.ResolutionLevel r, double f) { // viewpoint, complete don't participate
-        int result = 1;
-        result = 31 * result + s;
+    private static int computeHash(int s, int fr, SubImage si, ResolutionSet.ResolutionLevel r, float f) { // viewpoint, complete don't participate
+        int result = 31 + s;
         result = 31 * result + fr;
         result = 31 * result + si.hashCode();
         result = 31 * result + r.level;
-        long tmp = Double.doubleToLongBits(f);
-        return 31 * result + (int) (tmp ^ (tmp >>> 32));
+        return 31 * result + Float.floatToRawIntBits(f);
     }
 
     @Override

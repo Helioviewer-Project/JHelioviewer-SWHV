@@ -62,7 +62,7 @@ class J2KDecoder implements Runnable {
             compositor.Add_ilayer(frame, empty, empty);
         }
 
-        compositor.Set_scale(false, false, false, 1f / (1 << params.resolution.level), (float) params.factor);
+        compositor.Set_scale(false, false, false, 1f / (1 << params.resolution.level), params.factor);
 
         Kdu_dims requestedRegion = new Kdu_dims();
         requestedRegion.From_u32(subImage.x, subImage.y, subImage.width, subImage.height);

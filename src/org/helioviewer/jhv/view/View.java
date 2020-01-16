@@ -20,7 +20,7 @@ public interface View {
 
     void abolish();
 
-    void decode(Position viewpoint, double pixFactor, double factor);
+    void decode(Position viewpoint, double pixFactor, float factor);
 
     URI getURI();
 
