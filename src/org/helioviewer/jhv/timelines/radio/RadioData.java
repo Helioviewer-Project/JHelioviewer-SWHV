@@ -9,6 +9,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
 import java.net.URI;
+import java.util.HashSet;
 import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Nullable;
@@ -46,6 +47,7 @@ public class RadioData extends AbstractTimelineLayer {
     }
 
     private static final Cache<Long, RadioJ2KData> cache = CacheBuilder.newBuilder().maximumSize(DAYS_IN_CACHE).removalListener(RadioData::removalListener).build();
+    private static final HashSet<Long> downloading = new HashSet<>();
 
     private final RadioOptionsPanel optionsPanel;
     private static IndexColorModel colorModel;
@@ -91,13 +93,11 @@ public class RadioData extends AbstractTimelineLayer {
         long end = Math.min(TimeUtils.floorDay(start) + (DAYS_IN_CACHE - 2) * TimeUtils.DAY_IN_MILLIS, TimeUtils.floorDay(System.currentTimeMillis()));
         for (int i = 0; i < DAYS_IN_CACHE; i++) {
             long date = end - i * TimeUtils.DAY_IN_MILLIS;
-            if (cache.getIfPresent(date) == null) {
+            if (!downloading.contains(date) && cache.getIfPresent(date) == null) {
                 JHVGlobals.getExecutorService().execute(new RadioJPXDownload(date));
             }
         }
     }
-
-    private static int isDownloading;
 
     private class RadioJPXDownload extends JHVWorker<RadioJ2KData, Void> {
 
@@ -105,7 +105,7 @@ public class RadioData extends AbstractTimelineLayer {
 
         RadioJPXDownload(long _date) {
             date = _date;
-            isDownloading++;
+            downloading.add(date);
             Timelines.getLayers().downloadStarted(RadioData.this);
             setThreadName("EVE--RadioDownloader");
         }
@@ -126,7 +126,7 @@ public class RadioData extends AbstractTimelineLayer {
 
         @Override
         protected void done() {
-            isDownloading--;
+            downloading.remove(date);
             Timelines.getLayers().downloadFinished(RadioData.this);
             try {
                 RadioJ2KData data = get();
@@ -175,7 +175,7 @@ public class RadioData extends AbstractTimelineLayer {
 
     @Override
     public boolean isDownloading() {
-        return isDownloading != 0;
+        return downloading.size() != 0;
     }
 
     @Override
