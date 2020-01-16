@@ -14,7 +14,7 @@ import org.helioviewer.jhv.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.view.fits.FITSImage;
-import org.helioviewer.jhv.view.simpleimage.SimpleImage;
+import org.helioviewer.jhv.view.generic.GenericImage;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -31,10 +31,10 @@ public class URIView extends BaseView {
                 return new FITSImage();
             }
         },
-        SIMPLE {
+        GENERIC {
             @Override
             protected URIImageReader getReader() {
-                return new SimpleImage();
+                return new GenericImage();
             }
         };
 
