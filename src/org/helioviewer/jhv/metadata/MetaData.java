@@ -26,21 +26,21 @@ public interface MetaData {
 
     double getResponseFactor();
 
-    double getCROTA();
+    float getCROTA();
 
-    double getSCROTA();
+    float getSCROTA();
 
-    double getCCROTA();
+    float getCCROTA();
 
-    double getSector0();
+    float getSector0();
 
-    double getSector1();
+    float getSector1();
 
     double getInnerRadius();
 
     double getOuterRadius();
 
-    double getCutOffValue();
+    float getCutOffValue();
 
     @Nonnull
     Vec2 getCutOffDirection();
