@@ -19,9 +19,7 @@ import org.helioviewer.jhv.time.JHVDate;
 public class BaseView implements View {
 
     private static final AtomicBoolean fullCache = new AtomicBoolean(true);
-    protected static final Cleaner reaper = Cleaner.create();
 
-    private final Cleaner.Cleanable baseAbolishable;
     private final boolean isLocal;
 
     protected final DecodeExecutor executor;
@@ -37,7 +35,6 @@ public class BaseView implements View {
         uri = _uri;
         isLocal = uri != null && "file".equals(uri.getScheme());
         metaData[0] = new PixelBasedMetaData(1, 1, 0, uri);
-        baseAbolishable = reaper.register(this, new BaseAbolisher(executor));
     }
 
     @Override
@@ -152,25 +149,8 @@ public class BaseView implements View {
         return "<meta/>";
     }
 
-    private static class BaseAbolisher implements Runnable {
-
-        private final DecodeExecutor aExecutor;
-
-        BaseAbolisher(DecodeExecutor _executor) {
-            aExecutor = _executor;
-        }
-
-        @Override
-        public void run() {
-            if (aExecutor != null)
-                aExecutor.abolish();
-        }
-
-    }
-
     @Override
     public void abolish() {
-        baseAbolishable.clean();
     }
 
 }

@@ -2,6 +2,7 @@ package org.helioviewer.jhv.view.j2k;
 
 import java.awt.EventQueue;
 import java.io.IOException;
+import java.lang.ref.Cleaner;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -38,6 +39,9 @@ public class J2KView extends BaseView {
 
     private static volatile int global_serial;
     private static final int HIRES_CUTOFF = 1280;
+
+    private static final Cleaner reaper = Cleaner.create();
+    private final Cleaner.Cleanable abolishable;
 
     private final int maxFrame;
     private int targetFrame;
@@ -123,7 +127,7 @@ public class J2KView extends BaseView {
                 reader.start();
             }
 
-            reaper.register(this, new J2KAbolisher(reader, jpipCache));
+            abolishable = reaper.register(this, new J2KAbolisher(reader, jpipCache));
         } catch (KduException e) {
             e.printStackTrace();
             throw new IOException("Failed to create Kakadu machinery: " + e.getMessage(), e);
@@ -166,6 +170,11 @@ public class J2KView extends BaseView {
             }).start();
         }
 
+    }
+
+    @Override
+    public void abolish() {
+        abolishable.clean();
     }
 
     @Override
