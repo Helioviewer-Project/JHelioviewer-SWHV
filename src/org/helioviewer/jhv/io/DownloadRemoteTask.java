@@ -73,7 +73,7 @@ public class DownloadRemoteTask extends JHVWorker<Void, Void> {
                 if (failed || isCancelled())
                     dstFile.delete();
                 else { // reload from disk
-                    LoadView.getURI(layer, dstFile.toURI());
+                    LoadView.get(layer, dstFile.toURI());
                     EventQueue.invokeLater(() -> JHVGlobals.displayNotification(dstFile.toString()));
                 }
             } catch (Exception e) {
