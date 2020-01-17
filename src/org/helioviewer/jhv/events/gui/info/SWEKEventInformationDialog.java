@@ -3,28 +3,29 @@ package org.helioviewer.jhv.events.gui.info;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
+import javax.annotation.Nonnull;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.threads.JHVWorker;
+import org.helioviewer.jhv.log.Log;
+import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 
-/**
- * Popup displaying informations about a HEK event.
- * <p>
- * This panel is a JDialog, so that it can be displayed on top of an GLCanvas,
- * which is not possible for other swing components.
- */
+import com.google.common.util.concurrent.FutureCallback;
+
+// Popup displaying informations about a HEK event.
+// This panel is a JDialog, so that it can be displayed on top of an GLCanvas,
+// which is not possible for other swing components.
 @SuppressWarnings("serial")
 public class SWEKEventInformationDialog extends JDialog implements DataCollapsiblePanelModelListener {
 
@@ -75,7 +76,8 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
 
         add(allTablePanel, allTablePanelConstraint);
 
-        startOtherRelatedEventsWorker();
+        //startOtherRelatedEventsWorker();
+        EventQueueCallbackExecutor.pool.submit(new DatabaseCallable(event), new DatabaseCallback());
     }
 
     private void initAllTablePanel() {
@@ -193,43 +195,55 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
         pack();
     }
 
-    private void startOtherRelatedEventsWorker() {
-        JHVWorker<ArrayList<JHVEvent>, Void> worker = new JHVWorker<>() {
-            @Override
-            public ArrayList<JHVEvent> backgroundWork() {
-                return EventDatabase.getOtherRelations(event.getUniqueID(), event.getSupplier(), false, true);
+    private static class DatabaseCallable implements Callable<ArrayList<JHVEvent>> {
+
+        private final JHVEvent e;
+
+        DatabaseCallable(JHVEvent _e) {
+            e = _e;
+        }
+
+        @Override
+        public ArrayList<JHVEvent> call() {
+            return EventDatabase.getOtherRelations(e.getUniqueID(), e.getSupplier(), false, true);
+        }
+
+    }
+
+    private class DatabaseCallback implements FutureCallback<ArrayList<JHVEvent>> {
+
+        @Override
+        public void onSuccess(ArrayList<JHVEvent> result) {
+            result.forEach(JHVEventCache::add);
+
+            ArrayList<JHVRelatedEvents> rEvents = new ArrayList<>();
+            int id = event.getUniqueID();
+            for (JHVEvent jhvEvent : result) {
+                int jid = jhvEvent.getUniqueID();
+                if (jid == id)
+                    event = jhvEvent;
+                else
+                    rEvents.add(JHVEventCache.getRelatedEvents(jid));
             }
 
-            @Override
-            public void done() {
-                try {
-                    ArrayList<JHVEvent> events = get();
-                    events.forEach(JHVEventCache::add);
+            if (!rEvents.isEmpty())
+                otherRelatedEventsPanel = createOtherRelatedEventsCollapsiblePane("Other Related Events", rEvents);
 
-                    ArrayList<JHVRelatedEvents> rEvents = new ArrayList<>();
-                    int id = event.getUniqueID();
-                    for (JHVEvent jhvEvent : events) {
-                        int jid = jhvEvent.getUniqueID();
-                        if (jid == id)
-                            event = jhvEvent;
-                        else
-                            rEvents.add(JHVEventCache.getRelatedEvents(jid));
-                    }
+            allTablePanel.removeAll();
+            initParameterCollapsiblePanels();
+            setCollapsiblePanels();
 
-                    if (!rEvents.isEmpty())
-                        otherRelatedEventsPanel = createOtherRelatedEventsCollapsiblePane("Other Related Events", rEvents);
+            repack();
+            repaint();
+        }
 
-                    allTablePanel.removeAll();
-                    initParameterCollapsiblePanels();
-                    setCollapsiblePanels();
+        @Override
+        public void onFailure(@Nonnull Throwable t) {
+            if (t instanceof InterruptedException || t instanceof ExecutionException)
+                return; // ignore ?
+            Log.error("SWEKEventInformationDialog:", t);
+        }
 
-                    repack();
-                    repaint();
-                } catch (InterruptedException | ExecutionException ignore) {
-                }
-            }
-        };
-        JHVGlobals.getExecutorService().execute(worker);
     }
 
 }

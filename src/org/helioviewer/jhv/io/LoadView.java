@@ -123,8 +123,10 @@ public class LoadView {
             if (t instanceof CancellationException ||
                     t instanceof ClosedByInterruptException ||
                     t instanceof InterruptedIOException ||
-                    t instanceof InterruptedException)
-                return; // ignore
+                    t instanceof InterruptedException) { // ignore
+                Log.info(t);
+                return;
+            }
 
             layer.unload();
 
