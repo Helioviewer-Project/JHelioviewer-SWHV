@@ -94,19 +94,19 @@ public class RadioData extends AbstractTimelineLayer {
         for (int i = 0; i < DAYS_IN_CACHE; i++) {
             long date = end - i * TimeUtils.DAY_IN_MILLIS;
             if (!downloading.contains(date) && cache.getIfPresent(date) == null) {
+                Timelines.getLayers().downloadStarted(RadioData.this);
                 EventQueueCallbackExecutor.pool.submit(new RadioJPXDownload(date), new RadioJPXCallback(date));
             }
         }
     }
 
-    private class RadioJPXDownload implements Callable<RadioJ2KData> {
+    private static class RadioJPXDownload implements Callable<RadioJ2KData> {
 
         private final long date;
 
         RadioJPXDownload(long _date) {
             date = _date;
             downloading.add(date);
-            Timelines.getLayers().downloadStarted(RadioData.this);
         }
 
         @Override
