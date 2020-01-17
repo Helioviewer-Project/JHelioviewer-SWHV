@@ -15,7 +15,6 @@ public abstract class DecodeCallback implements FutureCallback<ImageBuffer> {
     @Override
     public void onFailure(@Nonnull Throwable t) {
         Log.error("Decode error", t);
-        // t.printStackTrace();
     }
 
 }

@@ -130,7 +130,6 @@ public class LoadView {
 
             Log.error("An error occurred while opening the remote file: ", t);
             Message.err("An error occurred while opening the remote file: ", t.getMessage(), false);
-            // t.printStackTrace();
         }
 
     }
