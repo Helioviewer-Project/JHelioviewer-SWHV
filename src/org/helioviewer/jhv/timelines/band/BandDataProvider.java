@@ -96,7 +96,6 @@ public class BandDataProvider {
         @Override
         public void onFailure(@Nonnull Throwable t) {
             Log.error("Error downloading band", t);
-            // t.printStackTrace();
         }
 
     }
@@ -128,7 +127,6 @@ public class BandDataProvider {
         @Override
         public void onFailure(@Nonnull Throwable t) {
             Log.error("Error loading band", t);
-            // t.printStackTrace();
         }
 
     }
@@ -153,7 +151,6 @@ public class BandDataProvider {
         @Override
         public void onFailure(@Nonnull Throwable t) {
             Log.error("Error downloading band types", t);
-            // t.printStackTrace();
         }
 
     }
