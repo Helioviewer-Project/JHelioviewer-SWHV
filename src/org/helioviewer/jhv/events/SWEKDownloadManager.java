@@ -21,7 +21,7 @@ public class SWEKDownloadManager implements FilterManagerListener {
 
     private static final int NUMBER_THREADS = 8;
     private static final long SIXHOURS = 1000 * 60 * 60 * 6;
-    private static final ExecutorService downloadEventPool = new ThreadPoolExecutor(NUMBER_THREADS, NUMBER_THREADS, 10000L, TimeUnit.MILLISECONDS,
+    private static final ExecutorService downloadEventPool = new ThreadPoolExecutor(0, NUMBER_THREADS, 10000L, TimeUnit.MILLISECONDS,
             new PriorityBlockingQueue<>(2048, new ComparePriority()),
             new JHVThread.NamedThreadFactory("SWEK Download"),
             new ThreadPoolExecutor.DiscardPolicy()) {

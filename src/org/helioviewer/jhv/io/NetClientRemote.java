@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 //import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
+import org.helioviewer.jhv.threads.JHVExecutor;
 //import org.helioviewer.jhv.log.Log;
 
 import okhttp3.Cache;
@@ -33,7 +33,7 @@ class NetClientRemote implements NetClient {
 
     static {
         Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
-        dispatcher = new Dispatcher(EventQueueCallbackExecutor.cachedPool);
+        dispatcher = new Dispatcher(JHVExecutor.cachedPool);
         dispatcher.setMaxRequestsPerHost(8);
         dispatcher.setMaxRequests(96);
     }
