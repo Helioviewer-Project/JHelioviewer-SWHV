@@ -11,10 +11,13 @@ import java.util.logging.Logger;
 //import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 //import org.helioviewer.jhv.log.Log;
 
 import okhttp3.Cache;
 import okhttp3.CacheControl;
+import okhttp3.ConnectionPool;
+import okhttp3.Dispatcher;
 import okhttp3.HttpUrl;
 //import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -26,20 +29,28 @@ import okio.BufferedSource;
 
 class NetClientRemote implements NetClient {
 
+    private static final Dispatcher dispatcher;
+
     static {
         Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
+        dispatcher = new Dispatcher(EventQueueCallbackExecutor.pool);
+        dispatcher.setMaxRequestsPerHost(8);
+        dispatcher.setMaxRequests(96);
     }
 
     //private static final HttpLoggingInterceptor logging = new HttpLoggingInterceptor(Log::info).setLevel(HttpLoggingInterceptor.Level.HEADERS);
 
     private static final int cacheSize = 1024 * 1024 * 1024;
     private static final CacheControl noStore = new CacheControl.Builder().noStore().build();
+    private static final ConnectionPool connectionPool = new ConnectionPool(8, 10, TimeUnit.MINUTES);
     private static final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(JHVGlobals.getConnectTimeout(), TimeUnit.MILLISECONDS)
             .readTimeout(JHVGlobals.getReadTimeout(), TimeUnit.MILLISECONDS)
             .cache(new Cache(JHVGlobals.clientCacheDir, cacheSize))
             //.addInterceptor(logging)
             //.addInterceptor(new LoggingInterceptor())
+            .dispatcher(dispatcher)
+            .connectionPool(connectionPool)
             .build();
 
     private final ResponseBody responseBody;
