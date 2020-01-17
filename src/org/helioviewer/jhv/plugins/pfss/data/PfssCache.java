@@ -5,8 +5,6 @@ import java.util.TreeMap;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
-
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
@@ -26,7 +24,7 @@ public class PfssCache {
     private PfssData get(long time, String url) {
         PfssData ret = cache.getIfPresent(url);
         if (ret == null) {
-            PfssPlugin.pfssDataPool.execute(new PfssDataLoader(time, url));
+            PfssDataLoader.get(time, url);
         }
         return ret;
     }
