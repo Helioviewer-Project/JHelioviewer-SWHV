@@ -3,8 +3,8 @@ package org.helioviewer.jhv.threads;
 import java.awt.EventQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
-//import java.util.concurrent.Executors;
-//import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.annotation.Nonnull;
 
@@ -13,7 +13,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
-//import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.MoreExecutors;
 
 public class EventQueueCallbackExecutor extends ForwardingListeningExecutorService {
 
@@ -27,13 +27,13 @@ public class EventQueueCallbackExecutor extends ForwardingListeningExecutorServi
     }
 
     private static final Executor eventQueue = new EventQueueExecutor();
-    /*
-        public static final EventQueueCallbackExecutor pool =
-                new EventQueueCallbackExecutor(
-                        MoreExecutors.listeningDecorator(
-                                MoreExecutors.getExitingExecutorService(
-                                        (ThreadPoolExecutor) Executors.newCachedThreadPool())));
-    */
+
+    public static final EventQueueCallbackExecutor pool =
+            new EventQueueCallbackExecutor(
+                    MoreExecutors.listeningDecorator(
+                            MoreExecutors.getExitingExecutorService(
+                                    (ThreadPoolExecutor) Executors.newCachedThreadPool())));
+
     private final ListeningExecutorService delegate;
 
     public EventQueueCallbackExecutor(ListeningExecutorService _delegate) {
