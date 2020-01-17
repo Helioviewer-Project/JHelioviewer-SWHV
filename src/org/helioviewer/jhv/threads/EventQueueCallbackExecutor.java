@@ -3,9 +3,6 @@ package org.helioviewer.jhv.threads;
 import java.awt.EventQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.annotation.Nonnull;
 
@@ -18,6 +15,8 @@ import com.google.common.util.concurrent.MoreExecutors;
 
 public class EventQueueCallbackExecutor extends ForwardingListeningExecutorService {
 
+    public static final EventQueueCallbackExecutor pool = new EventQueueCallbackExecutor(MoreExecutors.listeningDecorator(JHVExecutor.cachedPool));
+
     private static class EventQueueExecutor implements Executor {
 
         @Override
@@ -28,9 +27,6 @@ public class EventQueueCallbackExecutor extends ForwardingListeningExecutorServi
     }
 
     private static final Executor eventQueue = new EventQueueExecutor();
-
-    public static final ExecutorService cachedPool = MoreExecutors.getExitingExecutorService((ThreadPoolExecutor) Executors.newCachedThreadPool());
-    public static final EventQueueCallbackExecutor pool = new EventQueueCallbackExecutor(MoreExecutors.listeningDecorator(cachedPool));
 
     private final ListeningExecutorService delegate;
 

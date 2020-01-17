@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -19,6 +18,7 @@ import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.plugins.PluginManager;
+import org.helioviewer.jhv.threads.JHVExecutor;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -181,8 +181,8 @@ public class State {
         JHVDate time = new JHVDate(TimeUtils.optParse(data.optString("time"), Movie.getTime().milli));
         boolean tracking = data.optBoolean("tracking", JHVFrame.getToolBar().getTrackingButton().isSelected());
         boolean play = data.optBoolean("play", false);
-        LoadState loadStateTask = new LoadState(newlist, masterLayer, time, tracking, play);
-        JHVGlobals.getExecutorService().execute(loadStateTask);
+
+        JHVExecutor.cachedPool.execute(new LoadState(newlist, masterLayer, time, tracking, play));
     }
 
     public static void load(JSONObject jo) {
