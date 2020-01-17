@@ -20,14 +20,14 @@ import org.helioviewer.jhv.view.uri.URIView;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-class LoadView {
+public class LoadView {
 
-    static class LoadRemote implements Callable<View> {
+    public static class LoadRemote implements Callable<View> {
 
         private final ImageLayer layer;
         private final APIRequest req;
 
-        LoadRemote(ImageLayer _layer, APIRequest _req) {
+        public LoadRemote(ImageLayer _layer, APIRequest _req) {
             layer = _layer;
             req = _req;
         }
@@ -87,11 +87,11 @@ class LoadView {
 
     }
 
-    static class Callback implements FutureCallback<View> {
+    public static class Callback implements FutureCallback<View> {
 
         final ImageLayer layer;
 
-        Callback(ImageLayer _layer) {
+        public Callback(ImageLayer _layer) {
             layer = _layer;
         }
 

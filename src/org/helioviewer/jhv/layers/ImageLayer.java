@@ -15,18 +15,20 @@ import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DownloadRemoteTask;
-import org.helioviewer.jhv.io.LoadRemoteTask;
+import org.helioviewer.jhv.io.LoadView;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.opengl.GLImage.DifferenceMode;
 import org.helioviewer.jhv.opengl.GLListener;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
+import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.View;
 import org.json.JSONObject;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.jogamp.opengl.GL2;
 
 public class ImageLayer extends AbstractLayer implements ImageDataHandler {
@@ -36,7 +38,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     private final ImageLayerOptions optionsPanel = new ImageLayerOptions(this);
 
     private boolean removed;
-    private LoadRemoteTask worker;
+    private ListenableFuture<View> worker;
     private View view = new BaseView(null, null, null);
 
     public static ImageLayer create(JSONObject jo) {
@@ -73,8 +75,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
         if (worker != null)
             worker.cancel(true);
-        worker = new LoadRemoteTask(this, req);
-        JHVGlobals.getExecutorService().execute(worker);
+        worker = EventQueueCallbackExecutor.pool.submit(new LoadView.LoadRemote(this, req), new LoadView.Callback(this));
         JHVFrame.getLayersPanel().refresh(); // give feedback asap
     }
 
