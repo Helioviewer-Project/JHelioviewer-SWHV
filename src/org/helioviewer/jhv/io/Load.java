@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 
 public interface Load {
 
@@ -28,23 +27,21 @@ public interface Load {
         }
 
         public void getAll(List<URI> uris) {
-            ImageLayer imageLayer = ImageLayer.create(null);
-            EventQueueCallbackExecutor.pool.submit(new LoadView.LoadURI(imageLayer, uris.toArray(URI[]::new)), new LoadView.Callback(imageLayer));
+            LoadView.getURI(ImageLayer.create(null), uris.toArray(URI[]::new));
         }
     }
 
     class Request implements Load {
         @Override
         public void get(URI uri) {
-            EventQueueCallbackExecutor.pool.submit(new LoadRequest(uri), new LoadRequest.Callback());
+            LoadRequest.getRequest(uri);
         }
     }
 
     class FITS implements Load {
         @Override
         public void get(URI uri) {
-            ImageLayer imageLayer = ImageLayer.create(null);
-            EventQueueCallbackExecutor.pool.submit(new LoadView.LoadFITS(imageLayer, uri), new LoadView.Callback(imageLayer));
+            LoadView.getFITS(ImageLayer.create(null), uri);
         }
     }
 
@@ -53,9 +50,9 @@ public interface Load {
         public void get(URI uri) {
             String name = uri.getPath().toLowerCase();
             if (name.endsWith("jhvz"))
-                EventQueueCallbackExecutor.pool.submit(new LoadZip(uri), new LoadZip.Callback());
+                LoadZip.getZip(uri);
             else
-                EventQueueCallbackExecutor.pool.submit(new LoadState(uri), new LoadState.Callback());
+                LoadState.getState(uri);
         }
     }
 
