@@ -10,6 +10,7 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.threads.JHVWorker;
+import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 
 import okio.Buffer;
 import okio.Okio;
@@ -73,7 +74,7 @@ public class DownloadRemoteTask extends JHVWorker<Void, Void> {
                 if (failed || isCancelled())
                     dstFile.delete();
                 else { // reload from disk
-                    JHVGlobals.getExecutorService().execute(new LoadViewTask(layer, dstFile.toURI()));
+                    EventQueueCallbackExecutor.pool.submit(new LoadView.LoadURI(layer, dstFile.toURI()), new LoadView.Callback(layer));
                     EventQueue.invokeLater(() -> JHVGlobals.displayNotification(dstFile.toString()));
                 }
             } catch (Exception e) {
