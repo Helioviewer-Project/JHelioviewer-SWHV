@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 
 public interface Load {
 
@@ -27,21 +28,23 @@ public interface Load {
         }
 
         public void getAll(List<URI> uris) {
-            JHVGlobals.getExecutorService().execute(new LoadViewTask(ImageLayer.create(null), uris.toArray(URI[]::new)));
+            ImageLayer imageLayer = ImageLayer.create(null);
+            EventQueueCallbackExecutor.pool.submit(new LoadNG.LoadView(imageLayer, uris.toArray(URI[]::new)), new LoadNG.Callback(imageLayer));
         }
     }
 
     class Request implements Load {
         @Override
         public void get(URI uri) {
-            JHVGlobals.getExecutorService().execute(new LoadRequestTask(uri));
+            EventQueueCallbackExecutor.pool.submit(new LoadRequest(uri), new LoadRequest.Callback());
         }
     }
 
     class FITS implements Load {
         @Override
         public void get(URI uri) {
-            JHVGlobals.getExecutorService().execute(new LoadFITSTask(ImageLayer.create(null), uri));
+            ImageLayer imageLayer = ImageLayer.create(null);
+            EventQueueCallbackExecutor.pool.submit(new LoadNG.LoadFITS(imageLayer, uri), new LoadNG.Callback(imageLayer));
         }
     }
 
