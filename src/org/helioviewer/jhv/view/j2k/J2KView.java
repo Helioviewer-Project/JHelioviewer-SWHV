@@ -144,7 +144,7 @@ public class J2KView extends BaseView {
                 reader.start();
             }
 
-            abolishable = reaper.register(this, new J2KAbolisher(reader, jpipCache));
+            abolishable = reaper.register(this, new J2KAbolisher(serial, reader, jpipCache));
         } catch (KduException e) {
             e.printStackTrace();
             throw new IOException("Failed to create Kakadu machinery: " + e.getMessage(), e);
@@ -161,16 +161,22 @@ public class J2KView extends BaseView {
 
     private static class J2KAbolisher implements Runnable {
 
+        private final int aSerial;
         private final J2KReader aReader;
         private final JPIPCache aJpipCache;
 
-        J2KAbolisher(J2KReader _reader, JPIPCache _jpipCache) {
+        J2KAbolisher(int _serial, J2KReader _reader, JPIPCache _jpipCache) {
+            aSerial = _serial;
             aReader = _reader;
             aJpipCache = _jpipCache;
         }
 
         @Override
         public void run() {
+            for (DecodeParams params : decodeCache.asMap().keySet()) {
+                if (params.serial == aSerial)
+                    decodeCache.invalidate(params);
+            }
             // reader abolish may take too long in stressed conditions
             new Thread(() -> {
                 if (aReader != null) {
@@ -192,10 +198,6 @@ public class J2KView extends BaseView {
     @Override
     public void abolish() {
         abolishable.clean();
-        for (DecodeParams params : decodeCache.asMap().keySet()) {
-            if (params.serial == serial)
-                decodeCache.invalidate(params);
-        }
     }
 
     @Override
