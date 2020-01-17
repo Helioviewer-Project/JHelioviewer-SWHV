@@ -20,7 +20,7 @@ import org.helioviewer.jhv.view.uri.URIView;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-class LoadNG {
+class LoadView {
 
     static class LoadRemote implements Callable<View> {
 
@@ -40,12 +40,12 @@ class LoadNG {
 
     }
 
-    static class LoadView implements Callable<View> {
+    static class LoadURI implements Callable<View> {
 
         private final ImageLayer layer;
         private final URI[] uriList;
 
-        LoadView(ImageLayer _layer, URI... _uriList) {
+        LoadURI(ImageLayer _layer, URI... _uriList) {
             layer = _layer;
             uriList = _uriList;
         }
