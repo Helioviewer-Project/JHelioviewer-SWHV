@@ -24,29 +24,29 @@ class LoadNG {
 
     static class LoadRemote implements Callable<View> {
 
-        private final ImageLayer imageLayer;
+        private final ImageLayer layer;
         private final APIRequest req;
 
-        LoadRemote(ImageLayer _imageLayer, APIRequest _req) {
-            imageLayer = _imageLayer;
+        LoadRemote(ImageLayer _layer, APIRequest _req) {
+            layer = _layer;
             req = _req;
         }
 
         @Override
         public View call() throws Exception {
             APIResponse res = APIRequestManager.requestRemoteFile(req);
-            return res == null ? null : loadView(imageLayer.getExecutor(), req, res.getURI(), res);
+            return res == null ? null : loadView(layer.getExecutor(), req, res.getURI(), res);
         }
 
     }
 
     static class LoadView implements Callable<View> {
 
-        private final ImageLayer imageLayer;
+        private final ImageLayer layer;
         private final URI[] uriList;
 
-        LoadView(ImageLayer _imageLayer, URI... _uriList) {
-            imageLayer = _imageLayer;
+        LoadView(ImageLayer _layer, URI... _uriList) {
+            layer = _layer;
             uriList = _uriList;
         }
 
@@ -55,7 +55,7 @@ class LoadNG {
             if (uriList == null || uriList.length == 0)
                 throw new IOException("Invalid URI list");
 
-            DecodeExecutor executor = imageLayer.getExecutor();
+            DecodeExecutor executor = layer.getExecutor();
             if (uriList.length == 1) {
                 return loadView(executor, null, uriList[0], null);
             } else {
@@ -70,11 +70,11 @@ class LoadNG {
 
     static class LoadFITS implements Callable<View> {
 
-        private final ImageLayer imageLayer;
+        private final ImageLayer layer;
         private final URI uri;
 
-        LoadFITS(ImageLayer _imageLayer, URI _uri) {
-            imageLayer = _imageLayer;
+        LoadFITS(ImageLayer _layer, URI _uri) {
+            layer = _layer;
             uri = _uri;
         }
 
@@ -82,28 +82,30 @@ class LoadNG {
         public View call() throws Exception {
             if (uri == null)
                 throw new Exception("Invalid URI");
-            return new URIView(imageLayer.getExecutor(), null, uri, URIView.URIType.FITS);
+            return new URIView(layer.getExecutor(), null, uri, URIView.URIType.FITS);
         }
 
     }
 
-    static class LoadViewCallback implements FutureCallback<View> {
+    static class Callback implements FutureCallback<View> {
 
-        final ImageLayer imageLayer;
+        final ImageLayer layer;
 
-        LoadViewCallback(ImageLayer _imageLayer) {
-            imageLayer = _imageLayer;
+        Callback(ImageLayer _layer) {
+            layer = _layer;
         }
 
         @Override
         public void onSuccess(View result) {
             if (result != null)
-                imageLayer.setView(result);
+                layer.setView(result);
+            else
+                layer.unload();
         }
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            imageLayer.unload();
+            layer.unload();
 
             Log.error("An error occurred while opening the remote file: ", t);
             Message.err("An error occurred while opening the remote file: ", t.getMessage(), false);
