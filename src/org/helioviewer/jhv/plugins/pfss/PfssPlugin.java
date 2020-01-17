@@ -32,15 +32,6 @@ public class PfssPlugin extends Plugin {
 
     public static final ScheduledExecutorService pfssReaperPool = new ScheduledThreadPoolExecutor(1, new JHVThread.NamedThreadFactory("PFSS Reaper"), new ThreadPoolExecutor.DiscardPolicy());
 
-    private static final BlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<>(1024);
-    public static final ExecutorService pfssDataPool = new ThreadPoolExecutor(0, 5, 10L, TimeUnit.MINUTES, blockingQueue, new JHVThread.NamedThreadFactory("PFSS DataLoad"), new ThreadPoolExecutor.DiscardPolicy()) {
-        @Override
-        protected void afterExecute(Runnable r, Throwable t) {
-            super.afterExecute(r, t);
-            JHVThread.afterExecute(r, t);
-        }
-    };
-
     public PfssPlugin() {
         super("PFSS", "Visualize PFSS model data");
     }
