@@ -33,7 +33,7 @@ class NetClientRemote implements NetClient {
 
     static {
         Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
-        dispatcher = new Dispatcher(EventQueueCallbackExecutor.pool);
+        dispatcher = new Dispatcher(EventQueueCallbackExecutor.cachedPool);
         dispatcher.setMaxRequestsPerHost(8);
         dispatcher.setMaxRequests(96);
     }
