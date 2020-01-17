@@ -10,16 +10,14 @@ import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
 import java.net.URI;
 import java.util.HashSet;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Callable;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.log.Log;
-import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
 import org.helioviewer.jhv.timelines.Timelines;
@@ -27,6 +25,7 @@ import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis.YAxisPositiveIdentityScale;
+import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.j2k.J2KViewCallisto;
 import org.json.JSONObject;
@@ -34,6 +33,7 @@ import org.json.JSONObject;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalNotification;
+import com.google.common.util.concurrent.FutureCallback;
 
 public class RadioData extends AbstractTimelineLayer {
 
@@ -94,12 +94,12 @@ public class RadioData extends AbstractTimelineLayer {
         for (int i = 0; i < DAYS_IN_CACHE; i++) {
             long date = end - i * TimeUtils.DAY_IN_MILLIS;
             if (!downloading.contains(date) && cache.getIfPresent(date) == null) {
-                JHVGlobals.getExecutorService().execute(new RadioJPXDownload(date));
+                EventQueueCallbackExecutor.pool.submit(new RadioJPXDownload(date), new RadioJPXCallback(date));
             }
         }
     }
 
-    private class RadioJPXDownload extends JHVWorker<RadioJ2KData, Void> {
+    private class RadioJPXDownload implements Callable<RadioJ2KData> {
 
         private final long date;
 
@@ -107,36 +107,43 @@ public class RadioData extends AbstractTimelineLayer {
             date = _date;
             downloading.add(date);
             Timelines.getLayers().downloadStarted(RadioData.this);
-            setThreadName("EVE--RadioDownloader");
-        }
-
-        @Nullable
-        @Override
-        protected RadioJ2KData backgroundWork() {
-            try {
-                APIRequest req = new APIRequest("ROB", APIRequest.CallistoID, date, date, APIRequest.CADENCE_ANY);
-                URI uri = new URI(req.toFileRequest());
-                DecodeExecutor executor = new DecodeExecutor();
-                return new RadioJ2KData(new J2KViewCallisto(executor, req, NetFileCache.get(uri)), req.startTime, executor);
-            } catch (Exception e) {
-                Log.error("An error occured while opening the remote file: " + e.getMessage());
-            }
-            return null;
         }
 
         @Override
-        protected void done() {
+        public RadioJ2KData call() throws Exception {
+            APIRequest req = new APIRequest("ROB", APIRequest.CallistoID, date, date, APIRequest.CADENCE_ANY);
+            URI uri = new URI(req.toFileRequest());
+            DecodeExecutor executor = new DecodeExecutor();
+            return new RadioJ2KData(new J2KViewCallisto(executor, req, NetFileCache.get(uri)), req.startTime, executor);
+        }
+
+    }
+
+    private class RadioJPXCallback implements FutureCallback<RadioJ2KData> {
+
+        private final long date;
+
+        RadioJPXCallback(long _date) {
+            date = _date;
+        }
+
+        private void done() {
             downloading.remove(date);
             Timelines.getLayers().downloadFinished(RadioData.this);
-            try {
-                RadioJ2KData data = get();
-                if (data != null) {
-                    cache.put(date, data);
-                    data.requestData(DrawController.selectedAxis);
-                }
-            } catch (InterruptedException | ExecutionException e) {
-                Log.error("RadioData error: " + e.getCause().getMessage());
-            }
+        }
+
+        @Override
+        public void onSuccess(RadioJ2KData result) {
+            done();
+            cache.put(date, result);
+            result.requestData(DrawController.selectedAxis);
+        }
+
+        @Override
+        public void onFailure(@Nonnull Throwable t) {
+            done();
+            Log.error(t);
+            // t.printStackTrace();
         }
 
     }
