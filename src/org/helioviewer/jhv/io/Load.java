@@ -53,9 +53,9 @@ public interface Load {
         public void get(URI uri) {
             String name = uri.getPath().toLowerCase();
             if (name.endsWith("jhvz"))
-                JHVGlobals.getExecutorService().execute(new LoadZipTask(uri));
+                EventQueueCallbackExecutor.pool.submit(new LoadZip(uri), new LoadZip.Callback());
             else
-                JHVGlobals.getExecutorService().execute(new LoadStateTask(uri));
+                EventQueueCallbackExecutor.pool.submit(new LoadState(uri), new LoadState.Callback());
         }
     }
 
