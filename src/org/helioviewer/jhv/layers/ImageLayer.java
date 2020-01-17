@@ -74,7 +74,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
         if (worker != null)
             worker.cancel(true);
-        worker = LoadView.getRemote(this, req);
+        worker = LoadView.get(this, req);
         JHVFrame.getLayersPanel().refresh(); // give feedback asap
     }
 

@@ -23,7 +23,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 class LoadZip implements Callable<Void> {
 
-    static ListenableFuture<Void> getZip(URI uri) {
+    static ListenableFuture<Void> get(URI uri) {
         return EventQueueCallbackExecutor.pool.submit(new LoadZip(uri), new Callback());
     }
 

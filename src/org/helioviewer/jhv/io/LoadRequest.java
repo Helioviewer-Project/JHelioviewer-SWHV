@@ -19,7 +19,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 class LoadRequest implements Callable<Void> {
 
-    static ListenableFuture<Void> getRequest(URI uri) {
+    static ListenableFuture<Void> get(URI uri) {
         return EventQueueCallbackExecutor.pool.submit(new LoadRequest(uri), new Callback());
     }
 
@@ -39,7 +39,7 @@ class LoadRequest implements Callable<Void> {
             for (int i = 0; i < len; i++) {
                 APIRequest req = APIRequest.fromRequestJson(ji.getJSONObject(i));
                 ImageLayer layer = EventDispatchQueue.invokeAndWait(() -> ImageLayer.create(null));
-                LoadView.getRemote(layer, req);
+                LoadView.get(layer, req);
             }
         }
 

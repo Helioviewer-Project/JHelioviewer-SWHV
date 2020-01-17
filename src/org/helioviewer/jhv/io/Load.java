@@ -27,14 +27,14 @@ public interface Load {
         }
 
         public void getAll(List<URI> uris) {
-            LoadView.getURI(ImageLayer.create(null), uris.toArray(URI[]::new));
+            LoadView.get(ImageLayer.create(null), uris.toArray(URI[]::new));
         }
     }
 
     class Request implements Load {
         @Override
         public void get(URI uri) {
-            LoadRequest.getRequest(uri);
+            LoadRequest.get(uri);
         }
     }
 
@@ -50,9 +50,9 @@ public interface Load {
         public void get(URI uri) {
             String name = uri.getPath().toLowerCase();
             if (name.endsWith("jhvz"))
-                LoadZip.getZip(uri);
+                LoadZip.get(uri);
             else
-                LoadState.getState(uri);
+                LoadState.get(uri);
         }
     }
 

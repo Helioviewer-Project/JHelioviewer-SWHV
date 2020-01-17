@@ -1,13 +1,14 @@
 package org.helioviewer.jhv.io;
 
-import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.net.URI;
+import java.nio.channels.ClosedByInterruptException;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -24,11 +25,11 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 public class LoadView {
 
-    public static ListenableFuture<View> getRemote(ImageLayer layer, APIRequest req) {
+    public static ListenableFuture<View> get(ImageLayer layer, APIRequest req) {
         return EventQueueCallbackExecutor.pool.submit(new LoadRemote(layer, req), new Callback(layer));
     }
 
-    public static ListenableFuture<View> getURI(ImageLayer layer, URI... uriList) {
+    public static ListenableFuture<View> get(ImageLayer layer, URI... uriList) {
         return EventQueueCallbackExecutor.pool.submit(new LoadURI(layer, uriList), new Callback(layer));
     }
 
@@ -67,7 +68,7 @@ public class LoadView {
         @Override
         public View call() throws Exception {
             if (uriList == null || uriList.length == 0)
-                throw new IOException("Invalid URI list");
+                throw new Exception("Invalid URI list");
 
             DecodeExecutor executor = layer.getExecutor();
             if (uriList.length == 1) {
@@ -111,7 +112,7 @@ public class LoadView {
 
         @Override
         public void onSuccess(View result) {
-            if (result != null)
+            if (result != null) // LoadRemote can return null
                 layer.setView(result);
             else
                 layer.unload();
@@ -119,6 +120,12 @@ public class LoadView {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
+            if (t instanceof CancellationException ||
+                    t instanceof ClosedByInterruptException ||
+                    t instanceof InterruptedIOException ||
+                    t instanceof InterruptedException)
+                return; // ignore
+
             layer.unload();
 
             Log.error("An error occurred while opening the remote file: ", t);
@@ -128,28 +135,20 @@ public class LoadView {
 
     }
 
-    @Nullable
-    private static View loadView(DecodeExecutor executor, APIRequest req, URI uri, APIResponse res) throws IOException {
+    @Nonnull
+    private static View loadView(DecodeExecutor executor, APIRequest req, URI uri, APIResponse res) throws Exception {
         if (uri == null || uri.getScheme() == null) {
-            throw new IOException("Invalid URI: " + uri);
+            throw new Exception("Invalid URI: " + uri);
         }
 
-        try {
-            String loc = uri.toString().toLowerCase(Locale.ENGLISH);
-            if (loc.endsWith(".fits") || loc.endsWith(".fts")) {
-                return new URIView(executor, req, uri, URIView.URIType.FITS);
-            } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
-                return new URIView(executor, req, uri, URIView.URIType.GENERIC);
-            } else {
-                return new J2KView(executor, req, uri, res);
-            }
-        } catch (InterruptedException ignore) {
-            // nothing
-        } catch (Exception e) {
-            Log.debug("loadView(\"" + uri + "\") ", e);
-            throw new IOException(e);
+        String loc = uri.toString().toLowerCase(Locale.ENGLISH);
+        if (loc.endsWith(".fits") || loc.endsWith(".fts")) {
+            return new URIView(executor, req, uri, URIView.URIType.FITS);
+        } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
+            return new URIView(executor, req, uri, URIView.URIType.GENERIC);
+        } else {
+            return new J2KView(executor, req, uri, res);
         }
-        return null;
     }
 
 }
