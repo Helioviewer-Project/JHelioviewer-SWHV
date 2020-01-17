@@ -76,7 +76,6 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
 
         add(allTablePanel, allTablePanelConstraint);
 
-        //startOtherRelatedEventsWorker();
         EventQueueCallbackExecutor.pool.submit(new DatabaseCallable(event), new DatabaseCallback());
     }
 
