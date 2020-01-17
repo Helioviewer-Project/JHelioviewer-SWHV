@@ -29,7 +29,7 @@ public interface Load {
 
         public void getAll(List<URI> uris) {
             ImageLayer imageLayer = ImageLayer.create(null);
-            EventQueueCallbackExecutor.pool.submit(new LoadNG.LoadView(imageLayer, uris.toArray(URI[]::new)), new LoadNG.Callback(imageLayer));
+            EventQueueCallbackExecutor.pool.submit(new LoadView.LoadURI(imageLayer, uris.toArray(URI[]::new)), new LoadView.Callback(imageLayer));
         }
     }
 
@@ -44,7 +44,7 @@ public interface Load {
         @Override
         public void get(URI uri) {
             ImageLayer imageLayer = ImageLayer.create(null);
-            EventQueueCallbackExecutor.pool.submit(new LoadNG.LoadFITS(imageLayer, uri), new LoadNG.Callback(imageLayer));
+            EventQueueCallbackExecutor.pool.submit(new LoadView.LoadFITS(imageLayer, uri), new LoadView.Callback(imageLayer));
         }
     }
 

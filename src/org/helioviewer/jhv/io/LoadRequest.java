@@ -34,7 +34,7 @@ class LoadRequest implements Callable<Void> {
             for (int i = 0; i < len; i++) {
                 APIRequest req = APIRequest.fromRequestJson(ji.getJSONObject(i));
                 ImageLayer layer = EventDispatchQueue.invokeAndWait(() -> ImageLayer.create(null));
-                EventQueueCallbackExecutor.pool.submit(new LoadNG.LoadRemote(layer, req), new LoadNG.Callback(layer));
+                EventQueueCallbackExecutor.pool.submit(new LoadView.LoadRemote(layer, req), new LoadView.Callback(layer));
             }
         }
 
