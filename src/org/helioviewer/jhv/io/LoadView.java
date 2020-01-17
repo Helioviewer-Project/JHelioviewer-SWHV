@@ -17,17 +17,31 @@ import org.helioviewer.jhv.view.ManyView;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.j2k.J2KView;
 import org.helioviewer.jhv.view.uri.URIView;
+import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.ListenableFuture;
 
 public class LoadView {
 
-    public static class LoadRemote implements Callable<View> {
+    public static ListenableFuture<View> getRemote(ImageLayer layer, APIRequest req) {
+        return EventQueueCallbackExecutor.pool.submit(new LoadRemote(layer, req), new Callback(layer));
+    }
+
+    public static ListenableFuture<View> getURI(ImageLayer layer, URI... uriList) {
+        return EventQueueCallbackExecutor.pool.submit(new LoadURI(layer, uriList), new Callback(layer));
+    }
+
+    public static ListenableFuture<View> getFITS(ImageLayer layer, URI uri) {
+        return EventQueueCallbackExecutor.pool.submit(new LoadFITS(layer, uri), new Callback(layer));
+    }
+
+    private static class LoadRemote implements Callable<View> {
 
         private final ImageLayer layer;
         private final APIRequest req;
 
-        public LoadRemote(ImageLayer _layer, APIRequest _req) {
+        LoadRemote(ImageLayer _layer, APIRequest _req) {
             layer = _layer;
             req = _req;
         }
@@ -40,7 +54,7 @@ public class LoadView {
 
     }
 
-    static class LoadURI implements Callable<View> {
+    private static class LoadURI implements Callable<View> {
 
         private final ImageLayer layer;
         private final URI[] uriList;
@@ -68,7 +82,7 @@ public class LoadView {
 
     }
 
-    static class LoadFITS implements Callable<View> {
+    private static class LoadFITS implements Callable<View> {
 
         private final ImageLayer layer;
         private final URI uri;
@@ -87,11 +101,11 @@ public class LoadView {
 
     }
 
-    public static class Callback implements FutureCallback<View> {
+    private static class Callback implements FutureCallback<View> {
 
         final ImageLayer layer;
 
-        public Callback(ImageLayer _layer) {
+        Callback(ImageLayer _layer) {
             layer = _layer;
         }
 

@@ -15,12 +15,17 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.ListenableFuture;
 
 class LoadRequest implements Callable<Void> {
 
+    static ListenableFuture<Void> getRequest(URI uri) {
+        return EventQueueCallbackExecutor.pool.submit(new LoadRequest(uri), new Callback());
+    }
+
     private final URI uri;
 
-    LoadRequest(URI _uri) {
+    private LoadRequest(URI _uri) {
         uri = _uri;
     }
 
@@ -34,7 +39,7 @@ class LoadRequest implements Callable<Void> {
             for (int i = 0; i < len; i++) {
                 APIRequest req = APIRequest.fromRequestJson(ji.getJSONObject(i));
                 ImageLayer layer = EventDispatchQueue.invokeAndWait(() -> ImageLayer.create(null));
-                EventQueueCallbackExecutor.pool.submit(new LoadView.LoadRemote(layer, req), new LoadView.Callback(layer));
+                LoadView.getRemote(layer, req);
             }
         }
 
@@ -48,7 +53,7 @@ class LoadRequest implements Callable<Void> {
         return null;
     }
 
-    static class Callback implements FutureCallback<Void> {
+    private static class Callback implements FutureCallback<Void> {
 
         @Override
         public void onSuccess(Void result) {

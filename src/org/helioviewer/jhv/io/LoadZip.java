@@ -16,14 +16,20 @@ import javax.annotation.Nonnull;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.log.Log;
+import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.ListenableFuture;
 
 class LoadZip implements Callable<Void> {
 
+    static ListenableFuture<Void> getZip(URI uri) {
+        return EventQueueCallbackExecutor.pool.submit(new LoadZip(uri), new Callback());
+    }
+
     private final URI remoteUri;
 
-    LoadZip(URI _remoteUri) {
+    private LoadZip(URI _remoteUri) {
         remoteUri = _remoteUri;
     }
 
@@ -64,7 +70,7 @@ class LoadZip implements Callable<Void> {
         return null;
     }
 
-    static class Callback implements FutureCallback<Void> {
+    private static class Callback implements FutureCallback<Void> {
 
         @Override
         public void onSuccess(Void result) {

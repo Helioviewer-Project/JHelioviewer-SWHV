@@ -8,15 +8,21 @@ import javax.annotation.Nonnull;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.layers.selector.State;
 import org.helioviewer.jhv.log.Log;
+import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.json.JSONObject;
 
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.ListenableFuture;
 
 class LoadState implements Callable<JSONObject> {
 
+    static ListenableFuture<JSONObject> getState(URI uri) {
+        return EventQueueCallbackExecutor.pool.submit(new LoadState(uri), new Callback());
+    }
+
     private final URI uri;
 
-    LoadState(URI _uri) {
+    private LoadState(URI _uri) {
         uri = _uri;
     }
 
@@ -25,7 +31,7 @@ class LoadState implements Callable<JSONObject> {
         return JSONUtils.get(uri).getJSONObject("org.helioviewer.jhv.state");
     }
 
-    static class Callback implements FutureCallback<JSONObject> {
+    private static class Callback implements FutureCallback<JSONObject> {
 
         @Override
         public void onSuccess(JSONObject result) {

@@ -22,7 +22,6 @@ import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.opengl.GLImage.DifferenceMode;
 import org.helioviewer.jhv.opengl.GLListener;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
-import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.View;
@@ -75,7 +74,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
         if (worker != null)
             worker.cancel(true);
-        worker = EventQueueCallbackExecutor.pool.submit(new LoadView.LoadRemote(this, req), new LoadView.Callback(this));
+        worker = LoadView.getRemote(this, req);
         JHVFrame.getLayersPanel().refresh(); // give feedback asap
     }
 
