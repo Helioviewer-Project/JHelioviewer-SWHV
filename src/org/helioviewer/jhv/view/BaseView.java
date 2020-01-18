@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
@@ -28,10 +29,10 @@ public class BaseView implements View {
     protected LUT builtinLUT;
     protected MetaData[] metaData = new MetaData[1];
 
-    public BaseView(DecodeExecutor _executor, APIRequest _request, URI _uri) {
+    public BaseView(DecodeExecutor _executor, APIRequest _request, URI _uri) throws Exception {
         executor = _executor;
         request = _request;
-        uri = _uri;
+        uri = _uri == null ? null : NetFileCache.get(_uri);
         isLocal = uri != null && "file".equals(uri.getScheme());
         metaData[0] = new PixelBasedMetaData(1, 1, 0, uri);
     }

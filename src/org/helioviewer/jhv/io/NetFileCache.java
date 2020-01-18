@@ -17,10 +17,14 @@ import okio.Okio;
 
 public class NetFileCache {
 
-    private static final LoadingCache<URI, URI> cache = CacheBuilder.newBuilder().maximumSize(512).
+    private static final LoadingCache<URI, URI> cache = CacheBuilder.newBuilder().softValues().
             build(new CacheLoader<>() {
                 @Override
                 public URI load(@Nonnull URI uri) throws IOException {
+                    String scheme = uri.getScheme().toLowerCase();
+                    if (scheme.equals("jpip") || scheme.equals("file"))
+                        return uri;
+
                     File f = File.createTempFile("jhv", null, JHVGlobals.fileCacheDir);
                     try (NetClient nc = NetClient.of(uri, false, NetClient.NetCache.BYPASS); BufferedSink sink = Okio.buffer(Okio.sink(f))) {
                         sink.writeAll(nc.getSource());
@@ -29,16 +33,12 @@ public class NetFileCache {
                 }
             });
 
-    public static URI get(URI uri) throws IOException {
+    public static URI get(@Nonnull URI uri) throws IOException {
         try {
             return cache.get(uri);
         } catch (ExecutionException e) {
             throw new IOException(e.getCause());
         }
-    }
-
-    public static void delete(URI uri) {
-        cache.invalidate(uri);
     }
 
 }

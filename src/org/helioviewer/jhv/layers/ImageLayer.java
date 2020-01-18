@@ -37,7 +37,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     private boolean removed;
     private Future<?> worker;
-    private View view = new BaseView(null, null, null);
+    private View view;
 
     public static ImageLayer create(JSONObject jo) {
         ImageLayer imageLayer = new ImageLayer(jo);
@@ -64,6 +64,11 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
                 if (imageParams != null)
                     glImage.fromJson(imageParams);
             }
+        }
+        try {
+            view = new BaseView(null, null, null);
+        } catch (Exception e) { // impossible
+            e.printStackTrace();
         }
     }
 
