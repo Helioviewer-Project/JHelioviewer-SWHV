@@ -11,8 +11,8 @@ public interface Load {
     void get(URI uri);
 
     Load.Image image = new Image();
-    Load request = new Request();
     Load fits = new FITS();
+    Load request = new Request();
     Load state = new State();
 
     class Image implements Load {
@@ -26,21 +26,21 @@ public interface Load {
         }
 
         public void getAll(List<URI> uris) {
-            LoadView.get(ImageLayer.create(null), uris.toArray(URI[]::new));
-        }
-    }
-
-    class Request implements Load {
-        @Override
-        public void get(URI uri) {
-            LoadRequest.get(uri);
+            LoadLayer.submit(ImageLayer.create(null), uris.toArray(URI[]::new));
         }
     }
 
     class FITS implements Load {
         @Override
         public void get(URI uri) {
-            LoadView.getFITS(ImageLayer.create(null), uri);
+            LoadLayer.submitFITS(ImageLayer.create(null), uri);
+        }
+    }
+
+    class Request implements Load {
+        @Override
+        public void get(URI uri) {
+            LoadRequest.submit(uri);
         }
     }
 
@@ -49,9 +49,9 @@ public interface Load {
         public void get(URI uri) {
             String name = uri.getPath().toLowerCase();
             if (name.endsWith("jhvz"))
-                LoadZip.get(uri);
+                LoadZip.submit(uri);
             else
-                LoadState.get(uri);
+                LoadState.submit(uri);
         }
     }
 

@@ -24,7 +24,7 @@ public class PfssCache {
     private PfssData get(long time, String url) {
         PfssData ret = cache.getIfPresent(url);
         if (ret == null) {
-            PfssDataLoader.get(time, url);
+            PfssDataLoader.submit(time, url);
         }
         return ret;
     }
