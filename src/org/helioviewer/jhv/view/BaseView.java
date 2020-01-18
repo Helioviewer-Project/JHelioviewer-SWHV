@@ -20,8 +20,6 @@ public class BaseView implements View {
 
     private static final AtomicBoolean fullCache = new AtomicBoolean(true);
 
-    private final boolean isLocal;
-
     protected final DecodeExecutor executor;
     protected final APIRequest request;
     protected final URI uri;
@@ -33,18 +31,12 @@ public class BaseView implements View {
         executor = _executor;
         request = _request;
         uri = _uri == null ? null : NetFileCache.get(_uri);
-        isLocal = uri != null && "file".equals(uri.getScheme());
         metaData[0] = new PixelBasedMetaData(1, 1, 0, uri);
     }
 
     @Override
     public URI getURI() {
         return uri;
-    }
-
-    @Override
-    public boolean isLocal() {
-        return isLocal;
     }
 
     @Nullable
