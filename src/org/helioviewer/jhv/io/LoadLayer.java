@@ -23,17 +23,17 @@ import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-public class LoadView {
+public class LoadLayer {
 
-    public static Future<View> get(ImageLayer layer, APIRequest req) {
+    public static Future<View> submit(ImageLayer layer, APIRequest req) {
         return EventQueueCallbackExecutor.pool.submit(new LoadRemote(layer, req), new Callback(layer));
     }
 
-    public static Future<View> get(ImageLayer layer, URI... uriList) {
+    public static Future<View> submit(ImageLayer layer, URI... uriList) {
         return EventQueueCallbackExecutor.pool.submit(new LoadURI(layer, uriList), new Callback(layer));
     }
 
-    public static Future<View> getFITS(ImageLayer layer, URI uri) {
+    public static Future<View> submitFITS(ImageLayer layer, URI uri) {
         return EventQueueCallbackExecutor.pool.submit(new LoadFITS(layer, uri), new Callback(layer));
     }
 
