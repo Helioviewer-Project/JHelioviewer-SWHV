@@ -240,7 +240,7 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
         public void onFailure(@Nonnull Throwable t) {
             if (t instanceof InterruptedException || t instanceof ExecutionException)
                 return; // ignore ?
-            Log.error("SWEKEventInformationDialog:", t);
+            Log.error("SWEKEventInformationDialog error", t);
         }
 
     }

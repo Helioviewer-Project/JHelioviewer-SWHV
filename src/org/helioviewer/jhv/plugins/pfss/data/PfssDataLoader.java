@@ -84,7 +84,7 @@ class PfssDataLoader implements Callable<PfssData> {
         @Override
         public void onFailure(@Nonnull Throwable t) {
             PfssPlugin.downloads--;
-            Log.error("PfssDataLoader: " + u, t);
+            Log.error("PfssDataLoader error: " + u, t);
         }
 
     }
