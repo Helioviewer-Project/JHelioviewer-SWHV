@@ -269,7 +269,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     @Override
     public boolean isLocal() {
-        return view.isLocal();
+        return getAPIRequest() == null;
     }
 
     @Nonnull

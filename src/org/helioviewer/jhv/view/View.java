@@ -24,8 +24,6 @@ public interface View {
 
     URI getURI();
 
-    boolean isLocal();
-
     @Nullable
     LUT getDefaultLUT();
 

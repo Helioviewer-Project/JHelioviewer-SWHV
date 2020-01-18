@@ -77,11 +77,6 @@ public class ManyView implements View {
         return null;
     }
 
-    @Override
-    public boolean isLocal() {
-        return true;
-    }
-
     @Nullable
     @Override
     public LUT getDefaultLUT() {

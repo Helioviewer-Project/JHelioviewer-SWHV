@@ -6,6 +6,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVDirectory;
@@ -21,7 +22,7 @@ import okio.BufferedSink;
 
 public class DownloadRemote extends JHVWorker<Void, Void> {
 
-    public static Future<?> get(ImageLayer layer, APIRequest req, URI uri) {
+    public static Future<?> get(@Nonnull ImageLayer layer, @Nonnull APIRequest req, @Nonnull URI uri) {
         return JHVExecutor.cachedPool.submit(new DownloadRemote(layer, req, uri));
     }
 
@@ -35,17 +36,14 @@ public class DownloadRemote extends JHVWorker<Void, Void> {
         layer = _layer;
         uri = _uri;
 
-        if (req == null)
-            downloadURI = uri;
-        else {
-            URI dURI;
-            try {
-                dURI = new URI(req.toFileRequest());
-            } catch (Exception e) {
-                dURI = uri;
-            }
-            downloadURI = dURI;
+        URI dURI;
+        try {
+            dURI = new URI(req.toFileRequest());
+        } catch (Exception e) {
+            dURI = uri;
         }
+        downloadURI = dURI;
+
         setThreadName("MAIN--DownloadRemote");
     }
 
