@@ -19,7 +19,7 @@ import com.google.common.util.concurrent.FutureCallback;
 
 class LoadRequest implements Callable<Void> {
 
-    static Future<Void> submit(URI uri) {
+    static Future<Void> submit(@Nonnull URI uri) {
         return EventQueueCallbackExecutor.pool.submit(new LoadRequest(uri), new Callback());
     }
 

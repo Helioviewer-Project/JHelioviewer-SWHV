@@ -4,6 +4,7 @@ import java.io.InterruptedIOException;
 import java.net.URI;
 import java.nio.channels.ClosedByInterruptException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
@@ -25,15 +26,15 @@ import com.google.common.util.concurrent.FutureCallback;
 
 public class LoadLayer {
 
-    public static Future<View> submit(ImageLayer layer, APIRequest req) {
+    public static Future<View> submit(@Nonnull ImageLayer layer, @Nonnull APIRequest req) {
         return EventQueueCallbackExecutor.pool.submit(new LoadRemote(layer, req), new Callback(layer));
     }
 
-    public static Future<View> submit(ImageLayer layer, URI... uriList) {
+    public static Future<View> submit(@Nonnull ImageLayer layer, @Nonnull List<URI> uriList) {
         return EventQueueCallbackExecutor.pool.submit(new LoadURI(layer, uriList), new Callback(layer));
     }
 
-    public static Future<View> submitFITS(ImageLayer layer, URI uri) {
+    public static Future<View> submitFITS(@Nonnull ImageLayer layer, @Nonnull URI uri) {
         return EventQueueCallbackExecutor.pool.submit(new LoadFITS(layer, uri), new Callback(layer));
     }
 
@@ -58,23 +59,20 @@ public class LoadLayer {
     private static class LoadURI implements Callable<View> {
 
         private final ImageLayer layer;
-        private final URI[] uriList;
+        private final List<URI> uriList;
 
-        LoadURI(ImageLayer _layer, URI... _uriList) {
+        LoadURI(ImageLayer _layer, List<URI> _uriList) {
             layer = _layer;
             uriList = _uriList;
         }
 
         @Override
         public View call() throws Exception {
-            if (uriList == null || uriList.length == 0)
-                throw new Exception("Invalid URI list");
-
             DecodeExecutor executor = layer.getExecutor();
-            if (uriList.length == 1) {
-                return loadView(executor, null, uriList[0], null);
+            if (uriList.size() == 1) {
+                return loadView(executor, null, uriList.get(0), null);
             } else {
-                ArrayList<View> views = new ArrayList<>(uriList.length);
+                ArrayList<View> views = new ArrayList<>(uriList.size());
                 for (URI uri : uriList)
                     views.add(loadView(executor, null, uri, null));
                 return new ManyView(views);
@@ -95,8 +93,6 @@ public class LoadLayer {
 
         @Override
         public View call() throws Exception {
-            if (uri == null)
-                throw new Exception("Invalid URI");
             return new URIView(layer.getExecutor(), null, uri, URIView.URIType.FITS);
         }
 

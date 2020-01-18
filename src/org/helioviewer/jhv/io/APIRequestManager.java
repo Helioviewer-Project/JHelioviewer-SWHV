@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.gui.Message;
@@ -12,7 +13,7 @@ import org.helioviewer.jhv.log.Log;
 class APIRequestManager {
 
     @Nullable
-    public static APIResponse requestRemoteFile(APIRequest req) throws IOException {
+    public static APIResponse requestRemoteFile(@Nonnull APIRequest req) throws IOException {
         String jpipRequest = req.toJpipRequest();
         try {
             APIResponse response = new APIResponse(JSONUtils.get(jpipRequest));
