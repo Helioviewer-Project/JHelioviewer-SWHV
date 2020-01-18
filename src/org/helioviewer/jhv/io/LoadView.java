@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.Future;
 
 import javax.annotation.Nonnull;
 
@@ -21,19 +22,18 @@ import org.helioviewer.jhv.view.uri.URIView;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.ListenableFuture;
 
 public class LoadView {
 
-    public static ListenableFuture<View> get(ImageLayer layer, APIRequest req) {
+    public static Future<View> get(ImageLayer layer, APIRequest req) {
         return EventQueueCallbackExecutor.pool.submit(new LoadRemote(layer, req), new Callback(layer));
     }
 
-    public static ListenableFuture<View> get(ImageLayer layer, URI... uriList) {
+    public static Future<View> get(ImageLayer layer, URI... uriList) {
         return EventQueueCallbackExecutor.pool.submit(new LoadURI(layer, uriList), new Callback(layer));
     }
 
-    public static ListenableFuture<View> getFITS(ImageLayer layer, URI uri) {
+    public static Future<View> getFITS(ImageLayer layer, URI uri) {
         return EventQueueCallbackExecutor.pool.submit(new LoadFITS(layer, uri), new Callback(layer));
     }
 

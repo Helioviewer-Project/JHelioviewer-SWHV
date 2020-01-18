@@ -3,6 +3,7 @@ package org.helioviewer.jhv.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 import javax.annotation.Nonnull;
 
@@ -17,11 +18,10 @@ import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.ListenableFuture;
 
 class LoadSources implements Callable<DataSourcesParser> {
 
-    static ListenableFuture<DataSourcesParser> get(String server, Validator validator) {
+    static Future<DataSourcesParser> get(String server, Validator validator) {
         return EventQueueCallbackExecutor.pool.submit(new LoadSources(server, validator), new Callback(server));
     }
 

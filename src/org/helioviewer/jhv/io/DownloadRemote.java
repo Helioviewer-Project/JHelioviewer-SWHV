@@ -3,12 +3,14 @@ package org.helioviewer.jhv.io;
 import java.awt.EventQueue;
 import java.io.File;
 import java.net.URI;
+import java.util.concurrent.Future;
 
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.threads.JHVExecutor;
 import org.helioviewer.jhv.threads.JHVWorker;
 
 import okio.Buffer;
@@ -16,7 +18,11 @@ import okio.Okio;
 import okio.BufferedSource;
 import okio.BufferedSink;
 
-public class DownloadRemoteTask extends JHVWorker<Void, Void> {
+public class DownloadRemote extends JHVWorker<Void, Void> {
+
+    public static Future<?> get(ImageLayer layer, APIRequest req, URI uri) {
+        return JHVExecutor.cachedPool.submit(new DownloadRemote(layer, req, uri));
+    }
 
     private static final int BUFSIZ = 1024 * 1024;
 
@@ -24,7 +30,7 @@ public class DownloadRemoteTask extends JHVWorker<Void, Void> {
     private final URI downloadURI;
     private final ImageLayer layer;
 
-    public DownloadRemoteTask(ImageLayer _layer, APIRequest req, URI _uri) {
+    private DownloadRemote(ImageLayer _layer, APIRequest req, URI _uri) {
         layer = _layer;
         uri = _uri;
 

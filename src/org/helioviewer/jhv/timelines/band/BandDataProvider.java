@@ -2,6 +2,7 @@ package org.helioviewer.jhv.timelines.band;
 
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 import javax.annotation.Nonnull;
 
@@ -17,11 +18,10 @@ import org.json.JSONObject;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.ListenableFuture;
 
 public class BandDataProvider {
 
-    private static final ArrayListMultimap<Band, ListenableFuture<BandResponse>> workerMap = ArrayListMultimap.create();
+    private static final ArrayListMultimap<Band, Future<BandResponse>> workerMap = ArrayListMultimap.create();
 
     public static void loadBandTypes() {
         EventQueueCallbackExecutor.pool.submit(new BandTypeDownload(), new BandTypeDownloadCallback());
@@ -33,7 +33,7 @@ public class BandDataProvider {
 
     static void addDownloads(Band band, List<Interval> intervals) {
         for (Interval interval : intervals) {
-            ListenableFuture<BandResponse> worker = EventQueueCallbackExecutor.pool.submit(
+            Future<BandResponse> worker = EventQueueCallbackExecutor.pool.submit(
                     new BandDownload(band, interval.start, interval.end), new BandDownloadCallback(band));
             workerMap.put(band, worker);
         }
@@ -45,7 +45,7 @@ public class BandDataProvider {
     }
 
     static boolean isDownloadActive(Band band) {
-        for (ListenableFuture<BandResponse> worker : workerMap.get(band)) {
+        for (Future<BandResponse> worker : workerMap.get(band)) {
             if (!worker.isDone())
                 return true;
         }
