@@ -4,8 +4,8 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.threads.JHVExecutor;
 
 public interface Load {
 
@@ -22,7 +22,7 @@ public interface Load {
             try {
                 getAll(FileUtils.listDir(Path.of(uri)));
             } catch (Exception e) {
-                JHVGlobals.getExecutorService().execute(new DownloadRemoteTask(ImageLayer.create(null), null, uri));
+                JHVExecutor.cachedPool.execute(new DownloadRemoteTask(ImageLayer.create(null), null, uri));
             }
         }
 
