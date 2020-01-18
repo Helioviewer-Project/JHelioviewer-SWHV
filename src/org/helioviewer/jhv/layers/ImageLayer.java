@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
+import java.util.concurrent.Future;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -13,7 +14,7 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.io.DownloadRemoteTask;
+import org.helioviewer.jhv.io.DownloadRemote;
 import org.helioviewer.jhv.io.LoadView;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.metadata.MetaData;
@@ -21,13 +22,11 @@ import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.opengl.GLImage.DifferenceMode;
 import org.helioviewer.jhv.opengl.GLListener;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
-import org.helioviewer.jhv.threads.JHVExecutor;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.View;
 import org.json.JSONObject;
 
-import com.google.common.util.concurrent.ListenableFuture;
 import com.jogamp.opengl.GL2;
 
 public class ImageLayer extends AbstractLayer implements ImageDataHandler {
@@ -37,7 +36,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     private final ImageLayerOptions optionsPanel = new ImageLayerOptions(this);
 
     private boolean removed;
-    private ListenableFuture<View> worker;
+    private Future<?> worker;
     private View view = new BaseView(null, null, null);
 
     public static ImageLayer create(JSONObject jo) {
@@ -306,13 +305,12 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         return worker == null && view.getFrameCacheStatus(view.getMaximumFrameNumber()) != null;
     }
 
-    private DownloadRemoteTask downloadTask;
+    private Future<?> downloadTask;
 
     public void startDownloadView() {
         if (downloadTask != null)
             downloadTask.cancel(true);
-        downloadTask = new DownloadRemoteTask(this, view.getAPIRequest(), view.getURI());
-        JHVExecutor.cachedPool.execute(downloadTask);
+        downloadTask = DownloadRemote.get(this, view.getAPIRequest(), view.getURI());
     }
 
     public void stopDownloadView() {
