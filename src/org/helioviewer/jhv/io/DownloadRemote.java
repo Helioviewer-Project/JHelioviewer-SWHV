@@ -3,6 +3,7 @@ package org.helioviewer.jhv.io;
 import java.awt.EventQueue;
 import java.io.File;
 import java.net.URI;
+import java.util.List;
 import java.util.concurrent.Future;
 
 import javax.annotation.Nullable;
@@ -79,7 +80,7 @@ public class DownloadRemote extends JHVWorker<Void, Void> {
                 if (failed || isCancelled())
                     dstFile.delete();
                 else { // reload from disk
-                    LoadLayer.submit(layer, dstFile.toURI());
+                    LoadLayer.submit(layer, List.of(dstFile.toURI()));
                     EventQueue.invokeLater(() -> JHVGlobals.displayNotification(dstFile.toString()));
                 }
             } catch (Exception e) {

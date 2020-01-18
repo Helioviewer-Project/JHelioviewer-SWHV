@@ -16,7 +16,7 @@ import com.google.common.util.concurrent.FutureCallback;
 
 class LoadState implements Callable<JSONObject> {
 
-    static Future<JSONObject> submit(URI uri) {
+    static Future<JSONObject> submit(@Nonnull URI uri) {
         return EventQueueCallbackExecutor.pool.submit(new LoadState(uri), new Callback());
     }
 
