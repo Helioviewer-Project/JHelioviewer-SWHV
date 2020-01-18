@@ -7,8 +7,6 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.JHVGlobals;
-
 import org.everit.json.schema.Validator;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -95,7 +93,7 @@ public class DataSources {
 
     public static void loadSources() {
         Validator validator = Validator.builder().failEarly().build();
-        serverSettings.keySet().forEach(serverName -> JHVGlobals.getExecutorService().execute(new DataSourcesTask(serverName, validator)));
+        serverSettings.keySet().forEach(serverName -> LoadSources.get(serverName, validator));
     }
 
     private static final ArrayList<DataSourcesListener> listeners = new ArrayList<>();

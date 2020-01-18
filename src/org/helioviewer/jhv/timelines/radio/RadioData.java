@@ -142,7 +142,7 @@ public class RadioData extends AbstractTimelineLayer {
         @Override
         public void onFailure(@Nonnull Throwable t) {
             done();
-            Log.error(t);
+            Log.error("RadioJPXDownload error", t);
         }
 
     }
