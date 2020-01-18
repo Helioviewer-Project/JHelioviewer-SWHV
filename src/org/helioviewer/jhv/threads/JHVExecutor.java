@@ -15,7 +15,7 @@ public class JHVExecutor {
     public static final ScheduledExecutorService reaperPool = createReaperPool();
 
     private static ExecutorService createCachedPool() {
-        ExecutorService service = Executors.newCachedThreadPool();
+        ExecutorService service = Executors.newCachedThreadPool(new JHVThread.NamedThreadFactory("Worker"));
         shutdownOnDisposal(service);
         return service;
     }
