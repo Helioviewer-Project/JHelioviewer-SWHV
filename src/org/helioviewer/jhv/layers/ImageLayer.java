@@ -15,7 +15,7 @@ import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DownloadRemote;
-import org.helioviewer.jhv.io.LoadView;
+import org.helioviewer.jhv.io.LoadLayer;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.opengl.GLImage;
@@ -73,7 +73,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
         if (worker != null)
             worker.cancel(true);
-        worker = LoadView.get(this, req);
+        worker = LoadLayer.submit(this, req);
         JHVFrame.getLayersPanel().refresh(); // give feedback asap
     }
 

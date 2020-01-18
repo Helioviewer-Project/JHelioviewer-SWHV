@@ -21,7 +21,7 @@ import nom.tam.fits.Header;
 
 class PfssDataLoader implements Callable<PfssData> {
 
-    static Future<PfssData> get(long time, String url) {
+    static Future<PfssData> submit(long time, String url) {
         return EventQueueCallbackExecutor.pool.submit(new PfssDataLoader(time, url), new Callback(url));
     }
 

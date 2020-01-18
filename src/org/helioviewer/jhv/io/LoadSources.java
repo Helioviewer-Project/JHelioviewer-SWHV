@@ -21,7 +21,7 @@ import com.google.common.util.concurrent.FutureCallback;
 
 class LoadSources implements Callable<DataSourcesParser> {
 
-    static Future<DataSourcesParser> get(String server, Validator validator) {
+    static Future<DataSourcesParser> submit(String server, Validator validator) {
         return EventQueueCallbackExecutor.pool.submit(new LoadSources(server, validator), new Callback(server));
     }
 
