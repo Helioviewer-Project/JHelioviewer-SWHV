@@ -2,6 +2,7 @@ package org.helioviewer.jhv.io;
 
 import java.net.URI;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 import javax.annotation.Nonnull;
 
@@ -12,11 +13,10 @@ import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.json.JSONObject;
 
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.ListenableFuture;
 
 class LoadState implements Callable<JSONObject> {
 
-    static ListenableFuture<JSONObject> get(URI uri) {
+    static Future<JSONObject> get(URI uri) {
         return EventQueueCallbackExecutor.pool.submit(new LoadState(uri), new Callback());
     }
 

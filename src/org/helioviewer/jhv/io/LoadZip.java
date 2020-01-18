@@ -10,6 +10,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 import javax.annotation.Nonnull;
 
@@ -19,11 +20,10 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.ListenableFuture;
 
 class LoadZip implements Callable<Void> {
 
-    static ListenableFuture<Void> get(URI uri) {
+    static Future<Void> get(URI uri) {
         return EventQueueCallbackExecutor.pool.submit(new LoadZip(uri), new Callback());
     }
 

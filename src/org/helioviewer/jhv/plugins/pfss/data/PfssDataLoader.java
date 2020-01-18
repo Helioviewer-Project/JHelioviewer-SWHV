@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.pfss.data;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 import javax.annotation.Nonnull;
 
@@ -12,7 +13,6 @@ import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.time.JHVDate;
 
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.ListenableFuture;
 
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.BinaryTableHDU;
@@ -21,7 +21,7 @@ import nom.tam.fits.Header;
 
 class PfssDataLoader implements Callable<PfssData> {
 
-    static ListenableFuture<PfssData> get(long time, String url) {
+    static Future<PfssData> get(long time, String url) {
         return EventQueueCallbackExecutor.pool.submit(new PfssDataLoader(time, url), new Callback(url));
     }
 

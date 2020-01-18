@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.threads.JHVExecutor;
 
 public interface Load {
 
@@ -22,7 +21,7 @@ public interface Load {
             try {
                 getAll(FileUtils.listDir(Path.of(uri)));
             } catch (Exception e) {
-                JHVExecutor.cachedPool.execute(new DownloadRemoteTask(ImageLayer.create(null), null, uri));
+                DownloadRemote.get(ImageLayer.create(null), null, uri);
             }
         }
 
