@@ -6,13 +6,13 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.CancelTask;
+import org.helioviewer.jhv.threads.JHVExecutor;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONObject;
@@ -112,8 +112,8 @@ public class LoadPosition extends JHVWorker<PositionResponse, Void> {
 
     public static LoadPosition execute(StatusReceiver _receiver, SpaceObject _observer, SpaceObject _target, Frame _frame, long _start, long _end) {
         LoadPosition load = new LoadPosition(_receiver, _observer, _target, _frame, _start, _end);
-        JHVGlobals.getExecutorService().execute(load);
-        JHVGlobals.getReaperService().schedule(new CancelTask(load), 120, TimeUnit.SECONDS);
+        JHVExecutor.cachedPool.execute(load);
+        JHVExecutor.reaperPool.schedule(new CancelTask(load), 120, TimeUnit.SECONDS);
         return load;
     }
 
