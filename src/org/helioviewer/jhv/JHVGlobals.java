@@ -9,7 +9,6 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
 
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -36,14 +35,9 @@ public class JHVGlobals {
     public static final AlphanumComparator alphanumComparator = new AlphanumComparator(true);
 
     private static final ExecutorService executorService = JHVExecutor.createJHVWorkersExecutorService("MAIN", 12);
-    private static final ScheduledExecutorService reaperService = JHVExecutor.createReaperService();
 
     public static ExecutorService getExecutorService() {
         return executorService;
-    }
-
-    public static ScheduledExecutorService getReaperService() {
-        return reaperService;
     }
 
     private static int readTimeout = -1;
