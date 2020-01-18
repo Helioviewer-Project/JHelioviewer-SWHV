@@ -20,6 +20,7 @@ import org.helioviewer.jhv.plugins.pfss.data.PfssData;
 import org.helioviewer.jhv.plugins.pfss.data.PfssNewDataLoader;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.threads.CancelTask;
+import org.helioviewer.jhv.threads.JHVExecutor;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -115,7 +116,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener, TimespanLi
     public void timespanChanged(long start, long end) {
         FutureTask<Void> dataLoaderTask = new FutureTask<>(new PfssNewDataLoader(start, end), null);
         PfssPlugin.pfssNewLoadPool.execute(dataLoaderTask);
-        PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), PfssSettings.TIMEOUT_DOWNLOAD, TimeUnit.SECONDS);
+        JHVExecutor.reaperPool.schedule(new CancelTask(dataLoaderTask), PfssSettings.TIMEOUT_DOWNLOAD, TimeUnit.SECONDS);
     }
 
     @Override

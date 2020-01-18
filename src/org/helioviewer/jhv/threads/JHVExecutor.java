@@ -11,11 +11,22 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.util.concurrent.MoreExecutors;
-
 public class JHVExecutor {
 
-    public static final ExecutorService cachedPool = MoreExecutors.getExitingExecutorService((ThreadPoolExecutor) Executors.newCachedThreadPool());
+    public static final ExecutorService cachedPool = createCachedPool();
+    public static final ScheduledExecutorService reaperPool = createReaperPool();
+
+    private static ExecutorService createCachedPool() {
+        ExecutorService service = Executors.newCachedThreadPool();
+        shutdownOnDisposal(service);
+        return service;
+    }
+
+    private static ScheduledExecutorService createReaperPool() {
+        ScheduledExecutorService service = new ScheduledThreadPoolExecutor(1, new JHVThread.NamedThreadFactory("Reaper"), new ThreadPoolExecutor.DiscardPolicy());
+        shutdownOnDisposal(service);
+        return service;
+    }
 
 /*
 import java.beans.PropertyChangeEvent;
@@ -66,11 +77,6 @@ import sun.awt.AppContext;
     }
 */
 
-    public static ScheduledExecutorService createReaperService() {
-        ScheduledExecutorService service = new ScheduledThreadPoolExecutor(1, new JHVThread.NamedThreadFactory("Reaper"), new ThreadPoolExecutor.DiscardPolicy());
-        shutdownOnDisposal(service);
-        return service;
-    }
 
     public static ExecutorService createJHVWorkersExecutorService(String name, int MAX_WORKER_THREADS) {
         ExecutorService service = new ThreadPoolExecutor(MAX_WORKER_THREADS / 2, MAX_WORKER_THREADS, 10L, TimeUnit.MINUTES,
@@ -103,11 +109,7 @@ import sun.awt.AppContext;
                     }
                 };
 
-        AccessController.doPrivileged(
-                (PrivilegedAction<Void>) () -> {
-                    Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook));
-                    return null;
-                });
+        Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook));
     }
 
 }
