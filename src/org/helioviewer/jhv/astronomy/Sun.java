@@ -53,12 +53,7 @@ public class Sun {
     }
 
     public static Position getEarth(JHVDate time) {
-        try {
-            return cache.get(time);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return getEarthInternal(time);
+        return cache.getUnchecked(time);
     }
 
     // derived from http://hesperia.gsfc.nasa.gov/ssw/gen/idl/solar/get_sun.pro

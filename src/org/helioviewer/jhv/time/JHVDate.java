@@ -44,12 +44,7 @@ public class JHVDate implements Comparable<JHVDate> {
 
     @Override
     public String toString() {
-        try {
-            return cache.get(milli);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return getString(milli);
+        return cache.getUnchecked(milli);
     }
 
     private static final LoadingCache<Long, String> cache = CacheBuilder.newBuilder().maximumSize(100000).build(CacheLoader.from(JHVDate::getString));
