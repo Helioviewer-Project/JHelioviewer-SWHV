@@ -7,7 +7,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVDirectory;
@@ -17,9 +19,9 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.plugins.PluginManager;
-import org.helioviewer.jhv.threads.JHVExecutor;
-import org.helioviewer.jhv.threads.JHVWorker;
+import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
@@ -27,6 +29,8 @@ import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.google.common.util.concurrent.FutureCallback;
 
 public class State {
 
@@ -182,7 +186,61 @@ public class State {
         boolean tracking = data.optBoolean("tracking", JHVFrame.getToolBar().getTrackingButton().isSelected());
         boolean play = data.optBoolean("play", false);
 
-        JHVExecutor.cachedPool.execute(new LoadState(newlist, masterLayer, time, tracking, play));
+        EventQueueCallbackExecutor.pool.submit(new WaitLoad(newlist), new Callback(newlist, masterLayer, time, tracking, play));
+    }
+
+    private static class WaitLoad implements Callable<Void> {
+
+        private final ArrayList<ImageLayer> newlist;
+
+        WaitLoad(ArrayList<ImageLayer> _newlist) {
+            newlist = _newlist;
+        }
+
+        @Override
+        public Void call() throws Exception {
+            for (ImageLayer layer : newlist) {
+                while (!layer.isLoadedForState()) {
+                    Thread.sleep(1000);
+                }
+            }
+            return null;
+        }
+
+    }
+
+    private static class Callback implements FutureCallback<Void> {
+
+        private final ArrayList<ImageLayer> newlist;
+        private final ImageLayer masterLayer;
+        private final JHVDate time;
+        private final boolean tracking;
+        private final boolean play;
+
+        Callback(ArrayList<ImageLayer> _newlist, ImageLayer _masterLayer, JHVDate _time, boolean _tracking, boolean _play) {
+            newlist = _newlist;
+            masterLayer = _masterLayer;
+            time = _time;
+            tracking = _tracking;
+            play = _play;
+        }
+
+        @Override
+        public void onSuccess(Void result) {
+            newlist.forEach(ImageLayer::unload); // prune failed layers
+            if (masterLayer != null)
+                Layers.setActiveImageLayer(masterLayer);
+            Movie.setTime(time);
+            JHVFrame.getToolBar().getTrackingButton().setSelected(tracking);
+            if (play)
+                Movie.play();
+        }
+
+        @Override
+        public void onFailure(@Nonnull Throwable t) {
+            Log.error("StateLoad", t);
+        }
+
     }
 
     public static void load(JSONObject jo) {
@@ -199,51 +257,6 @@ public class State {
                 PluginManager.loadState(plugins);
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    private static class LoadState extends JHVWorker<Void, Void> {
-        private final ArrayList<ImageLayer> newlist;
-        private final ImageLayer masterLayer;
-        private final JHVDate time;
-        private final boolean tracking;
-        private final boolean play;
-
-        LoadState(ArrayList<ImageLayer> _newlist, ImageLayer _masterLayer, JHVDate _time, boolean _tracking, boolean _play) {
-            newlist = _newlist;
-            masterLayer = _masterLayer;
-            time = _time;
-            tracking = _tracking;
-            play = _play;
-        }
-
-        @Nullable
-        @Override
-        protected Void backgroundWork() {
-            for (ImageLayer layer : newlist) {
-                while (!layer.isLoadedForState()) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void done() {
-            if (isCancelled())
-                return;
-
-            newlist.forEach(ImageLayer::unload); // prune failed layers
-            if (masterLayer != null)
-                Layers.setActiveImageLayer(masterLayer);
-            Movie.setTime(time);
-            JHVFrame.getToolBar().getTrackingButton().setSelected(tracking);
-            if (play)
-                Movie.play();
         }
     }
 
