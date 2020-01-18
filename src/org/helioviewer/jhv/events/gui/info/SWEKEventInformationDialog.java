@@ -37,7 +37,7 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
     private DataCollapsiblePanel followingEventsPanel;
     private DataCollapsiblePanel otherRelatedEventsPanel;
 
-    private JHVEvent event;
+    private final JHVEvent event;
     private final JHVRelatedEvents rEvent;
 
     private final DataCollapsiblePanelModel model;
@@ -219,9 +219,10 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
             int id = event.getUniqueID();
             for (JHVEvent jhvEvent : result) {
                 int jid = jhvEvent.getUniqueID();
-                if (jid == id)
-                    event = jhvEvent;
-                else
+                //if (jid == id)
+                //    event = jhvEvent;
+                //else
+                if (jid != id)
                     rEvents.add(JHVEventCache.getRelatedEvents(jid));
             }
 
