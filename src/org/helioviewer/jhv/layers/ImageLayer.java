@@ -5,7 +5,6 @@ import java.awt.Component;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
@@ -22,6 +21,7 @@ import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.opengl.GLImage.DifferenceMode;
 import org.helioviewer.jhv.opengl.GLListener;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
+import org.helioviewer.jhv.threads.JHVExecutor;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.View;
@@ -312,7 +312,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         if (downloadTask != null)
             downloadTask.cancel(true);
         downloadTask = new DownloadRemoteTask(this, view.getAPIRequest(), view.getURI());
-        JHVGlobals.getExecutorService().execute(downloadTask);
+        JHVExecutor.cachedPool.execute(downloadTask);
     }
 
     public void stopDownloadView() {

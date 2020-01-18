@@ -8,7 +8,6 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Properties;
-import java.util.concurrent.ExecutorService;
 
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -17,7 +16,6 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.log.Log;
-import org.helioviewer.jhv.threads.JHVExecutor;
 
 import com.jidesoft.comparator.AlphanumComparator;
 
@@ -33,12 +31,6 @@ public class JHVGlobals {
     public static String versionDetail = "";
 
     public static final AlphanumComparator alphanumComparator = new AlphanumComparator(true);
-
-    private static final ExecutorService executorService = JHVExecutor.createJHVWorkersExecutorService("MAIN", 12);
-
-    public static ExecutorService getExecutorService() {
-        return executorService;
-    }
 
     private static int readTimeout = -1;
     private static int connectTimeout = -1;
