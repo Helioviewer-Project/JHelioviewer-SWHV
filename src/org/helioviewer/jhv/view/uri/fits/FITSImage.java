@@ -40,7 +40,7 @@ public class FITSImage implements URIImageReader {
                 }
             }
         }
-        return null;
+        throw new Exception("No image found");
     }
 
     @Nullable
@@ -60,7 +60,7 @@ public class FITSImage implements URIImageReader {
                 }
             }
         }
-        return null;
+        throw new Exception("No image found");
     }
 
     private static String readHeader(ImageHDU hdu) {
