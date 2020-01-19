@@ -46,7 +46,7 @@ public class OpenLocalFileAction extends AbstractAction {
                 if (f.isFile() && f.canRead()) // cannot select directories anyway
                     uris.add(f.toURI());
             }
-            Load.image.getAll(uris);
+            Load.Image.getAll(uris);
         }
     }
 
