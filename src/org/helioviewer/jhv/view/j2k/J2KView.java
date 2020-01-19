@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.view.j2k;
 
 import java.awt.EventQueue;
-import java.io.IOException;
 import java.lang.ref.Cleaner;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -102,7 +101,7 @@ public class J2KView extends BaseView {
                     // nothing
                     break;
                 default:
-                    throw new IOException(scheme + " scheme not supported!");
+                    throw new Exception(scheme + " scheme not supported!");
             }
 
             kduSource = new KakaduSource(jpipCache, uri);
@@ -145,9 +144,9 @@ public class J2KView extends BaseView {
             }
 
             abolishable = reaper.register(this, new J2KAbolisher(serial, reader, jpipCache));
-        } catch (KduException e) {
-            e.printStackTrace();
-            throw new IOException("Failed to create Kakadu machinery: " + e.getMessage(), e);
+        } catch (Exception e) {
+            String msg = e instanceof KduException ? "Kakadu error" : e.getMessage();
+            throw new Exception(msg + ": " + uri, e);
         }
     }
 
