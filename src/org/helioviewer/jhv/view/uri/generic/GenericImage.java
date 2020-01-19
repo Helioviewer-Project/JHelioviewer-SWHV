@@ -32,7 +32,7 @@ public class GenericImage implements URIImageReader {
         try (NetClient nc = NetClient.of(uri); ImageInputStream iis = ImageIO.createImageInputStream(nc.getStream())) {
             ImageReader reader = getReader(iis);
             if (reader == null)
-                throw new Exception("No image reader found for: " + uri);
+                throw new Exception("No image reader found");
 
             String xml = null;
             // read metadata of first image
@@ -62,7 +62,7 @@ public class GenericImage implements URIImageReader {
         try (NetClient nc = NetClient.of(uri); ImageInputStream iis = ImageIO.createImageInputStream(nc.getStream())) {
             ImageReader reader = getReader(iis);
             if (reader == null)
-                throw new Exception("No image reader found for: " + uri);
+                throw new Exception("No image reader found");
 
             ImageBuffer imageBuffer = buffered2ImageBuffer(reader.read(0));
             reader.dispose();

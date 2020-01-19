@@ -54,18 +54,22 @@ public class URIView extends BaseView {
 
         reader = type.getReader();
 
-        MetaData m;
-        String readXml = reader.readXML(uri);
-        if (readXml == null) {
-            xml = "<meta/>";
-            m = new PixelBasedMetaData(100, 100, 0, uri);
-        } else {
-            xml = readXml;
-            m = new XMLMetaDataContainer(xml).getHVMetaData(0, true);
-        }
+        try {
+            MetaData m;
+            String readXml = reader.readXML(uri);
+            if (readXml == null) {
+                xml = "<meta/>";
+                m = new PixelBasedMetaData(100, 100, 0, uri);
+            } else {
+                xml = readXml;
+                m = new XMLMetaDataContainer(xml).getHVMetaData(0, true);
+            }
 
-        imageRegion = m.roiToRegion(0, 0, m.getPixelWidth(), m.getPixelHeight(), 1, 1);
-        metaData[0] = m;
+            imageRegion = m.roiToRegion(0, 0, m.getPixelWidth(), m.getPixelHeight(), 1, 1);
+            metaData[0] = m;
+        } catch (Exception e) {
+            throw new Exception(e.getMessage() + ": " + uri, e);
+        }
     }
 
     @Override
