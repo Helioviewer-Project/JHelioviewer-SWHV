@@ -22,7 +22,7 @@ public class GLInfo {
 
     static void glVersionError(String err) {
         Log.error("GLInfo > " + err);
-        Message.err("OpenGL fatal error, JHelioviewer is not able to run:\n", Message.formatMessage(err), true);
+        Message.err("OpenGL fatal error, JHelioviewer is not able to run:\n", err, true);
     }
 
     public static void update(GL2 gl) {

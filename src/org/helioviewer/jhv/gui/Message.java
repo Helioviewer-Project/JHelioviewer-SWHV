@@ -7,13 +7,9 @@ import javax.swing.JOptionPane;
 import org.helioviewer.jhv.base.Regex;
 
 public class Message {
-    /**
-     * Inserts line breaks into the message so that it can shown as a message
-     *
-     * @param message the message to be displayed
-     * @return formatted string with every line at most 70 characters
-     */
-    public static String formatMessage(String message) {
+
+    // Format string with at most 70 characters per line
+    private static String formatMessage(String message) {
         StringBuilder sb = new StringBuilder();
         int lineLength = 0;
         for (String word : Regex.Space.split(message)) {
@@ -29,35 +25,22 @@ public class Message {
         return sb.toString();
     }
 
-    /**
-     * A central error handler. Displays an error message in a JOptionDialog and
-     * exits if the flag is set.
-     *
-     * @param _title           title of the error message
-     * @param _msg             the message to be displayed
-     * @param _exitImmediately the program exits when the value true will be passed.
-     */
-    public static void err(String _title, Object _msg, boolean _exitImmediately) {
+    public static void err(String title, Object msg, boolean exitImmediately) {
         if (Thread.currentThread().isInterrupted())
             return;
         // invoked immediately
-        JOptionPane.showMessageDialog(null, ((_title == null ? "" : _title + '\n') + (_msg == null ? "No error details available." : _msg.toString())), (_exitImmediately ? "Fatal Error" : "Error"), JOptionPane.ERROR_MESSAGE);
-        if (_exitImmediately)
+        String str = msg == null || msg.toString().isEmpty() ? "No error details available." : formatMessage(msg.toString());
+        JOptionPane.showMessageDialog(null, (title == null ? "" : title + '\n') + str, exitImmediately ? "Fatal Error" : "Error", JOptionPane.ERROR_MESSAGE);
+        if (exitImmediately)
             System.exit(-1);
     }
 
-    /**
-     * A central warning handler. Displays a warning message in a JOptionDialog.
-     *
-     * @param _title title of the warning message
-     * @param _msg   the message to be displayed
-     */
-    public static void warn(String _title, Object _msg) {
+    public static void warn(String title, Object msg) {
         if (Thread.currentThread().isInterrupted())
             return;
 
-        String msg = _msg.toString();
-        EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(null, ((_title == null ? "" : _title + '\n') + (msg == null || msg.isEmpty() ? "No warning details available." : msg)), "Warning", JOptionPane.WARNING_MESSAGE));
+        String str = msg == null || msg.toString().isEmpty() ? "No warning details available." : formatMessage(msg.toString());
+        EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(null, (title == null ? "" : title + '\n') + str, "Warning", JOptionPane.WARNING_MESSAGE));
     }
 
 }

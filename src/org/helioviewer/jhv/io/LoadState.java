@@ -40,8 +40,8 @@ class LoadState implements Callable<JSONObject> {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log.error("An error occurred while opening the remote file: ", t);
-            Message.err("An error occurred while opening the remote file: ", t.getMessage(), false);
+            Log.error("An error occurred while opening the remote file:", t);
+            Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
         }
 
     }
