@@ -14,7 +14,7 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.io.DownloadRemote;
+import org.helioviewer.jhv.io.DownloadLayer;
 import org.helioviewer.jhv.io.LoadLayer;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.metadata.MetaData;
@@ -128,7 +128,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     }
 
     private void unsetView() {
-        stopDownloadView();
+        stopDownload();
 
         CameraHelper.zoomToFit(Display.getMiniCamera());
         view.setDataHandler(null);
@@ -312,24 +312,26 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     private Future<?> downloadTask;
 
-    public void startDownloadView() {
+    public void startDownload() {
         if (downloadTask != null)
             downloadTask.cancel(true);
-        downloadTask = DownloadRemote.get(this, view.getAPIRequest(), view.getURI());
+        APIRequest req = view.getAPIRequest();
+        if (req != null) // should not happen
+            downloadTask = DownloadLayer.submit(this, req, view.getURI());
     }
 
-    public void stopDownloadView() {
+    public void stopDownload() {
         if (downloadTask != null) {
             downloadTask.cancel(true);
             downloadTask = null;
         }
     }
 
-    public void doneDownloadView() {
+    public void doneDownload() {
         optionsPanel.getRunningDifferencePanel().done();
     }
 
-    public void progressDownloadView(int percent) {
+    public void progressDownload(int percent) {
         optionsPanel.getRunningDifferencePanel().setValue(percent);
     }
 
