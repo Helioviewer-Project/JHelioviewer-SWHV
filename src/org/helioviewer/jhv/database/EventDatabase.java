@@ -844,31 +844,26 @@ public class EventDatabase {
 
         @Nullable
         @Override
-        public JsonEvent call() {
+        public JsonEvent call() throws Exception {
             Connection connection = EventDatabaseThread.getConnection();
             if (connection == null) {
                 return null;
             }
 
-            try {
-                PreparedStatement ps = getPreparedStatement(connection, SELECT_EVENT_BY_ID);
-                ps.setLong(1, event_id);
+            PreparedStatement ps = getPreparedStatement(connection, SELECT_EVENT_BY_ID);
+            ps.setLong(1, event_id);
 
-                JsonEvent je = null;
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        int id = rs.getInt(1);
-                        long start = rs.getLong(2);
-                        long end = rs.getLong(3);
-                        byte[] json = rs.getBytes(4);
-                        je = new JsonEvent(json, SWEKSupplier.getSupplier(rs.getString(5)), id, start, end);
-                    }
+            JsonEvent je = null;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int id = rs.getInt(1);
+                    long start = rs.getLong(2);
+                    long end = rs.getLong(3);
+                    byte[] json = rs.getBytes(4);
+                    je = new JsonEvent(json, SWEKSupplier.getSupplier(rs.getString(5)), id, start, end);
                 }
-                return je;
-            } catch (SQLException e) {
-                Log.error("Could not fetch associations " + e.getMessage());
             }
-            return null;
+            return je;
         }
     }
 
