@@ -55,6 +55,12 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     }
 
     private ImageLayer(JSONObject jo) {
+        try {
+            view = new BaseView(null, null, null);
+        } catch (Exception e) { // impossible
+            e.printStackTrace();
+        }
+
         if (jo != null) {
             JSONObject apiRequest = jo.optJSONObject("APIRequest");
             if (apiRequest != null) {
@@ -64,11 +70,6 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
                 if (imageParams != null)
                     glImage.fromJson(imageParams);
             }
-        }
-        try {
-            view = new BaseView(null, null, null);
-        } catch (Exception e) { // impossible
-            e.printStackTrace();
         }
     }
 
