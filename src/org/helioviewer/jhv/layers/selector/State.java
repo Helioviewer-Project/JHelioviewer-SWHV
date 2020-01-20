@@ -7,12 +7,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -155,7 +157,7 @@ public class State {
             }
         }
 
-        ArrayList<ImageLayer> newlist = new ArrayList<>();
+        HashMap<ImageLayer, Boolean> newLayers = new HashMap<>();
         ImageLayer masterLayer = null;
         rja = data.getJSONArray("imageLayers");
         for (Object o : rja) {
@@ -167,8 +169,7 @@ public class State {
 
                 try {
                     ImageLayer layer = ImageLayer.create(jd);
-                    newlist.add(layer);
-                    layer.setEnabled(jo.optBoolean("enabled", false)); // pointless
+                    newLayers.put(layer, jo.optBoolean("enabled", false));
                     if (jo.optBoolean("master", false))
                         masterLayer = layer;
                 } catch (Exception e) { // don't stop for a broken one
@@ -185,20 +186,20 @@ public class State {
         boolean tracking = data.optBoolean("tracking", JHVFrame.getToolBar().getTrackingButton().isSelected());
         boolean play = data.optBoolean("play", false);
 
-        EventQueueCallbackExecutor.pool.submit(new WaitLoad(newlist), new Callback(newlist, masterLayer, time, tracking, play));
+        EventQueueCallbackExecutor.pool.submit(new WaitLoad(newLayers.keySet()), new Callback(newLayers, masterLayer, time, tracking, play));
     }
 
     private static class WaitLoad implements Callable<Void> {
 
-        private final ArrayList<ImageLayer> newlist;
+        private final Set<ImageLayer> newLayers;
 
-        WaitLoad(ArrayList<ImageLayer> _newlist) {
-            newlist = _newlist;
+        WaitLoad(Set<ImageLayer> _newLayers) {
+            newLayers = _newLayers;
         }
 
         @Override
         public Void call() throws Exception {
-            for (ImageLayer layer : newlist) {
+            for (ImageLayer layer : newLayers) {
                 while (!layer.isLoadedForState()) {
                     Thread.sleep(1000);
                 }
@@ -210,14 +211,14 @@ public class State {
 
     private static class Callback implements FutureCallback<Void> {
 
-        private final ArrayList<ImageLayer> newlist;
+        private final Map<ImageLayer, Boolean> newLayers;
         private final ImageLayer masterLayer;
         private final JHVDate time;
         private final boolean tracking;
         private final boolean play;
 
-        Callback(ArrayList<ImageLayer> _newlist, ImageLayer _masterLayer, JHVDate _time, boolean _tracking, boolean _play) {
-            newlist = _newlist;
+        Callback(Map<ImageLayer, Boolean> _newLayers, ImageLayer _masterLayer, JHVDate _time, boolean _tracking, boolean _play) {
+            newLayers = _newLayers;
             masterLayer = _masterLayer;
             time = _time;
             tracking = _tracking;
@@ -226,7 +227,10 @@ public class State {
 
         @Override
         public void onSuccess(Void result) {
-            newlist.forEach(ImageLayer::unload); // prune failed layers
+            newLayers.keySet().forEach(ImageLayer::unload); // prune failed layers
+            for (ImageLayer layer : Layers.getImageLayers()) {
+                layer.setEnabled(newLayers.get(layer));
+            }
             if (masterLayer != null)
                 Layers.setActiveImageLayer(masterLayer);
             Movie.setTime(time);
