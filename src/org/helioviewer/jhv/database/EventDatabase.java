@@ -304,88 +304,86 @@ public class EventDatabase {
         }
 
         @Override
-        public int[] call() {
+        public int[] call() throws Exception {
             int[] inserted_ids = get_id_init_list(event2db_list.size());
             Connection connection = EventDatabaseThread.getConnection();
             if (connection == null) {
                 return inserted_ids;
             }
-            try {
-                int typeId = getEventTypeId(connection, type);
-                int llen = event2db_list.size();
-                for (int i = 0; i < llen; i++) {
-                    Event2Db event2db = event2db_list.get(i);
-                    int generatedKey = -1;
-                    if (typeId != -1) {
-                        generatedKey = getEventId(connection, event2db.uid);
 
-                        if (generatedKey == -1) {
-                            {
-                                PreparedStatement pstatement = getPreparedStatement(connection, INSERT_FULL_EVENT);
-                                pstatement.setInt(1, typeId);
-                                pstatement.setString(2, event2db.uid);
-                                pstatement.setLong(3, event2db.start);
-                                pstatement.setLong(4, event2db.end);
-                                pstatement.setLong(5, event2db.archiv);
-                                pstatement.setBinaryStream(6, new ByteArrayInputStream(event2db.compressedJson), event2db.compressedJson.length);
-                                pstatement.executeUpdate();
-                            }
-                            {
-                                PreparedStatement pstatement = getPreparedStatement(connection, SELECT_LAST_INSERT);
+            int typeId = getEventTypeId(connection, type);
+            int llen = event2db_list.size();
+            for (int i = 0; i < llen; i++) {
+                Event2Db event2db = event2db_list.get(i);
+                int generatedKey = -1;
+                if (typeId != -1) {
+                    generatedKey = getEventId(connection, event2db.uid);
 
-                                try (ResultSet rs = pstatement.executeQuery()) {
-                                    if (rs.next()) {
-                                        generatedKey = rs.getInt(1);
-                                    }
-                                }
-                            }
-                        } else {
-                            PreparedStatement pstatement = getPreparedStatement(connection, UPDATE_EVENT);
+                    if (generatedKey == -1) {
+                        {
+                            PreparedStatement pstatement = getPreparedStatement(connection, INSERT_FULL_EVENT);
                             pstatement.setInt(1, typeId);
                             pstatement.setString(2, event2db.uid);
                             pstatement.setLong(3, event2db.start);
                             pstatement.setLong(4, event2db.end);
-                            pstatement.setBinaryStream(5, new ByteArrayInputStream(event2db.compressedJson), event2db.compressedJson.length);
-                            pstatement.setInt(6, generatedKey);
+                            pstatement.setLong(5, event2db.archiv);
+                            pstatement.setBinaryStream(6, new ByteArrayInputStream(event2db.compressedJson), event2db.compressedJson.length);
                             pstatement.executeUpdate();
                         }
                         {
-                            StringBuilder fieldString = new StringBuilder();
-                            StringBuilder varString = new StringBuilder();
-                            for (JHVDatabaseParam p : event2db.paramList) {
-                                fieldString.append(',').append(p.getParamName());
-                                varString.append(",?");
-                            }
-                            String full_statement = "INSERT INTO " + type.getDatabaseName() + "(event_id" + fieldString + ") VALUES(?" + varString + ")";
-                            PreparedStatement pstatement = getPreparedStatement(connection, full_statement);
-                            pstatement.setInt(1, generatedKey);
+                            PreparedStatement pstatement = getPreparedStatement(connection, SELECT_LAST_INSERT);
 
-                            int index = 2;
-                            for (JHVDatabaseParam p : event2db.paramList) {
-                                if (p.isInt()) {
-                                    pstatement.setInt(index, p.getIntValue());
-                                } else if (p.isString()) {
-                                    pstatement.setString(index, p.getStringValue());
-                                } else if (p.isDouble()) {
-                                    pstatement.setDouble(index, p.getDoubleValue());
+                            try (ResultSet rs = pstatement.executeQuery()) {
+                                if (rs.next()) {
+                                    generatedKey = rs.getInt(1);
                                 }
-                                index++;
                             }
-                            pstatement.executeUpdate();
                         }
                     } else {
-                        Log.error("Failed to insert event");
+                        PreparedStatement pstatement = getPreparedStatement(connection, UPDATE_EVENT);
+                        pstatement.setInt(1, typeId);
+                        pstatement.setString(2, event2db.uid);
+                        pstatement.setLong(3, event2db.start);
+                        pstatement.setLong(4, event2db.end);
+                        pstatement.setBinaryStream(5, new ByteArrayInputStream(event2db.compressedJson), event2db.compressedJson.length);
+                        pstatement.setInt(6, generatedKey);
+                        pstatement.executeUpdate();
                     }
-                    inserted_ids[i] = generatedKey;
+                    {
+                        StringBuilder fieldString = new StringBuilder();
+                        StringBuilder varString = new StringBuilder();
+                        for (JHVDatabaseParam p : event2db.paramList) {
+                            fieldString.append(',').append(p.getParamName());
+                            varString.append(",?");
+                        }
+                        String full_statement = "INSERT INTO " + type.getDatabaseName() + "(event_id" + fieldString + ") VALUES(?" + varString + ")";
+                        PreparedStatement pstatement = getPreparedStatement(connection, full_statement);
+                        pstatement.setInt(1, generatedKey);
+
+                        int index = 2;
+                        for (JHVDatabaseParam p : event2db.paramList) {
+                            if (p.isInt()) {
+                                pstatement.setInt(index, p.getIntValue());
+                            } else if (p.isString()) {
+                                pstatement.setString(index, p.getStringValue());
+                            } else if (p.isDouble()) {
+                                pstatement.setDouble(index, p.getDoubleValue());
+                            }
+                            index++;
+                        }
+                        pstatement.executeUpdate();
+                    }
+                } else {
+                    Log.error("Failed to insert event");
                 }
-                connection.commit();
-            } catch (SQLException e) {
-                Log.error("Could not insert event " + e.getMessage());
+                inserted_ids[i] = generatedKey;
             }
+            connection.commit();
+
             ArrayList<Pair<Integer, Integer>> assocs = new ArrayList<>();
             for (int id : inserted_ids) {
                 if (id == -1) {
-                    Log.error("failed to dump to database");
+                    Log.error("Failed to dump to database");
                     assocs.add(new Pair<>(1, 1));
                 } else {
                     ArrayList<JHVEvent> rels = _getOtherRelations(id, type, true, false, true);
