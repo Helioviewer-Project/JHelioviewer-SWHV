@@ -202,7 +202,7 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
         }
 
         @Override
-        public ArrayList<JHVEvent> call() {
+        public ArrayList<JHVEvent> call() throws Exception {
             return EventDatabase.getOtherRelations(e.getUniqueID(), e.getSupplier(), false, true);
         }
 
