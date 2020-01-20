@@ -12,11 +12,11 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVThread;
-import org.helioviewer.jhv.threads.SerialExecutor;
+import org.helioviewer.jhv.threads.SingleExecutor;
 
 public class SourcesDatabase extends Thread {
 
-    private static final SerialExecutor executor = new SerialExecutor(new JHVThread.NamedClassThreadFactory(SourcesDatabase.class, "SourcesDatabase"));
+    private static final SingleExecutor executor = new SingleExecutor(new JHVThread.NamedClassThreadFactory(SourcesDatabase.class, "SourcesDatabase"));
 
     private static Connection connection;
     private static PreparedStatement insert;
