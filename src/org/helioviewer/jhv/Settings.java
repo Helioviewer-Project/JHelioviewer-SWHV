@@ -35,7 +35,9 @@ public class Settings {
         }
 
         if (getProperty("path.local") == null)
-            setProperty("path.local", JHVDirectory.HOME.getPath());
+            setProperty("path.local", JHVDirectory.REMOTEFILES.getPath());
+        if (getProperty("path.state") == null)
+            setProperty("path.state", JHVDirectory.STATES.getPath());
         String server = getProperty("default.server");
         if (server == null || DataSources.getServerSetting(server, "API.getDataSources") == null)
             setProperty("default.server", "IAS");

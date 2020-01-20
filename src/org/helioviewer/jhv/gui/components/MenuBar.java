@@ -16,6 +16,7 @@ import org.helioviewer.jhv.gui.actions.OpenLocalFileAction;
 import org.helioviewer.jhv.gui.actions.OpenURLinBrowserAction;
 import org.helioviewer.jhv.gui.actions.ResetCameraAction;
 import org.helioviewer.jhv.gui.actions.SaveStateAction;
+import org.helioviewer.jhv.gui.actions.SaveStateAsAction;
 import org.helioviewer.jhv.gui.actions.ShowDialogAction;
 import org.helioviewer.jhv.gui.actions.WindowMinimizeAction;
 import org.helioviewer.jhv.gui.actions.WindowZoomAction;
@@ -36,8 +37,9 @@ public class MenuBar extends JMenuBar {
         fileMenu.add(new NewLayerAction());
         fileMenu.add(new OpenLocalFileAction());
         fileMenu.addSeparator();
-        fileMenu.add(new SaveStateAction());
         fileMenu.add(new LoadStateAction());
+        fileMenu.add(new SaveStateAction());
+        fileMenu.add(new SaveStateAsAction());
 
         ExitProgramAction exitAction = new ExitProgramAction();
         if (System.getProperty("jhv.os").equals("mac")) {

@@ -34,9 +34,8 @@ import com.google.common.util.concurrent.FutureCallback;
 
 public class State {
 
-    public static void save() {
-        String fileName = JHVDirectory.STATES.getPath() + "state__" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".jhv";
-        try (BufferedWriter writer = Files.newBufferedWriter(Path.of(fileName), StandardCharsets.UTF_8)) {
+    public static void save(String dir, String file) {
+        try (BufferedWriter writer = Files.newBufferedWriter(Path.of(dir, file), StandardCharsets.UTF_8)) {
             toJson().write(writer);
         } catch (IOException e) {
             e.printStackTrace();
