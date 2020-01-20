@@ -9,13 +9,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.FutureTask;
 import java.util.zip.GZIPInputStream;
 
 import javax.annotation.Nullable;
@@ -33,10 +30,11 @@ import org.helioviewer.jhv.events.SWEKSupplier;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVThread;
+import org.helioviewer.jhv.threads.SingleExecutor;
 
 public class EventDatabase {
 
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor(new JHVThread.NamedClassThreadFactory(EventDatabaseThread.class, "EventDatabase"));
+    private static final SingleExecutor executor = new SingleExecutor(new JHVThread.NamedClassThreadFactory(EventDatabaseThread.class, "EventDatabase"));
 
     public static class Event2Db {
         final byte[] compressedJson;
@@ -218,13 +216,11 @@ public class EventDatabase {
         return errorcode;
     }
 
-    public static Integer dump_association2db(Pair<String, String>[] assocs) {
-        FutureTask<Integer> ft = new FutureTask<>(new DumpAssociation2Db(assocs));
-        executor.execute(ft);
+    public static int dump_association2db(Pair<String, String>[] assocs) {
         try {
-            return ft.get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            return executor.invokeAndWait(new DumpAssociation2Db(assocs));
+        } catch (Exception e) {
+            Log.error(e);
         }
         return -1;
     }
@@ -294,19 +290,15 @@ public class EventDatabase {
 
     private static int[] get_id_init_list(int sz) {
         int[] inserted_ids = new int[sz];
-        for (int i = 0; i < sz; i++) {
-            inserted_ids[i] = -1;
-        }
+        Arrays.fill(inserted_ids, -1);
         return inserted_ids;
     }
 
     public static int[] dump_event2db(ArrayList<Event2Db> event2db_list, SWEKSupplier type) {
-        FutureTask<int[]> ft = new FutureTask<>(new DumpEvent2Db(event2db_list, type));
-        executor.execute(ft);
         try {
-            return ft.get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            return executor.invokeAndWait(new DumpEvent2Db(event2db_list, type));
+        } catch (Exception e) {
+            Log.error(e);
         }
         return get_id_init_list(event2db_list.size());
     }
@@ -501,7 +493,7 @@ public class EventDatabase {
     }
 
     public static void addDaterange2db(long start, long end, SWEKSupplier type) {
-        executor.execute(new AddDateRange2db(start, end, type));
+        executor.invokeLater(new AddDateRange2db(start, end, type));
     }
 
     private static class AddDateRange2db implements Runnable {
@@ -550,12 +542,10 @@ public class EventDatabase {
     }
 
     public static ArrayList<Interval> db2daterange(SWEKSupplier type) {
-        FutureTask<ArrayList<Interval>> ft = new FutureTask<>(new Db2DateRange(type));
-        executor.execute(ft);
         try {
-            return ft.get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            return executor.invokeAndWait(new Db2DateRange(type));
+        } catch (Exception e) {
+            Log.error(e);
         }
         return new ArrayList<>();
     }
@@ -644,12 +634,10 @@ public class EventDatabase {
     }
 
     public static ArrayList<JHVEvent> events2Program(long start, long end, SWEKSupplier type, List<SWEKParam> params) {
-        FutureTask<ArrayList<JHVEvent>> ft = new FutureTask<>(new Events2Program(start, end, type, params));
-        executor.execute(ft);
         try {
-            return ft.get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            return executor.invokeAndWait(new Events2Program(start, end, type, params));
+        } catch (Exception e) {
+            Log.error(e);
         }
         return new ArrayList<>();
     }
@@ -714,12 +702,10 @@ public class EventDatabase {
     }
 
     public static ArrayList<JHVAssociation> associations2Program(long start, long end, SWEKSupplier type) {
-        FutureTask<ArrayList<JHVAssociation>> ft = new FutureTask<>(new Associations2Program(start, end, type));
-        executor.execute(ft);
         try {
-            return ft.get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            return executor.invokeAndWait(new Associations2Program(start, end, type));
+        } catch (Exception e) {
+            Log.error(e);
         }
         return new ArrayList<>();
     }
@@ -766,12 +752,10 @@ public class EventDatabase {
     }
 
     private static ArrayList<JsonEvent> relations2Program(int event_id, SWEKSupplier type_left, SWEKSupplier type_right, String param_left, String param_right) {
-        FutureTask<ArrayList<JsonEvent>> ft = new FutureTask<>(new Relations2Program(event_id, type_left, type_right, param_left, param_right));
-        executor.execute(ft);
         try {
-            return ft.get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            return executor.invokeAndWait(new Relations2Program(event_id, type_left, type_right, param_left, param_right));
+        } catch (Exception e) {
+            Log.error(e);
         }
         return new ArrayList<>();
     }
@@ -890,15 +874,12 @@ public class EventDatabase {
 
     @Nullable
     private static JsonEvent event2Program(int event_id) {
-        FutureTask<JsonEvent> ft = new FutureTask<>(new Event2Program(event_id));
-        executor.execute(ft);
-        JsonEvent evt = null;
         try {
-            evt = ft.get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            return executor.invokeAndWait(new Event2Program(event_id));
+        } catch (Exception e) {
+            Log.error(e);
         }
-        return evt;
+        return null;
     }
 
 }
