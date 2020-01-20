@@ -229,6 +229,7 @@ class CalendarPicker extends JPanel {
             table.setCellSelectionEnabled(true);
             table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             table.setShowGrid(false);
+            table.setRequestFocusEnabled(false); // allow calendarButton to keep focus
             // avoid reordering and resizing of columns
             table.getTableHeader().setReorderingAllowed(false);
             table.getTableHeader().setResizingAllowed(false);
