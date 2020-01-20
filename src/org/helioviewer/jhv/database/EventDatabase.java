@@ -640,7 +640,7 @@ public class EventDatabase {
         }
 
         @Override
-        public ArrayList<JHVEvent> call() {
+        public ArrayList<JHVEvent> call() throws Exception {
             Connection connection = EventDatabaseThread.getConnection();
             ArrayList<JHVEvent> eventList = new ArrayList<>();
             if (connection == null) {
@@ -649,36 +649,31 @@ public class EventDatabase {
 
             int typeId = getEventTypeId(connection, type);
             if (typeId != -1) {
-                try {
-                    String join = "LEFT JOIN " + type.getDatabaseName() + " AS tp ON tp.event_id=e.id";
-                    StringBuilder and = new StringBuilder();
-                    for (SWEKParam p : params) {
-                        if (!p.param.equals("provider")) {
-                            and.append("AND tp.").append(p.param).append(p.operand.representation).append(p.value).append(' ');
-                        }
+                String join = "LEFT JOIN " + type.getDatabaseName() + " AS tp ON tp.event_id=e.id";
+                StringBuilder and = new StringBuilder();
+                for (SWEKParam p : params) {
+                    if (!p.param.equals("provider")) {
+                        and.append("AND tp.").append(p.param).append(p.operand.representation).append(p.value).append(' ');
                     }
-                    String sqlt = "SELECT e.id, e.start, e.end, e.data FROM events AS e " + join + " WHERE e.start BETWEEN ? AND ? and e.type_id=? " + and + " order by e.start, e.end ";
-                    PreparedStatement pstatement = getPreparedStatement(connection, sqlt);
-                    pstatement.setLong(1, start);
-                    pstatement.setLong(2, end);
-                    pstatement.setInt(3, typeId);
+                }
+                String sqlt = "SELECT e.id, e.start, e.end, e.data FROM events AS e " + join + " WHERE e.start BETWEEN ? AND ? and e.type_id=? " + and + " order by e.start, e.end ";
+                PreparedStatement pstatement = getPreparedStatement(connection, sqlt);
+                pstatement.setLong(1, start);
+                pstatement.setLong(2, end);
+                pstatement.setInt(3, typeId);
 
-                    try (ResultSet rs = pstatement.executeQuery()) {
-                        while (rs.next()) {
-                            int id = rs.getInt(1);
-                            long _start = rs.getLong(2);
-                            long _end = rs.getLong(3);
-                            byte[] json = rs.getBytes(4);
-                            try {
-                                eventList.add(parseJSON(new JsonEvent(json, type, id, _start, _end), false));
-                            } catch (Exception e) {
-                                Log.error(e);
-                            }
+                try (ResultSet rs = pstatement.executeQuery()) {
+                    while (rs.next()) {
+                        int id = rs.getInt(1);
+                        long _start = rs.getLong(2);
+                        long _end = rs.getLong(3);
+                        byte[] json = rs.getBytes(4);
+                        try {
+                            eventList.add(parseJSON(new JsonEvent(json, type, id, _start, _end), false));
+                        } catch (Exception e) {
+                            Log.error(e);
                         }
                     }
-                } catch (SQLException e) {
-                    Log.error("Could not fetch events " + e.getMessage());
-                    return eventList;
                 }
             }
             return eventList;
