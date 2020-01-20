@@ -7,19 +7,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
 
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVThread;
+import org.helioviewer.jhv.threads.SerialExecutor;
 
 public class SourcesDatabase extends Thread {
 
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor(new JHVThread.NamedClassThreadFactory(SourcesDatabase.class, "SourcesDatabase"));
+    private static final SerialExecutor executor = new SerialExecutor(new JHVThread.NamedClassThreadFactory(SourcesDatabase.class, "SourcesDatabase"));
 
     private static Connection connection;
     private static PreparedStatement insert;
@@ -50,14 +47,12 @@ public class SourcesDatabase extends Thread {
         }
     }
 
-    public static void insert(int sourceId, @Nonnull String server, @Nonnull String observatory, @Nonnull String dataset, long start, long end) {
-        FutureTask<Void> ft = new FutureTask<>(new Insert(sourceId, server, observatory, dataset, start, end));
-        executor.execute(ft);
-     /* try {
-            ft.get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        } */
+    public static void doInsert(int sourceId, @Nonnull String server, @Nonnull String observatory, @Nonnull String dataset, long start, long end) {
+        try {
+            executor.invokeAndWait(new Insert(sourceId, server, observatory, dataset, start, end));
+        } catch (Exception e) {
+            Log.error("SourcesDatabase.doInsert", e);
+        }
     }
 
     private static class Insert implements Callable<Void> {
@@ -79,33 +74,24 @@ public class SourcesDatabase extends Thread {
         }
 
         @Override
-        public Void call() {
-            if (connection == null)
-                return null;
-
-            try {
-                insert.setInt(1, sourceId);
-                insert.setString(2, server);
-                insert.setString(3, observatory);
-                insert.setString(4, dataset);
-                insert.setLong(5, start);
-                insert.setLong(6, end);
-                insert.executeUpdate();
-            } catch (SQLException e) {
-                Log.error("Failed to insert", e);
-            }
+        public Void call() throws Exception {
+            insert.setInt(1, sourceId);
+            insert.setString(2, server);
+            insert.setString(3, observatory);
+            insert.setString(4, dataset);
+            insert.setLong(5, start);
+            insert.setLong(6, end);
+            insert.executeUpdate();
             return null;
         }
 
     }
 
-    public static int select(@Nonnull String server, @Nonnull String observatory, @Nonnull String dataset) {
-        FutureTask<Integer> ft = new FutureTask<>(new Select(server, observatory, dataset));
-        executor.execute(ft);
+    public static int doSelect(@Nonnull String server, @Nonnull String observatory, @Nonnull String dataset) {
         try {
-            return ft.get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            return executor.invokeAndWait(new Select(server, observatory, dataset));
+        } catch (Exception e) {
+            Log.error("SourcesDatabase.doSelect", e);
         }
         return -1;
     }
@@ -123,22 +109,15 @@ public class SourcesDatabase extends Thread {
         }
 
         @Override
-        public Integer call() {
+        public Integer call() throws Exception {
+            select.setString(1, server);
+            select.setString(2, '%' + observatory + '%');
+            select.setString(3, '%' + dataset + '%');
+
             int res = -1;
-            if (connection == null)
-                return res;
-
-            try {
-                select.setString(1, server);
-                select.setString(2, '%' + observatory + '%');
-                select.setString(3, '%' + dataset + '%');
-
-                try (ResultSet rs = select.executeQuery()) {
-                    if (rs.next())
-                        res = rs.getInt(1);
-                }
-            } catch (SQLException e) {
-                Log.error("Failed to select", e);
+            try (ResultSet rs = select.executeQuery()) {
+                if (rs.next())
+                    res = rs.getInt(1);
             }
             return res;
         }

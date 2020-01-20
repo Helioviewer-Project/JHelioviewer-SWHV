@@ -64,7 +64,7 @@ public class DataSourcesParser {
 
                 TreeNode[] path = treeNode.getPath();
                 if (path.length == 3) {
-                    SourcesDatabase.insert(sourceId, path[0].toString(), path[1].toString(), path[2].toString(), start, end);
+                    SourcesDatabase.doInsert(sourceId, path[0].toString(), path[1].toString(), path[2].toString(), start, end);
                 }
                 if (item.defaultItem)
                     defaultNode = treeNode;

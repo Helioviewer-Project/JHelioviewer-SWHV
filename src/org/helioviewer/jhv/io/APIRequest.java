@@ -109,7 +109,7 @@ public class APIRequest {
         if (DataSources.getServerSetting(_server, "API.getDataSources") == null)
             _server = Settings.getProperty("default.server");
 
-        int _sourceId = SourcesDatabase.select(_server, observatory, dataset);
+        int _sourceId = SourcesDatabase.doSelect(_server, observatory, dataset);
         if (_sourceId < 0)
             throw new Exception("Empty request result");
 
