@@ -548,7 +548,7 @@ public class EventDatabase {
         }
 
         @Override
-        public ArrayList<Interval> call() {
+        public ArrayList<Interval> call() throws Exception {
             Connection connection = EventDatabaseThread.getConnection();
             if (connection == null) {
                 return new ArrayList<>();
@@ -564,19 +564,14 @@ public class EventDatabase {
 
                 int typeId = getEventTypeId(connection, type);
                 if (typeId != -1) {
-                    try {
-                        PreparedStatement pstatement = getPreparedStatement(connection, SELECT_DATERANGE);
-                        pstatement.setInt(1, typeId);
-
-                        try (ResultSet rs = pstatement.executeQuery()) {
-                            while (rs.next()) {
-                                long beginDate = Math.min(invalidationDate, rs.getLong(1));
-                                long endDate = Math.min(invalidationDate, rs.getLong(2));
-                                typedCache.adaptRequestCache(beginDate, endDate);
-                            }
+                    PreparedStatement pstatement = getPreparedStatement(connection, SELECT_DATERANGE);
+                    pstatement.setInt(1, typeId);
+                    try (ResultSet rs = pstatement.executeQuery()) {
+                        while (rs.next()) {
+                            long beginDate = Math.min(invalidationDate, rs.getLong(1));
+                            long endDate = Math.min(invalidationDate, rs.getLong(2));
+                            typedCache.adaptRequestCache(beginDate, endDate);
                         }
-                    } catch (SQLException e) {
-                        Log.error("Could db2daterange " + e.getMessage());
                     }
                 }
             }
