@@ -233,11 +233,12 @@ public class EventDatabase {
         }
 
         @Override
-        public Integer call() {
+        public Integer call() throws Exception {
             Connection connection = EventDatabaseThread.getConnection();
             if (connection == null) {
                 return -1;
             }
+
             int len = assocs.length;
             int i = 0;
             int errorcode = 0;
@@ -246,27 +247,17 @@ public class EventDatabase {
                 int id0 = getIdFromUID(connection, assoc.a);
                 int id1 = getIdFromUID(connection, assoc.b);
                 if (id0 != -1 && id1 != -1) {
-                    try {
-                        PreparedStatement pstatement = getPreparedStatement(connection, INSERT_LINK);
-                        pstatement.setInt(1, id0);
-                        pstatement.setInt(2, id1);
-                        pstatement.executeUpdate();
-                    } catch (SQLException e) {
-                        Log.error("Failed to insert event type " + e.getMessage());
-                        errorcode = -1;
-                    }
+                    PreparedStatement pstatement = getPreparedStatement(connection, INSERT_LINK);
+                    pstatement.setInt(1, id0);
+                    pstatement.setInt(2, id1);
+                    pstatement.executeUpdate();
                 } else {
                     errorcode = -1;
                     Log.error("Could not add association to database ");
                 }
                 i++;
             }
-            try {
-                connection.commit();
-            } catch (SQLException e1) {
-                Log.error("Could not reset autocommit");
-                errorcode = -1;
-            }
+            connection.commit();
             return errorcode;
         }
     }
