@@ -4,7 +4,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Nonnull;
 import javax.swing.BoxLayout;
@@ -239,9 +238,7 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            if (t instanceof InterruptedException || t instanceof ExecutionException)
-                return; // ignore ?
-            Log.error("SWEKEventInformationDialog error", t);
+            Log.error("SWEKEventInformationDialog", t);
         }
 
     }
