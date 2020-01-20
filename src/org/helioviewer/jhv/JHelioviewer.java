@@ -79,6 +79,7 @@ public class JHelioviewer {
         // if (true) throw new RuntimeException("This is a Sentry test. Please ignore.");
 
         FitsFactory.setUseHierarch(true);
+        FitsFactory.setLongStringsEnabled(true);
 
         try {
             JHVLoader.loadKDULibs();
