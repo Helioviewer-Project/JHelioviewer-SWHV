@@ -12,6 +12,8 @@ import java.util.Optional;
 import org.everit.json.schema.FormatValidator;
 import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
 
+import org.helioviewer.jhv.astronomy.Spice;
+
 public class TimeUtils {
 
     private static final ZoneOffset ZERO = ZoneOffset.ofTotalSeconds(0);
@@ -95,6 +97,9 @@ public class TimeUtils {
 
     public static long optParse(String date, long alt) {
         try {
+            String spice = Spice.dateParse2UTC(date);
+            if (spice != null)
+                return parse(spice);
             return roundSec(prettyParser.parse(date).get(0).getTime());
         } catch (Exception e) {
             return alt;
