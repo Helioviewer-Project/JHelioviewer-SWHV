@@ -59,11 +59,7 @@ public class JHelioviewer {
         // Init log
         LogSettings.init("/settings/log4j.properties", JHVDirectory.LOGS.getPath());
         // Information log message
-        StringBuilder argString = new StringBuilder();
-        for (String arg : args) {
-            argString.append(' ').append(arg);
-        }
-        Log.info("JHelioviewer started with command-line options:" + argString);
+        Log.info("JHelioviewer started with command-line options: " + String.join(" ", args));
 
         // This attempts to create the necessary directories for the application
         JHVGlobals.createDirs();
@@ -77,30 +73,6 @@ public class JHelioviewer {
         System.setProperty("org.lwjgl.system.SharedLibraryExtractPath", JHVGlobals.libCacheDir.toString());
         // System.setProperty("jsamp.nosystray", "true");
         // if (true) throw new RuntimeException("This is a Sentry test. Please ignore.");
-
-        FitsFactory.setUseHierarch(true);
-        FitsFactory.setLongStringsEnabled(true);
-
-        try {
-            JHVLoader.loadKDULibs();
-            KakaduMessageSystem.startKduMessageSystem();
-        } catch (Exception e) {
-            Message.err("Failed to setup Kakadu", e.getMessage(), true);
-            return;
-        }
-
-        try {
-            JPIPCacheManager.init();
-        } catch (Exception e) {
-            Log.error("JPIP cache initialization error", e);
-        }
-
-        ProxySettings.init();
-        try {
-            AIAResponse.load();
-        } catch (Exception e) {
-            Log.error("AIA response map load error", e);
-        }
 
         EventQueue.invokeLater(() -> {
             UIGlobals.setUIFont(UIGlobals.uiFont);
@@ -130,6 +102,8 @@ public class JHelioviewer {
 
             UITimer.start();
 
+            initialize();
+
             DataSources.loadSources();
             CommandLine.load();
             SampClient.init();
@@ -137,6 +111,32 @@ public class JHelioviewer {
             new JHVUpdate(false).check();
         });
     }
+
+    private static void initialize() {
+        FitsFactory.setUseHierarch(true);
+        FitsFactory.setLongStringsEnabled(true);
+
+        try {
+            JHVLoader.loadKDULibs();
+            KakaduMessageSystem.startKduMessageSystem();
+        } catch (Exception e) {
+            Message.err("Failed to setup Kakadu", e.getMessage(), true);
+            return;
+        }
+
+        try {
+            JPIPCacheManager.init();
+        } catch (Exception e) {
+            Log.error("JPIP cache initialization error", e);
+        }
+
+        ProxySettings.init();
+        try {
+            AIAResponse.load();
+        } catch (Exception e) {
+            Log.error("AIA response map load error", e);
+        }
+    } 
 
     private static boolean isHeadless() {
         if (GraphicsEnvironment.isHeadless()) {
