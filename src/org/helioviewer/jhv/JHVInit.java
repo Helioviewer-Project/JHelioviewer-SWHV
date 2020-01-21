@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.ProxySettings;
@@ -15,8 +16,6 @@ import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.view.j2k.kakadu.KakaduMessageSystem;
 
 import nom.tam.fits.FitsFactory;
-
-import spice.basic.KernelDatabase;
 
 class JHVInit {
 
@@ -87,9 +86,9 @@ class JHVInit {
             try (InputStream in = FileUtils.getResource("/kernels/" + k)) {
                 File f = new File(JHVGlobals.kernelCacheDir, k);
                 Files.copy(in, f.toPath());
-                KernelDatabase.load(f.getAbsolutePath());
+                Spice.loadKernel(f.getAbsolutePath());
             } catch (Exception e) {
-                Log.error("SPICE kernels load error", e);
+                Log.error("SPICE kernel load error", e);
             }
         });
     }
