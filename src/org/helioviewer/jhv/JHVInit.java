@@ -19,7 +19,6 @@ import nom.tam.fits.FitsFactory;
 
 import spice.basic.KernelDatabase;
 import spice.basic.SpiceErrorException;
-import spice.basic.TDBTime;
 
 class JHVInit {
 
@@ -53,13 +52,6 @@ class JHVInit {
         } catch (Exception e) {
             Log.error("SPICE kernels load error", e);
         }
-
-        try {
-            System.out.println(">>> " + new TDBTime("2020 jan 21").toUTCString("isoc", 0));
-        } catch (SpiceErrorException e) {
-            System.out.println(">>> " + e.getMessage());
-        }
-
     }
 
     private static void loadKDULibs() throws IOException {
