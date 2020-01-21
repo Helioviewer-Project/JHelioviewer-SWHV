@@ -1,11 +1,11 @@
 package org.helioviewer.jhv.io;
 
 import java.io.InterruptedIOException;
-import java.lang.RuntimeException;
 import java.net.URI;
 import java.nio.channels.ClosedByInterruptException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.Future;
@@ -73,7 +73,14 @@ public class LoadLayer {
             if (uriList.size() == 1) {
                 return loadView(executor, null, uriList.get(0), null);
             } else {
-                List<View> views = uriList.parallelStream().map(uri -> loadView(executor, null, uri, null)).collect(Collectors.toList());
+                List<View> views = uriList.parallelStream().map(uri -> {
+                    try {
+                        return loadView(executor, null, uri, null);
+                    } catch (Exception e) {
+                        Log.error(e);
+                        return null;
+                    }
+                }).filter(Objects::nonNull).collect(Collectors.toList());
                 return new ManyView(views);
             }
         }
@@ -132,18 +139,14 @@ public class LoadLayer {
     }
 
     @Nonnull
-    private static View loadView(DecodeExecutor executor, APIRequest req, URI uri, APIResponse res) {
+    private static View loadView(DecodeExecutor executor, APIRequest req, URI uri, APIResponse res) throws Exception {
         String loc = uri.toString().toLowerCase(Locale.ENGLISH);
-        try {
-            if (loc.endsWith(".fits") || loc.endsWith(".fts")) {
-                return new URIView(executor, req, uri, URIView.URIType.FITS);
-            } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
-                return new URIView(executor, req, uri, URIView.URIType.GENERIC);
-            } else {
-                return new J2KView(executor, req, uri, res);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        if (loc.endsWith(".fits") || loc.endsWith(".fts")) {
+            return new URIView(executor, req, uri, URIView.URIType.FITS);
+        } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
+            return new URIView(executor, req, uri, URIView.URIType.GENERIC);
+        } else {
+            return new J2KView(executor, req, uri, res);
         }
     }
 
