@@ -1,7 +1,6 @@
 package org.helioviewer.jhv;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ import org.helioviewer.jhv.view.j2k.kakadu.KakaduMessageSystem;
 import nom.tam.fits.FitsFactory;
 
 import spice.basic.KernelDatabase;
-import spice.basic.SpiceErrorException;
 
 class JHVInit {
 
@@ -26,13 +24,14 @@ class JHVInit {
         FitsFactory.setUseHierarch(true);
         FitsFactory.setLongStringsEnabled(true);
 
+        loadKDULibs();
         try {
-            loadKDULibs();
             KakaduMessageSystem.startKduMessageSystem();
         } catch (Exception e) {
             Message.err("Failed to setup Kakadu", e.getMessage(), true);
             return;
         }
+        loadKernels();
 
         try {
             JPIPCacheManager.init();
@@ -46,15 +45,9 @@ class JHVInit {
         } catch (Exception e) {
             Log.error("AIA response map load error", e);
         }
-
-        try {
-            loadKernels();
-        } catch (Exception e) {
-            Log.error("SPICE kernels load error", e);
-        }
     }
 
-    private static void loadKDULibs() throws IOException {
+    private static void loadKDULibs() {
         String pathlib = "";
         ArrayList<String> kduLibs = new ArrayList<>();
 
@@ -75,26 +68,30 @@ class JHVInit {
         kduLibs.add(System.mapLibraryName("kdu_jni"));
         kduLibs.add(System.mapLibraryName("JNISpice"));
 
-        for (String kduLib : kduLibs) {
-            try (InputStream in = FileUtils.getResource("/natives/" + pathlib + kduLib)) {
-                File f = new File(JHVGlobals.libCacheDir, kduLib);
+        String fullDir = "/natives/" + pathlib;
+        kduLibs.parallelStream().forEach(k -> {
+            try (InputStream in = FileUtils.getResource(fullDir + k)) {
+                File f = new File(JHVGlobals.libCacheDir, k);
                 Files.copy(in, f.toPath());
                 System.load(f.getAbsolutePath());
+            } catch (Exception e) {
+                Log.error("Native library load error", e);
             }
-        }
+        });
     }
 
-    private static void loadKernels() throws IOException, SpiceErrorException {
+    private static void loadKernels() {
         List<String> kernels = List.of("naif0012.tls");
 
-        for (String k : kernels) {
+        kernels.parallelStream().forEach(k -> {
             try (InputStream in = FileUtils.getResource("/kernels/" + k)) {
                 File f = new File(JHVGlobals.kernelCacheDir, k);
                 Files.copy(in, f.toPath());
                 KernelDatabase.load(f.getAbsolutePath());
+            } catch (Exception e) {
+                Log.error("SPICE kernels load error", e);
             }
-        }
-
+        });
     }
 
 }
