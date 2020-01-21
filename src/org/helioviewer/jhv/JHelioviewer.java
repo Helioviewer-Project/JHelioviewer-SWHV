@@ -12,24 +12,17 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
-import org.helioviewer.jhv.io.ProxySettings;
 import org.helioviewer.jhv.io.SampClient;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.log.LogSettings;
-import org.helioviewer.jhv.metadata.AIAResponse;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
-import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCacheManager;
-import org.helioviewer.jhv.view.j2k.kakadu.KakaduMessageSystem;
-
-import nom.tam.fits.FitsFactory;
 
 public class JHelioviewer {
 
@@ -99,11 +92,9 @@ public class JHelioviewer {
             frame.pack();
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
-
             UITimer.start();
 
-            initialize();
-
+            JHVInit.init();
             DataSources.loadSources();
             CommandLine.load();
             SampClient.init();
@@ -111,32 +102,6 @@ public class JHelioviewer {
             new JHVUpdate(false).check();
         });
     }
-
-    private static void initialize() {
-        FitsFactory.setUseHierarch(true);
-        FitsFactory.setLongStringsEnabled(true);
-
-        try {
-            JHVLoader.loadKDULibs();
-            KakaduMessageSystem.startKduMessageSystem();
-        } catch (Exception e) {
-            Message.err("Failed to setup Kakadu", e.getMessage(), true);
-            return;
-        }
-
-        try {
-            JPIPCacheManager.init();
-        } catch (Exception e) {
-            Log.error("JPIP cache initialization error", e);
-        }
-
-        ProxySettings.init();
-        try {
-            AIAResponse.load();
-        } catch (Exception e) {
-            Log.error("AIA response map load error", e);
-        }
-    } 
 
     private static boolean isHeadless() {
         if (GraphicsEnvironment.isHeadless()) {
