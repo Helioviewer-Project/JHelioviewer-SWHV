@@ -6,11 +6,45 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 
+import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.FileUtils;
+import org.helioviewer.jhv.io.ProxySettings;
+import org.helioviewer.jhv.log.Log;
+import org.helioviewer.jhv.metadata.AIAResponse;
+import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCacheManager;
+import org.helioviewer.jhv.view.j2k.kakadu.KakaduMessageSystem;
 
-class JHVLoader {
+import nom.tam.fits.FitsFactory;
 
-    public static void loadKDULibs() throws IOException {
+class JHVInit {
+
+    static void init() {
+        FitsFactory.setUseHierarch(true);
+        FitsFactory.setLongStringsEnabled(true);
+
+        try {
+            loadKDULibs();
+            KakaduMessageSystem.startKduMessageSystem();
+        } catch (Exception e) {
+            Message.err("Failed to setup Kakadu", e.getMessage(), true);
+            return;
+        }
+
+        try {
+            JPIPCacheManager.init();
+        } catch (Exception e) {
+            Log.error("JPIP cache initialization error", e);
+        }
+
+        ProxySettings.init();
+        try {
+            AIAResponse.load();
+        } catch (Exception e) {
+            Log.error("AIA response map load error", e);
+        }
+    }
+
+    private static void loadKDULibs() throws IOException {
         String pathlib = "";
         ArrayList<String> kduLibs = new ArrayList<>();
 
