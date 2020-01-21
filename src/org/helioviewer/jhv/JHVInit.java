@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.FileUtils;
@@ -15,6 +16,10 @@ import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.view.j2k.kakadu.KakaduMessageSystem;
 
 import nom.tam.fits.FitsFactory;
+
+import spice.basic.KernelDatabase;
+import spice.basic.SpiceErrorException;
+import spice.basic.TDBTime;
 
 class JHVInit {
 
@@ -42,6 +47,19 @@ class JHVInit {
         } catch (Exception e) {
             Log.error("AIA response map load error", e);
         }
+
+        try {
+            loadKernels();
+        } catch (Exception e) {
+            Log.error("SPICE kernels load error", e);
+        }
+
+        try {
+            System.out.println(">>> " + new TDBTime("2020 jan 21").toUTCString("isoc", 0));
+        } catch (SpiceErrorException e) {
+            System.out.println(">>> " + e.getMessage());
+        }
+
     }
 
     private static void loadKDULibs() throws IOException {
@@ -62,6 +80,10 @@ class JHVInit {
             kduLibs.add(System.mapLibraryName("kdu_v7AR"));
             kduLibs.add(System.mapLibraryName("kdu_a7AR"));
         }
+        if (System.getProperty("jhv.os").equals("mac")) {
+            kduLibs.add(System.mapLibraryName("JNISpice"));
+        }
+
         kduLibs.add(System.mapLibraryName("kdu_jni"));
 
         for (String kduLib : kduLibs) {
@@ -71,6 +93,19 @@ class JHVInit {
                 System.load(f.getAbsolutePath());
             }
         }
+    }
+
+    private static void loadKernels() throws IOException, SpiceErrorException {
+        List<String> kernels = List.of("naif0012.tls");
+
+        for (String k : kernels) {
+            try (InputStream in = FileUtils.getResource("/kernels/" + k)) {
+                File f = new File(JHVGlobals.kernelCacheDir, k);
+                Files.copy(in, f.toPath());
+                KernelDatabase.load(f.getAbsolutePath());
+            }
+        }
+
     }
 
 }
