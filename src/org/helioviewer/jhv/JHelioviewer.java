@@ -94,11 +94,11 @@ public class JHelioviewer {
                 Log.error("Plugin load error", e);
             }
 
+            JComponent leftPane = JHVFrame.getLeftScrollPane();
+            leftPane.setMinimumSize(new Dimension(leftPane.getPreferredSize().width + 10, -1));
             frame.pack();
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
-            JComponent leftPane = JHVFrame.getLeftScrollPane();
-            leftPane.setMinimumSize(new Dimension(leftPane.getPreferredSize().width + 10, -1));
 
             UITimer.start();
 
