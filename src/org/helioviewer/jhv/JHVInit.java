@@ -72,11 +72,8 @@ class JHVInit {
             kduLibs.add(System.mapLibraryName("kdu_v7AR"));
             kduLibs.add(System.mapLibraryName("kdu_a7AR"));
         }
-        if (System.getProperty("jhv.os").equals("mac")) {
-            kduLibs.add(System.mapLibraryName("JNISpice"));
-        }
-
         kduLibs.add(System.mapLibraryName("kdu_jni"));
+        kduLibs.add(System.mapLibraryName("JNISpice"));
 
         for (String kduLib : kduLibs) {
             try (InputStream in = FileUtils.getResource("/natives/" + pathlib + kduLib)) {
