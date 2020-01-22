@@ -8,7 +8,7 @@ public enum Frame {
 
     public final ReferenceFrame frame;
 
-    private Frame() {
+    Frame() {
         try {
             frame = new ReferenceFrame(toString());
         } catch (SpiceException e) {
