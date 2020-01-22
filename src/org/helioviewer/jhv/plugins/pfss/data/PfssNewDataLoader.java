@@ -3,33 +3,40 @@ package org.helioviewer.jhv.plugins.pfss.data;
 import java.awt.EventQueue;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssSettings;
-import org.helioviewer.jhv.threads.JHVWorker;
+import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import okio.BufferedSource;
 
-public class PfssNewDataLoader extends JHVWorker<Void, Void> {
+import com.google.common.util.concurrent.FutureCallback;
+
+public class PfssNewDataLoader implements Callable<Void> {
+
+    public static Future<Void> submit(long start, long end) {
+        return EventQueueCallbackExecutor.pool.submit(new PfssNewDataLoader(start, end), new Callback(start));
+    }
 
     private final long start;
     private final long end;
 
-    public PfssNewDataLoader(long _start, long _end) {
+    private PfssNewDataLoader(long _start, long _end) {
         PfssPlugin.downloads++;
         start = _start;
         end = _end;
     }
 
-    @Nullable
     @Override
-    protected Void backgroundWork() {
+    public Void call() {
         Calendar cal = Calendar.getInstance();
 
         cal.setTimeInMillis(start);
@@ -70,10 +77,26 @@ public class PfssNewDataLoader extends JHVWorker<Void, Void> {
         return null;
     }
 
-    @Override
-    protected void done() {
-        PfssPlugin.downloads--;
-        PfssPlugin.getPfsscache().getNearestData(start); // preload first
+    private static class Callback implements FutureCallback<Void> {
+
+        private final long start;
+
+        Callback(long _start) {
+            start = _start;
+        }
+
+        @Override
+        public void onSuccess(Void result) {
+            PfssPlugin.downloads--;
+            PfssPlugin.getPfsscache().getNearestData(start); // preload first
+        }
+
+        @Override
+        public void onFailure(@Nonnull Throwable t) {
+            PfssPlugin.downloads--;
+            Log.error("PfssNewDataLoader", t);
+        }
+
     }
 
 }
