@@ -31,7 +31,7 @@ class SpaceObjectElement implements PositionReceiver {
             uv.unsetPositionLoad(load);
         }
 
-        load = PositionLoad.execute(this, observer, target, frame, startTime, endTime);
+        load = PositionLoad.submit(this, observer, target, frame, startTime, endTime);
         uv.setPositionLoad(load);
     }
 
