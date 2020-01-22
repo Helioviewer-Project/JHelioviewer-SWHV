@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.astronomy;
 
-import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
@@ -107,12 +106,13 @@ public class Spice extends Thread {
 
         @Override
         public PositionCartesian[] call() throws SpiceException {
-            //Stopwatch sw = Stopwatch.createStarted();
-            ArrayList<PositionCartesian> list = new ArrayList<>();
-            for (long t = start; t <= end; t += deltat * 1000) {
-                list.add(position(target, t, frame, observer));
+            // Stopwatch sw = Stopwatch.createStarted();
+            long dt = deltat * 1000;
+            PositionCartesian[] ret = new PositionCartesian[(int) ((end - start) / dt) + 1];
+            int i = 0;
+            for (long t = start; t <= end; t += dt) {
+                ret[i++] = position(target, t, frame, observer);
             }
-            PositionCartesian[] ret = list.toArray(PositionCartesian[]::new);
             //System.out.println((sw.elapsed().toNanos() / 1e9));
             return ret;
         }
