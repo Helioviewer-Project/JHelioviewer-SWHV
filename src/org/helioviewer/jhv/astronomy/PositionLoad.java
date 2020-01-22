@@ -20,10 +20,10 @@ import spice.basic.Body;
 
 public class PositionLoad {
 
-    private static final int MAX_POINTS = 10000;
-    private static final String baseURL = "http://swhv.oma.be/position?";
-
     private static class LoadPosition implements Callable<PositionResponse> {
+
+        private static final int MAX_POINTS = 10000;
+        private static final String baseURL = "http://swhv.oma.be/position?";
 
         private final SpaceObject observer;
         private final SpaceObject target;
