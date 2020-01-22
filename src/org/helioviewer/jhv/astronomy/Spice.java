@@ -1,14 +1,25 @@
 package org.helioviewer.jhv.astronomy;
 
+import java.util.ArrayList;
 import java.util.concurrent.Callable;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.SingleExecutor;
 import org.helioviewer.jhv.threads.JHVThread;
+import org.helioviewer.jhv.time.JHVDate;
 
+import spice.basic.Body;
 import spice.basic.KernelDatabase;
+import spice.basic.PositionVector;
+import spice.basic.ReferenceFrame;
 import spice.basic.SpiceErrorException;
+import spice.basic.SpiceException;
 import spice.basic.TDBTime;
+import spice.basic.TDTDuration;
+import spice.basic.TDTTime;
 
 public class Spice extends Thread {
 
@@ -18,7 +29,7 @@ public class Spice extends Thread {
         super(r, name);
     }
 
-    public static void loadKernel(String file) {
+    public static void loadKernel(@Nonnull String file) {
         executor.invokeLater(new LoadKernel(file));
     }
 
@@ -41,7 +52,8 @@ public class Spice extends Thread {
 
     }
 
-    public static String dateParse2UTC(String date) {
+    @Nullable
+    public static String dateParse2UTC(@Nonnull String date) {
         try {
             return executor.invokeAndWait(new DateParse2UTC(date));
         } catch (Exception e) {
@@ -61,6 +73,57 @@ public class Spice extends Thread {
         @Override
         public String call() throws SpiceErrorException {
             return new TDBTime(date).toUTCString("isoc", 0);
+        }
+
+    }
+
+    @Nullable
+    static PositionCartesian[] getPosition(@Nonnull Body observer, @Nonnull Body target, @Nonnull ReferenceFrame referenceFrame, long start, long end, long deltat) {
+        try {
+            return executor.invokeAndWait(new GetPosition(observer, target, referenceFrame, start, end, deltat));
+        } catch (Exception e) {
+            Log.error(e);
+        }
+        return null;
+    }
+
+    private static class GetPosition implements Callable<PositionCartesian[]> {
+
+        private final Body observer;
+        private final Body target;
+        private final ReferenceFrame referenceFrame;
+        private final long start;
+        private final long end;
+        private final long deltat;
+
+        GetPosition(Body _observer, Body _target, ReferenceFrame _referenceFrame, long _start, long _end, long _deltat) {
+            observer = _observer;
+            target = _target;
+            referenceFrame = _referenceFrame;
+            start = _start;
+            end = _end;
+            deltat = _deltat;
+        }
+
+        @Override
+        public PositionCartesian[] call() throws SpiceException {
+            ArrayList<PositionCartesian> ret = new ArrayList<>();
+
+            TDTDuration duration = new TDTDuration(deltat);
+            TDTTime tdt = new TDTTime(new JHVDate(start).toString());
+            TDTTime tdtEnd = new TDTTime(new JHVDate(end).toString());
+
+            long milli = start;
+            while (tdt.getTDTSeconds() <= tdtEnd.getTDTSeconds()) {
+                PositionVector v = new PositionVector(target, tdt, referenceFrame, AbCorrection.NONE.correction, observer);
+                ret.add(new PositionCartesian(milli,
+                        v.getElt(0) * Sun.RadiusKMeterInv,
+                        v.getElt(1) * Sun.RadiusKMeterInv,
+                        v.getElt(2) * Sun.RadiusKMeterInv));
+                tdt = tdt.add(duration);
+                milli += deltat;
+            }
+            return ret.toArray(PositionCartesian[]::new);
         }
 
     }

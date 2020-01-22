@@ -6,11 +6,11 @@ import spice.basic.SpiceException;
 public enum Frame {
     HCI, HEEQ, HEE;
 
-    public final ReferenceFrame frame;
+    public final ReferenceFrame referenceFrame;
 
     Frame() {
         try {
-            frame = new ReferenceFrame(toString());
+            referenceFrame = new ReferenceFrame(toString());
         } catch (SpiceException e) {
             throw new ExceptionInInitializerError(e);
         }
