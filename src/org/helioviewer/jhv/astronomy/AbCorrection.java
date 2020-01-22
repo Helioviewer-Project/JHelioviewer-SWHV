@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets;
 import spice.basic.AberrationCorrection;
 import spice.basic.SpiceErrorException;
 
-public enum AbCorrection {
+enum AbCorrection {
     NONE("NONE"), LT("LT"), LTS("LT+S"), XLT("XLT"), XLTS("XLT+S");
 
     public final String code;

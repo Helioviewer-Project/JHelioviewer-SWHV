@@ -1,21 +1,21 @@
 package org.helioviewer.jhv.base.scale;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
-import org.helioviewer.jhv.position.Position;
 
-public interface Transform {
+public interface GridTransform {
 
     Vec2 transform(Position viewpoint, Vec3 pt, GridScale scale);
 
     Vec3 transformInverse(Quat frame, Vec2 pt);
 
-    Transform transformpolar = new TransformPolar();
-    Transform transformlatitudinal = new TransformLatitudinal();
+    GridTransform transformpolar = new GridTransformPolar();
+    GridTransform transformlatitudinal = new GridTransformLatitudinal();
 
-    class TransformPolar implements Transform {
+    class GridTransformPolar implements GridTransform {
         @Override
         public Vec2 transform(Position viewpoint, Vec3 pt, GridScale scale) {
             Quat q = new Quat(viewpoint.lat, 0);
@@ -40,7 +40,7 @@ public interface Transform {
         }
     }
 
-    class TransformLatitudinal implements Transform {
+    class GridTransformLatitudinal implements GridTransform {
         @Override
         public Vec2 transform(Position viewpoint, Vec3 pt, GridScale scale) {
             double theta = Math.PI / 2 - Math.acos(-pt.y);

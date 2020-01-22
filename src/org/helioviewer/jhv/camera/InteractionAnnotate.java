@@ -5,6 +5,7 @@ import java.awt.event.MouseEvent;
 
 import java.util.ArrayList;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
 import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
@@ -15,7 +16,6 @@ import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
-import org.helioviewer.jhv.position.Position;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

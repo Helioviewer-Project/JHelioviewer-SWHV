@@ -1,8 +1,7 @@
-package org.helioviewer.jhv.position;
+package org.helioviewer.jhv.astronomy;
 
 import java.util.Iterator;
 
-import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVDate;
@@ -11,20 +10,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class PositionResponse {
-
-    private static class PositionCartesian {
-        final long milli;
-        final double x;
-        final double y;
-        final double z;
-
-        PositionCartesian(long _milli, double _x, double _y, double _z) {
-            milli = _milli;
-            x = _x;
-            y = _y;
-            z = _z;
-        }
-    }
 
     private final PositionCartesian[] position;
     private final long positionStart;

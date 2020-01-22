@@ -1,8 +1,8 @@
 package org.helioviewer.jhv.base.scale;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.position.Position;
 
 public enum GridType {
 

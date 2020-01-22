@@ -2,6 +2,7 @@ package org.helioviewer.jhv.camera.annotate;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.scale.GridType;
@@ -12,7 +13,6 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
-import org.helioviewer.jhv.position.Position;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
