@@ -49,7 +49,7 @@ public class PositionLoad {
 
             Body observerBody = observer.getBody(), targetBody = target.getBody();
             if (observerBody != null && targetBody != null) {
-                PositionCartesian[] p = Spice.getPosition(observerBody, targetBody, frame.referenceFrame, start, end, deltat);
+                PositionCartesian[] p = Spice.getPosition(observerBody, targetBody, frame, start, end, deltat);
                 if (p != null)
                     try {
                         return new PositionResponse(p);
