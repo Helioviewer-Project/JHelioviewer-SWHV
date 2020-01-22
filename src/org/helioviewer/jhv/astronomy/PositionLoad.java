@@ -15,6 +15,8 @@ import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONObject;
 
+import spice.basic.Body;
+
 public class PositionLoad extends JHVWorker<PositionResponse, Void> {
 
     private static final int MAX_POINTS = 10000;
@@ -51,6 +53,18 @@ public class PositionLoad extends JHVWorker<PositionResponse, Void> {
     @Nullable
     @Override
     protected PositionResponse backgroundWork() {
+        Body observerBody = observer.getBody(), targetBody = target.getBody();
+        if (observerBody != null && targetBody != null) {
+            PositionCartesian[] p = Spice.getPosition(observerBody, targetBody, frame.referenceFrame, start, end, deltat);
+            if (p != null)
+                try {
+                    return new PositionResponse(p);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+        }
+
+        System.out.println(">>> " + this);
         try (NetClient nc = NetClient.of(toString(), true)) {
             JSONObject result = JSONUtils.get(nc.getReader());
             if (nc.isSuccessful())

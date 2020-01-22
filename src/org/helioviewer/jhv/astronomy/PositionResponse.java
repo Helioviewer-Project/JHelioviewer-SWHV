@@ -15,6 +15,15 @@ public class PositionResponse {
     private final long positionStart;
     private final long positionEnd;
 
+    PositionResponse(PositionCartesian[] _position) throws Exception {
+        int len = _position.length;
+        if (len == 0)
+            throw new Exception("Empty response");
+        position = _position;
+        positionStart = position[0].milli;
+        positionEnd = position[len - 1].milli;
+    }
+
     PositionResponse(JSONObject jo) throws Exception {
         JSONArray res = jo.getJSONArray("result");
         int len = res.length();
@@ -37,7 +46,7 @@ public class PositionResponse {
             position[i] = new PositionCartesian(TimeUtils.parse(date), x, y, z);
         }
         positionStart = position[0].milli;
-        positionEnd = position[position.length - 1].milli;
+        positionEnd = position[len - 1].milli;
     }
 
     public long interpolateTime(long t, long start, long end) {
