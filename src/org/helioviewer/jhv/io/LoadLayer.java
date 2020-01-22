@@ -1,13 +1,10 @@
 package org.helioviewer.jhv.io;
 
-import java.io.InterruptedIOException;
 import java.net.URI;
-import java.nio.channels.ClosedByInterruptException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
@@ -22,6 +19,7 @@ import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.j2k.J2KView;
 import org.helioviewer.jhv.view.uri.URIView;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
+import org.helioviewer.jhv.threads.JHVThread;
 
 import com.google.common.util.concurrent.FutureCallback;
 
@@ -122,10 +120,7 @@ public class LoadLayer {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            if (t instanceof CancellationException ||
-                    t instanceof ClosedByInterruptException ||
-                    t instanceof InterruptedIOException ||
-                    t instanceof InterruptedException) { // ignore
+            if (JHVThread.isInterrupted(t)) { // ignore
                 Log.info(t);
                 return;
             }
