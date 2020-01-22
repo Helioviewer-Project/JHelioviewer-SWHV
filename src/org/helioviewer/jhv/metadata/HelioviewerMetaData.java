@@ -191,6 +191,9 @@ public class HelioviewerMetaData extends BaseMetaData {
             displayName = instrument + ' ' + measurement;
         } else if (instrument.equals("COSMO K-Coronagraph")) {
             displayName = "COSMO KCor";
+        } else if (instrument.equals("SJI")) {
+            measurement = m.getDouble("TWAVE1").map(w -> String.valueOf(w.longValue())).orElse("");
+            displayName = observatory + ' ' + instrument + ' ' + measurement;
         } else {
             displayName = instrument + ' ' + measurement;
         }
