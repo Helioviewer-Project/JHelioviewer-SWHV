@@ -96,10 +96,11 @@ public class TimeUtils {
     }
 
     public static long optParse(String date, long alt) {
+        String spice = Spice.dateParse2UTC(date);
+        if (spice != null)
+            return parse(spice);
+
         try {
-            String spice = Spice.dateParse2UTC(date);
-            if (spice != null)
-                return parse(spice);
             return roundSec(prettyParser.parse(date).get(0).getTime());
         } catch (Exception e) {
             return alt;
