@@ -1,9 +1,9 @@
 package org.helioviewer.jhv.camera.annotate;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.opengl.BufVertex;
-import org.helioviewer.jhv.position.Position;
 import org.json.JSONObject;
 
 public interface Annotateable {

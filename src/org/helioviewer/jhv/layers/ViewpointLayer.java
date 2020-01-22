@@ -10,6 +10,9 @@ import java.util.Collection;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Carrington;
+import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.astronomy.PositionLoad;
+import org.helioviewer.jhv.astronomy.PositionResponse;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
@@ -26,9 +29,6 @@ import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
-import org.helioviewer.jhv.position.LoadPosition;
-import org.helioviewer.jhv.position.Position;
-import org.helioviewer.jhv.position.PositionResponse;
 import org.helioviewer.jhv.time.JHVDate;
 import org.json.JSONObject;
 
@@ -82,10 +82,10 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
 
         renderSpiral(gl, vp, viewpoint, optionsPanel.isFrameInertial(), optionsPanel.getSpiralSpeed());
 
-        Collection<LoadPosition> loadPositions = camera.getUpdateViewpoint().getLoadPositions();
-        if (!loadPositions.isEmpty()) {
+        Collection<PositionLoad> positionLoads = camera.getUpdateViewpoint().getPositionLoads();
+        if (!positionLoads.isEmpty()) {
             gl.glDisable(GL2.GL_DEPTH_TEST);
-            renderPlanets(gl, vp, loadPositions, pixFactor);
+            renderPlanets(gl, vp, positionLoads, pixFactor);
             gl.glEnable(GL2.GL_DEPTH_TEST);
         }
 
@@ -108,8 +108,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
     @Override
     public void mouseMoved(MouseEvent e) {
         Camera camera = Display.getCamera();
-        Collection<LoadPosition> loadPositions = camera.getUpdateViewpoint().getLoadPositions();
-        if (!loadPositions.isEmpty()) {
+        Collection<PositionLoad> positionLoads = camera.getUpdateViewpoint().getPositionLoads();
+        if (!positionLoads.isEmpty()) {
             mouseX = e.getX();
             mouseY = e.getY();
             Vec3 v = CameraHelper.getVectorFromPlane(camera, Display.getActiveViewport(), mouseX, mouseY, Quat.ZERO, true);
@@ -120,8 +120,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
 
             double width = camera.getCameraWidth() / 2, minDist = 5; // TBD
             String name = null;
-            for (LoadPosition loadPosition : loadPositions) {
-                PositionResponse response = loadPosition.getResponse();
+            for (PositionLoad positionLoad : positionLoads) {
+                PositionResponse response = positionLoad.getResponse();
                 if (response == null)
                     continue;
 
@@ -131,7 +131,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
                 double dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY) / width;
                 if (dist < minDist) {
                     minDist = dist;
-                    name = loadPosition.getTarget().toString();
+                    name = positionLoad.getTarget().toString();
                 }
             }
             if (!text.isEmpty()) {
@@ -269,14 +269,14 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
 
     private final float[] xyzw = {0, 0, 0, 1};
 
-    private void renderPlanets(GL2 gl, Viewport vp, Collection<LoadPosition> loadPositions, double pointFactor) {
+    private void renderPlanets(GL2 gl, Viewport vp, Collection<PositionLoad> positionLoads, double pointFactor) {
         long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
-        for (LoadPosition loadPosition : loadPositions) {
-            PositionResponse response = loadPosition.getResponse();
+        for (PositionLoad positionLoad : positionLoads) {
+            PositionResponse response = positionLoad.getResponse();
             if (response == null)
                 continue;
 
-            byte[] color = loadPosition.getTarget().getColor();
+            byte[] color = positionLoad.getTarget().getColor();
             long t = start;
 
             double dist = response.getInterpolated(xyzw, t, start, end);

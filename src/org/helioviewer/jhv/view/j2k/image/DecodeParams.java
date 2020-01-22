@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.view.j2k.image;
 
-import org.helioviewer.jhv.position.Position;
+import org.helioviewer.jhv.astronomy.Position;
 
 public class DecodeParams {
 

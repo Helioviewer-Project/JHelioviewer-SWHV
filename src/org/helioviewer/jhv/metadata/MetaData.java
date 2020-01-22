@@ -3,9 +3,9 @@ package org.helioviewer.jhv.metadata;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.position.Position;
 
 public interface MetaData {
 

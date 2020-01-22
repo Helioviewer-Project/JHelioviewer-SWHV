@@ -15,10 +15,11 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
+import org.helioviewer.jhv.base.scale.GridTransform;
 import org.helioviewer.jhv.base.scale.GridScale;
-import org.helioviewer.jhv.base.scale.Transform;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
@@ -46,7 +47,6 @@ import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLTexture;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.GLTexture;
-import org.helioviewer.jhv.position.Position;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -268,7 +268,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         texBuf.putCoord((float) (theta + width2), (float) (r + height2), 0, 1, texCoord[3]);
     }
 
-    private void drawIconScale(Camera camera, Viewport vp, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Transform xform) {
+    private void drawIconScale(Camera camera, Viewport vp, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, GridTransform xform) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;

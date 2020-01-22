@@ -3,21 +3,21 @@ package org.helioviewer.jhv.layers.spaceobject;
 import javax.swing.border.Border;
 
 import org.helioviewer.jhv.astronomy.Frame;
+import org.helioviewer.jhv.astronomy.PositionLoad;
+import org.helioviewer.jhv.astronomy.PositionReceiver;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.camera.viewpoint.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.layers.MovieDisplay;
-import org.helioviewer.jhv.position.LoadPosition;
-import org.helioviewer.jhv.position.StatusReceiver;
 
-class SpaceObjectElement implements StatusReceiver {
+class SpaceObjectElement implements PositionReceiver {
 
     private final SpaceObject target;
     private final SpaceObjectModel model;
 
     private boolean selected;
     private String status;
-    private LoadPosition load;
+    private PositionLoad load;
 
     SpaceObjectElement(SpaceObject _target, SpaceObjectModel _model) {
         target = _target;
@@ -28,18 +28,18 @@ class SpaceObjectElement implements StatusReceiver {
         selected = true;
 
         if (load != null) {
-            uv.unsetLoadPosition(load);
+            uv.unsetPositionLoad(load);
         }
 
-        load = LoadPosition.execute(this, observer, target, frame, startTime, endTime);
-        uv.setLoadPosition(load);
+        load = PositionLoad.execute(this, observer, target, frame, startTime, endTime);
+        uv.setPositionLoad(load);
     }
 
     void unload(UpdateViewpoint uv) {
         selected = false;
 
         if (load != null) {
-            uv.unsetLoadPosition(load);
+            uv.unsetPositionLoad(load);
             load = null;
             MovieDisplay.display();
         }

@@ -2,9 +2,9 @@ package org.helioviewer.jhv.imagedata;
 
 import javax.annotation.Nonnull;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.position.Position;
 
 public class ImageData {
 

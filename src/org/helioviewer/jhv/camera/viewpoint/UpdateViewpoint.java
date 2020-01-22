@@ -5,14 +5,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.astronomy.PositionLoad;
+import org.helioviewer.jhv.astronomy.PositionResponse;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
-import org.helioviewer.jhv.position.LoadPosition;
-import org.helioviewer.jhv.position.Position;
-import org.helioviewer.jhv.position.PositionResponse;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -22,11 +22,11 @@ public interface UpdateViewpoint {
 
     void clear();
 
-    void setLoadPosition(LoadPosition _loadPosition);
+    void setPositionLoad(PositionLoad _positionLoad);
 
-    void unsetLoadPosition(LoadPosition _loadPosition);
+    void unsetPositionLoad(PositionLoad _positionLoad);
 
-    Collection<LoadPosition> getLoadPositions();
+    Collection<PositionLoad> getPositionLoads();
 
     UpdateViewpoint observer = new Observer();
     UpdateViewpoint earth = new Earth();
@@ -36,23 +36,23 @@ public interface UpdateViewpoint {
 
     abstract class AbstractUpdateViewpoint implements UpdateViewpoint {
 
-        private final Collection<LoadPosition> loadPositions = Collections.emptySet();
+        private final Collection<PositionLoad> positionLoads = Collections.emptySet();
 
         @Override
         public void clear() {
         }
 
         @Override
-        public void setLoadPosition(LoadPosition _loadPosition) {
+        public void setPositionLoad(PositionLoad _positionLoad) {
         }
 
         @Override
-        public void unsetLoadPosition(LoadPosition _loadPosition) {
+        public void unsetPositionLoad(PositionLoad _positionLoad) {
         }
 
         @Override
-        public Collection<LoadPosition> getLoadPositions() {
-            return loadPositions;
+        public Collection<PositionLoad> getPositionLoads() {
+            return positionLoads;
         }
 
         @Override
@@ -86,7 +86,7 @@ public interface UpdateViewpoint {
     class Equatorial extends AbstractUpdateViewpoint {
 
         private static final double distance = 2 * Sun.MeanEarthDistance / Math.tan(0.5 * Math.PI / 180);
-        private final HashMap<SpaceObject, LoadPosition> loadMap = new HashMap<>();
+        private final HashMap<SpaceObject, PositionLoad> loadMap = new HashMap<>();
 
         @Override
         public void clear() {
@@ -94,25 +94,25 @@ public interface UpdateViewpoint {
         }
 
         @Override
-        public void setLoadPosition(LoadPosition loadPosition) {
-            loadMap.put(loadPosition.getTarget(), loadPosition);
+        public void setPositionLoad(PositionLoad positionLoad) {
+            loadMap.put(positionLoad.getTarget(), positionLoad);
         }
 
         @Override
-        public void unsetLoadPosition(LoadPosition loadPosition) {
-            loadPosition.stop();
-            loadMap.remove(loadPosition.getTarget());
+        public void unsetPositionLoad(PositionLoad positionLoad) {
+            positionLoad.stop();
+            loadMap.remove(positionLoad.getTarget());
         }
 
         @Override
-        public Collection<LoadPosition> getLoadPositions() {
+        public Collection<PositionLoad> getPositionLoads() {
             return loadMap.values();
         }
 
         @Override
         public Position update(JHVDate time) {
             JHVDate itime = time;
-            Iterator<LoadPosition> it = getLoadPositions().iterator();
+            Iterator<PositionLoad> it = getPositionLoads().iterator();
             if (it.hasNext()) {
                 PositionResponse response = it.next().getResponse();
                 if (response != null) {
@@ -131,28 +131,28 @@ public interface UpdateViewpoint {
 
     class Expert extends AbstractUpdateViewpoint {
 
-        private LoadPosition loadPosition;
+        private PositionLoad positionLoad;
 
         @Override
         public void clear() {
-            loadPosition = null;
+            positionLoad = null;
         }
 
         @Override
-        public void setLoadPosition(LoadPosition _loadPosition) {
-            loadPosition = _loadPosition;
+        public void setPositionLoad(PositionLoad _positionLoad) {
+            positionLoad = _positionLoad;
         }
 
         @Override
-        public void unsetLoadPosition(LoadPosition _loadPosition) {
-            loadPosition.stop();
-            loadPosition = null;
+        public void unsetPositionLoad(PositionLoad _positionLoad) {
+            positionLoad.stop();
+            positionLoad = null;
         }
 
         @Override
         public Position update(JHVDate time) {
             PositionResponse response;
-            if (loadPosition == null || (response = loadPosition.getResponse()) == null)
+            if (positionLoad == null || (response = positionLoad.getResponse()) == null)
                 return Sun.getEarth(time);
             return response.getRelativeInterpolated(time.milli, Movie.getStartTime(), Movie.getEndTime());
         }

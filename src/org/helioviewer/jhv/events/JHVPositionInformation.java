@@ -2,8 +2,8 @@ package org.helioviewer.jhv.events;
 
 import java.util.List;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.math.Vec3;
-import org.helioviewer.jhv.position.Position;
 
 public class JHVPositionInformation {
 
