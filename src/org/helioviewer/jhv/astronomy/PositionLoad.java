@@ -8,7 +8,6 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -42,6 +41,9 @@ public class PositionLoad {
 
         @Override
         public PositionResponse call() throws Exception {
+            if (start > end)
+                throw new Exception("End before start");
+
             long dt = 60, span = (end - start) / 1000;
             if (span / dt > MAX_POINTS)
                 dt = span / MAX_POINTS;
@@ -51,11 +53,7 @@ public class PositionLoad {
             if (observerBody != null && targetBody != null) {
                 PositionCartesian[] p = Spice.getPosition(observerBody, targetBody, frame, start, end, deltat);
                 if (p != null)
-                    try {
-                        return new PositionResponse(p);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    return new PositionResponse(p);
             }
 
             //Stopwatch sw = Stopwatch.createStarted();
@@ -63,10 +61,11 @@ public class PositionLoad {
                     "&utc=" + TimeUtils.format(start) + "&utc_end=" + TimeUtils.format(end) + "&deltat=" + deltat;
             try (NetClient nc = NetClient.of(url, true)) {
                 JSONObject result = JSONUtils.get(nc.getReader());
-                if (nc.isSuccessful())
+                if (nc.isSuccessful()) {
                     return new PositionResponse(result);
-                else
+                } else {
                     throw new Exception(result.optString("faultstring", "Invalid network response"));
+                }
                 //} finally {
                 //    System.out.println((sw.elapsed().toNanos() / 1e9));
             }
@@ -127,8 +126,7 @@ public class PositionLoad {
     public PositionResponse getResponse() {
         try {
             return future.isDone() ? future.get() : null;
-        } catch (Exception e) { // should not happen
-            Log.error(e);
+        } catch (Exception ignore) { // logged to UI by onFailure
         }
         return null;
     }
