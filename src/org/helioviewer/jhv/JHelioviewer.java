@@ -67,6 +67,9 @@ public class JHelioviewer {
         // System.setProperty("jsamp.nosystray", "true");
         // if (true) throw new RuntimeException("This is a Sentry test. Please ignore.");
 
+        Thread init = new Thread(JHVInit::init);
+        init.start();
+
         EventQueue.invokeLater(() -> {
             UIGlobals.setUIFont(UIGlobals.uiFont);
 
@@ -94,7 +97,12 @@ public class JHelioviewer {
             frame.setVisible(true);
             UITimer.start();
 
-            JHVInit.init();
+            try {
+                init.join();
+            } catch (Exception e) {
+                Log.error(e);
+            }
+
             DataSources.loadSources();
             CommandLine.load();
             SampClient.init();
