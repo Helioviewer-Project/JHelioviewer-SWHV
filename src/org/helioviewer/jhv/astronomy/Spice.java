@@ -12,14 +12,14 @@ import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.time.JHVDate;
 
 import spice.basic.Body;
+import spice.basic.CSPICE;
 import spice.basic.KernelDatabase;
 import spice.basic.PositionVector;
-import spice.basic.ReferenceFrame;
 import spice.basic.SpiceErrorException;
 import spice.basic.SpiceException;
 import spice.basic.TDBTime;
-import spice.basic.TDTDuration;
-import spice.basic.TDTTime;
+
+//import com.google.common.base.Stopwatch;
 
 public class Spice extends Thread {
 
@@ -78,9 +78,9 @@ public class Spice extends Thread {
     }
 
     @Nullable
-    static PositionCartesian[] getPosition(@Nonnull Body observer, @Nonnull Body target, @Nonnull ReferenceFrame referenceFrame, long start, long end, long deltat) {
+    static PositionCartesian[] getPosition(@Nonnull Body observer, @Nonnull Body target, Frame frame, long start, long end, long deltat) {
         try {
-            return executor.invokeAndWait(new GetPosition(observer, target, referenceFrame, start, end, deltat));
+            return executor.invokeAndWait(new GetPosition(observer, target, frame, start, end, deltat));
         } catch (Exception e) {
             Log.error(e);
         }
@@ -91,15 +91,15 @@ public class Spice extends Thread {
 
         private final Body observer;
         private final Body target;
-        private final ReferenceFrame referenceFrame;
+        private final Frame frame;
         private final long start;
         private final long end;
         private final long deltat;
 
-        GetPosition(Body _observer, Body _target, ReferenceFrame _referenceFrame, long _start, long _end, long _deltat) {
+        GetPosition(Body _observer, Body _target, Frame _frame, long _start, long _end, long _deltat) {
             observer = _observer;
             target = _target;
-            referenceFrame = _referenceFrame;
+            frame = _frame;
             start = _start;
             end = _end;
             deltat = _deltat;
@@ -107,25 +107,29 @@ public class Spice extends Thread {
 
         @Override
         public PositionCartesian[] call() throws SpiceException {
-            ArrayList<PositionCartesian> ret = new ArrayList<>();
-
-            TDTDuration duration = new TDTDuration(deltat);
-            TDTTime tdt = new TDTTime(new JHVDate(start).toString());
-            TDTTime tdtEnd = new TDTTime(new JHVDate(end).toString());
-
-            long milli = start;
-            while (tdt.getTDTSeconds() <= tdtEnd.getTDTSeconds()) {
-                PositionVector v = new PositionVector(target, tdt, referenceFrame, AbCorrection.NONE.correction, observer);
-                ret.add(new PositionCartesian(milli,
-                        v.getElt(0) * Sun.RadiusKMeterInv,
-                        v.getElt(1) * Sun.RadiusKMeterInv,
-                        v.getElt(2) * Sun.RadiusKMeterInv));
-                tdt = tdt.add(duration);
-                milli += deltat;
+            //Stopwatch sw = Stopwatch.createStarted();
+            ArrayList<PositionCartesian> list = new ArrayList<>();
+            for (long t = start; t <= end; t += deltat * 1000) {
+                list.add(position(target, t, frame, observer));
             }
-            return ret.toArray(PositionCartesian[]::new);
+            PositionCartesian[] ret = list.toArray(PositionCartesian[]::new);
+            //System.out.println((sw.elapsed().toNanos() / 1e9));
+            return ret;
         }
 
     }
+
+    private static PositionCartesian position(Body target, long milli, Frame frame, Body observer) throws SpiceException {
+        double sec = (milli - J2000.milli) / 1000.;
+        TDBTime time = new TDBTime(sec + CSPICE.deltet(sec, "UTC"));
+        PositionVector v = new PositionVector(target, time, frame.referenceFrame, AbCorrection.NONE.correction, observer);
+        // System.out.println(">>> " + time.toUTCString("isoc", 0) + " " + new JHVDate(milli));
+        return new PositionCartesian(milli,
+                v.getElt(0) * Sun.RadiusKMeterInv,
+                v.getElt(1) * Sun.RadiusKMeterInv,
+                v.getElt(2) * Sun.RadiusKMeterInv);
+    }
+
+    private static final JHVDate J2000 = new JHVDate("2000-01-01T12:00:00");
 
 }
