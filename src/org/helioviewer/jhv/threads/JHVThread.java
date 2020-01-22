@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.threads;
 
+import java.io.InterruptedIOException;
+import java.nio.channels.ClosedByInterruptException;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -9,6 +11,13 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class JHVThread {
+
+    public static boolean isInterrupted(Throwable t) {
+        return t instanceof CancellationException ||
+                t instanceof ClosedByInterruptException ||
+                t instanceof InterruptedIOException ||
+                t instanceof InterruptedException;
+    }
 
     public static void afterExecute(Runnable r, Throwable t) {
         if (t == null && r instanceof Future<?>) {
