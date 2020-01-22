@@ -5,23 +5,13 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
 
 public class JHVExecutor {
 
     public static final ExecutorService cachedPool = createCachedPool();
-    public static final ScheduledExecutorService reaperPool = createReaperPool();
 
     private static ExecutorService createCachedPool() {
         ExecutorService service = Executors.newCachedThreadPool(new JHVThread.NamedThreadFactory("Worker"));
-        shutdownOnDisposal(service);
-        return service;
-    }
-
-    private static ScheduledExecutorService createReaperPool() {
-        ScheduledExecutorService service = new ScheduledThreadPoolExecutor(1, new JHVThread.NamedThreadFactory("Reaper"), new ThreadPoolExecutor.DiscardPolicy());
         shutdownOnDisposal(service);
         return service;
     }
