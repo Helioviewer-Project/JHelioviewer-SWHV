@@ -2,7 +2,6 @@ package org.helioviewer.jhv.astronomy;
 
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.time.JulianDay;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;

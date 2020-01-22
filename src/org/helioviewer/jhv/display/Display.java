@@ -2,8 +2,8 @@ package org.helioviewer.jhv.display;
 
 import javax.swing.JRadioButtonMenuItem;
 
+import org.helioviewer.jhv.base.scale.GridTransform;
 import org.helioviewer.jhv.base.scale.GridScale;
-import org.helioviewer.jhv.base.scale.Transform;
 import org.helioviewer.jhv.camera.Camera;
 //import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.viewpoint.UpdateViewpoint;
@@ -14,17 +14,17 @@ import org.helioviewer.jhv.opengl.GLSLSolarShader;
 public class Display {
 
     public enum DisplayMode {
-        Orthographic(GLSLSolarShader.ortho, GridScale.ortho, Transform.transformlatitudinal),
-        Latitudinal(GLSLSolarShader.lati, GridScale.lati, Transform.transformlatitudinal),
-        LogPolar(GLSLSolarShader.logpolar, GridScale.logpolar, Transform.transformpolar),
-        Polar(GLSLSolarShader.polar, GridScale.polar, Transform.transformpolar);
+        Orthographic(GLSLSolarShader.ortho, GridScale.ortho, GridTransform.transformlatitudinal),
+        Latitudinal(GLSLSolarShader.lati, GridScale.lati, GridTransform.transformlatitudinal),
+        LogPolar(GLSLSolarShader.logpolar, GridScale.logpolar, GridTransform.transformpolar),
+        Polar(GLSLSolarShader.polar, GridScale.polar, GridTransform.transformpolar);
 
         public final GLSLSolarShader shader;
         public final GridScale scale;
-        public final Transform xform;
+        public final GridTransform xform;
         public final JRadioButtonMenuItem radio;
 
-        DisplayMode(GLSLSolarShader _shader, GridScale _scale, Transform _xform) {
+        DisplayMode(GLSLSolarShader _shader, GridScale _scale, GridTransform _xform) {
             shader = _shader;
             scale = _scale;
             xform = _xform;

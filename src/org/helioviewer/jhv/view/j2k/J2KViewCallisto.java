@@ -4,8 +4,8 @@ import java.awt.Rectangle;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.position.Position;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.j2k.image.DecodeParams;
 import org.helioviewer.jhv.view.j2k.image.ReadParams;

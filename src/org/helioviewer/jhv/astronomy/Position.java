@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.position;
+package org.helioviewer.jhv.astronomy;
 
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.time.JHVDate;

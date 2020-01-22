@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.position;
+package org.helioviewer.jhv.astronomy;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -6,8 +6,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.astronomy.Frame;
-import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.log.Log;
@@ -17,12 +15,12 @@ import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONObject;
 
-public class LoadPosition extends JHVWorker<PositionResponse, Void> {
+public class PositionLoad extends JHVWorker<PositionResponse, Void> {
 
     private static final int MAX_POINTS = 10000;
     private static final String baseURL = "http://swhv.oma.be/position?";
 
-    private final StatusReceiver receiver;
+    private final PositionReceiver receiver;
     private final SpaceObject observer;
     private final SpaceObject target;
     private final Frame frame;
@@ -33,7 +31,7 @@ public class LoadPosition extends JHVWorker<PositionResponse, Void> {
     private PositionResponse response;
     private String report;
 
-    private LoadPosition(StatusReceiver _receiver, SpaceObject _observer, SpaceObject _target, Frame _frame, long _start, long _end) {
+    private PositionLoad(PositionReceiver _receiver, SpaceObject _observer, SpaceObject _target, Frame _frame, long _start, long _end) {
         receiver = _receiver;
         observer = _observer;
         target = _target;
@@ -94,8 +92,8 @@ public class LoadPosition extends JHVWorker<PositionResponse, Void> {
                 "&utc=" + TimeUtils.format(start) + "&utc_end=" + TimeUtils.format(end) + "&deltat=" + deltat;
     }
 
-    public static LoadPosition execute(StatusReceiver _receiver, SpaceObject _observer, SpaceObject _target, Frame _frame, long _start, long _end) {
-        LoadPosition load = new LoadPosition(_receiver, _observer, _target, _frame, _start, _end);
+    public static PositionLoad execute(PositionReceiver _receiver, SpaceObject _observer, SpaceObject _target, Frame _frame, long _start, long _end) {
+        PositionLoad load = new PositionLoad(_receiver, _observer, _target, _frame, _start, _end);
         JHVExecutor.cachedPool.execute(load);
         JHVExecutor.reaperPool.schedule(new CancelTask(load), 120, TimeUnit.SECONDS);
         return load;
