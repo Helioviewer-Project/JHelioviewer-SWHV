@@ -80,7 +80,7 @@ class JHVInit {
     }
 
     private static void loadKernels() {
-        List<String> kernels = List.of("naif0012.tls");
+        List<String> kernels = List.of("de432s.bsp", "naif0012.tls", "pck00010.tpc", "rssd0001.tf");
 
         kernels.parallelStream().forEach(k -> {
             try (InputStream in = FileUtils.getResource("/kernels/" + k)) {
