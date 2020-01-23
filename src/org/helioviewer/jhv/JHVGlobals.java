@@ -81,25 +81,25 @@ public class JHVGlobals {
         try {
             File cacheDir = JHVDirectory.CACHE.getFile();
             libCacheDir = FileUtils.tempDir(cacheDir, "lib");
+            dataCacheDir = FileUtils.tempDir(cacheDir, "data");
             fileCacheDir = FileUtils.tempDir(cacheDir, "file");
             clientCacheDir = FileUtils.tempDir(cacheDir, "client");
             exportCacheDir = FileUtils.tempDir(cacheDir, "export");
-            kernelCacheDir = FileUtils.tempDir(cacheDir, "kernel");
         } catch (Exception e) {
             String cacheDir = System.getProperty("java.io.tmpdir");
             libCacheDir = new File(cacheDir);
+            dataCacheDir = new File(cacheDir);
             fileCacheDir = new File(cacheDir);
             clientCacheDir = new File(cacheDir);
             exportCacheDir = new File(cacheDir);
-            kernelCacheDir = new File(cacheDir);
         }
     }
 
     public static File libCacheDir;
+    public static File dataCacheDir;
     public static File fileCacheDir;
     public static File clientCacheDir;
     public static File exportCacheDir;
-    public static File kernelCacheDir;
 
     public static final HyperOpenURL hyperOpenURL = new HyperOpenURL();
 
