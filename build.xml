@@ -36,18 +36,18 @@
 
     <target name="prone">
         <mkdir dir="${bin}"/>
-        <property name="javac.jar" location="shared/javac-9+181-r4173-1.jar"/>
+        <property name="javac.jar" location="extra/prone/javac-9+181-r4173-1.jar"/>
         <!-- using github.com/google/error-prone-javac is required when running on JDK 8 -->
         <condition property="jdk9orlater">
             <javaversion atleast="9"/>
         </condition>
 
         <path id="processorpath.ref">
-            <pathelement location="shared/error_prone_core-2.3.4-with-dependencies.jar"/>
-            <pathelement location="shared/jFormatString-3.0.0.jar"/>
-            <pathelement location="shared/dataflow-2.5.7.jar"/>
-            <pathelement location="shared/javacutil-2.5.7.jar"/>
-            <pathelement location="shared/caffeine-2.8.0.jar"/>
+            <pathelement location="extra/prone/error_prone_core-2.3.4-with-dependencies.jar"/>
+            <pathelement location="extra/prone/jFormatString-3.0.0.jar"/>
+            <pathelement location="extra/prone/dataflow-2.5.7.jar"/>
+            <pathelement location="extra/prone/javacutil-2.5.7.jar"/>
+            <pathelement location="extra/prone/caffeine-2.8.0.jar"/>
             <!-- Add annotation processors and Error Prone custom checks here if needed -->
         </path>
 
