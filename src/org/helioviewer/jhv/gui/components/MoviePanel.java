@@ -43,7 +43,6 @@ import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.Movie.AdvanceMode;
-import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.View;
 
@@ -81,7 +80,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
 
             @Override
             protected Dimension getSize() {
-                return GLHelper.GL2AWTDimension(Display.fullViewport.width, Display.fullViewport.height);
+                return new Dimension(Display.fullViewport.width, Display.fullViewport.height);
             }
 
             @Override
