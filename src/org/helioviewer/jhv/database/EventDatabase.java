@@ -118,7 +118,7 @@ public class EventDatabase {
 
         StringBuilder createtbl = new StringBuilder("CREATE TABLE ").append(eventType.getDatabaseName()).append(" (");
         eventType.getGroup().getAllDatabaseFields().forEach((key, value) -> createtbl.append(key).append(' ').append(value).append(" DEFAULT NULL,"));
-        createtbl.append("event_id INTEGER, id INTEGER PRIMARY KEY AUTOINCREMENT, FOREIGN KEY(event_id) REFERENCES events(id), UNIQUE(event_id) ON CONFLICT REPLACE );");
+        createtbl.append("event_id INTEGER, id INTEGER PRIMARY KEY AUTOINCREMENT, FOREIGN KEY(event_id) REFERENCES events(id), UNIQUE(event_id) ON CONFLICT REPLACE )");
 
         try (Statement statement = connection.createStatement()) {
             statement.setQueryTimeout(30);
@@ -321,7 +321,7 @@ public class EventDatabase {
                             fieldString.append(',').append(p.getParamName());
                             varString.append(",?");
                         }
-                        String full_statement = "INSERT INTO " + type.getDatabaseName() + "(event_id" + fieldString + ") VALUES(?" + varString + ")";
+                        String full_statement = "INSERT INTO " + type.getDatabaseName() + "(event_id" + fieldString + ") VALUES(?" + varString + ')';
                         PreparedStatement pstatement = getPreparedStatement(connection, full_statement);
                         pstatement.setInt(1, generatedKey);
 
@@ -577,7 +577,7 @@ public class EventDatabase {
         }
     }
 
-    public static ArrayList<JHVEvent> events2Program(long start, long end, SWEKSupplier type, List<SWEKParam> params) {
+    public static List<JHVEvent> events2Program(long start, long end, SWEKSupplier type, List<SWEKParam> params) {
         try {
             return executor.invokeAndWait(new Events2Program(start, end, type, params));
         } catch (Exception e) {
@@ -586,7 +586,7 @@ public class EventDatabase {
         return new ArrayList<>();
     }
 
-    private static class Events2Program implements Callable<ArrayList<JHVEvent>> {
+    private static class Events2Program implements Callable<List<JHVEvent>> {
         private final SWEKSupplier type;
         private final long start;
         private final long end;
@@ -600,9 +600,9 @@ public class EventDatabase {
         }
 
         @Override
-        public ArrayList<JHVEvent> call() throws SQLException {
+        public List<JHVEvent> call() throws SQLException {
             Connection connection = EventDatabaseThread.getConnection();
-            ArrayList<JHVEvent> eventList = new ArrayList<>();
+            List<JHVEvent> eventList = new ArrayList<>();
             if (connection == null) {
                 return eventList;
             }
@@ -640,7 +640,7 @@ public class EventDatabase {
         }
     }
 
-    public static ArrayList<JHVAssociation> associations2Program(long start, long end, SWEKSupplier type) {
+    public static List<JHVAssociation> associations2Program(long start, long end, SWEKSupplier type) {
         try {
             return executor.invokeAndWait(new Associations2Program(start, end, type));
         } catch (Exception e) {
@@ -649,7 +649,7 @@ public class EventDatabase {
         return new ArrayList<>();
     }
 
-    private static class Associations2Program implements Callable<ArrayList<JHVAssociation>> {
+    private static class Associations2Program implements Callable<List<JHVAssociation>> {
         private final SWEKSupplier type;
         private final long start;
         private final long end;
@@ -661,9 +661,9 @@ public class EventDatabase {
         }
 
         @Override
-        public ArrayList<JHVAssociation> call() throws SQLException {
+        public List<JHVAssociation> call() throws SQLException {
             Connection connection = EventDatabaseThread.getConnection();
-            ArrayList<JHVAssociation> assocList = new ArrayList<>();
+            List<JHVAssociation> assocList = new ArrayList<>();
             if (connection == null) {
                 return assocList;
             }
@@ -725,7 +725,7 @@ public class EventDatabase {
                 }
             }
 
-            String query = "SELECT distinct events.id, events.start, events.end, events.data, event_type.supplier FROM events LEFT JOIN event_type ON events.type_id = event_type.id WHERE events.id IN ( " + idList + ") AND events.id != " + event_id + ";";
+            String query = "SELECT distinct events.id, events.start, events.end, events.data, event_type.supplier FROM events LEFT JOIN event_type ON events.type_id = event_type.id WHERE events.id IN ( " + idList + ") AND events.id != " + event_id;
             ArrayList<JsonEvent> ret = new ArrayList<>();
             try (Statement statement = connection.createStatement();
                  ResultSet rs = statement.executeQuery(query)) {
