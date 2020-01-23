@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import java.awt.Dimension;
 import java.awt.Point;
 
 import org.helioviewer.jhv.astronomy.Position;
@@ -45,10 +44,6 @@ public class GLHelper {
 
     public static Point GL2AWTPoint(int x, int y) {
         return new Point((int) (x / GLInfo.pixelScale[0] + .5), (int) (y / GLInfo.pixelScale[1] + .5));
-    }
-
-    public static Dimension GL2AWTDimension(int x, int y) {
-        return new Dimension((int) (x / GLInfo.pixelScale[0] + .5), (int) (y / GLInfo.pixelScale[1] + .5));
     }
 
     public static Vec2 drawVertex(Position viewpoint, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color) {
