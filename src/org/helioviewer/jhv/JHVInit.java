@@ -83,8 +83,8 @@ class JHVInit {
         List<String> kernels = List.of("de432s.bsp", "naif0012.tls", "pck00010.tpc", "rssd0001.tf");
 
         kernels.parallelStream().forEach(k -> {
-            try (InputStream in = FileUtils.getResource("/kernels/" + k)) {
-                File f = new File(JHVGlobals.kernelCacheDir, k);
+            try (InputStream in = FileUtils.getResource("/data/" + k)) {
+                File f = new File(JHVGlobals.dataCacheDir, k);
                 Files.copy(in, f.toPath());
                 Spice.loadKernel(f.getAbsolutePath());
             } catch (Exception e) {
