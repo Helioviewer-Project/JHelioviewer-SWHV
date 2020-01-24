@@ -62,8 +62,8 @@ public class JHelioviewer {
         // Set the platform system properties
         SystemProperties.setPlatform();
         System.setProperty("sun.awt.noerasebackground", "true");
-        System.setProperty("org.sqlite.tmpdir", JHVGlobals.libCacheDir.toString());
-        System.setProperty("org.lwjgl.system.SharedLibraryExtractPath", JHVGlobals.libCacheDir.toString());
+        System.setProperty("org.sqlite.tmpdir", JHVGlobals.libCacheDir);
+        System.setProperty("org.lwjgl.system.SharedLibraryExtractPath", JHVGlobals.libCacheDir);
         // System.setProperty("jsamp.nosystray", "true");
         // if (true) throw new RuntimeException("This is a Sentry test. Please ignore.");
 

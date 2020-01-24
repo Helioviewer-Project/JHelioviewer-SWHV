@@ -43,11 +43,11 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
                 "<li><a href=\"http://www.kakadusoftware.com\">Kakadu</a> JPEG2000 Toolkit, ©2015, <a href='/licenses/Kakadu.txt'>licensed</a> from NewSouth Innovations Ltd.</li>" +
                 "<li><a href=\"https://jogamp.org\">JogAmp</a> libraries for Java 3D graphics.</li>" +
                 "<li><a href=\"https://naif.jpl.nasa.gov/naif/\">SPICE</a>, the observation geometry system for space science missions.</li>" +
+                "<li><a href=\"https://ffmpeg.org\">FFmpeg</a>, the leading multimedia framework.</li>" +
                 "<li><a href=\"https://github.com/stleary/JSON-java\">JSON</a> in Java library.</li>" +
                 "<li>JSON <a href=\"https://github.com/everit-org/json-schema\">Schema Validator</a> library.</li>" +
                 "<li><a href=\"http://www.ehcache.org\">Ehcache</a> library.</li>" +
                 "<li><a href=\"https://github.com/xerial/sqlite-jdbc\">Xerial</a> SQLite JDBC driver.</li>" +
-                "<li><a href=\"http://jcodec.org\">JCodec</a>, a pure Java video codec library.</li>" +
                 "<li><a href=\"http://www.star.bristol.ac.uk/%7Embt/jsamp/index.html\">JSAMP</a> toolkit for the Simple Applications Messaging Protocol.</li>" +
                 "<li><a href=\"http://www.ocpsoft.org/prettytime/nlp\">PrettyTime NLP</a>, a human time parsing library.</li>" +
                 "<li><a href=\"https://github.com/jidesoft/jide-oss\">JIDE Common Layer</a>, ©2002-2017, JIDE Software, Inc.</li>" +
