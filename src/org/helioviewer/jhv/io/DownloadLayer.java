@@ -32,7 +32,8 @@ public class DownloadLayer implements Callable<File> {
             return null;
         }
 
-        File dstFile = new File(JHVDirectory.REMOTEFILES.getPath(), uri.getPath().substring(Math.max(0, uri.getPath().lastIndexOf('/')))).getAbsoluteFile();
+        String uriPath = uri.getPath();
+        File dstFile = new File(JHVDirectory.REMOTEFILES.getPath(), uriPath.substring(Math.max(0, uriPath.lastIndexOf('/')))).getAbsoluteFile();
         return EventQueueCallbackExecutor.pool.submit(new DownloadLayer(layer, dstFile, downloadURI), new Callback(layer, dstFile));
     }
 

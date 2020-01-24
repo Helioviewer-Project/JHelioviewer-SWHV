@@ -40,7 +40,7 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
     @Override
     public JComponent createContentPanel() {
         String text = "<center>This software was built using several components including:</center><ul>" +
-                "<li><a href=\"http://www.kakadusoftware.com\">Kakadu</a> JPEG2000 Toolkit, ©2015, <a href=Kakadu.txt>licensed</a> from NewSouth Innovations Ltd.</li>" +
+                "<li><a href=\"http://www.kakadusoftware.com\">Kakadu</a> JPEG2000 Toolkit, ©2015, <a href='/licenses/Kakadu.txt'>licensed</a> from NewSouth Innovations Ltd.</li>" +
                 "<li><a href=\"https://jogamp.org\">JogAmp</a> libraries for Java 3D graphics.</li>" +
                 "<li><a href=\"https://naif.jpl.nasa.gov/naif/\">SPICE</a>, the observation geometry system for space science missions.</li>" +
                 "<li><a href=\"https://github.com/stleary/JSON-java\">JSON</a> in Java library.</li>" +
@@ -69,15 +69,17 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
     public JComponent createBannerPanel() {
         int delta = 3;
         int fontSize = UIGlobals.uiFont.getSize();
-        String text = "<center><b><span style='font-size:" + (fontSize + delta) + "pt'>" + JHVGlobals.programName + "</span><br/>" +
+        String text = "<center><b><span style='font-size:" + (fontSize + delta) + "pt'>" +
+                "<a href='http://www.jhelioviewer.org'>" + JHVGlobals.programName + "</a></span><br/>" +
                 "Version " + JHVGlobals.version + '.' + JHVGlobals.revision + "</b><br/>" +
                 "<span style='font-size:" + (fontSize - delta) + "pt'>" + JHVGlobals.versionDetail + "<br/>" + GLInfo.glVersion + "</span><br/><br/>" +
                 "©2020 <a href='http://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br/>" +
                 "Part of the ESA/NASA Helioviewer Project<br/>" +
                 "Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)<br/><br/>" +
                 "JHelioviewer is released under the<br/>" +
-                "<a href=JHelioviewer.txt>Mozilla Public License Version 2.0</a><br/><br/>" +
-                "<a href='http://www.jhelioviewer.org'>www.jhelioviewer.org</a><br/><br/>" +
+                "<a href='/licenses/JHelioviewer.txt'>Mozilla Public License Version 2.0</a><br/>" +
+                "and its use if governed by the<br/>" +
+                "<a href='/licenses/EULA.txt'>End-User License Agreement</a><br/><br/>" +
                 "Contact: <a href='mailto:Daniel.Mueller@esa.int'>Daniel.Mueller@esa.int</a>";
 
         HTMLPane pane = new HTMLPane();
@@ -103,8 +105,10 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             if (e.getURL() == null) {
-                try (InputStream is = FileUtils.getResource("/licenses/" + e.getDescription())) {
-                    new TextDialog("License - " + e.getDescription().substring(0, e.getDescription().indexOf('.')), FileUtils.streamToString(is), true).showDialog();
+                String res = e.getDescription();
+                String name = res.substring(Math.max(0, res.lastIndexOf('/') + 1));
+                try (InputStream is = FileUtils.getResource(res)) {
+                    new TextDialog("License - " + name.substring(0, name.indexOf('.')), FileUtils.streamToString(is), true).showDialog();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
