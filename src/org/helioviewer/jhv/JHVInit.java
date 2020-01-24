@@ -77,6 +77,15 @@ class JHVInit {
                 Log.error("Native library load error", e);
             }
         });
+
+        String ffmpeg = "ffmpeg";
+        try (InputStream in = FileUtils.getResource(fullDir + ffmpeg)) {
+            File f = new File(JHVGlobals.libCacheDir, ffmpeg);
+            Files.copy(in, f.toPath());
+            f.setExecutable(true);
+        } catch (Exception e) {
+            Log.error("Native library load error", e);
+        }
     }
 
     private static void loadKernels() {
