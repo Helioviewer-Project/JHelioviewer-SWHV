@@ -68,7 +68,7 @@ class JHVInit {
         kduLibs.add(System.mapLibraryName("JNISpice"));
 
         String fullDir = "/natives/" + pathlib;
-        kduLibs.parallelStream().forEach(k -> {
+        kduLibs.stream().forEach(k -> {
             try (InputStream in = FileUtils.getResource(fullDir + k)) {
                 File f = new File(JHVGlobals.libCacheDir, k);
                 Files.copy(in, f.toPath());
