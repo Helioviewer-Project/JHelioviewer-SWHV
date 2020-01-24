@@ -40,7 +40,7 @@ public class EventQueueCallbackExecutor extends ForwardingListeningExecutorServi
     }
 
     public <T> ListenableFuture<T> submit(Callable<T> callable, FutureCallback<T> callback) {
-        ListenableFuture<T> futureTask = submit(callable);
+        ListenableFuture<T> futureTask = super.submit(callable);
         Futures.addCallback(futureTask, callback, eventQueue);
         return futureTask;
     }

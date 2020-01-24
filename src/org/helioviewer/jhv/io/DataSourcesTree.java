@@ -189,6 +189,9 @@ public class DataSourcesTree extends JTree {
     @Nullable
     @Override
     public String getToolTipText(MouseEvent e) {
+        if (e == null) // may receive null according to docs
+            return null;
+
         TreePath path;
         if (getRowForLocation(e.getX(), e.getY()) == -1 || (path = getPathForLocation(e.getX(), e.getY())) == null)
             return null;

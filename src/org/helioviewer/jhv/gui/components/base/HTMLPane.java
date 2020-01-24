@@ -18,7 +18,7 @@ public class HTMLPane extends JTextPane {
 
     @Override
     public void setText(String text) {
-        super.setText(pre + text.replace("\n", "<br/>") + post);
+        super.setText(text == null ? null : pre + text.replace("\n", "<br/>") + post); // may receive null
         setCaretPosition(0);
     }
 
