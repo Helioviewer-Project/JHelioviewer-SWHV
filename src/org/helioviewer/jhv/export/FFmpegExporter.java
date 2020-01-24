@@ -47,6 +47,12 @@ class FFmpegExporter implements MovieExporter {
                 "-s", w + "x" + h,
                 "-i", tempFile.getPath(),
                 "-pix_fmt", "yuv420p",
+                "-c:v", "libx264",
+                "-preset", "fast",
+                "-tune", "animation",
+                "-profile:v", "high",
+                "-level", "4.2",
+                "-movflags", "+faststart",
                 "-y", path);
 
         try {
@@ -57,7 +63,8 @@ class FFmpegExporter implements MovieExporter {
                     .command(command);
 
             int exitCode = builder.start().waitFor();
-            System.out.println(">>> exitCode " + exitCode);
+            if (exitCode != 0)
+                throw new Exception("FFmpeg exit code " + exitCode);
         } finally {
             tempFile.delete();
         }
