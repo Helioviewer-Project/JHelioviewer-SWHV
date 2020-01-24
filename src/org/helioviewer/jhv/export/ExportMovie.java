@@ -100,7 +100,7 @@ public class ExportMovie implements FrameListener {
             MovieDisplay.render(1);
         } else {
             try {
-                exporter = new JCodecExporter();
+                exporter = new FFmpegExporter();
                 exporter.open(prefix + ".mp4", canvasWidth, exportHeight, fps);
             } catch (Exception e) {
                 e.printStackTrace();
