@@ -4,12 +4,15 @@
     <property name="lib" location="../lib"/>
     <property name="tmp" location="tmp"/>
 
-    <property name="jar-linux"        value="${bin}/JHelioviewer-linux.jar"/>
-    <property name="jar-macos"        value="${bin}/JHelioviewer-macos.jar"/>
-    <property name="jar-windows"      value="${bin}/JHelioviewer-windows.jar"/>
-    <property name="excludes-linux"   value="**/*macos*,**/*windows*"/>
-    <property name="excludes-macos"   value="**/*linux*,**/*windows*"/>
-    <property name="excludes-windows" value="**/*linux*,**/*macos*"/>
+    <property name="jarfile"          value="${bin}/JHelioviewer.jar"/>
+
+    <property name="natives-linux"     value="${bin}/natives-linux.jar"/>
+    <property name="natives-macos"     value="${bin}/natives-macos.jar"/>
+    <property name="natives-windows"   value="${bin}/natives-windows.jar"/>
+
+    <property name="includes-linux"   value="**/*linux*.jar"/>
+    <property name="includes-macos"   value="**/*macos*.jar"/>
+    <property name="includes-windows" value="**/*windows*.jar"/>
 
     <loadfile property="version" srcFile="../VERSION"/>
     <exec executable="git" outputproperty="revision">
@@ -32,39 +35,31 @@
         <echo message="${version}.${revision}" file="${bin}/VERSION"/>
     </target>
 
-    <macrodef name="jar-bundle">
+    <macrodef name="native-bundle">
         <attribute name="destfile"/>
-        <attribute name="excludes"/>
+        <attribute name="includes"/>
         <sequential>
             <jar destfile="@{destfile}">
-                <manifest>
-                    <attribute name="Automatic-Module-Name" value="org.helioviewer.jhv"/>
-                    <attribute name="Main-Class" value="org.helioviewer.jhv.JHelioviewer"/>
-                    <attribute name="Class-Path" value="."/>
-                    <attribute name="version" value="${version}"/>
-                    <attribute name="revision" value="${revision}"/>
-                </manifest>
-                <zipgroupfileset dir="${lib}" excludes="@{excludes}"/>
+                <zipgroupfileset dir="${lib}" includes="@{includes}"/>
                 <zipfileset src="../JHelioviewer.jar"/>
             </jar>
         </sequential>
     </macrodef>
 
-    <target name="jar-bundle-linux">
-        <jar-bundle destfile="${jar-linux}" excludes="${excludes-linux}"/>
+    <target name="natives-bundle-linux">
+        <native-bundle destfile="${natives-linux}"   includes="${includes-linux}"/>
     </target>
 
-    <target name="jar-bundle-macos">
-        <jar-bundle destfile="${jar-macos}" excludes="${excludes-macos}"/>
+    <target name="natives-bundle-macos">
+        <native-bundle destfile="${natives-macos}"   includes="${includes-macos}"/>
     </target>
 
-    <target name="jar-bundle-windows">
-        <jar-bundle destfile="${jar-windows}" excludes="${excludes-windows}"/>
+    <target name="natives-bundle-windows">
+        <native-bundle destfile="${natives-windows}" includes="${includes-windows}"/>
     </target>
 
-<!--
-    <target name="jar-bundle-macos">
-        <jar destfile="${jar-macos}">
+    <target name="jar-bundle">
+        <jar destfile="${jarfile}">
             <manifest>
                 <attribute name="Automatic-Module-Name" value="org.helioviewer.jhv"/>
                 <attribute name="Main-Class" value="org.helioviewer.jhv.JHelioviewer"/>
@@ -72,11 +67,11 @@
                 <attribute name="version" value="${version}"/>
                 <attribute name="revision" value="${revision}"/>
             </manifest>
-            <zipgroupfileset dir="${lib}" excludes="${excludes-macos}"/>
+            <zipgroupfileset dir="${lib}" excludes="**/*linux*.jar,**/*macos*.jar,**/*windows*.jar"/>
             <zipfileset src="../JHelioviewer.jar"/>
         </jar>
     </target>
--->
+
 <!--
     <target name="release-tar" depends="init,jar-bundle">
         <tar destfile="${bin}/${pkg.name}.bin.tar.gz" compression="gzip">
@@ -84,6 +79,6 @@
         </tar>
     </target>
 -->
-    <target name="all" depends="jar-bundle-linux,jar-bundle-macos,jar-bundle-windows"/>
+    <target name="all" depends="jar-bundle,natives-bundle-linux,natives-bundle-macos,natives-bundle-windows"/>
 
 </project>
