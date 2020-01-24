@@ -82,7 +82,8 @@ class JHVInit {
             }
         });
 
-        Files.setPosixFilePermissions(Path.of(JHVGlobals.libCacheDir, "ffmpeg"), Set.of(PosixFilePermission.OWNER_EXECUTE));
+        if (!System.getProperty("jhv.os").equals("windows"))
+            Files.setPosixFilePermissions(Path.of(JHVGlobals.libCacheDir, "ffmpeg"), Set.of(PosixFilePermission.OWNER_EXECUTE));
         for (String l : libs) {
             System.load(Path.of(JHVGlobals.libCacheDir, l).toString());
         }
