@@ -10,6 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.zip.GZIPInputStream;
@@ -351,7 +352,7 @@ public class EventDatabase {
                     Log.error("Failed to dump to database");
                     assocs.add(new Pair<>(1, 1));
                 } else {
-                    ArrayList<JHVEvent> rels = _getOtherRelations(id, type, true, false, true);
+                    List<JHVEvent> rels = _getOtherRelations(id, type, true, false, true);
                     rels.forEach(rel -> assocs.add(new Pair<>(id, rel.getUniqueID())));
                 }
             }
@@ -367,25 +368,25 @@ public class EventDatabase {
         }
     }
 
-    private static ArrayList<JHVEvent> createUniqueList(ArrayList<JHVEvent> events) {
-        HashMap<Integer, JHVEvent> ids = new HashMap<>();
+    private static List<JHVEvent> createUniqueList(List<JHVEvent> events) {
+        HashSet<Integer> ids = new HashSet<>();
         ArrayList<JHVEvent> uniqueEvents = new ArrayList<>();
         for (JHVEvent ev : events) {
             int id = ev.getUniqueID();
-            if (!ids.containsKey(id)) {
-                ids.put(id, ev);
+            if (!ids.contains(id)) {
+                ids.add(id);
                 uniqueEvents.add(ev);
             }
         }
         return uniqueEvents;
     }
 
-    public static ArrayList<JHVEvent> getOtherRelations(int id, SWEKSupplier jhvEventType, boolean similartype, boolean full) throws SQLException {
+    public static List<JHVEvent> getOtherRelations(int id, SWEKSupplier jhvEventType, boolean similartype, boolean full) throws SQLException {
         return _getOtherRelations(id, jhvEventType, similartype, full, false);
     }
 
     //Given an event id and its type, return all related events. If similartype is true, return only related events having the same type.
-    private static ArrayList<JHVEvent> _getOtherRelations(int id, SWEKSupplier jhvEventType, boolean similartype, boolean full, boolean is_dbthread) throws SQLException {
+    private static List<JHVEvent> _getOtherRelations(int id, SWEKSupplier jhvEventType, boolean similartype, boolean full, boolean is_dbthread) throws SQLException {
         SWEKGroup group = jhvEventType.getGroup();
         ArrayList<JHVEvent> nEvents = new ArrayList<>();
         ArrayList<JsonEvent> jsonEvents = new ArrayList<>();

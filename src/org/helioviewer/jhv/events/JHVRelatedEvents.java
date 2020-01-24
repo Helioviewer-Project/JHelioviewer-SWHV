@@ -3,6 +3,7 @@ package org.helioviewer.jhv.events;
 import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -39,7 +40,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         eventsMap.get(supplier).put(interval, this);
     }
 
-    public ArrayList<JHVEvent> getEvents() {
+    public List<JHVEvent> getEvents() {
         return events;
     }
 
@@ -123,7 +124,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         return null;
     }
 
-    public ArrayList<JHVEvent> getNextEvents(JHVEvent event) {
+    public List<JHVEvent> getNextEvents(JHVEvent event) {
         ArrayList<JHVEvent> nEvents = new ArrayList<>();
         for (JHVAssociation assoc : associations) {
             if (assoc.left == event.getUniqueID()) {
@@ -136,7 +137,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         return nEvents;
     }
 
-    public ArrayList<JHVEvent> getPreviousEvents(JHVEvent event) {
+    public List<JHVEvent> getPreviousEvents(JHVEvent event) {
         ArrayList<JHVEvent> nEvents = new ArrayList<>();
         for (JHVAssociation assoc : associations) {
             if (assoc.right == event.getUniqueID()) {
