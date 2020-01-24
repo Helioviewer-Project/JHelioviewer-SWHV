@@ -3,6 +3,7 @@ package org.helioviewer.jhv.events.gui.info;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
@@ -89,12 +90,12 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
         ParameterTablePanel allEventsPanel = new ParameterTablePanel(event.getAllEventParameters());
         allParameters = new DataCollapsiblePanel("All Parameters", allEventsPanel, false, model);
 
-        ArrayList<JHVEvent> precedingEvents = rEvent.getPreviousEvents(event);
+        List<JHVEvent> precedingEvents = rEvent.getPreviousEvents(event);
         if (!precedingEvents.isEmpty()) {
             precedingEventsPanel = createRelatedEventsCollapsiblePane("Preceding Events", rEvent, precedingEvents);
         }
 
-        ArrayList<JHVEvent> nextEvents = rEvent.getNextEvents(event);
+        List<JHVEvent> nextEvents = rEvent.getNextEvents(event);
         if (!nextEvents.isEmpty()) {
             followingEventsPanel = createRelatedEventsCollapsiblePane("Following Events", rEvent, nextEvents);
         }
@@ -138,18 +139,18 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
         }
     }
 
-    private DataCollapsiblePanel createRelatedEventsCollapsiblePane(String relation, JHVRelatedEvents rEvents, ArrayList<JHVEvent> relations) {
+    private DataCollapsiblePanel createRelatedEventsCollapsiblePane(String relation, JHVRelatedEvents rEvents, List<JHVEvent> relations) {
         JPanel allPrecedingEvents = new JPanel();
         allPrecedingEvents.setLayout(new BoxLayout(allPrecedingEvents, BoxLayout.PAGE_AXIS));
         relations.forEach(ev -> allPrecedingEvents.add(createEventPanel(rEvents, ev)));
         return new DataCollapsiblePanel(relation, new JScrollPane(allPrecedingEvents), false, model);
     }
 
-    private DataCollapsiblePanel createOtherRelatedEventsCollapsiblePane(String relation, ArrayList<JHVRelatedEvents> rEvents) {
+    private DataCollapsiblePanel createOtherRelatedEventsCollapsiblePane(String relation, List<JHVRelatedEvents> rEvents) {
         JPanel allPrecedingEvents = new JPanel();
         allPrecedingEvents.setLayout(new BoxLayout(allPrecedingEvents, BoxLayout.PAGE_AXIS));
         for (JHVRelatedEvents rev : rEvents) {
-            ArrayList<JHVEvent> evs = rev.getEvents();
+            List<JHVEvent> evs = rev.getEvents();
             if (!evs.isEmpty()) {
                 allPrecedingEvents.add(createEventPanel(rev, evs.get(0)));
             }
@@ -193,7 +194,7 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
         pack();
     }
 
-    private static class DatabaseCallable implements Callable<ArrayList<JHVEvent>> {
+    private static class DatabaseCallable implements Callable<List<JHVEvent>> {
 
         private final JHVEvent e;
 
@@ -202,16 +203,16 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
         }
 
         @Override
-        public ArrayList<JHVEvent> call() throws Exception {
+        public List<JHVEvent> call() throws Exception {
             return EventDatabase.getOtherRelations(e.getUniqueID(), e.getSupplier(), false, true);
         }
 
     }
 
-    private class DatabaseCallback implements FutureCallback<ArrayList<JHVEvent>> {
+    private class DatabaseCallback implements FutureCallback<List<JHVEvent>> {
 
         @Override
-        public void onSuccess(ArrayList<JHVEvent> result) {
+        public void onSuccess(List<JHVEvent> result) {
             JHVEventCache.addEvents(result);
 
             ArrayList<JHVRelatedEvents> rEvents = new ArrayList<>();
