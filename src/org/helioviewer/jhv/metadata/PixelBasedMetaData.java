@@ -17,8 +17,8 @@ public class PixelBasedMetaData extends BaseMetaData {
         unitPerPixelY = Sun.Radius / pixelH;
 
         if (uri != null) {
-            String path = uri.getPath();
-            displayName = path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.')).intern();
+            String uriPath = uri.getPath();
+            displayName = uriPath.substring(uriPath.lastIndexOf('/') + 1, uriPath.lastIndexOf('.')).intern();
         }
     }
 

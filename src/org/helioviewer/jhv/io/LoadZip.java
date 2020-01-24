@@ -37,7 +37,8 @@ class LoadZip implements Callable<Void> {
     public Void call() throws Exception {
         HashSet<Path> exclude = new HashSet<>();
         URI uri = NetFileCache.get(remoteUri);
-        String tmpDir = FileUtils.tempDir(JHVGlobals.fileCacheDir, uri.getPath().substring(Math.max(0, uri.getPath().lastIndexOf('/') + 1)) + ".x").toString();
+        String uriPath = uri.getPath();
+        String tmpDir = FileUtils.tempDir(JHVGlobals.fileCacheDir, uriPath.substring(Math.max(0, uriPath.lastIndexOf('/') + 1)) + ".x").toString();
         try (FileSystem zipfs = FileSystems.newFileSystem(URI.create("jar:" + uri), new HashMap<>())) {
             for (Path root : zipfs.getRootDirectories()) {
                 try (DirectoryStream<Path> stream = Files.newDirectoryStream(root, "*.jhv")) {
