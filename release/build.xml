@@ -3,22 +3,13 @@
     <property name="bin" location="bin"/>
     <property name="lib" location="../lib"/>
     <property name="tmp" location="tmp"/>
-    <property name="resources" value="release-resources"/>
-    <property name="jarfile" value="${bin}/JHelioviewer.jar"/>
 
-    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
-        <classpath>
-            <pathelement location="${resources}/shared/ant-contrib-1.0b3.jar"/>
-        </classpath>
-    </taskdef>
-
-    <taskdef name="bundleapp" classname="com.oracle.appbundler.AppBundlerTask">
-        <classpath path="${resources}/mac/lib/appbundler-1.0.jar"/>
-    </taskdef>
-
-    <taskdef name="nsis" classname="com.danielreese.nsisant.Task">
-        <classpath location="${resources}/windows/nsisant-1.3.jar"/>
-    </taskdef>
+    <property name="jar-linux"        value="${bin}/JHelioviewer-linux.jar"/>
+    <property name="jar-macos"        value="${bin}/JHelioviewer-macos.jar"/>
+    <property name="jar-windows"      value="${bin}/JHelioviewer-windows.jar"/>
+    <property name="excludes-linux"   value="**/*macos*,**/*windows*"/>
+    <property name="excludes-macos"   value="**/*linux*,**/*windows*"/>
+    <property name="excludes-windows" value="**/*linux*,**/*macos*"/>
 
     <loadfile property="version" srcFile="../VERSION"/>
     <exec executable="git" outputproperty="revision">
@@ -41,8 +32,39 @@
         <echo message="${version}.${revision}" file="${bin}/VERSION"/>
     </target>
 
-    <target name="jar-bundle">
-        <jar destfile="${jarfile}">
+    <macrodef name="jar-bundle">
+        <attribute name="destfile"/>
+        <attribute name="excludes"/>
+        <sequential>
+            <jar destfile="@{destfile}">
+                <manifest>
+                    <attribute name="Automatic-Module-Name" value="org.helioviewer.jhv"/>
+                    <attribute name="Main-Class" value="org.helioviewer.jhv.JHelioviewer"/>
+                    <attribute name="Class-Path" value="."/>
+                    <attribute name="version" value="${version}"/>
+                    <attribute name="revision" value="${revision}"/>
+                </manifest>
+                <zipgroupfileset dir="${lib}" excludes="@{excludes}"/>
+                <zipfileset src="../JHelioviewer.jar"/>
+            </jar>
+        </sequential>
+    </macrodef>
+
+    <target name="jar-bundle-linux">
+        <jar-bundle destfile="${jar-linux}" excludes="${excludes-linux}"/>
+    </target>
+
+    <target name="jar-bundle-macos">
+        <jar-bundle destfile="${jar-macos}" excludes="${excludes-macos}"/>
+    </target>
+
+    <target name="jar-bundle-windows">
+        <jar-bundle destfile="${jar-windows}" excludes="${excludes-windows}"/>
+    </target>
+
+<!--
+    <target name="jar-bundle-macos">
+        <jar destfile="${jar-macos}">
             <manifest>
                 <attribute name="Automatic-Module-Name" value="org.helioviewer.jhv"/>
                 <attribute name="Main-Class" value="org.helioviewer.jhv.JHelioviewer"/>
@@ -50,59 +72,18 @@
                 <attribute name="version" value="${version}"/>
                 <attribute name="revision" value="${revision}"/>
             </manifest>
-            <zipgroupfileset dir="${lib}"/>
+            <zipgroupfileset dir="${lib}" excludes="${excludes-macos}"/>
             <zipfileset src="../JHelioviewer.jar"/>
         </jar>
     </target>
-
-    <target name="release-windows" depends="init,jar-bundle">
-        <nsis script="${basedir}/${resources}/windows/windows-setup.nsi" noconfig="yes">
-            <define name="JHV_VERSION" value="${version}"/>
-            <define name="JHV_REVISION" value="${revision}"/>
-            <define name="RESOURCE_PATH" value="${basedir}/${resources}/windows"/>
-            <define name="BUILD_PATH" value="${bin}"/>
-            <define name="FILE_NAME" value="${pkg.name}"/>
-            <define name="README_FILE" value="${bin}/README.md"/>
-            <define name="COPYING_FILE" value="${bin}/LICENSE"/>
-            <define name="VERSION_FILE" value="${bin}/VERSION"/>
-        </nsis>
-    </target>
-
-    <target name="release-mac" depends="init,jar-bundle">
-        <if>
-            <contains string="${os.name}" substring="mac" casesensitive="false"/>
-            <then>
-                <exec executable="chmod" dir="${resources}/mac">
-                    <arg value="u+x"/>
-                    <arg value="bundle.sh"/>
-                </exec>
-                <mkdir dir="${tmp}/mac/"/>
-                <bundleapp outputdirectory="${tmp}/mac/" name="JHelioviewer" displayname="JHelioviewer" identifier="org.helioviewer.jhv" mainclassname="org.helioviewer.jhv.JHelioviewer" icon="${resources}/mac/JHV_icon.icns" shortversion="${version}" version="${version}.${revision}" copyright="©2019, European Space Agency">
-                    <classpath file="${bin}/JHelioviewer.jar"/>
-                    <option value="-Xdock:name=JHelioviewer"/>
-                </bundleapp>
-                <exec executable="${resources}/mac/bundle.sh">
-                    <env key="TEMP" value="${tmp}/mac"/>
-                    <env key="RESOURCES" value="${resources}/mac"/>
-                    <env key="BUILD" value="${bin}"/>
-                    <env key="NAME" value="${pkg.name}"/>
-                    <env key="README" value="${bin}/README.md"/>
-                    <env key="COPYING" value="${bin}/LICENSE"/>
-                    <env key="VERSION" value="${bin}/VERSION"/>
-                </exec>
-            </then>
-            <else>
-                <echo> Cannot build MacOS dmg file under ${os.name}.</echo>
-            </else>
-        </if>
-    </target>
-
+-->
+<!--
     <target name="release-tar" depends="init,jar-bundle">
         <tar destfile="${bin}/${pkg.name}.bin.tar.gz" compression="gzip">
             <zipfileset dir="${bin}" includes="JHelioviewer.jar, README.md, LICENSE" prefix="${pkg.name}"/>
         </tar>
     </target>
-
-    <target name="all" depends="release-tar,release-windows,release-mac"/>
+-->
+    <target name="all" depends="jar-bundle-linux,jar-bundle-macos,jar-bundle-windows"/>
 
 </project>
