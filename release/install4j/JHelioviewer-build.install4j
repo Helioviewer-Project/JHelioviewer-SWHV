@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="8.0.4" transformSequenceNumber="8">
-  <directoryPresets config="../release-resources/mac" />
+  <directoryPresets config="../bin/JHelioviewer.jar" />
   <application name="JHelioviewer" applicationId="6448-7333-6138-9110" mediaDir="./builds" compression="9" lzmaCompression="true" shortName="JHelioviewer" publisher="ESA JHelioviewer Team" publisherWeb="http://www.jhelioviewer.org" version="2.16.0" allPathsRelative="true" macVolumeId="7ed177551bd348bc" javaMinVersion="11" javaMaxVersion="14" jdkMode="jdk">
     <codeSigning macEnabled="true" macPkcs12File="~/Certificates.p12" macNotarize="true" appleId="bogdan@nicula.net" />
     <jreBundles jdkProviderId="AdoptOpenJDK" release="openjdk11/jdk-11.0.6+10">
@@ -19,6 +19,9 @@
       <mountPoint id="1149" location="Helpers" />
     </mountPoints>
     <entries>
+      <fileEntry mountPoint="182" file="../bin/natives-linux.jar" />
+      <fileEntry mountPoint="182" file="../bin/natives-macos.jar" />
+      <fileEntry mountPoint="182" file="../bin/natives-windows.jar" />
       <fileEntry mountPoint="182" file="../bin/JHelioviewer.jar" />
       <dirEntry mountPoint="1149" file="../release-resources/mac/notifier" subDirectory="notifier" />
     </entries>
@@ -30,9 +33,12 @@
   </files>
   <launchers>
     <launcher name="JHelioviewer" id="24" icnsFile="./resources/JHV_icon.icns" customMacBundleIdentifier="true" macBundleIdentifier="org.helioviewer.jhv.JHelioviewer" macEntitlementsFile="./mac-build/JHelioViewer.plist">
-      <executable name="JHelioviewer" iconSet="true" iconFile="./resources/JHelioviewer.ico" executableDir="bin" redirectStderr="false" executableMode="gui" dpiAware="true" />
+      <executable name="JHelioviewer" iconSet="true" iconFile="./resources/JHelioviewer.ico" executableDir="bin" redirectStderr="false" executableMode="gui" singleInstance="true" dpiAware="true" />
       <java mainClass="org.helioviewer.jhv.JHelioviewer" vmParameters="-Xms1024m">
         <classPath>
+          <archive location="classes/natives-linux.jar" failOnError="false" />
+          <archive location="classes/natives-macos.jar" failOnError="false" />
+          <archive location="classes/natives-windows.jar" failOnError="false" />
           <archive location="classes/JHelioviewer.jar" failOnError="false" />
         </classPath>
         <nativeLibraryDirectories>
@@ -164,7 +170,7 @@ return console.askOkCancel(message, true);
               </formComponent>
             </formComponents>
           </screen>
-          <screen id="747" beanClass="com.install4j.runtime.beans.screens.LicenseScreen">
+          <screen id="747" beanClass="com.install4j.runtime.beans.screens.LicenseScreen" enabled="false">
             <formComponents>
               <formComponent id="749" beanClass="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent">
                 <serializedBean>
@@ -1083,6 +1089,10 @@ return true;</property>
   </installerGui>
   <mediaSets>
     <macosArchive name="Mac OS X Single Bundle Archive" id="68" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}" launcherId="24">
+      <exclude>
+        <entry location="classes/natives-linux.jar" />
+        <entry location="classes/natives-windows.jar" />
+      </exclude>
       <variables>
         <variable name="dir" value="${sys.contentDir}" />
       </variables>
@@ -1099,6 +1109,8 @@ return true;</property>
         <launcher id="296" />
       </excludedLaunchers>
       <exclude>
+        <entry location="classes/natives-linux.jar" />
+        <entry location="classes/natives-macos.jar" />
         <entry location="Helpers" />
       </exclude>
       <jreBundle usePack200="false" jreBundleSource="generated" />
@@ -1108,6 +1120,8 @@ return true;</property>
         <launcher id="24" />
       </excludedLaunchers>
       <exclude>
+        <entry location="classes/natives-macos.jar" />
+        <entry location="classes/natives-windows.jar" />
         <entry location="Helpers" />
       </exclude>
       <postInstallScript>${compiler:file("./resources/linux-post-install.sh")}</postInstallScript>
@@ -1117,6 +1131,8 @@ return true;</property>
         <launcher id="24" />
       </excludedLaunchers>
       <exclude>
+        <entry location="classes/natives-macos.jar" />
+        <entry location="classes/natives-windows.jar" />
         <entry location="Helpers" />
       </exclude>
       <postInstallScript>${compiler:file("./resources/linux-post-install.sh")}</postInstallScript>
