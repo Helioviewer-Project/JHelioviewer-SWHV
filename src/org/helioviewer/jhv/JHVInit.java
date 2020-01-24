@@ -1,10 +1,12 @@
 package org.helioviewer.jhv;
 
-import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.gui.Message;
@@ -20,14 +22,11 @@ import nom.tam.fits.FitsFactory;
 class JHVInit {
 
     static void init() {
-        FitsFactory.setUseHierarch(true);
-        FitsFactory.setLongStringsEnabled(true);
-
-        loadKDULibs();
         try {
+            loadLibs();
             KakaduMessageSystem.startKduMessageSystem();
         } catch (Exception e) {
-            Message.err("Failed to setup Kakadu", e.getMessage(), true);
+            Message.err("Failed to setup native libraries", e.getMessage(), true);
             return;
         }
         loadKernels();
@@ -44,11 +43,14 @@ class JHVInit {
         } catch (Exception e) {
             Log.error("AIA response map load error", e);
         }
+
+        FitsFactory.setUseHierarch(true);
+        FitsFactory.setLongStringsEnabled(true);
     }
 
-    private static void loadKDULibs() {
+    private static void loadLibs() throws Exception {
         String pathlib = "";
-        ArrayList<String> kduLibs = new ArrayList<>();
+        ArrayList<String> libs = new ArrayList<>();
 
         if (System.getProperty("jhv.os").equals("mac") && System.getProperty("jhv.arch").equals("x86-64")) {
             pathlib = "macosx-universal/";
@@ -59,47 +61,44 @@ class JHVInit {
         }
 
         if (System.getProperty("jhv.os").equals("windows")) {
-            kduLibs.add(System.mapLibraryName("msvcr120"));
-            kduLibs.add(System.mapLibraryName("msvcp120"));
-            kduLibs.add(System.mapLibraryName("kdu_v7AR"));
-            kduLibs.add(System.mapLibraryName("kdu_a7AR"));
+            libs.add(System.mapLibraryName("msvcr120"));
+            libs.add(System.mapLibraryName("msvcp120"));
+            libs.add(System.mapLibraryName("kdu_v7AR"));
+            libs.add(System.mapLibraryName("kdu_a7AR"));
         }
-        kduLibs.add(System.mapLibraryName("kdu_jni"));
-        kduLibs.add(System.mapLibraryName("JNISpice"));
+        libs.add(System.mapLibraryName("kdu_jni"));
+        libs.add(System.mapLibraryName("JNISpice"));
+
+        List<String> xtract = new ArrayList<>(libs);
+        xtract.add("ffmpeg");
 
         String fullDir = "/natives/" + pathlib;
-        kduLibs.stream().forEach(k -> {
-            try (InputStream in = FileUtils.getResource(fullDir + k)) {
-                File f = new File(JHVGlobals.libCacheDir, k);
-                Files.copy(in, f.toPath());
-                System.load(f.getAbsolutePath());
+        xtract.parallelStream().forEach(x -> {
+            try (InputStream in = FileUtils.getResource(fullDir + x)) {
+                Path p = Path.of(JHVGlobals.libCacheDir, x);
+                Files.copy(in, p);
             } catch (Exception e) {
-                Log.error("Native library load error", e);
+                throw new RuntimeException(e);
             }
         });
 
-        String ffmpeg = "ffmpeg";
-        try (InputStream in = FileUtils.getResource(fullDir + ffmpeg)) {
-            File f = new File(JHVGlobals.libCacheDir, ffmpeg);
-            Files.copy(in, f.toPath());
-            f.setExecutable(true);
-        } catch (Exception e) {
-            Log.error("Native library load error", e);
+        Files.setPosixFilePermissions(Path.of(JHVGlobals.libCacheDir, "ffmpeg"), Set.of(PosixFilePermission.OWNER_EXECUTE));
+        for (String l : libs) {
+            System.load(Path.of(JHVGlobals.libCacheDir, l).toString());
         }
     }
 
     private static void loadKernels() {
         List<String> kernels = List.of("de432s.bsp", "naif0012.tls", "pck00010.tpc", "rssd0001.tf");
 
-        kernels.parallelStream().forEach(k -> {
-            try (InputStream in = FileUtils.getResource("/kernels/" + k)) {
-                File f = new File(JHVGlobals.dataCacheDir, k);
-                Files.copy(in, f.toPath());
-                Spice.loadKernel(f.getAbsolutePath());
+        kernels.parallelStream().forEach(x -> {
+            try (InputStream in = FileUtils.getResource("/kernels/" + x)) {
+                Files.copy(in, Path.of(JHVGlobals.dataCacheDir, x));
             } catch (Exception e) {
                 Log.error("SPICE kernel load error", e);
             }
         });
+        Spice.loadKernels(kernels);
     }
 
 }

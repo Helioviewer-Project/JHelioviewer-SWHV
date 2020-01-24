@@ -1,10 +1,13 @@
 package org.helioviewer.jhv.astronomy;
 
+import java.nio.file.Path;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.SingleExecutor;
 import org.helioviewer.jhv.threads.JHVThread;
@@ -28,22 +31,24 @@ public class Spice extends Thread {
         super(r, name);
     }
 
-    public static void loadKernel(@Nonnull String file) {
-        executor.invokeLater(new LoadKernel(file));
+    public static void loadKernels(@Nonnull List<String> files) {
+        executor.invokeLater(new LoadKernels(files));
     }
 
-    private static class LoadKernel implements Runnable {
+    private static class LoadKernels implements Runnable {
 
-        private final String file;
+        private final List<String> files;
 
-        LoadKernel(String _file) {
-            file = _file;
+        LoadKernels(List<String> _files) {
+            files = _files;
         }
 
         @Override
         public void run() {
             try {
-                KernelDatabase.load(file);
+                for (String f : files) {
+                    KernelDatabase.load(Path.of(JHVGlobals.dataCacheDir, f).toString());
+                }
             } catch (Exception e) {
                 Log.error(e);
             }

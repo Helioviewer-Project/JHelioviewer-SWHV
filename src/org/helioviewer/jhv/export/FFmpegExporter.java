@@ -12,6 +12,8 @@ import org.helioviewer.jhv.base.image.MappedImageFactory;
 
 class FFmpegExporter implements MovieExporter {
 
+    private static final String ffmpeg = new File(JHVGlobals.libCacheDir, "ffmpeg").getAbsolutePath();
+
     private String path;
     private int w;
     private int h;
@@ -25,16 +27,12 @@ class FFmpegExporter implements MovieExporter {
         w = _w;
         h = _h;
         fps = _fps;
-
         tempFile = File.createTempFile("dump", null, JHVGlobals.exportCacheDir);
-        //tempFile.deleteOnExit();
-        System.out.println(">>> " + w + 'x' + h + '@' + fps);
     }
 
     @Override
     public void encode(BufferedImage image) throws Exception {
         ByteBuffer data = MappedImageFactory.getByteBuffer(image).flip().limit(w * h * 3);
-
         try (FileChannel channel = new FileOutputStream(tempFile, true).getChannel()) {
             channel.write(data);
         }
@@ -42,7 +40,7 @@ class FFmpegExporter implements MovieExporter {
 
     @Override
     public void close() throws Exception {
-        List<String> command = List.of(JHVGlobals.libCacheDir.getPath() + "/ffmpeg",
+        List<String> command = List.of(ffmpeg,
                 "-f", "rawvideo",
                 "-pix_fmt", "bgr24",
                 "-r", String.valueOf(fps),
