@@ -28,6 +28,7 @@ class FFmpegExporter implements MovieExporter {
         h = _h;
         fps = _fps;
         tempFile = File.createTempFile("dump", null, JHVGlobals.exportCacheDir);
+        tempFile.deleteOnExit();
     }
 
     @Override

@@ -34,7 +34,7 @@
   <launchers>
     <launcher name="JHelioviewer" id="24" icnsFile="./resources/JHV_icon.icns" customMacBundleIdentifier="true" macBundleIdentifier="org.helioviewer.jhv.JHelioviewer" macEntitlementsFile="./mac-build/JHelioViewer.plist">
       <executable name="JHelioviewer" iconSet="true" iconFile="./resources/JHelioviewer.ico" executableDir="bin" redirectStderr="false" executableMode="gui" singleInstance="true" dpiAware="true" />
-      <java mainClass="org.helioviewer.jhv.JHelioviewer" vmParameters="-Xms1024m">
+      <java mainClass="org.helioviewer.jhv.JHelioviewer" vmParameters="-Xms2g">
         <classPath>
           <archive location="classes/natives-linux.jar" failOnError="false" />
           <archive location="classes/natives-macos.jar" failOnError="false" />
