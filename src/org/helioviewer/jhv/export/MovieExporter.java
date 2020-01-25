@@ -1,15 +1,88 @@
 package org.helioviewer.jhv.export;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.List;
 
-interface MovieExporter {
+import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.base.image.MappedImageFactory;
 
-    void encode(BufferedImage image) throws Exception;
+class MovieExporter {
 
-    void close() throws Exception;
+    private static final List<String> ffmpeg = List.of(new File(JHVGlobals.libCacheDir, "ffmpeg").getAbsolutePath());
 
-    String getPath();
+    private final VideoFormat format;
+    private final String path;
+    private final int w;
+    private final int h;
+    private final int fps;
 
-    int getHeight();
+    private File tempFile;
+
+    MovieExporter(String prefix, VideoFormat _format, int _w, int _h, int _fps) {
+        path = prefix + _format.extension;
+        format = _format;
+        w = _w;
+        h = _h;
+        fps = _fps;
+    }
+
+    void encode(BufferedImage image) throws Exception {
+        if (tempFile == null) {
+            tempFile = File.createTempFile("dump", null, JHVGlobals.exportCacheDir);
+            tempFile.deleteOnExit();
+        }
+
+        ByteBuffer data = MappedImageFactory.getByteBuffer(image).flip().limit(w * h * 3);
+        try (FileChannel channel = new FileOutputStream(tempFile, true).getChannel()) {
+            channel.write(data);
+        }
+    }
+
+    void close() throws Exception {
+        List<String> input = List.of(
+                "-f", "rawvideo",
+                "-pix_fmt", "bgr24",
+                "-r", format == VideoFormat.PNG ? "1" : String.valueOf(fps),
+                "-s", w + "x" + h,
+                "-i", tempFile.getPath()
+        );
+        List<String> output = List.of(
+                "-pix_fmt", "yuv420p",
+                "-tune", "animation",
+                "-movflags", "+faststart",
+                "-y", path
+        );
+        ArrayList<String> command = new ArrayList<>(ffmpeg);
+        command.addAll(input);
+        command.addAll(format.settings);
+        command.addAll(output);
+
+        try {
+            ProcessBuilder builder = new ProcessBuilder()
+                    .directory(JHVGlobals.exportCacheDir)
+                    .redirectError(File.createTempFile("fferr", null, JHVGlobals.exportCacheDir))
+                    .redirectOutput(File.createTempFile("ffout", null, JHVGlobals.exportCacheDir))
+                    .command(command);
+
+            int exitCode = builder.start().waitFor();
+            if (exitCode != 0)
+                throw new Exception("FFmpeg exit code " + exitCode);
+        } finally {
+            tempFile.delete();
+        }
+    }
+
+    String getPath() {
+        return path;
+    }
+
+    int getHeight() {
+        return h;
+    }
 
 }

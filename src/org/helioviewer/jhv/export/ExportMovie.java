@@ -91,7 +91,7 @@ public class ExportMovie implements FrameListener {
 
         String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + TimeUtils.formatFilename(System.currentTimeMillis());
         if (mode == RecordMode.SHOT) {
-            exporter = new FFmpegExporter(prefix, VideoFormat.PNG, canvasWidth, exportHeight, fps);
+            exporter = new MovieExporter(prefix, VideoFormat.PNG, canvasWidth, exportHeight, fps);
             shallStop = true;
             MovieDisplay.render(1);
         } else {
@@ -100,7 +100,7 @@ public class ExportMovie implements FrameListener {
                 format = VideoFormat.valueOf(Settings.getProperty("video.format"));
             } catch (Exception ignore) {
             }
-            exporter = new FFmpegExporter(prefix, format, canvasWidth, exportHeight, fps);
+            exporter = new MovieExporter(prefix, format, canvasWidth, exportHeight, fps);
 
             if (mode == RecordMode.LOOP) {
                 Movie.addFrameListener(instance);
