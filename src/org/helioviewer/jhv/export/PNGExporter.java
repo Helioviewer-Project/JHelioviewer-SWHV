@@ -13,8 +13,8 @@ public class PNGExporter implements MovieExporter {
     private BufferedImage image;
 
     @Override
-    public void open(String _path, int w, int h, int fps) {
-        path = _path;
+    public void open(String prefix, int w, int h, int fps) {
+        path = prefix + ".png";
         height = h;
     }
 

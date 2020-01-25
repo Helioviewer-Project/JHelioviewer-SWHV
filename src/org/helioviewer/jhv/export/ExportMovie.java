@@ -92,7 +92,7 @@ public class ExportMovie implements FrameListener {
         if (mode == RecordMode.SHOT) {
             try {
                 exporter = new PNGExporter();
-                exporter.open(prefix + ".png", canvasWidth, exportHeight, fps);
+                exporter.open(prefix, canvasWidth, exportHeight, fps);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -101,7 +101,7 @@ public class ExportMovie implements FrameListener {
         } else {
             try {
                 exporter = new FFmpegExporter();
-                exporter.open(prefix + ".mp4", canvasWidth, exportHeight, fps);
+                exporter.open(prefix, canvasWidth, exportHeight, fps);
             } catch (Exception e) {
                 e.printStackTrace();
             }
