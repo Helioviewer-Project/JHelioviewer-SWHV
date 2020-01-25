@@ -78,7 +78,7 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
                 "Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)<br/><br/>" +
                 "JHelioviewer is released under the<br/>" +
                 "<a href='/licenses/JHelioviewer.txt'>Mozilla Public License Version 2.0</a><br/>" +
-                "and its use if governed by the<br/>" +
+                "and its use is governed by the<br/>" +
                 "<a href='/licenses/EULA.txt'>End-User License Agreement</a><br/><br/>" +
                 "Contact: <a href='mailto:Daniel.Mueller@esa.int'>Daniel.Mueller@esa.int</a>";
 
