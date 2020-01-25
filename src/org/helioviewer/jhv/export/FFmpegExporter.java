@@ -16,6 +16,7 @@ class FFmpegExporter implements MovieExporter {
 
     private static final List<String> ffmpeg = List.of(new File(JHVGlobals.libCacheDir, "ffmpeg").getAbsolutePath());
 
+    private VideoFormat format = VideoFormat.H264;
     private String path;
     private int w;
     private int h;
@@ -24,8 +25,13 @@ class FFmpegExporter implements MovieExporter {
     private File tempFile;
 
     @Override
-    public void open(String _path, int _w, int _h, int _fps) throws Exception {
-        path = _path;
+    public void open(String prefix, int _w, int _h, int _fps) throws Exception {
+        try {
+            format = VideoFormat.valueOf(Settings.getProperty("video.format"));
+        } catch (Exception ignore) {
+        }
+        path = prefix + format.extension;
+
         w = _w;
         h = _h;
         fps = _fps;
@@ -43,12 +49,6 @@ class FFmpegExporter implements MovieExporter {
 
     @Override
     public void close() throws Exception {
-        VideoFormat format = VideoFormat.H264;
-        try {
-            format = VideoFormat.valueOf(Settings.getProperty("video.format"));
-        } catch (Exception ignore) {
-        }
-
         List<String> input = List.of(
                 "-f", "rawvideo",
                 "-pix_fmt", "bgr24",
