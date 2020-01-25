@@ -52,7 +52,7 @@ class FFmpegExporter implements MovieExporter {
         List<String> input = List.of(
                 "-f", "rawvideo",
                 "-pix_fmt", "bgr24",
-                "-r", String.valueOf(fps),
+                "-r", format == VideoFormat.PNG ? "1" : String.valueOf(fps),
                 "-s", w + "x" + h,
                 "-i", tempFile.getPath()
         );
