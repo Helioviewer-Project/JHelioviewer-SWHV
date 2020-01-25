@@ -21,4 +21,5 @@
 - Rework handling of threads throughout the program
 - Incorporate SPICE and use it for input time parsing and position calculations for planets
 - Support IRIS SJI
-- Change movie export to use FFmpeg and disk buffering
+- Change video export to use FFmpeg and disk buffering
+- Allow several video export qualities of H.264 and H.265, as well as series of PNGs
