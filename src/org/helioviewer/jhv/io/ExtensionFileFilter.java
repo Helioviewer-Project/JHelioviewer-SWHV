@@ -11,8 +11,8 @@ public class ExtensionFileFilter {
             new String[]{"jpg", "jpeg", "png", "fts", "fits", "jp2", "jpx"},
             "All supported files (\".jpg\", \".jpeg\", \".png\", \".fts\", \".fits\", \".jp2\", \".jpx\")"));
     public static final FilenameFilter JHV = new Filter(new ExtensionFilter(
-            new String[]{"jhv", "jhvz"},
-            "State files (\".jhv\", \".jhvz\")"));
+            new String[]{"jhv"},
+            "State files (\".jhv\")"));
     public static final FilenameFilter JSON = new Filter(new ExtensionFilter(
             new String[]{"json"},
             "JSON files (\".json\")"));
