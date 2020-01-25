@@ -2,18 +2,21 @@ package org.helioviewer.jhv.export;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.base.image.MappedImageFactory;
+import org.helioviewer.jhv.base.image.NIOImageFactory;
 import org.helioviewer.jhv.opengl.GLInfo;
 
 class ExportUtils {
 
-    private static void flipVertically(BufferedImage img, int h) {
+    static void flipVertically(BufferedImage img) {
         int w = 3 * img.getWidth(); // assume bgr
+        int h = img.getHeight();
         byte[] line1 = new byte[w];
         byte[] line2 = new byte[w];
         ByteBuffer data = MappedImageFactory.getByteBuffer(img);
@@ -31,29 +34,24 @@ class ExportUtils {
         }
     }
 
-    static void pasteCanvases(BufferedImage im1, int frameH, BufferedImage im2, int movieLinePosition, int finalH) {
-        flipVertically(im1, frameH);
-        if (im2 == null)
-            return;
+    static BufferedImage scaleImage(BufferedImage img, int newW, int newH, int movieLinePosition) {
+        int oldW = img.getWidth(), oldH = img.getHeight();
+        Image tmp = img.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
+        BufferedImage simg = NIOImageFactory.createCompatible(newW, newH, BufferedImage.TYPE_3BYTE_BGR);
 
-        Graphics2D g = im1.createGraphics();
+        Graphics2D g = simg.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g.drawImage(im2, 0, frameH, im1.getWidth(), finalH - frameH, null);
+        g.drawImage(tmp, 0, 0, null);
 
         if (movieLinePosition != -1) {
             g.setColor(Color.BLACK);
-
-            double scaleY = (finalH - frameH) / (double) im2.getHeight();
-            double scaleX = im1.getWidth() / (double) im2.getWidth();
-
-            AffineTransform at = AffineTransform.getTranslateInstance(0, frameH);
-            at.concatenate(AffineTransform.getScaleInstance(scaleX, scaleY));
-            g.setTransform(at);
+            g.setTransform(AffineTransform.getScaleInstance(newW / (double) oldW, newH / (double) oldH));
             int screenMovieLine = (int) (movieLinePosition * GLInfo.pixelScale[0] + .5);
-            g.drawLine(screenMovieLine, 0, screenMovieLine, im2.getHeight());
+            g.drawLine(screenMovieLine, 0, screenMovieLine, oldH);
         }
-
         g.dispose();
+
+        return simg;
     }
 
 }

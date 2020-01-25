@@ -12,6 +12,7 @@ import java.util.List;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.image.MappedImageFactory;
+import org.helioviewer.jhv.base.image.NIOImageFactory;
 import org.helioviewer.jhv.time.TimeUtils;
 
 class MovieExporter {
@@ -36,21 +37,32 @@ class MovieExporter {
         fps = _fps;
     }
 
-    void encode(BufferedImage image) throws Exception {
+    void encode(BufferedImage mainImage, BufferedImage eveImage, int movieLinePosition) throws Exception {
         if (tempFile == null) {
             tempFile = File.createTempFile("dump", null, JHVGlobals.exportCacheDir);
             tempFile.deleteOnExit();
         }
 
-        try {
-            ByteBuffer data = MappedImageFactory.getByteBuffer(image).flip().limit(w * h * 3);
-            try (FileChannel channel = new FileOutputStream(tempFile, true).getChannel()) {
-                channel.write(data);
-            }
+        BufferedImage scaled = null;
+        ByteBuffer dataeve = null;
+        if (eveImage != null) {
+            scaled = ExportUtils.scaleImage(eveImage, w, h - mainImage.getHeight(), movieLinePosition);
+            dataeve = NIOImageFactory.getByteBuffer(scaled).flip().limit(3 * w * scaled.getHeight());
+        }
+
+        ExportUtils.flipVertically(mainImage);
+        ByteBuffer data = MappedImageFactory.getByteBuffer(mainImage).flip().limit(3 * w * mainImage.getHeight());
+
+        try (FileChannel channel = new FileOutputStream(tempFile, true).getChannel()) {
+            channel.write(data);
+            if (dataeve != null)
+                channel.write(dataeve);
         } catch (Exception e) {
             tempFile.delete();
             tempFile = null;
             throw e;
+        } finally {
+            NIOImageFactory.free(scaled);
         }
     }
 
@@ -99,10 +111,6 @@ class MovieExporter {
 
     String getPath() {
         return path;
-    }
-
-    int getHeight() {
-        return h;
     }
 
 }

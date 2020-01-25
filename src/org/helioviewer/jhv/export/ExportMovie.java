@@ -49,10 +49,10 @@ public class ExportMovie implements FrameListener {
 
     public static void handleMovieExport(Camera camera, GL2 gl) {
         try {
-            BufferedImage screen = MappedImageFactory.createCompatible(grabber.w, exporter.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+            BufferedImage screen = MappedImageFactory.createCompatible(grabber.w, grabber.h, BufferedImage.TYPE_3BYTE_BGR);
             grabber.renderFrame(camera, gl, MappedImageFactory.getByteBuffer(screen));
             BufferedImage eve = EVEImage == null ? null : NIOImageFactory.copyImage(EVEImage);
-            encodeExecutor.execute(new FrameConsumer(exporter, screen, grabber.h, eve, EVEMovieLinePosition));
+            encodeExecutor.execute(new FrameConsumer(exporter, screen, eve, EVEMovieLinePosition));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -139,24 +139,20 @@ public class ExportMovie implements FrameListener {
         private final MovieExporter movieExporter;
         private final BufferedImage mainImage;
         private final BufferedImage eveImage;
-        private final int frameH;
         private final int movieLinePosition;
 
-        FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, int _frameH, BufferedImage _eveImage, int _movieLinePosition) {
+        FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eveImage, int _movieLinePosition) {
             movieExporter = _movieExporter;
             mainImage = _mainImage;
             eveImage = _eveImage;
-            frameH = _frameH;
             movieLinePosition = _movieLinePosition;
         }
 
         @Override
         public void run() {
             try {
-                ExportUtils.pasteCanvases(mainImage, frameH, eveImage, movieLinePosition, movieExporter.getHeight());
-                if (eveImage != null)
-                    NIOImageFactory.free(eveImage);
-                movieExporter.encode(mainImage);
+                movieExporter.encode(mainImage, eveImage, movieLinePosition);
+                NIOImageFactory.free(eveImage);
                 MappedImageFactory.free(mainImage);
             } catch (Exception e) {
                 e.printStackTrace();

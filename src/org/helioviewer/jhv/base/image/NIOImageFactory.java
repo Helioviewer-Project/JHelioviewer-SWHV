@@ -52,6 +52,8 @@ public class NIOImageFactory {
     }
 
     public static void free(BufferedImage img) {
+        if (img == null)
+            return;
         DataBuffer buffer = img.getRaster().getDataBuffer();
         if (buffer instanceof NIODataBuffer) {
             ((NIODataBuffer) buffer).free();
