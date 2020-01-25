@@ -58,12 +58,11 @@ public class Movie {
     }
 
     static void setMaster(ImageLayer layer) {
-        View view;
-        if (layer == null || !(view = layer.getView()).isMultiFrame()) {
+        if (layer == null) {
             pause();
             MoviePanel.unsetMovie();
         } else
-            MoviePanel.setMovie(view);
+            MoviePanel.setMovie(layer.getView().getMaximumFrameNumber());
         timespanChanged();
     }
 
