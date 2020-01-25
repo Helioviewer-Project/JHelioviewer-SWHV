@@ -181,13 +181,10 @@ public class ExportMovie implements FrameListener {
                 if (keep) {
                     movieExporter.close();
                     EventQueue.invokeLater(() -> JHVGlobals.displayNotification(movieExporter.getPath()));
-                }
+                } else
+                    new File(movieExporter.getPath()).delete();
             } catch (Exception e) {
                 e.printStackTrace();
-            }
-            if (!keep) {
-                File f = new File(movieExporter.getPath());
-                f.delete();
             }
             System.gc();
         }
