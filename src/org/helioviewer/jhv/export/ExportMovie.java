@@ -2,7 +2,6 @@ package org.helioviewer.jhv.export;
 
 import java.awt.EventQueue;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
@@ -38,10 +37,9 @@ public class ExportMovie implements FrameListener {
     public static void disposeMovieWriter(boolean keep) {
         if (exporter != null) {
             if (keep) {
-                encodeExecutor.execute(new CloseWriter(exporter, true));
+                encodeExecutor.execute(new CloseWriter(exporter));
             } else {
                 encodeExecutor.shutdownNow();
-                new CloseWriter(exporter, false).run();
             }
             exporter = null;
         }
@@ -165,21 +163,16 @@ public class ExportMovie implements FrameListener {
     private static class CloseWriter implements Runnable {
 
         private final MovieExporter movieExporter;
-        private final boolean keep;
 
-        CloseWriter(MovieExporter _movieExporter, boolean _keep) {
+        CloseWriter(MovieExporter _movieExporter) {
             movieExporter = _movieExporter;
-            keep = _keep;
         }
 
         @Override
         public void run() {
             try {
-                if (keep) {
-                    movieExporter.close();
-                    EventQueue.invokeLater(() -> JHVGlobals.displayNotification(movieExporter.getPath()));
-                } else
-                    new File(movieExporter.getPath()).delete();
+                String path = movieExporter.close();
+                EventQueue.invokeLater(() -> JHVGlobals.displayNotification(path));
             } catch (Exception e) {
                 e.printStackTrace();
             }

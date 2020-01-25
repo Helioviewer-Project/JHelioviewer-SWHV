@@ -20,7 +20,6 @@ class MovieExporter {
     private static final List<String> ffmpeg = List.of(new File(JHVGlobals.libCacheDir, "ffmpeg").getAbsolutePath());
 
     private final String prefix;
-    private final String path;
     private final VideoFormat format;
     private final int w;
     private final int h;
@@ -31,7 +30,6 @@ class MovieExporter {
     MovieExporter(VideoFormat _format, int _w, int _h, int _fps) {
         prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + TimeUtils.formatFilename(System.currentTimeMillis());
         format = _format;
-        path = prefix + format.extension;
         w = _w;
         h = _h;
         fps = _fps;
@@ -70,7 +68,7 @@ class MovieExporter {
         }
     }
 
-    void close() throws Exception {
+    String close() throws Exception {
         List<String> input = List.of(
                 "-f", "rawvideo",
                 "-pix_fmt", "bgr24",
@@ -78,11 +76,12 @@ class MovieExporter {
                 "-s", w + "x" + h,
                 "-i", tempFile.getPath()
         );
+        String outPath = prefix + format.extension;
         List<String> output = List.of(
                 "-pix_fmt", "yuv420p",
                 "-tune", "animation",
                 "-movflags", "+faststart",
-                "-y", path
+                "-y", outPath
         );
         ArrayList<String> command = new ArrayList<>(ffmpeg);
         command.addAll(input);
@@ -111,10 +110,8 @@ class MovieExporter {
             tempFile.delete();
             tempFile = null;
         }
-    }
 
-    String getPath() {
-        return path;
+        return outPath;
     }
 
 }
