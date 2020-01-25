@@ -6,7 +6,6 @@ import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
-import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.image.MappedImageFactory;
@@ -19,7 +18,6 @@ import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.GLGrab;
 import org.helioviewer.jhv.threads.JHVThread;
-import org.helioviewer.jhv.time.TimeUtils;
 
 import com.jogamp.opengl.GL2;
 
@@ -89,9 +87,8 @@ public class ExportMovie implements FrameListener {
         canvasHeight = exportHeight - sh;
         grabber = new GLGrab(canvasWidth, canvasHeight);
 
-        String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + TimeUtils.formatFilename(System.currentTimeMillis());
         if (mode == RecordMode.SHOT) {
-            exporter = new MovieExporter(prefix, VideoFormat.PNG, canvasWidth, exportHeight, fps);
+            exporter = new MovieExporter(VideoFormat.PNG, canvasWidth, exportHeight, fps);
             shallStop = true;
             MovieDisplay.render(1);
         } else {
@@ -100,7 +97,7 @@ public class ExportMovie implements FrameListener {
                 format = VideoFormat.valueOf(Settings.getProperty("video.format"));
             } catch (Exception ignore) {
             }
-            exporter = new MovieExporter(prefix, format, canvasWidth, exportHeight, fps);
+            exporter = new MovieExporter(format, canvasWidth, exportHeight, fps);
 
             if (mode == RecordMode.LOOP) {
                 Movie.addFrameListener(instance);
@@ -180,7 +177,6 @@ public class ExportMovie implements FrameListener {
 
         @Override
         public void run() {
-            boolean failed = false;
             try {
                 if (keep) {
                     movieExporter.close();
@@ -188,9 +184,8 @@ public class ExportMovie implements FrameListener {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                failed = true;
             }
-            if (!keep || failed) {
+            if (!keep) {
                 File f = new File(movieExporter.getPath());
                 f.delete();
             }
