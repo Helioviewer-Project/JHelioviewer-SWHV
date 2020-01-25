@@ -32,6 +32,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.export.VideoFormat;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.io.DataSources;
@@ -115,10 +116,10 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
 
         c.gridx = 1;
         c.gridy = 0;
-        JComboBox<String> combo = new JComboBox<>(DataSources.getServers().toArray(String[]::new));
-        combo.setSelectedItem(Settings.getProperty("default.server"));
-        combo.addActionListener(e -> Settings.setProperty("default.server", (String) Objects.requireNonNull(combo.getSelectedItem())));
-        settings.add(combo, c);
+        JComboBox<String> comboServers = new JComboBox<>(DataSources.getServers().toArray(String[]::new));
+        comboServers.setSelectedItem(Settings.getProperty("default.server"));
+        comboServers.addActionListener(e -> Settings.setProperty("default.server", (String) Objects.requireNonNull(comboServers.getSelectedItem())));
+        settings.add(comboServers, c);
 
         c.gridx = 0;
         c.gridy = 1;
@@ -154,6 +155,22 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
 
         c.gridx = 0;
         c.gridy = 5;
+        settings.add(new JLabel("Record video as:", JLabel.RIGHT), c);
+
+        c.gridx = 1;
+        c.gridy = 5;
+        JComboBox<VideoFormat> comboVideo = new JComboBox<>(VideoFormat.values());
+        VideoFormat selected = VideoFormat.H264;
+        try {
+            selected = VideoFormat.valueOf(Settings.getProperty("video.format"));
+        } catch (Exception ignore) {
+        }
+        comboVideo.setSelectedItem(selected);
+        comboVideo.addActionListener(e -> Settings.setProperty("video.format", ((VideoFormat) Objects.requireNonNull(comboVideo.getSelectedItem())).name()));
+        settings.add(comboVideo, c);
+
+        c.gridx = 0;
+        c.gridy = 6;
         settings.add(new JLabel("Plugins:", JLabel.RIGHT), c);
 
         c.gridx = 1;

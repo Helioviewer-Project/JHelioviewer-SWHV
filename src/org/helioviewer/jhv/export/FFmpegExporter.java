@@ -5,14 +5,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.image.MappedImageFactory;
 
 class FFmpegExporter implements MovieExporter {
 
-    private static final String ffmpeg = new File(JHVGlobals.libCacheDir, "ffmpeg").getAbsolutePath();
+    private static final List<String> ffmpeg = List.of(new File(JHVGlobals.libCacheDir, "ffmpeg").getAbsolutePath());
 
     private String path;
     private int w;
@@ -41,20 +43,29 @@ class FFmpegExporter implements MovieExporter {
 
     @Override
     public void close() throws Exception {
-        List<String> command = List.of(ffmpeg,
+        VideoFormat format = VideoFormat.H264;
+        try {
+            format = VideoFormat.valueOf(Settings.getProperty("video.format"));
+        } catch (Exception ignore) {
+        }
+
+        List<String> input = List.of(
                 "-f", "rawvideo",
                 "-pix_fmt", "bgr24",
                 "-r", String.valueOf(fps),
                 "-s", w + "x" + h,
-                "-i", tempFile.getPath(),
+                "-i", tempFile.getPath()
+        );
+        List<String> output = List.of(
                 "-pix_fmt", "yuv420p",
-                "-c:v", "libx264",
-                "-preset", "fast",
                 "-tune", "animation",
-                "-profile:v", "high",
-                "-level", "4.2",
                 "-movflags", "+faststart",
-                "-y", path);
+                "-y", path
+        );
+        ArrayList<String> command = new ArrayList<>(ffmpeg);
+        command.addAll(input);
+        command.addAll(format.settings);
+        command.addAll(output);
 
         try {
             ProcessBuilder builder = new ProcessBuilder()

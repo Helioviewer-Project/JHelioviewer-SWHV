@@ -23,6 +23,7 @@ public class Settings {
             super.setProperty("timeout.read", "120000");
             super.setProperty("timeout.connect", "30000");
             super.setProperty("update.next", "0");
+            super.setProperty("video.format", "H264");
         }
     };
     private static final Properties settings = new Properties(defaults);
