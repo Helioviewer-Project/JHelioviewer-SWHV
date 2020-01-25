@@ -152,10 +152,11 @@ public class ExportMovie implements FrameListener {
         public void run() {
             try {
                 movieExporter.encode(mainImage, eveImage, movieLinePosition);
-                NIOImageFactory.free(eveImage);
-                MappedImageFactory.free(mainImage);
             } catch (Exception e) {
                 e.printStackTrace();
+            } finally {
+                NIOImageFactory.free(eveImage);
+                MappedImageFactory.free(mainImage);
             }
         }
 

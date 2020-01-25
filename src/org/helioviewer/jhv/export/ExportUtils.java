@@ -6,33 +6,11 @@ import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.nio.ByteBuffer;
 
-import org.helioviewer.jhv.base.image.MappedImageFactory;
 import org.helioviewer.jhv.base.image.NIOImageFactory;
 import org.helioviewer.jhv.opengl.GLInfo;
 
 class ExportUtils {
-
-    static void flipVertically(BufferedImage img) {
-        int w = 3 * img.getWidth(); // assume bgr
-        int h = img.getHeight();
-        byte[] line1 = new byte[w];
-        byte[] line2 = new byte[w];
-        ByteBuffer data = MappedImageFactory.getByteBuffer(img);
-
-        for (int i = 0; i < h / 2; i++) {
-            data.position(w * i);
-            data.get(line1);
-            data.position(w * (h - i - 1));
-            data.get(line2);
-
-            data.position(w * (h - i - 1));
-            data.put(line1);
-            data.position(w * i);
-            data.put(line2);
-        }
-    }
 
     static BufferedImage scaleImage(BufferedImage img, int newW, int newH, int movieLinePosition) {
         int oldW = img.getWidth(), oldH = img.getHeight();
