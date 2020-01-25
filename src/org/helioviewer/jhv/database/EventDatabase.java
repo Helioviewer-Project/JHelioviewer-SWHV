@@ -42,9 +42,9 @@ public class EventDatabase {
         final long end;
         final long archiv;
         final String uid;
-        final ArrayList<JHVDatabaseParam> paramList;
+        final List<JHVDatabaseParam> paramList;
 
-        public Event2Db(byte[] _compressedJson, long _start, long _end, long _archiv, String _uid, ArrayList<JHVDatabaseParam> _paramList) {
+        public Event2Db(byte[] _compressedJson, long _start, long _end, long _archiv, String _uid, List<JHVDatabaseParam> _paramList) {
             compressedJson = _compressedJson;
             start = _start;
             end = _end;
@@ -156,7 +156,7 @@ public class EventDatabase {
         pstatement.executeUpdate();
     }
 
-    private static int dump_associationint2db(Connection connection, ArrayList<Pair<Integer, Integer>> assocs) throws SQLException {
+    private static int dump_associationint2db(Connection connection, List<Pair<Integer, Integer>> assocs) throws SQLException {
         int len = assocs.size();
         int i = 0;
         int errorcode = 0;
@@ -251,7 +251,7 @@ public class EventDatabase {
         return inserted_ids;
     }
 
-    public static int[] dump_event2db(ArrayList<Event2Db> event2db_list, SWEKSupplier type) {
+    public static int[] dump_event2db(List<Event2Db> event2db_list, SWEKSupplier type) {
         try {
             return executor.invokeAndWait(new DumpEvent2Db(event2db_list, type));
         } catch (Exception e) {
@@ -262,9 +262,9 @@ public class EventDatabase {
 
     private static class DumpEvent2Db implements Callable<int[]> {
         private final SWEKSupplier type;
-        private final ArrayList<Event2Db> event2db_list;
+        private final List<Event2Db> event2db_list;
 
-        DumpEvent2Db(ArrayList<Event2Db> _event2db_list, SWEKSupplier _type) {
+        DumpEvent2Db(List<Event2Db> _event2db_list, SWEKSupplier _type) {
             event2db_list = _event2db_list;
             type = _type;
         }
@@ -496,7 +496,7 @@ public class EventDatabase {
 
     }
 
-    public static ArrayList<Interval> db2daterange(SWEKSupplier type) {
+    public static List<Interval> db2daterange(SWEKSupplier type) {
         try {
             return executor.invokeAndWait(new Db2DateRange(type));
         } catch (Exception e) {
@@ -505,7 +505,7 @@ public class EventDatabase {
         return new ArrayList<>();
     }
 
-    private static class Db2DateRange implements Callable<ArrayList<Interval>> {
+    private static class Db2DateRange implements Callable<List<Interval>> {
 
         private final SWEKSupplier type;
 
@@ -514,7 +514,7 @@ public class EventDatabase {
         }
 
         @Override
-        public ArrayList<Interval> call() throws SQLException {
+        public List<Interval> call() throws SQLException {
             Connection connection = EventDatabaseThread.getConnection();
             if (connection == null) {
                 return new ArrayList<>();
@@ -686,7 +686,7 @@ public class EventDatabase {
         }
     }
 
-    private static ArrayList<JsonEvent> relations2Program(int event_id, SWEKSupplier type_left, SWEKSupplier type_right, String param_left, String param_right) {
+    private static List<JsonEvent> relations2Program(int event_id, SWEKSupplier type_left, SWEKSupplier type_right, String param_left, String param_right) {
         try {
             return executor.invokeAndWait(new Relations2Program(event_id, type_left, type_right, param_left, param_right));
         } catch (Exception e) {
@@ -695,7 +695,7 @@ public class EventDatabase {
         return new ArrayList<>();
     }
 
-    private static ArrayList<JsonEvent> rel2prog(int event_id, SWEKSupplier type_left, SWEKSupplier type_right, String param_left, String param_right) throws SQLException {
+    private static List<JsonEvent> rel2prog(int event_id, SWEKSupplier type_left, SWEKSupplier type_right, String param_left, String param_right) throws SQLException {
         Connection connection = EventDatabaseThread.getConnection();
         if (connection == null) {
             return new ArrayList<>();
@@ -743,7 +743,7 @@ public class EventDatabase {
         return new ArrayList<>();
     }
 
-    private static class Relations2Program implements Callable<ArrayList<JsonEvent>> {
+    private static class Relations2Program implements Callable<List<JsonEvent>> {
         private final SWEKSupplier type_left;
         private final SWEKSupplier type_right;
         private final String param_left;
@@ -760,7 +760,7 @@ public class EventDatabase {
         }
 
         @Override
-        public ArrayList<JsonEvent> call() throws SQLException {
+        public List<JsonEvent> call() throws SQLException {
             return rel2prog(event_id, type_left, type_right, param_left, param_right);
         }
     }
