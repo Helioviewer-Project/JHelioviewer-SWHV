@@ -49,11 +49,7 @@ public interface Load {
     class State implements Load {
         @Override
         public void get(@Nonnull URI uri) {
-            String name = uri.getPath().toLowerCase();
-            if (name.endsWith("jhvz"))
-                LoadZip.submit(uri);
-            else
-                LoadState.submit(uri);
+            LoadState.submit(uri);
         }
     }
 
