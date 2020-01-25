@@ -43,20 +43,24 @@ class MovieExporter {
             tempFile.deleteOnExit();
         }
 
+        int mainH = mainImage.getHeight();
         BufferedImage scaled = null;
-        ByteBuffer dataeve = null;
+        ByteBuffer eveData = null;
         if (eveImage != null) {
-            scaled = ExportUtils.scaleImage(eveImage, w, h - mainImage.getHeight(), movieLinePosition);
-            dataeve = NIOImageFactory.getByteBuffer(scaled).flip().limit(3 * w * scaled.getHeight());
+            scaled = ExportUtils.scaleImage(eveImage, w, h - mainH, movieLinePosition);
+            eveData = NIOImageFactory.getByteBuffer(scaled).flip().limit(3 * w * scaled.getHeight());
         }
 
-        ExportUtils.flipVertically(mainImage);
-        ByteBuffer data = MappedImageFactory.getByteBuffer(mainImage).flip().limit(3 * w * mainImage.getHeight());
-
+        ByteBuffer mainData = MappedImageFactory.getByteBuffer(mainImage);
         try (FileChannel channel = new FileOutputStream(tempFile, true).getChannel()) {
-            channel.write(data);
-            if (dataeve != null)
-                channel.write(dataeve);
+            for (int j = mainH - 1; j >= 0; j--) { // write image flipped
+                int pos = 3 * w * j;
+                mainData.position(pos);
+                mainData.limit(pos + 3 * w);
+                channel.write(mainData);
+            }
+            if (eveData != null)
+                channel.write(eveData);
         } catch (Exception e) {
             tempFile.delete();
             tempFile = null;
