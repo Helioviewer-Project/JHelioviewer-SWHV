@@ -44,7 +44,6 @@ import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.Movie.AdvanceMode;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.helioviewer.jhv.view.View;
 
 @SuppressWarnings("serial")
 public class MoviePanel extends JPanel implements ObservationSelector {
@@ -181,8 +180,8 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         recordButton.setEnabled(false);
     }
 
-    public static void setMovie(View view) {
-        timeSlider.setMaximum(view.getMaximumFrameNumber());
+    public static void setMovie(int max) {
+        timeSlider.setMaximum(max);
         timeSlider.repaint();
         setEnabledState(true);
 
