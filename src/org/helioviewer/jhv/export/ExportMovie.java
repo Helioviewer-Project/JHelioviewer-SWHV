@@ -1,11 +1,9 @@
 package org.helioviewer.jhv.export;
 
-import java.awt.EventQueue;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.image.MappedImageFactory;
 import org.helioviewer.jhv.base.image.NIOImageFactory;
@@ -171,8 +169,7 @@ public class ExportMovie implements FrameListener {
         @Override
         public void run() {
             try {
-                String path = movieExporter.close();
-                EventQueue.invokeLater(() -> JHVGlobals.displayNotification(path));
+                movieExporter.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }

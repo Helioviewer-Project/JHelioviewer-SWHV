@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.export;
 
+import java.awt.EventQueue;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileFilter;
@@ -68,7 +69,7 @@ class MovieExporter {
         }
     }
 
-    String close() throws Exception {
+    void close() throws Exception {
         List<String> input = List.of(
                 "-f", "rawvideo",
                 "-pix_fmt", "bgr24",
@@ -98,6 +99,11 @@ class MovieExporter {
             int exitCode = builder.start().waitFor();
             if (exitCode != 0)
                 throw new Exception("FFmpeg exit code " + exitCode);
+
+            if (format == VideoFormat.PNG) // don't know name and how many
+                EventQueue.invokeLater(() -> JHVGlobals.displayNotificationEx("Recording is ready in ", JHVDirectory.EXPORTS.getPath(), "."));
+            else
+                EventQueue.invokeLater(() -> JHVGlobals.displayNotification(outPath));
         } catch (Exception e) {
             FileFilter filter = p -> p.getName().startsWith(prefix);
             File[] toDelete = JHVDirectory.EXPORTS.getFile().listFiles(filter);
@@ -110,8 +116,6 @@ class MovieExporter {
             tempFile.delete();
             tempFile = null;
         }
-
-        return outPath;
     }
 
 }
