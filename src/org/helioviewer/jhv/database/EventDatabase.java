@@ -73,8 +73,7 @@ public class EventDatabase {
     private static final String SELECT_ASSOCIATIONS = "SELECT left_events.id, right_events.id FROM event_link " + "LEFT JOIN events AS left_events ON left_events.id=event_link.left_id " + "LEFT JOIN events AS right_events ON right_events.id=event_link.right_id " + "WHERE left_events.start BETWEEN ? AND ? and left_events.type_id=? order by left_events.start, left_events.end ";
     private static final String SELECT_EVENT_BY_ID = "SELECT e.id, e.start, e.end, e.data, event_type.supplier FROM events AS e LEFT JOIN event_type ON e.type_id = event_type.id WHERE e.id=?";
 
-    private static final HashMap<Object, PreparedStatement> statements = new HashMap<>();
-
+    private static final HashMap<String, PreparedStatement> statements = new HashMap<>();
     private static final HashMap<SWEKSupplier, RequestCache> downloadedCache = new HashMap<>();
 
     private static PreparedStatement getPreparedStatement(Connection connection, String statement) throws SQLException {
@@ -160,13 +159,13 @@ public class EventDatabase {
         int len = assocs.size();
         int i = 0;
         int errorcode = 0;
+        PreparedStatement pstatement = getPreparedStatement(connection, INSERT_LINK);
         while (i < len && errorcode == 0) {
             Pair<Integer, Integer> assoc = assocs.get(i);
             int id0 = assoc.a;
             int id1 = assoc.b;
 
             if (id0 != -1 && id1 != -1 && id0 != id1) {
-                PreparedStatement pstatement = getPreparedStatement(connection, INSERT_LINK);
                 /* Avoid circular insertions by pre-ordering events */
                 if (id0 < id1) {
                     pstatement.setInt(1, id0);
@@ -212,12 +211,12 @@ public class EventDatabase {
             int len = assocs.length;
             int i = 0;
             int errorcode = 0;
+            PreparedStatement pstatement = getPreparedStatement(connection, INSERT_LINK);
             while (i < len && errorcode == 0) {
                 Pair<String, String> assoc = assocs[i];
                 int id0 = getIdFromUID(connection, assoc.a);
                 int id1 = getIdFromUID(connection, assoc.b);
                 if (id0 != -1 && id1 != -1) {
-                    PreparedStatement pstatement = getPreparedStatement(connection, INSERT_LINK);
                     pstatement.setInt(1, id0);
                     pstatement.setInt(2, id1);
                     pstatement.executeUpdate();
@@ -279,6 +278,11 @@ public class EventDatabase {
 
             int typeId = getEventTypeId(connection, type);
             int llen = event2db_list.size();
+
+            PreparedStatement insertFullEvent = getPreparedStatement(connection, INSERT_FULL_EVENT);
+            PreparedStatement selectLastInsert = getPreparedStatement(connection, SELECT_LAST_INSERT);
+            PreparedStatement updateEvent = getPreparedStatement(connection, UPDATE_EVENT);
+
             for (int i = 0; i < llen; i++) {
                 Event2Db event2db = event2db_list.get(i);
                 int generatedKey = -1;
@@ -287,33 +291,29 @@ public class EventDatabase {
 
                     if (generatedKey == -1) {
                         {
-                            PreparedStatement pstatement = getPreparedStatement(connection, INSERT_FULL_EVENT);
-                            pstatement.setInt(1, typeId);
-                            pstatement.setString(2, event2db.uid);
-                            pstatement.setLong(3, event2db.start);
-                            pstatement.setLong(4, event2db.end);
-                            pstatement.setLong(5, event2db.archiv);
-                            pstatement.setBinaryStream(6, new ByteArrayInputStream(event2db.compressedJson), event2db.compressedJson.length);
-                            pstatement.executeUpdate();
+                            insertFullEvent.setInt(1, typeId);
+                            insertFullEvent.setString(2, event2db.uid);
+                            insertFullEvent.setLong(3, event2db.start);
+                            insertFullEvent.setLong(4, event2db.end);
+                            insertFullEvent.setLong(5, event2db.archiv);
+                            insertFullEvent.setBinaryStream(6, new ByteArrayInputStream(event2db.compressedJson), event2db.compressedJson.length);
+                            insertFullEvent.executeUpdate();
                         }
                         {
-                            PreparedStatement pstatement = getPreparedStatement(connection, SELECT_LAST_INSERT);
-
-                            try (ResultSet rs = pstatement.executeQuery()) {
+                            try (ResultSet rs = selectLastInsert.executeQuery()) {
                                 if (rs.next()) {
                                     generatedKey = rs.getInt(1);
                                 }
                             }
                         }
                     } else {
-                        PreparedStatement pstatement = getPreparedStatement(connection, UPDATE_EVENT);
-                        pstatement.setInt(1, typeId);
-                        pstatement.setString(2, event2db.uid);
-                        pstatement.setLong(3, event2db.start);
-                        pstatement.setLong(4, event2db.end);
-                        pstatement.setBinaryStream(5, new ByteArrayInputStream(event2db.compressedJson), event2db.compressedJson.length);
-                        pstatement.setInt(6, generatedKey);
-                        pstatement.executeUpdate();
+                        updateEvent.setInt(1, typeId);
+                        updateEvent.setString(2, event2db.uid);
+                        updateEvent.setLong(3, event2db.start);
+                        updateEvent.setLong(4, event2db.end);
+                        updateEvent.setBinaryStream(5, new ByteArrayInputStream(event2db.compressedJson), event2db.compressedJson.length);
+                        updateEvent.setInt(6, generatedKey);
+                        updateEvent.executeUpdate();
                     }
                     {
                         StringBuilder fieldString = new StringBuilder();
