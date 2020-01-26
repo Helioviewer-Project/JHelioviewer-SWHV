@@ -8,10 +8,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.log.Log;
 
 public class EventDatabaseThread extends Thread {
 
@@ -45,48 +44,40 @@ public class EventDatabaseThread extends Thread {
         }
     }
 
-    @Nullable
-    static Connection getConnection() {
+    @Nonnull
+    static Connection getConnection() throws SQLException {
         if (connection != null)
             return connection;
 
-        try {
-            String filepath = JHVDirectory.EVENTS.getPath() + "events.db";
-            File file = new File(filepath);
-            boolean fexist = file.isFile() && file.canRead();
-            connection = DriverManager.getConnection("jdbc:sqlite:" + filepath);
+        String filepath = JHVDirectory.EVENTS.getPath() + "events.db";
+        File file = new File(filepath);
+        boolean fexist = file.isFile() && file.canRead();
+        connection = DriverManager.getConnection("jdbc:sqlite:" + filepath);
 
-            if (fexist) {
-                int found_version = -1;
-                int found_hash = -1;
-                try (PreparedStatement pstatement = connection.prepareStatement("SELECT version, hash from version LIMIT 1")) {
-                    pstatement.setQueryTimeout(30);
-                    try (ResultSet rs = pstatement.executeQuery()) {
-                        if (rs.next()) {
-                            found_version = rs.getInt(1);
-                            found_hash = rs.getInt(2);
-                        }
+        if (fexist) {
+            int found_version = -1;
+            int found_hash = -1;
+            try (PreparedStatement pstatement = connection.prepareStatement("SELECT version, hash from version LIMIT 1")) {
+                pstatement.setQueryTimeout(30);
+                try (ResultSet rs = pstatement.executeQuery()) {
+                    if (rs.next()) {
+                        found_version = rs.getInt(1);
+                        found_hash = rs.getInt(2);
                     }
                 }
+            }
 
-                if (found_version != CURRENT_VERSION_SCHEMA || EventDatabase.config_hash != found_hash) {
-                    connection.close();
-                    file.delete();
-                    connection = DriverManager.getConnection("jdbc:sqlite:" + filepath);
-                    createSchema();
-                }
-            } else {
+            if (found_version != CURRENT_VERSION_SCHEMA || EventDatabase.config_hash != found_hash) {
+                connection.close();
+                file.delete();
+                connection = DriverManager.getConnection("jdbc:sqlite:" + filepath);
                 createSchema();
             }
-            connection.setAutoCommit(false);
-        } catch (SQLException e) {
-            Log.error("Could not create database connection", e);
-            try {
-                connection.close();
-            } catch (Exception ignore) {
-            }
-            connection = null;
+        } else {
+            createSchema();
         }
+
+        connection.setAutoCommit(false);
         return connection;
     }
 

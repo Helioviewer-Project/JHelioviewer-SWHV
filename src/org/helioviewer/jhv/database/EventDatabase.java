@@ -79,12 +79,7 @@ public class EventDatabase {
     private static PreparedStatement getPreparedStatement(String statement) throws SQLException {
         PreparedStatement pstat = statements.get(statement);
         if (pstat == null) {
-            Connection connection = EventDatabaseThread.getConnection();
-            if (connection == null) {
-                throw new SQLException("Database connection not open");
-            }
-
-            pstat = connection.prepareStatement(statement);
+            pstat = EventDatabaseThread.getConnection().prepareStatement(statement);
             pstat.setQueryTimeout(30);
             statements.put(statement, pstat);
         }
