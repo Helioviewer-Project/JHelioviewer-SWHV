@@ -18,12 +18,12 @@ public class SourcesDatabase extends Thread {
 
     private static final SingleExecutor executor = new SingleExecutor(new JHVThread.NamedClassThreadFactory(SourcesDatabase.class, "SourcesDatabase"));
 
-    private static Connection connection;
     private static PreparedStatement insert;
     private static PreparedStatement select;
 
     public SourcesDatabase(Runnable r, String name) {
         super(r, name);
+        Connection connection = null;
         try {
             connection = DriverManager.getConnection("jdbc:sqlite::memory:");
 
@@ -40,10 +40,10 @@ public class SourcesDatabase extends Thread {
         } catch (SQLException e) {
             Log.error("Could not create database connection", e);
             try {
-                connection.close();
+                if (connection != null)
+                    connection.close();
             } catch (Exception ignore) {
             }
-            connection = null;
         }
     }
 
