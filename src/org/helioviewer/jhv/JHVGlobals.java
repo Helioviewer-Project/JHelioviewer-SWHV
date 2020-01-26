@@ -121,12 +121,16 @@ public class JHVGlobals {
         }
     }
 
-    public static void displayNotification(String moviePath) {
-        String openURL = new File(moviePath).toURI().toString();
+    public static void displayNotification(String path) {
+        displayNotificationEx("File ", path, " is ready.");
+    }
+
+    public static void displayNotificationEx(String prefix, String path, String suffix) {
+        String openURL = new File(path).toURI().toString();
 
         if (System.getProperty("jhv.os").equals("mac")) {
             try {
-                String msg = "File " + moviePath + " is ready.";
+                String msg = prefix + path + suffix;
                 File jarParent = new File(JHVGlobals.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getCanonicalFile().getParentFile();
                 if (jarParent != null) {
                     String[] cmd = {
@@ -146,7 +150,7 @@ public class JHVGlobals {
             }
         }
         // otherwise
-        new TextDialog("Ready", "File <a href=\"" + openURL + "\">" + moviePath + "</a> is ready.", false).showDialog();
+        new TextDialog("Ready", prefix + "<a href=\"" + openURL + "\">" + path + "</a>" + suffix, false).showDialog();
     }
 
 }
