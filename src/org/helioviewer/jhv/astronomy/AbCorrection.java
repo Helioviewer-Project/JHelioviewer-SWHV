@@ -3,22 +3,20 @@ package org.helioviewer.jhv.astronomy;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-import spice.basic.AberrationCorrection;
-import spice.basic.SpiceErrorException;
-
 enum AbCorrection {
     NONE("NONE"), LT("LT"), LTS("LT+S"), XLT("XLT"), XLTS("XLT+S");
 
+    private final String corr;
     public final String code;
-    public final AberrationCorrection correction;
 
-    AbCorrection(String abcorr) {
-        code = URLEncoder.encode(abcorr, StandardCharsets.UTF_8);
-        try {
-            correction = new AberrationCorrection(abcorr);
-        } catch (SpiceErrorException e) {
-            throw new ExceptionInInitializerError(e);
-        }
+    AbCorrection(String _corr) {
+        corr = _corr;
+        code = URLEncoder.encode(corr, StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public String toString() {
+        return corr;
     }
 
 }
