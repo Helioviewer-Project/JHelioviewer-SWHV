@@ -79,16 +79,16 @@ public class Spice extends Thread {
     }
 
     @Nullable
-    static PositionCartesian[] getPosition(@Nonnull String observer, @Nonnull String target, Frame frame, long start, long end, long deltat) {
+    static PositionCartesian[] getPositionRange(@Nonnull String observer, @Nonnull String target, Frame frame, long start, long end, long deltat) {
         try {
-            return executor.invokeAndWait(new GetPosition(observer, target, frame, start, end, deltat));
+            return executor.invokeAndWait(new GetPositionRange(observer, target, frame, start, end, deltat));
         } catch (Exception e) {
             Log.error(e);
         }
         return null;
     }
 
-    private static class GetPosition implements Callable<PositionCartesian[]> {
+    private static class GetPositionRange implements Callable<PositionCartesian[]> {
 
         private final String observer;
         private final String target;
@@ -97,7 +97,7 @@ public class Spice extends Thread {
         private final long end;
         private final long deltat;
 
-        GetPosition(String _observer, String _target, Frame _frame, long _start, long _end, long _deltat) {
+        GetPositionRange(String _observer, String _target, Frame _frame, long _start, long _end, long _deltat) {
             observer = _observer;
             target = _target;
             frame = _frame;
@@ -131,20 +131,20 @@ public class Spice extends Thread {
     }
 
     @Nonnull
-    public static Position getEarth(JHVTime time) {
+    public static Position getEarthCarrington(JHVTime time) {
         try {
-            return executor.invokeAndWait(new GetEarth(time));
+            return executor.invokeAndWait(new GetEarthCarrington(time));
         } catch (Exception e) {
             Log.error(e);
         }
-        return Sun.getEarthSSW(time);
+        return SSW.getEarthSSW(time);
     }
 
-    private static class GetEarth implements Callable<Position> {
+    private static class GetEarthCarrington implements Callable<Position> {
 
         private final JHVTime time;
 
-        GetEarth(JHVTime _time) {
+        GetEarthCarrington(JHVTime _time) {
             time = _time;
         }
 
