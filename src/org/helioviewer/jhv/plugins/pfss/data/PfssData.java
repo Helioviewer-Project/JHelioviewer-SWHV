@@ -4,11 +4,11 @@ import java.nio.ShortBuffer;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.BufferUtils;
-import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVTime;
 
 public class PfssData {
 
-    public final JHVDate dateObs;
+    public final JHVTime dateObs;
     public final int pointsPerLine;
     public final ShortBuffer flinex;
     public final ShortBuffer fliney;
@@ -18,7 +18,7 @@ public class PfssData {
     public final double cphi;
     public final double sphi;
 
-    public PfssData(JHVDate _dateObs, short[] _flinex, short[] _fliney, short[] _flinez, short[] _flines, int _pointsPerLine) {
+    public PfssData(JHVTime _dateObs, short[] _flinex, short[] _fliney, short[] _flinez, short[] _flines, int _pointsPerLine) {
         dateObs = _dateObs;
 
         int len = _flinex.length;

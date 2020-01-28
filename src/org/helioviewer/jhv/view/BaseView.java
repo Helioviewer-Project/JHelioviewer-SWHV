@@ -14,7 +14,7 @@ import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
-import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVTime;
 
 public class BaseView implements View {
 
@@ -75,42 +75,42 @@ public class BaseView implements View {
     }
 
     @Override
-    public JHVDate getFirstTime() {
+    public JHVTime getFirstTime() {
         return metaData[0].getViewpoint().time;
     }
 
     @Override
-    public JHVDate getLastTime() {
+    public JHVTime getLastTime() {
         return metaData[0].getViewpoint().time;
     }
 
     @Override
-    public boolean setNearestFrame(JHVDate time) {
+    public boolean setNearestFrame(JHVTime time) {
         return true;
     }
 
     @Override
-    public JHVDate getNearestTime(JHVDate time) {
+    public JHVTime getNearestTime(JHVTime time) {
         return getFirstTime();
     }
 
     @Override
-    public JHVDate getLowerTime(JHVDate time) {
+    public JHVTime getLowerTime(JHVTime time) {
         return getFirstTime();
     }
 
     @Override
-    public JHVDate getHigherTime(JHVDate time) {
+    public JHVTime getHigherTime(JHVTime time) {
         return getLastTime();
     }
 
     @Override
-    public JHVDate getFrameTime(int frame) {
+    public JHVTime getFrameTime(int frame) {
         return getFirstTime();
     }
 
     @Override
-    public MetaData getMetaData(JHVDate time) {
+    public MetaData getMetaData(JHVTime time) {
         return metaData[0];
     }
 

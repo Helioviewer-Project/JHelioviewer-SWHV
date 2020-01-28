@@ -2,8 +2,8 @@ package org.helioviewer.jhv.astronomy;
 
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.JulianDay;
-import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import com.google.common.cache.CacheBuilder;
@@ -40,23 +40,23 @@ public class Sun {
     public static final double RadiusFactor_6173 = MeanEarthDistance * Math.tan(959.57 / 3600 * Math.PI / 180);
     public static final double RadiusFactor_6562 = MeanEarthDistance * Math.tan(960.017 / 3600 * Math.PI / 180);
 
-    private static final JHVDate EPOCH = new JHVDate("2000-01-01T00:00:00");
+    private static final JHVTime EPOCH = new JHVTime("2000-01-01T00:00:00");
     private static final Position EpochEarth;
     public static final Position StartEarth;
 
-    private static final LoadingCache<JHVDate, Position> cache = CacheBuilder.newBuilder().maximumSize(10000).build(CacheLoader.from(Sun::getEarthInternal));
+    private static final LoadingCache<JHVTime, Position> cache = CacheBuilder.newBuilder().maximumSize(10000).build(CacheLoader.from(Sun::getEarthInternal));
 
     static {
         EpochEarth = getEarth(EPOCH);
         StartEarth = getEarth(TimeUtils.START);
     }
 
-    public static Position getEarth(JHVDate time) {
+    public static Position getEarth(JHVTime time) {
         return cache.getUnchecked(time);
     }
 
     // derived from http://hesperia.gsfc.nasa.gov/ssw/gen/idl/solar/get_sun.pro
-    private static Position getEarthInternal(JHVDate time) {
+    private static Position getEarthInternal(JHVTime time) {
         double mjd = JulianDay.milli2mjd(time.milli);
         double t = JulianDay.mjd2jcy(mjd, 2415020.);
 
@@ -126,12 +126,12 @@ public class Sun {
 
     private static final double theta0 = sunRot(JulianDay.milli2mjd(EPOCH.milli));
 
-    public static double getHCILongitude(JHVDate time) {
+    public static double getHCILongitude(JHVTime time) {
         // 1.7381339560109783
         return sunRot(JulianDay.milli2mjd(time.milli)) + (1.738033457804639 + EpochEarth.lon - theta0);
     }
 
-    public static Quat getHCI(JHVDate time) {
+    public static Quat getHCI(JHVTime time) {
         return new Quat(0, getHCILongitude(time));
     }
 

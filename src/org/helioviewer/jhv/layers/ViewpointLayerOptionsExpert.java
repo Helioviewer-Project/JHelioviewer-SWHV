@@ -20,7 +20,7 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorListener;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectContainer;
-import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -152,8 +152,8 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         boolean sync = syncCheckBox.isSelected();
         jo.put("syncInterval", sync);
         if (!sync) {
-            jo.put("startTime", new JHVDate(timeSelectorPanel.getStartTime()));
-            jo.put("endTime", new JHVDate(timeSelectorPanel.getEndTime()));
+            jo.put("startTime", new JHVTime(timeSelectorPanel.getStartTime()));
+            jo.put("endTime", new JHVTime(timeSelectorPanel.getEndTime()));
         }
         jo.put("objects", container.toJson());
         return jo;

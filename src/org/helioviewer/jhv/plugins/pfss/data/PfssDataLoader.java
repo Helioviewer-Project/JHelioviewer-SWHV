@@ -10,7 +10,7 @@ import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
-import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVTime;
 
 import com.google.common.util.concurrent.FutureCallback;
 
@@ -47,9 +47,9 @@ class PfssDataLoader implements Callable<PfssData> {
             String dateFits = header.getStringValue("DATE-OBS");
             if (dateFits == null)
                 throw new Exception("DATE-OBS not found");
-            JHVDate date = new JHVDate(dateFits);
+            JHVTime date = new JHVTime(dateFits);
             if (time != date.milli)
-                throw new Exception("Inconsistent DATE-OBS. Expected " + new JHVDate(time) + ", got " + date);
+                throw new Exception("Inconsistent DATE-OBS. Expected " + new JHVTime(time) + ", got " + date);
 
             int points = header.getIntValue("HIERARCH.POINTS_PER_LINE");
             if (points == 0)

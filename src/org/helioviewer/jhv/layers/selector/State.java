@@ -24,7 +24,7 @@ import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
-import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
@@ -182,7 +182,7 @@ public class State {
         JHVFrame.getToolBar().getMultiviewButton().setSelected(data.optBoolean("multiview", JHVFrame.getToolBar().getMultiviewButton().isSelected()));
         JHVFrame.getToolBar().getShowCoronaButton().setSelected(data.optBoolean("showCorona", JHVFrame.getToolBar().getShowCoronaButton().isSelected()));
 
-        JHVDate time = new JHVDate(TimeUtils.optParse(data.optString("time"), Movie.getTime().milli));
+        JHVTime time = new JHVTime(TimeUtils.optParse(data.optString("time"), Movie.getTime().milli));
         boolean tracking = data.optBoolean("tracking", JHVFrame.getToolBar().getTrackingButton().isSelected());
         boolean play = data.optBoolean("play", false);
 
@@ -213,11 +213,11 @@ public class State {
 
         private final Map<ImageLayer, Boolean> newLayers;
         private final ImageLayer masterLayer;
-        private final JHVDate time;
+        private final JHVTime time;
         private final boolean tracking;
         private final boolean play;
 
-        Callback(Map<ImageLayer, Boolean> _newLayers, ImageLayer _masterLayer, JHVDate _time, boolean _tracking, boolean _play) {
+        Callback(Map<ImageLayer, Boolean> _newLayers, ImageLayer _masterLayer, JHVTime _time, boolean _tracking, boolean _play) {
             newLayers = _newLayers;
             masterLayer = _masterLayer;
             time = _time;

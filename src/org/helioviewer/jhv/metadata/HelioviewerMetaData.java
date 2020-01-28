@@ -11,7 +11,7 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
-import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVTime;
 
 public class HelioviewerMetaData extends BaseMetaData {
 
@@ -45,7 +45,7 @@ public class HelioviewerMetaData extends BaseMetaData {
         observatory = observatory.trim().intern();
         displayName = displayName.trim().intern();
 
-        retrievePosition(m, retrieveDateTime(m));
+        retrievePosition(m, retrieveTime(m));
         centerRotation = retrieveCenterRotation(m);
         retrievePixelParameters(m);
 
@@ -199,16 +199,16 @@ public class HelioviewerMetaData extends BaseMetaData {
         }
     }
 
-    private JHVDate retrieveDateTime(MetaDataContainer m) {
+    private JHVTime retrieveTime(MetaDataContainer m) {
         String observedDate = m.getString("DATE_OBS").orElseGet(() -> m.getRequiredString("DATE-OBS")); // DATE-OBS unusable for MDI and early EIT
         if (instrument.equals("LASCO")) {
             String observedTime = m.getString("TIME_OBS").orElseGet(() -> m.getRequiredString("TIME-OBS"));
             observedDate = observedDate.replace('/', '-') + 'T' + observedTime;
         }
-        return new JHVDate(observedDate.substring(0, 19)); // truncate
+        return new JHVTime(observedDate.substring(0, 19)); // truncate
     }
 
-    private void retrievePosition(MetaDataContainer m, JHVDate dateObs) {
+    private void retrievePosition(MetaDataContainer m, JHVTime dateObs) {
         Position p = Sun.getEarth(dateObs);
         double distanceObs = m.getDouble("DSUN_OBS").map(d -> d / Sun.RadiusMeter).orElse(p.distance);
         if (observatory.equals("SOHO"))

@@ -5,38 +5,38 @@ import java.util.Set;
 import java.util.TreeMap;
 
 @SuppressWarnings("serial")
-public class TimeMap<V> extends TreeMap<JHVDate, V> {
+public class TimeMap<V> extends TreeMap<JHVTime, V> {
 
-    private HashSet<JHVDate> timeSet;
-    private JHVDate[] timeArray;
+    private HashSet<JHVTime> timeSet;
+    private JHVTime[] timeArray;
     private int maxIdx;
 
     public void buildIndex() {
-        Set<JHVDate> keySet = navigableKeySet();
+        Set<JHVTime> keySet = navigableKeySet();
         timeSet = new HashSet<>(keySet);
-        timeArray = keySet.toArray(JHVDate[]::new);
+        timeArray = keySet.toArray(JHVTime[]::new);
         maxIdx = timeArray.length - 1;
     }
 
     @Override
-    public JHVDate firstKey() {
+    public JHVTime firstKey() {
         return timeArray[0];
     }
 
     @Override
-    public JHVDate lastKey() {
+    public JHVTime lastKey() {
         return timeArray[maxIdx];
     }
 
     @Override
-    public JHVDate lowerKey(JHVDate time) {
-        JHVDate k = super.lowerKey(time);
+    public JHVTime lowerKey(JHVTime time) {
+        JHVTime k = super.lowerKey(time);
         return k == null ? timeArray[0] : k;
     }
 
     @Override
-    public JHVDate higherKey(JHVDate time) {
-        JHVDate k = super.higherKey(time);
+    public JHVTime higherKey(JHVTime time) {
+        JHVTime k = super.higherKey(time);
         return k == null ? timeArray[maxIdx] : k;
     }
 
@@ -44,7 +44,7 @@ public class TimeMap<V> extends TreeMap<JHVDate, V> {
         return maxIdx;
     }
 
-    public JHVDate key(int idx) {
+    public JHVTime key(int idx) {
         if (idx < 0) {
             idx = 0;
         } else if (idx > maxIdx) {
@@ -53,12 +53,12 @@ public class TimeMap<V> extends TreeMap<JHVDate, V> {
         return timeArray[idx];
     }
 
-    public JHVDate nearestKey(JHVDate time) {
+    public JHVTime nearestKey(JHVTime time) {
         if (timeSet.contains(time)) // common case
             return time;
 
-        JHVDate c = ceilingKey(time);
-        JHVDate f = floorKey(time);
+        JHVTime c = ceilingKey(time);
+        JHVTime f = floorKey(time);
 
         if (f != null && c != null)
             return time.milli - f.milli < c.milli - time.milli ? f : c;
@@ -67,7 +67,7 @@ public class TimeMap<V> extends TreeMap<JHVDate, V> {
         return f;
     }
 
-    public V nearestValue(JHVDate time) {
+    public V nearestValue(JHVTime time) {
         return get(nearestKey(time));
     }
 

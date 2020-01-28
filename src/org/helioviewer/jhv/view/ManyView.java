@@ -13,7 +13,7 @@ import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
 
 public class ManyView implements View {
@@ -21,11 +21,11 @@ public class ManyView implements View {
     private static class FrameInfo {
 
         final View view;
-        final JHVDate timeView;
+        final JHVTime timeView;
         final int idxView;
         int idxMany;
 
-        FrameInfo(View _view, JHVDate _timeView, int _idxView) {
+        FrameInfo(View _view, JHVTime _timeView, int _idxView) {
             view = _view;
             timeView = _timeView;
             idxView = _idxView;
@@ -51,7 +51,7 @@ public class ManyView implements View {
     private void putDates(View v) {
         int m = v.getMaximumFrameNumber();
         for (int i = 0; i <= m; i++) {
-            JHVDate t = v.getFrameTime(i);
+            JHVTime t = v.getFrameTime(i);
             frameMap.put(t, new FrameInfo(v, t, i));
         }
     }
@@ -121,22 +121,22 @@ public class ManyView implements View {
     }
 
     @Override
-    public JHVDate getFrameTime(int frame) {
+    public JHVTime getFrameTime(int frame) {
         return frameMap.key(frame);
     }
 
     @Override
-    public JHVDate getFirstTime() {
+    public JHVTime getFirstTime() {
         return frameMap.firstKey();
     }
 
     @Override
-    public JHVDate getLastTime() {
+    public JHVTime getLastTime() {
         return frameMap.lastKey();
     }
 
     @Override
-    public boolean setNearestFrame(JHVDate time) {
+    public boolean setNearestFrame(JHVTime time) {
         FrameInfo frameInfo = frameMap.nearestValue(time);
         if (frameInfo.view.setNearestFrame(frameInfo.timeView)) {
             targetFrame = frameInfo.idxMany;
@@ -146,22 +146,22 @@ public class ManyView implements View {
     }
 
     @Override
-    public JHVDate getNearestTime(JHVDate time) {
+    public JHVTime getNearestTime(JHVTime time) {
         return frameMap.nearestKey(time);
     }
 
     @Override
-    public JHVDate getLowerTime(JHVDate time) {
+    public JHVTime getLowerTime(JHVTime time) {
         return frameMap.lowerKey(time);
     }
 
     @Override
-    public JHVDate getHigherTime(JHVDate time) {
+    public JHVTime getHigherTime(JHVTime time) {
         return frameMap.higherKey(time);
     }
 
     @Override
-    public MetaData getMetaData(JHVDate time) {
+    public MetaData getMetaData(JHVTime time) {
         FrameInfo frameInfo = frameMap.nearestValue(time);
         return frameInfo.view.getMetaData(frameInfo.timeView);
     }

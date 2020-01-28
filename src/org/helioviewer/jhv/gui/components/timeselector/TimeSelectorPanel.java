@@ -12,7 +12,7 @@ import javax.swing.JRadioButtonMenuItem;
 import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.JHVSplitButton;
-import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
@@ -98,7 +98,7 @@ public class TimeSelectorPanel extends JPanel {
 
     private void carringtonChanged() {
         long time = carringtonPicker.getTime();
-        int cr = (int) Math.round(Carrington.time2CR(new JHVDate(time)) - Carrington.CR_MINIMAL) + 1;
+        int cr = (int) Math.round(Carrington.time2CR(new JHVTime(time)) - Carrington.CR_MINIMAL) + 1;
         setTime(time, Carrington.CR_start[Math.min(cr, Carrington.CR_start.length - 1)]);
     }
 

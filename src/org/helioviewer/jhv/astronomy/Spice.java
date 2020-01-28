@@ -11,7 +11,7 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.SingleExecutor;
 import org.helioviewer.jhv.threads.JHVThread;
-import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVTime;
 
 import spice.basic.CSPICE;
 import spice.basic.KernelDatabase;
@@ -126,12 +126,12 @@ public class Spice extends Thread {
         double[] lt = new double[1];
         double[] v = new double[3];
         CSPICE.spkpos(target, et, frame.toString(), "NONE", observer, v, lt);
-        // System.out.println(">>> " + CSPICE.et2utc(et, "isoc", 0) + " " + new JHVDate(milli));
+        // System.out.println(">>> " + CSPICE.et2utc(et, "isoc", 0) + " " + new JHVTime(milli));
         return new PositionCartesian(milli, v[0] * Sun.RadiusKMeterInv, v[1] * Sun.RadiusKMeterInv, v[2] * Sun.RadiusKMeterInv);
     }
 
     @Nonnull
-    public static Position getEarth(JHVDate time) {
+    public static Position getEarth(JHVTime time) {
         try {
             return executor.invokeAndWait(new GetEarth(time));
         } catch (Exception e) {
@@ -142,9 +142,9 @@ public class Spice extends Thread {
 
     private static class GetEarth implements Callable<Position> {
 
-        private final JHVDate time;
+        private final JHVTime time;
 
-        GetEarth(JHVDate _time) {
+        GetEarth(JHVTime _time) {
             time = _time;
         }
 
@@ -165,7 +165,7 @@ public class Spice extends Thread {
 
     }
 
-    private static final JHVDate J2000 = new JHVDate("2000-01-01T12:00:00");
+    private static final JHVTime J2000 = new JHVTime("2000-01-01T12:00:00");
 
     private static double milli2et(long milli) throws SpiceErrorException {
         double sec = (milli - J2000.milli) / 1000.;

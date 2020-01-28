@@ -29,7 +29,7 @@ import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
-import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVTime;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -58,7 +58,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
 
     private final ViewpointLayerOptions optionsPanel;
 
-    private JHVDate viewpointTime;
+    private JHVTime viewpointTime;
 
     public ViewpointLayer(JSONObject jo) {
         optionsPanel = new ViewpointLayerOptions(jo);
@@ -228,7 +228,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
         return viewpointTime == null ? null : viewpointTime.toString();
     }
 
-    public void fireTimeUpdated(JHVDate _viewpointTime) {
+    public void fireTimeUpdated(JHVTime _viewpointTime) {
         viewpointTime = _viewpointTime;
         JHVFrame.getCarringtonStatusPanel().update(viewpointTime);
         JHVFrame.getLayers().fireTimeUpdated(this);

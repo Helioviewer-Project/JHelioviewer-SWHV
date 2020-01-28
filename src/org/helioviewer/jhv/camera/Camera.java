@@ -12,7 +12,7 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.opengl.GLSLShape;
-import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -80,7 +80,7 @@ public class Camera {
     }
 ////
 
-    private void updateCamera(JHVDate time) {
+    private void updateCamera(JHVTime time) {
         viewpoint = Display.mode == Display.DisplayMode.Orthographic ? updateViewpoint.update(time) : UpdateViewpoint.earthFixedDistance.update(time);
         updateRotation();
         updateWidth();
@@ -164,7 +164,7 @@ public class Camera {
         setFOV(fov * (1 + 0.015 * wr));
     }
 
-    public void timeChanged(JHVDate date) {
+    public void timeChanged(JHVTime date) {
         if (!tracking) {
             updateCamera(date);
         }

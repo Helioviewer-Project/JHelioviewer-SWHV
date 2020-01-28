@@ -12,7 +12,7 @@ import javax.swing.Timer;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.View;
 
@@ -25,10 +25,10 @@ public class Movie {
     public static final int DEF_FPS = 20;
 
     @Nullable
-    private static JHVDate nextTime(AdvanceMode mode, JHVDate time,
-                                    Supplier<JHVDate> firstTime, Supplier<JHVDate> lastTime,
-                                    Function<JHVDate, JHVDate> lowerTime, Function<JHVDate, JHVDate> higherTime) {
-        JHVDate next = mode == AdvanceMode.SwingDown ? lowerTime.apply(time) : higherTime.apply(time);
+    private static JHVTime nextTime(AdvanceMode mode, JHVTime time,
+                                    Supplier<JHVTime> firstTime, Supplier<JHVTime> lastTime,
+                                    Function<JHVTime, JHVTime> lowerTime, Function<JHVTime, JHVTime> higherTime) {
+        JHVTime next = mode == AdvanceMode.SwingDown ? lowerTime.apply(time) : higherTime.apply(time);
         if (next.milli == time.milli) { // already at the edges
             switch (mode) {
                 case Stop:
@@ -96,7 +96,7 @@ public class Movie {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
             View view = layer.getView();
-            JHVDate next = nextTime(advanceMode, lastTimestamp,
+            JHVTime next = nextTime(advanceMode, lastTimestamp,
                     view::getFirstTime, view::getLastTime,
                     view::getLowerTime, view::getHigherTime);
 
@@ -111,12 +111,12 @@ public class Movie {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
             View view = layer.getView();
-            JHVDate first = view.getFirstTime();
-            JHVDate last = view.getLastTime();
-            JHVDate next = nextTime(advanceMode, lastTimestamp,
+            JHVTime first = view.getFirstTime();
+            JHVTime last = view.getLastTime();
+            JHVTime next = nextTime(advanceMode, lastTimestamp,
                     () -> first, () -> last,
-                    time -> new JHVDate(Math.max(first.milli, time.milli - deltaT)),
-                    time -> new JHVDate(Math.min(last.milli, time.milli + deltaT)));
+                    time -> new JHVTime(Math.max(first.milli, time.milli - deltaT)),
+                    time -> new JHVTime(Math.min(last.milli, time.milli + deltaT)));
 
             if (next == null)
                 pause();
@@ -168,7 +168,7 @@ public class Movie {
             play();
     }
 
-    public static void setTime(JHVDate dateTime) {
+    public static void setTime(JHVTime dateTime) {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
             syncTime(layer.getView().getNearestTime(dateTime));
@@ -196,15 +196,15 @@ public class Movie {
         }
     }
 
-    private static JHVDate lastTimestamp = TimeUtils.START;
+    private static JHVTime lastTimestamp = TimeUtils.START;
     private static long movieStart = TimeUtils.START.milli;
     private static long movieEnd = TimeUtils.START.milli;
 
-    public static JHVDate getTime() {
+    public static JHVTime getTime() {
         return lastTimestamp;
     }
 
-    private static void syncTime(JHVDate dateTime) {
+    private static void syncTime(JHVTime dateTime) {
         if (recording && notDone)
             return;
 
