@@ -48,7 +48,7 @@ public class PositionLoad {
             long deltat = dt;
 
             if (observer.isInternal() && target.isInternal()) {
-                PositionCartesian[] p = Spice.getPosition(observer.getSpiceName(), target.getSpiceName(), frame, start, end, deltat);
+                PositionCartesian[] p = Spice.getPositionRange(observer.getSpiceName(), target.getSpiceName(), frame, start, end, deltat);
                 if (p != null)
                     return new PositionResponse(p);
             }
