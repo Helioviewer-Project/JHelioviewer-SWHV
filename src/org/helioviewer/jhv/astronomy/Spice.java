@@ -151,9 +151,14 @@ public class Spice extends Thread {
         @Override
         public Position call() throws SpiceErrorException {
             double et = milli2et(time.milli);
+
+            double[] ettarg = new double[1];
+            double[] elapsd = new double[2];
+            CSPICE.ltime(et, 399, "<-", 10, ettarg, elapsd);
+
             double[] lt = new double[1];
             double[] v = new double[3];
-            CSPICE.spkpos("EARTH", et, "IAU_SUN", "NONE", "SUN", v, lt);
+            CSPICE.spkpos("EARTH", ettarg[0], "IAU_SUN", "NONE", "SUN", v, lt);
             double[] c = CSPICE.reclat(v);
 
             // like in Sun.getEarthInternal
@@ -170,6 +175,11 @@ public class Spice extends Thread {
     private static double milli2et(long milli) throws SpiceErrorException {
         double sec = (milli - J2000.milli) / 1000.;
         return sec + CSPICE.deltet(sec, "UTC");
+    }
+
+    private static long et2milli(double et) throws SpiceErrorException {
+        double sec = et - CSPICE.deltet(et, "ET");
+        return (long) (sec * 1000. + J2000.milli + .5);
     }
 
 }
