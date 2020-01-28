@@ -14,7 +14,7 @@ import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.layers.TimespanListener;
-import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
@@ -233,7 +233,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     public static void setMovieFrame(Point point) {
         if (!graphArea.contains(point))
             return;
-        Movie.setTime(new JHVDate(selectedAxis.pixel2value(graphArea.x, graphArea.width, point.x)));
+        Movie.setTime(new JHVTime(selectedAxis.pixel2value(graphArea.x, graphArea.width, point.x)));
     }
 
     @Override

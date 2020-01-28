@@ -6,16 +6,16 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
-public class JHVDate implements Comparable<JHVDate> {
+public class JHVTime implements Comparable<JHVTime> {
 
     public final long milli;
     private final int hash;
 
-    public JHVDate(String date) {
+    public JHVTime(String date) {
         this(TimeUtils.parse(date));
     }
 
-    public JHVDate(long _milli) {
+    public JHVTime(long _milli) {
         if (_milli < 0)
             throw new IllegalArgumentException("Argument cannot be negative");
         milli = _milli;
@@ -23,7 +23,7 @@ public class JHVDate implements Comparable<JHVDate> {
     }
 
     @Override
-    public int compareTo(@Nonnull JHVDate dt) {
+    public int compareTo(@Nonnull JHVTime dt) {
         return Long.compare(milli, dt.milli);
     }
 
@@ -31,9 +31,9 @@ public class JHVDate implements Comparable<JHVDate> {
     public final boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof JHVDate))
+        if (!(o instanceof JHVTime))
             return false;
-        JHVDate d = (JHVDate) o;
+        JHVTime d = (JHVTime) o;
         return milli == d.milli;
     }
 
@@ -47,7 +47,7 @@ public class JHVDate implements Comparable<JHVDate> {
         return cache.getUnchecked(milli);
     }
 
-    private static final LoadingCache<Long, String> cache = CacheBuilder.newBuilder().maximumSize(100000).build(CacheLoader.from(JHVDate::getString));
+    private static final LoadingCache<Long, String> cache = CacheBuilder.newBuilder().maximumSize(100000).build(CacheLoader.from(JHVTime::getString));
 
     private static String getString(long ms) {
         return TimeUtils.format(ms);

@@ -5,20 +5,20 @@ import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.Movie;
-import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVTime;
 
 @SuppressWarnings("serial")
 public class CarringtonStatusPanel extends StatusPanel.StatusPlugin implements LazyComponent {
 
     private boolean dirty;
-    private JHVDate time;
+    private JHVTime time;
 
     public CarringtonStatusPanel() {
         update(Movie.getTime());
         UITimer.register(this);
     }
 
-    public void update(JHVDate _time) {
+    public void update(JHVTime _time) {
         time = _time;
         dirty = true;
     }

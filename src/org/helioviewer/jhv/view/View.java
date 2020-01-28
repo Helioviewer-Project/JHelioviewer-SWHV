@@ -11,7 +11,7 @@ import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVTime;
 
 public interface View {
 
@@ -42,22 +42,22 @@ public interface View {
     @Nullable
     AtomicBoolean getFrameCacheStatus(int frame);
 
-    JHVDate getFrameTime(int frame);
+    JHVTime getFrameTime(int frame);
 
-    JHVDate getFirstTime();
+    JHVTime getFirstTime();
 
-    JHVDate getLastTime();
+    JHVTime getLastTime();
 
     // <!- only for Layers
-    boolean setNearestFrame(JHVDate time);
+    boolean setNearestFrame(JHVTime time);
 
-    JHVDate getNearestTime(JHVDate time);
+    JHVTime getNearestTime(JHVTime time);
 
-    JHVDate getLowerTime(JHVDate time);
+    JHVTime getLowerTime(JHVTime time);
 
-    JHVDate getHigherTime(JHVDate time);
+    JHVTime getHigherTime(JHVTime time);
 
-    MetaData getMetaData(JHVDate time);
+    MetaData getMetaData(JHVTime time);
     // -->
 
     @Nonnull

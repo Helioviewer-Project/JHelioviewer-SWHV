@@ -21,7 +21,7 @@ import org.helioviewer.jhv.io.APIResponse;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.DecodeCallback;
@@ -124,10 +124,10 @@ public class J2KView extends BaseView {
                 if (maxFrame + 1 != frames.length)
                     Log.warn(uri + ": expected " + (maxFrame + 1) + "frames, got " + frames.length);
                 for (int i = 0; i < Math.min(maxFrame + 1, frames.length); i++) {
-                    JHVDate d = frameMap.key(i);
+                    JHVTime d = frameMap.key(i);
                     if (d.milli != frames[i] * 1000) {
                         cacheKey[i] = 0; // uncacheable
-                        Log.warn(uri + "[" + i + "]: expected " + d + ", got " + new JHVDate(frames[i] * 1000));
+                        Log.warn(uri + "[" + i + "]: expected " + d + ", got " + new JHVTime(frames[i] * 1000));
                     }
                 }
             }
@@ -215,17 +215,17 @@ public class J2KView extends BaseView {
     }
 
     @Override
-    public JHVDate getFirstTime() {
+    public JHVTime getFirstTime() {
         return frameMap.firstKey();
     }
 
     @Override
-    public JHVDate getLastTime() {
+    public JHVTime getLastTime() {
         return frameMap.lastKey();
     }
 
     @Override
-    public boolean setNearestFrame(JHVDate time) {
+    public boolean setNearestFrame(JHVTime time) {
         int frame = frameMap.nearestValue(time);
         if (frame != targetFrame) {
             if (frame > cacheStatus.getPartialUntil())
@@ -236,27 +236,27 @@ public class J2KView extends BaseView {
     }
 
     @Override
-    public JHVDate getFrameTime(int frame) {
+    public JHVTime getFrameTime(int frame) {
         return frameMap.key(frame);
     }
 
     @Override
-    public JHVDate getNearestTime(JHVDate time) {
+    public JHVTime getNearestTime(JHVTime time) {
         return frameMap.nearestKey(time);
     }
 
     @Override
-    public JHVDate getLowerTime(JHVDate time) {
+    public JHVTime getLowerTime(JHVTime time) {
         return frameMap.lowerKey(time);
     }
 
     @Override
-    public JHVDate getHigherTime(JHVDate time) {
+    public JHVTime getHigherTime(JHVTime time) {
         return frameMap.higherKey(time);
     }
 
     @Override
-    public MetaData getMetaData(JHVDate time) {
+    public MetaData getMetaData(JHVTime time) {
         return metaData[frameMap.nearestValue(time)];
     }
 

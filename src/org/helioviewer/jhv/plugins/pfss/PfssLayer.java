@@ -16,7 +16,7 @@ import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.plugins.pfss.data.PfssData;
 import org.helioviewer.jhv.plugins.pfss.data.PfssNewDataLoader;
-import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVTime;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -31,7 +31,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener, TimespanLi
     private final BufVertex lineBuf = new BufVertex(3276 * GLSLLine.stride); // pre-allocate 64k
 
     private PfssData previousPfssData;
-    private JHVDate pfssTime;
+    private JHVTime pfssTime;
     private long currentTime;
 
     public PfssLayer(JSONObject jo) {

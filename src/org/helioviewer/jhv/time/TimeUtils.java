@@ -25,9 +25,9 @@ public class TimeUtils {
     public static final long DAY_IN_MILLIS = 86400000;
     public static final long MINUTE_IN_MILLIS = 60000;
 
-    public static final JHVDate START = new JHVDate(floorSec(System.currentTimeMillis()));
-    public static final JHVDate MINIMAL_DATE = new JHVDate("1970-01-01T00:00:00");
-    public static final JHVDate MAXIMAL_DATE = new JHVDate("2050-01-01T00:00:00");
+    public static final JHVTime START = new JHVTime(floorSec(System.currentTimeMillis()));
+    public static final JHVTime MINIMAL_TIME = new JHVTime("1970-01-01T00:00:00");
+    public static final JHVTime MAXIMAL_TIME = new JHVTime("2050-01-01T00:00:00");
 
     private static final double MAX_FRAMES = 96;
 
@@ -113,14 +113,14 @@ public class TimeUtils {
         public Optional<String> validate(String subject) {
             try {
                 long time = parseSQL(subject);
-                if (time < MINIMAL_DATE.milli || time > MAXIMAL_DATE.milli)
+                if (time < MINIMAL_TIME.milli || time > MAXIMAL_TIME.milli)
                     throw new Exception();
 
                 return Optional.empty();
             } catch (DateTimeParseException e) {
                 return Optional.of(String.format("[%s] is not a valid sql-date-time.", subject));
             } catch (Exception e) {
-                return Optional.of(String.format("[%s] is outside date range of [%s,%s].", subject, MINIMAL_DATE, MAXIMAL_DATE));
+                return Optional.of(String.format("[%s] is outside time range of [%s,%s].", subject, MINIMAL_TIME, MAXIMAL_TIME));
             }
         }
 

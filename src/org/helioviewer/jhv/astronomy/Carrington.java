@@ -3,7 +3,7 @@ package org.helioviewer.jhv.astronomy;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.JulianDay;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -1090,7 +1090,7 @@ public class Carrington {
     };
 
     // derived from tim2carr
-    public static double time2CR(JHVDate time) {
+    public static double time2CR(JHVTime time) {
         double mjd = JulianDay.milli2mjd(time.milli);
         double cr = ((JulianDay.DJM0 - 2398167.) + mjd) / CR_SYNODIC_MEAN + 1.;
         int icr = (int) cr;
@@ -1107,9 +1107,9 @@ public class Carrington {
     }
 
     public static void computeTable() {
-        JHVDate next = TimeUtils.MINIMAL_DATE;
+        JHVTime next = TimeUtils.MINIMAL_TIME;
 
-        while (next.milli < TimeUtils.MAXIMAL_DATE.milli) {
+        while (next.milli < TimeUtils.MAXIMAL_TIME.milli) {
             double cr = time2CR(next);
             long delta_next = (long) ((CR_SYNODIC_MEAN - 0.25) * TimeUtils.DAY_IN_MILLIS);
 
@@ -1117,9 +1117,9 @@ public class Carrington {
             double rcr = bd.doubleValue();
             if (rcr == (int) rcr) {
                 System.out.println("        /* " + ((int) rcr) + " */ " + next.milli + "L, /* " + next + " */");
-                next = new JHVDate(next.milli + delta_next);
+                next = new JHVTime(next.milli + delta_next);
             } else
-                next = new JHVDate(next.milli + 500);
+                next = new JHVTime(next.milli + 500);
         }
     }
 

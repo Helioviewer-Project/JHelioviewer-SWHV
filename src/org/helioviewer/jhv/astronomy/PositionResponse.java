@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec3;
-import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -92,9 +92,9 @@ public class PositionResponse {
             hglt = Math.asin(z / dist);
         }
 
-        JHVDate date = new JHVDate(time);
-        double elon = Sun.getEarth(date).lon;
-        return new Position(date, dist, elon - hgln, hglt);
+        JHVTime jtime = new JHVTime(time);
+        double elon = Sun.getEarth(jtime).lon;
+        return new Position(jtime, dist, elon - hgln, hglt);
     }
 
     public Vec3 getInterpolatedHG(long t, long start, long end) {

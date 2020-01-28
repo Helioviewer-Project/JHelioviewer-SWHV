@@ -13,12 +13,12 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
-import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 
 public interface UpdateViewpoint {
 
-    Position update(JHVDate time);
+    Position update(JHVTime time);
 
     void clear();
 
@@ -56,13 +56,13 @@ public interface UpdateViewpoint {
         }
 
         @Override
-        public abstract Position update(JHVDate time);
+        public abstract Position update(JHVTime time);
 
     }
 
     class Observer extends AbstractUpdateViewpoint {
         @Override
-        public Position update(JHVDate time) {
+        public Position update(JHVTime time) {
             ImageLayer layer = Layers.getActiveImageLayer();
             return layer == null ? Sun.getEarth(time) : layer.getView().getMetaData(time).getViewpoint();
         }
@@ -70,14 +70,14 @@ public interface UpdateViewpoint {
 
     class Earth extends AbstractUpdateViewpoint {
         @Override
-        public Position update(JHVDate time) {
+        public Position update(JHVTime time) {
             return Sun.getEarth(time);
         }
     }
 
     class EarthFixedDistance extends AbstractUpdateViewpoint {
         @Override
-        public Position update(JHVDate time) {
+        public Position update(JHVTime time) {
             double elon = Sun.getEarth(time).lon;
             return new Position(time, Sun.MeanEarthDistance, elon, 0);
         }
@@ -110,14 +110,14 @@ public interface UpdateViewpoint {
         }
 
         @Override
-        public Position update(JHVDate time) {
-            JHVDate itime = time;
+        public Position update(JHVTime time) {
+            JHVTime itime = time;
             Iterator<PositionLoad> it = getPositionLoads().iterator();
             if (it.hasNext()) {
                 PositionResponse response = it.next().getResponse();
                 if (response != null) {
                     long t = response.interpolateTime(time.milli, Movie.getStartTime(), Movie.getEndTime());
-                    itime = new JHVDate(TimeUtils.floorSec(t));
+                    itime = new JHVTime(TimeUtils.floorSec(t));
                 }
             }
 
@@ -150,7 +150,7 @@ public interface UpdateViewpoint {
         }
 
         @Override
-        public Position update(JHVDate time) {
+        public Position update(JHVTime time) {
             PositionResponse response;
             if (positionLoad == null || (response = positionLoad.getResponse()) == null)
                 return Sun.getEarth(time);

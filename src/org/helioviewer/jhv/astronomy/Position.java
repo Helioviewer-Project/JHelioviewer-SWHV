@@ -2,17 +2,17 @@ package org.helioviewer.jhv.astronomy;
 
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVTime;
 
 public class Position {
 
     public final double distance;
     public final double lon;
     public final double lat;
-    public final JHVDate time;
+    public final JHVTime time;
     private Quat q;
 
-    public Position(JHVDate _time, double _distance, double _lon, double _lat) {
+    public Position(JHVTime _time, double _distance, double _lon, double _lat) {
         distance = _distance;
         lon = _lon;
         lat = _lat;

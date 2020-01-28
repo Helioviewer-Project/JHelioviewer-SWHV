@@ -18,7 +18,7 @@ import org.helioviewer.jhv.events.JHVPositionInformation;
 import org.helioviewer.jhv.events.SWEKParameter;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec3;
-import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -258,7 +258,7 @@ class HEKParser {
                 }
             }
 
-            Position p = Sun.getEarth(new JHVDate(currentEvent.start));
+            Position p = Sun.getEarth(new JHVTime(currentEvent.start));
             double elon = p.lon;
 
             ArrayList<Vec3> jhvBoundedBox = new ArrayList<>(localHGSBoundedBox.size());

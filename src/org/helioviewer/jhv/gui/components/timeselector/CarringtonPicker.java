@@ -15,7 +15,7 @@ import javax.swing.event.PopupMenuListener;
 import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.gui.components.base.MenuScroller;
 import org.helioviewer.jhv.gui.components.base.JHVButton;
-import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
@@ -50,7 +50,7 @@ class CarringtonPicker extends JHVButton implements PopupMenuListener {
 
     @Override
     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-        int cr = (int) Math.round(Carrington.time2CR(new JHVDate(time)) - Carrington.CR_MINIMAL);
+        int cr = (int) Math.round(Carrington.time2CR(new JHVTime(time)) - Carrington.CR_MINIMAL);
         Component component = popup.getComponent(cr);
         if (component instanceof JMenuItem) {
             ((JMenuItem) component).setSelected(true);
@@ -73,7 +73,7 @@ class CarringtonPicker extends JHVButton implements PopupMenuListener {
     }
 
     void setTime(long _time) {
-        if (_time > TimeUtils.MINIMAL_DATE.milli && _time < TimeUtils.MAXIMAL_DATE.milli)
+        if (_time > TimeUtils.MINIMAL_TIME.milli && _time < TimeUtils.MAXIMAL_TIME.milli)
             time = _time;
     }
 
