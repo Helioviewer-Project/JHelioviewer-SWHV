@@ -7,6 +7,18 @@ public class MathUtils {
     public static final double radeg = 180 / Math.PI;
     public static final double degra = Math.PI / 180;
 
+    public static String radian2String(double r) {
+        double d = Math.toDegrees(r);
+        double f = d % 1;
+        int id = (int) (d - f);
+
+        double m = Math.abs(f * 60.);
+        f = m % 1;
+        int im = (int) (m - f);
+
+        return String.format("%d\u00B0%d\u2032%.2f\u2033", id, im, f * 60.);
+    }
+
     /**
      * Returns the integer, x, closest on the number line such that
      * min(_side1,_side2) <= x <= max(_side1,_side2).

@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.astronomy;
 
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.time.JHVDate;
 
@@ -51,7 +52,7 @@ public class Position {
 
     @Override
     public String toString() {
-        return String.format("%s [%f,%f,%f]", time, distance, lon, lat);
+        return String.format("%s [%f,%s,%s]", time, distance, MathUtils.radian2String(lon), MathUtils.radian2String(lat));
     }
 
 }
