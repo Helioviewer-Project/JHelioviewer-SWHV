@@ -137,7 +137,7 @@ public class Spice extends Thread {
         } catch (Exception e) {
             Log.error(e);
         }
-        return Sun.getEarth(time);
+        return Sun.getEarthSSW(time);
     }
 
     private static class GetEarth implements Callable<Position> {
@@ -152,13 +152,12 @@ public class Spice extends Thread {
         public Position call() throws SpiceErrorException {
             double et = milli2et(time.milli);
 
-            double[] ettarg = new double[1];
-            double[] elapsd = new double[2];
-            CSPICE.ltime(et, 399, "<-", 10, ettarg, elapsd);
-
             double[] lt = new double[1];
             double[] v = new double[3];
-            CSPICE.spkpos("EARTH", ettarg[0], "IAU_SUN", "NONE", "SUN", v, lt);
+            // possibly faster than using ltime()
+            CSPICE.spkpos("EARTH", et, "IAU_SUN", "NONE", "SUN", v, lt);
+            CSPICE.spkpos("EARTH", et - lt[0], "IAU_SUN", "NONE", "SUN", v, lt);
+
             double[] c = CSPICE.reclat(v);
 
             // like in Sun.getEarthInternal
