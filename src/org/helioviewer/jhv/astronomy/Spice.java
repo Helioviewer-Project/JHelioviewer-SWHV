@@ -155,7 +155,7 @@ public class Spice extends Thread {
             double[] lt = new double[1];
             double[] v = new double[3];
             // possibly faster than using ltime()
-            CSPICE.spkpos("EARTH", et, "IAU_SUN", "NONE", "SUN", v, lt);
+            CSPICE.spkpos("EARTH", et, "J2000", "NONE", "SUN", v, lt);
             CSPICE.spkpos("EARTH", et - lt[0], "IAU_SUN", "NONE", "SUN", v, lt);
 
             double[] c = CSPICE.reclat(v);
