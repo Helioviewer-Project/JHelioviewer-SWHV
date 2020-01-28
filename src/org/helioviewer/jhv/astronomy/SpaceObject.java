@@ -13,14 +13,12 @@ import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
 
 import com.google.common.collect.ImmutableMap;
 
-import spice.basic.Body;
-import spice.basic.SpiceException;
-
 public class SpaceObject {
 
+    private final boolean internal;
+    private final String spiceName;
     private final String urlName;
-    private final Body body;
-    private final String name;
+    private final String uiName;
     private final double radius;
     private final byte[] color;
     private final Border border;
@@ -63,29 +61,26 @@ public class SpaceObject {
         return objectMap.get(obj);
     }
 
-    private SpaceObject(boolean supported, String spiceName, String uiName, double _radius, byte[] _color, Border _border) {
+    private SpaceObject(boolean _internal, String _spiceName, String _uiName, double _radius, byte[] _color, Border _border) {
+        internal = _internal;
+        spiceName = _spiceName;
         urlName = URLEncoder.encode(spiceName, StandardCharsets.UTF_8);
-        if (supported) {
-            try {
-                body = new Body(spiceName);
-            } catch (SpiceException e) {
-                throw new ExceptionInInitializerError(e);
-            }
-        } else
-            body = null;
-
-        name = uiName;
+        uiName = _uiName;
         radius = _radius;
         color = _color;
         border = _border;
     }
 
-    public String getUrlName() {
-        return urlName;
+    public boolean isInternal() {
+        return internal;
     }
 
-    public Body getBody() {
-        return body;
+    public String getSpiceName() {
+        return spiceName;
+    }
+
+    public String getUrlName() {
+        return urlName;
     }
 
     public double getRadius() {
@@ -117,7 +112,7 @@ public class SpaceObject {
 
     @Override
     public String toString() {
-        return name;
+        return uiName;
     }
 
 }

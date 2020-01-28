@@ -16,8 +16,6 @@ import org.json.JSONObject;
 //import com.google.common.base.Stopwatch;
 import com.google.common.util.concurrent.FutureCallback;
 
-import spice.basic.Body;
-
 public class PositionLoad {
 
     private static class LoadPosition implements Callable<PositionResponse> {
@@ -49,9 +47,8 @@ public class PositionLoad {
                 dt = span / MAX_POINTS;
             long deltat = dt;
 
-            Body observerBody = observer.getBody(), targetBody = target.getBody();
-            if (observerBody != null && targetBody != null) {
-                PositionCartesian[] p = Spice.getPosition(observerBody, targetBody, frame, start, end, deltat);
+            if (observer.isInternal() && target.isInternal()) {
+                PositionCartesian[] p = Spice.getPosition(observer.getSpiceName(), target.getSpiceName(), frame, start, end, deltat);
                 if (p != null)
                     return new PositionResponse(p);
             }
