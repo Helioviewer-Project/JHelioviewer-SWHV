@@ -125,16 +125,55 @@ public class Spice extends Thread {
     }
 
     private static PositionCartesian position(Body target, long milli, Frame frame, Body observer) throws SpiceException {
-        double sec = (milli - J2000.milli) / 1000.;
-        TDBTime time = new TDBTime(sec + CSPICE.deltet(sec, "UTC"));
-        PositionVector v = new PositionVector(target, time, frame.referenceFrame, AbCorrection.NONE.correction, observer);
-        // System.out.println(">>> " + time.toUTCString("isoc", 0) + " " + new JHVDate(milli));
+        TDBTime et = new TDBTime(milli2et(milli));
+        PositionVector v = new PositionVector(target, et, frame.referenceFrame, AbCorrection.NONE.correction, observer);
+        // System.out.println(">>> " + et.toUTCString("isoc", 0) + " " + new JHVDate(milli));
         return new PositionCartesian(milli,
                 v.getElt(0) * Sun.RadiusKMeterInv,
                 v.getElt(1) * Sun.RadiusKMeterInv,
                 v.getElt(2) * Sun.RadiusKMeterInv);
     }
 
+    @Nonnull
+    public static Position getEarth(JHVDate time) {
+        try {
+            return executor.invokeAndWait(new GetEarth(time));
+        } catch (Exception e) {
+            Log.error(e);
+        }
+        return Sun.getEarth(time);
+    }
+
+    private static class GetEarth implements Callable<Position> {
+
+        private final JHVDate time;
+
+        GetEarth(JHVDate _time) {
+            time = _time;
+        }
+
+        @Override
+        public Position call() throws SpiceErrorException {
+            double et = milli2et(time.milli);
+            double[] lt = new double[1];
+            double[] v = new double[3];
+            CSPICE.spkpos("EARTH", et, "IAU_SUN", "NONE", "SUN", v, lt);
+            double[] c = CSPICE.reclat(v);
+
+            // like in Sun.getEarthInternal
+            double lon = c[1];
+            if (lon < 0)
+                lon += 2 * Math.PI;
+            return new Position(time, c[0] * Sun.RadiusKMeterInv, -lon, c[2]);
+        }
+
+    }
+
     private static final JHVDate J2000 = new JHVDate("2000-01-01T12:00:00");
+
+    private static double milli2et(long milli) throws SpiceErrorException {
+        double sec = (milli - J2000.milli) / 1000.;
+        return sec + CSPICE.deltet(sec, "UTC");
+    }
 
 }
