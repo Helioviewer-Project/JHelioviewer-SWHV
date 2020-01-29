@@ -7,7 +7,7 @@
 - Draw spiral in heliosphere
 - Read Helioviewer metadata from JPG and PNG files
 - Switch from NewtCanvasAWT to GLCanvas (full screen is lost)
-- Support pixel scale in Windows 10
+- Support pixel scale in Windows 10 ([#75](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/75>),[#76](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/76>))
 - Support fractional pixel scale
 - Switch to Java 11
 - Switch to OpenGL 3.3
@@ -17,11 +17,11 @@
 - Request SOLO trajectory backdated 5 years
 - Use install4j for packaging installation
 - Support setting playback speed in time period per second
-- Play sequence of files as movie
+- Play sequence of files as movie ([#119](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/119>))
 - Rework handling of threads throughout the program
 - Incorporate SPICE and use it for input [time parsing](<https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/str2et_c.html>) and position calculations for planets
 - Support IRIS SJI
 - Change video export to use FFmpeg and disk buffering
-- Allow several video export qualities of H.264 and H.265, as well as series of PNGs
+- Allow several video export qualities of H.264 and H.265, as well as series of PNGs ([#26](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/26>),[#44](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/44>),[#45](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/45>))
 - Use SPICE for the calculations of internal reference frames
 - Allow customization of grid in latitudinal projection ([#99](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/99>))
