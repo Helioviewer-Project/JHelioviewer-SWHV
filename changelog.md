@@ -24,4 +24,4 @@
 - Change video export to use FFmpeg and disk buffering
 - Allow several video export qualities of H.264 and H.265, as well as series of PNGs
 - Use SPICE for the calculations of internal reference frames
-- Allow customization of grid in latitudinal projection ([#99](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/99))
+- Allow customization of grid in latitudinal projection ([#99](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/99>))
