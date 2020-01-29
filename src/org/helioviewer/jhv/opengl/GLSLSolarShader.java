@@ -228,7 +228,8 @@ public class GLSLSolarShader extends GLSLShader {
         hglt[1] = (float) Math.sin(viewpoint.lat);
         hglt[2] = (float) Math.cos(viewpoint.lat);
         gl.glUniform1fv(hgltRef, 3, hglt, 0);
-        hgln[0] = (float) ((viewpoint.lon + 2. * Math.PI) % (2. * Math.PI));
+        double lon = viewpoint.lon - Layers.getGridLayer().gridLongitude(viewpoint);
+        hgln[0] = (float) ((lon + 2. * Math.PI) % (2. * Math.PI));
         gl.glUniform1fv(hglnRef, 1, hgln, 0);
         crota[0] = _crota;
         crota[1] = scrota;
@@ -241,7 +242,8 @@ public class GLSLSolarShader extends GLSLShader {
         hgltDiff[1] = (float) Math.sin(viewpoint.lat);
         hgltDiff[2] = (float) Math.cos(viewpoint.lat);
         gl.glUniform1fv(hgltDiffRef, 3, hgltDiff, 0);
-        hglnDiff[0] = (float) ((viewpoint.lon + 2. * Math.PI) % (2. * Math.PI));
+        double lon = viewpoint.lon - Layers.getGridLayer().gridLongitude(viewpoint);
+        hglnDiff[0] = (float) ((lon + 2. * Math.PI) % (2. * Math.PI));
         gl.glUniform1fv(hglnDiffRef, 1, hglnDiff, 0);
         crotaDiff[0] = _crota;
         crotaDiff[1] = scrota;

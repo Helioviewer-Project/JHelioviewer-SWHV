@@ -92,7 +92,8 @@ public interface GridScale {
         public Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridType gridType) {
             double x = CameraHelper.computeUpX(camera, vp, px) / vp.aspect + 0.5;
             double y = CameraHelper.computeUpY(camera, vp, py) + 0.5;
-            return new Vec2(getInterpolatedXValue(x), getInterpolatedYValue(y));
+            double ix = MathUtils.mapToMinus180To180(getInterpolatedXValue(x) + 180);
+            return new Vec2(ix, getInterpolatedYValue(y));
         }
 
         @Nonnull
