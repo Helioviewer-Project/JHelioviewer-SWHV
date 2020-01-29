@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.astronomy;
 
 import org.helioviewer.jhv.math.MathUtils;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.JulianDay;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -42,14 +41,21 @@ public class Sun {
 
     public static final Position StartEarth;
 
-    private static final LoadingCache<JHVTime, Position> cache = CacheBuilder.newBuilder().maximumSize(10000).build(CacheLoader.from(Spice::getEarthCarrington));
+    private static final LoadingCache<JHVTime, Position> carringtonCache = CacheBuilder.newBuilder().maximumSize(10000)
+            .build(CacheLoader.from(Spice::getEarthCarrington));
+    private static final LoadingCache<JHVTime, Position> hciCache = CacheBuilder.newBuilder().maximumSize(10000)
+            .build(CacheLoader.from(t -> Spice.getPosition("SUN", "EARTH", Frame.HCI, t)));
 
     static {
         StartEarth = getEarth(TimeUtils.START);
     }
 
     public static Position getEarth(JHVTime time) {
-        return cache.getUnchecked(time);
+        return carringtonCache.getUnchecked(time);
+    }
+
+    public static Position getEarthHCI(JHVTime time) {
+        return hciCache.getUnchecked(time);
     }
 
     public static double getEarthDistance(long milli) {
@@ -72,14 +78,6 @@ public class Sun {
         double dist = 1.0000002 * (1. - e * e) / (1. + e * Math.cos(ta * MathUtils.degra));
 
         return dist * MeanEarthDistance;
-    }
-
-    public static Position getEarthHCI(JHVTime time) {
-        return Spice.getPosition("SUN", "EARTH", Frame.HCI, time); // should be cached
-    }
-
-    public static Quat getHCI(JHVTime time) {
-        return new Quat(0, getEarth(time).lon + getEarthHCI(time).lon);
     }
 
 }
