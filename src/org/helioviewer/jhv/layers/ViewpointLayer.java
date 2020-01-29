@@ -319,9 +319,9 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
         double rad0, lon0, lat0;
 
         if (spiralControl == null) {
-            Position p0 = Sun.getEarth(viewpoint.time);
+            Position p0 = Sun.getEarthHCI(viewpoint.time);
             rad0 = p0.distance;
-            lon0 = inertial ? Sun.getHCILongitude(viewpoint.time) - p0.lon : 0;
+            lon0 = inertial ? p0.lon : 0;
             lat0 = 0;
         } else {
             rad0 = spiralControl.x;

@@ -130,6 +130,43 @@ public class Spice extends Thread {
         return new PositionCartesian(milli, v[0] * Sun.RadiusKMeterInv, v[1] * Sun.RadiusKMeterInv, v[2] * Sun.RadiusKMeterInv);
     }
 
+    @Nullable
+    static Position getPosition(@Nonnull String observer, @Nonnull String target, Frame frame, JHVTime time) {
+        try {
+            return executor.invokeAndWait(new GetPosition(observer, target, frame, time));
+        } catch (Exception e) {
+            Log.error(e);
+        }
+        return null;
+    }
+
+    private static class GetPosition implements Callable<Position> {
+
+        private final String observer;
+        private final String target;
+        private final Frame frame;
+        private final JHVTime time;
+
+        GetPosition(String _observer, String _target, Frame _frame, JHVTime _time) {
+            observer = _observer;
+            target = _target;
+            frame = _frame;
+            time = _time;
+        }
+
+        @Override
+        public Position call() throws SpiceErrorException {
+            double et = milli2et(time.milli);
+            double[] lt = new double[1];
+            double[] v = new double[3];
+            CSPICE.spkpos(target, et, frame.toString(), "NONE", observer, v, lt);
+
+            double[] c = CSPICE.reclat(v);
+            return new Position(time, c[0] * Sun.RadiusKMeterInv, c[1], c[2]);
+        }
+
+    }
+
     @Nonnull
     public static Position getEarthCarrington(JHVTime time) {
         try {
