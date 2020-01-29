@@ -1,6 +1,6 @@
 void get_lati_texcoord(const float ln, const float lt[3], const float cr[3], const vec2 scrpos, const vec4 rect, out vec2 texcoord) {
     float theta = lt[0] + scrpos.y * PI;
-    float phi = PI + ln + scrpos.x * TWOPI;
+    float phi = PI + scrpos.x * TWOPI;
 
     vec3 xcart;
     xcart.x = sin(theta) * cos(phi);
