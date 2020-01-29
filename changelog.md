@@ -12,7 +12,7 @@
 - Switch to Java 11
 - Switch to OpenGL 3.3
 - Move plugins options to preferences
-- Support KCor dataset (#114)
+- Support KCor dataset ([#114](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/114>))
 - Simplify datetime selection and use NLP for input time parsing
 - Request SOLO trajectory backdated 5 years
 - Use install4j for packaging installation
@@ -24,4 +24,4 @@
 - Change video export to use FFmpeg and disk buffering
 - Allow several video export qualities of H.264 and H.265, as well as series of PNGs
 - Use SPICE for the calculations of internal reference frames
-- Allow customization of grid in latitudinal projection (#99)
+- Allow customization of grid in latitudinal projection ([#99](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/99))
