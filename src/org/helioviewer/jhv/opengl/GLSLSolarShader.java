@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.opengl;
 
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.math.Quat;
 
 import com.jogamp.opengl.GL2;
@@ -223,7 +224,7 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindAngles(GL2 gl, Position viewpoint, float _crota, float scrota, float ccrota) {
-        hglt[0] = (float) viewpoint.lat;
+        hglt[0] = (float) Layers.getGridLayer().gridLatitude(viewpoint);
         hglt[1] = (float) Math.sin(viewpoint.lat);
         hglt[2] = (float) Math.cos(viewpoint.lat);
         gl.glUniform1fv(hgltRef, 3, hglt, 0);
@@ -236,7 +237,7 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindAnglesDiff(GL2 gl, Position viewpoint, float _crota, float scrota, float ccrota) {
-        hgltDiff[0] = (float) viewpoint.lat;
+        hgltDiff[0] = (float) Layers.getGridLayer().gridLatitude(viewpoint);
         hgltDiff[1] = (float) Math.sin(viewpoint.lat);
         hgltDiff[2] = (float) Math.cos(viewpoint.lat);
         gl.glUniform1fv(hgltDiffRef, 3, hgltDiff, 0);

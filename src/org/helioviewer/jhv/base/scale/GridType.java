@@ -22,4 +22,8 @@ public enum GridType {
         }
     }
 
+    public double toLatitude(Position viewpoint) {
+        return this == Viewpoint ? viewpoint.lat : 0;
+    }
+
 }

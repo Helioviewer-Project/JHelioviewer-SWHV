@@ -115,6 +115,10 @@ public class GridLayer extends AbstractLayer {
         return Display.mode.scale.mouseToGrid(x, y, vp, camera, gridType);
     }
 
+    public double gridLatitude(Position viewpoint) {
+        return gridType.toLatitude(viewpoint);
+    }
+
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.idx])
