@@ -40,14 +40,11 @@ public class Sun {
     public static final double RadiusFactor_6173 = MeanEarthDistance * Math.tan(959.57 / 3600 * Math.PI / 180);
     public static final double RadiusFactor_6562 = MeanEarthDistance * Math.tan(960.017 / 3600 * Math.PI / 180);
 
-    private static final JHVTime EPOCH = new JHVTime("2000-01-01T00:00:00");
-    private static final Position EpochEarth;
     public static final Position StartEarth;
 
     private static final LoadingCache<JHVTime, Position> cache = CacheBuilder.newBuilder().maximumSize(10000).build(CacheLoader.from(Spice::getEarthCarrington));
 
     static {
-        EpochEarth = getEarth(EPOCH);
         StartEarth = getEarth(TimeUtils.START);
     }
 
@@ -77,20 +74,12 @@ public class Sun {
         return dist * MeanEarthDistance;
     }
 
-    private static double sunRot(double mjd) {
-        // 1854-01-01.5 / Carrington sidereal period 25.38
-        return ((JulianDay.DJM0 - 2398220.) + mjd) * (2 * Math.PI / Carrington.CR_SIDEREAL); // rad
-    }
-
-    private static final double theta0 = sunRot(JulianDay.milli2mjd(EPOCH.milli));
-
-    public static double getHCILongitude(JHVTime time) {
-        // 1.7381339560109783
-        return sunRot(JulianDay.milli2mjd(time.milli)) + (1.738033457804639 + EpochEarth.lon - theta0);
+    public static Position getEarthHCI(JHVTime time) {
+        return Spice.getPosition("SUN", "EARTH", Frame.HCI, time); // should be cached
     }
 
     public static Quat getHCI(JHVTime time) {
-        return new Quat(0, getHCILongitude(time));
+        return new Quat(0, getEarth(time).lon + getEarthHCI(time).lon);
     }
 
 }

@@ -3,8 +3,12 @@ package org.helioviewer.jhv.astronomy;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.JulianDay;
+//import org.helioviewer.jhv.time.TimeUtils;
 
 class SSW {
+
+    private static final JHVTime EPOCH = new JHVTime("2000-01-01T00:00:00");
+    private static final Position EpochEarth = getEarthSSW(EPOCH);
 
     // derived from http://hesperia.gsfc.nasa.gov/ssw/gen/idl/solar/get_sun.pro
     public static Position getEarthSSW(JHVTime time) {
@@ -51,6 +55,13 @@ class SSW {
     private static double sunRot(double mjd) {
         // 1854-01-01.5 / Carrington sidereal period 25.38
         return ((JulianDay.DJM0 - 2398220.) + mjd) * (2 * Math.PI / Carrington.CR_SIDEREAL); // rad
+    }
+
+    private static final double theta0 = sunRot(JulianDay.milli2mjd(EPOCH.milli));
+
+    private static double getHCILongitude(JHVTime time) {
+        // 1.7381339560109783
+        return sunRot(JulianDay.milli2mjd(time.milli)) + (1.738033457804639 + EpochEarth.lon - theta0);
     }
 
     private static double calculateRotationInRadians(double latitude, double deltaTsec) {
