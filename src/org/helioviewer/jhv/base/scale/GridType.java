@@ -27,7 +27,7 @@ public enum GridType {
             default: // Carrington
                 return 0;
         }
-                
+
     }
 
 }
