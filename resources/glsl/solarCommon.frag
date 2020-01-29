@@ -28,9 +28,9 @@ uniform vec4 color;
 uniform float slit[2];
 
 uniform float hgln;
-uniform float hglt[2];
+uniform float hglt[3];
 uniform float hglnDiff;
-uniform float hgltDiff[2];
+uniform float hgltDiff[3];
 uniform float crota[3];
 uniform float crotaDiff[3];
 

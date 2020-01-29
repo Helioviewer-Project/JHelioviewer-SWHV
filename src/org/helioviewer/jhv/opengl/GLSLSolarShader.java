@@ -45,10 +45,10 @@ public class GLSLSolarShader extends GLSLShader {
 
     private final int[] isDiff = new int[1];
 
-    private final float[] hglt = new float[2];
+    private final float[] hglt = new float[3];
     private final float[] hgln = new float[1];
     private final float[] crota = new float[3];
-    private final float[] hgltDiff = new float[2];
+    private final float[] hgltDiff = new float[3];
     private final float[] hglnDiff = new float[1];
     private final float[] crotaDiff = new float[3];
 
@@ -223,9 +223,10 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindAngles(GL2 gl, Position viewpoint, float _crota, float scrota, float ccrota) {
-        hglt[0] = (float) Math.sin(viewpoint.lat);
-        hglt[1] = (float) Math.cos(viewpoint.lat);
-        gl.glUniform1fv(hgltRef, 2, hglt, 0);
+        hglt[0] = (float) viewpoint.lat;
+        hglt[1] = (float) Math.sin(viewpoint.lat);
+        hglt[2] = (float) Math.cos(viewpoint.lat);
+        gl.glUniform1fv(hgltRef, 3, hglt, 0);
         hgln[0] = (float) ((viewpoint.lon + 2. * Math.PI) % (2. * Math.PI));
         gl.glUniform1fv(hglnRef, 1, hgln, 0);
         crota[0] = _crota;
@@ -235,9 +236,10 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindAnglesDiff(GL2 gl, Position viewpoint, float _crota, float scrota, float ccrota) {
-        hgltDiff[0] = (float) Math.sin(viewpoint.lat);
-        hgltDiff[1] = (float) Math.cos(viewpoint.lat);
-        gl.glUniform1fv(hgltDiffRef, 2, hgltDiff, 0);
+        hgltDiff[0] = (float) viewpoint.lat;
+        hgltDiff[1] = (float) Math.sin(viewpoint.lat);
+        hgltDiff[2] = (float) Math.cos(viewpoint.lat);
+        gl.glUniform1fv(hgltDiffRef, 3, hgltDiff, 0);
         hglnDiff[0] = (float) ((viewpoint.lon + 2. * Math.PI) % (2. * Math.PI));
         gl.glUniform1fv(hglnDiffRef, 1, hglnDiff, 0);
         crotaDiff[0] = _crota;
