@@ -7,9 +7,6 @@ import org.helioviewer.jhv.time.JulianDay;
 
 class SSW {
 
-    private static final JHVTime EPOCH = new JHVTime("2000-01-01T00:00:00");
-    private static final Position EpochEarth = getEarthSSW(EPOCH);
-
     // derived from http://hesperia.gsfc.nasa.gov/ssw/gen/idl/solar/get_sun.pro
     public static Position getEarthSSW(JHVTime time) {
         double mjd = JulianDay.milli2mjd(time.milli);
@@ -57,6 +54,8 @@ class SSW {
         return ((JulianDay.DJM0 - 2398220.) + mjd) * (2 * Math.PI / Carrington.CR_SIDEREAL); // rad
     }
 
+    private static final JHVTime EPOCH = new JHVTime("2000-01-01T00:00:00");
+    private static final Position EpochEarth = getEarthSSW(EPOCH);
     private static final double theta0 = sunRot(JulianDay.milli2mjd(EPOCH.milli));
 
     private static double getHCILongitude(JHVTime time) {

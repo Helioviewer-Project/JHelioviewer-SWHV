@@ -16,7 +16,7 @@ public enum GridType {
                 double elon = Sun.getEarth(viewpoint.time).lon;
                 return new Quat(0, elon);
             case HCI:
-                return Sun.getHCI(viewpoint.time);
+                return new Quat(0, Sun.getEarth(viewpoint.time).lon + Sun.getEarthHCI(viewpoint.time).lon);
             default: // Carrington
                 return Quat.ZERO;
         }
