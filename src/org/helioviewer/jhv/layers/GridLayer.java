@@ -119,6 +119,10 @@ public class GridLayer extends AbstractLayer {
         return gridType.toLatitude(viewpoint);
     }
 
+    public double gridLongitude(Position viewpoint) {
+        return gridType.toLongitude(viewpoint);
+    }
+
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.idx])
@@ -206,7 +210,8 @@ public class GridLayer extends AbstractLayer {
                     continue;
                 }
                 float start = -w / 2 + i * w / GridMath.FLAT_STEPS_THETA;
-                String label = formatter2.format(scale.getInterpolatedXValue(1. / GridMath.FLAT_STEPS_THETA * i));
+                double lon = MathUtils.mapToMinus180To180(scale.getInterpolatedXValue(1. / GridMath.FLAT_STEPS_THETA * i) + 180);
+                String label = formatter2.format(lon);
                 renderer.draw3D(label, start, 0, 0, textScaleFactor);
             }
             for (int i = 0; i <= GridMath.FLAT_STEPS_RADIAL; i++) {
