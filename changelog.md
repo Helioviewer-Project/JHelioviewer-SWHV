@@ -19,7 +19,7 @@
 - Support setting playback speed in time period per second
 - Play sequence of files as movie
 - Rework handling of threads throughout the program
-- Incorporate SPICE and use it for input time parsing and position calculations for planets
+- Incorporate SPICE and use it for input [time parsing](<https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/str2et_c.html>) and position calculations for planets
 - Support IRIS SJI
 - Change video export to use FFmpeg and disk buffering
 - Allow several video export qualities of H.264 and H.265, as well as series of PNGs
