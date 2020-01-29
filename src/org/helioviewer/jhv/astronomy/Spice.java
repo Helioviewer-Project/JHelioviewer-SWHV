@@ -112,22 +112,14 @@ public class Spice extends Thread {
             long dt = deltat * 1000;
             PositionCartesian[] ret = new PositionCartesian[(int) ((end - start) / dt) + 1];
             int i = 0;
-            for (long t = start; t <= end; t += dt) {
-                ret[i++] = position(target, t, frame, observer);
+            for (long milli = start; milli <= end; milli += dt) {
+                double[] v = positionRectangular(target, milli, frame.toString(), observer);
+                ret[i++] = new PositionCartesian(milli, v[0] * Sun.RadiusKMeterInv, v[1] * Sun.RadiusKMeterInv, v[2] * Sun.RadiusKMeterInv);
             }
             //System.out.println((sw.elapsed().toNanos() / 1e9));
             return ret;
         }
 
-    }
-
-    private static PositionCartesian position(String target, long milli, Frame frame, String observer) throws SpiceErrorException {
-        double et = milli2et(milli);
-        double[] lt = new double[1];
-        double[] v = new double[3];
-        CSPICE.spkpos(target, et, frame.toString(), "NONE", observer, v, lt);
-        // System.out.println(">>> " + CSPICE.et2utc(et, "isoc", 0) + " " + new JHVTime(milli));
-        return new PositionCartesian(milli, v[0] * Sun.RadiusKMeterInv, v[1] * Sun.RadiusKMeterInv, v[2] * Sun.RadiusKMeterInv);
     }
 
     @Nullable
@@ -156,11 +148,7 @@ public class Spice extends Thread {
 
         @Override
         public Position call() throws SpiceErrorException {
-            double et = milli2et(time.milli);
-            double[] lt = new double[1];
-            double[] v = new double[3];
-            CSPICE.spkpos(target, et, frame.toString(), "NONE", observer, v, lt);
-
+            double[] v = positionRectangular(target, time.milli, frame.toString(), observer);
             double[] c = CSPICE.reclat(v);
             return new Position(time, c[0] * Sun.RadiusKMeterInv, c[1], c[2]);
         }
@@ -187,12 +175,7 @@ public class Spice extends Thread {
 
         @Override
         public Position call() throws SpiceErrorException {
-            double et = milli2et(time.milli);
-
-            double[] lt = new double[1];
-            double[] v = new double[3];
-            CSPICE.spkpos("EARTH", et, "SOLO_IAU_SUN_2003", "NONE", "SUN", v, lt); // apparent PM
-
+            double[] v = positionRectangular("EARTH", time.milli, "SOLO_IAU_SUN_2003", "SUN");
             double[] c = CSPICE.reclat(v);
             // like in SSW.getEarthSSW
             double lon = c[1];
@@ -213,6 +196,14 @@ public class Spice extends Thread {
     private static long et2milli(double et) throws SpiceErrorException {
         double sec = et - CSPICE.deltet(et, "ET");
         return (long) (sec * 1000. + J2000.milli + .5);
+    }
+
+    private static double[] positionRectangular(String target, long milli, String frame, String observer) throws SpiceErrorException {
+        double et = milli2et(milli);
+        double[] lt = new double[1];
+        double[] v = new double[3];
+        CSPICE.spkpos(target, et, frame, "NONE", observer, v, lt);
+        return v;
     }
 
 }
