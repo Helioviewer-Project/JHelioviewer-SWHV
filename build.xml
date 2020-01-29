@@ -3,6 +3,7 @@
     <property environment="env"/>
     <property name="src" location="src"/>
     <property name="bin" location="bin"/>
+    <property name="resources" location="resources"/>
     <property name="jarfile" location= "JHelioviewer.jar"/>
 
     <condition property="DSN" value="${env.SENTRY_DSN}" else="">
@@ -78,6 +79,7 @@
         </manifestclasspath>
         <jar destfile="${jarfile}">
             <fileset dir="${bin}"/>
+            <fileset dir="${resources}"/>
             <manifest>
                 <attribute name="Automatic-Module-Name" value="org.helioviewer.jhv"/>
                 <attribute name="Main-Class" value="org.helioviewer.jhv.JHelioviewer"/>
