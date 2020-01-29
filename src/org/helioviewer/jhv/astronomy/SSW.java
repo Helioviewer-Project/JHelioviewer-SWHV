@@ -3,9 +3,8 @@ package org.helioviewer.jhv.astronomy;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.JulianDay;
-//import org.helioviewer.jhv.time.TimeUtils;
 
-class SSW {
+public class SSW {
 
     // derived from http://hesperia.gsfc.nasa.gov/ssw/gen/idl/solar/get_sun.pro
     public static Position getEarthSSW(JHVTime time) {

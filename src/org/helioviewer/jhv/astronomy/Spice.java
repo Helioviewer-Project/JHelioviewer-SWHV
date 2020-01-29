@@ -191,8 +191,7 @@ public class Spice extends Thread {
 
             double[] lt = new double[1];
             double[] v = new double[3];
-            CSPICE.spkpos("EARTH", et, "J2000", "NONE", "SUN", v, lt); // possibly faster than using ltime() which does 3 iterations
-            CSPICE.spkpos("EARTH", et - lt[0], "IAU_SUN", "NONE", "SUN", v, lt);
+            CSPICE.spkpos("EARTH", et, "SOLO_IAU_SUN_2003", "NONE", "SUN", v, lt); // apparent PM
 
             double[] c = CSPICE.reclat(v);
             // like in SSW.getEarthSSW
