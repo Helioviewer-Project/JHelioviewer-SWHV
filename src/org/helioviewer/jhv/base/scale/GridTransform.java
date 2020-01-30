@@ -47,8 +47,7 @@ public interface GridTransform {
             pt = q.rotateInverseVector(pt);
             double theta = Math.PI / 2 - Math.acos(-pt.y) - viewpoint.lat; // ???
             double phi = Math.atan2(pt.x, pt.z);
-            phi += Math.PI;
-            phi += 6 * Math.PI;
+            phi += 3 * Math.PI;
             phi %= 2 * Math.PI;
             double scaledphi = scale.getXValueInv(phi * MathUtils.radeg);
             double scaledtheta = scale.getYValueInv(theta * MathUtils.radeg);
