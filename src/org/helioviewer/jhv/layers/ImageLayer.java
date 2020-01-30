@@ -187,28 +187,29 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         shader.bindMatrix(gl, camera.getTransformationInverse(vp.aspect)); // viewport dependent
         shader.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height); // viewport dependent
 
+        Position cameraViewpoint = imageData.getViewpoint(); // camera at decode command moment
         MetaData metaData = imageData.getMetaData();
-        shader.bindAnglesLatiGrid(gl, (float) getGridLongitude(metaData.getViewpoint()), (float) getGridLatitude(metaData.getViewpoint()));
+        shader.bindAnglesLatiGrid(gl, (float) getGridLongitude(cameraViewpoint, metaData), (float) getGridLatitude(metaData));
         glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
 
-        Quat q = Quat.rotate(camera.getCurrentDragRotation(), imageData.getViewpoint().toQuat()); // sync with camera at decode command moment
+        Quat q = Quat.rotate(camera.getCurrentDragRotation(), cameraViewpoint.toQuat()); // sync with camera
         shader.bindCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, metaData.getCenterRotation()));
 
         DifferenceMode diffMode = glImage.getDifferenceMode();
         MetaData metaDataDiff = diffMode == DifferenceMode.Base ? baseImageData.getMetaData() : prevImageData.getMetaData();
-        shader.bindAnglesLatiGridDiff(gl, (float) getGridLongitude(metaDataDiff.getViewpoint()), (float) getGridLatitude(metaDataDiff.getViewpoint()));
+        shader.bindAnglesLatiGridDiff(gl, (float) getGridLongitude(cameraViewpoint, metaDataDiff), (float) getGridLatitude(metaDataDiff));
         shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, metaDataDiff.getCenterRotation()));
 
         GLListener.glslSolar.render(gl);
     }
 
-    private static double getGridLongitude(Position viewpoint) {
-        double lon = viewpoint.lon - Layers.getGridLayer().gridLongitude(viewpoint);
+    private static double getGridLongitude(Position cameraViewpoint, MetaData metaData) {
+        double lon = Layers.getGridLayer().gridLongitude(cameraViewpoint, metaData.getViewpoint());
         return (lon + 3. * Math.PI) % (2. * Math.PI);
     }
 
-    private static double getGridLatitude(Position viewpoint) {
-        return Layers.getGridLayer().gridLatitude(viewpoint);
+    private static double getGridLatitude(MetaData metaData) {
+        return Layers.getGridLayer().gridLatitude(metaData.getViewpoint());
     }
 
     @Override
