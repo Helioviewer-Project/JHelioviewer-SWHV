@@ -223,8 +223,8 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform2fv(cutOffDirectionRef, 1, cutOffDirection, 0);
     }
 
-    public void bindAngles(GL2 gl, Position viewpoint, float _crota, float scrota, float ccrota) {
-        hglt[0] = (float) viewpoint.lat;
+    public void bindAngles(GL2 gl, float _hglt, float _crota, float scrota, float ccrota) {
+        hglt[0] = _hglt;
         gl.glUniform1fv(hgltRef, 1, hglt, 0);
         crota[0] = _crota;
         crota[1] = scrota;
@@ -232,8 +232,8 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform1fv(crotaRef, 3, crota, 0);
     }
 
-    public void bindAnglesDiff(GL2 gl, Position viewpoint, float _crota, float scrota, float ccrota) {
-        hgltDiff[0] = (float) viewpoint.lat;
+    public void bindAnglesDiff(GL2 gl, float _hglt, float _crota, float scrota, float ccrota) {
+        hgltDiff[0] = _hglt;
         gl.glUniform1fv(hgltDiffRef, 1, hgltDiff, 0);
         crotaDiff[0] = _crota;
         crotaDiff[1] = scrota;
@@ -268,9 +268,9 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform1fv(radiiRef, 2, radii, 0);
     }
 
-    public void bindPolarRadii(GL2 gl, double start, double stop) {
-        polarRadii[0] = (float) start;
-        polarRadii[1] = (float) stop;
+    public void bindPolarRadii(GL2 gl, float start, float stop) {
+        polarRadii[0] = start;
+        polarRadii[1] = stop;
         gl.glUniform1fv(polarRadiiRef, 2, polarRadii, 0);
     }
 
