@@ -6,6 +6,7 @@ import java.util.concurrent.Future;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
@@ -187,7 +188,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         shader.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height); // viewport dependent
 
         MetaData metaData = imageData.getMetaData();
-        shader.bindAnglesGrid(gl, metaData.getViewpoint());
+        shader.bindAnglesLatiGrid(gl, (float) getGridLongitude(metaData.getViewpoint()), (float) getGridLatitude(metaData.getViewpoint()));
         glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
 
         Quat q = Quat.rotate(camera.getCurrentDragRotation(), imageData.getViewpoint().toQuat()); // sync with camera at decode command moment
@@ -195,10 +196,19 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
         DifferenceMode diffMode = glImage.getDifferenceMode();
         MetaData metaDataDiff = diffMode == DifferenceMode.Base ? baseImageData.getMetaData() : prevImageData.getMetaData();
-        shader.bindAnglesGridDiff(gl, metaDataDiff.getViewpoint());
+        shader.bindAnglesLatiGridDiff(gl, (float) getGridLongitude(metaDataDiff.getViewpoint()), (float) getGridLatitude(metaDataDiff.getViewpoint()));
         shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, metaDataDiff.getCenterRotation()));
 
         GLListener.glslSolar.render(gl);
+    }
+
+    private static double getGridLongitude(Position viewpoint) {
+        double lon = viewpoint.lon - Layers.getGridLayer().gridLongitude(viewpoint);
+        return (lon + 3. * Math.PI) % (2. * Math.PI);
+    }
+
+    private static double getGridLatitude(Position viewpoint) {
+        return Layers.getGridLayer().gridLatitude(viewpoint);
     }
 
     @Override
