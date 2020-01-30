@@ -3,6 +3,7 @@ package org.helioviewer.jhv.camera;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.camera.viewpoint.UpdateViewpoint;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Mat4f;
@@ -80,7 +81,8 @@ public class Camera {
 ////
 
     private void updateCamera(JHVTime time) {
-        viewpoint = updateViewpoint.update(time);
+        Position v = updateViewpoint.update(time);
+        viewpoint = Display.mode == Display.DisplayMode.Orthographic ? v : new Position(time, Sun.MeanEarthDistance, v.lon, v.lat);
         updateRotation();
         updateWidth();
     }
