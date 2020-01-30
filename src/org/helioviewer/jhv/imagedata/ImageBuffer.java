@@ -60,4 +60,8 @@ public class ImageBuffer {
         return p;
     }
 
+    boolean hasLUT() {
+        return lut != null;
+    }
+
 }
