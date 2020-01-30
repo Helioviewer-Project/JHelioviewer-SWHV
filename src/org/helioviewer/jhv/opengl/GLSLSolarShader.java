@@ -228,7 +228,7 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform1fv(hgltRef, 1, hglt, 0);
 
         double lon = viewpoint.lon - Layers.getGridLayer().gridLongitude(viewpoint);
-        grid[0] = (float) ((lon + 2. * Math.PI) % (2. * Math.PI));
+        grid[0] = (float) ((lon + 3. * Math.PI) % (2. * Math.PI));
         grid[1] = (float) Layers.getGridLayer().gridLatitude(viewpoint);
         gl.glUniform1fv(gridRef, 2, grid, 0);
 
@@ -243,7 +243,7 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform1fv(hgltDiffRef, 1, hgltDiff, 0);
 
         double lon = viewpoint.lon - Layers.getGridLayer().gridLongitude(viewpoint);
-        gridDiff[0] = (float) ((lon + 2. * Math.PI) % (2. * Math.PI));
+        gridDiff[0] = (float) ((lon + 3. * Math.PI) % (2. * Math.PI));
         gridDiff[1] = (float) Layers.getGridLayer().gridLatitude(viewpoint);
         gl.glUniform1fv(gridDiffRef, 2, gridDiff, 0);
 
