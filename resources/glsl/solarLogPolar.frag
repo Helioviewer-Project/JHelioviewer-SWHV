@@ -3,7 +3,7 @@ void get_polar_texcoord(const float cr, const vec2 scrpos, const vec4 rect, out 
     if (interpolated > radii[1] || interpolated < radii[0])
         discard;
 
-    float theta = -(scrpos.x * TWOPI + (PI / 2.) - cr);
+    float theta = -(scrpos.x * TWOPI + HALFPI - cr);
     vec2 pos = vec2(cos(theta), sin(theta)) * interpolated;
 
     if (cutOffValue >= 0.) {

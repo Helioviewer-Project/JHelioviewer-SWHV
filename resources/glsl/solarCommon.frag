@@ -4,7 +4,8 @@
 
 #define NODIFFERENCE 0
 #define PI 3.1415926535897932384626433832795
-#define TWOPI (2. * PI)
+#define HALFPI (PI / 2.)
+#define TWOPI  (2. * PI)
 
 #define CLIP_SCALE_NARROW 1. / (2. * 32.)
 #define CLIP_SCALE_WIDE   1. / (2. * 50. * 215.09151684811678)
@@ -102,6 +103,11 @@ void clamp_texture(const vec2 texcoord) {
 
 void clamp_coord(const vec2 coord) {
     if (coord.x < slit[0] || coord.y < 0. || coord.x > slit[1] || coord.y > 1.)
+        discard;
+}
+
+void clamp_value(const float value, const float low, const float high) {
+    if (value < low || value > high)
         discard;
 }
 
