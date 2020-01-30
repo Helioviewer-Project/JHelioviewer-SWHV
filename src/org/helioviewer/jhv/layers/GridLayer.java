@@ -115,12 +115,13 @@ public class GridLayer extends AbstractLayer {
         return Display.mode.scale.mouseToGrid(x, y, vp, camera, gridType);
     }
 
-    public double gridLatitude(Position viewpoint) {
-        return gridType.toLatitude(viewpoint);
+    public double gridLatitude(Position metaViewpoint) {
+        return gridType.toLatitude(metaViewpoint);
     }
 
-    public double gridLongitude(Position viewpoint) {
-        return gridType.toLongitude(viewpoint);
+    public double gridLongitude(Position cameraViewpoint, Position metaViewpoint) {
+        double gridLon = gridType.toLongitude(metaViewpoint);
+        return gridType == GridType.Viewpoint ? cameraViewpoint.lon - gridLon : metaViewpoint.lon - gridLon;
     }
 
     @Override
