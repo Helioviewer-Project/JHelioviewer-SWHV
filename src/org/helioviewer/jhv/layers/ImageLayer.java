@@ -189,7 +189,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
         Position cameraViewpoint = imageData.getViewpoint(); // camera at decode command moment
         MetaData metaData = imageData.getMetaData();
-        shader.bindAnglesLatiGrid(gl, (float) getGridLongitude(cameraViewpoint, metaData), (float) getGridLatitude(metaData));
+        shader.bindAnglesLatiGrid(gl, (float) gridLongitude(cameraViewpoint, metaData), (float) gridLatitude(metaData));
         glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
 
         Quat q = Quat.rotate(camera.getCurrentDragRotation(), cameraViewpoint.toQuat()); // sync with camera
@@ -197,18 +197,18 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
         DifferenceMode diffMode = glImage.getDifferenceMode();
         MetaData metaDataDiff = diffMode == DifferenceMode.Base ? baseImageData.getMetaData() : prevImageData.getMetaData();
-        shader.bindAnglesLatiGridDiff(gl, (float) getGridLongitude(cameraViewpoint, metaDataDiff), (float) getGridLatitude(metaDataDiff));
+        shader.bindAnglesLatiGridDiff(gl, (float) gridLongitude(cameraViewpoint, metaDataDiff), (float) gridLatitude(metaDataDiff));
         shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, metaDataDiff.getCenterRotation()));
 
         GLListener.glslSolar.render(gl);
     }
 
-    private static double getGridLongitude(Position cameraViewpoint, MetaData metaData) {
+    private static double gridLongitude(Position cameraViewpoint, MetaData metaData) {
         double lon = Layers.getGridLayer().gridLongitude(cameraViewpoint, metaData.getViewpoint());
-        return (lon + 3. * Math.PI) % (2. * Math.PI);
+        return (lon + 3. * Math.PI) % (2. * Math.PI); // centered
     }
 
-    private static double getGridLatitude(MetaData metaData) {
+    private static double gridLatitude(MetaData metaData) {
         return Layers.getGridLayer().gridLatitude(metaData.getViewpoint());
     }
 
