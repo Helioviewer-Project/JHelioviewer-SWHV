@@ -186,17 +186,18 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         shader.bindMatrix(gl, camera.getTransformationInverse(vp.aspect)); // viewport dependent
         shader.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height); // viewport dependent
 
+        MetaData metaData = imageData.getMetaData();
+        shader.bindAnglesGrid(gl, metaData.getViewpoint());
         glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
 
         Quat q = Quat.rotate(camera.getCurrentDragRotation(), imageData.getViewpoint().toQuat()); // sync with camera at decode command moment
-        shader.bindCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, imageData.getMetaData().getCenterRotation()));
+        shader.bindCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, metaData.getCenterRotation()));
 
         DifferenceMode diffMode = glImage.getDifferenceMode();
-        if (diffMode == DifferenceMode.Base) {
-            shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, baseImageData.getMetaData().getCenterRotation()));
-        } else if (diffMode == DifferenceMode.Running) {
-            shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, prevImageData.getMetaData().getCenterRotation()));
-        }
+        MetaData metaDataDiff = diffMode == DifferenceMode.Base ? baseImageData.getMetaData() : prevImageData.getMetaData();
+        shader.bindAnglesGridDiff(gl, metaDataDiff.getViewpoint());
+        shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, metaDataDiff.getCenterRotation()));
+
         GLListener.glslSolar.render(gl);
     }
 
