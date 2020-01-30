@@ -121,7 +121,7 @@ public class GridLayer extends AbstractLayer {
 
     public double gridLongitude(Position cameraViewpoint, Position metaViewpoint) {
         double gridLon = gridType.toLongitude(metaViewpoint);
-        return gridType == GridType.Viewpoint ? cameraViewpoint.lon - gridLon : metaViewpoint.lon - gridLon;
+        return gridType == GridType.Viewpoint ? gridLon - cameraViewpoint.lon : metaViewpoint.lon - gridLon;
     }
 
     @Override
