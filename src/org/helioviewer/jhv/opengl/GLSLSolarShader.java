@@ -224,13 +224,15 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindAngles(GL2 gl, Position viewpoint, float _crota, float scrota, float ccrota) {
-        hglt[0] = (float) Layers.getGridLayer().gridLatitude(viewpoint);
         hglt[1] = (float) Math.sin(viewpoint.lat);
         hglt[2] = (float) Math.cos(viewpoint.lat);
         gl.glUniform1fv(hgltRef, 3, hglt, 0);
+
         double lon = viewpoint.lon - Layers.getGridLayer().gridLongitude(viewpoint);
         grid[0] = (float) ((lon + 2. * Math.PI) % (2. * Math.PI));
+        grid[1] = (float) Layers.getGridLayer().gridLatitude(viewpoint);
         gl.glUniform1fv(gridRef, 2, grid, 0);
+
         crota[0] = _crota;
         crota[1] = scrota;
         crota[2] = ccrota;
@@ -238,13 +240,15 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindAnglesDiff(GL2 gl, Position viewpoint, float _crota, float scrota, float ccrota) {
-        hgltDiff[0] = (float) Layers.getGridLayer().gridLatitude(viewpoint);
         hgltDiff[1] = (float) Math.sin(viewpoint.lat);
         hgltDiff[2] = (float) Math.cos(viewpoint.lat);
         gl.glUniform1fv(hgltDiffRef, 3, hgltDiff, 0);
+
         double lon = viewpoint.lon - Layers.getGridLayer().gridLongitude(viewpoint);
         gridDiff[0] = (float) ((lon + 2. * Math.PI) % (2. * Math.PI));
+        gridDiff[1] = (float) Layers.getGridLayer().gridLatitude(viewpoint);
         gl.glUniform1fv(gridDiffRef, 2, gridDiff, 0);
+
         crotaDiff[0] = _crota;
         crotaDiff[1] = scrota;
         crotaDiff[2] = ccrota;
