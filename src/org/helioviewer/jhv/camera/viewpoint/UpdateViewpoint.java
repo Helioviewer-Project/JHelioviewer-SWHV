@@ -78,8 +78,7 @@ public interface UpdateViewpoint {
     class EarthFixedDistance extends AbstractUpdateViewpoint {
         @Override
         public Position update(JHVTime time) {
-            double elon = Sun.getEarth(time).lon;
-            return new Position(time, Sun.MeanEarthDistance, elon, 0);
+            return new Position(time, Sun.MeanEarthDistance, Sun.getEarth(time).lon, 0);
         }
     }
 
@@ -121,10 +120,8 @@ public interface UpdateViewpoint {
                 }
             }
 
-            double elon = Sun.getEarth(itime).lon;
             ImageLayer layer = Layers.getActiveImageLayer();
-            double lon = layer == null ? elon : layer.getView().getMetaData(time).getViewpoint().lon;
-
+            double lon = layer == null ? Sun.getEarth(itime).lon : layer.getView().getMetaData(time).getViewpoint().lon;
             return new Position(itime, distance, lon + Math.PI / 2, Math.PI / 2);
         }
     }
