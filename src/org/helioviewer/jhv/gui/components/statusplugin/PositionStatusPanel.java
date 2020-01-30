@@ -7,9 +7,9 @@ import java.awt.event.MouseMotionListener;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.camera.viewpoint.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ClipBoardCopier;
