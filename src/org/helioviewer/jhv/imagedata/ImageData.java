@@ -18,6 +18,7 @@ public class ImageData {
     private final float[] physLUT;
     private final Region region;
     private final Position viewpoint;
+    private final boolean hasLUT;
 
     public ImageData(@Nonnull ImageBuffer _imageBuffer, @Nonnull MetaData _metaData, @Nonnull Region _region, @Nonnull Position _viewpoint) {
         imageBuffer = _imageBuffer;
@@ -26,6 +27,7 @@ public class ImageData {
         physLUT = metaData.getPhysicalLUT();
         region = _region;
         viewpoint = _viewpoint;
+        hasLUT = physLUT != null || imageBuffer.hasLUT();
     }
 
     @Nonnull
@@ -79,7 +81,10 @@ public class ImageData {
             ret = String.format("%9d", (int) v);
         else
             ret = String.format("%9.2f", v);
-        return ret + unit;
+
+        if (hasLUT)
+            ret += unit;
+        return ret;
     }
 
 }
