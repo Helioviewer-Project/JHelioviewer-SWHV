@@ -1,5 +1,5 @@
 void get_lati_texcoord(const float grid[2], const float lt[3], const float cr[3], const vec2 scrpos, const vec4 rect, out vec2 texcoord) {
-    float theta = lt[0] + scrpos.y * PI;
+    float theta = grid[1] + scrpos.y * PI;
     float phi = PI + grid[0] + scrpos.x * TWOPI;
 
     vec3 xcart;
