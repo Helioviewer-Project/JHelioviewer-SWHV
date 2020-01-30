@@ -226,12 +226,6 @@ public class GLSLSolarShader extends GLSLShader {
     public void bindAngles(GL2 gl, Position viewpoint, float _crota, float scrota, float ccrota) {
         hglt[0] = (float) viewpoint.lat;
         gl.glUniform1fv(hgltRef, 1, hglt, 0);
-
-        double lon = viewpoint.lon - Layers.getGridLayer().gridLongitude(viewpoint);
-        grid[0] = (float) ((lon + 3. * Math.PI) % (2. * Math.PI));
-        grid[1] = (float) Layers.getGridLayer().gridLatitude(viewpoint);
-        gl.glUniform1fv(gridRef, 2, grid, 0);
-
         crota[0] = _crota;
         crota[1] = scrota;
         crota[2] = ccrota;
@@ -241,16 +235,24 @@ public class GLSLSolarShader extends GLSLShader {
     public void bindAnglesDiff(GL2 gl, Position viewpoint, float _crota, float scrota, float ccrota) {
         hgltDiff[0] = (float) viewpoint.lat;
         gl.glUniform1fv(hgltDiffRef, 1, hgltDiff, 0);
-
-        double lon = viewpoint.lon - Layers.getGridLayer().gridLongitude(viewpoint);
-        gridDiff[0] = (float) ((lon + 3. * Math.PI) % (2. * Math.PI));
-        gridDiff[1] = (float) Layers.getGridLayer().gridLatitude(viewpoint);
-        gl.glUniform1fv(gridDiffRef, 2, gridDiff, 0);
-
         crotaDiff[0] = _crota;
         crotaDiff[1] = scrota;
         crotaDiff[2] = ccrota;
         gl.glUniform1fv(crotaDiffRef, 3, crotaDiff, 0);
+    }
+
+    public void bindAnglesGrid(GL2 gl, Position viewpoint) {
+        double lon = viewpoint.lon - Layers.getGridLayer().gridLongitude(viewpoint);
+        grid[0] = (float) ((lon + 3. * Math.PI) % (2. * Math.PI));
+        grid[1] = (float) Layers.getGridLayer().gridLatitude(viewpoint);
+        gl.glUniform1fv(gridRef, 2, grid, 0);
+    }
+
+    public void bindAnglesGridDiff(GL2 gl, Position viewpoint) {
+        double lon = viewpoint.lon - Layers.getGridLayer().gridLongitude(viewpoint);
+        gridDiff[0] = (float) ((lon + 3. * Math.PI) % (2. * Math.PI));
+        gridDiff[1] = (float) Layers.getGridLayer().gridLatitude(viewpoint);
+        gl.glUniform1fv(gridDiffRef, 2, gridDiff, 0);
     }
 
     public void bindSector(GL2 gl, float sector0, float sector1) {
