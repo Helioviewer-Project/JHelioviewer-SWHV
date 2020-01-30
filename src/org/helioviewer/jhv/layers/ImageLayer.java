@@ -189,7 +189,6 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
         Position cameraViewpoint = imageData.getViewpoint(); // camera at decode command moment
         MetaData metaData = imageData.getMetaData();
-        shader.bindAnglesLatiGrid(gl, (float) gridLongitude(cameraViewpoint, metaData), (float) gridLatitude(metaData));
         glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
 
         Quat q = Quat.rotate(camera.getCurrentDragRotation(), cameraViewpoint.toQuat()); // sync with camera
@@ -197,8 +196,12 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
         DifferenceMode diffMode = glImage.getDifferenceMode();
         MetaData metaDataDiff = diffMode == DifferenceMode.Base ? baseImageData.getMetaData() : prevImageData.getMetaData();
-        shader.bindAnglesLatiGridDiff(gl, (float) gridLongitude(cameraViewpoint, metaDataDiff), (float) gridLatitude(metaDataDiff));
         shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, metaDataDiff.getCenterRotation()));
+
+        if (Display.mode == Display.DisplayMode.Latitudinal) {
+            shader.bindAnglesLatiGrid(gl, (float) gridLongitude(cameraViewpoint, metaData), (float) gridLatitude(metaData));
+            shader.bindAnglesLatiGridDiff(gl, (float) gridLongitude(cameraViewpoint, metaDataDiff), (float) gridLatitude(metaDataDiff));
+        }
 
         GLListener.glslSolar.render(gl);
     }
