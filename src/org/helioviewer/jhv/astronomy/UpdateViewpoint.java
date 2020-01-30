@@ -1,15 +1,10 @@
-package org.helioviewer.jhv.camera.viewpoint;
+package org.helioviewer.jhv.astronomy;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.astronomy.PositionLoad;
-import org.helioviewer.jhv.astronomy.PositionResponse;
-import org.helioviewer.jhv.astronomy.SpaceObject;
-import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
