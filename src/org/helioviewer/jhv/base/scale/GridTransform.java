@@ -55,11 +55,11 @@ public interface GridTransform {
 
         @Override
         public Vec3 transformInverse(Quat frame, Vec2 pt) {
-            double phi = pt.x / MathUtils.radeg;
-            double theta = pt.y / MathUtils.radeg;
+            double phi = MathUtils.mapToMinus180To180(pt.x + 180) * MathUtils.degra;
+            double theta = pt.y * MathUtils.degra;
             phi += Math.PI;
             theta = -theta + Math.PI / 2;
-            return new Vec3(Math.sin(theta) * Math.sin(phi), Math.cos(theta), Math.sin(theta) * Math.cos(phi));
+            return frame.rotateInverseVector(new Vec3(Math.sin(theta) * Math.sin(phi), Math.cos(theta), Math.sin(theta) * Math.cos(phi)));
         }
     }
 
