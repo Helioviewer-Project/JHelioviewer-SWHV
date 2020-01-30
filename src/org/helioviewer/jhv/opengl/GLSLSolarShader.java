@@ -16,9 +16,9 @@ public class GLSLSolarShader extends GLSLShader {
     private int isDiffRef;
 
     private int hgltRef;
-    private int hglnRef;
+    private int gridRef;
     private int hgltDiffRef;
-    private int hglnDiffRef;
+    private int gridDiffRef;
     private int crotaRef;
     private int crotaDiffRef;
 
@@ -47,10 +47,10 @@ public class GLSLSolarShader extends GLSLShader {
     private final int[] isDiff = new int[1];
 
     private final float[] hglt = new float[3];
-    private final float[] hgln = new float[1];
+    private final float[] grid = new float[2];
     private final float[] crota = new float[3];
     private final float[] hgltDiff = new float[3];
-    private final float[] hglnDiff = new float[1];
+    private final float[] gridDiff = new float[2];
     private final float[] crotaDiff = new float[3];
 
     private final float[] sector = new float[3];
@@ -89,10 +89,10 @@ public class GLSLSolarShader extends GLSLShader {
         isDiffRef = gl.glGetUniformLocation(id, "isdifference");
 
         hgltRef = gl.glGetUniformLocation(id, "hglt");
-        hglnRef = gl.glGetUniformLocation(id, "hgln");
+        gridRef = gl.glGetUniformLocation(id, "grid");
         crotaRef = gl.glGetUniformLocation(id, "crota");
         hgltDiffRef = gl.glGetUniformLocation(id, "hgltDiff");
-        hglnDiffRef = gl.glGetUniformLocation(id, "hglnDiff");
+        gridDiffRef = gl.glGetUniformLocation(id, "gridDiff");
         crotaDiffRef = gl.glGetUniformLocation(id, "crotaDiff");
 
         sectorRef = gl.glGetUniformLocation(id, "sector");
@@ -229,8 +229,8 @@ public class GLSLSolarShader extends GLSLShader {
         hglt[2] = (float) Math.cos(viewpoint.lat);
         gl.glUniform1fv(hgltRef, 3, hglt, 0);
         double lon = viewpoint.lon - Layers.getGridLayer().gridLongitude(viewpoint);
-        hgln[0] = (float) ((lon + 2. * Math.PI) % (2. * Math.PI));
-        gl.glUniform1fv(hglnRef, 1, hgln, 0);
+        grid[0] = (float) ((lon + 2. * Math.PI) % (2. * Math.PI));
+        gl.glUniform1fv(gridRef, 2, grid, 0);
         crota[0] = _crota;
         crota[1] = scrota;
         crota[2] = ccrota;
@@ -243,8 +243,8 @@ public class GLSLSolarShader extends GLSLShader {
         hgltDiff[2] = (float) Math.cos(viewpoint.lat);
         gl.glUniform1fv(hgltDiffRef, 3, hgltDiff, 0);
         double lon = viewpoint.lon - Layers.getGridLayer().gridLongitude(viewpoint);
-        hglnDiff[0] = (float) ((lon + 2. * Math.PI) % (2. * Math.PI));
-        gl.glUniform1fv(hglnDiffRef, 1, hglnDiff, 0);
+        gridDiff[0] = (float) ((lon + 2. * Math.PI) % (2. * Math.PI));
+        gl.glUniform1fv(gridDiffRef, 2, gridDiff, 0);
         crotaDiff[0] = _crota;
         crotaDiff[1] = scrota;
         crotaDiff[2] = ccrota;

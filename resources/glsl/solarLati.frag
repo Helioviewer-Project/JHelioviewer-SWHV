@@ -1,6 +1,6 @@
-void get_lati_texcoord(const float ln, const float lt[3], const float cr[3], const vec2 scrpos, const vec4 rect, out vec2 texcoord) {
+void get_lati_texcoord(const float grid[2], const float lt[3], const float cr[3], const vec2 scrpos, const vec4 rect, out vec2 texcoord) {
     float theta = lt[0] + scrpos.y * PI;
-    float phi = PI + hgln + scrpos.x * TWOPI;
+    float phi = PI + grid[0] + scrpos.x * TWOPI;
 
     vec3 xcart;
     xcart.x = sin(theta) * cos(phi);
@@ -44,13 +44,13 @@ void main(void) {
     vec2 texcoord;
 
     vec2 scrpos = getScrPos();
-    get_lati_texcoord(hgln, hglt, crota, scrpos, rect, texcoord);
+    get_lati_texcoord(grid, hglt, crota, scrpos, rect, texcoord);
     if (isdifference == NODIFFERENCE) {
         color = getColor(texcoord, texcoord, 1);
     } else {
         vec2 difftexcoord;
         float difftexcoord_radius;
-        get_lati_texcoord(hglnDiff, hgltDiff, crotaDiff, scrpos, differencerect, difftexcoord);
+        get_lati_texcoord(gridDiff, hgltDiff, crotaDiff, scrpos, differencerect, difftexcoord);
         color = getColor(texcoord, difftexcoord, 1);
     }
     outColor = color;
