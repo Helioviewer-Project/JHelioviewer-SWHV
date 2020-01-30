@@ -32,7 +32,7 @@ public interface GridTransform {
         @Override
         public Vec3 transformInverse(Quat frame, Vec2 pt) {
             double r = pt.y;
-            double theta = -pt.x / MathUtils.radeg;
+            double theta = -MathUtils.mapToMinus180To180(pt.x + 180) * MathUtils.degra;
             double y = r * Math.cos(theta);
             double x = r * Math.sin(theta);
             double z = Math.sqrt(Math.max(0, 1 - x * x - y * y));
