@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.astronomy;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
@@ -14,6 +15,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONObject;
 
 //import com.google.common.base.Stopwatch;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.util.concurrent.FutureCallback;
 
 public class PositionLoad {
@@ -101,12 +103,7 @@ public class PositionLoad {
         future = _future;
     }
 
-    public static PositionLoad submit(PositionReceiver receiver, SpaceObject observer, SpaceObject target, Frame frame, long start, long end) {
-        receiver.setStatus("Loading...");
-        return new PositionLoad(receiver, target, EventQueueCallbackExecutor.pool.submit(new LoadPosition(observer, target, frame, start, end), new Callback(receiver)));
-    }
-
-    public void stop() {
+    private void stop() {
         future.cancel(true);
         receiver.setStatus(null);
     }
@@ -126,6 +123,33 @@ public class PositionLoad {
         } catch (Exception ignore) { // logged to UI by onFailure
         }
         return null;
+    }
+
+    private static final ArrayListMultimap<UpdateViewpoint, PositionLoad> loads = ArrayListMultimap.create();
+
+    public static PositionLoad submit(UpdateViewpoint uv, PositionReceiver receiver, SpaceObject observer, SpaceObject target, Frame frame, long start, long end) {
+        receiver.setStatus("Loading...");
+        PositionLoad load = new PositionLoad(receiver, target, EventQueueCallbackExecutor.pool.submit(
+                new LoadPosition(observer, target, frame, start, end),
+                new Callback(receiver)));
+        loads.put(uv, load);
+
+        return load;
+    }
+
+    public static List<PositionLoad> get(UpdateViewpoint uv) {
+        return loads.get(uv);
+    }
+
+    public static void remove(UpdateViewpoint uv, PositionLoad load) {
+        load.stop();
+        loads.remove(uv, load);
+    }
+
+    public static void removeAll(UpdateViewpoint uv) {
+        for (PositionLoad load : loads.removeAll(uv)) {
+            load.stop();
+        }
     }
 
 }

@@ -16,6 +16,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 
 import org.helioviewer.jhv.astronomy.Frame;
+import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
@@ -90,7 +91,8 @@ public class SpaceObjectContainer extends JScrollPane {
         setPreferredSize(new Dimension(-1, getGridRowHeight(grid) * NUMBEROFVISIBLEROWS + 1));
         grid.setRowHeight(getGridRowHeight(grid));
 
-        uv.clear();
+        PositionLoad.removeAll(uv);
+
         int len = ja.length();
         for (int i = 0; i < len; i++)
             selectTarget(SpaceObject.get(ja.optString(i, "Earth")));

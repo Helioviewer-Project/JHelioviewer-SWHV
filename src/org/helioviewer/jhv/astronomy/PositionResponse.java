@@ -3,8 +3,6 @@ package org.helioviewer.jhv.astronomy;
 import java.util.Iterator;
 
 import org.helioviewer.jhv.math.MathUtils;
-import org.helioviewer.jhv.math.Vec3;
-import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -49,7 +47,7 @@ public class PositionResponse {
         positionEnd = position[len - 1].milli;
     }
 
-    public long interpolateTime(long t, long start, long end) {
+    long interpolateTime(long t, long start, long end) {
         if (start >= end)
             return positionEnd;
         else {

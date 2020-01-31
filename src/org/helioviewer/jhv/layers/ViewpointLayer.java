@@ -5,7 +5,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -82,7 +82,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
 
         renderSpiral(gl, vp, viewpoint, optionsPanel.isFrameInertial(), optionsPanel.getSpiralSpeed());
 
-        Collection<PositionLoad> positionLoads = camera.getUpdateViewpoint().getPositionLoads();
+        List<PositionLoad> positionLoads = PositionLoad.get(camera.getUpdateViewpoint());
         if (!positionLoads.isEmpty()) {
             gl.glDisable(GL2.GL_DEPTH_TEST);
             renderPlanets(gl, vp, positionLoads, pixFactor);
@@ -108,7 +108,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
     @Override
     public void mouseMoved(MouseEvent e) {
         Camera camera = Display.getCamera();
-        Collection<PositionLoad> positionLoads = camera.getUpdateViewpoint().getPositionLoads();
+        List<PositionLoad> positionLoads = PositionLoad.get(camera.getUpdateViewpoint());
         if (positionLoads.isEmpty())
             return;
 
@@ -271,7 +271,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
 
     private final float[] xyzw = {0, 0, 0, 1};
 
-    private void renderPlanets(GL2 gl, Viewport vp, Collection<PositionLoad> positionLoads, double pointFactor) {
+    private void renderPlanets(GL2 gl, Viewport vp, List<PositionLoad> positionLoads, double pointFactor) {
         long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
         for (PositionLoad positionLoad : positionLoads) {
             PositionResponse response = positionLoad.getResponse();
