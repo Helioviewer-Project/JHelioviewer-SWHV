@@ -130,8 +130,7 @@ public class PositionLoad {
     public static PositionLoad submit(UpdateViewpoint uv, PositionReceiver receiver, SpaceObject observer, SpaceObject target, Frame frame, long start, long end) {
         receiver.setStatus("Loading...");
         PositionLoad load = new PositionLoad(receiver, target, EventQueueCallbackExecutor.pool.submit(
-                new LoadPosition(observer, target, frame, start, end),
-                new Callback(receiver)));
+                new LoadPosition(observer, target, frame, start, end), new Callback(receiver)));
         loads.put(uv, load);
 
         return load;
