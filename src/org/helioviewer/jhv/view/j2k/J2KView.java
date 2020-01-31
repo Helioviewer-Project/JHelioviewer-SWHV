@@ -36,15 +36,15 @@ import org.helioviewer.jhv.view.j2k.image.SubImage;
 import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCache;
 import org.helioviewer.jhv.view.j2k.kakadu.KakaduSource;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 
 public class J2KView extends BaseView {
 
     private static final AtomicInteger global_serial = new AtomicInteger(0);
     private static final int HIRES_CUTOFF = 1280;
 
-    private static final Cache<DecodeParams, ImageBuffer> decodeCache = CacheBuilder.newBuilder().softValues().build();
+    private static final Cache<DecodeParams, ImageBuffer> decodeCache = Caffeine.newBuilder().softValues().build();
 
     private static final Cleaner reaper = Cleaner.create();
     private final Cleaner.Cleanable abolishable;

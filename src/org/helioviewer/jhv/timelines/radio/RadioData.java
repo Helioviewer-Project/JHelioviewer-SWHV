@@ -30,9 +30,9 @@ import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.j2k.J2KViewCallisto;
 import org.json.JSONObject;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.RemovalNotification;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.google.common.util.concurrent.FutureCallback;
 
 public class RadioData extends AbstractTimelineLayer {
@@ -42,11 +42,11 @@ public class RadioData extends AbstractTimelineLayer {
     private static final int MAX_AMOUNT_OF_DAYS = 3;
     private static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 4;
 
-    private static void removalListener(RemovalNotification<Long, RadioJ2KData> removed) {
-        removed.getValue().removeData();
-    }
-
-    private static final Cache<Long, RadioJ2KData> cache = CacheBuilder.newBuilder().maximumSize(DAYS_IN_CACHE).removalListener(RadioData::removalListener).build();
+    private static final Cache<Long, RadioJ2KData> cache = Caffeine.newBuilder().maximumSize(DAYS_IN_CACHE)
+            .removalListener((Long k, RadioJ2KData v, RemovalCause c) -> {
+                if (v != null)
+                    v.removeData();
+            }).build();
     private static final HashSet<Long> downloading = new HashSet<>();
 
     private final RadioOptionsPanel optionsPanel;
