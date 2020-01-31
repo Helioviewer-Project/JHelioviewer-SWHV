@@ -28,18 +28,16 @@ class SpaceObjectElement implements PositionReceiver {
         selected = true;
 
         if (load != null) {
-            uv.unsetPositionLoad(load);
+            PositionLoad.remove(uv, load);
         }
-
-        load = PositionLoad.submit(this, observer, target, frame, startTime, endTime);
-        uv.setPositionLoad(load);
+        load = PositionLoad.submit(uv, this, observer, target, frame, startTime, endTime);
     }
 
     void unload(UpdateViewpoint uv) {
         selected = false;
 
         if (load != null) {
-            uv.unsetPositionLoad(load);
+            PositionLoad.remove(uv, load);
             load = null;
             MovieDisplay.display();
         }
