@@ -110,8 +110,7 @@ public interface UpdateViewpoint {
             if (it.hasNext()) {
                 PositionResponse response = it.next().getResponse();
                 if (response != null) {
-                    long t = response.interpolateTime(time.milli, Movie.getStartTime(), Movie.getEndTime());
-                    itime = new JHVTime(TimeUtils.floorSec(t));
+                    itime = new JHVTime(response.interpolateTime(time.milli, Movie.getStartTime(), Movie.getEndTime()));
                 }
             }
 
@@ -123,6 +122,7 @@ public interface UpdateViewpoint {
 
     class Expert extends AbstractUpdateViewpoint {
 
+        private final double[] lat = new double[3];
         private PositionLoad positionLoad;
 
         @Override
@@ -146,7 +146,10 @@ public interface UpdateViewpoint {
             PositionResponse response;
             if (positionLoad == null || (response = positionLoad.getResponse()) == null)
                 return Sun.getEarth(time);
-            return response.getRelativeInterpolated(time.milli, Movie.getStartTime(), Movie.getEndTime());
+
+            JHVTime itime = new JHVTime(response.interpolateLatitudinal(time.milli, Movie.getStartTime(), Movie.getEndTime(), lat));
+            double elon = Sun.getEarth(itime).lon;
+            return new Position(itime, lat[0], elon - lat[1], lat[2]);
         }
 
     }
