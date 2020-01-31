@@ -141,8 +141,8 @@ public class PositionLoad {
     }
 
     public static void remove(UpdateViewpoint uv, PositionLoad load) {
-        load.stop();
         loads.remove(uv, load);
+        load.stop();
     }
 
     public static void removeAll(UpdateViewpoint uv) {
