@@ -59,7 +59,7 @@ public class PositionResponse {
         }
     }
 
-    public Position getRelativeInterpolated(long t, long start, long end) {
+    public long interpolateLatitudinal(long t, long start, long end, double[] lat) {
         long time = interpolateTime(t, start, end);
 
         double x, y, z;
@@ -91,48 +91,13 @@ public class PositionResponse {
             hgln = Math.atan2(y, x);
             hglt = Math.asin(z / dist);
         }
-
-        JHVTime jtime = new JHVTime(time);
-        double elon = Sun.getEarth(jtime).lon;
-        return new Position(jtime, dist, elon - hgln, hglt);
+        lat[0] = dist;
+        lat[1] = hgln;
+        lat[2] = hglt;
+        return time;
     }
 
-    public Vec3 getInterpolatedHG(long t, long start, long end) {
-        long time = interpolateTime(t, start, end);
-
-        double x, y, z;
-        if (positionStart == positionEnd) {
-            x = position[0].x;
-            y = position[0].y;
-            z = position[0].z;
-        } else {
-            double interpolatedIndex = (time - positionStart) / (double) (positionEnd - positionStart) * position.length;
-            int i = (int) interpolatedIndex;
-            i = MathUtils.clip(i, 0, position.length - 1);
-            int inext = Math.min(i + 1, position.length - 1);
-
-            long tstart = position[i].milli;
-            long tend = position[inext].milli;
-
-            double alpha = tend == tstart ? 1. : ((time - tstart) / (double) (tend - tstart)) % 1.;
-            x = (1. - alpha) * position[i].x + alpha * position[inext].x;
-            y = (1. - alpha) * position[i].y + alpha * position[inext].y;
-            z = (1. - alpha) * position[i].z + alpha * position[inext].z;
-        }
-
-        double dist, hgln, hglt;
-        dist = Math.sqrt(x * x + y * y + z * z);
-        if (dist == 0) {
-            hgln = 0;
-            hglt = 0;
-        } else {
-            hgln = Math.atan2(y, x);
-            hglt = Math.asin(z / dist);
-        }
-        return new Vec3(dist, hgln, hglt);
-    }
-
-    public double getInterpolated(float[] xyz, long t, long start, long end) {
+    public double interpolateRectangular(long t, long start, long end, float[] xyz) {
         long time = interpolateTime(t, start, end);
 
         double x, y, z;

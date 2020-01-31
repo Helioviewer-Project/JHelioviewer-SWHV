@@ -109,39 +109,41 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
     public void mouseMoved(MouseEvent e) {
         Camera camera = Display.getCamera();
         Collection<PositionLoad> positionLoads = camera.getUpdateViewpoint().getPositionLoads();
-        if (!positionLoads.isEmpty()) {
-            mouseX = e.getX();
-            mouseY = e.getY();
-            Vec3 v = CameraHelper.getVectorFromPlane(camera, Display.getActiveViewport(), mouseX, mouseY, Quat.ZERO, true);
-            if (v == null)
-                return;
+        if (positionLoads.isEmpty())
+            return;
 
-            long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
+        mouseX = e.getX();
+        mouseY = e.getY();
+        Vec3 v = CameraHelper.getVectorFromPlane(camera, Display.getActiveViewport(), mouseX, mouseY, Quat.ZERO, true);
+        if (v == null)
+            return;
 
-            double width = camera.getCameraWidth() / 2, minDist = 5; // TBD
-            String name = null;
-            for (PositionLoad positionLoad : positionLoads) {
-                PositionResponse response = positionLoad.getResponse();
-                if (response == null)
-                    continue;
+        long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
 
-                Vec3 p = response.getInterpolatedHG(time, start, end);
-                double deltaX = Math.abs(p.x * Math.cos(p.y) - v.x);
-                double deltaY = Math.abs(p.x * Math.sin(p.y) - v.y);
-                double dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY) / width;
-                if (dist < minDist) {
-                    minDist = dist;
-                    name = positionLoad.getTarget().toString();
-                }
+        double[] lat = new double[3];
+        double width = camera.getCameraWidth() / 2, minDist = 5; // TBD
+        String name = null;
+        for (PositionLoad positionLoad : positionLoads) {
+            PositionResponse response = positionLoad.getResponse();
+            if (response == null)
+                continue;
+
+            response.interpolateLatitudinal(time, start, end, lat);
+            double deltaX = Math.abs(lat[0] * Math.cos(lat[1]) - v.x);
+            double deltaY = Math.abs(lat[0] * Math.sin(lat[1]) - v.y);
+            double dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY) / width;
+            if (dist < minDist) {
+                minDist = dist;
+                name = positionLoad.getTarget().toString();
             }
-            if (!text.isEmpty()) {
-                text.clear();
-                MovieDisplay.display();
-            }
-            if (minDist < 0.01) {
-                text.add(name);
-                MovieDisplay.display();
-            }
+        }
+        if (!text.isEmpty()) {
+            text.clear();
+            MovieDisplay.display();
+        }
+        if (minDist < 0.01) {
+            text.add(name);
+            MovieDisplay.display();
         }
     }
 
@@ -279,7 +281,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
             byte[] color = positionLoad.getTarget().getColor();
             long t = start;
 
-            double dist = response.getInterpolated(xyzw, t, start, end);
+            double dist = response.interpolateRectangular(t, start, end, xyzw);
             orbitBuf.putVertex(xyzw[0], xyzw[1], xyzw[2], xyzw[3], Colors.Null);
             orbitBuf.repeatVertex(color);
 
@@ -288,7 +290,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
                 t += delta;
                 if (t > time)
                     t = time;
-                dist = response.getInterpolated(xyzw, t, start, end);
+                dist = response.interpolateRectangular(t, start, end, xyzw);
                 orbitBuf.putVertex(xyzw[0], xyzw[1], xyzw[2], xyzw[3], color);
                 delta = getStep(dist);
             }
