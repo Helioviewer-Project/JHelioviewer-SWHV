@@ -24,7 +24,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 
 public class URIView extends BaseView {
 
-    private static final Cache<URI, ImageBuffer> decodeCache = Caffeine.newBuilder().weakKeys().softValues().build();
+    private static final Cache<URI, ImageBuffer> decodeCache = Caffeine.newBuilder().softValues().build();
 
     public enum URIType {
 

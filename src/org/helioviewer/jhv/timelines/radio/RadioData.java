@@ -16,7 +16,6 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
@@ -114,7 +113,7 @@ public class RadioData extends AbstractTimelineLayer {
             APIRequest req = new APIRequest("ROB", APIRequest.CallistoID, date, date, APIRequest.CADENCE_ANY);
             URI uri = new URI(req.toFileRequest());
             DecodeExecutor executor = new DecodeExecutor();
-            return new RadioJ2KData(new J2KViewCallisto(executor, req, NetFileCache.get(uri)), req.startTime, executor);
+            return new RadioJ2KData(new J2KViewCallisto(executor, req, uri), req.startTime, executor);
         }
 
     }
