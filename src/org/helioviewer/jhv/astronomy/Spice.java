@@ -114,7 +114,7 @@ public class Spice extends Thread {
             int i = 0;
             for (long milli = start; milli <= end; milli += dt) {
                 double[] v = positionRectangular(target, milli, frame.toString(), observer);
-                ret[i++] = new PositionCartesian(milli, v[0] * Sun.RadiusKMeterInv, v[1] * Sun.RadiusKMeterInv, v[2] * Sun.RadiusKMeterInv);
+                ret[i++] = new PositionCartesian(milli, v[0], v[1], v[2]);
             }
             //System.out.println((sw.elapsed().toNanos() / 1e9));
             return ret;
@@ -123,23 +123,23 @@ public class Spice extends Thread {
     }
 
     @Nullable
-    static Position getPosition(@Nonnull String observer, @Nonnull String target, Frame frame, JHVTime time) {
+    static Position getPositionLatitudinal(@Nonnull String observer, @Nonnull String target, Frame frame, JHVTime time) {
         try {
-            return executor.invokeAndWait(new GetPosition(observer, target, frame, time));
+            return executor.invokeAndWait(new GetPositionLatitudinal(observer, target, frame, time));
         } catch (Exception e) {
             Log.error(e);
         }
         return null;
     }
 
-    private static class GetPosition implements Callable<Position> {
+    private static class GetPositionLatitudinal implements Callable<Position> {
 
         private final String observer;
         private final String target;
         private final Frame frame;
         private final JHVTime time;
 
-        GetPosition(String _observer, String _target, Frame _frame, JHVTime _time) {
+        GetPositionLatitudinal(String _observer, String _target, Frame _frame, JHVTime _time) {
             observer = _observer;
             target = _target;
             frame = _frame;
@@ -148,9 +148,8 @@ public class Spice extends Thread {
 
         @Override
         public Position call() throws SpiceErrorException {
-            double[] v = positionRectangular(target, time.milli, frame.toString(), observer);
-            double[] c = CSPICE.reclat(v);
-            return new Position(time, c[0] * Sun.RadiusKMeterInv, c[1], c[2]);
+            double[] c = positionLatitudinal(target, time.milli, frame.toString(), observer);
+            return new Position(time, c[0], c[1], c[2]);
         }
 
     }
@@ -175,13 +174,12 @@ public class Spice extends Thread {
 
         @Override
         public Position call() throws SpiceErrorException {
-            double[] v = positionRectangular("EARTH", time.milli, "SOLO_IAU_SUN_2003", "SUN");
-            double[] c = CSPICE.reclat(v);
+            double[] c = positionLatitudinal("EARTH", time.milli, "SOLO_IAU_SUN_2003", "SUN");
             // like in SSW.getEarthSSW
             double lon = c[1];
             if (lon < 0)
                 lon += 2 * Math.PI;
-            return new Position(time, c[0] * Sun.RadiusKMeterInv, -lon, c[2]);
+            return new Position(time, c[0], -lon, c[2]);
         }
 
     }
@@ -203,7 +201,14 @@ public class Spice extends Thread {
         double[] lt = new double[1];
         double[] v = new double[3];
         CSPICE.spkpos(target, et, frame, "NONE", observer, v, lt);
+        v[0] *= Sun.RadiusKMeterInv;
+        v[1] *= Sun.RadiusKMeterInv;
+        v[2] *= Sun.RadiusKMeterInv;
         return v;
+    }
+
+    private static double[] positionLatitudinal(String target, long milli, String frame, String observer) throws SpiceErrorException {
+        return CSPICE.reclat(positionRectangular(target, milli, frame, observer));
     }
 
 }
