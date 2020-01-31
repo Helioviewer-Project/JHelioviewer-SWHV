@@ -5,13 +5,13 @@ import java.util.TreeMap;
 
 import javax.annotation.Nullable;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 
 public class PfssCache {
 
     private final TreeMap<Long, String> map = new TreeMap<>();
-    private final Cache<String, PfssData> cache = CacheBuilder.newBuilder().softValues().build();
+    private final Cache<String, PfssData> cache = Caffeine.newBuilder().softValues().build();
 
     void put(Map<Long, String> urls) {
         map.putAll(urls);

@@ -2,9 +2,8 @@ package org.helioviewer.jhv.time;
 
 import javax.annotation.Nonnull;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 
 public class JHVTime implements Comparable<JHVTime> {
 
@@ -44,13 +43,9 @@ public class JHVTime implements Comparable<JHVTime> {
 
     @Override
     public String toString() {
-        return cache.getUnchecked(milli);
+        return timeStrings.get(milli);
     }
 
-    private static final LoadingCache<Long, String> cache = CacheBuilder.newBuilder().maximumSize(100000).build(CacheLoader.from(JHVTime::getString));
-
-    private static String getString(long ms) {
-        return TimeUtils.format(ms);
-    }
+    private static final LoadingCache<Long, String> timeStrings = Caffeine.newBuilder().maximumSize(100000).build(TimeUtils::format);
 
 }

@@ -19,12 +19,12 @@ import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.uri.fits.FITSImage;
 import org.helioviewer.jhv.view.uri.generic.GenericImage;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 
 public class URIView extends BaseView {
 
-    private static final Cache<URI, ImageBuffer> decodeCache = CacheBuilder.newBuilder().weakKeys().softValues().build();
+    private static final Cache<URI, ImageBuffer> decodeCache = Caffeine.newBuilder().weakKeys().softValues().build();
 
     public enum URIType {
 
