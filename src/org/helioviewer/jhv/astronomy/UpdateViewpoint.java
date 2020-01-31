@@ -47,8 +47,7 @@ public interface UpdateViewpoint {
             JHVTime itime = time;
             List<PositionLoad> loadList = PositionLoad.get(this);
             if (!loadList.isEmpty()) {
-                PositionLoad positionLoad = loadList.get(0);
-                PositionResponse response = positionLoad.getResponse();
+                PositionResponse response = loadList.get(0).getResponse();
                 if (response != null) {
                     itime = new JHVTime(response.interpolateTime(time.milli, Movie.getStartTime(), Movie.getEndTime()));
                 }
@@ -67,8 +66,7 @@ public interface UpdateViewpoint {
         public Position update(JHVTime time) {
             List<PositionLoad> loadList = PositionLoad.get(this);
             if (!loadList.isEmpty()) {
-                PositionLoad positionLoad = loadList.get(0);
-                PositionResponse response = positionLoad.getResponse();
+                PositionResponse response = loadList.get(0).getResponse();
                 if (response != null) {
                     JHVTime itime = new JHVTime(response.interpolateLatitudinal(time.milli, Movie.getStartTime(), Movie.getEndTime(), lat));
                     double elon = Sun.getEarth(itime).lon;
