@@ -6,30 +6,39 @@ public class SubImage {
 
     public final int x;
     public final int y;
-    public final int width;
-    public final int height;
+    public final int w;
+    public final int h;
+    private final int hash;
 
     private static final int QUANTA = 32;
 
     // roundoff to quanta, minimum 1 pixel, clip to full image size
-    public SubImage(int x, int y, int w, int h, int fwidth, int fheight) {
-        x = MathUtils.roundDownTo(x, QUANTA);
-        y = MathUtils.roundDownTo(y, QUANTA);
-        w = MathUtils.roundUpTo(w + QUANTA, QUANTA);
-        h = MathUtils.roundUpTo(h + QUANTA, QUANTA);
+    public SubImage(int xx, int yy, int ww, int hh, int fwidth, int fheight) {
+        xx = MathUtils.roundDownTo(xx, QUANTA);
+        yy = MathUtils.roundDownTo(yy, QUANTA);
+        ww = MathUtils.roundUpTo(ww + QUANTA, QUANTA);
+        hh = MathUtils.roundUpTo(hh + QUANTA, QUANTA);
 
-        x = MathUtils.clip(x, 0, fwidth - 1);
-        y = MathUtils.clip(y, 0, fheight - 1);
-        w = MathUtils.clip(w, 1, fwidth);
-        h = MathUtils.clip(h, 1, fheight);
+        xx = MathUtils.clip(xx, 0, fwidth - 1);
+        yy = MathUtils.clip(yy, 0, fheight - 1);
+        ww = MathUtils.clip(ww, 1, fwidth);
+        hh = MathUtils.clip(hh, 1, fheight);
 
-        w = MathUtils.clip(w, fwidth - x);
-        h = MathUtils.clip(h, fheight - y);
+        ww = MathUtils.clip(ww, fwidth - xx);
+        hh = MathUtils.clip(hh, fheight - yy);
 
-        this.x = x;
-        this.y = y;
-        this.width = w;
-        this.height = h;
+        x = xx;
+        y = yy;
+        w = ww;
+        h = hh;
+        hash = computeHash(x, y, w, h);
+    }
+
+    private static int computeHash(int _x, int _y, int _w, int _h) {
+        int result = 31 + _x;
+        result = 31 * result + _y;
+        result = 31 * result + _w;
+        return 31 * result + _h;
     }
 
     @Override
@@ -39,20 +48,17 @@ public class SubImage {
         if (!(o instanceof SubImage))
             return false;
         SubImage s = (SubImage) o;
-        return x == s.x && y == s.y && width == s.width && height == s.height;
+        return x == s.x && y == s.y && w == s.w && h == s.h;
     }
 
     @Override
     public int hashCode() {
-        int result = 31 + x;
-        result = 31 * result + y;
-        result = 31 * result + width;
-        return 31 * result + height;
+        return hash;
     }
 
     @Override
     public String toString() {
-        return "[x=" + x + " y=" + y + " w=" + width + " h=" + height + ']';
+        return "[x=" + x + " y=" + y + " w=" + w + " h=" + h + ']';
     }
 
 }
