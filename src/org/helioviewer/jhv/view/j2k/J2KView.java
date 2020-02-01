@@ -356,7 +356,7 @@ public class J2KView extends BaseView {
         MetaData m = metaData[frame];
         SubImage roi = decodeParams.subImage;
         ResolutionLevel resolution = getResolutionLevel(frame, decodeParams.level);
-        Region r = m.roiToRegion(roi.x, roi.y, roi.width, roi.height, resolution.factorX, resolution.factorY);
+        Region r = m.roiToRegion(roi.x, roi.y, roi.w, roi.h, resolution.factorX, resolution.factorY);
         ImageData data = new ImageData(imageBuffer, m, r, decodeParams.viewpoint);
 
         EventQueue.invokeLater(() -> {

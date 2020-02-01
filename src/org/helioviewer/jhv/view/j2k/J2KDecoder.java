@@ -68,7 +68,7 @@ class J2KDecoder implements Callable<ImageBuffer> {
         compositor.Set_scale(false, false, false, 1f / (1 << params.level), params.factor);
 
         Kdu_dims requestedRegion = new Kdu_dims();
-        requestedRegion.From_u32(subImage.x, subImage.y, subImage.width, subImage.height);
+        requestedRegion.From_u32(subImage.x, subImage.y, subImage.w, subImage.h);
         compositor.Set_buffer_surface(requestedRegion);
 
         Kdu_compositor_buf compositorBuf = compositor.Get_composition_buffer(empty, true); // modifies empty
