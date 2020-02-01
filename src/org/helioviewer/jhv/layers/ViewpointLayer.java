@@ -58,7 +58,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
 
     private final ViewpointLayerOptions optionsPanel;
 
-    private JHVTime viewpointTime;
+    private JHVTime viewpointTime = Sun.StartEarth.time;
 
     public ViewpointLayer(JSONObject jo) {
         optionsPanel = new ViewpointLayerOptions(jo);
@@ -227,7 +227,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
     @Nullable
     @Override
     public String getTimeString() {
-        return viewpointTime == null ? null : viewpointTime.toString();
+        return viewpointTime.toString();
     }
 
     public void fireTimeUpdated(JHVTime _viewpointTime) {
