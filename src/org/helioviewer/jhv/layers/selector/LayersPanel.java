@@ -7,7 +7,6 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -24,6 +23,7 @@ import javax.swing.table.TableModel;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
+import org.helioviewer.jhv.gui.components.TableValue;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -172,31 +172,27 @@ public class LayersPanel extends JPanel {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                Point pt = e.getPoint();
-                int row = grid.rowAtPoint(pt);
-                int col = grid.columnAtPoint(pt);
-                Object obj = grid.getValueAt(row, col);
-                if (!(obj instanceof Layer))
+                TableValue v = TableValue.tableValueAtPoint(grid, e.getPoint());
+                if (v == null || !(v.value instanceof Layer))
                     return;
+                Layer layer = (Layer) v.value;
 
-                Layer layer = (Layer) obj;
-
-                if ((col == TITLE_COL || col == TIME_COL) && layer instanceof ImageLayer && e.getClickCount() == 2) {
+                if ((v.col == TITLE_COL || v.col == TIME_COL) && layer instanceof ImageLayer && e.getClickCount() == 2) {
                     ObservationDialog.getInstance().showDialog(false, (ImageLayer) layer);
                     return;
                 }
 
-                if (col == ENABLED_COL) {
+                if (v.col == ENABLED_COL) {
                     layer.setEnabled(!layer.isEnabled());
-                    model.updateCell(row, col);
+                    model.updateCell(v.row, v.col);
                     MovieDisplay.render(1);
-                } else if (col == TITLE_COL && layer instanceof ImageLayer) {
+                } else if (v.col == TITLE_COL && layer instanceof ImageLayer) {
                     Layers.setActiveImageLayer((ImageLayer) layer);
                     grid.repaint(); // multiple rows involved
-                } else if (col == REMOVE_COL && layer.isDeletable()) {
+                } else if (v.col == REMOVE_COL && layer.isDeletable()) {
                     model.remove(layer);
                     int idx = grid.getSelectedRow();
-                    if (row <= idx)
+                    if (v.row <= idx)
                         grid.getSelectionModel().setSelectionInterval(idx - 1, idx - 1);
                 }
             }
