@@ -3,7 +3,6 @@ package org.helioviewer.jhv.layers.spaceobject;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -19,6 +18,7 @@ import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
+import org.helioviewer.jhv.gui.components.TableValue;
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
 import org.json.JSONArray;
 
@@ -71,14 +71,11 @@ public class SpaceObjectContainer extends JScrollPane {
         grid.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Point pt = e.getPoint();
-                int row = grid.rowAtPoint(pt);
-                if (row < 0)
+                TableValue v = TableValue.tableValueAtPoint(grid, e.getPoint());
+                if (v == null || !(v.value instanceof SpaceObjectElement))
                     return;
-
-                int col = grid.columnAtPoint(pt);
-                if (col == SELECTED_COL)
-                    selectElement((SpaceObjectElement) grid.getValueAt(row, col));
+                if (v.col == SELECTED_COL)
+                    selectElement((SpaceObjectElement) v.value);
             }
         });
 

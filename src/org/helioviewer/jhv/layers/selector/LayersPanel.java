@@ -202,7 +202,7 @@ public class LayersPanel extends JPanel {
             @Override
             public void mouseMoved(MouseEvent e) {
                 int row = grid.rowAtPoint(e.getPoint());
-                if (grid.getValueAt(row, 0) instanceof ImageLayer) {
+                if (row >= 0 && grid.getValueAt(row, 0) instanceof ImageLayer) {
                     grid.setCursor(UIGlobals.openHandCursor);
                 } else {
                     grid.setCursor(Cursor.getDefaultCursor());
