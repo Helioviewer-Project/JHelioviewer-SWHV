@@ -31,12 +31,15 @@ import com.jogamp.opengl.GL2;
 
 public class FOVLayer extends AbstractLayer {
 
+    //private static final double METIS_INNER = 3;
+    //private static final double METIS_OUTER = 5.8;
+
     private static final double LINEWIDTH_FOV = GLSLLine.LINEWIDTH_BASIC;
 
     private final FOVShape fov = new FOVShape();
     private final byte[] fovColor = Colors.Blue;
     private final GLSLLine fovLine = new GLSLLine(true);
-    private final BufVertex fovBuf = new BufVertex((4 * (FOVShape.SUBDIVISIONS + 1) + 2) * GLSLLine.stride);
+    private final BufVertex fovBuf = new BufVertex((4 * (FOVShape.RECT_SUBDIVS + 1) + 2) * GLSLLine.stride);
     private final GLSLShape center = new GLSLShape(true);
     private final BufVertex centerBuf = new BufVertex(GLSLShape.stride);
 
@@ -60,6 +63,8 @@ public class FOVLayer extends AbstractLayer {
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
         Position viewpoint = camera.getViewpoint();
         double halfSide = 0.5 * viewpoint.distance * Math.tan(fovAngle * (Math.PI / 180.));
+        //double halfInner = 0.5 * viewpoint.distance * Math.tan(METIS_INNER * (Math.PI / 180.));
+        //double halfOuter = 0.5 * viewpoint.distance * Math.tan(METIS_OUTER * (Math.PI / 180.));
 
         Transform.pushView();
         Transform.rotateViewInverse(viewpoint.toQuat());
@@ -73,7 +78,9 @@ public class FOVLayer extends AbstractLayer {
         center.setData(gl, centerBuf);
         center.renderPoints(gl, pixFactor);
 
-        fov.putLine(halfSide, halfSide, fovBuf, fovColor);
+        fov.putRectLine(halfSide, halfSide, fovBuf, fovColor);
+        //fov.putCircLine(halfInner, fovBuf, fovColor);
+        //fov.putCircLine(halfOuter, fovBuf, fovColor);
         fovLine.setData(gl, fovBuf);
         fovLine.render(gl, vp.aspect, LINEWIDTH_FOV);
 
