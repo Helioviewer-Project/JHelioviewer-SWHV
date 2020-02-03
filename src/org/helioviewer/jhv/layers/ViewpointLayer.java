@@ -68,6 +68,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.idx])
             return;
+        if (!optionsPanel.isHeliospheric())
+            return;
 
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
         Position viewpoint = camera.getViewpoint();
@@ -107,6 +109,9 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
 
     @Override
     public void mouseMoved(MouseEvent e) {
+        if (!optionsPanel.isHeliospheric())
+            return;
+
         Camera camera = Display.getCamera();
         List<PositionLoad> positionLoads = PositionLoad.get(camera.getUpdateViewpoint());
         if (positionLoads.isEmpty())
@@ -151,6 +156,9 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        if (!optionsPanel.isHeliospheric())
+            return;
+
         if (e.isControlDown()) {
             Vec3 v = null;
             if (!e.isShiftDown()) { // ctrl-shift-click to reset control point
