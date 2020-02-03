@@ -95,9 +95,10 @@ public class SpaceObjectContainer extends JScrollPane {
 
         PositionLoad.removeAll(uv);
 
+        ListSelectionModel selectionModel = grid.getSelectionModel();
         int len = ja.length();
         for (int i = 0; i < len; i++)
-            selectTarget(SpaceObject.get(ja.optString(i, "Earth")), grid.getSelectionModel());
+            selectTarget(SpaceObject.get(ja.optString(i, "Earth")), selectionModel);
     }
 
     private void selectTarget(SpaceObject target, ListSelectionModel selectionModel) {
