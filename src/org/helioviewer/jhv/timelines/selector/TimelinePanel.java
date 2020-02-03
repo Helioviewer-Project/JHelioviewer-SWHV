@@ -6,7 +6,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -22,6 +21,7 @@ import javax.swing.table.TableModel;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.Buttons;
+import org.helioviewer.jhv.gui.components.TableValue;
 import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.timelines.TimelineLayer;
@@ -180,25 +180,21 @@ public class TimelinePanel extends JPanel {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                Point pt = e.getPoint();
-                int row = grid.rowAtPoint(pt);
-                int col = grid.columnAtPoint(pt);
-                if (row < 0 || col < 0) {
+                TableValue v = TableValue.tableValueAtPoint(grid, e.getPoint());
+                if (v == null || !(v.value instanceof TimelineLayer))
                     return;
-                }
+                TimelineLayer timeline = (TimelineLayer) v.value;
 
-                TimelineLayer timeline = (TimelineLayer) grid.getValueAt(row, col);
-
-                if (col == ENABLED_COL) {
+                if (v.col == ENABLED_COL) {
                     timeline.setEnabled(!timeline.isEnabled());
-                    model.updateCell(row, col);
-                    if (grid.getSelectedRow() == row)
+                    model.updateCell(v.row, v.col);
+                    if (grid.getSelectedRow() == v.row)
                         setOptionsPanel(timeline);
                     DrawController.graphAreaChanged();
-                } else if (col == REMOVE_COL && timeline.isDeletable()) {
+                } else if (v.col == REMOVE_COL && timeline.isDeletable()) {
                     model.remove(timeline);
                     int idx = grid.getSelectedRow();
-                    if (row <= idx)
+                    if (v.row <= idx)
                         grid.getSelectionModel().setSelectionInterval(idx - 1, idx - 1);
                 }
             }
