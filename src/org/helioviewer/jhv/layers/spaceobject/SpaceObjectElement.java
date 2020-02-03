@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.layers.spaceobject;
 
+import java.util.List;
+
 import javax.swing.border.Border;
 
 import org.helioviewer.jhv.astronomy.Frame;
@@ -53,6 +55,12 @@ class SpaceObjectElement implements PositionReceiver {
 
     boolean isSelected() {
         return selected;
+    }
+
+    PositionLoad getLoad(UpdateViewpoint uv) {
+        List<PositionLoad> loads = PositionLoad.get(uv);
+        int idx = loads.indexOf(load);
+        return idx < 0 ? null : loads.get(idx);
     }
 
     Border getBorder() {

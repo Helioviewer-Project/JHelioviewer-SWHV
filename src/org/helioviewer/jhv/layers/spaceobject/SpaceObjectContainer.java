@@ -20,6 +20,7 @@ import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.gui.components.TableValue;
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
+import org.helioviewer.jhv.layers.MovieDisplay;
 import org.json.JSONArray;
 
 @SuppressWarnings("serial")
@@ -37,6 +38,7 @@ public class SpaceObjectContainer extends JScrollPane {
     private final SpaceObject observer;
     private final SpaceObjectModel model;
 
+    private SpaceObjectElement highlighted;
     private Frame frame;
     private long startTime;
     private long endTime;
@@ -74,8 +76,11 @@ public class SpaceObjectContainer extends JScrollPane {
                 TableValue v = TableValue.tableValueAtPoint(grid, e.getPoint());
                 if (v == null || !(v.value instanceof SpaceObjectElement))
                     return;
+
+                highlighted = (SpaceObjectElement) v.value;
                 if (v.col == SELECTED_COL)
-                    selectElement((SpaceObjectElement) v.value);
+                    selectElement(highlighted);
+                MovieDisplay.display();
             }
         });
 
@@ -92,13 +97,21 @@ public class SpaceObjectContainer extends JScrollPane {
 
         int len = ja.length();
         for (int i = 0; i < len; i++)
-            selectTarget(SpaceObject.get(ja.optString(i, "Earth")));
+            selectTarget(SpaceObject.get(ja.optString(i, "Earth")), grid.getSelectionModel());
     }
 
-    private void selectTarget(SpaceObject target) {
-        SpaceObjectElement element = model.elementOf(target);
-        if (element != null) // found
+    private void selectTarget(SpaceObject target, ListSelectionModel selectionModel) {
+        int idx = model.indexOf(target);
+        if (idx != -1) { // found
+            selectionModel.setSelectionInterval(idx, idx); // highlight in table
+            SpaceObjectElement element = (SpaceObjectElement) model.getValueAt(idx, 0);
             selectElement(element);
+            highlighted = element;
+        }
+    }
+
+    public PositionLoad getHighlightedLoad() {
+        return highlighted == null ? null : highlighted.getLoad(uv);
     }
 
     public void setFrame(Frame _frame) {
@@ -161,6 +174,7 @@ public class SpaceObjectContainer extends JScrollPane {
                 SpaceObjectElement element = (SpaceObjectElement) value;
                 label.setText(element.toString());
                 label.setBorder(element.getBorder());
+                label.setToolTipText("Select for spiral");
             }
             return label;
         }

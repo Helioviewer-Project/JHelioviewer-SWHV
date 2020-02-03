@@ -3,7 +3,6 @@ package org.helioviewer.jhv.layers.spaceobject;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
 import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.jhv.astronomy.SpaceObject;
@@ -25,13 +24,13 @@ class SpaceObjectModel extends AbstractTableModel {
         return selected;
     }
 
-    @Nullable
-    SpaceObjectElement elementOf(SpaceObject object) {
-        for (SpaceObjectElement element : elements) {
+    int indexOf(SpaceObject object) {
+        for (int i = 0; i < elements.size(); i++) {
+            SpaceObjectElement element = elements.get(i);
             if (element.isTarget(object))
-                return element;
+                return i;
         }
-        return null;
+        return -1;
     }
 
     void refresh(SpaceObjectElement element) {
