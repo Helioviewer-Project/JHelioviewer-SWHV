@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.swing.JFormattedTextField;
@@ -31,8 +32,44 @@ import com.jogamp.opengl.GL2;
 
 public class FOVLayer extends AbstractLayer {
 
-    //private static final double METIS_INNER = 3;
-    //private static final double METIS_OUTER = 5.8;
+    private enum FOVType { RECTANGULAR, CIRCULAR }
+
+    private static class FOV {
+
+        final String name;
+        final FOVType type;
+        final double inner;
+        final double wide;
+        final double high;
+
+        FOV(String _name, FOVType _type, double innerDeg, double wideDeg, double highDeg) {
+            name = _name;
+            type = _type;
+            inner = 0.5 * Math.tan(innerDeg * (Math.PI / 180.));
+            wide  = 0.5 * Math.tan(wideDeg * (Math.PI / 180.));
+            high  = 0.5 * Math.tan(highDeg * (Math.PI / 180.));
+        }
+
+        void putFOV(FOVShape f, BufVertex buf, byte[] color) {
+            if (inner > 0)
+                f.putCircLine(inner, buf, color);
+            if (type == FOVType.RECTANGULAR)
+                f.putRectLine(wide, high, buf, color);
+            else
+                f.putCircLine(wide, buf, color);
+        }
+
+    }
+
+    private static final List<FOV> FOVs = List.of(
+        new FOV("SOLO/EUI/HRI", FOVType.RECTANGULAR, 0, 16.6 / 60., 16.6 / 60.),
+        new FOV("SOLO/EUI/FSI", FOVType.RECTANGULAR, 0,  228 / 60.,  228 / 60.),
+        new FOV("SOLO/METIS",   FOVType.CIRCULAR,    3,        5.8,        5.8),
+        new FOV("SOLO/PHI/HRT", FOVType.RECTANGULAR, 0,       0.28,       0.28),
+        new FOV("SOLO/PHI/FDT", FOVType.RECTANGULAR, 0,          2,          2),
+        new FOV("SOLO/SPICE",   FOVType.RECTANGULAR, 0,    16 / 60.,  11 / 60.),
+        new FOV("SOLO/STIX",    FOVType.RECTANGULAR, 0,           2,         2)
+    );
 
     private static final double LINEWIDTH_FOV = GLSLLine.LINEWIDTH_BASIC;
 
@@ -63,8 +100,6 @@ public class FOVLayer extends AbstractLayer {
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
         Position viewpoint = camera.getViewpoint();
         double halfSide = 0.5 * viewpoint.distance * Math.tan(fovAngle * (Math.PI / 180.));
-        //double halfInner = 0.5 * viewpoint.distance * Math.tan(METIS_INNER * (Math.PI / 180.));
-        //double halfOuter = 0.5 * viewpoint.distance * Math.tan(METIS_OUTER * (Math.PI / 180.));
 
         Transform.pushView();
         Transform.rotateViewInverse(viewpoint.toQuat());
@@ -79,8 +114,6 @@ public class FOVLayer extends AbstractLayer {
         center.renderPoints(gl, pixFactor);
 
         fov.putRectLine(halfSide, halfSide, fovBuf, fovColor);
-        //fov.putCircLine(halfInner, fovBuf, fovColor);
-        //fov.putCircLine(halfOuter, fovBuf, fovColor);
         fovLine.setData(gl, fovBuf);
         fovLine.render(gl, vp.aspect, LINEWIDTH_FOV);
 
@@ -151,7 +184,7 @@ public class FOVLayer extends AbstractLayer {
         c0.weighty = 1.;
         c0.gridy = 0;
         c0.gridx = 0;
-        panel.add(new JLabel("FOV angle", JLabel.RIGHT), c0);
+        panel.add(new JLabel("Custom angle", JLabel.RIGHT), c0);
         c0.anchor = GridBagConstraints.LINE_START;
         c0.gridx = 1;
         panel.add(spinner, c0);
