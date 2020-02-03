@@ -147,7 +147,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
         }
     }
 
-    private Vec3 spiralControl = null;
+    private Vec3 customControl = null;
 
     @Override
     public void mouseClicked(MouseEvent e) {
@@ -167,7 +167,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
                     v.z = lat;
                 }
             }
-            spiralControl = v;
+            customControl = v;
             MovieDisplay.display();
         }
     }
@@ -320,7 +320,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
         // control point
         double rad0, lon0, lat0;
 
-        if (spiralControl == null) {
+        if (customControl == null) {
             if (control == null)
                 return;
             PositionResponse response = control.getResponse();
@@ -335,8 +335,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
             lon0 = lat[1];
             lat0 = lat[2];
         } else {
-            rad0 = spiralControl.x;
-            lon0 = spiralControl.y;
+            rad0 = customControl.x;
+            lon0 = customControl.y;
             lat0 = 0;
         }
 
