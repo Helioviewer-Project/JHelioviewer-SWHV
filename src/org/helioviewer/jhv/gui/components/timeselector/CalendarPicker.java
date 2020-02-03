@@ -19,6 +19,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
+import org.helioviewer.jhv.gui.components.TableValue;
 import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -238,27 +239,23 @@ class CalendarPicker extends JPanel {
                 // when a cell which contains valid data was clicked, the view controller and view mode will be changed
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    if (e.getButton() == MouseEvent.BUTTON1 && isValidCellSelected(e.getPoint())) {
-                        int row = table.getSelectedRow();
-                        int col = table.getSelectedColumn();
-                        if (row == -1 || col == -1)
-                            return;
+                    TableValue v = TableValue.tableValueAtPoint(table, e.getPoint());
+                    if (v == null || v.value == null)
+                        return;
+                    calendarViewController.setTimeOfCellValue(v.value);
 
-                        calendarViewController.setTimeOfCellValue(table.getValueAt(row, col));
-
-                        switch (displayMode) {
-                            case YEARS:
-                                changeDisplayMode(DisplayMode.MONTHS);
-                                updateDateDisplay();
-                                break;
-                            case MONTHS:
-                                changeDisplayMode(DisplayMode.DAYS);
-                                updateDateDisplay();
-                                break;
-                            case DAYS:
-                                informCalendarListeners();
-                                break;
-                        }
+                    switch (displayMode) {
+                        case YEARS:
+                            changeDisplayMode(DisplayMode.MONTHS);
+                            updateDateDisplay();
+                            break;
+                        case MONTHS:
+                            changeDisplayMode(DisplayMode.DAYS);
+                            updateDateDisplay();
+                            break;
+                        case DAYS:
+                            informCalendarListeners();
+                            break;
                     }
                 }
             });
@@ -310,22 +307,6 @@ class CalendarPicker extends JPanel {
             // select cell
             if (selectedCell != null)
                 table.changeSelection(selectedCell.x, selectedCell.y, false, false);
-        }
-
-        /**
-         * Checks if the selected cell has a valid value. The method will return
-         * false if the cell value is null or the user clicked in an empty table
-         * space where no cell is located; otherwise the method returns true.
-         *
-         * @return boolean value if cell is unequal null and user clicked inside a cell.
-         */
-        boolean isValidCellSelected(Point point) {
-            int row = table.getSelectedRow();
-            int col = table.getSelectedColumn();
-            if (row == -1 || col == -1)
-                return false;
-
-            return table.getModel().getValueAt(row, col) != null && table.rowAtPoint(point) >= 0;
         }
 
         // Sets the size of the table to the size of the available space
