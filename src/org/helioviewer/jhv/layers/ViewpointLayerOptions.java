@@ -165,6 +165,10 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
         equatorialOptionPanel.setTimespan(start, end);
     }
 
+    boolean isHeliospheric() {
+        return currentOptionPanel == equatorialOptionPanel;
+    }
+
     PositionLoad getHighlightedLoad() {
         return currentOptionPanel == equatorialOptionPanel ? equatorialOptionPanel.getHighlightedLoad() : null;
     }
