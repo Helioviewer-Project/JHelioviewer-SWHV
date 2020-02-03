@@ -345,6 +345,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
             // before control point
             for (int i = 0; i < SPIRAL_DIVISIONS; i++) {
                 double rad = (Sun.Radius + (rad0 - Sun.Radius) * i / (double) SPIRAL_DIVISIONS);
+                if (rad > SPIRAL_RADIUS)
+                    break;
                 double lon = lona - (rad - rad0) / sr;
                 if (i == 0) {
                     spiralPutVertex(rad, lon, lat0, Colors.Null);
@@ -356,14 +358,12 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
             // after control point
             for (int i = 0; i <= SPIRAL_DIVISIONS; i++) {
                 double rad = (rad0 + (SPIRAL_RADIUS - rad0) * i / (double) SPIRAL_DIVISIONS);
+                if (rad > SPIRAL_RADIUS)
+                    break;
                 double lon = lona - (rad - rad0) / sr;
-                if (i == SPIRAL_DIVISIONS) {
-                    spiralPutVertex(rad, lon, lat0, spiralColor);
-                    spiralBuf.repeatVertex(Colors.Null);
-                } else {
-                    spiralPutVertex(rad, lon, lat0, spiralColor);
-                }
+                spiralPutVertex(rad, lon, lat0, spiralColor);
             }
+            spiralBuf.repeatVertex(Colors.Null);
         }
 
         spiral.setData(gl, spiralBuf);
