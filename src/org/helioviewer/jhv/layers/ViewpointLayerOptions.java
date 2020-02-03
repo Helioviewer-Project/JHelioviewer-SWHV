@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import org.helioviewer.jhv.astronomy.Frame;
+import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
@@ -164,12 +165,12 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
         equatorialOptionPanel.setTimespan(start, end);
     }
 
-    int getSpiralSpeed() {
-        return currentOptionPanel == equatorialOptionPanel ? equatorialOptionPanel.getSpiralSpeed() : 0;
+    PositionLoad getHighlightedLoad() {
+        return currentOptionPanel == equatorialOptionPanel ? equatorialOptionPanel.getHighlightedLoad() : null;
     }
 
-    boolean isFrameInertial() {
-        return currentOptionPanel == equatorialOptionPanel && currentOptionPanel.isFrameInertial();
+    int getSpiralSpeed() {
+        return currentOptionPanel == equatorialOptionPanel ? equatorialOptionPanel.getSpiralSpeed() : 0;
     }
 
 }

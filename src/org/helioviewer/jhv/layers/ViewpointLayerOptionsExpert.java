@@ -13,6 +13,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 
 import org.helioviewer.jhv.astronomy.Frame;
+import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.gui.ComponentUtils;
@@ -159,12 +160,12 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         return jo;
     }
 
-    int getSpiralSpeed() {
-        return spiralMult * spiralSpeed;
+    PositionLoad getHighlightedLoad() {
+        return container.getHighlightedLoad();
     }
 
-    boolean isFrameInertial() {
-        return frame == Frame.HCI;
+    int getSpiralSpeed() {
+        return spiralMult * spiralSpeed;
     }
 
 }

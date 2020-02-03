@@ -80,7 +80,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
             camera.projectionOrthoWide(vp.aspect);
         }
 
-        renderSpiral(gl, vp, viewpoint, optionsPanel.isFrameInertial(), optionsPanel.getSpiralSpeed());
+        renderSpiral(gl, vp, optionsPanel.getHighlightedLoad(), optionsPanel.getSpiralSpeed());
 
         List<PositionLoad> positionLoads = PositionLoad.get(camera.getUpdateViewpoint());
         if (!positionLoads.isEmpty()) {
@@ -312,7 +312,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
         spiralBuf.putVertex(x, y, z, 1, color);
     }
 
-    private void renderSpiral(GL2 gl, Viewport vp, Position viewpoint, boolean inertial, int speed) {
+    private void renderSpiral(GL2 gl, Viewport vp, PositionLoad control, int speed) {
         if (speed == 0)
             return;
 
@@ -321,10 +321,19 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
         double rad0, lon0, lat0;
 
         if (spiralControl == null) {
-            Position p0 = Sun.getEarthHCI(viewpoint.time);
-            rad0 = p0.distance;
-            lon0 = inertial ? p0.lon : 0;
-            lat0 = 0;
+            if (control == null)
+                return;
+            PositionResponse response = control.getResponse();
+            if (response == null)
+                return;
+
+            double[] lat = new double[3];
+            long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
+            response.interpolateLatitudinal(time, start, end, lat);
+
+            rad0 = lat[0];
+            lon0 = lat[1];
+            lat0 = lat[2];
         } else {
             rad0 = spiralControl.x;
             lon0 = spiralControl.y;
