@@ -133,9 +133,7 @@ public class FOVLayer extends AbstractLayer {
 
     private static void drawLabel(String name, double x, double y, double size, JhvTextRenderer renderer) {
         float textScaleFactor = (float) (textScale / renderer.getFont().getSize2D() * size);
-        renderer.begin3DRendering();
         renderer.draw3D(name, (float) x, (float) y, (float) (FOVShape.computeZ(x, y) + textEpsilon), textScaleFactor);
-        renderer.end3DRendering();
     }
 
     @Override
@@ -159,12 +157,15 @@ public class FOVLayer extends AbstractLayer {
         center.renderPoints(gl, pixFactor);
 
         JhvTextRenderer renderer = GLText.getRenderer(48);
+        renderer.begin3DRendering();
         FOVs.forEach(f -> f.putFOV(fov, viewpoint.distance, fovBuf, renderer));
         if (drawCustom) {
             double halfSide = 0.5 * viewpoint.distance * Math.tan(fovAngle * (Math.PI / 180.));
             fov.putRectLine(halfSide, halfSide, fovBuf, fovColor);
             drawLabel("Custom", halfSide, -halfSide, halfSide, renderer);
         }
+        renderer.end3DRendering();
+
         fovLine.setData(gl, fovBuf);
         fovLine.render(gl, vp.aspect, LINEWIDTH_FOV);
 
