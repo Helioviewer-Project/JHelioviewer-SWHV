@@ -4,7 +4,6 @@
 ## JHelioviewer 2.16 (pending)
 
 - Non-modal annotations (shift+click)
-- Draw spiral in heliosphere
 - Read Helioviewer metadata from JPG and PNG files
 - Switch from NewtCanvasAWT to GLCanvas (full screen is lost)
 - Support pixel scale in Windows 10 ([#75](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/75>),[#76](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/76>))
@@ -24,4 +23,6 @@
 - Change video export to use FFmpeg and disk buffering
 - Allow several video export qualities of H.264 and H.265, as well as series of PNGs ([#26](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/26>),[#44](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/44>),[#45](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/45>))
 - Use SPICE for the calculations of internal reference frames
-- Allow customization of grid in latitudinal projection ([#99](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/99>))
+- Allow customization of grid type in latitudinal projection ([#99](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/99>))
+- Draw spiral in heliosphere through the trajectory of the highlighted object
+- Draw field-of-views of some SOLO remote sensing instruments
