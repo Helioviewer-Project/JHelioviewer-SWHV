@@ -37,6 +37,8 @@ import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.FOVShape;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
+import org.helioviewer.jhv.opengl.GLText;
+import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -65,15 +67,18 @@ public class FOVLayer extends AbstractLayer {
             color = _color;
         }
 
-        void putFOV(FOVShape f, double distance, BufVertex buf) {
+        void putFOV(JhvTextRenderer renderer, FOVShape f, double distance, BufVertex buf) {
             if (!selected)
                 return;
             if (inner > 0)
                 f.putCircLine(inner * distance, buf, color);
-            if (type == FOVType.RECTANGULAR)
+            if (type == FOVType.RECTANGULAR) {
                 f.putRectLine(wide * distance, high * distance, buf, color);
-            else
+                drawLabel(renderer, name, wide * distance, -high * distance);
+            } else {
                 f.putCircLine(wide * distance, buf, color);
+                drawLabel(renderer, name, wide * distance * Math.sqrt(2), -wide * distance * Math.sqrt(2));
+            }
         }
 
         boolean isSelected() {
@@ -102,6 +107,7 @@ public class FOVLayer extends AbstractLayer {
     );
 
     private static final double LINEWIDTH_FOV = GLSLLine.LINEWIDTH_BASIC;
+    private static final double textEpsilon = 0.09;
 
     private final FOVShape fov = new FOVShape();
     private final byte[] fovColor = Colors.Blue;
@@ -121,6 +127,13 @@ public class FOVLayer extends AbstractLayer {
 
     public FOVLayer(JSONObject jo) {
         optionsPanel = optionsPanel();
+    }
+
+    private static void drawLabel(JhvTextRenderer renderer, String name, double x, double y) {
+        float textScaleFactor = GridLabel.textScale / renderer.getFont().getSize2D();
+        renderer.begin3DRendering();
+        renderer.draw3D(name, (float) x, (float) y, (float) (FOVShape.computeZ(x, y) + textEpsilon), textScaleFactor);
+        renderer.end3DRendering();
     }
 
     @Override
@@ -143,10 +156,12 @@ public class FOVLayer extends AbstractLayer {
         center.setData(gl, centerBuf);
         center.renderPoints(gl, pixFactor);
 
-        FOVs.forEach(f -> f.putFOV(fov, viewpoint.distance, fovBuf));
+        JhvTextRenderer renderer = GLText.getRenderer((int) (GridLabel.textScale * pixFactor));
+        FOVs.forEach(f -> f.putFOV(renderer, fov, viewpoint.distance, fovBuf));
         if (drawCustom) {
             double halfSide = 0.5 * viewpoint.distance * Math.tan(fovAngle * (Math.PI / 180.));
             fov.putRectLine(halfSide, halfSide, fovBuf, fovColor);
+            drawLabel(renderer, "Custom", halfSide, -halfSide);
         }
         fovLine.setData(gl, fovBuf);
         fovLine.render(gl, vp.aspect, LINEWIDTH_FOV);
