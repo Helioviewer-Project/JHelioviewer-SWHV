@@ -76,7 +76,7 @@ public class FOVShape {
             if (i == 0) {
                 buf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
             }
-            buf.putVertex((float) x, (float) y, (float) z, 1, color);
+            buf.putVertex((float) x, (float) y, (float) z, 1, i % 2 == 0 ? color : Colors.White);
             if (i == CIRC_SUBDIVS) {
                 buf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
             }
