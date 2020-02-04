@@ -67,17 +67,18 @@ public class FOVLayer extends AbstractLayer {
             color = _color;
         }
 
-        void putFOV(JhvTextRenderer renderer, FOVShape f, double distance, BufVertex buf) {
+        void putFOV(FOVShape f, double distance, BufVertex buf, JhvTextRenderer renderer) {
             if (!selected)
                 return;
             if (inner > 0)
                 f.putCircLine(inner * distance, buf, color);
             if (type == FOVType.RECTANGULAR) {
                 f.putRectLine(wide * distance, high * distance, buf, color);
-                drawLabel(renderer, name, wide * distance, -high * distance);
+                drawLabel(name, wide * distance, -high * distance, high * distance, renderer);
             } else {
                 f.putCircLine(wide * distance, buf, color);
-                drawLabel(renderer, name, wide * distance / Math.sqrt(2), -wide * distance / Math.sqrt(2));
+                double halfSide = wide * distance / Math.sqrt(2);
+                drawLabel(name, halfSide, -halfSide, halfSide, renderer);
             }
         }
 
@@ -108,6 +109,7 @@ public class FOVLayer extends AbstractLayer {
 
     private static final double LINEWIDTH_FOV = GLSLLine.LINEWIDTH_BASIC;
     private static final double textEpsilon = 0.09;
+    private static final double textScale = 0.075;
 
     private final FOVShape fov = new FOVShape();
     private final byte[] fovColor = Colors.Blue;
@@ -129,8 +131,8 @@ public class FOVLayer extends AbstractLayer {
         optionsPanel = optionsPanel();
     }
 
-    private static void drawLabel(JhvTextRenderer renderer, String name, double x, double y) {
-        float textScaleFactor = GridLabel.textScale / renderer.getFont().getSize2D();
+    private static void drawLabel(String name, double x, double y, double size, JhvTextRenderer renderer) {
+        float textScaleFactor = (float) (textScale / renderer.getFont().getSize2D() * size);
         renderer.begin3DRendering();
         renderer.draw3D(name, (float) x, (float) y, (float) (FOVShape.computeZ(x, y) + textEpsilon), textScaleFactor);
         renderer.end3DRendering();
@@ -156,12 +158,12 @@ public class FOVLayer extends AbstractLayer {
         center.setData(gl, centerBuf);
         center.renderPoints(gl, pixFactor);
 
-        JhvTextRenderer renderer = GLText.getRenderer((int) (GridLabel.textScale * pixFactor));
-        FOVs.forEach(f -> f.putFOV(renderer, fov, viewpoint.distance, fovBuf));
+        JhvTextRenderer renderer = GLText.getRenderer(48);
+        FOVs.forEach(f -> f.putFOV(fov, viewpoint.distance, fovBuf, renderer));
         if (drawCustom) {
             double halfSide = 0.5 * viewpoint.distance * Math.tan(fovAngle * (Math.PI / 180.));
             fov.putRectLine(halfSide, halfSide, fovBuf, fovColor);
-            drawLabel(renderer, "Custom", halfSide, -halfSide);
+            drawLabel("Custom", halfSide, -halfSide, halfSide, renderer);
         }
         fovLine.setData(gl, fovBuf);
         fovLine.render(gl, vp.aspect, LINEWIDTH_FOV);
