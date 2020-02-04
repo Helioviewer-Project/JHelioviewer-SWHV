@@ -77,7 +77,7 @@ public class FOVLayer extends AbstractLayer {
                 drawLabel(renderer, name, wide * distance, -high * distance);
             } else {
                 f.putCircLine(wide * distance, buf, color);
-                drawLabel(renderer, name, wide * distance * Math.sqrt(2), -wide * distance * Math.sqrt(2));
+                drawLabel(renderer, name, wide * distance / Math.sqrt(2), -wide * distance / Math.sqrt(2));
             }
         }
 
