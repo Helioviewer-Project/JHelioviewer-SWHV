@@ -21,7 +21,7 @@ public class AnnotateFOV extends AbstractAnnotateable {
 
     @Nullable
     private static Vec3 computePointFOV(Camera camera, int x, int y) {
-        return CameraHelper.getVectorFromSphereOrPlane(camera, Display.getActiveViewport(), x, y, camera.getCurrentDragRotation());
+        return CameraHelper.getVectorFromSphereOrPlane(camera, Display.getActiveViewport(), x, y, camera.getDragRotation());
     }
 
     public void zoom(Camera camera) {
@@ -34,8 +34,8 @@ public class AnnotateFOV extends AbstractAnnotateable {
         double dx = 0.5 * (p1.x - p0.x);
         double dy = 0.5 * (p1.y - p0.y);
 
-        camera.setCurrentTranslation(-(p0.x + dx), -(p0.y + dy));
-        camera.resetCurrentDragRotation();
+        camera.setTranslation(-(p0.x + dx), -(p0.y + dy));
+        camera.resetDragRotation();
         camera.setFOV(2 * Math.atan2(Math.sqrt(dx * dx + dy * dy), camera.getViewpoint().distance));
     }
 

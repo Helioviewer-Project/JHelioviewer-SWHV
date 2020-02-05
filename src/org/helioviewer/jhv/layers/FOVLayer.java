@@ -84,8 +84,8 @@ public class FOVLayer extends AbstractLayer {
         }
 
         void zoom(Camera camera) {
-            camera.setCurrentTranslation(0, 0);
-            camera.resetCurrentDragRotation();
+            camera.setTranslation(0, 0);
+            camera.resetDragRotation();
             camera.setFOV(2 * wide);
         }
 
@@ -363,7 +363,7 @@ public class FOVLayer extends AbstractLayer {
                 FOV fov = (FOV) value;
                 label.setText(fov.toString());
                 label.setBorder(JHVTableCellRenderer.cellBorder);
-                label.setToolTipText("Double-click to fit view");
+                label.setToolTipText("Double-click to fit FOV");
             }
             return label;
         }

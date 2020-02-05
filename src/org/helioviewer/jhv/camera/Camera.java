@@ -29,8 +29,8 @@ public class Camera {
     private double fov = INITFOV;
 
     private Quat rotation = Quat.ZERO;
-    private final Vec2 currentTranslation = new Vec2(0, 0);
-    private Quat currentDragRotation = Quat.ZERO;
+    private final Vec2 translation = new Vec2(0, 0);
+    private Quat dragRotation = Quat.ZERO;
     private double cameraWidth = 1;
 
     private boolean tracking;
@@ -54,13 +54,13 @@ public class Camera {
 
     public void projectionOrtho2D(double aspect) {
         Transform.setOrthoSymmetricProjection((float) (cameraWidth * aspect), (float) cameraWidth, -1, 1);
-        Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
+        Transform.setTranslateView((float) translation.x, (float) translation.y, 0);
         Transform.cacheMVP();
     }
 
     public void projectionOrtho(double aspect, GL2 gl, GLSLShape blackCircle) {
         Transform.setOrthoSymmetricProjection((float) (cameraWidth * aspect), (float) cameraWidth, -clipNarrow, clipNarrow);
-        Transform.setTranslateView((float) currentTranslation.x, (float) currentTranslation.y, 0);
+        Transform.setTranslateView((float) translation.x, (float) translation.y, 0);
         Transform.cacheMVP();
 
         blackCircle.renderShape(gl, GL2.GL_TRIANGLE_STRIP);
@@ -71,7 +71,7 @@ public class Camera {
 
     public float[] getTransformationInverse(double aspect) {
         Mat4f.orthoSymmetricInverse(invProj, (float) (cameraWidth * aspect), (float) cameraWidth, -1, 1);
-        Mat4f.translate(invProj, -(float) currentTranslation.x, -(float) currentTranslation.y, 0);
+        Mat4f.translate(invProj, -(float) translation.x, -(float) translation.y, 0);
         return invProj;
     }
 
@@ -88,7 +88,7 @@ public class Camera {
     }
 
     private void updateRotation() {
-        rotation = Quat.rotate(currentDragRotation, viewpoint.toQuat());
+        rotation = Quat.rotate(dragRotation, viewpoint.toQuat());
     }
 
     private void updateWidth() {
@@ -101,9 +101,9 @@ public class Camera {
     }
 
     public void reset() {
-        currentTranslation.x = 0;
-        currentTranslation.y = 0;
-        currentDragRotation = Quat.ZERO;
+        translation.x = 0;
+        translation.y = 0;
+        dragRotation = Quat.ZERO;
 
         updateCamera(Movie.getTime());
         CameraHelper.zoomToFit(this);
@@ -123,26 +123,26 @@ public class Camera {
         reset();
     }
 
-    public Vec2 getCurrentTranslation() {
-        return currentTranslation;
+    public Vec2 getTranslation() {
+        return translation;
     }
 
-    public void setCurrentTranslation(double x, double y) {
-        currentTranslation.x = x;
-        currentTranslation.y = y;
+    public void setTranslation(double x, double y) {
+        translation.x = x;
+        translation.y = y;
     }
 
-    public Quat getCurrentDragRotation() {
-        return currentDragRotation;
+    public Quat getDragRotation() {
+        return dragRotation;
     }
 
-    void rotateCurrentDragRotation(Quat _currentDragRotation) {
-        currentDragRotation = Quat.rotate(currentDragRotation, _currentDragRotation);
+    void rotateDragRotation(Quat _dragRotation) {
+        dragRotation = Quat.rotate(dragRotation, _dragRotation);
         updateRotation();
     }
 
-    public void resetCurrentDragRotation() {
-        currentDragRotation = Quat.ZERO;
+    public void resetDragRotation() {
+        dragRotation = Quat.ZERO;
         updateRotation();
     }
 
@@ -178,9 +178,9 @@ public class Camera {
 
     public JSONObject toJson() {
         JSONObject jo = new JSONObject();
-        jo.put("dragRotation", currentDragRotation.toJson());
-        jo.put("translationX", currentTranslation.x);
-        jo.put("translationY", currentTranslation.y);
+        jo.put("dragRotation", dragRotation.toJson());
+        jo.put("translationX", translation.x);
+        jo.put("translationY", translation.y);
         jo.put("fov", fov);
         return jo;
     }
@@ -188,9 +188,9 @@ public class Camera {
     public void fromJson(JSONObject jo) {
         JSONArray ja = jo.optJSONArray("dragRotation");
         if (ja != null)
-            currentDragRotation = Quat.fromJson(ja);
-        currentTranslation.x = jo.optDouble("translationX", currentTranslation.x);
-        currentTranslation.y = jo.optDouble("translationY", currentTranslation.y);
+            dragRotation = Quat.fromJson(ja);
+        translation.x = jo.optDouble("translationX", translation.x);
+        translation.y = jo.optDouble("translationY", translation.y);
         fov = jo.optDouble("fov", fov);
     }
 

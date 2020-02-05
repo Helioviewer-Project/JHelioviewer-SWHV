@@ -47,7 +47,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
             setText(formatPolar(coord));
         } else {
             String valueStr = ImageData.nanValue;
-            Vec3 v = CameraHelper.getVectorFromSphereOrPlane(camera, vp, x, y, camera.getCurrentDragRotation());
+            Vec3 v = CameraHelper.getVectorFromSphereOrPlane(camera, vp, x, y, camera.getDragRotation());
             if (v == null) {
                 setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0, valueStr));
             } else {
