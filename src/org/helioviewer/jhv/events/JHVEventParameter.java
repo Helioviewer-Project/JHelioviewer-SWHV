@@ -72,12 +72,12 @@ public class JHVEventParameter {
     public String getDisplayParameterValue() {
         if (parameterDisplayValue == null) {
             parameterDisplayValue = getSimpleDisplayParameterValue();
-            if (parameterName == "ar_noaanum")
+            if ("ar_noaanum".equals(parameterName))
                 parameterDisplayValue = Strings.intern(
                         "<a href=\"https://ui.adsabs.harvard.edu/#search/q=%22NOAA%20" +
-                        parameterDisplayValue +
-                        "%22&sort=date%20desc\">" +
-                        parameterDisplayValue + "</a>");
+                                parameterDisplayValue +
+                                "%22&sort=date%20desc\">" +
+                                parameterDisplayValue + "</a>");
         }
         return parameterDisplayValue;
     }

@@ -33,7 +33,7 @@ public class SWEKSupplier extends SWEKTreeModelElement {
         key = supplierName + source.getName() + db;
         suppliers.put(key, this);
 
-        isCactus = name == "CACTus" && source.getName() == "HEK"; // interned
+        isCactus = "CACTus".equals(name) && "HEK".equals(source.getName());
         if (group.containsFilter())
             filterDialog = new FilterDialog(this);
     }
