@@ -59,6 +59,9 @@ public class FOVLayer extends AbstractLayer {
         private final byte[] color;
         private boolean selected;
 
+        private double centerX = 0;
+        private double centerY = 0;
+
         FOV(String _name, FOVType _type, double innerDeg, double wideDeg, double highDeg, byte[] _color) {
             name = _name;
             type = _type;
@@ -68,23 +71,32 @@ public class FOVLayer extends AbstractLayer {
             color = _color;
         }
 
-        void putFOV(FOVShape f, double distance, BufVertex buf, JhvTextRenderer renderer) {
+        void setCenter(double _centerX, double _centerY) {
+            centerX = _centerX;
+            centerY = _centerY;
+        }
+
+        void putFOV(FOVShape f, double distance, BufVertex lineBuf, BufVertex centerBuf, JhvTextRenderer renderer) {
             if (!selected)
                 return;
+
+            f.setCenter(centerX, centerY);
+            f.putCenter(centerBuf, color);
+
             if (inner > 0)
-                f.putCircLine(inner * distance, buf, color);
+                f.putCircLine(inner * distance, lineBuf, color);
             if (type == FOVType.RECTANGULAR) {
-                f.putRectLine(wide * distance, high * distance, buf, color);
-                drawLabel(name, wide * distance, -high * distance, high * distance, renderer);
+                f.putRectLine(wide * distance, high * distance, lineBuf, color);
+                drawLabel(name, wide * distance + centerX, -high * distance + centerY, high * distance, renderer);
             } else {
-                f.putCircLine(wide * distance, buf, color);
+                f.putCircLine(wide * distance, lineBuf, color);
                 double halfSide = wide * distance / Math.sqrt(2);
-                drawLabel(name, halfSide, -halfSide, halfSide, renderer);
+                drawLabel(name, halfSide + centerX, -halfSide + centerY, halfSide, renderer);
             }
         }
 
         void zoom(Camera camera) {
-            camera.setTranslation(0, 0);
+            camera.setTranslation(-centerX, -centerY);
             camera.resetDragRotation();
             camera.setFOV(2 * wide);
         }
@@ -121,7 +133,7 @@ public class FOVLayer extends AbstractLayer {
     private final FOVShape fov = new FOVShape();
     private final byte[] fovColor = Colors.Blue;
     private final GLSLLine fovLine = new GLSLLine(true);
-    private final BufVertex fovBuf = new BufVertex((4 * (FOVShape.RECT_SUBDIVS + 1) + 2) * GLSLLine.stride);
+    private final BufVertex lineBuf = new BufVertex((4 * (FOVShape.RECT_SUBDIVS + 1) + 2) * GLSLLine.stride);
     private final GLSLShape center = new GLSLShape(true);
     private final BufVertex centerBuf = new BufVertex(GLSLShape.stride);
 
@@ -171,21 +183,23 @@ public class FOVLayer extends AbstractLayer {
             camera.projectionOrthoWide(vp.aspect);
         }
 
-        fov.putCenter(centerBuf, fovColor);
-        center.setData(gl, centerBuf);
-        center.renderPoints(gl, pixFactor);
-
         JhvTextRenderer renderer = GLText.getRenderer(48);
         renderer.begin3DRendering();
-        FOVs.forEach(f -> f.putFOV(fov, viewpoint.distance, fovBuf, renderer));
+        FOVs.forEach(f -> f.putFOV(fov, viewpoint.distance, lineBuf, centerBuf, renderer));
         if (drawCustom) {
+            fov.setCenter(0, 0);
+            fov.putCenter(centerBuf, fovColor);
+
             double halfSide = 0.5 * viewpoint.distance * Math.tan(fovAngle * (Math.PI / 180.));
-            fov.putRectLine(halfSide, halfSide, fovBuf, fovColor);
+            fov.putRectLine(halfSide, halfSide, lineBuf, fovColor);
             drawLabel("Custom", halfSide, -halfSide, halfSide, renderer);
         }
         renderer.end3DRendering();
 
-        fovLine.setData(gl, fovBuf);
+        center.setData(gl, centerBuf);
+        center.renderPoints(gl, pixFactor);
+
+        fovLine.setData(gl, lineBuf);
         fovLine.render(gl, vp.aspect, LINEWIDTH_FOV);
 
         if (far) {
