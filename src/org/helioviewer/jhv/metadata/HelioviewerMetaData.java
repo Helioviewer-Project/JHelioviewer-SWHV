@@ -8,7 +8,6 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.base.Strings;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
@@ -40,11 +39,11 @@ public class HelioviewerMetaData extends BaseMetaData {
 
         identifyObservation(m);
 
-        instrument = Strings.intern(instrument.trim());
-        detector = Strings.intern(detector.trim());
-        measurement = Strings.intern(measurement.trim());
-        observatory = Strings.intern(observatory.trim());
-        displayName = Strings.intern(displayName.trim());
+        instrument = instrument.trim().intern();
+        detector = detector.trim().intern();
+        measurement = measurement.trim().intern();
+        observatory = observatory.trim().intern();
+        displayName = displayName.trim().intern();
 
         retrievePosition(m, retrieveTime(m));
         centerRotation = retrieveCenterRotation(m);
@@ -72,8 +71,7 @@ public class HelioviewerMetaData extends BaseMetaData {
 
     private void retrieveUnit(MetaDataContainer m) {
         unit = m.getString("BUNIT").orElse(unit);
-        unit = unit.replace("-1", "\u207B\u00B9").replace("-2", "\u207B\u00B2").replace("-3", "\u207B\u00B3").replace(" ", "");
-        unit = Strings.intern(unit);
+        unit = unit.replace("-1", "\u207B\u00B9").replace("-2", "\u207B\u00B2").replace("-3", "\u207B\u00B3").replace(" ", "").intern();
 
         // a linear physical LUT
         Optional<Double> mZero = m.getDouble("HV_ZERO");
