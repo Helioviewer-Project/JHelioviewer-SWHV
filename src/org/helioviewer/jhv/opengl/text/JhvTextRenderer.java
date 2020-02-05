@@ -896,7 +896,7 @@ public class JhvTextRenderer {
         }
     }
 
-    private final GLSLTexture glslTexture = new GLSLTexture();
+    private static final GLSLTexture glslTexture = new GLSLTexture();
     private float[] textColor = Colors.WhiteFloat;
 
     int outstandingGlyphsVerticesPipeline = 0;
