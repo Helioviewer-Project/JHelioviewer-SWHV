@@ -148,6 +148,18 @@ public class FOVLayer extends AbstractLayer {
         if (!isVisible[vp.idx])
             return;
 
+        if (!drawCustom) {
+            boolean willDraw = false;
+            for (FOV f : FOVs) {
+                if (f.isSelected()) {
+                    willDraw = true;
+                    break;
+                }
+            }
+            if (!willDraw)
+                return;
+        }
+
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
         Position viewpoint = camera.getViewpoint();
 
