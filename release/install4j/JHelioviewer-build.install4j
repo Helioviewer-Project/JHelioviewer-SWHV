@@ -15,14 +15,12 @@
   <files missingFilesStrategy="error" globalExcludeSuffixes=".DS_Store">
     <mountPoints>
       <mountPoint id="182" location="classes" />
-      <mountPoint id="1149" location="Helpers" />
     </mountPoints>
     <entries>
       <fileEntry mountPoint="182" file="../bin/natives-linux.jar" />
       <fileEntry mountPoint="182" file="../bin/natives-macos.jar" />
       <fileEntry mountPoint="182" file="../bin/natives-windows.jar" />
       <fileEntry mountPoint="182" file="../bin/JHelioviewer.jar" />
-      <dirEntry mountPoint="1149" file="../release-resources/mac/notifier" subDirectory="notifier" />
     </entries>
     <components>
       <component name="JHelioviewer" id="23" changeable="false">
@@ -1110,7 +1108,6 @@ return true;</property>
       <exclude>
         <entry location="classes/natives-linux.jar" />
         <entry location="classes/natives-macos.jar" />
-        <entry location="Helpers" />
       </exclude>
       <jreBundle usePack200="false" jreBundleSource="generated" />
     </windows>
