@@ -203,7 +203,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
         long ts = DrawController.selectedAxis.pixel2value(graphArea.x, graphArea.width, mouseX);
         for (JHVEventParameter p : event.getClosestTo(ts).getSimpleVisibleEventParameters()) {
             String name = p.getParameterName();
-            if (!"event_description".equals(name) && !"event_title".equals(name)) {
+            if (name != "event_description" && name != "event_title") { // interned
                 String str = p.getParameterDisplayName() + " : " + p.getSimpleDisplayParameterValue();
                 txts.add(str);
                 width = Math.max(width, g.getFontMetrics().stringWidth(str));

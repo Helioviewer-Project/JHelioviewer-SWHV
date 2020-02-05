@@ -346,7 +346,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         ArrayList<String> txts = new ArrayList<>();
         for (JHVEventParameter p : mouseOverJHVEvent.getClosestTo(controller.currentTime).getSimpleVisibleEventParameters()) {
             String name = p.getParameterName();
-            if (!"event_description".equals(name) && !"event_title".equals(name)) {
+            if (name != "event_description" && name != "event_title") { // interned
                 txts.add(p.getParameterDisplayName() + " : " + p.getSimpleDisplayParameterValue());
             }
         }
