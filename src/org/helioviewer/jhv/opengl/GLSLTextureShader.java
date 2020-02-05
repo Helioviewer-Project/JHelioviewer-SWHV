@@ -27,8 +27,7 @@ class GLSLTextureShader extends GLSLShader {
     protected void initUniforms(GL2 gl, int id) {
         refModelViewProjectionMatrix = gl.glGetUniformLocation(id, "ModelViewProjectionMatrix");
         colorRef = gl.glGetUniformLocation(id, "color");
-
-        setTextureUnit(gl, id, "image", GLTexture.Unit.ZERO);
+        setTextureUnit(gl, id, "image", GLTexture.Unit.THREE);
     }
 
     void bindParams(GL2 gl, float[] color) {
