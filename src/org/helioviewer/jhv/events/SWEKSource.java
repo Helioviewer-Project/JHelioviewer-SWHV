@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.base.Strings;
+
 public class SWEKSource {
 
     private final String name;
@@ -11,7 +13,7 @@ public class SWEKSource {
     private final SWEKHandler handler;
 
     public SWEKSource(String _name, List<SWEKParameter> _generalParameters, SWEKHandler _handler) {
-        name = _name.intern();
+        name = Strings.intern(_name);
         generalParameters = _generalParameters;
         handler = _handler;
     }
