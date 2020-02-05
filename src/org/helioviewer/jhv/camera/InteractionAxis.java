@@ -13,7 +13,7 @@ import org.helioviewer.jhv.math.Vec3;
 class InteractionAxis implements InteractionType {
 
     private final Camera camera;
-    private Vec3 currentRotationStartPoint;
+    private Vec3 rotationStartPoint;
 
     InteractionAxis(Camera _camera) {
         camera = _camera;
@@ -21,24 +21,24 @@ class InteractionAxis implements InteractionType {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        currentRotationStartPoint = CameraHelper.getVectorFromSphereTrackball(camera, Display.getActiveViewport(), e.getX(), e.getY(), Sun.Radius2);
-        double len2 = currentRotationStartPoint.length2();
+        rotationStartPoint = CameraHelper.getVectorFromSphereTrackball(camera, Display.getActiveViewport(), e.getX(), e.getY(), Sun.Radius2);
+        double len2 = rotationStartPoint.length2();
         if (len2 > Sun.Radius2) {
             double r = 0.5 * camera.getCameraWidth();
-            currentRotationStartPoint = CameraHelper.getVectorFromSphereTrackball(camera, Display.getActiveViewport(), e.getX(), e.getY(), r * r);
+            rotationStartPoint = CameraHelper.getVectorFromSphereTrackball(camera, Display.getActiveViewport(), e.getX(), e.getY(), r * r);
         }
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        if (currentRotationStartPoint == null) // freak crash
+        if (rotationStartPoint == null) // freak crash
             return;
 
-        double len2 = currentRotationStartPoint.length2();
-        Vec3 currentRotationEndPoint = CameraHelper.getVectorFromSphereTrackball(camera, Display.getActiveViewport(), e.getX(), e.getY(), len2);
+        double len2 = rotationStartPoint.length2();
+        Vec3 rotationEndPoint = CameraHelper.getVectorFromSphereTrackball(camera, Display.getActiveViewport(), e.getX(), e.getY(), len2);
 
         Vec3 axis = camera.getUpdateViewpoint() == UpdateViewpoint.equatorial ? Vec3.ZAxis : Vec3.YAxis;
-        camera.rotateCurrentDragRotation(Quat.calcRotation(currentRotationStartPoint, currentRotationEndPoint).twist(axis));
+        camera.rotateDragRotation(Quat.calcRotation(rotationStartPoint, rotationEndPoint).twist(axis));
         MovieDisplay.display();
     }
 

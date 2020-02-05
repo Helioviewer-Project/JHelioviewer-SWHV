@@ -31,9 +31,9 @@ class InteractionPan implements InteractionType {
         lastX = e.getX();
         lastY = e.getY();
 
-        Vec2 pan = camera.getCurrentTranslation();
+        Vec2 pan = camera.getTranslation();
         double m = 1 / CameraHelper.getPixelFactor(camera, Display.getActiveViewport());
-        camera.setCurrentTranslation(pan.x + x * m, pan.y - y * m);
+        camera.setTranslation(pan.x + x * m, pan.y - y * m);
         MovieDisplay.display();
     }
 

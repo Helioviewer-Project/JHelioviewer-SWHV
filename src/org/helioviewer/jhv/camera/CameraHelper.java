@@ -22,13 +22,13 @@ public class CameraHelper {
 
     public static double computeUpX(Camera camera, Viewport vp, double screenX) {
         double width = camera.getCameraWidth();
-        Vec2 translation = camera.getCurrentTranslation();
+        Vec2 translation = camera.getTranslation();
         return computeNormalizedX(vp, screenX) * width * vp.aspect - translation.x;
     }
 
     public static double computeUpY(Camera camera, Viewport vp, double screenY) {
         double width = camera.getCameraWidth();
-        Vec2 translation = camera.getCurrentTranslation();
+        Vec2 translation = camera.getTranslation();
         return computeNormalizedY(vp, screenY) * width - translation.y;
     }
 
@@ -43,7 +43,7 @@ public class CameraHelper {
 
         double z = radius2 <= 0.5 * refRadius2 ? Math.sqrt(refRadius2 - radius2) : 0.5 * refRadius2 / Math.sqrt(radius2);
         Vec3 hitPoint = new Vec3(up1x, up1y, z);
-        return camera.getCurrentDragRotation().rotateInverseVector(hitPoint);
+        return camera.getDragRotation().rotateInverseVector(hitPoint);
     }
 
     @Nullable
@@ -57,16 +57,16 @@ public class CameraHelper {
 
         Vec3 hitPoint = new Vec3(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
         if (correctDrag)
-            hitPoint = camera.getCurrentDragRotation().rotateInverseVector(hitPoint);
+            hitPoint = camera.getDragRotation().rotateInverseVector(hitPoint);
         return rotation.rotateInverseVector(hitPoint);
     }
 
     @Nullable
     public static Vec3 getVectorFromPlane(Camera camera, Viewport vp, double screenX, double screenY, Quat rotation, boolean correctDrag) {
-        Quat currentDragRotation = camera.getCurrentDragRotation();
+        Quat dragRotation = camera.getDragRotation();
         Vec3 altnormal = rotation.rotateVector(Vec3.ZAxis);
         if (correctDrag)
-            altnormal = currentDragRotation.rotateVector(Vec3.ZAxis);
+            altnormal = dragRotation.rotateVector(Vec3.ZAxis);
 
         if (altnormal.z == 0)
             return null;
@@ -77,7 +77,7 @@ public class CameraHelper {
 
         Vec3 hitPoint = new Vec3(up1x, up1y, zvalue);
         if (correctDrag)
-            hitPoint = currentDragRotation.rotateInverseVector(hitPoint);
+            hitPoint = dragRotation.rotateInverseVector(hitPoint);
         return rotation.rotateInverseVector(hitPoint);
     }
 

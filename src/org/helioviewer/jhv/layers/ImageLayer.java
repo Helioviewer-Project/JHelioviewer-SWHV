@@ -191,7 +191,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         MetaData metaData = imageData.getMetaData();
         glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
 
-        Quat q = Quat.rotate(camera.getCurrentDragRotation(), cameraViewpoint.toQuat()); // sync with camera
+        Quat q = Quat.rotate(camera.getDragRotation(), cameraViewpoint.toQuat()); // sync with camera
         shader.bindCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, metaData.getCenterRotation()));
 
         DifferenceMode diffMode = glImage.getDifferenceMode();
