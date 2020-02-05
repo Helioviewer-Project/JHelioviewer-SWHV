@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.events;
 
 import java.util.ArrayList;
+import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 
@@ -46,7 +47,7 @@ public class JHVEvent {
         int i = 0;
         while (i < allParameters.length) {
             JHVEventParameter p = allParameters[i];
-            if (p.getParameterName() == key)
+            if (p.getParameterName().equals(key))
                 return p;
             i++;
         }
@@ -70,9 +71,9 @@ public class JHVEvent {
     }
 
     public void addParameter(JHVEventParameter parameter, boolean visible, boolean configured, boolean full) {
-        String keyString = parameter.getParameterName(); // interned
+        String keyString = parameter.getParameterName();
         if (!visible && !full)
-            if (keyString != "cme_radiallinvel" && keyString != "event_coord1" && keyString != "cme_angularwidth") {
+            if (Stream.of("cme_radiallinvel", "event_coord1", "cme_angularwidth").noneMatch(s -> s.equals(keyString))) {
                 return;
             }
         allParametersArray.add(parameter);

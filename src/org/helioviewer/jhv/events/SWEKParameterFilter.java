@@ -9,19 +9,9 @@ public class SWEKParameterFilter {
     private final Double stepSize;
     private final String units;
     private final String dbType;
-
-    /**
-     * Creates a SWEK parameter filter description based on the given filter
-     * type, the minimum value, the maximum value, the start value and step
-     * size.
-     *
-     * @param _filterType the filter
-     * @param _min        the minimum value
-     * @param _max        the maximum value
-     * @param _startValue the start value
-     * @param _dbType
-     * @param _stepSize   the stepsize
-     */
+    
+    // Creates a SWEK parameter filter description based on the given filter
+    // type, the minimum value, the maximum value, the start value and step size
     public SWEKParameterFilter(String _filterType, double _min, double _max, double _startValue, double _stepSize, String _units, String _dbType) {
         filterType = _filterType;
         min = _min;
