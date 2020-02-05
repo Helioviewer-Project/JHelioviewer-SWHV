@@ -141,6 +141,11 @@ public class Camera {
         updateRotation();
     }
 
+    public void resetCurrentDragRotation() {
+        currentDragRotation = Quat.ZERO;
+        updateRotation();
+    }
+
     public void setFOV(double _fov) {
         fov = MathUtils.clip(_fov, MIN_FOV, MAX_FOV);
         updateWidth();
