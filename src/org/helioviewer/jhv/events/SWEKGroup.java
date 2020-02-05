@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 
+import org.helioviewer.jhv.base.Strings;
 import org.helioviewer.jhv.events.gui.SWEKTreeModelElement;
 
 public class SWEKGroup extends SWEKTreeModelElement {
@@ -21,7 +22,7 @@ public class SWEKGroup extends SWEKTreeModelElement {
     private HashMap<String, String> databaseFields;
 
     public SWEKGroup(String _name, List<SWEKParameter> _parameterList, @Nonnull ImageIcon _icon) {
-        name = _name.intern();
+        name = Strings.intern(_name);
         parameterList = _parameterList;
         icon = _icon;
         containsParameterFilter = checkFilters(parameterList);
@@ -39,15 +40,15 @@ public class SWEKGroup extends SWEKTreeModelElement {
         for (SWEKParameter p : parameterList) {
             SWEKParameterFilter pf = p.getParameterFilter();
             if (pf != null) {
-                fields.put(p.getParameterName().intern(), pf.getDbType());
+                fields.put(Strings.intern(p.getParameterName()), pf.getDbType());
             }
         }
         for (SWEKRelatedEvents re : swekrelEvents) {
             if (re.getGroup() == this) {
-                re.getRelatedOnList().forEach(swon -> fields.put(swon.parameterFrom.getParameterName().intern(), swon.dbType));
+                re.getRelatedOnList().forEach(swon -> fields.put(Strings.intern(swon.parameterFrom.getParameterName()), swon.dbType));
             }
             if (re.getRelatedWith() == this) {
-                re.getRelatedOnList().forEach(swon -> fields.put(swon.parameterWith.getParameterName().intern(), swon.dbType));
+                re.getRelatedOnList().forEach(swon -> fields.put(Strings.intern(swon.parameterWith.getParameterName()), swon.dbType));
             }
         }
         databaseFields = fields;

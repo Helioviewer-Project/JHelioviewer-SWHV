@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 import org.helioviewer.jhv.base.Regex;
+import org.helioviewer.jhv.base.Strings;
 
 import org.apache.commons.validator.routines.UrlValidator;
 
@@ -19,7 +20,6 @@ public class JHVEventParameter {
     private final String parameterValue;
 
     private String parameterDisplayValue;
-
     private String parameterSimpleDisplayValue;
 
     /**
@@ -31,9 +31,9 @@ public class JHVEventParameter {
      * @param _parameterValue       the parameter value
      */
     public JHVEventParameter(String _parameterName, String _parameterDisplayName, String _parameterValue) {
-        parameterName = _parameterName.intern();
-        parameterDisplayName = _parameterDisplayName.intern();
-        parameterValue = _parameterValue.intern();
+        parameterName = Strings.intern(_parameterName);
+        parameterDisplayName = Strings.intern(_parameterDisplayName);
+        parameterValue = Strings.intern(_parameterValue);
     }
 
     /**
@@ -65,7 +65,7 @@ public class JHVEventParameter {
 
     public String getSimpleDisplayParameterValue() {
         if (parameterSimpleDisplayValue == null)
-            parameterSimpleDisplayValue = beautifyValue(parameterValue).intern();
+            parameterSimpleDisplayValue = Strings.intern(beautifyValue(parameterValue));
         return parameterSimpleDisplayValue;
     }
 
@@ -73,10 +73,11 @@ public class JHVEventParameter {
         if (parameterDisplayValue == null) {
             parameterDisplayValue = getSimpleDisplayParameterValue();
             if (parameterName == "ar_noaanum")
-                parameterDisplayValue = ("<a href=\"https://ui.adsabs.harvard.edu/#search/q=%22NOAA%20" +
+                parameterDisplayValue = Strings.intern(
+                        "<a href=\"https://ui.adsabs.harvard.edu/#search/q=%22NOAA%20" +
                         parameterDisplayValue +
                         "%22&sort=date%20desc\">" +
-                        parameterDisplayValue + "</a>").intern();
+                        parameterDisplayValue + "</a>");
         }
         return parameterDisplayValue;
     }
