@@ -26,6 +26,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.TableValue;
@@ -80,6 +81,12 @@ public class FOVLayer extends AbstractLayer {
                 double halfSide = wide * distance / Math.sqrt(2);
                 drawLabel(name, halfSide, -halfSide, halfSide, renderer);
             }
+        }
+
+        void zoom(Camera camera) {
+            camera.setCurrentTranslation(0, 0);
+            camera.resetCurrentDragRotation();
+            camera.setFOV(2 * wide);
         }
 
         boolean isSelected() {
@@ -276,11 +283,15 @@ public class FOVLayer extends AbstractLayer {
                 if (v == null || !(v.value instanceof FOV))
                     return;
 
+                FOV fov = (FOV) v.value;
                 if (v.col == SELECTED_COL) {
-                    ((FOV) v.value).select();
+                    fov.select();
                     model.fireTableRowsUpdated(v.row, v.row);
+                    MovieDisplay.display();
+                } else if (e.getClickCount() == 2) {
+                    fov.zoom(Display.getCamera());
+                    MovieDisplay.render(1);
                 }
-                MovieDisplay.display();
             }
         });
 
@@ -352,6 +363,7 @@ public class FOVLayer extends AbstractLayer {
                 FOV fov = (FOV) value;
                 label.setText(fov.toString());
                 label.setBorder(JHVTableCellRenderer.cellBorder);
+                label.setToolTipText("Double-click to fit view");
             }
             return label;
         }
