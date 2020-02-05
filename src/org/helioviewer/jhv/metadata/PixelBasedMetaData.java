@@ -4,7 +4,6 @@ import java.net.URI;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.base.Strings;
 
 public class PixelBasedMetaData extends BaseMetaData {
 
@@ -19,7 +18,7 @@ public class PixelBasedMetaData extends BaseMetaData {
 
         if (uri != null) {
             String uriPath = uri.getPath();
-            displayName = Strings.intern(uriPath.substring(uriPath.lastIndexOf('/') + 1, uriPath.lastIndexOf('.')));
+            displayName = uriPath.substring(uriPath.lastIndexOf('/') + 1, uriPath.lastIndexOf('.')).intern();
         }
     }
 

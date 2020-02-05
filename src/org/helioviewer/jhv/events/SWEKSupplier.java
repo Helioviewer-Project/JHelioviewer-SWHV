@@ -5,7 +5,6 @@ import java.util.HashMap;
 import javax.annotation.Nonnull;
 import javax.swing.ImageIcon;
 
-import org.helioviewer.jhv.base.Strings;
 import org.helioviewer.jhv.events.gui.SWEKTreeModelElement;
 import org.helioviewer.jhv.events.gui.filter.FilterDialog;
 
@@ -24,7 +23,7 @@ public class SWEKSupplier extends SWEKTreeModelElement {
 
     public SWEKSupplier(String _supplierName, String _name, SWEKGroup _group, SWEKSource _source, String _db) {
         supplierName = _supplierName;
-        name = Strings.intern(_name);
+        name = _name.intern();
 
         group = _group;
         source = _source;
