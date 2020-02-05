@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.JHVFrame;
 
 import com.jogamp.opengl.GL2;
 
@@ -17,9 +16,6 @@ public abstract class AbstractLayer implements Layer {
     public void setEnabled(boolean _enabled) {
         enabled = _enabled;
         Arrays.fill(isVisible, enabled);
-        // ugly but keeps enabled in sync with options panel
-        if (JHVFrame.getLayersPanel() != null)
-            JHVFrame.getLayersPanel().setOptionsPanel(this);
     }
 
     @Override

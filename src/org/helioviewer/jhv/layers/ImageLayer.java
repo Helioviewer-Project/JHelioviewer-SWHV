@@ -116,6 +116,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
         optionsPanel.getRunningDifferencePanel().downloadVisible(!isLocal());
         setEnabled(true); // enable optionsPanel
+        JHVFrame.getLayersPanel().setOptionsPanel(this);
 
         view.setDataHandler(this);
         CameraHelper.zoomToFit(Display.getMiniCamera());
