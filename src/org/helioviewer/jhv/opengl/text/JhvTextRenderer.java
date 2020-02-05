@@ -50,7 +50,7 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
 import java.text.StringCharacterIterator;
-import java.util.ArrayList;
+//import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
@@ -129,11 +129,11 @@ public class JhvTextRenderer {
 
     // Every certain number of render cycles, flush the strings which
     // haven't been used recently
-    private static final int CYCLES_PER_FLUSH = 100;
+    //private static final int CYCLES_PER_FLUSH = 100;
 
     // The amount of vertical dead space on the backing store before we
     // force a compaction
-    private static final float MAX_VERTICAL_FRAGMENTATION = 0.7f;
+    //private static final float MAX_VERTICAL_FRAGMENTATION = 0.7f;
     private static final int kVertsPerQuad = 6;
     private static final int kQuadsPerBuffer = 100;
     private static final int kTotalBufferSizeVerts = kQuadsPerBuffer * kVertsPerQuad;
@@ -149,7 +149,7 @@ public class JhvTextRenderer {
     private FontRenderContext cachedFontRenderContext;
     final GlyphProducer glyphProducer;
 
-    private int numRenderCycles;
+    //private int numRenderCycles;
 
     // Need to keep track of whether we're in a beginRendering() /
     // endRendering() cycle so we can re-enter the exact same state if
@@ -421,11 +421,12 @@ public class JhvTextRenderer {
 
         inBeginEndPair = false;
         internal_endRendering(ortho);
-
+/*
         if (++numRenderCycles >= CYCLES_PER_FLUSH) {
             numRenderCycles = 0;
             clearUnusedEntries();
         }
+*/
     }
 
     static void internal_beginRendering(boolean ortho, int width, int height) {
@@ -449,7 +450,7 @@ public class JhvTextRenderer {
             Transform.popProjection();
         }
     }
-
+/*
     void clearUnusedEntries() {
         ArrayList<Rect> deadRects = new ArrayList<>();
         // Iterate through the contents of the backing store, removing
@@ -476,6 +477,7 @@ public class JhvTextRenderer {
             packer.compact();
         }
     }
+*/
 
     /**
      * Class supporting more full control over the process of rendering
@@ -517,7 +519,7 @@ public class JhvTextRenderer {
     // Data associated with each rectangle of text
     static class TextData {
         // If this TextData represents a single glyph, this is its unicode ID
-        final int unicodeID;
+        //final int unicodeID;
 
         // The following must be defined and used VERY precisely. This is
         // the offset from the upper-left corner of this rectangle (Java
@@ -538,10 +540,10 @@ public class JhvTextRenderer {
         private final int origRectMinX;
         private final int origRectMinY;
 
-        private boolean used; // Whether this text was used recently
+        //private boolean used; // Whether this text was used recently
 
         TextData(Point _origin, Rectangle2D origRect, int _unicodeID) {
-            unicodeID = _unicodeID;
+            //unicodeID = _unicodeID;
             origin = _origin;
             origRectWidth = (int) origRect.getWidth();
             origRectHeight = (int) origRect.getHeight();
@@ -570,7 +572,7 @@ public class JhvTextRenderer {
         int origRectHeight() {
             return origRectHeight;
         }
-
+/*
         boolean used() {
             return used;
         }
@@ -582,6 +584,7 @@ public class JhvTextRenderer {
         void clearUsed() {
             used = false;
         }
+*/
     }
 
     class Manager implements BackingStoreManager {
@@ -618,7 +621,7 @@ public class JhvTextRenderer {
                     // Draw any outstanding glyphs
                     flush();
                 }
-                clearUnusedEntries();
+                //clearUnusedEntries();
                 return true;
             }
             return false;
@@ -755,7 +758,7 @@ public class JhvTextRenderer {
             JhvTextureRenderer renderer = getBackingStore();
             Rect rect = glyphRectForTextureMapping;
             TextData data = (TextData) rect.getUserData();
-            data.markUsed();
+            //data.markUsed();
 
             int width = data.origRectWidth();
             int height = data.origRectHeight();
