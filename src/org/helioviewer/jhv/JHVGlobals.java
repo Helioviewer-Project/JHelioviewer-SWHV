@@ -3,10 +3,7 @@ package org.helioviewer.jhv;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Properties;
 
 import javax.swing.event.HyperlinkEvent;
@@ -127,29 +124,6 @@ public class JHVGlobals {
 
     public static void displayNotificationEx(String prefix, String path, String suffix) {
         String openURL = new File(path).toURI().toString();
-
-        if (System.getProperty("jhv.os").equals("mac")) {
-            try {
-                String msg = prefix + path + suffix;
-                File jarParent = new File(JHVGlobals.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getCanonicalFile().getParentFile();
-                if (jarParent != null) {
-                    String[] cmd = {
-                            jarParent.getParent() + "/Helpers/terminal-notifier.app/Contents/MacOS/terminal-notifier",
-                            "-message", '"' + msg + '"',
-                            "-execute", "open " + '"' + openURL + '"',
-                            "-title", "JHelioviewer"
-                    };
-                    Log.info("JHVGlobals.displayNotification " + Arrays.toString(cmd));
-                    Runtime.getRuntime().exec(cmd);
-                    return;
-                }
-            } catch (Exception e) {
-                StringWriter errors = new StringWriter();
-                e.printStackTrace(new PrintWriter(errors));
-                Log.error("JHVGlobals.displayNotification " + errors);
-            }
-        }
-        // otherwise
         new TextDialog("Ready", prefix + "<a href=\"" + openURL + "\">" + path + "</a>" + suffix, false).showDialog();
     }
 
