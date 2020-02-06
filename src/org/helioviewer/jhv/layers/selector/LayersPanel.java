@@ -186,7 +186,7 @@ public class LayersPanel extends JPanel {
                     layer.setEnabled(!layer.isEnabled());
                     model.updateCell(v.row, v.col);
                     if (grid.getSelectedRow() == v.row)
-                         setOptionsPanel(layer);
+                        setOptionsPanel(layer);
                     MovieDisplay.render(1);
                 } else if (v.col == TITLE_COL && layer instanceof ImageLayer) {
                     Layers.setActiveImageLayer((ImageLayer) layer);
