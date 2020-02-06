@@ -199,7 +199,6 @@ public class SpaceObjectContainer extends JScrollPane {
                 checkBox.setBorder(element.getBorder());
             }
             checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
-            checkBox.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
             return checkBox;
         }
 
@@ -223,7 +222,6 @@ public class SpaceObjectContainer extends JScrollPane {
                 radio.setBorder(element.getBorder());
             }
             radio.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
-            radio.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
             return radio;
         }
 
