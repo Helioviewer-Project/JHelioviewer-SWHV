@@ -20,7 +20,6 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellRenderer;
 
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.ComponentUtils;
@@ -93,10 +92,10 @@ class FOVLayerOptions extends JPanel {
                 if (v.value instanceof FOVLayer.FOV) {
                     FOVLayer.FOV fov = (FOVLayer.FOV) v.value;
                     if (v.col == SELECTED_COL) {
-                        fov.select();
+                        fov.toggle();
                         model.fireTableRowsUpdated(v.row, v.row);
                         MovieDisplay.display();
-                    } else if (e.getClickCount() == 2) {
+                    } else if (e.getClickCount() == 2 && fov.isEnabled()) {
                         fov.zoom(Display.getCamera());
                         MovieDisplay.render(1);
                     }
@@ -157,16 +156,16 @@ class FOVLayerOptions extends JPanel {
 
     }
 
-    private static class OffRenderer extends OffControl implements TableCellRenderer {
+    private static class OffRenderer extends JHVTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
-            setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
-
+            JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             if (value instanceof Double) {
-                setValue(value);
+                label.setText(String.format("%.2f\u2032", value));
+                label.setBorder(JHVTableCellRenderer.cellBorder);
+                label.setHorizontalAlignment(JLabel.RIGHT);
             }
-            return this;
+            return label;
         }
     }
 
@@ -181,9 +180,6 @@ class FOVLayerOptions extends JPanel {
         @Override
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
             offControl = FOVLayer.getOffControl(row, column - OFF1_COL);
-            offControl.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
-            offControl.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
-
             if (value instanceof Double) {
                 offControl.setValue(value);
             }
@@ -211,7 +207,7 @@ class FOVLayerOptions extends JPanel {
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             if (value instanceof FOVLayer.FOV) {
                 FOVLayer.FOV fov = (FOVLayer.FOV) value;
-                checkBox.setSelected(fov.isSelected());
+                checkBox.setSelected(fov.isEnabled());
                 checkBox.setBorder(JHVTableCellRenderer.cellBorder);
             }
             checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
