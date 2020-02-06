@@ -23,7 +23,7 @@ import javax.swing.table.TableModel;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
-import org.helioviewer.jhv.gui.components.TableValue;
+import org.helioviewer.jhv.gui.components.base.TableValue;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.ImageLayer;

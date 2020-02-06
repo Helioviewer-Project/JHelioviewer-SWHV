@@ -19,8 +19,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
-import org.helioviewer.jhv.gui.components.TableValue;
 import org.helioviewer.jhv.gui.components.base.JHVButton;
+import org.helioviewer.jhv.gui.components.base.TableValue;
 import org.helioviewer.jhv.time.TimeUtils;
 
 // This component allows to select a date. There are 3 different views:

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.components;
+package org.helioviewer.jhv.gui.components.base;
 
 import java.awt.Point;
 
