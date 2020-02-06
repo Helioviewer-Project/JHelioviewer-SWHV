@@ -216,10 +216,6 @@ public class Movie {
         Layers.forEachImageLayer(layer -> layer.getView().setNearestFrame(dateTime));
         MovieDisplay.render(1);
 
-        ViewpointLayer viewpointLayer = Layers.getViewpointLayer();
-        if (viewpointLayer != null)
-            viewpointLayer.fireTimeUpdated(camera.getViewpoint().time); // !
-
         timeListeners.forEach(listener -> listener.timeChanged(lastTimestamp.milli));
 
         View view = Layers.getActiveImageLayer().getView(); // should be not null
