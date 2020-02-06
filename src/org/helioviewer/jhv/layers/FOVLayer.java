@@ -54,12 +54,12 @@ public class FOVLayer extends AbstractLayer {
 
             offControl[0] = new FOVLayerOptions.OffControl();
             offControl[0].addChangeListener(e -> {
-                centerX = control2Center(offControl[0].getValue());
+                centerX = control2Center((Double) offControl[0].getValue());
                 MovieDisplay.display();
             });
             offControl[1] = new FOVLayerOptions.OffControl();
             offControl[1].addChangeListener(e -> {
-                centerY = control2Center(offControl[1].getValue());
+                centerY = control2Center((Double) offControl[1].getValue());
                 MovieDisplay.display();
             });
         }
@@ -88,7 +88,8 @@ public class FOVLayer extends AbstractLayer {
         }
 
         void zoom(Camera camera) {
-            camera.setTranslation(-centerX, -centerY);
+            double distance = camera.getViewpoint().distance;
+            camera.setTranslation(-centerX * distance, -centerY * distance);
             camera.resetDragRotation();
             camera.setFOV(2 * wide);
         }
