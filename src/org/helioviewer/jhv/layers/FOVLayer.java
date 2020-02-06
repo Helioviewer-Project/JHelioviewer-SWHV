@@ -66,7 +66,7 @@ public class FOVLayer extends AbstractLayer {
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.idx])
             return;
-        if (!customEnabled && treePane.countEnabled() == 0)
+        if (!customEnabled && !treePane.hasEnabled())
             return;
 
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
