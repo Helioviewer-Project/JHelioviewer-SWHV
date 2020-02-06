@@ -27,6 +27,7 @@ public class RendererEnabled extends JHVTableCellRenderer {
             checkBox.setSelected(((Layer) value).isEnabled());
         }
         checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+        checkBox.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
         return checkBox;
     }
 
