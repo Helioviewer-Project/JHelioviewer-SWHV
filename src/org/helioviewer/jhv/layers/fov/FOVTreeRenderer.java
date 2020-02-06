@@ -2,7 +2,7 @@ package org.helioviewer.jhv.layers.fov;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -46,7 +46,7 @@ class FOVTreeRenderer extends DefaultTreeCellRenderer {
         if (obj instanceof FOVTreeElement) {
             return createLeaf((FOVTreeElement) obj, tree.getBackground());
         } else if (obj instanceof FOVTreeRoot) {
-            return createRoot((FOVTreeRoot) obj, tree.getBackground());
+            return createRoot((FOVTreeRoot) obj);
         } else {
             return super.getTreeCellRendererComponent(tree, obj, selected, expanded, leaf, row, hasFocus);
         }
@@ -55,6 +55,7 @@ class FOVTreeRenderer extends DefaultTreeCellRenderer {
     private static JCheckBox createLeaf(FOVTreeElement f, Color back) {
         JCheckBox checkBox = new JCheckBox(f.toString(), f.isEnabled());
         checkBox.setBackground(back);
+        checkBox.setFocusPainted(false);
         checkBox.addActionListener(e -> {
             f.toggle();
             MovieDisplay.display();
@@ -72,11 +73,11 @@ class FOVTreeRenderer extends DefaultTreeCellRenderer {
         return checkBox;
     }
 
-    private JPanel createRoot(FOVTreeRoot r, Color back) {
+    private JPanel createRoot(FOVTreeRoot r) {
         spinnerX.addChangeListener(e -> r.setCenterX((Double) spinnerX.getValue()));
         spinnerY.addChangeListener(e -> r.setCenterY((Double) spinnerY.getValue()));
 
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+        JPanel panel = new JPanel(new GridLayout(1, 5, 0, 0));
         panel.setOpaque(false);
         panel.add(new JLabel(r.toString()));
         panel.add(new JLabel("  Offpoint X: ", JLabel.RIGHT));
