@@ -40,6 +40,10 @@ public class FOVLayer extends AbstractLayer {
         private double centerX = 0;
         private double centerY = 0;
 
+        private static double control2Center(double v) { // v in arcmin
+            return Math.tan(v * (Math.PI / 180. / 60.));
+        }
+
         FOV(String _name, FOVType _type, double innerDeg, double wideDeg, double highDeg, byte[] _color) {
             name = _name;
             type = _type;
@@ -50,15 +54,13 @@ public class FOVLayer extends AbstractLayer {
 
             offControl[0] = new FOVLayerOptions.OffControl();
             offControl[0].addChangeListener(e -> {
-                centerX = offControl[0].getValue();
+                centerX = control2Center(offControl[0].getValue());
                 MovieDisplay.display();
-                System.out.println(">>> " + name + ' ' + centerX + ' ' + centerY);
             });
             offControl[1] = new FOVLayerOptions.OffControl();
             offControl[1].addChangeListener(e -> {
-                centerY = offControl[1].getValue();
+                centerY = control2Center(offControl[1].getValue());
                 MovieDisplay.display();
-                System.out.println(">>> " + name + ' ' + centerX + ' ' + centerY);
             });
         }
 
@@ -66,27 +68,22 @@ public class FOVLayer extends AbstractLayer {
             return offControl[col];
         }
 
-        void setCenter(double _centerX, double _centerY) {
-            centerX = _centerX;
-            centerY = _centerY;
-        }
-
         void putFOV(FOVShape f, double distance, BufVertex lineBuf, BufVertex centerBuf, JhvTextRenderer renderer) {
             if (!selected)
                 return;
 
-            f.setCenter(centerX, centerY);
+            f.setCenter(centerX * distance, centerY * distance);
             f.putCenter(centerBuf, color);
 
             if (inner > 0)
                 f.putCircLine(inner * distance, lineBuf, color);
             if (type == FOVType.RECTANGULAR) {
                 f.putRectLine(wide * distance, high * distance, lineBuf, color);
-                drawLabel(name, wide * distance + centerX, -high * distance + centerY, high * distance, renderer);
+                drawLabel(name, (wide + centerX) * distance, (-high + centerY) * distance, high * distance, renderer);
             } else {
                 f.putCircLine(wide * distance, lineBuf, color);
-                double halfSide = wide * distance / Math.sqrt(2);
-                drawLabel(name, halfSide + centerX, -halfSide + centerY, halfSide, renderer);
+                double halfSide = wide / Math.sqrt(2);
+                drawLabel(name, (halfSide + centerX) * distance, (-halfSide + centerY) * distance, halfSide * distance, renderer);
             }
         }
 
@@ -288,7 +285,7 @@ public class FOVLayer extends AbstractLayer {
 
         @Override
         public boolean isCellEditable(int row, int col) {
-            return col != FOVLayerOptions.SELECTED_COL && col != FOVLayerOptions.FOV_COL;
+            return fovs.get(row).isSelected() && col != FOVLayerOptions.SELECTED_COL && col != FOVLayerOptions.FOV_COL;
         }
 
     }
