@@ -54,7 +54,7 @@ class FOVLayerOptions extends JPanel {
         WheelSupport.installMouseWheelSupport(spinner);
 
         JCheckBox customCheckBox = new JCheckBox("Custom angle", false);
-        customCheckBox.addChangeListener(e -> FOVLayer.setCustomEnabled(customCheckBox.isEnabled()));
+        customCheckBox.addChangeListener(e -> FOVLayer.setCustomEnabled(customCheckBox.isSelected()));
 
         JPanel customPanel = new JPanel(new GridBagLayout());
         GridBagConstraints c0 = new GridBagConstraints();
@@ -156,8 +156,8 @@ class FOVLayerOptions extends JPanel {
             slider = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
             WheelSupport.installMouseWheelSupport(slider);
 
-            label = new JLabel(slider.getValue() + "\u2033", JLabel.RIGHT);
-            slider.addChangeListener(e -> label.setText(slider.getValue() + "\u2033"));
+            label = new JLabel(slider.getValue() + "\u2032", JLabel.RIGHT);
+            slider.addChangeListener(e -> label.setText(slider.getValue() + "\u2032"));
 
             add(slider, BorderLayout.LINE_START);
             add(label, BorderLayout.LINE_END);
