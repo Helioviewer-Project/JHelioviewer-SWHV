@@ -34,7 +34,7 @@ public class FOVLayer extends AbstractLayer {
         private final double wide;
         private final double high;
         private final byte[] color;
-        private boolean selected;
+        private boolean enabled;
 
         private final FOVLayerOptions.OffControl[] offControl = new FOVLayerOptions.OffControl[2];
         private double centerX = 0;
@@ -69,7 +69,7 @@ public class FOVLayer extends AbstractLayer {
         }
 
         void putFOV(FOVShape f, double distance, BufVertex lineBuf, BufVertex centerBuf, JhvTextRenderer renderer) {
-            if (!selected)
+            if (!enabled)
                 return;
 
             f.setCenter(centerX * distance, centerY * distance);
@@ -94,12 +94,12 @@ public class FOVLayer extends AbstractLayer {
             camera.setFOV(2 * wide);
         }
 
-        boolean isSelected() {
-            return selected;
+        boolean isEnabled() {
+            return enabled;
         }
 
-        void select() {
-            selected = !selected;
+        void toggle() {
+            enabled = !enabled;
         }
 
         @Override
@@ -170,7 +170,7 @@ public class FOVLayer extends AbstractLayer {
         if (!customEnabled) {
             boolean willDraw = false;
             for (FOV f : FOVs) {
-                if (f.isSelected()) {
+                if (f.isEnabled()) {
                     willDraw = true;
                     break;
                 }
@@ -286,7 +286,7 @@ public class FOVLayer extends AbstractLayer {
 
         @Override
         public boolean isCellEditable(int row, int col) {
-            return fovs.get(row).isSelected() && col != FOVLayerOptions.SELECTED_COL && col != FOVLayerOptions.FOV_COL;
+            return fovs.get(row).isEnabled() && col != FOVLayerOptions.SELECTED_COL && col != FOVLayerOptions.FOV_COL;
         }
 
     }
