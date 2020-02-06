@@ -18,8 +18,8 @@ import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
-import org.helioviewer.jhv.gui.components.TableValue;
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
+import org.helioviewer.jhv.gui.components.base.TableValue;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.json.JSONArray;
 
@@ -199,6 +199,7 @@ public class SpaceObjectContainer extends JScrollPane {
                 checkBox.setBorder(element.getBorder());
             }
             checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+            checkBox.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
             return checkBox;
         }
 
@@ -222,6 +223,7 @@ public class SpaceObjectContainer extends JScrollPane {
                 radio.setBorder(element.getBorder());
             }
             radio.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+            radio.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
             return radio;
         }
 
