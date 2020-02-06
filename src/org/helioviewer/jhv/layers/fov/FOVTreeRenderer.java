@@ -79,7 +79,9 @@ class FOVTreeRenderer extends DefaultTreeCellRenderer {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
         panel.setOpaque(false);
         panel.add(new JLabel(r.toString()));
+        panel.add(new JLabel("  Offpoint X: ", JLabel.RIGHT));
         panel.add(spinnerX);
+        panel.add(new JLabel("  Offpoint Y: ", JLabel.RIGHT));
         panel.add(spinnerY);
         ComponentUtils.smallVariant(panel);
         return panel;
