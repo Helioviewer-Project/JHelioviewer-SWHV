@@ -66,19 +66,9 @@ public class FOVLayer extends AbstractLayer {
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.idx])
             return;
-/*
-        if (!customEnabled) {
-            boolean willDraw = false;
-            for (FOV f : FOVs) {
-                if (f.isEnabled()) {
-                    willDraw = true;
-                    break;
-                }
-            }
-            if (!willDraw)
-                return;
-        }
-*/
+        if (!customEnabled && treePane.countEnabled() == 0)
+            return;
+
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
         Position viewpoint = camera.getViewpoint();
 
