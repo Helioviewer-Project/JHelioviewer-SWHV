@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.camera;
 
+import java.util.ArrayList;
+
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
@@ -85,6 +87,9 @@ public class Camera {
         viewpoint = Display.mode == Display.DisplayMode.Orthographic ? v : new Position(v.time, Sun.MeanEarthDistance, v.lon, v.lat);
         updateRotation();
         updateWidth();
+
+        for (CameraListener listener : listeners)
+            listener.timeChanged(viewpoint.time);
     }
 
     private void updateRotation() {
@@ -192,6 +197,17 @@ public class Camera {
         translation.x = jo.optDouble("translationX", translation.x);
         translation.y = jo.optDouble("translationY", translation.y);
         fov = jo.optDouble("fov", fov);
+    }
+
+    private final ArrayList<CameraListener> listeners = new ArrayList<>();
+
+    public void addListener(CameraListener listener) {
+        if (!listeners.contains(listener))
+            listeners.add(listener);
+    }
+
+    public void removeListener(CameraListener listener) {
+        listeners.remove(listener);
     }
 
 }
