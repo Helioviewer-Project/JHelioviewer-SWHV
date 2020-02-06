@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -16,12 +15,10 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
@@ -47,7 +44,6 @@ class FOVLayerOptions extends JPanel {
     FOVLayerOptions(AbstractTableModel model, double customAngle) {
         double fovMin = 0, fovMax = 180;
         JSpinner spinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(customAngle), Double.valueOf(fovMin), Double.valueOf(fovMax), Double.valueOf(0.01)));
-        spinner.setMaximumSize(new Dimension(6, 22));
         spinner.addChangeListener(e -> FOVLayer.setCustomAngle((Double) spinner.getValue()));
         JFormattedTextField f = ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField();
         f.setFormatterFactory(new TerminatedFormatterFactory("%.2f", "\u00B0", fovMin, fovMax));
@@ -144,51 +140,19 @@ class FOVLayerOptions extends JPanel {
         return rowHeight;
     }
 
-    static class OffControl extends JPanel {
+    static class OffControl extends JSpinner {
 
-        private final JSlider slider;
-        private final JLabel label;
+        private static final double min = -60;
+        private static final double max = 60;
 
         OffControl() {
-            setLayout(new BorderLayout());
+            setModel(new SpinnerNumberModel(0, min, max, 0.01));
+            JFormattedTextField f = ((JSpinner.DefaultEditor) getEditor()).getTextField();
+            f.setFormatterFactory(new TerminatedFormatterFactory("%.2f", "\u2032", min, max));
+            WheelSupport.installMouseWheelSupport(this);
+
             setBorder(JHVTableCellRenderer.cellBorder);
-
-            slider = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
-            WheelSupport.installMouseWheelSupport(slider);
-
-            label = new JLabel(slider.getValue() + "\u2032", JLabel.RIGHT);
-            slider.addChangeListener(e -> label.setText(slider.getValue() + "\u2032"));
-
-            add(slider, BorderLayout.LINE_START);
-            add(label, BorderLayout.LINE_END);
-
-            ComponentUtils.smallVariant(this);
-        }
-
-        @Override
-        public void setForeground(Color color) {
-            super.setForeground(color);
-            if (slider != null) slider.setForeground(color);
-            if (label != null) label.setForeground(color);
-        }
-
-        @Override
-        public void setBackground(Color color) {
-            super.setBackground(color);
-            if (slider != null) slider.setBackground(color);
-            if (label != null) label.setBackground(color);
-        }
-
-        int getValue() {
-            return slider.getValue();
-        }
-
-        void setValue(int v) {
-            slider.setValue(v);
-        }
-
-        void addChangeListener(ChangeListener l) {
-            slider.addChangeListener(l);
+            putClientProperty("JComponent.sizeVariant", "small");
         }
 
     }
@@ -199,9 +163,8 @@ class FOVLayerOptions extends JPanel {
             setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
             setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
 
-            if (value instanceof Integer) {
-                int v = (Integer) value;
-                setValue(v);
+            if (value instanceof Double) {
+                setValue(value);
             }
             return this;
         }
@@ -221,9 +184,8 @@ class FOVLayerOptions extends JPanel {
             offControl.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
             offControl.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
 
-            if (value instanceof Integer) {
-                int v = (Integer) value;
-                offControl.setValue(v);
+            if (value instanceof Double) {
+                offControl.setValue(value);
             }
             return offControl;
         }
