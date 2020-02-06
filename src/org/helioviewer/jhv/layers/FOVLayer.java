@@ -1,16 +1,24 @@
 package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
-import java.util.List;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 
 import javax.annotation.Nullable;
-import javax.swing.table.AbstractTableModel;
+import javax.swing.JCheckBox;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
+import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.layers.fov.FOVTreePane;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.FOVShape;
@@ -24,105 +32,6 @@ import com.jogamp.opengl.GL2;
 
 public class FOVLayer extends AbstractLayer {
 
-    private enum FOVType {RECTANGULAR, CIRCULAR}
-
-    static class FOV {
-
-        private final String name;
-        private final FOVType type;
-        private final double inner;
-        private final double wide;
-        private final double high;
-        private final byte[] color;
-        private boolean enabled;
-
-        private final FOVLayerOptions.OffControl[] offControl = new FOVLayerOptions.OffControl[2];
-        private double centerX = 0;
-        private double centerY = 0;
-
-        private static double control2Center(double v) { // v in arcmin
-            return Math.tan(v * (Math.PI / 180. / 60.));
-        }
-
-        FOV(String _name, FOVType _type, double innerDeg, double wideDeg, double highDeg, byte[] _color) {
-            name = _name;
-            type = _type;
-            inner = 0.5 * Math.tan(innerDeg * (Math.PI / 180.));
-            wide = 0.5 * Math.tan(wideDeg * (Math.PI / 180.));
-            high = 0.5 * Math.tan(highDeg * (Math.PI / 180.));
-            color = _color;
-
-            offControl[0] = new FOVLayerOptions.OffControl();
-            offControl[0].addChangeListener(e -> {
-                centerX = control2Center((Double) offControl[0].getValue());
-                MovieDisplay.display();
-            });
-            offControl[1] = new FOVLayerOptions.OffControl();
-            offControl[1].addChangeListener(e -> {
-                centerY = control2Center((Double) offControl[1].getValue());
-                MovieDisplay.display();
-            });
-        }
-
-        FOVLayerOptions.OffControl getOffControl(int col) {
-            return offControl[col];
-        }
-
-        void putFOV(FOVShape f, double distance, BufVertex lineBuf, BufVertex centerBuf, JhvTextRenderer renderer) {
-            if (!enabled)
-                return;
-
-            f.setCenter(centerX * distance, centerY * distance);
-            f.putCenter(centerBuf, color);
-
-            if (inner > 0)
-                f.putCircLine(inner * distance, lineBuf, color);
-            if (type == FOVType.RECTANGULAR) {
-                f.putRectLine(wide * distance, high * distance, lineBuf, color);
-                drawLabel(name, (wide + centerX) * distance, (-high + centerY) * distance, high * distance, renderer);
-            } else {
-                f.putCircLine(wide * distance, lineBuf, color);
-                double halfSide = wide / Math.sqrt(2);
-                drawLabel(name, (halfSide + centerX) * distance, (-halfSide + centerY) * distance, halfSide * distance, renderer);
-            }
-        }
-
-        void zoom(Camera camera) {
-            double distance = camera.getViewpoint().distance;
-            camera.setTranslation(-centerX * distance, -centerY * distance);
-            camera.resetDragRotation();
-            camera.setFOV(2 * wide);
-        }
-
-        boolean isEnabled() {
-            return enabled;
-        }
-
-        void toggle() {
-            enabled = !enabled;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-
-    }
-
-    private static final List<FOV> FOVs = List.of(
-            new FOV("SOLO/EUI/HRI", FOVType.RECTANGULAR, 0, 16.6 / 60., 16.6 / 60., Colors.Blue),
-            new FOV("SOLO/EUI/FSI", FOVType.RECTANGULAR, 0, 228 / 60., 228 / 60., Colors.Blue),
-            new FOV("SOLO/METIS", FOVType.CIRCULAR, 3, 5.8, 5.8, Colors.Blue),
-            new FOV("SOLO/PHI/HRT", FOVType.RECTANGULAR, 0, 0.28, 0.28, Colors.Blue),
-            new FOV("SOLO/PHI/FDT", FOVType.RECTANGULAR, 0, 2, 2, Colors.Blue),
-            new FOV("SOLO/SPICE", FOVType.RECTANGULAR, 0, 16 / 60., 11 / 60., Colors.Blue),
-            new FOV("SOLO/STIX", FOVType.RECTANGULAR, 0, 2, 2, Colors.Blue)
-    );
-
-    static FOVLayerOptions.OffControl getOffControl(int row, int col) {
-        return FOVs.get(row).getOffControl(col);
-    }
-
     private static final double LINEWIDTH_FOV = GLSLLine.LINEWIDTH_BASIC;
     private static final double textEpsilon = 0.09;
     private static final double textScale = 0.075;
@@ -134,27 +43,18 @@ public class FOVLayer extends AbstractLayer {
     private final GLSLShape center = new GLSLShape(true);
     private final BufVertex centerBuf = new BufVertex(GLSLShape.stride);
 
-    private final FOVLayerOptions optionsPanel;
+    private final FOVTreePane treePane = new FOVTreePane();
+    private final JPanel optionsPanel;
 
     private static boolean customEnabled;
     private static double customAngle = Camera.INITFOV / Math.PI * 180;
-
-    static void setCustomEnabled(boolean b) {
-        customEnabled = b;
-        MovieDisplay.display();
-    }
-
-    static void setCustomAngle(double a) {
-        customAngle = a;
-        MovieDisplay.display();
-    }
 
     @Override
     public void serialize(JSONObject jo) {
     }
 
     public FOVLayer(JSONObject jo) {
-        optionsPanel = new FOVLayerOptions(new FOVModel(FOVs), customAngle);
+        optionsPanel = buildOptionsPanel();
     }
 
     private static void drawLabel(String name, double x, double y, double size, JhvTextRenderer renderer) {
@@ -166,7 +66,7 @@ public class FOVLayer extends AbstractLayer {
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.idx])
             return;
-
+/*
         if (!customEnabled) {
             boolean willDraw = false;
             for (FOV f : FOVs) {
@@ -178,7 +78,7 @@ public class FOVLayer extends AbstractLayer {
             if (!willDraw)
                 return;
         }
-
+*/
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
         Position viewpoint = camera.getViewpoint();
 
@@ -192,7 +92,7 @@ public class FOVLayer extends AbstractLayer {
 
         JhvTextRenderer renderer = GLText.getRenderer(48);
         renderer.begin3DRendering();
-        FOVs.forEach(f -> f.putFOV(fov, viewpoint.distance, lineBuf, centerBuf, renderer));
+        treePane.putFOV(fov, viewpoint.distance, lineBuf, centerBuf, renderer);
         if (customEnabled) {
             fov.setCenter(0, 0);
             fov.putCenter(centerBuf, fovColor);
@@ -257,38 +157,50 @@ public class FOVLayer extends AbstractLayer {
         return false;
     }
 
-    @SuppressWarnings("serial")
-    static class FOVModel extends AbstractTableModel {
+    private JPanel buildOptionsPanel() {
+        double fovMin = 0, fovMax = 180;
+        JSpinner spinner = new JSpinner(new SpinnerNumberModel(customAngle, fovMin, fovMax, 0.01));
+        ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField().setFormatterFactory(new TerminatedFormatterFactory("%.2f", "\u00B0", fovMin, fovMax));
+        WheelSupport.installMouseWheelSupport(spinner);
+        spinner.addChangeListener(e -> {
+            customAngle = (Double) spinner.getValue();
+            MovieDisplay.display();
+        });
 
-        private final List<FOV> fovs;
+        JCheckBox customCheckBox = new JCheckBox("Custom FOV", false);
+        customCheckBox.addChangeListener(e -> {
+            customEnabled = customCheckBox.isSelected();
+            MovieDisplay.display();
+        });
 
-        FOVModel(List<FOV> _fovs) {
-            fovs = _fovs;
-        }
+        JPanel customPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints c0 = new GridBagConstraints();
+        c0.anchor = GridBagConstraints.LINE_END;
+        c0.weightx = 1.;
+        c0.weighty = 1.;
+        c0.gridy = 0;
+        c0.gridx = 0;
+        customPanel.add(customCheckBox, c0);
+        c0.anchor = GridBagConstraints.LINE_START;
+        c0.gridx = 1;
+        customPanel.add(spinner, c0);
 
-        @Override
-        public int getRowCount() {
-            return fovs.size();
-        }
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints c1 = new GridBagConstraints();
+        c1.fill = GridBagConstraints.BOTH;
+        c1.weightx = 1;
+        c1.gridx = 0;
 
-        @Override
-        public int getColumnCount() {
-            return FOVLayerOptions.NUMBEROFCOLUMNS;
-        }
+        c1.weighty = 0;
+        c1.gridy = 0;
+        panel.add(customPanel, c1);
 
-        @Override
-        public Object getValueAt(int row, int col) {
-            if (col == FOVLayerOptions.SELECTED_COL || col == FOVLayerOptions.FOV_COL)
-                return fovs.get(row);
-            else
-                return fovs.get(row).getOffControl(col - FOVLayerOptions.OFF1_COL).getValue();
-        }
+        c1.weighty = 1;
+        c1.gridy = 1;
+        panel.add(treePane, c1);
 
-        @Override
-        public boolean isCellEditable(int row, int col) {
-            return fovs.get(row).isEnabled() && col != FOVLayerOptions.SELECTED_COL && col != FOVLayerOptions.FOV_COL;
-        }
-
+        ComponentUtils.smallVariant(panel);
+        return panel;
     }
 
 }
