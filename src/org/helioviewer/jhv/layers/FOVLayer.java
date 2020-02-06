@@ -1,17 +1,15 @@
 package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.List;
 
 import javax.annotation.Nullable;
+import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -158,13 +156,7 @@ public class FOVLayer extends AbstractLayer {
     }
 
     public FOVLayer(JSONObject jo) {
-        Object[][] data = new Object[FOVs.size()][3];
-        for (int i = 0; i < FOVs.size(); i++) {
-            data[i][0] = FOVs.get(i);
-            data[i][1] = 0;
-            data[i][2] = 0;
-        }
-        optionsPanel = new FOVLayerOptions(data, customAngle);
+        optionsPanel = new FOVLayerOptions(new FOVModel(FOVs), customAngle);
     }
 
     private static void drawLabel(String name, double x, double y, double size, JhvTextRenderer renderer) {
@@ -265,6 +257,40 @@ public class FOVLayer extends AbstractLayer {
     @Override
     public boolean isDeletable() {
         return false;
+    }
+
+    @SuppressWarnings("serial")
+    static class FOVModel extends AbstractTableModel {
+
+        private final List<FOV> fovs;
+
+        FOVModel(List<FOV> _fovs) {
+            fovs = _fovs;
+        }
+
+        @Override
+        public int getRowCount() {
+            return fovs.size();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return FOVLayerOptions.NUMBEROFCOLUMNS;
+        }
+
+        @Override
+        public Object getValueAt(int row, int col) {
+            if (col == FOVLayerOptions.SELECTED_COL || col == FOVLayerOptions.FOV_COL)
+                return fovs.get(row);
+            else
+                return fovs.get(row).getOffControl(col - FOVLayerOptions.OFF1_COL).getValue();
+        }
+
+        @Override
+        public boolean isCellEditable(int row, int col) {
+            return col != FOVLayerOptions.SELECTED_COL && col != FOVLayerOptions.FOV_COL;
+        }
+
     }
 
 }
