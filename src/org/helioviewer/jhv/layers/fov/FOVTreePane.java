@@ -3,6 +3,7 @@ package org.helioviewer.jhv.layers.fov;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.util.Enumeration;
 import java.util.EventObject;
 
 import javax.swing.BorderFactory;
@@ -11,6 +12,7 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.layers.fov.FOVTreeElement.FOVType;
@@ -52,6 +54,15 @@ public class FOVTreePane extends JScrollPane {
 
     public void putFOV(FOVShape f, double distance, BufVertex lineBuf, BufVertex centerBuf, JhvTextRenderer renderer) {
         root.children().asIterator().forEachRemaining(c -> ((FOVTreeElement) c).putFOV(f, distance, lineBuf, centerBuf, renderer));
+    }
+
+    public int countEnabled() {
+        int count = 0;
+        for (Enumeration<TreeNode> e = root.children(); e.hasMoreElements();) {
+            if (((FOVTreeElement) e.nextElement()).isEnabled())
+                count++;
+        }
+        return count;
     }
 
     private static class MyTreeCellEditor extends DefaultTreeCellEditor {
