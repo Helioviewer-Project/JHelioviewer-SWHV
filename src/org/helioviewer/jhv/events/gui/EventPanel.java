@@ -5,7 +5,6 @@ import java.awt.Component;
 import java.util.EventObject;
 
 import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayer;
@@ -41,11 +40,7 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener {
         eventTypeTree.setSelectionModel(null);
         eventTypeTree.setCellRenderer(new SWEKEventTreeRenderer(eventTypeTree));
         eventTypeTree.setCellEditor(new MyTreeCellEditor(eventTypeTree, (DefaultTreeCellRenderer) eventTypeTree.getCellRenderer()));
-
-        // workaround for Win HiDpi
-        if (System.getProperty("jhv.os").equals("windows")) {
-            eventTypeTree.setRowHeight(new JCheckBox("J").getPreferredSize().height);
-        }
+        eventTypeTree.setRowHeight(0); // force calculation of nodes heights
 
         add(eventTypeTree, BorderLayout.CENTER);
 
