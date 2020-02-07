@@ -76,6 +76,8 @@ public class FOVLayer extends AbstractLayer {
 
         JhvTextRenderer renderer = GLText.getRenderer(48);
         renderer.begin3DRendering();
+        renderer.setSurfacePut();
+
         treePane.putFOV(fov, viewpoint.distance, lineBuf, centerBuf, renderer);
         if (customEnabled) {
             fov.setCenter(0, 0);
@@ -85,6 +87,8 @@ public class FOVLayer extends AbstractLayer {
             fov.putRectLine(halfSide, halfSide, lineBuf, fovColor);
             FOVText.drawLabel(renderer, "Custom", halfSide, -halfSide, halfSide);
         }
+
+        renderer.setDirectPut();
         renderer.end3DRendering();
 
         center.setData(gl, centerBuf);
