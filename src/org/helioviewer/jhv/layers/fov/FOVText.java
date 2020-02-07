@@ -6,9 +6,9 @@ public class FOVText {
 
     private static final double textScale = 0.075;
 
-    public static void drawLabel(JhvTextRenderer renderer, String name, double x, double y, double size) {
+    public static void drawLabel(JhvTextRenderer renderer, String text, double x, double y, double size) {
         float scaleFactor = (float) (textScale / renderer.getFont().getSize2D() * size);
-        renderer.draw3D(name, (float) x, (float) y, 0, scaleFactor); // using SurfacePut
+        renderer.draw3D(text, (float) x, (float) y, 0, scaleFactor); // using SurfacePut
     }
 
 }

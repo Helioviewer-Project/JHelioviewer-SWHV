@@ -52,11 +52,11 @@ class FOVTreeElement extends DefaultMutableTreeNode {
             f.putCircLine(inner * distance, lineBuf, color);
         if (type == FOVType.RECTANGULAR) {
             f.putRectLine(wide * distance, high * distance, lineBuf, color);
-            FOVText.drawLabel(renderer, name, (wide + centerX) * distance, (-high + centerY) * distance, high * distance);
+            FOVText.drawLabel(renderer, name, (centerX - wide) * distance, (centerY - high) * distance, high * distance);
         } else {
             f.putCircLine(wide * distance, lineBuf, color);
             double halfSide = wide / Math.sqrt(2);
-            FOVText.drawLabel(renderer, name, (halfSide + centerX) * distance, (-halfSide + centerY) * distance, halfSide * distance);
+            FOVText.drawLabel(renderer, name, (centerX - halfSide) * distance, (centerY - halfSide) * distance, halfSide * distance);
         }
     }
 

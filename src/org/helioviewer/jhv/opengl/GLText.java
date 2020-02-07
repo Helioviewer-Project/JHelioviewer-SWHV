@@ -16,7 +16,7 @@ public class GLText {
     private static final int MAX = 144;
     private static final int STEP = 1;
     private static final int SIZE = (MAX - MIN) / STEP + 1;
-    private static final JhvTextRenderer[] renderer = new JhvTextRenderer[SIZE];
+    private static final JhvTextRenderer[] renderers = new JhvTextRenderer[SIZE];
 
     public static final float[] shadowColor = {0.1f, 0.1f, 0.1f, 0.75f};
     public static final int[] shadowOffset = {2, -2};
@@ -30,20 +30,20 @@ public class GLText {
         else if (idx >= SIZE)
             idx = SIZE - 1;
 
-        if (renderer[idx] == null) {
+        if (renderers[idx] == null) {
             Font font = UIGlobals.uiFontRoboto.deriveFont((float) (idx * STEP + MIN));
-            renderer[idx] = new JhvTextRenderer(font, true, true);
+            renderers[idx] = new JhvTextRenderer(font, true, true);
             // precache for grid text
-            renderer[idx].draw3D("-0123456789.", 0, 0, 0, 0);
+            renderers[idx].draw3D("-0123456789.", 0, 0, 0, 0);
         }
-        return renderer[idx];
+        return renderers[idx];
     }
 
     public static void dispose(GL2 gl) {
         for (int i = 0; i < SIZE; i++) {
-            if (renderer[i] != null) {
-                renderer[i].dispose(gl);
-                renderer[i] = null;
+            if (renderers[i] != null) {
+                renderers[i].dispose(gl);
+                renderers[i] = null;
             }
         }
     }
