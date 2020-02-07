@@ -18,7 +18,6 @@ import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.camera.CameraListener;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
@@ -35,7 +34,7 @@ import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public class ViewpointLayer extends AbstractLayer implements CameraListener, MouseListener, MouseMotionListener {
+public class ViewpointLayer extends AbstractLayer implements MouseListener, MouseMotionListener {
 
     private static final double DELTA_ORBIT = 10 * 60 * 1000 * Sun.MeanEarthDistanceInv;
     private static final double DELTA_CUTOFF = 3 * Sun.MeanEarthDistance;
@@ -239,8 +238,10 @@ public class ViewpointLayer extends AbstractLayer implements CameraListener, Mou
         return viewpointTime.toString();
     }
 
-    @Override
-    public void timeChanged(JHVTime _viewpointTime) {
+    public void updateTime(JHVTime _viewpointTime) {
+        if (viewpointTime.milli == _viewpointTime.milli)
+            return;
+
         viewpointTime = _viewpointTime;
         JHVFrame.getCarringtonStatusPanel().update(viewpointTime);
         JHVFrame.getLayers().fireTimeUpdated(this);
@@ -261,7 +262,6 @@ public class ViewpointLayer extends AbstractLayer implements CameraListener, Mou
         orbits.init(gl);
         planets.init(gl);
         spiral.init(gl);
-        Display.getCamera().addListener(this);
     }
 
     @Override
@@ -269,7 +269,6 @@ public class ViewpointLayer extends AbstractLayer implements CameraListener, Mou
         orbits.dispose(gl);
         planets.dispose(gl);
         spiral.dispose(gl);
-        Display.getCamera().removeListener(this);
     }
 
     @Override
