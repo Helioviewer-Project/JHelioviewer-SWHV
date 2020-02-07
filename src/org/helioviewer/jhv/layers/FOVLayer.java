@@ -18,6 +18,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.layers.fov.FOVText;
 import org.helioviewer.jhv.layers.fov.FOVTreePane;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -33,8 +34,6 @@ import com.jogamp.opengl.GL2;
 public class FOVLayer extends AbstractLayer {
 
     private static final double LINEWIDTH_FOV = GLSLLine.LINEWIDTH_BASIC;
-    private static final double textEpsilon = 0.09;
-    private static final double textScale = 0.075;
 
     private final FOVShape fov = new FOVShape();
     private final byte[] fovColor = Colors.Blue;
@@ -55,11 +54,6 @@ public class FOVLayer extends AbstractLayer {
 
     public FOVLayer(JSONObject jo) {
         optionsPanel = buildOptionsPanel();
-    }
-
-    private static void drawLabel(String name, double x, double y, double size, JhvTextRenderer renderer) {
-        float textScaleFactor = (float) (textScale / renderer.getFont().getSize2D() * size);
-        renderer.draw3D(name, (float) x, (float) y, (float) (FOVShape.computeZ(x, y) + textEpsilon), textScaleFactor);
     }
 
     @Override
@@ -89,7 +83,7 @@ public class FOVLayer extends AbstractLayer {
 
             double halfSide = 0.5 * viewpoint.distance * Math.tan(customAngle * (Math.PI / 180.));
             fov.putRectLine(halfSide, halfSide, lineBuf, fovColor);
-            drawLabel("Custom", halfSide, -halfSide, halfSide, renderer);
+            FOVText.drawLabel(renderer, "Custom", halfSide, -halfSide, halfSide);
         }
         renderer.end3DRendering();
 
