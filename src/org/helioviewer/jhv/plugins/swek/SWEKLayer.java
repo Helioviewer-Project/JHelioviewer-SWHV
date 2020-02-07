@@ -350,7 +350,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                 txts.add(p.getParameterDisplayName() + " : " + p.getSimpleDisplayParameterValue());
             }
         }
-        GLText.drawText(vp, txts, x + MOUSE_OFFSET_X, y + MOUSE_OFFSET_Y);
+        GLText.drawTextFloat(vp, txts, x + MOUSE_OFFSET_X, y + MOUSE_OFFSET_Y);
     }
 
     private void renderEvents(Viewport vp, GL2 gl) {

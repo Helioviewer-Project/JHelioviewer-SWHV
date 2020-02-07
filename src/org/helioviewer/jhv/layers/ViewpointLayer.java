@@ -105,7 +105,7 @@ public class ViewpointLayer extends AbstractLayer implements CameraListener, Mou
 
     @Override
     public void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
-        GLText.drawText(vp, text, mouseX + MOUSE_OFFSET_X, mouseY + MOUSE_OFFSET_Y);
+        GLText.drawTextFloat(vp, text, mouseX + MOUSE_OFFSET_X, mouseY + MOUSE_OFFSET_Y);
     }
 
     @Override
