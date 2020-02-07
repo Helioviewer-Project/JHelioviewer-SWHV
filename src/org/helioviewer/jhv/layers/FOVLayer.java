@@ -85,7 +85,7 @@ public class FOVLayer extends AbstractLayer {
 
             double halfSide = 0.5 * viewpoint.distance * Math.tan(customAngle * (Math.PI / 180.));
             fov.putRectLine(halfSide, halfSide, lineBuf, fovColor);
-            FOVText.drawLabel(renderer, "Custom", halfSide, -halfSide, halfSide);
+            FOVText.drawLabel(renderer, "Custom", -halfSide, -halfSide, halfSide);
         }
 
         renderer.setDirectPut();
