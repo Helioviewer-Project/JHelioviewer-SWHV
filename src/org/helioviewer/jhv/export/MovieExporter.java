@@ -4,9 +4,9 @@ import java.awt.EventQueue;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,7 +51,7 @@ class MovieExporter {
         }
 
         ByteBuffer mainData = MappedImageFactory.getByteBuffer(mainImage);
-        try (FileChannel channel = new FileOutputStream(tempFile, true).getChannel()) {
+        try (FileChannel channel = FileChannel.open(tempFile.toPath(), StandardOpenOption.APPEND)) {
             for (int j = mainH - 1; j >= 0; j--) { // write image flipped
                 int pos = 3 * w * j;
                 mainData.position(pos);

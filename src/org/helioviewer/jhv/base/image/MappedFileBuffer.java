@@ -31,9 +31,13 @@ package org.helioviewer.jhv.base.image;
 import java.awt.image.DataBuffer;
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.*;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.StandardOpenOption;
 
 import org.helioviewer.jhv.JHVGlobals;
 
@@ -57,9 +61,9 @@ abstract class MappedFileBuffer extends DataBuffer {
         int componentSize = DataBuffer.getDataTypeSize(type) / 8;
         File tempFile = File.createTempFile("mfilebuf", null, JHVGlobals.exportCacheDir);
 
-        try (RandomAccessFile raf = new RandomAccessFile(tempFile, "rw"); FileChannel channel = raf.getChannel()) {
+        try (FileChannel channel = FileChannel.open(tempFile.toPath(), StandardOpenOption.READ, StandardOpenOption.WRITE)) {
             long length = ((long) size) * componentSize * numBanks;
-            raf.setLength(length);
+            channel.truncate(length);
 
             ByteBuffer byteBuffer = channel.map(FileChannel.MapMode.READ_WRITE, 0, length).order(ByteOrder.nativeOrder());
             switch (type) {
