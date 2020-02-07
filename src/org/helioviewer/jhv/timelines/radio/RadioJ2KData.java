@@ -66,11 +66,15 @@ class RadioJ2KData implements ImageDataHandler {
             executor = null;
             view = null;
         }
-        bufferedImage = null;
+        NIOImageFactory.free(bufferedImage);
     }
 
     @Override
     public void handleData(ImageData imageData) {
+        if (bufferedImage != null) {
+            Log.error("Already handled data");
+            return;
+        }
         ImageBuffer imageBuffer = imageData.getImageBuffer();
         int w = imageBuffer.width;
         int h = imageBuffer.height;
@@ -194,6 +198,7 @@ class RadioJ2KData implements ImageDataHandler {
         if (hasData()) {
             BufferedImage old = bufferedImage;
             bufferedImage = new BufferedImage(cm, old.getRaster(), false, null);
+            NIOImageFactory.free(old);
         }
     }
 

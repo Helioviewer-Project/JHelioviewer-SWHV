@@ -59,7 +59,7 @@ public class FOVTreePane extends JScrollPane {
         setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         getVerticalScrollBar().setUnitIncrement(20); // ugh
         setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
-        setPreferredSize(new Dimension(-1, 90));
+        setPreferredSize(new Dimension(-1, 94));
     }
 
     public void putFOV(FOVShape f, double distance, BufVertex lineBuf, BufVertex centerBuf, JhvTextRenderer renderer) {
