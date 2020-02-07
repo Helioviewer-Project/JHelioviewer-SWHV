@@ -18,7 +18,7 @@ public class CarringtonStatusPanel extends StatusPanel.StatusPlugin implements L
         UITimer.register(this);
     }
 
-    public void update(JHVTime _time) {
+    public void update(JHVTime _time) { // checked for change in the calling ViewpointLayer
         time = _time;
         dirty = true;
     }

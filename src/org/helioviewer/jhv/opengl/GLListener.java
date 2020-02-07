@@ -169,6 +169,7 @@ public class GLListener implements GLEventListener {
         renderFullFloatScene(camera, gl);
 
         fpsCount++;
+        Layers.getViewpointLayer().updateTime(camera.getViewpoint().time);
         JHVFrame.getZoomStatusPanel().update(camera.getCameraWidth(), camera.getViewpoint().distance);
         // GLInfo.checkGLErrors(gl, "GLListener.display()");
     }

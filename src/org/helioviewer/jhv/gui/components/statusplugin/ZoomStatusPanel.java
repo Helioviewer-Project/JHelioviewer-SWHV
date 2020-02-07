@@ -26,6 +26,9 @@ public class ZoomStatusPanel extends StatusPanel.StatusPlugin implements LazyCom
     }
 
     public void update(double _cameraWidth, double _distance) {
+        if (cameraWidth == _cameraWidth && distance == _distance)
+            return;
+
         cameraWidth = _cameraWidth;
         distance = _distance;
         dirty = true;
