@@ -4,6 +4,7 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
+import javax.annotation.Nullable;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
@@ -160,6 +161,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         return jo;
     }
 
+    @Nullable
     PositionLoad getHighlightedLoad() {
         return container.getHighlightedLoad();
     }

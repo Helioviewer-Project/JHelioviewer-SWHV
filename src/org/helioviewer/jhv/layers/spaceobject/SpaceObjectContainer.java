@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.annotation.Nullable;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -111,6 +112,7 @@ public class SpaceObjectContainer extends JScrollPane {
         }
     }
 
+    @Nullable
     public PositionLoad getHighlightedLoad() {
         return highlighted == null ? null : highlighted.getLoad(uv);
     }
