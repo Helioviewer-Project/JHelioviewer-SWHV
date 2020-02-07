@@ -1,15 +1,17 @@
 package org.helioviewer.jhv.layers.fov;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.util.Enumeration;
+import java.util.EventObject;
 
 import javax.swing.BorderFactory;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.tree.DefaultTreeModel;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellEditor;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.base.Colors;
@@ -21,40 +23,38 @@ import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
 @SuppressWarnings("serial")
 public class FOVTreePane extends JScrollPane {
 
-    private final FOVTreeRoot[] roots = new FOVTreeRoot[]{
-            new FOVTreeRoot("SOLO"),
-            new FOVTreeRoot("SDO"),
-            new FOVTreeRoot("PROBA-2")
-    };
+    private final DefaultMutableTreeNode mother = new DefaultMutableTreeNode("Mother");
 
     public FOVTreePane() {
-        roots[0].add(new FOVTreeElement("EUI/HRI", FOVType.RECTANGULAR, 0, 16.6 / 60., 16.6 / 60., Colors.Blue));
-        roots[0].add(new FOVTreeElement("EUI/FSI", FOVType.RECTANGULAR, 0, 228 / 60., 228 / 60., Colors.Blue));
-        roots[0].add(new FOVTreeElement("METIS", FOVType.CIRCULAR, 3, 5.8, 5.8, Colors.Blue));
-        roots[0].add(new FOVTreeElement("PHI/HRT", FOVType.RECTANGULAR, 0, 0.28, 0.28, Colors.Blue));
-        roots[0].add(new FOVTreeElement("PHI/FDT", FOVType.RECTANGULAR, 0, 2, 2, Colors.Blue));
-        roots[0].add(new FOVTreeElement("SPICE", FOVType.RECTANGULAR, 0, 16 / 60., 11 / 60., Colors.Blue));
-        roots[0].add(new FOVTreeElement("STIX", FOVType.RECTANGULAR, 0, 2, 2, Colors.Blue));
+        FOVTreeRoot root = new FOVTreeRoot("SOLO");
+        root.add(new FOVTreeElement("EUI/HRI", FOVType.RECTANGULAR, 0, 16.6 / 60., 16.6 / 60., Colors.Blue));
+        root.add(new FOVTreeElement("EUI/FSI", FOVType.RECTANGULAR, 0, 228 / 60., 228 / 60., Colors.Blue));
+        root.add(new FOVTreeElement("METIS", FOVType.CIRCULAR, 3, 5.8, 5.8, Colors.Blue));
+        root.add(new FOVTreeElement("PHI/HRT", FOVType.RECTANGULAR, 0, 0.28, 0.28, Colors.Blue));
+        root.add(new FOVTreeElement("PHI/FDT", FOVType.RECTANGULAR, 0, 2, 2, Colors.Blue));
+        root.add(new FOVTreeElement("SPICE", FOVType.RECTANGULAR, 0, 16 / 60., 11 / 60., Colors.Blue));
+        root.add(new FOVTreeElement("STIX", FOVType.RECTANGULAR, 0, 2, 2, Colors.Blue));
+        mother.add(root);
 
-        roots[1].add(new FOVTreeElement("AIA", FOVType.RECTANGULAR, 0, (0.6 * 4096) / 3600., (0.6 * 4096) / 3600., Colors.Blue));
-        roots[1].add(new FOVTreeElement("HMI", FOVType.RECTANGULAR, 0, (0.6 * 4096) / 3600., (0.6 * 4096) / 3600., Colors.Blue));
+        root = new FOVTreeRoot("SDO");
+        root.add(new FOVTreeElement("AIA", FOVType.RECTANGULAR, 0, (0.6 * 4096) / 3600., (0.6 * 4096) / 3600., Colors.Blue));
+        root.add(new FOVTreeElement("HMI", FOVType.RECTANGULAR, 0, (0.6 * 4096) / 3600., (0.6 * 4096) / 3600., Colors.Blue));
+        mother.add(root);
 
-        roots[2].add(new FOVTreeElement("SWAP", FOVType.RECTANGULAR, 0, (3.1646941 * 1024) / 3600., (3.1646941 * 1024) / 3600., Colors.Blue));
+        root = new FOVTreeRoot("PROBA-2");
+        root.add(new FOVTreeElement("SWAP", FOVType.RECTANGULAR, 0, (3.1646941 * 1024) / 3600., (3.1646941 * 1024) / 3600., Colors.Blue));
+        mother.add(root);
 
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints gc = new GridBagConstraints();
-        gc.gridx = 0;
-        gc.gridy = 0;
-        gc.weightx = 1;
-        gc.weighty = 0;
-        gc.fill = GridBagConstraints.BOTH;
+        FOVTreeRenderer ftr = new FOVTreeRenderer();
+        JTree tree = new JTree(mother);
+        tree.setRootVisible(false);
+        tree.setEditable(true);
+        tree.setShowsRootHandles(true);
+        tree.setCellRenderer(ftr);
+        tree.setCellEditor(new MyTreeCellEditor(tree, ftr));
+        tree.setRowHeight(0); // force calculation of nodes heights
 
-        for (FOVTreeRoot root : roots) {
-            panel.add(new FOVTree(new DefaultTreeModel(root)), gc);
-            gc.gridy++;
-        }
-
-        setViewportView(panel);
+        setViewportView(tree);
         setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         getVerticalScrollBar().setUnitIncrement(20); // ugh
@@ -63,19 +63,42 @@ public class FOVTreePane extends JScrollPane {
     }
 
     public void putFOV(FOVShape f, double distance, BufVertex lineBuf, BufVertex centerBuf, JhvTextRenderer renderer) {
-        for (FOVTreeRoot root : roots) {
-            root.children().asIterator().forEachRemaining(c -> ((FOVTreeElement) c).putFOV(f, distance, lineBuf, centerBuf, renderer));
+        Enumeration<TreeNode> e = mother.depthFirstEnumeration();
+        while (e.hasMoreElements()) {
+            TreeNode node = e.nextElement();
+            if (node.isLeaf()) {
+                ((FOVTreeElement) node).putFOV(f, distance, lineBuf, centerBuf, renderer);
+            }
         }
     }
 
     public boolean hasEnabled() {
-        for (FOVTreeRoot root : roots) {
-            for (Enumeration<TreeNode> e = root.children(); e.hasMoreElements(); ) {
-                if (((FOVTreeElement) e.nextElement()).isEnabled())
-                    return true;
+        Enumeration<TreeNode> e = mother.depthFirstEnumeration();
+        while (e.hasMoreElements()) {
+            TreeNode node = e.nextElement();
+            if (node.isLeaf() && ((FOVTreeElement) node).isEnabled()) {
+                return true;
             }
         }
         return false;
+    }
+
+    private static class MyTreeCellEditor extends DefaultTreeCellEditor {
+
+        MyTreeCellEditor(JTree tree, DefaultTreeCellRenderer renderer) {
+            super(tree, renderer);
+        }
+
+        @Override
+        public Component getTreeCellEditorComponent(JTree tree, Object value, boolean isSelected, boolean expanded, boolean leaf, int row) {
+            return renderer.getTreeCellRendererComponent(tree, value, true, expanded, leaf, row, true);
+        }
+
+        @Override
+        public boolean isCellEditable(EventObject e) {
+            return true;
+        }
+
     }
 
 }
