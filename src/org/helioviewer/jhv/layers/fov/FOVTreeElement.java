@@ -13,9 +13,6 @@ class FOVTreeElement extends DefaultMutableTreeNode {
 
     enum FOVType {RECTANGULAR, CIRCULAR}
 
-    private static final double textEpsilon = 0.09;
-    private static final double textScale = 0.075;
-
     private final String name;
     private final FOVType type;
     private final double inner;
@@ -26,11 +23,6 @@ class FOVTreeElement extends DefaultMutableTreeNode {
 
     private double centerX = 0;
     private double centerY = 0;
-
-    private static void drawLabel(String name, double x, double y, double size, JhvTextRenderer renderer) {
-        float textScaleFactor = (float) (textScale / renderer.getFont().getSize2D() * size);
-        renderer.draw3D(name, (float) x, (float) y, (float) (FOVShape.computeZ(x, y) + textEpsilon), textScaleFactor);
-    }
 
     FOVTreeElement(String _name, FOVType _type, double innerDeg, double wideDeg, double highDeg, byte[] _color) {
         name = _name;
@@ -60,11 +52,11 @@ class FOVTreeElement extends DefaultMutableTreeNode {
             f.putCircLine(inner * distance, lineBuf, color);
         if (type == FOVType.RECTANGULAR) {
             f.putRectLine(wide * distance, high * distance, lineBuf, color);
-            drawLabel(name, (wide + centerX) * distance, (-high + centerY) * distance, high * distance, renderer);
+            FOVText.drawLabel(renderer, name, (wide + centerX) * distance, (-high + centerY) * distance, high * distance);
         } else {
             f.putCircLine(wide * distance, lineBuf, color);
             double halfSide = wide / Math.sqrt(2);
-            drawLabel(name, (halfSide + centerX) * distance, (-halfSide + centerY) * distance, halfSide * distance, renderer);
+            FOVText.drawLabel(renderer, name, (halfSide + centerX) * distance, (-halfSide + centerY) * distance, halfSide * distance);
         }
     }
 
