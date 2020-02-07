@@ -327,10 +327,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
         if (speed == 0)
             return;
 
-        double sr = speed * (Sun.RadiusKMeterInv / RAD_PER_SEC);
         // control point
         double rad0, lon0, lat0;
-
         if (customControl == null) {
             if (control == null)
                 return;
@@ -351,6 +349,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
             lat0 = 0;
         }
 
+        double sr = speed * (Sun.RadiusKMeterInv / RAD_PER_SEC);
         for (int j = 0; j < SPIRAL_ARMS; j++) {
             double lona = lon0 + j * (2 * Math.PI / SPIRAL_ARMS); // arm longitude
             // before control point
