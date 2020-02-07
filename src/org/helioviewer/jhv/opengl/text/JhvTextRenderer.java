@@ -701,6 +701,46 @@ public class JhvTextRenderer {
 
     }
 
+    private interface VertexPut {
+
+        void put(float x, float y, float z, float w, float c0, float c1);
+
+    }
+
+    private class DirectPut implements VertexPut {
+
+        @Override
+        public void put(float x, float y, float z, float w, float c0, float c1) {
+            vexBuf.putCoord(x, y, z, w, c0, c1);
+        }
+
+    }
+
+    private class SurfacePut implements VertexPut {
+
+        private static final float epsilon = 0.07f;
+
+        @Override
+        public void put(float x, float y, float z, float w, float c0, float c1) {
+            float n = 1 - x * x - y * y;
+            vexBuf.putCoord(x, y, n > 0 ? epsilon + (float) Math.sqrt(n) : epsilon, w, c0, c1);
+        }
+
+    }
+
+    private final VertexPut directPut = new DirectPut();
+    private final VertexPut surfacePut = new SurfacePut();
+
+    private VertexPut vertexPut = directPut;
+
+    public void setDirectPut() {
+        vertexPut = directPut;
+    }
+
+    public void setSurfacePut() {
+        vertexPut = surfacePut;
+    }
+
     // Glyph-by-glyph rendering support
 
     /**
@@ -773,12 +813,12 @@ public class JhvTextRenderer {
             float tx2 = (texturex + width) / (float) renderer.getWidth();
             float ty2 = 1f - (texturey + height) / (float) renderer.getHeight();
 
-            vexBuf.putCoord(x, y, z, 1, tx1, ty1); // A
-            vexBuf.putCoord(x + (width * scaleFactor), y, z, 1, tx2, ty1); // B
-            vexBuf.putCoord(x + (width * scaleFactor), y + (height * scaleFactor), z, 1, tx2, ty2); // C
-            vexBuf.putCoord(x, y, z, 1, tx1, ty1); // A
-            vexBuf.putCoord(x + (width * scaleFactor), y + (height * scaleFactor), z, 1, tx2, ty2); // C
-            vexBuf.putCoord(x, y + (height * scaleFactor), z, 1, tx1, ty2); // D
+            vertexPut.put(x, y, z, 1, tx1, ty1); // A
+            vertexPut.put(x + (width * scaleFactor), y, z, 1, tx2, ty1); // B
+            vertexPut.put(x + (width * scaleFactor), y + (height * scaleFactor), z, 1, tx2, ty2); // C
+            vertexPut.put(x, y, z, 1, tx1, ty1); // A
+            vertexPut.put(x + (width * scaleFactor), y + (height * scaleFactor), z, 1, tx2, ty2); // C
+            vertexPut.put(x, y + (height * scaleFactor), z, 1, tx1, ty2); // D
 
             outstandingGlyphsVerticesPipeline += kVertsPerQuad;
             if (outstandingGlyphsVerticesPipeline >= kTotalBufferSizeVerts) {
