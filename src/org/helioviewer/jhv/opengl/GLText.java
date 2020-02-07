@@ -55,7 +55,7 @@ public class GLText {
     private static final int TOP_MARGIN_TEXT = 0;//5;
     private static final int BOTTOM_MARGIN_TEXT = 0;//5;
 
-    public static void drawText(Viewport vp, List<String> txts, int pt_x, int pt_y) {
+    public static void drawTextFloat(Viewport vp, List<String> txts, int pt_x, int pt_y) {
         if (txts.isEmpty())
             return;
 
