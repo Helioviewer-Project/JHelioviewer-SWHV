@@ -2,7 +2,7 @@ package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -66,10 +66,10 @@ public class GridLayer extends AbstractLayer {
     private final GLSLLine flatLine = new GLSLLine(false);
     private final GLSLLine gridLine = new GLSLLine(false);
 
-    private ArrayList<GridLabel> latLabels;
-    private ArrayList<GridLabel> lonLabels;
-    private final ArrayList<GridLabel> radialLabels;
-    private final ArrayList<GridLabel> radialLabelsFar;
+    private List<GridLabel> latLabels;
+    private List<GridLabel> lonLabels;
+    private final List<GridLabel> radialLabels;
+    private final List<GridLabel> radialLabelsFar;
 
     private final Component optionsPanel;
 
@@ -210,15 +210,15 @@ public class GridLayer extends AbstractLayer {
                 if (i == GridMath.FLAT_STEPS_THETA / 2) {
                     continue;
                 }
-                float start = -w / 2 + i * w / GridMath.FLAT_STEPS_THETA;
                 double lon = MathUtils.mapToMinus180To180(scale.getInterpolatedXValue(1. / GridMath.FLAT_STEPS_THETA * i) + 180);
-                String label = formatter2.format(lon);
-                renderer.draw3D(label, start, 0, 0, textScaleFactor);
+                String txt = formatter2.format(lon);
+                float x = i / (float) GridMath.FLAT_STEPS_THETA - 0.5f;
+                renderer.draw3D(txt, w * x, 0, 0, textScaleFactor);
             }
             for (int i = 0; i <= GridMath.FLAT_STEPS_RADIAL; i++) {
-                String label = formatter2.format(scale.getInterpolatedYValue(1. / GridMath.FLAT_STEPS_RADIAL * i));
-                float start = -h / 2 + i * h / GridMath.FLAT_STEPS_RADIAL;
-                renderer.draw3D(label, 0, start, 0, textScaleFactor);
+                String txt = formatter2.format(scale.getInterpolatedYValue(1. / GridMath.FLAT_STEPS_RADIAL * i));
+                float y = i / (float) GridMath.FLAT_STEPS_RADIAL - 0.5f;
+                renderer.draw3D(txt, 0, h * y, 0, textScaleFactor);
             }
         }
         renderer.end3DRendering();
@@ -234,7 +234,7 @@ public class GridLayer extends AbstractLayer {
         Transform.popView();
     }
 
-    private static void drawRadialGridText(GL2 gl, ArrayList<GridLabel> labels, double size, float z, float[] labelPos) {
+    private static void drawRadialGridText(GL2 gl, List<GridLabel> labels, double size, float z, float[] labelPos) {
         float fuzz = 0.75f;
         gl.glDisable(GL2.GL_CULL_FACE);
         for (float rsize : labelPos) {
