@@ -1,30 +1,42 @@
 package org.helioviewer.jhv.events;
 
+import java.awt.Component;
+import java.awt.Image;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 
-import org.helioviewer.jhv.events.gui.SWEKTreeModelElement;
+import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.interfaces.JHVTreeNode;
 
-public class SWEKGroup extends SWEKTreeModelElement {
+public class SWEKGroup implements JHVTreeNode {
 
     private static List<SWEKRelatedEvents> swekrelEvents;
+
+    private final String name;
     private final List<SWEKParameter> parameterList;
 
     private final ImageIcon icon;
+    private final JLabel label;
     private final boolean containsParameterFilter;
 
     private List<SWEKSupplier> suppliers;
     private HashMap<String, String> databaseFields;
 
-    public SWEKGroup(String _name, List<SWEKParameter> _parameterList, @Nonnull ImageIcon _icon) {
+    public SWEKGroup(String _name, List<SWEKParameter> _parameterList, ImageIcon _icon) {
         name = _name.intern();
         parameterList = _parameterList;
         icon = _icon;
         containsParameterFilter = checkFilters(parameterList);
+
+        label = new JLabel(name);
+        label.setOpaque(false);
+        ComponentUtils.smallVariant(label);
+        int size = label.getPreferredSize().height;
+        label.setIcon(new ImageIcon(icon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH)));
     }
 
     public HashMap<String, String> getAllDatabaseFields() {
@@ -69,6 +81,10 @@ public class SWEKGroup extends SWEKTreeModelElement {
         suppliers = _suppliers;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public List<SWEKParameter> getParameterList() {
         return parameterList;
     }
@@ -96,18 +112,13 @@ public class SWEKGroup extends SWEKTreeModelElement {
         return false;
     }
 
-    @Override
-    public void activate(boolean activate) {
-        setSelected(activate);
-        for (SWEKSupplier supplier : suppliers) {
-            supplier.setSelected(activate);
-            SWEKDownloadManager.activateSupplier(supplier, activate);
-        }
-    }
-
-    @Nonnull
     public ImageIcon getIcon() {
         return icon;
+    }
+
+    @Override
+    public Component getComponent() {
+        return label;
     }
 
 }

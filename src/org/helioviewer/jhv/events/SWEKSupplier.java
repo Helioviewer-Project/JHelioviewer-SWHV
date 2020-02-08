@@ -1,22 +1,33 @@
 package org.helioviewer.jhv.events;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.HashMap;
 
-import javax.annotation.Nullable;
+import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 
-import org.helioviewer.jhv.events.gui.SWEKTreeModelElement;
 import org.helioviewer.jhv.events.gui.filter.FilterDialog;
+import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.components.base.JHVButton;
+import org.helioviewer.jhv.gui.interfaces.JHVTreeNode;
 
-public class SWEKSupplier extends SWEKTreeModelElement {
+public class SWEKSupplier implements JHVTreeNode {
 
     private final String supplierName;
+    private final String name;
     private final String db;
     private final String key;
 
     private final SWEKGroup group;
     private final SWEKSource source;
-    private final FilterDialog filterDialog;
 
+    private final JPanel panel;
+    private final JCheckBox checkBox;
     private final boolean isCactus;
 
     private static final HashMap<String, SWEKSupplier> suppliers = new HashMap<>();
@@ -28,12 +39,36 @@ public class SWEKSupplier extends SWEKTreeModelElement {
         group = _group;
         source = _source;
         db = _db;
-        filterDialog = group.containsFilter() ? new FilterDialog(this) : null;
+
+        isCactus = name == "CACTus" && source.getName() == "HEK"; // interned
 
         key = supplierName + source.getName() + db;
         suppliers.put(key, this);
 
-        isCactus = name == "CACTus" && source.getName() == "HEK"; // interned
+        panel = new JPanel(new BorderLayout());
+        panel.setOpaque(false);
+        checkBox = new JCheckBox(name);
+        checkBox.addActionListener(e -> internalActivate(checkBox.isSelected()));
+        checkBox.setFocusPainted(false);
+        checkBox.setOpaque(false);
+        panel.add(checkBox, BorderLayout.LINE_START);
+
+        if (group.containsFilter()) {
+            FilterDialog filterDialog = new FilterDialog(this);
+            JHVButton filterButton = new JHVButton("Filter");
+            filterButton.addActionListener(e -> filterDialog.setVisible(true));
+            filterButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    Point pressedLocation = e.getLocationOnScreen();
+                    Point windowLocation = new Point(pressedLocation.x, pressedLocation.y - filterDialog.getSize().height);
+                    filterDialog.setLocation(windowLocation);
+                }
+            });
+            panel.setPreferredSize(new Dimension(250, filterButton.getPreferredSize().height)); //!
+            panel.add(filterButton, BorderLayout.LINE_END);
+        }
+        ComponentUtils.smallVariant(panel);
     }
 
     public static SWEKSupplier getSupplier(String name) {
@@ -48,17 +83,16 @@ public class SWEKSupplier extends SWEKTreeModelElement {
         return db;
     }
 
-    public SWEKSource getSource() {
-        return source;
+    public String getName() {
+        return name;
     }
 
     public SWEKGroup getGroup() {
         return group;
     }
 
-    @Nullable
-    public FilterDialog getFilterDialog() {
-        return filterDialog;
+    public SWEKSource getSource() {
+        return source;
     }
 
     public String getKey() {
@@ -69,19 +103,21 @@ public class SWEKSupplier extends SWEKTreeModelElement {
         return isCactus;
     }
 
+    public void activate(boolean b) {
+        checkBox.setSelected(b);
+    }
+
+    public void internalActivate(boolean b) {
+        SWEKDownloadManager.activateSupplier(this, b);
+    }
+
+    public boolean isSelected() {
+        return checkBox.isSelected();
+    }
+
     @Override
-    public void activate(boolean activate) {
-        setSelected(activate);
-        if (activate) {
-            group.setSelected(true);
-        } else {
-            boolean groupSelected = false;
-            for (SWEKSupplier stms : group.getSuppliers()) {
-                groupSelected |= stms.isSelected();
-            }
-            group.setSelected(groupSelected);
-        }
-        SWEKDownloadManager.activateSupplier(this, activate);
+    public Component getComponent() {
+        return panel;
     }
 
 }
