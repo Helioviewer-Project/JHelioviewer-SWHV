@@ -18,6 +18,7 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import org.helioviewer.jhv.events.SWEKGroup;
+import org.helioviewer.jhv.events.SWEKSupplier;
 import org.helioviewer.jhv.events.gui.filter.FilterDialog;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.JHVButton;
@@ -66,7 +67,7 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
         leaf.setOpaque(false);
 
         if (element instanceof SWEKGroup) {
-            leaf.add(new TreeLabel(element.getIcon()), BorderLayout.LINE_START);
+            leaf.add(new TreeLabel(((SWEKGroup) element).getIcon()), BorderLayout.LINE_START);
         }
 
         JCheckBox checkBox = new JCheckBox(element.getName());
@@ -78,13 +79,15 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
         });
         leaf.add(checkBox, BorderLayout.CENTER);
 
-        FilterDialog filterDialog = element.getFilterDialog();
-        if (filterDialog != null) {
-            JHVButton filterButton = new JHVButton("Filter");
-            filterButton.addActionListener(e -> filterDialog.setVisible(true));
-            filterButton.addMouseListener(new FilterMouseAdapter(filterDialog));
-            leaf.setPreferredSize(new Dimension(250, filterButton.getPreferredSize().height)); //!
-            leaf.add(filterButton, BorderLayout.LINE_END);
+        if (element instanceof SWEKSupplier) {
+            FilterDialog filterDialog = ((SWEKSupplier) element).getFilterDialog();
+            if (filterDialog != null) {
+                JHVButton filterButton = new JHVButton("Filter");
+                filterButton.addActionListener(e -> filterDialog.setVisible(true));
+                filterButton.addMouseListener(new FilterMouseAdapter(filterDialog));
+                leaf.setPreferredSize(new Dimension(250, filterButton.getPreferredSize().height)); //!
+                leaf.add(filterButton, BorderLayout.LINE_END);
+            }
         }
 
         ComponentUtils.smallVariant(leaf);

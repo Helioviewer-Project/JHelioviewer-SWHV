@@ -2,8 +2,7 @@ package org.helioviewer.jhv.events;
 
 import java.util.HashMap;
 
-import javax.annotation.Nonnull;
-import javax.swing.ImageIcon;
+import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.events.gui.SWEKTreeModelElement;
 import org.helioviewer.jhv.events.gui.filter.FilterDialog;
@@ -16,6 +15,7 @@ public class SWEKSupplier extends SWEKTreeModelElement {
 
     private final SWEKGroup group;
     private final SWEKSource source;
+    private final FilterDialog filterDialog;
 
     private final boolean isCactus;
 
@@ -28,13 +28,12 @@ public class SWEKSupplier extends SWEKTreeModelElement {
         group = _group;
         source = _source;
         db = _db;
+        filterDialog = group.containsFilter() ? new FilterDialog(this) : null;
 
         key = supplierName + source.getName() + db;
         suppliers.put(key, this);
 
         isCactus = name == "CACTus" && source.getName() == "HEK"; // interned
-        if (group.containsFilter())
-            filterDialog = new FilterDialog(this);
     }
 
     public static SWEKSupplier getSupplier(String name) {
@@ -55,6 +54,11 @@ public class SWEKSupplier extends SWEKTreeModelElement {
 
     public SWEKGroup getGroup() {
         return group;
+    }
+
+    @Nullable
+    public FilterDialog getFilterDialog() {
+        return filterDialog;
     }
 
     public String getKey() {
@@ -78,12 +82,6 @@ public class SWEKSupplier extends SWEKTreeModelElement {
             group.setSelected(groupSelected);
         }
         SWEKDownloadManager.activateSupplier(this, activate);
-    }
-
-    @Nonnull
-    @Override
-    public ImageIcon getIcon() {
-        return group.getIcon();
     }
 
 }
