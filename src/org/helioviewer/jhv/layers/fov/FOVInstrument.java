@@ -1,15 +1,24 @@
 package org.helioviewer.jhv.layers.fov;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.FOVShape;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
 
 @SuppressWarnings("serial")
-class FOVTreeElement extends DefaultMutableTreeNode {
+class FOVInstrument extends DefaultMutableTreeNode implements FOVTreeNode {
 
     enum FOVType {RECTANGULAR, CIRCULAR}
 
@@ -19,18 +28,44 @@ class FOVTreeElement extends DefaultMutableTreeNode {
     private final double wide;
     private final double high;
     private final byte[] color;
-    private boolean enabled;
+
+    private final JPanel panel;
+    private final JCheckBox checkBox;
 
     private double centerX = 0;
     private double centerY = 0;
 
-    FOVTreeElement(String _name, FOVType _type, double innerDeg, double wideDeg, double highDeg, byte[] _color) {
+    FOVInstrument(String _name, FOVType _type, double innerDeg, double wideDeg, double highDeg, byte[] _color) {
         name = _name;
         type = _type;
         inner = 0.5 * Math.tan(innerDeg * (Math.PI / 180.));
         wide = 0.5 * Math.tan(wideDeg * (Math.PI / 180.));
         high = 0.5 * Math.tan(highDeg * (Math.PI / 180.));
         color = _color;
+
+        panel = new JPanel(new BorderLayout());
+        panel.setOpaque(false);
+        checkBox = new JCheckBox(name);
+        checkBox.addActionListener(e -> MovieDisplay.display());
+        checkBox.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON3 && checkBox.isSelected()) {
+                    zoom();
+                    MovieDisplay.render(1);
+                }
+            }
+        });
+
+        checkBox.setFocusPainted(false);
+        checkBox.setOpaque(false);
+        panel.add(checkBox);
+        ComponentUtils.smallVariant(panel);
+    }
+
+    @Override
+    public Component getComponent() {
+        return panel;
     }
 
     void setCenterX(double _centerX) {
@@ -42,7 +77,7 @@ class FOVTreeElement extends DefaultMutableTreeNode {
     }
 
     void putFOV(FOVShape f, double distance, BufVertex lineBuf, BufVertex centerBuf, JhvTextRenderer renderer) {
-        if (!enabled)
+        if (!checkBox.isSelected())
             return;
 
         f.setCenter(centerX * distance, centerY * distance);
@@ -60,7 +95,7 @@ class FOVTreeElement extends DefaultMutableTreeNode {
         }
     }
 
-    void zoom() {
+    private void zoom() {
         Camera camera = Display.getCamera();
         double distance = camera.getViewpoint().distance;
         camera.setTranslation(-centerX * distance, -centerY * distance);
@@ -69,16 +104,7 @@ class FOVTreeElement extends DefaultMutableTreeNode {
     }
 
     boolean isEnabled() {
-        return enabled;
-    }
-
-    void toggle() {
-        enabled = !enabled;
-    }
-
-    @Override
-    public String toString() {
-        return name;
+        return checkBox.isSelected();
     }
 
 }
