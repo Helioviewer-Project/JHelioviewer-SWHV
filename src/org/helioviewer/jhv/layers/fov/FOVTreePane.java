@@ -1,20 +1,17 @@
 package org.helioviewer.jhv.layers.fov;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.util.Enumeration;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultCellEditor;
-import javax.swing.JCheckBox;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.base.Colors;
+import org.helioviewer.jhv.gui.components.base.JHVTreeCell;
 import org.helioviewer.jhv.layers.fov.FOVInstrument.FOVType;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.FOVShape;
@@ -49,8 +46,8 @@ public class FOVTreePane extends JScrollPane {
         tree.setRootVisible(false);
         tree.setEditable(true);
         tree.setShowsRootHandles(true);
-        tree.setCellRenderer(new CellRenderer());
-        tree.setCellEditor(new CellEditor());
+        tree.setCellRenderer(new JHVTreeCell.Renderer());
+        tree.setCellEditor(new JHVTreeCell.Editor());
         tree.setRowHeight(0); // force calculation of nodes heights
 
         setViewportView(tree);
@@ -80,34 +77,6 @@ public class FOVTreePane extends JScrollPane {
             }
         }
         return false;
-    }
-
-    private static class CellRenderer extends DefaultTreeCellRenderer {
-
-        @Override
-        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            if (value instanceof FOVTreeNode) {
-                return ((FOVTreeNode) value).getComponent();
-            } else
-                return super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
-        }
-
-    }
-
-    private static class CellEditor extends DefaultCellEditor {
-
-        CellEditor() {
-            super(new JCheckBox());
-        }
-
-        @Override
-        public Component getTreeCellEditorComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row) {
-            if (value instanceof FOVTreeNode) {
-                return ((FOVTreeNode) value).getComponent();
-            } else
-                return super.getTreeCellEditorComponent(tree, value, selected, expanded, leaf, row);
-        }
-
     }
 
 }
