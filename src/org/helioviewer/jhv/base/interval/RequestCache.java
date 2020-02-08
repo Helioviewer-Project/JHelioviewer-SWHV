@@ -6,7 +6,7 @@ import java.util.List;
 
 public class RequestCache {
 
-    private ArrayList<Interval> cache = new ArrayList<>();
+    private List<Interval> cache = new ArrayList<>();
 
     public List<Interval> adaptRequestCache(long start, long end) {
         List<Interval> missingIntervals = new ArrayList<>();
@@ -30,7 +30,7 @@ public class RequestCache {
     }
 
     public List<Interval> getMissingIntervals(long start, long end) {
-        ArrayList<Interval> localCache = getInvertedCache(cache);
+        List<Interval> localCache = getInvertedCache(cache);
         localCache = remove(localCache, new Interval(Long.MIN_VALUE, start));
         localCache = remove(localCache, new Interval(end, Long.MAX_VALUE));
         return localCache;
@@ -41,8 +41,8 @@ public class RequestCache {
         cache = merge(cache);
     }
 
-    private static ArrayList<Interval> getInvertedCache(ArrayList<Interval> toInvert) {
-        ArrayList<Interval> newCache = new ArrayList<>();
+    private static List<Interval> getInvertedCache(List<Interval> toInvert) {
+        List<Interval> newCache = new ArrayList<>();
         int len = toInvert.size();
         if (len == 0) {
             newCache.add(new Interval(Long.MIN_VALUE, Long.MAX_VALUE));
@@ -69,14 +69,14 @@ public class RequestCache {
         return newCache;
     }
 
-    private static ArrayList<Interval> merge(ArrayList<Interval> intervals) {
+    private static List<Interval> merge(List<Interval> intervals) {
         int size = intervals.size(); // cannot be null
         if (size <= 1)
             return intervals;
 
         Collections.sort(intervals);
 
-        ArrayList<Interval> result = new ArrayList<>();
+        List<Interval> result = new ArrayList<>();
         Interval prev = intervals.get(0);
         for (int i = 1; i < size; i++) {
             Interval curr = intervals.get(i);
@@ -91,8 +91,8 @@ public class RequestCache {
         return result;
     }
 
-    private static ArrayList<Interval> remove(ArrayList<Interval> cache, Interval ri) {
-        ArrayList<Interval> icache = getInvertedCache(cache);
+    private static List<Interval> remove(List<Interval> cache, Interval ri) {
+        List<Interval> icache = getInvertedCache(cache);
         icache.add(ri);
         icache = merge(icache);
         return getInvertedCache(icache);

@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.base.interval;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -30,8 +31,8 @@ public class Interval implements Comparable<Interval> {
     }
 
     @Nonnull
-    public static ArrayList<Interval> splitInterval(Interval interval, int days) {
-        ArrayList<Interval> intervals = new ArrayList<>();
+    public static List<Interval> splitInterval(Interval interval, int days) {
+        List<Interval> intervals = new ArrayList<>();
         long startDate = interval.start;
 
         while (true) {
