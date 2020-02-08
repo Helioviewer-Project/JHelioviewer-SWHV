@@ -106,7 +106,6 @@ public class SWEKGroup extends SWEKTreeModelElement {
     }
 
     @Nonnull
-    @Override
     public ImageIcon getIcon() {
         return icon;
     }
