@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.events.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.util.EventObject;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -11,11 +9,10 @@ import javax.swing.JLayer;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.Timer;
-import javax.swing.tree.DefaultTreeCellEditor;
-import javax.swing.tree.DefaultTreeCellRenderer;
 
 import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.gui.UITimer;
+import org.helioviewer.jhv.gui.components.base.JHVTreeCell;
 import org.json.JSONObject;
 
 @SuppressWarnings("serial")
@@ -38,8 +35,8 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener {
         eventTypeTree.setEditable(true);
         eventTypeTree.setShowsRootHandles(true);
         eventTypeTree.setSelectionModel(null);
-        eventTypeTree.setCellRenderer(new SWEKEventTreeRenderer(eventTypeTree));
-        eventTypeTree.setCellEditor(new MyTreeCellEditor(eventTypeTree, (DefaultTreeCellRenderer) eventTypeTree.getCellRenderer()));
+        eventTypeTree.setCellRenderer(new JHVTreeCell.Renderer());
+        eventTypeTree.setCellEditor(new JHVTreeCell.Editor());
         eventTypeTree.setRowHeight(0); // force calculation of nodes heights
 
         add(eventTypeTree, BorderLayout.CENTER);
@@ -77,24 +74,6 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener {
         JSONObject go = jo.optJSONObject(group.getName());
         if (go != null)
             group.getSuppliers().forEach(supplier -> supplier.activate(go.optBoolean(supplier.getName(), false)));
-    }
-
-    private static class MyTreeCellEditor extends DefaultTreeCellEditor {
-
-        MyTreeCellEditor(JTree tree, DefaultTreeCellRenderer renderer) {
-            super(tree, renderer);
-        }
-
-        @Override
-        public Component getTreeCellEditorComponent(JTree tree, Object value, boolean isSelected, boolean expanded, boolean leaf, int row) {
-            return renderer.getTreeCellRendererComponent(tree, value, true, expanded, leaf, row, true);
-        }
-
-        @Override
-        public boolean isCellEditable(EventObject e) {
-            return true;
-        }
-
     }
 
 }
