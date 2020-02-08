@@ -2,6 +2,7 @@ package org.helioviewer.jhv.layers;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.scale.GridType;
@@ -28,7 +29,7 @@ class GridLabel {
         m = _m;
     }
 
-    static ArrayList<GridLabel> makeRadialLabels(double delta, double radialStep) {
+    static List<GridLabel> makeRadialLabels(double delta, double radialStep) {
         double size = Sun.Radius;
         double horizontalAdjustment = textScale / 2.;
         double verticalAdjustment = textScale / 3.;
@@ -44,7 +45,7 @@ class GridLabel {
         return labels;
     }
 
-    static ArrayList<GridLabel> makeLatLabels(double latStep) {
+    static List<GridLabel> makeLatLabels(double latStep) {
         double size = Sun.Radius * 1.1;
         // adjust for font size in horizontal and vertical direction (centering the text approximately)
         double horizontalAdjustment = textScale / 2.;
@@ -78,7 +79,7 @@ class GridLabel {
         return labels;
     }
 
-    static ArrayList<GridLabel> makeLonLabels(GridType gridType, double lonStep) {
+    static List<GridLabel> makeLonLabels(GridType gridType, double lonStep) {
         double size = Sun.Radius * 1.05;
 
         ArrayList<GridLabel> labels = new ArrayList<>();
