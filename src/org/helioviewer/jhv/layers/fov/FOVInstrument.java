@@ -12,13 +12,14 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.interfaces.JHVTreeNode;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.FOVShape;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
 
 @SuppressWarnings("serial")
-class FOVInstrument extends DefaultMutableTreeNode implements FOVTreeNode {
+class FOVInstrument extends DefaultMutableTreeNode implements JHVTreeNode {
 
     enum FOVType {RECTANGULAR, CIRCULAR}
 
