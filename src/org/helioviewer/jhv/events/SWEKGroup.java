@@ -39,7 +39,7 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVTreeNode {
 
     private final boolean containsParameterFilter;
 
-    private List<SWEKSupplier> suppliers = new ArrayList<>();
+    private final List<SWEKSupplier> suppliers = new ArrayList<>();
     private HashMap<String, String> databaseFields;
 
     public SWEKGroup(String _name, List<SWEKParameter> _parameterList, ImageIcon _icon) {
@@ -99,7 +99,7 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVTreeNode {
         return suppliers;
     }
 
-    void add(SWEKSupplier supplier) {
+    public void addSupplier(SWEKSupplier supplier) {
         super.add(supplier);
         suppliers.add(supplier);
     }
