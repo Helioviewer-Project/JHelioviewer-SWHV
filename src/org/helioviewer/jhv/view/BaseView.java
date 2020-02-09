@@ -34,6 +34,7 @@ public class BaseView implements View {
         metaData[0] = new PixelBasedMetaData(1, 1, 0, uri);
     }
 
+    @Nullable
     @Override
     public URI getURI() {
         return uri;

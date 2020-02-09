@@ -84,7 +84,7 @@ public class Movie {
         return layer == null ? lastTimestamp.milli : layer.getEndTime();
     }
 
-    static void timespanChanged() {
+    private static void timespanChanged() {
         movieStart = getMovieStart();
         movieEnd = getMovieEnd();
         timespanListeners.forEach(listener -> listener.timespanChanged(movieStart, movieEnd));

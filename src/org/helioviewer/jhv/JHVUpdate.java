@@ -10,6 +10,8 @@ import org.helioviewer.jhv.gui.dialogs.NewVersionDialog;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.log.Log;
 
+import okio.BufferedSource;
+
 public class JHVUpdate implements Runnable {
     /*
      * Determines whether to show a message box if already the latest version is
@@ -48,8 +50,8 @@ public class JHVUpdate implements Runnable {
             }
         }
 
-        try (NetClient nc = NetClient.of(JHVGlobals.downloadURL + "VERSION")) {
-            String version = nc.getSource().readUtf8Line();
+        try (NetClient nc = NetClient.of(JHVGlobals.downloadURL + "VERSION"); BufferedSource source = nc.getSource()) {
+            String version = source.readUtf8Line();
             if (version == null || version.isEmpty()) {
                 throw new IOException("JHVUpdate: Empty version string");
             }

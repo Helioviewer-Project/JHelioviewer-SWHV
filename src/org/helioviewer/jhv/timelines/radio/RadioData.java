@@ -180,7 +180,7 @@ public class RadioData extends AbstractTimelineLayer {
 
     @Override
     public boolean isDownloading() {
-        return downloading.size() != 0;
+        return !downloading.isEmpty();
     }
 
     @Override

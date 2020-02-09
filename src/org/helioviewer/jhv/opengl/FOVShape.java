@@ -5,7 +5,7 @@ import org.helioviewer.jhv.base.Colors;
 public class FOVShape {
 
     public static final int RECT_SUBDIVS = 24;
-    public static final int CIRC_SUBDIVS = 90;
+    private static final int CIRC_SUBDIVS = 90;
     private static final float SIZE_POINT = 0.01f;
     private static final double epsilon = 0.03;
 
@@ -23,7 +23,7 @@ public class FOVShape {
         buf.putVertex((float) centerX, (float) centerY, (float) centerZ, SIZE_POINT, color);
     }
 
-    public static double computeZ(double x, double y) {
+    private static double computeZ(double x, double y) {
         double n = 1 - x * x - y * y;
         return n > 0 ? epsilon + Math.sqrt(n) : epsilon;
     }

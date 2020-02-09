@@ -22,6 +22,7 @@ public interface View {
 
     void decode(Position viewpoint, double pixFactor, float factor);
 
+    @Nullable
     URI getURI();
 
     @Nullable
