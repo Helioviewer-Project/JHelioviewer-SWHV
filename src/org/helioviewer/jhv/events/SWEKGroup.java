@@ -8,11 +8,13 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.interfaces.JHVTreeNode;
 
-public class SWEKGroup implements JHVTreeNode {
+@SuppressWarnings("serial")
+public class SWEKGroup extends DefaultMutableTreeNode implements JHVTreeNode {
 
     private static List<SWEKRelatedEvents> swekrelEvents;
 
@@ -79,6 +81,7 @@ public class SWEKGroup implements JHVTreeNode {
 
     public void setSuppliers(List<SWEKSupplier> _suppliers) {
         suppliers = _suppliers;
+        suppliers.forEach(this::add);
     }
 
     public String getName() {
