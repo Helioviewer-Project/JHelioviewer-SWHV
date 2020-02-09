@@ -31,18 +31,17 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener {
         setLayout(new BorderLayout());
         SWEKTreeModel.addListener(this);
 
-        JTree eventTypeTree = new JTree(new EventPanelModel(group));
-        eventTypeTree.setEditable(true);
-        eventTypeTree.setShowsRootHandles(true);
-        eventTypeTree.setSelectionModel(null);
-        eventTypeTree.setCellRenderer(new JHVTreeCell.Renderer());
-        eventTypeTree.setCellEditor(new JHVTreeCell.Editor());
-        eventTypeTree.setRowHeight(0); // force calculation of nodes heights
-
-        add(eventTypeTree, BorderLayout.CENTER);
+        JTree tree = new JTree(new EventPanelModel(group));
+        tree.setEditable(true);
+        tree.setShowsRootHandles(true);
+        tree.setSelectionModel(null);
+        tree.setCellRenderer(new JHVTreeCell.Renderer());
+        tree.setCellEditor(new JHVTreeCell.Editor());
+        tree.setRowHeight(0); // force calculation of nodes heights
+        add(tree, BorderLayout.CENTER);
 
         JPanel busyPanel = new JPanel();
-        busyPanel.setBackground(eventTypeTree.getBackground());
+        busyPanel.setBackground(tree.getBackground());
         busyPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 2));
         busyPanel.add(over);
         add(busyPanel, BorderLayout.LINE_END);

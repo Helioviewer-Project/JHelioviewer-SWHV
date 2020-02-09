@@ -6,6 +6,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -60,7 +61,8 @@ class FOVInstrument extends DefaultMutableTreeNode implements JHVTreeNode {
 
         checkBox.setFocusPainted(false);
         checkBox.setOpaque(false);
-        panel.add(checkBox);
+        panel.add(checkBox, BorderLayout.LINE_START);
+        panel.add(new JLabel("      "), BorderLayout.LINE_END); // avoid ellipsis on Windows
         ComponentUtils.smallVariant(panel);
     }
 
