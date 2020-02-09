@@ -10,13 +10,15 @@ import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.Timer;
 
+import org.helioviewer.jhv.events.SWEKDownloadListener;
+import org.helioviewer.jhv.events.SWEKDownloadManager;
 import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.base.JHVTreeCell;
 import org.json.JSONObject;
 
 @SuppressWarnings("serial")
-public class EventPanel extends JPanel implements SWEKTreeModelListener {
+public class EventPanel extends JPanel implements SWEKDownloadListener {
 
     private final SWEKGroup group;
 
@@ -29,7 +31,7 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener {
     public EventPanel(SWEKGroup _group) {
         group = _group;
         setLayout(new BorderLayout());
-        SWEKTreeModel.addListener(this);
+        SWEKDownloadManager.addListener(this);
 
         JTree tree = new JTree(new EventPanelModel(group));
         tree.setEditable(true);
@@ -48,7 +50,7 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener {
     }
 
     @Override
-    public void startedDownloadingGroup(SWEKGroup _group) {
+    public void startedDownload(SWEKGroup _group) {
         if (group.equals(_group) && !loadingTimer.isRunning()) {
             over.setView(loadingLabel);
             loadingTimer.start();
@@ -56,7 +58,7 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener {
     }
 
     @Override
-    public void stoppedDownloadingGroup(SWEKGroup _group) {
+    public void stoppedDownload(SWEKGroup _group) {
         if (group.equals(_group) && loadingTimer.isRunning()) {
             loadingTimer.stop();
             over.setView(null);
