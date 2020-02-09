@@ -120,7 +120,7 @@ class SWEKConfig {
     }
 
     private static SWEKSupplier parseSupplier(JSONObject obj, SWEKGroup group) {
-        return new SWEKSupplier(parseSupplierName(obj), parseSupplierDisplayName(obj), group, parseSupplierSource(obj), parseDbName(obj));
+        return new SWEKSupplier(parseSupplierName(obj), parseSupplierDisplayName(obj), parseSupplierSource(obj), parseDbName(obj), group);
     }
 
     private static String parseSupplierName(JSONObject obj) {

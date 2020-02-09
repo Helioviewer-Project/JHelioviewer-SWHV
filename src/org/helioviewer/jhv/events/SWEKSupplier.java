@@ -25,7 +25,6 @@ public class SWEKSupplier extends DefaultMutableTreeNode implements JHVTreeNode 
     private final String db;
     private final String key;
 
-    private final SWEKGroup group;
     private final SWEKSource source;
 
     private final JPanel panel;
@@ -34,11 +33,9 @@ public class SWEKSupplier extends DefaultMutableTreeNode implements JHVTreeNode 
 
     private static final HashMap<String, SWEKSupplier> suppliers = new HashMap<>();
 
-    public SWEKSupplier(String _supplierName, String _name, SWEKGroup _group, SWEKSource _source, String _db) {
+    public SWEKSupplier(String _supplierName, String _name, SWEKSource _source, String _db, SWEKGroup group) {
         supplierName = _supplierName;
         name = _name.intern();
-
-        group = _group;
         source = _source;
         db = _db;
 
@@ -56,7 +53,7 @@ public class SWEKSupplier extends DefaultMutableTreeNode implements JHVTreeNode 
         panel.add(checkBox, BorderLayout.LINE_START);
 
         if (group.containsFilter()) {
-            FilterDialog filterDialog = new FilterDialog(this);
+            FilterDialog filterDialog = new FilterDialog(group, this);
             JHVButton filterButton = new JHVButton("Filter");
             filterButton.addMouseListener(new MouseAdapter() {
                 @Override
@@ -90,7 +87,7 @@ public class SWEKSupplier extends DefaultMutableTreeNode implements JHVTreeNode 
     }
 
     public SWEKGroup getGroup() {
-        return group;
+        return (SWEKGroup) getParent();
     }
 
     public SWEKSource getSource() {
