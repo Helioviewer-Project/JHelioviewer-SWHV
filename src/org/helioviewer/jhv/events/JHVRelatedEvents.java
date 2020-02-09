@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.events.gui.info.SWEKEventInformationDialog;
+import org.helioviewer.jhv.events.info.SWEKEventInformationDialog;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 
 public class JHVRelatedEvents implements ClickableDrawable {

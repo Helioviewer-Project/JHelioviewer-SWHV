@@ -8,7 +8,7 @@ class JHVCacheColors {
     private static final int[] usedArray = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     private static int minValue = 0;
 
-    public static Color getNextColor() {
+    static Color getNextColor() {
         while (true) {
             for (int i = 0; i < hekColorArray.length; i++) {
                 if (usedArray[i] == minValue) {
@@ -20,7 +20,7 @@ class JHVCacheColors {
         }
     }
 
-    public static void resetColor(Color c) {
+    static void resetColor(Color c) {
         for (int i = 0; i < hekColorArray.length; i++) {
             if (hekColorArray[i].equals(c)) {
                 usedArray[i]--;
@@ -29,7 +29,7 @@ class JHVCacheColors {
         }
     }
 
-    public static void setColorUsed(Color c) {
+    static void setColorUsed(Color c) {
         for (int i = 0; i < hekColorArray.length; i++) {
             if (hekColorArray[i].equals(c)) {
                 usedArray[i]++;
