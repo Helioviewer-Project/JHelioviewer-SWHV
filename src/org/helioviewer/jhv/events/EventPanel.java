@@ -30,7 +30,7 @@ public class EventPanel extends JPanel implements SWEKDownloadListener {
         setLayout(new BorderLayout());
         SWEKDownloadManager.addListener(this);
 
-        JTree tree = new JTree(new EventPanelModel(group));
+        JTree tree = new JTree(group);
         tree.setEditable(true);
         tree.setShowsRootHandles(true);
         tree.setSelectionModel(null);

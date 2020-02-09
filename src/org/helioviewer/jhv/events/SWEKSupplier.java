@@ -10,13 +10,15 @@ import java.util.HashMap;
 
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.helioviewer.jhv.events.filter.FilterDialog;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.gui.interfaces.JHVTreeNode;
 
-public class SWEKSupplier implements JHVTreeNode {
+@SuppressWarnings("serial")
+public class SWEKSupplier extends DefaultMutableTreeNode implements JHVTreeNode {
 
     private final String supplierName;
     private final String name;
