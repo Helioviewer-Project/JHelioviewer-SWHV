@@ -2,6 +2,7 @@ package org.helioviewer.jhv.events;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Image;
 import java.util.HashMap;
 import java.util.List;
@@ -54,6 +55,7 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVTreeNode {
         panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
         panel.add(label, BorderLayout.LINE_START);
+        panel.setPreferredSize(new Dimension(250, label.getPreferredSize().height)); //!
         panel.add(over, BorderLayout.LINE_END);
     }
 

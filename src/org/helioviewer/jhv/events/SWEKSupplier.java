@@ -58,13 +58,13 @@ public class SWEKSupplier extends DefaultMutableTreeNode implements JHVTreeNode 
         if (group.containsFilter()) {
             FilterDialog filterDialog = new FilterDialog(this);
             JHVButton filterButton = new JHVButton("Filter");
-            filterButton.addActionListener(e -> filterDialog.setVisible(true));
             filterButton.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     Point pressedLocation = e.getLocationOnScreen();
                     Point windowLocation = new Point(pressedLocation.x, pressedLocation.y - filterDialog.getSize().height);
                     filterDialog.setLocation(windowLocation);
+                    filterDialog.setVisible(true);
                 }
             });
             panel.setPreferredSize(new Dimension(250, filterButton.getPreferredSize().height)); //!
