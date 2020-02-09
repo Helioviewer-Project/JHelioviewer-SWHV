@@ -9,6 +9,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 
+import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.events.SWEKOperand;
 import org.helioviewer.jhv.events.SWEKParameter;
 import org.helioviewer.jhv.events.SWEKSupplier;
@@ -59,9 +60,9 @@ class FilterPanelFactory {
         return spinner;
     }
 
-    static List<FilterPanel> createFilterPanel(SWEKSupplier supplier, FilterDialog filterDialog, boolean enabled) {
+    static List<FilterPanel> createFilterPanel(SWEKGroup group, SWEKSupplier supplier, FilterDialog filterDialog, boolean enabled) {
         List<FilterPanel> panels = new ArrayList<>();
-        for (SWEKParameter parameter : supplier.getGroup().getParameterList()) {
+        for (SWEKParameter parameter : group.getParameterList()) {
             if (parameter.getParameterFilter() != null) {
                 String filterType = parameter.getParameterFilter().getFilterType().toLowerCase();
                 switch (filterType) {
