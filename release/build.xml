@@ -41,7 +41,6 @@
         <sequential>
             <jar destfile="@{destfile}">
                 <zipgroupfileset dir="${lib}" includes="@{includes}"/>
-                <zipfileset src="../JHelioviewer.jar"/>
             </jar>
         </sequential>
     </macrodef>

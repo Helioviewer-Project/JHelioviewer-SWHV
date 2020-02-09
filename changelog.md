@@ -14,7 +14,7 @@
 - Support KCor dataset ([#114](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/114>))
 - Simplify datetime selection and use NLP for input time parsing
 - Request SOLO trajectory backdated 5 years
-- Use install4j for packaging installation
+- Use install4j for packaging installation; separate native libraries bundling per operating system
 - Support setting playback speed in time period per second
 - Play sequence of files as movie ([#119](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/119>))
 - Rework handling of threads throughout the program
