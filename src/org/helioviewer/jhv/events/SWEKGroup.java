@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.events;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Image;
 import java.util.HashMap;
@@ -7,10 +8,16 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JLayer;
+import javax.swing.JPanel;
+import javax.swing.JTree;
+import javax.swing.Timer;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.interfaces.JHVTreeNode;
 
 @SuppressWarnings("serial")
@@ -22,7 +29,12 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVTreeNode {
     private final List<SWEKParameter> parameterList;
 
     private final ImageIcon icon;
-    private final JLabel label;
+    private final JPanel panel;
+    private final JLabel loadingLabel = new JLabel("    ");
+    private final JLayer<JComponent> over = new JLayer<>(null, UITimer.busyIndicator);
+    // The timer handling the loading animation
+    private final Timer loadingTimer = new Timer(500, e -> over.repaint());
+
     private final boolean containsParameterFilter;
 
     private List<SWEKSupplier> suppliers;
@@ -34,11 +46,15 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVTreeNode {
         icon = _icon;
         containsParameterFilter = checkFilters(parameterList);
 
-        label = new JLabel(name);
-        label.setOpaque(false);
+        JLabel label = new JLabel(name);
         ComponentUtils.smallVariant(label);
         int size = label.getPreferredSize().height;
         label.setIcon(new ImageIcon(icon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH)));
+
+        panel = new JPanel(new BorderLayout());
+        panel.setOpaque(false);
+        panel.add(label, BorderLayout.LINE_START);
+        panel.add(over, BorderLayout.LINE_END);
     }
 
     public HashMap<String, String> getAllDatabaseFields() {
@@ -121,7 +137,29 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVTreeNode {
 
     @Override
     public Component getComponent() {
-        return label;
+        return panel;
+    }
+
+    private JTree tree;
+
+    void setTree(JTree _tree) {
+        tree = _tree;
+    }
+
+    void startedDownload() {
+        if (!loadingTimer.isRunning()) {
+            over.setView(loadingLabel);
+            loadingTimer.start();
+            tree.treeDidChange(); // notify to repaint
+        }
+    }
+
+    void stoppedDownload() {
+        if (loadingTimer.isRunning()) {
+            loadingTimer.stop();
+            over.setView(null);
+            tree.treeDidChange(); // notify to repaint
+        }
     }
 
 }

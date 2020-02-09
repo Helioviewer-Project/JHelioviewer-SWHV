@@ -31,17 +31,11 @@ class SWEKDownloadManager implements FilterManagerListener {
         }
     };
     private static final ArrayListMultimap<SWEKSupplier, SWEKDownloadWorker> workerMap = ArrayListMultimap.create();
-    private static final ArrayList<SWEKDownloadListener> listeners = new ArrayList<>();
 
     private static final SWEKDownloadManager instance = new SWEKDownloadManager();
 
     private SWEKDownloadManager() {
         FilterManager.addListener(this);
-    }
-
-    static void addListener(SWEKDownloadListener listener) {
-        if (!listeners.contains(listener))
-            listeners.add(listener);
     }
 
     private static void stopDownloadSupplier(SWEKSupplier supplier, boolean keepActive) {
@@ -50,7 +44,7 @@ class SWEKDownloadManager implements FilterManagerListener {
             JHVEventCache.intervalNotDownloaded(supplier, worker.getStart(), worker.getEnd());
         });
         JHVEventCache.removeSupplier(supplier, keepActive);
-        listeners.forEach(listener -> listener.stoppedDownload(supplier.getGroup()));
+        supplier.getGroup().stoppedDownload();
     }
 
     static void workerForcedToStop(SWEKSupplier supplier, SWEKDownloadWorker worker) {
@@ -61,7 +55,7 @@ class SWEKDownloadManager implements FilterManagerListener {
     static void workerFinished(SWEKSupplier supplier, SWEKDownloadWorker worker) {
         workerMap.remove(supplier, worker);
         if (workerMap.get(supplier).isEmpty())
-            listeners.forEach(listener -> listener.stoppedDownload(supplier.getGroup()));
+            supplier.getGroup().stoppedDownload();
     }
 
     static void activateSupplier(SWEKSupplier supplier, boolean active) {
@@ -94,7 +88,7 @@ class SWEKDownloadManager implements FilterManagerListener {
                     SWEKDownloadWorker worker = new SWEKDownloadWorker(supplier, intt.start, intt.end, params);
                     downloadEventPool.execute(worker);
                     workerMap.put(supplier, worker);
-                    listeners.forEach(listener -> listener.startedDownload(supplier.getGroup()));
+                    supplier.getGroup().startedDownload();
                 }
             }
         }
