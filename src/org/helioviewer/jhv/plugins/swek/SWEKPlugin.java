@@ -5,7 +5,7 @@ import java.awt.Component;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.events.gui.EventPanel;
+import org.helioviewer.jhv.events.EventPanel;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.timelines.Timelines;

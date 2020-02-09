@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.events.gui.info;
+package org.helioviewer.jhv.events.info;
 
 import javax.swing.table.AbstractTableModel;
 

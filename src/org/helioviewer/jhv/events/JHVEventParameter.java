@@ -22,43 +22,20 @@ public class JHVEventParameter {
 
     private String parameterSimpleDisplayValue;
 
-    /**
-     * Creates a JHVEvent parameter with a parameter name, parameter display
-     * name and parameter value.
-     *
-     * @param _parameterName        the parameter name
-     * @param _parameterDisplayName the parameter display name
-     * @param _parameterValue       the parameter value
-     */
     public JHVEventParameter(String _parameterName, String _parameterDisplayName, String _parameterValue) {
         parameterName = _parameterName.intern();
         parameterDisplayName = _parameterDisplayName.intern();
         parameterValue = _parameterValue.intern();
     }
 
-    /**
-     * Gets the parameter name.
-     *
-     * @return the name of the parameter
-     */
     public String getParameterName() {
         return parameterName;
     }
 
-    /**
-     * Gets the parameter display name.
-     *
-     * @return the parameter display name
-     */
     public String getParameterDisplayName() {
         return parameterDisplayName;
     }
 
-    /**
-     * Gets the value of the parameter.
-     *
-     * @return the value of the parameter
-     */
     public String getParameterValue() {
         return parameterValue;
     }

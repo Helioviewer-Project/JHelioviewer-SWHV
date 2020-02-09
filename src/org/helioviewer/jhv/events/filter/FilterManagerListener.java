@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.events.gui.filter;
+package org.helioviewer.jhv.events.filter;
 
 import org.helioviewer.jhv.events.SWEKSupplier;
 

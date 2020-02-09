@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.events.gui.filter;
+package org.helioviewer.jhv.events.filter;
 
 import java.math.BigDecimal;
 import java.math.MathContext;

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.events.gui;
+package org.helioviewer.jhv.events;
 
 import java.awt.BorderLayout;
 
@@ -10,9 +10,6 @@ import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.Timer;
 
-import org.helioviewer.jhv.events.SWEKDownloadListener;
-import org.helioviewer.jhv.events.SWEKDownloadManager;
-import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.base.JHVTreeCell;
 import org.json.JSONObject;

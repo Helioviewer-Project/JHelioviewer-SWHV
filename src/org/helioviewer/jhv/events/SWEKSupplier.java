@@ -11,7 +11,7 @@ import java.util.HashMap;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.events.gui.filter.FilterDialog;
+import org.helioviewer.jhv.events.filter.FilterDialog;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.gui.interfaces.JHVTreeNode;

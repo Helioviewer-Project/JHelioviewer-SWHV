@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.events;
 
-public interface SWEKDownloadListener {
+interface SWEKDownloadListener {
 
     void startedDownload(SWEKGroup group);
 
