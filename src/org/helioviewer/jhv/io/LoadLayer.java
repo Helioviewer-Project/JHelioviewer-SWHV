@@ -29,12 +29,12 @@ public class LoadLayer {
         return EventQueueCallbackExecutor.pool.submit(new LoadRemote(layer, req), new Callback(layer));
     }
 
-    public static Future<View> submit(@Nonnull ImageLayer layer, @Nonnull List<URI> uriList) {
-        return EventQueueCallbackExecutor.pool.submit(new LoadURI(layer, uriList), new Callback(layer));
+    public static void submit(@Nonnull ImageLayer layer, @Nonnull List<URI> uriList) {
+        EventQueueCallbackExecutor.pool.submit(new LoadURI(layer, uriList), new Callback(layer));
     }
 
-    public static Future<View> submitFITS(@Nonnull ImageLayer layer, @Nonnull URI uri) {
-        return EventQueueCallbackExecutor.pool.submit(new LoadFITS(layer, uri), new Callback(layer));
+    public static void submitFITS(@Nonnull ImageLayer layer, @Nonnull URI uri) {
+        EventQueueCallbackExecutor.pool.submit(new LoadFITS(layer, uri), new Callback(layer));
     }
 
     private static class LoadRemote implements Callable<View> {
