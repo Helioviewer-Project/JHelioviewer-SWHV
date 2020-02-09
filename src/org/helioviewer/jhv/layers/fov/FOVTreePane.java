@@ -46,6 +46,7 @@ public class FOVTreePane extends JScrollPane {
         tree.setRootVisible(false);
         tree.setEditable(true);
         tree.setShowsRootHandles(true);
+        tree.setSelectionModel(null);
         tree.setCellRenderer(new JHVTreeCell.Renderer());
         tree.setCellEditor(new JHVTreeCell.Editor());
         tree.setRowHeight(0); // force calculation of nodes heights
