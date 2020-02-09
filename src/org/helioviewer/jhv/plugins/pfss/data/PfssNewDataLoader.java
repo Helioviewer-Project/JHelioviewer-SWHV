@@ -4,7 +4,6 @@ import java.awt.EventQueue;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 
 import javax.annotation.Nonnull;
 
@@ -22,8 +21,8 @@ import com.google.common.util.concurrent.FutureCallback;
 
 public class PfssNewDataLoader implements Callable<Void> {
 
-    public static Future<Void> submit(long start, long end) {
-        return EventQueueCallbackExecutor.pool.submit(new PfssNewDataLoader(start, end), new Callback(start));
+    public static void submit(long start, long end) {
+        EventQueueCallbackExecutor.pool.submit(new PfssNewDataLoader(start, end), new Callback(start));
     }
 
     private final long start;

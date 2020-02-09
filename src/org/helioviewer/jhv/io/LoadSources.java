@@ -3,7 +3,6 @@ package org.helioviewer.jhv.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 
 import javax.annotation.Nonnull;
 
@@ -21,8 +20,8 @@ import com.google.common.util.concurrent.FutureCallback;
 
 class LoadSources implements Callable<DataSourcesParser> {
 
-    static Future<DataSourcesParser> submit(@Nonnull String server, @Nonnull Validator validator) {
-        return EventQueueCallbackExecutor.pool.submit(new LoadSources(server, validator), new Callback(server));
+    static void submit(@Nonnull String server, @Nonnull Validator validator) {
+        EventQueueCallbackExecutor.pool.submit(new LoadSources(server, validator), new Callback(server));
     }
 
     private final Validator validator;
