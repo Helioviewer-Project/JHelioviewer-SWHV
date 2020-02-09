@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVTreeNode {
 
     private final boolean containsParameterFilter;
 
-    private List<SWEKSupplier> suppliers;
+    private List<SWEKSupplier> suppliers = new ArrayList<>();
     private HashMap<String, String> databaseFields;
 
     public SWEKGroup(String _name, List<SWEKParameter> _parameterList, ImageIcon _icon) {

@@ -109,7 +109,7 @@ public class SWEKSupplier extends DefaultMutableTreeNode implements JHVTreeNode 
         checkBox.setSelected(b);
     }
 
-    public void internalActivate(boolean b) {
+    private void internalActivate(boolean b) {
         SWEKDownloadManager.activateSupplier(this, b);
     }
 
