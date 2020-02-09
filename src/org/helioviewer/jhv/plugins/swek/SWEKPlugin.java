@@ -1,27 +1,48 @@
 package org.helioviewer.jhv.plugins.swek;
 
-import java.awt.Component;
+import java.awt.BorderLayout;
 
-import javax.swing.BoxLayout;
 import javax.swing.JPanel;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.helioviewer.jhv.events.EventPanel;
 import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.components.base.JHVTreeCell;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.json.JSONObject;
 
 public class SWEKPlugin extends Plugin {
 
-    private static final JPanel swekPanel = new JPanel();
+    private static final JPanel swekPanel = new JPanel(new BorderLayout());
 
     private static final SWEKLayer layer = new SWEKLayer(null);
     private static final EventTimelineLayer etl = new EventTimelineLayer(null);
 
     public SWEKPlugin() {
         super("Space Weather Event Knowledgebase", "Visualize space weather relevant events");
-        swekPanel.setLayout(new BoxLayout(swekPanel, BoxLayout.PAGE_AXIS));
-        SWEKConfig.load().forEach(group -> swekPanel.add(new EventPanel(group)));
+
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
+        DefaultTreeModel dtm = new DefaultTreeModel(root);
+        SWEKConfig.load().forEach(g -> {
+            root.add(g);
+            g.setModel(dtm);
+        });
+
+        JTree tree = new JTree(dtm);
+        tree.setRootVisible(false);
+        tree.setEditable(true);
+        tree.setShowsRootHandles(true);
+        tree.setSelectionModel(null);
+        tree.setCellRenderer(new JHVTreeCell.Renderer());
+        tree.setCellEditor(new JHVTreeCell.Editor());
+        tree.setRowHeight(0); // force calculation of nodes heights
+        for (int i = 0; i < tree.getRowCount(); i++) {
+            tree.expandRow(i);
+        }
+
+        swekPanel.add(tree);
     }
 
     @Override
@@ -42,20 +63,12 @@ public class SWEKPlugin extends Plugin {
 
     @Override
     public void saveState(JSONObject jo) {
-        for (Component c : swekPanel.getComponents()) {
-            if (c instanceof EventPanel) {
-                ((EventPanel) c).serialize(jo);
-            }
-        }
+        // functionality to be restored later
     }
 
     @Override
     public void loadState(JSONObject jo) {
-        for (Component c : swekPanel.getComponents()) {
-            if (c instanceof EventPanel) {
-                ((EventPanel) c).deserialize(jo);
-            }
-        }
+        // functionality to be restored later
     }
 
 }

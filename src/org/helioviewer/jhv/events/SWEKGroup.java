@@ -14,9 +14,9 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayer;
 import javax.swing.JPanel;
-import javax.swing.JTree;
 import javax.swing.Timer;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.UITimer;
@@ -144,17 +144,17 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVTreeNode {
         return panel;
     }
 
-    private JTree tree;
+    private DefaultTreeModel model;
 
-    void setTree(JTree _tree) {
-        tree = _tree;
+    public void setModel(DefaultTreeModel _model) {
+        model = _model;
     }
 
     void startedDownload() {
         if (!loadingTimer.isRunning()) {
             over.setView(loadingLabel);
             loadingTimer.start();
-            tree.treeDidChange(); // notify to repaint
+            model.nodeChanged(this); // notify to repaint
         }
     }
 
@@ -162,7 +162,7 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVTreeNode {
         if (loadingTimer.isRunning()) {
             loadingTimer.stop();
             over.setView(null);
-            tree.treeDidChange(); // notify to repaint
+            model.nodeChanged(this); // notify to repaint
         }
     }
 
