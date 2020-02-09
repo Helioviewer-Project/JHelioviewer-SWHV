@@ -55,8 +55,9 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVTreeNode {
         panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
         panel.add(label, BorderLayout.LINE_START);
-        panel.setPreferredSize(new Dimension(250, label.getPreferredSize().height)); //!
+        panel.setPreferredSize(new Dimension(250, size)); //!
         panel.add(over, BorderLayout.LINE_END);
+        ComponentUtils.smallVariant(panel);
     }
 
     public HashMap<String, String> getAllDatabaseFields() {
