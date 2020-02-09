@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 
-public class URIDecoder implements Callable<ImageBuffer> {
+class URIDecoder implements Callable<ImageBuffer> {
 
     private final URI uri;
     private final URIImageReader reader;

@@ -52,8 +52,7 @@ public class PfssNewDataLoader implements Callable<Void> {
             HashMap<Long, String> urls = new HashMap<>();
 
             // may come from http cache
-            try (NetClient nc = NetClient.of(url)) {
-                BufferedSource source = nc.getSource();
+            try (NetClient nc = NetClient.of(url); BufferedSource source = nc.getSource()) {
                 String line;
                 while ((line = source.readUtf8Line()) != null) {
                     String[] splitted = Regex.Space.split(line);

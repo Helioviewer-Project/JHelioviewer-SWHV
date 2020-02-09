@@ -9,7 +9,7 @@ import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings("serial")
-public class CloseButtonPanel extends ButtonPanel {
+class CloseButtonPanel extends ButtonPanel {
 
     public CloseButtonPanel(StandardDialog dialog) {
         AbstractAction close = new CloseAction(dialog);

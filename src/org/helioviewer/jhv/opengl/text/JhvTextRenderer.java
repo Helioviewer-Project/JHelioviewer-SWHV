@@ -137,27 +137,27 @@ public class JhvTextRenderer {
     private static final int kVertsPerQuad = 6;
     private static final int kQuadsPerBuffer = 100;
     private static final int kTotalBufferSizeVerts = kQuadsPerBuffer * kVertsPerQuad;
-    final Font font;
+    private final Font font;
     private final boolean antialiased;
     private final boolean useFractionalMetrics;
 
-    RectanglePacker packer;
+    private RectanglePacker packer;
     private boolean haveMaxSize;
-    final RenderDelegate renderDelegate;
+    private final RenderDelegate renderDelegate;
     private JhvTextureRenderer cachedBackingStore;
     private Graphics2D cachedGraphics;
     private FontRenderContext cachedFontRenderContext;
-    final GlyphProducer glyphProducer;
+    private final GlyphProducer glyphProducer;
 
     //private int numRenderCycles;
 
     // Need to keep track of whether we're in a beginRendering() /
     // endRendering() cycle so we can re-enter the exact same state if
     // we have to reallocate the backing store
-    boolean inBeginEndPair;
-    boolean isOrthoMode;
-    int beginRenderingWidth;
-    int beginRenderingHeight;
+    private boolean inBeginEndPair;
+    private boolean isOrthoMode;
+    private int beginRenderingWidth;
+    private int beginRenderingHeight;
 
     /**
      * Creates a new TextRenderer with the given Font, specified font
@@ -218,7 +218,7 @@ public class JhvTextRenderer {
      * #beginRendering beginRendering} / {@link #endRendering
      * endRendering} pairs.
      */
-    FontRenderContext getFontRenderContext() {
+    private FontRenderContext getFontRenderContext() {
         if (cachedFontRenderContext == null) {
             cachedFontRenderContext = getGraphics2D().getFontRenderContext();
         }
@@ -343,7 +343,7 @@ public class JhvTextRenderer {
     // Internals only below this point
     //
 
-    static Rectangle2D preNormalize(Rectangle2D src) {
+    private static Rectangle2D preNormalize(Rectangle2D src) {
         // Need to round to integer coordinates
         // Also give ourselves a little slop around the reported
         // bounds of glyphs because it looks like neither the visual
@@ -355,7 +355,7 @@ public class JhvTextRenderer {
         return new Rectangle2D.Double(minX, minY, maxX - minX, maxY - minY);
     }
 
-    Rectangle2D normalize(Rectangle2D src) {
+    private Rectangle2D normalize(Rectangle2D src) {
         // Give ourselves a boundary around each entity on the backing
         // store in order to prevent bleeding of nearby Strings due to
         // the fact that we use linear filtering
@@ -371,7 +371,7 @@ public class JhvTextRenderer {
                 (int) Math.ceil(src.getHeight()) + 2 * boundary);
     }
 
-    JhvTextureRenderer getBackingStore() {
+    private JhvTextureRenderer getBackingStore() {
         JhvTextureRenderer renderer = (JhvTextureRenderer) packer.getBackingStore();
         if (renderer != cachedBackingStore) {
             // Backing store changed since last time; discard any cached Graphics2D
@@ -385,7 +385,7 @@ public class JhvTextRenderer {
         return cachedBackingStore;
     }
 
-    Graphics2D getGraphics2D() {
+    private Graphics2D getGraphics2D() {
         JhvTextureRenderer renderer = getBackingStore();
         if (cachedGraphics == null) {
             cachedGraphics = renderer.createGraphics();
@@ -429,7 +429,7 @@ public class JhvTextRenderer {
 */
     }
 
-    static void internal_beginRendering(boolean ortho, int width, int height) {
+    private static void internal_beginRendering(boolean ortho, int width, int height) {
         if (ortho) {
             GL2 gl = (GL2) GLContext.getCurrentGL();
             gl.glDisable(GL2.GL_DEPTH_TEST);
@@ -441,7 +441,7 @@ public class JhvTextRenderer {
         }
     }
 
-    static void internal_endRendering(boolean ortho) {
+    private static void internal_endRendering(boolean ortho) {
         if (ortho) {
             GL2 gl = (GL2) GLContext.getCurrentGL();
             gl.glEnable(GL2.GL_DEPTH_TEST);
@@ -942,10 +942,10 @@ public class JhvTextRenderer {
     private static final GLSLTexture glslTexture = new GLSLTexture();
     private float[] textColor = Colors.WhiteFloat;
 
-    int outstandingGlyphsVerticesPipeline = 0;
-    final BufCoord vexBuf = new BufCoord(kTotalBufferSizeVerts);
+    private int outstandingGlyphsVerticesPipeline = 0;
+    private final BufCoord vexBuf = new BufCoord(kTotalBufferSizeVerts);
 
-    void drawVertices() {
+    private void drawVertices() {
         if (outstandingGlyphsVerticesPipeline > 0) {
             GL2 gl = (GL2) GLContext.getCurrentGL();
             getBackingStore().bind(gl);

@@ -11,7 +11,7 @@ public class TableValue {
     public final int col;
     public final Object value;
 
-    TableValue(int _row, int _col, Object _value) {
+    private TableValue(int _row, int _col, Object _value) {
         row = _row;
         col = _col;
         value = _value;

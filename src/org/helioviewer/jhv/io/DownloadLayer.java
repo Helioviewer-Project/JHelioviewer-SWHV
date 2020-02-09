@@ -53,10 +53,8 @@ public class DownloadLayer implements Callable<File> {
 
     @Override
     public File call() throws Exception {
-        try (NetClient nc = NetClient.of(uri); BufferedSink sink = Okio.buffer(Okio.sink(dstFile))) {
+        try (NetClient nc = NetClient.of(uri); BufferedSource source = nc.getSource(); BufferedSink sink = Okio.buffer(Okio.sink(dstFile))) {
             long count = 0, contentLength = nc.getContentLength();
-
-            BufferedSource source = nc.getSource();
             long bytesRead, totalRead = 0;
             Buffer sinkBuffer = sink.getBuffer();
             while ((bytesRead = source.read(sinkBuffer, BUFSIZ)) != -1) {

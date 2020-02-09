@@ -72,6 +72,7 @@ public class ManyView implements View {
         frameMap.indexedValue(targetFrame).view.decode(viewpoint, pixFactor, factor);
     }
 
+    @Nullable
     @Override
     public URI getURI() {
         return null;

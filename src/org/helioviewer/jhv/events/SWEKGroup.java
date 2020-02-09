@@ -100,7 +100,7 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVTreeNode {
     }
 
     public void addSupplier(SWEKSupplier supplier) {
-        super.add(supplier);
+        add(supplier);
         suppliers.add(supplier);
     }
 
