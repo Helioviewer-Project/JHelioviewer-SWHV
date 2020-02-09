@@ -95,8 +95,11 @@ class SWEKConfig {
 
     private static SWEKGroup parseGroup(JSONObject obj) {
         SWEKGroup group = new SWEKGroup(parseEventName(obj), parseParameterList(obj), parseEventIcon(obj));
-        List<SWEKSupplier> suppliers = parseSuppliers(obj, group);
-        group.setSuppliers(suppliers);
+        JSONArray suppliersArray = obj.getJSONArray("suppliers");
+        int len = suppliersArray.length();
+        for (int i = 0; i < len; i++) {
+            group.add(parseSupplier(suppliersArray.getJSONObject(i), group));
+        }
         return group;
     }
 
@@ -114,16 +117,6 @@ class SWEKConfig {
 
     private static String parseEventName(JSONObject obj) {
         return obj.getString("event_name");
-    }
-
-    private static List<SWEKSupplier> parseSuppliers(JSONObject obj, SWEKGroup group) {
-        JSONArray suppliersArray = obj.getJSONArray("suppliers");
-        int len = suppliersArray.length();
-        List<SWEKSupplier> suppliers = new ArrayList<>(len);
-        for (int i = 0; i < len; i++) {
-            suppliers.add(parseSupplier(suppliersArray.getJSONObject(i), group));
-        }
-        return suppliers;
     }
 
     private static SWEKSupplier parseSupplier(JSONObject obj, SWEKGroup group) {

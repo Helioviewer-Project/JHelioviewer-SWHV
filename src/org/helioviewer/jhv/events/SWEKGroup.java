@@ -98,9 +98,9 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVTreeNode {
         return suppliers;
     }
 
-    public void setSuppliers(List<SWEKSupplier> _suppliers) {
-        suppliers = _suppliers;
-        suppliers.forEach(this::add);
+    void add(SWEKSupplier supplier) {
+        super.add(supplier);
+        suppliers.add(supplier);
     }
 
     public String getName() {
