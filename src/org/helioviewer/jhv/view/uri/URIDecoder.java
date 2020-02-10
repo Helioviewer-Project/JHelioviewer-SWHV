@@ -12,7 +12,7 @@ class URIDecoder implements Callable<ImageBuffer> {
     private final URI uri;
     private final URIImageReader reader;
 
-    public URIDecoder(URI _uri, URIImageReader _reader) {
+    URIDecoder(URI _uri, URIImageReader _reader) {
         uri = _uri;
         reader = _reader;
     }

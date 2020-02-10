@@ -41,7 +41,6 @@ public class SWEKPlugin extends Plugin {
         for (int i = 0; i < tree.getRowCount(); i++) {
             tree.expandRow(i);
         }
-
         swekPanel.add(tree);
     }
 
