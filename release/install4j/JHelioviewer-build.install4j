@@ -48,13 +48,14 @@
         <file path="./resources/JHV_icon.png" />
       </iconImageFiles>
     </launcher>
-    <launcher name="Linux_dis" id="296">
+    <launcher name="Linux_dis" id="296" menuName="JHelioviewer">
       <executable name="jhelioviewer" iconSet="true" executableDir="bin" redirectStderr="false" executableMode="gui" singleInstance="true" dpiAware="false" />
-      <java mainClass="org.helioviewer.jhv.JHelioviewer" vmParameters="-Xms1024m">
+      <java mainClass="org.helioviewer.jhv.JHelioviewer" vmParameters="-Xms2g">
         <classPath>
-          <directory location="classes" />
-          <scanDirectory location="lib" />
-          <directory location="resources" />
+          <archive location="classes/natives-linux.jar" failOnError="false" />
+          <archive location="classes/natives-macos.jar" failOnError="false" />
+          <archive location="classes/natives-windows.jar" failOnError="false" />
+          <archive location="classes/JHelioviewer.jar" failOnError="false" />
         </classPath>
         <nativeLibraryDirectories>
           <directory name="bin" />
@@ -1122,7 +1123,7 @@ return true;</property>
       </exclude>
       <postInstallScript>${compiler:file("./resources/linux-post-install.sh")}</postInstallScript>
     </linuxDeb>
-    <linuxRPM name="Linux RPM 64 bit" id="270" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_amd64">
+    <linuxRPM name="Linux RPM 64 bit" id="270" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_amd64" arch="amd64">
       <excludedLaunchers>
         <launcher id="24" />
       </excludedLaunchers>
