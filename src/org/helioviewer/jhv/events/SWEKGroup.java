@@ -32,10 +32,7 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVTreeNode {
 
     private final ImageIcon icon;
     private final JPanel panel;
-    private final JLabel loadingLabel = new JLabel("    ");
     private final JLayer<JComponent> over = new JLayer<>(null, UITimer.busyIndicator);
-    // The timer handling the loading animation
-    private final Timer loadingTimer = new Timer(500, e -> over.repaint());
 
     private final boolean containsParameterFilter;
 
@@ -149,6 +146,13 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVTreeNode {
     public void setModel(DefaultTreeModel _model) {
         model = _model;
     }
+
+    private final JLabel loadingLabel = new JLabel("    ");
+    // The timer handling the loading animation
+    private final Timer loadingTimer = new Timer(500, e -> {
+        over.repaint();
+        model.nodeChanged(this); // notify to repaint
+    });
 
     void startedDownload() {
         if (!loadingTimer.isRunning()) {
