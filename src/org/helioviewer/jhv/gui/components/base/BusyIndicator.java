@@ -17,14 +17,15 @@ public class BusyIndicator extends LayerUI<JComponent> {
     public void paint(Graphics g1, JComponent c) {
         super.paint(g1, c);
 
-        Graphics2D g = (Graphics2D) g1.create();
         int w = c.getWidth();
         int h = c.getHeight();
-
         double s = Math.min(w, h) / 4.;
+        if (s < 1)
+            return;
         double cx = w / 2.;
         double cy = h / 2.;
 
+        Graphics2D g = (Graphics2D) g1.create();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
         g.setStroke(new BasicStroke((float) (s / 4), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
