@@ -1,8 +1,11 @@
 package org.helioviewer.jhv.gui.dialogs;
 
+import java.awt.BorderLayout;
+
 import javax.annotation.Nullable;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.JHVGlobals;
@@ -32,10 +35,13 @@ public class TextDialog extends StandardDialog implements ShowableDialog {
     @Override
     public JComponent createContentPanel() {
         HTMLPane pane = new HTMLPane();
+        pane.setOpaque(false);
         pane.setText(text);
         pane.addHyperlinkListener(JHVGlobals.hyperOpenURL);
-        pane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        return new JScrollPane(pane);
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        panel.add(pane);
+        return new JScrollPane(panel);
     }
 
     @Nullable
