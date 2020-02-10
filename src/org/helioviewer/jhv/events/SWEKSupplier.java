@@ -64,7 +64,7 @@ public class SWEKSupplier extends DefaultMutableTreeNode implements JHVTreeNode 
                     filterDialog.setVisible(true);
                 }
             });
-            panel.setPreferredSize(new Dimension(250, filterButton.getPreferredSize().height)); //!
+            panel.setPreferredSize(new Dimension(SWEKGroup.RIGHT_ALIGNMENT, filterButton.getPreferredSize().height)); //!
             panel.add(filterButton, BorderLayout.LINE_END);
         }
         ComponentUtils.smallVariant(panel);

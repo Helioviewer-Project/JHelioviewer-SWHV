@@ -25,6 +25,8 @@ import org.helioviewer.jhv.gui.interfaces.JHVTreeNode;
 @SuppressWarnings("serial")
 public class SWEKGroup extends DefaultMutableTreeNode implements JHVTreeNode {
 
+    static final int RIGHT_ALIGNMENT = 300;
+
     private static List<SWEKRelatedEvents> swekrelEvents;
 
     private final String name;
@@ -53,7 +55,7 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVTreeNode {
         panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
         panel.add(label, BorderLayout.LINE_START);
-        panel.setPreferredSize(new Dimension(250, size)); //!
+        panel.setPreferredSize(new Dimension(RIGHT_ALIGNMENT, size)); //!
         panel.add(over, BorderLayout.LINE_END);
         ComponentUtils.smallVariant(panel);
     }
