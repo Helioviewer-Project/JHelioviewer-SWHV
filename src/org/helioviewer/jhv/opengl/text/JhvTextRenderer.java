@@ -718,7 +718,7 @@ public class JhvTextRenderer {
 
     private class SurfacePut implements VertexPut {
 
-        private static final float epsilon = 0.07f;
+        private static final float epsilon = 0.125f; // should depend on triangle size
 
         @Override
         public void put(float x, float y, float z, float w, float c0, float c1) {
