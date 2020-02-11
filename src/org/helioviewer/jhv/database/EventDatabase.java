@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.concurrent.Callable;
 import java.util.zip.GZIPInputStream;
 
 import javax.annotation.Nullable;
+import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.interval.Interval;
@@ -377,7 +379,7 @@ public class EventDatabase {
         return _getOtherRelations(id, jhvEventType, similartype, full, false);
     }
 
-    //Given an event id and its type, return all related events. If similartype is true, return only related events having the same type.
+    // Given an event id and its type, return all related events. If similartype is true, return only related events having the same type.
     private static List<JHVEvent> _getOtherRelations(int id, SWEKSupplier jhvEventType, boolean similartype, boolean full, boolean is_dbthread) throws SQLException {
         SWEKGroup group = jhvEventType.getGroup();
         ArrayList<JHVEvent> nEvents = new ArrayList<>();
@@ -389,13 +391,15 @@ public class EventDatabase {
                 for (SWEKRelatedOn swon : relon) {
                     String f = swon.parameterFrom.getParameterName().toLowerCase();
                     String w = swon.parameterWith.getParameterName().toLowerCase();
+
                     SWEKGroup reType = re.getRelatedWith();
-                    for (SWEKSupplier supplier : reType.getSuppliers()) {
-                        if (similartype == (supplier == jhvEventType))
-                            if (is_dbthread)
-                                jsonEvents.addAll(rel2prog(id, jhvEventType, supplier, f, w));
-                            else
-                                jsonEvents.addAll(relations2Program(id, jhvEventType, supplier, f, w));
+                    for (Enumeration<TreeNode> e = reType.children(); e.hasMoreElements(); ) {
+                        SWEKSupplier supplier = (SWEKSupplier) e.nextElement();
+                        if (similartype == (supplier == jhvEventType)) {
+                            jsonEvents.addAll(is_dbthread
+                                    ? rel2prog(id, jhvEventType, supplier, f, w)
+                                    : relations2Program(id, jhvEventType, supplier, f, w));
+                        }
                     }
                 }
             }
@@ -405,13 +409,15 @@ public class EventDatabase {
                 for (SWEKRelatedOn swon : relon) {
                     String f = swon.parameterFrom.getParameterName().toLowerCase();
                     String w = swon.parameterWith.getParameterName().toLowerCase();
+
                     SWEKGroup reType = re.getGroup();
-                    for (SWEKSupplier supplier : reType.getSuppliers()) {
-                        if (similartype == (supplier == jhvEventType))
-                            if (is_dbthread)
-                                jsonEvents.addAll(rel2prog(id, supplier, jhvEventType, f, w));
-                            else
-                                jsonEvents.addAll(relations2Program(id, supplier, jhvEventType, f, w));
+                    for (Enumeration<TreeNode> e = reType.children(); e.hasMoreElements(); ) {
+                        SWEKSupplier supplier = (SWEKSupplier) e.nextElement();
+                        if (similartype == (supplier == jhvEventType)) {
+                            jsonEvents.addAll(is_dbthread
+                                    ? rel2prog(id, supplier, jhvEventType, f, w)
+                                    : relations2Program(id, supplier, jhvEventType, f, w));
+                        }
                     }
                 }
             }
