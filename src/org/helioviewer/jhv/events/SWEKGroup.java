@@ -31,20 +31,29 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVTreeNode {
 
     private final String name;
     private final List<SWEKParameter> parameterList;
-
     private final ImageIcon icon;
-    private final JPanel panel;
-    private final JLayer<JComponent> over = new JLayer<>(null, UITimer.busyIndicator);
+    private final DefaultTreeModel treeModel;
 
     private final boolean containsParameterFilter;
+
+    private final JPanel panel;
+    private final JLayer<JComponent> over = new JLayer<>(null, UITimer.busyIndicator);
+    private final JLabel loadingLabel = new JLabel("    ");
+    private final Timer loadingTimer; // handles the loading animation
 
     private final List<SWEKSupplier> suppliers = new ArrayList<>();
     private HashMap<String, String> databaseFields;
 
-    public SWEKGroup(String _name, List<SWEKParameter> _parameterList, ImageIcon _icon) {
+    public SWEKGroup(String _name, List<SWEKParameter> _parameterList, ImageIcon _icon, DefaultTreeModel _treeModel) {
         name = _name.intern();
         parameterList = _parameterList;
         icon = _icon;
+        treeModel = _treeModel;
+
+        loadingTimer = new Timer(500, e -> {
+            over.repaint();
+            treeModel.nodeChanged(this); // notify to repaint
+        });
         containsParameterFilter = checkFilters(parameterList);
 
         JLabel label = new JLabel(name);
@@ -143,24 +152,11 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVTreeNode {
         return panel;
     }
 
-    private DefaultTreeModel model;
-
-    public void setModel(DefaultTreeModel _model) {
-        model = _model;
-    }
-
-    private final JLabel loadingLabel = new JLabel("    ");
-    // The timer handling the loading animation
-    private final Timer loadingTimer = new Timer(500, e -> {
-        over.repaint();
-        model.nodeChanged(this); // notify to repaint
-    });
-
     void startedDownload() {
         if (!loadingTimer.isRunning()) {
             over.setView(loadingLabel);
             loadingTimer.start();
-            model.nodeChanged(this); // notify to repaint
+            treeModel.nodeChanged(this); // notify to repaint
         }
     }
 
@@ -168,7 +164,7 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVTreeNode {
         if (loadingTimer.isRunning()) {
             loadingTimer.stop();
             over.setView(null);
-            model.nodeChanged(this); // notify to repaint
+            treeModel.nodeChanged(this); // notify to repaint
         }
     }
 
