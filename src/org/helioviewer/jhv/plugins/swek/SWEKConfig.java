@@ -105,7 +105,7 @@ class SWEKConfig {
         JSONArray suppliersArray = obj.getJSONArray("suppliers");
         int len = suppliersArray.length();
         for (int i = 0; i < len; i++) {
-            group.addSupplier(parseSupplier(suppliersArray.getJSONObject(i), group));
+            group.add(parseSupplier(suppliersArray.getJSONObject(i), group));
         }
         return group;
     }
