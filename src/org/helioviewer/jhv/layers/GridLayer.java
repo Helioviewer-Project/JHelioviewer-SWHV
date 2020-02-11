@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.layers;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.text.DecimalFormat;
 import java.util.List;
@@ -9,6 +10,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.base.scale.GridType;
 import org.helioviewer.jhv.camera.Camera;
@@ -18,6 +20,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
@@ -27,6 +30,8 @@ import org.json.JSONObject;
 import com.jogamp.opengl.GL2;
 
 public class GridLayer extends AbstractLayer {
+
+    private static boolean odeIsDone;
 
     private static final double RADIAL_UNIT = Sun.Radius;
     private static final double RADIAL_STEP = 15;
@@ -132,6 +137,8 @@ public class GridLayer extends AbstractLayer {
             GridMath.initGrid(gl, gridLine, lonStep, latStep);
             gridNeedsInit = false;
         }
+        if (!odeIsDone)
+            return;
 
         if (showAxis)
             axesLine.render(gl, vp.aspect, LINEWIDTH_AXES);
@@ -387,5 +394,98 @@ public class GridLayer extends AbstractLayer {
         gridType = _gridType;
         lonLabels = GridLabel.makeLonLabels(gridType, lonStep);
     }
+
+
+    private static int shift = 0;
+
+    @Override
+    public void renderFloat(Camera camera, Viewport vp, GL2 gl) {
+        if (!isVisible[vp.idx])
+            return;
+        if (odeIsDone)
+            return;
+
+        int scale = 100;
+        int delta = (int) (vp.width / 4.);
+        int size = (int) (vp.height * (scale * 0.01 * 0.015));
+        shift += 3 * size;
+
+        if (GLInfo.pixelScale[1] == 1) //! nasty
+            size *= 2;
+
+        int y = 0;
+
+        JhvTextRenderer renderer = GLText.getRenderer(size);
+        renderer.beginRendering(vp.width, vp.height);
+        for (int i = 0; i < ode.length; i++) {
+            String text = ode[i];
+            renderer.setColor(colors[i % 6]);
+            y = shift - 3 * i * size;
+            renderer.draw(text, delta, y);
+        }
+        renderer.endRendering();
+
+        try {
+            Thread.sleep(500);
+        } catch (Exception ignore) {
+        }
+
+        if (y > vp.height + 100) {
+            odeIsDone = true;
+        }
+        MovieDisplay.display();
+    }
+
+    private static final float[][] colors = new float[][]{
+            Colors.floats(new Color(255, 235, 0), 1),
+            Colors.floats(new Color(252, 0, 25), 1),
+            Colors.floats(new Color(1, 255, 79), 1),
+            Colors.floats(new Color(255, 1, 215), 1),
+            Colors.floats(new Color(86, 0, 204), 1),
+            Colors.floats(new Color(0, 237, 245), 1)
+    };
+
+    private static final String[] ode = {
+            "Ode to Orbiter 2020",
+            " ",
+            "It's been a journey getting here -",
+            "now you're about to disappear!",
+            "Sent out to explore our dear star,",
+            "while we watch proudly from afar.",
+            " ",
+            "Go carry all our greatest hopes,",
+            "untangling twisted flux ropes,",
+            "reach up to hidden stellar poles,",
+            "and peer in those coronal holes.",
+            " ",
+            "Call up some divine providence",
+            "for each erupting prominence,",
+            "listening without apology,",
+            "to helioseimology.",
+            " ",
+            "Watch every blazing plasma arc,",
+            "found framed against the deepest dark,",
+            "feeling each spinning Alfvén wave,",
+            "amidst the storms where you stand brave.",
+            " ",
+            "Shed light on solar mysteries:",
+            "coronal heating if you please!",
+            "And what lies secret unawares -",
+            "some global hidden nanoflares?",
+            " ",
+            "Gather data for articles,",
+            "on energetic particles,",
+            "and try to give us just a trace",
+            "of how they then fill all of space.",
+            " ",
+            "Some of us have to say goodbye,",
+            "waving you off into the sky,",
+            "others know work has just begun,",
+            "on fathoming our glorious Sun!",
+            " ",
+            "Congratulations Team Solar Orbiter!",
+            " ",
+            "Copyright © 2020 Max"
+    };
 
 }
