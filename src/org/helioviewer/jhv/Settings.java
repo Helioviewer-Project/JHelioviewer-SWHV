@@ -32,7 +32,7 @@ public class Settings {
         try (BufferedReader reader = Files.newBufferedReader(userPath, StandardCharsets.UTF_8)) {
             settings.load(reader);
         } catch (Exception e) {
-            Log.error("Settings > Could not load settings", e);
+            Log.warn("Settings > Could not load settings");
         }
 
         if (getProperty("path.local") == null)
