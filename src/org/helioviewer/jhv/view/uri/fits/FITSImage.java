@@ -56,14 +56,14 @@ public class FITSImage implements URIImageReader {
             }
             for (BasicHDU<?> hdu : hdus) {
                 if (hdu instanceof ImageHDU) {
-                    return readHDU((ImageHDU) hdu);
+                    return readHDU(hdu);
                 }
             }
         }
         throw new Exception("No image found");
     }
 
-    private static String readHeader(ImageHDU hdu) {
+    private static String readHeader(BasicHDU<?> hdu) {
         return getHeaderAsXML(hdu.getHeader());
     }
 
@@ -73,19 +73,19 @@ public class FITSImage implements URIImageReader {
     private static float getValue(int bpp, Object lineData, int i, long blank, double bzero, double bscale) {
         double v = ImageBuffer.BAD_PIXEL;
         switch (bpp) {
-            case ImageHDU.BITPIX_SHORT:
+            case BasicHDU.BITPIX_SHORT:
                 v = ((short[]) lineData)[i];
                 break;
-            case ImageHDU.BITPIX_INT:
+            case BasicHDU.BITPIX_INT:
                 v = ((int[]) lineData)[i];
                 break;
-            case ImageHDU.BITPIX_LONG:
+            case BasicHDU.BITPIX_LONG:
                 v = ((long[]) lineData)[i];
                 break;
-            case ImageHDU.BITPIX_FLOAT:
+            case BasicHDU.BITPIX_FLOAT:
                 v = ((float[]) lineData)[i];
                 break;
-            case ImageHDU.BITPIX_DOUBLE:
+            case BasicHDU.BITPIX_DOUBLE:
                 v = ((double[]) lineData)[i];
                 break;
         }
@@ -131,7 +131,7 @@ public class FITSImage implements URIImageReader {
         }
     */
 
-    private static ImageBuffer readHDU(ImageHDU hdu) throws Exception {
+    private static ImageBuffer readHDU(BasicHDU<?> hdu) throws Exception {
         int[] axes = hdu.getAxes();
         if (axes == null || axes.length != 2)
             throw new Exception("Only 2D FITS files supported");
@@ -150,7 +150,7 @@ public class FITSImage implements URIImageReader {
         } catch (Exception ignore) {
         }
 
-        if (bpp == ImageHDU.BITPIX_BYTE) {
+        if (bpp == BasicHDU.BITPIX_BYTE) {
             byte[][] inData = (byte[][]) pixelData;
             byte[] outData = new byte[width * height];
             for (int j = 0; j < height; j++) {
@@ -183,10 +183,10 @@ public class FITSImage implements URIImageReader {
         short[] outData = new short[width * height];
         float[] lut = new float[65536];
         switch (bpp) {
-            case ImageHDU.BITPIX_SHORT:
-            case ImageHDU.BITPIX_INT:
-            case ImageHDU.BITPIX_LONG:
-            case ImageHDU.BITPIX_FLOAT: {
+            case BasicHDU.BITPIX_SHORT:
+            case BasicHDU.BITPIX_INT:
+            case BasicHDU.BITPIX_LONG:
+            case BasicHDU.BITPIX_FLOAT: {
                 double scale = 65535. / Math.pow(range, GAMMA);
                 for (int j = 0; j < height; j++) {
                     Object lineData = pixelData[j];
@@ -199,7 +199,7 @@ public class FITSImage implements URIImageReader {
                 }
                 break;
             }
-            case ImageHDU.BITPIX_DOUBLE: {
+            case BasicHDU.BITPIX_DOUBLE: {
                 double scale = 65535. / Math.log1p(range);
                 for (int j = 0; j < height; j++) {
                     Object lineData = pixelData[j];
