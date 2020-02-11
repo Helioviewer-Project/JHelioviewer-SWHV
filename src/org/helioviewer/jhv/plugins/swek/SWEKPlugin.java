@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
 import javax.swing.JTree;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.base.JHVTreeCell;
@@ -23,14 +21,7 @@ public class SWEKPlugin extends Plugin {
     public SWEKPlugin() {
         super("Space Weather Event Knowledgebase", "Visualize space weather relevant events");
 
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
-        DefaultTreeModel dtm = new DefaultTreeModel(root);
-        SWEKConfig.load().forEach(g -> {
-            root.add(g);
-            g.setModel(dtm);
-        });
-
-        JTree tree = new JTree(dtm);
+        JTree tree = new JTree(SWEKConfig.load());
         tree.setRootVisible(false);
         tree.setEditable(true);
         tree.setShowsRootHandles(true);

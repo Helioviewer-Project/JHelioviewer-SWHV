@@ -11,6 +11,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.events.SWEKParameter;
@@ -33,20 +35,21 @@ class SWEKConfig {
 
     private static final HashMap<String, SWEKSource> sources = new HashMap<>();
     private static final HashMap<String, SWEKGroup> groups = new HashMap<>();
-    private static final List<SWEKGroup> orderedGroups = new ArrayList<>();
 
-    static List<SWEKGroup> load() {
+    static DefaultTreeModel load() {
         SWEKIconBank.init();
         try (InputStream in = FileUtils.getResource("/settings/SWEK.json")) {
             JSONObject jo = JSONUtils.get(in);
             EventDatabase.config_hash = Arrays.hashCode(jo.toString().toCharArray());
             parseSources(jo);
-            parseGroups(jo);
+
+            DefaultTreeModel dtm = parseGroups(jo);
             SWEKGroup.setSwekRelatedEvents(parseRelatedEvents(jo));
+            return dtm;
         } catch (Exception e) {
             Log.error("Configuration file could not be parsed: " + e);
+            return new DefaultTreeModel(new DefaultMutableTreeNode(""));
         }
-        return orderedGroups;
     }
 
     private static void parseSources(JSONObject obj) {
@@ -83,18 +86,22 @@ class SWEKConfig {
         return parameterList;
     }
 
-    private static void parseGroups(JSONObject obj) {
+    private static DefaultTreeModel parseGroups(JSONObject obj) {
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
+        DefaultTreeModel dtm = new DefaultTreeModel(root);
+
         JSONArray eventJSONArray = obj.getJSONArray("events_types");
         int len = eventJSONArray.length();
         for (int i = 0; i < len; i++) {
-            SWEKGroup group = parseGroup(eventJSONArray.getJSONObject(i));
+            SWEKGroup group = parseGroup(eventJSONArray.getJSONObject(i), dtm);
+            root.add(group);
             groups.put(group.getName(), group);
-            orderedGroups.add(group);
         }
+        return dtm;
     }
 
-    private static SWEKGroup parseGroup(JSONObject obj) {
-        SWEKGroup group = new SWEKGroup(parseEventName(obj), parseParameterList(obj), parseEventIcon(obj));
+    private static SWEKGroup parseGroup(JSONObject obj, DefaultTreeModel dtm) {
+        SWEKGroup group = new SWEKGroup(parseEventName(obj), parseParameterList(obj), parseEventIcon(obj), dtm);
         JSONArray suppliersArray = obj.getJSONArray("suppliers");
         int len = suppliersArray.length();
         for (int i = 0; i < len; i++) {
