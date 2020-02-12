@@ -31,7 +31,7 @@ import com.jogamp.opengl.GL2;
 
 public class GridLayer extends AbstractLayer {
 
-    private static boolean odeIsDone;
+    private static boolean odeIsDone = false;
 
     private static final double RADIAL_UNIT = Sun.Radius;
     private static final double RADIAL_STEP = 15;
@@ -428,7 +428,7 @@ public class GridLayer extends AbstractLayer {
         renderer.endRendering();
 
         try {
-            Thread.sleep(20);
+            Thread.sleep(30);
         } catch (Exception ignore) {
         }
 
