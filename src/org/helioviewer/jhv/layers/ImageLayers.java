@@ -2,7 +2,6 @@ package org.helioviewer.jhv.layers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -11,7 +10,6 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
@@ -24,10 +22,7 @@ import org.astrogrid.samp.SampUtils;
 public class ImageLayers {
 
     static boolean areEnabled() {
-        List<ImageLayer> list = Layers.getImageLayers();
-        int size = list.size();
-        for (int i = 0; i < size; i++) {
-            ImageLayer layer = list.get(i);
+        for (ImageLayer layer : Layers.getImageLayers()) {
             if (layer.isEnabled())
                 return true;
         }
@@ -48,15 +43,12 @@ public class ImageLayers {
     }
 
     static void displaySynced(Position viewpoint) { // coalesce layers
-        List<ImageLayer> list = Layers.getImageLayers();
-        int size = list.size();
-        for (int i = 0; i < size; i++) {
-            ImageLayer layer = list.get(i);
+        for (ImageLayer layer : Layers.getImageLayers()) {
             ImageData id;
             if (layer.isEnabled() && (id = layer.getImageData()) != null && viewpoint != id.getViewpoint() /* deliberate on reference */)
                 return;
         }
-        JHVFrame.getGLCanvas().display(); // display asap
+        MovieDisplay.display();
     }
 
     public static void arrangeMultiView(boolean multiview) {

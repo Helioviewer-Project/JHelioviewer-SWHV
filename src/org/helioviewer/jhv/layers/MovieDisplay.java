@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.layers;
 
-import javax.swing.Timer;
+import java.awt.EventQueue;
 
 import org.helioviewer.jhv.events.JHVEventHighlightListener;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
@@ -9,7 +9,6 @@ import org.helioviewer.jhv.gui.JHVFrame;
 public class MovieDisplay implements JHVEventHighlightListener {
 
     private static final MovieDisplay instance = new MovieDisplay();
-    private static Timer displayTimer;
 
     public static void render(float decodeFactor) {
         if (ImageLayers.areEnabled())
@@ -19,7 +18,7 @@ public class MovieDisplay implements JHVEventHighlightListener {
     }
 
     public static void display() {
-        displayTimer.restart();
+        EventQueue.invokeLater(() -> JHVFrame.getGLCanvas().display()); // decouple from caller
     }
 
     @Override
@@ -28,8 +27,6 @@ public class MovieDisplay implements JHVEventHighlightListener {
     }
 
     private MovieDisplay() {
-        displayTimer = new Timer(1000 / 120, e -> JHVFrame.getGLCanvas().display());
-        displayTimer.setRepeats(false);
         JHVRelatedEvents.addHighlightListener(this);
     }
 
