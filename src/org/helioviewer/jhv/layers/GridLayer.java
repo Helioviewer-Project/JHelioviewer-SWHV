@@ -425,6 +425,7 @@ public class GridLayer extends AbstractLayer {
             renderer.setColor(colors[(i + (shift / shift_step) / 6) % 6]);
             renderer.draw(text, delta, y);
         }
+        renderer.setColor(Colors.WhiteFloat);
         renderer.endRendering();
 
         try {
@@ -488,7 +489,7 @@ public class GridLayer extends AbstractLayer {
             " ",
             "Congratulations Team Solar Orbiter!",
             " ",
-            "Copyright © 2020 Max"
+            "Copyright © MMXX Max"
     };
 
 }
