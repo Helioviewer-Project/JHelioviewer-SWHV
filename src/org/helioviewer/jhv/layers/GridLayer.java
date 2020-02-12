@@ -395,7 +395,6 @@ public class GridLayer extends AbstractLayer {
         lonLabels = GridLabel.makeLonLabels(gridType, lonStep);
     }
 
-
     private static int shift = 0;
 
     @Override
@@ -405,10 +404,9 @@ public class GridLayer extends AbstractLayer {
         if (odeIsDone)
             return;
 
-        int scale = 100;
         int delta = (int) (vp.width / 4.);
-        int size = (int) (vp.height * (scale * 0.01 * 0.015));
-        shift += 3 * size;
+        int size = (int) (vp.height * 0.015);
+        shift += 2;
 
         if (GLInfo.pixelScale[1] == 1) //! nasty
             size *= 2;
@@ -419,20 +417,24 @@ public class GridLayer extends AbstractLayer {
         renderer.beginRendering(vp.width, vp.height);
         for (int i = 0; i < ode.length; i++) {
             String text = ode[i];
-            renderer.setColor(colors[i % 6]);
             y = shift - 3 * i * size;
+
+            renderer.setColor(GLText.shadowColor);
+            renderer.draw(text, delta + GLText.shadowOffset[0], y + GLText.shadowOffset[1]);
+            renderer.setColor(colors[i % 6]);
             renderer.draw(text, delta, y);
         }
         renderer.endRendering();
 
         try {
-            Thread.sleep(500);
+            Thread.sleep(20);
         } catch (Exception ignore) {
         }
 
         if (y > vp.height + 100) {
             odeIsDone = true;
         }
+
         MovieDisplay.display();
     }
 
