@@ -28,8 +28,10 @@ public class MovieDisplay implements JHVEventHighlightListener {
     }
 
     private MovieDisplay() {
-        displayTimer = new Timer(1000 / 120, e -> JHVFrame.getGLCanvas().display());
-        displayTimer.setRepeats(false);
+        displayTimer = new Timer(10, e -> {
+            displayTimer.stop();
+            JHVFrame.getGLCanvas().display();
+        });
         JHVRelatedEvents.addHighlightListener(this);
     }
 

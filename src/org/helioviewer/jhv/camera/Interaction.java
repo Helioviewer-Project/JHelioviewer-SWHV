@@ -45,7 +45,7 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
         }
     }
 
-    private static final Timer wheelTimer = new Timer(1000 / 2, e -> MovieDisplay.render(1));
+    private static Timer wheelTimer;
     private final Camera camera;
     private final InteractionAnnotate interactionAnnotate;
     private final InteractionAxis interactionAxis;
@@ -63,7 +63,10 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
         interactionPan = new InteractionPan(camera);
         interactionRotate = new InteractionRotate(camera);
 
-        wheelTimer.setRepeats(false);
+        wheelTimer = new Timer(1000 / 2, e -> {
+            wheelTimer.stop();
+            MovieDisplay.render(1);
+        });
     }
 
     public void setMode(Mode _mode) {
