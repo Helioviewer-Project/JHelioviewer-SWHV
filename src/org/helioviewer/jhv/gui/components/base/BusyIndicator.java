@@ -25,7 +25,7 @@ public class BusyIndicator extends LayerUI<JComponent> {
         double cx = w / 2.;
         double cy = h / 2.;
 
-        Graphics2D g = (Graphics2D) g1.create();
+        Graphics2D g = (Graphics2D) g1;
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
         g.setStroke(new BasicStroke((float) (s / 4), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
@@ -38,8 +38,6 @@ public class BusyIndicator extends LayerUI<JComponent> {
             g.rotate(-Math.PI / 6, cx, cy);
             g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (11 - i) / 11f));
         }
-
-        g.dispose();
     }
 
     private static final double dangle = Math.PI / 30;
