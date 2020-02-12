@@ -116,6 +116,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     protected void paintComponent(Graphics g1) {
+        super.paintComponent(g1);
         Rectangle graphArea = DrawController.getGraphArea();
 
         boolean axisHighlightChanged = toggleAxisHightlight(graphArea);
