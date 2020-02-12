@@ -8,8 +8,8 @@ import javax.swing.filechooser.FileFilter;
 public class ExtensionFileFilter {
 
     public static final FilenameFilter Image = new Filter(new ExtensionFilter(
-            new String[]{"jpg", "jpeg", "png", "fts", "fits", "jp2", "jpx"},
-            "All supported files (\".jpg\", \".jpeg\", \".png\", \".fts\", \".fits\", \".jp2\", \".jpx\")"));
+            new String[]{"jpg", "jpeg", "png", "fts", "fits", "fits.gz", "jp2", "jpx"},
+            "All supported files (\".jpg\", \".jpeg\", \".png\", \".fts\", \".fits\", \".fits.gz\", \".jp2\", \".jpx\")"));
     public static final FilenameFilter JHV = new Filter(new ExtensionFilter(
             new String[]{"jhv"},
             "State files (\".jhv\")"));
