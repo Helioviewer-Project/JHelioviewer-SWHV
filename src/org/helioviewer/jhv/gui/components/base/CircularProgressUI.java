@@ -51,7 +51,7 @@ public class CircularProgressUI extends BasicProgressBarUI {
         double or = sz * .5;
         double ir = or * .5;
 
-        Graphics2D g = (Graphics2D) g1.create();
+        Graphics2D g = (Graphics2D) g1;
         g.setPaint(progressBar.getForeground());
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -62,7 +62,6 @@ public class CircularProgressUI extends BasicProgressBarUI {
         g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
         g.setStroke(new BasicStroke((float) (sz * THICK_FACTOR), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g.draw(out);
-        g.dispose();
     }
 
 }

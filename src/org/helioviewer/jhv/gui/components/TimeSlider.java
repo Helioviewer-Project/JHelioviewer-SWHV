@@ -148,6 +148,7 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
         private static final Color partialCachedColor = UIGlobals.midColor;
         private static final Color completeCachedColor = UIGlobals.foreColor;
 
+        private static final BasicStroke thinStroke = new BasicStroke(1);
         private static final BasicStroke thickStroke = new BasicStroke(4);
 
         TimeSliderUI(JSlider component) {
@@ -155,7 +156,9 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
         }
 
         @Override
-        public void paintThumb(Graphics g) {
+        public void paintThumb(Graphics g1) {
+            Graphics2D g = (Graphics2D) g1;
+            g.setStroke(thinStroke);
             g.setColor(UIGlobals.foreColor);
             g.drawRect(thumbRect.x, thumbRect.y, thumbRect.width - 1, thumbRect.height - 1);
 
@@ -166,7 +169,7 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
         // Draws the different regions: no/partial/complete information
         @Override
         public void paintTrack(Graphics g1) {
-            Graphics2D g = (Graphics2D) g1.create();
+            Graphics2D g = (Graphics2D) g1;
             g.setStroke(thickStroke);
 
             int y = slider.getSize().height / 2;
@@ -191,7 +194,6 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
                     g.drawLine(trackRect.x + begin, y, trackRect.x + end, y);
                 }
             }
-            g.dispose();
         }
 
     }
