@@ -396,6 +396,7 @@ public class GridLayer extends AbstractLayer {
     }
 
     private static int shift = 0;
+    private static final int shift_step = 2;
 
     @Override
     public void renderFloat(Camera camera, Viewport vp, GL2 gl) {
@@ -406,7 +407,7 @@ public class GridLayer extends AbstractLayer {
 
         int delta = (int) (vp.width / 4.);
         int size = (int) (vp.height * 0.015);
-        shift += 2;
+        shift += shift_step;
 
         if (GLInfo.pixelScale[1] == 1) //! nasty
             size *= 2;
@@ -421,7 +422,7 @@ public class GridLayer extends AbstractLayer {
 
             renderer.setColor(GLText.shadowColor);
             renderer.draw(text, delta + GLText.shadowOffset[0], y + GLText.shadowOffset[1]);
-            renderer.setColor(colors[i % 6]);
+            renderer.setColor(colors[(i + (shift / shift_step) / 6) % 6]);
             renderer.draw(text, delta, y);
         }
         renderer.endRendering();
@@ -463,7 +464,7 @@ public class GridLayer extends AbstractLayer {
             "Call up some divine providence",
             "for each erupting prominence,",
             "listening without apology,",
-            "to helioseimology.",
+            "to helioseismology.",
             " ",
             "Watch every blazing plasma arc,",
             "found framed against the deepest dark,",
