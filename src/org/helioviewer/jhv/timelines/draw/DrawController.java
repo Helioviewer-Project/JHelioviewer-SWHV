@@ -33,19 +33,17 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     private static long currentTime;
     private static boolean locked;
 
-    private static Timer layersTimer;
+    private static final Timer layersTimer = new Timer(1000 / 2, e -> {
+        long start = TimeUtils.ceilSec(selectedAxis.start());
+        long end = TimeUtils.floorSec(selectedAxis.end());
+        MoviePanel.getInstance().syncLayersSpan(start, end);
+    });
 
     public DrawController() {
         long t = System.currentTimeMillis();
         setSelectedInterval(t - 2 * TimeUtils.DAY_IN_MILLIS, t);
+        layersTimer.setRepeats(false);
         UITimer.register(this);
-
-        layersTimer = new Timer(1000 / 2, e -> {
-            layersTimer.stop();
-            long start = TimeUtils.ceilSec(selectedAxis.start());
-            long end = TimeUtils.floorSec(selectedAxis.end());
-            MoviePanel.getInstance().syncLayersSpan(start, end);
-        });
     }
 
     public static void saveState(JSONObject jo) {
