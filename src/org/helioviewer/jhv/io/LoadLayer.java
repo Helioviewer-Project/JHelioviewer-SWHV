@@ -136,7 +136,7 @@ public class LoadLayer {
     @Nonnull
     private static View loadView(DecodeExecutor executor, APIRequest req, URI uri, APIResponse res) throws Exception {
         String loc = uri.toString().toLowerCase(Locale.ENGLISH);
-        if (loc.endsWith(".fits") || loc.endsWith(".fts")) {
+        if (loc.endsWith(".fits") || loc.endsWith(".fts") || loc.endsWith(".fits.gz")) {
             return new URIView(executor, req, uri, URIView.URIType.FITS);
         } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
             return new URIView(executor, req, uri, URIView.URIType.GENERIC);

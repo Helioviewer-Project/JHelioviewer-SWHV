@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.view.uri.fits;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
@@ -15,6 +16,7 @@ import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
 
 import org.helioviewer.jhv.imagedata.ImageBuffer;
+import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.log.Log;
@@ -26,7 +28,9 @@ public class FITSImage implements URIImageReader {
     @Nullable
     @Override
     public String readXML(URI uri) throws Exception {
-        try (NetClient nc = NetClient.of(uri); Fits f = new Fits(nc.getStream())) {
+        try (NetClient nc = NetClient.of(uri);
+             InputStream is = FileUtils.decompressStream(nc.getStream());
+             Fits f = new Fits(is)) {
             BasicHDU<?>[] hdus = f.read();
             // this is cumbersome
             for (BasicHDU<?> hdu : hdus) {
@@ -36,7 +40,7 @@ public class FITSImage implements URIImageReader {
             }
             for (BasicHDU<?> hdu : hdus) {
                 if (hdu instanceof ImageHDU) {
-                    return readHeader((ImageHDU) hdu);
+                    return readHeader(hdu);
                 }
             }
         }
@@ -46,7 +50,9 @@ public class FITSImage implements URIImageReader {
     @Nullable
     @Override
     public ImageBuffer readImageBuffer(URI uri) throws Exception {
-        try (NetClient nc = NetClient.of(uri); Fits f = new Fits(nc.getStream())) {
+        try (NetClient nc = NetClient.of(uri);
+             InputStream is = FileUtils.decompressStream(nc.getStream());
+             Fits f = new Fits(is)) {
             BasicHDU<?>[] hdus = f.read();
             // this is cumbersome
             for (BasicHDU<?> hdu : hdus) {
