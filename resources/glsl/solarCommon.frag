@@ -35,6 +35,9 @@ uniform float hgltDiff;
 uniform float crota[3];
 uniform float crotaDiff[3];
 
+uniform float deltaT;
+uniform float deltaTDiff;
+
 uniform mat4 cameraTransformationInverse;
 uniform vec4 cameraDifferenceRotationQuat;
 uniform vec4 diffcameraDifferenceRotationQuat;
@@ -125,4 +128,10 @@ vec2 getScrPos(void) {
     vec2 scrpos = vec2(viewport.z * up1.x, up1.y) + .5;
     clamp_coord(scrpos);
     return scrpos;
+}
+
+float differentialRotation(float dt, float theta) {
+    float sin2l = sin(theta);
+    sin2l *= sin2l;
+    return -dt * (0.343 * sin2l + 0.474 * sin2l * sin2l); // Snodgrass, SunPy
 }
