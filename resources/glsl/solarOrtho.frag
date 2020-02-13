@@ -1,17 +1,15 @@
 
-#define testDeltaT (3 * 86400. * 1e-6) // usec
+vec3 differential(float dt, vec3 v) {
+    if (dt == 0)
+        return v;
 
-vec3 differential(vec3 p, float deltaT) {
-    if (deltaT == 0)
-        return p;
-
-    float phi = atan(p.x, p.z);
-    float theta = acos(p.y);
+    float phi = atan(v.x, v.z);
+    float theta = acos(v.y);
 
     float sin2l = sin(theta);
     sin2l *= sin2l;
     float sin4l = sin2l * sin2l;
-    phi -= deltaT * (0.343 * sin2l + 0.474 * sin4l);
+    phi -= dt * (0.343 * sin2l + 0.474 * sin4l);
 
     return vec3(sin(theta) * sin(phi), cos(theta), sin(theta) * cos(phi));
 }
@@ -31,12 +29,12 @@ void main(void) {
     bool onDisk = radius2 <= 1;
 
     float factor;
-    vec3 hitPoint = vec3(0.), rotatedHitPoint = vec3(0.), diffrotatedHitPoint = vec3(0.);;
+    vec3 hitPoint = vec3(0.), rotatedHitPoint = vec3(0.), diffrotatedHitPoint = vec3(0.);
 
     if (onDisk) {
         hitPoint = vec3(up1.x, up1.y, sqrt(1. - radius2));
-        rotatedHitPoint = differential(rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint), 0);
-        diffrotatedHitPoint = differential(rotate_vector_inverse(diffcameraDifferenceRotationQuat, hitPoint), 0);
+        rotatedHitPoint =     differential(deltaT,     rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint));
+        diffrotatedHitPoint = differential(deltaTDiff, rotate_vector_inverse(diffcameraDifferenceRotationQuat, hitPoint));
         factor = 1.;
         gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_NARROW;
     } else {
@@ -51,7 +49,7 @@ void main(void) {
         if (length(rotatedHitPoint) <= 1) // central disk
             discard;
 
-        if (calculateDepth != 0) // intersecting Eufhoria planes
+        if (calculateDepth != 0) // intersecting Euhforia planes
             gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_WIDE;
     }
 
