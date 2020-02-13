@@ -193,6 +193,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
         Position cameraViewpoint = imageData.getViewpoint(); // camera at decode command moment
         MetaData metaData = imageData.getMetaData();
+        Position metaDataViewpoint = metaData.getViewpoint();
         glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
 
         Quat q = Quat.rotate(camera.getDragRotation(), cameraViewpoint.toQuat()); // sync with camera
@@ -200,23 +201,24 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
         DifferenceMode diffMode = glImage.getDifferenceMode();
         MetaData metaDataDiff = diffMode == DifferenceMode.Base ? baseImageData.getMetaData() : prevImageData.getMetaData();
+        Position metaDataViewpointDiff = metaDataDiff.getViewpoint();
         shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, metaDataDiff.getCenterRotation()));
 
         if (differential) {
-            shader.bindDeltaT(gl, (float) (3 * 86400. * 1e-6));
-            shader.bindDeltaTDiff(gl, (float) (3 * 86400. * 1e-6));
+            shader.bindDeltaT(gl, (float) ((cameraViewpoint.time.milli - metaDataViewpoint.time.milli) * 1e-9));
+            shader.bindDeltaTDiff(gl, (float) ((cameraViewpoint.time.milli - metaDataViewpointDiff.time.milli) * 1e-9));
         }
 
         if (Display.mode == Display.DisplayMode.Latitudinal) {
-            shader.bindAnglesLatiGrid(gl, (float) gridLongitude(cameraViewpoint, metaData), (float) gridLatitude(metaData));
-            shader.bindAnglesLatiGridDiff(gl, (float) gridLongitude(cameraViewpoint, metaDataDiff), (float) gridLatitude(metaDataDiff));
+            shader.bindAnglesLatiGrid(gl, (float) gridLongitude(cameraViewpoint, metaDataViewpoint), (float) gridLatitude(metaData));
+            shader.bindAnglesLatiGridDiff(gl, (float) gridLongitude(cameraViewpoint, metaDataViewpointDiff), (float) gridLatitude(metaDataDiff));
         }
 
         GLListener.glslSolar.render(gl);
     }
 
-    private static double gridLongitude(Position cameraViewpoint, MetaData metaData) {
-        double lon = Layers.getGridLayer().gridLongitude(cameraViewpoint, metaData.getViewpoint());
+    private static double gridLongitude(Position cameraViewpoint, Position metaDataViewpoint) {
+        double lon = Layers.getGridLayer().gridLongitude(cameraViewpoint, metaDataViewpoint);
         return (lon + 3. * Math.PI) % (2. * Math.PI); // centered
     }
 
