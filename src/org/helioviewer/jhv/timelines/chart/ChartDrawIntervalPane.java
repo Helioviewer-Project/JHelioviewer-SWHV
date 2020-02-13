@@ -44,6 +44,7 @@ class ChartDrawIntervalPane extends JComponent implements DrawListener, MouseLis
 
     @Override
     protected void paintComponent(Graphics g1) {
+        super.paintComponent(g1);
         Graphics2D g = (Graphics2D) g1;
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setFont(DrawConstants.font);
@@ -80,7 +81,6 @@ class ChartDrawIntervalPane extends JComponent implements DrawListener, MouseLis
 
     private void drawBackground(Graphics2D g) {
         int availableIntervalSpace = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1;
-
         g.setColor(DrawConstants.AVAILABLE_INTERVAL_BACKGROUND_COLOR);
         g.fillRect(DrawConstants.GRAPH_LEFT_SPACE, 2, availableIntervalSpace, getHeight() - 3);
     }

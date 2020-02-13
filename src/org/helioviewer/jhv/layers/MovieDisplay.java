@@ -18,7 +18,7 @@ public class MovieDisplay implements JHVEventHighlightListener {
     }
 
     public static void display() {
-        EventQueue.invokeLater(() -> JHVFrame.getGLCanvas().display());
+        EventQueue.invokeLater(() -> JHVFrame.getGLCanvas().display()); // decouple from caller
     }
 
     @Override
