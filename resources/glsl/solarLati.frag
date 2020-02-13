@@ -1,6 +1,11 @@
-void get_lati_texcoord(const float grid[2], const float lt, const float cr[3], const vec2 scrpos, const vec4 rect, out vec2 texcoord) {
+void get_lati_texcoord(const float grid[2], const float dt, const float lt, const float cr[3], const vec2 scrpos, const vec4 rect, out vec2 texcoord) {
     float phi =   grid[0] + scrpos.x * TWOPI;
     float theta = grid[1] + scrpos.y * PI;
+
+    if (dt != 0) {
+        phi += differentialRotation(dt, theta);
+    }
+
     clamp_value(theta, 0, PI);
 
     vec3 xcart;
@@ -45,13 +50,13 @@ void main(void) {
     vec2 texcoord;
 
     vec2 scrpos = getScrPos();
-    get_lati_texcoord(grid, hglt, crota, scrpos, rect, texcoord);
+    get_lati_texcoord(grid, deltaT, hglt, crota, scrpos, rect, texcoord);
     if (isdifference == NODIFFERENCE) {
         color = getColor(texcoord, texcoord, 1);
     } else {
         vec2 difftexcoord;
         float difftexcoord_radius;
-        get_lati_texcoord(gridDiff, hgltDiff, crotaDiff, scrpos, differencerect, difftexcoord);
+        get_lati_texcoord(gridDiff, deltaTDiff, hgltDiff, crotaDiff, scrpos, differencerect, difftexcoord);
         color = getColor(texcoord, difftexcoord, 1);
     }
     outColor = color;

@@ -5,12 +5,7 @@ vec3 differential(float dt, vec3 v) {
 
     float phi = atan(v.x, v.z);
     float theta = acos(v.y);
-
-    float sin2l = sin(theta);
-    sin2l *= sin2l;
-    float sin4l = sin2l * sin2l;
-    phi -= dt * (0.343 * sin2l + 0.474 * sin4l); // Snodgrass, SunPy
-
+    phi += differentialRotation(dt, theta);
     return vec3(sin(theta) * sin(phi), cos(theta), sin(theta) * cos(phi));
 }
 
