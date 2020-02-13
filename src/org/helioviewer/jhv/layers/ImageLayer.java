@@ -6,6 +6,7 @@ import java.util.concurrent.Future;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -31,6 +32,8 @@ import org.json.JSONObject;
 import com.jogamp.opengl.GL2;
 
 public class ImageLayer extends AbstractLayer implements ImageDataHandler {
+
+    private static final boolean differential = Boolean.parseBoolean(Settings.getProperty("display.differential"));
 
     private final GLImage glImage = new GLImage();
     private final DecodeExecutor executor = new DecodeExecutor();
