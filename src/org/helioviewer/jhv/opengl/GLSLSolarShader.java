@@ -20,6 +20,9 @@ public class GLSLSolarShader extends GLSLShader {
     private int crotaRef;
     private int crotaDiffRef;
 
+    private int deltaTRef;
+    private int deltaTDiffRef;
+
     private int sectorRef;
     private int radiiRef;
     private int polarRadiiRef;
@@ -50,6 +53,9 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] hgltDiff = new float[1];
     private final float[] gridDiff = new float[2];
     private final float[] crotaDiff = new float[3];
+
+    private final float[] deltaT = new float[1];
+    private final float[] deltaTDiff = new float[1];
 
     private final float[] sector = new float[3];
     private final float[] radii = new float[2];
@@ -92,6 +98,9 @@ public class GLSLSolarShader extends GLSLShader {
         hgltDiffRef = gl.glGetUniformLocation(id, "hgltDiff");
         gridDiffRef = gl.glGetUniformLocation(id, "gridDiff");
         crotaDiffRef = gl.glGetUniformLocation(id, "crotaDiff");
+
+        deltaTRef = gl.glGetUniformLocation(id, "deltaT");
+        deltaTDiffRef = gl.glGetUniformLocation(id, "deltaTDiff");
 
         sectorRef = gl.glGetUniformLocation(id, "sector");
         radiiRef = gl.glGetUniformLocation(id, "radii");
@@ -139,6 +148,16 @@ public class GLSLSolarShader extends GLSLShader {
     public void bindDiffCameraDifferenceRotationQuat(GL2 gl, Quat quat) {
         quat.setFloatArray(quatArray);
         gl.glUniform4fv(diffCameraDifferenceRotationQuatRef, 1, quatArray, 0);
+    }
+
+    public void bindDeltaT(GL2 gl, float _deltaT) {
+        deltaT[0] = _deltaT;
+        gl.glUniform1fv(deltaTRef, 1, deltaT, 0);
+    }
+
+    public void bindDeltaTDiff(GL2 gl, float _deltaTDiff) {
+        deltaTDiff[0] = _deltaTDiff;
+        gl.glUniform1fv(deltaTDiffRef, 1, deltaTDiff, 0);
     }
 
     public void bindRect(GL2 gl, double xOffset, double yOffset, double xScale, double yScale) {
