@@ -202,6 +202,11 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         MetaData metaDataDiff = diffMode == DifferenceMode.Base ? baseImageData.getMetaData() : prevImageData.getMetaData();
         shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, metaDataDiff.getCenterRotation()));
 
+        if (differential) {
+            shader.bindDeltaT(gl, (float) (3 * 86400. * 1e-6));
+            shader.bindDeltaTDiff(gl, (float) (3 * 86400. * 1e-6));
+        }
+
         if (Display.mode == Display.DisplayMode.Latitudinal) {
             shader.bindAnglesLatiGrid(gl, (float) gridLongitude(cameraViewpoint, metaData), (float) gridLatitude(metaData));
             shader.bindAnglesLatiGridDiff(gl, (float) gridLongitude(cameraViewpoint, metaDataDiff), (float) gridLatitude(metaDataDiff));
