@@ -35,6 +35,9 @@ uniform float hgltDiff;
 uniform float crota[3];
 uniform float crotaDiff[3];
 
+uniform float deltaT;
+uniform float deltaTDiff;
+
 uniform mat4 cameraTransformationInverse;
 uniform vec4 cameraDifferenceRotationQuat;
 uniform vec4 diffcameraDifferenceRotationQuat;
