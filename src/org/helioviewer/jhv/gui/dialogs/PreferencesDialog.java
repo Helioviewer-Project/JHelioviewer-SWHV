@@ -139,26 +139,32 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
 
         c.gridx = 0;
         c.gridy = 3;
-        settings.add(new JLabel("Normalize (after restart):", JLabel.RIGHT), c);
+        settings.add(new JLabel("After restart:", JLabel.RIGHT), c);
 
         c.gridx = 1;
         c.gridy = 3;
-        JCheckBox normalizeRadius = new JCheckBox("Solar radius", Boolean.parseBoolean(Settings.getProperty("display.normalize")));
+        JCheckBox normalizeAIA = new JCheckBox("Normalize SDO/AIA brightness", Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA")));
+        normalizeAIA.addActionListener(e -> Settings.setProperty("display.normalizeAIA", Boolean.toString(normalizeAIA.isSelected())));
+        settings.add(normalizeAIA, c);
+
+        c.gridx = 1;
+        c.gridy = 4;
+        JCheckBox normalizeRadius = new JCheckBox("Normalize solar radius", Boolean.parseBoolean(Settings.getProperty("display.normalize")));
         normalizeRadius.addActionListener(e -> Settings.setProperty("display.normalize", Boolean.toString(normalizeRadius.isSelected())));
         settings.add(normalizeRadius, c);
 
         c.gridx = 1;
-        c.gridy = 4;
-        JCheckBox normalizeAIA = new JCheckBox("SDO/AIA brightness", Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA")));
-        normalizeAIA.addActionListener(e -> Settings.setProperty("display.normalizeAIA", Boolean.toString(normalizeAIA.isSelected())));
-        settings.add(normalizeAIA, c);
+        c.gridy = 5;
+        JCheckBox differential = new JCheckBox("Apply differential rotation", Boolean.parseBoolean(Settings.getProperty("display.differential")));
+        differential.addActionListener(e -> Settings.setProperty("display.differential", Boolean.toString(differential.isSelected())));
+        settings.add(differential, c);
 
         c.gridx = 0;
-        c.gridy = 5;
+        c.gridy = 6;
         settings.add(new JLabel("Record video as:", JLabel.RIGHT), c);
 
         c.gridx = 1;
-        c.gridy = 5;
+        c.gridy = 6;
         JComboBox<VideoFormat> comboVideo = new JComboBox<>(VideoFormat.values());
         VideoFormat selected = VideoFormat.H264;
         try {
@@ -170,7 +176,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         settings.add(comboVideo, c);
 
         c.gridx = 0;
-        c.gridy = 6;
+        c.gridy = 7;
         settings.add(new JLabel("Plugins:", JLabel.RIGHT), c);
 
         c.gridx = 1;
