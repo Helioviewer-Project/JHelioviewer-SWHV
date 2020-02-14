@@ -11,12 +11,9 @@ import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec2;
-import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.time.JHVTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import com.jogamp.opengl.GL2;
 
 public class Camera {
 
@@ -58,12 +55,10 @@ public class Camera {
         Transform.cacheMVP();
     }
 
-    public void projectionOrtho(double aspect, GL2 gl, GLSLShape blackCircle) {
+    public void projectionOrtho(double aspect) {
         Transform.setOrthoSymmetricProjection((float) (cameraWidth * aspect), (float) cameraWidth, -clipNarrow, clipNarrow);
         Transform.setTranslateView((float) translation.x, (float) translation.y, 0);
         Transform.cacheMVP();
-
-//        blackCircle.renderShape(gl, GL2.GL_TRIANGLE_STRIP);
 
         Transform.rotateView(rotation);
         Transform.cacheMVP();
