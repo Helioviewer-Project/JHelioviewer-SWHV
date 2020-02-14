@@ -100,6 +100,11 @@ public class GLListener implements GLEventListener {
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             camera.projectionOrtho(vp.aspect, gl, blackCircle);
 
+            GLSLSolarShader.sphere.use(gl);
+            GLSLSolarShader.sphere.bindMatrix(gl, camera.getTransformationInverse(vp.aspect));
+            GLSLSolarShader.sphere.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height);
+            glslSolar.render(gl);
+
             Layers.render(camera, vp, gl);
             JHVFrame.getInteraction().drawAnnotations(vp, gl);
             Layers.renderFloat(camera, vp, gl);

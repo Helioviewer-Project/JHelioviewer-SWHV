@@ -63,7 +63,7 @@ public class Camera {
         Transform.setTranslateView((float) translation.x, (float) translation.y, 0);
         Transform.cacheMVP();
 
-        blackCircle.renderShape(gl, GL2.GL_TRIANGLE_STRIP);
+//        blackCircle.renderShape(gl, GL2.GL_TRIANGLE_STRIP);
 
         Transform.rotateView(rotation);
         Transform.cacheMVP();

@@ -6,6 +6,7 @@ import com.jogamp.opengl.GL2;
 
 public class GLSLSolarShader extends GLSLShader {
 
+    public static final GLSLSolarShader sphere = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarSphere.frag");
     public static final GLSLSolarShader ortho = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarOrtho.frag");
     public static final GLSLSolarShader lati = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarLati.frag");
     public static final GLSLSolarShader polar = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarPolar.frag");
@@ -82,6 +83,7 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public static void init(GL2 gl) {
+        sphere._init(gl, false);
         ortho._init(gl, true);
         lati._init(gl, true);
         polar._init(gl, true);
@@ -130,6 +132,7 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public static void dispose(GL2 gl) {
+        sphere._dispose(gl);
         ortho._dispose(gl);
         lati._dispose(gl);
         polar._dispose(gl);
