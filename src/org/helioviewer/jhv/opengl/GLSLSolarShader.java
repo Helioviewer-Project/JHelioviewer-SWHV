@@ -6,11 +6,13 @@ import com.jogamp.opengl.GL2;
 
 public class GLSLSolarShader extends GLSLShader {
 
-    public static final GLSLSolarShader sphere = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarSphere.frag");
-    public static final GLSLSolarShader ortho = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarOrtho.frag");
-    public static final GLSLSolarShader lati = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarLati.frag");
-    public static final GLSLSolarShader polar = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarPolar.frag");
-    public static final GLSLSolarShader logpolar = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarLogPolar.frag");
+    public static final GLSLSolarShader sphere = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarSphere.frag", false);
+    public static final GLSLSolarShader ortho = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarOrtho.frag", true);
+    public static final GLSLSolarShader lati = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarLati.frag", true);
+    public static final GLSLSolarShader polar = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarPolar.frag", true);
+    public static final GLSLSolarShader logpolar = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarLogPolar.frag", true);
+
+    private final boolean hasCommon;
 
     private int isDiffRef;
 
@@ -78,16 +80,17 @@ public class GLSLSolarShader extends GLSLShader {
 
     private final float[] quatArray = new float[4];
 
-    private GLSLSolarShader(String vertex, String fragment) {
+    private GLSLSolarShader(String vertex, String fragment, boolean _hasCommon) {
         super(vertex, fragment);
+        hasCommon = _hasCommon;
     }
 
     public static void init(GL2 gl) {
-        sphere._init(gl, false);
-        ortho._init(gl, true);
-        lati._init(gl, true);
-        polar._init(gl, true);
-        logpolar._init(gl, true);
+        sphere._init(gl, sphere.hasCommon);
+        ortho._init(gl, ortho.hasCommon);
+        lati._init(gl, lati.hasCommon);
+        polar._init(gl, polar.hasCommon);
+        logpolar._init(gl, logpolar.hasCommon);
     }
 
     @Override
@@ -126,9 +129,11 @@ public class GLSLSolarShader extends GLSLShader {
         cameraDifferenceRotationQuatRef = gl.glGetUniformLocation(id, "cameraDifferenceRotationQuat");
         diffCameraDifferenceRotationQuatRef = gl.glGetUniformLocation(id, "diffcameraDifferenceRotationQuat");
 
-        setTextureUnit(gl, id, "image", GLTexture.Unit.ZERO);
-        setTextureUnit(gl, id, "lut", GLTexture.Unit.ONE);
-        setTextureUnit(gl, id, "diffImage", GLTexture.Unit.TWO);
+        if (hasCommon) {
+            setTextureUnit(gl, id, "image", GLTexture.Unit.ZERO);
+            setTextureUnit(gl, id, "lut", GLTexture.Unit.ONE);
+            setTextureUnit(gl, id, "diffImage", GLTexture.Unit.TWO);
+        }
     }
 
     public static void dispose(GL2 gl) {
