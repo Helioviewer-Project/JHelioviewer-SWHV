@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
@@ -22,7 +21,6 @@ public class GLListener implements GLEventListener {
 
     private final GLCanvas canvas;
 
-    private static final GLSLShape blackCircle = new GLSLShape(false);
     public static final GLSLSolar glslSolar = new GLSLSolar();
 
     public GLListener(GLCanvas _canvas) {
@@ -62,8 +60,6 @@ public class GLListener implements GLEventListener {
         GLSLShapeShader.init(gl);
         GLSLTextureShader.init(gl);
 
-        blackCircle.init(gl);
-        GLHelper.initCircleFront(gl, blackCircle, 0, 0, 0.99, 180, Colors.Black);
         JHVFrame.getInteraction().initAnnotations(gl);
     }
 
@@ -72,7 +68,6 @@ public class GLListener implements GLEventListener {
         GL2 gl = (GL2) drawable.getGL();
         Layers.dispose(gl);
         JHVFrame.getInteraction().disposeAnnotations(gl);
-        blackCircle.dispose(gl);
         GLText.dispose(gl);
 
         glslSolar.dispose(gl);
@@ -98,7 +93,7 @@ public class GLListener implements GLEventListener {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         for (Viewport vp : Display.getViewports()) {
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            camera.projectionOrtho(vp.aspect, gl, blackCircle);
+            camera.projectionOrtho(vp.aspect);
 
             GLSLSolarShader.sphere.use(gl);
             GLSLSolarShader.sphere.bindMatrix(gl, camera.getTransformationInverse(vp.aspect));

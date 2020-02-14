@@ -39,11 +39,11 @@ void main(void) {
 
     if (rotatedHitPoint.z <= 0.) { // off-limb or back
         hitPoint = vec3(up1.x, up1.y, intersectPlane(cameraDifferenceRotationQuat, up1, onDisk));
-        if (onDisk && hitPoint.z < 0) // off-limb behind sphere
+        if (onDisk && hitPoint.z < 0) // differential: off-limb behind sphere
             discard;
 
         rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
-        if (length(rotatedHitPoint) <= 1) // central disk
+        if (length(rotatedHitPoint) <= 1) // differential: central disk
             discard;
 
         if (calculateDepth != 0) // intersecting Euhforia planes
