@@ -6,9 +6,9 @@ vec3 differential(const float dt, const vec3 v) {
         return v;
 
     float phi = atan(v.x, v.z);
-    float theta = acos(v.y);
-    phi += differentialRotation(dt, theta);
-    return vec3(sin(theta) * sin(phi), cos(theta), sin(theta) * cos(phi));
+    float theta = asin(v.y);
+    phi -= differentialRotation(dt, theta); // difference from rigid rotation
+    return vec3(cos(theta) * sin(phi), v.y, cos(theta) * cos(phi));
 }
 
 float intersectPlane(const vec4 quat, const vec4 vecin, const bool hideBack) {
