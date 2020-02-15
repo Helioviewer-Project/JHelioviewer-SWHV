@@ -1,6 +1,8 @@
 
-vec3 differential(float dt, vec3 v) {
-    if (dt == 0)
+const vec3 zAxis = vec3(0, 0, 1);
+
+vec3 differential(const float dt, const vec3 v) {
+    if (dt == 0.)
         return v;
 
     float phi = atan(v.x, v.z);
@@ -9,8 +11,8 @@ vec3 differential(float dt, vec3 v) {
     return vec3(sin(theta) * sin(phi), cos(theta), sin(theta) * cos(phi));
 }
 
-float intersectPlane(const vec4 quat, const vec4 vecin, bool hideBack) {
-    vec3 altnormal = rotate_vector(quat, vec3(0., 0., 1.));
+float intersectPlane(const vec4 quat, const vec4 vecin, const bool hideBack) {
+    vec3 altnormal = rotate_vector(quat, zAxis);
     if (hideBack && altnormal.z <= 0.)
         discard;
     return -dot(altnormal.xy, vecin.xy) / altnormal.z;
@@ -21,7 +23,7 @@ void main(void) {
     vec4 up1 = cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
 
     float radius2 = dot(up1.xy, up1.xy);
-    bool onDisk = radius2 <= 1;
+    bool onDisk = radius2 <= 1.;
 
     float factor;
     vec3 hitPoint = vec3(0.), rotatedHitPoint = vec3(0.), diffrotatedHitPoint = vec3(0.);
@@ -39,18 +41,18 @@ void main(void) {
 
     if (rotatedHitPoint.z <= 0.) { // off-limb or back
         hitPoint = vec3(up1.x, up1.y, intersectPlane(cameraDifferenceRotationQuat, up1, onDisk));
-        if (onDisk && hitPoint.z < 0) // differential: off-limb behind sphere
+        if (onDisk && hitPoint.z < 0.) // differential: off-limb behind sphere
             discard;
 
         rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
-        if (length(rotatedHitPoint) <= 1) // differential: central disk
+        if (length(rotatedHitPoint) <= 1.) // differential: central disk
             discard;
 
         if (calculateDepth != 0) // intersecting Euhforia planes
             gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_WIDE;
     }
 
-    if (sector[0] != 0) {
+    if (sector[0] != 0.) {
         float theta = atan(rotatedHitPoint.y, rotatedHitPoint.x);
         if (theta < sector[1] || theta > sector[2])
             discard;

@@ -1,3 +1,4 @@
+
 void get_polar_texcoord(const float cr, const vec2 scrpos, const vec4 rect, out vec2 texcoord, out float radius) {
     float interpolated = polarRadii[0] + scrpos.y * (polarRadii[1] - polarRadii[0]);
     if (interpolated > radii[1] || interpolated < radii[0])

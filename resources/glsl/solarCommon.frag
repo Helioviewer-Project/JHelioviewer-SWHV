@@ -130,7 +130,7 @@ vec2 getScrPos(void) {
     return scrpos;
 }
 
-float differentialRotation(float dt, float theta) {
+float differentialRotation(const float dt, const float theta) {
     float sin2l = sin(theta);
     sin2l *= sin2l;
     return -dt * (0.343 * sin2l + 0.474 * sin2l * sin2l); // Snodgrass, SunPy
