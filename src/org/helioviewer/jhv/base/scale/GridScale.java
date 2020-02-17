@@ -33,10 +33,10 @@ public interface GridScale {
     @Nonnull
     Vec2 mouseToGridInv(int px, int py, Viewport vp, Camera camera);
 
-    GridScale polar = new GridScaleIdentity(0, 360, 0, 0);
-    GridScale lati = new GridScaleLati(0, 360, -90, 90);
-    GridScale logpolar = new GridScaleLogY(0, 360, 0, 0);
     GridScale ortho = new GridScaleOrtho(0, 0, 0, 0);
+    GridScale lati = new GridScaleIdentity(-180, 180, -90, 90);
+    GridScale polar = new GridScaleIdentity(0, 360, 0, 0);
+    GridScale logpolar = new GridScaleLogY(0, 360, 0, 0);
 
     abstract class GridScaleAbstract implements GridScale {
 
@@ -165,22 +165,6 @@ public interface GridScale {
         @Override
         public double invScaleY(double val) {
             return val;
-        }
-
-    }
-
-    class GridScaleLati extends GridScaleIdentity {
-
-        GridScaleLati(double _xStart, double _xStop, double _yStart, double _yStop) {
-            super(_xStart, _xStop, _yStart, _yStop);
-        }
-
-        @Nonnull
-        @Override
-        public Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridType gridType) {
-            double x = CameraHelper.computeUpX(camera, vp, px) / vp.aspect;
-            double y = CameraHelper.computeUpY(camera, vp, py) + 0.5;
-            return new Vec2(getInterpolatedXValue(x), getInterpolatedYValue(y));
         }
 
     }
