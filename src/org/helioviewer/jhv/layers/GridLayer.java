@@ -379,7 +379,7 @@ public class GridLayer extends AbstractLayer {
         return false;
     }
 
-    GridType getGridType() {
+    public GridType getGridType() {
         return gridType;
     }
 
