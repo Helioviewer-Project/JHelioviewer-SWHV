@@ -133,5 +133,6 @@ vec2 getScrPos(void) {
 float differentialRotation(const float dt, const float theta) {
     float sin2l = sin(theta);
     sin2l *= sin2l;
-    return -dt * (0.343 * sin2l + 0.474 * sin2l * sin2l); // Snodgrass, SunPy
+    // Snodgrass, Table 1 Magnetic - http://articles.adsabs.harvard.edu/pdf/1990ApJ...351..309S
+    return -dt * (0.339 * sin2l + 0.485 * sin2l * sin2l); 
 }
