@@ -39,7 +39,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
     private void update(int x, int y) {
         Viewport vp = Display.getActiveViewport();
         GridLayer gridLayer = Layers.getGridLayer();
-        Vec2 coord = gridLayer == null ? Vec2.NAN : gridLayer.gridPoint(camera, vp, x, y);
+        Vec2 coord = gridLayer == null ? Vec2.NAN : Display.mode.scale.mouseToGrid(x, y, vp, camera, gridLayer.getGridType());
 
         if (Display.mode == Display.DisplayMode.Latitudinal) {
             setText(formatLati(coord));
