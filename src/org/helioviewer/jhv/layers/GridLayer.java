@@ -182,7 +182,7 @@ public class GridLayer extends AbstractLayer {
         flatLine.render(gl, vp.aspect, LINEWIDTH);
     }
 
-    private static void drawGridTextFlat(int size, GridScale scale, Viewport vp) {
+    private void drawGridTextFlat(int size, GridScale scale, Viewport vp) {
         float w = (float) vp.aspect;
         float h = 1;
         JhvTextRenderer renderer = GLText.getRenderer(size);
@@ -194,7 +194,7 @@ public class GridLayer extends AbstractLayer {
                 if (i == GridMath.FLAT_STEPS_THETA / 2) {
                     continue;
                 }
-                double lon = scale.getInterpolatedXValue(1. / GridMath.FLAT_STEPS_THETA * i);
+                double lon = scale.getInterpolatedXValue(1. / GridMath.FLAT_STEPS_THETA * i, gridType);
                 String txt = formatter2.format(lon);
                 float x = i / (float) GridMath.FLAT_STEPS_THETA - 0.5f;
                 renderer.draw3D(txt, w * x, 0, 0, textScaleFactor);
