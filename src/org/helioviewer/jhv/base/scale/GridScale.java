@@ -13,7 +13,7 @@ import org.helioviewer.jhv.math.Vec3;
 
 public interface GridScale {
 
-    double getInterpolatedXValue(double v);
+    double getInterpolatedXValue(double v, GridType gridType);
 
     double getInterpolatedYValue(double v);
 
@@ -34,7 +34,7 @@ public interface GridScale {
     Vec2 mouseToGridInv(int px, int py, Viewport vp, Camera camera);
 
     GridScale ortho = new GridScaleOrtho(0, 0, 0, 0);
-    GridScale lati = new GridScaleIdentity(-180, 180, -90, 90);
+    GridScale lati = new GridScaleLati(-180, 180, -90, 90);
     GridScale polar = new GridScaleIdentity(0, 360, 0, 0);
     GridScale logpolar = new GridScaleLogY(0, 360, 0, 0);
 
@@ -58,7 +58,7 @@ public interface GridScale {
         }
 
         @Override
-        public double getInterpolatedXValue(double v) {
+        public double getInterpolatedXValue(double v, GridType gridType) {
             return invScaleX(xStart + v * (xStop - xStart));
         }
 
@@ -92,7 +92,7 @@ public interface GridScale {
         public Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridType gridType) {
             double x = CameraHelper.computeUpX(camera, vp, px) / vp.aspect + 0.5;
             double y = CameraHelper.computeUpY(camera, vp, py) + 0.5;
-            return new Vec2(getInterpolatedXValue(x), getInterpolatedYValue(y));
+            return new Vec2(getInterpolatedXValue(x, gridType), getInterpolatedYValue(y));
         }
 
         @Nonnull
@@ -165,6 +165,22 @@ public interface GridScale {
         @Override
         public double invScaleY(double val) {
             return val;
+        }
+
+    }
+
+    class GridScaleLati extends GridScaleIdentity {
+
+        GridScaleLati(double _xStart, double _xStop, double _yStart, double _yStop) {
+            super(_xStart, _xStop, _yStart, _yStop);
+        }
+
+        @Override
+        public double getInterpolatedXValue(double v, GridType gridType) {
+            double ix = super.getInterpolatedXValue(v, gridType);
+            if (gridType == GridType.Carrington && ix < 0)
+                ix += 360;
+            return ix;
         }
 
     }
