@@ -2,10 +2,10 @@ package org.helioviewer.jhv.io;
 
 import java.awt.EventQueue;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-//import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.Metadata;
+import org.astrogrid.samp.SampUtils;
 import org.astrogrid.samp.client.AbstractMessageHandler;
 import org.astrogrid.samp.client.ClientProfile;
 import org.astrogrid.samp.client.DefaultClientProfile;
@@ -24,6 +25,8 @@ import org.astrogrid.samp.hub.HubServiceMode;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.layers.ImageLayers;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class SampClient extends HubConnector {
 
@@ -48,22 +51,6 @@ public class SampClient extends HubConnector {
         }
     }
 
-    /*
-        @Nullable
-        private static URI[] extractURIs(Message msg) {
-            Map<?, ?> params = msg.getParams();
-            if (params == null)
-                return null;
-            return params.values().stream().map(v -> {
-                try {
-                    return new URI(v.toString());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }).filter(Objects::nonNull).toArray(URI[]::new);
-        }
-    */
     private SampClient(ClientProfile _profile) {
         super(_profile);
 
@@ -119,10 +106,17 @@ public class SampClient extends HubConnector {
             @Override
             public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
-                    Object url = msg.getParam("url");
-                    if (url != null) {
-                        URI uri = new URI(url.toString());
+                    JSONObject jo = new JSONObject(SampUtils.toJson(msg.getParams(), false));
+                    JSONArray ja = jo.optJSONArray("url");
+                    if (ja == null) {
+                        URI uri = new URI(jo.optString("url"));
                         EventQueue.invokeLater(() -> Load.image.get(uri));
+                    } else {
+                        ArrayList<URI> uris = new ArrayList<>(ja.length());
+                        for (Object obj : ja) {
+                            uris.add(new URI(obj.toString()));
+                        }
+                        EventQueue.invokeLater(() -> Load.Image.getAll(uris));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
