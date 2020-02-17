@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.base.scale.GridType;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
@@ -193,7 +194,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
         Position cameraViewpoint = imageData.getViewpoint(); // camera at decode command moment
         MetaData metaData = imageData.getMetaData();
-        Position metaDataViewpoint = metaData.getViewpoint();
+        Position metaViewpoint = metaData.getViewpoint();
         glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
 
         Quat q = Quat.rotate(camera.getDragRotation(), cameraViewpoint.toQuat()); // sync with camera
@@ -201,29 +202,27 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
         DifferenceMode diffMode = glImage.getDifferenceMode();
         MetaData metaDataDiff = diffMode == DifferenceMode.Base ? baseImageData.getMetaData() : prevImageData.getMetaData();
-        Position metaDataViewpointDiff = metaDataDiff.getViewpoint();
+        Position metaViewpointDiff = metaDataDiff.getViewpoint();
         shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, metaDataDiff.getCenterRotation()));
 
         if (differential) {
-            shader.bindDeltaT(gl, (float) ((cameraViewpoint.time.milli - metaDataViewpoint.time.milli) * 1e-9));
-            shader.bindDeltaTDiff(gl, (float) ((cameraViewpoint.time.milli - metaDataViewpointDiff.time.milli) * 1e-9));
+            shader.bindDeltaT(gl, (float) ((cameraViewpoint.time.milli - metaViewpoint.time.milli) * 1e-9));
+            shader.bindDeltaTDiff(gl, (float) ((cameraViewpoint.time.milli - metaViewpointDiff.time.milli) * 1e-9));
         }
 
         if (Display.mode == Display.DisplayMode.Latitudinal) {
-            shader.bindAnglesLatiGrid(gl, (float) gridLongitude(cameraViewpoint, metaDataViewpoint), (float) gridLatitude(metaData));
-            shader.bindAnglesLatiGridDiff(gl, (float) gridLongitude(cameraViewpoint, metaDataViewpointDiff), (float) gridLatitude(metaDataDiff));
+            GridType gridType = Layers.getGridLayer().getGridType();
+            shader.bindAnglesLatiGrid(gl, (float) latiLongitude(gridType, cameraViewpoint, metaViewpoint), (float) gridType.toLatitude(metaViewpoint));
+            shader.bindAnglesLatiGridDiff(gl, (float) latiLongitude(gridType, cameraViewpoint, metaViewpointDiff), (float) gridType.toLatitude(metaViewpointDiff));
         }
 
         GLListener.glslSolar.render(gl);
     }
 
-    private static double gridLongitude(Position cameraViewpoint, Position metaDataViewpoint) {
-        double lon = Layers.getGridLayer().gridLongitude(cameraViewpoint, metaDataViewpoint);
+    private static double latiLongitude(GridType gridType, Position cameraViewpoint, Position metaViewpoint) {
+        double gridLon = gridType.toLongitude(metaViewpoint);
+        double lon = gridType == GridType.Viewpoint ? gridLon - cameraViewpoint.lon : metaViewpoint.lon - gridLon;
         return (lon + 3. * Math.PI) % (2. * Math.PI); // centered
-    }
-
-    private static double gridLatitude(MetaData metaData) {
-        return Layers.getGridLayer().gridLatitude(metaData.getViewpoint());
     }
 
     @Override

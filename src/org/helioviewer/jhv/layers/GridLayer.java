@@ -4,7 +4,6 @@ import java.awt.Component;
 import java.text.DecimalFormat;
 import java.util.List;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
@@ -17,7 +16,6 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Transform;
-import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
@@ -108,20 +106,6 @@ public class GridLayer extends AbstractLayer {
         lonLabels = GridLabel.makeLonLabels(gridType, lonStep);
         radialLabels = GridLabel.makeRadialLabels(0, RADIAL_STEP);
         radialLabelsFar = GridLabel.makeRadialLabels(Math.PI / 2, RADIAL_STEP_FAR);
-    }
-
-    @Nonnull
-    public Vec2 gridPoint(Camera camera, Viewport vp, int x, int y) {
-        return Display.mode.scale.mouseToGrid(x, y, vp, camera, gridType);
-    }
-
-    public double gridLatitude(Position metaViewpoint) {
-        return gridType.toLatitude(metaViewpoint);
-    }
-
-    public double gridLongitude(Position cameraViewpoint, Position metaViewpoint) {
-        double gridLon = gridType.toLongitude(metaViewpoint);
-        return gridType == GridType.Viewpoint ? gridLon - cameraViewpoint.lon : metaViewpoint.lon - gridLon;
     }
 
     @Override
