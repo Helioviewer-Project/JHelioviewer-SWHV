@@ -210,7 +210,7 @@ public class GridLayer extends AbstractLayer {
                 if (i == GridMath.FLAT_STEPS_THETA / 2) {
                     continue;
                 }
-                double lon = MathUtils.mapToMinus180To180(scale.getInterpolatedXValue(1. / GridMath.FLAT_STEPS_THETA * i) + 180);
+                double lon = scale.getInterpolatedXValue(1. / GridMath.FLAT_STEPS_THETA * i);
                 String txt = formatter2.format(lon);
                 float x = i / (float) GridMath.FLAT_STEPS_THETA - 0.5f;
                 renderer.draw3D(txt, w * x, 0, 0, textScaleFactor);
