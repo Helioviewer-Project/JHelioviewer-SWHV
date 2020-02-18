@@ -21,21 +21,21 @@ public interface UpdateViewpoint {
         @Override
         public Position update(JHVTime time) {
             ImageLayer layer = Layers.getActiveImageLayer();
-            return layer == null ? Sun.getEarth(time) : layer.getView().getMetaData(time).getViewpoint();
+            return layer == null ? Sun.getEarthHCI(time) : layer.getView().getMetaData(time).getViewpoint();
         }
     }
 
     class Earth implements UpdateViewpoint {
         @Override
         public Position update(JHVTime time) {
-            return Sun.getEarth(time);
+            return Sun.getEarthHCI(time);
         }
     }
 
     class EarthFixedDistance implements UpdateViewpoint {
         @Override
         public Position update(JHVTime time) {
-            return new Position(time, Sun.MeanEarthDistance, Sun.getEarth(time).lon, 0);
+            return new Position(time, Sun.MeanEarthDistance, Sun.getEarthHCI(time).lon, 0);
         }
     }
 
@@ -54,13 +54,13 @@ public interface UpdateViewpoint {
             }
 
             ImageLayer layer = Layers.getActiveImageLayer();
-            double lon = layer == null ? Sun.getEarth(itime).lon : layer.getView().getMetaData(time).getViewpoint().lon;
+            double lon = layer == null ? Sun.getEarthHCI(itime).lon : layer.getView().getMetaData(time).getViewpoint().lon;
             return new Position(itime, distance, lon + Math.PI / 2, Math.PI / 2);
         }
     }
 
     class Expert implements UpdateViewpoint {
-        private final double[] lat = new double[3];
+        private final double[] lati = new double[3];
 
         @Override
         public Position update(JHVTime time) {
@@ -68,12 +68,11 @@ public interface UpdateViewpoint {
             if (!loadList.isEmpty()) {
                 PositionResponse response = loadList.get(0).getResponse();
                 if (response != null) {
-                    JHVTime itime = new JHVTime(response.interpolateLatitudinal(time.milli, Movie.getStartTime(), Movie.getEndTime(), lat));
-                    double elon = Sun.getEarth(itime).lon;
-                    return new Position(itime, lat[0], elon - lat[1], lat[2]);
+                    JHVTime itime = new JHVTime(response.interpolateLatitudinal(time.milli, Movie.getStartTime(), Movie.getEndTime(), lati));
+                    return new Position(itime, lati[0], lati[1], lati[2]);
                 }
             }
-            return Sun.getEarth(time);
+            return Sun.getEarthHCI(time);
         }
 
     }

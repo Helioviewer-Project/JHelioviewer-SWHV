@@ -123,7 +123,7 @@ public class GridLayer extends AbstractLayer {
         Position viewpoint = camera.getViewpoint();
         float ztext = 0; //(float) (camera.getWidth() * PLANETEXT_Z);
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
-        drawEarthCircles(gl, vp, pixFactor, Sun.getEarth(viewpoint.time));
+        drawEarthCircles(gl, vp, pixFactor, Sun.getEarthHCI(viewpoint.time));
 
         double pixelsPerSolarRadius = textScale * pixFactor;
 
