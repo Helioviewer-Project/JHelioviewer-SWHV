@@ -209,18 +209,13 @@ public class HelioviewerMetaData extends BaseMetaData {
     }
 
     private void retrievePosition(MetaDataContainer m, JHVTime dateObs) {
-        Position p = Sun.getEarth(dateObs);
+        Position p = Sun.getEarthHCI(dateObs);
         double distanceObs = m.getDouble("DSUN_OBS").map(d -> d / Sun.RadiusMeter).orElse(p.distance);
         if (observatory.equals("SOHO"))
             distanceObs *= Sun.L1Factor;
 
-        double theta = m.getDouble("HGLT_OBS").map(Math::toRadians)
-                .or(() -> m.getDouble("CRLT_OBS").map(Math::toRadians))
-                .or(() -> m.getDouble("REF_B0").map(Math::toRadians)).orElse(p.lat);
-
-        double phi = m.getDouble("HGLN_OBS").map(v -> p.lon - Math.toRadians(v))
-                .or(() -> m.getDouble("CRLN_OBS").map(v -> -Math.toRadians(v)))
-                .or(() -> m.getDouble("REF_L0").map(v -> -Math.toRadians(v))).orElse(p.lon);
+        double theta = m.getDouble("HGLT_OBS").map(Math::toRadians).orElse(p.lat);
+        double phi = m.getDouble("HGLN_OBS").map(v -> Math.toRadians(v) + p.lon).orElse(p.lon);
 
         viewpoint = new Position(dateObs, distanceObs, phi, theta);
     }
