@@ -27,4 +27,5 @@
 - Allow customization of grid type in latitudinal projection ([#99](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/99>))
 - Draw spiral in heliosphere through the trajectory of the highlighted object
 - Draw field-of-views of some SOLO, SDO and PROBA-2 remote sensing instruments; ability to "off-point" and to zoom-fit FOV with right-click
-- Optionally distort displayed images according to solar differential rotation (Snodgrass)
+- Optionally distort displayed images according to solar differential rotation (Snodgrass, magnetic features)
+- Load sequences of files as movie from the "jhv.load.image" SAMP message, example at <https://github.com/Helioviewer-Project/samp4jhv/blob/master/examples/python/samp_multi.py>
