@@ -6,7 +6,6 @@ import java.util.concurrent.Future;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.scale.GridType;
 import org.helioviewer.jhv.camera.Camera;
@@ -33,8 +32,6 @@ import org.json.JSONObject;
 import com.jogamp.opengl.GL2;
 
 public class ImageLayer extends AbstractLayer implements ImageDataHandler {
-
-    private static final boolean differential = Boolean.parseBoolean(Settings.getProperty("display.differential"));
 
     private final GLImage glImage = new GLImage();
     private final DecodeExecutor executor = new DecodeExecutor();
@@ -205,10 +202,9 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         Position metaViewpointDiff = metaDataDiff.getViewpoint();
         shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, metaDataDiff.getCenterRotation()));
 
-        if (differential) {
-            shader.bindDeltaT(gl, (float) ((cameraViewpoint.time.milli - metaViewpoint.time.milli) * 1e-9));
-            shader.bindDeltaTDiff(gl, (float) ((cameraViewpoint.time.milli - metaViewpointDiff.time.milli) * 1e-9));
-        }
+        boolean diffRot = ImageLayers.getDiffRotationMode();
+        shader.bindDeltaT(gl, diffRot ? (float) ((cameraViewpoint.time.milli - metaViewpoint.time.milli) * 1e-9) : 0);
+        shader.bindDeltaTDiff(gl, diffRot ? (float) ((cameraViewpoint.time.milli - metaViewpointDiff.time.milli) * 1e-9) : 0);
 
         if (Display.mode == Display.DisplayMode.Latitudinal) {
             GridType gridType = Layers.getGridLayer().getGridType();

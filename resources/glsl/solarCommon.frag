@@ -134,5 +134,5 @@ float differentialRotation(const float dt, const float theta) {
     float sin2l = sin(theta);
     sin2l *= sin2l;
     // Snodgrass, Table 1 Magnetic - http://articles.adsabs.harvard.edu/pdf/1990ApJ...351..309S
-    return -dt * (0.339 * sin2l + 0.485 * sin2l * sin2l); 
+    return dt * (0.01367 - 0.339 * sin2l - 0.485 * sin2l * sin2l); // 2.879 urad/s - 14.1844 deg/86400s (not fully right: 1st SI, 2nd TDB)
 }

@@ -64,7 +64,8 @@ public class ToolBar extends JToolBar {
 
     private final ButtonText ANNOTATION = new ButtonText(Buttons.annotate, "Annotation", "Annotation");
     private final ButtonText AXIS = new ButtonText(Buttons.axis, "Axis", "Axis");
-    private final ButtonText CUTOUT = new ButtonText(Buttons.cutOut, "SDO Cut-out", "SDO cut-out service");
+    private final ButtonText CUTOUT = new ButtonText(Buttons.cutOut, "SDO Cut-out", "Send layers to SDO cut-out service");
+    private final ButtonText DIFFROTATION = new ButtonText(Buttons.diffRotation, "Differential", "Toggle differential rotation");
     private final ButtonText MULTIVIEW = new ButtonText(Buttons.multiview, "Multiview", "Multiview");
     private final ButtonText OFFDISK = new ButtonText(Buttons.offDisk, "Corona", "Toggle off-disk corona");
     private final ButtonText PAN = new ButtonText(Buttons.pan, "Pan", "Pan");
@@ -73,7 +74,7 @@ public class ToolBar extends JToolBar {
     private final ButtonText ROTATE = new ButtonText(Buttons.rotate, "Rotate", "Rotate");
     private final ButtonText SAMP = new ButtonText(Buttons.samp, "SAMP", "Send SAMP message");
     private final ButtonText TRACK = new ButtonText(Buttons.track, "Track", "Track solar rotation");
-    private final ButtonText ZOOMFIT = new ButtonText(Buttons.zoomFit, "Zoom to Fit", "Zoom to fit");
+    private final ButtonText ZOOMFIT = new ButtonText(Buttons.zoomFit, "Zoom-Fit", "Zoom to fit");
     private final ButtonText ZOOMIN = new ButtonText(Buttons.zoomIn, "Zoom In", "Zoom in");
     private final ButtonText ZOOMONE = new ButtonText(Buttons.zoomOne, "Actual Size", "Zoom to native resolution");
     private final ButtonText ZOOMOUT = new ButtonText(Buttons.zoomOut, "Zoom Out", "Zoom out");
@@ -116,16 +117,21 @@ public class ToolBar extends JToolBar {
         setDisplayMode(displayMode);
     }
 
-    private JHVToggleButton multiviewButton;
     private JHVToggleButton coronaButton;
+    private JHVToggleButton diffRotationButton;
+    private JHVToggleButton multiviewButton;
     private JHVToggleButton trackingButton;
-
-    public JHVToggleButton getMultiviewButton() {
-        return multiviewButton;
-    }
 
     public JHVToggleButton getShowCoronaButton() {
         return coronaButton;
+    }
+
+    public JHVToggleButton getDiffRotationButton() {
+        return diffRotationButton;
+    }
+
+    public JHVToggleButton getMultiviewButton() {
+        return multiviewButton;
     }
 
     public JHVToggleButton getTrackingButton() {
@@ -196,6 +202,14 @@ public class ToolBar extends JToolBar {
         trackingButton.setSelected(Display.getCamera().getTrackingMode());
         trackingButton.addItemListener(e -> Display.getCamera().setTrackingMode(trackingButton.isSelected()));
         addButton(trackingButton);
+
+        diffRotationButton = toolToggleButton(DIFFROTATION);
+        diffRotationButton.setSelected(ImageLayers.getDiffRotationMode());
+        diffRotationButton.addItemListener(e -> {
+            ImageLayers.setDiffRotationMode(diffRotationButton.isSelected());
+            MovieDisplay.display();
+        });
+        addButton(diffRotationButton);
 
         coronaButton = toolToggleButton(OFFDISK);
         coronaButton.setSelected(Display.getShowCorona());
