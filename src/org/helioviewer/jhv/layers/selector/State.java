@@ -52,6 +52,7 @@ public class State {
         main.put("projection", Display.mode);
         main.put("tracking", JHVFrame.getToolBar().getTrackingButton().isSelected());
         main.put("showCorona", JHVFrame.getToolBar().getShowCoronaButton().isSelected());
+        main.put("differentialRotation", JHVFrame.getToolBar().getDiffRotationButton().isSelected());
         main.put("annotations", JHVFrame.getInteraction().saveAnnotations());
 
         JSONArray ja = new JSONArray();
@@ -181,6 +182,7 @@ public class State {
         JHVFrame.getInteraction().loadAnnotations(data.optJSONObject("annotations"));
         JHVFrame.getToolBar().getMultiviewButton().setSelected(data.optBoolean("multiview", JHVFrame.getToolBar().getMultiviewButton().isSelected()));
         JHVFrame.getToolBar().getShowCoronaButton().setSelected(data.optBoolean("showCorona", JHVFrame.getToolBar().getShowCoronaButton().isSelected()));
+        JHVFrame.getToolBar().getDiffRotationButton().setSelected(data.optBoolean("differentialRotation", JHVFrame.getToolBar().getDiffRotationButton().isSelected()));
 
         JHVTime time = new JHVTime(TimeUtils.optParse(data.optString("time"), Movie.getTime().milli));
         boolean tracking = data.optBoolean("tracking", JHVFrame.getToolBar().getTrackingButton().isSelected());

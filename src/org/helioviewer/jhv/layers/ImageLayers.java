@@ -190,4 +190,14 @@ public class ImageLayers {
         msg.addParam("layers", layersData);
     }
 
+    private static boolean diffRotationMode;
+
+    public static boolean getDiffRotationMode() {
+        return diffRotationMode;
+    }
+
+    public static void setDiffRotationMode(boolean b) {
+        diffRotationMode = b;
+    }
+
 }

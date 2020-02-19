@@ -68,6 +68,7 @@ public class Buttons {
     public static final String annotate = toolBar(MaterialDesign.MDI_SHAPE_POLYGON_PLUS);
     public static final String axis = toolBar(MaterialDesign.MDI_BACKUP_RESTORE);
     public static final String cutOut = toolBar(MaterialDesign.MDI_VECTOR_CIRCLE_VARIANT);
+    public static final String diffRotation = toolBar(MaterialDesign.MDI_CHART_GANTT);
     public static final String multiview = toolBar(MaterialDesign.MDI_BORDER_ALL);
     public static final String offDisk = toolBar(MaterialDesign.MDI_WEATHER_SUNNY);
     public static final String pan = toolBar(MaterialDesign.MDI_CURSOR_MOVE);
