@@ -2,6 +2,7 @@ package org.helioviewer.jhv.io;
 
 import java.awt.EventQueue;
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -51,6 +52,13 @@ public class SampClient extends HubConnector {
         }
     }
 
+    private static URI toURI(String url) throws Exception {
+        URI uri = new URI(url);
+        if (uri.getScheme() == null) // assume local file
+            uri = Path.of(url).toUri();
+        return uri;
+    }
+
     private SampClient(ClientProfile _profile) {
         super(_profile);
 
@@ -73,7 +81,7 @@ public class SampClient extends HubConnector {
                 try {
                     Object url = msg.getParam("url");
                     if (url != null) {
-                        URI uri = new URI(url.toString());
+                        URI uri = toURI(url.toString());
                         EventQueue.invokeLater(() -> Load.fits.get(uri));
                     }
                 } catch (Exception e) {
@@ -91,7 +99,7 @@ public class SampClient extends HubConnector {
                     if ("SSA".equals(c.getMetadata(senderId).getName())) {
                         Object url = msg.getParam("url");
                         if (url != null) {
-                            URI uri = new URI(url.toString());
+                            URI uri = toURI(url.toString());
                             EventQueue.invokeLater(() -> Load.fits.get(uri));
                         }
                     }
@@ -109,12 +117,12 @@ public class SampClient extends HubConnector {
                     JSONObject jo = new JSONObject(SampUtils.toJson(msg.getParams(), false));
                     JSONArray ja = jo.optJSONArray("url");
                     if (ja == null) {
-                        URI uri = new URI(jo.optString("url"));
+                        URI uri = toURI(jo.optString("url"));
                         EventQueue.invokeLater(() -> Load.image.get(uri));
                     } else {
                         ArrayList<URI> uris = new ArrayList<>(ja.length());
                         for (Object obj : ja) {
-                            uris.add(new URI(obj.toString()));
+                            uris.add(toURI(obj.toString()));
                         }
                         EventQueue.invokeLater(() -> Load.Image.getAll(uris));
                     }
@@ -131,7 +139,7 @@ public class SampClient extends HubConnector {
                 try {
                     Object url = msg.getParam("url");
                     if (url != null) {
-                        URI uri = new URI(url.toString());
+                        URI uri = toURI(url.toString());
                         EventQueue.invokeLater(() -> Load.request.get(uri));
                     }
                 } catch (Exception e) {
@@ -147,7 +155,7 @@ public class SampClient extends HubConnector {
                 try {
                     Object url = msg.getParam("url");
                     if (url != null) {
-                        URI uri = new URI(url.toString());
+                        URI uri = toURI(url.toString());
                         EventQueue.invokeLater(() -> Load.state.get(uri));
                     }
                 } catch (Exception e) {
