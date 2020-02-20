@@ -32,7 +32,7 @@ public class NetFileCache {
         try {
             return cache.get(uri);
         } catch (Exception e) {
-            throw new IOException(e.getCause());
+            throw new IOException(e);
         }
     }
 
