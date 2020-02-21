@@ -43,9 +43,7 @@ public interface GridTransform {
     class GridTransformLatitudinal implements GridTransform {
         @Override
         public Vec2 transform(Position viewpoint, Vec3 pt, GridScale scale) {
-            Quat q = new Quat(viewpoint.lat, 0);
-            pt = q.rotateInverseVector(pt);
-            double theta = Math.PI / 2 - Math.acos(-pt.y) - viewpoint.lat; // ???
+            double theta = Math.asin(-pt.y);
             double phi = Math.atan2(pt.x, pt.z);
             double scaledphi = scale.getXValueInv(phi * MathUtils.radeg);
             double scaledtheta = scale.getYValueInv(theta * MathUtils.radeg);
@@ -56,8 +54,7 @@ public interface GridTransform {
         public Vec3 transformInverse(Quat frame, Vec2 pt) {
             double phi = MathUtils.mapToMinus180To180(pt.x) * MathUtils.degra;
             double theta = pt.y * MathUtils.degra;
-            theta = -theta + Math.PI / 2;
-            return frame.rotateInverseVector(new Vec3(Math.sin(theta) * Math.sin(phi), Math.cos(theta), Math.sin(theta) * Math.cos(phi)));
+            return frame.rotateInverseVector(new Vec3(Math.cos(theta) * Math.sin(phi), Math.sin(theta), Math.cos(theta) * Math.cos(phi)));
         }
     }
 
