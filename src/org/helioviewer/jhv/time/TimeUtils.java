@@ -96,7 +96,7 @@ public class TimeUtils {
     }
 
     public static long optParse(String date, long alt) {
-        String spice = Spice.dateParse2UTC(date);
+        String spice = Spice.timeParse2UTC(date);
         if (spice != null)
             return parse(spice);
 
