@@ -72,7 +72,7 @@ public class Spice {
     @Nonnull
     public static Position getEarthCarrington(JHVTime time) {
         try {
-            double[] c = positionLatitudinal("EARTH", time.milli, "SOLO_IAU_SUN_2003", "SUN");
+            double[] c = positionLatitudinal("EARTH", time.milli, "SOLO_IAU_SUN_2009", "SUN");
             // like in SSW.getEarthSSW
             double lon = c[1];
             if (lon < 0)
