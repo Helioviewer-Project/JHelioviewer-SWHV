@@ -5,6 +5,7 @@ import java.awt.Component;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.AbstractLayer;
@@ -12,6 +13,7 @@ import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.plugins.pfss.data.PfssData;
@@ -61,7 +63,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener, TimespanLi
 
         PfssData pfssData = PfssPlugin.getPfsscache().getNearestData(currentTime);
         if (pfssData != null) {
-            renderData(gl, vp, pfssData);
+            renderData(camera, vp, gl, pfssData);
             previousPfssData = pfssData;
         }
     }
@@ -137,7 +139,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener, TimespanLi
     private boolean lastFixedColor;
     private double lastRadius;
 
-    private void renderData(GL2 gl, Viewport vp, PfssData data) {
+    private void renderData(Camera camera, Viewport vp, GL2 gl, PfssData data) {
         int detail = optionsPanel.getDetail();
         boolean fixedColor = optionsPanel.getFixedColor();
         double radius = optionsPanel.getRadius();
@@ -153,7 +155,11 @@ public class PfssLayer extends AbstractLayer implements TimeListener, TimespanLi
             pfssTime = data.dateObs;
             JHVFrame.getLayers().fireTimeUpdated(this);
         }
+
+        Transform.pushView();
+        CameraHelper.rotate2EarthLon(camera.getViewpoint());
         glslLine.render(gl, vp.aspect, LINEWIDTH);
+        Transform.popView();
     }
 
 }
