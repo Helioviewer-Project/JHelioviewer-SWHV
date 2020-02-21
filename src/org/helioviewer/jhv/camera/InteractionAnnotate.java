@@ -12,6 +12,7 @@ import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.MovieDisplay;
+import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
@@ -53,15 +54,16 @@ class InteractionAnnotate implements InteractionType {
             return;
 
         Position viewpoint = camera.getViewpoint();
+        Quat q = viewpoint.toQuat();
         Annotateable activeAnn = activeIndex >= 0 && activeIndex < anns.size() ? anns.get(activeIndex) : null;
 
         anns.forEach(annotateable -> {
             boolean active = annotateable == activeAnn;
-            annotateable.draw(viewpoint, vp, active, annsBuf);
+            annotateable.draw(q, vp, active, annsBuf);
             annotateable.drawTransformed(active, transBuf, centerBuf);
         });
         if (newAnnotateable != null) {
-            newAnnotateable.draw(viewpoint, vp, false, annsBuf);
+            newAnnotateable.draw(q, vp, false, annsBuf);
             newAnnotateable.drawTransformed(false, transBuf, centerBuf);
         }
         annsLine.setData(gl, annsBuf);
@@ -70,7 +72,7 @@ class InteractionAnnotate implements InteractionType {
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
 
         Transform.pushView();
-        Transform.rotateViewInverse(viewpoint.toQuat());
+        Transform.rotateViewInverse(q);
         boolean far = Camera.useWideProjection(viewpoint.distance);
         if (far) {
             Transform.pushProjection();

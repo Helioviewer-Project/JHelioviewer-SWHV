@@ -1,11 +1,11 @@
 package org.helioviewer.jhv.camera.annotate;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -20,7 +20,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         super(jo);
     }
 
-    private static void drawRectangle(Position viewpoint, Viewport vp, Vec3 bp, Vec3 ep, BufVertex buf, byte[] color) {
+    private static void drawRectangle(Quat q, Viewport vp, Vec3 bp, Vec3 ep, BufVertex buf, byte[] color) {
         if (bp.z * ep.z < 0) {
             if (ep.z < bp.z && bp.z > Math.PI / 2)
                 ep.z += 2 * Math.PI;
@@ -45,9 +45,9 @@ public class AnnotateRectangle extends AbstractAnnotateable {
             } else {
                 pc.y = -pc.y;
                 if (i == 0) {
-                    GLHelper.drawVertex(viewpoint, vp, pc, previous, buf, Colors.Null);
+                    GLHelper.drawVertex(q, vp, pc, previous, buf, Colors.Null);
                 }
-                previous = GLHelper.drawVertex(viewpoint, vp, pc, previous, buf, color);
+                previous = GLHelper.drawVertex(q, vp, pc, previous, buf, color);
             }
         }
 
@@ -59,7 +59,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
                 buf.putVertex(pc, color);
             } else {
                 pc.y = -pc.y;
-                previous = GLHelper.drawVertex(viewpoint, vp, pc, previous, buf, color);
+                previous = GLHelper.drawVertex(q, vp, pc, previous, buf, color);
             }
         }
 
@@ -71,7 +71,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
                 buf.putVertex(pc, color);
             } else {
                 pc.y = -pc.y;
-                previous = GLHelper.drawVertex(viewpoint, vp, pc, previous, buf, color);
+                previous = GLHelper.drawVertex(q, vp, pc, previous, buf, color);
             }
         }
 
@@ -86,16 +86,16 @@ public class AnnotateRectangle extends AbstractAnnotateable {
                 }
             } else {
                 pc.y = -pc.y;
-                previous = GLHelper.drawVertex(viewpoint, vp, pc, previous, buf, color);
+                previous = GLHelper.drawVertex(q, vp, pc, previous, buf, color);
                 if (i == SUBDIVISIONS) {
-                    GLHelper.drawVertex(viewpoint, vp, pc, previous, buf, Colors.Null);
+                    GLHelper.drawVertex(q, vp, pc, previous, buf, Colors.Null);
                 }
             }
         }
     }
 
     @Override
-    public void draw(Position viewpoint, Viewport vp, boolean active, BufVertex buf) {
+    public void draw(Quat q, Viewport vp, boolean active, BufVertex buf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
@@ -104,7 +104,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
 
-        drawRectangle(viewpoint, vp, toSpherical(p0), toSpherical(p1), buf, color);
+        drawRectangle(q, vp, toSpherical(p0), toSpherical(p1), buf, color);
     }
 
     @Override

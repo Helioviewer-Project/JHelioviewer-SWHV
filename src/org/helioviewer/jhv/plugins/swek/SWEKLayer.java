@@ -15,7 +15,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.scale.GridScale;
@@ -170,7 +169,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         }
     }
 
-    private void drawPolygon(Camera camera, Viewport vp, JHVRelatedEvents evtr, JHVEvent evt) {
+    private void drawPolygon(Quat q, Viewport vp, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -183,7 +182,6 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         BufVertex buf = evtr.isHighlighted() ? bufThick : bufEvent;
         byte[] color = Colors.bytes(evtr.getColor());
 
-        Position viewpoint = camera.getViewpoint();
         Vec3 pt = new Vec3();
         Vec2 previous = null;
 
@@ -212,9 +210,9 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                         pt.y = ynew / r;
                         pt.z = znew / r;
                         if (j == 0) {
-                            previous = GLHelper.drawVertex(viewpoint, vp, pt, previous, buf, Colors.Null);
+                            previous = GLHelper.drawVertex(q, vp, pt, previous, buf, Colors.Null);
                         }
-                        previous = GLHelper.drawVertex(viewpoint, vp, pt, previous, buf, color);
+                        previous = GLHelper.drawVertex(q, vp, pt, previous, buf, color);
                     }
                 }
                 buf.repeatVertex(Colors.Null);
@@ -268,17 +266,14 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         texBuf.putCoord((float) (theta + width2), (float) (r + height2), 0, 1, texCoord[3]);
     }
 
-    private void drawIconScale(Camera camera, Viewport vp, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, GridTransform xform) {
+    private void drawIconScale(Quat q, Viewport vp, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, GridTransform xform) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
 
         Vec3 pt = pi.centralPoint();
         if (pt != null) {
-            Position viewpoint = camera.getViewpoint();
-            pt = viewpoint.toQuat().rotateVector(pt);
-            Vec2 tf = xform.transform(viewpoint, pt, scale);
-
+            Vec2 tf = xform.transform(q, pt, scale);
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
             drawImageScale(tf.x * vp.aspect, tf.y, sz, sz);
         }
@@ -380,12 +375,13 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             if (evs.isEmpty())
                 return;
 
+            Quat q = camera.getViewpoint().toQuat();
             for (JHVRelatedEvents evtr : evs) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
                 if (evt.isCactus()) {
                     drawCactusArc(evtr, evt, controller.currentTime);
                 } else {
-                    drawPolygon(camera, vp, evtr, evt);
+                    drawPolygon(q, vp, evtr, evt);
                     if (icons) {
                         drawIcon(evtr, evt);
                     }
@@ -405,14 +401,15 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             if (evs.isEmpty())
                 return;
 
+            Quat q = camera.getViewpoint().toQuat();
             for (JHVRelatedEvents evtr : evs) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
                 if (evt.isCactus() && (Display.mode == Display.DisplayMode.LogPolar || Display.mode == Display.DisplayMode.Polar)) {
                     drawCactusArcScale(vp, evtr, evt, controller.currentTime, Display.mode.scale);
                 } else {
-                    drawPolygon(camera, vp, evtr, evt);
+                    drawPolygon(q, vp, evtr, evt);
                     if (icons) {
-                        drawIconScale(camera, vp, evtr, evt, Display.mode.scale, Display.mode.xform);
+                        drawIconScale(q, vp, evtr, evt, Display.mode.scale, Display.mode.xform);
                     }
                 }
             }

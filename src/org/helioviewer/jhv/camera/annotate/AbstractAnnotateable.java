@@ -2,7 +2,6 @@ package org.helioviewer.jhv.camera.annotate;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
@@ -61,16 +60,16 @@ abstract class AbstractAnnotateable implements Annotateable {
 
     @Nullable
     static Vec3 computePoint(Camera camera, int x, int y) {
-        Quat frame = camera.getViewpoint().toQuat();
+        Quat q = camera.getViewpoint().toQuat();
         if (Display.mode == Display.DisplayMode.Orthographic) {
-            return CameraHelper.getVectorFromSphere(camera, Display.getActiveViewport(), x, y, frame, true);
+            return CameraHelper.getVectorFromSphere(camera, Display.getActiveViewport(), x, y, q, true);
         } else {
-            return Display.mode.xform.transformInverse(frame, Display.mode.scale.mouseToGrid(x, y, Display.getActiveViewport(), camera, Layers.getGridLayer().getGridType()));
+            return Display.mode.xform.transformInverse(q, Display.mode.scale.mouseToGrid(x, y, Display.getActiveViewport(), camera, Layers.getGridLayer().getGridType()));
         }
     }
 
     @Override
-    public void draw(Position viewpoint, Viewport vp, boolean active, BufVertex buf) {
+    public void draw(Quat q, Viewport vp, boolean active, BufVertex buf) {
     }
 
     @Override
