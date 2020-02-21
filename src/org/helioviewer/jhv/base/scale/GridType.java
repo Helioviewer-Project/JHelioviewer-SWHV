@@ -21,13 +21,12 @@ public enum GridType {
             case Viewpoint:
                 return viewpoint.lon;
             case Stonyhurst:
-                return Sun.getEarth(viewpoint.time).lon;
-            case HCI:
-                return Sun.getEarth(viewpoint.time).lon + Sun.getEarthHCI(viewpoint.time).lon;
-            default: // Carrington
-                return 0;
+                return 2 * viewpoint.lon - Sun.getEarthHCI(viewpoint.time).lon;
+            case Carrington:
+                return 2 * viewpoint.lon - Sun.getEarthHCI(viewpoint.time).lon - Sun.getEarth(viewpoint.time).lon;
+            default: // HCI
+                return 2 * viewpoint.lon;
         }
-
     }
 
 }
