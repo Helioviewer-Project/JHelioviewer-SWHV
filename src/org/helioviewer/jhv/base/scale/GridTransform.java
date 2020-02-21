@@ -16,8 +16,8 @@ public interface GridTransform {
 
     class GridTransformPolar implements GridTransform {
         @Override
-        public Vec2 transform(Quat q, Vec3 pt, GridScale scale) {
-            pt = q.rotateVector(pt);
+        public Vec2 transform(Quat q, Vec3 v, GridScale scale) {
+            Vec3 pt = q.rotateVector(v);
             double r = Math.sqrt(pt.x * pt.x + pt.y * pt.y);
             double theta = Math.atan2(-pt.x, -pt.y);
             theta += 2 * Math.PI;
@@ -40,8 +40,8 @@ public interface GridTransform {
 
     class GridTransformLatitudinal implements GridTransform {
         @Override
-        public Vec2 transform(Quat q, Vec3 pt, GridScale scale) {
-            pt = q.rotateVector(pt);
+        public Vec2 transform(Quat q, Vec3 v, GridScale scale) {
+            Vec3 pt = q.rotateVector(v);
             double theta = Math.asin(-pt.y);
             double phi = Math.atan2(pt.x, pt.z);
             double scaledphi = scale.getXValueInv(phi * MathUtils.radeg);
