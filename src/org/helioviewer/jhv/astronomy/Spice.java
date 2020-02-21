@@ -13,13 +13,12 @@ import org.helioviewer.jhv.time.JHVTime;
 import spice.basic.CSPICE;
 import spice.basic.KernelDatabase;
 import spice.basic.SpiceErrorException;
-import spice.basic.TDBTime;
 
 //import com.google.common.base.Stopwatch;
 
 public class Spice {
 
-    public static void loadKernels(@Nonnull List<String> files) {
+    public static void loadKernels(List<String> files) {
         try {
             for (String f : files) {
                 KernelDatabase.load(Path.of(JHVGlobals.dataCacheDir, f).toString());
@@ -30,9 +29,9 @@ public class Spice {
     }
 
     @Nullable
-    public static String dateParse2UTC(@Nonnull String date) {
+    public static String timeParse2UTC(String time) {
         try {
-            return new TDBTime(date).toUTCString("isoc", 0);
+            return CSPICE.et2utc(CSPICE.str2et(time), "isoc", 0);
         } catch (SpiceErrorException e) {
             Log.error(e);
         }
@@ -40,14 +39,14 @@ public class Spice {
     }
 
     @Nullable
-    static PositionCartesian[] getPositionRange(@Nonnull String observer, @Nonnull String target, Frame frame, long start, long end, long deltat) {
+    static PositionCartesian[] getPositionRange(String observer, String target, String frame, long start, long end, long deltat) {
         // Stopwatch sw = Stopwatch.createStarted();
         try {
             long dt = deltat * 1000;
             PositionCartesian[] ret = new PositionCartesian[(int) ((end - start) / dt) + 1];
             int i = 0;
             for (long milli = start; milli <= end; milli += dt) {
-                double[] v = positionRectangular(target, milli, frame.toString(), observer);
+                double[] v = positionRectangular(target, milli, frame, observer);
                 ret[i++] = new PositionCartesian(milli, v[0], v[1], v[2]);
             }
             //System.out.println((sw.elapsed().toNanos() / 1e9));
@@ -59,9 +58,9 @@ public class Spice {
     }
 
     @Nullable
-    static Position getPositionLatitudinal(@Nonnull String observer, @Nonnull String target, Frame frame, JHVTime time) {
+    static Position getPositionLatitudinal(String observer, String target, String frame, JHVTime time) {
         try {
-            double[] c = positionLatitudinal(target, time.milli, frame.toString(), observer);
+            double[] c = positionLatitudinal(target, time.milli, frame, observer);
             return new Position(time, c[0], c[1], c[2]);
         } catch (SpiceErrorException e) {
             Log.error(e);
