@@ -204,9 +204,8 @@ public interface GridScale {
                 p = q.rotateInverseVector(p);
             }
 
-            double theta = 90 - MathUtils.radeg * Math.acos(p.y);
-            double phi = 90 - MathUtils.radeg * Math.atan2(p.z, p.x);
-            phi = MathUtils.mapToMinus180To180(phi);
+            double theta = Math.asin(p.y) * MathUtils.radeg;
+            double phi = Math.atan2(p.x, p.z) * MathUtils.radeg;
 
             if (gridType == GridType.Carrington && phi < 0)
                 phi += 360;
