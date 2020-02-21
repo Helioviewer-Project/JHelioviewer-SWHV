@@ -11,7 +11,6 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.JHVTime;
 
 import spice.basic.CSPICE;
-import spice.basic.KernelDatabase;
 import spice.basic.SpiceErrorException;
 
 //import com.google.common.base.Stopwatch;
@@ -21,9 +20,9 @@ public class Spice {
     public static void loadKernels(List<String> files) {
         try {
             for (String f : files) {
-                KernelDatabase.load(Path.of(JHVGlobals.dataCacheDir, f).toString());
+                CSPICE.furnsh(Path.of(JHVGlobals.dataCacheDir, f).toString());
             }
-        } catch (Exception e) {
+        } catch (SpiceErrorException e) {
             Log.error(e);
         }
     }
