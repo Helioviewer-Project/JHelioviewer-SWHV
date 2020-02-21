@@ -9,7 +9,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -165,9 +164,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener {
                 } else {
                     Vec3 pt = pi.centralPoint();
                     if (pt != null) {
-                        Position viewpoint = camera.getViewpoint();
-                        pt = viewpoint.toQuat().rotateVector(pt);
-                        tf = Display.mode.xform.transform(viewpoint, pt, Display.mode.scale);
+                        tf = Display.mode.xform.transform(camera.getViewpoint().toQuat(), pt, Display.mode.scale);
                     }
                 }
 

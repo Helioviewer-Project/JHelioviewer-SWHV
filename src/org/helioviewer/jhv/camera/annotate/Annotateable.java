@@ -1,14 +1,14 @@
 package org.helioviewer.jhv.camera.annotate;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.json.JSONObject;
 
 public interface Annotateable {
 
-    void draw(Position viewpoint, Viewport vp, boolean active, BufVertex buf);
+    void draw(Quat q, Viewport vp, boolean active, BufVertex buf);
 
     void drawTransformed(boolean active, BufVertex lineBuf, BufVertex centerBuf);
 

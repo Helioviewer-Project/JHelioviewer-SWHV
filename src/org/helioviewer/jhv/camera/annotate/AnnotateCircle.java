@@ -1,11 +1,11 @@
 package org.helioviewer.jhv.camera.annotate;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -20,7 +20,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
         super(jo);
     }
 
-    private static void drawCircle(Position viewpoint, Viewport vp, Vec3 bp, Vec3 ep, BufVertex buf, byte[] color) {
+    private static void drawCircle(Quat q, Viewport vp, Vec3 bp, Vec3 ep, BufVertex buf, byte[] color) {
         double cosf = Vec3.dot(bp, ep);
         double r = Math.sqrt(1 - cosf * cosf);
         // P = center + r cos(A) (bp x ep) + r sin(A) ep
@@ -51,18 +51,18 @@ public class AnnotateCircle extends AbstractAnnotateable {
             } else {
                 vx.y = -vx.y;
                 if (i == 0) {
-                    GLHelper.drawVertex(viewpoint, vp, vx, previous, buf, Colors.Null);
+                    GLHelper.drawVertex(q, vp, vx, previous, buf, Colors.Null);
                 }
-                previous = GLHelper.drawVertex(viewpoint, vp, vx, previous, buf, color);
+                previous = GLHelper.drawVertex(q, vp, vx, previous, buf, color);
                 if (i == SUBDIVISIONS) {
-                    GLHelper.drawVertex(viewpoint, vp, vx, previous, buf, Colors.Null);
+                    GLHelper.drawVertex(q, vp, vx, previous, buf, Colors.Null);
                 }
             }
         }
     }
 
     @Override
-    public void draw(Position viewpoint, Viewport vp, boolean active, BufVertex buf) {
+    public void draw(Quat q, Viewport vp, boolean active, BufVertex buf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
@@ -71,7 +71,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
 
-        drawCircle(viewpoint, vp, p0, p1, buf, color);
+        drawCircle(q, vp, p0, p1, buf, color);
     }
 
     @Override
