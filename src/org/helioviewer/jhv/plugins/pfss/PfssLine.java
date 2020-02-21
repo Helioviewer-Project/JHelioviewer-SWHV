@@ -35,6 +35,8 @@ class PfssLine {
 
     public void calculatePositions(PfssData data, int detail, boolean fixedColor, double radius, BufVertex lineBuf) {
         int pointsPerLine = data.pointsPerLine;
+        double cphi = data.cphi;
+        double sphi = data.sphi;
         ShortBuffer flinex = data.flinex;
         ShortBuffer fliney = data.fliney;
         ShortBuffer flinez = data.flinez;
@@ -47,9 +49,14 @@ class PfssLine {
                 double x = 3. * decode(flinex, i);
                 double y = 3. * decode(fliney, i);
                 double z = 3. * decode(flinez, i);
-                double r = Math.sqrt(x * x + y * y + z * z);
                 double b = decode(flines, i);
                 computeBrightColor(b);
+
+                double helpx = cphi * x + sphi * y;
+                double helpy = -sphi * x + cphi * y;
+                x = helpx;
+                y = helpy;
+                double r = Math.sqrt(x * x + y * y + z * z);
 
                 if (i % pointsPerLine == 0) { // start line
                     lineBuf.putVertex((float) x, (float) z, (float) -y, 1, Colors.Null);

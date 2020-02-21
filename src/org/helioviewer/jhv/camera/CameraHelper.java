@@ -2,13 +2,11 @@ package org.helioviewer.jhv.camera;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 
@@ -102,16 +100,6 @@ public class CameraHelper {
         if (size != 0)
             newFOV = 2. * Math.atan2(0.5 * size, camera.getViewpoint().distance);
         camera.setFOV(newFOV);
-    }
-
-    public static void rotate2Earth(Position viewpoint) {
-        Position e = Sun.getEarthHCI(viewpoint.time);
-        Transform.rotateViewInverse(new Quat(e.lat, 2 * viewpoint.lon - e.lon));
-    }
-
-    public static void rotate2EarthLon(Position viewpoint) {
-        Position e = Sun.getEarthHCI(viewpoint.time);
-        Transform.rotateViewInverse(new Quat(0, 2 * viewpoint.lon - e.lon));
     }
 
 }
