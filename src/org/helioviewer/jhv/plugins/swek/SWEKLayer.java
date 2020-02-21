@@ -21,6 +21,7 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.base.scale.GridTransform;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.events.JHVEvent;
@@ -38,6 +39,7 @@ import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufCoord;
@@ -380,6 +382,9 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             if (evs.isEmpty())
                 return;
 
+            Transform.pushView();
+            CameraHelper.rotate2Carrington(camera.getViewpoint());
+
             for (JHVRelatedEvents evtr : evs) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
                 if (evt.isCactus()) {
@@ -395,6 +400,8 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             if (icons) {
                 renderIcons(gl, evs);
             }
+
+            Transform.popView();
         }
     }
 
