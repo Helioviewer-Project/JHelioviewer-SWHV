@@ -26,7 +26,7 @@ public class TimeUtils {
     public static final long MINUTE_IN_MILLIS = 60000;
 
     public static final JHVTime START = new JHVTime(floorSec(System.currentTimeMillis()));
-    public static final JHVTime MINIMAL_TIME = new JHVTime("1970-01-01T00:00:00");
+    public static final JHVTime MINIMAL_TIME = new JHVTime("1990-01-01T00:00:00");
     public static final JHVTime MAXIMAL_TIME = new JHVTime("2050-01-01T00:00:00");
 
     private static final double MAX_FRAMES = 96;
