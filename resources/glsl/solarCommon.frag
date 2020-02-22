@@ -114,14 +114,6 @@ void clamp_value(const float value, const float low, const float high) {
         discard;
 }
 
-vec3 rotate_vector_inverse(const vec4 quat, const vec3 vec) {
-    return vec + 2. * cross(cross(vec, quat.xyz) + quat.w * vec, quat.xyz);
-}
-
-vec3 rotate_vector(const vec4 quat, const vec3 vec) {
-    return vec + 2. * cross(quat.xyz, cross(quat.xyz, vec) + quat.w * vec);
-}
-
 vec2 getScrPos(void) {
     vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - viewportOffset) / viewport.xy - 1.;
     vec4 up1 = cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);

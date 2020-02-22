@@ -71,6 +71,7 @@ class MovieExporter {
 
     void close() throws Exception {
         List<String> input = List.of(
+                "-hide_banner",
                 "-f", "rawvideo",
                 "-pix_fmt", "bgr24",
                 "-r", format == VideoFormat.PNG ? "1" : String.valueOf(fps),

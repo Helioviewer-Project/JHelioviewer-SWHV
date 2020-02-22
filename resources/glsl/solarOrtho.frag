@@ -11,6 +11,14 @@ vec3 differential(const float dt, const vec3 v) {
     return vec3(cos(theta) * sin(phi), v.y, cos(theta) * cos(phi));
 }
 
+vec3 rotate_vector_inverse(const vec4 quat, const vec3 vec) {
+    return vec + 2. * cross(cross(vec, quat.xyz) + quat.w * vec, quat.xyz);
+}
+
+vec3 rotate_vector(const vec4 quat, const vec3 vec) {
+    return vec + 2. * cross(quat.xyz, cross(quat.xyz, vec) + quat.w * vec);
+}
+
 float intersectPlane(const vec4 quat, const vec4 vecin, const bool hideBack) {
     vec3 altnormal = rotate_vector(quat, zAxis);
     if (hideBack && altnormal.z <= 0.)
