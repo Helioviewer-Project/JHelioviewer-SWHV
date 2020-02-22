@@ -4,22 +4,22 @@ import java.awt.Component;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JCheckBox;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.jhv.gui.interfaces.JHVCell;
 
-public class JHVTreeCell {
+public class JHVTableCell {
 
     @SuppressWarnings("serial")
-    public static class Renderer extends DefaultTreeCellRenderer {
+    public static class Renderer extends DefaultTableCellRenderer {
 
         @Override
-        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             if (value instanceof JHVCell) {
                 return ((JHVCell) value).getComponent();
             } else
-                return super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
+                return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         }
 
     }
@@ -32,11 +32,11 @@ public class JHVTreeCell {
         }
 
         @Override
-        public Component getTreeCellEditorComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row) {
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
             if (value instanceof JHVCell) {
                 return ((JHVCell) value).getComponent();
             } else
-                return super.getTreeCellEditorComponent(tree, value, selected, expanded, leaf, row);
+                return super.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
 
     }

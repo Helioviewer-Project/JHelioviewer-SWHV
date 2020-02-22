@@ -15,10 +15,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.helioviewer.jhv.events.filter.FilterDialog;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.JHVButton;
-import org.helioviewer.jhv.gui.interfaces.JHVTreeNode;
+import org.helioviewer.jhv.gui.interfaces.JHVCell;
 
 @SuppressWarnings("serial")
-public class SWEKSupplier extends DefaultMutableTreeNode implements JHVTreeNode {
+public class SWEKSupplier extends DefaultMutableTreeNode implements JHVCell {
 
     private final String supplierName;
     private final String name;

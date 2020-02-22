@@ -19,10 +19,10 @@ import javax.swing.tree.DefaultTreeModel;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.UITimer;
-import org.helioviewer.jhv.gui.interfaces.JHVTreeNode;
+import org.helioviewer.jhv.gui.interfaces.JHVCell;
 
 @SuppressWarnings("serial")
-public class SWEKGroup extends DefaultMutableTreeNode implements JHVTreeNode {
+public class SWEKGroup extends DefaultMutableTreeNode implements JHVCell {
 
     static final int RIGHT_ALIGNMENT = 300;
 
