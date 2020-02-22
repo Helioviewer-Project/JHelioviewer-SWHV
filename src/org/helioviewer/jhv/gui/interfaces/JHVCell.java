@@ -2,7 +2,7 @@ package org.helioviewer.jhv.gui.interfaces;
 
 import java.awt.Component;
 
-public interface JHVTreeNode {
+public interface JHVCell {
 
     Component getComponent();
 

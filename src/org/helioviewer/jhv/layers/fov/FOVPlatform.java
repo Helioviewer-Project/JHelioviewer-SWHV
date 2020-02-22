@@ -13,11 +13,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
-import org.helioviewer.jhv.gui.interfaces.JHVTreeNode;
+import org.helioviewer.jhv.gui.interfaces.JHVCell;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
 @SuppressWarnings("serial")
-class FOVPlatform extends DefaultMutableTreeNode implements JHVTreeNode {
+class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
 
     private final JPanel panel;
     private final JSpinner spinnerX;
