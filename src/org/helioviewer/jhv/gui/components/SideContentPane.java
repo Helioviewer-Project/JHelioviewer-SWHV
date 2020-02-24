@@ -8,12 +8,9 @@ import java.util.HashMap;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-/**
- * Panel managing multiple {@link CollapsiblePane}s.
- * <p>
- * This panel hides the use of the {@link CollapsiblePane} and allows accessing
- * the children of the {@link CollapsiblePane} directly.
- */
+// Panel managing multiple CollapsiblePanes
+// This panel hides the use of the CollapsiblePane and allows accessing
+// the children of the CollapsiblePane directly.
 @SuppressWarnings("serial")
 public class SideContentPane extends JComponent {
 
@@ -22,6 +19,7 @@ public class SideContentPane extends JComponent {
 
     public SideContentPane() {
         setLayout(new GridBagLayout());
+        dummy.setOpaque(false);
         add(dummy);
     }
 
