@@ -56,6 +56,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
     private final BufVertex spiralBuf = new BufVertex(SPIRAL_ARMS * (2 * SPIRAL_DIVISIONS + 1 + 2) * GLSLLine.stride);
     private final byte[] spiralColor = Colors.ReducedGreen;
 
+    private final double[] lati = new double[3];
+
     private final ViewpointLayerOptions optionsPanel;
 
     private JHVTime viewpointTime = Sun.StartEarth.time;
@@ -125,7 +127,6 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
 
         long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
 
-        double[] lat = new double[3];
         double width = camera.getCameraWidth() / 2, minDist = 5; // TBD
         String name = null;
         for (PositionLoad positionLoad : positionLoads) {
@@ -133,9 +134,9 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
             if (response == null)
                 continue;
 
-            response.interpolateLatitudinal(time, start, end, lat);
-            double deltaX = Math.abs(lat[0] * Math.cos(lat[1]) - v.x);
-            double deltaY = Math.abs(lat[0] * Math.sin(lat[1]) - v.y);
+            response.interpolateLatitudinal(time, start, end, lati);
+            double deltaX = Math.abs(lati[0] * Math.cos(lati[1]) - v.x);
+            double deltaY = Math.abs(lati[0] * Math.sin(lati[1]) - v.y);
             double dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY) / width;
             if (dist < minDist) {
                 minDist = dist;
@@ -336,13 +337,12 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
             if (response == null)
                 return;
 
-            double[] lat = new double[3];
             long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
-            response.interpolateLatitudinal(time, start, end, lat);
+            response.interpolateLatitudinal(time, start, end, lati);
 
-            rad0 = lat[0];
-            lon0 = lat[1];
-            lat0 = lat[2];
+            rad0 = lati[0];
+            lon0 = lati[1];
+            lat0 = lati[2];
         } else {
             rad0 = customControl.x;
             lon0 = customControl.y;
