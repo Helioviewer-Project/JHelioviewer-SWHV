@@ -73,6 +73,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
             return;
 
         PositionLoad control = optionsPanel.getHighlightedLoad();
+        double relativeLon = 0;
         int spiralSpeed = 0;
 
         lati[0] = lati[1] = lati[2] = 0; // reset
@@ -82,6 +83,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
                 long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
                 response.interpolateLatitudinal(time, start, end, lati);
                 spiralSpeed = optionsPanel.getSpiralSpeed(); // only if we have control point
+                relativeLon = optionsPanel.isRelative() ? lati[1] : 0;
             }
         }
 
@@ -89,7 +91,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
         Position viewpoint = camera.getViewpoint();
 
         Transform.pushView();
-        Transform.rotateViewInverse(new Quat(viewpoint.lat, viewpoint.lon + (optionsPanel.isRelative() ? lati[1] : 0)));
+        Transform.rotateViewInverse(new Quat(viewpoint.lat, viewpoint.lon + relativeLon));
         boolean far = Camera.useWideProjection(viewpoint.distance);
         if (far) {
             Transform.pushProjection();
@@ -139,6 +141,17 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
 
         long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
 
+        double relativeLon = 0;
+        if (optionsPanel.isRelative()) {
+            PositionLoad control = optionsPanel.getHighlightedLoad();
+            if (control != null) {
+                PositionResponse response = control.getResponse();
+                if (response != null) {
+                    relativeLon = lati[1];
+                }
+            }
+        }
+
         double width = camera.getCameraWidth() / 2, minDist = 5; // TBD
         String name = null;
         for (PositionLoad positionLoad : positionLoads) {
@@ -147,8 +160,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
                 continue;
 
             response.interpolateLatitudinal(time, start, end, lati);
-            double deltaX = Math.abs(lati[0] * Math.cos(lati[1]) - v.x);
-            double deltaY = Math.abs(lati[0] * Math.sin(lati[1]) - v.y);
+            double deltaX = Math.abs(lati[0] * Math.cos(lati[1] - relativeLon) - v.x);
+            double deltaY = Math.abs(lati[0] * Math.sin(lati[1] - relativeLon) - v.y);
             double dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY) / width;
             if (dist < minDist) {
                 minDist = dist;
