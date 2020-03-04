@@ -27,6 +27,8 @@ public class Sun {
     public static final double MeanEarthDistance = MeanEarthDistanceMeter / RadiusMeter;
     public static final double MeanEarthDistanceInv = RadiusMeter / MeanEarthDistanceMeter;
 
+    public static final double RotationRate = 14.1844 / 180 * Math.PI / 86400; // rad / sec, from BODY10_PM
+
     // doi:10.1088/0004-637X/812/2/91
     public static final double RadiusFactor_171 = 7.01 * 1e5 * 1e3 / RadiusMeter; // Frédéric Auchère, personal communication
     public static final double RadiusFactor_304 = 7.01 * 1e5 * 1e3 / RadiusMeter; // for visualisation better use same
