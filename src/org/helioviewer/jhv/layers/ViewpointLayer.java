@@ -21,7 +21,6 @@ import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec3;
@@ -153,32 +152,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
         }
     }
 
-    private Vec3 customControl = null;
-
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (!optionsPanel.isHeliospheric())
-            return;
-
-        if (e.isControlDown()) {
-            Vec3 v = null;
-            if (!e.isShiftDown()) { // ctrl-shift-click to reset control point
-                v = CameraHelper.getVectorFromPlane(Display.getCamera(), Display.getActiveViewport(), e.getX(), e.getY(), Quat.ZERO, true);
-                if (v != null) {
-                    double lon = 0, lat = 0;
-                    double rad = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
-                    if (rad > 0) {
-                        lon = Math.atan2(v.y, v.x);
-                        // lat = Math.asin(v.z / rad); unneeded
-                    }
-                    v.x = MathUtils.clip(rad, 0, SPIRAL_RADIUS);
-                    v.y = lon;
-                    v.z = lat;
-                }
-            }
-            customControl = v;
-            MovieDisplay.display();
-        }
     }
 
     @Override
@@ -329,25 +304,19 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
             return;
 
         // control point
+        if (control == null)
+            return;
+        PositionResponse response = control.getResponse();
+        if (response == null)
+            return;
+
+        long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
+        response.interpolateLatitudinal(time, start, end, lati);
+
         double rad0, lon0, lat0;
-        if (customControl == null) {
-            if (control == null)
-                return;
-            PositionResponse response = control.getResponse();
-            if (response == null)
-                return;
-
-            long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
-            response.interpolateLatitudinal(time, start, end, lati);
-
-            rad0 = lati[0];
-            lon0 = lati[1];
-            lat0 = lati[2];
-        } else {
-            rad0 = customControl.x;
-            lon0 = customControl.y;
-            lat0 = 0;
-        }
+        rad0 = lati[0];
+        lon0 = lati[1];
+        lat0 = lati[2];
 
         double sr = speed * (Sun.RadiusKMeterInv / RAD_PER_SEC);
         for (int j = 0; j < SPIRAL_ARMS; j++) {
