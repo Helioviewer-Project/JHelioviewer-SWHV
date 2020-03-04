@@ -102,7 +102,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
             framePanel.add(radio);
             modeGroup.add(radio);
         }
-        relativeCheckBox = new JCheckBox("Relative to selected");
+        relativeCheckBox = new JCheckBox("Relative longitude");
         relativeCheckBox.addActionListener(e -> {
             relative = !relative;
             MovieDisplay.display();
