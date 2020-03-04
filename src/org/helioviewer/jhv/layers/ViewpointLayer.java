@@ -9,7 +9,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.PositionResponse;
@@ -41,7 +40,6 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
     private static final double LINEWIDTH_SPIRAL = 2 * GLSLLine.LINEWIDTH_BASIC;
     private static final float SIZE_PLANET = 5;
 
-    private static final double RAD_PER_SEC = (2 * Math.PI) / (Carrington.CR_SIDEREAL * 86400);
     private static final double SPIRAL_RADIUS = 3 * Sun.MeanEarthDistance;
     private static final int SPIRAL_DIVISIONS = 64;
     private static final int SPIRAL_ARMS = 9;
@@ -98,7 +96,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
             camera.projectionOrthoWide(vp.aspect);
         }
 
-        renderSpiral(gl, vp, lati, spiralSpeed);
+        if (spiralSpeed > 0)
+            renderSpiral(gl, vp, lati, spiralSpeed);
 
         List<PositionLoad> positionLoads = PositionLoad.get(camera.getUpdateViewpoint());
         if (!positionLoads.isEmpty()) {
@@ -160,8 +159,11 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
                 continue;
 
             response.interpolateLatitudinal(time, start, end, lati);
-            double deltaX = Math.abs(lati[0] * Math.cos(lati[1] - relativeLon) - v.x);
-            double deltaY = Math.abs(lati[0] * Math.sin(lati[1] - relativeLon) - v.y);
+
+            double rad = lati[0];
+            double lon = lati[1] - relativeLon;
+            double deltaX = Math.abs(rad * Math.cos(lon) - v.x);
+            double deltaY = Math.abs(rad * Math.sin(lon) - v.y);
             double dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY) / width;
             if (dist < minDist) {
                 minDist = dist;
@@ -326,15 +328,12 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
     }
 
     private void renderSpiral(GL2 gl, Viewport vp, double[] spiralLati, int speed) {
-        if (speed == 0)
-            return;
-
         double rad0, lon0, lat0;
         rad0 = spiralLati[0];
         lon0 = spiralLati[1];
         lat0 = spiralLati[2];
 
-        double sr = speed * (Sun.RadiusKMeterInv / RAD_PER_SEC);
+        double sr = speed * (Sun.RadiusKMeterInv / Sun.RotationRate);
         for (int j = 0; j < SPIRAL_ARMS; j++) {
             double lona = lon0 + j * (2 * Math.PI / SPIRAL_ARMS); // arm longitude
             // before control point
