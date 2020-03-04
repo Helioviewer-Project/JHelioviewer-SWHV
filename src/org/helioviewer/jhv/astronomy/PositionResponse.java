@@ -57,7 +57,7 @@ public class PositionResponse {
         }
     }
 
-    public long interpolateLatitudinal(long t, long start, long end, double[] lat) {
+    public long interpolateLatitudinal(long t, long start, long end, double[] lati) {
         long time = interpolateTime(t, start, end);
 
         double x, y, z;
@@ -89,9 +89,9 @@ public class PositionResponse {
             hgln = Math.atan2(y, x);
             hglt = Math.asin(z / dist);
         }
-        lat[0] = dist;
-        lat[1] = hgln;
-        lat[2] = hglt;
+        lati[0] = dist;
+        lati[1] = hgln;
+        lati[2] = hglt;
         return time;
     }
 
