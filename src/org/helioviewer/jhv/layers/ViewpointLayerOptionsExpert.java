@@ -32,12 +32,14 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
 
     private final SpaceObjectContainer container;
     private final JCheckBox syncCheckBox;
+    private final JCheckBox relativeCheckBox;
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
 
     private static final int MIN_SPEED_SPIRAL = 200;
     private static final int MAX_SPEED_SPIRAL = 2000;
     private int spiralSpeed = 500;
     private int spiralMult = 0;
+    private boolean relative;
 
     private Frame frame;
 
@@ -85,9 +87,9 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         spiralPanel.add(spiralSlider);
         spiralPanel.add(spiralLabel);
 
-        JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
-        radioPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-        radioPanel.add(new JLabel("Frame", JLabel.RIGHT));
+        JPanel framePanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+        framePanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+        framePanel.add(new JLabel("Frame", JLabel.RIGHT));
         ButtonGroup modeGroup = new ButtonGroup();
         for (Frame f : Frame.values()) {
             JRadioButton radio = new JRadioButton(f.toString(), f == frame);
@@ -97,9 +99,15 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
                     container.setFrame(frame);
                 }
             });
-            radioPanel.add(radio);
+            framePanel.add(radio);
             modeGroup.add(radio);
         }
+        relativeCheckBox = new JCheckBox("Relative to selected");
+        relativeCheckBox.addActionListener(e -> {
+            relative = !relative;
+            MovieDisplay.display();
+        });
+        framePanel.add(relativeCheckBox);
 
         syncCheckBox = new JCheckBox("Use movie time interval", sync);
         syncCheckBox.addActionListener(e -> setTimespan(Movie.getStartTime(), Movie.getEndTime()));
@@ -123,7 +131,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         add(timeSelectorPanel, c);
         if (!exclusive) {
             c.gridy = 3;
-            add(radioPanel, c);
+            add(framePanel, c);
             c.gridy = 4;
             add(spiralPanel, c);
         }
@@ -168,6 +176,10 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
 
     int getSpiralSpeed() {
         return spiralMult * spiralSpeed;
+    }
+
+    boolean isRelative() {
+        return relative;
     }
 
 }

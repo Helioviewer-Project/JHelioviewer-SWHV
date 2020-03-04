@@ -72,18 +72,31 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
         if (!optionsPanel.isHeliospheric())
             return;
 
+        PositionLoad control = optionsPanel.getHighlightedLoad();
+        int spiralSpeed = 0;
+
+        lati[0] = lati[1] = lati[2] = 0; // reset
+        if (control != null) {
+            PositionResponse response = control.getResponse();
+            if (response != null) {
+                long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
+                response.interpolateLatitudinal(time, start, end, lati);
+                spiralSpeed = optionsPanel.getSpiralSpeed(); // only if we have control point
+            }
+        }
+
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
         Position viewpoint = camera.getViewpoint();
 
         Transform.pushView();
-        Transform.rotateViewInverse(viewpoint.toQuat());
+        Transform.rotateViewInverse(new Quat(viewpoint.lat, viewpoint.lon + (optionsPanel.isRelative() ? lati[1] : 0)));
         boolean far = Camera.useWideProjection(viewpoint.distance);
         if (far) {
             Transform.pushProjection();
             camera.projectionOrthoWide(vp.aspect);
         }
 
-        renderSpiral(gl, vp, optionsPanel.getHighlightedLoad(), optionsPanel.getSpiralSpeed());
+        renderSpiral(gl, vp, lati, spiralSpeed);
 
         List<PositionLoad> positionLoads = PositionLoad.get(camera.getUpdateViewpoint());
         if (!positionLoads.isEmpty()) {
@@ -299,24 +312,14 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
         spiralBuf.putVertex(x, y, z, 1, color);
     }
 
-    private void renderSpiral(GL2 gl, Viewport vp, PositionLoad control, int speed) {
+    private void renderSpiral(GL2 gl, Viewport vp, double[] spiralLati, int speed) {
         if (speed == 0)
             return;
 
-        // control point
-        if (control == null)
-            return;
-        PositionResponse response = control.getResponse();
-        if (response == null)
-            return;
-
-        long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
-        response.interpolateLatitudinal(time, start, end, lati);
-
         double rad0, lon0, lat0;
-        rad0 = lati[0];
-        lon0 = lati[1];
-        lat0 = lati[2];
+        rad0 = spiralLati[0];
+        lon0 = spiralLati[1];
+        lat0 = spiralLati[2];
 
         double sr = speed * (Sun.RadiusKMeterInv / RAD_PER_SEC);
         for (int j = 0; j < SPIRAL_ARMS; j++) {
