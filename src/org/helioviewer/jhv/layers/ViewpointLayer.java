@@ -34,7 +34,7 @@ import com.jogamp.opengl.GL2;
 
 public class ViewpointLayer extends AbstractLayer implements MouseListener, MouseMotionListener {
 
-    private static final double DELTA_ORBIT = 10 * 60 * 1000 * Sun.MeanEarthDistanceInv;
+    private static final double DELTA_ORBIT = 2 * 60 * 1000 * Sun.MeanEarthDistanceInv;
     private static final double DELTA_CUTOFF = 3 * Sun.MeanEarthDistance;
     private static final double LINEWIDTH_ORBIT = 2 * GLSLLine.LINEWIDTH_BASIC;
     private static final double LINEWIDTH_SPIRAL = 2 * GLSLLine.LINEWIDTH_BASIC;
@@ -328,10 +328,9 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
     }
 
     private void renderSpiral(GL2 gl, Viewport vp, double[] spiralLati, int speed) {
-        double rad0, lon0, lat0;
-        rad0 = spiralLati[0];
-        lon0 = spiralLati[1];
-        lat0 = spiralLati[2];
+        double rad0 = spiralLati[0];
+        double lon0 = spiralLati[1];
+        double lat0 = spiralLati[2];
 
         double sr = speed * (Sun.RadiusKMeterInv / Sun.RotationRate);
         for (int j = 0; j < SPIRAL_ARMS; j++) {

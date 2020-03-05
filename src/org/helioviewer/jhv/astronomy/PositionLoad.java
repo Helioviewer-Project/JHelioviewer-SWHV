@@ -22,7 +22,7 @@ public class PositionLoad {
 
     private static class LoadPosition implements Callable<PositionResponse> {
 
-        private static final int MAX_POINTS = 10000;
+        private static final int MAX_POINTS = 50000;
         private static final String baseURL = "http://swhv.oma.be/position?";
 
         private final SpaceObject observer;
