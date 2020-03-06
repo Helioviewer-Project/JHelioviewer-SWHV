@@ -180,7 +180,7 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
     }
 
     boolean isRelative() {
-        return currentOptionPanel == equatorialOptionPanel ? equatorialOptionPanel.isRelative() : false;
+        return currentOptionPanel == equatorialOptionPanel && equatorialOptionPanel.isRelative();
     }
 
 }
