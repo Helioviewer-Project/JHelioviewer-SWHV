@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.base.scale.GridType;
 import org.helioviewer.jhv.camera.Camera;
@@ -186,6 +187,7 @@ public class GridLayer extends AbstractLayer {
         float w = (float) vp.aspect;
         float h = 1;
         JhvTextRenderer renderer = GLText.getRenderer(size);
+        renderer.setColor(Colors.WhiteFloat);
         float textScaleFactor = textScale / renderer.getFont().getSize2D() * w / GridMath.FLAT_STEPS_THETA * 5;
 
         renderer.begin3DRendering();
@@ -223,6 +225,7 @@ public class GridLayer extends AbstractLayer {
         gl.glDisable(GL2.GL_CULL_FACE);
         for (float rsize : labelPos) {
             JhvTextRenderer renderer = GLText.getRenderer((int) (fuzz * rsize * size));
+            renderer.setColor(Colors.MiddleGrayFloat);
             float textScaleFactor = textScale / renderer.getFont().getSize2D();
 
             renderer.begin3DRendering();
@@ -234,6 +237,7 @@ public class GridLayer extends AbstractLayer {
 
     private void drawGridText(GL2 gl, int size, float z) {
         JhvTextRenderer renderer = GLText.getRenderer(size);
+        renderer.setColor(Colors.WhiteFloat);
         // the scale factor has to be divided by the current font size
         float textScaleFactor = textScale / renderer.getFont().getSize2D();
 

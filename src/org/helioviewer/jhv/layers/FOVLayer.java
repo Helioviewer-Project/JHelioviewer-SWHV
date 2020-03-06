@@ -75,6 +75,7 @@ public class FOVLayer extends AbstractLayer {
         }
 
         JhvTextRenderer renderer = GLText.getRenderer(48);
+        renderer.setColor(Colors.WhiteFloat);
         renderer.begin3DRendering();
         renderer.setSurfacePut();
 

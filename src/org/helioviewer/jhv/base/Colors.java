@@ -33,5 +33,7 @@ public class Colors {
     public static final byte[] LightGray = bytes(Color.LIGHT_GRAY);
 
     public static final float[] WhiteFloat = {1, 1, 1, 1};
+    public static final float[] LightGrayFloat = {.75f, .75f, .75f, 1};
+    public static final float[] MiddleGrayFloat = {.5f, .5f, .5f, 1};
 
 }
