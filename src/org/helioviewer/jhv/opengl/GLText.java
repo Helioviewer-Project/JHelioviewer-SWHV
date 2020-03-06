@@ -91,7 +91,7 @@ public class GLText {
         for (String txt : txts) {
             renderer.setColor(shadowColor);
             renderer.draw(txt, textInit_x + shadowOffset[0], vp.height - textInit_y + shadowOffset[1] - deltaY);
-            renderer.setColor(Colors.WhiteFloat);
+            renderer.setColor(Colors.LightGrayFloat);
             renderer.draw(txt, textInit_x, vp.height - textInit_y - deltaY);
             deltaY += (int) (fontSize * 1.1);
         }

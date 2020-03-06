@@ -69,7 +69,7 @@ public class TimestampLayer extends AbstractLayer {
         renderer.beginRendering(vp.width, vp.height);
         renderer.setColor(GLText.shadowColor);
         renderer.draw(text, delta + GLText.shadowOffset[0], delta + GLText.shadowOffset[1]);
-        renderer.setColor(Colors.WhiteFloat);
+        renderer.setColor(Colors.LightGrayFloat);
         renderer.draw(text, delta, delta);
         renderer.endRendering();
     }
