@@ -3,10 +3,12 @@ package org.helioviewer.jhv.gui.components;
 import java.awt.Desktop;
 import java.awt.event.KeyEvent;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.actions.CheckUpdateAction;
 import org.helioviewer.jhv.gui.actions.ClearAnnotationsAction;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
@@ -26,6 +28,7 @@ import org.helioviewer.jhv.gui.actions.ZoomOneToOneAction;
 import org.helioviewer.jhv.gui.actions.ZoomOutAction;
 import org.helioviewer.jhv.gui.dialogs.AboutDialog;
 import org.helioviewer.jhv.gui.dialogs.PreferencesDialog;
+import org.helioviewer.jhv.layers.MovieDisplay;
 
 // Menu bar of the main window
 @SuppressWarnings("serial")
@@ -59,6 +62,14 @@ public class MenuBar extends JMenuBar {
         viewMenu.addSeparator();
         viewMenu.add(new ResetCameraAction());
         viewMenu.add(new ClearAnnotationsAction());
+
+        JCheckBoxMenuItem invert = new JCheckBoxMenuItem("Invert Background");
+        invert.addItemListener(e -> {
+            JHVFrame.getGLListener().setInverted(invert.getState());
+            MovieDisplay.display();
+        });
+        viewMenu.add(invert);
+
         add(viewMenu);
 
         JMenu movieMenu = new JMenu("Movie");
