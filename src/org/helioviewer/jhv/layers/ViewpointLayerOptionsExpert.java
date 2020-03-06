@@ -32,7 +32,6 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
 
     private final SpaceObjectContainer container;
     private final JCheckBox syncCheckBox;
-    private final JCheckBox relativeCheckBox;
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
 
     private static final int MIN_SPEED_SPIRAL = 200;
@@ -55,6 +54,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
                 frame = Frame.valueOf(jo.optString("frame"));
             } catch (Exception ignore) {
             }
+            relative = jo.optBoolean("relativeLongitude", relative);
             ja = jo.optJSONArray("objects");
             sync = jo.optBoolean("syncInterval", sync);
             if (!sync) {
@@ -102,7 +102,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
             framePanel.add(radio);
             modeGroup.add(radio);
         }
-        relativeCheckBox = new JCheckBox("Relative longitude");
+        JCheckBox relativeCheckBox = new JCheckBox("Relative longitude", relative);
         relativeCheckBox.addActionListener(e -> {
             relative = !relative;
             MovieDisplay.display();
@@ -159,6 +159,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
     JSONObject toJson() {
         JSONObject jo = new JSONObject();
         jo.put("frame", frame);
+        jo.put("relativeLongitude", relative);
         boolean sync = syncCheckBox.isSelected();
         jo.put("syncInterval", sync);
         if (!sync) {
