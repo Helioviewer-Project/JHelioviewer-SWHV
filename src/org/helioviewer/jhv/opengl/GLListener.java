@@ -20,7 +20,7 @@ import com.jogamp.opengl.awt.GLCanvas;
 public class GLListener implements GLEventListener {
 
     private final GLCanvas canvas;
-    private boolean inverted;
+    private boolean whiteBack;
 
     public static final GLSLSolar glslSolar = new GLSLSolar();
 
@@ -28,8 +28,8 @@ public class GLListener implements GLEventListener {
         canvas = _canvas;
     }
 
-    public void setInverted(boolean b) {
-        inverted = b;
+    public void setWhiteBack(boolean b) {
+        whiteBack = b;
     }
 
     @Override
@@ -159,7 +159,7 @@ public class GLListener implements GLEventListener {
         GL2 gl = (GL2) drawable.getGL();
         gl.glFinish();
 
-        if (inverted)
+        if (whiteBack)
             gl.glClearColor(1, 1, 1, 0);
         else
             gl.glClearColor(0, 0, 0, 0);
