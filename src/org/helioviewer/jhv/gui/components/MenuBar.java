@@ -63,12 +63,12 @@ public class MenuBar extends JMenuBar {
         viewMenu.add(new ResetCameraAction());
         viewMenu.add(new ClearAnnotationsAction());
 
-        JCheckBoxMenuItem invert = new JCheckBoxMenuItem("Invert Background");
-        invert.addItemListener(e -> {
-            JHVFrame.getGLListener().setInverted(invert.getState());
+        JCheckBoxMenuItem white = new JCheckBoxMenuItem("White Background");
+        white.addItemListener(e -> {
+            JHVFrame.getGLListener().setWhiteBack(white.getState());
             MovieDisplay.display();
         });
-        viewMenu.add(invert);
+        viewMenu.add(white);
 
         add(viewMenu);
 
