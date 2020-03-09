@@ -194,6 +194,8 @@ public class HelioviewerMetaData extends BaseMetaData {
         } else if (instrument.equals("SJI")) {
             measurement = m.getDouble("TWAVE1").map(w -> String.valueOf(w.longValue())).orElse("");
             displayName = observatory + ' ' + instrument + ' ' + measurement;
+        } else if (instrument.equals("EUI")) {
+            displayName = instrument + ' ' + detector.replace('_', '-') + ' ' + measurement;
         } else {
             displayName = instrument + ' ' + measurement;
         }
