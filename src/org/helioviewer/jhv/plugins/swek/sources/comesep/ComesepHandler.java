@@ -21,7 +21,7 @@ import org.json.JSONObject;
 @SuppressWarnings("unchecked")
 public class ComesepHandler extends SWEKHandler {
 
-    private static final String _baseurl = "http://swhv.oma.be/comesep/comeseprequestapi/getComesep.php?";
+    private static final String _baseURL = "http://swhv.oma.be/comesep/comeseprequestapi/getComesep.php?";
 
     @Override
     protected boolean parseRemote(JSONObject eventJSON, SWEKSupplier supplier) {
@@ -71,7 +71,7 @@ public class ComesepHandler extends SWEKHandler {
 
     @Override
     protected String createURL(SWEKGroup group, long start, long end, List<SWEKParam> params, int page) {
-        StringBuilder baseURL = new StringBuilder(_baseurl);
+        StringBuilder baseURL = new StringBuilder(_baseURL);
         baseURL = appendModel(baseURL, params).append('&');
         baseURL.append("startdate=").append(TimeUtils.format(start)).append('&');
         baseURL.append("enddate=").append(TimeUtils.format(end)).append('&');

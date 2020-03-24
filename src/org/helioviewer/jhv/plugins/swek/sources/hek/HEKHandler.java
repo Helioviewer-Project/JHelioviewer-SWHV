@@ -28,7 +28,7 @@ import org.json.JSONObject;
 @SuppressWarnings("unchecked")
 public class HEKHandler extends SWEKHandler {
 
-    private static final String _baseURL = "http://www.lmsal.com/hek/her?";
+    private static final String _baseURL = "https://www.lmsal.com/hek/her?";
 
     @Override
     protected boolean parseRemote(JSONObject eventJSON, SWEKSupplier supplier) {
