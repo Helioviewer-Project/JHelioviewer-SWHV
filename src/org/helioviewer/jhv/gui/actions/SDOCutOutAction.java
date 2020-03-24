@@ -10,7 +10,7 @@ import org.helioviewer.jhv.layers.ImageLayers;
 @SuppressWarnings("serial")
 public class SDOCutOutAction extends AbstractAction {
 
-    private static final String baseURL = "http://www.lmsal.com/get_aia_data/?";
+    private static final String baseURL = "https://www.lmsal.com/get_aia_data/?";
 
     public SDOCutOutAction() {
         super("SDO Cut-out");
