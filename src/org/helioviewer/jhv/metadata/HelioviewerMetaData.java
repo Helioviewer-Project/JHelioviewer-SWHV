@@ -222,7 +222,7 @@ public class HelioviewerMetaData extends BaseMetaData {
     }
 
     private Quat retrieveCenterRotation(MetaDataContainer m) {
-        if (instrument.equals("AIA") || instrument.equals("HMI") || instrument.equals("SWAP") || instrument.equals("SUVI")) {
+        if (instrument.equals("AIA") || instrument.equals("HMI") || instrument.equals("SWAP") || instrument.equals("SUVI") || instrument.equals("EUI")) {
             double c = m.getDouble("CROTA").map(Math::toRadians)
                     .or(() -> m.getDouble("CROTA1").map(Math::toRadians))
                     .or(() -> m.getDouble("CROTA2").map(Math::toRadians)).orElse(0.);
