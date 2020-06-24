@@ -248,8 +248,11 @@ public class HelioviewerMetaData extends BaseMetaData {
         if (instrument.equals("CALLISTO")) { // pixel based
             region = new Region(0, 0, pixelW, pixelH);
         } else {
-            double arcsecPerPixelX = m.getRequiredDouble("CDELT1");
-            double arcsecPerPixelY = m.getRequiredDouble("CDELT2");
+            double arcsecX = m.getString("CUNIT1").map(u -> u.equals("deg") ? 3600 : 1).orElse(1);
+            double arcsecY = m.getString("CUNIT2").map(u -> u.equals("deg") ? 3600 : 1).orElse(1);
+            double arcsecPerPixelX = m.getRequiredDouble("CDELT1") * arcsecX;
+            double arcsecPerPixelY = m.getRequiredDouble("CDELT2") * arcsecY;
+
             double radiusSunInArcsec = Math.toDegrees(Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance)) * 3600;
             unitPerArcsec = Sun.Radius / radiusSunInArcsec;
 
@@ -259,9 +262,9 @@ public class HelioviewerMetaData extends BaseMetaData {
             double sunX = m.getDouble("CRPIX1").orElse((pixelW + 1) / 2.) - .5;
             double sunY = m.getDouble("CRPIX2").orElse((pixelH + 1) / 2.) - .5;
 
-            if (instrument.equals("XRT") || instrument.equals("Euhforia")) { // until CRVALx of all datasets can be tested
-                double crval1 = m.getDouble("CRVAL1").orElse(0.) / arcsecPerPixelX;
-                double crval2 = m.getDouble("CRVAL2").orElse(0.) / arcsecPerPixelY;
+            if (instrument.equals("XRT") || instrument.equals("Euhforia") || instrument.equals("EUI") || instrument.equals("SoloHI")) { // until CRVALx of all datasets can be tested
+                double crval1 = m.getDouble("CRVAL1").orElse(0.) * arcsecX / arcsecPerPixelX;
+                double crval2 = m.getDouble("CRVAL2").orElse(0.) * arcsecY / arcsecPerPixelY;
 
                 sunX -= crval1;
                 sunY -= crval2;
