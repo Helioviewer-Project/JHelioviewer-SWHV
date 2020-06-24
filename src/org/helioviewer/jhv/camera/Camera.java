@@ -22,7 +22,7 @@ public class Camera {
 
     public static final double INITFOV = 1. * Math.PI / 180.;
     private static final double MIN_FOV = INITFOV / 60;
-    private static final double MAX_FOV = INITFOV * 30;
+    private static final double MAX_FOV = INITFOV * 120;
     private double fov = INITFOV;
 
     private Quat rotation = Quat.ZERO;
