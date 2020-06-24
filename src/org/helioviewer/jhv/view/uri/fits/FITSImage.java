@@ -101,7 +101,7 @@ public class FITSImage implements URIImageReader {
     private static float[] sampleImage(int bpp, int width, int height, Object[] pixelData, long blank, double bzero, double bscale, int[] npix) {
         int stepW = Math.max(4 * width / 1024, 1);
         int stepH = Math.max(4 * height / 1024, 1);
-        float[] sampleData = new float[(width / stepW) * (height / stepH)];
+        float[] sampleData = new float[((int) (width / (double) stepW + 0.5)) * ((int) (height / (double) stepH + 0.5))];
 
         int k = 0;
         for (int j = 0; j < height; j += stepH) {
@@ -125,7 +125,7 @@ public class FITSImage implements URIImageReader {
                 Object lineData = pixelData[j];
                 for (int i = 0; i < width; i++) {
                     float v = getValue(bpp, lineData, i, blank, bzero, bscale);
-                    if (v != ImageData.BAD_PIXEL) {
+                    if (v != ImageBuffer.BAD_PIXEL) {
                         if (v > max)
                             max = v;
                         if (v < min)
