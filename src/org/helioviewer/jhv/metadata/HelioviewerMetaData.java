@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.metadata;
 
 import java.util.Optional;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 
@@ -17,6 +18,9 @@ public class HelioviewerMetaData extends BaseMetaData {
 
     private static final boolean normalizeAIA = Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA"));
     private static final boolean normalizeRadius = Boolean.parseBoolean(Settings.getProperty("display.normalize"));
+
+    private static final Set<String> CROTASupported = Set.of("AIA", "HMI", "SWAP", "SUVI", "EUI", "SoloHI");
+    private static final Set<String> CRVALSupported = Set.of("XRT", "Euhforia", "EUI", "SoloHI"); // until CRVALx of all datasets can be tested
 
     private String instrument = "";
     private String detector = "";
@@ -222,7 +226,7 @@ public class HelioviewerMetaData extends BaseMetaData {
     }
 
     private Quat retrieveCenterRotation(MetaDataContainer m) {
-        if (instrument.equals("AIA") || instrument.equals("HMI") || instrument.equals("SWAP") || instrument.equals("SUVI") || instrument.equals("EUI") || instrument.equals("SoloHI")) {
+        if (CROTASupported.contains(instrument)) {
             double c = m.getDouble("CROTA").map(Math::toRadians)
                     .or(() -> m.getDouble("PC1_1").map(Math::acos))
                     .or(() -> m.getDouble("CROTA1").map(Math::toRadians))
@@ -262,7 +266,7 @@ public class HelioviewerMetaData extends BaseMetaData {
             double sunX = m.getDouble("CRPIX1").orElse((pixelW + 1) / 2.) - .5;
             double sunY = m.getDouble("CRPIX2").orElse((pixelH + 1) / 2.) - .5;
 
-            if (instrument.equals("XRT") || instrument.equals("Euhforia") || instrument.equals("EUI") || instrument.equals("SoloHI")) { // until CRVALx of all datasets can be tested
+            if (CRVALSupported.contains(instrument)) {
                 double crval1 = m.getDouble("CRVAL1").orElse(0.) * arcsecX / arcsecPerPixelX;
                 double crval2 = m.getDouble("CRVAL2").orElse(0.) * arcsecY / arcsecPerPixelY;
 

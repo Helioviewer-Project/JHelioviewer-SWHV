@@ -9,11 +9,10 @@ import javax.annotation.Nullable;
 
 import org.everit.json.schema.Validator;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 
 public class DataSources {
 
-    static final Set<String> SupportedObservatories = ImmutableSet.of(
+    static final Set<String> SupportedObservatories = Set.of(
             "SOHO", "SDO", "STEREO_A", "STEREO_B", "PROBA2",
             "ROB-USET", "ROB-Humain", "NSO-GONG", "NSO-SOLIS", "Kanzelhoehe",
             "NRH", "Yohkoh", "Hinode", "TRACE", "MLSO");
