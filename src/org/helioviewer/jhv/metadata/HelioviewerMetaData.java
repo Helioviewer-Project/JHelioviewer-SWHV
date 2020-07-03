@@ -19,8 +19,8 @@ public class HelioviewerMetaData extends BaseMetaData {
     private static final boolean normalizeAIA = Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA"));
     private static final boolean normalizeRadius = Boolean.parseBoolean(Settings.getProperty("display.normalize"));
 
-    private static final Set<String> CROTASupported = Set.of("AIA", "HMI", "SWAP", "SUVI", "EUI", "SoloHI");
-    private static final Set<String> CRVALSupported = Set.of("XRT", "Euhforia", "EUI", "SoloHI"); // until CRVALx of all datasets can be tested
+    private static final Set<String> CROTASupported = Set.of("AIA", "HMI", "SWAP", "SUVI", "EUI", "SoloHI", "PHI", "METIS");
+    private static final Set<String> CRVALSupported = Set.of("XRT", "Euhforia", "EUI", "SoloHI", "PHI", "METIS"); // until CRVALx of all datasets can be tested
 
     private String instrument = "";
     private String detector = "";
@@ -260,8 +260,8 @@ public class HelioviewerMetaData extends BaseMetaData {
             double radiusSunInArcsec = Math.toDegrees(Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance)) * 3600;
             unitPerArcsec = Sun.Radius / radiusSunInArcsec;
 
-            unitPerPixelX = arcsecPerPixelX * unitPerArcsec;
-            unitPerPixelY = arcsecPerPixelY * unitPerArcsec;
+            unitPerPixelX = Math.abs(arcsecPerPixelX * unitPerArcsec);
+            unitPerPixelY = Math.abs(arcsecPerPixelY * unitPerArcsec);
 
             double sunX = m.getDouble("CRPIX1").orElse((pixelW + 1) / 2.) - .5;
             double sunY = m.getDouble("CRPIX2").orElse((pixelH + 1) / 2.) - .5;
