@@ -200,6 +200,8 @@ public class HelioviewerMetaData extends BaseMetaData {
             displayName = observatory + ' ' + instrument + ' ' + measurement;
         } else if (instrument.equals("EUI")) {
             displayName = instrument + ' ' + detector.replace('_', '-') + ' ' + measurement;
+        } else if (instrument.equals("PHI")) {
+            displayName = instrument + ' ' + detector; // TBD
         } else {
             displayName = instrument + ' ' + measurement;
         }
