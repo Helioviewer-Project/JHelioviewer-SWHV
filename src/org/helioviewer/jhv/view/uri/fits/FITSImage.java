@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
+import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
@@ -21,6 +22,8 @@ import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.uri.URIImageReader;
+
+import com.google.common.primitives.Floats;
 
 // essentially static; local or network cache
 public class FITSImage implements URIImageReader {
@@ -101,19 +104,18 @@ public class FITSImage implements URIImageReader {
     private static float[] sampleImage(int bpp, int width, int height, Object[] pixelData, long blank, double bzero, double bscale, int[] npix) {
         int stepW = Math.max(4 * width / 1024, 1);
         int stepH = Math.max(4 * height / 1024, 1);
-        float[] sampleData = new float[((int) (width / (double) stepW + 0.5)) * ((int) (height / (double) stepH + 0.5))];
+        ArrayList<Float> sampleData = new ArrayList<>((width / stepW) * (height / stepH));
 
-        int k = 0;
         for (int j = 0; j < height; j += stepH) {
             Object lineData = pixelData[j];
             for (int i = 0; i < width; i += stepW) {
                 float v = getValue(bpp, lineData, i, blank, bzero, bscale);
                 if (v != ImageBuffer.BAD_PIXEL)
-                    sampleData[k++] = v;
+                    sampleData.add(v);
             }
         }
-        npix[0] = k;
-        return sampleData;
+        npix[0] = sampleData.size();
+        return Floats.toArray(sampleData);
     }
 
     /*
