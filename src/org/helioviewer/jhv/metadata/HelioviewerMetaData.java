@@ -19,7 +19,7 @@ public class HelioviewerMetaData extends BaseMetaData {
     private static final boolean normalizeAIA = Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA"));
     private static final boolean normalizeRadius = Boolean.parseBoolean(Settings.getProperty("display.normalize"));
 
-    private static final Set<String> CROTASupported = Set.of("AIA", "HMI", "SWAP", "SUVI", "EUI", "SoloHI", "PHI", "Metis");
+    private static final Set<String> CROTASupported = Set.of("AIA", "HMI", "SWAP", "SUVI", "Hi-C", "Hi-C2.1", "EUI", "SoloHI", "PHI", "Metis");
     private static final Set<String> CRVALSupported = Set.of("XRT", "Euhforia", "EUI", "SoloHI", "PHI", "Metis"); // until CRVALx of all datasets can be tested
 
     private String instrument = "";
