@@ -232,7 +232,7 @@ public class Quat {
     }
 
     public void setFloatArray(float[] arr, int idx) {
-        arr[idx + 0] = (float) u.x;
+        arr[idx] = (float) u.x;
         arr[idx + 1] = (float) u.y;
         arr[idx + 2] = (float) u.z;
         arr[idx + 3] = (float) a;

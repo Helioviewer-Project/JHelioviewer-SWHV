@@ -30,7 +30,7 @@ class BaseMetaData implements MetaData {
     protected float innerRadius = 0;
     protected float outerRadius = Float.MAX_VALUE;
 
-    protected Vec2 crval = new Vec2(0, 0);
+    protected final Vec2 crval = new Vec2(0, 0);
     protected Quat crotaQ = Quat.ZERO;
     protected float crota = 0;
     protected float scrota = 0;
