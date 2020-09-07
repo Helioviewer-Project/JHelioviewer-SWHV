@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.opengl;
 
 import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Vec2;
 
 import com.jogamp.opengl.GL2;
 
@@ -20,6 +21,9 @@ public class GLSLSolarShader extends GLSLShader {
     private int gridRef;
     private int hgltDiffRef;
     private int gridDiffRef;
+
+    private int crvalRef;
+    private int crotaQuatRef;
     private int crotaRef;
     private int crotaDiffRef;
 
@@ -46,7 +50,6 @@ public class GLSLSolarShader extends GLSLShader {
 
     private int cameraTransformationInverseRef;
     private int cameraDifferenceRef;
-    private int crotaQuatRef;
 
     private final int[] isDiff = new int[1];
 
@@ -78,6 +81,7 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] viewport = new float[3];
     private final float[] viewportOffset = new float[2];
 
+    private final float[] crvalArray = new float[4];
     private final float[] quatArray = new float[8];
 
     private GLSLSolarShader(String vertex, String fragment, boolean _hasCommon) {
@@ -99,9 +103,12 @@ public class GLSLSolarShader extends GLSLShader {
 
         hgltRef = gl.glGetUniformLocation(id, "hglt");
         gridRef = gl.glGetUniformLocation(id, "grid");
-        crotaRef = gl.glGetUniformLocation(id, "crota");
         hgltDiffRef = gl.glGetUniformLocation(id, "hgltDiff");
         gridDiffRef = gl.glGetUniformLocation(id, "gridDiff");
+
+        crvalRef = gl.glGetUniformLocation(id, "crval");
+        crotaQuatRef = gl.glGetUniformLocation(id, "crotaQuat");
+        crotaRef = gl.glGetUniformLocation(id, "crota");
         crotaDiffRef = gl.glGetUniformLocation(id, "crotaDiff");
 
         deltaTRef = gl.glGetUniformLocation(id, "deltaT");
@@ -127,7 +134,6 @@ public class GLSLSolarShader extends GLSLShader {
 
         cameraTransformationInverseRef = gl.glGetUniformLocation(id, "cameraTransformationInverse");
         cameraDifferenceRef = gl.glGetUniformLocation(id, "cameraDifference");
-        crotaQuatRef = gl.glGetUniformLocation(id, "crotaQuat");
 
         if (hasCommon) {
             setTextureUnit(gl, id, "image", GLTexture.Unit.ZERO);
@@ -152,6 +158,14 @@ public class GLSLSolarShader extends GLSLShader {
         quat.setFloatArray(quatArray, 0);
         quatDiff.setFloatArray(quatArray, 4);
         gl.glUniform4fv(cameraDifferenceRef, 2, quatArray, 0);
+    }
+
+    public void bindCRVAL(GL2 gl, Vec2 vec, Vec2 vecDiff) {
+        crvalArray[0] = (float) vec.x;
+        crvalArray[1] = (float) vec.y;
+        crvalArray[2] = (float) vecDiff.x;
+        crvalArray[3] = (float) vecDiff.y;
+        gl.glUniform2fv(crvalRef, 2, crvalArray, 0);
     }
 
     public void bindCROTAQuat(GL2 gl, Quat quat, Quat quatDiff) {
