@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Vec2;
 
 public interface MetaData {
 
@@ -24,6 +25,9 @@ public interface MetaData {
     double getUnitPerArcsec();
 
     float getResponseFactor();
+
+    @Nonnull
+    Vec2 getCRVAL();
 
     @Nonnull
     Quat getCROTAQuat();

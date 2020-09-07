@@ -200,6 +200,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         Position metaViewpointDiff = metaDataDiff.getViewpoint();
 
         shader.bindCameraDifference(gl, Quat.rotateWithConjugate(q, metaViewpoint.toQuat()), Quat.rotateWithConjugate(q, metaViewpointDiff.toQuat()));
+        shader.bindCRVAL(gl, metaData.getCRVAL(), metaDataDiff.getCRVAL());
         shader.bindCROTAQuat(gl, metaData.getCROTAQuat(), metaDataDiff.getCROTAQuat());
 
         boolean diffRot = ImageLayers.getDiffRotationMode();

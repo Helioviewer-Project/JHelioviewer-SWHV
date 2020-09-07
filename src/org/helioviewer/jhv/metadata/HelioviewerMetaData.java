@@ -246,19 +246,15 @@ public class HelioviewerMetaData extends BaseMetaData {
             double sunX = m.getDouble("CRPIX1").orElse((pixelW + 1) / 2.) - .5;
             double sunY = m.getDouble("CRPIX2").orElse((pixelH + 1) / 2.) - .5;
 
-            if (CRVALSupported.contains(instrument)) {
-                double crval1 = m.getDouble("CRVAL1").orElse(0.) * arcsecX / arcsecPerPixelX;
-                double crval2 = m.getDouble("CRVAL2").orElse(0.) * arcsecY / arcsecPerPixelY;
-
-                System.out.println(">>> " + (crval1 * unitPerPixelX) + " " + (crval2 * unitPerPixelY));
-                //sunX -= crval1;
-                //sunY -= crval2;
-            }
-
             sunPositionX = unitPerPixelX * sunX;
             sunPositionY = unitPerPixelY * (pixelH - 1 - sunY);
 
             region = new Region(-sunX * unitPerPixelX, -sunY * unitPerPixelY, pixelW * unitPerPixelX, pixelH * unitPerPixelY);
+
+            if (CRVALSupported.contains(instrument)) {
+                crval.x = m.getDouble("CRVAL1").orElse(0.) * arcsecX / arcsecPerPixelX * unitPerPixelX;
+                crval.y = m.getDouble("CRVAL2").orElse(0.) * arcsecY / arcsecPerPixelY * unitPerPixelY;
+            }
 
             if (CROTASupported.contains(instrument)) {
                 double c = m.getDouble("CROTA").map(Math::toRadians)

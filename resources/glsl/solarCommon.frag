@@ -32,6 +32,9 @@ uniform float grid[2];
 uniform float hglt;
 uniform float gridDiff[2];
 uniform float hgltDiff;
+
+uniform vec2 crval[2];
+uniform vec4 crotaQuat[2];
 uniform float crota[3];
 uniform float crotaDiff[3];
 
@@ -40,7 +43,6 @@ uniform float deltaTDiff;
 
 uniform mat4 cameraTransformationInverse;
 uniform vec4 cameraDifference[2];
-uniform vec4 crotaQuat[2];
 
 uniform vec3 viewport;
 uniform vec2 viewportOffset;
