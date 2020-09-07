@@ -185,22 +185,22 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         GLSLSolarShader shader = Display.mode.shader;
         shader.use(gl);
 
+        glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
+
         shader.bindPolarRadii(gl, (float) Display.mode.scale.getYstart(), (float) Display.mode.scale.getYstop()); // independent
         shader.bindMatrix(gl, camera.getTransformationInverse(vp.aspect)); // viewport dependent
         shader.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height); // viewport dependent
 
         Position cameraViewpoint = imageData.getViewpoint(); // camera at decode command moment
+        Quat q = Quat.rotate(camera.getDragRotation(), cameraViewpoint.toQuat());
+
         MetaData metaData = imageData.getMetaData();
         Position metaViewpoint = metaData.getViewpoint();
-        glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
-
-        Quat q = Quat.rotate(camera.getDragRotation(), cameraViewpoint.toQuat()); // sync with camera
-        shader.bindCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, metaData.getCenterRotation()));
-
-        DifferenceMode diffMode = glImage.getDifferenceMode();
-        MetaData metaDataDiff = diffMode == DifferenceMode.Base ? baseImageData.getMetaData() : prevImageData.getMetaData();
+        MetaData metaDataDiff = glImage.getDifferenceMode() == DifferenceMode.Base ? baseImageData.getMetaData() : prevImageData.getMetaData();
         Position metaViewpointDiff = metaDataDiff.getViewpoint();
-        shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, metaDataDiff.getCenterRotation()));
+
+        shader.bindCameraDifference(gl, Quat.rotateWithConjugate(q, metaViewpoint.toQuat()), Quat.rotateWithConjugate(q, metaViewpointDiff.toQuat()));
+        shader.bindCROTAQuat(gl, metaData.getCROTAQuat(), metaDataDiff.getCROTAQuat());
 
         boolean diffRot = ImageLayers.getDiffRotationMode();
         shader.bindDeltaT(gl, diffRot ? (float) ((cameraViewpoint.time.milli - metaViewpoint.time.milli) * 1e-9) : 0);

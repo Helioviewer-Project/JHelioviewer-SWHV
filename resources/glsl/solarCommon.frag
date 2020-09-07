@@ -39,8 +39,9 @@ uniform float deltaT;
 uniform float deltaTDiff;
 
 uniform mat4 cameraTransformationInverse;
-uniform vec4 cameraDifferenceRotationQuat;
-uniform vec4 diffcameraDifferenceRotationQuat;
+uniform vec4 cameraDifference[2];
+uniform vec4 crotaQuat[2];
+
 uniform vec3 viewport;
 uniform vec2 viewportOffset;
 

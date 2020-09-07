@@ -29,6 +29,7 @@ class BaseMetaData implements MetaData {
     protected float innerRadius = 0;
     protected float outerRadius = Float.MAX_VALUE;
 
+    protected Quat crotaQ = Quat.ZERO;
     protected float crota = 0;
     protected float scrota = 0;
     protected float ccrota = 1;
@@ -111,8 +112,8 @@ class BaseMetaData implements MetaData {
 
     @Nonnull
     @Override
-    public Quat getCenterRotation() {
-        return viewpoint.toQuat();
+    public Quat getCROTAQuat() {
+        return crotaQ;
     }
 
     @Override
