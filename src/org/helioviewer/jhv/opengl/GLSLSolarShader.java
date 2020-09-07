@@ -45,8 +45,8 @@ public class GLSLSolarShader extends GLSLShader {
     private int viewportOffsetRef;
 
     private int cameraTransformationInverseRef;
-    private int cameraDifferenceRotationQuatRef;
-    private int diffCameraDifferenceRotationQuatRef;
+    private int cameraDifferenceRef;
+    private int crotaQuatRef;
 
     private final int[] isDiff = new int[1];
 
@@ -78,7 +78,7 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] viewport = new float[3];
     private final float[] viewportOffset = new float[2];
 
-    private final float[] quatArray = new float[4];
+    private final float[] quatArray = new float[8];
 
     private GLSLSolarShader(String vertex, String fragment, boolean _hasCommon) {
         super(vertex, fragment);
@@ -126,8 +126,8 @@ public class GLSLSolarShader extends GLSLShader {
         viewportOffsetRef = gl.glGetUniformLocation(id, "viewportOffset");
 
         cameraTransformationInverseRef = gl.glGetUniformLocation(id, "cameraTransformationInverse");
-        cameraDifferenceRotationQuatRef = gl.glGetUniformLocation(id, "cameraDifferenceRotationQuat");
-        diffCameraDifferenceRotationQuatRef = gl.glGetUniformLocation(id, "diffcameraDifferenceRotationQuat");
+        cameraDifferenceRef = gl.glGetUniformLocation(id, "cameraDifference");
+        crotaQuatRef = gl.glGetUniformLocation(id, "crotaQuat");
 
         if (hasCommon) {
             setTextureUnit(gl, id, "image", GLTexture.Unit.ZERO);
@@ -148,14 +148,16 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniformMatrix4fv(cameraTransformationInverseRef, 1, false, matrix, 0);
     }
 
-    public void bindCameraDifferenceRotationQuat(GL2 gl, Quat quat) {
-        quat.setFloatArray(quatArray);
-        gl.glUniform4fv(cameraDifferenceRotationQuatRef, 1, quatArray, 0);
+    public void bindCameraDifference(GL2 gl, Quat quat, Quat quatDiff) {
+        quat.setFloatArray(quatArray, 0);
+        quatDiff.setFloatArray(quatArray, 4);
+        gl.glUniform4fv(cameraDifferenceRef, 2, quatArray, 0);
     }
 
-    public void bindDiffCameraDifferenceRotationQuat(GL2 gl, Quat quat) {
-        quat.setFloatArray(quatArray);
-        gl.glUniform4fv(diffCameraDifferenceRotationQuatRef, 1, quatArray, 0);
+    public void bindCROTAQuat(GL2 gl, Quat quat, Quat quatDiff) {
+        quat.setFloatArray(quatArray, 0);
+        quatDiff.setFloatArray(quatArray, 4);
+        gl.glUniform4fv(crotaQuatRef, 2, quatArray, 0);
     }
 
     public void bindDeltaT(GL2 gl, float _deltaT) {

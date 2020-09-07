@@ -25,6 +25,9 @@ public interface MetaData {
 
     float getResponseFactor();
 
+    @Nonnull
+    Quat getCROTAQuat();
+
     float getCROTA();
 
     float getSCROTA();
@@ -47,9 +50,6 @@ public interface MetaData {
 
     @Nonnull
     Position getViewpoint();
-
-    @Nonnull
-    Quat getCenterRotation();
 
     @Nonnull
     Region roiToRegion(int roiX, int roiY, int roiWidth, int roiHeight, double factorX, double factorY);
