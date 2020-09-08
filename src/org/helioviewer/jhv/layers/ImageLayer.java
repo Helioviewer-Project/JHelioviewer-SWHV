@@ -204,8 +204,9 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         shader.bindCROTAQuat(gl, metaData.getCROTAQuat(), metaDataDiff.getCROTAQuat());
 
         boolean diffRot = ImageLayers.getDiffRotationMode();
-        shader.bindDeltaT(gl, diffRot ? (float) ((cameraViewpoint.time.milli - metaViewpoint.time.milli) * 1e-9) : 0);
-        shader.bindDeltaTDiff(gl, diffRot ? (float) ((cameraViewpoint.time.milli - metaViewpointDiff.time.milli) * 1e-9) : 0);
+        double deltaT = diffRot ? (cameraViewpoint.time.milli - metaViewpoint.time.milli) * 1e-9 : 0;
+        double deltaTDiff = diffRot ? (cameraViewpoint.time.milli - metaViewpointDiff.time.milli) * 1e-9 : 0;
+        shader.bindDeltaT(gl, deltaT, deltaTDiff);
 
         if (Display.mode == Display.DisplayMode.Latitudinal) {
             GridType gridType = Layers.getGridLayer().getGridType();

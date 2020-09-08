@@ -28,7 +28,6 @@ public class GLSLSolarShader extends GLSLShader {
     private int crotaDiffRef;
 
     private int deltaTRef;
-    private int deltaTDiffRef;
 
     private int sectorRef;
     private int radiiRef;
@@ -60,9 +59,6 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] gridDiff = new float[2];
     private final float[] crotaDiff = new float[3];
 
-    private final float[] deltaT = new float[1];
-    private final float[] deltaTDiff = new float[1];
-
     private final float[] sector = new float[3];
     private final float[] radii = new float[2];
     private final float[] polarRadii = new float[2];
@@ -81,8 +77,7 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] viewport = new float[3];
     private final float[] viewportOffset = new float[2];
 
-    private final float[] crvalArray = new float[4];
-    private final float[] quatArray = new float[8];
+    private final float[] floatArray = new float[8];
 
     private GLSLSolarShader(String vertex, String fragment, boolean _hasCommon) {
         super(vertex, fragment);
@@ -112,7 +107,6 @@ public class GLSLSolarShader extends GLSLShader {
         crotaDiffRef = gl.glGetUniformLocation(id, "crotaDiff");
 
         deltaTRef = gl.glGetUniformLocation(id, "deltaT");
-        deltaTDiffRef = gl.glGetUniformLocation(id, "deltaTDiff");
 
         sectorRef = gl.glGetUniformLocation(id, "sector");
         radiiRef = gl.glGetUniformLocation(id, "radii");
@@ -155,33 +149,29 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindCameraDifference(GL2 gl, Quat quat, Quat quatDiff) {
-        quat.setFloatArray(quatArray, 0);
-        quatDiff.setFloatArray(quatArray, 4);
-        gl.glUniform4fv(cameraDifferenceRef, 2, quatArray, 0);
+        quat.setFloatArray(floatArray, 0);
+        quatDiff.setFloatArray(floatArray, 4);
+        gl.glUniform4fv(cameraDifferenceRef, 2, floatArray, 0);
     }
 
     public void bindCRVAL(GL2 gl, Vec2 vec, Vec2 vecDiff) {
-        crvalArray[0] = (float) vec.x;
-        crvalArray[1] = (float) vec.y;
-        crvalArray[2] = (float) vecDiff.x;
-        crvalArray[3] = (float) vecDiff.y;
-        gl.glUniform2fv(crvalRef, 2, crvalArray, 0);
+        floatArray[0] = (float) vec.x;
+        floatArray[1] = (float) vec.y;
+        floatArray[2] = (float) vecDiff.x;
+        floatArray[3] = (float) vecDiff.y;
+        gl.glUniform2fv(crvalRef, 2, floatArray, 0);
     }
 
     public void bindCROTAQuat(GL2 gl, Quat quat, Quat quatDiff) {
-        quat.setFloatArray(quatArray, 0);
-        quatDiff.setFloatArray(quatArray, 4);
-        gl.glUniform4fv(crotaQuatRef, 2, quatArray, 0);
+        quat.setFloatArray(floatArray, 0);
+        quatDiff.setFloatArray(floatArray, 4);
+        gl.glUniform4fv(crotaQuatRef, 2, floatArray, 0);
     }
 
-    public void bindDeltaT(GL2 gl, float _deltaT) {
-        deltaT[0] = _deltaT;
-        gl.glUniform1fv(deltaTRef, 1, deltaT, 0);
-    }
-
-    public void bindDeltaTDiff(GL2 gl, float _deltaTDiff) {
-        deltaTDiff[0] = _deltaTDiff;
-        gl.glUniform1fv(deltaTDiffRef, 1, deltaTDiff, 0);
+    public void bindDeltaT(GL2 gl, double deltaT, double deltaTDiff) {
+        floatArray[0] = (float) deltaT;
+        floatArray[1] = (float) deltaTDiff;
+        gl.glUniform1fv(deltaTRef, 2, floatArray, 0);
     }
 
     public void bindRect(GL2 gl, double xOffset, double yOffset, double xScale, double yScale) {

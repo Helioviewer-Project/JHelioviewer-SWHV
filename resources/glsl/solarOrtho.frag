@@ -43,11 +43,12 @@ void main(void) {
 
     if (onDisk) {
         hitPoint = vec3(up1.x, up1.y, sqrt(1. - radius2));
-        rotatedHitPoint =     differential(deltaT,     rotate_vector_inverse(cameraDifference[0], hitPoint));
-        rotatedHitPoint =     apply_center(rotatedHitPoint, crval[0], crotaQuat[0]);
+        rotatedHitPoint     = differential(deltaT[0], rotate_vector_inverse(cameraDifference[0], hitPoint));
+        rotatedHitPoint     = apply_center(rotatedHitPoint, crval[0], crotaQuat[0]);
 
-        diffrotatedHitPoint = differential(deltaTDiff, rotate_vector_inverse(cameraDifference[1], hitPoint));
+        diffrotatedHitPoint = differential(deltaT[1], rotate_vector_inverse(cameraDifference[1], hitPoint));
         diffrotatedHitPoint = apply_center(diffrotatedHitPoint, crval[1], crotaQuat[1]);
+
         factor = 1.;
         gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_NARROW;
     } else {
