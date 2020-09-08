@@ -59,25 +59,10 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] gridDiff = new float[2];
     private final float[] crotaDiff = new float[3];
 
-    private final float[] sector = new float[3];
-    private final float[] radii = new float[2];
-    private final float[] polarRadii = new float[2];
-    private final float[] cutOffDirection = new float[2];
-    private final float[] cutOffValue = new float[1];
-
-    private final float[] slit = new float[2];
-    private final float[] bright = new float[3];
-    private final float[] color = new float[4];
-    private final float[] sharpen = new float[3];
     private final int[] enhanced = new int[1];
     private final int[] calculateDepth = new int[1];
 
-    private final float[] rect = new float[4];
-    private final float[] diffRect = new float[4];
-    private final float[] viewport = new float[3];
-    private final float[] viewportOffset = new float[2];
-
-    private final float[] floatArray = new float[8];
+    private final float[] floatArr = new float[8];
 
     private GLSLSolarShader(String vertex, String fragment, boolean _hasCommon) {
         super(vertex, fragment);
@@ -149,73 +134,73 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindCameraDifference(GL2 gl, Quat quat, Quat quatDiff) {
-        quat.setFloatArray(floatArray, 0);
-        quatDiff.setFloatArray(floatArray, 4);
-        gl.glUniform4fv(cameraDifferenceRef, 2, floatArray, 0);
+        quat.setFloatArray(floatArr, 0);
+        quatDiff.setFloatArray(floatArr, 4);
+        gl.glUniform4fv(cameraDifferenceRef, 2, floatArr, 0);
     }
 
     public void bindCRVAL(GL2 gl, Vec2 vec, Vec2 vecDiff) {
-        floatArray[0] = (float) vec.x;
-        floatArray[1] = (float) vec.y;
-        floatArray[2] = (float) vecDiff.x;
-        floatArray[3] = (float) vecDiff.y;
-        gl.glUniform2fv(crvalRef, 2, floatArray, 0);
+        floatArr[0] = (float) vec.x;
+        floatArr[1] = (float) vec.y;
+        floatArr[2] = (float) vecDiff.x;
+        floatArr[3] = (float) vecDiff.y;
+        gl.glUniform2fv(crvalRef, 2, floatArr, 0);
     }
 
     public void bindCROTAQuat(GL2 gl, Quat quat, Quat quatDiff) {
-        quat.setFloatArray(floatArray, 0);
-        quatDiff.setFloatArray(floatArray, 4);
-        gl.glUniform4fv(crotaQuatRef, 2, floatArray, 0);
+        quat.setFloatArray(floatArr, 0);
+        quatDiff.setFloatArray(floatArr, 4);
+        gl.glUniform4fv(crotaQuatRef, 2, floatArr, 0);
     }
 
     public void bindDeltaT(GL2 gl, double deltaT, double deltaTDiff) {
-        floatArray[0] = (float) deltaT;
-        floatArray[1] = (float) deltaTDiff;
-        gl.glUniform1fv(deltaTRef, 2, floatArray, 0);
+        floatArr[0] = (float) deltaT;
+        floatArr[1] = (float) deltaTDiff;
+        gl.glUniform1fv(deltaTRef, 2, floatArr, 0);
     }
 
     public void bindRect(GL2 gl, double xOffset, double yOffset, double xScale, double yScale) {
-        rect[0] = (float) xOffset;
-        rect[1] = (float) yOffset;
-        rect[2] = (float) xScale;
-        rect[3] = (float) yScale;
-        gl.glUniform4fv(rectRef, 1, rect, 0);
+        floatArr[0] = (float) xOffset;
+        floatArr[1] = (float) yOffset;
+        floatArr[2] = (float) xScale;
+        floatArr[3] = (float) yScale;
+        gl.glUniform4fv(rectRef, 1, floatArr, 0);
     }
 
     public void bindDiffRect(GL2 gl, double diffXOffset, double diffYOffset, double diffXScale, double diffYScale) {
-        diffRect[0] = (float) diffXOffset;
-        diffRect[1] = (float) diffYOffset;
-        diffRect[2] = (float) diffXScale;
-        diffRect[3] = (float) diffYScale;
-        gl.glUniform4fv(diffRectRef, 1, diffRect, 0);
+        floatArr[0] = (float) diffXOffset;
+        floatArr[1] = (float) diffYOffset;
+        floatArr[2] = (float) diffXScale;
+        floatArr[3] = (float) diffYScale;
+        gl.glUniform4fv(diffRectRef, 1, floatArr, 0);
     }
 
     public void bindColor(GL2 gl, float red, float green, float blue, double alpha, double blend) {
-        color[0] = (float) (red * alpha);
-        color[1] = (float) (green * alpha);
-        color[2] = (float) (blue * alpha);
-        color[3] = (float) (alpha * blend); // http://amindforeverprogramming.blogspot.be/2013/07/why-alpha-premultiplied-colour-blending.html
-        gl.glUniform4fv(colorRef, 1, color, 0);
+        floatArr[0] = (float) (red * alpha);
+        floatArr[1] = (float) (green * alpha);
+        floatArr[2] = (float) (blue * alpha);
+        floatArr[3] = (float) (alpha * blend); // http://amindforeverprogramming.blogspot.be/2013/07/why-alpha-premultiplied-colour-blending.html
+        gl.glUniform4fv(colorRef, 1, floatArr, 0);
     }
 
     public void bindSlit(GL2 gl, double left, double right) {
-        slit[0] = (float) left;
-        slit[1] = (float) right;
-        gl.glUniform1fv(slitRef, 2, slit, 0);
+        floatArr[0] = (float) left;
+        floatArr[1] = (float) right;
+        gl.glUniform1fv(slitRef, 2, floatArr, 0);
     }
 
     public void bindBrightness(GL2 gl, double offset, double scale, double gamma) {
-        bright[0] = (float) offset;
-        bright[1] = (float) scale;
-        bright[2] = (float) gamma;
-        gl.glUniform3fv(brightRef, 1, bright, 0);
+        floatArr[0] = (float) offset;
+        floatArr[1] = (float) scale;
+        floatArr[2] = (float) gamma;
+        gl.glUniform3fv(brightRef, 1, floatArr, 0);
     }
 
     public void bindSharpen(GL2 gl, double weight, double pixelWidth, double pixelHeight) {
-        sharpen[0] = (float) pixelWidth;
-        sharpen[1] = (float) pixelHeight;
-        sharpen[2] = -2 * (float) weight; // used for mix
-        gl.glUniform3fv(sharpenRef, 1, sharpen, 0);
+        floatArr[0] = (float) pixelWidth;
+        floatArr[1] = (float) pixelHeight;
+        floatArr[2] = -2 * (float) weight; // used for mix
+        gl.glUniform3fv(sharpenRef, 1, floatArr, 0);
     }
 
     public void bindEnhanced(GL2 gl, boolean _enhanced) {
@@ -234,24 +219,24 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindViewport(GL2 gl, float offsetX, float offsetY, float width, float height) {
-        viewportOffset[0] = offsetX;
-        viewportOffset[1] = offsetY;
-        gl.glUniform2fv(viewportOffsetRef, 1, viewportOffset, 0);
-        viewport[0] = width;
-        viewport[1] = height;
-        viewport[2] = height / width;
-        gl.glUniform3fv(viewportRef, 1, viewport, 0);
+        floatArr[0] = offsetX;
+        floatArr[1] = offsetY;
+        gl.glUniform2fv(viewportOffsetRef, 1, floatArr, 0);
+        floatArr[0] = width;
+        floatArr[1] = height;
+        floatArr[2] = height / width;
+        gl.glUniform3fv(viewportRef, 1, floatArr, 0);
     }
 
     public void bindCutOffValue(GL2 gl, float val) {
-        cutOffValue[0] = val;
-        gl.glUniform1fv(cutOffValueRef, 1, cutOffValue, 0);
+        floatArr[0] = val;
+        gl.glUniform1fv(cutOffValueRef, 1, floatArr, 0);
     }
 
     public void bindCutOffDirection(GL2 gl, float x, float y) {
-        cutOffDirection[0] = x;
-        cutOffDirection[1] = y;
-        gl.glUniform2fv(cutOffDirectionRef, 1, cutOffDirection, 0);
+        floatArr[0] = x;
+        floatArr[1] = y;
+        gl.glUniform2fv(cutOffDirectionRef, 1, floatArr, 0);
     }
 
     public void bindAngles(GL2 gl, float _hglt, float _crota, float scrota, float ccrota) {
@@ -285,22 +270,22 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindSector(GL2 gl, float sector0, float sector1) {
-        sector[0] = sector0 == sector1 ? 0 : 1;
-        sector[1] = sector0;
-        sector[2] = sector1;
-        gl.glUniform1fv(sectorRef, 3, sector, 0);
+        floatArr[0] = sector0 == sector1 ? 0 : 1;
+        floatArr[1] = sector0;
+        floatArr[2] = sector1;
+        gl.glUniform1fv(sectorRef, 3, floatArr, 0);
     }
 
     public void bindRadii(GL2 gl, float innerRadius, float outerRadius) {
-        radii[0] = innerRadius;
-        radii[1] = outerRadius;
-        gl.glUniform1fv(radiiRef, 2, radii, 0);
+        floatArr[0] = innerRadius;
+        floatArr[1] = outerRadius;
+        gl.glUniform1fv(radiiRef, 2, floatArr, 0);
     }
 
-    public void bindPolarRadii(GL2 gl, float start, float stop) {
-        polarRadii[0] = start;
-        polarRadii[1] = stop;
-        gl.glUniform1fv(polarRadiiRef, 2, polarRadii, 0);
+    public void bindPolarRadii(GL2 gl, double start, double stop) {
+        floatArr[0] = (float) start;
+        floatArr[1] = (float) stop;
+        gl.glUniform1fv(polarRadiiRef, 2, floatArr, 0);
     }
 
 }
