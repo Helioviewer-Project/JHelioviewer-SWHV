@@ -50,8 +50,6 @@ public class GLSLSolarShader extends GLSLShader {
     private int cameraTransformationInverseRef;
     private int cameraDifferenceRef;
 
-    private final int[] isDiff = new int[1];
-
     private final float[] hglt = new float[1];
     private final float[] grid = new float[2];
     private final float[] crota = new float[3];
@@ -59,9 +57,7 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] gridDiff = new float[2];
     private final float[] crotaDiff = new float[3];
 
-    private final int[] enhanced = new int[1];
-    private final int[] calculateDepth = new int[1];
-
+    private final int[] intArr = new int[1];
     private final float[] floatArr = new float[8];
 
     private GLSLSolarShader(String vertex, String fragment, boolean _hasCommon) {
@@ -203,19 +199,19 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform3fv(sharpenRef, 1, floatArr, 0);
     }
 
-    public void bindEnhanced(GL2 gl, boolean _enhanced) {
-        enhanced[0] = _enhanced ? 1 : 0;
-        gl.glUniform1iv(enhancedRef, 1, enhanced, 0);
+    public void bindEnhanced(GL2 gl, boolean enhanced) {
+        intArr[0] = enhanced ? 1 : 0;
+        gl.glUniform1iv(enhancedRef, 1, intArr, 0);
     }
 
-    public void bindCalculateDepth(GL2 gl, boolean _calculateDepth) {
-        calculateDepth[0] = _calculateDepth ? 1 : 0;
-        gl.glUniform1iv(calculateDepthRef, 1, calculateDepth, 0);
+    public void bindCalculateDepth(GL2 gl, boolean calculateDepth) {
+        intArr[0] = calculateDepth ? 1 : 0;
+        gl.glUniform1iv(calculateDepthRef, 1, intArr, 0);
     }
 
-    public void bindIsDiff(GL2 gl, int _isDiff) {
-        isDiff[0] = _isDiff;
-        gl.glUniform1iv(isDiffRef, 1, isDiff, 0);
+    public void bindIsDiff(GL2 gl, int isDiff) {
+        intArr[0] = isDiff;
+        gl.glUniform1iv(isDiffRef, 1, intArr, 0);
     }
 
     public void bindViewport(GL2 gl, float offsetX, float offsetY, float width, float height) {
