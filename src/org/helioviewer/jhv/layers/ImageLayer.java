@@ -187,7 +187,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
         glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
 
-        shader.bindPolarRadii(gl, (float) Display.mode.scale.getYstart(), (float) Display.mode.scale.getYstop()); // independent
+        shader.bindPolarRadii(gl, Display.mode.scale.getYstart(), Display.mode.scale.getYstop()); // independent
         shader.bindMatrix(gl, camera.getTransformationInverse(vp.aspect)); // viewport dependent
         shader.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height); // viewport dependent
 
