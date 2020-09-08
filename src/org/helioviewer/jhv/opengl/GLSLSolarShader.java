@@ -50,13 +50,6 @@ public class GLSLSolarShader extends GLSLShader {
     private int cameraTransformationInverseRef;
     private int cameraDifferenceRef;
 
-    private final float[] hglt = new float[1];
-    private final float[] grid = new float[2];
-    private final float[] crota = new float[3];
-    private final float[] hgltDiff = new float[1];
-    private final float[] gridDiff = new float[2];
-    private final float[] crotaDiff = new float[3];
-
     private final int[] intArr = new int[1];
     private final float[] floatArr = new float[8];
 
@@ -163,11 +156,11 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform4fv(rectRef, 1, floatArr, 0);
     }
 
-    public void bindDiffRect(GL2 gl, double diffXOffset, double diffYOffset, double diffXScale, double diffYScale) {
-        floatArr[0] = (float) diffXOffset;
-        floatArr[1] = (float) diffYOffset;
-        floatArr[2] = (float) diffXScale;
-        floatArr[3] = (float) diffYScale;
+    public void bindDiffRect(GL2 gl, double xOffset, double yOffset, double xScale, double yScale) {
+        floatArr[0] = (float) xOffset;
+        floatArr[1] = (float) yOffset;
+        floatArr[2] = (float) xScale;
+        floatArr[3] = (float) yScale;
         gl.glUniform4fv(diffRectRef, 1, floatArr, 0);
     }
 
@@ -235,34 +228,34 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform2fv(cutOffDirectionRef, 1, floatArr, 0);
     }
 
-    public void bindAngles(GL2 gl, float _hglt, float _crota, float scrota, float ccrota) {
-        hglt[0] = _hglt;
-        gl.glUniform1fv(hgltRef, 1, hglt, 0);
-        crota[0] = _crota;
-        crota[1] = scrota;
-        crota[2] = ccrota;
-        gl.glUniform1fv(crotaRef, 3, crota, 0);
+    public void bindAngles(GL2 gl, float hglt, float crota, float scrota, float ccrota) {
+        floatArr[0] = hglt;
+        gl.glUniform1fv(hgltRef, 1, floatArr, 0);
+        floatArr[0] = crota;
+        floatArr[1] = scrota;
+        floatArr[2] = ccrota;
+        gl.glUniform1fv(crotaRef, 3, floatArr, 0);
     }
 
-    public void bindAnglesDiff(GL2 gl, float _hglt, float _crota, float scrota, float ccrota) {
-        hgltDiff[0] = _hglt;
-        gl.glUniform1fv(hgltDiffRef, 1, hgltDiff, 0);
-        crotaDiff[0] = _crota;
-        crotaDiff[1] = scrota;
-        crotaDiff[2] = ccrota;
-        gl.glUniform1fv(crotaDiffRef, 3, crotaDiff, 0);
+    public void bindAnglesDiff(GL2 gl, float hglt, float crota, float scrota, float ccrota) {
+        floatArr[0] = hglt;
+        gl.glUniform1fv(hgltDiffRef, 1, floatArr, 0);
+        floatArr[0] = crota;
+        floatArr[1] = scrota;
+        floatArr[2] = ccrota;
+        gl.glUniform1fv(crotaDiffRef, 3, floatArr, 0);
     }
 
     public void bindAnglesLatiGrid(GL2 gl, float lon, float lat) {
-        grid[0] = lon;
-        grid[1] = lat;
-        gl.glUniform1fv(gridRef, 2, grid, 0);
+        floatArr[0] = lon;
+        floatArr[1] = lat;
+        gl.glUniform1fv(gridRef, 2, floatArr, 0);
     }
 
     public void bindAnglesLatiGridDiff(GL2 gl, float lon, float lat) {
-        gridDiff[0] = lon;
-        gridDiff[1] = lat;
-        gl.glUniform1fv(gridDiffRef, 2, gridDiff, 0);
+        floatArr[0] = lon;
+        floatArr[1] = lat;
+        gl.glUniform1fv(gridDiffRef, 2, floatArr, 0);
     }
 
     public void bindSector(GL2 gl, float sector0, float sector1) {
