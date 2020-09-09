@@ -205,6 +205,15 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         shader.bindCROTA(gl, metaData.getCROTA(), metaDataDiff.getCROTA());
         shader.bindRect(gl, imageData.getRegion(), imageDataDiff.getRegion());
 
+        shader.bindCalculateDepth(gl, metaData.getCalculateDepth());
+        shader.bindRadii(gl, metaData.getInnerRadius(), Display.getShowCorona() ? metaData.getOuterRadius() : 1);
+        shader.bindSector(gl, metaData.getSector0(), metaData.getSector1());
+        if (metaData.getCutOffValue() > 0) {
+            shader.bindCutOffDirection(gl, metaData.getCutOffX(), metaData.getCutOffY());
+            shader.bindCutOffValue(gl, metaData.getCutOffValue());
+        } else
+            shader.bindCutOffValue(gl, -1);
+
         boolean diffRot = ImageLayers.getDiffRotationMode();
         double deltaT = diffRot ? (cameraViewpoint.time.milli - metaViewpoint.time.milli) * 1e-9 : 0;
         double deltaTDiff = diffRot ? (cameraViewpoint.time.milli - metaViewpointDiff.time.milli) * 1e-9 : 0;
