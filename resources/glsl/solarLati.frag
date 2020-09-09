@@ -1,5 +1,5 @@
 
-void get_lati_texcoord(const float grid[2], const float dt, const float lt, const float cr[3], const vec2 scrpos, const vec4 rect, out vec2 texcoord) {
+void get_lati_texcoord(const vec2 CRVAL, const vec4 CROTA, const float grid[2], const float dt, const float lt, const float cr[3], const vec2 scrpos, const vec4 rect, out vec2 texcoord) {
     float phi   = grid[0] + scrpos.x * TWOPI;
     float theta = grid[1] + scrpos.y * PI;
 
@@ -39,7 +39,8 @@ void get_lati_texcoord(const float grid[2], const float dt, const float lt, cons
     if (xcartrot.x < 0.)
         discard;
 
-    texcoord = vec2(rect.w * (xcartrot.y - rect.x), rect.w * (xcartrot.z - rect.y));
+    vec3 centered = apply_center(vec3(xcartrot.y, xcartrot.z, 1.), CRVAL, CROTA);
+    texcoord = rect.zw * vec2(centered.x - rect.x, -centered.y - rect.y);
     clamp_texture(texcoord);
 }
 
@@ -51,13 +52,13 @@ void main(void) {
     vec2 texcoord;
 
     vec2 scrpos = getScrPos();
-    get_lati_texcoord(grid, deltaT[0], hglt, crota, scrpos, rect, texcoord);
+    get_lati_texcoord(crval[0], crotaQuat[0], grid, deltaT[0], hglt, crota, scrpos, rect, texcoord);
     if (isdifference == NODIFFERENCE) {
         color = getColor(texcoord, texcoord, 1);
     } else {
         vec2 difftexcoord;
         float difftexcoord_radius;
-        get_lati_texcoord(gridDiff, deltaT[1], hgltDiff, crotaDiff, scrpos, differencerect, difftexcoord);
+        get_lati_texcoord(crval[1], crotaQuat[1], gridDiff, deltaT[1], hgltDiff, crotaDiff, scrpos, differencerect, difftexcoord);
         color = getColor(texcoord, difftexcoord, 1);
     }
     outColor = color;
