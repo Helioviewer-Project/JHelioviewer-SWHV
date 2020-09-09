@@ -1,5 +1,5 @@
 
-void get_polar_texcoord(const vec2 CRVAL, const vec4 CROTA, const vec2 scrpos, const vec4 rect, out vec2 texcoord, out float radius) {
+void get_polar_texcoord(const vec2 CRVAL, const vec4 CROTA, const vec4 rect, const vec2 scrpos, out vec2 texcoord, out float radius) {
     float interpolated = exp(polarRadii[0] + scrpos.y * (polarRadii[1] - polarRadii[0]));
     if (interpolated > radii[1] || interpolated < radii[0])
         discard;
@@ -34,13 +34,13 @@ void main(void) {
     float radius;
 
     vec2 scrpos = getScrPos();
-    get_polar_texcoord(crval[0], crota[0], scrpos, rect[0], texcoord, radius);
+    get_polar_texcoord(crval[0], crota[0], rect[0], scrpos, texcoord, radius);
     if (isdifference == NODIFFERENCE) {
         color = getColor(texcoord, texcoord, radius);
     } else {
         vec2 difftexcoord;
         float diffradius;
-        get_polar_texcoord(crval[1], crota[1], scrpos, rect[1], difftexcoord, diffradius);
+        get_polar_texcoord(crval[1], crota[1], rect[1], scrpos, difftexcoord, diffradius);
         color = getColor(texcoord, difftexcoord, radius);
     }
     outColor = color;
