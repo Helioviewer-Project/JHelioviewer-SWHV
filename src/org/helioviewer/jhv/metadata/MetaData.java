@@ -30,9 +30,7 @@ public interface MetaData {
     Vec2 getCRVAL();
 
     @Nonnull
-    Quat getCROTAQuat();
-
-    float getCROTA();
+    Quat getCROTA();
 
     float getSCROTA();
 
