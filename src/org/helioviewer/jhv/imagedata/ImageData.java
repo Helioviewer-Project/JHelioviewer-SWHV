@@ -4,6 +4,9 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
+import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.metadata.MetaData;
 
 public class ImageData {
@@ -13,7 +16,11 @@ public class ImageData {
     private boolean uploaded;
 
     private final ImageBuffer imageBuffer;
+
     private final MetaData metaData;
+    private final Vec2 crval;
+    private final Quat crota;
+
     private final String unit;
     private final float[] physLUT;
     private final Region region;
@@ -22,7 +29,11 @@ public class ImageData {
 
     public ImageData(@Nonnull ImageBuffer _imageBuffer, @Nonnull MetaData _metaData, @Nonnull Region _region, @Nonnull Position _viewpoint) {
         imageBuffer = _imageBuffer;
+
         metaData = _metaData;
+        crval = metaData.getCRVAL();
+        crota = metaData.getCROTA();
+
         unit = metaData.getUnit();
         physLUT = metaData.getPhysicalLUT();
         region = _region;
@@ -59,12 +70,9 @@ public class ImageData {
     }
 
     private float getPixel(float x, float y) {
-        float ccr = metaData.getCCROTA();
-        float scr = -metaData.getSCROTA();
-        float xr = x * ccr - y * scr;
-        float yr = x * scr + y * ccr;
-        float xf = (float) metaData.xPixelFactor(xr);
-        float yf = (float) metaData.yPixelFactor(yr);
+        Vec3 r = crota.rotateInverseVector(new Vec3(x - crval.x, y - crval.y, 0));
+        float xf = (float) metaData.xPixelFactor(r.x);
+        float yf = (float) metaData.yPixelFactor(r.y);
 
         int ix = (int) (xf * (imageBuffer.width - 1) + .5f);
         int iy = (int) (yf * (imageBuffer.height - 1) + .5f);

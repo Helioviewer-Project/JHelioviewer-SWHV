@@ -261,9 +261,6 @@ public class HelioviewerMetaData extends BaseMetaData {
                         .or(() -> m.getDouble("PC1_1").map(Math::acos))
                         .or(() -> m.getDouble("CROTA1").map(Math::toRadians))
                         .or(() -> m.getDouble("CROTA2").map(Math::toRadians)).orElse(0.);
-
-                scrota = (float) Math.sin(c);
-                ccrota = (float) Math.cos(c);
                 crota =  Quat.createRotation(c, Vec3.ZAxis);
             }
         }
