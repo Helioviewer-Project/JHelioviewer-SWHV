@@ -210,8 +210,13 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
         if (Display.mode == Display.DisplayMode.Latitudinal) {
             GridType gridType = Layers.getGridLayer().getGridType();
-            shader.bindAnglesLatiGrid(gl, (float) latiLongitude(gridType, cameraViewpoint, metaViewpoint), (float) gridType.toLatitude(metaViewpoint));
-            shader.bindAnglesLatiGridDiff(gl, (float) latiLongitude(gridType, cameraViewpoint, metaViewpointDiff), (float) gridType.toLatitude(metaViewpointDiff));
+            shader.bindAnglesLatiGrid(gl,
+                latiLongitude(gridType, cameraViewpoint, metaViewpoint),
+                gridType.toLatitude(metaViewpoint),
+                metaViewpoint.lat,
+                latiLongitude(gridType, cameraViewpoint, metaViewpointDiff),
+                gridType.toLatitude(metaViewpointDiff),
+                metaViewpointDiff.lat);
         }
 
         GLListener.glslSolar.render(gl);

@@ -17,10 +17,7 @@ public class GLSLSolarShader extends GLSLShader {
 
     private int isDiffRef;
 
-    private int hgltRef;
     private int gridRef;
-    private int hgltDiffRef;
-    private int gridDiffRef;
 
     private int crvalRef;
     private int crotaRef;
@@ -68,10 +65,7 @@ public class GLSLSolarShader extends GLSLShader {
     protected void initUniforms(GL2 gl, int id) {
         isDiffRef = gl.glGetUniformLocation(id, "isdifference");
 
-        hgltRef = gl.glGetUniformLocation(id, "hglt");
         gridRef = gl.glGetUniformLocation(id, "grid");
-        hgltDiffRef = gl.glGetUniformLocation(id, "hgltDiff");
-        gridDiffRef = gl.glGetUniformLocation(id, "gridDiff");
 
         crvalRef = gl.glGetUniformLocation(id, "crval");
         crotaRef = gl.glGetUniformLocation(id, "crota");
@@ -224,26 +218,14 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform2fv(cutOffDirectionRef, 1, floatArr, 0);
     }
 
-    public void bindAngles(GL2 gl, float hglt) {
-        floatArr[0] = hglt;
-        gl.glUniform1fv(hgltRef, 1, floatArr, 0);
-    }
-
-    public void bindAnglesDiff(GL2 gl, float hglt) {
-        floatArr[0] = hglt;
-        gl.glUniform1fv(hgltDiffRef, 1, floatArr, 0);
-    }
-
-    public void bindAnglesLatiGrid(GL2 gl, float lon, float lat) {
-        floatArr[0] = lon;
-        floatArr[1] = lat;
-        gl.glUniform1fv(gridRef, 2, floatArr, 0);
-    }
-
-    public void bindAnglesLatiGridDiff(GL2 gl, float lon, float lat) {
-        floatArr[0] = lon;
-        floatArr[1] = lat;
-        gl.glUniform1fv(gridDiffRef, 2, floatArr, 0);
+    public void bindAnglesLatiGrid(GL2 gl, double lon, double lat, double hglt, double dlon, double dlat, double dhglt) {
+        floatArr[0] = (float) lon;
+        floatArr[1] = (float) lat;
+        floatArr[2] = (float) hglt;
+        floatArr[3] = (float) dlon;
+        floatArr[4] = (float) dlat;
+        floatArr[5] = (float) dhglt;
+        gl.glUniform3fv(gridRef, 2, floatArr, 0);
     }
 
     public void bindSector(GL2 gl, float sector0, float sector1) {

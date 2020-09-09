@@ -1,7 +1,7 @@
 
-void get_lati_texcoord(const vec2 CRVAL, const vec4 CROTA, const float grid[2], const float dt, const float lt, const vec2 scrpos, const vec4 rect, out vec2 texcoord) {
-    float phi   = grid[0] + scrpos.x * TWOPI;
-    float theta = grid[1] + scrpos.y * PI;
+void get_lati_texcoord(const vec2 CRVAL, const vec4 CROTA, const vec3 grid, const float dt, const vec2 scrpos, const vec4 rect, out vec2 texcoord) {
+    float phi   = grid.x + scrpos.x * TWOPI;
+    float theta = grid.y + scrpos.y * PI;
 
     if (dt != 0) {
         phi -= differentialRotation(dt, theta - HALFPI); // difference from rigid rotation
@@ -14,8 +14,8 @@ void get_lati_texcoord(const vec2 CRVAL, const vec4 CROTA, const float grid[2], 
     xcart.y = sin(theta) * sin(phi);
     xcart.z = cos(theta);
 
-    float slt = sin(lt);
-    float clt = cos(lt);
+    float slt = sin(grid.z);
+    float clt = cos(grid.z);
     mat3 rot = mat3(
           clt, 0., slt,
            0., 1.,  0.,
@@ -38,13 +38,13 @@ void main(void) {
     vec2 texcoord;
 
     vec2 scrpos = getScrPos();
-    get_lati_texcoord(crval[0], crota[0], grid, deltaT[0], hglt, scrpos, rect, texcoord);
+    get_lati_texcoord(crval[0], crota[0], grid[0], deltaT[0], scrpos, rect, texcoord);
     if (isdifference == NODIFFERENCE) {
         color = getColor(texcoord, texcoord, 1);
     } else {
         vec2 difftexcoord;
         float difftexcoord_radius;
-        get_lati_texcoord(crval[1], crota[1], gridDiff, deltaT[1], hgltDiff, scrpos, differencerect, difftexcoord);
+        get_lati_texcoord(crval[1], crota[1], grid[0], deltaT[1], scrpos, differencerect, difftexcoord);
         color = getColor(texcoord, difftexcoord, 1);
     }
     outColor = color;
