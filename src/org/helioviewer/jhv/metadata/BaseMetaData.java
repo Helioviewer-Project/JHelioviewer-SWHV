@@ -32,8 +32,6 @@ class BaseMetaData implements MetaData {
 
     protected final Vec2 crval = new Vec2(0, 0);
     protected Quat crota = Quat.ZERO;
-    protected float scrota = 0;
-    protected float ccrota = 1;
 
     protected float sector0 = 0;
     protected float sector1 = 0;
@@ -121,16 +119,6 @@ class BaseMetaData implements MetaData {
     @Override
     public Quat getCROTA() {
         return crota;
-    }
-
-    @Override
-    public float getSCROTA() {
-        return scrota;
-    }
-
-    @Override
-    public float getCCROTA() {
-        return ccrota;
     }
 
     @Override

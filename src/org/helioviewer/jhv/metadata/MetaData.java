@@ -32,10 +32,6 @@ public interface MetaData {
     @Nonnull
     Quat getCROTA();
 
-    float getSCROTA();
-
-    float getCCROTA();
-
     float getSector0();
 
     float getSector1();
