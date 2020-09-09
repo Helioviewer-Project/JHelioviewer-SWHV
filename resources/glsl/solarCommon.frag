@@ -124,19 +124,6 @@ vec2 getScrPos(void) {
     return scrpos;
 }
 
-vec3 rotate_vector_inverse(const vec4 quat, const vec3 vec) {
-    return vec + 2. * cross(cross(vec, quat.xyz) + quat.w * vec, quat.xyz);
-}
-
-vec3 rotate_vector(const vec4 quat, const vec3 vec) {
-    return vec + 2. * cross(quat.xyz, cross(quat.xyz, vec) + quat.w * vec);
-}
-
-vec3 apply_center(const vec3 v, const vec2 shift, const vec4 quat) {
-    vec3 r = vec3(v.xy - shift, v.z);
-    return rotate_vector_inverse(quat, r);
-}
-
 float differentialRotation(const float dt, const float theta) {
     float sin2l = sin(theta);
     sin2l *= sin2l;

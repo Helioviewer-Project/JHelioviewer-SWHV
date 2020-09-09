@@ -1,4 +1,17 @@
-void get_polar_texcoord(const vec2 CRVAL, const vec4 CROTA, const vec2 scrpos, const vec4 rect, out vec2 texcoord, out float radius, vec4 crota) {
+vec3 rotate_vector_inverse(const vec4 quat, const vec3 vec) {
+    return vec + 2. * cross(cross(vec, quat.xyz) + quat.w * vec, quat.xyz);
+}
+
+vec3 rotate_vector(const vec4 quat, const vec3 vec) {
+    return vec + 2. * cross(quat.xyz, cross(quat.xyz, vec) + quat.w * vec);
+}
+
+vec3 apply_center(const vec3 v, const vec2 shift, const vec4 quat) {
+    vec3 r = vec3(v.xy - shift, v.z);
+    return rotate_vector_inverse(quat, r);
+}
+
+void get_polar_texcoord(const float cr, const vec2 scrpos, const vec4 rect, out vec2 texcoord, out float radius) {
     float interpolated = exp(polarRadii[0] + scrpos.y * (polarRadii[1] - polarRadii[0]));
     if (interpolated > radii[1] || interpolated < radii[0])
         discard;
@@ -17,7 +30,7 @@ void get_polar_texcoord(const vec2 CRVAL, const vec4 CROTA, const vec2 scrpos, c
             discard;
     }
 
-    vec3 centeredHitPoint = apply_center(pos, crval[0], crota);
+    vec3 centeredHitPoint = apply_center(pos, crval[0], crotaQuat[0]);
     texcoord = rect.zw * vec2(centeredHitPoint.x - rect.x, -centeredHitPoint.y - rect.y);
     clamp_coord(texcoord);
 
@@ -33,13 +46,13 @@ void main(void) {
     float radius;
 
     vec2 scrpos = getScrPos();
-    get_polar_texcoord(crval[0], crotaQuat[0], scrpos, rect, texcoord, radius, crotaQuat[0]);
+    get_polar_texcoord(crota[0], scrpos, rect, texcoord, radius);
     if (isdifference == NODIFFERENCE) {
         color = getColor(texcoord, texcoord, radius);
     } else {
         vec2 difftexcoord;
         float diffradius;
-        get_polar_texcoord(crval[1], crotaQuat[1], scrpos, differencerect, difftexcoord, diffradius, crotaQuat[1]);
+        get_polar_texcoord(crotaDiff[0], scrpos, differencerect, difftexcoord, diffradius);
         color = getColor(texcoord, difftexcoord, radius);
     }
     outColor = color;
