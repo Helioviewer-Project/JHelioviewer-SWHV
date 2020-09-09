@@ -77,8 +77,6 @@ public class GLSLSolarShader extends GLSLShader {
 
         crvalRef = gl.glGetUniformLocation(id, "crval");
         crotaQuatRef = gl.glGetUniformLocation(id, "crotaQuat");
-        crotaRef = gl.glGetUniformLocation(id, "crota");
-        crotaDiffRef = gl.glGetUniformLocation(id, "crotaDiff");
 
         deltaTRef = gl.glGetUniformLocation(id, "deltaT");
 
@@ -228,22 +226,14 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform2fv(cutOffDirectionRef, 1, floatArr, 0);
     }
 
-    public void bindAngles(GL2 gl, float hglt, float crota, float scrota, float ccrota) {
+    public void bindAngles(GL2 gl, float hglt) {
         floatArr[0] = hglt;
         gl.glUniform1fv(hgltRef, 1, floatArr, 0);
-        floatArr[0] = crota;
-        floatArr[1] = scrota;
-        floatArr[2] = ccrota;
-        gl.glUniform1fv(crotaRef, 3, floatArr, 0);
     }
 
-    public void bindAnglesDiff(GL2 gl, float hglt, float crota, float scrota, float ccrota) {
+    public void bindAnglesDiff(GL2 gl, float hglt) {
         floatArr[0] = hglt;
         gl.glUniform1fv(hgltDiffRef, 1, floatArr, 0);
-        floatArr[0] = crota;
-        floatArr[1] = scrota;
-        floatArr[2] = ccrota;
-        gl.glUniform1fv(crotaDiffRef, 3, floatArr, 0);
     }
 
     public void bindAnglesLatiGrid(GL2 gl, float lon, float lat) {

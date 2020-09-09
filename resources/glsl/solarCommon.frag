@@ -35,8 +35,6 @@ uniform float hgltDiff;
 
 uniform vec2 crval[2];
 uniform vec4 crotaQuat[2];
-uniform float crota[3];
-uniform float crotaDiff[3];
 
 uniform float deltaT[2];
 
