@@ -5,7 +5,9 @@ void get_polar_texcoord(const vec2 CRVAL, const vec4 CROTA, const vec2 scrpos, c
         discard;
 
     float theta = -(scrpos.x * TWOPI + HALFPI /* - cr TBD */);
-    vec2 pos = vec2(cos(theta), sin(theta)) * interpolated;
+    vec3 pos = vec3(cos(theta), sin(theta), 0) * interpolated;
+    // if (interpolated < 1.)
+    //     pos.z = interpolated;
 
     if (cutOffValue >= 0.) {
         vec2 dpos = pos.yx;
@@ -16,8 +18,8 @@ void get_polar_texcoord(const vec2 CRVAL, const vec4 CROTA, const vec2 scrpos, c
             discard;
     }
 
-    vec3 p = apply_center(vec3(pos, 1.), CRVAL, CROTA);
-    texcoord = rect.zw * vec2(p.x - rect.x, -p.y - rect.y);
+    vec3 centered = apply_center(pos, CRVAL, CROTA);
+    texcoord = rect.zw * vec2(centered.x - rect.x, -centered.y - rect.y);
     clamp_texture(texcoord);
 
     radius = 1.;
