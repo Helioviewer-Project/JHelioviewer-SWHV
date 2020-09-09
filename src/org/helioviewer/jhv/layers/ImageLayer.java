@@ -185,7 +185,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         GLSLSolarShader shader = Display.mode.shader;
         shader.use(gl);
 
-        glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
+        glImage.applyFilters(gl, imageData, shader);
 
         shader.bindPolarRadii(gl, Display.mode.scale.getYstart(), Display.mode.scale.getYstop()); // independent
         shader.bindMatrix(gl, camera.getTransformationInverse(vp.aspect)); // viewport dependent
@@ -196,12 +196,14 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
         MetaData metaData = imageData.getMetaData();
         Position metaViewpoint = metaData.getViewpoint();
-        MetaData metaDataDiff = glImage.getDifferenceMode() == DifferenceMode.Base ? baseImageData.getMetaData() : prevImageData.getMetaData();
+        ImageData imageDataDiff = glImage.getDifferenceMode() == DifferenceMode.Base ? baseImageData : prevImageData;
+        MetaData metaDataDiff = imageDataDiff.getMetaData();
         Position metaViewpointDiff = metaDataDiff.getViewpoint();
 
         shader.bindCameraDifference(gl, Quat.rotateWithConjugate(q, metaViewpoint.toQuat()), Quat.rotateWithConjugate(q, metaViewpointDiff.toQuat()));
         shader.bindCRVAL(gl, metaData.getCRVAL(), metaDataDiff.getCRVAL());
         shader.bindCROTA(gl, metaData.getCROTA(), metaDataDiff.getCROTA());
+        shader.bindRect(gl, imageData.getRegion(), imageDataDiff.getRegion());
 
         boolean diffRot = ImageLayers.getDiffRotationMode();
         double deltaT = diffRot ? (cameraViewpoint.time.milli - metaViewpoint.time.milli) * 1e-9 : 0;

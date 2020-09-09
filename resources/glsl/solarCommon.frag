@@ -20,8 +20,6 @@ uniform int isdifference;
 uniform int enhanced;
 uniform sampler2D diffImage;
 
-uniform vec4 rect;
-uniform vec4 differencerect;
 uniform sampler1D lut;
 uniform vec3 brightness;
 uniform vec4 color;
@@ -32,6 +30,7 @@ uniform vec3 grid[2];
 
 uniform vec2 crval[2];
 uniform vec4 crota[2];
+uniform vec4 rect[2];
 
 uniform float deltaT[2];
 
