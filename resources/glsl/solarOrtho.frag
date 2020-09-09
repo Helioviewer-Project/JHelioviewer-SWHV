@@ -32,10 +32,10 @@ void main(void) {
     if (onDisk) {
         hitPoint = vec3(up1.x, up1.y, sqrt(1. - radius2));
         rotatedHitPoint      = differential(deltaT[0], rotate_vector_inverse(cameraDifference[0], hitPoint));
-        centeredHitPoint     = apply_center(rotatedHitPoint, crval[0], crotaQuat[0]);
+        centeredHitPoint     = apply_center(rotatedHitPoint, crval[0], crota[0]);
 
         diffRotatedHitPoint  = differential(deltaT[1], rotate_vector_inverse(cameraDifference[1], hitPoint));
-        diffCenteredHitPoint = apply_center(diffRotatedHitPoint, crval[1], crotaQuat[1]);
+        diffCenteredHitPoint = apply_center(diffRotatedHitPoint, crval[1], crota[1]);
 
         factor = 1.;
         gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_NARROW;
@@ -53,7 +53,7 @@ void main(void) {
         if (length(rotatedHitPoint) <= 1.) // differential: central disk
             discard;
 
-        centeredHitPoint = apply_center(rotatedHitPoint, crval[0], crotaQuat[0]);
+        centeredHitPoint = apply_center(rotatedHitPoint, crval[0], crota[0]);
 
         if (calculateDepth != 0) // intersecting Euhforia planes
             gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_WIDE;
@@ -83,7 +83,7 @@ void main(void) {
         if (/*radius2 >= 1. ||*/ diffRotatedHitPoint.z <= 0.) {
             hitPoint = vec3(up1.x, up1.y, intersectPlane(cameraDifference[1], up1, onDisk));
             diffRotatedHitPoint  = rotate_vector_inverse(cameraDifference[1], hitPoint);
-            diffCenteredHitPoint = apply_center(diffRotatedHitPoint, crval[1], crotaQuat[1]);
+            diffCenteredHitPoint = apply_center(diffRotatedHitPoint, crval[1], crota[1]);
         }
 
         difftexcoord = differencerect.zw * vec2(diffCenteredHitPoint.x - differencerect.x, -diffCenteredHitPoint.y - differencerect.y);

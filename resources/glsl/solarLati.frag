@@ -38,13 +38,13 @@ void main(void) {
     vec2 texcoord;
 
     vec2 scrpos = getScrPos();
-    get_lati_texcoord(crval[0], crotaQuat[0], grid, deltaT[0], hglt, scrpos, rect, texcoord);
+    get_lati_texcoord(crval[0], crota[0], grid, deltaT[0], hglt, scrpos, rect, texcoord);
     if (isdifference == NODIFFERENCE) {
         color = getColor(texcoord, texcoord, 1);
     } else {
         vec2 difftexcoord;
         float difftexcoord_radius;
-        get_lati_texcoord(crval[1], crotaQuat[1], gridDiff, deltaT[1], hgltDiff, scrpos, differencerect, difftexcoord);
+        get_lati_texcoord(crval[1], crota[1], gridDiff, deltaT[1], hgltDiff, scrpos, differencerect, difftexcoord);
         color = getColor(texcoord, difftexcoord, 1);
     }
     outColor = color;

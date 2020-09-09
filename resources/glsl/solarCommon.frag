@@ -34,7 +34,7 @@ uniform float gridDiff[2];
 uniform float hgltDiff;
 
 uniform vec2 crval[2];
-uniform vec4 crotaQuat[2];
+uniform vec4 crota[2];
 
 uniform float deltaT[2];
 
