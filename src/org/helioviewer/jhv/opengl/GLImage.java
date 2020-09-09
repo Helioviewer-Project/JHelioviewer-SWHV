@@ -3,10 +3,8 @@ package org.helioviewer.jhv.opengl;
 import java.nio.IntBuffer;
 
 import org.helioviewer.jhv.base.lut.LUT;
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.math.MathUtils;
-import org.helioviewer.jhv.metadata.MetaData;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -59,16 +57,6 @@ public class GLImage {
     }
 
     public void applyFilters(GL2 gl, ImageData imageData, GLSLSolarShader shader) {
-        MetaData metaData = imageData.getMetaData();
-        shader.bindCalculateDepth(gl, metaData.getCalculateDepth());
-        shader.bindRadii(gl, metaData.getInnerRadius(), Display.getShowCorona() ? metaData.getOuterRadius() : 1);
-        shader.bindSector(gl, metaData.getSector0(), metaData.getSector1());
-        if (metaData.getCutOffValue() > 0) {
-            shader.bindCutOffDirection(gl, metaData.getCutOffX(), metaData.getCutOffY());
-            shader.bindCutOffValue(gl, metaData.getCutOffValue());
-        } else
-            shader.bindCutOffValue(gl, -1);
-
         shader.bindSlit(gl, slitLeft, slitRight);
         shader.bindBrightness(gl, brightOffset, brightScale * imageData.getMetaData().getResponseFactor(), 1);
         shader.bindColor(gl, red, green, blue, opacity, blend);
