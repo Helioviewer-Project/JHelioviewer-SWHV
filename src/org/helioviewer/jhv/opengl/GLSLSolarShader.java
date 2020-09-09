@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.opengl;
 
+import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 
@@ -21,6 +22,7 @@ public class GLSLSolarShader extends GLSLShader {
 
     private int crvalRef;
     private int crotaRef;
+    private int rectRef;
 
     private int deltaTRef;
 
@@ -37,8 +39,6 @@ public class GLSLSolarShader extends GLSLShader {
     private int enhancedRef;
     private int calculateDepthRef;
 
-    private int rectRef;
-    private int diffRectRef;
     private int viewportRef;
     private int viewportOffsetRef;
 
@@ -86,7 +86,6 @@ public class GLSLSolarShader extends GLSLShader {
         calculateDepthRef = gl.glGetUniformLocation(id, "calculateDepth");
 
         rectRef = gl.glGetUniformLocation(id, "rect");
-        diffRectRef = gl.glGetUniformLocation(id, "differencerect");
         viewportRef = gl.glGetUniformLocation(id, "viewport");
         viewportOffsetRef = gl.glGetUniformLocation(id, "viewportOffset");
 
@@ -132,26 +131,22 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform4fv(crotaRef, 2, floatArr, 0);
     }
 
+    public void bindRect(GL2 gl, Region r, Region dr) {
+        floatArr[0] = (float) r.llx;
+        floatArr[1] = (float) r.lly;
+        floatArr[2] = (float) (1. / r.width);
+        floatArr[3] = (float) (1. / r.height);
+        floatArr[4] = (float) dr.llx;
+        floatArr[5] = (float) dr.lly;
+        floatArr[6] = (float) (1. / dr.width);
+        floatArr[7] = (float) (1. / dr.height);
+        gl.glUniform4fv(rectRef, 2, floatArr, 0);
+    }
+
     public void bindDeltaT(GL2 gl, double deltaT, double deltaTDiff) {
         floatArr[0] = (float) deltaT;
         floatArr[1] = (float) deltaTDiff;
         gl.glUniform1fv(deltaTRef, 2, floatArr, 0);
-    }
-
-    public void bindRect(GL2 gl, double xOffset, double yOffset, double xScale, double yScale) {
-        floatArr[0] = (float) xOffset;
-        floatArr[1] = (float) yOffset;
-        floatArr[2] = (float) xScale;
-        floatArr[3] = (float) yScale;
-        gl.glUniform4fv(rectRef, 1, floatArr, 0);
-    }
-
-    public void bindDiffRect(GL2 gl, double xOffset, double yOffset, double xScale, double yScale) {
-        floatArr[0] = (float) xOffset;
-        floatArr[1] = (float) yOffset;
-        floatArr[2] = (float) xScale;
-        floatArr[3] = (float) yScale;
-        gl.glUniform4fv(diffRectRef, 1, floatArr, 0);
     }
 
     public void bindColor(GL2 gl, float red, float green, float blue, double alpha, double blend) {
