@@ -5,7 +5,7 @@ void get_polar_texcoord(const vec2 CRVAL, const vec4 CROTA, const vec2 scrpos, c
         discard;
 
     float theta = -(scrpos.x * TWOPI + HALFPI /* - cr TBD */);
-    vec3 pos = vec3(cos(theta), sin(theta), 0) * interpolated;
+    vec3 pos = vec3(cos(theta), sin(theta), 0.) * interpolated;
     // if (interpolated < 1.)
     //     pos.z = interpolated;
 
