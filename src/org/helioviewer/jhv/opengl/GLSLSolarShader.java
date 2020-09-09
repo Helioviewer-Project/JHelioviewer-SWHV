@@ -23,9 +23,7 @@ public class GLSLSolarShader extends GLSLShader {
     private int gridDiffRef;
 
     private int crvalRef;
-    private int crotaQuatRef;
     private int crotaRef;
-    private int crotaDiffRef;
 
     private int deltaTRef;
 
@@ -76,7 +74,7 @@ public class GLSLSolarShader extends GLSLShader {
         gridDiffRef = gl.glGetUniformLocation(id, "gridDiff");
 
         crvalRef = gl.glGetUniformLocation(id, "crval");
-        crotaQuatRef = gl.glGetUniformLocation(id, "crotaQuat");
+        crotaRef = gl.glGetUniformLocation(id, "crota");
 
         deltaTRef = gl.glGetUniformLocation(id, "deltaT");
 
@@ -134,10 +132,10 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform2fv(crvalRef, 2, floatArr, 0);
     }
 
-    public void bindCROTAQuat(GL2 gl, Quat quat, Quat quatDiff) {
+    public void bindCROTA(GL2 gl, Quat quat, Quat quatDiff) {
         quat.setFloatArray(floatArr, 0);
         quatDiff.setFloatArray(floatArr, 4);
-        gl.glUniform4fv(crotaQuatRef, 2, floatArr, 0);
+        gl.glUniform4fv(crotaRef, 2, floatArr, 0);
     }
 
     public void bindDeltaT(GL2 gl, double deltaT, double deltaTDiff) {
