@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Vec2;
 
 public interface MetaData {
 
@@ -25,11 +26,11 @@ public interface MetaData {
 
     float getResponseFactor();
 
-    float getCROTA();
+    @Nonnull
+    Vec2 getCRVAL();
 
-    float getSCROTA();
-
-    float getCCROTA();
+    @Nonnull
+    Quat getCROTA();
 
     float getSector0();
 
@@ -47,9 +48,6 @@ public interface MetaData {
 
     @Nonnull
     Position getViewpoint();
-
-    @Nonnull
-    Quat getCenterRotation();
 
     @Nonnull
     Region roiToRegion(int roiX, int roiY, int roiWidth, int roiHeight, double factorX, double factorY);

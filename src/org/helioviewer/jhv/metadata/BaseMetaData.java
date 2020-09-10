@@ -7,6 +7,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Vec2;
 
 class BaseMetaData implements MetaData {
 
@@ -29,9 +30,8 @@ class BaseMetaData implements MetaData {
     protected float innerRadius = 0;
     protected float outerRadius = Float.MAX_VALUE;
 
-    protected float crota = 0;
-    protected float scrota = 0;
-    protected float ccrota = 1;
+    protected final Vec2 crval = new Vec2(0, 0);
+    protected Quat crota = Quat.ZERO;
 
     protected float sector0 = 0;
     protected float sector1 = 0;
@@ -111,23 +111,14 @@ class BaseMetaData implements MetaData {
 
     @Nonnull
     @Override
-    public Quat getCenterRotation() {
-        return viewpoint.toQuat();
+    public Vec2 getCRVAL() {
+        return crval;
     }
 
+    @Nonnull
     @Override
-    public float getCROTA() {
+    public Quat getCROTA() {
         return crota;
-    }
-
-    @Override
-    public float getSCROTA() {
-        return scrota;
-    }
-
-    @Override
-    public float getCCROTA() {
-        return ccrota;
     }
 
     @Override
