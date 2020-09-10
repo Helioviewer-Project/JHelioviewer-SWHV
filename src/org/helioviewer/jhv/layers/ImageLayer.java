@@ -185,31 +185,49 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         GLSLSolarShader shader = Display.mode.shader;
         shader.use(gl);
 
-        shader.bindPolarRadii(gl, (float) Display.mode.scale.getYstart(), (float) Display.mode.scale.getYstop()); // independent
+        glImage.applyFilters(gl, imageData, shader);
+
+        shader.bindPolarRadii(gl, Display.mode.scale.getYstart(), Display.mode.scale.getYstop()); // independent
         shader.bindMatrix(gl, camera.getTransformationInverse(vp.aspect)); // viewport dependent
         shader.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height); // viewport dependent
 
         Position cameraViewpoint = imageData.getViewpoint(); // camera at decode command moment
+        Quat q = Quat.rotate(camera.getDragRotation(), cameraViewpoint.toQuat());
+
         MetaData metaData = imageData.getMetaData();
         Position metaViewpoint = metaData.getViewpoint();
-        glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
-
-        Quat q = Quat.rotate(camera.getDragRotation(), cameraViewpoint.toQuat()); // sync with camera
-        shader.bindCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, metaData.getCenterRotation()));
-
-        DifferenceMode diffMode = glImage.getDifferenceMode();
-        MetaData metaDataDiff = diffMode == DifferenceMode.Base ? baseImageData.getMetaData() : prevImageData.getMetaData();
+        ImageData imageDataDiff = glImage.getDifferenceMode() == DifferenceMode.Base ? baseImageData : prevImageData;
+        MetaData metaDataDiff = imageDataDiff.getMetaData();
         Position metaViewpointDiff = metaDataDiff.getViewpoint();
-        shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, metaDataDiff.getCenterRotation()));
+
+        shader.bindCameraDifference(gl, Quat.rotateWithConjugate(q, metaViewpoint.toQuat()), Quat.rotateWithConjugate(q, metaViewpointDiff.toQuat()));
+        shader.bindCRVAL(gl, metaData.getCRVAL(), metaDataDiff.getCRVAL());
+        shader.bindCROTA(gl, metaData.getCROTA(), metaDataDiff.getCROTA());
+        shader.bindRect(gl, imageData.getRegion(), imageDataDiff.getRegion());
+
+        shader.bindCalculateDepth(gl, metaData.getCalculateDepth());
+        shader.bindRadii(gl, metaData.getInnerRadius(), Display.getShowCorona() ? metaData.getOuterRadius() : 1);
+        shader.bindSector(gl, metaData.getSector0(), metaData.getSector1());
+        if (metaData.getCutOffValue() > 0) {
+            shader.bindCutOffDirection(gl, metaData.getCutOffX(), metaData.getCutOffY());
+            shader.bindCutOffValue(gl, metaData.getCutOffValue());
+        } else
+            shader.bindCutOffValue(gl, -1);
 
         boolean diffRot = ImageLayers.getDiffRotationMode();
-        shader.bindDeltaT(gl, diffRot ? (float) ((cameraViewpoint.time.milli - metaViewpoint.time.milli) * 1e-9) : 0);
-        shader.bindDeltaTDiff(gl, diffRot ? (float) ((cameraViewpoint.time.milli - metaViewpointDiff.time.milli) * 1e-9) : 0);
+        double deltaT = diffRot ? (cameraViewpoint.time.milli - metaViewpoint.time.milli) * 1e-9 : 0;
+        double deltaTDiff = diffRot ? (cameraViewpoint.time.milli - metaViewpointDiff.time.milli) * 1e-9 : 0;
+        shader.bindDeltaT(gl, deltaT, deltaTDiff);
 
         if (Display.mode == Display.DisplayMode.Latitudinal) {
             GridType gridType = Layers.getGridLayer().getGridType();
-            shader.bindAnglesLatiGrid(gl, (float) latiLongitude(gridType, cameraViewpoint, metaViewpoint), (float) gridType.toLatitude(metaViewpoint));
-            shader.bindAnglesLatiGridDiff(gl, (float) latiLongitude(gridType, cameraViewpoint, metaViewpointDiff), (float) gridType.toLatitude(metaViewpointDiff));
+            shader.bindAnglesLatiGrid(gl,
+                latiLongitude(gridType, cameraViewpoint, metaViewpoint),
+                gridType.toLatitude(metaViewpoint),
+                metaViewpoint.lat,
+                latiLongitude(gridType, cameraViewpoint, metaViewpointDiff),
+                gridType.toLatitude(metaViewpointDiff),
+                metaViewpointDiff.lat);
         }
 
         GLListener.glslSolar.render(gl);

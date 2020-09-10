@@ -2,12 +2,9 @@ package org.helioviewer.jhv.opengl;
 
 import java.nio.IntBuffer;
 
-import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.math.MathUtils;
-import org.helioviewer.jhv.metadata.MetaData;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -52,16 +49,14 @@ public class GLImage {
             tex.copyImageBuffer(gl, imageData.getImageBuffer());
         }
 
-        ImageData prevFrame = isBaseDiff() ? baseImageData : prevImageData;
+        ImageData prevFrame = diffMode == DifferenceMode.Base ? baseImageData : prevImageData;
         if (diffMode != DifferenceMode.None && prevFrame != null) {
             diffTex.bind(gl);
             diffTex.copyImageBuffer(gl, prevFrame.getImageBuffer());
         }
     }
 
-    public void applyFilters(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLSolarShader shader) {
-        applyRegion(gl, imageData, prevImageData, baseImageData, shader);
-
+    public void applyFilters(GL2 gl, ImageData imageData, GLSLSolarShader shader) {
         shader.bindSlit(gl, slitLeft, slitRight);
         shader.bindBrightness(gl, brightOffset, brightScale * imageData.getMetaData().getResponseFactor(), 1);
         shader.bindColor(gl, red, green, blue, opacity, blend);
@@ -73,43 +68,6 @@ public class GLImage {
         shader.bindIsDiff(gl, diffMode.ordinal());
         if (diffMode != DifferenceMode.None)
             diffTex.bind(gl);
-    }
-
-    private boolean isBaseDiff() {
-        return diffMode == DifferenceMode.Base;
-    }
-
-    private static MetaData bindParams(GL2 gl, ImageData imageData, GLSLSolarShader shader) {
-        Region r = imageData.getRegion();
-        shader.bindRect(gl, r.llx, r.lly, 1. / r.width, 1. / r.height);
-        MetaData metaData = imageData.getMetaData();
-        shader.bindAngles(gl, (float) metaData.getViewpoint().lat, metaData.getCROTA(), metaData.getSCROTA(), metaData.getCCROTA());
-        return metaData;
-    }
-
-    private static void bindParamsDiff(GL2 gl, ImageData imageData, GLSLSolarShader shader) {
-        Region r = imageData.getRegion();
-        shader.bindDiffRect(gl, r.llx, r.lly, 1. / r.width, 1. / r.height);
-        MetaData metaData = imageData.getMetaData();
-        shader.bindAnglesDiff(gl, (float) metaData.getViewpoint().lat, metaData.getCROTA(), metaData.getSCROTA(), metaData.getCCROTA());
-    }
-
-    private void applyRegion(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLSolarShader shader) {
-        if (prevImageData != null && !isBaseDiff()) {
-            bindParamsDiff(gl, prevImageData, shader);
-        } else if (baseImageData != null && isBaseDiff()) {
-            bindParamsDiff(gl, baseImageData, shader);
-        }
-
-        MetaData metaData = bindParams(gl, imageData, shader);
-        shader.bindCalculateDepth(gl, metaData.getCalculateDepth());
-        shader.bindRadii(gl, metaData.getInnerRadius(), Display.getShowCorona() ? metaData.getOuterRadius() : 1);
-        shader.bindSector(gl, metaData.getSector0(), metaData.getSector1());
-        if (metaData.getCutOffValue() > 0) {
-            shader.bindCutOffDirection(gl, metaData.getCutOffX(), metaData.getCutOffY());
-            shader.bindCutOffValue(gl, metaData.getCutOffValue());
-        } else
-            shader.bindCutOffValue(gl, -1);
     }
 
     private void applyLUT(GL2 gl) {

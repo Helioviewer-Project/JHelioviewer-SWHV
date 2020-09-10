@@ -20,27 +20,23 @@ uniform int isdifference;
 uniform int enhanced;
 uniform sampler2D diffImage;
 
-uniform vec4 rect;
-uniform vec4 differencerect;
 uniform sampler1D lut;
 uniform vec3 brightness;
 uniform vec4 color;
 
 uniform float slit[2];
 
-uniform float grid[2];
-uniform float hglt;
-uniform float gridDiff[2];
-uniform float hgltDiff;
-uniform float crota[3];
-uniform float crotaDiff[3];
+uniform vec3 grid[2];
 
-uniform float deltaT;
-uniform float deltaTDiff;
+uniform vec2 crval[2];
+uniform vec4 crota[2];
+uniform vec4 rect[2];
+
+uniform float deltaT[2];
 
 uniform mat4 cameraTransformationInverse;
-uniform vec4 cameraDifferenceRotationQuat;
-uniform vec4 diffcameraDifferenceRotationQuat;
+uniform vec4 cameraDifference[2];
+
 uniform vec3 viewport;
 uniform vec2 viewportOffset;
 
@@ -120,6 +116,19 @@ vec2 getScrPos(void) {
     vec2 scrpos = vec2(viewport.z * up1.x, up1.y) + .5;
     clamp_coord(scrpos);
     return scrpos;
+}
+
+vec3 rotate_vector_inverse(const vec4 quat, const vec3 vec) {
+    return vec + 2. * cross(cross(vec, quat.xyz) + quat.w * vec, quat.xyz);
+}
+
+vec3 rotate_vector(const vec4 quat, const vec3 vec) {
+    return vec + 2. * cross(quat.xyz, cross(quat.xyz, vec) + quat.w * vec);
+}
+
+vec3 apply_center(const vec3 v, const vec2 shift, const vec4 quat) {
+    vec3 r = vec3(v.xy - shift, v.z);
+    return rotate_vector_inverse(quat, r);
 }
 
 float differentialRotation(const float dt, const float theta) {
