@@ -62,7 +62,7 @@ public class URIView extends BaseView {
                 m = new PixelBasedMetaData(100, 100, uri);
             } else {
                 xml = readXml;
-                m = new XMLMetaDataContainer(xml).getHVMetaData(true);
+                m = new XMLMetaDataContainer(xml).getHVMetaData();
             }
 
             imageRegion = m.roiToRegion(0, 0, m.getPixelWidth(), m.getPixelHeight(), 1, 1);
