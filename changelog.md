@@ -29,3 +29,5 @@
 - Draw field-of-views of some SOLO, SDO and PROBA-2 remote sensing instruments; ability to "off-point" and to zoom-fit FOV with right-click
 - Optionally distort displayed images according to solar differential rotation (Snodgrass, magnetic features)
 - Load sequences of files as movie from the "jhv.load.image" SAMP message, example at <https://github.com/Helioviewer-Project/samp4jhv/blob/master/examples/python/samp_multi.py>
+- Support Solar Orbiter remote sensing datasets (EUI, PHI, Metis, SoloHI)
+- Support Hi-C 1 and 2.1
