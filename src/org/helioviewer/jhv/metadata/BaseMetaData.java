@@ -11,7 +11,6 @@ import org.helioviewer.jhv.math.Vec2;
 
 class BaseMetaData implements MetaData {
 
-    protected int frameNumber = 0;
     protected Region region;
     protected String displayName = "unknown";
     protected String unit = "";
@@ -40,11 +39,6 @@ class BaseMetaData implements MetaData {
     protected float cutOffValue = -1;
     protected float cutOffX = 0;
     protected float cutOffY = 0;
-
-    @Override
-    public int getFrameNumber() {
-        return frameNumber;
-    }
 
     @Nonnull
     @Override

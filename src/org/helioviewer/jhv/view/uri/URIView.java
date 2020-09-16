@@ -59,10 +59,10 @@ public class URIView extends BaseView {
             String readXml = reader.readXML(uri);
             if (readXml == null) {
                 xml = "<meta/>";
-                m = new PixelBasedMetaData(100, 100, 0, uri);
+                m = new PixelBasedMetaData(100, 100, uri);
             } else {
                 xml = readXml;
-                m = new XMLMetaDataContainer(xml).getHVMetaData(0, true);
+                m = new XMLMetaDataContainer(xml).getHVMetaData(true);
             }
 
             imageRegion = m.roiToRegion(0, 0, m.getPixelWidth(), m.getPixelHeight(), 1, 1);

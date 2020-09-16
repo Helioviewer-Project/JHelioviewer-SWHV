@@ -141,7 +141,7 @@ public class KakaduSource {
             if (i == metaDataList.length)
                 break;
             if (node.Open_existing(xmlBox)) {
-                metaDataList[i] = new XMLMetaDataContainer(xmlBox2String(xmlBox)).getHVMetaData(i, true);
+                metaDataList[i] = new XMLMetaDataContainer(xmlBox2String(xmlBox)).getHVMetaData(true);
                 xmlBox.Close();
             }
             i++;

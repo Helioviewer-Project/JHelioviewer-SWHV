@@ -10,8 +10,6 @@ import org.helioviewer.jhv.math.Vec2;
 
 public interface MetaData {
 
-    int getFrameNumber();
-
     @Nonnull
     String getDisplayName();
 

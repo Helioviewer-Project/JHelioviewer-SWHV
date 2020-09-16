@@ -30,9 +30,7 @@ public class HelioviewerMetaData extends BaseMetaData {
     private double sunPositionX = 0;
     private double sunPositionY = 0;
 
-    public HelioviewerMetaData(@Nonnull MetaDataContainer m, int frame, boolean normalizeResponse) {
-        frameNumber = frame;
-
+    public HelioviewerMetaData(@Nonnull MetaDataContainer m, boolean normalizeResponse) {
         identifyObservation(m);
 
         instrument = instrument.trim().intern();
