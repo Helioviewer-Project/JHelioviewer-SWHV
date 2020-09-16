@@ -30,7 +30,7 @@ public class HelioviewerMetaData extends BaseMetaData {
     private double sunPositionX = 0;
     private double sunPositionY = 0;
 
-    public HelioviewerMetaData(@Nonnull MetaDataContainer m, boolean normalizeResponse) {
+    public HelioviewerMetaData(@Nonnull MetaDataContainer m) {
         identifyObservation(m);
 
         instrument = instrument.trim().intern();
@@ -47,9 +47,7 @@ public class HelioviewerMetaData extends BaseMetaData {
         retrieveSector(m);
 
         retrieveUnit(m);
-
-        if (normalizeResponse)
-            retrieveResponse();
+        retrieveResponse();
 
         if (instrument.equals("Euhforia"))
             calculateDepth = true;
