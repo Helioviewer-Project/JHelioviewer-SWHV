@@ -270,14 +270,14 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     private ImageData baseImageData;
 
     private void setImageData(@Nonnull ImageData newImageData) {
-        int frame = newImageData.getMetaData().getFrameNumber();
-        if (frame == 0) {
+        long newMilli = newImageData.getMetaData().getViewpoint().time.milli;
+        if (newMilli == view.getFirstTime().milli) {
             baseImageData = newImageData;
         }
 
-        if (imageData == null || (prevImageData != null && prevImageData.getMetaData().getFrameNumber() - frame > 2)) {
+        if (imageData == null || baseImageData == newImageData) { // first or loop playback
             prevImageData = newImageData;
-        } else if (frame != imageData.getMetaData().getFrameNumber()) {
+        } else if (newMilli != imageData.getMetaData().getViewpoint().time.milli) { // new frame
             prevImageData = imageData;
         }
 
