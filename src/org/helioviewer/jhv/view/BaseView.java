@@ -31,7 +31,7 @@ public class BaseView implements View {
         executor = _executor;
         request = _request;
         uri = _uri == null ? null : NetFileCache.get(_uri);
-        metaData[0] = new PixelBasedMetaData(1, 1, 0, uri);
+        metaData[0] = new PixelBasedMetaData(1, 1, uri);
     }
 
     @Nullable
