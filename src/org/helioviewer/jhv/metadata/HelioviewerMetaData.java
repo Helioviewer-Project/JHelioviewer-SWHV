@@ -80,7 +80,7 @@ public class HelioviewerMetaData extends BaseMetaData {
 
     private void retrieveResponse() {
         if (normalizeAIA && instrument.equals("AIA")) {
-            responseFactor = (float) AIAResponse.get(viewpoint.time.toString().substring(0, 10), measurement);
+            responseFactor = (float) AIAResponse.get(viewpoint.time.milli, measurement);
         }
     }
 

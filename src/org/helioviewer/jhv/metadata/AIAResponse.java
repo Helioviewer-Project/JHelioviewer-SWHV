@@ -1,98 +1,108 @@
 package org.helioviewer.jhv.metadata;
 
 import java.io.InputStream;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.JSONUtils;
+import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONObject;
 
-import com.google.common.collect.ImmutableMap;
-
 public class AIAResponse {
-    /*
-        // https://github.com/mjpauly/aia/blob/master/mov_img.py
-        private static final HashMap<String, Double> STANDARD_INT = new HashMap<String, Double>() {
-        private static final ImmutableMap<String, Double> STANDARD_INT = new ImmutableMap.Builder<String, Double>().
-                put("131", 6.99685).
-                put("171", 4.99803).
-                put("193", 2.9995).
-                put("211", 4.99801).
-                put("304", 4.99941).
-                put("335", 6.99734).
-                put("94", 4.99803).
-                build();
 
-        private static final ImmutableMap<String, Double> MAX = new ImmutableMap.Builder<String, Double>().
-                put("131", 1200.).
-                put("171", 6000.).
-                put("193", 6000.).
-                put("211", 13000.).
-                put("304", 2000.).
-                put("335", 1000.).
-                put("94",  50.).
-                build();
-    */
+    private static class PassBand {
+
+        final String degradationFile;
+        final double dataMax;
+        final boolean isSqrt;
+
+        PassBand(String _degradationFile, double _dataMax, boolean _isSqrt) {
+            degradationFile = _degradationFile;
+            dataMax = _dataMax;
+            isSqrt = _isSqrt;
+        }
+
+    }
+
     // https://github.com/Helioviewer-Project/jp2gen/blob/master/idl/sdo/aia/hvs_version5_aia.pro
-    private static final ImmutableMap<String, Double> HV_MAX = new ImmutableMap.Builder<String, Double>().
-            put("131", 500.).
-            put("171", 14000.).
-            put("193", 2500.).
-            put("211", 1500.).
-            put("304", 250.).
-            put("335", 80.).
-            put("94", 30.).
-            build();
+    private static final Map<String, PassBand> passBands = Map.of(
+            "131", new PassBand("131_aia_response.json", 500, false),
+            "1600", new PassBand("1600_aia_response.json", 400, false),
+            "1700", new PassBand("1700_aia_response.json", 5000, true),
+            "171", new PassBand("171_aia_response.json", 14000, true),
+            "193", new PassBand("193_aia_response.json", 2500, false),
+            "211", new PassBand("211_aia_response.json", 1500, false),
+            "304", new PassBand("304_aia_response.json", 250, false),
+            "335", new PassBand("335_aia_response.json", 80, false),
+            "4500", new PassBand("4500_aia_response.json", 20000, false),
+            "94", new PassBand("94_aia_response.json", 30, false)
+    );
 
-//    private static final HashMap<String, Double> LMSAL_MAX = new HashMap<>();
-//    private static final String extPath = "https://raw.githubusercontent.com/mjpauly/aia/master/aia_rescaling_data.json";
+    private static class Response {
 
-    private static boolean loaded;
-    private static JSONObject responseData;
-    private static JSONObject referenceData;
-    private static String firstDate;
-    private static String lastDate;
+        final long t_start;
+        final long t_stop;
+        final double reff_area;
+        final double eff_area_p1;
 
-    public static void load() throws Exception {
-        try (InputStream is = FileUtils.getResource("/data/aia_rescaling_data.json")) {
-            JSONObject data = JSONUtils.get(is);
-            String[] keys = JSONObject.getNames(data);
-            Arrays.sort(keys);
-
-            firstDate = keys[0];
-            lastDate = keys[keys.length - 1];
-            responseData = data;
-            referenceData = data.getJSONObject("2010-05-01");
-
-            // for (String key : STANDARD_INT.keySet())
-            // LMSAL_MAX.put(key, MAX.get(key) / STANDARD_INT.get(key));
-
-            loaded = true;
+        Response(long _t_start, long _t_stop, double _reff_area, double _eff_area_p1) {
+            t_start = _t_start;
+            t_stop = _t_stop;
+            reff_area = _reff_area;
+            eff_area_p1 = _eff_area_p1;
         }
     }
 
-    static double get(String date, String pass) {
+    private static final Map<String, ArrayList<Response>> response = new HashMap<>();
+
+    private static boolean loaded;
+
+    public static void load() throws Exception {
+        for (Map.Entry<String, PassBand> entry : passBands.entrySet()) {
+            try (InputStream is = FileUtils.getResource("/data/" + entry.getValue().degradationFile)) {
+                JSONObject data = JSONUtils.get(is);
+                JSONObject T_START = data.getJSONObject("T_START");
+                JSONObject T_STOP = data.getJSONObject("T_STOP");
+                JSONObject EFF_AREA = data.getJSONObject("EFF_AREA");
+                JSONObject EFFA_P1 = data.getJSONObject("EFFA_P1");
+
+                int length = T_START.length();
+                ArrayList<Response> respList = new ArrayList<>(length);
+
+                String key = String.valueOf(0);
+                double zeff_area = EFF_AREA.getDouble(key);
+                respList.add(new Response(T_START.getLong(key), T_STOP.getLong(key), 1, EFFA_P1.getDouble(key)));
+
+                for (int i = 1; i < length; i++) {
+                    key = String.valueOf(i);
+                    respList.add(new Response(
+                            T_START.getLong(key),
+                            T_STOP.getLong(key),
+                            EFF_AREA.getDouble(key) / zeff_area,
+                            EFFA_P1.getDouble(key)));
+                }
+                response.put(entry.getKey(), respList);
+            }
+        }
+        loaded = true;
+    }
+
+    static double get(long milli, String pass) {
         if (!loaded)
             return 1;
 
-        try {
-            if (lastDate.compareTo(date) < 0)
-                date = lastDate;
-            else if (firstDate.compareTo(date) > 0)
-                date = firstDate;
+        for (Response r : response.get(pass)) {
+            if (milli >= r.t_start && milli < r.t_stop) {
+                double factor = 1 / (r.reff_area * (1 + r.eff_area_p1 * (milli - r.t_start) / TimeUtils.DAY_IN_MILLIS));
+                // System.out.println(">>> degradation " + (1 / factor));
 
-            String key = pass; //+ "_filtered";
-            if (!referenceData.has(key) || !responseData.getJSONObject(date).has(key)) // exception if date missing
-                return 1;
-
-            double factor, ratio = referenceData.getDouble(key) / responseData.getJSONObject(date).getDouble(key);
-            if ("171".equals(pass) || "1700".equals(pass))
-                factor = Math.sqrt(ratio);
-            else
-                factor = 1 + Math.log10(ratio) / Math.log10(HV_MAX.get(pass));
-            return factor;
-        } catch (Exception e) {
-            e.printStackTrace();
+                PassBand p = passBands.get(pass);
+                return p.isSqrt ?
+                        Math.sqrt(factor) :
+                        1 + Math.log10(factor) / Math.log10(p.dataMax);
+            }
         }
         return 1;
     }

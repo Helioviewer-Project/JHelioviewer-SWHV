@@ -1,7 +1,7 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 2.16 (pending)
+## JHelioviewer 4.0 (pending)
 
 - Non-modal annotations (shift+click)
 - Read Helioviewer metadata from JPG and PNG files
@@ -29,5 +29,7 @@
 - Draw field-of-views of some SOLO, SDO and PROBA-2 remote sensing instruments; ability to "off-point" and to zoom-fit FOV with right-click
 - Optionally distort displayed images according to solar differential rotation (Snodgrass, magnetic features)
 - Load sequences of files as movie from the "jhv.load.image" SAMP message, example at <https://github.com/Helioviewer-Project/samp4jhv/blob/master/examples/python/samp_multi.py>
+- Add white background view option
 - Support Solar Orbiter remote sensing datasets (EUI, PHI, Metis, SoloHI)
 - Support Hi-C 1 and 2.1
+- Update AIA degradation correction
