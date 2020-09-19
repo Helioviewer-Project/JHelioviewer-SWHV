@@ -38,7 +38,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
     private static final int MAX_SPEED_SPIRAL = 2000;
     private int spiralSpeed = 500;
     private int spiralMult = 0;
-    private boolean relative;
+    private boolean relative = false;
 
     private Frame frame;
 
