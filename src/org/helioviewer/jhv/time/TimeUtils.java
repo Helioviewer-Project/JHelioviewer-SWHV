@@ -97,9 +97,14 @@ public class TimeUtils {
 
     public static long optParse(String date, long alt) {
         String spice = Spice.timeParse2UTC(date);
-        if (spice != null)
-            return parse(spice);
-
+        if (spice != null) { // understood by SPICE, may still fail Java parser
+            try {
+                return parse(spice);
+            } catch (Exception e) {
+                return alt;
+            }
+        }
+        // try NLP
         try {
             return roundSec(prettyParser.parse(date).get(0).getTime());
         } catch (Exception e) {
