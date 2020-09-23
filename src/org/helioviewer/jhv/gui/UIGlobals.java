@@ -17,7 +17,6 @@ import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
-import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
 
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -32,14 +31,8 @@ public class UIGlobals {
 
     private UIGlobals() {
         try {
-            String laf = UIManager.getSystemLookAndFeelClassName();
-            UIManager.setLookAndFeel(laf);
-            if (laf.contains("gtk") || laf.contains("nimbus") || laf.contains("synth")) { // crash due to uninitialized defaults
-                UIManager.getDefaults().put("SliderUI", "javax.swing.plaf.basic.BasicSliderUI");
-                UIManager.getDefaults().put("RangeSliderUI", "com.jidesoft.plaf.basic.BasicRangeSliderUI");
-                if (laf.contains("synth"))
-                    UIManager.getDefaults().put("textHighlight", new ColorUIResource(255, 255, 255));
-            }
+            if (System.getProperty("jhv.os").equals("windows"))
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             LookAndFeelFactory.installJideExtension();
         } catch (Exception e) {
             e.printStackTrace();
