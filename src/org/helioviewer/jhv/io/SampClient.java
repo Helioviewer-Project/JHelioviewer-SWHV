@@ -44,7 +44,7 @@ public class SampClient extends HubConnector {
             new Thread(() -> {
                 try {
                     if (Hub.getRunningHubs().length == 0)
-                        Hub.runHub(HubServiceMode.CLIENT_GUI);
+                        Hub.runHub(HubServiceMode.NO_GUI);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
