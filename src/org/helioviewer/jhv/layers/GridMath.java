@@ -26,7 +26,7 @@ class GridMath {
 
     private static final int LINEAR_STEPS = 1;
 
-    private static final float AXIS_START = (float) (1. * Sun.Radius);
+    private static final float AXIS_START = (float) Sun.Radius;
     private static final float AXIS_STOP = (float) (1.2 * Sun.Radius);
 
     private static final double GRID_RADIUS = Sun.Radius + GridLayer.LINEWIDTH; // avoid intersecting solar surface
