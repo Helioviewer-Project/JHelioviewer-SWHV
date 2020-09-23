@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
 
@@ -18,16 +20,37 @@ import org.astrogrid.samp.client.ClientProfile;
 import org.astrogrid.samp.client.DefaultClientProfile;
 import org.astrogrid.samp.client.HubConnection;
 import org.astrogrid.samp.client.HubConnector;
+import org.astrogrid.samp.hub.Hub;
+import org.astrogrid.samp.hub.HubServiceMode;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class SampClient extends HubConnector {
 
+    static {
+        Logger.getLogger("org.astrogrid.samp").setLevel(Level.WARNING);
+    }
+
     private static final String MTYPE_VIEW_DATA = "jhv.vso.load";
+    private static final boolean startHub = Boolean.parseBoolean(Settings.getProperty("startup.sampHub"));
     private static final SampClient instance = new SampClient(DefaultClientProfile.getProfile());
+
+    public static void init() {
+        if (startHub) {
+            new Thread(() -> {
+                try {
+                    if (Hub.getRunningHubs().length == 0)
+                        Hub.runHub(HubServiceMode.CLIENT_GUI);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
+    }
 
     private static URI toURI(String url) throws Exception {
         URI uri = new URI(url);

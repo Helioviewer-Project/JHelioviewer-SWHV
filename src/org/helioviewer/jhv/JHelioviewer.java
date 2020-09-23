@@ -16,7 +16,7 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
-import org.helioviewer.jhv.io.SampHub;
+import org.helioviewer.jhv.io.SampClient;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.log.LogSettings;
 import org.helioviewer.jhv.plugins.PluginManager;
@@ -98,7 +98,7 @@ public class JHelioviewer {
 
             DataSources.loadSources();
             CommandLine.load();
-            SampHub.init();
+            SampClient.init();
 
             new JHVUpdate(false).check();
         });
