@@ -115,7 +115,7 @@ public class HEKHandler extends SWEKHandler {
         int paramCount = 1;
 
         for (SWEKParam param : params) {
-            if (param.param.toLowerCase().equals("provider")) {
+            if (param.param.equalsIgnoreCase("provider")) {
                 String encodedValue = URLEncoder.encode(param.value, StandardCharsets.UTF_8);
                 baseURL.append("param").append(paramCount).append('=').append("frm_name").append('&').append("op").append(paramCount).append('=').append(param.operand.encodedRepresentation).append('&').append("value").append(paramCount).append('=').append(encodedValue).append('&');
                 paramCount++;

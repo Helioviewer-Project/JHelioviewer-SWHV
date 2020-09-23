@@ -20,7 +20,7 @@ public class Camera {
     public static final double ZOOM_MULTIPLIER_WHEEL = 2.;
     public static final double ZOOM_MULTIPLIER_BUTTON = 2.;
 
-    public static final double INITFOV = 1. * Math.PI / 180.;
+    public static final double INITFOV = Math.PI / 180.;
     private static final double MIN_FOV = INITFOV / 60;
     private static final double MAX_FOV = INITFOV * 120;
     private double fov = INITFOV;
