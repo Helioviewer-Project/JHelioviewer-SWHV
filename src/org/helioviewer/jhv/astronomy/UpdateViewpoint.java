@@ -52,17 +52,13 @@ public interface UpdateViewpoint {
     }
 
     class Location implements UpdateViewpoint {
-        private final double[] lat = new double[3];
-
         @Override
         public Position update(JHVTime time) {
             List<PositionLoad> loadList = PositionLoad.get(this);
             if (!loadList.isEmpty()) {
                 PositionResponse response = loadList.get(0).getResponse();
                 if (response != null) {
-                    JHVTime itime = new JHVTime(response.interpolateLatitudinal(time.milli, Movie.getStartTime(), Movie.getEndTime(), lat));
-                    double elon = Sun.getEarth(itime).lon;
-                    return new Position(itime, lat[0], elon - lat[1], lat[2]);
+                    return response.interpolateCarrington(time.milli, Movie.getStartTime(), Movie.getEndTime());
                 }
             }
             return Sun.getEarth(time);
