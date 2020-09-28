@@ -18,6 +18,7 @@ import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorListener;
@@ -106,7 +107,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         JCheckBox relativeCheckBox = new JCheckBox("Relative longitude", relative);
         relativeCheckBox.addActionListener(e -> {
             relative = !relative;
-            MovieDisplay.display();
+            Display.getCamera().refresh(); // full camera refresh to update viewpoint
         });
         framePanel.add(relativeCheckBox);
 
