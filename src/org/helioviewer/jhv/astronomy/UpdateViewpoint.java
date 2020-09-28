@@ -36,18 +36,20 @@ public interface UpdateViewpoint {
 
         @Override
         public Position update(JHVTime time) {
+            double hciLon = 0;
             JHVTime itime = time;
             List<PositionLoad> loadList = PositionLoad.get(this);
             if (!loadList.isEmpty()) {
-                PositionResponse response = loadList.get(0).getResponse();
+                PositionLoad load = loadList.get(0);
+                PositionResponse response = load.getResponse();
                 if (response != null) {
                     itime = new JHVTime(response.interpolateTime(time.milli, Movie.getStartTime(), Movie.getEndTime()));
+                    if (load.isHCI())
+                        hciLon = Sun.getEarthHCI(itime).lon;
                 }
             }
 
-            ImageLayer layer = Layers.getActiveImageLayer();
-            double lon = layer == null ? Sun.getEarth(itime).lon : layer.getView().getMetaData(time).getViewpoint().lon;
-            return new Position(itime, distance, lon + Math.PI / 2, Math.PI / 2);
+            return new Position(itime, distance, Sun.getEarth(itime).lon + hciLon + Math.PI / 2, Math.PI / 2);
         }
     }
 
