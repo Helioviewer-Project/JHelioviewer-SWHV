@@ -3,6 +3,7 @@ package org.helioviewer.jhv.astronomy;
 import java.util.Iterator;
 
 import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -93,6 +94,41 @@ public class PositionResponse {
         lati[1] = hgln;
         lati[2] = hglt;
         return time;
+    }
+
+    Position interpolateCarrington(long t, long start, long end) {
+        long time = interpolateTime(t, start, end);
+
+        double x, y, z;
+        if (positionStart == positionEnd) {
+            x = position[0].x;
+            y = position[0].y;
+            z = position[0].z;
+        } else {
+            double interpolatedIndex = (time - positionStart) / (double) (positionEnd - positionStart) * position.length;
+            int i = (int) interpolatedIndex;
+            i = MathUtils.clip(i, 0, position.length - 1);
+            int inext = Math.min(i + 1, position.length - 1);
+
+            long tstart = position[i].milli;
+            long tend = position[inext].milli;
+
+            double alpha = tend == tstart ? 1. : ((time - tstart) / (double) (tend - tstart)) % 1.;
+            x = (1. - alpha) * position[i].x + alpha * position[inext].x;
+            y = (1. - alpha) * position[i].y + alpha * position[inext].y;
+            z = (1. - alpha) * position[i].z + alpha * position[inext].z;
+        }
+
+        double dist, hgln, hglt;
+        dist = Math.sqrt(x * x + y * y + z * z);
+        if (dist == 0) {
+            hgln = 0;
+            hglt = 0;
+        } else {
+            hgln = -Math.atan2(y, x); // like Carrington
+            hglt = Math.asin(z / dist);
+        }
+        return new Position(new JHVTime(time), dist, hgln, hglt);
     }
 
     public double interpolateRectangular(long t, long start, long end, float[] xyz) {
