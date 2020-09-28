@@ -95,11 +95,13 @@ public class PositionLoad {
 
     private final PositionReceiver receiver;
     private final SpaceObject target;
+    private final boolean isHCI;
     private final Future<PositionResponse> future;
 
-    private PositionLoad(PositionReceiver _receiver, SpaceObject _target, Future<PositionResponse> _future) {
+    private PositionLoad(PositionReceiver _receiver, SpaceObject _target, boolean _isHCI, Future<PositionResponse> _future) {
         receiver = _receiver;
         target = _target;
+        isHCI = _isHCI;
         future = _future;
     }
 
@@ -116,6 +118,10 @@ public class PositionLoad {
         return target;
     }
 
+    public boolean isHCI() {
+        return isHCI;
+    }
+
     @Nullable
     public PositionResponse getResponse() {
         try {
@@ -129,7 +135,7 @@ public class PositionLoad {
 
     public static PositionLoad submit(UpdateViewpoint uv, PositionReceiver receiver, SpaceObject observer, SpaceObject target, Frame frame, long start, long end) {
         receiver.setStatus("Loading...");
-        PositionLoad load = new PositionLoad(receiver, target, EventQueueCallbackExecutor.pool.submit(
+        PositionLoad load = new PositionLoad(receiver, target, frame == Frame.HCI, EventQueueCallbackExecutor.pool.submit(
                 new LoadPosition(observer, target, frame, start, end), new Callback(receiver)));
         loads.put(uv, load);
 
