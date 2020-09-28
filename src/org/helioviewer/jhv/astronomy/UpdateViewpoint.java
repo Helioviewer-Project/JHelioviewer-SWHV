@@ -37,19 +37,21 @@ public interface UpdateViewpoint {
         @Override
         public Position update(JHVTime time) {
             double hciLon = 0;
+            long start = Movie.getStartTime(), end = Movie.getEndTime();
             JHVTime itime = time;
+
             List<PositionLoad> loadList = PositionLoad.get(this);
             if (!loadList.isEmpty()) {
                 PositionLoad load = loadList.get(0);
                 PositionResponse response = load.getResponse();
                 if (response != null) {
-                    itime = new JHVTime(response.interpolateTime(time.milli, Movie.getStartTime(), Movie.getEndTime()));
+                    itime = new JHVTime(response.interpolateTime(time.milli, start, end));
                     if (load.isHCI())
                         hciLon = Sun.getEarthHCI(itime).lon;
                 }
             }
 
-            double relLon = Layers.getViewpointLayer().getRelativeLongitude();
+            double relLon = Layers.getViewpointLayer().getRelativeLongitude(itime.milli, start, end);
             return new Position(itime, distance, Sun.getEarth(itime).lon + hciLon - relLon + Math.PI / 2, Math.PI / 2);
         }
     }

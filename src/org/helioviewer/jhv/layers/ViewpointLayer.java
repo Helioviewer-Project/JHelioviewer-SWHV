@@ -63,14 +63,13 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
         optionsPanel = new ViewpointLayerOptions(jo);
     }
 
-    public double getRelativeLongitude() {
+    public double getRelativeLongitude(long time, long start, long end) {
         double relativeLon = 0;
 
         PositionLoad control = optionsPanel.getHighlightedLoad();
         if (control != null && optionsPanel.isRelative()) {
             PositionResponse response = control.getResponse();
             if (response != null) {
-                long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
                 response.interpolateLatitudinal(time, start, end, lati);
                 relativeLon = lati[1];
             }
