@@ -12,23 +12,15 @@ public interface UpdateViewpoint {
     Position update(JHVTime time);
 
     UpdateViewpoint observer = new Observer();
-    UpdateViewpoint earth = new Earth();
     UpdateViewpoint earthFixedDistance = new EarthFixedDistance();
     UpdateViewpoint equatorial = new Equatorial();
-    UpdateViewpoint expert = new Expert();
+    UpdateViewpoint location = new Location();
 
     class Observer implements UpdateViewpoint {
         @Override
         public Position update(JHVTime time) {
             ImageLayer layer = Layers.getActiveImageLayer();
             return layer == null ? Sun.getEarth(time) : layer.getView().getMetaData(time).getViewpoint();
-        }
-    }
-
-    class Earth implements UpdateViewpoint {
-        @Override
-        public Position update(JHVTime time) {
-            return Sun.getEarth(time);
         }
     }
 
@@ -59,7 +51,7 @@ public interface UpdateViewpoint {
         }
     }
 
-    class Expert implements UpdateViewpoint {
+    class Location implements UpdateViewpoint {
         private final double[] lat = new double[3];
 
         @Override

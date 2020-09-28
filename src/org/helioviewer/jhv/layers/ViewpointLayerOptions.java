@@ -26,7 +26,7 @@ import org.json.JSONObject;
 class ViewpointLayerOptions extends JPanel implements TimespanListener {
 
     private enum CameraMode {
-        Observer(UpdateViewpoint.observer), Earth(UpdateViewpoint.earth), Heliosphere(UpdateViewpoint.equatorial), Other(UpdateViewpoint.expert);
+        Observer(UpdateViewpoint.observer), Location(UpdateViewpoint.location), Heliosphere(UpdateViewpoint.equatorial);
 
         final UpdateViewpoint update;
 
@@ -35,30 +35,29 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
         }
     }
 
-    private final ViewpointLayerOptionsExpert expertOptionPanel;
+    private final ViewpointLayerOptionsExpert locationOptionPanel;
     private final ViewpointLayerOptionsExpert equatorialOptionPanel;
 
     private CameraMode cameraMode;
     private ViewpointLayerOptionsExpert currentOptionPanel;
 
     private static final String explanation = "<b>Observer</b>: view from observer.\nCamera time defined by timestamps of the master layer.\n\n" +
-            "<b>Earth</b>: view from Earth.\nCamera time defined by timestamps of the master layer.\n\n" +
-            "<b>Equatorial</b>: view onto the solar equatorial plane.\nCamera time defined by timestamps of the master layer.\n" +
-            "If \"Use movie time interval\" is unselected, the positions of objects are interpolated in the configured time interval.\n\n" +
-            "<b>Other</b>: view from selected object.\n" +
-            "If \"Use movie time interval\" is unselected, the camera time is interpolated in the configured time interval.";
+            "<b>Location</b>: view from selected object.\n" +
+            "If \"Use movie time interval\" is unselected, the camera time is interpolated in the configured time interval.\n\n" +
+            "<b>Heliosphere</b>: view onto the solar equatorial plane.\n" +
+            "If \"Use movie time interval\" is unselected, the positions of objects are interpolated in the configured time interval.";
 
     ViewpointLayerOptions(JSONObject jo) {
         setLayout(new GridBagLayout());
 
         // create panels before potential camera change
-        JSONObject joExpert = null;
+        JSONObject joLocation = null;
         JSONObject joEquatorial = null;
         if (jo != null) {
-            joExpert = jo.optJSONObject("expert");
+            joLocation = jo.optJSONObject("location");
             joEquatorial = jo.optJSONObject("equatorial");
         }
-        expertOptionPanel = new ViewpointLayerOptionsExpert(joExpert, UpdateViewpoint.expert, SpaceObject.Sol, Frame.HEEQ, true);
+        locationOptionPanel = new ViewpointLayerOptionsExpert(joLocation, UpdateViewpoint.location, SpaceObject.Sol, Frame.HEEQ, true);
         equatorialOptionPanel = new ViewpointLayerOptionsExpert(joEquatorial, UpdateViewpoint.equatorial, SpaceObject.Sol, Frame.HCI, false);
 
         cameraMode = CameraMode.Observer;
@@ -90,7 +89,7 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
 
         JHVButton info = new JHVButton(Buttons.info);
         info.setToolTipText("Show viewpoint info");
-        info.addActionListener(e -> new TextDialog("Viewpoint options information", explanation, false).showDialog());
+        info.addActionListener(e -> new TextDialog("Viewpoint Options Information", explanation, false).showDialog());
         radioPanel.add(info);
 
         GridBagConstraints c = new GridBagConstraints();
@@ -111,7 +110,7 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
     void serialize(JSONObject jo) {
         jo.put("mode", cameraMode);
         jo.put("camera", Display.getCamera().toJson());
-        jo.put("expert", expertOptionPanel.toJson());
+        jo.put("location", locationOptionPanel.toJson());
         jo.put("equatorial", equatorialOptionPanel.toJson());
     }
 
@@ -138,13 +137,13 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
     }
 
     boolean isDownloading() {
-        return expertOptionPanel.isDownloading() || equatorialOptionPanel.isDownloading();
+        return locationOptionPanel.isDownloading() || equatorialOptionPanel.isDownloading();
     }
 
     void syncViewpoint() {
         ViewpointLayerOptionsExpert panel = null;
-        if (cameraMode == CameraMode.Other)
-            panel = expertOptionPanel;
+        if (cameraMode == CameraMode.Location)
+            panel = locationOptionPanel;
         else if (cameraMode == CameraMode.Heliosphere)
             panel = equatorialOptionPanel;
         switchOptionsPanel(panel);
@@ -162,7 +161,7 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
 
     @Override
     public void timespanChanged(long start, long end) {
-        expertOptionPanel.setTimespan(start, end);
+        locationOptionPanel.setTimespan(start, end);
         equatorialOptionPanel.setTimespan(start, end);
     }
 
