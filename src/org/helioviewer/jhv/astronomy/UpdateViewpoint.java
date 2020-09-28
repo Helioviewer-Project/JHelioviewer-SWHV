@@ -49,7 +49,8 @@ public interface UpdateViewpoint {
                 }
             }
 
-            return new Position(itime, distance, Sun.getEarth(itime).lon + hciLon + Math.PI / 2, Math.PI / 2);
+            double relLon = Layers.getViewpointLayer().getRelativeLongitude();
+            return new Position(itime, distance, Sun.getEarth(itime).lon + hciLon - relLon + Math.PI / 2, Math.PI / 2);
         }
     }
 
