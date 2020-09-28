@@ -3,6 +3,7 @@ package org.helioviewer.jhv.layers;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.swing.BorderFactory;
@@ -91,7 +92,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         framePanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
         framePanel.add(new JLabel("Frame", JLabel.RIGHT));
         ButtonGroup modeGroup = new ButtonGroup();
-        for (Frame f : Frame.values()) {
+        for (Frame f : List.of(Frame.HCI, Frame.HEEQ, Frame.HEE)) {
             JRadioButton radio = new JRadioButton(f.toString(), f == frame);
             radio.addItemListener(e -> {
                 if (radio.isSelected()) {
