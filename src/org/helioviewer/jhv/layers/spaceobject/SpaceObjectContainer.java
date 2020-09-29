@@ -19,9 +19,9 @@ import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
 import org.helioviewer.jhv.gui.components.base.TableValue;
-import org.helioviewer.jhv.layers.MovieDisplay;
 import org.json.JSONArray;
 
 @SuppressWarnings("serial")
@@ -81,7 +81,7 @@ public class SpaceObjectContainer extends JScrollPane {
                 highlighted = (SpaceObjectElement) v.value;
                 if (v.col == SELECTED_COL)
                     selectElement(highlighted);
-                MovieDisplay.display();
+                Display.getCamera().refresh(); // full camera refresh to update viewpoint for relative longitude
             }
         });
 

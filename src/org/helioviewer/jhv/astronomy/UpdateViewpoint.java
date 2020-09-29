@@ -68,7 +68,6 @@ public interface UpdateViewpoint {
             }
             return Sun.getEarth(time);
         }
-
     }
 
 }
