@@ -96,7 +96,7 @@ public class PositionResponse {
         return time;
     }
 
-    public Position interpolateCarrington(long t, long start, long end) {
+    Position interpolateCarrington(long t, long start, long end) {
         long time = interpolateTime(t, start, end);
 
         double x, y, z;
