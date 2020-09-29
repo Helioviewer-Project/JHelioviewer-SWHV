@@ -125,10 +125,12 @@ public class PositionResponse {
             hgln = 0;
             hglt = 0;
         } else {
-            hgln = -Math.atan2(y, x); // like Carrington
+            hgln = Math.atan2(y, x);
+            if (hgln < 0)
+                hgln += 2 * Math.PI;
             hglt = Math.asin(z / dist);
         }
-        return new Position(new JHVTime(time), dist, hgln, hglt);
+        return new Position(new JHVTime(time), dist, -hgln, hglt);
     }
 
     public double interpolateRectangular(long t, long start, long end, float[] xyz) {
