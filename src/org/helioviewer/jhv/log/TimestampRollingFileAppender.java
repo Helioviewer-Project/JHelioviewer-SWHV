@@ -6,16 +6,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.RollingFileAppender;
 
 /*
  * Allows to use syntax patterns of SimpleDateFormat for log file naming.
  * Overwrites the setFile method of FileAppender.
  * @author Andre Dau
  */
-public class TimestampRollingFileAppender extends FileAppender {
+public class TimestampRollingFileAppender extends RollingFileAppender {
 
     // Maximum number of days to keep log files before they are deleted
     private long days;
@@ -27,6 +27,7 @@ public class TimestampRollingFileAppender extends FileAppender {
     public TimestampRollingFileAppender() {
         formatter = new SimpleDateFormat();
         formatter.setTimeZone(TimeZone.getTimeZone(System.getProperty("user.timezone")));
+        setMaxBackupIndex(0);
     }
 
     public void setTimeStamp(String _timeStampString) {
