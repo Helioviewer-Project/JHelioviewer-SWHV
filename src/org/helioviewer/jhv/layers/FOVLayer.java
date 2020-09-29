@@ -16,7 +16,6 @@ import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.PositionReceiver;
 import org.helioviewer.jhv.astronomy.PositionResponse;
 import org.helioviewer.jhv.astronomy.SpaceObject;
-import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -76,14 +75,13 @@ public class FOVLayer extends AbstractLayer implements PositionReceiver, Timespa
         double distance = viewpoint.distance;
 
         Transform.pushView();
-        Transform.rotateViewInverse(viewpoint.toQuat());
 
         if (load != null) {
             PositionResponse response = load.getResponse();
             if (response != null) {
                 long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
                 Position p = response.interpolateCarrington(time, start, end);
-                Transform.rotateView(p.toQuat());
+                Transform.rotateViewInverse(p.toQuat());
                 distance = p.distance;
             }
         }
