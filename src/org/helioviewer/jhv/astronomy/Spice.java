@@ -67,10 +67,10 @@ public class Spice {
         return null;
     }
 
-    @Nonnull
-    public static Position getEarthCarrington(JHVTime time) {
+    @Nullable
+    public static Position getCarrington(String observer, String target, JHVTime time) {
         try {
-            double[] c = positionLatitudinal("EARTH", time.milli, "SOLO_IAU_SUN_2009", "SUN");
+            double[] c = positionLatitudinal(target, time.milli, "SOLO_IAU_SUN_2009", observer);
             // like in SSW.getEarthSSW
             double lon = c[1];
             if (lon < 0)
@@ -79,7 +79,7 @@ public class Spice {
         } catch (Exception e) {
             Log.error(e);
         }
-        return SSW.getEarthSSW(time);
+        return null;
     }
 
     private static final JHVTime J2000 = new JHVTime("2000-01-01T12:00:00");
