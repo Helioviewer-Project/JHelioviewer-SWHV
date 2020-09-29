@@ -23,23 +23,21 @@ public class SpaceObject {
     private final byte[] color;
     private final Border border;
 
-    public static final SpaceObject SUN = new SpaceObject(true, "SUN", "Sun", 1, Colors.Yellow, JHVTableCellRenderer.cellEmphasisBorder);
-    public static final SpaceObject SOLO = new SpaceObject(true, "SOLO", "Solar Orbiter", 2 / Sun.RadiusMeter, Colors.bytes(226, 0, 79), JHVTableCellRenderer.cellBorder);
-    public static final SpaceObject SDO = new SpaceObject(false, "SDO", "SDO", 2 / Sun.RadiusMeter, Colors.White, JHVTableCellRenderer.cellBorder);
+    public static final SpaceObject Sol = new SpaceObject(true, "SUN", "Sun", 1, Colors.Yellow, JHVTableCellRenderer.cellEmphasisBorder);
 
     private static final ImmutableMap<String, SpaceObject> objectMap = new ImmutableMap.Builder<String, SpaceObject>()
-            .put("Sun", SUN)
+            .put("Sun", Sol)
             .put("Mercury", new SpaceObject(true, "MERCURY", "Mercury", 2439700 / Sun.RadiusMeter, Colors.Gray, JHVTableCellRenderer.cellBorder))
             .put("Venus", new SpaceObject(true, "VENUS", "Venus", 6051800 / Sun.RadiusMeter, Colors.bytes(181, 110, 26), JHVTableCellRenderer.cellBorder))
             .put("Earth", new SpaceObject(true, "EARTH", "Earth", 6371000 / Sun.RadiusMeter, Colors.Blue, JHVTableCellRenderer.cellEmphasisBorder))
             //
             .put("Parker Solar Probe", new SpaceObject(false, "PSP", "Parker Solar Probe", 2 / Sun.RadiusMeter, Colors.bytes(235, 199, 31), JHVTableCellRenderer.cellBorder))
-            .put("Solar Orbiter", SOLO)
+            .put("Solar Orbiter", new SpaceObject(true, "SOLO", "Solar Orbiter", 2 / Sun.RadiusMeter, Colors.bytes(226, 0, 79), JHVTableCellRenderer.cellBorder))
             .put("Solar Orbiter -5y", new SpaceObject(false, "-999", "Solar Orbiter -5y", 2 / Sun.RadiusMeter, Colors.White, JHVTableCellRenderer.cellBorder))
             .put("STEREO Ahead", new SpaceObject(false, "STEREO AHEAD", "STEREO Ahead", 2 / Sun.RadiusMeter, Colors.bytes(32, 32, 128), JHVTableCellRenderer.cellBorder))
             .put("STEREO Behind", new SpaceObject(false, "STEREO BEHIND", "STEREO Behind", 2 / Sun.RadiusMeter, Colors.White, JHVTableCellRenderer.cellBorder))
             .put("SOHO", new SpaceObject(false, "SOHO", "SOHO", 2 / Sun.RadiusMeter, Colors.White, JHVTableCellRenderer.cellBorder))
-            .put("SDO", SDO)
+            .put("SDO", new SpaceObject(false, "SDO", "SDO", 2 / Sun.RadiusMeter, Colors.White, JHVTableCellRenderer.cellBorder))
             .put("PROBA-2", new SpaceObject(false, "PROBA2", "PROBA-2", 2 / Sun.RadiusMeter, Colors.White, JHVTableCellRenderer.cellEmphasisBorder))
             //
             .put("Moon", new SpaceObject(true, "MOON", "Moon", 1737400 / Sun.RadiusMeter, Colors.LightGray, JHVTableCellRenderer.cellBorder))
