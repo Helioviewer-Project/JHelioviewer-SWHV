@@ -10,7 +10,13 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
+import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.astronomy.PositionLoad;
+import org.helioviewer.jhv.astronomy.PositionReceiver;
+import org.helioviewer.jhv.astronomy.PositionResponse;
+import org.helioviewer.jhv.astronomy.SpaceObject;
+import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -31,7 +37,7 @@ import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public class FOVLayer extends AbstractLayer {
+public class FOVLayer extends AbstractLayer implements PositionReceiver, TimespanListener {
 
     private static final double LINEWIDTH_FOV = GLSLLine.LINEWIDTH_BASIC;
 
@@ -47,6 +53,8 @@ public class FOVLayer extends AbstractLayer {
 
     private static boolean customEnabled;
     private static double customAngle = Camera.INITFOV / Math.PI * 180;
+
+    PositionLoad load;
 
     @Override
     public void serialize(JSONObject jo) {
@@ -65,10 +73,22 @@ public class FOVLayer extends AbstractLayer {
 
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
         Position viewpoint = camera.getViewpoint();
+        double distance = viewpoint.distance;
 
         Transform.pushView();
         Transform.rotateViewInverse(viewpoint.toQuat());
-        boolean far = Camera.useWideProjection(viewpoint.distance);
+
+        if (load != null) {
+            PositionResponse response = load.getResponse();
+            if (response != null) {
+                long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
+                Position p = response.interpolateCarrington(time, start, end);
+                Transform.rotateView(p.toQuat());
+                distance = p.distance;
+            }
+        }
+
+        boolean far = Camera.useWideProjection(distance);
         if (far) {
             Transform.pushProjection();
             camera.projectionOrthoWide(vp.aspect);
@@ -79,12 +99,12 @@ public class FOVLayer extends AbstractLayer {
         renderer.begin3DRendering();
         renderer.setSurfacePut();
 
-        treePane.putFOV(fov, viewpoint.distance, lineBuf, centerBuf, renderer);
+        treePane.putFOV(fov, distance, lineBuf, centerBuf, renderer);
         if (customEnabled) {
             fov.setCenter(0, 0);
             fov.putCenter(centerBuf, fovColor);
 
-            double halfSide = 0.5 * viewpoint.distance * Math.tan(customAngle * (Math.PI / 180.));
+            double halfSide = 0.5 * distance * Math.tan(customAngle * (Math.PI / 180.));
             fov.putRectLine(halfSide, halfSide, lineBuf, fovColor);
             FOVText.drawLabel(renderer, "Custom", -halfSide, -halfSide, halfSide);
         }
@@ -126,6 +146,17 @@ public class FOVLayer extends AbstractLayer {
     }
 
     @Override
+    public void setEnabled(boolean _enabled) {
+        super.setEnabled(_enabled);
+
+        if (enabled) {
+            Movie.addTimespanListener(this);
+        } else {
+            Movie.removeTimespanListener(this);
+        }
+    }
+
+    @Override
     public Component getOptionsPanel() {
         return optionsPanel;
     }
@@ -144,6 +175,16 @@ public class FOVLayer extends AbstractLayer {
     @Override
     public boolean isDeletable() {
         return false;
+    }
+
+    @Override
+    public void setStatus(String _status) {
+        System.out.println(">>> " + _status);
+    }
+
+    @Override
+    public void timespanChanged(long start, long end) {
+        load = PositionLoad.submit(this, SpaceObject.SUN, SpaceObject.SOLO, Frame.SOLO_IAU_SUN_2009, start, end);
     }
 
     private JPanel buildOptionsPanel() {

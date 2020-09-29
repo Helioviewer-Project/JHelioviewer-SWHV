@@ -142,6 +142,12 @@ public class PositionLoad {
         return load;
     }
 
+    public static PositionLoad submit(PositionReceiver receiver, SpaceObject observer, SpaceObject target, Frame frame, long start, long end) {
+        receiver.setStatus("Loading...");
+        return new PositionLoad(receiver, target, frame == Frame.HCI, EventQueueCallbackExecutor.pool.submit(
+                new LoadPosition(observer, target, frame, start, end), new Callback(receiver)));
+    }
+
     public static List<PositionLoad> get(UpdateViewpoint uv) {
         return loads.get(uv);
     }
