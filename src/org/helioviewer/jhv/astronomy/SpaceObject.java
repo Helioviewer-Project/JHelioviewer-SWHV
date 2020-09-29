@@ -24,7 +24,7 @@ public class SpaceObject {
     private final Border border;
 
     public static final SpaceObject SUN = new SpaceObject(true, "SUN", "Sun", 1, Colors.Yellow, JHVTableCellRenderer.cellEmphasisBorder);
-    public static final SpaceObject SOLO = new SpaceObject(false, "SOLO", "Solar Orbiter", 2 / Sun.RadiusMeter, Colors.bytes(226, 0, 79), JHVTableCellRenderer.cellBorder);
+    public static final SpaceObject SOLO = new SpaceObject(true, "SOLO", "Solar Orbiter", 2 / Sun.RadiusMeter, Colors.bytes(226, 0, 79), JHVTableCellRenderer.cellBorder);
     public static final SpaceObject SDO = new SpaceObject(false, "SDO", "SDO", 2 / Sun.RadiusMeter, Colors.White, JHVTableCellRenderer.cellBorder);
 
     private static final ImmutableMap<String, SpaceObject> objectMap = new ImmutableMap.Builder<String, SpaceObject>()

@@ -10,12 +10,8 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.astronomy.PositionLoad;
-import org.helioviewer.jhv.astronomy.PositionReceiver;
-import org.helioviewer.jhv.astronomy.PositionResponse;
-import org.helioviewer.jhv.astronomy.SpaceObject;
+import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -36,7 +32,7 @@ import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public class FOVLayer extends AbstractLayer implements PositionReceiver, TimespanListener {
+public class FOVLayer extends AbstractLayer {
 
     private static final double LINEWIDTH_FOV = GLSLLine.LINEWIDTH_BASIC;
 
@@ -52,8 +48,6 @@ public class FOVLayer extends AbstractLayer implements PositionReceiver, Timespa
 
     private static boolean customEnabled;
     private static double customAngle = Camera.INITFOV / Math.PI * 180;
-
-    PositionLoad load;
 
     @Override
     public void serialize(JSONObject jo) {
@@ -72,19 +66,14 @@ public class FOVLayer extends AbstractLayer implements PositionReceiver, Timespa
 
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
         Position viewpoint = camera.getViewpoint();
-        double distance = viewpoint.distance;
+
+        Position fovObserver = Spice.getCarrington("SUN", "SOLO", viewpoint.time);
+        if (fovObserver == null)
+            return;
+        double distance = fovObserver.distance;
 
         Transform.pushView();
-
-        if (load != null) {
-            PositionResponse response = load.getResponse();
-            if (response != null) {
-                long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
-                Position p = response.interpolateCarrington(time, start, end);
-                Transform.rotateViewInverse(p.toQuat());
-                distance = p.distance;
-            }
-        }
+        Transform.rotateViewInverse(fovObserver.toQuat());
 
         boolean far = Camera.useWideProjection(distance);
         if (far) {
@@ -144,17 +133,6 @@ public class FOVLayer extends AbstractLayer implements PositionReceiver, Timespa
     }
 
     @Override
-    public void setEnabled(boolean _enabled) {
-        super.setEnabled(_enabled);
-
-        if (enabled) {
-            Movie.addTimespanListener(this);
-        } else {
-            Movie.removeTimespanListener(this);
-        }
-    }
-
-    @Override
     public Component getOptionsPanel() {
         return optionsPanel;
     }
@@ -173,16 +151,6 @@ public class FOVLayer extends AbstractLayer implements PositionReceiver, Timespa
     @Override
     public boolean isDeletable() {
         return false;
-    }
-
-    @Override
-    public void setStatus(String _status) {
-        System.out.println(">>> " + _status);
-    }
-
-    @Override
-    public void timespanChanged(long start, long end) {
-        load = PositionLoad.submit(this, SpaceObject.SUN, SpaceObject.SOLO, Frame.SOLO_IAU_SUN_2009, start, end);
     }
 
     private JPanel buildOptionsPanel() {
