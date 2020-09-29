@@ -11,6 +11,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.base.Colors;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.JHVTreeCell;
 import org.helioviewer.jhv.layers.fov.FOVInstrument.FOVType;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -57,6 +58,8 @@ public class FOVTreePane extends JScrollPane {
         getVerticalScrollBar().setUnitIncrement(20); // ugh
         setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
         setPreferredSize(new Dimension(-1, 94));
+
+        ComponentUtils.smallVariant(this);
     }
 
     public void putFOV(FOVShape f, double distance, BufVertex lineBuf, BufVertex centerBuf, JhvTextRenderer renderer) {
