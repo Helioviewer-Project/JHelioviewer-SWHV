@@ -19,8 +19,8 @@ public class HelioviewerMetaData extends BaseMetaData {
     private static final boolean normalizeAIA = Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA"));
     private static final boolean normalizeRadius = Boolean.parseBoolean(Settings.getProperty("display.normalize"));
 
-    private static final Set<String> CROTASupported = Set.of("AIA", "HMI", "SWAP", "SUVI", "Hi-C", "Hi-C2.1", "EUI", "SoloHI", "PHI", "Metis");
-    private static final Set<String> CRVALSupported = Set.of("XRT", "Euhforia", "EUI", "SoloHI", "PHI", "Metis"); // until CRVALx of all datasets can be tested
+    private static final Set<String> SECCHIDetectors = Set.of("EUVI", "COR1", "COR2", "HI1", "HI2");
+    private static final Set<String> CROTABlockList = Set.of("LASCO");
 
     private String instrument = "";
     private String detector = "";
@@ -165,12 +165,11 @@ public class HelioviewerMetaData extends BaseMetaData {
         } else if (instrument.equals("MDI")) {
             measurement = m.getString("DPC_OBSR").orElse("");
             displayName = "MDI " + measurement.substring(measurement.indexOf('_') + 1).toLowerCase();
-        } else if (detector.equals("COR1") || detector.equals("COR2")) {
+        } else if (SECCHIDetectors.contains(detector)) {
             observatory = m.getString("OBSRVTRY").orElse("").replace('_', '-');
             displayName = observatory + ' ' + detector;
-        } else if (detector.equals("EUVI")) {
-            observatory = m.getString("OBSRVTRY").orElse("").replace('_', '-');
-            displayName = observatory + ' ' + detector + ' ' + measurement;
+            if (detector.equals("EUVI"))
+                displayName += ' ' + measurement;
         } else if (instrument.equals("TRACE")) {
             measurement = m.getString("WAVE_LEN").orElse("");
             displayName = instrument + ' ' + measurement;
@@ -247,12 +246,10 @@ public class HelioviewerMetaData extends BaseMetaData {
 
             region = new Region(-sunX * unitPerPixelX, -sunY * unitPerPixelY, pixelW * unitPerPixelX, pixelH * unitPerPixelY);
 
-            if (CRVALSupported.contains(instrument)) {
-                crval.x = m.getDouble("CRVAL1").orElse(0.) * arcsecX / arcsecPerPixelX * unitPerPixelX;
-                crval.y = m.getDouble("CRVAL2").orElse(0.) * arcsecY / arcsecPerPixelY * unitPerPixelY;
-            }
+            crval.x = m.getDouble("CRVAL1").orElse(0.) * arcsecX / arcsecPerPixelX * unitPerPixelX;
+            crval.y = m.getDouble("CRVAL2").orElse(0.) * arcsecY / arcsecPerPixelY * unitPerPixelY;
 
-            if (CROTASupported.contains(instrument)) {
+            if (!CROTABlockList.contains(instrument)) {
                 double c = m.getDouble("CROTA").map(Math::toRadians)
                         .or(() -> m.getDouble("PC1_1").map(Math::acos))
                         .or(() -> m.getDouble("CROTA1").map(Math::toRadians))
