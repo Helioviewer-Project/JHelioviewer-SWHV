@@ -30,12 +30,12 @@
 - Incorporate SPICE and use it for input [time parsing](<https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/str2et_c.html>) and position calculations for planets
 - Use SPICE for the calculations of internal reference frames
 - Draw spiral in heliosphere through the trajectory of the highlighted object
-- Draw field-of-views of some SOLO, STEREO-A, SDO and PROBA-2 remote sensing instruments; ability to "off-point" and to zoom-fit FOV with right-click
+- Draw field-of-views of some SOLO, STEREO-A, SDO, and PROBA-2 remote sensing instruments; ability to "off-point" and to zoom-fit FOV with right-click
 - Optionally distort displayed images according to solar differential rotation (Snodgrass, magnetic features)
 - Read Helioviewer metadata from JPG and PNG files
 - Load sequences of files as movie from the "jhv.load.image" SAMP message, example at <https://github.com/Helioviewer-Project/samp4jhv/blob/master/examples/python/samp_multi.py>
+- Update AIA degradation correction
 - Support IRIS SJI
 - Support KCor dataset ([#114](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/114>))
 - Support Solar Orbiter remote sensing datasets (EUI, PHI, Metis, SoloHI)
 - Support Hi-C 1 and 2.1
-- Update AIA degradation correction
