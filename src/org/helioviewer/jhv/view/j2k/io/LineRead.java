@@ -16,7 +16,7 @@ public class LineRead {
             while ((ch = in.read()) >= 0 && ch != LF) {
                 baos.write(ch);
             }
-            return new String(baos.toByteArray(), StandardCharsets.UTF_8).trim();
+            return baos.toString(StandardCharsets.UTF_8).trim();
         }
     }
 
