@@ -250,10 +250,15 @@ public class HelioviewerMetaData extends BaseMetaData {
             crval.y = m.getDouble("CRVAL2").orElse(0.) * arcsecY / arcsecPerPixelY * unitPerPixelY;
 
             if (!CROTABlockList.contains(instrument)) {
-                double c = m.getDouble("CROTA").map(Math::toRadians)
-                        .or(() -> m.getDouble("PC1_1").map(Math::acos))
-                        .or(() -> m.getDouble("CROTA1").map(Math::toRadians))
-                        .or(() -> m.getDouble("CROTA2").map(Math::toRadians)).orElse(0.);
+                double c;
+                try {
+                    // Eq.32 Thompson (2006)
+                    c = Math.atan2(m.getRequiredDouble("PC2_1") / (arcsecPerPixelX / arcsecPerPixelY), m.getRequiredDouble("PC1_1"));
+                } catch (Exception e) {
+                    c = m.getDouble("CROTA").map(Math::toRadians)
+                            .or(() -> m.getDouble("CROTA1").map(Math::toRadians))
+                            .or(() -> m.getDouble("CROTA2").map(Math::toRadians)).orElse(0.);
+                }
                 crota = Quat.createRotation(c, Vec3.ZAxis);
             }
         }
