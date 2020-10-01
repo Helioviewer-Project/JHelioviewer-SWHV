@@ -3,7 +3,6 @@ package org.helioviewer.jhv.astronomy;
 import java.nio.file.Path;
 import java.util.List;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVGlobals;
