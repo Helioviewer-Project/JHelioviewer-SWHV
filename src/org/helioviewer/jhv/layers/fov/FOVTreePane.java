@@ -35,6 +35,12 @@ public class FOVTreePane extends JScrollPane {
         plat.add(new FOVInstrument("STIX", "SOLO", FOVType.RECTANGULAR, 0, 2, 2, Colors.Blue));
         root.add(plat);
 
+        plat = new FOVPlatform("STEREO-A");
+        plat.add(new FOVInstrument("EUVI", "STEREO AHEAD", FOVType.RECTANGULAR, 0, 1.5877740 * 2048 / 3600., 1.5877740 * 2048 / 3600., Colors.Blue));
+        plat.add(new FOVInstrument("COR1", "STEREO AHEAD", FOVType.RECTANGULAR, 0, 15.008600 * 512 / 3600., 15.008600 * 512 / 3600., Colors.Blue));
+        plat.add(new FOVInstrument("COR2", "STEREO AHEAD", FOVType.CIRCULAR, 0, 14.700000 * 2048 / 3600., 14.700000 * 2048 / 3600., Colors.Blue));
+        root.add(plat);
+
         plat = new FOVPlatform("SDO"); // Earth approximate
         plat.add(new FOVInstrument("AIA", "EARTH", FOVType.RECTANGULAR, 0, (0.6 * 4096) / 3600., (0.6 * 4096) / 3600., Colors.Blue));
         plat.add(new FOVInstrument("HMI", "EARTH", FOVType.RECTANGULAR, 0, (0.6 * 4096) / 3600., (0.6 * 4096) / 3600., Colors.Blue));
@@ -58,7 +64,7 @@ public class FOVTreePane extends JScrollPane {
         setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         getVerticalScrollBar().setUnitIncrement(20); // ugh
         setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
-        setPreferredSize(new Dimension(-1, 94));
+        setPreferredSize(new Dimension(-1, 98));
 
         ComponentUtils.smallVariant(this);
     }
