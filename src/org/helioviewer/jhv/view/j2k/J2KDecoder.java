@@ -104,14 +104,14 @@ class J2KDecoder implements Callable<ImageBuffer> {
             if (numComponents < 3) {
                 for (int row = 0; row < newHeight; row++, dstIdx += actualWidth, srcIdx += srcStride[0]) {
                     for (int col = 0; col < newWidth; ++col) {
-                        byteBuffer[dstIdx + col] = MemoryUtil.memGetByte(addr + 4 * (srcIdx + col));
+                        byteBuffer[dstIdx + col] = MemoryUtil.memGetByte(addr + 4L * (srcIdx + col));
                     }
                 }
             } else {
                 for (int row = 0; row < newHeight; row++, dstIdx += actualWidth, srcIdx += srcStride[0]) {
                     for (int col = 0; col < newWidth; ++col) {
                         for (int idx = 0; idx < 4; ++idx)
-                            byteBuffer[4 * (dstIdx + col) + idx] = MemoryUtil.memGetByte(addr + 4 * (srcIdx + col) + idx);
+                            byteBuffer[4 * (dstIdx + col) + idx] = MemoryUtil.memGetByte(addr + 4L * (srcIdx + col) + idx);
                     }
                 }
             }
