@@ -2,13 +2,11 @@ package org.helioviewer.jhv.layers.fov;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.util.Enumeration;
 
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
@@ -70,24 +68,15 @@ public class FOVTreePane extends JScrollPane {
     }
 
     public void init(GL2 gl) {
-        Enumeration<TreeNode> e = root.children();
-        while (e.hasMoreElements()) {
-            ((FOVPlatform) e.nextElement()).init(gl);
-        }
+        root.children().asIterator().forEachRemaining(c -> ((FOVPlatform) c).init(gl));
     }
 
     public void dispose(GL2 gl) {
-        Enumeration<TreeNode> e = root.children();
-        while (e.hasMoreElements()) {
-            ((FOVPlatform) e.nextElement()).dispose(gl);
-        }
+        root.children().asIterator().forEachRemaining(c -> ((FOVPlatform) c).dispose(gl));
     }
 
     public void render(Camera camera, Viewport vp, GL2 gl) {
-        Enumeration<TreeNode> e = root.children();
-        while (e.hasMoreElements()) {
-            ((FOVPlatform) e.nextElement()).render(camera, vp, gl);
-        }
+        root.children().asIterator().forEachRemaining(c -> ((FOVPlatform) c).render(camera, vp, gl));
     }
 
 }
