@@ -58,17 +58,11 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
     }
 
     void init(GL2 gl) {
-        Enumeration<TreeNode> e = children();
-        while (e.hasMoreElements()) {
-            ((FOVInstrument) e.nextElement()).init(gl);
-        }
+        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).init(gl));
     }
 
     void dispose(GL2 gl) {
-        Enumeration<TreeNode> e = children();
-        while (e.hasMoreElements()) {
-            ((FOVInstrument) e.nextElement()).dispose(gl);
-        }
+        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).dispose(gl));
     }
 
     void render(Camera camera, Viewport vp, GL2 gl) {
@@ -89,10 +83,7 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
             camera.projectionOrthoWide(vp.aspect);
         }
 
-        Enumeration<TreeNode> e = children();
-        while (e.hasMoreElements()) {
-            ((FOVInstrument) e.nextElement()).render(camera, vp, gl, obsPosition.distance, pixFactor);
-        }
+        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).render(vp, gl, obsPosition.distance, pixFactor));
 
         if (far) {
             Transform.popProjection();
