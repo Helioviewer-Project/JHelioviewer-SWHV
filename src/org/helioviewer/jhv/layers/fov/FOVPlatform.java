@@ -14,6 +14,7 @@ import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Spice;
+import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Viewport;
@@ -33,10 +34,10 @@ import com.jogamp.opengl.GL2;
 class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
 
     static final double LINEWIDTH_FOV = GLSLLine.LINEWIDTH_BASIC;
+    private static final double HEMI_RADIUS = Sun.Radius + LINEWIDTH_FOV; // avoid intersecting solar surface
 
     private final FOVShape hemiShape = new FOVShape();
-    private final GLSLLine hemiLine = new GLSLLine(true);
-    private final BufVertex hemiBuf = new BufVertex((FOVShape.CIRC_SUBDIVS + 2) * GLSLLine.stride);
+    private final GLSLLine hemiLine = new GLSLLine(false);
 
     private final String observer;
     private final byte[] color;
@@ -69,8 +70,16 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
         return panel;
     }
 
+    private void initHemiLine(GL2 gl) {
+        BufVertex hemiBuf = new BufVertex((FOVShape.CIRC_SUBDIVS + 2) * GLSLLine.stride);
+        hemiShape.putCircLine(HEMI_RADIUS, hemiBuf, color);
+        hemiLine.setData(gl, hemiBuf);
+    }
+
     void init(GL2 gl) {
         hemiLine.init(gl);
+        initHemiLine(gl);
+
         children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).init(gl));
     }
 
@@ -97,8 +106,6 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
             camera.projectionOrthoWide(vp.aspect);
         }
 
-        hemiShape.putCircLine(1, hemiBuf, color);
-        hemiLine.setData(gl, hemiBuf);
         hemiLine.render(gl, vp.aspect, LINEWIDTH_FOV);
         children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).render(vp, gl, obsPosition.distance, pixFactor, color));
 
