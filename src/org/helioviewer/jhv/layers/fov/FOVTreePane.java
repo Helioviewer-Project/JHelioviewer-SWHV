@@ -8,6 +8,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
@@ -23,7 +24,7 @@ public class FOVTreePane extends JScrollPane {
     private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
 
     public FOVTreePane() {
-        FOVPlatform plat = new FOVPlatform("SOLO", "SOLO", Colors.Blue);
+        FOVPlatform plat = new FOVPlatform("SOLO", "SOLO", SpaceObject.SOLO.getColor());
         plat.add(new FOVInstrument("EUI/HRI", FOVType.RECTANGULAR, 0, 16.6 / 60., 16.6 / 60.));
         plat.add(new FOVInstrument("EUI/FSI", FOVType.RECTANGULAR, 0, 228 / 60., 228 / 60.));
         plat.add(new FOVInstrument("METIS", FOVType.CIRCULAR, 3, 5.8, 5.8));
@@ -33,7 +34,7 @@ public class FOVTreePane extends JScrollPane {
         plat.add(new FOVInstrument("STIX", FOVType.RECTANGULAR, 0, 2, 2));
         root.add(plat);
 
-        plat = new FOVPlatform("STEREO-A", "STEREO AHEAD", Colors.Blue);
+        plat = new FOVPlatform("STEREO-A", "STEREO AHEAD", SpaceObject.STA.getColor());
         plat.add(new FOVInstrument("EUVI", FOVType.RECTANGULAR, 0, 1.5877740 * 2048 / 3600., 1.5877740 * 2048 / 3600.));
         plat.add(new FOVInstrument("COR1", FOVType.RECTANGULAR, 0, 15.008600 * 512 / 3600., 15.008600 * 512 / 3600.));
         plat.add(new FOVInstrument("COR2", FOVType.CIRCULAR, 0, 14.700000 * 2048 / 3600., 14.700000 * 2048 / 3600.));
