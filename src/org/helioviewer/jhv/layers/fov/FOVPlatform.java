@@ -10,20 +10,26 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.interfaces.JHVCell;
 import org.helioviewer.jhv.layers.MovieDisplay;
+import org.helioviewer.jhv.time.JHVTime;
 
 @SuppressWarnings("serial")
 class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
 
+    private final String observer;
     private final JPanel panel;
     private final JSpinner spinnerX;
     private final JSpinner spinnerY;
 
-    FOVPlatform(String name) {
+    FOVPlatform(String name, String _observer) {
+        observer = _observer;
+
         spinnerX = createSpinner();
         spinnerX.addChangeListener(e -> setCenterX((Double) spinnerX.getValue()));
         spinnerY = createSpinner();
@@ -42,6 +48,10 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
     @Override
     public Component getComponent() {
         return panel;
+    }
+
+    Position getObserverPosition(JHVTime time) {
+        return Spice.getCarrington("SUN", observer, time);
     }
 
     private static double control2Center(double v) { // v in arcmin

@@ -44,7 +44,6 @@ class FOVInstrument extends DefaultMutableTreeNode implements JHVCell {
     private final BufVertex centerBuf = new BufVertex(GLSLShape.stride);
 
     private final String name;
-    private final String observer;
     private final FOVType type;
     private final double inner;
     private final double wide;
@@ -57,9 +56,8 @@ class FOVInstrument extends DefaultMutableTreeNode implements JHVCell {
     private double centerX = 0;
     private double centerY = 0;
 
-    FOVInstrument(String _name, String _observer, FOVType _type, double innerDeg, double wideDeg, double highDeg, byte[] _color) {
+    FOVInstrument(String _name, FOVType _type, double innerDeg, double wideDeg, double highDeg, byte[] _color) {
         name = _name;
-        observer = _observer;
         type = _type;
         inner = 0.5 * Math.tan(innerDeg * (Math.PI / 180.));
         wide = 0.5 * Math.tan(wideDeg * (Math.PI / 180.));
@@ -114,14 +112,14 @@ class FOVInstrument extends DefaultMutableTreeNode implements JHVCell {
         if (!checkBox.isSelected())
             return;
 
-        Position fovObserver = Spice.getCarrington("SUN", observer, camera.getViewpoint().time);
-        if (fovObserver == null)
+        Position obsPosition = ((FOVPlatform) getParent()).getObserverPosition(camera.getViewpoint().time);
+        if (obsPosition == null)
             return;
-        double distance = fovObserver.distance;
+        double distance = obsPosition.distance;
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
 
         Transform.pushView();
-        Transform.rotateViewInverse(fovObserver.toQuat());
+        Transform.rotateViewInverse(obsPosition.toQuat());
 
         boolean far = Camera.useWideProjection(distance);
         if (far) {
@@ -165,10 +163,10 @@ class FOVInstrument extends DefaultMutableTreeNode implements JHVCell {
 
     private void zoom() {
         Camera camera = Display.getCamera();
-        Position fovObserver = Spice.getCarrington("SUN", observer, camera.getViewpoint().time);
-        if (fovObserver == null)
+        Position obsPosition = ((FOVPlatform) getParent()).getObserverPosition(camera.getViewpoint().time);
+        if (obsPosition == null)
             return;
-        double distance = fovObserver.distance;
+        double distance = obsPosition.distance;
 
         camera.setTranslation(-centerX * distance, -centerY * distance);
         camera.resetDragRotation();
