@@ -5,6 +5,8 @@ import org.json.JSONArray;
 public class Quat {
 
     public static final Quat ZERO = new Quat();
+    public static final Quat X90 = Quat.createRotation(Math.PI / 2, Vec3.XAxis);
+    public static final Quat Y90 = Quat.createRotation(Math.PI / 2, Vec3.YAxis);
 
     final double a;
     final Vec3 u;
