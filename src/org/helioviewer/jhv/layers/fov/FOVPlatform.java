@@ -23,19 +23,31 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.interfaces.JHVCell;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Transform;
+import org.helioviewer.jhv.opengl.BufVertex;
+import org.helioviewer.jhv.opengl.FOVShape;
+import org.helioviewer.jhv.opengl.GLSLLine;
 
 import com.jogamp.opengl.GL2;
 
 @SuppressWarnings("serial")
 class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
 
+    static final double LINEWIDTH_FOV = GLSLLine.LINEWIDTH_BASIC;
+
+    private final FOVShape hemiShape = new FOVShape();
+    private final GLSLLine hemiLine = new GLSLLine(true);
+    private final BufVertex hemiBuf = new BufVertex((FOVShape.CIRC_SUBDIVS + 2) * GLSLLine.stride);
+
     private final String observer;
+    private final byte[] color;
+
     private final JPanel panel;
     private final JSpinner spinnerX;
     private final JSpinner spinnerY;
 
-    FOVPlatform(String name, String _observer) {
+    FOVPlatform(String name, String _observer, byte[] _color) {
         observer = _observer;
+        color = _color;
 
         spinnerX = createSpinner();
         spinnerX.addChangeListener(e -> setCenterX((Double) spinnerX.getValue()));
@@ -58,10 +70,12 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
     }
 
     void init(GL2 gl) {
+        hemiLine.init(gl);
         children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).init(gl));
     }
 
     void dispose(GL2 gl) {
+        hemiLine.dispose(gl);
         children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).dispose(gl));
     }
 
@@ -83,7 +97,10 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
             camera.projectionOrthoWide(vp.aspect);
         }
 
-        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).render(vp, gl, obsPosition.distance, pixFactor));
+        hemiShape.putCircLine(1, hemiBuf, color);
+        hemiLine.setData(gl, hemiBuf);
+        hemiLine.render(gl, vp.aspect, LINEWIDTH_FOV);
+        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).render(vp, gl, obsPosition.distance, pixFactor, color));
 
         if (far) {
             Transform.popProjection();

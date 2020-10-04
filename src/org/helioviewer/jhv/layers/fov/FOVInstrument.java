@@ -27,8 +27,6 @@ class FOVInstrument extends DefaultMutableTreeNode implements JHVCell {
 
     enum FOVType {RECTANGULAR, CIRCULAR}
 
-    private static final double LINEWIDTH_FOV = GLSLLine.LINEWIDTH_BASIC;
-
     private final FOVShape fov = new FOVShape();
     private final GLSLLine fovLine = new GLSLLine(true);
     private final BufVertex lineBuf = new BufVertex((4 * (FOVShape.RECT_SUBDIVS + 1) + 2) * GLSLLine.stride);
@@ -40,7 +38,6 @@ class FOVInstrument extends DefaultMutableTreeNode implements JHVCell {
     private final double inner;
     private final double wide;
     private final double high;
-    private final byte[] color;
 
     private final JPanel panel;
     private final JCheckBox checkBox;
@@ -48,13 +45,12 @@ class FOVInstrument extends DefaultMutableTreeNode implements JHVCell {
     private double centerX = 0;
     private double centerY = 0;
 
-    FOVInstrument(String _name, FOVType _type, double innerDeg, double wideDeg, double highDeg, byte[] _color) {
+    FOVInstrument(String _name, FOVType _type, double innerDeg, double wideDeg, double highDeg) {
         name = _name;
         type = _type;
         inner = 0.5 * Math.tan(innerDeg * (Math.PI / 180.));
         wide = 0.5 * Math.tan(wideDeg * (Math.PI / 180.));
         high = 0.5 * Math.tan(highDeg * (Math.PI / 180.));
-        color = _color;
 
         panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
@@ -92,7 +88,7 @@ class FOVInstrument extends DefaultMutableTreeNode implements JHVCell {
         centerY = _centerY;
     }
 
-    void render(Viewport vp, GL2 gl, double distance, double pixFactor) {
+    void render(Viewport vp, GL2 gl, double distance, double pixFactor, byte[] color) {
         if (!checkBox.isSelected())
             return;
 
@@ -122,7 +118,7 @@ class FOVInstrument extends DefaultMutableTreeNode implements JHVCell {
         center.renderPoints(gl, pixFactor);
 
         fovLine.setData(gl, lineBuf);
-        fovLine.render(gl, vp.aspect, LINEWIDTH_FOV);
+        fovLine.render(gl, vp.aspect, FOVPlatform.LINEWIDTH_FOV);
     }
 
     boolean isEnabled() {
