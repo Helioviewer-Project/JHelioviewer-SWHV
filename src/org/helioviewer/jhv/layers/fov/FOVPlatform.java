@@ -15,6 +15,7 @@ import javax.swing.tree.TreeNode;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Viewport;
@@ -23,9 +24,10 @@ import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.interfaces.JHVCell;
 import org.helioviewer.jhv.layers.MovieDisplay;
+import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Transform;
+import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
-import org.helioviewer.jhv.opengl.FOVShape;
 import org.helioviewer.jhv.opengl.GLSLLine;
 
 import com.jogamp.opengl.GL2;
@@ -34,9 +36,9 @@ import com.jogamp.opengl.GL2;
 class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
 
     static final double LINEWIDTH_FOV = GLSLLine.LINEWIDTH_BASIC;
+    private static final int SUBDIVISIONS = 180;
     private static final double HEMI_RADIUS = Sun.Radius + LINEWIDTH_FOV; // avoid intersecting solar surface
 
-    private final FOVShape hemiShape = new FOVShape();
     private final GLSLLine hemiLine = new GLSLLine(false);
 
     private final String observer;
@@ -71,9 +73,50 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
     }
 
     private void initHemiLine(GL2 gl) {
-        BufVertex hemiBuf = new BufVertex((FOVShape.CIRC_SUBDIVS + 2) * GLSLLine.stride);
-        hemiShape.putCircLine(HEMI_RADIUS, hemiBuf, color);
-        hemiLine.setData(gl, hemiBuf);
+        int no_points = 2 * (SUBDIVISIONS + 3);
+        BufVertex vexBuf = new BufVertex(no_points * GLSLLine.stride);
+        Vec3 rotv = new Vec3(), v = new Vec3();
+
+        for (int i = 0; i <= SUBDIVISIONS; i++) {
+            double a = 2 * Math.PI * i / SUBDIVISIONS;
+            v.x = HEMI_RADIUS * Math.cos(a);
+            v.y = HEMI_RADIUS * Math.sin(a);
+            v.z = 0.;
+
+            if (i == 0) {
+                vexBuf.putVertex(v, Colors.Null);
+            }
+            vexBuf.putVertex(v, i % 2 == 0 ? color : Colors.White);
+        }
+        vexBuf.putVertex(v, Colors.Null);
+
+        for (int i = 0; i <= SUBDIVISIONS / 2; i++) {
+            double a = 2 * Math.PI * i / SUBDIVISIONS;
+            v.x = HEMI_RADIUS * Math.cos(a);
+            v.y = HEMI_RADIUS * Math.sin(a);
+            v.z = 0.;
+            rotv = Quat.X90.rotateVector(v);
+            if (i == 0) {
+                vexBuf.putVertex(rotv, Colors.Null);
+            }
+            vexBuf.putVertex(rotv, i % 2 == 0 ? color : Colors.White);
+        }
+        vexBuf.putVertex(rotv, Colors.Null);
+
+        for (int i = 0; i <= SUBDIVISIONS / 2; i++) {
+            double a = 2 * Math.PI * i / SUBDIVISIONS + Math.PI / 2;
+            v.x = HEMI_RADIUS * Math.cos(a);
+            v.y = HEMI_RADIUS * Math.sin(a);
+            v.z = 0.;
+            rotv = Quat.Y90.rotateVector(v);
+            if (i == 0) {
+                vexBuf.putVertex(rotv, Colors.Null);
+            }
+            vexBuf.putVertex(rotv, i % 2 == 0 ? color : Colors.White);
+        }
+        vexBuf.putVertex(rotv, Colors.Null);
+
+        hemiLine.setData(gl, vexBuf);
     }
 
     void init(GL2 gl) {
