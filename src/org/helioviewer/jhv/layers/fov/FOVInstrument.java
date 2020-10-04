@@ -2,8 +2,6 @@ package org.helioviewer.jhv.layers.fov;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -11,11 +9,9 @@ import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.interfaces.JHVCell;
@@ -66,20 +62,12 @@ class FOVInstrument extends DefaultMutableTreeNode implements JHVCell {
 
         panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
+
         checkBox = new JCheckBox(name);
         checkBox.addActionListener(e -> MovieDisplay.display());
-        checkBox.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON3 && checkBox.isSelected()) {
-                    zoom();
-                    MovieDisplay.render(1);
-                }
-            }
-        });
-
         checkBox.setFocusPainted(false);
         checkBox.setOpaque(false);
+
         panel.add(checkBox, BorderLayout.LINE_START);
         panel.add(new JLabel("      "), BorderLayout.LINE_END); // avoid ellipsis on Windows
         ComponentUtils.smallVariant(panel);
@@ -108,13 +96,10 @@ class FOVInstrument extends DefaultMutableTreeNode implements JHVCell {
         centerY = _centerY;
     }
 
-    void render(Camera camera, Viewport vp, GL2 gl) {
-        if (!checkBox.isSelected())
+    void render(Camera camera, Viewport vp, GL2 gl, Position obsPosition) {
+        if (!checkBox.isSelected() || obsPosition == null)
             return;
 
-        Position obsPosition = ((FOVPlatform) getParent()).getObserverPosition(camera.getViewpoint().time);
-        if (obsPosition == null)
-            return;
         double distance = obsPosition.distance;
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
 
@@ -159,18 +144,6 @@ class FOVInstrument extends DefaultMutableTreeNode implements JHVCell {
             Transform.popProjection();
         }
         Transform.popView();
-    }
-
-    private void zoom() {
-        Camera camera = Display.getCamera();
-        Position obsPosition = ((FOVPlatform) getParent()).getObserverPosition(camera.getViewpoint().time);
-        if (obsPosition == null)
-            return;
-        double distance = obsPosition.distance;
-
-        camera.setTranslation(-centerX * distance, -centerY * distance);
-        camera.resetDragRotation();
-        camera.setFOV(2 * wide);
     }
 
     boolean isEnabled() {
