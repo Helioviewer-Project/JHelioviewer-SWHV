@@ -66,15 +66,14 @@ class GridMath {
     static void initEarthCircles(GL2 gl, GLSLLine earthCircleLine) {
         int no_points = 2 * (SUBDIVISIONS + 3);
         BufVertex vexBuf = new BufVertex(no_points * GLSLLine.stride);
-
         Vec3 rotv = new Vec3(), v = new Vec3();
-        Quat q = Quat.createRotation(Math.PI / 2, Vec3.XAxis);
+
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             double a = 2 * Math.PI * i / SUBDIVISIONS;
             v.x = EARTH_CIRCLE_RADIUS * Math.cos(a);
             v.y = EARTH_CIRCLE_RADIUS * Math.sin(a);
             v.z = 0.;
-            rotv = q.rotateVector(v);
+            rotv = Quat.X90.rotateVector(v);
             if (i == 0) {
                 vexBuf.putVertex(rotv, Colors.Null);
             }
@@ -82,14 +81,12 @@ class GridMath {
         }
         vexBuf.putVertex(rotv, Colors.Null);
 
-        v = new Vec3();
-        q = Quat.createRotation(Math.PI / 2, Vec3.YAxis);
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             double a = 2 * Math.PI * i / SUBDIVISIONS;
             v.x = EARTH_CIRCLE_RADIUS * Math.cos(a);
             v.y = EARTH_CIRCLE_RADIUS * Math.sin(a);
             v.z = 0.;
-            rotv = q.rotateVector(v);
+            rotv = Quat.Y90.rotateVector(v);
             if (i == 0) {
                 vexBuf.putVertex(rotv, Colors.Null);
             }
