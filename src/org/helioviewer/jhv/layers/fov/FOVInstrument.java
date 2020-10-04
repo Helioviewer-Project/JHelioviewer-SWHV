@@ -8,15 +8,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.interfaces.JHVCell;
 import org.helioviewer.jhv.layers.MovieDisplay;
-import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.FOVShape;
 import org.helioviewer.jhv.opengl.GLSLLine;
@@ -96,21 +92,9 @@ class FOVInstrument extends DefaultMutableTreeNode implements JHVCell {
         centerY = _centerY;
     }
 
-    void render(Camera camera, Viewport vp, GL2 gl, Position obsPosition) {
-        if (!checkBox.isSelected() || obsPosition == null)
+    void render(Viewport vp, GL2 gl, double distance, double pixFactor) {
+        if (!checkBox.isSelected())
             return;
-
-        double distance = obsPosition.distance;
-        double pixFactor = CameraHelper.getPixelFactor(camera, vp);
-
-        Transform.pushView();
-        Transform.rotateViewInverse(obsPosition.toQuat());
-
-        boolean far = Camera.useWideProjection(distance);
-        if (far) {
-            Transform.pushProjection();
-            camera.projectionOrthoWide(vp.aspect);
-        }
 
         fov.setCenter(centerX * distance, centerY * distance);
         fov.putCenter(centerBuf, color);
@@ -139,11 +123,6 @@ class FOVInstrument extends DefaultMutableTreeNode implements JHVCell {
 
         fovLine.setData(gl, lineBuf);
         fovLine.render(gl, vp.aspect, LINEWIDTH_FOV);
-
-        if (far) {
-            Transform.popProjection();
-        }
-        Transform.popView();
     }
 
     boolean isEnabled() {

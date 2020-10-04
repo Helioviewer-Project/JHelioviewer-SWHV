@@ -26,9 +26,6 @@ public class FOVLayer extends AbstractLayer {
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.idx])
             return;
-        if (!treePane.hasEnabled())
-            return;
-
         treePane.render(camera, vp, gl);
     }
 
