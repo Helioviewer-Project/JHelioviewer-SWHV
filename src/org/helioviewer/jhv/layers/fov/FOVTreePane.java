@@ -69,43 +69,32 @@ public class FOVTreePane extends JScrollPane {
         ComponentUtils.smallVariant(this);
     }
 
-    public void render(Camera camera, Viewport vp, GL2 gl) {
-        Enumeration<TreeNode> e = root.depthFirstEnumeration();
-        while (e.hasMoreElements()) {
-            TreeNode node = e.nextElement();
-            if (node.isLeaf()) {
-                ((FOVInstrument) node).render(camera, vp, gl);
-            }
-        }
-    }
-
     public void init(GL2 gl) {
-        Enumeration<TreeNode> e = root.depthFirstEnumeration();
+        Enumeration<TreeNode> e = root.children();
         while (e.hasMoreElements()) {
-            TreeNode node = e.nextElement();
-            if (node.isLeaf()) {
-                ((FOVInstrument) node).init(gl);
-            }
+            ((FOVPlatform) e.nextElement()).init(gl);
         }
     }
 
     public void dispose(GL2 gl) {
-        Enumeration<TreeNode> e = root.depthFirstEnumeration();
+        Enumeration<TreeNode> e = root.children();
         while (e.hasMoreElements()) {
-            TreeNode node = e.nextElement();
-            if (node.isLeaf()) {
-                ((FOVInstrument) node).dispose(gl);
-            }
+            ((FOVPlatform) e.nextElement()).dispose(gl);
+        }
+    }
+
+    public void render(Camera camera, Viewport vp, GL2 gl) {
+        Enumeration<TreeNode> e = root.children();
+        while (e.hasMoreElements()) {
+            ((FOVPlatform) e.nextElement()).render(camera, vp, gl);
         }
     }
 
     public boolean hasEnabled() {
-        Enumeration<TreeNode> e = root.depthFirstEnumeration();
+        Enumeration<TreeNode> e = root.children();
         while (e.hasMoreElements()) {
-            TreeNode node = e.nextElement();
-            if (node.isLeaf() && ((FOVInstrument) node).isEnabled()) {
+            if (((FOVPlatform) e.nextElement()).hasEnabled())
                 return true;
-            }
         }
         return false;
     }
