@@ -15,12 +15,14 @@ import javax.swing.tree.TreeNode;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.interfaces.JHVCell;
 import org.helioviewer.jhv.layers.MovieDisplay;
+import org.helioviewer.jhv.math.Transform;
 
 import com.jogamp.opengl.GL2;
 
@@ -72,15 +74,33 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
     void render(Camera camera, Viewport vp, GL2 gl) {
         if (!hasEnabled())
             return;
+
         Position obsPosition = Spice.getCarrington("SUN", observer, camera.getViewpoint().time);
+        if (obsPosition == null)
+            return;
+
+        Transform.pushView();
+        Transform.rotateViewInverse(obsPosition.toQuat());
+
+        double pixFactor = CameraHelper.getPixelFactor(camera, vp);
+        boolean far = Camera.useWideProjection(obsPosition.distance);
+        if (far) {
+            Transform.pushProjection();
+            camera.projectionOrthoWide(vp.aspect);
+        }
 
         Enumeration<TreeNode> e = children();
         while (e.hasMoreElements()) {
-            ((FOVInstrument) e.nextElement()).render(camera, vp, gl, obsPosition);
+            ((FOVInstrument) e.nextElement()).render(camera, vp, gl, obsPosition.distance, pixFactor);
         }
+
+        if (far) {
+            Transform.popProjection();
+        }
+        Transform.popView();
     }
 
-    boolean hasEnabled() {
+    private boolean hasEnabled() {
         Enumeration<TreeNode> e = children();
         while (e.hasMoreElements()) {
             if (((FOVInstrument) e.nextElement()).isEnabled())

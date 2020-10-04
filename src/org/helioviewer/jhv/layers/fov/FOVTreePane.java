@@ -90,13 +90,4 @@ public class FOVTreePane extends JScrollPane {
         }
     }
 
-    public boolean hasEnabled() {
-        Enumeration<TreeNode> e = root.children();
-        while (e.hasMoreElements()) {
-            if (((FOVPlatform) e.nextElement()).hasEnabled())
-                return true;
-        }
-        return false;
-    }
-
 }
