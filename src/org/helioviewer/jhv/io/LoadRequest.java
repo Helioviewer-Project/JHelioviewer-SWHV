@@ -16,22 +16,13 @@ import org.json.JSONObject;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-class LoadRequest implements Callable<Void> {
+class LoadRequest {
 
     static void submit(@Nonnull URI uri) {
-        EventQueueCallbackExecutor.pool.submit(new LoadRequest(uri), new Callback());
+        EventQueueCallbackExecutor.pool.submit(new LoadRequestURI(uri), new Callback());
     }
 
-    private final URI uri;
-
-    private LoadRequest(URI _uri) {
-        uri = _uri;
-    }
-
-    @Override
-    public Void call() throws Exception {
-        JSONObject jo = JSONUtils.get(uri);
-
+    private static void parseRequest(JSONObject jo) throws Exception {
         JSONArray ji = jo.optJSONArray("org.helioviewer.jhv.request.image");
         if (ji != null) {
             int len = ji.length();
@@ -49,7 +40,22 @@ class LoadRequest implements Callable<Void> {
                 BandDataProvider.loadBand(jt.getJSONObject(i));
             }
         }
-        return null;
+    }
+
+    private static class LoadRequestURI implements Callable<Void> {
+
+        private final URI uri;
+
+        LoadRequestURI(URI _uri) {
+            uri = _uri;
+        }
+
+        @Override
+        public Void call() throws Exception {
+            parseRequest(JSONUtils.get(uri));
+            return null;
+        }
+
     }
 
     private static class Callback implements FutureCallback<Void> {
