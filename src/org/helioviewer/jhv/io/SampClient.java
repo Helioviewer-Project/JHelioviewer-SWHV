@@ -142,7 +142,7 @@ public class SampClient extends HubConnector {
                         URI uri = toURI(url.toString());
                         EventQueue.invokeLater(() -> Load.request.get(uri));
                     } else {
-                        Object value = msg.getParam("url");
+                        Object value = msg.getParam("value");
                         if (value != null) {
                             String json = value.toString();
                             EventQueue.invokeLater(() -> Load.request.get(json));
