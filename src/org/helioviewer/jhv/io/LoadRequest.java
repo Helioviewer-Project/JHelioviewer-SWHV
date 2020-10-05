@@ -22,6 +22,10 @@ class LoadRequest {
         EventQueueCallbackExecutor.pool.submit(new LoadRequestURI(uri), new Callback());
     }
 
+    static void submit(@Nonnull String json) {
+        EventQueueCallbackExecutor.pool.submit(new LoadRequestString(json), new Callback());
+    }
+
     private static void parseRequest(JSONObject jo) throws Exception {
         JSONArray ji = jo.optJSONArray("org.helioviewer.jhv.request.image");
         if (ji != null) {
@@ -53,6 +57,22 @@ class LoadRequest {
         @Override
         public Void call() throws Exception {
             parseRequest(JSONUtils.get(uri));
+            return null;
+        }
+
+    }
+
+    private static class LoadRequestString implements Callable<Void> {
+
+        private final String json;
+
+        LoadRequestString(String _json) {
+            json = _json;
+        }
+
+        @Override
+        public Void call() throws Exception {
+            parseRequest(new JSONObject(json));
             return null;
         }
 
