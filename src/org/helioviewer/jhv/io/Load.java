@@ -14,7 +14,7 @@ public interface Load {
 
     Load.Image image = new Image();
     Load fits = new FITS();
-    Load request = new Request();
+    Load.Request request = new Request();
     Load state = new State();
 
     class Image implements Load {
@@ -43,6 +43,10 @@ public interface Load {
         @Override
         public void get(@Nonnull URI uri) {
             LoadRequest.submit(uri);
+        }
+
+        public void get(@Nonnull String json) {
+            LoadRequest.submit(json);
         }
     }
 
