@@ -141,6 +141,12 @@ public class SampClient extends HubConnector {
                     if (url != null) {
                         URI uri = toURI(url.toString());
                         EventQueue.invokeLater(() -> Load.request.get(uri));
+                    } else {
+                        Object value = msg.getParam("url");
+                        if (value != null) {
+                            String json = value.toString();
+                            EventQueue.invokeLater(() -> Load.request.get(json));
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
