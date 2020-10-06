@@ -97,6 +97,7 @@ class JHVInit {
                 "naif0012.tls",
                 "pck00010.tpc",
                 "rssd0001.tf",
+                "solo_ANC_soc-ops-fk_V02.tf",
                 "solo_ANC_soc-sci-fk_V06.tf");
 
         kernels.parallelStream().forEach(x -> {

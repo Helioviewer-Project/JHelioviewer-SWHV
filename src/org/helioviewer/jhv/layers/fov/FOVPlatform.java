@@ -29,6 +29,7 @@ import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
+import org.helioviewer.jhv.time.JHVTime;
 
 import com.jogamp.opengl.GL2;
 
@@ -43,6 +44,7 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
 
     private final String observer;
     private final byte[] color;
+    private final boolean isSOLO;
 
     private final JPanel panel;
     private final JSpinner spinnerX;
@@ -51,6 +53,7 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
     FOVPlatform(String name, String _observer, byte[] _color) {
         observer = _observer;
         color = _color;
+        isSOLO = "SOLO".equals(observer);
 
         spinnerX = createSpinner();
         spinnerX.addChangeListener(e -> setCenterX((Double) spinnerX.getValue()));
@@ -131,16 +134,22 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
         children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).dispose(gl));
     }
 
+    private Quat tiltSOLO(JHVTime time) {
+        double[] rot = Spice.getRotation("SOLO_EQUAT_NORM", "SOLO_ORBIT_NORM", time);
+        return rot == null ? Quat.ZERO : Quat.createRotation(rot[2], Vec3.ZAxis);
+    }
+
     void render(Camera camera, Viewport vp, GL2 gl) {
         if (!hasEnabled())
             return;
 
-        Position obsPosition = Spice.getCarrington("SUN", observer, camera.getViewpoint().time);
+        JHVTime time = camera.getViewpoint().time;
+        Position obsPosition = Spice.getCarrington("SUN", observer, time);
         if (obsPosition == null)
             return;
 
         Transform.pushView();
-        Transform.rotateViewInverse(obsPosition.toQuat());
+        Transform.rotateViewInverse(isSOLO ? Quat.rotate(tiltSOLO(time), obsPosition.toQuat()) : obsPosition.toQuat());
 
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
         boolean far = Camera.useWideProjection(obsPosition.distance);

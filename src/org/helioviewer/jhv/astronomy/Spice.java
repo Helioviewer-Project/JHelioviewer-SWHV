@@ -81,6 +81,19 @@ public class Spice {
         return null;
     }
 
+    private static final int[] axes = new int[]{3, 2, 1};
+
+    @Nullable
+    public static double[] getRotation(String fromFrame, String toFrame, JHVTime time) {
+        try {
+            double et = milli2et(time.milli);
+            return CSPICE.m2eul(CSPICE.pxform(fromFrame, toFrame, et), axes);
+        } catch (Exception e) {
+            Log.error(e);
+        }
+        return null;
+    }
+
     private static final JHVTime J2000 = new JHVTime("2000-01-01T12:00:00");
 
     private static double milli2et(long milli) throws SpiceErrorException {
