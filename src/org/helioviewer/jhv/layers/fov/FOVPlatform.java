@@ -29,7 +29,6 @@ import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
-import org.helioviewer.jhv.time.JHVTime;
 
 import com.jogamp.opengl.GL2;
 
@@ -138,8 +137,8 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
         if (!hasEnabled())
             return;
 
-        JHVTime time = camera.getViewpoint().time;
-        Position obsPosition = Spice.getCarrington("SUN", observer, time);
+        Position viewpoint = camera.getViewpoint();
+        Position obsPosition = Spice.getCarrington("SUN", observer, viewpoint.time);
         if (obsPosition == null)
             return;
 
@@ -147,7 +146,7 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
         Transform.rotateViewInverse(obsPosition.toQuat());
 
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
-        boolean far = Camera.useWideProjection(obsPosition.distance);
+        boolean far = Camera.useWideProjection(viewpoint.distance);
         if (far) {
             Transform.pushProjection();
             camera.projectionOrthoWide(vp.aspect);
@@ -156,7 +155,7 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
         hemiLine.render(gl, vp.aspect, LINEWIDTH_FOV);
 
         double[] rot;
-        if (isSOLO && null != (rot = Spice.getRotation("SOLO_EQUAT_NORM", "SOLO_ORBIT_NORM", time))) {
+        if (isSOLO && null != (rot = Spice.getRotation("SOLO_EQUAT_NORM", "SOLO_ORBIT_NORM", viewpoint.time))) {
             Transform.rotateViewInverse(Quat.createRotation(rot[2], Vec3.ZAxis));
         }
 
