@@ -29,6 +29,7 @@ import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
+import org.helioviewer.jhv.time.JHVTime;
 
 import com.jogamp.opengl.GL2;
 
@@ -137,16 +138,17 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
         if (!hasEnabled())
             return;
 
-        Position viewpoint = camera.getViewpoint();
-        Position obsPosition = Spice.getCarrington("SUN", observer, viewpoint.time);
+        JHVTime time = camera.getViewpoint().time;
+        Position obsPosition = Spice.getCarrington("SUN", observer, time);
         if (obsPosition == null)
             return;
+        double distance = obsPosition.distance;
 
         Transform.pushView();
-        Transform.rotateViewInverse(obsPosition.toQuat());
+        Transform.rotateViewInverse(new Quat(obsPosition.lat, obsPosition.lon));
 
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
-        boolean far = Camera.useWideProjection(viewpoint.distance);
+        boolean far = Camera.useWideProjection(distance);
         if (far) {
             Transform.pushProjection();
             camera.projectionOrthoWide(vp.aspect);
@@ -155,11 +157,11 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
         hemiLine.render(gl, vp.aspect, LINEWIDTH_FOV);
 
         double[] rot;
-        if (isSOLO && null != (rot = Spice.getRotation("SOLO_EQUAT_NORM", "SOLO_ORBIT_NORM", viewpoint.time))) {
+        if (isSOLO && null != (rot = Spice.getRotation("SOLO_EQUAT_NORM", "SOLO_ORBIT_NORM", time))) {
             Transform.rotateViewInverse(Quat.createRotation(rot[2], Vec3.ZAxis));
         }
 
-        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).render(vp, gl, obsPosition.distance, pixFactor, color));
+        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).render(vp, gl, distance, pixFactor, color));
 
         if (far) {
             Transform.popProjection();
