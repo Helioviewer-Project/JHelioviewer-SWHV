@@ -134,11 +134,6 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
         children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).dispose(gl));
     }
 
-    private Quat tiltSOLO(JHVTime time) {
-        double[] rot = Spice.getRotation("SOLO_EQUAT_NORM", "SOLO_ORBIT_NORM", time);
-        return rot == null ? Quat.ZERO : Quat.createRotation(rot[2], Vec3.ZAxis);
-    }
-
     void render(Camera camera, Viewport vp, GL2 gl) {
         if (!hasEnabled())
             return;
@@ -149,7 +144,7 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
             return;
 
         Transform.pushView();
-        Transform.rotateViewInverse(isSOLO ? Quat.rotate(tiltSOLO(time), obsPosition.toQuat()) : obsPosition.toQuat());
+        Transform.rotateViewInverse(obsPosition.toQuat());
 
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
         boolean far = Camera.useWideProjection(obsPosition.distance);
@@ -159,6 +154,12 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
         }
 
         hemiLine.render(gl, vp.aspect, LINEWIDTH_FOV);
+
+        double[] rot;
+        if (isSOLO && null != (rot = Spice.getRotation("SOLO_EQUAT_NORM", "SOLO_ORBIT_NORM", time))) {
+            Transform.rotateViewInverse(Quat.createRotation(rot[2], Vec3.ZAxis));
+        }
+
         children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).render(vp, gl, obsPosition.distance, pixFactor, color));
 
         if (far) {
