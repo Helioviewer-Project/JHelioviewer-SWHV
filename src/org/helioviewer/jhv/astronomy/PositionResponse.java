@@ -58,7 +58,7 @@ public class PositionResponse {
         }
     }
 
-    public long interpolateLatitudinal(long t, long start, long end, double[] lati) {
+    public void interpolateLatitudinal(long t, long start, long end, double[] lati) {
         long time = interpolateTime(t, start, end);
 
         double x, y, z;
@@ -93,7 +93,6 @@ public class PositionResponse {
         lati[0] = dist;
         lati[1] = hgln;
         lati[2] = hglt;
-        return time;
     }
 
     Position interpolateCarrington(long t, long start, long end) {

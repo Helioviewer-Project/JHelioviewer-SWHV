@@ -142,13 +142,12 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
         Position obsPosition = Spice.getCarrington("SUN", observer, time);
         if (obsPosition == null)
             return;
-        double distance = obsPosition.distance;
 
         Transform.pushView();
-        Transform.rotateViewInverse(new Quat(obsPosition.lat, obsPosition.lon));
+        Transform.rotateViewInverse(obsPosition.toQuat());
 
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
-        boolean far = Camera.useWideProjection(distance);
+        boolean far = Camera.useWideProjection(obsPosition.distance);
         if (far) {
             Transform.pushProjection();
             camera.projectionOrthoWide(vp.aspect);
@@ -161,7 +160,7 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
             Transform.rotateViewInverse(Quat.createRotation(rot[2], Vec3.ZAxis));
         }
 
-        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).render(vp, gl, distance, pixFactor, color));
+        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).render(vp, gl, obsPosition.distance, pixFactor, color));
 
         if (far) {
             Transform.popProjection();
