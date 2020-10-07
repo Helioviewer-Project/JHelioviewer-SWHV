@@ -52,7 +52,7 @@ public class Camera {
     }
 
     public void projectionOrtho(double aspect) {
-        float clip = cameraWidth < 10 ? clipNarrow : clipWide;
+        float clip = cameraWidth < 32 ? clipNarrow : clipWide;
         Transform.setOrthoSymmetricProjection((float) (cameraWidth * aspect), (float) cameraWidth, -clip, clip);
         Transform.setTranslateView((float) translation.x, (float) translation.y, 0);
         Transform.cacheMVP();
