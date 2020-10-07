@@ -104,11 +104,6 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
 
         Transform.pushView();
         Transform.rotateViewInverse(new Quat(viewpoint.lat, viewpoint.lon + relativeLon));
-        boolean far = Camera.useWideProjection(viewpoint.distance);
-        if (far) {
-            Transform.pushProjection();
-            camera.projectionOrthoWide(vp.aspect);
-        }
 
         if (spiralSpeed > 0)
             renderSpiral(gl, vp, lati, spiralSpeed);
@@ -120,9 +115,6 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
             gl.glEnable(GL2.GL_DEPTH_TEST);
         }
 
-        if (far) {
-            Transform.popProjection();
-        }
         Transform.popView();
     }
 

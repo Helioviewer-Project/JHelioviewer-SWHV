@@ -73,21 +73,12 @@ class InteractionAnnotate implements InteractionType {
 
         Transform.pushView();
         Transform.rotateViewInverse(q);
-        boolean far = Camera.useWideProjection(viewpoint.distance);
-        if (far) {
-            Transform.pushProjection();
-            camera.projectionOrthoWide(vp.aspect);
-        }
 
         transLine.setData(gl, transBuf);
         transLine.render(gl, vp.aspect, LINEWIDTH);
-
         center.setData(gl, centerBuf);
         center.renderPoints(gl, pixFactor);
 
-        if (far) {
-            Transform.popProjection();
-        }
         Transform.popView();
     }
 

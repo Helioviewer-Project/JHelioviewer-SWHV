@@ -142,15 +142,11 @@ public class GridLayer extends AbstractLayer {
             Transform.pushView();
             Transform.rotateViewInverse(viewpoint.toQuat());
             {
-                boolean far = Camera.useWideProjection(viewpoint.distance);
-                if (far) {
-                    Transform.pushProjection();
-                    camera.projectionOrthoWide(vp.aspect);
+                if (viewpoint.distance > 100 * Sun.MeanEarthDistance) {
                     radialCircleLineFar.render(gl, vp.aspect, LINEWIDTH);
                     radialThickLineFar.render(gl, vp.aspect, LINEWIDTH_THICK);
                     if (showLabels)
                         drawRadialGridText(gl, radialLabelsFar, pixelsPerSolarRadius * RADIAL_UNIT_FAR, ztext, R_LABEL_POS_FAR);
-                    Transform.popProjection();
                 } else {
                     radialCircleLine.render(gl, vp.aspect, LINEWIDTH);
                     radialThickLine.render(gl, vp.aspect, LINEWIDTH_THICK);
