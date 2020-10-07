@@ -146,25 +146,15 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
         Transform.pushView();
         Transform.rotateViewInverse(obsPosition.toQuat());
 
-        double pixFactor = CameraHelper.getPixelFactor(camera, vp);
-        boolean far = Camera.useWideProjection(obsPosition.distance);
-        if (far) {
-            Transform.pushProjection();
-            camera.projectionOrthoWide(vp.aspect);
-        }
-
         hemiLine.render(gl, vp.aspect, LINEWIDTH_FOV);
-
         double[] rot;
-        if (isSOLO && null != (rot = Spice.getRotation("SOLO_EQUAT_NORM", "SOLO_ORBIT_NORM", time))) {
+        if (isSOLO && null != (rot = Spice.getRotation("SOLO_EQUAT_NORM", "SOLO_ORBIT_NORM", time))) { // SOLO pointing normal to orbit
             Transform.rotateViewInverse(Quat.createRotation(rot[2], Vec3.ZAxis));
         }
 
+        double pixFactor = CameraHelper.getPixelFactor(camera, vp);
         children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).render(vp, gl, obsPosition.distance, pixFactor, color));
 
-        if (far) {
-            Transform.popProjection();
-        }
         Transform.popView();
     }
 

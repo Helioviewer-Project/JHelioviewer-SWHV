@@ -45,10 +45,6 @@ public class Camera {
         updateViewpoint = _updateViewpoint;
     }
 
-    public static boolean useWideProjection(double distance) {
-        return distance > 100 * Sun.MeanEarthDistance;
-    }
-
     public void projectionOrtho2D(double aspect) {
         Transform.setOrthoSymmetricProjection((float) (cameraWidth * aspect), (float) cameraWidth, -1, 1);
         Transform.setTranslateView((float) translation.x, (float) translation.y, 0);
@@ -56,7 +52,8 @@ public class Camera {
     }
 
     public void projectionOrtho(double aspect) {
-        Transform.setOrthoSymmetricProjection((float) (cameraWidth * aspect), (float) cameraWidth, -clipNarrow, clipNarrow);
+        float clip = cameraWidth < 10 ? clipNarrow : clipWide;
+        Transform.setOrthoSymmetricProjection((float) (cameraWidth * aspect), (float) cameraWidth, -clip, clip);
         Transform.setTranslateView((float) translation.x, (float) translation.y, 0);
         Transform.cacheMVP();
 
@@ -70,9 +67,6 @@ public class Camera {
         return invProj;
     }
 
-    public void projectionOrthoWide(double aspect) {
-        Transform.setOrthoSymmetricProjection((float) (cameraWidth * aspect), (float) cameraWidth, -clipWide, clipWide);
-    }
 ////
 
     private void updateCamera(JHVTime time) {
