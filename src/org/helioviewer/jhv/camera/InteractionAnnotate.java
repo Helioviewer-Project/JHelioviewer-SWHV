@@ -8,14 +8,15 @@ import java.util.ArrayList;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.camera.annotate.AnnotateCross;
 import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
-import org.helioviewer.jhv.camera.annotate.AnnotatePOS;
 import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
@@ -86,10 +87,10 @@ class InteractionAnnotate implements InteractionType {
     }
 
     @Nullable
-    Quat getPOSRotation() {
+    Vec3 getAnnotationPoint() {
         Annotateable activeAnn = activeIndex >= 0 && activeIndex < anns.size() ? anns.get(activeIndex) : null;
-        if (activeAnn instanceof AnnotatePOS)
-            return ((AnnotatePOS) activeAnn).getPOSRotation();
+        if (activeAnn instanceof AnnotateCross)
+            return ((AnnotateCross) activeAnn).getStartPoint();
         return null;
     }
 
