@@ -15,12 +15,11 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.camera.annotate.AnnotateCircle;
 import org.helioviewer.jhv.camera.annotate.AnnotateCross;
 import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
-import org.helioviewer.jhv.camera.annotate.AnnotatePOS;
 import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.MovieDisplay;
-import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Vec3;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -33,8 +32,7 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
         Rectangle(AnnotateRectangle.class),
         Circle(AnnotateCircle.class),
         Cross(AnnotateCross.class),
-        FOV(AnnotateFOV.class),
-        POS(AnnotatePOS.class);
+        FOV(AnnotateFOV.class);
 
         private final Class<? extends Annotateable> clazz;
 
@@ -190,8 +188,8 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
     }
 
     @Nullable
-    public Quat getPOSRotation() {
-        return interactionAnnotate.getPOSRotation();
+    public Vec3 getAnnotationPoint() {
+        return interactionAnnotate.getAnnotationPoint();
     }
 
     public JSONObject saveAnnotations() {
