@@ -41,8 +41,8 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
 
     private static Vec3 toCart(Position p) {
         return new Vec3(/*p.distance */ Math.cos(p.lat) * Math.sin(-p.lon), // longitude is Carrington, negated
-                        /*p.distance */ Math.sin(p.lat),
-                        /*p.distance */ Math.cos(p.lat) * Math.cos(p.lon));
+                /*p.distance */ Math.sin(p.lat),
+                /*p.distance */ Math.cos(p.lat) * Math.cos(p.lon));
     }
 
     private void update(int x, int y) {
@@ -64,7 +64,11 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
                 Vec3 annPoint = JHVFrame.getInteraction().getAnnotationPoint();
                 if (annPoint != null) {
                     Vec3 v_vp = toCart(viewpoint);
-                    System.out.println(">>> " + annPoint + " " + v_vp);
+                    Vec3 v_a = Vec3.cross(Vec3.cross(v, v_vp), Vec3.cross(Vec3.YAxis, annPoint));
+
+                    double h = Vec3.dot(v_vp, v_vp) * Vec3.dot(v, v) / (Vec3.dot(v_a, v) * Vec3.dot(v_vp, v_vp) + Vec3.dot(v_a, v_vp) * Vec3.dot(v, v));
+                    h = Math.abs(h - 1);
+                    System.out.println(">>> " + h);
                 }
 
                 double r = Math.sqrt(v.x * v.x + v.y * v.y);
