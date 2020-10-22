@@ -13,12 +13,14 @@ import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ClipBoardCopier;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.layers.GridLayer;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 
@@ -51,6 +53,10 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
             if (v == null) {
                 setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0, valueStr));
             } else {
+                Quat rot = JHVFrame.getInteraction().getPOSRotation();
+                if (rot != null)
+                    v = rot.rotateVector(v);
+
                 double r = Math.sqrt(v.x * v.x + v.y * v.y);
 
                 double d = camera.getViewpoint().distance;

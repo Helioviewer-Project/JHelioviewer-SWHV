@@ -1,7 +1,10 @@
 package org.helioviewer.jhv.camera.annotate;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
@@ -15,6 +18,8 @@ import org.json.JSONObject;
 public class AnnotateLOS extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 2;
+
+    private Quat posRotation; // plane-of-sky, should be saved
 
     public AnnotateLOS(JSONObject jo) {
         super(jo);
@@ -57,6 +62,11 @@ public class AnnotateLOS extends AbstractAnnotateable {
         }
     }
 
+    @Nullable
+    public Quat getPOSRotation() {
+        return posRotation;
+    }
+
     @Override
     public void draw(Quat q, Viewport vp, boolean active, BufVertex buf) {
         if (startPoint == null)
@@ -69,8 +79,15 @@ public class AnnotateLOS extends AbstractAnnotateable {
     @Override
     public void mousePressed(Camera camera, int x, int y) {
         Vec3 pt = computePoint(camera, x, y);
-        if (pt != null)
+        if (pt != null) {
             startPoint = pt;
+
+            Vec3 posPoint = CameraHelper.getVectorFromSphere(camera, Display.getActiveViewport(), x, y, Quat.ZERO, true);
+            if (posPoint != null) {
+                double lon = Math.atan2(posPoint.x, posPoint.z);
+                posRotation = new Quat(0, Math.PI / 2 - lon);
+            }
+        }
     }
 
     @Override

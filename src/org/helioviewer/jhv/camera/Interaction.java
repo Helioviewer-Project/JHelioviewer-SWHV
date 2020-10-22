@@ -8,6 +8,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
+import javax.annotation.Nullable;
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.Settings;
@@ -19,6 +20,7 @@ import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.MovieDisplay;
+import org.helioviewer.jhv.math.Quat;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -185,6 +187,11 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
 
     public void drawAnnotations(Viewport vp, GL2 gl) {
         interactionAnnotate.draw(vp, gl);
+    }
+
+    @Nullable
+    public Quat getPOSRotation() {
+        return interactionAnnotate.getPOSRotation();
     }
 
     public JSONObject saveAnnotations() {
