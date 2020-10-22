@@ -53,9 +53,9 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
             if (v == null) {
                 setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0, valueStr));
             } else {
-                Quat rot = JHVFrame.getInteraction().getPOSRotation();
-                if (rot != null)
-                    v = rot.rotateVector(v);
+                Vec3 annPoint = JHVFrame.getInteraction().getAnnotationPoint();
+                if (annPoint != null)
+                    System.out.println(">>> " + annPoint);
 
                 double r = Math.sqrt(v.x * v.x + v.y * v.y);
 
