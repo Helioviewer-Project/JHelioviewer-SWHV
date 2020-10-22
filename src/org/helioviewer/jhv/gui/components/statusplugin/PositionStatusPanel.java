@@ -6,6 +6,7 @@ import java.awt.event.MouseMotionListener;
 
 import javax.annotation.Nonnull;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.Camera;
@@ -38,6 +39,12 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         camera = Display.getCamera();
     }
 
+    private static Vec3 toCart(Position p) {
+        return new Vec3(/*p.distance */ Math.cos(p.lat) * Math.sin(-p.lon), // longitude is Carrington, negated
+                        /*p.distance */ Math.sin(p.lat),
+                        /*p.distance */ Math.cos(p.lat) * Math.cos(p.lon));
+    }
+
     private void update(int x, int y) {
         Viewport vp = Display.getActiveViewport();
         GridLayer gridLayer = Layers.getGridLayer();
@@ -53,15 +60,17 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
             if (v == null) {
                 setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0, valueStr));
             } else {
+                Position viewpoint = camera.getViewpoint();
                 Vec3 annPoint = JHVFrame.getInteraction().getAnnotationPoint();
-                if (annPoint != null)
-                    System.out.println(">>> " + annPoint);
+                if (annPoint != null) {
+                    Vec3 v_vp = toCart(viewpoint);
+                    System.out.println(">>> " + annPoint + " " + v_vp);
+                }
 
                 double r = Math.sqrt(v.x * v.x + v.y * v.y);
 
-                double d = camera.getViewpoint().distance;
-                double px = (180 / Math.PI) * Math.atan2(v.x, d);
-                double py = (180 / Math.PI) * Math.atan2(v.y, d);
+                double px = (180 / Math.PI) * Math.atan2(v.x, viewpoint.distance);
+                double py = (180 / Math.PI) * Math.atan2(v.y, viewpoint.distance);
                 double pa = MathUtils.mapTo0To360((180 / Math.PI) * Math.atan2(v.y, v.x) - (camera.getUpdateViewpoint() == UpdateViewpoint.equatorial ? 0 : 90)); // w.r.t. axis
 
                 ImageLayer layer = Layers.getActiveImageLayer();

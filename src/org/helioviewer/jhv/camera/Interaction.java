@@ -29,10 +29,7 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
     public enum Mode {PAN, ROTATE, AXIS}
 
     public enum AnnotationMode {
-        Rectangle(AnnotateRectangle.class),
-        Circle(AnnotateCircle.class),
-        Cross(AnnotateCross.class),
-        FOV(AnnotateFOV.class);
+        Rectangle(AnnotateRectangle.class), Circle(AnnotateCircle.class), Cross(AnnotateCross.class), FOV(AnnotateFOV.class);
 
         private final Class<? extends Annotateable> clazz;
 
@@ -58,7 +55,7 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
     private final InteractionRotate interactionRotate;
 
     private Mode mode = Mode.ROTATE;
-    private AnnotationMode annotationMode = AnnotationMode.Rectangle;
+    private AnnotationMode annotationMode = AnnotationMode.Cross;//Rectangle;
     private boolean annotate = false;
 
     public Interaction(Camera _camera) {
