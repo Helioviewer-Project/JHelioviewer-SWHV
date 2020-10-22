@@ -5,8 +5,11 @@ import java.awt.event.MouseEvent;
 
 import java.util.ArrayList;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
+import org.helioviewer.jhv.camera.annotate.AnnotateLOS;
 import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Viewport;
@@ -80,6 +83,14 @@ class InteractionAnnotate implements InteractionType {
         center.renderPoints(gl, pixFactor);
 
         Transform.popView();
+    }
+
+    @Nullable
+    Quat getPOSRotation() {
+        Annotateable activeAnn = activeIndex >= 0 && activeIndex < anns.size() ? anns.get(activeIndex) : null;
+        if (activeAnn instanceof AnnotateLOS)
+            return ((AnnotateLOS) activeAnn).getPOSRotation();
+        return null;
     }
 
     void zoom() {
