@@ -27,26 +27,26 @@ public class AnnotatePOS extends AbstractAnnotateable {
 
     private static void drawLOS(Quat q, Viewport vp, Vec3 bp, BufVertex buf, byte[] color) {
         double delta = 2.5 * Math.PI / 180;
-        Vec3 p1 = new Vec3(radius, bp.y + delta, bp.z);
-        Vec3 p2 = new Vec3(radius, bp.y - delta, bp.z);
+        Vec3 p1 = new Vec3(radius, bp.y + 4 * delta, bp.z);
+        Vec3 p2 = new Vec3(radius, bp.y - 4 * delta, bp.z);
         Vec3 p3 = new Vec3(radius, bp.y, bp.z + delta);
         Vec3 p4 = new Vec3(radius, bp.y, bp.z - delta);
 
-        interpolatedDraw(q, vp, p1, p2, buf, color);
-        interpolatedDraw(q, vp, p3, p4, buf, color);
+        interpolatedDraw(q, vp, p1, p2, buf, color, 4 * SUBDIVISIONS);
+        interpolatedDraw(q, vp, p3, p4, buf, color, SUBDIVISIONS);
     }
 
-    private static void interpolatedDraw(Quat q, Viewport vp, Vec3 p1s, Vec3 p2s, BufVertex buf, byte[] color) {
+    private static void interpolatedDraw(Quat q, Viewport vp, Vec3 p1s, Vec3 p2s, BufVertex buf, byte[] color, int subdivs) {
         Vec2 previous = null;
-        for (int i = 0; i <= SUBDIVISIONS; i++) {
-            Vec3 pc = interpolate(i / (double) SUBDIVISIONS, p1s, p2s);
+        for (int i = 0; i <= subdivs; i++) {
+            Vec3 pc = interpolate(i / (double) subdivs, p1s, p2s);
 
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 if (i == 0) {
                     buf.putVertex(pc, Colors.Null);
                 }
                 buf.putVertex(pc, color);
-                if (i == SUBDIVISIONS) {
+                if (i == subdivs) {
                     buf.putVertex(pc, Colors.Null);
                 }
             } else {
@@ -55,7 +55,7 @@ public class AnnotatePOS extends AbstractAnnotateable {
                     GLHelper.drawVertex(q, vp, pc, previous, buf, Colors.Null);
                 }
                 previous = GLHelper.drawVertex(q, vp, pc, previous, buf, color);
-                if (i == SUBDIVISIONS) {
+                if (i == subdivs) {
                     GLHelper.drawVertex(q, vp, pc, previous, buf, Colors.Null);
                 }
             }
