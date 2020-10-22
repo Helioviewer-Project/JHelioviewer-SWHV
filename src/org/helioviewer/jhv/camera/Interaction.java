@@ -15,7 +15,7 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.camera.annotate.AnnotateCircle;
 import org.helioviewer.jhv.camera.annotate.AnnotateCross;
 import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
-import org.helioviewer.jhv.camera.annotate.AnnotateLOS;
+import org.helioviewer.jhv.camera.annotate.AnnotatePOS;
 import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Viewport;
@@ -34,7 +34,7 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
         Circle(AnnotateCircle.class),
         Cross(AnnotateCross.class),
         FOV(AnnotateFOV.class),
-        LOS(AnnotateLOS.class);
+        POS(AnnotatePOS.class);
 
         private final Class<? extends Annotateable> clazz;
 

@@ -15,13 +15,13 @@ import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.json.JSONObject;
 
-public class AnnotateLOS extends AbstractAnnotateable {
+public class AnnotatePOS extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 2;
 
     private Quat posRotation; // plane-of-sky, should be saved
 
-    public AnnotateLOS(JSONObject jo) {
+    public AnnotatePOS(JSONObject jo) {
         super(jo);
     }
 
@@ -110,7 +110,7 @@ public class AnnotateLOS extends AbstractAnnotateable {
 
     @Override
     public String getType() {
-        return Interaction.AnnotationMode.LOS.toString();
+        return Interaction.AnnotationMode.POS.toString();
     }
 
 }
