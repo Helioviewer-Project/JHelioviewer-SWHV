@@ -116,7 +116,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
 
     private static String formatOrtho(@Nonnull Vec2 coord, double h, double r, double pa, double px, double py, String valueStr) {
         String coordStr = coord == Vec2.NAN ? nanOrtho : String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
-        String hStr = Double.isFinite(h) ? String.format("%7.2fMm", h /* (Sun.RadiusMeter / 1e6)*/) : nanH;
+        String hStr = Double.isFinite(h) ? String.format("%7.2fMm", h * (Sun.RadiusMeter / 1e6)) : nanH;
         return String.format("H: %s | (\u03c1,\u03c8):(%s,%+7.2f\u00B0) | (\u03C6,\u03B8):(%s) | (x,y):(%s,%s) | %s", hStr, formatR(r), pa, coordStr, formatXY(px), formatXY(py), valueStr);
     }
 
