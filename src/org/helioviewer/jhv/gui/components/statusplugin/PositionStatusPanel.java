@@ -30,6 +30,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
     private static final String nanOrtho = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
     private static final String nanLati = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
     private static final String nanPolar = String.format("%7s\u00B0,%7s\u2299", "--", "--");
+    private static final String nanH = String.format("%7sMm", "--");
 
     private final Camera camera;
 
@@ -103,13 +104,6 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
             return String.format("%7.2fau", r * Sun.MeanEarthDistanceInv);
     }
 
-    private static String formatH(double h) {
-        if (Double.isFinite(h)) {
-            return String.format("H: %7.2fMm", h * (Sun.RadiusMeter / 1e6));
-        } else
-            return "H: -- Mm";
-    }
-
     private static String formatLati(@Nonnull Vec2 coord) {
         String coordStr = coord == Vec2.NAN ? nanLati : String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
         return String.format("(\u03C6,\u03B8):(%s)", coordStr);
@@ -122,7 +116,8 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
 
     private static String formatOrtho(@Nonnull Vec2 coord, double h, double r, double pa, double px, double py, String valueStr) {
         String coordStr = coord == Vec2.NAN ? nanOrtho : String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
-        return String.format("%s | (\u03c1,\u03c8):(%s,%+7.2f\u00B0) | (\u03C6,\u03B8):(%s) | (x,y):(%s,%s) | %s", formatH(h), formatR(r), pa, coordStr, formatXY(px), formatXY(py), valueStr);
+        String hStr = Double.isFinite(h) ? String.format("%7.2fMm", h /* (Sun.RadiusMeter / 1e6)*/) : nanH;
+        return String.format("H: %s | (\u03c1,\u03c8):(%s,%+7.2f\u00B0) | (\u03C6,\u03B8):(%s) | (x,y):(%s,%s) | %s", hStr, formatR(r), pa, coordStr, formatXY(px), formatXY(py), valueStr);
     }
 
     @Override
