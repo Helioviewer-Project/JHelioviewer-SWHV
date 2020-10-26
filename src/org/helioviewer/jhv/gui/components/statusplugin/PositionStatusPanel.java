@@ -21,7 +21,6 @@ import org.helioviewer.jhv.layers.GridLayer;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.math.MathUtils;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 
@@ -35,14 +34,8 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
     private final Camera camera;
 
     public PositionStatusPanel() {
-        setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0, ImageData.nanValue));
+        setText(formatOrtho(Vec2.NAN, Double.NaN, 0, 0, 0, 0, ImageData.nanValue));
         camera = Display.getCamera();
-    }
-
-    private static Vec3 toCart(Position p) {
-        return new Vec3(/*p.distance */ Math.cos(p.lat) * Math.sin(-p.lon), // longitude is Carrington, negated
-                /*p.distance */ Math.sin(p.lat),
-                /*p.distance */ Math.cos(p.lat) * Math.cos(p.lon));
     }
 
     private void update(int x, int y) {
@@ -58,20 +51,28 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
             String valueStr = ImageData.nanValue;
             Vec3 v = CameraHelper.getVectorFromSphereOrPlane(camera, vp, x, y, camera.getDragRotation());
             if (v == null) {
-                setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0, valueStr));
+                setText(formatOrtho(Vec2.NAN, Double.NaN, 0, 0, 0, 0, valueStr));
             } else {
-                Position viewpoint = camera.getViewpoint();
-                Vec3 annPoint = JHVFrame.getInteraction().getAnnotationPoint();
-                if (annPoint != null) {
-                    Vec3 v_vp = toCart(viewpoint);
-                    Vec3 v_a = Vec3.cross(Vec3.cross(v, v_vp), Vec3.cross(Vec3.YAxis, annPoint));
-
-                    double h = Vec3.dot(v_vp, v_vp) * Vec3.dot(v, v) / (Vec3.dot(v_a, v) * Vec3.dot(v_vp, v_vp) + Vec3.dot(v_a, v_vp) * Vec3.dot(v, v));
-                    h = Math.abs(h - 1);
-                    System.out.println(">>> " + h);
-                }
-
+                double h = Double.NaN;
                 double r = Math.sqrt(v.x * v.x + v.y * v.y);
+
+                Position viewpoint = camera.getViewpoint();
+                if (r > 1) {
+                    Vec3 annPoint = JHVFrame.getInteraction().getAnnotationPoint();
+                    if (annPoint != null) {
+                        Vec3 v_m = new Vec3(v.x / r, v.y / r, 0);
+                        Vec3 vva = viewpoint.toQuat().rotateVector(annPoint);
+                        Vec3 v_a = v.x < 0 ?
+                                Vec3.cross(Vec3.cross(vva, Vec3.YAxis), Vec3.cross(Vec3.ZAxis, v_m)) :
+                                Vec3.cross(Vec3.cross(Vec3.ZAxis, v_m), Vec3.cross(vva, Vec3.YAxis));
+                        //System.out.println(">>> " + vva + " " + v_a);
+
+                        double alpha = Math.atan2(r, viewpoint.distance);
+                        double beta = Math.acos(Vec3.dot(v_a, Vec3.ZAxis));
+                        double gamma = Math.PI - alpha - beta;
+                        h = /*Math.abs*/(viewpoint.distance * Math.sin(alpha) / Math.sin(gamma) - 1);
+                    }
+                }
 
                 double px = (180 / Math.PI) * Math.atan2(v.x, viewpoint.distance);
                 double py = (180 / Math.PI) * Math.atan2(v.y, viewpoint.distance);
@@ -83,7 +84,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
                     valueStr = id.getPixelString((float) v.x, (float) v.y);
                 }
 
-                setText(formatOrtho(coord, r, pa, px, py, valueStr));
+                setText(formatOrtho(coord, h, r, pa, px, py, valueStr));
             }
         }
     }
@@ -102,6 +103,13 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
             return String.format("%7.2fau", r * Sun.MeanEarthDistanceInv);
     }
 
+    private static String formatH(double h) {
+        if (Double.isFinite(h)) {
+            return String.format("H: %7.2fMm", h * (Sun.RadiusMeter / 1e6));
+        } else
+            return "H: -- Mm";
+    }
+
     private static String formatLati(@Nonnull Vec2 coord) {
         String coordStr = coord == Vec2.NAN ? nanLati : String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
         return String.format("(\u03C6,\u03B8):(%s)", coordStr);
@@ -112,9 +120,9 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         return String.format("(\u03B8,\u03c1):(%s)", coordStr);
     }
 
-    private static String formatOrtho(@Nonnull Vec2 coord, double r, double pa, double px, double py, String valueStr) {
+    private static String formatOrtho(@Nonnull Vec2 coord, double h, double r, double pa, double px, double py, String valueStr) {
         String coordStr = coord == Vec2.NAN ? nanOrtho : String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
-        return String.format("(\u03c1,\u03c8):(%s,%+7.2f\u00B0) | (\u03C6,\u03B8):(%s) | (x,y):(%s,%s) | %s", formatR(r), pa, coordStr, formatXY(px), formatXY(py), valueStr);
+        return String.format("%s | (\u03c1,\u03c8):(%s,%+7.2f\u00B0) | (\u03C6,\u03B8):(%s) | (x,y):(%s,%s) | %s", formatH(h), formatR(r), pa, coordStr, formatXY(px), formatXY(py), valueStr);
     }
 
     @Override
