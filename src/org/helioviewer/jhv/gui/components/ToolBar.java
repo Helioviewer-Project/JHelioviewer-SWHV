@@ -62,7 +62,7 @@ public class ToolBar extends JToolBar {
         }
     }
 
-    private final ButtonText ANNOTATION = new ButtonText(Buttons.annotate, "Annotation", "Annotation");
+    private final ButtonText ANNOTATION = new ButtonText(Buttons.annotate, "Annotation", "Annotation (Press Shift to draw)");
     private final ButtonText AXIS = new ButtonText(Buttons.axis, "Axis", "Axis");
     private final ButtonText CUTOUT = new ButtonText(Buttons.cutOut, "SDO Cut-out", "Send layers to SDO cut-out service");
     private final ButtonText DIFFROTATION = new ButtonText(Buttons.diffRotation, "Differential", "Toggle differential rotation");
