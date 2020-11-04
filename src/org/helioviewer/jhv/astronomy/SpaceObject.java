@@ -34,6 +34,7 @@ public class SpaceObject {
             .put("Earth", new SpaceObject(true, "EARTH", "Earth", 6371000 / Sun.RadiusMeter, Colors.Blue, JHVTableCellRenderer.cellEmphasisBorder))
             //
             .put("Parker Solar Probe", new SpaceObject(false, "PSP", "Parker Solar Probe", 2 / Sun.RadiusMeter, Colors.bytes(235, 199, 31), JHVTableCellRenderer.cellBorder))
+            .put("BepiColombo", new SpaceObject(false, "BEPICOLOMBO MPO", "BepiColombo", 2 / Sun.RadiusMeter, Colors.White, JHVTableCellRenderer.cellBorder))
             .put("Solar Orbiter", SOLO)
             .put("Solar Orbiter -5y", new SpaceObject(false, "-999", "Solar Orbiter -5y", 2 / Sun.RadiusMeter, Colors.White, JHVTableCellRenderer.cellBorder))
             .put("STEREO Ahead", STA)
