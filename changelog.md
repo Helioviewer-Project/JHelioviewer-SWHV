@@ -25,7 +25,6 @@
 - Add white background view option
 
 ### Datasets
-- Request SOLO trajectory backdated 5 years
 - Play sequence of files as movie ([#119](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/119>))
 - Incorporate SPICE and use it for input [time parsing](<https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/str2et_c.html>) and position calculations for planets
 - Use SPICE for the calculations of internal reference frames
