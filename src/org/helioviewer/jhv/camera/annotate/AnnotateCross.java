@@ -20,7 +20,7 @@ public class AnnotateCross extends AbstractAnnotateable {
         super(jo);
     }
 
-    private static void drawCross(Quat q, Viewport vp, Vec3 bp, BufVertex buf, byte[] color) {
+    public static void drawCross(Quat q, Viewport vp, Vec3 bp, BufVertex buf, byte[] color) {
         double delta = 2.5 * Math.PI / 180;
         Vec3 p1 = new Vec3(radius, bp.y + delta, bp.z);
         Vec3 p2 = new Vec3(radius, bp.y - delta, bp.z);
