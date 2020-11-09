@@ -30,10 +30,6 @@ public class FOVLayer extends AbstractLayer {
     }
 
     @Override
-    public void renderFloat(Camera camera, Viewport vp, GL2 gl) {
-    }
-
-    @Override
     public void init(GL2 gl) {
         treePane.init(gl);
     }

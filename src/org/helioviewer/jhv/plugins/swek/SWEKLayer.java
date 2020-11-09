@@ -370,53 +370,53 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
-        if (isVisible[vp.idx]) {
-            List<JHVRelatedEvents> evs = SWEKData.getActiveEvents(controller.currentTime);
-            if (evs.isEmpty())
-                return;
+        if (!isVisible[vp.idx])
+            return;
+        List<JHVRelatedEvents> evs = SWEKData.getActiveEvents(controller.currentTime);
+        if (evs.isEmpty())
+            return;
 
-            Quat q = camera.getViewpoint().toQuat();
-            for (JHVRelatedEvents evtr : evs) {
-                JHVEvent evt = evtr.getClosestTo(controller.currentTime);
-                if (evt.isCactus()) {
-                    drawCactusArc(evtr, evt, controller.currentTime);
-                } else {
-                    drawPolygon(q, vp, evtr, evt);
-                    if (icons) {
-                        drawIcon(evtr, evt);
-                    }
+        Quat q = camera.getViewpoint().toQuat();
+        for (JHVRelatedEvents evtr : evs) {
+            JHVEvent evt = evtr.getClosestTo(controller.currentTime);
+            if (evt.isCactus()) {
+                drawCactusArc(evtr, evt, controller.currentTime);
+            } else {
+                drawPolygon(q, vp, evtr, evt);
+                if (icons) {
+                    drawIcon(evtr, evt);
                 }
             }
-            renderEvents(vp, gl);
-            if (icons) {
-                renderIcons(gl, evs);
-            }
+        }
+        renderEvents(vp, gl);
+        if (icons) {
+            renderIcons(gl, evs);
         }
     }
 
     @Override
     public void renderScale(Camera camera, Viewport vp, GL2 gl) {
-        if (isVisible[vp.idx]) {
-            List<JHVRelatedEvents> evs = SWEKData.getActiveEvents(controller.currentTime);
-            if (evs.isEmpty())
-                return;
+        if (!isVisible[vp.idx])
+            return;
+        List<JHVRelatedEvents> evs = SWEKData.getActiveEvents(controller.currentTime);
+        if (evs.isEmpty())
+            return;
 
-            Quat q = camera.getViewpoint().toQuat();
-            for (JHVRelatedEvents evtr : evs) {
-                JHVEvent evt = evtr.getClosestTo(controller.currentTime);
-                if (evt.isCactus() && (Display.mode == Display.DisplayMode.LogPolar || Display.mode == Display.DisplayMode.Polar)) {
-                    drawCactusArcScale(vp, evtr, evt, controller.currentTime, Display.mode.scale);
-                } else {
-                    drawPolygon(q, vp, evtr, evt);
-                    if (icons) {
-                        drawIconScale(q, vp, evtr, evt, Display.mode.scale, Display.mode.xform);
-                    }
+        Quat q = camera.getViewpoint().toQuat();
+        for (JHVRelatedEvents evtr : evs) {
+            JHVEvent evt = evtr.getClosestTo(controller.currentTime);
+            if (evt.isCactus() && (Display.mode == Display.DisplayMode.LogPolar || Display.mode == Display.DisplayMode.Polar)) {
+                drawCactusArcScale(vp, evtr, evt, controller.currentTime, Display.mode.scale);
+            } else {
+                drawPolygon(q, vp, evtr, evt);
+                if (icons) {
+                    drawIconScale(q, vp, evtr, evt, Display.mode.scale, Display.mode.xform);
                 }
             }
-            renderEvents(vp, gl);
-            if (icons) {
-                renderIcons(gl, evs);
-            }
+        }
+        renderEvents(vp, gl);
+        if (icons) {
+            renderIcons(gl, evs);
         }
     }
 
