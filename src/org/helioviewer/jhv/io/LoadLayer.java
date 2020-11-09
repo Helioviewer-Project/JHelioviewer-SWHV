@@ -104,7 +104,7 @@ public class LoadLayer {
 
     private static class Callback implements FutureCallback<View> {
 
-        final ImageLayer layer;
+        private final ImageLayer layer;
 
         Callback(ImageLayer _layer) {
             layer = _layer;
