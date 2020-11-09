@@ -45,7 +45,7 @@ public class LoadFootpoints implements Callable<List<Position>> {
                 String[] values = Regex.Comma.split(line);
                 if (values.length > 8) {
                     try {
-                        JHVTime time = new JHVTime(TimeUtils.parse(values[6], timeFormatter));
+                        JHVTime time = new JHVTime(TimeUtils.parse(timeFormatter, values[6]));
                         double lon = Math.toRadians(Double.parseDouble(values[7]));
                         double lat = Math.toRadians(Double.parseDouble(values[8]));
                         posList.add(new Position(time, 1, lon, lat));
