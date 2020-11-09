@@ -12,13 +12,17 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.PositionMapReceiver;
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.annotate.AnnotateCross;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.connect.LoadFootpoints;
+import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
+import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
 import org.json.JSONObject;
 
@@ -26,12 +30,15 @@ import com.jogamp.opengl.GL2;
 
 public class ConnectLayer extends AbstractLayer implements PositionMapReceiver {
 
-    private final GLSLLine hcs = new GLSLLine(true);
-    private final BufVertex hcsBuf = new BufVertex(512 * GLSLLine.stride);
+    private static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
+
+    private final GLSLLine footpoint = new GLSLLine(true);
+    private final BufVertex footpointBuf = new BufVertex(12 * GLSLLine.stride);
 
     private final JPanel optionsPanel;
 
     private TimeMap<Position> positionMap;
+    private JHVTime lastTimestamp;
 
     @Override
     public void serialize(JSONObject jo) {
@@ -45,20 +52,40 @@ public class ConnectLayer extends AbstractLayer implements PositionMapReceiver {
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.idx])
             return;
+        if (positionMap == null)
+            return;
+        draw(camera.getViewpoint(), vp, gl);
     }
 
     @Override
-    public void renderFloat(Camera camera, Viewport vp, GL2 gl) {
+    public void renderScale(Camera camera, Viewport vp, GL2 gl) {
+        if (!isVisible[vp.idx])
+            return;
+        if (positionMap == null)
+            return;
+        draw(camera.getViewpoint(), vp, gl);
+    }
+
+    private void draw(Position viewpoint, Viewport vp, GL2 gl) {
+        Position p = positionMap.nearestValue(viewpoint.time);
+        if (!p.time.equals(lastTimestamp)) {
+            lastTimestamp = p.time; // should be reset to null
+            JHVFrame.getLayers().fireTimeUpdated(this);
+        }
+
+        AnnotateCross.drawCross(viewpoint.toQuat(), vp, new Vec3(p.distance, Math.PI / 2 - p.lat, p.lon), footpointBuf, Colors.Green);
+        footpoint.setData(gl, footpointBuf);
+        footpoint.render(gl, vp.aspect, LINEWIDTH);
     }
 
     @Override
     public void init(GL2 gl) {
-        hcs.init(gl);
+        footpoint.init(gl);
     }
 
     @Override
     public void dispose(GL2 gl) {
-        hcs.dispose(gl);
+        footpoint.dispose(gl);
     }
 
     @Override
@@ -79,7 +106,7 @@ public class ConnectLayer extends AbstractLayer implements PositionMapReceiver {
     @Nullable
     @Override
     public String getTimeString() {
-        return null;
+        return positionMap == null ? null : lastTimestamp.toString();
     }
 
     @Override
@@ -90,7 +117,7 @@ public class ConnectLayer extends AbstractLayer implements PositionMapReceiver {
     @Override
     public void setMap(TimeMap<Position> _positionMap) {
         positionMap = _positionMap;
-        positionMap.values().forEach(p -> System.out.println(">>> " + p));
+        MovieDisplay.display();
     }
 
     private JPanel optionsPanel() {
