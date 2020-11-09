@@ -83,6 +83,10 @@ public class TimeUtils {
         return LocalDateTime.parse(date, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(ZERO).toEpochMilli();
     }
 
+    public static long parse(String date, DateTimeFormatter formatter) {
+        return LocalDateTime.parse(date, formatter).toInstant(ZERO).toEpochMilli();
+    }
+
     public static long parseSQL(String date) {
         return LocalDateTime.parse(date, sqlFormatter).toInstant(ZERO).toEpochMilli();
     }
