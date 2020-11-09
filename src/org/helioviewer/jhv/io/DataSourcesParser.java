@@ -53,8 +53,8 @@ public class DataSourcesParser {
 
             if (str != null /* can't happen */ && json.has("sourceId")) { // leaf
                 int sourceId = json.getInt("sourceId");
-                long start = TimeUtils.parseSQL(json.getString("start"));
-                long end = TimeUtils.parseSQL(json.getString("end"));
+                long start = TimeUtils.parse(TimeUtils.sqlTimeFormatter, json.getString("start"));
+                long end = TimeUtils.parse(TimeUtils.sqlTimeFormatter, json.getString("end"));
                 String description = json.getString("description") + " [" + TimeUtils.formatDate(start) + " : " + TimeUtils.formatDate(end) + ']';
                 DataSourcesTree.SourceItem item = new DataSourcesTree.SourceItem(server, mergeNames(str, name),
                         description, sourceId, start, end,

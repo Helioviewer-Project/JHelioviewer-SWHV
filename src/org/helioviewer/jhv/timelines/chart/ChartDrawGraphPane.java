@@ -208,7 +208,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             return;
         }
         long ts = xAxis.pixel2value(graphArea.x, graphArea.width, mousePosition.x);
-        String lbl = '(' + TimeUtils.formatSQL(ts);
+        String lbl = '(' + TimeUtils.format(TimeUtils.sqlTimeFormatter, ts);
         int currWidth = 0;
         g.setColor(DrawConstants.LABEL_TEXT_COLOR);
         g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
