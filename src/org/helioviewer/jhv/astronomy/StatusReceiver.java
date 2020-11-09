@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.astronomy;
 
-public interface PositionReceiver {
+public interface StatusReceiver {
 
     void setStatus(String state);
 
