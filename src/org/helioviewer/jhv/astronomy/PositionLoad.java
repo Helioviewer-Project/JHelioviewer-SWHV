@@ -74,9 +74,9 @@ public class PositionLoad {
 
     private static class Callback implements FutureCallback<PositionResponse> {
 
-        private final PositionReceiver receiver;
+        private final StatusReceiver receiver;
 
-        Callback(PositionReceiver _receiver) {
+        Callback(StatusReceiver _receiver) {
             receiver = _receiver;
         }
 
@@ -93,12 +93,12 @@ public class PositionLoad {
 
     }
 
-    private final PositionReceiver receiver;
+    private final StatusReceiver receiver;
     private final SpaceObject target;
     private final boolean isHCI;
     private final Future<PositionResponse> future;
 
-    private PositionLoad(PositionReceiver _receiver, SpaceObject _target, boolean _isHCI, Future<PositionResponse> _future) {
+    private PositionLoad(StatusReceiver _receiver, SpaceObject _target, boolean _isHCI, Future<PositionResponse> _future) {
         receiver = _receiver;
         target = _target;
         isHCI = _isHCI;
@@ -133,7 +133,7 @@ public class PositionLoad {
 
     private static final ArrayListMultimap<UpdateViewpoint, PositionLoad> loads = ArrayListMultimap.create();
 
-    public static PositionLoad submit(UpdateViewpoint uv, PositionReceiver receiver, SpaceObject observer, SpaceObject target, Frame frame, long start, long end) {
+    public static PositionLoad submit(UpdateViewpoint uv, StatusReceiver receiver, SpaceObject observer, SpaceObject target, Frame frame, long start, long end) {
         receiver.setStatus("Loading...");
         PositionLoad load = new PositionLoad(receiver, target, frame == Frame.HCI, EventQueueCallbackExecutor.pool.submit(
                 new LoadPosition(observer, target, frame, start, end), new Callback(receiver)));
