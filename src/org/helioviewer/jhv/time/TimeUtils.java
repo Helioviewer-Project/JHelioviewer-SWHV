@@ -17,8 +17,8 @@ import org.helioviewer.jhv.astronomy.Spice;
 public class TimeUtils {
 
     private static final ZoneOffset ZERO = ZoneOffset.ofTotalSeconds(0);
-    private static final DateTimeFormatter sqlFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final DateTimeFormatter fileFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss");
+    public static final DateTimeFormatter sqlTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private static final PrettyTimeParser prettyParser = new PrettyTimeParser();
 
@@ -71,24 +71,16 @@ public class TimeUtils {
         return format(DateTimeFormatter.ISO_INSTANT, milli);
     }
 
-    public static String formatSQL(long milli) {
-        return format(sqlFormatter, milli);
-    }
-
     public static String formatFilename(long milli) {
         return format(fileFormatter, milli);
     }
 
-    public static long parse(String date) {
-        return LocalDateTime.parse(date, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(ZERO).toEpochMilli();
-    }
-
-    public static long parse(String date, DateTimeFormatter formatter) {
+    public static long parse(DateTimeFormatter formatter, String date) {
         return LocalDateTime.parse(date, formatter).toInstant(ZERO).toEpochMilli();
     }
 
-    public static long parseSQL(String date) {
-        return LocalDateTime.parse(date, sqlFormatter).toInstant(ZERO).toEpochMilli();
+    public static long parse(String date) {
+        return LocalDateTime.parse(date, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(ZERO).toEpochMilli();
     }
 
     public static long parseDate(String date) {
@@ -121,7 +113,7 @@ public class TimeUtils {
         @Override
         public Optional<String> validate(String subject) {
             try {
-                long time = parseSQL(subject);
+                long time = parse(sqlTimeFormatter, subject);
                 if (time < MINIMAL_TIME.milli || time > MAXIMAL_TIME.milli)
                     throw new Exception();
 
