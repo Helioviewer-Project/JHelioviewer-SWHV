@@ -5,15 +5,13 @@ import java.awt.FileDialog;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.File;
-import java.net.URI;
-import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.astronomy.PositionListReceiver;
+import org.helioviewer.jhv.astronomy.PositionMapReceiver;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ComponentUtils;
@@ -21,18 +19,19 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.connect.LoadFootpoints;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
+import org.helioviewer.jhv.time.TimeMap;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public class ConnectLayer extends AbstractLayer implements PositionListReceiver {
+public class ConnectLayer extends AbstractLayer implements PositionMapReceiver {
 
     private final GLSLLine hcs = new GLSLLine(true);
     private final BufVertex hcsBuf = new BufVertex(512 * GLSLLine.stride);
 
     private final JPanel optionsPanel;
 
-    private List<Position> posList;
+    private TimeMap<Position> positionMap;
 
     @Override
     public void serialize(JSONObject jo) {
@@ -89,9 +88,9 @@ public class ConnectLayer extends AbstractLayer implements PositionListReceiver 
     }
 
     @Override
-    public void setList(List<Position> _posList) {
-        posList = _posList;
-        posList.forEach(p -> System.out.println(">>> " + p));
+    public void setMap(TimeMap<Position> _positionMap) {
+        positionMap = _positionMap;
+        positionMap.values().forEach(p -> System.out.println(">>> " + p));
     }
 
     private JPanel optionsPanel() {
