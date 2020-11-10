@@ -18,7 +18,7 @@ void get_polar_texcoord(const vec2 CRVAL, const vec4 CROTA, const vec4 rect, con
             discard;
     }
 
-    vec3 centered = apply_center(pos, CRVAL, CROTA);
+    vec3 centered = apply_center(vec3(pos.x, -pos.y, 0.), CRVAL, CROTA);
     texcoord = rect.zw * vec2(centered.x - rect.x, -centered.y - rect.y);
     clamp_texture(texcoord);
 
