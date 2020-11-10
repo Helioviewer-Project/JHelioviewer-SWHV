@@ -25,7 +25,7 @@ vec2 get_lati_texcoord(const vec2 CRVAL, const vec4 CROTA, const vec4 rect, cons
     if (xcartrot.x < 0.)
         discard;
 
-    vec3 centered = apply_center(vec3(xcartrot.y, xcartrot.z, 1.), CRVAL, CROTA);
+    vec3 centered = apply_center(vec3(xcartrot.y, -xcartrot.z, 0.), CRVAL, CROTA);
     vec2 texcoord = rect.zw * vec2(centered.x - rect.x, -centered.y - rect.y);
     clamp_texture(texcoord);
 
