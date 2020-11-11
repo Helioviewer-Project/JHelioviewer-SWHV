@@ -56,7 +56,7 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
             return;
         if (positionMap == null)
             return;
-        draw(camera, vp, gl);
+        drawInterpolated(camera, vp, gl);
     }
 
     @Override
@@ -64,15 +64,51 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
         render(camera, vp, gl);
     }
 
-    private void draw(Camera camera, Viewport vp, GL2 gl) {
+    private static Vec3 interpolate(long t, Position prev, Position next) {
+        double xprev = Math.cos(prev.lat) * Math.sin(prev.lon);
+        double yprev = Math.sin(prev.lat);
+        double zprev = Math.cos(prev.lat) * Math.cos(prev.lon);
+
+        double xnext = Math.cos(next.lat) * Math.sin(next.lon);
+        double ynext = Math.sin(next.lat);
+        double znext = Math.cos(next.lat) * Math.cos(next.lon);
+
+        long tprev = prev.time.milli;
+        long tnext = next.time.milli;
+
+        double alpha = tnext == tprev ? 1. : ((t - tprev) / (double) (tnext - tprev)) % 1.;
+        double x = (1. - alpha) * xprev + alpha * xnext;
+        double y = (1. - alpha) * yprev + alpha * ynext;
+        double z = (1. - alpha) * zprev + alpha * znext;
+
+        return new Vec3(radius, Math.acos(y), Math.atan2(x, z));
+    }
+
+    /*
+        private void drawNearest(Camera camera, Viewport vp, GL2 gl) {
+            Position viewpoint = camera.getViewpoint();
+            Position p = positionMap.nearestValue(viewpoint.time);
+            if (!p.time.equals(lastTimestamp)) {
+                lastTimestamp = p.time; // should be reset to null
+                JHVFrame.getLayers().fireTimeUpdated(this);
+            }
+
+            Vec3 v = new Vec3(radius, Math.PI / 2 - p.lat, p.lon);
+            Quat q = Layers.getGridLayer().getGridType().toQuat(viewpoint);
+
+            AnnotateCross.drawCross(q, vp, v, footpointBuf, Colors.Green);
+            footpoint.setData(gl, footpointBuf);
+            footpoint.render(gl, vp.aspect, LINEWIDTH);
+        }
+    */
+    private void drawInterpolated(Camera camera, Viewport vp, GL2 gl) {
         Position viewpoint = camera.getViewpoint();
-        Position p = positionMap.nearestValue(viewpoint.time);
-        if (!p.time.equals(lastTimestamp)) {
-            lastTimestamp = p.time; // should be reset to null
+        if (!viewpoint.time.equals(lastTimestamp)) {
+            lastTimestamp = viewpoint.time; // should be reset to null
             JHVFrame.getLayers().fireTimeUpdated(this);
         }
 
-        Vec3 v = new Vec3(radius, Math.PI / 2 - p.lat, p.lon);
+        Vec3 v = interpolate(viewpoint.time.milli, positionMap.lowerValue(viewpoint.time), positionMap.higherValue(viewpoint.time));
         Quat q = Layers.getGridLayer().getGridType().toQuat(viewpoint);
 
         AnnotateCross.drawCross(q, vp, v, footpointBuf, Colors.Green);
