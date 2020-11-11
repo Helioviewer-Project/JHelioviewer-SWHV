@@ -20,17 +20,17 @@ import org.helioviewer.jhv.time.TimeUtils;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-public class LoadFootpoints implements Callable<TimeMap<Position>> {
+public class LoadFootpoint implements Callable<TimeMap<Position>> {
 
     private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     public static void submit(@Nonnull URI uri, PositionMapReceiver receiver) {
-        EventQueueCallbackExecutor.pool.submit(new LoadFootpoints(uri), new Callback(receiver));
+        EventQueueCallbackExecutor.pool.submit(new LoadFootpoint(uri), new Callback(receiver));
     }
 
     private final URI uri;
 
-    private LoadFootpoints(URI _uri) {
+    private LoadFootpoint(URI _uri) {
         uri = _uri;
     }
 
