@@ -75,4 +75,12 @@ public class TimeMap<V> extends TreeMap<JHVTime, V> {
         return get(key(idx));
     }
 
+    public V lowerValue(JHVTime time) {
+        return get(lowerKey(time));
+    }
+
+    public V higherValue(JHVTime time) {
+        return get(higherKey(time));
+    }
+
 }
