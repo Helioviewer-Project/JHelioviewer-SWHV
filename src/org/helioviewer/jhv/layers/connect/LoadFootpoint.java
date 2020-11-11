@@ -22,7 +22,7 @@ import com.google.common.util.concurrent.FutureCallback;
 
 public class LoadFootpoint implements Callable<TimeMap<Position>> {
 
-    private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private static final DateTimeFormatter euroTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     public static void submit(@Nonnull URI uri, PositionMapReceiver receiver) {
         EventQueueCallbackExecutor.pool.submit(new LoadFootpoint(uri), new Callback(receiver));
@@ -32,6 +32,14 @@ public class LoadFootpoint implements Callable<TimeMap<Position>> {
 
     private LoadFootpoint(URI _uri) {
         uri = _uri;
+    }
+
+    private static long parseTime(String s) {
+        try {
+            return TimeUtils.parse(TimeUtils.sqlTimeFormatter, s);
+        } catch (Exception e) {
+            return TimeUtils.parse(euroTimeFormatter, s);
+        }
     }
 
     @Override
@@ -44,7 +52,7 @@ public class LoadFootpoint implements Callable<TimeMap<Position>> {
                 String[] values = Regex.Comma.split(line);
                 if (values.length > 8) {
                     try {
-                        JHVTime time = new JHVTime(TimeUtils.parse(timeFormatter, values[6]));
+                        JHVTime time = new JHVTime(parseTime(values[6]));
                         double lon = Math.toRadians(Double.parseDouble(values[7]));
                         double lat = Math.toRadians(Double.parseDouble(values[8]));
                         positionMap.put(time, new Position(time, 1, lon, lat));
