@@ -14,6 +14,7 @@ import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
@@ -61,13 +62,14 @@ class InteractionAnnotate implements InteractionType {
         Quat q = viewpoint.toQuat();
         Annotateable activeAnn = activeIndex >= 0 && activeIndex < anns.size() ? anns.get(activeIndex) : null;
 
+        Quat q1 = Layers.getGridLayer().getGridType().toQuat(viewpoint); //!
         anns.forEach(annotateable -> {
             boolean active = annotateable == activeAnn;
-            annotateable.draw(q, vp, active, annsBuf);
+            annotateable.draw(q1, vp, active, annsBuf);
             annotateable.drawTransformed(active, transBuf, centerBuf);
         });
         if (newAnnotateable != null) {
-            newAnnotateable.draw(q, vp, false, annsBuf);
+            newAnnotateable.draw(q1, vp, false, annsBuf);
             newAnnotateable.drawTransformed(false, transBuf, centerBuf);
         }
         annsLine.setData(gl, annsBuf);
