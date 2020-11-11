@@ -54,6 +54,9 @@ public class LoadFootpoint implements Callable<TimeMap<Position>> {
                 }
             }
         }
+
+        if (positionMap.isEmpty())
+            return null;
         positionMap.buildIndex();
         return positionMap;
     }
