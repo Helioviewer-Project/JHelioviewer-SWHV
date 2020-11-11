@@ -29,7 +29,7 @@ import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public class ConnectLayer extends AbstractLayer implements PositionMapReceiver {
+public class ConnectionLayer extends AbstractLayer implements PositionMapReceiver {
 
     private static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
     private static final double radius = 1.01;
@@ -46,7 +46,7 @@ public class ConnectLayer extends AbstractLayer implements PositionMapReceiver {
     public void serialize(JSONObject jo) {
     }
 
-    public ConnectLayer(JSONObject jo) {
+    public ConnectionLayer(JSONObject jo) {
         optionsPanel = optionsPanel();
     }
 
@@ -102,7 +102,7 @@ public class ConnectLayer extends AbstractLayer implements PositionMapReceiver {
 
     @Override
     public String getName() {
-        return "Connect";
+        return "Connection";
     }
 
     @Nullable
