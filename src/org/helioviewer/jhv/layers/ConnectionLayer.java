@@ -5,6 +5,7 @@ import java.awt.FileDialog;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.File;
+import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.swing.JButton;
@@ -12,7 +13,6 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.PositionCartesian;
-import org.helioviewer.jhv.astronomy.PositionMapReceiver;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.annotate.AnnotateCross;
@@ -20,6 +20,9 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.connect.LoadFootpoint;
+import org.helioviewer.jhv.layers.connect.LoadHCS;
+import org.helioviewer.jhv.layers.connect.PositionMapReceiver;
+import org.helioviewer.jhv.layers.connect.VecListReceiver;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -30,17 +33,18 @@ import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public class ConnectionLayer extends AbstractLayer implements PositionMapReceiver {
+public class ConnectionLayer extends AbstractLayer implements PositionMapReceiver, VecListReceiver {
 
     private static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
     private static final double radius = 1.01;
 
-    private final GLSLLine footpoint = new GLSLLine(true);
+    private final GLSLLine footpointLine = new GLSLLine(true);
     private final BufVertex footpointBuf = new BufVertex(12 * GLSLLine.stride);
 
     private final JPanel optionsPanel;
 
-    private TimeMap<PositionCartesian> positionMap;
+    private List<Vec3> hcsList;
+    private TimeMap<PositionCartesian> footpointMap;
     private JHVTime lastTimestamp;
 
     @Override
@@ -55,9 +59,8 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.idx])
             return;
-        if (positionMap == null)
-            return;
-        drawInterpolated(camera, vp, gl);
+        if (footpointMap != null)
+            drawFootpointInterpolated(camera, vp, gl);
     }
 
     @Override
@@ -77,9 +80,9 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
     }
 
     /*
-        private void drawNearest(Camera camera, Viewport vp, GL2 gl) {
+        private void drawFootpointNearest(Camera camera, Viewport vp, GL2 gl) {
             Position viewpoint = camera.getViewpoint();
-            PositionCartesian p = positionMap.nearestValue(viewpoint.time);
+            PositionCartesian p = footpointMap.nearestValue(viewpoint.time);
             if (!p.time.equals(lastTimestamp)) {
                 lastTimestamp = p.time; // should be reset to null
                 JHVFrame.getLayers().fireTimeUpdated(this);
@@ -89,33 +92,33 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
             Quat q = Layers.getGridLayer().getGridType().toQuat(viewpoint);
 
             AnnotateCross.drawCross(q, vp, v, footpointBuf, Colors.Green);
-            footpoint.setData(gl, footpointBuf);
-            footpoint.render(gl, vp.aspect, LINEWIDTH);
+            footpointLine.setData(gl, footpointBuf);
+            footpointLine.render(gl, vp.aspect, LINEWIDTH);
         }
     */
-    private void drawInterpolated(Camera camera, Viewport vp, GL2 gl) {
+    private void drawFootpointInterpolated(Camera camera, Viewport vp, GL2 gl) {
         Position viewpoint = camera.getViewpoint();
         if (!viewpoint.time.equals(lastTimestamp)) {
             lastTimestamp = viewpoint.time;
             JHVFrame.getLayers().fireTimeUpdated(this);
         }
 
-        Vec3 v = interpolate(viewpoint.time.milli, positionMap.lowerValue(viewpoint.time), positionMap.higherValue(viewpoint.time));
+        Vec3 v = interpolate(viewpoint.time.milli, footpointMap.lowerValue(viewpoint.time), footpointMap.higherValue(viewpoint.time));
         Quat q = Layers.getGridLayer().getGridType().toQuat(viewpoint);
 
         AnnotateCross.drawCross(q, vp, v, footpointBuf, Colors.Green);
-        footpoint.setData(gl, footpointBuf);
-        footpoint.render(gl, vp.aspect, LINEWIDTH);
+        footpointLine.setData(gl, footpointBuf);
+        footpointLine.render(gl, vp.aspect, LINEWIDTH);
     }
 
     @Override
     public void init(GL2 gl) {
-        footpoint.init(gl);
+        footpointLine.init(gl);
     }
 
     @Override
     public void dispose(GL2 gl) {
-        footpoint.dispose(gl);
+        footpointLine.dispose(gl);
     }
 
     @Override
@@ -153,14 +156,23 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
     }
 
     @Override
-    public void setMap(TimeMap<PositionCartesian> _positionMap) {
-        positionMap = _positionMap;
+    public void setMap(TimeMap<PositionCartesian> _footpointMap) {
+        footpointMap = _footpointMap;
+        MovieDisplay.display();
+    }
+
+    @Override
+    public void setList(List<Vec3> _hcsList) {
+        hcsList = _hcsList;
         MovieDisplay.display();
     }
 
     private JPanel optionsPanel() {
-        JButton button = new JButton("Footpoint");
-        button.addActionListener(e -> loadFootpoint());
+        JButton footpointBtn = new JButton("Footpoint");
+        footpointBtn.addActionListener(e -> loadFootpoint());
+
+        JButton hcsBtn = new JButton("HCS");
+        hcsBtn.addActionListener(e -> loadHCS());
 
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints c0 = new GridBagConstraints();
@@ -168,8 +180,11 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
         c0.weightx = 1.;
         c0.weighty = 1.;
         c0.gridy = 0;
+
         c0.gridx = 0;
-        panel.add(button, c0);
+        panel.add(footpointBtn, c0);
+        c0.gridx = 1;
+        panel.add(hcsBtn, c0);
 
         ComponentUtils.smallVariant(panel);
         return panel;
@@ -182,6 +197,15 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
         File[] fileNames = fileDialog.getFiles();
         if (fileNames.length > 0 && fileNames[0].isFile())
             LoadFootpoint.submit(fileNames[0].toURI(), this);
+    }
+
+    private void loadHCS() {
+        FileDialog fileDialog = new FileDialog(JHVFrame.getFrame(), "Choose a file", FileDialog.LOAD);
+        fileDialog.setVisible(true);
+
+        File[] fileNames = fileDialog.getFiles();
+        if (fileNames.length > 0 && fileNames[0].isFile())
+            LoadHCS.submit(fileNames[0].toURI(), this);
     }
 
 }
