@@ -4,7 +4,6 @@ import java.util.Iterator;
 
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.time.JHVTime;
-import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -19,8 +18,8 @@ public class PositionResponse {
         if (len == 0)
             throw new Exception("Empty response");
         position = _position;
-        positionStart = position[0].milli;
-        positionEnd = position[len - 1].milli;
+        positionStart = position[0].time.milli;
+        positionEnd = position[len - 1].time.milli;
     }
 
     PositionResponse(JSONObject jo) throws Exception {
@@ -42,10 +41,10 @@ public class PositionResponse {
             double x = posArray.getDouble(0) * Sun.RadiusKMeterInv;
             double y = posArray.getDouble(1) * Sun.RadiusKMeterInv;
             double z = posArray.getDouble(2) * Sun.RadiusKMeterInv;
-            position[i] = new PositionCartesian(TimeUtils.parse(date), x, y, z);
+            position[i] = new PositionCartesian(new JHVTime(date), x, y, z);
         }
-        positionStart = position[0].milli;
-        positionEnd = position[len - 1].milli;
+        positionStart = position[0].time.milli;
+        positionEnd = position[len - 1].time.milli;
     }
 
     long interpolateTime(long t, long start, long end) {
@@ -72,8 +71,8 @@ public class PositionResponse {
             i = MathUtils.clip(i, 0, position.length - 1);
             int inext = Math.min(i + 1, position.length - 1);
 
-            long tstart = position[i].milli;
-            long tend = position[inext].milli;
+            long tstart = position[i].time.milli;
+            long tend = position[inext].time.milli;
 
             double alpha = tend == tstart ? 1. : ((time - tstart) / (double) (tend - tstart)) % 1.;
             x = (1. - alpha) * position[i].x + alpha * position[inext].x;
@@ -109,8 +108,8 @@ public class PositionResponse {
             i = MathUtils.clip(i, 0, position.length - 1);
             int inext = Math.min(i + 1, position.length - 1);
 
-            long tstart = position[i].milli;
-            long tend = position[inext].milli;
+            long tstart = position[i].time.milli;
+            long tend = position[inext].time.milli;
 
             double alpha = tend == tstart ? 1. : ((time - tstart) / (double) (tend - tstart)) % 1.;
             x = (1. - alpha) * position[i].x + alpha * position[inext].x;
@@ -146,8 +145,8 @@ public class PositionResponse {
             i = MathUtils.clip(i, 0, position.length - 1);
             int inext = Math.min(i + 1, position.length - 1);
 
-            long tstart = position[i].milli;
-            long tend = position[inext].milli;
+            long tstart = position[i].time.milli;
+            long tend = position[inext].time.milli;
 
             double alpha = tend == tstart ? 1. : ((time - tstart) / (double) (tend - tstart)) % 1.;
             x = (1. - alpha) * position[i].x + alpha * position[inext].x;

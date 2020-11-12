@@ -7,7 +7,7 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.astronomy.PositionCartesian;
 import org.helioviewer.jhv.astronomy.PositionMapReceiver;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.gui.Message;
@@ -20,7 +20,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-public class LoadFootpoint implements Callable<TimeMap<Position>> {
+public class LoadFootpoint implements Callable<TimeMap<PositionCartesian>> {
 
     private static final DateTimeFormatter euroTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
@@ -43,8 +43,8 @@ public class LoadFootpoint implements Callable<TimeMap<Position>> {
     }
 
     @Override
-    public TimeMap<Position> call() throws Exception {
-        TimeMap<Position> positionMap = new TimeMap<>();
+    public TimeMap<PositionCartesian> call() throws Exception {
+        TimeMap<PositionCartesian> positionMap = new TimeMap<>();
 
         try (NetClient nc = NetClient.of(uri); BufferedReader br = new BufferedReader(nc.getReader())) {
             String line = br.readLine(); // skip first line
@@ -55,7 +55,11 @@ public class LoadFootpoint implements Callable<TimeMap<Position>> {
                         JHVTime time = new JHVTime(parseTime(values[6]));
                         double lon = Math.toRadians(Double.parseDouble(values[7]));
                         double lat = Math.toRadians(Double.parseDouble(values[8]));
-                        positionMap.put(time, new Position(time, 1, lon, lat));
+                        double x = Math.cos(lat) * Math.sin(lon);
+                        double y = Math.sin(lat);
+                        double z = Math.cos(lat) * Math.cos(lon);
+
+                        positionMap.put(time, new PositionCartesian(time, x, y, z));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -69,7 +73,7 @@ public class LoadFootpoint implements Callable<TimeMap<Position>> {
         return positionMap;
     }
 
-    private static class Callback implements FutureCallback<TimeMap<Position>> {
+    private static class Callback implements FutureCallback<TimeMap<PositionCartesian>> {
 
         private final PositionMapReceiver receiver;
 
@@ -78,7 +82,7 @@ public class LoadFootpoint implements Callable<TimeMap<Position>> {
         }
 
         @Override
-        public void onSuccess(TimeMap<Position> result) {
+        public void onSuccess(TimeMap<PositionCartesian> result) {
             receiver.setMap(result);
         }
 

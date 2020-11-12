@@ -4,6 +4,6 @@ import org.helioviewer.jhv.time.TimeMap;
 
 public interface PositionMapReceiver {
 
-    void setMap(TimeMap<Position> positionMap);
+    void setMap(TimeMap<PositionCartesian> positionMap);
 
 }
