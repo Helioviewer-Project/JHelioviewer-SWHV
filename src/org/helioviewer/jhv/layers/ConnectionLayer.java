@@ -6,6 +6,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.File;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -54,6 +55,9 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
     private final JPanel optionsPanel;
 
     private List<Vec3> hcsList;
+    private List<Vec3> hcsListOrtho;
+    private List<Vec3> hcsListScale;
+
     private TimeMap<PositionCartesian> footpointMap;
     private JHVTime lastTimestamp;
 
@@ -81,52 +85,26 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
     }
 
     private void drawHCS(Camera camera, Viewport vp, GL2 gl) {
-        int size = hcsList.size();
-        Vec3 v, vv = new Vec3();
-
         if (Display.mode == Display.DisplayMode.Orthographic) {
-            for (int i = 0; i < size; i++) {
-                v = hcsList.get(i);
-                vv.x = radius * v.x;
-                vv.y = radius * v.y;
-                vv.z = radius * v.z;
-
-                if (i == 0) {
-                    hcsBuf.putVertex(vv, Colors.Null);
-                }
-                hcsBuf.putVertex(vv, hcsColor);
-                if (i == size - 1) {
-                    v = hcsList.get(0);
-                    vv.x = radius * v.x;
-                    vv.y = radius * v.y;
-                    vv.z = radius * v.z;
-                    hcsBuf.putVertex(vv, hcsColor);
-                    hcsBuf.putVertex(vv, Colors.Null);
-                }
-            }
+            Vec3 first = hcsListOrtho.get(0);
+            hcsBuf.putVertex(first, Colors.Null);
+            hcsListOrtho.forEach(v -> hcsBuf.putVertex(v, hcsColor));
+            hcsBuf.putVertex(first, hcsColor);
+            hcsBuf.putVertex(first, Colors.Null);
         } else {
             Quat q = Layers.getGridLayer().getGridType().toQuat(camera.getViewpoint());
             Vec2 previous = null;
 
-            for (int i = 0; i < size; i++) {
-                v = hcsList.get(i);
-                vv.x = v.x;
-                vv.y = -v.y;
-                vv.z = v.z;
+            Vec3 first = hcsListScale.get(0);
+            GLHelper.drawVertex(q, vp, first, previous, hcsBuf, Colors.Null);
 
-                if (i == 0) {
-                    GLHelper.drawVertex(q, vp, vv, previous, hcsBuf, Colors.Null);
-                }
-                previous = GLHelper.drawVertex(q, vp, vv, previous, hcsBuf, hcsColor);
-                if (i == size - 1) {
-                    v = hcsList.get(0);
-                    vv.x = v.x;
-                    vv.y = -v.y;
-                    vv.z = v.z;
-                    previous = GLHelper.drawVertex(q, vp, vv, previous, hcsBuf, hcsColor);
-                    GLHelper.drawVertex(q, vp, vv, previous, hcsBuf, Colors.Null);
-                }
+            int size = hcsList.size();
+            for (int i = 0; i < size; i++) {
+                Vec3 v = hcsListScale.get(i);
+                previous = GLHelper.drawVertex(q, vp, v, previous, hcsBuf, hcsColor);
             }
+            previous = GLHelper.drawVertex(q, vp, first, previous, hcsBuf, hcsColor);
+            GLHelper.drawVertex(q, vp, first, previous, hcsBuf, Colors.Null);
         }
 
         hcsLine.setData(gl, hcsBuf);
@@ -231,6 +209,13 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
     @Override
     public void setList(List<Vec3> _hcsList) {
         hcsList = _hcsList;
+
+        int size = hcsList.size();
+        hcsListOrtho = new ArrayList<>(size);
+        hcsList.forEach(v -> hcsListOrtho.add(new Vec3(radius * v.x, radius * v.y, radius * v.z)));
+        hcsListScale = new ArrayList<>(size);
+        hcsList.forEach(v -> hcsListScale.add(new Vec3(v.x, -v.y, v.z)));
+
         MovieDisplay.display();
     }
 
