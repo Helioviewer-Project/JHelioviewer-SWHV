@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.astronomy.PositionCartesian;
 import org.helioviewer.jhv.astronomy.PositionMapReceiver;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
@@ -39,7 +40,7 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
 
     private final JPanel optionsPanel;
 
-    private TimeMap<Position> positionMap;
+    private TimeMap<PositionCartesian> positionMap;
     private JHVTime lastTimestamp;
 
     @Override
@@ -64,22 +65,13 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
         render(camera, vp, gl);
     }
 
-    private static Vec3 interpolate(long t, Position prev, Position next) {
-        double xprev = Math.cos(prev.lat) * Math.sin(prev.lon);
-        double yprev = Math.sin(prev.lat);
-        double zprev = Math.cos(prev.lat) * Math.cos(prev.lon);
-
-        double xnext = Math.cos(next.lat) * Math.sin(next.lon);
-        double ynext = Math.sin(next.lat);
-        double znext = Math.cos(next.lat) * Math.cos(next.lon);
-
+    private static Vec3 interpolate(long t, PositionCartesian prev, PositionCartesian next) {
         long tprev = prev.time.milli;
         long tnext = next.time.milli;
-
         double alpha = tnext == tprev ? 1. : ((t - tprev) / (double) (tnext - tprev)) % 1.;
-        double x = (1. - alpha) * xprev + alpha * xnext;
-        double y = (1. - alpha) * yprev + alpha * ynext;
-        double z = (1. - alpha) * zprev + alpha * znext;
+        double x = (1. - alpha) * prev.x + alpha * next.x;
+        double y = (1. - alpha) * prev.y + alpha * next.y;
+        double z = (1. - alpha) * prev.z + alpha * next.z;
 
         return new Vec3(radius, Math.acos(y), Math.atan2(x, z));
     }
@@ -87,13 +79,13 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
     /*
         private void drawNearest(Camera camera, Viewport vp, GL2 gl) {
             Position viewpoint = camera.getViewpoint();
-            Position p = positionMap.nearestValue(viewpoint.time);
+            PositionCartesian p = positionMap.nearestValue(viewpoint.time);
             if (!p.time.equals(lastTimestamp)) {
                 lastTimestamp = p.time; // should be reset to null
                 JHVFrame.getLayers().fireTimeUpdated(this);
             }
 
-            Vec3 v = new Vec3(radius, Math.PI / 2 - p.lat, p.lon);
+            Vec3 v = new Vec3(radius, Math.acos(p.y), Math.atan2(p.x, p.z));
             Quat q = Layers.getGridLayer().getGridType().toQuat(viewpoint);
 
             AnnotateCross.drawCross(q, vp, v, footpointBuf, Colors.Green);
@@ -153,7 +145,7 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
     }
 
     @Override
-    public void setMap(TimeMap<Position> _positionMap) {
+    public void setMap(TimeMap<PositionCartesian> _positionMap) {
         positionMap = _positionMap;
         MovieDisplay.display();
     }

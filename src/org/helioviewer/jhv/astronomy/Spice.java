@@ -45,7 +45,7 @@ public class Spice {
             int i = 0;
             for (long milli = start; milli <= end; milli += dt) {
                 double[] v = positionRectangular(target, milli, frame, observer);
-                ret[i++] = new PositionCartesian(milli, v[0], v[1], v[2]);
+                ret[i++] = new PositionCartesian(new JHVTime(milli), v[0], v[1], v[2]);
             }
             //System.out.println((sw.elapsed().toNanos() / 1e9));
             return ret;
