@@ -5,7 +5,9 @@ import java.awt.FileDialog;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.File;
+import java.net.URI;
 import java.util.List;
+import java.util.function.BiFunction;
 
 import javax.annotation.Nullable;
 import javax.swing.JButton;
@@ -16,6 +18,7 @@ import org.helioviewer.jhv.astronomy.PositionCartesian;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.annotate.AnnotateCross;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.JHVFrame;
@@ -24,8 +27,10 @@ import org.helioviewer.jhv.layers.connect.LoadHCS;
 import org.helioviewer.jhv.layers.connect.PositionMapReceiver;
 import org.helioviewer.jhv.layers.connect.VecListReceiver;
 import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
+import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
@@ -38,8 +43,13 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
     private static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
     private static final double radius = 1.01;
 
+    private final byte[] footpointColor = Colors.Green;
     private final GLSLLine footpointLine = new GLSLLine(true);
     private final BufVertex footpointBuf = new BufVertex(12 * GLSLLine.stride);
+
+    private final byte[] hcsColor = Colors.Red;
+    private final GLSLLine hcsLine = new GLSLLine(true); // TBD
+    private final BufVertex hcsBuf = new BufVertex(512 * GLSLLine.stride);
 
     private final JPanel optionsPanel;
 
@@ -61,11 +71,66 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
             return;
         if (footpointMap != null)
             drawFootpointInterpolated(camera, vp, gl);
+        if (hcsList != null)
+            drawHCS(camera, vp, gl);
     }
 
     @Override
     public void renderScale(Camera camera, Viewport vp, GL2 gl) {
         render(camera, vp, gl);
+    }
+
+    private void drawHCS(Camera camera, Viewport vp, GL2 gl) {
+        int size = hcsList.size();
+        Vec3 v, vv = new Vec3();
+
+        if (Display.mode == Display.DisplayMode.Orthographic) {
+            for (int i = 0; i < size; i++) {
+                v = hcsList.get(i);
+                vv.x = radius * v.x;
+                vv.y = radius * v.y;
+                vv.z = radius * v.z;
+
+                if (i == 0) {
+                    hcsBuf.putVertex(vv, Colors.Null);
+                }
+                hcsBuf.putVertex(vv, hcsColor);
+                if (i == size - 1) {
+                    v = hcsList.get(0);
+                    vv.x = radius * v.x;
+                    vv.y = radius * v.y;
+                    vv.z = radius * v.z;
+                    hcsBuf.putVertex(vv, hcsColor);
+                    hcsBuf.putVertex(vv, Colors.Null);
+                }
+            }
+        } else {
+            Quat q = Layers.getGridLayer().getGridType().toQuat(camera.getViewpoint());
+            Vec2 previous = null;
+
+            for (int i = 0; i < size; i++) {
+                v = hcsList.get(i);
+                vv.x = v.x;
+                vv.y = -v.y;
+                vv.z = v.z;
+
+                if (i == 0) {
+                    GLHelper.drawVertex(q, vp, vv, previous, hcsBuf, Colors.Null);
+                }
+                previous = GLHelper.drawVertex(q, vp, vv, previous, hcsBuf, hcsColor);
+                if (i == size - 1) {
+                    v = hcsList.get(0);
+                    vv.x = v.x;
+                    vv.y = -v.y;
+                    vv.z = v.z;
+                    previous = GLHelper.drawVertex(q, vp, vv, previous, hcsBuf, hcsColor);
+                    GLHelper.drawVertex(q, vp, vv, previous, hcsBuf, Colors.Null);
+                }
+            }
+        }
+
+        hcsLine.setData(gl, hcsBuf);
+        hcsLine.render(gl, vp.aspect, 2 * LINEWIDTH);
     }
 
     private static Vec3 interpolate(long t, PositionCartesian prev, PositionCartesian next) {
@@ -91,7 +156,7 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
             Vec3 v = new Vec3(radius, Math.acos(p.y), Math.atan2(p.x, p.z));
             Quat q = Layers.getGridLayer().getGridType().toQuat(viewpoint);
 
-            AnnotateCross.drawCross(q, vp, v, footpointBuf, Colors.Green);
+            AnnotateCross.drawCross(q, vp, v, footpointBuf, footpointColor);
             footpointLine.setData(gl, footpointBuf);
             footpointLine.render(gl, vp.aspect, LINEWIDTH);
         }
@@ -106,7 +171,7 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
         Vec3 v = interpolate(viewpoint.time.milli, footpointMap.lowerValue(viewpoint.time), footpointMap.higherValue(viewpoint.time));
         Quat q = Layers.getGridLayer().getGridType().toQuat(viewpoint);
 
-        AnnotateCross.drawCross(q, vp, v, footpointBuf, Colors.Green);
+        AnnotateCross.drawCross(q, vp, v, footpointBuf, footpointColor);
         footpointLine.setData(gl, footpointBuf);
         footpointLine.render(gl, vp.aspect, LINEWIDTH);
     }
@@ -114,11 +179,13 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
     @Override
     public void init(GL2 gl) {
         footpointLine.init(gl);
+        hcsLine.init(gl);
     }
 
     @Override
     public void dispose(GL2 gl) {
         footpointLine.dispose(gl);
+        hcsLine.dispose(gl);
     }
 
     @Override
@@ -169,10 +236,10 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
 
     private JPanel optionsPanel() {
         JButton footpointBtn = new JButton("Footpoint");
-        footpointBtn.addActionListener(e -> loadFootpoint());
+        footpointBtn.addActionListener(e -> load(LoadFootpoint::submit));
 
         JButton hcsBtn = new JButton("HCS");
-        hcsBtn.addActionListener(e -> loadHCS());
+        hcsBtn.addActionListener(e -> load(LoadHCS::submit));
 
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints c0 = new GridBagConstraints();
@@ -190,22 +257,13 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
         return panel;
     }
 
-    private void loadFootpoint() {
+    private void load(BiFunction<URI, ConnectionLayer, Void> func) {
         FileDialog fileDialog = new FileDialog(JHVFrame.getFrame(), "Choose a file", FileDialog.LOAD);
         fileDialog.setVisible(true);
 
         File[] fileNames = fileDialog.getFiles();
         if (fileNames.length > 0 && fileNames[0].isFile())
-            LoadFootpoint.submit(fileNames[0].toURI(), this);
-    }
-
-    private void loadHCS() {
-        FileDialog fileDialog = new FileDialog(JHVFrame.getFrame(), "Choose a file", FileDialog.LOAD);
-        fileDialog.setVisible(true);
-
-        File[] fileNames = fileDialog.getFiles();
-        if (fileNames.length > 0 && fileNames[0].isFile())
-            LoadHCS.submit(fileNames[0].toURI(), this);
+            func.apply(fileNames[0].toURI(), this);
     }
 
 }

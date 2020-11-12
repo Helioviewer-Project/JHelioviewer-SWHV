@@ -8,7 +8,6 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.NetClient;
@@ -20,8 +19,9 @@ import com.google.common.util.concurrent.FutureCallback;
 
 public class LoadHCS implements Callable<List<Vec3>> {
 
-    public static void submit(@Nonnull URI uri, VecListReceiver receiver) {
+    public static Void submit(@Nonnull URI uri, VecListReceiver receiver) {
         EventQueueCallbackExecutor.pool.submit(new LoadHCS(uri), new Callback(receiver));
+        return null;
     }
 
     private final URI uri;
@@ -45,12 +45,11 @@ public class LoadHCS implements Callable<List<Vec3>> {
                 String[] values = Regex.MultiSpace.split(line);
                 if (values.length > 4) {
                     try {
-                        double r = Double.parseDouble(values[2]) / Sun.RadiusMeter;
                         double lat = Math.toRadians(Double.parseDouble(values[3]));
                         double lon = Math.toRadians(Double.parseDouble(values[4]));
-                        double x = r * Math.cos(lat) * Math.sin(lon);
-                        double y = r * Math.sin(lat);
-                        double z = r * Math.cos(lat) * Math.cos(lon);
+                        double x = Math.cos(lat) * Math.sin(lon);
+                        double y = Math.sin(lat);
+                        double z = Math.cos(lat) * Math.cos(lon);
                         vecList.add(new Vec3(x, y, z));
                     } catch (Exception e) {
                         e.printStackTrace();
