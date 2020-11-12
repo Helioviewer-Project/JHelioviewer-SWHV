@@ -8,7 +8,6 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.astronomy.PositionCartesian;
-import org.helioviewer.jhv.astronomy.PositionMapReceiver;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.NetClient;
@@ -47,7 +46,9 @@ public class LoadFootpoint implements Callable<TimeMap<PositionCartesian>> {
         TimeMap<PositionCartesian> positionMap = new TimeMap<>();
 
         try (NetClient nc = NetClient.of(uri); BufferedReader br = new BufferedReader(nc.getReader())) {
-            String line = br.readLine(); // skip first line
+            br.readLine(); // skip 1st line
+
+            String line;
             while ((line = br.readLine()) != null) {
                 String[] values = Regex.Comma.split(line);
                 if (values.length > 8) {

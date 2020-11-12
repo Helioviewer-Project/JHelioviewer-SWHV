@@ -1,5 +1,6 @@
-package org.helioviewer.jhv.astronomy;
+package org.helioviewer.jhv.layers.connect;
 
+import org.helioviewer.jhv.astronomy.PositionCartesian;
 import org.helioviewer.jhv.time.TimeMap;
 
 public interface PositionMapReceiver {
