@@ -23,8 +23,9 @@ public class LoadFootpoint implements Callable<TimeMap<PositionCartesian>> {
 
     private static final DateTimeFormatter euroTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    public static void submit(@Nonnull URI uri, PositionMapReceiver receiver) {
+    public static Void submit(@Nonnull URI uri, PositionMapReceiver receiver) {
         EventQueueCallbackExecutor.pool.submit(new LoadFootpoint(uri), new Callback(receiver));
+        return null;
     }
 
     private final URI uri;
