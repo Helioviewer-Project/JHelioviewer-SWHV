@@ -96,7 +96,7 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
     private void drawInterpolated(Camera camera, Viewport vp, GL2 gl) {
         Position viewpoint = camera.getViewpoint();
         if (!viewpoint.time.equals(lastTimestamp)) {
-            lastTimestamp = viewpoint.time; // should be reset to null
+            lastTimestamp = viewpoint.time;
             JHVFrame.getLayers().fireTimeUpdated(this);
         }
 
@@ -124,6 +124,14 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
     }
 
     @Override
+    public void setEnabled(boolean _enabled) {
+        super.setEnabled(_enabled);
+        if (!enabled) {
+            lastTimestamp = null;
+        }
+    }
+
+    @Override
     public Component getOptionsPanel() {
         return optionsPanel;
     }
@@ -136,7 +144,7 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
     @Nullable
     @Override
     public String getTimeString() {
-        return positionMap == null || lastTimestamp == null ? null : lastTimestamp.toString();
+        return lastTimestamp == null ? null : lastTimestamp.toString();
     }
 
     @Override
