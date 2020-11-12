@@ -136,7 +136,7 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
     @Nullable
     @Override
     public String getTimeString() {
-        return positionMap == null ? null : lastTimestamp.toString();
+        return positionMap == null || lastTimestamp == null ? null : lastTimestamp.toString();
     }
 
     @Override
