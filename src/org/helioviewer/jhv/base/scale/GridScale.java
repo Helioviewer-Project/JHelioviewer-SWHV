@@ -200,7 +200,7 @@ public interface GridScale {
 
             if (gridType != GridType.Viewpoint) {
                 Position viewpoint = camera.getViewpoint();
-                Quat q = Quat.rotateWithConjugate(viewpoint.toQuat(), gridType.toQuat(viewpoint));
+                Quat q = Quat.rotateWithConjugate(viewpoint.toQuat(), gridType.toCarrington(viewpoint));
                 p = q.rotateInverseVector(p);
             }
 

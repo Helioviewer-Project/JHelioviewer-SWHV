@@ -129,7 +129,7 @@ public class GridLayer extends AbstractLayer {
         double pixelsPerSolarRadius = textScale * pixFactor;
 
         Transform.pushView();
-        Transform.rotateViewInverse(gridType.toQuat(viewpoint));
+        Transform.rotateViewInverse(gridType.toCarrington(viewpoint));
         {
             gridLine.render(gl, vp.aspect, LINEWIDTH);
             if (showLabels) {
