@@ -22,10 +22,10 @@ public class AnnotateCross extends AbstractAnnotateable {
 
     public static void drawCross(Quat q, Viewport vp, Vec3 bp, BufVertex buf, byte[] color) {
         double delta = 2.5 * Math.PI / 180;
-        Vec3 p1 = new Vec3(radius, bp.y + delta, bp.z);
-        Vec3 p2 = new Vec3(radius, bp.y - delta, bp.z);
-        Vec3 p3 = new Vec3(radius, bp.y, bp.z + delta);
-        Vec3 p4 = new Vec3(radius, bp.y, bp.z - delta);
+        Vec3 p1 = new Vec3(1, bp.y + delta, bp.z);
+        Vec3 p2 = new Vec3(1, bp.y - delta, bp.z);
+        Vec3 p3 = new Vec3(1, bp.y, bp.z + delta);
+        Vec3 p4 = new Vec3(1, bp.y, bp.z - delta);
 
         interpolatedDraw(q, vp, p1, p2, buf, color);
         interpolatedDraw(q, vp, p3, p4, buf, color);
@@ -38,11 +38,11 @@ public class AnnotateCross extends AbstractAnnotateable {
 
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 if (i == 0) {
-                    buf.putVertex(pc, Colors.Null);
+                    putSphere(pc, buf, Colors.Null);
                 }
-                buf.putVertex(pc, color);
+                putSphere(pc, buf, color);
                 if (i == SUBDIVISIONS) {
-                    buf.putVertex(pc, Colors.Null);
+                    putSphere(pc, buf, Colors.Null);
                 }
             } else {
                 pc.y = -pc.y;

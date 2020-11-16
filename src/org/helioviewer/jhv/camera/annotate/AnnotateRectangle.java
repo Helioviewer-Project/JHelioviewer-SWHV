@@ -28,8 +28,8 @@ public class AnnotateRectangle extends AbstractAnnotateable {
                 bp.z += 2 * Math.PI;
         }
 
-        Vec3 p2 = new Vec3(radius, ep.y, bp.z);
-        Vec3 p4 = new Vec3(radius, bp.y, ep.z);
+        Vec3 p2 = new Vec3(1, ep.y, bp.z);
+        Vec3 p4 = new Vec3(1, bp.y, ep.z);
         Vec3 point1, point2;
         Vec2 previous = null;
 
@@ -39,9 +39,9 @@ public class AnnotateRectangle extends AbstractAnnotateable {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 if (i == 0) { // first
-                    buf.putVertex(pc, Colors.Null);
+                    putSphere(pc, buf, Colors.Null);
                 }
-                buf.putVertex(pc, color);
+                putSphere(pc, buf, color);
             } else {
                 pc.y = -pc.y;
                 if (i == 0) {
@@ -56,7 +56,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
             if (Display.mode == Display.DisplayMode.Orthographic) {
-                buf.putVertex(pc, color);
+                putSphere(pc, buf, color);
             } else {
                 pc.y = -pc.y;
                 previous = GLHelper.drawVertex(q, vp, pc, previous, buf, color);
@@ -68,7 +68,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
             if (Display.mode == Display.DisplayMode.Orthographic) {
-                buf.putVertex(pc, color);
+                putSphere(pc, buf, color);
             } else {
                 pc.y = -pc.y;
                 previous = GLHelper.drawVertex(q, vp, pc, previous, buf, color);
@@ -80,9 +80,9 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
             if (Display.mode == Display.DisplayMode.Orthographic) {
-                buf.putVertex(pc, color);
+                putSphere(pc, buf, color);
                 if (i == SUBDIVISIONS) { // last
-                    buf.putVertex(pc, Colors.Null);
+                    putSphere(pc, buf, Colors.Null);
                 }
             } else {
                 pc.y = -pc.y;
