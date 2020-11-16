@@ -71,7 +71,7 @@ public class Camera {
 
     private void updateCamera(JHVTime time) {
         Position v = updateViewpoint.update(time);
-        viewpoint = Display.mode == Display.DisplayMode.Orthographic ? v : new Position(v.time, Sun.MeanEarthDistance, v.lon, 0);
+        viewpoint = Display.mode == Display.DisplayMode.Orthographic ? v : new Position(v.time, Sun.MeanEarthDistance, v.lon, v.lat);
         updateRotation();
         updateWidth();
     }
