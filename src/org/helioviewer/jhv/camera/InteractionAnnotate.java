@@ -62,7 +62,7 @@ class InteractionAnnotate implements InteractionType {
         Quat q = viewpoint.toQuat();
         Annotateable activeAnn = activeIndex >= 0 && activeIndex < anns.size() ? anns.get(activeIndex) : null;
 
-        Quat q1 = Layers.getGridLayer().getGridType().toQuat(viewpoint); //!
+        Quat q1 = Layers.getGridLayer().getGridType().toGrid(viewpoint); //!
         anns.forEach(annotateable -> {
             boolean active = annotateable == activeAnn;
             annotateable.draw(q1, vp, active, annsBuf);

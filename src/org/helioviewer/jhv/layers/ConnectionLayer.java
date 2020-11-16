@@ -92,7 +92,7 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
             hcsBuf.putVertex(first, hcsColor);
             hcsBuf.putVertex(first, Colors.Null);
         } else {
-            Quat q = Layers.getGridLayer().getGridType().toQuat(camera.getViewpoint());
+            Quat q = Layers.getGridLayer().getGridType().toGrid(camera.getViewpoint());
             Vec2 previous = null;
 
             Vec3 first = hcsListScale.get(0);
@@ -132,7 +132,7 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
             }
 
             Vec3 v = new Vec3(radius, Math.acos(p.y), Math.atan2(p.x, p.z));
-            Quat q = Layers.getGridLayer().getGridType().toQuat(viewpoint);
+            Quat q = Layers.getGridLayer().getGridType().toGrid(viewpoint);
 
             AnnotateCross.drawCross(q, vp, v, footpointBuf, footpointColor);
             footpointLine.setData(gl, footpointBuf);
@@ -147,7 +147,7 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
         }
 
         Vec3 v = interpolate(viewpoint.time.milli, footpointMap.lowerValue(viewpoint.time), footpointMap.higherValue(viewpoint.time));
-        Quat q = Layers.getGridLayer().getGridType().toQuat(viewpoint);
+        Quat q = Layers.getGridLayer().getGridType().toGrid(viewpoint);
 
         AnnotateCross.drawCross(q, vp, v, footpointBuf, footpointColor);
         footpointLine.setData(gl, footpointBuf);

@@ -64,7 +64,7 @@ abstract class AbstractAnnotateable implements Annotateable {
             Quat q = camera.getViewpoint().toQuat();
             return CameraHelper.getVectorFromSphere(camera, Display.getActiveViewport(), x, y, q, true);
         } else {
-            Quat q = Layers.getGridLayer().getGridType().toQuat(camera.getViewpoint()); //!
+            Quat q = Layers.getGridLayer().getGridType().toCarrington(camera.getViewpoint()); //!
             return Display.mode.xform.transformInverse(q, Display.mode.scale.mouseToGrid(x, y, Display.getActiveViewport(), camera, Layers.getGridLayer().getGridType()));
         }
     }
