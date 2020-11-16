@@ -25,7 +25,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
         double r = Math.sqrt(1 - cosf * cosf);
         // P = center + r cos(A) (bp x ep) + r sin(A) ep
 
-        Vec3 center = Vec3.multiply(bp, cosf * radius);
+        Vec3 center = Vec3.multiply(bp, cosf);
         Vec3 u = Vec3.cross(bp, ep);
         u.normalize();
         Vec3 v = Vec3.cross(bp, u);
@@ -42,11 +42,11 @@ public class AnnotateCircle extends AbstractAnnotateable {
             vx.z = center.z + cosr * u.z + sinr * v.z;
             if (Display.mode == Display.DisplayMode.Orthographic) {
                 if (i == 0) {
-                    buf.putVertex(vx, Colors.Null);
+                    putSphere(vx, buf, Colors.Null);
                 }
-                buf.putVertex(vx, color);
+                putSphere(vx, buf, color);
                 if (i == SUBDIVISIONS) {
-                    buf.putVertex(vx, Colors.Null);
+                    putSphere(vx, buf, Colors.Null);
                 }
             } else {
                 vx.y = -vx.y;

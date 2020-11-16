@@ -119,7 +119,7 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
         double y = (1. - alpha) * prev.y + alpha * next.y;
         double z = (1. - alpha) * prev.z + alpha * next.z;
 
-        return new Vec3(radius, Math.acos(y), Math.atan2(x, z));
+        return new Vec3(1, Math.acos(y), Math.atan2(x, z));
     }
 
     /*
@@ -131,7 +131,7 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
                 JHVFrame.getLayers().fireTimeUpdated(this);
             }
 
-            Vec3 v = new Vec3(radius, Math.acos(p.y), Math.atan2(p.x, p.z));
+            Vec3 v = new Vec3(1, Math.acos(p.y), Math.atan2(p.x, p.z));
             Quat q = Layers.getGridLayer().getGridType().toGrid(viewpoint);
 
             AnnotateCross.drawCross(q, vp, v, footpointBuf, footpointColor);
