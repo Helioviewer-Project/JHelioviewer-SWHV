@@ -23,6 +23,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.layers.connect.LoadConnectivity;
 import org.helioviewer.jhv.layers.connect.LoadFootpoint;
 import org.helioviewer.jhv.layers.connect.LoadHCS;
 import org.helioviewer.jhv.layers.connect.ReceiverConnectivity;
@@ -207,6 +208,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     @Override
     public void setConnectivity(Connectivity _connectivity) {
         connectivity = _connectivity;
+        // System.out.println(">>> SSW: " + connectivity.SSW.size() + " FSW: " + connectivity.FSW.size() + " M: " + connectivity.M.size());
         MovieDisplay.display();
     }
 
@@ -219,12 +221,14 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     @Override
     public void setVecList(List<Vec3> _hcsList) {
         hcsList = _hcsList;
-
-        int size = hcsList.size();
-        hcsListOrtho = new ArrayList<>(size);
-        hcsList.forEach(v -> hcsListOrtho.add(new Vec3(radius * v.x, radius * v.y, radius * v.z)));
-        hcsListScale = new ArrayList<>(size);
-        hcsList.forEach(v -> hcsListScale.add(new Vec3(v.x, -v.y, v.z)));
+        // System.out.println(">>> HCS: " + hcsList.size());
+        if (hcsList != null) {
+            int size = hcsList.size();
+            hcsListOrtho = new ArrayList<>(size);
+            hcsList.forEach(v -> hcsListOrtho.add(new Vec3(radius * v.x, radius * v.y, radius * v.z)));
+            hcsListScale = new ArrayList<>(size);
+            hcsList.forEach(v -> hcsListScale.add(new Vec3(v.x, -v.y, v.z)));
+        }
 
         MovieDisplay.display();
     }
@@ -232,6 +236,9 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     private JPanel optionsPanel() {
         JButton footpointBtn = new JButton("Footpoint");
         footpointBtn.addActionListener(e -> load(LoadFootpoint::submit));
+
+        JButton connectivityBtn = new JButton("Connectivity");
+        connectivityBtn.addActionListener(e -> load(LoadConnectivity::submit));
 
         JButton hcsBtn = new JButton("HCS");
         hcsBtn.addActionListener(e -> load(LoadHCS::submit));
@@ -246,19 +253,21 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
         c0.gridx = 0;
         panel.add(footpointBtn, c0);
         c0.gridx = 1;
+        panel.add(connectivityBtn, c0);
+        c0.gridx = 2;
         panel.add(hcsBtn, c0);
 
         ComponentUtils.smallVariant(panel);
         return panel;
     }
 
-    private void load(BiFunction<URI, ConnectionLayer, Void> func) {
+    private void load(BiFunction<URI, ConnectionLayer, Void> function) {
         FileDialog fileDialog = new FileDialog(JHVFrame.getFrame(), "Choose a file", FileDialog.LOAD);
         fileDialog.setVisible(true);
 
         File[] fileNames = fileDialog.getFiles();
         if (fileNames.length > 0 && fileNames[0].isFile())
-            func.apply(fileNames[0].toURI(), this);
+            function.apply(fileNames[0].toURI(), this);
     }
 
 }
