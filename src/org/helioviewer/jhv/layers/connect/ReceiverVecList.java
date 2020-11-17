@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.helioviewer.jhv.math.Vec3;
 
-public interface VecListReceiver {
+public interface ReceiverVecList {
 
-    void setList(List<Vec3> vecList);
+    void setVecList(List<Vec3> vecList);
 
 }

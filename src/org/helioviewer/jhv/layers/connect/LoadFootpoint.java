@@ -23,7 +23,7 @@ public class LoadFootpoint implements Callable<TimeMap<PositionCartesian>> {
 
     private static final DateTimeFormatter euroTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    public static Void submit(@Nonnull URI uri, PositionMapReceiver receiver) {
+    public static Void submit(@Nonnull URI uri, ReceiverPositionMap receiver) {
         EventQueueCallbackExecutor.pool.submit(new LoadFootpoint(uri), new Callback(receiver));
         return null;
     }
@@ -77,15 +77,15 @@ public class LoadFootpoint implements Callable<TimeMap<PositionCartesian>> {
 
     private static class Callback implements FutureCallback<TimeMap<PositionCartesian>> {
 
-        private final PositionMapReceiver receiver;
+        private final ReceiverPositionMap receiver;
 
-        Callback(PositionMapReceiver _receiver) {
+        Callback(ReceiverPositionMap _receiver) {
             receiver = _receiver;
         }
 
         @Override
         public void onSuccess(TimeMap<PositionCartesian> result) {
-            receiver.setMap(result);
+            receiver.setPositionMap(result);
         }
 
         @Override
