@@ -32,16 +32,20 @@ public class LoadHCS implements Callable<List<Vec3>> {
 
     @Override
     public List<Vec3> call() throws Exception {
-        ArrayList<Vec3> vecList = new ArrayList<>();
+        List<Vec3> vecList = new ArrayList<>();
 
         try (NetClient nc = NetClient.of(uri); BufferedReader br = new BufferedReader(nc.getReader())) {
-            br.readLine(); // skip 1st line
-            br.readLine(); // skip 2nd line
-            br.readLine(); // skip 3rd line
-            br.readLine(); // skip 4th line
-
+            int lineNo = 0;
             String line;
             while ((line = br.readLine()) != null) {
+                if (line.startsWith("#")) // skip comment lines
+                    continue;
+
+                lineNo++;
+
+                if (lineNo <= 1) // skip 1 line
+                    continue;
+
                 String[] values = Regex.MultiSpace.split(line);
                 if (values.length > 4) {
                     try {
