@@ -9,7 +9,7 @@ public enum GridType {
     Viewpoint, Stonyhurst, Carrington, HCI;
 
     public Quat toCarrington(Position viewpoint) {
-        return new Quat(this == Viewpoint ? viewpoint.lat : 0, toLongitude(viewpoint));
+        return this == Viewpoint ? viewpoint.toQuat() : new Quat(0, toLongitude(viewpoint)); // shortcircuit allocation
     }
 
     public Quat toGrid(Position viewpoint) {

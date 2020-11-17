@@ -14,10 +14,10 @@ import org.helioviewer.jhv.opengl.GLSLSolarShader;
 public class Display {
 
     public enum DisplayMode {
-        Orthographic(GLSLSolarShader.ortho, GridScale.ortho, GridTransform.transformlatitudinal),
-        Latitudinal(GLSLSolarShader.lati, GridScale.lati, GridTransform.transformlatitudinal),
-        LogPolar(GLSLSolarShader.logpolar, GridScale.logpolar, GridTransform.transformpolar),
-        Polar(GLSLSolarShader.polar, GridScale.polar, GridTransform.transformpolar);
+        Orthographic(GLSLSolarShader.ortho, GridScale.ortho, null),
+        Latitudinal(GLSLSolarShader.lati, GridScale.lati, GridTransform.xformLati),
+        LogPolar(GLSLSolarShader.logpolar, GridScale.logpolar, GridTransform.xformPolar),
+        Polar(GLSLSolarShader.polar, GridScale.polar, GridTransform.xformPolar);
 
         public final GLSLSolarShader shader;
         public final GridScale scale;
