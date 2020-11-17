@@ -11,8 +11,8 @@ public interface GridTransform {
 
     Vec3 transformInverse(Quat q, Vec2 pt);
 
-    GridTransform transformpolar = new GridTransformPolar();
-    GridTransform transformlatitudinal = new GridTransformLatitudinal();
+    GridTransform xformPolar = new GridTransformPolar();
+    GridTransform xformLati = new GridTransformLatitudinal();
 
     class GridTransformPolar implements GridTransform {
         @Override
