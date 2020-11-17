@@ -19,7 +19,7 @@ import com.google.common.util.concurrent.FutureCallback;
 
 public class LoadHCS implements Callable<List<Vec3>> {
 
-    public static Void submit(@Nonnull URI uri, VecListReceiver receiver) {
+    public static Void submit(@Nonnull URI uri, ReceiverVecList receiver) {
         EventQueueCallbackExecutor.pool.submit(new LoadHCS(uri), new Callback(receiver));
         return null;
     }
@@ -65,15 +65,15 @@ public class LoadHCS implements Callable<List<Vec3>> {
 
     private static class Callback implements FutureCallback<List<Vec3>> {
 
-        private final VecListReceiver receiver;
+        private final ReceiverVecList receiver;
 
-        Callback(VecListReceiver _receiver) {
+        Callback(ReceiverVecList _receiver) {
             receiver = _receiver;
         }
 
         @Override
         public void onSuccess(List<Vec3> result) {
-            receiver.setList(result);
+            receiver.setVecList(result);
         }
 
         @Override

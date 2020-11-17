@@ -25,8 +25,10 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.connect.LoadFootpoint;
 import org.helioviewer.jhv.layers.connect.LoadHCS;
-import org.helioviewer.jhv.layers.connect.PositionMapReceiver;
-import org.helioviewer.jhv.layers.connect.VecListReceiver;
+import org.helioviewer.jhv.layers.connect.ReceiverConnectivity;
+import org.helioviewer.jhv.layers.connect.ReceiverConnectivity.Connectivity;
+import org.helioviewer.jhv.layers.connect.ReceiverPositionMap;
+import org.helioviewer.jhv.layers.connect.ReceiverVecList;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -39,7 +41,7 @@ import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public class ConnectionLayer extends AbstractLayer implements PositionMapReceiver, VecListReceiver {
+public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivity, ReceiverPositionMap, ReceiverVecList {
 
     private static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
     private static final double radius = 1.01;
@@ -53,6 +55,8 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
     private final BufVertex hcsBuf = new BufVertex(512 * GLSLLine.stride);
 
     private final JPanel optionsPanel;
+
+    private Connectivity connectivity;
 
     private List<Vec3> hcsList;
     private List<Vec3> hcsListOrtho;
@@ -201,13 +205,19 @@ public class ConnectionLayer extends AbstractLayer implements PositionMapReceive
     }
 
     @Override
-    public void setMap(TimeMap<PositionCartesian> _footpointMap) {
+    public void setConnectivity(Connectivity _connectivity) {
+        connectivity = _connectivity;
+        MovieDisplay.display();
+    }
+
+    @Override
+    public void setPositionMap(TimeMap<PositionCartesian> _footpointMap) {
         footpointMap = _footpointMap;
         MovieDisplay.display();
     }
 
     @Override
-    public void setList(List<Vec3> _hcsList) {
+    public void setVecList(List<Vec3> _hcsList) {
         hcsList = _hcsList;
 
         int size = hcsList.size();
