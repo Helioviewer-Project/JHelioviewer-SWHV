@@ -34,6 +34,7 @@ import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLLine;
+//import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
 import org.json.JSONObject;
@@ -45,13 +46,21 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     private static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
     private static final double radius = 1.01;
 
-    private final byte[] footpointColor = Colors.Green;
-    private final GLSLLine footpointLine = new GLSLLine(true);
-    private final BufVertex footpointBuf = new BufVertex(12 * GLSLLine.stride);
+    private final byte[] sswColor = Colors.Red;
+    private final byte[] fswColor = Colors.Green;
+    private final byte[] mColor = Colors.Orange;
+    // private final GLSLShape connectivityCenter = new GLSLShape(true);
+    // private final BufVertex connectivityBuf = new BufVertex(96 * GLSLShape.stride);
+    private final GLSLLine connectivityCenter = new GLSLLine(true);
+    private final BufVertex connectivityBuf = new BufVertex(96 * GLSLLine.stride);
 
     private final byte[] hcsColor = Colors.Red;
     private final GLSLLine hcsLine = new GLSLLine(true); // TBD
     private final BufVertex hcsBuf = new BufVertex(512 * GLSLLine.stride);
+
+    private final byte[] footpointColor = Colors.Green;
+    private final GLSLLine footpointLine = new GLSLLine(true);
+    private final BufVertex footpointBuf = new BufVertex(12 * GLSLLine.stride);
 
     private final JPanel optionsPanel;
 
@@ -73,15 +82,28 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.idx])
             return;
-        if (footpointMap != null)
-            drawFootpointInterpolated(camera, vp, gl);
+        if (connectivity != null)
+            drawConnectivity(camera, vp, gl);
         if (hcs != null)
             drawHCS(camera, vp, gl);
+        if (footpointMap != null)
+            drawFootpointInterpolated(camera, vp, gl);
     }
 
     @Override
     public void renderScale(Camera camera, Viewport vp, GL2 gl) {
         render(camera, vp, gl);
+    }
+
+    private void drawConnectivity(Camera camera, Viewport vp, GL2 gl) {
+        Position viewpoint = camera.getViewpoint();
+        Quat q = Layers.getGridLayer().getGridType().toGrid(viewpoint);
+
+        connectivity.SSW.forEach(v -> AnnotateCross.drawCross(q, vp, v, connectivityBuf, sswColor));
+        connectivity.FSW.forEach(v -> AnnotateCross.drawCross(q, vp, v, connectivityBuf, fswColor));
+        connectivity.M.forEach(v -> AnnotateCross.drawCross(q, vp, v, connectivityBuf, mColor));
+        connectivityCenter.setData(gl, connectivityBuf);
+        connectivityCenter.render(gl, vp.aspect, LINEWIDTH);
     }
 
     private void drawHCS(Camera camera, Viewport vp, GL2 gl) {
@@ -156,14 +178,16 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
 
     @Override
     public void init(GL2 gl) {
-        footpointLine.init(gl);
+        connectivityCenter.init(gl);
         hcsLine.init(gl);
+        footpointLine.init(gl);
     }
 
     @Override
     public void dispose(GL2 gl) {
-        footpointLine.dispose(gl);
+        connectivityCenter.dispose(gl);
         hcsLine.dispose(gl);
+        footpointLine.dispose(gl);
     }
 
     @Override
@@ -221,14 +245,14 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     }
 
     private JPanel optionsPanel() {
-        JButton footpointBtn = new JButton("Footpoint");
-        footpointBtn.addActionListener(e -> load(LoadFootpoint::submit));
-
         JButton connectivityBtn = new JButton("Connectivity");
         connectivityBtn.addActionListener(e -> load(LoadConnectivity::submit));
 
         JButton hcsBtn = new JButton("HCS");
         hcsBtn.addActionListener(e -> load(LoadHCS::submit));
+
+        JButton footpointBtn = new JButton("Footpoint");
+        footpointBtn.addActionListener(e -> load(LoadFootpoint::submit));
 
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints c0 = new GridBagConstraints();
@@ -238,11 +262,11 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
         c0.gridy = 0;
 
         c0.gridx = 0;
-        panel.add(footpointBtn, c0);
-        c0.gridx = 1;
         panel.add(connectivityBtn, c0);
-        c0.gridx = 2;
+        c0.gridx = 1;
         panel.add(hcsBtn, c0);
+        c0.gridx = 2;
+        panel.add(footpointBtn, c0);
 
         ComponentUtils.smallVariant(panel);
         return panel;

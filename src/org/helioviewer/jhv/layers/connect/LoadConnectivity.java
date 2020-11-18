@@ -63,9 +63,12 @@ public class LoadConnectivity implements Callable<Connectivity> {
                     try {
                         double lat = Math.toRadians(Double.parseDouble(values[5]));
                         double lon = Math.toRadians(Double.parseDouble(values[6]));
-                        double x = Math.cos(lat) * Math.sin(lon);
-                        double y = Math.sin(lat);
-                        double z = Math.cos(lat) * Math.cos(lon);
+                        //double x = Math.cos(lat) * Math.sin(lon);
+                        //double y = Math.sin(lat);
+                        //double z = Math.cos(lat) * Math.cos(lon);
+                        double x = 1;
+                        double y = Math.PI / 2 - lat;
+                        double z = lon;
 
                         Vec3 v = new Vec3(x, y, z);
                         switch (values[1]) {
