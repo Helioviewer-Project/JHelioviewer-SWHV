@@ -1121,7 +1121,7 @@ return true;</property>
         <entry location="classes/natives-windows.jar" />
         <entry location="Helpers" />
       </exclude>
-      <jreBundle jdkProviderId="JBR" release="11.0.8-b1156.1" overrideJdkRelease="true" jreBundleSource="generated" />
+      <jreBundle jdkProviderId="JBR" release="11.0.9-b1183.8" overrideJdkRelease="true" jreBundleSource="generated" />
       <postInstallScript>${compiler:file("./resources/linux-post-install.sh")}</postInstallScript>
     </linuxDeb>
     <linuxRPM name="Linux RPM 64 bit" id="270" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_amd64" arch="amd64">
@@ -1133,7 +1133,7 @@ return true;</property>
         <entry location="classes/natives-windows.jar" />
         <entry location="Helpers" />
       </exclude>
-      <jreBundle jdkProviderId="JBR" release="11.0.8-b1156.1" overrideJdkRelease="true" jreBundleSource="generated" />
+      <jreBundle jdkProviderId="JBR" release="11.0.9-b1183.8" overrideJdkRelease="true" jreBundleSource="generated" />
       <postInstallScript>${compiler:file("./resources/linux-post-install.sh")}</postInstallScript>
     </linuxRPM>
   </mediaSets>
