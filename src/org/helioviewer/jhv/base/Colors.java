@@ -31,6 +31,7 @@ public class Colors {
     public static final byte[] Gray = bytes(Color.GRAY);
     public static final byte[] DarkGray = bytes(Color.DARK_GRAY);
     public static final byte[] LightGray = bytes(Color.LIGHT_GRAY);
+    public static final byte[] Orange = bytes(Color.ORANGE);
 
     public static final float[] WhiteFloat = {1, 1, 1, 1};
     public static final float[] LightGrayFloat = {.75f, .75f, .75f, 1};
