@@ -6,8 +6,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.File;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.BiFunction;
 
 import javax.annotation.Nullable;
@@ -28,8 +26,8 @@ import org.helioviewer.jhv.layers.connect.LoadFootpoint;
 import org.helioviewer.jhv.layers.connect.LoadHCS;
 import org.helioviewer.jhv.layers.connect.ReceiverConnectivity;
 import org.helioviewer.jhv.layers.connect.ReceiverConnectivity.Connectivity;
+import org.helioviewer.jhv.layers.connect.ReceiverHCS;
 import org.helioviewer.jhv.layers.connect.ReceiverPositionMap;
-import org.helioviewer.jhv.layers.connect.ReceiverVecList;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -42,7 +40,7 @@ import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivity, ReceiverPositionMap, ReceiverVecList {
+public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivity, ReceiverHCS, ReceiverPositionMap {
 
     private static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
     private static final double radius = 1.01;
@@ -58,12 +56,9 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     private final JPanel optionsPanel;
 
     private Connectivity connectivity;
-
-    private List<Vec3> hcsList;
-    private List<Vec3> hcsListOrtho;
-    private List<Vec3> hcsListScale;
-
+    private HCS hcs;
     private TimeMap<PositionCartesian> footpointMap;
+
     private JHVTime lastTimestamp;
 
     @Override
@@ -80,7 +75,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
             return;
         if (footpointMap != null)
             drawFootpointInterpolated(camera, vp, gl);
-        if (hcsList != null)
+        if (hcs != null)
             drawHCS(camera, vp, gl);
     }
 
@@ -91,21 +86,21 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
 
     private void drawHCS(Camera camera, Viewport vp, GL2 gl) {
         if (Display.mode == Display.DisplayMode.Orthographic) {
-            Vec3 first = hcsListOrtho.get(0);
+            Vec3 first = hcs.ortho.get(0);
             hcsBuf.putVertex(first, Colors.Null);
-            hcsListOrtho.forEach(v -> hcsBuf.putVertex(v, hcsColor));
+            hcs.ortho.forEach(v -> hcsBuf.putVertex(v, hcsColor));
             hcsBuf.putVertex(first, hcsColor);
             hcsBuf.putVertex(first, Colors.Null);
         } else {
             Quat q = Layers.getGridLayer().getGridType().toGrid(camera.getViewpoint());
             Vec2 previous = null;
 
-            Vec3 first = hcsListScale.get(0);
+            Vec3 first = hcs.scale.get(0);
             GLHelper.drawVertex(q, vp, first, previous, hcsBuf, Colors.Null);
 
-            int size = hcsList.size();
+            int size = hcs.scale.size();
             for (int i = 0; i < size; i++) {
-                Vec3 v = hcsListScale.get(i);
+                Vec3 v = hcs.scale.get(i);
                 previous = GLHelper.drawVertex(q, vp, v, previous, hcsBuf, hcsColor);
             }
             previous = GLHelper.drawVertex(q, vp, first, previous, hcsBuf, hcsColor);
@@ -219,17 +214,9 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     }
 
     @Override
-    public void setVecList(List<Vec3> _hcsList) {
-        hcsList = _hcsList;
-        // System.out.println(">>> HCS: " + hcsList.size());
-        if (hcsList != null) {
-            int size = hcsList.size();
-            hcsListOrtho = new ArrayList<>(size);
-            hcsList.forEach(v -> hcsListOrtho.add(new Vec3(radius * v.x, radius * v.y, radius * v.z)));
-            hcsListScale = new ArrayList<>(size);
-            hcsList.forEach(v -> hcsListScale.add(new Vec3(v.x, -v.y, v.z)));
-        }
-
+    public void setHCS(HCS _hcs) {
+        hcs = _hcs;
+        // System.out.println(">>> HCS: " + hcs.ortho.size());
         MovieDisplay.display();
     }
 
