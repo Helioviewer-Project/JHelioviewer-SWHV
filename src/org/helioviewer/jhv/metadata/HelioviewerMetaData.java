@@ -39,7 +39,7 @@ public class HelioviewerMetaData extends BaseMetaData {
         observatory = observatory.trim().intern();
         displayName = displayName.trim().intern();
 
-        retrievePosition(m, retrieveTime(m));
+        viewpoint = retrievePosition(m, retrieveTime(m));
         retrievePixelParameters(m);
 
         retrieveOcculterRadii(m);
@@ -204,15 +204,21 @@ public class HelioviewerMetaData extends BaseMetaData {
         return new JHVTime(observedDate.substring(0, 19)); // truncate
     }
 
-    private void retrievePosition(MetaDataContainer m, JHVTime dateObs) {
+    private Position retrievePosition(MetaDataContainer m, JHVTime dateObs) {
         Position p = Sun.getEarth(dateObs);
-        double distanceObs = m.getDouble("DSUN_OBS").map(d -> d / Sun.RadiusMeter).orElse(p.distance);
-        if (observatory.equals("SOHO"))
-            distanceObs *= Sun.L1Factor;
+        if (observatory.equals("SDO")) // slightly wrong position metadata
+            return p;
 
-        double theta = m.getDouble("HGLT_OBS").map(Math::toRadians).orElse(p.lat);
-        double phi = m.getDouble("HGLN_OBS").map(v -> p.lon - Math.toRadians(v)).orElse(p.lon);
-        viewpoint = new Position(dateObs, distanceObs, phi, theta);
+        double distance = m.getDouble("DSUN_OBS").map(d -> d / Sun.RadiusMeter).orElse(p.distance);
+        if (observatory.equals("SOHO"))
+            distance *= Sun.L1Factor;
+
+        double lon = m.getDouble("HGLN_OBS").map(v -> p.lon - Math.toRadians(v))
+                .orElseGet(() -> m.getDouble("CRLN_OBS").map(v -> -Math.toRadians(v)).orElse(p.lon));
+        double lat = m.getDouble("HGLT_OBS").map(Math::toRadians)
+                .orElseGet(() -> m.getDouble("CRLT_OBS").map(Math::toRadians).orElse(p.lat));
+
+        return new Position(dateObs, distance, lon, lat);
     }
 
     private void retrievePixelParameters(MetaDataContainer m) {
