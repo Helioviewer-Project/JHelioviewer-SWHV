@@ -49,13 +49,13 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     private static final double radius = 1.01;
     private static final float SIZE_POINT = 0.01f;
 
-    private final byte[] sswColor = Colors.Red;
-    private final byte[] fswColor = Colors.Green;
-    private final byte[] mColor = Colors.Orange;
+    private final byte[] sswColor = Colors.bytes(164, 48, 42);
+    private final byte[] fswColor = Colors.bytes(74, 136, 92);
+    private final byte[] mColor = Colors.bytes(240, 145, 53);
     private final GLSLShape connectivityCenter = new GLSLShape(true);
     private final BufVertex connectivityBuf = new BufVertex(96 * GLSLShape.stride);
 
-    private final byte[] hcsColor = Colors.Red;
+    private final byte[] hcsColor = Colors.bytes(223, 62, 48);
     private final GLSLLine hcsLine = new GLSLLine(true); // TBD
     private final BufVertex hcsBuf = new BufVertex(512 * GLSLLine.stride);
 
@@ -242,7 +242,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     @Override
     public void setConnectivity(Connectivity _connectivity) {
         connectivity = _connectivity;
-        System.out.println(">>> SSW: " + connectivity.SSW.ortho.size() + " FSW: " + connectivity.FSW.ortho.size() + " M: " + connectivity.M.ortho.size());
+        // System.out.println(">>> SSW: " + connectivity.SSW.ortho.size() + " FSW: " + connectivity.FSW.ortho.size() + " M: " + connectivity.M.ortho.size());
         MovieDisplay.display();
     }
 
