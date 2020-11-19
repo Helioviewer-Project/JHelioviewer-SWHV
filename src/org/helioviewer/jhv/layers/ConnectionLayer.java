@@ -46,7 +46,6 @@ import com.jogamp.opengl.GL2;
 public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivity, ReceiverHCS, ReceiverPositionMap {
 
     private static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
-    private static final double radius = 1.01;
     private static final float SIZE_POINT = 0.01f;
 
     private final byte[] sswColor = Colors.bytes(164, 48, 42);
