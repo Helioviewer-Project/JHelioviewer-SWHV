@@ -57,6 +57,7 @@ public class LoadHCS implements Callable<HCS> {
                         double x = Math.cos(lat) * Math.sin(lon);
                         double y = Math.sin(lat);
                         double z = Math.cos(lat) * Math.cos(lon);
+
                         hcsList.add(new Vec3(x, y, z));
                     } catch (Exception e) {
                         e.printStackTrace();

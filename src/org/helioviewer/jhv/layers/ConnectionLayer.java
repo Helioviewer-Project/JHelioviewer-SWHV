@@ -6,6 +6,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.File;
 import java.net.URI;
+import java.util.List;
 import java.util.function.BiFunction;
 
 import javax.annotation.Nullable;
@@ -16,6 +17,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.PositionCartesian;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.annotate.AnnotateCross;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
@@ -34,7 +36,7 @@ import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLLine;
-//import org.helioviewer.jhv.opengl.GLSLShape;
+import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
 import org.json.JSONObject;
@@ -45,14 +47,15 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
 
     private static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
     private static final double radius = 1.01;
+    private static final float SIZE_POINT = 0.01f;
 
     private final byte[] sswColor = Colors.Red;
     private final byte[] fswColor = Colors.Green;
     private final byte[] mColor = Colors.Orange;
-    // private final GLSLShape connectivityCenter = new GLSLShape(true);
-    // private final BufVertex connectivityBuf = new BufVertex(96 * GLSLShape.stride);
-    private final GLSLLine connectivityCenter = new GLSLLine(true);
-    private final BufVertex connectivityBuf = new BufVertex(96 * GLSLLine.stride);
+    private final GLSLShape connectivityCenter = new GLSLShape(true);
+    private final BufVertex connectivityBuf = new BufVertex(96 * GLSLShape.stride);
+    //private final GLSLLine connectivityCenter = new GLSLLine(true);
+    //private final BufVertex connectivityBuf = new BufVertex(96 * GLSLLine.stride);
 
     private final byte[] hcsColor = Colors.Red;
     private final GLSLLine hcsLine = new GLSLLine(true); // TBD
@@ -99,11 +102,30 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
         Position viewpoint = camera.getViewpoint();
         Quat q = Layers.getGridLayer().getGridType().toGrid(viewpoint);
 
-        connectivity.SSW.forEach(v -> AnnotateCross.drawCross(q, vp, v, connectivityBuf, sswColor));
-        connectivity.FSW.forEach(v -> AnnotateCross.drawCross(q, vp, v, connectivityBuf, fswColor));
-        connectivity.M.forEach(v -> AnnotateCross.drawCross(q, vp, v, connectivityBuf, mColor));
+        //connectivity.SSW.forEach(v -> AnnotateCross.drawCross(q, vp, v, connectivityBuf, sswColor));
+        //connectivity.FSW.forEach(v -> AnnotateCross.drawCross(q, vp, v, connectivityBuf, fswColor));
+        //connectivity.M.forEach(v -> AnnotateCross.drawCross(q, vp, v, connectivityBuf, mColor));
+        //connectivityCenter.render(gl, vp.aspect, LINEWIDTH);
+
+        putConnectivity(q, vp, connectivity.SSW, connectivityBuf, sswColor);
+        putConnectivity(q, vp, connectivity.FSW, connectivityBuf, fswColor);
+        putConnectivity(q, vp, connectivity.M, connectivityBuf, mColor);
         connectivityCenter.setData(gl, connectivityBuf);
-        connectivityCenter.render(gl, vp.aspect, LINEWIDTH);
+        connectivityCenter.renderPoints(gl, CameraHelper.getPixelFactor(camera, vp));
+    }
+
+    private static void putPointScale(Quat q, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color) {
+        Vec2 tf = Display.mode.xform.transform(q, vertex, Display.mode.scale);
+        float x = (float) (tf.x * vp.aspect);
+        float y = (float) tf.y;
+        vexBuf.putVertex(x, y, 0, SIZE_POINT, color);
+    }
+
+    private static void putConnectivity(Quat q, Viewport vp, List<Vec3> vecList, BufVertex vexBuf, byte[] color) {
+        if (Display.mode == Display.DisplayMode.Orthographic)
+            vecList.forEach(v -> vexBuf.putVertex((float) (v.x * radius), (float) (v.y * radius), (float) (v.z * radius), 2 * SIZE_POINT, color));
+        else
+            vecList.forEach(v -> putPointScale(q, vp, new Vec3(v.x, -v.y, v.z), vexBuf, color));
     }
 
     private void drawHCS(Camera camera, Viewport vp, GL2 gl) {
