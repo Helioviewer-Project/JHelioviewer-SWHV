@@ -11,16 +11,13 @@ import javax.annotation.Nonnull;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.NetClient;
-import org.helioviewer.jhv.layers.connect.ReceiverHCS.HCS;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-public class LoadHCS implements Callable<HCS> {
-
-    private static final double radius = 1.01;
+public class LoadHCS implements Callable<OrthoScaleList> {
 
     public static Void submit(@Nonnull URI uri, ReceiverHCS receiver) {
         EventQueueCallbackExecutor.pool.submit(new LoadHCS(uri), new Callback(receiver));
@@ -34,7 +31,7 @@ public class LoadHCS implements Callable<HCS> {
     }
 
     @Override
-    public HCS call() throws Exception {
+    public OrthoScaleList call() throws Exception {
         List<Vec3> hcsList = new ArrayList<>();
 
         try (NetClient nc = NetClient.of(uri); BufferedReader br = new BufferedReader(nc.getReader())) {
@@ -66,20 +63,10 @@ public class LoadHCS implements Callable<HCS> {
             }
         }
 
-        int size = hcsList.size();
-        if (size == 0)
-            return null;
-
-        List<Vec3> ortho = new ArrayList<>(size);
-        List<Vec3> scale = new ArrayList<>(size);
-        hcsList.forEach(v -> {
-            ortho.add(new Vec3(radius * v.x, radius * v.y, radius * v.z));
-            scale.add(new Vec3(v.x, -v.y, v.z));
-        });
-        return new HCS(ortho, scale);
+        return new OrthoScaleList(hcsList);
     }
 
-    private static class Callback implements FutureCallback<HCS> {
+    private static class Callback implements FutureCallback<OrthoScaleList> {
 
         private final ReceiverHCS receiver;
 
@@ -88,7 +75,7 @@ public class LoadHCS implements Callable<HCS> {
         }
 
         @Override
-        public void onSuccess(HCS result) {
+        public void onSuccess(OrthoScaleList result) {
             receiver.setHCS(result);
         }
 

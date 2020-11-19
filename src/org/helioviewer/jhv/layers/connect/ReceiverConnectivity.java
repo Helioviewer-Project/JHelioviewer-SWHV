@@ -12,15 +12,15 @@ public interface ReceiverConnectivity {
     class Connectivity {
 
         public final JHVTime time;
-        public final List<Vec3> SSW;
-        public final List<Vec3> FSW;
-        public final List<Vec3> M;
+        public final OrthoScaleList SSW;
+        public final OrthoScaleList FSW;
+        public final OrthoScaleList M;
 
-        Connectivity(JHVTime _time, List<Vec3> _SSW, List<Vec3> _FSW, List<Vec3> _M) {
+        Connectivity(JHVTime _time, List<Vec3> cartSSW, List<Vec3> cartFSW, List<Vec3> cartM) {
             time = _time;
-            SSW = _SSW;
-            FSW = _FSW;
-            M = _M;
+            SSW = new OrthoScaleList(cartSSW);
+            FSW = new OrthoScaleList(cartFSW);
+            M = new OrthoScaleList(cartM);
         }
 
     }
