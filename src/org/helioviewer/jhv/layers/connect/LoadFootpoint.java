@@ -55,13 +55,7 @@ public class LoadFootpoint implements Callable<TimeMap<PositionCartesian>> {
                 if (values.length > 8) {
                     try {
                         JHVTime time = new JHVTime(parseTime(values[6]));
-                        double lon = Math.toRadians(Double.parseDouble(values[7]));
-                        double lat = Math.toRadians(Double.parseDouble(values[8]));
-                        double x = Math.cos(lat) * Math.sin(lon);
-                        double y = Math.sin(lat);
-                        double z = Math.cos(lat) * Math.cos(lon);
-
-                        positionMap.put(time, new PositionCartesian(time, x, y, z));
+                        positionMap.put(time, ConnectUtils.toCartesian(time, values[7], values[8]));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
