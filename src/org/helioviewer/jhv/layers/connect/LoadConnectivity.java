@@ -61,13 +61,7 @@ public class LoadConnectivity implements Callable<Connectivity> {
                 String[] values = Regex.MultiSpace.split(line);
                 if (values.length > 6) {
                     try {
-                        double lat = Math.toRadians(Double.parseDouble(values[5]));
-                        double lon = Math.toRadians(Double.parseDouble(values[6]));
-                        double x = Math.cos(lat) * Math.sin(lon);
-                        double y = Math.sin(lat);
-                        double z = Math.cos(lat) * Math.cos(lon);
-
-                        Vec3 v = new Vec3(x, y, z);
+                        Vec3 v = ConnectUtils.toCartesian(values[6], values[5]);
                         switch (values[1]) {
                             case "SSW":
                                 SSW.add(v);

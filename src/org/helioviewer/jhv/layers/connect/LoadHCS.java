@@ -49,13 +49,7 @@ public class LoadHCS implements Callable<OrthoScaleList> {
                 String[] values = Regex.MultiSpace.split(line);
                 if (values.length > 4) {
                     try {
-                        double lat = Math.toRadians(Double.parseDouble(values[3]));
-                        double lon = Math.toRadians(Double.parseDouble(values[4]));
-                        double x = Math.cos(lat) * Math.sin(lon);
-                        double y = Math.sin(lat);
-                        double z = Math.cos(lat) * Math.cos(lon);
-
-                        hcsList.add(new Vec3(x, y, z));
+                        hcsList.add(ConnectUtils.toCartesian(values[4], values[3]));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
