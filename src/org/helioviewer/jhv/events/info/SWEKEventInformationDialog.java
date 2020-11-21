@@ -2,6 +2,7 @@ package org.helioviewer.jhv.events.info;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Window.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -44,9 +45,11 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
 
     public SWEKEventInformationDialog(JHVRelatedEvents revent, JHVEvent _event) {
         super(JHVFrame.getFrame(), revent.getSupplier().getGroup().getName());
-        event = _event;
+        setType(Type.UTILITY); // avoids tab on macOS when Prefer tabs is always
 
+        event = _event;
         rEvent = revent;
+
         model = new DataCollapsiblePanelModel();
         model.addListener(this);
 
