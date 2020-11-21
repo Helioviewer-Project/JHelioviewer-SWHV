@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.base.scale;
+package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;

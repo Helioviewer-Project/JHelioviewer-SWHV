@@ -3,8 +3,6 @@ package org.helioviewer.jhv.display;
 import javax.swing.JRadioButtonMenuItem;
 
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
-import org.helioviewer.jhv.base.scale.GridScale;
-import org.helioviewer.jhv.base.scale.GridTransform;
 import org.helioviewer.jhv.camera.Camera;
 //import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.layers.ImageLayer;

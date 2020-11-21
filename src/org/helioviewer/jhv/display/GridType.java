@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.base.scale;
+package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
