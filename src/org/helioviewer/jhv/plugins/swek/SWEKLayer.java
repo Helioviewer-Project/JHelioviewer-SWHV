@@ -17,10 +17,10 @@ import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.base.scale.GridScale;
-import org.helioviewer.jhv.base.scale.GridTransform;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.GridScale;
+import org.helioviewer.jhv.display.GridTransform;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.JHVEventCache;
