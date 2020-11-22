@@ -97,7 +97,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
 
     private void drawConnectivity(Camera camera, Viewport vp, GL2 gl) {
         Position viewpoint = camera.getViewpoint();
-        Quat q = Layers.getGridLayer().getGridType().toGrid(viewpoint);
+        Quat q = Display.getGridType().toGrid(viewpoint);
 
         putConnectivity(q, vp, connectivity.SSW, connectivityBuf, sswColor);
         putConnectivity(q, vp, connectivity.FSW, connectivityBuf, fswColor);
@@ -128,7 +128,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
             hcsBuf.putVertex(first, hcsColor);
             hcsBuf.putVertex(first, Colors.Null);
         } else {
-            Quat q = Layers.getGridLayer().getGridType().toGrid(camera.getViewpoint());
+            Quat q = Display.getGridType().toGrid(camera.getViewpoint());
             Vec2 previous = null;
 
             Vec3 first = hcs.scale.get(0);
@@ -168,7 +168,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
             }
 
             Vec3 v = new Vec3(1, Math.acos(p.y), Math.atan2(p.x, p.z));
-            Quat q = Layers.getGridLayer().getGridType().toGrid(viewpoint);
+            Quat q = Display.getGridType().toGrid(viewpoint);
 
             AnnotateCross.drawCross(q, vp, v, footpointBuf, footpointColor);
             footpointLine.setData(gl, footpointBuf);
@@ -183,7 +183,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
         }
 
         Vec3 v = interpolate(viewpoint.time.milli, footpointMap.lowerValue(viewpoint.time), footpointMap.higherValue(viewpoint.time));
-        Quat q = Layers.getGridLayer().getGridType().toGrid(viewpoint);
+        Quat q = Display.getGridType().toGrid(viewpoint);
 
         AnnotateCross.drawCross(q, vp, v, footpointBuf, footpointColor);
         footpointLine.setData(gl, footpointBuf);
