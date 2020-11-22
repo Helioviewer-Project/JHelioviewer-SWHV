@@ -42,9 +42,9 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         Viewport vp = Display.getActiveViewport();
         Vec2 coord = Display.mode.scale.mouseToGrid(x, y, vp, camera, Display.getGridType());
 
-        if (Display.mode == Display.DisplayMode.Latitudinal) {
+        if (Display.mode == Display.ProjectionMode.Latitudinal) {
             setText(formatLati(coord));
-        } else if (Display.mode == Display.DisplayMode.Polar || Display.mode == Display.DisplayMode.LogPolar) {
+        } else if (Display.mode == Display.ProjectionMode.Polar || Display.mode == Display.ProjectionMode.LogPolar) {
             setText(formatPolar(coord));
         } else {
             String valueStr = ImageData.nanValue;

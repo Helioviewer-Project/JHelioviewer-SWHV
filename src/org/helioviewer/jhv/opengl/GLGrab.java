@@ -53,7 +53,7 @@ public class GLGrab {
         Display.reshapeAll();
 
         fbo.bind(gl);
-        if (Display.mode == Display.DisplayMode.Orthographic) {
+        if (Display.mode == Display.ProjectionMode.Orthographic) {
             GLListener.renderScene(camera, gl);
         } else {
             GLListener.renderSceneScale(camera, gl);

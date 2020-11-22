@@ -92,7 +92,7 @@ public class CameraHelper {
 
     public static void zoomToFit(Camera camera) {
         double size = 1;
-        if (Display.mode == Display.DisplayMode.Orthographic) {
+        if (Display.mode == Display.ProjectionMode.Orthographic) {
             size = ImageLayers.getLargestPhysicalHeight();
         }
 
