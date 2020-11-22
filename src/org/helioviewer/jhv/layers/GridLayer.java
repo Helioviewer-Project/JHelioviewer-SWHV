@@ -77,7 +77,7 @@ public class GridLayer extends AbstractLayer {
         jo.put("showAxis", showAxis);
         jo.put("showLabels", showLabels);
         jo.put("showRadial", showRadial);
-        jo.put("type", Display.getGridType());
+        jo.put("type", Display.gridType);
     }
 
     private void deserialize(JSONObject jo) {
@@ -87,7 +87,7 @@ public class GridLayer extends AbstractLayer {
         showLabels = jo.optBoolean("showLabels", showLabels);
         showRadial = jo.optBoolean("showRadial", showRadial);
 
-        String strGridType = jo.optString("type", Display.getGridType().toString());
+        String strGridType = jo.optString("type", Display.gridType.toString());
         try {
             Display.setGridType(GridType.valueOf(strGridType));
         } catch (Exception ignore) {
@@ -102,7 +102,7 @@ public class GridLayer extends AbstractLayer {
         optionsPanel = new GridLayerOptions(this);
 
         latLabels = GridLabel.makeLatLabels(latStep);
-        lonLabels = GridLabel.makeLonLabels(Display.getGridType(), lonStep);
+        lonLabels = GridLabel.makeLonLabels(Display.gridType, lonStep);
         radialLabels = GridLabel.makeRadialLabels(0, RADIAL_STEP);
         radialLabelsFar = GridLabel.makeRadialLabels(Math.PI / 2, RADIAL_STEP_FAR);
     }
@@ -127,7 +127,7 @@ public class GridLayer extends AbstractLayer {
         double pixelsPerSolarRadius = textScale * pixFactor;
 
         Transform.pushView();
-        Transform.rotateViewInverse(Display.getGridType().toCarrington(viewpoint));
+        Transform.rotateViewInverse(Display.gridType.toCarrington(viewpoint));
         {
             gridLine.render(gl, vp.aspect, LINEWIDTH);
             if (showLabels) {
@@ -183,7 +183,6 @@ public class GridLayer extends AbstractLayer {
         JhvTextRenderer renderer = GLText.getRenderer(size);
         renderer.setColor(Colors.WhiteFloat);
         float textScaleFactor = textScale / renderer.getFont().getSize2D() * w / GridMath.FLAT_STEPS_THETA * 5;
-        GridType gridType = Display.getGridType();
 
         renderer.begin3DRendering();
         {
@@ -191,7 +190,7 @@ public class GridLayer extends AbstractLayer {
                 if (i == GridMath.FLAT_STEPS_THETA / 2) {
                     continue;
                 }
-                double lon = scale.getInterpolatedXValue(1. / GridMath.FLAT_STEPS_THETA * i, gridType);
+                double lon = scale.getInterpolatedXValue(1. / GridMath.FLAT_STEPS_THETA * i, Display.gridType);
                 String txt = formatter2.format(lon);
                 float x = i / (float) GridMath.FLAT_STEPS_THETA - 0.5f;
                 renderer.draw3D(txt, w * x, 0, 0, textScaleFactor);
@@ -313,7 +312,7 @@ public class GridLayer extends AbstractLayer {
 
     void setLonStep(double _lonStep) {
         lonStep = _lonStep;
-        lonLabels = GridLabel.makeLonLabels(Display.getGridType(), lonStep);
+        lonLabels = GridLabel.makeLonLabels(Display.gridType, lonStep);
         gridNeedsInit = true;
     }
 

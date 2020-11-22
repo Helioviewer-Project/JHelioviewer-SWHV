@@ -58,18 +58,17 @@ class InteractionAnnotate implements InteractionType {
         if (newAnnotateable == null && anns.isEmpty())
             return;
 
-        Position viewpoint = camera.getViewpoint();
-        Quat q = viewpoint.toQuat();
         Annotateable activeAnn = activeIndex >= 0 && activeIndex < anns.size() ? anns.get(activeIndex) : null;
 
-        Quat q1 = Display.getGridType().toGrid(viewpoint); //!
+        Position viewpoint = camera.getViewpoint();
+        Quat q = Display.gridType.toGrid(viewpoint);
         anns.forEach(annotateable -> {
             boolean active = annotateable == activeAnn;
-            annotateable.draw(q1, vp, active, annsBuf);
+            annotateable.draw(q, vp, active, annsBuf);
             annotateable.drawTransformed(active, transBuf, centerBuf);
         });
         if (newAnnotateable != null) {
-            newAnnotateable.draw(q1, vp, false, annsBuf);
+            newAnnotateable.draw(q, vp, false, annsBuf);
             newAnnotateable.drawTransformed(false, transBuf, centerBuf);
         }
         annsLine.setData(gl, annsBuf);
@@ -78,7 +77,7 @@ class InteractionAnnotate implements InteractionType {
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
 
         Transform.pushView();
-        Transform.rotateViewInverse(q);
+        Transform.rotateViewInverse(viewpoint.toQuat());
 
         transLine.setData(gl, transBuf);
         transLine.render(gl, vp.aspect, LINEWIDTH);

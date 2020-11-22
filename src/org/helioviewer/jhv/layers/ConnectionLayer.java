@@ -96,12 +96,11 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     }
 
     private void drawConnectivity(Camera camera, Viewport vp, GL2 gl) {
-        Position viewpoint = camera.getViewpoint();
-        Quat q = Display.getGridType().toGrid(viewpoint);
-
+        Quat q = Display.gridType.toGrid(camera.getViewpoint());
         putConnectivity(q, vp, connectivity.SSW, connectivityBuf, sswColor);
         putConnectivity(q, vp, connectivity.FSW, connectivityBuf, fswColor);
         putConnectivity(q, vp, connectivity.M, connectivityBuf, mColor);
+
         connectivityCenter.setData(gl, connectivityBuf);
         connectivityCenter.renderPoints(gl, CameraHelper.getPixelFactor(camera, vp));
     }
@@ -128,7 +127,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
             hcsBuf.putVertex(first, hcsColor);
             hcsBuf.putVertex(first, Colors.Null);
         } else {
-            Quat q = Display.getGridType().toGrid(camera.getViewpoint());
+            Quat q = Display.gridType.toGrid(camera.getViewpoint());
             Vec2 previous = null;
 
             Vec3 first = hcs.scale.get(0);
@@ -183,7 +182,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
         }
 
         Vec3 v = interpolate(viewpoint.time.milli, footpointMap.lowerValue(viewpoint.time), footpointMap.higherValue(viewpoint.time));
-        Quat q = Display.getGridType().toGrid(viewpoint);
+        Quat q = Display.gridType.toGrid(viewpoint);
 
         AnnotateCross.drawCross(q, vp, v, footpointBuf, footpointColor);
         footpointLine.setData(gl, footpointBuf);
