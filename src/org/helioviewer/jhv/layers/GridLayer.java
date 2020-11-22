@@ -15,6 +15,8 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridScale;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.layers.grid.GridLabel;
+import org.helioviewer.jhv.layers.grid.GridMath;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.opengl.GLSLLine;
@@ -36,12 +38,11 @@ public class GridLayer extends AbstractLayer {
 
     // height of text in solar radii
     private static final float textScale = GridLabel.textScale;
-    static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
+    private static final double LINEWIDTH = GridMath.LINEWIDTH;
     private static final double LINEWIDTH_THICK = 2 * LINEWIDTH;
     private static final double LINEWIDTH_EARTH = LINEWIDTH;
     private static final double LINEWIDTH_AXES = 2 * LINEWIDTH;
-
-    private static final double PLANETEXT_Z = 0.01;
+    // private static final double PLANETEXT_Z = 0.01;
 
     private static final DecimalFormat formatter2 = MathUtils.numberFormatter("0", 2);
 
@@ -306,6 +307,17 @@ public class GridLayer extends AbstractLayer {
         return "Grid";
     }
 
+    @Nullable
+    @Override
+    public String getTimeString() {
+        return null;
+    }
+
+    @Override
+    public boolean isDeletable() {
+        return false;
+    }
+
     double getLonStep() {
         return lonStep;
     }
@@ -353,17 +365,6 @@ public class GridLayer extends AbstractLayer {
     void setGridType(GridType gridType) {
         lonLabels = GridLabel.makeLonLabels(gridType, lonStep);
         Display.setGridType(gridType);
-    }
-
-    @Nullable
-    @Override
-    public String getTimeString() {
-        return null;
-    }
-
-    @Override
-    public boolean isDeletable() {
-        return false;
     }
 
 }
