@@ -1,10 +1,21 @@
 package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Objects;
 
 import javax.annotation.Nullable;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
@@ -15,6 +26,9 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridScale;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
+import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.layers.grid.GridLabel;
 import org.helioviewer.jhv.layers.grid.GridMath;
 import org.helioviewer.jhv.math.MathUtils;
@@ -100,7 +114,7 @@ public class GridLayer extends AbstractLayer {
             deserialize(jo);
         else
             setEnabled(true);
-        optionsPanel = new GridLayerOptions(this);
+        optionsPanel = new GridLayerOptions();
 
         latLabels = GridLabel.makeLatLabels(latStep);
         lonLabels = GridLabel.makeLonLabels(Display.gridType, lonStep);
@@ -318,53 +332,129 @@ public class GridLayer extends AbstractLayer {
         return false;
     }
 
-    double getLonStep() {
-        return lonStep;
+    @SuppressWarnings("serial")
+    private class GridLayerOptions extends JPanel {
+
+        private static final double min = 5, max = 90;
+
+        private JSpinner gridResolutionXSpinner;
+        private JSpinner gridResolutionYSpinner;
+        private JComboBox<GridType> gridTypeBox;
+
+        GridLayerOptions() {
+            createGridResolutionX();
+            createGridResolutionY();
+
+            setLayout(new GridBagLayout());
+
+            GridBagConstraints c0 = new GridBagConstraints();
+            c0.fill = GridBagConstraints.HORIZONTAL;
+            c0.weightx = 1.;
+            c0.weighty = 1.;
+
+            c0.gridy = 0;
+
+            c0.gridx = 1;
+            c0.anchor = GridBagConstraints.LINE_END;
+            JCheckBox axis = new JCheckBox("Solar axis", showAxis);
+            axis.setHorizontalTextPosition(SwingConstants.LEFT);
+            axis.addActionListener(e -> {
+                showAxis = axis.isSelected();
+                MovieDisplay.display();
+            });
+            add(axis, c0);
+
+            c0.gridx = 3;
+            c0.anchor = GridBagConstraints.LINE_END;
+            JCheckBox labels = new JCheckBox("Grid labels", showLabels);
+            labels.setHorizontalTextPosition(SwingConstants.LEFT);
+            labels.addActionListener(e -> {
+                showLabels = labels.isSelected();
+                MovieDisplay.display();
+            });
+            add(labels, c0);
+
+            c0.gridy = 1;
+
+            c0.gridx = 1;
+            c0.anchor = GridBagConstraints.LINE_END;
+            JCheckBox radial = new JCheckBox("Radial grid", showRadial);
+            radial.setHorizontalTextPosition(SwingConstants.LEFT);
+            radial.addActionListener(e -> {
+                showRadial = radial.isSelected();
+                MovieDisplay.display();
+            });
+            add(radial, c0);
+
+            c0.gridx = 2;
+            c0.anchor = GridBagConstraints.LINE_END;
+            add(new JLabel("Grid type", JLabel.RIGHT), c0);
+            c0.gridx = 3;
+            c0.anchor = GridBagConstraints.LINE_START;
+            createGridTypeBox();
+            add(gridTypeBox, c0);
+
+            c0.gridy = 2;
+
+            c0.gridx = 0;
+            c0.anchor = GridBagConstraints.LINE_END;
+            add(new JLabel("Longitude", JLabel.RIGHT), c0);
+
+            JFormattedTextField fx = ((JSpinner.DefaultEditor) gridResolutionXSpinner.getEditor()).getTextField();
+            fx.setFormatterFactory(new TerminatedFormatterFactory("%.1f", "\u00B0", min, max));
+
+            c0.gridx = 1;
+            c0.anchor = GridBagConstraints.LINE_START;
+            add(gridResolutionXSpinner, c0);
+
+            c0.gridx = 2;
+            c0.anchor = GridBagConstraints.LINE_END;
+            add(new JLabel("Latitude", JLabel.RIGHT), c0);
+
+            JFormattedTextField fy = ((JSpinner.DefaultEditor) gridResolutionYSpinner.getEditor()).getTextField();
+            fy.setFormatterFactory(new TerminatedFormatterFactory("%.1f", "\u00B0", min, max));
+
+            c0.gridx = 3;
+            c0.anchor = GridBagConstraints.LINE_START;
+            add(gridResolutionYSpinner, c0);
+
+            ComponentUtils.smallVariant(this);
+        }
+
+        private void createGridTypeBox() {
+            gridTypeBox = new JComboBox<>(GridType.values());
+            gridTypeBox.setSelectedItem(Display.gridType);
+            gridTypeBox.addActionListener(e -> {
+                GridType gridType = (GridType) Objects.requireNonNull(gridTypeBox.getSelectedItem());
+                Display.setGridType(gridType);
+                lonLabels = GridLabel.makeLonLabels(gridType, lonStep);
+                MovieDisplay.display();
+            });
+        }
+
+        private void createGridResolutionX() {
+            gridResolutionXSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(lonStep), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.1)));
+            gridResolutionXSpinner.addChangeListener(e -> {
+                lonStep = (Double) gridResolutionXSpinner.getValue();
+                lonLabels = GridLabel.makeLonLabels(Display.gridType, lonStep);
+                gridNeedsInit = true;
+                MovieDisplay.display();
+            });
+            WheelSupport.installMouseWheelSupport(gridResolutionXSpinner);
+        }
+
+        private void createGridResolutionY() {
+            gridResolutionYSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(latStep), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.1)));
+            gridResolutionYSpinner.addChangeListener(e -> {
+                latStep = (Double) gridResolutionYSpinner.getValue();
+                latLabels = GridLabel.makeLatLabels(latStep);
+                gridNeedsInit = true;
+                MovieDisplay.display();
+            });
+            WheelSupport.installMouseWheelSupport(gridResolutionYSpinner);
+        }
+
     }
 
-    void setLonStep(double _lonStep) {
-        lonStep = _lonStep;
-        lonLabels = GridLabel.makeLonLabels(Display.gridType, lonStep);
-        gridNeedsInit = true;
-    }
-
-    double getLatStep() {
-        return latStep;
-    }
-
-    void setLatStep(double _latStep) {
-        latStep = _latStep;
-        latLabels = GridLabel.makeLatLabels(latStep);
-        gridNeedsInit = true;
-    }
-
-    boolean getShowLabels() {
-        return showLabels;
-    }
-
-    boolean getShowAxis() {
-        return showAxis;
-    }
-
-    boolean getShowRadial() {
-        return showRadial;
-    }
-
-    void showLabels(boolean show) {
-        showLabels = show;
-    }
-
-    void showAxis(boolean show) {
-        showAxis = show;
-    }
-
-    void showRadial(boolean show) {
-        showRadial = show;
-    }
-
-    void setGridType(GridType gridType) {
-        lonLabels = GridLabel.makeLonLabels(gridType, lonStep);
-        Display.setGridType(gridType);
-    }
 
 }
