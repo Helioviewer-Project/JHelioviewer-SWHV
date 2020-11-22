@@ -40,7 +40,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
             vx.x = center.x + cosr * u.x + sinr * v.x;
             vx.y = center.y + cosr * u.y + sinr * v.y;
             vx.z = center.z + cosr * u.z + sinr * v.z;
-            if (Display.mode == Display.DisplayMode.Orthographic) {
+            if (Display.mode == Display.ProjectionMode.Orthographic) {
                 if (i == 0) {
                     putSphere(vx, buf, Colors.Null);
                 }

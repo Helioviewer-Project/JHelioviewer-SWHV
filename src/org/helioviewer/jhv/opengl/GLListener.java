@@ -112,9 +112,9 @@ public class GLListener implements GLEventListener {
     }
 
     public static void renderSceneScale(Camera camera, GL2 gl) {
-        if (Display.mode == Display.DisplayMode.Polar) {
+        if (Display.mode == Display.ProjectionMode.Polar) {
             GridScale.polar.set(0, 360, 0, 0.5 * ImageLayers.getLargestPhysicalSize());
-        } else if (Display.mode == Display.DisplayMode.LogPolar) {
+        } else if (Display.mode == Display.ProjectionMode.LogPolar) {
             GridScale.logpolar.set(0, 360, 0.05, Math.max(0.05, 0.5 * ImageLayers.getLargestPhysicalSize()));
         }
 
@@ -171,7 +171,7 @@ public class GLListener implements GLEventListener {
         if (Movie.isRecording())
             ExportMovie.handleMovieExport(camera, gl);
 
-        if (Display.mode == Display.DisplayMode.Orthographic) {
+        if (Display.mode == Display.ProjectionMode.Orthographic) {
             renderScene(camera, gl);
             renderMiniview(gl);
         } else

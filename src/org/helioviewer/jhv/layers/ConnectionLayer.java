@@ -114,14 +114,14 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     }
 
     private static void putConnectivity(Quat q, Viewport vp, OrthoScaleList points, BufVertex vexBuf, byte[] color) {
-        if (Display.mode == Display.DisplayMode.Orthographic)
+        if (Display.mode == Display.ProjectionMode.Orthographic)
             points.ortho.forEach(v -> vexBuf.putVertex((float) v.x, (float) v.y, (float) v.z, 2 * SIZE_POINT, color));
         else
             points.scale.forEach(v -> putPointScale(q, vp, v, vexBuf, color));
     }
 
     private void drawHCS(Camera camera, Viewport vp, GL2 gl) {
-        if (Display.mode == Display.DisplayMode.Orthographic) {
+        if (Display.mode == Display.ProjectionMode.Orthographic) {
             Vec3 first = hcs.ortho.get(0);
             hcsBuf.putVertex(first, Colors.Null);
             hcs.ortho.forEach(v -> hcsBuf.putVertex(v, hcsColor));

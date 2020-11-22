@@ -11,7 +11,7 @@ import org.helioviewer.jhv.opengl.GLSLSolarShader;
 
 public class Display {
 
-    public enum DisplayMode {
+    public enum ProjectionMode {
         Orthographic(GLSLSolarShader.ortho, GridScale.ortho, null),
         Latitudinal(GLSLSolarShader.lati, GridScale.lati, GridTransform.xformLati),
         LogPolar(GLSLSolarShader.logpolar, GridScale.logpolar, GridTransform.xformPolar),
@@ -22,7 +22,7 @@ public class Display {
         public final GridTransform xform;
         public final JRadioButtonMenuItem radio;
 
-        DisplayMode(GLSLSolarShader _shader, GridScale _scale, GridTransform _xform) {
+        ProjectionMode(GLSLSolarShader _shader, GridScale _scale, GridTransform _xform) {
             shader = _shader;
             scale = _scale;
             xform = _xform;
@@ -32,10 +32,10 @@ public class Display {
 
     }
 
-    public static DisplayMode mode = DisplayMode.Orthographic;
+    public static ProjectionMode mode = ProjectionMode.Orthographic;
     public static boolean multiview = false;
 
-    private static void setProjectionMode(DisplayMode _mode) {
+    private static void setProjectionMode(ProjectionMode _mode) {
         mode = _mode;
         //CameraHelper.zoomToFit(miniCamera);
         miniCamera.reset();

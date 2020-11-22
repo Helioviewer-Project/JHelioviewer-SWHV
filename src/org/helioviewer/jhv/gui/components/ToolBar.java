@@ -234,11 +234,11 @@ public class ToolBar extends JToolBar {
 
         JPopupMenu projectionPopup = new JPopupMenu();
         ButtonGroup projectionGroup = new ButtonGroup();
-        for (Display.DisplayMode el : Display.DisplayMode.values()) {
+        for (Display.ProjectionMode el : Display.ProjectionMode.values()) {
             projectionPopup.add(el.radio);
             projectionGroup.add(el.radio);
         }
-        Display.DisplayMode.Orthographic.radio.setSelected(true);
+        Display.ProjectionMode.Orthographic.radio.setSelected(true);
 
         projectionButton.addMouseListener(new MouseAdapter() {
             @Override

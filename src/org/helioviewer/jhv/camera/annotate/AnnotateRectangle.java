@@ -37,7 +37,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         point2 = p2;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
-            if (Display.mode == Display.DisplayMode.Orthographic) {
+            if (Display.mode == Display.ProjectionMode.Orthographic) {
                 if (i == 0) { // first
                     putSphere(pc, buf, Colors.Null);
                 }
@@ -55,7 +55,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         point2 = ep;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
-            if (Display.mode == Display.DisplayMode.Orthographic) {
+            if (Display.mode == Display.ProjectionMode.Orthographic) {
                 putSphere(pc, buf, color);
             } else {
                 pc.y = -pc.y;
@@ -67,7 +67,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         point2 = p4;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
-            if (Display.mode == Display.DisplayMode.Orthographic) {
+            if (Display.mode == Display.ProjectionMode.Orthographic) {
                 putSphere(pc, buf, color);
             } else {
                 pc.y = -pc.y;
@@ -79,7 +79,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         point2 = bp;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
-            if (Display.mode == Display.DisplayMode.Orthographic) {
+            if (Display.mode == Display.ProjectionMode.Orthographic) {
                 putSphere(pc, buf, color);
                 if (i == SUBDIVISIONS) { // last
                     putSphere(pc, buf, Colors.Null);

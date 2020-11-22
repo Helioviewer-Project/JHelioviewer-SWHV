@@ -129,7 +129,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener {
             if (pi == null)
                 continue;
 
-            if (Display.mode == Display.DisplayMode.Orthographic) {
+            if (Display.mode == Display.ProjectionMode.Orthographic) {
                 Vec3 hitpoint, pt;
                 if (evt.isCactus()) {
                     double principalAngle = Math.toRadians(SWEKData.readCMEPrincipalAngleDegree(evt));
@@ -157,7 +157,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener {
                 }
             } else {
                 Vec2 tf = null;
-                if ((Display.mode == Display.DisplayMode.LogPolar || Display.mode == Display.DisplayMode.Polar) && evt.isCactus()) {
+                if ((Display.mode == Display.ProjectionMode.LogPolar || Display.mode == Display.ProjectionMode.Polar) && evt.isCactus()) {
                     double principalAngle = SWEKData.readCMEPrincipalAngleDegree(evt) - 90;
                     double distSun = computeDistSun(evt);
                     tf = new Vec2(Display.mode.scale.getXValueInv(principalAngle), Display.mode.scale.getYValueInv(distSun));
