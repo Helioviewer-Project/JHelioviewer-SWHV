@@ -220,7 +220,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         shader.bindDeltaT(gl, deltaT, deltaTDiff);
 
         if (Display.mode == Display.ProjectionMode.Latitudinal) {
-            GridType gridType = Display.getGridType();
+            GridType gridType = Display.gridType;
             shader.bindAnglesLatiGrid(gl,
                     latiLongitude(gridType, cameraViewpoint, metaViewpoint),
                     gridType.toLatitude(metaViewpoint),

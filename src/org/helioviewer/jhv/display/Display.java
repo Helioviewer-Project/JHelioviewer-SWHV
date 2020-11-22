@@ -42,14 +42,10 @@ public class Display {
         camera.reset();
     }
 
-    private static GridType gridType = GridType.Viewpoint;
+    public static GridType gridType = GridType.Viewpoint;
 
     public static void setGridType(GridType _gridType) {
         gridType = _gridType;
-    }
-
-    public static GridType getGridType() {
-        return gridType;
     }
 
     static int glWidth = 1;

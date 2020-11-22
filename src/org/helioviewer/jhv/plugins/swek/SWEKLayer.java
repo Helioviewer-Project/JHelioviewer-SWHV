@@ -376,7 +376,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         if (evs.isEmpty())
             return;
 
-        Quat q = Display.getGridType().toGrid(camera.getViewpoint());
+        Quat q = Display.gridType.toGrid(camera.getViewpoint());
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(controller.currentTime);
             if (evt.isCactus()) {
@@ -402,7 +402,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         if (evs.isEmpty())
             return;
 
-        Quat q = Display.getGridType().toGrid(camera.getViewpoint());
+        Quat q = Display.gridType.toGrid(camera.getViewpoint());
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(controller.currentTime);
             if (evt.isCactus() && (Display.mode == Display.ProjectionMode.LogPolar || Display.mode == Display.ProjectionMode.Polar)) {
