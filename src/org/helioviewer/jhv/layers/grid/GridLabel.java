@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.layers;
+package org.helioviewer.jhv.layers.grid;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -9,18 +9,18 @@ import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.math.MathUtils;
 import org.joml.Matrix4f;
 
-class GridLabel {
+public class GridLabel {
 
     // height of text in solar radii
-    static final float textScale = (float) (0.06 * Sun.Radius);
+    public static final float textScale = (float) (0.06 * Sun.Radius);
 
     private static final DecimalFormat formatter1 = MathUtils.numberFormatter("0", 1);
     private static final Matrix4f identity = new Matrix4f();
 
-    final String txt;
-    final float x;
-    final float y;
-    final Matrix4f m;
+    public final String txt;
+    public final float x;
+    public final float y;
+    public final Matrix4f m;
 
     private GridLabel(String _txt, float _x, float _y, Matrix4f _m) {
         txt = _txt;
@@ -29,7 +29,7 @@ class GridLabel {
         m = _m;
     }
 
-    static List<GridLabel> makeRadialLabels(double delta, double radialStep) {
+    public static List<GridLabel> makeRadialLabels(double delta, double radialStep) {
         double size = Sun.Radius;
         double horizontalAdjustment = textScale / 2.;
         double verticalAdjustment = textScale / 3.;
@@ -45,7 +45,7 @@ class GridLabel {
         return labels;
     }
 
-    static List<GridLabel> makeLatLabels(double latStep) {
+    public static List<GridLabel> makeLatLabels(double latStep) {
         double size = Sun.Radius * 1.1;
         // adjust for font size in horizontal and vertical direction (centering the text approximately)
         double horizontalAdjustment = textScale / 2.;
@@ -79,7 +79,7 @@ class GridLabel {
         return labels;
     }
 
-    static List<GridLabel> makeLonLabels(GridType gridType, double lonStep) {
+    public static List<GridLabel> makeLonLabels(GridType gridType, double lonStep) {
         double size = Sun.Radius * 1.05;
 
         ArrayList<GridLabel> labels = new ArrayList<>();
