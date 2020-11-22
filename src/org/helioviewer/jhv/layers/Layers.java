@@ -79,7 +79,6 @@ public class Layers extends AbstractTableModel implements Reorderable {
     private static LayerList newLayers = new LayerList();
     private static final ArrayList<Layer> removedLayers = new ArrayList<>();
 
-    private static GridLayer gridLayer;
     private static ViewpointLayer viewpointLayer;
     private static MiniviewLayer miniviewLayer;
 
@@ -90,10 +89,6 @@ public class Layers extends AbstractTableModel implements Reorderable {
         add(new ConnectionLayer(null));
         add(new TimestampLayer(null));
         add(new MiniviewLayer(null));
-    }
-
-    public static GridLayer getGridLayer() {
-        return gridLayer;
     }
 
     public static ViewpointLayer getViewpointLayer() {
@@ -108,9 +103,7 @@ public class Layers extends AbstractTableModel implements Reorderable {
         layers.add(layer);
         newLayers.add(layer);
 
-        if (layer instanceof GridLayer)
-            gridLayer = (GridLayer) layer;
-        else if (layer instanceof ViewpointLayer)
+        if (layer instanceof ViewpointLayer)
             viewpointLayer = (ViewpointLayer) layer;
         else if (layer instanceof MiniviewLayer)
             miniviewLayer = (MiniviewLayer) layer;

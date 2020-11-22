@@ -35,11 +35,21 @@ public class Display {
     public static DisplayMode mode = DisplayMode.Orthographic;
     public static boolean multiview = false;
 
-    private static void setProjectionMode(DisplayMode newMode) {
-        mode = newMode;
+    private static void setProjectionMode(DisplayMode _mode) {
+        mode = _mode;
         //CameraHelper.zoomToFit(miniCamera);
         miniCamera.reset();
         camera.reset();
+    }
+
+    private static GridType gridType = GridType.Viewpoint;
+
+    public static void setGridType(GridType _gridType) {
+        gridType = _gridType;
+    }
+
+    public static GridType getGridType() {
+        return gridType;
     }
 
     static int glWidth = 1;
