@@ -219,7 +219,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         double deltaTDiff = diffRot ? (cameraViewpoint.time.milli - metaViewpointDiff.time.milli) * 1e-9 : 0;
         shader.bindDeltaT(gl, deltaT, deltaTDiff);
 
-        if (Display.mode == Display.DisplayMode.Latitudinal) {
+        if (Display.mode == Display.ProjectionMode.Latitudinal) {
             GridType gridType = Display.getGridType();
             shader.bindAnglesLatiGrid(gl,
                     latiLongitude(gridType, cameraViewpoint, metaViewpoint),

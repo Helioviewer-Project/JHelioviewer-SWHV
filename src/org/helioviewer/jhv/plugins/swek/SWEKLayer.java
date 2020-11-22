@@ -197,7 +197,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
                     double znew = alpha * oldBoundaryPoint3d[2] + (1 - alpha) * points[3 * i + 2];
                     double r = Math.sqrt(xnew * xnew + ynew * ynew + znew * znew);
 
-                    if (Display.mode == Display.DisplayMode.Orthographic) {
+                    if (Display.mode == Display.ProjectionMode.Orthographic) {
                         float x = (float) (xnew / r);
                         float y = -(float) (ynew / r);
                         float z = (float) (znew / r);
@@ -360,7 +360,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         int idx = 0;
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(controller.currentTime);
-            if (Display.mode == Display.DisplayMode.Latitudinal && evt.isCactus())
+            if (Display.mode == Display.ProjectionMode.Latitudinal && evt.isCactus())
                 continue;
             bindTexture(gl, evtr.getSupplier().getGroup());
             glslTexture.render(gl, GL2.GL_TRIANGLE_STRIP, Colors.floats(evtr.getColor(), ICON_ALPHA), idx, 4);
@@ -405,7 +405,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         Quat q = Display.getGridType().toGrid(camera.getViewpoint());
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(controller.currentTime);
-            if (evt.isCactus() && (Display.mode == Display.DisplayMode.LogPolar || Display.mode == Display.DisplayMode.Polar)) {
+            if (evt.isCactus() && (Display.mode == Display.ProjectionMode.LogPolar || Display.mode == Display.ProjectionMode.Polar)) {
                 drawCactusArcScale(vp, evtr, evt, controller.currentTime, Display.mode.scale);
             } else {
                 drawPolygon(q, vp, evtr, evt);

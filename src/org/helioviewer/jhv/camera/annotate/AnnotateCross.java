@@ -36,7 +36,7 @@ public class AnnotateCross extends AbstractAnnotateable {
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, p1s, p2s);
 
-            if (Display.mode == Display.DisplayMode.Orthographic) {
+            if (Display.mode == Display.ProjectionMode.Orthographic) {
                 if (i == 0) {
                     putSphere(pc, buf, Colors.Null);
                 }
