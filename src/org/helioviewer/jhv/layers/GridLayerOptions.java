@@ -112,7 +112,7 @@ class GridLayerOptions extends JPanel {
 
     private void createGridTypeBox() {
         gridTypeBox = new JComboBox<>(GridType.values());
-        gridTypeBox.setSelectedItem(Display.getGridType());
+        gridTypeBox.setSelectedItem(Display.gridType);
         gridTypeBox.addActionListener(e -> {
             grid.setGridType((GridType) Objects.requireNonNull(gridTypeBox.getSelectedItem()));
             MovieDisplay.display();
