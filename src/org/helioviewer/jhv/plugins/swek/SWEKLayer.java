@@ -32,7 +32,6 @@ import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.AbstractLayer;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.layers.TimespanListener;
@@ -377,7 +376,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         if (evs.isEmpty())
             return;
 
-        Quat q = Layers.getGridLayer().getGridType().toGrid(camera.getViewpoint());
+        Quat q = Display.getGridType().toGrid(camera.getViewpoint());
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(controller.currentTime);
             if (evt.isCactus()) {
@@ -403,7 +402,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         if (evs.isEmpty())
             return;
 
-        Quat q = Layers.getGridLayer().getGridType().toGrid(camera.getViewpoint());
+        Quat q = Display.getGridType().toGrid(camera.getViewpoint());
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(controller.currentTime);
             if (evt.isCactus() && (Display.mode == Display.DisplayMode.LogPolar || Display.mode == Display.DisplayMode.Polar)) {

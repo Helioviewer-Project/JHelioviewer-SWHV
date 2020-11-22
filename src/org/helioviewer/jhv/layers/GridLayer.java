@@ -45,8 +45,6 @@ public class GridLayer extends AbstractLayer {
 
     private static final DecimalFormat formatter2 = MathUtils.numberFormatter("0", 2);
 
-    private GridType gridType = GridType.Viewpoint;
-
     private double lonStep = 15;
     private double latStep = 20;
     private boolean gridNeedsInit = true;
@@ -79,7 +77,7 @@ public class GridLayer extends AbstractLayer {
         jo.put("showAxis", showAxis);
         jo.put("showLabels", showLabels);
         jo.put("showRadial", showRadial);
-        jo.put("type", gridType);
+        jo.put("type", Display.getGridType());
     }
 
     private void deserialize(JSONObject jo) {
@@ -89,9 +87,9 @@ public class GridLayer extends AbstractLayer {
         showLabels = jo.optBoolean("showLabels", showLabels);
         showRadial = jo.optBoolean("showRadial", showRadial);
 
-        String strGridType = jo.optString("type", gridType.toString());
+        String strGridType = jo.optString("type", Display.getGridType().toString());
         try {
-            gridType = GridType.valueOf(strGridType);
+            Display.setGridType(GridType.valueOf(strGridType));
         } catch (Exception ignore) {
         }
     }
@@ -104,7 +102,7 @@ public class GridLayer extends AbstractLayer {
         optionsPanel = new GridLayerOptions(this);
 
         latLabels = GridLabel.makeLatLabels(latStep);
-        lonLabels = GridLabel.makeLonLabels(gridType, lonStep);
+        lonLabels = GridLabel.makeLonLabels(Display.getGridType(), lonStep);
         radialLabels = GridLabel.makeRadialLabels(0, RADIAL_STEP);
         radialLabelsFar = GridLabel.makeRadialLabels(Math.PI / 2, RADIAL_STEP_FAR);
     }
@@ -129,7 +127,7 @@ public class GridLayer extends AbstractLayer {
         double pixelsPerSolarRadius = textScale * pixFactor;
 
         Transform.pushView();
-        Transform.rotateViewInverse(gridType.toCarrington(viewpoint));
+        Transform.rotateViewInverse(Display.getGridType().toCarrington(viewpoint));
         {
             gridLine.render(gl, vp.aspect, LINEWIDTH);
             if (showLabels) {
@@ -185,6 +183,7 @@ public class GridLayer extends AbstractLayer {
         JhvTextRenderer renderer = GLText.getRenderer(size);
         renderer.setColor(Colors.WhiteFloat);
         float textScaleFactor = textScale / renderer.getFont().getSize2D() * w / GridMath.FLAT_STEPS_THETA * 5;
+        GridType gridType = Display.getGridType();
 
         renderer.begin3DRendering();
         {
@@ -308,48 +307,53 @@ public class GridLayer extends AbstractLayer {
         return "Grid";
     }
 
-    public double getLonStep() {
+    double getLonStep() {
         return lonStep;
     }
 
-    public void setLonStep(double _lonStep) {
+    void setLonStep(double _lonStep) {
         lonStep = _lonStep;
-        lonLabels = GridLabel.makeLonLabels(gridType, lonStep);
+        lonLabels = GridLabel.makeLonLabels(Display.getGridType(), lonStep);
         gridNeedsInit = true;
     }
 
-    public double getLatStep() {
+    double getLatStep() {
         return latStep;
     }
 
-    public void setLatStep(double _latStep) {
+    void setLatStep(double _latStep) {
         latStep = _latStep;
         latLabels = GridLabel.makeLatLabels(latStep);
         gridNeedsInit = true;
     }
 
-    public boolean getShowLabels() {
+    boolean getShowLabels() {
         return showLabels;
     }
 
-    public boolean getShowAxis() {
+    boolean getShowAxis() {
         return showAxis;
     }
 
-    public boolean getShowRadial() {
+    boolean getShowRadial() {
         return showRadial;
     }
 
-    public void showLabels(boolean show) {
+    void showLabels(boolean show) {
         showLabels = show;
     }
 
-    public void showAxis(boolean show) {
+    void showAxis(boolean show) {
         showAxis = show;
     }
 
-    public void showRadial(boolean show) {
+    void showRadial(boolean show) {
         showRadial = show;
+    }
+
+    void setGridType(GridType gridType) {
+        lonLabels = GridLabel.makeLonLabels(gridType, lonStep);
+        Display.setGridType(gridType);
     }
 
     @Nullable
@@ -361,15 +365,6 @@ public class GridLayer extends AbstractLayer {
     @Override
     public boolean isDeletable() {
         return false;
-    }
-
-    public GridType getGridType() {
-        return gridType;
-    }
-
-    void setGridType(GridType _gridType) {
-        gridType = _gridType;
-        lonLabels = GridLabel.makeLonLabels(gridType, lonStep);
     }
 
 }
