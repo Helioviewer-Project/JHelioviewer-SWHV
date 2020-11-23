@@ -7,6 +7,9 @@ import org.helioviewer.jhv.camera.Camera;
 //import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 
 public class Display {
@@ -19,7 +22,7 @@ public class Display {
 
         public final GLSLSolarShader shader;
         public final GridScale scale;
-        public final GridTransform xform;
+        private final GridTransform xform;
         public final JRadioButtonMenuItem radio;
 
         ProjectionMode(GLSLSolarShader _shader, GridScale _scale, GridTransform _xform) {
@@ -28,6 +31,14 @@ public class Display {
             xform = _xform;
             radio = new JRadioButtonMenuItem(toString());
             radio.addActionListener(e -> setProjectionMode(this));
+        }
+
+        public Vec2 transform(Quat q, Vec3 v) {
+            return xform.transform(q, v, scale);
+        }
+
+        public Vec3 transformInverse(Quat q, Vec2 pt) {
+            return xform.transformInverse(q, pt);
         }
 
     }

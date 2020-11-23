@@ -272,7 +272,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
         Vec3 pt = pi.centralPoint();
         if (pt != null) {
-            Vec2 tf = Display.mode.xform.transform(q, pt, Display.mode.scale);
+            Vec2 tf = Display.mode.transform(q, pt);
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
             drawImageScale(tf.x * vp.aspect, tf.y, sz, sz);
         }
