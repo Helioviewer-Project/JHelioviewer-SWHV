@@ -20,7 +20,6 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridScale;
-import org.helioviewer.jhv.display.GridTransform;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.JHVEventCache;
@@ -266,14 +265,14 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         texBuf.putCoord((float) (theta + width2), (float) (r + height2), 0, 1, texCoord[3]);
     }
 
-    private void drawIconScale(Quat q, Viewport vp, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, GridTransform xform) {
+    private void drawIconScale(Quat q, Viewport vp, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
 
         Vec3 pt = pi.centralPoint();
         if (pt != null) {
-            Vec2 tf = xform.transform(q, pt, scale);
+            Vec2 tf = Display.mode.xform.transform(q, pt, Display.mode.scale);
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
             drawImageScale(tf.x * vp.aspect, tf.y, sz, sz);
         }
@@ -410,7 +409,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
             } else {
                 drawPolygon(q, vp, evtr, evt);
                 if (icons) {
-                    drawIconScale(q, vp, evtr, evt, Display.mode.scale, Display.mode.xform);
+                    drawIconScale(q, vp, evtr, evt);
                 }
             }
         }
