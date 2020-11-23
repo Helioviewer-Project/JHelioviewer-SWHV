@@ -34,11 +34,11 @@ public class Display {
         }
 
         public Vec2 transform(Quat q, Vec3 v) {
-            return xform.transform(q, v, scale);
+            return xform.transform(q.rotateVector(v), scale);
         }
 
         public Vec3 transformInverse(Quat q, Vec2 pt) {
-            return xform.transformInverse(q, pt);
+            return q.rotateInverseVector(xform.transformInverse(pt));
         }
 
     }
