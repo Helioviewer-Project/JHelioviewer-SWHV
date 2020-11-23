@@ -47,7 +47,7 @@ public class GLHelper {
     }
 
     public static Vec2 drawVertex(Quat q, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color) {
-        Vec2 tf = Display.mode.xform.transform(q, vertex, Display.mode.scale);
+        Vec2 tf = Display.mode.transform(q, vertex);
 
         float x;
         float y = (float) tf.y;

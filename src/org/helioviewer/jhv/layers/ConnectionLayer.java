@@ -106,7 +106,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     }
 
     private static void putPointScale(Quat q, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color) {
-        Vec2 tf = Display.mode.xform.transform(q, vertex, Display.mode.scale);
+        Vec2 tf = Display.mode.transform(q, vertex);
         float x = (float) (tf.x * vp.aspect);
         float y = (float) tf.y;
         vexBuf.putVertex(x, y, 0, SIZE_POINT, color);
