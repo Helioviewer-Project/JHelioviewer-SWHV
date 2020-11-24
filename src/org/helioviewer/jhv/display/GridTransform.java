@@ -4,7 +4,7 @@ import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 
-public interface GridTransform {
+interface GridTransform {
 
     Vec2 transform(Vec3 v, GridScale scale);
 
