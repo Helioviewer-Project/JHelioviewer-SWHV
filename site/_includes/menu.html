@@ -1,0 +1,39 @@
+<header class="site-header">
+
+
+  <div id="menu">
+  <ul>
+	{% if page.active == "home" %}	
+		<li><a href="index.html" class="selected">home</a></li>
+	{% else %}
+		<li><a href="index.html">home</a></li>
+	{% endif %}
+	{% if page.active == "download" %}	
+		<li><a href="download.html" class="selected">download</a></li>
+	{% else %}
+		<li><a href="download.html">download</a></li>
+	{% endif %}
+	{% if page.active == "blog" %}
+		<li><a href="blog.html" class="selected">blog</a></li>
+	{% else %}
+		<li><a href="blog.html">blog</a></li>
+	{% endif %}
+	{% if page.active == "doc" %}	
+		<li><a href="doc.html" class="selected">docs</a></li>
+	{% else %}
+		<li><a href="doc.html">docs</a></li>
+	{% endif %}
+	{% if page.active == "demo" %}
+		<li><a href="demo.html" class="selected">demo</a></li>
+	{% else %}
+		<li><a href="demo.html">demo</a></li>
+	{% endif %}
+	{% if page.active == "about" %}
+		<li><a href="about.html" class="selected">about</a></li>
+	{% else %}
+		<li><a href="about.html">about</a></li>
+	{% endif %}
+  </ul>
+</div>
+
+</header>

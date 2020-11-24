@@ -1,0 +1,19 @@
+# Site settings
+title: JHelioviewer
+suppportEmail: "support@jhelioviewer.org"
+danielEmail: "daniel.mueller@esa.int"
+gitPage: "https://github.com/Helioviewer-Project/JHelioviewer-SWHV"
+gitIssuePage: "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues" 
+esaPage: "http://www.esa.int/ESA"
+SDOPage: "http://sdo.gsfc.nasa.gov/"
+SOHOPage: "http://sohowww.nascom.nasa.gov/"
+TutorialPage: "https://www.youtube.com/watch?v=xzSV94LfRwc"
+baseurl: "" # the subpath of your site, e.g. /blog/
+twitter_username: Helioviewer
+github_username:  jekyll
+name: The Helioviewer Project Blog
+description: Explore your Heliosphere
+url: http://blog.helioviewer.org/
+
+# Build settings
+markdown: kramdown

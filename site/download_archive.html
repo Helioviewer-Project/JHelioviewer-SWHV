@@ -1,0 +1,67 @@
+---
+layout: default
+active: download
+---
+  <div id="site_content">    
+  <div id="content">
+        
+  <div class="disignBoxSecond">
+  <div id="archive" class="boxContent">
+    <h1>Archive</h1>
+
+
+  </div>
+  </div>
+
+
+  <!--close divs for content and site-content-->
+  </div>	
+  </div>
+
+
+  <!-- Google Analytics -->
+  <script type="text/javascript">
+  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+  </script>
+  <script type="text/javascript">
+  try {
+  var pageTracker = _gat._getTracker("UA-9465077-1");
+  pageTracker._trackPageview();
+  } catch(err) {}</script>
+  <!-- END Google Analytics -->
+
+  <script type="text/javascript">
+  function platformDetect(){
+  var pathName = String(window.location);
+    if ( (pathName.indexOf('platform=win') != -1) || (pathName.indexOf('##') != -1) ) {
+      $("#windows").appendTo("#detected");
+    } else if (String(navigator.platform).toLowerCase().indexOf('mac') == 0) {
+      $("#osx").appendTo("#detected");
+    } else if (String(navigator.platform).toLowerCase().indexOf('linux') == 0) {
+      $("#linux").appendTo("#detected");
+      // Linux site
+      //window.location.href = "linux.html" ;
+    }
+  }
+  platformDetect();
+
+  function loadRepos(){
+    $.getJSON( "https://api.github.com/repos/Helioviewer-Project/JHelioviewer/releases", function( data ) {
+      var items = [];
+      $.each( data, function( key, value ) {
+        //if (!value["prerelase"]{
+          tmp = "<div class='disignBoxSecond'><div id='archive' class='boxContent'>" + value["name"] + "<ul>";
+          $.each(value["assets"], function(key, value){
+              tmp += "<li><a href=" + value["browser_download_url"] + ">"+ value["name"] +"</a></li>";
+          });
+          tmp += "</ul></div></div>"
+          console.log(tmp)
+          $("#archive").append(tmp)
+        //}
+      });
+
+  });
+  }
+  loadRepos();
+  </script>

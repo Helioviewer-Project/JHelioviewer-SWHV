@@ -1,0 +1,141 @@
+---
+layout: default
+active: download
+---
+    <div id="site_content">    
+       <div id="content">
+        
+<!--
+<div id="detected">
+        </div>
+-->
+           
+<div style="float:left; width:500px" class="disignBoxSecond">
+<div class="boxContent">
+<h1>Download JHelioviewer</h1>
+<a href='http://swhv.oma.be/download/'><img src='imgs/downloads/all_platforms.png' height='140'  /></a>
+    <p></p>
+</div></div>
+
+<!--
+<div class="disignBoxSecond" style="width:500; float:left">
+<div class="boxContent">
+<p>
+<a href="download_archive.html">Download previous versions and beta releases</a>
+</p>
+    </div>
+</div>
+-->
+           
+<!--        
+        <div class="disignBoxSecond">
+          <div class="boxContent">
+            <h1 id="titleAlternativ">Other Downloads</h1>
+  
+            <div id="otherDownload" style="height:200px"></div>
+            <div id="link" style="float:none">
+              <a href="download_archive.html">Download previous versions and beta releases</a>
+            </div>
+          </div>
+        </div>
+           
+        <div class="disignBoxSecond">
+          <div class="boxContent">
+            <h1>Getting started</h1>
+            <ul>
+              <li>Browse the latest solar movie (automatically loaded at start-up), load one of the examples or use the observation panel to access images from SOHO and SDO.</li>
+              <li>Check out the <a href="https://github.com/Helioviewer-Project/JHelioviewer/wiki" target="_blank">JHelioviewer Handbook</a>.</li>
+              <li>If you find a bug, please send us a <a href="mailto:support@jhelioviewer.org">email</a> or create a bugreport on <a href="{{ site.gitIssuePage }}" target="_blank">GitHub</a>. </li>
+              <li>JHelioviewer is <a href="{{ site.gitPage }}" target="_blank">open source</a> - share and enjoy!</li>
+            </ul>
+          </div>
+        </div>
+-->
+      </div>
+    </div>
+
+  <!-- Google Analytics -->
+  <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+  </script>
+  <script type="text/javascript">
+    try {
+    var pageTracker = _gat._getTracker("UA-9465077-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+    <!-- END Google Analytics -->
+  </script>
+  <script type="text/javascript">
+function platformDetect(){
+  var pathName = String(window.location);
+
+  $.getJSON( "https://api.github.com/repos/Helioviewer-Project/JHelioviewer/releases", function( data ) {
+    var items = [];
+    $.each( data, function( key, value ) {
+      if (!value["prerelease"]){
+        var startBox = "<div class='disignBoxSecond'><div class='boxContent'>";
+        var startBoxFloat = "<div class='disignBoxSecond' style='float:left'><div class='boxContent'>";
+        var endBox = "</div></div>"
+        var windows="", osx="", linux="", deb64="", deb="", rpm64="", rpm ="", jar ="";
+        $.each(value["assets"], function(key, value){
+          if (value["name"].toLowerCase().indexOf(".exe") >= 0){
+            windows += "<a href='" + value["browser_download_url"]+ "'><img id='windows' class='downloadMain' src='imgs/downloads/windows.png' height='140' /></a>";
+          }
+          else if (value["name"].toLowerCase().indexOf(".dmg") >= 0){
+            osx += "<a href='" + value["browser_download_url"]+ "'><img id='osx' class='downloadMain' src='imgs/downloads/osx.png'  height='140' /></a>";
+          }
+          else if (value["name"].toLowerCase().indexOf("64_bit.rpm") >= 0){
+            console.log("rpm-64")
+            rpm64 = "<a href='" + value["browser_download_url"]+ "'><img id='rpm-64' class='downloadMain' src='imgs/downloads/rpm-64.png' height='140' /></a>";
+          }
+          else if (value["name"].toLowerCase().indexOf("64_bit.deb") >= 0){
+            deb64 = "<a href='" + value["browser_download_url"]+ "'><img id='deb-64' class='downloadMain' src='imgs/downloads/deb-64.png' height='140'/></a>";
+          }
+          else if (value["name"].toLowerCase().indexOf(".rpm") >= 0){
+            rpm = "<a href='" + value["browser_download_url"]+ "'><img  id='rpm-32' class='downloadMain' src='imgs/downloads/rpm-32.png' height='140' /></a>";
+          }
+          else if (value["name"].toLowerCase().indexOf(".deb") >= 0){
+            deb = "<a href='" + value["browser_download_url"]+ "'><img  id='deb-32' class='downloadMain' src='imgs/downloads/deb-32.png' height='140' /></a>";
+          } 
+          else if (value["name"].toLowerCase().indexOf(".jar") >= 0){
+            jar = "<a href='" + value["browser_download_url"]+ "'><img  id='jar' class='downloadMain' src='imgs/downloads/all_platforms.png' height='140' /></a>";
+          }
+
+        });
+        if (rpm64 != "" || deb64 != "" || rpm != "" || deb != ""){
+          linux = "<div>" + deb64 + deb + rpm64 + rpm + "</div>";
+        }
+        var otherPlatforms = "";
+        if (windows != "" && (String(navigator.platform).toLowerCase().indexOf('win')) != 0){
+          otherPlatforms += startBoxFloat + "<h2>Windows</h2>" + windows + endBox;
+        }
+        if (osx != "" && (String(navigator.platform).toLowerCase().indexOf('mac')) != 0){
+          otherPlatforms += startBoxFloat + "<h2>OSX</h2>" + osx + endBox;  
+        }
+        if (linux != "" && (String(navigator.platform).toLowerCase().indexOf('linux')) != 0){
+          otherPlatforms += startBoxFloat + " <h2>Linux</h2>" + linux + endBox            
+        }
+        if (jar != ""){
+          otherPlatforms += startBoxFloat + " <h2>All platforms</h2>" + jar + endBox
+        }
+        if ( String(navigator.platform).toLowerCase().indexOf('win') == 0) {
+          $("#detected").append(startBox + "<h1>Windows</h1>" + windows + endBox);
+          $("#otherDownload").append(otherPlatforms);
+        } else if (String(navigator.platform).toLowerCase().indexOf('mac') == 0) {
+          $("#detected").append(startBox + "<h1>OS X</h1>" + osx + endBox);
+          $("#otherDownload").append(otherPlatforms);
+        } else if (String(navigator.platform).toLowerCase().indexOf('linux') == 0) {    
+          $("#detected").append(startBox + "<h1>Linux</h1>" + linux + endBox);
+          $("#otherDownload").append(otherPlatforms);
+        }
+        $("a").click(function(){
+          _gaq.push(['_trackPageview', this.href]);
+        })
+        return false;
+      }
+    });
+  });
+}
+platformDetect();
+  </script>

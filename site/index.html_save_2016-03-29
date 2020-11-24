@@ -1,0 +1,142 @@
+---
+layout: default
+active: home
+---
+
+<div id="site_content">    
+<div id="content">
+
+<div class="disignBoxSecond">
+<div class="boxContent">
+  <div style="float:left">
+  <h1>JHelioviewer - Explore the Sun</h1>
+</div>
+
+<div style="float:right; width:290px" class="disignBoxSecond">
+<div class="boxContent">
+<h1>Get JHelioviewer</h1>
+<div id="download">
+</div>
+<br />
+<a href="download.html">Other platforms</a><br>
+<a href="{{ site.TutorialPage }}"2-minute video tutorial</a>
+<p></p>
+<ul>
+<li>Explore 18+ years of <a href="{{ site.SOHOPage }}" target="_blank">SOHO</a> data</li>
+<li>Browse high-res <a href="{{ site.SDOPage }}" target="_blank">SDO</a> data</li>
+<li>Create your own movies of the Sun</li>
+<li><a href="download_archive.html">Download beta and old versions</a></li>
+</ul>
+
+
+ 
+</div></div>
+
+
+
+<p style="float:left">
+  <a href="download.html"><img src="imgs/screenshots/JHV_2.1_screenshot_w350.png"
+  width="520" alt="Click to download JHelioviewer" /></a>
+</p>
+
+<!--
+<p style="clear:left">
+</p>
+-->
+
+
+</div>
+</div>
+    
+    <div class="disignBoxSecond" style="width:520; float:left">
+<div class="boxContent">        
+  <h1>What is JHelioviewer?</h1>
+<p>
+JHelioviewer is visualization software for solar image data based on the JPEG 2000 compression standard. 
+JPEG 2000 offers many useful new features and has the potential to
+  revolutionize the way high-resolution image data are disseminated
+  and analyzed. The JPEG 2000 Interactive Protocol (JPIP) enables serving data in a highly compressed, quality-progressive,
+  region-of-interest-based stream. These features minimize the data volume transmitted while maximizing its
+  usability. This is especially relevant for solar physics since
+  NASA's <a href="{{ site.SDOPage }}" target="_blank">Solar Dynamics
+  Observatory</a> has started providing more than a terabyte of image data per
+  day.
+  </p>
+
+<!--
+<p>
+<a href="pub/Mueller+al_CiSE2009.pdf">Read more: The JHelioviewer paper (published in <i>Computing in Science &amp; Engineering</i> 2009).</a>
+</p>
+-->
+
+<ul>
+<li><a href="pub/Mueller+al_CiSE2009.pdf" target="_blank">Read more: The JHelioviewer paper (published in <i>Computing in Science &amp; Engineering</i> 2009).</a></li>
+<li><a href="http://helioviewer.org" target="_blank">The Helioviewer web application</a></li>
+</ul>
+
+</div>
+</div>
+
+
+<!--close divs for content and site-content-->
+</div>  
+</div>
+
+<script type="text/javascript">
+function platformDetect(){
+  var pathName = String(window.location);
+
+  $.getJSON( "https://api.github.com/repos/Helioviewer-Project/JHelioviewer/releases", function( data ) {
+    var items = [];
+    $.each( data, function( key, value ) {
+      if (!value["prerelease"]){
+        var text = "<div>";
+        if ( String(navigator.platform).toLowerCase().indexOf('win') == 0) {
+          $.each(value["assets"], function(key, value){
+            if (value["name"].toLowerCase().indexOf(".exe") >= 0){
+              text += "<a href='" + value["browser_download_url"]+ "'><img class='downloadMain' src='imgs/downloads/windows.png' height='140' /></>";
+            }
+          });    
+        } else if (String(navigator.platform).toLowerCase().indexOf('mac') == 0) {
+          $.each(value["assets"], function(key, value){
+            if (value["name"].toLowerCase().indexOf(".dmg") >= 0){
+              text += "<a href='" + value["browser_download_url"]+ "'><img class='downloadMain' src='imgs/downloads/osx.png'  height='140' /></>";
+              return false;
+            }
+          });
+        } else if (String(navigator.platform).toLowerCase().indexOf('linux') == 0) {
+          var rpm64 = "", deb64 ="", rpm = "", deb ="", jar="";
+          $.each(value["assets"], function(key, value){
+            if (value["name"].toLowerCase().indexOf(".rpm") >= 0){
+              rmp64 = "<a href='" + value["browser_download_url"]+ "'><img class='downloadMain' src='imgs/downloads/rpm-64.png' height='140' /></>";
+            }
+            else if (value["name"].toLowerCase().indexOf(".deb") >= 0){
+              deb64 = "<a href='" + value["browser_download_url"]+ "'><img class='downloadMain' src='imgs/downloads/deb-64.png' height='140'/></>";
+            }
+            else if (value["name"].toLowerCase().indexOf(".jar") >= 0){
+              jar = "<a href='" + value["browser_download_url"]+ "'><img  id='jar' class='downloadMain' src='imgs/downloads/all_platforms.png' height='140' /></a>";
+            }
+          });
+          if (rpm64 != "" || deb64 != "" || rpm != "" || deb != ""){
+            text += "<div>"+deb64 + deb+"</div><div>"+rpm64+rpm+"</div>";
+          }
+          else{
+            text += jar;
+          }
+        } else{
+			text += "<a href='download.html'><img src='imgs/downloads/all_platforms.png' height='140'  /></a>";
+		}
+
+        text += "</div>"
+        $("#download").append(text);
+        
+        $("a").click(function(){
+          _gaq.push(['_trackPageview', this.href]);
+        })
+        return false;
+      }
+    });
+  });
+}
+platformDetect();
+</script>
