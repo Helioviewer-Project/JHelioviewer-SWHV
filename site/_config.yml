@@ -17,3 +17,7 @@ url: http://blog.helioviewer.org/
 
 # Build settings
 markdown: kramdown
+
+# SASS settings
+sass:
+    sass_dir: site/_sass
