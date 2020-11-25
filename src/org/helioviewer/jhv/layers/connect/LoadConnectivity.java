@@ -61,6 +61,10 @@ public class LoadConnectivity implements Callable<Connectivity> {
                 String[] values = Regex.MultiSpace.split(line);
                 if (values.length > 6) {
                     try {
+                        double density = Double.parseDouble(values[3]);
+                        if (density <= 1)
+                            continue;
+
                         Vec3 v = ConnectUtils.toCartesian(values[6], values[5]);
                         switch (values[1]) {
                             case "SSW":
