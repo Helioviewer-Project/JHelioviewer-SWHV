@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVTime;
 
 public interface ReceiverConnectivity {
@@ -12,15 +11,15 @@ public interface ReceiverConnectivity {
     class Connectivity {
 
         public final JHVTime time;
-        public final OrthoScaleList SSW;
-        public final OrthoScaleList FSW;
-        public final OrthoScaleList M;
+        public final List<OrthoScale> SSW;
+        public final List<OrthoScale> FSW;
+        public final List<OrthoScale> M;
 
-        Connectivity(JHVTime _time, List<Vec3> cartSSW, List<Vec3> cartFSW, List<Vec3> cartM) {
+        Connectivity(JHVTime _time, List<OrthoScale> _SSW, List<OrthoScale> _FSW, List<OrthoScale> _M) {
             time = _time;
-            SSW = new OrthoScaleList(cartSSW);
-            FSW = new OrthoScaleList(cartFSW);
-            M = new OrthoScaleList(cartM);
+            SSW = _SSW;
+            FSW = _FSW;
+            M = _M;
         }
 
     }

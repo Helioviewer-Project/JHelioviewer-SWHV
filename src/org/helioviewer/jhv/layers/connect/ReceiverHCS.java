@@ -1,7 +1,9 @@
 package org.helioviewer.jhv.layers.connect;
 
+import java.util.List;
+
 public interface ReceiverHCS {
 
-    void setHCS(OrthoScaleList hcs);
+    void setHCS(List<OrthoScale> hcs);
 
 }

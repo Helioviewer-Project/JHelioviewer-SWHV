@@ -13,6 +13,7 @@ import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.layers.connect.ReceiverConnectivity.Connectivity;
 import org.helioviewer.jhv.log.Log;
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.time.JHVTime;
@@ -27,6 +28,15 @@ public class LoadConnectivity implements Callable<Connectivity> {
         return null;
     }
 
+    private static final double AMPLIFY = 4;
+    private static final double[] sswColor = new double[]{164 / 255., 48 / 255., 42 / 255.};
+    private static final double[] fswColor = new double[]{74 / 255., 136 / 255., 92 / 255.};
+    private static final double[] mColor = new double[]{240 / 255., 145 / 255., 53 / 255.};
+
+    private static byte[] alphaColor(double[] color, double alpha) {
+        return new byte[]{(byte) (color[0] * alpha), (byte) (color[1] * alpha), (byte) (color[2] * alpha), (byte) alpha};
+    }
+
     private final URI uri;
 
     private LoadConnectivity(URI _uri) {
@@ -36,9 +46,9 @@ public class LoadConnectivity implements Callable<Connectivity> {
     @Override
     public Connectivity call() throws Exception {
         JHVTime time = null;
-        List<Vec3> SSW = new ArrayList<>();
-        List<Vec3> FSW = new ArrayList<>();
-        List<Vec3> M = new ArrayList<>();
+        List<OrthoScale> SSW = new ArrayList<>();
+        List<OrthoScale> FSW = new ArrayList<>();
+        List<OrthoScale> M = new ArrayList<>();
 
         try (NetClient nc = NetClient.of(uri); BufferedReader br = new BufferedReader(nc.getReader())) {
             int lineNo = 0;
@@ -61,20 +71,17 @@ public class LoadConnectivity implements Callable<Connectivity> {
                 String[] values = Regex.MultiSpace.split(line);
                 if (values.length > 6) {
                     try {
-                        double density = Double.parseDouble(values[3]);
-                        if (density <= 1)
-                            continue;
-
+                        double density = 2.55 * MathUtils.clip(AMPLIFY * Double.parseDouble(values[3]), 0, 100);
                         Vec3 v = ConnectUtils.toCartesian(values[6], values[5]);
                         switch (values[1]) {
                             case "SSW":
-                                SSW.add(v);
+                                SSW.add(new OrthoScale(v, alphaColor(sswColor, density)));
                                 break;
                             case "FSW":
-                                FSW.add(v);
+                                FSW.add(new OrthoScale(v, alphaColor(fswColor, density)));
                                 break;
                             case "M":
-                                M.add(v);
+                                M.add(new OrthoScale(v, alphaColor(mColor, density)));
                                 break;
                         }
                     } catch (Exception e) {
@@ -83,10 +90,7 @@ public class LoadConnectivity implements Callable<Connectivity> {
                 }
             }
         }
-
-        if (time == null)
-            return null;
-        return new Connectivity(time, SSW, FSW, M);
+        return time == null ? null : new Connectivity(time, SSW, FSW, M);
     }
 
     private static class Callback implements FutureCallback<Connectivity> {

@@ -6,6 +6,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.File;
 import java.net.URI;
+import java.util.List;
 import java.util.function.BiFunction;
 
 import javax.annotation.Nullable;
@@ -25,7 +26,7 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.connect.LoadConnectivity;
 import org.helioviewer.jhv.layers.connect.LoadFootpoint;
 import org.helioviewer.jhv.layers.connect.LoadHCS;
-import org.helioviewer.jhv.layers.connect.OrthoScaleList;
+import org.helioviewer.jhv.layers.connect.OrthoScale;
 import org.helioviewer.jhv.layers.connect.ReceiverConnectivity;
 import org.helioviewer.jhv.layers.connect.ReceiverConnectivity.Connectivity;
 import org.helioviewer.jhv.layers.connect.ReceiverHCS;
@@ -48,13 +49,9 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     private static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
     private static final float SIZE_POINT = 0.01f;
 
-    private final byte[] sswColor = Colors.bytes(164, 48, 42);
-    private final byte[] fswColor = Colors.bytes(74, 136, 92);
-    private final byte[] mColor = Colors.bytes(240, 145, 53);
     private final GLSLShape connectivityCenter = new GLSLShape(true);
     private final BufVertex connectivityBuf = new BufVertex(96 * GLSLShape.stride);
 
-    private final byte[] hcsColor = Colors.bytes(223, 62, 48);
     private final GLSLLine hcsLine = new GLSLLine(true); // TBD
     private final BufVertex hcsBuf = new BufVertex(512 * GLSLLine.stride);
 
@@ -65,7 +62,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     private final JPanel optionsPanel;
 
     private Connectivity connectivity;
-    private OrthoScaleList hcs;
+    private List<OrthoScale> hcs;
     private TimeMap<PositionCartesian> footpointMap;
 
     private JHVTime lastTimestamp;
@@ -97,9 +94,9 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
 
     private void drawConnectivity(Camera camera, Viewport vp, GL2 gl) {
         Quat q = Display.gridType.toGrid(camera.getViewpoint());
-        putConnectivity(q, vp, connectivity.SSW, connectivityBuf, sswColor);
-        putConnectivity(q, vp, connectivity.FSW, connectivityBuf, fswColor);
-        putConnectivity(q, vp, connectivity.M, connectivityBuf, mColor);
+        putConnectivity(q, vp, connectivity.SSW, connectivityBuf);
+        putConnectivity(q, vp, connectivity.FSW, connectivityBuf);
+        putConnectivity(q, vp, connectivity.M, connectivityBuf);
 
         connectivityCenter.setData(gl, connectivityBuf);
         connectivityCenter.renderPoints(gl, CameraHelper.getPixelFactor(camera, vp));
@@ -112,34 +109,31 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
         vexBuf.putVertex(x, y, 0, SIZE_POINT, color);
     }
 
-    private static void putConnectivity(Quat q, Viewport vp, OrthoScaleList points, BufVertex vexBuf, byte[] color) {
+    private static void putConnectivity(Quat q, Viewport vp, List<OrthoScale> points, BufVertex vexBuf) {
         if (Display.mode == Display.ProjectionMode.Orthographic)
-            points.ortho.forEach(v -> vexBuf.putVertex((float) v.x, (float) v.y, (float) v.z, 2 * SIZE_POINT, color));
+            points.forEach(v -> vexBuf.putVertex((float) v.ortho.x, (float) v.ortho.y, (float) v.ortho.z, 2 * SIZE_POINT, v.color));
         else
-            points.scale.forEach(v -> putPointScale(q, vp, v, vexBuf, color));
+            points.forEach(v -> putPointScale(q, vp, v.scale, vexBuf, v.color));
     }
 
     private void drawHCS(Camera camera, Viewport vp, GL2 gl) {
+        OrthoScale first = hcs.get(0);
+
         if (Display.mode == Display.ProjectionMode.Orthographic) {
-            Vec3 first = hcs.ortho.get(0);
-            hcsBuf.putVertex(first, Colors.Null);
-            hcs.ortho.forEach(v -> hcsBuf.putVertex(v, hcsColor));
-            hcsBuf.putVertex(first, hcsColor);
-            hcsBuf.putVertex(first, Colors.Null);
+            hcsBuf.putVertex(first.ortho, Colors.Null);
+            hcs.forEach(v -> hcsBuf.putVertex(v.ortho, v.color));
+            hcsBuf.putVertex(first.ortho, first.color);
+            hcsBuf.putVertex(first.ortho, Colors.Null);
         } else {
             Quat q = Display.gridType.toGrid(camera.getViewpoint());
             Vec2 previous = null;
 
-            Vec3 first = hcs.scale.get(0);
-            GLHelper.drawVertex(q, vp, first, previous, hcsBuf, Colors.Null);
-
-            int size = hcs.scale.size();
-            for (int i = 0; i < size; i++) {
-                Vec3 v = hcs.scale.get(i);
-                previous = GLHelper.drawVertex(q, vp, v, previous, hcsBuf, hcsColor);
+            GLHelper.drawVertex(q, vp, first.scale, previous, hcsBuf, Colors.Null);
+            for (OrthoScale v : hcs) {
+                previous = GLHelper.drawVertex(q, vp, v.scale, previous, hcsBuf, v.color);
             }
-            previous = GLHelper.drawVertex(q, vp, first, previous, hcsBuf, hcsColor);
-            GLHelper.drawVertex(q, vp, first, previous, hcsBuf, Colors.Null);
+            previous = GLHelper.drawVertex(q, vp, first.scale, previous, hcsBuf, first.color);
+            GLHelper.drawVertex(q, vp, first.scale, previous, hcsBuf, Colors.Null);
         }
 
         hcsLine.setData(gl, hcsBuf);
@@ -240,7 +234,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     @Override
     public void setConnectivity(Connectivity _connectivity) {
         connectivity = _connectivity;
-        // System.out.println(">>> SSW: " + connectivity.SSW.ortho.size() + " FSW: " + connectivity.FSW.ortho.size() + " M: " + connectivity.M.ortho.size());
+        // System.out.println(">>> SSW: " + connectivity.SSW.size() + " FSW: " + connectivity.FSW.size() + " M: " + connectivity.M.size());
         MovieDisplay.display();
     }
 
@@ -251,9 +245,9 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     }
 
     @Override
-    public void setHCS(OrthoScaleList _hcs) {
+    public void setHCS(List<OrthoScale> _hcs) {
         hcs = _hcs;
-        // System.out.println(">>> HCS: " + hcs.ortho.size());
+        // System.out.println(">>> HCS: " + hcs.size());
         MovieDisplay.display();
     }
 
