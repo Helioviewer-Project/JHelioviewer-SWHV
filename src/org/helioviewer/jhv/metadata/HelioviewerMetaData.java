@@ -64,14 +64,21 @@ public class HelioviewerMetaData extends BaseMetaData {
         unit = m.getString("BUNIT").orElse(unit);
         unit = unit.replace("-1", "\u207B\u00B9").replace("-2", "\u207B\u00B2").replace("-3", "\u207B\u00B3").replace(" ", "").intern();
 
+        Optional<Double> mDataMin = m.getDouble("DATAMIN");
+        Optional<Double> mDataMax = m.getDouble("DATAMAX");
+        if (mDataMin.isPresent() && mDataMax.isPresent()) {
+            minMax = new float[2];
+            minMax[0] = mDataMin.get().floatValue();
+            minMax[1] = mDataMax.get().floatValue();
+        }
+
         // a linear physical LUT
         Optional<Double> mZero = m.getDouble("HV_ZERO");
         Optional<Double> mScale = m.getDouble("HV_SCALE");
-        Optional<Double> mDatamax = m.getDouble("DATAMAX");
-        if (mZero.isPresent() && mScale.isPresent() && mDatamax.isPresent()) {
+        if (mZero.isPresent() && mScale.isPresent() && mDataMax.isPresent()) {
             double zero = mZero.get();
             double scale = mScale.get();
-            int size = MathUtils.clip((int) Math.ceil(mDatamax.get()) + 1, 0, 65535);
+            int size = MathUtils.clip((int) Math.ceil(mDataMax.get()) + 1, 0, 65535);
             physLUT = new float[size];
             for (int i = 0; i < size; i++)
                 physLUT[i] = (float) (zero + i * scale);

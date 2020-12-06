@@ -58,7 +58,7 @@ public class GenericImage implements URIImageReader {
     }
 
     @Override
-    public ImageBuffer readImageBuffer(URI uri) throws Exception {
+    public ImageBuffer readImageBuffer(URI uri, float[] minMax) throws Exception {
         try (NetClient nc = NetClient.of(uri); ImageInputStream iis = ImageIO.createImageInputStream(nc.getStream())) {
             ImageReader reader = getReader(iis);
             if (reader == null)
