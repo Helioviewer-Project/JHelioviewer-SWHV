@@ -52,7 +52,7 @@ public class FITSImage implements URIImageReader {
 
     @Nullable
     @Override
-    public ImageBuffer readImageBuffer(URI uri) throws Exception {
+    public ImageBuffer readImageBuffer(URI uri, float[] minMax) throws Exception {
         try (NetClient nc = NetClient.of(uri);
              InputStream is = FileUtils.decompressStream(nc.getStream());
              Fits f = new Fits(is)) {
@@ -60,12 +60,12 @@ public class FITSImage implements URIImageReader {
             // this is cumbersome
             for (BasicHDU<?> hdu : hdus) {
                 if (hdu instanceof CompressedImageHDU) {
-                    return readHDU(((CompressedImageHDU) hdu).asImageHDU());
+                    return readHDU(((CompressedImageHDU) hdu).asImageHDU(), minMax);
                 }
             }
             for (BasicHDU<?> hdu : hdus) {
                 if (hdu instanceof ImageHDU) {
-                    return readHDU(hdu);
+                    return readHDU(hdu, minMax);
                 }
             }
         }
@@ -139,7 +139,7 @@ public class FITSImage implements URIImageReader {
         }
     */
 
-    private static ImageBuffer readHDU(BasicHDU<?> hdu) throws Exception {
+    private static ImageBuffer readHDU(BasicHDU<?> hdu, float[] minMax) throws Exception {
         int[] axes = hdu.getAxes();
         if (axes == null || axes.length != 2)
             throw new Exception("Only 2D FITS files supported");
@@ -170,23 +170,25 @@ public class FITSImage implements URIImageReader {
         double bzero = hdu.getBZero();
         double bscale = hdu.getBScale();
 
-        int[] npix = {0};
-        float[] sampleData = sampleImage(bpp, width, height, pixelData, blank, bzero, bscale, npix);
+        if (minMax == null) {
+            int[] npix = {0};
+            float[] sampleData = sampleImage(bpp, width, height, pixelData, blank, bzero, bscale, npix);
 
-        float[] zLow = {0};
-        float[] zHigh = {0};
-        float[] zMax = {0};
-        ZScale.zscale(sampleData, npix[0], zLow, zHigh, zMax);
-        // System.out.println(">>> " + npix[0] + " " + zLow[0] + " " + zMax[0]);
+            float[] zLow = {0};
+            float[] zHigh = {0};
+            float[] zMax = {0};
+            ZScale.zscale(sampleData, npix[0], zLow, zHigh, zMax);
+            // System.out.println(">>> " + npix[0] + " " + zLow[0] + " " + zMax[0]);
 
-        float[] minmax = {zLow[0], zMax[0]};
-        // float[] minmax = getMinMax(bpp, width, height, pixelData, blank, bzero, bscale);
-        if (minmax[0] >= minmax[1]) {
-            Log.debug("min >= max :" + minmax[0] + ' ' + minmax[1]);
-            minmax[1] = minmax[0] + 1;
+            minMax = new float[]{zLow[0], zMax[0]};
+            // minMax = getMinMax(bpp, width, height, pixelData, blank, bzero, bscale);
+            if (minMax[0] >= minMax[1]) {
+                Log.debug("min >= max :" + minMax[0] + ' ' + minMax[1]);
+                minMax[1] = minMax[0] + 1;
+            }
         }
-        double range = minmax[1] - minmax[0];
-        // System.out.println(">>> " + minmax[0] + ' ' + minmax[1]);
+        double range = minMax[1] - minMax[0];
+        // System.out.println(">>> " + minMax[0] + ' ' + minMax[1]);
 
         short[] outData = new short[width * height];
         float[] lut = new float[65536];
@@ -200,7 +202,7 @@ public class FITSImage implements URIImageReader {
                     Object lineData = pixelData[j];
                     for (int i = 0; i < width; i++) {
                         float v = getValue(bpp, lineData, i, blank, bzero, bscale);
-                        int p = (int) MathUtils.clip(scale * Math.pow(v - minmax[0], GAMMA) + .5, 0, 65535);
+                        int p = (int) MathUtils.clip(scale * Math.pow(v - minMax[0], GAMMA) + .5, 0, 65535);
                         lut[p] = v;
                         outData[width * (height - 1 - j) + i] = v == ImageBuffer.BAD_PIXEL ? 0 : (short) p;
                     }
@@ -213,7 +215,7 @@ public class FITSImage implements URIImageReader {
                     Object lineData = pixelData[j];
                     for (int i = 0; i < width; i++) {
                         float v = getValue(bpp, lineData, i, blank, bzero, bscale);
-                        int p = (int) MathUtils.clip(scale * Math.log1p(v - minmax[0]) + .5, 0, 65535);
+                        int p = (int) MathUtils.clip(scale * Math.log1p(v - minMax[0]) + .5, 0, 65535);
                         lut[p] = v;
                         outData[width * (height - 1 - j) + i] = v == ImageBuffer.BAD_PIXEL ? 0 : (short) p;
                     }

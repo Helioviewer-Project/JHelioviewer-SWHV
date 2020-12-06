@@ -60,6 +60,9 @@ public interface MetaData {
     @Nullable
     float[] getPhysicalLUT();
 
+    @Nullable
+    float[] getMinMax();
+
     boolean getCalculateDepth();
 
 }
