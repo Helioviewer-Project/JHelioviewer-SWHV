@@ -1,10 +1,11 @@
-package org.helioviewer.jhv.view.uri.fits;
+package org.helioviewer.jhv.view.uri;
 
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.annotation.Nullable;
 
@@ -20,13 +21,11 @@ import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.math.MathUtils;
-import org.helioviewer.jhv.log.Log;
-import org.helioviewer.jhv.view.uri.URIImageReader;
 
 import com.google.common.primitives.Floats;
 
 // essentially static; local or network cache
-public class FITSImage implements URIImageReader {
+class FITSImage implements URIImageReader {
 
     @Nullable
     @Override
@@ -101,9 +100,11 @@ public class FITSImage implements URIImageReader {
         return (blank != BLANK && v == blank) || !Double.isFinite(v) ? ImageBuffer.BAD_PIXEL : (float) (bzero + v * bscale);
     }
 
-    private static float[] sampleImage(int bpp, int width, int height, Object[] pixelData, long blank, double bzero, double bscale, int[] npix) {
-        int stepW = Math.max(4 * width / 1024, 1);
-        int stepH = Math.max(4 * height / 1024, 1);
+    private static final int SAMPLE = 8;
+
+    private static float[] sampleImage(int bpp, int width, int height, Object[] pixelData, long blank, double bzero, double bscale) {
+        int stepW = Math.max(SAMPLE * width / 1024, 1);
+        int stepH = Math.max(SAMPLE * height / 1024, 1);
         ArrayList<Float> sampleData = new ArrayList<>((width / stepW) * (height / stepH));
 
         for (int j = 0; j < height; j += stepH) {
@@ -114,7 +115,6 @@ public class FITSImage implements URIImageReader {
                     sampleData.add(v);
             }
         }
-        npix[0] = sampleData.size();
         return Floats.toArray(sampleData);
     }
 
@@ -138,6 +138,9 @@ public class FITSImage implements URIImageReader {
             return new float[]{min, max};
         }
     */
+
+    private static final double MIN_MULT = 0.0005;
+    private static final double MAX_MULT = 0.9995;
 
     private static ImageBuffer readHDU(BasicHDU<?> hdu, float[] minMax) throws Exception {
         int[] axes = hdu.getAxes();
@@ -171,19 +174,16 @@ public class FITSImage implements URIImageReader {
         double bscale = hdu.getBScale();
 
         if (minMax == null) {
-            int[] npix = {0};
-            float[] sampleData = sampleImage(bpp, width, height, pixelData, blank, bzero, bscale, npix);
+            float[] sampleData = sampleImage(bpp, width, height, pixelData, blank, bzero, bscale);
+            Arrays.sort(sampleData);
 
-            float[] zLow = {0};
-            float[] zHigh = {0};
-            float[] zMax = {0};
-            ZScale.zscale(sampleData, npix[0], zLow, zHigh, zMax);
-            // System.out.println(">>> " + npix[0] + " " + zLow[0] + " " + zMax[0]);
+            // System.out.println(">>> " + sampleData.length + " " + (int) (MIN_MULT * sampleData.length) + " " + (int) (MAX_MULT * sampleData.length));
+            minMax = new float[]{
+                    sampleData[(int) (MIN_MULT * sampleData.length)],
+                    sampleData[(int) (MAX_MULT * sampleData.length)]};
 
-            minMax = new float[]{zLow[0], zMax[0]};
             // minMax = getMinMax(bpp, width, height, pixelData, blank, bzero, bscale);
-            if (minMax[0] >= minMax[1]) {
-                Log.debug("min >= max :" + minMax[0] + ' ' + minMax[1]);
+            if (minMax[0] == minMax[1]) {
                 minMax[1] = minMax[0] + 1;
             }
         }
