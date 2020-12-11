@@ -44,11 +44,11 @@
         </condition>
 
         <path id="processorpath.ref">
-            <pathelement location="extra/prone/error_prone_core-2.3.4-with-dependencies.jar"/>
+            <pathelement location="extra/prone/error_prone_core-2.4.1-20201211.021249-180-with-dependencies.jar"/>
             <pathelement location="extra/prone/jFormatString-3.0.0.jar"/>
             <pathelement location="extra/prone/dataflow-2.5.7.jar"/>
             <pathelement location="extra/prone/javacutil-2.5.7.jar"/>
-            <pathelement location="extra/prone/caffeine-2.8.0.jar"/>
+            <pathelement location="extra/prone/caffeine-2.8.8.jar"/>
             <!-- Add annotation processors and Error Prone custom checks here if needed -->
         </path>
 
@@ -58,7 +58,8 @@
             <compilerarg value="-processorpath"/>
             <compilerarg pathref="processorpath.ref"/>
             <!-- CatchAndPrintStackTrace - not interesting -->
-            <compilerarg value="-Xplugin:ErrorProne -Xep:DeadException:ERROR -Xep:CatchAndPrintStackTrace:OFF" />
+            <compilerarg value="-Xplugin:ErrorProne -Xep:DeadException:ERROR -Xep:CatchAndPrintStackTrace:OFF
+                                -Xep:SameNameButDifferent:OFF -Xep:ReferenceEquality:OFF" />
             <classpath>
                 <fileset refid="libfiles"/>
             </classpath>
