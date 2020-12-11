@@ -58,8 +58,11 @@
             <compilerarg value="-processorpath"/>
             <compilerarg pathref="processorpath.ref"/>
             <!-- CatchAndPrintStackTrace - not interesting -->
-            <compilerarg value="-Xplugin:ErrorProne -Xep:DeadException:ERROR -Xep:CatchAndPrintStackTrace:OFF
-                                -Xep:SameNameButDifferent:OFF -Xep:ReferenceEquality:OFF" />
+            <compilerarg value="-Xplugin:ErrorProne
+                                -Xep:SameNameButDifferent:OFF
+                                -Xep:ReferenceEquality:OFF
+                                -Xep:CatchAndPrintStackTrace:OFF
+                                -Xep:EmptyCatch:OFF "/>
             <classpath>
                 <fileset refid="libfiles"/>
             </classpath>

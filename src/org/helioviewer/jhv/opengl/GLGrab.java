@@ -6,7 +6,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 
 import com.jogamp.opengl.FBObject;
-import com.jogamp.opengl.FBObject.Attachment.Type;
+import com.jogamp.opengl.FBObject.Attachment;
 import com.jogamp.opengl.FBObject.TextureAttachment;
 import com.jogamp.opengl.GL2;
 
@@ -27,7 +27,7 @@ public class GLGrab {
         fbo.init(gl, w, h, 0);
         fboTex = fbo.attachTexture2D(gl, 0, true, GL2.GL_LINEAR, GL2.GL_LINEAR, GL2.GL_CLAMP_TO_EDGE, GL2.GL_CLAMP_TO_EDGE);
 
-        fbo.attachRenderbuffer(gl, Type.DEPTH, FBObject.CHOSEN_BITS);
+        fbo.attachRenderbuffer(gl, Attachment.Type.DEPTH, FBObject.CHOSEN_BITS);
         fbo.reset(gl, fbo.getWidth(), fbo.getHeight(), GLInfo.GLSAMPLES);
         fbo.unbind(gl);
     }

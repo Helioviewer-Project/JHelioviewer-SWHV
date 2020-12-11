@@ -10,11 +10,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.RollingFileAppender;
 
-/*
- * Allows to use syntax patterns of SimpleDateFormat for log file naming.
- * Overwrites the setFile method of FileAppender.
- * @author Andre Dau
- */
+// Allows to use syntax patterns of SimpleDateFormat for log file naming.
+// Overwrites the setFile method of FileAppender.
 public class TimestampRollingFileAppender extends RollingFileAppender {
 
     // Maximum number of days to keep log files before they are deleted
