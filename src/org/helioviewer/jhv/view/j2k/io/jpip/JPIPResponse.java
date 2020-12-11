@@ -9,11 +9,7 @@ import javax.annotation.Nullable;
 
 import kdu_jni.KduException;
 
-/*
- * A response to a JPIPRequest, encapsulates the JPIPSegments
- * @author Juan Pablo Garcia Ortiz
- * @author caplins
- */
+// A response to a JPIPRequest, encapsulates the JPIPSegments
 public class JPIPResponse {
 
     // The status: could be EOR_WINDOW_DONE or EOR_IMAGE_DONE
@@ -46,11 +42,9 @@ public class JPIPResponse {
     // The first byte of the last VBAS read
     private int vbasFstByte = 0;
 
-    /*
-     * Reads an VBAS integer from the stream. The length in bytes of the VBAS is
-     * stored in the <code>vbasLength</code>variable, and the first byte of the
-     * VBAS is stored in the <code>vbasFstByte</code> variable.
-     */
+    // Reads an VBAS integer from the stream. The length in bytes of the VBAS is
+    // stored in the vbasLength variable, and the first byte of the
+    // VBAS is stored in the vbasFstByte variable.
     private long readVBAS(InputStream in) throws IOException {
         vbasLength = 0;
         long value = 0;
@@ -76,12 +70,10 @@ public class JPIPResponse {
         return value;
     }
 
-    /*
-     * Reads the next data segment from the stream, and stores its information
-     * in the <code>JPIPSegment</code> object passed as parameter. The data
-     * buffer is not reallocated every time. It is only reallocated if the next
-     * data length is bigger than the previous one.
-     */
+    // Reads the next data segment from the stream, and stores its information
+    // in the JPIPSegment object passed as parameter. The data
+    // buffer is not reallocated every time. It is only reallocated if the next
+    // data length is bigger than the previous one.
     @Nullable
     private JPIPSegment readSegment(InputStream in) throws IOException {
         long id;

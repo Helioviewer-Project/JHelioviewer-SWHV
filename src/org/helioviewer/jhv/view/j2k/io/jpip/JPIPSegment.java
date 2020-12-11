@@ -6,13 +6,10 @@ import java.io.Serializable;
 
 //import com.google.common.primitives.Shorts;
 
-/*
- * The class <code>JPIPSegment</code> is used to construct objects to store
- * segments of JPIP data. These segments can be data-bin segments as well as EOR
- * messages. In this last case, the EOR code is stored in the <code>id</code>
- * field and the EOR message body is stored in the <code>data</code> field.
- * @author Juan Pablo Garcia Ortiz
- */
+// The class JPIPSegment is used to construct objects to store
+// segments of JPIP data. These segments can be data-bin segments as well as EOR
+// messages. In this last case, the EOR code is stored in the 'id'
+// field and the EOR message body is stored in the 'data' field.
 class JPIPSegment implements Serializable {
 
     static final long serialVersionUID = 42L;

@@ -13,10 +13,8 @@ import org.helioviewer.jhv.io.FileUtils;
 
 public class LogSettings {
 
-    /**
-     * @param defaultLogSettingsPath Path to the default log settings
-     * @param logsDirectory          Path to the directory where the log files are stored
-     */
+    // defaultLogSettingsPath Path to the default log settings
+    // logsDirectory          Path to the directory where the log files are stored
     public static void init(String defaultLogSettingsPath, String logsDirectory) {
         Properties settings = new Properties();
         try (InputStream is = FileUtils.getResource(defaultLogSettingsPath)) {

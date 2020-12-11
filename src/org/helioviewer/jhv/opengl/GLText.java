@@ -22,7 +22,7 @@ public class GLText {
     public static final int[] shadowOffset = {2, -2};
 
     public static JhvTextRenderer getRenderer(int size) {
-        size *= GLInfo.pixelScale[1];
+        size = (int) (size * GLInfo.pixelScale[1]);
 
         int idx = (size - MIN) / STEP;
         if (idx < 0)
@@ -86,14 +86,14 @@ public class GLText {
         // float left = textInit_x - LEFT_MARGIN_TEXT;
         // float bottom = textInit_y - fontSize - TOP_MARGIN_TEXT;
 
-        int deltaY = 0;
+        int deltaY = 0, dY = (int) (fontSize * 1.1);
         renderer.beginRendering(vp.width, vp.height);
         for (String txt : txts) {
             renderer.setColor(shadowColor);
             renderer.draw(txt, textInit_x + shadowOffset[0], vp.height - textInit_y + shadowOffset[1] - deltaY);
             renderer.setColor(Colors.LightGrayFloat);
             renderer.draw(txt, textInit_x, vp.height - textInit_y - deltaY);
-            deltaY += (int) (fontSize * 1.1);
+            deltaY += dY;
         }
         renderer.endRendering();
     }
