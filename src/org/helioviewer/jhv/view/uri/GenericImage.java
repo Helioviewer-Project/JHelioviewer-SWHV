@@ -90,6 +90,7 @@ class GenericImage implements URIImageReader {
         ImageBuffer.Format format;
         switch (image.getType()) {
             case BufferedImage.TYPE_BYTE_GRAY:
+            case BufferedImage.TYPE_BYTE_INDEXED:
                 buffer = ByteBuffer.wrap(((DataBufferByte) image.getRaster().getDataBuffer()).getData());
                 format = ImageBuffer.Format.Gray8;
                 break;
