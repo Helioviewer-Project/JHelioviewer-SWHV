@@ -176,7 +176,7 @@ public class YAxis {
         private final String label;
 
         YAxisLogScale(String _label) {
-            label = "log(" + fixupUnit(_label) + ')';
+            label = "log10(" + fixupUnit(_label) + ')';
         }
 
         @Override
