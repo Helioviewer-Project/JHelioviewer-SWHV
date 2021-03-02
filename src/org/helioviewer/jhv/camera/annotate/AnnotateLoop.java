@@ -42,13 +42,10 @@ public class AnnotateLoop extends AbstractAnnotateable {
             vx.z = center.z + cosr * v.z + sinr * bp.z;
             if (Display.mode == Display.ProjectionMode.Orthographic) {
                 if (i == 0) {
-                    buf.putVertex((float) (v.x * radius), (float) (v.y * radius), (float) (v.z * radius), 1, color);
                     putSphere(vx, buf, Colors.Null);
                 }
-                buf.putVertex((float) (v.x * radius), (float) (v.y * radius), (float) (v.z * radius), 1, color);
                 putSphere(vx, buf, color);
                 if (i == SUBDIVISIONS) {
-                    buf.putVertex((float) (v.x * radius), (float) (v.y * radius), (float) (v.z * radius), 1, color);
                     putSphere(vx, buf, Colors.Null);
                 }
             } else {
