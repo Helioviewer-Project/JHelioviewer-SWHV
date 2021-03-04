@@ -16,7 +16,6 @@ public class Settings {
     private static final Path userPath = Path.of(JHVDirectory.SETTINGS.getPath(), "user.properties");
     private static final Properties defaults = new Properties() {
         {
-            super.setProperty("startup.loadmovie", "true");
             super.setProperty("startup.sampHub", "true");
             super.setProperty("display.normalizeAIA", "true");
             super.setProperty("display.normalize", "false");
