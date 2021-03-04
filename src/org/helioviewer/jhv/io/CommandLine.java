@@ -4,8 +4,10 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.log.Log;
 
 public class CommandLine {
@@ -15,6 +17,14 @@ public class CommandLine {
 
     public static void setArguments(String[] args) {
         arguments = args;
+        // append state if user set in GUI, command line takes precedence
+        String propState = Settings.getProperty("startup.loadState");
+        if (propState != null && !"false".equals(propState)) {
+            arguments = Arrays.copyOf(args, args.length + 2);
+            arguments[args.length] = "-state";
+            arguments[args.length + 1] = propState;
+        }
+
         usageMessage = "The following command-line options are available: \n\n" +
                 "-load    file location\n" + "       Load or request a supported file at program start. The option can be used multiple times.\n\n" +
                 "-request request file location\n" + "       Load a request file and issue a request at program start. The option can be used multiple times.\n\n" +
@@ -26,11 +36,6 @@ public class CommandLine {
         for (URI uri : getURIOptionValues("-load")) {
             Load.image.get(uri);
         }
-        // -state
-        for (URI uri : getURIOptionValues("-state")) {
-            Load.state.get(uri);
-            break;
-        }
     }
 
     // after DataSources is loaded
@@ -39,11 +44,16 @@ public class CommandLine {
         for (URI uri : getURIOptionValues("-request")) {
             Load.request.get(uri);
         }
+        // -state
+        for (URI uri : getURIOptionValues("-state")) {
+            Load.state.get(uri);
+            break;
+        }
     }
 
     private static List<URI> getURIOptionValues(String param) {
         List<String> opts = getOptionValues(param);
-        ArrayList<URI> uris = new ArrayList<>();
+        List<URI> uris = new ArrayList<>();
         for (String opt : opts) {
             try {
                 URI uri = new URI(opt);
@@ -71,7 +81,7 @@ public class CommandLine {
      * @return the values associated to the option.
      */
     private static List<String> getOptionValues(String param) {
-        ArrayList<String> values = new ArrayList<>();
+        List<String> values = new ArrayList<>();
         if (arguments != null) {
             for (int i = 0; i < arguments.length; i++) {
                 if (param.equals(arguments[i]) && arguments.length > i + 1) {

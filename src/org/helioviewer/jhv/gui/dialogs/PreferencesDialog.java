@@ -34,6 +34,7 @@ import javax.swing.table.TableModel;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.export.VideoFormat;
 import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.actions.LoadStateDialog;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.log.Log;
@@ -127,9 +128,23 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
 
         c.gridx = 1;
         c.gridy = 1;
-        JCheckBox defaultMovie = new JCheckBox("Load default movie", Boolean.parseBoolean(Settings.getProperty("startup.loadmovie")));
-        defaultMovie.addActionListener(e -> Settings.setProperty("startup.loadmovie", Boolean.toString(defaultMovie.isSelected())));
-        settings.add(defaultMovie, c);
+
+        String propState = Settings.getProperty("startup.loadState");
+        boolean loadState = propState != null && !"false".equals(propState);
+        JButton selectState = new JButton("Select State");
+        selectState.setEnabled(loadState);
+        selectState.addActionListener(e -> Settings.setProperty("startup.loadState", Objects.requireNonNull(LoadStateDialog.get()).toString()));
+
+        JCheckBox defaultState = new JCheckBox("Load state", loadState);
+        defaultState.addActionListener(e -> {
+            selectState.setEnabled(defaultState.isSelected());
+            Settings.setProperty("startup.loadState", Boolean.toString(defaultState.isSelected()));
+        });
+
+        JPanel statePanel = new JPanel(new BorderLayout());
+        statePanel.add(defaultState, BorderLayout.LINE_START);
+        statePanel.add(selectState, BorderLayout.LINE_END);
+        settings.add(statePanel, c);
 
         c.gridx = 1;
         c.gridy = 2;

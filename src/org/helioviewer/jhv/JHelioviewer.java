@@ -27,14 +27,6 @@ import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 public class JHelioviewer {
 
     public static void main(String[] args) throws Exception {
-        // Save command line arguments
-        CommandLine.setArguments(args);
-        // Prints the usage message
-        if (args.length == 1 && (args[0].equals("-h") || args[0].equals("--help"))) {
-            System.out.println(CommandLine.getUsageMessage());
-            return;
-        }
-
         if (isHeadless())
             throw new Exception("This application cannot run in a headless configuration.");
 
@@ -68,6 +60,14 @@ public class JHelioviewer {
         // if (true) throw new RuntimeException("This is a Sentry test. Please ignore.");
 
         JHVInit.init();
+
+        // Save command line arguments
+        CommandLine.setArguments(args);
+        // Prints the usage message
+        if (args.length == 1 && (args[0].equals("-h") || args[0].equals("--help"))) {
+            System.out.println(CommandLine.getUsageMessage());
+            return;
+        }
 
         EventQueue.invokeLater(() -> {
             UIGlobals.setUIFont(UIGlobals.uiFont);

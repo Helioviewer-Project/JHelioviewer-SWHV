@@ -8,7 +8,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataSources;
@@ -24,7 +23,6 @@ public class ImageSelectorPanel extends JPanel implements DataSourcesListener {
 
     private final ObservationSelector selector;
     private final DataSourcesTree sourcesTree;
-    private static boolean first = true;
 
     public ImageSelectorPanel(ObservationSelector _selector) {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
@@ -49,11 +47,6 @@ public class ImageSelectorPanel extends JPanel implements DataSourcesListener {
             long start = item.end - 2 * TimeUtils.DAY_IN_MILLIS;
             long end = item.end;
             selector.setTime(start, end);
-
-            if (first && Boolean.parseBoolean(Settings.getProperty("startup.loadmovie"))) {
-                load(null, start, end, selector.getCadence());
-                first = false;
-            }
         }
     }
 
