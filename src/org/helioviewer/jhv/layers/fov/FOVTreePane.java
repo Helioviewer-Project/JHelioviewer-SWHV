@@ -27,7 +27,7 @@ public class FOVTreePane extends JScrollPane {
         FOVPlatform plat = new FOVPlatform("SOLO", "SOLO", SpaceObject.SOLO.getColor());
         plat.add(new FOVInstrument("EUI/HRI", FOVType.RECTANGULAR, 0, 16.6 / 60., 16.6 / 60.));
         plat.add(new FOVInstrument("EUI/FSI", FOVType.RECTANGULAR, 0, 228 / 60., 228 / 60.));
-        plat.add(new FOVInstrument("METIS", FOVType.CIRCULAR, 3, 5.8, 5.8));
+        plat.add(new FOVInstrument("Metis", FOVType.CIRCULAR, 3.2, 6.8, 6.8));
         plat.add(new FOVInstrument("PHI/HRT", FOVType.RECTANGULAR, 0, 0.28, 0.28));
         plat.add(new FOVInstrument("PHI/FDT", FOVType.RECTANGULAR, 0, 2, 2));
         plat.add(new FOVInstrument("SPICE", FOVType.RECTANGULAR, 0, 16 / 60., 11 / 60.));
