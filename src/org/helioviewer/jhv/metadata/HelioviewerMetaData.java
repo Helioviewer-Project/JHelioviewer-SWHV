@@ -198,7 +198,8 @@ public class HelioviewerMetaData extends BaseMetaData {
         } else if (instrument.equals("PHI")) {
             displayName = instrument + ' ' + detector; // TBD
         } else if (instrument.equals("Metis")) {
-            displayName = instrument + ' ' + detector; // TBD
+            measurement = m.getString("BTYPE").orElse("");
+            displayName = instrument + ' ' + measurement; // TBD
         } else {
             displayName = instrument + ' ' + measurement;
         }
