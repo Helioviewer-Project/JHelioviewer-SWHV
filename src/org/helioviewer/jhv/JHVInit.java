@@ -93,12 +93,12 @@ class JHVInit {
         List<String> kernels = List.of(
                 "de432s_reduced.bsp",
                 "ahead_2017_061_5295day_predict.epm.bsp",
-                "solo_ANC_soc-orbit_20200210-20301120_L003_V1_00031_V02.bsp",
+                "solo_ANC_soc-orbit_20200210-20301120_L004_V1_00062_V01.bsp",
                 "naif0012.tls",
                 "pck00010.tpc",
                 "rssd0001.tf",
                 "solo_ANC_soc-ops-fk_V02.tf",
-                "solo_ANC_soc-sci-fk_V06.tf");
+                "solo_ANC_soc-sci-fk_V07.tf");
 
         kernels.parallelStream().forEach(x -> {
             try (InputStream in = FileUtils.getResource("/kernels/" + x)) {
