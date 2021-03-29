@@ -40,11 +40,11 @@ Since JHelioviewer is still rapidly evolving, this document may not reflect enti
 
 # Installing and Running
 
-JHelioviewer is a Java application that requires the Java Runtime Environment to be installed on the computer. The required Java version is 8, and JHelioviewer works best with the latest available Java 8 update, available at <http://java.com>. 64-bit computers should use the 64-bit version of Java.
+The JHelioviewer software does advanced data processing and visualisation; therefore it works best on a reasonably recent computer with decent CPU and OpenGL graphics power, and memory. The minimal OpenGL version required is 3.3.
 
-The JHelioviewer software does advanced data processing and visualisation; therefore it works best on a reasonably recent computer with decent CPU and OpenGL graphics power, and memory. The minimal OpenGL version required is 2.1.
+JHelioviewer is an open source project and its source code can be accessed at <https://github.com/Helioviewer-Project/JHelioviewer-SWHV>.
 
-JHelioviewer is an open source project and its source code can be accessed at <https://github.com/Helioviewer-Project/JHelioviewer-SWHV>. Its releases are available in compiled form for Windows, Mac OS X and Linux from <http://swhv.oma.be/download>.
+Compiled releases are available for Windows, Mac OS X and Linux from <http://swhv.oma.be/download>. A brief changelog is at <https://github.com/Helioviewer-Project/JHelioviewer-SWHV/blob/master/changelog.md>.
 
 ## Windows
 
@@ -54,12 +54,19 @@ JHelioviewer is an open source project and its source code can be accessed at <h
 ## Mac OS X
 
  * Download the DMG Mac OS X disk image from <http://swhv.oma.be/download>.
- * Move JHelioviewer.app into the Applications folder or just open it by double-clicking it.
+ * Move JHelioviewer.app to the Applications folder and run it by double-clicking its icon.
 
 ## Linux
 
-* Download the TAR.GZ archive from <http://swhv.oma.be/download>.
-* Extract the archive and run the JHelioviewer.jar by double-clicking it or by opening a terminal window and typing ```java -jar path/to/JHelioviewer.jar```.
+* Download either the DEB or RPM package from <http://swhv.oma.be/download>.
+* Install the package with ```dpkg -i JHelioviewer_*_amd64.deb``` or ```rpm --install JHelioviewer_*_amd64.rpm``` with supervisor privileges.
+* Run the program by typing ```jhelioviewer``` in a terminal window.
+
+## Manual installation
+
+* Download and extract the TAR.GZ archive from <http://swhv.oma.be/download>.
+* Make sure the appropriate Java Runtime Environment 11 or higher from <https://adoptopenjdk.net> is in the PATH.
+* Run the program by typing ```java -cp JHelioviewer.jar:natives-linux.jar:natives-macos.jar:natives-windows.jar org.helioviewer.jhv.JHelioviewer``` in a terminal window.
 
 This procedure works for Windows, Mac OS X and Linux.
 
