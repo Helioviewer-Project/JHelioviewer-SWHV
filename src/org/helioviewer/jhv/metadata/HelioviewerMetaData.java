@@ -257,11 +257,10 @@ public class HelioviewerMetaData extends BaseMetaData {
             // Pixel center: FITS = integer from 1, OpenGL = half-integer from 0
             double sunX = m.getDouble("CRPIX1").orElse((pixelW + 1) / 2.) - .5;
             double sunY = m.getDouble("CRPIX2").orElse((pixelH + 1) / 2.) - .5;
+            sunPositionX = sunX * unitPerPixelX;
+            sunPositionY = sunY * unitPerPixelY;
 
-            sunPositionX = unitPerPixelX * sunX;
-            sunPositionY = unitPerPixelY * (pixelH - sunY);
-
-            region = new Region(-sunX * unitPerPixelX, -sunY * unitPerPixelY, pixelW * unitPerPixelX, pixelH * unitPerPixelY);
+            region = new Region(-sunPositionX, -sunPositionY, pixelW * unitPerPixelX, pixelH * unitPerPixelY);
 
             crval.x = m.getDouble("CRVAL1").orElse(0.) * arcsecX / arcsecPerPixelX * unitPerPixelX;
             crval.y = m.getDouble("CRVAL2").orElse(0.) * arcsecY / arcsecPerPixelY * unitPerPixelY;
