@@ -71,13 +71,12 @@
         </jar>
     </target>
 
-<!--
-    <target name="release-tar" depends="init,jar-bundle">
+    <target name="release-tar" depends="init,jar-bundle,natives-bundle-linux,natives-bundle-macos,natives-bundle-windows">
         <tar destfile="${bin}/${pkg.name}.bin.tar.gz" compression="gzip">
-            <zipfileset dir="${bin}" includes="JHelioviewer.jar, README.md, LICENSE" prefix="${pkg.name}"/>
+            <zipfileset dir="${bin}" includes="JHelioviewer.jar, natives-linux.jar, natives-macos.jar, natives-windows.jar, README.md, LICENSE" prefix="${pkg.name}"/>
         </tar>
     </target>
--->
-    <target name="all" depends="jar-bundle,natives-bundle-linux,natives-bundle-macos,natives-bundle-windows"/>
+
+    <target name="all" depends="release-tar"/>
 
 </project>
