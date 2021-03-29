@@ -1,7 +1,7 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.0 (pending)
+## JHelioviewer 4.0 (2021-03-29)
 
 ### Technical
 - Switch from NewtCanvasAWT to GLCanvas (full screen is lost)
@@ -38,4 +38,5 @@
 - Support IRIS SJI
 - Support KCor dataset ([#114](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/114>))
 - Support Solar Orbiter remote sensing datasets (EUI, PHI, Metis, SoloHI)
-- Support Hi-C 1 and 2.1
+- Support Hi-C 1 and 2.1 datasets
+- Support GOES SUVI datasets
