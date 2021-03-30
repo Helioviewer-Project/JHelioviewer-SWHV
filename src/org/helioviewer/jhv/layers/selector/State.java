@@ -231,7 +231,9 @@ public class State {
         public void onSuccess(Void result) {
             newLayers.keySet().forEach(ImageLayer::unload); // prune failed layers
             for (ImageLayer layer : Layers.getImageLayers()) {
-                layer.setEnabled(newLayers.get(layer));
+                Boolean enabled = newLayers.get(layer);
+                if (enabled != null) // user may have loaded a new layer in the meanwhile
+                    layer.setEnabled(enabled);
             }
             if (masterLayer != null)
                 Layers.setActiveImageLayer(masterLayer);
