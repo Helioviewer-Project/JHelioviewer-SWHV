@@ -258,7 +258,7 @@ public class HelioviewerMetaData extends BaseMetaData {
             double sunX = m.getDouble("CRPIX1").orElse((pixelW + 1) / 2.) - .5;
             double sunY = m.getDouble("CRPIX2").orElse((pixelH + 1) / 2.) - .5;
             sunPositionX = unitPerPixelX * sunX;
-            sunPositionY = unitPerPixelY * (pixelH - 1 - sunY);
+            sunPositionY = unitPerPixelY * (pixelH - sunY);
 
             region = new Region(-sunX * unitPerPixelX, -sunY * unitPerPixelY, pixelW * unitPerPixelX, pixelH * unitPerPixelY);
 
