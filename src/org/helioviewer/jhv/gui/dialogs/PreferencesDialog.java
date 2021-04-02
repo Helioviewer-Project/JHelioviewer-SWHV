@@ -8,6 +8,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Objects;
@@ -133,7 +134,11 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         boolean loadState = propState != null && !"false".equals(propState);
         JButton selectState = new JButton("Select State");
         selectState.setEnabled(loadState);
-        selectState.addActionListener(e -> Settings.setProperty("startup.loadState", Objects.requireNonNull(LoadStateDialog.get()).toString()));
+        selectState.addActionListener(e -> {
+            File file = LoadStateDialog.get();
+            if (file != null)
+                Settings.setProperty("startup.loadState", file.toString());
+        });
 
         JCheckBox defaultState = new JCheckBox("Load state", loadState);
         defaultState.addActionListener(e -> {
