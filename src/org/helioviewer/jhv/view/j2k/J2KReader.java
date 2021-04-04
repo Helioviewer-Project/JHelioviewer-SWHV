@@ -136,10 +136,7 @@ class J2KReader implements Runnable {
                     socket = new JPIPSocket(view.getURI(), cache);
                 }
                 // choose cache strategy
-                boolean singleFrame = false;
-                if (numFrames <= 1 /* one frame */ || params.priority) {
-                    singleFrame = true;
-                }
+                boolean singleFrame = numFrames <= 1 /* one frame */ || params.priority;
 
                 // build query based on strategy
                 int currentStep;
