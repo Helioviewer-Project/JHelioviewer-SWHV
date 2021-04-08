@@ -72,7 +72,7 @@ class JHVInit {
         List<String> xtract = new ArrayList<>(libs);
         xtract.add("ffmpeg");
 
-        String fullDir = "/natives/" + pathlib;
+        String fullDir = "/jhv/" + pathlib;
         xtract.parallelStream().forEach(x -> {
             try (InputStream in = FileUtils.getResource(fullDir + x)) {
                 Path p = Path.of(JHVGlobals.libCacheDir, x);
