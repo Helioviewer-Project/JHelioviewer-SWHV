@@ -15,7 +15,7 @@ public class DataSources {
     static final Set<String> SupportedObservatories = Set.of(
             "SOHO", "SDO", "STEREO_A", "STEREO_B", "PROBA2",
             "ROB-USET", "ROB-Humain", "NSO-GONG", "NSO-SOLIS", "Kanzelhoehe",
-            "NRH", "Yohkoh", "Hinode", "TRACE", "MLSO");
+            "NRH", "Yohkoh", "Hinode", "TRACE", "MLSO", "SOLO");
 
     private static final ImmutableMap<String, Map<String, String>> serverSettings = new ImmutableMap.Builder<String, Map<String, String>>().
             put("ROB", new ImmutableMap.Builder<String, String>().
