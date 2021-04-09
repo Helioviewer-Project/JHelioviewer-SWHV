@@ -40,7 +40,7 @@ Since JHelioviewer is still rapidly evolving, this document may not reflect enti
 
 # Installing and Running
 
-The JHelioviewer software does advanced data processing and visualisation; therefore it works best on a reasonably recent computer with decent CPU and OpenGL graphics power, and memory. The minimal OpenGL version required is 3.3.
+The JHelioviewer software does advanced data processing and visualisation; therefore it works best on a reasonably recent computer with decent CPU and OpenGL graphics power, and memory. It contains native compiled libraries to speed up critical operations. The supported computer architecture is Intel/AMD 64-bit and the minimal OpenGL version required is 3.3.
 
 JHelioviewer is an open source project and its source code can be accessed at <https://github.com/Helioviewer-Project/JHelioviewer-SWHV>.
 
@@ -736,60 +736,30 @@ Parts of JHelioviewer are built out of plugins that can be disabled for a more s
 
 # Troubleshooting [trouble]
 
-## Instability on Windows 64-bit with Java 32-bit [win64java32]
+## Out of Memory Problems [oom]
 
-To find out the installed Windows version:
-
-* Open System by clicking the Start button
-* Right-click Computer
-* Click Properties
-* Under System, you can view the system type.
-
-To find out the installed Java version:
-
-* Click the Start Button
-* In the search field type `cmd`
-* In the command window type `java -version`
-* It will display 32- or 64-bit.
-
-You may encounter JHelioviewer crashes if the system is 64-bit and the Java version is 32-bit. To resolve those problems, the 32-bit version of Java must be uninstalled by following the guidelines on the page:
->><https://java.com/en/download/help/uninstall_java.xml>.
-
-Do a clean install of Java by following the guidelines on this page:
->><https://java.com/en/download/help/windows_manual_download.xml>
-
-Try to start JHelioviewer again after finishing the clean Java installation.
-
-## Out of Memory Problems on 32-bit Systems [java32]
-
-Although a lot of effort was put into reducing the memory usage of JHelioviewer, it usually needs more than the default amount reserved by Java on 32-bit systems, which is very low for a program with those functionalities. The amount of memory reserved by Java can be tweaked from the command line.
+Although a lot of effort was put into reducing the memory usage of JHelioviewer, it occasionally may run out of the default amount reserved by Java. The amount of memory reserved by Java can be tweaked from the command line.
 
 <!-- \hspace{0pt} -->
 To start JHelioviewer from the command line in Windows:
 
 * Click the Start Button
 * In the search field type `cmd`
-* Type the following command:
->>`java -Xmx1g -jar "C:\Program Files\JHelioviewer\JHelioviewer.jar"`
+* Type the following commands:
+
+>>`cd "C:\Program Files\JHelioviewer\classes"`
+
+>>`..\jre\bin\java.exe -Xmx4g -cp JHelioviewer.jar;natives-windows.jar org.helioviewer.jhv.JHelioviewer"`
 
 or where is JHelioviewer installed.
 
-This allocates maximum 1GB for Java and reduces the risk of running into out-of-memory errors.
+This allocates maximum 4GB for Java and reduces the risk of running into out-of-memory errors.
 
 <!-- \hspace{0pt} -->
 To find the amount of memory allocated by Java type:
->>`java -XX:+PrintFlagsFinal -version | findstr /R /C:"HeapSize"`
+>>`"C:\Program Files\JHelioviewer\jre\bin\java.exe" -XX:+PrintFlagsFinal -version | findstr /R /C:"HeapSize"`
 
-The interesting value is MaxHeapSize. The default value can be as low as about 256MB.
-
-## Windows 10 and Integrated Intel(R) HD Graphics 2000/3000 [win10intel]
-
-Since the introduction of Windows 10, Intel does not provide updated drivers anymore for some of its integrated graphics chips and relies on the drivers included in Windows by Microsoft. The integrated Intel(R) HD Graphics 2000/3000 chip is one of those affected devices under Windows 10. The list of graphics chips supported by Intel with its own drivers can be seen in the following chart: <http://www.intel.com/content/www/us/en/support/graphics-drivers/000005526.html>.
-
-The driver patch attached to the following comment may help to run JHelioviewer on the affected devices: <https://github.com/LWJGL/lwjgl/issues/119#issuecomment-262090230>
-
-JHelioviewer needs at least OpenGL 2.1 support, while the highest version of OpenGL provided by Microsoft is 1.1. Support for higher versions of OpenGL can be added to Windows by installing the drivers from the graphics card manufacturer.
-
+The interesting value is MaxHeapSize.
 
 # Frequently Asked Questions [FAQ]
 
@@ -800,15 +770,6 @@ How can I get a square movie?
 
 How do I get a movie without the timeline canvas?
 :  Collapse the timeline canvas using the separator.
-
-The movie is missing frames, what is the reason, what can I do about it?
-:  To reduce the impact of the movie creation on your computer, frames may get dropped sometimes. Lowering the frame rate or reducing the number of frames may reduce the number of dropped frames.
-
-Can I change the movie file format?
-:  The file format can't be changed. The H.264/AVC format in a MP4 container can be played on all major devices. We advise to use a conversion program if you prefer other file formats.
-
-Can I change the movie quality?
-:  The movie quality can not be changed. It is set to be adequate for most purposes.
 
 ## Data
 
