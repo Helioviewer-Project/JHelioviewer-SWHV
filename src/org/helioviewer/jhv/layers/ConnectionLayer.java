@@ -45,7 +45,7 @@ import com.jogamp.opengl.GL2;
 
 public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivity, ReceiverHCS, ReceiverPositionMap {
 
-    private static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
+    private static final double LINEWIDTH = 2 * GLSLLine.LINEWIDTH_BASIC;
     private static final float SIZE_POINT = 0.01f;
 
     private final byte[] sswColor = Colors.bytes(164, 48, 42);
@@ -58,7 +58,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     private final GLSLLine hcsLine = new GLSLLine(true); // TBD
     private final BufVertex hcsBuf = new BufVertex(512 * GLSLLine.stride);
 
-    private final byte[] footpointColor = Colors.Green;
+    private final byte[] footpointColor = Colors.White;
     private final GLSLLine footpointLine = new GLSLLine(true);
     private final BufVertex footpointBuf = new BufVertex(12 * GLSLLine.stride);
 
@@ -143,7 +143,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
         }
 
         hcsLine.setData(gl, hcsBuf);
-        hcsLine.render(gl, vp.aspect, 2 * LINEWIDTH);
+        hcsLine.render(gl, vp.aspect, LINEWIDTH);
     }
 
     private static Vec3 interpolate(long t, PositionCartesian prev, PositionCartesian next) {
