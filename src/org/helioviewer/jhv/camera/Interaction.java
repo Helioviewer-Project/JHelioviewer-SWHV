@@ -9,7 +9,6 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
 import javax.annotation.Nullable;
-import javax.swing.Timer;
 
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.camera.annotate.AnnotateCircle;
@@ -19,7 +18,6 @@ import org.helioviewer.jhv.camera.annotate.AnnotateLoop;
 import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Vec3;
 import org.json.JSONObject;
 
@@ -48,12 +46,12 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
         }
     }
 
-    private static final Timer wheelTimer = new Timer(1000 / 2, e -> MovieDisplay.render(1));
     private final Camera camera;
     private final InteractionAnnotate interactionAnnotate;
     private final InteractionAxis interactionAxis;
     private final InteractionPan interactionPan;
     private final InteractionRotate interactionRotate;
+    private final Zoom zoom;
 
     private Mode mode = Mode.ROTATE;
     private AnnotationMode annotationMode = AnnotationMode.Cross;//Rectangle;
@@ -65,8 +63,7 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
         interactionAxis = new InteractionAxis(camera);
         interactionPan = new InteractionPan(camera);
         interactionRotate = new InteractionRotate(camera);
-
-        wheelTimer.setRepeats(false);
+        zoom = new Zoom();
     }
 
     public void setMode(Mode _mode) {
@@ -99,15 +96,7 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        double r = e.getPreciseWheelRotation();
-        if (r != 0) {
-            camera.zoom(Camera.ZOOM_MULTIPLIER_WHEEL * r);
-            if (r > 0) {
-                MovieDisplay.render(0.5f);
-                wheelTimer.restart();
-            } else
-                MovieDisplay.display();
-        }
+        zoom.zoom(camera, e.getPreciseWheelRotation());
     }
 
     @Override
