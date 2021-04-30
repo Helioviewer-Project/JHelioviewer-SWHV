@@ -161,9 +161,22 @@ public class ImageFilter {
                 image[i] += res[i];
         }
 
-        float k = (1 - H) / sigmas.length;
+        float min = 1e6f, max = -1e6f;
         for (int i = 0; i < size; ++i) {
-            image[i] = k * image[i] + H * data[i];
+            float v = image[i] / sigmas.length;
+            if (v > max)
+                max = v;
+            if (v < min)
+                min = v;
+            image[i] = v;
+        }
+
+        if (max == min)
+            return data;
+
+        float k = (1 - H) / (max - min);
+        for (int i = 0; i < size; ++i) {
+            image[i] = k * (image[i] - min) + H * data[i];
         }
         return image;
     }
