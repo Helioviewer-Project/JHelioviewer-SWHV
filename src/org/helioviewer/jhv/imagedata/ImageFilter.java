@@ -142,7 +142,7 @@ public class ImageFilter {
 
     }
 
-    private static float[] multiScale2(float[] data, int width, int height) {
+    private static float[] multiScale(float[] data, int width, int height) {
         ArrayList<ForkJoinTask<float[]>> tasks = new ArrayList<>(sigmas.length);
         for (double sigma : sigmas)
             tasks.add(new ScaleTask(data, width, height, sigma).fork());
@@ -158,39 +158,6 @@ public class ImageFilter {
         for (int i = 0; i < size; ++i) {
             image[i] += H * data[i];
         }
-        return image;
-    }
-
-    private static float[] multiScale(float[] data, int width, int height) {
-        int N = Math.max(width, height);
-        int size = width * height;
-        float[] conv = new float[size];
-        float[] conv2 = new float[size];
-        float[] image = new float[size];
-
-        for (double sigma : sigmas) {
-            ImageFilter filter = new ImageFilter(sigma, _K, N);
-
-            filter.gaussianConvImage(conv, data, width, height);
-            for (int i = 0; i < size; ++i) {
-                float v = data[i] - conv[i];
-                conv[i] = v;
-                conv2[i] = v * v;
-            }
-            filter.gaussianConvImage(conv2, conv2, width, height);
-
-            for (int i = 0; i < size; ++i) {
-                double v = Math.sqrt(conv2[i]);
-                if (v == 0)
-                    v = 1;
-                image[i] += (float) Math.atan(KA * conv[i] / v);
-            }
-        }
-
-        for (int i = 0; i < size; ++i) {
-            image[i] = (1 - H) * (image[i] / sigmas.length) + H * data[i];
-        }
-
         return image;
     }
 
@@ -218,7 +185,7 @@ public class ImageFilter {
         for (int i = 0; i < size; ++i)
             data[i] = ((array[i] + 65536) & 0xFFFF) / 65535f;
 
-        float[] image = multiScale2(data, width, height);
+        float[] image = multiScale(data, width, height);
 
         ShortBuffer ret = ShortBuffer.allocate(size);
         for (int i = 0; i < size; ++i) {
