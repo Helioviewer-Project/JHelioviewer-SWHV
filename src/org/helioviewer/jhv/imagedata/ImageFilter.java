@@ -191,10 +191,10 @@ public class ImageFilter {
 
         float[] image = multiScale(data, width, height);
 
-        ByteBuffer ret = ByteBuffer.allocate(size);
+        byte[] out = new byte[size];
         for (int i = 0; i < size; ++i)
-            ret.put((byte) MathUtils.clip(image[i] * 255 + .5f, 0, 255));
-        return ret.rewind();
+            out[i] = (byte) MathUtils.clip(image[i] * 255 + .5f, 0, 255);
+        return ByteBuffer.wrap(out);
     }
 
     public static ShortBuffer mgn(ShortBuffer buf, int width, int height) {
@@ -207,11 +207,10 @@ public class ImageFilter {
 
         float[] image = multiScale(data, width, height);
 
-        ShortBuffer ret = ShortBuffer.allocate(size);
-        for (int i = 0; i < size; ++i) {
-            ret.put((short) MathUtils.clip(image[i] * 65535 + .5f, 0, 65535));
-        }
-        return ret.rewind();
+        short[] out = new short[size];
+        for (int i = 0; i < size; ++i)
+            out[i] = (short) MathUtils.clip(image[i] * 65535 + .5f, 0, 65535);
+        return ShortBuffer.wrap(out);
     }
 
 }
