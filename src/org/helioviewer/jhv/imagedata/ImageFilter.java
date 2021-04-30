@@ -68,7 +68,15 @@ public class ImageFilter {
         float accum = 0;
 
         // Compute cumulative sum of src over n = -pad,..., N + pad - 1
-        for (int n = -pad; n < N + pad; ++n) {
+        for (int n = -pad; n < 0; ++n) {
+            accum += src[offset + stride * extension(N, n)];
+            buffer[pad + n] = accum;
+        }
+        for (int n = 0; n < N; ++n) {
+            accum += src[offset + stride * n];
+            buffer[pad + n] = accum;
+        }
+        for (int n = N; n < N + pad; ++n) {
             accum += src[offset + stride * extension(N, n)];
             buffer[pad + n] = accum;
         }
