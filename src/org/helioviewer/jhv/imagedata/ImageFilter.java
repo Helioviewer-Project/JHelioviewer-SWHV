@@ -2,6 +2,9 @@ package org.helioviewer.jhv.imagedata;
 
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
+import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.RecursiveTask;
+import java.util.ArrayList;
 
 import org.helioviewer.jhv.math.MathUtils;
 
@@ -73,7 +76,6 @@ public class ImageFilter {
         // Compute stacked box filters
         for (int n = 0; n < N; ++n) {
             accum = weights[0] * (buffer[pad + n + radii[0]] - buffer[pad + n - radii[0] - 1]);
-
             for (int k = 1; k < K; ++k)
                 accum += weights[k] * (buffer[pad + n + radii[k]] - buffer[pad + n - radii[k] - 1]);
             dst[offset + stride * n] = accum;
@@ -93,6 +95,71 @@ public class ImageFilter {
     private static final float H = 0.7f;
     private static final double KA = 0.7;
     private static final double[] sigmas = {1.25, 2.5, 5, 10, 20, 40};
+
+    @SuppressWarnings("serial")
+    private static class ScaleTask extends RecursiveTask<float[]> {
+
+        private final float[] data;
+        private final int width;
+        private final int height;
+        private final int size;
+        private final int N;
+        private final double sigma;
+
+        ScaleTask(float[] _data, int _width, int _height, double _sigma) {
+            data = _data;
+            width = _width;
+            height = _height;
+            size = width * height;
+            N = Math.max(width, height);
+            sigma = _sigma;
+        }
+
+        @Override
+        protected float[] compute() {
+            ImageFilter filter = new ImageFilter(sigma, _K, N);
+
+            float[] conv = new float[size];
+            float[] conv2 = new float[size];
+
+            filter.gaussianConvImage(conv, data, width, height);
+            for (int i = 0; i < size; ++i) {
+                float v = data[i] - conv[i];
+                conv[i] = v;
+                conv2[i] = v * v;
+            }
+            filter.gaussianConvImage(conv2, conv2, width, height);
+
+            for (int i = 0; i < size; ++i) {
+                double v = Math.sqrt(conv2[i]);
+                if (v == 0)
+                    v = 1;
+                conv[i] = (float) Math.atan(KA * conv[i] / v) * (1 - H) / sigmas.length;
+            }
+
+            return conv;
+        }
+
+    }
+
+    private static float[] multiScale2(float[] data, int width, int height) {
+        ArrayList<ForkJoinTask<float[]>> tasks = new ArrayList<>(sigmas.length);
+        for (double sigma : sigmas)
+            tasks.add(new ScaleTask(data, width, height, sigma).fork());
+
+        int size = width * height;
+        float[] image = new float[size];
+        for (ForkJoinTask<float[]> task : tasks) {
+            float[] res = task.join();
+            for (int i = 0; i < size; ++i)
+                image[i] += res[i];
+        }
+
+        for (int i = 0; i < size; ++i) {
+            image[i] += H * data[i];
+        }
+        return image;
+    }
 
     private static float[] multiScale(float[] data, int width, int height) {
         int N = Math.max(width, height);
@@ -151,7 +218,7 @@ public class ImageFilter {
         for (int i = 0; i < size; ++i)
             data[i] = ((array[i] + 65536) & 0xFFFF) / 65535f;
 
-        float[] image = multiScale(data, width, height);
+        float[] image = multiScale2(data, width, height);
 
         ShortBuffer ret = ShortBuffer.allocate(size);
         for (int i = 0; i < size; ++i) {
