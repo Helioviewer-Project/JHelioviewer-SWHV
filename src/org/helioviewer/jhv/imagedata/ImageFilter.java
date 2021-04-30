@@ -94,7 +94,13 @@ public class ImageFilter {
     private static final int _K = 3;
     private static final float H = 0.7f;
     private static final double KA = 0.7;
-    private static final double[] sigmas = {1.25, 2.5, 5, 10, 20, 40};
+    private static final double[] sigmas = {1, 4, 16, 64};
+
+    private static float Atan(double x) {
+        x = MathUtils.clip(x, -1, 1);
+        // (8) of http://www-labs.iro.umontreal.ca/~mignotte/IFT2425/Documents/EfficientApproximationArctgFunction.pdf
+        return (float) (x * ((Math.PI / 4 + 0.186982) - 0.191942 * x * x));
+    }
 
     @SuppressWarnings("serial")
     private static class ScaleTask extends RecursiveTask<float[]> {
@@ -134,7 +140,7 @@ public class ImageFilter {
                 double v = Math.sqrt(conv2[i]);
                 if (v == 0)
                     v = 1;
-                conv[i] = (float) Math.atan(KA * conv[i] / v) * (1 - H) / sigmas.length;
+                conv[i] = Atan(KA * conv[i] / v);
             }
 
             return conv;
@@ -155,8 +161,9 @@ public class ImageFilter {
                 image[i] += res[i];
         }
 
+        float k = (1 - H) / sigmas.length;
         for (int i = 0; i < size; ++i) {
-            image[i] += H * data[i];
+            image[i] = k * image[i] + H * data[i];
         }
         return image;
     }
