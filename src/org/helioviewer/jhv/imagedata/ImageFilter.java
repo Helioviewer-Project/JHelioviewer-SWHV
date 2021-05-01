@@ -144,12 +144,8 @@ public class ImageFilter {
             }
             filter.gaussianConvImage(conv2, conv2, width, height);
 
-            for (int i = 0; i < size; ++i) {
-                double v = Math.sqrt(conv2[i]);
-                if (v == 0)
-                    v = 1;
-                conv[i] = Atan(KA * conv[i] / v);
-            }
+            for (int i = 0; i < size; ++i)
+                conv[i] = Atan(KA * conv[i] / Math.sqrt(conv2[i])); // clips input
 
             return conv;
         }
