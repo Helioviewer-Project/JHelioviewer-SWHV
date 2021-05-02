@@ -165,7 +165,6 @@ public class ImageFilter {
                 max = v;
             if (v < min)
                 min = v;
-            image[i] = v;
         }
 
         if (max == min)
