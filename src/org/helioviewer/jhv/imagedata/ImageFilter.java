@@ -102,6 +102,7 @@ public class ImageFilter {
     private static final int _K = 3;
     private static final float H = 0.7f;
     private static final double[] sigmas = {1, 4, 16, 64};
+    private static final double[] weight = {0.25, 0.5, 0.75, 1};
 
     @SuppressWarnings("serial")
     private static class ScaleTask extends RecursiveTask<float[]> {
@@ -110,12 +111,14 @@ public class ImageFilter {
         private final int width;
         private final int height;
         private final double sigma;
+        private final double weight;
 
-        ScaleTask(float[] _data, int _width, int _height, double _sigma) {
+        ScaleTask(float[] _data, int _width, int _height, double _sigma, double _weight) {
             data = _data;
             width = _width;
             height = _height;
             sigma = _sigma;
+            weight = _weight;
         }
 
         @Override
@@ -135,7 +138,7 @@ public class ImageFilter {
             filter.gaussianConvImage(conv2, conv2, width, height);
 
             for (int i = 0; i < size; ++i)
-                conv[i] = (float) MathUtils.clip(conv[i] / Math.sqrt(conv2[i]), -1, 1);
+                conv[i] = (float) (weight * MathUtils.clip(conv[i] / Math.sqrt(conv2[i]), -1, 1));
 
             return conv;
         }
@@ -144,8 +147,8 @@ public class ImageFilter {
 
     private static float[] multiScale(float[] data, int width, int height) {
         ArrayList<ForkJoinTask<float[]>> tasks = new ArrayList<>(sigmas.length);
-        for (double sigma : sigmas)
-            tasks.add(new ScaleTask(data, width, height, sigma).fork());
+        for (int i = 0; i < sigmas.length; ++i)
+            tasks.add(new ScaleTask(data, width, height, sigmas[i], weight[i]).fork());
 
         int size = width * height;
         float[] image = new float[size];
@@ -157,7 +160,7 @@ public class ImageFilter {
 
         float min = 1e6f, max = -1e6f;
         for (int i = 0; i < size; ++i) {
-            float v = image[i] / sigmas.length;
+            float v = image[i];
             if (v > max)
                 max = v;
             if (v < min)
@@ -169,9 +172,8 @@ public class ImageFilter {
             return data;
 
         float k = (1 - H) / (max - min);
-        for (int i = 0; i < size; ++i) {
+        for (int i = 0; i < size; ++i)
             image[i] = k * (image[i] - min) + H * data[i];
-        }
         return image;
     }
 
