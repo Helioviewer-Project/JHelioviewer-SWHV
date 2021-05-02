@@ -101,14 +101,7 @@ public class ImageFilter {
 
     private static final int _K = 3;
     private static final float H = 0.7f;
-    private static final double KA = 0.7;
     private static final double[] sigmas = {1, 4, 16, 64};
-
-    private static float Atan(double x) {
-        x = MathUtils.clip(x, -1, 1);
-        // (8) of http://www-labs.iro.umontreal.ca/~mignotte/IFT2425/Documents/EfficientApproximationArctgFunction.pdf
-        return (float) (x * ((Math.PI / 4 + 0.186982) - 0.191942 * x * x));
-    }
 
     @SuppressWarnings("serial")
     private static class ScaleTask extends RecursiveTask<float[]> {
@@ -116,23 +109,20 @@ public class ImageFilter {
         private final float[] data;
         private final int width;
         private final int height;
-        private final int size;
-        private final int N;
         private final double sigma;
 
         ScaleTask(float[] _data, int _width, int _height, double _sigma) {
             data = _data;
             width = _width;
             height = _height;
-            size = width * height;
-            N = Math.max(width, height);
             sigma = _sigma;
         }
 
         @Override
         protected float[] compute() {
-            ImageFilter filter = new ImageFilter(sigma, _K, N);
+            ImageFilter filter = new ImageFilter(sigma, _K, Math.max(width, height));
 
+            int size = width * height;
             float[] conv = new float[size];
             float[] conv2 = new float[size];
 
@@ -145,7 +135,7 @@ public class ImageFilter {
             filter.gaussianConvImage(conv2, conv2, width, height);
 
             for (int i = 0; i < size; ++i)
-                conv[i] = Atan(KA * conv[i] / Math.sqrt(conv2[i])); // clips input
+                conv[i] = (float) MathUtils.clip(conv[i] / Math.sqrt(conv2[i]), -1, 1);
 
             return conv;
         }
