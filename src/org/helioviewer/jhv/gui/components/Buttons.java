@@ -38,6 +38,7 @@ public class Buttons {
     public static final String unlock = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
             MaterialDesign.LOCK_OPEN + "</font>&nbsp;";
 
+    public static final String sync = button(MaterialDesign.SYNC);
     public static final String info = button(MaterialDesign.INFORMATION_VARIANT);
     public static final String download = button(MaterialDesign.DOWNLOAD);
 

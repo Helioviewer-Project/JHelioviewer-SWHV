@@ -15,7 +15,7 @@ import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.CircularProgressUI;
 import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.gui.components.base.JHVToggleButton;
-import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
+import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.GLImage;
@@ -41,13 +41,9 @@ public class RunningDifferencePanel implements FilterDetails {
             modePanel.add(item);
         }
 
-        MetaDataDialog metaDialog = new MetaDataDialog();
-        JHVButton metaButton = new JHVButton(Buttons.info);
-        metaButton.setToolTipText("Show metadata of selected layer");
-        metaButton.addActionListener(e -> {
-            metaDialog.setMetaData(layer);
-            metaDialog.showDialog();
-        });
+        JHVButton syncButton = new JHVButton(Buttons.sync);
+        syncButton.setToolTipText("Synchronize time interval of other layers");
+        syncButton.addActionListener(e -> MoviePanel.getInstance().syncLayersSpan(layer.getStartTime(), layer.getEndTime()));
 
         downloadButton.setToolTipText("Download selected layer");
         downloadButton.addActionListener(e -> {
@@ -70,7 +66,7 @@ public class RunningDifferencePanel implements FilterDetails {
         progressBar.setUI(new CircularProgressUI());
         progressBar.setForeground(downloadButton.getForeground());
 
-        buttonPanel.add(metaButton);
+        buttonPanel.add(syncButton);
         buttonPanel.add(downloadButton);
     }
 

@@ -9,12 +9,16 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.helioviewer.jhv.gui.components.Buttons;
+import org.helioviewer.jhv.gui.components.base.JHVButton;
+import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
 public class ChannelMixerPanel implements FilterDetails {
 
     private final JPanel boxPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+    private final JPanel buttonPanel = new JPanel();
 
     public ChannelMixerPanel(ImageLayer layer) {
         JCheckBox redCheckBox = new JCheckBox("Red", layer.getGLImage().getRed());
@@ -38,6 +42,15 @@ public class ChannelMixerPanel implements FilterDetails {
         redCheckBox.addActionListener(listener);
         greenCheckBox.addActionListener(listener);
         blueCheckBox.addActionListener(listener);
+
+        MetaDataDialog metaDialog = new MetaDataDialog();
+        JHVButton metaButton = new JHVButton(Buttons.info);
+        metaButton.setToolTipText("Show metadata of selected layer");
+        metaButton.addActionListener(e -> {
+            metaDialog.setMetaData(layer);
+            metaDialog.showDialog();
+        });
+        buttonPanel.add(metaButton);
     }
 
     @Override
@@ -52,7 +65,7 @@ public class ChannelMixerPanel implements FilterDetails {
 
     @Override
     public Component getLabel() {
-        return new JLabel("           ");
+        return buttonPanel;
     }
 
 }
