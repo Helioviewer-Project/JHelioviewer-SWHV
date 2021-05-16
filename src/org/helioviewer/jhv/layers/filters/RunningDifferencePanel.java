@@ -42,7 +42,7 @@ public class RunningDifferencePanel implements FilterDetails {
         }
 
         JHVButton syncButton = new JHVButton(Buttons.sync);
-        syncButton.setToolTipText("Synchronize time interval of other layers");
+        syncButton.setToolTipText("Synchronize time intervals of other layers");
         syncButton.addActionListener(e -> MoviePanel.getInstance().syncLayersSpan(layer.getStartTime(), layer.getEndTime()));
 
         downloadButton.setToolTipText("Download selected layer");

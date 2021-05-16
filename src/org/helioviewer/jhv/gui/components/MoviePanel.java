@@ -324,7 +324,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         addLayerButton.add(imageSelectorPanel);
 
         JHVButton syncButton = new JHVButton(Buttons.syncLayers);
-        syncButton.setToolTipText("Synchronize layers time interval");
+        syncButton.setToolTipText("Synchronize time intervals of all layers");
         syncButton.addActionListener(e -> syncLayersSpan());
 
         JPanel addLayerPanel = new JPanel(new BorderLayout());
