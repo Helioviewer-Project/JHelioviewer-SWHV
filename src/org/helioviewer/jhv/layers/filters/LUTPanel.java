@@ -16,7 +16,7 @@ import org.helioviewer.jhv.layers.MovieDisplay;
 public class LUTPanel implements FilterDetails {
 
     private final LUTComboBox lutCombo;
-    private final JPanel buttonPanel;
+    private final JPanel buttonPanel = new JPanel();
 
     public LUTPanel(ImageLayer layer) {
         lutCombo = new LUTComboBox();
@@ -37,7 +37,6 @@ public class LUTPanel implements FilterDetails {
             MovieDisplay.display();
         });
 
-        buttonPanel = new JPanel();
         buttonPanel.add(invertButton);
         buttonPanel.add(enhanceButton);
     }
