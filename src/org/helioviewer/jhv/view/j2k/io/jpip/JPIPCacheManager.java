@@ -21,24 +21,24 @@ import org.ehcache.config.units.MemoryUnit;
 
 public class JPIPCacheManager {
 
-    private static final File levelCacheDir = new File(JHVDirectory.CACHE.getFile(), "JPIPLevel-2");
-    private static final File streamCacheDir = new File(JHVDirectory.CACHE.getFile(), "JPIPStream-2");
+    private static final File levelCacheDir = new File(JHVDirectory.CACHE.getFile(), "JPIPLevel-3");
+    private static final File streamCacheDir = new File(JHVDirectory.CACHE.getFile(), "JPIPStream-3");
 
     private static PersistentCacheManager levelManager;
     private static PersistentCacheManager streamManager;
-    private static Cache<Long, Integer> levelCache;
-    private static Cache<Long, JPIPStream> streamCache;
+    private static Cache<String, Integer> levelCache;
+    private static Cache<String, JPIPStream> streamCache;
     private static Thread hook;
 
     public static void init() {
-        deleteDirs("JPIPLevel", "JPIPStream"); // delete old versions
+        deleteDirs("JPIPLevel", "JPIPStream", "JPIPLevel-2", "JPIPStream-2"); // delete old versions
 
         ExpiryPolicy<Object, Object> expiryPolicy = ExpiryPolicyBuilder.timeToIdleExpiration(Duration.ofDays(7));
 
         levelManager = CacheManagerBuilder.newCacheManagerBuilder()
                 .with(CacheManagerBuilder.persistence(levelCacheDir))
                 .withCache("JPIPLevel", CacheConfigurationBuilder
-                        .newCacheConfigurationBuilder(Long.class, Integer.class,
+                        .newCacheConfigurationBuilder(String.class, Integer.class,
                                 ResourcePoolsBuilder.newResourcePoolsBuilder()
                                         .heap(10000, EntryUnit.ENTRIES)
                                         .disk(10, MemoryUnit.MB, true))
@@ -47,7 +47,7 @@ public class JPIPCacheManager {
         streamManager = CacheManagerBuilder.newCacheManagerBuilder()
                 .with(CacheManagerBuilder.persistence(streamCacheDir))
                 .withCache("JPIPStream", CacheConfigurationBuilder
-                        .newCacheConfigurationBuilder(Long.class, JPIPStream.class,
+                        .newCacheConfigurationBuilder(String.class, JPIPStream.class,
                                 ResourcePoolsBuilder.newResourcePoolsBuilder()
                                         .disk(8, MemoryUnit.GB, true))
                         .withExpiry(expiryPolicy))
@@ -58,12 +58,13 @@ public class JPIPCacheManager {
             Runtime.getRuntime().addShutdownHook(hook);
         }
 
-        streamCache = streamManager.getCache("JPIPStream", Long.class, JPIPStream.class);
-        levelCache = levelManager.getCache("JPIPLevel", Long.class, Integer.class);
+        streamCache = streamManager.getCache("JPIPStream", String.class, JPIPStream.class);
+        levelCache = levelManager.getCache("JPIPLevel", String.class, Integer.class);
     }
 
+
     @Nullable
-    public static JPIPStream get(long key, int level) {
+    public static JPIPStream get(String key, int level) {
         try {
             Integer clevel = levelCache.get(key);
             if (clevel != null && clevel <= level)
@@ -74,17 +75,15 @@ public class JPIPCacheManager {
         return null;
     }
 
-    public static void put(long key, int level, @Nonnull JPIPStream stream) {
-        if (key != 0) {
-            try {
-                Integer clevel = levelCache.get(key);
-                if (clevel == null || clevel > level) {
-                    levelCache.put(key, level);
-                    streamCache.put(key, stream);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+    public static void put(String key, int level, @Nonnull JPIPStream stream) {
+        try {
+            Integer clevel = levelCache.get(key);
+            if (clevel == null || clevel > level) {
+                levelCache.put(key, level);
+                streamCache.put(key, stream);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

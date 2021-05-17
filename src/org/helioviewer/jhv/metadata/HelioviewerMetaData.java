@@ -211,7 +211,7 @@ public class HelioviewerMetaData extends BaseMetaData {
             String observedTime = m.getString("TIME_OBS").orElseGet(() -> m.getRequiredString("TIME-OBS"));
             observedDate = observedDate.replace('/', '-') + 'T' + observedTime;
         }
-        return new JHVTime(observedDate.substring(0, 19)); // truncate
+        return new JHVTime(observedDate);
     }
 
     private Position retrievePosition(MetaDataContainer m, JHVTime dateObs) {
