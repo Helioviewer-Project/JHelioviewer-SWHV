@@ -5,6 +5,7 @@ import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.TransferHandler;
 
@@ -26,16 +27,27 @@ class MainDropHandler extends TransferHandler {
 
         try {
             List<?> objects = (List<?>) info.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-            ArrayList<URI> uris = new ArrayList<>(objects.size());
+
+            ArrayList<URI> imageUris = new ArrayList<>(objects.size());
+            ArrayList<URI> requestUris = new ArrayList<>(objects.size());
             for (Object object : objects) {
                 if (object instanceof File) {
                     File f = (File) object;
-                    if (f.isFile() && f.canRead())
-                        uris.add(f.toURI());
+                    if (f.isFile() && f.canRead()) {
+                        URI uri = f.toURI();
+                        String loc = uri.toString().toLowerCase(Locale.ENGLISH);
+                        if (loc.endsWith(".json"))
+                            requestUris.add(uri);
+                        else
+                            imageUris.add(uri);
+                    }
                 }
             }
 
-            Load.Image.getAll(uris);
+            requestUris.forEach(Load.request::get);
+            if (!imageUris.isEmpty())
+                Load.Image.getAll(imageUris);
+
             return true;
         } catch (Exception e) {
             e.printStackTrace();
