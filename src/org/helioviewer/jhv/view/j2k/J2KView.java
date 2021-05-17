@@ -107,16 +107,18 @@ public class J2KView extends BaseView {
                 throw new Exception("Duplicated time stamps");
 
             cacheKey = new String[maxFrame + 1];
-            ByteBuffer bb = ByteBuffer.allocate(12).order(ByteOrder.BIG_ENDIAN);
-            for (int i = 0; i <= maxFrame; i++) {
-                long milli = frameMap.key(i).milli;
-                if (milli != metaData[i].getViewpoint().time.milli)
-                    Log.warn("Badly ordered metadata: " + uri + "[" + i + "]: expected " + frameMap.key(i) + ", got " + metaData[i].getViewpoint().time);
+            if (request != null) {
+                ByteBuffer bb = ByteBuffer.allocate(12).order(ByteOrder.BIG_ENDIAN);
+                for (int i = 0; i <= maxFrame; i++) {
+                    long milli = frameMap.key(i).milli;
+                    if (milli != metaData[i].getViewpoint().time.milli)
+                        Log.warn("Badly ordered metadata: " + uri + "[" + i + "]: expected " + frameMap.key(i) + ", got " + metaData[i].getViewpoint().time);
 
-                bb.putInt(request.sourceId);
-                bb.putLong(milli);
-                cacheKey[i] = new BigInteger(bb.array()).toString();
-                bb.rewind();
+                    bb.putInt(request.sourceId);
+                    bb.putLong(milli);
+                    cacheKey[i] = new BigInteger(bb.array()).toString();
+                    bb.rewind();
+                }
             }
 
             int[] lut = kduSource.getLUT();
