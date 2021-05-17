@@ -2,10 +2,7 @@ package org.helioviewer.jhv.view.j2k;
 
 import java.awt.EventQueue;
 import java.lang.ref.Cleaner;
-import java.math.BigInteger;
 import java.net.URI;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -108,16 +105,12 @@ public class J2KView extends BaseView {
 
             cacheKey = new String[maxFrame + 1];
             if (request != null) {
-                ByteBuffer bb = ByteBuffer.allocate(12).order(ByteOrder.BIG_ENDIAN);
                 for (int i = 0; i <= maxFrame; i++) {
                     long milli = frameMap.key(i).milli;
                     if (milli != metaData[i].getViewpoint().time.milli)
                         Log.warn("Badly ordered metadata: " + uri + "[" + i + "]: expected " + frameMap.key(i) + ", got " + metaData[i].getViewpoint().time);
 
-                    bb.putInt(request.sourceId);
-                    bb.putLong(milli);
-                    cacheKey[i] = new BigInteger(bb.array()).toString();
-                    bb.rewind();
+                    cacheKey[i] = request.sourceId + "+" + milli;
                 }
             }
 
