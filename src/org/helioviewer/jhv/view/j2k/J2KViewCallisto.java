@@ -15,7 +15,7 @@ import org.helioviewer.jhv.view.j2k.image.SubImage;
 public class J2KViewCallisto extends J2KView {
 
     public J2KViewCallisto(DecodeExecutor _executor, APIRequest _request, URI _uri) throws Exception {
-        super(_executor, _request, _uri, null);
+        super(_executor, _request, _uri);
     }
 
     public void setRegion(Rectangle r) {
