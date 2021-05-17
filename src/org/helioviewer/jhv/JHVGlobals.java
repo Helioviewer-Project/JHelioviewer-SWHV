@@ -119,12 +119,16 @@ public class JHVGlobals {
     }
 
     public static void displayNotification(String path) {
-        displayNotificationEx("File ", path, " is ready.");
+        displayNotificationEx("File " + urify(path) + " is ready.");
     }
 
-    public static void displayNotificationEx(String prefix, String path, String suffix) {
-        String openURL = new File(path).toURI().toString();
-        new TextDialog("Ready", prefix + "<a href=\"" + openURL + "\">" + path + "</a>" + suffix, false).showDialog();
+    public static String urify(String uri) {
+        String openURI = new File(uri).toURI().toString();
+        return "<a href=\"" + openURI + "\">" + uri + "</a>";
+    }
+
+    public static void displayNotificationEx(String text) {
+        new TextDialog("Ready", text, false).showDialog();
     }
 
 }
