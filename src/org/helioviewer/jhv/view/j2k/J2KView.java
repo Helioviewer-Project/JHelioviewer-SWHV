@@ -2,7 +2,10 @@ package org.helioviewer.jhv.view.j2k;
 
 import java.awt.EventQueue;
 import java.lang.ref.Cleaner;
+import java.math.BigInteger;
 import java.net.URI;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -52,7 +55,7 @@ public class J2KView extends BaseView {
     private final int maxFrame;
     private int targetFrame;
 
-    private final long[] cacheKey;
+    private final String[] cacheKey;
     private final TimeMap<Integer> frameMap = new TimeMap<>();
 
     private final KakaduSource kduSource;
@@ -75,18 +78,6 @@ public class J2KView extends BaseView {
     public J2KView(DecodeExecutor _executor, APIRequest _request, URI _uri, APIResponse _response) throws Exception {
         super(_executor, _request, _uri);
         serial = incrementSerial();
-
-        long[] frames = _response == null ? null : _response.getFrames();
-        if (frames != null) {
-            long key = request == null ? 0 : ((long) request.sourceId) << 32;
-            int len = frames.length;
-            cacheKey = new long[len];
-            if (key != 0)
-                for (int i = 0; i < len; i++) {
-                    cacheKey[i] = key + frames[i];
-                }
-        } else
-            cacheKey = new long[1];
 
         try {
             String scheme = uri.getScheme().toLowerCase();
@@ -115,21 +106,18 @@ public class J2KView extends BaseView {
             frameMap.buildIndex();
             if (frameMap.maxIndex() != maxFrame)
                 throw new Exception("Duplicated time stamps");
-            for (int i = 0; i <= maxFrame; i++) {
-                if (frameMap.key(i).milli != metaData[i].getViewpoint().time.milli)
-                    throw new Exception("Badly ordered metadata");
-            }
 
-            if (frames != null) {
-                if (maxFrame + 1 != frames.length)
-                    Log.warn(uri + ": expected " + (maxFrame + 1) + "frames, got " + frames.length);
-                for (int i = 0; i < Math.min(maxFrame + 1, frames.length); i++) {
-                    JHVTime d = frameMap.key(i);
-                    if (d.milli != frames[i] * 1000) {
-                        cacheKey[i] = 0; // uncacheable
-                        Log.warn(uri + "[" + i + "]: expected " + d + ", got " + new JHVTime(frames[i] * 1000));
-                    }
-                }
+            cacheKey = new String[maxFrame + 1];
+            ByteBuffer bb = ByteBuffer.allocate(12).order(ByteOrder.BIG_ENDIAN);
+            for (int i = 0; i <= maxFrame; i++) {
+                long milli = frameMap.key(i).milli;
+                if (milli != metaData[i].getViewpoint().time.milli)
+                    Log.warn("Badly ordered metadata: " + uri + "[" + i + "]: expected " + frameMap.key(i) + ", got " + metaData[i].getViewpoint().time);
+
+                bb.putInt(request.sourceId);
+                bb.putLong(milli);
+                cacheKey[i] = new BigInteger(bb.array()).toString();
+                bb.rewind();
             }
 
             int[] lut = kduSource.getLUT();
@@ -150,8 +138,8 @@ public class J2KView extends BaseView {
         }
     }
 
-    long getCacheKey(int frame) {
-        return frame < 0 || frame >= cacheKey.length ? 0 : cacheKey[frame];
+    String getCacheKey(int frame) {
+        return frame < 0 || frame >= cacheKey.length ? null : cacheKey[frame];
     }
 
     String getName() {
