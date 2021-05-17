@@ -50,7 +50,7 @@ public class LoadLayer {
         @Override
         public View call() throws Exception {
             APIResponse res = APIRequestManager.requestRemoteFile(req);
-            return res == null ? null : loadView(layer.getExecutor(), req, res.getURI(), res);
+            return res == null ? null : loadView(layer.getExecutor(), req, res.getURI());
         }
 
     }
@@ -69,11 +69,11 @@ public class LoadLayer {
         public View call() throws Exception {
             DecodeExecutor executor = layer.getExecutor();
             if (uriList.size() == 1) {
-                return loadView(executor, null, uriList.get(0), null);
+                return loadView(executor, null, uriList.get(0));
             } else {
                 List<View> views = uriList.parallelStream().map(uri -> {
                     try {
-                        return loadView(executor, null, uri, null);
+                        return loadView(executor, null, uri);
                     } catch (Exception e) {
                         Log.error(e);
                         return null;
@@ -134,14 +134,14 @@ public class LoadLayer {
     }
 
     @Nonnull
-    private static View loadView(DecodeExecutor executor, APIRequest req, URI uri, APIResponse res) throws Exception {
+    private static View loadView(DecodeExecutor executor, APIRequest req, URI uri) throws Exception {
         String loc = uri.toString().toLowerCase(Locale.ENGLISH);
         if (loc.endsWith(".fits") || loc.endsWith(".fts") || loc.endsWith(".fits.gz")) {
             return new URIView(executor, req, uri, URIView.URIType.FITS);
         } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
             return new URIView(executor, req, uri, URIView.URIType.GENERIC);
         } else {
-            return new J2KView(executor, req, uri, res);
+            return new J2KView(executor, req, uri);
         }
     }
 

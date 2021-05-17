@@ -7,12 +7,11 @@ import org.helioviewer.jhv.log.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class APIResponse {
+class APIResponse {
 
     private final String err;
     private final String msg;
     private URI uri;
-    private long[] frames;
 
     APIResponse(JSONObject data) throws IOException {
         try {
@@ -23,12 +22,7 @@ public class APIResponse {
                 uri = new URI(data.getString("uri"));
             if (!data.isNull("frames")) {
                 JSONArray arr = data.getJSONArray("frames");
-                int len = arr.length();
-
-                frames = new long[len];
-                for (int i = 0; i < len; i++)
-                    frames[i] = arr.getLong(i); // seconds
-                data.put("frames", len); // don't log timestamps, modifies input
+                data.put("frames", arr.length()); // don't log timestamps, modifies input
             }
 
             Log.debug("Response: " + data);
@@ -37,20 +31,16 @@ public class APIResponse {
         }
     }
 
-    public String getError() {
+    String getError() {
         return err;
     }
 
-    public String getMessage() {
+    String getMessage() {
         return msg;
     }
 
-    public URI getURI() {
+    URI getURI() {
         return uri;
-    }
-
-    public long[] getFrames() {
-        return frames;
     }
 
 }
