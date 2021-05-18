@@ -44,8 +44,6 @@ public class MainContentPanel extends JPanel {
         setLayout(new BorderLayout());
         setMinimumSize(new Dimension());
         add(splitPane, BorderLayout.CENTER);
-
-        setTransferHandler(new MainDropHandler());
     }
 
     // Adds a plug-in and the associated GUI to the container. The GUI will be displayed below the main component.

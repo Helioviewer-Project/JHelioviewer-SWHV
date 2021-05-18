@@ -117,6 +117,7 @@ public class JHVFrame {
     private static JFrame createFrame() {
         JFrame frame = new JFrame(JHVGlobals.programName);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        frame.setTransferHandler(new DropHandler());
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
