@@ -58,7 +58,6 @@ class DropHandler extends TransferHandler {
                 return true;
             } else if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                 String loc = (String) transferable.getTransferData(DataFlavor.stringFlavor);
-                System.out.println(">>> " + loc);
 
                 if (UrlValidator.getInstance().isValid(loc)) {
                     URI uri = new URI(loc);
