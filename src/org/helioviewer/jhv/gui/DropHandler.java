@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.components;
+package org.helioviewer.jhv.gui;
 
 import java.awt.datatransfer.DataFlavor;
 import java.io.File;
@@ -12,7 +12,7 @@ import javax.swing.TransferHandler;
 import org.helioviewer.jhv.io.Load;
 
 @SuppressWarnings("serial")
-class MainDropHandler extends TransferHandler {
+class DropHandler extends TransferHandler {
 
     @Override
     public boolean canImport(TransferHandler.TransferSupport info) {
