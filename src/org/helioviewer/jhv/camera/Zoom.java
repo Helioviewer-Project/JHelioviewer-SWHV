@@ -76,14 +76,14 @@ class Zoom {
     }
 
     private double getAverage(ArrayList<Double> array) {
+        int size = array.size();
+        if (size == 0)
+            return 0;
+
         double sum = 0;
-        if (!array.isEmpty()) {
-            for (double item : array) {
-                sum = sum + item;
-            }
-            return sum / array.size();
-        }
-        return sum;
+        for (double item : array)
+            sum += item;
+        return sum / size;
     }
 
 }
