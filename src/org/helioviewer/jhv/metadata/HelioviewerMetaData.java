@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.metadata;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -21,6 +22,13 @@ public class HelioviewerMetaData extends BaseMetaData {
 
     private static final Set<String> SECCHIDetectors = Set.of("EUVI", "COR1", "COR2", "HI1", "HI2");
     private static final Set<String> CROTABlockList = Set.of("LASCO");
+
+    private static final Map<String, String> unitRepl = Map.of(
+            " ", "",
+            "-1", "\u207B\u00B9",
+            "-2", "\u207B\u00B2",
+            "-3", "\u207B\u00B3",
+            "-5", "\u207B\u2075");
 
     private String instrument = "";
     private String detector = "";
@@ -61,9 +69,6 @@ public class HelioviewerMetaData extends BaseMetaData {
     }
 
     private void retrieveUnit(MetaDataContainer m) {
-        unit = m.getString("BUNIT").orElse(unit);
-        unit = unit.replace("-1", "\u207B\u00B9").replace("-2", "\u207B\u00B2").replace("-3", "\u207B\u00B3").replace(" ", "").intern();
-
         // JHV specific clipping
         Optional<Double> mMin = m.getDouble("HV_DMIN");
         Optional<Double> mMax = m.getDouble("HV_DMAX");
@@ -84,6 +89,14 @@ public class HelioviewerMetaData extends BaseMetaData {
             physLUT = new float[size];
             for (int i = 0; i < size; i++)
                 physLUT[i] = (float) (zero + i * scale);
+        }
+
+        // only if we have LUT
+        if (physLUT != null) {
+            unit = m.getString("BUNIT").orElse(unit);
+            for (Map.Entry<String, String> entry : unitRepl.entrySet())
+                unit = unit.replace(entry.getKey(), entry.getValue());
+            unit = unit.intern();
         }
     }
 
