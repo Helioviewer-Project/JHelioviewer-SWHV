@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.gui.components;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 //import java.awt.event.ActionListener;
@@ -16,6 +15,7 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToolBar;
 
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.JHVFrame;
@@ -95,7 +95,7 @@ public class ToolBar extends JToolBar {
 
     public ToolBar() {
         setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
-        setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
+        setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Colors.lightGray));
         setRollover(true);
 
         addMouseListener(new MouseAdapter() {
