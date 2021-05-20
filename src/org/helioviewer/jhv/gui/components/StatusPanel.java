@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.gui.components;
 
-import java.awt.Color;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -9,6 +8,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.gui.UIGlobals;
 
 // Class used for displaying information and statuses in a panel at the very bottom of JHV.
@@ -35,7 +35,7 @@ public class StatusPanel extends JPanel {
 
     public StatusPanel(int leftMargin, int rightMargin) {
         super(new BorderLayout());
-        setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
+        setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Colors.lightGray));
 
         add(leftPanel, BorderLayout.LINE_START);
         add(rightPanel, BorderLayout.LINE_END);

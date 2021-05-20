@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.layers.fov;
 
-import java.awt.Color;
 import java.awt.Dimension;
 
 import javax.swing.BorderFactory;
@@ -62,7 +61,7 @@ public class FOVTreePane extends JScrollPane {
         setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         getVerticalScrollBar().setUnitIncrement(20); // ugh
-        setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
+        setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Colors.lightGray));
         setPreferredSize(new Dimension(-1, 98));
 
         ComponentUtils.smallVariant(this);

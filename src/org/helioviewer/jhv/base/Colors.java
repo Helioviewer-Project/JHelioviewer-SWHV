@@ -4,6 +4,9 @@ import java.awt.Color;
 
 public class Colors {
 
+    public static final Color darkGray = Color.DARK_GRAY;
+    public static final Color lightGray = Color.LIGHT_GRAY;
+
     public static byte[] bytes(Color c) {
         return new byte[]{(byte) c.getRed(), (byte) c.getGreen(), (byte) c.getBlue(), (byte) 255};
     }
