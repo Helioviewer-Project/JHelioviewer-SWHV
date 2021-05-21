@@ -23,16 +23,14 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.log.Log;
 
+import com.formdev.flatlaf.FlatLightLaf;
 import com.jidesoft.plaf.LookAndFeelFactory;
 
 public class UIGlobals {
 
-    private static final UIGlobals instance = new UIGlobals();
-
-    private UIGlobals() {
+    public static void setLaf() {
         try {
-            if (System.getProperty("jhv.os").equals("windows"))
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            FlatLightLaf.setup();
             LookAndFeelFactory.installJideExtension();
         } catch (Exception e) {
             e.printStackTrace();
@@ -49,11 +47,10 @@ public class UIGlobals {
         midColor = new Color((foreColor.getRed() + backColor.getRed()) / 2, (foreColor.getGreen() + backColor.getGreen()) / 2, (foreColor.getBlue() + backColor.getBlue()) / 2);
 
         Font font = label.getFont();
+        String defaultFont = font.getFamily();
         int defaultSize = font.getSize();
 
-        String defaultFont = "SansSerif";
         if (System.getProperty("jhv.os").equals("mac")) {
-            defaultFont = "HelveticaNeue"; // scrap enormous Lucida Sans
             defaultSize -= 1;
 
             ImageIcon cursor = IconBank.getIcon(JHVIcon.CLOSED_HAND_MAC);
@@ -90,8 +87,10 @@ public class UIGlobals {
         map.put(TextAttribute.SIZE, defaultSize - 2);
         uiFontSmallBold = font.deriveFont(map);
 
-        uiFontMono = new Font("Monospaced", Font.PLAIN, defaultSize);
+        // uiFontMono = new Font("Monospaced", Font.PLAIN, defaultSize);
         uiFontMonoSmall = new Font("Monospaced", Font.PLAIN, defaultSize - 2);
+
+        setUIFont(uiFont);
 
         try (InputStream is = FileUtils.getResource("/fonts/RobotoCondensed-Regular.ttf")) {
             uiFontRoboto = Font.createFont(Font.TRUETYPE_FONT, is);
@@ -108,9 +107,9 @@ public class UIGlobals {
         }
     }
 
-    public static void setUIFont(Font font) {
+    private static void setUIFont(Font font) {
         FontUIResource f = new FontUIResource(font);
-        Enumeration<?> keys = UIManager.getDefaults().keys();
+        Enumeration<?> keys = UIManager.getLookAndFeelDefaults().keys();
         while (keys.hasMoreElements()) {
             Object key = keys.nextElement();
             Object value = UIManager.get(key);
@@ -125,7 +124,7 @@ public class UIGlobals {
     public static Font uiFontSmall;
     public static Font uiFontSmallBold;
 
-    public static Font uiFontMono;
+    // public static Font uiFontMono;
     public static Font uiFontMonoSmall;
 
     public static Font uiFontMDI;
