@@ -30,9 +30,10 @@ public class TimeUtils {
     public static final JHVTime MAXIMAL_TIME = new JHVTime("2050-01-01T00:00:00");
 
     private static final double MAX_FRAMES = 96;
+    private static final int MIN_DEF_CADENCE = 60;
 
     public static int defaultCadence(long start, long end) {
-        return (int) Math.max(1, (end - start) / MAX_FRAMES / 1000);
+        return (int) Math.max(MIN_DEF_CADENCE, (end - start) / MAX_FRAMES / 1000);
     }
 
     public static long floorSec(long milli) {

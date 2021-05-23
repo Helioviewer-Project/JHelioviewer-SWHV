@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 public class APIRequest {
 
+    private static final long RANGE_EXPAND = 60 * TimeUtils.MINUTE_IN_MILLIS;
     public static final int CADENCE_ANY = -100;
     public static final int CADENCE_DEFAULT = 1800;
     public static final int CallistoID = 5000;
@@ -24,9 +25,16 @@ public class APIRequest {
     public APIRequest(@Nonnull String _server, int _sourceId, long _startTime, long _endTime, int _cadence) {
         server = _server;
         sourceId = _sourceId;
-        startTime = _startTime;
-        endTime = _endTime;
         cadence = _cadence;
+
+        long expand = (RANGE_EXPAND - (_endTime - _startTime)) / 2;
+        if (_startTime != _endTime && expand > 0) {
+            startTime = _startTime - expand;
+            endTime = _endTime + expand;
+        } else {
+            startTime = _startTime;
+            endTime = _endTime;
+        }
     }
 
     public String toFileRequest() throws IOException {

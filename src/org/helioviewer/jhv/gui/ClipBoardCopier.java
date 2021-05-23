@@ -9,7 +9,6 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
-// Simple helper for accessing the user's clipboard.
 public class ClipBoardCopier implements ClipboardOwner {
 
     private static final ClipBoardCopier instance = new ClipBoardCopier();
@@ -25,21 +24,13 @@ public class ClipBoardCopier implements ClipboardOwner {
     public void lostOwnership(Clipboard aClipboard, Transferable aContents) {
     }
 
-    /**
-     * Set the content of the clipboard
-     *
-     * @param data content to write to the clipboard
-     */
+    // Set the content of the clipboard
     public void setString(String data) {
         StringSelection stringSelection = new StringSelection(data);
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, this);
     }
 
-    /**
-     * Read the current content from the clipboard.
-     *
-     * @return clipboard content
-     */
+    // Read the current content from the clipboard
     public static String getString() {
         Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
         boolean hasTransferableText = contents != null && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
