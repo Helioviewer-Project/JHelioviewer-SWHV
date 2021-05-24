@@ -5,7 +5,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JLabel;
-import javax.swing.JTextArea;
 
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -16,7 +15,7 @@ import com.jidesoft.swing.RangeSlider;
 public class SlitPanel implements FilterDetails {
 
     private final RangeSlider slider;
-    private final JTextArea label;
+    private final JLabel label;
 
     public SlitPanel(ImageLayer layer) {
         int left = (int) (layer.getGLImage().getSlitLeft() * 100);
@@ -34,11 +33,7 @@ public class SlitPanel implements FilterDetails {
         });
         slider.setRangeDraggable(true);
 
-        label = new JTextArea(LevelsPanel.format(slider.getLowValue(), slider.getHighValue()));
-        label.setDragEnabled(false);
-        label.setHighlighter(null);
-        label.setEditable(false);
-        label.setOpaque(false);
+        label = new JLabel(LevelsPanel.format(slider.getLowValue(), slider.getHighValue()));
 
         slider.addChangeListener(e -> {
             int lo = slider.getLowValue();
