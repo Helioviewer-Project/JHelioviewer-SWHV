@@ -5,7 +5,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JLabel;
-import javax.swing.JTextArea;
 
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -16,7 +15,7 @@ import com.jidesoft.swing.RangeSlider;
 public class LevelsPanel implements FilterDetails {
 
     private final RangeSlider slider;
-    private final JTextArea label;
+    private final JLabel label;
 
     static String align3(int value) {
         if (value < -99)
@@ -33,7 +32,7 @@ public class LevelsPanel implements FilterDetails {
     }
 
     static String format(int low, int high) {
-        return align3(low) + '\n' + align3(high);
+        return "<html>" + align3(low) + "<br/>" + align3(high);
     }
 
     public LevelsPanel(ImageLayer layer) {
@@ -53,11 +52,7 @@ public class LevelsPanel implements FilterDetails {
         });
         slider.setRangeDraggable(true);
 
-        label = new JTextArea(format(slider.getLowValue(), slider.getHighValue()));
-        label.setDragEnabled(false);
-        label.setHighlighter(null);
-        label.setEditable(false);
-        label.setOpaque(false);
+        label = new JLabel(format(slider.getLowValue(), slider.getHighValue()));
 
         slider.addChangeListener(e -> {
             int lo = slider.getLowValue();
