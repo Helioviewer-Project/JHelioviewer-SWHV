@@ -10,21 +10,20 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
-import com.jidesoft.swing.MultilineLabel;
 import com.jidesoft.swing.RangeSlider;
 
 public class LevelsPanel implements FilterDetails {
 
     private final RangeSlider slider;
-    private final MultilineLabel label;
+    private final JLabel label;
 
-    static String align3(int value) {
+    private static String align3(int value) {
         if (value < -99)
-            return value + "%";
+            return "\u2212" + (-value) + "%";
         if (value < -9)
-            return "\u2007" + value + '%';
+            return "\u2007\u2212" + (-value) + '%';
         if (value < 0)
-            return "\u2007\u2007" + value + '%';
+            return "\u2007\u2007\u2212" + (-value) + '%';
         if (value < 10)
             return "\u2007\u2007\u2007" + value + '%';
         if (value < 100)
@@ -32,8 +31,12 @@ public class LevelsPanel implements FilterDetails {
         return "\u2007" + value + '%';
     }
 
+    static String align(int value) {
+        return "<html>" + align3(value);
+    }
+
     static String format(int low, int high) {
-        return align3(low) + '\n' + align3(high);
+        return "<html>" + align3(low) + "<br/>" + align3(high);
     }
 
     public LevelsPanel(ImageLayer layer) {
@@ -53,7 +56,7 @@ public class LevelsPanel implements FilterDetails {
         });
         slider.setRangeDraggable(true);
 
-        label = new MultilineLabel(format(slider.getLowValue(), slider.getHighValue()));
+        label = new JLabel(format(slider.getLowValue(), slider.getHighValue()), JLabel.RIGHT);
 
         slider.addChangeListener(e -> {
             int lo = slider.getLowValue();
