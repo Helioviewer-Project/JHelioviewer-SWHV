@@ -17,6 +17,7 @@ import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.SampClient;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.log.LogSettings;
 import org.helioviewer.jhv.plugins.PluginManager;
@@ -90,7 +91,10 @@ public class JHelioviewer {
             }
 
             JComponent leftPane = JHVFrame.getLeftScrollPane();
-            leftPane.setMinimumSize(new Dimension(leftPane.getPreferredSize().width + 10, -1));
+            ImageLayer dummy = ImageLayer.create(null);
+            leftPane.setMinimumSize(new Dimension(leftPane.getPreferredSize().width, -1));
+            dummy.unload();
+
             frame.pack();
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
