@@ -10,7 +10,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.interfaces.JHVCell;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -62,7 +61,6 @@ class FOVInstrument extends DefaultMutableTreeNode implements JHVCell {
 
         panel.add(checkBox, BorderLayout.LINE_START);
         panel.add(new JLabel("      "), BorderLayout.LINE_END); // avoid ellipsis on Windows
-        ComponentUtils.smallVariant(panel);
     }
 
     @Override

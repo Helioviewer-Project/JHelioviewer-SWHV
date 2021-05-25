@@ -17,7 +17,6 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.JHVButton;
@@ -88,7 +87,6 @@ class BandOptionPanel extends JPanel {
             band.setPropagationModel(new PropagationModelRadial(speed));
         });
         add(propagationField, c);
-        ComponentUtils.smallVariant(this);
     }
 
 }

@@ -13,7 +13,6 @@ import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
@@ -149,7 +148,6 @@ public class TimestampLayer extends AbstractLayer {
         });
         panel.add(showTop, c0);
 
-        ComponentUtils.smallVariant(panel);
         return panel;
     }
 

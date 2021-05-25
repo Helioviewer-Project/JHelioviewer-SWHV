@@ -26,7 +26,6 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridScale;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.layers.grid.GridLabel;
@@ -417,8 +416,6 @@ public class GridLayer extends AbstractLayer {
             c0.gridx = 3;
             c0.anchor = GridBagConstraints.LINE_START;
             add(gridResolutionYSpinner, c0);
-
-            ComponentUtils.smallVariant(this);
         }
 
         private void createGridTypeBox() {

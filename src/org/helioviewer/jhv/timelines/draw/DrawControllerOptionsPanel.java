@@ -7,7 +7,6 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.astronomy.Carrington;
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.JHVToggleButton;
 import org.helioviewer.jhv.layers.Movie;
@@ -55,8 +54,6 @@ class DrawControllerOptionsPanel extends JPanel {
 
         add(lockButton, BorderLayout.CENTER);
         add(zoomCombo, BorderLayout.LINE_END);
-
-        ComponentUtils.smallVariant(this);
     }
 
     private static class ZoomItem {
