@@ -20,7 +20,6 @@ import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.annotate.AnnotateCross;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.connect.LoadConnectivity;
 import org.helioviewer.jhv.layers.connect.LoadFootpoint;
@@ -281,7 +280,6 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
         c0.gridx = 2;
         panel.add(footpointBtn, c0);
 
-        ComponentUtils.smallVariant(panel);
         return panel;
     }
 

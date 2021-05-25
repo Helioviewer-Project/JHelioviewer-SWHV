@@ -16,7 +16,6 @@ import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
@@ -101,8 +100,6 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
 
         c.gridy = 0;
         add(radioPanel, c);
-
-        ComponentUtils.smallVariant(this);
 
         syncViewpoint();
     }

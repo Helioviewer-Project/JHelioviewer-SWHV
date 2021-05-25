@@ -15,7 +15,6 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.GLHelper;
@@ -133,7 +132,6 @@ public class MiniviewLayer extends AbstractLayer {
         c0.gridx = 1;
         panel.add(slider, c0);
 
-        ComponentUtils.smallVariant(panel);
         return panel;
     }
 

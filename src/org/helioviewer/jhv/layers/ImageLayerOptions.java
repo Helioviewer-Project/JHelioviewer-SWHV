@@ -7,7 +7,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.lut.LUT;
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.layers.filters.*;
 
 @SuppressWarnings("serial")
@@ -53,8 +52,6 @@ class ImageLayerOptions extends JPanel {
         addToGridBag(c, lutPanel);
         c.gridy++;
         addToGridBag(c, channelMixerPanel);
-
-        ComponentUtils.smallVariant(this);
     }
 
     private void addToGridBag(GridBagConstraints c, FilterDetails details) {

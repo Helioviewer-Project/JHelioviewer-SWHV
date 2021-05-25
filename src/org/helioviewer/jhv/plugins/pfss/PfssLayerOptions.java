@@ -11,7 +11,6 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
@@ -81,8 +80,6 @@ class PfssLayerOptions extends JPanel {
         c0.anchor = GridBagConstraints.LINE_START;
         c0.gridx = 4;
         add(availabilityButton, c0);
-
-        ComponentUtils.smallVariant(this);
     }
 
     int getDetail() {

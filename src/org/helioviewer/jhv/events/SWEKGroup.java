@@ -17,7 +17,6 @@ import javax.swing.Timer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.interfaces.JHVCell;
 
@@ -55,7 +54,6 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVCell {
         containsParameterFilter = checkFilters(parameterList);
 
         JLabel label = new JLabel(name);
-        ComponentUtils.smallVariant(label);
         int size = label.getPreferredSize().height;
         label.setIcon(new ImageIcon(icon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH)));
 
@@ -64,7 +62,6 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVCell {
         panel.add(label, BorderLayout.LINE_START);
         panel.setPreferredSize(new Dimension(RIGHT_ALIGNMENT, size)); //!
         panel.add(over, BorderLayout.LINE_END);
-        ComponentUtils.smallVariant(panel);
     }
 
     public HashMap<String, String> getAllDatabaseFields() {

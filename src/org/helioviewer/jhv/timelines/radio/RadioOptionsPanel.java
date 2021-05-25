@@ -8,7 +8,6 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.lut.LUTComboBox;
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataSources;
 
@@ -39,8 +38,6 @@ class RadioOptionsPanel extends JPanel {
         c.gridx = 1;
         c.gridy = 0;
         add(availabilityButton, c);
-
-        ComponentUtils.smallVariant(this);
     }
 
     String getColormap() {

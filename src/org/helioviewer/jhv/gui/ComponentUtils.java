@@ -23,8 +23,4 @@ public class ComponentUtils {
         JideSwingUtilities.setEnabledRecursively(c, enable);
     }
 
-    public static void smallVariant(Component c) {
-        JideSwingUtilities.putClientPropertyRecursively(c, "JComponent.sizeVariant", "small");
-    }
-
 }

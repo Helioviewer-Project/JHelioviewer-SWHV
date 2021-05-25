@@ -19,7 +19,6 @@ import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorListener;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
@@ -137,8 +136,6 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
             c.gridy = 4;
             add(spiralPanel, c);
         }
-
-        ComponentUtils.smallVariant(this);
     }
 
     void setTimespan(long start, long end) {

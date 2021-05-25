@@ -11,7 +11,6 @@ import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.JHVTreeCell;
 import org.helioviewer.jhv.layers.fov.FOVInstrument.FOVType;
 
@@ -63,8 +62,6 @@ public class FOVTreePane extends JScrollPane {
         getVerticalScrollBar().setUnitIncrement(20); // ugh
         setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Colors.lightGray));
         setPreferredSize(new Dimension(-1, 98));
-
-        ComponentUtils.smallVariant(this);
     }
 
     public void init(GL2 gl) {

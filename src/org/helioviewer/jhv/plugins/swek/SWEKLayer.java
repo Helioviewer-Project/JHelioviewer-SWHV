@@ -28,7 +28,6 @@ import org.helioviewer.jhv.events.JHVEventParameter;
 import org.helioviewer.jhv.events.JHVPositionInformation;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.events.SWEKGroup;
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Movie;
@@ -527,7 +526,6 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         c0.gridx = 0;
         panel.add(check, c0);
 
-        ComponentUtils.smallVariant(panel);
         return panel;
     }
 
