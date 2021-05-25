@@ -9,15 +9,16 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.font.TextAttribute;
 import java.io.InputStream;
-import java.util.Enumeration;
+//import java.util.Enumeration;
 import java.util.HashMap;
+//import java.util.Map;
+//import java.util.TreeSet;
 
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
-import javax.swing.plaf.FontUIResource;
+//import javax.swing.plaf.FontUIResource;
 
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.io.FileUtils;
@@ -41,13 +42,15 @@ public class UIGlobals {
             JPopupMenu.setDefaultLightWeightPopupEnabled(false);
         }
 
-        JLabel label = new JLabel();
-        foreColor = label.getForeground();
-        backColor = label.getBackground();
+        // listFontKeys();
+        // listColorKeys();
+
+        foreColor = UIManager.getColor("Label.foreground");
+        backColor = UIManager.getColor("Label.background");
         midColor = new Color((foreColor.getRed() + backColor.getRed()) / 2, (foreColor.getGreen() + backColor.getGreen()) / 2, (foreColor.getBlue() + backColor.getBlue()) / 2);
 
-        Font font = label.getFont();
-        String defaultFont = font.getFamily();
+        Font font = UIManager.getFont("defaultFont");
+        String defaultFamily = font.getFamily();
         int defaultSize = font.getSize();
 
         if (System.getProperty("jhv.os").equals("mac")) {
@@ -67,7 +70,7 @@ public class UIGlobals {
 
         HashMap<TextAttribute, Object> map = new HashMap<>();
         map.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
-        map.put(TextAttribute.FAMILY, defaultFont);
+        map.put(TextAttribute.FAMILY, defaultFamily);
 
         map.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_REGULAR);
         map.put(TextAttribute.SIZE, defaultSize);
@@ -90,7 +93,8 @@ public class UIGlobals {
         // uiFontMono = new Font("Monospaced", Font.PLAIN, defaultSize);
         uiFontMonoSmall = new Font("Monospaced", Font.PLAIN, defaultSize - 2);
 
-        setUIFont(uiFont);
+        // setUIFont(uiFont);
+        UIManager.getLookAndFeelDefaults().put("defaultFont", uiFont);
 
         try (InputStream is = FileUtils.getResource("/fonts/RobotoCondensed-Regular.ttf")) {
             uiFontRoboto = Font.createFont(Font.TRUETYPE_FONT, is);
@@ -106,7 +110,7 @@ public class UIGlobals {
             e.printStackTrace();
         }
     }
-
+/*
     private static void setUIFont(Font font) {
         FontUIResource f = new FontUIResource(font);
         Enumeration<?> keys = UIManager.getLookAndFeelDefaults().keys();
@@ -117,6 +121,29 @@ public class UIGlobals {
                 UIManager.put(key, f);
         }
     }
+*/
+/*
+    private static void listFontKeys() {
+        TreeSet<String> keys = new TreeSet<>();
+        for (Map.Entry<Object, Object> entry : UIManager.getLookAndFeelDefaults().entrySet()) {
+            if (entry.getValue() instanceof Font) {
+                keys.add((String) entry.getKey());
+            }
+        }
+        keys.forEach(System.out::println);
+    }
+*/
+/*
+    private static void listColorKeys() {
+        TreeSet<String> keys = new TreeSet<>();
+        for (Map.Entry<Object, Object> entry : UIManager.getLookAndFeelDefaults().entrySet()) {
+            if (entry.getValue() instanceof Color) {
+                keys.add((String) entry.getKey());
+            }
+        }
+        keys.forEach(System.out::println);
+    }
+*/
 
     public static Font uiFont;
     public static Font uiFontBold;
