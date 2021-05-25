@@ -216,21 +216,15 @@ public class LayersPanel extends JPanel {
         grid.setDropMode(DropMode.INSERT_ROWS);
         grid.setTransferHandler(new TableRowTransferHandler(grid));
 
-        jsp.setPreferredSize(new Dimension(-1, getGridRowHeight() * NUMBEROFVISIBLEROWS + 1));
-        grid.setRowHeight(getGridRowHeight());
+        jsp.setPreferredSize(new Dimension(-1, grid.getRowHeight() * NUMBEROFVISIBLEROWS + 1));
 
         gc.gridy = 1;
         optionsPanelWrapper = new JPanel(new BorderLayout());
         add(optionsPanelWrapper, gc);
     }
 
-    private int rowHeight = -1;
-
     public int getGridRowHeight() {
-        if (rowHeight == -1) {
-            rowHeight = grid.getRowHeight() + 4;
-        }
-        return rowHeight;
+        return grid.getRowHeight();
     }
 
     public void setOptionsPanel(Layer layer) {

@@ -200,23 +200,11 @@ public class TimelinePanel extends JPanel {
             }
         });
 
-        int h = getGridRowHeight(grid);
-        jsp.setPreferredSize(new Dimension(-1, h * NUMBEROFVISIBLEROWS + 1));
-        grid.setRowHeight(h);
-
-        optionsPanelWrapper = new JPanel(new BorderLayout());
+        jsp.setPreferredSize(new Dimension(-1, grid.getRowHeight() * NUMBEROFVISIBLEROWS + 1));
 
         gc.gridy = 1;
+        optionsPanelWrapper = new JPanel(new BorderLayout());
         add(optionsPanelWrapper, gc);
-    }
-
-    private int rowHeight = -1;
-
-    private int getGridRowHeight(JTable table) {
-        if (rowHeight == -1) {
-            rowHeight = table.getRowHeight() + 4;
-        }
-        return rowHeight;
     }
 
     private void setOptionsPanel(TimelineLayer timeline) {

@@ -91,8 +91,7 @@ public class SpaceObjectContainer extends JScrollPane {
 
         setViewportView(grid);
         getViewport().setBackground(grid.getBackground());
-        setPreferredSize(new Dimension(-1, getGridRowHeight(grid) * NUMBEROFVISIBLEROWS + 1));
-        grid.setRowHeight(getGridRowHeight(grid));
+        setPreferredSize(new Dimension(-1, grid.getRowHeight() * NUMBEROFVISIBLEROWS + 1));
 
         PositionLoad.removeAll(uv);
 
@@ -152,15 +151,6 @@ public class SpaceObjectContainer extends JScrollPane {
                 return true;
         }
         return false;
-    }
-
-    private int rowHeight = -1;
-
-    private int getGridRowHeight(JTable grid) {
-        if (rowHeight == -1) {
-            rowHeight = grid.getRowHeight() + 4;
-        }
-        return rowHeight;
     }
 
     public JSONArray toJson() {
