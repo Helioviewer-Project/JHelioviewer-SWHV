@@ -71,21 +71,26 @@ public class TimeSelectorPanel extends JPanel {
         c.anchor = GridBagConstraints.LINE_START;
         c.fill = GridBagConstraints.HORIZONTAL;
 
+        c.gridy = 0;
+
         c.weightx = 0;
         c.gridx = 0;
         add(backButton, c);
-
         c.weightx = 1;
         c.gridx = 1;
         add(startTimePanel, c);
+        c.weightx = 0;
         c.gridx = 2;
-        add(endTimePanel, c);
+        add(carringtonPicker, c);
+
+        c.gridy = 1;
 
         c.weightx = 0;
-        c.gridx = 3;
-        add(carringtonPicker, c);
-        c.gridx = 4;
+        c.gridx = 0;
         add(foreButton, c);
+        c.weightx = 1;
+        c.gridx = 1;
+        add(endTimePanel, c);
     }
 
     private void shiftSpan(long shift) {
