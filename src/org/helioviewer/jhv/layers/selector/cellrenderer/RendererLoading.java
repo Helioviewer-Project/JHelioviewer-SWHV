@@ -8,6 +8,7 @@ import javax.swing.JLabel;
 import javax.swing.JLayer;
 import javax.swing.JTable;
 
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
@@ -16,7 +17,7 @@ import org.helioviewer.jhv.layers.Layer;
 @SuppressWarnings("serial")
 public class RendererLoading extends JHVTableCellRenderer {
 
-    private final Font font = Buttons.getMaterialFont(getFont().getSize2D());
+    private final Font font = Buttons.getMaterialFont(UIGlobals.uiFont.getSize2D());
     private final JLayer<JComponent> over = new JLayer<>(null, UITimer.busyIndicator);
 
     @Override
