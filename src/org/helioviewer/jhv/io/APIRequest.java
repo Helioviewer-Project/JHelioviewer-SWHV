@@ -43,20 +43,20 @@ public class APIRequest {
         if (startTime == endTime) {
             if ((api = DataSources.getServerSetting(server, "API.getJP2Image")) == null)
                 throw new IOException("Unknown server: " + server);
-            fileReq = api + "json=true&sourceId=" + sourceId + "&date=" + TimeUtils.formatZ(startTime);
+            fileReq = api + "sourceId=" + sourceId + "&date=" + TimeUtils.formatZ(startTime);
         } else {
             if ((api = DataSources.getServerSetting(server, "API.getJPX")) == null)
                 throw new IOException("Unknown server: " + server);
-            fileReq = api + "verbose=true&linked=true&sourceId=" + sourceId + "&startTime=" + TimeUtils.formatZ(startTime) + "&endTime=" + TimeUtils.formatZ(endTime);
-            if (cadence != CADENCE_ANY) {
+            fileReq = api + "sourceId=" + sourceId + "&startTime=" + TimeUtils.formatZ(startTime) + "&endTime=" + TimeUtils.formatZ(endTime);
+            if (cadence != CADENCE_ANY)
                 fileReq += "&cadence=" + cadence;
-            }
         }
         return fileReq;
     }
 
     String toJpipRequest() throws IOException {
-        return toFileRequest() + "&jpip=true";
+        String jsonReq = startTime == endTime ? "&json=true" : "&verbose=true&linked=true";
+        return toFileRequest() + jsonReq + "&jpip=true";
     }
 
     @Override
