@@ -12,18 +12,14 @@ public class RendererRemove extends JHVTableCellRenderer {
 
     private final Font font = Buttons.getMaterialFont(UIGlobals.uiFont.getSize2D());
 
-    public RendererRemove() {
-        setHorizontalAlignment(CENTER);
-    }
-
     @Override
     public void setValue(Object value) {
+        setBorder(null); //!
         if (value instanceof TimelineLayer && ((TimelineLayer) value).isDeletable()) {
             setFont(font);
             setText(Buttons.close);
         } else
             setText(null);
-        setBorder(cellBorder);
     }
 
 }

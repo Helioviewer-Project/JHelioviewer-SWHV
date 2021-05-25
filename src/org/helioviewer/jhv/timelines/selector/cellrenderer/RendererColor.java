@@ -32,10 +32,6 @@ public class RendererColor extends JHVTableCellRenderer {
 
         private Color c;
 
-        LineColorPanel() {
-            setBorder(cellBorder);
-        }
-
         void setLineColor(Color _c) {
             c = _c;
         }
