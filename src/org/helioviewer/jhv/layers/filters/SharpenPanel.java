@@ -16,11 +16,11 @@ public class SharpenPanel implements FilterDetails {
 
     public SharpenPanel(ImageLayer layer) {
         slider = new JSlider(JSlider.HORIZONTAL, -100, 100, (int) (layer.getGLImage().getSharpen() * 100));
-        label = new JLabel(LevelsPanel.align3(slider.getValue()), JLabel.RIGHT);
+        label = new JLabel(LevelsPanel.align(slider.getValue()), JLabel.RIGHT);
         slider.addChangeListener(e -> {
             int value = slider.getValue();
             layer.getGLImage().setSharpen(value / 100.);
-            label.setText(LevelsPanel.align3(value));
+            label.setText(LevelsPanel.align(value));
             MovieDisplay.display();
         });
         WheelSupport.installMouseWheelSupport(slider);

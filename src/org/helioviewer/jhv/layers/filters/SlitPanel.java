@@ -10,13 +10,12 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
-import com.jidesoft.swing.MultilineLabel;
 import com.jidesoft.swing.RangeSlider;
 
 public class SlitPanel implements FilterDetails {
 
     private final RangeSlider slider;
-    private final MultilineLabel label;
+    private final JLabel label;
 
     public SlitPanel(ImageLayer layer) {
         int left = (int) (layer.getGLImage().getSlitLeft() * 100);
@@ -34,7 +33,7 @@ public class SlitPanel implements FilterDetails {
         });
         slider.setRangeDraggable(true);
 
-        label = new MultilineLabel(LevelsPanel.format(slider.getLowValue(), slider.getHighValue()));
+        label = new JLabel(LevelsPanel.format(slider.getLowValue(), slider.getHighValue()), JLabel.RIGHT);
 
         slider.addChangeListener(e -> {
             int lo = slider.getLowValue();

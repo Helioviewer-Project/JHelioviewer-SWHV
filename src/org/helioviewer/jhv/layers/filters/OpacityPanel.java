@@ -16,11 +16,11 @@ public class OpacityPanel implements FilterDetails {
 
     public OpacityPanel(ImageLayer layer) {
         slider = new JSlider(JSlider.HORIZONTAL, 0, 100, (int) (layer.getGLImage().getOpacity() * 100));
-        label = new JLabel(LevelsPanel.align3(slider.getValue()), JLabel.RIGHT);
+        label = new JLabel(LevelsPanel.align(slider.getValue()), JLabel.RIGHT);
         slider.addChangeListener(e -> {
             int value = slider.getValue();
             layer.getGLImage().setOpacity(value / 100.);
-            label.setText(LevelsPanel.align3(value));
+            label.setText(LevelsPanel.align(value));
             MovieDisplay.display();
         });
         WheelSupport.installMouseWheelSupport(slider);
