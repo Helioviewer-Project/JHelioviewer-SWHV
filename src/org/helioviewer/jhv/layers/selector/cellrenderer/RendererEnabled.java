@@ -13,13 +13,6 @@ public class RendererEnabled extends JHVTableCellRenderer {
 
     private final JCheckBox checkBox = new JCheckBox();
 
-    public RendererEnabled() {
-        setHorizontalAlignment(CENTER);
-        checkBox.putClientProperty("JComponent.sizeVariant", "small");
-        checkBox.setBorderPainted(true);
-        checkBox.setBorder(cellBorder);
-    }
-
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point

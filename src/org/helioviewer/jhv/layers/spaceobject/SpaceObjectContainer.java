@@ -56,7 +56,7 @@ public class SpaceObjectContainer extends JScrollPane {
 
         JTable grid = new JTable(model);
         grid.setTableHeader(null);
-        grid.setShowGrid(false);
+        grid.setShowHorizontalLines(true);
         grid.setRowSelectionAllowed(true);
         grid.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         grid.setColumnSelectionAllowed(false);
@@ -166,7 +166,6 @@ public class SpaceObjectContainer extends JScrollPane {
             if (value instanceof SpaceObjectElement) {
                 SpaceObjectElement element = (SpaceObjectElement) value;
                 label.setText(element.toString());
-                label.setBorder(element.getBorder());
                 label.setToolTipText("Select for spiral");
             }
             return label;
@@ -177,18 +176,11 @@ public class SpaceObjectContainer extends JScrollPane {
 
         private final JCheckBox checkBox = new JCheckBox();
 
-        SelectedRenderer() {
-            setHorizontalAlignment(CENTER);
-            checkBox.putClientProperty("JComponent.sizeVariant", "small");
-            checkBox.setBorderPainted(true);
-        }
-
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             if (value instanceof SpaceObjectElement) {
                 SpaceObjectElement element = (SpaceObjectElement) value;
                 checkBox.setSelected(element.isSelected());
-                checkBox.setBorder(element.getBorder());
             }
             checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
             return checkBox;
@@ -200,18 +192,11 @@ public class SpaceObjectContainer extends JScrollPane {
 
         private final JRadioButton radio = new JRadioButton();
 
-        SelectedExclusiveRenderer() {
-            setHorizontalAlignment(CENTER);
-            radio.putClientProperty("JComponent.sizeVariant", "small");
-            radio.setBorderPainted(true);
-        }
-
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             if (value instanceof SpaceObjectElement) {
                 SpaceObjectElement element = (SpaceObjectElement) value;
                 radio.setSelected(element.isSelected());
-                radio.setBorder(element.getBorder());
             }
             radio.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
             return radio;
@@ -228,7 +213,6 @@ public class SpaceObjectContainer extends JScrollPane {
                 String status = element.getStatus();
                 label.setText(status);
                 label.setToolTipText(status);
-                label.setBorder(element.getBorder());
             }
             return label;
         }

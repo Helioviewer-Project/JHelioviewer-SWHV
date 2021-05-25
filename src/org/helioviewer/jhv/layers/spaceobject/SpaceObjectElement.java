@@ -3,7 +3,6 @@ package org.helioviewer.jhv.layers.spaceobject;
 import java.util.List;
 
 import javax.annotation.Nullable;
-import javax.swing.border.Border;
 
 import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.PositionLoad;
@@ -63,10 +62,6 @@ class SpaceObjectElement implements StatusReceiver {
         List<PositionLoad> loads = PositionLoad.get(uv);
         int idx = loads.indexOf(load);
         return idx < 0 ? null : loads.get(idx);
-    }
-
-    Border getBorder() {
-        return target.getBorder();
     }
 
     String getStatus() {

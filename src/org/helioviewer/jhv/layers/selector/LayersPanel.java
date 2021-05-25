@@ -122,7 +122,7 @@ public class LayersPanel extends JPanel {
         add(jsp, gc);
 
         grid.setTableHeader(null);
-        grid.setShowGrid(false);
+        grid.setShowHorizontalLines(true);
         grid.setRowSelectionAllowed(true);
         grid.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         grid.setColumnSelectionAllowed(false);
@@ -135,7 +135,7 @@ public class LayersPanel extends JPanel {
         grid.getColumnModel().getColumn(TITLE_COL).setCellRenderer(new RendererName());
 
         grid.getColumnModel().getColumn(TIME_COL).setCellRenderer(new RendererTime());
-        int timeWidth = new JLabel("2000-01-01T00:00:00").getPreferredSize().width;
+        int timeWidth = new JLabel("2000-01-01T00:00:00.000").getPreferredSize().width;
         grid.getColumnModel().getColumn(TIME_COL).setMinWidth(timeWidth);
 
         grid.getColumnModel().getColumn(DOWNLOAD_COL).setCellRenderer(new RendererLoading());

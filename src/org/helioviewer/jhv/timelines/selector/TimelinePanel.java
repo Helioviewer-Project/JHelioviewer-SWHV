@@ -130,7 +130,7 @@ public class TimelinePanel extends JPanel {
         add(jspContainer, gc);
 
         grid.setTableHeader(null);
-        grid.setShowGrid(false);
+        grid.setShowHorizontalLines(true);
         grid.setRowSelectionAllowed(true);
         grid.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         grid.setColumnSelectionAllowed(false);

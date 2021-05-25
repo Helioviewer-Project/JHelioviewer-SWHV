@@ -22,7 +22,6 @@ public class RendererName extends JHVTableCellRenderer {
                 setFont(UIGlobals.uiFont);
             }
         }
-        setBorder(cellBorder);
     }
 
 }
