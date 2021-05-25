@@ -62,9 +62,9 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
         panel = new JPanel(new GridLayout(1, 5, 0, 0));
         panel.setOpaque(false);
         panel.add(new JLabel(name));
-        panel.add(new JLabel("  Offpoint X: ", JLabel.RIGHT));
+        panel.add(new JLabel("\u03B4x ", JLabel.RIGHT));
         panel.add(spinnerX);
-        panel.add(new JLabel("  Offpoint Y: ", JLabel.RIGHT));
+        panel.add(new JLabel("\u03B4y ", JLabel.RIGHT));
         panel.add(spinnerY);
     }
 
