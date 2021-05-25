@@ -17,7 +17,8 @@ public class BandType {
         int len = ja.length();
         for (int i = 0; i < len; i++) {
             BandType bandType = new BandType(ja.getJSONObject(i));
-            groups.put(bandType.group, bandType);
+            if (!"ODI".equals(bandType.group)) //! hide ODI for the time being
+                groups.put(bandType.group, bandType);
         }
     }
 
