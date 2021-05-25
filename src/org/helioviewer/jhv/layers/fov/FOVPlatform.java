@@ -19,7 +19,6 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.interfaces.JHVCell;
@@ -67,7 +66,6 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
         panel.add(spinnerX);
         panel.add(new JLabel("  Offpoint Y: ", JLabel.RIGHT));
         panel.add(spinnerY);
-        ComponentUtils.smallVariant(panel);
     }
 
     @Override

@@ -13,7 +13,6 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.events.SWEKSupplier;
-import org.helioviewer.jhv.gui.ComponentUtils;
 
 @SuppressWarnings("serial")
 public class FilterDialog extends JDialog implements FocusListener, WindowFocusListener {
@@ -39,7 +38,6 @@ public class FilterDialog extends JDialog implements FocusListener, WindowFocusL
         filterPanel.add(applyButton);
 
         setContentPane(filterPanel);
-        ComponentUtils.smallVariant(this);
         pack();
     }
 

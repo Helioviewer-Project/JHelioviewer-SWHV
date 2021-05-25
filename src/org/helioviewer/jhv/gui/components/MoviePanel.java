@@ -335,7 +335,6 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         add(JHVFrame.getLayersPanel());
 
         setEnabledState(false);
-        ComponentUtils.smallVariant(this);
     }
 
     @Override

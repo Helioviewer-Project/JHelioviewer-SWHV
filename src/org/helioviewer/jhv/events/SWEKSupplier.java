@@ -13,7 +13,6 @@ import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.helioviewer.jhv.events.filter.FilterDialog;
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.gui.interfaces.JHVCell;
 
@@ -67,7 +66,6 @@ public class SWEKSupplier extends DefaultMutableTreeNode implements JHVCell {
             panel.setPreferredSize(new Dimension(SWEKGroup.RIGHT_ALIGNMENT, filterButton.getPreferredSize().height)); //!
             panel.add(filterButton, BorderLayout.LINE_END);
         }
-        ComponentUtils.smallVariant(panel);
     }
 
     public static SWEKSupplier getSupplier(String name) {
