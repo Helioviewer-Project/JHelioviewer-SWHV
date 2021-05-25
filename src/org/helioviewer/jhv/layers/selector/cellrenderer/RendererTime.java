@@ -11,7 +11,6 @@ public class RendererTime extends JHVTableCellRenderer {
         if (value instanceof Layer) {
             setText(((Layer) value).getTimeString());
         }
-        setBorder(cellBorder);
     }
 
 }
