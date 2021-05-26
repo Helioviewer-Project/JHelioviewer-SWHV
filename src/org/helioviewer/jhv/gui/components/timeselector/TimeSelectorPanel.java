@@ -5,6 +5,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
@@ -67,30 +68,31 @@ public class TimeSelectorPanel extends JPanel {
         foreButton.addActionListener(e -> shiftSpan(ShiftUnit.valueOf(foreGroup.getSelection().getActionCommand()).shift));
 
         setLayout(new GridBagLayout());
+        setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.LINE_START;
         c.fill = GridBagConstraints.HORIZONTAL;
 
         c.gridy = 0;
 
-        c.weightx = 0;
-        c.gridx = 0;
-        add(backButton, c);
         c.weightx = 1;
-        c.gridx = 1;
+        c.gridx = 0;
         add(startTimePanel, c);
+        c.weightx = 0;
+        c.gridx = 1;
+        add(backButton, c);
         c.weightx = 0;
         c.gridx = 2;
         add(carringtonPicker, c);
 
         c.gridy = 1;
 
-        c.weightx = 0;
-        c.gridx = 0;
-        add(foreButton, c);
         c.weightx = 1;
-        c.gridx = 1;
+        c.gridx = 0;
         add(endTimePanel, c);
+        c.weightx = 0;
+        c.gridx = 1;
+        add(foreButton, c);
     }
 
     private void shiftSpan(long shift) {
