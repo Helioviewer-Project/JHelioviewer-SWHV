@@ -44,7 +44,7 @@
         </condition>
 
         <path id="processorpath.ref">
-            <pathelement location="extra/prone/error_prone_core-2.6.0-with-dependencies.jar"/>
+            <pathelement location="extra/prone/error_prone_core-2.7.1-with-dependencies.jar"/>
             <pathelement location="extra/prone/jFormatString-3.0.0.jar"/>
             <pathelement location="extra/prone/dataflow-shaded-3.7.1.jar"/>
             <!-- Add annotation processors and Error Prone custom checks here if needed -->

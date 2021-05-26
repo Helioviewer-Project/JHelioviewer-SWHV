@@ -19,11 +19,11 @@ public class LevelsPanel implements FilterDetails {
 
     private static String align3(int value) {
         if (value < -99)
-            return "\u2212" + (-value) + "%";
+            return "\u2212" + -value + "%";
         if (value < -9)
-            return "\u2007\u2212" + (-value) + '%';
+            return "\u2007\u2212" + -value + '%';
         if (value < 0)
-            return "\u2007\u2007\u2212" + (-value) + '%';
+            return "\u2007\u2007\u2212" + -value + '%';
         if (value < 10)
             return "\u2007\u2007\u2007" + value + '%';
         if (value < 100)
