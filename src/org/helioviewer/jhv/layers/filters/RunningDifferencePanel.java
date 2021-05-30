@@ -72,7 +72,7 @@ public class RunningDifferencePanel implements FilterDetails {
 
     @Override
     public Component getTitle() {
-        return new JLabel("Difference", JLabel.RIGHT);
+        return new JLabel(" Difference ", JLabel.RIGHT);
     }
 
     @Override

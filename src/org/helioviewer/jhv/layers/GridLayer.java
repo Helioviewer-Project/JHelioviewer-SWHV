@@ -387,7 +387,7 @@ public class GridLayer extends AbstractLayer {
 
             c0.gridx = 2;
             c0.anchor = GridBagConstraints.LINE_END;
-            add(new JLabel("Grid type", JLabel.RIGHT), c0);
+            add(new JLabel("Grid type ", JLabel.RIGHT), c0);
             c0.gridx = 3;
             c0.anchor = GridBagConstraints.LINE_START;
             createGridTypeBox();
@@ -397,7 +397,7 @@ public class GridLayer extends AbstractLayer {
 
             c0.gridx = 0;
             c0.anchor = GridBagConstraints.LINE_END;
-            add(new JLabel("Longitude", JLabel.RIGHT), c0);
+            add(new JLabel("Longitude ", JLabel.RIGHT), c0);
 
             JFormattedTextField fx = ((JSpinner.DefaultEditor) gridResolutionXSpinner.getEditor()).getTextField();
             fx.setFormatterFactory(new TerminatedFormatterFactory("%.1f", "\u00B0", min, max));
@@ -408,7 +408,7 @@ public class GridLayer extends AbstractLayer {
 
             c0.gridx = 2;
             c0.anchor = GridBagConstraints.LINE_END;
-            add(new JLabel("Latitude", JLabel.RIGHT), c0);
+            add(new JLabel("Latitude ", JLabel.RIGHT), c0);
 
             JFormattedTextField fy = ((JSpinner.DefaultEditor) gridResolutionYSpinner.getEditor()).getTextField();
             fy.setFormatterFactory(new TerminatedFormatterFactory("%.1f", "\u00B0", min, max));
