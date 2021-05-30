@@ -72,7 +72,7 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
 
         JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
         radioPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-        radioPanel.add(new JLabel("View", JLabel.RIGHT));
+        radioPanel.add(new JLabel(" View ", JLabel.RIGHT));
         ButtonGroup modeGroup = new ButtonGroup();
         for (CameraMode mode : CameraMode.values()) {
             JRadioButton radio = new JRadioButton(mode.toString(), mode == cameraMode);

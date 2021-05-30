@@ -47,7 +47,7 @@ public class LUTPanel implements FilterDetails {
 
     @Override
     public Component getTitle() {
-        return new JLabel("Color", JLabel.RIGHT);
+        return new JLabel("Color ", JLabel.RIGHT);
     }
 
     @Override

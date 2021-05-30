@@ -242,7 +242,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         secondLine.add(frameNumberPanel, BorderLayout.LINE_END);
 
         // Speed
-        modePanel.add(new JLabel("Play", JLabel.RIGHT));
+        modePanel.add(new JLabel(" Play ", JLabel.RIGHT));
 
         int speedMin = 1, speedMax = 60;
         speedSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(Movie.DEF_FPS), Double.valueOf(1), Double.valueOf(speedMax), Double.valueOf(speedMin)));
@@ -262,7 +262,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         modePanel.add(speedUnitComboBox);
 
         // Animation mode
-        modePanel.add(new JLabel("and", JLabel.RIGHT));
+        modePanel.add(new JLabel(" and ", JLabel.RIGHT));
 
         advanceModeComboBox = new JComboBox<>(new AdvanceMode[]{AdvanceMode.Loop, AdvanceMode.Stop, AdvanceMode.Swing});
         advanceModeComboBox.setPreferredSize(speedUnitComboBox.getPreferredSize());
@@ -283,7 +283,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
 
         c.gridy = 0;
         c.gridx = 0;
-        recordPanel.add(new JLabel("Record", JLabel.RIGHT), c);
+        recordPanel.add(new JLabel("Record ", JLabel.RIGHT), c);
         c.gridx = 1;
         recordPanel.add(loopButton, c);
         c.gridx = 2;
@@ -302,7 +302,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
 
         c.gridy = 1;
         c.gridx = 2;
-        recordPanel.add(new JLabel("Size", JLabel.RIGHT), c);
+        recordPanel.add(new JLabel("Size ", JLabel.RIGHT), c);
 
         JComboBox<RecordSize> recordSizeCombo = new JComboBox<>(RecordSize.values());
         recordSizeCombo.setSelectedItem(RecordSize.ORIGINAL);
