@@ -18,6 +18,7 @@ import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
 
 import org.helioviewer.jhv.imagedata.ImageBuffer;
+import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.math.MathUtils;
@@ -223,7 +224,16 @@ class FITSImage implements URIImageReader {
                 break;
             }
         }
-        return new ImageBuffer(width, height, ImageBuffer.Format.Gray16, ShortBuffer.wrap(outData), lut);
+
+        ShortBuffer buf = ShortBuffer.wrap(outData);
+        ShortBuffer f = buf;
+/*
+        long startTime = System.currentTimeMillis();
+        ShortBuffer f = ImageFilter.mgn(buf, width, height);
+        long endTime = System.currentTimeMillis();
+        System.out.println(">>> " + (endTime - startTime));
+*/
+        return new ImageBuffer(width, height, ImageBuffer.Format.Gray16, f, lut);
     }
 
     private static final String nl = System.getProperty("line.separator");

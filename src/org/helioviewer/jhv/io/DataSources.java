@@ -18,6 +18,14 @@ public class DataSources {
             "NRH", "Yohkoh", "Hinode", "TRACE", "MLSO", "SOLO", "GOES");
 
     private static final ImmutableMap<String, Map<String, String>> serverSettings = new ImmutableMap.Builder<String, Map<String, String>>().
+/*            put("Local", new ImmutableMap.Builder<String, String>().
+                    put("API.getDataSources", "http://hv.local/api/docroot/index.php/?action=getDataSources&verbose=true&enable=[SOLO]").
+                    put("API.getJP2Image", "http://hv.local/api/docroot/index.php/?action=getJP2Image&").
+                    put("API.getJPX", "http://hv.local/api/docroot/index.php/?action=getJPX&").
+                    put("label", "Local").
+                    put("schema", "/data/sources_v1.0.json").
+                    put("availability.images", "http://swhv.oma.be/availability/images/availability/availability.html").
+                    build()).*/
             put("ROB", new ImmutableMap.Builder<String, String>().
                     put("API.getDataSources", "http://swhv.oma.be/hv/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]").
                     put("API.getJP2Image", "http://swhv.oma.be/hv/api/index.php?action=getJP2Image&").
@@ -68,13 +76,6 @@ public class DataSources {
                     put("API.getJPX", "http://gs671-heliovw7.ndc.nasa.gov/api.php?action=getJPX&").
                     put("label", "Goddard Space Flight Center NDC Test");.
                     put("schema", "/data/sources_v1.0.json").
-                    build()). */
-/*          put("LOCALHOST", new ImmutableMap.Builder<String, String>().
-                    put("API.getDataSources", "http://localhost:8080/helioviewer/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]").
-                    put("API.getJP2Image", "http://localhost:8080/helioviewer/api/index.php?action=getJP2Image&").
-                    put("API.getJPX", "http://localhost:8080/helioviewer/api/index.php?action=getJPX&").
-                    put("schema", "/data/sources_v1.0.json").
-                    put("label", "Localhost").
                     build()). */
         build();
 
