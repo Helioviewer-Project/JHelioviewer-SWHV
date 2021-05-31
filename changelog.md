@@ -1,12 +1,15 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.0.1 (pending)
+## JHelioviewer 4.x (pending)
 
-- Load SOLO/EUI images from ROB server
+- Add multi-scale Gaussian normalization (<https://arxiv.org/abs/1403.6613>) image enhancement
+
+## JHelioviewer 4.0.1 (2021-05-31)
+
+- Load SOLO/EUI, GOES/SUVI images from ROB server
 - Allow to sync the current image layer time interval to the other layers
 - Allow drag'n'drop of image files
-- Add multi-scale Gaussian normalization (<https://arxiv.org/abs/1403.6613>) image enhancement
 - Bug fixes
 
 ## JHelioviewer 4.0 (2021-03-29)
