@@ -18,6 +18,7 @@ import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
 
 import org.helioviewer.jhv.imagedata.ImageBuffer;
+import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.view.j2k.image.DecodeParams;
 import org.helioviewer.jhv.view.j2k.image.SubImage;
 
@@ -124,7 +125,16 @@ class J2KDecoder implements Callable<ImageBuffer> {
         if (view.getMaximumFrameNumber() > 0 && acc.count() == view.getMaximumFrameNumber() + 1)
             System.out.println(">>> mean: " + acc.mean() + " stddev: " + acc.sampleStandardDeviation());
 */
-        return new ImageBuffer(actualWidth, actualHeight, format, ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder()));
+
+        ByteBuffer buf = ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder());
+        ByteBuffer f = buf;
+/*
+        long startTime = System.currentTimeMillis();
+        ByteBuffer f = ImageFilter.mgn(buf, actualWidth, actualHeight);
+        long endTime = System.currentTimeMillis();
+        System.out.println(">>> " + (endTime - startTime));
+*/
+        return new ImageBuffer(actualWidth, actualHeight, format, f);
     }
 
     @Nullable
