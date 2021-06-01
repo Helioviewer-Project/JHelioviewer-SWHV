@@ -14,12 +14,13 @@ import javax.swing.event.PopupMenuListener;
 
 import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.gui.components.base.MenuScroller;
-import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 
+import com.jidesoft.swing.JideButton;
+
 @SuppressWarnings("serial")
-class CarringtonPicker extends JHVButton implements PopupMenuListener {
+class CarringtonPicker extends JideButton implements PopupMenuListener {
 
     private final ArrayList<CalendarListener> listeners = new ArrayList<>();
     private final JPopupMenu popup = new JPopupMenu();

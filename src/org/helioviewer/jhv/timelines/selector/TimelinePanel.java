@@ -21,7 +21,6 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.Buttons;
-import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.gui.components.base.TableValue;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.timelines.TimelineLayer;
@@ -33,6 +32,8 @@ import org.helioviewer.jhv.timelines.selector.cellrenderer.RendererEnabled;
 import org.helioviewer.jhv.timelines.selector.cellrenderer.RendererLoading;
 import org.helioviewer.jhv.timelines.selector.cellrenderer.RendererName;
 import org.helioviewer.jhv.timelines.selector.cellrenderer.RendererRemove;
+
+import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
 public class TimelinePanel extends JPanel {
@@ -117,7 +118,7 @@ public class TimelinePanel extends JPanel {
         jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Colors.lightGray));
         jsp.getViewport().setBackground(grid.getBackground());
 
-        JHVButton addLayerButton = new JHVButton(Buttons.newLayer);
+        JideButton addLayerButton = new JideButton(Buttons.newLayer);
         addLayerButton.addActionListener(e -> new NewLayerAction().actionPerformed(new ActionEvent(addLayerButton, 0, "")));
 
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());

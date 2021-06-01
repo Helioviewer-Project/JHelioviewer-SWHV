@@ -8,15 +8,16 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.gui.components.Buttons;
-import org.helioviewer.jhv.gui.components.base.JHVToggleButton;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.time.TimeUtils;
+
+import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
 class DrawControllerOptionsPanel extends JPanel {
 
     private final JComboBox<ZoomItem> zoomCombo;
-    private final JHVToggleButton lockButton;
+    private final JideToggleButton lockButton;
 
     private enum ZOOM {
         CUSTOM, All, Year, Month, Day, Hour, Carrington, Movie
@@ -45,7 +46,7 @@ class DrawControllerOptionsPanel extends JPanel {
             zoomTo(item.zoom, item.number);
         });
 
-        lockButton = new JHVToggleButton(Buttons.unlock);
+        lockButton = new JideToggleButton(Buttons.unlock);
         lockButton.setToolTipText("Synchronize movie with time series");
         lockButton.addActionListener(e -> {
             DrawController.setLocked(lockButton.isSelected());
