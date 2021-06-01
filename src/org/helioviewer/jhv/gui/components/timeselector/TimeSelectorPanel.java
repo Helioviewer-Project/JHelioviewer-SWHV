@@ -12,9 +12,10 @@ import javax.swing.JRadioButtonMenuItem;
 
 import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.gui.components.Buttons;
-import org.helioviewer.jhv.gui.components.base.JHVSplitButton;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
+
+import com.jidesoft.swing.JideSplitButton;
 
 @SuppressWarnings("serial")
 public class TimeSelectorPanel extends JPanel {
@@ -29,7 +30,7 @@ public class TimeSelectorPanel extends JPanel {
         }
     }
 
-    private static ButtonGroup createShiftMenu(JHVSplitButton menu) {
+    private static ButtonGroup createShiftMenu(JideSplitButton menu) {
         ButtonGroup group = new ButtonGroup();
         for (ShiftUnit unit : ShiftUnit.values()) {
             JRadioButtonMenuItem item = new JRadioButtonMenuItem(unit.toString());
@@ -55,13 +56,13 @@ public class TimeSelectorPanel extends JPanel {
         endTimePanel.addListener(this::timeChanged);
         carringtonPicker.addListener(this::carringtonChanged);
 
-        JHVSplitButton backButton = new JHVSplitButton(Buttons.skipBack);
+        JideSplitButton backButton = new JideSplitButton(Buttons.skipBack);
         backButton.setMargin(new Insets(0, 0, 0, 0));
         backButton.setToolTipText("Move time interval backward");
         ButtonGroup backGroup = createShiftMenu(backButton);
         backButton.addActionListener(e -> shiftSpan(-ShiftUnit.valueOf(backGroup.getSelection().getActionCommand()).shift));
 
-        JHVSplitButton foreButton = new JHVSplitButton(Buttons.skipFore);
+        JideSplitButton foreButton = new JideSplitButton(Buttons.skipFore);
         foreButton.setMargin(new Insets(0, 0, 0, 0));
         foreButton.setToolTipText("Move time interval forward");
         ButtonGroup foreGroup = createShiftMenu(foreButton);

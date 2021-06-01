@@ -32,7 +32,6 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.components.base.JHVButton;
-import org.helioviewer.jhv.gui.components.base.JHVSplitButton;
 import org.helioviewer.jhv.gui.components.base.JHVToggleButton;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
@@ -44,6 +43,8 @@ import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.Movie.AdvanceMode;
 import org.helioviewer.jhv.time.TimeUtils;
+
+import com.jidesoft.swing.JideSplitButton;
 
 @SuppressWarnings("serial")
 public class MoviePanel extends JPanel implements ObservationSelector {
@@ -145,7 +146,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
 
     private static final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
     private final ImageSelectorPanel imageSelectorPanel;
-    private final JHVSplitButton addLayerButton;
+    private final JideSplitButton addLayerButton;
 
     private static TimeSlider timeSlider;
     private static JHVButton prevFrameButton;
@@ -319,7 +320,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         ObservationDialog.getInstance(); // make sure it's instanced
         imageSelectorPanel = new ImageSelectorPanel(this);
 
-        addLayerButton = new JHVSplitButton(Buttons.newLayer);
+        addLayerButton = new JideSplitButton(Buttons.newLayer);
         addLayerButton.setAlwaysDropdown(true);
         addLayerButton.add(imageSelectorPanel);
 

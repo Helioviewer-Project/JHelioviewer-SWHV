@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.JHVButton;
+import org.helioviewer.jhv.gui.components.base.JHVToggleButton;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.MovieDisplay;
@@ -42,6 +43,10 @@ public class ChannelMixerPanel implements FilterDetails {
         redCheckBox.addActionListener(listener);
         greenCheckBox.addActionListener(listener);
         blueCheckBox.addActionListener(listener);
+
+        JHVToggleButton mgnButton = new JHVToggleButton(Buttons.mgn);
+        mgnButton.setToolTipText("Moo!");
+        buttonPanel.add(mgnButton);
 
         MetaDataDialog metaDialog = new MetaDataDialog();
         JHVButton metaButton = new JHVButton(Buttons.info);
