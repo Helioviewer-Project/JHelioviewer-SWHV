@@ -31,8 +31,6 @@ import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.gui.components.base.JHVButton;
-import org.helioviewer.jhv.gui.components.base.JHVToggleButton;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
@@ -44,6 +42,8 @@ import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.Movie.AdvanceMode;
 import org.helioviewer.jhv.time.TimeUtils;
 
+import com.jidesoft.swing.JideButton;
+import com.jidesoft.swing.JideToggleButton;
 import com.jidesoft.swing.JideSplitButton;
 
 @SuppressWarnings("serial")
@@ -149,13 +149,13 @@ public class MoviePanel extends JPanel implements ObservationSelector {
     private final JideSplitButton addLayerButton;
 
     private static TimeSlider timeSlider;
-    private static JHVButton prevFrameButton;
-    private static JHVButton nextFrameButton;
-    private static JHVButton playButton;
+    private static JideButton prevFrameButton;
+    private static JideButton nextFrameButton;
+    private static JideButton playButton;
 
     private static RecordButton recordButton;
 
-    private static JHVButton advancedButton;
+    private static JideButton advancedButton;
     private static JSpinner speedSpinner;
     private static JComboBox<SpeedUnit> speedUnitComboBox;
     private static JComboBox<AdvanceMode> advanceModeComboBox;
@@ -209,19 +209,19 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 1, 0));
         int small = 18, big = 26;
 
-        prevFrameButton = new JHVButton(Buttons.backward);
+        prevFrameButton = new JideButton(Buttons.backward);
         prevFrameButton.setFont(Buttons.getMaterialFont(small));
         prevFrameButton.setToolTipText("Step to previous frame");
         prevFrameButton.addActionListener(getPreviousFrameAction());
         buttonPanel.add(prevFrameButton);
 
-        playButton = new JHVButton(Buttons.play);
+        playButton = new JideButton(Buttons.play);
         playButton.setFont(Buttons.getMaterialFont(big));
         playButton.setToolTipText("Play movie");
         playButton.addActionListener(getPlayPauseAction());
         buttonPanel.add(playButton);
 
-        nextFrameButton = new JHVButton(Buttons.forward);
+        nextFrameButton = new JideButton(Buttons.forward);
         nextFrameButton.setFont(Buttons.getMaterialFont(small));
         nextFrameButton.setToolTipText("Step to next frame");
         nextFrameButton.addActionListener(getNextFrameAction());
@@ -230,7 +230,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         recordButton = new RecordButton(small);
         buttonPanel.add(recordButton);
 
-        advancedButton = new JHVButton(Buttons.optionsDown);
+        advancedButton = new JideButton(Buttons.optionsDown);
         advancedButton.setToolTipText("Options to control playback and recording");
         advancedButton.addActionListener(e -> setAdvanced(!isAdvanced));
         buttonPanel.add(advancedButton);
@@ -324,7 +324,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         addLayerButton.setAlwaysDropdown(true);
         addLayerButton.add(imageSelectorPanel);
 
-        JHVButton syncButton = new JHVButton(Buttons.syncLayers);
+        JideButton syncButton = new JideButton(Buttons.syncLayers);
         syncButton.setToolTipText("Synchronize time intervals of all layers");
         syncButton.addActionListener(e -> syncLayersSpan());
 
@@ -407,7 +407,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         ComponentUtils.setEnabled(recordPanel, enabled);
     }
 
-    private static class RecordButton extends JHVToggleButton implements ActionListener {
+    private static class RecordButton extends JideToggleButton implements ActionListener {
 
         private RecordMode mode = RecordMode.LOOP;
         private RecordSize size = RecordSize.ORIGINAL;

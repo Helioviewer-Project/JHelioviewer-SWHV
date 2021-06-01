@@ -10,11 +10,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.gui.components.Buttons;
-import org.helioviewer.jhv.gui.components.base.JHVButton;
-import org.helioviewer.jhv.gui.components.base.JHVToggleButton;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.MovieDisplay;
+
+import com.jidesoft.swing.JideButton;
+import com.jidesoft.swing.JideToggleButton;
 
 public class ChannelMixerPanel implements FilterDetails {
 
@@ -44,12 +45,12 @@ public class ChannelMixerPanel implements FilterDetails {
         greenCheckBox.addActionListener(listener);
         blueCheckBox.addActionListener(listener);
 
-        JHVToggleButton mgnButton = new JHVToggleButton(Buttons.mgn);
+        JideToggleButton mgnButton = new JideToggleButton(Buttons.mgn);
         mgnButton.setToolTipText("Moo!");
         buttonPanel.add(mgnButton);
 
         MetaDataDialog metaDialog = new MetaDataDialog();
-        JHVButton metaButton = new JHVButton(Buttons.info);
+        JideButton metaButton = new JideButton(Buttons.info);
         metaButton.setToolTipText("Show metadata of selected layer");
         metaButton.addActionListener(e -> {
             metaDialog.setMetaData(layer);

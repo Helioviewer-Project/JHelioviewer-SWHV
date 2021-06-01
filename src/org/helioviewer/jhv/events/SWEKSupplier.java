@@ -13,8 +13,9 @@ import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.helioviewer.jhv.events.filter.FilterDialog;
-import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.gui.interfaces.JHVCell;
+
+import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
 public class SWEKSupplier extends DefaultMutableTreeNode implements JHVCell {
@@ -53,7 +54,7 @@ public class SWEKSupplier extends DefaultMutableTreeNode implements JHVCell {
 
         if (group.containsFilter()) {
             FilterDialog filterDialog = new FilterDialog(group, this);
-            JHVButton filterButton = new JHVButton("Filter");
+            JideButton filterButton = new JideButton("Filter");
             filterButton.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {

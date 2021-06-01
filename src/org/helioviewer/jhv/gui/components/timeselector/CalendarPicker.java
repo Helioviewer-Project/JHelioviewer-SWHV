@@ -19,9 +19,10 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
-import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.gui.components.base.TableValue;
 import org.helioviewer.jhv.time.TimeUtils;
+
+import com.jidesoft.swing.JideButton;
 
 // This component allows to select a date. There are 3 different views:
 // 1. All days of a month are displayed corresponding to the weekdays,
@@ -113,11 +114,11 @@ class CalendarPicker extends JPanel {
     // the calendar component
     private class NavigationPanel extends JPanel implements ActionListener {
 
-        private final JHVButton quickForwardButton = new JHVButton(">>");
-        private final JHVButton quickBackButton = new JHVButton("<<");
-        private final JHVButton forwardButton = new JHVButton(">");
-        private final JHVButton backButton = new JHVButton("<");
-        private final JHVButton selectButton = new JHVButton();
+        private final JideButton quickForwardButton = new JideButton(">>");
+        private final JideButton quickBackButton = new JideButton("<<");
+        private final JideButton forwardButton = new JideButton(">");
+        private final JideButton backButton = new JideButton("<");
+        private final JideButton selectButton = new JideButton();
 
         NavigationPanel() {
             setLayout(new BorderLayout());
@@ -355,7 +356,7 @@ class CalendarPicker extends JPanel {
         BottomPanel() {
             setLayout(new FlowLayout(FlowLayout.CENTER, 2, 2));
 
-            JHVButton dateButton = new JHVButton("Today is " + TimeUtils.formatDate(System.currentTimeMillis()));
+            JideButton dateButton = new JideButton("Today is " + TimeUtils.formatDate(System.currentTimeMillis()));
             // set the calendar component to the current date
             dateButton.addActionListener(e -> {
                 changeDisplayMode(DisplayMode.DAYS);

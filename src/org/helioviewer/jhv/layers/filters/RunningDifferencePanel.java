@@ -13,16 +13,17 @@ import javax.swing.JRadioButton;
 
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.CircularProgressUI;
-import org.helioviewer.jhv.gui.components.base.JHVButton;
-import org.helioviewer.jhv.gui.components.base.JHVToggleButton;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.GLImage;
 
+import com.jidesoft.swing.JideButton;
+import com.jidesoft.swing.JideToggleButton;
+
 public class RunningDifferencePanel implements FilterDetails {
 
-    private final JHVToggleButton downloadButton = new JHVToggleButton(Buttons.download);
+    private final JideToggleButton downloadButton = new JideToggleButton(Buttons.download);
     private final JProgressBar progressBar = new JProgressBar();
     private final JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
     private final JPanel buttonPanel = new JPanel();
@@ -41,7 +42,7 @@ public class RunningDifferencePanel implements FilterDetails {
             modePanel.add(item);
         }
 
-        JHVButton syncButton = new JHVButton(Buttons.sync);
+        JideButton syncButton = new JideButton(Buttons.sync);
         syncButton.setToolTipText("Synchronize time intervals of other layers");
         syncButton.addActionListener(e -> MoviePanel.getInstance().syncLayersSpan(layer.getStartTime(), layer.getEndTime()));
 

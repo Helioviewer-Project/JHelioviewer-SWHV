@@ -19,10 +19,9 @@ import javax.swing.Popup;
 import javax.swing.PopupFactory;
 
 import org.helioviewer.jhv.gui.components.Buttons;
-import org.helioviewer.jhv.gui.components.base.JHVButton;
 import org.helioviewer.jhv.time.TimeUtils;
 
-import com.jidesoft.swing.ButtonStyle;
+import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
 class TimePanel extends JPanel {
@@ -32,7 +31,7 @@ class TimePanel extends JPanel {
 
     private final CalendarPicker calendarPicker = new CalendarPicker();
     private final JTextField textField = new JTextField("2000-01-01T00:00:00");
-    private final JHVButton calendarButton = new JHVButton(Buttons.calendar);
+    private final JideButton calendarButton = new JideButton(Buttons.calendar);
     private Popup calPopup = null;
 
     TimePanel(String tip) {
@@ -42,7 +41,6 @@ class TimePanel extends JPanel {
 
         textField.setBorder(null);
         textField.setToolTipText(tip);
-        calendarButton.setButtonStyle(ButtonStyle.FLAT_STYLE);
         calendarButton.setMargin(new Insets(0, 0, 0, 0));
         calendarButton.setToolTipText(tip);
 
