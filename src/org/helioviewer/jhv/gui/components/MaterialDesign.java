@@ -12,6 +12,7 @@ enum MaterialDesign {
     CHEVRON_DOWN("mdi-chevron-down", '\uf140'),
     CHEVRON_RIGHT("mdi-chevron-right", '\uf142'),
     CLOSE("mdi-close", '\uf156'),
+    COW("mdi-cow", '\uf19a'),
     CROP_LANDSCAPE("mdi-crop-landscape", '\uf1a0'),
     CROSSHAIRS("mdi-crosshairs", '\uf1a3'),
     CROSSHAIRS_GPS("mdi-crosshairs-gps", '\uf1a4'),
