@@ -24,6 +24,7 @@ public class BaseView implements View {
     protected final APIRequest request;
     protected final URI uri;
 
+    protected boolean mgn;
     protected LUT builtinLUT;
     protected MetaData[] metaData = new MetaData[1];
 
@@ -148,6 +149,11 @@ public class BaseView implements View {
 
     @Override
     public void clearCache() {
+    }
+
+    @Override
+    public void setMGN(boolean b) {
+        mgn = b;
     }
 
 }

@@ -18,7 +18,6 @@ import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
 
 import org.helioviewer.jhv.imagedata.ImageBuffer;
-import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.view.j2k.image.DecodeParams;
 import org.helioviewer.jhv.view.j2k.image.SubImage;
 
@@ -39,18 +38,20 @@ class J2KDecoder implements Callable<ImageBuffer> {
 
     private final J2KView view;
     private final DecodeParams params;
+    private final boolean mgn;
 
     //private final Stopwatch sw = Stopwatch.createUnstarted();
     //private static final ThreadLocal<StatsAccumulator> localAcc = ThreadLocal.withInitial(StatsAccumulator::new);
 
-    J2KDecoder(J2KView _view, DecodeParams _params) {
+    J2KDecoder(J2KView _view, DecodeParams _params, boolean _mgn) {
         view = _view;
         params = _params;
+        mgn = _mgn;
     }
 
     @Nonnull
     @Override
-    public ImageBuffer call() throws KduException {
+    public ImageBuffer call() throws Exception {
         //sw.reset().start();
 
         SubImage subImage = params.subImage;
@@ -125,16 +126,14 @@ class J2KDecoder implements Callable<ImageBuffer> {
         if (view.getMaximumFrameNumber() > 0 && acc.count() == view.getMaximumFrameNumber() + 1)
             System.out.println(">>> mean: " + acc.mean() + " stddev: " + acc.sampleStandardDeviation());
 */
-
-        ByteBuffer buf = ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder());
-        ByteBuffer f = buf;
+        ImageBuffer ib = new ImageBuffer(actualWidth, actualHeight, format, ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder()));
 /*
         long startTime = System.currentTimeMillis();
         ByteBuffer f = ImageFilter.mgn(buf, actualWidth, actualHeight);
         long endTime = System.currentTimeMillis();
         System.out.println(">>> " + (endTime - startTime));
 */
-        return new ImageBuffer(actualWidth, actualHeight, format, f);
+        return ImageBuffer.mgnFilter(ib, mgn);
     }
 
     @Nullable

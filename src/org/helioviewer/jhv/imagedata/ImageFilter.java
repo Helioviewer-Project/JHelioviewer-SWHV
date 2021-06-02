@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.imagedata;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.concurrent.ForkJoinTask;
@@ -8,7 +9,7 @@ import java.util.ArrayList;
 
 import org.helioviewer.jhv.math.MathUtils;
 
-public class ImageFilter {
+class ImageFilter {
 
     // derived from http://dev.ipol.im/~getreuer/code/
     private static class GaussFilter {
@@ -180,7 +181,7 @@ public class ImageFilter {
         return image;
     }
 
-    public static ByteBuffer mgn(ByteBuffer buf, int width, int height) {
+    private static ByteBuffer mgn(ByteBuffer buf, int width, int height) {
         int size = width * height;
         float[] data = new float[size];
 
@@ -196,7 +197,7 @@ public class ImageFilter {
         return ByteBuffer.wrap(out);
     }
 
-    public static ShortBuffer mgn(ShortBuffer buf, int width, int height) {
+    private static ShortBuffer mgn(ShortBuffer buf, int width, int height) {
         int size = width * height;
         float[] data = new float[size];
 
@@ -210,6 +211,15 @@ public class ImageFilter {
         for (int i = 0; i < size; ++i)
             out[i] = (short) MathUtils.clip(image[i] * 65535 + .5f, 0, 65535);
         return ShortBuffer.wrap(out);
+    }
+
+    static Buffer mgn(Buffer buf, int width, int height) throws Exception {
+        if (buf instanceof ByteBuffer)
+            return mgn((ByteBuffer) buf, width, height);
+        else if (buf instanceof ShortBuffer)
+            return mgn((ShortBuffer) buf, width, height);
+        else
+            throw new Exception("Unimplemented MGN filter");
     }
 
 }
