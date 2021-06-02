@@ -115,4 +115,9 @@ public class URIView extends BaseView {
         decodeCache.invalidate(uri);
     }
 
+    @Override
+    public void clearCache() {
+        decodeCache.invalidateAll();
+    }
+
 }

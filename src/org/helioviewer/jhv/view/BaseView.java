@@ -146,4 +146,8 @@ public class BaseView implements View {
     public void abolish() {
     }
 
+    @Override
+    public void clearCache() {
+    }
+
 }
