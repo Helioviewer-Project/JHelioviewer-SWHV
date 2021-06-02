@@ -101,7 +101,8 @@ class FITSImage implements URIImageReader {
         return (blank != BLANK && v == blank) || !Double.isFinite(v) ? ImageBuffer.BAD_PIXEL : (float) (bzero + v * bscale);
     }
 
-    private static final int SAMPLE = 8;
+    // private static final int SAMPLE = 8;
+    private static final int SAMPLE = 4;
 
     private static float[] sampleImage(int bpp, int width, int height, Object[] pixelData, long blank, double bzero, double bscale) {
         int stepW = Math.max(SAMPLE * width / 1024, 1);
@@ -140,8 +141,10 @@ class FITSImage implements URIImageReader {
         }
     */
 
-    private static final double MIN_MULT = 0.0005;
-    private static final double MAX_MULT = 0.9995;
+    // private static final double MIN_MULT = 0.0005;
+    // private static final double MAX_MULT = 0.9995;
+    private static final double MIN_MULT = 0.00001;
+    private static final double MAX_MULT = 0.99999;
 
     private static ImageBuffer readHDU(BasicHDU<?> hdu, float[] minMax) throws Exception {
         int[] axes = hdu.getAxes();

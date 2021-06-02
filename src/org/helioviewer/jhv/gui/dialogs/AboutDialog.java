@@ -71,7 +71,7 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
                 "<a href='http://www.jhelioviewer.org'>" + JHVGlobals.programName + "</a></span><br/>" +
                 "Version " + JHVGlobals.version + '.' + JHVGlobals.revision + "</b><br/>" +
                 "<span style='font-size:" + (fontSize - delta) + "pt'>" + JHVGlobals.versionDetail + "<br/>" + GLInfo.glVersion + "</span><br/><br/>" +
-                "© 2020 <a href='http://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br/>" +
+                "© 2021 <a href='http://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br/>" +
                 "Part of the ESA/NASA Helioviewer Project<br/>" +
                 "Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)<br/><br/>" +
                 "JHelioviewer is released under the<br/>" +
