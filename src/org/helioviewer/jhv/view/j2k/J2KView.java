@@ -315,7 +315,7 @@ public class J2KView extends BaseView {
     private void executeDecode(DecodeParams params) {
         ImageBuffer imageBuffer = decodeCache.getIfPresent(params);
         if (imageBuffer == null) {
-            executor.decode(new J2KDecoder(this, params), new J2KCallback(params));
+            executor.decode(new J2KDecoder(this, params, mgn), new J2KCallback(params));
         } else {
             sendDataToHandler(params, imageBuffer);
         }
