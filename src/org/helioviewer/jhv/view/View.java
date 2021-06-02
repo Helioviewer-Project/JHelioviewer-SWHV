@@ -20,6 +20,8 @@ public interface View {
 
     void abolish();
 
+    void clearCache();
+
     void decode(Position viewpoint, double pixFactor, float factor);
 
     @Nullable

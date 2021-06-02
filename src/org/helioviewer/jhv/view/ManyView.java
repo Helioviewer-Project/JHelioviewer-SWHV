@@ -68,6 +68,11 @@ public class ManyView implements View {
     }
 
     @Override
+    public void clearCache() {
+        frameMap.values().forEach(frameInfo -> frameInfo.view.clearCache());
+    }
+
+    @Override
     public void decode(Position viewpoint, double pixFactor, float factor) {
         frameMap.indexedValue(targetFrame).view.decode(viewpoint, pixFactor, factor);
     }
