@@ -182,6 +182,11 @@ public class J2KView extends BaseView {
     }
 
     @Override
+    public void clearCache() {
+        decodeCache.invalidateAll();
+    }
+
+    @Override
     public boolean isMultiFrame() {
         return maxFrame > 0;
     }
