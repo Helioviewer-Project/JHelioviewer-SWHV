@@ -12,11 +12,13 @@ class URIDecoder implements Callable<ImageBuffer> {
     private final URI uri;
     private final URIImageReader reader;
     private final float[] minMax;
+    private final boolean mgn;
 
-    URIDecoder(URI _uri, URIImageReader _reader, float[] _minMax) {
+    URIDecoder(URI _uri, URIImageReader _reader, float[] _minMax, boolean _mgn) {
         uri = _uri;
         reader = _reader;
         minMax = _minMax;
+        mgn = _mgn;
     }
 
     @Nonnull
@@ -25,7 +27,7 @@ class URIDecoder implements Callable<ImageBuffer> {
         ImageBuffer imageBuffer = reader.readImageBuffer(uri, minMax);
         if (imageBuffer == null) // e.g. FITS
             throw new Exception("Could not read: " + uri);
-        return imageBuffer;
+        return ImageBuffer.mgnFilter(imageBuffer, mgn);
     }
 
 }

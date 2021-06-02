@@ -48,8 +48,8 @@ public class ChannelMixerPanel implements FilterDetails {
         JideToggleButton mgnButton = new JideToggleButton(Buttons.mgn);
         mgnButton.setToolTipText("Moo!");
         mgnButton.addActionListener(e -> {
-            //layer.getGLImage().setMGN(mgnButton.isSelected());
             layer.getView().clearCache();
+            layer.getView().setMGN(mgnButton.isSelected());
             MovieDisplay.render(1);
         });
 

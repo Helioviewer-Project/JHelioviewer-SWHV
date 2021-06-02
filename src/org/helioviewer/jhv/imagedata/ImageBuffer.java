@@ -36,6 +36,12 @@ public class ImageBuffer {
         lut = _lut;
     }
 
+    public static ImageBuffer mgnFilter(ImageBuffer ib, boolean mgn) throws Exception {
+        if (!mgn || ib.format == Format.ARGB32)
+            return ib;
+        return new ImageBuffer(ib.width, ib.height, ib.format, ImageFilter.mgn(ib.buffer, ib.width, ib.height), ib.lut);
+    }
+
     private int getPixelInternal(int x, int y) {
         if (x < 0 || x > width - 1 || y < 0 || y > height - 1 || format == Format.ARGB32)
             return BAD_PIXEL;

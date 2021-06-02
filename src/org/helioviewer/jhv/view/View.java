@@ -22,6 +22,8 @@ public interface View {
 
     void clearCache();
 
+    void setMGN(boolean b);
+
     void decode(Position viewpoint, double pixFactor, float factor);
 
     @Nullable
