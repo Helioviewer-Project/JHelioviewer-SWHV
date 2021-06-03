@@ -46,7 +46,7 @@ public class ChannelMixerPanel implements FilterDetails {
         blueCheckBox.addActionListener(listener);
 
         JideToggleButton mgnButton = new JideToggleButton(Buttons.mgn);
-        mgnButton.setToolTipText("Moo!");
+        mgnButton.setToolTipText("Multi-scale Gaussian normalization");
         mgnButton.addActionListener(e -> {
             layer.getView().clearCache();
             layer.getView().setMGN(mgnButton.isSelected());
