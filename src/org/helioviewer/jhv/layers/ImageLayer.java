@@ -35,7 +35,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     private final GLImage glImage = new GLImage();
     private final DecodeExecutor executor = new DecodeExecutor();
-    private final ImageLayerOptions optionsPanel = new ImageLayerOptions(this);
+    private final ImageLayerOptions optionsPanel;
 
     private boolean removed;
     private Future<?> worker;
@@ -73,6 +73,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
                     glImage.fromJson(imageParams);
             }
         }
+        optionsPanel = new ImageLayerOptions(this);
     }
 
     public void load(APIRequest req) {
