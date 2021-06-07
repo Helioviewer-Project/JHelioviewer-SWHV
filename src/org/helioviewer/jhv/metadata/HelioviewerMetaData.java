@@ -226,6 +226,9 @@ public class HelioviewerMetaData extends BaseMetaData {
             String observedTime = m.getString("TIME_OBS").orElseGet(() -> m.getRequiredString("TIME-OBS"));
             observedDate = observedDate.replace('/', '-') + 'T' + observedTime;
         }
+        if (observedDate.endsWith("Z")) // MDI & EIT
+            observedDate = observedDate.substring(0, observedDate.length() - 1);
+
         return new JHVTime(observedDate);
     }
 
