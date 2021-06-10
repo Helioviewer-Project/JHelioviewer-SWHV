@@ -24,6 +24,8 @@ public interface View {
 
     void setMGN(boolean b);
 
+    boolean getMGN();
+
     void decode(Position viewpoint, double pixFactor, float factor);
 
     @Nullable

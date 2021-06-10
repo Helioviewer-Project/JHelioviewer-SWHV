@@ -112,9 +112,11 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         if (removed) //!
             return;
 
+        boolean isMGN = view.getMGN();
         unsetView();
         view = _view;
         worker = null; // drop reference
+        view.setMGN(isMGN);
 
         optionsPanel.getRunningDifferencePanel().downloadVisible(!isLocal());
         setEnabled(true); // enable optionsPanel

@@ -156,4 +156,9 @@ public class BaseView implements View {
         mgn = b;
     }
 
+    @Override
+    public boolean getMGN() {
+        return mgn;
+    }
+
 }
