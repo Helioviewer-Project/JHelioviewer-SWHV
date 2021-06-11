@@ -64,7 +64,7 @@ public class TimestampLayer extends AbstractLayer {
         if (Display.multiview) {
             ImageLayer im = ImageLayers.getImageLayerInViewport(vp.idx);
             if (im != null) {
-                text = im.getTimeString() + ' ' + im.getName();
+                text = im.getName() + ' ' + im.getTimeString();
             }
         }
 
