@@ -3,6 +3,8 @@
 
 ## JHelioviewer 4.x (pending)
 
+## JHelioviewer 4.0.2 (2021-06-11)
+
 - Add multi-scale Gaussian normalization (<https://arxiv.org/abs/1403.6613>) image enhancement
 
 ## JHelioviewer 4.0.1 (2021-05-31)
