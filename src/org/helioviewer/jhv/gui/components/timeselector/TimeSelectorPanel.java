@@ -82,9 +82,6 @@ public class TimeSelectorPanel extends JPanel {
         c.weightx = 0;
         c.gridx = 1;
         add(backButton, c);
-        c.weightx = 0;
-        c.gridx = 2;
-        add(carringtonPicker, c);
 
         c.gridy = 1;
 
@@ -94,6 +91,9 @@ public class TimeSelectorPanel extends JPanel {
         c.weightx = 0;
         c.gridx = 1;
         add(foreButton, c);
+        c.weightx = 0;
+        c.gridx = 2;
+        add(carringtonPicker, c);
     }
 
     private void shiftSpan(long shift) {
