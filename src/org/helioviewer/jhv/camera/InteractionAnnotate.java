@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.camera.annotate.AnnotateCross;
 import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
 import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
@@ -88,10 +87,10 @@ class InteractionAnnotate implements InteractionType {
 
     @Nullable
     Object getAnnotationData() {
-        Annotateable activeAnn = activeIndex >= 0 && activeIndex < anns.size() ? anns.get(activeIndex) : null;
-        if (activeAnn instanceof AnnotateCross)
-            return ((AnnotateCross) activeAnn).getStartPoint();
-        return null;
+        if (newAnnotateable == null)
+            return activeIndex >= 0 && activeIndex < anns.size() ? anns.get(activeIndex).getData() : null;
+        else
+            return newAnnotateable.getData();
     }
 
     void zoom() {

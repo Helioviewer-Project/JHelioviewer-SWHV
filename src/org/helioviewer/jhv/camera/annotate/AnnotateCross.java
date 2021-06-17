@@ -99,7 +99,7 @@ public class AnnotateCross extends AbstractAnnotateable {
     }
 
     @Nullable
-    public Object getStartPoint() {
+    public Object getData() {
         return startPoint;
     }
 

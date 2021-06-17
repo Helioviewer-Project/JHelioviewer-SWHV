@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.camera.annotate;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Interaction;
@@ -111,6 +113,21 @@ public class AnnotateCircle extends AbstractAnnotateable {
     @Override
     public String getType() {
         return Interaction.AnnotationMode.Circle.toString();
+    }
+
+    @Nullable
+    @Override
+    public Object getData() {
+        boolean dragged = beingDragged();
+        if ((startPoint == null || endPoint == null) && !dragged)
+            return null;
+
+        Vec3 bp = dragged ? dragStartPoint : startPoint;
+        Vec3 ep = dragged ? dragEndPoint : endPoint;
+
+        double cosf = Vec3.dot(bp, ep);
+        double r = Math.sqrt(1 - cosf * cosf);
+        return Double.valueOf(r);
     }
 
 }
