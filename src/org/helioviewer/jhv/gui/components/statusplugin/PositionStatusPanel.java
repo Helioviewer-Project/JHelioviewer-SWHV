@@ -53,25 +53,29 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
             } else {
                 String annStr = "";
                 double r = Math.sqrt(v.x * v.x + v.y * v.y);
-
                 Position viewpoint = camera.getViewpoint();
-                if (r > 1) {
-                    Object annData = JHVFrame.getInteraction().getAnnotationData();
-                    if (annData instanceof Vec3) {
-                        Vec3 v_m = new Vec3(v.x / r, v.y / r, 0);
-                        Vec3 vva = viewpoint.toQuat().rotateVector((Vec3) annData);
-                        Vec3 v_a = v.x < 0 ?
-                                Vec3.cross(Vec3.cross(vva, Vec3.YAxis), Vec3.cross(Vec3.ZAxis, v_m)) :
-                                Vec3.cross(Vec3.cross(Vec3.ZAxis, v_m), Vec3.cross(vva, Vec3.YAxis));
-                        //System.out.println(">>> " + vva + " " + v_a);
 
-                        double alpha = Math.atan2(r, viewpoint.distance);
-                        double beta = Math.acos(Vec3.dot(v_a, Vec3.ZAxis));
-                        double gamma = Math.PI - alpha - beta;
-                        double h = /*Math.abs*/(viewpoint.distance * Math.sin(alpha) / Math.sin(gamma) - 1);
+                Object annData = JHVFrame.getInteraction().getAnnotationData();
+                if (annData instanceof Double) {
+                    double diam = 2 * (Double) annData;
+                    if (diam < 0.2 * Sun.Radius)
+                        annStr = String.format("\u2300ann: %7.2fMm", diam * (Sun.RadiusMeter / 1e6));
+                    else
+                        annStr = String.format("\u2300ann: %7.2fR\u2299", diam);
+                } else if (r > 1 && annData instanceof Vec3) {
+                    Vec3 v_m = new Vec3(v.x / r, v.y / r, 0);
+                    Vec3 vva = viewpoint.toQuat().rotateVector((Vec3) annData);
+                    Vec3 v_a = v.x < 0 ?
+                            Vec3.cross(Vec3.cross(vva, Vec3.YAxis), Vec3.cross(Vec3.ZAxis, v_m)) :
+                            Vec3.cross(Vec3.cross(Vec3.ZAxis, v_m), Vec3.cross(vva, Vec3.YAxis));
+                    //System.out.println(">>> " + vva + " " + v_a);
 
-                        annStr = String.format("H: %7.2fMm", h * (Sun.RadiusMeter / 1e6));
-                    }
+                    double alpha = Math.atan2(r, viewpoint.distance);
+                    double beta = Math.acos(Vec3.dot(v_a, Vec3.ZAxis));
+                    double gamma = Math.PI - alpha - beta;
+                    double h = /*Math.abs*/(viewpoint.distance * Math.sin(alpha) / Math.sin(gamma) - 1);
+
+                    annStr = String.format("Hann: %7.2fMm", h * (Sun.RadiusMeter / 1e6));
                 }
 
                 double px = (180 / Math.PI) * Math.atan2(v.x, viewpoint.distance);
