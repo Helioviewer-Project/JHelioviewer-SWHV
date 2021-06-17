@@ -17,7 +17,6 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
@@ -88,7 +87,7 @@ class InteractionAnnotate implements InteractionType {
     }
 
     @Nullable
-    Vec3 getAnnotationPoint() {
+    Object getAnnotationData() {
         Annotateable activeAnn = activeIndex >= 0 && activeIndex < anns.size() ? anns.get(activeIndex) : null;
         if (activeAnn instanceof AnnotateCross)
             return ((AnnotateCross) activeAnn).getStartPoint();

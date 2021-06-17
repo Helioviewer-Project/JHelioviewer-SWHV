@@ -3,13 +3,10 @@ package org.helioviewer.jhv.camera.annotate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.json.JSONObject;
 
 public interface Annotateable {
-
-    Vec3 getStartPoint();
 
     void draw(Quat q, Viewport vp, boolean active, BufVertex buf);
 

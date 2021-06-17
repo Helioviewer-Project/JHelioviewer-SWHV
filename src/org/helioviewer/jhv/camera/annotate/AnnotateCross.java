@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.camera.annotate;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Interaction;
@@ -94,6 +96,11 @@ public class AnnotateCross extends AbstractAnnotateable {
     @Override
     public String getType() {
         return Interaction.AnnotationMode.Cross.toString();
+    }
+
+    @Nullable
+    public Object getStartPoint() {
+        return startPoint;
     }
 
 }

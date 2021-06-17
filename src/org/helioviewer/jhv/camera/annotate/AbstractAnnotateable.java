@@ -70,12 +70,6 @@ abstract class AbstractAnnotateable implements Annotateable {
         }
     }
 
-    @Nullable
-    @Override
-    public Vec3 getStartPoint() {
-        return startPoint;
-    }
-
     @Override
     public void draw(Quat q, Viewport vp, boolean active, BufVertex buf) {
     }

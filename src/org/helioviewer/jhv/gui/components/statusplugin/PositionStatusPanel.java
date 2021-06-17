@@ -29,12 +29,11 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
     private static final String nanOrtho = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
     private static final String nanLati = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
     private static final String nanPolar = String.format("%7s\u00B0,%7s\u2299", "--", "--");
-    private static final String nanH = String.format("%7sMm", "--");
 
     private final Camera camera;
 
     public PositionStatusPanel() {
-        setText(formatOrtho(Vec2.NAN, Double.NaN, 0, 0, 0, 0, ImageData.nanValue));
+        setText(formatOrtho(Vec2.NAN, "", 0, 0, 0, 0, ImageData.nanValue));
         camera = Display.getCamera();
     }
 
@@ -50,17 +49,17 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
             String valueStr = ImageData.nanValue;
             Vec3 v = CameraHelper.getVectorFromSphereOrPlane(camera, vp, x, y, camera.getDragRotation());
             if (v == null) {
-                setText(formatOrtho(Vec2.NAN, Double.NaN, 0, 0, 0, 0, valueStr));
+                setText(formatOrtho(Vec2.NAN, "", 0, 0, 0, 0, valueStr));
             } else {
-                double h = Double.NaN;
+                String annStr = "";
                 double r = Math.sqrt(v.x * v.x + v.y * v.y);
 
                 Position viewpoint = camera.getViewpoint();
                 if (r > 1) {
-                    Vec3 annPoint = JHVFrame.getInteraction().getAnnotationPoint();
-                    if (annPoint != null) {
+                    Object annData = JHVFrame.getInteraction().getAnnotationData();
+                    if (annData instanceof Vec3) {
                         Vec3 v_m = new Vec3(v.x / r, v.y / r, 0);
-                        Vec3 vva = viewpoint.toQuat().rotateVector(annPoint);
+                        Vec3 vva = viewpoint.toQuat().rotateVector((Vec3) annData);
                         Vec3 v_a = v.x < 0 ?
                                 Vec3.cross(Vec3.cross(vva, Vec3.YAxis), Vec3.cross(Vec3.ZAxis, v_m)) :
                                 Vec3.cross(Vec3.cross(Vec3.ZAxis, v_m), Vec3.cross(vva, Vec3.YAxis));
@@ -69,7 +68,9 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
                         double alpha = Math.atan2(r, viewpoint.distance);
                         double beta = Math.acos(Vec3.dot(v_a, Vec3.ZAxis));
                         double gamma = Math.PI - alpha - beta;
-                        h = /*Math.abs*/(viewpoint.distance * Math.sin(alpha) / Math.sin(gamma) - 1);
+                        double h = /*Math.abs*/(viewpoint.distance * Math.sin(alpha) / Math.sin(gamma) - 1);
+
+                        annStr = String.format("H: %7.2fMm", h * (Sun.RadiusMeter / 1e6));
                     }
                 }
 
@@ -83,7 +84,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
                     valueStr = id.getPixelString((float) v.x, (float) v.y);
                 }
 
-                setText(formatOrtho(coord, h, r, pa, px, py, valueStr));
+                setText(formatOrtho(coord, annStr, r, pa, px, py, valueStr));
             }
         }
     }
@@ -112,10 +113,9 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         return String.format("(\u03B8,\u03c1):(%s)", coordStr);
     }
 
-    private static String formatOrtho(@Nonnull Vec2 coord, double h, double r, double pa, double px, double py, String valueStr) {
+    private static String formatOrtho(@Nonnull Vec2 coord, String annStr, double r, double pa, double px, double py, String valueStr) {
         String coordStr = coord == Vec2.NAN ? nanOrtho : String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
-        String hStr = Double.isFinite(h) ? String.format("%7.2fMm", h * (Sun.RadiusMeter / 1e6)) : nanH;
-        return String.format("H: %s | (\u03c1,\u03c8):(%s,%+7.2f\u00B0) | (\u03C6,\u03B8):(%s) | (x,y):(%s,%s) | %s", hStr, formatR(r), pa, coordStr, formatXY(px), formatXY(py), valueStr);
+        return String.format("%s | (\u03c1,\u03c8):(%s,%+7.2f\u00B0) | (\u03C6,\u03B8):(%s) | (x,y):(%s,%s) | %s", annStr, formatR(r), pa, coordStr, formatXY(px), formatXY(py), valueStr);
     }
 
     @Override

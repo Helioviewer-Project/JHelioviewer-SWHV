@@ -18,7 +18,6 @@ import org.helioviewer.jhv.camera.annotate.AnnotateLoop;
 import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.math.Vec3;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -175,8 +174,8 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
     }
 
     @Nullable
-    public Vec3 getAnnotationPoint() {
-        return interactionAnnotate.getAnnotationPoint();
+    public Object getAnnotationData() {
+        return interactionAnnotate.getAnnotationData();
     }
 
     public JSONObject saveAnnotations() {
