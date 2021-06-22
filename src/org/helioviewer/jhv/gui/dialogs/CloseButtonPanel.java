@@ -11,7 +11,7 @@ import com.jidesoft.dialog.StandardDialog;
 @SuppressWarnings("serial")
 class CloseButtonPanel extends ButtonPanel {
 
-    public CloseButtonPanel(StandardDialog dialog) {
+    CloseButtonPanel(StandardDialog dialog) {
         AbstractAction close = new CloseAction(dialog);
         dialog.setDefaultAction(close);
         dialog.setDefaultCancelAction(close);

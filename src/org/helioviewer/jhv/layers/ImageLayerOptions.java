@@ -15,7 +15,7 @@ class ImageLayerOptions extends JPanel {
     private final LUTPanel lutPanel;
     private final RunningDifferencePanel runningDifferencePanel;
 
-    public ImageLayerOptions(ImageLayer layer) {
+    ImageLayerOptions(ImageLayer layer) {
         runningDifferencePanel = new RunningDifferencePanel(layer);
         OpacityPanel opacityPanel = new OpacityPanel(layer);
         BlendPanel blendPanel = new BlendPanel(layer);

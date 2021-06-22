@@ -69,8 +69,8 @@ public class HTTPSocket {
         }
     }
 
-    protected int write(String str) throws IOException {
-        return channel.write(ByteBuffer.wrap(str.getBytes(StandardCharsets.UTF_8)));
+    protected void write(String str) throws IOException {
+        channel.write(ByteBuffer.wrap(str.getBytes(StandardCharsets.UTF_8)));
     }
 
     protected void close() throws IOException {
