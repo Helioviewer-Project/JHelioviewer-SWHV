@@ -11,7 +11,7 @@ import org.helioviewer.jhv.metadata.MetaData;
 
 public class ImageData {
 
-    public static final String nanValue = String.format("%9s", "--");
+    public static final String nanValue = "----,----,     ----";
 
     private boolean uploaded;
 
@@ -69,26 +69,23 @@ public class ImageData {
         uploaded = _uploaded;
     }
 
-    private float getPixel(float x, float y) {
+    @Nonnull
+    public String getPixelString(float x, float y) {
         Vec3 r = crota.rotateInverseVector(new Vec3(x - crval.x, y - crval.y, 0));
         float xf = (float) metaData.xPixelFactor(r.x);
         float yf = (float) metaData.yPixelFactor(r.y);
 
         int ix = (int) (xf * (imageBuffer.width - 1) + .5f);
         int iy = (int) (yf * (imageBuffer.height - 1) + .5f);
-        return imageBuffer.getPixel(ix, iy, physLUT);
-    }
+        float v = imageBuffer.getPixel(ix, iy, physLUT);
 
-    @Nonnull
-    public String getPixelString(float x, float y) {
-        float v = getPixel(x, y);
         String ret;
         if (v == ImageBuffer.BAD_PIXEL)
             ret = nanValue;
         else if (v == (int) v)
-            ret = String.format("%9d", (int) v);
+            ret = String.format("%4d,%4d,%9d", ix, iy, (int) v);
         else
-            ret = String.format("%9.2f", v);
+            ret = String.format("%4d,%4d,%9.2f", ix, iy, v);
 
         if (hasLUT)
             ret += unit;
