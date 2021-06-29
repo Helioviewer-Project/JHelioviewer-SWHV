@@ -25,7 +25,7 @@ public class DataSources {
                     put("label", "Local").
                     put("schema", "/data/sources_v1.0.json").
                     put("availability.images", "http://swhv.oma.be/availability/images/availability/availability.html").
-                    build()).*/
+                    build()). */
         put("ROB", new ImmutableMap.Builder<String, String>().
         put("API.getDataSources", "http://swhv.oma.be/hv/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]").
         put("API.getJP2Image", "http://swhv.oma.be/hv/api/index.php?action=getJP2Image&").
@@ -77,7 +77,14 @@ public class DataSources {
                     put("label", "Goddard Space Flight Center NDC Test");.
                     put("schema", "/data/sources_v1.0.json").
                     build()). */
-        build();
+        put("ESAC", new ImmutableMap.Builder<String, String>().
+        put("API.getDataSources", "http://soar.esac.esa.int/jpip-api/v2/getDataSources/?verbose=true&enable=[SOLO]").
+        put("API.getJP2Image", "http://soar.esac.esa.int/jpip-api/v2/getJP2Image/?").
+        put("API.getJPX", "http://soar.esac.esa.int/jpip-api/v2/getJPX/?").
+        put("label", "European Space Astronomy Center").
+        put("schema", "/data/sources_v1.0.json").
+        build()).
+            build();
 
     public static Set<String> getServers() {
         return serverSettings.keySet();
