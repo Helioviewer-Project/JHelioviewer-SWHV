@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 
 import kdu_jni.KduException;
 
+import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
@@ -41,7 +42,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 public class J2KView extends BaseView {
 
     private static final AtomicInteger global_serial = new AtomicInteger(0);
-    private static final int HIRES_CUTOFF = 1280;
+    private static final int HIRES_CUTOFF = Boolean.parseBoolean(Settings.getProperty("display.highResolution")) ? 4096 : 1280;
 
     private static final Cache<DecodeParams, ImageBuffer> decodeCache = Caffeine.newBuilder().softValues().build();
 
