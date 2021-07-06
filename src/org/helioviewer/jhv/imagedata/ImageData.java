@@ -11,7 +11,7 @@ import org.helioviewer.jhv.metadata.MetaData;
 
 public class ImageData {
 
-    public static final String nanValue = "----,----,     ----";
+    public static final String nanValue = "----,----      ----";
 
     private boolean uploaded;
 
@@ -83,9 +83,9 @@ public class ImageData {
         if (v == ImageBuffer.BAD_PIXEL)
             ret = nanValue;
         else if (v == (int) v)
-            ret = String.format("%4d,%4d,%9d", ix, iy, (int) v);
+            ret = String.format("%4d,%4d %9d", ix, iy, (int) v);
         else
-            ret = String.format("%4d,%4d,%9.2f", ix, iy, v);
+            ret = String.format("%4d,%4d %9.2f", ix, iy, v);
 
         if (hasLUT)
             ret += unit;

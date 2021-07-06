@@ -6,6 +6,7 @@
 - Indicate diameter of circle annotation
 - Indicate pixel coordinates of the decoded image under the mouse pointer
 - Add ESAC as source server
+- Add option to playback at high resolution
 
 ## JHelioviewer 4.0.2 (2021-06-11)
 
