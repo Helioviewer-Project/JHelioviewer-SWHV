@@ -126,7 +126,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
         Vec3 ep = dragged ? dragEndPoint : endPoint;
 
         double cosf = Vec3.dot(bp, ep);
-        return Math.sqrt(1 - cosf * cosf);
+        return 2 * Math.sqrt(1 - cosf * cosf); // diameter
     }
 
 }
