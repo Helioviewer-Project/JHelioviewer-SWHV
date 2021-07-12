@@ -21,6 +21,7 @@ import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.SideContentPane;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.gui.components.ToolBar;
+import org.helioviewer.jhv.gui.components.statusplugin.AnnotationStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugin.CarringtonStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugin.FramerateStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugin.PositionStatusPanel;
@@ -47,6 +48,7 @@ public class JHVFrame {
     private static Interaction interaction;
     private static MainContentPanel mainContentPanel;
 
+    private static AnnotationStatusPanel annotationStatus;
     private static ZoomStatusPanel zoomStatus;
     private static CarringtonStatusPanel carringtonStatus;
 
@@ -94,6 +96,7 @@ public class JHVFrame {
         midSplitPane.setLeftComponent(leftScrollPane);
         midSplitPane.setRightComponent(mainContentPanel);
 
+        annotationStatus = new AnnotationStatusPanel();
         zoomStatus = new ZoomStatusPanel();
         carringtonStatus = new CarringtonStatusPanel();
         FramerateStatusPanel framerateStatus = new FramerateStatusPanel();
@@ -105,6 +108,7 @@ public class JHVFrame {
         statusPanel.addPlugin(positionStatus, StatusPanel.Alignment.RIGHT);
         statusPanel.addPlugin(zoomStatus, StatusPanel.Alignment.RIGHT);
         statusPanel.addPlugin(carringtonStatus, StatusPanel.Alignment.RIGHT);
+        statusPanel.addPlugin(annotationStatus, StatusPanel.Alignment.RIGHT);
 
         toolBar = new ToolBar();
         mainFrame.add(toolBar, BorderLayout.PAGE_START);
@@ -163,6 +167,10 @@ public class JHVFrame {
 
     public static InputController getInputController() {
         return inputController;
+    }
+
+    public static AnnotationStatusPanel getAnnotationStatusPanel() {
+        return annotationStatus;
     }
 
     public static ZoomStatusPanel getZoomStatusPanel() {
