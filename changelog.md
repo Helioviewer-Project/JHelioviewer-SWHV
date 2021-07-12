@@ -4,6 +4,7 @@
 ## JHelioviewer 4.0.3 (pending)
 
 - Indicate diameter of circle annotation
+- Indicate height above sphere of loop annotation top
 - Indicate pixel coordinates of the decoded image under the mouse pointer
 - Add ESAC as source server
 - Add option to playback at high resolution
@@ -35,7 +36,7 @@
 
 ### User interface
 - Move plugins options to preferences
-- Non-modal annotations (shift+click)
+- Non-modal annotations (use shift+click), add loop annotation
 - Simplify datetime selection and use NLP for input time parsing
 - Support setting playback speed in time period per second
 - Allow customization of grid type in latitudinal projection ([#99](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/99>))
