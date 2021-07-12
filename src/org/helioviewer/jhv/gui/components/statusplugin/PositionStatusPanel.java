@@ -57,11 +57,11 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
 
                 Object annData = JHVFrame.getInteraction().getAnnotationData();
                 if (annData instanceof Double) {
-                    double diam = 2 * (Double) annData;
-                    if (diam < 0.2 * Sun.Radius)
-                        annStr = String.format("\u2300ann: %7.2fMm", diam * (Sun.RadiusMeter / 1e6));
+                    double data = (Double) annData;
+                    if (data < 0.2 * Sun.Radius)
+                        annStr = String.format("\u2300ann: %7.2fMm", data * (Sun.RadiusMeter / 1e6));
                     else
-                        annStr = String.format("\u2300ann: %7.2fR\u2299", diam);
+                        annStr = String.format("\u2300ann: %7.2fR\u2299", data);
                 } else if (r > 1 && annData instanceof Vec3) {
                     Vec3 v_m = new Vec3(v.x / r, v.y / r, 0);
                     Vec3 vva = viewpoint.toQuat().rotateVector((Vec3) annData);

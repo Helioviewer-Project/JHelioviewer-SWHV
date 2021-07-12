@@ -136,7 +136,7 @@ public class AnnotateLoop extends AbstractAnnotateable {
         double pz = center.z + r * bp.z;
         */
 
-        return 0.5 /* ? */ * ((cosf + r) * Math.sqrt(bp.x * bp.x + bp.y * bp.y + bp.z * bp.z) - 1 /* Rsun */);
+        return (cosf + r) * Math.sqrt(bp.x * bp.x + bp.y * bp.y + bp.z * bp.z) - 1 /* Rsun */;
     }
 
 }
