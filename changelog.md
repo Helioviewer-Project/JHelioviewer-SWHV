@@ -18,6 +18,7 @@
 - Load SOLO/EUI, GOES/SUVI images from ROB server
 - Allow to sync the current image layer time interval to the other layers
 - Allow drag'n'drop of image files
+- Use FlatLaf look'n'feel
 - Bug fixes
 
 ## JHelioviewer 4.0 (2021-03-29)
