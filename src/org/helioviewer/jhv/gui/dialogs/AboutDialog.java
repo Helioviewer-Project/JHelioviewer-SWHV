@@ -51,6 +51,7 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
                 "<li><a href=\"http://www.ehcache.org\">Ehcache</a> library.</li>" +
                 "<li><a href=\"http://www.ocpsoft.org/prettytime/nlp\">PrettyTime NLP</a>, a human time parsing library.</li>" +
                 "<li><a href=\"https://github.com/jidesoft/jide-oss\">JIDE Common Layer</a>, © 2002-2017, JIDE Software, Inc.</li>" +
+                "<li><a href=\"https://github.com/JFormDesigner/FlatLaf\">FlatLaf</a>, a modern cross-platform Look and Feel for Java Swing.</li>" +
                 "<li><a href=\"http://www.star.bristol.ac.uk/%7Embt/jsamp/index.html\">JSAMP</a> toolkit for the Simple Applications Messaging Protocol.</li>" +
                 "<li><a href=\"http://nom-tam-fits.github.io/nom-tam-fits\">FITS</a> in Java public domain library.</li>" +
                 "<li><a href=\"https://github.com/xerial/sqlite-jdbc\">Xerial</a> SQLite JDBC driver.</li>" +
