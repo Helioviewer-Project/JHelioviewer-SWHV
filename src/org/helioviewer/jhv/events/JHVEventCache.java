@@ -10,6 +10,7 @@ import java.util.SortedMap;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.interval.RequestCache;
+import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.TimeUtils;
 
 public class JHVEventCache {
@@ -137,6 +138,11 @@ public class JHVEventCache {
 
         Interval first = new Interval(start - DELTAT_GET, start - DELTAT_GET);
         Interval last = new Interval(end + DELTAT_GET, end + DELTAT_GET);
+
+        if (first.compareTo(last) > 0) { // should not happen, but some users hit
+            Log.error("JHVEventCache.getEvents: " + start + " > " + end);
+            return Collections.emptyList();
+        }
 
         ArrayList<JHVRelatedEvents> result = new ArrayList<>();
         for (SWEKSupplier evt : activeEventTypes) {
