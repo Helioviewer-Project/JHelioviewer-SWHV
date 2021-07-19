@@ -133,6 +133,7 @@ public class J2KView extends BaseView {
         }
     }
 
+    @Nullable
     String getCacheKey(int frame) {
         return frame < 0 || frame >= cacheKey.length ? null : cacheKey[frame];
     }

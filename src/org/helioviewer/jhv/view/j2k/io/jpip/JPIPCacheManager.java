@@ -62,9 +62,8 @@ public class JPIPCacheManager {
         levelCache = levelManager.getCache("JPIPLevel", String.class, Integer.class);
     }
 
-
     @Nullable
-    public static JPIPStream get(String key, int level) {
+    public static JPIPStream get(@Nonnull String key, int level) {
         try {
             Integer clevel = levelCache.get(key);
             if (clevel != null && clevel <= level)
@@ -75,7 +74,7 @@ public class JPIPCacheManager {
         return null;
     }
 
-    public static void put(String key, int level, @Nonnull JPIPStream stream) {
+    public static void put(@Nonnull String key, int level, @Nonnull JPIPStream stream) {
         try {
             Integer clevel = levelCache.get(key);
             if (clevel == null || clevel > level) {
