@@ -2,6 +2,7 @@ package org.helioviewer.jhv.camera.annotate;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Interaction;
@@ -18,14 +19,19 @@ public class AnnotateLoop extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 45;
 
+    private String heightStr = null;
+
     public AnnotateLoop(JSONObject jo) {
         super(jo);
     }
 
-    private static void drawCircle(Quat q, Viewport vp, Vec3 bp, Vec3 ep, BufVertex buf, byte[] color) {
+    private void drawCircle(Quat q, Viewport vp, Vec3 bp, Vec3 ep, BufVertex buf, byte[] color) {
         double cosf = Vec3.dot(bp, ep);
         double r = Math.sqrt(1 - cosf * cosf);
         // P = center + r cos(A) (bp x ep) + r sin(A) ep
+
+        double h = (cosf + r) * Math.sqrt(bp.x * bp.x + bp.y * bp.y + bp.z * bp.z) - Sun.Radius;
+        heightStr = h < 0.2 * Sun.Radius ? String.format("Hann: %7.2fMm", h * (Sun.RadiusMeter / 1e6)) : String.format("Hann: %7.2fR\u2299", h);
 
         Vec3 center = Vec3.multiply(bp, cosf);
         Vec3 u = Vec3.cross(bp, ep);
@@ -118,25 +124,7 @@ public class AnnotateLoop extends AbstractAnnotateable {
     @Nullable
     @Override
     public Object getData() {
-        boolean dragged = beingDragged();
-        if ((startPoint == null || endPoint == null) && !dragged)
-            return null;
-
-        Vec3 bp = dragged ? dragStartPoint : startPoint;
-        Vec3 ep = dragged ? dragEndPoint : endPoint;
-
-        double cosf = Vec3.dot(bp, ep);
-        double r = Math.sqrt(1 - cosf * cosf);
-
-        /*
-        Vec3 center = Vec3.multiply(bp, cosf);
-
-        double px = center.x + r * bp.x;
-        double py = center.y + r * bp.y;
-        double pz = center.z + r * bp.z;
-        */
-
-        return (cosf + r) * Math.sqrt(bp.x * bp.x + bp.y * bp.y + bp.z * bp.z) - 1 /* Rsun */;
+        return heightStr;
     }
 
 }

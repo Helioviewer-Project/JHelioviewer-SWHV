@@ -2,6 +2,7 @@ package org.helioviewer.jhv.camera.annotate;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Interaction;
@@ -18,14 +19,19 @@ public class AnnotateCircle extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 90;
 
+    private String diameterStr = null;
+
     public AnnotateCircle(JSONObject jo) {
         super(jo);
     }
 
-    private static void drawCircle(Quat q, Viewport vp, Vec3 bp, Vec3 ep, BufVertex buf, byte[] color) {
+    private void drawCircle(Quat q, Viewport vp, Vec3 bp, Vec3 ep, BufVertex buf, byte[] color) {
         double cosf = Vec3.dot(bp, ep);
         double r = Math.sqrt(1 - cosf * cosf);
         // P = center + r cos(A) (bp x ep) + r sin(A) ep
+
+        double d = 2 * r;
+        diameterStr = d < 0.2 * Sun.Radius ? String.format("Dann: %7.2fMm", d * (Sun.RadiusMeter / 1e6)) : String.format("Dann: %7.2fR\u2299", d);
 
         Vec3 center = Vec3.multiply(bp, cosf);
         Vec3 u = Vec3.cross(bp, ep);
@@ -118,15 +124,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
     @Nullable
     @Override
     public Object getData() {
-        boolean dragged = beingDragged();
-        if ((startPoint == null || endPoint == null) && !dragged)
-            return null;
-
-        Vec3 bp = dragged ? dragStartPoint : startPoint;
-        Vec3 ep = dragged ? dragEndPoint : endPoint;
-
-        double cosf = Vec3.dot(bp, ep);
-        return 2 * Math.sqrt(1 - cosf * cosf); // diameter
+        return diameterStr;
     }
 
 }
