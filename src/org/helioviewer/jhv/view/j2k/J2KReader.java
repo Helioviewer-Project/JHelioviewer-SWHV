@@ -169,16 +169,16 @@ class J2KReader implements Runnable {
                     {
                         String key = view.getCacheKey(currentStep);
                         JPIPStream stream = key == null ? null : JPIPCacheManager.get(key, level);
-                        if (stream != null) {
-                            downloadComplete = true;
-                            cache.put(currentStep, stream);
-                        } else {
+                        if (stream == null) { // not in JPIP cache
                             JPIPResponse res = socket.send(stepQuerys[currentStep], cache, currentStep);
                             if (res.isResponseComplete()) { // downloaded
                                 downloadComplete = true;
                                 if (key != null && (stream = cache.get(currentStep)) != null)
                                     JPIPCacheManager.put(key, level, stream);
                             }
+                        } else {
+                            downloadComplete = true;
+                            cache.put(currentStep, stream);
                         }
                     }
 
