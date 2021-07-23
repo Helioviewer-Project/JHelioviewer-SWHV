@@ -2,6 +2,7 @@ package org.helioviewer.jhv.camera.annotate;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
@@ -67,6 +68,19 @@ public class AnnotateLoop extends AbstractAnnotateable {
                 }
             }
         }
+
+        vx.x = Sun.Radius * 1.01 * (center.x + r * bp.x);
+        vx.y = Sun.Radius * 1.01 * (center.y + r * bp.y);
+        vx.z = Sun.Radius * 1.01 * (center.z + r * bp.z);
+        Position p = Display.getCamera().getViewpoint();
+        double vvz = p.distance * Math.sin(p.lon + Math.PI / 2) * Math.cos(p.lat);
+        double vvx = p.distance * Math.cos(p.lon + Math.PI / 2) * Math.cos(p.lat);
+        double vvy = p.distance * Math.sin(p.lat);
+
+        buf.putVertex(vx, Colors.Null);
+        buf.repeatVertex(color);
+        buf.putVertex((float) vvx, (float) vvy, (float) vvz, 1, color);
+        buf.repeatVertex(Colors.Null);
     }
 
     @Override

@@ -53,7 +53,7 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
     private final Zoom zoom;
 
     private Mode mode = Mode.ROTATE;
-    private AnnotationMode annotationMode = AnnotationMode.Cross;//Rectangle;
+    private AnnotationMode annotationMode = AnnotationMode.Loop;//Rectangle;
     private boolean annotate = false;
 
     public Interaction(Camera _camera) {
