@@ -10,8 +10,7 @@ public class RendererName extends JHVTableCellRenderer {
 
     @Override
     public void setValue(Object value) {
-        if (value instanceof Layer) {
-            Layer layer = (Layer) value;
+        if (value instanceof Layer layer) {
             String layerName = layer.getName();
             setText(layerName);
             if (layer == Layers.getActiveImageLayer()) {

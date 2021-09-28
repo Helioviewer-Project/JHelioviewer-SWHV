@@ -18,10 +18,9 @@ public class RendererName extends JHVTableCellRenderer {
         label.setText(null);
 
         // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
-        if (value instanceof TimelineLayer) {
-            TimelineLayer tl = (TimelineLayer) value;
-            String layerName = tl.getName();
-            if (tl.hasData()) {
+        if (value instanceof TimelineLayer layer) {
+            String layerName = layer.getName();
+            if (layer.hasData()) {
                 label.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
                 label.setToolTipText(layerName);
             } else {

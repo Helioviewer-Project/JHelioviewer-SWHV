@@ -37,9 +37,8 @@ class DropHandler extends TransferHandler {
 
                 ArrayList<URI> imageUris = new ArrayList<>(objects.size());
                 ArrayList<URI> requestUris = new ArrayList<>(objects.size());
-                for (Object object : objects) {
-                    if (object instanceof File) {
-                        File f = (File) object;
+                for (Object o : objects) {
+                    if (o instanceof File f) {
                         if (f.isFile() && f.canRead()) {
                             URI uri = f.toURI();
                             String loc = uri.toString().toLowerCase(Locale.ENGLISH);

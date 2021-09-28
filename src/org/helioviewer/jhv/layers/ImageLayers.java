@@ -173,11 +173,8 @@ public class ImageLayers {
                 if ((id = layer.getImageData()) == null)
                     continue;
 
-                MetaData m = id.getMetaData();
-                if (m instanceof HelioviewerMetaData) {
-                    HelioviewerMetaData hm = (HelioviewerMetaData) m;
+                if (id.getMetaData() instanceof HelioviewerMetaData hm) {
                     HashMap<String, String> layerMsg = new HashMap<>();
-
                     layerMsg.put("observatory", hm.getObservatory());
                     layerMsg.put("instrument", hm.getInstrument());
                     layerMsg.put("detector", hm.getDetector());

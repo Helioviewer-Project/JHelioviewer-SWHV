@@ -163,8 +163,7 @@ public class SpaceObjectContainer extends JScrollPane {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            if (value instanceof SpaceObjectElement) {
-                SpaceObjectElement element = (SpaceObjectElement) value;
+            if (value instanceof SpaceObjectElement element) {
                 label.setText(element.toString());
                 label.setToolTipText("Select for spiral");
             }
@@ -178,8 +177,7 @@ public class SpaceObjectContainer extends JScrollPane {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            if (value instanceof SpaceObjectElement) {
-                SpaceObjectElement element = (SpaceObjectElement) value;
+            if (value instanceof SpaceObjectElement element) {
                 checkBox.setSelected(element.isSelected());
             }
             checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
@@ -194,8 +192,7 @@ public class SpaceObjectContainer extends JScrollPane {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            if (value instanceof SpaceObjectElement) {
-                SpaceObjectElement element = (SpaceObjectElement) value;
+            if (value instanceof SpaceObjectElement element) {
                 radio.setSelected(element.isSelected());
             }
             radio.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
@@ -208,8 +205,7 @@ public class SpaceObjectContainer extends JScrollPane {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            if (value instanceof SpaceObjectElement) {
-                SpaceObjectElement element = (SpaceObjectElement) value;
+            if (value instanceof SpaceObjectElement element) {
                 String status = element.getStatus();
                 label.setText(status);
                 label.setToolTipText(status);
