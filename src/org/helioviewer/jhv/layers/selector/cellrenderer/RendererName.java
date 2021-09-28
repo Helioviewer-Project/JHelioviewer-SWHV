@@ -18,7 +18,6 @@ public class RendererName extends JHVTableCellRenderer {
                 setFont(UIGlobals.uiFontBold);
             } else {
                 setToolTipText(null);
-                setFont(UIGlobals.uiFont);
             }
         }
     }
