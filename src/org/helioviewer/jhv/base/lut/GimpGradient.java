@@ -18,7 +18,7 @@ class GimpGradient {
     // Interpolate color according to the gradient
     public int getGradientColor(double x) throws Exception {
         for (GimpGradientSegment s : segments) {
-            if (s.leftStop <= x && x <= s.rightStop) {
+            if (s.leftStop() <= x && x <= s.rightStop()) {
                 return s.getGradientColor(x);
             }
         }
