@@ -139,15 +139,11 @@ public class YAxis {
         LOGARITHMIC, LINEAR, POSITIVELINEAR;
 
         YAxisScale generateScale(String label) {
-            switch (this) {
-                case LOGARITHMIC:
-                    return new YAxisLogScale(label);
-                case POSITIVELINEAR:
-                    return new YAxisPositiveIdentityScale(label);
-                case LINEAR:
-                default:
-                    return new YAxisIdentityScale(label);
-            }
+            return switch (this) {
+                case LOGARITHMIC -> new YAxisLogScale(label);
+                case POSITIVELINEAR -> new YAxisPositiveIdentityScale(label);
+                case LINEAR -> new YAxisIdentityScale(label);
+            };
         }
     }
 

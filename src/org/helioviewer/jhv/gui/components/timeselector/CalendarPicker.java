@@ -166,7 +166,7 @@ class CalendarPicker extends JPanel {
                         changeDisplayMode(DisplayMode.YEARS);
                         updateDateDisplay();
                     }
-                    default -> {
+                    case YEARS -> {
                     }
                 }
             } else if (e.getSource() == quickForwardButton) {
@@ -174,7 +174,7 @@ class CalendarPicker extends JPanel {
                 CalendarViewController cvc = switch (displayMode) {
                     case DAYS -> new MonthViewController();
                     case MONTHS -> new YearViewController();
-                    default -> null;
+                    case YEARS -> null;
                 };
 
                 if (cvc != null) {
@@ -187,7 +187,7 @@ class CalendarPicker extends JPanel {
                 CalendarViewController cvc = switch (displayMode) {
                     case DAYS -> new MonthViewController();
                     case MONTHS -> new YearViewController();
-                    default -> null;
+                    case YEARS -> null;
                 };
 
                 if (cvc != null) {
@@ -236,15 +236,15 @@ class CalendarPicker extends JPanel {
                     calendarViewController.setTimeOfCellValue(v.value);
 
                     switch (displayMode) {
-                        case YEARS -> {
-                            changeDisplayMode(DisplayMode.MONTHS);
-                            updateDateDisplay();
-                        }
+                        case DAYS -> informCalendarListeners();
                         case MONTHS -> {
                             changeDisplayMode(DisplayMode.DAYS);
                             updateDateDisplay();
                         }
-                        case DAYS -> informCalendarListeners();
+                        case YEARS -> {
+                            changeDisplayMode(DisplayMode.MONTHS);
+                            updateDateDisplay();
+                        }
                     }
                 }
             });

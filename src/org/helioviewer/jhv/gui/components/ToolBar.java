@@ -184,14 +184,9 @@ public class ToolBar extends JToolBar {
         addButton(axis);
 
         switch (interactionMode) {
-            case PAN:
-                pan.setSelected(true);
-                break;
-            case AXIS:
-                axis.setSelected(true);
-                break;
-            default:
-                rotate.setSelected(true);
+            case PAN -> pan.setSelected(true);
+            case AXIS -> axis.setSelected(true);
+            case ROTATE -> rotate.setSelected(true);
         }
         JHVFrame.getInteraction().setMode(interactionMode);
 
