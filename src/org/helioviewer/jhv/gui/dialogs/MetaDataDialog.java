@@ -25,7 +25,6 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
-import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -108,13 +107,11 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         lastNodeSeen = null;
         exportFitsButton.setEnabled(false);
 
-        MetaData metaData = layer.getMetaData();
-        if (!(metaData instanceof HelioviewerMetaData)) {
+        if (!(layer.getMetaData() instanceof HelioviewerMetaData m)) {
             basicArea.setText("No Helioviewer metadata available");
             return;
         }
 
-        HelioviewerMetaData m = (HelioviewerMetaData) metaData;
         basicArea.setText("Observatory: " + m.getObservatory() + "<br/>" +
                 "Instrument: " + m.getInstrument() + "<br/>" +
                 "Detector: " + m.getDetector() + "<br/>" +
