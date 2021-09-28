@@ -79,24 +79,14 @@ class FITSImage implements URIImageReader {
     private static final long BLANK = 0; // in case it doesn't exist, very unlikely value
 
     private static float getValue(int bpp, Object lineData, int i, long blank, double bzero, double bscale) {
-        double v = ImageBuffer.BAD_PIXEL;
-        switch (bpp) {
-            case BasicHDU.BITPIX_SHORT:
-                v = ((short[]) lineData)[i];
-                break;
-            case BasicHDU.BITPIX_INT:
-                v = ((int[]) lineData)[i];
-                break;
-            case BasicHDU.BITPIX_LONG:
-                v = ((long[]) lineData)[i];
-                break;
-            case BasicHDU.BITPIX_FLOAT:
-                v = ((float[]) lineData)[i];
-                break;
-            case BasicHDU.BITPIX_DOUBLE:
-                v = ((double[]) lineData)[i];
-                break;
-        }
+        double v = switch (bpp) {
+            case BasicHDU.BITPIX_SHORT -> ((short[]) lineData)[i];
+            case BasicHDU.BITPIX_INT -> ((int[]) lineData)[i];
+            case BasicHDU.BITPIX_LONG -> ((long[]) lineData)[i];
+            case BasicHDU.BITPIX_FLOAT -> ((float[]) lineData)[i];
+            case BasicHDU.BITPIX_DOUBLE -> ((double[]) lineData)[i];
+            default -> ImageBuffer.BAD_PIXEL;
+        };
         return (blank != BLANK && v == blank) || !Double.isFinite(v) ? ImageBuffer.BAD_PIXEL : (float) (bzero + v * bscale);
     }
 
@@ -195,10 +185,7 @@ class FITSImage implements URIImageReader {
         short[] outData = new short[width * height];
         float[] lut = new float[65536];
         switch (bpp) {
-            case BasicHDU.BITPIX_SHORT:
-            case BasicHDU.BITPIX_INT:
-            case BasicHDU.BITPIX_LONG:
-            case BasicHDU.BITPIX_FLOAT: {
+            case BasicHDU.BITPIX_SHORT, BasicHDU.BITPIX_INT, BasicHDU.BITPIX_LONG, BasicHDU.BITPIX_FLOAT -> {
                 double scale = 65535. / Math.pow(range, GAMMA);
                 for (int j = 0; j < height; j++) {
                     Object lineData = pixelData[j];
@@ -211,7 +198,7 @@ class FITSImage implements URIImageReader {
                 }
                 break;
             }
-            case BasicHDU.BITPIX_DOUBLE: {
+            case BasicHDU.BITPIX_DOUBLE -> {
                 double scale = 65535. / Math.log1p(range);
                 for (int j = 0; j < height; j++) {
                     Object lineData = pixelData[j];

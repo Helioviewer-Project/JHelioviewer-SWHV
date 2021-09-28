@@ -58,17 +58,9 @@ public class HEKHandler extends SWEKHandler {
                     String lfieldName = fieldName.toLowerCase(Locale.ENGLISH);
                     if (!result.isNull(lfieldName)) {
                         switch (dbType) {
-                            case JHVDatabaseParam.DBINTTYPE:
-                                paramList.add(new JHVDatabaseParam(result.getInt(lfieldName), fieldName));
-                                break;
-                            case JHVDatabaseParam.DBSTRINGTYPE:
-                                paramList.add(new JHVDatabaseParam(result.getString(lfieldName), fieldName));
-                                break;
-                            case JHVDatabaseParam.DBDOUBLETYPE:
-                                paramList.add(new JHVDatabaseParam(result.getDouble(lfieldName), fieldName));
-                                break;
-                            default:
-                                break;
+                            case JHVDatabaseParam.DBINTTYPE -> paramList.add(new JHVDatabaseParam(result.getInt(lfieldName), fieldName));
+                            case JHVDatabaseParam.DBSTRINGTYPE -> paramList.add(new JHVDatabaseParam(result.getString(lfieldName), fieldName));
+                            case JHVDatabaseParam.DBDOUBLETYPE -> paramList.add(new JHVDatabaseParam(result.getDouble(lfieldName), fieldName));
                         }
                     }
                 }

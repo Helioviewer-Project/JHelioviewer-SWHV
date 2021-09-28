@@ -117,20 +117,20 @@ class HEKParser {
             if (lowerKey.equals("ref_type")) {
                 String lvalue = value.toLowerCase(Locale.ENGLISH);
                 switch (lvalue) {
-                    case "movie":
+                    case "movie" -> {
                         type = "Reference Movie";
                         ok = true;
-                        break;
-                    case "image":
+                    }
+                    case "image" -> {
                         type = "Reference Image";
                         ok = true;
-                        break;
-                    case "html":
+                    }
+                    case "html" -> {
                         type = "Reference Link";
                         ok = true;
-                        break;
-                    default:
-                        break;
+                    }
+                    default -> {
+                    }
                 }
             } else if (lowerKey.equals("ref_url")) {
                 url = value;
