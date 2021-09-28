@@ -3,8 +3,8 @@ package org.helioviewer.jhv.view.j2k;
 import org.helioviewer.jhv.view.j2k.image.ReadParams;
 
 // Very simple way of signaling between threads. Has no sense of ownership and
-// thus any thread can signal or wait for a signal. In general it is not a
-// problem if many different threads call the signal method, but only one thread
+// thus any thread can signal or wait for a signal. In general, it is not a
+// problem if many threads call the signal method, but only one thread
 // should be calling the waitForSignal method, since there is no way to tell
 // which thread will be woken up.
 class BooleanSignal {

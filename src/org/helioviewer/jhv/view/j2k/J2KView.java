@@ -79,17 +79,15 @@ public class J2KView extends BaseView {
         try {
             String scheme = uri.getScheme().toLowerCase();
             switch (scheme) {
-                case "jpip":
+                case "jpip" -> {
                     jpipCache = new JPIPCache();
                     reader = new J2KReader(this);
-                    break;
-                case "file":
+                }
+                case "file" -> {
                     jpipCache = null;
                     reader = null;
-                    // nothing
-                    break;
-                default:
-                    throw new Exception(scheme + " scheme not supported!");
+                }
+                default -> throw new Exception(scheme + " scheme not supported!");
             }
 
             kduSource = new KakaduSource(jpipCache, uri);
