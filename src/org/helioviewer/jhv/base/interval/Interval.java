@@ -52,10 +52,9 @@ public class Interval implements Comparable<Interval> {
     public final boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof Interval))
-            return false;
-        Interval s = (Interval) o;
-        return start == s.start && end == s.end;
+        if (o instanceof Interval i)
+            return start == i.start && end == i.end;
+        return false;
     }
 
     @Override

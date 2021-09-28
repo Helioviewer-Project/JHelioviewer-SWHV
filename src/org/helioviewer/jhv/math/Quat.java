@@ -256,10 +256,9 @@ public class Quat {
     public final boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof Quat))
-            return false;
-        Quat q = (Quat) o;
-        return Double.doubleToLongBits(a) == Double.doubleToLongBits(q.a) && u.equals(q.u);
+        if (o instanceof Quat q)
+            return Double.doubleToLongBits(a) == Double.doubleToLongBits(q.a) && u.equals(q.u);
+        return false;
     }
 
     @Override

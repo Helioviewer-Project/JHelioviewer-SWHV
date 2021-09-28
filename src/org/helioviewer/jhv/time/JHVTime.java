@@ -30,10 +30,9 @@ public class JHVTime implements Comparable<JHVTime> {
     public final boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof JHVTime))
-            return false;
-        JHVTime d = (JHVTime) o;
-        return milli == d.milli;
+        if (o instanceof JHVTime t)
+            return milli == t.milli;
+        return false;
     }
 
     @Override

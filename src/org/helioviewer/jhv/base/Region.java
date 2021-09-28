@@ -34,13 +34,12 @@ public class Region {
     public final boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof Region))
-            return false;
-        Region r = (Region) o;
-        return Double.doubleToLongBits(width) == Double.doubleToLongBits(r.width) &&
-                Double.doubleToLongBits(height) == Double.doubleToLongBits(r.height) &&
-                Double.doubleToLongBits(llx) == Double.doubleToLongBits(r.llx) &&
-                Double.doubleToLongBits(lly) == Double.doubleToLongBits(r.lly);
+        if (o instanceof Region r)
+            return Double.doubleToLongBits(width) == Double.doubleToLongBits(r.width) &&
+                    Double.doubleToLongBits(height) == Double.doubleToLongBits(r.height) &&
+                    Double.doubleToLongBits(llx) == Double.doubleToLongBits(r.llx) &&
+                    Double.doubleToLongBits(lly) == Double.doubleToLongBits(r.lly);
+        return false;
     }
 
     @Override
