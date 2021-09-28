@@ -162,8 +162,7 @@ public class DataSourcesTree extends JTree {
         Enumeration<?> e = nodeRoot.depthFirstEnumeration();
         while (e.hasMoreElements()) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement();
-            if (node.isLeaf() && node.getUserObject() instanceof SourceItem) {
-                SourceItem item = (SourceItem) node.getUserObject();
+            if (node.isLeaf() && node.getUserObject() instanceof SourceItem item) {
                 if (item.sourceId == sourceId && item.server.equals(server)) {
                     setSelectionPath(new TreePath(node.getPath()));
                     break;

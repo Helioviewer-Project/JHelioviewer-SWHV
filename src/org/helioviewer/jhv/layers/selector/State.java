@@ -118,16 +118,12 @@ public class State {
     private static void loadTimelines(JSONObject data) {
         ArrayList<TimelineLayer> newlist = new ArrayList<>();
 
-        JSONArray rja = data.getJSONArray("timelines");
-        for (Object o : rja) {
-            if (o instanceof JSONObject) {
-                JSONObject jo = (JSONObject) o;
+        for (Object o : data.getJSONArray("timelines")) {
+            if (o instanceof JSONObject jo) {
                 try {
-                    Object obj = json2Object(jo);
-                    if (obj instanceof TimelineLayer) {
-                        TimelineLayer tl = (TimelineLayer) obj;
-                        newlist.add(tl);
-                        tl.setEnabled(jo.optBoolean("enabled", true));
+                    if (json2Object(jo) instanceof TimelineLayer layer) {
+                        newlist.add(layer);
+                        layer.setEnabled(jo.optBoolean("enabled", true));
                     }
                 } catch (Exception e) { // don't stop for a broken one
                     e.printStackTrace();
@@ -141,14 +137,10 @@ public class State {
     private static void loadLayers(JSONObject data) {
         Layers.clear();
 
-        JSONArray rja = data.getJSONArray("layers");
-        for (Object o : rja) {
-            if (o instanceof JSONObject) {
-                JSONObject jo = (JSONObject) o;
+        for (Object o : data.getJSONArray("layers")) {
+            if (o instanceof JSONObject jo) {
                 try {
-                    Object obj = json2Object(jo);
-                    if (obj instanceof Layer) {
-                        Layer layer = (Layer) obj;
+                    if (json2Object(jo) instanceof Layer layer) {
                         JHVFrame.getLayers().add(layer);
                         layer.setEnabled(jo.optBoolean("enabled", false));
                     }
@@ -160,10 +152,8 @@ public class State {
 
         HashMap<ImageLayer, Boolean> newLayers = new HashMap<>();
         ImageLayer masterLayer = null;
-        rja = data.getJSONArray("imageLayers");
-        for (Object o : rja) {
-            if (o instanceof JSONObject) {
-                JSONObject jo = (JSONObject) o;
+        for (Object o : data.getJSONArray("imageLayers")) {
+            if (o instanceof JSONObject jo) {
                 JSONObject jd = jo.optJSONObject("data");
                 if (jd == null)
                     continue;
