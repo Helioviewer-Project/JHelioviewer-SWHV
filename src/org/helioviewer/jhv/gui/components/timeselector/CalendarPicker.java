@@ -63,17 +63,11 @@ class CalendarPicker extends JPanel {
         // memorize the selected time
         long time = calendarViewController.getTime();
         // change the view controller
-        switch (newMode) {
-            case DAYS:
-                calendarViewController = new DayViewController();
-                break;
-            case MONTHS:
-                calendarViewController = new MonthViewController();
-                break;
-            case YEARS:
-                calendarViewController = new YearViewController();
-                break;
-        }
+        calendarViewController = switch (newMode) {
+            case DAYS -> new DayViewController();
+            case MONTHS -> new MonthViewController();
+            case YEARS -> new YearViewController();
+        };
         // set memorized time
         calendarViewController.setTime(time);
         // memorize current view mode
@@ -164,26 +158,24 @@ class CalendarPicker extends JPanel {
             } else if (e.getSource() == selectButton) {
                 // change the view mode and the corresponding controller
                 switch (displayMode) {
-                    case DAYS:
+                    case DAYS -> {
                         changeDisplayMode(DisplayMode.MONTHS);
                         updateDateDisplay();
-                        break;
-                    case MONTHS:
+                    }
+                    case MONTHS -> {
                         changeDisplayMode(DisplayMode.YEARS);
                         updateDateDisplay();
-                        break;
-                    default:
-                        break;
+                    }
+                    default -> {
+                    }
                 }
             } else if (e.getSource() == quickForwardButton) {
                 // increase current date by using the view controller of the next higher period control
-                CalendarViewController cvc = null;
-
-                if (displayMode == DisplayMode.DAYS) {
-                    cvc = new MonthViewController();
-                } else if (displayMode == DisplayMode.MONTHS) {
-                    cvc = new YearViewController();
-                }
+                CalendarViewController cvc = switch (displayMode) {
+                    case DAYS -> new MonthViewController();
+                    case MONTHS -> new YearViewController();
+                    default -> null;
+                };
 
                 if (cvc != null) {
                     cvc.setTime(calendarViewController.getTime());
@@ -192,13 +184,11 @@ class CalendarPicker extends JPanel {
                 }
             } else if (e.getSource() == quickBackButton) {
                 // reduce current date by using the view controller of the next higher period control
-                CalendarViewController cvc = null;
-
-                if (displayMode == DisplayMode.DAYS) {
-                    cvc = new MonthViewController();
-                } else if (displayMode == DisplayMode.MONTHS) {
-                    cvc = new YearViewController();
-                }
+                CalendarViewController cvc = switch (displayMode) {
+                    case DAYS -> new MonthViewController();
+                    case MONTHS -> new YearViewController();
+                    default -> null;
+                };
 
                 if (cvc != null) {
                     cvc.setTime(calendarViewController.getTime());
@@ -246,17 +236,15 @@ class CalendarPicker extends JPanel {
                     calendarViewController.setTimeOfCellValue(v.value);
 
                     switch (displayMode) {
-                        case YEARS:
+                        case YEARS -> {
                             changeDisplayMode(DisplayMode.MONTHS);
                             updateDateDisplay();
-                            break;
-                        case MONTHS:
+                        }
+                        case MONTHS -> {
                             changeDisplayMode(DisplayMode.DAYS);
                             updateDateDisplay();
-                            break;
-                        case DAYS:
-                            informCalendarListeners();
-                            break;
+                        }
+                        case DAYS -> informCalendarListeners();
                     }
                 }
             });
@@ -316,7 +304,7 @@ class CalendarPicker extends JPanel {
             table.setPreferredSize(new Dimension(contentPane.getWidth() - 4, contentPane.getHeight()));
         }
 
-        // Computes the height of the rows so they will fit to the whole height of the the table
+        // Computes the height of the rows, so they will fit to the whole height of the table
         void resizeTableRowHeight() {
             int headerHeight = 0;
             if (displayMode == DisplayMode.DAYS)
