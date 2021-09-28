@@ -53,15 +53,11 @@ public class ChunkedInputStream extends TransferInputStream {
     // no more chunks to decode.
     @Override
     public int read() throws IOException {
-        int n = read(tmpRead, 0, 1);
-        switch (n) {
-            case -1:
-                return -1;
-            case 1:
-                return tmpRead[0] & 0xff;
-            default:
-                throw new IllegalArgumentException();
-        }
+        return switch (read(tmpRead, 0, 1)) {
+            case -1 -> -1;
+            case 1 -> tmpRead[0] & 0xff;
+            default -> throw new IllegalArgumentException();
+        };
     }
 
     @Override

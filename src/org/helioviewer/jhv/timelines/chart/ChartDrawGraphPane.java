@@ -43,7 +43,7 @@ import org.helioviewer.jhv.timelines.draw.YAxis;
 public class ChartDrawGraphPane extends JComponent implements MouseInputListener, MouseWheelListener, ComponentListener, DrawListener {
 
     private enum DragMode {
-        MOVIELINE, CHART, NODRAG
+        MOVIELINE, CHART;
     }
 
     private Point mousePressedPosition;
@@ -59,7 +59,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private boolean redrawGraphArea;
 
-    private DragMode dragMode = DragMode.NODRAG;
+    private DragMode dragMode = null;
 
     public ChartDrawGraphPane() {
         setPreferredSize(new Dimension(-1, 50));
@@ -438,20 +438,16 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         Point p = e.getPoint();
 
         switch (dragMode) {
-            case CHART:
+            case CHART -> {
                 setCursor(UIGlobals.openHandCursor);
                 if (mousePressedPosition != null && mouseDragPosition != null) {
                     DrawController.moveX(mousePressedPosition.x - p.x);
                     DrawController.moveAllAxes(p.y - mousePressedPosition.y);
                 }
-                break;
-            case MOVIELINE:
-                DrawController.setMovieFrame(p);
-                break;
-            default:
-                break;
+            }
+            case MOVIELINE -> DrawController.setMovieFrame(p);
         }
-        dragMode = DragMode.NODRAG;
+        dragMode = null;
         mousePressedPosition = null;
         mouseDragPosition = null;
     }
@@ -462,16 +458,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         mouseDragPosition = p;
         if (mousePressedPosition != null) {
             switch (dragMode) {
-                case CHART:
+                case CHART -> {
                     setCursor(UIGlobals.closedHandCursor);
                     DrawController.moveX(mousePressedPosition.x - p.x);
                     DrawController.moveY(p, p.y - mousePressedPosition.y);
-                    break;
-                case MOVIELINE:
-                    DrawController.setMovieFrame(p);
-                    break;
-                default:
-                    break;
+                }
+                case MOVIELINE -> DrawController.setMovieFrame(p);
             }
         }
         mousePressedPosition = p;

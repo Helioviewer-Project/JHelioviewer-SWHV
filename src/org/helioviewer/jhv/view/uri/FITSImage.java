@@ -196,7 +196,6 @@ class FITSImage implements URIImageReader {
                         outData[width * (height - 1 - j) + i] = v == ImageBuffer.BAD_PIXEL ? 0 : (short) p;
                     }
                 }
-                break;
             }
             case BasicHDU.BITPIX_DOUBLE -> {
                 double scale = 65535. / Math.log1p(range);
@@ -209,7 +208,6 @@ class FITSImage implements URIImageReader {
                         outData[width * (height - 1 - j) + i] = v == ImageBuffer.BAD_PIXEL ? 0 : (short) p;
                     }
                 }
-                break;
             }
         }
         return new ImageBuffer(width, height, ImageBuffer.Format.Gray16, ShortBuffer.wrap(outData), lut);

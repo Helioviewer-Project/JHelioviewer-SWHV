@@ -102,20 +102,16 @@ public class JPIPSocket extends HTTPSocket {
         String head = res.getHeader("Transfer-Encoding");
         String transferEncoding = head == null ? "" : head.toLowerCase();
         switch (transferEncoding) {
-            case "":
-            case "identity":
+            case "", "identity" -> {
                 String contentLength = res.getHeader("Content-Length");
                 try {
                     transferInput = new FixedSizedInputStream(inputStream, Integer.parseInt(contentLength));
                 } catch (Exception e) {
                     throw new IOException("Invalid Content-Length header: " + contentLength);
                 }
-                break;
-            case "chunked":
-                transferInput = new ChunkedInputStream(inputStream);
-                break;
-            default:
-                throw new IOException("Unsupported transfer encoding: " + transferEncoding);
+            }
+            case "chunked" -> transferInput = new ChunkedInputStream(inputStream);
+            default -> throw new IOException("Unsupported transfer encoding: " + transferEncoding);
         }
 
         InputStream input = transferInput;
