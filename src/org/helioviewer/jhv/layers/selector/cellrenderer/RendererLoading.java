@@ -26,8 +26,7 @@ public class RendererLoading extends JHVTableCellRenderer {
         label.setText(null);
 
         // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
-        if (value instanceof Layer) {
-            Layer layer = (Layer) value;
+        if (value instanceof Layer layer) {
             if (layer.isDownloading()) {
                 table.repaint(); // lazy
 
