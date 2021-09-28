@@ -154,9 +154,8 @@ class FITSImage implements URIImageReader {
 
         int bpp = hdu.getBitPix();
         Object kernel = hdu.getKernel();
-        if (!(kernel instanceof Object[]))
+        if (!(kernel instanceof Object[] pixelData))
             throw new Exception("Cannot retrieve pixel data");
-        Object[] pixelData = (Object[]) kernel;
 
         long blank = BLANK;
         try {
