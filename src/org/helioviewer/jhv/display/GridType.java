@@ -21,16 +21,12 @@ public enum GridType {
     }
 
     public double toLongitude(Position viewpoint) {
-        switch (this) {
-            case Viewpoint:
-                return viewpoint.lon;
-            case Stonyhurst:
-                return Sun.getEarth(viewpoint.time).lon;
-            case HCI:
-                return Sun.getEarth(viewpoint.time).lon + Sun.getEarthHCI(viewpoint.time).lon;
-            default: // Carrington
-                return 0;
-        }
+        return switch (this) {
+            case Viewpoint -> viewpoint.lon;
+            case Stonyhurst -> Sun.getEarth(viewpoint.time).lon;
+            case Carrington -> 0;
+            case HCI -> Sun.getEarth(viewpoint.time).lon + Sun.getEarthHCI(viewpoint.time).lon;
+        };
 
     }
 

@@ -67,17 +67,10 @@ abstract class MappedFileBuffer extends DataBuffer {
 
             ByteBuffer byteBuffer = channel.map(FileChannel.MapMode.READ_WRITE, 0, length).order(ByteOrder.nativeOrder());
             switch (type) {
-                case DataBuffer.TYPE_BYTE:
-                    buffer = byteBuffer;
-                    break;
-                case DataBuffer.TYPE_USHORT:
-                    buffer = byteBuffer.asShortBuffer();
-                    break;
-                case DataBuffer.TYPE_INT:
-                    buffer = byteBuffer.asIntBuffer();
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unsupported data type: " + type);
+                case DataBuffer.TYPE_BYTE -> buffer = byteBuffer;
+                case DataBuffer.TYPE_USHORT -> buffer = byteBuffer.asShortBuffer();
+                case DataBuffer.TYPE_INT -> buffer = byteBuffer.asIntBuffer();
+                default -> throw new IllegalArgumentException("Unsupported data type: " + type);
             }
         } finally {
             if (!tempFile.delete()) { // NOTE: File can't be deleted right now on Windows, as the file is open. Let JVM clean up later
@@ -102,16 +95,12 @@ abstract class MappedFileBuffer extends DataBuffer {
     // TODO: Is throws IOException a good idea?
 
     public static DataBuffer create(int type, int size, int numBanks) throws IOException {
-        switch (type) {
-            case DataBuffer.TYPE_BYTE:
-                return new DataBufferByte(size, numBanks);
-            case DataBuffer.TYPE_USHORT:
-                return new DataBufferUShort(size, numBanks);
-            case DataBuffer.TYPE_INT:
-                return new DataBufferInt(size, numBanks);
-            default:
-                throw new IllegalArgumentException("Unsupported data type: " + type);
-        }
+        return switch (type) {
+            case DataBuffer.TYPE_BYTE -> new DataBufferByte(size, numBanks);
+            case DataBuffer.TYPE_USHORT -> new DataBufferUShort(size, numBanks);
+            case DataBuffer.TYPE_INT -> new DataBufferInt(size, numBanks);
+            default -> throw new IllegalArgumentException("Unsupported data type: " + type);
+        };
     }
 
     public static class DataBufferByte extends MappedFileBuffer {

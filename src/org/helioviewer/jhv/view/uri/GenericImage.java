@@ -89,24 +89,24 @@ class GenericImage implements URIImageReader {
         Buffer buffer;
         ImageBuffer.Format format;
         switch (image.getType()) {
-            case BufferedImage.TYPE_BYTE_GRAY:
-            case BufferedImage.TYPE_BYTE_INDEXED:
+            case BufferedImage.TYPE_BYTE_GRAY, BufferedImage.TYPE_BYTE_INDEXED -> {
                 buffer = ByteBuffer.wrap(((DataBufferByte) image.getRaster().getDataBuffer()).getData());
                 format = ImageBuffer.Format.Gray8;
-                break;
-            case BufferedImage.TYPE_USHORT_GRAY:
+            }
+            case BufferedImage.TYPE_USHORT_GRAY -> {
                 buffer = ShortBuffer.wrap(((DataBufferUShort) image.getRaster().getDataBuffer()).getData());
                 format = ImageBuffer.Format.Gray16;
-                break;
-            case BufferedImage.TYPE_INT_ARGB_PRE:
+            }
+            case BufferedImage.TYPE_INT_ARGB_PRE -> {
                 buffer = IntBuffer.wrap(((DataBufferInt) image.getRaster().getDataBuffer()).getData());
                 format = ImageBuffer.Format.ARGB32;
-                break;
-            default:
+            }
+            default -> {
                 BufferedImage conv = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB_PRE);
                 conv.getGraphics().drawImage(image, 0, 0, null);
                 buffer = IntBuffer.wrap(((DataBufferInt) conv.getRaster().getDataBuffer()).getData());
                 format = ImageBuffer.Format.ARGB32;
+            }
         }
         return new ImageBuffer(w, h, format, buffer);
     }
