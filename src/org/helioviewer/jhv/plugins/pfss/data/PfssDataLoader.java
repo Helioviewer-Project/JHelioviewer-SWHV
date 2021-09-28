@@ -37,12 +37,10 @@ class PfssDataLoader implements Callable<PfssData> {
     public PfssData call() throws Exception {
         try (NetClient nc = NetClient.of(url); Fits fits = new Fits(nc.getStream())) {
             BasicHDU<?>[] hdus = fits.read();
-            if (hdus == null || hdus.length < 2 || !(hdus[1] instanceof BinaryTableHDU))
+            if (hdus == null || hdus.length < 2 || !(hdus[1] instanceof BinaryTableHDU bhdu))
                 throw new Exception("Could not read FITS");
 
-            BinaryTableHDU bhdu = (BinaryTableHDU) hdus[1];
             Header header = bhdu.getHeader();
-
             String dateFits = header.getStringValue("DATE-OBS");
             if (dateFits == null)
                 throw new Exception("DATE-OBS not found");

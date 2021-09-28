@@ -173,9 +173,8 @@ public class LayersPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 TableValue v = TableValue.tableValueAtPoint(grid, e.getPoint());
-                if (v == null || !(v.value instanceof Layer))
+                if (v == null || !(v.value instanceof Layer layer))
                     return;
-                Layer layer = (Layer) v.value;
 
                 if ((v.col == TITLE_COL || v.col == TIME_COL) && layer instanceof ImageLayer && e.getClickCount() == 2) {
                     ObservationDialog.getInstance().showDialog(false, (ImageLayer) layer);

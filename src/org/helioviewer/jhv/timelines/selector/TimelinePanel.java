@@ -182,9 +182,8 @@ public class TimelinePanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 TableValue v = TableValue.tableValueAtPoint(grid, e.getPoint());
-                if (v == null || !(v.value instanceof TimelineLayer))
+                if (v == null || !(v.value instanceof TimelineLayer timeline))
                     return;
-                TimelineLayer timeline = (TimelineLayer) v.value;
 
                 if (v.col == ENABLED_COL) {
                     timeline.setEnabled(!timeline.isEnabled());
