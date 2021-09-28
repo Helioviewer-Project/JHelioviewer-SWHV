@@ -136,13 +136,13 @@ public class YAxis {
     }
 
     private enum Scale {
-        LOGARITHMIC, LINEAR, POSITIVELINEAR;
+        LINEAR, POSITIVELINEAR, LOGARITHMIC;
 
         YAxisScale generateScale(String label) {
             return switch (this) {
-                case LOGARITHMIC -> new YAxisLogScale(label);
-                case POSITIVELINEAR -> new YAxisPositiveIdentityScale(label);
                 case LINEAR -> new YAxisIdentityScale(label);
+                case POSITIVELINEAR -> new YAxisPositiveIdentityScale(label);
+                case LOGARITHMIC -> new YAxisLogScale(label);
             };
         }
     }
