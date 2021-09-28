@@ -69,7 +69,6 @@ public class UIGlobals {
         openHandCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
 
         HashMap<TextAttribute, Object> map = new HashMap<>();
-        map.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
         map.put(TextAttribute.FAMILY, defaultFamily);
 
         map.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_REGULAR);
