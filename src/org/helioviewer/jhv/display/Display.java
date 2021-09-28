@@ -127,18 +127,10 @@ public class Display {
 
         int ct = countEnabledLayers();
         switch (ct) {
-            case 2:
-                reshape2();
-                break;
-            case 3:
-                reshape3();
-                break;
-            case 4:
-                reshape4();
-                break;
-            default:
-                reshape();
-                break;
+            case 2 -> reshape2();
+            case 3 -> reshape3();
+            case 4 -> reshape4();
+            default -> reshape();
         }
     }
 

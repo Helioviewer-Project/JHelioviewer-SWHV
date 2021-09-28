@@ -66,21 +66,15 @@ class FilterPanelFactory {
             if (parameter.getParameterFilter() != null) {
                 String filterType = parameter.getParameterFilter().getFilterType().toLowerCase();
                 switch (filterType) {
-                    case "doublemaxfilter":
-                        panels.add(new FilterPanel(supplier, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.BIGGER_OR_EQUAL, enabled));
-                        break;
-                    case "doubleminfilter":
-                        panels.add(new FilterPanel(supplier, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.SMALLER_OR_EQUAL, enabled));
-                        break;
-                    case "doubleminmaxfilter":
+                    case "doublemaxfilter" -> panels.add(new FilterPanel(supplier, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.BIGGER_OR_EQUAL, enabled));
+                    case "doubleminfilter" -> panels.add(new FilterPanel(supplier, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.SMALLER_OR_EQUAL, enabled));
+                    case "doubleminmaxfilter" -> {
                         panels.add(new FilterPanel(supplier, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.BIGGER_OR_EQUAL, enabled));
                         panels.add(new FilterPanel(supplier, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.SMALLER_OR_EQUAL, enabled));
-                        break;
-                    case "flarefilter":
-                        panels.add(new FilterPanel(supplier, parameter, generateFlareSpinner(filterDialog, parameter), filterDialog, SWEKOperand.BIGGER_OR_EQUAL, enabled));
-                        break;
-                    default:
-                        break;
+                    }
+                    case "flarefilter" -> panels.add(new FilterPanel(supplier, parameter, generateFlareSpinner(filterDialog, parameter), filterDialog, SWEKOperand.BIGGER_OR_EQUAL, enabled));
+                    default -> {
+                    }
                 }
             }
         }
