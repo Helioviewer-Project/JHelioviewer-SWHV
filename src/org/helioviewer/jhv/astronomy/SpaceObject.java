@@ -94,10 +94,9 @@ public class SpaceObject {
     public final boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof SpaceObject))
-            return false;
-        SpaceObject r = (SpaceObject) o;
-        return urlName.equals(r.urlName);
+        if (o instanceof SpaceObject s)
+            return urlName.equals(s.urlName);
+        return false;
     }
 
     @Override

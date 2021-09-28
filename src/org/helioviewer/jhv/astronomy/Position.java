@@ -28,13 +28,12 @@ public class Position {
     public final boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof Position))
-            return false;
-        Position p = (Position) o;
-        return Double.doubleToLongBits(distance) == Double.doubleToLongBits(p.distance) &&
-                Double.doubleToLongBits(lon) == Double.doubleToLongBits(p.lon) &&
-                Double.doubleToLongBits(lat) == Double.doubleToLongBits(p.lat) &&
-                time.equals(p.time);
+        if (o instanceof Position p)
+            return Double.doubleToLongBits(distance) == Double.doubleToLongBits(p.distance) &&
+                    Double.doubleToLongBits(lon) == Double.doubleToLongBits(p.lon) &&
+                    Double.doubleToLongBits(lat) == Double.doubleToLongBits(p.lat) &&
+                    time.equals(p.time);
+        return false;
     }
 
     @Override

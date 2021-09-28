@@ -20,13 +20,12 @@ public class PositionCartesian {
     public final boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof PositionCartesian))
-            return false;
-        PositionCartesian p = (PositionCartesian) o;
-        return Double.doubleToLongBits(x) == Double.doubleToLongBits(p.x) &&
-                Double.doubleToLongBits(y) == Double.doubleToLongBits(p.y) &&
-                Double.doubleToLongBits(z) == Double.doubleToLongBits(p.z) &&
-                time.equals(p.time);
+        if (o instanceof PositionCartesian p)
+            return Double.doubleToLongBits(x) == Double.doubleToLongBits(p.x) &&
+                    Double.doubleToLongBits(y) == Double.doubleToLongBits(p.y) &&
+                    Double.doubleToLongBits(z) == Double.doubleToLongBits(p.z) &&
+                    time.equals(p.time);
+        return false;
     }
 
     @Override

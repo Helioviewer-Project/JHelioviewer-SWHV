@@ -36,10 +36,9 @@ public class DecodeParams {
     public final boolean equals(Object o) { // viewpoint, complete don't participate
         if (this == o)
             return true;
-        if (!(o instanceof DecodeParams))
-            return false;
-        DecodeParams p = (DecodeParams) o;
-        return serial == p.serial && frame == p.frame && level == p.level && factor == p.factor && subImage.equals(p.subImage);
+        if (o instanceof DecodeParams p)
+            return serial == p.serial && frame == p.frame && level == p.level && factor == p.factor && subImage.equals(p.subImage);
+        return false;
     }
 
     @Override

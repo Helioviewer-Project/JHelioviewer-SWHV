@@ -143,10 +143,9 @@ public class BandType {
     public final boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof BandType))
-            return false;
-        BandType t = (BandType) o;
-        return name.equals(t.name);
+        if (o instanceof BandType t)
+            return name.equals(t.name);
+        return false;
     }
 
     @Override

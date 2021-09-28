@@ -45,10 +45,9 @@ public class SubImage {
     public final boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof SubImage))
-            return false;
-        SubImage s = (SubImage) o;
-        return x == s.x && y == s.y && w == s.w && h == s.h;
+        if (o instanceof SubImage s)
+            return x == s.x && y == s.y && w == s.w && h == s.h;
+        return false;
     }
 
     @Override

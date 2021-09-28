@@ -17,11 +17,10 @@ public class Vec2 {
     public final boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof Vec2))
-            return false;
-        Vec2 v = (Vec2) o;
-        return Double.doubleToLongBits(x) == Double.doubleToLongBits(v.x) &&
-                Double.doubleToLongBits(y) == Double.doubleToLongBits(v.y);
+        if (o instanceof Vec2 v)
+            return Double.doubleToLongBits(x) == Double.doubleToLongBits(v.x) &&
+                    Double.doubleToLongBits(y) == Double.doubleToLongBits(v.y);
+        return false;
     }
 
     @Override

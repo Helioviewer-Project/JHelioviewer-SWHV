@@ -27,10 +27,9 @@ class DateValue implements Comparable<DateValue> {
     public final boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof DateValue))
-            return false;
-        DateValue d = (DateValue) o;
-        return milli == d.milli;
+        if (o instanceof DateValue v)
+            return milli == v.milli;
+        return false;
     }
 
     @Override

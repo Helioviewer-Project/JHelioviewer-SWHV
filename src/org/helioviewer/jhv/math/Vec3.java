@@ -103,12 +103,11 @@ public class Vec3 {
     public final boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof Vec3))
-            return false;
-        Vec3 v = (Vec3) o;
-        return Double.doubleToLongBits(x) == Double.doubleToLongBits(v.x) &&
-                Double.doubleToLongBits(y) == Double.doubleToLongBits(v.y) &&
-                Double.doubleToLongBits(z) == Double.doubleToLongBits(v.z);
+        if (o instanceof Vec3 v)
+            return Double.doubleToLongBits(x) == Double.doubleToLongBits(v.x) &&
+                    Double.doubleToLongBits(y) == Double.doubleToLongBits(v.y) &&
+                    Double.doubleToLongBits(z) == Double.doubleToLongBits(v.z);
+        return false;
     }
 
     @Override
