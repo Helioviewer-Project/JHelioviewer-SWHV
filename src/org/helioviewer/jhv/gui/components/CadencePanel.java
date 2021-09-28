@@ -36,18 +36,13 @@ public class CadencePanel extends JPanel {
     public int getCadence() {
         int value = (Integer) spinnerCadence.getValue();
 
-        switch (comboUnit.getSelectedIndex()) {
-            case 1: // min
-                return value * 60;
-            case 2: // hour
-                return value * 3600;
-            case 3: // day
-                return value * 86400;
-            case 4:
-                return APIRequest.CADENCE_ANY;
-            default:
-                return value;
-        }
+        return switch (comboUnit.getSelectedIndex()) {
+            case 1 -> value * 60; // minute
+            case 2 -> value * 3600; // hour
+            case 3 -> value * 86400; // day
+            case 4 -> APIRequest.CADENCE_ANY;
+            default -> value;
+        };
     }
 
     public void setCadence(int value) {
