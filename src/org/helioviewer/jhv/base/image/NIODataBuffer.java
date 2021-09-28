@@ -15,17 +15,10 @@ abstract class NIODataBuffer extends DataBuffer {
 
         ByteBuffer byteBuffer = ByteBuffer.allocateDirect((int) length).order(ByteOrder.nativeOrder());
         switch (type) {
-            case DataBuffer.TYPE_BYTE:
-                buffer = byteBuffer;
-                break;
-            case DataBuffer.TYPE_USHORT:
-                buffer = byteBuffer.asShortBuffer();
-                break;
-            case DataBuffer.TYPE_INT:
-                buffer = byteBuffer.asIntBuffer();
-                break;
-            default:
-                throw new IllegalArgumentException("Unsupported data type: " + type);
+            case DataBuffer.TYPE_BYTE -> buffer = byteBuffer;
+            case DataBuffer.TYPE_USHORT -> buffer = byteBuffer.asShortBuffer();
+            case DataBuffer.TYPE_INT -> buffer = byteBuffer.asIntBuffer();
+            default -> throw new IllegalArgumentException("Unsupported data type: " + type);
         }
     }
 
@@ -43,16 +36,12 @@ abstract class NIODataBuffer extends DataBuffer {
     }
 
     public static DataBuffer create(int type, int size, int numBanks) {
-        switch (type) {
-            case DataBuffer.TYPE_BYTE:
-                return new DataBufferByte(size, numBanks);
-            case DataBuffer.TYPE_USHORT:
-                return new DataBufferUShort(size, numBanks);
-            case DataBuffer.TYPE_INT:
-                return new DataBufferInt(size, numBanks);
-            default:
-                throw new IllegalArgumentException("Unsupported data type: " + type);
-        }
+        return switch (type) {
+            case DataBuffer.TYPE_BYTE -> new DataBufferByte(size, numBanks);
+            case DataBuffer.TYPE_USHORT -> new DataBufferUShort(size, numBanks);
+            case DataBuffer.TYPE_INT -> new DataBufferInt(size, numBanks);
+            default -> throw new IllegalArgumentException("Unsupported data type: " + type);
+        };
     }
 
     public static DataBuffer create(Buffer buffer) {
