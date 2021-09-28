@@ -30,10 +30,11 @@ public class EventQueueCallbackExecutor extends ForwardingListeningExecutorServi
 
     private final ListeningExecutorService delegate;
 
-    public EventQueueCallbackExecutor(ListeningExecutorService _delegate) {
+    public EventQueueCallbackExecutor(@Nonnull ListeningExecutorService _delegate) {
         delegate = _delegate;
     }
 
+    @Nonnull
     @Override
     public ListeningExecutorService delegate() {
         return delegate;

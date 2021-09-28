@@ -67,15 +67,9 @@ public class LoadConnectivity implements Callable<Connectivity> {
 
                         Vec3 v = ConnectUtils.toCartesian(values[6], values[5]);
                         switch (values[1]) {
-                            case "SSW":
-                                SSW.add(v);
-                                break;
-                            case "FSW":
-                                FSW.add(v);
-                                break;
-                            case "M":
-                                M.add(v);
-                                break;
+                            case "SSW" -> SSW.add(v);
+                            case "FSW" -> FSW.add(v);
+                            case "M" -> M.add(v);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
