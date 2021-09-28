@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="9.0.4" transformSequenceNumber="9">
+<install4j version="9.0.5" transformSequenceNumber="9">
   <directoryPresets config="../bin/JHelioviewer.jar" />
-  <application name="JHelioviewer" applicationId="6448-7333-6138-9110" mediaDir="./builds" compression="9" lzmaCompression="true" shortName="JHelioviewer" publisher="ESA JHelioviewer Team" publisherWeb="http://www.jhelioviewer.org" version="4.0.3" allPathsRelative="true" macVolumeId="7ed177551bd348bc" javaMinVersion="11" javaMaxVersion="15" jdkMode="jdk">
+  <application name="JHelioviewer" applicationId="6448-7333-6138-9110" mediaDir="./builds" compression="9" lzmaCompression="true" shortName="JHelioviewer" publisher="ESA JHelioviewer Team" publisherWeb="http://www.jhelioviewer.org" version="4.0.3" allPathsRelative="true" macVolumeId="7ed177551bd348bc" javaMinVersion="17" javaMaxVersion="17" jdkMode="jdk">
     <codeSigning macEnabled="true" macPkcs12File="~/Certificates.p12" macNotarize="true" appleId="bogdan@nicula.net" />
-    <jreBundles jdkProviderId="AdoptOpenJDK" release="11/latest">
+    <jreBundles jdkProviderId="JBR" release="17/latest">
       <modules>
         <module name="java.desktop" />
         <module name="java.sql" />
@@ -31,7 +31,7 @@
   <launchers>
     <launcher name="JHelioviewer" id="24" icnsFile="./resources/JHV_icon.icns" customMacBundleIdentifier="true" macBundleIdentifier="org.helioviewer.jhv.JHelioviewer" macEntitlementsFile="./mac-build/JHelioViewer.plist">
       <executable name="JHelioviewer" iconSet="true" iconFile="./resources/JHelioviewer.ico" executableDir="bin" redirectStderr="false" executableMode="gui" singleInstance="true" dpiAware="true" />
-      <java mainClass="org.helioviewer.jhv.JHelioviewer" vmParameters="-Xms2g">
+      <java mainClass="org.helioviewer.jhv.JHelioviewer" vmParameters="-Xms2g --add-exports java.desktop/sun.awt=ALL-UNNAMED --add-exports jogl.all/com.jogamp.opengl.util.packrect=ALL-UNNAMED">
         <classPath>
           <archive location="classes/natives-linux.jar" failOnError="false" />
           <archive location="classes/natives-macos.jar" failOnError="false" />
@@ -50,7 +50,7 @@
     </launcher>
     <launcher name="Linux_dis" id="296" menuName="JHelioviewer">
       <executable name="jhelioviewer" iconSet="true" executableDir="bin" redirectStderr="false" executableMode="gui" singleInstance="true" dpiAware="false" />
-      <java mainClass="org.helioviewer.jhv.JHelioviewer" vmParameters="-Xms2g">
+      <java mainClass="org.helioviewer.jhv.JHelioviewer" vmParameters="-Xms2g --add-exports java.desktop/sun.awt=ALL-UNNAMED --add-exports jogl.all/com.jogamp.opengl.util.packrect=ALL-UNNAMED">
         <classPath>
           <archive location="classes/natives-linux.jar" failOnError="false" />
           <archive location="classes/natives-macos.jar" failOnError="false" />
@@ -1133,7 +1133,6 @@ return true;</property>
         <entry location="classes/natives-linux.jar" />
         <entry location="classes/natives-macos.jar" />
       </exclude>
-      <jreBundle usePack200="false" />
     </windows>
     <linuxDeb name="Linux Deb Archive 64 bit" id="218" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_amd64" bzip="true" maintainerEmail="daniel.mueller@esa.int" architectureSet="true" architecture="amd64">
       <excludedLaunchers>
@@ -1144,7 +1143,6 @@ return true;</property>
         <entry location="classes/natives-windows.jar" />
         <entry location="Helpers" />
       </exclude>
-      <jreBundle jdkProviderId="JBR" release="11/latest" overrideJdkRelease="true" />
       <postInstallScript>${compiler:file("./resources/linux-post-install.sh")}</postInstallScript>
     </linuxDeb>
     <linuxRPM name="Linux RPM 64 bit" id="270" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_amd64" arch="amd64">
@@ -1156,14 +1154,7 @@ return true;</property>
         <entry location="classes/natives-windows.jar" />
         <entry location="Helpers" />
       </exclude>
-      <jreBundle jdkProviderId="JBR" release="11/latest" overrideJdkRelease="true" />
       <postInstallScript>${compiler:file("./resources/linux-post-install.sh")}</postInstallScript>
     </linuxRPM>
   </mediaSets>
-  <buildIds>
-    <mediaSet refId="68" />
-    <mediaSet refId="150" />
-    <mediaSet refId="218" />
-    <mediaSet refId="270" />
-  </buildIds>
 </install4j>
