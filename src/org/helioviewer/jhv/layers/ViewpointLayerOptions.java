@@ -41,11 +41,15 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
     private CameraMode cameraMode;
     private ViewpointLayerOptionsExpert currentOptionPanel;
 
-    private static final String explanation = "<b>Observer</b>: view from observer.\nCamera time defined by timestamps of the master layer.\n\n" +
-            "<b>Location</b>: view from selected object.\n" +
-            "If \"Use movie time interval\" is unselected, the camera time is interpolated in the configured time interval.\n\n" +
-            "<b>Heliosphere</b>: view onto the solar equatorial plane.\n" +
-            "If \"Use movie time interval\" is unselected, the positions of objects are interpolated in the configured time interval.";
+    private static final String explanation = """
+            <b>Observer</b>: view from observer.
+            Camera time defined by timestamps of the master layer.
+
+            <b>Location</b>: view from selected object.
+            If "Use movie time interval" is unselected, the camera time is interpolated in the configured time interval.
+
+            <b>Heliosphere</b>: view onto the solar equatorial plane.
+            If "Use movie time interval" is unselected, the positions of objects are interpolated in the configured time interval.""";
 
     ViewpointLayerOptions(JSONObject jo) {
         setLayout(new GridBagLayout());

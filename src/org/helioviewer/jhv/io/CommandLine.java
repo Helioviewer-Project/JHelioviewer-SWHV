@@ -25,10 +25,17 @@ public class CommandLine {
             arguments[args.length + 1] = propState;
         }
 
-        usageMessage = "The following command-line options are available: \n\n" +
-                "-load    file location\n" + "       Load or request a supported file at program start. The option can be used multiple times.\n\n" +
-                "-request request file location\n" + "       Load a request file and issue a request at program start. The option can be used multiple times.\n\n" +
-                "-state   state file\n" + "       Load state file.";
+        usageMessage = """
+                The following command-line options are available:
+
+                -load    file location
+                       Load or request a supported file at program start. The option can be used multiple times.
+
+                -request request file location
+                       Load a request file and issue a request at program start. The option can be used multiple times.
+
+                -state   state file
+                       Load state file.""";
     }
 
     public static void load() {
