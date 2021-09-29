@@ -61,7 +61,7 @@ public class JHVEventCache {
         lastHighlighted = event;
     }
 
-    static void addEvent(JHVEvent event) {
+    public static void addEvent(JHVEvent event) {
         Integer id = event.getUniqueID();
         if (relEvents.containsKey(id)) {
             relEvents.get(id).swapEvent(event, events);
