@@ -70,7 +70,7 @@ public class RadioData extends AbstractTimelineLayer {
     }
 
     private static IndexColorModel createIndexColorModelFromLUT(LUT lut2) {
-        int[] source = lut2.getLut8();
+        int[] source = lut2.lut8();
         return new IndexColorModel(8, source.length, source, 0, false, -1, DataBuffer.TYPE_BYTE);
     }
 
