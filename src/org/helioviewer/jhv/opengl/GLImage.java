@@ -75,7 +75,7 @@ public class GLImage {
 
         LUT currlut = diffMode == DifferenceMode.None ? lut : gray;
         if (lutChanged || lastLut != currlut || invertLUT != lastInverted) {
-            int[] intLUT = invertLUT ? currlut.getLut8Inv() : currlut.getLut8();
+            int[] intLUT = invertLUT ? currlut.lut8Inv() : currlut.lut8();
             IntBuffer lutBuffer = IntBuffer.wrap(intLUT);
             lastLut = currlut;
             lastInverted = invertLUT;

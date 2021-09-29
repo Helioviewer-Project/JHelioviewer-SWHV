@@ -38,7 +38,7 @@ public class LUTComboBox extends JComboBox<String> {
         if (lut == null) // e.g. RGB
             name = "Gray";
         else {
-            name = lut.getName();
+            name = lut.name();
             if (lutMap.get(name) == null) {
                 lutMap.put(name, lut);
                 addItem(name);

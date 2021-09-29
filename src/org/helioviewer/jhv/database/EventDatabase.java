@@ -164,8 +164,8 @@ public class EventDatabase {
         PreparedStatement pstatement = getPreparedStatement(INSERT_LINK);
         while (i < len && errorcode == 0) {
             Pair<Integer, Integer> assoc = assocs.get(i);
-            int id0 = assoc.a;
-            int id1 = assoc.b;
+            int id0 = assoc.left();
+            int id1 = assoc.right();
 
             if (id0 != -1 && id1 != -1 && id0 != id1) {
                 /* Avoid circular insertions by pre-ordering events */
@@ -213,8 +213,8 @@ public class EventDatabase {
 
             while (i < len && errorcode == 0) {
                 Pair<String, String> assoc = assocs[i];
-                int id0 = getIdFromUID(assoc.a);
-                int id1 = getIdFromUID(assoc.b);
+                int id0 = getIdFromUID(assoc.left());
+                int id1 = getIdFromUID(assoc.right());
                 if (id0 != -1 && id1 != -1) {
                     pstatement.setInt(1, id0);
                     pstatement.setInt(2, id1);

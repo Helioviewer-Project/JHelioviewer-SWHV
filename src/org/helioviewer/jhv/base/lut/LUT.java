@@ -23,27 +23,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-public class LUT {
+public record LUT(String name, int[] lut8) {
 
     private static final char angstrom = '\u212B';
 
-    private final String lutName;
-    private final int[] lut8;
-
-    public LUT(String name, int[] lookup8) {
-        lutName = name;
-        lut8 = lookup8;
-    }
-
-    public String getName() {
-        return lutName;
-    }
-
-    public int[] getLut8() {
-        return lut8;
-    }
-
-    public int[] getLut8Inv() {
+    public int[] lut8Inv() {
         int len = lut8.length;
         int[] inv = new int[len];
 
@@ -95,7 +79,7 @@ public class LUT {
         for (String file : ggrFiles) {
             try (InputStream is = FileUtils.getResource("/ggr/" + file + ".ggr")) {
                 LUT l = readGimpGradient(is);
-                standardList.put(l.lutName, l);
+                standardList.put(l.name, l);
             } catch (Exception e) {
                 Log.warn("Could not restore gimp gradient file " + file, e);
             }
@@ -107,7 +91,7 @@ public class LUT {
             for (File f : fileList) {
                 try (InputStream is = Files.newInputStream(f.toPath())) {
                     LUT l = readGimpGradient(is);
-                    standardList.put(l.lutName, l);
+                    standardList.put(l.name, l);
                 } catch (Exception e) {
                     Log.warn("Error loading color table plugin dir", e);
                 }

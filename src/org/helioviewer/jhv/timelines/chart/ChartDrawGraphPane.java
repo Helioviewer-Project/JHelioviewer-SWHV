@@ -43,7 +43,7 @@ import org.helioviewer.jhv.timelines.draw.YAxis;
 public class ChartDrawGraphPane extends JComponent implements MouseInputListener, MouseWheelListener, ComponentListener, DrawListener {
 
     private enum DragMode {
-        MOVIELINE, CHART;
+        MOVIELINE, CHART
     }
 
     private Point mousePressedPosition;
