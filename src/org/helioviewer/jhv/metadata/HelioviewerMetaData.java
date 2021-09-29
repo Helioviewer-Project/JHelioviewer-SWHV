@@ -160,6 +160,10 @@ public class HelioviewerMetaData extends BaseMetaData {
                 observatory.equals("Kanzelhoehe") || observatory.equals("ROB-USET") ||
                 observatory.equals("NSO-GONG") || observatory.equals("NSO-SOLIS"))
             outer = 1;
+        else if (instrument.equals("Metis")) {
+            inner = viewpoint.distance * Math.atan(1.49 / 180 * Math.PI); // 1.6 official
+            outer = viewpoint.distance * Math.atan(3.49 / 180 * Math.PI); // 3.4 official
+        }
 
         innerRadius = (float) inner;
         outerRadius = (float) outer;
