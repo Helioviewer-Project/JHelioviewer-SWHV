@@ -12,6 +12,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 
+import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.events.info.SWEKEventInformationDialog;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
@@ -21,7 +22,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
     private static final ArrayList<JHVEventHighlightListener> listeners = new ArrayList<>();
 
     private final ArrayList<JHVEvent> events = new ArrayList<>();
-    private final ArrayList<JHVAssociation> associations = new ArrayList<>();
+    private final ArrayList<Pair<Integer, Integer>> associations = new ArrayList<>();
     private final SWEKSupplier supplier;
     private final Color color;
 
@@ -110,7 +111,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         return events.get(0);
     }
 
-    void addAssociation(JHVAssociation association) {
+    void addAssociation(Pair<Integer, Integer> association) {
         associations.add(association);
     }
 
@@ -126,9 +127,9 @@ public class JHVRelatedEvents implements ClickableDrawable {
 
     public List<JHVEvent> getNextEvents(JHVEvent event) {
         ArrayList<JHVEvent> nEvents = new ArrayList<>();
-        for (JHVAssociation assoc : associations) {
-            if (assoc.left == event.getUniqueID()) {
-                JHVEvent newEvt = findEvent(assoc.right);
+        for (Pair<Integer, Integer> assoc : associations) {
+            if (assoc.left() == event.getUniqueID()) {
+                JHVEvent newEvt = findEvent(assoc.right());
                 if (newEvt != null) {
                     nEvents.add(newEvt);
                 }
@@ -139,9 +140,9 @@ public class JHVRelatedEvents implements ClickableDrawable {
 
     public List<JHVEvent> getPreviousEvents(JHVEvent event) {
         ArrayList<JHVEvent> nEvents = new ArrayList<>();
-        for (JHVAssociation assoc : associations) {
-            if (assoc.right == event.getUniqueID()) {
-                JHVEvent newEvt = findEvent(assoc.left);
+        for (Pair<Integer, Integer> assoc : associations) {
+            if (assoc.right() == event.getUniqueID()) {
+                JHVEvent newEvt = findEvent(assoc.left());
                 if (newEvt != null) {
                     nEvents.add(newEvt);
                 }

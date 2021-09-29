@@ -3,6 +3,7 @@ package org.helioviewer.jhv.events;
 import java.awt.EventQueue;
 import java.util.List;
 
+import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.database.EventDatabase;
 
 class SWEKDownloadWorker implements Runnable {
@@ -27,7 +28,7 @@ class SWEKDownloadWorker implements Runnable {
     public void run() {
         boolean success = supplier.getSource().getHandler().remote2db(supplier, start, end, params);
         if (success) {
-            List<JHVAssociation> assocList = EventDatabase.associations2Program(start, end, supplier);
+            List<Pair<Integer, Integer>> assocList = EventDatabase.associations2Program(start, end, supplier);
             List<JHVEvent> eventList = EventDatabase.events2Program(start, end, supplier, params);
             EventQueue.invokeLater(() -> {
                 JHVEventCache.addAssociations(assocList);
