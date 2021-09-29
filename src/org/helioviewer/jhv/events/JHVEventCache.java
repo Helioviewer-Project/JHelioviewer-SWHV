@@ -61,12 +61,7 @@ public class JHVEventCache {
         lastHighlighted = event;
     }
 
-    public static void addEvents(List<JHVEvent> eventList) {
-        for (JHVEvent event : eventList)
-            add(event);
-    }
-
-    private static void add(JHVEvent event) {
+    static void addEvent(JHVEvent event) {
         Integer id = event.getUniqueID();
         if (relEvents.containsKey(id)) {
             relEvents.get(id).swapEvent(event, events);
@@ -115,11 +110,7 @@ public class JHVEventCache {
         }
     }
 
-    static void addAssociations(List<Pair<Integer, Integer>> associationList) {
-        associationList.forEach(JHVEventCache::add);
-    }
-
-    private static void add(Pair<Integer, Integer> association) {
+    static void addAssociation(Pair<Integer, Integer> association) {
         if (relEvents.containsKey(association.left()) && relEvents.containsKey(association.right())) {
             JHVRelatedEvents ll = relEvents.get(association.left());
             JHVRelatedEvents rr = relEvents.get(association.right());
