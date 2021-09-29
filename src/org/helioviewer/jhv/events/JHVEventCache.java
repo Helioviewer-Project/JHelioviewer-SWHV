@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.SortedMap;
 
+import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.interval.RequestCache;
 import org.helioviewer.jhv.log.Log;
@@ -23,7 +24,7 @@ public class JHVEventCache {
     private static final HashMap<Integer, JHVRelatedEvents> relEvents = new HashMap<>();
     private static final HashSet<SWEKSupplier> activeEventTypes = new HashSet<>();
     private static final HashMap<SWEKSupplier, RequestCache> downloadedCache = new HashMap<>();
-    private static final ArrayList<JHVAssociation> assocs = new ArrayList<>();
+    private static final ArrayList<Pair<Integer, Integer>> assocs = new ArrayList<>();
 
     private static JHVRelatedEvents lastHighlighted = null;
 
@@ -82,15 +83,15 @@ public class JHVEventCache {
     private static void checkAssociation(JHVEvent event) {
         int uid = event.getUniqueID();
         JHVRelatedEvents rEvent = relEvents.get(uid);
-        for (Iterator<JHVAssociation> iterator = assocs.iterator(); iterator.hasNext(); ) {
-            JHVAssociation tocheck = iterator.next();
-            if (tocheck.left == uid && relEvents.containsKey(tocheck.right)) {
-                merge(rEvent, relEvents.get(tocheck.right));
+        for (Iterator<Pair<Integer, Integer>> iterator = assocs.iterator(); iterator.hasNext(); ) {
+            Pair<Integer, Integer> tocheck = iterator.next();
+            if (tocheck.left() == uid && relEvents.containsKey(tocheck.right())) {
+                merge(rEvent, relEvents.get(tocheck.right()));
                 rEvent.addAssociation(tocheck);
                 iterator.remove();
             }
-            if (tocheck.right == uid && relEvents.containsKey(tocheck.left)) {
-                merge(rEvent, relEvents.get(tocheck.left));
+            if (tocheck.right() == uid && relEvents.containsKey(tocheck.left())) {
+                merge(rEvent, relEvents.get(tocheck.left()));
                 rEvent.addAssociation(tocheck);
                 iterator.remove();
             }
@@ -114,15 +115,14 @@ public class JHVEventCache {
         }
     }
 
-    static void addAssociations(List<JHVAssociation> associationList) {
-        for (JHVAssociation association : associationList)
-            add(association);
+    static void addAssociations(List<Pair<Integer, Integer>> associationList) {
+        associationList.forEach(JHVEventCache::add);
     }
 
-    private static void add(JHVAssociation association) {
-        if (relEvents.containsKey(association.left) && relEvents.containsKey(association.right)) {
-            JHVRelatedEvents ll = relEvents.get(association.left);
-            JHVRelatedEvents rr = relEvents.get(association.right);
+    private static void add(Pair<Integer, Integer> association) {
+        if (relEvents.containsKey(association.left()) && relEvents.containsKey(association.right())) {
+            JHVRelatedEvents ll = relEvents.get(association.left());
+            JHVRelatedEvents rr = relEvents.get(association.right());
             if (ll != rr) {
                 merge(ll, rr);
                 ll.addAssociation(association);

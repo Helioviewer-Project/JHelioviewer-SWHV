@@ -22,7 +22,6 @@ import javax.swing.tree.TreeNode;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.interval.RequestCache;
-import org.helioviewer.jhv.events.JHVAssociation;
 import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.events.SWEKParam;
@@ -625,7 +624,7 @@ public class EventDatabase {
         }
     }
 
-    public static List<JHVAssociation> associations2Program(long start, long end, SWEKSupplier type) {
+    public static List<Pair<Integer, Integer>> associations2Program(long start, long end, SWEKSupplier type) {
         try {
             return executor.invokeAndWait(new Associations2Program(start, end, type));
         } catch (Exception e) {
@@ -634,7 +633,7 @@ public class EventDatabase {
         return new ArrayList<>();
     }
 
-    private static class Associations2Program implements Callable<List<JHVAssociation>> {
+    private static class Associations2Program implements Callable<List<Pair<Integer, Integer>>> {
         private final SWEKSupplier type;
         private final long start;
         private final long end;
@@ -646,8 +645,8 @@ public class EventDatabase {
         }
 
         @Override
-        public List<JHVAssociation> call() throws SQLException {
-            List<JHVAssociation> assocList = new ArrayList<>();
+        public List<Pair<Integer, Integer>> call() throws SQLException {
+            List<Pair<Integer, Integer>> assocList = new ArrayList<>();
             int typeId = getEventTypeId(type);
             if (typeId != -1) {
                 PreparedStatement pstatement = getPreparedStatement(SELECT_ASSOCIATIONS);
@@ -657,7 +656,7 @@ public class EventDatabase {
 
                 try (ResultSet rs = pstatement.executeQuery()) {
                     while (rs.next()) {
-                        assocList.add(new JHVAssociation(rs.getInt(1), rs.getInt(2)));
+                        assocList.add(new Pair<>(rs.getInt(1), rs.getInt(2)));
                     }
                 }
             }
