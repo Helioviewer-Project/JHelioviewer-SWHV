@@ -69,7 +69,9 @@
             <compilerarg value="-Xplugin:ErrorProne
                                 -Xep:ReferenceEquality:OFF
                                 -Xep:CatchAndPrintStackTrace:OFF
-                                -Xep:EmptyCatch:OFF "/>
+                                -Xep:EmptyCatch:OFF
+                                -Xep:UnnecessaryParentheses:OFF
+                                "/>
             <classpath>
                 <fileset refid="libfiles"/>
             </classpath>
