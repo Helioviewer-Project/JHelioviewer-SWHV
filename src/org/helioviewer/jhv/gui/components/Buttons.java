@@ -68,7 +68,8 @@ public class Buttons {
     public static final String offDisk = toolBar(MaterialDesign.WEATHER_SUNNY);
     public static final String pan = toolBar(MaterialDesign.CURSOR_MOVE);
     public static final String projection = toolBar(MaterialDesign.CUBE_OUTLINE);
-    public static final String resetCamera = toolBar(MaterialDesign.CROSSHAIRS);
+    public static final String resetCamera = toolBar(MaterialDesign.IMAGE_FILTER_CENTER_FOCUS);
+    public static final String resetCameraAxis = toolBar(MaterialDesign.DEBUG_STEP_OUT);
     public static final String rotate = toolBar(MaterialDesign.ROTATE_3D);
     public static final String samp = toolBar(MaterialDesign.SHARE_VARIANT);
     public static final String track = toolBar(MaterialDesign.CROSSHAIRS_GPS);
