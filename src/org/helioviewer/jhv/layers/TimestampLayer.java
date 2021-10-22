@@ -8,12 +8,11 @@ import javax.annotation.Nullable;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
 import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.gui.components.base.JHVSlider;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.MathUtils;
@@ -119,12 +118,11 @@ public class TimestampLayer extends AbstractLayer {
     }
 
     private JPanel optionsPanel() {
-        JSlider slider = new JSlider(JSlider.HORIZONTAL, MIN_SCALE, MAX_SCALE, scale);
+        JHVSlider slider = new JHVSlider(MIN_SCALE, MAX_SCALE, scale);
         slider.addChangeListener(e -> {
             scale = slider.getValue();
             MovieDisplay.display();
         });
-        WheelSupport.installMouseWheelSupport(slider);
 
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints c0 = new GridBagConstraints();

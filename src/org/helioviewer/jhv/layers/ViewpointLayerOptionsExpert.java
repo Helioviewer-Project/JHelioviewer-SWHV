@@ -12,14 +12,13 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JSlider;
 
 import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.gui.components.base.JHVSlider;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorListener;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectContainer;
@@ -75,13 +74,12 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         });
 
         JLabel spiralLabel = new JLabel(spiralSpeed + " km/s");
-        JSlider spiralSlider = new JSlider(JSlider.HORIZONTAL, MIN_SPEED_SPIRAL, MAX_SPEED_SPIRAL, spiralSpeed);
+        JHVSlider spiralSlider = new JHVSlider(MIN_SPEED_SPIRAL, MAX_SPEED_SPIRAL, spiralSpeed);
         spiralSlider.addChangeListener(e -> {
             spiralSpeed = spiralSlider.getValue();
             spiralLabel.setText(spiralSpeed + " km/s");
             MovieDisplay.display();
         });
-        WheelSupport.installMouseWheelSupport(spiralSlider);
 
         JPanel spiralPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
         spiralPanel.add(spiralCheckBox);
