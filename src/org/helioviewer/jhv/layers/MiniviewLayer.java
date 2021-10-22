@@ -7,7 +7,6 @@ import java.awt.GridBagLayout;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
 
 import javax.annotation.Nullable;
 
@@ -15,7 +14,7 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.gui.components.base.JHVSlider;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLShape;
@@ -113,13 +112,12 @@ public class MiniviewLayer extends AbstractLayer {
 
     private JPanel optionsPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
-        JSlider slider = new JSlider(JSlider.HORIZONTAL, MIN_SCALE, MAX_SCALE, scale);
+        JHVSlider slider = new JHVSlider(MIN_SCALE, MAX_SCALE, scale);
         slider.addChangeListener(e -> {
             scale = slider.getValue();
             reshapeViewport();
             MovieDisplay.display();
         });
-        WheelSupport.installMouseWheelSupport(slider);
 
         GridBagConstraints c0 = new GridBagConstraints();
         c0.anchor = GridBagConstraints.LINE_END;
