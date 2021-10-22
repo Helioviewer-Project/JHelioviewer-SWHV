@@ -11,6 +11,7 @@ import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -132,6 +133,12 @@ public class Camera {
 
     public void resetDragRotation() {
         dragRotation = Quat.ZERO;
+        updateRotation();
+    }
+
+    public void resetDragRotationAxis() {
+        Vec3 axis = updateViewpoint == UpdateViewpoint.equatorial ? Vec3.ZAxis : Vec3.YAxis;
+        dragRotation = dragRotation.twist(axis);
         updateRotation();
     }
 

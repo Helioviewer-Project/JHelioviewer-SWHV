@@ -21,6 +21,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.actions.ClearAnnotationsAction;
 import org.helioviewer.jhv.gui.actions.ResetCameraAction;
+import org.helioviewer.jhv.gui.actions.ResetCameraAxisAction;
 import org.helioviewer.jhv.gui.actions.SDOCutOutAction;
 import org.helioviewer.jhv.gui.actions.ZoomFOVAnnotationAction;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
@@ -70,6 +71,7 @@ public class ToolBar extends JToolBar {
     private final ButtonText PAN = new ButtonText(Buttons.pan, "Pan", "Pan");
     private final ButtonText PROJECTION = new ButtonText(Buttons.projection, "Projection", "Projection");
     private final ButtonText RESETCAMERA = new ButtonText(Buttons.resetCamera, "Reset Camera", "Reset camera position to default");
+    private final ButtonText RESETCAMERAAXIS = new ButtonText(Buttons.resetCameraAxis, "Reset Camera Axis", "Reset camera axis");
     private final ButtonText ROTATE = new ButtonText(Buttons.rotate, "Rotate", "Rotate");
     private final ButtonText SAMP = new ButtonText(Buttons.samp, "SAMP", "Send SAMP message");
     private final ButtonText TRACK = new ButtonText(Buttons.track, "Track", "Track solar rotation");
@@ -157,12 +159,15 @@ public class ToolBar extends JToolBar {
         zoomOne.addActionListener(new ZoomOneToOneAction());
         JideButton resetCamera = toolButton(RESETCAMERA);
         resetCamera.addActionListener(new ResetCameraAction());
+        JideButton resetCameraAxis = toolButton(RESETCAMERAAXIS);
+        resetCameraAxis.addActionListener(new ResetCameraAxisAction());
 
         addButton(zoomIn);
         addButton(zoomOut);
         addButton(zoomFit);
         addButton(zoomOne);
         addButton(resetCamera);
+        addButton(resetCameraAxis);
 
         add(new JToolBar.Separator(dim));
 

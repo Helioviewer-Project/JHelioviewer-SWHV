@@ -8,6 +8,8 @@
 - Indicate pixel coordinates of the decoded image under the mouse pointer
 - Add ESAC as source server
 - Add option to playback at high resolution
+- Double-click to reset sliders to default
+- Add toolbar button to reset camera axis
 - Switch to Java 17
 
 ## JHelioviewer 4.0.2 (2021-06-11)
