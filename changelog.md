@@ -10,7 +10,7 @@
 - Add option to playback at high resolution
 - Double-click to reset sliders to default
 - Add toolbar button to reset camera axis
-- Allow playback without image layers loaded
+- Allow playback without image layers loaded (within selected time interval)
 - Switch to Java 17
 
 ## JHelioviewer 4.0.2 (2021-06-11)
