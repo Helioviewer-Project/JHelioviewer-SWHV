@@ -13,6 +13,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.selector.Reorderable;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
+import org.helioviewer.jhv.time.JHVTime;
 
 import com.jogamp.opengl.GL2;
 
@@ -233,6 +234,13 @@ public class Layers extends AbstractTableModel implements Reorderable {
     public static void forEachImageLayer(Consumer<? super ImageLayer> action) {
         for (int i = 0; i < layers.imageLayersCount; i++)
             action.accept((ImageLayer) layers.get(i));
+    }
+
+    public static void setImageLayersNearestFrame(JHVTime dateTime) {
+        /*if (layers.imageLayersCount == 0) {
+            activeLayer.getView().setNearestFrame(dateTime);
+        } else*/
+            forEachImageLayer(layer -> layer.getView().setNearestFrame(dateTime));
     }
 
     public static List<ImageLayer> getImageLayers() {
