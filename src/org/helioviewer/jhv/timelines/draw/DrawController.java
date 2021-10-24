@@ -12,15 +12,15 @@ import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.Movie;
-import org.helioviewer.jhv.layers.TimeListener;
-import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.time.JHVTime;
+import org.helioviewer.jhv.time.TimeListener;
+import org.helioviewer.jhv.time.TimeRangeListener;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.json.JSONObject;
 
-public class DrawController implements JHVEventHighlightListener, TimeListener, TimespanListener, LazyComponent {
+public class DrawController implements JHVEventHighlightListener, TimeListener, TimeRangeListener, LazyComponent {
 
     public static final TimeAxis selectedAxis = new TimeAxis(0, 0);
     public static final TimeAxis availableAxis = new TimeAxis(0, 0);
@@ -248,7 +248,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     }
 
     @Override
-    public void timespanChanged(long start, long end) {
+    public void timeRangeChanged(long start, long end) {
         if (locked)
             setSelectedInterval(start, end);
     }

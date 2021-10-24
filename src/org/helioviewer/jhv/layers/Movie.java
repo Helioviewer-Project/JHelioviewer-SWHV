@@ -13,6 +13,8 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.time.JHVTime;
+import org.helioviewer.jhv.time.TimeListener;
+import org.helioviewer.jhv.time.TimeRangeListener;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.View;
 
@@ -87,7 +89,7 @@ public class Movie {
     private static void timespanChanged() {
         movieStart = getMovieStart();
         movieEnd = getMovieEnd();
-        timespanListeners.forEach(listener -> listener.timespanChanged(movieStart, movieEnd));
+        timeRangeListeners.forEach(listener -> listener.timeRangeChanged(movieStart, movieEnd));
     }
 
     private static int deltaT;
@@ -238,7 +240,7 @@ public class Movie {
 
     private static final ArrayList<FrameListener> frameListeners = new ArrayList<>();
     private static final ArrayList<TimeListener> timeListeners = new ArrayList<>();
-    private static final ArrayList<TimespanListener> timespanListeners = new ArrayList<>();
+    private static final ArrayList<TimeRangeListener> timeRangeListeners = new ArrayList<>();
 
     public static void addFrameListener(FrameListener listener) {
         if (!frameListeners.contains(listener))
@@ -260,15 +262,15 @@ public class Movie {
         timeListeners.remove(listener);
     }
 
-    public static void addTimespanListener(TimespanListener listener) {
-        if (!timespanListeners.contains(listener)) {
-            timespanListeners.add(listener);
-            listener.timespanChanged(movieStart, movieEnd);
+    public static void addTimeRangeListener(TimeRangeListener listener) {
+        if (!timeRangeListeners.contains(listener)) {
+            timeRangeListeners.add(listener);
+            listener.timeRangeChanged(movieStart, movieEnd);
         }
     }
 
-    public static void removeTimespanListener(TimespanListener listener) {
-        timespanListeners.remove(listener);
+    public static void removeTimeRangeListener(TimeRangeListener listener) {
+        timeRangeListeners.remove(listener);
     }
 
     public static void setDesiredRelativeSpeed(int fps) {
