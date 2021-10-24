@@ -144,13 +144,11 @@ class ViewpointLayerOptions extends JPanel implements TimeRangeListener {
     }
 
     void syncViewpoint() {
-        ViewpointLayerOptionsExpert panel = null;
-        if (cameraMode == CameraMode.Location)
-            panel = locationOptionPanel;
-        else if (cameraMode == CameraMode.Heliosphere)
-            panel = equatorialOptionPanel;
-        switchOptionsPanel(panel);
-
+        switchOptionsPanel(switch (cameraMode) {
+            case Observer -> null;
+            case Location -> locationOptionPanel;
+            case Heliosphere -> equatorialOptionPanel;
+        });
         Display.getCamera().setViewpointUpdate(cameraMode.update);
     }
 
