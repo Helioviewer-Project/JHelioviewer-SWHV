@@ -341,10 +341,6 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         setEnabledState(false);
     }
 
-    public static TimeSelectorPanel getTimeSelector() {
-        return timeSelectorPanel;
-    }
-
     @Override
     public int getCadence() {
         return TimeUtils.defaultCadence(getStartTime(), getEndTime());
