@@ -65,7 +65,7 @@ public class Movie {
             MoviePanel.unsetMovie();
         } else
             MoviePanel.setMovie(layer.getView().getMaximumFrameNumber());
-        timespanChanged();
+        timeRangeChanged();
     }
 
     public static long getStartTime() {
@@ -86,7 +86,7 @@ public class Movie {
         return layer == null ? lastTimestamp.milli : layer.getEndTime();
     }
 
-    private static void timespanChanged() {
+    private static void timeRangeChanged() {
         movieStart = getMovieStart();
         movieEnd = getMovieEnd();
         timeRangeListeners.forEach(listener -> listener.timeRangeChanged(movieStart, movieEnd));
