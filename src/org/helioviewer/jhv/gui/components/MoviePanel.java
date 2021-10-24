@@ -358,6 +358,10 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         return timeSelectorPanel.getEndTime();
     }
 
+    private static int getCadenceStatic() {
+        return TimeUtils.defaultCadence(timeSelectorPanel.getStartTime(), timeSelectorPanel.getEndTime());
+    }
+
     @Override
     public void load(String server, int sourceId) {
         addLayerButton.doClickOnMenu();
@@ -470,6 +474,12 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         } else {
             Movie.setDesiredAbsoluteSpeed(speed * unit.secPerSecond);
         }
+    }
+
+    public static int getMovieCadence() {
+        int speed = ((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue();
+        SpeedUnit unit = (SpeedUnit) Objects.requireNonNull(speedUnitComboBox.getSelectedItem());
+        return unit == SpeedUnit.FRAMESPERSECOND ? getCadenceStatic() : speed * unit.secPerSecond;
     }
 
     public static void setFrameSlider(int frame) {
