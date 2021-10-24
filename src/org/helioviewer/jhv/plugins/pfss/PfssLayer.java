@@ -9,19 +9,19 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Movie;
-import org.helioviewer.jhv.layers.TimeListener;
-import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.plugins.pfss.data.PfssData;
 import org.helioviewer.jhv.plugins.pfss.data.PfssNewDataLoader;
 import org.helioviewer.jhv.time.JHVTime;
+import org.helioviewer.jhv.time.TimeListener;
+import org.helioviewer.jhv.time.TimeRangeListener;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public class PfssLayer extends AbstractLayer implements TimeListener, TimespanListener { // has to be public for state
+public class PfssLayer extends AbstractLayer implements TimeListener, TimeRangeListener { // has to be public for state
 
     private static final double LINEWIDTH = 2 * GLSLLine.LINEWIDTH_BASIC;
 
@@ -94,10 +94,10 @@ public class PfssLayer extends AbstractLayer implements TimeListener, TimespanLi
 
         if (enabled) {
             Movie.addTimeListener(this);
-            Movie.addTimespanListener(this);
+            Movie.addTimeRangeListener(this);
         } else {
             Movie.removeTimeListener(this);
-            Movie.removeTimespanListener(this);
+            Movie.removeTimeRangeListener(this);
             pfssTime = null;
             previousPfssData = null;
         }
@@ -109,7 +109,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener, TimespanLi
     }
 
     @Override
-    public void timespanChanged(long start, long end) {
+    public void timeRangeChanged(long start, long end) {
         PfssNewDataLoader.submit(start, end);
     }
 

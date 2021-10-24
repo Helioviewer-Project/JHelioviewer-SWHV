@@ -13,6 +13,7 @@ import javax.swing.JRadioButtonMenuItem;
 import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.time.JHVTime;
+import org.helioviewer.jhv.time.TimeSelectorListener;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import com.jidesoft.swing.JideSplitButton;

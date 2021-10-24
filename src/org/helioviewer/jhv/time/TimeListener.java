@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.layers;
+package org.helioviewer.jhv.time;
 
 public interface TimeListener {
 

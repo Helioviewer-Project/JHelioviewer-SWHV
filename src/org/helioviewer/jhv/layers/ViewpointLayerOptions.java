@@ -18,12 +18,13 @@ import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
+import org.helioviewer.jhv.time.TimeRangeListener;
 import org.json.JSONObject;
 
 import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
-class ViewpointLayerOptions extends JPanel implements TimespanListener {
+class ViewpointLayerOptions extends JPanel implements TimeRangeListener {
 
     private enum CameraMode {
         Observer(UpdateViewpoint.observer), Location(UpdateViewpoint.location), Heliosphere(UpdateViewpoint.equatorial);
@@ -154,15 +155,15 @@ class ViewpointLayerOptions extends JPanel implements TimespanListener {
     }
 
     void activate() {
-        Movie.addTimespanListener(this);
+        Movie.addTimeRangeListener(this);
     }
 
     void deactivate() {
-        Movie.removeTimespanListener(this);
+        Movie.removeTimeRangeListener(this);
     }
 
     @Override
-    public void timespanChanged(long start, long end) {
+    public void timeRangeChanged(long start, long end) {
         locationOptionPanel.setTimespan(start, end);
         equatorialOptionPanel.setTimespan(start, end);
     }
