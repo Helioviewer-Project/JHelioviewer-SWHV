@@ -208,6 +208,12 @@ public class Movie {
         if (recording && notDone)
             return;
 
+        // avoid time out of range
+        if (dateTime.milli > movieEnd)
+            dateTime = new JHVTime(movieEnd);
+        if (dateTime.milli < movieStart)
+            dateTime = new JHVTime(movieStart);
+
         lastTimestamp = dateTime;
 
         Camera camera = Display.getCamera();
