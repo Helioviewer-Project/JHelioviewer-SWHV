@@ -219,7 +219,7 @@ public class Movie {
         Camera camera = Display.getCamera();
         camera.timeChanged(lastTimestamp);
 
-        Layers.forEachImageLayer(layer -> layer.getView().setNearestFrame(dateTime));
+        Layers.setImageLayersNearestFrame(dateTime);
         MovieDisplay.render(1);
 
         timeListeners.forEach(listener -> listener.timeChanged(lastTimestamp.milli));

@@ -39,7 +39,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     private boolean removed;
     private Future<?> worker;
-    private View view;
+    protected View view;
 
     public static ImageLayer create(JSONObject jo) {
         ImageLayer imageLayer = new ImageLayer(jo);
@@ -56,7 +56,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         }
     }
 
-    private ImageLayer(JSONObject jo) {
+    protected ImageLayer(JSONObject jo) {
         try {
             view = new BaseView(null, null, null);
         } catch (Exception e) { // impossible
