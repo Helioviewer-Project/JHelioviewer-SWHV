@@ -32,7 +32,6 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
-import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
@@ -44,12 +43,13 @@ import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLTexture;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.GLTexture;
+import org.helioviewer.jhv.time.TimeRangeListener;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
 // has to be public for state
-public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEventHandler {
+public class SWEKLayer extends AbstractLayer implements TimeRangeListener, JHVEventHandler {
 
     private final SWEKPopupController controller = new SWEKPopupController(JHVFrame.getGLCanvas());
     private final JPanel optionsPanel;
@@ -446,13 +446,13 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
         super.setEnabled(_enabled);
 
         if (enabled) {
-            Movie.addTimespanListener(this);
+            Movie.addTimeRangeListener(this);
             Movie.addTimeListener(controller);
             JHVFrame.getInputController().addPlugin(controller);
         } else {
             JHVFrame.getInputController().removePlugin(controller);
             Movie.removeTimeListener(controller);
-            Movie.removeTimespanListener(this);
+            Movie.removeTimeRangeListener(this);
         }
     }
 
@@ -494,7 +494,7 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
     }
 
     @Override
-    public void timespanChanged(long start, long end) {
+    public void timeRangeChanged(long start, long end) {
         requestEvents(false, start, end);
     }
 

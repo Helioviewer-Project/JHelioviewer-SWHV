@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.components.timeselector;
+package org.helioviewer.jhv.time;
 
 public interface TimeSelectorListener {
 
