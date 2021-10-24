@@ -14,11 +14,14 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.selector.Reorderable;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
 import org.helioviewer.jhv.time.JHVTime;
+import org.helioviewer.jhv.time.TimeSelectorListener;
+import org.helioviewer.jhv.time.TimeUtils;
+import org.helioviewer.jhv.view.NullView;
 
 import com.jogamp.opengl.GL2;
 
 @SuppressWarnings({"serial", "unchecked"})
-public class Layers extends AbstractTableModel implements Reorderable {
+public class Layers extends AbstractTableModel implements Reorderable, TimeSelectorListener {
 
     private static class LayerList extends ArrayList<Layer> {
 
@@ -65,13 +68,19 @@ public class Layers extends AbstractTableModel implements Reorderable {
 
     }
 
-    private static ImageLayer activeLayer;
+    private static final NullImageLayer nullImageLayer = new NullImageLayer(NullView.create(TimeUtils.START.milli - 2 * TimeUtils.DAY_IN_MILLIS, TimeUtils.START.milli,
+            TimeUtils.defaultCadence(TimeUtils.START.milli - 2 * TimeUtils.DAY_IN_MILLIS, TimeUtils.START.milli)));
+    private static ImageLayer activeLayer = nullImageLayer;
 
     public static ImageLayer getActiveImageLayer() {
         return activeLayer;
     }
 
     public static void setActiveImageLayer(ImageLayer layer) {
+        if (layer == null) {
+            layer = nullImageLayer;
+        }
+
         activeLayer = layer;
         Movie.setMaster(activeLayer);
     }
@@ -83,7 +92,7 @@ public class Layers extends AbstractTableModel implements Reorderable {
     private static ViewpointLayer viewpointLayer;
     private static MiniviewLayer miniviewLayer;
 
-    public Layers() {
+    private Layers() {
         add(new ViewpointLayer(null));
         add(new GridLayer(null));
         add(new FOVLayer(null));
@@ -237,9 +246,9 @@ public class Layers extends AbstractTableModel implements Reorderable {
     }
 
     public static void setImageLayersNearestFrame(JHVTime dateTime) {
-        /*if (layers.imageLayersCount == 0) {
-            activeLayer.getView().setNearestFrame(dateTime);
-        } else*/
+        if (layers.imageLayersCount == 0) {
+            nullImageLayer.getView().setNearestFrame(dateTime);
+        } else
             forEachImageLayer(layer -> layer.getView().setNearestFrame(dateTime));
     }
 
@@ -255,6 +264,20 @@ public class Layers extends AbstractTableModel implements Reorderable {
         removedLayers.addAll(layers);
         layers = new LayerList();
         setActiveImageLayer(null);
+    }
+
+    @Override
+    public void timeSelectionChanged(long start, long end) {
+        nullImageLayer.setView(NullView.create(start, end, TimeUtils.defaultCadence(start, end)));
+    }
+
+    private static Layers instance;
+
+    public static Layers getInstance() {
+        if (instance == null) {
+            instance = new Layers();
+        }
+        return instance;
     }
 
 }

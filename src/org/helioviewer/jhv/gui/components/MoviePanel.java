@@ -38,6 +38,7 @@ import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.ObservationSelector;
 import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.ImageLayers;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.Movie.AdvanceMode;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -311,6 +312,8 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         c.gridx = 3;
         recordPanel.add(recordSizeCombo, c);
 
+        timeSelectorPanel.addListener(Layers.getInstance());
+
         add(sliderPanel);
         add(secondLine);
         add(modePanel);
@@ -338,6 +341,10 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         setEnabledState(false);
     }
 
+    public static TimeSelectorPanel getTimeSelector() {
+        return timeSelectorPanel;
+    }
+
     @Override
     public int getCadence() {
         return TimeUtils.defaultCadence(getStartTime(), getEndTime());
@@ -356,10 +363,6 @@ public class MoviePanel extends JPanel implements ObservationSelector {
     @Override
     public long getEndTime() {
         return timeSelectorPanel.getEndTime();
-    }
-
-    private static int getCadenceStatic() {
-        return TimeUtils.defaultCadence(timeSelectorPanel.getStartTime(), timeSelectorPanel.getEndTime());
     }
 
     @Override
@@ -474,12 +477,6 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         } else {
             Movie.setDesiredAbsoluteSpeed(speed * unit.secPerSecond);
         }
-    }
-
-    public static int getMovieCadence() {
-        int speed = ((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue();
-        SpeedUnit unit = (SpeedUnit) Objects.requireNonNull(speedUnitComboBox.getSelectedItem());
-        return unit == SpeedUnit.FRAMESPERSECOND ? getCadenceStatic() : speed * unit.secPerSecond;
     }
 
     public static void setFrameSlider(int frame) {

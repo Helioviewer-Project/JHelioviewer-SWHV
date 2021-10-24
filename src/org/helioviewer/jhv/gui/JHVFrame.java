@@ -66,7 +66,7 @@ public class JHVFrame {
         glListener = new GLListener(glCanvas);
         glCanvas.addGLEventListener(glListener);
 
-        layers = new Layers();
+        layers = Layers.getInstance();
         layersPanel = new LayersPanel(layers);
 
         leftPane = new SideContentPane();
