@@ -1,12 +1,12 @@
 package org.helioviewer.jhv.layers;
 
-import org.helioviewer.jhv.view.NullView;
+import org.helioviewer.jhv.view.ManyView;
 
 public class NullImageLayer extends ImageLayer {
 
-    public NullImageLayer(long start, long end, int cadence) {
+    public NullImageLayer(ManyView _view) {
         super(null);
-        view = NullView.create(start, end, cadence);
+        view = _view;
     }
 
 }

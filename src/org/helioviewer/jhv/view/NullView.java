@@ -9,7 +9,6 @@ import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.NullMetaData;
 import org.helioviewer.jhv.time.JHVTime;
-import org.helioviewer.jhv.time.TimeMap;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -41,7 +40,9 @@ public class NullView implements View {
         }
     }
 
+    private static final String emptyXML = "<xml/>";
     private static final AtomicBoolean fullCache = new AtomicBoolean(true);
+
     private final JHVTime time;
     private final MetaData metaData;
 
@@ -166,8 +167,8 @@ public class NullView implements View {
 
     @Nonnull
     @Override
-    public String getXMLMetaData() throws Exception {
-        return null;
+    public String getXMLMetaData() {
+        return emptyXML;
     }
 
 }
