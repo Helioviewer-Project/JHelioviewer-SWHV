@@ -33,8 +33,8 @@ import com.jogamp.opengl.GL2;
 
 public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
-    private final GLImage glImage = new GLImage();
-    private final DecodeExecutor executor = new DecodeExecutor();
+    private final GLImage glImage;
+    private final DecodeExecutor executor;
     private final ImageLayerOptions optionsPanel;
 
     private boolean removed;
@@ -56,12 +56,23 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         }
     }
 
-    protected ImageLayer(JSONObject jo) {
+    // Constructor for NullImageLayer
+    protected ImageLayer(View _view) {
+        view = _view;
+        glImage = null;
+        executor = null;
+        optionsPanel = null;
+    }
+
+    private ImageLayer(JSONObject jo) {
         try {
             view = new BaseView(null, null, null);
         } catch (Exception e) { // impossible
             e.printStackTrace();
         }
+
+        glImage = new GLImage();
+        executor = new DecodeExecutor();
 
         if (jo != null) {
             JSONObject apiRequest = jo.optJSONObject("APIRequest");
