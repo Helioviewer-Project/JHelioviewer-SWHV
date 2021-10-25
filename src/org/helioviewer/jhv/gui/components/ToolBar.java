@@ -166,9 +166,9 @@ public class ToolBar extends JToolBar {
         addButton(zoomOut);
         addButton(zoomFit);
         addButton(zoomOne);
-        addButton(resetCamera);
+        add(new JToolBar.Separator(dim));
         addButton(resetCameraAxis);
-
+        addButton(resetCamera);
         add(new JToolBar.Separator(dim));
 
         // Interaction
@@ -184,9 +184,11 @@ public class ToolBar extends JToolBar {
         group.add(pan);
         group.add(rotate);
         group.add(axis);
+
         addButton(pan);
         addButton(rotate);
         addButton(axis);
+        add(new JToolBar.Separator(dim));
 
         switch (interactionMode) {
             case PAN -> pan.setSelected(true);
@@ -195,12 +197,9 @@ public class ToolBar extends JToolBar {
         }
         JHVFrame.getInteraction().setMode(interactionMode);
 
-        add(new JToolBar.Separator(dim));
-
         trackingButton = toolToggleButton(TRACK);
         trackingButton.setSelected(Display.getCamera().getTrackingMode());
         trackingButton.addItemListener(e -> Display.getCamera().setTrackingMode(trackingButton.isSelected()));
-        addButton(trackingButton);
 
         diffRotationButton = toolToggleButton(DIFFROTATION);
         diffRotationButton.setSelected(ImageLayers.getDiffRotationMode());
@@ -208,7 +207,6 @@ public class ToolBar extends JToolBar {
             ImageLayers.setDiffRotationMode(diffRotationButton.isSelected());
             MovieDisplay.display();
         });
-        addButton(diffRotationButton);
 
         coronaButton = toolToggleButton(OFFDISK);
         coronaButton.setSelected(Display.getShowCorona());
@@ -216,7 +214,6 @@ public class ToolBar extends JToolBar {
             Display.setShowCorona(coronaButton.isSelected());
             MovieDisplay.display();
         });
-        addButton(coronaButton);
 
         multiviewButton = toolToggleButton(MULTIVIEW);
         multiviewButton.setSelected(Display.multiview);
@@ -224,8 +221,11 @@ public class ToolBar extends JToolBar {
             Display.multiview = multiviewButton.isSelected();
             ImageLayers.arrangeMultiView(Display.multiview);
         });
-        addButton(multiviewButton);
 
+        addButton(trackingButton);
+        addButton(diffRotationButton);
+        addButton(coronaButton);
+        addButton(multiviewButton);
         add(new JToolBar.Separator(dim));
 
         JideButton projectionButton = toolButton(PROJECTION);
