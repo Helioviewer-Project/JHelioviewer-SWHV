@@ -59,7 +59,7 @@ public class Movie {
         return next;
     }
 
-    static void setMaster(ImageLayer layer) {
+    public static void setMaster(ImageLayer layer) {
         if (layer == null) {
             pause();
             MoviePanel.unsetMovie();
