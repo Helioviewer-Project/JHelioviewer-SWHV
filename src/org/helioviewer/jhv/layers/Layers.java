@@ -72,6 +72,11 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeSelec
             TimeUtils.defaultCadence(TimeUtils.START.milli - 2 * TimeUtils.DAY_IN_MILLIS, TimeUtils.START.milli)));
     private static ImageLayer activeLayer = nullImageLayer;
 
+    @Override
+    public void timeSelectionChanged(long start, long end) {
+        nullImageLayer.setView(NullView.create(start, end, TimeUtils.defaultCadence(start, end)));
+    }
+
     public static ImageLayer getActiveImageLayer() {
         return activeLayer;
     }
@@ -264,11 +269,6 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeSelec
         removedLayers.addAll(layers);
         layers = new LayerList();
         setActiveImageLayer(null);
-    }
-
-    @Override
-    public void timeSelectionChanged(long start, long end) {
-        nullImageLayer.setView(NullView.create(start, end, TimeUtils.defaultCadence(start, end)));
     }
 
     private static Layers instance;

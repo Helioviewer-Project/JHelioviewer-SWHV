@@ -27,6 +27,7 @@ import org.helioviewer.jhv.gui.components.statusplugin.PositionStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugin.ZoomStatusPanel;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLListener;
@@ -110,6 +111,8 @@ public class JHVFrame {
         mainFrame.add(toolBar, BorderLayout.PAGE_START);
         mainFrame.add(midSplitPane, BorderLayout.CENTER);
         mainFrame.add(statusPanel, BorderLayout.PAGE_END);
+
+        Movie.setMaster(Layers.getActiveImageLayer()); //! for nullImageLayer
 
         return mainFrame;
     }
