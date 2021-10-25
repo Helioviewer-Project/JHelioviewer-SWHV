@@ -83,10 +83,11 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeSelec
 
     public static void setActiveImageLayer(ImageLayer layer) {
         if (layer == null) {
-            layer = nullImageLayer;
-        }
+            activeLayer = nullImageLayer;
+            Movie.timeRangeChanged();
+        } else
+            activeLayer = layer;
 
-        activeLayer = layer;
         Movie.setMaster(activeLayer);
     }
 
@@ -251,9 +252,9 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeSelec
     }
 
     public static void setImageLayersNearestFrame(JHVTime dateTime) {
-        if (layers.imageLayersCount == 0) {
+        if (layers.imageLayersCount == 0)
             nullImageLayer.getView().setNearestFrame(dateTime);
-        } else
+        else
             forEachImageLayer(layer -> layer.getView().setNearestFrame(dateTime));
     }
 

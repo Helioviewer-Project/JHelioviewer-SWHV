@@ -86,7 +86,7 @@ public class Movie {
         return layer == null ? lastTimestamp.milli : layer.getEndTime();
     }
 
-    private static void timeRangeChanged() {
+    static void timeRangeChanged() {
         movieStart = getMovieStart();
         movieEnd = getMovieEnd();
         timeRangeListeners.forEach(listener -> listener.timeRangeChanged(movieStart, movieEnd));
@@ -209,12 +209,6 @@ public class Movie {
     private static void syncTime(JHVTime dateTime) {
         if (recording && notDone)
             return;
-
-        // avoid time out of range
-        if (dateTime.milli > movieEnd)
-            dateTime = new JHVTime(movieEnd);
-        if (dateTime.milli < movieStart)
-            dateTime = new JHVTime(movieStart);
 
         lastTimestamp = dateTime;
 
