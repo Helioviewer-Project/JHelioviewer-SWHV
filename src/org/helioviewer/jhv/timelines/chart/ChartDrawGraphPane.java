@@ -43,7 +43,7 @@ import org.helioviewer.jhv.timelines.draw.YAxis;
 public class ChartDrawGraphPane extends JComponent implements MouseInputListener, MouseWheelListener, ComponentListener, DrawListener {
 
     private enum DragMode {
-        MOVIELINE, CHART
+        MOVIELINE, CHART, NODRAG
     }
 
     private Point mousePressedPosition;
@@ -59,7 +59,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private boolean redrawGraphArea;
 
-    private DragMode dragMode = null;
+    private DragMode dragMode = DragMode.NODRAG;
 
     public ChartDrawGraphPane() {
         setPreferredSize(new Dimension(-1, 50));
@@ -446,8 +446,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
             }
             case MOVIELINE -> DrawController.setMovieFrame(p);
+            case NODRAG -> {
+            }
         }
-        dragMode = null;
+        dragMode = DragMode.NODRAG;
         mousePressedPosition = null;
         mouseDragPosition = null;
     }
@@ -464,6 +466,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                     DrawController.moveY(p, p.y - mousePressedPosition.y);
                 }
                 case MOVIELINE -> DrawController.setMovieFrame(p);
+                case NODRAG -> {
+                }
             }
         }
         mousePressedPosition = p;
