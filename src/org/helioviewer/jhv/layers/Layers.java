@@ -75,6 +75,7 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeSelec
     @Override
     public void timeSelectionChanged(long start, long end) {
         nullImageLayer.setView(NullView.create(start, end, TimeUtils.defaultCadence(start, end)));
+        Movie.timeRangeChanged();
     }
 
     public static ImageLayer getActiveImageLayer() {
@@ -82,12 +83,7 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeSelec
     }
 
     public static void setActiveImageLayer(ImageLayer layer) {
-        if (layer == null) {
-            activeLayer = nullImageLayer;
-            Movie.timeRangeChanged();
-        } else
-            activeLayer = layer;
-
+        activeLayer = layer == null ? nullImageLayer : layer;
         Movie.setMaster(activeLayer);
     }
 
