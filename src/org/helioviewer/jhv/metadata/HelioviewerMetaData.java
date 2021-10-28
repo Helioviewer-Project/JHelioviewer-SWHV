@@ -225,7 +225,7 @@ public class HelioviewerMetaData extends BaseMetaData {
     }
 
     private JHVTime retrieveTime(MetaDataContainer m) {
-        String observedDate = m.getString("DATE_OBS").orElseGet(() -> m.getRequiredString("DATE-OBS")); // DATE-OBS unusable for MDI and early EIT
+        String observedDate = m.getString("DATE_OBS").or(() -> m.getString("DATE-AVG")).orElseGet(() -> m.getRequiredString("DATE-OBS")); // DATE-OBS unusable for MDI and early EIT
         if (instrument.equals("LASCO")) {
             String observedTime = m.getString("TIME_OBS").orElseGet(() -> m.getRequiredString("TIME-OBS"));
             observedDate = observedDate.replace('/', '-') + 'T' + observedTime;
