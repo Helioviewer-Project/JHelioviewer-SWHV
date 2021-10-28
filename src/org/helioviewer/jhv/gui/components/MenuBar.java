@@ -17,6 +17,7 @@ import org.helioviewer.jhv.gui.actions.NewLayerAction;
 import org.helioviewer.jhv.gui.actions.OpenLocalFileAction;
 import org.helioviewer.jhv.gui.actions.OpenURLinBrowserAction;
 import org.helioviewer.jhv.gui.actions.ResetCameraAction;
+import org.helioviewer.jhv.gui.actions.ResetCameraAxisAction;
 import org.helioviewer.jhv.gui.actions.SaveStateAction;
 import org.helioviewer.jhv.gui.actions.SaveStateAsAction;
 import org.helioviewer.jhv.gui.actions.ShowDialogAction;
@@ -60,10 +61,12 @@ public class MenuBar extends JMenuBar {
         viewMenu.add(new ZoomInAction());
         viewMenu.add(new ZoomOutAction());
         viewMenu.addSeparator();
+        viewMenu.add(new ResetCameraAxisAction());
         viewMenu.add(new ResetCameraAction());
+        viewMenu.addSeparator();
         viewMenu.add(new ClearAnnotationsAction());
 
-        JCheckBoxMenuItem white = new JCheckBoxMenuItem("White Background");
+        JCheckBoxMenuItem white = new JCheckBoxMenuItem("Use White Background");
         white.addItemListener(e -> {
             JHVFrame.getGLListener().setWhiteBack(white.getState());
             MovieDisplay.display();
