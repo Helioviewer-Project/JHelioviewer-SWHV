@@ -93,7 +93,7 @@ class JHVInit {
         List<String> kernels = List.of(
                 "de432s_reduced.bsp",
                 "ahead_2017_061_5295day_predict.epm.bsp",
-                "solo_ANC_soc-orbit_20200210-20301120_L006_V1_00102_V01.bsp",
+                "solo_ANC_soc-orbit_20200210-20301120_L007_V1_00118_V01.bsp",
                 "naif0012.tls",
                 "pck00010.tpc",
                 "rssd0001.tf",
