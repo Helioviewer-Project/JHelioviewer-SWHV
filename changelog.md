@@ -1,6 +1,8 @@
 
 # Revision history for JHelioviewer
 
+## JHelioviewer 4.1.1 (pending)
+
 ## JHelioviewer 4.1 (2021-10-29)
 
 - Indicate diameter of circle annotation
