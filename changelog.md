@@ -1,7 +1,7 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.0.3 (pending)
+## JHelioviewer 4.1 (2021-10-29)
 
 - Indicate diameter of circle annotation
 - Indicate height above sphere of loop annotation top
