@@ -24,7 +24,8 @@ public class Movie {
         Loop, Stop, Swing, SwingDown
     }
 
-    public static final int DEF_FPS = 20;
+    public static final int FPS_RELATIVE_DEFAULT = 20;
+    public static final int FPS_ABSOLUTE = 30;
 
     @Nullable
     private static JHVTime nextTime(AdvanceMode mode, JHVTime time,
@@ -143,7 +144,7 @@ public class Movie {
 
     private static final RelativeTimeAdvanceListener relativeTimeAdvanceListener = new RelativeTimeAdvanceListener();
     private static final AbsoluteTimeAdvanceListener absoluteTimeAdvanceListener = new AbsoluteTimeAdvanceListener();
-    private static final Timer movieTimer = new Timer(1000 / DEF_FPS, relativeTimeAdvanceListener);
+    private static final Timer movieTimer = new Timer(1000 / FPS_RELATIVE_DEFAULT, relativeTimeAdvanceListener);
 
     public static boolean isPlaying() {
         return movieTimer.isRunning();
@@ -279,8 +280,8 @@ public class Movie {
         for (ActionListener listener : movieTimer.getActionListeners())
             movieTimer.removeActionListener(listener);
         movieTimer.addActionListener(absoluteTimeAdvanceListener);
-        movieTimer.setDelay(1000 / DEF_FPS);
-        deltaT = 1000 / DEF_FPS * sec;
+        movieTimer.setDelay(1000 / FPS_ABSOLUTE);
+        deltaT = 1000 / FPS_ABSOLUTE * sec;
     }
 
     private static AdvanceMode advanceMode = AdvanceMode.Loop;
