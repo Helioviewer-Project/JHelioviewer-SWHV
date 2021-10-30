@@ -46,7 +46,7 @@ public class Sun {
     private static final LoadingCache<JHVTime, Position> carringtonCache = Caffeine.newBuilder().maximumSize(10000)
             .build(t -> Spice.getCarrington("SUN", "EARTH", t));
     private static final LoadingCache<JHVTime, Position> hciCache = Caffeine.newBuilder().maximumSize(10000)
-            .build(t -> Spice.getPositionLatitudinal("SUN", "EARTH", Frame.HCI.toString(), t));
+            .build(t -> Spice.getPositionLatitudinal("SUN", "EARTH", Frame.SOLO_HCI.toString(), t));
 
     static {
         StartEarth = getEarth(TimeUtils.START);
