@@ -90,8 +90,8 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener
         framePanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
         framePanel.add(new JLabel("Frame", JLabel.RIGHT));
         ButtonGroup modeGroup = new ButtonGroup();
-        for (Frame f : List.of(Frame.HCI, Frame.HEEQ, Frame.HEE)) {
-            JRadioButton radio = new JRadioButton(f.toString(), f == frame);
+        for (Frame f : List.of(Frame.SOLO_HCI, Frame.SOLO_HEEQ, Frame.SOLO_HEE)) {
+            JRadioButton radio = new JRadioButton(f.uiString(), f == frame);
             radio.addItemListener(e -> {
                 if (radio.isSelected()) {
                     frame = f;

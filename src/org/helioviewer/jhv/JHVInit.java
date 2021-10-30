@@ -96,7 +96,6 @@ class JHVInit {
                 "solo_ANC_soc-orbit_20200210-20301120_L007_V1_00118_V01.bsp",
                 "naif0012.tls",
                 "pck00010.tpc",
-                "rssd0001.tf",
                 "solo_ANC_soc-ops-fk_V02.tf",
                 "solo_ANC_soc-sci-fk_V07.tf");
 

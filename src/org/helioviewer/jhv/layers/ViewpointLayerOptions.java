@@ -63,7 +63,7 @@ class ViewpointLayerOptions extends JPanel implements TimeRangeListener {
             joEquatorial = jo.optJSONObject("equatorial");
         }
         locationOptionPanel = new ViewpointLayerOptionsExpert(joLocation, UpdateViewpoint.location, SpaceObject.SUN, Frame.SOLO_IAU_SUN_2009, true);
-        equatorialOptionPanel = new ViewpointLayerOptionsExpert(joEquatorial, UpdateViewpoint.equatorial, SpaceObject.SUN, Frame.HCI, false);
+        equatorialOptionPanel = new ViewpointLayerOptionsExpert(joEquatorial, UpdateViewpoint.equatorial, SpaceObject.SUN, Frame.SOLO_HCI, false);
 
         cameraMode = CameraMode.Observer;
         if (jo != null) {
