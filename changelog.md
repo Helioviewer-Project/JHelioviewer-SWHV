@@ -1,6 +1,8 @@
 
 # Revision history for JHelioviewer
 
+## JHelioviewer 4.1.2 (pending)
+
 ## JHelioviewer 4.1.1 (2021-10-30)
 
 - Use SOLO heliospheric reference frames
