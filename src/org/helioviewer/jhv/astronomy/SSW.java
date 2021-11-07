@@ -3,6 +3,7 @@ package org.helioviewer.jhv.astronomy;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.JulianDay;
+import org.helioviewer.jhv.time.TimeUtils;
 
 public class SSW {
 
@@ -53,9 +54,8 @@ public class SSW {
         return ((JulianDay.DJM0 - 2398220.) + mjd) * (2 * Math.PI / Carrington.CR_SIDEREAL); // rad
     }
 
-    private static final JHVTime EPOCH = new JHVTime("2000-01-01T00:00:00");
-    private static final Position EpochEarth = getEarthSSW(EPOCH);
-    private static final double theta0 = sunRot(JulianDay.milli2mjd(EPOCH.milli));
+    private static final Position EpochEarth = getEarthSSW(TimeUtils.J2000);
+    private static final double theta0 = sunRot(JulianDay.milli2mjd(TimeUtils.J2000.milli));
 
     private static double getHCILongitude(JHVTime time) {
         // 1.7381339560109783
