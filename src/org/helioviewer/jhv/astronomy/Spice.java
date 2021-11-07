@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.JHVTime;
+import org.helioviewer.jhv.time.TimeUtils;
 
 import spice.basic.CSPICE;
 import spice.basic.SpiceErrorException;
@@ -94,16 +95,14 @@ public class Spice {
         return null;
     }
 
-    private static final JHVTime J2000 = new JHVTime("2000-01-01T12:00:00");
-
     private static double milli2et(long milli) throws SpiceErrorException {
-        double sec = (milli - J2000.milli) / 1000.;
+        double sec = (milli - TimeUtils.J2000.milli) / 1000.;
         return sec + CSPICE.deltet(sec, "UTC");
     }
 
     private static long et2milli(double et) throws SpiceErrorException {
         double sec = et - CSPICE.deltet(et, "ET");
-        return (long) (sec * 1000. + J2000.milli + .5);
+        return (long) (sec * 1000. + TimeUtils.J2000.milli + .5);
     }
 
     private static double[] positionRectangular(String target, long milli, String frame, String observer) throws SpiceErrorException {
