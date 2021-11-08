@@ -157,7 +157,7 @@ class TimePanel extends JPanel {
     }
 
     private void setTextField() {
-        textField.setText(TimeUtils.format(getTime()));
+        textField.setText(TimeUtils.formatShort(getTime()));
     }
 
     // Override the setEnabled method in order to keep the containing
