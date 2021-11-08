@@ -10,6 +10,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.gui.components.base.JHVSlider;
@@ -29,6 +31,7 @@ public class TimestampLayer extends AbstractLayer {
     private static final int MAX_SCALE = 200;
 
     private int scale = 100;
+    private boolean extra = false;
     private boolean top = false;
 
     private final JPanel optionsPanel;
@@ -36,11 +39,13 @@ public class TimestampLayer extends AbstractLayer {
     @Override
     public void serialize(JSONObject jo) {
         jo.put("scale", scale);
+        jo.put("extra", extra);
         jo.put("top", top);
     }
 
     private void deserialize(JSONObject jo) {
         scale = MathUtils.clip(jo.optInt("scale", scale), MIN_SCALE, MAX_SCALE);
+        extra = jo.optBoolean("extra", extra);
         top = jo.optBoolean("top", top);
     }
 
@@ -59,15 +64,25 @@ public class TimestampLayer extends AbstractLayer {
         if (!isVisible[vp.idx])
             return;
 
-        String text = camera.getViewpoint().time.toString(); //Movie.getTime().toString();
+        String text = "";
+        Position viewpoint = camera.getViewpoint();
         if (Display.multiview) {
             ImageLayer im = ImageLayers.getImageLayerInViewport(vp.idx);
             if (im != null) {
-                text = im.getName() + ' ' + im.getTimeString();
+                text = im.getName() + ' ';
+                viewpoint = im.getMetaData().getViewpoint();
+            }
+        }
+        text += viewpoint.time.toString();
+
+        if (extra) {
+            text += String.format(" | D\u2299: %7.4fau", viewpoint.distance * Sun.MeanEarthDistanceInv);
+            if (!Display.multiview) {
+                text += " | FOV: " + formatFOV(camera.getCameraWidth());
             }
         }
 
-        int size = (int) (vp.height * (scale * 0.01 * 0.015));
+        int size = (int) (vp.height * (scale * 0.01 * 0.012));
         if (GLInfo.pixelScale[1] == 1) //! nasty
             size *= 2;
 
@@ -81,6 +96,13 @@ public class TimestampLayer extends AbstractLayer {
         renderer.setColor(Colors.LightGrayFloat);
         renderer.draw(text, deltaX, deltaY);
         renderer.endRendering();
+    }
+
+    private static String formatFOV(double r) {
+        if (r < 2 * 32 * Sun.Radius)
+            return String.format("%6.4fR\u2299", r);
+        else
+            return String.format("%6.4fau", r * Sun.MeanEarthDistanceInv);
     }
 
     @Override
@@ -137,6 +159,16 @@ public class TimestampLayer extends AbstractLayer {
         panel.add(slider, c0);
 
         c0.gridx = 2;
+        c0.anchor = GridBagConstraints.LINE_END;
+        JCheckBox showExtra = new JCheckBox("Extra info", top);
+        showExtra.setHorizontalTextPosition(SwingConstants.LEFT);
+        showExtra.addActionListener(e -> {
+            extra = showExtra.isSelected();
+            MovieDisplay.display();
+        });
+        panel.add(showExtra, c0);
+
+        c0.gridx = 3;
         c0.anchor = GridBagConstraints.LINE_END;
         JCheckBox showTop = new JCheckBox("Top", top);
         showTop.setHorizontalTextPosition(SwingConstants.LEFT);
