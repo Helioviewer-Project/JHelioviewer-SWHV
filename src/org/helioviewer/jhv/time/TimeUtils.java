@@ -58,8 +58,12 @@ public class TimeUtils {
         return formatter.format(Instant.ofEpochMilli(milli).atOffset(ZERO));
     }
 
-    public static String format(long milli) {
+    public static String format(long milli) { // always three digits milli
         return format(milliFormatter, milli);
+    }
+
+    public static String formatShort(long milli) { // without trailing zeros milli
+        return format(DateTimeFormatter.ISO_LOCAL_DATE_TIME, milli);
     }
 
     public static String formatDate(long milli) {
