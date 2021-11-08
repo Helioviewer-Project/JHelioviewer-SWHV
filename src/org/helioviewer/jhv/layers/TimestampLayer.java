@@ -160,7 +160,7 @@ public class TimestampLayer extends AbstractLayer {
 
         c0.gridx = 2;
         c0.anchor = GridBagConstraints.LINE_END;
-        JCheckBox showExtra = new JCheckBox("Extra info", top);
+        JCheckBox showExtra = new JCheckBox("Extra info", extra);
         showExtra.setHorizontalTextPosition(SwingConstants.LEFT);
         showExtra.addActionListener(e -> {
             extra = showExtra.isSelected();

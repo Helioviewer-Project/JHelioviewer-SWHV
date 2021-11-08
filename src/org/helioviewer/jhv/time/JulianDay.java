@@ -37,7 +37,7 @@ public class JulianDay {
 
         /* Return result. */
         my = (im - 14) / 12;
-        iypmy = iy + my;
+        iypmy = iy + (long) my;
 
         return (double) ((1461L * (iypmy + 4800L)) / 4L
                 + (367L * (long) (im - 2 - 12 * my)) / 12L
