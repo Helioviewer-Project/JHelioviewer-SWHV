@@ -95,7 +95,7 @@ public class UIGlobals {
         // setUIFont(uiFont);
         UIManager.getLookAndFeelDefaults().put("defaultFont", uiFont);
 
-        try (InputStream is = FileUtils.getResource("/fonts/RobotoCondensed-Regular.ttf")) {
+        try (InputStream is = FileUtils.getResource("/fonts/DroidSansFallback.ttf")) {
             uiFontRoboto = Font.createFont(Font.TRUETYPE_FONT, is);
             GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(uiFontRoboto);
         } catch (Exception e) {
