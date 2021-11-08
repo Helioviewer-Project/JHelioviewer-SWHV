@@ -17,6 +17,7 @@ import org.helioviewer.jhv.astronomy.Spice;
 public class TimeUtils {
 
     private static final ZoneOffset ZERO = ZoneOffset.ofTotalSeconds(0);
+    private static final DateTimeFormatter milliFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
     private static final DateTimeFormatter fileFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss");
     public static final DateTimeFormatter sqlTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -58,7 +59,7 @@ public class TimeUtils {
     }
 
     public static String format(long milli) {
-        return format(DateTimeFormatter.ISO_LOCAL_DATE_TIME, milli);
+        return format(milliFormatter, milli);
     }
 
     public static String formatDate(long milli) {
