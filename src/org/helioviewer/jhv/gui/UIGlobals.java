@@ -96,17 +96,19 @@ public class UIGlobals {
         UIManager.getLookAndFeelDefaults().put("defaultFont", uiFont);
 
         try (InputStream is = FileUtils.getResource("/fonts/DroidSansFallback.ttf")) {
-            uiFontRoboto = Font.createFont(Font.TRUETYPE_FONT, is);
-            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(uiFontRoboto);
+            canvasFont = Font.createFont(Font.TRUETYPE_FONT, is);
+            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(canvasFont);
         } catch (Exception e) {
             Log.warn("Font not loaded correctly, fallback to default");
-            uiFontRoboto = new Font("SansSerif", Font.PLAIN, defaultSize);
+            canvasFont = new Font("SansSerif", Font.PLAIN, defaultSize);
         }
+
         try (InputStream is = FileUtils.getResource("/fonts/materialdesignicons-webfont.ttf")) {
             uiFontMDI = Font.createFont(Font.TRUETYPE_FONT, is);
             GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(uiFontMDI);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.warn("Font not loaded correctly, fallback to default");
+            uiFontMDI = new Font("SansSerif", Font.PLAIN, defaultSize);
         }
     }
 /*
@@ -154,7 +156,7 @@ public class UIGlobals {
     public static Font uiFontMonoSmall;
 
     public static Font uiFontMDI;
-    public static Font uiFontRoboto;
+    public static Font canvasFont;
 
     public static Cursor openHandCursor;
     public static Cursor closedHandCursor;
