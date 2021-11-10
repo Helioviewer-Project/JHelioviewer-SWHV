@@ -12,7 +12,7 @@ import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-public class LoadSunJSON implements Callable<SunJSON.GeometryBuffer> {
+public class LoadSunJSON implements Callable<SunJSON.GeometryCollection> {
 
     public static Void submit(@Nonnull URI uri, ReceiverSunJSON receiver) {
         EventQueueCallbackExecutor.pool.submit(new LoadSunJSON(uri), new Callback(receiver));
@@ -26,11 +26,11 @@ public class LoadSunJSON implements Callable<SunJSON.GeometryBuffer> {
     }
 
     @Override
-    public SunJSON.GeometryBuffer call() throws Exception {
+    public SunJSON.GeometryCollection call() throws Exception {
         return SunJSON.process(JSONUtils.get(uri));
     }
 
-    private static class Callback implements FutureCallback<SunJSON.GeometryBuffer> {
+    private static class Callback implements FutureCallback<SunJSON.GeometryCollection> {
 
         private final ReceiverSunJSON receiver;
 
@@ -39,7 +39,7 @@ public class LoadSunJSON implements Callable<SunJSON.GeometryBuffer> {
         }
 
         @Override
-        public void onSuccess(SunJSON.GeometryBuffer result) {
+        public void onSuccess(SunJSON.GeometryCollection result) {
             receiver.setGeometry(result);
         }
 
