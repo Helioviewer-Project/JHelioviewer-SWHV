@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.helioviewer.jhv.base.Colors;
+import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -15,6 +16,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.jogamp.opengl.GL2;
+
 public class SunJSON {
 
     private static final int SUBDIVISIONS = 360;
@@ -24,17 +27,38 @@ public class SunJSON {
     private record Geometry(GeometryType type, List<Vec3> coordinates, List<byte[]> colors, double thickness) {
     }
 
-    private record GeometryCollection(JHVTime time, List<Geometry> geometryList) {
+    private record GeometryBuffer(Geometry g, BufVertex vexBuf) {
     }
 
-    public record GeometryBuffer(JHVTime time, List<BufVertex> vexList) {
+    public static class GeometryCollection {
+
+        public final JHVTime time;
+        private final List<GeometryBuffer> list;
+
+        GeometryCollection(JHVTime _time, List<GeometryBuffer> _list) {
+            time = _time;
+            list = _list;
+        }
+
+        public void render(GL2 gl, GLSLLine lines, GLSLShape points, double aspect, double factor) {
+            for (GeometryBuffer buf : list) {
+                if (buf.g.type == GeometryType.Point) {
+                    points.setVertex(gl, buf.vexBuf.duplicate()); // TBD
+                    points.renderPoints(gl, factor);
+                } else {
+                    lines.setVertex(gl, buf.vexBuf.duplicate()); // TBD
+                    lines.render(gl, aspect, buf.g.thickness);
+                }
+            }
+        }
+
     }
 
-    static GeometryBuffer process(JSONObject jo) throws JSONException {
-        GeometryCollection collection = parse(jo);
+    static GeometryCollection process(JSONObject jo) throws JSONException {
+        Pair<JHVTime, List<Geometry>> res = parse(jo);
 
-        List<BufVertex> vexList = new ArrayList<>();
-        for (Geometry g : collection.geometryList) {
+        List<GeometryBuffer> bufs = new ArrayList<>();
+        for (Geometry g : res.right()) {
             int coords = g.coordinates.size();
 
             BufVertex vexBuf = switch (g.type) {
@@ -43,12 +67,12 @@ public class SunJSON {
                 case Ellipse -> new BufVertex((SUBDIVISIONS + 1 + 2) * GLSLLine.stride);
             };
             putGeometry(g, vexBuf);
-            vexList.add(vexBuf);
+            bufs.add(new GeometryBuffer(g, vexBuf));
         }
-        return new GeometryBuffer(collection.time, vexList);
+        return new GeometryCollection(res.left(), bufs);
     }
 
-    private static GeometryCollection parse(JSONObject jo) throws JSONException {
+    private static Pair<JHVTime, List<Geometry>> parse(JSONObject jo) throws JSONException {
         List<Geometry> geometryList = new ArrayList<>();
         JHVTime time = TimeUtils.J2000;
 
@@ -120,7 +144,7 @@ public class SunJSON {
             }
         }
 
-        return new GeometryCollection(time, geometryList);
+        return new Pair<>(time, geometryList);
     }
 
     private static void toCartesian(Vec3 v, double r, double lon, double lat) {

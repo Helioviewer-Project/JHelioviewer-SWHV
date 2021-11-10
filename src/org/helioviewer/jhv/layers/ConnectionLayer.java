@@ -64,16 +64,15 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     private final GLSLLine footpointLine = new GLSLLine(true);
     private final BufVertex footpointBuf = new BufVertex(12 * GLSLLine.stride);
 
-    private final GLSLLine geometryLine = new GLSLLine(false);
-    private final BufVertex geometryLineBuf = new BufVertex(512 * GLSLLine.stride);
-    private final GLSLShape geometryPoint = new GLSLShape(false);
-    private final BufVertex geometryPointBuf = new BufVertex(64 * GLSLShape.stride);
+    private final GLSLLine geometryLine = new GLSLLine(true);
+    private final GLSLShape geometryPoint = new GLSLShape(true);
 
     private final JPanel optionsPanel;
 
     private Connectivity connectivity;
     private OrthoScaleList hcs;
     private TimeMap<PositionCartesian> footpointMap;
+    private SunJSON.GeometryCollection geometry;
 
     private JHVTime lastTimestamp;
 
@@ -95,6 +94,8 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
             drawHCS(camera, vp, gl);
         if (footpointMap != null)
             drawFootpointInterpolated(camera, vp, gl);
+        if (geometry != null)
+            geometry.render(gl, geometryLine, geometryPoint, vp.aspect, CameraHelper.getPixelFactor(camera, vp));
     }
 
     @Override
@@ -202,8 +203,8 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
         hcsLine.init(gl);
         footpointLine.init(gl);
 
-        geometryLine.dispose(gl);
-        geometryPoint.dispose(gl);
+        geometryLine.init(gl);
+        geometryPoint.init(gl);
     }
 
     @Override
@@ -271,8 +272,8 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     }
 
     @Override
-    public void setGeometry(SunJSON.GeometryBuffer geometry) {
-        // geometry.geometryList().forEach(g -> SunJSON.putGeometry(g, g.type() == SunJSON.GeometryType.Point ? geometryPointBuf : geometryLineBuf));
+    public void setGeometry(SunJSON.GeometryCollection _geometry) {
+        geometry = _geometry;
         MovieDisplay.display();
     }
 

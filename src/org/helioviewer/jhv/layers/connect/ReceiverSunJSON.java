@@ -2,6 +2,6 @@ package org.helioviewer.jhv.layers.connect;
 
 public interface ReceiverSunJSON {
 
-    void setGeometry(SunJSON.GeometryBuffer g);
+    void setGeometry(SunJSON.GeometryCollection g);
 
 }
