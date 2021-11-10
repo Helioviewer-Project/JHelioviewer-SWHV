@@ -8,6 +8,7 @@ import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
+import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
@@ -16,15 +17,38 @@ import org.json.JSONObject;
 
 public class SunJSON {
 
-    public enum GeometryType {Point, Line, Ellipse}
+    private static final int SUBDIVISIONS = 360;
 
-    public record Geometry(GeometryType type, List<Vec3> coordinates, List<byte[]> colors, double thickness) {
+    private enum GeometryType {Point, Line, Ellipse}
+
+    private record Geometry(GeometryType type, List<Vec3> coordinates, List<byte[]> colors, double thickness) {
     }
 
-    public record GeometryCollection(JHVTime time, List<Geometry> geometryList) {
+    private record GeometryCollection(JHVTime time, List<Geometry> geometryList) {
     }
 
-    static GeometryCollection parse(JSONObject jo) throws JSONException {
+    public record GeometryBuffer(JHVTime time, List<BufVertex> vexList) {
+    }
+
+    static GeometryBuffer process(JSONObject jo) throws JSONException {
+        GeometryCollection collection = parse(jo);
+
+        List<BufVertex> vexList = new ArrayList<>();
+        for (Geometry g : collection.geometryList) {
+            int coords = g.coordinates.size();
+
+            BufVertex vexBuf = switch (g.type) {
+                case Point -> new BufVertex(coords * GLSLShape.stride);
+                case Line -> new BufVertex((coords + 2) * GLSLLine.stride);
+                case Ellipse -> new BufVertex((SUBDIVISIONS + 1 + 2) * GLSLLine.stride);
+            };
+            putGeometry(g, vexBuf);
+            vexList.add(vexBuf);
+        }
+        return new GeometryBuffer(collection.time, vexList);
+    }
+
+    private static GeometryCollection parse(JSONObject jo) throws JSONException {
         List<Geometry> geometryList = new ArrayList<>();
         JHVTime time = TimeUtils.J2000;
 
@@ -107,19 +131,18 @@ public class SunJSON {
         v.z = r * Math.cos(lat) * Math.cos(lon);
     }
 
-    private static final int SUBDIVISIONS = 360;
-
-    public static void putGeometry(Geometry g, BufVertex buf) {
+    private static void putGeometry(Geometry g, BufVertex buf) {
         switch (g.type) {
             case Point -> {
                 Vec3 v = new Vec3();
                 int coordsSize = g.coordinates.size();
+                float pointSize = (float) (2 * g.thickness);
 
                 for (int i = 0; i < coordsSize; i++) {
                     Vec3 coord = g.coordinates.get(i);
                     if (coord.x > 1) {
                         toCartesian(v, coord.x, coord.y, coord.z);
-                        buf.putVertex(v, g.colors.get(i));
+                        buf.putVertex((float) v.x, (float) v.y, (float) v.z, pointSize, g.colors.get(i));
                     }
                 }
             }
