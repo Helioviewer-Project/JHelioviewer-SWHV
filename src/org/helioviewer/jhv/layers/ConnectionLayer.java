@@ -6,7 +6,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.File;
 import java.net.URI;
-import java.util.List;
 import java.util.function.BiFunction;
 
 import javax.annotation.Nullable;
@@ -272,8 +271,8 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     }
 
     @Override
-    public void setGeometry(List<SunJSON.Geometry> geometry) {
-        geometry.forEach(g -> SunJSON.putGeometry(g, g.type() == SunJSON.GeometryType.Point ? geometryPointBuf : geometryLineBuf));
+    public void setGeometry(SunJSON.GeometryCollection geometry) {
+        geometry.geometryList().forEach(g -> SunJSON.putGeometry(g, g.type() == SunJSON.GeometryType.Point ? geometryPointBuf : geometryLineBuf));
         MovieDisplay.display();
     }
 

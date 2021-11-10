@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.layers.connect;
 
 import java.net.URI;
-import java.util.List;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
@@ -13,7 +12,7 @@ import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-public class LoadSunJSON implements Callable<List<SunJSON.Geometry>> {
+public class LoadSunJSON implements Callable<SunJSON.GeometryCollection> {
 
     public static Void submit(@Nonnull URI uri, ReceiverSunJSON receiver) {
         EventQueueCallbackExecutor.pool.submit(new LoadSunJSON(uri), new Callback(receiver));
@@ -27,11 +26,11 @@ public class LoadSunJSON implements Callable<List<SunJSON.Geometry>> {
     }
 
     @Override
-    public List<SunJSON.Geometry> call() throws Exception {
+    public SunJSON.GeometryCollection call() throws Exception {
         return SunJSON.parse(JSONUtils.get(uri));
     }
 
-    private static class Callback implements FutureCallback<List<SunJSON.Geometry>> {
+    private static class Callback implements FutureCallback<SunJSON.GeometryCollection> {
 
         private final ReceiverSunJSON receiver;
 
@@ -40,7 +39,7 @@ public class LoadSunJSON implements Callable<List<SunJSON.Geometry>> {
         }
 
         @Override
-        public void onSuccess(List<SunJSON.Geometry> result) {
+        public void onSuccess(SunJSON.GeometryCollection result) {
             receiver.setGeometry(result);
         }
 
