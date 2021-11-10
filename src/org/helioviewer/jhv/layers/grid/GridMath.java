@@ -55,13 +55,13 @@ public class GridMath {
         vexBuf.putVertex(0, AXIS_STOP, 0, 1, axisNorthColor);
         vexBuf.repeatVertex(Colors.Null);
 
-        axesLine.setData(gl, vexBuf);
+        axesLine.setVertex(gl, vexBuf);
     }
 
     public static void initEarthPoint(GL2 gl, GLSLShape earthPoint) {
         BufVertex vexBuf = new BufVertex(GLSLShape.stride);
         vexBuf.putVertex(0, 0, (float) EARTH_CIRCLE_RADIUS, earthPointSize, earthLineColor);
-        earthPoint.setData(gl, vexBuf);
+        earthPoint.setVertex(gl, vexBuf);
     }
 
     public static void initEarthCircles(GL2 gl, GLSLLine earthCircleLine) {
@@ -95,7 +95,7 @@ public class GridMath {
         }
         vexBuf.putVertex(rotv, Colors.Null);
 
-        earthCircleLine.setData(gl, vexBuf);
+        earthCircleLine.setVertex(gl, vexBuf);
     }
 
     public static void initRadialCircles(GL2 gl, GLSLLine radialCircleLine, GLSLLine radialThickLine, double unit, double step) {
@@ -143,8 +143,8 @@ public class GridMath {
             }
         }
 
-        radialCircleLine.setData(gl, circleBuf);
-        radialThickLine.setData(gl, thickBuf);
+        radialCircleLine.setVertex(gl, circleBuf);
+        radialThickLine.setVertex(gl, thickBuf);
     }
 
     public static void initFlatGrid(GL2 gl, GLSLLine flatLine, double aspect) {
@@ -180,7 +180,7 @@ public class GridMath {
             }
         }
 
-        flatLine.setData(gl, vexBuf);
+        flatLine.setVertex(gl, vexBuf);
     }
 
     public static void initGrid(GL2 gl, GLSLLine gridLine, double lonstepDegrees, double latstepDegrees) {
@@ -234,7 +234,7 @@ public class GridMath {
             }
         }
 
-        gridLine.setData(gl, vexBuf);
+        gridLine.setVertex(gl, vexBuf);
     }
 
 }

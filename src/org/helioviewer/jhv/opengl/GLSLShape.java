@@ -4,7 +4,7 @@ import java.nio.Buffer;
 
 import com.jogamp.opengl.GL2;
 
-public class GLSLShape extends VAO {
+public class GLSLShape extends VAO implements GLSLVertexReceiver {
 
     private static final int size0 = 4;
     private static final int size1 = 4;
@@ -16,7 +16,8 @@ public class GLSLShape extends VAO {
         super(2, _dynamic, new VAA[]{new VAA(0, size0, false, 0, 0, 0), new VAA(1, size1, true, 0, 0, 0)});
     }
 
-    public void setData(GL2 gl, BufVertex buf) {
+    @Override
+    public void setVertex(GL2 gl, BufVertex buf) {
         count = buf.getCount();
         if (count == 0)
             return;

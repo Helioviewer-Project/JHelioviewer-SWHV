@@ -112,10 +112,10 @@ class FOVInstrument extends DefaultMutableTreeNode implements JHVCell {
         renderer.setDirectPut();
         renderer.end3DRendering();
 
-        center.setData(gl, centerBuf);
+        center.setVertex(gl, centerBuf);
         center.renderPoints(gl, pixFactor);
 
-        fovLine.setData(gl, lineBuf);
+        fovLine.setVertex(gl, lineBuf);
         fovLine.render(gl, vp.aspect, FOVPlatform.LINEWIDTH_FOV);
     }
 

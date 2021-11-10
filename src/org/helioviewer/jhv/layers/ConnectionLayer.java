@@ -6,6 +6,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.File;
 import java.net.URI;
+import java.util.List;
 import java.util.function.BiFunction;
 
 import javax.annotation.Nullable;
@@ -24,11 +25,14 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.connect.LoadConnectivity;
 import org.helioviewer.jhv.layers.connect.LoadFootpoint;
 import org.helioviewer.jhv.layers.connect.LoadHCS;
+import org.helioviewer.jhv.layers.connect.LoadSunJSON;
 import org.helioviewer.jhv.layers.connect.OrthoScaleList;
 import org.helioviewer.jhv.layers.connect.ReceiverConnectivity;
 import org.helioviewer.jhv.layers.connect.ReceiverConnectivity.Connectivity;
 import org.helioviewer.jhv.layers.connect.ReceiverHCS;
 import org.helioviewer.jhv.layers.connect.ReceiverPositionMap;
+import org.helioviewer.jhv.layers.connect.ReceiverSunJSON;
+import org.helioviewer.jhv.layers.connect.SunJSON;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -42,7 +46,7 @@ import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivity, ReceiverHCS, ReceiverPositionMap {
+public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivity, ReceiverHCS, ReceiverPositionMap, ReceiverSunJSON {
 
     private static final double LINEWIDTH = 2 * GLSLLine.LINEWIDTH_BASIC;
     private static final float SIZE_POINT = 0.01f;
@@ -60,6 +64,11 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     private final byte[] footpointColor = Colors.White;
     private final GLSLLine footpointLine = new GLSLLine(true);
     private final BufVertex footpointBuf = new BufVertex(12 * GLSLLine.stride);
+
+    private final GLSLLine geometryLine = new GLSLLine(false);
+    private final BufVertex geometryLineBuf = new BufVertex(512 * GLSLLine.stride);
+    private final GLSLShape geometryPoint = new GLSLShape(false);
+    private final BufVertex geometryPointBuf = new BufVertex(64 * GLSLShape.stride);
 
     private final JPanel optionsPanel;
 
@@ -100,7 +109,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
         putConnectivity(q, vp, connectivity.FSW, connectivityBuf, fswColor);
         putConnectivity(q, vp, connectivity.M, connectivityBuf, mColor);
 
-        connectivityCenter.setData(gl, connectivityBuf);
+        connectivityCenter.setVertex(gl, connectivityBuf);
         connectivityCenter.renderPoints(gl, CameraHelper.getPixelFactor(camera, vp));
     }
 
@@ -141,7 +150,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
             GLHelper.drawVertex(q, vp, first, previous, hcsBuf, Colors.Null);
         }
 
-        hcsLine.setData(gl, hcsBuf);
+        hcsLine.setVertex(gl, hcsBuf);
         hcsLine.render(gl, vp.aspect, LINEWIDTH);
     }
 
@@ -169,7 +178,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
             Quat q = Display.getGridType().toGrid(viewpoint);
 
             AnnotateCross.drawCross(q, vp, v, footpointBuf, footpointColor);
-            footpointLine.setData(gl, footpointBuf);
+            footpointLine.setVertex(gl, footpointBuf);
             footpointLine.render(gl, vp.aspect, LINEWIDTH);
         }
     */
@@ -184,7 +193,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
         Quat q = Display.gridType.toGrid(viewpoint);
 
         AnnotateCross.drawCross(q, vp, v, footpointBuf, footpointColor);
-        footpointLine.setData(gl, footpointBuf);
+        footpointLine.setVertex(gl, footpointBuf);
         footpointLine.render(gl, vp.aspect, LINEWIDTH);
     }
 
@@ -193,6 +202,9 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
         connectivityCenter.init(gl);
         hcsLine.init(gl);
         footpointLine.init(gl);
+
+        geometryLine.dispose(gl);
+        geometryPoint.dispose(gl);
     }
 
     @Override
@@ -200,6 +212,9 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
         connectivityCenter.dispose(gl);
         hcsLine.dispose(gl);
         footpointLine.dispose(gl);
+
+        geometryLine.dispose(gl);
+        geometryPoint.dispose(gl);
     }
 
     @Override
@@ -256,7 +271,16 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
         MovieDisplay.display();
     }
 
+    @Override
+    public void setGeometry(List<SunJSON.Geometry> geometry) {
+        geometry.forEach(g -> SunJSON.putGeometry(g, g.type() == SunJSON.GeometryType.Point ? geometryPointBuf : geometryLineBuf));
+        MovieDisplay.display();
+    }
+
     private JPanel optionsPanel() {
+        JButton geometryBtn = new JButton("SunJSON");
+        geometryBtn.addActionListener(e -> load(LoadSunJSON::submit));
+
         JButton connectivityBtn = new JButton("Connectivity");
         connectivityBtn.addActionListener(e -> load(LoadConnectivity::submit));
 
@@ -274,10 +298,12 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
         c0.gridy = 0;
 
         c0.gridx = 0;
-        panel.add(connectivityBtn, c0);
+        panel.add(geometryBtn, c0);
         c0.gridx = 1;
-        panel.add(hcsBtn, c0);
+        panel.add(connectivityBtn, c0);
         c0.gridx = 2;
+        panel.add(hcsBtn, c0);
+        c0.gridx = 3;
         panel.add(footpointBtn, c0);
 
         return panel;

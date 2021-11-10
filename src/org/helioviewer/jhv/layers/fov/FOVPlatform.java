@@ -117,7 +117,7 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
         }
         vexBuf.putVertex(rotv, Colors.Null);
 
-        hemiLine.setData(gl, vexBuf);
+        hemiLine.setVertex(gl, vexBuf);
     }
 
     void init(GL2 gl) {

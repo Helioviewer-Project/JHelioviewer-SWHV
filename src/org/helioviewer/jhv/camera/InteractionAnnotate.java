@@ -69,7 +69,7 @@ class InteractionAnnotate implements InteractionType {
             newAnnotateable.draw(q, vp, false, annsBuf);
             newAnnotateable.drawTransformed(false, transBuf, centerBuf);
         }
-        annsLine.setData(gl, annsBuf);
+        annsLine.setVertex(gl, annsBuf);
         annsLine.render(gl, vp.aspect, LINEWIDTH);
 
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
@@ -77,9 +77,9 @@ class InteractionAnnotate implements InteractionType {
         Transform.pushView();
         Transform.rotateViewInverse(viewpoint.toQuat());
 
-        transLine.setData(gl, transBuf);
+        transLine.setVertex(gl, transBuf);
         transLine.render(gl, vp.aspect, LINEWIDTH);
-        center.setData(gl, centerBuf);
+        center.setVertex(gl, centerBuf);
         center.renderPoints(gl, pixFactor);
 
         Transform.popView();

@@ -4,7 +4,7 @@ import java.nio.Buffer;
 
 import com.jogamp.opengl.GL2;
 
-public class GLSLLine extends VAO {
+public class GLSLLine extends VAO implements GLSLVertexReceiver {
 
     public static final double LINEWIDTH_BASIC = 0.002;
 
@@ -20,7 +20,8 @@ public class GLSLLine extends VAO {
                 new VAA(2, size0, false, 0, 4 * size0, 1), new VAA(3, size1, true, 0, size1, 1)});
     }
 
-    public void setData(GL2 gl, BufVertex buf) {
+    @Override
+    public void setVertex(GL2 gl, BufVertex buf) {
         count = buf.getCount();
         if (count == 0)
             return;

@@ -347,14 +347,14 @@ public class SWEKLayer extends AbstractLayer implements TimeRangeListener, JHVEv
     }
 
     private void renderEvents(Viewport vp, GL2 gl) {
-        lineEvent.setData(gl, bufEvent);
-        lineThick.setData(gl, bufThick);
+        lineEvent.setVertex(gl, bufEvent);
+        lineThick.setVertex(gl, bufThick);
         lineEvent.render(gl, vp.aspect, LINEWIDTH);
         lineThick.render(gl, vp.aspect, LINEWIDTH_HIGHLIGHT);
     }
 
     private void renderIcons(GL2 gl, List<JHVRelatedEvents> evs) {
-        glslTexture.setData(gl, texBuf);
+        glslTexture.setCoord(gl, texBuf);
         int idx = 0;
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(controller.currentTime);
