@@ -18,15 +18,19 @@ public class SunJSON {
 
     public enum GeometryType {Point, Line, Ellipse}
 
-    public record Geometry(GeometryType type, JHVTime time, List<Vec3> coordinates, List<byte[]> colors,
-                           double thickness) {
+    public record Geometry(GeometryType type, List<Vec3> coordinates, List<byte[]> colors, double thickness) {
     }
 
-    static List<Geometry> parse(JSONObject jo) throws JSONException {
+    public record GeometryCollection(JHVTime time, List<Geometry> geometryList) {
+    }
+
+    static GeometryCollection parse(JSONObject jo) throws JSONException {
         List<Geometry> geometryList = new ArrayList<>();
+        JHVTime time = TimeUtils.J2000;
 
         if ("SunJSON".equals(jo.optString("type"))) {
-            JHVTime globalTime = jo.has("time") ? new JHVTime(jo.getString("time")) : TimeUtils.J2000;
+            if (jo.has("time"))
+                time = new JHVTime(jo.getString("time"));
 
             for (Object og : jo.getJSONArray("geometry")) {
                 if (og instanceof JSONObject go) {
@@ -86,14 +90,13 @@ public class SunJSON {
                     } else if (colorsSize > coordsSize)
                         colors.subList(coordsSize, colorsSize).clear();
 
-                    JHVTime time = go.has("time") ? new JHVTime(go.getString("time")) : globalTime;
                     double thickness = go.optDouble("thickness", 2 * GLSLLine.LINEWIDTH_BASIC);
-                    geometryList.add(new Geometry(type, time, coords, colors, thickness));
+                    geometryList.add(new Geometry(type, coords, colors, thickness));
                 }
             }
         }
 
-        return geometryList;
+        return new GeometryCollection(time, geometryList);
     }
 
     private static void toCartesian(Vec3 v, double r, double lon, double lat) {
