@@ -19,6 +19,10 @@ public class Colors {
         return new byte[]{(byte) r, (byte) g, (byte) b, (byte) 255};
     }
 
+    public static byte[] bytes(int r, int g, int b, int a) {
+        return new byte[]{(byte) (r * a / 255f), (byte) (g * a / 255f), (byte) (b * a / 255f), (byte) a};
+    }
+
     public static float[] floats(Color c, double alpha) {
         return new float[]{(float) (c.getRed() * alpha / 255), (float) (c.getGreen() * alpha / 255), (float) (c.getBlue() * alpha / 255), (float) alpha};
     }
