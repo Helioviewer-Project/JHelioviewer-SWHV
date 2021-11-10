@@ -22,7 +22,7 @@ public class SunJSON {
                            double thickness) {
     }
 
-    public List<Geometry> parse(JSONObject jo) throws JSONException {
+    static List<Geometry> parse(JSONObject jo) throws JSONException {
         List<Geometry> geometryList = new ArrayList<>();
 
         if ("SunJSON".equals(jo.optString("type"))) {
@@ -106,7 +106,7 @@ public class SunJSON {
 
     private static final int SUBDIVISIONS = 360;
 
-    public static void setGeometry(Geometry g, BufVertex buf) {
+    public static void putGeometry(Geometry g, BufVertex buf) {
         switch (g.type) {
             case Point -> {
                 Vec3 v = new Vec3();

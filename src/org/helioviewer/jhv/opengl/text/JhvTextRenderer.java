@@ -701,44 +701,44 @@ public class JhvTextRenderer {
 
     }
 
-    private interface VertexPut {
+    private interface CoordPut {
 
         void put(float x, float y, float z, float w, float c0, float c1);
 
     }
 
-    private class DirectPut implements VertexPut {
+    private class DirectPut implements CoordPut {
 
         @Override
         public void put(float x, float y, float z, float w, float c0, float c1) {
-            vexBuf.putCoord(x, y, z, w, c0, c1);
+            coordBuf.putCoord(x, y, z, w, c0, c1);
         }
 
     }
 
-    private class SurfacePut implements VertexPut {
+    private class SurfacePut implements CoordPut {
 
         private static final float epsilon = 0.125f; // should depend on triangle size
 
         @Override
         public void put(float x, float y, float z, float w, float c0, float c1) {
             float n = 1 - x * x - y * y;
-            vexBuf.putCoord(x, y, n > 0 ? epsilon + (float) Math.sqrt(n) : epsilon, w, c0, c1);
+            coordBuf.putCoord(x, y, n > 0 ? epsilon + (float) Math.sqrt(n) : epsilon, w, c0, c1);
         }
 
     }
 
-    private final VertexPut directPut = new DirectPut();
-    private final VertexPut surfacePut = new SurfacePut();
+    private final CoordPut directPut = new DirectPut();
+    private final CoordPut surfacePut = new SurfacePut();
 
-    private VertexPut vertexPut = directPut;
+    private CoordPut coordPut = directPut;
 
     public void setDirectPut() {
-        vertexPut = directPut;
+        coordPut = directPut;
     }
 
     public void setSurfacePut() {
-        vertexPut = surfacePut;
+        coordPut = surfacePut;
     }
 
     // Glyph-by-glyph rendering support
@@ -813,12 +813,12 @@ public class JhvTextRenderer {
             float tx2 = (texturex + width) / (float) renderer.getWidth();
             float ty2 = 1f - (texturey + height) / (float) renderer.getHeight();
 
-            vertexPut.put(x, y, z, 1, tx1, ty1); // A
-            vertexPut.put(x + (width * scaleFactor), y, z, 1, tx2, ty1); // B
-            vertexPut.put(x + (width * scaleFactor), y + (height * scaleFactor), z, 1, tx2, ty2); // C
-            vertexPut.put(x, y, z, 1, tx1, ty1); // A
-            vertexPut.put(x + (width * scaleFactor), y + (height * scaleFactor), z, 1, tx2, ty2); // C
-            vertexPut.put(x, y + (height * scaleFactor), z, 1, tx1, ty2); // D
+            coordPut.put(x, y, z, 1, tx1, ty1); // A
+            coordPut.put(x + (width * scaleFactor), y, z, 1, tx2, ty1); // B
+            coordPut.put(x + (width * scaleFactor), y + (height * scaleFactor), z, 1, tx2, ty2); // C
+            coordPut.put(x, y, z, 1, tx1, ty1); // A
+            coordPut.put(x + (width * scaleFactor), y + (height * scaleFactor), z, 1, tx2, ty2); // C
+            coordPut.put(x, y + (height * scaleFactor), z, 1, tx1, ty2); // D
 
             outstandingGlyphsVerticesPipeline += kVertsPerQuad;
             if (outstandingGlyphsVerticesPipeline >= kTotalBufferSizeVerts) {
@@ -943,7 +943,7 @@ public class JhvTextRenderer {
     private float[] textColor = Colors.WhiteFloat;
 
     private int outstandingGlyphsVerticesPipeline = 0;
-    private final BufCoord vexBuf = new BufCoord(kTotalBufferSizeVerts);
+    private final BufCoord coordBuf = new BufCoord(kTotalBufferSizeVerts);
 
     private void drawVertices() {
         if (outstandingGlyphsVerticesPipeline > 0) {
@@ -951,7 +951,7 @@ public class JhvTextRenderer {
             getBackingStore().bind(gl);
 
             glslTexture.init(gl);
-            glslTexture.setData(gl, vexBuf);
+            glslTexture.setCoord(gl, coordBuf);
             glslTexture.render(gl, GL2.GL_TRIANGLES, textColor, 0, outstandingGlyphsVerticesPipeline);
             outstandingGlyphsVerticesPipeline = 0;
         }

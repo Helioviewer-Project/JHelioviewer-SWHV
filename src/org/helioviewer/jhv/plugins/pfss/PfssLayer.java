@@ -148,7 +148,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener, TimeRangeL
             lastRadius = radius;
 
             pfssLine.calculatePositions(data, detail, fixedColor, radius, lineBuf);
-            glslLine.setData(gl, lineBuf);
+            glslLine.setVertex(gl, lineBuf);
 
             pfssTime = data.dateObs;
             JHVFrame.getLayers().fireTimeUpdated(this);

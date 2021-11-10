@@ -26,7 +26,7 @@ public class GLHelper {
             vexBuf.putVertex((float) (x + Math.sin(t) * r), (float) (y + Math.cos(t) * r), 0, 1, color);
             vexBuf.putVertex((float) x, (float) y, 0, 1, color);
         }
-        circle.setData(gl, vexBuf);
+        circle.setVertex(gl, vexBuf);
     }
 
     public static void initRectangleFront(GL2 gl, GLSLShape rectangle, double x0, double y0, double w, double h, byte[] color) {
@@ -39,7 +39,7 @@ public class GLHelper {
         vexBuf.putVertex((float) x0, y1, 0, 1, color);
         vexBuf.putVertex(x1, y1, 0, 1, color);
 
-        rectangle.setData(gl, vexBuf);
+        rectangle.setVertex(gl, vexBuf);
     }
 
     public static Point GL2AWTPoint(int x, int y) {
