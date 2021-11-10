@@ -271,8 +271,8 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     }
 
     @Override
-    public void setGeometry(SunJSON.GeometryCollection geometry) {
-        geometry.geometryList().forEach(g -> SunJSON.putGeometry(g, g.type() == SunJSON.GeometryType.Point ? geometryPointBuf : geometryLineBuf));
+    public void setGeometry(SunJSON.GeometryBuffer geometry) {
+        // geometry.geometryList().forEach(g -> SunJSON.putGeometry(g, g.type() == SunJSON.GeometryType.Point ? geometryPointBuf : geometryLineBuf));
         MovieDisplay.display();
     }
 
