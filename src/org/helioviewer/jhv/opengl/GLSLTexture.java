@@ -26,7 +26,7 @@ public class GLSLTexture extends VAO1 {
         buf.clear();
     }
 
-    public void render(GL2 gl, int mode, float[] color, int first, int toDraw) {
+    public void renderTexture(GL2 gl, int mode, float[] color, int first, int toDraw) {
         if (count == 0 || toDraw > count)
             return;
 
