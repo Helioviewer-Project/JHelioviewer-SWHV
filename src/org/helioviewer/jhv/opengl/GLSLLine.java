@@ -35,7 +35,7 @@ public class GLSLLine extends VAO implements GLSLVertexReceiver {
         count--;
     }
 
-    public void render(GL2 gl, double aspect, double thickness) {
+    public void renderLine(GL2 gl, double aspect, double thickness) {
         if (count == 0)
             return;
 

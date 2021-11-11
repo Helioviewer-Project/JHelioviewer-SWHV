@@ -144,7 +144,7 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
         Transform.pushView();
         Transform.rotateViewInverse(obsPosition.toQuat());
 
-        hemiLine.render(gl, vp.aspect, LINEWIDTH_FOV);
+        hemiLine.renderLine(gl, vp.aspect, LINEWIDTH_FOV);
         double[] rot;
         if (isSOLO && null != (rot = Spice.getRotation("SOLO_EQUAT_NORM", "SOLO_ORBIT_NORM", time))) { // SOLO pointing normal to orbit
             Transform.rotateViewInverse(Quat.createRotation(rot[2], Vec3.ZAxis));

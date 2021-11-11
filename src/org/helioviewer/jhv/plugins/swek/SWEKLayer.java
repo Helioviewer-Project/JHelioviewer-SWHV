@@ -349,8 +349,8 @@ public class SWEKLayer extends AbstractLayer implements TimeRangeListener, JHVEv
     private void renderEvents(Viewport vp, GL2 gl) {
         lineEvent.setVertex(gl, bufEvent);
         lineThick.setVertex(gl, bufThick);
-        lineEvent.render(gl, vp.aspect, LINEWIDTH);
-        lineThick.render(gl, vp.aspect, LINEWIDTH_HIGHLIGHT);
+        lineEvent.renderLine(gl, vp.aspect, LINEWIDTH);
+        lineThick.renderLine(gl, vp.aspect, LINEWIDTH_HIGHLIGHT);
     }
 
     private void renderIcons(GL2 gl, List<JHVRelatedEvents> evs) {

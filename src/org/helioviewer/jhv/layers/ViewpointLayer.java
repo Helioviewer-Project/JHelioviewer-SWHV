@@ -310,7 +310,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
         }
 
         orbits.setVertex(gl, orbitBuf);
-        orbits.render(gl, vp.aspect, LINEWIDTH_ORBIT);
+        orbits.renderLine(gl, vp.aspect, LINEWIDTH_ORBIT);
 
         planets.setVertex(gl, planetBuf);
         planets.renderPoints(gl, pointFactor);
@@ -356,7 +356,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
         }
 
         spiral.setVertex(gl, spiralBuf);
-        spiral.render(gl, vp.aspect, LINEWIDTH_SPIRAL);
+        spiral.renderLine(gl, vp.aspect, LINEWIDTH_SPIRAL);
     }
 
 }

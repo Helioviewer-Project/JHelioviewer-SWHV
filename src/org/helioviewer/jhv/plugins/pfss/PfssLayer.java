@@ -153,7 +153,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener, TimeRangeL
             pfssTime = data.dateObs;
             JHVFrame.getLayers().fireTimeUpdated(this);
         }
-        glslLine.render(gl, vp.aspect, LINEWIDTH);
+        glslLine.renderLine(gl, vp.aspect, LINEWIDTH);
     }
 
 }
