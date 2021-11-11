@@ -43,10 +43,10 @@ public class SunJSON {
         public void render(GL2 gl, GLSLLine lines, GLSLShape points, double aspect, double factor) {
             for (GeometryBuffer buf : list) {
                 if (buf.g.type == GeometryType.Point) {
-                    points.setVertex(gl, buf.vexBuf.duplicate()); // TBD
+                    points.setVertexRepeatable(gl, buf.vexBuf);
                     points.renderPoints(gl, factor);
                 } else {
-                    lines.setVertex(gl, buf.vexBuf.duplicate()); // TBD
+                    lines.setVertexRepeatable(gl, buf.vexBuf);
                     lines.render(gl, aspect, buf.g.thickness);
                 }
             }
