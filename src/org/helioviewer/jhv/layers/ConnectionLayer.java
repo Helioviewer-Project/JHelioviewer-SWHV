@@ -151,7 +151,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
         }
 
         hcsLine.setVertex(gl, hcsBuf);
-        hcsLine.render(gl, vp.aspect, LINEWIDTH);
+        hcsLine.renderLine(gl, vp.aspect, LINEWIDTH);
     }
 
     private static Vec3 interpolate(long t, PositionCartesian prev, PositionCartesian next) {
@@ -194,7 +194,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
 
         AnnotateCross.drawCross(q, vp, v, footpointBuf, footpointColor);
         footpointLine.setVertex(gl, footpointBuf);
-        footpointLine.render(gl, vp.aspect, LINEWIDTH);
+        footpointLine.renderLine(gl, vp.aspect, LINEWIDTH);
     }
 
     @Override
