@@ -11,6 +11,9 @@ uniform float thickness;
 
 uniform mat4 ModelViewProjectionMatrix;
 
+const float[] dir = float[](1, -1);
+vec4[2] pos, col;
+
 // https://forums.developer.apple.com/thread/86098
 void main(void) {
     if (Vertex == NextVertex) {
@@ -25,15 +28,9 @@ void main(void) {
     vec4 d = normalize(next - curr);
     vec4 off = thickness * vec4(-d.y * iaspect, d.x, 0, 0);
 
-    float dir[2];
-    dir[0] = 1;
-    dir[1] = -1;
-
-    vec4 pos[2];
     pos[0] = curr;
     pos[1] = next;
 
-    vec4 col[2];
     col[0] = Color;
     col[1] = NextColor;
 
