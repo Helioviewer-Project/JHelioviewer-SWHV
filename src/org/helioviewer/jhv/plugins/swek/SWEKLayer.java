@@ -361,7 +361,7 @@ public class SWEKLayer extends AbstractLayer implements TimeRangeListener, JHVEv
             if (Display.mode == Display.ProjectionMode.Latitudinal && evt.isCactus())
                 continue;
             bindTexture(gl, evtr.getSupplier().getGroup());
-            glslTexture.render(gl, GL2.GL_TRIANGLE_STRIP, Colors.floats(evtr.getColor(), ICON_ALPHA), idx, 4);
+            glslTexture.renderTexture(gl, GL2.GL_TRIANGLE_STRIP, Colors.floats(evtr.getColor(), ICON_ALPHA), idx, 4);
             idx += 4;
         }
     }

@@ -952,7 +952,7 @@ public class JhvTextRenderer {
 
             glslTexture.init(gl);
             glslTexture.setCoord(gl, coordBuf);
-            glslTexture.render(gl, GL2.GL_TRIANGLES, textColor, 0, outstandingGlyphsVerticesPipeline);
+            glslTexture.renderTexture(gl, GL2.GL_TRIANGLES, textColor, 0, outstandingGlyphsVerticesPipeline);
             outstandingGlyphsVerticesPipeline = 0;
         }
     }
