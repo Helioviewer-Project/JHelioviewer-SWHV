@@ -91,17 +91,4 @@ public class BufVertex {
         return colorBuffer.limit(lengthColor);
     }
 
-    private BufVertex() {
-    }
-
-    public BufVertex duplicate() { // TBD
-        BufVertex d = new BufVertex();
-        d.lengthVertx = lengthVertx;
-        d.lengthColor = lengthColor;
-        d.count = count;
-        d.vertxBuffer = vertxBuffer.duplicate();
-        d.colorBuffer = colorBuffer.duplicate();
-        return d;
-    }
-
 }
