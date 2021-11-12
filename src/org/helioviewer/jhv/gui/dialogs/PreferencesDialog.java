@@ -213,12 +213,12 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         c.gridx = 1;
         c.gridy = 7;
         JComboBox<VideoFormat> comboVideo = new JComboBox<>(VideoFormat.values());
-        VideoFormat videoMode = VideoFormat.H264;
+        VideoFormat videoFormat = VideoFormat.H264;
         try {
-            videoMode = VideoFormat.valueOf(Settings.getProperty("video.format"));
+            videoFormat = VideoFormat.valueOf(Settings.getProperty("video.format"));
         } catch (Exception ignore) {
         }
-        comboVideo.setSelectedItem(videoMode);
+        comboVideo.setSelectedItem(videoFormat);
         comboVideo.addActionListener(e -> Settings.setProperty("video.format", ((VideoFormat) Objects.requireNonNull(comboVideo.getSelectedItem())).name()));
         settings.add(comboVideo, c);
 
