@@ -147,7 +147,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
     @Override
     public void mouseClicked(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON3)
-            ClipBoardCopier.getSingletonInstance().setString(getText());
+            ClipBoardCopier.getSingletonInstance().setString(camera.getViewpoint().time.toString() + getText());
     }
 
 }
