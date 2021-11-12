@@ -3,7 +3,7 @@
   <directoryPresets config="../bin/JHelioviewer.jar" />
   <application name="JHelioviewer" applicationId="6448-7333-6138-9110" mediaDir="./builds" compression="9" lzmaCompression="true" shortName="JHelioviewer" publisher="ESA JHelioviewer Team" publisherWeb="http://www.jhelioviewer.org" version="4.1.2" allPathsRelative="true" macVolumeId="7ed177551bd348bc" javaMinVersion="17" javaMaxVersion="17" jdkMode="jdk">
     <codeSigning macEnabled="true" macPkcs12File="~/Certificates.p12" macNotarize="true" appleId="bogdan@nicula.net" />
-    <jreBundles jdkProviderId="Adoptium" release="17/latest">
+    <jreBundles jdkProviderId="AdoptOpenJDK" release="17/latest">
       <modules>
         <module name="java.desktop" />
         <module name="java.sql" />
