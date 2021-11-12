@@ -255,7 +255,7 @@ public class HelioviewerMetaData extends BaseMetaData {
         return switch (timeMode) {
             case Observer -> dateObs;
             case Sun -> new JHVTime((long) (dateObs.milli - distObs * Sun.RadiusMilli + .5));
-            case Earth -> new JHVTime((long) (dateObs.milli - (distObs - distEarth) * Sun.RadiusMilli + .5));
+            case Earth -> new JHVTime((long) (dateObs.milli - (distObs - distEarth) * Sun.RadiusMilli + .5)); // shortcut, avoids inconsistent results for Earth based observers
         };
     }
 

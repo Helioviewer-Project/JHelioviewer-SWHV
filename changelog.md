@@ -3,6 +3,10 @@
 
 ## JHelioviewer 4.1.2 (pending)
 
+- Add option to adjust the image timestamp to be
+    - observed time minus light time from Sun center
+    - observed time minus light time from Sun center plus light time to Earth
+
 ## JHelioviewer 4.1.1 (2021-10-30)
 
 - Use SOLO heliospheric reference frames
