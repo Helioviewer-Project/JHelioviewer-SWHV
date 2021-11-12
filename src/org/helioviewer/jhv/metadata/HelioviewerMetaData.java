@@ -251,27 +251,32 @@ public class HelioviewerMetaData extends BaseMetaData {
         return new JHVTime(observedDate);
     }
 
-    private Position retrievePosition(MetaDataContainer m, JHVTime dateObs) {
-        Position p = Sun.getEarth(dateObs);
-        if (observatory.equals("SDO")) // slightly wrong position metadata
-            return p;
-
-        double distance = m.getDouble("DSUN_OBS").map(d -> d / Sun.RadiusMeter).orElse(p.distance);
-        if (observatory.equals("SOHO"))
-            distance *= Sun.L1Factor;
-
-        double lon = m.getDouble("HGLN_OBS").map(v -> p.lon - Math.toRadians(v))
-                .orElseGet(() -> m.getDouble("CRLN_OBS").map(v -> -Math.toRadians(v)).orElse(p.lon));
-        double lat = m.getDouble("HGLT_OBS").map(Math::toRadians)
-                .orElseGet(() -> m.getDouble("CRLT_OBS").map(Math::toRadians).orElse(p.lat));
-
-        JHVTime time = switch (timeMode) {
+    private static JHVTime adjustTime(JHVTime dateObs, double distObs, double distEarth) {
+        return switch (timeMode) {
             case Observer -> dateObs;
-            case Sun -> dateObs;
-            case Earth -> dateObs;
+            case Sun -> new JHVTime((long) (dateObs.milli - distObs * Sun.RadiusMilli + .5));
+            case Earth -> new JHVTime((long) (dateObs.milli - (distObs - distEarth) * Sun.RadiusMilli + .5));
         };
+    }
 
-        return new Position(time, distance, lon, lat);
+    private Position retrievePosition(MetaDataContainer m, JHVTime dateObs) {
+        Position earth = Sun.getEarth(dateObs);
+        if (observatory.equals("SDO")) { // SDO has slightly wrong position metadata, place it at Earth
+            JHVTime time = adjustTime(dateObs, earth.distance, earth.distance);
+            return new Position(time, earth.distance, earth.lon, earth.lat);
+        }
+
+        double distObs = m.getDouble("DSUN_OBS").map(d -> d / Sun.RadiusMeter).orElse(earth.distance);
+        if (observatory.equals("SOHO"))
+            distObs *= Sun.L1Factor;
+
+        double lon = m.getDouble("HGLN_OBS").map(v -> earth.lon - Math.toRadians(v))
+                .orElseGet(() -> m.getDouble("CRLN_OBS").map(v -> -Math.toRadians(v)).orElse(earth.lon));
+        double lat = m.getDouble("HGLT_OBS").map(Math::toRadians)
+                .orElseGet(() -> m.getDouble("CRLT_OBS").map(Math::toRadians).orElse(earth.lat));
+
+        JHVTime time = adjustTime(dateObs, distObs, earth.distance);
+        return new Position(time, distObs, lon, lat);
     }
 
     private void retrievePixelParameters(MetaDataContainer m) {
