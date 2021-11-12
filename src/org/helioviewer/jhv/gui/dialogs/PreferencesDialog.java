@@ -15,6 +15,7 @@ import java.util.Objects;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -23,6 +24,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -41,6 +43,7 @@ import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.plugins.PluginManager;
+import org.helioviewer.jhv.time.TimeMode;
 import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCacheManager;
 
 import com.jidesoft.dialog.ButtonPanel;
@@ -179,24 +182,48 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         highResolution.addActionListener(e -> Settings.setProperty("display.highResolution", Boolean.toString(highResolution.isSelected())));
         settings.add(highResolution, c);
 
-        c.gridx = 0;
-        c.gridy = 6;
-        settings.add(new JLabel("Record video as:", JLabel.RIGHT), c);
+        TimeMode timeMode = TimeMode.Observer;
+        try {
+            timeMode = TimeMode.valueOf(Settings.getProperty("display.time"));
+        } catch (Exception ignore) {
+        }
+
+        JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+        timePanel.add(new JLabel("Use time at", JLabel.RIGHT));
+        ButtonGroup timeModeGroup = new ButtonGroup();
+        for (TimeMode mode : TimeMode.values()) {
+            JRadioButton radio = new JRadioButton(mode.toString(), mode == timeMode);
+            radio.addItemListener(e -> {
+                if (radio.isSelected()) {
+                    Settings.setProperty("display.time", mode.toString());
+                }
+            });
+            timePanel.add(radio);
+            timeModeGroup.add(radio);
+        }
 
         c.gridx = 1;
         c.gridy = 6;
+        settings.add(timePanel, c);
+
+        c.gridx = 0;
+        c.gridy = 7;
+        settings.add(new JLabel("Record video as:", JLabel.RIGHT), c);
+
+        c.gridx = 1;
+        c.gridy = 7;
         JComboBox<VideoFormat> comboVideo = new JComboBox<>(VideoFormat.values());
-        VideoFormat selected = VideoFormat.H264;
+        VideoFormat videoMode = VideoFormat.H264;
         try {
-            selected = VideoFormat.valueOf(Settings.getProperty("video.format"));
+            videoMode = VideoFormat.valueOf(Settings.getProperty("video.format"));
         } catch (Exception ignore) {
         }
-        comboVideo.setSelectedItem(selected);
+        comboVideo.setSelectedItem(videoMode);
         comboVideo.addActionListener(e -> Settings.setProperty("video.format", ((VideoFormat) Objects.requireNonNull(comboVideo.getSelectedItem())).name()));
         settings.add(comboVideo, c);
 
         c.gridx = 0;
-        c.gridy = 7;
+        c.gridy = 8;
         settings.add(new JLabel("Plugins:", JLabel.RIGHT), c);
 
         c.gridx = 1;

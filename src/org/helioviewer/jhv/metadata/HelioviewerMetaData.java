@@ -14,11 +14,23 @@ import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVTime;
+import org.helioviewer.jhv.time.TimeMode;
 
 public class HelioviewerMetaData extends BaseMetaData {
 
     private static final boolean normalizeAIA = Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA"));
     private static final boolean normalizeRadius = Boolean.parseBoolean(Settings.getProperty("display.normalize"));
+
+    private static final TimeMode timeMode;
+
+    static {
+        TimeMode setTimeMode = TimeMode.Observer;
+        try {
+            setTimeMode = TimeMode.valueOf(Settings.getProperty("display.time"));
+        } catch (Exception ignore) {
+        }
+        timeMode = setTimeMode;
+    }
 
     private static final Set<String> SECCHIDetectors = Set.of("EUVI", "COR1", "COR2", "HI1", "HI2");
     private static final Set<String> CROTABlockList = Set.of("LASCO");
@@ -253,7 +265,13 @@ public class HelioviewerMetaData extends BaseMetaData {
         double lat = m.getDouble("HGLT_OBS").map(Math::toRadians)
                 .orElseGet(() -> m.getDouble("CRLT_OBS").map(Math::toRadians).orElse(p.lat));
 
-        return new Position(dateObs, distance, lon, lat);
+        JHVTime time = switch (timeMode) {
+            case Observer -> dateObs;
+            case Sun -> dateObs;
+            case Earth -> dateObs;
+        };
+
+        return new Position(time, distance, lon, lat);
     }
 
     private void retrievePixelParameters(MetaDataContainer m) {
