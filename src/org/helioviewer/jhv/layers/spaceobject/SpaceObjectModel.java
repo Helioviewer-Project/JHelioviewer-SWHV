@@ -17,7 +17,7 @@ class SpaceObjectModel extends AbstractTableModel {
     }
 
     List<SpaceObjectElement> getSelected() {
-        ArrayList<SpaceObjectElement> selected = new ArrayList<>();
+        List<SpaceObjectElement> selected = new ArrayList<>();
         for (SpaceObjectElement element : elements)
             if (element.isSelected())
                 selected.add(element);

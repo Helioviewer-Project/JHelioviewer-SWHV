@@ -36,7 +36,7 @@ public class Band extends AbstractTimelineLayer {
 
     private final YAxis yAxis;
     private final int[] warnLevels;
-    private final ArrayList<GraphPolyline> graphPolylines = new ArrayList<>();
+    private final List<GraphPolyline> graphPolylines = new ArrayList<>();
 
     private Color graphColor = BandColors.getNextColor();
     private PropagationModel propagationModel = new PropagationModelRadial(0);
