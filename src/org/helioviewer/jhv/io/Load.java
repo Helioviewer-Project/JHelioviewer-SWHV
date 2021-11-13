@@ -12,7 +12,7 @@ public interface Load {
 
     void get(@Nonnull URI uri);
 
-    Load.Image image = new Image();
+    Load image = new Image();
     Load fits = new FITS();
     Load.Request request = new Request();
     Load state = new State();

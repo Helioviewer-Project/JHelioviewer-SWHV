@@ -34,7 +34,7 @@ public class GridLabel {
         double horizontalAdjustment = textScale / 2.;
         double verticalAdjustment = textScale / 3.;
 
-        ArrayList<GridLabel> labels = new ArrayList<>();
+        List<GridLabel> labels = new ArrayList<>();
         for (double phi = 0; phi < 360; phi += radialStep) {
             String txt = formatter1.format(phi);
             double angle = -phi * Math.PI / 180. + delta;
@@ -51,7 +51,7 @@ public class GridLabel {
         double horizontalAdjustment = textScale / 2.;
         double verticalAdjustment = textScale / 3.;
 
-        ArrayList<GridLabel> labels = new ArrayList<>();
+        List<GridLabel> labels = new ArrayList<>();
         for (double phi = 0; phi <= 90; phi += latStep) {
             String txt = formatter1.format(phi);
             double angle = (90 - phi) * Math.PI / 180.;
@@ -82,7 +82,7 @@ public class GridLabel {
     public static List<GridLabel> makeLonLabels(GridType gridType, double lonStep) {
         double size = Sun.Radius * 1.05;
 
-        ArrayList<GridLabel> labels = new ArrayList<>();
+        List<GridLabel> labels = new ArrayList<>();
         for (double theta = 0; theta <= 180.; theta += lonStep) {
             String txt = formatter1.format(theta);
             double angle = (90 - theta) * Math.PI / 180.;

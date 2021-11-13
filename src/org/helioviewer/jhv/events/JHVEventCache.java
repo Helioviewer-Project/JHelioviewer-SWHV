@@ -24,7 +24,7 @@ public class JHVEventCache {
     private static final HashMap<Integer, JHVRelatedEvents> relEvents = new HashMap<>();
     private static final HashSet<SWEKSupplier> activeEventTypes = new HashSet<>();
     private static final HashMap<SWEKSupplier, RequestCache> downloadedCache = new HashMap<>();
-    private static final ArrayList<Pair<Integer, Integer>> assocs = new ArrayList<>();
+    private static final List<Pair<Integer, Integer>> assocs = new ArrayList<>();
 
     private static JHVRelatedEvents lastHighlighted = null;
 
@@ -135,7 +135,7 @@ public class JHVEventCache {
             return Collections.emptyList();
         }
 
-        ArrayList<JHVRelatedEvents> result = new ArrayList<>();
+        List<JHVRelatedEvents> result = new ArrayList<>();
         for (SWEKSupplier evt : activeEventTypes) {
             SortedMap<Interval, JHVRelatedEvents> sortedEvents = events.get(evt);
             if (sortedEvents != null) {
