@@ -35,7 +35,7 @@ class DropHandler extends TransferHandler {
             if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                 List<?> objects = (List<?>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 
-                ArrayList<URI> imageUris = new ArrayList<>(objects.size());
+                List<URI> imageUris = new ArrayList<>(objects.size());
                 ArrayList<URI> requestUris = new ArrayList<>(objects.size());
                 for (Object o : objects) {
                     if (o instanceof File f) {

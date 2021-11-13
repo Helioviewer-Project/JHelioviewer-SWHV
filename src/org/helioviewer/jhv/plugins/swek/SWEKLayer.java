@@ -336,7 +336,7 @@ public class SWEKLayer extends AbstractLayer implements TimeRangeListener, JHVEv
     private static final int MOUSE_OFFSET_Y = 25;
 
     private void drawText(Viewport vp, JHVRelatedEvents mouseOverJHVEvent, int x, int y) {
-        ArrayList<String> txts = new ArrayList<>();
+        List<String> txts = new ArrayList<>();
         for (JHVEventParameter p : mouseOverJHVEvent.getClosestTo(controller.currentTime).getSimpleVisibleEventParameters()) {
             String name = p.getParameterName();
             if (name != "event_description" && name != "event_title") { // interned

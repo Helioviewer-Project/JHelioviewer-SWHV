@@ -17,7 +17,7 @@ class SWEKData {
         if (events.isEmpty())
             return Collections.emptyList();
 
-        ArrayList<JHVRelatedEvents> activeEvents = new ArrayList<>();
+        List<JHVRelatedEvents> activeEvents = new ArrayList<>();
         for (JHVRelatedEvents evr : events) {
             if (evr.getStart() <= timestamp && timestamp <= evr.getEnd()) {
                 activeEvents.add(evr);

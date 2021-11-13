@@ -363,7 +363,7 @@ public class EventDatabase {
 
     private static List<JHVEvent> createUniqueList(List<JHVEvent> events) {
         HashSet<Integer> ids = new HashSet<>();
-        ArrayList<JHVEvent> uniqueEvents = new ArrayList<>();
+        List<JHVEvent> uniqueEvents = new ArrayList<>();
         for (JHVEvent ev : events) {
             int id = ev.getUniqueID();
             if (!ids.contains(id)) {
@@ -381,8 +381,8 @@ public class EventDatabase {
     // Given an event id and its type, return all related events. If similartype is true, return only related events having the same type.
     private static List<JHVEvent> _getOtherRelations(int id, SWEKSupplier jhvEventType, boolean similartype, boolean full, boolean is_dbthread) throws SQLException {
         SWEKGroup group = jhvEventType.getGroup();
-        ArrayList<JHVEvent> nEvents = new ArrayList<>();
-        ArrayList<JsonEvent> jsonEvents = new ArrayList<>();
+        List<JHVEvent> nEvents = new ArrayList<>();
+        List<JsonEvent> jsonEvents = new ArrayList<>();
 
         for (SWEKRelatedEvents re : SWEKGroup.getSWEKRelatedEvents()) {
             if (re.getGroup() == group) {
@@ -700,7 +700,7 @@ public class EventDatabase {
             }
 
             String query = "SELECT distinct events.id, events.start, events.end, events.data, event_type.supplier FROM events LEFT JOIN event_type ON events.type_id = event_type.id WHERE events.id IN ( " + idList + ") AND events.id != " + event_id;
-            ArrayList<JsonEvent> ret = new ArrayList<>();
+            List<JsonEvent> ret = new ArrayList<>();
             try (Statement statement = pstatement.getConnection().createStatement();
                  ResultSet rs = statement.executeQuery(query)) {
                 while (rs.next()) {

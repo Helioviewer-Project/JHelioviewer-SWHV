@@ -198,7 +198,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
     }
 
     private static void drawText(Rectangle graphArea, Graphics2D g, JHVRelatedEvents event, int y, int mouseX) {
-        ArrayList<String> txts = new ArrayList<>();
+        List<String> txts = new ArrayList<>();
         int width = 1;
         long ts = DrawController.selectedAxis.pixel2value(graphArea.x, graphArea.width, mouseX);
         for (JHVEventParameter p : event.getClosestTo(ts).getSimpleVisibleEventParameters()) {

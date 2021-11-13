@@ -26,7 +26,7 @@ public class ClipBoardCopier implements ClipboardOwner {
 
     // Set the content of the clipboard
     public void setString(String data) {
-        StringSelection stringSelection = new StringSelection(data);
+        Transferable stringSelection = new StringSelection(data);
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, this);
     }
 

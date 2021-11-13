@@ -28,7 +28,7 @@ public class ComesepHandler extends SWEKHandler {
         try {
             JSONArray results = eventJSON.getJSONArray("results");
             int len = results.length();
-            ArrayList<EventDatabase.Event2Db> event2db_list = new ArrayList<>(len);
+            List<EventDatabase.Event2Db> event2dbList = new ArrayList<>(len);
             for (int i = 0; i < len; i++) {
                 JSONObject result = results.getJSONObject(i);
 
@@ -47,10 +47,10 @@ public class ComesepHandler extends SWEKHandler {
                 long archiv = start;
                 String uid = result.getString("alertid");
                 try (ByteArrayOutputStream baos = JSONUtils.compressJSON(result)) {
-                    event2db_list.add(new EventDatabase.Event2Db(baos.toByteArray(), start, end, archiv, uid, new ArrayList<>()));
+                    event2dbList.add(new EventDatabase.Event2Db(baos.toByteArray(), start, end, archiv, uid, new ArrayList<>()));
                 }
             }
-            EventDatabase.dump_event2db(event2db_list, supplier);
+            EventDatabase.dump_event2db(event2dbList, supplier);
         } catch (Exception e) {
             return false;
         }
