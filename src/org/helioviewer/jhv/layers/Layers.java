@@ -271,10 +271,7 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeSelec
     private static Layers instance;
 
     public static Layers getInstance() {
-        if (instance == null) {
-            instance = new Layers();
-        }
-        return instance;
+        return instance == null ? instance = new Layers() : instance;
     }
 
 }
