@@ -8,7 +8,7 @@ import org.json.JSONObject;
 
 public class PluginManager {
 
-    private static final ArrayList<Plugin> plugins = new ArrayList<>();
+    private static final List<Plugin> plugins = new ArrayList<>();
 
     public static List<Plugin> getPlugins() {
         return Collections.unmodifiableList(plugins);

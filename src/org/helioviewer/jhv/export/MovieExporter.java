@@ -85,7 +85,7 @@ class MovieExporter {
                 "-movflags", "+faststart",
                 "-y", outPath
         );
-        ArrayList<String> command = new ArrayList<>(ffmpeg);
+        List<String> command = new ArrayList<>(ffmpeg);
         command.addAll(input);
         command.addAll(format.settings);
         command.addAll(output);

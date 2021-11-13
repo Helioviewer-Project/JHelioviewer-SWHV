@@ -22,7 +22,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
     private static final ArrayList<JHVEventHighlightListener> listeners = new ArrayList<>();
 
     private final ArrayList<JHVEvent> events = new ArrayList<>();
-    private final ArrayList<Pair<Integer, Integer>> associations = new ArrayList<>();
+    private final List<Pair<Integer, Integer>> associations = new ArrayList<>();
     private final SWEKSupplier supplier;
     private final Color color;
 
@@ -126,7 +126,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
     }
 
     public List<JHVEvent> getNextEvents(JHVEvent event) {
-        ArrayList<JHVEvent> nEvents = new ArrayList<>();
+        List<JHVEvent> nEvents = new ArrayList<>();
         for (Pair<Integer, Integer> assoc : associations) {
             if (assoc.left() == event.getUniqueID()) {
                 JHVEvent newEvt = findEvent(assoc.right());
@@ -139,7 +139,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
     }
 
     public List<JHVEvent> getPreviousEvents(JHVEvent event) {
-        ArrayList<JHVEvent> nEvents = new ArrayList<>();
+        List<JHVEvent> nEvents = new ArrayList<>();
         for (Pair<Integer, Integer> assoc : associations) {
             if (assoc.right() == event.getUniqueID()) {
                 JHVEvent newEvt = findEvent(assoc.left());

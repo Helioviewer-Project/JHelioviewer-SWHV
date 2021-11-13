@@ -283,7 +283,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
             };
 
             JPasswordField passField = new JPasswordField();
-            DefaultCellEditor passEditor = new DefaultCellEditor(passField);
+            TableCellEditor passEditor = new DefaultCellEditor(passField);
 
             grid = new JTable(model) {
                 @Override

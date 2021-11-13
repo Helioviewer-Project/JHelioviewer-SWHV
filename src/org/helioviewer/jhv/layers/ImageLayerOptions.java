@@ -17,13 +17,13 @@ class ImageLayerOptions extends JPanel {
 
     ImageLayerOptions(ImageLayer layer) {
         runningDifferencePanel = new RunningDifferencePanel(layer);
-        OpacityPanel opacityPanel = new OpacityPanel(layer);
-        BlendPanel blendPanel = new BlendPanel(layer);
-        ChannelMixerPanel channelMixerPanel = new ChannelMixerPanel(layer);
+        FilterDetails opacityPanel = new OpacityPanel(layer);
+        FilterDetails blendPanel = new BlendPanel(layer);
+        FilterDetails channelMixerPanel = new ChannelMixerPanel(layer);
         lutPanel = new LUTPanel(layer);
-        SlitPanel slitPanel = new SlitPanel(layer);
-        LevelsPanel levelsPanel = new LevelsPanel(layer);
-        SharpenPanel sharpenPanel = new SharpenPanel(layer);
+        FilterDetails slitPanel = new SlitPanel(layer);
+        FilterDetails levelsPanel = new LevelsPanel(layer);
+        FilterDetails sharpenPanel = new SharpenPanel(layer);
 
         setLayout(new GridBagLayout());
         setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
