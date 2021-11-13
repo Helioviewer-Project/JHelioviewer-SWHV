@@ -44,10 +44,7 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
     private static ObservationDialog instance;
 
     public static ObservationDialog getInstance() {
-        if (instance == null) {
-            instance = new ObservationDialog(JHVFrame.getFrame());
-        }
-        return instance;
+        return instance == null ? instance = new ObservationDialog(JHVFrame.getFrame()) : instance;
     }
 
     private ObservationDialog(JFrame mainFrame) {

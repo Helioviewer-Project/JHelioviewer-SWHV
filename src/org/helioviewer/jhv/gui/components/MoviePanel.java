@@ -167,10 +167,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
     private static MoviePanel instance;
 
     public static MoviePanel getInstance() {
-        if (instance == null) {
-            instance = new MoviePanel();
-        }
-        return instance;
+        return instance == null ? instance = new MoviePanel() : instance;
     }
 
     public static void unsetMovie() {
