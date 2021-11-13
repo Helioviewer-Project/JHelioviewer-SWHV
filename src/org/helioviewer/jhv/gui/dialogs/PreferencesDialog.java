@@ -166,21 +166,21 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
 
         c.gridx = 1;
         c.gridy = 3;
+        JCheckBox highResolution = new JCheckBox("Playback at high resolution", Boolean.parseBoolean(Settings.getProperty("display.highResolution")));
+        highResolution.addActionListener(e -> Settings.setProperty("display.highResolution", Boolean.toString(highResolution.isSelected())));
+        settings.add(highResolution, c);
+
+        c.gridx = 1;
+        c.gridy = 4;
         JCheckBox normalizeAIA = new JCheckBox("Normalize SDO/AIA brightness", Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA")));
         normalizeAIA.addActionListener(e -> Settings.setProperty("display.normalizeAIA", Boolean.toString(normalizeAIA.isSelected())));
         settings.add(normalizeAIA, c);
 
         c.gridx = 1;
-        c.gridy = 4;
+        c.gridy = 5;
         JCheckBox normalizeRadius = new JCheckBox("Normalize solar radius", Boolean.parseBoolean(Settings.getProperty("display.normalize")));
         normalizeRadius.addActionListener(e -> Settings.setProperty("display.normalize", Boolean.toString(normalizeRadius.isSelected())));
         settings.add(normalizeRadius, c);
-
-        c.gridx = 1;
-        c.gridy = 5;
-        JCheckBox highResolution = new JCheckBox("Playback at high resolution", Boolean.parseBoolean(Settings.getProperty("display.highResolution")));
-        highResolution.addActionListener(e -> Settings.setProperty("display.highResolution", Boolean.toString(highResolution.isSelected())));
-        settings.add(highResolution, c);
 
         TimeMode timeMode = TimeMode.Observer;
         try {
