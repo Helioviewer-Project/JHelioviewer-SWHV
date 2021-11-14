@@ -47,7 +47,7 @@ public class SunJSON {
                     points.renderPoints(gl, factor);
                 } else {
                     lines.setVertexRepeatable(gl, buf.vexBuf);
-                    lines.renderLine(gl, aspect, buf.g.thickness);
+                    lines.renderLine(gl, aspect, buf.g.thickness * factor * 0.5e-2 /* TBD */);
                 }
             }
         }
