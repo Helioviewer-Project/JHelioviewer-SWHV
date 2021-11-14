@@ -1,0 +1,4 @@
+<Project projectName="JHV">
+  <Jar>./release/bin/JHelioviewer.jar</Jar>
+  <SrcDir>./src</SrcDir>
+</Project>
