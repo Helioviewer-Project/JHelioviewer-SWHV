@@ -57,16 +57,7 @@ class DrawControllerOptionsPanel extends JPanel {
         add(zoomCombo, BorderLayout.LINE_END);
     }
 
-    private static class ZoomItem {
-
-        final ZOOM zoom;
-        final long number;
-
-        ZoomItem(ZOOM _zoom, long _number) {
-            zoom = _zoom;
-            number = _number;
-        }
-
+    private record ZoomItem(ZOOM zoom, long number) {
         @Override
         public String toString() {
             String plural = number > 1 ? "s" : "";
