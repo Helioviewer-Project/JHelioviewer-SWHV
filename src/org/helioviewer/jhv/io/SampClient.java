@@ -170,6 +170,28 @@ public class SampClient extends HubConnector {
                 return null;
             }
         });
+        addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("jhv.load.sunjson", harmless)) {
+            @Nullable
+            @Override
+            public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
+                try {
+                    Object url = msg.getParam("url");
+                    if (url != null) {
+                        URI uri = toURI(url.toString());
+                        EventQueue.invokeLater(() -> Load.sunJSON.get(uri));
+                    } else {
+                        Object value = msg.getParam("value");
+                        if (value != null) {
+                            String json = value.toString();
+                            EventQueue.invokeLater(() -> Load.sunJSON.get(json));
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        });
         declareSubscriptions(computeSubscriptions());
 
         setAutoconnect(10);
