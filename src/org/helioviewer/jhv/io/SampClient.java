@@ -35,6 +35,7 @@ public class SampClient extends HubConnector {
         Logger.getLogger("org.astrogrid.samp").setLevel(Level.WARNING);
     }
 
+    private static final Map<String, String> harmless = Collections.singletonMap("x-samp.mostly-harmless", "1"); // allow SAMP messages from web
     private static final String MTYPE_VIEW_DATA = "jhv.vso.load";
     private static final boolean startHub = Boolean.parseBoolean(Settings.getProperty("startup.sampHub"));
     private static final SampClient instance = new SampClient(DefaultClientProfile.getProfile());
@@ -70,9 +71,6 @@ public class SampClient extends HubConnector {
         meta.put("author.mail", JHVGlobals.emailAddress);
         meta.put("author.name", "ESA JHelioviewer Team");
         declareMetadata(Metadata.asMetadata(meta));
-
-        // allow samp message from web
-        Map<String, String> harmless = Collections.singletonMap("x-samp.mostly-harmless", "1");
 
         addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("image.load.fits", harmless)) {
             @Nullable
@@ -132,69 +130,37 @@ public class SampClient extends HubConnector {
                 return null;
             }
         });
-        addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("jhv.load.request", harmless)) {
-            @Nullable
-            @Override
-            public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
-                try {
-                    Object url = msg.getParam("url");
-                    if (url != null) {
-                        URI uri = toURI(url.toString());
-                        EventQueue.invokeLater(() -> Load.request.get(uri));
-                    } else {
-                        Object value = msg.getParam("value");
-                        if (value != null) {
-                            String json = value.toString();
-                            EventQueue.invokeLater(() -> Load.request.get(json));
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-        });
-        addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("jhv.load.state", harmless)) {
-            @Nullable
-            @Override
-            public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
-                try {
-                    Object url = msg.getParam("url");
-                    if (url != null) {
-                        URI uri = toURI(url.toString());
-                        EventQueue.invokeLater(() -> Load.state.get(uri));
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-        });
-        addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("jhv.load.sunjson", harmless)) {
-            @Nullable
-            @Override
-            public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
-                try {
-                    Object url = msg.getParam("url");
-                    if (url != null) {
-                        URI uri = toURI(url.toString());
-                        EventQueue.invokeLater(() -> Load.sunJSON.get(uri));
-                    } else {
-                        Object value = msg.getParam("value");
-                        if (value != null) {
-                            String json = value.toString();
-                            EventQueue.invokeLater(() -> Load.sunJSON.get(json));
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-        });
+        addMessageHandler(inlineHandler("jhv.load.request", Load.request));
+        addMessageHandler(inlineHandler("jhv.load.state", Load.state));
+        addMessageHandler(inlineHandler("jhv.load.sunjson", Load.sunJSON));
         declareSubscriptions(computeSubscriptions());
 
         setAutoconnect(10);
+    }
+
+    private static AbstractMessageHandler inlineHandler(String type, Load.LoadString loader) {
+        return new AbstractMessageHandler(Collections.singletonMap(type, harmless)) {
+            @Nullable
+            @Override
+            public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
+                try {
+                    Object url = msg.getParam("url");
+                    if (url != null) {
+                        URI uri = toURI(url.toString());
+                        EventQueue.invokeLater(() -> loader.get(uri));
+                    } else {
+                        Object value = msg.getParam("value");
+                        if (value != null) {
+                            String json = value.toString();
+                            EventQueue.invokeLater(() -> loader.get(json));
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        };
     }
 
     public static void notifyRequestData() {
