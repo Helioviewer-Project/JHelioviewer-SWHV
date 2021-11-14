@@ -356,13 +356,12 @@ public class EventDatabase {
         List<JsonEvent> jsonEvents = new ArrayList<>();
 
         for (SWEKRelatedEvents re : SWEKGroup.getSWEKRelatedEvents()) {
-            if (re.getGroup() == group) {
-                List<SWEKRelatedOn> relon = re.getRelatedOnList();
-                for (SWEKRelatedOn swon : relon) {
+            if (re.group() == group) {
+                for (SWEKRelatedOn swon : re.relatedOnList()) {
                     String f = swon.parameterFrom.name().toLowerCase();
                     String w = swon.parameterWith.name().toLowerCase();
 
-                    SWEKGroup reType = re.getRelatedWith();
+                    SWEKGroup reType = re.relatedWith();
                     for (Enumeration<TreeNode> e = reType.children(); e.hasMoreElements(); ) {
                         SWEKSupplier supplier = (SWEKSupplier) e.nextElement();
                         if (similartype == (supplier == jhvEventType)) {
@@ -374,13 +373,12 @@ public class EventDatabase {
                 }
             }
 
-            if (re.getRelatedWith() == group) {
-                List<SWEKRelatedOn> relon = re.getRelatedOnList();
-                for (SWEKRelatedOn swon : relon) {
+            if (re.relatedWith() == group) {
+                for (SWEKRelatedOn swon : re.relatedOnList()) {
                     String f = swon.parameterFrom.name().toLowerCase();
                     String w = swon.parameterWith.name().toLowerCase();
 
-                    SWEKGroup reType = re.getGroup();
+                    SWEKGroup reType = re.group();
                     for (Enumeration<TreeNode> e = reType.children(); e.hasMoreElements(); ) {
                         SWEKSupplier supplier = (SWEKSupplier) e.nextElement();
                         if (similartype == (supplier == jhvEventType)) {
