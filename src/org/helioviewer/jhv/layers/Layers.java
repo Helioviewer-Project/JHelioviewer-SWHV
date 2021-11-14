@@ -93,6 +93,7 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeSelec
 
     private static ViewpointLayer viewpointLayer;
     private static MiniviewLayer miniviewLayer;
+    private static ConnectionLayer connectionLayer;
 
     private Layers() {
         add(new ViewpointLayer(null));
@@ -109,6 +110,10 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeSelec
 
     public static MiniviewLayer getMiniviewLayer() {
         return miniviewLayer;
+    }
+
+    public static ConnectionLayer getConnectionLayer() {
+        return connectionLayer;
     }
 
     public void add(Layer layer) {

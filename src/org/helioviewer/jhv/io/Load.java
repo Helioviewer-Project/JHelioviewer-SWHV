@@ -7,6 +7,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.connect.LoadSunJSON;
 
 public interface Load {
 
@@ -54,6 +55,13 @@ public interface Load {
         @Override
         public void get(@Nonnull URI uri) {
             LoadState.submit(uri);
+        }
+    }
+
+    class SunJSON implements Load {
+        @Override
+        public void get(@Nonnull URI uri) {
+            LoadSunJSON.submit(uri);
         }
     }
 
