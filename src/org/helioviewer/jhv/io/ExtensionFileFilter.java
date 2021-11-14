@@ -20,19 +20,11 @@ public class ExtensionFileFilter {
             new String[]{"ggr"},
             "GIMP gradient files (\".ggr\")"));
 
-    private static class Filter implements FilenameFilter {
-
-        private final FileFilter filter;
-
-        Filter(FileFilter _filter) {
-            filter = _filter;
-        }
-
+    private record Filter(FileFilter filter) implements FilenameFilter {
         @Override
         public boolean accept(File dir, String name) {
             return filter.accept(new File(dir, name));
         }
-
     }
 
     private static class ExtensionFilter extends FileFilter {

@@ -40,14 +40,7 @@ public class JHVThread {
     }
 
     // this creates daemon threads
-    public static class NamedThreadFactory implements ThreadFactory {
-
-        private final String name;
-
-        public NamedThreadFactory(String _name) {
-            name = _name;
-        }
-
+    public record NamedThreadFactory(String name) implements ThreadFactory {
         @Override
         public Thread newThread(@Nonnull Runnable r) {
             Thread t = new Thread(r, name);
@@ -56,16 +49,7 @@ public class JHVThread {
         }
     }
 
-    public static class NamedClassThreadFactory implements ThreadFactory {
-
-        private final Class<? extends Thread> clazz;
-        private final String name;
-
-        public NamedClassThreadFactory(Class<? extends Thread> _clazz, String _name) {
-            clazz = _clazz;
-            name = _name;
-        }
-
+    public record NamedClassThreadFactory(Class<? extends Thread> clazz, String name) implements ThreadFactory {
         @Nullable
         @Override
         public Thread newThread(@Nonnull Runnable r) {

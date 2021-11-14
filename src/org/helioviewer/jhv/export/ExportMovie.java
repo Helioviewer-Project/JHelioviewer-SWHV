@@ -130,20 +130,8 @@ public class ExportMovie implements FrameListener {
         MovieDisplay.display(); // force detach
     }
 
-    private static class FrameConsumer implements Runnable {
-
-        private final MovieExporter movieExporter;
-        private final BufferedImage mainImage;
-        private final BufferedImage eveImage;
-        private final int movieLinePosition;
-
-        FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eveImage, int _movieLinePosition) {
-            movieExporter = _movieExporter;
-            mainImage = _mainImage;
-            eveImage = _eveImage;
-            movieLinePosition = _movieLinePosition;
-        }
-
+    private record FrameConsumer(MovieExporter movieExporter, BufferedImage mainImage, BufferedImage eveImage,
+                                 int movieLinePosition) implements Runnable {
         @Override
         public void run() {
             try {
@@ -155,17 +143,9 @@ public class ExportMovie implements FrameListener {
                 MappedImageFactory.free(mainImage);
             }
         }
-
     }
 
-    private static class CloseWriter implements Runnable {
-
-        private final MovieExporter movieExporter;
-
-        CloseWriter(MovieExporter _movieExporter) {
-            movieExporter = _movieExporter;
-        }
-
+    private record CloseWriter(MovieExporter movieExporter) implements Runnable {
         @Override
         public void run() {
             try {

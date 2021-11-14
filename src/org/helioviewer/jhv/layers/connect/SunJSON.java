@@ -30,15 +30,7 @@ public class SunJSON {
     private record GeometryBuffer(Geometry g, BufVertex vexBuf) {
     }
 
-    public static class GeometryCollection {
-
-        public final JHVTime time;
-        private final List<GeometryBuffer> list;
-
-        GeometryCollection(JHVTime _time, List<GeometryBuffer> _list) {
-            time = _time;
-            list = _list;
-        }
+    public record GeometryCollection(JHVTime time, List<GeometryBuffer> list) {
 
         public void render(GL2 gl, GLSLLine lines, GLSLShape points, double aspect, double factor) {
             for (GeometryBuffer buf : list) {

@@ -146,20 +146,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
         return false;
     }
 
-    private static class EventPlotConfiguration {
-
-        final JHVRelatedEvents event;
-        final int x0;
-        final int x1;
-        final int yPosition;
-
-        EventPlotConfiguration(JHVRelatedEvents _event, int _x0, int _x1, int _yPosition) {
-            event = _event;
-            x0 = _x0;
-            x1 = _x1;
-            yPosition = _yPosition;
-        }
-
+    private record EventPlotConfiguration(JHVRelatedEvents event, int x0, int x1, int yPosition) {
     }
 
     @Nullable
