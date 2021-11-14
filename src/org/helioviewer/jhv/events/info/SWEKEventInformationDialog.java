@@ -197,19 +197,11 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
         pack();
     }
 
-    private static class DatabaseCallable implements Callable<List<JHVEvent>> {
-
-        private final JHVEvent e;
-
-        DatabaseCallable(JHVEvent _e) {
-            e = _e;
-        }
-
+    private record DatabaseCallable(JHVEvent qEvent) implements Callable<List<JHVEvent>> {
         @Override
         public List<JHVEvent> call() throws Exception {
-            return EventDatabase.getOtherRelations(e.getUniqueID(), e.getSupplier(), false, true);
+            return EventDatabase.getOtherRelations(qEvent.getUniqueID(), qEvent.getSupplier(), false, true);
         }
-
     }
 
     private class DatabaseCallback implements FutureCallback<List<JHVEvent>> {

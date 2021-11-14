@@ -75,13 +75,7 @@ public class PfssNewDataLoader implements Callable<Void> {
         return null;
     }
 
-    private static class Callback implements FutureCallback<Void> {
-
-        private final long start;
-
-        Callback(long _start) {
-            start = _start;
-        }
+    private record Callback(long start) implements FutureCallback<Void> {
 
         @Override
         public void onSuccess(Void result) {

@@ -17,17 +17,11 @@ import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-public class LoadHCS implements Callable<OrthoScaleList> {
+public record LoadHCS(URI uri) implements Callable<OrthoScaleList> {
 
     public static Void submit(@Nonnull URI uri, ReceiverHCS receiver) {
         EventQueueCallbackExecutor.pool.submit(new LoadHCS(uri), new Callback(receiver));
         return null;
-    }
-
-    private final URI uri;
-
-    private LoadHCS(URI _uri) {
-        uri = _uri;
     }
 
     @Override
@@ -60,13 +54,7 @@ public class LoadHCS implements Callable<OrthoScaleList> {
         return new OrthoScaleList(hcsList);
     }
 
-    private static class Callback implements FutureCallback<OrthoScaleList> {
-
-        private final ReceiverHCS receiver;
-
-        Callback(ReceiverHCS _receiver) {
-            receiver = _receiver;
-        }
+    private record Callback(ReceiverHCS receiver) implements FutureCallback<OrthoScaleList> {
 
         @Override
         public void onSuccess(OrthoScaleList result) {

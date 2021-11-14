@@ -20,17 +20,11 @@ import org.helioviewer.jhv.time.TimeUtils;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-public class LoadConnectivity implements Callable<Connectivity> {
+public record LoadConnectivity(URI uri) implements Callable<Connectivity> {
 
     public static Void submit(@Nonnull URI uri, ReceiverConnectivity receiver) {
         EventQueueCallbackExecutor.pool.submit(new LoadConnectivity(uri), new Callback(receiver));
         return null;
-    }
-
-    private final URI uri;
-
-    private LoadConnectivity(URI _uri) {
-        uri = _uri;
     }
 
     @Override
@@ -83,13 +77,7 @@ public class LoadConnectivity implements Callable<Connectivity> {
         return new Connectivity(time, SSW, FSW, M);
     }
 
-    private static class Callback implements FutureCallback<Connectivity> {
-
-        private final ReceiverConnectivity receiver;
-
-        Callback(ReceiverConnectivity _receiver) {
-            receiver = _receiver;
-        }
+    private record Callback(ReceiverConnectivity receiver) implements FutureCallback<Connectivity> {
 
         @Override
         public void onSuccess(Connectivity result) {

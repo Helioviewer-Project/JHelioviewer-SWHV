@@ -63,25 +63,19 @@ class PfssDataLoader implements Callable<PfssData> {
         }
     }
 
-    private static class Callback implements FutureCallback<PfssData> {
-
-        private final String u;
-
-        Callback(String _u) {
-            u = _u;
-        }
+    private record Callback(String url) implements FutureCallback<PfssData> {
 
         @Override
         public void onSuccess(PfssData result) {
             PfssPlugin.downloads--;
-            PfssPlugin.getPfsscache().putData(u, result);
+            PfssPlugin.getPfsscache().putData(url, result);
             MovieDisplay.display(); //!
         }
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
             PfssPlugin.downloads--;
-            Log.error("PfssDataLoader: " + u, t);
+            Log.error("PfssDataLoader: " + url, t);
         }
 
     }

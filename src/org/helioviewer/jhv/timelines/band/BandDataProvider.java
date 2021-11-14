@@ -77,13 +77,7 @@ public class BandDataProvider {
 
     }
 
-    private static class BandDownloadCallback implements FutureCallback<BandResponse> {
-
-        private final Band band;
-
-        BandDownloadCallback(Band _band) {
-            band = _band;
-        }
+    private record BandDownloadCallback(Band band) implements FutureCallback<BandResponse> {
 
         @Override
         public void onSuccess(BandResponse result) {
@@ -100,19 +94,11 @@ public class BandDataProvider {
 
     }
 
-    private static class BandLoad implements Callable<BandResponse> {
-
-        private final JSONObject jo;
-
-        BandLoad(JSONObject _jo) {
-            jo = _jo;
-        }
-
+    private record BandLoad(JSONObject jo) implements Callable<BandResponse> {
         @Override
         public BandResponse call() {
             return new BandResponse(jo);
         }
-
     }
 
     private static class BandLoadCallback implements FutureCallback<BandResponse> {
@@ -132,12 +118,10 @@ public class BandDataProvider {
     }
 
     private static class BandTypeDownload implements Callable<JSONArray> {
-
         @Override
         public JSONArray call() throws Exception {
             return JSONUtils.get(TimelineSettings.baseURL).getJSONArray("objects");
         }
-
     }
 
     private static class BandTypeDownloadCallback implements FutureCallback<JSONArray> {
