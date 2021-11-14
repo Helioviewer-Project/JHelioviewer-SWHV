@@ -163,7 +163,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
             double dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY) / width;
             if (dist < minDist) {
                 minDist = dist;
-                name = positionLoad.getTarget().toString();
+                name = positionLoad.target().toString();
             }
         }
         if (!text.isEmpty()) {
@@ -289,7 +289,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
             if (response == null)
                 continue;
 
-            byte[] color = positionLoad.getTarget().getColor();
+            byte[] color = positionLoad.target().getColor();
             long t = start;
 
             double dist = response.interpolateRectangular(t, start, end, xyzw);

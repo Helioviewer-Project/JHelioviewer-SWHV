@@ -18,26 +18,14 @@ import org.json.JSONObject;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.util.concurrent.FutureCallback;
 
-public class PositionLoad {
+public record PositionLoad(StatusReceiver receiver, SpaceObject target, boolean isHCI,
+                           Future<PositionResponse> future) {
 
-    private static class LoadPosition implements Callable<PositionResponse> {
+    private record LoadPosition(SpaceObject observer, SpaceObject target, Frame frame, long start,
+                                long end) implements Callable<PositionResponse> {
 
         private static final int MAX_POINTS = 50000;
         private static final String baseURL = "http://swhv.oma.be/position?";
-
-        private final SpaceObject observer;
-        private final SpaceObject target;
-        private final Frame frame;
-        private final long start;
-        private final long end;
-
-        LoadPosition(SpaceObject _observer, SpaceObject _target, Frame _frame, long _start, long _end) {
-            observer = _observer;
-            target = _target;
-            frame = _frame;
-            start = _start;
-            end = _end;
-        }
 
         @Override
         public PositionResponse call() throws Exception {
@@ -72,13 +60,7 @@ public class PositionLoad {
 
     }
 
-    private static class Callback implements FutureCallback<PositionResponse> {
-
-        private final StatusReceiver receiver;
-
-        Callback(StatusReceiver _receiver) {
-            receiver = _receiver;
-        }
+    private record Callback(StatusReceiver receiver) implements FutureCallback<PositionResponse> {
 
         @Override
         public void onSuccess(PositionResponse result) {
@@ -93,18 +75,6 @@ public class PositionLoad {
 
     }
 
-    private final StatusReceiver receiver;
-    private final SpaceObject target;
-    private final boolean isHCI;
-    private final Future<PositionResponse> future;
-
-    private PositionLoad(StatusReceiver _receiver, SpaceObject _target, boolean _isHCI, Future<PositionResponse> _future) {
-        receiver = _receiver;
-        target = _target;
-        isHCI = _isHCI;
-        future = _future;
-    }
-
     private void stop() {
         future.cancel(true);
         receiver.setStatus(null);
@@ -112,14 +82,6 @@ public class PositionLoad {
 
     public boolean isDownloading() {
         return !future.isDone();
-    }
-
-    public SpaceObject getTarget() {
-        return target;
-    }
-
-    public boolean isHCI() {
-        return isHCI;
     }
 
     @Nullable

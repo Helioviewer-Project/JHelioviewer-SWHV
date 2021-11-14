@@ -10,7 +10,7 @@ import org.helioviewer.jhv.astronomy.SpaceObject;
 @SuppressWarnings("serial")
 class SpaceObjectModel extends AbstractTableModel {
 
-    private final ArrayList<SpaceObjectElement> elements = new ArrayList<>();
+    private final List<SpaceObjectElement> elements = new ArrayList<>();
 
     SpaceObjectModel(SpaceObject observer) {
         SpaceObject.getTargets(observer).forEach(target -> elements.add(new SpaceObjectElement(target, this)));
