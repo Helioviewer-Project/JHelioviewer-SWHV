@@ -67,13 +67,7 @@ class LoadSources implements Callable<DataSourcesParser> {
         return parser;
     }
 
-    private static class Callback implements FutureCallback<DataSourcesParser> {
-
-        private final String s;
-
-        Callback(String _s) {
-            s = _s;
-        }
+    private record Callback(String server) implements FutureCallback<DataSourcesParser> {
 
         @Override
         public void onSuccess(DataSourcesParser result) {
@@ -82,7 +76,7 @@ class LoadSources implements Callable<DataSourcesParser> {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log.error("LoadSources error: " + s, t);
+            Log.error("LoadSources error: " + server, t);
             if (t instanceof ValidationException) {
                 ((ValidationException) t).getCausingExceptions().stream().map(ValidationException::getMessage).forEach(Log::error);
             }

@@ -37,34 +37,15 @@ public class LoadLayer {
         EventQueueCallbackExecutor.pool.submit(new LoadFITS(layer, uri), new Callback(layer));
     }
 
-    private static class LoadRemote implements Callable<View> {
-
-        private final ImageLayer layer;
-        private final APIRequest req;
-
-        LoadRemote(ImageLayer _layer, APIRequest _req) {
-            layer = _layer;
-            req = _req;
-        }
-
+    private record LoadRemote(ImageLayer layer, APIRequest req) implements Callable<View> {
         @Override
         public View call() throws Exception {
             APIResponse res = APIRequestManager.requestRemoteFile(req);
             return res == null ? null : loadView(layer.getExecutor(), req, res.getURI());
         }
-
     }
 
-    private static class LoadURI implements Callable<View> {
-
-        private final ImageLayer layer;
-        private final List<URI> uriList;
-
-        LoadURI(ImageLayer _layer, List<URI> _uriList) {
-            layer = _layer;
-            uriList = _uriList;
-        }
-
+    private record LoadURI(ImageLayer layer, List<URI> uriList) implements Callable<View> {
         @Override
         public View call() throws Exception {
             DecodeExecutor executor = layer.getExecutor();
@@ -82,33 +63,16 @@ public class LoadLayer {
                 return new ManyView(views);
             }
         }
-
     }
 
-    private static class LoadFITS implements Callable<View> {
-
-        private final ImageLayer layer;
-        private final URI uri;
-
-        LoadFITS(ImageLayer _layer, URI _uri) {
-            layer = _layer;
-            uri = _uri;
-        }
-
+    private record LoadFITS(ImageLayer layer, URI uri) implements Callable<View> {
         @Override
         public View call() throws Exception {
             return new URIView(layer.getExecutor(), null, uri, URIView.URIType.FITS);
         }
-
     }
 
-    private static class Callback implements FutureCallback<View> {
-
-        private final ImageLayer layer;
-
-        Callback(ImageLayer _layer) {
-            layer = _layer;
-        }
+    private record Callback(ImageLayer layer) implements FutureCallback<View> {
 
         @Override
         public void onSuccess(View result) {

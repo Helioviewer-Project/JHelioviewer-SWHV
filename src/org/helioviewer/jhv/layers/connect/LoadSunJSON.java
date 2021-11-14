@@ -14,7 +14,7 @@ import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-public class LoadSunJSON implements Callable<SunJSON.GeometryCollection> {
+public class LoadSunJSON {
 
     public static void submit(@Nonnull URI uri) {
         submit(uri, Layers.getConnectionLayer());
@@ -22,28 +22,18 @@ public class LoadSunJSON implements Callable<SunJSON.GeometryCollection> {
 
     public static Void submit(@Nonnull URI uri, @Nullable ReceiverSunJSON receiver) {
         if (receiver != null)
-            EventQueueCallbackExecutor.pool.submit(new LoadSunJSON(uri), new Callback(receiver));
+            EventQueueCallbackExecutor.pool.submit(new LoadSunJSONURI(uri), new Callback(receiver));
         return null;
     }
 
-    private final URI uri;
-
-    private LoadSunJSON(URI _uri) {
-        uri = _uri;
-    }
-
-    @Override
-    public SunJSON.GeometryCollection call() throws Exception {
-        return SunJSON.process(JSONUtils.get(uri));
-    }
-
-    private static class Callback implements FutureCallback<SunJSON.GeometryCollection> {
-
-        private final ReceiverSunJSON receiver;
-
-        Callback(ReceiverSunJSON _receiver) {
-            receiver = _receiver;
+    private record LoadSunJSONURI(URI uri) implements Callable<SunJSON.GeometryCollection> {
+        @Override
+        public SunJSON.GeometryCollection call() throws Exception {
+            return SunJSON.process(JSONUtils.get(uri));
         }
+    }
+
+    private record Callback(ReceiverSunJSON receiver) implements FutureCallback<SunJSON.GeometryCollection> {
 
         @Override
         public void onSuccess(SunJSON.GeometryCollection result) {
