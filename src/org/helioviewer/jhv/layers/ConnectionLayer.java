@@ -6,6 +6,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.File;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.function.BiFunction;
 
 import javax.annotation.Nullable;
@@ -24,7 +25,6 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.connect.LoadConnectivity;
 import org.helioviewer.jhv.layers.connect.LoadFootpoint;
 import org.helioviewer.jhv.layers.connect.LoadHCS;
-import org.helioviewer.jhv.layers.connect.LoadSunJSON;
 import org.helioviewer.jhv.layers.connect.OrthoScaleList;
 import org.helioviewer.jhv.layers.connect.ReceiverConnectivity;
 import org.helioviewer.jhv.layers.connect.ReceiverConnectivity.Connectivity;
@@ -72,7 +72,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     private Connectivity connectivity;
     private OrthoScaleList hcs;
     private TimeMap<PositionCartesian> footpointMap;
-    private SunJSON.GeometryCollection geometry;
+    private final ArrayList<SunJSON.GeometryCollection> geometryList = new ArrayList<>();
 
     private JHVTime lastTimestamp;
 
@@ -94,8 +94,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
             drawHCS(camera, vp, gl);
         if (footpointMap != null)
             drawFootpointInterpolated(camera, vp, gl);
-        if (geometry != null)
-            geometry.render(gl, geometryLine, geometryPoint, vp.aspect, CameraHelper.getPixelFactor(camera, vp));
+        geometryList.forEach(g -> g.render(gl, geometryLine, geometryPoint, vp.aspect, CameraHelper.getPixelFactor(camera, vp)));
     }
 
     @Override
@@ -272,14 +271,20 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     }
 
     @Override
-    public void setGeometry(SunJSON.GeometryCollection _geometry) {
-        geometry = _geometry;
+    public void setGeometry(SunJSON.GeometryCollection geometry) {
+        geometryList.add(geometry);
         MovieDisplay.display();
     }
 
     private JPanel optionsPanel() {
-        JButton geometryBtn = new JButton("SunJSON");
-        geometryBtn.addActionListener(e -> load(LoadSunJSON::submit));
+        JButton clearBtn = new JButton("Clear all");
+        clearBtn.addActionListener(e -> {
+            connectivity = null;
+            hcs = null;
+            footpointMap = null;
+            geometryList.clear();
+            MovieDisplay.display();
+        });
 
         JButton connectivityBtn = new JButton("Connectivity");
         connectivityBtn.addActionListener(e -> load(LoadConnectivity::submit));
@@ -298,7 +303,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
         c0.gridy = 0;
 
         c0.gridx = 0;
-        panel.add(geometryBtn, c0);
+        panel.add(clearBtn, c0);
         c0.gridx = 1;
         panel.add(connectivityBtn, c0);
         c0.gridx = 2;

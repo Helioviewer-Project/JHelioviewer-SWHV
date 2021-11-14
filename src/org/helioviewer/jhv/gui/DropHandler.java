@@ -51,8 +51,7 @@ class DropHandler extends TransferHandler {
                 }
 
                 // jsonUris.forEach(Load.request::get);
-                if (!jsonUris.isEmpty())
-                    Load.sunJSON.get(jsonUris.get(0));
+                jsonUris.forEach(Load.sunJSON::get);
                 if (!imageUris.isEmpty())
                     Load.Image.getAll(imageUris);
 
