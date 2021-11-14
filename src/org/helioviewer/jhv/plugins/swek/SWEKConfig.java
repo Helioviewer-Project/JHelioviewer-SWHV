@@ -58,7 +58,7 @@ class SWEKConfig {
         for (int i = 0; i < len; i++) {
             SWEKSource source = parseSource(sourcesArray.getJSONObject(i));
             if (source != null) {
-                sources.put(source.getName(), source);
+                sources.put(source.name(), source);
             }
         }
     }

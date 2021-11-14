@@ -93,8 +93,8 @@ public class JHVEvent {
 
         if (p != null) {
             configured = true;
-            visible = p.isDefaultVisible();
-            displayName = p.getParameterDisplayName();
+            visible = p.visible();
+            displayName = p.displayName();
         } else {
             displayName = keyString.replaceAll("_", " ").trim();
         }

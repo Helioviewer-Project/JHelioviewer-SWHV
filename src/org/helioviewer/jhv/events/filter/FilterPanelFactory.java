@@ -12,6 +12,7 @@ import javax.swing.SpinnerNumberModel;
 import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.events.SWEKOperand;
 import org.helioviewer.jhv.events.SWEKParameter;
+import org.helioviewer.jhv.events.SWEKParameterFilter;
 import org.helioviewer.jhv.events.SWEKSupplier;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
@@ -33,10 +34,11 @@ class FilterPanelFactory {
     }
 
     private static JSpinner generateFlareSpinner(FilterDialog filterDialog, SWEKParameter parameter) {
-        double min = parameter.getParameterFilter().getMin() == null ? 1e-8 : parameter.getParameterFilter().getMin();
-        double max = parameter.getParameterFilter().getMax() == null ? 1e-3 : parameter.getParameterFilter().getMax();
-        double start = parameter.getParameterFilter().getStartValue() == null ? 1e-5 : parameter.getParameterFilter().getStartValue();
-        double step = parameter.getParameterFilter().getStepSize() == null ? 0.5 : parameter.getParameterFilter().getStepSize();
+        SWEKParameterFilter filter = parameter.filter();
+        double min = filter.min() == null ? 1e-8 : filter.min();
+        double max = filter.max() == null ? 1e-3 : filter.max();
+        double start = filter.startValue() == null ? 1e-5 : filter.startValue();
+        double step = filter.stepSize() == null ? 0.5 : filter.stepSize();
 
         FlareSpinnerModel minimumSpinnerModel = new FlareSpinnerModel(start, min, max, step);
         JSpinner spinner = new JSpinner(minimumSpinnerModel);
@@ -47,10 +49,11 @@ class FilterPanelFactory {
     }
 
     private static JSpinner generateMinOrMaxSpinner(FilterDialog filterDialog, SWEKParameter parameter) {
-        double min = parameter.getParameterFilter().getMin() == null ? Double.MIN_VALUE : parameter.getParameterFilter().getMin();
-        double max = parameter.getParameterFilter().getMax() == null ? Double.MAX_VALUE : parameter.getParameterFilter().getMax();
-        double start = parameter.getParameterFilter().getStartValue() == null ? (max - min) * 0.5 : parameter.getParameterFilter().getStartValue();
-        double step = parameter.getParameterFilter().getStepSize() == null ? (max - min) * 0.01 : parameter.getParameterFilter().getStepSize();
+        SWEKParameterFilter filter = parameter.filter();
+        double min = filter.min() == null ? Double.MIN_VALUE : filter.min();
+        double max = filter.max() == null ? Double.MAX_VALUE : filter.max();
+        double start = filter.startValue() == null ? (max - min) * 0.5 : filter.startValue();
+        double step = filter.stepSize() == null ? (max - min) * 0.01 : filter.stepSize();
 
         SpinnerModel minimumSpinnerModel = new SpinnerNumberModel(start, min, max, step);
         JSpinner spinner = new JSpinner(minimumSpinnerModel);
@@ -63,8 +66,9 @@ class FilterPanelFactory {
     static List<FilterPanel> createFilterPanel(SWEKGroup group, SWEKSupplier supplier, FilterDialog filterDialog, boolean enabled) {
         List<FilterPanel> panels = new ArrayList<>();
         for (SWEKParameter parameter : group.getParameterList()) {
-            if (parameter.getParameterFilter() != null) {
-                String filterType = parameter.getParameterFilter().getFilterType().toLowerCase();
+            SWEKParameterFilter filter = parameter.filter();
+            if (filter != null) {
+                String filterType = filter.type().toLowerCase();
                 switch (filterType) {
                     case "doublemaxfilter" -> panels.add(new FilterPanel(supplier, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.BIGGER_OR_EQUAL, enabled));
                     case "doubleminfilter" -> panels.add(new FilterPanel(supplier, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.SMALLER_OR_EQUAL, enabled));

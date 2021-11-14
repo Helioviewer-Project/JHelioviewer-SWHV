@@ -44,7 +44,7 @@ class HEKParser {
 
         Iterator<String> keys = result.keys();
         while (paramIterator.hasNext() || keys.hasNext()) {
-            String key = paramIterator.hasNext() ? paramIterator.next().getParameterName() : keys.next();
+            String key = paramIterator.hasNext() ? paramIterator.next().name() : keys.next();
             String lowKey = key.toLowerCase(Locale.ENGLISH);
             if (insertedKeys.contains(lowKey))
                 continue;

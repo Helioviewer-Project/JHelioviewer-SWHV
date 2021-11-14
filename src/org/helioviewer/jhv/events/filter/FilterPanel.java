@@ -37,7 +37,7 @@ class FilterPanel extends JPanel {
 
         JCheckBox enableButton = new JCheckBox();
         enableButton.addActionListener(e -> toggleEnabled());
-        label = new JLabel(parameter.getParameterDisplayName() + ' ' + operand.representation);
+        label = new JLabel(parameter.displayName() + ' ' + operand.representation);
         spinner.setEnabled(enabled);
         label.setEnabled(enabled);
 
@@ -60,7 +60,7 @@ class FilterPanel extends JPanel {
         if (enabled) {
             Object oval = spinner.getValue();
             String pval = oval instanceof String ? String.valueOf(GOESLevel.getFloatValue((String) oval)) : String.valueOf(oval);
-            SWEKParam param = new SWEKParam(parameter.getParameterName(), pval, operand);
+            SWEKParam param = new SWEKParam(parameter.name(), pval, operand);
             FilterManager.addFilter(supplier, parameter, param);
         }
     }

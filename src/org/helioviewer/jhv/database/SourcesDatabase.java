@@ -96,18 +96,8 @@ public class SourcesDatabase extends Thread {
         return -1;
     }
 
-    private static class Select implements Callable<Integer> {
-
-        private final String server;
-        private final String observatory;
-        private final String dataset;
-
-        Select(@Nonnull String _server, @Nonnull String _observatory, @Nonnull String _dataset) {
-            server = _server;
-            observatory = _observatory;
-            dataset = _dataset;
-        }
-
+    private record Select(@Nonnull String server, @Nonnull String observatory,
+                          @Nonnull String dataset) implements Callable<Integer> {
         @Override
         public Integer call() throws Exception {
             select.setString(1, server);
@@ -121,7 +111,6 @@ public class SourcesDatabase extends Thread {
             }
             return res;
         }
-
     }
 
 }
