@@ -13,16 +13,10 @@ import org.json.JSONObject;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-class LoadState implements Callable<JSONObject> {
+record LoadState(URI uri) implements Callable<JSONObject> {
 
     static void submit(@Nonnull URI uri) {
         EventQueueCallbackExecutor.pool.submit(new LoadState(uri), new Callback());
-    }
-
-    private final URI uri;
-
-    private LoadState(URI _uri) {
-        uri = _uri;
     }
 
     @Override

@@ -7,19 +7,7 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 
-class URIDecoder implements Callable<ImageBuffer> {
-
-    private final URI uri;
-    private final URIImageReader reader;
-    private final float[] minMax;
-    private final boolean mgn;
-
-    URIDecoder(URI _uri, URIImageReader _reader, float[] _minMax, boolean _mgn) {
-        uri = _uri;
-        reader = _reader;
-        minMax = _minMax;
-        mgn = _mgn;
-    }
+record URIDecoder(URI uri, URIImageReader reader, float[] minMax, boolean mgn) implements Callable<ImageBuffer> {
 
     @Nonnull
     @Override

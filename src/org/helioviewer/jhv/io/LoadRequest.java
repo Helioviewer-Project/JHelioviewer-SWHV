@@ -46,36 +46,20 @@ class LoadRequest {
         }
     }
 
-    private static class LoadRequestURI implements Callable<Void> {
-
-        private final URI uri;
-
-        LoadRequestURI(URI _uri) {
-            uri = _uri;
-        }
-
+    private record LoadRequestURI(URI uri) implements Callable<Void> {
         @Override
         public Void call() throws Exception {
             parseRequest(JSONUtils.get(uri));
             return null;
         }
-
     }
 
-    private static class LoadRequestString implements Callable<Void> {
-
-        private final String json;
-
-        LoadRequestString(String _json) {
-            json = _json;
-        }
-
+    private record LoadRequestString(String json) implements Callable<Void> {
         @Override
         public Void call() throws Exception {
             parseRequest(new JSONObject(json));
             return null;
         }
-
     }
 
     private static class Callback implements FutureCallback<Void> {

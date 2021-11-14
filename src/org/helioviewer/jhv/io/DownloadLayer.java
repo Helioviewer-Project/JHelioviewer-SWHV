@@ -23,7 +23,7 @@ import okio.BufferedSink;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-public class DownloadLayer implements Callable<File> {
+public record DownloadLayer(ImageLayer layer, File dstFile, URI uri) implements Callable<File> {
 
     @Nullable
     public static Future<File> submit(@Nonnull ImageLayer layer, @Nonnull APIRequest req, @Nonnull URI uri) {
@@ -40,16 +40,6 @@ public class DownloadLayer implements Callable<File> {
     }
 
     private static final int BUFSIZ = 1024 * 1024;
-
-    private final ImageLayer layer;
-    private final File dstFile;
-    private final URI uri;
-
-    private DownloadLayer(ImageLayer _layer, File _dstFile, URI _uri) {
-        layer = _layer;
-        dstFile = _dstFile;
-        uri = _uri;
-    }
 
     @Override
     public File call() throws Exception {
@@ -70,15 +60,7 @@ public class DownloadLayer implements Callable<File> {
         return dstFile;
     }
 
-    private static class Callback implements FutureCallback<File> {
-
-        private final ImageLayer layer;
-        private final File dstFile;
-
-        Callback(ImageLayer _layer, File _dstFile) {
-            layer = _layer;
-            dstFile = _dstFile;
-        }
+    private record Callback(ImageLayer layer, File dstFile) implements FutureCallback<File> {
 
         @Override
         public void onSuccess(File result) {
