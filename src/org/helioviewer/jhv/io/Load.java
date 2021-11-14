@@ -17,7 +17,7 @@ public interface Load {
     Load fits = new FITS();
     Load.Request request = new Request();
     Load state = new State();
-    Load sunJSON = new SunJSON();
+    Load.SunJSON sunJSON = new SunJSON();
 
     class Image implements Load {
         @Override
@@ -63,6 +63,10 @@ public interface Load {
         @Override
         public void get(@Nonnull URI uri) {
             LoadSunJSON.submit(uri);
+        }
+
+        public void get(@Nonnull String json) {
+            LoadSunJSON.submit(json);
         }
     }
 

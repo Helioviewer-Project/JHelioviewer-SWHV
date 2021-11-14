@@ -11,6 +11,7 @@ import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
+import org.json.JSONObject;
 
 import com.google.common.util.concurrent.FutureCallback;
 
@@ -20,8 +21,14 @@ public class LoadSunJSON {
         submit(uri, Layers.getConnectionLayer());
     }
 
+    public static void submit(@Nonnull String json) {
+        ReceiverSunJSON receiver = Layers.getConnectionLayer();
+        if (receiver != null) // ConnectionLayer() can be null in current releases
+            EventQueueCallbackExecutor.pool.submit(new LoadSunJSONString(json), new Callback(receiver));
+    }
+
     public static Void submit(@Nonnull URI uri, @Nullable ReceiverSunJSON receiver) {
-        if (receiver != null)
+        if (receiver != null) // ConnectionLayer() can be null in current releases
             EventQueueCallbackExecutor.pool.submit(new LoadSunJSONURI(uri), new Callback(receiver));
         return null;
     }
@@ -30,6 +37,13 @@ public class LoadSunJSON {
         @Override
         public SunJSON.GeometryCollection call() throws Exception {
             return SunJSON.process(JSONUtils.get(uri));
+        }
+    }
+
+    private record LoadSunJSONString(String json) implements Callable<SunJSON.GeometryCollection> {
+        @Override
+        public SunJSON.GeometryCollection call() throws Exception {
+            return SunJSON.process(new JSONObject(json));
         }
     }
 
