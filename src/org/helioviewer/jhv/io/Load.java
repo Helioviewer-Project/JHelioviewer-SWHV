@@ -13,11 +13,17 @@ public interface Load {
 
     void get(@Nonnull URI uri);
 
+    interface LoadString extends Load {
+
+        void get(@Nonnull String string);
+
+    }
+
     Load image = new Image();
     Load fits = new FITS();
-    Load.Request request = new Request();
-    Load state = new State();
-    Load.SunJSON sunJSON = new SunJSON();
+    LoadString request = new Request();
+    LoadString state = new State();
+    LoadString sunJSON = new SunJSON();
 
     class Image implements Load {
         @Override
@@ -41,30 +47,37 @@ public interface Load {
         }
     }
 
-    class Request implements Load {
+    class Request implements LoadString {
         @Override
         public void get(@Nonnull URI uri) {
             LoadRequest.submit(uri);
         }
 
+        @Override
         public void get(@Nonnull String json) {
             LoadRequest.submit(json);
         }
     }
 
-    class State implements Load {
+    class State implements LoadString {
         @Override
         public void get(@Nonnull URI uri) {
             LoadState.submit(uri);
         }
+
+        @Override
+        public void get(@Nonnull String json) {
+            LoadState.submit(json);
+        }
     }
 
-    class SunJSON implements Load {
+    class SunJSON implements LoadString {
         @Override
         public void get(@Nonnull URI uri) {
             LoadSunJSON.submit(uri);
         }
 
+        @Override
         public void get(@Nonnull String json) {
             LoadSunJSON.submit(json);
         }

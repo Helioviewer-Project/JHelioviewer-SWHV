@@ -30,7 +30,7 @@ public class LoadLayer {
     }
 
     public static void submit(@Nonnull ImageLayer layer, @Nonnull List<URI> uriList) {
-        EventQueueCallbackExecutor.pool.submit(new LoadURI(layer, uriList), new Callback(layer));
+        EventQueueCallbackExecutor.pool.submit(new LoadURIImage(layer, uriList), new Callback(layer));
     }
 
     public static void submitFITS(@Nonnull ImageLayer layer, @Nonnull URI uri) {
@@ -45,7 +45,7 @@ public class LoadLayer {
         }
     }
 
-    private record LoadURI(ImageLayer layer, List<URI> uriList) implements Callable<View> {
+    private record LoadURIImage(ImageLayer layer, List<URI> uriList) implements Callable<View> {
         @Override
         public View call() throws Exception {
             DecodeExecutor executor = layer.getExecutor();

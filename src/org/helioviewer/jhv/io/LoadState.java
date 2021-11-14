@@ -13,15 +13,28 @@ import org.json.JSONObject;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-record LoadState(URI uri) implements Callable<JSONObject> {
+class LoadState {
 
     static void submit(@Nonnull URI uri) {
-        EventQueueCallbackExecutor.pool.submit(new LoadState(uri), new Callback());
+        EventQueueCallbackExecutor.pool.submit(new LoadStateURI(uri), new Callback());
     }
 
-    @Override
-    public JSONObject call() throws Exception {
-        return JSONUtils.get(uri).getJSONObject("org.helioviewer.jhv.state");
+    static void submit(@Nonnull String json) {
+        EventQueueCallbackExecutor.pool.submit(new LoadStateString(json), new Callback());
+    }
+
+    private record LoadStateURI(URI uri) implements Callable<JSONObject> {
+        @Override
+        public JSONObject call() throws Exception {
+            return JSONUtils.get(uri).getJSONObject("org.helioviewer.jhv.state");
+        }
+    }
+
+    private record LoadStateString(String json) implements Callable<JSONObject> {
+        @Override
+        public JSONObject call() throws Exception {
+            return new JSONObject(json).getJSONObject("org.helioviewer.jhv.state");
+        }
     }
 
     private static class Callback implements FutureCallback<JSONObject> {
