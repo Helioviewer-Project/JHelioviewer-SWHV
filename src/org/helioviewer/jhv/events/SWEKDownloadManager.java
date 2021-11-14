@@ -41,14 +41,14 @@ class SWEKDownloadManager implements FilterManagerListener {
     private static void stopDownloadSupplier(SWEKSupplier supplier, boolean keepActive) {
         workerMap.get(supplier).forEach(worker -> {
             worker.stopWorker();
-            JHVEventCache.intervalNotDownloaded(supplier, worker.getStart(), worker.getEnd());
+            JHVEventCache.intervalNotDownloaded(supplier, worker.start(), worker.end());
         });
         JHVEventCache.removeSupplier(supplier, keepActive);
         supplier.getGroup().stoppedDownload();
     }
 
     static void workerForcedToStop(SWEKSupplier supplier, SWEKDownloadWorker worker) {
-        JHVEventCache.intervalNotDownloaded(supplier, worker.getStart(), worker.getEnd());
+        JHVEventCache.intervalNotDownloaded(supplier, worker.start(), worker.end());
         workerFinished(supplier, worker);
     }
 
@@ -97,7 +97,7 @@ class SWEKDownloadManager implements FilterManagerListener {
     private static class ComparePriority<T extends SWEKDownloadWorker> implements Comparator<T> {
         @Override
         public int compare(T l1, T l2) {
-            return Long.compare(l2.getEnd(), l1.getEnd());
+            return Long.compare(l2.end(), l1.end());
         }
     }
 

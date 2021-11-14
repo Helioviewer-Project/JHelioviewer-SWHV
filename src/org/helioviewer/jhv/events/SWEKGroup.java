@@ -74,17 +74,17 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVCell {
     private void createAllDatabaseFields() {
         HashMap<String, String> fields = new HashMap<>();
         for (SWEKParameter p : parameterList) {
-            SWEKParameterFilter pf = p.getParameterFilter();
+            SWEKParameterFilter pf = p.filter();
             if (pf != null) {
-                fields.put(p.getParameterName().intern(), pf.getDbType());
+                fields.put(p.name().intern(), pf.dbType());
             }
         }
         for (SWEKRelatedEvents re : swekrelEvents) {
             if (re.getGroup() == this) {
-                re.getRelatedOnList().forEach(swon -> fields.put(swon.parameterFrom.getParameterName().intern(), swon.dbType));
+                re.getRelatedOnList().forEach(swon -> fields.put(swon.parameterFrom.name().intern(), swon.dbType));
             }
             if (re.getRelatedWith() == this) {
-                re.getRelatedOnList().forEach(swon -> fields.put(swon.parameterWith.getParameterName().intern(), swon.dbType));
+                re.getRelatedOnList().forEach(swon -> fields.put(swon.parameterWith.name().intern(), swon.dbType));
             }
         }
         databaseFields = fields;
@@ -109,7 +109,7 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVCell {
     @Nullable
     public SWEKParameter getParameter(String _name) {
         for (SWEKParameter parameter : parameterList) {
-            if (parameter.getParameterName().equalsIgnoreCase(_name)) {
+            if (parameter.name().equalsIgnoreCase(_name)) {
                 return parameter;
             }
         }
@@ -122,7 +122,7 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVCell {
 
     private static boolean checkFilters(List<SWEKParameter> parameters) {
         for (SWEKParameter parameter : parameters) {
-            if (parameter.getParameterFilter() != null) {
+            if (parameter.filter() != null) {
                 return true;
             }
         }

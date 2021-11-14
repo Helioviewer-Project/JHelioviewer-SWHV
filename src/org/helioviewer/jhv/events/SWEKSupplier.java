@@ -39,9 +39,9 @@ public class SWEKSupplier extends DefaultMutableTreeNode implements JHVCell {
         source = _source;
         db = _db;
 
-        isCactus = name == "CACTus" && source.getName() == "HEK"; // interned
+        isCactus = name == "CACTus" && "HEK".equals(source.name());
 
-        key = supplierName + source.getName() + db;
+        key = supplierName + source.name() + db;
         suppliers.put(key, this);
 
         panel = new JPanel(new BorderLayout());
