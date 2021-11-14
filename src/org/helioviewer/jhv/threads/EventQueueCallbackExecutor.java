@@ -18,12 +18,10 @@ public class EventQueueCallbackExecutor extends ForwardingListeningExecutorServi
     public static final EventQueueCallbackExecutor pool = new EventQueueCallbackExecutor(MoreExecutors.listeningDecorator(JHVExecutor.cachedPool));
 
     private static class EventQueueExecutor implements Executor {
-
         @Override
         public void execute(@Nonnull Runnable command) {
             EventQueue.invokeLater(command);
         }
-
     }
 
     private static final Executor eventQueue = new EventQueueExecutor();

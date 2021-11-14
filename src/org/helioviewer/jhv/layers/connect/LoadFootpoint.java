@@ -19,19 +19,13 @@ import org.helioviewer.jhv.time.TimeUtils;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-public class LoadFootpoint implements Callable<TimeMap<PositionCartesian>> {
+public record LoadFootpoint(URI uri) implements Callable<TimeMap<PositionCartesian>> {
 
     private static final DateTimeFormatter euroTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     public static Void submit(@Nonnull URI uri, ReceiverPositionMap receiver) {
         EventQueueCallbackExecutor.pool.submit(new LoadFootpoint(uri), new Callback(receiver));
         return null;
-    }
-
-    private final URI uri;
-
-    private LoadFootpoint(URI _uri) {
-        uri = _uri;
     }
 
     private static long parseTime(String s) {
@@ -69,13 +63,7 @@ public class LoadFootpoint implements Callable<TimeMap<PositionCartesian>> {
         return positionMap;
     }
 
-    private static class Callback implements FutureCallback<TimeMap<PositionCartesian>> {
-
-        private final ReceiverPositionMap receiver;
-
-        Callback(ReceiverPositionMap _receiver) {
-            receiver = _receiver;
-        }
+    private record Callback(ReceiverPositionMap receiver) implements FutureCallback<TimeMap<PositionCartesian>> {
 
         @Override
         public void onSuccess(TimeMap<PositionCartesian> result) {
