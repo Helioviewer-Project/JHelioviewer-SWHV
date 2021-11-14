@@ -17,6 +17,7 @@ public interface Load {
     Load fits = new FITS();
     Load.Request request = new Request();
     Load state = new State();
+    Load sunJSON = new SunJSON();
 
     class Image implements Load {
         @Override
