@@ -124,6 +124,8 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeSelec
             viewpointLayer = (ViewpointLayer) layer;
         else if (layer instanceof MiniviewLayer)
             miniviewLayer = (MiniviewLayer) layer;
+        else if (layer instanceof ConnectionLayer)
+            connectionLayer = (ConnectionLayer) layer;
 
         int row = layers.indexOf(layer);
         fireTableRowsInserted(row, row);

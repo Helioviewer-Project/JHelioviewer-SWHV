@@ -36,21 +36,23 @@ class DropHandler extends TransferHandler {
                 List<?> objects = (List<?>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 
                 List<URI> imageUris = new ArrayList<>(objects.size());
-                ArrayList<URI> requestUris = new ArrayList<>(objects.size());
+                List<URI> jsonUris = new ArrayList<>(objects.size());
                 for (Object o : objects) {
                     if (o instanceof File f) {
                         if (f.isFile() && f.canRead()) {
                             URI uri = f.toURI();
                             String loc = uri.toString().toLowerCase(Locale.ENGLISH);
                             if (loc.endsWith(".json"))
-                                requestUris.add(uri);
+                                jsonUris.add(uri);
                             else
                                 imageUris.add(uri);
                         }
                     }
                 }
 
-                requestUris.forEach(Load.request::get);
+                // jsonUris.forEach(Load.request::get);
+                if (!jsonUris.isEmpty())
+                    Load.sunJSON.get(jsonUris.get(0));
                 if (!imageUris.isEmpty())
                     Load.Image.getAll(imageUris);
 
@@ -61,7 +63,7 @@ class DropHandler extends TransferHandler {
                 if (UrlValidator.getInstance().isValid(loc)) {
                     URI uri = new URI(loc);
                     if (loc.endsWith(".json"))
-                        Load.request.get(uri);
+                        Load.sunJSON.get(uri);
                     else if (loc.endsWith(".jhv"))
                         Load.state.get(uri);
                     else
