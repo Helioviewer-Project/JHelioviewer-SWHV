@@ -80,11 +80,11 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVCell {
             }
         }
         for (SWEKRelatedEvents re : swekrelEvents) {
-            if (re.getGroup() == this) {
-                re.getRelatedOnList().forEach(swon -> fields.put(swon.parameterFrom.name().intern(), swon.dbType));
+            if (re.group() == this) {
+                re.relatedOnList().forEach(swon -> fields.put(swon.parameterFrom.name().intern(), swon.dbType));
             }
-            if (re.getRelatedWith() == this) {
-                re.getRelatedOnList().forEach(swon -> fields.put(swon.parameterWith.name().intern(), swon.dbType));
+            if (re.relatedWith() == this) {
+                re.relatedOnList().forEach(swon -> fields.put(swon.parameterWith.name().intern(), swon.dbType));
             }
         }
         databaseFields = fields;
