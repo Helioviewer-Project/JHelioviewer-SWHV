@@ -181,14 +181,7 @@ public class State {
         EventQueueCallbackExecutor.pool.submit(new WaitLoad(newLayers.keySet()), new Callback(newLayers, masterLayer, time, tracking, play));
     }
 
-    private static class WaitLoad implements Callable<Void> {
-
-        private final Set<ImageLayer> newLayers;
-
-        WaitLoad(Set<ImageLayer> _newLayers) {
-            newLayers = _newLayers;
-        }
-
+    private record WaitLoad(Set<ImageLayer> newLayers) implements Callable<Void> {
         @Override
         public Void call() throws Exception {
             for (ImageLayer layer : newLayers) {
@@ -198,24 +191,10 @@ public class State {
             }
             return null;
         }
-
     }
 
-    private static class Callback implements FutureCallback<Void> {
-
-        private final Map<ImageLayer, Boolean> newLayers;
-        private final ImageLayer masterLayer;
-        private final JHVTime time;
-        private final boolean tracking;
-        private final boolean play;
-
-        Callback(Map<ImageLayer, Boolean> _newLayers, ImageLayer _masterLayer, JHVTime _time, boolean _tracking, boolean _play) {
-            newLayers = _newLayers;
-            masterLayer = _masterLayer;
-            time = _time;
-            tracking = _tracking;
-            play = _play;
-        }
+    private record Callback(Map<ImageLayer, Boolean> newLayers, ImageLayer masterLayer, JHVTime time, boolean tracking,
+                            boolean play) implements FutureCallback<Void> {
 
         @Override
         public void onSuccess(Void result) {
