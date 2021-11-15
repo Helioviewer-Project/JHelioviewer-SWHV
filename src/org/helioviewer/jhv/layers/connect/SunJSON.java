@@ -31,7 +31,6 @@ public class SunJSON {
     }
 
     public record GeometryCollection(JHVTime time, List<GeometryBuffer> list) {
-
         public void render(GL2 gl, GLSLLine lines, GLSLShape points, double aspect, double factor) {
             for (GeometryBuffer buf : list) {
                 if (buf.g.type == GeometryType.Point) {
@@ -43,7 +42,6 @@ public class SunJSON {
                 }
             }
         }
-
     }
 
     static GeometryCollection process(JSONObject jo) throws JSONException {
@@ -85,7 +83,7 @@ public class SunJSON {
                     List<Vec3> coords = new ArrayList<>();
                     for (Object oc : go.getJSONArray("coordinates")) {
                         if (oc instanceof JSONArray coord) {
-                            coords.add(new Vec3(coord.getDouble(0), coord.getDouble(1), coord.getDouble(2)));
+                            coords.add(new Vec3(coord.getDouble(0), Math.toRadians(coord.getDouble(1)), Math.toRadians(coord.getDouble(2))));
                         }
                     }
                     int coordsSize = coords.size();
@@ -140,8 +138,6 @@ public class SunJSON {
     }
 
     private static void toCartesian(Vec3 v, double r, double lon, double lat) {
-        lon = Math.toRadians(lon);
-        lat = Math.toRadians(lat);
         v.x = r * Math.cos(lat) * Math.sin(lon);
         v.y = r * Math.sin(lat);
         v.z = r * Math.cos(lat) * Math.cos(lon);
