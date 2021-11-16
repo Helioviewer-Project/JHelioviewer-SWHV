@@ -52,8 +52,6 @@ class J2KDecoder implements Callable<ImageBuffer> {
     @Nonnull
     @Override
     public ImageBuffer call() throws Exception {
-        //sw.reset().start();
-
         SubImage subImage = params.subImage;
         int frame = params.frame;
         int numComponents = view.getNumComponents(frame);
@@ -84,11 +82,13 @@ class J2KDecoder implements Callable<ImageBuffer> {
 
         int[] srcStride = new int[1];
         long addr = compositorBuf.Get_buf(srcStride, false);
+        ByteBuffer nativeBuffer = MemoryUtil.memByteBuffer(addr, 4 * srcStride[0] * actualHeight).order(ByteOrder.nativeOrder());
 
         ImageBuffer.Format format = numComponents < 3 ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.ARGB32;
-        byte[] byteBuffer = new byte[actualWidth * actualHeight * format.bytes];
+        byte[] outBuffer = new byte[actualWidth * actualHeight * format.bytes];
 
         Kdu_dims newRegion = new Kdu_dims();
+        //sw.reset().start();
         while (compositor.Process(MAX_RENDER_SAMPLES, newRegion)) {
             Kdu_coords newSize = newRegion.Access_size();
             int newWidth = newSize.Get_x();
@@ -104,17 +104,14 @@ class J2KDecoder implements Callable<ImageBuffer> {
             int srcIdx = 0;
 
             if (numComponents < 3) {
-                for (int row = 0; row < newHeight; row++, dstIdx += actualWidth, srcIdx += srcStride[0]) {
-                    for (int col = 0; col < newWidth; ++col) {
-                        byteBuffer[dstIdx + col] = MemoryUtil.memGetByte(addr + 4L * (srcIdx + col));
+                for (int j = 0; j < newHeight; ++j, dstIdx += actualWidth, srcIdx += srcStride[0]) {
+                    for (int i = 0; i < newWidth; ++i) {
+                        outBuffer[dstIdx + i] = nativeBuffer.get(4 * (srcIdx + i));
                     }
                 }
             } else {
-                for (int row = 0; row < newHeight; row++, dstIdx += actualWidth, srcIdx += srcStride[0]) {
-                    for (int col = 0; col < newWidth; ++col) {
-                        for (int idx = 0; idx < 4; ++idx)
-                            byteBuffer[4 * (dstIdx + col) + idx] = MemoryUtil.memGetByte(addr + 4L * (srcIdx + col) + idx);
-                    }
+                for (int j = 0; j < newHeight; ++j, dstIdx += actualWidth, srcIdx += srcStride[0]) {
+                    nativeBuffer.get(4 * srcIdx, outBuffer, 4 * dstIdx, 4 * newWidth);
                 }
             }
         }
@@ -126,8 +123,7 @@ class J2KDecoder implements Callable<ImageBuffer> {
         if (view.getMaximumFrameNumber() > 0 && acc.count() == view.getMaximumFrameNumber() + 1)
             System.out.println(">>> mean: " + acc.mean() + " stddev: " + acc.sampleStandardDeviation());
 */
-
-        ImageBuffer ib = new ImageBuffer(actualWidth, actualHeight, format, ByteBuffer.wrap(byteBuffer).order(ByteOrder.nativeOrder()));
+        ImageBuffer ib = new ImageBuffer(actualWidth, actualHeight, format, ByteBuffer.wrap(outBuffer).order(ByteOrder.nativeOrder()));
         return ImageBuffer.mgnFilter(ib, mgn);
     }
 
@@ -136,7 +132,7 @@ class J2KDecoder implements Callable<ImageBuffer> {
         try {
             Kdu_thread_env kte = new Kdu_thread_env();
             kte.Create();
-            int numThreads = Math.min(4, Kdu_global.Kdu_get_num_processors());
+            int numThreads = Math.min(8, Kdu_global.Kdu_get_num_processors());
             for (int i = 1; i < numThreads; i++)
                 kte.Add_thread();
             return kte;

@@ -30,9 +30,9 @@ public class SunJSON {
     private record GeometryBuffer(Geometry g, BufVertex vexBuf) {
     }
 
-    public record GeometryCollection(JHVTime time, List<GeometryBuffer> list) {
+    public record GeometryCollection(JHVTime time, List<GeometryBuffer> bufList) {
         public void render(GL2 gl, GLSLLine lines, GLSLShape points, double aspect, double factor) {
-            for (GeometryBuffer buf : list) {
+            for (GeometryBuffer buf : bufList) {
                 if (buf.g.type == GeometryType.Point) {
                     points.setVertexRepeatable(gl, buf.vexBuf);
                     points.renderPoints(gl, factor);
@@ -47,7 +47,7 @@ public class SunJSON {
     static GeometryCollection process(JSONObject jo) throws JSONException {
         Pair<JHVTime, List<Geometry>> res = parse(jo);
 
-        List<GeometryBuffer> bufs = new ArrayList<>();
+        List<GeometryBuffer> bufList = new ArrayList<>();
         for (Geometry g : res.right()) {
             int coords = g.coordinates.size();
 
@@ -57,9 +57,9 @@ public class SunJSON {
                 case Ellipse -> new BufVertex((SUBDIVISIONS + 1 + 2) * GLSLLine.stride);
             };
             putGeometry(g, vexBuf);
-            bufs.add(new GeometryBuffer(g, vexBuf));
+            bufList.add(new GeometryBuffer(g, vexBuf));
         }
-        return new GeometryCollection(res.left(), bufs);
+        return new GeometryCollection(res.left(), bufList);
     }
 
     private static Pair<JHVTime, List<Geometry>> parse(JSONObject jo) throws JSONException {
