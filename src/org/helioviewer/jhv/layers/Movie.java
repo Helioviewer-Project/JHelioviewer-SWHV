@@ -214,7 +214,7 @@ public class Movie {
         lastTimestamp = dateTime;
 
         Camera camera = Display.getCamera();
-        camera.timeChanged(lastTimestamp);
+        camera.timeChanged(dateTime);
 
         Layers.setImageLayersNearestFrame(dateTime);
         MovieDisplay.render(1);
