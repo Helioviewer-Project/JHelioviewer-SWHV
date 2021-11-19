@@ -95,7 +95,7 @@ public class UIGlobals {
         // setUIFont(uiFont);
         UIManager.getLookAndFeelDefaults().put("defaultFont", uiFont);
 
-        try (InputStream is = FileUtils.getResource("/fonts/DroidSansFallback.ttf")) {
+        try (InputStream is = FileUtils.getResource("/fonts/DejaVuSansCondensed.ttf")) {
             canvasFont = Font.createFont(Font.TRUETYPE_FONT, is);
             GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(canvasFont);
         } catch (Exception e) {

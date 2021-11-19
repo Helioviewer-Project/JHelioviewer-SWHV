@@ -31,7 +31,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
         // P = center + r cos(A) (bp x ep) + r sin(A) ep
 
         double d = 2 * r;
-        diameterStr = d < 0.2 * Sun.Radius ? String.format("Dann: %7.2fMm", d * (Sun.RadiusMeter / 1e6)) : String.format("Dann: %7.2fR\u2299", d);
+        diameterStr = d < 0.2 * Sun.Radius ? String.format("Dann: %7.2fMm", d * (Sun.RadiusMeter / 1e6)) : String.format("Dann: %7.2fR\u2609", d);
 
         Vec3 center = Vec3.multiply(bp, cosf);
         Vec3 u = Vec3.cross(bp, ep);

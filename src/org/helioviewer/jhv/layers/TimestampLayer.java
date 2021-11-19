@@ -76,7 +76,7 @@ public class TimestampLayer extends AbstractLayer {
         text += viewpoint.time.toString();
 
         if (extra) {
-            text += String.format(" | D\u2299: %7.4fau", viewpoint.distance * Sun.MeanEarthDistanceInv);
+            text += String.format(" | D\u2609: %7.4fau", viewpoint.distance * Sun.MeanEarthDistanceInv);
             if (!Display.multiview) {
                 text += " | FOV: " + formatFOV(camera.getCameraWidth());
             }
@@ -100,7 +100,7 @@ public class TimestampLayer extends AbstractLayer {
 
     private static String formatFOV(double r) {
         if (r < 2 * 32 * Sun.Radius)
-            return String.format("%6.4fR\u2299", r);
+            return String.format("%6.4fR\u2609", r);
         else
             return String.format("%6.4fau", r * Sun.MeanEarthDistanceInv);
     }
