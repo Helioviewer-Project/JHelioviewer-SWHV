@@ -31,7 +31,7 @@ public class AnnotateLoop extends AbstractAnnotateable {
         // P = center + r cos(A) (bp x ep) + r sin(A) ep
 
         double h = (cosf + r) * Math.sqrt(bp.x * bp.x + bp.y * bp.y + bp.z * bp.z) - Sun.Radius;
-        heightStr = h < 0.2 * Sun.Radius ? String.format("Hann: %7.2fMm", h * (Sun.RadiusMeter / 1e6)) : String.format("Hann: %7.2fR\u2299", h);
+        heightStr = h < 0.2 * Sun.Radius ? String.format("Hann: %7.2fMm", h * (Sun.RadiusMeter / 1e6)) : String.format("Hann: %7.2fR\u2609", h);
 
         Vec3 center = Vec3.multiply(bp, cosf);
         Vec3 u = Vec3.cross(bp, ep);

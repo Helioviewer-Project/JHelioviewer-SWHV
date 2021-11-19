@@ -3,6 +3,7 @@
 
 ## JHelioviewer 4.1.2 (pending)
 
+- Allow drag'n'drop of directories
 - Add option to adjust the image timestamp to be
     - observed time minus light time from Sun center
     - observed time minus light time from Sun center plus light time to Earth

@@ -28,7 +28,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
 
     private static final String nanOrtho = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
     private static final String nanLati = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
-    private static final String nanPolar = String.format("%7s\u00B0,%7s\u2299", "--", "--");
+    private static final String nanPolar = String.format("%7s\u00B0,%7s\u2609", "--", "--");
 
     private final Camera camera;
 
@@ -98,7 +98,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
 
     private static String formatR(double r) {
         if (r < 32 * Sun.Radius)
-            return String.format("%7.2fR\u2299", r);
+            return String.format("%7.2fR\u2609", r);
         else
             return String.format("%7.2fau", r * Sun.MeanEarthDistanceInv);
     }

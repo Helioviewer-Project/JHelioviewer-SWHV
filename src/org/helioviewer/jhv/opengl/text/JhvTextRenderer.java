@@ -883,7 +883,7 @@ public class JhvTextRenderer {
         private final Glyph[] glyphCache;
 
         GlyphProducer(int fontLengthInGlyphs) {
-            unicodes2Glyphs = new int[9000]; // highest character we can draw
+            unicodes2Glyphs = new int[10000]; // highest character we can draw
             glyphCache = new Glyph[fontLengthInGlyphs];
             clearAllCacheEntries();
         }
