@@ -6,7 +6,7 @@ import java.util.concurrent.Executors;
 
 class JHVExecutor {
 
-    public static final ExecutorService cachedPool = createCachedPool();
+    static final ExecutorService cachedPool = createCachedPool();
 
     private static ExecutorService createCachedPool() {
         ExecutorService service = Executors.newCachedThreadPool(new JHVThread.NamedThreadFactory("Worker"));

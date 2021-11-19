@@ -10,6 +10,7 @@ import java.util.Locale;
 
 import javax.swing.TransferHandler;
 
+import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.log.Log;
 
@@ -46,6 +47,18 @@ class DropHandler extends TransferHandler {
                                 jsonUris.add(uri);
                             else
                                 imageUris.add(uri);
+                        } else if (f.isDirectory()) {
+                            try {
+                                for (URI uri : FileUtils.listDir(f.toPath())) {
+                                    String loc = uri.toString().toLowerCase(Locale.ENGLISH);
+                                    if (loc.endsWith(".json"))
+                                        jsonUris.add(uri);
+                                    else
+                                        imageUris.add(uri);
+                                }
+                            } catch (Exception e) {
+                                Log.error("Error reading directory " + f, e);
+                            }
                         }
                     }
                 }
