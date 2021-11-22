@@ -58,7 +58,7 @@ public class TimeAxis {
         long now = System.currentTimeMillis(); // assume now < TimeUtils.MAXIMAL_TIME
 
         start = MathUtils.clip(start, TimeUtils.MINIMAL_TIME.milli, now);
-        end = MathUtils.clip(end, start + TimeUtils.MINUTE_IN_MILLIS, now);
+        end = MathUtils.clip(end, Math.min(start + TimeUtils.MINUTE_IN_MILLIS, now), now);
         if (end - start < TimeUtils.MINUTE_IN_MILLIS) {
             start = now - TimeUtils.MINUTE_IN_MILLIS;
             end = now;
