@@ -8,9 +8,8 @@ public class TimeAxis {
     private long start;
     private long end;
 
-    public TimeAxis(long _min, long _max) {
-        start = _min;
-        end = _max;
+    public TimeAxis(long _start, long _end) {
+        set(_start, _end);
     }
 
     public long start() {
