@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.timelines.draw;
 
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.time.TimeUtils;
 
 public class TimeAxis {
@@ -54,19 +55,13 @@ public class TimeAxis {
     }
 
     private void adaptBounds() {
-        long now = System.currentTimeMillis();
-        long intervalLength = Math.min(end - start, now - TimeUtils.MINIMAL_TIME.milli);
-        if (intervalLength < TimeUtils.MINUTE_IN_MILLIS) { // or intervalLength <= 0, via wheel zoom in
-            end = start + TimeUtils.MINUTE_IN_MILLIS;
-            intervalLength = TimeUtils.MINUTE_IN_MILLIS;
-        }
-        if (end > now) {
-            start = now - intervalLength;
+        long now = System.currentTimeMillis(); // assume now < TimeUtils.MAXIMAL_TIME
+
+        start = MathUtils.clip(start, TimeUtils.MINIMAL_TIME.milli, now);
+        end = MathUtils.clip(end, start + TimeUtils.MINUTE_IN_MILLIS, now);
+        if (end - start < TimeUtils.MINUTE_IN_MILLIS) {
+            start = now - TimeUtils.MINUTE_IN_MILLIS;
             end = now;
-        }
-        if (start < TimeUtils.MINIMAL_TIME.milli) {
-            start = TimeUtils.MINIMAL_TIME.milli;
-            end = TimeUtils.MINIMAL_TIME.milli + intervalLength;
         }
     }
 
