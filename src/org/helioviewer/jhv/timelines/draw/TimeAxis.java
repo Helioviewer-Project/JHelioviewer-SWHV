@@ -21,15 +21,15 @@ public class TimeAxis {
     }
 
     public int value2pixel(int x0, int w, long val) {
-        return (int) ((double) w * (val - start) / (end - start) + x0);
+        return (int) ((double) w / (end - start) * (val - start) + x0);
     }
 
     public long pixel2value(int x0, int w, int x) {
-        return (long) (start + (end - start) * (x - x0) / (double) w);
+        return (long) (start + (end - start) / (double) w * (x - x0));
     }
 
     void move(int w, double pixelDistance) {
-        long diff = (long) (pixelDistance * (end - start) / w);
+        long diff = (long) (pixelDistance / w * (end - start));
         move(diff);
     }
 
@@ -40,7 +40,7 @@ public class TimeAxis {
     }
 
     void zoom(int x0, int w, int x, double factor) {
-        double multiplier = factor * (end - start) / w;
+        double multiplier = factor / w * (end - start);
         double ratio = (x - x0) / (double) w;
         start -= (long) (multiplier * ratio);
         end += (long) (multiplier * (1. - ratio));
