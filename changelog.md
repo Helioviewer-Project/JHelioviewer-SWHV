@@ -4,7 +4,7 @@
 ## JHelioviewer 4.1.2 (pending)
 
 - Allow drag'n'drop of directories
-- Add option to adjust the image timestamp to be
+- Add preference option to adjust the image timestamp to be:
     - observed time minus light time from Sun center
     - observed time minus light time from Sun center plus light time to Earth
 
@@ -18,7 +18,7 @@
 - Indicate height above sphere of loop annotation top
 - Indicate pixel coordinates of the decoded image under the mouse pointer
 - Add ESAC as source server
-- Add option to playback at high resolution
+- Add preference option to playback at high resolution
 - Double-click to reset sliders to default
 - Add toolbar button to reset camera axis
 - Allow playback without image layers loaded (within selected time interval)
@@ -56,7 +56,7 @@
 - Simplify datetime selection and use NLP for input time parsing
 - Support setting playback speed in time period per second
 - Allow customization of grid type in latitudinal projection ([#99](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/99>))
-- Allow several video export qualities of H.264 and H.265, as well as series of PNGs ([#26](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/26>),[#44](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/44>),[#45](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/45>))
+- Add preference setting for several video export qualities of H.264 and H.265, as well as series of PNGs ([#26](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/26>),[#44](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/44>),[#45](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/45>))
 - Add white background view option
 - Allow setting a state file to load at start-up
 
