@@ -236,7 +236,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private static int value2pixel(int x0, int w, long val, long start, long end) {
-        return (int) ((double) w * (val - start) / (end - start) + x0);
+        return (int) ((double) w / (end - start) * (val - start) + x0);
     }
 
     private static void drawHorizontalLabels(Graphics2D g, Rectangle graphArea, TimeAxis xAxis, int ht, TimelineLayer tl) {
