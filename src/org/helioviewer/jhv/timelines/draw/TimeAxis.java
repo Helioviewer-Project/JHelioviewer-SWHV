@@ -29,7 +29,7 @@ public class TimeAxis {
     }
 
     void move(int w, double pixelDistance) {
-        long diff = (long) (pixelDistance / w * (end - start));
+        long diff = (long) ((end - start) / (double) w * pixelDistance);
         move(diff);
     }
 
@@ -40,7 +40,7 @@ public class TimeAxis {
     }
 
     void zoom(int x0, int w, int x, double factor) {
-        double multiplier = factor / w * (end - start);
+        double multiplier = (end - start) / (double) w * factor;
         double ratio = (x - x0) / (double) w;
         start -= (long) (multiplier * ratio);
         end += (long) (multiplier * (1. - ratio));
@@ -56,7 +56,7 @@ public class TimeAxis {
     private void adaptBounds() {
         long now = System.currentTimeMillis();
         long intervalLength = Math.min(end - start, now - TimeUtils.MINIMAL_TIME.milli);
-        if (intervalLength < TimeUtils.MINUTE_IN_MILLIS) { // or intervalLength <= 0, via wheel zoomin
+        if (intervalLength < TimeUtils.MINUTE_IN_MILLIS) { // or intervalLength <= 0, via wheel zoom in
             end = start + TimeUtils.MINUTE_IN_MILLIS;
             intervalLength = TimeUtils.MINUTE_IN_MILLIS;
         }
