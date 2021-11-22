@@ -9,7 +9,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.JHVGlobals;
@@ -140,15 +139,8 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
 
     @Override
     public void load(String server, int sourceId) {
-        long start = getStartTime();
-        long end = getEndTime();
-        if (start > end) {
-            setTime(end, end);
-            JOptionPane.showMessageDialog(null, "End date is before start date", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        imageSelectorPanel.load(layer, getStartTime(), getEndTime(), getCadence());
+        setTime(getStartTime(), getEndTime());
+        imageSelectorPanel.load(layer, getStartTime(), getEndTime(), getCadence()); // time selector might have changed
         layer = null;
         setVisible(false);
     }

@@ -112,11 +112,12 @@ public class TimeSelectorPanel extends JPanel {
     }
 
     public void setTime(long start, long end) {
-        carringtonPicker.setTime(start);
-        startTimePanel.setTime(start);
-        endTimePanel.setTime(end);
+        long finalStart = start < end ? start : end; // maybe popup error
 
-        listeners.forEach(listener -> listener.timeSelectionChanged(start, end));
+        carringtonPicker.setTime(finalStart);
+        startTimePanel.setTime(finalStart);
+        endTimePanel.setTime(end);
+        listeners.forEach(listener -> listener.timeSelectionChanged(finalStart, end));
     }
 
     public long getStartTime() {
