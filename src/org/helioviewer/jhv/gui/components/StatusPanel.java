@@ -19,11 +19,9 @@ import org.helioviewer.jhv.gui.UIGlobals;
 public class StatusPanel extends JPanel {
 
     public static class StatusPlugin extends JLabel {
-
         protected StatusPlugin() {
             setFont(UIGlobals.uiFontMonoSmall);
         }
-
     }
 
     private final JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));

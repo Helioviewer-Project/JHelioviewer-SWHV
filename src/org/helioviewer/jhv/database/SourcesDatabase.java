@@ -55,24 +55,8 @@ public class SourcesDatabase extends Thread {
         }
     }
 
-    private static class Insert implements Callable<Void> {
-
-        private final int sourceId;
-        private final String server;
-        private final String observatory;
-        private final String dataset;
-        private final long start;
-        private final long end;
-
-        Insert(int _sourceId, @Nonnull String _server, @Nonnull String _observatory, @Nonnull String _dataset, long _start, long _end) {
-            sourceId = _sourceId;
-            server = _server;
-            observatory = _observatory;
-            dataset = _dataset;
-            start = _start;
-            end = _end;
-        }
-
+    private record Insert(int sourceId, @Nonnull String server, @Nonnull String observatory, @Nonnull String dataset,
+                          long start, long end) implements Callable<Void> {
         @Override
         public Void call() throws Exception {
             insert.setInt(1, sourceId);
@@ -84,7 +68,6 @@ public class SourcesDatabase extends Thread {
             insert.executeUpdate();
             return null;
         }
-
     }
 
     public static int doSelect(@Nonnull String server, @Nonnull String observatory, @Nonnull String dataset) {
