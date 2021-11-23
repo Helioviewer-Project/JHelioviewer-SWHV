@@ -37,7 +37,7 @@ public class LoadSunJSON {
 
     private record LoadSunJSONString(String json) implements Callable<SunJSON.GeometryCollection> {
         @Override
-        public SunJSON.GeometryCollection call() throws Exception {
+        public SunJSON.GeometryCollection call() {
             return SunJSON.process(new JSONObject(json));
         }
     }
