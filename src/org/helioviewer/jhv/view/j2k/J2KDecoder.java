@@ -26,7 +26,7 @@ import org.lwjgl.system.MemoryUtil;
 //import com.google.common.math.StatsAccumulator;
 //import com.google.common.base.Stopwatch;
 
-class J2KDecoder implements Callable<ImageBuffer> {
+record J2KDecoder(J2KView view, DecodeParams params, boolean mgn) implements Callable<ImageBuffer> {
 
     // Maximum of samples to process per rendering iteration
     private static final int MAX_RENDER_SAMPLES = 256 * 1024;
@@ -36,18 +36,8 @@ class J2KDecoder implements Callable<ImageBuffer> {
 
     private static final ThreadLocal<Kdu_thread_env> localThread = ThreadLocal.withInitial(J2KDecoder::createThreadEnv);
 
-    private final J2KView view;
-    private final DecodeParams params;
-    private final boolean mgn;
-
     //private final Stopwatch sw = Stopwatch.createUnstarted();
     //private static final ThreadLocal<StatsAccumulator> localAcc = ThreadLocal.withInitial(StatsAccumulator::new);
-
-    J2KDecoder(J2KView _view, DecodeParams _params, boolean _mgn) {
-        view = _view;
-        params = _params;
-        mgn = _mgn;
-    }
 
     @Nonnull
     @Override

@@ -44,18 +44,7 @@ public class ToolBar extends JToolBar {
         ICONANDTEXT, ICONONLY
     }
 
-    static class ButtonText {
-
-        private final String icon;
-        private final String text;
-        final String tip;
-
-        ButtonText(String _icon, String _text, String _tip) {
-            icon = _icon;
-            text = _text;
-            tip = _tip;
-        }
-
+    private record ButtonText(String icon, String text, String tip) {
         @Override
         public String toString() {
             return displayMode == DisplayMode.ICONONLY ? icon : icon + "<br/>" + text;
