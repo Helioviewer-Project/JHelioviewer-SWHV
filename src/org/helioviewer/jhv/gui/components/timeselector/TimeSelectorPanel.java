@@ -112,8 +112,7 @@ public class TimeSelectorPanel extends JPanel {
     }
 
     public void setTime(long start, long end) {
-        long finalStart = start < end ? start : end; // maybe popup error
-
+        long finalStart = Math.min(start, end); // maybe popup error
         carringtonPicker.setTime(finalStart);
         startTimePanel.setTime(finalStart);
         endTimePanel.setTime(end);

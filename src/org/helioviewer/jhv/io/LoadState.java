@@ -32,7 +32,7 @@ class LoadState {
 
     private record LoadStateString(String json) implements Callable<JSONObject> {
         @Override
-        public JSONObject call() throws Exception {
+        public JSONObject call() {
             return new JSONObject(json).getJSONObject("org.helioviewer.jhv.state");
         }
     }
