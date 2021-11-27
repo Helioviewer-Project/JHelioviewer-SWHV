@@ -3,8 +3,8 @@ package org.helioviewer.jhv.io;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
@@ -19,38 +19,49 @@ import com.google.common.util.concurrent.FutureCallback;
 
 public class SoarClient {
 
+    private static final String SEARCH_URL = "http://soar.esac.esa.int/soar-sl-tap/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=";
+    private static final String LOAD_URL = "http://soar.esac.esa.int/soar-sl-tap/data?retrieval_type=LAST_PRODUCT&product_type=SCIENCE&data_item_id=";
+
     public static void submitSearch(@Nonnull SoarReceiver receiver, @Nonnull String descriptor, @Nonnull String level, long start, long end) {
         EventQueueCallbackExecutor.pool.submit(new SoarSearch(descriptor, level, start, end), new Callback(receiver));
     }
 
-    private static final String SOAR_URL = "http://soar.esac.esa.int/soar-sl-tap/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=";
+    public static void submitLoad(@Nonnull List<String> descriptors) {
+        List<URI> uris = new ArrayList<>(descriptors.size());
+        for (String descriptor : descriptors) {
+            try {
+                uris.add(new URI(LOAD_URL + descriptor));
+            } catch (Exception e) {
+                Log.error(e);
+            }
+        }
+        Load.Image.getAll(uris);
+    }
 
-    private record SoarSearch(String descriptor, String level, long start,
-                              long end) implements Callable<Map<String, String>> {
+    private record SoarSearch(String descriptor, String level, long start, long end) implements Callable<List<String>> {
         @Override
-        public Map<String, String> call() throws Exception {
-            String select = "SELECT data_item_id,filename from v_sc_data_item " +
+        public List<String> call() throws Exception {
+            String select = "SELECT data_item_id from v_sc_data_item " +
                     "WHERE descriptor='" + descriptor +
                     "' AND begin_time >= '" + TimeUtils.format(start) + "' and begin_time <= '" + TimeUtils.format(end) +
                     "' and level='" + level + "' ORDER BY begin_time";
-            URI uri = new URI(SOAR_URL + URLEncoder.encode(select, StandardCharsets.UTF_8));
+            URI uri = new URI(SEARCH_URL + URLEncoder.encode(select, StandardCharsets.UTF_8));
             JSONArray data = JSONUtils.get(uri).getJSONArray("data");
 
             int length = data.length();
-            Map<String, String> result = new LinkedHashMap<>(length);
+            List<String> result = new ArrayList<>(length);
             for (int i = 0; i < length; i++) {
                 JSONArray item = data.getJSONArray(i);
-                result.put(item.getString(0), item.getString(1));
+                result.add(item.getString(0));
             }
-
             return result;
         }
     }
 
-    private record Callback(SoarReceiver receiver) implements FutureCallback<Map<String, String>> {
+    private record Callback(SoarReceiver receiver) implements FutureCallback<List<String>> {
 
         @Override
-        public void onSuccess(Map<String, String> result) {
+        public void onSuccess(List<String> result) {
             receiver.setSoarItems(result);
         }
 
