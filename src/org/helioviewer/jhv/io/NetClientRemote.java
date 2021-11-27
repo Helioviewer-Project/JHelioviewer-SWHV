@@ -15,6 +15,7 @@ import org.helioviewer.jhv.JHVGlobals;
 
 import okhttp3.Cache;
 import okhttp3.CacheControl;
+import okhttp3.Dispatcher;
 import okhttp3.HttpUrl;
 //import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -26,8 +27,12 @@ import okio.BufferedSource;
 
 class NetClientRemote implements NetClient {
 
+    private static final Dispatcher dispatcher;
+
     static {
         Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
+        dispatcher = new Dispatcher();
+        dispatcher.setMaxRequestsPerHost(8);
     }
 
     //private static final HttpLoggingInterceptor logging = new HttpLoggingInterceptor(Log::info).setLevel(HttpLoggingInterceptor.Level.HEADERS);
@@ -38,6 +43,7 @@ class NetClientRemote implements NetClient {
             .connectTimeout(JHVGlobals.getConnectTimeout(), TimeUnit.MILLISECONDS)
             .readTimeout(JHVGlobals.getReadTimeout(), TimeUnit.MILLISECONDS)
             .cache(new Cache(JHVGlobals.clientCacheDir, cacheSize))
+            .dispatcher(dispatcher)
             //.addInterceptor(logging)
             //.addInterceptor(new LoggingInterceptor())
             .build();
