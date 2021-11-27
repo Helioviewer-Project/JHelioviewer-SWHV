@@ -36,7 +36,9 @@ public interface Load {
         }
 
         public static void getAll(@Nonnull List<URI> uris) {
-            LoadLayer.submit(ImageLayer.create(null), uris);
+            if (!uris.isEmpty()) {
+                LoadLayer.submit(ImageLayer.create(null), uris);
+            }
         }
     }
 

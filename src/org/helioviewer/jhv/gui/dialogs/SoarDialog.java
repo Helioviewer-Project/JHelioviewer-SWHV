@@ -35,8 +35,8 @@ public class SoarDialog extends StandardDialog implements SoarReceiver {
     private static final ImmutableSortedMap<String, String> Dataset = new ImmutableSortedMap.Builder<String, String>(JHVGlobals.alphanumComparator).
             put("EUI FSI 174", "EUI-FSI174-IMAGE").
             put("EUI FSI 304", "EUI-FSI304-IMAGE").
-            put("EUI HRI 174", "EUI-HRI174-IMAGE").
-            put("EUI HRI LYA", "EUI-HRILYA-IMAGE").
+            put("EUI HRI 174", "EUI-HRIEUV174-IMAGE").
+            put("EUI HRI LYA", "EUI-HRILYA1216-IMAGE").
             build();
 
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
@@ -68,8 +68,14 @@ public class SoarDialog extends StandardDialog implements SoarReceiver {
         JButton cancelBtn = new JButton(close);
         cancelBtn.setText("Cancel");
 
+        JButton loadBtn = new JButton("Add");
+        loadBtn.addActionListener(e -> {
+            SoarClient.submitLoad(listPane.getSelectedValuesList());
+            setVisible(false);
+        });
+
         ButtonPanel panel = new ButtonPanel();
-        //panel.add(okBtn, ButtonPanel.AFFIRMATIVE_BUTTON);
+        panel.add(loadBtn, ButtonPanel.AFFIRMATIVE_BUTTON);
         panel.add(cancelBtn, ButtonPanel.CANCEL_BUTTON);
 
         return panel;
@@ -87,8 +93,10 @@ public class SoarDialog extends StandardDialog implements SoarReceiver {
         searchBtn.addActionListener(e -> {
             if (datasetCombo.getSelectedItem() instanceof String dataset && levelCombo.getSelectedItem() instanceof String level) {
                 String descriptor = Dataset.get(dataset);
-                if (descriptor != null)
+                if (descriptor != null) {
                     SoarClient.submitSearch(this, descriptor, level, timeSelectorPanel.getStartTime(), timeSelectorPanel.getEndTime());
+                    resultLabel.setText("Searching...");
+                }
             }
         });
         dataSelector.add(searchBtn);
@@ -103,8 +111,8 @@ public class SoarDialog extends StandardDialog implements SoarReceiver {
         content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
         content.add(timeSelectorPanel);
         content.add(dataSelector);
-        content.add(scrollPane);
         content.add(resultPanel);
+        content.add(scrollPane);
 
         content.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
         return content;
