@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
@@ -51,6 +52,9 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
 
         fitsTable.setModel(fitsModel);
         fitsTable.setRowSorter(new TableRowSorter<>(fitsModel));
+        int keywordWidth = new JLabel("MMMMMMMM").getPreferredSize().width;
+        fitsTable.getColumnModel().getColumn(0).setMinWidth(keywordWidth);
+        fitsTable.getColumnModel().getColumn(0).setMaxWidth(keywordWidth);
         fitsTable.getColumnModel().getColumn(1).setCellRenderer(new WrappedTable.WrappedTextRenderer());
 
         setInitFocusedComponent(fitsTable);
@@ -152,7 +156,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
     private static class FitsModel extends DefaultTableModel {
 
         FitsModel() {
-            super(new String[0][0], new String[]{"FITS Keyword", "Value"});
+            super(new String[0][0], new String[]{"Keyword", "Value"});
         }
 
         @Override
