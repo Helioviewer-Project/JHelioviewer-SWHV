@@ -45,7 +45,13 @@ public interface Load {
     class FITS implements Load {
         @Override
         public void get(@Nonnull URI uri) {
-            LoadLayer.submitFITS(ImageLayer.create(null), uri);
+            getAll(List.of(uri));
+        }
+
+        public static void getAll(@Nonnull List<URI> uris) {
+            if (!uris.isEmpty()) {
+                LoadLayer.submitFITS(ImageLayer.create(null), uris);
+            }
         }
     }
 

@@ -35,7 +35,7 @@ public class SoarClient {
                 Log.error(e);
             }
         }
-        Load.Image.getAll(uris);
+        Load.FITS.getAll(uris);
     }
 
     private record SoarSearch(String descriptor, String level, long start, long end) implements Callable<List<String>> {
