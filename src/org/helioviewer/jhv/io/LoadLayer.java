@@ -29,12 +29,8 @@ public class LoadLayer {
         return EventQueueCallbackExecutor.pool.submit(new LoadRemote(layer, req), new Callback(layer));
     }
 
-    public static void submit(@Nonnull ImageLayer layer, @Nonnull List<URI> uriList) {
-        EventQueueCallbackExecutor.pool.submit(new LoadURIImage(layer, uriList, false), new Callback(layer));
-    }
-
-    public static void submitFITS(@Nonnull ImageLayer layer, @Nonnull List<URI> uri) {
-        EventQueueCallbackExecutor.pool.submit(new LoadURIImage(layer, uri, true), new Callback(layer));
+    public static void submit(@Nonnull ImageLayer layer, @Nonnull List<URI> uriList, boolean forceFITS) {
+        EventQueueCallbackExecutor.pool.submit(new LoadURIImage(layer, uriList, forceFITS), new Callback(layer));
     }
 
     private record LoadRemote(ImageLayer layer, APIRequest req) implements Callable<View> {

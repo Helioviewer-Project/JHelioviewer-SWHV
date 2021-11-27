@@ -66,7 +66,7 @@ public record DownloadLayer(ImageLayer layer, File dstFile, URI uri) implements 
         public void onSuccess(File result) {
             layer.doneDownload();
             if (result != null) {
-                LoadLayer.submit(layer, List.of(result.toURI()));
+                LoadLayer.submit(layer, List.of(result.toURI()), false);
                 EventQueue.invokeLater(() -> JHVGlobals.displayNotification(result.toString()));
             }
         }
