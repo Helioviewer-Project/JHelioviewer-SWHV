@@ -20,6 +20,7 @@ import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
 import org.helioviewer.jhv.io.SoarClient;
 import org.helioviewer.jhv.io.SoarReceiver;
@@ -31,6 +32,7 @@ import com.jidesoft.dialog.StandardDialog;
 @SuppressWarnings("serial")
 public class SoarDialog extends StandardDialog implements SoarReceiver {
 
+    private static final int MAX_FILES = 100;
     private static final String[] Level = new String[]{/* "LL01", "LL02", "LL03", */ "L1", "L2" /*, "L3"*/};
     private static final ImmutableSortedMap<String, String> Dataset = new ImmutableSortedMap.Builder<String, String>(JHVGlobals.alphanumComparator).
             put("EUI FSI 174", "EUI-FSI174-IMAGE").
@@ -70,8 +72,14 @@ public class SoarDialog extends StandardDialog implements SoarReceiver {
 
         JButton loadBtn = new JButton("Add");
         loadBtn.addActionListener(e -> {
-            SoarClient.submitLoad(listPane.getSelectedValuesList());
-            setVisible(false);
+            List<String> descriptors = listPane.getSelectedValuesList();
+            int length = descriptors.size();
+            if (length > MAX_FILES) {
+                Message.err("Too many files selected (" + length + ").", "Please select at most " + MAX_FILES + " files.", false);
+            } else {
+                SoarClient.submitLoad(descriptors);
+                setVisible(false);
+            }
         });
 
         ButtonPanel panel = new ButtonPanel();
