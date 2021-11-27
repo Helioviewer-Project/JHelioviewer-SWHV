@@ -24,8 +24,8 @@ public class EVEPlugin extends Plugin {
     public void install() {
         tl.installTimelines();
         BandDataProvider.loadBandTypes();
-        JHVFrame.getMenuBar().getMenu(0).add(newItem, 1);
-        JHVFrame.getMenuBar().getMenu(0).add(openItem, 3);
+        JHVFrame.getMenuBar().getMenu(0).add(newItem, 2);
+        JHVFrame.getMenuBar().getMenu(0).add(openItem, 4);
     }
 
     @Override
