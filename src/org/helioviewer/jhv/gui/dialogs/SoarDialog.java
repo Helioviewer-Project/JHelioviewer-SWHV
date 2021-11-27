@@ -31,7 +31,7 @@ import com.jidesoft.dialog.StandardDialog;
 @SuppressWarnings("serial")
 public class SoarDialog extends StandardDialog implements SoarReceiver {
 
-    private static final String[] Level = new String[]{"LL01", "LL02", "LL03", "L1", "L2", "L3"};
+    private static final String[] Level = new String[]{/* "LL01", "LL02", "LL03", */ "L1", "L2" /*, "L3"*/};
     private static final ImmutableSortedMap<String, String> Dataset = new ImmutableSortedMap.Builder<String, String>(JHVGlobals.alphanumComparator).
             put("EUI FSI 174", "EUI-FSI174-IMAGE").
             put("EUI FSI 304", "EUI-FSI304-IMAGE").
@@ -102,7 +102,7 @@ public class SoarDialog extends StandardDialog implements SoarReceiver {
         dataSelector.add(searchBtn);
 
         JScrollPane scrollPane = new JScrollPane(listPane);
-        scrollPane.setPreferredSize(new Dimension(300, 350));
+        scrollPane.setPreferredSize(new Dimension(350, 350));
 
         JPanel resultPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
         resultPanel.add(resultLabel);
