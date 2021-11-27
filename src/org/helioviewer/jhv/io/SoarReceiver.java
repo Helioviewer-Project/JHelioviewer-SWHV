@@ -1,9 +1,9 @@
 package org.helioviewer.jhv.io;
 
-import java.util.Map;
+import java.util.List;
 
 public interface SoarReceiver {
 
-    void setSoarItems(Map<String, String> items);
+    void setSoarItems(List<String> items);
 
 }

@@ -3,7 +3,7 @@ package org.helioviewer.jhv.gui.dialogs;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.util.Map;
+import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.swing.AbstractAction;
@@ -53,10 +53,6 @@ public class SoarDialog extends StandardDialog implements SoarReceiver {
         super(mainFrame, true);
         setResizable(false);
         setTitle("New SOAR Layer");
-
-        //imageSelectorPanel = new ImageSelectorPanel(this);
-        //availabilityBtn.addActionListener(e -> JHVGlobals.openURL(imageSelectorPanel.getAvailabilityURL()));
-        //setInitFocusedComponent(imageSelectorPanel.getFocused());
     }
 
     @Override
@@ -75,7 +71,6 @@ public class SoarDialog extends StandardDialog implements SoarReceiver {
         ButtonPanel panel = new ButtonPanel();
         //panel.add(okBtn, ButtonPanel.AFFIRMATIVE_BUTTON);
         panel.add(cancelBtn, ButtonPanel.CANCEL_BUTTON);
-        //panel.add(availabilityBtn, ButtonPanel.OTHER_BUTTON);
 
         return panel;
     }
@@ -99,7 +94,7 @@ public class SoarDialog extends StandardDialog implements SoarReceiver {
         dataSelector.add(searchBtn);
 
         JScrollPane scrollPane = new JScrollPane(listPane);
-        scrollPane.setPreferredSize(new Dimension(350, 350));
+        scrollPane.setPreferredSize(new Dimension(300, 350));
 
         JPanel resultPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
         resultPanel.add(resultLabel);
@@ -128,10 +123,9 @@ public class SoarDialog extends StandardDialog implements SoarReceiver {
     }
 
     @Override
-    public void setSoarItems(Map<String, String> items) {
-        String[] result = items.values().toArray(String[]::new);
-        listPane.setListData(result);
-        resultLabel.setText(result.length + " result(s)");
+    public void setSoarItems(List<String> items) {
+        listPane.setListData(items.toArray(String[]::new));
+        resultLabel.setText(items.size() + " result(s)");
     }
 
 }
