@@ -37,7 +37,7 @@ public interface Load {
 
         public static void getAll(@Nonnull List<URI> uris) {
             if (!uris.isEmpty()) {
-                LoadLayer.submit(ImageLayer.create(null), uris);
+                LoadLayer.submit(ImageLayer.create(null), uris, false);
             }
         }
     }
@@ -50,7 +50,7 @@ public interface Load {
 
         public static void getAll(@Nonnull List<URI> uris) {
             if (!uris.isEmpty()) {
-                LoadLayer.submitFITS(ImageLayer.create(null), uris);
+                LoadLayer.submit(ImageLayer.create(null), uris, true);
             }
         }
     }
