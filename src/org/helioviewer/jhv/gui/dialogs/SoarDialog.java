@@ -34,11 +34,11 @@ public class SoarDialog extends StandardDialog implements SoarReceiver {
 
     private static final int MAX_FILES = 100;
     private static final String[] Level = new String[]{/* "LL01", "LL02", "LL03", */ "L1", "L2" /*, "L3"*/};
-    private static final ImmutableSortedMap<String, String> Dataset = new ImmutableSortedMap.Builder<String, String>(JHVGlobals.alphanumComparator).
-            put("EUI FSI 174", "EUI-FSI174-IMAGE").
-            put("EUI FSI 304", "EUI-FSI304-IMAGE").
-            put("EUI HRI 174", "EUI-HRIEUV174-IMAGE").
-            put("EUI HRI LYA", "EUI-HRILYA1216-IMAGE").
+    private static final ImmutableSortedMap<String, List<String>> Dataset = new ImmutableSortedMap.Builder<String, List<String>>(JHVGlobals.alphanumComparator).
+            put("EUI FSI 174", List.of("EUI-FSI174-IMAGE")).
+            put("EUI FSI 304", List.of("EUI-FSI304-IMAGE")).
+            put("EUI HRI 174", List.of("EUI-HRIEUV174-IMAGE", "EUI-HRIEUVNON-IMAGE")).
+            put("EUI HRI LYA", List.of("EUI-HRILYA1216-IMAGE")).
             build();
 
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
@@ -102,9 +102,9 @@ public class SoarDialog extends StandardDialog implements SoarReceiver {
         JButton searchBtn = new JButton("Search");
         searchBtn.addActionListener(e -> {
             if (datasetCombo.getSelectedItem() instanceof String dataset && levelCombo.getSelectedItem() instanceof String level) {
-                String descriptor = Dataset.get(dataset);
-                if (descriptor != null) {
-                    SoarClient.submitSearch(this, descriptor, level, timeSelectorPanel.getStartTime(), timeSelectorPanel.getEndTime());
+                List<String> descriptors = Dataset.get(dataset);
+                if (descriptors != null) {
+                    SoarClient.submitSearch(this, descriptors, level, timeSelectorPanel.getStartTime(), timeSelectorPanel.getEndTime());
                     foundLabel.setText("Searching...");
                 }
             }

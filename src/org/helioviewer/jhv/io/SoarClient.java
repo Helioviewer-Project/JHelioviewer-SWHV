@@ -22,15 +22,15 @@ public class SoarClient {
     private static final String SEARCH_URL = "http://soar.esac.esa.int/soar-sl-tap/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=";
     private static final String LOAD_URL = "http://soar.esac.esa.int/soar-sl-tap/data?retrieval_type=LAST_PRODUCT&product_type=SCIENCE&data_item_id=";
 
-    public static void submitSearch(@Nonnull SoarReceiver receiver, @Nonnull String descriptor, @Nonnull String level, long start, long end) {
-        EventQueueCallbackExecutor.pool.submit(new SoarSearch(descriptor, level, start, end), new Callback(receiver));
+    public static void submitSearch(@Nonnull SoarReceiver receiver, @Nonnull List<String> descriptors, @Nonnull String level, long start, long end) {
+        EventQueueCallbackExecutor.pool.submit(new SoarSearch(descriptors, level, start, end), new Callback(receiver));
     }
 
-    public static void submitLoad(@Nonnull List<String> descriptors) {
-        List<URI> uris = new ArrayList<>(descriptors.size());
-        for (String descriptor : descriptors) {
+    public static void submitLoad(@Nonnull List<String> itemIDs) {
+        List<URI> uris = new ArrayList<>(itemIDs.size());
+        for (String itemID : itemIDs) {
             try {
-                uris.add(new URI(LOAD_URL + descriptor));
+                uris.add(new URI(LOAD_URL + itemID));
             } catch (Exception e) {
                 Log.error(e);
             }
@@ -38,13 +38,15 @@ public class SoarClient {
         Load.FITS.getAll(uris);
     }
 
-    private record SoarSearch(String descriptor, String level, long start, long end) implements Callable<List<String>> {
+    private record SoarSearch(List<String> descriptors, String level, long start, long end)
+            implements Callable<List<String>> {
         @Override
         public List<String> call() throws Exception {
-            String select = "SELECT data_item_id from v_sc_data_item " +
-                    "WHERE descriptor='" + descriptor +
-                    "' AND begin_time >= '" + TimeUtils.format(start) + "' and begin_time <= '" + TimeUtils.format(end) +
-                    "' and level='" + level + "' ORDER BY begin_time";
+            String sqldesc = String.join("' OR descriptor='", descriptors);
+            String select = "SELECT data_item_id from v_sc_data_item WHERE " +
+                    "(descriptor='" + sqldesc + "') AND " +
+                    "begin_time >= '" + TimeUtils.format(start) + "' and begin_time <= '" + TimeUtils.format(end) + "' AND " +
+                    "level='" + level + "' ORDER BY begin_time";
             URI uri = new URI(SEARCH_URL + URLEncoder.encode(select, StandardCharsets.UTF_8));
             JSONArray data = JSONUtils.get(uri).getJSONArray("data");
 
