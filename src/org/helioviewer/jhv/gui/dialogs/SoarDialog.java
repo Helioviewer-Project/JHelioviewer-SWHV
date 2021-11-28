@@ -74,6 +74,8 @@ public class SoarDialog extends StandardDialog implements SoarReceiver {
         loadBtn.addActionListener(e -> {
             List<String> descriptors = listPane.getSelectedValuesList();
             int length = descriptors.size();
+            if (length == 0)
+                return;
             if (length > MAX_FILES) {
                 Message.err("Too many files selected (" + length + ").", "Please select at most " + MAX_FILES + " files.", false);
             } else {
