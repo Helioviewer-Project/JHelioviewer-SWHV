@@ -43,7 +43,7 @@ public class SoarDialog extends StandardDialog implements SoarReceiver {
 
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
     private final JList<String> listPane = new JList<>();
-    private final JLabel resultLabel = new JLabel("0 result(s)", JLabel.RIGHT);
+    private final JLabel foundLabel = new JLabel("0 found", JLabel.RIGHT);
 
     private static SoarDialog instance;
 
@@ -103,24 +103,29 @@ public class SoarDialog extends StandardDialog implements SoarReceiver {
                 String descriptor = Dataset.get(dataset);
                 if (descriptor != null) {
                     SoarClient.submitSearch(this, descriptor, level, timeSelectorPanel.getStartTime(), timeSelectorPanel.getEndTime());
-                    resultLabel.setText("Searching...");
+                    foundLabel.setText("Searching...");
                 }
             }
         });
         dataSelector.add(searchBtn);
 
+        JPanel foundPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
+        foundPanel.add(foundLabel);
+        JPanel selectedPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
+        JLabel selectedLabel = new JLabel("0 selected", JLabel.RIGHT);
+        selectedPanel.add(selectedLabel);
+
+        listPane.addListSelectionListener(e -> selectedLabel.setText(listPane.getSelectedValuesList().size() + " selected"));
         JScrollPane scrollPane = new JScrollPane(listPane);
         scrollPane.setPreferredSize(new Dimension(350, 350));
-
-        JPanel resultPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
-        resultPanel.add(resultLabel);
 
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
         content.add(timeSelectorPanel);
         content.add(dataSelector);
-        content.add(resultPanel);
+        content.add(foundPanel);
         content.add(scrollPane);
+        content.add(selectedPanel);
 
         content.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
         return content;
@@ -141,7 +146,7 @@ public class SoarDialog extends StandardDialog implements SoarReceiver {
     @Override
     public void setSoarItems(List<String> items) {
         listPane.setListData(items.toArray(String[]::new));
-        resultLabel.setText(items.size() + " result(s)");
+        foundLabel.setText(items.size() + " found");
     }
 
 }
