@@ -4,8 +4,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 public class SWEK {
 
     public enum Operand {
@@ -39,16 +37,6 @@ public class SWEK {
     }
 
     public record Source(String name, List<Parameter> generalParameters, SWEKHandler handler) {
-    }
-
-    @Nullable
-    static SWEK.Parameter parameterFromList(String name, List<Parameter> parameterList) {
-        for (SWEK.Parameter p : parameterList) {
-            if (p.name().equalsIgnoreCase(name)) {
-                return p;
-            }
-        }
-        return null;
     }
 
 }
