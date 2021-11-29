@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.events;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -15,8 +16,8 @@ public class JHVEvent {
     private JHVEventParameter[] visibleParameters;
     private JHVEventParameter[] simpleVisibleParameters;
 
-    private ArrayList<JHVEventParameter> allParametersArray = new ArrayList<>();
-    private ArrayList<JHVEventParameter> visibleParametersArray = new ArrayList<>();
+    private List<JHVEventParameter> allParametersArray = new ArrayList<>();
+    private List<JHVEventParameter> visibleParametersArray = new ArrayList<>();
 
     private final SWEKSupplier supplier;
     private JHVPositionInformation positionInformation = null;
@@ -81,14 +82,24 @@ public class JHVEvent {
         }
     }
 
+    @Nullable
+    private static SWEK.Parameter parameterFromList(String name, List<SWEK.Parameter> parameterList) {
+        for (SWEK.Parameter p : parameterList) {
+            if (p.name().equalsIgnoreCase(name)) {
+                return p;
+            }
+        }
+        return null;
+    }
+
     public void addParameter(String keyString, String value, boolean full) {
         boolean visible = false;
         boolean configured = false;
         String displayName;
 
-        SWEK.Parameter p = SWEK.parameterFromList(keyString, supplier.getGroup().getParameterList());
+        SWEK.Parameter p = parameterFromList(keyString, supplier.getGroup().getParameterList());
         if (p == null) {
-            p = SWEK.parameterFromList(keyString, supplier.getSource().generalParameters());
+            p = parameterFromList(keyString, supplier.getSource().generalParameters());
         }
 
         if (p != null) {
@@ -110,7 +121,7 @@ public class JHVEvent {
 
         UrlValidator urlValidator = UrlValidator.getInstance();
         // maybe should be configured
-        ArrayList<JHVEventParameter> simpleVisibleParametersArray = new ArrayList<>();
+        List<JHVEventParameter> simpleVisibleParametersArray = new ArrayList<>();
         for (JHVEventParameter param : visibleParametersArray) {
             if (!urlValidator.isValid(param.getParameterValue()))
                 simpleVisibleParametersArray.add(param);
