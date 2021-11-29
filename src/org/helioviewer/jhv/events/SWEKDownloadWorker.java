@@ -6,7 +6,7 @@ import java.util.List;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.database.EventDatabase;
 
-record SWEKDownloadWorker(SWEKSupplier supplier, long start, long end, List<SWEKParam> params) implements Runnable {
+record SWEKDownloadWorker(SWEKSupplier supplier, long start, long end, List<SWEK.Param> params) implements Runnable {
 
     @Override
     public void run() {

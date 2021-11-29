@@ -23,10 +23,8 @@ import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.interval.RequestCache;
 import org.helioviewer.jhv.events.JHVEvent;
+import org.helioviewer.jhv.events.SWEK;
 import org.helioviewer.jhv.events.SWEKGroup;
-import org.helioviewer.jhv.events.SWEKParam;
-import org.helioviewer.jhv.events.SWEKRelatedEvents;
-import org.helioviewer.jhv.events.SWEKRelatedOn;
 import org.helioviewer.jhv.events.SWEKSupplier;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.log.Log;
@@ -355,11 +353,11 @@ public class EventDatabase {
         List<JHVEvent> nEvents = new ArrayList<>();
         List<JsonEvent> jsonEvents = new ArrayList<>();
 
-        for (SWEKRelatedEvents re : SWEKGroup.getSWEKRelatedEvents()) {
+        for (SWEK.RelatedEvents re : SWEKGroup.getSWEKRelatedEvents()) {
             if (re.group() == group) {
-                for (SWEKRelatedOn swon : re.relatedOnList()) {
-                    String f = swon.parameterFrom.name().toLowerCase();
-                    String w = swon.parameterWith.name().toLowerCase();
+                for (SWEK.RelatedOn swon : re.relatedOnList()) {
+                    String f = swon.parameterFrom().name().toLowerCase();
+                    String w = swon.parameterWith().name().toLowerCase();
 
                     SWEKGroup reType = re.relatedWith();
                     for (Enumeration<TreeNode> e = reType.children(); e.hasMoreElements(); ) {
@@ -374,9 +372,9 @@ public class EventDatabase {
             }
 
             if (re.relatedWith() == group) {
-                for (SWEKRelatedOn swon : re.relatedOnList()) {
-                    String f = swon.parameterFrom.name().toLowerCase();
-                    String w = swon.parameterWith.name().toLowerCase();
+                for (SWEK.RelatedOn swon : re.relatedOnList()) {
+                    String f = swon.parameterFrom().name().toLowerCase();
+                    String w = swon.parameterWith().name().toLowerCase();
 
                     SWEKGroup reType = re.group();
                     for (Enumeration<TreeNode> e = reType.children(); e.hasMoreElements(); ) {
@@ -503,7 +501,7 @@ public class EventDatabase {
     private record JsonEvent(byte[] json, SWEKSupplier type, int id, long start, long end) {
     }
 
-    public static List<JHVEvent> events2Program(long start, long end, SWEKSupplier type, List<SWEKParam> params) {
+    public static List<JHVEvent> events2Program(long start, long end, SWEKSupplier type, List<SWEK.Param> params) {
         try {
             return executor.invokeAndWait(new Events2Program(start, end, type, params));
         } catch (Exception e) {
@@ -512,8 +510,8 @@ public class EventDatabase {
         return new ArrayList<>();
     }
 
-    private record Events2Program(long start, long end, SWEKSupplier type,
-                                  List<SWEKParam> params) implements Callable<List<JHVEvent>> {
+    private record Events2Program(long start, long end, SWEKSupplier type, List<SWEK.Param> params)
+            implements Callable<List<JHVEvent>> {
         @Override
         public List<JHVEvent> call() throws SQLException {
             List<JHVEvent> eventList = new ArrayList<>();
@@ -521,9 +519,9 @@ public class EventDatabase {
             if (typeId != -1) {
                 String join = "LEFT JOIN " + type.getDatabaseName() + " AS tp ON tp.event_id=e.id";
                 StringBuilder and = new StringBuilder();
-                for (SWEKParam p : params) {
-                    if (!p.param.equals("provider")) {
-                        and.append("AND tp.").append(p.param).append(p.operand.representation).append(p.value).append(' ');
+                for (SWEK.Param p : params) {
+                    if (!p.name().equals("provider")) {
+                        and.append("AND tp.").append(p.name()).append(p.operand().representation).append(p.value()).append(' ');
                     }
                 }
                 String sqlt = "SELECT e.id, e.start, e.end, e.data FROM events AS e " + join + " WHERE e.start BETWEEN ? AND ? and e.type_id=? " + and + " order by e.start, e.end ";

@@ -9,9 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
 import org.helioviewer.jhv.base.conversion.GOESLevel;
-import org.helioviewer.jhv.events.SWEKOperand;
-import org.helioviewer.jhv.events.SWEKParam;
-import org.helioviewer.jhv.events.SWEKParameter;
+import org.helioviewer.jhv.events.SWEK;
 import org.helioviewer.jhv.events.SWEKSupplier;
 
 @SuppressWarnings("serial")
@@ -22,13 +20,13 @@ class FilterPanel extends JPanel {
 
     private boolean enabled = false;
 
-    private final SWEKParameter parameter;
+    private final SWEK.Parameter parameter;
     private final SWEKSupplier supplier;
 
     private final FilterDialog filterDialog;
-    private final SWEKOperand operand;
+    private final SWEK.Operand operand;
 
-    FilterPanel(SWEKSupplier _supplier, SWEKParameter _parameter, JSpinner _spinner, FilterDialog _filterDialog, SWEKOperand _operand, boolean _enabled) {
+    FilterPanel(SWEKSupplier _supplier, SWEK.Parameter _parameter, JSpinner _spinner, FilterDialog _filterDialog, SWEK.Operand _operand, boolean _enabled) {
         operand = _operand;
         filterDialog = _filterDialog;
         spinner = _spinner;
@@ -60,7 +58,7 @@ class FilterPanel extends JPanel {
         if (enabled) {
             Object oval = spinner.getValue();
             String pval = oval instanceof String ? String.valueOf(GOESLevel.getFloatValue((String) oval)) : String.valueOf(oval);
-            SWEKParam param = new SWEKParam(parameter.name(), pval, operand);
+            SWEK.Param param = new SWEK.Param(parameter.name(), pval, operand);
             FilterManager.addFilter(supplier, parameter, param);
         }
     }

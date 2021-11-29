@@ -73,15 +73,15 @@ class SWEKDownloadManager implements FilterManagerListener {
         }
     }
 
-    private static List<SWEKParam> defineParameters(SWEKSupplier supplier) {
-        List<SWEKParam> params = new ArrayList<>();
-        params.add(new SWEKParam("provider", supplier.getSupplierName(), SWEKOperand.EQUALS));
+    private static List<SWEK.Param> defineParameters(SWEKSupplier supplier) {
+        List<SWEK.Param> params = new ArrayList<>();
+        params.add(new SWEK.Param("provider", supplier.getSupplierName(), SWEK.Operand.EQUALS));
         FilterManager.getFilter(supplier).values().forEach(params::addAll);
         return params;
     }
 
     static void startDownloadSupplier(SWEKSupplier supplier, List<Interval> intervals) {
-        List<SWEKParam> params = defineParameters(supplier);
+        List<SWEK.Param> params = defineParameters(supplier);
         for (Interval interval : intervals) {
             for (Interval intt : Interval.splitInterval(interval, 2)) {
                 if (intt.start < System.currentTimeMillis() + SIXHOURS) {

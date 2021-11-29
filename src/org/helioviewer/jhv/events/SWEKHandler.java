@@ -11,7 +11,7 @@ import org.json.JSONObject;
 
 public abstract class SWEKHandler {
 
-    public boolean remote2db(SWEKSupplier supplier, long start, long end, List<SWEKParam> params) {
+    public boolean remote2db(SWEKSupplier supplier, long start, long end, List<SWEK.Param> params) {
         for (Interval interval : EventDatabase.db2daterange(supplier)) {
             if (interval.start <= start && interval.end >= end) {
                 return true;
@@ -39,7 +39,7 @@ public abstract class SWEKHandler {
 
     protected abstract boolean parseAssociations(JSONObject eventJSON);
 
-    protected abstract String createURL(SWEKGroup group, long start, long end, List<SWEKParam> params, int page);
+    protected abstract String createURL(SWEKGroup group, long start, long end, List<SWEK.Param> params, int page);
 
     public abstract JHVEvent parseEventJSON(JSONObject json, SWEKSupplier supplier, int id, long start, long end, boolean full) throws JSONException;
 

@@ -5,13 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.helioviewer.jhv.events.SWEKParam;
-import org.helioviewer.jhv.events.SWEKParameter;
+import org.helioviewer.jhv.events.SWEK;
 import org.helioviewer.jhv.events.SWEKSupplier;
 
 public class FilterManager {
 
-    private static final Map<SWEKSupplier, Map<SWEKParameter, List<SWEKParam>>> filters = new HashMap<>();
+    private static final Map<SWEKSupplier, Map<SWEK.Parameter, List<SWEK.Param>>> filters = new HashMap<>();
     private static final ArrayList<FilterManagerListener> listeners = new ArrayList<>();
 
     public static void addListener(FilterManagerListener listener) {
@@ -19,8 +18,8 @@ public class FilterManager {
             listeners.add(listener);
     }
 
-    static void addFilter(SWEKSupplier supplier, SWEKParameter parameter, SWEKParam filter) {
-        Map<SWEKParameter, List<SWEKParam>> filteredParameter = getFilter(supplier);
+    static void addFilter(SWEKSupplier supplier, SWEK.Parameter parameter, SWEK.Param filter) {
+        Map<SWEK.Parameter, List<SWEK.Param>> filteredParameter = getFilter(supplier);
         filteredParameter.computeIfAbsent(parameter, k -> new ArrayList<>()).add(filter);
     }
 
@@ -32,7 +31,7 @@ public class FilterManager {
         listeners.forEach(listener -> listener.filtersChanged(supplier));
     }
 
-    public static Map<SWEKParameter, List<SWEKParam>> getFilter(SWEKSupplier supplier) {
+    public static Map<SWEK.Parameter, List<SWEK.Param>> getFilter(SWEKSupplier supplier) {
         return filters.computeIfAbsent(supplier, k -> new HashMap<>());
     }
 /*

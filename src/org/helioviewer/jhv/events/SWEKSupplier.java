@@ -25,7 +25,7 @@ public class SWEKSupplier extends DefaultMutableTreeNode implements JHVCell {
     private final String db;
     private final String key;
 
-    private final SWEKSource source;
+    private final SWEK.Source source;
 
     private final JPanel panel;
     private final JCheckBox checkBox;
@@ -33,7 +33,7 @@ public class SWEKSupplier extends DefaultMutableTreeNode implements JHVCell {
 
     private static final HashMap<String, SWEKSupplier> suppliers = new HashMap<>();
 
-    public SWEKSupplier(String _supplierName, String _name, SWEKSource _source, String _db, SWEKGroup group) {
+    public SWEKSupplier(String _supplierName, String _name, SWEK.Source _source, String _db, SWEKGroup group) {
         supplierName = _supplierName;
         name = _name.intern();
         source = _source;
@@ -89,7 +89,7 @@ public class SWEKSupplier extends DefaultMutableTreeNode implements JHVCell {
         return (SWEKGroup) getParent();
     }
 
-    public SWEKSource getSource() {
+    public SWEK.Source getSource() {
         return source;
     }
 
