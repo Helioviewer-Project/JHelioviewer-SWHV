@@ -9,10 +9,8 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 
+import org.helioviewer.jhv.events.SWEK;
 import org.helioviewer.jhv.events.SWEKGroup;
-import org.helioviewer.jhv.events.SWEKOperand;
-import org.helioviewer.jhv.events.SWEKParameter;
-import org.helioviewer.jhv.events.SWEKParameterFilter;
 import org.helioviewer.jhv.events.SWEKSupplier;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
@@ -33,8 +31,8 @@ class FilterPanelFactory {
         return spinnerFormat.toString();
     }
 
-    private static JSpinner generateFlareSpinner(FilterDialog filterDialog, SWEKParameter parameter) {
-        SWEKParameterFilter filter = parameter.filter();
+    private static JSpinner generateFlareSpinner(FilterDialog filterDialog, SWEK.Parameter parameter) {
+        SWEK.ParameterFilter filter = parameter.filter();
         double min = filter.min() == null ? 1e-8 : filter.min();
         double max = filter.max() == null ? 1e-3 : filter.max();
         double start = filter.startValue() == null ? 1e-5 : filter.startValue();
@@ -48,8 +46,8 @@ class FilterPanelFactory {
         return spinner;
     }
 
-    private static JSpinner generateMinOrMaxSpinner(FilterDialog filterDialog, SWEKParameter parameter) {
-        SWEKParameterFilter filter = parameter.filter();
+    private static JSpinner generateMinOrMaxSpinner(FilterDialog filterDialog, SWEK.Parameter parameter) {
+        SWEK.ParameterFilter filter = parameter.filter();
         double min = filter.min() == null ? Double.MIN_VALUE : filter.min();
         double max = filter.max() == null ? Double.MAX_VALUE : filter.max();
         double start = filter.startValue() == null ? (max - min) * 0.5 : filter.startValue();
@@ -65,18 +63,18 @@ class FilterPanelFactory {
 
     static List<FilterPanel> createFilterPanel(SWEKGroup group, SWEKSupplier supplier, FilterDialog filterDialog, boolean enabled) {
         List<FilterPanel> panels = new ArrayList<>();
-        for (SWEKParameter parameter : group.getParameterList()) {
-            SWEKParameterFilter filter = parameter.filter();
+        for (SWEK.Parameter p : group.getParameterList()) {
+            SWEK.ParameterFilter filter = p.filter();
             if (filter != null) {
                 String filterType = filter.type().toLowerCase();
                 switch (filterType) {
-                    case "doublemaxfilter" -> panels.add(new FilterPanel(supplier, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.BIGGER_OR_EQUAL, enabled));
-                    case "doubleminfilter" -> panels.add(new FilterPanel(supplier, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.SMALLER_OR_EQUAL, enabled));
+                    case "doublemaxfilter" -> panels.add(new FilterPanel(supplier, p, generateMinOrMaxSpinner(filterDialog, p), filterDialog, SWEK.Operand.BIGGER_OR_EQUAL, enabled));
+                    case "doubleminfilter" -> panels.add(new FilterPanel(supplier, p, generateMinOrMaxSpinner(filterDialog, p), filterDialog, SWEK.Operand.SMALLER_OR_EQUAL, enabled));
                     case "doubleminmaxfilter" -> {
-                        panels.add(new FilterPanel(supplier, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.BIGGER_OR_EQUAL, enabled));
-                        panels.add(new FilterPanel(supplier, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.SMALLER_OR_EQUAL, enabled));
+                        panels.add(new FilterPanel(supplier, p, generateMinOrMaxSpinner(filterDialog, p), filterDialog, SWEK.Operand.BIGGER_OR_EQUAL, enabled));
+                        panels.add(new FilterPanel(supplier, p, generateMinOrMaxSpinner(filterDialog, p), filterDialog, SWEK.Operand.SMALLER_OR_EQUAL, enabled));
                     }
-                    case "flarefilter" -> panels.add(new FilterPanel(supplier, parameter, generateFlareSpinner(filterDialog, parameter), filterDialog, SWEKOperand.BIGGER_OR_EQUAL, enabled));
+                    case "flarefilter" -> panels.add(new FilterPanel(supplier, p, generateFlareSpinner(filterDialog, p), filterDialog, SWEK.Operand.BIGGER_OR_EQUAL, enabled));
                     default -> {
                     }
                 }

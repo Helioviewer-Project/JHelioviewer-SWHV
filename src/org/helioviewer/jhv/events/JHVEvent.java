@@ -86,9 +86,9 @@ public class JHVEvent {
         boolean configured = false;
         String displayName;
 
-        SWEKParameter p = supplier.getGroup().getParameter(keyString);
+        SWEK.Parameter p = SWEK.parameterFromList(keyString, supplier.getGroup().getParameterList());
         if (p == null) {
-            p = supplier.getSource().getParameter(keyString);
+            p = SWEK.parameterFromList(keyString, supplier.getSource().generalParameters());
         }
 
         if (p != null) {

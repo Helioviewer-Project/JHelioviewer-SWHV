@@ -13,10 +13,9 @@ import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.database.JHVDatabaseParam;
 import org.helioviewer.jhv.events.JHVEvent;
+import org.helioviewer.jhv.events.SWEK;
 import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.events.SWEKHandler;
-import org.helioviewer.jhv.events.SWEKOperand;
-import org.helioviewer.jhv.events.SWEKParam;
 import org.helioviewer.jhv.events.SWEKSupplier;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.log.Log;
@@ -88,12 +87,12 @@ public class HEKHandler extends SWEKHandler {
     }
 
     @Override
-    protected String createURL(SWEKGroup group, long start, long end, List<SWEKParam> params, int page) {
+    protected String createURL(SWEKGroup group, long start, long end, List<SWEK.Param> params, int page) {
         StringBuilder baseURL = new StringBuilder(_baseURL);
         baseURL.append("cmd=search&type=column&");
         baseURL.append("event_type=").append(HEKEventEnum.getHEKEventAbbreviation(group.getName())).append('&');
         baseURL.append("event_coordsys=helioprojective&x1=-3600&x2=3600&y1=-3600&y2=3600&cosec=2&");
-        baseURL.append("param0=event_starttime&op0=").append(SWEKOperand.SMALLER_OR_EQUAL.encodedRepresentation).append('&');
+        baseURL.append("param0=event_starttime&op0=").append(SWEK.Operand.SMALLER_OR_EQUAL.encodedRepresentation).append('&');
         baseURL.append("value0=").append(TimeUtils.format(end)).append('&');
         appendParams(baseURL, params);
         baseURL.append("event_starttime=").append(TimeUtils.format(start)).append('&');
@@ -103,13 +102,12 @@ public class HEKHandler extends SWEKHandler {
         return baseURL.toString();
     }
 
-    private static void appendParams(StringBuilder baseURL, List<SWEKParam> params) {
+    private static void appendParams(StringBuilder baseURL, List<SWEK.Param> params) {
         int paramCount = 1;
-
-        for (SWEKParam param : params) {
-            if (param.param.equalsIgnoreCase("provider")) {
-                String encodedValue = URLEncoder.encode(param.value, StandardCharsets.UTF_8);
-                baseURL.append("param").append(paramCount).append('=').append("frm_name").append('&').append("op").append(paramCount).append('=').append(param.operand.encodedRepresentation).append('&').append("value").append(paramCount).append('=').append(encodedValue).append('&');
+        for (SWEK.Param p : params) {
+            if (p.name().equalsIgnoreCase("provider")) {
+                String encodedValue = URLEncoder.encode(p.value(), StandardCharsets.UTF_8);
+                baseURL.append("param").append(paramCount).append('=').append("frm_name").append('&').append("op").append(paramCount).append('=').append(p.operand().encodedRepresentation).append('&').append("value").append(paramCount).append('=').append(encodedValue).append('&');
                 paramCount++;
             }
         }

@@ -6,9 +6,9 @@ import java.util.List;
 
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.events.JHVEvent;
+import org.helioviewer.jhv.events.SWEK;
 import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.events.SWEKHandler;
-import org.helioviewer.jhv.events.SWEKParam;
 import org.helioviewer.jhv.events.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.io.JSONUtils;
@@ -70,7 +70,7 @@ public class ComesepHandler extends SWEKHandler {
     }
 
     @Override
-    protected String createURL(SWEKGroup group, long start, long end, List<SWEKParam> params, int page) {
+    protected String createURL(SWEKGroup group, long start, long end, List<SWEK.Param> params, int page) {
         StringBuilder baseURL = new StringBuilder(_baseURL);
         baseURL = appendModel(baseURL, params).append('&');
         baseURL.append("startdate=").append(TimeUtils.format(start)).append('&');
@@ -78,11 +78,11 @@ public class ComesepHandler extends SWEKHandler {
         return baseURL.toString();
     }
 
-    private static StringBuilder appendModel(StringBuilder baseURL, List<SWEKParam> params) {
+    private static StringBuilder appendModel(StringBuilder baseURL, List<SWEK.Param> params) {
         String model = "";
-        for (SWEKParam p : params) {
-            if (p.param.equals("provider")) {
-                model = p.value;
+        for (SWEK.Param p : params) {
+            if (p.name().equals("provider")) {
+                model = p.value();
                 break;
             }
         }
