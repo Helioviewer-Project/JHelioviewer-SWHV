@@ -38,7 +38,7 @@ public record PositionLoad(StatusReceiver receiver, SpaceObject target, boolean 
             long deltat = dt;
 
             if (observer.isInternal() && target.isInternal()) {
-                PositionCartesian[] p = Spice.getPositionRange(observer.getSpiceName(), target.getSpiceName(), frame.toString(), start, end, deltat);
+                Position.Cartesian[] p = Spice.getPositionRange(observer.getSpiceName(), target.getSpiceName(), frame.toString(), start, end, deltat);
                 if (p != null)
                     return new PositionResponse(p);
             }

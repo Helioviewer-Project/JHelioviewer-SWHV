@@ -5,6 +5,9 @@ import org.helioviewer.jhv.time.JHVTime;
 
 public class Position {
 
+    public record Cartesian(long milli, double x, double y, double z) {
+    }
+
     public final double distance;
     public final double lon;
     public final double lat;

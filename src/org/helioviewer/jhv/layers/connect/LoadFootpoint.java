@@ -7,7 +7,7 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.astronomy.PositionCartesian;
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.NetClient;
@@ -19,7 +19,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-public record LoadFootpoint(URI uri) implements Callable<TimeMap<PositionCartesian>> {
+public record LoadFootpoint(URI uri) implements Callable<TimeMap<Position.Cartesian>> {
 
     private static final DateTimeFormatter euroTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
@@ -37,8 +37,8 @@ public record LoadFootpoint(URI uri) implements Callable<TimeMap<PositionCartesi
     }
 
     @Override
-    public TimeMap<PositionCartesian> call() throws Exception {
-        TimeMap<PositionCartesian> positionMap = new TimeMap<>();
+    public TimeMap<Position.Cartesian> call() throws Exception {
+        TimeMap<Position.Cartesian> positionMap = new TimeMap<>();
 
         try (NetClient nc = NetClient.of(uri); BufferedReader br = new BufferedReader(nc.getReader())) {
             br.readLine(); // skip 1st line
@@ -49,7 +49,7 @@ public record LoadFootpoint(URI uri) implements Callable<TimeMap<PositionCartesi
                 if (values.length > 8) {
                     try {
                         JHVTime time = new JHVTime(parseTime(values[6]));
-                        positionMap.put(time, ConnectUtils.toCartesian(time, values[7], values[8]));
+                        positionMap.put(time, ConnectUtils.toCartesian(time.milli, values[7], values[8]));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -63,10 +63,10 @@ public record LoadFootpoint(URI uri) implements Callable<TimeMap<PositionCartesi
         return positionMap;
     }
 
-    private record Callback(ReceiverPositionMap receiver) implements FutureCallback<TimeMap<PositionCartesian>> {
+    private record Callback(ReceiverPositionMap receiver) implements FutureCallback<TimeMap<Position.Cartesian>> {
 
         @Override
-        public void onSuccess(TimeMap<PositionCartesian> result) {
+        public void onSuccess(TimeMap<Position.Cartesian> result) {
             receiver.setPositionMap(result);
         }
 
