@@ -38,15 +38,15 @@ public class Spice {
     }
 
     @Nullable
-    static PositionCartesian[] getPositionRange(String observer, String target, String frame, long start, long end, long deltat) {
+    static Position.Cartesian[] getPositionRange(String observer, String target, String frame, long start, long end, long deltat) {
         // Stopwatch sw = Stopwatch.createStarted();
         try {
             long dt = deltat * 1000;
-            PositionCartesian[] ret = new PositionCartesian[(int) ((end - start) / dt) + 1];
+            Position.Cartesian[] ret = new Position.Cartesian[(int) ((end - start) / dt) + 1];
             int i = 0;
             for (long milli = start; milli <= end; milli += dt) {
                 double[] v = positionRectangular(target, milli, frame, observer);
-                ret[i++] = new PositionCartesian(new JHVTime(milli), v[0], v[1], v[2]);
+                ret[i++] = new Position.Cartesian(milli, v[0], v[1], v[2]);
             }
             //System.out.println((sw.elapsed().toNanos() / 1e9));
             return ret;

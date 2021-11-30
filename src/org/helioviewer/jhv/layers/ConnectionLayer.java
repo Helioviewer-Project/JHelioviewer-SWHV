@@ -14,7 +14,6 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.astronomy.PositionCartesian;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -71,7 +70,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
 
     private Connectivity connectivity;
     private OrthoScaleList hcs;
-    private TimeMap<PositionCartesian> footpointMap;
+    private TimeMap<Position.Cartesian> footpointMap;
     private final ArrayList<SunJSON.GeometryCollection> geometryList = new ArrayList<>();
 
     private JHVTime lastTimestamp;
@@ -153,13 +152,13 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
         hcsLine.renderLine(gl, vp.aspect, LINEWIDTH);
     }
 
-    private static Vec3 interpolate(long t, PositionCartesian prev, PositionCartesian next) {
-        long tprev = prev.time.milli;
-        long tnext = next.time.milli;
+    private static Vec3 interpolate(long t, Position.Cartesian prev, Position.Cartesian next) {
+        long tprev = prev.milli();
+        long tnext = next.milli();
         double alpha = tnext == tprev ? 1. : ((t - tprev) / (double) (tnext - tprev)) % 1.;
-        double x = (1. - alpha) * prev.x + alpha * next.x;
-        double y = (1. - alpha) * prev.y + alpha * next.y;
-        double z = (1. - alpha) * prev.z + alpha * next.z;
+        double x = (1. - alpha) * prev.x() + alpha * next.x();
+        double y = (1. - alpha) * prev.y() + alpha * next.y();
+        double z = (1. - alpha) * prev.z() + alpha * next.z();
 
         return new Vec3(1, Math.acos(y), Math.atan2(x, z));
     }
@@ -258,7 +257,7 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverConnectivi
     }
 
     @Override
-    public void setPositionMap(TimeMap<PositionCartesian> _footpointMap) {
+    public void setPositionMap(TimeMap<Position.Cartesian> _footpointMap) {
         footpointMap = _footpointMap;
         MovieDisplay.display();
     }
