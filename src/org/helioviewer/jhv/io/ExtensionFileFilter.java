@@ -10,12 +10,15 @@ public class ExtensionFileFilter {
     public static final FilenameFilter Image = new Filter(new ExtensionFilter(
             new String[]{"jpg", "jpeg", "png", "fts", "fits", "fits.gz", "jp2", "jpx"},
             "All supported files (\".jpg\", \".jpeg\", \".png\", \".fts\", \".fits\", \".fits.gz\", \".jp2\", \".jpx\")"));
+    public static final FilenameFilter Timeline = new Filter(new ExtensionFilter(
+            new String[]{"json", "cdf"},
+            "All supported files (\".jpg\", \".cdf\")"));
     public static final FilenameFilter JHV = new Filter(new ExtensionFilter(
             new String[]{"jhv"},
             "State files (\".jhv\")"));
-    public static final FilenameFilter JSON = new Filter(new ExtensionFilter(
-            new String[]{"json"},
-            "JSON files (\".json\")"));
+    /*  public static final FilenameFilter JSON = new Filter(new ExtensionFilter(
+                new String[]{"json"},
+                "JSON files (\".json\")")); */
     public static final FilenameFilter GGR = new Filter(new ExtensionFilter(
             new String[]{"ggr"},
             "GIMP gradient files (\".ggr\")"));
