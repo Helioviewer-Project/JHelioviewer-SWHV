@@ -49,7 +49,10 @@ class LoadRequest {
     private record LoadRequestURI(URI uri) implements Callable<Void> {
         @Override
         public Void call() throws Exception {
-            parseRequest(JSONUtils.get(uri));
+            if (uri.toString().toLowerCase().endsWith(".cdf"))
+                CDFUtils.load(NetFileCache.get(uri));
+            else
+                parseRequest(JSONUtils.get(uri));
             return null;
         }
     }
