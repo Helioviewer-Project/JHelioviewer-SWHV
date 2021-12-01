@@ -46,6 +46,7 @@ public class JHelioviewer {
         LogSettings.init("/settings/log4j.properties", JHVDirectory.LOGS.getPath());
         // Information log message
         Log.info("JHelioviewer started with command-line options: " + String.join(" ", args));
+        // System.setProperty("java.util.logging.manager", "org.apache.logging.julbridge.JULBridgeLogManager");
 
         // This attempts to create the necessary directories for the application
         JHVGlobals.createDirs();
