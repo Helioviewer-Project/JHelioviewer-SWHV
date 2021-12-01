@@ -105,11 +105,12 @@ public class Spice {
         return (long) (sec * 1000. + TimeUtils.J2000.milli + .5);
     }
 
+    private static final double[] lightTimeUnused = new double[1];
+
     private static double[] positionRectangular(String target, long milli, String frame, String observer) throws SpiceErrorException {
         double et = milli2et(milli);
-        double[] lt = new double[1];
         double[] v = new double[3];
-        CSPICE.spkpos(target, et, frame, "NONE", observer, v, lt);
+        CSPICE.spkpos(target, et, frame, "NONE", observer, v, lightTimeUnused);
         v[0] *= Sun.RadiusKMeterInv;
         v[1] *= Sun.RadiusKMeterInv;
         v[2] *= Sun.RadiusKMeterInv;
