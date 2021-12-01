@@ -10,6 +10,8 @@ import org.json.JSONObject;
 
 class BandCacheAll implements BandCache {
 
+    private static final int MAX_SIZE = 86400;
+
     private final List<DateValue> datevals = new ArrayList<>();
     private boolean hasData;
 
@@ -24,7 +26,6 @@ class BandCacheAll implements BandCache {
         if (len > 0) {
             hasData = true;
         }
-        int MAX_SIZE = 10000;
         if (datevals.size() >= MAX_SIZE) {
             return;
         }
