@@ -3,6 +3,8 @@ package org.helioviewer.jhv.base.image;
 import java.awt.image.DataBuffer;
 import java.nio.*;
 
+import org.lwjgl.system.MemoryUtil;
+
 abstract class NIODataBuffer extends DataBuffer {
 
     private Buffer buffer;
@@ -13,7 +15,7 @@ abstract class NIODataBuffer extends DataBuffer {
         int componentSize = DataBuffer.getDataTypeSize(type) / 8;
         long length = ((long) size) * componentSize * numBanks;
 
-        ByteBuffer byteBuffer = ByteBuffer.allocateDirect((int) length).order(ByteOrder.nativeOrder());
+        ByteBuffer byteBuffer = MemoryUtil.memAlloc((int) length).order(ByteOrder.nativeOrder());
         switch (type) {
             case DataBuffer.TYPE_BYTE -> buffer = byteBuffer;
             case DataBuffer.TYPE_USHORT -> buffer = byteBuffer.asShortBuffer();
@@ -27,6 +29,7 @@ abstract class NIODataBuffer extends DataBuffer {
     }
 
     void free() {
+        MemoryUtil.memFree(buffer);
         buffer = null;
     }
 
