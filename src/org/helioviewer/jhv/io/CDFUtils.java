@@ -30,7 +30,7 @@ class CDFUtils {
         VariableAttribute[] varAttrs = cdf.getVariableAttributes();
 
         for (Variable v : cdf.getVariables()) {
-            System.out.println(">>> Var " + v.getNum() + ' ' + v.getName() + ' ' + v.getSummary());
+            System.out.println(">>> Var " + v.getNum() + " | " + v.getName() + " | " + v.getSummary());
             for (VariableAttribute attr : varAttrs) {
                 AttributeEntry entry = attr.getEntry(v);
                 if (entry != null)
