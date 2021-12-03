@@ -57,7 +57,7 @@ public class ImageSelectorPanel extends JPanel implements DataSourcesListener {
     }
 
     public void setupLayer(APIRequest req) {
-        sourcesTree.setSelectedItem(req.server, req.sourceId);
+        sourcesTree.setSelectedItem(req.server(), req.sourceId());
     }
 
     public void load(ImageLayer layer, long startTime, long endTime, int cadence) {

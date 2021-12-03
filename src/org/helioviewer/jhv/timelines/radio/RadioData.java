@@ -113,7 +113,7 @@ public class RadioData extends AbstractTimelineLayer {
             APIRequest req = new APIRequest("ROB", APIRequest.CallistoID, date, date, APIRequest.CADENCE_ANY);
             URI uri = new URI(req.toFileRequest());
             DecodeExecutor executor = new DecodeExecutor();
-            return new RadioJ2KData(new J2KViewCallisto(executor, req, uri), req.startTime, executor);
+            return new RadioJ2KData(new J2KViewCallisto(executor, req, uri), req.startTime(), executor);
         }
 
     }

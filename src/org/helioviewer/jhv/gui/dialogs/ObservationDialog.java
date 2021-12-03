@@ -100,8 +100,8 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
         APIRequest req;
         if (layer != null && (req = layer.getAPIRequest()) != null) {
             imageSelectorPanel.setupLayer(req);
-            timeSelectorPanel.setTime(req.startTime, req.endTime);
-            cadencePanel.setCadence(req.cadence);
+            timeSelectorPanel.setTime(req.startTime(), req.endTime());
+            cadencePanel.setCadence(req.cadence());
         }
 
         if (newLayer) {
