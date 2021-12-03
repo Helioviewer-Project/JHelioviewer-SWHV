@@ -32,7 +32,7 @@ import com.jidesoft.dialog.StandardDialog;
 @SuppressWarnings("serial")
 public class SoarDialog extends StandardDialog implements SoarReceiver {
 
-    private static final int MAX_ITEMS = 100;
+    private static final double MAX_SIZE = 2;
     private static final String[] Level = new String[]{/* "LL01", "LL02", "LL03", */ "L1", "L2", "L3"};
     private static final ImmutableSortedMap<String, List<String>> Dataset = new ImmutableSortedMap.Builder<String, List<String>>(JHVGlobals.alphanumComparator).
             put("EUI FSI 174", List.of("EUI-FSI174-IMAGE", "eui-fsi174-image")).
@@ -57,6 +57,10 @@ public class SoarDialog extends StandardDialog implements SoarReceiver {
         setTitle("New SOAR Layer");
     }
 
+    private static double getTotalSize(List<SoarClient.DataItem> items) {
+        return items.stream().mapToLong(SoarClient.DataItem::size).sum() / (1024. * 1024. * 1024.);
+    }
+
     @Override
     public ButtonPanel createButtonPanel() {
         AbstractAction close = new AbstractAction() {
@@ -73,11 +77,13 @@ public class SoarDialog extends StandardDialog implements SoarReceiver {
         JButton loadBtn = new JButton("Add");
         loadBtn.addActionListener(e -> {
             List<SoarClient.DataItem> items = listPane.getSelectedValuesList();
-            int size = items.size();
-            if (size == 0)
+            if (items.isEmpty())
                 return;
-            if (size > MAX_ITEMS) {
-                Message.err("Too many items selected (" + size + ").", "Please select at most " + MAX_ITEMS + " items.", false);
+
+            double size = getTotalSize(items);
+            if (size > MAX_SIZE) {
+                Message.err(String.format("Too much data selected for download (%.1fGiB).", size),
+                        String.format("Please reduce the selection to less than %gGiB.", MAX_SIZE), false);
             } else {
                 SoarClient.submitLoad(items);
                 setVisible(false);
@@ -117,7 +123,12 @@ public class SoarDialog extends StandardDialog implements SoarReceiver {
         JLabel selectedLabel = new JLabel("0 selected", JLabel.RIGHT);
         selectedPanel.add(selectedLabel);
 
-        listPane.addListSelectionListener(e -> selectedLabel.setText(listPane.getSelectedValuesList().size() + " selected"));
+        listPane.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                List<SoarClient.DataItem> items = listPane.getSelectedValuesList();
+                selectedLabel.setText(items.size() + " selected " + String.format("(%.1fGiB)", getTotalSize(items)));
+            }
+        });
         JScrollPane scrollPane = new JScrollPane(listPane);
         scrollPane.setPreferredSize(new Dimension(350, 350));
 

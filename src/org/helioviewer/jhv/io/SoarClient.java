@@ -24,7 +24,7 @@ public class SoarClient {
 
     private enum FileFormat {FITS, JP2, CDF}
 
-    public record DataItem(String id, FileFormat format) {
+    public record DataItem(String id, FileFormat format, long size) {
         @Override
         public String toString() {
             return id;
@@ -62,7 +62,7 @@ public class SoarClient {
         @Override
         public List<DataItem> call() throws Exception {
             String sqldesc = String.join("' OR descriptor='", descriptors);
-            String select = "SELECT data_item_id,file_format from v_sc_data_item WHERE " +
+            String select = "SELECT data_item_id,file_format,filesize from v_sc_data_item WHERE " +
                     "(descriptor='" + sqldesc + "') AND " +
                     "begin_time >= '" + TimeUtils.format(start) + "' and begin_time <= '" + TimeUtils.format(end) + "' AND " +
                     "level='" + level + "' ORDER BY begin_time";
@@ -74,7 +74,7 @@ public class SoarClient {
             for (int i = 0; i < length; i++) {
                 JSONArray item = data.getJSONArray(i);
                 try {
-                    result.add(new DataItem(item.getString(0), FileFormat.valueOf(item.getString(1))));
+                    result.add(new DataItem(item.getString(0), FileFormat.valueOf(item.getString(1)), item.getLong(2)));
                 } catch (Exception ignore) { // ignore unknown formats
                 }
             }
