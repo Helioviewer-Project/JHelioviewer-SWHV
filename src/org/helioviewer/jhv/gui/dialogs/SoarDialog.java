@@ -33,12 +33,12 @@ import com.jidesoft.dialog.StandardDialog;
 public class SoarDialog extends StandardDialog implements SoarReceiver {
 
     private static final int MAX_ITEMS = 100;
-    private static final String[] Level = new String[]{/* "LL01", "LL02", "LL03", */ "L1", "L2" /*, "L3"*/};
+    private static final String[] Level = new String[]{/* "LL01", "LL02", "LL03", */ "L1", "L2", "L3"};
     private static final ImmutableSortedMap<String, List<String>> Dataset = new ImmutableSortedMap.Builder<String, List<String>>(JHVGlobals.alphanumComparator).
-            put("EUI FSI 174", List.of("EUI-FSI174-IMAGE")).
-            put("EUI FSI 304", List.of("EUI-FSI304-IMAGE")).
-            put("EUI HRI 174", List.of("EUI-HRIEUV174-IMAGE", "EUI-HRIEUVNON-IMAGE")).
-            put("EUI HRI LYA", List.of("EUI-HRILYA1216-IMAGE")).
+            put("EUI FSI 174", List.of("EUI-FSI174-IMAGE", "eui-fsi174-image")).
+            put("EUI FSI 304", List.of("EUI-FSI304-IMAGE", "eui-fsi304-image")).
+            put("EUI HRI 174", List.of("EUI-HRIEUV174-IMAGE", "EUI-HRIEUVNON-IMAGE", "eui-hrieuv174-image", "eui-hrieuvnon-image")).
+            put("EUI HRI LYA", List.of("EUI-HRILYA1216-IMAGE", "eui-hrilya1216-image")).
             build();
 
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
