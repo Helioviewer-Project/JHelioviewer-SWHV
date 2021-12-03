@@ -6,17 +6,17 @@ import java.awt.GridBagLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
 
 import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.events.SWEK;
 import org.helioviewer.jhv.events.SWEKSupplier;
+import org.helioviewer.jhv.gui.components.base.JHVSpinner;
 
 @SuppressWarnings("serial")
 class FilterPanel extends JPanel {
 
     private final JLabel label;
-    private final JSpinner spinner;
+    private final JHVSpinner spinner;
 
     private boolean enabled = false;
 
@@ -26,7 +26,7 @@ class FilterPanel extends JPanel {
     private final FilterDialog filterDialog;
     private final SWEK.Operand operand;
 
-    FilterPanel(SWEKSupplier _supplier, SWEK.Parameter _parameter, JSpinner _spinner, FilterDialog _filterDialog, SWEK.Operand _operand, boolean _enabled) {
+    FilterPanel(SWEKSupplier _supplier, SWEK.Parameter _parameter, JHVSpinner _spinner, FilterDialog _filterDialog, SWEK.Operand _operand, boolean _enabled) {
         operand = _operand;
         filterDialog = _filterDialog;
         spinner = _spinner;

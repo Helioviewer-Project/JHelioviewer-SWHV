@@ -17,12 +17,10 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JSpinner;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 
@@ -31,8 +29,7 @@ import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
-import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.gui.components.base.JHVSpinner;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.ObservationSelector;
@@ -157,7 +154,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
     private static RecordButton recordButton;
 
     private static JideButton advancedButton;
-    private static JSpinner speedSpinner;
+    private static JHVSpinner speedSpinner;
     private static JComboBox<SpeedUnit> speedUnitComboBox;
     private static JComboBox<AdvanceMode> advanceModeComboBox;
 
@@ -243,16 +240,11 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         // Speed
         modePanel.add(new JLabel(" Play ", JLabel.RIGHT));
 
-        int speedMin = 1, speedMax = 60;
-        speedSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(Movie.FPS_RELATIVE_DEFAULT), Double.valueOf(1), Double.valueOf(speedMax), Double.valueOf(speedMin)));
+        int speedMax = 60;
+        speedSpinner = new JHVSpinner(Movie.FPS_RELATIVE_DEFAULT, 1, speedMax, 1);
         speedSpinner.setToolTipText("Maximum " + speedMax + " fps");
         speedSpinner.addChangeListener(e -> updateMovieSpeed());
-
-        JFormattedTextField fx = ((JSpinner.DefaultEditor) speedSpinner.getEditor()).getTextField();
-        fx.setFormatterFactory(new TerminatedFormatterFactory("%.0f", "", speedMin, speedMax));
-
         speedSpinner.setMaximumSize(speedSpinner.getPreferredSize());
-        WheelSupport.installMouseWheelSupport(speedSpinner);
         modePanel.add(speedSpinner);
 
         speedUnitComboBox = new JComboBox<>(new SpeedUnit[]{SpeedUnit.FRAMESPERSECOND, SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND});

@@ -6,9 +6,8 @@ import java.awt.FlowLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
 
+import org.helioviewer.jhv.gui.components.base.JHVSpinner;
 import org.helioviewer.jhv.io.APIRequest;
 
 @SuppressWarnings("serial")
@@ -16,7 +15,7 @@ public class CadencePanel extends JPanel {
 
     private static final String[] timeStepUnitStrings = {"sec", "min", "hours", "days", "get all"};
 
-    private final JSpinner spinnerCadence = new JSpinner(new SpinnerNumberModel(1, 1, 1000000, 1));
+    private final JHVSpinner spinnerCadence = new JHVSpinner(1, 1, 1000000, 1);
     private final JComboBox<String> comboUnit = new JComboBox<>(timeStepUnitStrings);
 
     public CadencePanel() {

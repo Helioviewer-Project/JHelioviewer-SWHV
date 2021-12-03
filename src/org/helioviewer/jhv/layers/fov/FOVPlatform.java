@@ -7,8 +7,6 @@ import java.util.Enumeration;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
@@ -20,7 +18,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
-import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.gui.components.base.JHVSpinner;
 import org.helioviewer.jhv.gui.interfaces.JHVCell;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
@@ -46,8 +44,8 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
     private final boolean isSOLO;
 
     private final JPanel panel;
-    private final JSpinner spinnerX;
-    private final JSpinner spinnerY;
+    private final JHVSpinner spinnerX;
+    private final JHVSpinner spinnerY;
 
     FOVPlatform(String name, String _observer, byte[] _color) {
         observer = _observer;
@@ -182,11 +180,10 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
     private static final double min = -60;
     private static final double max = 60;
 
-    private static JSpinner createSpinner() {
-        JSpinner spinner = new JSpinner(new SpinnerNumberModel(0, min, max, 0.1));
-        JFormattedTextField f = ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField();
+    private static JHVSpinner createSpinner() {
+        JHVSpinner spinner = new JHVSpinner(0, min, max, 0.1);
+        JFormattedTextField f = ((JHVSpinner.DefaultEditor) spinner.getEditor()).getTextField();
         f.setFormatterFactory(new TerminatedFormatterFactory("%.2f", "\u2032", min, max));
-        WheelSupport.installMouseWheelSupport(spinner);
         return spinner;
     }
 

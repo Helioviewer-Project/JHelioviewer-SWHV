@@ -5,14 +5,10 @@ import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JSpinner;
-import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
-
 import org.helioviewer.jhv.events.SWEK;
 import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.events.SWEKSupplier;
-import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.gui.components.base.JHVSpinner;
 
 class FilterPanelFactory {
 
@@ -31,33 +27,28 @@ class FilterPanelFactory {
         return spinnerFormat.toString();
     }
 
-    private static JSpinner generateFlareSpinner(FilterDialog filterDialog, SWEK.Parameter parameter) {
+    private static JHVSpinner generateFlareSpinner(FilterDialog filterDialog, SWEK.Parameter parameter) {
         SWEK.ParameterFilter filter = parameter.filter();
         double min = filter.min() == null ? 1e-8 : filter.min();
         double max = filter.max() == null ? 1e-3 : filter.max();
         double start = filter.startValue() == null ? 1e-5 : filter.startValue();
         double step = filter.stepSize() == null ? 0.5 : filter.stepSize();
 
-        FlareSpinnerModel minimumSpinnerModel = new FlareSpinnerModel(start, min, max, step);
-        JSpinner spinner = new JSpinner(minimumSpinnerModel);
-        spinner.setEditor(new JSpinner.DefaultEditor(spinner));
+        JHVSpinner spinner = new JHVSpinner(new FlareSpinnerModel(start, min, max, step));
         spinner.addChangeListener(e -> filterDialog.filterParameterChanged());
-        WheelSupport.installMouseWheelSupport(spinner);
         return spinner;
     }
 
-    private static JSpinner generateMinOrMaxSpinner(FilterDialog filterDialog, SWEK.Parameter parameter) {
+    private static JHVSpinner generateMinOrMaxSpinner(FilterDialog filterDialog, SWEK.Parameter parameter) {
         SWEK.ParameterFilter filter = parameter.filter();
         double min = filter.min() == null ? Double.MIN_VALUE : filter.min();
         double max = filter.max() == null ? Double.MAX_VALUE : filter.max();
         double start = filter.startValue() == null ? (max - min) * 0.5 : filter.startValue();
         double step = filter.stepSize() == null ? (max - min) * 0.01 : filter.stepSize();
 
-        SpinnerModel minimumSpinnerModel = new SpinnerNumberModel(start, min, max, step);
-        JSpinner spinner = new JSpinner(minimumSpinnerModel);
-        spinner.setEditor(new JSpinner.NumberEditor(spinner, getSpinnerFormat(min, max)));
+        JHVSpinner spinner = new JHVSpinner(start, min, max, step);
+        spinner.setEditor(new JHVSpinner.NumberEditor(spinner, getSpinnerFormat(min, max)));
         spinner.addChangeListener(e -> filterDialog.filterParameterChanged());
-        WheelSupport.installMouseWheelSupport(spinner);
         return spinner;
     }
 
