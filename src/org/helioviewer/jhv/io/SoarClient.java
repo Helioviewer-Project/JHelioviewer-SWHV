@@ -62,9 +62,9 @@ public class SoarClient {
         @Override
         public List<DataItem> call() throws Exception {
             String sqldesc = String.join("' OR descriptor='", descriptors);
-            String select = "SELECT data_item_id,file_format,filesize from v_sc_data_item WHERE " +
+            String select = "SELECT data_item_id,file_format,filesize FROM v_sc_data_item WHERE " +
                     "(descriptor='" + sqldesc + "') AND " +
-                    "begin_time >= '" + TimeUtils.format(start) + "' and begin_time <= '" + TimeUtils.format(end) + "' AND " +
+                    "begin_time >= '" + TimeUtils.format(start) + "' AND end_time <= '" + TimeUtils.format(end) + "' AND " +
                     "level='" + level + "' ORDER BY begin_time";
             URI uri = new URI(SEARCH_URL + URLEncoder.encode(select, StandardCharsets.UTF_8));
             JSONArray data = JSONUtils.get(uri).getJSONArray("data");
