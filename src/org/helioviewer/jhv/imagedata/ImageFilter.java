@@ -109,8 +109,8 @@ class ImageFilter {
     private static final double[] sigmas = {1, 4, 16, 64};
     private static final double[] weights = {0.25, 0.5, 0.75, 1};
 
-    private record ScaleTask(float[] data, int width, int height, double sigma,
-                             double weight) implements Callable<float[]> {
+    private record ScaleTask(float[] data, int width, int height, double sigma, double weight)
+            implements Callable<float[]> {
         @Override
         public float[] call() {
             GaussFilter filter = new GaussFilter(sigma, K, Math.max(width, height));

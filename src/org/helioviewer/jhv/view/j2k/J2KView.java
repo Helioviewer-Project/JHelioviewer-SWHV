@@ -109,7 +109,7 @@ public class J2KView extends BaseView {
                     if (milli != metaData[i].getViewpoint().time.milli)
                         Log.warn("Badly ordered metadata: " + uri + "[" + i + "]: expected " + frameMap.key(i) + ", got " + metaData[i].getViewpoint().time);
 
-                    cacheKey[i] = request.sourceId + "+" + milli;
+                    cacheKey[i] = request.sourceId() + "+" + milli;
                 }
             }
 

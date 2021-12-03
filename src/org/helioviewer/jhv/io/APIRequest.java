@@ -9,31 +9,18 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.database.SourcesDatabase;
 import org.json.JSONObject;
 
-public class APIRequest {
+public record APIRequest(@Nonnull String server, int sourceId, long startTime, long endTime, int cadence) {
 
     private static final long RANGE_EXPAND = 60 * TimeUtils.MINUTE_IN_MILLIS;
     public static final int CADENCE_ANY = -100;
     public static final int CADENCE_DEFAULT = 1800;
     public static final int CallistoID = 5000;
 
-    public final String server;
-    public final int sourceId;
-    public final long startTime;
-    public final long endTime;
-    public final int cadence;
-
-    public APIRequest(@Nonnull String _server, int _sourceId, long _startTime, long _endTime, int _cadence) {
-        server = _server;
-        sourceId = _sourceId;
-        cadence = _cadence;
-
-        long expand = (RANGE_EXPAND - (_endTime - _startTime)) / 2;
-        if (_startTime != _endTime && expand > 0) {
-            startTime = _startTime - expand;
-            endTime = _endTime + expand;
-        } else {
-            startTime = _startTime;
-            endTime = _endTime;
+    public APIRequest {
+        long expand = (RANGE_EXPAND - (endTime - startTime)) / 2;
+        if (startTime != endTime && expand > 0) {
+            startTime = startTime - expand;
+            endTime = endTime + expand;
         }
     }
 
@@ -57,25 +44,6 @@ public class APIRequest {
     String toJpipRequest() throws IOException {
         String jsonReq = startTime == endTime ? "&json=true" : "&verbose=true&linked=true";
         return toFileRequest() + jsonReq + "&jpip=true";
-    }
-
-    @Override
-    public final boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o instanceof APIRequest r)
-            return sourceId == r.sourceId && startTime == r.startTime && endTime == r.endTime && cadence == r.cadence && server.equals(r.server);
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = 1;
-        result = 31 * result + sourceId;
-        result = 31 * result + cadence;
-        result = 31 * result + (int) (startTime ^ (startTime >>> 32));
-        result = 31 * result + (int) (endTime ^ (endTime >>> 32));
-        return 31 * result + server.hashCode();
     }
 
     public JSONObject toJson() {
