@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface SoarReceiver {
 
-    void setSoarItems(List<String> items);
+    void setDataItems(List<SoarClient.DataItem> items);
 
 }
