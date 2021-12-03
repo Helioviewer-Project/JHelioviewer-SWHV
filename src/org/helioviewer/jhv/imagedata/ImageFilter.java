@@ -3,8 +3,8 @@ package org.helioviewer.jhv.imagedata;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ForkJoinTask;
-import java.util.concurrent.RecursiveTask;
 import java.util.ArrayList;
 
 import org.helioviewer.jhv.math.MathUtils;
@@ -109,25 +109,10 @@ class ImageFilter {
     private static final double[] sigmas = {1, 4, 16, 64};
     private static final double[] weights = {0.25, 0.5, 0.75, 1};
 
-    @SuppressWarnings("serial")
-    private static class ScaleTask extends RecursiveTask<float[]> {
-
-        private final float[] data;
-        private final int width;
-        private final int height;
-        private final double sigma;
-        private final double weight;
-
-        ScaleTask(float[] _data, int _width, int _height, double _sigma, double _weight) {
-            data = _data;
-            width = _width;
-            height = _height;
-            sigma = _sigma;
-            weight = _weight;
-        }
-
+    private record ScaleTask(float[] data, int width, int height, double sigma,
+                             double weight) implements Callable<float[]> {
         @Override
-        protected float[] compute() {
+        public float[] call() {
             GaussFilter filter = new GaussFilter(sigma, K, Math.max(width, height));
 
             int size = width * height;
@@ -147,13 +132,12 @@ class ImageFilter {
 
             return conv;
         }
-
     }
 
     private static float[] multiScale(float[] data, int width, int height) {
         ArrayList<ForkJoinTask<float[]>> tasks = new ArrayList<>(sigmas.length);
         for (int i = 0; i < sigmas.length; ++i)
-            tasks.add(new ScaleTask(data, width, height, sigmas[i], weights[i]).fork());
+            tasks.add(ForkJoinTask.adapt(new ScaleTask(data, width, height, sigmas[i], weights[i])).fork());
 
         int size = width * height;
         float[] image = new float[size];
