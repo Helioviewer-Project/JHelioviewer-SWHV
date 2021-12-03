@@ -32,7 +32,7 @@ import com.jidesoft.dialog.StandardDialog;
 @SuppressWarnings("serial")
 public class SoarDialog extends StandardDialog implements SoarReceiver {
 
-    private static final int MAX_FILES = 100;
+    private static final int MAX_ITEMS = 100;
     private static final String[] Level = new String[]{/* "LL01", "LL02", "LL03", */ "L1", "L2" /*, "L3"*/};
     private static final ImmutableSortedMap<String, List<String>> Dataset = new ImmutableSortedMap.Builder<String, List<String>>(JHVGlobals.alphanumComparator).
             put("EUI FSI 174", List.of("EUI-FSI174-IMAGE")).
@@ -42,7 +42,7 @@ public class SoarDialog extends StandardDialog implements SoarReceiver {
             build();
 
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
-    private final JList<String> listPane = new JList<>();
+    private final JList<SoarClient.DataItem> listPane = new JList<>();
     private final JLabel foundLabel = new JLabel("0 found", JLabel.RIGHT);
 
     private static SoarDialog instance;
@@ -72,14 +72,14 @@ public class SoarDialog extends StandardDialog implements SoarReceiver {
 
         JButton loadBtn = new JButton("Add");
         loadBtn.addActionListener(e -> {
-            List<String> descriptors = listPane.getSelectedValuesList();
-            int length = descriptors.size();
-            if (length == 0)
+            List<SoarClient.DataItem> items = listPane.getSelectedValuesList();
+            int size = items.size();
+            if (size == 0)
                 return;
-            if (length > MAX_FILES) {
-                Message.err("Too many files selected (" + length + ").", "Please select at most " + MAX_FILES + " files.", false);
+            if (size > MAX_ITEMS) {
+                Message.err("Too many items selected (" + size + ").", "Please select at most " + MAX_ITEMS + " items.", false);
             } else {
-                SoarClient.submitLoad(descriptors);
+                SoarClient.submitLoad(items);
                 setVisible(false);
             }
         });
@@ -146,8 +146,8 @@ public class SoarDialog extends StandardDialog implements SoarReceiver {
     }
 
     @Override
-    public void setSoarItems(List<String> items) {
-        listPane.setListData(items.toArray(String[]::new));
+    public void setDataItems(List<SoarClient.DataItem> items) {
+        listPane.setListData(items.toArray(SoarClient.DataItem[]::new));
         foundLabel.setText(items.size() + " found");
     }
 
