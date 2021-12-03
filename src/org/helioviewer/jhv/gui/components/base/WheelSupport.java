@@ -27,7 +27,7 @@ public class WheelSupport {
     private static final String SLIDER_ACTION_NAME_INCREMENT = "positiveUnitIncrement";
     private static final String SLIDER_ACTION_NAME_DECREMENT = "negativeUnitIncrement";
 
-    public static void installMouseWheelSupport(JSpinner spinner) {
+    static void installMouseWheelSupport(JSpinner spinner) {
         MouseWheelListener l = e -> {
             if (!spinner.isEnabled()) {
                 return;
@@ -73,7 +73,7 @@ public class WheelSupport {
         slider.putClientProperty(CLIENT_PROPERTY_MOUSE_WHEEL_LISTENER, l);
     }
 
-    public static <T extends JComponent> void uninstallMouseWheelSupport(T component) {
+    static <T extends JComponent> void uninstallMouseWheelSupport(T component) {
         MouseWheelListener l = (MouseWheelListener) component.getClientProperty(CLIENT_PROPERTY_MOUSE_WHEEL_LISTENER);
         if (l != null) {
             component.removeMouseWheelListener(l);

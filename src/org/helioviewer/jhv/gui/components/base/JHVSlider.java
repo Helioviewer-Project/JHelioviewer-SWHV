@@ -5,8 +5,6 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JSlider;
 
-import org.helioviewer.jhv.gui.components.base.WheelSupport;
-
 @SuppressWarnings("serial")
 public class JHVSlider extends JSlider {
 

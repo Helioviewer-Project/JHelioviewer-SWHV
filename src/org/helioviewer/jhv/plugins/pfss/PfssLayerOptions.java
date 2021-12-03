@@ -7,11 +7,9 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.gui.components.base.JHVSpinner;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
 @SuppressWarnings("serial")
@@ -27,19 +25,17 @@ class PfssLayerOptions extends JPanel {
         radius = _radius;
         setLayout(new GridBagLayout());
 
-        JSpinner levelSpinner = new JSpinner(new SpinnerNumberModel(detail, 0, PfssSettings.MAX_DETAIL, 1));
+        JHVSpinner levelSpinner = new JHVSpinner(detail, 0, PfssSettings.MAX_DETAIL, 1);
         levelSpinner.addChangeListener(e -> {
             detail = (Integer) levelSpinner.getValue();
             MovieDisplay.display();
         });
-        WheelSupport.installMouseWheelSupport(levelSpinner);
 
-        JSpinner radiusSpinner = new JSpinner(new SpinnerNumberModel(radius, 1.099999999999999, PfssSettings.MAX_RADIUS, 0.1));
+        JHVSpinner radiusSpinner = new JHVSpinner(radius, 1.099999999999999, PfssSettings.MAX_RADIUS, 0.1);
         radiusSpinner.addChangeListener(e -> {
             radius = (Double) radiusSpinner.getValue();
             MovieDisplay.display();
         });
-        WheelSupport.installMouseWheelSupport(levelSpinner);
 
         GridBagConstraints c0 = new GridBagConstraints();
         c0.weightx = 1.;
