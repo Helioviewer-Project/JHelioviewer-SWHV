@@ -17,44 +17,49 @@ import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-public record LoadHCS(URI uri) implements Callable<OrthoScaleList> {
+public class LoadHCS {
 
-    public static Void submit(@Nonnull URI uri, ReceiverHCS receiver) {
-        EventQueueCallbackExecutor.pool.submit(new LoadHCS(uri), new Callback(receiver));
+    public interface Receiver {
+        void setHCS(OrthoScaleList hcs);
+    }
+
+    public static Void submit(@Nonnull URI uri, Receiver receiver) {
+        EventQueueCallbackExecutor.pool.submit(new HCS(uri), new Callback(receiver));
         return null;
     }
 
-    @Override
-    public OrthoScaleList call() throws Exception {
-        List<Vec3> hcsList = new ArrayList<>();
+    private record HCS(URI uri) implements Callable<OrthoScaleList> {
+        @Override
+        public OrthoScaleList call() throws Exception {
+            List<Vec3> hcsList = new ArrayList<>();
 
-        try (NetClient nc = NetClient.of(uri); BufferedReader br = new BufferedReader(nc.getReader())) {
-            int lineNo = 0;
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (line.startsWith("#")) // skip comment lines
-                    continue;
+            try (NetClient nc = NetClient.of(uri); BufferedReader br = new BufferedReader(nc.getReader())) {
+                int lineNo = 0;
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if (line.startsWith("#")) // skip comment lines
+                        continue;
 
-                lineNo++;
+                    lineNo++;
 
-                if (lineNo <= 1) // skip 1 line
-                    continue;
+                    if (lineNo <= 1) // skip 1 line
+                        continue;
 
-                String[] values = Regex.MultiSpace.split(line);
-                if (values.length > 4) {
-                    try {
-                        hcsList.add(ConnectUtils.toCartesian(values[4], values[3]));
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    String[] values = Regex.MultiSpace.split(line);
+                    if (values.length > 4) {
+                        try {
+                            hcsList.add(ConnectUtils.toCartesian(values[4], values[3]));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
+            return new OrthoScaleList(hcsList);
         }
-
-        return new OrthoScaleList(hcsList);
     }
 
-    private record Callback(ReceiverHCS receiver) implements FutureCallback<OrthoScaleList> {
+    private record Callback(Receiver receiver) implements FutureCallback<OrthoScaleList> {
 
         @Override
         public void onSuccess(OrthoScaleList result) {
