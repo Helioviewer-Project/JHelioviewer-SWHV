@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Regex;
@@ -19,12 +20,16 @@ import org.helioviewer.jhv.time.TimeUtils;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-public record LoadFootpoint(URI uri) implements Callable<TimeMap<Position.Cartesian>> {
+public class LoadFootpoint {
+
+    public interface Receiver {
+        void setPositionMap(@Nullable TimeMap<Position.Cartesian> positionMap);
+    }
 
     private static final DateTimeFormatter euroTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    public static Void submit(@Nonnull URI uri, ReceiverPositionMap receiver) {
-        EventQueueCallbackExecutor.pool.submit(new LoadFootpoint(uri), new Callback(receiver));
+    public static Void submit(@Nonnull URI uri, Receiver receiver) {
+        EventQueueCallbackExecutor.pool.submit(new Footpoint(uri), new Callback(receiver));
         return null;
     }
 
@@ -36,34 +41,36 @@ public record LoadFootpoint(URI uri) implements Callable<TimeMap<Position.Cartes
         }
     }
 
-    @Override
-    public TimeMap<Position.Cartesian> call() throws Exception {
-        TimeMap<Position.Cartesian> positionMap = new TimeMap<>();
+    private record Footpoint(URI uri) implements Callable<TimeMap<Position.Cartesian>> {
+        @Override
+        public TimeMap<Position.Cartesian> call() throws Exception {
+            TimeMap<Position.Cartesian> positionMap = new TimeMap<>();
 
-        try (NetClient nc = NetClient.of(uri); BufferedReader br = new BufferedReader(nc.getReader())) {
-            br.readLine(); // skip 1st line
+            try (NetClient nc = NetClient.of(uri); BufferedReader br = new BufferedReader(nc.getReader())) {
+                br.readLine(); // skip 1st line
 
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] values = Regex.Comma.split(line);
-                if (values.length > 8) {
-                    try {
-                        JHVTime time = new JHVTime(parseTime(values[6]));
-                        positionMap.put(time, ConnectUtils.toCartesian(time.milli, values[7], values[8]));
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                String line;
+                while ((line = br.readLine()) != null) {
+                    String[] values = Regex.Comma.split(line);
+                    if (values.length > 8) {
+                        try {
+                            JHVTime time = new JHVTime(parseTime(values[6]));
+                            positionMap.put(time, ConnectUtils.toCartesian(time.milli, values[7], values[8]));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
-        }
 
-        if (positionMap.isEmpty())
-            return null;
-        positionMap.buildIndex();
-        return positionMap;
+            if (positionMap.isEmpty())
+                return null;
+            positionMap.buildIndex();
+            return positionMap;
+        }
     }
 
-    private record Callback(ReceiverPositionMap receiver) implements FutureCallback<TimeMap<Position.Cartesian>> {
+    private record Callback(Receiver receiver) implements FutureCallback<TimeMap<Position.Cartesian>> {
 
         @Override
         public void onSuccess(TimeMap<Position.Cartesian> result) {
