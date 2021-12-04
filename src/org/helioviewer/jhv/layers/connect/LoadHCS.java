@@ -23,9 +23,8 @@ public class LoadHCS {
         void setHCS(OrthoScaleList hcs);
     }
 
-    public static Void submit(@Nonnull URI uri, Receiver receiver) {
+    public static void submit(@Nonnull URI uri, Receiver receiver) {
         EventQueueCallbackExecutor.pool.submit(new HCS(uri), new Callback(receiver));
-        return null;
     }
 
     private record HCS(URI uri) implements Callable<OrthoScaleList> {
