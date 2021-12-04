@@ -25,7 +25,7 @@ import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.time.TimeListener;
 
-class SWEKPopupController extends MouseAdapter implements TimeListener {
+class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
 
     private static final Cursor helpCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
     private static final int xOffset = 12;

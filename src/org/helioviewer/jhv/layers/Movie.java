@@ -14,7 +14,6 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
-import org.helioviewer.jhv.time.TimeRangeListener;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.View;
 
@@ -234,8 +233,8 @@ public class Movie {
     }
 
     private static final ArrayList<FrameListener> frameListeners = new ArrayList<>();
-    private static final ArrayList<TimeListener> timeListeners = new ArrayList<>();
-    private static final ArrayList<TimeRangeListener> timeRangeListeners = new ArrayList<>();
+    private static final ArrayList<TimeListener.Change> timeListeners = new ArrayList<>();
+    private static final ArrayList<TimeListener.Range> timeRangeListeners = new ArrayList<>();
 
     public static void addFrameListener(FrameListener listener) {
         if (!frameListeners.contains(listener))
@@ -246,25 +245,25 @@ public class Movie {
         frameListeners.remove(listener);
     }
 
-    public static void addTimeListener(TimeListener listener) {
+    public static void addTimeListener(TimeListener.Change listener) {
         if (!timeListeners.contains(listener)) {
             timeListeners.add(listener);
             listener.timeChanged(lastTimestamp.milli);
         }
     }
 
-    public static void removeTimeListener(TimeListener listener) {
+    public static void removeTimeListener(TimeListener.Change listener) {
         timeListeners.remove(listener);
     }
 
-    public static void addTimeRangeListener(TimeRangeListener listener) {
+    public static void addTimeRangeListener(TimeListener.Range listener) {
         if (!timeRangeListeners.contains(listener)) {
             timeRangeListeners.add(listener);
             listener.timeRangeChanged(movieStart, movieEnd);
         }
     }
 
-    public static void removeTimeRangeListener(TimeRangeListener listener) {
+    public static void removeTimeRangeListener(TimeListener.Range listener) {
         timeRangeListeners.remove(listener);
     }
 
