@@ -7,7 +7,7 @@ import java.awt.GridBagLayout;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.function.BiFunction;
+import java.util.function.BiConsumer;
 
 import javax.annotation.Nullable;
 import javax.swing.JButton;
@@ -310,13 +310,13 @@ public class ConnectionLayer extends AbstractLayer implements ReceiverSunJSON, L
         return panel;
     }
 
-    private void load(BiFunction<URI, ConnectionLayer, Void> function) {
+    private void load(BiConsumer<URI, ConnectionLayer> consumer) {
         FileDialog fileDialog = new FileDialog(JHVFrame.getFrame(), "Choose a file", FileDialog.LOAD);
         fileDialog.setVisible(true);
 
         File[] fileNames = fileDialog.getFiles();
         if (fileNames.length > 0 && fileNames[0].isFile())
-            function.apply(fileNames[0].toURI(), this);
+            consumer.accept(fileNames[0].toURI(), this);
     }
 
 }
