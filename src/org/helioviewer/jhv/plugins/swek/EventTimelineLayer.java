@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.events.JHVEventCache;
-import org.helioviewer.jhv.events.JHVEventHandler;
+import org.helioviewer.jhv.events.JHVEventListener;
 import org.helioviewer.jhv.events.JHVEventParameter;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -26,7 +26,7 @@ import org.helioviewer.jhv.timelines.draw.YAxis.YAxisIdentityScale;
 import org.json.JSONObject;
 
 // has to be public for state
-public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEventHandler {
+public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEventListener.Handle {
 
     private final YAxis yAxis = new YAxis(0, 0, new YAxisIdentityScale("Events"));
     private static EventPlotConfiguration eventUnderMouse;

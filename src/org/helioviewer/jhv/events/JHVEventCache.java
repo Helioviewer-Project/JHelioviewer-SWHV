@@ -19,7 +19,7 @@ public class JHVEventCache {
     private static final double FACTOR = 0.2;
     private static final long DELTAT_GET = TimeUtils.DAY_IN_MILLIS;
 
-    private static final HashSet<JHVEventHandler> cacheEventHandlers = new HashSet<>();
+    private static final HashSet<JHVEventListener.Handle> cacheEventHandlers = new HashSet<>();
     private static final HashMap<SWEKSupplier, SortedMap<Interval, JHVRelatedEvents>> events = new HashMap<>();
     private static final HashMap<Integer, JHVRelatedEvents> relEvents = new HashMap<>();
     private static final HashSet<SWEKSupplier> activeEventTypes = new HashSet<>();
@@ -28,14 +28,14 @@ public class JHVEventCache {
 
     private static JHVRelatedEvents lastHighlighted = null;
 
-    public static void requestForInterval(long start, long end, JHVEventHandler handler) {
+    public static void requestForInterval(long start, long end, JHVEventListener.Handle handler) {
         cacheEventHandlers.add(handler);
         downloadMissingIntervals(start, end);
         handler.newEventsReceived();
     }
 
     static void fireEventCacheChanged() {
-        cacheEventHandlers.forEach(JHVEventHandler::cacheUpdated);
+        cacheEventHandlers.forEach(JHVEventListener.Handle::cacheUpdated);
     }
 
     static void intervalNotDownloaded(SWEKSupplier eventType, long start, long end) {

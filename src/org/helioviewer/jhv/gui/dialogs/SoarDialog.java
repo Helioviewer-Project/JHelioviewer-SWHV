@@ -23,14 +23,13 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
 import org.helioviewer.jhv.io.SoarClient;
-import org.helioviewer.jhv.io.SoarReceiver;
 
 import com.google.common.collect.ImmutableSortedMap;
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings("serial")
-public class SoarDialog extends StandardDialog implements SoarReceiver {
+public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
 
     private static final double MAX_SIZE = 2;
     private static final String[] Level = new String[]{/* "LL01", "LL02", "LL03", */ "L1", "L2", "L3"};

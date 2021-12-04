@@ -20,11 +20,10 @@ import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
-import org.helioviewer.jhv.timelines.draw.DrawListener;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 
 @SuppressWarnings("serial")
-class ChartDrawIntervalPane extends JComponent implements DrawListener, MouseListener, MouseMotionListener {
+class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMotionListener, DrawController.Listener {
 
     private final Calendar calendar = Calendar.getInstance();
 

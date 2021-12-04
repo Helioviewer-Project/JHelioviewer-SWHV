@@ -19,6 +19,10 @@ import com.google.common.util.concurrent.FutureCallback;
 
 public class SoarClient {
 
+    public interface Receiver {
+        void setDataItems(List<DataItem> items);
+    }
+
     private static final String SEARCH_URL = "http://soar.esac.esa.int/soar-sl-tap/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=";
     private static final String LOAD_URL = "http://soar.esac.esa.int/soar-sl-tap/data?retrieval_type=LAST_PRODUCT&product_type=SCIENCE&data_item_id=";
 
@@ -31,7 +35,7 @@ public class SoarClient {
         }
     }
 
-    public static void submitSearch(@Nonnull SoarReceiver receiver, @Nonnull List<String> descriptors, @Nonnull String level, long start, long end) {
+    public static void submitSearch(@Nonnull Receiver receiver, @Nonnull List<String> descriptors, @Nonnull String level, long start, long end) {
         EventQueueCallbackExecutor.pool.submit(new SoarSearch(descriptors, level, start, end), new Callback(receiver));
     }
 
@@ -82,7 +86,7 @@ public class SoarClient {
         }
     }
 
-    private record Callback(SoarReceiver receiver) implements FutureCallback<List<DataItem>> {
+    private record Callback(Receiver receiver) implements FutureCallback<List<DataItem>> {
 
         @Override
         public void onSuccess(List<DataItem> result) {
