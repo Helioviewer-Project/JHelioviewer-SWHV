@@ -26,7 +26,6 @@ public class PfssLayer extends AbstractLayer implements TimeListener, TimeRangeL
     private static final double LINEWIDTH = 2 * GLSLLine.LINEWIDTH_BASIC;
 
     private final PfssLayerOptions optionsPanel;
-    private final PfssLine pfssLine = new PfssLine();
     private final GLSLLine glslLine = new GLSLLine(true);
     private final BufVertex lineBuf = new BufVertex(3276 * GLSLLine.stride); // pre-allocate 64k
 
@@ -147,7 +146,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener, TimeRangeL
             lastFixedColor = fixedColor;
             lastRadius = radius;
 
-            pfssLine.calculatePositions(data, detail, fixedColor, radius, lineBuf);
+            PfssLine.calculatePositions(data, detail, fixedColor, radius, lineBuf);
             glslLine.setVertex(gl, lineBuf);
 
             pfssTime = data.dateObs;
