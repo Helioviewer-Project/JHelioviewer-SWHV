@@ -36,8 +36,8 @@ public class LoadLayer {
     private record LoadRemote(ImageLayer layer, APIRequest req) implements Callable<View> {
         @Override
         public View call() throws Exception {
-            APIResponse res = APIResponse.request(req);
-            return res == null ? null : loadView(layer.getExecutor(), req, res.getURI(), false);
+            URI uri = APIResponse.get(req);
+            return uri == null ? null : loadView(layer.getExecutor(), req, uri, false);
         }
     }
 
