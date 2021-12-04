@@ -14,13 +14,12 @@ import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
-import org.helioviewer.jhv.time.TimeRangeListener;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.json.JSONObject;
 
-public class DrawController implements JHVEventHighlightListener, TimeListener, TimeRangeListener, LazyComponent {
+public class DrawController implements JHVEventHighlightListener, LazyComponent, TimeListener.Change, TimeListener.Range {
 
     public static final TimeAxis selectedAxis = new TimeAxis(0, 0);
     public static final TimeAxis availableAxis = new TimeAxis(0, 0);

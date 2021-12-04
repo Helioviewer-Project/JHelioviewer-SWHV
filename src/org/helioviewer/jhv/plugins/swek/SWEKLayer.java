@@ -43,13 +43,13 @@ import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLTexture;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.GLTexture;
-import org.helioviewer.jhv.time.TimeRangeListener;
+import org.helioviewer.jhv.time.TimeListener;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
 // has to be public for state
-public class SWEKLayer extends AbstractLayer implements TimeRangeListener, JHVEventHandler {
+public class SWEKLayer extends AbstractLayer implements JHVEventHandler, TimeListener.Range {
 
     private final SWEKPopupController controller = new SWEKPopupController(JHVFrame.getGLCanvas());
     private final JPanel optionsPanel;
