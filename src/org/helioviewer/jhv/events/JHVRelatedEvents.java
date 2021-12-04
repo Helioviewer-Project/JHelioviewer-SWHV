@@ -19,7 +19,7 @@ import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 
 public class JHVRelatedEvents implements ClickableDrawable {
 
-    private static final ArrayList<JHVEventHighlightListener> listeners = new ArrayList<>();
+    private static final ArrayList<JHVEventListener.Highlight> listeners = new ArrayList<>();
 
     private final ArrayList<JHVEvent> events = new ArrayList<>();
     private final List<Pair<Integer, Integer>> associations = new ArrayList<>();
@@ -85,12 +85,12 @@ public class JHVRelatedEvents implements ClickableDrawable {
         }
     }
 
-    public static void addHighlightListener(JHVEventHighlightListener listener) {
+    public static void addHighlightListener(JHVEventListener.Highlight listener) {
         if (!listeners.contains(listener))
             listeners.add(listener);
     }
 
-    public static void removeHighlightListener(JHVEventHighlightListener listener) {
+    public static void removeHighlightListener(JHVEventListener.Highlight listener) {
         listeners.remove(listener);
     }
 
@@ -99,7 +99,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
     }
 
     private static void fireHighlightChanged() {
-        listeners.forEach(JHVEventHighlightListener::eventHightChanged);
+        listeners.forEach(JHVEventListener.Highlight::highlightChanged);
     }
 
     public JHVEvent getClosestTo(long timestamp) {

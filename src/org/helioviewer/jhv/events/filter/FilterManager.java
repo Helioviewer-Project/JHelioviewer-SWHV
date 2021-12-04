@@ -10,10 +10,14 @@ import org.helioviewer.jhv.events.SWEKSupplier;
 
 public class FilterManager {
 
-    private static final Map<SWEKSupplier, Map<SWEK.Parameter, List<SWEK.Param>>> filters = new HashMap<>();
-    private static final ArrayList<FilterManagerListener> listeners = new ArrayList<>();
+    public interface Listener {
+        void filtersChanged(SWEKSupplier supplier);
+    }
 
-    public static void addListener(FilterManagerListener listener) {
+    private static final Map<SWEKSupplier, Map<SWEK.Parameter, List<SWEK.Param>>> filters = new HashMap<>();
+    private static final ArrayList<Listener> listeners = new ArrayList<>();
+
+    public static void addListener(Listener listener) {
         if (!listeners.contains(listener))
             listeners.add(listener);
     }

@@ -23,7 +23,7 @@ import org.helioviewer.jhv.display.GridScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.JHVEventCache;
-import org.helioviewer.jhv.events.JHVEventHandler;
+import org.helioviewer.jhv.events.JHVEventListener;
 import org.helioviewer.jhv.events.JHVEventParameter;
 import org.helioviewer.jhv.events.JHVPositionInformation;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
@@ -49,7 +49,7 @@ import org.json.JSONObject;
 import com.jogamp.opengl.GL2;
 
 // has to be public for state
-public class SWEKLayer extends AbstractLayer implements JHVEventHandler, TimeListener.Range {
+public class SWEKLayer extends AbstractLayer implements JHVEventListener.Handle, TimeListener.Range {
 
     private final SWEKPopupController controller = new SWEKPopupController(JHVFrame.getGLCanvas());
     private final JPanel optionsPanel;
