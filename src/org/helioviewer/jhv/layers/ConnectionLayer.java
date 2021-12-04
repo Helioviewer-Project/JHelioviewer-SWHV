@@ -25,8 +25,8 @@ import org.helioviewer.jhv.layers.connect.LoadConnectivity;
 import org.helioviewer.jhv.layers.connect.LoadConnectivity.Connectivity;
 import org.helioviewer.jhv.layers.connect.LoadFootpoint;
 import org.helioviewer.jhv.layers.connect.LoadHCS;
+import org.helioviewer.jhv.layers.connect.LoadSunJSON;
 import org.helioviewer.jhv.layers.connect.OrthoScaleList;
-import org.helioviewer.jhv.layers.connect.ReceiverSunJSON;
 import org.helioviewer.jhv.layers.connect.SunJSON;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
@@ -41,7 +41,7 @@ import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public class ConnectionLayer extends AbstractLayer implements ReceiverSunJSON, LoadConnectivity.Receiver, LoadFootpoint.Receiver, LoadHCS.Receiver {
+public class ConnectionLayer extends AbstractLayer implements LoadConnectivity.Receiver, LoadFootpoint.Receiver, LoadHCS.Receiver, LoadSunJSON.Receiver {
 
     private static final double LINEWIDTH = 2 * GLSLLine.LINEWIDTH_BASIC;
     private static final float SIZE_POINT = 0.01f;
