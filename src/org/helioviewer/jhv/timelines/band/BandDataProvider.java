@@ -52,16 +52,9 @@ public class BandDataProvider {
         return false;
     }
 
-    private static class BandDownload implements Callable<BandResponse> {
+    private record BandDownload(Band band, long startTime, long endTime) implements Callable<BandResponse> {
 
-        private final Band band;
-        private final long startTime;
-        private final long endTime;
-
-        BandDownload(Band _band, long _startTime, long _endTime) {
-            band = _band;
-            startTime = _startTime;
-            endTime = _endTime;
+        BandDownload {
             Timelines.getLayers().downloadStarted(band);
         }
 

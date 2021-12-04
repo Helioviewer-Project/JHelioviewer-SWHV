@@ -18,49 +18,48 @@ import nom.tam.fits.BinaryTableHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 
-class PfssDataLoader implements Callable<PfssData> {
+class PfssDataLoader {
 
     static void submit(long time, String url) {
-        EventQueueCallbackExecutor.pool.submit(new PfssDataLoader(time, url), new Callback(url));
+        EventQueueCallbackExecutor.pool.submit(new DataLoader(time, url), new Callback(url));
     }
 
-    private final long time;
-    private final String url;
+    private record DataLoader(long time, String url) implements Callable<PfssData> {
 
-    private PfssDataLoader(long _time, String _url) {
-        PfssPlugin.downloads++;
-        time = _time;
-        url = _url;
-    }
-
-    @Override
-    public PfssData call() throws Exception {
-        try (NetClient nc = NetClient.of(url); Fits fits = new Fits(nc.getStream())) {
-            BasicHDU<?>[] hdus = fits.read();
-            if (hdus == null || hdus.length < 2 || !(hdus[1] instanceof BinaryTableHDU bhdu))
-                throw new Exception("Could not read FITS");
-
-            Header header = bhdu.getHeader();
-            String dateFits = header.getStringValue("DATE-OBS");
-            if (dateFits == null)
-                throw new Exception("DATE-OBS not found");
-            JHVTime date = new JHVTime(dateFits);
-            if (time != date.milli)
-                throw new Exception("Inconsistent DATE-OBS. Expected " + new JHVTime(time) + ", got " + date);
-
-            int points = header.getIntValue("HIERARCH.POINTS_PER_LINE");
-            if (points == 0)
-                throw new Exception("POINTS_PER_LINE not found");
-
-            short[] flinex = (short[]) bhdu.getColumn("FIELDLINEx");
-            short[] fliney = (short[]) bhdu.getColumn("FIELDLINEy");
-            short[] flinez = (short[]) bhdu.getColumn("FIELDLINEz");
-            short[] flines = (short[]) bhdu.getColumn("FIELDLINEs");
-            if (flinex.length != fliney.length || flinex.length != flinez.length || flinex.length != flines.length)
-                throw new Exception("Fieldline arrays not equal " + flinex.length + ' ' + fliney.length + ' ' + flinez.length + ' ' + flinex.length);
-
-            return new PfssData(date, flinex, fliney, flinez, flines, points);
+        DataLoader {
+            PfssPlugin.downloads++;
         }
+
+        @Override
+        public PfssData call() throws Exception {
+            try (NetClient nc = NetClient.of(url); Fits fits = new Fits(nc.getStream())) {
+                BasicHDU<?>[] hdus = fits.read();
+                if (hdus == null || hdus.length < 2 || !(hdus[1] instanceof BinaryTableHDU bhdu))
+                    throw new Exception("Could not read FITS");
+
+                Header header = bhdu.getHeader();
+                String dateFits = header.getStringValue("DATE-OBS");
+                if (dateFits == null)
+                    throw new Exception("DATE-OBS not found");
+                JHVTime date = new JHVTime(dateFits);
+                if (time != date.milli)
+                    throw new Exception("Inconsistent DATE-OBS. Expected " + new JHVTime(time) + ", got " + date);
+
+                int points = header.getIntValue("HIERARCH.POINTS_PER_LINE");
+                if (points == 0)
+                    throw new Exception("POINTS_PER_LINE not found");
+
+                short[] flinex = (short[]) bhdu.getColumn("FIELDLINEx");
+                short[] fliney = (short[]) bhdu.getColumn("FIELDLINEy");
+                short[] flinez = (short[]) bhdu.getColumn("FIELDLINEz");
+                short[] flines = (short[]) bhdu.getColumn("FIELDLINEs");
+                if (flinex.length != fliney.length || flinex.length != flinez.length || flinex.length != flines.length)
+                    throw new Exception("Fieldline arrays not equal " + flinex.length + ' ' + fliney.length + ' ' + flinez.length + ' ' + flinex.length);
+
+                return new PfssData(date, flinex, fliney, flinez, flines, points);
+            }
+        }
+
     }
 
     private record Callback(String url) implements FutureCallback<PfssData> {
