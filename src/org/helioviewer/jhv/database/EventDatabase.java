@@ -139,7 +139,7 @@ public class EventDatabase {
         pstatement.executeUpdate();
     }
 
-    private static int dump_associationint2db(List<Pair<Integer, Integer>> assocs) throws SQLException {
+    private static void dump_associationint2db(List<Pair<Integer, Integer>> assocs) throws SQLException {
         int len = assocs.size();
         int i = 0;
         int errorcode = 0;
@@ -166,7 +166,6 @@ public class EventDatabase {
             i++;
         }
         pstatement.getConnection().commit();
-        return errorcode;
     }
 
     public static int dump_association2db(Pair<String, String>[] assocs) {
@@ -252,20 +251,17 @@ public class EventDatabase {
                     generatedKey = getEventId(event2db.uid);
 
                     if (generatedKey == -1) {
-                        {
-                            insertFullEvent.setInt(1, typeId);
-                            insertFullEvent.setString(2, event2db.uid);
-                            insertFullEvent.setLong(3, event2db.start);
-                            insertFullEvent.setLong(4, event2db.end);
-                            insertFullEvent.setLong(5, event2db.archiv);
-                            insertFullEvent.setBinaryStream(6, new ByteArrayInputStream(event2db.compressedJson), event2db.compressedJson.length);
-                            insertFullEvent.executeUpdate();
-                        }
-                        {
-                            try (ResultSet rs = selectLastInsert.executeQuery()) {
-                                if (rs.next()) {
-                                    generatedKey = rs.getInt(1);
-                                }
+                        insertFullEvent.setInt(1, typeId);
+                        insertFullEvent.setString(2, event2db.uid);
+                        insertFullEvent.setLong(3, event2db.start);
+                        insertFullEvent.setLong(4, event2db.end);
+                        insertFullEvent.setLong(5, event2db.archiv);
+                        insertFullEvent.setBinaryStream(6, new ByteArrayInputStream(event2db.compressedJson), event2db.compressedJson.length);
+                        insertFullEvent.executeUpdate();
+
+                        try (ResultSet rs = selectLastInsert.executeQuery()) {
+                            if (rs.next()) {
+                                generatedKey = rs.getInt(1);
                             }
                         }
                     } else {
@@ -557,8 +553,8 @@ public class EventDatabase {
         return new ArrayList<>();
     }
 
-    private record Associations2Program(long start, long end,
-                                        SWEKSupplier type) implements Callable<List<Pair<Integer, Integer>>> {
+    private record Associations2Program(long start, long end, SWEKSupplier type)
+            implements Callable<List<Pair<Integer, Integer>>> {
         @Override
         public List<Pair<Integer, Integer>> call() throws SQLException {
             List<Pair<Integer, Integer>> assocList = new ArrayList<>();
