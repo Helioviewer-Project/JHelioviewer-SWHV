@@ -14,14 +14,14 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.selector.Reorderable;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
 import org.helioviewer.jhv.time.JHVTime;
-import org.helioviewer.jhv.time.TimeSelectorListener;
+import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.NullView;
 
 import com.jogamp.opengl.GL2;
 
 @SuppressWarnings({"serial", "unchecked"})
-public class Layers extends AbstractTableModel implements Reorderable, TimeSelectorListener {
+public class Layers extends AbstractTableModel implements Reorderable, TimeListener.Selection {
 
     private static class LayerList extends ArrayList<Layer> {
 

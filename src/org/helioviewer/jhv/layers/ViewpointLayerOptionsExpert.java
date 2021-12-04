@@ -22,13 +22,13 @@ import org.helioviewer.jhv.gui.components.base.JHVSlider;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectContainer;
 import org.helioviewer.jhv.time.JHVTime;
-import org.helioviewer.jhv.time.TimeSelectorListener;
+import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 @SuppressWarnings("serial")
-class ViewpointLayerOptionsExpert extends JPanel implements TimeSelectorListener {
+class ViewpointLayerOptionsExpert extends JPanel implements TimeListener.Selection {
 
     private final SpaceObjectContainer container;
     private final JCheckBox syncCheckBox;

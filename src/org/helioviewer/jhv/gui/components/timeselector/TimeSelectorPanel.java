@@ -13,7 +13,7 @@ import javax.swing.JRadioButtonMenuItem;
 import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.time.JHVTime;
-import org.helioviewer.jhv.time.TimeSelectorListener;
+import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import com.jidesoft.swing.JideSplitButton;
@@ -44,7 +44,7 @@ public class TimeSelectorPanel extends JPanel {
         return group;
     }
 
-    private final ArrayList<TimeSelectorListener> listeners = new ArrayList<>();
+    private final ArrayList<TimeListener.Selection> listeners = new ArrayList<>();
     private final TimePanel startTimePanel = new TimePanel("Select start date");
     private final TimePanel endTimePanel = new TimePanel("Select end date");
     private final CarringtonPicker carringtonPicker = new CarringtonPicker();
@@ -127,7 +127,7 @@ public class TimeSelectorPanel extends JPanel {
         return endTimePanel.getTime();
     }
 
-    public void addListener(TimeSelectorListener listener) {
+    public void addListener(TimeListener.Selection listener) {
         if (!listeners.contains(listener))
             listeners.add(listener);
     }
