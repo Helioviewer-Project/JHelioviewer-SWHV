@@ -28,9 +28,8 @@ public class LoadFootpoint {
 
     private static final DateTimeFormatter euroTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    public static Void submit(@Nonnull URI uri, Receiver receiver) {
+    public static void submit(@Nonnull URI uri, Receiver receiver) {
         EventQueueCallbackExecutor.pool.submit(new Footpoint(uri), new Callback(receiver));
-        return null;
     }
 
     private static long parseTime(String s) {

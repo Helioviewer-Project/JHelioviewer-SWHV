@@ -42,9 +42,8 @@ public class LoadConnectivity {
         void setConnectivity(@Nullable Connectivity connectivity);
     }
 
-    public static Void submit(@Nonnull URI uri, Receiver receiver) {
+    public static void submit(@Nonnull URI uri, Receiver receiver) {
         EventQueueCallbackExecutor.pool.submit(new ConnectivityLoad(uri), new Callback(receiver));
-        return null;
     }
 
     private record ConnectivityLoad(URI uri) implements Callable<Connectivity> {
