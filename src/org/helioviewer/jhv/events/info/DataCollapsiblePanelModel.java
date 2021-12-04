@@ -4,15 +4,19 @@ import java.util.ArrayList;
 
 class DataCollapsiblePanelModel {
 
-    private final ArrayList<DataCollapsiblePanelModelListener> listeners = new ArrayList<>();
+    interface Listener {
+        void repack();
+    }
 
-    void addListener(DataCollapsiblePanelModelListener listener) {
+    private final ArrayList<Listener> listeners = new ArrayList<>();
+
+    void addListener(Listener listener) {
         if (!listeners.contains(listener))
             listeners.add(listener);
     }
 
     void repackCollapsiblePanels() {
-        listeners.forEach(DataCollapsiblePanelModelListener::repack);
+        listeners.forEach(Listener::repack);
     }
 
 }

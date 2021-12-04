@@ -28,7 +28,7 @@ import com.google.common.util.concurrent.FutureCallback;
 // This panel is a JDialog, so that it can be displayed on top of an GLCanvas,
 // which is not possible for other swing components.
 @SuppressWarnings("serial")
-public class SWEKEventInformationDialog extends JDialog implements DataCollapsiblePanelModelListener {
+public class SWEKEventInformationDialog extends JDialog implements DataCollapsiblePanelModel.Listener {
 
     private JPanel allTablePanel;
 
