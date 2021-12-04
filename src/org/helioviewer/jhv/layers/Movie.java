@@ -23,6 +23,10 @@ public class Movie {
         Loop, Stop, Swing, SwingDown
     }
 
+    public interface Listener {
+        void frameChanged(int frame, boolean last);
+    }
+
     public static final int FPS_RELATIVE_DEFAULT = 20;
     public static final int FPS_ABSOLUTE = 30;
 
@@ -232,16 +236,16 @@ public class Movie {
             notDone = true;
     }
 
-    private static final ArrayList<FrameListener> frameListeners = new ArrayList<>();
+    private static final ArrayList<Listener> frameListeners = new ArrayList<>();
     private static final ArrayList<TimeListener.Change> timeListeners = new ArrayList<>();
     private static final ArrayList<TimeListener.Range> timeRangeListeners = new ArrayList<>();
 
-    public static void addFrameListener(FrameListener listener) {
+    public static void addFrameListener(Listener listener) {
         if (!frameListeners.contains(listener))
             frameListeners.add(listener);
     }
 
-    public static void removeFrameListener(FrameListener listener) {
+    public static void removeFrameListener(Listener listener) {
         frameListeners.remove(listener);
     }
 

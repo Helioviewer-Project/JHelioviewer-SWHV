@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 import javax.swing.Timer;
 
-import org.helioviewer.jhv.events.JHVEventHighlightListener;
+import org.helioviewer.jhv.events.JHVEventListener;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
@@ -19,13 +19,18 @@ import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.json.JSONObject;
 
-public class DrawController implements JHVEventHighlightListener, LazyComponent, TimeListener.Change, TimeListener.Range {
+public class DrawController implements LazyComponent, JHVEventListener.Highlight, TimeListener.Change, TimeListener.Range {
+
+    public interface Listener {
+        void drawRequest();
+        void drawMovieLineRequest();
+    }
 
     public static final TimeAxis selectedAxis = new TimeAxis(0, 0);
     public static final TimeAxis availableAxis = new TimeAxis(0, 0);
 
     private static final DrawControllerOptionsPanel optionsPanel = new DrawControllerOptionsPanel();
-    private static final ArrayList<DrawListener> listeners = new ArrayList<>();
+    private static final ArrayList<Listener> listeners = new ArrayList<>();
 
     private static Rectangle graphArea = new Rectangle();
     private static Rectangle graphSize = new Rectangle();
@@ -68,7 +73,7 @@ public class DrawController implements JHVEventHighlightListener, LazyComponent,
         return optionsPanel;
     }
 
-    public static void addDrawListener(DrawListener listener) {
+    public static void addDrawListener(Listener listener) {
         if (!listeners.contains(listener))
             listeners.add(listener);
     }
@@ -236,7 +241,7 @@ public class DrawController implements JHVEventHighlightListener, LazyComponent,
     }
 
     @Override
-    public void eventHightChanged() {
+    public void highlightChanged() {
         drawRequest();
     }
 
@@ -267,11 +272,11 @@ public class DrawController implements JHVEventHighlightListener, LazyComponent,
 
         if (toDraw) {
             toDraw = false;
-            listeners.forEach(DrawListener::drawRequest);
+            listeners.forEach(Listener::drawRequest);
         }
         if (drawMovieLine) {
             drawMovieLine = false;
-            listeners.forEach(DrawListener::drawMovieLineRequest);
+            listeners.forEach(Listener::drawMovieLineRequest);
         }
     }
 

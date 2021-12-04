@@ -2,11 +2,11 @@ package org.helioviewer.jhv.layers;
 
 import java.awt.EventQueue;
 
-import org.helioviewer.jhv.events.JHVEventHighlightListener;
+import org.helioviewer.jhv.events.JHVEventListener;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.gui.JHVFrame;
 
-public class MovieDisplay implements JHVEventHighlightListener {
+public class MovieDisplay implements JHVEventListener.Highlight {
 
     private static final MovieDisplay instance = new MovieDisplay();
 
@@ -22,7 +22,7 @@ public class MovieDisplay implements JHVEventHighlightListener {
     }
 
     @Override
-    public void eventHightChanged() {
+    public void highlightChanged() {
         display();
     }
 

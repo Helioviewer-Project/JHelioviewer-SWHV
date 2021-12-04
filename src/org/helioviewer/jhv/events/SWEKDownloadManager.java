@@ -10,13 +10,12 @@ import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.events.filter.FilterManager;
-import org.helioviewer.jhv.events.filter.FilterManagerListener;
 import org.helioviewer.jhv.threads.JHVThread;
 
 import com.google.common.collect.ArrayListMultimap;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-class SWEKDownloadManager implements FilterManagerListener {
+class SWEKDownloadManager implements FilterManager.Listener {
 
     private static final int NUMBER_THREADS = 8;
     private static final long SIXHOURS = 1000 * 60 * 60 * 6;
