@@ -12,9 +12,7 @@ class PfssLine {
     private static final byte[] loopColor = Colors.White;
     private static final byte[] insideFieldColor = Colors.Blue;
 
-    private final byte[] brightColor = new byte[4];
-
-    private void computeBrightColor(double b) {
+    private static void computeBrightColor(double b, byte[] brightColor) {
         if (b > 0) {
             byte bb = (byte) (255 * (1. - b));
             brightColor[0] = (byte) 255;
@@ -33,7 +31,7 @@ class PfssLine {
         return (buf.get(idx) + 32768.) * (2. / 65535.) - 1.;
     }
 
-    public void calculatePositions(PfssData data, int detail, boolean fixedColor, double radius, BufVertex lineBuf) {
+    static void calculatePositions(PfssData data, int detail, boolean fixedColor, double radius, BufVertex lineBuf) {
         int pointsPerLine = data.pointsPerLine;
         double cphi = data.cphi;
         double sphi = data.sphi;
@@ -43,6 +41,7 @@ class PfssLine {
         ShortBuffer flines = data.flines;
         int dlength = flinex.capacity();
 
+        byte[] brightColor = new byte[4];
         byte[] oneColor = loopColor;
         for (int i = 0; i < dlength; i++) {
             if (i / pointsPerLine % 9 <= detail) {
@@ -50,7 +49,7 @@ class PfssLine {
                 double y = 3. * decode(fliney, i);
                 double z = 3. * decode(flinez, i);
                 double b = decode(flines, i);
-                computeBrightColor(b);
+                computeBrightColor(b, brightColor);
 
                 double helpx = cphi * x + sphi * y;
                 double helpy = -sphi * x + cphi * y;
