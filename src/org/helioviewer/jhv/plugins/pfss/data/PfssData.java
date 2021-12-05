@@ -18,7 +18,7 @@ public class PfssData {
     public final double cphi;
     public final double sphi;
 
-    public PfssData(JHVTime _dateObs, short[] _flinex, short[] _fliney, short[] _flinez, short[] _flines, int _pointsPerLine) {
+    PfssData(JHVTime _dateObs, short[] _flinex, short[] _fliney, short[] _flinez, short[] _flines, int _pointsPerLine) {
         dateObs = _dateObs;
 
         int len = _flinex.length;
