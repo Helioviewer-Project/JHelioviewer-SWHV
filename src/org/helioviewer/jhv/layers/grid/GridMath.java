@@ -45,13 +45,11 @@ public class GridMath {
 
         vexBuf.putVertex(0, -AXIS_STOP, 0, 1, Colors.Null);
         vexBuf.repeatVertex(axisSouthColor);
-
         vexBuf.putVertex(0, -AXIS_START, 0, 1, axisSouthColor);
         vexBuf.repeatVertex(Colors.Null);
 
         vexBuf.putVertex(0, AXIS_START, 0, 1, Colors.Null);
         vexBuf.repeatVertex(axisNorthColor);
-
         vexBuf.putVertex(0, AXIS_STOP, 0, 1, axisNorthColor);
         vexBuf.repeatVertex(Colors.Null);
 
