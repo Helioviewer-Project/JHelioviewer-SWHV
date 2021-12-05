@@ -21,6 +21,7 @@ import javax.imageio.stream.ImageInputStream;
 //import org.helioviewer.jhv.base.XMLUtils;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.io.NetClient;
+import org.helioviewer.jhv.log.Log;
 
 // essentially static; local or network cache
 class GenericImage implements URIImageReader {
@@ -35,13 +36,17 @@ class GenericImage implements URIImageReader {
 
             String xml = null;
             // read metadata of first image
-            IIOMetadata metadata = reader.getImageMetadata(0);
-            IIOMetadataNode root = (IIOMetadataNode) metadata.getAsTree("javax_imageio_1.0");
-            Object text = root.getElementsByTagName("TextEntry").item(0);
-            if (text instanceof IIOMetadataNode) {
-                xml = ((IIOMetadataNode) text).getAttribute("value");
-                if (xml != null) // coverity
-                    xml = xml.trim().replace("&", "&amp;");
+            try {
+                IIOMetadata metadata = reader.getImageMetadata(0); // random files may have malformed metadata
+                IIOMetadataNode root = (IIOMetadataNode) metadata.getAsTree("javax_imageio_1.0");
+                Object text = root.getElementsByTagName("TextEntry").item(0);
+                if (text instanceof IIOMetadataNode) {
+                    xml = ((IIOMetadataNode) text).getAttribute("value");
+                    if (xml != null) // coverity
+                        xml = xml.trim().replace("&", "&amp;");
+                }
+            } catch (Exception e) {
+                Log.error(uri, e);
             }
             /*
             String[] names = metadata.getMetadataFormatNames();
