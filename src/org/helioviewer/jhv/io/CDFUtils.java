@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.YAxis;
@@ -41,6 +42,7 @@ class CDFUtils {
         }
         // dumpGlobalAttrs(globalAttrs);
         String instrumentName = String.join(" ", globalAttrs.get("Instrument_name"));
+        String dataProduct = Regex.Space.split(String.join(" ", globalAttrs.get("Data_product")))[0];
 
         Variable[] cdfVars = cdf.getVariables();
         VariableAttribute[] cdfAttrs = cdf.getVariableAttributes();
@@ -130,7 +132,7 @@ class CDFUtils {
         // Temporary
         System.out.println(">>> " + instrumentName + '_' + data.variable().getName());
         switch (instrumentName + '_' + data.variable().getName()) {
-            case "MAG_B_RTN", "MAG_B_VSO" -> {
+            case "MAG_B_RTN", "MAG_B_VSO", "MAG_B_SRF" -> {
                 dataScaleMin = "-20";
                 dataScaleMax = "+20";
             }
@@ -140,7 +142,7 @@ class CDFUtils {
 
         JSONArray ja = new JSONArray();
         for (int j = 0; j < dataVals[0].length; j++) {
-            String name = instrumentName + ' ' + labelVals[0][j];
+            String name = instrumentName + ' ' + dataProduct + ' ' + labelVals[0][j];
             JSONObject bandType = new JSONObject().
                     put("baseUrl", "").
                     put("unitLabel", dataUnits).
@@ -148,8 +150,8 @@ class CDFUtils {
                     put("range", new JSONArray().put(Float.valueOf(dataScaleMin)).put(Float.valueOf(dataScaleMax))).
                     put("scale", dataScaleTyp). //! TBD
                             put("label", name).
-                    put("group", "GROUP_CDF").
-                    put("bandCacheType", "BandCacheAll");
+                    put("group", "GROUP_CDF");
+            //put("bandCacheType", "BandCacheAll");
 
             JSONArray dataArray = new JSONArray();
             for (int i = 0; i < dataVals.length; i++) {
@@ -164,14 +166,15 @@ class CDFUtils {
 
             ja.put(new JSONObject().put("bandType", bandType).put("data", dataArray));
         }
-/*
-        dumpVariableAttrs(epoch);
-        dumpValues(epochVals);
-        dumpVariableAttrs(data);
-        dumpValues(dataVals);
-        dumpVariableAttrs(label);
-        dumpValues(labelVals);
-*/
+
+        // dumpGlobalAttrs(globalAttrs);
+        // dumpVariableAttrs(epoch);
+        // dumpValues(epochVals);
+        // dumpVariableAttrs(data);
+        // dumpValues(dataVals);
+        // dumpVariableAttrs(label);
+        // dumpValues(labelVals);
+
         return ret.put("org.helioviewer.jhv.request.timeline", ja);
     }
 
@@ -214,7 +217,6 @@ class CDFUtils {
         }
         return ret;
     }
-
 /*
     private static void dumpGlobalAttrs(LinkedListMultimap<String, String> map) {
         for (String key : map.keySet()) {
