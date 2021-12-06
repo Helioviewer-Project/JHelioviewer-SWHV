@@ -23,6 +23,7 @@ public class DrawController implements LazyComponent, JHVEventListener.Highlight
 
     public interface Listener {
         void drawRequest();
+
         void drawMovieLineRequest();
     }
 

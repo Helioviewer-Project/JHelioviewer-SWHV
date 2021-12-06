@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.timelines.band;
 
+import java.awt.EventQueue;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -13,6 +14,7 @@ import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.TimelineSettings;
+import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -31,7 +33,20 @@ public class BandDataProvider {
         EventQueueCallbackExecutor.pool.submit(new BandLoad(jo), new BandLoadCallback());
     }
 
+    public static void loadBandResponse(JSONObject jo) {
+        EventQueue.invokeLater(() -> { // TBD
+            BandResponse response = new BandResponse(jo);
+            Band band = new Band(response.bandType);
+            band.addToCache(response.values, response.dates);
+            Timelines.getLayers().add(band);
+
+            DrawController.setSelectedInterval(response.dates[0], response.dates[response.dates.length - 1]);
+        });
+    }
+
     static void addDownloads(Band band, List<Interval> intervals) {
+        if ("".equals(band.getBandType().getBaseURL()))
+            return;
         for (Interval interval : intervals) {
             Future<BandResponse> worker = EventQueueCallbackExecutor.pool.submit(
                     new BandDownload(band, interval.start, interval.end), new BandDownloadCallback(band));
