@@ -12,8 +12,10 @@ class BandCacheAll implements BandCache {
 
     private static final int MAX_SIZE = 86400;
 
-    private final List<DateValue> datevals = new ArrayList<>();
+    private final List<DateValue> dateVals = new ArrayList<>();
     private boolean hasData;
+    private DateValue first;
+    private DateValue last;
 
     @Override
     public boolean hasData() {
@@ -26,16 +28,19 @@ class BandCacheAll implements BandCache {
         if (len > 0) {
             hasData = true;
         }
-        if (datevals.size() >= MAX_SIZE) {
+        if (dateVals.size() >= MAX_SIZE) {
             return;
         }
 
         for (int i = 0; i < len; i++) {
-            if (datevals.size() >= MAX_SIZE)
+            if (dateVals.size() >= MAX_SIZE)
                 break;
-            datevals.add(new DateValue(dates[i], yAxis.clip(values[i])));
+            dateVals.add(new DateValue(dates[i], yAxis.clip(values[i])));
         }
-        Collections.sort(datevals);
+        Collections.sort(dateVals);
+
+        first = dateVals.get(0);
+        last = dateVals.get(dateVals.size() - 1);
     }
 
     @Override
@@ -43,7 +48,7 @@ class BandCacheAll implements BandCache {
         float min = Float.POSITIVE_INFINITY;
         float max = Float.NEGATIVE_INFINITY;
 
-        for (DateValue dv : datevals) {
+        for (DateValue dv : dateVals) {
             if (dv.value != YAxis.BLANK && start <= dv.milli && dv.milli <= end) {
                 min = Math.min(dv.value, min);
                 max = Math.max(dv.value, max);
@@ -56,7 +61,7 @@ class BandCacheAll implements BandCache {
     public List<List<DateValue>> getValues(double graphWidth, long start, long end) {
         List<List<DateValue>> ret = new ArrayList<>();
         List<DateValue> list = new ArrayList<>();
-        for (DateValue dv : datevals) {
+        for (DateValue dv : dateVals) {
             if (dv.value == YAxis.BLANK) {
                 ret.add(list);
                 list = new ArrayList<>();
@@ -70,13 +75,18 @@ class BandCacheAll implements BandCache {
 
     @Override
     public float getValue(long ts) {
+        int len = dateVals.size();
+        int idx = (int) ((len - 1) * 1. * (ts - first.milli) / (last.milli - first.milli) + 0.5);
+        if (idx >= 0 && idx < len) {
+            return dateVals.get(idx).value;
+        }
         return YAxis.BLANK;
     }
 
     @Override
     public void serialize(JSONObject jo, double f) {
         JSONArray ja = new JSONArray();
-        datevals.forEach(dv -> dv.serialize(ja, f));
+        dateVals.forEach(dv -> dv.serialize(ja, f));
         jo.put("data", ja);
     }
 
