@@ -190,7 +190,7 @@ class BandCacheMinute implements BandCache {
             long[] d = dates[0];
             float[] v = values[0];
             for (int i = 0; i < v.length; i++)
-                ja.put(new JSONArray().put(d[i] / 1000).put(f * v[i]));
+                ja.put(new JSONArray().put(d[i] / 1000L).put(f * v[i]));
         }
 
     }
