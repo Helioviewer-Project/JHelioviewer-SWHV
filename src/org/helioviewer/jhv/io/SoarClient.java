@@ -26,7 +26,7 @@ public class SoarClient {
     private static final String SEARCH_URL = "http://soar.esac.esa.int/soar-sl-tap/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=";
     private static final String LOAD_URL = "http://soar.esac.esa.int/soar-sl-tap/data?retrieval_type=LAST_PRODUCT&product_type=SCIENCE&data_item_id=";
 
-    private enum FileFormat {FITS, JP2, CDF}
+    private enum FileFormat {CDF, FITS, JP2}
 
     public record DataItem(String id, FileFormat format, long size) {
         @Override
@@ -48,17 +48,17 @@ public class SoarClient {
             try {
                 URI uri = new URI(LOAD_URL + item.id);
                 switch (item.format) {
+                    case CDF -> cdfUris.add(uri);
                     case FITS -> fitsUris.add(uri);
                     case JP2 -> jp2Uris.add(uri);
-                    case CDF -> cdfUris.add(uri);
                 }
             } catch (Exception e) {
                 Log.error(e);
             }
         }
+        Load.CDF.getAll(cdfUris);
         Load.FITS.getAll(fitsUris);
         Load.Image.getAll(jp2Uris);
-        // Load.Request.getAll(cdfUris);
     }
 
     private record SoarSearch(List<String> descriptors, String level, long start, long end)

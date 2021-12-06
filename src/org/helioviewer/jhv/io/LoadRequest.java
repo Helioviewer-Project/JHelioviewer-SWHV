@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.io;
 
 import java.net.URI;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
@@ -24,6 +25,10 @@ class LoadRequest {
 
     static void submit(@Nonnull String json) {
         EventQueueCallbackExecutor.pool.submit(new LoadRequestString(json), new Callback());
+    }
+
+    static void submitCDF(@Nonnull List<URI> uriList) {
+        EventQueueCallbackExecutor.pool.submit(new LoadRequestCDF(uriList), new Callback());
     }
 
     private static void parseRequest(JSONObject jo) throws Exception {
@@ -50,17 +55,35 @@ class LoadRequest {
         @Override
         public Void call() throws Exception {
             if (uri.toString().toLowerCase().endsWith(".cdf")) {
-                JSONObject jo = CDFUtils.load(NetFileCache.get(uri));
-                JSONArray ja = jo.optJSONArray("org.helioviewer.jhv.request.timeline");
-                if (ja != null) {
-                    int len = ja.length();
-                    for (int i = 0; i < len; i++) {
-                        BandDataProvider.loadBandResponse(ja.getJSONObject(i));
-                    }
-                }
+                loadCDF(uri);
             } else
                 parseRequest(JSONUtils.get(uri));
             return null;
+        }
+    }
+
+    private record LoadRequestCDF(List<URI> uriList) implements Callable<Void> {
+        @Override
+        public Void call() {
+            uriList.parallelStream().forEach(uri -> {
+                try {
+                    loadCDF(uri);
+                } catch (Exception e) {
+                    Log.error(e);
+                }
+            });
+            return null;
+        }
+    }
+
+    private static void loadCDF(URI uri) throws Exception {
+        JSONObject jo = CDFUtils.load(NetFileCache.get(uri));
+        JSONArray ja = jo.optJSONArray("org.helioviewer.jhv.request.timeline");
+        if (ja != null) {
+            int len = ja.length();
+            for (int i = 0; i < len; i++) {
+                BandDataProvider.loadBandResponse(ja.getJSONObject(i));
+            }
         }
     }
 
