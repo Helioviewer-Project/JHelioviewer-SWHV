@@ -38,6 +38,7 @@ public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
             put("EUI FSI 304", List.of("EUI-FSI304-IMAGE", "eui-fsi304-image")).
             put("EUI HRI 174", List.of("EUI-HRIEUV174-IMAGE", "EUI-HRIEUVNON-IMAGE", "eui-hrieuv174-image", "eui-hrieuvnon-image")).
             put("EUI HRI LYA", List.of("EUI-HRILYA1216-IMAGE", "eui-hrilya1216-image")).
+            put("MAG", List.of("MAG-RTN-NORMAL-1-MINUTE", "MAG-VSO-NORMAL-1-MINUTE")).
             build();
 
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();

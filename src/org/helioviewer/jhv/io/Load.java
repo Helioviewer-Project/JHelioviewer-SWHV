@@ -19,8 +19,8 @@ public interface Load {
 
     }
 
-    Load image = new Image();
     Load fits = new FITS();
+    Load image = new Image();
     LoadString request = new Request();
     LoadString state = new State();
     LoadString sunJSON = new SunJSON();
@@ -51,6 +51,14 @@ public interface Load {
         public static void getAll(@Nonnull List<URI> uris) {
             if (!uris.isEmpty()) {
                 LoadLayer.submit(ImageLayer.create(null), uris, true);
+            }
+        }
+    }
+
+    class CDF {
+        public static void getAll(@Nonnull List<URI> uris) {
+            if (!uris.isEmpty()) {
+                LoadRequest.submitCDF(uris);
             }
         }
     }
