@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.helioviewer.jhv.log.Log;
@@ -90,34 +91,42 @@ class CDFUtils {
             return;
         }
 
+        Map<String, String> dataAttrs = data.attributes();
+        if (!"EPOCH".equals(dataAttrs.get("DEPEND_0")) || !"time_series".equals(dataAttrs.get("DISPLAY_TYPE"))) {
+            Log.error("Inconsistent variable " + data.variable.getName() + ": " + uri);
+            return;
+        }
+        String dataFillVal = dataAttrs.get("FILLVAL");
+        String dataScaleMax = dataAttrs.get("SCALEMAX");
+        String dataScaleMin = dataAttrs.get("SCALEMIN");
+        String dataScaleTyp = dataAttrs.get("SCALETYP");
+        String dataUnits = dataAttrs.get("UNITS");
+        if (dataFillVal == null || dataScaleMax == null || dataScaleMin == null || dataScaleTyp == null || dataUnits == null) {
+            Log.error("Missing attributes for variable " + data.variable.getName() + ": " + uri);
+            return;
+        }
+
+        List<String> timeFillVal = List.of("9999-12-31T23:59:59.999999999", "0000-01-01T00:00:00.000000000", epoch.attributes().get("FILLVAL"));
+
+        String[][] epochVals = readVariable(epoch.variable());
+        String[][] dataVals = readVariable(data.variable());
+        String[][] labelVals = readVariable(label.variable());
+
         dumpVariableAttrs(epoch);
-        dumpVariable(epoch.variable());
+        dumpValues(epochVals);
         dumpVariableAttrs(data);
-        dumpVariable(data.variable());
+        dumpValues(dataVals);
         dumpVariableAttrs(label);
-        dumpVariable(label.variable());
+        dumpValues(labelVals);
     }
 
-    private static void dumpGlobalAttrs(LinkedListMultimap<String, String> map) {
-        for (String key : map.keySet()) {
-            System.out.println(">>> " + key);
-            System.out.println("        " + String.join("\n        ", map.get(key)));
-        }
-    }
-
-    private static void dumpVariableAttrs(CDFVariable v) {
-        System.out.println(">>> " + v.variable().getName());
-        for (Map.Entry<String, String> entry : v.attributes().entrySet()) {
-            System.out.println("        " + entry.getKey() + ' ' + entry.getValue());
-        }
-    }
-
-    private static void dumpVariable(Variable v) throws IOException {
+    private static String[][] readVariable(Variable v) throws IOException {
         DataType dataType = v.getDataType();
         int groupSize = dataType.getGroupSize();
         Object abuf = v.createRawValueArray();
         int count = v.getRecordCount();
 
+        String[][] ret = new String[count][];
         for (int j = 0; j < count; j++) {
             v.readRawRecord(j, abuf);
             int len = Array.getLength(abuf);
@@ -126,7 +135,28 @@ class CDFUtils {
             for (int i = 0; i < len; i += groupSize) {
                 out[i / groupSize] = dataType.formatArrayValue(abuf, i);
             }
-            System.out.println("   " + String.join(" ", out));
+            ret[j] = out;
+        }
+        return ret;
+    }
+
+    private static void dumpGlobalAttrs(LinkedListMultimap<String, String> map) {
+        for (String key : map.keySet()) {
+            System.out.println(">>> " + key);
+            System.out.println("\t" + String.join("\n\t", map.get(key)));
+        }
+    }
+
+    private static void dumpVariableAttrs(CDFVariable v) {
+        System.out.println(">>> " + v.variable().getName());
+        for (Map.Entry<String, String> entry : v.attributes().entrySet()) {
+            System.out.println("\t" + entry.getKey() + ' ' + entry.getValue());
+        }
+    }
+
+    private static void dumpValues(String[][] vals) {
+        for (String[] val : vals) {
+            System.out.println("\t\t" + String.join(" ", val));
         }
     }
 
