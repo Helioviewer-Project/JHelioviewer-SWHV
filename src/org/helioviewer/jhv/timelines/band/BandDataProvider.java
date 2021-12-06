@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.timelines.band;
 
 import java.awt.EventQueue;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -24,6 +25,7 @@ import com.google.common.util.concurrent.FutureCallback;
 public class BandDataProvider {
 
     private static final ArrayListMultimap<Band, Future<BandResponse>> workerMap = ArrayListMultimap.create();
+    private static final HashMap<BandType, Band> externalLoad = new HashMap<>();
 
     public static void loadBandTypes() {
         EventQueueCallbackExecutor.pool.submit(new BandTypeDownload(), new BandTypeDownloadCallback());
@@ -36,10 +38,9 @@ public class BandDataProvider {
     public static void loadBandResponse(JSONObject jo) {
         BandResponse response = new BandResponse(jo); // outside EDT
         EventQueue.invokeLater(() -> {
-            Band band = new Band(response.bandType);
+            Band band = externalLoad.computeIfAbsent(response.bandType, Band::new);
             band.addToCache(response.values, response.dates);
             Timelines.getLayers().add(band);
-
             DrawController.setSelectedInterval(response.dates[0], response.dates[response.dates.length - 1]);
         });
     }
