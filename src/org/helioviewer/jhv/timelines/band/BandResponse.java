@@ -23,7 +23,7 @@ class BandResponse {
             dates = new long[len];
             for (int i = 0; i < len; i++) {
                 JSONArray entry = data.getJSONArray(i);
-                dates[i] = entry.getLong(0) * 1000;
+                dates[i] = entry.getLong(0) * 1000L;
                 values[i] = (float) (entry.getDouble(1) * multiplier);
             }
         } else {
