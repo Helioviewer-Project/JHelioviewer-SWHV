@@ -104,8 +104,10 @@ class CDFUtils {
         }
         String dataFillVal = dataAttrs.get("FILLVAL");
         String dataScaleTyp = dataAttrs.get("SCALETYP");
+        String dataScaleMax = dataAttrs.get("SCALEMAX");
+        String dataScaleMin = dataAttrs.get("SCALEMIN");
         String dataUnits = dataAttrs.get("UNITS");
-        if (dataFillVal == null || dataScaleTyp == null || dataUnits == null) {
+        if (dataFillVal == null || dataScaleMax == null || dataScaleMin == null || dataScaleTyp == null || dataUnits == null) {
             Log.error("Missing attributes for variable " + data.variable.getName() + ": " + uri);
             return ret;
         }
@@ -125,17 +127,18 @@ class CDFUtils {
             return ret;
         }
 
-        float dataMin = Float.POSITIVE_INFINITY;
-        float dataMax = Float.NEGATIVE_INFINITY;
-        for (float[] dataVal : dataVals) {
-            for (int j = 0; j < dataVals[0].length; j++) {
-                float val = dataVal[j];
-                if (!Float.isFinite(val))
-                    continue;
-                if (val > dataMax)
-                    dataMax = val;
-                if (val < dataMin)
-                    dataMin = val;
+        // Temporary
+        System.out.println(">>> " + instrumentName + '_' + data.variable().getName());
+        switch (instrumentName + '_' + data.variable().getName()) {
+            case "MAG_B_RTN" -> {
+                dataScaleMin = "-20";
+                dataScaleMax = "+20";
+            }
+            case "MAG_B_VSO" -> {
+                dataScaleMin = "-20";
+                dataScaleMax = "+20";
+            }
+            default -> {
             }
         }
 
@@ -146,7 +149,7 @@ class CDFUtils {
                     put("baseUrl", "").
                     put("unitLabel", dataUnits).
                     put("name", name).
-                    put("range", new JSONArray().put(dataMin).put(dataMax)).
+                    put("range", new JSONArray().put(Float.valueOf(dataScaleMin)).put(Float.valueOf(dataScaleMax))).
                     put("scale", dataScaleTyp). //! TBD
                             put("label", name).
                     put("group", "GROUP_CDF").
