@@ -49,9 +49,16 @@ class LoadRequest {
     private record LoadRequestURI(URI uri) implements Callable<Void> {
         @Override
         public Void call() throws Exception {
-            if (uri.toString().toLowerCase().endsWith(".cdf"))
-                CDFUtils.load(NetFileCache.get(uri));
-            else
+            if (uri.toString().toLowerCase().endsWith(".cdf")) {
+                JSONObject jo = CDFUtils.load(NetFileCache.get(uri));
+                JSONArray ja = jo.optJSONArray("org.helioviewer.jhv.request.timeline");
+                if (ja != null) {
+                    int len = ja.length();
+                    for (int i = 0; i < len; i++) {
+                        BandDataProvider.loadBandResponse(ja.getJSONObject(i));
+                    }
+                }
+            } else
                 parseRequest(JSONUtils.get(uri));
             return null;
         }
