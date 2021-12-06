@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.helioviewer.jhv.base.conversion.GOESLevel;
@@ -26,6 +27,12 @@ import org.json.JSONObject;
 
 public class Band extends AbstractTimelineLayer {
 
+    private static final HashMap<BandType, Band> externalLoad = new HashMap<>();
+
+    public static final Band createFromType(BandType _bandType) {
+        return externalLoad.computeIfAbsent(_bandType, Band::new);
+    }
+
     private static final int SUPER_SAMPLE = 1; // 8 for dots
     private static final int DOWNLOADER_MAX_DAYS_PER_BLOCK = 21;
 
@@ -41,7 +48,7 @@ public class Band extends AbstractTimelineLayer {
     private Color graphColor = BandColors.getNextColor();
     private PropagationModel propagationModel = new PropagationModelRadial(0);
 
-    public Band(BandType _bandType) {
+    private Band(BandType _bandType) {
         bandType = _bandType;
         bandCache = bandType.getBandCacheType().equals("BandCacheAll") ? new BandCacheAll() : new BandCacheMinute();
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), YAxis.generateScale(bandType.getScale(), bandType.getUnitLabel()));
