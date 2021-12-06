@@ -34,8 +34,8 @@ public class BandDataProvider {
     }
 
     public static void loadBandResponse(JSONObject jo) {
-        EventQueue.invokeLater(() -> { // TBD
-            BandResponse response = new BandResponse(jo);
+        BandResponse response = new BandResponse(jo); // outside EDT
+        EventQueue.invokeLater(() -> {
             Band band = new Band(response.bandType);
             band.addToCache(response.values, response.dates);
             Timelines.getLayers().add(band);
