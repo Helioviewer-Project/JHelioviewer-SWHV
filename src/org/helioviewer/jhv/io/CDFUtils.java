@@ -130,11 +130,7 @@ class CDFUtils {
         // Temporary
         System.out.println(">>> " + instrumentName + '_' + data.variable().getName());
         switch (instrumentName + '_' + data.variable().getName()) {
-            case "MAG_B_RTN" -> {
-                dataScaleMin = "-20";
-                dataScaleMax = "+20";
-            }
-            case "MAG_B_VSO" -> {
+            case "MAG_B_RTN", "MAG_B_VSO" -> {
                 dataScaleMin = "-20";
                 dataScaleMax = "+20";
             }
