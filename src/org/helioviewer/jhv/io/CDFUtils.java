@@ -2,6 +2,7 @@ package org.helioviewer.jhv.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +14,7 @@ import com.google.common.collect.LinkedListMultimap;
 import uk.ac.bristol.star.cdf.AttributeEntry;
 import uk.ac.bristol.star.cdf.CdfContent;
 import uk.ac.bristol.star.cdf.CdfReader;
+import uk.ac.bristol.star.cdf.DataType;
 import uk.ac.bristol.star.cdf.GlobalAttribute;
 import uk.ac.bristol.star.cdf.Variable;
 import uk.ac.bristol.star.cdf.VariableAttribute;
@@ -89,8 +91,11 @@ class CDFUtils {
         }
 
         dumpVariableAttrs(epoch);
+        dumpVariable(epoch.variable());
         dumpVariableAttrs(data);
+        dumpVariable(data.variable());
         dumpVariableAttrs(label);
+        dumpVariable(label.variable());
     }
 
     private static void dumpGlobalAttrs(LinkedListMultimap<String, String> map) {
@@ -104,6 +109,24 @@ class CDFUtils {
         System.out.println(">>> " + v.variable().getName());
         for (Map.Entry<String, String> entry : v.attributes().entrySet()) {
             System.out.println("        " + entry.getKey() + ' ' + entry.getValue());
+        }
+    }
+
+    private static void dumpVariable(Variable v) throws IOException {
+        DataType dataType = v.getDataType();
+        int groupSize = dataType.getGroupSize();
+        Object abuf = v.createRawValueArray();
+        int count = v.getRecordCount();
+
+        for (int j = 0; j < count; j++) {
+            v.readRawRecord(j, abuf);
+            int len = Array.getLength(abuf);
+
+            String[] out = new String[len / groupSize];
+            for (int i = 0; i < len; i += groupSize) {
+                out[i / groupSize] = dataType.formatArrayValue(abuf, i);
+            }
+            System.out.println("   " + String.join(" ", out));
         }
     }
 
