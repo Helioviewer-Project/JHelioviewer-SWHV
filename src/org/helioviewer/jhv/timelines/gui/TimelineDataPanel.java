@@ -78,7 +78,7 @@ public class TimelineDataPanel extends JPanel {
         BandType bandType = (BandType) comboBoxData.getSelectedItem();
         if (bandType == null)
             return;
-        Timelines.getLayers().add(new Band(bandType));
+        Timelines.getLayers().add(Band.createFromType(bandType));
     }
 
 }
