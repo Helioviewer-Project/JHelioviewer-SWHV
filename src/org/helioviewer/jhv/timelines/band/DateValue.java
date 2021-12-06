@@ -15,7 +15,7 @@ class DateValue implements Comparable<DateValue> {
     }
 
     void serialize(JSONArray ja, double f) {
-        ja.put(new JSONArray().put(milli / 1000).put(value * f));
+        ja.put(new JSONArray().put(milli / 1000L).put(value * f));
     }
 
     @Override
