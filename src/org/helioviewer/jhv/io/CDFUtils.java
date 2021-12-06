@@ -103,11 +103,9 @@ class CDFUtils {
             return ret;
         }
         String dataFillVal = dataAttrs.get("FILLVAL");
-        String dataScaleMax = dataAttrs.get("SCALEMAX");
-        String dataScaleMin = dataAttrs.get("SCALEMIN");
         String dataScaleTyp = dataAttrs.get("SCALETYP");
         String dataUnits = dataAttrs.get("UNITS");
-        if (dataFillVal == null || dataScaleMax == null || dataScaleMin == null || dataScaleTyp == null || dataUnits == null) {
+        if (dataFillVal == null || dataScaleTyp == null || dataUnits == null) {
             Log.error("Missing attributes for variable " + data.variable.getName() + ": " + uri);
             return ret;
         }
@@ -115,7 +113,7 @@ class CDFUtils {
         List<String> timeFillVal = List.of("9999-12-31T23:59:59.999999999", "0000-01-01T00:00:00.000000000", epoch.attributes().get("FILLVAL"));
 
         String[][] epochVals = readVariable(epoch.variable());
-        String[][] dataVals = readVariable(data.variable());
+        float[][] dataVals = readVariableFloat(data.variable());
         String[][] labelVals = readVariable(label.variable());
 
         if (epochVals.length != dataVals.length) {
@@ -127,6 +125,20 @@ class CDFUtils {
             return ret;
         }
 
+        float dataMin = Float.POSITIVE_INFINITY;
+        float dataMax = Float.NEGATIVE_INFINITY;
+        for (float[] dataVal : dataVals) {
+            for (int j = 0; j < dataVals[0].length; j++) {
+                float val = dataVal[j];
+                if (!Float.isFinite(val))
+                    continue;
+                if (val > dataMax)
+                    dataMax = val;
+                if (val < dataMin)
+                    dataMin = val;
+            }
+        }
+
         JSONArray ja = new JSONArray();
         for (int j = 0; j < dataVals[0].length; j++) {
             String name = instrumentName + ' ' + labelVals[0][j];
@@ -134,7 +146,7 @@ class CDFUtils {
                     put("baseUrl", "").
                     put("unitLabel", dataUnits).
                     put("name", name).
-                    put("range", new JSONArray().put(/*Float.valueOf(dataScaleMin)*/-10).put(/*Float.valueOf(dataScaleMax)*/10)).
+                    put("range", new JSONArray().put(dataMin).put(dataMax)).
                     put("scale", dataScaleTyp). //! TBD
                             put("label", name).
                     put("group", "GROUP_CDF").
@@ -145,8 +157,9 @@ class CDFUtils {
                 String epochStr = epochVals[i][0];
                 if (!timeFillVal.contains(epochStr)) {
                     long milli = TimeUtils.parse(epochStr);
-                    String dataStr = dataVals[i][j];
-                    dataArray.put(new JSONArray().put(milli / 1000L).put(dataFillVal.equals(dataStr) ? YAxis.BLANK : Float.parseFloat(dataStr)));
+                    float val = dataVals[i][j];
+                    String dataStr = String.valueOf(val);
+                    dataArray.put(new JSONArray().put(milli / 1000L).put(dataFillVal.equals(dataStr) ? YAxis.BLANK : val));
                 }
             }
 
@@ -182,6 +195,27 @@ class CDFUtils {
         }
         return ret;
     }
+
+    private static float[][] readVariableFloat(Variable v) throws IOException {
+        DataType dataType = v.getDataType();
+        int groupSize = dataType.getGroupSize();
+        Object abuf = v.createRawValueArray();
+        int count = v.getRecordCount();
+
+        float[][] ret = new float[count][];
+        for (int j = 0; j < count; j++) {
+            v.readRawRecord(j, abuf);
+            int len = Array.getLength(abuf);
+
+            float[] out = new float[len / groupSize];
+            for (int i = 0; i < len; i += groupSize) {
+                out[i / groupSize] = (float) dataType.getScalar(abuf, i); // dubious
+            }
+            ret[j] = out;
+        }
+        return ret;
+    }
+
 /*
     private static void dumpGlobalAttrs(LinkedListMultimap<String, String> map) {
         for (String key : map.keySet()) {
