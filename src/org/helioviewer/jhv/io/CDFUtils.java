@@ -9,6 +9,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.helioviewer.jhv.log.Log;
+import org.helioviewer.jhv.time.TimeUtils;
+import org.helioviewer.jhv.timelines.draw.YAxis;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.google.common.collect.LinkedListMultimap;
 
@@ -25,7 +29,7 @@ class CDFUtils {
     private record CDFVariable(Variable variable, Map<String, String> attributes) {
     }
 
-    static void load(URI uri) throws IOException {
+    static JSONObject load(URI uri) throws IOException {
         CdfContent cdf = new CdfContent(new CdfReader(new File(uri)));
 
         LinkedListMultimap<String, String> globalAttrs = LinkedListMultimap.create();
@@ -35,7 +39,7 @@ class CDFUtils {
                 globalAttrs.put(name, entry.toString());
             }
         }
-        dumpGlobalAttrs(globalAttrs);
+        // dumpGlobalAttrs(globalAttrs);
         String instrumentName = String.join(" ", globalAttrs.get("Instrument_name"));
 
         Variable[] cdfVars = cdf.getVariables();
@@ -53,6 +57,8 @@ class CDFUtils {
             variables[i] = new CDFVariable(v, attrs);
         }
 
+        JSONObject ret = new JSONObject();
+
         CDFVariable epoch = null;
         for (CDFVariable v : variables) {
             if ("EPOCH".equals(v.variable().getName())) {
@@ -62,7 +68,7 @@ class CDFUtils {
         }
         if (epoch == null) {
             Log.error("Epoch not found: " + uri);
-            return;
+            return ret;
         }
 
         CDFVariable data = null;
@@ -75,7 +81,7 @@ class CDFUtils {
         }
         if (data == null) {
             Log.error("Data not found: " + uri);
-            return;
+            return ret;
         }
 
         CDFVariable label = null;
@@ -88,13 +94,13 @@ class CDFUtils {
         }
         if (label == null) {
             Log.error("Label not found: " + uri);
-            return;
+            return ret;
         }
 
         Map<String, String> dataAttrs = data.attributes();
         if (!"EPOCH".equals(dataAttrs.get("DEPEND_0")) || !"time_series".equals(dataAttrs.get("DISPLAY_TYPE"))) {
             Log.error("Inconsistent variable " + data.variable.getName() + ": " + uri);
-            return;
+            return ret;
         }
         String dataFillVal = dataAttrs.get("FILLVAL");
         String dataScaleMax = dataAttrs.get("SCALEMAX");
@@ -103,7 +109,7 @@ class CDFUtils {
         String dataUnits = dataAttrs.get("UNITS");
         if (dataFillVal == null || dataScaleMax == null || dataScaleMin == null || dataScaleTyp == null || dataUnits == null) {
             Log.error("Missing attributes for variable " + data.variable.getName() + ": " + uri);
-            return;
+            return ret;
         }
 
         List<String> timeFillVal = List.of("9999-12-31T23:59:59.999999999", "0000-01-01T00:00:00.000000000", epoch.attributes().get("FILLVAL"));
@@ -112,12 +118,49 @@ class CDFUtils {
         String[][] dataVals = readVariable(data.variable());
         String[][] labelVals = readVariable(label.variable());
 
+        if (epochVals.length != dataVals.length) {
+            Log.error("Inconsistent lengths of epoch (" + epochVals.length + ") and data (" + dataVals.length + ") variables: " + uri);
+            return ret;
+        }
+        if (labelVals[0].length != dataVals[0].length) {
+            Log.error("Inconsistent number of labels (" + labelVals[0].length + ") with number of data axes (" + dataVals[0].length + "): " + uri);
+            return ret;
+        }
+
+        JSONArray ja = new JSONArray();
+        for (int j = 0; j < dataVals[0].length; j++) {
+            String name = instrumentName + ' ' + labelVals[0][j];
+            JSONObject bandType = new JSONObject().
+                    put("baseUrl", "").
+                    put("unitLabel", dataUnits).
+                    put("name", name).
+                    put("range", new JSONArray().put(/*Float.valueOf(dataScaleMin)*/-10).put(/*Float.valueOf(dataScaleMax)*/10)).
+                    put("scale", dataScaleTyp). //! TBD
+                            put("label", name).
+                    put("group", "GROUP_CDF").
+                    put("bandCacheType", "BandCacheAll");
+
+            JSONArray dataArray = new JSONArray();
+            for (int i = 0; i < dataVals.length; i++) {
+                String epochStr = epochVals[i][0];
+                if (!timeFillVal.contains(epochStr)) {
+                    long milli = TimeUtils.parse(epochStr);
+                    String dataStr = dataVals[i][j];
+                    dataArray.put(new JSONArray().put(milli / 1000L).put(dataFillVal.equals(dataStr) ? YAxis.BLANK : Float.parseFloat(dataStr)));
+                }
+            }
+
+            ja.put(new JSONObject().put("bandType", bandType).put("data", dataArray));
+        }
+/*
         dumpVariableAttrs(epoch);
         dumpValues(epochVals);
         dumpVariableAttrs(data);
         dumpValues(dataVals);
         dumpVariableAttrs(label);
         dumpValues(labelVals);
+*/
+        return ret.put("org.helioviewer.jhv.request.timeline", ja);
     }
 
     private static String[][] readVariable(Variable v) throws IOException {
@@ -139,7 +182,7 @@ class CDFUtils {
         }
         return ret;
     }
-
+/*
     private static void dumpGlobalAttrs(LinkedListMultimap<String, String> map) {
         for (String key : map.keySet()) {
             System.out.println(">>> " + key);
@@ -159,5 +202,5 @@ class CDFUtils {
             System.out.println("\t\t" + String.join(" ", val));
         }
     }
-
+*/
 }
