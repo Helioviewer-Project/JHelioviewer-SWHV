@@ -33,8 +33,7 @@ public class CDFReader {
 
     public static void load(URI uri) throws Exception {
         BandData[] lines = read(NetFileCache.get(uri));
-        int count = lines.length;
-        if (count == 0) // failed
+        if (lines.length == 0) // failed
             return;
 
         EventQueue.invokeLater(() -> {
@@ -52,6 +51,24 @@ public class CDFReader {
     }
 
     private record CDFVariable(Variable variable, Map<String, String> attributes) {
+    }
+
+    private static class Bin {
+
+        private int n = 0;
+        private float mean = 0;
+
+        void add(float val) {
+            if (val != YAxis.BLANK) {
+                n++;
+                mean += (val - mean) / n;
+            }
+        }
+
+        float getMean() {
+            return n == 0 ? YAxis.BLANK : mean;
+        }
+
     }
 
     private static BandData[] read(URI uri) throws IOException {
@@ -177,6 +194,34 @@ public class CDFReader {
             dates[i] = TimeUtils.parse(epochStr);
         }
 
+        long rebinFactor = TimeUtils.MINUTE_IN_MILLIS;
+        long startBin = dates[0] / rebinFactor;
+        long endBin = dates[dates.length - 1] / rebinFactor;
+        int numBins = (int) (endBin - startBin + 1);
+
+        Bin[][] bins = new Bin[numAxes][numBins];
+        for (int j = 0; j < numAxes; j++) {
+            for (int i = 0; i < numBins; i++) {
+                bins[j][i] = new Bin();
+            }
+        }
+        for (int j = 0; j < numAxes; j++) {
+            for (int i = 0; i < numPoints; i++) {
+                bins[j][(int) (dates[i] / rebinFactor - startBin)].add(dataVals[j][i]);
+            }
+        }
+
+        long[] datesBinned = new long[numBins];
+        for (int i = 0; i < numBins; i++) {
+            datesBinned[i] = (startBin + i) * rebinFactor;
+        }
+        float[][] valsBinned = new float[numAxes][numBins];
+        for (int j = 0; j < numAxes; j++) {
+            for (int i = 0; i < numBins; i++) {
+                valsBinned[j][i] = bins[j][i].getMean();
+            }
+        }
+
         ret = new BandData[numAxes];
         for (int i = 0; i < numAxes; i++) {
             String name = instrumentName + ' ' + dataProduct + ' ' + labelVals[0][i];
@@ -189,7 +234,7 @@ public class CDFReader {
                             put("label", name).
                     put("group", "GROUP_CDF");
             //put("bandCacheType", "BandCacheAll");
-            ret[i] = new BandData(new BandType(jo), dates, dataVals[i]);
+            ret[i] = new BandData(new BandType(jo), datesBinned, valsBinned[i]);
         }
 
         // dumpGlobalAttrs(globalAttrs);
