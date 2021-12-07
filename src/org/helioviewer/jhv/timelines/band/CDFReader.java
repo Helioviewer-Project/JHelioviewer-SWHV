@@ -32,34 +32,29 @@ import uk.ac.bristol.star.cdf.VariableAttribute;
 public class CDFReader {
 
     public static void load(URI uri) throws Exception {
-        JSONObject jo = read(NetFileCache.get(uri));
-        JSONArray ja = jo.optJSONArray("org.helioviewer.jhv.request.timeline");
-        if (ja != null) {
-            int len = ja.length();
-            for (int i = 0; i < len; i++) {
-                loadBandResponse(ja.getJSONObject(i));
-            }
-        }
-    }
-
-    private static void loadBandResponse(JSONObject jo) {
-        BandResponse response = new BandResponse(jo); // outside EDT
+        BandData[] lines = read(NetFileCache.get(uri));
+        int count = lines.length;
+        if (count == 0) // failed
+            return;
 
         EventQueue.invokeLater(() -> {
-            Band band = Band.createFromType(response.bandType);
-            band.addToCache(response.values, response.dates);
-            Timelines.getLayers().add(band);
-            DrawController.setSelectedInterval(response.dates[0], response.dates[response.dates.length - 1]);
+            long[] dates = lines[0].dates();
+            for (BandData line : lines) {
+                Band band = Band.createFromType(line.bandType());
+                band.addToCache(line.values(), dates);
+                Timelines.getLayers().add(band);
+            }
+            DrawController.setSelectedInterval(dates[0], dates[dates.length - 1]);
         });
     }
 
-    private record CDFData(BandType bandType, long[] dates, float[] values) {
+    private record BandData(BandType bandType, long[] dates, float[] values) {
     }
 
     private record CDFVariable(Variable variable, Map<String, String> attributes) {
     }
 
-    private static JSONObject read(URI uri) throws IOException {
+    private static BandData[] read(URI uri) throws IOException {
         CdfContent cdf = new CdfContent(new CdfReader(new File(uri)));
 
         LinkedListMultimap<String, String> globalAttrs = LinkedListMultimap.create();
@@ -87,7 +82,7 @@ public class CDFReader {
             variables[i] = new CDFVariable(v, attrs);
         }
 
-        JSONObject ret = new JSONObject();
+        BandData[] ret = new BandData[0];
 
         CDFVariable epoch = null;
         for (CDFVariable v : variables) {
@@ -182,10 +177,10 @@ public class CDFReader {
             dates[i] = TimeUtils.parse(epochStr);
         }
 
-        JSONArray ja = new JSONArray();
-        for (int j = 0; j < count; j++) {
-            String name = instrumentName + ' ' + dataProduct + ' ' + labelVals[0][j];
-            JSONObject bandType = new JSONObject().
+        ret = new BandData[count];
+        for (int i = 0; i < count; i++) {
+            String name = instrumentName + ' ' + dataProduct + ' ' + labelVals[0][i];
+            JSONObject jo = new JSONObject().
                     put("baseUrl", "").
                     put("unitLabel", dataUnits).
                     put("name", name).
@@ -194,19 +189,7 @@ public class CDFReader {
                             put("label", name).
                     put("group", "GROUP_CDF");
             //put("bandCacheType", "BandCacheAll");
-
-            JSONArray dataArray = new JSONArray();
-            for (int i = 0; i < length; i++) {
-                String epochStr = epochVals[i][0];
-                if (!timeFillVal.contains(epochStr)) {
-                    long milli = TimeUtils.parse(epochStr) / 1000L; // TBD
-                    float val = dataVals[j][i];
-
-                    dataArray.put(new JSONArray().put(milli).put(val));
-                }
-            }
-
-            ja.put(new JSONObject().put("bandType", bandType).put("data", dataArray));
+            ret[i] = new BandData(new BandType(jo), dates, dataVals[i]);
         }
 
         // dumpGlobalAttrs(globalAttrs);
@@ -217,7 +200,7 @@ public class CDFReader {
         // dumpVariableAttrs(label);
         // dumpValues(labelVals);
 
-        return ret.put("org.helioviewer.jhv.request.timeline", ja);
+        return ret;
     }
 
     private static String[][] readVariable(Variable v) throws IOException {
