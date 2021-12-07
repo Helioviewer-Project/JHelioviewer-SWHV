@@ -149,12 +149,14 @@ public class CDFReader {
         float[][] dataVals = readVariableFloat(data.variable(), fillVal);
         String[][] labelVals = readVariable(label.variable());
 
-        if (epochVals.length != dataVals[0].length) {
-            Log.error("Inconsistent lengths of epoch (" + epochVals.length + ") and data (" + dataVals[0].length + ") variables: " + uri);
+        int count = dataVals.length;
+        int length = dataVals[0].length;
+        if (epochVals.length != length) {
+            Log.error("Inconsistent lengths of epoch (" + epochVals.length + ") and data (" + length + ") variables: " + uri);
             return ret;
         }
-        if (labelVals[0].length != dataVals.length) {
-            Log.error("Inconsistent number of labels (" + labelVals[0].length + ") with number of data axes (" + dataVals.length + "): " + uri);
+        if (labelVals[0].length != count) {
+            Log.error("Inconsistent number of labels (" + labelVals[0].length + ") with number of data axes (" + count + "): " + uri);
             return ret;
         }
 
@@ -170,8 +172,8 @@ public class CDFReader {
         };
 
         // Refuse to fill timestamps
-        long[] dates = new long[epochVals.length];
-        for (int i = 0; i < epochVals.length; i++) {
+        long[] dates = new long[length];
+        for (int i = 0; i < length; i++) {
             String epochStr = epochVals[i][0];
             if (timeFillVal.contains(epochStr)) {
                 Log.error("Filled timestamp (" + epochStr + "): " + uri);
@@ -181,7 +183,7 @@ public class CDFReader {
         }
 
         JSONArray ja = new JSONArray();
-        for (int j = 0; j < dataVals.length; j++) {
+        for (int j = 0; j < count; j++) {
             String name = instrumentName + ' ' + dataProduct + ' ' + labelVals[0][j];
             JSONObject bandType = new JSONObject().
                     put("baseUrl", "").
@@ -194,7 +196,7 @@ public class CDFReader {
             //put("bandCacheType", "BandCacheAll");
 
             JSONArray dataArray = new JSONArray();
-            for (int i = 0; i < dataVals[0].length; i++) {
+            for (int i = 0; i < length; i++) {
                 String epochStr = epochVals[i][0];
                 if (!timeFillVal.contains(epochStr)) {
                     long milli = TimeUtils.parse(epochStr) / 1000L; // TBD
@@ -260,7 +262,7 @@ public class CDFReader {
             v.readRawRecord(j, abuf);
             int nlen = Array.getLength(abuf);
             if (nlen != len)
-                throw new IOException("Inconsistent element number: expected " + len + ", got " + nlen);
+                throw new IOException("Inconsistent number of elements: expected " + len + ", got " + nlen);
 
             for (int i = 0; i < len; i++)
                 ret[i][j] = fill(dataType.getScalar(abuf, i), fillVal); // dubious
