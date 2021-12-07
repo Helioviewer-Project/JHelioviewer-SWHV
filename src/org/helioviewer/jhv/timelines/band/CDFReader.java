@@ -144,14 +144,14 @@ public class CDFReader {
         float[][] dataVals = readVariableFloat(data.variable(), fillVal);
         String[][] labelVals = readVariable(label.variable());
 
-        int count = dataVals.length;
-        int length = dataVals[0].length;
-        if (epochVals.length != length) {
-            Log.error("Inconsistent lengths of epoch (" + epochVals.length + ") and data (" + length + ") variables: " + uri);
+        int numAxes = dataVals.length;
+        int numPoints = dataVals[0].length;
+        if (epochVals.length != numPoints) {
+            Log.error("Inconsistent lengths of epoch (" + epochVals.length + ") and data (" + numPoints + ") variables: " + uri);
             return ret;
         }
-        if (labelVals[0].length != count) {
-            Log.error("Inconsistent number of labels (" + labelVals[0].length + ") with number of data axes (" + count + "): " + uri);
+        if (labelVals[0].length != numAxes) {
+            Log.error("Inconsistent number of labels (" + labelVals[0].length + ") with number of data axes (" + numAxes + "): " + uri);
             return ret;
         }
 
@@ -167,8 +167,8 @@ public class CDFReader {
         };
 
         // Refuse to fill timestamps
-        long[] dates = new long[length];
-        for (int i = 0; i < length; i++) {
+        long[] dates = new long[numPoints];
+        for (int i = 0; i < dates.length; i++) {
             String epochStr = epochVals[i][0];
             if (timeFillVal.contains(epochStr)) {
                 Log.error("Filled timestamp (" + epochStr + "): " + uri);
@@ -177,8 +177,8 @@ public class CDFReader {
             dates[i] = TimeUtils.parse(epochStr);
         }
 
-        ret = new BandData[count];
-        for (int i = 0; i < count; i++) {
+        ret = new BandData[numAxes];
+        for (int i = 0; i < numAxes; i++) {
             String name = instrumentName + ' ' + dataProduct + ' ' + labelVals[0][i];
             JSONObject jo = new JSONObject().
                     put("baseUrl", "").
