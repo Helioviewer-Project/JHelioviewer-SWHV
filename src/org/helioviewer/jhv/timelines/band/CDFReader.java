@@ -157,16 +157,18 @@ public class CDFReader {
             return ret;
         }
 
+        float fillVal = Float.parseFloat(dataFillVal);
+
         // Temporary
-        // System.out.println(">>> " + instrumentName + '_' + data.variable().getName());
-        switch (instrumentName + '_' + data.variable().getName()) {
-            case "MAG_B_RTN", "MAG_B_VSO", "MAG_B_SRF" -> {
-                dataScaleMin = "-20";
-                dataScaleMax = "+20";
-            }
-            default -> {
-            }
-        }
+        String datasetId = instrumentName + '_' + data.variable().getName();
+        float scaleMin = switch (datasetId) {
+            case "MAG_B_RTN", "MAG_B_VSO", "MAG_B_SRF" -> -20;
+            default -> Float.parseFloat(dataScaleMin);
+        };
+        float scaleMax = switch (datasetId) {
+            case "MAG_B_RTN", "MAG_B_VSO", "MAG_B_SRF" -> +20;
+            default -> Float.parseFloat(dataScaleMax);
+        };
 
         JSONArray ja = new JSONArray();
         for (int j = 0; j < dataVals[0].length; j++) {
@@ -175,7 +177,7 @@ public class CDFReader {
                     put("baseUrl", "").
                     put("unitLabel", dataUnits).
                     put("name", name).
-                    put("range", new JSONArray().put(Float.valueOf(dataScaleMin)).put(Float.valueOf(dataScaleMax))).
+                    put("range", new JSONArray().put(scaleMin).put(scaleMax)).
                     put("scale", dataScaleTyp). //! TBD
                             put("label", name).
                     put("group", "GROUP_CDF");
@@ -185,10 +187,12 @@ public class CDFReader {
             for (int i = 0; i < dataVals.length; i++) {
                 String epochStr = epochVals[i][0];
                 if (!timeFillVal.contains(epochStr)) {
-                    long milli = TimeUtils.parse(epochStr);
+                    long milli = TimeUtils.parse(epochStr) / 1000L; // TBD
+
                     float val = dataVals[i][j];
-                    String dataStr = String.valueOf(val);
-                    dataArray.put(new JSONArray().put(milli / 1000L).put(dataFillVal.equals(dataStr) ? YAxis.BLANK : val));
+                    val = !Float.isFinite(val) || val == fillVal ? YAxis.BLANK : val;
+
+                    dataArray.put(new JSONArray().put(milli).put(val));
                 }
             }
 
