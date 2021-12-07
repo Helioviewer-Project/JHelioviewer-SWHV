@@ -53,6 +53,9 @@ public class CDFReader {
         });
     }
 
+    private record CDFData(BandType bandType, long[] dates, float[] values) {
+    }
+
     private record CDFVariable(Variable variable, Map<String, String> attributes) {
     }
 
@@ -66,7 +69,6 @@ public class CDFReader {
                 globalAttrs.put(name, entry.toString());
             }
         }
-        // dumpGlobalAttrs(globalAttrs);
         String instrumentName = String.join(" ", globalAttrs.get("Instrument_name"));
         String dataProduct = Regex.Space.split(String.join(" ", globalAttrs.get("Data_product")))[0];
 
