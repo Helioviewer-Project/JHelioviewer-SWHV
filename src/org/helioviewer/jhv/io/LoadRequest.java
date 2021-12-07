@@ -12,6 +12,7 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.EventDispatchQueue;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.timelines.band.BandDataProvider;
+import org.helioviewer.jhv.timelines.band.CDFReader;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -55,7 +56,7 @@ class LoadRequest {
         @Override
         public Void call() throws Exception {
             if (uri.toString().toLowerCase().endsWith(".cdf")) {
-                loadCDF(uri);
+                CDFReader.load(uri);
             } else
                 parseRequest(JSONUtils.get(uri));
             return null;
@@ -67,23 +68,12 @@ class LoadRequest {
         public Void call() {
             uriList.parallelStream().forEach(uri -> {
                 try {
-                    loadCDF(uri);
+                    CDFReader.load(uri);
                 } catch (Exception e) {
                     Log.error(e);
                 }
             });
             return null;
-        }
-    }
-
-    private static void loadCDF(URI uri) throws Exception {
-        JSONObject jo = CDFUtils.load(NetFileCache.get(uri));
-        JSONArray ja = jo.optJSONArray("org.helioviewer.jhv.request.timeline");
-        if (ja != null) {
-            int len = ja.length();
-            for (int i = 0; i < len; i++) {
-                BandDataProvider.loadBandResponse(ja.getJSONObject(i));
-            }
         }
     }
 

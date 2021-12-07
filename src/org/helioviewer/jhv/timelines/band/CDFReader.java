@@ -1,5 +1,6 @@
-package org.helioviewer.jhv.io;
+package org.helioviewer.jhv.timelines.band;
 
+import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -9,8 +10,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.helioviewer.jhv.base.Regex;
+import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.TimeUtils;
+import org.helioviewer.jhv.timelines.Timelines;
+import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -25,12 +29,34 @@ import uk.ac.bristol.star.cdf.GlobalAttribute;
 import uk.ac.bristol.star.cdf.Variable;
 import uk.ac.bristol.star.cdf.VariableAttribute;
 
-class CDFUtils {
+public class CDFReader {
+
+    public static void load(URI uri) throws Exception {
+        JSONObject jo = read(NetFileCache.get(uri));
+        JSONArray ja = jo.optJSONArray("org.helioviewer.jhv.request.timeline");
+        if (ja != null) {
+            int len = ja.length();
+            for (int i = 0; i < len; i++) {
+                loadBandResponse(ja.getJSONObject(i));
+            }
+        }
+    }
+
+    private static void loadBandResponse(JSONObject jo) {
+        BandResponse response = new BandResponse(jo); // outside EDT
+
+        EventQueue.invokeLater(() -> {
+            Band band = Band.createFromType(response.bandType);
+            band.addToCache(response.values, response.dates);
+            Timelines.getLayers().add(band);
+            DrawController.setSelectedInterval(response.dates[0], response.dates[response.dates.length - 1]);
+        });
+    }
 
     private record CDFVariable(Variable variable, Map<String, String> attributes) {
     }
 
-    static JSONObject load(URI uri) throws IOException {
+    private static JSONObject read(URI uri) throws IOException {
         CdfContent cdf = new CdfContent(new CdfReader(new File(uri)));
 
         LinkedListMultimap<String, String> globalAttrs = LinkedListMultimap.create();
