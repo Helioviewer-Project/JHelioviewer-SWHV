@@ -3,7 +3,7 @@
 
 ## JHelioviewer 4.2 (pending)
 
-- Load EUI and MAG data from SOAR
+- Load EUI, MAG and SWA datasets from SOAR
 - Add CDF file format support
 - Allow drag'n'drop of directories
 - Add preference option to adjust the image timestamp to be:
