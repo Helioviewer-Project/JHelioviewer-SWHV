@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.NetFileCache;
@@ -35,9 +36,11 @@ public class CDFReader {
         List<BandData> lines = read(NetFileCache.get(uri));
         if (lines.isEmpty()) // failed
             return;
+        long[] dates = lines.get(0).dates();
+        if (dates.length == 0)
+            return;
 
         EventQueue.invokeLater(() -> {
-            long[] dates = lines.get(0).dates();
             for (BandData line : lines) {
                 Band band = Band.createFromType(line.bandType());
                 band.addToCache(line.values(), dates);
@@ -46,6 +49,8 @@ public class CDFReader {
             DrawController.setSelectedInterval(dates[0], dates[dates.length - 1]);
         });
     }
+
+    private static final Set<String> SWAExcluded = Set.of("V_SOLO_RTN", "TxTyTz_SRF", "P_SRF", "V_SRF");
 
     private record BandData(BandType bandType, long[] dates, float[] values) {
     }
@@ -93,10 +98,11 @@ public class CDFReader {
 
         for (CDFVariable v : variables) {
             if ("data".equals(v.attributes.get("VAR_TYPE"))) {
+                if ("SWA-PAS".equals(instrumentName) && SWAExcluded.contains(v.variable.getName()))
+                    continue;
                 ret.addAll(readBandData(v, dates, instrumentName, variables, uri));
             }
         }
-
         return ret;
     }
 
@@ -132,7 +138,7 @@ public class CDFReader {
         if (epoch == null)
             throw new IOException("Epoch not found: " + uri);
 
-        List<String> timeFillVal = List.of("9999-12-31T23:59:59.999999999", "0000-01-01T00:00:00.000000000", epoch.attributes.get("FILLVAL"));
+        List<String> timeFillVal = List.of("9999-12-31T23:59:59.999999999", "0000-01-01T00:00:00.000000000", epoch.attributes.get("FILLVAL")); // FILLVAL may be duplicate
         String[][] epochVals = readCDFVariableString(epoch.variable);
         // dumpVariableAttrs(epoch);
         // dumpValues(epochVals);
@@ -243,6 +249,8 @@ public class CDFReader {
         float[][] values = datesValues.values;
         int numAxes = values.length;
         int numPoints = values[0].length;
+        if (numPoints == 0)
+            return datesValues;
 
         long rebinFactor = TimeUtils.MINUTE_IN_MILLIS;
         long startBin = dates[0] / rebinFactor;
@@ -309,6 +317,8 @@ public class CDFReader {
         int len = Array.getLength(abuf);
 
         float[][] ret = new float[len][count];
+        if (count == 0)
+            return ret;
 
         for (int i = 0; i < len; i++)
             ret[i][0] = fill(dataType.getScalar(abuf, i), fillVal); // dubious
