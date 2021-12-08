@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -107,6 +108,23 @@ public class SampClient extends HubConnector {
                 return null;
             }
         });
+        // advertise we can load CDF, although we can do only MAG and SWA
+        addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("table.load.cdf", harmless)) {
+            @Nullable
+            @Override
+            public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
+                try {
+                    Object url = msg.getParam("url");
+                    if (url != null) {
+                        URI uri = toURI(url.toString());
+                        EventQueue.invokeLater(() -> Load.CDF.getAll(List.of(uri)));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        });
         addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("jhv.load.image", harmless)) {
             @Nullable
             @Override
@@ -118,7 +136,7 @@ public class SampClient extends HubConnector {
                         URI uri = toURI(jo.optString("url"));
                         EventQueue.invokeLater(() -> Load.image.get(uri));
                     } else {
-                        ArrayList<URI> uris = new ArrayList<>(ja.length());
+                        List<URI> uris = new ArrayList<>(ja.length());
                         for (Object obj : ja) {
                             uris.add(toURI(obj.toString()));
                         }
