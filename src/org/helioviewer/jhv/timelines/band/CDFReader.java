@@ -50,25 +50,10 @@ public class CDFReader {
     private record BandData(BandType bandType, long[] dates, float[] values) {
     }
 
-    private record CDFVariable(Variable variable, Map<String, String> attributes) {
+    private record DatesValues(long[] dates, float[][] values) {
     }
 
-    private static class Bin {
-
-        private int n = 0;
-        private float mean = 0;
-
-        void add(float val) {
-            if (val != YAxis.BLANK) {
-                n++;
-                mean += (val - mean) / n;
-            }
-        }
-
-        float getMean() {
-            return n == 0 ? YAxis.BLANK : mean;
-        }
-
+    private record CDFVariable(Variable variable, Map<String, String> attributes) {
     }
 
     private static BandData[] read(URI uri) throws IOException {
@@ -81,6 +66,7 @@ public class CDFReader {
                 globalAttrs.put(name, entry.toString());
             }
         }
+        // dumpGlobalAttrs(globalAttrs);
         String instrumentName = Regex.GT.split(String.join(" ", globalAttrs.get("Descriptor")))[0];
 
         Variable[] cdfVars = cdf.getVariables();
@@ -100,17 +86,7 @@ public class CDFReader {
 
         BandData[] ret = new BandData[0];
 
-        CDFVariable epoch = null;
-        for (CDFVariable v : variables) {
-            if ("EPOCH".equalsIgnoreCase(v.variable().getName())) {
-                epoch = v;
-                break;
-            }
-        }
-        if (epoch == null) {
-            Log.error("Epoch not found: " + uri);
-            return ret;
-        }
+        long[] dates = readEpoch(variables, uri);
 
         CDFVariable data = null;
         for (CDFVariable v : variables) {
@@ -133,10 +109,12 @@ public class CDFReader {
                 break;
             }
         }
+        /*
         if (label == null) {
             Log.error("Label not found: " + uri);
             return ret;
         }
+        */
 
         String dataVariableName = data.variable.getName();
 
@@ -155,22 +133,29 @@ public class CDFReader {
             return ret;
         }
 
-        List<String> timeFillVal = List.of("9999-12-31T23:59:59.999999999", "0000-01-01T00:00:00.000000000", epoch.attributes().get("FILLVAL"));
         float fillVal = Float.parseFloat(dataFillVal);
-
-        String[][] epochVals = readVariable(epoch.variable());
         float[][] dataVals = readVariableFloat(data.variable(), fillVal);
-        String[][] labelVals = readVariable(label.variable());
 
         int numAxes = dataVals.length;
         int numPoints = dataVals[0].length;
-        if (epochVals.length != numPoints) {
-            Log.error("Inconsistent lengths of epoch (" + epochVals.length + ") and data (" + numPoints + ") variables: " + uri);
+        if (dates.length != numPoints) {
+            Log.error("Inconsistent lengths of epoch (" + dates.length + ") and data (" + numPoints + ") variables: " + uri);
             return ret;
         }
-        if (labelVals[0].length != numAxes) {
-            Log.error("Inconsistent number of labels (" + labelVals[0].length + ") with number of data axes (" + numAxes + "): " + uri);
-            return ret;
+
+        String[] labels = new String[numAxes];
+        if (label != null) {
+            String[][] labelVals = readVariable(label.variable());
+            if (labelVals[0].length != numAxes) {
+                Log.error("Inconsistent number of labels (" + labelVals[0].length + ") with number of data axes (" + numAxes + "): " + uri);
+                return ret;
+            }
+            for (int i = 0; i < numAxes; i++)
+                labels[i] = dataVariableName + ' ' + labelVals[0][i];
+        } else {
+            String labelAxis = dataAttrs.get("LABLAXIS");
+            for (int i = 0; i < numAxes; i++)
+                labels[i] = labelAxis + String.format(" ch_%d", i);
         }
 
         // Temporary
@@ -184,16 +169,84 @@ public class CDFReader {
             default -> Float.parseFloat(dataScaleMax);
         };
 
+
+        DatesValues rebinned = rebin(new DatesValues(dates, dataVals));
+
+        ret = new BandData[numAxes];
+        for (int i = 0; i < numAxes; i++) {
+            String name = instrumentName + ' ' + labels[i];
+            JSONObject jo = new JSONObject().
+                    put("baseUrl", "").
+                    put("unitLabel", dataUnits).
+                    put("name", name).
+                    put("range", new JSONArray().put(scaleMin).put(scaleMax)).
+                    put("scale", dataScaleTyp). //! TBD
+                            put("label", name).
+                    put("group", "GROUP_CDF");
+            //put("bandCacheType", "BandCacheAll");
+            ret[i] = new BandData(new BandType(jo), rebinned.dates, rebinned.values[i]);
+        }
+
+        // dumpVariableAttrs(data);
+        // dumpValues(dataVals);
+        // dumpVariableAttrs(label);
+        // dumpValues(labelVals);
+
+        return ret;
+    }
+
+    private static long[] readEpoch(CDFVariable[] variables, URI uri) throws IOException {
+        CDFVariable epoch = null;
+        for (CDFVariable v : variables) {
+            if ("EPOCH".equalsIgnoreCase(v.variable().getName())) { // mandated by MetadataStandard
+                epoch = v;
+                break;
+            }
+        }
+        if (epoch == null) {
+            throw new IOException("Epoch not found: " + uri);
+        }
+
+        List<String> timeFillVal = List.of("9999-12-31T23:59:59.999999999", "0000-01-01T00:00:00.000000000", epoch.attributes().get("FILLVAL"));
+        String[][] epochVals = readVariable(epoch.variable());
+        // dumpVariableAttrs(epoch);
+        // dumpValues(epochVals);
+
         // Refuse to fill timestamps
-        long[] dates = new long[numPoints];
+        long[] dates = new long[epochVals.length];
         for (int i = 0; i < dates.length; i++) {
             String epochStr = epochVals[i][0];
             if (timeFillVal.contains(epochStr)) {
-                Log.error("Filled timestamp (" + epochStr + "): " + uri);
-                return ret;
+                throw new IOException("Filled timestamp (" + epochStr + "): " + uri);
             }
             dates[i] = TimeUtils.parse(epochStr);
         }
+        return dates;
+    }
+
+    private static class Bin {
+
+        private int n = 0;
+        private float mean = 0;
+
+        void add(float val) {
+            if (val != YAxis.BLANK) {
+                n++;
+                mean += (val - mean) / n;
+            }
+        }
+
+        float getMean() {
+            return n == 0 ? YAxis.BLANK : mean;
+        }
+
+    }
+
+    private static DatesValues rebin(DatesValues datesValues) {
+        long[] dates = datesValues.dates;
+        float[][] values = datesValues.values;
+        int numAxes = values.length;
+        int numPoints = values[0].length;
 
         long rebinFactor = TimeUtils.MINUTE_IN_MILLIS;
         long startBin = dates[0] / rebinFactor;
@@ -208,7 +261,7 @@ public class CDFReader {
         }
         for (int j = 0; j < numAxes; j++) {
             for (int i = 0; i < numPoints; i++) {
-                bins[j][(int) (dates[i] / rebinFactor - startBin)].add(dataVals[j][i]);
+                bins[j][(int) (dates[i] / rebinFactor - startBin)].add(values[j][i]);
             }
         }
 
@@ -216,37 +269,14 @@ public class CDFReader {
         for (int i = 0; i < numBins; i++) {
             datesBinned[i] = (startBin + i) * rebinFactor;
         }
-        float[][] valsBinned = new float[numAxes][numBins];
+        float[][] valuesBinned = new float[numAxes][numBins];
         for (int j = 0; j < numAxes; j++) {
             for (int i = 0; i < numBins; i++) {
-                valsBinned[j][i] = bins[j][i].getMean();
+                valuesBinned[j][i] = bins[j][i].getMean();
             }
         }
 
-        ret = new BandData[numAxes];
-        for (int i = 0; i < numAxes; i++) {
-            String name = instrumentName + ' ' + dataVariableName + ' ' + labelVals[0][i];
-            JSONObject jo = new JSONObject().
-                    put("baseUrl", "").
-                    put("unitLabel", dataUnits).
-                    put("name", name).
-                    put("range", new JSONArray().put(scaleMin).put(scaleMax)).
-                    put("scale", dataScaleTyp). //! TBD
-                            put("label", name).
-                    put("group", "GROUP_CDF");
-            //put("bandCacheType", "BandCacheAll");
-            ret[i] = new BandData(new BandType(jo), datesBinned, valsBinned[i]);
-        }
-
-        // dumpGlobalAttrs(globalAttrs);
-        // dumpVariableAttrs(epoch);
-        // dumpValues(epochVals);
-        // dumpVariableAttrs(data);
-        // dumpValues(dataVals);
-        // dumpVariableAttrs(label);
-        // dumpValues(labelVals);
-
-        return ret;
+        return new DatesValues(datesBinned, valuesBinned);
     }
 
     private static String[][] readVariable(Variable v) throws IOException {
