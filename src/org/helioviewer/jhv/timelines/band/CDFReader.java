@@ -53,6 +53,10 @@ public class CDFReader {
     private record DatesValues(long[] dates, float[][] values) {
     }
 
+    private record CDFData(DatesValues datesValues, float scaleMin, float scaleMax, String scaleType, String units,
+                           String[] labels) {
+    }
+
     private record CDFVariable(Variable variable, Map<String, String> attributes) {
     }
 
@@ -84,111 +88,35 @@ public class CDFReader {
             variables[i] = new CDFVariable(v, attrs);
         }
 
-        BandData[] ret = new BandData[0];
-
         long[] dates = readEpoch(variables, uri);
 
-        CDFVariable data = null;
+        CDFVariable dataVar = null;
         for (CDFVariable v : variables) {
             if ("data".equals(v.attributes.get("VAR_TYPE"))) {
-                data = v;
+                dataVar = v;
                 break;
             }
         }
-        if (data == null) {
-            Log.error("Data not found: " + uri);
-            return ret;
-        }
+        if (dataVar == null)
+            throw new IOException("Data not found: " + uri);
 
-        CDFVariable label = null;
-        String labelRef = data.attributes.get("LABL_PTR_1");
-        for (CDFVariable v : variables) {
-            if (v.variable.getName().equals(labelRef)) {
-                label = v;
-                break;
-            }
-        }
-        /*
-        if (label == null) {
-            Log.error("Label not found: " + uri);
-            return ret;
-        }
-        */
+        CDFData data = readData(dataVar, dates, instrumentName, variables, uri);
+        int numAxes = data.datesValues.values.length;
 
-        String dataVariableName = data.variable.getName();
-
-        Map<String, String> dataAttrs = data.attributes;
-        if (!"EPOCH".equalsIgnoreCase(dataAttrs.get("DEPEND_0")) /*|| !"time_series".equals(dataAttrs.get("DISPLAY_TYPE"))*/) {
-            Log.error("Inconsistent variable " + dataVariableName + ": " + uri);
-            return ret;
-        }
-        String dataFillVal = dataAttrs.get("FILLVAL");
-        String dataScaleTyp = dataAttrs.get("SCALETYP");
-        String dataScaleMax = dataAttrs.computeIfAbsent("SCALEMAX", k -> dataAttrs.get("VALIDMAX"));
-        String dataScaleMin = dataAttrs.computeIfAbsent("SCALEMIN", k -> dataAttrs.get("VALIDMIN"));
-        String dataUnits = dataAttrs.get("UNITS");
-        if (dataFillVal == null || dataScaleMax == null || dataScaleMin == null || dataScaleTyp == null || dataUnits == null) {
-            Log.error("Missing attributes for variable " + dataVariableName + ": " + uri);
-            return ret;
-        }
-
-        float fillVal = Float.parseFloat(dataFillVal);
-        float[][] dataVals = readCDFVariableFloat(data.variable, fillVal);
-
-        int numAxes = dataVals.length;
-        int numPoints = dataVals[0].length;
-        if (dates.length != numPoints) {
-            Log.error("Inconsistent lengths of epoch (" + dates.length + ") and data (" + numPoints + ") variables: " + uri);
-            return ret;
-        }
-
-        String[] labels = new String[numAxes];
-        if (label != null) {
-            String[][] labelVals = readCDFVariable(label.variable);
-            // dumpVariableAttrs(label);
-            // dumpValues(labelVals);
-            if (labelVals[0].length != numAxes) {
-                Log.error("Inconsistent number of labels (" + labelVals[0].length + ") with number of data axes (" + numAxes + "): " + uri);
-                return ret;
-            }
-            for (int i = 0; i < numAxes; i++)
-                labels[i] = dataVariableName + ' ' + labelVals[0][i];
-        } else {
-            String labelAxis = dataAttrs.get("LABLAXIS");
-            for (int i = 0; i < numAxes; i++)
-                labels[i] = labelAxis + String.format(" ch_%d", i);
-        }
-
-        // Temporary
-        String datasetId = instrumentName + '_' + data.variable.getName();
-        float scaleMin = switch (datasetId) {
-            case "MAG_B_RTN", "MAG_B_VSO", "MAG_B_SRF" -> -20;
-            default -> Float.parseFloat(dataScaleMin);
-        };
-        float scaleMax = switch (datasetId) {
-            case "MAG_B_RTN", "MAG_B_VSO", "MAG_B_SRF" -> +20;
-            default -> Float.parseFloat(dataScaleMax);
-        };
-
-        DatesValues rebinned = rebin(new DatesValues(dates, dataVals));
-
-        ret = new BandData[numAxes];
+        BandData[] ret = new BandData[numAxes];
         for (int i = 0; i < numAxes; i++) {
-            String name = instrumentName + ' ' + labels[i];
+            String name = instrumentName + ' ' + data.labels[i];
             JSONObject jo = new JSONObject().
                     put("baseUrl", "").
-                    put("unitLabel", dataUnits).
+                    put("unitLabel", data.units).
                     put("name", name).
-                    put("range", new JSONArray().put(scaleMin).put(scaleMax)).
-                    put("scale", dataScaleTyp). //! TBD
+                    put("range", new JSONArray().put(data.scaleMin).put(data.scaleMax)).
+                    put("scale", data.scaleType). //! TBD
                             put("label", name).
                     put("group", "GROUP_CDF");
             //put("bandCacheType", "BandCacheAll");
-            ret[i] = new BandData(new BandType(jo), rebinned.dates, rebinned.values[i]);
+            ret[i] = new BandData(new BandType(jo), data.datesValues.dates, data.datesValues.values[i]);
         }
-
-        // dumpVariableAttrs(data);
-        // dumpValues(dataVals);
 
         return ret;
     }
@@ -201,9 +129,8 @@ public class CDFReader {
                 break;
             }
         }
-        if (epoch == null) {
+        if (epoch == null)
             throw new IOException("Epoch not found: " + uri);
-        }
 
         List<String> timeFillVal = List.of("9999-12-31T23:59:59.999999999", "0000-01-01T00:00:00.000000000", epoch.attributes.get("FILLVAL"));
         String[][] epochVals = readCDFVariable(epoch.variable);
@@ -220,6 +147,77 @@ public class CDFReader {
             dates[i] = TimeUtils.parse(epochStr);
         }
         return dates;
+    }
+
+    private static CDFData readData(CDFVariable data, long[] dates, String instrumentName, CDFVariable[] variables, URI uri) throws IOException {
+        String dataVariableName = data.variable.getName();
+
+        Map<String, String> dataAttrs = data.attributes;
+        if (!"EPOCH".equalsIgnoreCase(dataAttrs.get("DEPEND_0")) /*|| !"time_series".equals(dataAttrs.get("DISPLAY_TYPE"))*/) {
+            throw new IOException("Inconsistent variable " + dataVariableName + ": " + uri);
+        }
+        String dataFillVal = dataAttrs.get("FILLVAL");
+        String dataScaleTyp = dataAttrs.get("SCALETYP");
+        String dataScaleMax = dataAttrs.computeIfAbsent("SCALEMAX", k -> dataAttrs.get("VALIDMAX"));
+        String dataScaleMin = dataAttrs.computeIfAbsent("SCALEMIN", k -> dataAttrs.get("VALIDMIN"));
+        String dataUnits = dataAttrs.get("UNITS");
+        if (dataFillVal == null || dataScaleMax == null || dataScaleMin == null || dataScaleTyp == null || dataUnits == null) {
+            throw new IOException("Missing attributes for variable " + dataVariableName + ": " + uri);
+        }
+
+        float fillVal = Float.parseFloat(dataFillVal);
+        float[][] values = readCDFVariableFloat(data.variable, fillVal);
+        // dumpVariableAttrs(data);
+        // dumpValues(dataVals);
+
+        int numAxes = values.length;
+        int numPoints = values[0].length;
+        if (dates.length != numPoints) {
+            throw new IOException("Inconsistent lengths of epoch (" + dates.length + ") and data (" + numPoints + ") variables: " + uri);
+        }
+
+        String[] labels = new String[numAxes];
+
+        CDFVariable label = null;
+        String labelRef = data.attributes.get("LABL_PTR_1");
+        for (CDFVariable v : variables) {
+            if (v.variable.getName().equals(labelRef)) {
+                label = v;
+                break;
+            }
+        }
+        if (label == null) {
+            String labelAxis = dataAttrs.get("LABLAXIS");
+            if (numAxes == 1)
+                labels[0] = labelAxis;
+            else {
+                for (int i = 0; i < numAxes; i++)
+                    labels[i] = labelAxis + String.format(" ch_%d", i);
+            }
+        } else {
+            String[][] labelVals = readCDFVariable(label.variable);
+            // dumpVariableAttrs(label);
+            // dumpValues(labelVals);
+            if (labelVals[0].length != numAxes) {
+                throw new IOException("Inconsistent number of labels (" + labelVals[0].length + ") with number of data axes (" + numAxes + "): " + uri);
+            }
+            for (int i = 0; i < numAxes; i++)
+                labels[i] = dataVariableName + ' ' + labelVals[0][i];
+        }
+
+        // Temporary
+        String datasetId = instrumentName + '_' + data.variable.getName();
+        float scaleMin = switch (datasetId) {
+            case "MAG_B_RTN", "MAG_B_VSO", "MAG_B_SRF" -> -20;
+            default -> Float.parseFloat(dataScaleMin);
+        };
+        float scaleMax = switch (datasetId) {
+            case "MAG_B_RTN", "MAG_B_VSO", "MAG_B_SRF" -> +20;
+            default -> Float.parseFloat(dataScaleMax);
+        };
+
+        DatesValues rebinned = rebin(new DatesValues(dates, values));
+        return new CDFData(rebinned, scaleMin, scaleMax, dataScaleTyp, dataUnits, labels);
     }
 
     private static class Bin {
