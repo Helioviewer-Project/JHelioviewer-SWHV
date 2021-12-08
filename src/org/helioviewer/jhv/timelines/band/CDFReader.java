@@ -231,7 +231,7 @@ public class CDFReader {
             float[][] rValues = rebinned.values;
             float[][] modValues = new float[1][rNumPoints];
             for (int i = 0; i < rNumPoints; i++) {
-                modValues[0][i] = (float) Math.sqrt(rValues[0][i] * rValues[0][i] + rValues[1][i] * rValues[0][i] + rValues[2][i] * rValues[2][i]);
+                modValues[0][i] = (float) Math.sqrt(rValues[0][i] * rValues[0][i] + rValues[1][i] * rValues[1][i] + rValues[2][i] * rValues[2][i]);
             }
             rebinned = new DatesValues(rebinned.dates, modValues);
             labels = new String[]{"Velocity"};
