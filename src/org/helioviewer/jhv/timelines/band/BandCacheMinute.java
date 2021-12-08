@@ -168,6 +168,8 @@ class BandCacheMinute implements BandCache {
         void setValue(boolean max, int minuteOfDay, float value) {
             int factor = 1;
             for (int i = 0; i < values.length; i++) {
+                //if (values[i].length == 0) -- if ever MILLIS_PER_TICK > 5min
+                //    continue;
                 int idx = minuteOfDay / factor;
                 if (idx >= values[i].length) {
                     idx = values[i].length - 1;
