@@ -33,7 +33,7 @@ public class HelioviewerMetaData extends BaseMetaData {
     }
 
     private static final Set<String> SECCHIDetectors = Set.of("EUVI", "COR1", "COR2", "HI1", "HI2");
-    private static final Set<String> CROTABlockList = Set.of("LASCO");
+    private static final Set<String> CROTABlockSet = Set.of("LASCO");
 
     private static final Map<String, String> unitRepl = Map.of(
             " ", "",
@@ -313,7 +313,7 @@ public class HelioviewerMetaData extends BaseMetaData {
             crval.x = m.getDouble("CRVAL1").orElse(0.) * arcsecX / arcsecPerPixelX * unitPerPixelX;
             crval.y = m.getDouble("CRVAL2").orElse(0.) * arcsecY / arcsecPerPixelY * unitPerPixelY;
 
-            if (!CROTABlockList.contains(instrument)) {
+            if (!CROTABlockSet.contains(instrument)) {
                 double c;
                 try {
                     // Eq.32 Thompson (2006)
