@@ -50,7 +50,7 @@ public class CDFReader {
         });
     }
 
-    private static final Set<String> SWAExcluded = Set.of("V_SOLO_RTN", "TxTyTz_SRF", "P_SRF", "V_SRF");
+    private static final Set<String> SWAIncluded = Set.of("N", "V_RTN", "T");
 
     private record BandData(BandType bandType, long[] dates, float[] values) {
     }
@@ -98,9 +98,8 @@ public class CDFReader {
 
         for (CDFVariable v : variables) {
             if ("data".equals(v.attributes.get("VAR_TYPE"))) {
-                if ("SWA-PAS".equals(instrumentName) && SWAExcluded.contains(v.variable.getName()))
-                    continue;
-                ret.addAll(readBandData(v, dates, instrumentName, variables, uri));
+                if (!"SWA-PAS".equals(instrumentName) || SWAIncluded.contains(v.variable.getName()))
+                    ret.addAll(readBandData(v, dates, instrumentName, variables, uri));
             }
         }
         return ret;
