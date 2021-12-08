@@ -90,8 +90,7 @@ public class CDFReader {
 
         CDFVariable data = null;
         for (CDFVariable v : variables) {
-            Map<String, String> attrs = v.attributes();
-            if ("data".equals(attrs.get("VAR_TYPE"))) {
+            if ("data".equals(v.attributes.get("VAR_TYPE"))) {
                 data = v;
                 break;
             }
@@ -102,9 +101,9 @@ public class CDFReader {
         }
 
         CDFVariable label = null;
-        String labelRef = data.attributes().get("LABL_PTR_1");
+        String labelRef = data.attributes.get("LABL_PTR_1");
         for (CDFVariable v : variables) {
-            if (v.variable().getName().equals(labelRef)) {
+            if (v.variable.getName().equals(labelRef)) {
                 label = v;
                 break;
             }
@@ -118,7 +117,7 @@ public class CDFReader {
 
         String dataVariableName = data.variable.getName();
 
-        Map<String, String> dataAttrs = data.attributes();
+        Map<String, String> dataAttrs = data.attributes;
         if (!"EPOCH".equalsIgnoreCase(dataAttrs.get("DEPEND_0")) /*|| !"time_series".equals(dataAttrs.get("DISPLAY_TYPE"))*/) {
             Log.error("Inconsistent variable " + dataVariableName + ": " + uri);
             return ret;
@@ -134,7 +133,7 @@ public class CDFReader {
         }
 
         float fillVal = Float.parseFloat(dataFillVal);
-        float[][] dataVals = readVariableFloat(data.variable(), fillVal);
+        float[][] dataVals = readCDFVariableFloat(data.variable, fillVal);
 
         int numAxes = dataVals.length;
         int numPoints = dataVals[0].length;
@@ -145,7 +144,9 @@ public class CDFReader {
 
         String[] labels = new String[numAxes];
         if (label != null) {
-            String[][] labelVals = readVariable(label.variable());
+            String[][] labelVals = readCDFVariable(label.variable);
+            // dumpVariableAttrs(label);
+            // dumpValues(labelVals);
             if (labelVals[0].length != numAxes) {
                 Log.error("Inconsistent number of labels (" + labelVals[0].length + ") with number of data axes (" + numAxes + "): " + uri);
                 return ret;
@@ -159,7 +160,7 @@ public class CDFReader {
         }
 
         // Temporary
-        String datasetId = instrumentName + '_' + data.variable().getName();
+        String datasetId = instrumentName + '_' + data.variable.getName();
         float scaleMin = switch (datasetId) {
             case "MAG_B_RTN", "MAG_B_VSO", "MAG_B_SRF" -> -20;
             default -> Float.parseFloat(dataScaleMin);
@@ -168,7 +169,6 @@ public class CDFReader {
             case "MAG_B_RTN", "MAG_B_VSO", "MAG_B_SRF" -> +20;
             default -> Float.parseFloat(dataScaleMax);
         };
-
 
         DatesValues rebinned = rebin(new DatesValues(dates, dataVals));
 
@@ -189,8 +189,6 @@ public class CDFReader {
 
         // dumpVariableAttrs(data);
         // dumpValues(dataVals);
-        // dumpVariableAttrs(label);
-        // dumpValues(labelVals);
 
         return ret;
     }
@@ -198,7 +196,7 @@ public class CDFReader {
     private static long[] readEpoch(CDFVariable[] variables, URI uri) throws IOException {
         CDFVariable epoch = null;
         for (CDFVariable v : variables) {
-            if ("EPOCH".equalsIgnoreCase(v.variable().getName())) { // mandated by MetadataStandard
+            if ("EPOCH".equalsIgnoreCase(v.variable.getName())) { // mandated by MetadataStandard
                 epoch = v;
                 break;
             }
@@ -207,8 +205,8 @@ public class CDFReader {
             throw new IOException("Epoch not found: " + uri);
         }
 
-        List<String> timeFillVal = List.of("9999-12-31T23:59:59.999999999", "0000-01-01T00:00:00.000000000", epoch.attributes().get("FILLVAL"));
-        String[][] epochVals = readVariable(epoch.variable());
+        List<String> timeFillVal = List.of("9999-12-31T23:59:59.999999999", "0000-01-01T00:00:00.000000000", epoch.attributes.get("FILLVAL"));
+        String[][] epochVals = readCDFVariable(epoch.variable);
         // dumpVariableAttrs(epoch);
         // dumpValues(epochVals);
 
@@ -279,7 +277,7 @@ public class CDFReader {
         return new DatesValues(datesBinned, valuesBinned);
     }
 
-    private static String[][] readVariable(Variable v) throws IOException {
+    private static String[][] readCDFVariable(Variable v) throws IOException {
         DataType dataType = v.getDataType();
         int groupSize = dataType.getGroupSize();
         Object abuf = v.createRawValueArray();
@@ -304,7 +302,7 @@ public class CDFReader {
         return !Float.isFinite(val) || val == fillVal ? YAxis.BLANK : val;
     }
 
-    private static float[][] readVariableFloat(Variable v, float fillVal) throws IOException {
+    private static float[][] readCDFVariableFloat(Variable v, float fillVal) throws IOException {
         DataType dataType = v.getDataType();
         Object abuf = v.createRawValueArray();
         int count = v.getRecordCount();
@@ -338,8 +336,8 @@ public class CDFReader {
     }
 
     private static void dumpVariableAttrs(CDFVariable v) {
-        System.out.println(">>> " + v.variable().getName());
-        for (Map.Entry<String, String> entry : v.attributes().entrySet()) {
+        System.out.println(">>> " + v.variable.getName());
+        for (Map.Entry<String, String> entry : v.attributes.entrySet()) {
             System.out.println("\t" + entry.getKey() + ' ' + entry.getValue());
         }
     }
