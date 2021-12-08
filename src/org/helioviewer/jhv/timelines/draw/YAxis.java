@@ -164,7 +164,7 @@ public class YAxis {
     }
 
     private static String fixupUnit(String unit) {
-        return unit.replace("^2", "\u00B2").replace("^3", "\u00B3");
+        return unit.replace("^2", "\u00B2").replace("^3", "\u00B3").replace("^-2", "\u207B\u00B2").replace("^-3", "\u207B\u00B3");
     }
 
     public static class YAxisLogScale implements YAxisScale {
