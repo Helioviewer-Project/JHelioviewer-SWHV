@@ -5,13 +5,13 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.NetFileCache;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -32,12 +32,12 @@ import uk.ac.bristol.star.cdf.VariableAttribute;
 public class CDFReader {
 
     public static void load(URI uri) throws Exception {
-        BandData[] lines = read(NetFileCache.get(uri));
-        if (lines.length == 0) // failed
+        List<BandData> lines = read(NetFileCache.get(uri));
+        if (lines.isEmpty()) // failed
             return;
 
         EventQueue.invokeLater(() -> {
-            long[] dates = lines[0].dates();
+            long[] dates = lines.get(0).dates();
             for (BandData line : lines) {
                 Band band = Band.createFromType(line.bandType());
                 band.addToCache(line.values(), dates);
@@ -60,7 +60,7 @@ public class CDFReader {
     private record CDFVariable(Variable variable, Map<String, String> attributes) {
     }
 
-    private static BandData[] read(URI uri) throws IOException {
+    private static List<BandData> read(URI uri) throws IOException {
         CdfContent cdf = new CdfContent(new CdfReader(new File(uri)));
 
         LinkedListMultimap<String, String> globalAttrs = LinkedListMultimap.create();
@@ -89,21 +89,22 @@ public class CDFReader {
         }
 
         long[] dates = readEpoch(variables, uri);
+        List<BandData> ret = new ArrayList<>();
 
-        CDFVariable dataVar = null;
         for (CDFVariable v : variables) {
             if ("data".equals(v.attributes.get("VAR_TYPE"))) {
-                dataVar = v;
-                break;
+                ret.addAll(readBandData(v, dates, instrumentName, variables, uri));
             }
         }
-        if (dataVar == null)
-            throw new IOException("Data not found: " + uri);
 
-        CDFData data = readData(dataVar, dates, instrumentName, variables, uri);
+        return ret;
+    }
+
+    private static List<BandData> readBandData(CDFVariable v, long[] dates, String instrumentName, CDFVariable[] variables, URI uri) throws IOException {
+        CDFData data = readData(v, dates, instrumentName, variables, uri);
         int numAxes = data.datesValues.values.length;
 
-        BandData[] ret = new BandData[numAxes];
+        List<BandData> ret = new ArrayList<>(numAxes);
         for (int i = 0; i < numAxes; i++) {
             String name = instrumentName + ' ' + data.labels[i];
             JSONObject jo = new JSONObject().
@@ -115,9 +116,8 @@ public class CDFReader {
                             put("label", name).
                     put("group", "GROUP_CDF");
             //put("bandCacheType", "BandCacheAll");
-            ret[i] = new BandData(new BandType(jo), data.datesValues.dates, data.datesValues.values[i]);
+            ret.add(new BandData(new BandType(jo), data.datesValues.dates, data.datesValues.values[i]));
         }
-
         return ret;
     }
 
@@ -133,7 +133,7 @@ public class CDFReader {
             throw new IOException("Epoch not found: " + uri);
 
         List<String> timeFillVal = List.of("9999-12-31T23:59:59.999999999", "0000-01-01T00:00:00.000000000", epoch.attributes.get("FILLVAL"));
-        String[][] epochVals = readCDFVariable(epoch.variable);
+        String[][] epochVals = readCDFVariableString(epoch.variable);
         // dumpVariableAttrs(epoch);
         // dumpValues(epochVals);
 
@@ -195,7 +195,7 @@ public class CDFReader {
                     labels[i] = labelAxis + String.format(" ch_%d", i);
             }
         } else {
-            String[][] labelVals = readCDFVariable(label.variable);
+            String[][] labelVals = readCDFVariableString(label.variable);
             // dumpVariableAttrs(label);
             // dumpValues(labelVals);
             if (labelVals[0].length != numAxes) {
@@ -275,7 +275,7 @@ public class CDFReader {
         return new DatesValues(datesBinned, valuesBinned);
     }
 
-    private static String[][] readCDFVariable(Variable v) throws IOException {
+    private static String[][] readCDFVariableString(Variable v) throws IOException {
         DataType dataType = v.getDataType();
         int groupSize = dataType.getGroupSize();
         Object abuf = v.createRawValueArray();
