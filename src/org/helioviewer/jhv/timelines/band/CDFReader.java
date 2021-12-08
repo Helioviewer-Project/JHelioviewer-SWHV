@@ -81,8 +81,7 @@ public class CDFReader {
                 globalAttrs.put(name, entry.toString());
             }
         }
-        String instrumentName = String.join(" ", globalAttrs.get("Instrument_name"));
-        String dataProduct = Regex.Space.split(String.join(" ", globalAttrs.get("Data_product")))[0];
+        String instrumentName = Regex.GT.split(String.join(" ", globalAttrs.get("Descriptor")))[0];
 
         Variable[] cdfVars = cdf.getVariables();
         VariableAttribute[] cdfAttrs = cdf.getVariableAttributes();
@@ -103,7 +102,7 @@ public class CDFReader {
 
         CDFVariable epoch = null;
         for (CDFVariable v : variables) {
-            if ("EPOCH".equals(v.variable().getName())) {
+            if ("EPOCH".equalsIgnoreCase(v.variable().getName())) {
                 epoch = v;
                 break;
             }
@@ -139,18 +138,20 @@ public class CDFReader {
             return ret;
         }
 
+        String dataVariableName = data.variable.getName();
+
         Map<String, String> dataAttrs = data.attributes();
-        if (!"EPOCH".equals(dataAttrs.get("DEPEND_0")) || !"time_series".equals(dataAttrs.get("DISPLAY_TYPE"))) {
-            Log.error("Inconsistent variable " + data.variable.getName() + ": " + uri);
+        if (!"EPOCH".equalsIgnoreCase(dataAttrs.get("DEPEND_0")) /*|| !"time_series".equals(dataAttrs.get("DISPLAY_TYPE"))*/) {
+            Log.error("Inconsistent variable " + dataVariableName + ": " + uri);
             return ret;
         }
         String dataFillVal = dataAttrs.get("FILLVAL");
         String dataScaleTyp = dataAttrs.get("SCALETYP");
-        String dataScaleMax = dataAttrs.get("SCALEMAX");
-        String dataScaleMin = dataAttrs.get("SCALEMIN");
+        String dataScaleMax = dataAttrs.computeIfAbsent("SCALEMAX", k -> dataAttrs.get("VALIDMAX"));
+        String dataScaleMin = dataAttrs.computeIfAbsent("SCALEMIN", k -> dataAttrs.get("VALIDMIN"));
         String dataUnits = dataAttrs.get("UNITS");
         if (dataFillVal == null || dataScaleMax == null || dataScaleMin == null || dataScaleTyp == null || dataUnits == null) {
-            Log.error("Missing attributes for variable " + data.variable.getName() + ": " + uri);
+            Log.error("Missing attributes for variable " + dataVariableName + ": " + uri);
             return ret;
         }
 
@@ -224,7 +225,7 @@ public class CDFReader {
 
         ret = new BandData[numAxes];
         for (int i = 0; i < numAxes; i++) {
-            String name = instrumentName + ' ' + dataProduct + ' ' + labelVals[0][i];
+            String name = instrumentName + ' ' + dataVariableName + ' ' + labelVals[0][i];
             JSONObject jo = new JSONObject().
                     put("baseUrl", "").
                     put("unitLabel", dataUnits).
