@@ -11,6 +11,7 @@ import org.helioviewer.jhv.events.JHVEventListener;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
+import org.helioviewer.jhv.gui.interfaces.StatusReceiver;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
@@ -19,7 +20,7 @@ import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.json.JSONObject;
 
-public class DrawController implements LazyComponent, JHVEventListener.Highlight, TimeListener.Change, TimeListener.Range {
+public class DrawController implements LazyComponent, StatusReceiver, JHVEventListener.Highlight, TimeListener.Change, TimeListener.Range {
 
     public interface Listener {
         void drawRequest();
@@ -256,6 +257,11 @@ public class DrawController implements LazyComponent, JHVEventListener.Highlight
     public void timeRangeChanged(long start, long end) {
         if (locked)
             setSelectedInterval(start, end);
+    }
+
+    @Override
+    public void setStatus(String status) {
+        optionsPanel.setStatus(status);
     }
 
     public static void drawRequest() {
