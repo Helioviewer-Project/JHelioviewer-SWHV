@@ -32,7 +32,7 @@ import com.jidesoft.dialog.StandardDialog;
 public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
 
     private static final double MAX_SIZE = 2;
-    private static final String[] Level = new String[]{/* "LL01", "LL02", "LL03", "L1", */ "L2", "L3"};
+    private static final String[] Level = new String[]{/* "LL01", "LL02", "LL03",*/ "L1", "L2", "L3"};
     private static final ImmutableSortedMap<String, List<String>> Dataset = new ImmutableSortedMap.Builder<String, List<String>>(JHVGlobals.alphanumComparator).
             put("EUI FSI 174", List.of("EUI-FSI174-IMAGE", "eui-fsi174-image")).
             put("EUI FSI 304", List.of("EUI-FSI304-IMAGE", "eui-fsi304-image")).
