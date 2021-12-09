@@ -230,12 +230,32 @@ public class CDFReader {
         if ("SWA-PAS".equals(instrumentName) && "V_RTN".equals(variableName)) { // replace with velocity modulus
             int rNumPoints = rebinned.dates.length;
             float[][] rValues = rebinned.values;
+
             float[][] modValues = new float[1][rNumPoints];
             for (int i = 0; i < rNumPoints; i++) {
                 modValues[0][i] = (float) Math.sqrt(rValues[0][i] * rValues[0][i] + rValues[1][i] * rValues[1][i] + rValues[2][i] * rValues[2][i]);
             }
+
             rebinned = new DatesValues(rebinned.dates, modValues);
             labels = new String[]{"Velocity"};
+        }
+        if ("MAG".equals(instrumentName) && variableName.startsWith("B_")) { // prepend column with modulus
+            int rNumPoints = rebinned.dates.length;
+            float[][] rValues = rebinned.values;
+
+            int rNumAxes = rValues.length;
+            float[][] modValues = new float[rNumAxes + 1][];
+            modValues[0] = new float[rNumPoints];
+            for (int i = 0; i < rNumPoints; i++) {
+                modValues[0][i] = (float) Math.sqrt(rValues[0][i] * rValues[0][i] + rValues[1][i] * rValues[1][i] + rValues[2][i] * rValues[2][i]);
+            }
+            System.arraycopy(rValues, 0, modValues, 1, rNumAxes);
+            rebinned = new DatesValues(rebinned.dates, modValues);
+
+            String[] modLabels = new String[rNumAxes + 1];
+            modLabels[0] = variableName + ' ' + "|B|";
+            System.arraycopy(labels, 0, modLabels, 1, rNumAxes);
+            labels = modLabels;
         }
         return new CDFData(rebinned, scaleMin, scaleMax, dataScaleTyp, dataUnits, labels);
     }
