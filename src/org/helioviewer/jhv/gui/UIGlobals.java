@@ -49,7 +49,7 @@ public class UIGlobals {
         backColor = UIManager.getColor("Label.background");
         midColor = new Color((foreColor.getRed() + backColor.getRed()) / 2, (foreColor.getGreen() + backColor.getGreen()) / 2, (foreColor.getBlue() + backColor.getBlue()) / 2);
 
-        Font font = UIManager.getFont("defaultFont");
+        Font font = UIManager.getFont("Label.font");
         String defaultFamily = font.getFamily();
         int defaultSize = font.getSize();
 

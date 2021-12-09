@@ -61,7 +61,7 @@ public class BandType {
         name = jo.optString("name", "Unknown");
         group = jo.optString("group", "Unknown");
         baseURL = jo.optString("baseUrl", "");
-        label = jo.optString("label", "Unknown");
+        label = "<html><body>" + jo.optString("label", "Unknown").replaceAll("_(r|t|n|x|y|z|RTN|SRF|VSO|URF)", "<sub>$1</sub>");
 
         String ul = jo.optString("unitLabel", "unknown");
         if ("".equals(ul)) // crashes ChartDrawGraphPane.drawVerticalLabels

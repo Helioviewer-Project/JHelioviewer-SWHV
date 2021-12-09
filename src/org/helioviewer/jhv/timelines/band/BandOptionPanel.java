@@ -64,7 +64,8 @@ class BandOptionPanel extends JPanel {
         JideButton downloadButton = new JideButton(Buttons.download);
         downloadButton.setToolTipText("Download selected layer");
         downloadButton.addActionListener(e -> {
-            String fileName = JHVDirectory.REMOTEFILES.getPath() + band.getBandType().getName() + "__" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".json";
+            String fileName = JHVDirectory.REMOTEFILES.getPath() + band.getBandType().getName().replace(" ", "_") + "__" +
+                    TimeUtils.formatFilename(System.currentTimeMillis()) + ".json";
             JSONObject jo = band.toJson();
 
             new Thread(() -> {
