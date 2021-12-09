@@ -7,9 +7,9 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
-import org.helioviewer.jhv.astronomy.StatusReceiver;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.gui.interfaces.StatusReceiver;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
 class SpaceObjectElement implements StatusReceiver {

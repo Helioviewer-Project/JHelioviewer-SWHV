@@ -11,6 +11,7 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.EventDispatchQueue;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
+import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.band.BandDataProvider;
 import org.helioviewer.jhv.timelines.band.CDFReader;
 import org.json.JSONArray;
@@ -29,7 +30,8 @@ class LoadRequest {
     }
 
     static void submitCDF(@Nonnull List<URI> uriList) {
-        EventQueueCallbackExecutor.pool.submit(new LoadRequestCDF(uriList), new Callback());
+        EventQueueCallbackExecutor.pool.submit(new LoadRequestCDF(uriList), new CallbackCDF());
+        Timelines.dc.setStatus("Loading...");
     }
 
     private static void parseRequest(JSONObject jo) throws Exception {
@@ -93,6 +95,22 @@ class LoadRequest {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
+            Log.error("An error occurred while opening the remote file:", t);
+            Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
+        }
+
+    }
+
+    private static class CallbackCDF implements FutureCallback<Void> {
+
+        @Override
+        public void onSuccess(Void result) {
+            Timelines.dc.setStatus(null);
+        }
+
+        @Override
+        public void onFailure(@Nonnull Throwable t) {
+            Timelines.dc.setStatus(null);
             Log.error("An error occurred while opening the remote file:", t);
             Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
         }

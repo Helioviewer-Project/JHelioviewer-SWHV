@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.util.Objects;
 
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.astronomy.Carrington;
@@ -18,6 +19,7 @@ class DrawControllerOptionsPanel extends JPanel {
 
     private final JComboBox<ZoomItem> zoomCombo;
     private final JideToggleButton lockButton;
+    private final JLabel statusLabel;
 
     private enum ZOOM {
         CUSTOM, All, Year, Month, Day, Hour, Carrington, Movie
@@ -53,6 +55,9 @@ class DrawControllerOptionsPanel extends JPanel {
             lockButton.setText(lockButton.isSelected() ? Buttons.lock : Buttons.unlock);
         });
 
+        statusLabel = new JLabel("", JLabel.RIGHT);
+
+        add(statusLabel, BorderLayout.LINE_START);
         add(lockButton, BorderLayout.CENTER);
         add(zoomCombo, BorderLayout.LINE_END);
     }
@@ -125,6 +130,10 @@ class DrawControllerOptionsPanel extends JPanel {
     void setLocked(boolean locked) {
         if (lockButton.isSelected() != locked)
             lockButton.doClick();
+    }
+
+    void setStatus(String status) {
+        statusLabel.setText(status);
     }
 
 }

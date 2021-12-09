@@ -7,6 +7,7 @@ import java.util.concurrent.Future;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.gui.interfaces.StatusReceiver;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;

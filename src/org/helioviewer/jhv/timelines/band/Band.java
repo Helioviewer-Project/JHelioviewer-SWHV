@@ -29,7 +29,7 @@ public class Band extends AbstractTimelineLayer {
 
     private static final HashMap<BandType, Band> externalLoad = new HashMap<>();
 
-    public static final Band createFromType(BandType _bandType) {
+    public static Band createFromType(BandType _bandType) {
         return externalLoad.computeIfAbsent(_bandType, Band::new);
     }
 
