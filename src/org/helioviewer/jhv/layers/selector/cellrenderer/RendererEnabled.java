@@ -4,12 +4,12 @@ import java.awt.Component;
 
 import javax.swing.JCheckBox;
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
 
-import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
 import org.helioviewer.jhv.layers.Layer;
 
 @SuppressWarnings("serial")
-public class RendererEnabled extends JHVTableCellRenderer {
+public class RendererEnabled extends DefaultTableCellRenderer {
 
     private final JCheckBox checkBox = new JCheckBox();
 

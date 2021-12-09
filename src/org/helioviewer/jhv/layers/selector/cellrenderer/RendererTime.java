@@ -1,10 +1,11 @@
 package org.helioviewer.jhv.layers.selector.cellrenderer;
 
-import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
+import javax.swing.table.DefaultTableCellRenderer;
+
 import org.helioviewer.jhv.layers.Layer;
 
 @SuppressWarnings("serial")
-public class RendererTime extends JHVTableCellRenderer {
+public class RendererTime extends DefaultTableCellRenderer {
 
     @Override
     public void setValue(Object value) {
