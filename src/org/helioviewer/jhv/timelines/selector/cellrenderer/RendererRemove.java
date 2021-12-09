@@ -2,12 +2,13 @@ package org.helioviewer.jhv.timelines.selector.cellrenderer;
 
 import java.awt.Font;
 
+import javax.swing.table.DefaultTableCellRenderer;
+
 import org.helioviewer.jhv.gui.components.Buttons;
-import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 
 @SuppressWarnings("serial")
-public class RendererRemove extends JHVTableCellRenderer {
+public class RendererRemove extends DefaultTableCellRenderer {
 
     private final Font font = Buttons.getMaterialFont(getFont().getSize2D());
 

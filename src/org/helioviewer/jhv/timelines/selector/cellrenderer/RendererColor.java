@@ -6,12 +6,12 @@ import java.awt.Graphics;
 
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
 
-import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 
 @SuppressWarnings("serial")
-public class RendererColor extends JHVTableCellRenderer {
+public class RendererColor extends DefaultTableCellRenderer {
 
     private final LineColorPanel lineColorPanel = new LineColorPanel();
 
