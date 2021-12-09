@@ -215,14 +215,14 @@ public class CDFReader {
         // Temporary
         String datasetId = instrumentName + '_' + variableName;
         float scaleMin = switch (datasetId) {
-            case "MAG_B_RTN", "MAG_B_VSO", "MAG_B_SRF" -> -20;
+            case "MAG_B_RTN", "MAG_B_VSO", "MAG_B_SRF" -> -30;
             case "SWA-PAS_V_RTN" -> 200;
             case "SWA-PAS_N" -> 1; // log
             case "SWA-PAS_T" -> 1e3f; // log
             default -> Float.parseFloat(dataScaleMin);
         };
         float scaleMax = switch (datasetId) {
-            case "MAG_B_RTN", "MAG_B_VSO", "MAG_B_SRF" -> +20;
+            case "MAG_B_RTN", "MAG_B_VSO", "MAG_B_SRF" -> +30;
             case "SWA-PAS_V_RTN" -> 600;
             case "SWA-PAS_N" -> 1e10f; // log
             case "SWA-PAS_T" -> 1e7f; // log
