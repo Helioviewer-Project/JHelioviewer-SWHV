@@ -47,7 +47,7 @@ public class TimelinePanel extends JPanel {
     private static final int REMOVE_COL = 4;
 
     public static final int NUMBEROFCOLUMNS = 5;
-    private static final int NUMBEROFVISIBLEROWS = 5;
+    private static final int NUMBEROFVISIBLEROWS = 6;
 
     private final TimelineTable grid;
     private final JPanel optionsPanelWrapper;
