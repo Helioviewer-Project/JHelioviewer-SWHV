@@ -38,6 +38,7 @@ class DropHandler extends TransferHandler {
 
                 List<URI> imageUris = new ArrayList<>(objects.size());
                 List<URI> jsonUris = new ArrayList<>(objects.size());
+                List<URI> cdfUris = new ArrayList<>(objects.size());
                 for (Object o : objects) {
                     if (o instanceof File f) {
                         if (f.isFile() && f.canRead()) {
@@ -45,6 +46,8 @@ class DropHandler extends TransferHandler {
                             String loc = uri.toString().toLowerCase(Locale.ENGLISH);
                             if (loc.endsWith(".json"))
                                 jsonUris.add(uri);
+                            else if (loc.endsWith(".cdf"))
+                                cdfUris.add(uri);
                             else
                                 imageUris.add(uri);
                         } else if (f.isDirectory()) {
@@ -53,6 +56,8 @@ class DropHandler extends TransferHandler {
                                     String loc = uri.toString().toLowerCase(Locale.ENGLISH);
                                     if (loc.endsWith(".json"))
                                         jsonUris.add(uri);
+                                    else if (loc.endsWith(".cdf"))
+                                        cdfUris.add(uri);
                                     else
                                         imageUris.add(uri);
                                 }
@@ -65,8 +70,8 @@ class DropHandler extends TransferHandler {
 
                 // jsonUris.forEach(Load.request::get);
                 jsonUris.forEach(Load.sunJSON::get);
-                if (!imageUris.isEmpty())
-                    Load.Image.getAll(imageUris);
+                Load.CDF.getAll(cdfUris);
+                Load.Image.getAll(imageUris);
 
                 return true;
             } else if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
@@ -76,6 +81,8 @@ class DropHandler extends TransferHandler {
                     URI uri = new URI(loc);
                     if (loc.endsWith(".json"))
                         Load.sunJSON.get(uri);
+                    else if (loc.endsWith(".cdf"))
+                        Load.cdf.get(uri);
                     else if (loc.endsWith(".jhv"))
                         Load.state.get(uri);
                     else

@@ -19,6 +19,7 @@ public interface Load {
 
     }
 
+    Load cdf = new CDF();
     Load fits = new FITS();
     Load image = new Image();
     LoadString request = new Request();
@@ -55,7 +56,12 @@ public interface Load {
         }
     }
 
-    class CDF {
+    class CDF implements Load {
+        @Override
+        public void get(@Nonnull URI uri) {
+            getAll(List.of(uri));
+        }
+
         public static void getAll(@Nonnull List<URI> uris) {
             if (!uris.isEmpty()) {
                 LoadRequest.submitCDF(uris);
