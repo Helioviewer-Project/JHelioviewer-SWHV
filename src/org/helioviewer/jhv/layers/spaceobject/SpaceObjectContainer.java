@@ -13,6 +13,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.PositionLoad;
@@ -20,7 +21,6 @@ import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
 import org.helioviewer.jhv.gui.components.base.TableValue;
 import org.json.JSONArray;
 
@@ -159,19 +159,17 @@ public class SpaceObjectContainer extends JScrollPane {
         return ja;
     }
 
-    private static class ObjectRenderer extends JHVTableCellRenderer {
+    private static class ObjectRenderer extends DefaultTableCellRenderer {
         @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        public void setValue(Object value) {
             if (value instanceof SpaceObjectElement element) {
-                label.setText(element.toString());
-                label.setToolTipText("Select for spiral");
+                setText(element.toString());
+                setToolTipText("Select for spiral");
             }
-            return label;
         }
     }
 
-    private static class SelectedRenderer extends JHVTableCellRenderer {
+    private static class SelectedRenderer extends DefaultTableCellRenderer {
 
         private final JCheckBox checkBox = new JCheckBox();
 
@@ -186,7 +184,7 @@ public class SpaceObjectContainer extends JScrollPane {
 
     }
 
-    private static class SelectedExclusiveRenderer extends JHVTableCellRenderer {
+    private static class SelectedExclusiveRenderer extends DefaultTableCellRenderer {
 
         private final JRadioButton radio = new JRadioButton();
 
@@ -201,16 +199,14 @@ public class SpaceObjectContainer extends JScrollPane {
 
     }
 
-    private static class StatusRenderer extends JHVTableCellRenderer {
+    private static class StatusRenderer extends DefaultTableCellRenderer {
         @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        public void setValue(Object value) {
             if (value instanceof SpaceObjectElement element) {
                 String status = element.getStatus();
-                label.setText(status);
-                label.setToolTipText(status);
+                setText(status);
+                setToolTipText(status);
             }
-            return label;
         }
     }
 
