@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.NetFileCache;
@@ -316,13 +317,24 @@ public class CDFReader {
         return ret;
     }
 
-    private static float fill(Object o, float fillVal) {
+    private static float fillFloat(Object o, Float fillVal) {
         float val = (float) o;
         return !Float.isFinite(val) || val == fillVal ? YAxis.BLANK : val;
     }
 
-    private static float[][] readCDFVariableFloat(Variable v, float fillVal) throws IOException {
+    private static float fillDouble(Object o, Float fillVal) {
+        float val = (float) ((double) o);
+        return !Float.isFinite(val) || val == fillVal ? YAxis.BLANK : val;
+    }
+
+    private static float[][] readCDFVariableFloat(Variable v, Float fillVal /* avoid autoboxing */) throws IOException {
         DataType dataType = v.getDataType();
+        BiFunction<Object, Float, Float> fillFunc = switch (dataType.toString()) { // next version: patterns in switch
+            case "REAL4", "FLOAT" -> CDFReader::fillFloat;
+            case "REAL8", "DOUBLE" -> CDFReader::fillDouble;
+            default -> throw new IOException("Unimplemented data type: " + dataType);
+        };
+
         Object abuf = v.createRawValueArray();
         int count = v.getRecordCount();
 
@@ -334,7 +346,7 @@ public class CDFReader {
             return ret;
 
         for (int i = 0; i < len; i++)
-            ret[i][0] = fill(dataType.getScalar(abuf, i), fillVal); // dubious
+            ret[i][0] = fillFunc.apply(dataType.getScalar(abuf, i), fillVal);
 
         for (int j = 1; j < count; j++) {
             v.readRawRecord(j, abuf);
@@ -343,7 +355,7 @@ public class CDFReader {
                 throw new IOException("Inconsistent number of elements: expected " + len + ", got " + nlen);
 
             for (int i = 0; i < len; i++)
-                ret[i][j] = fill(dataType.getScalar(abuf, i), fillVal); // dubious
+                ret[i][j] = fillFunc.apply(dataType.getScalar(abuf, i), fillVal);
         }
 
         return ret;
