@@ -26,6 +26,16 @@ class DropHandler extends TransferHandler {
                 transferable.isDataFlavorSupported(DataFlavor.stringFlavor));
     }
 
+    private static void classify(URI uri, List<URI> imageUris, List<URI> jsonUris, List<URI> cdfUris) {
+        String loc = uri.toString().toLowerCase(Locale.ENGLISH);
+        if (loc.endsWith(".json"))
+            jsonUris.add(uri);
+        else if (loc.endsWith(".cdf"))
+            cdfUris.add(uri);
+        else
+            imageUris.add(uri);
+    }
+
     @Override
     public boolean importData(TransferHandler.TransferSupport support) {
         if (!canImport(support))
@@ -42,25 +52,10 @@ class DropHandler extends TransferHandler {
                 for (Object o : objects) {
                     if (o instanceof File f) {
                         if (f.isFile() && f.canRead()) {
-                            URI uri = f.toURI();
-                            String loc = uri.toString().toLowerCase(Locale.ENGLISH);
-                            if (loc.endsWith(".json"))
-                                jsonUris.add(uri);
-                            else if (loc.endsWith(".cdf"))
-                                cdfUris.add(uri);
-                            else
-                                imageUris.add(uri);
+                            classify(f.toURI(), imageUris, jsonUris, cdfUris);
                         } else if (f.isDirectory()) {
                             try {
-                                for (URI uri : FileUtils.listDir(f.toPath())) {
-                                    String loc = uri.toString().toLowerCase(Locale.ENGLISH);
-                                    if (loc.endsWith(".json"))
-                                        jsonUris.add(uri);
-                                    else if (loc.endsWith(".cdf"))
-                                        cdfUris.add(uri);
-                                    else
-                                        imageUris.add(uri);
-                                }
+                                FileUtils.listDir(f.toPath()).forEach(uri -> classify(uri, imageUris, jsonUris, cdfUris));
                             } catch (Exception e) {
                                 Log.error("Error reading directory " + f, e);
                             }
