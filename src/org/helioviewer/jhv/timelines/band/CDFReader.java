@@ -51,6 +51,7 @@ public class CDFReader {
         });
     }
 
+    private static final double eV2K = 11604.5250061657;
     private static final Set<String> SWAIncluded = Set.of("N", "V_RTN", "T");
 
     private record BandData(BandType bandType, long[] dates, float[] values) {
@@ -118,8 +119,8 @@ public class CDFReader {
                     put("unitLabel", data.units).
                     put("name", name).
                     put("range", new JSONArray().put(data.scaleMin).put(data.scaleMax)).
-                    put("scale", data.scaleType). //! TBD
-                            put("label", name).
+                    put("scale", data.scaleType).
+                    put("label", name).
                     put("group", "GROUP_CDF");
             //put("bandCacheType", "BandCacheAll");
             ret.add(new BandData(new BandType(jo), data.datesValues.dates, data.datesValues.values[i]));
@@ -163,11 +164,11 @@ public class CDFReader {
             throw new IOException("Inconsistent variable " + variableName + ": " + uri);
         }
         String dataFillVal = dataAttrs.get("FILLVAL");
-        String dataScaleTyp = dataAttrs.get("SCALETYP");
+        String dataScaleTyp = "linear"; //dataAttrs.get("SCALETYP"); -- don't trust value in CDF
         String dataScaleMax = dataAttrs.computeIfAbsent("SCALEMAX", k -> dataAttrs.get("VALIDMAX"));
         String dataScaleMin = dataAttrs.computeIfAbsent("SCALEMIN", k -> dataAttrs.get("VALIDMIN"));
         String dataUnits = dataAttrs.get("UNITS");
-        if (dataFillVal == null || dataScaleMax == null || dataScaleMin == null || dataScaleTyp == null || dataUnits == null) {
+        if (dataFillVal == null || dataScaleMax == null || dataScaleMin == null /*|| dataScaleTyp == null*/ || dataUnits == null) {
             throw new IOException("Missing attributes for variable " + variableName + ": " + uri);
         }
 
@@ -215,14 +216,16 @@ public class CDFReader {
         String datasetId = instrumentName + '_' + variableName;
         float scaleMin = switch (datasetId) {
             case "MAG_B_RTN", "MAG_B_VSO", "MAG_B_SRF" -> -20;
-            case "SWA-PAS_V_RTN" -> -500;
+            case "SWA-PAS_V_RTN" -> 200;
+            case "SWA-PAS_N" -> 1; // log
+            case "SWA-PAS_T" -> 1e3f; // log
             default -> Float.parseFloat(dataScaleMin);
         };
         float scaleMax = switch (datasetId) {
             case "MAG_B_RTN", "MAG_B_VSO", "MAG_B_SRF" -> +20;
-            case "SWA-PAS_V_RTN" -> +500;
-            case "SWA-PAS_N" -> 50;
-            case "SWA-PAS_T" -> 20;
+            case "SWA-PAS_V_RTN" -> 600;
+            case "SWA-PAS_N" -> 1e10f; // log
+            case "SWA-PAS_T" -> 1e7f; // log
             default -> Float.parseFloat(dataScaleMax);
         };
 
@@ -233,13 +236,31 @@ public class CDFReader {
 
             float[][] modValues = new float[1][rNumPoints];
             for (int i = 0; i < rNumPoints; i++) {
-                modValues[0][i] = (float) Math.sqrt(rValues[0][i] * rValues[0][i] + rValues[1][i] * rValues[1][i] + rValues[2][i] * rValues[2][i]);
+                float x = rValues[0][i];
+                float y = rValues[1][i];
+                float z = rValues[2][i];
+                if (x == YAxis.BLANK || y == YAxis.BLANK || z == YAxis.BLANK)
+                    modValues[0][i] = YAxis.BLANK;
+                else
+                    modValues[0][i] = (float) Math.sqrt(x * x + y * y + z * z);
             }
 
             rebinned = new DatesValues(rebinned.dates, modValues);
             labels = new String[]{"Velocity"};
-        }
-        if ("MAG".equals(instrumentName) && variableName.startsWith("B_")) { // prepend column with modulus
+        } else if ("SWA-PAS".equals(instrumentName) && "N".equals(variableName)) { // show log
+            dataUnits = "cm^-3";
+            dataScaleTyp = "logarithmic";
+        } else if ("SWA-PAS".equals(instrumentName) && "T".equals(variableName)) { // transform to Kelvin + show log
+            int rNumPoints = rebinned.dates.length;
+            float[][] rValues = rebinned.values;
+            for (int i = 0; i < rNumPoints; i++) {
+                float v = rValues[0][i];
+                if (v != YAxis.BLANK)
+                    rValues[0][i] = (float) (v * eV2K);
+            }
+            dataUnits = "K";
+            dataScaleTyp = "logarithmic";
+        } else if ("MAG".equals(instrumentName) && variableName.startsWith("B_")) { // prepend column with modulus
             int rNumPoints = rebinned.dates.length;
             float[][] rValues = rebinned.values;
 
@@ -247,7 +268,13 @@ public class CDFReader {
             float[][] modValues = new float[rNumAxes + 1][];
             modValues[0] = new float[rNumPoints];
             for (int i = 0; i < rNumPoints; i++) {
-                modValues[0][i] = (float) Math.sqrt(rValues[0][i] * rValues[0][i] + rValues[1][i] * rValues[1][i] + rValues[2][i] * rValues[2][i]);
+                float x = rValues[0][i];
+                float y = rValues[1][i];
+                float z = rValues[2][i];
+                if (x == YAxis.BLANK || y == YAxis.BLANK || z == YAxis.BLANK)
+                    modValues[0][i] = YAxis.BLANK;
+                else
+                    modValues[0][i] = (float) Math.sqrt(x * x + y * y + z * z);
             }
             System.arraycopy(rValues, 0, modValues, 1, rNumAxes);
             rebinned = new DatesValues(rebinned.dates, modValues);
