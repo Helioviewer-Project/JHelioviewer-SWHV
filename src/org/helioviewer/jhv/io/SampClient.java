@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -117,7 +116,7 @@ public class SampClient extends HubConnector {
                     Object url = msg.getParam("url");
                     if (url != null) {
                         URI uri = toURI(url.toString());
-                        EventQueue.invokeLater(() -> Load.CDF.getAll(List.of(uri)));
+                        EventQueue.invokeLater(() -> Load.cdf.get(uri));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -136,7 +135,7 @@ public class SampClient extends HubConnector {
                         URI uri = toURI(jo.optString("url"));
                         EventQueue.invokeLater(() -> Load.image.get(uri));
                     } else {
-                        List<URI> uris = new ArrayList<>(ja.length());
+                        ArrayList<URI> uris = new ArrayList<>(ja.length());
                         for (Object obj : ja) {
                             uris.add(toURI(obj.toString()));
                         }
