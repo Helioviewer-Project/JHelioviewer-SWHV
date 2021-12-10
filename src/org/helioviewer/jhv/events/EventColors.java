@@ -4,7 +4,7 @@ import java.awt.Color;
 
 import static org.helioviewer.jhv.base.Colors.brightColors;
 
-class JHVCacheColors {
+class EventColors {
 
     private static final int[] usedArray = new int[brightColors.length];
     private static int minValue = 0;
