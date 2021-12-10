@@ -17,7 +17,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableModel;
 
-import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.Buttons;
@@ -115,7 +114,7 @@ public class TimelinePanel extends JPanel {
         grid = new TimelineTable(model);
 
         JScrollPane jsp = new JScrollPane(grid, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Colors.lightGray));
+        jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, getBackground().brighter()));
         jsp.getViewport().setBackground(grid.getBackground());
 
         JideButton addLayerButton = new JideButton(Buttons.newLayer);

@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.timelines.chart;
 
 import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -273,7 +272,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             if (tl == null) {
                 g.setColor(DrawConstants.TICK_LINE_COLOR);
                 g.drawLine(x, graphArea.y, x, graphArea.y + graphArea.height + 3);
-                g.setColor(Color.BLACK);
+                g.setColor(DrawConstants.LABEL_TEXT_COLOR);
             } else {
                 g.setColor(tl.getDataColor());
             }

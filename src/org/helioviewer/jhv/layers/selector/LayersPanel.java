@@ -19,7 +19,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableModel;
 
-import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
@@ -117,7 +116,7 @@ public class LayersPanel extends JPanel {
         grid = new LayersTable(model);
 
         JScrollPane jsp = new JScrollPane(grid, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Colors.lightGray));
+        jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, getBackground().brighter()));
         jsp.getViewport().setBackground(grid.getBackground());
         add(jsp, gc);
 

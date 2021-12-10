@@ -24,14 +24,14 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.log.Log;
 
-import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.FlatDarkLaf;
 import com.jidesoft.plaf.LookAndFeelFactory;
 
 public class UIGlobals {
 
     public static void setLaf() {
         try {
-            FlatLightLaf.setup();
+            FlatDarkLaf.setup();
             LookAndFeelFactory.installJideExtension();
         } catch (Exception e) {
             e.printStackTrace();
@@ -94,6 +94,7 @@ public class UIGlobals {
 
         // setUIFont(uiFont);
         UIManager.getLookAndFeelDefaults().put("defaultFont", uiFont);
+        UIManager.put("TextComponent.arc", 5);
 
         try (InputStream is = FileUtils.getResource("/fonts/DejaVuSansCondensed.ttf")) {
             canvasFont = Font.createFont(Font.TRUETYPE_FONT, is);
