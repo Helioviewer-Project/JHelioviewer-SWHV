@@ -25,7 +25,10 @@ public class FOVTreePane extends JScrollPane {
     public FOVTreePane(JSONObject jo) {
         JSONObject jpo, empty = new JSONObject();
 
-        jpo = jo == null ? empty : jo.optJSONObject("SOLO", empty);
+        if (jo == null)
+            jo = empty;
+
+        jpo = jo.optJSONObject("SOLO", empty);
         FOVPlatform plat = new FOVPlatform("SOLO", "SOLO", SpaceObject.SOLO.getColor(), jpo);
         plat.add(new FOVInstrument("EUI/HRI", FOVType.RECTANGULAR, 0, 16.6 / 60., 16.6 / 60., jpo));
         plat.add(new FOVInstrument("EUI/FSI", FOVType.RECTANGULAR, 0, 228 / 60., 228 / 60., jpo));
@@ -36,20 +39,20 @@ public class FOVTreePane extends JScrollPane {
         plat.add(new FOVInstrument("STIX", FOVType.RECTANGULAR, 0, 2, 2, jpo));
         root.add(plat);
 
-        jpo = jo == null ? empty : jo.optJSONObject("STEREO-A", empty);
+        jpo = jo.optJSONObject("STEREO-A", empty);
         plat = new FOVPlatform("STEREO-A", "STEREO AHEAD", SpaceObject.STA.getColor(), jpo);
         plat.add(new FOVInstrument("EUVI", FOVType.RECTANGULAR, 0, 1.5877740 * 2048 / 3600., 1.5877740 * 2048 / 3600., jpo));
         plat.add(new FOVInstrument("COR1", FOVType.RECTANGULAR, 0, 15.008600 * 512 / 3600., 15.008600 * 512 / 3600., jpo));
         plat.add(new FOVInstrument("COR2", FOVType.CIRCULAR, 0, 14.700000 * 2048 / 3600., 14.700000 * 2048 / 3600., jpo));
         root.add(plat);
 
-        jpo = jo == null ? empty : jo.optJSONObject("SDO", empty);
+        jpo = jo.optJSONObject("SDO", empty);
         plat = new FOVPlatform("SDO", "EARTH", Colors.Blue, jpo); // Earth approximate
         plat.add(new FOVInstrument("AIA", FOVType.RECTANGULAR, 0, (0.6 * 4096) / 3600., (0.6 * 4096) / 3600., jpo));
         plat.add(new FOVInstrument("HMI", FOVType.RECTANGULAR, 0, (0.6 * 4096) / 3600., (0.6 * 4096) / 3600., jpo));
         root.add(plat);
 
-        jpo = jo == null ? empty : jo.optJSONObject("PROBA-2", empty);
+        jpo = jo.optJSONObject("PROBA-2", empty);
         plat = new FOVPlatform("PROBA-2", "EARTH", Colors.Blue, jpo); // Earth approximate
         plat.add(new FOVInstrument("SWAP", FOVType.RECTANGULAR, 0, (3.1646941 * 1024) / 3600., (3.1646941 * 1024) / 3600., jpo));
         root.add(plat);
