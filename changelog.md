@@ -1,7 +1,9 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.2 (pending)
+## JHelioviewer 4.2.1 (pending)
+
+## JHelioviewer 4.2 (2021-12-10)
 
 - Load EUI, MAG and SWA datasets from SOAR
 - Add CDF file format support
