@@ -31,7 +31,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
 
     JHVRelatedEvents(JHVEvent event, Map<SWEKSupplier, SortedMap<Interval, JHVRelatedEvents>> eventsMap) {
         supplier = event.getSupplier();
-        color = JHVCacheColors.getNextColor();
+        color = EventColors.getNextColor();
         highlighted = false;
 
         events.add(event);

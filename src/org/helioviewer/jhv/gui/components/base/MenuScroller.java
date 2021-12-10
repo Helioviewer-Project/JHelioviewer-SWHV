@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.gui.components.base;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -15,6 +14,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+
+import org.helioviewer.jhv.gui.UIGlobals;
 
 // https://tips4java.wordpress.com/2009/02/01/menu-scroller/
 
@@ -535,10 +536,10 @@ public class MenuScroller {
         public void paintIcon(Component c, Graphics g, int x, int y) {
             Dimension size = c.getSize();
             Graphics g2 = g.create(size.width / 2 - 5, size.height / 2 - 5, 10, 10);
-            g2.setColor(Color.GRAY);
+            g2.setColor(UIGlobals.backColor);
             g2.drawPolygon(xPoints, yPoints, 3);
             if (c.isEnabled()) {
-                g2.setColor(Color.BLACK);
+                g2.setColor(UIGlobals.foreColor);
                 g2.fillPolygon(xPoints, yPoints, 3);
             }
             g2.dispose();

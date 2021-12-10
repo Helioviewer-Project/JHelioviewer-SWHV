@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.export;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
@@ -9,6 +8,7 @@ import java.awt.image.BufferedImage;
 
 import org.helioviewer.jhv.base.image.NIOImageFactory;
 import org.helioviewer.jhv.opengl.GLInfo;
+import org.helioviewer.jhv.timelines.draw.DrawConstants;
 
 class ExportUtils {
 
@@ -22,7 +22,7 @@ class ExportUtils {
         g.drawImage(tmp, 0, 0, null);
 
         if (movieLinePosition != -1) {
-            g.setColor(Color.BLACK);
+            g.setColor(DrawConstants.MOVIE_FRAME_COLOR);
             g.setTransform(AffineTransform.getScaleInstance(newW / (double) oldW, newH / (double) oldH));
             int screenMovieLine = (int) (movieLinePosition * GLInfo.pixelScale[0] + .5);
             g.drawLine(screenMovieLine, 0, screenMovieLine, oldH);
