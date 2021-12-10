@@ -23,7 +23,7 @@ public class RendererLoading extends DefaultTableCellRenderer {
         label.setText(null);
 
         // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
-        if (value instanceof TimelineLayer && ((TimelineLayer) value).isDownloading()) {
+        if (value instanceof TimelineLayer layer && layer.isDownloading()) {
             table.repaint(); // lazy
 
             over.setForeground(label.getForeground());

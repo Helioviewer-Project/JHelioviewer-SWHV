@@ -9,8 +9,8 @@ public class RendererTime extends DefaultTableCellRenderer {
 
     @Override
     public void setValue(Object value) {
-        if (value instanceof Layer) {
-            setText(((Layer) value).getTimeString());
+        if (value instanceof Layer layer) {
+            setText(layer.getTimeString());
         }
     }
 

@@ -15,7 +15,7 @@ public class RendererRemove extends DefaultTableCellRenderer {
     @Override
     public void setValue(Object value) {
         setBorder(null); //!
-        if (value instanceof Layer && ((Layer) value).isDeletable()) {
+        if (value instanceof Layer layer && layer.isDeletable()) {
             setFont(font);
             setText(Buttons.close);
         } else
