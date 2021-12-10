@@ -49,15 +49,18 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
     private final JHVSpinner spinnerX;
     private final JHVSpinner spinnerY;
 
-    FOVPlatform(String _name, String _observer, byte[] _color) {
+    FOVPlatform(String _name, String _observer, byte[] _color, JSONObject jo) {
         name = _name;
         observer = _observer;
         color = _color;
         isSOLO = "SOLO".equals(observer);
 
-        spinnerX = createSpinner();
+        double centerX = jo.optDouble("centerX", 0);
+        double centerY = jo.optDouble("centerY", 0);
+
+        spinnerX = createSpinner(centerX);
         spinnerX.addChangeListener(e -> setCenterX((Double) spinnerX.getValue()));
-        spinnerY = createSpinner();
+        spinnerY = createSpinner(centerY);
         spinnerY.addChangeListener(e -> setCenterY((Double) spinnerY.getValue()));
 
         panel = new JPanel(new GridLayout(1, 5, 0, 0));
@@ -183,8 +186,8 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
     private static final double min = -60;
     private static final double max = 60;
 
-    private static JHVSpinner createSpinner() {
-        JHVSpinner spinner = new JHVSpinner(0, min, max, 0.1);
+    private static JHVSpinner createSpinner(double val) {
+        JHVSpinner spinner = new JHVSpinner(val, min, max, 0.1);
         JFormattedTextField f = ((JHVSpinner.DefaultEditor) spinner.getEditor()).getTextField();
         f.setFormatterFactory(new TerminatedFormatterFactory("%.2f", "\u2032", min, max));
         return spinner;

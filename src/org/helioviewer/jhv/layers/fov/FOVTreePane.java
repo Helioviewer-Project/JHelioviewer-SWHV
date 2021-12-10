@@ -23,29 +23,35 @@ public class FOVTreePane extends JScrollPane {
     private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
 
     public FOVTreePane(JSONObject jo) {
-        FOVPlatform plat = new FOVPlatform("SOLO", "SOLO", SpaceObject.SOLO.getColor());
-        plat.add(new FOVInstrument("EUI/HRI", FOVType.RECTANGULAR, 0, 16.6 / 60., 16.6 / 60.));
-        plat.add(new FOVInstrument("EUI/FSI", FOVType.RECTANGULAR, 0, 228 / 60., 228 / 60.));
-        plat.add(new FOVInstrument("Metis", FOVType.CIRCULAR, 3.2, 6.8, 6.8));
-        plat.add(new FOVInstrument("PHI/HRT", FOVType.RECTANGULAR, 0, 0.28, 0.28));
-        plat.add(new FOVInstrument("PHI/FDT", FOVType.RECTANGULAR, 0, 2, 2));
-        plat.add(new FOVInstrument("SPICE", FOVType.RECTANGULAR, 0, 16 / 60., 11 / 60.));
-        plat.add(new FOVInstrument("STIX", FOVType.RECTANGULAR, 0, 2, 2));
+        JSONObject jpo, empty = new JSONObject();
+
+        jpo = jo == null ? empty : jo.optJSONObject("SOLO", empty);
+        FOVPlatform plat = new FOVPlatform("SOLO", "SOLO", SpaceObject.SOLO.getColor(), jpo);
+        plat.add(new FOVInstrument("EUI/HRI", FOVType.RECTANGULAR, 0, 16.6 / 60., 16.6 / 60., jpo));
+        plat.add(new FOVInstrument("EUI/FSI", FOVType.RECTANGULAR, 0, 228 / 60., 228 / 60., jpo));
+        plat.add(new FOVInstrument("Metis", FOVType.CIRCULAR, 3.2, 6.8, 6.8, jpo));
+        plat.add(new FOVInstrument("PHI/HRT", FOVType.RECTANGULAR, 0, 0.28, 0.28, jpo));
+        plat.add(new FOVInstrument("PHI/FDT", FOVType.RECTANGULAR, 0, 2, 2, jpo));
+        plat.add(new FOVInstrument("SPICE", FOVType.RECTANGULAR, 0, 16 / 60., 11 / 60., jpo));
+        plat.add(new FOVInstrument("STIX", FOVType.RECTANGULAR, 0, 2, 2, jpo));
         root.add(plat);
 
-        plat = new FOVPlatform("STEREO-A", "STEREO AHEAD", SpaceObject.STA.getColor());
-        plat.add(new FOVInstrument("EUVI", FOVType.RECTANGULAR, 0, 1.5877740 * 2048 / 3600., 1.5877740 * 2048 / 3600.));
-        plat.add(new FOVInstrument("COR1", FOVType.RECTANGULAR, 0, 15.008600 * 512 / 3600., 15.008600 * 512 / 3600.));
-        plat.add(new FOVInstrument("COR2", FOVType.CIRCULAR, 0, 14.700000 * 2048 / 3600., 14.700000 * 2048 / 3600.));
+        jpo = jo == null ? empty : jo.optJSONObject("STEREO-A", empty);
+        plat = new FOVPlatform("STEREO-A", "STEREO AHEAD", SpaceObject.STA.getColor(), jpo);
+        plat.add(new FOVInstrument("EUVI", FOVType.RECTANGULAR, 0, 1.5877740 * 2048 / 3600., 1.5877740 * 2048 / 3600., jpo));
+        plat.add(new FOVInstrument("COR1", FOVType.RECTANGULAR, 0, 15.008600 * 512 / 3600., 15.008600 * 512 / 3600., jpo));
+        plat.add(new FOVInstrument("COR2", FOVType.CIRCULAR, 0, 14.700000 * 2048 / 3600., 14.700000 * 2048 / 3600., jpo));
         root.add(plat);
 
-        plat = new FOVPlatform("SDO", "EARTH", Colors.Blue); // Earth approximate
-        plat.add(new FOVInstrument("AIA", FOVType.RECTANGULAR, 0, (0.6 * 4096) / 3600., (0.6 * 4096) / 3600.));
-        plat.add(new FOVInstrument("HMI", FOVType.RECTANGULAR, 0, (0.6 * 4096) / 3600., (0.6 * 4096) / 3600.));
+        jpo = jo == null ? empty : jo.optJSONObject("SDO", empty);
+        plat = new FOVPlatform("SDO", "EARTH", Colors.Blue, jpo); // Earth approximate
+        plat.add(new FOVInstrument("AIA", FOVType.RECTANGULAR, 0, (0.6 * 4096) / 3600., (0.6 * 4096) / 3600., jpo));
+        plat.add(new FOVInstrument("HMI", FOVType.RECTANGULAR, 0, (0.6 * 4096) / 3600., (0.6 * 4096) / 3600., jpo));
         root.add(plat);
 
-        plat = new FOVPlatform("PROBA-2", "EARTH", Colors.Blue); // Earth approximate
-        plat.add(new FOVInstrument("SWAP", FOVType.RECTANGULAR, 0, (3.1646941 * 1024) / 3600., (3.1646941 * 1024) / 3600.));
+        jpo = jo == null ? empty : jo.optJSONObject("PROBA-2", empty);
+        plat = new FOVPlatform("PROBA-2", "EARTH", Colors.Blue, jpo); // Earth approximate
+        plat.add(new FOVInstrument("SWAP", FOVType.RECTANGULAR, 0, (3.1646941 * 1024) / 3600., (3.1646941 * 1024) / 3600., jpo));
         root.add(plat);
 
         JTree tree = new JTree(root);

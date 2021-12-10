@@ -18,6 +18,7 @@ import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
+import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
@@ -44,7 +45,7 @@ class FOVInstrument extends DefaultMutableTreeNode implements JHVCell {
     private double centerX = 0;
     private double centerY = 0;
 
-    FOVInstrument(String _name, FOVType _type, double innerDeg, double wideDeg, double highDeg) {
+    FOVInstrument(String _name, FOVType _type, double innerDeg, double wideDeg, double highDeg, JSONObject jo) {
         name = _name;
         type = _type;
         inner = 0.5 * Math.tan(innerDeg * (Math.PI / 180.));
@@ -54,7 +55,8 @@ class FOVInstrument extends DefaultMutableTreeNode implements JHVCell {
         panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
 
-        checkBox = new JCheckBox(name);
+        boolean enabled = jo.optBoolean(name, false);
+        checkBox = new JCheckBox(name, enabled);
         checkBox.addActionListener(e -> MovieDisplay.display());
         checkBox.setFocusPainted(false);
         checkBox.setOpaque(false);
