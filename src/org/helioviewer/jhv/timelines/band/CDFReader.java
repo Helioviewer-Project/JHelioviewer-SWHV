@@ -246,7 +246,7 @@ public class CDFReader {
             }
 
             rebinned = new DatesValues(rebinned.dates, modValues);
-            labels = new String[]{"Velocity"};
+            labels = new String[]{"Speed"};
         } else if ("SWA-PAS".equals(instrumentName) && "N".equals(variableName)) { // show log
             dataUnits = "cm^-3";
             dataScaleTyp = "logarithmic";
