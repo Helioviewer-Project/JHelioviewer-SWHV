@@ -79,7 +79,12 @@ public class BandType {
 
         scale = jo.optString("scale", "linear");
 
-        JSONArray warn = jo.optJSONArray("warnLevels");
+        JSONArray warn;
+        if (name.startsWith("GOES_XRSB")) // temporary
+            warn = new JSONArray("""
+                    [{"warnLabel":"B","warnValue":1e-7},{"warnLabel":"C","warnValue":1e-6},{"warnLabel":"M","warnValue":1e-5},{"warnLabel":"X","warnValue":1e-4}]""");
+        else
+            warn = jo.optJSONArray("warnLevels");
         if (warn != null) {
             int len = warn.length();
             warnLabels = new String[len];

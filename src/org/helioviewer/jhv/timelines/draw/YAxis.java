@@ -172,7 +172,7 @@ public class YAxis {
         private final String label;
 
         YAxisLogScale(String _label) {
-            label = "log10(" + fixupUnit(_label) + ')';
+            label = "log\u2081\u2080(" + fixupUnit(_label) + ')';
         }
 
         @Override
