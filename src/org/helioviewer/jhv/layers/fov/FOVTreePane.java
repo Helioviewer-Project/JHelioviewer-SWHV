@@ -13,6 +13,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.components.base.JHVTreeCell;
 import org.helioviewer.jhv.layers.fov.FOVInstrument.FOVType;
+import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
@@ -21,7 +22,7 @@ public class FOVTreePane extends JScrollPane {
 
     private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
 
-    public FOVTreePane() {
+    public FOVTreePane(JSONObject jo) {
         FOVPlatform plat = new FOVPlatform("SOLO", "SOLO", SpaceObject.SOLO.getColor());
         plat.add(new FOVInstrument("EUI/HRI", FOVType.RECTANGULAR, 0, 16.6 / 60., 16.6 / 60.));
         plat.add(new FOVInstrument("EUI/FSI", FOVType.RECTANGULAR, 0, 228 / 60., 228 / 60.));
@@ -74,6 +75,10 @@ public class FOVTreePane extends JScrollPane {
 
     public void render(Camera camera, Viewport vp, GL2 gl) {
         root.children().asIterator().forEachRemaining(c -> ((FOVPlatform) c).render(camera, vp, gl));
+    }
+
+    public void serialize(JSONObject jo) {
+        root.children().asIterator().forEachRemaining(c -> jo.put(c.toString(), ((FOVPlatform) c).toJson()));
     }
 
 }

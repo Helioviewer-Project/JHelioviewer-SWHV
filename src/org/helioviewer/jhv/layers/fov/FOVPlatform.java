@@ -27,6 +27,7 @@ import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.time.JHVTime;
+import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
@@ -39,6 +40,7 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
 
     private final GLSLLine hemiLine = new GLSLLine(false);
 
+    private final String name;
     private final String observer;
     private final byte[] color;
     private final boolean isSOLO;
@@ -47,7 +49,8 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
     private final JHVSpinner spinnerX;
     private final JHVSpinner spinnerY;
 
-    FOVPlatform(String name, String _observer, byte[] _color) {
+    FOVPlatform(String _name, String _observer, byte[] _color) {
+        name = _name;
         observer = _observer;
         color = _color;
         isSOLO = "SOLO".equals(observer);
@@ -185,6 +188,24 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
         JFormattedTextField f = ((JHVSpinner.DefaultEditor) spinner.getEditor()).getTextField();
         f.setFormatterFactory(new TerminatedFormatterFactory("%.2f", "\u2032", min, max));
         return spinner;
+    }
+
+    JSONObject toJson() {
+        JSONObject jo = new JSONObject();
+        jo.put("centerX", spinnerX.getValue());
+        jo.put("centerY", spinnerY.getValue());
+
+        Enumeration<TreeNode> e = children();
+        while (e.hasMoreElements()) {
+            FOVInstrument instrument = (FOVInstrument) e.nextElement();
+            jo.put(instrument.toString(), instrument.isEnabled());
+        }
+        return jo;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 
 }

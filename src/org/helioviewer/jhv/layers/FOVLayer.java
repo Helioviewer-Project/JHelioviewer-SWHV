@@ -13,13 +13,15 @@ import com.jogamp.opengl.GL2;
 
 public class FOVLayer extends AbstractLayer {
 
-    private final FOVTreePane treePane = new FOVTreePane();
+    private final FOVTreePane treePane;
 
     @Override
     public void serialize(JSONObject jo) {
+        treePane.serialize(jo);
     }
 
     public FOVLayer(JSONObject jo) {
+        treePane = new FOVTreePane(jo);
     }
 
     @Override
