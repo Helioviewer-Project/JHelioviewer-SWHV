@@ -23,12 +23,11 @@ public class FOVTreePane extends JScrollPane {
     private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
 
     public FOVTreePane(JSONObject jo) {
-        JSONObject jpo, empty = new JSONObject();
-
+        JSONObject empty = new JSONObject();
         if (jo == null)
             jo = empty;
 
-        jpo = jo.optJSONObject("SOLO", empty);
+        JSONObject jpo = jo.optJSONObject("SOLO", empty);
         FOVPlatform plat = new FOVPlatform("SOLO", "SOLO", SpaceObject.SOLO.getColor(), jpo);
         plat.add(new FOVInstrument("EUI/HRI", FOVType.RECTANGULAR, 0, 16.6 / 60., 16.6 / 60., jpo));
         plat.add(new FOVInstrument("EUI/FSI", FOVType.RECTANGULAR, 0, 228 / 60., 228 / 60., jpo));
