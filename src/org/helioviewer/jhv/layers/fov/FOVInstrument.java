@@ -123,4 +123,9 @@ class FOVInstrument extends DefaultMutableTreeNode implements JHVCell {
         return checkBox.isSelected();
     }
 
+    @Override
+    public String toString() {
+        return name;
+    }
+
 }

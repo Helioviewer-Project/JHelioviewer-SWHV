@@ -32,6 +32,11 @@ public class IconBank {
         return IconsFactory.getImageIcon(IconBank.class, "/images/" + icon.fname);
     }
 
+    @Nullable
+    public static ImageIcon getAIcon() {
+        return new ImageIcon(IconBank.class.getResource("/images/mc.gif"));
+    }
+
     @Nonnull
     public static ImageIcon getBlank() {
         return blank;

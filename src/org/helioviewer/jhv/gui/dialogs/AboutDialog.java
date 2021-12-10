@@ -87,7 +87,7 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
         pane.setOpaque(false);
 
         JPanel banner = new JPanel(new BorderLayout());
-        banner.add(new JLabel(IconBank.getIcon(JHVIcon.HVLOGO_SMALL)), BorderLayout.LINE_START);
+        banner.add(new JLabel(IconBank.getAIcon()/*getIcon(JHVIcon.HVLOGO_SMALL)*/), BorderLayout.LINE_START);
         banner.add(pane, BorderLayout.LINE_END);
         banner.setBorder(BorderFactory.createEmptyBorder(5, 35, 5, 35));
         return banner;
