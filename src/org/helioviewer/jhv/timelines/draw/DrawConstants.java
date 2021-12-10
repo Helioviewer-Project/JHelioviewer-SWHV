@@ -20,17 +20,17 @@ public class DrawConstants {
     public static final int INTERVAL_SELECTION_HEIGHT = 20;
     public static final int RANGE_SELECTION_WIDTH = 15;
 
-    public static final Color AVAILABLE_INTERVAL_BACKGROUND_COLOR = new Color(224, 224, 224);
-    public static final Color SELECTED_INTERVAL_BACKGROUND_COLOR = Color.WHITE;
-    public static final Color BORDER_COLOR = new Color(182, 190, 206);
+    public static final Color AVAILABLE_INTERVAL_BACKGROUND_COLOR = UIGlobals.midColor.darker();
+    public static final Color SELECTED_INTERVAL_BACKGROUND_COLOR = UIGlobals.backColor.darker();
+    public static final Color BORDER_COLOR = UIGlobals.foreColor;
 
-    public static final Color TICK_LINE_COLOR = Color.LIGHT_GRAY;
-    public static final Color LABEL_TEXT_COLOR = Color.BLACK;
-    public static final Color TEXT_COLOR = Color.WHITE;
-    public static final Color TEXT_BACKGROUND_COLOR = Color.GRAY;
+    public static final Color TICK_LINE_COLOR = UIGlobals.foreColor;
+    public static final Color LABEL_TEXT_COLOR = UIGlobals.foreColor;
+    public static final Color TEXT_COLOR = UIGlobals.foreColor;
+    public static final Color TEXT_BACKGROUND_COLOR = UIGlobals.backColor;
 
-    public static final Color MOVIE_FRAME_COLOR = Color.BLACK;
-    public static final Color MOVIE_INTERVAL_COLOR = Color.LIGHT_GRAY;
+    public static final Color MOVIE_FRAME_COLOR = UIGlobals.foreColor;
+    public static final Color MOVIE_INTERVAL_COLOR = UIGlobals.backColor;
 
     public static final DateTimeFormatter FULL_DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd\nHH:mm:ss");
     public static final DateTimeFormatter FULL_DATE_TIME_FORMAT_NO_SEC = DateTimeFormatter.ofPattern("yyyy-MM-dd\nHH:mm");
