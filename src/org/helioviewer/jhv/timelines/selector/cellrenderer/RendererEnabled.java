@@ -16,8 +16,8 @@ public class RendererEnabled extends DefaultTableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
-        if (value instanceof TimelineLayer) {
-            checkBox.setSelected(((TimelineLayer) value).isEnabled());
+        if (value instanceof TimelineLayer layer) {
+            checkBox.setSelected(layer.isEnabled());
         }
         checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
         return checkBox;

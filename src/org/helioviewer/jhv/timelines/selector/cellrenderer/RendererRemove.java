@@ -15,7 +15,7 @@ public class RendererRemove extends DefaultTableCellRenderer {
     @Override
     public void setValue(Object value) {
         setBorder(null); //!
-        if (value instanceof TimelineLayer && ((TimelineLayer) value).isDeletable()) {
+        if (value instanceof TimelineLayer layer && layer.isDeletable()) {
             setFont(font);
             setText(Buttons.close);
         } else
