@@ -51,7 +51,7 @@ public class UIGlobals {
         int defaultSize = font.getSize();
 
         if (System.getProperty("jhv.os").equals("mac")) {
-            //defaultSize -= 1;
+            defaultSize -= 1;
 
             ImageIcon cursor = IconBank.getIcon(JHVIcon.CLOSED_HAND_MAC);
             cursor = cursor == null ? IconBank.getBlank() : cursor;

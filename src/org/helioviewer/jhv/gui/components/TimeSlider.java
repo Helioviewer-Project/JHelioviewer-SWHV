@@ -13,6 +13,7 @@ import java.awt.event.MouseWheelListener;
 
 import javax.swing.JLabel;
 import javax.swing.JSlider;
+import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicSliderUI;
 
 import org.helioviewer.jhv.gui.UIGlobals;
@@ -144,9 +145,9 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
     // All functions for size calculations stay the same.
     private static class TimeSliderUI extends BasicSliderUI {
 
-        private static final Color notCachedColor = UIGlobals.backColor;
-        private static final Color partialCachedColor = UIGlobals.midColor;
-        private static final Color completeCachedColor = UIGlobals.foreColor;
+        private static final Color completeCachedColor = UIManager.getColor("ProgressBar.foreground");
+        private static final Color partialCachedColor = completeCachedColor.darker();
+        private static final Color notCachedColor = UIManager.getColor("ProgressBar.background");
 
         private static final BasicStroke thinStroke = new BasicStroke(1);
         private static final BasicStroke thickStroke = new BasicStroke(4);
