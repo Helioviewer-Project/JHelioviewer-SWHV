@@ -24,7 +24,7 @@ public class RendererColor extends DefaultTableCellRenderer {
         super.paintComponent(g);
         if (c != null) {
             g.setColor(c);
-            g.fillRect(0, getHeight() / 2 - 1, getWidth(), 2);
+            g.fillRect(4, getHeight() / 2 - 1, getWidth() - 4, 2);
         }
     }
 
