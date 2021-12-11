@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.timelines.chart;
 
-import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -57,7 +56,6 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         drawInterval(g);
         drawMovieInterval(g, availableAxis);
         drawLabels(g, availableAxis, selectedAxis);
-        drawBorders(g);
         drawIntervalGraspPoints(g);
         drawIntervalHBar(g);
     }
@@ -85,7 +83,7 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
     }
 
     private void drawInterval(Graphics2D g) {
-        g.setColor(Color.black);
+        g.setColor(DrawConstants.INTERVAL_BORDER_COLOR);
         g.fillRect(leftIntervalBorderPosition, getHeight() - 2, rightIntervalBorderPosition - leftIntervalBorderPosition, 2);
         g.setColor(DrawConstants.BORDER_COLOR);
         g.fillRect(leftIntervalBorderPosition, 0, rightIntervalBorderPosition - leftIntervalBorderPosition, 1);
@@ -136,18 +134,14 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         }
     }
 
-    private static void drawBorders(Graphics2D g) {
-        g.setColor(DrawConstants.BORDER_COLOR);
-    }
-
     private void drawIntervalGraspPoints(Graphics2D g) {
-        g.setColor(Color.BLACK);
+        g.setColor(DrawConstants.INTERVAL_BORDER_COLOR);
         g.fill(new RoundRectangle2D.Double(leftIntervalBorderPosition - 1, 0, 2, getHeight(), 5, 5));
         g.fill(new RoundRectangle2D.Double(rightIntervalBorderPosition - 1, 0, 2, getHeight(), 5, 5));
     }
 
     private void drawIntervalHBar(Graphics2D g) {
-        g.setColor(Color.BLACK);
+        g.setColor(DrawConstants.INTERVAL_BORDER_COLOR);
         g.fill(new RoundRectangle2D.Double(DrawConstants.GRAPH_LEFT_SPACE, 0, leftIntervalBorderPosition - DrawConstants.GRAPH_LEFT_SPACE, 2, 5, 5));
         g.fill(new RoundRectangle2D.Double(rightIntervalBorderPosition, 0, getWidth() - rightIntervalBorderPosition - DrawConstants.GRAPH_RIGHT_SPACE, 2, 5, 5));
     }

@@ -22,7 +22,8 @@ public class DrawConstants {
 
     public static final Color AVAILABLE_INTERVAL_BACKGROUND_COLOR = UIGlobals.midColor.darker();
     public static final Color SELECTED_INTERVAL_BACKGROUND_COLOR = UIGlobals.backColor.darker().darker();
-    public static final Color BORDER_COLOR = UIGlobals.foreColor;
+    public static final Color INTERVAL_BORDER_COLOR = SELECTED_INTERVAL_BACKGROUND_COLOR.darker();
+    public static final Color BORDER_COLOR = SELECTED_INTERVAL_BACKGROUND_COLOR.brighter();
 
     public static final Color TICK_LINE_COLOR = UIGlobals.foreColor;
     public static final Color LABEL_TEXT_COLOR = UIGlobals.foreColor;

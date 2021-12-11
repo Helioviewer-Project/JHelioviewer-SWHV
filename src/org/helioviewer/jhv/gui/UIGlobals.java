@@ -24,15 +24,12 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.log.Log;
 
-import com.formdev.flatlaf.FlatDarkLaf;
-import com.jidesoft.plaf.LookAndFeelFactory;
-
 public class UIGlobals {
 
     public static void setLaf() {
         try {
-            FlatDarkLaf.setup();
-            LookAndFeelFactory.installJideExtension();
+            com.formdev.flatlaf.FlatDarkLaf.setup();
+            com.jidesoft.plaf.LookAndFeelFactory.installJideExtension();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -54,7 +51,7 @@ public class UIGlobals {
         int defaultSize = font.getSize();
 
         if (System.getProperty("jhv.os").equals("mac")) {
-            defaultSize -= 1;
+            //defaultSize -= 1;
 
             ImageIcon cursor = IconBank.getIcon(JHVIcon.CLOSED_HAND_MAC);
             cursor = cursor == null ? IconBank.getBlank() : cursor;
@@ -101,6 +98,7 @@ public class UIGlobals {
         UIManager.put("CheckBox.arc", arc);
         UIManager.put("ProgressBar.arc", arc);
         UIManager.put("TextComponent.arc", arc);
+        UIManager.put("Component.arrowType", "triangle");
 
         try (InputStream is = FileUtils.getResource("/fonts/DejaVuSansCondensed.ttf")) {
             canvasFont = Font.createFont(Font.TRUETYPE_FONT, is);
