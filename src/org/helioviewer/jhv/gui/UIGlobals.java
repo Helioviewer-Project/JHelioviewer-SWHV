@@ -94,7 +94,13 @@ public class UIGlobals {
 
         // setUIFont(uiFont);
         UIManager.getLookAndFeelDefaults().put("defaultFont", uiFont);
-        UIManager.put("TextComponent.arc", 5);
+
+        int arc = 8;
+        UIManager.put("Button.arc", arc);
+        UIManager.put("Component.arc", arc);
+        UIManager.put("CheckBox.arc", arc);
+        UIManager.put("ProgressBar.arc", arc);
+        UIManager.put("TextComponent.arc", arc);
 
         try (InputStream is = FileUtils.getResource("/fonts/DejaVuSansCondensed.ttf")) {
             canvasFont = Font.createFont(Font.TRUETYPE_FONT, is);
