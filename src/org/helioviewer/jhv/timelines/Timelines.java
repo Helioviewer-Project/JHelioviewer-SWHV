@@ -40,13 +40,11 @@ public class Timelines implements MainContentPanelPlugin {
         JHVFrame.getMainContentPanel().addPlugin(this);
 
         Movie.addTimeListener(dc);
-        Movie.addTimeRangeListener(dc);
         JHVRelatedEvents.addHighlightListener(dc);
     }
 
     public void uninstallTimelines() {
         JHVRelatedEvents.removeHighlightListener(dc);
-        Movie.removeTimeRangeListener(dc);
         Movie.removeTimeListener(dc);
 
         JHVFrame.getMainContentPanel().removePlugin(this);

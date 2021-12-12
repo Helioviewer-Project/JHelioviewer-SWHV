@@ -3,6 +3,8 @@ package org.helioviewer.jhv.timelines.draw;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.Timer;
@@ -20,7 +22,7 @@ import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.json.JSONObject;
 
-public class DrawController implements LazyComponent, StatusReceiver, JHVEventListener.Highlight, TimeListener.Change, TimeListener.Range {
+public class DrawController implements LazyComponent, StatusReceiver, JHVEventListener.Highlight, TimeListener.Change {
 
     public interface Listener {
         void drawRequest();
@@ -39,16 +41,36 @@ public class DrawController implements LazyComponent, StatusReceiver, JHVEventLi
     private static long currentTime;
     private static boolean locked;
 
-    private static final Timer layersTimer = new Timer(1000 / 2, e -> {
-        long start = TimeUtils.ceilSec(selectedAxis.start());
-        long end = TimeUtils.floorSec(selectedAxis.end());
-        MoviePanel.getInstance().syncLayersSpan(start, end);
-    });
+    private static class LockedLayersUpdater {
+
+        private final Timer timer;
+
+        LockedLayersUpdater() {
+            ActionListener syncLayers = new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    timer.stop();
+                    long start = TimeUtils.ceilSec(selectedAxis.start());
+                    long end = TimeUtils.floorSec(selectedAxis.end());
+                    MoviePanel.getInstance().syncLayersSpan(start, end);
+                }
+            };
+
+            timer = new Timer(1000 / 2, syncLayers);
+            timer.setRepeats(false);
+        }
+
+        void update() {
+            timer.restart();
+        }
+
+    }
+
+    private static final LockedLayersUpdater layersUpdater = new LockedLayersUpdater();
 
     public DrawController() {
         long t = System.currentTimeMillis();
         setSelectedInterval(t - 2 * TimeUtils.DAY_IN_MILLIS, t);
-        layersTimer.setRepeats(false);
         UITimer.register(this);
     }
 
@@ -184,7 +206,7 @@ public class DrawController implements LazyComponent, StatusReceiver, JHVEventLi
 
     private static void setAvailableInterval() {
         if (locked)
-            layersTimer.restart();
+            layersUpdater.update();
 
         long diff = selectedAxis.end() - selectedAxis.start();
         long availableStart = selectedAxis.start() - diff;
@@ -251,12 +273,6 @@ public class DrawController implements LazyComponent, StatusReceiver, JHVEventLi
         createGraphArea();
         moveX(0); // force recalculation of polylines
         drawRequest();
-    }
-
-    @Override
-    public void timeRangeChanged(long start, long end) {
-        if (locked)
-            setSelectedInterval(start, end);
     }
 
     @Override
