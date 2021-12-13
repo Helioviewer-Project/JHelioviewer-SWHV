@@ -28,6 +28,10 @@ import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 public class JHelioviewer {
 
     public static void main(String[] args) throws Exception {
+        System.setProperty("apple.awt.application.appearance", "NSAppearanceNameDarkAqua");
+        System.setProperty("apple.awt.application.name", "JHelioviewer");
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
+
         if (isHeadless())
             throw new Exception("This application cannot run in a headless configuration.");
 
