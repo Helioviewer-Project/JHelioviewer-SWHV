@@ -14,9 +14,8 @@ import org.helioviewer.jhv.gui.UIGlobals;
 @SuppressWarnings("serial")
 class CollapsiblePaneButton extends JToggleButton {
 
-    private static final Color color = UIGlobals.backColor;
-    private static final Color bright = brighter(color, 0.85);
-    private static final Color dark = darker(color, 0.9);
+    private static final Color bright = brighter(UIGlobals.backColor, 0.85);
+    private static final Color dark = darker(UIGlobals.backColor, 0.9);
 
     CollapsiblePaneButton() {
         setContentAreaFilled(false);
@@ -58,14 +57,14 @@ class CollapsiblePaneButton extends JToggleButton {
         Point ph = new Point(0, h);
 
         if (isSelected()) {
+            g.setPaint(new GradientPaint(p0, bright, ph, dark));
+            g.fillRect(0, 0, w, h / 2);
+            g.setPaint(new GradientPaint(p0, dark, ph, bright));
+            g.fillRect(0, h / 2, w, h / 2);
+        } else {
             g.setPaint(new GradientPaint(p0, dark, ph, bright));
             g.fillRect(0, 0, w, h / 2);
             g.setPaint(new GradientPaint(p0, bright, ph, dark));
-            g.fillRect(0, h / 2, w, h / 2);
-        } else {
-            g.setPaint(new GradientPaint(p0, dark, ph, color));
-            g.fillRect(0, 0, w, h / 2);
-            g.setPaint(new GradientPaint(p0, color, ph, dark));
             g.fillRect(0, h / 2, w, h / 2);
         }
         g.dispose();
