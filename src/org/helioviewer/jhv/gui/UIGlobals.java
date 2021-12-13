@@ -56,8 +56,6 @@ public class UIGlobals {
             ImageIcon cursor = IconBank.getIcon(JHVIcon.CLOSED_HAND_MAC);
             cursor = cursor == null ? IconBank.getBlank() : cursor;
             closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursor.getImage(), new Point(5, 1), cursor.toString());
-
-            System.setProperty("apple.laf.useScreenMenuBar", "true"); // proper menu bar
         } else {
             ImageIcon cursor = IconBank.getIcon(JHVIcon.CLOSED_HAND);
             cursor = cursor == null ? IconBank.getBlank() : cursor;
