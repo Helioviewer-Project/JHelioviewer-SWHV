@@ -145,7 +145,7 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
     // All functions for size calculations stay the same.
     private static class TimeSliderUI extends BasicSliderUI {
 
-        private static final Color completeCachedColor = UIManager.getColor("ProgressBar.foreground");
+        private static final Color completeCachedColor = UIManager.getColor("Table.selectionBackground");
         private static final Color partialCachedColor = completeCachedColor.darker();
         private static final Color notCachedColor = UIManager.getColor("ProgressBar.background");
 

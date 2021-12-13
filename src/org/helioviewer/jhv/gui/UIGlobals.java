@@ -28,7 +28,7 @@ public class UIGlobals {
 
     public static void setLaf() {
         try {
-            com.formdev.flatlaf.FlatDarkLaf.setup();
+            com.formdev.flatlaf.intellijthemes.FlatDarkFlatIJTheme.setup();
             com.jidesoft.plaf.LookAndFeelFactory.installJideExtension();
         } catch (Exception e) {
             e.printStackTrace();
@@ -92,13 +92,13 @@ public class UIGlobals {
         // setUIFont(uiFont);
         UIManager.getLookAndFeelDefaults().put("defaultFont", uiFont);
 
-        int arc = 8;
+        int arc = 6;
         UIManager.put("Button.arc", arc);
-        UIManager.put("Component.arc", arc);
         UIManager.put("CheckBox.arc", arc);
+        UIManager.put("Component.arc", arc);
         UIManager.put("ProgressBar.arc", arc);
         UIManager.put("TextComponent.arc", arc);
-        UIManager.put("Component.arrowType", "triangle");
+        // UIManager.put("Component.arrowType", "triangle");
 
         try (InputStream is = FileUtils.getResource("/fonts/DejaVuSansCondensed.ttf")) {
             canvasFont = Font.createFont(Font.TRUETYPE_FONT, is);

@@ -20,7 +20,7 @@ public class DrawConstants {
     public static final int INTERVAL_SELECTION_HEIGHT = 20;
     public static final int RANGE_SELECTION_WIDTH = 15;
 
-    public static final Color AVAILABLE_INTERVAL_BACKGROUND_COLOR = UIGlobals.midColor.darker();
+    public static final Color AVAILABLE_INTERVAL_BACKGROUND_COLOR = UIGlobals.backColor.darker();
     public static final Color SELECTED_INTERVAL_BACKGROUND_COLOR = UIGlobals.backColor.darker().darker();
     public static final Color INTERVAL_BORDER_COLOR = SELECTED_INTERVAL_BACKGROUND_COLOR.darker();
     public static final Color BORDER_COLOR = SELECTED_INTERVAL_BACKGROUND_COLOR.brighter();

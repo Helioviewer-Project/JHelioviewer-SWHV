@@ -15,6 +15,7 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.base.lut.LUT;
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -175,7 +176,7 @@ public class RadioData extends AbstractTimelineLayer {
 
     @Override
     public Color getDataColor() {
-        return Color.BLACK;
+        return UIGlobals.foreColor;
     }
 
     @Override
