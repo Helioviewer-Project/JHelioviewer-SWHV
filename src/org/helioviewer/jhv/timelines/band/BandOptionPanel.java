@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.io.BufferedWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -43,7 +42,6 @@ class BandOptionPanel extends JPanel {
         c.gridx = 0;
         c.anchor = GridBagConstraints.LINE_START;
         JButton pickColor = new JButton("Line color");
-        pickColor.setMargin(new Insets(0, 0, 0, 0));
         pickColor.setToolTipText("Change the color of the current line");
         pickColor.addActionListener(e -> {
             Color newColor = JColorChooser.showDialog(JHVFrame.getFrame(), "Choose Line Color", band.getDataColor());

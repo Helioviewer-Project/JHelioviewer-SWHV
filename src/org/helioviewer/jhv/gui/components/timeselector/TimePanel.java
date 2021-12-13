@@ -36,10 +36,10 @@ class TimePanel extends JPanel {
 
     TimePanel(String tip) {
         setLayout(new GridBagLayout());
-        setBackground(textField.getBackground());
-        setBorder(textField.getBorder());
+        //setBackground(textField.getBackground());
+        //setBorder(textField.getBorder());
 
-        textField.setBorder(null);
+        //textField.setBorder(null);
         textField.setToolTipText(tip);
         calendarButton.setMargin(new Insets(0, 0, 0, 0));
         calendarButton.setToolTipText(tip);

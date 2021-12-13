@@ -22,7 +22,7 @@ public class CadencePanel extends JPanel {
         setLayout(new FlowLayout(FlowLayout.TRAILING, 5, 0));
 
         setCadence(APIRequest.CADENCE_DEFAULT);
-        spinnerCadence.setPreferredSize(new Dimension(50, spinnerCadence.getPreferredSize().height));
+        spinnerCadence.setPreferredSize(new Dimension(60, spinnerCadence.getPreferredSize().height));
         comboUnit.setSelectedItem("min");
         comboUnit.addActionListener(e -> spinnerCadence.setEnabled(comboUnit.getSelectedIndex() != 4));
 
