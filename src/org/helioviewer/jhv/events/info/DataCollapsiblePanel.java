@@ -1,7 +1,8 @@
 package org.helioviewer.jhv.events.info;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
+
+import javax.swing.JComponent;
 
 import org.helioviewer.jhv.gui.components.CollapsiblePane;
 
@@ -12,8 +13,8 @@ class DataCollapsiblePanel extends CollapsiblePane {
 
     private final DataCollapsiblePanelModel model;
 
-    DataCollapsiblePanel(String title, Component component, boolean startExpanded, DataCollapsiblePanelModel _model) {
-        super(title, component, startExpanded);
+    DataCollapsiblePanel(String title, JComponent managed, boolean startExpanded, DataCollapsiblePanelModel _model) {
+        super(title, managed, startExpanded);
         isExpanded = startExpanded;
         model = _model;
     }

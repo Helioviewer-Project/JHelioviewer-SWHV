@@ -1,13 +1,10 @@
 package org.helioviewer.jhv.gui.components;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.UIGlobals;
@@ -18,27 +15,23 @@ import org.helioviewer.jhv.gui.UIGlobals;
 public class CollapsiblePane extends JComponent implements ActionListener {
 
     final CollapsiblePaneButton toggleButton;
-    private final JPanel component;
+    private final JComponent managed;
     private String title;
 
-    public CollapsiblePane(String _title, Component managed, boolean startExpanded) {
+    public CollapsiblePane(String _title, JComponent _managed, boolean startExpanded) {
         setLayout(new BorderLayout());
 
-        component = new JPanel(new BorderLayout());
-        component.add(managed);
-        ComponentUtils.setVisible(component, startExpanded);
+        managed = _managed;
+        ComponentUtils.setVisible(managed, startExpanded);
 
         toggleButton = new CollapsiblePaneButton();
         toggleButton.setSelected(startExpanded);
         toggleButton.setFont(UIGlobals.uiFontSmallBold);
-        int height = toggleButton.getFontMetrics(UIGlobals.uiFontSmallBold).getHeight();
-        toggleButton.setPreferredSize(new Dimension(-1, height + 4));
         toggleButton.addActionListener(this);
-
         setTitle(_title);
 
         add(toggleButton, BorderLayout.PAGE_START);
-        add(component, BorderLayout.CENTER);
+        add(managed, BorderLayout.CENTER);
     }
 
     void setTitle(String _title) {
@@ -48,9 +41,9 @@ public class CollapsiblePane extends JComponent implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        boolean toggle = !component.isVisible();
+        boolean toggle = !managed.isVisible();
+        ComponentUtils.setVisible(managed, toggle);
         toggleButton.setSelected(toggle);
-        ComponentUtils.setVisible(component, toggle);
         setTitle(title);
     }
 
