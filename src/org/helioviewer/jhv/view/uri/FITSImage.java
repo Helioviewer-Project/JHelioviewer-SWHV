@@ -14,6 +14,7 @@ import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 import nom.tam.fits.HeaderCard;
 import nom.tam.fits.ImageHDU;
+import nom.tam.fits.header.Bitpix;
 import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
 
@@ -78,13 +79,13 @@ class FITSImage implements URIImageReader {
     private static final double GAMMA = 1 / 2.2;
     private static final long BLANK = 0; // in case it doesn't exist, very unlikely value
 
-    private static float getValue(int bpp, Object lineData, int i, long blank, double bzero, double bscale) {
-        double v = switch (bpp) {
-            case BasicHDU.BITPIX_SHORT -> ((short[]) lineData)[i];
-            case BasicHDU.BITPIX_INT -> ((int[]) lineData)[i];
-            case BasicHDU.BITPIX_LONG -> ((long[]) lineData)[i];
-            case BasicHDU.BITPIX_FLOAT -> ((float[]) lineData)[i];
-            case BasicHDU.BITPIX_DOUBLE -> ((double[]) lineData)[i];
+    private static float getValue(Bitpix bitpix, Object lineData, int i, long blank, double bzero, double bscale) {
+        double v = switch (bitpix) {
+            case SHORT -> ((short[]) lineData)[i];
+            case INTEGER -> ((int[]) lineData)[i];
+            case LONG -> ((long[]) lineData)[i];
+            case FLOAT -> ((float[]) lineData)[i];
+            case DOUBLE -> ((double[]) lineData)[i];
             default -> ImageBuffer.BAD_PIXEL;
         };
         return (blank != BLANK && v == blank) || !Double.isFinite(v) ? ImageBuffer.BAD_PIXEL : (float) (bzero + v * bscale);
@@ -93,7 +94,7 @@ class FITSImage implements URIImageReader {
     // private static final int SAMPLE = 8;
     private static final int SAMPLE = 4;
 
-    private static float[] sampleImage(int bpp, int width, int height, Object[] pixelData, long blank, double bzero, double bscale) {
+    private static float[] sampleImage(Bitpix bitpix, int width, int height, Object[] pixelData, long blank, double bzero, double bscale) {
         int stepW = Math.max(SAMPLE * width / 1024, 1);
         int stepH = Math.max(SAMPLE * height / 1024, 1);
         ArrayList<Float> sampleData = new ArrayList<>((width / stepW) * (height / stepH));
@@ -101,7 +102,7 @@ class FITSImage implements URIImageReader {
         for (int j = 0; j < height; j += stepH) {
             Object lineData = pixelData[j];
             for (int i = 0; i < width; i += stepW) {
-                float v = getValue(bpp, lineData, i, blank, bzero, bscale);
+                float v = getValue(bitpix, lineData, i, blank, bzero, bscale);
                 if (v != ImageBuffer.BAD_PIXEL)
                     sampleData.add(v);
             }
@@ -110,14 +111,14 @@ class FITSImage implements URIImageReader {
     }
 
     /*
-        private static float[] getMinMax(int bpp, int width, int height, Object[] pixelData, long blank, double bzero, double bscale) {
+        private static float[] getMinMax(Bitpix bitpix, int width, int height, Object[] pixelData, long blank, double bzero, double bscale) {
             float min = Float.MAX_VALUE;
             float max = -Float.MAX_VALUE;
 
             for (int j = 0; j < height; j++) {
                 Object lineData = pixelData[j];
                 for (int i = 0; i < width; i++) {
-                    float v = getValue(bpp, lineData, i, blank, bzero, bscale);
+                    float v = getValue(bitpix, lineData, i, blank, bzero, bscale);
                     if (v != ImageBuffer.BAD_PIXEL) {
                         if (v > max)
                             max = v;
@@ -142,7 +143,7 @@ class FITSImage implements URIImageReader {
         int height = axes[0];
         int width = axes[1];
 
-        int bpp = hdu.getBitPix();
+        Bitpix bitpix = hdu.getBitpix();
         Object kernel = hdu.getKernel();
         if (!(kernel instanceof Object[] pixelData))
             throw new Exception("Cannot retrieve pixel data");
@@ -153,7 +154,7 @@ class FITSImage implements URIImageReader {
         } catch (Exception ignore) {
         }
 
-        if (bpp == BasicHDU.BITPIX_BYTE) {
+        if (bitpix == Bitpix.BYTE) {
             byte[][] inData = (byte[][]) pixelData;
             byte[] outData = new byte[width * height];
             for (int j = 0; j < height; j++) {
@@ -166,7 +167,7 @@ class FITSImage implements URIImageReader {
         double bscale = hdu.getBScale();
 
         if (minMax == null) {
-            float[] sampleData = sampleImage(bpp, width, height, pixelData, blank, bzero, bscale);
+            float[] sampleData = sampleImage(bitpix, width, height, pixelData, blank, bzero, bscale);
             Arrays.sort(sampleData);
 
             // System.out.println(">>> " + sampleData.length + " " + (int) (MIN_MULT * sampleData.length) + " " + (int) (MAX_MULT * sampleData.length));
@@ -174,7 +175,7 @@ class FITSImage implements URIImageReader {
                     sampleData[(int) (MIN_MULT * sampleData.length)],
                     sampleData[(int) (MAX_MULT * sampleData.length)]};
 
-            // minMax = getMinMax(bpp, width, height, pixelData, blank, bzero, bscale);
+            // minMax = getMinMax(bitpix, width, height, pixelData, blank, bzero, bscale);
             if (minMax[0] == minMax[1]) {
                 minMax[1] = minMax[0] + 1;
             }
@@ -184,25 +185,25 @@ class FITSImage implements URIImageReader {
 
         short[] outData = new short[width * height];
         float[] lut = new float[65536];
-        switch (bpp) {
-            case BasicHDU.BITPIX_SHORT, BasicHDU.BITPIX_INT, BasicHDU.BITPIX_LONG, BasicHDU.BITPIX_FLOAT -> {
+        switch (bitpix) {
+            case SHORT, INTEGER, LONG, FLOAT -> {
                 double scale = 65535. / Math.pow(range, GAMMA);
                 for (int j = 0; j < height; j++) {
                     Object lineData = pixelData[j];
                     for (int i = 0; i < width; i++) {
-                        float v = getValue(bpp, lineData, i, blank, bzero, bscale);
+                        float v = getValue(bitpix, lineData, i, blank, bzero, bscale);
                         int p = (int) MathUtils.clip(scale * Math.pow(v - minMax[0], GAMMA) + .5, 0, 65535);
                         lut[p] = v;
                         outData[width * (height - 1 - j) + i] = v == ImageBuffer.BAD_PIXEL ? 0 : (short) p;
                     }
                 }
             }
-            case BasicHDU.BITPIX_DOUBLE -> {
+            case DOUBLE -> {
                 double scale = 65535. / Math.log1p(range);
                 for (int j = 0; j < height; j++) {
                     Object lineData = pixelData[j];
                     for (int i = 0; i < width; i++) {
-                        float v = getValue(bpp, lineData, i, blank, bzero, bscale);
+                        float v = getValue(bitpix, lineData, i, blank, bzero, bscale);
                         int p = (int) MathUtils.clip(scale * Math.log1p(v - minMax[0]) + .5, 0, 65535);
                         lut[p] = v;
                         outData[width * (height - 1 - j) + i] = v == ImageBuffer.BAD_PIXEL ? 0 : (short) p;
