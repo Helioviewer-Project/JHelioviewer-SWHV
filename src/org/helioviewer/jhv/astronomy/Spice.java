@@ -44,8 +44,9 @@ public class Spice {
             long dt = deltat * 1000;
             Position.Cartesian[] ret = new Position.Cartesian[(int) ((end - start) / dt) + 1];
             int i = 0;
+            double[] v = new double[3];
             for (long milli = start; milli <= end; milli += dt) {
-                double[] v = positionRectangular(target, milli, frame, observer);
+                positionRectangular(target, milli, frame, observer, v);
                 ret[i++] = new Position.Cartesian(milli, v[0], v[1], v[2]);
             }
             //System.out.println((sw.elapsed().toNanos() / 1e9));
@@ -107,18 +108,18 @@ public class Spice {
 
     private static final double[] lightTimeUnused = new double[1];
 
-    private static double[] positionRectangular(String target, long milli, String frame, String observer) throws SpiceErrorException {
+    private static void positionRectangular(String target, long milli, String frame, String observer, double[] result) throws SpiceErrorException {
         double et = milli2et(milli);
-        double[] v = new double[3];
-        CSPICE.spkpos(target, et, frame, "NONE", observer, v, lightTimeUnused);
-        v[0] *= Sun.RadiusKMeterInv;
-        v[1] *= Sun.RadiusKMeterInv;
-        v[2] *= Sun.RadiusKMeterInv;
-        return v;
+        CSPICE.spkpos(target, et, frame, "NONE", observer, result, lightTimeUnused);
+        result[0] *= Sun.RadiusKMeterInv;
+        result[1] *= Sun.RadiusKMeterInv;
+        result[2] *= Sun.RadiusKMeterInv;
     }
 
     private static double[] positionLatitudinal(String target, long milli, String frame, String observer) throws SpiceErrorException {
-        return CSPICE.reclat(positionRectangular(target, milli, frame, observer));
+        double[] v = new double[3];
+        positionRectangular(target, milli, frame, observer, v);
+        return CSPICE.reclat(v);
     }
 
 }
