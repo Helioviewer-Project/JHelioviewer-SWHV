@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 
+import javax.swing.BorderFactory;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 
@@ -18,6 +19,7 @@ class CollapsiblePaneButton extends JToggleButton {
     private static final Color dark = darker(UIGlobals.backColor, 0.9);
 
     CollapsiblePaneButton() {
+        setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
         setContentAreaFilled(false);
         setFocusPainted(false);
         setBorderPainted(false);
