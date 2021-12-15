@@ -45,16 +45,16 @@ public class TimeSelectorPanel extends JPanel {
     }
 
     private final ArrayList<TimeListener.Selection> listeners = new ArrayList<>();
-    private final TimePanel startTimePanel = new TimePanel("Select start date");
-    private final TimePanel endTimePanel = new TimePanel("Select end date");
+    private final TimeField startField = new TimeField("Select start date");
+    private final TimeField endField = new TimeField("Select end date");
     private final CarringtonPicker carringtonPicker = new CarringtonPicker();
 
     public TimeSelectorPanel() {
         long milli = TimeUtils.START.milli;
         setTime(milli - 2 * TimeUtils.DAY_IN_MILLIS, milli);
 
-        startTimePanel.addListener(this::timeChanged);
-        endTimePanel.addListener(this::timeChanged);
+        startField.addListener(this::timeChanged);
+        endField.addListener(this::timeChanged);
         carringtonPicker.addListener(this::carringtonChanged);
 
         JideSplitButton backButton = new JideSplitButton(Buttons.skipBack);
@@ -79,7 +79,7 @@ public class TimeSelectorPanel extends JPanel {
 
         c.weightx = 1;
         c.gridx = 0;
-        add(startTimePanel, c);
+        add(startField, c);
         c.weightx = 0;
         c.gridx = 1;
         add(backButton, c);
@@ -88,7 +88,7 @@ public class TimeSelectorPanel extends JPanel {
 
         c.weightx = 1;
         c.gridx = 0;
-        add(endTimePanel, c);
+        add(endField, c);
         c.weightx = 0;
         c.gridx = 1;
         add(foreButton, c);
@@ -114,17 +114,17 @@ public class TimeSelectorPanel extends JPanel {
     public void setTime(long start, long end) {
         long finalStart = Math.min(start, end); // maybe popup error
         carringtonPicker.setTime(finalStart);
-        startTimePanel.setTime(finalStart);
-        endTimePanel.setTime(end);
+        startField.setTime(finalStart);
+        endField.setTime(end);
         listeners.forEach(listener -> listener.timeSelectionChanged(finalStart, end));
     }
 
     public long getStartTime() {
-        return startTimePanel.getTime();
+        return startField.getTime();
     }
 
     public long getEndTime() {
-        return endTimePanel.getTime();
+        return endField.getTime();
     }
 
     public void addListener(TimeListener.Selection listener) {
