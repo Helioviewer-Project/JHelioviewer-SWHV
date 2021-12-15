@@ -38,7 +38,6 @@ class TimeField extends JTextField {
             }
         });
         calendarButton.addActionListener(e -> {
-            setTimeFromText(false);
             if (calPopup == null) {
                 calendarButton.requestFocus();
                 showPopup();
@@ -54,14 +53,14 @@ class TimeField extends JTextField {
         addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                setTimeFromText(true);
+                setTimeFromText();
             }
         });
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    setTimeFromText(true);
+                    transferFocus();
                 }
             }
         });
@@ -112,12 +111,11 @@ class TimeField extends JTextField {
         listeners.forEach(CalendarListener::calendarAction);
     }
 
-    private void setTimeFromText(boolean propagate) {
+    private void setTimeFromText() {
         String text = getText();
         if (text != null) { // satisfy coverity
             setTime(TimeUtils.optParse(text, getTime()));
-            if (propagate)
-                informListeners();
+            informListeners();
         }
     }
 
