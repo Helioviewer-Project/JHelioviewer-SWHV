@@ -42,7 +42,6 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
     private final JideSplitPane content = new JideSplitPane(JideSplitPane.VERTICAL_SPLIT);
     private final JButton exportFitsButton = new JButton("Export FITS Header as XML");
 
-    private final WrappedTable fitsTable = new WrappedTable();
     private final FitsModel fitsModel = new FitsModel();
     private final HTMLPane basicArea = new HTMLPane();
     private final HTMLPane hvArea = new HTMLPane();
@@ -50,6 +49,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
     public MetaDataDialog() {
         super(JHVFrame.getFrame(), "Image Information");
 
+        WrappedTable fitsTable = new WrappedTable();
         fitsTable.setModel(fitsModel);
         fitsTable.setRowSorter(new TableRowSorter<>(fitsModel));
         int keywordWidth = new JLabel("MMMMMMMM").getPreferredSize().width;
@@ -134,7 +134,6 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
             root = doc.getDocumentElement().getElementsByTagName("helioviewer").item(0);
             if (root != null)
                 readXMLData(hvSB, root);
-            fitsTable.updateRowHeights();
             hvArea.setText(hvSB.toString().trim());
 
             String outFileName = JHVDirectory.EXPORTS.getPath() + m.getDisplayName().replace(' ', '_') + "__" + TimeUtils.formatFilename(m.getViewpoint().time.milli) + ".fits.xml";
