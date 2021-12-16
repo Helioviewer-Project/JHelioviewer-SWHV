@@ -7,8 +7,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 
-import com.jidesoft.icons.IconsFactory;
-
 public class IconBank {
 
     private static final ImageIcon blank = new ImageIcon(GraphicsEnvironment.getLocalGraphicsEnvironment().
@@ -29,10 +27,10 @@ public class IconBank {
 
     @Nullable
     public static ImageIcon getIcon(JHVIcon icon) {
-        return IconsFactory.getImageIcon(IconBank.class, "/images/" + icon.fname);
+        return com.jidesoft.icons.IconsFactory.getImageIcon(IconBank.class, "/images/" + icon.fname);
     }
 
-    @Nullable
+    @Nonnull
     public static ImageIcon getAIcon() {
         return new ImageIcon(IconBank.class.getResource("/images/mc.gif"));
     }

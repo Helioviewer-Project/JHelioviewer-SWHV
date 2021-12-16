@@ -21,8 +21,6 @@ import javax.swing.tree.TreeSelectionModel;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.interfaces.ObservationSelector;
 
-import com.jidesoft.swing.SearchableUtils;
-
 @SuppressWarnings("serial")
 public class DataSourcesTree extends JTree {
 
@@ -87,7 +85,7 @@ public class DataSourcesTree extends JTree {
 
         setSelectionModel(new OneLeafTreeSelectionModel());
         ToolTipManager.sharedInstance().registerComponent(this);
-        SearchableUtils.installSearchable(this).setRecursive(true);
+        com.jidesoft.swing.SearchableUtils.installSearchable(this).setRecursive(true);
 
         addMouseListener(new MouseAdapter() {
             @Override

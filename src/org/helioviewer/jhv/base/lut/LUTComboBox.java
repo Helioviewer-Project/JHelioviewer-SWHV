@@ -6,8 +6,6 @@ import java.util.Objects;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 
-import com.jidesoft.swing.SearchableUtils;
-
 @SuppressWarnings("serial")
 public class LUTComboBox extends JComboBox<String> {
 
@@ -17,7 +15,7 @@ public class LUTComboBox extends JComboBox<String> {
         lutMap = LUT.copyMap(); // duplicate
         setModel(new DefaultComboBoxModel<>(lutMap.keySet().toArray(String[]::new)));
         setToolTipText("Choose a color table");
-        SearchableUtils.installSearchable(this);
+        com.jidesoft.swing.SearchableUtils.installSearchable(this);
     }
 
     public LUTComboBox(String selected) {
