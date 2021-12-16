@@ -34,7 +34,6 @@ import org.w3c.dom.NodeList;
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 import com.jidesoft.swing.JideSplitPane;
-import com.jidesoft.swing.SearchableUtils;
 
 @SuppressWarnings("serial")
 public class MetaDataDialog extends StandardDialog implements ShowableDialog {
@@ -58,7 +57,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         fitsTable.getColumnModel().getColumn(1).setCellRenderer(new WrappedTable.WrappedTextRenderer());
 
         setInitFocusedComponent(fitsTable);
-        SearchableUtils.installSearchable(fitsTable);
+        com.jidesoft.swing.SearchableUtils.installSearchable(fitsTable);
 
         content.add(new JScrollPane(basicArea));
         content.add(new JScrollPane(fitsTable));
