@@ -24,7 +24,7 @@ class APIResponse {
                 JSONArray arr = data.getJSONArray("frames");
                 data.put("frames", arr.length()); // don't log timestamps, modifies input
             }
-            Log.debug("Response: " + data);
+            Log.info("Response: " + data);
 
             String message = data.optString("message", null);
             if (message != null) {

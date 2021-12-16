@@ -22,42 +22,6 @@ public class Log {
         return null;
     }
 
-    public static void log(Level logLevel, Object message, Throwable error) {
-        if (logLevel.equals(Level.TRACE)) {
-            trace(message, error);
-        } else if (logLevel.equals(Level.DEBUG)) {
-            debug(message, error);
-        } else if (logLevel.equals(Level.INFO)) {
-            info(message, error);
-        } else if (logLevel.equals(Level.WARN)) {
-            warn(message, error);
-        } else if (logLevel.equals(Level.ERROR)) {
-            error(message, error);
-        } else if (logLevel.equals(Level.FATAL)) {
-            fatal(message, error);
-        } else {
-            error("Log.log(" + logLevel + ", " + message + ", " + error + ") > Invalid log level.", new IllegalArgumentException("Unknown log level"));
-        }
-    }
-
-    public static void log(Level logLevel, Object message) {
-        if (logLevel.equals(Level.TRACE)) {
-            trace(message);
-        } else if (logLevel.equals(Level.DEBUG)) {
-            debug(message);
-        } else if (logLevel.equals(Level.INFO)) {
-            info(message);
-        } else if (logLevel.equals(Level.WARN)) {
-            warn(message);
-        } else if (logLevel.equals(Level.ERROR)) {
-            error(message);
-        } else if (logLevel.equals(Level.FATAL)) {
-            fatal(message);
-        } else {
-            error("Log.log(" + logLevel + ", " + message + ") > Invalid log level.", new IllegalArgumentException("Unknown log level"));
-        }
-    }
-
     public static void fatal(Object obj, Throwable error) {
         if (log.isEnabledFor(Level.FATAL)) {
             log.fatal(obj, error);
@@ -103,30 +67,6 @@ public class Log {
     public static void info(Object obj) {
         if (log.isEnabledFor(Level.INFO)) {
             log.info(obj);
-        }
-    }
-
-    public static void debug(Object obj, Throwable error) {
-        if (log.isEnabledFor(Level.DEBUG)) {
-            log.debug(obj, error);
-        }
-    }
-
-    public static void debug(Object obj) {
-        if (log.isEnabledFor(Level.DEBUG)) {
-            log.debug(obj);
-        }
-    }
-
-    public static void trace(Object obj, Throwable error) {
-        if (log.isEnabledFor(Level.TRACE)) {
-            log.trace(obj, error);
-        }
-    }
-
-    public static void trace(Object obj) {
-        if (log.isEnabledFor(Level.TRACE)) {
-            log.trace(obj);
         }
     }
 
