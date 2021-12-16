@@ -63,20 +63,13 @@ public class DataSources {
         put("label", "Goddard Space Flight Center").
         put("schema", "/data/sources_v1.0.json").
         build()).
-/*          put("GSFC SCI Test", new ImmutableMap.Builder<String, String>().
-                    put("API.getDataSources", "http://helioviewer.sci.gsfc.nasa.gov/api.php?action=getDataSources&verbose=true&enable=[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]").
-                    put("API.getJP2Image", "http://helioviewer.sci.gsfc.nasa.gov/api.php?action=getJP2Image&").
-                    put("API.getJPX", "http://helioviewer.sci.gsfc.nasa.gov/api.php?action=getJPX&").
-                    put("label", "Goddard Space Flight Center SCI Test").
-                    put("schema", "/data/sources_v1.0.json").
-                    build()). */
-/*          put("GSFC NDC Test", new ImmutableMap.Builder<String, String>().
-                    put("API.getDataSources", "http://gs671-heliovw7.ndc.nasa.gov/api.php?action=getDataSources&verbose=true&enable=[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]").
-                    put("API.getJP2Image", "http://gs671-heliovw7.ndc.nasa.gov/api.php?action=getJP2Image&").
-                    put("API.getJPX", "http://gs671-heliovw7.ndc.nasa.gov/api.php?action=getJPX&").
-                    put("label", "Goddard Space Flight Center NDC Test");.
-                    put("schema", "/data/sources_v1.0.json").
-                    build()). */
+        put("GSFC Beta", new ImmutableMap.Builder<String, String>().
+        put("API.getDataSources", "https://api.beta.helioviewer.org/v2/getDataSources/?verbose=true&enable=[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]").
+        put("API.getJP2Image", "https://api.beta.helioviewer.org/v2/getJP2Image/?").
+        put("API.getJPX", "https://api.beta.helioviewer.org/v2/getJPX/?").
+        put("label", "Goddard Space Flight Center Beta Server").
+        put("schema", "/data/sources_v1.0.json").
+        build()).
         put("ESAC", new ImmutableMap.Builder<String, String>().
         put("API.getDataSources", "http://soar.esac.esa.int/jpip-api/v2/getDataSources/?verbose=true&enable=[SOLO]").
         put("API.getJP2Image", "http://soar.esac.esa.int/jpip-api/v2/getJP2Image/?").
