@@ -122,7 +122,7 @@ public class JHelioviewer {
             GraphicsDevice[] screens = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
             return screens == null || screens.length == 0;
         } catch (HeadlessException e) {
-            Log2.error("isHeadless", e);
+            Log2.error(e);
             return true;
         }
     }

@@ -60,7 +60,7 @@ public record JHVUpdate(boolean verbose) implements Runnable {
                 }
             });
         } catch (IOException e) {
-            Log2.warn("Error retrieving update server", e);
+            Log2.warn(e);
             if (verbose)
                 Message.warn("Update check error", "While checking for a newer version got " + e.getLocalizedMessage());
         }
