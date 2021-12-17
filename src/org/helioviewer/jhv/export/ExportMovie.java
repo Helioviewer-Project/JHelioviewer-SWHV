@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
+import org.helioviewer.jhv.Log2;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.image.MappedImageFactory;
 import org.helioviewer.jhv.base.image.NIOImageFactory;
@@ -17,13 +18,8 @@ import org.helioviewer.jhv.threads.JHVThread;
 
 import com.jogamp.opengl.GL2;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class ExportMovie implements Movie.Listener {
 
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
     private static final ExportMovie instance = new ExportMovie();
     private static final ExecutorService encodeExecutor = Executors.newSingleThreadExecutor(new JHVThread.NamedThreadFactory("Movie Encode"));
 
@@ -54,7 +50,7 @@ public class ExportMovie implements Movie.Listener {
             BufferedImage eve = EVEImage == null ? null : NIOImageFactory.copyImage(EVEImage);
             encodeExecutor.execute(new FrameConsumer(exporter, screen, eve, EVEMovieLinePosition));
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "ExportMovie.handleMovieExport", e);
+            Log2.error(e);
         }
         Movie.grabDone();
 
@@ -118,7 +114,7 @@ public class ExportMovie implements Movie.Listener {
         try {
             disposeMovieWriter(true);
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "ExportMovie.stop", e);
+            Log2.error(e);
         }
     }
 
@@ -141,7 +137,7 @@ public class ExportMovie implements Movie.Listener {
             try {
                 movieExporter.encode(mainImage, eveImage, movieLinePosition);
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "ExportMovie.FrameConsumer", e);
+                Log2.error(e);
             } finally {
                 NIOImageFactory.free(eveImage);
                 MappedImageFactory.free(mainImage);
@@ -155,7 +151,7 @@ public class ExportMovie implements Movie.Listener {
             try {
                 movieExporter.close();
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "ExportMovie.CloseWriter", e);
+                Log2.error(e);
             }
             System.gc();
         }
