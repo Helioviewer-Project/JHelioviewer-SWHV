@@ -8,11 +8,15 @@ import java.nio.file.Path;
 import java.util.Properties;
 
 import org.helioviewer.jhv.io.DataSources;
-import org.helioviewer.jhv.log.Log;
+
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @SuppressWarnings("serial")
 public class Settings {
 
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
     private static final Path userPath = Path.of(JHVDirectory.SETTINGS.getPath(), "user.properties");
     private static final Properties defaults = new Properties() {
         {
@@ -33,7 +37,7 @@ public class Settings {
         try (BufferedReader reader = Files.newBufferedReader(userPath, StandardCharsets.UTF_8)) {
             settings.load(reader);
         } catch (Exception e) {
-            Log.warn("Settings > Could not load settings");
+            LOGGER.log(Level.WARNING, "Settings > Could not load settings", e);
         }
 
         if (getProperty("path.local") == null)
@@ -51,7 +55,7 @@ public class Settings {
             try (BufferedWriter writer = Files.newBufferedWriter(userPath, StandardCharsets.UTF_8)) {
                 settings.store(writer, null);
             } catch (Exception e) {
-                Log.error("Settings > Could not save settings", e);
+                LOGGER.log(Level.WARNING, "Settings > Could not save settings", e);
             }
         }
     }

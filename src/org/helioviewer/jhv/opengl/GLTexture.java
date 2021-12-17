@@ -12,11 +12,16 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 import org.helioviewer.jhv.imagedata.ImageBuffer;
-import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.opengl.GL2;
 
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class GLTexture {
+
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     public enum Unit {
         ZERO, ONE, TWO, THREE
@@ -63,7 +68,7 @@ public class GLTexture {
         int w = imageBuffer.width;
         int h = imageBuffer.height;
         if (w < 1 || h < 1 || w > GLInfo.maxTextureSize || h > GLInfo.maxTextureSize) {
-            Log.error("GLTexture.copyImageData2D: w= " + w + " h=" + h);
+            LOGGER.log(Level.SEVERE, "GLTexture.copyImageData2D: w= " + w + " h=" + h);
             return;
         }
 
@@ -90,7 +95,7 @@ public class GLTexture {
         int w = source.getWidth();
         int h = source.getHeight();
         if (w < 1 || h < 1 || w > GLInfo.maxTextureSize || h > GLInfo.maxTextureSize) {
-            Log.error("GLTexture.copyBufferedImage2D: w= " + w + " h=" + h);
+            LOGGER.log(Level.SEVERE, "GLTexture.copyBufferedImage2D: w= " + w + " h=" + h);
             return;
         }
 
