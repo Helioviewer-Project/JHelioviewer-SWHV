@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.Log2;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
@@ -26,14 +27,8 @@ import org.json.JSONObject;
 
 import com.jidesoft.swing.JideButton;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 @SuppressWarnings("serial")
 class BandOptionPanel extends JPanel {
-
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     BandOptionPanel(Band band) {
         setLayout(new GridBagLayout());
@@ -76,7 +71,7 @@ class BandOptionPanel extends JPanel {
                     jo.write(writer);
                     EventQueue.invokeLater(() -> JHVGlobals.displayNotification(fileName));
                 } catch (Exception ex) {
-                    LOGGER.log(Level.SEVERE, "Failed to write JSON", ex);
+                    Log2.error("Failed to write JSON", ex);
                 }
             }).start();
         });

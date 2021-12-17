@@ -7,6 +7,7 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
+import org.helioviewer.jhv.Log2;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
@@ -18,13 +19,7 @@ import okio.BufferedSource;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class PfssListDataLoader {
-
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     public static void submit(long start, long end) {
         EventQueueCallbackExecutor.pool.submit(new ListDataLoader(start, end), new Callback(start));
@@ -63,7 +58,7 @@ public class PfssListDataLoader {
                         urls.put(TimeUtils.parse(splitted[0]), PfssSettings.baseURL + splitted[1]);
                     }
                 } catch (Exception e) {
-                    LOGGER.log(Level.WARNING, "PFSS list error", e);
+                    Log2.warn("PFSS list error", e);
                 }
                 EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().put(urls));
 
@@ -90,7 +85,7 @@ public class PfssListDataLoader {
         @Override
         public void onFailure(@Nonnull Throwable t) {
             PfssPlugin.downloads--;
-            LOGGER.log(Level.SEVERE, "PfssNewDataLoader", t);
+            Log2.error(t);
         }
 
     }

@@ -3,6 +3,7 @@ package org.helioviewer.jhv;
 import java.lang.StackWalker;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -50,8 +51,8 @@ public class Log2 {
     }
 
     private static String getCaller(String msg) {
-        StackWalker.StackFrame frame = StackWalker.getInstance().walk(s -> s.skip(2).findFirst()).get(); //! unconditional get
-        String caller = frame.getClassName() + '.' + frame.getMethodName();
+        Optional<StackWalker.StackFrame> frame = StackWalker.getInstance().walk(s -> s.skip(2).findFirst());
+        String caller = frame.map(stackFrame -> stackFrame.getClassName() + '.' + stackFrame.getMethodName()).orElse("|unknown|");
         return msg == null ? caller : caller + " - " + msg;
     }
 
