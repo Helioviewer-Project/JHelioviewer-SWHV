@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.Log2;
 import org.helioviewer.jhv.io.FileUtils;
 
 import org.ehcache.Cache;
@@ -19,13 +20,8 @@ import org.ehcache.expiry.ExpiryPolicy;
 import org.ehcache.config.units.EntryUnit;
 import org.ehcache.config.units.MemoryUnit;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class JPIPCacheManager {
 
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
     private static final File levelCacheDir = new File(JHVDirectory.CACHE.getFile(), "JPIPLevel-3");
     private static final File streamCacheDir = new File(JHVDirectory.CACHE.getFile(), "JPIPStream-3");
 
@@ -74,7 +70,7 @@ public class JPIPCacheManager {
             if (clevel != null && clevel <= level)
                 return streamCache.get(key);
         } catch (Exception e) { // might get interrupted
-            LOGGER.log(Level.SEVERE, "JPIPCacheManager.get", e);
+            Log2.error(e);
         }
         return null;
     }
@@ -87,7 +83,7 @@ public class JPIPCacheManager {
                 streamCache.put(key, stream);
             }
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "JPIPCacheManager.put", e);
+            Log2.error(e);
         }
     }
 
@@ -105,7 +101,7 @@ public class JPIPCacheManager {
             levelManager.close();
             streamManager.close();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "JPIPCacheManager.close", e);
+            Log2.error(e);
         }
     }
 
@@ -115,7 +111,7 @@ public class JPIPCacheManager {
             levelManager.destroy();
             streamManager.destroy();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "JPIPCacheManager.clear", e);
+            Log2.error(e);
         }
         init();
     }
@@ -126,7 +122,7 @@ public class JPIPCacheManager {
             size += FileUtils.diskUsage(levelCacheDir);
             size += FileUtils.diskUsage(streamCacheDir);
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "JPIPCacheManager.getSize", e);
+            Log2.error(e);
         }
         return size;
     }

@@ -14,6 +14,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import org.helioviewer.jhv.Log2;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.JHVEventCache;
@@ -23,17 +24,11 @@ import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 // Popup displaying informations about a HEK event.
 // This panel is a JDialog, so that it can be displayed on top of an GLCanvas,
 // which is not possible for other Swing components.
 @SuppressWarnings("serial")
 public class SWEKEventInformationDialog extends JDialog implements DataCollapsiblePanelModel.Listener {
-
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     private JPanel allTablePanel;
 
@@ -239,7 +234,7 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            LOGGER.log(Level.SEVERE, "SWEKEventInformationDialog", t);
+            Log2.error(t);
         }
 
     }
