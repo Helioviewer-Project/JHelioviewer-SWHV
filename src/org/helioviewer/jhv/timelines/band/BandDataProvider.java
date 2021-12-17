@@ -8,7 +8,6 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.io.JSONUtils;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
@@ -19,8 +18,13 @@ import org.json.JSONObject;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.util.concurrent.FutureCallback;
 
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class BandDataProvider {
 
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
     private static final ArrayListMultimap<Band, Future<BandResponse>> workerMap = ArrayListMultimap.create();
 
     public static void loadBandTypes() {
@@ -79,12 +83,12 @@ public class BandDataProvider {
             if (result.bandName.equals(band.getBandType().getName()))
                 band.addToCache(result.values, result.dates);
             else
-                Log.error("Expected " + band.getBandType().getName() + ", got " + result.bandName);
+                LOGGER.log(Level.SEVERE, "Expected " + band.getBandType().getName() + ", got " + result.bandName);
         }
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log.error("Error downloading band", t);
+            LOGGER.log(Level.SEVERE, "Error downloading band", t);
         }
 
     }
@@ -107,7 +111,7 @@ public class BandDataProvider {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log.error("Error loading band", t);
+            LOGGER.log(Level.SEVERE, "Error loading band", t);
         }
 
     }
@@ -129,7 +133,7 @@ public class BandDataProvider {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log.error("Error downloading band types", t);
+            LOGGER.log(Level.SEVERE, "Error downloading band types", t);
         }
 
     }

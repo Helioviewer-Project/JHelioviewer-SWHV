@@ -22,16 +22,21 @@ import javax.swing.UIManager;
 
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.io.FileUtils;
-import org.helioviewer.jhv.log.Log;
+
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class UIGlobals {
+
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     public static void setLaf() {
         try {
             com.formdev.flatlaf.intellijthemes.FlatDarkFlatIJTheme.setup();
             com.jidesoft.plaf.LookAndFeelFactory.installJideExtension();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "setLaf", e);
         }
 
         if (!System.getProperty("jhv.os").equals("mac")) {
@@ -102,7 +107,7 @@ public class UIGlobals {
             canvasFont = Font.createFont(Font.TRUETYPE_FONT, is);
             GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(canvasFont);
         } catch (Exception e) {
-            Log.warn("Font not loaded correctly, fallback to default");
+            LOGGER.log(Level.WARNING, "Font not loaded correctly, fallback to default", e);
             canvasFont = new Font("SansSerif", Font.PLAIN, defaultSize);
         }
 
@@ -110,7 +115,7 @@ public class UIGlobals {
             uiFontMDI = Font.createFont(Font.TRUETYPE_FONT, is);
             GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(uiFontMDI);
         } catch (Exception e) {
-            Log.warn("Font not loaded correctly, fallback to default");
+            LOGGER.log(Level.WARNING, "Font not loaded correctly, fallback to default", e);
             uiFontMDI = new Font("SansSerif", Font.PLAIN, defaultSize);
         }
     }
