@@ -10,7 +10,7 @@ import java.util.Locale;
 
 import javax.swing.TransferHandler;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.Load;
 
@@ -57,7 +57,7 @@ class DropHandler extends TransferHandler {
                             try {
                                 FileUtils.listDir(f.toPath()).forEach(uri -> classify(uri, imageUris, jsonUris, cdfUris));
                             } catch (Exception e) {
-                                Log2.warn("Error reading directory " + f, e);
+                                Log.warn("Error reading directory " + f, e);
                             }
                         }
                     }
@@ -87,7 +87,7 @@ class DropHandler extends TransferHandler {
                 }
             }
         } catch (Exception e) {
-            Log2.warn("Import error", e);
+            Log.warn("Import error", e);
         }
 
         return false;

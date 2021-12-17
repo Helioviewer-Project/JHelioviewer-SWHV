@@ -4,7 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.SWEK;
@@ -35,7 +35,7 @@ public class ComesepHandler extends SWEKHandler {
                 long start = result.getLong("atearliest") * 1000;
                 long end = result.getLong("atlatest") * 1000;
                 if (end < start) {
-                    Log2.warn("Event end before start: " + result);
+                    Log.warn("Event end before start: " + result);
                     continue;
                 }
 
@@ -52,7 +52,7 @@ public class ComesepHandler extends SWEKHandler {
             }
             EventDatabase.dump_event2db(event2dbList, supplier);
         } catch (Exception e) {
-            Log2.error(e);
+            Log.error(e);
             return false;
         }
         return true;

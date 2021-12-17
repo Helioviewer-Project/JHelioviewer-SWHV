@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.view.DecodeExecutor;
@@ -52,7 +52,7 @@ public class LoadLayer {
                     try {
                         return loadView(executor, null, uri, forceFITS);
                     } catch (Exception e) {
-                        Log2.warn(uri.toString(), e);
+                        Log.warn(uri.toString(), e);
                         return null;
                     }
                 }).filter(Objects::nonNull).collect(Collectors.toList());
@@ -74,13 +74,13 @@ public class LoadLayer {
         @Override
         public void onFailure(@Nonnull Throwable t) {
             if (JHVThread.isInterrupted(t)) { // ignore
-                Log2.warn(t);
+                Log.warn(t);
                 return;
             }
 
             layer.unload();
 
-            Log2.error(t);
+            Log.error(t);
             Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
         }
 

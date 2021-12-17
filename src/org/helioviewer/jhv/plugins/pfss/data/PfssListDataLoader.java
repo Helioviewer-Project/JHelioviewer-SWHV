@@ -7,7 +7,7 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
@@ -58,7 +58,7 @@ public class PfssListDataLoader {
                         urls.put(TimeUtils.parse(splitted[0]), PfssSettings.baseURL + splitted[1]);
                     }
                 } catch (Exception e) {
-                    Log2.warn("PFSS list error", e);
+                    Log.warn("PFSS list error", e);
                 }
                 EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().put(urls));
 
@@ -85,7 +85,7 @@ public class PfssListDataLoader {
         @Override
         public void onFailure(@Nonnull Throwable t) {
             PfssPlugin.downloads--;
-            Log2.error(t);
+            Log.error(t);
         }
 
     }

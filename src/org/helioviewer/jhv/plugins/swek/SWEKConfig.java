@@ -14,7 +14,7 @@ import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.events.SWEK;
 import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.events.SWEKSupplier;
@@ -43,7 +43,7 @@ class SWEKConfig {
             SWEKGroup.setSWEKRelatedEvents(parseRelatedEvents(jo));
             return dtm;
         } catch (Exception e) {
-            Log2.error(e);
+            Log.error(e);
             return new DefaultTreeModel(new DefaultMutableTreeNode(""));
         }
     }
@@ -110,7 +110,7 @@ class SWEKConfig {
             URI eventIconURI = new URI(eventIconValue);
             return eventIconURI.getScheme().equals("iconbank") ? SWEKIconBank.getIcon(eventIconURI.getHost()) : SWEKIconBank.getIcon("Other");
         } catch (URISyntaxException e) {
-            Log2.warn(eventIconValue, e);
+            Log.warn(eventIconValue, e);
         }
         return IconBank.getBlank();
     }

@@ -8,7 +8,7 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.gui.Message;
@@ -56,7 +56,7 @@ public class LoadFootpoint {
                             JHVTime time = new JHVTime(parseTime(values[6]));
                             positionMap.put(time, ConnectUtils.toCartesian(time.milli, values[7], values[8]));
                         } catch (Exception e) {
-                            Log2.warn(e);
+                            Log.warn(e);
                         }
                     }
                 }
@@ -78,7 +78,7 @@ public class LoadFootpoint {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log2.error(t);
+            Log.error(t);
             Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
         }
 

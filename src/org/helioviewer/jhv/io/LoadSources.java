@@ -6,7 +6,7 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -60,7 +60,7 @@ class LoadSources implements Callable<DataSourcesParser> {
                 parser.parse(jo);
                 break;
             } catch (IOException e) {
-                // Log2.error(url, e);
+                // Log.error(url, e);
                 Thread.sleep(15000);
             }
         }
@@ -76,9 +76,9 @@ class LoadSources implements Callable<DataSourcesParser> {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log2.error(server, t);
+            Log.error(server, t);
             if (t instanceof ValidationException) {
-                ((ValidationException) t).getCausingExceptions().stream().map(ValidationException::getMessage).forEach(Log2::error);
+                ((ValidationException) t).getCausingExceptions().stream().map(ValidationException::getMessage).forEach(Log::error);
             }
         }
 

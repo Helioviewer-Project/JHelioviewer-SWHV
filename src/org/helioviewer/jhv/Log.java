@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 
 import org.helioviewer.jhv.time.TimeUtils;
 
-public class Log2 {
+public class Log {
 
     private static final Level loggedLevel = Level.INFO;
     private static final Logger root = Logger.getLogger("");
@@ -23,10 +23,10 @@ public class Log2 {
     private static final DateTimeFormatter fileFormatterLocal = TimeUtils.fileFormatter.withZone(zoneId);
     private static final DateTimeFormatter milliFormatterLocal = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(zoneId);
 
-    private static final String logFilename = JHVDirectory.LOGS.getPath() + "JHV_" + TimeUtils.format(fileFormatterLocal, System.currentTimeMillis()) + ".log";
+    private static final String filename = JHVDirectory.LOGS.getPath() + "JHV_" + TimeUtils.format(fileFormatterLocal, System.currentTimeMillis()) + ".log";
 
     static void init() throws Exception {
-        FileHandler fileHandler = new FileHandler(logFilename, 1024 * 1024, 1);
+        FileHandler fileHandler = new FileHandler(filename, 1024 * 1024, 1);
         fileHandler.setLevel(loggedLevel);
         fileHandler.setFormatter(new LogFormatter());
         ConsoleHandler consoleHandler = new ConsoleHandler();
@@ -57,8 +57,8 @@ public class Log2 {
         return msg == null ? caller : caller + " - " + msg;
     }
 
-    static String getLogFilename() {
-        return logFilename;
+    static String getFilename() {
+        return filename;
     }
 
     public static void info(String msg) {

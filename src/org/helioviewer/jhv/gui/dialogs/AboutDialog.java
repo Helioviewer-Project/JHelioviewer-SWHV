@@ -12,7 +12,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
@@ -109,7 +109,7 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
                 try (InputStream is = FileUtils.getResource(res)) {
                     new TextDialog("License - " + name.substring(0, name.indexOf('.')), FileUtils.streamToString(is), true).showDialog();
                 } catch (Exception ex) {
-                    Log2.error(ex);
+                    Log.error(ex);
                 }
             } else {
                 JHVGlobals.openURL(e.getURL().toString());

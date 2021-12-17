@@ -9,7 +9,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 
 public class ClipBoardCopier implements ClipboardOwner {
 
@@ -40,7 +40,7 @@ public class ClipBoardCopier implements ClipboardOwner {
             try {
                 return (String) contents.getTransferData(DataFlavor.stringFlavor);
             } catch (UnsupportedFlavorException | IOException e) {
-                Log2.warn(e);
+                Log.warn(e);
             }
         }
         return "";

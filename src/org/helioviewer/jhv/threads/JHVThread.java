@@ -10,7 +10,7 @@ import java.util.concurrent.ThreadFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 
 public class JHVThread {
 
@@ -60,7 +60,7 @@ public class JHVThread {
                 t.setDaemon(true);
                 return t;
             } catch (Exception e) {
-                Log2.error(e);
+                Log.error(e);
             }
             return null;
         }

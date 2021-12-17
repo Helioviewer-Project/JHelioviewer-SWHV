@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 
 import com.jogamp.opengl.GL2;
@@ -63,7 +63,7 @@ public class GLTexture {
         int w = imageBuffer.width;
         int h = imageBuffer.height;
         if (w < 1 || h < 1 || w > GLInfo.maxTextureSize || h > GLInfo.maxTextureSize) {
-            Log2.warn("w= " + w + " h=" + h);
+            Log.warn("w= " + w + " h=" + h);
             return;
         }
 
@@ -90,7 +90,7 @@ public class GLTexture {
         int w = source.getWidth();
         int h = source.getHeight();
         if (w < 1 || h < 1 || w > GLInfo.maxTextureSize || h > GLInfo.maxTextureSize) {
-            Log2.warn("w= " + w + " h=" + h);
+            Log.warn("w= " + w + " h=" + h);
             return;
         }
 

@@ -3,7 +3,7 @@ package org.helioviewer.jhv.opengl;
 import java.awt.GraphicsConfiguration;
 import java.awt.geom.AffineTransform;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.Message;
 
 import com.jogamp.opengl.GL2;
@@ -21,14 +21,14 @@ public class GLInfo {
     public static int maxTextureSize;
 
     static void glVersionError(String err) {
-        Log2.error(err);
+        Log.error(err);
         Message.err("OpenGL fatal error, JHelioviewer is not able to run:\n", err, true);
     }
 
     public static void get(GL2 gl) {
         glVersion = "OpenGL " + gl.glGetString(GL2.GL_VERSION);
-        Log2.info(glVersion);
-        //Log2.info("Extensions: " + gl.glGetString(GL2.GL_EXTENSIONS));
+        Log.info(glVersion);
+        // Log.info("Extensions: " + gl.glGetString(GL2.GL_EXTENSIONS));
         if (!gl.isExtensionAvailable("GL_VERSION_3_3")) {
             glVersionError("OpenGL 3.3 not supported.");
         }
@@ -52,7 +52,7 @@ public class GLInfo {
         int glErrorCode, errors = 0;
 
         while ((glErrorCode = gl.glGetError()) != GL2.GL_NO_ERROR) {
-            Log2.error("GL Error (" + glErrorCode + "): " + glu.gluErrorString(glErrorCode) + " - @" + message);
+            Log.error("GL Error (" + glErrorCode + "): " + glu.gluErrorString(glErrorCode) + " - @" + message);
             errors++;
         }
         return errors != 0;

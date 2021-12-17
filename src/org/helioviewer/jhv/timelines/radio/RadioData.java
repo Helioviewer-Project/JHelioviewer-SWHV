@@ -14,7 +14,7 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.APIRequest;
@@ -142,7 +142,7 @@ public class RadioData extends AbstractTimelineLayer {
         @Override
         public void onFailure(@Nonnull Throwable t) {
             done();
-            Log2.error(t);
+            Log.error(t);
         }
 
     }

@@ -5,7 +5,7 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.layers.selector.State;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
@@ -46,7 +46,7 @@ class LoadState {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log2.error(t);
+            Log.error(t);
             Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
         }
 

@@ -8,7 +8,7 @@ public class ExitHooks {
         try {
             ExportMovie.disposeMovieWriter(false);
         } catch (Exception e) {
-            Log2.warn("Movie was not shut down properly");
+            Log.warn("Movie was not shut down properly");
         }
     });
 
