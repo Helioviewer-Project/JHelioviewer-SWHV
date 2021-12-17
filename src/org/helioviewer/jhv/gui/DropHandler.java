@@ -12,12 +12,17 @@ import javax.swing.TransferHandler;
 
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.Load;
-import org.helioviewer.jhv.log.Log;
 
 import org.apache.commons.validator.routines.UrlValidator;
 
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 @SuppressWarnings("serial")
 class DropHandler extends TransferHandler {
+
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     @Override
     public boolean canImport(TransferHandler.TransferSupport support) {
@@ -57,7 +62,7 @@ class DropHandler extends TransferHandler {
                             try {
                                 FileUtils.listDir(f.toPath()).forEach(uri -> classify(uri, imageUris, jsonUris, cdfUris));
                             } catch (Exception e) {
-                                Log.error("Error reading directory " + f, e);
+                                LOGGER.log(Level.SEVERE, "Error reading directory " + f, e);
                             }
                         }
                     }
@@ -87,7 +92,7 @@ class DropHandler extends TransferHandler {
                 }
             }
         } catch (Exception e) {
-            Log.error("Import error", e);
+            LOGGER.log(Level.SEVERE, "Import error", e);
         }
 
         return false;
