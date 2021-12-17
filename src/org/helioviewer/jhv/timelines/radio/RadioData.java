@@ -14,6 +14,7 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
+import org.helioviewer.jhv.Log2;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.APIRequest;
@@ -34,13 +35,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.google.common.util.concurrent.FutureCallback;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class RadioData extends AbstractTimelineLayer {
-
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     static final YAxis yAxis = new YAxis(400, 20, new YAxisPositiveIdentityScale("MHz"));
 
@@ -147,7 +142,7 @@ public class RadioData extends AbstractTimelineLayer {
         @Override
         public void onFailure(@Nonnull Throwable t) {
             done();
-            LOGGER.log(Level.SEVERE, "RadioJPXDownload error", t);
+            Log2.error(t);
         }
 
     }

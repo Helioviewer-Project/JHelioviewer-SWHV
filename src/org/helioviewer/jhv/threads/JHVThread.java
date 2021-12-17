@@ -10,13 +10,9 @@ import java.util.concurrent.ThreadFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.helioviewer.jhv.Log2;
 
 public class JHVThread {
-
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     public static boolean isInterrupted(Throwable t) {
         return t instanceof CancellationException ||
@@ -64,7 +60,7 @@ public class JHVThread {
                 t.setDaemon(true);
                 return t;
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "JHVThread.NamedClassThreadFactory", e);
+                Log2.error(e);
             }
             return null;
         }

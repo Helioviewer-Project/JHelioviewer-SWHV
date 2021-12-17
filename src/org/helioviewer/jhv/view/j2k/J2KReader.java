@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import kdu_jni.KduException;
 
+import org.helioviewer.jhv.Log2;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.view.j2k.cache.CacheStatus;
 import org.helioviewer.jhv.view.j2k.image.ReadParams;
@@ -17,13 +18,7 @@ import org.helioviewer.jhv.view.j2k.io.jpip.JPIPResponse;
 import org.helioviewer.jhv.view.j2k.io.jpip.JPIPSocket;
 import org.helioviewer.jhv.view.j2k.io.jpip.JPIPStream;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 class J2KReader implements Runnable {
-
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     private final BooleanSignal readerSignal = new BooleanSignal();
 
@@ -57,7 +52,7 @@ class J2KReader implements Runnable {
                 myThread.interrupt();
                 myThread.join(100);
             } catch (Exception e) { // avoid exit from loop
-                LOGGER.log(Level.SEVERE, "abolish", e);
+                Log2.error(e);
             }
         }
     }
@@ -92,7 +87,7 @@ class J2KReader implements Runnable {
             try {
                 socket.close();
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "J2KReader.initJPIP() > Error closing socket", e);
+                Log2.error(e);
             }
             socket = null;
         }
@@ -229,13 +224,13 @@ class J2KReader implements Runnable {
                 try {
                     socket.close();
                 } catch (IOException ioe) {
-                    LOGGER.log(Level.SEVERE, "J2KReader.run() > Error closing socket", ioe);
+                    Log2.error("Error closing socket", ioe);
                 }
 
                 if (retries++ < 13)
                     readerSignal.signal(params); // signal to retry
                 else
-                    LOGGER.log(Level.SEVERE, "Retry limit reached: " + view.getURI()); // something may be terribly wrong
+                    Log2.error("Retry limit reached: " + view.getURI()); // something may be terribly wrong
             }
         }
     }
