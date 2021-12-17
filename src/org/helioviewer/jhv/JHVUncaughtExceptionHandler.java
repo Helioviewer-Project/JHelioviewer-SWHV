@@ -1,17 +1,12 @@
 package org.helioviewer.jhv;
 
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Properties;
+import java.nio.file.Path;
 
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
@@ -21,50 +16,31 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 
-import org.apache.log4j.NDC;
 import org.helioviewer.jhv.gui.ClipBoardCopier;
 import org.helioviewer.jhv.gui.components.base.HTMLPane;
-import org.helioviewer.jhv.log.Log;
 
 class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     private static final String BUG_URL = "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues";
 
-    private static final int default_width = 600;
-    private static final int default_height = 400;
-
     private static final JHVUncaughtExceptionHandler instance = new JHVUncaughtExceptionHandler();
 
     private JHVUncaughtExceptionHandler() {
-        try (InputStream is = JHVUncaughtExceptionHandler.class.getResourceAsStream("/sentry.properties")) {
-            Properties p = new Properties();
-            p.load(is);
-            p.stringPropertyNames().forEach(key -> System.setProperty(key, p.getProperty(key)));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
-    /**
-     * This method sets the default uncaught exception handler. Thus, this
-     * method should be called once when the application starts.
-     */
+    // This method should be called once when the application starts
     public static void setupHandlerForThread() {
         Thread.setDefaultUncaughtExceptionHandler(instance);
     }
 
     private static void showErrorDialog(String msg) {
-        ArrayList<Object> objects = new ArrayList<>();
-
         HTMLPane report = new HTMLPane();
         report.setOpaque(false);
         report.addHyperlinkListener(JHVGlobals.hyperOpenURL);
         report.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 10));
         report.setText("Fatal error detected." +
                 "<p>Please email this report at <a href='mailto:" + JHVGlobals.emailAddress + "'>" + JHVGlobals.emailAddress + "</a> " +
-                "or use it to open an issue at <a href='" + BUG_URL + "'>" + BUG_URL + "</a>.<br/>" +
-                "This report was sent to swhv.oma.be.");
-        objects.add(report);
+                "or use it to open an issue at <a href='" + BUG_URL + "'>" + BUG_URL + "</a>.<br/>");
 
         JLabel copyToClipboard = new JLabel("<html><a href=''>Click here to copy the error report to the clipboard.");
         copyToClipboard.addMouseListener(new MouseAdapter() {
@@ -79,15 +55,13 @@ class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
         textArea.setMargin(new Insets(5, 5, 5, 5));
         textArea.setText(msg);
         textArea.setEditable(false);
-        JScrollPane sp = new JScrollPane(textArea);
-        sp.setPreferredSize(new Dimension(default_width, default_height));
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(600, 400));
 
-        objects.add(copyToClipboard);
-        objects.add(new JSeparator());
-        objects.add(sp);
+        Object[] objects = new Object[]{report, copyToClipboard, new JSeparator(), scrollPane};
 
         JOptionPane optionPane = new JOptionPane();
-        optionPane.setMessage(objects.toArray());
+        optionPane.setMessage(objects);
         optionPane.setMessageType(JOptionPane.ERROR_MESSAGE);
         optionPane.setOptions(new String[]{"Quit JHelioviewer", "Continue"});
         JDialog dialog = optionPane.createDialog(null, "JHelioviewer: Fatal Error");
@@ -96,6 +70,8 @@ class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
         if ("Quit JHelioviewer".equals(optionPane.getValue()))
             System.exit(1);
     }
+
+    private boolean alreadySent;
 
     // we do not use the logger here, since it should work even before logging initialization
     @Override
@@ -107,33 +83,23 @@ class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
         }
 
         String msg = "";
-        StringBuilder sb = new StringBuilder();
+        msg += "Uncaught Exception in " + JHVGlobals.userAgent;
+        msg += "\nThread: " + t;
+        msg += "\nMessage: " + e.getMessage();
+        msg += "\nStacktrace:\n";
+        msg += stackTrace + "\n";
 
-        File logFile;
-        String logName = Log.getCurrentLogFile();
-        if (logName != null && (logFile = new File(logName)).canRead()) {
-            Log.error("Runtime exception", e);
-            try (BufferedReader input = Files.newBufferedReader(logFile.toPath(), StandardCharsets.UTF_8)) {
-                String line;
-                while ((line = input.readLine()) != null) {
-                    sb.append(line).append('\n');
-                }
-                NDC.push(sb.toString());
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        } else {
-            System.err.println("Runtime exception");
-            System.err.println(stackTrace);
-            msg += "Uncaught Exception in " + JHVGlobals.userAgent;
-            msg += "\nThread: " + t;
-            msg += "\nMessage: " + e.getMessage();
-            msg += "\nStacktrace:\n";
-            msg += stackTrace + "\n";
+        try {
+            msg += "Log:\n" + Files.readString(Path.of(Log2.getLogFilename()));
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
 
-        Log.fatal(null, e);
-        showErrorDialog(msg + "Log:\n" + sb);
+        if (!alreadySent) {
+            alreadySent = true;
+            String errorMsg = msg;
+            EventQueue.invokeLater(() -> showErrorDialog(errorMsg));
+        }
     }
 
 }
