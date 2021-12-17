@@ -57,7 +57,7 @@ public class LoadLayer {
                     try {
                         return loadView(executor, null, uri, forceFITS);
                     } catch (Exception e) {
-                        LOGGER.log(Level.SEVERE, "", e);
+                        LOGGER.log(Level.SEVERE, "loadView", e);
                         return null;
                     }
                 }).filter(Objects::nonNull).collect(Collectors.toList());
@@ -79,13 +79,13 @@ public class LoadLayer {
         @Override
         public void onFailure(@Nonnull Throwable t) {
             if (JHVThread.isInterrupted(t)) { // ignore
-                LOGGER.log(Level.INFO, "", t);
+                LOGGER.log(Level.INFO, "LoadLayer", t);
                 return;
             }
 
             layer.unload();
 
-            LOGGER.log(Level.SEVERE, "An error occurred while opening the remote file:", t);
+            LOGGER.log(Level.SEVERE, "An error occurred while opening the remote file", t);
             Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
         }
 

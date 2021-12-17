@@ -51,7 +51,7 @@ class LoadState {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            LOGGER.log(Level.SEVERE, "An error occurred while opening the remote file:", t);
+            LOGGER.log(Level.SEVERE, "An error occurred while opening the remote file", t);
             Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
         }
 

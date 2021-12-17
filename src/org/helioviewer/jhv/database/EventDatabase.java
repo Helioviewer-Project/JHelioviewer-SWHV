@@ -176,7 +176,7 @@ public class EventDatabase {
         try {
             return executor.invokeAndWait(new DumpAssociation2Db(assocs));
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "", e);
+            LOGGER.log(Level.SEVERE, "dump_association2db", e);
         }
         return -1;
     }
@@ -232,7 +232,7 @@ public class EventDatabase {
         try {
             return executor.invokeAndWait(new DumpEvent2Db(event2db_list, type));
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "", e);
+            LOGGER.log(Level.SEVERE, "dump_event2db", e);
         }
         return get_id_init_list(event2db_list.size());
     }
@@ -392,7 +392,7 @@ public class EventDatabase {
                 try {
                     nEvents.add(parseJSON(jsonEvent, full));
                 } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "", e);
+                    LOGGER.log(Level.SEVERE, "getOtherRelations", e);
                 }
             }
             jsonEvents.clear();
@@ -404,7 +404,7 @@ public class EventDatabase {
             try {
                 nEvents.add(parseJSON(ev, full));
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "", e);
+                LOGGER.log(Level.SEVERE, "getOtherRelations", e);
             }
         }
 
@@ -449,7 +449,7 @@ public class EventDatabase {
         try {
             return executor.invokeAndWait(new Db2DateRange(type));
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "", e);
+            LOGGER.log(Level.SEVERE, "db2daterange", e);
         }
         return new ArrayList<>();
     }
@@ -505,7 +505,7 @@ public class EventDatabase {
         try {
             return executor.invokeAndWait(new Events2Program(start, end, type, params));
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "", e);
+            LOGGER.log(Level.SEVERE, "events2Program", e);
         }
         return new ArrayList<>();
     }
@@ -539,7 +539,7 @@ public class EventDatabase {
                         try {
                             eventList.add(parseJSON(new JsonEvent(json, type, id, _start, _end), false));
                         } catch (Exception e) {
-                            LOGGER.log(Level.SEVERE, "", e);
+                            LOGGER.log(Level.SEVERE, "Events2Program", e);
                         }
                     }
                 }
@@ -552,7 +552,7 @@ public class EventDatabase {
         try {
             return executor.invokeAndWait(new Associations2Program(start, end, type));
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "", e);
+            LOGGER.log(Level.SEVERE, "associations2Program", e);
         }
         return new ArrayList<>();
     }
@@ -583,7 +583,7 @@ public class EventDatabase {
         try {
             return executor.invokeAndWait(new Relations2Program(event_id, type_left, type_right, param_left, param_right));
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "", e);
+            LOGGER.log(Level.SEVERE, "relations2Program", e);
         }
         return new ArrayList<>();
     }
@@ -665,7 +665,7 @@ public class EventDatabase {
         try {
             return executor.invokeAndWait(new Event2Program(event_id));
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "", e);
+            LOGGER.log(Level.SEVERE, "event2Program", e);
         }
         return null;
     }

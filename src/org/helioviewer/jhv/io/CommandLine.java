@@ -80,7 +80,7 @@ public class CommandLine {
                         LOGGER.log(Level.SEVERE, "File not found: " + opt);
                 }
             } catch (URISyntaxException e) {
-                LOGGER.log(Level.SEVERE, "", e);
+                LOGGER.log(Level.SEVERE, "getURIOptionValues", e);
             }
         }
         return uris;
