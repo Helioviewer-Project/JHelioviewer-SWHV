@@ -55,7 +55,7 @@ public class JHVGlobals {
             p.load(is);
             p.stringPropertyNames().forEach(key -> System.setProperty(key, p.getProperty(key)));
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "determineVersionAndRevision", e);
         }
 
         String v = System.getProperty("jhv.version");
@@ -119,7 +119,7 @@ public class JHVGlobals {
             if (UIGlobals.canBrowse && url != null)
                 Desktop.getDesktop().browse(new URI(url));
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "openURL", e);
         }
     }
 
