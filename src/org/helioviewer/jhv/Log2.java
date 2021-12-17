@@ -23,10 +23,10 @@ public class Log2 {
     private static final DateTimeFormatter fileFormatterLocal = TimeUtils.fileFormatter.withZone(zoneId);
     private static final DateTimeFormatter milliFormatterLocal = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(zoneId);
 
-    static void init() throws Exception {
-        String pattern = JHVDirectory.LOGS.getPath() + "JHV_" + TimeUtils.format(fileFormatterLocal, System.currentTimeMillis()) + ".log";
+    private static final String logFilename = JHVDirectory.LOGS.getPath() + "JHV_" + TimeUtils.format(fileFormatterLocal, System.currentTimeMillis()) + ".log";
 
-        FileHandler fileHandler = new FileHandler(pattern, 1024 * 1024, 1);
+    static void init() throws Exception {
+        FileHandler fileHandler = new FileHandler(logFilename, 1024 * 1024, 1);
         fileHandler.setLevel(loggedLevel);
         fileHandler.setFormatter(new LogFormatter());
         ConsoleHandler consoleHandler = new ConsoleHandler();
@@ -45,7 +45,8 @@ public class Log2 {
             String strThrown = thrown == null ? "" : ": " + thrown.getMessage();
             return TimeUtils.format(milliFormatterLocal, record.getMillis()) +
                     " [" + Thread.currentThread().getName() + "] " +
-                    record.getLevel() + " " +
+                    record.getLevel() +
+                    ' ' + record.getLoggerName() + ' ' +
                     record.getMessage() + strThrown + '\n';
         }
     }
@@ -54,6 +55,10 @@ public class Log2 {
         Optional<StackWalker.StackFrame> frame = StackWalker.getInstance().walk(s -> s.skip(2).findFirst());
         String caller = frame.map(stackFrame -> stackFrame.getClassName() + '.' + stackFrame.getMethodName()).orElse("|unknown|");
         return msg == null ? caller : caller + " - " + msg;
+    }
+
+    static String getLogFilename() {
+        return logFilename;
     }
 
     public static void info(String msg) {
