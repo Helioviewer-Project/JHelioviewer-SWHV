@@ -18,7 +18,6 @@ import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.SampClient;
-import org.helioviewer.jhv.log.LogSettings;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
@@ -45,17 +44,15 @@ public class JHelioviewer {
         // Per default, the us locale should be used
         Locale.setDefault(Locale.US);
 
-        Log2.init();
-        // Init log
-        LogSettings.init("/settings/log4j.properties", JHVDirectory.LOGS.getPath());
-        // Information log message
-        Log2.info("JHelioviewer started with command-line options: " + String.join(" ", args));
-        // System.setProperty("java.util.logging.manager", "org.apache.logging.julbridge.JULBridgeLogManager");
-
         // This attempts to create the necessary directories for the application
         JHVGlobals.createDirs();
+        // Init log
+        Log2.init();
+        // Information log message
+        Log2.info("JHelioviewer started with command-line options: " + String.join(" ", args));
+
         // Read the version and revision from the JAR metafile
-        JHVGlobals.determineVersionAndRevision();
+        JHVGlobals.getVersion();
         Settings.load();
         // Set the platform system properties
         SystemProperties.setPlatform();
