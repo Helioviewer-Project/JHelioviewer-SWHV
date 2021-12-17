@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.Log2;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
@@ -22,13 +23,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public record LUT(String name, int[] lut8) {
 
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
     private static final char angstrom = '\u212B';
 
     public int[] lut8Inv() {
@@ -85,7 +81,7 @@ public record LUT(String name, int[] lut8) {
                 LUT l = readGimpGradient(is);
                 standardList.put(l.name, l);
             } catch (Exception e) {
-                LOGGER.log(Level.WARNING, "Could not restore gimp gradient file " + file, e);
+                Log2.warn("Could not restore gimp gradient file " + file, e);
             }
         }
         // User addons
@@ -97,7 +93,7 @@ public record LUT(String name, int[] lut8) {
                     LUT l = readGimpGradient(is);
                     standardList.put(l.name, l);
                 } catch (Exception e) {
-                    LOGGER.log(Level.WARNING, "Error loading color table plugin dir", e);
+                    Log2.warn("Error loading color table plugin dir", e);
                 }
             }
 
@@ -123,7 +119,7 @@ public record LUT(String name, int[] lut8) {
              BufferedReader in = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             colorRules = new JSONArray(new JSONTokener(in));
         } catch (IOException | JSONException e) {
-            LOGGER.log(Level.WARNING, "Error reading the configuration for the default color tables", e);
+            Log2.warn("Error reading the configuration for the default color tables", e);
             colorRules = new JSONArray();
         }
     }
@@ -152,7 +148,7 @@ public record LUT(String name, int[] lut8) {
                     continue;
                 return standardList.get(rule.getString("color"));
             } catch (JSONException e) {
-                LOGGER.log(Level.WARNING, "Rule " + i + " for the default color table is invalid", e);
+                Log2.warn("Rule " + i + " for the default color table is invalid", e);
             }
         }
         return null;

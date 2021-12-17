@@ -9,13 +9,10 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.helioviewer.jhv.Log2;
 
 public class ClipBoardCopier implements ClipboardOwner {
 
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
     private static final ClipBoardCopier instance = new ClipBoardCopier();
 
     public static ClipBoardCopier getSingletonInstance() {
@@ -43,7 +40,7 @@ public class ClipBoardCopier implements ClipboardOwner {
             try {
                 return (String) contents.getTransferData(DataFlavor.stringFlavor);
             } catch (UnsupportedFlavorException | IOException e) {
-                LOGGER.log(Level.SEVERE, "ClipBoardCopier.getString", e);
+                Log2.warn(e);
             }
         }
         return "";

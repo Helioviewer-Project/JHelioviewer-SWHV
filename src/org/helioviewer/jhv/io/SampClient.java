@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
 
@@ -22,18 +24,13 @@ import org.astrogrid.samp.hub.Hub;
 import org.astrogrid.samp.hub.HubServiceMode;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.Log2;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class SampClient extends HubConnector {
-
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     static {
         Logger.getLogger("org.astrogrid.samp").setLevel(Level.WARNING); // shutup SAMP info logs
@@ -51,7 +48,7 @@ public class SampClient extends HubConnector {
                     if (Hub.getRunningHubs().length == 0)
                         Hub.runHub(HubServiceMode.NO_GUI);
                 } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "SAMP hub init", e);
+                    Log2.warn(e);
                 }
             }).start();
         }
@@ -87,7 +84,7 @@ public class SampClient extends HubConnector {
                         EventQueue.invokeLater(() -> Load.fits.get(uri));
                     }
                 } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "image.load.fits", e);
+                    Log2.warn("image.load.fits", e);
                 }
                 return null;
             }
@@ -106,7 +103,7 @@ public class SampClient extends HubConnector {
                         }
                     }
                 } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "table.load.fits", e);
+                    Log2.warn("table.load.fits", e);
                 }
                 return null;
             }
@@ -123,7 +120,7 @@ public class SampClient extends HubConnector {
                         EventQueue.invokeLater(() -> Load.cdf.get(uri));
                     }
                 } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "table.load.cdf", e);
+                    Log2.warn("table.load.cdf", e);
                 }
                 return null;
             }
@@ -146,7 +143,7 @@ public class SampClient extends HubConnector {
                         EventQueue.invokeLater(() -> Load.Image.getAll(uris));
                     }
                 } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "jhv.load.image", e);
+                    Log2.warn("jhv.load.image", e);
                 }
                 return null;
             }
@@ -177,7 +174,7 @@ public class SampClient extends HubConnector {
                         }
                     }
                 } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, type, e);
+                    Log2.warn(type, e);
                 }
                 return null;
             }
@@ -192,7 +189,7 @@ public class SampClient extends HubConnector {
             if (c != null)
                 c.notifyAll(msg);
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "SAMP notify", e);
+            Log2.warn(e);
         }
     }
 

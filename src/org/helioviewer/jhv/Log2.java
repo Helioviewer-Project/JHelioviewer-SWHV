@@ -1,5 +1,6 @@
 package org.helioviewer.jhv;
 
+import java.lang.StackWalker;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.ConsoleHandler;
@@ -43,30 +44,43 @@ public class Log2 {
             String strThrown = thrown == null ? "" : ": " + thrown.getMessage();
             return TimeUtils.format(milliFormatterLocal, record.getMillis()) +
                     " [" + Thread.currentThread().getName() + "] " +
-                    record.getLevel() +
-                    ' ' + record.getLoggerName() +
-                    " - " + record.getMessage() + strThrown + '\n';
+                    record.getLevel() + " " +
+                    record.getMessage() + strThrown + '\n';
         }
     }
 
+    private static String getCaller(String msg) {
+        StackWalker.StackFrame frame = StackWalker.getInstance().walk(s -> s.skip(2).findFirst()).get(); //! unconditional get
+        String caller = frame.getClassName() + '.' + frame.getMethodName();
+        return msg == null ? caller : caller + " - " + msg;
+    }
+
     public static void info(String msg) {
-        root.log(Level.INFO, msg);
+        root.log(Level.INFO, getCaller(msg));
     }
 
     public static void warn(String msg) {
-        root.log(Level.WARNING, msg);
+        root.log(Level.WARNING, getCaller(msg));
+    }
+
+    public static void warn(Throwable thrown) {
+        root.log(Level.WARNING, getCaller(null), thrown);
     }
 
     public static void warn(String msg, Throwable thrown) {
-        root.log(Level.WARNING, msg, thrown);
+        root.log(Level.WARNING, getCaller(msg), thrown);
     }
 
     public static void error(String msg) {
-        root.log(Level.SEVERE, msg);
+        root.log(Level.SEVERE, getCaller(msg));
+    }
+
+    public static void error(Throwable thrown) {
+        root.log(Level.SEVERE, getCaller(null), thrown);
     }
 
     public static void error(String msg, Throwable thrown) {
-        root.log(Level.SEVERE, msg, thrown);
+        root.log(Level.SEVERE, getCaller(msg), thrown);
     }
 
 }
