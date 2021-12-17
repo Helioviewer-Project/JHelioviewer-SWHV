@@ -12,6 +12,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.Log2;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
@@ -23,14 +24,8 @@ import org.helioviewer.jhv.opengl.GLInfo;
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 @SuppressWarnings("serial")
 public class AboutDialog extends StandardDialog implements ShowableDialog, HyperlinkListener {
-
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     public AboutDialog() {
         super(JHVFrame.getFrame(), "About JHelioviewer", true);
@@ -114,7 +109,7 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
                 try (InputStream is = FileUtils.getResource(res)) {
                     new TextDialog("License - " + name.substring(0, name.indexOf('.')), FileUtils.streamToString(is), true).showDialog();
                 } catch (Exception ex) {
-                    LOGGER.log(Level.SEVERE, "hyperlinkUpdate", ex);
+                    Log2.error(ex);
                 }
             } else {
                 JHVGlobals.openURL(e.getURL().toString());
