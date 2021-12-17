@@ -3,12 +3,17 @@ package org.helioviewer.jhv.opengl;
 import java.nio.charset.StandardCharsets;
 
 import org.helioviewer.jhv.io.FileUtils;
-import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLException;
 
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 abstract class GLSLShader {
+
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     private enum ShaderType {
         vertex(GL2.GL_VERTEX_SHADER), fragment(GL2.GL_FRAGMENT_SHADER);
@@ -71,7 +76,7 @@ abstract class GLSLShader {
         if (loc != -1)
             gl.glUniform1i(loc, unit.ordinal());
         else
-            Log.error("Warning: Invalid texture " + texname);
+            LOGGER.log(Level.WARNING, "Invalid texture " + texname);
     }
 
     private static int attachShader(GL2 gl, ShaderType type, String text) {
@@ -90,14 +95,14 @@ abstract class GLSLShader {
         int[] params = {0};
         gl.glGetShaderiv(id, GL2.GL_COMPILE_STATUS, params, 0);
         if (params[0] != 1) {
-            Log.error("Shader compile status: " + params[0]);
+            LOGGER.log(Level.SEVERE, "Shader compile status: " + params[0]);
             gl.glGetShaderiv(id, GL2.GL_INFO_LOG_LENGTH, params, 0);
             if (params[0] > 0) {
                 byte[] infoLog = new byte[params[0]];
                 gl.glGetShaderInfoLog(id, params[0], params, 0, infoLog, 0);
 
                 String log = new String(infoLog, StandardCharsets.UTF_8);
-                Log.error(log);
+                LOGGER.log(Level.SEVERE, log);
                 throw new GLException("Cannot compile " + type + " shader: " + log);
             } else
                 throw new GLException("Cannot compile " + type + " shader: unknown reason");
@@ -115,14 +120,14 @@ abstract class GLSLShader {
         int[] params = {0};
         gl.glGetProgramiv(id, GL2.GL_LINK_STATUS, params, 0);
         if (params[0] != 1) {
-            Log.error("Shader link status: " + params[0]);
+            LOGGER.log(Level.SEVERE, "Shader link status: " + params[0]);
             gl.glGetProgramiv(id, GL2.GL_INFO_LOG_LENGTH, params, 0);
             if (params[0] > 0) {
                 byte[] infoLog = new byte[params[0]];
                 gl.glGetProgramInfoLog(id, params[0], params, 0, infoLog, 0);
 
                 String log = new String(infoLog, StandardCharsets.UTF_8);
-                Log.error(log);
+                LOGGER.log(Level.SEVERE, log);
                 throw new GLException("Cannot link shader: " + log);
             } else
                 throw new GLException("Cannot link shader: unknown reason");
