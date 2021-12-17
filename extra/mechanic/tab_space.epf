@@ -1,6 +1,0 @@
-# @title Set to insert 4 space instead of tabs
-# @description Sets to insert 4 space instead of tabs
-# @audit_type RECONCILE
-file_export_version=3.0
-/instance/org.eclipse.ui.editors/spacesForTabs=true
-/instance/org.eclipse.ui.editors/tabWidth=4
