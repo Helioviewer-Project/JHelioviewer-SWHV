@@ -51,7 +51,7 @@ public class SampClient extends HubConnector {
                     if (Hub.getRunningHubs().length == 0)
                         Hub.runHub(HubServiceMode.NO_GUI);
                 } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "SAMP Hub init", e);
+                    LOGGER.log(Level.SEVERE, "SAMP hub init", e);
                 }
             }).start();
         }

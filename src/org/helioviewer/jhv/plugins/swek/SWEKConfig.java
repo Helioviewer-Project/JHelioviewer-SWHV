@@ -21,14 +21,18 @@ import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.JSONUtils;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepHandler;
 import org.helioviewer.jhv.plugins.swek.sources.hek.HEKHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 class SWEKConfig {
 
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
     private static final HashMap<String, SWEK.Source> sources = new HashMap<>();
     private static final HashMap<String, SWEKGroup> groups = new HashMap<>();
 
@@ -43,7 +47,7 @@ class SWEKConfig {
             SWEKGroup.setSWEKRelatedEvents(parseRelatedEvents(jo));
             return dtm;
         } catch (Exception e) {
-            Log.error("Configuration file could not be parsed: " + e);
+            LOGGER.log(Level.SEVERE, "Configuration file could not be parsed", e);
             return new DefaultTreeModel(new DefaultMutableTreeNode(""));
         }
     }
@@ -110,7 +114,7 @@ class SWEKConfig {
             URI eventIconURI = new URI(eventIconValue);
             return eventIconURI.getScheme().equals("iconbank") ? SWEKIconBank.getIcon(eventIconURI.getHost()) : SWEKIconBank.getIcon("Other");
         } catch (URISyntaxException e) {
-            Log.info("Could not parse the URI " + eventIconValue);
+            LOGGER.log(Level.WARNING, "Could not parse the URI " + eventIconValue);
         }
         return IconBank.getBlank();
     }

@@ -77,7 +77,7 @@ class LoadRequest {
                 try {
                     CDFReader.load(uri);
                 } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "", e);
+                    LOGGER.log(Level.SEVERE, "CDFReader.load", e);
                 }
             });
             return null;
@@ -100,7 +100,7 @@ class LoadRequest {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            LOGGER.log(Level.SEVERE, "An error occurred while opening the remote file:", t);
+            LOGGER.log(Level.SEVERE, "An error occurred while opening the remote file", t);
             Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
         }
 
@@ -116,7 +116,7 @@ class LoadRequest {
         @Override
         public void onFailure(@Nonnull Throwable t) {
             Timelines.dc.setStatus(null);
-            LOGGER.log(Level.SEVERE, "An error occurred while opening the remote file:", t);
+            LOGGER.log(Level.SEVERE, "An error occurred while opening the remote file", t);
             Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
         }
 

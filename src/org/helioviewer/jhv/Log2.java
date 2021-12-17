@@ -25,7 +25,7 @@ class Log2 {
         @Override
         public String format(LogRecord record) { // traditional JHV style
             Throwable thrown = record.getThrown();
-            String strThrown = thrown == null ? "" : " " + thrown.getMessage();
+            String strThrown = thrown == null ? "" : ": " + thrown.getMessage();
             return TimeUtils.format(record.getMillis()) +
                     " [" + Thread.currentThread().getName() + "] " +
                     record.getLevel() +
