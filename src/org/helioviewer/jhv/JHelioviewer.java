@@ -24,13 +24,7 @@ import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class JHelioviewer {
-
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     public static void main(String[] args) throws Exception {
         System.setProperty("apple.awt.application.appearance", "NSAppearanceNameDarkAqua");
@@ -55,7 +49,7 @@ public class JHelioviewer {
         // Init log
         LogSettings.init("/settings/log4j.properties", JHVDirectory.LOGS.getPath());
         // Information log message
-        LOGGER.log(Level.INFO, "JHelioviewer started with command-line options: " + String.join(" ", args));
+        Log2.info("JHelioviewer started with command-line options: " + String.join(" ", args));
         // System.setProperty("java.util.logging.manager", "org.apache.logging.julbridge.JULBridgeLogManager");
 
         // This attempts to create the necessary directories for the application
@@ -84,21 +78,21 @@ public class JHelioviewer {
         EventQueue.invokeLater(() -> {
             UIGlobals.setLaf();
 
-            LOGGER.log(Level.INFO, "Start main window");
+            Log2.info("Start main window");
             ExitHooks.attach();
             JFrame frame = JHVFrame.prepare();
 
             try {
                 if (args.length != 0 && args[0].equals("--exclude-plugins")) {
-                    LOGGER.log(Level.INFO, "Do not load plugins");
+                    Log2.info("Do not load plugins");
                 } else {
-                    LOGGER.log(Level.INFO, "Load bundled plugins");
+                    Log2.info("Load bundled plugins");
                     PluginManager.addPlugin(new EVEPlugin());
                     PluginManager.addPlugin(new SWEKPlugin());
                     PluginManager.addPlugin(new PfssPlugin());
                 }
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Plugin load error", e);
+                Log2.warn("Plugin load error", e);
             }
 
             JComponent leftPane = JHVFrame.getLeftScrollPane();
@@ -128,7 +122,7 @@ public class JHelioviewer {
             GraphicsDevice[] screens = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
             return screens == null || screens.length == 0;
         } catch (HeadlessException e) {
-            LOGGER.log(Level.SEVERE, "isHeadless", e);
+            Log2.error("isHeadless", e);
             return true;
         }
     }

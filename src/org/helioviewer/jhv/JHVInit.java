@@ -18,20 +18,14 @@ import org.helioviewer.jhv.view.j2k.kakadu.KakaduMessageSystem;
 
 import nom.tam.fits.FitsFactory;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 class JHVInit {
-
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     static void init() {
         try {
             loadLibs();
             KakaduMessageSystem.startKduMessageSystem();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to setup native libraries", e);
+            Log2.error("Failed to setup native libraries", e);
             Message.err("Failed to setup native libraries", e.getMessage(), true);
             return;
         }
@@ -40,14 +34,14 @@ class JHVInit {
         try {
             JPIPCacheManager.init();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "JPIP cache initialization error", e);
+            Log2.error("JPIP cache initialization error", e);
         }
 
         ProxySettings.init();
         try {
             AIAResponse.load();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "AIA response map load error", e);
+            Log2.error("AIA response map load error", e);
         }
 
         FitsFactory.setUseHierarch(true);
@@ -109,7 +103,7 @@ class JHVInit {
             try (InputStream in = FileUtils.getResource("/kernels/" + x)) {
                 Files.copy(in, Path.of(JHVGlobals.dataCacheDir, x));
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "SPICE kernel copy error", e);
+                Log2.error("SPICE kernel copy error", e);
             }
         });
         Spice.loadKernels(kernels);
