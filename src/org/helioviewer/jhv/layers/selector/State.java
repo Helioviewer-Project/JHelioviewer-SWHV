@@ -21,7 +21,6 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.time.JHVTime;
@@ -34,13 +33,19 @@ import org.json.JSONObject;
 
 import com.google.common.util.concurrent.FutureCallback;
 
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class State {
+
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     public static void save(String dir, String file) {
         try (BufferedWriter writer = Files.newBufferedWriter(Path.of(dir, file), StandardCharsets.UTF_8)) {
             toJson().write(writer);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "save", e);
         }
     }
 
@@ -110,7 +115,7 @@ public class State {
             Constructor<?> cons = c.getConstructor(JSONObject.class);
             return cons.newInstance(jdata);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "json2Object", e);
         }
         return null;
     }
@@ -126,7 +131,7 @@ public class State {
                         layer.setEnabled(jo.optBoolean("enabled", true));
                     }
                 } catch (Exception e) { // don't stop for a broken one
-                    e.printStackTrace();
+                    LOGGER.log(Level.SEVERE, "loadTimelines", e);
                 }
             }
         }
@@ -145,7 +150,7 @@ public class State {
                         layer.setEnabled(jo.optBoolean("enabled", false));
                     }
                 } catch (Exception e) { // don't stop for a broken one
-                    e.printStackTrace();
+                    LOGGER.log(Level.SEVERE, "layers", e);
                 }
             }
         }
@@ -164,7 +169,7 @@ public class State {
                     if (jo.optBoolean("master", false))
                         masterLayer = layer;
                 } catch (Exception e) { // don't stop for a broken one
-                    e.printStackTrace();
+                    LOGGER.log(Level.SEVERE, "imageLayers", e);
                 }
             }
         }
@@ -214,7 +219,7 @@ public class State {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log.error("StateLoad", t);
+            LOGGER.log(Level.SEVERE, "StateLoad", t);
         }
 
     }
@@ -232,7 +237,7 @@ public class State {
             if (plugins != null)
                 PluginManager.loadState(plugins);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "load", e);
         }
     }
 

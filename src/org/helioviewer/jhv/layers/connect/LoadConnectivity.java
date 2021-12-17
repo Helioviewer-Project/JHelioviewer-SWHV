@@ -12,7 +12,6 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.NetClient;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.time.JHVTime;
@@ -20,7 +19,13 @@ import org.helioviewer.jhv.time.TimeUtils;
 
 import com.google.common.util.concurrent.FutureCallback;
 
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class LoadConnectivity {
+
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     public static class Connectivity {
 
@@ -107,7 +112,7 @@ public class LoadConnectivity {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log.error("An error occurred while opening the remote file:", t);
+            LOGGER.log(Level.SEVERE, "An error occurred while opening the remote file", t);
             Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
         }
 

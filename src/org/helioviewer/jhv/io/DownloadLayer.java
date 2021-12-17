@@ -80,7 +80,7 @@ public record DownloadLayer(ImageLayer layer, File dstFile, URI uri) implements 
         public void onFailure(@Nonnull Throwable t) {
             layer.doneDownload();
             dstFile.delete();
-            LOGGER.log(Level.SEVERE, "", t);
+            LOGGER.log(Level.SEVERE, "DownloadLayer", t);
         }
 
     }

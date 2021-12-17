@@ -12,15 +12,19 @@ import org.helioviewer.jhv.events.SWEKHandler;
 import org.helioviewer.jhv.events.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.io.JSONUtils;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 @SuppressWarnings("unchecked")
 public class ComesepHandler extends SWEKHandler {
 
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
     private static final String _baseURL = "http://swhv.oma.be/comesep/comeseprequestapi/getComesep.php?";
 
     @Override
@@ -35,7 +39,7 @@ public class ComesepHandler extends SWEKHandler {
                 long start = result.getLong("atearliest") * 1000;
                 long end = result.getLong("atlatest") * 1000;
                 if (end < start) {
-                    Log.error("Event end before start: " + result);
+                    LOGGER.log(Level.SEVERE, "Event end before start: " + result);
                     continue;
                 }
 
@@ -52,6 +56,7 @@ public class ComesepHandler extends SWEKHandler {
             }
             EventDatabase.dump_event2db(event2dbList, supplier);
         } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "parseRemote", e);
             return false;
         }
         return true;
