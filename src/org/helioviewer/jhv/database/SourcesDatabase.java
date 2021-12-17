@@ -10,7 +10,7 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.threads.SingleExecutor;
 
@@ -38,7 +38,7 @@ public class SourcesDatabase extends Thread {
             select = connection.prepareStatement("SELECT sourceId FROM Sources WHERE server=? AND observatory LIKE ? AND dataset LIKE ? LIMIT 1");
             select.setQueryTimeout(30);
         } catch (SQLException e) {
-            Log2.error("Could not create database connection", e);
+            Log.error("Could not create database connection", e);
             try {
                 if (connection != null)
                     connection.close();
@@ -51,7 +51,7 @@ public class SourcesDatabase extends Thread {
         try {
             executor.invokeAndWait(new Insert(sourceId, server, observatory, dataset, start, end));
         } catch (Exception e) {
-            Log2.error(e);
+            Log.error(e);
         }
     }
 
@@ -74,7 +74,7 @@ public class SourcesDatabase extends Thread {
         try {
             return executor.invokeAndWait(new Select(server, observatory, dataset));
         } catch (Exception e) {
-            Log2.error(e);
+            Log.error(e);
         }
         return -1;
     }

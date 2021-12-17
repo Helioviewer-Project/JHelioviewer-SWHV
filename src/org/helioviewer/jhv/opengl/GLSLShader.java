@@ -2,7 +2,7 @@ package org.helioviewer.jhv.opengl;
 
 import java.nio.charset.StandardCharsets;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.io.FileUtils;
 
 import com.jogamp.opengl.GL2;
@@ -71,7 +71,7 @@ abstract class GLSLShader {
         if (loc != -1)
             gl.glUniform1i(loc, unit.ordinal());
         else
-            Log2.error("Invalid texture " + texname);
+            Log.error("Invalid texture " + texname);
     }
 
     private static int attachShader(GL2 gl, ShaderType type, String text) {
@@ -90,14 +90,14 @@ abstract class GLSLShader {
         int[] params = {0};
         gl.glGetShaderiv(id, GL2.GL_COMPILE_STATUS, params, 0);
         if (params[0] != 1) {
-            Log2.error("Shader compile status: " + params[0]);
+            Log.error("Shader compile status: " + params[0]);
             gl.glGetShaderiv(id, GL2.GL_INFO_LOG_LENGTH, params, 0);
             if (params[0] > 0) {
                 byte[] infoLog = new byte[params[0]];
                 gl.glGetShaderInfoLog(id, params[0], params, 0, infoLog, 0);
 
                 String log = new String(infoLog, StandardCharsets.UTF_8);
-                Log2.error(log);
+                Log.error(log);
                 throw new GLException("Cannot compile " + type + " shader: " + log);
             } else
                 throw new GLException("Cannot compile " + type + " shader: unknown reason");
@@ -115,14 +115,14 @@ abstract class GLSLShader {
         int[] params = {0};
         gl.glGetProgramiv(id, GL2.GL_LINK_STATUS, params, 0);
         if (params[0] != 1) {
-            Log2.error("Shader link status: " + params[0]);
+            Log.error("Shader link status: " + params[0]);
             gl.glGetProgramiv(id, GL2.GL_INFO_LOG_LENGTH, params, 0);
             if (params[0] > 0) {
                 byte[] infoLog = new byte[params[0]];
                 gl.glGetProgramInfoLog(id, params[0], params, 0, infoLog, 0);
 
                 String log = new String(infoLog, StandardCharsets.UTF_8);
-                Log2.error(log);
+                Log.error(log);
                 throw new GLException("Cannot link shader: " + log);
             } else
                 throw new GLException("Cannot link shader: unknown reason");

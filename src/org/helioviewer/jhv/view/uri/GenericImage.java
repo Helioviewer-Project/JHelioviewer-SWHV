@@ -18,7 +18,7 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.stream.ImageInputStream;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 //import org.helioviewer.jhv.base.XMLUtils;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.io.NetClient;
@@ -47,7 +47,7 @@ class GenericImage implements URIImageReader {
                         xml = xml.trim().replace("&", "&amp;");
                 }
             } catch (Exception e) {
-                Log2.error(uri.toString(), e);
+                Log.error(uri.toString(), e);
             }
             /*
             String[] names = metadata.getMetadataFormatNames();

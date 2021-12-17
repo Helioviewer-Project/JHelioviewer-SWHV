@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 
@@ -75,7 +75,7 @@ public record DownloadLayer(ImageLayer layer, File dstFile, URI uri) implements 
         public void onFailure(@Nonnull Throwable t) {
             layer.doneDownload();
             dstFile.delete();
-            Log2.error(t);
+            Log.error(t);
         }
 
     }

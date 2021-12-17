@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.math;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.json.JSONArray;
 
 public class Vec3 {
@@ -80,7 +80,7 @@ public class Vec3 {
 
         len = Math.sqrt(x * x + y * y + z * z);
         if (len > 1 || Double.isNaN(len)) {
-            Log2.error("Normalized to bigger than 1: please report. Computed length: " + len);
+            Log.error("Normalized to bigger than 1: please report. Computed length: " + len);
             x = 0;
             y = 0;
             z = 0;

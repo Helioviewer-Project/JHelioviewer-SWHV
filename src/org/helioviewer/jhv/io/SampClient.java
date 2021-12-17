@@ -24,7 +24,7 @@ import org.astrogrid.samp.hub.Hub;
 import org.astrogrid.samp.hub.HubServiceMode;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.json.JSONArray;
@@ -48,7 +48,7 @@ public class SampClient extends HubConnector {
                     if (Hub.getRunningHubs().length == 0)
                         Hub.runHub(HubServiceMode.NO_GUI);
                 } catch (Exception e) {
-                    Log2.warn(e);
+                    Log.warn(e);
                 }
             }).start();
         }
@@ -84,7 +84,7 @@ public class SampClient extends HubConnector {
                         EventQueue.invokeLater(() -> Load.fits.get(uri));
                     }
                 } catch (Exception e) {
-                    Log2.warn("image.load.fits", e);
+                    Log.warn("image.load.fits", e);
                 }
                 return null;
             }
@@ -103,7 +103,7 @@ public class SampClient extends HubConnector {
                         }
                     }
                 } catch (Exception e) {
-                    Log2.warn("table.load.fits", e);
+                    Log.warn("table.load.fits", e);
                 }
                 return null;
             }
@@ -120,7 +120,7 @@ public class SampClient extends HubConnector {
                         EventQueue.invokeLater(() -> Load.cdf.get(uri));
                     }
                 } catch (Exception e) {
-                    Log2.warn("table.load.cdf", e);
+                    Log.warn("table.load.cdf", e);
                 }
                 return null;
             }
@@ -143,7 +143,7 @@ public class SampClient extends HubConnector {
                         EventQueue.invokeLater(() -> Load.Image.getAll(uris));
                     }
                 } catch (Exception e) {
-                    Log2.warn("jhv.load.image", e);
+                    Log.warn("jhv.load.image", e);
                 }
                 return null;
             }
@@ -174,7 +174,7 @@ public class SampClient extends HubConnector {
                         }
                     }
                 } catch (Exception e) {
-                    Log2.warn(type, e);
+                    Log.warn(type, e);
                 }
                 return null;
             }
@@ -189,7 +189,7 @@ public class SampClient extends HubConnector {
             if (c != null)
                 c.notifyAll(msg);
         } catch (Exception e) {
-            Log2.warn(e);
+            Log.warn(e);
         }
     }
 

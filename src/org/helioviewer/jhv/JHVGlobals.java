@@ -49,7 +49,7 @@ public class JHVGlobals {
             p.load(is);
             p.stringPropertyNames().forEach(key -> System.setProperty(key, p.getProperty(key)));
         } catch (Exception e) {
-            Log2.warn(e);
+            Log.warn(e);
         }
 
         String v = System.getProperty("jhv.version");
@@ -61,7 +61,7 @@ public class JHVGlobals {
                 System.getProperty("os.arch") + ' ' + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ") " +
                 System.getProperty("java.vendor") + " JRE " + System.getProperty("java.version");
         versionDetail = String.format("%s %.1fGB %dCPU", userAgent, Runtime.getRuntime().maxMemory() / (1024 * 1024 * 1024.), Runtime.getRuntime().availableProcessors());
-        Log2.info(versionDetail);
+        Log.info(versionDetail);
     }
 
     // Attempts to create the necessary directories if they do not exist, should not use Log
@@ -113,7 +113,7 @@ public class JHVGlobals {
             if (UIGlobals.canBrowse && url != null)
                 Desktop.getDesktop().browse(new URI(url));
         } catch (Exception e) {
-            Log2.warn(e);
+            Log.warn(e);
         }
     }
 

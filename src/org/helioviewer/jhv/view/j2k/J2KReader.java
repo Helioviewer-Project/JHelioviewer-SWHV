@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import kdu_jni.KduException;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.view.j2k.cache.CacheStatus;
 import org.helioviewer.jhv.view.j2k.image.ReadParams;
@@ -52,7 +52,7 @@ class J2KReader implements Runnable {
                 myThread.interrupt();
                 myThread.join(100);
             } catch (Exception e) { // avoid exit from loop
-                Log2.error(e);
+                Log.error(e);
             }
         }
     }
@@ -87,7 +87,7 @@ class J2KReader implements Runnable {
             try {
                 socket.close();
             } catch (IOException e) {
-                Log2.error(e);
+                Log.error(e);
             }
             socket = null;
         }
@@ -224,13 +224,13 @@ class J2KReader implements Runnable {
                 try {
                     socket.close();
                 } catch (IOException ioe) {
-                    Log2.error("Error closing socket", ioe);
+                    Log.error("Error closing socket", ioe);
                 }
 
                 if (retries++ < 13)
                     readerSignal.signal(params); // signal to retry
                 else
-                    Log2.error("Retry limit reached: " + view.getURI()); // something may be terribly wrong
+                    Log.error("Retry limit reached: " + view.getURI()); // something may be terribly wrong
             }
         }
     }

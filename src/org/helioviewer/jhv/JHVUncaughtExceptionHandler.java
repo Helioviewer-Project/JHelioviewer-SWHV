@@ -90,7 +90,7 @@ class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
         msg += stackTrace + "\n";
 
         try {
-            msg += "Log:\n" + Files.readString(Path.of(Log2.getLogFilename()));
+            msg += "Log:\n" + Files.readString(Path.of(Log.getFilename()));
         } catch (Exception ex) {
             ex.printStackTrace();
         }

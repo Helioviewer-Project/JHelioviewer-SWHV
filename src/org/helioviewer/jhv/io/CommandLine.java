@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
 
 public class CommandLine {
@@ -72,10 +72,10 @@ public class CommandLine {
                     if (f.canRead()) {
                         uris.add(f.toURI());
                     } else
-                        Log2.warn("File not found: " + opt);
+                        Log.warn("File not found: " + opt);
                 }
             } catch (URISyntaxException e) {
-                Log2.warn(e);
+                Log.warn(e);
             }
         }
         return uris;
