@@ -11,15 +11,9 @@ import org.helioviewer.jhv.io.NetClient;
 
 import okio.BufferedSource;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 // Verbose whether a dialog box should be popped up.
 // Otherwise a message box is shown in case of an update error.
 public record JHVUpdate(boolean verbose) implements Runnable {
-
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     public void check() {
         new Thread(this, "JHV Update Checker").start();
@@ -35,11 +29,11 @@ public record JHVUpdate(boolean verbose) implements Runnable {
                     Settings.setProperty("update.next", Integer.toString(n));
                 }
                 if (n != 0) {
-                    LOGGER.log(Level.INFO, "Update check suspended for this startup");
+                    Log2.info("Update check suspended for this startup");
                     return;
                 }
             } catch (NumberFormatException e) {
-                LOGGER.log(Level.SEVERE, "Invalid update setting", e);
+                Log2.error("Invalid update setting", e);
                 Settings.setProperty("update.next", Integer.toString(0));
             }
         }
@@ -53,7 +47,7 @@ public record JHVUpdate(boolean verbose) implements Runnable {
             EventQueue.invokeLater(() -> {
                 String runningVersion = JHVGlobals.version + '.' + JHVGlobals.revision;
                 if (JHVGlobals.alphanumComparator.compare(version, runningVersion) > 0) {
-                    LOGGER.log(Level.INFO, "Found newer version " + version);
+                    Log2.info("Found newer version " + version);
 
                     NewVersionDialog dialog = new NewVersionDialog("JHelioviewer " + version + " is now available (you have " + runningVersion + ").", verbose);
                     dialog.showDialog();
@@ -66,7 +60,7 @@ public record JHVUpdate(boolean verbose) implements Runnable {
                 }
             });
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error retrieving update server", e);
+            Log2.warn("Error retrieving update server", e);
             if (verbose)
                 Message.warn("Update check error", "While checking for a newer version got " + e.getLocalizedMessage());
         }
