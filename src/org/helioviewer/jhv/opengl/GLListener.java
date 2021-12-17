@@ -35,7 +35,7 @@ public class GLListener implements GLEventListener {
     @Override
     public void init(GLAutoDrawable drawable) {
         GL2 gl = (GL2) drawable.getGL();
-        GLInfo.update(gl);
+        GLInfo.get(gl);
         GLInfo.updatePixelScale(canvas);
 
         gl.glDisable(GL2.GL_TEXTURE_1D);

@@ -1,14 +1,9 @@
 package org.helioviewer.jhv.math;
 
+import org.helioviewer.jhv.Log2;
 import org.json.JSONArray;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class Vec3 {
-
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     public static final Vec3 ZERO = new Vec3(0, 0, 0);
     public static final Vec3 XAxis = new Vec3(1, 0, 0);
@@ -85,7 +80,7 @@ public class Vec3 {
 
         len = Math.sqrt(x * x + y * y + z * z);
         if (len > 1 || Double.isNaN(len)) {
-            LOGGER.log(Level.SEVERE, "Normalized to bigger than 1: please report. Computed length: " + len);
+            Log2.error("Normalized to bigger than 1: please report. Computed length: " + len);
             x = 0;
             y = 0;
             z = 0;
