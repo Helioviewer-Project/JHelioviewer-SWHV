@@ -34,6 +34,7 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
+import org.helioviewer.jhv.Log2;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.export.VideoFormat;
 import org.helioviewer.jhv.gui.JHVFrame;
@@ -48,14 +49,8 @@ import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCacheManager;
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 @SuppressWarnings("serial")
 public class PreferencesDialog extends StandardDialog implements ShowableDialog {
-
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     private final JLabel labelCache = new JLabel("The image cache currently uses 0.0GB on disk.", JLabel.RIGHT);
 
@@ -246,7 +241,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
                 JPIPCacheManager.clear();
                 setLabelCache();
             } catch (Exception ex) {
-                LOGGER.log(Level.SEVERE, "JPIP cache clear error", ex);
+                Log2.error("JPIP cache clear error", ex);
             }
         });
         cache.add(labelCache);

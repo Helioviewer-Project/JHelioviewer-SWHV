@@ -6,6 +6,7 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
+import org.helioviewer.jhv.Log2;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -17,13 +18,7 @@ import org.json.JSONObject;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 class LoadSources implements Callable<DataSourcesParser> {
-
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     static void submit(@Nonnull String server, @Nonnull Validator validator) {
         EventQueueCallbackExecutor.pool.submit(new LoadSources(server, validator), new Callback(server));
@@ -65,7 +60,7 @@ class LoadSources implements Callable<DataSourcesParser> {
                 parser.parse(jo);
                 break;
             } catch (IOException e) {
-                // LOGGER.log(Level.SEVERE, "Server " + url, e);
+                // Log2.error(url, e);
                 Thread.sleep(15000);
             }
         }
@@ -81,9 +76,9 @@ class LoadSources implements Callable<DataSourcesParser> {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            LOGGER.log(Level.SEVERE, "LoadSources error: " + server, t);
+            Log2.error(server, t);
             if (t instanceof ValidationException) {
-                ((ValidationException) t).getCausingExceptions().stream().map(ValidationException::getMessage).forEach(msg -> LOGGER.log(Level.SEVERE, msg));
+                ((ValidationException) t).getCausingExceptions().stream().map(ValidationException::getMessage).forEach(Log2::error);
             }
         }
 
