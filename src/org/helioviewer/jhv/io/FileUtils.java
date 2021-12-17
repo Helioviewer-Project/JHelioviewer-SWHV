@@ -60,7 +60,15 @@ public class FileUtils {
         return size.get();
     }
 
-    private static final SimpleFileVisitor<Path> nukeVisitor = new SimpleFileVisitor<>() {
+    private static class DeleteFileVisitor extends SimpleFileVisitor<Path> {
+
+        private final long olderThan;
+        private final boolean deleteDir;
+
+        DeleteFileVisitor(long _olderThan, boolean _deleteDir) {
+            olderThan = _olderThan;
+            deleteDir = _deleteDir;
+        }
 
         private FileVisitResult delete(Path file) throws IOException {
             Files.delete(file);
@@ -69,7 +77,9 @@ public class FileUtils {
 
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            return delete(file);
+            if (olderThan < 0 || System.currentTimeMillis() - attrs.lastModifiedTime().toMillis() > olderThan)
+                return delete(file);
+            return FileVisitResult.CONTINUE;
         }
 
         @Override
@@ -79,13 +89,19 @@ public class FileUtils {
 
         @Override
         public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-            return delete(dir);
+            return deleteDir ? delete(dir) : FileVisitResult.CONTINUE;
         }
 
-    };
+    }
+
+    private static final DeleteFileVisitor nukeVisitor = new DeleteFileVisitor(-1, true);
 
     public static void deleteDir(File dir) throws IOException {
         Files.walkFileTree(dir.toPath(), nukeVisitor);
+    }
+
+    public static void deleteDir(File dir, long olderThan, boolean deleteDir) throws IOException {
+        Files.walkFileTree(dir.toPath(), new DeleteFileVisitor(olderThan, deleteDir));
     }
 
     public static List<URI> listDir(Path path) throws IOException {
