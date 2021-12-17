@@ -10,12 +10,16 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.threads.SingleExecutor;
 
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class SourcesDatabase extends Thread {
 
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
     private static final SingleExecutor executor = new SingleExecutor(new JHVThread.NamedClassThreadFactory(SourcesDatabase.class, "SourcesDatabase"));
 
     private static PreparedStatement insert;
@@ -38,7 +42,7 @@ public class SourcesDatabase extends Thread {
             select = connection.prepareStatement("SELECT sourceId FROM Sources WHERE server=? AND observatory LIKE ? AND dataset LIKE ? LIMIT 1");
             select.setQueryTimeout(30);
         } catch (SQLException e) {
-            Log.error("Could not create database connection", e);
+            LOGGER.log(Level.SEVERE, "Could not create database connection", e);
             try {
                 if (connection != null)
                     connection.close();
@@ -51,7 +55,7 @@ public class SourcesDatabase extends Thread {
         try {
             executor.invokeAndWait(new Insert(sourceId, server, observatory, dataset, start, end));
         } catch (Exception e) {
-            Log.error("SourcesDatabase.doInsert", e);
+            LOGGER.log(Level.SEVERE, "doInsert", e);
         }
     }
 
@@ -74,7 +78,7 @@ public class SourcesDatabase extends Thread {
         try {
             return executor.invokeAndWait(new Select(server, observatory, dataset));
         } catch (Exception e) {
-            Log.error("SourcesDatabase.doSelect", e);
+            LOGGER.log(Level.SEVERE, "doSelect", e);
         }
         return -1;
     }
