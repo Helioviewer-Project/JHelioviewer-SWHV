@@ -25,7 +25,7 @@ public class GLInfo {
         Message.err("OpenGL fatal error, JHelioviewer is not able to run:\n", err, true);
     }
 
-    public static void update(GL2 gl) {
+    public static void get(GL2 gl) {
         glVersion = "OpenGL " + gl.glGetString(GL2.GL_VERSION);
         Log2.info(glVersion);
         //Log2.info("Extensions: " + gl.glGetString(GL2.GL_EXTENSIONS));

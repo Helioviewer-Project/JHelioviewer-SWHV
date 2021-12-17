@@ -18,18 +18,14 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.stream.ImageInputStream;
 
+import org.helioviewer.jhv.Log2;
 //import org.helioviewer.jhv.base.XMLUtils;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.io.NetClient;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 // essentially static; local or network cache
 class GenericImage implements URIImageReader {
 
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     @Nullable
     @Override
@@ -51,7 +47,7 @@ class GenericImage implements URIImageReader {
                         xml = xml.trim().replace("&", "&amp;");
                 }
             } catch (Exception e) {
-                LOGGER.log(Level.WARNING, "readXML " + uri, e);
+                Log2.error(uri.toString(), e);
             }
             /*
             String[] names = metadata.getMetadataFormatNames();
