@@ -35,10 +35,11 @@ With JHelioviewer users can visualise the Sun for any time period between Septem
 1991 and today; they can perform basic image processing in real time, track features
 on the Sun, and interactively overlay magnetic field extrapolations. The software
 integrates solar event data and a timeline display. Once an interesting event has
-been identified, science quality data can be accessed for in-depth analysis. As a
-first step towards supporting science planning of the upcoming Solar Orbiter mission,
-JHelioviewer offers a virtual camera model that enables users to set the vantage
-point to the location of a spacecraft or celestial body at any given time.
+been identified, science quality data can be accessed for in-depth analysis.
+
+As support for the science planning of the Solar Orbiter mission, JHelioviewer
+offers a virtual camera model that enables users to set the vantage point to the
+location of a spacecraft or celestial body at any given time.
 
 References:
 
@@ -66,4 +67,5 @@ please also be ready to provide the log files from the session where the problem
 occured. The log files can be found in the Logs/ directory of your JHelioviewer
 home folder. You can find the correct log file by searching for the correct
 start date. The files have the form:
-jhv.'year'-'month'-'day'T'hours'-'minutes'-'seconds'.log
+
+JHV_'year'-'month'-'day'_'hours'.'minutes'.seconds'.log
