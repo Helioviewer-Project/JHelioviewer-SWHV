@@ -2,6 +2,8 @@ package org.helioviewer.jhv.view.j2k.io.jpip;
 
 import java.io.File;
 import java.time.Duration;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -21,6 +23,10 @@ import org.ehcache.config.units.EntryUnit;
 import org.ehcache.config.units.MemoryUnit;
 
 public class JPIPCacheManager {
+
+    static {
+        Logger.getLogger("org.ehcache").setLevel(Level.WARNING); // shutup Ehcache info logs
+    }
 
     private static final File levelCacheDir = new File(JHVDirectory.CACHE.getFile(), "JPIPLevel-3");
     private static final File streamCacheDir = new File(JHVDirectory.CACHE.getFile(), "JPIPStream-3");
