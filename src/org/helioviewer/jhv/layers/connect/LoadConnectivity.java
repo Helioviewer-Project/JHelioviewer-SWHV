@@ -9,6 +9,7 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.Log2;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.NetClient;
@@ -19,13 +20,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class LoadConnectivity {
-
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     public static class Connectivity {
 
@@ -91,7 +86,7 @@ public class LoadConnectivity {
                                 case "M" -> M.add(v);
                             }
                         } catch (Exception e) {
-                            LOGGER.log(Level.SEVERE, "ConnectivityLoad", e);
+                            Log2.warn(e);
                         }
                     }
                 }
@@ -112,7 +107,7 @@ public class LoadConnectivity {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            LOGGER.log(Level.SEVERE, "An error occurred while opening the remote file", t);
+            Log2.error(t);
             Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
         }
 

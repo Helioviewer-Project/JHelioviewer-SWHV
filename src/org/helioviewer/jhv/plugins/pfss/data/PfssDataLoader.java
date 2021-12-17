@@ -4,6 +4,7 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
+import org.helioviewer.jhv.Log2;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
@@ -17,13 +18,7 @@ import nom.tam.fits.BinaryTableHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 class PfssDataLoader {
-
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     static void submit(long time, String url) {
         EventQueueCallbackExecutor.pool.submit(new DataLoader(time, url), new Callback(url));
@@ -79,7 +74,7 @@ class PfssDataLoader {
         @Override
         public void onFailure(@Nonnull Throwable t) {
             PfssPlugin.downloads--;
-            LOGGER.log(Level.SEVERE, "PfssDataLoader: " + url, t);
+            Log2.error(url, t);
         }
 
     }

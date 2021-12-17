@@ -6,6 +6,7 @@ import java.util.concurrent.Future;
 
 import javax.annotation.Nonnull;
 
+import org.helioviewer.jhv.Log2;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
@@ -18,13 +19,8 @@ import org.json.JSONObject;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.util.concurrent.FutureCallback;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class BandDataProvider {
 
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
     private static final ArrayListMultimap<Band, Future<BandResponse>> workerMap = ArrayListMultimap.create();
 
     public static void loadBandTypes() {
@@ -83,12 +79,12 @@ public class BandDataProvider {
             if (result.bandName.equals(band.getBandType().getName()))
                 band.addToCache(result.values, result.dates);
             else
-                LOGGER.log(Level.SEVERE, "Expected " + band.getBandType().getName() + ", got " + result.bandName);
+                Log2.error("Expected " + band.getBandType().getName() + ", got " + result.bandName);
         }
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            LOGGER.log(Level.SEVERE, "Error downloading band", t);
+            Log2.error(t);
         }
 
     }
@@ -111,7 +107,7 @@ public class BandDataProvider {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            LOGGER.log(Level.SEVERE, "Error loading band", t);
+            Log2.error(t);
         }
 
     }
@@ -133,7 +129,7 @@ public class BandDataProvider {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            LOGGER.log(Level.SEVERE, "Error downloading band types", t);
+            Log2.error(t);
         }
 
     }

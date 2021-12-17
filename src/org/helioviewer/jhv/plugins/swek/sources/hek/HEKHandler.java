@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.helioviewer.jhv.Log2;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.database.EventDatabase;
@@ -23,14 +24,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 @SuppressWarnings("unchecked")
 public class HEKHandler extends SWEKHandler {
 
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
     private static final String _baseURL = "https://www.lmsal.com/hek/her?";
 
     @Override
@@ -47,7 +43,7 @@ public class HEKHandler extends SWEKHandler {
                 long start = TimeUtils.parse(result.getString("event_starttime"));
                 long end = TimeUtils.parse(result.getString("event_endtime"));
                 if (end < start) {
-                    LOGGER.log(Level.SEVERE, "Event end before start: " + result);
+                    Log2.warn("Event end before start: " + result);
                     continue;
                 }
 
@@ -73,7 +69,7 @@ public class HEKHandler extends SWEKHandler {
             }
             EventDatabase.dump_event2db(event2dbList, supplier);
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "parseRemote", e);
+            Log2.error(e);
             return false;
         }
         return true;

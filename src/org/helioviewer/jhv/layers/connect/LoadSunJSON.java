@@ -5,6 +5,7 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
+import org.helioviewer.jhv.Log2;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.layers.Layers;
@@ -13,13 +14,7 @@ import org.json.JSONObject;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class LoadSunJSON {
-
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     public interface Receiver {
         void setGeometry(SunJSON.GeometryCollection g);
@@ -60,7 +55,7 @@ public class LoadSunJSON {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            LOGGER.log(Level.SEVERE, "An error occurred while opening the remote file", t);
+            Log2.error(t);
             Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
         }
 

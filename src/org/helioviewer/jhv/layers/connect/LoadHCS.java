@@ -8,6 +8,7 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
+import org.helioviewer.jhv.Log2;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.NetClient;
@@ -16,13 +17,7 @@ import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class LoadHCS {
-
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     public interface Receiver {
         void setHCS(OrthoScaleList hcs);
@@ -54,7 +49,7 @@ public class LoadHCS {
                         try {
                             hcsList.add(ConnectUtils.toCartesian(values[4], values[3]));
                         } catch (Exception e) {
-                            LOGGER.log(Level.SEVERE, "HCS", e);
+                            Log2.warn(e);
                         }
                     }
                 }
@@ -72,7 +67,7 @@ public class LoadHCS {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            LOGGER.log(Level.SEVERE, "An error occurred while opening the remote file", t);
+            Log2.error(t);
             Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
         }
 
