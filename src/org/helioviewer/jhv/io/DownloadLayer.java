@@ -13,7 +13,6 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 
 import okio.Buffer;
@@ -23,7 +22,13 @@ import okio.BufferedSink;
 
 import com.google.common.util.concurrent.FutureCallback;
 
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public record DownloadLayer(ImageLayer layer, File dstFile, URI uri) implements Callable<File> {
+
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     @Nullable
     public static Future<File> submit(@Nonnull ImageLayer layer, @Nonnull APIRequest req, @Nonnull URI uri) {
@@ -75,7 +80,7 @@ public record DownloadLayer(ImageLayer layer, File dstFile, URI uri) implements 
         public void onFailure(@Nonnull Throwable t) {
             layer.doneDownload();
             dstFile.delete();
-            Log.error("DownloadRemote", t);
+            LOGGER.log(Level.SEVERE, "", t);
         }
 
     }

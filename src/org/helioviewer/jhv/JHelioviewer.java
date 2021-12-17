@@ -46,6 +46,7 @@ public class JHelioviewer {
         // Per default, the us locale should be used
         Locale.setDefault(Locale.US);
 
+        Log2.init();
         // Init log
         LogSettings.init("/settings/log4j.properties", JHVDirectory.LOGS.getPath());
         // Information log message

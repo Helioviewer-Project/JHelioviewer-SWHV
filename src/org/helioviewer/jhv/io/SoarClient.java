@@ -10,14 +10,19 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.gui.Message;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 
 import com.google.common.util.concurrent.FutureCallback;
 
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class SoarClient {
+
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     public interface Receiver {
         void setDataItems(List<DataItem> items);
@@ -53,7 +58,7 @@ public class SoarClient {
                     case JP2 -> jp2Uris.add(uri);
                 }
             } catch (Exception e) {
-                Log.error(e);
+                LOGGER.log(Level.SEVERE, "", e);
             }
         }
         Load.CDF.getAll(cdfUris);
@@ -95,7 +100,7 @@ public class SoarClient {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log.error("An error occurred while opening the remote file:", t);
+            LOGGER.log(Level.SEVERE, "An error occurred while opening the remote file:", t);
             Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
         }
 

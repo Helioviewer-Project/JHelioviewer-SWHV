@@ -8,9 +8,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.log.Log;
+
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CommandLine {
+
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     private static String[] arguments;
     private static String usageMessage;
@@ -72,10 +77,10 @@ public class CommandLine {
                     if (f.canRead()) {
                         uris.add(f.toURI());
                     } else
-                        Log.error("File not found: " + opt);
+                        LOGGER.log(Level.SEVERE, "File not found: " + opt);
                 }
             } catch (URISyntaxException e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, "", e);
             }
         }
         return uris;

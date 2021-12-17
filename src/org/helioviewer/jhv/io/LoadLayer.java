@@ -12,7 +12,6 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.ManyView;
 import org.helioviewer.jhv.view.View;
@@ -23,7 +22,13 @@ import org.helioviewer.jhv.threads.JHVThread;
 
 import com.google.common.util.concurrent.FutureCallback;
 
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class LoadLayer {
+
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     public static Future<View> submit(@Nonnull ImageLayer layer, @Nonnull APIRequest req) {
         return EventQueueCallbackExecutor.pool.submit(new LoadRemote(layer, req), new Callback(layer));
@@ -52,7 +57,7 @@ public class LoadLayer {
                     try {
                         return loadView(executor, null, uri, forceFITS);
                     } catch (Exception e) {
-                        Log.error(e);
+                        LOGGER.log(Level.SEVERE, "", e);
                         return null;
                     }
                 }).filter(Objects::nonNull).collect(Collectors.toList());
@@ -74,13 +79,13 @@ public class LoadLayer {
         @Override
         public void onFailure(@Nonnull Throwable t) {
             if (JHVThread.isInterrupted(t)) { // ignore
-                Log.info(t);
+                LOGGER.log(Level.INFO, "", t);
                 return;
             }
 
             layer.unload();
 
-            Log.error("An error occurred while opening the remote file:", t);
+            LOGGER.log(Level.SEVERE, "An error occurred while opening the remote file:", t);
             Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
         }
 
