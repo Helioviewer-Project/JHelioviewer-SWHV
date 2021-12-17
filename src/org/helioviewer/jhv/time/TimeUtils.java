@@ -18,7 +18,7 @@ public class TimeUtils {
 
     private static final ZoneOffset ZERO = ZoneOffset.ofTotalSeconds(0);
     private static final DateTimeFormatter milliFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
-    private static final DateTimeFormatter fileFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss");
+    public static final DateTimeFormatter fileFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss");
     public static final DateTimeFormatter sqlTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private static final PrettyTimeParser prettyParser = new PrettyTimeParser();

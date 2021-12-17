@@ -15,13 +15,7 @@ import org.helioviewer.jhv.io.FileUtils;
 
 import com.jidesoft.comparator.AlphanumComparator;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class JHVGlobals {
-
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     public static final String programName = "ESA JHelioviewer";
     public static final String downloadURL = "http://swhv.oma.be/download/";
@@ -55,7 +49,7 @@ public class JHVGlobals {
             p.load(is);
             p.stringPropertyNames().forEach(key -> System.setProperty(key, p.getProperty(key)));
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "determineVersionAndRevision", e);
+            Log2.warn("JHVGlobals.determineVersionAndRevision", e);
         }
 
         String v = System.getProperty("jhv.version");
@@ -67,7 +61,7 @@ public class JHVGlobals {
                 System.getProperty("os.arch") + ' ' + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ") " +
                 System.getProperty("java.vendor") + " JRE " + System.getProperty("java.version");
         versionDetail = String.format("%s %.1fGB %dCPU", userAgent, Runtime.getRuntime().maxMemory() / (1024 * 1024 * 1024.), Runtime.getRuntime().availableProcessors());
-        LOGGER.log(Level.INFO, versionDetail);
+        Log2.info(versionDetail);
     }
 
     // Attempts to create the necessary directories if they do not exist
@@ -119,7 +113,7 @@ public class JHVGlobals {
             if (UIGlobals.canBrowse && url != null)
                 Desktop.getDesktop().browse(new URI(url));
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "openURL", e);
+            Log2.warn("JHVGlobals.openURL", e);
         }
     }
 
