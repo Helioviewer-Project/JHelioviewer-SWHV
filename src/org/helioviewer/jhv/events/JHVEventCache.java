@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.SortedMap;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.interval.RequestCache;
@@ -131,7 +131,7 @@ public class JHVEventCache {
         Interval last = new Interval(end + DELTAT_GET, end + DELTAT_GET);
 
         if (first.compareTo(last) > 0) { // should not happen, but some users hit
-            Log2.error(start + " > " + end);
+            Log.error(start + " > " + end);
             return Collections.emptyList();
         }
 

@@ -25,7 +25,7 @@ class JHVInit {
             loadLibs();
             KakaduMessageSystem.startKduMessageSystem();
         } catch (Exception e) {
-            Log2.error("Failed to setup native libraries", e);
+            Log.error("Failed to setup native libraries", e);
             Message.err("Failed to setup native libraries", e.getMessage(), true);
             return;
         }
@@ -34,14 +34,14 @@ class JHVInit {
         try {
             JPIPCacheManager.init();
         } catch (Exception e) {
-            Log2.error("JPIP cache initialization error", e);
+            Log.error("JPIP cache initialization error", e);
         }
 
         ProxySettings.init();
         try {
             AIAResponse.load();
         } catch (Exception e) {
-            Log2.error("AIA response map load error", e);
+            Log.error("AIA response map load error", e);
         }
 
         FitsFactory.setUseHierarch(true);
@@ -103,7 +103,7 @@ class JHVInit {
             try (InputStream in = FileUtils.getResource("/kernels/" + x)) {
                 Files.copy(in, Path.of(JHVGlobals.dataCacheDir, x));
             } catch (Exception e) {
-                Log2.error("SPICE kernel copy error", e);
+                Log.error("SPICE kernel copy error", e);
             }
         });
         Spice.loadKernels(kernels);

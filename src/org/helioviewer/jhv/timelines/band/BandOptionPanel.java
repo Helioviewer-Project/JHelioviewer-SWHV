@@ -16,7 +16,7 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
@@ -71,7 +71,7 @@ class BandOptionPanel extends JPanel {
                     jo.write(writer);
                     EventQueue.invokeLater(() -> JHVGlobals.displayNotification(fileName));
                 } catch (Exception ex) {
-                    Log2.error("Failed to write JSON", ex);
+                    Log.error("Failed to write JSON", ex);
                 }
             }).start();
         });

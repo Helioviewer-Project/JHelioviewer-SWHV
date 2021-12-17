@@ -8,7 +8,7 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.NetClient;
@@ -49,7 +49,7 @@ public class LoadHCS {
                         try {
                             hcsList.add(ConnectUtils.toCartesian(values[4], values[3]));
                         } catch (Exception e) {
-                            Log2.warn(e);
+                            Log.warn(e);
                         }
                     }
                 }
@@ -67,7 +67,7 @@ public class LoadHCS {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log2.error(t);
+            Log.error(t);
             Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
         }
 

@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 
 import kdu_jni.KduException;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.view.j2k.image.ResolutionSet;
 import org.helioviewer.jhv.view.j2k.kakadu.KakaduSource;
 
@@ -37,7 +37,7 @@ public class CacheStatusRemote implements CacheStatus {
     @Override
     public ResolutionSet getResolutionSet(int frame) {
         if (resolutionSet[frame] == null) {
-            Log2.error("resolutionSet[" + frame + "] is null"); // never happened?
+            Log.error("resolutionSet[" + frame + "] is null"); // never happened?
             return resolutionSet[0];
         }
         return resolutionSet[frame];

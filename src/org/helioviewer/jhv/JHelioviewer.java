@@ -47,9 +47,9 @@ public class JHelioviewer {
         // This attempts to create the necessary directories for the application
         JHVGlobals.createDirs();
         // Init log
-        Log2.init();
+        Log.init();
         // Information log message
-        Log2.info("JHelioviewer started with command-line options: " + String.join(" ", args));
+        Log.info("JHelioviewer started with command-line options: " + String.join(" ", args));
 
         // Read the version and revision from the JAR metafile
         JHVGlobals.getVersion();
@@ -75,21 +75,21 @@ public class JHelioviewer {
         EventQueue.invokeLater(() -> {
             UIGlobals.setLaf();
 
-            Log2.info("Start main window");
+            Log.info("Start main window");
             ExitHooks.attach();
             JFrame frame = JHVFrame.prepare();
 
             try {
                 if (args.length != 0 && args[0].equals("--exclude-plugins")) {
-                    Log2.info("Do not load plugins");
+                    Log.info("Do not load plugins");
                 } else {
-                    Log2.info("Load bundled plugins");
+                    Log.info("Load bundled plugins");
                     PluginManager.addPlugin(new EVEPlugin());
                     PluginManager.addPlugin(new SWEKPlugin());
                     PluginManager.addPlugin(new PfssPlugin());
                 }
             } catch (Exception e) {
-                Log2.warn("Plugin load error", e);
+                Log.warn("Plugin load error", e);
             }
 
             JComponent leftPane = JHVFrame.getLeftScrollPane();
@@ -119,7 +119,7 @@ public class JHelioviewer {
             GraphicsDevice[] screens = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
             return screens == null || screens.length == 0;
         } catch (HeadlessException e) {
-            Log2.error(e);
+            Log.error(e);
             return true;
         }
     }

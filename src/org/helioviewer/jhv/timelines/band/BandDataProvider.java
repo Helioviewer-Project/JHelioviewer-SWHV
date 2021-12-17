@@ -6,7 +6,7 @@ import java.util.concurrent.Future;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
@@ -79,12 +79,12 @@ public class BandDataProvider {
             if (result.bandName.equals(band.getBandType().getName()))
                 band.addToCache(result.values, result.dates);
             else
-                Log2.error("Expected " + band.getBandType().getName() + ", got " + result.bandName);
+                Log.error("Expected " + band.getBandType().getName() + ", got " + result.bandName);
         }
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log2.error(t);
+            Log.error(t);
         }
 
     }
@@ -107,7 +107,7 @@ public class BandDataProvider {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log2.error(t);
+            Log.error(t);
         }
 
     }
@@ -129,7 +129,7 @@ public class BandDataProvider {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log2.error(t);
+            Log.error(t);
         }
 
     }

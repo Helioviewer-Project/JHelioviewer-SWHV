@@ -29,11 +29,11 @@ public record JHVUpdate(boolean verbose) implements Runnable {
                     Settings.setProperty("update.next", Integer.toString(n));
                 }
                 if (n != 0) {
-                    Log2.info("Update check suspended for this startup");
+                    Log.info("Update check suspended for this startup");
                     return;
                 }
             } catch (NumberFormatException e) {
-                Log2.error("Invalid update setting", e);
+                Log.error("Invalid update setting", e);
                 Settings.setProperty("update.next", Integer.toString(0));
             }
         }
@@ -47,7 +47,7 @@ public record JHVUpdate(boolean verbose) implements Runnable {
             EventQueue.invokeLater(() -> {
                 String runningVersion = JHVGlobals.version + '.' + JHVGlobals.revision;
                 if (JHVGlobals.alphanumComparator.compare(version, runningVersion) > 0) {
-                    Log2.info("Found newer version " + version);
+                    Log.info("Found newer version " + version);
 
                     NewVersionDialog dialog = new NewVersionDialog("JHelioviewer " + version + " is now available (you have " + runningVersion + ").", verbose);
                     dialog.showDialog();
@@ -60,7 +60,7 @@ public record JHVUpdate(boolean verbose) implements Runnable {
                 }
             });
         } catch (IOException e) {
-            Log2.warn(e);
+            Log.warn(e);
             if (verbose)
                 Message.warn("Update check error", "While checking for a newer version got " + e.getLocalizedMessage());
         }

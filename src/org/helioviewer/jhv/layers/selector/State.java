@@ -15,7 +15,7 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -40,7 +40,7 @@ public class State {
         try (BufferedWriter writer = Files.newBufferedWriter(Path.of(dir, file), StandardCharsets.UTF_8)) {
             toJson().write(writer);
         } catch (IOException e) {
-            Log2.error(e);
+            Log.error(e);
         }
     }
 
@@ -110,7 +110,7 @@ public class State {
             Constructor<?> cons = c.getConstructor(JSONObject.class);
             return cons.newInstance(jdata);
         } catch (Exception e) {
-            Log2.error(e);
+            Log.error(e);
         }
         return null;
     }
@@ -126,7 +126,7 @@ public class State {
                         layer.setEnabled(jo.optBoolean("enabled", true));
                     }
                 } catch (Exception e) { // don't stop for a broken one
-                    Log2.error(e);
+                    Log.error(e);
                 }
             }
         }
@@ -145,7 +145,7 @@ public class State {
                         layer.setEnabled(jo.optBoolean("enabled", false));
                     }
                 } catch (Exception e) { // don't stop for a broken one
-                    Log2.error("layers", e);
+                    Log.error("layers", e);
                 }
             }
         }
@@ -164,7 +164,7 @@ public class State {
                     if (jo.optBoolean("master", false))
                         masterLayer = layer;
                 } catch (Exception e) { // don't stop for a broken one
-                    Log2.error("imageLayers", e);
+                    Log.error("imageLayers", e);
                 }
             }
         }
@@ -214,7 +214,7 @@ public class State {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log2.error(t);
+            Log.error(t);
         }
 
     }
@@ -232,7 +232,7 @@ public class State {
             if (plugins != null)
                 PluginManager.loadState(plugins);
         } catch (Exception e) {
-            Log2.error(e);
+            Log.error(e);
         }
     }
 

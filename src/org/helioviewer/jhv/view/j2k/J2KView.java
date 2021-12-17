@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 
 import kdu_jni.KduException;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
@@ -107,7 +107,7 @@ public class J2KView extends BaseView {
                 for (int i = 0; i <= maxFrame; i++) {
                     long milli = frameMap.key(i).milli;
                     if (milli != metaData[i].getViewpoint().time.milli)
-                        Log2.warn("Badly ordered metadata: " + uri + "[" + i + "]: expected " + frameMap.key(i) + ", got " + metaData[i].getViewpoint().time);
+                        Log.warn("Badly ordered metadata: " + uri + "[" + i + "]: expected " + frameMap.key(i) + ", got " + metaData[i].getViewpoint().time);
 
                     cacheKey[i] = request.sourceId() + "+" + milli;
                 }
@@ -169,7 +169,7 @@ public class J2KView extends BaseView {
                         aJpipCache.Native_destroy();
                     }
                 } catch (KduException e) {
-                    Log2.error(e);
+                    Log.error(e);
                 }
             }).start();
         }

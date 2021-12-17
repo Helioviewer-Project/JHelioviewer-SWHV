@@ -4,7 +4,7 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
@@ -74,7 +74,7 @@ class PfssDataLoader {
         @Override
         public void onFailure(@Nonnull Throwable t) {
             PfssPlugin.downloads--;
-            Log2.error(url, t);
+            Log.error(url, t);
         }
 
     }

@@ -16,7 +16,7 @@ import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.TransferHandler;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
@@ -98,7 +98,7 @@ class TableRowTransferHandler extends TransferHandler {
                     return true;
                 }
             } catch (Exception e) {
-                Log2.error(e);
+                Log.error(e);
             }
         }
         return false;

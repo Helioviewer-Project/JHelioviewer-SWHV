@@ -6,7 +6,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -23,7 +23,7 @@ public class Spice {
                 CSPICE.furnsh(Path.of(JHVGlobals.dataCacheDir, f).toString());
             }
         } catch (SpiceErrorException e) {
-            Log2.error(e);
+            Log.error(e);
         }
     }
 
@@ -32,7 +32,7 @@ public class Spice {
         try {
             return CSPICE.et2utc(CSPICE.str2et(time), "isoc", 0);
         } catch (SpiceErrorException e) {
-            Log2.error(e);
+            Log.error(e);
         }
         return null;
     }
@@ -52,7 +52,7 @@ public class Spice {
             //System.out.println((sw.elapsed().toNanos() / 1e9));
             return ret;
         } catch (SpiceErrorException e) {
-            Log2.error(e);
+            Log.error(e);
         }
         return null;
     }
@@ -63,7 +63,7 @@ public class Spice {
             double[] c = positionLatitudinal(target, time.milli, frame, observer);
             return new Position(time, c[0], c[1], c[2]);
         } catch (SpiceErrorException e) {
-            Log2.error(e);
+            Log.error(e);
         }
         return null;
     }
@@ -78,7 +78,7 @@ public class Spice {
                 lon += 2 * Math.PI;
             return new Position(time, c[0], -lon, c[2]);
         } catch (Exception e) {
-            Log2.error(e);
+            Log.error(e);
         }
         return null;
     }
@@ -91,7 +91,7 @@ public class Spice {
             double et = milli2et(time.milli);
             return CSPICE.m2eul(CSPICE.pxform(fromFrame, toFrame, et), axes);
         } catch (Exception e) {
-            Log2.error(e);
+            Log.error(e);
         }
         return null;
     }

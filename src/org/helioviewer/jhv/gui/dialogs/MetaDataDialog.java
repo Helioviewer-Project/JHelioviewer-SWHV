@@ -18,7 +18,7 @@ import javax.swing.table.TableRowSorter;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.XMLUtils;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.base.HTMLPane;
@@ -141,13 +141,13 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
                 try (BufferedWriter writer = Files.newBufferedWriter(Path.of(outFileName), StandardCharsets.UTF_8)) {
                     writer.write(xml, 0, xml.length());
                 } catch (Exception ex) {
-                    Log2.error(outFileName, ex);
+                    Log.error(outFileName, ex);
                     return; // try with resources
                 }
                 JHVGlobals.displayNotification(outFileName);
             });
         } catch (Exception e) {
-            Log2.error(e);
+            Log.error(e);
         }
     }
 

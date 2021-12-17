@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.image.MappedImageFactory;
 import org.helioviewer.jhv.base.image.NIOImageFactory;
@@ -50,7 +50,7 @@ public class ExportMovie implements Movie.Listener {
             BufferedImage eve = EVEImage == null ? null : NIOImageFactory.copyImage(EVEImage);
             encodeExecutor.execute(new FrameConsumer(exporter, screen, eve, EVEMovieLinePosition));
         } catch (Exception e) {
-            Log2.error(e);
+            Log.error(e);
         }
         Movie.grabDone();
 
@@ -114,7 +114,7 @@ public class ExportMovie implements Movie.Listener {
         try {
             disposeMovieWriter(true);
         } catch (Exception e) {
-            Log2.error(e);
+            Log.error(e);
         }
     }
 
@@ -137,7 +137,7 @@ public class ExportMovie implements Movie.Listener {
             try {
                 movieExporter.encode(mainImage, eveImage, movieLinePosition);
             } catch (Exception e) {
-                Log2.error(e);
+                Log.error(e);
             } finally {
                 NIOImageFactory.free(eveImage);
                 MappedImageFactory.free(mainImage);
@@ -151,7 +151,7 @@ public class ExportMovie implements Movie.Listener {
             try {
                 movieExporter.close();
             } catch (Exception e) {
-                Log2.error(e);
+                Log.error(e);
             }
             System.gc();
         }

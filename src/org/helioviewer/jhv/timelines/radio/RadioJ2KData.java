@@ -5,7 +5,7 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.image.NIOImageFactory;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
@@ -72,14 +72,14 @@ class RadioJ2KData implements ImageDataHandler {
     @Override
     public void handleData(ImageData imageData) {
         if (bufferedImage != null) {
-            Log2.warn("Already handled data");
+            Log.warn("Already handled data");
             return;
         }
         ImageBuffer imageBuffer = imageData.getImageBuffer();
         int w = imageBuffer.width;
         int h = imageBuffer.height;
         if (w < 1 || h < 1) {
-            Log2.error("width: " + w + " height: " + h);
+            Log.error("width: " + w + " height: " + h);
             return;
         }
 

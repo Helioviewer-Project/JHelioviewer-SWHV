@@ -6,7 +6,7 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.threads.EventDispatchQueue;
@@ -72,7 +72,7 @@ class LoadRequest {
                 try {
                     CDFReader.load(uri);
                 } catch (Exception e) {
-                    Log2.warn(uri.toString(), e);
+                    Log.warn(uri.toString(), e);
                 }
             });
             return null;
@@ -95,7 +95,7 @@ class LoadRequest {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log2.error(t);
+            Log.error(t);
             Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
         }
 
@@ -111,7 +111,7 @@ class LoadRequest {
         @Override
         public void onFailure(@Nonnull Throwable t) {
             Timelines.dc.setStatus(null);
-            Log2.error(t);
+            Log.error(t);
             Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
         }
 

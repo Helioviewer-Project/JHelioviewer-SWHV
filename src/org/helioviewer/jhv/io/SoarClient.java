@@ -9,7 +9,7 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -53,7 +53,7 @@ public class SoarClient {
                     case JP2 -> jp2Uris.add(uri);
                 }
             } catch (Exception e) {
-                Log2.warn(e);
+                Log.warn(e);
             }
         }
         Load.CDF.getAll(cdfUris);
@@ -95,7 +95,7 @@ public class SoarClient {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log2.error(t);
+            Log.error(t);
             Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
         }
 

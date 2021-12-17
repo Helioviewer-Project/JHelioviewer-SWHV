@@ -9,7 +9,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.io.FileUtils;
 
 import org.ehcache.Cache;
@@ -76,7 +76,7 @@ public class JPIPCacheManager {
             if (clevel != null && clevel <= level)
                 return streamCache.get(key);
         } catch (Exception e) { // might get interrupted
-            Log2.error(e);
+            Log.error(e);
         }
         return null;
     }
@@ -89,7 +89,7 @@ public class JPIPCacheManager {
                 streamCache.put(key, stream);
             }
         } catch (Exception e) {
-            Log2.error(e);
+            Log.error(e);
         }
     }
 
@@ -107,7 +107,7 @@ public class JPIPCacheManager {
             levelManager.close();
             streamManager.close();
         } catch (Exception e) {
-            Log2.error(e);
+            Log.error(e);
         }
     }
 
@@ -117,7 +117,7 @@ public class JPIPCacheManager {
             levelManager.destroy();
             streamManager.destroy();
         } catch (Exception e) {
-            Log2.error(e);
+            Log.error(e);
         }
         init();
     }
@@ -128,7 +128,7 @@ public class JPIPCacheManager {
             size += FileUtils.diskUsage(levelCacheDir);
             size += FileUtils.diskUsage(streamCacheDir);
         } catch (Exception e) {
-            Log2.error(e);
+            Log.error(e);
         }
         return size;
     }

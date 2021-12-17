@@ -34,7 +34,7 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
-import org.helioviewer.jhv.Log2;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.export.VideoFormat;
 import org.helioviewer.jhv.gui.JHVFrame;
@@ -241,7 +241,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
                 JPIPCacheManager.clear();
                 setLabelCache();
             } catch (Exception ex) {
-                Log2.error("JPIP cache clear error", ex);
+                Log.error("JPIP cache clear error", ex);
             }
         });
         cache.add(labelCache);
