@@ -63,20 +63,20 @@ public class DataSources {
         put("label", "Goddard Space Flight Center").
         put("schema", "/data/sources_v1.0.json").
         build()).
-        put("GSFC Beta", new ImmutableMap.Builder<String, String>().
-        put("API.getDataSources", "https://api.beta.helioviewer.org/v2/getDataSources/?verbose=true&enable=[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]").
-        put("API.getJP2Image", "https://api.beta.helioviewer.org/v2/getJP2Image/?").
-        put("API.getJPX", "https://api.beta.helioviewer.org/v2/getJPX/?").
-        put("label", "Goddard Space Flight Center Beta Server").
-        put("schema", "/data/sources_v1.0.json").
-        build()).
-        put("ESAC", new ImmutableMap.Builder<String, String>().
-        put("API.getDataSources", "http://soar.esac.esa.int/jpip-api/v2/getDataSources/?verbose=true&enable=[SOLO]").
-        put("API.getJP2Image", "http://soar.esac.esa.int/jpip-api/v2/getJP2Image/?").
-        put("API.getJPX", "http://soar.esac.esa.int/jpip-api/v2/getJPX/?").
-        put("label", "European Space Astronomy Center").
-        put("schema", "/data/sources_v1.0.json").
-        build()).
+            put("GSFC Beta", new ImmutableMap.Builder<String, String>().
+                    put("API.getDataSources", "https://api.beta.helioviewer.org/v2/getDataSources/?verbose=true&enable=[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]").
+                    put("API.getJP2Image", "https://api.beta.helioviewer.org/v2/getJP2Image/?").
+                    put("API.getJPX", "https://api.beta.helioviewer.org/v2/getJPX/?").
+                    put("label", "Goddard Space Flight Center Beta Server").
+                    put("schema", "/data/sources_v1.0.json").
+                    build()).
+            put("ESAC", new ImmutableMap.Builder<String, String>().
+                    put("API.getDataSources", "http://soar.esac.esa.int/jpip-api/v2/getDataSources/?verbose=true&enable=[SOLO]").
+                    put("API.getJP2Image", "http://soar.esac.esa.int/jpip-api/v2/getJP2Image/?").
+                    put("API.getJPX", "http://soar.esac.esa.int/jpip-api/v2/getJPX/?").
+                    put("label", "European Space Astronomy Center").
+                    put("schema", "/data/sources_v1.0.json").
+                    build()).
             build();
 
     public static Set<String> getServers() {

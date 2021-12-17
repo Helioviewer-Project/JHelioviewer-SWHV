@@ -6,7 +6,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -15,7 +14,13 @@ import spice.basic.SpiceErrorException;
 
 //import com.google.common.base.Stopwatch;
 
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class Spice {
+
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     public static void loadKernels(List<String> files) {
         try {
@@ -23,7 +28,7 @@ public class Spice {
                 CSPICE.furnsh(Path.of(JHVGlobals.dataCacheDir, f).toString());
             }
         } catch (SpiceErrorException e) {
-            Log.error(e);
+            LOGGER.log(Level.SEVERE, "loadKernels", e);
         }
     }
 
@@ -32,7 +37,7 @@ public class Spice {
         try {
             return CSPICE.et2utc(CSPICE.str2et(time), "isoc", 0);
         } catch (SpiceErrorException e) {
-            Log.error(e);
+            LOGGER.log(Level.SEVERE, "timeParse2UTC", e);
         }
         return null;
     }
@@ -52,7 +57,7 @@ public class Spice {
             //System.out.println((sw.elapsed().toNanos() / 1e9));
             return ret;
         } catch (SpiceErrorException e) {
-            Log.error(e);
+            LOGGER.log(Level.SEVERE, "getPositionRange", e);
         }
         return null;
     }
@@ -63,7 +68,7 @@ public class Spice {
             double[] c = positionLatitudinal(target, time.milli, frame, observer);
             return new Position(time, c[0], c[1], c[2]);
         } catch (SpiceErrorException e) {
-            Log.error(e);
+            LOGGER.log(Level.SEVERE, "getPositionLatitudinal", e);
         }
         return null;
     }
@@ -78,7 +83,7 @@ public class Spice {
                 lon += 2 * Math.PI;
             return new Position(time, c[0], -lon, c[2]);
         } catch (Exception e) {
-            Log.error(e);
+            LOGGER.log(Level.SEVERE, "getCarrington", e);
         }
         return null;
     }
@@ -91,7 +96,7 @@ public class Spice {
             double et = milli2et(time.milli);
             return CSPICE.m2eul(CSPICE.pxform(fromFrame, toFrame, et), axes);
         } catch (Exception e) {
-            Log.error(e);
+            LOGGER.log(Level.SEVERE, "getRotation", e);
         }
         return null;
     }

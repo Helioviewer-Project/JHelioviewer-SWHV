@@ -27,12 +27,16 @@ import org.helioviewer.jhv.events.SWEK;
 import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.events.SWEKSupplier;
 import org.helioviewer.jhv.io.JSONUtils;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.threads.SingleExecutor;
 
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class EventDatabase {
 
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
     private static final SingleExecutor executor = new SingleExecutor(new JHVThread.NamedClassThreadFactory(EventDatabaseThread.class, "EventDatabase"));
 
     public record Event2Db(byte[] compressedJson, long start, long end, long archiv, String uid,
@@ -161,7 +165,7 @@ public class EventDatabase {
                 pstatement.executeUpdate();
             } else if (id0 != id1) {
                 errorcode = -1;
-                Log.error("Could not add association to database ");
+                LOGGER.log(Level.SEVERE, "Could not add association to database");
             }
             i++;
         }
@@ -172,7 +176,7 @@ public class EventDatabase {
         try {
             return executor.invokeAndWait(new DumpAssociation2Db(assocs));
         } catch (Exception e) {
-            Log.error(e);
+            LOGGER.log(Level.SEVERE, "", e);
         }
         return -1;
     }
@@ -196,7 +200,7 @@ public class EventDatabase {
                     pstatement.executeUpdate();
                 } else {
                     errorcode = -1;
-                    Log.error("Could not add association to database ");
+                    LOGGER.log(Level.SEVERE, "Could not add association to database");
                 }
                 i++;
             }
@@ -228,7 +232,7 @@ public class EventDatabase {
         try {
             return executor.invokeAndWait(new DumpEvent2Db(event2db_list, type));
         } catch (Exception e) {
-            Log.error(e);
+            LOGGER.log(Level.SEVERE, "", e);
         }
         return get_id_init_list(event2db_list.size());
     }
@@ -298,7 +302,7 @@ public class EventDatabase {
                         pstatement.executeUpdate();
                     }
                 } else {
-                    Log.error("Failed to insert event");
+                    LOGGER.log(Level.SEVERE, "Failed to insert event");
                 }
                 inserted_ids[i] = generatedKey;
             }
@@ -307,7 +311,7 @@ public class EventDatabase {
             ArrayList<Pair<Integer, Integer>> assocs = new ArrayList<>();
             for (int id : inserted_ids) {
                 if (id == -1) {
-                    Log.error("Failed to dump to database");
+                    LOGGER.log(Level.SEVERE, "Failed to dump to database");
                     assocs.add(new Pair<>(1, 1));
                 } else {
                     List<JHVEvent> rels = _getOtherRelations(id, type, true, false, true);
@@ -388,7 +392,7 @@ public class EventDatabase {
                 try {
                     nEvents.add(parseJSON(jsonEvent, full));
                 } catch (Exception e) {
-                    Log.error(e);
+                    LOGGER.log(Level.SEVERE, "", e);
                 }
             }
             jsonEvents.clear();
@@ -400,7 +404,7 @@ public class EventDatabase {
             try {
                 nEvents.add(parseJSON(ev, full));
             } catch (Exception e) {
-                Log.error(e);
+                LOGGER.log(Level.SEVERE, "", e);
             }
         }
 
@@ -436,7 +440,7 @@ public class EventDatabase {
                 }
                 dstatement.getConnection().commit();
             } catch (SQLException e) {
-                Log.error("Could not serialize date_range to database " + e.getMessage());
+                LOGGER.log(Level.SEVERE, "Could not serialize date_range to database", e);
             }
         }
     }
@@ -445,7 +449,7 @@ public class EventDatabase {
         try {
             return executor.invokeAndWait(new Db2DateRange(type));
         } catch (Exception e) {
-            Log.error(e);
+            LOGGER.log(Level.SEVERE, "", e);
         }
         return new ArrayList<>();
     }
@@ -501,7 +505,7 @@ public class EventDatabase {
         try {
             return executor.invokeAndWait(new Events2Program(start, end, type, params));
         } catch (Exception e) {
-            Log.error(e);
+            LOGGER.log(Level.SEVERE, "", e);
         }
         return new ArrayList<>();
     }
@@ -535,7 +539,7 @@ public class EventDatabase {
                         try {
                             eventList.add(parseJSON(new JsonEvent(json, type, id, _start, _end), false));
                         } catch (Exception e) {
-                            Log.error(e);
+                            LOGGER.log(Level.SEVERE, "", e);
                         }
                     }
                 }
@@ -548,7 +552,7 @@ public class EventDatabase {
         try {
             return executor.invokeAndWait(new Associations2Program(start, end, type));
         } catch (Exception e) {
-            Log.error(e);
+            LOGGER.log(Level.SEVERE, "", e);
         }
         return new ArrayList<>();
     }
@@ -579,7 +583,7 @@ public class EventDatabase {
         try {
             return executor.invokeAndWait(new Relations2Program(event_id, type_left, type_right, param_left, param_right));
         } catch (Exception e) {
-            Log.error(e);
+            LOGGER.log(Level.SEVERE, "", e);
         }
         return new ArrayList<>();
     }
@@ -661,7 +665,7 @@ public class EventDatabase {
         try {
             return executor.invokeAndWait(new Event2Program(event_id));
         } catch (Exception e) {
-            Log.error(e);
+            LOGGER.log(Level.SEVERE, "", e);
         }
         return null;
     }

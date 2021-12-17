@@ -24,7 +24,6 @@ import org.helioviewer.jhv.gui.components.base.HTMLPane;
 import org.helioviewer.jhv.gui.components.base.WrappedTable;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.w3c.dom.Document;
@@ -35,8 +34,14 @@ import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 import com.jidesoft.swing.JideSplitPane;
 
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 @SuppressWarnings("serial")
 public class MetaDataDialog extends StandardDialog implements ShowableDialog {
+
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     private final JideSplitPane content = new JideSplitPane(JideSplitPane.VERTICAL_SPLIT);
     private final JButton exportFitsButton = new JButton("Export FITS Header as XML");
@@ -141,13 +146,13 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
                 try (BufferedWriter writer = Files.newBufferedWriter(Path.of(outFileName), StandardCharsets.UTF_8)) {
                     writer.write(xml, 0, xml.length());
                 } catch (Exception ex) {
-                    Log.error("Failed to write XML: " + ex);
+                    LOGGER.log(Level.SEVERE, "Failed to write XML", ex);
                     return; // try with resources
                 }
                 JHVGlobals.displayNotification(outFileName);
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "setMetaData", e);
         }
     }
 

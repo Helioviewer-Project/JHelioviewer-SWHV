@@ -40,7 +40,6 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.actions.LoadStateDialog;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.io.DataSources;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.time.TimeMode;
@@ -49,8 +48,14 @@ import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCacheManager;
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 @SuppressWarnings("serial")
 public class PreferencesDialog extends StandardDialog implements ShowableDialog {
+
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     private final JLabel labelCache = new JLabel("The image cache currently uses 0.0GB on disk.", JLabel.RIGHT);
 
@@ -241,7 +246,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
                 JPIPCacheManager.clear();
                 setLabelCache();
             } catch (Exception ex) {
-                Log.error("JPIP cache clear error", ex);
+                LOGGER.log(Level.SEVERE, "JPIP cache clear error", ex);
             }
         });
         cache.add(labelCache);
