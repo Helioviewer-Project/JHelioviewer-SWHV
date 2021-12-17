@@ -32,7 +32,7 @@ import org.json.JSONObject;
 public class SampClient extends HubConnector {
 
     static {
-        Logger.getLogger("org.astrogrid.samp").setLevel(Level.WARNING);
+        Logger.getLogger("org.astrogrid.samp").setLevel(Level.WARNING); // shutup SAMP info logs
     }
 
     private static final Map<String, String> harmless = Collections.singletonMap("x-samp.mostly-harmless", "1"); // allow SAMP messages from web

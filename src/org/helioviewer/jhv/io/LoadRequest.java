@@ -8,7 +8,6 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.EventDispatchQueue;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.timelines.Timelines;
@@ -19,7 +18,13 @@ import org.json.JSONObject;
 
 import com.google.common.util.concurrent.FutureCallback;
 
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 class LoadRequest {
+
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     static void submit(@Nonnull URI uri) {
         EventQueueCallbackExecutor.pool.submit(new LoadRequestURI(uri), new Callback());
@@ -72,7 +77,7 @@ class LoadRequest {
                 try {
                     CDFReader.load(uri);
                 } catch (Exception e) {
-                    Log.error(e);
+                    LOGGER.log(Level.SEVERE, "", e);
                 }
             });
             return null;
@@ -95,7 +100,7 @@ class LoadRequest {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log.error("An error occurred while opening the remote file:", t);
+            LOGGER.log(Level.SEVERE, "An error occurred while opening the remote file:", t);
             Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
         }
 
@@ -111,7 +116,7 @@ class LoadRequest {
         @Override
         public void onFailure(@Nonnull Throwable t) {
             Timelines.dc.setStatus(null);
-            Log.error("An error occurred while opening the remote file:", t);
+            LOGGER.log(Level.SEVERE, "An error occurred while opening the remote file:", t);
             Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
         }
 
