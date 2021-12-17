@@ -18,6 +18,7 @@ import javax.swing.table.TableRowSorter;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.Log2;
 import org.helioviewer.jhv.base.XMLUtils;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.base.HTMLPane;
@@ -34,14 +35,8 @@ import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 import com.jidesoft.swing.JideSplitPane;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 @SuppressWarnings("serial")
 public class MetaDataDialog extends StandardDialog implements ShowableDialog {
-
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     private final JideSplitPane content = new JideSplitPane(JideSplitPane.VERTICAL_SPLIT);
     private final JButton exportFitsButton = new JButton("Export FITS Header as XML");
@@ -146,13 +141,13 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
                 try (BufferedWriter writer = Files.newBufferedWriter(Path.of(outFileName), StandardCharsets.UTF_8)) {
                     writer.write(xml, 0, xml.length());
                 } catch (Exception ex) {
-                    LOGGER.log(Level.SEVERE, "Failed to write XML", ex);
+                    Log2.error(outFileName, ex);
                     return; // try with resources
                 }
                 JHVGlobals.displayNotification(outFileName);
             });
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "setMetaData", e);
+            Log2.error(e);
         }
     }
 

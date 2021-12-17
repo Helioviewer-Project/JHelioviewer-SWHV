@@ -7,15 +7,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.helioviewer.jhv.Log2;
 import org.helioviewer.jhv.Settings;
 
-import java.lang.invoke.MethodHandles;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class CommandLine {
-
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     private static String[] arguments;
     private static String usageMessage;
@@ -77,10 +72,10 @@ public class CommandLine {
                     if (f.canRead()) {
                         uris.add(f.toURI());
                     } else
-                        LOGGER.log(Level.SEVERE, "File not found: " + opt);
+                        Log2.warn("File not found: " + opt);
                 }
             } catch (URISyntaxException e) {
-                LOGGER.log(Level.SEVERE, "getURIOptionValues", e);
+                Log2.warn(e);
             }
         }
         return uris;

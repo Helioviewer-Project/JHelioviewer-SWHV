@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 //import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.JHVGlobals;
+//import org.helioviewer.jhv.Log2;
 
 import okhttp3.Cache;
 import okhttp3.CacheControl;
@@ -24,13 +25,8 @@ import okhttp3.ResponseBody;
 //import okhttp3.logging.HttpLoggingInterceptor;
 import okio.BufferedSource;
 
-//import java.lang.invoke.MethodHandles;
-//import java.util.logging.Level;
-//import java.util.logging.Logger;
-
 class NetClientRemote implements NetClient {
 
-    // private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
     private static final Dispatcher dispatcher;
 
     static {
@@ -120,15 +116,15 @@ class NetClientRemote implements NetClient {
         public Response intercept(@Nonnull Chain chain) throws IOException {
             long t1 = System.nanoTime();
             Request r1 = chain.request();
-            LOGGER.log(Level.INFO, String.format("Sending request %s on %s%n%s", r1.url(), chain.connection(), r1.headers()));
+            Log2.info(String.format("Sending request %s on %s%n%s", r1.url(), chain.connection(), r1.headers()));
 
             Response r2 = chain.proceed(r1);
             long t2 = System.nanoTime();
-            LOGGER.log(Level.INFO, String.format("Received response for %s in %.1fms", r1.url(), (t2 - t1) / 1e6d));
+            Log2.info(String.format("Received response for %s in %.1fms", r1.url(), (t2 - t1) / 1e6d));
 
             Response r3 = r2.networkResponse();
             if (r3 != null)
-                LOGGER.log(Level.INFO, String.format("Network headers %s:\n%s", r1.url(), r3.headers()));
+                Log2.info(String.format("Network headers %s:\n%s", r1.url(), r3.headers()));
 
             return r2;
         }
