@@ -1,18 +1,20 @@
 package org.helioviewer.jhv;
 
-//import javax.swing.JOptionPane;
-
 import org.helioviewer.jhv.export.ExportMovie;
-//import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.log.Log;
+
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ExitHooks {
+
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     private static final Thread finishMovieThread = new Thread(() -> {
         try {
             ExportMovie.disposeMovieWriter(false);
         } catch (Exception e) {
-            Log.warn("Movie was not shut down properly");
+            LOGGER.log(Level.WARNING, "Movie was not shut down properly");
         }
     });
 
@@ -22,7 +24,6 @@ public class ExitHooks {
     }
 
     public static boolean exitProgram() {
-        // return !(JOptionPane.showConfirmDialog(ImageViewerGui.getMainFrame(), "Are you sure you want to quit?", "Confirm", JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION);
         return true;
     }
 
