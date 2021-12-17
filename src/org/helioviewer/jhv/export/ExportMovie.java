@@ -17,8 +17,13 @@ import org.helioviewer.jhv.threads.JHVThread;
 
 import com.jogamp.opengl.GL2;
 
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class ExportMovie implements Movie.Listener {
 
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
     private static final ExportMovie instance = new ExportMovie();
     private static final ExecutorService encodeExecutor = Executors.newSingleThreadExecutor(new JHVThread.NamedThreadFactory("Movie Encode"));
 
@@ -49,7 +54,7 @@ public class ExportMovie implements Movie.Listener {
             BufferedImage eve = EVEImage == null ? null : NIOImageFactory.copyImage(EVEImage);
             encodeExecutor.execute(new FrameConsumer(exporter, screen, eve, EVEMovieLinePosition));
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "ExportMovie.handleMovieExport", e);
         }
         Movie.grabDone();
 
@@ -113,7 +118,7 @@ public class ExportMovie implements Movie.Listener {
         try {
             disposeMovieWriter(true);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "ExportMovie.stop", e);
         }
     }
 
@@ -136,7 +141,7 @@ public class ExportMovie implements Movie.Listener {
             try {
                 movieExporter.encode(mainImage, eveImage, movieLinePosition);
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, "ExportMovie.FrameConsumer", e);
             } finally {
                 NIOImageFactory.free(eveImage);
                 MappedImageFactory.free(mainImage);
@@ -150,7 +155,7 @@ public class ExportMovie implements Movie.Listener {
             try {
                 movieExporter.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, "ExportMovie.CloseWriter", e);
             }
             System.gc();
         }

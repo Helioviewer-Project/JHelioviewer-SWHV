@@ -19,9 +19,15 @@ import javax.swing.TransferHandler;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 // Handles DnD row reordering
 @SuppressWarnings("serial")
 class TableRowTransferHandler extends TransferHandler {
+
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     private final JTable grid;
     private BufferedImage image;
@@ -97,7 +103,7 @@ class TableRowTransferHandler extends TransferHandler {
                     return true;
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, "TableRowTransferHandler.importData", e);
             }
         }
         return false;
