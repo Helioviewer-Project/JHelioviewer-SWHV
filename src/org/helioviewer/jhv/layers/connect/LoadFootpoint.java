@@ -61,7 +61,7 @@ public class LoadFootpoint {
                             JHVTime time = new JHVTime(parseTime(values[6]));
                             positionMap.put(time, ConnectUtils.toCartesian(time.milli, values[7], values[8]));
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            LOGGER.log(Level.SEVERE, "Footpoint", e);
                         }
                     }
                 }
