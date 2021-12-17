@@ -70,7 +70,7 @@ public class FileUtils {
             deleteDir = _deleteDir;
         }
 
-        private FileVisitResult delete(Path file) throws IOException {
+        private static FileVisitResult delete(Path file) throws IOException {
             Files.delete(file);
             return FileVisitResult.CONTINUE;
         }

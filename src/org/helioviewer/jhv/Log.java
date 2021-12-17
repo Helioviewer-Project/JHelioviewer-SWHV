@@ -29,12 +29,13 @@ public class Log {
     static void init() throws Exception {
         FileUtils.deleteDir(JHVDirectory.LOGS.getFile(), 7 * TimeUtils.DAY_IN_MILLIS, false);
 
+        LogFormatter logFormatter = new LogFormatter();
         FileHandler fileHandler = new FileHandler(filename, 1024 * 1024, 1);
         fileHandler.setLevel(loggedLevel);
-        fileHandler.setFormatter(new LogFormatter());
+        fileHandler.setFormatter(logFormatter);
         ConsoleHandler consoleHandler = new ConsoleHandler();
         consoleHandler.setLevel(loggedLevel);
-        consoleHandler.setFormatter(new LogFormatter());
+        consoleHandler.setFormatter(logFormatter);
 
         LogManager.getLogManager().reset();
         root.addHandler(fileHandler);
