@@ -19,7 +19,6 @@ import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.layers.Movie;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
@@ -39,8 +38,13 @@ import org.helioviewer.jhv.view.j2k.kakadu.KakaduSource;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class J2KView extends BaseView {
 
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
     private static final AtomicInteger global_serial = new AtomicInteger(0);
     private static final int HIRES_CUTOFF = Boolean.parseBoolean(Settings.getProperty("display.highResolution")) ? 4096 : 1280;
 
@@ -107,7 +111,7 @@ public class J2KView extends BaseView {
                 for (int i = 0; i <= maxFrame; i++) {
                     long milli = frameMap.key(i).milli;
                     if (milli != metaData[i].getViewpoint().time.milli)
-                        Log.warn("Badly ordered metadata: " + uri + "[" + i + "]: expected " + frameMap.key(i) + ", got " + metaData[i].getViewpoint().time);
+                        LOGGER.log(Level.WARNING, "Badly ordered metadata: " + uri + "[" + i + "]: expected " + frameMap.key(i) + ", got " + metaData[i].getViewpoint().time);
 
                     cacheKey[i] = request.sourceId() + "+" + milli;
                 }
@@ -169,7 +173,7 @@ public class J2KView extends BaseView {
                         aJpipCache.Native_destroy();
                     }
                 } catch (KduException e) {
-                    e.printStackTrace();
+                    LOGGER.log(Level.SEVERE, "J2KAbolisher", e);
                 }
             }).start();
         }

@@ -12,11 +12,16 @@ import javax.swing.event.HyperlinkListener;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
 import org.helioviewer.jhv.io.FileUtils;
-import org.helioviewer.jhv.log.Log;
 
 import com.jidesoft.comparator.AlphanumComparator;
 
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class JHVGlobals {
+
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     public static final String programName = "ESA JHelioviewer";
     public static final String downloadURL = "http://swhv.oma.be/download/";
@@ -62,7 +67,7 @@ public class JHVGlobals {
                 System.getProperty("os.arch") + ' ' + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ") " +
                 System.getProperty("java.vendor") + " JRE " + System.getProperty("java.version");
         versionDetail = String.format("%s %.1fGB %dCPU", userAgent, Runtime.getRuntime().maxMemory() / (1024 * 1024 * 1024.), Runtime.getRuntime().availableProcessors());
-        Log.info(versionDetail);
+        LOGGER.log(Level.INFO, versionDetail);
     }
 
     // Attempts to create the necessary directories if they do not exist

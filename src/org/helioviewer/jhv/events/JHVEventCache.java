@@ -11,11 +11,15 @@ import java.util.SortedMap;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.interval.RequestCache;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.TimeUtils;
+
+import java.lang.invoke.MethodHandles;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class JHVEventCache {
 
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
     private static final double FACTOR = 0.2;
     private static final long DELTAT_GET = TimeUtils.DAY_IN_MILLIS;
 
@@ -131,7 +135,7 @@ public class JHVEventCache {
         Interval last = new Interval(end + DELTAT_GET, end + DELTAT_GET);
 
         if (first.compareTo(last) > 0) { // should not happen, but some users hit
-            Log.error("JHVEventCache.getEvents: " + start + " > " + end);
+            LOGGER.log(Level.SEVERE, "JHVEventCache.getEvents: " + start + " > " + end);
             return Collections.emptyList();
         }
 

@@ -54,7 +54,7 @@ public class LoadHCS {
                         try {
                             hcsList.add(ConnectUtils.toCartesian(values[4], values[3]));
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            LOGGER.log(Level.SEVERE, "HCS", e);
                         }
                     }
                 }

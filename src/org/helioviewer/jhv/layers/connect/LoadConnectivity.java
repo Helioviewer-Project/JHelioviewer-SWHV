@@ -91,7 +91,7 @@ public class LoadConnectivity {
                                 case "M" -> M.add(v);
                             }
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            LOGGER.log(Level.SEVERE, "ConnectivityLoad", e);
                         }
                     }
                 }
