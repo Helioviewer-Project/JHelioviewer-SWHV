@@ -43,7 +43,7 @@ public class JHVGlobals {
         return connectTimeout;
     }
 
-    public static void determineVersionAndRevision() {
+    public static void getVersion() {
         try (InputStream is = JHVGlobals.class.getResourceAsStream("/version.properties")) {
             Properties p = new Properties();
             p.load(is);
@@ -64,7 +64,7 @@ public class JHVGlobals {
         Log2.info(versionDetail);
     }
 
-    // Attempts to create the necessary directories if they do not exist
+    // Attempts to create the necessary directories if they do not exist, should not use Log
     public static void createDirs() {
         JHVDirectory[] dirs = JHVDirectory.values();
         for (JHVDirectory dir : dirs) {
