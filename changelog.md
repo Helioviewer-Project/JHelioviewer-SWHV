@@ -3,6 +3,9 @@
 
 ## JHelioviewer 4.2.1 (pending)
 
+- Overhaul logging system and remove log4j
+- Switch to a dark theme
+
 ## JHelioviewer 4.2 (2021-12-10)
 
 - Load EUI, MAG and SWA datasets from SOAR
