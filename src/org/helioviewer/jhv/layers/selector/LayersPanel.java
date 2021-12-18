@@ -153,23 +153,6 @@ public class LayersPanel extends JPanel {
 
         grid.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseReleased(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    handlePopup(e);
-                }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    handlePopup(e);
-                }
-            }
-
-            private void handlePopup(MouseEvent e) {
-            }
-
-            @Override
             public void mouseClicked(MouseEvent e) {
                 TableValue v = TableValue.tableValueAtPoint(grid, e.getPoint());
                 if (v == null || !(v.value instanceof Layer layer))

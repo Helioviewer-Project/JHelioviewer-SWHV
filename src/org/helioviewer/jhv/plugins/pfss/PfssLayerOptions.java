@@ -7,6 +7,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.components.base.JHVSpinner;
@@ -59,6 +60,7 @@ class PfssLayerOptions extends JPanel {
         add(radiusSpinner, c0);
 
         JCheckBox fixedColors = new JCheckBox("Fixed colors", fixedColor);
+        fixedColors.setHorizontalTextPosition(SwingConstants.LEFT);
         fixedColors.addActionListener(e -> {
             fixedColor = fixedColors.isSelected();
             MovieDisplay.display();
