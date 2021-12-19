@@ -7,10 +7,8 @@ import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.font.TextAttribute;
 import java.io.InputStream;
 //import java.util.Enumeration;
-import java.util.HashMap;
 //import java.util.Map;
 //import java.util.TreeSet;
 
@@ -33,26 +31,20 @@ public class UIGlobals {
         } catch (Exception e) {
             Log.error(e);
         }
+        // listFontKeys();
+        // listColorKeys();
 
         if (!System.getProperty("jhv.os").equals("mac")) {
             ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
             JPopupMenu.setDefaultLightWeightPopupEnabled(false);
         }
 
-        // listFontKeys();
-        // listColorKeys();
-
         foreColor = UIManager.getColor("Label.foreground");
         backColor = UIManager.getColor("Label.background");
         midColor = new Color((foreColor.getRed() + backColor.getRed()) / 2, (foreColor.getGreen() + backColor.getGreen()) / 2, (foreColor.getBlue() + backColor.getBlue()) / 2);
 
-        Font font = UIManager.getFont("Label.font");
-        String defaultFamily = font.getFamily();
-        int defaultSize = font.getSize();
-
         if (System.getProperty("jhv.os").equals("mac")) {
-            defaultSize -= 1;
-
+            UIManager.getLookAndFeelDefaults().put("defaultFont", UIManager.getFont("medium.font")); // smaller, FlatLaf 2
             ImageIcon cursor = IconBank.getIcon(JHVIcon.CLOSED_HAND_MAC);
             cursor = cursor == null ? IconBank.getBlank() : cursor;
             closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursor.getImage(), new Point(5, 1), cursor.toString());
@@ -63,32 +55,15 @@ public class UIGlobals {
         }
         openHandCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
 
-        HashMap<TextAttribute, Object> map = new HashMap<>();
-        map.put(TextAttribute.FAMILY, defaultFamily);
+        uiFont = UIManager.getFont("defaultFont");
+        float defaultSize = uiFont.getSize();
 
-        map.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_REGULAR);
-        map.put(TextAttribute.SIZE, defaultSize);
+        uiFontBold = uiFont.deriveFont(Font.BOLD);
+        uiFontSmall = uiFont.deriveFont(defaultSize - 2);
+        uiFontSmallBold = uiFontSmall.deriveFont(Font.BOLD);
 
-        font = new Font(map);
-        uiFont = font;
-
-        map.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD);
-        map.put(TextAttribute.SIZE, defaultSize);
-        uiFontBold = font.deriveFont(map);
-
-        map.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_REGULAR);
-        map.put(TextAttribute.SIZE, defaultSize - 2);
-        uiFontSmall = font.deriveFont(map);
-
-        map.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD);
-        map.put(TextAttribute.SIZE, defaultSize - 2);
-        uiFontSmallBold = font.deriveFont(map);
-
-        // uiFontMono = new Font("Monospaced", Font.PLAIN, defaultSize);
-        uiFontMonoSmall = new Font("Monospaced", Font.PLAIN, defaultSize - 2);
-
-        // setUIFont(uiFont);
-        UIManager.getLookAndFeelDefaults().put("defaultFont", uiFont);
+        Font monoFont = UIManager.getFont("monospaced.font");
+        uiFontMonoSmall = monoFont.deriveFont(defaultSize - 2);
 
         int arc = 6;
         UIManager.put("Button.arc", arc);
@@ -103,7 +78,7 @@ public class UIGlobals {
             GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(canvasFont);
         } catch (Exception e) {
             Log.warn("Font not loaded correctly, fallback to default", e);
-            canvasFont = new Font("SansSerif", Font.PLAIN, defaultSize);
+            canvasFont = new Font("SansSerif", Font.PLAIN, (int) defaultSize);
         }
 
         try (InputStream is = FileUtils.getResource("/fonts/materialdesignicons-webfont.ttf")) {
@@ -111,7 +86,7 @@ public class UIGlobals {
             GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(uiFontMDI);
         } catch (Exception e) {
             Log.warn("Font not loaded correctly, fallback to default", e);
-            uiFontMDI = new Font("SansSerif", Font.PLAIN, defaultSize);
+            uiFontMDI = new Font("SansSerif", Font.PLAIN, (int) defaultSize);
         }
     }
 /*
@@ -125,8 +100,7 @@ public class UIGlobals {
                 UIManager.put(key, f);
         }
     }
-*/
-/*
+
     private static void listFontKeys() {
         TreeSet<String> keys = new TreeSet<>();
         for (Map.Entry<Object, Object> entry : UIManager.getLookAndFeelDefaults().entrySet()) {
@@ -136,8 +110,7 @@ public class UIGlobals {
         }
         keys.forEach(System.out::println);
     }
-*/
-/*
+
     private static void listColorKeys() {
         TreeSet<String> keys = new TreeSet<>();
         for (Map.Entry<Object, Object> entry : UIManager.getLookAndFeelDefaults().entrySet()) {
@@ -155,7 +128,6 @@ public class UIGlobals {
     public static Font uiFontSmall;
     public static Font uiFontSmallBold;
 
-    // public static Font uiFontMono;
     public static Font uiFontMonoSmall;
 
     public static Font uiFontMDI;
