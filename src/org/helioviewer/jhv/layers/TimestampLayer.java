@@ -5,6 +5,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 import javax.annotation.Nullable;
+import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -146,37 +147,47 @@ public class TimestampLayer extends AbstractLayer {
             MovieDisplay.display();
         });
 
-        JPanel panel = new JPanel(new GridBagLayout());
+        JPanel panelSlider = new JPanel(new GridBagLayout());
         GridBagConstraints c0 = new GridBagConstraints();
-        c0.anchor = GridBagConstraints.LINE_END;
-        c0.weightx = 1.;
-        c0.weighty = 1.;
+        c0.weightx = 1;
+        c0.weighty = 1;
         c0.gridy = 0;
+        c0.anchor = GridBagConstraints.LINE_END;
         c0.gridx = 0;
-        panel.add(new JLabel("Size", JLabel.RIGHT), c0);
+        panelSlider.add(new JLabel("Size", JLabel.RIGHT), c0);
         c0.anchor = GridBagConstraints.LINE_START;
         c0.gridx = 1;
-        panel.add(slider, c0);
+        panelSlider.add(slider, c0);
 
-        c0.gridx = 2;
-        c0.anchor = GridBagConstraints.LINE_END;
+        JPanel panelCheck = new JPanel(new GridBagLayout());
+        GridBagConstraints c1 = new GridBagConstraints();
+        c1.weightx = 1;
+        c1.weighty = 1;
+        c1.gridy = 0;
+        c1.anchor = GridBagConstraints.LINE_END;
+        c1.gridx = 0;
         JCheckBox showExtra = new JCheckBox("Extra info", extra);
         showExtra.setHorizontalTextPosition(SwingConstants.LEFT);
         showExtra.addActionListener(e -> {
             extra = showExtra.isSelected();
             MovieDisplay.display();
         });
-        panel.add(showExtra, c0);
+        panelCheck.add(showExtra, c1);
 
-        c0.gridx = 3;
-        c0.anchor = GridBagConstraints.LINE_END;
+        c1.anchor = GridBagConstraints.LINE_START;
+        c1.gridx = 1;
         JCheckBox showTop = new JCheckBox("Top", top);
         showTop.setHorizontalTextPosition(SwingConstants.LEFT);
         showTop.addActionListener(e -> {
             top = showTop.isSelected();
             MovieDisplay.display();
         });
-        panel.add(showTop, c0);
+        panelCheck.add(showTop, c1);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        panel.add(panelSlider);
+        panel.add(panelCheck);
 
         return panel;
     }
