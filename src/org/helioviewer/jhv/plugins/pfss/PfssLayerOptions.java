@@ -38,26 +38,26 @@ class PfssLayerOptions extends JPanel {
             MovieDisplay.display();
         });
 
+        JPanel detailPanel = new JPanel();
+        detailPanel.add(new JLabel("Detail", JLabel.RIGHT));
+        detailPanel.add(levelSpinner);
+
+        JPanel radiusPanel = new JPanel();
+        radiusPanel.add(new JLabel("Radius", JLabel.RIGHT));
+        radiusPanel.add(radiusSpinner);
+
         GridBagConstraints c0 = new GridBagConstraints();
         c0.weightx = 1.;
         c0.weighty = 1.;
         c0.gridy = 0;
 
         c0.gridx = 0;
-        c0.anchor = GridBagConstraints.LINE_END;
-        add(new JLabel("Detail", JLabel.RIGHT), c0);
+        c0.anchor = GridBagConstraints.LINE_START;
+        add(detailPanel, c0);
 
         c0.gridx = 1;
         c0.anchor = GridBagConstraints.LINE_START;
-        add(levelSpinner, c0);
-
-        c0.gridx = 2;
-        c0.anchor = GridBagConstraints.LINE_END;
-        add(new JLabel("Radius", JLabel.RIGHT), c0);
-
-        c0.gridx = 3;
-        c0.anchor = GridBagConstraints.LINE_START;
-        add(radiusSpinner, c0);
+        add(radiusPanel, c0);
 
         JCheckBox fixedColors = new JCheckBox("Fixed colors", fixedColor);
         fixedColors.setHorizontalTextPosition(SwingConstants.LEFT);
@@ -66,8 +66,8 @@ class PfssLayerOptions extends JPanel {
             MovieDisplay.display();
         });
 
-        c0.gridx = 4;
-        c0.anchor = GridBagConstraints.LINE_START;
+        c0.gridx = 2;
+        c0.anchor = GridBagConstraints.LINE_END;
         add(fixedColors, c0);
 
         JButton availabilityButton = new JButton("Available data");
@@ -76,7 +76,7 @@ class PfssLayerOptions extends JPanel {
 
         c0.gridy = 1;
         c0.anchor = GridBagConstraints.LINE_START;
-        c0.gridx = 4;
+        c0.gridx = 0;
         add(availabilityButton, c0);
     }
 
