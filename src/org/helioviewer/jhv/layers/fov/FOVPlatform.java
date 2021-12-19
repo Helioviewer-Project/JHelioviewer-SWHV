@@ -63,13 +63,21 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
         spinnerY = createSpinner(centerY);
         spinnerY.addChangeListener(e -> setCenterY((Double) spinnerY.getValue()));
 
-        panel = new JPanel(new GridLayout(1, 5, 0, 0));
+        JPanel spinnerXPanel = new JPanel();
+        spinnerXPanel.setOpaque(false);
+        spinnerXPanel.add(new JLabel("\u03B4x", JLabel.RIGHT));
+        spinnerXPanel.add(spinnerX);
+
+        JPanel spinnerYPanel = new JPanel();
+        spinnerYPanel.setOpaque(false);
+        spinnerYPanel.add(new JLabel("\u03B4y", JLabel.RIGHT));
+        spinnerYPanel.add(spinnerY);
+
+        panel = new JPanel(new GridLayout(1, 3, 0, 0));
         panel.setOpaque(false);
         panel.add(new JLabel(name));
-        panel.add(new JLabel("\u03B4x ", JLabel.RIGHT));
-        panel.add(spinnerX);
-        panel.add(new JLabel("\u03B4y ", JLabel.RIGHT));
-        panel.add(spinnerY);
+        panel.add(spinnerXPanel);
+        panel.add(spinnerYPanel);
     }
 
     @Override

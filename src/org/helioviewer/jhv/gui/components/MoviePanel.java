@@ -244,7 +244,6 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         speedSpinner = new JHVSpinner(Movie.FPS_RELATIVE_DEFAULT, 1, speedMax, 1);
         speedSpinner.setToolTipText("Maximum " + speedMax + " fps");
         speedSpinner.addChangeListener(e -> updateMovieSpeed());
-        speedSpinner.setMaximumSize(speedSpinner.getPreferredSize());
         modePanel.add(speedSpinner);
 
         speedUnitComboBox = new JComboBox<>(new SpeedUnit[]{SpeedUnit.FRAMESPERSECOND, SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND});
@@ -256,7 +255,6 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         modePanel.add(new JLabel(" and ", JLabel.RIGHT));
 
         advanceModeComboBox = new JComboBox<>(new AdvanceMode[]{AdvanceMode.Loop, AdvanceMode.Stop, AdvanceMode.Swing});
-        advanceModeComboBox.setPreferredSize(speedUnitComboBox.getPreferredSize());
         advanceModeComboBox.addActionListener(e -> Movie.setAdvanceMode((AdvanceMode) Objects.requireNonNull(advanceModeComboBox.getSelectedItem())));
         modePanel.add(advanceModeComboBox);
 
