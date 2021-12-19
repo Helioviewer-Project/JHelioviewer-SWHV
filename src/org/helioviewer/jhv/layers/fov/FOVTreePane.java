@@ -69,7 +69,7 @@ public class FOVTreePane extends JScrollPane {
         setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, getBackground().brighter()));
-        setPreferredSize(new Dimension(-1, 160));
+        setPreferredSize(new Dimension(-1, 120));
     }
 
     public void init(GL2 gl) {
