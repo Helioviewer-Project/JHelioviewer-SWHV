@@ -52,10 +52,15 @@ class BandOptionPanel extends JPanel {
         add(pickColor, c);
 
         c.gridx = 1;
-        c.anchor = GridBagConstraints.LINE_END;
-        JButton availabilityButton = new JButton("Available data");
-        availabilityButton.addActionListener(e -> JHVGlobals.openURL(TimelineSettings.availabilityURL + '#' + band.getBandType().getName()));
-        add(availabilityButton, c);
+        c.anchor = GridBagConstraints.LINE_START;
+        JFormattedTextField propagationField = new JFormattedTextField(new TerminatedFormatterFactory("%.3f", "km/s", 0, 299792.458));
+        propagationField.setValue(0.);
+        propagationField.setColumns(10);
+        propagationField.addPropertyChangeListener("value", e -> {
+            double speed = (Double) propagationField.getValue();
+            band.setPropagationModel(new PropagationModelRadial(speed));
+        });
+        add(propagationField, c);
 
         c.gridx = 2;
         c.anchor = GridBagConstraints.LINE_END;
@@ -77,16 +82,12 @@ class BandOptionPanel extends JPanel {
         });
         add(downloadButton, c);
 
-        c.gridx = 3;
-        c.anchor = GridBagConstraints.LINE_END;
-        JFormattedTextField propagationField = new JFormattedTextField(new TerminatedFormatterFactory("%.3f", "km/s", 0, 299792.458));
-        propagationField.setValue(0.);
-        propagationField.setColumns(10);
-        propagationField.addPropertyChangeListener("value", e -> {
-            double speed = (Double) propagationField.getValue();
-            band.setPropagationModel(new PropagationModelRadial(speed));
-        });
-        add(propagationField, c);
+        c.gridy = 1;
+        c.gridx = 0;
+        c.anchor = GridBagConstraints.LINE_START;
+        JButton availabilityButton = new JButton("Available data");
+        availabilityButton.addActionListener(e -> JHVGlobals.openURL(TimelineSettings.availabilityURL + '#' + band.getBandType().getName()));
+        add(availabilityButton, c);
     }
 
 }
