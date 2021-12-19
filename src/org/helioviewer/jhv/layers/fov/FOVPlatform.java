@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.layers.fov;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.util.Enumeration;
@@ -63,15 +64,15 @@ class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
         spinnerY = createSpinner(centerY);
         spinnerY.addChangeListener(e -> setCenterY((Double) spinnerY.getValue()));
 
-        JPanel spinnerXPanel = new JPanel();
+        JPanel spinnerXPanel = new JPanel(new BorderLayout());
         spinnerXPanel.setOpaque(false);
-        spinnerXPanel.add(new JLabel("\u03B4x", JLabel.RIGHT));
-        spinnerXPanel.add(spinnerX);
+        spinnerXPanel.add(new JLabel("    \u03B4x ", JLabel.RIGHT), BorderLayout.LINE_START);
+        spinnerXPanel.add(spinnerX, BorderLayout.LINE_END);
 
-        JPanel spinnerYPanel = new JPanel();
+        JPanel spinnerYPanel = new JPanel(new BorderLayout());
         spinnerYPanel.setOpaque(false);
-        spinnerYPanel.add(new JLabel("\u03B4y", JLabel.RIGHT));
-        spinnerYPanel.add(spinnerY);
+        spinnerYPanel.add(new JLabel("    \u03B4y ", JLabel.RIGHT), BorderLayout.LINE_START);
+        spinnerYPanel.add(spinnerY, BorderLayout.LINE_END);
 
         panel = new JPanel(new GridLayout(1, 3, 0, 0));
         panel.setOpaque(false);

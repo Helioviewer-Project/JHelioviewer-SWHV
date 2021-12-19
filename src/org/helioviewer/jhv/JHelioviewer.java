@@ -14,10 +14,10 @@ import javax.swing.JFrame;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
-import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.SampClient;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
@@ -93,10 +93,9 @@ public class JHelioviewer {
             }
 
             JComponent leftPane = JHVFrame.getLeftScrollPane();
-            MoviePanel.setAdvanced(true);
-            int moviePanelWidth = leftPane.getPreferredSize().width;
-            MoviePanel.setAdvanced(false);
-            leftPane.setMinimumSize(new Dimension(moviePanelWidth, -1));
+            ImageLayer dummy = ImageLayer.create(null);
+            leftPane.setMinimumSize(new Dimension(leftPane.getPreferredSize().width, -1));
+            dummy.unload();
 
             frame.pack();
             frame.setLocationRelativeTo(null);
