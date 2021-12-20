@@ -1,8 +1,6 @@
 package org.helioviewer.jhv;
 
 import java.lang.StackWalker;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
@@ -20,11 +18,7 @@ public class Log {
     private static final Level loggedLevel = Level.INFO;
     private static final Logger root = Logger.getLogger("");
 
-    private static final ZoneId zoneId = ZoneId.of(System.getProperty("user.timezone"));
-    private static final DateTimeFormatter fileFormatterLocal = TimeUtils.fileFormatter.withZone(zoneId);
-    private static final DateTimeFormatter milliFormatterLocal = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(zoneId);
-
-    private static final String filename = JHVDirectory.LOGS.getPath() + "JHV_" + TimeUtils.format(fileFormatterLocal, System.currentTimeMillis()) + ".log";
+    private static final String filename = JHVDirectory.LOGS.getPath() + "JHV_" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".log";
 
     static void init() throws Exception {
         FileUtils.deleteDir(JHVDirectory.LOGS.getFile(), 7 * TimeUtils.DAY_IN_MILLIS, false);
@@ -47,7 +41,7 @@ public class Log {
         public String format(LogRecord record) { // traditional JHV style
             Throwable thrown = record.getThrown();
             String strThrown = thrown == null ? "" : ": " + thrown.getMessage();
-            return TimeUtils.format(milliFormatterLocal, record.getMillis()) +
+            return TimeUtils.formatLog(record.getMillis()) +
                     " [" + Thread.currentThread().getName() + "] " +
                     record.getLevel() +
                     ' ' + record.getLoggerName() + ' ' +
