@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import java.awt.HeadlessException;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -29,12 +28,6 @@ public class JHelioviewer {
         System.setProperty("apple.awt.application.appearance", "NSAppearanceNameDarkAqua");
         System.setProperty("apple.awt.application.name", "JHelioviewer");
         System.setProperty("apple.laf.useScreenMenuBar", "true");
-
-        if (isHeadless())
-            throw new Exception("This application cannot run in a headless configuration.");
-
-        // Uncaught runtime errors are displayed in a dialog box in addition
-        JHVUncaughtExceptionHandler.setupHandlerForThread();
         // Save current default system timezone in user.timezone
         System.setProperty("user.timezone", TimeZone.getDefault().getID());
         // Per default all times should be given in GMT
@@ -44,6 +37,11 @@ public class JHelioviewer {
         // Per default, the us locale should be used
         Locale.setDefault(Locale.US);
 
+        if (isHeadless())
+            throw new Exception("This application cannot run in a headless configuration.");
+
+        // Uncaught runtime errors are displayed in a dialog box in addition
+        JHVUncaughtExceptionHandler.setupHandlerForThread();
         // This attempts to create the necessary directories for the application
         JHVGlobals.createDirs();
         // Init log
@@ -114,13 +112,8 @@ public class JHelioviewer {
         if (GraphicsEnvironment.isHeadless()) {
             return true;
         }
-        try {
-            GraphicsDevice[] screens = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
-            return screens == null || screens.length == 0;
-        } catch (HeadlessException e) {
-            Log.error(e);
-            return true;
-        }
+        GraphicsDevice[] screens = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
+        return screens == null || screens.length == 0;
     }
 
 }
