@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -18,8 +19,11 @@ public class TimeUtils {
 
     private static final ZoneOffset ZERO = ZoneOffset.ofTotalSeconds(0);
     private static final DateTimeFormatter milliFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
-    public static final DateTimeFormatter fileFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss");
     public static final DateTimeFormatter sqlTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    private static final ZoneId zoneId = ZoneId.of(System.getProperty("user.timezone"));
+    private static final DateTimeFormatter fileFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss").withZone(zoneId); //! local time
+    private static final DateTimeFormatter logFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(zoneId); //!local time
 
     private static final PrettyTimeParser prettyParser = new PrettyTimeParser();
 
@@ -78,8 +82,12 @@ public class TimeUtils {
         return format(DateTimeFormatter.ISO_INSTANT, milli);
     }
 
-    public static String formatFilename(long milli) {
+    public static String formatFilename(long milli) { //! local time
         return format(fileFormatter, milli);
+    }
+
+    public static String formatLog(long milli) { //! local time
+        return format(logFormatter, milli);
     }
 
     public static long parse(DateTimeFormatter formatter, String date) {
