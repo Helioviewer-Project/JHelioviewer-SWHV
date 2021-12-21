@@ -28,7 +28,7 @@ record GimpGradientSegment(double leftStop, double midStop, double rightStop, do
      * @param x Point in segment
      * @return Color according to gradient
      */
-    public int getGradientColor(double x) throws Exception {
+    int getGradientColor(double x) throws Exception {
         // Normalize the segment geometry.
         double mid = (midStop - leftStop) / (rightStop - leftStop);
         double pos = (x - leftStop) / (rightStop - leftStop);

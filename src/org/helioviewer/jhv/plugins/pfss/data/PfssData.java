@@ -34,9 +34,9 @@ public class PfssData {
                 double y = 3 * decode(_fliney[j * points + i]);
                 double z = 3 * decode(_flinez[j * points + i]);
 
-                linex[j][i] = (float) (cphi * x + sphi * y); 
+                linex[j][i] = (float) (cphi * x + sphi * y);
                 liney[j][i] = (float) (-sphi * x + cphi * y);
-                linez[j][i] = (float) z; // !?
+                linez[j][i] = (float) z;
                 lines[j][i] = (float) MathUtils.clip(decode(_flines[j * points + i]), -1, 1);
             }
         }
