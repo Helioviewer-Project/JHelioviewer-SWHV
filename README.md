@@ -68,4 +68,4 @@ occured. The log files can be found in the Logs/ directory of your JHelioviewer
 home folder. You can find the correct log file by searching for the correct
 start date. The files have the form:
 
-JHV_'year'-'month'-'day'_'hours'.'minutes'.seconds'.log
+JHV_'year'-'month'-'day'_'hours'.'minutes'.'seconds'.log
