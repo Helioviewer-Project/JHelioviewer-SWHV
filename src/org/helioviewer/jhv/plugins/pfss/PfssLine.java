@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.pfss;
 
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.plugins.pfss.data.PfssData;
 
@@ -11,14 +10,14 @@ class PfssLine {
     private static final byte[] loopColor = Colors.White;
     private static final byte[] insideFieldColor = Colors.Blue;
 
-    private static void computeBrightColor(double b, byte[] brightColor) {
+    private static void computeBrightColor(float b, byte[] brightColor) {
         if (b > 0) {
-            byte bb = (byte) (255 * (1. - b));
+            byte bb = (byte) (255 * (1f - b));
             brightColor[0] = (byte) 255;
             brightColor[1] = bb;
             brightColor[2] = bb;
         } else {
-            byte bb = (byte) (255 * (1. + b));
+            byte bb = (byte) (255 * (1f + b));
             brightColor[0] = bb;
             brightColor[1] = bb;
             brightColor[2] = (byte) 255;
@@ -26,17 +25,11 @@ class PfssLine {
         brightColor[3] = (byte) 255;
     }
 
-    private static double decode(short v) {
-        return (v + 32768.) * (2. / 65535.) - 1.;
-    }
-
     static void calculatePositions(PfssData data, int detail, boolean fixedColor, double radius, BufVertex lineBuf) {
-        double cphi = data.cphi;
-        double sphi = data.sphi;
-        short[][] linex = data.linex;
-        short[][] liney = data.liney;
-        short[][] linez = data.linez;
-        short[][] lines = data.lines;
+        float[][] linex = data.linex;
+        float[][] liney = data.liney;
+        float[][] linez = data.linez;
+        float[][] lines = data.lines;
         int nlines = linex.length;
         int points = linex[0].length;
 
@@ -46,25 +39,21 @@ class PfssLine {
         for (int j = 0; j < nlines; j++) {
             if (j % (PfssSettings.MAX_DETAIL + 1) <= detail) {
                 for (int i = 0; i < points; i++) {
-                    double x = 3 * decode(linex[j][i]);
-                    double y = 3 * decode(liney[j][i]);
-                    double z = 3 * decode(linez[j][i]);
-                    double b = MathUtils.clip(decode(lines[j][i]), -1, 1);
-                    computeBrightColor(b, brightColor);
-
-                    double helpx = cphi * x + sphi * y;
-                    double helpy = -sphi * x + cphi * y;
-                    x = helpx;
-                    y = helpy;
+                    float x = linex[j][i];
+                    float y = liney[j][i];
+                    float z = linez[j][i];
                     double r = Math.sqrt(x * x + y * y + z * z);
 
+                    float b = lines[j][i]; // this can be index in LUT
+                    computeBrightColor(b, brightColor);
+
                     if (i == 0) {
-                        lineBuf.putVertex((float) x, (float) z, (float) -y, 1, Colors.Null);
+                        lineBuf.putVertex(x, z, -y, 1, Colors.Null);
 
                         if (fixedColor) {
-                            double xo = 3 * decode(linex[j][points - 1]);
-                            double yo = 3 * decode(liney[j][points - 1]);
-                            double zo = 3 * decode(linez[j][points - 1]);
+                            float xo = linex[j][points - 1];
+                            float yo = liney[j][points - 1];
+                            float zo = linez[j][points - 1];
                             double ro = Math.sqrt(xo * xo + yo * yo + zo * zo);
 
                             if (Math.abs(r - ro) < 2.5 - 1.0 - 0.2) {
@@ -77,7 +66,7 @@ class PfssLine {
                         }
                     }
 
-                    lineBuf.putVertex((float) x, (float) z, (float) -y, 1, r > radius ? Colors.Null : (fixedColor ? oneColor : brightColor));
+                    lineBuf.putVertex(x, z, -y, 1, r > radius ? Colors.Null : (fixedColor ? oneColor : brightColor));
                     if (i == points - 1) {
                         lineBuf.repeatVertex(Colors.Null);
                     }

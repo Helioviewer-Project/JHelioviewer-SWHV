@@ -1,39 +1,45 @@
 package org.helioviewer.jhv.plugins.pfss.data;
 
-import java.util.Arrays;
-
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.time.JHVTime;
 
 public class PfssData {
 
     public final JHVTime dateObs;
-    public final short[][] linex;
-    public final short[][] liney;
-    public final short[][] linez;
-    public final short[][] lines;
+    public final float[][] linex;
+    public final float[][] liney;
+    public final float[][] linez;
+    public final float[][] lines;
 
-    public final double cphi;
-    public final double sphi;
+    private static double decode(short v) {
+        return (v + 32768.) * (2. / 65535.) - 1.;
+    }
 
-    PfssData(JHVTime _dateObs, short[] _flinex, short[] _fliney, short[] _flinez, short[] _flines, int pointsPerLine) {
+    PfssData(JHVTime _dateObs, short[] _flinex, short[] _fliney, short[] _flinez, short[] _flines, int points) {
         dateObs = _dateObs;
 
-        int nlines = _flinex.length / pointsPerLine;
-        linex = new short[nlines][];
-        liney = new short[nlines][];
-        linez = new short[nlines][];
-        lines = new short[nlines][];
-        for (int i = 0; i < nlines; i++) {
-            linex[i] = Arrays.copyOfRange(_flinex, i * pointsPerLine, (i + 1) * pointsPerLine);
-            liney[i] = Arrays.copyOfRange(_fliney, i * pointsPerLine, (i + 1) * pointsPerLine);
-            linez[i] = Arrays.copyOfRange(_flinez, i * pointsPerLine, (i + 1) * pointsPerLine);
-            lines[i] = Arrays.copyOfRange(_flines, i * pointsPerLine, (i + 1) * pointsPerLine);
-        }
-
         double elon = Sun.getEarth(dateObs).lon;
-        cphi = Math.cos(elon);
-        sphi = Math.sin(elon);
+        double cphi = Math.cos(elon);
+        double sphi = Math.sin(elon);
+
+        int nlines = _flinex.length / points;
+        linex = new float[nlines][points];
+        liney = new float[nlines][points];
+        linez = new float[nlines][points];
+        lines = new float[nlines][points];
+        for (int j = 0; j < nlines; j++) {
+            for (int i = 0; i < points; i++) {
+                double x = 3 * decode(_flinex[j * points + i]);
+                double y = 3 * decode(_fliney[j * points + i]);
+                double z = 3 * decode(_flinez[j * points + i]);
+
+                linex[j][i] = (float) (cphi * x + sphi * y); 
+                liney[j][i] = (float) (-sphi * x + cphi * y);
+                linez[j][i] = (float) z; // !?
+                lines[j][i] = (float) MathUtils.clip(decode(_flines[j * points + i]), -1, 1);
+            }
+        }
     }
 
 }
