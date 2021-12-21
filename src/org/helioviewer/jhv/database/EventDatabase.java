@@ -224,18 +224,17 @@ public class EventDatabase {
         return inserted_ids;
     }
 
-    public static int[] dump_event2db(List<Event2Db> event2db_list, SWEKSupplier type) {
+    public static void dump_event2db(List<Event2Db> event2db_list, SWEKSupplier type) {
         try {
-            return executor.invokeAndWait(new DumpEvent2Db(event2db_list, type));
+            executor.invokeAndWait(new DumpEvent2Db(event2db_list, type));
         } catch (Exception e) {
             Log.error(e);
         }
-        return get_id_init_list(event2db_list.size());
     }
 
-    private record DumpEvent2Db(List<Event2Db> event2db_list, SWEKSupplier type) implements Callable<int[]> {
+    private record DumpEvent2Db(List<Event2Db> event2db_list, SWEKSupplier type) implements Callable<Void> {
         @Override
-        public int[] call() throws SQLException {
+        public Void call() throws SQLException {
             int[] inserted_ids = get_id_init_list(event2db_list.size());
             int typeId = getEventTypeId(type);
             int llen = event2db_list.size();
@@ -315,8 +314,7 @@ public class EventDatabase {
                 }
             }
             dump_associationint2db(assocs);
-
-            return inserted_ids;
+            return null;
         }
     }
 
