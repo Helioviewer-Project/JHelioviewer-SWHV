@@ -1,8 +1,7 @@
 package org.helioviewer.jhv.plugins.pfss;
 
-import java.nio.ShortBuffer;
-
 import org.helioviewer.jhv.base.Colors;
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.plugins.pfss.data.PfssData;
 
@@ -27,59 +26,61 @@ class PfssLine {
         brightColor[3] = (byte) 255;
     }
 
-    private static double decode(ShortBuffer buf, int idx) {
-        return (buf.get(idx) + 32768.) * (2. / 65535.) - 1.;
+    private static double decode(short v) {
+        return (v + 32768.) * (2. / 65535.) - 1.;
     }
 
     static void calculatePositions(PfssData data, int detail, boolean fixedColor, double radius, BufVertex lineBuf) {
-        int pointsPerLine = data.pointsPerLine;
         double cphi = data.cphi;
         double sphi = data.sphi;
-        ShortBuffer flinex = data.flinex;
-        ShortBuffer fliney = data.fliney;
-        ShortBuffer flinez = data.flinez;
-        ShortBuffer flines = data.flines;
-        int dlength = flinex.capacity();
+        short[][] linex = data.linex;
+        short[][] liney = data.liney;
+        short[][] linez = data.linez;
+        short[][] lines = data.lines;
+        int nlines = linex.length;
+        int points = linex[0].length;
 
         byte[] brightColor = new byte[4];
         byte[] oneColor = loopColor;
-        for (int i = 0; i < dlength; i++) {
-            if (i / pointsPerLine % 9 <= detail) {
-                double x = 3. * decode(flinex, i);
-                double y = 3. * decode(fliney, i);
-                double z = 3. * decode(flinez, i);
-                double b = decode(flines, i);
-                computeBrightColor(b, brightColor);
 
-                double helpx = cphi * x + sphi * y;
-                double helpy = -sphi * x + cphi * y;
-                x = helpx;
-                y = helpy;
-                double r = Math.sqrt(x * x + y * y + z * z);
+        for (int j = 0; j < nlines; j++) {
+            if (j % (PfssSettings.MAX_DETAIL + 1) <= detail) {
+                for (int i = 0; i < points; i++) {
+                    double x = 3 * decode(linex[j][i]);
+                    double y = 3 * decode(liney[j][i]);
+                    double z = 3 * decode(linez[j][i]);
+                    double b = MathUtils.clip(decode(lines[j][i]), -1, 1);
+                    computeBrightColor(b, brightColor);
 
-                if (i % pointsPerLine == 0) { // start line
-                    lineBuf.putVertex((float) x, (float) z, (float) -y, 1, Colors.Null);
+                    double helpx = cphi * x + sphi * y;
+                    double helpy = -sphi * x + cphi * y;
+                    x = helpx;
+                    y = helpy;
+                    double r = Math.sqrt(x * x + y * y + z * z);
 
-                    if (fixedColor) {
-                        double xo = 3. * decode(flinex, i + pointsPerLine - 1);
-                        double yo = 3. * decode(fliney, i + pointsPerLine - 1);
-                        double zo = 3. * decode(flinez, i + pointsPerLine - 1);
-                        double ro = Math.sqrt(xo * xo + yo * yo + zo * zo);
+                    if (i == 0) {
+                        lineBuf.putVertex((float) x, (float) z, (float) -y, 1, Colors.Null);
 
-                        if (Math.abs(r - ro) < 2.5 - 1.0 - 0.2) {
-                            oneColor = loopColor;
-                        } else if (b < 0) {
-                            oneColor = insideFieldColor;
-                        } else {
-                            oneColor = openFieldColor;
+                        if (fixedColor) {
+                            double xo = 3 * decode(linex[j][points - 1]);
+                            double yo = 3 * decode(liney[j][points - 1]);
+                            double zo = 3 * decode(linez[j][points - 1]);
+                            double ro = Math.sqrt(xo * xo + yo * yo + zo * zo);
+
+                            if (Math.abs(r - ro) < 2.5 - 1.0 - 0.2) {
+                                oneColor = loopColor;
+                            } else if (b < 0) {
+                                oneColor = insideFieldColor;
+                            } else {
+                                oneColor = openFieldColor;
+                            }
                         }
                     }
-                }
 
-                lineBuf.putVertex((float) x, (float) z, (float) -y, 1, r > radius ? Colors.Null : (fixedColor ? oneColor : brightColor));
-
-                if (i % pointsPerLine == pointsPerLine - 1) { // end line
-                    lineBuf.putVertex((float) x, (float) z, (float) -y, 1, Colors.Null);
+                    lineBuf.putVertex((float) x, (float) z, (float) -y, 1, r > radius ? Colors.Null : (fixedColor ? oneColor : brightColor));
+                    if (i == points - 1) {
+                        lineBuf.repeatVertex(Colors.Null);
+                    }
                 }
             }
         }
