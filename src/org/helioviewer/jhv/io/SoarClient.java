@@ -39,6 +39,27 @@ public class SoarClient {
         EventQueueCallbackExecutor.pool.submit(new SoarSearch(descriptors, level, start, end), new Callback(receiver));
     }
 
+    private static String buildADQL(@Nonnull List<String> descriptors, @Nonnull String level, long start, long end) {
+        String desc = String.join("' OR descriptor='", descriptors);
+        return "SELECT data_item_id,file_format,filesize FROM v_sc_data_item WHERE " +
+                "(descriptor='" + desc + "') AND " +
+                "begin_time >= '" + TimeUtils.format(start) + "' AND end_time <= '" + TimeUtils.format(end) + "' AND " +
+                "level='" + level + "' ORDER BY begin_time";
+    }
+
+    private static List<DataItem> data2DataItems(JSONArray data) {
+        int length = data.length();
+        List<DataItem> result = new ArrayList<>(length);
+        for (int i = 0; i < length; i++) {
+            JSONArray item = data.getJSONArray(i);
+            try {
+                result.add(new DataItem(item.getString(0), FileFormat.valueOf(item.getString(1)), item.getLong(2)));
+            } catch (Exception ignore) { // ignore unknown formats
+            }
+        }
+        return result;
+    }
+
     public static void submitLoad(@Nonnull List<DataItem> items) {
         List<URI> fitsUris = new ArrayList<>();
         List<URI> jp2Uris = new ArrayList<>();
@@ -65,24 +86,10 @@ public class SoarClient {
             implements Callable<List<DataItem>> {
         @Override
         public List<DataItem> call() throws Exception {
-            String sqldesc = String.join("' OR descriptor='", descriptors);
-            String select = "SELECT data_item_id,file_format,filesize FROM v_sc_data_item WHERE " +
-                    "(descriptor='" + sqldesc + "') AND " +
-                    "begin_time >= '" + TimeUtils.format(start) + "' AND end_time <= '" + TimeUtils.format(end) + "' AND " +
-                    "level='" + level + "' ORDER BY begin_time";
-            URI uri = new URI(SEARCH_URL + URLEncoder.encode(select, StandardCharsets.UTF_8));
+            String adql = buildADQL(descriptors, level, start, end);
+            URI uri = new URI(SEARCH_URL + URLEncoder.encode(adql, StandardCharsets.UTF_8));
             JSONArray data = JSONUtils.get(uri).getJSONArray("data");
-
-            int length = data.length();
-            List<DataItem> result = new ArrayList<>(length);
-            for (int i = 0; i < length; i++) {
-                JSONArray item = data.getJSONArray(i);
-                try {
-                    result.add(new DataItem(item.getString(0), FileFormat.valueOf(item.getString(1)), item.getLong(2)));
-                } catch (Exception ignore) { // ignore unknown formats
-                }
-            }
-            return result;
+            return data2DataItems(data);
         }
     }
 
