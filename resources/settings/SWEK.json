@@ -1,0 +1,947 @@
+{
+    "sources" : [
+        {
+            "name"                  : "HEK",
+            "provider_name"         : "HEK",
+            "general_parameters"    : [
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "event_description",
+                    "parameter_display_name"    : "Event Description",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "event_title",
+                    "parameter_display_name"    : "Event Title",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_PeakTime",
+                    "parameter_display_name"    : "Event Peak Time",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_MeanWavel",
+                    "parameter_display_name"    : "Mean Wavelength",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_Type",
+                    "parameter_display_name"    : "Event Type"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_CoordSys",
+                    "parameter_display_name"    : "Coordinate System"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_CoordUnit",
+                    "parameter_display_name"    : "Coordinate Unit"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_Coord1",
+                    "parameter_display_name"    : "Coordinate 1"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_Coord2",
+                    "parameter_display_name"    : "Coordinate 2"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_Coord3",
+                    "parameter_display_name"    : "Coordinate 3"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_ClippedSpatial",
+                    "parameter_display_name"    : "Clipped Spatial"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_ClippedTemporal",
+                    "parameter_display_name"    : "Clipped Temporal"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_TestFlag",
+                    "parameter_display_name"    : "Test Flag"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "FRM_Institute",
+                    "parameter_display_name"    : "Institute"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "FRM_Name",
+                    "parameter_display_name"    : "From Name"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Bound_CCNsteps",
+                    "parameter_display_name"    : "CCN Steps"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Bound_CCStartC1",
+                    "parameter_display_name"    : "CC Start C1"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Bound_CCStartC2",
+                    "parameter_display_name"    : "CC Start C2"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Bound_ChainCode",
+                    "parameter_display_name"    : "Chain Code"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "BoundBox_C1LL",
+                    "parameter_display_name"    : "Bound Box C1LL"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "BoundBox_C2LL",
+                    "parameter_display_name"    : "Bound Box C2LL"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Bound Box",
+                    "parameter_display_name"    : "Bound Box"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "GS_ImageURL",
+                    "parameter_display_name"    : "Context Image",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "GS_MovieURL",
+                    "parameter_display_name"    : "Context Movie",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "GS_ThumbURL",
+                    "parameter_display_name"    : "Context Thumbnail"
+                }
+            ]
+        },
+        {
+            "name"                  : "COMESEP",
+            "provider_name"         : "COMESEP",
+            "general_parameters"    : [
+                {
+                    "source"                    : "COMESEP",
+                    "parameter_name"            : "atearliest",
+                    "parameter_display_name"    : "Event Time at Earliest",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "COMESEP",
+                    "parameter_name"            : "atstrongest",
+                    "parameter_display_name"    : "Event Time at Strongest",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "COMESEP",
+                    "parameter_name"            : "atlatest",
+                    "parameter_display_name"    : "Event Time at Latest",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "COMESEP",
+                    "parameter_name"            : "emitter",
+                    "parameter_display_name"    : "Emitter",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "COMESEP",
+                    "parameter_name"            : "emitter_href",
+                    "parameter_display_name"    : "Emitter URL"
+                },
+                {
+                    "source"                    : "COMESEP",
+                    "parameter_name"            : "emitter_verion",
+                    "parameter_display_name"    : "Emitter Version"
+                },
+                {
+                    "source"                    : "COMESEP",
+                    "parameter_name"            : "subject",
+                    "parameter_display_name"    : "Subject",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "COMESEP",
+                    "parameter_name"            : "target",
+                    "parameter_display_name"    : "Target",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "COMESEP",
+                    "parameter_name"            : "action",
+                    "parameter_display_name"    : "Action"
+                },
+                {
+                    "source"                    : "COMESEP",
+                    "parameter_name"            : "alertid",
+                    "parameter_display_name"    : "Alert ID"
+                },
+                {
+                    "source"                    : "COMESEP",
+                    "parameter_name"            : "alert_version",
+                    "parameter_display_name"    : "Alert Version"
+                }
+            ]
+        }
+    ],
+    "events_types" : [
+        {
+            "event_name"    : "Flare",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "SWPC",
+                    "supplier_display_name" : "NOAA SWPC",
+                    "source"        : "HEK",
+                    "db": "flare_swpc"
+                }
+            ],
+            "parameter_list"        : [
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "AR_NOAANum",
+                    "parameter_display_name"    : "NOAA Number",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_ChannelID",
+                    "parameter_display_name"    : "Channel ID"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Instrument",
+                    "parameter_display_name"    : "Instrument",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "FL_GOESCLs",
+                    "parameter_display_name"    : "GOES Classification",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "fl_val",
+                    "parameter_display_name"    : "GOES value",
+                    "filter"                    :
+                        {
+                            "filter_type"   : "flarefilter",
+                            "min"           : 1e-8,
+                            "max"           : 1e-3,
+                            "start_value"   : 1e-5,
+                            "step_size"     : 0.5,
+                            "units"         : "W/m^2",
+                            "dbtype"        : "REAL"
+                        }
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "FL_PeakFlux",
+                    "parameter_display_name"    : "Peak Flux",
+                    "default_visible"           : true
+                }
+            ],
+            "icon" : "iconbank://Flare"
+        },
+        {
+            "event_name"    : "Coronal Mass Ejection",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "CACTus (Computer Aided CME Tracking)",
+                    "supplier_display_name" : "CACTus",
+                    "db": "cactus",
+                    "source"        : "HEK"
+                }
+            ],
+            "parameter_list"        : [
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_ChannelID",
+                    "parameter_display_name"    : "Channel ID"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Instrument",
+                    "parameter_display_name"    : "Instrument",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "CME_RadialLinVel",
+                    "parameter_display_name"    : "Radial Linear Velocity",
+                    "filter"                    :
+                        {
+                            "filter_type"   : "doubleminmaxfilter",
+                            "min"           : 0,
+                            "max"           : 3000,
+                            "start_value"   : 1000,
+                            "step_size"     : 100,
+                            "units"         : "km/s",
+                            "dbtype"        : "INTEGER"
+                        },
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "CME_RadialLinVelUncert",
+                    "parameter_display_name"    : "Radial Linear Velocity Uncertainty"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "CME_RadialLinVelMin",
+                    "parameter_display_name"    : "Minimum Radial Linear Velocity"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "CME_RadialLinVelMax",
+                    "parameter_display_name"    : "Maximum Radial Linear Velocity"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "CME_RadialLinVelStddev",
+                    "parameter_display_name"    : "Radial Linear Velocity Standard Deviation"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "CME_Accel",
+                    "parameter_display_name"    : "Acceleration"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "CME_AccelUncert",
+                    "parameter_display_name"    : "Acceleration Uncertainty"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "CME_Mass",
+                    "parameter_display_name"    : "Mass"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "CME_AngularWidth",
+                    "parameter_display_name"    : "Angular Width",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_Coord1",
+                    "parameter_display_name"    : "Principal Angle",
+                    "default_visible"           : true
+                }
+            ],
+            "icon" : "iconbank://CME"
+        },
+        {
+            "event_name"    : "Active Region",
+            "suppliers"     : [
+                {
+                    "db": "ar_noaa_swpc",
+                    "supplier_name" : "NOAA SWPC Observer",
+                    "supplier_display_name" : "NOAA SWPC",
+                    "source"        : "HEK"
+                },
+                {
+                    "db": "ar_spoca",
+                    "supplier_name" : "SPoCA",
+                    "supplier_display_name" : "SPoCA",
+                    "source"        : "HEK"
+                }
+            ],
+            "parameter_list"        : [
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "AR_NOAANum",
+                    "parameter_display_name"    : "NOAA Number",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "AR_McIntoshCls",
+                    "parameter_display_name"    : "McIntosh Classification",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "AR_MtWilsonCls",
+                    "parameter_display_name"    : "Mount Wilson Classification",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "AR_CompactnessCls",
+                    "parameter_display_name"    : "Compactness Classification"
+                }
+            ],
+            "icon" : "iconbank://ActiveRegion"
+        },
+        {
+            "event_name"    : "Coronal Hole",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "SPoCA",
+                    "supplier_display_name" : "SPoCA",
+                    "source"        : "HEK",
+                    "db": "coronal_hole_spoca"
+                }
+            ],
+            "parameter_list"        : [
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_ChannelID",
+                    "parameter_display_name"    : "Channel ID"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Instrument",
+                    "parameter_display_name"    : "Instrument",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time"
+                }
+            ],
+            "icon" : "iconbank://CoronalHole"
+        },
+        {
+            "event_name"    : "Sunspot",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "EGSO_SFC",
+                    "supplier_display_name" : "EGSO SFC",
+                    "source"        : "HEK",
+                    "db": "sunspot"
+                }
+            ],
+            "parameter_list"        : [
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "AR_NumSpot",
+                    "parameter_display_name"    : "Number of Sunspots",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_ChannelID",
+                    "parameter_display_name"    : "Channel ID"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Instrument",
+                    "parameter_display_name"    : "Instrument",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time"
+                }
+            ],
+            "icon" : "iconbank://SunSpot"
+        },
+        {
+            "event_name"    : "Coronal Dimming",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "halocme",
+                    "supplier_display_name" : "Halo CME",
+                    "db": "coronal_dimming_halo",
+                    "source"        : "HEK"
+                },
+                {
+                    "supplier_name" : "Coronal Dimming Module",
+                    "supplier_display_name" : "Coronal Dimming Module",
+                    "db": "coronal_dimming",
+                    "source"        : "HEK"
+                }
+            ],
+            "parameter_list"        : [
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_ChannelID",
+                    "parameter_display_name"    : "Channel ID"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Instrument",
+                    "parameter_display_name"    : "Instrument",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "CD_Area",
+                    "parameter_display_name"    : "Area",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "CD_Volume",
+                    "parameter_display_name"    : "Volume",
+                    "default_visible"           : true
+                }
+            ],
+            "icon" : "iconbank://CoronalDimming"
+        },
+        {
+            "event_name"    : "Coronal Wave",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "halocme",
+                    "supplier_display_name" : "Halo CME",
+                    "source"        : "HEK",
+                    "db": "coronal_wave_halo"
+                }
+            ],
+            "parameter_list"        : [
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_ChannelID",
+                    "parameter_display_name"    : "Channel ID"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Instrument",
+                    "parameter_display_name"    : "Instrument",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time"
+                }
+            ],
+            "icon" : "iconbank://CoronalWave"
+        },
+        {
+            "event_name"    : "Filament",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "AAFDCC",
+                    "supplier_display_name" : "AAFDCC",
+                    "source"        : "HEK",
+                    "db": "aafdcc"
+                }
+            ],
+            "parameter_list"        : [
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_ChannelID",
+                    "parameter_display_name"    : "Channel ID"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Instrument",
+                    "parameter_display_name"    : "Instrument",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "FI_Length",
+                    "parameter_display_name"    : "Length",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "FI_Tilt",
+                    "parameter_display_name"    : "Tilt",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "FI_Chirality",
+                    "parameter_display_name"    : "Chirality",
+                    "default_visible"           : true
+                }
+            ],
+            "icon" : "iconbank://Filament"
+        },
+        {
+            "event_name"    : "Filament Eruption",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "halocme",
+                    "supplier_display_name" : "Halo CME",
+                    "db": "halocme",
+                    "source"        : "HEK"
+                }
+            ],
+            "parameter_list"        : [
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_ChannelID",
+                    "parameter_display_name"    : "Channel ID"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Instrument",
+                    "parameter_display_name"    : "Instrument",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time"
+                }
+            ],
+            "icon" : "iconbank://FilamentEruption"
+        },
+        {
+            "event_name"    : "Flare Trigger",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "Flare Detective - Trigger Module",
+                    "supplier_display_name" : "Flare Detective",
+                    "source"                : "HEK",
+                    "db": "flare_trigger"
+                }
+            ],
+            "parameter_list"        : [
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "AR_NOAANum",
+                    "parameter_display_name"    : "NOAA Number",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_ChannelID",
+                    "parameter_display_name"    : "Channel ID"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Instrument",
+                    "parameter_display_name"    : "Instrument",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "FL_GOESCLs",
+                    "parameter_display_name"    : "GOES Classification",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "FL_PeakFlux",
+                    "parameter_display_name"    : "Peak Flux",
+                    "default_visible"           : true
+                }
+            ],
+            "icon" : "iconbank://Flare"
+        },
+        {
+            "event_name"    : "Emerging Flux",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "Emerging flux region module",
+                    "supplier_display_name" : "EFRM",
+                    "source"        : "HEK",
+                    "db": "efrm"
+                }
+            ],
+            "parameter_list"                : [
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_ChannelID",
+                    "parameter_display_name"    : "Channel ID"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Instrument",
+                    "parameter_display_name"    : "Instrument",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time"
+                }
+            ],
+            "icon" : "iconbank://EmergingFlux"
+        },
+        {
+            "event_name"    : "Eruption",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "EruptionPatrol",
+                    "supplier_display_name" : "Eruption Patrol",
+                    "source"        : "HEK",
+                    "db": "eruptionpatrol"
+                }
+            ],
+            "parameter_list"        : [
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_ChannelID",
+                    "parameter_display_name"    : "Channel ID"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Instrument",
+                    "parameter_display_name"    : "Instrument",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time"
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time"
+                }],
+            "icon" : "iconbank://Eruption"
+        },
+        {
+            "event_name"    : "COMESEP",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "cactus",
+                    "supplier_display_name" : "CACTus",
+                    "source"        : "COMESEP",
+                    "db": "com_cactus"
+                },
+                {
+                    "supplier_name" : "flaremail",
+                    "supplier_display_name" : "Flaremail",
+                    "source"        : "COMESEP",
+                    "db": "com_flaremail"
+                },
+                {
+                    "supplier_name" : "solardemon",
+                    "supplier_display_name" : "Solar Demon",
+                    "source"        : "COMESEP",
+                    "db": "com_solardemon"
+                },
+                {
+                    "supplier_name" : "dbm",
+                    "supplier_display_name" : "Drag Based Model",
+                    "source"        : "COMESEP",
+                    "db": "com_dbm"
+                },
+                {
+                    "supplier_name" : "cgft",
+                    "supplier_display_name" : "cgft",
+                    "source"        : "COMESEP",
+                    "db": "com_cgft"
+                },
+                {
+                    "supplier_name" : "sepforecast",
+                    "supplier_display_name" : "SEP Forecast",
+                    "source"        : "COMESEP",
+                    "db": "com_sepforecast"
+                },
+                {
+                    "supplier_name" : "glealert",
+                    "supplier_display_name" : "GLE Alert",
+                    "source"        : "COMESEP",
+                    "db": "com_gle"
+                },
+                {
+                    "supplier_name" : "geomag24",
+                    "supplier_display_name" : "Geomag24",
+                    "source"        : "COMESEP",
+                    "db": "com_geomag"
+                }
+            ],
+            "parameter_list"        : [],
+            "icon" : "iconbank://Comesep"
+        }
+    ],
+    "related_events" : [
+        {
+            "event_name"    : "Active Region",
+            "related_with"  : "Flare",
+            "related_on"    : [
+                {
+                    "parameter_from" : "ar_noaanum",
+                    "parameter_with" : "ar_noaanum",
+                    "dbtype": "INTEGER"
+                }
+            ]
+        },
+        {
+            "event_name"    : "Active Region",
+            "related_with"  : "Active Region",
+            "related_on"    : [
+                {
+                    "parameter_from" : "ar_noaanum",
+                    "parameter_with" : "ar_noaanum",
+                    "dbtype": "INTEGER"
+                }
+            ]
+        }
+    ]
+}
