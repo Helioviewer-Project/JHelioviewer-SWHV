@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 import javax.annotation.Nonnull;
 
@@ -17,26 +18,28 @@ import com.google.common.util.concurrent.FutureCallback;
 public class TAPClient {
 
     public interface Receiver {
-        void setResponse(JSONArray ja);
+        void setTAPResponse(Object o);
     }
 
-    public static void submitQuery(@Nonnull Receiver receiver, @Nonnull String serverUrl, @Nonnull String adql) {
-        EventQueueCallbackExecutor.pool.submit(new ADQLQuery(serverUrl, adql), new Callback(receiver));
+    public static void submitQuery(@Nonnull Receiver receiver, @Nonnull String serverUrl, @Nonnull String adql, Function<Object, JSONArray> func) {
+        EventQueueCallbackExecutor.pool.submit(new ADQLQuery(serverUrl, adql, func), new Callback(receiver));
     }
 
-    private record ADQLQuery(String serverUrl, String adql) implements Callable<JSONArray> {
+    private record ADQLQuery(String serverUrl, String adql,
+                             Function<Object, JSONArray> func) implements Callable<Object> {
         @Override
         public JSONArray call() throws Exception {
             URI uri = new URI(serverUrl + "/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=" + URLEncoder.encode(adql, StandardCharsets.UTF_8));
-            return JSONUtils.get(uri).getJSONArray("data");
+            JSONArray ja = JSONUtils.get(uri).getJSONArray("data");
+            return func.apply(ja);
         }
     }
 
-    private record Callback(Receiver receiver) implements FutureCallback<JSONArray> {
+    private record Callback(Receiver receiver) implements FutureCallback<Object> {
 
         @Override
-        public void onSuccess(JSONArray result) {
-            receiver.setResponse(result);
+        public void onSuccess(Object result) {
+            receiver.setTAPResponse(result);
         }
 
         @Override
