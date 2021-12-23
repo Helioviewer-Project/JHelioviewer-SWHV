@@ -15,10 +15,10 @@ import org.json.JSONArray;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-public class TAPClient {
+public class TapClient {
 
     public interface Receiver {
-        void setTAPResponse(Object o);
+        void setTapResponse(Object o);
     }
 
     public static void submitQuery(@Nonnull Receiver receiver, @Nonnull String serverUrl, @Nonnull String adql, Function<JSONArray, Object> func) {
@@ -39,7 +39,7 @@ public class TAPClient {
 
         @Override
         public void onSuccess(Object result) {
-            receiver.setTAPResponse(result);
+            receiver.setTapResponse(result);
         }
 
         @Override
