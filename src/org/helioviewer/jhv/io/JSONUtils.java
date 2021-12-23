@@ -35,12 +35,6 @@ public class JSONUtils {
         }
     }
 
-    public static JSONObject get(String uri) throws IOException, JSONException {
-        try (NetClient nc = NetClient.of(uri)) {
-            return get(nc.getReader());
-        }
-    }
-
     public static ByteArrayOutputStream compressJSON(JSONObject json) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(BUFSIZ);
         try (GZIPOutputStream gz = new GZIPOutputStream(baos, BUFSIZ);

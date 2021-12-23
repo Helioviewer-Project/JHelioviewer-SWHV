@@ -53,7 +53,7 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
         setInitFocusedComponent(okBtn);
 
         JButton availabilityBtn = new JButton("Available data");
-        availabilityBtn.addActionListener(e -> JHVGlobals.openURL(TimelineSettings.availabilityURL));
+        availabilityBtn.addActionListener(e -> JHVGlobals.openURL(TimelineSettings.AVAILABILITY_URL));
 
         ButtonPanel panel = new ButtonPanel();
         panel.add(okBtn, ButtonPanel.AFFIRMATIVE_BUTTON);
