@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.astronomy;
 
+import java.net.URI;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -26,7 +27,7 @@ public record PositionLoad(StatusReceiver receiver, SpaceObject target, boolean 
                                 long end) implements Callable<PositionResponse> {
 
         private static final int MAX_POINTS = 50000;
-        private static final String baseURL = "http://swhv.oma.be/position?";
+        private static final String BASE_URL = "http://swhv.oma.be/position?";
 
         @Override
         public PositionResponse call() throws Exception {
@@ -45,9 +46,9 @@ public record PositionLoad(StatusReceiver receiver, SpaceObject target, boolean 
             }
 
             //Stopwatch sw = Stopwatch.createStarted();
-            String url = baseURL + "ref=" + frame + "&observer=" + observer.getUrlName() + "&target=" + target.getUrlName() +
-                    "&utc=" + TimeUtils.format(start) + "&utc_end=" + TimeUtils.format(end) + "&deltat=" + deltat;
-            try (NetClient nc = NetClient.of(url, true)) {
+            URI uri = new URI(BASE_URL + "ref=" + frame + "&observer=" + observer.getUrlName() + "&target=" + target.getUrlName() +
+                    "&utc=" + TimeUtils.format(start) + "&utc_end=" + TimeUtils.format(end) + "&deltat=" + deltat);
+            try (NetClient nc = NetClient.of(uri, true)) {
                 JSONObject result = JSONUtils.get(nc.getReader());
                 if (nc.isSuccessful()) {
                     return new PositionResponse(result);
