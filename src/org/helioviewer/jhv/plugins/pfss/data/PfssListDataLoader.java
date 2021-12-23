@@ -42,22 +42,22 @@ public class PfssListDataLoader {
 
             do {
                 String m = startMonth < 9 ? "0" + (startMonth + 1) : Integer.toString(startMonth + 1);
-                URI uri = new URI(PfssSettings.BASE_URL + startYear + '/' + m + "/list.txt");
-                HashMap<Long, String> urls = new HashMap<>();
+                URI listUri = new URI(PfssSettings.BASE_URL + startYear + '/' + m + "/list.txt");
+                HashMap<Long, URI> uris = new HashMap<>();
 
                 // may come from http cache
-                try (NetClient nc = NetClient.of(uri); BufferedSource source = nc.getSource()) {
+                try (NetClient nc = NetClient.of(listUri); BufferedSource source = nc.getSource()) {
                     String line;
                     while ((line = source.readUtf8Line()) != null) {
                         String[] splitted = Regex.Space.split(line);
                         if (splitted.length != 2)
                             throw new Exception("Invalid line: " + line);
-                        urls.put(TimeUtils.parse(splitted[0]), PfssSettings.BASE_URL + splitted[1]);
+                        uris.put(TimeUtils.parse(splitted[0]), new URI(PfssSettings.BASE_URL + splitted[1]));
                     }
                 } catch (Exception e) { // continue in case of list error
                     Log.warn("PFSS list error", e);
                 }
-                EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().put(urls));
+                EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().put(uris));
 
                 if (startMonth == 11) {
                     startMonth = 0;
