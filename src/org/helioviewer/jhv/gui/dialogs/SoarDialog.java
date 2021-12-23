@@ -160,9 +160,9 @@ public class SoarDialog extends StandardDialog implements TapClient.Receiver {
         setVisible(true);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void setTapResponse(Object o) {
+        @SuppressWarnings("unchecked")
         List<SoarClient.DataItem> items = (List<SoarClient.DataItem>) o;
         listPane.setListData(items.toArray(SoarClient.DataItem[]::new));
         foundLabel.setText(items.size() + " found");
