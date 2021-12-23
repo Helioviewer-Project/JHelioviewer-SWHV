@@ -1,7 +1,7 @@
 package org.helioviewer.jhv;
 
 import java.awt.EventQueue;
-import java.io.IOException;
+import java.net.URI;
 
 import javax.swing.JOptionPane;
 
@@ -12,7 +12,7 @@ import org.helioviewer.jhv.io.NetClient;
 import okio.BufferedSource;
 
 // Verbose whether a dialog box should be popped up.
-// Otherwise a message box is shown in case of an update error.
+// A message box is shown in case of an update error.
 public record JHVUpdate(boolean verbose) implements Runnable {
 
     public void check() {
@@ -38,10 +38,10 @@ public record JHVUpdate(boolean verbose) implements Runnable {
             }
         }
 
-        try (NetClient nc = NetClient.of(JHVGlobals.downloadURL + "VERSION"); BufferedSource source = nc.getSource()) {
+        try (NetClient nc = NetClient.of(new URI(JHVGlobals.downloadURL + "VERSION")); BufferedSource source = nc.getSource()) {
             String version = source.readUtf8Line();
             if (version == null || version.isEmpty()) {
-                throw new IOException("JHVUpdate: Empty version string");
+                throw new Exception("JHVUpdate: Empty version string");
             }
 
             EventQueue.invokeLater(() -> {
@@ -59,10 +59,10 @@ public record JHVUpdate(boolean verbose) implements Runnable {
                         JOptionPane.showMessageDialog(null, "You are running the latest JHelioviewer version (" + runningVersion + ')');
                 }
             });
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.warn(e);
             if (verbose)
-                Message.warn("Update check error", "While checking for a newer version got " + e.getLocalizedMessage());
+                Message.warn("Update check error", "While checking for a newer version got " + e.getMessage());
         }
     }
 
