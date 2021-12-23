@@ -370,7 +370,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
             downloadTask.cancel(true);
         APIRequest req = view.getAPIRequest();
         if (req != null && view.getURI() != null) // should not happen
-            downloadTask = DownloadLayer.submit(this, req, view.getURI());
+            downloadTask = DownloadLayer.submit(req, this, view.getURI());
     }
 
     public void stopDownload() {

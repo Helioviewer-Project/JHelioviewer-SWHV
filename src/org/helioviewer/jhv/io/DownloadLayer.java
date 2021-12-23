@@ -23,41 +23,37 @@ import okio.BufferedSink;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-public record DownloadLayer(ImageLayer layer, File dstFile, URI uri) implements Callable<File> {
+public class DownloadLayer {
 
     @Nullable
-    public static Future<File> submit(@Nonnull ImageLayer layer, @Nonnull APIRequest req, @Nonnull URI uri) {
-        URI downloadURI;
-        try {
-            downloadURI = new URI(req.toFileRequest());
-        } catch (Exception e) { // should not happen
-            return null;
-        }
-
-        String uriPath = uri.getPath();
-        File dstFile = new File(JHVDirectory.REMOTEFILES.getPath(), uriPath.substring(Math.max(0, uriPath.lastIndexOf('/')))).getAbsoluteFile();
-        return EventQueueCallbackExecutor.pool.submit(new DownloadLayer(layer, dstFile, downloadURI), new Callback(layer, dstFile));
+    public static Future<File> submit(@Nonnull APIRequest req, @Nonnull ImageLayer layer, @Nonnull URI dst) {
+        String dstPath = dst.getPath();
+        File dstFile = new File(JHVDirectory.REMOTEFILES.getPath(), dstPath.substring(Math.max(0, dstPath.lastIndexOf('/')))).getAbsoluteFile();
+        return EventQueueCallbackExecutor.pool.submit(new LayerDownload(req, layer, dstFile), new Callback(layer, dstFile));
     }
 
     private static final int BUFSIZ = 1024 * 1024;
 
-    @Override
-    public File call() throws Exception {
-        try (NetClient nc = NetClient.of(uri); BufferedSource source = nc.getSource(); BufferedSink sink = Okio.buffer(Okio.sink(dstFile))) {
-            long count = 0, contentLength = nc.getContentLength();
-            long bytesRead, totalRead = 0;
-            Buffer sinkBuffer = sink.getBuffer();
-            while ((bytesRead = source.read(sinkBuffer, BUFSIZ)) != -1) {
-                totalRead += bytesRead;
-                count++;
+    private record LayerDownload(APIRequest req, ImageLayer layer, File dstFile) implements Callable<File> {
+        @Override
+        public File call() throws Exception {
+            URI uri = new URI(req.toFileRequest());
+            try (NetClient nc = NetClient.of(uri); BufferedSource source = nc.getSource(); BufferedSink sink = Okio.buffer(Okio.sink(dstFile))) {
+                long count = 0, contentLength = nc.getContentLength();
+                long bytesRead, totalRead = 0;
+                Buffer sinkBuffer = sink.getBuffer();
+                while ((bytesRead = source.read(sinkBuffer, BUFSIZ)) != -1) {
+                    totalRead += bytesRead;
+                    count++;
 
-                if (count % 128 == 0) { // approx 1MB
-                    int percent = contentLength > 0 ? (int) (100. / contentLength * totalRead + .5) : -1;
-                    EventQueue.invokeLater(() -> layer.progressDownload(percent));
+                    if (count % 128 == 0) { // approx 1MB
+                        int percent = contentLength > 0 ? (int) (100. / contentLength * totalRead + .5) : -1;
+                        EventQueue.invokeLater(() -> layer.progressDownload(percent));
+                    }
                 }
             }
+            return dstFile;
         }
-        return dstFile;
     }
 
     private record Callback(ImageLayer layer, File dstFile) implements FutureCallback<File> {
