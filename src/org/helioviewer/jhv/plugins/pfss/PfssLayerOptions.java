@@ -72,7 +72,7 @@ class PfssLayerOptions extends JPanel {
 
         JButton availabilityButton = new JButton("Available data");
         availabilityButton.setToolTipText("Click here to check the PFSS data availability");
-        availabilityButton.addActionListener(e -> JHVGlobals.openURL(PfssSettings.availabilityURL));
+        availabilityButton.addActionListener(e -> JHVGlobals.openURL(PfssSettings.AVAILABILITY_URL));
 
         c0.gridy = 1;
         c0.anchor = GridBagConstraints.LINE_START;
