@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.timelines.band;
 
+import java.net.URI;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -63,11 +64,10 @@ public class BandDataProvider {
         @Override
         public BandResponse call() throws Exception {
             BandType type = band.getBandType();
-            String request = type.getBaseURL() +
-                    "start_date=" + TimeUtils.formatDate(startTime) +
-                    "&end_date=" + TimeUtils.formatDate(endTime) +
-                    "&timeline=" + type.getName();
-            return new BandResponse(JSONUtils.get(request));
+            URI uri = new URI(type.getBaseURL() + "timeline=" + type.getName() +
+                    "&start_date=" + TimeUtils.formatDate(startTime) +
+                    "&end_date=" + TimeUtils.formatDate(endTime));
+            return new BandResponse(JSONUtils.get(uri));
         }
 
     }
@@ -115,7 +115,7 @@ public class BandDataProvider {
     private static class BandTypeDownload implements Callable<JSONArray> {
         @Override
         public JSONArray call() throws Exception {
-            return JSONUtils.get(TimelineSettings.baseURL).getJSONArray("objects");
+            return JSONUtils.get(new URI(TimelineSettings.BASE_URL)).getJSONArray("objects");
         }
     }
 

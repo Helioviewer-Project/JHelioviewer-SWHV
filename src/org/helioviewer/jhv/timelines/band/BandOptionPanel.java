@@ -86,7 +86,7 @@ class BandOptionPanel extends JPanel {
         c.gridx = 0;
         c.anchor = GridBagConstraints.LINE_START;
         JButton availabilityButton = new JButton("Available data");
-        availabilityButton.addActionListener(e -> JHVGlobals.openURL(TimelineSettings.availabilityURL + '#' + band.getBandType().getName()));
+        availabilityButton.addActionListener(e -> JHVGlobals.openURL(TimelineSettings.AVAILABILITY_URL + '#' + band.getBandType().getName()));
         add(availabilityButton, c);
     }
 
