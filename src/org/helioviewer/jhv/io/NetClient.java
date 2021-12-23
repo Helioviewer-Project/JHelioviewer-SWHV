@@ -41,14 +41,6 @@ public interface NetClient extends AutoCloseable {
         return of(uri, false, NetCache.CACHE);
     }
 
-    static NetClient of(String uri, boolean allowError) throws IOException {
-        try {
-            return of(new URI(uri), allowError, NetCache.CACHE);
-        } catch (URISyntaxException e) {
-            throw new IOException(e);
-        }
-    }
-
     static NetClient of(URI uri, boolean allowError) throws IOException {
         return of(uri, allowError, NetCache.CACHE);
     }
