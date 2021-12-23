@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins.pfss.data;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -10,21 +11,21 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 
 public class PfssCache {
 
-    private final TreeMap<Long, String> map = new TreeMap<>();
-    private final Cache<String, PfssData> cache = Caffeine.newBuilder().softValues().build();
+    private final TreeMap<Long, URI> map = new TreeMap<>();
+    private final Cache<URI, PfssData> cache = Caffeine.newBuilder().softValues().build();
 
-    void put(Map<Long, String> urls) {
-        map.putAll(urls);
+    void put(Map<Long, URI> uris) {
+        map.putAll(uris);
     }
 
-    void putData(String url, PfssData data) {
-        cache.put(url, data);
+    void putData(URI uri, PfssData data) {
+        cache.put(uri, data);
     }
 
-    private PfssData get(long time, String url) {
-        PfssData ret = cache.getIfPresent(url);
+    private PfssData get(long time, URI uri) {
+        PfssData ret = cache.getIfPresent(uri);
         if (ret == null) {
-            PfssDataLoader.submit(time, url);
+            PfssDataLoader.submit(time, uri);
         }
         return ret;
     }

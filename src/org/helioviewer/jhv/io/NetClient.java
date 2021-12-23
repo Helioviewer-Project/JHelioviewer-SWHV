@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 import okio.BufferedSource;
 
@@ -27,14 +26,6 @@ public interface NetClient extends AutoCloseable {
 
     enum NetCache {
         CACHE, NETWORK, BYPASS
-    }
-
-    static NetClient of(String uri) throws IOException {
-        try {
-            return of(new URI(uri), false, NetCache.CACHE);
-        } catch (URISyntaxException e) {
-            throw new IOException(e);
-        }
     }
 
     static NetClient of(URI uri) throws IOException {

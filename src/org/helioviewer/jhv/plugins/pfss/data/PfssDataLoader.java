@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins.pfss.data;
 
+import java.net.URI;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
@@ -20,15 +21,15 @@ import nom.tam.fits.Header;
 
 class PfssDataLoader {
 
-    static void submit(long time, String url) {
-        EventQueueCallbackExecutor.pool.submit(new DataLoader(time, url), new Callback(url));
+    static void submit(long time, URI uri) {
+        EventQueueCallbackExecutor.pool.submit(new DataLoader(time, uri), new Callback(uri));
         PfssPlugin.downloads++;
     }
 
-    private record DataLoader(long time, String url) implements Callable<PfssData> {
+    private record DataLoader(long time, URI uri) implements Callable<PfssData> {
         @Override
         public PfssData call() throws Exception {
-            try (NetClient nc = NetClient.of(url); Fits fits = new Fits(nc.getStream())) {
+            try (NetClient nc = NetClient.of(uri); Fits fits = new Fits(nc.getStream())) {
                 BasicHDU<?>[] hdus = fits.read();
                 if (hdus == null || hdus.length < 2 || !(hdus[1] instanceof BinaryTableHDU bhdu))
                     throw new Exception("Could not read FITS");
@@ -58,19 +59,19 @@ class PfssDataLoader {
 
     }
 
-    private record Callback(String url) implements FutureCallback<PfssData> {
+    private record Callback(URI uri) implements FutureCallback<PfssData> {
 
         @Override
         public void onSuccess(PfssData result) {
             PfssPlugin.downloads--;
-            PfssPlugin.getPfsscache().putData(url, result);
+            PfssPlugin.getPfsscache().putData(uri, result);
             MovieDisplay.display(); //!
         }
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
             PfssPlugin.downloads--;
-            Log.error(url, t);
+            Log.error(t);
         }
 
     }
