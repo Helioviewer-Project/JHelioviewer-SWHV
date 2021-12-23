@@ -90,16 +90,16 @@ public class HEKHandler extends SWEKHandler {
 
     @Override
     protected URI createURI(SWEKGroup group, long start, long end, List<SWEK.Param> params, int page) throws Exception {
-        StringBuilder baseURL = new StringBuilder(BASE_URL + "cmd=search&type=column&");
-        baseURL.append("event_type=").append(HEKEventEnum.getHEKEventAbbreviation(group.getName())).append('&');
-        baseURL.append("event_coordsys=helioprojective&x1=-3600&x2=3600&y1=-3600&y2=3600&cosec=2&");
-        baseURL.append("param0=event_starttime&op0=").append(SWEK.Operand.SMALLER_OR_EQUAL.encodedRepresentation).append('&');
-        baseURL.append("value0=").append(TimeUtils.format(end)).append('&');
+        StringBuilder baseURL = new StringBuilder(BASE_URL + "cmd=search&type=column");
+        baseURL.append("&event_type=").append(HEKEventEnum.getHEKEventAbbreviation(group.getName()));
+        baseURL.append("&event_coordsys=helioprojective&x1=-3600&x2=3600&y1=-3600&y2=3600&cosec=2");
+        baseURL.append("&param0=event_starttime&op0=").append(SWEK.Operand.SMALLER_OR_EQUAL.encodedRepresentation);
+        baseURL.append("&value0=").append(TimeUtils.format(end));
         appendParams(baseURL, params);
-        baseURL.append("event_starttime=").append(TimeUtils.format(start)).append('&');
+        baseURL.append("&event_starttime=").append(TimeUtils.format(start));
         long max = Math.max(System.currentTimeMillis(), end);
-        baseURL.append("event_endtime=").append(TimeUtils.format(max)).append('&');
-        baseURL.append("page=").append(page);
+        baseURL.append("&event_endtime=").append(TimeUtils.format(max));
+        baseURL.append("&page=").append(page);
         return new URI(baseURL.toString());
     }
 
@@ -108,7 +108,9 @@ public class HEKHandler extends SWEKHandler {
         for (SWEK.Param p : params) {
             if (p.name().equalsIgnoreCase("provider")) {
                 String encodedValue = URLEncoder.encode(p.value(), StandardCharsets.UTF_8);
-                baseURL.append("param").append(paramCount).append('=').append("frm_name").append('&').append("op").append(paramCount).append('=').append(p.operand().encodedRepresentation).append('&').append("value").append(paramCount).append('=').append(encodedValue).append('&');
+                baseURL.append("&param").append(paramCount).append('=').append("frm_name").
+                        append("&op").append(paramCount).append('=').append(p.operand().encodedRepresentation).
+                        append("&value").append(paramCount).append('=').append(encodedValue);
                 paramCount++;
             }
         }
