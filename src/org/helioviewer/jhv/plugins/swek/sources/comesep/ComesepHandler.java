@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.swek.sources.comesep;
 
 import java.io.ByteArrayOutputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +22,7 @@ import org.json.JSONObject;
 @SuppressWarnings("unchecked")
 public class ComesepHandler extends SWEKHandler {
 
-    private static final String _baseURL = "http://swhv.oma.be/comesep/comeseprequestapi/getComesep.php?";
+    private static final String BASE_URL = "http://swhv.oma.be/comesep/comeseprequestapi/getComesep.php?";
 
     @Override
     protected boolean parseRemote(JSONObject eventJSON, SWEKSupplier supplier) {
@@ -71,15 +72,14 @@ public class ComesepHandler extends SWEKHandler {
     }
 
     @Override
-    protected String createURL(SWEKGroup group, long start, long end, List<SWEK.Param> params, int page) {
-        StringBuilder baseURL = new StringBuilder(_baseURL);
-        baseURL = appendModel(baseURL, params).append('&');
-        baseURL.append("startdate=").append(TimeUtils.format(start)).append('&');
-        baseURL.append("enddate=").append(TimeUtils.format(end)).append('&');
-        return baseURL.toString();
+    protected URI createURI(SWEKGroup group, long start, long end, List<SWEK.Param> params, int page) throws Exception {
+        String url = BASE_URL + "model=" + model(params) + '&' +
+                "startdate=" + TimeUtils.format(start) + '&' +
+                "enddate=" + TimeUtils.format(end);
+        return new URI(url);
     }
 
-    private static StringBuilder appendModel(StringBuilder baseURL, List<SWEK.Param> params) {
+    private static String model(List<SWEK.Param> params) {
         String model = "";
         for (SWEK.Param p : params) {
             if (p.name().equals("provider")) {
@@ -87,7 +87,7 @@ public class ComesepHandler extends SWEKHandler {
                 break;
             }
         }
-        return baseURL.append("model=").append(model);
+        return model;
     }
 
     @Override

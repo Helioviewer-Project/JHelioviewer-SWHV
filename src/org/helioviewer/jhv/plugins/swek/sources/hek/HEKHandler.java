@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.swek.sources.hek;
 
 import java.io.ByteArrayOutputStream;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ import org.json.JSONObject;
 @SuppressWarnings("unchecked")
 public class HEKHandler extends SWEKHandler {
 
-    private static final String _baseURL = "https://www.lmsal.com/hek/her?";
+    private static final String BASE_URL = "https://www.lmsal.com/hek/her?";
 
     @Override
     protected boolean parseRemote(JSONObject eventJSON, SWEKSupplier supplier) {
@@ -88,9 +89,8 @@ public class HEKHandler extends SWEKHandler {
     }
 
     @Override
-    protected String createURL(SWEKGroup group, long start, long end, List<SWEK.Param> params, int page) {
-        StringBuilder baseURL = new StringBuilder(_baseURL);
-        baseURL.append("cmd=search&type=column&");
+    protected URI createURI(SWEKGroup group, long start, long end, List<SWEK.Param> params, int page) throws Exception {
+        StringBuilder baseURL = new StringBuilder(BASE_URL + "cmd=search&type=column&");
         baseURL.append("event_type=").append(HEKEventEnum.getHEKEventAbbreviation(group.getName())).append('&');
         baseURL.append("event_coordsys=helioprojective&x1=-3600&x2=3600&y1=-3600&y2=3600&cosec=2&");
         baseURL.append("param0=event_starttime&op0=").append(SWEK.Operand.SMALLER_OR_EQUAL.encodedRepresentation).append('&');
@@ -100,7 +100,7 @@ public class HEKHandler extends SWEKHandler {
         long max = Math.max(System.currentTimeMillis(), end);
         baseURL.append("event_endtime=").append(TimeUtils.format(max)).append('&');
         baseURL.append("page=").append(page);
-        return baseURL.toString();
+        return new URI(baseURL.toString());
     }
 
     private static void appendParams(StringBuilder baseURL, List<SWEK.Param> params) {
