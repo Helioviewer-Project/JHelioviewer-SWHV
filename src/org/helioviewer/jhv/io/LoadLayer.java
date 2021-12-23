@@ -36,7 +36,7 @@ public class LoadLayer {
     private record LoadRemote(ImageLayer layer, APIRequest req) implements Callable<View> {
         @Override
         public View call() throws Exception {
-            URI uri = APIResponse.get(req);
+            URI uri = APIResponse.get(req.toJpipRequest());
             return uri == null ? null : loadView(layer.getExecutor(), req, uri, false);
         }
     }

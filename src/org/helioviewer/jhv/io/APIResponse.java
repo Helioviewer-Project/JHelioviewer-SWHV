@@ -15,8 +15,7 @@ import org.json.JSONObject;
 class APIResponse {
 
     @Nullable
-    static URI get(@Nonnull APIRequest req) throws IOException {
-        String jpipRequest = req.toJpipRequest();
+    static URI get(@Nonnull URI jpipRequest) throws IOException {
         try {
             JSONObject data = JSONUtils.get(jpipRequest);
 
