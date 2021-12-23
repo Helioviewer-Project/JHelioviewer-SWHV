@@ -35,6 +35,12 @@ public class JSONUtils {
         }
     }
 
+    public static JSONObject getUncached(URI uri) throws IOException, JSONException {
+        try (NetClient nc = NetClient.of(uri, false, NetClient.NetCache.NETWORK)) {
+            return get(nc.getReader());
+        }
+    }
+
     public static ByteArrayOutputStream compressJSON(JSONObject json) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(BUFSIZ);
         try (GZIPOutputStream gz = new GZIPOutputStream(baos, BUFSIZ);

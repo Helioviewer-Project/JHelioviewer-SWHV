@@ -67,7 +67,7 @@ public class BandDataProvider {
             URI uri = new URI(type.getBaseURL() + "timeline=" + type.getName() +
                     "&start_date=" + TimeUtils.formatDate(startTime) +
                     "&end_date=" + TimeUtils.formatDate(endTime));
-            return new BandResponse(JSONUtils.get(uri));
+            return new BandResponse(JSONUtils.getUncached(uri));
         }
 
     }
