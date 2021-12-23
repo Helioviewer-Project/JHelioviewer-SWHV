@@ -73,10 +73,7 @@ public class ComesepHandler extends SWEKHandler {
 
     @Override
     protected URI createURI(SWEKGroup group, long start, long end, List<SWEK.Param> params, int page) throws Exception {
-        String url = BASE_URL + "model=" + model(params) + '&' +
-                "startdate=" + TimeUtils.format(start) + '&' +
-                "enddate=" + TimeUtils.format(end);
-        return new URI(url);
+        return new URI(BASE_URL + "model=" + model(params) + "&startdate=" + TimeUtils.format(start) + "&enddate=" + TimeUtils.format(end));
     }
 
     private static String model(List<SWEK.Param> params) {
