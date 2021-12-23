@@ -22,14 +22,10 @@ class PfssDataLoader {
 
     static void submit(long time, String url) {
         EventQueueCallbackExecutor.pool.submit(new DataLoader(time, url), new Callback(url));
+        PfssPlugin.downloads++;
     }
 
     private record DataLoader(long time, String url) implements Callable<PfssData> {
-
-        DataLoader {
-            PfssPlugin.downloads++;
-        }
-
         @Override
         public PfssData call() throws Exception {
             try (NetClient nc = NetClient.of(url); Fits fits = new Fits(nc.getStream())) {

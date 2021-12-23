@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.pfss.data;
 
 import java.awt.EventQueue;
+import java.net.URI;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
@@ -23,16 +24,12 @@ public class PfssListDataLoader {
 
     public static void submit(long start, long end) {
         EventQueueCallbackExecutor.pool.submit(new ListDataLoader(start, end), new Callback(start));
+        PfssPlugin.downloads++;
     }
 
     private record ListDataLoader(long start, long end) implements Callable<Void> {
-
-        ListDataLoader {
-            PfssPlugin.downloads++;
-        }
-
         @Override
-        public Void call() {
+        public Void call() throws Exception {
             Calendar cal = Calendar.getInstance();
 
             cal.setTimeInMillis(start);
@@ -45,19 +42,19 @@ public class PfssListDataLoader {
 
             do {
                 String m = startMonth < 9 ? "0" + (startMonth + 1) : Integer.toString(startMonth + 1);
-                String url = PfssSettings.baseURL + startYear + '/' + m + "/list.txt";
+                URI uri = new URI(PfssSettings.BASE_URL + startYear + '/' + m + "/list.txt");
                 HashMap<Long, String> urls = new HashMap<>();
 
                 // may come from http cache
-                try (NetClient nc = NetClient.of(url); BufferedSource source = nc.getSource()) {
+                try (NetClient nc = NetClient.of(uri); BufferedSource source = nc.getSource()) {
                     String line;
                     while ((line = source.readUtf8Line()) != null) {
                         String[] splitted = Regex.Space.split(line);
                         if (splitted.length != 2)
                             throw new Exception("Invalid line: " + line);
-                        urls.put(TimeUtils.parse(splitted[0]), PfssSettings.baseURL + splitted[1]);
+                        urls.put(TimeUtils.parse(splitted[0]), PfssSettings.BASE_URL + splitted[1]);
                     }
-                } catch (Exception e) {
+                } catch (Exception e) { // continue in case of list error
                     Log.warn("PFSS list error", e);
                 }
                 EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().put(urls));
