@@ -19,14 +19,14 @@ public class JSONUtils {
 
     private static final int BUFSIZ = 65536;
 
-    public static JSONObject get(InputStream in) throws IOException, JSONException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8), BUFSIZ)) {
-            return new JSONObject(new JSONTokener(reader));
-        }
-    }
-
     public static JSONObject get(Reader in) throws JSONException {
         return new JSONObject(new JSONTokener(in));
+    }
+
+    public static JSONObject get(InputStream in) throws IOException, JSONException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8), BUFSIZ)) {
+            return get(reader);
+        }
     }
 
     public static JSONObject get(URI uri) throws IOException, JSONException {
