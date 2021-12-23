@@ -383,25 +383,25 @@ public class CDFReader {
         };
 
         Object abuf = v.createRawValueArray();
-        int count = v.getRecordCount();
+        int numPoints = v.getRecordCount();
 
-        v.readRawRecord(0, abuf); // read first record to get number of elements
-        int len = Array.getLength(abuf);
+        v.readRawRecord(0, abuf); // read first record to get number of axes
+        int numAxes = Array.getLength(abuf);
 
-        float[][] ret = new float[len][count];
-        if (count == 0)
+        float[][] ret = new float[numAxes][numPoints];
+        if (numPoints == 0)
             return ret;
 
-        for (int i = 0; i < len; i++)
+        for (int i = 0; i < numAxes; i++)
             ret[i][0] = fillFunc.apply(dataType.getScalar(abuf, i), fillVal);
 
-        for (int j = 1; j < count; j++) {
+        for (int j = 1; j < numPoints; j++) {
             v.readRawRecord(j, abuf);
-            int nlen = Array.getLength(abuf);
-            if (nlen != len)
-                throw new IOException("Inconsistent number of elements: expected " + len + ", got " + nlen);
+            int len = Array.getLength(abuf);
+            if (len != numAxes)
+                throw new IOException("Inconsistent number of elements: expected " + numAxes + ", got " + len);
 
-            for (int i = 0; i < len; i++)
+            for (int i = 0; i < numAxes; i++)
                 ret[i][j] = fillFunc.apply(dataType.getScalar(abuf, i), fillVal);
         }
 
