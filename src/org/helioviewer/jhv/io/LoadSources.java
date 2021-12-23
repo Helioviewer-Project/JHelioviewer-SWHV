@@ -2,6 +2,7 @@ package org.helioviewer.jhv.io;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
@@ -18,53 +19,43 @@ import org.json.JSONObject;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-class LoadSources implements Callable<DataSourcesParser> {
+class LoadSources {
 
     static void submit(@Nonnull String server, @Nonnull Validator validator) {
-        EventQueueCallbackExecutor.pool.submit(new LoadSources(server, validator), new Callback(server));
+        EventQueueCallbackExecutor.pool.submit(new SourcesLoad(server, validator), new Callback(server));
     }
 
-    private final Validator validator;
-    private final DataSourcesParser parser;
-    private final String url;
-    private final String schemaName;
+    private record SourcesLoad(String server, Validator validator) implements Callable<DataSourcesParser> {
+        @Override
+        public DataSourcesParser call() throws Exception {
+            String serverUrl = DataSources.getServerSetting(server, "API.getDataSources");
+            String schemaName = DataSources.getServerSetting(server, "schema");
+            if (serverUrl == null || schemaName == null)
+                throw new Exception("Unknown server: " + server);
 
-    private LoadSources(String server, Validator _validator) {
-        validator = _validator;
-        parser = new DataSourcesParser(server);
-        url = DataSources.getServerSetting(server, "API.getDataSources");
-        schemaName = DataSources.getServerSetting(server, "schema");
-    }
-
-    @Override
-    public DataSourcesParser call() throws Exception {
-        Schema schema;
-        try (InputStream is = FileUtils.getResource(schemaName)) {
-            JSONObject rawSchema = JSONUtils.get(is);
-            SchemaLoader schemaLoader = SchemaLoader.builder().schemaJson(rawSchema).addFormatValidator(new TimeUtils.SQLDateTimeFormatValidator()).build();
-            schema = schemaLoader.load().build();
-        }
-
-        while (true) {
-            try {
-                JSONObject jo = JSONUtils.get(url);
-/*
-                if (url.contains("helioviewer.org")) {
-                    jo.getJSONObject("PROBA2").getJSONObject("children").getJSONObject("SWAP").getJSONObject("children").remove("174");
-                    JSONObject o = new JSONObject( "{\"sourceId\":32,\"layeringOrder\":1,\"name\":\"174\u205fÅ\",\"nickname\":\"SWAP 174\",\"start\":\"2010-01-04 17:00:50\",\"description\":\"174 Ångström extreme ultraviolet\",\"end\":\"2017-03-21 10:23:31\",\"label\":\"Measurement\"} ");
-                    jo.getJSONObject("PROBA2").getJSONObject("children").getJSONObject("SWAP").getJSONObject("children").put("174", o);
-                }
-*/
-                if (schema != null)
-                    validator.performValidation(schema, jo);
-                parser.parse(jo);
-                break;
-            } catch (IOException e) {
-                // Log.error(url, e);
-                Thread.sleep(15000);
+            Schema schema;
+            try (InputStream is = FileUtils.getResource(schemaName)) {
+                JSONObject rawSchema = JSONUtils.get(is);
+                SchemaLoader schemaLoader = SchemaLoader.builder().schemaJson(rawSchema).addFormatValidator(new TimeUtils.SQLDateTimeFormatValidator()).build();
+                schema = schemaLoader.load().build();
             }
+
+            URI uri = new URI(serverUrl);
+            DataSourcesParser parser = new DataSourcesParser(server);
+            while (true) {
+                try {
+                    JSONObject jo = JSONUtils.get(uri);
+                    if (schema != null)
+                        validator.performValidation(schema, jo);
+                    parser.parse(jo);
+                    break;
+                } catch (IOException e) {
+                    // Log.error(uri, e);
+                    Thread.sleep(15000);
+                }
+            }
+            return parser;
         }
-        return parser;
     }
 
     private record Callback(String server) implements FutureCallback<DataSourcesParser> {
