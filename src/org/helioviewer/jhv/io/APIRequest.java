@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.io;
 
-import java.io.IOException;
+import java.net.URI;
 
 import javax.annotation.Nonnull;
 
@@ -24,16 +24,16 @@ public record APIRequest(@Nonnull String server, int sourceId, long startTime, l
         }
     }
 
-    public String toFileRequest() throws IOException {
+    public String toFileRequest() throws Exception {
         String api;
         String fileReq;
         if (startTime == endTime) {
             if ((api = DataSources.getServerSetting(server, "API.getJP2Image")) == null)
-                throw new IOException("Unknown server: " + server);
+                throw new Exception("Unknown server: " + server);
             fileReq = api + "sourceId=" + sourceId + "&date=" + TimeUtils.formatZ(startTime);
         } else {
             if ((api = DataSources.getServerSetting(server, "API.getJPX")) == null)
-                throw new IOException("Unknown server: " + server);
+                throw new Exception("Unknown server: " + server);
             fileReq = api + "sourceId=" + sourceId + "&startTime=" + TimeUtils.formatZ(startTime) + "&endTime=" + TimeUtils.formatZ(endTime);
             if (cadence != CADENCE_ANY)
                 fileReq += "&cadence=" + cadence;
@@ -41,9 +41,9 @@ public record APIRequest(@Nonnull String server, int sourceId, long startTime, l
         return fileReq;
     }
 
-    String toJpipRequest() throws IOException {
+    URI toJpipRequest() throws Exception {
         String jsonReq = startTime == endTime ? "&json=true" : "&verbose=true&linked=true";
-        return toFileRequest() + jsonReq + "&jpip=true";
+        return new URI(toFileRequest() + jsonReq + "&jpip=true");
     }
 
     public JSONObject toJson() {
