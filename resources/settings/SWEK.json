@@ -203,6 +203,11 @@
                     "parameter_display_name"    : "Alert Version"
                 }
             ]
+        },
+        {
+            "name"                  : "FHNW",
+            "provider_name"         : "FHNW",
+            "general_parameters"    : []
         }
     ],
     "events_types" : [
@@ -918,6 +923,19 @@
             ],
             "parameter_list"        : [],
             "icon" : "iconbank://Comesep"
+        },
+        {
+            "event_name"    : "FHNW",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "rhessi_flares",
+                    "supplier_display_name" : "RHESSI Flare List",
+                    "source"        : "FHNW",
+                    "db" : "fhnw_rhessi"
+                }
+            ],
+            "parameter_list"        : [],
+            "icon" : "iconbank://RHESSI"
         }
     ],
     "related_events" : [

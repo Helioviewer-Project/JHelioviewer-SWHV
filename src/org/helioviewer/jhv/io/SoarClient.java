@@ -9,6 +9,7 @@ import javax.annotation.Nonnull;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class SoarClient {
 
@@ -25,7 +26,7 @@ public class SoarClient {
     }
 
     public static void submitSearch(@Nonnull TapClient.Receiver receiver, @Nonnull List<String> descriptors, @Nonnull String level, long start, long end) {
-        TapClient.submitQuery(receiver, QUERY_URL, buildADQL(descriptors, level, start, end), SoarClient::data2DataItems);
+        TapClient.submitQuery(receiver, QUERY_URL, buildADQL(descriptors, level, start, end), SoarClient::json2DataItems);
     }
 
     public static void submitLoad(@Nonnull List<DataItem> items) {
@@ -58,7 +59,8 @@ public class SoarClient {
                 "level='" + level + "' ORDER BY begin_time";
     }
 
-    private static List<DataItem> data2DataItems(JSONArray data) {
+    private static List<DataItem> json2DataItems(JSONObject jo) {
+        JSONArray data = jo.getJSONArray("data");
         int length = data.length();
         List<DataItem> result = new ArrayList<>(length);
         for (int i = 0; i < length; i++) {
