@@ -48,6 +48,7 @@ class SWEKIconBank {
             iconBank.put("SpraySurge", getImageIcon("/images/EventIcons/sp_icon.png"));
             iconBank.put("SunSpot", getImageIcon("/images/EventIcons/ss_icon.png"));
             iconBank.put("Comesep", getImageIcon("/images/EventIcons/comesep.png"));
+            iconBank.put("RHESSI", getImageIcon("/images/EventIcons/rhessi.png"));
         } catch (Exception e) {
             e.printStackTrace();
         }
