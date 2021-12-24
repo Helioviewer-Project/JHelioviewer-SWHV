@@ -24,6 +24,7 @@ import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepHandler;
 import org.helioviewer.jhv.plugins.swek.sources.hek.HEKHandler;
+import org.helioviewer.jhv.plugins.swek.sources.fhnw.FHNWHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -63,8 +64,9 @@ class SWEKConfig {
     private static SWEK.Source parseSource(JSONObject obj) {
         String name = obj.getString("name");
         return switch (name) {
-            case "HEK" -> new SWEK.Source(name, parseGeneralParameters(obj), new HEKHandler());
             case "COMESEP" -> new SWEK.Source(name, parseGeneralParameters(obj), new ComesepHandler());
+            case "FHNW" -> new SWEK.Source(name, parseGeneralParameters(obj), new FHNWHandler());
+            case "HEK" -> new SWEK.Source(name, parseGeneralParameters(obj), new HEKHandler());
             default -> null;
         };
     }
