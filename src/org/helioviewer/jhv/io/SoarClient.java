@@ -50,7 +50,7 @@ public class SoarClient {
         Load.Image.getAll(jp2Uris);
     }
 
-    private static String buildADQL(@Nonnull List<String> descriptors, @Nonnull String level, long start, long end) {
+    private static String buildADQL(List<String> descriptors, String level, long start, long end) {
         String desc = String.join("' OR descriptor='", descriptors);
         return "SELECT data_item_id,file_format,filesize FROM v_sc_data_item WHERE " +
                 "(descriptor='" + desc + "') AND " +

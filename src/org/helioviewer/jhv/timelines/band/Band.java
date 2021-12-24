@@ -241,7 +241,7 @@ public class Band extends AbstractTimelineLayer {
             start -= 7 * TimeUtils.DAY_IN_MILLIS;
             end += 7 * TimeUtils.DAY_IN_MILLIS;
 
-            ArrayList<Interval> intervals = new ArrayList<>();
+            List<Interval> intervals = new ArrayList<>();
             requestCache.adaptRequestCache(start, end).forEach(interval -> intervals.addAll(Interval.splitInterval(interval, DOWNLOADER_MAX_DAYS_PER_BLOCK)));
             BandDataProvider.addDownloads(this, intervals);
         }
