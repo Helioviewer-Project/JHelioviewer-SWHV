@@ -89,8 +89,8 @@ public class FHNWHandler extends SWEKHandler {
 
     @Override
     protected URI createURI(SWEKGroup group, long start, long end, List<SWEK.Param> params, int page) throws Exception {
-        String adql = "SELECT TOP 10 * FROM rhessi_flares.epn_core WHERE start_time >= '" +
-                "2002-01-01T00:00:00" + //TimeUtils.format(start) +
+        String adql = "SELECT TOP 10 * FROM rhessi_flares.epn_core WHERE" +
+                " start_time >= '" + "2002-01-01T00:00:00" + //TimeUtils.format(start) +
                 "' AND end_time <= '" + TimeUtils.format(end) + "' ORDER BY start_time";
         return new URI(QUERY_URL + "/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=" + URLEncoder.encode(adql, StandardCharsets.UTF_8));
     }
