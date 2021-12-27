@@ -22,9 +22,9 @@ import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.JSONUtils;
-import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepHandler;
-import org.helioviewer.jhv.plugins.swek.sources.hek.HEKHandler;
-import org.helioviewer.jhv.plugins.swek.sources.fhnw.FHNWHandler;
+import org.helioviewer.jhv.plugins.swek.sources.ComesepHandler;
+import org.helioviewer.jhv.plugins.swek.sources.FHNWHandler;
+import org.helioviewer.jhv.plugins.swek.sources.HEKHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
