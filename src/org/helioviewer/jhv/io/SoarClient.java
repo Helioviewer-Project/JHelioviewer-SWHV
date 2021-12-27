@@ -1,19 +1,26 @@
 package org.helioviewer.jhv.io;
 
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.gui.Message;
+import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.google.common.util.concurrent.FutureCallback;
+
 public class SoarClient {
 
-    private static final String QUERY_URL = "http://soar.esac.esa.int/soar-sl-tap/tap";
+    private static final String QUERY_URL = "http://soar.esac.esa.int/soar-sl-tap/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=";
     private static final String LOAD_URL = "http://soar.esac.esa.int/soar-sl-tap/data?retrieval_type=LAST_PRODUCT&product_type=SCIENCE&data_item_id=";
 
     private enum FileFormat {CDF, FITS, JP2}
@@ -25,8 +32,10 @@ public class SoarClient {
         }
     }
 
-    public static void submitSearch(@Nonnull TapClient.Receiver receiver, @Nonnull List<String> descriptors, @Nonnull String level, long start, long end) {
-        TapClient.submitQuery(receiver, QUERY_URL, buildADQL(descriptors, level, start, end), SoarClient::json2DataItems);
+    public static void submitSearch(@Nonnull Receiver receiver, @Nonnull List<String> descriptors, @Nonnull String level, long start, long end) {
+        String adql = buildADQL(descriptors, level, start, end);
+        String url = QUERY_URL + URLEncoder.encode(adql, StandardCharsets.UTF_8);
+        EventQueueCallbackExecutor.pool.submit(new ADQLQuery(url), new Callback(receiver));
     }
 
     public static void submitLoad(@Nonnull List<DataItem> items) {
@@ -71,6 +80,32 @@ public class SoarClient {
             }
         }
         return result;
+    }
+
+    public interface Receiver {
+        void setSoarResponse(List<DataItem> list);
+    }
+
+    private record ADQLQuery(String url) implements Callable<List<DataItem>> {
+        @Override
+        public List<DataItem> call() throws Exception {
+            return json2DataItems(JSONUtils.get(new URI(url)));
+        }
+    }
+
+    private record Callback(Receiver receiver) implements FutureCallback<List<DataItem>> {
+
+        @Override
+        public void onSuccess(List<DataItem> result) {
+            receiver.setSoarResponse(result);
+        }
+
+        @Override
+        public void onFailure(@Nonnull Throwable t) {
+            Log.error(t);
+            Message.err("An error occurred while querying the server:", t.getMessage(), false);
+        }
+
     }
 
 }
