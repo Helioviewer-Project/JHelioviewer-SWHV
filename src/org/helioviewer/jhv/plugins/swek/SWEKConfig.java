@@ -65,7 +65,7 @@ class SWEKConfig {
         String name = obj.getString("name");
         return switch (name) {
             case "COMESEP" -> new SWEK.Source(name, parseGeneralParameters(obj), new ComesepHandler());
-            case "FHNW" -> new SWEK.Source(name, parseGeneralParameters(obj), new FHNWHandler());
+            //case "FHNW" -> new SWEK.Source(name, parseGeneralParameters(obj), new FHNWHandler());
             case "HEK" -> new SWEK.Source(name, parseGeneralParameters(obj), new HEKHandler());
             default -> null;
         };
@@ -88,9 +88,13 @@ class SWEKConfig {
         JSONArray eventJSONArray = obj.getJSONArray("events_types");
         int len = eventJSONArray.length();
         for (int i = 0; i < len; i++) {
-            SWEKGroup group = parseGroup(eventJSONArray.getJSONObject(i), dtm);
-            root.add(group);
-            groups.put(group.getName(), group);
+            try {
+                SWEKGroup group = parseGroup(eventJSONArray.getJSONObject(i), dtm);
+                root.add(group);
+                groups.put(group.getName(), group);
+            } catch (Exception e) { // allow to continue when a source is disabled
+                Log.error(e);
+            }
         }
         return dtm;
     }
