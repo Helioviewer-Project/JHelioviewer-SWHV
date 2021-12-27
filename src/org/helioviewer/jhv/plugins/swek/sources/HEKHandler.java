@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.sources.hek;
+package org.helioviewer.jhv.plugins.swek.sources;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
@@ -30,6 +30,41 @@ public class HEKHandler extends SWEKHandler {
 
     private static final String BASE_URL = "https://www.lmsal.com/hek/her?";
 
+    private enum HEKEventEnum {
+        ACTIVE_REGION("ActiveRegion", "Active Region", "AR"),
+        CORONAL_DIMMING("CoronalDimming", "Coronal Dimming", "CD"),
+        CORONAL_HOLE("CoronalHole", "Coronal Hole", "CH"),
+        CORONAL_MASS_EJECTION("CME", "Coronal Mass Ejection", "CE"),
+        CORONAL_WAVE("CoronalWave", "Coronal Wave", "CW"),
+        EMERGING_FLUX("EmergingFlux", "Emerging Flux", "EF"),
+        ERUPTION("Eruption", "Eruption", "ER"),
+        FILAMENT("Filament", "Filament", "FI"),
+        FILAMENT_ERUPTION("FilamentEruption", "Filament Eruption", "FE"),
+        FLARE("Flare", "Flare", "FL"),
+        SUNSPOT("Sunspot", "Sunspot", "SS"),
+        UNKNOWN("Unknown", "Unknown", "UK");
+
+        // The abbreviation of the HEKEvent
+        private final String eventAbbreviation;
+        // The name of the SWEK Event
+        private final String swekEventName;
+
+        HEKEventEnum(String _hekEventName, String _swekEventName, String _eventAbbreviation) {
+            eventAbbreviation = _eventAbbreviation;
+            swekEventName = _swekEventName;
+        }
+
+        static String getHEKEventAbbreviation(String eventType) {
+            for (HEKEventEnum event : values()) {
+                if (event.swekEventName.equals(eventType)) {
+                    return event.eventAbbreviation;
+                }
+            }
+            return UNKNOWN.eventAbbreviation;
+        }
+
+    }
+
     @Override
     protected boolean parseRemote(JSONObject eventJSON, SWEKSupplier supplier) {
         try {
@@ -52,9 +87,9 @@ public class HEKHandler extends SWEKHandler {
                 String uid = result.getString("kb_archivid");
 
                 ArrayList<JHVDatabaseParam> paramList = new ArrayList<>();
-                for (Map.Entry<String, String> entry : supplier.getGroup().getAllDatabaseFields().entrySet()) {
-                    String dbType = entry.getValue();
-                    String fieldName = entry.getKey();
+                for (Map.Entry<String, String> fieldEntry : supplier.getGroup().getAllDatabaseFields().entrySet()) {
+                    String dbType = fieldEntry.getValue();
+                    String fieldName = fieldEntry.getKey();
                     String lfieldName = fieldName.toLowerCase(Locale.ENGLISH);
                     if (!result.isNull(lfieldName)) {
                         switch (dbType) {

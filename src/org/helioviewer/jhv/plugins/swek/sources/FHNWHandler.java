@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.sources.fhnw;
+package org.helioviewer.jhv.plugins.swek.sources;
 
 import java.net.URI;
 import java.net.URLEncoder;

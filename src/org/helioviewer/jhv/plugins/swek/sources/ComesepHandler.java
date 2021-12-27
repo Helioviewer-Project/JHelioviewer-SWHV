@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.sources.comesep;
+package org.helioviewer.jhv.plugins.swek.sources;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
