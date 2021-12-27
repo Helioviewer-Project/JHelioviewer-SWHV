@@ -207,7 +207,38 @@
         {
             "name"                  : "FHNW",
             "provider_name"         : "FHNW",
-            "general_parameters"    : []
+            "general_parameters"    : [
+                {
+                    "source"                    : "FHNW",
+                    "parameter_name"            : "access_url",
+                    "parameter_display_name"    : "Access URL",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "FHNW",
+                    "parameter_name"            : "active_region",
+                    "parameter_display_name"    : "Active Region",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "FHNW",
+                    "parameter_name"            : "limb_flare",
+                    "parameter_display_name"    : "Limb Flare",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "FHNW",
+                    "parameter_name"            : "peak_time",
+                    "parameter_display_name"    : "Peak Time",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "FHNW",
+                    "parameter_name"            : "thumbnail_url",
+                    "parameter_display_name"    : "Thumbnail URL",
+                    "default_visible"           : true
+                }
+            ]
         }
     ],
     "events_types" : [
