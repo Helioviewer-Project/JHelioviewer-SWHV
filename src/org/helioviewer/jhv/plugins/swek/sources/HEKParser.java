@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.sources.hek;
+package org.helioviewer.jhv.plugins.swek.sources;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
