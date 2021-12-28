@@ -26,7 +26,7 @@ import com.google.common.util.concurrent.FutureCallback;
 public class DownloadLayer {
 
     @Nullable
-    public static Future<File> submit(@Nonnull APIRequest req, @Nonnull ImageLayer layer, @Nonnull URI dst) {
+    public static Future<Void> submit(@Nonnull APIRequest req, @Nonnull ImageLayer layer, @Nonnull URI dst) {
         String dstPath = dst.getPath();
         File dstFile = new File(JHVDirectory.REMOTEFILES.getPath(), dstPath.substring(Math.max(0, dstPath.lastIndexOf('/')))).getAbsoluteFile();
         return EventQueueCallbackExecutor.pool.submit(new LayerDownload(req, layer, dstFile), new Callback(layer, dstFile));
@@ -34,9 +34,9 @@ public class DownloadLayer {
 
     private static final int BUFSIZ = 1024 * 1024;
 
-    private record LayerDownload(APIRequest req, ImageLayer layer, File dstFile) implements Callable<File> {
+    private record LayerDownload(APIRequest req, ImageLayer layer, File dstFile) implements Callable<Void> {
         @Override
-        public File call() throws Exception {
+        public Void call() throws Exception {
             URI uri = new URI(req.toFileRequest());
             try (NetClient nc = NetClient.of(uri); BufferedSource source = nc.getSource(); BufferedSink sink = Okio.buffer(Okio.sink(dstFile))) {
                 long count = 0, contentLength = nc.getContentLength();
@@ -52,17 +52,17 @@ public class DownloadLayer {
                     }
                 }
             }
-            return dstFile;
+            return null;
         }
     }
 
-    private record Callback(ImageLayer layer, File dstFile) implements FutureCallback<File> {
+    private record Callback(ImageLayer layer, File dstFile) implements FutureCallback<Void> {
 
         @Override
-        public void onSuccess(File result) {
+        public void onSuccess(Void result) {
             layer.doneDownload();
-            LoadLayer.submit(layer, List.of(result.toURI()), false);
-            JHVGlobals.displayNotification(result.toString());
+            LoadLayer.submit(layer, List.of(dstFile.toURI()), false);
+            JHVGlobals.displayNotification(dstFile.toString());
         }
 
         @Override
