@@ -215,11 +215,12 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         if (elem != null && elem.hasChildNodes()) {
             for (Node child = elem.getFirstChild(); child != null; child = child.getNextSibling()) {
                 if (child.getNodeType() == Node.TEXT_NODE) {
-                    return child.getNodeValue();
+                    String value = child.getNodeValue().trim();
+                    return value.isEmpty() ? "&nbsp;" : value; //! avoid row crush by WrappedTable
                 }
             }
         }
-        return "";
+        return "&nbsp;";
     }
 
 }
