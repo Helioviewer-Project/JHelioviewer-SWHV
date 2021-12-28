@@ -30,6 +30,7 @@ class ParameterTablePanel extends JPanel implements MouseListener, MouseMotionLi
         JTable table = new WrappedTable();
         table.setModel(parameterModel);
         table.setAutoCreateRowSorter(true);
+        table.setIntercellSpacing(new Dimension(0, 0));
         table.getColumnModel().getColumn(0).setResizable(false);
         table.getColumnModel().getColumn(0).setMaxWidth(180);
         table.getColumnModel().getColumn(0).setPreferredWidth(180);

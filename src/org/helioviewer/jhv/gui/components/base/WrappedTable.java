@@ -27,9 +27,8 @@ public class WrappedTable extends JTable {
         for (int i = 0; i < rows; i++) {
             Component comp = prepareRenderer(getCellRenderer(i, 1), i, 1);
             Dimension dim = comp.getPreferredSize();
-            int height;
-            if (dim != null /* satisfy coverity */ && (height = dim.height + rowMargin) > rowHeight)
-                setRowHeight(i, height);
+            if (dim != null) // satisfy coverity
+                setRowHeight(i, dim.height);
         }
     }
 
