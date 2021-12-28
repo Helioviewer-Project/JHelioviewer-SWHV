@@ -3,8 +3,8 @@ package org.helioviewer.jhv.events.info;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -17,7 +17,7 @@ import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
-class EventDescriptionPanel extends JPanel implements MouseListener {
+class EventDescriptionPanel extends JPanel {
 
     private final JHVRelatedEvents revent;
 
@@ -32,7 +32,17 @@ class EventDescriptionPanel extends JPanel implements MouseListener {
         JTextArea textEndTime = new JTextArea(TimeUtils.format(event.end));
         textEndTime.setOpaque(false);
 
-        addMouseListener(this);
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                JHVEventCache.highlight(revent);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                JHVEventCache.highlight(null);
+            }
+        });
         setLayout(new GridBagLayout());
 
         JLabel colorLabel = new JLabel();
@@ -113,28 +123,6 @@ class EventDescriptionPanel extends JPanel implements MouseListener {
         shortPanelLabelConstraint.weightx = 1;
         shortPanelLabelConstraint.fill = GridBagConstraints.BOTH;
         panel.add(component, shortPanelLabelConstraint);
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        JHVEventCache.highlight(revent);
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-        JHVEventCache.highlight(null);
     }
 
 }

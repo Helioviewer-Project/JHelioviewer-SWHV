@@ -4,9 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.util.regex.Matcher;
 
 import javax.annotation.Nullable;
@@ -21,7 +20,7 @@ import org.helioviewer.jhv.events.JHVEventParameter;
 import org.helioviewer.jhv.gui.components.base.WrappedTable;
 
 @SuppressWarnings("serial")
-class ParameterTablePanel extends JPanel implements MouseListener, MouseMotionListener {
+class ParameterTablePanel extends JPanel {
 
     ParameterTablePanel(JHVEventParameter[] parameters) {
         setLayout(new BorderLayout());
@@ -43,8 +42,49 @@ class ParameterTablePanel extends JPanel implements MouseListener, MouseMotionLi
         sorter.toggleSortOrder(0);
         table.setRowSorter(sorter);
 
-        table.addMouseMotionListener(this);
-        table.addMouseListener(this);
+        MouseAdapter ma = new MouseAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                JTable t = (JTable) e.getComponent();
+                Point p = e.getPoint();
+                int row = t.rowAtPoint(p);
+                int col = t.columnAtPoint(p);
+                if (row < 0 || col < 0) {
+                    return;
+                }
+
+                if (col == 1 && extractURL(t, col, row) != null) {
+                    t.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                } else {
+                    t.setCursor(Cursor.getDefaultCursor());
+                }
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                JTable t = (JTable) e.getComponent();
+                t.setCursor(Cursor.getDefaultCursor());
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JTable t = (JTable) e.getComponent();
+                Point p = e.getPoint();
+                int row = t.rowAtPoint(p);
+                int col = t.columnAtPoint(p);
+                if (row < 0 || col != 1) {
+                    return;
+                }
+
+                String url = extractURL(t, col, row);
+                if (url != null) {
+                    JHVGlobals.openURL(url);
+                }
+            }
+        };
+
+        table.addMouseMotionListener(ma);
+        table.addMouseListener(ma);
 
         add(new JScrollPane(table), BorderLayout.CENTER);
     }
@@ -57,61 +97,6 @@ class ParameterTablePanel extends JPanel implements MouseListener, MouseMotionLi
             return m.find() ? m.group(1) : null;
         }
         return null;
-    }
-
-    @Override
-    public void mouseMoved(MouseEvent e) {
-        JTable table = (JTable) e.getComponent();
-        Point p = e.getPoint();
-        int row = table.rowAtPoint(p);
-        int col = table.columnAtPoint(p);
-        if (row < 0 || col < 0) {
-            return;
-        }
-
-        if (col == 1 && extractURL(table, col, row) != null) {
-            table.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        } else {
-            table.setCursor(Cursor.getDefaultCursor());
-        }
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-        JTable table = (JTable) e.getComponent();
-        table.setCursor(Cursor.getDefaultCursor());
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        JTable table = (JTable) e.getComponent();
-        Point p = e.getPoint();
-        int row = table.rowAtPoint(p);
-        int col = table.columnAtPoint(p);
-        if (row < 0 || col != 1) {
-            return;
-        }
-
-        String url = extractURL(table, col, row);
-        if (url != null) {
-            JHVGlobals.openURL(url);
-        }
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
     }
 
 }
