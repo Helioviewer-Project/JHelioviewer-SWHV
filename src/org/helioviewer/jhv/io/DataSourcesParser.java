@@ -6,7 +6,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.database.SourcesDatabase;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONObject;
 
@@ -64,7 +63,7 @@ public class DataSourcesParser {
 
                 TreeNode[] path = treeNode.getPath();
                 if (path.length == 3) {
-                    SourcesDatabase.doInsert(sourceId, path[0].toString(), path[1].toString(), path[2].toString(), start, end);
+                    DataSources.insert(sourceId, path[0].toString(), path[1].toString(), path[2].toString());
                 }
                 if (item.defaultItem)
                     defaultNode = treeNode;
