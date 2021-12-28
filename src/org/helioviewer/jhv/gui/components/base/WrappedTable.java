@@ -37,7 +37,7 @@ public class WrappedTable extends JTable {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            label.setText(String.format("<html><div width=%d>%s</div><html>", table.getColumnModel().getColumn(column).getWidth(), value));
+            label.setText(String.format("<html><div width=%d>%s</div>", table.getColumnModel().getColumn(column).getWidth(), value));
             return label;
         }
     }
