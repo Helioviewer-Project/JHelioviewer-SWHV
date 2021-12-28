@@ -3,6 +3,7 @@ package org.helioviewer.jhv.io;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -109,6 +110,30 @@ public class DataSources {
         toLoad--;
         if (toLoad == 0)
             CommandLine.loadRequest();
+    }
+
+    private record DatasetId(String server, int sourceId) {
+    }
+
+    private record Source(String observatory, String dataset) {
+    }
+
+    private static final Map<DatasetId, Source> sourceMap = new ConcurrentHashMap<>();
+
+    static void insert(int sourceId, @Nonnull String server, @Nonnull String observatory, @Nonnull String dataset) {
+        sourceMap.put(new DatasetId(server, sourceId), new Source(observatory, dataset));
+    }
+
+    static int select(@Nonnull String server, @Nonnull String observatory, @Nonnull String dataset) {
+        for (Map.Entry<DatasetId, Source> entry : sourceMap.entrySet()) {
+            DatasetId key = entry.getKey();
+            if (server.equals(key.server())) {
+                Source value = entry.getValue();
+                if (value.observatory().contains(observatory) && value.dataset().contains(dataset))
+                    return key.sourceId();
+            }
+        }
+        return -1;
     }
 
 }

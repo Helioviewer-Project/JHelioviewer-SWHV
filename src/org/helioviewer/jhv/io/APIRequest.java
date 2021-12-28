@@ -6,7 +6,6 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.helioviewer.jhv.database.SourcesDatabase;
 import org.json.JSONObject;
 
 public record APIRequest(@Nonnull String server, int sourceId, long startTime, long endTime, int cadence) {
@@ -84,7 +83,7 @@ public record APIRequest(@Nonnull String server, int sourceId, long startTime, l
         if (DataSources.getServerSetting(_server, "API.getDataSources") == null)
             _server = Settings.getProperty("default.server");
 
-        int _sourceId = SourcesDatabase.doSelect(_server, observatory, dataset);
+        int _sourceId = DataSources.select(_server, observatory, dataset);
         if (_sourceId < 0)
             throw new Exception("Empty request result");
 
