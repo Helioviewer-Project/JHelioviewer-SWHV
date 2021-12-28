@@ -89,7 +89,8 @@ public class SoarClient {
     private record ADQLQuery(String url) implements Callable<List<DataItem>> {
         @Override
         public List<DataItem> call() throws Exception {
-            return json2DataItems(JSONUtils.get(new URI(url)));
+            JSONObject jo = JSONUtils.get(new URI(url));
+            return json2DataItems(jo);
         }
     }
 
