@@ -51,6 +51,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         WrappedTable fitsTable = new WrappedTable();
         fitsTable.setModel(fitsModel);
         fitsTable.setRowSorter(new TableRowSorter<>(fitsModel));
+        fitsTable.setIntercellSpacing(new Dimension(0, 0));
         int keywordWidth = new JLabel("MMMMMMMM").getPreferredSize().width;
         fitsTable.getColumnModel().getColumn(0).setMinWidth(keywordWidth);
         fitsTable.getColumnModel().getColumn(0).setMaxWidth(keywordWidth);
