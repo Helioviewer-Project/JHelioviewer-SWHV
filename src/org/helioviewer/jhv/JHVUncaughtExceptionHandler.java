@@ -21,8 +21,6 @@ import org.helioviewer.jhv.gui.components.base.HTMLPane;
 
 class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
 
-    private static final String BUG_URL = "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues";
-
     private static final JHVUncaughtExceptionHandler instance = new JHVUncaughtExceptionHandler();
 
     private JHVUncaughtExceptionHandler() {
@@ -40,7 +38,7 @@ class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
         report.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 10));
         report.setText("Fatal error detected." +
                 "<p>Please email this report at <a href='mailto:" + JHVGlobals.emailAddress + "'>" + JHVGlobals.emailAddress + "</a> " +
-                "or use it to open an issue at <a href='" + BUG_URL + "'>" + BUG_URL + "</a>.<br/>");
+                "or use it to open an issue at <a href='" + JHVGlobals.bugURL + "'>" + JHVGlobals.bugURL + "</a>.<br/>");
 
         JLabel copyToClipboard = new JLabel("<html><a href=''>Click here to copy the error report to the clipboard.");
         copyToClipboard.addMouseListener(new MouseAdapter() {
