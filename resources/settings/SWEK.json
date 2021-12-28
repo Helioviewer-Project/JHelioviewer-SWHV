@@ -211,13 +211,19 @@
                 {
                     "source"                    : "FHNW",
                     "parameter_name"            : "access_url",
-                    "parameter_display_name"    : "Access URL",
+                    "parameter_display_name"    : "Image Cube",
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "FHNW",
                     "parameter_name"            : "active_region",
                     "parameter_display_name"    : "Active Region",
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "FHNW",
+                    "parameter_name"            : "goes_class",
+                    "parameter_display_name"    : "GOES Class",
                     "default_visible"           : true
                 },
                 {
@@ -235,7 +241,7 @@
                 {
                     "source"                    : "FHNW",
                     "parameter_name"            : "thumbnail_url",
-                    "parameter_display_name"    : "Thumbnail URL",
+                    "parameter_display_name"    : "Thumbnail",
                     "default_visible"           : true
                 }
             ]
