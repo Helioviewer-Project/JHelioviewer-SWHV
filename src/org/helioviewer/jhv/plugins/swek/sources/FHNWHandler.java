@@ -82,7 +82,10 @@ public class FHNWHandler extends SWEKHandler {
         while (keys.hasNext()) {
             String key = keys.next();
             if (!(key.equals("start_time") || key.equals("end_time"))) { // don't repeat
-                currentEvent.addParameter(key, result.optString(key), true);
+                String value = result.optString(key).trim();
+                if (!value.isEmpty()) {
+                    currentEvent.addParameter(key, value, true);
+                }
             }
         }
     }
