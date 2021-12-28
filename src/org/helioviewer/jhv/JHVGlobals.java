@@ -20,6 +20,7 @@ public class JHVGlobals {
     public static final String programName = "ESA JHelioviewer";
     public static final String downloadURL = "http://swhv.oma.be/download/";
     public static final String documentationURL = "http://swhv.oma.be/user_manual/";
+    public static final String bugURL = "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues";
     public static final String emailAddress = "swhv@oma.be";
     public static String version = "2.-1.-1";
     public static String revision = "-1";
