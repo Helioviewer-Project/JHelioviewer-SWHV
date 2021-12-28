@@ -61,10 +61,8 @@ public class DownloadLayer {
         @Override
         public void onSuccess(File result) {
             layer.doneDownload();
-            if (result != null) {
-                LoadLayer.submit(layer, List.of(result.toURI()), false);
-                EventQueue.invokeLater(() -> JHVGlobals.displayNotification(result.toString()));
-            }
+            LoadLayer.submit(layer, List.of(result.toURI()), false);
+            JHVGlobals.displayNotification(result.toString());
         }
 
         @Override
