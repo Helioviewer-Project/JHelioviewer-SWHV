@@ -23,7 +23,7 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.plugins.swek.sources.ComesepHandler;
-import org.helioviewer.jhv.plugins.swek.sources.FHNWHandler;
+//import org.helioviewer.jhv.plugins.swek.sources.FHNWHandler;
 import org.helioviewer.jhv.plugins.swek.sources.HEKHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -92,7 +92,7 @@ class SWEKConfig {
                 SWEKGroup group = parseGroup(eventJSONArray.getJSONObject(i), dtm);
                 root.add(group);
                 groups.put(group.getName(), group);
-            } catch (Exception e) { // allow to continue when a source is disabled
+            } catch (Exception e) { // allow continuing when a source is disabled
                 Log.error(e);
             }
         }

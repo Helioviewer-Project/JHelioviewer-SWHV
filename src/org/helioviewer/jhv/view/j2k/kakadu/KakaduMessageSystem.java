@@ -8,7 +8,7 @@ import kdu_jni.Kdu_message_queue;
 // This class takes care of setting up the internal Kakadu messaging objects
 public class KakaduMessageSystem {
 
-    // This class allows to print Kakadu error messages, throwing Java exceptions if necessary
+    // This class allows printing Kakadu error messages, throwing Java exceptions if necessary
     private static class JHV_Kdu_message extends Kdu_message_queue {
 
         JHV_Kdu_message(boolean throwExceptions) throws KduException {
@@ -32,8 +32,8 @@ public class KakaduMessageSystem {
     private static Kdu_message_formatter warningsFormatter, errorsFormatter;
 
     /*
-     * Attempts to setup the Kakadu message handlers. Honestly, if this fails
-     * then there is probably a larger problem and it should error and exit.
+     * Attempts to set up the Kakadu message handlers. Honestly, if this fails
+     * then there is probably a larger problem, and it should error and exit.
      */
     public static void startKduMessageSystem() throws Exception {
         try {

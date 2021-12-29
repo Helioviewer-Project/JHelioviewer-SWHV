@@ -24,7 +24,7 @@ import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-// Popup displaying informations about a HEK event.
+// Popup displaying information about a HEK event.
 // This panel is a JDialog, so that it can be displayed on top of an GLCanvas,
 // which is not possible for other Swing components.
 @SuppressWarnings("serial")

@@ -66,7 +66,7 @@ public class KakaduSource {
 
         // Since it gets tricky here I am just grabbing a bunch of values
         // and taking the max of them. It is acceptable to think that an
-        // image is color when its not monochromatic, but not the other way
+        // image is color when it's not monochromatic, but not the other way
         // around... so this is just playing it safe.
         Kdu_channel_mapping cmap = new Kdu_channel_mapping();
         cmap.Configure(stream);

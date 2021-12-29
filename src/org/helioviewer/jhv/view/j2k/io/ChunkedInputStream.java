@@ -7,7 +7,7 @@ import java.net.ProtocolException;
 import javax.annotation.Nonnull;
 
 /*
- * Transparently coalesces chunks of a HTTP stream that uses
+ * Transparently coalesces chunks of an HTTP stream that uses
  * Transfer-Encoding chunked.
  *
  * Note that this class NEVER closes the underlying stream, even when close
@@ -17,7 +17,7 @@ import javax.annotation.Nonnull;
  * response.
  */
 
-// ChunkedInputStream allows to decode HTTP chunked responses with a simple
+// ChunkedInputStream allows decoding HTTP chunked responses with a simple
 // format. Does not support internal chunk headers.
 public class ChunkedInputStream extends TransferInputStream {
 
