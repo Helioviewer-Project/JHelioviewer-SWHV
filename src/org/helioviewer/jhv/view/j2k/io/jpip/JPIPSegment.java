@@ -38,7 +38,7 @@ class JPIPSegment implements Serializable {
     // Indicates if this segment is the last one (when there is a data segment stream)
     public boolean isFinal;
 
-    // Indicates if this segment is a End Of Response message
+    // Indicates if this segment is an End-Of-Response message
     public boolean isEOR;
 
 /*

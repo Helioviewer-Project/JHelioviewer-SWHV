@@ -26,7 +26,7 @@ import org.helioviewer.jhv.view.View;
 
 // Extension of JSlider displaying the caching status on the track.
 // This element provides its own look and feel. Therefore, it is independent
-// from the global look and feel.
+// of the global look and feel.
 @SuppressWarnings("serial")
 public class TimeSlider extends JSlider implements LazyComponent, MouseListener, MouseMotionListener, MouseWheelListener {
 

@@ -61,7 +61,7 @@ class EventDescriptionPanel extends JPanel {
         // add the icon
         add(labelIcon, iconLabelConstraint);
 
-        // setup the summary panel
+        // set up the summary panel
         JPanel summaryPanel = new JPanel(new GridBagLayout());
         summaryPanel.setBorder(BorderFactory.createEmptyBorder(3, 20, 3, 20));
 

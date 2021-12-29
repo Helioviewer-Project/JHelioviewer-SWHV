@@ -4,8 +4,7 @@ import java.awt.Point;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-// Class manages a calendar view which shows the a period of 12 years. Each
-// number of a year of this 12 years is shown separately.
+// Class manages a calendar view which shows a period of 12 years
 class YearViewController implements CalendarViewController {
 
     private final Calendar calendar = new GregorianCalendar();

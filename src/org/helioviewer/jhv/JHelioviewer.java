@@ -34,7 +34,7 @@ public class JHelioviewer {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         // Save current default locale to user.locale
         System.setProperty("user.locale", Locale.getDefault().toString());
-        // Per default, the us locale should be used
+        // Per default, the US locale should be used
         Locale.setDefault(Locale.US);
 
         if (isHeadless())
@@ -63,13 +63,13 @@ public class JHelioviewer {
 
         JHVInit.init();
 
-        // Save command line arguments
-        CommandLine.setArguments(args);
         // Prints the usage message
         if (args.length == 1 && (args[0].equals("-h") || args[0].equals("--help"))) {
             System.out.println(CommandLine.getUsageMessage());
             return;
         }
+        // Save command line arguments
+        CommandLine.setArguments(args);
 
         EventQueue.invokeLater(() -> {
             UIGlobals.setLaf();

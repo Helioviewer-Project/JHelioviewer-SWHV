@@ -64,9 +64,9 @@ public class MainContentPanel extends JPanel {
         }
     }
 
-    // Updates the layout of the container and its sub components. Plug-ins will
+    // Updates the layout of the container and its subcomponents. Plug-ins will
     // be displayed, if available, in separated tabs below the main component
-    // area. An split pane will be provided, if necessary, to readjust the
+    // area. A split pane will be provided, if necessary, to readjust the
     // height of the components.
     private void updateLayout() {
         splitPane.remove(collapsiblePane);
