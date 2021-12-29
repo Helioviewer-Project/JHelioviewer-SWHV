@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.io;
 
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
@@ -20,6 +21,8 @@ import org.helioviewer.jhv.view.j2k.J2KView;
 import org.helioviewer.jhv.view.uri.URIView;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.threads.JHVThread;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.google.common.util.concurrent.FutureCallback;
 
@@ -36,7 +39,7 @@ public class LoadLayer {
     private record LoadRemote(ImageLayer layer, APIRequest req) implements Callable<View> {
         @Override
         public View call() throws Exception {
-            URI uri = APIResponse.request(req.toJpipRequest());
+            URI uri = request(req.toJpipRequest());
             return uri == null ? null : loadView(layer.getExecutor(), req, uri, false);
         }
     }
@@ -86,7 +89,6 @@ public class LoadLayer {
 
     }
 
-    @Nonnull
     private static View loadView(DecodeExecutor executor, APIRequest req, URI uri, boolean forceFITS) throws Exception {
         String loc = uri.toString().toLowerCase(Locale.ENGLISH);
         if (forceFITS || loc.endsWith(".fits") || loc.endsWith(".fts") || loc.endsWith(".fits.gz")) {
@@ -96,6 +98,36 @@ public class LoadLayer {
         } else {
             return new J2KView(executor, req, uri);
         }
+    }
+
+    private static URI request(URI jpipRequest) throws Exception {
+        try {
+            JSONObject data = JSONUtils.get(jpipRequest);
+
+            if (!data.isNull("frames")) {
+                JSONArray arr = data.getJSONArray("frames");
+                data.put("frames", arr.length()); // don't log timestamps, modifies input
+            }
+            Log.info(data.toString());
+
+            String message = data.optString("message", null);
+            if (message != null) {
+                Message.warn("Warning", message);
+            }
+            String error = data.optString("error", null);
+            if (error != null) {
+                Log.error(error);
+                Message.err("Error getting the data", error, false);
+                return null;
+            }
+            return new URI(data.getString("uri"));
+        } catch (SocketTimeoutException e) {
+            Log.error("Socket timeout while requesting JPIP URL", e);
+            Message.err("Socket timeout", "Socket timeout while requesting JPIP URL", false);
+        } catch (Exception e) {
+            throw new Exception("Invalid response for " + jpipRequest, e);
+        }
+        return null;
     }
 
 }
