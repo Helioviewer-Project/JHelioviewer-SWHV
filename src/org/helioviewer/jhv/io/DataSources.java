@@ -13,6 +13,10 @@ import com.google.common.collect.ImmutableMap;
 
 public class DataSources {
 
+    public interface Listener {
+        void setupSources(DataSourcesParser parser);
+    }
+
     static final Set<String> SupportedObservatories = Set.of(
             "SOHO", "SDO", "STEREO_A", "STEREO_B", "PROBA2",
             "ROB-USET", "ROB-Humain", "NSO-GONG", "NSO-SOLIS", "Kanzelhoehe",
@@ -97,9 +101,9 @@ public class DataSources {
         serverSettings.keySet().forEach(serverName -> LoadSources.submit(serverName, validator));
     }
 
-    private static final ArrayList<DataSourcesListener> listeners = new ArrayList<>();
+    private static final ArrayList<Listener> listeners = new ArrayList<>();
 
-    public static void addListener(DataSourcesListener listener) {
+    public static void addListener(Listener listener) {
         if (!listeners.contains(listener))
             listeners.add(listener);
     }
