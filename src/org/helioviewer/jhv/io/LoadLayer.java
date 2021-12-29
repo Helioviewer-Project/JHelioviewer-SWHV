@@ -39,7 +39,7 @@ public class LoadLayer {
     private record LoadRemote(ImageLayer layer, APIRequest req) implements Callable<View> {
         @Override
         public View call() throws Exception {
-            URI uri = request(req.toJpipRequest());
+            URI uri = request(req.toJpipUrl());
             return uri == null ? null : loadView(layer.getExecutor(), req, uri, false);
         }
     }
@@ -100,9 +100,9 @@ public class LoadLayer {
         }
     }
 
-    private static URI request(URI jpipRequest) throws Exception {
+    private static URI request(String url) throws Exception {
         try {
-            JSONObject data = JSONUtils.get(jpipRequest);
+            JSONObject data = JSONUtils.get(new URI(url));
 
             if (!data.isNull("frames")) {
                 JSONArray arr = data.getJSONArray("frames");
@@ -125,7 +125,7 @@ public class LoadLayer {
             Log.error("Socket timeout while requesting JPIP URL", e);
             Message.err("Socket timeout", "Socket timeout while requesting JPIP URL", false);
         } catch (Exception e) {
-            throw new Exception("Invalid response for " + jpipRequest, e);
+            throw new Exception("Invalid response for " + url, e);
         }
         return null;
     }

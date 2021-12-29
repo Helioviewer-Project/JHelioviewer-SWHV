@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.io;
 
-import java.net.URI;
-
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Settings;
@@ -40,9 +38,9 @@ public record APIRequest(@Nonnull String server, int sourceId, long startTime, l
         return fileReq;
     }
 
-    URI toJpipRequest() throws Exception {
+    String toJpipUrl() throws Exception {
         String jsonReq = startTime == endTime ? "&json=true" : "&verbose=true&linked=true";
-        return new URI(toFileRequest() + jsonReq + "&jpip=true");
+        return toFileRequest() + jsonReq + "&jpip=true";
     }
 
     public JSONObject toJson() {
