@@ -72,7 +72,7 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
                 "<a href='http://www.jhelioviewer.org'>" + JHVGlobals.programName + "</a></span><br/>" +
                 "Version " + JHVGlobals.version + '.' + JHVGlobals.revision + "</b><br/>" +
                 "<span style='font-size:" + (fontSize - delta) + "pt'>" + JHVGlobals.versionDetail + "<br/>" + GLInfo.glVersion + "</span><br/><br/>" +
-                "© 2021 <a href='http://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br/>" +
+                "© 2022 <a href='http://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br/>" +
                 "Part of the ESA/NASA Helioviewer Project<br/>" +
                 "Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)<br/><br/>" +
                 "JHelioviewer is released under the<br/>" +
@@ -87,7 +87,7 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
         pane.setOpaque(false);
 
         JPanel banner = new JPanel(new BorderLayout());
-        banner.add(new JLabel(IconBank.getAIcon()/*getIcon(JHVIcon.HVLOGO_SMALL)*/), BorderLayout.LINE_START);
+        banner.add(new JLabel(IconBank.getIcon(IconBank.JHVIcon.HVLOGO_SMALL)), BorderLayout.LINE_START);
         banner.add(pane, BorderLayout.LINE_END);
         banner.setBorder(BorderFactory.createEmptyBorder(5, 35, 5, 35));
         return banner;
