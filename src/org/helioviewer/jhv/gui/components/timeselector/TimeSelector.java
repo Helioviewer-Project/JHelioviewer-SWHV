@@ -128,8 +128,14 @@ public class TimeSelector extends JPanel {
     }
 
     public void addListener(TimeListener.Selection listener) {
-        if (!listeners.contains(listener))
+        if (!listeners.contains(listener)) {
             listeners.add(listener);
+            listener.timeSelectionChanged(getStartTime(), getEndTime());
+        }
+    }
+
+    public void removeListener(TimeListener.Selection listener) {
+        listeners.remove(listener);
     }
 
 }

@@ -19,20 +19,14 @@ import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.base.JHVSlider;
-import org.helioviewer.jhv.gui.components.timeselector.TimeSelector;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectContainer;
-import org.helioviewer.jhv.time.JHVTime;
-import org.helioviewer.jhv.time.TimeListener;
-import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 @SuppressWarnings("serial")
-class ViewpointLayerOptionsExpert extends JPanel implements TimeListener.Selection {
+class ViewpointLayerOptionsExpert extends JPanel {
 
     private final SpaceObjectContainer container;
-    private final JCheckBox syncCheckBox;
-    private final TimeSelector timeSelector = new TimeSelector();
 
     private static final int MIN_SPEED_SPIRAL = 200;
     private static final int MAX_SPEED_SPIRAL = 2000;
@@ -42,13 +36,10 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeListener.Selecti
 
     private Frame frame;
 
-    ViewpointLayerOptionsExpert(JSONObject jo, UpdateViewpoint uv, SpaceObject observer, Frame _frame, boolean exclusive) {
+    ViewpointLayerOptionsExpert(JSONObject jo, UpdateViewpoint uv, SpaceObject observer, Frame _frame, long start, long end, boolean exclusive) {
         frame = _frame;
 
-        boolean sync = true;
         JSONArray ja = null;
-        long start = Movie.getStartTime();
-        long end = Movie.getEndTime();
         if (jo != null) {
             try {
                 frame = Frame.valueOf(jo.optString("frame"));
@@ -56,11 +47,6 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeListener.Selecti
             }
             relative = jo.optBoolean("relativeLongitude", relative);
             ja = jo.optJSONArray("objects");
-            sync = jo.optBoolean("syncInterval", sync);
-            if (!sync) {
-                start = TimeUtils.optParse(jo.optString("startTime"), start);
-                end = TimeUtils.optParse(jo.optString("endTime"), end);
-            }
         }
         if (ja == null)
             ja = new JSONArray(new String[]{"Earth"});
@@ -108,13 +94,6 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeListener.Selecti
         });
         framePanel.add(relativeCheckBox);
 
-        syncCheckBox = new JCheckBox("Use movie time interval", sync);
-        syncCheckBox.addActionListener(e -> setTimespan(Movie.getStartTime(), Movie.getEndTime()));
-
-        timeSelector.setTime(start, end);
-        timeSelector.setVisible(!sync);
-        timeSelector.addListener(this);
-
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 1.;
@@ -124,28 +103,15 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeListener.Selecti
 
         c.gridy = 0;
         add(container, c);
-        c.gridy = 1;
-        add(syncCheckBox, c);
-        c.gridy = 2;
-        add(timeSelector, c);
         if (!exclusive) {
-            c.gridy = 3;
+            c.gridy = 1;
             add(framePanel, c);
-            c.gridy = 4;
+            c.gridy = 2;
             add(spiralPanel, c);
         }
     }
 
     void setTimespan(long start, long end) {
-        boolean notSync = !syncCheckBox.isSelected();
-        timeSelector.setVisible(notSync);
-        if (notSync)
-            return;
-        timeSelector.setTime(start, end);
-    }
-
-    @Override
-    public void timeSelectionChanged(long start, long end) {
         container.setTime(start, end);
     }
 
@@ -157,12 +123,6 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeListener.Selecti
         JSONObject jo = new JSONObject();
         jo.put("frame", frame);
         jo.put("relativeLongitude", relative);
-        boolean sync = syncCheckBox.isSelected();
-        jo.put("syncInterval", sync);
-        if (!sync) {
-            jo.put("startTime", new JHVTime(timeSelector.getStartTime()));
-            jo.put("endTime", new JHVTime(timeSelector.getEndTime()));
-        }
         jo.put("objects", container.toJson());
         return jo;
     }

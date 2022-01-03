@@ -17,6 +17,7 @@ import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.Buttons;
+import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
 import org.helioviewer.jhv.time.TimeListener;
 import org.json.JSONObject;
@@ -24,7 +25,7 @@ import org.json.JSONObject;
 import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
-class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
+class ViewpointLayerOptions extends JPanel implements TimeListener.Range, TimeListener.Selection {
 
     private enum CameraMode {
         Observer(UpdateViewpoint.observer), Location(UpdateViewpoint.location), Heliosphere(UpdateViewpoint.equatorial);
@@ -62,8 +63,11 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
             joLocation = jo.optJSONObject("location");
             joEquatorial = jo.optJSONObject("equatorial");
         }
-        locationOptionPanel = new ViewpointLayerOptionsExpert(joLocation, UpdateViewpoint.location, SpaceObject.SUN, Frame.SOLO_IAU_SUN_2009, true);
-        equatorialOptionPanel = new ViewpointLayerOptionsExpert(joEquatorial, UpdateViewpoint.equatorial, SpaceObject.SUN, Frame.SOLO_HCI, false);
+
+        long start = Movie.getStartTime();
+        long end = Movie.getEndTime();
+        locationOptionPanel = new ViewpointLayerOptionsExpert(joLocation, UpdateViewpoint.location, SpaceObject.SUN, Frame.SOLO_IAU_SUN_2009, start, end, true);
+        equatorialOptionPanel = new ViewpointLayerOptionsExpert(joEquatorial, UpdateViewpoint.equatorial, SpaceObject.SUN, Frame.SOLO_HCI, start, end, false);
 
         cameraMode = CameraMode.Observer;
         if (jo != null) {
@@ -153,15 +157,23 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
     }
 
     void activate() {
-        Movie.addTimeRangeListener(this);
+        Movie.addTimeRangeListener(this); //!
+        MoviePanel.getTimeSelector().addListener(this);
     }
 
     void deactivate() {
-        Movie.removeTimeRangeListener(this);
+        Movie.removeTimeRangeListener(this); //!
+        MoviePanel.getTimeSelector().removeListener(this);
     }
 
     @Override
     public void timeRangeChanged(long start, long end) {
+        locationOptionPanel.setTimespan(start, end);
+        equatorialOptionPanel.setTimespan(start, end);
+    }
+
+    @Override
+    public void timeSelectionChanged(long start, long end) {
         locationOptionPanel.setTimespan(start, end);
         equatorialOptionPanel.setTimespan(start, end);
     }
