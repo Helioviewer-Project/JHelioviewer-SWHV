@@ -21,7 +21,7 @@ import javax.swing.JScrollPane;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.Message;
-import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
+import org.helioviewer.jhv.gui.components.timeselector.TimeSelector;
 import org.helioviewer.jhv.io.SoarClient;
 
 import com.google.common.collect.ImmutableSortedMap;
@@ -44,7 +44,6 @@ public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
                     put("SWA PAS", List.of("SWA-PAS-GRND-MOM")).
             build();
 
-    private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
     private final JList<SoarClient.DataItem> listPane = new JList<>();
     private final JLabel foundLabel = new JLabel("0 found", JLabel.RIGHT);
 
@@ -102,6 +101,8 @@ public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
 
     @Override
     public JComponent createContentPanel() {
+        TimeSelector timeSelector = new TimeSelector();
+
         JPanel dataSelector = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
         JComboBox<String> datasetCombo = new JComboBox<>(Dataset.keySet().toArray(String[]::new));
         dataSelector.add(datasetCombo);
@@ -113,7 +114,7 @@ public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
             if (datasetCombo.getSelectedItem() instanceof String dataset && levelCombo.getSelectedItem() instanceof String level) {
                 List<String> descriptors = Dataset.get(dataset);
                 if (descriptors != null) {
-                    SoarClient.submitSearch(this, descriptors, level, timeSelectorPanel.getStartTime(), timeSelectorPanel.getEndTime());
+                    SoarClient.submitSearch(this, descriptors, level, timeSelector.getStartTime(), timeSelector.getEndTime());
                     foundLabel.setText("Searching...");
                 }
             }
@@ -137,7 +138,7 @@ public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
 
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
-        content.add(timeSelectorPanel);
+        content.add(timeSelector);
         content.add(dataSelector);
         content.add(foundPanel);
         content.add(scrollPane);

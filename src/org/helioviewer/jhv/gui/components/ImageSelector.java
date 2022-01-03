@@ -18,12 +18,12 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
-public class ImageSelectorPanel extends JPanel implements DataSources.Listener {
+public class ImageSelector extends JPanel implements DataSources.Listener {
 
     private final ObservationSelector selector;
     private final DataSourcesTree sourcesTree;
 
-    public ImageSelectorPanel(ObservationSelector _selector) {
+    public ImageSelector(ObservationSelector _selector) {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         setPreferredSize(new Dimension(250, 350));
         selector = _selector;

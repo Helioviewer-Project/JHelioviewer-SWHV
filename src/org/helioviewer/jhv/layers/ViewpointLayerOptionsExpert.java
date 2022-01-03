@@ -19,7 +19,7 @@ import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.base.JHVSlider;
-import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
+import org.helioviewer.jhv.gui.components.timeselector.TimeSelector;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectContainer;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
@@ -32,7 +32,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeListener.Selecti
 
     private final SpaceObjectContainer container;
     private final JCheckBox syncCheckBox;
-    private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
+    private final TimeSelector timeSelector = new TimeSelector();
 
     private static final int MIN_SPEED_SPIRAL = 200;
     private static final int MAX_SPEED_SPIRAL = 2000;
@@ -111,9 +111,9 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeListener.Selecti
         syncCheckBox = new JCheckBox("Use movie time interval", sync);
         syncCheckBox.addActionListener(e -> setTimespan(Movie.getStartTime(), Movie.getEndTime()));
 
-        timeSelectorPanel.setTime(start, end);
-        timeSelectorPanel.setVisible(!sync);
-        timeSelectorPanel.addListener(this);
+        timeSelector.setTime(start, end);
+        timeSelector.setVisible(!sync);
+        timeSelector.addListener(this);
 
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -127,7 +127,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeListener.Selecti
         c.gridy = 1;
         add(syncCheckBox, c);
         c.gridy = 2;
-        add(timeSelectorPanel, c);
+        add(timeSelector, c);
         if (!exclusive) {
             c.gridy = 3;
             add(framePanel, c);
@@ -138,10 +138,10 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeListener.Selecti
 
     void setTimespan(long start, long end) {
         boolean notSync = !syncCheckBox.isSelected();
-        timeSelectorPanel.setVisible(notSync);
+        timeSelector.setVisible(notSync);
         if (notSync)
             return;
-        timeSelectorPanel.setTime(start, end);
+        timeSelector.setTime(start, end);
     }
 
     @Override
@@ -160,8 +160,8 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeListener.Selecti
         boolean sync = syncCheckBox.isSelected();
         jo.put("syncInterval", sync);
         if (!sync) {
-            jo.put("startTime", new JHVTime(timeSelectorPanel.getStartTime()));
-            jo.put("endTime", new JHVTime(timeSelectorPanel.getEndTime()));
+            jo.put("startTime", new JHVTime(timeSelector.getStartTime()));
+            jo.put("endTime", new JHVTime(timeSelector.getEndTime()));
         }
         jo.put("objects", container.toJson());
         return jo;

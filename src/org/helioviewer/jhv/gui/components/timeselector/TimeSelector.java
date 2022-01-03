@@ -19,7 +19,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 import com.jidesoft.swing.JideSplitButton;
 
 @SuppressWarnings("serial")
-public class TimeSelectorPanel extends JPanel {
+public class TimeSelector extends JPanel {
 
     private enum ShiftUnit {
         Day(TimeUtils.DAY_IN_MILLIS), Week(7 * TimeUtils.DAY_IN_MILLIS), Rotation(Math.round(Carrington.CR_SYNODIC_MEAN * TimeUtils.DAY_IN_MILLIS));
@@ -49,7 +49,7 @@ public class TimeSelectorPanel extends JPanel {
     private final TimeField endField = new TimeField("Select end date");
     private final CarringtonPicker carringtonPicker = new CarringtonPicker();
 
-    public TimeSelectorPanel() {
+    public TimeSelector() {
         long milli = TimeUtils.START.milli;
         setTime(milli - 2 * TimeUtils.DAY_IN_MILLIS, milli);
 

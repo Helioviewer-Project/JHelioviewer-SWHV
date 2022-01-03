@@ -13,9 +13,9 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.gui.components.CadencePanel;
-import org.helioviewer.jhv.gui.components.ImageSelectorPanel;
-import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
+import org.helioviewer.jhv.gui.components.CadenceSelector;
+import org.helioviewer.jhv.gui.components.ImageSelector;
+import org.helioviewer.jhv.gui.components.timeselector.TimeSelector;
 import org.helioviewer.jhv.gui.interfaces.ObservationSelector;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -35,9 +35,9 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
     private final JButton okBtn = new JButton(load);
     private final JButton availabilityBtn = new JButton("Available data");
 
-    private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
-    private final CadencePanel cadencePanel = new CadencePanel();
-    private final ImageSelectorPanel imageSelectorPanel;
+    private final TimeSelector timeSelector = new TimeSelector();
+    private final CadenceSelector cadenceSelector = new CadenceSelector();
+    private final ImageSelector imageSelector;
     private ImageLayer layer;
 
     private static ObservationDialog instance;
@@ -50,9 +50,9 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
         super(mainFrame, true);
         setResizable(false);
 
-        imageSelectorPanel = new ImageSelectorPanel(this);
-        availabilityBtn.addActionListener(e -> JHVGlobals.openURL(imageSelectorPanel.getAvailabilityURL()));
-        setInitFocusedComponent(imageSelectorPanel.getFocused());
+        imageSelector = new ImageSelector(this);
+        availabilityBtn.addActionListener(e -> JHVGlobals.openURL(imageSelector.getAvailabilityURL()));
+        setInitFocusedComponent(imageSelector.getFocused());
     }
 
     @Override
@@ -81,9 +81,9 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
     public JComponent createContentPanel() {
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
-        content.add(timeSelectorPanel);
-        content.add(cadencePanel);
-        content.add(imageSelectorPanel);
+        content.add(timeSelector);
+        content.add(cadenceSelector);
+        content.add(imageSelector);
         content.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
         return content;
     }
@@ -99,9 +99,9 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
 
         APIRequest req;
         if (layer != null && (req = layer.getAPIRequest()) != null) {
-            imageSelectorPanel.setupLayer(req);
-            timeSelectorPanel.setTime(req.startTime(), req.endTime());
-            cadencePanel.setCadence(req.cadence());
+            imageSelector.setupLayer(req);
+            timeSelector.setTime(req.startTime(), req.endTime());
+            cadenceSelector.setCadence(req.cadence());
         }
 
         if (newLayer) {
@@ -119,28 +119,28 @@ public class ObservationDialog extends StandardDialog implements ObservationSele
 
     @Override
     public int getCadence() {
-        return cadencePanel.getCadence();
+        return cadenceSelector.getCadence();
     }
 
     @Override
     public void setTime(long start, long end) {
-        timeSelectorPanel.setTime(start, end);
+        timeSelector.setTime(start, end);
     }
 
     @Override
     public long getStartTime() {
-        return timeSelectorPanel.getStartTime();
+        return timeSelector.getStartTime();
     }
 
     @Override
     public long getEndTime() {
-        return timeSelectorPanel.getEndTime();
+        return timeSelector.getEndTime();
     }
 
     @Override
     public void load(String server, int sourceId) {
         setTime(getStartTime(), getEndTime());
-        imageSelectorPanel.load(layer, getStartTime(), getEndTime(), getCadence()); // time selector might have changed
+        imageSelector.load(layer, getStartTime(), getEndTime(), getCadence()); // time selector might have changed
         layer = null;
         setVisible(false);
     }

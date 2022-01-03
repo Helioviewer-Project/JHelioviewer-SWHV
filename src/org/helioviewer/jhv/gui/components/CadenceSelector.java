@@ -11,14 +11,14 @@ import org.helioviewer.jhv.gui.components.base.JHVSpinner;
 import org.helioviewer.jhv.io.APIRequest;
 
 @SuppressWarnings("serial")
-public class CadencePanel extends JPanel {
+public class CadenceSelector extends JPanel {
 
     private static final String[] timeStepUnitStrings = {"sec", "min", "hours", "days", "get all"};
 
     private final JHVSpinner spinnerCadence = new JHVSpinner(1, 1, 1000000, 1);
     private final JComboBox<String> comboUnit = new JComboBox<>(timeStepUnitStrings);
 
-    public CadencePanel() {
+    public CadenceSelector() {
         setLayout(new FlowLayout(FlowLayout.TRAILING, 5, 0));
 
         setCadence(APIRequest.CADENCE_DEFAULT);

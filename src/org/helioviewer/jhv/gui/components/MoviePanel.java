@@ -30,7 +30,7 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.components.base.JHVSpinner;
-import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
+import org.helioviewer.jhv.gui.components.timeselector.TimeSelector;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.ObservationSelector;
 import org.helioviewer.jhv.input.KeyShortcuts;
@@ -142,8 +142,8 @@ public class MoviePanel extends JPanel implements ObservationSelector {
 
     private static boolean isAdvanced;
 
-    private static final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
-    private final ImageSelectorPanel imageSelectorPanel;
+    private static final TimeSelector timeSelector = new TimeSelector();
+    private final ImageSelector imageSelector;
     private final JideSplitButton addLayerButton;
 
     private static TimeSlider timeSlider;
@@ -299,20 +299,20 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         c.gridx = 3;
         recordPanel.add(recordSizeCombo, c);
 
-        timeSelectorPanel.addListener(Layers.getInstance());
+        timeSelector.addListener(Layers.getInstance());
 
         add(sliderPanel);
         add(secondLine);
         add(modePanel);
         add(recordPanel);
-        add(timeSelectorPanel);
+        add(timeSelector);
 
         ObservationDialog.getInstance(); // make sure it's instanced
-        imageSelectorPanel = new ImageSelectorPanel(this);
+        imageSelector = new ImageSelector(this);
 
         addLayerButton = new JideSplitButton(Buttons.newLayer);
         addLayerButton.setAlwaysDropdown(true);
-        addLayerButton.add(imageSelectorPanel);
+        addLayerButton.add(imageSelector);
 
         JideButton syncButton = new JideButton(Buttons.syncLayers);
         syncButton.setToolTipText("Synchronize time intervals of all layers");
@@ -328,6 +328,10 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         setEnabledState(false);
     }
 
+    public static TimeSelector getTimeSelector() {
+        return timeSelector;
+    }
+
     @Override
     public int getCadence() {
         return TimeUtils.defaultCadence(getStartTime(), getEndTime());
@@ -335,24 +339,24 @@ public class MoviePanel extends JPanel implements ObservationSelector {
 
     @Override
     public void setTime(long start, long end) {
-        timeSelectorPanel.setTime(start, end);
+        timeSelector.setTime(start, end);
     }
 
     @Override
     public long getStartTime() {
-        return timeSelectorPanel.getStartTime();
+        return timeSelector.getStartTime();
     }
 
     @Override
     public long getEndTime() {
-        return timeSelectorPanel.getEndTime();
+        return timeSelector.getEndTime();
     }
 
     @Override
     public void load(String server, int sourceId) {
         addLayerButton.doClickOnMenu();
         if (checkSanity())
-            imageSelectorPanel.load(null, getStartTime(), getEndTime(), getCadence());
+            imageSelector.load(null, getStartTime(), getEndTime(), getCadence());
     }
 
     @Override
