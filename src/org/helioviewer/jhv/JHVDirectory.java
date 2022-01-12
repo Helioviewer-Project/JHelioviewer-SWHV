@@ -7,7 +7,7 @@ import java.io.File;
 public enum JHVDirectory {
     // The home directory
     HOME {
-        private final String path = System.getProperty("user.home");
+        private final String path = System.getProperty("jhv.os").equals("windows") ? System.getProperty("java.io.tmpdir") : System.getProperty("user.home");
 
         @Override
         public String getPath() {
