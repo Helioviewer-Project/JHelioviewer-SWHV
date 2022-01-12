@@ -40,10 +40,10 @@ public class JHelioviewer {
 
         // Set the platform system properties
         SystemProperties.setPlatform();
-        // Uncaught runtime errors are displayed in a dialog box in addition
-        JHVUncaughtExceptionHandler.setupHandlerForThread();
         // This attempts to create the necessary directories for the application
         JHVGlobals.createDirs();
+        // Uncaught runtime errors are displayed in a dialog box in addition
+        JHVUncaughtExceptionHandler.setupHandlerForThread();
         // Init log
         Log.init();
         // Information log message
