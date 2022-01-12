@@ -32,8 +32,6 @@ public class JHelioviewer {
         System.setProperty("user.timezone", TimeZone.getDefault().getID());
         // Per default all times should be given in GMT
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-        // Save current default locale to user.locale
-        System.setProperty("user.locale", Locale.getDefault().toString());
         // Per default, the US locale should be used
         Locale.setDefault(Locale.US);
 
