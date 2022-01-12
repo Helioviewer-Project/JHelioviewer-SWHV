@@ -4,13 +4,22 @@ import javax.swing.JOptionPane;
 
 public class SystemProperties {
 
+    private static void die(String msg) {
+        JOptionPane optionPane = new JOptionPane();
+        optionPane.setMessage(msg);
+        optionPane.setMessageType(JOptionPane.ERROR_MESSAGE);
+        optionPane.setOptions(new String[]{"Quit JHelioviewer"});
+        optionPane.createDialog(null, "JHelioviewer").setVisible(true);
+        System.exit(1);
+    }
+
     // Reads the builtin Java properties to determine the platform and set simplified properties used by JHV
     static void setPlatform() {
         String os = System.getProperty("os.name");
         String arch = System.getProperty("os.arch");
         if (os == null || arch == null) {
-            Log.error("Could not determine platform. OS: " + os + " - arch: " + arch);
-            return;
+            die("Could not determine platform. OS: " + os + " - arch: " + arch);
+            return; // avoid warnings from static analysis
         }
 
         os = os.toLowerCase();
@@ -18,15 +27,8 @@ public class SystemProperties {
 
         if (arch.contains("x86_64") || arch.contains("amd64"))
             System.setProperty("jhv.arch", "x86-64");
-        else {
-            Log.error("Please install Java 64-bit to run JHelioviewer.");
-            JOptionPane optionPane = new JOptionPane();
-            optionPane.setMessage("Please install Java 64-bit to run JHelioviewer.");
-            optionPane.setMessageType(JOptionPane.ERROR_MESSAGE);
-            optionPane.setOptions(new String[]{"Quit JHelioviewer"});
-            optionPane.createDialog(null, "JHelioviewer: Java 64-bit required").setVisible(true);
-            System.exit(1);
-        }
+        else
+            die("Please install Java 64-bit to run JHelioviewer.");
 
         if (os.contains("windows"))
             System.setProperty("jhv.os", "windows");
@@ -35,7 +37,7 @@ public class SystemProperties {
         else if (os.contains("mac os x"))
             System.setProperty("jhv.os", "mac");
         else
-            Log.error("Could not determine platform. OS: " + os + " - arch: " + arch);
+            die("Could not determine platform. OS: " + os + " - arch: " + arch);
     }
 
 }
