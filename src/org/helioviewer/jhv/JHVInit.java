@@ -24,12 +24,12 @@ class JHVInit {
         try {
             loadLibs();
             KakaduMessageSystem.startKduMessageSystem();
+            loadKernels();
         } catch (Exception e) {
             Log.error("Failed to setup native libraries", e);
             Message.err("Failed to setup native libraries", e.getMessage(), true);
             return;
         }
-        loadKernels();
 
         try {
             JPIPCacheManager.init();
@@ -89,7 +89,7 @@ class JHVInit {
         }
     }
 
-    private static void loadKernels() {
+    private static void loadKernels() throws Exception {
         List<String> kernels = List.of(
                 "de432s_reduced.bsp",
                 "ahead_2017_061_5295day_predict.epm.bsp",
