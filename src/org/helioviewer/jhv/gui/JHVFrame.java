@@ -136,6 +136,7 @@ public class JHVFrame {
 
         frame.setMinimumSize(minSize);
         frame.setPreferredSize(new Dimension(maxSize.width - 100, maxSize.height - 100));
+        frame.setIconImage(IconBank.getIcon(IconBank.JHVIcon.HVLOGO_SMALL).getImage());
 
         return frame;
     }
