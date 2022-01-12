@@ -1,9 +1,8 @@
 package org.helioviewer.jhv.view.j2k.kakadu;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 
 import javax.annotation.Nullable;
 
@@ -33,10 +32,9 @@ public class KakaduSource {
     private final Jp2_threadsafe_family_src familySrc = new Jp2_threadsafe_family_src(); // reference has to be maintained
     private final Jpx_source jpxSrc;
 
-    public KakaduSource(Kdu_cache cache, URI uri) throws KduException, IOException {
+    public KakaduSource(Kdu_cache cache, URI uri) throws Exception {
         if (cache == null) { // local
-            File file = new File(uri);
-            familySrc.Open(file.getCanonicalPath(), true);
+            familySrc.Open(Path.of(uri).toString(), true);
         } else {
             familySrc.Open(cache);
         }
