@@ -17,13 +17,9 @@ import spice.basic.SpiceErrorException;
 
 public class Spice {
 
-    public static void loadKernels(List<String> files) {
-        try {
-            for (String f : files) {
-                CSPICE.furnsh(Path.of(JHVGlobals.dataCacheDir, f).toString());
-            }
-        } catch (SpiceErrorException e) {
-            Log.error(e);
+    public static void loadKernels(List<String> files) throws SpiceErrorException {
+        for (String f : files) {
+            CSPICE.furnsh(Path.of(JHVGlobals.dataCacheDir, f).toString());
         }
     }
 
