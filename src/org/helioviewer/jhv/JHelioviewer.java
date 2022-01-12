@@ -38,6 +38,8 @@ public class JHelioviewer {
         if (isHeadless())
             throw new Exception("This application cannot run in a headless configuration.");
 
+        // Set the platform system properties
+        SystemProperties.setPlatform();
         // Uncaught runtime errors are displayed in a dialog box in addition
         JHVUncaughtExceptionHandler.setupHandlerForThread();
         // This attempts to create the necessary directories for the application
@@ -50,8 +52,6 @@ public class JHelioviewer {
         // Read the version and revision from the JAR metafile
         JHVGlobals.getVersion();
         Settings.load();
-        // Set the platform system properties
-        SystemProperties.setPlatform();
         System.setProperty("sun.awt.noerasebackground", "true");
         System.setProperty("org.sqlite.tmpdir", JHVGlobals.libCacheDir);
         System.setProperty("org.lwjgl.system.SharedLibraryExtractPath", JHVGlobals.libCacheDir);
