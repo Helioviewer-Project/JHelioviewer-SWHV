@@ -4,7 +4,6 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Transparency;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 
 public class IconBank {
@@ -25,7 +24,6 @@ public class IconBank {
 
     }
 
-    @Nullable
     public static ImageIcon getIcon(JHVIcon icon) {
         return com.jidesoft.icons.IconsFactory.getImageIcon(IconBank.class, "/images/" + icon.fname);
     }
