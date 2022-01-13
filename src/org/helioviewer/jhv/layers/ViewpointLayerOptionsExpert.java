@@ -123,11 +123,11 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeListener.Selecti
         c.fill = GridBagConstraints.BOTH;
 
         c.gridy = 0;
-        add(container, c);
-        c.gridy = 1;
         add(syncCheckBox, c);
-        c.gridy = 2;
+        c.gridy = 1;
         add(timeSelectorPanel, c);
+        c.gridy = 2;
+        add(container, c);
         if (!exclusive) {
             c.gridy = 3;
             add(framePanel, c);

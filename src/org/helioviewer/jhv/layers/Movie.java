@@ -9,7 +9,6 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import javax.swing.Timer;
 
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.time.JHVTime;
@@ -215,9 +214,7 @@ public class Movie {
             return;
 
         lastTimestamp = dateTime;
-
-        Camera camera = Display.getCamera();
-        camera.timeChanged(dateTime);
+        Display.getCamera().timeChanged(dateTime);
 
         Layers.setImageLayersNearestFrame(dateTime);
         MovieDisplay.render(1);

@@ -5,11 +5,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 import javax.annotation.Nullable;
-import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.PositionLoad;
@@ -27,7 +26,7 @@ import com.jidesoft.swing.JideButton;
 class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
 
     private enum CameraMode {
-        Observer(UpdateViewpoint.observer), Location(UpdateViewpoint.location), Heliosphere(UpdateViewpoint.equatorial);
+        Location(UpdateViewpoint.location), Heliosphere(UpdateViewpoint.equatorial);
 
         final UpdateViewpoint update;
 
@@ -43,14 +42,10 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
     private ViewpointLayerOptionsExpert currentOptionPanel;
 
     private static final String explanation = """
-            <b>Observer</b>: view from observer.
-            Camera time defined by timestamps of the master layer.
-
             <b>Location</b>: view from selected object.
-            If "Use movie time interval" is unselected, the camera time is interpolated in the configured time interval.
-
             <b>Heliosphere</b>: view onto the solar equatorial plane.
-            If "Use movie time interval" is unselected, the positions of objects are interpolated in the configured time interval.""";
+
+            If "Use movie time interval" is unselected, the viewpoint time is interpolated in the configured time interval.""";
 
     ViewpointLayerOptions(JSONObject jo) {
         setLayout(new GridBagLayout());
@@ -65,7 +60,7 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
         locationOptionPanel = new ViewpointLayerOptionsExpert(joLocation, UpdateViewpoint.location, SpaceObject.SUN, Frame.SOLO_IAU_SUN_2009, true);
         equatorialOptionPanel = new ViewpointLayerOptionsExpert(joEquatorial, UpdateViewpoint.equatorial, SpaceObject.SUN, Frame.SOLO_HCI, false);
 
-        cameraMode = CameraMode.Observer;
+        cameraMode = CameraMode.Location;
         if (jo != null) {
             try {
                 cameraMode = CameraMode.valueOf(jo.optString("mode"));
@@ -75,13 +70,16 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
             if (jc != null)
                 Display.getCamera().fromJson(jc);
         }
+        switchOptionsPanel(switch (cameraMode) {
+            case Location -> locationOptionPanel;
+            case Heliosphere -> equatorialOptionPanel;
+        });
 
-        JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
-        radioPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-        radioPanel.add(new JLabel(" View ", JLabel.RIGHT));
+        JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 10, 0));
         ButtonGroup modeGroup = new ButtonGroup();
         for (CameraMode mode : CameraMode.values()) {
             JRadioButton radio = new JRadioButton(mode.toString(), mode == cameraMode);
+            radio.setHorizontalTextPosition(SwingConstants.LEFT);
             radio.addItemListener(e -> {
                 if (radio.isSelected()) {
                     cameraMode = mode;
@@ -101,13 +99,11 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
         c.anchor = GridBagConstraints.CENTER;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
-        c.weightx = 1.;
-        c.weighty = 1.;
+        c.weightx = 1;
+        c.weighty = 1;
 
         c.gridy = 0;
         add(radioPanel, c);
-
-        syncViewpoint();
     }
 
     void serialize(JSONObject jo) {
@@ -145,7 +141,6 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
 
     void syncViewpoint() {
         switchOptionsPanel(switch (cameraMode) {
-            case Observer -> null;
             case Location -> locationOptionPanel;
             case Heliosphere -> equatorialOptionPanel;
         });
