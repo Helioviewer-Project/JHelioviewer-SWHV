@@ -27,20 +27,17 @@ import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.view.j2k.image.ResolutionSet;
 
-public class KakaduSource {
+public class KakaduSource extends Jp2_threadsafe_family_src {
 
-    private final Jp2_threadsafe_family_src familySrc = new Jp2_threadsafe_family_src(); // reference has to be maintained
-    private final Jpx_source jpxSrc;
+    private final Jpx_source jpxSrc = new Jpx_source();
 
     public KakaduSource(Kdu_cache cache, URI uri) throws Exception {
         if (cache == null) { // local
-            familySrc.Open(Path.of(uri).toString(), true);
+            Open(Path.of(uri).toString(), true);
         } else {
-            familySrc.Open(cache);
+            Open(cache);
         }
-
-        jpxSrc = new Jpx_source();
-        jpxSrc.Open(familySrc, false);
+        jpxSrc.Open(this, false);
     }
 
     public Jpx_source getJpxSource() {
