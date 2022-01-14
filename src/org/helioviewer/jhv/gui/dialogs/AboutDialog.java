@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.gui.dialogs;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.io.InputStream;
 
 import javax.swing.BorderFactory;
@@ -86,8 +87,11 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
         pane.addHyperlinkListener(this);
         pane.setOpaque(false);
 
+        JLabel logo = new JLabel(IconBank.getIcon(IconBank.JHVIcon.HVLOGO_SMALL));
+        logo.setMaximumSize(new Dimension(64, 64));
+
         JPanel banner = new JPanel(new BorderLayout());
-        banner.add(new JLabel(IconBank.getIcon(IconBank.JHVIcon.HVLOGO_SMALL)), BorderLayout.LINE_START);
+        banner.add(logo, BorderLayout.LINE_START);
         banner.add(pane, BorderLayout.LINE_END);
         banner.setBorder(BorderFactory.createEmptyBorder(5, 35, 5, 35));
         return banner;
