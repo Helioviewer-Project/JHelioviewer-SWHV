@@ -1,11 +1,13 @@
 
 # Revision history for JHelioviewer
 
+## JHelioviewer 4.3.1 (pending)
+
 ## JHelioviewer 4.3 (2022-01-14)
 
 - Overhaul logging system and remove log4j
 - Switch to a dark theme
-- Windows: moved program directory to C:\Users\$USER\AppData\Local\Temp\JHelioviewer-SWHV\ for better compatibility with non-ASCII user names
+- Windows: move program directory to C:\Users\\$USER\AppData\Local\Temp\JHelioviewer-SWHV\ for better compatibility with non-ASCII user names
 
 ## JHelioviewer 4.2 (2021-12-10)
 
