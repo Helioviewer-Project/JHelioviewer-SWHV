@@ -49,7 +49,7 @@ public class EventDatabaseThread extends Thread {
         if (connection != null)
             return connection;
 
-        Path path = Path.of(JHVDirectory.EVENTS.getPath(), "events.db");
+        Path path = Path.of(JHVDirectory.CACHE.getPath(), "events.db");
         boolean fexist = Files.isWritable(path);
         connection = DriverManager.getConnection("jdbc:sqlite:" + path);
 
