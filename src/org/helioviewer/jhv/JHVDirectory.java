@@ -54,12 +54,6 @@ public enum JHVDirectory {
         public String getPath() {
             return HOME.getPath() + "Downloads" + File.separator;
         }
-    },
-    EVENTS {
-        @Override
-        public String getPath() {
-            return HOME.getPath() + "Events" + File.separator;
-        }
     };
 
     // A String representation of the path of the directory
