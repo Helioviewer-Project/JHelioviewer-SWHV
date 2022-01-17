@@ -1,8 +1,8 @@
 package org.helioviewer.jhv.io;
 
-import java.io.File;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -67,13 +67,13 @@ public class CommandLine {
                 if ("jpip".equals(scheme) || "http".equals(scheme) || "https".equals(scheme) || "file".equals(scheme))
                     uris.add(uri);
                 else {
-                    File f = new File(opt).getAbsoluteFile();
-                    if (f.canRead()) {
-                        uris.add(f.toURI());
+                    Path path = Path.of(opt);
+                    if (Files.isReadable(path)) {
+                        uris.add(path.toUri()); // toUri() is correct
                     } else
                         Log.warn("File not found: " + opt);
                 }
-            } catch (URISyntaxException e) {
+            } catch (Exception e) {
                 Log.warn(e);
             }
         }
