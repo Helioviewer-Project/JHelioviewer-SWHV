@@ -36,7 +36,7 @@ public class Settings {
         }
 
         if (getProperty("path.local") == null)
-            setProperty("path.local", JHVDirectory.REMOTEFILES.getPath());
+            setProperty("path.local", JHVDirectory.DOWNLOADS.getPath());
         if (getProperty("path.state") == null)
             setProperty("path.state", JHVDirectory.STATES.getPath());
         String server = getProperty("default.server");

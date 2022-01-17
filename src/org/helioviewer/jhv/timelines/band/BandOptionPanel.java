@@ -67,14 +67,14 @@ class BandOptionPanel extends JPanel {
         JideButton downloadButton = new JideButton(Buttons.download);
         downloadButton.setToolTipText("Download selected layer");
         downloadButton.addActionListener(e -> {
-            String fileName = JHVDirectory.REMOTEFILES.getPath() + band.getBandType().getName().replace(" ", "_") + "__" +
-                    TimeUtils.formatFilename(System.currentTimeMillis()) + ".json";
+            Path path = Path.of(JHVDirectory.DOWNLOADS.getPath(),
+                    band.getBandType().getName().replace(" ", "_") + "__" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".json");
             JSONObject jo = band.toJson();
 
             new Thread(() -> {
-                try (BufferedWriter writer = Files.newBufferedWriter(Path.of(fileName), StandardCharsets.UTF_8)) {
+                try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
                     jo.write(writer);
-                    EventQueue.invokeLater(() -> JHVGlobals.displayNotification(fileName));
+                    EventQueue.invokeLater(() -> JHVGlobals.displayNotification(path.toString()));
                 } catch (Exception ex) {
                     Log.error("Failed to write JSON", ex);
                 }
