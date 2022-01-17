@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.view.j2k.io.jpip;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,8 +28,8 @@ public class JPIPCacheManager {
         Logger.getLogger("org.ehcache").setLevel(Level.WARNING); // shutup Ehcache info logs
     }
 
-    private static final File levelCacheDir = new File(JHVDirectory.CACHE.getFile(), "JPIPLevel-3");
-    private static final File streamCacheDir = new File(JHVDirectory.CACHE.getFile(), "JPIPStream-3");
+    private static final Path levelCacheDir = Path.of(JHVDirectory.CACHE.getPath(), "JPIPLevel-3");
+    private static final Path streamCacheDir = Path.of(JHVDirectory.CACHE.getPath(), "JPIPStream-3");
 
     private static PersistentCacheManager levelManager;
     private static PersistentCacheManager streamManager;
@@ -43,7 +43,7 @@ public class JPIPCacheManager {
         ExpiryPolicy<Object, Object> expiryPolicy = ExpiryPolicyBuilder.timeToIdleExpiration(Duration.ofDays(7));
 
         levelManager = CacheManagerBuilder.newCacheManagerBuilder()
-                .with(CacheManagerBuilder.persistence(levelCacheDir))
+                .with(CacheManagerBuilder.persistence(levelCacheDir.toString()))
                 .withCache("JPIPLevel", CacheConfigurationBuilder
                         .newCacheConfigurationBuilder(String.class, Integer.class,
                                 ResourcePoolsBuilder.newResourcePoolsBuilder()
@@ -52,7 +52,7 @@ public class JPIPCacheManager {
                         .withExpiry(expiryPolicy))
                 .build(true);
         streamManager = CacheManagerBuilder.newCacheManagerBuilder()
-                .with(CacheManagerBuilder.persistence(streamCacheDir))
+                .with(CacheManagerBuilder.persistence(streamCacheDir.toString()))
                 .withCache("JPIPStream", CacheConfigurationBuilder
                         .newCacheConfigurationBuilder(String.class, JPIPStream.class,
                                 ResourcePoolsBuilder.newResourcePoolsBuilder()
@@ -96,7 +96,7 @@ public class JPIPCacheManager {
     private static void deleteDirs(String... dirs) {
         for (String dir : dirs) { // delete old versions
             try {
-                FileUtils.deleteDir(new File(JHVDirectory.CACHE.getFile(), dir));
+                FileUtils.deleteDir(Path.of(JHVDirectory.CACHE.getPath(), dir));
             } catch (Exception ignore) {
             }
         }

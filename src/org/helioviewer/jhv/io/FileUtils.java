@@ -47,10 +47,10 @@ public class FileUtils {
         }
     }
 
-    public static long diskUsage(File dir) throws IOException {
+    public static long diskUsage(Path path) throws IOException {
         AtomicLong size = new AtomicLong(0);
 
-        Files.walkFileTree(dir.toPath(), new SimpleFileVisitor<>() {
+        Files.walkFileTree(path, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                 size.addAndGet(attrs.size());
@@ -96,12 +96,12 @@ public class FileUtils {
 
     private static final DeleteFileVisitor nukeVisitor = new DeleteFileVisitor(-1, true);
 
-    public static void deleteDir(File dir) throws IOException {
-        Files.walkFileTree(dir.toPath(), nukeVisitor);
+    public static void deleteDir(Path path) throws IOException {
+        Files.walkFileTree(path, nukeVisitor);
     }
 
-    public static void deleteDir(File dir, long olderThan, boolean deleteDir) throws IOException {
-        Files.walkFileTree(dir.toPath(), new DeleteFileVisitor(olderThan, deleteDir));
+    public static void deleteDir(Path path, long olderThan, boolean deleteDir) throws IOException {
+        Files.walkFileTree(path, new DeleteFileVisitor(olderThan, deleteDir));
     }
 
     public static List<URI> listDir(Path path) throws IOException {
@@ -122,7 +122,7 @@ public class FileUtils {
         for (File dir : dirs) {
             if (new File(dir + lockSuffix).exists())
                 continue;
-            deleteDir(dir);
+            deleteDir(dir.toPath());
         }
 
         File tempDir = Files.createTempDirectory(parent.toPath(), name).toFile();
