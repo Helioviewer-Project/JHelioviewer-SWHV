@@ -19,6 +19,7 @@ import javax.swing.UIManager;
 //import javax.swing.plaf.FontUIResource;
 
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.io.FileUtils;
 
@@ -34,7 +35,7 @@ public class UIGlobals {
         // listFontKeys();
         // listColorKeys();
 
-        if (!System.getProperty("jhv.os").equals("mac")) {
+        if (!Platform.isMacOS()) {
             ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
             JPopupMenu.setDefaultLightWeightPopupEnabled(false);
         }
@@ -43,7 +44,7 @@ public class UIGlobals {
         backColor = UIManager.getColor("Label.background");
         midColor = new Color((foreColor.getRed() + backColor.getRed()) / 2, (foreColor.getGreen() + backColor.getGreen()) / 2, (foreColor.getBlue() + backColor.getBlue()) / 2);
 
-        if (System.getProperty("jhv.os").equals("mac")) {
+        if (Platform.isMacOS()) {
             UIManager.getLookAndFeelDefaults().put("defaultFont", UIManager.getFont("medium.font")); // smaller, FlatLaf 2
             ImageIcon cursor = IconBank.getIcon(JHVIcon.CLOSED_HAND_MAC);
             cursor = cursor == null ? IconBank.getBlank() : cursor;

@@ -38,8 +38,8 @@ public class JHelioviewer {
         if (isHeadless())
             throw new Exception("This application cannot run in a headless configuration.");
 
-        // Set the platform system properties
-        SystemProperties.setPlatform();
+        // Set the platform
+        Platform.init();
         // This attempts to create the necessary directories for the application
         JHVGlobals.createDirs();
         // Uncaught runtime errors are displayed in a dialog box in addition

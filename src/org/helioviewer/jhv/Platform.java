@@ -2,7 +2,7 @@ package org.helioviewer.jhv;
 
 import javax.swing.JOptionPane;
 
-public class SystemProperties {
+public class Platform {
 
     private static void die(String msg) {
         JOptionPane optionPane = new JOptionPane();
@@ -14,7 +14,7 @@ public class SystemProperties {
     }
 
     // Reads the builtin Java properties to determine the platform and set simplified properties used by JHV
-    static void setPlatform() {
+    static void init() {
         String os = System.getProperty("os.name");
         String arch = System.getProperty("os.arch");
         if (os == null || arch == null) {
@@ -26,18 +26,39 @@ public class SystemProperties {
         arch = arch.toLowerCase();
 
         if (arch.contains("x86_64") || arch.contains("amd64"))
-            System.setProperty("jhv.arch", "x86-64");
+            arch = "x86-64";
         else
             die("Please install Java 64-bit to run JHelioviewer.");
 
         if (os.contains("windows"))
-            System.setProperty("jhv.os", "windows");
+            isWindows = true;
         else if (os.contains("linux"))
-            System.setProperty("jhv.os", "linux");
+            isLinux = true;
         else if (os.contains("mac os x"))
-            System.setProperty("jhv.os", "mac");
+            isMacOS = true;
         else
             die("Could not determine platform. OS: " + os + " - arch: " + arch);
+    }
+
+    private static boolean isLinux = false;
+    private static boolean isMacOS = false;
+    private static boolean isWindows = false;
+    private static String arch;
+
+    public static boolean isLinux() {
+        return isLinux;
+    }
+
+    public static boolean isMacOS() {
+        return isMacOS;
+    }
+
+    public static boolean isWindows() {
+        return isWindows;
+    }
+
+    static String getArch() {
+        return arch;
     }
 
 }

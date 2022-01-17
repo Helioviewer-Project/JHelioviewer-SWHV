@@ -52,15 +52,15 @@ class JHVInit {
         String pathlib = "";
         ArrayList<String> libs = new ArrayList<>();
 
-        if (System.getProperty("jhv.os").equals("mac") && System.getProperty("jhv.arch").equals("x86-64")) {
+        if (Platform.isMacOS() && "x86-64".equals(Platform.getArch())) {
             pathlib = "macosx-universal/";
-        } else if (System.getProperty("jhv.os").equals("windows") && System.getProperty("jhv.arch").equals("x86-64")) {
+        } else if (Platform.isWindows() && "x86-64".equals(Platform.getArch())) {
             pathlib = "windows-amd64/";
-        } else if (System.getProperty("jhv.os").equals("linux") && System.getProperty("jhv.arch").equals("x86-64")) {
+        } else if (Platform.isLinux() && "x86-64".equals(Platform.getArch())) {
             pathlib = "linux-amd64/";
         }
 
-        if (System.getProperty("jhv.os").equals("windows")) {
+        if (Platform.isWindows()) {
             libs.add(System.mapLibraryName("msvcr120"));
             libs.add(System.mapLibraryName("msvcp120"));
             libs.add(System.mapLibraryName("kdu_v7AR"));
@@ -82,7 +82,7 @@ class JHVInit {
             }
         });
 
-        if (!System.getProperty("jhv.os").equals("windows"))
+        if (!Platform.isWindows())
             Files.setPosixFilePermissions(Path.of(JHVGlobals.libCacheDir, "ffmpeg"), Set.of(PosixFilePermission.OWNER_EXECUTE));
         for (String l : libs) {
             System.load(Path.of(JHVGlobals.libCacheDir, l).toString());

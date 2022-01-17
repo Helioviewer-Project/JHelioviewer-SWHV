@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.time.TimeUtils;
 
 // Class manages a calendar view which shows all days of a month.
@@ -70,7 +71,7 @@ class DayViewController implements CalendarViewController {
         // the calendar returns sometimes index 0 and sometimes index 1 for
         // first week of a month under windows, so an offset is needed
         int offset = 1;
-        if (System.getProperty("jhv.os").equals("windows"))
+        if (Platform.isWindows())
             offset = cal.get(Calendar.WEEK_OF_MONTH);
 
         // put all days at correct position in grid data
