@@ -8,6 +8,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.actions.CheckUpdateAction;
 import org.helioviewer.jhv.gui.actions.ClearAnnotationsAction;
@@ -48,7 +49,7 @@ public class MenuBar extends JMenuBar {
         fileMenu.add(new SaveStateAsAction());
 
         ExitProgramAction exitAction = new ExitProgramAction();
-        if (System.getProperty("jhv.os").equals("mac")) {
+        if (Platform.isMacOS()) {
             Desktop.getDesktop().setQuitHandler((e, response) -> exitAction.actionPerformed(null));
         } else {
             fileMenu.addSeparator();
@@ -85,7 +86,7 @@ public class MenuBar extends JMenuBar {
         add(movieMenu);
 
         ShowDialogAction preferencesAction = new ShowDialogAction("Preferences...", new PreferencesDialog());
-        if (System.getProperty("jhv.os").equals("mac")) {
+        if (Platform.isMacOS()) {
             Desktop.getDesktop().setPreferencesHandler(e -> preferencesAction.actionPerformed(null));
             JMenu windowMenu = new JMenu("Window");
             windowMenu.setMnemonic(KeyEvent.VK_W);
@@ -103,7 +104,7 @@ public class MenuBar extends JMenuBar {
         helpMenu.setMnemonic(KeyEvent.VK_H);
 
         ShowDialogAction aboutAction = new ShowDialogAction("About JHelioviewer...", new AboutDialog());
-        if (System.getProperty("jhv.os").equals("mac")) {
+        if (Platform.isMacOS()) {
             Desktop.getDesktop().setAboutHandler(e -> aboutAction.actionPerformed(null));
         } else {
             helpMenu.add(aboutAction);
