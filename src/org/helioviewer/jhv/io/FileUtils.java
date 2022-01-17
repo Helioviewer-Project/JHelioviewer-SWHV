@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -100,8 +101,15 @@ public class FileUtils {
         Files.walkFileTree(path, nukeVisitor);
     }
 
-    public static void deleteDir(Path path, long olderThan, boolean deleteDir) throws IOException {
+    public static void deleteFromDir(Path path, long olderThan, boolean deleteDir) throws IOException {
         Files.walkFileTree(path, new DeleteFileVisitor(olderThan, deleteDir));
+    }
+
+    public static void deleteFromDir(Path path, DirectoryStream.Filter<Path> filter) throws IOException {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path, filter)) {
+            for (Path p : stream)
+                Files.delete(p);
+        }
     }
 
     public static List<URI> listDir(Path path) throws IOException {

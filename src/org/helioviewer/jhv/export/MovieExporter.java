@@ -3,9 +3,10 @@ package org.helioviewer.jhv.export;
 import java.awt.EventQueue;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileFilter;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.image.MappedImageFactory;
 import org.helioviewer.jhv.base.image.NIOImageFactory;
+import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.time.TimeUtils;
 
 class MovieExporter {
@@ -107,12 +109,8 @@ class MovieExporter {
             else
                 EventQueue.invokeLater(() -> JHVGlobals.displayNotificationEx("Recording " + JHVGlobals.urify(outPath) + ready));
         } catch (Exception e) {
-            FileFilter filter = p -> p.getName().startsWith(prefix);
-            File[] toDelete = JHVDirectory.EXPORTS.getFile().listFiles(filter);
-            if (toDelete != null) {
-                for (File f : toDelete)
-                    f.delete();
-            }
+            DirectoryStream.Filter<Path> filter = p -> p.toString().startsWith(prefix);
+            FileUtils.deleteFromDir(Path.of(JHVDirectory.EXPORTS.getPath()), filter);
             throw e;
         } finally {
             tempFile.delete();
