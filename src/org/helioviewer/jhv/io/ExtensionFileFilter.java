@@ -19,9 +19,6 @@ public class ExtensionFileFilter {
     /*  public static final FilenameFilter JSON = new Filter(new ExtensionFilter(
                 new String[]{"json"},
                 "JSON files (\".json\")")); */
-    public static final FilenameFilter GGR = new Filter(new ExtensionFilter(
-            new String[]{"ggr"},
-            "GIMP gradient files (\".ggr\")"));
 
     private record Filter(FileFilter filter) implements FilenameFilter {
         @Override

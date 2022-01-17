@@ -55,19 +55,6 @@ public enum JHVDirectory {
             return HOME.getPath() + "Downloads" + File.separator;
         }
     },
-    // Directory of automatically loaded GIMP gradient files
-    COLOR_PLUGINS {
-        @Override
-        public String getPath() {
-            return HOME.getPath() + "Colortables" + File.separator;
-        }
-    },
-    TEMP {
-        @Override
-        public String getPath() {
-            return HOME.getPath() + "Temp" + File.separator;
-        }
-    },
     EVENTS {
         @Override
         public String getPath() {

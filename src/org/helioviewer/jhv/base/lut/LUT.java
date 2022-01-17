@@ -1,21 +1,17 @@
 package org.helioviewer.jhv.base.lut;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.Map;
 import java.util.TreeMap;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.json.JSONArray;
@@ -84,19 +80,6 @@ public record LUT(String name, int[] lut8) {
                 Log.warn("Could not restore gimp gradient file " + file, e);
             }
         }
-        // User addons
-        File addOnDir = JHVDirectory.COLOR_PLUGINS.getFile();
-        File[] fileList = addOnDir.listFiles(ExtensionFileFilter.GGR);
-        if (fileList != null)
-            for (File f : fileList) {
-                try (InputStream is = Files.newInputStream(f.toPath())) {
-                    LUT l = readGimpGradient(is);
-                    standardList.put(l.name, l);
-                } catch (Exception e) {
-                    Log.warn("Error loading color table plugin dir", e);
-                }
-            }
-
         // read associations
         readColors();
     }
