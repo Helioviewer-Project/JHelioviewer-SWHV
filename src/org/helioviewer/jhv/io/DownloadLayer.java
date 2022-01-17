@@ -72,7 +72,7 @@ public class DownloadLayer {
             Log.error(t);
             try {
                 Files.delete(dstPath);
-            } catch(Exception e) {
+            } catch (Exception e) {
                 Log.error(e);
             }
         }
