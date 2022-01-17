@@ -1,6 +1,7 @@
 package org.helioviewer.jhv;
 
 import java.lang.StackWalker;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
@@ -21,7 +22,7 @@ public class Log {
     private static final String filename = JHVDirectory.LOGS.getPath() + "JHV_" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".log";
 
     static void init() throws Exception {
-        FileUtils.deleteDir(JHVDirectory.LOGS.getFile(), 7 * TimeUtils.DAY_IN_MILLIS, false);
+        FileUtils.deleteDir(Path.of(JHVDirectory.LOGS.getPath()), 7 * TimeUtils.DAY_IN_MILLIS, false);
 
         LogFormatter logFormatter = new LogFormatter();
         FileHandler fileHandler = new FileHandler(filename, 1024 * 1024, 1);
