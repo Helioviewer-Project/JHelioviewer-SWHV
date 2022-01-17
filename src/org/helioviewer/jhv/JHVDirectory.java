@@ -7,7 +7,7 @@ import java.io.File;
 public enum JHVDirectory {
     // The home directory
     HOME {
-        private final String path = Platform.isWindows() ? System.getProperty("java.io.tmpdir") : System.getProperty("user.home");
+        private final String path = System.getProperty("user.home");
 
         @Override
         public String getPath() {
@@ -17,7 +17,9 @@ public enum JHVDirectory {
     CACHE {
         @Override
         public String getPath() {
-            return HOME.getPath() + "Cache" + File.separator;
+            // transient files, access problem for non-ASCII username on Windows
+            String cacheRoot = Platform.isWindows() ? System.getProperty("java.io.tmpdir") + File.separator + "JHelioviewer-SWHV" + File.separator : HOME.getPath();
+            return cacheRoot + "Cache" + File.separator;
         }
     },
     // The JHV state directory
@@ -52,7 +54,9 @@ public enum JHVDirectory {
     DOWNLOADS {
         @Override
         public String getPath() {
-            return HOME.getPath() + "Downloads" + File.separator;
+            // access problem for non-ASCII username on Windows
+            String downRoot = Platform.isWindows() ? System.getProperty("java.io.tmpdir") + File.separator + "JHelioviewer-SWHV" + File.separator : HOME.getPath();
+            return downRoot + "Downloads" + File.separator;
         }
     };
 
