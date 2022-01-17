@@ -1,8 +1,9 @@
 package org.helioviewer.jhv.io;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import javax.annotation.Nonnull;
 
@@ -21,11 +22,11 @@ public class NetFileCache {
                 if (scheme.equals("jpip") || scheme.equals("file"))
                     return uri;
 
-                File f = File.createTempFile("jhv", null, JHVGlobals.fileCacheDir);
-                try (NetClient nc = NetClient.of(uri, false, NetClient.NetCache.BYPASS); BufferedSink sink = Okio.buffer(Okio.sink(f))) {
+                Path path = Files.createTempFile(JHVGlobals.fileCacheDir.toPath(), "jhv", null);
+                try (NetClient nc = NetClient.of(uri, false, NetClient.NetCache.BYPASS); BufferedSink sink = Okio.buffer(Okio.sink(path))) {
                     sink.writeAll(nc.getSource());
                 }
-                return f.toURI();
+                return path.toUri();
             });
 
     public static URI get(@Nonnull URI uri) throws IOException {

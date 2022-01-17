@@ -29,7 +29,6 @@
 package org.helioviewer.jhv.base.image;
 
 import java.awt.image.DataBuffer;
-import java.io.File;
 import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -37,6 +36,8 @@ import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
 import org.helioviewer.jhv.JHVGlobals;
@@ -59,9 +60,9 @@ abstract class MappedFileBuffer extends DataBuffer {
         super(type, size, numBanks);
 
         int componentSize = DataBuffer.getDataTypeSize(type) / 8;
-        File tempFile = File.createTempFile("mfilebuf", null, JHVGlobals.exportCacheDir);
 
-        try (FileChannel channel = FileChannel.open(tempFile.toPath(), StandardOpenOption.READ, StandardOpenOption.WRITE)) {
+        Path temp = Files.createTempFile(JHVGlobals.exportCacheDir.toPath(), "mbuf", null);
+        try (FileChannel channel = FileChannel.open(temp, StandardOpenOption.READ, StandardOpenOption.WRITE, StandardOpenOption.DELETE_ON_CLOSE)) {
             long length = ((long) size) * componentSize * numBanks;
             channel.truncate(length);
 
@@ -71,10 +72,6 @@ abstract class MappedFileBuffer extends DataBuffer {
                 case DataBuffer.TYPE_USHORT -> buffer = byteBuffer.asShortBuffer();
                 case DataBuffer.TYPE_INT -> buffer = byteBuffer.asIntBuffer();
                 default -> throw new IllegalArgumentException("Unsupported data type: " + type);
-            }
-        } finally {
-            if (!tempFile.delete()) { // NOTE: File can't be deleted right now on Windows, as the file is open. Let JVM clean up later
-                tempFile.deleteOnExit();
             }
         }
     }
