@@ -1,8 +1,9 @@
 package org.helioviewer.jhv.io;
 
 import java.awt.EventQueue;
-import java.io.File;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -27,18 +28,18 @@ public class DownloadLayer {
 
     @Nullable
     public static Future<Void> submit(@Nonnull APIRequest req, @Nonnull ImageLayer layer, @Nonnull URI dst) {
-        String dstPath = dst.getPath();
-        File dstFile = new File(JHVDirectory.REMOTEFILES.getPath(), dstPath.substring(Math.max(0, dstPath.lastIndexOf('/')))).getAbsoluteFile();
-        return EventQueueCallbackExecutor.pool.submit(new LayerDownload(req, layer, dstFile), new Callback(layer, dstFile));
+        String path = dst.getPath();
+        Path dstPath = Path.of(JHVDirectory.DOWNLOADS.getPath(), path.substring(Math.max(0, path.lastIndexOf('/'))));
+        return EventQueueCallbackExecutor.pool.submit(new LayerDownload(req, layer, dstPath), new Callback(layer, dstPath));
     }
 
     private static final int BUFSIZ = 1024 * 1024;
 
-    private record LayerDownload(APIRequest req, ImageLayer layer, File dstFile) implements Callable<Void> {
+    private record LayerDownload(APIRequest req, ImageLayer layer, Path dstPath) implements Callable<Void> {
         @Override
         public Void call() throws Exception {
             URI uri = new URI(req.toFileRequest());
-            try (NetClient nc = NetClient.of(uri); BufferedSource source = nc.getSource(); BufferedSink sink = Okio.buffer(Okio.sink(dstFile))) {
+            try (NetClient nc = NetClient.of(uri); BufferedSource source = nc.getSource(); BufferedSink sink = Okio.buffer(Okio.sink(dstPath))) {
                 long count = 0, contentLength = nc.getContentLength();
                 long bytesRead, totalRead = 0;
                 Buffer sinkBuffer = sink.getBuffer();
@@ -56,20 +57,24 @@ public class DownloadLayer {
         }
     }
 
-    private record Callback(ImageLayer layer, File dstFile) implements FutureCallback<Void> {
+    private record Callback(ImageLayer layer, Path dstPath) implements FutureCallback<Void> {
 
         @Override
         public void onSuccess(Void result) {
             layer.doneDownload();
-            LoadLayer.submit(layer, List.of(dstFile.toURI()), false);
-            JHVGlobals.displayNotification(dstFile.toString());
+            LoadLayer.submit(layer, List.of(dstPath.toUri()), false);
+            JHVGlobals.displayNotification(dstPath.toString());
         }
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
             layer.doneDownload();
-            dstFile.delete();
             Log.error(t);
+            try {
+                Files.delete(dstPath);
+            } catch(Exception e) {
+                Log.error(e);
+            }
         }
 
     }

@@ -41,15 +41,15 @@ public enum JHVDirectory {
             return HOME.getPath() + "Logs" + File.separator;
         }
     },
-    // The log settings directory
+    // The settings directory
     SETTINGS {
         @Override
         public String getPath() {
             return HOME.getPath() + "Settings" + File.separator;
         }
     },
-    // The remote files directory
-    REMOTEFILES {
+    // The downloads directory
+    DOWNLOADS {
         @Override
         public String getPath() {
             return HOME.getPath() + "Downloads" + File.separator;
