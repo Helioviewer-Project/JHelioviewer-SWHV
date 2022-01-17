@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,7 +59,7 @@ public class EventDatabase {
     private static final HashMap<String, PreparedStatement> statements = new HashMap<>();
     private static final HashMap<SWEKSupplier, RequestCache> downloadedCache = new HashMap<>();
 
-    private static PreparedStatement getPreparedStatement(String statement) throws SQLException {
+    private static PreparedStatement getPreparedStatement(String statement) throws Exception {
         PreparedStatement pstat = statements.get(statement);
         if (pstat == null) {
             pstat = EventDatabaseThread.getConnection().prepareStatement(statement);
@@ -70,7 +69,7 @@ public class EventDatabase {
         return pstat;
     }
 
-    private static int getEventTypeId(SWEKSupplier eventType) throws SQLException {
+    private static int getEventTypeId(SWEKSupplier eventType) throws Exception {
         int typeId = _getEventTypeId(eventType);
         if (typeId == -1) {
             insertEventTypeIfNotExist(eventType);
@@ -79,7 +78,7 @@ public class EventDatabase {
         return typeId;
     }
 
-    private static int _getEventTypeId(SWEKSupplier event) throws SQLException {
+    private static int _getEventTypeId(SWEKSupplier event) throws Exception {
         int typeId = -1;
         PreparedStatement pstatement = getPreparedStatement(SELECT_EVENT_TYPE);
         pstatement.setString(1, event.getGroup().getName());
@@ -93,7 +92,7 @@ public class EventDatabase {
         return typeId;
     }
 
-    private static void insertEventTypeIfNotExist(SWEKSupplier eventType) throws SQLException {
+    private static void insertEventTypeIfNotExist(SWEKSupplier eventType) throws Exception {
         PreparedStatement pstatement = getPreparedStatement(INSERT_EVENT_TYPE);
         pstatement.setString(1, eventType.getGroup().getName());
         pstatement.setString(2, eventType.getKey());
@@ -111,7 +110,7 @@ public class EventDatabase {
         connection.commit();
     }
 
-    private static int getIdFromUID(String uid) throws SQLException {
+    private static int getIdFromUID(String uid) throws Exception {
         int id = _getIdFromUID(uid);
         if (id == -1) {
             insertVoidEvent(uid);
@@ -120,7 +119,7 @@ public class EventDatabase {
         return id;
     }
 
-    private static int _getIdFromUID(String uid) throws SQLException {
+    private static int _getIdFromUID(String uid) throws Exception {
         int id = -1;
         PreparedStatement pstatement = getPreparedStatement(SELECT_EVENT_ID_FROM_UID);
         pstatement.setString(1, uid);
@@ -133,13 +132,13 @@ public class EventDatabase {
         return id;
     }
 
-    private static void insertVoidEvent(String uid) throws SQLException {
+    private static void insertVoidEvent(String uid) throws Exception {
         PreparedStatement pstatement = getPreparedStatement(INSERT_EVENT);
         pstatement.setString(1, uid);
         pstatement.executeUpdate();
     }
 
-    private static void dump_associationint2db(List<Pair<Integer, Integer>> assocs) throws SQLException {
+    private static void dump_associationint2db(List<Pair<Integer, Integer>> assocs) throws Exception {
         int len = assocs.size();
         int i = 0;
         int errorcode = 0;
@@ -179,7 +178,7 @@ public class EventDatabase {
 
     private record DumpAssociation2Db(Pair<String, String>[] assocs) implements Callable<Integer> {
         @Override
-        public Integer call() throws SQLException {
+        public Integer call() throws Exception {
             int len = assocs.length;
             int i = 0;
             int errorcode = 0;
@@ -205,7 +204,7 @@ public class EventDatabase {
         }
     }
 
-    private static int getEventId(String uid) throws SQLException {
+    private static int getEventId(String uid) throws Exception {
         int generatedKey = -1;
         PreparedStatement pstatement = getPreparedStatement(SELECT_EVENT_ID_FROM_UID);
         pstatement.setString(1, uid);
@@ -234,7 +233,7 @@ public class EventDatabase {
 
     private record DumpEvent2Db(List<Event2Db> event2db_list, SWEKSupplier type) implements Callable<Void> {
         @Override
-        public Void call() throws SQLException {
+        public Void call() throws Exception {
             int[] inserted_ids = get_id_init_list(event2db_list.size());
             int typeId = getEventTypeId(type);
             int llen = event2db_list.size();
@@ -337,12 +336,12 @@ public class EventDatabase {
         return uniqueEvents;
     }
 
-    public static List<JHVEvent> getOtherRelations(int id, SWEKSupplier jhvEventType, boolean similartype, boolean full) throws SQLException {
+    public static List<JHVEvent> getOtherRelations(int id, SWEKSupplier jhvEventType, boolean similartype, boolean full) throws Exception {
         return _getOtherRelations(id, jhvEventType, similartype, full, false);
     }
 
     // Given an event id and its type, return all related events. If similartype is true, return only related events having the same type.
-    private static List<JHVEvent> _getOtherRelations(int id, SWEKSupplier jhvEventType, boolean similartype, boolean full, boolean is_dbthread) throws SQLException {
+    private static List<JHVEvent> _getOtherRelations(int id, SWEKSupplier jhvEventType, boolean similartype, boolean full, boolean is_dbthread) throws Exception {
         SWEKGroup group = jhvEventType.getGroup();
         List<JHVEvent> nEvents = new ArrayList<>();
         List<JsonEvent> jsonEvents = new ArrayList<>();
@@ -433,7 +432,7 @@ public class EventDatabase {
                     }
                 }
                 dstatement.getConnection().commit();
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 Log.error("Could not serialize date_range to database", e);
             }
         }
@@ -450,7 +449,7 @@ public class EventDatabase {
 
     private record Db2DateRange(SWEKSupplier type) implements Callable<List<Interval>> {
         @Override
-        public List<Interval> call() throws SQLException {
+        public List<Interval> call() throws Exception {
             RequestCache typedCache = downloadedCache.get(type);
             if (typedCache == null) {
                 typedCache = new RequestCache();
@@ -477,7 +476,7 @@ public class EventDatabase {
         }
     }
 
-    private static long getLastEvent(SWEKSupplier type) throws SQLException {
+    private static long getLastEvent(SWEKSupplier type) throws Exception {
         int typeId = getEventTypeId(type);
         long last_timestamp = Long.MIN_VALUE;
         if (typeId != -1) {
@@ -507,7 +506,7 @@ public class EventDatabase {
     private record Events2Program(long start, long end, SWEKSupplier type, List<SWEK.Param> params)
             implements Callable<List<JHVEvent>> {
         @Override
-        public List<JHVEvent> call() throws SQLException {
+        public List<JHVEvent> call() throws Exception {
             List<JHVEvent> eventList = new ArrayList<>();
             int typeId = getEventTypeId(type);
             if (typeId != -1) {
@@ -554,7 +553,7 @@ public class EventDatabase {
     private record Associations2Program(long start, long end, SWEKSupplier type)
             implements Callable<List<Pair<Integer, Integer>>> {
         @Override
-        public List<Pair<Integer, Integer>> call() throws SQLException {
+        public List<Pair<Integer, Integer>> call() throws Exception {
             List<Pair<Integer, Integer>> assocList = new ArrayList<>();
             int typeId = getEventTypeId(type);
             if (typeId != -1) {
@@ -582,7 +581,7 @@ public class EventDatabase {
         return new ArrayList<>();
     }
 
-    private static List<JsonEvent> rel2prog(int event_id, SWEKSupplier type_left, SWEKSupplier type_right, String param_left, String param_right) throws SQLException {
+    private static List<JsonEvent> rel2prog(int event_id, SWEKSupplier type_left, SWEKSupplier type_right, String param_left, String param_right) throws Exception {
         int type_left_id = getEventTypeId(type_left);
         int type_right_id = getEventTypeId(type_right);
 
@@ -628,7 +627,7 @@ public class EventDatabase {
     private record Relations2Program(int event_id, SWEKSupplier type_left, SWEKSupplier type_right, String param_left,
                                      String param_right) implements Callable<List<JsonEvent>> {
         @Override
-        public List<JsonEvent> call() throws SQLException {
+        public List<JsonEvent> call() throws Exception {
             return rel2prog(event_id, type_left, type_right, param_left, param_right);
         }
     }
@@ -636,7 +635,7 @@ public class EventDatabase {
     private record Event2Program(int event_id) implements Callable<JsonEvent> {
         @Nullable
         @Override
-        public JsonEvent call() throws SQLException {
+        public JsonEvent call() throws Exception {
             PreparedStatement ps = getPreparedStatement(SELECT_EVENT_BY_ID);
             ps.setLong(1, event_id);
 

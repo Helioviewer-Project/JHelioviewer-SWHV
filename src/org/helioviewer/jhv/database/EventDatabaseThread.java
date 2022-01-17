@@ -1,11 +1,11 @@
 package org.helioviewer.jhv.database;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 import javax.annotation.Nonnull;
@@ -21,7 +21,7 @@ public class EventDatabaseThread extends Thread {
         super(r, name);
     }
 
-    private static void createSchema() throws SQLException {
+    private static void createSchema() throws Exception {
         try (Statement statement = connection.createStatement()) {
             statement.setQueryTimeout(30);
             statement.executeUpdate("CREATE TABLE if not exists event_type (id INTEGER PRIMARY KEY AUTOINCREMENT, name STRING, supplier STRING, UNIQUE(name, supplier) ON CONFLICT IGNORE)");
@@ -45,14 +45,13 @@ public class EventDatabaseThread extends Thread {
     }
 
     @Nonnull
-    static Connection getConnection() throws SQLException {
+    static Connection getConnection() throws Exception {
         if (connection != null)
             return connection;
 
-        String filepath = JHVDirectory.EVENTS.getPath() + "events.db";
-        File file = new File(filepath);
-        boolean fexist = file.isFile() && file.canRead();
-        connection = DriverManager.getConnection("jdbc:sqlite:" + filepath);
+        Path path = Path.of(JHVDirectory.EVENTS.getPath(), "events.db");
+        boolean fexist = Files.isWritable(path);
+        connection = DriverManager.getConnection("jdbc:sqlite:" + path);
 
         if (fexist) {
             int found_version = -1;
@@ -69,8 +68,8 @@ public class EventDatabaseThread extends Thread {
 
             if (found_version != CURRENT_VERSION_SCHEMA || EventDatabase.config_hash != found_hash) {
                 connection.close();
-                file.delete();
-                connection = DriverManager.getConnection("jdbc:sqlite:" + filepath);
+                Files.delete(path);
+                connection = DriverManager.getConnection("jdbc:sqlite:" + path);
                 createSchema();
             }
         } else {
