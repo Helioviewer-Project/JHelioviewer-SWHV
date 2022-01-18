@@ -75,8 +75,7 @@ class JHVInit {
         String fullDir = "/jhv/" + pathlib;
         xtract.parallelStream().forEach(x -> {
             try (InputStream in = FileUtils.getResource(fullDir + x)) {
-                Path p = Path.of(JHVGlobals.libCacheDir, x);
-                Files.copy(in, p);
+                Files.copy(in, Path.of(JHVGlobals.libCacheDir, x));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
