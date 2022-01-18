@@ -2,7 +2,6 @@ package org.helioviewer.jhv;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
@@ -29,7 +28,7 @@ public class Settings {
     private static final Properties settings = new Properties(defaults);
 
     public static void load() {
-        try (BufferedReader reader = Files.newBufferedReader(userPath, StandardCharsets.UTF_8)) {
+        try (BufferedReader reader = Files.newBufferedReader(userPath)) {
             settings.load(reader);
         } catch (Exception e) {
             Log.warn(e);
@@ -47,7 +46,7 @@ public class Settings {
     public static void setProperty(String key, String val) {
         if (!val.equals(getProperty(key))) {
             settings.setProperty(key, val);
-            try (BufferedWriter writer = Files.newBufferedWriter(userPath, StandardCharsets.UTF_8)) {
+            try (BufferedWriter writer = Files.newBufferedWriter(userPath)) {
                 settings.store(writer, null);
             } catch (Exception e) {
                 Log.warn(e);

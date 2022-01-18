@@ -3,7 +3,6 @@ package org.helioviewer.jhv.layers.selector;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -37,7 +36,7 @@ import com.google.common.util.concurrent.FutureCallback;
 public class State {
 
     public static void save(String dir, String file) {
-        try (BufferedWriter writer = Files.newBufferedWriter(Path.of(dir, file), StandardCharsets.UTF_8)) {
+        try (BufferedWriter writer = Files.newBufferedWriter(Path.of(dir, file))) {
             toJson().write(writer);
         } catch (IOException e) {
             Log.error(e);

@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -140,7 +139,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
             String outFileName = JHVDirectory.EXPORTS.getPath() + m.getDisplayName().replace(' ', '_') + "__" + TimeUtils.formatFilename(m.getViewpoint().time.milli) + ".fits.xml";
             exportFitsButton.setEnabled(true);
             exportFitsButton.addActionListener(e -> new Thread(() -> {
-                try (BufferedWriter writer = Files.newBufferedWriter(Path.of(outFileName), StandardCharsets.UTF_8)) {
+                try (BufferedWriter writer = Files.newBufferedWriter(Path.of(outFileName))) {
                     writer.write(xml, 0, xml.length());
                     EventQueue.invokeLater(() -> JHVGlobals.displayNotification(outFileName));
                 } catch (Exception ex) {

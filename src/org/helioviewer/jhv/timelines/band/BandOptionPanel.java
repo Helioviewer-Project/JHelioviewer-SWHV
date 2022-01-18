@@ -5,7 +5,6 @@ import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.BufferedWriter;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -72,7 +71,7 @@ class BandOptionPanel extends JPanel {
             JSONObject jo = band.toJson();
 
             new Thread(() -> {
-                try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+                try (BufferedWriter writer = Files.newBufferedWriter(path)) {
                     jo.write(writer);
                     EventQueue.invokeLater(() -> JHVGlobals.displayNotification(path.toString()));
                 } catch (Exception ex) {
