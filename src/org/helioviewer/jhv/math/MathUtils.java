@@ -8,27 +8,6 @@ public class MathUtils {
     public static final double degra = Math.PI / 180;
 
     /**
-     * Returns the integer, x, closest on the number line such that
-     * min(_side1,_side2) <= x <= max(_side1,_side2).
-     *
-     * @param _val   the value to squeee into the interval
-     * @param _side1 one side of the interval
-     * @param _side2 the other side of the interval
-     * @return the closest value within the interval
-     */
-    public static int squeezeToInterval(int _val, int _side1, int _side2) {
-        int temp = Math.max(_side1, _side2);
-        _side1 = Math.min(_side1, _side2);
-        _side2 = temp;
-        if (_val <= _side1)
-            return _side1;
-        else if (_val >= _side2)
-            return _side2;
-        else
-            return _val;
-    }
-
-    /**
      * Takes and returns the maximum value from the given args.
      *
      * @param _is the values to compare

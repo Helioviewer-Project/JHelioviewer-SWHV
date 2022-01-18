@@ -26,7 +26,7 @@ public class Platform {
         arch = arch.toLowerCase();
 
         if (arch.contains("x86_64") || arch.contains("amd64"))
-            isArch = "x86-64";
+            jhvArch = "x86-64";
         else
             die("Please install Java 64-bit to run JHelioviewer.");
 
@@ -43,7 +43,7 @@ public class Platform {
     private static boolean isLinux = false;
     private static boolean isMacOS = false;
     private static boolean isWindows = false;
-    private static String isArch;
+    private static String jhvArch;
 
     public static boolean isLinux() {
         return isLinux;
@@ -58,7 +58,7 @@ public class Platform {
     }
 
     static String getArch() {
-        return isArch;
+        return jhvArch;
     }
 
 }
