@@ -1,7 +1,11 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.3.1 (pending)
+## JHelioviewer 4.3.1 (2022-01-18)
+
+- Windows: split program directory:
+    - Cache and Downloads to `C:\Users\$USER\AppData\Local\Temp\JHelioviewer-SWHV\`
+    - Exports and rest to `C:\Users\$USER\\JHelioviewer-SWHV\`
 
 ## JHelioviewer 4.3 (2022-01-14)
 

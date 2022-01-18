@@ -136,14 +136,15 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
                 readXMLData(hvSB, root);
             hvArea.setText(hvSB.toString().trim());
 
-            String outFileName = JHVDirectory.EXPORTS.getPath() + m.getDisplayName().replace(' ', '_') + "__" + TimeUtils.formatFilename(m.getViewpoint().time.milli) + ".fits.xml";
+            Path path = Path.of(JHVDirectory.EXPORTS.getPath(),
+                    m.getDisplayName().replace(' ', '_') + "__" + TimeUtils.formatFilename(m.getViewpoint().time.milli) + ".fits.xml");
             exportFitsButton.setEnabled(true);
             exportFitsButton.addActionListener(e -> new Thread(() -> {
-                try (BufferedWriter writer = Files.newBufferedWriter(Path.of(outFileName))) {
+                try (BufferedWriter writer = Files.newBufferedWriter(path)) {
                     writer.write(xml, 0, xml.length());
-                    EventQueue.invokeLater(() -> JHVGlobals.displayNotification(outFileName));
+                    EventQueue.invokeLater(() -> JHVGlobals.displayNotification(path.toString()));
                 } catch (Exception ex) {
-                    Log.error(outFileName, ex);
+                    Log.error("Failed to write metadata", ex);
                 }
             }).start());
         } catch (Exception e) {
