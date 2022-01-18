@@ -1,6 +1,8 @@
 
 # Revision history for JHelioviewer
 
+## JHelioviewer 4.3.2 (pending)
+
 ## JHelioviewer 4.3.1 (2022-01-18)
 
 - Windows: split program directory:
