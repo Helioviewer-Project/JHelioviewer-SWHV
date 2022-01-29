@@ -37,15 +37,13 @@
 
     <target name="prone">
         <mkdir dir="${bin}"/>
-        <property name="javac.jar" location="extra/prone/javac-9+181-r4173-1.jar"/>
         <!-- using github.com/google/error-prone-javac is required when running on JDK 8 -->
         <condition property="jdk9orlater">
             <javaversion atleast="9"/>
         </condition>
 
         <path id="processorpath.ref">
-            <pathelement location="extra/prone/error_prone_core-2.10.0-with-dependencies.jar"/>
-            <pathelement location="extra/prone/jFormatString-3.0.0.jar"/>
+            <pathelement location="extra/prone/error_prone_core-2.11.0-with-dependencies.jar"/>
             <pathelement location="extra/prone/dataflow-errorprone-3.15.0.jar"/>
             <!-- Add annotation processors and Error Prone custom checks here if needed -->
         </path>
