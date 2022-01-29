@@ -51,6 +51,9 @@ public class DataSourcesParser {
                 continue;
 
             if (str != null /* can't happen */ && json.has("sourceId")) { // leaf
+                if (json.isNull("start") || json.isNull("end")) // skip empty datasets
+                    continue;
+
                 int sourceId = json.getInt("sourceId");
                 long start = TimeUtils.parse(TimeUtils.sqlTimeFormatter, json.getString("start"));
                 long end = TimeUtils.parse(TimeUtils.sqlTimeFormatter, json.getString("end"));
