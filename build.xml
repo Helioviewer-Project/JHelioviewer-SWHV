@@ -64,11 +64,13 @@
             <compilerarg value="-processorpath"/>
             <compilerarg pathref="processorpath.ref"/>
             <!-- CatchAndPrintStackTrace - not interesting -->
+            <!-- UnusedVariable - works badly for private records -->
             <compilerarg value="-Xplugin:ErrorProne
                                 -Xep:ReferenceEquality:OFF
                                 -Xep:CatchAndPrintStackTrace:OFF
                                 -Xep:EmptyCatch:OFF
                                 -Xep:UnnecessaryParentheses:OFF
+                                -Xep:UnusedVariable:OFF
                                 "/>
             <classpath>
                 <fileset refid="libfiles"/>
