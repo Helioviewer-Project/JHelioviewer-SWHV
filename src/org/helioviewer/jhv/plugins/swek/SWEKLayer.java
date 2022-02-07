@@ -231,10 +231,10 @@ public class SWEKLayer extends AbstractLayer implements JHVEventListener.Handle,
         Vec3 p1 = q.rotateVector(new Vec3(width2, -height2, 0));
         Vec3 p2 = q.rotateVector(new Vec3(-width2, height2, 0));
         Vec3 p3 = q.rotateVector(new Vec3(width2, height2, 0));
-        p0.add(targetDir);
-        p1.add(targetDir);
-        p2.add(targetDir);
-        p3.add(targetDir);
+        p0.plus(targetDir);
+        p1.plus(targetDir);
+        p2.plus(targetDir);
+        p3.plus(targetDir);
 
         texBuf.putCoord(p0, texCoord[0]);
         texBuf.putCoord(p1, texCoord[1]);

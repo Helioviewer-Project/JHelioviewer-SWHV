@@ -191,6 +191,8 @@ public class SunJSON {
                 toCartesian(v, v.x, v.y, v.z);
                 byte[] color = g.colors.get(0);
 
+                u.minus(c);
+                v.minus(c);
                 for (int j = 0; j <= SUBDIVISIONS; j++) {
                     double a = 2 * Math.PI * j / SUBDIVISIONS;
                     double cost = Math.cos(a);
