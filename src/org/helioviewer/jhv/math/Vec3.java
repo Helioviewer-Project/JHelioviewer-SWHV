@@ -26,10 +26,16 @@ public class Vec3 {
         z = 0;
     }
 
-    public void add(Vec3 vec) {
+    public void plus(Vec3 vec) {
         x += vec.x;
         y += vec.y;
         z += vec.z;
+    }
+
+    public void minus(Vec3 vec) {
+        x -= vec.x;
+        y -= vec.y;
+        z -= vec.z;
     }
 
     public static Vec3 multiply(Vec3 vec1, double s) {
