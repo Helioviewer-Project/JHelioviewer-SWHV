@@ -118,6 +118,38 @@ public class MoviePanel extends JPanel implements ObservationSelector {
                 return true;
             }
         },
+        H2048 {
+            @Override
+            public String toString() {
+                return "2048×2048";
+            }
+
+            @Override
+            protected Dimension getSize() {
+                return new Dimension(2048, 2048);
+            }
+
+            @Override
+            protected boolean isInternal() {
+                return true;
+            }
+        },
+        H2160 {
+            @Override
+            public String toString() {
+                return "3840×2160";
+            }
+
+            @Override
+            protected Dimension getSize() {
+                return new Dimension(3840, 2160);
+            }
+
+            @Override
+            protected boolean isInternal() {
+                return true;
+            }
+        },
         H4096 {
             @Override
             public String toString() {
