@@ -29,11 +29,11 @@ class SoarTable {
                 ColumnInfo col_info = table.getColumnInfo(i);
                 String col_name = col_info.getName();
                 Class<?> col_class = col_info.getContentClass();
-                if ("Item Id".equals(col_name) && String.class.equals(col_class))
+                if ("Item Id".equals(col_name) && String.class == col_class)
                     col_id = i;
-                if ("File Format".equals(col_name) && String.class.equals(col_class))
+                if ("File Format".equals(col_name) && String.class == col_class)
                     col_format = i;
-                if ("File Size".equals(col_name) && Long.class.equals(col_class))
+                if ("File Size".equals(col_name) && Long.class == col_class)
                     col_size = i;
             }
             if (col_id == -1)

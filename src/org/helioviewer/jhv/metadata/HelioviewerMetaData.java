@@ -105,7 +105,7 @@ public class HelioviewerMetaData extends BaseMetaData {
 
         // only if we have LUT
         if (physLUT != null) {
-            unit = m.getString("BUNIT").orElse(unit);
+            unit = m.getString("BUNIT").orElseGet(() -> unit);
             for (Map.Entry<String, String> entry : unitRepl.entrySet())
                 unit = unit.replace(entry.getKey(), entry.getValue());
             unit = unit.intern();
@@ -255,7 +255,8 @@ public class HelioviewerMetaData extends BaseMetaData {
         return switch (timeMode) {
             case Observer -> dateObs;
             case Sun -> new JHVTime((long) (dateObs.milli - distObs * Sun.RadiusMilli + .5));
-            case Earth -> new JHVTime((long) (dateObs.milli - (distObs - distEarth) * Sun.RadiusMilli + .5)); // shortcut, avoids inconsistent results for Earth based observers
+            case Earth ->
+                    new JHVTime((long) (dateObs.milli - (distObs - distEarth) * Sun.RadiusMilli + .5)); // shortcut, avoids inconsistent results for Earth based observers
         };
     }
 
@@ -266,14 +267,14 @@ public class HelioviewerMetaData extends BaseMetaData {
             return new Position(time, earth.distance, earth.lon, earth.lat);
         }
 
-        double distObs = m.getDouble("DSUN_OBS").map(d -> d / Sun.RadiusMeter).orElse(earth.distance);
+        double distObs = m.getDouble("DSUN_OBS").map(d -> d / Sun.RadiusMeter).orElseGet(() -> earth.distance);
         if (observatory.equals("SOHO"))
             distObs *= Sun.L1Factor;
 
         double lon = m.getDouble("HGLN_OBS").map(v -> earth.lon - Math.toRadians(v))
-                .orElseGet(() -> m.getDouble("CRLN_OBS").map(v -> -Math.toRadians(v)).orElse(earth.lon));
+                .orElseGet(() -> m.getDouble("CRLN_OBS").map(v -> -Math.toRadians(v)).orElseGet(() -> earth.lon));
         double lat = m.getDouble("HGLT_OBS").map(Math::toRadians)
-                .orElseGet(() -> m.getDouble("CRLT_OBS").map(Math::toRadians).orElse(earth.lat));
+                .orElseGet(() -> m.getDouble("CRLT_OBS").map(Math::toRadians).orElseGet(() -> earth.lat));
 
         JHVTime time = adjustTime(dateObs, distObs, earth.distance);
         return new Position(time, distObs, lon, lat);
@@ -303,8 +304,8 @@ public class HelioviewerMetaData extends BaseMetaData {
             unitPerPixelY = Math.abs(arcsecPerPixelY * unitPerArcsec);
 
             // Pixel center: FITS = integer from 1, OpenGL = half-integer from 0
-            double sunX = m.getDouble("CRPIX1").orElse((pixelW + 1) / 2.) - .5;
-            double sunY = m.getDouble("CRPIX2").orElse((pixelH + 1) / 2.) - .5;
+            double sunX = m.getDouble("CRPIX1").orElseGet(() -> (pixelW + 1) / 2.) - .5;
+            double sunY = m.getDouble("CRPIX2").orElseGet(() -> (pixelH + 1) / 2.) - .5;
             sunPositionX = unitPerPixelX * sunX;
             sunPositionY = unitPerPixelY * (pixelH - sunY);
 
