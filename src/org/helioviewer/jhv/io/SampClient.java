@@ -61,6 +61,37 @@ public class SampClient extends HubConnector {
         return uri;
     }
 
+    @FunctionalInterface
+    private interface CheckedConsumer<T, U> {
+        void accept(T t, U u) throws Exception;
+    }
+
+    private static class JHVSampHandler extends AbstractMessageHandler {
+
+        private final String type;
+        private final CheckedConsumer<String, Message> consumer;
+
+        JHVSampHandler(String _type, CheckedConsumer<String, Message> _consumer) {
+            super(Collections.singletonMap(_type, harmless));
+            type = _type;
+            consumer = _consumer;
+        }
+
+        @Nullable
+        @Override
+        public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
+            try {
+                String sender = c.getMetadata(senderId).getName();
+                Log.info("{\"sender\": \"" + sender + "\",\"message\": " + SampUtils.toJson(msg, false));
+                consumer.accept(sender, msg);
+            } catch (Exception e) {
+                Log.warn(type, e);
+            }
+            return null;
+        }
+
+    }
+
     private SampClient(ClientProfile _profile) {
         super(_profile);
 
@@ -73,98 +104,55 @@ public class SampClient extends HubConnector {
         meta.put("author.name", "ESA JHelioviewer Team");
         declareMetadata(Metadata.asMetadata(meta));
 
-        addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("image.load.fits", harmless)) {
-            @Nullable
-            @Override
-            public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
-                try {
-                    Object url = msg.getParam("url");
-                    if (url != null) {
-                        URI uri = toURI(url.toString());
-                        EventQueue.invokeLater(() -> Load.fits.get(uri));
-                    }
-                } catch (Exception e) {
-                    Log.warn("image.load.fits", e);
-                }
-                return null;
+        addMessageHandler(new JHVSampHandler("image.load.fits", (sender, msg) -> {
+            Object url = msg.getParam("url");
+            if (url != null) {
+                URI uri = toURI(url.toString());
+                EventQueue.invokeLater(() -> Load.fits.get(uri));
             }
-        });
-        addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("table.load.votable", harmless)) {
-            @Nullable
-            @Override
-            public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
-                try {
-                    Object url = msg.getParam("url");
-                    if (url != null) {
-                        URI uri = toURI(url.toString());
-                        SoarClient.submitTable(uri);
-                    }
-                } catch (Exception e) {
-                    Log.warn("table.load.votable", e);
+        }));
+        // load VOTable only from SOAR
+        addMessageHandler(new JHVSampHandler("table.load.votable", (sender, msg) -> {
+            if ("SolarOrbiterARchive".equals(sender)) {
+                Object url = msg.getParam("url");
+                if (url != null) {
+                    URI uri = toURI(url.toString());
+                    SoarClient.submitTable(uri);
                 }
-                return null;
             }
-        });
+        }));
         // lie about support for FITS tables to get SOAR and SSA to send us (compressed) FITS
-        addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("table.load.fits", harmless)) {
-            @Nullable
-            @Override
-            public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
-                try {
-                    String sender = c.getMetadata(senderId).getName();
-                    if ("SolarOrbiterARchive".equals(sender) || "SSA".equals(sender)) {
-                        Object url = msg.getParam("url");
-                        if (url != null) {
-                            URI uri = toURI(url.toString());
-                            EventQueue.invokeLater(() -> Load.fits.get(uri));
-                        }
-                    }
-                } catch (Exception e) {
-                    Log.warn("table.load.fits", e);
+        addMessageHandler(new JHVSampHandler("table.load.fits", (sender, msg) -> {
+            if ("SolarOrbiterARchive".equals(sender) || "SSA".equals(sender)) {
+                Object url = msg.getParam("url");
+                if (url != null) {
+                    URI uri = toURI(url.toString());
+                    EventQueue.invokeLater(() -> Load.fits.get(uri));
                 }
-                return null;
             }
-        });
+        }));
         // advertise we can load CDF, although we can do only MAG and SWA
-        addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("table.load.cdf", harmless)) {
-            @Nullable
-            @Override
-            public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
-                try {
-                    Object url = msg.getParam("url");
-                    if (url != null) {
-                        URI uri = toURI(url.toString());
-                        EventQueue.invokeLater(() -> Load.cdf.get(uri));
-                    }
-                } catch (Exception e) {
-                    Log.warn("table.load.cdf", e);
-                }
-                return null;
+        addMessageHandler(new JHVSampHandler("table.load.cdf", (sender, msg) -> {
+            Object url = msg.getParam("url");
+            if (url != null) {
+                URI uri = toURI(url.toString());
+                EventQueue.invokeLater(() -> Load.cdf.get(uri));
             }
-        });
-        addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("jhv.load.image", harmless)) {
-            @Nullable
-            @Override
-            public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
-                try {
-                    JSONObject jo = new JSONObject(SampUtils.toJson(msg.getParams(), false));
-                    JSONArray ja = jo.optJSONArray("url");
-                    if (ja == null) {
-                        URI uri = toURI(jo.optString("url"));
-                        EventQueue.invokeLater(() -> Load.image.get(uri));
-                    } else {
-                        ArrayList<URI> uris = new ArrayList<>(ja.length());
-                        for (Object obj : ja) {
-                            uris.add(toURI(obj.toString()));
-                        }
-                        EventQueue.invokeLater(() -> Load.Image.getAll(uris));
-                    }
-                } catch (Exception e) {
-                    Log.warn("jhv.load.image", e);
+        }));
+        addMessageHandler(new JHVSampHandler("jhv.load.image", (sender, msg) -> {
+            JSONObject jo = new JSONObject(SampUtils.toJson(msg.getParams(), false));
+            JSONArray ja = jo.optJSONArray("url");
+            if (ja == null) {
+                URI uri = toURI(jo.optString("url"));
+                EventQueue.invokeLater(() -> Load.image.get(uri));
+            } else {
+                ArrayList<URI> uris = new ArrayList<>(ja.length());
+                for (Object obj : ja) {
+                    uris.add(toURI(obj.toString()));
                 }
-                return null;
+                EventQueue.invokeLater(() -> Load.Image.getAll(uris));
             }
-        });
+        }));
         addMessageHandler(inlineHandler("jhv.load.request", Load.request));
         addMessageHandler(inlineHandler("jhv.load.state", Load.state));
         addMessageHandler(inlineHandler("jhv.load.sunjson", Load.sunJSON));
@@ -174,28 +162,19 @@ public class SampClient extends HubConnector {
     }
 
     private static AbstractMessageHandler inlineHandler(String type, Load.LoadString loader) {
-        return new AbstractMessageHandler(Collections.singletonMap(type, harmless)) {
-            @Nullable
-            @Override
-            public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
-                try {
-                    Object url = msg.getParam("url");
-                    if (url != null) {
-                        URI uri = toURI(url.toString());
-                        EventQueue.invokeLater(() -> loader.get(uri));
-                    } else {
-                        Object value = msg.getParam("value");
-                        if (value != null) {
-                            String json = value.toString();
-                            EventQueue.invokeLater(() -> loader.get(json));
-                        }
-                    }
-                } catch (Exception e) {
-                    Log.warn(type, e);
+        return new JHVSampHandler(type, (sender, msg) -> {
+            Object url = msg.getParam("url");
+            if (url != null) {
+                URI uri = toURI(url.toString());
+                EventQueue.invokeLater(() -> loader.get(uri));
+            } else {
+                Object value = msg.getParam("value");
+                if (value != null) {
+                    String json = value.toString();
+                    EventQueue.invokeLater(() -> loader.get(json));
                 }
-                return null;
             }
-        };
+        });
     }
 
     public static void notifyRequestData() {
