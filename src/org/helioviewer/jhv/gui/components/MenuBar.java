@@ -30,6 +30,7 @@ import org.helioviewer.jhv.gui.actions.ZoomInAction;
 import org.helioviewer.jhv.gui.actions.ZoomOneToOneAction;
 import org.helioviewer.jhv.gui.actions.ZoomOutAction;
 import org.helioviewer.jhv.gui.dialogs.AboutDialog;
+import org.helioviewer.jhv.gui.dialogs.LogDialog;
 import org.helioviewer.jhv.gui.dialogs.PreferencesDialog;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
@@ -114,6 +115,7 @@ public class MenuBar extends JMenuBar {
         helpMenu.add(new OpenURLinBrowserAction("Open Website", "http://www.jhelioviewer.org"));
         helpMenu.add(new CheckUpdateAction());
         helpMenu.addSeparator();
+        helpMenu.add(new ShowDialogAction("Show Log...", new LogDialog()));
         helpMenu.add(new OpenURLinBrowserAction("Report Bug/Request Feature", JHVGlobals.bugURL));
 
         add(helpMenu);

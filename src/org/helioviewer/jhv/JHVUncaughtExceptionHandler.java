@@ -2,14 +2,10 @@ package org.helioviewer.jhv;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import javax.swing.BorderFactory;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -50,9 +46,9 @@ class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
         });
 
         JTextArea textArea = new JTextArea();
-        textArea.setMargin(new Insets(5, 5, 5, 5));
         textArea.setText(msg);
         textArea.setEditable(false);
+        textArea.setLineWrap(true);
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setPreferredSize(new Dimension(600, 400));
 
@@ -62,9 +58,8 @@ class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
         optionPane.setMessage(objects);
         optionPane.setMessageType(JOptionPane.ERROR_MESSAGE);
         optionPane.setOptions(new String[]{"Quit JHelioviewer", "Continue"});
-        JDialog dialog = optionPane.createDialog(null, "JHelioviewer: Fatal Error");
+        optionPane.createDialog("JHelioviewer: Fatal Error").setVisible(true);
 
-        dialog.setVisible(true);
         if ("Quit JHelioviewer".equals(optionPane.getValue()))
             System.exit(1);
     }
@@ -86,12 +81,7 @@ class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
         msg += "\nMessage: " + e.getMessage();
         msg += "\nStacktrace:\n";
         msg += stackTrace + "\n";
-
-        try {
-            msg += "Log:\n" + Files.readString(Path.of(Log.getFilename()));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        msg += "Log:\n" + Log.get();
 
         if (!alreadySent) {
             alreadySent = true;

@@ -1,6 +1,7 @@
 package org.helioviewer.jhv;
 
 import java.lang.StackWalker;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.logging.ConsoleHandler;
@@ -56,8 +57,13 @@ public class Log {
         return msg == null ? caller : caller + " - " + msg;
     }
 
-    static String getFilename() {
-        return filename;
+    public static String get() {
+        try {
+            return Files.readString(Path.of(filename));
+        } catch (Exception e) {
+            Log.error(e);
+            return "Unable to retrieve log";
+        }
     }
 
     public static void info(String msg) {
