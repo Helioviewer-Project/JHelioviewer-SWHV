@@ -100,7 +100,7 @@ import com.jogamp.opengl.util.packrect.RectanglePacker;
  * method of the TextRenderer; the OpenGL resources it uses
  * internally will be cleaned up automatically when the OpenGL
  * context is destroyed.
- *
+ * <p>
  * <b>Note</b> that the TextRenderer may cause the vertex and texture
  * coordinate array buffer bindings to change, or to be unbound. This
  * is important to note if you are using Vertex Buffer Objects (VBOs)

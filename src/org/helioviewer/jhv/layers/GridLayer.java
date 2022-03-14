@@ -189,7 +189,7 @@ public class GridLayer extends AbstractLayer {
         flatLine.renderLine(gl, vp.aspect, LINEWIDTH);
     }
 
-    private void drawGridTextFlat(int size, GridScale scale, Viewport vp) {
+    private static void drawGridTextFlat(int size, GridScale scale, Viewport vp) {
         float w = (float) vp.aspect;
         float h = 1;
         JhvTextRenderer renderer = GLText.getRenderer(size);
