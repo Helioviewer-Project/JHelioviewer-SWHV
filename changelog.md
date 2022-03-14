@@ -3,6 +3,11 @@
 
 ## JHelioviewer 4.3.2 (pending)
 
+- Linux: switch to OpenJRE, GNOME HiDPI users will need to pass the pixel factor as argument at program start, e.g., `jhelioviewer -J-Dsun.java2d.uiScale=2.0`
+- Add more export resolutions
+- Load VOTable from SOAR
+- Add menu option to show the current log
+
 ## JHelioviewer 4.3.1 (2022-01-18)
 
 - Windows: split program directory:

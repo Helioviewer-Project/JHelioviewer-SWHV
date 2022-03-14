@@ -11,9 +11,10 @@ public class OrthoScaleList {
 
     public final List<Vec3> ortho;
     public final List<Vec3> scale;
+    public final int size;
 
     OrthoScaleList(List<Vec3> cart) {
-        int size = cart.size();
+        size = cart.size();
         ortho = new ArrayList<>(size);
         scale = new ArrayList<>(size);
 
