@@ -89,13 +89,14 @@ public class SampClient extends HubConnector {
                 return null;
             }
         });
-        // lie about support for FITS tables to get SSA to send us FITS
+        // lie about support for FITS tables to get SOAR and SSA to send us (compressed) FITS
         addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("table.load.fits", harmless)) {
             @Nullable
             @Override
             public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
-                    if ("SSA".equals(c.getMetadata(senderId).getName())) {
+                    String sender = c.getMetadata(senderId).getName();
+                    if ("SolarOrbiterARchive".equals(sender) || "SSA".equals(sender)) {
                         Object url = msg.getParam("url");
                         if (url != null) {
                             URI uri = toURI(url.toString());
