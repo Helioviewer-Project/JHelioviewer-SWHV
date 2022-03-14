@@ -75,7 +75,7 @@ class Zoom {
         mVelocities.clear();
     }
 
-    private double getAverage(ArrayList<Double> array) {
+    private static double getAverage(ArrayList<Double> array) {
         int size = array.size();
         if (size == 0)
             return 0;
