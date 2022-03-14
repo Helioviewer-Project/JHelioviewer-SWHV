@@ -123,6 +123,8 @@ public class ConnectionLayer extends AbstractLayer implements LoadConnectivity.R
     }
 
     private void drawHCS(Camera camera, Viewport vp, GL2 gl) {
+        if (hcs.size == 0)
+            return;
         if (Display.mode == Display.ProjectionMode.Orthographic) {
             Vec3 first = hcs.ortho.get(0);
             hcsBuf.putVertex(first, Colors.Null);
