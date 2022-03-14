@@ -59,13 +59,16 @@ class FilterPanelFactory {
             if (filter != null) {
                 String filterType = filter.type().toLowerCase();
                 switch (filterType) {
-                    case "doublemaxfilter" -> panels.add(new FilterPanel(supplier, p, generateMinOrMaxSpinner(filterDialog, p), filterDialog, SWEK.Operand.BIGGER_OR_EQUAL, enabled));
-                    case "doubleminfilter" -> panels.add(new FilterPanel(supplier, p, generateMinOrMaxSpinner(filterDialog, p), filterDialog, SWEK.Operand.SMALLER_OR_EQUAL, enabled));
+                    case "doublemaxfilter" ->
+                            panels.add(new FilterPanel(supplier, p, generateMinOrMaxSpinner(filterDialog, p), filterDialog, SWEK.Operand.BIGGER_OR_EQUAL, enabled));
+                    case "doubleminfilter" ->
+                            panels.add(new FilterPanel(supplier, p, generateMinOrMaxSpinner(filterDialog, p), filterDialog, SWEK.Operand.SMALLER_OR_EQUAL, enabled));
                     case "doubleminmaxfilter" -> {
                         panels.add(new FilterPanel(supplier, p, generateMinOrMaxSpinner(filterDialog, p), filterDialog, SWEK.Operand.BIGGER_OR_EQUAL, enabled));
                         panels.add(new FilterPanel(supplier, p, generateMinOrMaxSpinner(filterDialog, p), filterDialog, SWEK.Operand.SMALLER_OR_EQUAL, enabled));
                     }
-                    case "flarefilter" -> panels.add(new FilterPanel(supplier, p, generateFlareSpinner(filterDialog, p), filterDialog, SWEK.Operand.BIGGER_OR_EQUAL, enabled));
+                    case "flarefilter" ->
+                            panels.add(new FilterPanel(supplier, p, generateFlareSpinner(filterDialog, p), filterDialog, SWEK.Operand.BIGGER_OR_EQUAL, enabled));
                     default -> {
                     }
                 }
