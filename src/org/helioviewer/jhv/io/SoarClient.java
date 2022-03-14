@@ -23,7 +23,7 @@ public class SoarClient {
     private static final String QUERY_URL = "http://soar.esac.esa.int/soar-sl-tap/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=";
     private static final String LOAD_URL = "http://soar.esac.esa.int/soar-sl-tap/data?retrieval_type=LAST_PRODUCT&product_type=SCIENCE&data_item_id=";
 
-    private enum FileFormat {CDF, FITS, JP2}
+    enum FileFormat {CDF, FITS, JP2}
 
     public record DataItem(String id, FileFormat format, long size) {
         @Override
@@ -60,6 +60,10 @@ public class SoarClient {
         Load.Image.getAll(jp2Uris);
     }
 
+    static void submitTable(@Nonnull URI uri) {
+        EventQueueCallbackExecutor.pool.submit(new TableQuery(uri), new CallbackTable());
+    }
+
     private static String buildADQL(List<String> descriptors, String level, long start, long end) {
         String desc = String.join("' OR descriptor='", descriptors);
         return "SELECT data_item_id,file_format,filesize FROM v_sc_data_item WHERE " +
@@ -94,11 +98,33 @@ public class SoarClient {
         }
     }
 
+    private record TableQuery(URI uri) implements Callable<List<DataItem>> {
+        @Override
+        public List<DataItem> call() throws Exception {
+            return SoarTable.get(uri);
+        }
+    }
+
     private record Callback(Receiver receiver) implements FutureCallback<List<DataItem>> {
 
         @Override
         public void onSuccess(List<DataItem> result) {
             receiver.setSoarResponse(result);
+        }
+
+        @Override
+        public void onFailure(@Nonnull Throwable t) {
+            Log.error(t);
+            Message.err("An error occurred while querying the server:", t.getMessage(), false);
+        }
+
+    }
+
+    private static class CallbackTable implements FutureCallback<List<DataItem>> {
+
+        @Override
+        public void onSuccess(List<DataItem> result) {
+            submitLoad(result);
         }
 
         @Override

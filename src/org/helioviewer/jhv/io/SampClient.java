@@ -33,7 +33,7 @@ import org.json.JSONObject;
 public class SampClient extends HubConnector {
 
     static {
-        Logger.getLogger("org.astrogrid.samp").setLevel(Level.WARNING); // shutup SAMP info logs
+        Logger.getLogger("org.astrogrid.samp").setLevel(Level.WARNING); // shut-up SAMP info logs
     }
 
     private static final Map<String, String> harmless = Collections.singletonMap("x-samp.mostly-harmless", "1"); // allow SAMP messages from web
@@ -85,6 +85,22 @@ public class SampClient extends HubConnector {
                     }
                 } catch (Exception e) {
                     Log.warn("image.load.fits", e);
+                }
+                return null;
+            }
+        });
+        addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("table.load.votable", harmless)) {
+            @Nullable
+            @Override
+            public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
+                try {
+                    Object url = msg.getParam("url");
+                    if (url != null) {
+                        URI uri = toURI(url.toString());
+                        SoarClient.submitTable(uri);
+                    }
+                } catch (Exception e) {
+                    Log.warn("table.load.votable", e);
                 }
                 return null;
             }
