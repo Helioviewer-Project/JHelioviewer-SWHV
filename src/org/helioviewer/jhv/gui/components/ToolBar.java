@@ -58,8 +58,8 @@ public class ToolBar extends JToolBar {
     private final ButtonText OFFDISK = new ButtonText(Buttons.offDisk, "Corona", "Toggle off-disk corona");
     private final ButtonText PAN = new ButtonText(Buttons.pan, "Pan", "Pan");
     private final ButtonText PROJECTION = new ButtonText(Buttons.projection, "Projection", "Projection");
-    private final ButtonText RESETCAMERA = new ButtonText(Buttons.resetCamera, "Reset Camera", "Reset camera position to default");
-    private final ButtonText RESETCAMERAAXIS = new ButtonText(Buttons.resetCameraAxis, "Reset Camera Axis", "Reset camera axis");
+    private final ButtonText RESETCAMERA = new ButtonText(Buttons.resetCamera, "Reset View", "Reset view to default");
+    private final ButtonText RESETCAMERAAXIS = new ButtonText(Buttons.resetCameraAxis, "Reset Axis", "Reset view axis");
     private final ButtonText ROTATE = new ButtonText(Buttons.rotate, "Rotate", "Rotate");
     private final ButtonText SAMP = new ButtonText(Buttons.samp, "SAMP", "Send SAMP message");
     private final ButtonText TRACK = new ButtonText(Buttons.track, "Track", "Track solar rotation");
