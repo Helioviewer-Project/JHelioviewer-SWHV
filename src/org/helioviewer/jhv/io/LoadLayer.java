@@ -84,7 +84,7 @@ public class LoadLayer {
             layer.unload();
 
             Log.error(t);
-            Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
+            Message.err("An error occurred opening the remote file", t.getMessage());
         }
 
     }
@@ -117,13 +117,13 @@ public class LoadLayer {
             String error = data.optString("error", null);
             if (error != null) {
                 Log.error(error);
-                Message.err("Error getting the data", error, false);
+                Message.err("Error getting the data", error);
                 return null;
             }
             return new URI(data.getString("uri"));
         } catch (SocketTimeoutException e) {
             Log.error("Socket timeout while requesting JPIP URL", e);
-            Message.err("Socket timeout", "Socket timeout while requesting JPIP URL", false);
+            Message.err("Socket timeout", "Socket timeout while requesting JPIP URL.");
         } catch (Exception e) {
             throw new Exception("Invalid response for " + url, e);
         }

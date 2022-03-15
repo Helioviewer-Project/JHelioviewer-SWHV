@@ -96,7 +96,7 @@ class LoadRequest {
         @Override
         public void onFailure(@Nonnull Throwable t) {
             Log.error(t);
-            Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
+            Message.err("An error occurred opening the remote file", t.getMessage());
         }
 
     }
@@ -112,7 +112,7 @@ class LoadRequest {
         public void onFailure(@Nonnull Throwable t) {
             Timelines.dc.setStatus(null);
             Log.error(t);
-            Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
+            Message.err("An error occurred opening the remote file", t.getMessage());
         }
 
     }
