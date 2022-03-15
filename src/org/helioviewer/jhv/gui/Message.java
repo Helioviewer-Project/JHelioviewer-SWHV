@@ -1,46 +1,47 @@
 package org.helioviewer.jhv.gui;
 
+import java.awt.Dimension;
 import java.awt.EventQueue;
 
 import javax.swing.JOptionPane;
-
-import org.helioviewer.jhv.base.Regex;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 public class Message {
 
-    // Format string with at most 70 characters per line
-    private static String formatMessage(String message) {
-        StringBuilder sb = new StringBuilder();
-        int lineLength = 0;
-        for (String word : Regex.Space.split(message)) {
-            if (lineLength + word.length() < 70) {
-                lineLength += word.length() + 1;
-            } else {
-                sb.append('\n');
-                lineLength = word.length() + 1;
-            }
-            sb.append(word);
-            sb.append(' ');
-        }
-        return sb.toString();
-    }
-
-    public static void err(String title, Object msg, boolean exitImmediately) {
+    private static void show(String title, Object msg, int type) {
         if (Thread.currentThread().isInterrupted())
             return;
-        // invoked immediately
-        String str = msg == null || msg.toString().isEmpty() ? "No error details available." : formatMessage(msg.toString());
-        JOptionPane.showMessageDialog(null, (title == null ? "" : title + '\n') + str, exitImmediately ? "Fatal Error" : "Error", JOptionPane.ERROR_MESSAGE);
-        if (exitImmediately)
-            System.exit(-1);
+
+        EventQueue.invokeLater(() -> {
+            String str = msg == null || msg.toString().isEmpty() ? "No details available." : msg.toString();
+
+            JTextArea textArea = new JTextArea();
+            textArea.setText(str);
+            textArea.setEditable(false);
+            textArea.setLineWrap(true);
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            scrollPane.setPreferredSize(new Dimension(600, 400));
+
+            JOptionPane optionPane = new JOptionPane();
+            optionPane.setMessage(scrollPane);
+            optionPane.setMessageType(type);
+            optionPane.setOptions(new String[]{"Close"});
+            optionPane.createDialog(JHVFrame.getFrame(), title).setVisible(true);
+        });
+    }
+
+    public static void err(String title, Object msg) {
+        show(title, msg, JOptionPane.ERROR_MESSAGE);
     }
 
     public static void warn(String title, Object msg) {
-        if (Thread.currentThread().isInterrupted())
-            return;
+        show(title, msg, JOptionPane.WARNING_MESSAGE);
+    }
 
-        String str = msg == null || msg.toString().isEmpty() ? "No warning details available." : formatMessage(msg.toString());
-        EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(null, (title == null ? "" : title + '\n') + str, "Warning", JOptionPane.WARNING_MESSAGE));
+    public static void fatalErr(String msg) {
+        JOptionPane.showMessageDialog(null, msg, "Fatal Error", JOptionPane.ERROR_MESSAGE);
+        System.exit(-1);
     }
 
 }

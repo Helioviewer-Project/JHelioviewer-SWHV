@@ -27,7 +27,7 @@ class JHVInit {
             loadKernels();
         } catch (Exception e) {
             Log.error("Failed to setup native libraries", e);
-            Message.err("Failed to setup native libraries", e.getMessage(), true);
+            Message.fatalErr("Failed to setup native libraries:\n" + e.getMessage());
             return;
         }
 

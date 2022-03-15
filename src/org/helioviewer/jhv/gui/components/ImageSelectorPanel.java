@@ -62,7 +62,7 @@ public class ImageSelectorPanel extends JPanel implements DataSources.Listener {
     public void load(ImageLayer layer, long startTime, long endTime, int cadence) {
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
         if (item == null) { // not valid
-            Message.err("Data is not selected", "There is no information on what to add", false);
+            Message.err("Data is not selected", "There is no information on what to add.");
             return;
         }
 

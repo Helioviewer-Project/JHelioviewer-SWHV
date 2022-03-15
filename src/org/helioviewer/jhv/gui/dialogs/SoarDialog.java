@@ -85,8 +85,7 @@ public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
 
             double size = getTotalSize(items);
             if (size > MAX_SIZE) {
-                Message.err(String.format("Too much data selected for download (%.1fGiB).", size),
-                        String.format("Please reduce the selection to less than %gGiB.", MAX_SIZE), false);
+                Message.err("SOAR error", String.format("Too much data selected for download: %.1fGiB.\nPlease reduce the selection to less than %.1fGiB.", size, MAX_SIZE));
             } else {
                 SoarClient.submitLoad(items);
                 setVisible(false);
