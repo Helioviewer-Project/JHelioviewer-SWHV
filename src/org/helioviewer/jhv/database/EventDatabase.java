@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -444,7 +445,7 @@ public class EventDatabase {
         } catch (Exception e) {
             Log.error(e);
         }
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
     private record Db2DateRange(SWEKSupplier type) implements Callable<List<Interval>> {
@@ -500,7 +501,7 @@ public class EventDatabase {
         } catch (Exception e) {
             Log.error(e);
         }
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
     private record Events2Program(long start, long end, SWEKSupplier type, List<SWEK.Param> params)
@@ -547,7 +548,7 @@ public class EventDatabase {
         } catch (Exception e) {
             Log.error(e);
         }
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
     private record Associations2Program(long start, long end, SWEKSupplier type)
@@ -578,7 +579,7 @@ public class EventDatabase {
         } catch (Exception e) {
             Log.error(e);
         }
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
     private static List<JsonEvent> rel2prog(int event_id, SWEKSupplier type_left, SWEKSupplier type_right, String param_left, String param_right) throws Exception {
@@ -621,7 +622,7 @@ public class EventDatabase {
             }
             return ret;
         }
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
     private record Relations2Program(int event_id, SWEKSupplier type_left, SWEKSupplier type_right, String param_left,
