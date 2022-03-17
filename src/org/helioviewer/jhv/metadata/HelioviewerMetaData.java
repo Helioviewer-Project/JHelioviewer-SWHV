@@ -214,7 +214,7 @@ public class HelioviewerMetaData extends BaseMetaData {
         } else if (instrument.equals("XRT")) {
             measurement = m.getString("EC_FW1_").orElse("") + ' ' + m.getString("EC_FW2_").orElse("");
             displayName = instrument + ' ' + measurement;
-        } else if (instrument.equals("GOES-R Series Solar Ultraviolet Imager")) {
+        } else if (instrument.startsWith("GOES-R Series Solar Ultraviolet Imager")) {
             instrument = "SUVI";
             displayName = instrument + ' ' + measurement;
         } else if (instrument.equals("COSMO K-Coronagraph")) {
