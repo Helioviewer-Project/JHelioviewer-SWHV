@@ -90,7 +90,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
     }
 
     private static String formatXY(double p) {
-        if (Math.abs(p) < 0.5)
+        if (Math.abs(p) < 1) // accomodate SOLO
             return String.format("%+7d\u2033", (int) Math.round(3600 * p));
         else
             return String.format("%+7.2f\u00B0", p);
