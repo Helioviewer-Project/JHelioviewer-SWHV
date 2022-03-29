@@ -33,6 +33,11 @@ public class CameraHelper {
     }
 
     public static double getPixelFactor(Camera camera, Viewport vp) {
+        double width = camera.getCameraWidth();
+        return vp.height / (width < 1 ? Math.cbrt(width) : width); // slow down zoomin of drawings
+    }
+
+    public static double getImagePixelFactor(Camera camera, Viewport vp) {
         return vp.height / camera.getCameraWidth();
     }
 

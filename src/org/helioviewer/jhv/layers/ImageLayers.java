@@ -36,7 +36,7 @@ public class ImageLayers {
         Layers.forEachImageLayer(layer -> {
             int idx = layer.isVisibleIdx();
             if (idx != -1) {
-                double pixFactor = CameraHelper.getPixelFactor(camera, Display.getViewport(idx));
+                double pixFactor = CameraHelper.getImagePixelFactor(camera, Display.getViewport(idx));
                 layer.getView().decode(viewpoint, pixFactor, factor);
             }
         });
