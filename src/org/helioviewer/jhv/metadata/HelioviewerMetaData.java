@@ -155,8 +155,8 @@ public class HelioviewerMetaData extends BaseMetaData {
                 inner = 1.36 * Sun.Radius;
                 outer = 4.5 * Sun.Radius;
             } else if (observatory.equals("STEREO-A") && detector.equals("COR2")) {
-                inner = 2.4 * Sun.Radius;
-                outer = 15.6 * Sun.Radius;
+                inner = 2.6 * Sun.Radius;
+                outer = 15.2 * Sun.Radius;
             } else if (observatory.equals("STEREO-B") && detector.equals("COR1")) {
                 inner = 1.5 * Sun.Radius;
                 outer = 4.9 * Sun.Radius;
