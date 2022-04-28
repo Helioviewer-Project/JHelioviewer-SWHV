@@ -34,20 +34,8 @@ class FITSImage implements URIImageReader {
         try (NetClient nc = NetClient.of(uri);
              InputStream is = FileUtils.decompressStream(nc.getStream());
              Fits f = new Fits(is)) {
-            BasicHDU<?>[] hdus = f.read();
-            // this is cumbersome
-            for (BasicHDU<?> hdu : hdus) {
-                if (hdu instanceof CompressedImageHDU) {
-                    return readHeader(((CompressedImageHDU) hdu).asImageHDU());
-                }
-            }
-            for (BasicHDU<?> hdu : hdus) {
-                if (hdu instanceof ImageHDU) {
-                    return readHeader(hdu);
-                }
-            }
+            return getHeaderAsXML(findHDU(f).getHeader());
         }
-        throw new Exception("No image found");
     }
 
     @Nullable
@@ -56,24 +44,24 @@ class FITSImage implements URIImageReader {
         try (NetClient nc = NetClient.of(uri);
              InputStream is = FileUtils.decompressStream(nc.getStream());
              Fits f = new Fits(is)) {
-            BasicHDU<?>[] hdus = f.read();
-            // this is cumbersome
-            for (BasicHDU<?> hdu : hdus) {
-                if (hdu instanceof CompressedImageHDU) {
-                    return readHDU(((CompressedImageHDU) hdu).asImageHDU(), minMax);
-                }
+            return readHDU(findHDU(f), minMax);
+        }
+    }
+
+    private static ImageHDU findHDU(Fits fits) throws Exception {
+        BasicHDU<?>[] hdus = fits.read();
+        // this is cumbersome
+        for (BasicHDU<?> hdu : hdus) {
+            if (hdu instanceof CompressedImageHDU chdu) {
+                return chdu.asImageHDU();
             }
-            for (BasicHDU<?> hdu : hdus) {
-                if (hdu instanceof ImageHDU) {
-                    return readHDU(hdu, minMax);
-                }
+        }
+        for (BasicHDU<?> hdu : hdus) {
+            if (hdu instanceof ImageHDU ihdu && ihdu.getAxes() != null /* might be an extension */) {
+                return ihdu;
             }
         }
         throw new Exception("No image found");
-    }
-
-    private static String readHeader(BasicHDU<?> hdu) {
-        return getHeaderAsXML(hdu.getHeader());
     }
 
     private static final double GAMMA = 1 / 2.2;
