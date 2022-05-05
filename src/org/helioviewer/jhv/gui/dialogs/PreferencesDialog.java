@@ -166,18 +166,12 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
 
         c.gridx = 1;
         c.gridy = 3;
-        JCheckBox highResolution = new JCheckBox("Playback at high resolution", Boolean.parseBoolean(Settings.getProperty("display.highResolution")));
-        highResolution.addActionListener(e -> Settings.setProperty("display.highResolution", Boolean.toString(highResolution.isSelected())));
-        settings.add(highResolution, c);
-
-        c.gridx = 1;
-        c.gridy = 4;
         JCheckBox normalizeAIA = new JCheckBox("Normalize SDO/AIA brightness", Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA")));
         normalizeAIA.addActionListener(e -> Settings.setProperty("display.normalizeAIA", Boolean.toString(normalizeAIA.isSelected())));
         settings.add(normalizeAIA, c);
 
         c.gridx = 1;
-        c.gridy = 5;
+        c.gridy = 4;
         JCheckBox normalizeRadius = new JCheckBox("Normalize solar radius", Boolean.parseBoolean(Settings.getProperty("display.normalize")));
         normalizeRadius.addActionListener(e -> Settings.setProperty("display.normalize", Boolean.toString(normalizeRadius.isSelected())));
         settings.add(normalizeRadius, c);
@@ -203,15 +197,15 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         }
 
         c.gridx = 1;
-        c.gridy = 6;
+        c.gridy = 5;
         settings.add(timePanel, c);
 
         c.gridx = 0;
-        c.gridy = 7;
+        c.gridy = 6;
         settings.add(new JLabel("Record video as:", JLabel.RIGHT), c);
 
         c.gridx = 1;
-        c.gridy = 7;
+        c.gridy = 6;
         JComboBox<VideoFormat> comboVideo = new JComboBox<>(VideoFormat.values());
         VideoFormat videoFormat = VideoFormat.H264;
         try {
@@ -223,7 +217,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         settings.add(comboVideo, c);
 
         c.gridx = 0;
-        c.gridy = 8;
+        c.gridy = 7;
         settings.add(new JLabel("Plugins:", JLabel.RIGHT), c);
 
         c.gridx = 1;

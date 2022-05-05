@@ -12,7 +12,6 @@ import javax.annotation.Nullable;
 import kdu_jni.KduException;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
@@ -42,7 +41,6 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 public class J2KView extends BaseView {
 
     private static final AtomicInteger global_serial = new AtomicInteger(0);
-    private static final int HIRES_CUTOFF = Boolean.parseBoolean(Settings.getProperty("display.highResolution")) ? 4096 : 1280;
 
     private static final Cache<DecodeParams, ImageBuffer> decodeCache = Caffeine.newBuilder().softValues().build();
 
@@ -260,24 +258,16 @@ public class J2KView extends BaseView {
 
     protected DecodeParams getDecodeParams(Position viewpoint, int frame, double pixFactor, float factor) {
         ResolutionLevel res;
-        SubImage subImage;
-
         if (Movie.isRecording()) { // all bets are off
             res = cacheStatus.getResolutionSet(frame).getResolutionLevel(0);
-            subImage = new SubImage(0, 0, res.width, res.height, res.width, res.height);
             factor = 1;
         } else {
             MetaData m = metaData[frame];
             int reqHeight = (int) (m.getPhysicalRegion().height * pixFactor + .5);
-
             res = cacheStatus.getResolutionSet(frame).getNextResolutionLevel(reqHeight, reqHeight);
-            subImage = new SubImage(0, 0, res.width, res.height, res.width, res.height);
-
-            int maxDim = Math.max(res.width, res.height);
-            if (maxDim > HIRES_CUTOFF && Movie.isPlaying()) {
-                factor = Math.min(factor, 0.5f);
-            }
         }
+
+        SubImage subImage = new SubImage(0, 0, res.width, res.height, res.width, res.height);
         AtomicBoolean status = cacheStatus.getFrameStatus(frame, res.level); // before signalling to reader
         return new DecodeParams(serial, frame, subImage, res.level, factor, status != null && status.get(), viewpoint);
     }
