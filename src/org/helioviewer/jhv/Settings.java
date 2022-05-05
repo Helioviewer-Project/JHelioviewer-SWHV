@@ -17,7 +17,6 @@ public class Settings {
             super.setProperty("startup.sampHub", "true");
             super.setProperty("display.normalizeAIA", "true");
             super.setProperty("display.normalize", "false");
-            super.setProperty("display.highResolution", "false");
             super.setProperty("display.time", "Observer");
             super.setProperty("timeout.read", "120000");
             super.setProperty("timeout.connect", "30000");
