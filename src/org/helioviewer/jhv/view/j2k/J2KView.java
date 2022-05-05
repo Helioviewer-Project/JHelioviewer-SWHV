@@ -267,9 +267,8 @@ public class J2KView extends BaseView {
             res = cacheStatus.getResolutionSet(frame).getNextResolutionLevel(reqHeight, reqHeight);
         }
 
-        SubImage subImage = new SubImage(0, 0, res.width, res.height, res.width, res.height);
         AtomicBoolean status = cacheStatus.getFrameStatus(frame, res.level); // before signalling to reader
-        return new DecodeParams(serial, frame, subImage, res.level, factor, status != null && status.get(), viewpoint);
+        return new DecodeParams(serial, frame, res.subImage, res.level, factor, status != null && status.get(), viewpoint);
     }
 
     private int currentLevel = 10000;
