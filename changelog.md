@@ -7,6 +7,7 @@
 - Add more export resolutions
 - Load VOTable from SOAR
 - Add menu option to show the current log
+- Always playback at high resolution
 
 ## JHelioviewer 4.3.1 (2022-01-18)
 
