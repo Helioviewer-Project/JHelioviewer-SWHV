@@ -1,7 +1,7 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.3.2 (pending)
+## JHelioviewer 4.3.2 (2022-05-11)
 
 - Linux: switch to OpenJRE, GNOME HiDPI users will need to pass the pixel factor as argument at program start, e.g., `jhelioviewer -J-Dsun.java2d.uiScale=2.0`
 - Add more export resolutions
