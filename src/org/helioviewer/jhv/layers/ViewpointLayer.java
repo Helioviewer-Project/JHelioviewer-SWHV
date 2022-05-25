@@ -99,7 +99,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
             }
         }
 
-        double pixFactor = CameraHelper.getPixelFactor(camera, vp);
+        double pixFactor = Math.cbrt(CameraHelper.getPixelFactor(camera, vp)); // temperate scaling of planets
         Position viewpoint = camera.getViewpoint();
 
         Transform.pushView();
