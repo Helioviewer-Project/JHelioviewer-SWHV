@@ -43,8 +43,6 @@ class GenericImage implements URIImageReader {
                 Object text = root.getElementsByTagName("TextEntry").item(0);
                 if (text instanceof IIOMetadataNode) {
                     xml = ((IIOMetadataNode) text).getAttribute("value");
-                    if (xml != null) // coverity
-                        xml = xml.trim().replace("&", "&amp;");
                 }
             } catch (Exception e) {
                 Log.error(uri.toString(), e);
