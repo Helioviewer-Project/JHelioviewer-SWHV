@@ -28,6 +28,7 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -56,6 +57,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         fitsTable.getColumnModel().getColumn(0).setMinWidth(keywordWidth);
         fitsTable.getColumnModel().getColumn(0).setMaxWidth(keywordWidth);
         fitsTable.getColumnModel().getColumn(1).setCellRenderer(new WrappedTable.WrappedTextRenderer());
+        fitsTable.getColumnModel().getColumn(2).setCellRenderer(new WrappedTable.WrappedTextRenderer());
 
         setInitFocusedComponent(fitsTable);
         com.jidesoft.swing.SearchableUtils.installSearchable(fitsTable);
@@ -155,7 +157,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
     private static class FitsModel extends DefaultTableModel {
 
         FitsModel() {
-            super(new String[0][0], new String[]{"Keyword", "Value"});
+            super(new String[0][0][0], new String[]{"Keyword", "Value", "Comment"});
         }
 
         @Override
@@ -177,6 +179,10 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         String nodeName = node.getNodeName();
         String nodeValue = getElementValue(node);
 
+        Node attrNode;
+        NamedNodeMap attributes = node.getAttributes();
+        String nodeComment = attributes != null && (attrNode = attributes.getNamedItem("comment")) != null ? attrNode.getNodeValue().trim() : "&nbsp;";
+
         switch (nodeName) {
             case "fits":
             case "helioviewer":
@@ -184,7 +190,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
                 break;
             default:
                 if ("fits".equals(lastNodeSeen))
-                    fitsModel.addRow(new String[]{nodeName, nodeValue});
+                    fitsModel.addRow(new String[]{nodeName, nodeValue, nodeComment});
                 else
                     hvSB.append(nodeName).append(": ").append(nodeValue).append("<br/>");
                 break;
