@@ -24,6 +24,7 @@ import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.math.MathUtils;
 
 import com.google.common.primitives.Floats;
+import com.google.common.xml.XmlEscapers;
 
 // essentially static; local or network cache
 class FITSImage implements URIImageReader {
@@ -210,13 +211,18 @@ class FITSImage implements URIImageReader {
         for (Cursor<String, HeaderCard> iter = header.iterator(); iter.hasNext(); ) {
             HeaderCard headerCard = iter.next();
             String key = headerCard.getKey();
+            if ("END".equals(key))
+                continue;
+
             String value = headerCard.getValue();
-            if (value != null) {
-                builder.append('<').append(key).append('>').append(value).append("</").append(key).append('>').append(nl);
-            }
+            String val = value == null || value.trim().isEmpty() ? "" : XmlEscapers.xmlContentEscaper().escape(value.trim());
+            String comment = headerCard.getComment();
+            String com = comment == null || comment.trim().isEmpty() ? "" : " comment=\"" + XmlEscapers.xmlAttributeEscaper().escape(comment.trim()) + "\"";
+
+            builder.append('<').append(key).append(com).append('>').append(val).append("</").append(key).append('>').append(nl);
         }
         builder.append("</fits>").append(nl).append("</meta>");
-        return builder.toString().replace("&", "&amp;");
+        return builder.toString();
     }
 
 }
