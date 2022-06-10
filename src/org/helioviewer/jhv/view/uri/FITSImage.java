@@ -215,9 +215,9 @@ class FITSImage implements URIImageReader {
                 continue;
 
             String value = headerCard.getValue();
-            String val = value == null || value.trim().isEmpty() ? "" : XmlEscapers.xmlContentEscaper().escape(value.trim());
+            String val = value == null ? "" : XmlEscapers.xmlContentEscaper().escape(value);
             String comment = headerCard.getComment();
-            String com = comment == null || comment.trim().isEmpty() ? "" : " comment=\"" + XmlEscapers.xmlAttributeEscaper().escape(comment.trim()) + "\"";
+            String com = comment == null ? "" : " comment=\"" + XmlEscapers.xmlAttributeEscaper().escape(comment) + "\"";
 
             builder.append('<').append(key).append(com).append('>').append(val).append("</").append(key).append('>').append(nl);
         }
