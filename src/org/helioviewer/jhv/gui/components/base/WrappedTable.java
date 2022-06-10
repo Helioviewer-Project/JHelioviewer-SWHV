@@ -22,13 +22,16 @@ public class WrappedTable extends JTable {
     //     updateRowHeights();
     // }
 
-    private void updateRowHeights() {
-        int rows = getRowCount();
-        for (int i = 0; i < rows; i++) {
-            Component comp = prepareRenderer(getCellRenderer(i, 1), i, 1);
-            Dimension dim = comp.getPreferredSize();
-            if (dim != null) // satisfy coverity
-                setRowHeight(i, dim.height);
+    public void updateRowHeights() {
+        for (int i = 0; i < getRowCount(); i++) {
+            int height = 0;
+            for (int j = 0; j < getColumnCount(); j++) {
+                Component comp = prepareRenderer(getCellRenderer(i, j), i, j);
+                Dimension dim = comp.getPreferredSize();
+                if (dim != null && dim.height > height) // satisfy coverity
+                    height = dim.height;
+            }
+            setRowHeight(i, height);
         }
     }
 

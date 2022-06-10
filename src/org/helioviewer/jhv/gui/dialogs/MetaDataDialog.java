@@ -136,7 +136,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
             root = doc.getDocumentElement().getElementsByTagName("helioviewer").item(0);
             if (root != null)
                 readXMLData(hvSB, root);
-            hvArea.setText(hvSB.toString().trim());
+            hvArea.setText(hvSB.toString());
 
             Path path = Path.of(JHVDirectory.EXPORTS.getPath(),
                     m.getDisplayName().replace(' ', '_') + "__" + TimeUtils.formatFilename(m.getViewpoint().time.milli) + ".fits.xml");
@@ -181,7 +181,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
 
         Node attrNode;
         NamedNodeMap attributes = node.getAttributes();
-        String nodeComment = attributes != null && (attrNode = attributes.getNamedItem("comment")) != null ? attrNode.getNodeValue().trim() : "&nbsp;";
+        String nodeComment = attributes != null && (attrNode = attributes.getNamedItem("comment")) != null ? attrNode.getNodeValue() : "";
 
         switch (nodeName) {
             case "fits":
@@ -221,12 +221,11 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         if (elem != null && elem.hasChildNodes()) {
             for (Node child = elem.getFirstChild(); child != null; child = child.getNextSibling()) {
                 if (child.getNodeType() == Node.TEXT_NODE) {
-                    String value = child.getNodeValue().trim();
-                    return value.isEmpty() ? "&nbsp;" : value; //! avoid row crush by WrappedTable
+                    return child.getNodeValue();
                 }
             }
         }
-        return "&nbsp;";
+        return "";
     }
 
 }
