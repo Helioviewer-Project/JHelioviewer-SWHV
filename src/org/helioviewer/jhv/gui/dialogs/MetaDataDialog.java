@@ -43,13 +43,13 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
     private final JButton exportFitsButton = new JButton("Export FITS Header as XML");
 
     private final FitsModel fitsModel = new FitsModel();
+    private final WrappedTable fitsTable = new WrappedTable();
     private final HTMLPane basicArea = new HTMLPane();
     private final HTMLPane hvArea = new HTMLPane();
 
     public MetaDataDialog() {
         super(JHVFrame.getFrame(), "Image Information");
 
-        WrappedTable fitsTable = new WrappedTable();
         fitsTable.setModel(fitsModel);
         fitsTable.setRowSorter(new TableRowSorter<>(fitsModel));
         fitsTable.setIntercellSpacing(new Dimension(0, 0));
@@ -101,6 +101,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
 
     @Override
     public void showDialog() {
+        fitsTable.updateRowHeights();
         pack();
         setLocationRelativeTo(JHVFrame.getFrame());
         setVisible(true);
@@ -109,7 +110,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
     public void setMetaData(ImageLayer layer) {
         fitsModel.setRowCount(0);
         hvArea.setText("");
-        hvArea.setPreferredSize(new Dimension(400, 100));
+        hvArea.setPreferredSize(new Dimension(600, 100));
         lastNodeSeen = null;
         exportFitsButton.setEnabled(false);
 
