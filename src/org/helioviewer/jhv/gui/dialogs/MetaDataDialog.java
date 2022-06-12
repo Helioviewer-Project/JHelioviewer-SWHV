@@ -184,6 +184,11 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         NamedNodeMap attributes = node.getAttributes();
         String nodeComment = attributes != null && (attrNode = attributes.getNamedItem("comment")) != null ? attrNode.getNodeValue() : "";
 
+        if ("COMMENT".equals(nodeName) || "HISTORY".equals(nodeName)) {
+            nodeValue = nodeComment;
+            nodeComment = "";
+        }
+
         switch (nodeName) {
             case "fits":
             case "helioviewer":
