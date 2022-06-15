@@ -126,7 +126,7 @@ public class Camera {
         return dragRotation;
     }
 
-    void rotateDragRotation(Quat _dragRotation) {
+    public void rotateDragRotation(Quat _dragRotation) {
         dragRotation = Quat.rotate(dragRotation, _dragRotation);
         updateRotation();
     }

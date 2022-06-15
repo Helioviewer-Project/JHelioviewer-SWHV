@@ -21,6 +21,7 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.actions.ClearAnnotationsAction;
 import org.helioviewer.jhv.gui.actions.ResetCameraAction;
 import org.helioviewer.jhv.gui.actions.ResetCameraAxisAction;
+import org.helioviewer.jhv.gui.actions.Rotate90CameraAction;
 import org.helioviewer.jhv.gui.actions.SDOCutOutAction;
 import org.helioviewer.jhv.gui.actions.ZoomFOVAnnotationAction;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
@@ -30,6 +31,7 @@ import org.helioviewer.jhv.gui.actions.ZoomOutAction;
 import org.helioviewer.jhv.io.SampClient;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.MovieDisplay;
+import org.helioviewer.jhv.math.Vec3;
 
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideToggleButton;
@@ -61,6 +63,7 @@ public class ToolBar extends JToolBar {
     private final ButtonText RESETCAMERA = new ButtonText(Buttons.resetCamera, "Reset View", "Reset view to default");
     private final ButtonText RESETCAMERAAXIS = new ButtonText(Buttons.resetCameraAxis, "Reset Axis", "Reset view axis");
     private final ButtonText ROTATE = new ButtonText(Buttons.rotate, "Rotate", "Rotate");
+    private final ButtonText ROTATE90 = new ButtonText(Buttons.rotate90, "Rotate View 90\u00B0", "Rotate view 90\u00B0");
     private final ButtonText SAMP = new ButtonText(Buttons.samp, "SAMP", "Send SAMP message");
     private final ButtonText TRACK = new ButtonText(Buttons.track, "Track", "Track solar rotation");
     private final ButtonText ZOOMFIT = new ButtonText(Buttons.zoomFit, "Zoom-Fit", "Zoom to fit");
@@ -150,11 +153,25 @@ public class ToolBar extends JToolBar {
         JideButton resetCameraAxis = toolButton(RESETCAMERAAXIS);
         resetCameraAxis.addActionListener(new ResetCameraAxisAction());
 
+        JideButton rotate90Button = toolButton(ROTATE90);
+        JPopupMenu rotate90Popup = new JPopupMenu();
+        rotate90Popup.add(new Rotate90CameraAction("X Axis", Vec3.XAxis));
+        rotate90Popup.add(new Rotate90CameraAction("Y Axis", Vec3.YAxis));
+        rotate90Popup.add(new Rotate90CameraAction("Z Axis", Vec3.ZAxis));
+
+        rotate90Button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                rotate90Popup.show(e.getComponent(), 0, e.getComponent().getHeight());
+            }
+        });
+
         addButton(zoomIn);
         addButton(zoomOut);
         addButton(zoomFit);
         addButton(zoomOne);
         add(new JToolBar.Separator(dim));
+        addButton(rotate90Button);
         addButton(resetCameraAxis);
         addButton(resetCamera);
         add(new JToolBar.Separator(dim));

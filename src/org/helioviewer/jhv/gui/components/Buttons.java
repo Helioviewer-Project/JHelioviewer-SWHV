@@ -71,6 +71,7 @@ public class Buttons {
     public static final String resetCamera = toolBar(MaterialDesign.IMAGE_FILTER_CENTER_FOCUS);
     public static final String resetCameraAxis = toolBar(MaterialDesign.DEBUG_STEP_OUT);
     public static final String rotate = toolBar(MaterialDesign.ROTATE_3D);
+    public static final String rotate90 = toolBar(MaterialDesign.ROTATE_90);
     public static final String samp = toolBar(MaterialDesign.SHARE_VARIANT);
     public static final String track = toolBar(MaterialDesign.CROSSHAIRS_GPS);
     public static final String zoomFit = toolBar(MaterialDesign.CROP_LANDSCAPE);
