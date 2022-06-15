@@ -72,6 +72,13 @@ public class ConnectionLayer extends AbstractLayer implements LoadConnectivity.R
 
     private JHVTime lastTimestamp;
 
+    private void updateTimestamp(JHVTime timestamp) {
+        if (!timestamp.equals(lastTimestamp)) {
+            lastTimestamp = timestamp;
+            JHVFrame.getLayers().fireTimeUpdated(this);
+        }
+    }
+
     @Override
     public void serialize(JSONObject jo) {
     }
@@ -91,8 +98,11 @@ public class ConnectionLayer extends AbstractLayer implements LoadConnectivity.R
         if (footpointMap != null)
             drawFootpointInterpolated(camera, vp, gl);
 
-        if (!geometryMap.isEmpty())
-            geometryMap.nearestValue(camera.getViewpoint().time).render(gl, geometryLine, geometryPoint, vp.aspect, CameraHelper.getPixelFactor(camera, vp));
+        if (!geometryMap.isEmpty()) {
+            SunJSON.GeometryCollection g = geometryMap.nearestValue(camera.getViewpoint().time);
+            updateTimestamp(g.time());
+            g.render(gl, geometryLine, geometryPoint, vp.aspect, CameraHelper.getPixelFactor(camera, vp));
+        }
     }
 
     @Override
@@ -164,29 +174,9 @@ public class ConnectionLayer extends AbstractLayer implements LoadConnectivity.R
         return new Vec3(1, Math.acos(y), Math.atan2(x, z));
     }
 
-    /*
-        private void drawFootpointNearest(Camera camera, Viewport vp, GL2 gl) {
-            Position viewpoint = camera.getViewpoint();
-            PositionCartesian p = footpointMap.nearestValue(viewpoint.time);
-            if (!p.time.equals(lastTimestamp)) {
-                lastTimestamp = p.time; // should be reset to null
-                JHVFrame.getLayers().fireTimeUpdated(this);
-            }
-
-            Vec3 v = new Vec3(1, Math.acos(p.y), Math.atan2(p.x, p.z));
-            Quat q = Display.getGridType().toGrid(viewpoint);
-
-            AnnotateCross.drawCross(q, vp, v, footpointBuf, footpointColor);
-            footpointLine.setVertex(gl, footpointBuf);
-            footpointLine.render(gl, vp.aspect, LINEWIDTH);
-        }
-    */
     private void drawFootpointInterpolated(Camera camera, Viewport vp, GL2 gl) {
         Position viewpoint = camera.getViewpoint();
-        if (!viewpoint.time.equals(lastTimestamp)) {
-            lastTimestamp = viewpoint.time;
-            JHVFrame.getLayers().fireTimeUpdated(this);
-        }
+        updateTimestamp(viewpoint.time);
 
         Vec3 v = interpolate(viewpoint.time.milli, footpointMap.lowerValue(viewpoint.time), footpointMap.higherValue(viewpoint.time));
         Quat q = Display.gridType.toGrid(viewpoint);
@@ -284,6 +274,7 @@ public class ConnectionLayer extends AbstractLayer implements LoadConnectivity.R
             hcs = null;
             footpointMap = null;
             geometryMap.clear();
+            lastTimestamp = null;
             MovieDisplay.display();
         });
 
