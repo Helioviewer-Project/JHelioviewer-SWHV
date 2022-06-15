@@ -128,7 +128,7 @@ class ImageFilter {
             filter.gaussianConvImage(conv2, conv2, width, height);
 
             for (int i = 0; i < size; ++i)
-                conv[i] = (float) (weight * MathUtils.clip(conv[i] / Math.sqrt(conv2[i]), -1, 1));
+                conv[i] = conv2[i] == 0 ? 0 : (float) (weight * MathUtils.clip(conv[i] / Math.sqrt(conv2[i]), -1, 1));
 
             return conv;
         }
