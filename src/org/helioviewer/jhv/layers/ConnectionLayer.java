@@ -6,7 +6,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.File;
 import java.net.URI;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiConsumer;
 
 import javax.annotation.Nullable;
@@ -68,7 +68,7 @@ public class ConnectionLayer extends AbstractLayer implements LoadConnectivity.R
     private Connectivity connectivity;
     private OrthoScaleList hcs;
     private TimeMap<Position.Cartesian> footpointMap;
-    private final ArrayList<SunJSON.GeometryCollection> geometryList = new ArrayList<>();
+    private final TimeMap<SunJSON.GeometryCollection> geometryMap = new TimeMap<>();
 
     private JHVTime lastTimestamp;
 
@@ -90,7 +90,7 @@ public class ConnectionLayer extends AbstractLayer implements LoadConnectivity.R
             drawHCS(camera, vp, gl);
         if (footpointMap != null)
             drawFootpointInterpolated(camera, vp, gl);
-        geometryList.forEach(g -> g.render(gl, geometryLine, geometryPoint, vp.aspect, CameraHelper.getPixelFactor(camera, vp)));
+        geometryMap.nearestValue(camera.getViewpoint().time).render(gl, geometryLine, geometryPoint, vp.aspect, CameraHelper.getPixelFactor(camera, vp));
     }
 
     @Override
@@ -269,8 +269,9 @@ public class ConnectionLayer extends AbstractLayer implements LoadConnectivity.R
     }
 
     @Override
-    public void setGeometry(SunJSON.GeometryCollection geometry) {
-        geometryList.add(geometry);
+    public void setGeometry(List<SunJSON.GeometryCollection> geometry) {
+        geometry.forEach(g -> geometryMap.put(g.time(), g));
+        geometryMap.buildIndex();
         MovieDisplay.display();
     }
 
@@ -280,7 +281,7 @@ public class ConnectionLayer extends AbstractLayer implements LoadConnectivity.R
             connectivity = null;
             hcs = null;
             footpointMap = null;
-            geometryList.clear();
+            geometryMap.clear();
             MovieDisplay.display();
         });
 

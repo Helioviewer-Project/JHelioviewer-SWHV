@@ -64,7 +64,7 @@ class DropHandler extends TransferHandler {
                 }
 
                 // jsonUris.forEach(Load.request::get);
-                jsonUris.forEach(Load.sunJSON::get);
+                Load.SunJSON.getAll(jsonUris);
                 Load.CDF.getAll(cdfUris);
                 Load.Image.getAll(imageUris);
 

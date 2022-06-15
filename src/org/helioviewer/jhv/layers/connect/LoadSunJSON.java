@@ -1,7 +1,10 @@
 package org.helioviewer.jhv.layers.connect;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
@@ -17,13 +20,13 @@ import com.google.common.util.concurrent.FutureCallback;
 public class LoadSunJSON {
 
     public interface Receiver {
-        void setGeometry(SunJSON.GeometryCollection g);
+        void setGeometry(List<SunJSON.GeometryCollection> g);
     }
 
-    public static void submit(@Nonnull URI uri) {
+    public static void submit(@Nonnull List<URI> uriList) {
         Receiver receiver = Layers.getConnectionLayer();
         if (receiver != null) // ConnectionLayer() can be null in current releases
-            EventQueueCallbackExecutor.pool.submit(new LoadSunJSONURI(uri), new Callback(receiver));
+            EventQueueCallbackExecutor.pool.submit(new LoadSunJSONURI(uriList), new Callback(receiver));
     }
 
     public static void submit(@Nonnull String json) {
@@ -32,24 +35,32 @@ public class LoadSunJSON {
             EventQueueCallbackExecutor.pool.submit(new LoadSunJSONString(json), new Callback(receiver));
     }
 
-    private record LoadSunJSONURI(URI uri) implements Callable<SunJSON.GeometryCollection> {
+    private record LoadSunJSONURI(List<URI> uriList) implements Callable<List<SunJSON.GeometryCollection>> {
         @Override
-        public SunJSON.GeometryCollection call() throws Exception {
-            return SunJSON.process(JSONUtils.get(uri));
+        public List<SunJSON.GeometryCollection> call() {
+            List<SunJSON.GeometryCollection> g = uriList.parallelStream().map(uri -> {
+                try {
+                    return SunJSON.process(JSONUtils.get(uri));
+                } catch (Exception e) {
+                    Log.warn(uri.toString(), e);
+                    return null;
+                }
+            }).filter(Objects::nonNull).collect(Collectors.toList());
+            return g;
         }
     }
 
-    private record LoadSunJSONString(String json) implements Callable<SunJSON.GeometryCollection> {
+    private record LoadSunJSONString(String json) implements Callable<List<SunJSON.GeometryCollection>> {
         @Override
-        public SunJSON.GeometryCollection call() {
-            return SunJSON.process(new JSONObject(json));
+        public List<SunJSON.GeometryCollection> call() {
+            return List.of(SunJSON.process(new JSONObject(json)));
         }
     }
 
-    private record Callback(Receiver receiver) implements FutureCallback<SunJSON.GeometryCollection> {
+    private record Callback(Receiver receiver) implements FutureCallback<List<SunJSON.GeometryCollection>> {
 
         @Override
-        public void onSuccess(SunJSON.GeometryCollection result) {
+        public void onSuccess(List<SunJSON.GeometryCollection> result) {
             receiver.setGeometry(result);
         }
 
