@@ -96,7 +96,13 @@ public interface Load {
     class SunJSON implements LoadString {
         @Override
         public void get(@Nonnull URI uri) {
-            LoadSunJSON.submit(uri);
+            getAll(List.of(uri));
+        }
+
+        public static void getAll(@Nonnull List<URI> uris) {
+            if (!uris.isEmpty()) {
+                LoadSunJSON.submit(uris);
+            }
         }
 
         @Override
