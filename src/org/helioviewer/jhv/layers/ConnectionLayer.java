@@ -90,7 +90,9 @@ public class ConnectionLayer extends AbstractLayer implements LoadConnectivity.R
             drawHCS(camera, vp, gl);
         if (footpointMap != null)
             drawFootpointInterpolated(camera, vp, gl);
-        geometryMap.nearestValue(camera.getViewpoint().time).render(gl, geometryLine, geometryPoint, vp.aspect, CameraHelper.getPixelFactor(camera, vp));
+
+        if (!geometryMap.isEmpty())
+            geometryMap.nearestValue(camera.getViewpoint().time).render(gl, geometryLine, geometryPoint, vp.aspect, CameraHelper.getPixelFactor(camera, vp));
     }
 
     @Override
