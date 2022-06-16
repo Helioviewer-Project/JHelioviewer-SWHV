@@ -14,9 +14,7 @@ public interface Load {
     void get(@Nonnull URI uri);
 
     interface LoadString extends Load {
-
         void get(@Nonnull String string);
-
     }
 
     Load cdf = new CDF();
