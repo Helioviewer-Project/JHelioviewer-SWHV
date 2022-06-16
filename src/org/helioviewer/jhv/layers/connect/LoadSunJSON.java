@@ -38,7 +38,7 @@ public class LoadSunJSON {
     private record LoadSunJSONURI(List<URI> uriList) implements Callable<List<SunJSON.GeometryCollection>> {
         @Override
         public List<SunJSON.GeometryCollection> call() {
-            List<SunJSON.GeometryCollection> g = uriList.parallelStream().map(uri -> {
+            return uriList.parallelStream().map(uri -> {
                 try {
                     return SunJSON.process(JSONUtils.get(uri));
                 } catch (Exception e) {
@@ -46,7 +46,6 @@ public class LoadSunJSON {
                     return null;
                 }
             }).filter(Objects::nonNull).collect(Collectors.toList());
-            return g;
         }
     }
 
