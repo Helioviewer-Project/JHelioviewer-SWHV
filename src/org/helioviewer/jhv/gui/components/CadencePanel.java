@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.gui.components;
 
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 
 import javax.swing.JComboBox;
@@ -22,7 +21,6 @@ public class CadencePanel extends JPanel {
         setLayout(new FlowLayout(FlowLayout.TRAILING, 5, 0));
 
         setCadence(APIRequest.CADENCE_DEFAULT);
-        spinnerCadence.setPreferredSize(new Dimension(60, spinnerCadence.getPreferredSize().height));
         comboUnit.setSelectedItem("min");
         comboUnit.addActionListener(e -> spinnerCadence.setEnabled(comboUnit.getSelectedIndex() != 4));
 
