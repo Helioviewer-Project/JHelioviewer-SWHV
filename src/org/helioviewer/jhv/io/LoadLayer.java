@@ -102,6 +102,7 @@ public class LoadLayer {
 
     private static URI request(String url) throws Exception {
         try {
+            // Log.info(url);
             JSONObject data = JSONUtils.get(new URI(url));
 
             if (!data.isNull("frames")) {
