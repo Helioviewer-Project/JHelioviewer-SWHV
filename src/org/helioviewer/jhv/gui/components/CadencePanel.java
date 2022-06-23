@@ -12,28 +12,28 @@ import org.helioviewer.jhv.io.APIRequest;
 @SuppressWarnings("serial")
 public class CadencePanel extends JPanel {
 
-    private static final String[] timeStepUnitStrings = {"sec", "min", "hours", "days", "get all"};
+    private static final String[] timeStepUnits = {"sec", "min", "hours", "days", "get all"};
 
-    private final JHVSpinner spinnerCadence = new JHVSpinner(1, 1, 1000000, 1);
-    private final JComboBox<String> comboUnit = new JComboBox<>(timeStepUnitStrings);
+    private final JHVSpinner cadenceSpinner = new JHVSpinner(1, 1, 1000000, 1);
+    private final JComboBox<String> unitCombo = new JComboBox<>(timeStepUnits);
 
     public CadencePanel() {
         setLayout(new FlowLayout(FlowLayout.TRAILING, 5, 0));
 
         setCadence(APIRequest.CADENCE_DEFAULT);
-        comboUnit.setSelectedItem("min");
-        comboUnit.addActionListener(e -> spinnerCadence.setEnabled(comboUnit.getSelectedIndex() != 4));
+        unitCombo.setSelectedItem("min");
+        ((JHVSpinner.DefaultEditor) cadenceSpinner.getEditor()).getTextField().setColumns(4);
 
         add(new JLabel("Time step", JLabel.RIGHT));
-        add(spinnerCadence);
-        add(comboUnit);
+        add(cadenceSpinner);
+        add(unitCombo);
     }
 
     // Returns the number of seconds of the selected cadence
     public int getCadence() {
-        int value = (Integer) spinnerCadence.getValue();
+        int value = (Integer) cadenceSpinner.getValue();
 
-        return switch (comboUnit.getSelectedIndex()) {
+        return switch (unitCombo.getSelectedIndex()) {
             case 1 -> value * 60; // minute
             case 2 -> value * 3600; // hour
             case 3 -> value * 86400; // day
@@ -44,19 +44,19 @@ public class CadencePanel extends JPanel {
 
     public void setCadence(int value) {
         if (value == APIRequest.CADENCE_ANY)
-            comboUnit.setSelectedItem(timeStepUnitStrings[4]);
+            unitCombo.setSelectedItem(timeStepUnits[4]);
         else if (value / 86400 != 0) {
-            comboUnit.setSelectedItem(timeStepUnitStrings[3]);
-            spinnerCadence.setValue(value / 86400);
+            unitCombo.setSelectedItem(timeStepUnits[3]);
+            cadenceSpinner.setValue(value / 86400);
         } else if (value / 3600 != 0) {
-            comboUnit.setSelectedItem(timeStepUnitStrings[2]);
-            spinnerCadence.setValue(value / 3600);
+            unitCombo.setSelectedItem(timeStepUnits[2]);
+            cadenceSpinner.setValue(value / 3600);
         } else if (value / 60 != 0) {
-            comboUnit.setSelectedItem(timeStepUnitStrings[1]);
-            spinnerCadence.setValue(value / 60);
+            unitCombo.setSelectedItem(timeStepUnits[1]);
+            cadenceSpinner.setValue(value / 60);
         } else {
-            comboUnit.setSelectedItem(timeStepUnitStrings[0]);
-            spinnerCadence.setValue(value);
+            unitCombo.setSelectedItem(timeStepUnits[0]);
+            cadenceSpinner.setValue(value);
         }
     }
 
