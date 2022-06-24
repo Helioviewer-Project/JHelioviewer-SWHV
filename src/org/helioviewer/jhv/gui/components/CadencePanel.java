@@ -22,6 +22,7 @@ public class CadencePanel extends JPanel {
 
         setCadence(APIRequest.CADENCE_DEFAULT);
         unitCombo.setSelectedItem("min");
+        unitCombo.addActionListener(e -> cadenceSpinner.setEnabled(unitCombo.getSelectedIndex() != 4));
         ((JHVSpinner.DefaultEditor) cadenceSpinner.getEditor()).getTextField().setColumns(6);
 
         add(new JLabel("Time step", JLabel.RIGHT));
