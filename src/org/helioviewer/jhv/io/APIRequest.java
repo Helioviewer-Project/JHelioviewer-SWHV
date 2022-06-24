@@ -9,7 +9,7 @@ import org.json.JSONObject;
 public record APIRequest(@Nonnull String server, int sourceId, long startTime, long endTime, int cadence) {
 
     private static final long RANGE_EXPAND = 60 * TimeUtils.MINUTE_IN_MILLIS;
-    public static final int CADENCE_ANY = -100;
+    public static final int CADENCE_ALL = -100;
     public static final int CADENCE_DEFAULT = 1800;
     public static final int CallistoID = 5000;
 
@@ -32,7 +32,7 @@ public record APIRequest(@Nonnull String server, int sourceId, long startTime, l
             if ((api = DataSources.getServerSetting(server, "API.getJPX")) == null)
                 throw new Exception("Unknown server: " + server);
             fileReq = api + "sourceId=" + sourceId + "&startTime=" + TimeUtils.formatZ(startTime) + "&endTime=" + TimeUtils.formatZ(endTime);
-            if (cadence != CADENCE_ANY)
+            if (cadence != CADENCE_ALL)
                 fileReq += "&cadence=" + cadence;
         }
         return fileReq;
