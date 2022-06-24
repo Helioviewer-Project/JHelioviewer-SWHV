@@ -20,4 +20,13 @@ public class JHVSpinner extends JSpinner {
         this(new SpinnerNumberModel(value, min, max, step));
     }
 
+    @Override
+    public Object getValue() {
+        try {
+            commitEdit();
+        } catch (Exception ignore) {
+        }
+        return super.getValue();
+    }
+
 }

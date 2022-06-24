@@ -14,7 +14,7 @@ public class CadencePanel extends JPanel {
 
     private static final String[] timeStepUnits = {"sec", "min", "hours", "days", "get all"};
 
-    private final JHVSpinner cadenceSpinner = new JHVSpinner(1, 1, 1000000, 1);
+    private final JHVSpinner cadenceSpinner = new JHVSpinner(1, 1, 100000, 1);
     private final JComboBox<String> unitCombo = new JComboBox<>(timeStepUnits);
 
     public CadencePanel() {
@@ -22,7 +22,7 @@ public class CadencePanel extends JPanel {
 
         setCadence(APIRequest.CADENCE_DEFAULT);
         unitCombo.setSelectedItem("min");
-        ((JHVSpinner.DefaultEditor) cadenceSpinner.getEditor()).getTextField().setColumns(4);
+        ((JHVSpinner.DefaultEditor) cadenceSpinner.getEditor()).getTextField().setColumns(6);
 
         add(new JLabel("Time step", JLabel.RIGHT));
         add(cadenceSpinner);
@@ -32,18 +32,17 @@ public class CadencePanel extends JPanel {
     // Returns the number of seconds of the selected cadence
     public int getCadence() {
         int value = (Integer) cadenceSpinner.getValue();
-
         return switch (unitCombo.getSelectedIndex()) {
-            case 1 -> value * 60; // minute
-            case 2 -> value * 3600; // hour
-            case 3 -> value * 86400; // day
-            case 4 -> APIRequest.CADENCE_ANY;
-            default -> value;
+            case 0 -> value; // sec
+            case 1 -> value * 60; // min
+            case 2 -> value * 3600; // hrs
+            case 3 -> value * 86400; // days
+            default -> APIRequest.CADENCE_ALL;
         };
     }
 
     public void setCadence(int value) {
-        if (value == APIRequest.CADENCE_ANY)
+        if (value == APIRequest.CADENCE_ALL)
             unitCombo.setSelectedItem(timeStepUnits[4]);
         else if (value / 86400 != 0) {
             unitCombo.setSelectedItem(timeStepUnits[3]);
