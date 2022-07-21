@@ -262,16 +262,22 @@ public class HelioviewerMetaData extends BaseMetaData {
         };
     }
 
+    private static Position earthPosition(JHVTime dateObs, Position earth) {
+        JHVTime time = adjustTime(dateObs, earth.distance, earth.distance);
+        return new Position(time, earth.distance, earth.lon, earth.lat);
+    }
+
     private Position retrievePosition(MetaDataContainer m, JHVTime dateObs) {
         Position earth = Sun.getEarth(dateObs);
-        if (observatory.equals("SDO")) { // SDO has slightly wrong position metadata, place it at Earth
-            JHVTime time = adjustTime(dateObs, earth.distance, earth.distance);
-            return new Position(time, earth.distance, earth.lon, earth.lat);
-        }
+        if (observatory.equals("SDO")) // SDO has slightly wrong position metadata, place it at Earth
+            return earthPosition(dateObs, earth);
 
         double distObs = m.getDouble("DSUN_OBS").map(d -> d / Sun.RadiusMeter).orElseGet(() -> earth.distance);
         if (observatory.equals("SOHO"))
             distObs *= Sun.L1Factor;
+
+        if (distObs < 1) // failure in metadata pipeline like SUVI L1b, place it at Earth
+            return earthPosition(dateObs, earth);
 
         double lon = m.getDouble("HGLN_OBS").map(v -> earth.lon - Math.toRadians(v))
                 .orElseGet(() -> m.getDouble("CRLN_OBS").map(v -> -Math.toRadians(v)).orElseGet(() -> earth.lon));
