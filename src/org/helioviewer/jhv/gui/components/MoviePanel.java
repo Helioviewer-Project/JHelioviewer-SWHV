@@ -39,6 +39,7 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.Movie.AdvanceMode;
 import org.helioviewer.jhv.time.TimeUtils;
+import org.helioviewer.jhv.timelines.draw.DrawController;
 
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideToggleButton;
@@ -408,8 +409,12 @@ public class MoviePanel extends JPanel implements ObservationSelector {
     }
 
     private void syncLayersSpan() {
-        if (checkSanity())
-            ImageLayers.syncLayersSpan(getStartTime(), getEndTime(), getCadence());
+        if (checkSanity()) {
+            long start = getStartTime();
+            long end = getEndTime();
+            DrawController.setSelectedInterval(start, end);
+            ImageLayers.syncLayersSpan(start, end, getCadence());
+        }
     }
 
     private static void clickRecordButton() {
