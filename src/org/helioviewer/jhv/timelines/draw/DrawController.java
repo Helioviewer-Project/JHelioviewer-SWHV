@@ -103,8 +103,10 @@ public class DrawController implements LazyComponent, StatusReceiver, JHVEventLi
     }
 
     public static void setSelectedInterval(long start, long end) {
-        selectedAxis.set(start, end);
-        setAvailableInterval();
+        if (start != selectedAxis.start() || end != selectedAxis.end()) {
+            selectedAxis.set(start, end);
+            setAvailableInterval();
+        }
     }
 
     public static void moveX(double pixelDistance) {
