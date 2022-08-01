@@ -9,7 +9,7 @@ public class PropagationModelDelay implements PropagationModel {
     private final double delayMilli;
 
     public PropagationModelDelay(double _delay) { // days
-        delayMilli = MathUtils.clip(_delay * TimeUtils.DAY_IN_MILLIS, 0, 100 * TimeUtils.DAY_IN_MILLIS); // m/s
+        delayMilli = MathUtils.clip(_delay * TimeUtils.DAY_IN_MILLIS, 0, 100 * TimeUtils.DAY_IN_MILLIS); // millis
         isPropagated = delayMilli > 0;
     }
 
