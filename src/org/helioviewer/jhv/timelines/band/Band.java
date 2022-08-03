@@ -21,7 +21,7 @@ import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.timelines.propagation.PropagationModel;
-import org.helioviewer.jhv.timelines.propagation.PropagationModelRadial;
+import org.helioviewer.jhv.timelines.propagation.PropagationModelDelay;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -46,7 +46,7 @@ public class Band extends AbstractTimelineLayer {
     private final List<GraphPolyline> graphPolylines = new ArrayList<>();
 
     private Color graphColor = BandColors.getNextColor();
-    private PropagationModel propagationModel = new PropagationModelRadial(0);
+    private PropagationModel propagationModel = new PropagationModelDelay(0);
 
     private Band(BandType _bandType) {
         bandType = _bandType;

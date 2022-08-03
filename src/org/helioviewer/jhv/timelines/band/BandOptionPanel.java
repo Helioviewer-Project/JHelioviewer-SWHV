@@ -21,7 +21,7 @@ import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineSettings;
-import org.helioviewer.jhv.timelines.propagation.PropagationModelRadial;
+import org.helioviewer.jhv.timelines.propagation.PropagationModelDelay;
 import org.json.JSONObject;
 
 import com.jidesoft.swing.JideButton;
@@ -52,12 +52,12 @@ class BandOptionPanel extends JPanel {
 
         c.gridx = 1;
         c.anchor = GridBagConstraints.LINE_START;
-        JFormattedTextField propagationField = new JFormattedTextField(new TerminatedFormatterFactory("%.3f", "km/s", 0, 299792.458));
+        JFormattedTextField propagationField = new JFormattedTextField(new TerminatedFormatterFactory("%.3f", " days", 0, 28));
         propagationField.setValue(0.);
         propagationField.setColumns(10);
         propagationField.addPropertyChangeListener("value", e -> {
             double speed = (Double) propagationField.getValue();
-            band.setPropagationModel(new PropagationModelRadial(speed));
+            band.setPropagationModel(new PropagationModelDelay(speed));
         });
         add(propagationField, c);
 
