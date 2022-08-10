@@ -41,6 +41,8 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     private Future<?> worker;
     protected View view;
 
+    public static boolean metadataView; // whether to ignore camera viewpoint
+
     public static ImageLayer create(JSONObject jo) {
         ImageLayer imageLayer = new ImageLayer(jo);
         JHVFrame.getLayers().add(imageLayer);
@@ -205,11 +207,14 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         shader.bindMatrix(gl, camera.getTransformationInverse(vp.aspect)); // viewport dependent
         shader.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height); // viewport dependent
 
-        Position cameraViewpoint = imageData.getViewpoint(); // camera at decode command moment
-        Quat q = Quat.rotate(camera.getDragRotation(), cameraViewpoint.toQuat());
-
         MetaData metaData = imageData.getMetaData();
         Position metaViewpoint = metaData.getViewpoint();
+
+        Position cameraViewpoint = imageData.getViewpoint(); // camera at decode command moment
+
+        Position viewpoint = Display.multiview && metadataView ? metaViewpoint : cameraViewpoint;
+        Quat q = Quat.rotate(camera.getDragRotation(), viewpoint.toQuat());
+
         ImageData imageDataDiff = glImage.getDifferenceMode() == DifferenceMode.Base ? baseImageData : prevImageData;
         MetaData metaDataDiff = imageDataDiff.getMetaData();
         Position metaViewpointDiff = metaDataDiff.getViewpoint();

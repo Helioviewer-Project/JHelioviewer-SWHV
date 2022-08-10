@@ -46,6 +46,9 @@ import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.time.TimeMode;
 import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCacheManager;
 
+import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.MovieDisplay;
+
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
@@ -202,10 +205,23 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
 
         c.gridx = 0;
         c.gridy = 6;
-        settings.add(new JLabel("Record video as:", JLabel.RIGHT), c);
+        settings.add(new JLabel("Display:", JLabel.RIGHT), c);
 
         c.gridx = 1;
         c.gridy = 6;
+        JCheckBox metadataView = new JCheckBox("<html>Multiview images as observed<br/><small>Any overlay may be incorrect");
+        metadataView.addActionListener(e -> {
+            ImageLayer.metadataView = metadataView.isSelected();
+            MovieDisplay.render(1);
+        });
+        settings.add(metadataView, c);
+
+        c.gridx = 0;
+        c.gridy = 7;
+        settings.add(new JLabel("Record video as:", JLabel.RIGHT), c);
+
+        c.gridx = 1;
+        c.gridy = 7;
         JComboBox<VideoFormat> comboVideo = new JComboBox<>(VideoFormat.values());
         VideoFormat videoFormat = VideoFormat.H264;
         try {
@@ -217,7 +233,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         settings.add(comboVideo, c);
 
         c.gridx = 0;
-        c.gridy = 7;
+        c.gridy = 8;
         settings.add(new JLabel("Plugins:", JLabel.RIGHT), c);
 
         c.gridx = 1;
