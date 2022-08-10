@@ -56,8 +56,8 @@ class BandOptionPanel extends JPanel {
         propagationField.setValue(0.);
         propagationField.setColumns(10);
         propagationField.addPropertyChangeListener("value", e -> {
-            double speed = (Double) propagationField.getValue();
-            band.setPropagationModel(new PropagationModelDelay(speed));
+            double value = (Double) propagationField.getValue();
+            band.setPropagationModel(new PropagationModelDelay(value));
         });
         add(propagationField, c);
 
