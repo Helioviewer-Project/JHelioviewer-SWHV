@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="9.0.7" transformSequenceNumber="9">
+<install4j version="10.0.1" transformSequenceNumber="10">
   <directoryPresets config="../bin/JHelioviewer.jar" />
   <application name="JHelioviewer" applicationId="6448-7333-6138-9110" mediaDir="./builds" compression="9" lzmaCompression="true" shortName="JHelioviewer" publisher="ESA JHelioviewer Team" publisherWeb="http://www.jhelioviewer.org" version="4.3.3" allPathsRelative="true" macVolumeId="7ed177551bd348bc" javaMinVersion="17" javaMaxVersion="17" jdkMode="jdk">
     <codeSigning macEnabled="true" macPkcs12File="~/Certificates.p12" macNotarize="true" appleId="bogdan@nicula.net" />
@@ -13,7 +13,7 @@
       </modules>
     </jreBundles>
   </application>
-  <files missingFilesStrategy="error" globalExcludeSuffixes=".DS_Store" preserveSymlinks="false">
+  <files missingFilesStrategy="error" globalExcludeSuffixes=".DS_Store">
     <mountPoints>
       <mountPoint id="182" location="classes" />
     </mountPoints>
@@ -43,7 +43,6 @@
           <directory name="bin" />
         </nativeLibraryDirectories>
       </java>
-      <macStaticAssociationActions mode="selected" />
       <vmOptionsFile mode="none" />
       <iconImageFiles>
         <file path="./resources/JHV_icon.png" />
@@ -62,7 +61,6 @@
           <directory name="bin" />
         </nativeLibraryDirectories>
       </java>
-      <macStaticAssociationActions mode="selected" />
       <vmOptionsFile mode="none" />
       <iconImageFiles>
         <file path="./resources/JHV_icon.png" />
@@ -1126,7 +1124,7 @@ return true;</property>
         <symlink name="Applications" target="/Applications" />
       </topLevelFiles>
     </macosArchive>
-    <windows name="Windows 64 bit" id="150" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}">
+    <windows name="Windows 64 bit" id="150" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}" architecture="64">
       <excludedLaunchers>
         <launcher id="296" />
       </excludedLaunchers>
