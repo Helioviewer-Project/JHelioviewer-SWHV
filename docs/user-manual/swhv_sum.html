@@ -2,12 +2,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN" "http://www.w3.org/TR/MathML2/dtd/xhtml-math11-f.dtd"><html>
 <head>
 	<meta charset="utf-8"/>
-	<meta name="svn_rev" content="$Rev: 8812 $"/>
-	<meta name="svn_date" content="$Date: 2018-01-17 15:59:24 +0100 (Wed, 17 Jan 2018) $"/>
 	<title>JHelioviewer User Manual</title>
 	<meta name="author" content="Bram Bourgoignie, Bogdan Nicula, Freek Verstringe"/>
 	<meta name="affiliation" content="Royal Observatory of Belgium"/>
-	<meta name="date" content="November 4, 2016"/>
+	<meta name="date" content="October 7, 2022"/>
 	<link type="text/css" rel="stylesheet" href="avenir-white.css"/>
 	<link type="text/css" rel="stylesheet" href="magnific-popup.css"/>
 	<meta name="xhtmlxslt" content="xhtml-sum.xslt"/>
@@ -96,6 +94,10 @@
 <p>The <a href="#trouble">Troubleshooting</a> and <a href="#faq">Frequent Asked Questions</a> sections may contain contain useful hints about installing and running JHelioviewer.</p>
 
 <h2 id="mui">Main User Interface</h2>
+
+<p>The following YouTube video demonstrates some basic functionalities of the interface.</p>
+
+<p><p align="center"><iframe width="560" height="315" src="https://www.youtube.com/embed/rJCRMA0wSDI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></p></p>
 
 <h3 id="overview">Overview</h3>
 
@@ -195,14 +197,14 @@
 
 <h4 id="annotationfeatures">Annotation Features</h4>
 
-<p>It is possible to annotate the image canvas with rectangles, circles and crosses. The <a href="#figure_annotation">annotation figure</a> shows an annotated image canvas and the modes when clicking the annotation button. Click the annotate button and select the annotation shape to change to annotation mode. There are three annotation shape modes: rectangle, circle and cross. If more than one annotation is added, the red one indicates the active annotation. The active annotation can be changed by pressing the <em>n</em>-key. It is not possible to annotate outside the solar disk.</p>
+<p>It is possible to annotate the image canvas with various shapes. The <a href="#figure_annotation">annotation figure</a> shows an annotated image canvas and the modes when clicking the annotation button. Click the annotate button and select the desired annotation shape. Then press the shift key and drag the mouse pointer with the left button pressed to draw. When finished, release the mouse button, then the shift key. If more than one annotation is added, the red one indicates the active annotation.</p>
 
 <figure>
 <img src="annotation_ic.png" alt="Annotated image canvas" id="figure_annotation"/>
 <figcaption>Annotated image canvas</figcaption>
 </figure>
 
-<p>Consider the situation shown by the <a href="#figure_annotation">annotation figure</a>. By pressing <em>n</em>-key, another annotation will become red. Pressing the forward or the backward delete key can delete the red rectangle. In order to delete a cross, press the <em>n</em>-key until the desired cross becomes highlighted in red and then the delete key has to be pressed. The annotations can deleted all at once via the menu item <em>“View&gt;Clear annotations”</em> or from the toolbar annotation mode button.</p>
+<p>Consider the situation shown by the <a href="#figure_annotation">annotation figure</a>. By pressing <em>shift</em>+<em>n</em>(ext) or <em>shift</em>+<em>p</em>(previous), another annotation will become red. Pressing shift combined with the forward or the backward delete key will delete the red rectangle. The annotations can deleted all at once via the menu item <em>“View&gt;Clear annotations”</em> or from the toolbar annotation mode button.</p>
 
 <h4 id="trackingfeatures">Tracking Features</h4>
 
@@ -267,566 +269,6 @@
 
 <p>Each layer has specific options that become available when selecting its entry in the table listing.</p>
 
-<h3 id="overviewoftheavailableimagesproviders">Overview of the Available Images Providers</h3>
-
-<p>The <a href="#image_providers">table below</a> records the image providers as of November 4, 2016; for an up-to-date list, check the program.</p>
-
-<table>
-<caption id="image_providers">Overview of the available image providers</caption>
-<colgroup>
-<col style="text-align:left;"/>
-<col style="text-align:left;"/>
-<col style="text-align:left;"/>
-<col style="text-align:left;"/>
-</colgroup>
-
-<thead>
-<tr>
-	<th style="text-align:left;">Server</th>
-	<th style="text-align:left;">Observatory</th>
-	<th style="text-align:left;">Instrument</th>
-	<th style="text-align:left;">Detector/Measurement</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-	<td style="text-align:left;">ROB</td>
-	<td style="text-align:left;">Kanzelhöhe</td>
-	<td style="text-align:left;">H-alpha</td>
-	<td style="text-align:left;">6562 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">NRH</td>
-	<td style="text-align:left;">NRH2</td>
-	<td style="text-align:left;">150.9 MHz</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">432.0 MHz</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">NSO-GONG</td>
-	<td style="text-align:left;">GONG</td>
-	<td style="text-align:left;">GONG Farside</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">GONG Magnetogram</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">H-alpha 6562 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">NSO-SOLIS</td>
-	<td style="text-align:left;">VSM</td>
-	<td style="text-align:left;">Azimuth 6302 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">CoreFluxDens 8542 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">CoreWingInt 8542 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">FillFactor 6302 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Inclination 6302 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Intensity 1083 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Intensity 6302 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Strength 6302 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">PROBA2</td>
-	<td style="text-align:left;">SWAP</td>
-	<td style="text-align:left;">174 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">ROB-USET</td>
-	<td style="text-align:left;">H-alpha</td>
-	<td style="text-align:left;">6562 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">SDO</td>
-	<td style="text-align:left;">AIA</td>
-	<td style="text-align:left;">171 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">304 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">HMI</td>
-	<td style="text-align:left;">Continuum</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Magnetogram</td>
-</tr>
-<tr>
-	<td style="text-align:left;">GSFC/IAS</td>
-	<td style="text-align:left;">Hinode</td>
-	<td style="text-align:left;">XRT</td>
-	<td style="text-align:left;">Al_med Al_thick</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Al_med Any</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Al_med Be_thick</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Al_med Open</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Al_med Ti_poly</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Al_poly Al_mesh</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Al_poly Al_thick</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Al_poly Any</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Al_poly Be_thick</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Al_poly Open</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Al_poly Ti_poly</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Any Al_mesh</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Any Al_thick</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Any Any Any</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Any Be_thick</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Any Open</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Any Ti_poly</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Be_med Any</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Be_med Open</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Be_thin Any</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Be_thin Open</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">C_poly Al_mesh</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">C_poly Al_thick</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">C_poly Any</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">C_poly Open</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">C_poly Ti_poly</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Open Al_mesh</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Open Al_thick</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Open Any</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Open Be_thick</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Open Ti_poly</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">PROBA2</td>
-	<td style="text-align:left;">SWAP</td>
-	<td style="text-align:left;">171 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">SDO</td>
-	<td style="text-align:left;">AIA</td>
-	<td style="text-align:left;">94 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">131 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">171 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">193 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">211 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">304 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">335 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">1600 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">1700 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">4500 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">HMI</td>
-	<td style="text-align:left;">Continuum</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Magnetogram</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">SOHO</td>
-	<td style="text-align:left;">EIT</td>
-	<td style="text-align:left;">171 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">195 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">284 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">304 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">LASCO</td>
-	<td style="text-align:left;">C2</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">C3</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">MDI</td>
-	<td style="text-align:left;">Continuum</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Magnetogram</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">STEREO_A/B</td>
-	<td style="text-align:left;">SECCHI</td>
-	<td style="text-align:left;">COR1</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">COR2</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EUVI 171 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EUVI 195 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EUVI 284 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EUVI 304 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">TRACE</td>
-	<td style="text-align:left;">TRACE</td>
-	<td style="text-align:left;">171 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">195 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">284 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">1216 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">1550 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">1600 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">1700 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">White Light</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Yohkoh</td>
-	<td style="text-align:left;">SXT</td>
-	<td style="text-align:left;">AlMgMn</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Thin Al</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">White Light</td>
-</tr>
-</tbody>
-</table>
-
 <h3 id="addingremovingasequenceofimages">Adding/Removing a Sequence of Images</h3>
 
 <p>A new image layer can be added by clicking the <em>“New Layer”</em> button (<em>ctrl/cmd + n</em>).</p>
@@ -883,114 +325,14 @@
 <figcaption>From top to bottom: no difference, running difference and base difference</figcaption>
 </figure>
 
-<p>The opacity, how the image blends with other layers, the perceived sharpness of the image, the low and the high level can also be adjusted. Click between the levels slider thumbs and drag left or right to move together the levels. Double-click to reset the levels. An automatic high level dependent on the content of current image can be calculated by pressing on the <em>“Auto”</em> button. To change the colors used for the image select a different colormap in the dropdown menu. The available colormaps are listed in the <a href="#colormaps">list of colormaps</a>. The colors of the image can be inverted by clicking the button next to the colormap dropdown menu. Individual color channels can be turned on and off.</p>
-
-<table>
-<caption id="colormaps">Overview of the colormaps</caption>
-<colgroup>
-<col style="text-align:center;"/>
-</colgroup>
-
-<thead>
-<tr>
-	<th style="text-align:center;">Colormap Name</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-	<td style="text-align:center;">Blue/Green/Red/Yellow</td>
-</tr>
-<tr>
-	<td style="text-align:center;">Blue/Red</td>
-</tr>
-<tr>
-	<td style="text-align:center;">Blue/White Linear</td>
-</tr>
-<tr>
-	<td style="text-align:center;">Blue/White/Red</td>
-</tr>
-<tr>
-	<td style="text-align:center;">Gray</td>
-</tr>
-<tr>
-	<td style="text-align:center;">Green/White Linear</td>
-</tr>
-<tr>
-	<td style="text-align:center;">Hinode XRT</td>
-</tr>
-<tr>
-	<td style="text-align:center;">Red Temperature</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SDO-AIA 94 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SDO-AIA 131 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SDO-AIA 171 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SDO-AIA 193 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SDO-AIA 211 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SDO-AIA 304 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SDO-AIA 335 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SDO-AIA 1600 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SDO-AIA 1700 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SDO-AIA 4500 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SOHO EIT 171 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SOHO EIT 195 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SOHO EIT 284 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SOHO EIT 304 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">STEREO EUVI 171 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">STEREO EUVI 195 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">STEREO EUVI 284 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">STEREO EUVI 304 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">Spectral</td>
-</tr>
-<tr>
-	<td style="text-align:center;">Yohkoh SXT</td>
-</tr>
-</tbody>
-</table>
+<p>The opacity, how the image blends with other layers, the perceived sharpness of the image, the low and the high level can also be adjusted. Click between the levels slider thumbs and drag left or right to move together the levels. Double-click to reset the levels. An automatic high level dependent on the content of current image can be calculated by pressing on the <em>“Auto”</em> button. To change the colors used for the image select a different colormap in the dropdown menu. The colors of the image can be inverted by clicking the button next to the colormap dropdown menu. Individual color channels can be turned on and off.</p>
 
 <p>The download button next to the difference image selection combobox allows the download of the data for the selected layer. A JPX file in case of a multiframe layer, or a JP2 file can be found in the Downloads directory of the JHelioviewer home folder.</p>
 
 <p>The <a href="#figure_fits_keywords">FITS keywords</a> can be shown by clicking the information icon next to the download icon. Basic information such as the observatory, instrument, detector and observation time, followed by the full list of FITS keywords, are displayed.</p>
 
 <figure>
-<img src="fits_keywords.png" alt="The FITS keywords" id="figure_fits_keywords"/>
+<img src="new/image_info.png" alt="The FITS keywords" id="figure_fits_keywords"/>
 <figcaption>The FITS keywords</figcaption>
 </figure>
 
@@ -1095,130 +437,6 @@
 
 <p>JHelioviewer is able to display 1D and 2D timelines. Similar to the images, the timelines have their own panel that lists the timeline layers. The timeline layers can be made visible or invisible. Some timeline layers have options that can be accessed by selecting the corresponding entry in the table listing. The options appear under the listing of the timeline layers.</p>
 
-<h3 id="overviewoftheavailabletimelinedataproviders">Overview of the Available Timeline Data Providers</h3>
-
-<p>The listings <a href="#timeline_providers_p1">1</a> below show the status as of November 4, 2016; for an up-to-date list, check the program.</p>
-
-<table>
-<caption id="timeline_providers_p1">Overview of the available timeline providers</caption>
-<colgroup>
-<col style="text-align:left;"/>
-<col style="text-align:left;"/>
-<col style="text-align:left;"/>
-</colgroup>
-
-<thead>
-<tr>
-	<th style="text-align:left;">Type</th>
-	<th style="text-align:left;">Group</th>
-	<th style="text-align:left;">Dataset</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-	<td style="text-align:left;">1D Timeline</td>
-	<td style="text-align:left;">SWHV Data</td>
-	<td style="text-align:left;">GOES XRS-A (shortwave)</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">GOES XRS-B (longwave)</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EVE XRS-A proxy</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EVE XRS-B proxy</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">LYRA Lyman-alpha</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">LYRA Herzberg</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">LYRA Aluminium</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">LYRA Zirconium</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EVE ESP 17_1</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EVE ESP 25_7</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EVE ESP 30_4</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EVE ESP 36_6</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EVE MEGS-P 121_6</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EVE ESPquad</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">GOES XRS-A (shortwave, STAFF)</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">GOES XRS-B (longwave, STAFF)</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">LYRA Lyman-alpha (STAFF)</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">LYRA Herzberg (STAFF)</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">LYRA Aluminium (STAFF)</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">LYRA Zirconium (STAFF)</td>
-</tr>
-</tbody>
-</table>
-
 <h3 id="1d_timelines">Working with 1D Timelines</h3>
 
 <p>Timelines can be added and removed. The appearance of the timelines can be changed.</p>
@@ -1273,7 +491,7 @@
 <figcaption>From top to bottom: radio data in the timeline list, part of the time interval had no data, the visible interval was too big and detailed zoom of the data</figcaption>
 </figure>
 
-<p>The colormap can be changed by selecting the <em>“Callisto Radiogram”</em> in the list of timelines and picking another colormap. The colormaps are listed in the <a href="#colormaps">list of colormaps</a>.</p>
+<p>The colormap can be changed by selecting the <em>“Callisto Radiogram”</em> in the list of timelines and picking another colormap. The colormaps are listed in the [list of colormaps][colormaps].</p>
 
 <h3 id="lockingthevisibleinterval">Locking the Visible Interval</h3>
 
@@ -1551,52 +769,56 @@
 
 <tbody>
 <tr>
-	<td style="text-align:left;">Add New Layer</td>
+	<td style="text-align:left;">Add new layer</td>
 	<td style="text-align:left;">Cmd/Ctrl-N</td>
 </tr>
 <tr>
-	<td style="text-align:left;">Open File</td>
+	<td style="text-align:left;">Open file</td>
 	<td style="text-align:left;">Cmd/Ctrl-O</td>
 </tr>
 <tr>
-	<td style="text-align:left;">Toggle Full Screen</td>
+	<td style="text-align:left;">Toggle full screen</td>
 	<td style="text-align:left;">Cmd/Ctrl-Enter</td>
 </tr>
 <tr>
-	<td style="text-align:left;">Exit Full Screen</td>
+	<td style="text-align:left;">Exit full screen</td>
 	<td style="text-align:left;">Esc</td>
 </tr>
 <tr>
-	<td style="text-align:left;">Actual Size</td>
+	<td style="text-align:left;">Actual size</td>
 	<td style="text-align:left;">Cmd/Ctrl–0</td>
 </tr>
 <tr>
-	<td style="text-align:left;">Zoom to Fit</td>
+	<td style="text-align:left;">Zoom to fit</td>
 	<td style="text-align:left;">Cmd/Ctrl–9</td>
 </tr>
 <tr>
-	<td style="text-align:left;">Zoom In</td>
+	<td style="text-align:left;">Zoom in</td>
 	<td style="text-align:left;">Cmd/Ctrl-=</td>
 </tr>
 <tr>
-	<td style="text-align:left;">Zoom Out</td>
+	<td style="text-align:left;">Zoom out</td>
 	<td style="text-align:left;">Cmd/Ctrl–</td>
 </tr>
 <tr>
-	<td style="text-align:left;">Play Movie</td>
+	<td style="text-align:left;">Play movie</td>
 	<td style="text-align:left;">Cmd/Ctrl-P</td>
 </tr>
 <tr>
-	<td style="text-align:left;">Step to Previous Frame</td>
+	<td style="text-align:left;">Step to previous frame</td>
 	<td style="text-align:left;">Cmd/Ctrl-Alt-Left Arrow</td>
 </tr>
 <tr>
-	<td style="text-align:left;">Step to Next Frame</td>
+	<td style="text-align:left;">Step to next frame</td>
 	<td style="text-align:left;">Cmd/Ctrl-Alt-Right Arrow</td>
 </tr>
 <tr>
-	<td style="text-align:left;">Remove Current Annotation</td>
-	<td style="text-align:left;">Delete / Backspace</td>
+	<td style="text-align:left;">Remove current annotation</td>
+	<td style="text-align:left;">Shift- Delete/Backspace</td>
+</tr>
+<tr>
+	<td style="text-align:left;">Cycle through annotations</td>
+	<td style="text-align:left;">Shift- n(ext)/p(revious)</td>
 </tr>
 </tbody>
 </table>
@@ -1642,6 +864,14 @@
 <tr>
 	<td style="text-align:left;"/>
 	<td style="text-align:left;">Rotate in Rotation Mode</td>
+</tr>
+<tr>
+	<td style="text-align:left;">Shift-click</td>
+	<td style="text-align:left;">Enter annotation mode; release mouse button then the shift key to exit mode</td>
+</tr>
+<tr>
+	<td style="text-align:left;">Right-click</td>
+	<td style="text-align:left;">Copy to clipboard the position data at the mouse pointer</td>
 </tr>
 </tbody>
 </table>

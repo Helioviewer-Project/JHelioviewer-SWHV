@@ -1,10 +1,8 @@
-svn_rev:            $Rev: 8812 $
-svn_date:           $Date: 2018-01-17 15:59:24 +0100 (Wed, 17 Jan 2018) $
 latex input:        mmd-memoir-header
 Title:              JHelioviewer User Manual
 Author:             Bram Bourgoignie, Bogdan Nicula, Freek Verstringe
 Affiliation:        Royal Observatory of Belgium
-Date:               November 4, 2016
+Date:               October 7, 2022
 Base Header Level:  2
 CSS:                avenir-white.css
 CSS:                magnific-popup.css
@@ -88,6 +86,10 @@ The [Troubleshooting][trouble] and [Frequent Asked Questions][FAQ] sections may 
 
 # Main User Interface [MUI]
 
+The following YouTube video demonstrates some basic functionalities of the interface.
+
+YOUTUBE
+
 ## Overview
 
 The main user interface consists of the toolbar, the image canvas, the timeline canvas, the control panels, the view status and the mouse position indicators.
@@ -169,11 +171,11 @@ The standard mouse operation mode is rotation. By clicking and holding the mouse
 
 ### Annotation Features
 
-It is possible to annotate the image canvas with rectangles, circles and crosses. The [annotation figure](#figure_annotation) shows an annotated image canvas and the modes when clicking the annotation button. Click the annotate button and select the annotation shape to change to annotation mode. There are three annotation shape modes: rectangle, circle and cross. If more than one annotation is added, the red one indicates the active annotation. The active annotation can be changed by pressing the *n*-key. It is not possible to annotate outside the solar disk.
+It is possible to annotate the image canvas with various shapes. The [annotation figure](#figure_annotation) shows an annotated image canvas and the modes when clicking the annotation button. Click the annotate button and select the desired annotation shape. Then press the shift key and drag the mouse pointer with the left button pressed to draw. When finished, release the mouse button, then the shift key. If more than one annotation is added, the red one indicates the active annotation.
 
 ![Annotated image canvas][figure_annotation]
 
-Consider the situation shown by the [annotation figure](#figure_annotation). By pressing *n*-key, another annotation will become red. Pressing the forward or the backward delete key can delete the red rectangle. In order to delete a cross, press the *n*-key until the desired cross becomes highlighted in red and then the delete key has to be pressed. The annotations can deleted all at once via the menu item *"View>Clear annotations"* or from the toolbar annotation mode button.
+Consider the situation shown by the [annotation figure](#figure_annotation). By pressing *shift*+*n*(ext) or *shift*+*p*(previous), another annotation will become red. Pressing shift combined with the forward or the backward delete key will delete the red rectangle. The annotations can deleted all at once via the menu item *"View>Clear annotations"* or from the toolbar annotation mode button.
 
 ### Tracking Features
 
@@ -224,102 +226,6 @@ Everything drawn on the image canvas is an image layer. Those layers can be imag
 
 Each layer has specific options that become available when selecting its entry in the table listing.
 
-## Overview of the Available Images Providers
-
-The [table below][image_providers] records the image providers as of [%Date]; for an up-to-date list, check the program.
-
-| Server       | Observatory   | Instrument           | Detector/Measurement |
-| :----------- | :-----------  |:-------------------  |:---------------------|
-| ROB          | Kanzelhöhe    | H-alpha              | 6562 Å               |
-|              | NRH           | NRH2                 | 150.9 MHz            |
-|              |               |                      | 432.0 MHz            |
-|              | NSO-GONG      | GONG                 | GONG Farside         |
-|              |               |                      | GONG Magnetogram     |
-|              |               |                      | H-alpha 6562 Å       |
-|              | NSO-SOLIS     | VSM                  | Azimuth 6302 Å       |
-|              |               |                      | CoreFluxDens 8542 Å  |
-|              |               |                      | CoreWingInt 8542 Å   |
-|              |               |                      | FillFactor 6302 Å    |
-|              |               |                      | Inclination 6302 Å   |
-|              |               |                      | Intensity 1083 Å     |
-|              |               |                      | Intensity 6302 Å     |
-|              |               |                      | Strength 6302 Å      |
-|              | PROBA2        | SWAP                 | 174 Å                |
-|              | ROB-USET      | H-alpha              | 6562 Å               |
-|              | SDO           | AIA                  | 171 Å                |
-|              |               |                      | 304 Å                |
-|              |               | HMI                  | Continuum            |
-|              |               |                      | Magnetogram          |
-| GSFC/IAS     | Hinode        | XRT                  | Al_med Al_thick      |
-|              |               |                      | Al_med Any           |
-|              |               |                      | Al_med Be_thick      |
-|              |               |                      | Al_med Open          |
-|              |               |                      | Al_med Ti_poly       |
-|              |               |                      | Al_poly Al_mesh      |
-|              |               |                      | Al_poly Al_thick     |
-|              |               |                      | Al_poly Any          |
-|              |               |                      | Al_poly Be_thick     |
-|              |               |                      | Al_poly Open         |
-|              |               |                      | Al_poly Ti_poly      |
-|              |               |                      | Any Al_mesh          |
-|              |               |                      | Any Al_thick         |
-|              |               |                      | Any Any Any          |
-|              |               |                      | Any Be_thick         |
-|              |               |                      | Any Open             |
-|              |               |                      | Any Ti_poly          |
-|              |               |                      | Be_med Any           |
-|              |               |                      | Be_med Open          |
-|              |               |                      | Be_thin Any          |
-|              |               |                      | Be_thin Open         |
-|              |               |                      | C_poly Al_mesh       |
-|              |               |                      | C_poly Al_thick      |
-|              |               |                      | C_poly Any           |
-|              |               |                      | C_poly Open          |
-|              |               |                      | C_poly Ti_poly       |
-|              |               |                      | Open Al_mesh         |
-|              |               |                      | Open Al_thick        |
-|              |               |                      | Open Any             |
-|              |               |                      | Open Be_thick        |
-|              |               |                      | Open Ti_poly         |
-|              | PROBA2        | SWAP                 | 171 Å                |
-|              | SDO           | AIA                  | 94 Å                 |
-|              |               |                      | 131 Å                |
-|              |               |                      | 171 Å                |
-|              |               |                      | 193 Å                |
-|              |               |                      | 211 Å                |
-|              |               |                      | 304 Å                |
-|              |               |                      | 335 Å                |
-|              |               |                      | 1600 Å               |
-|              |               |                      | 1700 Å               |
-|              |               |                      | 4500 Å               |
-|              |               | HMI                  | Continuum            |
-|              |               |                      | Magnetogram          |
-|              | SOHO          | EIT                  | 171 Å                |
-|              |               |                      | 195 Å                |
-|              |               |                      | 284 Å                |
-|              |               |                      | 304 Å                |
-|              |               | LASCO                | C2                   |
-|              |               |                      | C3                   |
-|              |               | MDI                  | Continuum            |
-|              |               |                      | Magnetogram          |
-|              | STEREO_A/B    | SECCHI               | COR1                 |
-|              |               |                      | COR2                 |
-|              |               |                      | EUVI 171 Å           |
-|              |               |                      | EUVI 195 Å           |
-|              |               |                      | EUVI 284 Å           |
-|              |               |                      | EUVI 304 Å           |
-|              | TRACE         | TRACE                | 171 Å                |
-|              |               |                      | 195 Å                |
-|              |               |                      | 284 Å                |
-|              |               |                      | 1216 Å               |
-|              |               |                      | 1550 Å               |
-|              |               |                      | 1600 Å               |
-|              |               |                      | 1700 Å               |
-|              |               |                      | White Light          |
-|              | Yohkoh        | SXT                  | AlMgMn               |
-|              |               |                      | Thin Al              |
-|              |               |                      | White Light          |
-[Overview of the available image providers][image_providers]
 
 ## Adding/Removing a Sequence of Images
 
@@ -361,39 +267,7 @@ Each layer can be displayed in a difference images mode. Several modes can be se
 
 ![From top to bottom: no difference, running difference and base difference][figure_difference]
 
-The opacity, how the image blends with other layers, the perceived sharpness of the image, the low and the high level can also be adjusted. Click between the levels slider thumbs and drag left or right to move together the levels. Double-click to reset the levels. An automatic high level dependent on the content of current image can be calculated by pressing on the *"Auto"* button. To change the colors used for the image select a different colormap in the dropdown menu. The available colormaps are listed in the [list of colormaps][colormaps]. The colors of the image can be inverted by clicking the button next to the colormap dropdown menu. Individual color channels can be turned on and off.
-
-| Colormap Name           |
-| :---------------------: |
-| Blue/Green/Red/Yellow   |
-| Blue/Red                |
-| Blue/White Linear       |
-| Blue/White/Red          |
-| Gray                    |
-| Green/White Linear      |
-| Hinode XRT              |
-| Red Temperature         |
-| SDO-AIA 94 Å            |
-| SDO-AIA 131 Å           |
-| SDO-AIA 171 Å           |
-| SDO-AIA 193 Å           |
-| SDO-AIA 211 Å           |
-| SDO-AIA 304 Å           |
-| SDO-AIA 335 Å           |
-| SDO-AIA 1600 Å          |
-| SDO-AIA 1700 Å          |
-| SDO-AIA 4500 Å          |
-| SOHO EIT 171 Å          |
-| SOHO EIT 195 Å          |
-| SOHO EIT 284 Å          |
-| SOHO EIT 304 Å          |
-| STEREO EUVI 171 Å       |
-| STEREO EUVI 195 Å       |
-| STEREO EUVI 284 Å       |
-| STEREO EUVI 304 Å       |
-| Spectral                |
-| Yohkoh SXT              |
-[Overview of the colormaps][colormaps]
+The opacity, how the image blends with other layers, the perceived sharpness of the image, the low and the high level can also be adjusted. Click between the levels slider thumbs and drag left or right to move together the levels. Double-click to reset the levels. An automatic high level dependent on the content of current image can be calculated by pressing on the *"Auto"* button. To change the colors used for the image select a different colormap in the dropdown menu. The colors of the image can be inverted by clicking the button next to the colormap dropdown menu. Individual color channels can be turned on and off.
 
 The download button next to the difference image selection combobox allows the download of the data for the selected layer. A JPX file in case of a multiframe layer, or a JP2 file can be found in the Downloads directory of the JHelioviewer home folder.
 
@@ -481,33 +355,6 @@ Clicking the *"Available data"* button brings will open a web browser window wit
 
 JHelioviewer is able to display 1D and 2D timelines. Similar to the images, the timelines have their own panel that lists the timeline layers. The timeline layers can be made visible or invisible. Some timeline layers have options that can be accessed by selecting the corresponding entry in the table listing. The options appear under the listing of the timeline layers.
 
-## Overview of the Available Timeline Data Providers
-
-The listings [1][timeline_providers_p1] below show the status as of [%Date]; for an up-to-date list, check the program.
-
-| Type         | Group             | Dataset                           |
-| :----------- | :---------------  |:--------------------------------  |
-| 1D Timeline  | SWHV Data         | GOES XRS-A (shortwave)            |
-|              |                   | GOES XRS-B (longwave)             |
-|              |                   | EVE XRS-A proxy                   |
-|              |                   | EVE XRS-B proxy                   |
-|              |                   | LYRA Lyman-alpha                  |
-|              |                   | LYRA Herzberg                     |
-|              |                   | LYRA Aluminium                    |
-|              |                   | LYRA Zirconium                    |
-|              |                   | EVE ESP 17_1                      |
-|              |                   | EVE ESP 25_7                      |
-|              |                   | EVE ESP 30_4                      |
-|              |                   | EVE ESP 36_6                      |
-|              |                   | EVE MEGS-P 121_6                  |
-|              |                   | EVE ESPquad                       |
-|              |                   | GOES XRS-A (shortwave, STAFF)     |
-|              |                   | GOES XRS-B (longwave, STAFF)      |
-|              |                   | LYRA Lyman-alpha (STAFF)          |
-|              |                   | LYRA Herzberg (STAFF)             |
-|              |                   | LYRA Aluminium (STAFF)            |
-|              |                   | LYRA Zirconium (STAFF)            |
-[Overview of the available timeline providers][timeline_providers_p1]
 
 ## Working with 1D Timelines [1d_timelines]
 
@@ -682,31 +529,34 @@ Parts of JHelioviewer are built out of plugins that can be disabled for a more s
 
 | Operation                 | Key combination          |
 |:--------------------------|:-------------------------|
-| Add New Layer             | Cmd/Ctrl-N               |
-| Open File                 | Cmd/Ctrl-O               |
-| Toggle Full Screen        | Cmd/Ctrl-Enter           |
-| Exit Full Screen          | Esc                      |
-| Actual Size               | Cmd/Ctrl-0               |
-| Zoom to Fit               | Cmd/Ctrl-9               |
-| Zoom In                   | Cmd/Ctrl-=               |
-| Zoom Out                  | Cmd/Ctrl--               |
-| Play Movie                | Cmd/Ctrl-P               |
-| Step to Previous Frame    | Cmd/Ctrl-Alt-Left Arrow  |
-| Step to Next Frame        | Cmd/Ctrl-Alt-Right Arrow |
-| Remove Current Annotation | Delete / Backspace       |
+| Add new layer             | Cmd/Ctrl-N               |
+| Open file                 | Cmd/Ctrl-O               |
+| Toggle full screen        | Cmd/Ctrl-Enter           |
+| Exit full screen          | Esc                      |
+| Actual size               | Cmd/Ctrl-0               |
+| Zoom to fit               | Cmd/Ctrl-9               |
+| Zoom in                   | Cmd/Ctrl-=               |
+| Zoom out                  | Cmd/Ctrl--               |
+| Play movie                | Cmd/Ctrl-P               |
+| Step to previous frame    | Cmd/Ctrl-Alt-Left Arrow  |
+| Step to next frame        | Cmd/Ctrl-Alt-Right Arrow |
+| Remove current annotation | Shift- Delete/Backspace  |
+| Cycle through annotations | Shift- n(ext)/p(revious) |
 
 
 # Mouse Manipulations
 
 ## On Image Canvas
-| Operation      | Action                      |
-|:---------------|:----------------------------|
-| Double-click   | Reset Camera                |
-| Scroll Up      | Zoom Out                    |
-| Scroll Down    | Zoom In                     |
-| Click          | Annotate in Annotation Mode |
-| Click and Drag | Pan in Panning Mode         |
-|                | Rotate in Rotation Mode     |
+| Operation      | Action                                                                      |
+|:---------------|:----------------------------------------------------------------------------|
+| Double-click   | Reset Camera                                                                |
+| Scroll Up      | Zoom Out                                                                    |
+| Scroll Down    | Zoom In                                                                     |
+| Click          | Annotate in Annotation Mode                                                 |
+| Click and Drag | Pan in Panning Mode                                                         |
+|                | Rotate in Rotation Mode                                                     |
+| Shift-click    | Enter annotation mode; release mouse button then the shift key to exit mode |
+| Right-click    | Copy to clipboard the position data at the mouse pointer                    |
 
 
 ## On Timeline Canvas
@@ -793,7 +643,7 @@ I can't find a specific wavelength for a specific instrument and observatory.
 [figure_projection_1]: projection_1.png height=297px width=397px
 [figure_projection_2]: projection_2.png height=297px width=397px
 [figure_enhance_corona]: enhance_corona.png height=297px width=397px
-[figure_fits_keywords]: fits_keywords.png height=297px width=397px
+[figure_fits_keywords]: new/image_info.png height=297px width=397px
 
 [figure_zooming]: zooming.png height=559px width=379px
 [figure_rotpan]: rotpan.png height=559px width=379px
