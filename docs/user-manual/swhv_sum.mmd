@@ -42,16 +42,16 @@ The JHelioviewer software does advanced data processing and visualisation; there
 
 JHelioviewer is an open source project and its source code can be accessed at <https://github.com/Helioviewer-Project/JHelioviewer-SWHV>.
 
-Compiled releases are available for Windows, Mac OS X and Linux from <http://swhv.oma.be/download>. A brief changelog is at <https://github.com/Helioviewer-Project/JHelioviewer-SWHV/blob/master/changelog.md>.
+Compiled releases are available for Windows, macOS and Linux from <http://swhv.oma.be/download>. A brief changelog is at <https://github.com/Helioviewer-Project/JHelioviewer-SWHV/blob/master/changelog.md>.
 
 ## Windows
 
- * Download the EXE Windows installer from <http://swhv.oma.be/download>.
+ * Download the Windows EXE installer from <http://swhv.oma.be/download>.
  * Double-click the installer and follow the steps.
 
-## Mac OS X
+## macOS
 
- * Download the DMG Mac OS X disk image from <http://swhv.oma.be/download>.
+ * Download the macOS DMG disk image from <http://swhv.oma.be/download>.
  * Move JHelioviewer.app to the Applications folder and run it by double-clicking its icon.
 
 ## Linux
@@ -66,7 +66,7 @@ Compiled releases are available for Windows, Mac OS X and Linux from <http://swh
 * Make sure the appropriate Java Runtime Environment 11 or higher from <https://adoptopenjdk.net> is in the PATH.
 * Run the program by typing ```java -cp JHelioviewer.jar:natives-linux.jar:natives-macos.jar:natives-windows.jar org.helioviewer.jhv.JHelioviewer``` in a terminal window.
 
-This procedure works for Windows, Mac OS X and Linux.
+This procedure works for Windows, macOS and Linux.
 
 The program accepts command line arguments. This is implemented using JSON documents specifying requests to the default server in a simple manner as in the example below. Natural language specification of time is supported (as is the case for the state file) and, besides the “dataset” field, all fields are optional with sensible defaults.
 
@@ -249,7 +249,7 @@ To change the options of a layer, it has to be selected in the table listing and
 
 Image layers can be replaced by double-clicking in the listing and modifying any of the selection parameters that were initially used. The time span of all image layers loaded can be matched by clicking the *"Synchronize layers time span"* button.
 
-The [multiview figure](#figure_multiview) shows what happens if the *"Multiview"* option is selected. The layers are displayed side-by-side instead of on top of each other. In this mode, up to four layers can be placed together in the image canvas.
+The [multiview figure](#figure_multiview) shows what happens if the *"Multiview"* option in the toolbar is selected. The layers are displayed side-by-side instead of on top of each other. In this mode, up to four layers can be placed together in the image canvas.
 
 ![The multiview option in action][figure_multiview]
 
@@ -271,7 +271,7 @@ The opacity, how the image blends with other layers, the perceived sharpness of 
 
 The download button next to the difference image selection combobox allows the download of the data for the selected layer. A JPX file in case of a multiframe layer, or a JP2 file can be found in the Downloads directory of the JHelioviewer home folder.
 
-The [FITS keywords](#figure_fits_keywords) can be shown by clicking the information icon next to the download icon. Basic information such as the observatory, instrument, detector and observation time, followed by the full list of FITS keywords, are displayed.
+The [FITS keywords](#figure_fits_keywords) can be shown by clicking the information icon in the lower right corner of the layer options. Basic information such as the observatory, instrument, detector and observation time, followed by the full list of FITS keywords, are displayed.
 
 ![The FITS keywords][figure_fits_keywords]
 
@@ -282,7 +282,7 @@ Click the button next to the invert colors button to make the corona better visi
 
 ## Solar Grid
 
-The grid can show heliographic coordinates as seen from the camera, Stonyhurst, Carrington and Heliocentric inertial coordinates. Two yellow great circles indicate the Earth direction. Clicking the adjacent checkbox can hide the grid. The grid options panel is shown in the [figure below](#figure_grid). The radial grid can be turned on and off; the same can be done for the solar axis (the blue and red lines at the poles of the Sun) and the grid labels.
+The grid can show heliographic coordinates as seen from the viewpoint, Stonyhurst, Carrington and Heliocentric inertial coordinates. Two yellow great circles indicate the Earth direction. Clicking the adjacent checkbox can hide the grid. The grid options panel is shown in the [figure below](#figure_grid). The radial grid can be turned on and off; the same can be done for the solar axis (the blue and red lines at the poles of the Sun) and the grid labels.
 
 The grid ticks size can be changed in both longitude and latitude. The value can be entered directly in the text field, it can be changed by scrolling the mouse over the text field, or by using the arrows. Values ranging from 5˚ and 90˚ are allowed.
 
@@ -515,15 +515,18 @@ By selecting *"File>Save State"* the state of the program can be saved with the 
 
 # Changing the Preferences
 
-On Mac OS X, the preferences can be found under the program menu (JHelioviewer), for Windows and Linux it is located in the menu *"Options"*. A [new dialog](#figure_preferences) opens. The preferred server and the loading of a default movie at start-up can be set. There are also settings for normalization of SDO/AIA data brightness for aesthetically pleasing mission long movies, as well as for normalization of EUV solar radius to visible light solar radius.
+The preferences dialog can be found under the program menu (JHelioviewer) on macOS, for Windows and Linux it is located in the menu *"Options"*. A [new dialog](#figure_preferences) opens. The following persistent options can be set:
+
+- preferred server
+- loading of a preferred state file at start-up
+- normalisation of SDO/AIA data brightness to reduce the effect of response degradation
+- normalisation of EUV solar radius to visible light solar radius
+- uniformisation of image observation time to Observer (default)/Sun emission/Earth arrival for the combination of observations from different vantage points
+- format for the recordings: H.264/H.264 better/H.265/H.265 better/PNG series. The H.265 format allows for significantly smaller file sizes at the price of increased CPU time for the encoding and reduced compatibility with video playing software. The "better" variants allow for increased file sizes and slighter higher CPU utilisation for better output quality.
+
+Several parts of the interface can be turned on and off under the Plugins heading: Timelines/SWEK/PFSS. The persistent image cache can also be cleared, as well as a proxy username and password can be set if required.
 
 ![The preferences][figure_preferences]
-
-# Managing Plugins
-
-Parts of JHelioviewer are built out of plugins that can be disabled for a more streamlined application. Managing the plugins is done via the menu item *"Plug-ins>Manage Plug-ins..."*. A [dialog box](#figure_plugins) will open. The list of plugins can be filtered: all plugins can be displayed, or only the enabled or disabled plugins. Clicking on *more* gives detailed information about the selected plugin.
-
-![Manage the plugins][figure_plugins]
 
 # Keyboard Shortcuts
 
@@ -621,9 +624,9 @@ How do I get a movie without the timeline canvas?
 ## Data
 
 I can't find a specific wavelength for a specific instrument and observatory.
-:  Make sure that you select the correct server. The ROB server only has a limited, for testing purpose, amount of data. GSFC and IAS have the full dataset of most instruments. If the dataset isn't to be found jhelioviewer is always capable to open the raw fitsfiles. The quality of the visualisation depends on the correctness of the keywords in the fits files.
+:  Make sure that you select the correct server. The ROB server only has a limited, for testing purpose, amount of data. GSFC and IAS have the full dataset of most instruments. If the dataset isn't to be found, JHelioviewer is always capable to open FITS files. The quality of the visualisation depends on the correctness of the keywords in the FITS files.
 
-[figure_overview_annotated]: new/full_window_annotated.png
+[figure_overview_annotated]: img/full_window_annotated.png
 
 [figure_toolbar]: toolbar.png height=297px width=397px
 [figure_annotation]: annotation_ic.png height=297px width=397px
@@ -631,19 +634,19 @@ I can't find a specific wavelength for a specific instrument and observatory.
 [figure_movie_panel]: movie_panel2.png height=297px width=397px
 [figure_add_layer_dialog]: add_layer_dialog.png height=297px width=397px
 [figure_image_layer_options]: image_layer_options.png height=297px width=397px
-[figure_grid]: grid.png height=297px width=379px
+[figure_grid]: img/grid.png height=297px width=379px
 [figure_timestamp]: timestamp.png height=297px width=397px
 [figure_miniview]: miniview.png height=297px width=397px
 [figure_change_color]: change_color.png height=297px width=397px
 [figure_events]: events.png height=297px width=397px
 [figure_detail_events]: detail_events.png height=297px width=397px
 [figure_timeline]: timeline.png height=297px width=397px
-[figure_preferences]: preferences.png height=189px width=397px
-[figure_multiview]: multiview.png height=297px width=397px
+[figure_preferences]: img/preferences.png height=189px width=397px
+[figure_multiview]: img/multiview.png height=297px width=397px
 [figure_projection_1]: projection_1.png height=297px width=397px
 [figure_projection_2]: projection_2.png height=297px width=397px
 [figure_enhance_corona]: enhance_corona.png height=297px width=397px
-[figure_fits_keywords]: new/image_info.png height=297px width=397px
+[figure_fits_keywords]: img/image_info.png height=297px width=397px
 
 [figure_zooming]: zooming.png height=559px width=379px
 [figure_rotpan]: rotpan.png height=559px width=379px
@@ -659,5 +662,3 @@ I can't find a specific wavelength for a specific instrument and observatory.
 
 [figure_add_timeline]: add_timeline.png height=126px width=397px
 [figure_swek]: swek.png height=547px width=370px
-[figure_plugins]: plugins.png height=140px width=397px
-

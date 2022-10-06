@@ -44,19 +44,19 @@
 
 <p>JHelioviewer is an open source project and its source code can be accessed at <a href="https://github.com/Helioviewer-Project/JHelioviewer-SWHV">https://github.com/Helioviewer-Project/JHelioviewer-SWHV</a>.</p>
 
-<p>Compiled releases are available for Windows, Mac OS X and Linux from <a href="http://swhv.oma.be/download">http://swhv.oma.be/download</a>. A brief changelog is at <a href="https://github.com/Helioviewer-Project/JHelioviewer-SWHV/blob/master/changelog.md">https://github.com/Helioviewer-Project/JHelioviewer-SWHV/blob/master/changelog.md</a>.</p>
+<p>Compiled releases are available for Windows, macOS and Linux from <a href="http://swhv.oma.be/download">http://swhv.oma.be/download</a>. A brief changelog is at <a href="https://github.com/Helioviewer-Project/JHelioviewer-SWHV/blob/master/changelog.md">https://github.com/Helioviewer-Project/JHelioviewer-SWHV/blob/master/changelog.md</a>.</p>
 
 <h3 id="windows">Windows</h3>
 
 <ul>
-<li>Download the EXE Windows installer from <a href="http://swhv.oma.be/download">http://swhv.oma.be/download</a>.</li>
+<li>Download the Windows EXE installer from <a href="http://swhv.oma.be/download">http://swhv.oma.be/download</a>.</li>
 <li>Double-click the installer and follow the steps.</li>
 </ul>
 
-<h3 id="macosx">Mac OS X</h3>
+<h3 id="macos">macOS</h3>
 
 <ul>
-<li>Download the DMG Mac OS X disk image from <a href="http://swhv.oma.be/download">http://swhv.oma.be/download</a>.</li>
+<li>Download the macOS DMG disk image from <a href="http://swhv.oma.be/download">http://swhv.oma.be/download</a>.</li>
 <li>Move JHelioviewer.app to the Applications folder and run it by double-clicking its icon.</li>
 </ul>
 
@@ -76,7 +76,7 @@
 <li>Run the program by typing <code>java -cp JHelioviewer.jar:natives-linux.jar:natives-macos.jar:natives-windows.jar org.helioviewer.jhv.JHelioviewer</code> in a terminal window.</li>
 </ul>
 
-<p>This procedure works for Windows, Mac OS X and Linux.</p>
+<p>This procedure works for Windows, macOS and Linux.</p>
 
 <p>The program accepts command line arguments. This is implemented using JSON documents specifying requests to the default server in a simple manner as in the example below. Natural language specification of time is supported (as is the case for the state file) and, besides the “dataset” field, all fields are optional with sensible defaults.</p>
 
@@ -104,7 +104,7 @@
 <p>The main user interface consists of the toolbar, the image canvas, the timeline canvas, the control panels, the view status and the mouse position indicators.</p>
 
 <figure>
-<img src="new/full_window_annotated.png" alt="Main user interface" id="figure_overview_annotated"/>
+<img src="img/full_window_annotated.png" alt="Main user interface" id="figure_overview_annotated"/>
 <figcaption>Main user interface</figcaption>
 </figure>
 
@@ -298,10 +298,10 @@
 
 <p>Image layers can be replaced by double-clicking in the listing and modifying any of the selection parameters that were initially used. The time span of all image layers loaded can be matched by clicking the <em>“Synchronize layers time span”</em> button.</p>
 
-<p>The <a href="#figure_multiview">multiview figure</a> shows what happens if the <em>“Multiview”</em> option is selected. The layers are displayed side-by-side instead of on top of each other. In this mode, up to four layers can be placed together in the image canvas.</p>
+<p>The <a href="#figure_multiview">multiview figure</a> shows what happens if the <em>“Multiview”</em> option in the toolbar is selected. The layers are displayed side-by-side instead of on top of each other. In this mode, up to four layers can be placed together in the image canvas.</p>
 
 <figure>
-<img src="multiview.png" alt="The multiview option in action" id="figure_multiview"/>
+<img src="img/multiview.png" alt="The multiview option in action" id="figure_multiview"/>
 <figcaption>The multiview option in action</figcaption>
 </figure>
 
@@ -329,10 +329,10 @@
 
 <p>The download button next to the difference image selection combobox allows the download of the data for the selected layer. A JPX file in case of a multiframe layer, or a JP2 file can be found in the Downloads directory of the JHelioviewer home folder.</p>
 
-<p>The <a href="#figure_fits_keywords">FITS keywords</a> can be shown by clicking the information icon next to the download icon. Basic information such as the observatory, instrument, detector and observation time, followed by the full list of FITS keywords, are displayed.</p>
+<p>The <a href="#figure_fits_keywords">FITS keywords</a> can be shown by clicking the information icon in the lower right corner of the layer options. Basic information such as the observatory, instrument, detector and observation time, followed by the full list of FITS keywords, are displayed.</p>
 
 <figure>
-<img src="new/image_info.png" alt="The FITS keywords" id="figure_fits_keywords"/>
+<img src="img/image_info.png" alt="The FITS keywords" id="figure_fits_keywords"/>
 <figcaption>The FITS keywords</figcaption>
 </figure>
 
@@ -345,12 +345,12 @@
 
 <h3 id="solargrid">Solar Grid</h3>
 
-<p>The grid can show heliographic coordinates as seen from the camera, Stonyhurst, Carrington and Heliocentric inertial coordinates. Two yellow great circles indicate the Earth direction. Clicking the adjacent checkbox can hide the grid. The grid options panel is shown in the <a href="#figure_grid">figure below</a>. The radial grid can be turned on and off; the same can be done for the solar axis (the blue and red lines at the poles of the Sun) and the grid labels.</p>
+<p>The grid can show heliographic coordinates as seen from the viewpoint, Stonyhurst, Carrington and Heliocentric inertial coordinates. Two yellow great circles indicate the Earth direction. Clicking the adjacent checkbox can hide the grid. The grid options panel is shown in the <a href="#figure_grid">figure below</a>. The radial grid can be turned on and off; the same can be done for the solar axis (the blue and red lines at the poles of the Sun) and the grid labels.</p>
 
 <p>The grid ticks size can be changed in both longitude and latitude. The value can be entered directly in the text field, it can be changed by scrolling the mouse over the text field, or by using the arrows. Values ranging from 5˚ and 90˚ are allowed.</p>
 
 <figure>
-<img src="grid.png" alt="The grid options panel" id="figure_grid"/>
+<img src="img/grid.png" alt="The grid options panel" id="figure_grid"/>
 <figcaption>The grid options panel</figcaption>
 </figure>
 
@@ -736,20 +736,22 @@
 
 <h2 id="changingthepreferences">Changing the Preferences</h2>
 
-<p>On Mac OS X, the preferences can be found under the program menu (JHelioviewer), for Windows and Linux it is located in the menu <em>“Options”</em>. A <a href="#figure_preferences">new dialog</a> opens. The preferred server and the loading of a default movie at start-up can be set. There are also settings for normalization of SDO/AIA data brightness for aesthetically pleasing mission long movies, as well as for normalization of EUV solar radius to visible light solar radius.</p>
+<p>The preferences dialog can be found under the program menu (JHelioviewer) on macOS, for Windows and Linux it is located in the menu <em>“Options”</em>. A <a href="#figure_preferences">new dialog</a> opens. The following persistent options can be set:</p>
+
+<ul>
+<li>preferred server</li>
+<li>loading of a preferred state file at start-up</li>
+<li>normalisation of SDO/AIA data brightness to reduce the effect of response degradation</li>
+<li>normalisation of EUV solar radius to visible light solar radius</li>
+<li>uniformisation of image observation time to Observer (default)/Sun emission/Earth arrival for the combination of observations from different vantage points</li>
+<li>format for the recordings: H.264/H.264 better/H.265/H.265 better/PNG series. The H.265 format allows for significantly smaller file sizes at the price of increased CPU time for the encoding and reduced compatibility with video playing software. The “better” variants allow for increased file sizes and slighter higher CPU utilisation for better output quality.</li>
+</ul>
+
+<p>Several parts of the interface can be turned on and off under the Plugins heading: Timelines/SWEK/PFSS. The persistent image cache can also be cleared, as well as a proxy username and password can be set if required.</p>
 
 <figure>
-<img src="preferences.png" alt="The preferences" id="figure_preferences"/>
+<img src="img/preferences.png" alt="The preferences" id="figure_preferences"/>
 <figcaption>The preferences</figcaption>
-</figure>
-
-<h2 id="managingplugins">Managing Plugins</h2>
-
-<p>Parts of JHelioviewer are built out of plugins that can be disabled for a more streamlined application. Managing the plugins is done via the menu item <em>“Plug-ins&gt;Manage Plug-ins…”</em>. A <a href="#figure_plugins">dialog box</a> will open. The list of plugins can be filtered: all plugins can be displayed, or only the enabled or disabled plugins. Clicking on <em>more</em> gives detailed information about the selected plugin.</p>
-
-<figure>
-<img src="plugins.png" alt="Manage the plugins" id="figure_plugins"/>
-<figcaption>Manage the plugins</figcaption>
 </figure>
 
 <h2 id="keyboardshortcuts">Keyboard Shortcuts</h2>
@@ -1019,7 +1021,7 @@
 
 <dl>
 <dt>I can’t find a specific wavelength for a specific instrument and observatory.</dt>
-<dd>Make sure that you select the correct server. The ROB server only has a limited, for testing purpose, amount of data. GSFC and IAS have the full dataset of most instruments. If the dataset isn’t to be found jhelioviewer is always capable to open the raw fitsfiles. The quality of the visualisation depends on the correctness of the keywords in the fits files.</dd>
+<dd>Make sure that you select the correct server. The ROB server only has a limited, for testing purpose, amount of data. GSFC and IAS have the full dataset of most instruments. If the dataset isn’t to be found, JHelioviewer is always capable to open FITS files. The quality of the visualisation depends on the correctness of the keywords in the FITS files.</dd>
 </dl>
 
 </body>
