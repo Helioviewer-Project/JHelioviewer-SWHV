@@ -8,7 +8,7 @@ macro(build_doc target input)
     set(outputHTML ${base}.html)
     add_custom_command(OUTPUT ${outputHTML} COMMAND /bin/sh -c \"
                             find ${CMAKE_CURRENT_SOURCE_DIR} \\\( -name \\*.png -or -name \\*.jpg -or -name \\*.css -or -name \\*.xslt -or -name \\*.js -or -name \\*.sh \\\) -exec cp {} ${CMAKE_CURRENT_BINARY_DIR} \\\; &&
-                            cp -r ${CMAKE_CURRENT_SOURCE_DIR}/new ${CMAKE_CURRENT_BINARY_DIR} &&
+                            cp -r ${CMAKE_CURRENT_SOURCE_DIR}/img ${CMAKE_CURRENT_BINARY_DIR} &&
                             cp -p ${CMAKE_CURRENT_SOURCE_DIR}/${input} ${CMAKE_CURRENT_BINARY_DIR} &&
                             mmd-xslt ${input} &&
                             sh ${CMAKE_CURRENT_BINARY_DIR}/youtube.sh ${CMAKE_CURRENT_BINARY_DIR}/${outputHTML} &&
