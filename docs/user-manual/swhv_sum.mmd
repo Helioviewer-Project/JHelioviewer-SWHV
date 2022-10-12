@@ -499,13 +499,19 @@ The image and timeline canvases can be exported in three ways: a one-loop movie,
 
 The record button is in the [movie control panel][movie_panel]. The default recording mode is a one-loop movie of the selected visible image layers. The created movie file will contain the first until the last frame of the current movie. The screenshot mode will make a screenshot of the current image and timeline canvases. In unlimited mode, all the manipulations are recorded from the moment the record button is clicked. Clicking the same record button, now indicating *"busy"*, stops the recording. Removing all image layers also stops the recording.
 
-# Saving program state
+# Saving program state [state]
 
-By selecting *"File>Save State"* the state of the program can be saved with the exception of annotations. This state can be shared. A state can be opened by *"File>Load State..."*. A file selection dialog will open and you can select the state file you want to open to recreate the state in the state file.
+The state file captures all the program's presentation including the loaded remote data, its orientation, and the options of the layers. This can be used to quickly reproduce a particular solar event or to share a particular combined presentation of data. The state file is a JSON file which can be saved by selecting *"File>Save State"* and loaded by *"File>Load State..."*.
 
 # Program interoperability
 
-## Simple Application Message Protocol [samp]
+## Simple Application Message Protocol (SAMP) [samp]
+
+[SAMP](https://www.ivoa.net/documents/SAMP/) is an inter-application messaging protocol standardised by IVOA that enables astronomy software tools to interoperate and communicate. The GitHub [samp4jhv](https://github.com/Helioviewer-Project/samp4jhv) project contains a collection of examples on how data can be shared between JHelioviewer and Python or IDL environments.
+
+This protocol can also be used on the web and the figure below shows the online SOAR archive which can send FITS and CDF files to JHelioviewer. Selecting "Send table" will instruct JHelioviewer to load the selected FITS files as a movie. Selecting "Send products" will make JHelioviewer to load the selected files as different layers.
+
+![SOAR archive in action][figure_soar]
 
 # Using time in JHelioviewer
 
@@ -518,7 +524,7 @@ By selecting *"File>Save State"* the state of the program can be saved with the 
 The preferences dialog can be found under the program menu (JHelioviewer) on macOS, for Windows and Linux it is located in the menu *"Options"*. A [new dialog](#figure_preferences) opens. The following persistent options can be set:
 
 - preferred server
-- loading of a preferred state file at start-up
+- loading of a preferred [state file][state] at start-up
 - normalisation of SDO/AIA data brightness to reduce the effect of response degradation
 - normalisation of EUV solar radius to visible light solar radius
 - uniformisation of image observation time to Observer (default)/Sun emission/Earth arrival for the combination of observations from different vantage points
@@ -661,3 +667,5 @@ I can't find a specific wavelength for a specific instrument and observatory.
 
 [figure_add_timeline]: add_timeline.png height=126px width=397px
 [figure_swek]: swek.png height=547px width=370px
+[figure_soar]: img/soar.png
+
