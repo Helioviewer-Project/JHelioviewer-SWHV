@@ -5,6 +5,7 @@
 
 - Improve metadata display to include comments and history
 - Add toolbar menu to rotate view 90˚ around the axes
+- Delay timelines in terms of time and not propagation speed
 
 ## JHelioviewer 4.3.2 (2022-05-11)
 
