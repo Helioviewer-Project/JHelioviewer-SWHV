@@ -718,9 +718,9 @@
 
 <h2 id="record">Recording</h2>
 
-<p>The image and timeline canvases can be exported in three ways: a one-loop movie, a screenshot, or an open ended recording of all the manipulations. All movies are saved in the directory <code>JHelioviewer-SWHV/Exports/</code> in the home directory. The export format is streamable H.264/AVC in a MP4 container file for the movies, and the PNG format for the screenshots. Several frame sizes are offered: the image canvas original size (on screen), 1920 by 1080 pixels and 4096 by 4096. The exported movie file has the selected frames per second setting.</p>
+<p>The image and timeline canvases can be exported in three ways: a one-loop movie, a screenshot, or an open ended recording of all the manipulations. All movies are saved in the directory <code>JHelioviewer-SWHV/Exports/</code> in the home directory. The export format can be set in the <a href="#preferences">preferences</a>. The movies can be either a streamable MP4 container file or series of PNGs. The MP4 files can be in H.264/AVC format for better compatibility or in H.265/HEVC for smaller files. Screenshots are saved in the PNG format. Several frame sizes are offered: from the image canvas original size (on screen) and up to 4096 by 4096. The exported movie file has the selected frames per second setting.</p>
 
-<p>The record button is in the <a href="#movie_panel">movie control panel</a>. The default recording mode is a one-loop movie of the selected visible image layers. The created movie file will contain the first until the last frame of the current movie. The screenshot mode will make a screenshot of the current image and timeline canvases. In unlimited mode, all the manipulations are recorded from the moment the record button is clicked. Clicking the same record button, now indicating <em>“busy”</em>, stops the recording. Removing all image layers also stops the recording.</p>
+<p>The record button is in the <a href="#movie_panel">movie control panel</a>. The default recording mode is a one-loop movie of the selected visible image layers together with the timeline canvas if visible. The created movie file will contain the first until the last frame of the current movie. The screenshot mode will make a screenshot of the current image and timeline canvases. In unlimited mode, all the manipulations are recorded from the moment the record button is clicked. Clicking the same record button, now indicating <em>“busy”</em>, stops the recording. Removing all image layers also stops the recording.</p>
 
 <h2 id="state">Saving program state</h2>
 
@@ -741,9 +741,9 @@
 
 <h2 id="usingtimeinjhelioviewer">Using time in JHelioviewer</h2>
 
-<h3 id="naturallanguagefortime">Natural language for time</h3>
+<p>All time input and display in JHelioviewer is UTC in ISO8601 format. Day of year format is supported, as well as natural English language phrases such as “one year ago” or “tho weeks ago”. If the input is not recognized or if the start time is later than the end time, the time field reverts to previously displayed value. The entire time range can be shifted backward or forward with a selectable duration (day/week/Carrington rotation). The period of an entire Carrington rotation can be filled in the time fields by clicking the “CR” button.</p>
 
-<h2 id="changingthepreferences">Changing the Preferences</h2>
+<h2 id="preferences">Changing the Preferences</h2>
 
 <p>The preferences dialog can be found under the program menu (JHelioviewer) on macOS, for Windows and Linux it is located in the menu <em>“Options”</em>. A <a href="#figure_preferences">new dialog</a> opens. The following persistent options can be set:</p>
 
