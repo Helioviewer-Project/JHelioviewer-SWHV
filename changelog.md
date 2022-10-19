@@ -1,7 +1,7 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.3.3 (pending)
+## JHelioviewer 4.3.3 (2022-10-19)
 
 - Improve metadata display to include comments and history
 - Add toolbar menu to rotate view 90˚ around the axes
