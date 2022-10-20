@@ -36,27 +36,28 @@ public class Movie {
         JHVTime next = mode == AdvanceMode.SwingDown ? lowerTime.apply(time) : higherTime.apply(time);
         if (next.milli == time.milli) { // already at the edges
             switch (mode) {
-                case Stop:
+                case Loop -> {
+                    if (next.milli == lastTime.get().milli) {
+                        return firstTime.get();
+                    }
+                }
+                case Stop -> {
                     if (next.milli == lastTime.get().milli) {
                         return null;
                     }
-                    break;
-                case Swing:
+                }
+                case Swing -> {
                     if (next.milli == lastTime.get().milli) {
                         setAdvanceMode(AdvanceMode.SwingDown);
                         return lowerTime.apply(next);
                     }
-                    break;
-                case SwingDown:
+                }
+                case SwingDown -> {
                     if (next.milli == firstTime.get().milli) {
                         setAdvanceMode(AdvanceMode.Swing);
                         return higherTime.apply(next);
                     }
-                    break;
-                default: // Loop
-                    if (next.milli == lastTime.get().milli) {
-                        return firstTime.get();
-                    }
+                }
             }
         }
         return next;
