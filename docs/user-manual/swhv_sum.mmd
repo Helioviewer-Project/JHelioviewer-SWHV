@@ -282,7 +282,7 @@ Click the button next to the invert colors button to make the corona better visi
 
 ## Solar Grid
 
-The grid can show heliographic coordinates as seen from the viewpoint, Stonyhurst, Carrington and Heliocentric inertial coordinates. Two yellow great circles indicate the Earth direction. Clicking the adjacent checkbox can hide the grid. The grid options panel is shown in the [figure below](#figure_grid). The radial grid can be turned on and off; the same can be done for the solar axis (the blue and red lines at the poles of the Sun) and the grid labels.
+The grid can show heliographic coordinates as seen from the viewpoint, Stonyhurst, Carrington and Heliocentric inertial coordinates. Two yellow great circles indicate the Earth direction and their intersection towards Earth is marked by a point. Clicking the adjacent checkbox can hide the grid. The grid options panel is shown in the [figure below](#figure_grid). The radial grid can be turned on and off; the same can be done for the solar axis (the blue and red lines at the poles of the Sun) and the grid labels.
 
 The grid ticks size can be changed in both longitude and latitude. The value can be entered directly in the text field, it can be changed by scrolling the mouse over the text field, or by using the arrows. Values ranging from 5˚ and 90˚ are allowed.
 
@@ -329,15 +329,13 @@ The timestamp indicated by the viewpoint is the one of the master layer for the 
 
 ## Timestamp
 
-The timestamp is invisible by default. If it is made visible, the timestamp of the master layer will appear on the image canvas as shown in the [figure below](#figure_timestamp). The slider changes the size of the displayed timestamp on the image canvas.
+The timestamp layer shows the timestamp of the viewpoint if the multiview mode is off and the timestamps of the individual layers if the multiview mode is on. The text size can be adjusted with a slider, the text can placed at top left and additional information like distance to Sun can displayed.
 
 ![The timestamp][figure_timestamp]
 
 ## Miniview
 
-The miniview is an aid for locating the position of the current scene within the full field of view, particularly when zoomed in. The size of the miniview can be changed in the option panel by entering the value in the text field, by scrolling the mouse over the text field, or by using the arrows. The smallest and largest miniview are shown in the [figure below](#figure_miniview).
-
-![The smallest and largest miniview][figure_miniview]
+The miniview shows a superposition of the loaded image layers irrespective of the current scene which may be substantially zoomed in or out. The size of the miniview can be changed in the option panel with a slider.
 
 ## Space Weather Event Knowledgebase Events [image_swek]
 
@@ -345,9 +343,11 @@ The SWEK image layer shows the events that have location information. The events
 
 ## PFSS Model [pfss]
 
-The PFSS model visualises a model of the magnetic field derived from magnetograms. The field lines are calculated on a daily basis using GONG magnetograms. The timestamp given in the list of layers is the timestamp of the GONG magnetogram used for the calculations. The [figure below](#figure_pfss) shows different views of the model. The number of field lines shown can be varied by decimation when changing the level of detail between 0 and 8. The radius sets the distance in solar radii that the field lines are visible. By default, the outgoing parts of the field lines are drawn in red, the incoming parts in blue. By enabling the *"Fixed colors"*, loops will be drawn white, open outgoing field lines red and incoming field lines blue.
+The PFSS model layer visualises a model of the magnetic field derived from magnetograms. The field lines are calculated from GONG magnetograms on the ROB server using a classic [model](<http://wso.stanford.edu/words/pfss.pdf>). The timestamp given in the list of layers is the timestamp of the GONG magnetogram used for the calculations. The figures below show different views of the model. The number of field lines shown can be varied by decimation when changing the level of detail between 0 and 8. The radius sets the distance in solar radii that the field lines are visible. By default, the outgoing parts of the field lines are drawn in red, the incoming parts in blue. By enabling the *"Fixed colors"*, loops will be drawn white, open outgoing field lines red and incoming field lines blue.
 
-![The PFSS model: no fixed colors, level 0 (top image); no fixed colors, level 8 (middle image) and fixed colors, level 5 (bottom image)][figure_pfss]
+![][figure_pfss0]
+![][figure_pfss8]
+![][figure_pfss_fixed]
 
 Clicking the *"Available data"* button brings will open a web browser window with [a page] (<http://swhv.oma.be/availability/pfss/availability/availability.html>) showing the available data for the PFSS Model. The darker the green, the more data are available.
 
@@ -638,8 +638,6 @@ I can't find a specific wavelength for a specific instrument and observatory.
 [figure_add_layer_dialog]: add_layer_dialog.png height=297px width=397px
 [figure_image_layer_options]: image_layer_options.png height=297px width=397px
 [figure_grid]: img/grid.png height=297px width=379px
-[figure_timestamp]: timestamp.png height=297px width=397px
-[figure_miniview]: miniview.png height=297px width=397px
 [figure_change_color]: change_color.png height=297px width=397px
 [figure_events]: events.png height=297px width=397px
 [figure_detail_events]: detail_events.png height=297px width=397px
@@ -658,7 +656,12 @@ I can't find a specific wavelength for a specific instrument and observatory.
 [figure_difference]: difference.png height=547px width=370px
 [figure_camera]: camera.png height=547px width=370px
 [figure_equatorial]: equatorial_view.png height=297px width=397px
-[figure_pfss]: pfss.png height=547px width=370px
+
+[figure_timestamp]: img/timestamp.png height=297px width=397px
+[figure_pfss0]: img/pfss_detail0.png height=547px width=370px
+[figure_pfss8]: img/pfss_detail8.png height=547px width=370px
+[figure_pfss_fixed]: img/pfss_fixedcolor.png height=547px width=370px
+
 [figure_no_locking]: no_locking.png height=547px width=370px
 [figure_locking]: locking.png height=547px width=370px
 [figure_radio]: radio.png height=547px width=370px
