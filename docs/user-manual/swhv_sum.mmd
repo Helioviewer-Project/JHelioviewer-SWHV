@@ -294,42 +294,31 @@ The grid ticks size can be changed in both longitude and latitude. The value can
 
 ## Viewpoint [camera]
 
-The viewpoint represents the vantage point and manages how the images are viewed. The viewpoint is defined by a location, a time instance and a rotation with respect to the direction to Sun. There are three viewpoint modes: the observer view, Earth view and expert view. The different viewpoint modes are demonstrated in the [figure below](#figure_camera). The viewpoint is invisible by default. When visible, a field of view indicator is shown. In all viewpoint modes, entering the value in the text field, scrolling the mouse over the text field, or using the arrows can change the angle of the field of view indicator.
+The viewpoint represents the vantage point and is defined by a location, a time instance, and a rotation with respect to the direction to Sun. If the Viewpoint layer is not selected, the scene is viewed as observed. If the layer is selected, the scene is rotated as if it was observed from another viewpoint, while the images are still correctly placed with respect to the Sun as they were observed.
 
-![Demonstration of the different viewpoint modes: STEREO-B image seen from STEREO-B (top image), from Earth (middle image), and from Mercury (bottom image)][figure_camera]
+### Location
 
-### Observer View
+The scene can be viewed as seen from planets or some known spacecraft.
 
-This is the view from the observer. The viewpoint time indicated in the layers list is defined by the timestamp of the master layer.
+![Location viewpoint][figure_viewpoint_location]
 
-### Earth View
+The viewing time range can be altered by deselecting *Use movie time interval* and setting a different time range, for example in the future. The timestamp of the viewpoint is shown in the list of layers.
 
-This is the view from Earth. For instruments located around Earth, this is very similar to the observer view, but for the case of STEREO or other instruments at a different location in the solar system, this view is different. The viewpoint time indicated in the layers list is defined by the timestamp of the master layer.
+![Location viewpoint future][figure_viewpoint_location_future]
 
-### Expert View
+### Heliosphere
 
-The expert view allows seeing the image as from a specific location. At the moment, the following locations are available:
+The scene is seen as from above the ecliptic plane and allows the visualisation of orbits. Several reference frames can be selected and the viewing time range can be altered by deselecting *Use movie time interval* and setting a different time range, for example in the future.
 
- * All planets + Pluto
- * The Moon
- * Comet 67P/Churyumov-Gerasimenko
- * SOHO spacecraft
- * STEREO (Ahead and Behind) spacecraft
- * Proba2 spacecraft
- * SDO spacecraft
- * Solar Orbiter spacecraft
- * Proba 3 spacecraft
+![Heliosphere viewpoint][figure_viewpoint_heliosphere]
 
-The expert view uses an online location service. If the status of the expert view is not *"Loaded"*, there was a problem with the connection to the location service and the expert camera won't work.
+If relative longitude is on, and a particular solar system object is selected from the list, that object is placed at 0 longitude. This allows for an approximate measurement of separation angles in the X-Y plane of the reference frame.
 
-If *"Use active layer timestamps"* is selected the timestamps of the master layer are used for the viewpoint time, otherwise arbitrary time intervals can be used for the viewpoint time. The image canvas scene will correctly show the geometric configuration and orientation of the solar system bodies involved.
+![Heliosphere viewpoint relative longitude][figure_viewpoint_heliosphere_relative]
 
-The timestamp indicated by the viewpoint is the one of the master layer for the observer and Earth camera modes. For the expert mode, it is the time of the expert viewpoint.
+An Archimedean spiral can be drawn determined by a selectable propagation speed. One arm of the spiral will pass through the selected solar system object.
 
-### Equatorial View
-
-![Equatorial view][figure_equatorial]
-
+![Heliosphere viewpoint spiral][figure_viewpoint_heliosphere_spiral]
 
 ## Timestamp
 
@@ -665,8 +654,12 @@ I can't find a specific wavelength for a specific instrument and observatory.
 [figure_tracking]: tracking.png height=559px width=379px
 
 [figure_difference]: difference.png height=547px width=370px
-[figure_camera]: camera.png height=547px width=370px
-[figure_equatorial]: equatorial_view.png height=297px width=397px
+
+[figure_viewpoint_location]: img/viewpoint_location.png height=297px width=397px
+[figure_viewpoint_location_future]: img/viewpoint_location_future.png height=297px width=397px
+[figure_viewpoint_heliosphere]: img/viewpoint_heliosphere.png height=297px width=397px
+[figure_viewpoint_heliosphere_relative]: img/viewpoint_heliosphere_relative.png height=297px width=397px
+[figure_viewpoint_heliosphere_spiral]: img/viewpoint_heliosphere_spiral.png height=297px width=397px
 
 [figure_timestamp]: img/timestamp.png height=297px width=397px
 [figure_pfss0]: img/pfss_detail0.png height=547px width=370px

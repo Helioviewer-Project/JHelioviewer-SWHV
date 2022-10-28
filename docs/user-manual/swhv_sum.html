@@ -228,7 +228,7 @@
 
 <h4 id="projection">Projection</h4>
 
-<p>Jhelioviewer is able to show images in four projections: orthographic, latitudinal (only for images on the solar disk), logpolar and polar. To change the projection click the projection button and select the projection.</p>
+<p>Jhelioviewer is able to show images in four projections: orthographic (default), latitudinal (only for images on the solar disk), logpolar and polar. To change the projection click the projection button and select the projection.</p>
 
 <figure>
 <img src="img/projection_orthographic.png" alt="Orthographic projection" id="figure_projection_orthographic"/>
@@ -366,48 +366,45 @@
 
 <h3 id="camera">Viewpoint</h3>
 
-<p>The viewpoint represents the vantage point and manages how the images are viewed. The viewpoint is defined by a location, a time instance and a rotation with respect to the direction to Sun. There are three viewpoint modes: the observer view, Earth view and expert view. The different viewpoint modes are demonstrated in the <a href="#figure_camera">figure below</a>. The viewpoint is invisible by default. When visible, a field of view indicator is shown. In all viewpoint modes, entering the value in the text field, scrolling the mouse over the text field, or using the arrows can change the angle of the field of view indicator.</p>
+<p>The viewpoint represents the vantage point and is defined by a location, a time instance, and a rotation with respect to the direction to Sun. If the Viewpoint layer is not selected, the scene is viewed as observed. If the layer is selected, the scene is rotated as if it was observed from another viewpoint, while the images are still correctly placed with respect to the Sun as they were observed.</p>
+
+<h4 id="location">Location</h4>
+
+<p>The scene can be viewed as seen from planets or some known spacecraft.</p>
 
 <figure>
-<img src="camera.png" alt="Demonstration of the different viewpoint modes: STEREO-B image seen from STEREO-B (top image), from Earth (middle image), and from Mercury (bottom image)" id="figure_camera"/>
-<figcaption>Demonstration of the different viewpoint modes: STEREO-B image seen from STEREO-B (top image), from Earth (middle image), and from Mercury (bottom image)</figcaption>
+<img src="img/viewpoint_location.png" alt="Location viewpoint" id="figure_viewpoint_location"/>
+<figcaption>Location viewpoint</figcaption>
 </figure>
 
-<h4 id="observerview">Observer View</h4>
-
-<p>This is the view from the observer. The viewpoint time indicated in the layers list is defined by the timestamp of the master layer.</p>
-
-<h4 id="earthview">Earth View</h4>
-
-<p>This is the view from Earth. For instruments located around Earth, this is very similar to the observer view, but for the case of STEREO or other instruments at a different location in the solar system, this view is different. The viewpoint time indicated in the layers list is defined by the timestamp of the master layer.</p>
-
-<h4 id="expertview">Expert View</h4>
-
-<p>The expert view allows seeing the image as from a specific location. At the moment, the following locations are available:</p>
-
-<ul>
-<li>All planets + Pluto</li>
-<li>The Moon</li>
-<li>Comet 67P/Churyumov-Gerasimenko</li>
-<li>SOHO spacecraft</li>
-<li>STEREO (Ahead and Behind) spacecraft</li>
-<li>Proba2 spacecraft</li>
-<li>SDO spacecraft</li>
-<li>Solar Orbiter spacecraft</li>
-<li>Proba 3 spacecraft</li>
-</ul>
-
-<p>The expert view uses an online location service. If the status of the expert view is not <em>“Loaded”</em>, there was a problem with the connection to the location service and the expert camera won’t work.</p>
-
-<p>If <em>“Use active layer timestamps”</em> is selected the timestamps of the master layer are used for the viewpoint time, otherwise arbitrary time intervals can be used for the viewpoint time. The image canvas scene will correctly show the geometric configuration and orientation of the solar system bodies involved.</p>
-
-<p>The timestamp indicated by the viewpoint is the one of the master layer for the observer and Earth camera modes. For the expert mode, it is the time of the expert viewpoint.</p>
-
-<h4 id="equatorialview">Equatorial View</h4>
+<p>The viewing time range can be altered by deselecting <em>Use movie time interval</em> and setting a different time range, for example in the future. The timestamp of the viewpoint is shown in the list of layers.</p>
 
 <figure>
-<img src="equatorial_view.png" alt="Equatorial view" id="figure_equatorial"/>
-<figcaption>Equatorial view</figcaption>
+<img src="img/viewpoint_location_future.png" alt="Location viewpoint future" id="figure_viewpoint_location_future"/>
+<figcaption>Location viewpoint future</figcaption>
+</figure>
+
+<h4 id="heliosphere">Heliosphere</h4>
+
+<p>The scene is seen as from above the ecliptic plane and allows the visualisation of orbits. Several reference frames can be selected and the viewing time range can be altered by deselecting <em>Use movie time interval</em> and setting a different time range, for example in the future.</p>
+
+<figure>
+<img src="img/viewpoint_heliosphere.png" alt="Heliosphere viewpoint" id="figure_viewpoint_heliosphere"/>
+<figcaption>Heliosphere viewpoint</figcaption>
+</figure>
+
+<p>If relative longitude is on, and a particular solar system object is selected from the list, that object is placed at 0 longitude. This allows for an approximate measurement of separation angles in the X-Y plane of the reference frame.</p>
+
+<figure>
+<img src="img/viewpoint_heliosphere_relative.png" alt="Heliosphere viewpoint relative longitude" id="figure_viewpoint_heliosphere_relative"/>
+<figcaption>Heliosphere viewpoint relative longitude</figcaption>
+</figure>
+
+<p>An Archimedean spiral can be drawn determined by a selectable propagation speed. One arm of the spiral will pass through the selected solar system object.</p>
+
+<figure>
+<img src="img/viewpoint_heliosphere_spiral.png" alt="Heliosphere viewpoint spiral" id="figure_viewpoint_heliosphere_spiral"/>
+<figcaption>Heliosphere viewpoint spiral</figcaption>
 </figure>
 
 <h3 id="timestamp">Timestamp</h3>
