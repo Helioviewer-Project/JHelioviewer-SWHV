@@ -114,7 +114,7 @@ See the [image canvas manipulation][image_canvas_manip] section and the [toolbar
 
 ### Image Canvas
 
-The image canvas displays the visible image layers. The images of the Sun are projected on a sphere. As long as no manipulations to the scene are done, and the camera is in observer mode (see the [camera section][camera]), the image is an undistorted representation of the two-dimensional data recorded by the instrument.
+The image canvas displays the visible image layers. The images of the Sun are projected on a sphere. As long as no manipulations to the scene are done, and the [viewpoint][viewpoint] is not altered, the image is an undistorted representation of the two-dimensional data recorded by the instrument.
 
 ### Timeline Canvas
 
@@ -175,21 +175,35 @@ It is possible to annotate the image canvas with various shapes. The [annotation
 
 ![Annotated image canvas][figure_annotation]
 
-Consider the situation shown by the [annotation figure](#figure_annotation). By pressing *shift*+*n*(ext) or *shift*+*p*(previous), another annotation will become red. Pressing shift combined with the forward or the backward delete key will delete the red rectangle. The annotations can deleted all at once via the menu item *"View>Clear annotations"* or from the toolbar annotation mode button.
+Consider the situation shown by the [annotation figure](#figure_annotation). By pressing *shift*+*n*(ext) or *shift*+*p*(previous), another annotation will become red. Pressing shift combined with the forward or the backward delete key will delete the red loop. The annotations can deleted all at once via the menu item *"View>Clear annotations"* or from the toolbar annotation mode button.
 
 ### Tracking Features
 
-The solar rotation can be tracked. Zoom, rotate and translate the image until a desired feature is visible. Enable the tracking mode in the toolbar and play the movie. The image canvas will show the evolution of the selected feature.
+The solar rotation can be tracked by freezing the [viewpoint][viewpoint] time at the moment when the tracking mode is enabled in the toolbar. The image canvas will co-rotate with the Sun when playing the movie, while keeping the original features fixed on screen, allowing to observe their evolution in time.
 
-The [figure below](#figure_tracking) shows the tracking in action. Top image is the start position. The image was zoomed, rotated and translated on top of the active regions and tracking was enabled. The first image is taken at time 08:09:46, the middle image is at 19:43:58 and the bottom image is at 07:39:10 the next day. Notice that the same active regions stay in view and the miniview moves slightly to the solar West.
+![Tracking mode on][figure_track_on]
 
-![Tracking in action][figure_tracking]
+![Tracked movie start][figure_track_start]
+
+![Tracked movie end][figure_track_end]
+
+### Differential Rotation
+
+The images can be distorted according to differential solar rotation of magnetic features by selecting the differential option in the toolbar and manipulating the viewpoint time, see [viewpoint section][viewpoint].
+
+![Differential rotation in action][figure_differential]
 
 ### Corona Visibility
 
 The off-disk solar corona can hidden by clicking the corona button in the toolbar. The [figure below](#figure_no_corona) shows the result after turning on this mode.
 
 ![Hiding the off-disk corona][figure_no_corona]
+
+### Multiview
+
+The [multiview figure](#figure_multiview) shows what happens if the *"Multiview"* option in the toolbar is selected. The layers are displayed side-by-side instead of on top of each other. In this mode, up to four layers can be placed together in the image canvas.
+
+![The multiview option in action][figure_multiview]
 
 ### Projection
 
@@ -253,10 +267,6 @@ To change the options of a layer, it has to be selected in the table listing and
 
 Image layers can be replaced by double-clicking in the listing and modifying any of the selection parameters that were initially used. The time span of all image layers loaded can be matched by clicking the *"Synchronize layers time span"* button.
 
-The [multiview figure](#figure_multiview) shows what happens if the *"Multiview"* option in the toolbar is selected. The layers are displayed side-by-side instead of on top of each other. In this mode, up to four layers can be placed together in the image canvas.
-
-![The multiview option in action][figure_multiview]
-
 ## Availability of the Images
 
 The availability of image datasets can be checked for the ROB server by clicking on the *"Available data"* button at the bottom left of the dialog box. A web browser window will open with [a page](<http://swhv.oma.be/availability/images/availability/availability.html>) showing an approximation of the available data on the ROB server. The darker the green, the more images are available.
@@ -292,9 +302,9 @@ The grid ticks size can be changed in both longitude and latitude. The value can
 
 ![The grid options panel][figure_grid]
 
-## Viewpoint [camera]
+## Viewpoint [viewpoint]
 
-The viewpoint represents the vantage point and is defined by a location, a time instance, and a rotation with respect to the direction to Sun. If the Viewpoint layer is not selected, the scene is viewed as observed. If the layer is selected, the scene is rotated as if it was observed from another viewpoint, while the images are still correctly placed with respect to the Sun as they were observed.
+The viewpoint represents the vantage point and is defined by a location, a time instance, and a rotation with respect to the direction to Sun. If the Viewpoint layer is not selected, the scene is viewed as observed. If the layer is selected, the scene is rotated as if it was observed from another location and/or another time, while the images are still correctly placed with respect to the Sun as they were observed.
 
 ### Location
 
@@ -302,7 +312,7 @@ The scene can be viewed as seen from planets or some known spacecraft.
 
 ![Location viewpoint][figure_viewpoint_location]
 
-The viewing time range can be altered by deselecting *Use movie time interval* and setting a different time range, for example in the future. The timestamp of the viewpoint is shown in the list of layers.
+The viewpoint time range can be altered by deselecting *Use movie time interval* and setting a different time range, for example in the future. The timestamp of the viewpoint is shown in the list of layers.
 
 ![Location viewpoint future][figure_viewpoint_location_future]
 
@@ -629,7 +639,6 @@ I can't find a specific wavelength for a specific instrument and observatory.
 [figure_overview_annotated]: img/full_window_annotated.png
 
 [figure_toolbar]: toolbar.png height=297px width=397px
-[figure_annotation]: annotation_ic.png height=297px width=397px
 [figure_no_corona]: no_corona_compo.png height=297px width=397px
 [figure_movie_panel]: movie_panel2.png height=297px width=397px
 [figure_add_layer_dialog]: add_layer_dialog.png height=297px width=397px
@@ -651,7 +660,14 @@ I can't find a specific wavelength for a specific instrument and observatory.
 
 [figure_zooming]: zooming.png height=559px width=379px
 [figure_rotpan]: rotpan.png height=559px width=379px
-[figure_tracking]: tracking.png height=559px width=379px
+
+[figure_annotation]: img/annotations.png height=297px width=397px
+
+[figure_track_on]: img/track_on.png height=297px width=397px
+[figure_track_start]: img/track_start.png height=297px width=397px
+[figure_track_end]: img/track_end.png height=297px width=397px
+
+[figure_differential]: img/differential.png height=297px width=397px
 
 [figure_difference]: difference.png height=547px width=370px
 

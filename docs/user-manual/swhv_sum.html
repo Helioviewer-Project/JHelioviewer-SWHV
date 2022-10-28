@@ -126,7 +126,7 @@
 
 <h4 id="imagecanvas">Image Canvas</h4>
 
-<p>The image canvas displays the visible image layers. The images of the Sun are projected on a sphere. As long as no manipulations to the scene are done, and the camera is in observer mode (see the <a href="#camera">camera section</a>), the image is an undistorted representation of the two-dimensional data recorded by the instrument.</p>
+<p>The image canvas displays the visible image layers. The images of the Sun are projected on a sphere. As long as no manipulations to the scene are done, and the <a href="#viewpoint">viewpoint</a> is not altered, the image is an undistorted representation of the two-dimensional data recorded by the instrument.</p>
 
 <h4 id="timelinecanvas">Timeline Canvas</h4>
 
@@ -200,21 +200,38 @@
 <p>It is possible to annotate the image canvas with various shapes. The <a href="#figure_annotation">annotation figure</a> shows an annotated image canvas and the modes when clicking the annotation button. Click the annotate button and select the desired annotation shape. Then press the shift key and drag the mouse pointer with the left button pressed to draw. When finished, release the mouse button, then the shift key. If more than one annotation is added, the red one indicates the active annotation.</p>
 
 <figure>
-<img src="annotation_ic.png" alt="Annotated image canvas" id="figure_annotation"/>
+<img src="img/annotations.png" alt="Annotated image canvas" id="figure_annotation"/>
 <figcaption>Annotated image canvas</figcaption>
 </figure>
 
-<p>Consider the situation shown by the <a href="#figure_annotation">annotation figure</a>. By pressing <em>shift</em>+<em>n</em>(ext) or <em>shift</em>+<em>p</em>(previous), another annotation will become red. Pressing shift combined with the forward or the backward delete key will delete the red rectangle. The annotations can deleted all at once via the menu item <em>“View&gt;Clear annotations”</em> or from the toolbar annotation mode button.</p>
+<p>Consider the situation shown by the <a href="#figure_annotation">annotation figure</a>. By pressing <em>shift</em>+<em>n</em>(ext) or <em>shift</em>+<em>p</em>(previous), another annotation will become red. Pressing shift combined with the forward or the backward delete key will delete the red loop. The annotations can deleted all at once via the menu item <em>“View&gt;Clear annotations”</em> or from the toolbar annotation mode button.</p>
 
 <h4 id="trackingfeatures">Tracking Features</h4>
 
-<p>The solar rotation can be tracked. Zoom, rotate and translate the image until a desired feature is visible. Enable the tracking mode in the toolbar and play the movie. The image canvas will show the evolution of the selected feature.</p>
-
-<p>The <a href="#figure_tracking">figure below</a> shows the tracking in action. Top image is the start position. The image was zoomed, rotated and translated on top of the active regions and tracking was enabled. The first image is taken at time 08:09:46, the middle image is at 19:43:58 and the bottom image is at 07:39:10 the next day. Notice that the same active regions stay in view and the miniview moves slightly to the solar West.</p>
+<p>The solar rotation can be tracked by freezing the <a href="#viewpoint">viewpoint</a> time at the moment when the tracking mode is enabled in the toolbar. The image canvas will co-rotate with the Sun when playing the movie, while keeping the original features fixed on screen, allowing to observe their evolution in time.</p>
 
 <figure>
-<img src="tracking.png" alt="Tracking in action" id="figure_tracking"/>
-<figcaption>Tracking in action</figcaption>
+<img src="img/track_on.png" alt="Tracking mode on" id="figure_track_on"/>
+<figcaption>Tracking mode on</figcaption>
+</figure>
+
+<figure>
+<img src="img/track_start.png" alt="Tracked movie start" id="figure_track_start"/>
+<figcaption>Tracked movie start</figcaption>
+</figure>
+
+<figure>
+<img src="img/track_end.png" alt="Tracked movie end" id="figure_track_end"/>
+<figcaption>Tracked movie end</figcaption>
+</figure>
+
+<h4 id="differentialrotation">Differential Rotation</h4>
+
+<p>The images can be distorted according to differential solar rotation of magnetic features by selecting the differential option in the toolbar and manipulating the viewpoint time, see <a href="#viewpoint">viewpoint section</a>.</p>
+
+<figure>
+<img src="img/differential.png" alt="Differential rotation in action" id="figure_differential"/>
+<figcaption>Differential rotation in action</figcaption>
 </figure>
 
 <h4 id="coronavisibility">Corona Visibility</h4>
@@ -224,6 +241,15 @@
 <figure>
 <img src="no_corona_compo.png" alt="Hiding the off-disk corona" id="figure_no_corona"/>
 <figcaption>Hiding the off-disk corona</figcaption>
+</figure>
+
+<h4 id="multiview">Multiview</h4>
+
+<p>The <a href="#figure_multiview">multiview figure</a> shows what happens if the <em>“Multiview”</em> option in the toolbar is selected. The layers are displayed side-by-side instead of on top of each other. In this mode, up to four layers can be placed together in the image canvas.</p>
+
+<figure>
+<img src="img/multiview.png" alt="The multiview option in action" id="figure_multiview"/>
+<figcaption>The multiview option in action</figcaption>
 </figure>
 
 <h4 id="projection">Projection</h4>
@@ -308,13 +334,6 @@
 
 <p>Image layers can be replaced by double-clicking in the listing and modifying any of the selection parameters that were initially used. The time span of all image layers loaded can be matched by clicking the <em>“Synchronize layers time span”</em> button.</p>
 
-<p>The <a href="#figure_multiview">multiview figure</a> shows what happens if the <em>“Multiview”</em> option in the toolbar is selected. The layers are displayed side-by-side instead of on top of each other. In this mode, up to four layers can be placed together in the image canvas.</p>
-
-<figure>
-<img src="img/multiview.png" alt="The multiview option in action" id="figure_multiview"/>
-<figcaption>The multiview option in action</figcaption>
-</figure>
-
 <h3 id="availabilityoftheimages">Availability of the Images</h3>
 
 <p>The availability of image datasets can be checked for the ROB server by clicking on the <em>“Available data”</em> button at the bottom left of the dialog box. A web browser window will open with <a href="http://swhv.oma.be/availability/images/availability/availability.html">a page</a> showing an approximation of the available data on the ROB server. The darker the green, the more images are available.</p>
@@ -364,9 +383,9 @@
 <figcaption>The grid options panel</figcaption>
 </figure>
 
-<h3 id="camera">Viewpoint</h3>
+<h3 id="viewpoint">Viewpoint</h3>
 
-<p>The viewpoint represents the vantage point and is defined by a location, a time instance, and a rotation with respect to the direction to Sun. If the Viewpoint layer is not selected, the scene is viewed as observed. If the layer is selected, the scene is rotated as if it was observed from another viewpoint, while the images are still correctly placed with respect to the Sun as they were observed.</p>
+<p>The viewpoint represents the vantage point and is defined by a location, a time instance, and a rotation with respect to the direction to Sun. If the Viewpoint layer is not selected, the scene is viewed as observed. If the layer is selected, the scene is rotated as if it was observed from another location and/or another time, while the images are still correctly placed with respect to the Sun as they were observed.</p>
 
 <h4 id="location">Location</h4>
 
@@ -377,7 +396,7 @@
 <figcaption>Location viewpoint</figcaption>
 </figure>
 
-<p>The viewing time range can be altered by deselecting <em>Use movie time interval</em> and setting a different time range, for example in the future. The timestamp of the viewpoint is shown in the list of layers.</p>
+<p>The viewpoint time range can be altered by deselecting <em>Use movie time interval</em> and setting a different time range, for example in the future. The timestamp of the viewpoint is shown in the list of layers.</p>
 
 <figure>
 <img src="img/viewpoint_location_future.png" alt="Location viewpoint future" id="figure_viewpoint_location_future"/>
