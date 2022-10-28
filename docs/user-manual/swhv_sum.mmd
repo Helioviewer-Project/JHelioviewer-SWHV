@@ -193,11 +193,15 @@ The off-disk solar corona can hidden by clicking the corona button in the toolba
 
 ### Projection
 
-Jhelioviewer is able to show images in four projections: orthographic, latitudinal (only for images on the solar disk), logpolar and polar. To change the projection click the projection button and select the projection. [Projection figure 1](#figure_projection_1) shows the orthographic and latitudinal projection, [projection figure 2](#figure_projection_2) shows the logpolar and polar projection.
+Jhelioviewer is able to show images in four projections: orthographic (default), latitudinal (only for images on the solar disk), logpolar and polar. To change the projection click the projection button and select the projection.
 
-![Orthographic and latitudinal projection][figure_projection_1]
+![Orthographic projection][figure_projection_orthographic]
 
-![Logpolar and polar projection][figure_projection_2]
+![Latitudinal projection][figure_projection_latitudinal]
+
+![LogPolar projection][figure_projection_logpolar]
+
+![Polar projection][figure_projection_polar]
 
 ### SDO Cut-out
 
@@ -515,7 +519,11 @@ This protocol can also be used on the web and the figure below shows the online 
 
 # Using time in JHelioviewer
 
-All time input and display in JHelioviewer is UTC in ISO8601 format. Day of year format is supported, as well as natural English language phrases such as "one year ago" or "tho weeks ago". If the input is not recognized or if the start time is later than the end time, the time field reverts to previously displayed value. The entire time range can be shifted backward or forward with a selectable duration (day/week/Carrington rotation). The period of an entire Carrington rotation can be filled in the time fields by clicking the "CR" button.
+All time input and display in JHelioviewer is UTC in ISO8601 format. [Day of year](#figure_timeinput_doy) format is supported, as well as [natural English language](#figure_timeinput_natural) phrases such as "one year ago" or "tho weeks ago". If the input is not recognized or if the start time is later than the end time, the time field reverts to previously displayed value. The entire time range can be shifted backward or forward with a selectable duration (day/week/Carrington rotation). The period of an entire Carrington rotation can be filled in the time fields by clicking the "CR" button.
+
+![Day of year time input][figure_timeinput_doy]
+
+![Natural language time input][figure_timeinput_natural]
 
 # Changing the Preferences [preferences]
 
@@ -644,10 +652,13 @@ I can't find a specific wavelength for a specific instrument and observatory.
 [figure_timeline]: timeline.png height=297px width=397px
 [figure_preferences]: img/preferences.png height=189px width=397px
 [figure_multiview]: img/multiview.png height=297px width=397px
-[figure_projection_1]: projection_1.png height=297px width=397px
-[figure_projection_2]: projection_2.png height=297px width=397px
 [figure_enhance_corona]: enhance_corona.png height=297px width=397px
 [figure_fits_keywords]: img/image_info.png height=297px width=397px
+
+[figure_projection_orthographic]: img/projection_orthographic.png height=297px width=397px
+[figure_projection_latitudinal]: img/projection_latitudinal.png height=297px width=397px
+[figure_projection_logpolar]: img/projection_logpolar.png height=297px width=397px
+[figure_projection_polar]: img/projection_polar.png height=297px width=397px
 
 [figure_zooming]: zooming.png height=559px width=379px
 [figure_rotpan]: rotpan.png height=559px width=379px
@@ -661,6 +672,9 @@ I can't find a specific wavelength for a specific instrument and observatory.
 [figure_pfss0]: img/pfss_detail0.png height=547px width=370px
 [figure_pfss8]: img/pfss_detail8.png height=547px width=370px
 [figure_pfss_fixed]: img/pfss_fixedcolor.png height=547px width=370px
+
+[figure_timeinput_doy]: img/time_input_doy.png height=297px width=397px
+[figure_timeinput_natural]: img/time_input_natural.png height=297px width=397px
 
 [figure_no_locking]: no_locking.png height=547px width=370px
 [figure_locking]: locking.png height=547px width=370px
