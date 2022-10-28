@@ -1,8 +1,8 @@
 latex input:        mmd-memoir-header
 Title:              JHelioviewer User Manual
-Author:             Bram Bourgoignie, Bogdan Nicula, Freek Verstringe
+Author:             Bogdan Nicula, Bram Bourgoignie, Freek Verstringe
 Affiliation:        Royal Observatory of Belgium
-Date:               October 7, 2022
+Date:               November 18, 2022
 Base Header Level:  2
 CSS:                avenir-white.css
 CSS:                magnific-popup.css
@@ -24,7 +24,7 @@ usexelatex:         1
 
 # Introduction
 
-Space Weather JHelioviewer is an outcome of the ESA Contract No. 4000107325/12/NL/AK - High Performance Distributed Solar Imaging and Processing System - run at the Solar Influences Data Analysis Center (SIDC, <http://sidc.be>) of the Royal Observatory of Belgium (ROB) under the supervision of Space Environments and Effects section of ESA (ESTEC/TEC-EES, <http://space-env.esa.int>). This project builds upon the infrastructure of ESA/NASA Helioviewer Project (<http://helioviewer.org>) at all levels of the software stack, and significantly augments the capabilities of the JHelioviewer software (<http://www.jhelioviewer.org>).
+Space Weather JHelioviewer is an outcome of the ESA Contract No. 4000107325/12/NL/AK - High Performance Distributed Solar Imaging and Processing System - run at the Solar Influences Data Analysis Center (SIDC, <https://sidc.be>) of the Royal Observatory of Belgium (ROB) under the supervision of Space Environments and Effects section of ESA (ESTEC/TEC-EES, <https://space-env.esa.int/>). This project builds upon the infrastructure of ESA/NASA Helioviewer Project (<https://helioviewer.org>) at all levels of the software stack, and significantly augments the capabilities of the JHelioviewer software (<http://www.jhelioviewer.org>).
 
 The JHelioviewer solar data visualisation tool has been overhauled with a strong focus for space weather usage. The viewer is able to display [solar image data][images_sun], and one-dimensional and two-dimensional solar [timeline data][timelines].
 
@@ -106,7 +106,7 @@ The miscellaneous part of the toolbar contains buttons to switch on and off the 
 
 The image canvas displays in four projections: the default orthographic, latitudinal, logpolar and polar projection. Switching from one projection to the other is instantaneous.
 
-There is also a direct link to the SDO AIA get data page (<http://www.lmsal.com/get_aia_data/>).
+There is also a direct link to the SDO AIA get data page (<https://www.lmsal.com/get_aia_data/>).
 
 The data of the image layer can be broadcasted using the [Simple Application Message Protocol(SAMP)][samp].
 
@@ -219,7 +219,7 @@ Jhelioviewer is able to show images in four projections: orthographic (default),
 
 ### SDO Cut-out
 
-The *SDO Cut-out* option will open the SDO AIA Get Data page (<http://www.lmsal.com/get_aia_data/>) at LMSAL with some of the parameters already filled-in based on the current AIA image layer stack.
+The *SDO Cut-out* option will open the SDO AIA Get Data page (<https://www.lmsal.com/get_aia_data/>) at LMSAL with some of the parameters already filled-in based on the current AIA image layer stack.
 
 ## Playing Movies
 
@@ -332,7 +332,7 @@ An Archimedean spiral determined by a selectable propagation speed can be drawn.
 
 ## Timestamp
 
-The timestamp layer shows the timestamp of the viewpoint if the multiview mode is off and the timestamps of the individual layers if the multiview mode is on. The text size can be adjusted with a slider, the text can placed at top left and additional information like distance to Sun can displayed.
+The timestamp layer shows the timestamp of the viewpoint if the multiview mode is off and the timestamps of the individual layers if the multiview mode is on. The text size can be adjusted with a slider, the text can placed at top left and additional information like distance to Sun can be displayed.
 
 ![The timestamp][figure_timestamp]
 
@@ -446,7 +446,7 @@ JHelioviewer provides a way to download space weather related events. A selectio
 |                |                        | Geomag24                          |
 [Overview of the default event types][eventtypes]
 
-For the moment only two sources for events are used: the [Heliophysics Events Knowledgebase (HEK)](http://www.lmsal.com/hek/) and the [COMESEP](http://comesep.aeronomy.be) alert system.
+For the moment only two sources for events are used: the [Heliophysics Events Knowledgebase (HEK)](https://www.lmsal.com/hek/) and the [COMESEP](http://comesep.aeronomy.be) alert system.
 
 ## Enabling/Disabling Space Weather Events
 
@@ -512,13 +512,13 @@ The state file captures all the program's presentation including the loaded remo
 
 [SAMP](https://www.ivoa.net/documents/SAMP/) is an inter-application messaging protocol standardised by IVOA that enables astronomy software tools to interoperate and communicate. The GitHub [samp4jhv](https://github.com/Helioviewer-Project/samp4jhv) project contains a collection of examples on how data can be shared between JHelioviewer and Python or IDL environments.
 
-This protocol can also be used on the web and the figure below shows the online SOAR archive which can send FITS and CDF files to JHelioviewer. Selecting "Send table" will instruct JHelioviewer to load the selected FITS files as a movie. Selecting "Send products" will make JHelioviewer to load the selected files as different layers.
+This protocol can also be used on the web and the figure below shows the online SOAR archive which can send FITS and CDF files to JHelioviewer. Selecting *"Send table"* will instruct JHelioviewer to load the selected FITS files as a movie. Selecting *"Send products"* will make JHelioviewer to load the selected files as different layers.
 
 ![SOAR archive in action][figure_soar]
 
 # Using time in JHelioviewer
 
-All time input and display in JHelioviewer is UTC in ISO8601 format. [Day of year](#figure_timeinput_doy) format is supported, as well as [natural English language](#figure_timeinput_natural) phrases such as "one year ago" or "tho weeks ago". If the input is not recognized or if the start time is later than the end time, the time field reverts to previously displayed value. The entire time range can be shifted backward or forward with a selectable duration (day/week/Carrington rotation). The period of an entire Carrington rotation can be filled in the time fields by clicking the "CR" button.
+All time input and display in JHelioviewer is UTC in ISO8601 format. [Day of year](#figure_timeinput_doy) format is supported, as well as [natural English language](#figure_timeinput_natural) phrases such as "one year ago" or "two weeks ago". If the input is not recognized or if the start time is later than the end time, the time field reverts to previously displayed value. The entire time range can be shifted backward or forward with a selectable duration (day/week/Carrington rotation). The period of an entire Carrington rotation can be filled in the time fields by clicking the *"CR"* button.
 
 ![Day of year time input][figure_timeinput_doy]
 
@@ -533,7 +533,7 @@ The preferences dialog can be found under the program menu (JHelioviewer) on mac
 - normalisation of SDO/AIA data brightness to reduce the effect of response degradation
 - normalisation of EUV solar radius to visible light solar radius
 - uniformisation of image observation time to Observer (default)/Sun emission/Earth arrival for the combination of observations from different vantage points
-- format for the recordings: H.264/H.264 better/H.265/H.265 better/PNG series. The H.265 format allows for significantly smaller file sizes at the price of increased CPU time for the encoding and reduced compatibility with video playing software. The "better" variants allow for increased file sizes and slighter higher CPU utilisation for better output quality.
+- format for the recordings: H.264/H.264 better/H.265/H.265 better/PNG series. The H.265 format allows for significantly smaller file sizes at the price of increased CPU time for the encoding and reduced compatibility with video playing software. The *"better"* variants allow for increased file sizes and slighter higher CPU utilisation for better output quality.
 
 Several parts of the interface can be turned on and off under the Plugins heading: Timelines/SWEK/PFSS. The persistent image cache can also be cleared, as well as a proxy username and password can be set if required.
 
@@ -626,7 +626,7 @@ The interesting value is MaxHeapSize.
 ## Movies
 
 How can I get a square movie?
-:  Resize your window to have a square canvas and record the movie in the "On screen" size.
+:  Resize your window to have a square canvas and record the movie in the *"On screen"* size.
 
 How do I get a movie without the timeline canvas?
 :  Collapse the timeline canvas using the separator.
