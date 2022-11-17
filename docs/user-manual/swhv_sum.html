@@ -307,28 +307,30 @@
 
 <h3 id="addingremovingasequenceofimages">Adding/Removing a Sequence of Images</h3>
 
-<p>A new image layer can be added by clicking the <em>“New Layer”</em> button (<em>ctrl/cmd + n</em>).</p>
-
-<blockquote>
-<ul>
-<li>a new <a href="#figure_add_layer_dialog">dialog box</a> will appear,</li>
-<li>select <em>image data</em> as data type,</li>
-<li>set the start date and the end date,</li>
-<li>select the time step,</li>
-<li>select the server from where to download the data,</li>
-<li>select the observatory, instrument and detector/measurement,</li>
-<li>click <em>“Add”</em> to add the layer to the image layers panel or <em>cancel</em> to stop</li>
-</ul>
-</blockquote>
-
-<p>The image servers currently available are ROB, GSFC and IAS.</p>
-
-<p>The layer is now added to the list of image layers. The layer becomes the master layer and will drive the timing for playing the movies. A layer can also be added by opening an image or series of images via the menu item <em>“File&gt;Open Image Layer…”</em>. A file selection dialog will open. Select the wanted image or image series to be added to the image layers. A layer can be removed by clicking the cross. The loading of a layer can be cancelled by clicking the cross while the layer is still loading.</p>
+<p>A new image layer can be rapidly added by selecting a time range and clicking <em>“New Layer”</em> in the image layers panel. Select the server from where to download the data, then the dataset from the list.</p>
 
 <figure>
-<img src="add_layer_dialog.png" alt="Add a layer" id="figure_add_layer_dialog"/>
+<img src="img/load_image_fast.png" alt="Quickly add a layer" id="figure_load_layer_fast"/>
+<figcaption>Quickly add a layer</figcaption>
+</figure>
+
+<p>The program calculates a time step for an approximately 98 frames sequence. For control over the cadence, use <em>“File&gt;New Image Layer…”</em> (<em>ctrl/cmd + n</em>) which will open a dialog box where the time step can be changed.</p>
+
+<figure>
+<img src="img/load_image.png" alt="Add a layer" id="figure_add_layer_dialog"/>
 <figcaption>Add a layer</figcaption>
 </figure>
+
+<p>The layer is now added to the list of image layers. The layer becomes the master layer and will drive the timing for playing the movies. A layer can also be added by opening an image or series of images via the menu item <em>“File&gt;Open Image Layer…”</em>. A file selection dialog will open. Select the wanted image or a list of images (using <em>shift</em> for a contiguous list or <em>ctrl/cmd</em> for disjoint list) to be added to the image layers. A list of images can also be added by dragging and dropping from other programs.</p>
+
+<p>Solar Orbiter science data can also be loaded from the Solar Orbiter Archive at ESAC using the menu item <em>“File&gt;New SOAR Layer…”</em>. Select a time range and search for a dataset and processing level. Select the items to load from the returned list and click the <em>“Add”</em> button. Images will load in the image canvas and time series in the timeline canvas. There is limit of 2GiB data to be loaded at one time.</p>
+
+<figure>
+<img src="img/load_soar.png" alt="Add a SOAR layer" id="figure_load_layer_soar"/>
+<figcaption>Add a SOAR layer</figcaption>
+</figure>
+
+<p>A layer can be removed by clicking the cross. The loading of a layer can be cancelled by clicking the cross while the layer is still loading.</p>
 
 <p>To change the options of a layer, it has to be selected in the table listing and its <a href="#options_panel">options panel</a> will become available underneath the listing. New layers are added with increased levels of transparency to avoid fully concealing the layers beneath and the opacity of each layer can be controlled from its options panel.</p>
 
@@ -463,27 +465,11 @@
 
 <h4 id="addingremovingtimelines">Adding/Removing Timelines</h4>
 
-<p>To add a new timeline follow the steps:</p>
-
-<blockquote>
-<ul>
-<li>click <em>“New Layer”</em> button of the timeline layers panel or the image layers panel,</li>
-<li>a new <a href="#figure_add_timeline">dialog box</a> will appear. Select the <em>“1D time series”</em> as data type,</li>
-<li>pick a desired start date,</li>
-<li>select a group,</li>
-<li>select a dataset,</li>
-<li>press the <em>“Add”</em> button to add the layer</li>
-</ul>
-</blockquote>
+<p>To add a new timeline click the <em>“New Layer”</em> button of the timeline layers panel or the menu item “<em>File&gt;New Timeline…</em>”, select a group and a dataset, and press the <em>“Add”</em> button to add the layer.</p>
 
 <p>A timeline layer can also be added by opening a saved timeline layer via the menu item <em>“File&gt;Open Timeline…”</em>. A file selection dialog will open. Select the wanted timeline layer to be added to the timelines. The missing data will be downloaded automatically. A layer can be removed by clicking the cross. The loading of a layer can be cancelled by clicking the cross while the layer is still loading.</p>
 
 <p>The timeline will be visible in the list of timelines and three days around the chosen date will be downloaded. The timeline will always be given a new y-axis.</p>
-
-<figure>
-<img src="add_timeline.png" alt="Add timeline" id="figure_add_timeline"/>
-<figcaption>Add timeline</figcaption>
-</figure>
 
 <p>A timeline layer can be downloaded by pressing the download layer button in the options panel of the layer.</p>
 
