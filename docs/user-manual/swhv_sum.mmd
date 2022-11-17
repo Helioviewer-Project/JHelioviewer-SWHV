@@ -247,21 +247,21 @@ Each layer has specific options that become available when selecting its entry i
 
 ## Adding/Removing a Sequence of Images
 
-A new image layer can be added by clicking the *"New Layer"* button (*ctrl/cmd + n*).
+A new image layer can be rapidly added by selecting a time range and clicking *"New Layer"* in the image layers panel. Select the server from where to download the data, then the dataset from the list.
 
-> * a new [dialog box](#figure_add_layer_dialog) will appear,
-  * select *image data* as data type,
-  * set the start date and the end date,
-  * select the time step,
-  * select the server from where to download the data,
-  * select the observatory, instrument and detector/measurement,
-  * click *"Add"* to add the layer to the image layers panel or *cancel* to stop
+![Quickly add a layer][figure_load_layer_fast]
 
-The image servers currently available are ROB, GSFC and IAS.
-
-The layer is now added to the list of image layers. The layer becomes the master layer and will drive the timing for playing the movies. A layer can also be added by opening an image or series of images via the menu item *"File>Open Image Layer..."*. A file selection dialog will open. Select the wanted image or image series to be added to the image layers. A layer can be removed by clicking the cross. The loading of a layer can be cancelled by clicking the cross while the layer is still loading.
+The program calculates a time step for an approximately 98 frames sequence. For control over the cadence, use *"File>New Image Layer..."* (*ctrl/cmd + n*) which will open a dialog box where the time step can be changed.
 
 ![Add a layer][figure_add_layer_dialog]
+
+The layer is now added to the list of image layers. The layer becomes the master layer and will drive the timing for playing the movies. A layer can also be added by opening an image or series of images via the menu item *"File>Open Image Layer..."*. A file selection dialog will open. Select the wanted image or a list of images (using *shift* for a contiguous list or *ctrl/cmd* for disjoint list) to be added to the image layers. A list of images can also be added by dragging and dropping from other programs.
+
+Solar Orbiter science data can also be loaded from the Solar Orbiter Archive at ESAC using the menu item *"File>New SOAR Layer..."*. Select a time range and search for a dataset and processing level. Select the items to load from the returned list and click the *"Add"* button. Images will load in the image canvas and time series in the timeline canvas. There is limit of 2GiB data to be loaded at one time.
+
+![Add a SOAR layer][figure_load_layer_soar]
+
+A layer can be removed by clicking the cross. The loading of a layer can be cancelled by clicking the cross while the layer is still loading.
 
 To change the options of a layer, it has to be selected in the table listing and its [options panel](#options_panel) will become available underneath the listing. New layers are added with increased levels of transparency to avoid fully concealing the layers beneath and the opacity of each layer can be controlled from its options panel.
 
@@ -365,20 +365,11 @@ Timelines can be added and removed. The appearance of the timelines can be chang
 
 ### Adding/Removing Timelines
 
-To add a new timeline follow the steps:
-
-> * click *"New Layer"* button of the timeline layers panel or the image layers panel,
- * a new [dialog box](#figure_add_timeline) will appear. Select the *"1D time series"* as data type,
- * pick a desired start date,
- * select a group,
- * select a dataset,
- * press the *"Add"* button to add the layer
+To add a new timeline click the *"New Layer"* button of the timeline layers panel or the menu item "*File>New Timeline...*", select a group and a dataset, and press the *"Add"* button to add the layer.
 
 A timeline layer can also be added by opening a saved timeline layer via the menu item *"File>Open Timeline..."*. A file selection dialog will open. Select the wanted timeline layer to be added to the timelines. The missing data will be downloaded automatically. A layer can be removed by clicking the cross. The loading of a layer can be cancelled by clicking the cross while the layer is still loading.
 
 The timeline will be visible in the list of timelines and three days around the chosen date will be downloaded. The timeline will always be given a new y-axis.
-
-![Add timeline][figure_add_timeline]
 
 A timeline layer can be downloaded by pressing the download layer button in the options panel of the layer.
 
@@ -641,13 +632,17 @@ I can't find a specific wavelength for a specific instrument and observatory.
 [figure_toolbar]: toolbar.png height=297px width=397px
 [figure_no_corona]: no_corona_compo.png height=297px width=397px
 [figure_movie_panel]: movie_panel2.png height=297px width=397px
-[figure_add_layer_dialog]: add_layer_dialog.png height=297px width=397px
 [figure_image_layer_options]: image_layer_options.png height=297px width=397px
 [figure_grid]: img/grid.png height=297px width=379px
 [figure_change_color]: change_color.png height=297px width=397px
 [figure_events]: events.png height=297px width=397px
 [figure_detail_events]: detail_events.png height=297px width=397px
 [figure_timeline]: timeline.png height=297px width=397px
+
+[figure_add_layer_dialog]: img/load_image.png height=297px width=397px
+[figure_load_layer_fast]: img/load_image_fast.png height=297px width=397px
+[figure_load_layer_soar]: img/load_soar.png height=297px width=397px
+
 [figure_preferences]: img/preferences.png height=189px width=397px
 [figure_multiview]: img/multiview.png height=297px width=397px
 [figure_enhance_corona]: enhance_corona.png height=297px width=397px
