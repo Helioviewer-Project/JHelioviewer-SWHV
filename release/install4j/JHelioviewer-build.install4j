@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="10.0.3" transformSequenceNumber="10">
+<install4j version="10.0.4" transformSequenceNumber="10">
   <directoryPresets config="../bin/JHelioviewer.jar" />
   <application name="JHelioviewer" applicationId="6448-7333-6138-9110" mediaDir="./builds" compression="9" lzmaCompression="true" shortName="JHelioviewer" publisher="ESA JHelioviewer Team" publisherWeb="http://www.jhelioviewer.org" version="4.3.4" allPathsRelative="true" macVolumeId="7ed177551bd348bc" javaMinVersion="19" javaMaxVersion="19" jdkMode="jdk">
     <codeSigning macEnabled="true" macPkcs12File="~/Certificates.p12" macNotarize="true" appleId="bogdan@nicula.net" />
@@ -1155,5 +1155,20 @@ return true;</property>
       </exclude>
       <postInstallScript>${compiler:file("./resources/linux-post-install.sh")}</postInstallScript>
     </linuxRPM>
+    <macosArchive name="Mac OS X Single Bundle Archive ARM64" id="1003" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_ARM64" architecture="aarch64" launcherId="24">
+      <exclude>
+        <entry location="classes/natives-linux.jar" />
+        <entry location="classes/natives-windows.jar" />
+      </exclude>
+      <variables>
+        <variable name="dir" value="${sys.contentDir}" />
+      </variables>
+      <topLevelFiles>
+        <file name=".DS_Store" file="./resources/test/.DS_Store" />
+        <file name=".background/backgroundImage.jpg" file="./resources/test/backgroundImage.jpg" />
+        <file name=".VolumeIcon.icns" file="./resources/test/.VolumeIcon.icns" />
+        <symlink name="Applications" target="/Applications" />
+      </topLevelFiles>
+    </macosArchive>
   </mediaSets>
 </install4j>
