@@ -1155,7 +1155,7 @@ return true;</property>
       </exclude>
       <postInstallScript>${compiler:file("./resources/linux-post-install.sh")}</postInstallScript>
     </linuxRPM>
-    <macosArchive name="Mac OS X Single Bundle Archive ARM64" id="1003" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_ARM64" architecture="aarch64" launcherId="24">
+    <macosArchive name="Mac OS X Single Bundle Archive ARM64" id="1003" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_arm64" architecture="aarch64" launcherId="24">
       <exclude>
         <entry location="classes/natives-linux.jar" />
         <entry location="classes/natives-windows.jar" />
