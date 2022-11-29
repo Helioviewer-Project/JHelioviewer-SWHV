@@ -52,11 +52,14 @@ class JHVInit {
         String pathlib = "";
         ArrayList<String> libs = new ArrayList<>();
 
-        if (Platform.isMacOS() && "x86-64".equals(Platform.getArch())) {
-            pathlib = "macosx-universal/";
-        } else if (Platform.isWindows() && "x86-64".equals(Platform.getArch())) {
+        if (Platform.isMacOS()) {
+            if ("amd64".equals(Platform.getArch()))
+                pathlib = "macos-amd64/";
+            else if ("aarch64".equals(Platform.getArch()))
+                pathlib = "macos-arm64/";
+        } else if (Platform.isWindows() && "amd64".equals(Platform.getArch())) {
             pathlib = "windows-amd64/";
-        } else if (Platform.isLinux() && "x86-64".equals(Platform.getArch())) {
+        } else if (Platform.isLinux() && "amd64".equals(Platform.getArch())) {
             pathlib = "linux-amd64/";
         }
 

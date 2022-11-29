@@ -26,7 +26,9 @@ public class Platform {
         arch = arch.toLowerCase();
 
         if (arch.contains("x86_64") || arch.contains("amd64"))
-            jhvArch = "x86-64";
+            jhvArch = "amd64";
+       else if (arch.contains("aarch64"))
+            jhvArch = "aarch64";
         else
             die("Please install Java 64-bit to run JHelioviewer.");
 
