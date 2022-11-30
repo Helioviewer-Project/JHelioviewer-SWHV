@@ -1,10 +1,8 @@
-svn_rev:            $Rev: 8812 $
-svn_date:           $Date: 2018-01-17 15:59:24 +0100 (Wed, 17 Jan 2018) $
 latex input:        mmd-memoir-header
 Title:              JHelioviewer User Manual
-Author:             Bram Bourgoignie, Bogdan Nicula, Freek Verstringe
+Author:             Bogdan Nicula, Bram Bourgoignie, Freek Verstringe
 Affiliation:        Royal Observatory of Belgium
-Date:               November 4, 2016
+Date:               November 18, 2022
 Base Header Level:  2
 CSS:                avenir-white.css
 CSS:                magnific-popup.css
@@ -26,7 +24,7 @@ usexelatex:         1
 
 # Introduction
 
-Space Weather JHelioviewer is an outcome of the ESA Contract No. 4000107325/12/NL/AK - High Performance Distributed Solar Imaging and Processing System - run at the Solar Influences Data Analysis Center (SIDC, <http://sidc.be>) of the Royal Observatory of Belgium (ROB) under the supervision of Space Environments and Effects section of ESA (ESTEC/TEC-EES, <http://space-env.esa.int>). This project builds upon the infrastructure of ESA/NASA Helioviewer Project (<http://helioviewer.org>) at all levels of the software stack, and significantly augments the capabilities of the JHelioviewer software (<http://www.jhelioviewer.org>).
+Space Weather JHelioviewer is an outcome of the ESA Contract No. 4000107325/12/NL/AK - High Performance Distributed Solar Imaging and Processing System - run at the Solar Influences Data Analysis Center (SIDC, <https://sidc.be>) of the Royal Observatory of Belgium (ROB) under the supervision of Space Environments and Effects section of ESA (ESTEC/TEC-EES, <https://space-env.esa.int/>). This project builds upon the infrastructure of ESA/NASA Helioviewer Project (<https://helioviewer.org>) at all levels of the software stack, and significantly augments the capabilities of the JHelioviewer software (<http://www.jhelioviewer.org>).
 
 The JHelioviewer solar data visualisation tool has been overhauled with a strong focus for space weather usage. The viewer is able to display [solar image data][images_sun], and one-dimensional and two-dimensional solar [timeline data][timelines].
 
@@ -44,16 +42,16 @@ The JHelioviewer software does advanced data processing and visualisation; there
 
 JHelioviewer is an open source project and its source code can be accessed at <https://github.com/Helioviewer-Project/JHelioviewer-SWHV>.
 
-Compiled releases are available for Windows, Mac OS X and Linux from <http://swhv.oma.be/download>. A brief changelog is at <https://github.com/Helioviewer-Project/JHelioviewer-SWHV/blob/master/changelog.md>.
+Compiled releases are available for Windows, macOS and Linux from <http://swhv.oma.be/download>. A brief changelog is at <https://github.com/Helioviewer-Project/JHelioviewer-SWHV/blob/master/changelog.md>.
 
 ## Windows
 
- * Download the EXE Windows installer from <http://swhv.oma.be/download>.
+ * Download the Windows EXE installer from <http://swhv.oma.be/download>.
  * Double-click the installer and follow the steps.
 
-## Mac OS X
+## macOS
 
- * Download the DMG Mac OS X disk image from <http://swhv.oma.be/download>.
+ * Download the macOS DMG disk image from <http://swhv.oma.be/download>.
  * Move JHelioviewer.app to the Applications folder and run it by double-clicking its icon.
 
 ## Linux
@@ -68,7 +66,7 @@ Compiled releases are available for Windows, Mac OS X and Linux from <http://swh
 * Make sure the appropriate Java Runtime Environment 11 or higher from <https://adoptopenjdk.net> is in the PATH.
 * Run the program by typing ```java -cp JHelioviewer.jar:natives-linux.jar:natives-macos.jar:natives-windows.jar org.helioviewer.jhv.JHelioviewer``` in a terminal window.
 
-This procedure works for Windows, Mac OS X and Linux.
+This procedure works for Windows, macOS and Linux.
 
 The program accepts command line arguments. This is implemented using JSON documents specifying requests to the default server in a simple manner as in the example below. Natural language specification of time is supported (as is the case for the state file) and, besides the “dataset” field, all fields are optional with sensible defaults.
 
@@ -86,10 +84,11 @@ When the program opens for the first time, a directory structure (```JHelioviewe
 
 The [Troubleshooting][trouble] and [Frequent Asked Questions][FAQ] sections may contain contain useful hints about installing and running JHelioviewer.
 
-![JHelioviewer in action][figure_overview]
-
-
 # Main User Interface [MUI]
+
+The following YouTube video demonstrates some basic functionalities of the interface.
+
+YOUTUBE
 
 ## Overview
 
@@ -107,7 +106,7 @@ The miscellaneous part of the toolbar contains buttons to switch on and off the 
 
 The image canvas displays in four projections: the default orthographic, latitudinal, logpolar and polar projection. Switching from one projection to the other is instantaneous.
 
-There is also a direct link to the SDO AIA get data page (<http://www.lmsal.com/get_aia_data/>).
+There is also a direct link to the SDO AIA get data page (<https://www.lmsal.com/get_aia_data/>).
 
 The data of the image layer can be broadcasted using the [Simple Application Message Protocol(SAMP)][samp].
 
@@ -115,7 +114,7 @@ See the [image canvas manipulation][image_canvas_manip] section and the [toolbar
 
 ### Image Canvas
 
-The image canvas displays the visible image layers. The images of the Sun are projected on a sphere. As long as no manipulations to the scene are done, and the camera is in observer mode (see the [camera section][camera]), the image is an undistorted representation of the two-dimensional data recorded by the instrument.
+The image canvas displays the visible image layers. The images of the Sun are projected on a sphere. As long as no manipulations to the scene are done, and the [viewpoint][viewpoint] is not altered, the image is an undistorted representation of the two-dimensional data recorded by the instrument.
 
 ### Timeline Canvas
 
@@ -172,19 +171,27 @@ The standard mouse operation mode is rotation. By clicking and holding the mouse
 
 ### Annotation Features
 
-It is possible to annotate the image canvas with rectangles, circles and crosses. The [annotation figure](#figure_annotation) shows an annotated image canvas and the modes when clicking the annotation button. Click the annotate button and select the annotation shape to change to annotation mode. There are three annotation shape modes: rectangle, circle and cross. If more than one annotation is added, the red one indicates the active annotation. The active annotation can be changed by pressing the *n*-key. It is not possible to annotate outside the solar disk.
+It is possible to annotate the image canvas with various shapes. The [annotation figure](#figure_annotation) shows an annotated image canvas and the modes when clicking the annotation button. Click the annotate button and select the desired annotation shape. Then press the shift key and drag the mouse pointer with the left button pressed to draw. When finished, release the mouse button, then the shift key. If more than one annotation is added, the red one indicates the active annotation.
 
 ![Annotated image canvas][figure_annotation]
 
-Consider the situation shown by the [annotation figure](#figure_annotation). By pressing *n*-key, another annotation will become red. Pressing the forward or the backward delete key can delete the red rectangle. In order to delete a cross, press the *n*-key until the desired cross becomes highlighted in red and then the delete key has to be pressed. The annotations can deleted all at once via the menu item *"View>Clear annotations"* or from the toolbar annotation mode button.
+Consider the situation shown by the [annotation figure](#figure_annotation). By pressing *shift*+*n*(ext) or *shift*+*p*(previous), another annotation will become red. Pressing shift combined with the forward or the backward delete key will delete the red loop. The annotations can deleted all at once via the menu item *"View>Clear annotations"* or from the toolbar annotation mode button.
 
 ### Tracking Features
 
-The solar rotation can be tracked. Zoom, rotate and translate the image until a desired feature is visible. Enable the tracking mode in the toolbar and play the movie. The image canvas will show the evolution of the selected feature.
+The solar rotation can be tracked by freezing the [viewpoint][viewpoint] time at the moment when the tracking mode is enabled in the toolbar. The image canvas will co-rotate with the Sun when playing the movie, while keeping the original features fixed on screen, allowing to observe their evolution in time.
 
-The [figure below](#figure_tracking) shows the tracking in action. Top image is the start position. The image was zoomed, rotated and translated on top of the active regions and tracking was enabled. The first image is taken at time 08:09:46, the middle image is at 19:43:58 and the bottom image is at 07:39:10 the next day. Notice that the same active regions stay in view and the miniview moves slightly to the solar West.
+![Tracking mode on][figure_track_on]
 
-![Tracking in action][figure_tracking]
+![Tracked movie start][figure_track_start]
+
+![Tracked movie end][figure_track_end]
+
+### Differential Rotation
+
+The images can be distorted according to differential solar rotation of magnetic features by selecting the differential option in the toolbar and manipulating the viewpoint time, see [viewpoint section][viewpoint].
+
+![Differential rotation in action][figure_differential]
 
 ### Corona Visibility
 
@@ -192,17 +199,27 @@ The off-disk solar corona can hidden by clicking the corona button in the toolba
 
 ![Hiding the off-disk corona][figure_no_corona]
 
+### Multiview
+
+The [multiview figure](#figure_multiview) shows what happens if the *"Multiview"* option in the toolbar is selected. The layers are displayed side-by-side instead of on top of each other. In this mode, up to four layers can be placed together in the image canvas.
+
+![The multiview option in action][figure_multiview]
+
 ### Projection
 
-Jhelioviewer is able to show images in four projections: orthographic, latitudinal (only for images on the solar disk), logpolar and polar. To change the projection click the projection button and select the projection. [Projection figure 1](#figure_projection_1) shows the orthographic and latitudinal projection, [projection figure 2](#figure_projection_2) shows the logpolar and polar projection.
+Jhelioviewer is able to show images in four projections: orthographic (default), latitudinal (only for images on the solar disk), logpolar and polar. To change the projection click the projection button in the toolbar and select the projection.
 
-![Orthographic and latitudinal projection][figure_projection_1]
+![Orthographic projection][figure_projection_orthographic]
 
-![Logpolar and polar projection][figure_projection_2]
+![Latitudinal projection][figure_projection_latitudinal]
+
+![LogPolar projection][figure_projection_logpolar]
+
+![Polar projection][figure_projection_polar]
 
 ### SDO Cut-out
 
-The *SDO Cut-out* option will open the SDO AIA Get Data page (<http://www.lmsal.com/get_aia_data/>) at LMSAL with some of the parameters already filled-in based on the current AIA image layer stack.
+The *SDO Cut-out* option will open the SDO AIA Get Data page (<https://www.lmsal.com/get_aia_data/>) at LMSAL with some of the parameters already filled-in based on the current AIA image layer stack.
 
 ## Playing Movies
 
@@ -227,128 +244,28 @@ Everything drawn on the image canvas is an image layer. Those layers can be imag
 
 Each layer has specific options that become available when selecting its entry in the table listing.
 
-## Overview of the Available Images Providers
-
-The [table below][image_providers] records the image providers as of [%Date]; for an up-to-date list, check the program.
-
-| Server       | Observatory   | Instrument           | Detector/Measurement |
-| :----------- | :-----------  |:-------------------  |:---------------------|
-| ROB          | Kanzelhöhe    | H-alpha              | 6562 Å               |
-|              | NRH           | NRH2                 | 150.9 MHz            |
-|              |               |                      | 432.0 MHz            |
-|              | NSO-GONG      | GONG                 | GONG Farside         |
-|              |               |                      | GONG Magnetogram     |
-|              |               |                      | H-alpha 6562 Å       |
-|              | NSO-SOLIS     | VSM                  | Azimuth 6302 Å       |
-|              |               |                      | CoreFluxDens 8542 Å  |
-|              |               |                      | CoreWingInt 8542 Å   |
-|              |               |                      | FillFactor 6302 Å    |
-|              |               |                      | Inclination 6302 Å   |
-|              |               |                      | Intensity 1083 Å     |
-|              |               |                      | Intensity 6302 Å     |
-|              |               |                      | Strength 6302 Å      |
-|              | PROBA2        | SWAP                 | 174 Å                |
-|              | ROB-USET      | H-alpha              | 6562 Å               |
-|              | SDO           | AIA                  | 171 Å                |
-|              |               |                      | 304 Å                |
-|              |               | HMI                  | Continuum            |
-|              |               |                      | Magnetogram          |
-| GSFC/IAS     | Hinode        | XRT                  | Al_med Al_thick      |
-|              |               |                      | Al_med Any           |
-|              |               |                      | Al_med Be_thick      |
-|              |               |                      | Al_med Open          |
-|              |               |                      | Al_med Ti_poly       |
-|              |               |                      | Al_poly Al_mesh      |
-|              |               |                      | Al_poly Al_thick     |
-|              |               |                      | Al_poly Any          |
-|              |               |                      | Al_poly Be_thick     |
-|              |               |                      | Al_poly Open         |
-|              |               |                      | Al_poly Ti_poly      |
-|              |               |                      | Any Al_mesh          |
-|              |               |                      | Any Al_thick         |
-|              |               |                      | Any Any Any          |
-|              |               |                      | Any Be_thick         |
-|              |               |                      | Any Open             |
-|              |               |                      | Any Ti_poly          |
-|              |               |                      | Be_med Any           |
-|              |               |                      | Be_med Open          |
-|              |               |                      | Be_thin Any          |
-|              |               |                      | Be_thin Open         |
-|              |               |                      | C_poly Al_mesh       |
-|              |               |                      | C_poly Al_thick      |
-|              |               |                      | C_poly Any           |
-|              |               |                      | C_poly Open          |
-|              |               |                      | C_poly Ti_poly       |
-|              |               |                      | Open Al_mesh         |
-|              |               |                      | Open Al_thick        |
-|              |               |                      | Open Any             |
-|              |               |                      | Open Be_thick        |
-|              |               |                      | Open Ti_poly         |
-|              | PROBA2        | SWAP                 | 171 Å                |
-|              | SDO           | AIA                  | 94 Å                 |
-|              |               |                      | 131 Å                |
-|              |               |                      | 171 Å                |
-|              |               |                      | 193 Å                |
-|              |               |                      | 211 Å                |
-|              |               |                      | 304 Å                |
-|              |               |                      | 335 Å                |
-|              |               |                      | 1600 Å               |
-|              |               |                      | 1700 Å               |
-|              |               |                      | 4500 Å               |
-|              |               | HMI                  | Continuum            |
-|              |               |                      | Magnetogram          |
-|              | SOHO          | EIT                  | 171 Å                |
-|              |               |                      | 195 Å                |
-|              |               |                      | 284 Å                |
-|              |               |                      | 304 Å                |
-|              |               | LASCO                | C2                   |
-|              |               |                      | C3                   |
-|              |               | MDI                  | Continuum            |
-|              |               |                      | Magnetogram          |
-|              | STEREO_A/B    | SECCHI               | COR1                 |
-|              |               |                      | COR2                 |
-|              |               |                      | EUVI 171 Å           |
-|              |               |                      | EUVI 195 Å           |
-|              |               |                      | EUVI 284 Å           |
-|              |               |                      | EUVI 304 Å           |
-|              | TRACE         | TRACE                | 171 Å                |
-|              |               |                      | 195 Å                |
-|              |               |                      | 284 Å                |
-|              |               |                      | 1216 Å               |
-|              |               |                      | 1550 Å               |
-|              |               |                      | 1600 Å               |
-|              |               |                      | 1700 Å               |
-|              |               |                      | White Light          |
-|              | Yohkoh        | SXT                  | AlMgMn               |
-|              |               |                      | Thin Al              |
-|              |               |                      | White Light          |
-[Overview of the available image providers][image_providers]
 
 ## Adding/Removing a Sequence of Images
 
-A new image layer can be added by clicking the *"New Layer"* button (*ctrl/cmd + n*).
+A new image layer can be rapidly added by selecting a time range and clicking *"New Layer"* in the image layers panel. Select the server from where to download the data, then the dataset from the list.
 
-> * a new [dialog box](#figure_add_layer_dialog) will appear,
-  * select *image data* as data type,
-  * set the start date and the end date,
-  * select the time step,
-  * select the server from where to download the data,
-  * select the observatory, instrument and detector/measurement,
-  * click *"Add"* to add the layer to the image layers panel or *cancel* to stop
+![Quickly add a layer][figure_load_layer_fast]
 
-The image servers currently available are ROB, GSFC and IAS.
-
-The layer is now added to the list of image layers. The layer becomes the master layer and will drive the timing for playing the movies. A layer can also be added by opening an image or series of images via the menu item *"File>Open Image Layer..."*. A file selection dialog will open. Select the wanted image or image series to be added to the image layers. A layer can be removed by clicking the cross. The loading of a layer can be cancelled by clicking the cross while the layer is still loading.
+The program calculates a time step for an approximately 98 frames sequence. For control over the cadence, use *"File>New Image Layer..."* (*ctrl/cmd + n*) which will open a dialog box where the time step can be changed.
 
 ![Add a layer][figure_add_layer_dialog]
+
+The layer is now added to the list of image layers. The layer becomes the master layer and will drive the timing for playing the movies. A layer can also be added by opening an image or series of images via the menu item *"File>Open Image Layer..."*. A file selection dialog will open. Select the wanted image or a list of images (using *shift* for a contiguous list or *ctrl/cmd* for disjoint list) to be added to the image layers. A list of images can also be added by dragging and dropping from other programs.
+
+Solar Orbiter science data can also be loaded from the Solar Orbiter Archive at ESAC using the menu item *"File>New SOAR Layer..."*. Select a time range and search for a dataset and processing level. Select the items to load from the returned list and click the *"Add"* button. Images will load in the image canvas and time series in the timeline canvas. There is limit of 2GiB data to be loaded at one time.
+
+![Add a SOAR layer][figure_load_layer_soar]
+
+A layer can be removed by clicking the cross. The loading of a layer can be cancelled by clicking the cross while the layer is still loading.
 
 To change the options of a layer, it has to be selected in the table listing and its [options panel](#options_panel) will become available underneath the listing. New layers are added with increased levels of transparency to avoid fully concealing the layers beneath and the opacity of each layer can be controlled from its options panel.
 
 Image layers can be replaced by double-clicking in the listing and modifying any of the selection parameters that were initially used. The time span of all image layers loaded can be matched by clicking the *"Synchronize layers time span"* button.
-
-The [multiview figure](#figure_multiview) shows what happens if the *"Multiview"* option is selected. The layers are displayed side-by-side instead of on top of each other. In this mode, up to four layers can be placed together in the image canvas.
-
-![The multiview option in action][figure_multiview]
 
 ## Availability of the Images
 
@@ -364,43 +281,11 @@ Each layer can be displayed in a difference images mode. Several modes can be se
 
 ![From top to bottom: no difference, running difference and base difference][figure_difference]
 
-The opacity, how the image blends with other layers, the perceived sharpness of the image, the low and the high level can also be adjusted. Click between the levels slider thumbs and drag left or right to move together the levels. Double-click to reset the levels. An automatic high level dependent on the content of current image can be calculated by pressing on the *"Auto"* button. To change the colors used for the image select a different colormap in the dropdown menu. The available colormaps are listed in the [list of colormaps][colormaps]. The colors of the image can be inverted by clicking the button next to the colormap dropdown menu. Individual color channels can be turned on and off.
-
-| Colormap Name           |
-| :---------------------: |
-| Blue/Green/Red/Yellow   |
-| Blue/Red                |
-| Blue/White Linear       |
-| Blue/White/Red          |
-| Gray                    |
-| Green/White Linear      |
-| Hinode XRT              |
-| Red Temperature         |
-| SDO-AIA 94 Å            |
-| SDO-AIA 131 Å           |
-| SDO-AIA 171 Å           |
-| SDO-AIA 193 Å           |
-| SDO-AIA 211 Å           |
-| SDO-AIA 304 Å           |
-| SDO-AIA 335 Å           |
-| SDO-AIA 1600 Å          |
-| SDO-AIA 1700 Å          |
-| SDO-AIA 4500 Å          |
-| SOHO EIT 171 Å          |
-| SOHO EIT 195 Å          |
-| SOHO EIT 284 Å          |
-| SOHO EIT 304 Å          |
-| STEREO EUVI 171 Å       |
-| STEREO EUVI 195 Å       |
-| STEREO EUVI 284 Å       |
-| STEREO EUVI 304 Å       |
-| Spectral                |
-| Yohkoh SXT              |
-[Overview of the colormaps][colormaps]
+The opacity, how the image blends with other layers, the perceived sharpness of the image, the low and the high level can also be adjusted. Click between the levels slider thumbs and drag left or right to move together the levels. Double-click to reset the levels. An automatic high level dependent on the content of current image can be calculated by pressing on the *"Auto"* button. To change the colors used for the image select a different colormap in the dropdown menu. The colors of the image can be inverted by clicking the button next to the colormap dropdown menu. Individual color channels can be turned on and off.
 
 The download button next to the difference image selection combobox allows the download of the data for the selected layer. A JPX file in case of a multiframe layer, or a JP2 file can be found in the Downloads directory of the JHelioviewer home folder.
 
-The [FITS keywords](#figure_fits_keywords) can be shown by clicking the information icon next to the download icon. Basic information such as the observatory, instrument, detector and observation time, followed by the full list of FITS keywords, are displayed.
+The [FITS keywords](#figure_fits_keywords) can be shown by clicking the information icon in the lower right corner of the layer options. Basic information such as the observatory, instrument, detector and observation time, followed by the full list of FITS keywords, are displayed.
 
 ![The FITS keywords][figure_fits_keywords]
 
@@ -411,62 +296,49 @@ Click the button next to the invert colors button to make the corona better visi
 
 ## Solar Grid
 
-The grid can show heliographic coordinates as seen from the camera, Stonyhurst, Carrington and Heliocentric inertial coordinates. Two yellow great circles indicate the Earth direction. Clicking the adjacent checkbox can hide the grid. The grid options panel is shown in the [figure below](#figure_grid). The radial grid can be turned on and off; the same can be done for the solar axis (the blue and red lines at the poles of the Sun) and the grid labels.
+The grid can show heliographic coordinates as seen from the viewpoint, Stonyhurst, Carrington and Heliocentric inertial coordinates. Two yellow great circles indicate the Earth direction and their intersection towards Earth is marked by a point. Clicking the adjacent checkbox can hide the grid. The grid options panel is shown in the [figure below](#figure_grid). The radial grid can be turned on and off; the same can be done for the solar axis (the blue and red lines at the poles of the Sun) and the grid labels.
 
 The grid ticks size can be changed in both longitude and latitude. The value can be entered directly in the text field, it can be changed by scrolling the mouse over the text field, or by using the arrows. Values ranging from 5˚ and 90˚ are allowed.
 
 ![The grid options panel][figure_grid]
 
-## Viewpoint [camera]
+## Viewpoint [viewpoint]
 
-The viewpoint represents the vantage point and manages how the images are viewed. The viewpoint is defined by a location, a time instance and a rotation with respect to the direction to Sun. There are three viewpoint modes: the observer view, Earth view and expert view. The different viewpoint modes are demonstrated in the [figure below](#figure_camera). The viewpoint is invisible by default. When visible, a field of view indicator is shown. In all viewpoint modes, entering the value in the text field, scrolling the mouse over the text field, or using the arrows can change the angle of the field of view indicator.
+The viewpoint represents the vantage point and is defined by a location in the solar system and a time instance. If the Viewpoint layer is not selected, the scene is viewed as observed. If the layer is selected, the scene is rotated as if it was observed from another location and/or another time, while the images are still correctly placed with respect to the Sun as they were observed.
 
-![Demonstration of the different viewpoint modes: STEREO-B image seen from STEREO-B (top image), from Earth (middle image), and from Mercury (bottom image)][figure_camera]
+### Location
 
-### Observer View
+This is useful to predict the observations of similar instruments from other known vantage points such as planets or spacecraft. It is recommended to use a solar grid linked to the solar rotation such as Carrington or HCI.
 
-This is the view from the observer. The viewpoint time indicated in the layers list is defined by the timestamp of the master layer.
+![Location viewpoint][figure_viewpoint_location]
 
-### Earth View
+The viewpoint time range can be altered by deselecting *Use movie time interval* and setting a different time range, for example in the future. The timestamp of the viewpoint is shown in the list of layers.
 
-This is the view from Earth. For instruments located around Earth, this is very similar to the observer view, but for the case of STEREO or other instruments at a different location in the solar system, this view is different. The viewpoint time indicated in the layers list is defined by the timestamp of the master layer.
+![Location viewpoint future][figure_viewpoint_location_future]
 
-### Expert View
+### Heliosphere
 
-The expert view allows seeing the image as from a specific location. At the moment, the following locations are available:
+The scene is seen as from above the ecliptic plane and allows the visualisation of orbits. Several reference frames can be selected and the viewing time range can be altered by deselecting *Use movie time interval* and setting a different time range, for example in the future.
 
- * All planets + Pluto
- * The Moon
- * Comet 67P/Churyumov-Gerasimenko
- * SOHO spacecraft
- * STEREO (Ahead and Behind) spacecraft
- * Proba2 spacecraft
- * SDO spacecraft
- * Solar Orbiter spacecraft
- * Proba 3 spacecraft
+![Heliosphere viewpoint][figure_viewpoint_heliosphere]
 
-The expert view uses an online location service. If the status of the expert view is not *"Loaded"*, there was a problem with the connection to the location service and the expert camera won't work.
+If relative longitude is on, and a particular solar system object is selected from the list, that object is placed at 0 longitude. This allows for an approximate measurement of separation angles in the X-Y plane of the reference frame.
 
-If *"Use active layer timestamps"* is selected the timestamps of the master layer are used for the viewpoint time, otherwise arbitrary time intervals can be used for the viewpoint time. The image canvas scene will correctly show the geometric configuration and orientation of the solar system bodies involved.
+![Heliosphere viewpoint relative longitude][figure_viewpoint_heliosphere_relative]
 
-The timestamp indicated by the viewpoint is the one of the master layer for the observer and Earth camera modes. For the expert mode, it is the time of the expert viewpoint.
+An Archimedean spiral determined by a selectable propagation speed can be drawn. One arm of the spiral will pass through the selected solar system object.
 
-### Equatorial View
-
-![Equatorial view][figure_equatorial]
-
+![Heliosphere viewpoint spiral][figure_viewpoint_heliosphere_spiral]
 
 ## Timestamp
 
-The timestamp is invisible by default. If it is made visible, the timestamp of the master layer will appear on the image canvas as shown in the [figure below](#figure_timestamp). The slider changes the size of the displayed timestamp on the image canvas.
+The timestamp layer shows the timestamp of the viewpoint if the multiview mode is off and the timestamps of the individual layers if the multiview mode is on. The text size can be adjusted with a slider, the text can placed at top left and additional information like distance to Sun can be displayed.
 
 ![The timestamp][figure_timestamp]
 
 ## Miniview
 
-The miniview is an aid for locating the position of the current scene within the full field of view, particularly when zoomed in. The size of the miniview can be changed in the option panel by entering the value in the text field, by scrolling the mouse over the text field, or by using the arrows. The smallest and largest miniview are shown in the [figure below](#figure_miniview).
-
-![The smallest and largest miniview][figure_miniview]
+The miniview shows a superposition of the loaded image layers irrespective of the current scene which may be substantially zoomed in or out. The size of the miniview can be changed in the option panel with a slider.
 
 ## Space Weather Event Knowledgebase Events [image_swek]
 
@@ -474,9 +346,11 @@ The SWEK image layer shows the events that have location information. The events
 
 ## PFSS Model [pfss]
 
-The PFSS model visualises a model of the magnetic field derived from magnetograms. The field lines are calculated on a daily basis using GONG magnetograms. The timestamp given in the list of layers is the timestamp of the GONG magnetogram used for the calculations. The [figure below](#figure_pfss) shows different views of the model. The number of field lines shown can be varied by decimation when changing the level of detail between 0 and 8. The radius sets the distance in solar radii that the field lines are visible. By default, the outgoing parts of the field lines are drawn in red, the incoming parts in blue. By enabling the *"Fixed colors"*, loops will be drawn white, open outgoing field lines red and incoming field lines blue.
+The PFSS model layer visualises a model of the magnetic field derived from magnetograms. The field lines are calculated from GONG magnetograms on the ROB server using a classic [model](<http://wso.stanford.edu/words/pfss.pdf>). The timestamp given in the list of layers is the timestamp of the GONG magnetogram used for the calculations. The figures below show different views of the model. The number of field lines shown can be varied by decimation when changing the level of detail between 0 and 8. The radius sets the distance in solar radii that the field lines are visible. By default, the outgoing parts of the field lines are drawn in red, the incoming parts in blue. By enabling the *"Fixed colors"*, loops will be drawn white, open outgoing field lines red and incoming field lines blue.
 
-![The PFSS model: no fixed colors, level 0 (top image); no fixed colors, level 8 (middle image) and fixed colors, level 5 (bottom image)][figure_pfss]
+![][figure_pfss0]
+![][figure_pfss8]
+![][figure_pfss_fixed]
 
 Clicking the *"Available data"* button brings will open a web browser window with [a page] (<http://swhv.oma.be/availability/pfss/availability/availability.html>) showing the available data for the PFSS Model. The darker the green, the more data are available.
 
@@ -484,33 +358,6 @@ Clicking the *"Available data"* button brings will open a web browser window wit
 
 JHelioviewer is able to display 1D and 2D timelines. Similar to the images, the timelines have their own panel that lists the timeline layers. The timeline layers can be made visible or invisible. Some timeline layers have options that can be accessed by selecting the corresponding entry in the table listing. The options appear under the listing of the timeline layers.
 
-## Overview of the Available Timeline Data Providers
-
-The listings [1][timeline_providers_p1] below show the status as of [%Date]; for an up-to-date list, check the program.
-
-| Type         | Group             | Dataset                           |
-| :----------- | :---------------  |:--------------------------------  |
-| 1D Timeline  | SWHV Data         | GOES XRS-A (shortwave)            |
-|              |                   | GOES XRS-B (longwave)             |
-|              |                   | EVE XRS-A proxy                   |
-|              |                   | EVE XRS-B proxy                   |
-|              |                   | LYRA Lyman-alpha                  |
-|              |                   | LYRA Herzberg                     |
-|              |                   | LYRA Aluminium                    |
-|              |                   | LYRA Zirconium                    |
-|              |                   | EVE ESP 17_1                      |
-|              |                   | EVE ESP 25_7                      |
-|              |                   | EVE ESP 30_4                      |
-|              |                   | EVE ESP 36_6                      |
-|              |                   | EVE MEGS-P 121_6                  |
-|              |                   | EVE ESPquad                       |
-|              |                   | GOES XRS-A (shortwave, STAFF)     |
-|              |                   | GOES XRS-B (longwave, STAFF)      |
-|              |                   | LYRA Lyman-alpha (STAFF)          |
-|              |                   | LYRA Herzberg (STAFF)             |
-|              |                   | LYRA Aluminium (STAFF)            |
-|              |                   | LYRA Zirconium (STAFF)            |
-[Overview of the available timeline providers][timeline_providers_p1]
 
 ## Working with 1D Timelines [1d_timelines]
 
@@ -518,20 +365,11 @@ Timelines can be added and removed. The appearance of the timelines can be chang
 
 ### Adding/Removing Timelines
 
-To add a new timeline follow the steps:
-
-> * click *"New Layer"* button of the timeline layers panel or the image layers panel,
- * a new [dialog box](#figure_add_timeline) will appear. Select the *"1D time series"* as data type,
- * pick a desired start date,
- * select a group,
- * select a dataset,
- * press the *"Add"* button to add the layer
+To add a new timeline click the *"New Layer"* button of the timeline layers panel or the menu item "*File>New Timeline...*", select a group and a dataset, and press the *"Add"* button to add the layer.
 
 A timeline layer can also be added by opening a saved timeline layer via the menu item *"File>Open Timeline..."*. A file selection dialog will open. Select the wanted timeline layer to be added to the timelines. The missing data will be downloaded automatically. A layer can be removed by clicking the cross. The loading of a layer can be cancelled by clicking the cross while the layer is still loading.
 
 The timeline will be visible in the list of timelines and three days around the chosen date will be downloaded. The timeline will always be given a new y-axis.
-
-![Add timeline][figure_add_timeline]
 
 A timeline layer can be downloaded by pressing the download layer button in the options panel of the layer.
 
@@ -599,7 +437,7 @@ JHelioviewer provides a way to download space weather related events. A selectio
 |                |                        | Geomag24                          |
 [Overview of the default event types][eventtypes]
 
-For the moment only two sources for events are used: the [Heliophysics Events Knowledgebase (HEK)](http://www.lmsal.com/hek/) and the [COMESEP](http://comesep.aeronomy.be) alert system.
+For the moment only two sources for events are used: the [Heliophysics Events Knowledgebase (HEK)](https://www.lmsal.com/hek/) and the [COMESEP](http://comesep.aeronomy.be) alert system.
 
 ## Enabling/Disabling Space Weather Events
 
@@ -651,65 +489,78 @@ The related events panels contain a list of small panels containing for each of 
 
 # Recording [record]
 
-The image and timeline canvases can be exported in three ways: a one-loop movie, a screenshot, or an open ended recording of all the manipulations. All movies are saved in the directory ```JHelioviewer-SWHV/Exports/``` in the home directory. The export format is streamable H.264/AVC in a MP4 container file for the movies, and the PNG format for the screenshots. Several frame sizes are offered: the image canvas original size (on screen), 1920 by 1080 pixels and 4096 by 4096. The exported movie file has the selected frames per second setting.
+The image and timeline canvases can be exported in three ways: a one-loop movie, a screenshot, or an open ended recording of all the manipulations. All movies are saved in the directory ```JHelioviewer-SWHV/Exports/``` in the home directory. The export format can be set in the [preferences][preferences]. The movies can be either a streamable MP4 container file or series of PNGs. The MP4 files can be in H.264/AVC format for better compatibility or in H.265/HEVC for smaller files. Screenshots are saved in the PNG format. Several frame sizes are offered: from the image canvas original size (on screen) and up to 4096 by 4096. The exported movie file has the selected frames per second setting.
 
-The record button is in the [movie control panel][movie_panel]. The default recording mode is a one-loop movie of the selected visible image layers. The created movie file will contain the first until the last frame of the current movie. The screenshot mode will make a screenshot of the current image and timeline canvases. In unlimited mode, all the manipulations are recorded from the moment the record button is clicked. Clicking the same record button, now indicating *"busy"*, stops the recording. Removing all image layers also stops the recording.
+The record button is in the [movie control panel][movie_panel]. The default recording mode is a one-loop movie of the selected visible image layers together with the timeline canvas if visible. The created movie file will contain the first until the last frame of the current movie. The screenshot mode will make a screenshot of the current image and timeline canvases. In unlimited mode, all the manipulations are recorded from the moment the record button is clicked. Clicking the same record button, now indicating *"busy"*, stops the recording. Removing all image layers also stops the recording.
 
-# Saving program state
+# Saving program state [state]
 
-By selecting *"File>Save State"* the state of the program can be saved with the exception of annotations. This state can be shared. A state can be opened by *"File>Load State..."*. A file selection dialog will open and you can select the state file you want to open to recreate the state in the state file.
+The state file captures all the program's presentation including the loaded remote data, its orientation, and the options of the layers. This can be used to quickly reproduce a particular solar event or to share a particular combined presentation of data. The state file is a JSON file which can be saved by selecting *"File>Save State"* and loaded by *"File>Load State..."*.
 
 # Program interoperability
 
-## Simple Application Message Protocol [samp]
+## Simple Application Message Protocol (SAMP) [samp]
+
+[SAMP](https://www.ivoa.net/documents/SAMP/) is an inter-application messaging protocol standardised by IVOA that enables astronomy software tools to interoperate and communicate. The GitHub [samp4jhv](https://github.com/Helioviewer-Project/samp4jhv) project contains a collection of examples on how data can be shared between JHelioviewer and Python or IDL environments.
+
+This protocol can also be used on the web and the figure below shows the online SOAR archive which can send FITS and CDF files to JHelioviewer. Selecting *"Send table"* will instruct JHelioviewer to load the selected FITS files as a movie. Selecting *"Send products"* will make JHelioviewer to load the selected files as different layers.
+
+![SOAR archive in action][figure_soar]
 
 # Using time in JHelioviewer
 
-## Natural language for time
+All time input and display in JHelioviewer is UTC in ISO8601 format. [Day of year](#figure_timeinput_doy) format is supported, as well as [natural English language](#figure_timeinput_natural) phrases such as "one year ago" or "two weeks ago". If the input is not recognized or if the start time is later than the end time, the time field reverts to previously displayed value. The entire time range can be shifted backward or forward with a selectable duration (day/week/Carrington rotation). The period of an entire Carrington rotation can be filled in the time fields by clicking the *"CR"* button.
 
+![Day of year time input][figure_timeinput_doy]
 
+![Natural language time input][figure_timeinput_natural]
 
-# Changing the Preferences
+# Changing the Preferences [preferences]
 
-On Mac OS X, the preferences can be found under the program menu (JHelioviewer), for Windows and Linux it is located in the menu *"Options"*. A [new dialog](#figure_preferences) opens. The preferred server and the loading of a default movie at start-up can be set. There are also settings for normalization of SDO/AIA data brightness for aesthetically pleasing mission long movies, as well as for normalization of EUV solar radius to visible light solar radius.
+The preferences dialog can be found under the program menu (JHelioviewer) on macOS, for Windows and Linux it is located in the menu *"Options"*. A [new dialog](#figure_preferences) opens. The following persistent options can be set:
+
+- preferred server
+- loading of a preferred [state file][state] at start-up
+- normalisation of SDO/AIA data brightness to reduce the effect of response degradation
+- normalisation of EUV solar radius to visible light solar radius
+- uniformisation of image observation time to Observer (default)/Sun emission/Earth arrival for the combination of observations from different vantage points
+- format for the recordings: H.264/H.264 better/H.265/H.265 better/PNG series. The H.265 format allows for significantly smaller file sizes at the price of increased CPU time for the encoding and reduced compatibility with video playing software. The *"better"* variants allow for increased file sizes and slighter higher CPU utilisation for better output quality.
+
+Several parts of the interface can be turned on and off under the Plugins heading: Timelines/SWEK/PFSS. The persistent image cache can also be cleared, as well as a proxy username and password can be set if required.
 
 ![The preferences][figure_preferences]
-
-# Managing Plugins
-
-Parts of JHelioviewer are built out of plugins that can be disabled for a more streamlined application. Managing the plugins is done via the menu item *"Plug-ins>Manage Plug-ins..."*. A [dialog box](#figure_plugins) will open. The list of plugins can be filtered: all plugins can be displayed, or only the enabled or disabled plugins. Clicking on *more* gives detailed information about the selected plugin.
-
-![Manage the plugins][figure_plugins]
 
 # Keyboard Shortcuts
 
 | Operation                 | Key combination          |
 |:--------------------------|:-------------------------|
-| Add New Layer             | Cmd/Ctrl-N               |
-| Open File                 | Cmd/Ctrl-O               |
-| Toggle Full Screen        | Cmd/Ctrl-Enter           |
-| Exit Full Screen          | Esc                      |
-| Actual Size               | Cmd/Ctrl-0               |
-| Zoom to Fit               | Cmd/Ctrl-9               |
-| Zoom In                   | Cmd/Ctrl-=               |
-| Zoom Out                  | Cmd/Ctrl--               |
-| Play Movie                | Cmd/Ctrl-P               |
-| Step to Previous Frame    | Cmd/Ctrl-Alt-Left Arrow  |
-| Step to Next Frame        | Cmd/Ctrl-Alt-Right Arrow |
-| Remove Current Annotation | Delete / Backspace       |
+| Add new layer             | Cmd/Ctrl-N               |
+| Open file                 | Cmd/Ctrl-O               |
+| Toggle full screen        | Cmd/Ctrl-Enter           |
+| Exit full screen          | Esc                      |
+| Actual size               | Cmd/Ctrl-0               |
+| Zoom to fit               | Cmd/Ctrl-9               |
+| Zoom in                   | Cmd/Ctrl-=               |
+| Zoom out                  | Cmd/Ctrl--               |
+| Play movie                | Cmd/Ctrl-P               |
+| Step to previous frame    | Cmd/Ctrl-Alt-Left Arrow  |
+| Step to next frame        | Cmd/Ctrl-Alt-Right Arrow |
+| Remove current annotation | Shift- Delete/Backspace  |
+| Cycle through annotations | Shift- n(ext)/p(revious) |
 
 
 # Mouse Manipulations
 
 ## On Image Canvas
-| Operation      | Action                      |
-|:---------------|:----------------------------|
-| Double-click   | Reset Camera                |
-| Scroll Up      | Zoom Out                    |
-| Scroll Down    | Zoom In                     |
-| Click          | Annotate in Annotation Mode |
-| Click and Drag | Pan in Panning Mode         |
-|                | Rotate in Rotation Mode     |
+| Operation            | Action                                                                               |
+|:---------------------|:-------------------------------------------------------------------------------------|
+| Double-click         | Reset Camera                                                                         |
+| Scroll Up            | Zoom Out                                                                             |
+| Scroll Down          | Zoom In                                                                              |
+| Click and Drag       | Pan in Panning Mode                                                                  |
+|                      | Rotate in Rotation Mode                                                              |
+| Shift-click and Drag | Enter annotation mode and draw; release mouse button then the shift key to exit mode |
+| Right-click          | Copy to clipboard the position data at the mouse pointer                             |
 
 
 ## On Timeline Canvas
@@ -766,7 +617,7 @@ The interesting value is MaxHeapSize.
 ## Movies
 
 How can I get a square movie?
-:  Resize your window to have a square canvas and record the movie in the "On screen" size.
+:  Resize your window to have a square canvas and record the movie in the *"On screen"* size.
 
 How do I get a movie without the timeline canvas?
 :  Collapse the timeline canvas using the separator.
@@ -774,44 +625,66 @@ How do I get a movie without the timeline canvas?
 ## Data
 
 I can't find a specific wavelength for a specific instrument and observatory.
-:  Make sure that you select the correct server. The ROB server only has a limited, for testing purpose, amount of data. GSFC and IAS have the full dataset of most instruments. If the dataset isn't to be found jhelioviewer is always capable to open the raw fitsfiles. The quality of the visualisation depends on the correctness of the keywords in the fits files.
+:  Make sure that you select the correct server. The ROB server only has a limited, for testing purpose, amount of data. GSFC and IAS have the full dataset of most instruments. If the dataset isn't to be found, JHelioviewer is always capable to open FITS files. The quality of the visualisation depends on the correctness of the keywords in the FITS files.
 
+[figure_overview_annotated]: img/full_window_annotated.png
 
-[figure_overview_annotated]: overview_anno.png height=297px width=397px
 [figure_toolbar]: toolbar.png height=297px width=397px
-[figure_annotation]: annotation_ic.png height=297px width=397px
 [figure_no_corona]: no_corona_compo.png height=297px width=397px
 [figure_movie_panel]: movie_panel2.png height=297px width=397px
-[figure_add_layer_dialog]: add_layer_dialog.png height=297px width=397px
 [figure_image_layer_options]: image_layer_options.png height=297px width=397px
-[figure_grid]: grid.png height=297px width=379px
-[figure_timestamp]: timestamp.png height=297px width=397px
-[figure_miniview]: miniview.png height=297px width=397px
+[figure_grid]: img/grid.png height=297px width=379px
 [figure_change_color]: change_color.png height=297px width=397px
 [figure_events]: events.png height=297px width=397px
 [figure_detail_events]: detail_events.png height=297px width=397px
 [figure_timeline]: timeline.png height=297px width=397px
-[figure_preferences]: preferences.png height=189px width=397px
-[figure_multiview]: multiview.png height=297px width=397px
-[figure_projection_1]: projection_1.png height=297px width=397px
-[figure_projection_2]: projection_2.png height=297px width=397px
+
+[figure_add_layer_dialog]: img/load_image.png height=297px width=397px
+[figure_load_layer_fast]: img/load_image_fast.png height=297px width=397px
+[figure_load_layer_soar]: img/load_soar.png height=297px width=397px
+
+[figure_preferences]: img/preferences.png height=189px width=397px
+[figure_multiview]: img/multiview.png height=297px width=397px
 [figure_enhance_corona]: enhance_corona.png height=297px width=397px
-[figure_fits_keywords]: fits_keywords.png height=297px width=397px
+[figure_fits_keywords]: img/image_info.png height=297px width=397px
+
+[figure_projection_orthographic]: img/projection_orthographic.png height=297px width=397px
+[figure_projection_latitudinal]: img/projection_latitudinal.png height=297px width=397px
+[figure_projection_logpolar]: img/projection_logpolar.png height=297px width=397px
+[figure_projection_polar]: img/projection_polar.png height=297px width=397px
 
 [figure_zooming]: zooming.png height=559px width=379px
 [figure_rotpan]: rotpan.png height=559px width=379px
-[figure_tracking]: tracking.png height=559px width=379px
+
+[figure_annotation]: img/annotations.png height=297px width=397px
+
+[figure_track_on]: img/track_on.png height=297px width=397px
+[figure_track_start]: img/track_start.png height=297px width=397px
+[figure_track_end]: img/track_end.png height=297px width=397px
+
+[figure_differential]: img/differential.png height=297px width=397px
 
 [figure_difference]: difference.png height=547px width=370px
-[figure_camera]: camera.png height=547px width=370px
-[figure_equatorial]: equatorial_view.png height=297px width=397px
-[figure_pfss]: pfss.png height=547px width=370px
+
+[figure_viewpoint_location]: img/viewpoint_location.png height=297px width=397px
+[figure_viewpoint_location_future]: img/viewpoint_location_future.png height=297px width=397px
+[figure_viewpoint_heliosphere]: img/viewpoint_heliosphere.png height=297px width=397px
+[figure_viewpoint_heliosphere_relative]: img/viewpoint_heliosphere_relative.png height=297px width=397px
+[figure_viewpoint_heliosphere_spiral]: img/viewpoint_heliosphere_spiral.png height=297px width=397px
+
+[figure_timestamp]: img/timestamp.png height=297px width=397px
+[figure_pfss0]: img/pfss_detail0.png height=547px width=370px
+[figure_pfss8]: img/pfss_detail8.png height=547px width=370px
+[figure_pfss_fixed]: img/pfss_fixedcolor.png height=547px width=370px
+
+[figure_timeinput_doy]: img/time_input_doy.png height=297px width=397px
+[figure_timeinput_natural]: img/time_input_natural.png height=297px width=397px
+
 [figure_no_locking]: no_locking.png height=547px width=370px
 [figure_locking]: locking.png height=547px width=370px
 [figure_radio]: radio.png height=547px width=370px
 
-[figure_overview]: overview.png height=238px width=397px
 [figure_add_timeline]: add_timeline.png height=126px width=397px
 [figure_swek]: swek.png height=547px width=370px
-[figure_plugins]: plugins.png height=140px width=397px
+[figure_soar]: img/soar.png
 
