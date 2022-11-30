@@ -2,12 +2,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN" "http://www.w3.org/TR/MathML2/dtd/xhtml-math11-f.dtd"><html>
 <head>
 	<meta charset="utf-8"/>
-	<meta name="svn_rev" content="$Rev: 8812 $"/>
-	<meta name="svn_date" content="$Date: 2018-01-17 15:59:24 +0100 (Wed, 17 Jan 2018) $"/>
 	<title>JHelioviewer User Manual</title>
-	<meta name="author" content="Bram Bourgoignie, Bogdan Nicula, Freek Verstringe"/>
+	<meta name="author" content="Bogdan Nicula, Bram Bourgoignie, Freek Verstringe"/>
 	<meta name="affiliation" content="Royal Observatory of Belgium"/>
-	<meta name="date" content="November 4, 2016"/>
+	<meta name="date" content="November 18, 2022"/>
 	<link type="text/css" rel="stylesheet" href="avenir-white.css"/>
 	<link type="text/css" rel="stylesheet" href="magnific-popup.css"/>
 	<meta name="xhtmlxslt" content="xhtml-sum.xslt"/>
@@ -28,7 +26,7 @@
 
 <h2 id="introduction">Introduction</h2>
 
-<p>Space Weather JHelioviewer is an outcome of the ESA Contract No. 4000107325/12/NL/AK - High Performance Distributed Solar Imaging and Processing System - run at the Solar Influences Data Analysis Center (SIDC, <a href="http://sidc.be">http://sidc.be</a>) of the Royal Observatory of Belgium (ROB) under the supervision of Space Environments and Effects section of ESA (ESTEC/TEC-EES, <a href="http://space-env.esa.int">http://space-env.esa.int</a>). This project builds upon the infrastructure of ESA/NASA Helioviewer Project (<a href="http://helioviewer.org">http://helioviewer.org</a>) at all levels of the software stack, and significantly augments the capabilities of the JHelioviewer software (<a href="http://www.jhelioviewer.org">http://www.jhelioviewer.org</a>).</p>
+<p>Space Weather JHelioviewer is an outcome of the ESA Contract No. 4000107325/12/NL/AK - High Performance Distributed Solar Imaging and Processing System - run at the Solar Influences Data Analysis Center (SIDC, <a href="https://sidc.be">https://sidc.be</a>) of the Royal Observatory of Belgium (ROB) under the supervision of Space Environments and Effects section of ESA (ESTEC/TEC-EES, <a href="https://space-env.esa.int/">https://space-env.esa.int/</a>). This project builds upon the infrastructure of ESA/NASA Helioviewer Project (<a href="https://helioviewer.org">https://helioviewer.org</a>) at all levels of the software stack, and significantly augments the capabilities of the JHelioviewer software (<a href="http://www.jhelioviewer.org">http://www.jhelioviewer.org</a>).</p>
 
 <p>The JHelioviewer solar data visualisation tool has been overhauled with a strong focus for space weather usage. The viewer is able to display <a href="#images_sun">solar image data</a>, and one-dimensional and two-dimensional solar <a href="#timelines">timeline data</a>.</p>
 
@@ -46,19 +44,19 @@
 
 <p>JHelioviewer is an open source project and its source code can be accessed at <a href="https://github.com/Helioviewer-Project/JHelioviewer-SWHV">https://github.com/Helioviewer-Project/JHelioviewer-SWHV</a>.</p>
 
-<p>Compiled releases are available for Windows, Mac OS X and Linux from <a href="http://swhv.oma.be/download">http://swhv.oma.be/download</a>. A brief changelog is at <a href="https://github.com/Helioviewer-Project/JHelioviewer-SWHV/blob/master/changelog.md">https://github.com/Helioviewer-Project/JHelioviewer-SWHV/blob/master/changelog.md</a>.</p>
+<p>Compiled releases are available for Windows, macOS and Linux from <a href="http://swhv.oma.be/download">http://swhv.oma.be/download</a>. A brief changelog is at <a href="https://github.com/Helioviewer-Project/JHelioviewer-SWHV/blob/master/changelog.md">https://github.com/Helioviewer-Project/JHelioviewer-SWHV/blob/master/changelog.md</a>.</p>
 
 <h3 id="windows">Windows</h3>
 
 <ul>
-<li>Download the EXE Windows installer from <a href="http://swhv.oma.be/download">http://swhv.oma.be/download</a>.</li>
+<li>Download the Windows EXE installer from <a href="http://swhv.oma.be/download">http://swhv.oma.be/download</a>.</li>
 <li>Double-click the installer and follow the steps.</li>
 </ul>
 
-<h3 id="macosx">Mac OS X</h3>
+<h3 id="macos">macOS</h3>
 
 <ul>
-<li>Download the DMG Mac OS X disk image from <a href="http://swhv.oma.be/download">http://swhv.oma.be/download</a>.</li>
+<li>Download the macOS DMG disk image from <a href="http://swhv.oma.be/download">http://swhv.oma.be/download</a>.</li>
 <li>Move JHelioviewer.app to the Applications folder and run it by double-clicking its icon.</li>
 </ul>
 
@@ -78,7 +76,7 @@
 <li>Run the program by typing <code>java -cp JHelioviewer.jar:natives-linux.jar:natives-macos.jar:natives-windows.jar org.helioviewer.jhv.JHelioviewer</code> in a terminal window.</li>
 </ul>
 
-<p>This procedure works for Windows, Mac OS X and Linux.</p>
+<p>This procedure works for Windows, macOS and Linux.</p>
 
 <p>The program accepts command line arguments. This is implemented using JSON documents specifying requests to the default server in a simple manner as in the example below. Natural language specification of time is supported (as is the case for the state file) and, besides the “dataset” field, all fields are optional with sensible defaults.</p>
 
@@ -95,19 +93,18 @@
 
 <p>The <a href="#trouble">Troubleshooting</a> and <a href="#faq">Frequent Asked Questions</a> sections may contain contain useful hints about installing and running JHelioviewer.</p>
 
-<figure>
-<img src="overview.png" alt="JHelioviewer in action" id="figure_overview"/>
-<figcaption>JHelioviewer in action</figcaption>
-</figure>
-
 <h2 id="mui">Main User Interface</h2>
+
+<p>The following YouTube video demonstrates some basic functionalities of the interface.</p>
+
+<p><p align="center"><iframe width="560" height="315" src="https://www.youtube.com/embed/zNvJkfJlsNQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></p></p>
 
 <h3 id="overview">Overview</h3>
 
 <p>The main user interface consists of the toolbar, the image canvas, the timeline canvas, the control panels, the view status and the mouse position indicators.</p>
 
 <figure>
-<img src="overview_anno.png" alt="Main user interface" id="figure_overview_annotated"/>
+<img src="img/full_window_annotated.png" alt="Main user interface" id="figure_overview_annotated"/>
 <figcaption>Main user interface</figcaption>
 </figure>
 
@@ -121,7 +118,7 @@
 
 <p>The image canvas displays in four projections: the default orthographic, latitudinal, logpolar and polar projection. Switching from one projection to the other is instantaneous.</p>
 
-<p>There is also a direct link to the SDO AIA get data page (<a href="http://www.lmsal.com/get_aia_data/">http://www.lmsal.com/get_aia_data/</a>).</p>
+<p>There is also a direct link to the SDO AIA get data page (<a href="https://www.lmsal.com/get_aia_data/">https://www.lmsal.com/get_aia_data/</a>).</p>
 
 <p>The data of the image layer can be broadcasted using the <a href="#samp">Simple Application Message Protocol(SAMP)</a>.</p>
 
@@ -129,7 +126,7 @@
 
 <h4 id="imagecanvas">Image Canvas</h4>
 
-<p>The image canvas displays the visible image layers. The images of the Sun are projected on a sphere. As long as no manipulations to the scene are done, and the camera is in observer mode (see the <a href="#camera">camera section</a>), the image is an undistorted representation of the two-dimensional data recorded by the instrument.</p>
+<p>The image canvas displays the visible image layers. The images of the Sun are projected on a sphere. As long as no manipulations to the scene are done, and the <a href="#viewpoint">viewpoint</a> is not altered, the image is an undistorted representation of the two-dimensional data recorded by the instrument.</p>
 
 <h4 id="timelinecanvas">Timeline Canvas</h4>
 
@@ -200,24 +197,41 @@
 
 <h4 id="annotationfeatures">Annotation Features</h4>
 
-<p>It is possible to annotate the image canvas with rectangles, circles and crosses. The <a href="#figure_annotation">annotation figure</a> shows an annotated image canvas and the modes when clicking the annotation button. Click the annotate button and select the annotation shape to change to annotation mode. There are three annotation shape modes: rectangle, circle and cross. If more than one annotation is added, the red one indicates the active annotation. The active annotation can be changed by pressing the <em>n</em>-key. It is not possible to annotate outside the solar disk.</p>
+<p>It is possible to annotate the image canvas with various shapes. The <a href="#figure_annotation">annotation figure</a> shows an annotated image canvas and the modes when clicking the annotation button. Click the annotate button and select the desired annotation shape. Then press the shift key and drag the mouse pointer with the left button pressed to draw. When finished, release the mouse button, then the shift key. If more than one annotation is added, the red one indicates the active annotation.</p>
 
 <figure>
-<img src="annotation_ic.png" alt="Annotated image canvas" id="figure_annotation"/>
+<img src="img/annotations.png" alt="Annotated image canvas" id="figure_annotation"/>
 <figcaption>Annotated image canvas</figcaption>
 </figure>
 
-<p>Consider the situation shown by the <a href="#figure_annotation">annotation figure</a>. By pressing <em>n</em>-key, another annotation will become red. Pressing the forward or the backward delete key can delete the red rectangle. In order to delete a cross, press the <em>n</em>-key until the desired cross becomes highlighted in red and then the delete key has to be pressed. The annotations can deleted all at once via the menu item <em>“View&gt;Clear annotations”</em> or from the toolbar annotation mode button.</p>
+<p>Consider the situation shown by the <a href="#figure_annotation">annotation figure</a>. By pressing <em>shift</em>+<em>n</em>(ext) or <em>shift</em>+<em>p</em>(previous), another annotation will become red. Pressing shift combined with the forward or the backward delete key will delete the red loop. The annotations can deleted all at once via the menu item <em>“View&gt;Clear annotations”</em> or from the toolbar annotation mode button.</p>
 
 <h4 id="trackingfeatures">Tracking Features</h4>
 
-<p>The solar rotation can be tracked. Zoom, rotate and translate the image until a desired feature is visible. Enable the tracking mode in the toolbar and play the movie. The image canvas will show the evolution of the selected feature.</p>
-
-<p>The <a href="#figure_tracking">figure below</a> shows the tracking in action. Top image is the start position. The image was zoomed, rotated and translated on top of the active regions and tracking was enabled. The first image is taken at time 08:09:46, the middle image is at 19:43:58 and the bottom image is at 07:39:10 the next day. Notice that the same active regions stay in view and the miniview moves slightly to the solar West.</p>
+<p>The solar rotation can be tracked by freezing the <a href="#viewpoint">viewpoint</a> time at the moment when the tracking mode is enabled in the toolbar. The image canvas will co-rotate with the Sun when playing the movie, while keeping the original features fixed on screen, allowing to observe their evolution in time.</p>
 
 <figure>
-<img src="tracking.png" alt="Tracking in action" id="figure_tracking"/>
-<figcaption>Tracking in action</figcaption>
+<img src="img/track_on.png" alt="Tracking mode on" id="figure_track_on"/>
+<figcaption>Tracking mode on</figcaption>
+</figure>
+
+<figure>
+<img src="img/track_start.png" alt="Tracked movie start" id="figure_track_start"/>
+<figcaption>Tracked movie start</figcaption>
+</figure>
+
+<figure>
+<img src="img/track_end.png" alt="Tracked movie end" id="figure_track_end"/>
+<figcaption>Tracked movie end</figcaption>
+</figure>
+
+<h4 id="differentialrotation">Differential Rotation</h4>
+
+<p>The images can be distorted according to differential solar rotation of magnetic features by selecting the differential option in the toolbar and manipulating the viewpoint time, see <a href="#viewpoint">viewpoint section</a>.</p>
+
+<figure>
+<img src="img/differential.png" alt="Differential rotation in action" id="figure_differential"/>
+<figcaption>Differential rotation in action</figcaption>
 </figure>
 
 <h4 id="coronavisibility">Corona Visibility</h4>
@@ -229,23 +243,42 @@
 <figcaption>Hiding the off-disk corona</figcaption>
 </figure>
 
-<h4 id="projection">Projection</h4>
+<h4 id="multiview">Multiview</h4>
 
-<p>Jhelioviewer is able to show images in four projections: orthographic, latitudinal (only for images on the solar disk), logpolar and polar. To change the projection click the projection button and select the projection. <a href="#figure_projection_1">Projection figure 1</a> shows the orthographic and latitudinal projection, <a href="#figure_projection_2">projection figure 2</a> shows the logpolar and polar projection.</p>
+<p>The <a href="#figure_multiview">multiview figure</a> shows what happens if the <em>“Multiview”</em> option in the toolbar is selected. The layers are displayed side-by-side instead of on top of each other. In this mode, up to four layers can be placed together in the image canvas.</p>
 
 <figure>
-<img src="projection_1.png" alt="Orthographic and latitudinal projection" id="figure_projection_1"/>
-<figcaption>Orthographic and latitudinal projection</figcaption>
+<img src="img/multiview.png" alt="The multiview option in action" id="figure_multiview"/>
+<figcaption>The multiview option in action</figcaption>
+</figure>
+
+<h4 id="projection">Projection</h4>
+
+<p>Jhelioviewer is able to show images in four projections: orthographic (default), latitudinal (only for images on the solar disk), logpolar and polar. To change the projection click the projection button in the toolbar and select the projection.</p>
+
+<figure>
+<img src="img/projection_orthographic.png" alt="Orthographic projection" id="figure_projection_orthographic"/>
+<figcaption>Orthographic projection</figcaption>
 </figure>
 
 <figure>
-<img src="projection_2.png" alt="Logpolar and polar projection" id="figure_projection_2"/>
-<figcaption>Logpolar and polar projection</figcaption>
+<img src="img/projection_latitudinal.png" alt="Latitudinal projection" id="figure_projection_latitudinal"/>
+<figcaption>Latitudinal projection</figcaption>
+</figure>
+
+<figure>
+<img src="img/projection_logpolar.png" alt="LogPolar projection" id="figure_projection_logpolar"/>
+<figcaption>LogPolar projection</figcaption>
+</figure>
+
+<figure>
+<img src="img/projection_polar.png" alt="Polar projection" id="figure_projection_polar"/>
+<figcaption>Polar projection</figcaption>
 </figure>
 
 <h4 id="sdocut-out">SDO Cut-out</h4>
 
-<p>The <em>SDO Cut-out</em> option will open the SDO AIA Get Data page (<a href="http://www.lmsal.com/get_aia_data/">http://www.lmsal.com/get_aia_data/</a>) at LMSAL with some of the parameters already filled-in based on the current AIA image layer stack.</p>
+<p>The <em>SDO Cut-out</em> option will open the SDO AIA Get Data page (<a href="https://www.lmsal.com/get_aia_data/">https://www.lmsal.com/get_aia_data/</a>) at LMSAL with some of the parameters already filled-in based on the current AIA image layer stack.</p>
 
 <h3 id="playingmovies">Playing Movies</h3>
 
@@ -272,601 +305,36 @@
 
 <p>Each layer has specific options that become available when selecting its entry in the table listing.</p>
 
-<h3 id="overviewoftheavailableimagesproviders">Overview of the Available Images Providers</h3>
-
-<p>The <a href="#image_providers">table below</a> records the image providers as of November 4, 2016; for an up-to-date list, check the program.</p>
-
-<table>
-<caption id="image_providers">Overview of the available image providers</caption>
-<colgroup>
-<col style="text-align:left;"/>
-<col style="text-align:left;"/>
-<col style="text-align:left;"/>
-<col style="text-align:left;"/>
-</colgroup>
-
-<thead>
-<tr>
-	<th style="text-align:left;">Server</th>
-	<th style="text-align:left;">Observatory</th>
-	<th style="text-align:left;">Instrument</th>
-	<th style="text-align:left;">Detector/Measurement</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-	<td style="text-align:left;">ROB</td>
-	<td style="text-align:left;">Kanzelhöhe</td>
-	<td style="text-align:left;">H-alpha</td>
-	<td style="text-align:left;">6562 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">NRH</td>
-	<td style="text-align:left;">NRH2</td>
-	<td style="text-align:left;">150.9 MHz</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">432.0 MHz</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">NSO-GONG</td>
-	<td style="text-align:left;">GONG</td>
-	<td style="text-align:left;">GONG Farside</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">GONG Magnetogram</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">H-alpha 6562 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">NSO-SOLIS</td>
-	<td style="text-align:left;">VSM</td>
-	<td style="text-align:left;">Azimuth 6302 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">CoreFluxDens 8542 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">CoreWingInt 8542 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">FillFactor 6302 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Inclination 6302 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Intensity 1083 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Intensity 6302 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Strength 6302 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">PROBA2</td>
-	<td style="text-align:left;">SWAP</td>
-	<td style="text-align:left;">174 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">ROB-USET</td>
-	<td style="text-align:left;">H-alpha</td>
-	<td style="text-align:left;">6562 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">SDO</td>
-	<td style="text-align:left;">AIA</td>
-	<td style="text-align:left;">171 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">304 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">HMI</td>
-	<td style="text-align:left;">Continuum</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Magnetogram</td>
-</tr>
-<tr>
-	<td style="text-align:left;">GSFC/IAS</td>
-	<td style="text-align:left;">Hinode</td>
-	<td style="text-align:left;">XRT</td>
-	<td style="text-align:left;">Al_med Al_thick</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Al_med Any</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Al_med Be_thick</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Al_med Open</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Al_med Ti_poly</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Al_poly Al_mesh</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Al_poly Al_thick</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Al_poly Any</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Al_poly Be_thick</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Al_poly Open</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Al_poly Ti_poly</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Any Al_mesh</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Any Al_thick</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Any Any Any</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Any Be_thick</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Any Open</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Any Ti_poly</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Be_med Any</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Be_med Open</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Be_thin Any</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Be_thin Open</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">C_poly Al_mesh</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">C_poly Al_thick</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">C_poly Any</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">C_poly Open</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">C_poly Ti_poly</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Open Al_mesh</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Open Al_thick</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Open Any</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Open Be_thick</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Open Ti_poly</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">PROBA2</td>
-	<td style="text-align:left;">SWAP</td>
-	<td style="text-align:left;">171 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">SDO</td>
-	<td style="text-align:left;">AIA</td>
-	<td style="text-align:left;">94 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">131 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">171 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">193 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">211 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">304 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">335 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">1600 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">1700 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">4500 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">HMI</td>
-	<td style="text-align:left;">Continuum</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Magnetogram</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">SOHO</td>
-	<td style="text-align:left;">EIT</td>
-	<td style="text-align:left;">171 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">195 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">284 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">304 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">LASCO</td>
-	<td style="text-align:left;">C2</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">C3</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">MDI</td>
-	<td style="text-align:left;">Continuum</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Magnetogram</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">STEREO_A/B</td>
-	<td style="text-align:left;">SECCHI</td>
-	<td style="text-align:left;">COR1</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">COR2</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EUVI 171 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EUVI 195 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EUVI 284 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EUVI 304 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">TRACE</td>
-	<td style="text-align:left;">TRACE</td>
-	<td style="text-align:left;">171 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">195 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">284 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">1216 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">1550 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">1600 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">1700 Å</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">White Light</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Yohkoh</td>
-	<td style="text-align:left;">SXT</td>
-	<td style="text-align:left;">AlMgMn</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">Thin Al</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">White Light</td>
-</tr>
-</tbody>
-</table>
-
 <h3 id="addingremovingasequenceofimages">Adding/Removing a Sequence of Images</h3>
 
-<p>A new image layer can be added by clicking the <em>“New Layer”</em> button (<em>ctrl/cmd + n</em>).</p>
-
-<blockquote>
-<ul>
-<li>a new <a href="#figure_add_layer_dialog">dialog box</a> will appear,</li>
-<li>select <em>image data</em> as data type,</li>
-<li>set the start date and the end date,</li>
-<li>select the time step,</li>
-<li>select the server from where to download the data,</li>
-<li>select the observatory, instrument and detector/measurement,</li>
-<li>click <em>“Add”</em> to add the layer to the image layers panel or <em>cancel</em> to stop</li>
-</ul>
-</blockquote>
-
-<p>The image servers currently available are ROB, GSFC and IAS.</p>
-
-<p>The layer is now added to the list of image layers. The layer becomes the master layer and will drive the timing for playing the movies. A layer can also be added by opening an image or series of images via the menu item <em>“File&gt;Open Image Layer…”</em>. A file selection dialog will open. Select the wanted image or image series to be added to the image layers. A layer can be removed by clicking the cross. The loading of a layer can be cancelled by clicking the cross while the layer is still loading.</p>
+<p>A new image layer can be rapidly added by selecting a time range and clicking <em>“New Layer”</em> in the image layers panel. Select the server from where to download the data, then the dataset from the list.</p>
 
 <figure>
-<img src="add_layer_dialog.png" alt="Add a layer" id="figure_add_layer_dialog"/>
+<img src="img/load_image_fast.png" alt="Quickly add a layer" id="figure_load_layer_fast"/>
+<figcaption>Quickly add a layer</figcaption>
+</figure>
+
+<p>The program calculates a time step for an approximately 98 frames sequence. For control over the cadence, use <em>“File&gt;New Image Layer…”</em> (<em>ctrl/cmd + n</em>) which will open a dialog box where the time step can be changed.</p>
+
+<figure>
+<img src="img/load_image.png" alt="Add a layer" id="figure_add_layer_dialog"/>
 <figcaption>Add a layer</figcaption>
 </figure>
+
+<p>The layer is now added to the list of image layers. The layer becomes the master layer and will drive the timing for playing the movies. A layer can also be added by opening an image or series of images via the menu item <em>“File&gt;Open Image Layer…”</em>. A file selection dialog will open. Select the wanted image or a list of images (using <em>shift</em> for a contiguous list or <em>ctrl/cmd</em> for disjoint list) to be added to the image layers. A list of images can also be added by dragging and dropping from other programs.</p>
+
+<p>Solar Orbiter science data can also be loaded from the Solar Orbiter Archive at ESAC using the menu item <em>“File&gt;New SOAR Layer…”</em>. Select a time range and search for a dataset and processing level. Select the items to load from the returned list and click the <em>“Add”</em> button. Images will load in the image canvas and time series in the timeline canvas. There is limit of 2GiB data to be loaded at one time.</p>
+
+<figure>
+<img src="img/load_soar.png" alt="Add a SOAR layer" id="figure_load_layer_soar"/>
+<figcaption>Add a SOAR layer</figcaption>
+</figure>
+
+<p>A layer can be removed by clicking the cross. The loading of a layer can be cancelled by clicking the cross while the layer is still loading.</p>
 
 <p>To change the options of a layer, it has to be selected in the table listing and its <a href="#options_panel">options panel</a> will become available underneath the listing. New layers are added with increased levels of transparency to avoid fully concealing the layers beneath and the opacity of each layer can be controlled from its options panel.</p>
 
 <p>Image layers can be replaced by double-clicking in the listing and modifying any of the selection parameters that were initially used. The time span of all image layers loaded can be matched by clicking the <em>“Synchronize layers time span”</em> button.</p>
-
-<p>The <a href="#figure_multiview">multiview figure</a> shows what happens if the <em>“Multiview”</em> option is selected. The layers are displayed side-by-side instead of on top of each other. In this mode, up to four layers can be placed together in the image canvas.</p>
-
-<figure>
-<img src="multiview.png" alt="The multiview option in action" id="figure_multiview"/>
-<figcaption>The multiview option in action</figcaption>
-</figure>
 
 <h3 id="availabilityoftheimages">Availability of the Images</h3>
 
@@ -888,114 +356,14 @@
 <figcaption>From top to bottom: no difference, running difference and base difference</figcaption>
 </figure>
 
-<p>The opacity, how the image blends with other layers, the perceived sharpness of the image, the low and the high level can also be adjusted. Click between the levels slider thumbs and drag left or right to move together the levels. Double-click to reset the levels. An automatic high level dependent on the content of current image can be calculated by pressing on the <em>“Auto”</em> button. To change the colors used for the image select a different colormap in the dropdown menu. The available colormaps are listed in the <a href="#colormaps">list of colormaps</a>. The colors of the image can be inverted by clicking the button next to the colormap dropdown menu. Individual color channels can be turned on and off.</p>
-
-<table>
-<caption id="colormaps">Overview of the colormaps</caption>
-<colgroup>
-<col style="text-align:center;"/>
-</colgroup>
-
-<thead>
-<tr>
-	<th style="text-align:center;">Colormap Name</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-	<td style="text-align:center;">Blue/Green/Red/Yellow</td>
-</tr>
-<tr>
-	<td style="text-align:center;">Blue/Red</td>
-</tr>
-<tr>
-	<td style="text-align:center;">Blue/White Linear</td>
-</tr>
-<tr>
-	<td style="text-align:center;">Blue/White/Red</td>
-</tr>
-<tr>
-	<td style="text-align:center;">Gray</td>
-</tr>
-<tr>
-	<td style="text-align:center;">Green/White Linear</td>
-</tr>
-<tr>
-	<td style="text-align:center;">Hinode XRT</td>
-</tr>
-<tr>
-	<td style="text-align:center;">Red Temperature</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SDO-AIA 94 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SDO-AIA 131 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SDO-AIA 171 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SDO-AIA 193 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SDO-AIA 211 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SDO-AIA 304 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SDO-AIA 335 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SDO-AIA 1600 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SDO-AIA 1700 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SDO-AIA 4500 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SOHO EIT 171 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SOHO EIT 195 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SOHO EIT 284 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">SOHO EIT 304 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">STEREO EUVI 171 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">STEREO EUVI 195 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">STEREO EUVI 284 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">STEREO EUVI 304 Å</td>
-</tr>
-<tr>
-	<td style="text-align:center;">Spectral</td>
-</tr>
-<tr>
-	<td style="text-align:center;">Yohkoh SXT</td>
-</tr>
-</tbody>
-</table>
+<p>The opacity, how the image blends with other layers, the perceived sharpness of the image, the low and the high level can also be adjusted. Click between the levels slider thumbs and drag left or right to move together the levels. Double-click to reset the levels. An automatic high level dependent on the content of current image can be calculated by pressing on the <em>“Auto”</em> button. To change the colors used for the image select a different colormap in the dropdown menu. The colors of the image can be inverted by clicking the button next to the colormap dropdown menu. Individual color channels can be turned on and off.</p>
 
 <p>The download button next to the difference image selection combobox allows the download of the data for the selected layer. A JPX file in case of a multiframe layer, or a JP2 file can be found in the Downloads directory of the JHelioviewer home folder.</p>
 
-<p>The <a href="#figure_fits_keywords">FITS keywords</a> can be shown by clicking the information icon next to the download icon. Basic information such as the observatory, instrument, detector and observation time, followed by the full list of FITS keywords, are displayed.</p>
+<p>The <a href="#figure_fits_keywords">FITS keywords</a> can be shown by clicking the information icon in the lower right corner of the layer options. Basic information such as the observatory, instrument, detector and observation time, followed by the full list of FITS keywords, are displayed.</p>
 
 <figure>
-<img src="fits_keywords.png" alt="The FITS keywords" id="figure_fits_keywords"/>
+<img src="img/image_info.png" alt="The FITS keywords" id="figure_fits_keywords"/>
 <figcaption>The FITS keywords</figcaption>
 </figure>
 
@@ -1008,78 +376,70 @@
 
 <h3 id="solargrid">Solar Grid</h3>
 
-<p>The grid can show heliographic coordinates as seen from the camera, Stonyhurst, Carrington and Heliocentric inertial coordinates. Two yellow great circles indicate the Earth direction. Clicking the adjacent checkbox can hide the grid. The grid options panel is shown in the <a href="#figure_grid">figure below</a>. The radial grid can be turned on and off; the same can be done for the solar axis (the blue and red lines at the poles of the Sun) and the grid labels.</p>
+<p>The grid can show heliographic coordinates as seen from the viewpoint, Stonyhurst, Carrington and Heliocentric inertial coordinates. Two yellow great circles indicate the Earth direction and their intersection towards Earth is marked by a point. Clicking the adjacent checkbox can hide the grid. The grid options panel is shown in the <a href="#figure_grid">figure below</a>. The radial grid can be turned on and off; the same can be done for the solar axis (the blue and red lines at the poles of the Sun) and the grid labels.</p>
 
 <p>The grid ticks size can be changed in both longitude and latitude. The value can be entered directly in the text field, it can be changed by scrolling the mouse over the text field, or by using the arrows. Values ranging from 5˚ and 90˚ are allowed.</p>
 
 <figure>
-<img src="grid.png" alt="The grid options panel" id="figure_grid"/>
+<img src="img/grid.png" alt="The grid options panel" id="figure_grid"/>
 <figcaption>The grid options panel</figcaption>
 </figure>
 
-<h3 id="camera">Viewpoint</h3>
+<h3 id="viewpoint">Viewpoint</h3>
 
-<p>The viewpoint represents the vantage point and manages how the images are viewed. The viewpoint is defined by a location, a time instance and a rotation with respect to the direction to Sun. There are three viewpoint modes: the observer view, Earth view and expert view. The different viewpoint modes are demonstrated in the <a href="#figure_camera">figure below</a>. The viewpoint is invisible by default. When visible, a field of view indicator is shown. In all viewpoint modes, entering the value in the text field, scrolling the mouse over the text field, or using the arrows can change the angle of the field of view indicator.</p>
+<p>The viewpoint represents the vantage point and is defined by a location in the solar system and a time instance. If the Viewpoint layer is not selected, the scene is viewed as observed. If the layer is selected, the scene is rotated as if it was observed from another location and/or another time, while the images are still correctly placed with respect to the Sun as they were observed.</p>
+
+<h4 id="location">Location</h4>
+
+<p>This is useful to predict the observations of similar instruments from other known vantage points such as planets or spacecraft. It is recommended to use a solar grid linked to the solar rotation such as Carrington or HCI.</p>
 
 <figure>
-<img src="camera.png" alt="Demonstration of the different viewpoint modes: STEREO-B image seen from STEREO-B (top image), from Earth (middle image), and from Mercury (bottom image)" id="figure_camera"/>
-<figcaption>Demonstration of the different viewpoint modes: STEREO-B image seen from STEREO-B (top image), from Earth (middle image), and from Mercury (bottom image)</figcaption>
+<img src="img/viewpoint_location.png" alt="Location viewpoint" id="figure_viewpoint_location"/>
+<figcaption>Location viewpoint</figcaption>
 </figure>
 
-<h4 id="observerview">Observer View</h4>
-
-<p>This is the view from the observer. The viewpoint time indicated in the layers list is defined by the timestamp of the master layer.</p>
-
-<h4 id="earthview">Earth View</h4>
-
-<p>This is the view from Earth. For instruments located around Earth, this is very similar to the observer view, but for the case of STEREO or other instruments at a different location in the solar system, this view is different. The viewpoint time indicated in the layers list is defined by the timestamp of the master layer.</p>
-
-<h4 id="expertview">Expert View</h4>
-
-<p>The expert view allows seeing the image as from a specific location. At the moment, the following locations are available:</p>
-
-<ul>
-<li>All planets + Pluto</li>
-<li>The Moon</li>
-<li>Comet 67P/Churyumov-Gerasimenko</li>
-<li>SOHO spacecraft</li>
-<li>STEREO (Ahead and Behind) spacecraft</li>
-<li>Proba2 spacecraft</li>
-<li>SDO spacecraft</li>
-<li>Solar Orbiter spacecraft</li>
-<li>Proba 3 spacecraft</li>
-</ul>
-
-<p>The expert view uses an online location service. If the status of the expert view is not <em>“Loaded”</em>, there was a problem with the connection to the location service and the expert camera won’t work.</p>
-
-<p>If <em>“Use active layer timestamps”</em> is selected the timestamps of the master layer are used for the viewpoint time, otherwise arbitrary time intervals can be used for the viewpoint time. The image canvas scene will correctly show the geometric configuration and orientation of the solar system bodies involved.</p>
-
-<p>The timestamp indicated by the viewpoint is the one of the master layer for the observer and Earth camera modes. For the expert mode, it is the time of the expert viewpoint.</p>
-
-<h4 id="equatorialview">Equatorial View</h4>
+<p>The viewpoint time range can be altered by deselecting <em>Use movie time interval</em> and setting a different time range, for example in the future. The timestamp of the viewpoint is shown in the list of layers.</p>
 
 <figure>
-<img src="equatorial_view.png" alt="Equatorial view" id="figure_equatorial"/>
-<figcaption>Equatorial view</figcaption>
+<img src="img/viewpoint_location_future.png" alt="Location viewpoint future" id="figure_viewpoint_location_future"/>
+<figcaption>Location viewpoint future</figcaption>
+</figure>
+
+<h4 id="heliosphere">Heliosphere</h4>
+
+<p>The scene is seen as from above the ecliptic plane and allows the visualisation of orbits. Several reference frames can be selected and the viewing time range can be altered by deselecting <em>Use movie time interval</em> and setting a different time range, for example in the future.</p>
+
+<figure>
+<img src="img/viewpoint_heliosphere.png" alt="Heliosphere viewpoint" id="figure_viewpoint_heliosphere"/>
+<figcaption>Heliosphere viewpoint</figcaption>
+</figure>
+
+<p>If relative longitude is on, and a particular solar system object is selected from the list, that object is placed at 0 longitude. This allows for an approximate measurement of separation angles in the X-Y plane of the reference frame.</p>
+
+<figure>
+<img src="img/viewpoint_heliosphere_relative.png" alt="Heliosphere viewpoint relative longitude" id="figure_viewpoint_heliosphere_relative"/>
+<figcaption>Heliosphere viewpoint relative longitude</figcaption>
+</figure>
+
+<p>An Archimedean spiral determined by a selectable propagation speed can be drawn. One arm of the spiral will pass through the selected solar system object.</p>
+
+<figure>
+<img src="img/viewpoint_heliosphere_spiral.png" alt="Heliosphere viewpoint spiral" id="figure_viewpoint_heliosphere_spiral"/>
+<figcaption>Heliosphere viewpoint spiral</figcaption>
 </figure>
 
 <h3 id="timestamp">Timestamp</h3>
 
-<p>The timestamp is invisible by default. If it is made visible, the timestamp of the master layer will appear on the image canvas as shown in the <a href="#figure_timestamp">figure below</a>. The slider changes the size of the displayed timestamp on the image canvas.</p>
+<p>The timestamp layer shows the timestamp of the viewpoint if the multiview mode is off and the timestamps of the individual layers if the multiview mode is on. The text size can be adjusted with a slider, the text can placed at top left and additional information like distance to Sun can be displayed.</p>
 
 <figure>
-<img src="timestamp.png" alt="The timestamp" id="figure_timestamp"/>
+<img src="img/timestamp.png" alt="The timestamp" id="figure_timestamp"/>
 <figcaption>The timestamp</figcaption>
 </figure>
 
 <h3 id="miniview">Miniview</h3>
 
-<p>The miniview is an aid for locating the position of the current scene within the full field of view, particularly when zoomed in. The size of the miniview can be changed in the option panel by entering the value in the text field, by scrolling the mouse over the text field, or by using the arrows. The smallest and largest miniview are shown in the <a href="#figure_miniview">figure below</a>.</p>
-
-<figure>
-<img src="miniview.png" alt="The smallest and largest miniview" id="figure_miniview"/>
-<figcaption>The smallest and largest miniview</figcaption>
-</figure>
+<p>The miniview shows a superposition of the loaded image layers irrespective of the current scene which may be substantially zoomed in or out. The size of the miniview can be changed in the option panel with a slider.</p>
 
 <h3 id="image_swek">Space Weather Event Knowledgebase Events</h3>
 
@@ -1087,12 +447,11 @@
 
 <h3 id="pfss">PFSS Model</h3>
 
-<p>The PFSS model visualises a model of the magnetic field derived from magnetograms. The field lines are calculated on a daily basis using GONG magnetograms. The timestamp given in the list of layers is the timestamp of the GONG magnetogram used for the calculations. The <a href="#figure_pfss">figure below</a> shows different views of the model. The number of field lines shown can be varied by decimation when changing the level of detail between 0 and 8. The radius sets the distance in solar radii that the field lines are visible. By default, the outgoing parts of the field lines are drawn in red, the incoming parts in blue. By enabling the <em>“Fixed colors”</em>, loops will be drawn white, open outgoing field lines red and incoming field lines blue.</p>
+<p>The PFSS model layer visualises a model of the magnetic field derived from magnetograms. The field lines are calculated from GONG magnetograms on the ROB server using a classic <a href="http://wso.stanford.edu/words/pfss.pdf">model</a>. The timestamp given in the list of layers is the timestamp of the GONG magnetogram used for the calculations. The figures below show different views of the model. The number of field lines shown can be varied by decimation when changing the level of detail between 0 and 8. The radius sets the distance in solar radii that the field lines are visible. By default, the outgoing parts of the field lines are drawn in red, the incoming parts in blue. By enabling the <em>“Fixed colors”</em>, loops will be drawn white, open outgoing field lines red and incoming field lines blue.</p>
 
-<figure>
-<img src="pfss.png" alt="The PFSS model: no fixed colors, level 0 (top image); no fixed colors, level 8 (middle image) and fixed colors, level 5 (bottom image)" id="figure_pfss"/>
-<figcaption>The PFSS model: no fixed colors, level 0 (top image); no fixed colors, level 8 (middle image) and fixed colors, level 5 (bottom image)</figcaption>
-</figure>
+<p><img src="img/pfss_detail0.png" alt="" id="figure_pfss0"/>
+<img src="img/pfss_detail8.png" alt="" id="figure_pfss8"/>
+<img src="img/pfss_fixedcolor.png" alt="" id="figure_pfss_fixed"/></p>
 
 <p>Clicking the <em>“Available data”</em> button brings will open a web browser window with <a href="http://swhv.oma.be/availability/pfss/availability/availability.html">a page</a> showing the available data for the PFSS Model. The darker the green, the more data are available.</p>
 
@@ -1100,157 +459,17 @@
 
 <p>JHelioviewer is able to display 1D and 2D timelines. Similar to the images, the timelines have their own panel that lists the timeline layers. The timeline layers can be made visible or invisible. Some timeline layers have options that can be accessed by selecting the corresponding entry in the table listing. The options appear under the listing of the timeline layers.</p>
 
-<h3 id="overviewoftheavailabletimelinedataproviders">Overview of the Available Timeline Data Providers</h3>
-
-<p>The listings <a href="#timeline_providers_p1">1</a> below show the status as of November 4, 2016; for an up-to-date list, check the program.</p>
-
-<table>
-<caption id="timeline_providers_p1">Overview of the available timeline providers</caption>
-<colgroup>
-<col style="text-align:left;"/>
-<col style="text-align:left;"/>
-<col style="text-align:left;"/>
-</colgroup>
-
-<thead>
-<tr>
-	<th style="text-align:left;">Type</th>
-	<th style="text-align:left;">Group</th>
-	<th style="text-align:left;">Dataset</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-	<td style="text-align:left;">1D Timeline</td>
-	<td style="text-align:left;">SWHV Data</td>
-	<td style="text-align:left;">GOES XRS-A (shortwave)</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">GOES XRS-B (longwave)</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EVE XRS-A proxy</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EVE XRS-B proxy</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">LYRA Lyman-alpha</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">LYRA Herzberg</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">LYRA Aluminium</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">LYRA Zirconium</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EVE ESP 17_1</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EVE ESP 25_7</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EVE ESP 30_4</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EVE ESP 36_6</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EVE MEGS-P 121_6</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">EVE ESPquad</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">GOES XRS-A (shortwave, STAFF)</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">GOES XRS-B (longwave, STAFF)</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">LYRA Lyman-alpha (STAFF)</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">LYRA Herzberg (STAFF)</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">LYRA Aluminium (STAFF)</td>
-</tr>
-<tr>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;"/>
-	<td style="text-align:left;">LYRA Zirconium (STAFF)</td>
-</tr>
-</tbody>
-</table>
-
 <h3 id="1d_timelines">Working with 1D Timelines</h3>
 
 <p>Timelines can be added and removed. The appearance of the timelines can be changed.</p>
 
 <h4 id="addingremovingtimelines">Adding/Removing Timelines</h4>
 
-<p>To add a new timeline follow the steps:</p>
-
-<blockquote>
-<ul>
-<li>click <em>“New Layer”</em> button of the timeline layers panel or the image layers panel,</li>
-<li>a new <a href="#figure_add_timeline">dialog box</a> will appear. Select the <em>“1D time series”</em> as data type,</li>
-<li>pick a desired start date,</li>
-<li>select a group,</li>
-<li>select a dataset,</li>
-<li>press the <em>“Add”</em> button to add the layer</li>
-</ul>
-</blockquote>
+<p>To add a new timeline click the <em>“New Layer”</em> button of the timeline layers panel or the menu item “<em>File&gt;New Timeline…</em>”, select a group and a dataset, and press the <em>“Add”</em> button to add the layer.</p>
 
 <p>A timeline layer can also be added by opening a saved timeline layer via the menu item <em>“File&gt;Open Timeline…”</em>. A file selection dialog will open. Select the wanted timeline layer to be added to the timelines. The missing data will be downloaded automatically. A layer can be removed by clicking the cross. The loading of a layer can be cancelled by clicking the cross while the layer is still loading.</p>
 
 <p>The timeline will be visible in the list of timelines and three days around the chosen date will be downloaded. The timeline will always be given a new y-axis.</p>
-
-<figure>
-<img src="add_timeline.png" alt="Add timeline" id="figure_add_timeline"/>
-<figcaption>Add timeline</figcaption>
-</figure>
 
 <p>A timeline layer can be downloaded by pressing the download layer button in the options panel of the layer.</p>
 
@@ -1278,7 +497,7 @@
 <figcaption>From top to bottom: radio data in the timeline list, part of the time interval had no data, the visible interval was too big and detailed zoom of the data</figcaption>
 </figure>
 
-<p>The colormap can be changed by selecting the <em>“Callisto Radiogram”</em> in the list of timelines and picking another colormap. The colormaps are listed in the <a href="#colormaps">list of colormaps</a>.</p>
+<p>The colormap can be changed by selecting the <em>“Callisto Radiogram”</em> in the list of timelines and picking another colormap. The colormaps are listed in the [list of colormaps][colormaps].</p>
 
 <h3 id="lockingthevisibleinterval">Locking the Visible Interval</h3>
 
@@ -1437,7 +656,7 @@
 </tbody>
 </table>
 
-<p>For the moment only two sources for events are used: the <a href="http://www.lmsal.com/hek/">Heliophysics Events Knowledgebase (HEK)</a> and the <a href="http://comesep.aeronomy.be">COMESEP</a> alert system.</p>
+<p>For the moment only two sources for events are used: the <a href="https://www.lmsal.com/hek/">Heliophysics Events Knowledgebase (HEK)</a> and the <a href="http://comesep.aeronomy.be">COMESEP</a> alert system.</p>
 
 <h3 id="enablingdisablingspaceweatherevents">Enabling/Disabling Space Weather Events</h3>
 
@@ -1505,38 +724,59 @@
 
 <h2 id="record">Recording</h2>
 
-<p>The image and timeline canvases can be exported in three ways: a one-loop movie, a screenshot, or an open ended recording of all the manipulations. All movies are saved in the directory <code>JHelioviewer-SWHV/Exports/</code> in the home directory. The export format is streamable H.264/AVC in a MP4 container file for the movies, and the PNG format for the screenshots. Several frame sizes are offered: the image canvas original size (on screen), 1920 by 1080 pixels and 4096 by 4096. The exported movie file has the selected frames per second setting.</p>
+<p>The image and timeline canvases can be exported in three ways: a one-loop movie, a screenshot, or an open ended recording of all the manipulations. All movies are saved in the directory <code>JHelioviewer-SWHV/Exports/</code> in the home directory. The export format can be set in the <a href="#preferences">preferences</a>. The movies can be either a streamable MP4 container file or series of PNGs. The MP4 files can be in H.264/AVC format for better compatibility or in H.265/HEVC for smaller files. Screenshots are saved in the PNG format. Several frame sizes are offered: from the image canvas original size (on screen) and up to 4096 by 4096. The exported movie file has the selected frames per second setting.</p>
 
-<p>The record button is in the <a href="#movie_panel">movie control panel</a>. The default recording mode is a one-loop movie of the selected visible image layers. The created movie file will contain the first until the last frame of the current movie. The screenshot mode will make a screenshot of the current image and timeline canvases. In unlimited mode, all the manipulations are recorded from the moment the record button is clicked. Clicking the same record button, now indicating <em>“busy”</em>, stops the recording. Removing all image layers also stops the recording.</p>
+<p>The record button is in the <a href="#movie_panel">movie control panel</a>. The default recording mode is a one-loop movie of the selected visible image layers together with the timeline canvas if visible. The created movie file will contain the first until the last frame of the current movie. The screenshot mode will make a screenshot of the current image and timeline canvases. In unlimited mode, all the manipulations are recorded from the moment the record button is clicked. Clicking the same record button, now indicating <em>“busy”</em>, stops the recording. Removing all image layers also stops the recording.</p>
 
-<h2 id="savingprogramstate">Saving program state</h2>
+<h2 id="state">Saving program state</h2>
 
-<p>By selecting <em>“File&gt;Save State”</em> the state of the program can be saved with the exception of annotations. This state can be shared. A state can be opened by <em>“File&gt;Load State…”</em>. A file selection dialog will open and you can select the state file you want to open to recreate the state in the state file.</p>
+<p>The state file captures all the program’s presentation including the loaded remote data, its orientation, and the options of the layers. This can be used to quickly reproduce a particular solar event or to share a particular combined presentation of data. The state file is a JSON file which can be saved by selecting <em>“File&gt;Save State”</em> and loaded by <em>“File&gt;Load State…”</em>.</p>
 
 <h2 id="programinteroperability">Program interoperability</h2>
 
-<h3 id="samp">Simple Application Message Protocol</h3>
+<h3 id="samp">Simple Application Message Protocol (SAMP)</h3>
+
+<p><a href="https://www.ivoa.net/documents/SAMP/">SAMP</a> is an inter-application messaging protocol standardised by IVOA that enables astronomy software tools to interoperate and communicate. The GitHub <a href="https://github.com/Helioviewer-Project/samp4jhv">samp4jhv</a> project contains a collection of examples on how data can be shared between JHelioviewer and Python or IDL environments.</p>
+
+<p>This protocol can also be used on the web and the figure below shows the online SOAR archive which can send FITS and CDF files to JHelioviewer. Selecting <em>“Send table”</em> will instruct JHelioviewer to load the selected FITS files as a movie. Selecting <em>“Send products”</em> will make JHelioviewer to load the selected files as different layers.</p>
+
+<figure>
+<img src="img/soar.png" alt="SOAR archive in action" id="figure_soar"/>
+<figcaption>SOAR archive in action</figcaption>
+</figure>
 
 <h2 id="usingtimeinjhelioviewer">Using time in JHelioviewer</h2>
 
-<h3 id="naturallanguagefortime">Natural language for time</h3>
-
-<h2 id="changingthepreferences">Changing the Preferences</h2>
-
-<p>On Mac OS X, the preferences can be found under the program menu (JHelioviewer), for Windows and Linux it is located in the menu <em>“Options”</em>. A <a href="#figure_preferences">new dialog</a> opens. The preferred server and the loading of a default movie at start-up can be set. There are also settings for normalization of SDO/AIA data brightness for aesthetically pleasing mission long movies, as well as for normalization of EUV solar radius to visible light solar radius.</p>
+<p>All time input and display in JHelioviewer is UTC in ISO8601 format. <a href="#figure_timeinput_doy">Day of year</a> format is supported, as well as <a href="#figure_timeinput_natural">natural English language</a> phrases such as “one year ago” or “two weeks ago”. If the input is not recognized or if the start time is later than the end time, the time field reverts to previously displayed value. The entire time range can be shifted backward or forward with a selectable duration (day/week/Carrington rotation). The period of an entire Carrington rotation can be filled in the time fields by clicking the <em>“CR”</em> button.</p>
 
 <figure>
-<img src="preferences.png" alt="The preferences" id="figure_preferences"/>
-<figcaption>The preferences</figcaption>
+<img src="img/time_input_doy.png" alt="Day of year time input" id="figure_timeinput_doy"/>
+<figcaption>Day of year time input</figcaption>
 </figure>
 
-<h2 id="managingplugins">Managing Plugins</h2>
+<figure>
+<img src="img/time_input_natural.png" alt="Natural language time input" id="figure_timeinput_natural"/>
+<figcaption>Natural language time input</figcaption>
+</figure>
 
-<p>Parts of JHelioviewer are built out of plugins that can be disabled for a more streamlined application. Managing the plugins is done via the menu item <em>“Plug-ins&gt;Manage Plug-ins…”</em>. A <a href="#figure_plugins">dialog box</a> will open. The list of plugins can be filtered: all plugins can be displayed, or only the enabled or disabled plugins. Clicking on <em>more</em> gives detailed information about the selected plugin.</p>
+<h2 id="preferences">Changing the Preferences</h2>
+
+<p>The preferences dialog can be found under the program menu (JHelioviewer) on macOS, for Windows and Linux it is located in the menu <em>“Options”</em>. A <a href="#figure_preferences">new dialog</a> opens. The following persistent options can be set:</p>
+
+<ul>
+<li>preferred server</li>
+<li>loading of a preferred <a href="#state">state file</a> at start-up</li>
+<li>normalisation of SDO/AIA data brightness to reduce the effect of response degradation</li>
+<li>normalisation of EUV solar radius to visible light solar radius</li>
+<li>uniformisation of image observation time to Observer (default)/Sun emission/Earth arrival for the combination of observations from different vantage points</li>
+<li>format for the recordings: H.264/H.264 better/H.265/H.265 better/PNG series. The H.265 format allows for significantly smaller file sizes at the price of increased CPU time for the encoding and reduced compatibility with video playing software. The <em>“better”</em> variants allow for increased file sizes and slighter higher CPU utilisation for better output quality.</li>
+</ul>
+
+<p>Several parts of the interface can be turned on and off under the Plugins heading: Timelines/SWEK/PFSS. The persistent image cache can also be cleared, as well as a proxy username and password can be set if required.</p>
 
 <figure>
-<img src="plugins.png" alt="Manage the plugins" id="figure_plugins"/>
-<figcaption>Manage the plugins</figcaption>
+<img src="img/preferences.png" alt="The preferences" id="figure_preferences"/>
+<figcaption>The preferences</figcaption>
 </figure>
 
 <h2 id="keyboardshortcuts">Keyboard Shortcuts</h2>
@@ -1556,52 +796,56 @@
 
 <tbody>
 <tr>
-	<td style="text-align:left;">Add New Layer</td>
+	<td style="text-align:left;">Add new layer</td>
 	<td style="text-align:left;">Cmd/Ctrl-N</td>
 </tr>
 <tr>
-	<td style="text-align:left;">Open File</td>
+	<td style="text-align:left;">Open file</td>
 	<td style="text-align:left;">Cmd/Ctrl-O</td>
 </tr>
 <tr>
-	<td style="text-align:left;">Toggle Full Screen</td>
+	<td style="text-align:left;">Toggle full screen</td>
 	<td style="text-align:left;">Cmd/Ctrl-Enter</td>
 </tr>
 <tr>
-	<td style="text-align:left;">Exit Full Screen</td>
+	<td style="text-align:left;">Exit full screen</td>
 	<td style="text-align:left;">Esc</td>
 </tr>
 <tr>
-	<td style="text-align:left;">Actual Size</td>
+	<td style="text-align:left;">Actual size</td>
 	<td style="text-align:left;">Cmd/Ctrl–0</td>
 </tr>
 <tr>
-	<td style="text-align:left;">Zoom to Fit</td>
+	<td style="text-align:left;">Zoom to fit</td>
 	<td style="text-align:left;">Cmd/Ctrl–9</td>
 </tr>
 <tr>
-	<td style="text-align:left;">Zoom In</td>
+	<td style="text-align:left;">Zoom in</td>
 	<td style="text-align:left;">Cmd/Ctrl-=</td>
 </tr>
 <tr>
-	<td style="text-align:left;">Zoom Out</td>
+	<td style="text-align:left;">Zoom out</td>
 	<td style="text-align:left;">Cmd/Ctrl–</td>
 </tr>
 <tr>
-	<td style="text-align:left;">Play Movie</td>
+	<td style="text-align:left;">Play movie</td>
 	<td style="text-align:left;">Cmd/Ctrl-P</td>
 </tr>
 <tr>
-	<td style="text-align:left;">Step to Previous Frame</td>
+	<td style="text-align:left;">Step to previous frame</td>
 	<td style="text-align:left;">Cmd/Ctrl-Alt-Left Arrow</td>
 </tr>
 <tr>
-	<td style="text-align:left;">Step to Next Frame</td>
+	<td style="text-align:left;">Step to next frame</td>
 	<td style="text-align:left;">Cmd/Ctrl-Alt-Right Arrow</td>
 </tr>
 <tr>
-	<td style="text-align:left;">Remove Current Annotation</td>
-	<td style="text-align:left;">Delete / Backspace</td>
+	<td style="text-align:left;">Remove current annotation</td>
+	<td style="text-align:left;">Shift- Delete/Backspace</td>
+</tr>
+<tr>
+	<td style="text-align:left;">Cycle through annotations</td>
+	<td style="text-align:left;">Shift- n(ext)/p(revious)</td>
 </tr>
 </tbody>
 </table>
@@ -1637,16 +881,20 @@
 	<td style="text-align:left;">Zoom In</td>
 </tr>
 <tr>
-	<td style="text-align:left;">Click</td>
-	<td style="text-align:left;">Annotate in Annotation Mode</td>
-</tr>
-<tr>
 	<td style="text-align:left;">Click and Drag</td>
 	<td style="text-align:left;">Pan in Panning Mode</td>
 </tr>
 <tr>
 	<td style="text-align:left;"/>
 	<td style="text-align:left;">Rotate in Rotation Mode</td>
+</tr>
+<tr>
+	<td style="text-align:left;">Shift-click and Drag</td>
+	<td style="text-align:left;">Enter annotation mode and draw; release mouse button then the shift key to exit mode</td>
+</tr>
+<tr>
+	<td style="text-align:left;">Right-click</td>
+	<td style="text-align:left;">Copy to clipboard the position data at the mouse pointer</td>
 </tr>
 </tbody>
 </table>
@@ -1784,7 +1032,7 @@
 
 <dl>
 <dt>How can I get a square movie?</dt>
-<dd>Resize your window to have a square canvas and record the movie in the “On screen” size.</dd>
+<dd>Resize your window to have a square canvas and record the movie in the <em>“On screen”</em> size.</dd>
 
 <dt>How do I get a movie without the timeline canvas?</dt>
 <dd>Collapse the timeline canvas using the separator.</dd>
@@ -1794,7 +1042,7 @@
 
 <dl>
 <dt>I can’t find a specific wavelength for a specific instrument and observatory.</dt>
-<dd>Make sure that you select the correct server. The ROB server only has a limited, for testing purpose, amount of data. GSFC and IAS have the full dataset of most instruments. If the dataset isn’t to be found jhelioviewer is always capable to open the raw fitsfiles. The quality of the visualisation depends on the correctness of the keywords in the fits files.</dd>
+<dd>Make sure that you select the correct server. The ROB server only has a limited, for testing purpose, amount of data. GSFC and IAS have the full dataset of most instruments. If the dataset isn’t to be found, JHelioviewer is always capable to open FITS files. The quality of the visualisation depends on the correctness of the keywords in the FITS files.</dd>
 </dl>
 
 </body>
