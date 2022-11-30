@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="10.0.4" transformSequenceNumber="10">
   <directoryPresets config="../bin/JHelioviewer.jar" />
-  <application name="JHelioviewer" applicationId="6448-7333-6138-9110" mediaDir="./builds" compression="9" lzmaCompression="true" shortName="JHelioviewer" publisher="ESA JHelioviewer Team" publisherWeb="http://www.jhelioviewer.org" version="4.3.4" allPathsRelative="true" macVolumeId="7ed177551bd348bc" javaMinVersion="19" javaMaxVersion="19" jdkMode="jdk">
+  <application name="JHelioviewer" applicationId="6448-7333-6138-9110" mediaDir="./builds" compression="9" lzmaCompression="true" shortName="JHelioviewer" publisher="ESA JHelioviewer Team" publisherWeb="http://www.jhelioviewer.org" version="4.4.0" allPathsRelative="true" macVolumeId="7ed177551bd348bc" javaMinVersion="19" javaMaxVersion="19" jdkMode="jdk">
     <codeSigning macEnabled="true" macPkcs12File="~/Certificates.p12" macNotarize="true" appleId="bogdan@nicula.net" />
     <jreBundles jdkProviderId="AdoptOpenJDK" release="19/latest">
       <modules>
