@@ -210,9 +210,11 @@ class FITSImage implements URIImageReader {
 
         for (Cursor<String, HeaderCard> iter = header.iterator(); iter.hasNext(); ) {
             HeaderCard headerCard = iter.next();
-            String key = headerCard.getKey();
+            String key = headerCard.getKey().trim();
             if ("END".equals(key))
                 continue;
+            if (key.isEmpty())
+                key = "COMMENT";
 
             String value = headerCard.getValue();
             String val = value == null ? "" : XmlEscapers.xmlContentEscaper().escape(value);
