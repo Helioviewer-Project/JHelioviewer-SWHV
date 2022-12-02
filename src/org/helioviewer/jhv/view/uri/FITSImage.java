@@ -53,11 +53,11 @@ class FITSImage implements URIImageReader {
 
     @Nullable
     @Override
-    public ImageBuffer readImageBuffer(URI uri, float[] minMax) throws Exception {
+    public ImageBuffer readImageBuffer(URI uri) throws Exception {
         try (NetClient nc = NetClient.of(uri);
              BufferedSource source = nc.getSource();
              Fits f = new Fits(unpackFits(source))) {
-            return readHDU(findHDU(f), minMax);
+            return readHDU(findHDU(f));
         }
     }
 
@@ -137,7 +137,7 @@ class FITSImage implements URIImageReader {
     private static final double MIN_MULT = 0.00001;
     private static final double MAX_MULT = 0.99999;
 
-    private static ImageBuffer readHDU(BasicHDU<?> hdu, float[] minMax) throws Exception {
+    private static ImageBuffer readHDU(BasicHDU<?> hdu) throws Exception {
         int[] axes = hdu.getAxes();
         if (axes == null || axes.length != 2)
             throw new Exception("Only 2D FITS files supported");
@@ -166,6 +166,18 @@ class FITSImage implements URIImageReader {
 
         double bzero = hdu.getBZero();
         double bscale = hdu.getBScale();
+
+        float[] minMax = null;
+        /*
+        // JHV specific clipping
+        Optional<Double> mMin = m.getDouble("HV_DMIN");
+        Optional<Double> mMax = m.getDouble("HV_DMAX");
+        if (mMin.isPresent() && mMax.isPresent()) {
+            minMax = new float[2];
+            minMax[0] = mMin.get().floatValue();
+            minMax[1] = mMax.get().floatValue();
+        }
+        */
 
         if (minMax == null) {
             float[] sampleData = sampleImage(bitpix, width, height, pixelData, blank, bzero, bscale);
