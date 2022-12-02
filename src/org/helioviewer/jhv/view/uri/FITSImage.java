@@ -16,7 +16,6 @@ import nom.tam.fits.Header;
 import nom.tam.fits.HeaderCard;
 import nom.tam.fits.ImageHDU;
 import nom.tam.fits.header.Bitpix;
-import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
 
 import org.helioviewer.jhv.JHVGlobals;
@@ -33,10 +32,10 @@ import okio.BufferedSource;
 // essentially static; local or network cache
 class FITSImage implements URIImageReader {
 
-    private static final String funpack = new File(JHVGlobals.libCacheDir, "fits_imcopy").getAbsolutePath();
+    private static final String unpack = new File(JHVGlobals.libCacheDir, "fits_imcopy").getAbsolutePath();
 
     private static InputStream unpackFits(BufferedSource source) throws Exception {
-        Process p = new ProcessBuilder(funpack, "-", "-").start();
+        Process p = new ProcessBuilder(unpack, "-", "-").start();
         FileUtils.copySource(source, p.getOutputStream());
         return p.getInputStream();
     }
@@ -63,12 +62,6 @@ class FITSImage implements URIImageReader {
 
     private static ImageHDU findHDU(Fits fits) throws Exception {
         BasicHDU<?>[] hdus = fits.read();
-        // this is cumbersome
-        for (BasicHDU<?> hdu : hdus) {
-            if (hdu instanceof CompressedImageHDU chdu) {
-                return chdu.asImageHDU();
-            }
-        }
         for (BasicHDU<?> hdu : hdus) {
             if (hdu instanceof ImageHDU ihdu && ihdu.getAxes() != null /* might be an extension */) {
                 return ihdu;
