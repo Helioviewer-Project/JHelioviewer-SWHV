@@ -47,7 +47,7 @@ class FITSImage implements URIImageReader {
         try (NetClient nc = NetClient.of(uri);
              BufferedSource source = nc.getSource();
              Fits f = new Fits(unpackFits(source))) {
-            return getHeaderAsXML(findHDU(f).getHeader());
+            return getHeaderAsXML(findHDU(f));
         }
     }
 
@@ -219,10 +219,10 @@ class FITSImage implements URIImageReader {
 
     private static final String nl = System.getProperty("line.separator");
 
-    private static String getHeaderAsXML(Header header) {
+    private static String getHeaderAsXML(BasicHDU<?> hdu) {
         StringBuilder builder = new StringBuilder("<meta>" + nl + "<fits>" + nl);
 
-        for (Cursor<String, HeaderCard> iter = header.iterator(); iter.hasNext(); ) {
+        for (Cursor<String, HeaderCard> iter = hdu.getHeader().iterator(); iter.hasNext(); ) {
             HeaderCard headerCard = iter.next();
             String key = headerCard.getKey().trim();
             if ("END".equals(key))
