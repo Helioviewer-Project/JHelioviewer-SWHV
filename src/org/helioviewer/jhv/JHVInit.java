@@ -48,7 +48,7 @@ class JHVInit {
         FitsFactory.setLongStringsEnabled(true);
     }
 
-    private static void loadLibs() throws Exception {
+    private static void loadLibs() {
         String pathlib = "";
         ArrayList<String> libs = new ArrayList<>();
 
@@ -72,8 +72,9 @@ class JHVInit {
         libs.add(System.mapLibraryName("kdu_jni"));
         libs.add(System.mapLibraryName("JNISpice"));
 
+        List<String> exes = List.of("ffmpeg", "fits_imcopy");
         List<String> xtract = new ArrayList<>(libs);
-        xtract.add("ffmpeg");
+        xtract.addAll(exes);
 
         String fullDir = "/jhv/" + pathlib;
         xtract.parallelStream().forEach(x -> {
@@ -84,8 +85,15 @@ class JHVInit {
             }
         });
 
-        if (!Platform.isWindows())
-            Files.setPosixFilePermissions(Path.of(JHVGlobals.libCacheDir, "ffmpeg"), Set.of(PosixFilePermission.OWNER_EXECUTE));
+        if (!Platform.isWindows()) {
+            exes.parallelStream().forEach(x -> {
+                try {
+                    Files.setPosixFilePermissions(Path.of(JHVGlobals.libCacheDir, x), Set.of(PosixFilePermission.OWNER_EXECUTE));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
         for (String l : libs) {
             System.load(Path.of(JHVGlobals.libCacheDir, l).toString());
         }

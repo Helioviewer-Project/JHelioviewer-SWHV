@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.view.uri;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.ByteBuffer;
@@ -18,6 +19,7 @@ import nom.tam.fits.header.Bitpix;
 import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.NetClient;
@@ -26,15 +28,25 @@ import org.helioviewer.jhv.math.MathUtils;
 import com.google.common.primitives.Floats;
 import com.google.common.xml.XmlEscapers;
 
+import okio.BufferedSource;
+
 // essentially static; local or network cache
 class FITSImage implements URIImageReader {
+
+    private static final String funpack = new File(JHVGlobals.libCacheDir, "fits_imcopy").getAbsolutePath();
+
+    private static InputStream unpackFits(BufferedSource source) throws Exception {
+        Process p = new ProcessBuilder(funpack, "-", "-").start();
+        FileUtils.copySource(source, p.getOutputStream());
+        return p.getInputStream();
+    }
 
     @Nullable
     @Override
     public String readXML(URI uri) throws Exception {
         try (NetClient nc = NetClient.of(uri);
-             InputStream is = FileUtils.decompressStream(nc.getStream());
-             Fits f = new Fits(is)) {
+             BufferedSource source = nc.getSource();
+             Fits f = new Fits(unpackFits(source))) {
             return getHeaderAsXML(findHDU(f).getHeader());
         }
     }
@@ -43,8 +55,8 @@ class FITSImage implements URIImageReader {
     @Override
     public ImageBuffer readImageBuffer(URI uri, float[] minMax) throws Exception {
         try (NetClient nc = NetClient.of(uri);
-             InputStream is = FileUtils.decompressStream(nc.getStream());
-             Fits f = new Fits(is)) {
+             BufferedSource source = nc.getSource();
+             Fits f = new Fits(unpackFits(source))) {
             return readHDU(findHDU(f), minMax);
         }
     }

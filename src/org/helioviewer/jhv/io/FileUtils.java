@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PushbackInputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -19,8 +20,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 
-import okio.Okio;
+import okio.BufferedSink;
 import okio.BufferedSource;
+import okio.Okio;
 
 public class FileUtils {
 
@@ -40,6 +42,12 @@ public class FileUtils {
             return new GZIPInputStream(pb);
         else
             return pb;
+    }
+
+    public static void copySource(BufferedSource from, OutputStream to) throws IOException {
+        try (BufferedSink b = Okio.buffer(Okio.sink(to))) {
+            b.writeAll(from);
+        }
     }
 
     public static String streamToString(InputStream is) throws IOException {
