@@ -8,8 +8,6 @@ import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import javax.annotation.Nullable;
-
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
@@ -40,17 +38,16 @@ class FITSImage implements URIImageReader {
         return p.getInputStream();
     }
 
-    @Nullable
     @Override
-    public String readXML(URI uri) throws Exception {
+    public URIImageReader.Image readImage(URI uri) throws Exception {
         try (NetClient nc = NetClient.of(uri);
              BufferedSource source = nc.getSource();
              Fits f = new Fits(unpackFits(source))) {
-            return getHeaderAsXML(findHDU(f));
+            BasicHDU<?> hdu = findHDU(f);
+            return new URIImageReader.Image(getHeaderAsXML(hdu), readHDU(hdu));
         }
     }
 
-    @Nullable
     @Override
     public ImageBuffer readImageBuffer(URI uri) throws Exception {
         try (NetClient nc = NetClient.of(uri);
