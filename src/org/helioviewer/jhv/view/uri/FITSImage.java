@@ -167,19 +167,9 @@ class FITSImage implements URIImageReader {
         double bzero = hdu.getBZero();
         double bscale = hdu.getBScale();
 
-        float[] minMax = null;
-        /*
-        // JHV specific clipping
-        Optional<Double> mMin = m.getDouble("HV_DMIN");
-        Optional<Double> mMax = m.getDouble("HV_DMAX");
-        if (mMin.isPresent() && mMax.isPresent()) {
-            minMax = new float[2];
-            minMax[0] = mMin.get().floatValue();
-            minMax[1] = mMax.get().floatValue();
-        }
-        */
-
-        if (minMax == null) {
+        Header header = hdu.getHeader();
+        float[] minMax = new float[]{header.getFloatValue("HV_DMIN", Float.MAX_VALUE), header.getFloatValue("HV_DMAX", Float.MAX_VALUE)};
+        if (minMax[0] == Float.MAX_VALUE || minMax[1] == Float.MAX_VALUE) {
             float[] sampleData = sampleImage(bitpix, width, height, pixelData, blank, bzero, bscale);
             Arrays.sort(sampleData);
 
