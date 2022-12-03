@@ -173,30 +173,14 @@ class FITSImage implements URIImageReader {
 
         short[] outData = new short[width * height];
         float[] lut = new float[65536];
-        switch (bitpix) {
-            case SHORT, INTEGER, LONG, FLOAT -> {
-                double scale = 65535. / Math.pow(range, GAMMA);
-                for (int j = 0; j < height; j++) {
-                    Object lineData = pixelData[j];
-                    for (int i = 0; i < width; i++) {
-                        float v = getValue(bitpix, lineData, i, blank, bzero, bscale);
-                        int p = (int) MathUtils.clip(scale * Math.pow(v - minMax[0], GAMMA) + .5, 0, 65535);
-                        lut[p] = v;
-                        outData[width * (height - 1 - j) + i] = v == ImageBuffer.BAD_PIXEL ? 0 : (short) p;
-                    }
-                }
-            }
-            case DOUBLE -> {
-                double scale = 65535. / Math.log1p(range);
-                for (int j = 0; j < height; j++) {
-                    Object lineData = pixelData[j];
-                    for (int i = 0; i < width; i++) {
-                        float v = getValue(bitpix, lineData, i, blank, bzero, bscale);
-                        int p = (int) MathUtils.clip(scale * Math.log1p(v - minMax[0]) + .5, 0, 65535);
-                        lut[p] = v;
-                        outData[width * (height - 1 - j) + i] = v == ImageBuffer.BAD_PIXEL ? 0 : (short) p;
-                    }
-                }
+        double scale = 65535. / Math.pow(range, GAMMA);
+        for (int j = 0; j < height; j++) {
+            Object lineData = pixelData[j];
+            for (int i = 0; i < width; i++) {
+                float v = getValue(bitpix, lineData, i, blank, bzero, bscale);
+                int p = (int) MathUtils.clip(scale * Math.pow(v - minMax[0], GAMMA) + .5, 0, 65535);
+                lut[p] = v;
+                outData[width * (height - 1 - j) + i] = v == ImageBuffer.BAD_PIXEL ? 0 : (short) p;
             }
         }
         return new ImageBuffer(width, height, ImageBuffer.Format.Gray16, ShortBuffer.wrap(outData), lut);
