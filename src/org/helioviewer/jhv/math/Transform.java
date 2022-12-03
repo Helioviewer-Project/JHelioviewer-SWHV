@@ -64,10 +64,10 @@ public class Transform {
         float y = (float) q.u.y, y2 = y * y;
         float z = (float) q.u.z, z2 = z * z;
 
-        view.mulAffine(mul.set(w2 + x2 - y2 - z2, 2 * x * y + 2 * w * z, 2 * x * z - 2 * w * y, 0,
-                2 * x * y - 2 * w * z, w2 - x2 + y2 - z2, 2 * y * z + 2 * w * x, 0,
-                2 * x * z + 2 * w * y, 2 * y * z - 2 * w * x, w2 - x2 - y2 + z2, 0,
-                0, 0, 0, w2 + x2 + y2 + z2));
+        view.mulAffine(mul.set(w2 + x2 - y2 - z2,     2 * x * y + 2 * w * z, 2 * x * z - 2 * w * y, 0,
+                               2 * x * y - 2 * w * z, w2 - x2 + y2 - z2,     2 * y * z + 2 * w * x, 0,
+                               2 * x * z + 2 * w * y, 2 * y * z - 2 * w * x, w2 - x2 - y2 + z2,     0,
+                               0,                     0,                     0,                     w2 + x2 + y2 + z2));
     }
 
     public static void rotateViewInverse(Quat q) {
@@ -76,10 +76,10 @@ public class Transform {
         float y = (float) q.u.y, y2 = y * y;
         float z = (float) q.u.z, z2 = z * z;
 
-        view.mulAffine(mul.set(w2 + x2 - y2 - z2, 2 * x * y - 2 * w * z, 2 * x * z + 2 * w * y, 0,
-                2 * x * y + 2 * w * z, w2 - x2 + y2 - z2, 2 * y * z - 2 * w * x, 0,
-                2 * x * z - 2 * w * y, 2 * y * z + 2 * w * x, w2 - x2 - y2 + z2, 0,
-                0, 0, 0, w2 + x2 + y2 + z2));
+        view.mulAffine(mul.set(w2 + x2 - y2 - z2,     2 * x * y - 2 * w * z, 2 * x * z + 2 * w * y, 0,
+                               2 * x * y + 2 * w * z, w2 - x2 + y2 - z2,     2 * y * z - 2 * w * x, 0,
+                               2 * x * z - 2 * w * y, 2 * y * z + 2 * w * x, w2 - x2 - y2 + z2,     0,
+                               0,                     0,                     0,                     w2 + x2 + y2 + z2));
     }
 
     public static void cacheMVP() {

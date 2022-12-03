@@ -7,8 +7,6 @@ import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import javax.annotation.Nullable;
-
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
@@ -29,7 +27,6 @@ import com.google.common.xml.XmlEscapers;
 // essentially static; local or network cache
 class FITSImage implements URIImageReader {
 
-    @Nullable
     @Override
     public String readXML(URI uri) throws Exception {
         try (NetClient nc = NetClient.of(uri);
@@ -39,7 +36,6 @@ class FITSImage implements URIImageReader {
         }
     }
 
-    @Nullable
     @Override
     public ImageBuffer readImageBuffer(URI uri) throws Exception {
         try (NetClient nc = NetClient.of(uri);
