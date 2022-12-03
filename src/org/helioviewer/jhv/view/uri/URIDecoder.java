@@ -7,12 +7,12 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 
-record URIDecoder(URI uri, URIImageReader reader, float[] minMax, boolean mgn) implements Callable<ImageBuffer> {
+record URIDecoder(URI uri, URIImageReader reader, boolean mgn) implements Callable<ImageBuffer> {
 
     @Nonnull
     @Override
     public ImageBuffer call() throws Exception {
-        ImageBuffer imageBuffer = reader.readImageBuffer(uri, minMax);
+        ImageBuffer imageBuffer = reader.readImageBuffer(uri);
         if (imageBuffer == null) // e.g. FITS
             throw new Exception("Could not read: " + uri);
         return ImageBuffer.mgnFilter(imageBuffer, mgn);

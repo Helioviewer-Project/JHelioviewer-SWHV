@@ -81,15 +81,6 @@ public class HelioviewerMetaData extends BaseMetaData {
     }
 
     private void retrieveUnit(MetaDataContainer m) {
-        // JHV specific clipping
-        Optional<Double> mMin = m.getDouble("HV_DMIN");
-        Optional<Double> mMax = m.getDouble("HV_DMAX");
-        if (mMin.isPresent() && mMax.isPresent()) {
-            minMax = new float[2];
-            minMax[0] = mMin.get().floatValue();
-            minMax[1] = mMax.get().floatValue();
-        }
-
         // a linear physical LUT
         Optional<Double> mZero = m.getDouble("HV_ZERO");
         Optional<Double> mScale = m.getDouble("HV_SCALE");
