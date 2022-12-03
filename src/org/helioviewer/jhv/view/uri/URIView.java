@@ -54,7 +54,8 @@ public class URIView extends BaseView {
 
         try {
             MetaData m;
-            String readXml = reader.readXML(uri);
+            URIImageReader.Image image = reader.readImage(uri);
+            String readXml = image.xml();
             if (readXml == null) {
                 xml = "<meta/>";
                 m = new PixelBasedMetaData(100, 100, uri);
@@ -65,6 +66,7 @@ public class URIView extends BaseView {
 
             imageRegion = m.roiToRegion(0, 0, m.getPixelWidth(), m.getPixelHeight(), 1, 1);
             metaData[0] = m;
+            decodeCache.put(uri, image.buffer());
         } catch (Exception e) {
             throw new Exception(e.getMessage() + ": " + uri, e);
         }

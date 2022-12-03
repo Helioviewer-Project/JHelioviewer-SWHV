@@ -28,11 +28,12 @@ import com.google.common.xml.XmlEscapers;
 class FITSImage implements URIImageReader {
 
     @Override
-    public String readXML(URI uri) throws Exception {
+    public URIImageReader.Image readImage(URI uri) throws Exception {
         try (NetClient nc = NetClient.of(uri);
              InputStream is = FileUtils.decompressStream(nc.getStream());
              Fits f = new Fits(is)) {
-            return getHeaderAsXML(findHDU(f));
+            BasicHDU<?> hdu = findHDU(f);
+            return new URIImageReader.Image(getHeaderAsXML(hdu), readHDU(hdu));
         }
     }
 
