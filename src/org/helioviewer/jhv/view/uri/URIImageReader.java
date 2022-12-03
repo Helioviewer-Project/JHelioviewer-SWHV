@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 
-public interface URIImageReader {
+interface URIImageReader {
 
     @Nullable
     String readXML(URI uri) throws Exception;
