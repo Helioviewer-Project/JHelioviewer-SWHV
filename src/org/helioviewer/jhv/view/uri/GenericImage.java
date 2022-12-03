@@ -26,10 +26,8 @@ import org.helioviewer.jhv.io.NetClient;
 // essentially static; local or network cache
 class GenericImage implements URIImageReader {
 
-
-    @Nullable
     @Override
-    public String readXML(URI uri) throws Exception {
+    public URIImageReader.Image readImage(URI uri) throws Exception {
         try (NetClient nc = NetClient.of(uri); ImageInputStream iis = ImageIO.createImageInputStream(nc.getStream())) {
             ImageReader reader = getReader(iis);
             if (reader == null)
@@ -55,8 +53,10 @@ class GenericImage implements URIImageReader {
                 XMLUtils.displayNode(metadata.getAsTree(names[i]), 0);
             }
             */
+            ImageBuffer imageBuffer = buffered2ImageBuffer(reader.read(0));
             reader.dispose();
-            return xml;
+
+            return new URIImageReader.Image(xml, imageBuffer);
         }
     }
 
