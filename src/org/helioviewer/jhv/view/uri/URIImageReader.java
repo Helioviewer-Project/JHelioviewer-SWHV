@@ -12,6 +12,6 @@ public interface URIImageReader {
     String readXML(URI uri) throws Exception;
 
     @Nullable
-    ImageBuffer readImageBuffer(URI uri, @Nullable float[] minMax) throws Exception;
+    ImageBuffer readImageBuffer(URI uri) throws Exception;
 
 }

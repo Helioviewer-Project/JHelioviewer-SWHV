@@ -35,17 +35,17 @@ class FITSImage implements URIImageReader {
         try (NetClient nc = NetClient.of(uri);
              InputStream is = FileUtils.decompressStream(nc.getStream());
              Fits f = new Fits(is)) {
-            return getHeaderAsXML(findHDU(f).getHeader());
+            return getHeaderAsXML(findHDU(f));
         }
     }
 
     @Nullable
     @Override
-    public ImageBuffer readImageBuffer(URI uri, float[] minMax) throws Exception {
+    public ImageBuffer readImageBuffer(URI uri) throws Exception {
         try (NetClient nc = NetClient.of(uri);
              InputStream is = FileUtils.decompressStream(nc.getStream());
              Fits f = new Fits(is)) {
-            return readHDU(findHDU(f), minMax);
+            return readHDU(findHDU(f));
         }
     }
 
@@ -125,7 +125,7 @@ class FITSImage implements URIImageReader {
     private static final double MIN_MULT = 0.00001;
     private static final double MAX_MULT = 0.99999;
 
-    private static ImageBuffer readHDU(BasicHDU<?> hdu, float[] minMax) throws Exception {
+    private static ImageBuffer readHDU(BasicHDU<?> hdu) throws Exception {
         int[] axes = hdu.getAxes();
         if (axes == null || axes.length != 2)
             throw new Exception("Only 2D FITS files supported");
@@ -155,7 +155,9 @@ class FITSImage implements URIImageReader {
         double bzero = hdu.getBZero();
         double bscale = hdu.getBScale();
 
-        if (minMax == null) {
+        Header header = hdu.getHeader();
+        float[] minMax = new float[]{header.getFloatValue("HV_DMIN", Float.MAX_VALUE), header.getFloatValue("HV_DMAX", Float.MAX_VALUE)};
+        if (minMax[0] == Float.MAX_VALUE || minMax[1] == Float.MAX_VALUE) {
             float[] sampleData = sampleImage(bitpix, width, height, pixelData, blank, bzero, bscale);
             Arrays.sort(sampleData);
 
@@ -205,10 +207,10 @@ class FITSImage implements URIImageReader {
 
     private static final String nl = System.getProperty("line.separator");
 
-    private static String getHeaderAsXML(Header header) {
+    private static String getHeaderAsXML(BasicHDU<?> hdu) {
         StringBuilder builder = new StringBuilder("<meta>" + nl + "<fits>" + nl);
 
-        for (Cursor<String, HeaderCard> iter = header.iterator(); iter.hasNext(); ) {
+        for (Cursor<String, HeaderCard> iter = hdu.getHeader().iterator(); iter.hasNext(); ) {
             HeaderCard headerCard = iter.next();
             String key = headerCard.getKey().trim();
             if ("END".equals(key))

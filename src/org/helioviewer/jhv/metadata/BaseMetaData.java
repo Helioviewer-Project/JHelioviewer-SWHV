@@ -17,7 +17,6 @@ class BaseMetaData implements MetaData {
     protected String displayName = "unknown";
     protected String unit = "";
     protected float[] physLUT;
-    protected float[] minMax;
 
     protected boolean calculateDepth;
 
@@ -155,12 +154,6 @@ class BaseMetaData implements MetaData {
     @Override
     public float[] getPhysicalLUT() {
         return physLUT;
-    }
-
-    @Nullable
-    @Override
-    public float[] getMinMax() {
-        return minMax;
     }
 
     @Override
