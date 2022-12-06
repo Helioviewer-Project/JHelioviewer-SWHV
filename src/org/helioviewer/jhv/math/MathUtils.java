@@ -98,4 +98,43 @@ public class MathUtils {
         return (a + (quanta - 1)) & -quanta;
     }
 
+    // https://stackoverflow.com/questions/11513344/how-to-implement-the-fast-inverse-square-root-in-java
+    public static float invSqrt(float x) {
+        float xhalf = 0.5f * x;
+        int i = Float.floatToIntBits(x);
+        i = 0x5f3759df - (i >> 1);
+        x = Float.intBitsToFloat(i);
+        x *= (1.5f - xhalf * x * x);
+        return x;
+    }
+
+    public static double invSqrt(double x) {
+        double xhalf = 0.5d * x;
+        long i = Double.doubleToLongBits(x);
+        i = 0x5fe6ec85e7de30daL - (i >> 1);
+        x = Double.longBitsToDouble(i);
+        x *= (1.5d - xhalf * x * x);
+        return x;
+    }
+
+    // https://martin.ankerl.com/2012/01/25/optimized-approximative-pow-in-c-and-cpp/
+    public static double pow(double a, double b) {
+        // exponentiation by squaring
+        double r = 1.0;
+        int exp = (int) b;
+        double base = a;
+        while (exp != 0) {
+            if ((exp & 1) != 0) {
+                r *= base;
+            }
+            base *= base;
+            exp >>= 1;
+        }
+        // use the IEEE 754 trick for the fraction of the exponent, 1065307417 for float
+        double b_faction = b - (int) b;
+        long tmp = Double.doubleToLongBits(a);
+        long tmp2 = (long) (b_faction * (tmp - 4606921280493453312L)) + 4606921280493453312L;
+        return r * Double.longBitsToDouble(tmp2);
+    }
+
 }
