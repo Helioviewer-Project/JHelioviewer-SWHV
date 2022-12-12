@@ -6,6 +6,7 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
@@ -267,8 +268,10 @@ public class HelioviewerMetaData extends BaseMetaData {
         if (observatory.equals("SOHO"))
             distObs *= Sun.L1Factor;
 
-        if (distObs < 1) // failure in metadata pipeline like SUVI L1b, place it at Earth
+        if (distObs < 1) { // failure in metadata pipeline like SUVI L1b, place it at Earth
+            Log.warn(String.join(" ", getDisplayName(), dateObs.toString(), "Unreliable DSUN_OBS:", String.valueOf(distObs)));
             return earthPosition(dateObs, earth);
+        }
 
         double lon = m.getDouble("HGLN_OBS").map(v -> earth.lon - Math.toRadians(v))
                 .orElseGet(() -> m.getDouble("CRLN_OBS").map(v -> -Math.toRadians(v)).orElseGet(() -> earth.lon));
