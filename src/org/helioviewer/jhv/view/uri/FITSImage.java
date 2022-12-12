@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.ForkJoinTask;
 
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Fits;
@@ -21,6 +22,7 @@ import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.math.MathUtils;
 
+//import com.google.common.base.Stopwatch;
 import com.google.common.primitives.Floats;
 import com.google.common.xml.XmlEscapers;
 
@@ -174,16 +176,30 @@ class FITSImage implements URIImageReader {
         short[] outData = new short[width * height];
         float[] lut = new float[65536];
         double scale = 65535. / Math.pow(range, GAMMA);
+
+        //Stopwatch sw = Stopwatch.createStarted();
+        ArrayList<ForkJoinTask<?>> tasks = new ArrayList<>(height);
         for (int j = 0; j < height; j++) {
             Object lineData = pixelData[j];
+            int outLine = width * (height - 1 - j);
+            tasks.add(ForkJoinTask.adapt(new convert(width, bitpix, lineData, blank, bzero, bscale, scale, minMax[0], lut, outData, outLine)).fork());
+        }
+        tasks.forEach(ForkJoinTask::join);
+        //System.out.println(">>> " + sw.elapsed().toNanos() / 1e9);
+        return new ImageBuffer(width, height, ImageBuffer.Format.Gray16, ShortBuffer.wrap(outData), lut);
+    }
+
+    private record convert(int width, Bitpix bitpix, Object lineData, long blank, double bzero, double bscale,
+                           double scale, float min, float[] lut, short[] outData, int outLine) implements Runnable {
+        @Override
+        public void run() {
             for (int i = 0; i < width; i++) {
                 float v = getValue(bitpix, lineData, i, blank, bzero, bscale);
-                int p = (int) MathUtils.clip(scale * Math.pow(v - minMax[0], GAMMA) + .5, 0, 65535);
+                int p = (int) MathUtils.clip(scale * MathUtils.pow(v - min, GAMMA) + .5, 0, 65535);
                 lut[p] = v;
-                outData[width * (height - 1 - j) + i] = v == ImageBuffer.BAD_PIXEL ? 0 : (short) p;
+                outData[outLine + i] = v == ImageBuffer.BAD_PIXEL ? 0 : (short) p;
             }
         }
-        return new ImageBuffer(width, height, ImageBuffer.Format.Gray16, ShortBuffer.wrap(outData), lut);
     }
 
     private static final String nl = System.getProperty("line.separator");
