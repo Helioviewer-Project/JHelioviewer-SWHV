@@ -50,7 +50,7 @@ import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings("serial")
-public class PreferencesDialog extends StandardDialog implements ShowableDialog {
+public class SettingsDialog extends StandardDialog implements ShowableDialog {
 
     private final JLabel labelCache = new JLabel("The image cache currently uses 0.0GB on disk.", JLabel.RIGHT);
 
@@ -60,8 +60,8 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
 
     private DefaultsSelectionPanel defaultsPanel;
 
-    public PreferencesDialog() {
-        super(JHVFrame.getFrame(), "Preferences", true);
+    public SettingsDialog() {
+        super(JHVFrame.getFrame(), "Settings", true);
         setResizable(false);
     }
 
