@@ -190,16 +190,13 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         }
 
         switch (nodeName) {
-            case "fits":
-            case "helioviewer":
-                lastNodeSeen = nodeName;
-                break;
-            default:
+            case "fits", "helioviewer" -> lastNodeSeen = nodeName;
+            default -> {
                 if ("fits".equals(lastNodeSeen))
                     fitsModel.addRow(new String[]{nodeName, nodeValue, nodeComment});
                 else
                     hvSB.append(nodeName).append(": ").append(nodeValue).append("<br/>");
-                break;
+            }
         }
 
         // write the child nodes recursively

@@ -64,7 +64,7 @@ record GimpGradientSegment(double leftStop, double midStop, double rightStop, do
             lHSV[1] += (float) ((rHSV[1] - lHSV[1]) * f);
             lHSV[2] += (float) ((rHSV[2] - lHSV[2]) * f);
             switch (blendingColor) {
-                case 1:
+                case 1 -> {
                     if (lHSV[0] < rHSV[0]) {
                         lHSV[0] += (float) ((rHSV[0] - lHSV[0]) * f);
                     } else {
@@ -72,8 +72,8 @@ record GimpGradientSegment(double leftStop, double midStop, double rightStop, do
                         if (lHSV[0] > 1.0)
                             lHSV[0]--;
                     }
-                    break;
-                case 2:
+                }
+                case 2 -> {
                     if (rHSV[0] < lHSV[0]) {
                         lHSV[0] -= (float) ((lHSV[0] - rHSV[0]) * f);
                     } else {
@@ -81,9 +81,8 @@ record GimpGradientSegment(double leftStop, double midStop, double rightStop, do
                         if (lHSV[0] < 0.0)
                             lHSV[0]++;
                     }
-                    break;
-                default:
-                    throw new Exception("Unknown blending color " + blendingColor + " for gimp gradient file");
+                }
+                default -> throw new Exception("Unknown blending color " + blendingColor + " for gimp gradient file");
             }
             r = Color.HSBtoRGB(lHSV[0], lHSV[1], lHSV[1]);
         }
