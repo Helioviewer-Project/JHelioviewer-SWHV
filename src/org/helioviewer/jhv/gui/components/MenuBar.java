@@ -31,7 +31,7 @@ import org.helioviewer.jhv.gui.actions.ZoomOneToOneAction;
 import org.helioviewer.jhv.gui.actions.ZoomOutAction;
 import org.helioviewer.jhv.gui.dialogs.AboutDialog;
 import org.helioviewer.jhv.gui.dialogs.LogDialog;
-import org.helioviewer.jhv.gui.dialogs.PreferencesDialog;
+import org.helioviewer.jhv.gui.dialogs.SettingsDialog;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
 // Menu bar of the main window
@@ -86,9 +86,9 @@ public class MenuBar extends JMenuBar {
         movieMenu.add(MoviePanel.getNextFrameAction());
         add(movieMenu);
 
-        ShowDialogAction preferencesAction = new ShowDialogAction("Preferences...", new PreferencesDialog());
+        ShowDialogAction settingsAction = new ShowDialogAction("Settings...", new SettingsDialog());
         if (Platform.isMacOS()) {
-            Desktop.getDesktop().setPreferencesHandler(e -> preferencesAction.actionPerformed(null));
+            Desktop.getDesktop().setPreferencesHandler(e -> settingsAction.actionPerformed(null));
             JMenu windowMenu = new JMenu("Window");
             windowMenu.setMnemonic(KeyEvent.VK_W);
             windowMenu.add(new WindowMinimizeAction());
@@ -97,7 +97,7 @@ public class MenuBar extends JMenuBar {
         } else {
             JMenu toolsMenu = new JMenu("Tools");
             toolsMenu.setMnemonic(KeyEvent.VK_T);
-            toolsMenu.add(preferencesAction);
+            toolsMenu.add(settingsAction);
             add(toolsMenu);
         }
 
