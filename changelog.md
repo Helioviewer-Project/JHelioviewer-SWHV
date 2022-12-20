@@ -1,7 +1,7 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.4 (pending)
+## JHelioviewer 4.4 (2022-12-20)
 
 - Switch to Java 19
 - Add macOS ARM64 (Apple Silicon) as supported computer architecture
