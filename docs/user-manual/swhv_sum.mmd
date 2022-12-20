@@ -38,7 +38,7 @@ Since JHelioviewer is still rapidly evolving, this document may not reflect enti
 
 # Installing and Running
 
-The JHelioviewer software does advanced data processing and visualisation; therefore it works best on a reasonably recent computer with decent CPU and OpenGL graphics power, and memory. It contains native compiled libraries to speed up critical operations. The supported computer architecture is Intel/AMD 64-bit and the minimal OpenGL version required is 3.3.
+The JHelioviewer software does advanced data processing and visualisation; therefore it works best on a reasonably recent computer with decent CPU and OpenGL graphics power, and memory. It contains native compiled libraries to speed up critical operations. The supported computer architecture are Intel/AMD 64-bit and, on macOS, Apple Silicon (ARM64). The minimal OpenGL version required is 3.3.
 
 JHelioviewer is an open source project and its source code can be accessed at <https://github.com/Helioviewer-Project/JHelioviewer-SWHV>.
 
@@ -52,7 +52,7 @@ Compiled releases are available for Windows, macOS and Linux from <http://swhv.o
 ## macOS
 
  * Download the macOS DMG disk image from <http://swhv.oma.be/download>.
- * Move JHelioviewer.app to the Applications folder and run it by double-clicking its icon.
+ * Drag JHelioviewer.app to the Applications folder and run it by double-clicking its icon.
 
 ## Linux
 
@@ -64,7 +64,7 @@ Compiled releases are available for Windows, macOS and Linux from <http://swhv.o
 
 * Download and extract the TAR.GZ archive from <http://swhv.oma.be/download>.
 * Make sure the appropriate Java Runtime Environment 11 or higher from <https://adoptopenjdk.net> is in the PATH.
-* Run the program by typing ```java -cp JHelioviewer.jar:natives-linux.jar:natives-macos.jar:natives-windows.jar org.helioviewer.jhv.JHelioviewer``` in a terminal window.
+* Run the program by typing ```java --add-exports java.desktop/sun.awt=ALL-UNNAMED -cp JHelioviewer.jar:natives-linux.jar:natives-macos.jar:natives-windows.jar org.helioviewer.jhv.JHelioviewer``` in a terminal window.
 
 This procedure works for Windows, macOS and Linux.
 
@@ -600,7 +600,7 @@ To start JHelioviewer from the command line in Windows:
 
 >>`cd "C:\Program Files\JHelioviewer\classes"`
 
->>`..\jre\bin\java.exe -Xmx4g -cp JHelioviewer.jar;natives-windows.jar org.helioviewer.jhv.JHelioviewer"`
+>>`..\jre\bin\java.exe -Xmx4g --add-exports java.desktop/sun.awt=ALL-UNNAMED -cp JHelioviewer.jar;natives-windows.jar org.helioviewer.jhv.JHelioviewer"`
 
 or where is JHelioviewer installed.
 
