@@ -97,7 +97,7 @@ class JHVInit {
                 "ahead_2017_061_5295day_predict.epm.bsp",
                 "solo_ANC_soc-orbit-stp_20200210-20301120_233_V1_00213_V01.bsp",
                 "naif0012.tls",
-                "pck00010.tpc",
+                "pck00011.tpc",
                 "solo_ANC_soc-ops-fk_V02.tf",
                 "solo_ANC_soc-sci-fk_V07.tf");
 
