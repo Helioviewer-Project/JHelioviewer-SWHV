@@ -33,7 +33,7 @@ public class CommandLine {
         if (propState != null && !"false".equals(propState)) {
             arguments = Arrays.copyOf(args, args.length + 2);
             arguments[args.length] = "-state";
-            arguments[args.length + 1] = propState;
+            arguments[args.length + 1] = Path.of(propState).toUri().toString();
         }
     }
 
