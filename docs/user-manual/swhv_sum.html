@@ -65,14 +65,14 @@
 <ul>
 <li>Download either the DEB or RPM package from <a href="http://swhv.oma.be/download">http://swhv.oma.be/download</a>.</li>
 <li>Install the package with <code>dpkg -i JHelioviewer_*_amd64.deb</code> or <code>rpm --install JHelioviewer_*_amd64.rpm</code> with supervisor privileges.</li>
-<li>Run the program by typing <code>jhelioviewer</code> in a terminal window.</li>
+<li>Run the program by typing <code>jhelioviewer</code> in a terminal window. For correct UI scaling on HiDPI displays use <code>jhelioviewer -J-Dsun.java2d.uiScale=2</code> and replace 2 with the scaling factor of your display.</li>
 </ul>
 
 <h3 id="manualinstallation">Manual installation</h3>
 
 <ul>
 <li>Download and extract the TAR.GZ archive from <a href="http://swhv.oma.be/download">http://swhv.oma.be/download</a>.</li>
-<li>Make sure the appropriate Java Runtime Environment 11 or higher from <a href="https://adoptopenjdk.net">https://adoptopenjdk.net</a> is in the PATH.</li>
+<li>Make sure the appropriate Java Runtime Environment 19 or higher from <a href="https://adoptopenjdk.net">https://adoptopenjdk.net</a> is in the PATH.</li>
 <li>Run the program by typing <code>java --add-exports java.desktop/sun.awt=ALL-UNNAMED -cp JHelioviewer.jar:natives-linux.jar:natives-macos.jar:natives-windows.jar org.helioviewer.jhv.JHelioviewer</code> in a terminal window.</li>
 </ul>
 
