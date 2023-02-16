@@ -58,12 +58,12 @@ Compiled releases are available for Windows, macOS and Linux from <http://swhv.o
 
 * Download either the DEB or RPM package from <http://swhv.oma.be/download>.
 * Install the package with ```dpkg -i JHelioviewer_*_amd64.deb``` or ```rpm --install JHelioviewer_*_amd64.rpm``` with supervisor privileges.
-* Run the program by typing ```jhelioviewer``` in a terminal window.
+* Run the program by typing ```jhelioviewer``` in a terminal window. For correct UI scaling on HiDPI displays use ```jhelioviewer -J-Dsun.java2d.uiScale=2``` and replace 2 with the scaling factor of your display.
 
 ## Manual installation
 
 * Download and extract the TAR.GZ archive from <http://swhv.oma.be/download>.
-* Make sure the appropriate Java Runtime Environment 11 or higher from <https://adoptopenjdk.net> is in the PATH.
+* Make sure the appropriate Java Runtime Environment 19 or higher from <https://adoptopenjdk.net> is in the PATH.
 * Run the program by typing ```java --add-exports java.desktop/sun.awt=ALL-UNNAMED -cp JHelioviewer.jar:natives-linux.jar:natives-macos.jar:natives-windows.jar org.helioviewer.jhv.JHelioviewer``` in a terminal window.
 
 This procedure works for Windows, macOS and Linux.
