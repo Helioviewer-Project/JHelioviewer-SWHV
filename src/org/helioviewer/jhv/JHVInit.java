@@ -64,10 +64,7 @@ class JHVInit {
         }
 
         if (Platform.isWindows()) {
-            libs.add(System.mapLibraryName("msvcr120"));
-            libs.add(System.mapLibraryName("msvcp120"));
             libs.add(System.mapLibraryName("kdu_v7AR"));
-            libs.add(System.mapLibraryName("kdu_a7AR"));
         }
         libs.add(System.mapLibraryName("kdu_jni"));
         libs.add(System.mapLibraryName("JNISpice"));
