@@ -90,9 +90,8 @@ public class J2KView extends BaseView {
 
             source = new KakaduSource(jpipCache, uri);
             maxFrame = source.getNumberLayers() - 1;
-            metaData = new MetaData[maxFrame + 1];
 
-            source.extractMetaData(metaData);
+            metaData = source.extractMetaData();
             for (int i = 0; i <= maxFrame; i++) {
                 frameMap.put(metaData[i].getViewpoint().time, i);
             }
