@@ -53,7 +53,7 @@ public class J2KView extends BaseView {
     private final String[] cacheKey;
     private final TimeMap<Integer> frameMap = new TimeMap<>();
 
-    private final KakaduSource kduSource;
+    private final KakaduSource source;
     private final JPIPCache jpipCache;
 
     protected final int serial;
@@ -88,11 +88,11 @@ public class J2KView extends BaseView {
                 default -> throw new Exception(scheme + " scheme not supported!");
             }
 
-            kduSource = new KakaduSource(jpipCache, uri);
-            maxFrame = kduSource.getNumberLayers() - 1;
+            source = new KakaduSource(jpipCache, uri);
+            maxFrame = source.getNumberLayers() - 1;
             metaData = new MetaData[maxFrame + 1];
 
-            kduSource.extractMetaData(metaData);
+            source.extractMetaData(metaData);
             for (int i = 0; i <= maxFrame; i++) {
                 frameMap.put(metaData[i].getViewpoint().time, i);
             }
@@ -111,18 +111,18 @@ public class J2KView extends BaseView {
                 }
             }
 
-            int[] lut = kduSource.getLUT();
+            int[] lut = source.getLUT();
             if (lut != null)
                 builtinLUT = new LUT(getName() + " built-in", lut);
 
             if (jpipCache == null)
-                cacheStatus = new CacheStatusLocal(kduSource, maxFrame);
+                cacheStatus = new CacheStatusLocal(source, maxFrame);
             else { // remote
-                cacheStatus = new CacheStatusRemote(kduSource, maxFrame);
+                cacheStatus = new CacheStatusRemote(source, maxFrame);
                 reader.start();
             }
 
-            abolishable = reaper.register(this, new J2KAbolisher(serial, reader, jpipCache));
+            abolishable = reaper.register(this, new J2KAbolisher(serial, reader, source, jpipCache));
         } catch (Exception e) {
             String msg = e instanceof KduException ? "Kakadu error" : e.getMessage();
             throw new Exception(msg + ": " + uri, e);
@@ -138,18 +138,8 @@ public class J2KView extends BaseView {
         return metaData[0].getDisplayName();
     }
 
-    private static class J2KAbolisher implements Runnable {
-
-        private final int aSerial;
-        private final J2KReader aReader;
-        private final JPIPCache aJpipCache;
-
-        J2KAbolisher(int _serial, J2KReader _reader, JPIPCache _jpipCache) {
-            aSerial = _serial;
-            aReader = _reader;
-            aJpipCache = _jpipCache;
-        }
-
+    private record J2KAbolisher(int aSerial, J2KReader aReader, KakaduSource aSource,
+                                JPIPCache aJpipCache) implements Runnable {
         @Override
         public void run() {
             for (DecodeParams params : decodeCache.asMap().keySet()) {
@@ -162,6 +152,9 @@ public class J2KView extends BaseView {
                     aReader.abolish();
                 }
                 try {
+                    if (aSource != null) {
+                        aSource.Close();
+                    }
                     if (aJpipCache != null) {
                         aJpipCache.Close();
                         aJpipCache.Native_destroy();
@@ -171,7 +164,6 @@ public class J2KView extends BaseView {
                 }
             }).start();
         }
-
     }
 
     @Override
@@ -356,7 +348,7 @@ public class J2KView extends BaseView {
     @Nonnull
     @Override
     public String getXMLMetaData() throws Exception {
-        return kduSource.extractXMLString(targetFrame);
+        return source.extractXMLString(targetFrame);
     }
 
     public ResolutionLevel getResolutionLevel(int frame, int level) {
@@ -368,7 +360,7 @@ public class J2KView extends BaseView {
     }
 
     KakaduSource getSource() {
-        return kduSource;
+        return source;
     }
 
     JPIPCache getJPIPCache() {
