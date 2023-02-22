@@ -152,7 +152,10 @@ public class J2KView extends BaseView {
                 }
                 try {
                     if (aSource != null) {
+                        aSource.getJpxSource().Close();
+                        aSource.getJpxSource().Native_destroy();
                         aSource.Close();
+                        aSource.Native_destroy();
                     }
                     if (aJpipCache != null) {
                         aJpipCache.Close();
