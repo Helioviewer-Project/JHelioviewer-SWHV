@@ -30,6 +30,7 @@ import org.helioviewer.jhv.view.j2k.image.ResolutionSet;
 public class KakaduSource extends Jp2_threadsafe_family_src {
 
     private final Jpx_source jpxSrc = new Jpx_source();
+    private final int numberLayers;
 
     public KakaduSource(Kdu_cache cache, URI uri) throws Exception {
         if (cache == null) { // local
@@ -38,16 +39,18 @@ public class KakaduSource extends Jp2_threadsafe_family_src {
             Open(cache);
         }
         jpxSrc.Open(this, false);
+
+        int[] temp = new int[1];
+        jpxSrc.Count_compositing_layers(temp);
+        numberLayers = temp[0];
     }
 
     public Jpx_source getJpxSource() {
         return jpxSrc;
     }
 
-    public int getNumberLayers() throws KduException {
-        int[] temp = new int[1];
-        jpxSrc.Count_compositing_layers(temp);
-        return temp[0];
+    public int getNumberLayers() {
+        return numberLayers;
     }
 
     public ResolutionSet getResolutionSet(int frame) throws KduException {
@@ -126,23 +129,25 @@ public class KakaduSource extends Jp2_threadsafe_family_src {
 
     private static final long[] xmlFilter = {Kdu_global.jp2_xml_4cc};
 
-    public void extractMetaData(MetaData[] metaDataList) throws Exception {
+    public MetaData[] extractMetaData() throws Exception {
         Jpx_meta_manager metaManager = jpxSrc.Access_meta_manager();
         Jpx_metanode node = new Jpx_metanode();
         int i = 0;
 
+        MetaData[] metaData = new MetaData[numberLayers];
         Jp2_input_box xmlBox = new Jp2_input_box();
         while ((node = metaManager.Peek_and_clear_touched_nodes(1, xmlFilter, node)).Exists()) {
-            if (i == metaDataList.length)
+            if (i == numberLayers)
                 break;
             if (node.Open_existing(xmlBox)) {
-                metaDataList[i] = new XMLMetaDataContainer(xmlBox2String(xmlBox)).getHVMetaData();
+                metaData[i] = new XMLMetaDataContainer(xmlBox2String(xmlBox)).getHVMetaData();
                 xmlBox.Close();
             }
             i++;
         }
-        if (i != metaDataList.length)
-            throw new Exception("Incomplete metadata: expected " + metaDataList.length + " layers, got " + i);
+        if (i != numberLayers)
+            throw new Exception("Incomplete metadata: expected " + numberLayers + " layers, got " + i);
+        return metaData;
     }
 
     public String extractXMLString(int frame) throws KduException {
