@@ -27,22 +27,28 @@ import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.view.j2k.image.ResolutionSet;
 
-public class KakaduSource extends Jp2_threadsafe_family_src {
+public class KakaduSource {
 
+    private final Jp2_threadsafe_family_src jp2Src = new Jp2_threadsafe_family_src();
     private final Jpx_source jpxSrc = new Jpx_source();
     private final int numberLayers;
 
     public KakaduSource(Kdu_cache cache, URI uri) throws Exception {
         if (cache == null) { // local
-            Open(Path.of(uri).toString(), true);
+            jp2Src.Open(Path.of(uri).toString(), true);
         } else {
-            Open(cache);
+            jp2Src.Open(cache);
         }
-        jpxSrc.Open(this, false);
+        jpxSrc.Open(jp2Src, false);
 
         int[] temp = new int[1];
         jpxSrc.Count_compositing_layers(temp);
         numberLayers = temp[0];
+    }
+
+    public void abolish() throws KduException {
+        jpxSrc.Close();
+        jp2Src.Close();
     }
 
     public Jpx_source getJpxSource() {

@@ -114,9 +114,9 @@ public class J2KView extends BaseView {
             if (lut != null)
                 builtinLUT = new LUT(getName() + " built-in", lut);
 
-            if (jpipCache == null)
+            if (jpipCache == null) {
                 cacheStatus = new CacheStatusLocal(source, maxFrame);
-            else { // remote
+            } else { // remote
                 cacheStatus = new CacheStatusRemote(source, maxFrame);
                 reader.start();
             }
@@ -152,10 +152,7 @@ public class J2KView extends BaseView {
                 }
                 try {
                     if (aSource != null) {
-                        aSource.getJpxSource().Close();
-                        aSource.getJpxSource().Native_destroy();
-                        aSource.Close();
-                        aSource.Native_destroy();
+                        aSource.abolish();
                     }
                     if (aJpipCache != null) {
                         aJpipCache.Close();
