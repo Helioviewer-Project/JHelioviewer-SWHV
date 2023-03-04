@@ -22,8 +22,10 @@ import kdu_jni.Kdu_coords;
 import kdu_jni.Kdu_dims;
 import kdu_jni.Kdu_global;
 
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.view.j2k.image.ResolutionSet;
 
@@ -135,7 +137,7 @@ public class KakaduSource {
 
     private static final long[] xmlFilter = {Kdu_global.jp2_xml_4cc};
 
-    public MetaData[] extractMetaData() throws Exception {
+    public MetaData[] extractMetaData(URI uri) throws Exception {
         Jpx_meta_manager metaManager = jpxSrc.Access_meta_manager();
         Jpx_metanode node = new Jpx_metanode();
         int i = 0;
@@ -151,8 +153,12 @@ public class KakaduSource {
             }
             i++;
         }
-        if (i != numberLayers)
-            throw new Exception("Incomplete metadata: expected " + numberLayers + " layers, got " + i);
+        for (i = 0; i < numberLayers; i++) {
+            if (metaData[i] == null) {
+                metaData[i] = new PixelBasedMetaData(100, 100, uri);
+                Log.error("Helioviewer metadata missing for layer " + i);
+            }
+        }
         return metaData;
     }
 
