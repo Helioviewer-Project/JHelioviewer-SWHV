@@ -347,7 +347,6 @@ public class J2KView extends BaseView {
         return cacheStatus.isComplete(currentLevel);
     }
 
-    // very slow
     @Nonnull
     @Override
     public String getXMLMetaData() {
