@@ -139,7 +139,7 @@ public class BaseView implements View {
 
     @Nonnull
     @Override
-    public String getXMLMetaData() throws Exception {
+    public String getXMLMetaData() {
         return "<meta/>";
     }
 

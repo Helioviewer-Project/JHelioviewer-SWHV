@@ -184,7 +184,7 @@ public class ManyView implements View {
 
     @Nonnull
     @Override
-    public String getXMLMetaData() throws Exception {
+    public String getXMLMetaData() {
         return frameMap.indexedValue(targetFrame).view.getXMLMetaData();
     }
 
