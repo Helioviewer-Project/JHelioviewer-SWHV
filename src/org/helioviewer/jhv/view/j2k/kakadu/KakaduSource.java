@@ -23,6 +23,7 @@ import kdu_jni.Kdu_dims;
 import kdu_jni.Kdu_global;
 
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
@@ -137,46 +138,32 @@ public class KakaduSource {
 
     private static final long[] xmlFilter = {Kdu_global.jp2_xml_4cc};
 
-    public MetaData[] extractMetaData(URI uri) throws Exception {
+    public Pair<String[], MetaData[]> extractMetaData(URI uri) throws Exception {
         Jpx_meta_manager metaManager = jpxSrc.Access_meta_manager();
         Jpx_metanode node = new Jpx_metanode();
         int i = 0;
 
+        String[] xmlMetaData = new String[numberLayers];
         MetaData[] metaData = new MetaData[numberLayers];
         Jp2_input_box xmlBox = new Jp2_input_box();
         while ((node = metaManager.Peek_and_clear_touched_nodes(1, xmlFilter, node)).Exists()) {
             if (i == numberLayers)
                 break;
             if (node.Open_existing(xmlBox)) {
-                metaData[i] = new XMLMetaDataContainer(xmlBox2String(xmlBox)).getHVMetaData();
+                xmlMetaData[i] = xmlBox2String(xmlBox);
+                metaData[i] = new XMLMetaDataContainer(xmlMetaData[i]).getHVMetaData();
                 xmlBox.Close();
             }
             i++;
         }
         for (i = 0; i < numberLayers; i++) {
             if (metaData[i] == null) {
+                xmlMetaData[i] = "<meta/>";
                 metaData[i] = new PixelBasedMetaData(100, 100, uri);
                 Log.error("Helioviewer metadata missing for layer " + i);
             }
         }
-        return metaData;
-    }
-
-    public String extractXMLString(int frame) throws KduException {
-        Jpx_meta_manager metaManager = jpxSrc.Access_meta_manager();
-        Jpx_metanode node = new Jpx_metanode();
-        int i = 0;
-
-        Jp2_input_box xmlBox = new Jp2_input_box();
-        while ((node = metaManager.Peek_and_clear_touched_nodes(1, xmlFilter, node)).Exists()) {
-            if (i == frame && node.Open_existing(xmlBox)) {
-                String meta = xmlBox2String(xmlBox);
-                xmlBox.Close();
-                return meta;
-            }
-            i++;
-        }
-        return "<meta/>";
+        return new Pair<>(xmlMetaData, metaData);
     }
 
     private static String xmlBox2String(Jp2_input_box xmlBox) throws KduException {

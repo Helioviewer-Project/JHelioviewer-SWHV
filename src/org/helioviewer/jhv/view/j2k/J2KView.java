@@ -13,6 +13,7 @@ import kdu_jni.KduException;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
@@ -49,6 +50,7 @@ public class J2KView extends BaseView {
 
     private final int maxFrame;
     private int targetFrame;
+    private final String[] xmlMetaData;
 
     private final String[] cacheKey;
     private final TimeMap<Integer> frameMap = new TimeMap<>();
@@ -91,7 +93,9 @@ public class J2KView extends BaseView {
             source = new KakaduSource(jpipCache, uri);
             maxFrame = source.getNumberLayers() - 1;
 
-            metaData = source.extractMetaData(uri);
+            Pair<String[], MetaData[]> meta = source.extractMetaData(uri);
+            xmlMetaData = meta.left();
+            metaData = meta.right();
             for (int i = 0; i <= maxFrame; i++) {
                 frameMap.put(metaData[i].getViewpoint().time, i);
             }
@@ -346,8 +350,8 @@ public class J2KView extends BaseView {
     // very slow
     @Nonnull
     @Override
-    public String getXMLMetaData() throws Exception {
-        return source.extractXMLString(targetFrame);
+    public String getXMLMetaData() {
+        return xmlMetaData[targetFrame];
     }
 
     public ResolutionLevel getResolutionLevel(int frame, int level) {
