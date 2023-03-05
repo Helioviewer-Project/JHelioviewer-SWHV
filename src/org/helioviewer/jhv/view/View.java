@@ -68,6 +68,6 @@ public interface View {
     // -->
 
     @Nonnull
-    String getXMLMetaData() throws Exception;
+    String getXMLMetaData();
 
 }
