@@ -182,7 +182,7 @@ class FITSImage implements URIImageReader {
         for (int j = 0; j < height; j++) {
             Object lineData = pixelData[j];
             int outLine = width * (height - 1 - j);
-            tasks.add(ForkJoinTask.adapt(new convert(width, bitpix, lineData, blank, bzero, bscale, scale, minMax[0], lut, outData, outLine)).fork());
+            tasks.add(ForkJoinTask.adapt(new convert(width, bitpix, lineData, blank, bzero, bscale, scale, minMax, lut, outData, outLine)).fork());
         }
         tasks.forEach(ForkJoinTask::join);
         //System.out.println(">>> " + sw.elapsed().toNanos() / 1e9);
@@ -190,14 +190,19 @@ class FITSImage implements URIImageReader {
     }
 
     private record convert(int width, Bitpix bitpix, Object lineData, long blank, double bzero, double bscale,
-                           double scale, float min, float[] lut, short[] outData, int outLine) implements Runnable {
+                           double scale, float[] minMax, float[] lut, short[] outData, int outLine) implements Runnable {
         @Override
         public void run() {
             for (int i = 0; i < width; i++) {
                 float v = getValue(bitpix, lineData, i, blank, bzero, bscale);
-                int p = (int) MathUtils.clip(scale * MathUtils.pow(v - min, GAMMA) + .5, 0, 65535);
-                lut[p] = v;
-                outData[outLine + i] = v == ImageBuffer.BAD_PIXEL ? 0 : (short) p;
+                if (v == ImageBuffer.BAD_PIXEL)
+                    outData[outLine + i] = 0;
+                else {
+                    v = MathUtils.clip(v, minMax[0], minMax[1]); // sampling may have missed extremes
+                    int p = (int) MathUtils.clip(scale * MathUtils.pow(v - minMax[0], GAMMA) + .5, 0, 65535);
+                    lut[p] = v;
+                    outData[outLine + i] = (short) p;
+                }
             }
         }
     }
