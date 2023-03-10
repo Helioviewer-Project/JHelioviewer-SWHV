@@ -1,6 +1,8 @@
 
 # Revision history for JHelioviewer
 
+## JHelioviewer 4.4.2 (pending)
+
 ## JHelioviewer 4.4.1 (2023-03-10)
 
 - Updates and bugfixes
