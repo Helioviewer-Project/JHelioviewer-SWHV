@@ -13,7 +13,6 @@ import kdu_jni.KduException;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
@@ -21,6 +20,8 @@ import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.metadata.PixelBasedMetaData;
+import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
 import org.helioviewer.jhv.view.BaseView;
@@ -93,10 +94,15 @@ public class J2KView extends BaseView {
             source = new KakaduSource(jpipCache, uri);
             maxFrame = source.getNumberLayers() - 1;
 
-            Pair<String[], MetaData[]> meta = source.extractMetaData(uri);
-            xmlMetaData = meta.left();
-            metaData = meta.right();
+            xmlMetaData = source.extractMetaData();
+            metaData = new MetaData[maxFrame + 1];
             for (int i = 0; i <= maxFrame; i++) {
+                if (xmlMetaData[i] == null) {
+                    xmlMetaData[i] = "<meta/>";
+                    metaData[i] = new PixelBasedMetaData(100, 100, uri);
+                    Log.warn("Helioviewer metadata missing for layer " + i);
+                } else
+                    metaData[i] = new XMLMetaDataContainer(xmlMetaData[i]).getHVMetaData();
                 frameMap.put(metaData[i].getViewpoint().time, i);
             }
             frameMap.buildIndex();
