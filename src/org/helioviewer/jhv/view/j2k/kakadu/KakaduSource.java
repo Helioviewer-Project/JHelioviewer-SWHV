@@ -22,12 +22,7 @@ import kdu_jni.Kdu_coords;
 import kdu_jni.Kdu_dims;
 import kdu_jni.Kdu_global;
 
-import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.math.MathUtils;
-import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.metadata.PixelBasedMetaData;
-import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.view.j2k.image.ResolutionSet;
 
 public class KakaduSource {
@@ -138,32 +133,23 @@ public class KakaduSource {
 
     private static final long[] xmlFilter = {Kdu_global.jp2_xml_4cc};
 
-    public Pair<String[], MetaData[]> extractMetaData(URI uri) throws Exception {
+    public String[] extractMetaData() throws KduException {
         Jpx_meta_manager metaManager = jpxSrc.Access_meta_manager();
         Jpx_metanode node = new Jpx_metanode();
         int i = 0;
 
         String[] xmlMetaData = new String[numberLayers];
-        MetaData[] metaData = new MetaData[numberLayers];
         Jp2_input_box xmlBox = new Jp2_input_box();
         while ((node = metaManager.Peek_and_clear_touched_nodes(1, xmlFilter, node)).Exists()) {
             if (i == numberLayers)
                 break;
             if (node.Open_existing(xmlBox)) {
                 xmlMetaData[i] = xmlBox2String(xmlBox);
-                metaData[i] = new XMLMetaDataContainer(xmlMetaData[i]).getHVMetaData();
                 xmlBox.Close();
             }
             i++;
         }
-        for (i = 0; i < numberLayers; i++) {
-            if (metaData[i] == null) {
-                xmlMetaData[i] = "<meta/>";
-                metaData[i] = new PixelBasedMetaData(100, 100, uri);
-                Log.error("Helioviewer metadata missing for layer " + i);
-            }
-        }
-        return new Pair<>(xmlMetaData, metaData);
+        return xmlMetaData;
     }
 
     private static String xmlBox2String(Jp2_input_box xmlBox) throws KduException {
