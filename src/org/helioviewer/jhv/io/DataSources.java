@@ -22,15 +22,19 @@ public class DataSources {
             "ROB-USET", "ROB-Humain", "NSO-GONG", "NSO-SOLIS", "Kanzelhoehe",
             "NRH", "Yohkoh", "Hinode", "TRACE", "MLSO", "SOLO", "GOES");
 
+    private static final String enabledDatasetsV2 = "[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2,SOLO]";
+
     private static final ImmutableMap<String, Map<String, String>> serverSettings = new ImmutableMap.Builder<String, Map<String, String>>().
-/*            put("Local", new ImmutableMap.Builder<String, String>().
-                    put("API.getDataSources", "http://hv.local/api/docroot/index.php/?action=getDataSources&verbose=true&enable=[SOLO]").
-                    put("API.getJP2Image", "http://hv.local/api/docroot/index.php/?action=getJP2Image&").
-                    put("API.getJPX", "http://hv.local/api/docroot/index.php/?action=getJPX&").
-                    put("label", "Local").
-                    put("schema", "/data/sources_v1.0.json").
-                    put("availability.images", "http://swhv.oma.be/availability/images/availability/availability.html").
-                    build()). */
+/*
+        put("Local", new ImmutableMap.Builder<String, String>().
+        put("API.getDataSources", "http://hv.local/api/docroot/index.php/?action=getDataSources&verbose=true&enable=[SOLO]").
+        put("API.getJP2Image", "http://hv.local/api/docroot/index.php/?action=getJP2Image&").
+        put("API.getJPX", "http://hv.local/api/docroot/index.php/?action=getJPX&").
+        put("label", "Local").
+        put("schema", "/data/sources_v1.0.json").
+        put("availability.images", "http://swhv.oma.be/availability/images/availability/availability.html").
+        build()).
+*/
         put("ROB", new ImmutableMap.Builder<String, String>().
         put("API.getDataSources", "http://swhv.oma.be/hv/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]").
         put("API.getJP2Image", "http://swhv.oma.be/hv/api/index.php?action=getJP2Image&").
@@ -39,49 +43,55 @@ public class DataSources {
         put("schema", "/data/sources_v1.0.json").
         put("availability.images", "http://swhv.oma.be/availability/images/availability/availability.html").
         build()).
-/*          put("ROB Test", new ImmutableMap.Builder<String, String>().
-                    put("API.getDataSources", "http://swhv2.oma.be:8083/index.php?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]").
-                    put("API.getJP2Image", "http://swhv2.oma.be:8083/index.php?action=getJP2Image&").
-                    put("API.getJPX", "http://swhv2.oma.be:8083/index.php?action=getJPX&").
-                    put("label", "Royal Observatory of Belgium").
-                    put("schema", "/data/sources_v1.0.json").
-                    put("availability.images", "http://swhv2.oma.be/availability/images/availability/availability.html").
-                    build()). */
+/*
+        put("ROB Test", new ImmutableMap.Builder<String, String>().
+        put("API.getDataSources", "http://swhv2.oma.be:8083/index.php?action=getDataSources&verbose=true&enable=" + enabledDatasetsV2).
+        put("API.getJP2Image", "http://swhv2.oma.be:8083/index.php?action=getJP2Image&").
+        put("API.getJPX", "http://swhv2.oma.be:8083/index.php?action=getJPX&").
+        put("label", "Royal Observatory of Belgium").
+        put("schema", "/data/sources_v1.0.json").
+        put("availability.images", "http://swhv2.oma.be/availability/images/availability/availability.html").
+        build()).
+*/
         put("IAS", new ImmutableMap.Builder<String, String>().
-        put("API.getDataSources", "https://helioviewer-api.ias.u-psud.fr/v2/getDataSources/?verbose=true&enable=[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]").
+        put("API.getDataSources", "https://helioviewer-api.ias.u-psud.fr/v2/getDataSources/?verbose=true&enable=" + enabledDatasetsV2).
         put("API.getJP2Image", "https://helioviewer-api.ias.u-psud.fr/v2/getJP2Image/?").
         put("API.getJPX", "https://helioviewer-api.ias.u-psud.fr/v2/getJPX/?").
         put("label", "Institut d'Astrophysique Spatiale").
         put("schema", "/data/sources_v1.0.json").
         build()).
-/*          put("IAS Test", new ImmutableMap.Builder<String, String>().
-                    put("API.getDataSources", "https://inf-helio-test-api.ias.u-psud.fr/v2/getDataSources/?verbose=true&enable=[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]").
-                    put("API.getJP2Image", "https://inf-helio-test-api.ias.u-psud.fr/v2/getJP2Image/?").
-                    put("API.getJPX", "https://inf-helio-test-api.ias.u-psud.fr/v2/getJPX/?").
-                    put("label", "Institut d'Astrophysique Spatiale").
-                    put("schema", "/data/sources_v1.0.json").
-                    build()). */
+/*
+        put("IAS Test", new ImmutableMap.Builder<String, String>().
+        put("API.getDataSources", "https://inf-helio-test-api.ias.u-psud.fr/v2/getDataSources/?verbose=true&enable=" + enabledDatasetsV2).
+        put("API.getJP2Image", "https://inf-helio-test-api.ias.u-psud.fr/v2/getJP2Image/?").
+        put("API.getJPX", "https://inf-helio-test-api.ias.u-psud.fr/v2/getJPX/?").
+        put("label", "Institut d'Astrophysique Spatiale").
+        put("schema", "/data/sources_v1.0.json").
+        build()).
+*/
         put("GSFC", new ImmutableMap.Builder<String, String>().
-        put("API.getDataSources", "https://api.helioviewer.org/v2/getDataSources/?verbose=true&enable=[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]").
+        put("API.getDataSources", "https://api.helioviewer.org/v2/getDataSources/?verbose=true&enable=" + enabledDatasetsV2).
         put("API.getJP2Image", "https://api.helioviewer.org/v2/getJP2Image/?").
         put("API.getJPX", "https://api.helioviewer.org/v2/getJPX/?").
         put("label", "Goddard Space Flight Center").
         put("schema", "/data/sources_v1.0.json").
         build()).
-            put("GSFC Beta", new ImmutableMap.Builder<String, String>().
-                    put("API.getDataSources", "https://api.beta.helioviewer.org/v2/getDataSources/?verbose=true&enable=[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]").
-                    put("API.getJP2Image", "https://api.beta.helioviewer.org/v2/getJP2Image/?").
-                    put("API.getJPX", "https://api.beta.helioviewer.org/v2/getJPX/?").
-                    put("label", "Goddard Space Flight Center Beta Server").
-                    put("schema", "/data/sources_v1.0.json").
-                    build()).
-            put("ESAC", new ImmutableMap.Builder<String, String>().
-                    put("API.getDataSources", "http://soar.esac.esa.int/jpip-api/v2/getDataSources/?verbose=true&enable=[SOLO]").
-                    put("API.getJP2Image", "http://soar.esac.esa.int/jpip-api/v2/getJP2Image/?").
-                    put("API.getJPX", "http://soar.esac.esa.int/jpip-api/v2/getJPX/?").
-                    put("label", "European Space Astronomy Center").
-                    put("schema", "/data/sources_v1.0.json").
-                    build()).
+/*    */
+        put("GSFC Beta", new ImmutableMap.Builder<String, String>().
+        put("API.getDataSources", "https://api.beta.helioviewer.org/v2/getDataSources/?verbose=true&enable=" + enabledDatasetsV2).
+        put("API.getJP2Image", "https://api.beta.helioviewer.org/v2/getJP2Image/?").
+        put("API.getJPX", "https://api.beta.helioviewer.org/v2/getJPX/?").
+        put("label", "Goddard Space Flight Center Beta Server").
+        put("schema", "/data/sources_v1.0.json").
+        build()).
+/*    */
+        put("ESAC", new ImmutableMap.Builder<String, String>().
+        put("API.getDataSources", "http://soar.esac.esa.int/jpip-api/v2/getDataSources/?verbose=true&enable=[SOLO]").
+        put("API.getJP2Image", "http://soar.esac.esa.int/jpip-api/v2/getJP2Image/?").
+        put("API.getJPX", "http://soar.esac.esa.int/jpip-api/v2/getJPX/?").
+        put("label", "European Space Astronomy Center").
+        put("schema", "/data/sources_v1.0.json").
+        build()).
             build();
 
     public static Set<String> getServers() {
