@@ -17,11 +17,6 @@ public class DataSources {
         void setupSources(DataSourcesParser parser);
     }
 
-    static final Set<String> SupportedObservatories = Set.of(
-            "SOHO", "SDO", "STEREO_A", "STEREO_B", "PROBA2",
-            "ROB-USET", "ROB-Humain", "NSO-GONG", "NSO-SOLIS", "Kanzelhoehe",
-            "NRH", "Yohkoh", "Hinode", "TRACE", "MLSO", "SOLO", "GOES-R");
-
     private static final String enabledDatasetsV2 = "[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2,SOLO,GOES-R]";
 
     private static final ImmutableMap<String, Map<String, String>> serverSettings = new ImmutableMap.Builder<String, Map<String, String>>().

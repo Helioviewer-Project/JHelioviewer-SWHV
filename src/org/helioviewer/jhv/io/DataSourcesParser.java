@@ -47,8 +47,6 @@ public class DataSourcesParser {
         for (String key : sorted) {
             JSONObject json = root.getJSONObject(key);
             String name = json.getString("name").replace((char) 8287, ' '); // for Windows
-            if (str == null && !DataSources.SupportedObservatories.contains(name)) // filter top level
-                continue;
 
             if (str != null /* can't happen */ && json.has("sourceId")) { // leaf
                 if (json.isNull("start") || json.isNull("end")) // skip empty datasets
