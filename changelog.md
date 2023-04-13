@@ -1,7 +1,9 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.4.2 (pending)
+## JHelioviewer 4.4.2 (2023-04-13)
+
+- Allow loading of GOES-R/SUVI images from all servers
 
 ## JHelioviewer 4.4.1 (2023-03-10)
 
@@ -69,7 +71,7 @@
 
 ## JHelioviewer 4.0.1 (2021-05-31)
 
-- Load SOLO/EUI, GOES/SUVI images from ROB server
+- Load SOLO/EUI, GOES-R/SUVI images from ROB server
 - Allow to sync the current image layer time interval to the other layers
 - Allow drag'n'drop of image files
 - Use FlatLaf look'n'feel
@@ -113,4 +115,4 @@
 - Support KCor dataset ([#114](<https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues/114>))
 - Support Solar Orbiter remote sensing datasets (EUI, PHI, Metis, SoloHI)
 - Support Hi-C 1 and 2.1 datasets
-- Support GOES SUVI datasets
+- Support GOES-R/SUVI datasets
