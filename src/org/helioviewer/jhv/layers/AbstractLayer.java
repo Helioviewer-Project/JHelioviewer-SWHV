@@ -10,7 +10,7 @@ import com.jogamp.opengl.GL2;
 public abstract class AbstractLayer implements Layer {
 
     protected boolean enabled;
-    protected final boolean[] isVisible = {false, false, false, false};
+    protected final boolean[] isVisible = {false, false, false, false, false, false}; // match max of Display.viewports.length
 
     @Override
     public void setEnabled(boolean _enabled) {
