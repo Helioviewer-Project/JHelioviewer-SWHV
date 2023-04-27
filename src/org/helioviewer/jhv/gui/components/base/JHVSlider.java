@@ -8,12 +8,9 @@ import javax.swing.JSlider;
 @SuppressWarnings("serial")
 public class JHVSlider extends JSlider {
 
-    private final int defaultValue;
+    public JHVSlider(int min, int max, int defaultValue) {
+        super(JSlider.HORIZONTAL, min, max, defaultValue);
 
-    public JHVSlider(int min, int max, int value) {
-        super(JSlider.HORIZONTAL, min, max, value);
-
-        defaultValue = value;
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
