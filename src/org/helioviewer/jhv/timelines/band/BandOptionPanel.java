@@ -67,7 +67,7 @@ class BandOptionPanel extends JPanel {
         downloadButton.setToolTipText("Download selected layer");
         downloadButton.addActionListener(e -> {
             Path path = Path.of(JHVDirectory.DOWNLOADS.getPath(),
-                    band.getBandType().getName().replace(" ", "_") + "__" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".json");
+                    band.getBandType().getName().replace(' ', '_') + "__" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".json");
             JSONObject jo = band.toJson();
 
             new Thread(() -> {

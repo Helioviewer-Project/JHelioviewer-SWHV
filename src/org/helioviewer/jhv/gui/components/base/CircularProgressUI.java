@@ -33,17 +33,17 @@ public class CircularProgressUI extends BasicProgressBarUI {
 
     @Override
     protected void paintDeterminate(Graphics g, JComponent c) {
-        doPaint(g, 360. * progressBar.getPercentComplete());
+        doPaint((Graphics2D) g, 360. * progressBar.getPercentComplete());
     }
 
     @Override
     protected void paintIndeterminate(Graphics g, JComponent c) {
-        doPaint(g, 360. * getAnimationIndex() / getFrameCount());
+        doPaint((Graphics2D) g, 360. * getAnimationIndex() / getFrameCount());
     }
 
     private static final double THICK_FACTOR = 1 / 8.;
 
-    private void doPaint(Graphics g1, double degree) {
+    private void doPaint(Graphics2D g, double degree) {
         Rectangle r = progressBar.getBounds();
         double sz = Math.min(r.width, r.height) * (1 - 3 * THICK_FACTOR);
         double cx = r.width * .5;
@@ -51,7 +51,6 @@ public class CircularProgressUI extends BasicProgressBarUI {
         double or = sz * .5;
         double ir = or * .5;
 
-        Graphics2D g = (Graphics2D) g1;
         g.setPaint(progressBar.getForeground());
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
