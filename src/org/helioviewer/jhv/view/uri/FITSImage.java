@@ -190,7 +190,8 @@ class FITSImage implements URIImageReader {
     }
 
     private record convert(int width, Bitpix bitpix, Object lineData, long blank, double bzero, double bscale,
-                           double scale, float[] minMax, float[] lut, short[] outData, int outLine) implements Runnable {
+                           double scale, float[] minMax, float[] lut, short[] outData,
+                           int outLine) implements Runnable {
         @Override
         public void run() {
             for (int i = 0; i < width; i++) {

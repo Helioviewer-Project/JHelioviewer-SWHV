@@ -19,11 +19,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 @SuppressWarnings("serial")
 class EventDescriptionPanel extends JPanel {
 
-    private final JHVRelatedEvents revent;
-
-    EventDescriptionPanel(JHVRelatedEvents _revent, JHVEvent event) {
-        revent = _revent;
-
+    EventDescriptionPanel(JHVRelatedEvents revent, JHVEvent event) {
         JLabel labelIcon = new JLabel(revent.getIcon());
 
         JTextArea textStartTime = new JTextArea(TimeUtils.formatShort(event.start));
