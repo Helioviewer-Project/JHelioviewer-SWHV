@@ -5,7 +5,7 @@
 
 ## JHelioviewer 4.4.2 (2023-04-13)
 
-- Allow loading of GOES-R/SUVI images from all servers
+- Allow loading of SOLO/EUI and GOES-R/SUVI images from all servers
 
 ## JHelioviewer 4.4.1 (2023-03-10)
 
