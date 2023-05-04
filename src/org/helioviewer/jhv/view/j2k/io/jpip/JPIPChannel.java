@@ -4,16 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
-import java.util.zip.InflaterInputStream;
-import java.util.zip.GZIPInputStream;
 
 import kdu_jni.KduException;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Regex;
-import org.helioviewer.jhv.view.j2k.io.ChunkedInputStream;
-import org.helioviewer.jhv.view.j2k.io.FixedSizedInputStream;
-import org.helioviewer.jhv.view.j2k.io.TransferInputStream;
 import org.helioviewer.jhv.view.j2k.io.http.HTTPChannel;
 import org.helioviewer.jhv.view.j2k.io.http.HTTPMessage;
 
@@ -22,8 +17,6 @@ public class JPIPChannel extends HTTPChannel {
 
     // The jpip channel ID for the connection (persistent)
     private final String jpipChannelID;
-
-    // private int totalLength = 0;
 
     // The path supplied on the uri line of the HTTP message. Generally for the
     // first request it is the image path in relative terms, but the response
@@ -96,50 +89,14 @@ public class JPIPChannel extends HTTPChannel {
         if (!"image/jpp-stream".equals(res.getHeader("Content-Type")))
             throw new IOException("Expected image/jpp-stream content");
 
-        String head = res.getHeader("Transfer-Encoding");
-        String transferEncoding = head == null ? "" : head.toLowerCase();
-        head = res.getHeader("Content-Encoding");
-        String contentEncoding = head == null ? "" : head.toLowerCase();
-
-        TransferInputStream transferInput;
-        switch (transferEncoding) {
-            case "", "identity" -> {
-                String contentLength = res.getHeader("Content-Length");
-                try {
-                    transferInput = new FixedSizedInputStream(inputStream, Integer.parseInt(contentLength));
-                } catch (Exception e) {
-                    throw new IOException("Invalid Content-Length header: " + contentLength);
-                }
-            }
-            case "chunked" -> transferInput = new ChunkedInputStream(inputStream);
-            default -> throw new IOException("Unsupported transfer encoding: " + transferEncoding);
-        }
-
-        InputStream input = transferInput;
-        switch (contentEncoding) {
-            case "":
-            case "identity":
-                break;
-            case "gzip":
-                input = new GZIPInputStream(input);
-                break;
-            case "deflate":
-                input = new InflaterInputStream(input);
-                break;
-            default:
-                throw new IOException("Unknown content encoding: " + contentEncoding);
-        }
-
         JPIPResponse jpipRes = new JPIPResponse(res.getHeader("JPIP-cnew"));
-        try (InputStream in = input) {
+        try (InputStream in = getStream(res)) {
             jpipRes.readSegments(in, cache, frame);
         }
-        // totalLength += transferInput.getTotalLength();
 
         if ("close".equals(res.getHeader("Connection"))) {
             super.close();
         }
-
         return jpipRes;
     }
 

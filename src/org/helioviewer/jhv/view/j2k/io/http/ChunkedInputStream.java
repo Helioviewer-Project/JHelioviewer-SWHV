@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.j2k.io;
+package org.helioviewer.jhv.view.j2k.io.http;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,20 +6,17 @@ import java.net.ProtocolException;
 
 import javax.annotation.Nonnull;
 
-/*
- * Transparently coalesces chunks of an HTTP stream that uses
- * Transfer-Encoding chunked.
- *
- * Note that this class NEVER closes the underlying stream, even when close
- * gets called.  Instead, it will read until the "end" of its chunking on close,
- * which allows for the seamless invocation of subsequent HTTP 1.1 calls, while
- * not requiring the client to remember to read the entire contents of the
- * response.
- */
+// Transparently coalesces chunks of an HTTP stream that uses
+// Transfer-Encoding chunked.
+// Note that this class NEVER closes the underlying stream, even when close
+// gets called. Instead, it will read until the "end" of its chunking on close,
+// which allows for the seamless invocation of subsequent HTTP 1.1 calls, while
+// not requiring the client to remember to read the entire contents of the
+// response.
 
 // ChunkedInputStream allows decoding HTTP chunked responses with a simple
 // format. Does not support internal chunk headers.
-public class ChunkedInputStream extends TransferInputStream {
+class ChunkedInputStream extends TransferInputStream {
 
     private int totalLength = 0;
     // The last chunk length
@@ -33,7 +30,7 @@ public class ChunkedInputStream extends TransferInputStream {
 
     private final byte[] tmpRead = new byte[1];
 
-    public ChunkedInputStream(InputStream _in) {
+    ChunkedInputStream(InputStream _in) {
         in = _in;
     }
 
