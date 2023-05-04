@@ -14,7 +14,7 @@ import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.view.j2k.io.ByteChannelInputStream;
 import org.helioviewer.jhv.view.j2k.io.LineRead;
 
-public class HTTPSocket {
+public class HTTPChannel {
 
     //private static final int TIMEOUT_CONNECT = 30000;
     private static final int TIMEOUT_READ = 30000;
@@ -25,7 +25,7 @@ public class HTTPSocket {
     protected final InputStream inputStream;
     protected final String host;
 
-    protected HTTPSocket(URI uri) throws IOException {
+    protected HTTPChannel(URI uri) throws IOException {
         try {
             //socket = new Socket(ProxySettings.proxy);
             channel = SocketChannel.open();
