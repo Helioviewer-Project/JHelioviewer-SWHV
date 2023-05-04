@@ -28,8 +28,8 @@ public class JPIPCacheManager {
         Logger.getLogger("org.ehcache").setLevel(Level.WARNING); // shutup Ehcache info logs
     }
 
-    private static final Path levelCacheDir = Path.of(JHVDirectory.CACHE.getPath(), "JPIPLevel-3");
-    private static final Path streamCacheDir = Path.of(JHVDirectory.CACHE.getPath(), "JPIPStream-3");
+    private static final Path levelCacheDir = Path.of(JHVDirectory.CACHE.getPath(), "JPIPLevel-4");
+    private static final Path streamCacheDir = Path.of(JHVDirectory.CACHE.getPath(), "JPIPStream-4");
 
     private static PersistentCacheManager levelManager;
     private static PersistentCacheManager streamManager;
@@ -38,7 +38,7 @@ public class JPIPCacheManager {
     private static Thread hook;
 
     public static void init() {
-        deleteDirs("JPIPLevel", "JPIPStream", "JPIPLevel-2", "JPIPStream-2"); // delete old versions
+        deleteDirs("JPIPLevel", "JPIPStream", "JPIPLevel-2", "JPIPStream-2", "JPIPLevel-3", "JPIPStream-3"); // delete old versions
 
         ExpiryPolicy<Object, Object> expiryPolicy = ExpiryPolicyBuilder.timeToIdleExpiration(Duration.ofDays(7));
 
