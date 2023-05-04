@@ -22,10 +22,8 @@ public class HTTPSocket {
 
     private final SocketChannel channel;
 
-    protected final int usedPort;
-    protected final String usedHost;
-
     protected final InputStream inputStream;
+    protected final String host;
 
     protected HTTPSocket(URI uri) throws IOException {
         try {
@@ -39,8 +37,9 @@ public class HTTPSocket {
             channel.socket().setTcpNoDelay(true);
 
             int port = uri.getPort();
-            usedPort = port <= 0 ? PORT : port;
-            usedHost = uri.getHost();
+            int usedPort = port <= 0 ? PORT : port;
+            String usedHost = uri.getHost();
+            host = usedHost + ':' + usedPort;
 
             //socket.connect(new InetSocketAddress(usedHost, usedPort), TIMEOUT_CONNECT);
             channel.connect(new InetSocketAddress(usedHost, usedPort));
