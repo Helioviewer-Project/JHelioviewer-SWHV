@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.j2k.io;
+package org.helioviewer.jhv.view.j2k.io.http;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,12 +7,12 @@ import java.nio.channels.ByteChannel;
 
 import javax.annotation.Nonnull;
 
-public class ByteChannelInputStream extends InputStream {
+class ByteChannelInputStream extends InputStream {
 
     private final ByteBuffer buf = ByteBuffer.allocateDirect(512 * 1024);
     private final ByteChannel chan;
 
-    public ByteChannelInputStream(ByteChannel _chan) {
+    ByteChannelInputStream(ByteChannel _chan) {
         chan = _chan;
     }
 
