@@ -8,11 +8,11 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
+import java.util.zip.InflaterInputStream;
+import java.util.zip.GZIPInputStream;
 
 //import org.helioviewer.jhv.io.ProxySettings;
 import org.helioviewer.jhv.base.Regex;
-import org.helioviewer.jhv.view.j2k.io.ByteChannelInputStream;
-import org.helioviewer.jhv.view.j2k.io.LineRead;
 
 public class HTTPChannel {
 
@@ -47,6 +47,34 @@ public class HTTPChannel {
         } catch (Exception e) { // redirect all to IOException
             throw new IOException(e);
         }
+    }
+
+    protected InputStream getStream(HTTPMessage res) throws IOException {
+        String head = res.getHeader("Transfer-Encoding");
+        String transferEncoding = head == null ? "" : head.toLowerCase();
+        head = res.getHeader("Content-Encoding");
+        String contentEncoding = head == null ? "" : head.toLowerCase();
+
+        TransferInputStream transferInput;
+        switch (transferEncoding) {
+            case "", "identity" -> {
+                String contentLength = res.getHeader("Content-Length");
+                try {
+                    transferInput = new FixedSizedInputStream(inputStream, Integer.parseInt(contentLength));
+                } catch (Exception e) {
+                    throw new IOException("Invalid Content-Length header: " + contentLength);
+                }
+            }
+            case "chunked" -> transferInput = new ChunkedInputStream(inputStream);
+            default -> throw new IOException("Unsupported transfer encoding: " + transferEncoding);
+        }
+
+        return switch (contentEncoding) {
+            case "", "identity" -> transferInput;
+            case "gzip" -> new GZIPInputStream(transferInput);
+            case "deflate" -> new InflaterInputStream(transferInput);
+            default -> throw new IOException("Unknown content encoding: " + contentEncoding);
+        };
     }
 
     protected HTTPMessage recv() throws IOException {

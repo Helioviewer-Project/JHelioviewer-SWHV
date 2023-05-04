@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.j2k.io;
+package org.helioviewer.jhv.view.j2k.io.http;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,14 +7,14 @@ import javax.annotation.Nonnull;
 
 // Input stream with a fixed size. After reading the expected number of bytes
 // this input stream will behave as if the end of the stream has been reached.
-public class FixedSizedInputStream extends TransferInputStream {
+class FixedSizedInputStream extends TransferInputStream {
 
     private int remainingBytes;
 
     private final int expectedBytes;
     private final InputStream in;
 
-    public FixedSizedInputStream(InputStream _in, int _expectedBytes) {
+    FixedSizedInputStream(InputStream _in, int _expectedBytes) {
         remainingBytes = expectedBytes = _expectedBytes;
         in = _in;
     }
