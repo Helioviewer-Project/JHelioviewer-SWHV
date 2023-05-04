@@ -2,7 +2,6 @@ package org.helioviewer.jhv.view.j2k.jpip.http;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetSocketAddress;
 import java.net.ProtocolException;
 import java.net.URI;
 import java.nio.ByteBuffer;
@@ -11,13 +10,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.zip.InflaterInputStream;
 import java.util.zip.GZIPInputStream;
 
-//import org.helioviewer.jhv.io.ProxySettings;
 import org.helioviewer.jhv.base.Regex;
 
 public class HTTPChannel {
 
-    //private static final int TIMEOUT_CONNECT = 30000;
-    private static final int TIMEOUT_READ = 30000;
     private static final int PORT = 80;
 
     private final SocketChannel channel;
@@ -27,22 +23,12 @@ public class HTTPChannel {
 
     protected HTTPChannel(URI uri) throws IOException {
         try {
-            //socket = new Socket(ProxySettings.proxy);
-            channel = SocketChannel.open();
-
-            channel.socket().setReceiveBufferSize(Math.max(262144 * 8, 2 * channel.socket().getReceiveBufferSize()));
-            channel.socket().setTrafficClass(0x10);
-            channel.socket().setSoTimeout(TIMEOUT_READ);
-            channel.socket().setKeepAlive(true);
-            channel.socket().setTcpNoDelay(true);
-
             int port = uri.getPort();
             int usedPort = port <= 0 ? PORT : port;
             String usedHost = uri.getHost();
             host = usedHost + ':' + usedPort;
 
-            //socket.connect(new InetSocketAddress(usedHost, usedPort), TIMEOUT_CONNECT);
-            channel.connect(new InetSocketAddress(usedHost, usedPort));
+            channel = JHVChannel.connect(usedHost, usedPort);
             inputStream = new ByteChannelInputStream(channel);
         } catch (Exception e) { // redirect all to IOException
             throw new IOException(e);
