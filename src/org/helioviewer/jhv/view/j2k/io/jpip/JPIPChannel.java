@@ -14,27 +14,25 @@ import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.view.j2k.io.ChunkedInputStream;
 import org.helioviewer.jhv.view.j2k.io.FixedSizedInputStream;
 import org.helioviewer.jhv.view.j2k.io.TransferInputStream;
+import org.helioviewer.jhv.view.j2k.io.http.HTTPChannel;
 import org.helioviewer.jhv.view.j2k.io.http.HTTPMessage;
-import org.helioviewer.jhv.view.j2k.io.http.HTTPSocket;
 
 // Assumes a persistent HTTP connection
-public class JPIPSocket extends HTTPSocket {
+public class JPIPChannel extends HTTPChannel {
 
     // The jpip channel ID for the connection (persistent)
     private final String jpipChannelID;
 
     // private int totalLength = 0;
 
-    /**
-     * The path supplied on the uri line of the HTTP message. Generally for the
-     * first request it is the image path in relative terms, but the response
-     * could change it. The Kakadu server seems to change it to /jpip.
-     */
+    // The path supplied on the uri line of the HTTP message. Generally for the
+    // first request it is the image path in relative terms, but the response
+    // could change it. The Kakadu server seems to change it to /jpip.
     private String jpipPath;
 
     private static final String[] cnewParams = {"cid", "transport", "host", "path", "port", "auxport"};
 
-    public JPIPSocket(URI uri, JPIPCache cache) throws KduException, IOException {
+    public JPIPChannel(URI uri, JPIPCache cache) throws KduException, IOException {
         super(uri);
 
         jpipPath = uri.getPath();
@@ -59,7 +57,7 @@ public class JPIPSocket extends HTTPSocket {
             throw new IOException("The client only supports HTTP transport");
     }
 
-    // Closes the JPIPSocket
+    // Closes the JPIPChannel
     @Override
     public void close() throws IOException {
         if (isClosed())
@@ -98,9 +96,12 @@ public class JPIPSocket extends HTTPSocket {
         if (!"image/jpp-stream".equals(res.getHeader("Content-Type")))
             throw new IOException("Expected image/jpp-stream content");
 
-        TransferInputStream transferInput;
         String head = res.getHeader("Transfer-Encoding");
         String transferEncoding = head == null ? "" : head.toLowerCase();
+        head = res.getHeader("Content-Encoding");
+        String contentEncoding = head == null ? "" : head.toLowerCase();
+
+        TransferInputStream transferInput;
         switch (transferEncoding) {
             case "", "identity" -> {
                 String contentLength = res.getHeader("Content-Length");
@@ -115,8 +116,6 @@ public class JPIPSocket extends HTTPSocket {
         }
 
         InputStream input = transferInput;
-        head = res.getHeader("Content-Encoding");
-        String contentEncoding = head == null ? "" : head.toLowerCase();
         switch (contentEncoding) {
             case "":
             case "identity":
