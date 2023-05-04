@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.j2k.io.jpip;
+package org.helioviewer.jhv.view.j2k.jpip;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,8 +9,8 @@ import kdu_jni.KduException;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Regex;
-import org.helioviewer.jhv.view.j2k.io.http.HTTPChannel;
-import org.helioviewer.jhv.view.j2k.io.http.HTTPMessage;
+import org.helioviewer.jhv.view.j2k.jpip.http.HTTPChannel;
+import org.helioviewer.jhv.view.j2k.jpip.http.HTTPMessage;
 
 // Assumes a persistent HTTP connection
 public class JPIPChannel extends HTTPChannel {

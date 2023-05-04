@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.j2k.io.http;
+package org.helioviewer.jhv.view.j2k.jpip.http;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,16 +49,16 @@ public class HTTPChannel {
         }
     }
 
-    protected InputStream getStream(HTTPMessage res) throws IOException {
-        String head = res.getHeader("Transfer-Encoding");
+    protected InputStream getStream(HTTPMessage msg) throws IOException {
+        String head = msg.getHeader("Transfer-Encoding");
         String transferEncoding = head == null ? "" : head.toLowerCase();
-        head = res.getHeader("Content-Encoding");
+        head = msg.getHeader("Content-Encoding");
         String contentEncoding = head == null ? "" : head.toLowerCase();
 
         TransferInputStream transferInput;
         switch (transferEncoding) {
             case "", "identity" -> {
-                String contentLength = res.getHeader("Content-Length");
+                String contentLength = msg.getHeader("Content-Length");
                 try {
                     transferInput = new FixedSizedInputStream(inputStream, Integer.parseInt(contentLength));
                 } catch (Exception e) {
