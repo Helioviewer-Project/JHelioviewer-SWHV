@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.j2k.io.jpip;
+package org.helioviewer.jhv.view.j2k.jpip;
 
 /**
  * The class <code>JPIPConstants</code> is used to define several JPIP global

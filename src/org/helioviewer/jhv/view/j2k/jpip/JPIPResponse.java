@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.j2k.io.jpip;
+package org.helioviewer.jhv.view.j2k.jpip;
 
 import java.io.EOFException;
 import java.io.IOException;

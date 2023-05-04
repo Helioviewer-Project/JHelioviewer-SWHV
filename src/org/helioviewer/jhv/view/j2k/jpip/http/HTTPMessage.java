@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.j2k.io.http;
+package org.helioviewer.jhv.view.j2k.jpip.http;
 
 import java.util.HashMap;
 

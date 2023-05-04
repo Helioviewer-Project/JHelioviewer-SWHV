@@ -9,14 +9,14 @@ import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.view.j2k.cache.CacheStatus;
 import org.helioviewer.jhv.view.j2k.image.ReadParams;
 import org.helioviewer.jhv.view.j2k.image.ResolutionSet.ResolutionLevel;
-import org.helioviewer.jhv.view.j2k.io.jpip.DatabinMap;
-import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCache;
-import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCacheManager;
-import org.helioviewer.jhv.view.j2k.io.jpip.JPIPChannel;
-import org.helioviewer.jhv.view.j2k.io.jpip.JPIPConstants;
-import org.helioviewer.jhv.view.j2k.io.jpip.JPIPQuery;
-import org.helioviewer.jhv.view.j2k.io.jpip.JPIPResponse;
-import org.helioviewer.jhv.view.j2k.io.jpip.JPIPStream;
+import org.helioviewer.jhv.view.j2k.jpip.DatabinMap;
+import org.helioviewer.jhv.view.j2k.jpip.JPIPCache;
+import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
+import org.helioviewer.jhv.view.j2k.jpip.JPIPChannel;
+import org.helioviewer.jhv.view.j2k.jpip.JPIPConstants;
+import org.helioviewer.jhv.view.j2k.jpip.JPIPQuery;
+import org.helioviewer.jhv.view.j2k.jpip.JPIPResponse;
+import org.helioviewer.jhv.view.j2k.jpip.JPIPStream;
 
 class J2KReader implements Runnable {
 

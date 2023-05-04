@@ -34,7 +34,7 @@ import org.helioviewer.jhv.view.j2k.image.DecodeParams;
 import org.helioviewer.jhv.view.j2k.image.ReadParams;
 import org.helioviewer.jhv.view.j2k.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.jhv.view.j2k.image.SubImage;
-import org.helioviewer.jhv.view.j2k.io.jpip.JPIPCache;
+import org.helioviewer.jhv.view.j2k.jpip.JPIPCache;
 import org.helioviewer.jhv.view.j2k.kakadu.KakaduSource;
 
 import com.github.benmanes.caffeine.cache.Cache;
