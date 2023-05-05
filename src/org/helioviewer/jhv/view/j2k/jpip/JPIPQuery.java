@@ -7,10 +7,7 @@ public class JPIPQuery {
         StringBuilder buf = new StringBuilder();
         for (String val : values) {
             buf.append(val);
-            if (isKey)
-                buf.append('=');
-            else
-                buf.append('&');
+            buf.append(isKey ? '=' : '&');
             isKey = !isKey;
         }
         return buf + "len=" + len;

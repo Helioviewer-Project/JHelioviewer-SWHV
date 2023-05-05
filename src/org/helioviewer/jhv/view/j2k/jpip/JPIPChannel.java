@@ -30,7 +30,7 @@ public class JPIPChannel extends HTTPChannel {
 
         jpipPath = uri.getPath();
 
-        JPIPResponse res = send(JPIPQuery.create(512, "cnew", "http", "type", "jpp-stream", "tid", "0"), cache, 0); // deliberately short
+        JPIPResponse res = request(JPIPQuery.create(512, "cnew", "http", "type", "jpp-stream", "tid", "0"), cache, 0); // deliberately short
         String cnew = res.getCNew();
         if (cnew == null)
             throw new IOException("The header 'JPIP-cnew' was not sent by the server");
@@ -56,36 +56,32 @@ public class JPIPChannel extends HTTPChannel {
         if (isClosed())
             return;
 
-        // System.out.println(">>> total MB: " + (totalLength / (double) (1024 * 1024)));
         try {
             if (jpipChannelID != null)
-                send(JPIPQuery.create(0, "cclose", jpipChannelID));
-        } catch (IOException ignore) {
-            // no problem, server may have closed the socket
+                writeRequest(JPIPQuery.create(0, "cclose", jpipChannelID));
+        } catch (IOException ignore) { // no problem, server may have closed the socket
         } finally {
             super.close();
         }
     }
 
-    private void send(String queryStr) throws IOException {
+    private void writeRequest(String queryStr) throws IOException {
         // Add a necessary JPIP request field
         if (jpipChannelID != null && !queryStr.contains("cid=") && !queryStr.contains("cclose"))
             queryStr += "&cid=" + jpipChannelID;
 
-        // Build request to send
         HTTPMessage req = new HTTPMessage();
         req.setHeader("User-Agent", JHVGlobals.userAgent);
         req.setHeader("Connection", "keep-alive");
         req.setHeader("Accept-Encoding", "gzip");
         req.setHeader("Cache-Control", "no-cache");
         req.setHeader("Host", host);
-        queryStr = "GET " + jpipPath + '?' + queryStr + " HTTP/1.1\r\n" + req + "\r\n";
-        write(queryStr);
+        write("GET " + jpipPath + '?' + queryStr + " HTTP/1.1\r\n" + req + "\r\n");
     }
 
-    public JPIPResponse send(String queryStr, JPIPCache cache, int frame) throws KduException, IOException {
-        send(queryStr);
-        HTTPMessage res = recv();
+    public JPIPResponse request(String queryStr, JPIPCache cache, int frame) throws KduException, IOException {
+        writeRequest(queryStr);
+        HTTPMessage res = readHeader();
         if (!"image/jpp-stream".equals(res.getHeader("Content-Type")))
             throw new IOException("Expected image/jpp-stream content");
 

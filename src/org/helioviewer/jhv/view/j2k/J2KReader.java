@@ -68,13 +68,13 @@ class J2KReader implements Runnable {
             JPIPResponse res;
             String req = JPIPQuery.create(JPIPConstants.META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
             do {
-                res = channel.send(req, cache, 0);
+                res = channel.request(req, cache, 0);
             } while (!res.isResponseComplete());
 
             // prime first image
             req = JPIPQuery.create(JPIPConstants.MAX_REQUEST_LEN, "stream", "0", "fsiz", "64,64,closest", "rsiz", "64,64", "roff", "0,0");
             do {
-                res = channel.send(req, cache, 0);
+                res = channel.request(req, cache, 0);
             } while (!res.isResponseComplete() && !cache.isDataBinCompleted(mainHeaderKlass, 0, 0));
         } catch (Exception e) {
             initCloseChannel();
@@ -170,7 +170,7 @@ class J2KReader implements Runnable {
                         String key = view.getCacheKey(currentStep);
                         JPIPStream stream = key == null ? null : JPIPCacheManager.get(key, level);
                         if (stream == null) { // not in JPIP cache
-                            JPIPResponse res = channel.send(stepQuerys[currentStep], cache, currentStep);
+                            JPIPResponse res = channel.request(stepQuerys[currentStep], cache, currentStep);
                             if (res.isResponseComplete()) { // downloaded
                                 downloadComplete = true;
                                 if (key != null && (stream = cache.get(currentStep)) != null)

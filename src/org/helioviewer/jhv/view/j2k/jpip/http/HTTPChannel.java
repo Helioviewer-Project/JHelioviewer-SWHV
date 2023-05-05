@@ -63,7 +63,7 @@ public class HTTPChannel {
         };
     }
 
-    protected HTTPMessage recv() throws IOException {
+    protected HTTPMessage readHeader() throws IOException {
         String line = LineRead.readAsciiLine(inputStream);
         if (!"HTTP/1.1 200 OK".equals(line))
             throw new ProtocolException("Invalid HTTP response: " + line);
