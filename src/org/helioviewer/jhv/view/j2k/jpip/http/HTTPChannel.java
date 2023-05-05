@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.net.ProtocolException;
 import java.net.URI;
 import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.ByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.InflaterInputStream;
 import java.util.zip.GZIPInputStream;
@@ -16,7 +16,7 @@ public class HTTPChannel {
 
     private static final int PORT = 80;
 
-    private final SocketChannel channel;
+    private final ByteChannel channel;
 
     protected final InputStream inputStream;
     protected final String host;
