@@ -7,7 +7,6 @@ import java.util.HashMap;
 
 import kdu_jni.KduException;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.view.j2k.jpip.http.HTTPChannel;
 import org.helioviewer.jhv.view.j2k.jpip.http.HTTPMessage;
@@ -19,7 +18,6 @@ public class JPIPChannel extends HTTPChannel {
 
     // The jpip channel ID for the connection (persistent)
     private final String jpipChannelID;
-    private final String httpHeader;
 
     // The path supplied on the uri line of the HTTP message. Generally for the
     // first request it is the image path in relative terms, but the response
@@ -28,14 +26,6 @@ public class JPIPChannel extends HTTPChannel {
 
     public JPIPChannel(URI uri, JPIPCache cache) throws KduException, IOException {
         super(uri);
-
-        HTTPMessage req = new HTTPMessage();
-        req.setHeader("User-Agent", JHVGlobals.userAgent);
-        req.setHeader("Connection", "keep-alive");
-        req.setHeader("Accept-Encoding", "gzip");
-        req.setHeader("Cache-Control", "no-cache");
-        req.setHeader("Host", host);
-        httpHeader = " HTTP/1.1\r\n" + req + "\r\n";
 
         jpipPath = uri.getPath();
 
