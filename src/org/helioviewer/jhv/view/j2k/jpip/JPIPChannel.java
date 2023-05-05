@@ -17,6 +17,7 @@ public class JPIPChannel extends HTTPChannel {
 
     // The jpip channel ID for the connection (persistent)
     private final String jpipChannelID;
+    private final String httpHeader;
 
     // The path supplied on the uri line of the HTTP message. Generally for the
     // first request it is the image path in relative terms, but the response
@@ -27,6 +28,14 @@ public class JPIPChannel extends HTTPChannel {
 
     public JPIPChannel(URI uri, JPIPCache cache) throws KduException, IOException {
         super(uri);
+
+        HTTPMessage req = new HTTPMessage();
+        req.setHeader("User-Agent", JHVGlobals.userAgent);
+        req.setHeader("Connection", "keep-alive");
+        req.setHeader("Accept-Encoding", "gzip");
+        req.setHeader("Cache-Control", "no-cache");
+        req.setHeader("Host", host);
+        httpHeader = " HTTP/1.1\r\n" + req + "\r\n";
 
         jpipPath = uri.getPath();
 
@@ -69,14 +78,7 @@ public class JPIPChannel extends HTTPChannel {
         // Add a necessary JPIP request field
         if (jpipChannelID != null && !queryStr.contains("cid=") && !queryStr.contains("cclose"))
             queryStr += "&cid=" + jpipChannelID;
-
-        HTTPMessage req = new HTTPMessage();
-        req.setHeader("User-Agent", JHVGlobals.userAgent);
-        req.setHeader("Connection", "keep-alive");
-        req.setHeader("Accept-Encoding", "gzip");
-        req.setHeader("Cache-Control", "no-cache");
-        req.setHeader("Host", host);
-        write("GET " + jpipPath + '?' + queryStr + " HTTP/1.1\r\n" + req + "\r\n");
+        write("GET " + jpipPath + '?' + queryStr + httpHeader);
     }
 
     public JPIPResponse request(String queryStr, JPIPCache cache, int frame) throws KduException, IOException {
