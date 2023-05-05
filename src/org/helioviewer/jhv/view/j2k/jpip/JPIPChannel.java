@@ -15,6 +15,8 @@ import org.helioviewer.jhv.view.j2k.jpip.http.HTTPMessage;
 // Assumes a persistent HTTP connection
 public class JPIPChannel extends HTTPChannel {
 
+    private static final String[] cnewParams = {"cid", "transport", "host", "path", "port", "auxport"};
+
     // The jpip channel ID for the connection (persistent)
     private final String jpipChannelID;
     private final String httpHeader;
@@ -23,8 +25,6 @@ public class JPIPChannel extends HTTPChannel {
     // first request it is the image path in relative terms, but the response
     // could change it. The Kakadu server seems to change it to /jpip.
     private String jpipPath;
-
-    private static final String[] cnewParams = {"cid", "transport", "host", "path", "port", "auxport"};
 
     public JPIPChannel(URI uri, JPIPCache cache) throws KduException, IOException {
         super(uri);
