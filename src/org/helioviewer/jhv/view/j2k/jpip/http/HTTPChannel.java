@@ -27,6 +27,12 @@ public class HTTPChannel {
             int usedPort = port <= 0 ? PORT : port;
             String usedHost = uri.getHost();
 
+            channel = switch (uri.getScheme().toLowerCase()) {
+                case "jpip" -> JHVChannel.connect(usedHost, usedPort);
+                default -> throw new IOException("JPIP scheme not supported: " + uri);
+            };
+            inputStream = new ByteChannelInputStream(channel);
+
             HTTPMessage msg = new HTTPMessage();
             msg.setHeader("User-Agent", JHVGlobals.userAgent);
             msg.setHeader("Connection", "keep-alive");
@@ -35,8 +41,6 @@ public class HTTPChannel {
             msg.setHeader("Host", usedHost + ':' + usedPort);
             httpHeader = " HTTP/1.1\r\n" + msg + "\r\n";
 
-            channel = JHVChannel.connect(usedHost, usedPort);
-            inputStream = new ByteChannelInputStream(channel);
         } catch (Exception e) { // redirect all to IOException
             throw new IOException(e);
         }
