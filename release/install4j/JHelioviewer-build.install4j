@@ -119,7 +119,7 @@
             <actions>
               <action id="13" beanClass="com.install4j.runtime.beans.actions.misc.RequestPrivilegesAction" actionElevationType="none">
                 <serializedBean>
-                  <property name="obtainIfNormalWin" type="boolean" value="true" />
+                  <property name="obtainIfAdminWin" type="boolean" value="false" />
                 </serializedBean>
               </action>
             </actions>
