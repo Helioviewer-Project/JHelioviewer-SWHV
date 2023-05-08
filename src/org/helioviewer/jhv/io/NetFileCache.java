@@ -19,7 +19,7 @@ public class NetFileCache {
     private static final LoadingCache<URI, URI> cache = Caffeine.newBuilder().softValues().
             build(uri -> {
                 String scheme = uri.getScheme().toLowerCase();
-                if (scheme.equals("jpip") || scheme.equals("file"))
+                if (scheme.equals("jpip") || scheme.equals("jpips") || scheme.equals("file"))
                     return uri;
 
                 Path path = Files.createTempFile(JHVGlobals.fileCacheDir.toPath(), "jhv", null);

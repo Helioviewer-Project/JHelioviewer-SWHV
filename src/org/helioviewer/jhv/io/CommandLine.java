@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
@@ -23,6 +24,8 @@ public class CommandLine {
 
             -state   state file
                    Load state file.""";
+
+    private static final Set<String> uriSchemes = Set.of("jpip", "jpips", "http", "https", "file");
 
     private static String[] arguments;
 
@@ -64,9 +67,12 @@ public class CommandLine {
             try {
                 URI uri = new URI(opt);
                 String scheme = uri.getScheme();
-                if ("jpip".equals(scheme) || "http".equals(scheme) || "https".equals(scheme) || "file".equals(scheme))
+                if (scheme != null)
+                    scheme = scheme.toLowerCase();
+
+                if (uriSchemes.contains(scheme)) {
                     uris.add(uri);
-                else {
+                } else {
                     Path path = Path.of(opt);
                     if (Files.isReadable(path)) {
                         uris.add(path.toUri()); // toUri() is correct

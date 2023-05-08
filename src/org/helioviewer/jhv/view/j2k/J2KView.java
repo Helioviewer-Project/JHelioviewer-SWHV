@@ -78,9 +78,8 @@ public class J2KView extends BaseView {
         serial = incrementSerial();
 
         try {
-            String scheme = uri.getScheme().toLowerCase();
-            switch (scheme) {
-                case "jpip" -> {
+            switch (uri.getScheme().toLowerCase()) {
+                case "jpip", "jpips" -> {
                     jpipCache = new JPIPCache();
                     reader = new J2KReader(this);
                 }
@@ -88,7 +87,7 @@ public class J2KView extends BaseView {
                     jpipCache = null;
                     reader = null;
                 }
-                default -> throw new Exception(scheme + " scheme not supported!");
+                default -> throw new Exception("J2K scheme not supported: " + uri);
             }
 
             source = new KakaduSource(jpipCache, uri);
