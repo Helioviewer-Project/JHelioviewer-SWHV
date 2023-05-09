@@ -40,13 +40,12 @@ public class HTTPChannel {
             msg.setHeader("Cache-Control", "no-cache");
             msg.setHeader("Host", usedHost + ':' + usedPort);
             httpHeader = " HTTP/1.1\r\n" + msg + "\r\n";
-
         } catch (Exception e) { // redirect all to IOException
             throw new IOException(e);
         }
     }
 
-    protected InputStream getStream(HTTPMessage msg) throws IOException {
+    protected InputStream getInputStream(HTTPMessage msg) throws IOException {
         String head = msg.getHeader("Transfer-Encoding");
         String transferEncoding = head == null ? "" : head.toLowerCase();
         head = msg.getHeader("Content-Encoding");

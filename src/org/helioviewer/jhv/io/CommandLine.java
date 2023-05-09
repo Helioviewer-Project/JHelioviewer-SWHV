@@ -67,10 +67,8 @@ public class CommandLine {
             try {
                 URI uri = new URI(opt);
                 String scheme = uri.getScheme();
-                if (scheme != null)
-                    scheme = scheme.toLowerCase();
 
-                if (uriSchemes.contains(scheme)) {
+                if (scheme != null && uriSchemes.contains(scheme.toLowerCase())) {
                     uris.add(uri);
                 } else {
                     Path path = Path.of(opt);

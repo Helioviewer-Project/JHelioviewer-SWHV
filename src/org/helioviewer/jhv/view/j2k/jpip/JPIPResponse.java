@@ -21,7 +21,7 @@ public class JPIPResponse {
         cnew = _cnew;
     }
 
-    public String getCNew() {
+    String getCNew() {
         return cnew;
     }
 
