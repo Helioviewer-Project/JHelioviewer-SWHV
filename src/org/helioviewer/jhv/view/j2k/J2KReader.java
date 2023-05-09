@@ -12,10 +12,10 @@ import org.helioviewer.jhv.view.j2k.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.jhv.view.j2k.jpip.DatabinMap;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCache;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
-import org.helioviewer.jhv.view.j2k.jpip.JPIPChannel;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPConstants;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPQuery;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPResponse;
+import org.helioviewer.jhv.view.j2k.jpip.JPIPSocket;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPStream;
 
 class J2KReader implements Runnable {
@@ -24,11 +24,11 @@ class J2KReader implements Runnable {
 
     private final Thread myThread;
     private volatile boolean isAbolished;
-    private JPIPChannel channel;
+    private JPIPSocket socket;
 
     J2KReader(J2KView view) throws KduException, IOException {
         JPIPCache cache = view.getJPIPCache();
-        channel = new JPIPChannel(view.getURI(), cache);
+        socket = new JPIPSocket(view.getURI(), cache);
         initJPIP(cache);
 
         myThread = new Thread(this, "Reader " + view.getName());
@@ -47,8 +47,8 @@ class J2KReader implements Runnable {
 
         while (myThread.isAlive()) {
             try {
-                if (channel != null)
-                    channel.close(); // try to unblock i/o
+                if (socket != null)
+                    socket.close(); // try to unblock i/o
                 myThread.interrupt();
                 myThread.join(100);
             } catch (Exception e) { // avoid exit from loop
@@ -68,28 +68,28 @@ class J2KReader implements Runnable {
             JPIPResponse res;
             String req = JPIPQuery.create(JPIPConstants.META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
             do {
-                res = channel.request(req, cache, 0);
+                res = socket.request(req, cache, 0);
             } while (!res.isResponseComplete());
 
             // prime first image
             req = JPIPQuery.create(JPIPConstants.MAX_REQUEST_LEN, "stream", "0", "fsiz", "64,64,closest", "rsiz", "64,64", "roff", "0,0");
             do {
-                res = channel.request(req, cache, 0);
+                res = socket.request(req, cache, 0);
             } while (!res.isResponseComplete() && !cache.isDataBinCompleted(mainHeaderKlass, 0, 0));
         } catch (Exception e) {
-            initCloseChannel();
+            initCloseSocket();
             throw new IOException("Error in the server communication: " + e.getMessage(), e);
         }
     }
 
-    private void initCloseChannel() {
-        if (channel != null) {
+    private void initCloseSocket() {
+        if (socket != null) {
             try {
-                channel.close();
+                socket.close();
             } catch (IOException e) {
                 Log.error(e);
             }
-            channel = null;
+            socket = null;
         }
     }
 
@@ -131,9 +131,9 @@ class J2KReader implements Runnable {
             view.setDownloading(true);
 
             try {
-                if (channel.isClosed()) {
+                if (socket.isClosed()) {
                     // System.out.println(">>> reconnect");
-                    channel = new JPIPChannel(view.getURI(), cache);
+                    socket = new JPIPSocket(view.getURI(), cache);
                 }
                 // choose cache strategy
                 boolean singleFrame = numFrames <= 1 /* one frame */ || params.priority;
@@ -170,7 +170,7 @@ class J2KReader implements Runnable {
                         String key = view.getCacheKey(currentStep);
                         JPIPStream stream = key == null ? null : JPIPCacheManager.get(key, level);
                         if (stream == null) { // not in JPIP cache
-                            JPIPResponse res = channel.request(stepQuerys[currentStep], cache, currentStep);
+                            JPIPResponse res = socket.request(stepQuerys[currentStep], cache, currentStep);
                             if (res.isResponseComplete()) { // downloaded
                                 downloadComplete = true;
                                 if (key != null && (stream = cache.get(currentStep)) != null)
@@ -210,7 +210,7 @@ class J2KReader implements Runnable {
                 // suicide if fully done
                 if (cacheStatus.isComplete(0)) {
                     try {
-                        channel.close();
+                        socket.close();
                     } catch (IOException ignore) {
                     }
                     return;
@@ -222,9 +222,9 @@ class J2KReader implements Runnable {
                 }
             } catch (KduException | IOException e) {
                 try {
-                    channel.close();
+                    socket.close();
                 } catch (IOException ioe) {
-                    Log.error("Error closing JPIP channel", ioe);
+                    Log.error("Error closing JPIPSocket", ioe);
                 }
 
                 if (retries++ < 13)
