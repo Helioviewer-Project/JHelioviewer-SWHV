@@ -2,43 +2,55 @@ package org.helioviewer.jhv.view.j2k.jpip.http;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetSocketAddress;
 import java.net.ProtocolException;
+import java.net.Socket;
 import java.net.URI;
-import java.nio.ByteBuffer;
-import java.nio.channels.ByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.InflaterInputStream;
 import java.util.zip.GZIPInputStream;
 
+import javax.net.ssl.SSLSocketFactory;
+
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Regex;
+import org.helioviewer.jhv.io.ProxySettings;
 
 public class HTTPChannel {
 
-    private static final int PORT = 80;
+    private static final int TIMEOUT_CONNECT = 30000;
+    private static final int TIMEOUT_READ = 30000;
 
-    private final ByteChannel channel;
+    private final Socket socket;
     private final InputStream inputStream;
     protected final String httpHeader;
 
     protected HTTPChannel(URI uri) throws IOException {
         try {
-            int port = uri.getPort();
-            int usedPort = port <= 0 ? PORT : port;
-            String usedHost = uri.getHost();
+            String host = uri.getHost();
+            int port = uri.getPort() <= 0 ? 80 : uri.getPort();
 
-            channel = switch (uri.getScheme().toLowerCase()) {
-                case "jpip" -> JHVChannel.connect(usedHost, usedPort);
+            socket = switch (uri.getScheme().toLowerCase()) {
+                case "jpip" -> new Socket(ProxySettings.proxy);
+                case "jpips" -> SSLSocketFactory.getDefault().createSocket();
                 default -> throw new IOException("JPIP scheme not supported: " + uri);
             };
-            inputStream = new ByteChannelInputStream(channel);
+
+            socket.setReceiveBufferSize(Math.max(262144 * 8, 2 * socket.getReceiveBufferSize()));
+            socket.setTrafficClass(0x10);
+            socket.setSoTimeout(TIMEOUT_READ);
+            socket.setKeepAlive(true);
+            socket.setTcpNoDelay(true);
+            socket.connect(new InetSocketAddress(host, port), TIMEOUT_CONNECT);
+
+            inputStream = socket.getInputStream();
 
             HTTPMessage msg = new HTTPMessage();
             msg.setHeader("User-Agent", JHVGlobals.userAgent);
             msg.setHeader("Connection", "keep-alive");
             msg.setHeader("Accept-Encoding", "gzip");
             msg.setHeader("Cache-Control", "no-cache");
-            msg.setHeader("Host", usedHost + ':' + usedPort);
+            msg.setHeader("Host", host + ':' + port);
             httpHeader = " HTTP/1.1\r\n" + msg + "\r\n";
         } catch (Exception e) { // redirect all to IOException
             throw new IOException(e);
@@ -93,15 +105,15 @@ public class HTTPChannel {
     }
 
     protected void write(String str) throws IOException {
-        channel.write(ByteBuffer.wrap(str.getBytes(StandardCharsets.UTF_8)));
+        socket.getOutputStream().write(str.getBytes(StandardCharsets.UTF_8));
     }
 
     protected void close() throws IOException {
-        channel.close();
+        socket.close();
     }
 
     public boolean isClosed() {
-        return !channel.isOpen();
+        return socket.isClosed();
     }
 
 }
