@@ -58,13 +58,13 @@ public class HTTPSocket {
 
     protected InputStream getInputStream(HTTPMessage msg) throws IOException {
         String head = msg.getHeader("Transfer-Encoding");
-        String transferEncoding = head == null ? "" : head.toLowerCase();
+        String transferEncoding = head == null ? "identity" : head.toLowerCase();
         head = msg.getHeader("Content-Encoding");
-        String contentEncoding = head == null ? "" : head.toLowerCase();
+        String contentEncoding = head == null ? "identity" : head.toLowerCase();
 
         TransferInputStream transferInput;
         switch (transferEncoding) {
-            case "", "identity" -> {
+            case "identity" -> {
                 String contentLength = msg.getHeader("Content-Length");
                 try {
                     transferInput = new FixedSizedInputStream(inputStream, Integer.parseInt(contentLength));
@@ -77,7 +77,7 @@ public class HTTPSocket {
         }
 
         return switch (contentEncoding) {
-            case "", "identity" -> transferInput;
+            case "identity" -> transferInput;
             case "gzip" -> new GZIPInputStream(transferInput);
             case "deflate" -> new InflaterInputStream(transferInput);
             default -> throw new IOException("Unknown content encoding: " + contentEncoding);
