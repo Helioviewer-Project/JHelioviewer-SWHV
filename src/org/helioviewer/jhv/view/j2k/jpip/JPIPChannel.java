@@ -78,7 +78,7 @@ public class JPIPChannel extends HTTPChannel {
             throw new IOException("Expected image/jpp-stream content");
 
         JPIPResponse jpipRes = new JPIPResponse(res.getHeader("JPIP-cnew"));
-        try (InputStream in = getStream(res)) {
+        try (InputStream in = getInputStream(res)) {
             jpipRes.readSegments(in, cache, frame);
         }
 
