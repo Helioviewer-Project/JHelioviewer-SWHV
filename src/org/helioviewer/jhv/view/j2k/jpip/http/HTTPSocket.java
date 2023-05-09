@@ -3,7 +3,6 @@ package org.helioviewer.jhv.view.j2k.jpip.http;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
-import java.net.ProtocolException;
 import java.net.Socket;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -16,7 +15,7 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.ProxySettings;
 
-public class HTTPChannel {
+public class HTTPSocket {
 
     private static final int TIMEOUT_CONNECT = 30000;
     private static final int TIMEOUT_READ = 30000;
@@ -25,7 +24,7 @@ public class HTTPChannel {
     private final InputStream inputStream;
     protected final String httpHeader;
 
-    protected HTTPChannel(URI uri) throws IOException {
+    protected HTTPSocket(URI uri) throws IOException {
         try {
             String host = uri.getHost();
             int port = uri.getPort() <= 0 ? 80 : uri.getPort();
@@ -88,7 +87,7 @@ public class HTTPChannel {
     protected HTTPMessage readHeader() throws IOException {
         String line = LineRead.readAsciiLine(inputStream);
         if (!"HTTP/1.1 200 OK".equals(line))
-            throw new ProtocolException("Invalid HTTP response: " + line);
+            throw new IOException("Invalid HTTP response: " + line);
 
         // Parses HTTP headers
         HTTPMessage res = new HTTPMessage();
@@ -99,7 +98,7 @@ public class HTTPChannel {
 
             String[] parts = Regex.HttpField.split(line);
             if (parts.length != 2)
-                throw new ProtocolException("Invalid HTTP header field: " + line);
+                throw new IOException("Invalid HTTP header field: " + line);
             res.setHeader(parts[0], parts[1]);
         }
     }

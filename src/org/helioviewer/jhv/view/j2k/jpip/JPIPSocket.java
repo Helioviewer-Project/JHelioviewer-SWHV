@@ -8,11 +8,11 @@ import java.util.HashMap;
 import kdu_jni.KduException;
 
 import org.helioviewer.jhv.base.Regex;
-import org.helioviewer.jhv.view.j2k.jpip.http.HTTPChannel;
 import org.helioviewer.jhv.view.j2k.jpip.http.HTTPMessage;
+import org.helioviewer.jhv.view.j2k.jpip.http.HTTPSocket;
 
 // Assumes a persistent HTTP connection
-public class JPIPChannel extends HTTPChannel {
+public class JPIPSocket extends HTTPSocket {
 
     private static final String[] cnewParams = {"cid", "transport", "host", "path", "port", "auxport"};
 
@@ -24,7 +24,7 @@ public class JPIPChannel extends HTTPChannel {
     // could change it. The Kakadu server seems to change it to /jpip.
     private String jpipPath;
 
-    public JPIPChannel(URI uri, JPIPCache cache) throws KduException, IOException {
+    public JPIPSocket(URI uri, JPIPCache cache) throws KduException, IOException {
         super(uri);
 
         jpipPath = uri.getPath();
