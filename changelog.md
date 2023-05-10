@@ -1,7 +1,9 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.4.3 (pending)
+## JHelioviewer 4.5 (2023-05-10)
+
+- Capability for SSL connection to JPIP movie streaming server, required for GSFC server
 
 ## JHelioviewer 4.4.2 (2023-04-13)
 
