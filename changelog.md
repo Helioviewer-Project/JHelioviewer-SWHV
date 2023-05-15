@@ -3,6 +3,8 @@
 
 ## JHelioviewer 4.5.1 (pending)
 
+- Toolbar button for automatic image layers refresh every 15 minutes interval
+
 ## JHelioviewer 4.5 (2023-05-10)
 
 - Capability for SSL connection to JPIP movie streaming server, required for GSFC server
