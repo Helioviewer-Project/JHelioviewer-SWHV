@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.annotation.Nullable;
+import javax.swing.Timer;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
@@ -195,6 +196,38 @@ public class ImageLayers {
 
     public static void setDiffRotationMode(boolean b) {
         diffRotationMode = b;
+    }
+
+    private static final Timer refreshTimer;
+    private static final int timerDelay = 15 * (int) TimeUtils.MINUTE_IN_MILLIS;
+
+    static {
+        refreshTimer = new Timer(timerDelay, e -> refreshLayersSpan());
+        refreshTimer.setInitialDelay(0);
+    }
+
+    private static boolean refreshMode;
+
+    public static boolean getRefreshMode() {
+        return refreshMode;
+    }
+
+    public static void setRefreshMode(boolean b) {
+        refreshMode = b;
+        if (refreshMode)
+            refreshTimer.start();
+        else
+            refreshTimer.stop();
+    }
+
+    private static void refreshLayersSpan() {
+        long now = System.currentTimeMillis();
+        for (ImageLayer layer : Layers.getImageLayers()) {
+            APIRequest req = layer.getAPIRequest();
+            if (req != null) {
+                layer.load(new APIRequest(req.server(), req.sourceId(), now - (req.endTime() - req.startTime()), now, req.cadence()));
+            }
+        }
     }
 
 }

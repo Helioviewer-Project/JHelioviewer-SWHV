@@ -60,6 +60,7 @@ public class ToolBar extends JToolBar {
     private final ButtonText OFFDISK = new ButtonText(Buttons.offDisk, "Corona", "Toggle off-disk corona");
     private final ButtonText PAN = new ButtonText(Buttons.pan, "Pan", "Pan");
     private final ButtonText PROJECTION = new ButtonText(Buttons.projection, "Projection", "Projection");
+    private final ButtonText REFRESH = new ButtonText(Buttons.refresh, "Refresh", "Automatic refresh");
     private final ButtonText RESETCAMERA = new ButtonText(Buttons.resetCamera, "Reset View", "Reset view to default");
     private final ButtonText RESETCAMERAAXIS = new ButtonText(Buttons.resetCameraAxis, "Reset Axis", "Reset view axis");
     private final ButtonText ROTATE = new ButtonText(Buttons.rotate, "Rotate", "Rotate");
@@ -112,6 +113,7 @@ public class ToolBar extends JToolBar {
     private JideToggleButton coronaButton;
     private JideToggleButton diffRotationButton;
     private JideToggleButton multiviewButton;
+    private JideToggleButton refreshButton;
     private JideToggleButton trackingButton;
 
     public JideToggleButton getShowCoronaButton() {
@@ -124,6 +126,10 @@ public class ToolBar extends JToolBar {
 
     public JideToggleButton getMultiviewButton() {
         return multiviewButton;
+    }
+
+    public JideToggleButton getRefreshButton() {
+        return refreshButton;
     }
 
     public JideToggleButton getTrackingButton() {
@@ -276,6 +282,13 @@ public class ToolBar extends JToolBar {
                 annotationPopup.show(e.getComponent(), 0, e.getComponent().getHeight());
             }
         });
+
+        add(new JToolBar.Separator(dim));
+
+        refreshButton = toolToggleButton(REFRESH);
+        refreshButton.setSelected(ImageLayers.getRefreshMode());
+        refreshButton.addItemListener(e -> ImageLayers.setRefreshMode(refreshButton.isSelected()));
+        addButton(refreshButton);
 
         add(new JToolBar.Separator(dim));
 
