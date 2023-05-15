@@ -6,6 +6,7 @@
 ## JHelioviewer 4.5 (2023-05-10)
 
 - Capability for SSL connection to JPIP movie streaming server, required for GSFC server
+- Up to six layers in multiview
 
 ## JHelioviewer 4.4.2 (2023-04-13)
 
