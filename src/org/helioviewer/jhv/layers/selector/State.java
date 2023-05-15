@@ -50,6 +50,7 @@ public class State {
         main.put("multiview", JHVFrame.getToolBar().getMultiviewButton().isSelected());
         main.put("projection", Display.mode);
         main.put("tracking", JHVFrame.getToolBar().getTrackingButton().isSelected());
+        main.put("refresh", JHVFrame.getToolBar().getRefreshButton().isSelected());
         main.put("showCorona", JHVFrame.getToolBar().getShowCoronaButton().isSelected());
         main.put("differentialRotation", JHVFrame.getToolBar().getDiffRotationButton().isSelected());
         main.put("annotations", JHVFrame.getInteraction().saveAnnotations());
@@ -100,14 +101,14 @@ public class State {
 
     @Nullable
     private static Object json2Object(JSONObject json) {
-        JSONObject jdata = json.optJSONObject("data");
-        if (jdata == null)
+        JSONObject data = json.optJSONObject("data");
+        if (data == null)
             return null;
 
         try {
             Class<?> c = Class.forName(json.optString("className"));
             Constructor<?> cons = c.getConstructor(JSONObject.class);
-            return cons.newInstance(jdata);
+            return cons.newInstance(data);
         } catch (Exception e) {
             Log.error(e);
         }
@@ -115,13 +116,13 @@ public class State {
     }
 
     private static void loadTimelines(JSONObject data) {
-        ArrayList<TimelineLayer> newlist = new ArrayList<>();
+        ArrayList<TimelineLayer> newList = new ArrayList<>();
 
         for (Object o : data.getJSONArray("timelines")) {
             if (o instanceof JSONObject jo) {
                 try {
                     if (json2Object(jo) instanceof TimelineLayer layer) {
-                        newlist.add(layer);
+                        newList.add(layer);
                         layer.setEnabled(jo.optBoolean("enabled", true));
                     }
                 } catch (Exception e) { // don't stop for a broken one
@@ -130,7 +131,7 @@ public class State {
             }
         }
         Timelines.getLayers().clear();
-        newlist.forEach(layer -> Timelines.getLayers().add(layer));
+        newList.forEach(layer -> Timelines.getLayers().add(layer));
     }
 
     private static void loadLayers(JSONObject data) {
@@ -175,9 +176,10 @@ public class State {
 
         JHVTime time = new JHVTime(TimeUtils.optParse(data.optString("time"), Movie.getTime().milli));
         boolean tracking = data.optBoolean("tracking", JHVFrame.getToolBar().getTrackingButton().isSelected());
+        boolean refresh = data.optBoolean("refresh", JHVFrame.getToolBar().getRefreshButton().isSelected());
         boolean play = data.optBoolean("play", false);
 
-        EventQueueCallbackExecutor.pool.submit(new WaitLoad(newLayers.keySet()), new Callback(newLayers, masterLayer, time, tracking, play));
+        EventQueueCallbackExecutor.pool.submit(new WaitLoad(newLayers.keySet()), new Callback(newLayers, masterLayer, time, tracking, refresh, play));
     }
 
     private record WaitLoad(Set<ImageLayer> newLayers) implements Callable<Void> {
@@ -193,7 +195,7 @@ public class State {
     }
 
     private record Callback(Map<ImageLayer, Boolean> newLayers, ImageLayer masterLayer, JHVTime time, boolean tracking,
-                            boolean play) implements FutureCallback<Void> {
+                            boolean refresh, boolean play) implements FutureCallback<Void> {
 
         @Override
         public void onSuccess(Void result) {
@@ -207,6 +209,7 @@ public class State {
                 Layers.setActiveImageLayer(masterLayer);
             Movie.setTime(time);
             JHVFrame.getToolBar().getTrackingButton().setSelected(tracking);
+            JHVFrame.getToolBar().getRefreshButton().setSelected(refresh);
             if (play)
                 Movie.play();
         }
