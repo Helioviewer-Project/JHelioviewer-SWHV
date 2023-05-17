@@ -28,6 +28,7 @@ import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.jhv.gui.actions.ZoomInAction;
 import org.helioviewer.jhv.gui.actions.ZoomOneToOneAction;
 import org.helioviewer.jhv.gui.actions.ZoomOutAction;
+import org.helioviewer.jhv.io.HapiClient;
 import org.helioviewer.jhv.io.SampClient;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.MovieDisplay;
@@ -303,6 +304,11 @@ public class ToolBar extends JToolBar {
         }
 
         add(new JToolBar.Separator(dim));
+
+        ButtonText hText = new ButtonText("HAPI", "HAPI", "HAPI");
+        JideButton hButton  = toolButton(hText);
+        hButton.addActionListener(e -> HapiClient.submit());
+        addButton(hButton);
 
 /*
         for (Map.Entry<ButtonText, ActionListener> entry : pluginButtons.entrySet()) {
