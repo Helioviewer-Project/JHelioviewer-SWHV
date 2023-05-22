@@ -3,7 +3,7 @@ package org.helioviewer.jhv.timelines.band;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 
-public record DatesValues(long[] dates, float[][] values) {
+record DatesValues(long[] dates, float[][] values) {
 
     private static class Bin {
 
