@@ -57,9 +57,6 @@ public class CDFReader {
     private record BandData(BandType bandType, long[] dates, float[] values) {
     }
 
-    private record DatesValues(long[] dates, float[][] values) {
-    }
-
     private record CDFData(DatesValues datesValues, float scaleMin, float scaleMax, String scaleType, String units,
                            String[] labels) {
     }
@@ -109,7 +106,7 @@ public class CDFReader {
 
     private static List<BandData> readBandData(CDFVariable v, long[] dates, String instrumentName, CDFVariable[] variables, URI uri) throws IOException {
         CDFData data = readData(v, dates, instrumentName, variables, uri);
-        int numAxes = data.datesValues.values.length;
+        int numAxes = data.datesValues.values().length;
 
         List<BandData> ret = new ArrayList<>(numAxes);
         for (int i = 0; i < numAxes; i++) {
@@ -123,7 +120,7 @@ public class CDFReader {
                     put("label", name).
                     put("group", "CDF");
             //put("bandCacheType", "BandCacheAll");
-            ret.add(new BandData(new BandType(jo), data.datesValues.dates, data.datesValues.values[i]));
+            ret.add(new BandData(new BandType(jo), data.datesValues.dates(), data.datesValues.values()[i]));
         }
         return ret;
     }
@@ -229,10 +226,10 @@ public class CDFReader {
             default -> Float.parseFloat(dataScaleMax);
         };
 
-        DatesValues rebinned = rebin(new DatesValues(dates, values));
+        DatesValues rebinned = new DatesValues(dates, values).rebin();
         if ("SWA-PAS".equals(instrumentName) && "V_RTN".equals(variableName)) { // replace with velocity modulus
-            int rNumPoints = rebinned.dates.length;
-            float[][] rValues = rebinned.values;
+            int rNumPoints = rebinned.dates().length;
+            float[][] rValues = rebinned.values();
 
             float[][] modValues = new float[1][rNumPoints];
             for (int i = 0; i < rNumPoints; i++) {
@@ -245,14 +242,14 @@ public class CDFReader {
                     modValues[0][i] = (float) Math.sqrt(x * x + y * y + z * z);
             }
 
-            rebinned = new DatesValues(rebinned.dates, modValues);
+            rebinned = new DatesValues(rebinned.dates(), modValues);
             labels = new String[]{"Speed"};
         } else if ("SWA-PAS".equals(instrumentName) && "N".equals(variableName)) { // show log
             dataUnits = "cm^-3";
             dataScaleTyp = "logarithmic";
         } else if ("SWA-PAS".equals(instrumentName) && "T".equals(variableName)) { // transform to Kelvin + show log
-            int rNumPoints = rebinned.dates.length;
-            float[][] rValues = rebinned.values;
+            int rNumPoints = rebinned.dates().length;
+            float[][] rValues = rebinned.values();
             for (int i = 0; i < rNumPoints; i++) {
                 float v = rValues[0][i];
                 if (v != YAxis.BLANK)
@@ -261,8 +258,8 @@ public class CDFReader {
             dataUnits = "K";
             dataScaleTyp = "logarithmic";
         } else if ("MAG".equals(instrumentName) && variableName.startsWith("B_")) { // prepend column with modulus
-            int rNumPoints = rebinned.dates.length;
-            float[][] rValues = rebinned.values;
+            int rNumPoints = rebinned.dates().length;
+            float[][] rValues = rebinned.values();
 
             int rNumAxes = rValues.length;
             float[][] modValues = new float[rNumAxes + 1][];
@@ -277,7 +274,7 @@ public class CDFReader {
                     modValues[0][i] = (float) Math.sqrt(x * x + y * y + z * z);
             }
             System.arraycopy(rValues, 0, modValues, 1, rNumAxes);
-            rebinned = new DatesValues(rebinned.dates, modValues);
+            rebinned = new DatesValues(rebinned.dates(), modValues);
 
             String[] modLabels = new String[rNumAxes + 1];
             modLabels[0] = variableName + ' ' + "|B|";
@@ -285,63 +282,6 @@ public class CDFReader {
             labels = modLabels;
         }
         return new CDFData(rebinned, scaleMin, scaleMax, dataScaleTyp, dataUnits, labels);
-    }
-
-    private static class Bin {
-
-        private int n = 0;
-        private float mean = 0;
-
-        void add(float val) {
-            if (val != YAxis.BLANK) {
-                n++;
-                mean += (val - mean) / n;
-            }
-        }
-
-        float getMean() {
-            return n == 0 ? YAxis.BLANK : mean;
-        }
-
-    }
-
-    private static DatesValues rebin(DatesValues datesValues) {
-        long[] dates = datesValues.dates;
-        float[][] values = datesValues.values;
-        int numAxes = values.length;
-        int numPoints = values[0].length;
-        if (numPoints == 0)
-            return datesValues;
-
-        long rebinFactor = TimeUtils.MINUTE_IN_MILLIS;
-        long startBin = dates[0] / rebinFactor;
-        long endBin = dates[dates.length - 1] / rebinFactor;
-        int numBins = (int) (endBin - startBin + 1);
-
-        Bin[][] bins = new Bin[numAxes][numBins];
-        for (int j = 0; j < numAxes; j++) {
-            for (int i = 0; i < numBins; i++) {
-                bins[j][i] = new Bin();
-            }
-        }
-        for (int j = 0; j < numAxes; j++) {
-            for (int i = 0; i < numPoints; i++) {
-                bins[j][(int) (dates[i] / rebinFactor - startBin)].add(values[j][i]);
-            }
-        }
-
-        long[] datesBinned = new long[numBins];
-        for (int i = 0; i < numBins; i++) {
-            datesBinned[i] = (startBin + i) * rebinFactor;
-        }
-        float[][] valuesBinned = new float[numAxes][numBins];
-        for (int j = 0; j < numAxes; j++) {
-            for (int i = 0; i < numBins; i++) {
-                valuesBinned[j][i] = bins[j][i].getMean();
-            }
-        }
-
-        return new DatesValues(datesBinned, valuesBinned);
     }
 
     private static String[][] readCDFVariableString(Variable v) throws IOException {
