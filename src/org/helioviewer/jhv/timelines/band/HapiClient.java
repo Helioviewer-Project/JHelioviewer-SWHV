@@ -3,6 +3,7 @@ package org.helioviewer.jhv.timelines.band;
 import java.io.Reader;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
@@ -11,10 +12,13 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.time.TimeUtils;
+import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import com.google.common.util.concurrent.FutureCallback;
 
 public class HapiClient {
@@ -34,7 +38,10 @@ public class HapiClient {
         @Override
         public DatesValues call() throws Exception {
             URI infoURI = new URI(server + "/info?id=" + id + "&parameters=" + parameters);
-            JSONUtils.get(infoURI);
+            HapiParameter[] pars = parseInfo(JSONUtils.get(infoURI));
+            String timeFill = pars[0].fill();
+            String valueFill = pars[1].fill();
+            int valueDim = pars[1].size[0];
 
             ArrayList<Long> dates = new ArrayList<>();
             ArrayList<float[]> values = new ArrayList<>();
@@ -42,15 +49,73 @@ public class HapiClient {
             URI dataURI = new URI(server + "/data?id=" + id + "&parameters=" + parameters + "&time.min=" + startTime + "&time.max=" + endTime);
             try (NetClient nc = NetClient.of(dataURI); Reader reader = nc.getReader()) {
                 for (CSVRecord rec : CSVFormat.DEFAULT.parse(reader)) {
-                    long milli = TimeUtils.optParse(rec.get(0), Long.MIN_VALUE);
+                    String time = rec.get(0);
+                    if (timeFill.equals(time))
+                        continue;
+
+                    long milli = TimeUtils.optParse(time, Long.MIN_VALUE);
                     if (milli > TimeUtils.MINIMAL_TIME.milli && milli < TimeUtils.MAXIMAL_TIME.milli) {
+                        float[] valueArray = new float[valueDim];
+                        for (int i = 0; i < valueDim; i++) {
+                            String str = rec.get(1 + i);
+                            if (valueFill.equals(str)) {
+                                Arrays.fill(valueArray, YAxis.BLANK);
+                                break;
+                            }
+                            valueArray[i] = Float.parseFloat(str);
+                        }
+
                         dates.add(milli);
-                        values.add(new float[]{Float.parseFloat(rec.get(1)), Float.parseFloat(rec.get(2)), Float.parseFloat(rec.get(3))});
+                        values.add(valueArray);
                     }
                 }
             }
             return new DatesValues(dates.stream().mapToLong(i -> i).toArray(), values.toArray(float[][]::new));
         }
+    }
+
+    private static HapiParameter[] parseInfo(JSONObject jo) throws Exception {
+        try {
+            if (!"2.0".equals(jo.getString("HAPI")))
+                throw new Exception("version");
+            JSONObject status = jo.getJSONObject("status");
+            if (1200 != status.getInt("code") && !"OK".equals(status.getString("message")))
+                throw new Exception("status");
+            JSONArray parameters = jo.getJSONArray("parameters");
+            if (parameters.length() != 2)
+                throw new Exception("parameters number");
+            JSONObject par1 = parameters.getJSONObject(0);
+            JSONObject par2 = parameters.getJSONObject(1);
+            HapiParameter[] pars = new HapiParameter[]{
+                    new HapiParameter(par1.getString("name"), par1.getString("type"), par1.getString("units"), par1.optString("fill", "null"), getSize(par1)),
+                    new HapiParameter(par2.getString("name"), par2.getString("type"), par2.getString("units"), par2.optString("fill", "null"), getSize(par2)),
+            };
+            if (!"Time".equals(pars[0].name()) || !"isotime".equals(pars[0].type()) || !"UTC".equals(pars[0].units()))
+                throw new Exception("time parameter");
+            if (1 != pars[1].size().length)
+                throw new Exception("parameter dimension");
+
+            return pars;
+        } catch (Exception e) {
+            throw new Exception("HAPI Info: " + e.getMessage() + ":\n" + jo);
+        }
+    }
+
+    private static final int[] size1 = new int[]{1};
+
+    private static int[] getSize(JSONObject par) {
+        JSONArray ja = par.optJSONArray("size");
+        if (ja == null)
+            return size1;
+
+        int length = ja.length();
+        int[] ret = new int[length];
+        for (int i = 0; i < length; i++)
+            ret[i] = ja.getInt(i);
+        return ret;
+    }
+
+    private record HapiParameter(String name, String type, String units, String fill, int[] size) {
     }
 
     interface Receiver {
@@ -76,8 +141,12 @@ public class HapiClient {
         public void setHapiResponse(DatesValues dvs) {
             long[] dates = dvs.dates();
             float[][] values = dvs.values();
-            for (int i = 0; i < dates.length; i++) {
-                System.out.printf("%s %s %s %s%n", TimeUtils.format(dates[i]), values[i][0], values[i][1], values[i][2]);
+            for (int j = 0; j < dates.length; j++) {
+                StringBuilder sb = new StringBuilder(TimeUtils.format(dates[j]));
+                for (int i = 0; i < values[j].length; i++) {
+                    sb.append(' ').append(values[j][i]);
+                }
+                System.out.println(sb);
             }
         }
     }
