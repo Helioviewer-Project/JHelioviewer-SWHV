@@ -45,7 +45,7 @@ public class SoarClient {
 
         for (DataItem item : items) {
             try {
-                URI uri = new URI(LOAD_URL + item.id);
+                URI uri = new URI(LOAD_URL + URLEncoder.encode(item.id, StandardCharsets.UTF_8));
                 switch (item.format) {
                     case CDF -> cdfUris.add(uri);
                     case FITS -> fitsUris.add(uri);
