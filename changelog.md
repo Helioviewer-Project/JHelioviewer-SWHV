@@ -3,7 +3,7 @@
 
 ## JHelioviewer 4.5.1 (pending)
 
-- Toolbar button for automatic image layers refresh every 15 minutes interval
+- Toolbar button for automatic image layers refresh to current data every 15 minutes
 
 ## JHelioviewer 4.5 (2023-05-10)
 
