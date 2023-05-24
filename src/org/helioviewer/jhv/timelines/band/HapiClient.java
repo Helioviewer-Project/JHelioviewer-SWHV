@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.timelines.band;
 
-import java.io.Reader;
+import java.io.BufferedReader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,7 +9,6 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.YAxis;
@@ -37,17 +36,25 @@ public class HapiClient {
                             String endTime) implements Callable<DatesValues> {
         @Override
         public DatesValues call() throws Exception {
-            URI infoURI = new URI(server + "/info?id=" + id + "&parameters=" + parameters);
-            HapiParameter[] pars = parseInfo(JSONUtils.get(infoURI));
-            String timeFill = pars[0].fill();
-            String valueFill = pars[1].fill();
-            int valueDim = pars[1].size[0];
-
             ArrayList<Long> dates = new ArrayList<>();
             ArrayList<float[]> values = new ArrayList<>();
 
-            URI dataURI = new URI(server + "/data?id=" + id + "&parameters=" + parameters + "&time.min=" + startTime + "&time.max=" + endTime);
-            try (NetClient nc = NetClient.of(dataURI); Reader reader = nc.getReader()) {
+            URI dataURI = new URI(server + "/data?include=header&id=" + id + "&parameters=" + parameters + "&time.min=" + startTime + "&time.max=" + endTime);
+            try (NetClient nc = NetClient.of(dataURI); BufferedReader reader = new BufferedReader(nc.getReader())) {
+                StringBuilder sb = new StringBuilder();
+                String line;
+                reader.mark(0);
+                while ((line = reader.readLine()) != null && line.startsWith("#")) {
+                    sb.append(line.substring(1));
+                    reader.mark(0);
+                }
+                reader.reset();
+
+                HapiParameter[] pars = parseInfo(new JSONObject(sb.toString()));
+                String timeFill = pars[0].fill();
+                String valueFill = pars[1].fill();
+                int valueDim = pars[1].size[0];
+
                 for (CSVRecord rec : CSVFormat.DEFAULT.parse(reader)) {
                     String time = rec.get(0);
                     if (timeFill.equals(time))
