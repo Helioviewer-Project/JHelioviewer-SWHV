@@ -60,7 +60,7 @@ public class HapiClient {
                     if (timeFill.equals(time))
                         continue;
 
-                    long milli = TimeUtils.optParse(time, Long.MIN_VALUE);
+                    long milli = TimeUtils.parseZ(time);
                     if (milli > TimeUtils.MINIMAL_TIME.milli && milli < TimeUtils.MAXIMAL_TIME.milli) {
                         float[] valueArray = new float[valueDim];
                         for (int i = 0; i < valueDim; i++) {
