@@ -51,8 +51,8 @@ public class HapiClient {
                 reader.reset();
 
                 HapiParameter[] pars = parseInfo(new JSONObject(sb.toString()));
-                String timeFill = pars[0].fill();
-                String valueFill = pars[1].fill();
+                String timeFill = pars[0].fill;
+                String valueFill = pars[1].fill;
                 int valueDim = pars[1].size[0];
 
                 for (CSVRecord rec : CSVFormat.DEFAULT.parse(reader)) {
@@ -94,12 +94,20 @@ public class HapiClient {
             JSONObject par1 = parameters.getJSONObject(0);
             JSONObject par2 = parameters.getJSONObject(1);
             HapiParameter[] pars = new HapiParameter[]{
-                    new HapiParameter(par1.getString("name"), par1.getString("type"), par1.getString("units"), par1.optString("fill", "null"), getSize(par1)),
-                    new HapiParameter(par2.getString("name"), par2.getString("type"), par2.getString("units"), par2.optString("fill", "null"), getSize(par2)),
+                    new HapiParameter(par1.getString("name"),
+                            getHapiType(par1.getString("type")),
+                            par1.getString("units"),
+                            par1.optString("fill", "null"),
+                            getHapiSize(par1.optJSONArray("size"))),
+                    new HapiParameter(par2.getString("name"),
+                            getHapiType(par2.getString("type")),
+                            par2.getString("units"),
+                            par2.optString("fill", "null"),
+                            getHapiSize(par2.optJSONArray("size"))),
             };
-            if (!"Time".equals(pars[0].name()) || !"isotime".equals(pars[0].type()) || !"UTC".equals(pars[0].units()))
+            if (!"Time".equals(pars[0].name) || pars[0].type != HapiType.ISOTIME || !"UTC".equals(pars[0].units))
                 throw new Exception("time parameter");
-            if (1 != pars[1].size().length)
+            if (1 != pars[1].size.length)
                 throw new Exception("parameter dimension");
 
             return pars;
@@ -110,8 +118,7 @@ public class HapiClient {
 
     private static final int[] size1 = new int[]{1};
 
-    private static int[] getSize(JSONObject par) {
-        JSONArray ja = par.optJSONArray("size");
+    private static int[] getHapiSize(JSONArray ja) {
         if (ja == null)
             return size1;
 
@@ -122,7 +129,18 @@ public class HapiClient {
         return ret;
     }
 
-    private record HapiParameter(String name, String type, String units, String fill, int[] size) {
+    private enum HapiType {ISOTIME, STRING, NUMBER}
+
+    private static HapiType getHapiType(String type) throws Exception {
+        return switch (type) {
+            case "isotime" -> HapiType.ISOTIME;
+            case "string" -> HapiType.STRING;
+            case "integer", "double" -> HapiType.NUMBER;
+            default -> throw new Exception("Unknown HAPI type: " + type);
+        };
+    }
+
+    private record HapiParameter(String name, HapiType type, String units, String fill, int[] size) {
     }
 
     interface Receiver {
