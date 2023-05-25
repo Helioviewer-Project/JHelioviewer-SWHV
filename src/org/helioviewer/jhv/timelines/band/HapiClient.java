@@ -20,32 +20,34 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import com.google.common.util.concurrent.FutureCallback;
 
+import org.helioviewer.jhv.io.Load;
+import org.helioviewer.jhv.gui.components.MoviePanel;
+
 public class HapiClient {
 
     public static void submit() {
+/*
         String server = "https://cdaweb.gsfc.nasa.gov/hapi" + "/data?include=header&format=csv";
-        String id = "SOLO_L2_MAG-RTN-NORMAL-1-MINUTE";
+        String dataset = "SOLO_L2_MAG-RTN-NORMAL-1-MINUTE";
         String parameters = "B_RTN";
         String startTime = "2022-01-01T00:00:00";
         String endTime = "2022-01-02T00:00:00";
-/*
-        String server = "https://api.helioviewer.org/hapi" + "/data?include=header&format=csv";
-        String id = "AIA_304";
-        String parameters = "jp2_url";
-        String startTime = "2022-01-01T00:00:00";
-        String endTime = "2022-01-02T00:00:00";
 */
-        EventQueueCallbackExecutor.pool.submit(new LoadHapi(server, id, parameters, startTime, endTime), new Callback(server, new HapiReceiver()));
+        String server = "https://api.helioviewer.org/hapi" + "/data?include=header&format=csv";
+        String dataset = "AIA_171";
+        String parameters = "jp2_url";
+        long end = MoviePanel.getInstance().getEndTime();
+        String startTime = TimeUtils.format(end - 2 * 60 * TimeUtils.MINUTE_IN_MILLIS);
+        String endTime = TimeUtils.format(end);
+
+        EventQueueCallbackExecutor.pool.submit(new LoadHapi(server, dataset, parameters, startTime, endTime), new Callback(server, new HapiReceiver()));
     }
 
-    private record LoadHapi(String server, String id, String parameters, String startTime,
+    private record LoadHapi(String server, String dataset, String parameters, String startTime,
                             String endTime) implements Callable<DatesValues> {
         @Override
         public DatesValues call() throws Exception {
-            ArrayList<Long> dates = new ArrayList<>();
-            ArrayList<float[]> values = new ArrayList<>();
-
-            URI dataURI = new URI(server + "&id=" + id + "&parameters=" + parameters + "&time.min=" + startTime + "&time.max=" + endTime);
+            URI dataURI = new URI(server + "&id=" + dataset + "&parameters=" + parameters + "&time.min=" + startTime + "&time.max=" + endTime);
             try (NetClient nc = NetClient.of(dataURI); BufferedReader reader = new BufferedReader(nc.getReader())) {
                 StringBuilder sb = new StringBuilder();
                 String line;
@@ -61,6 +63,9 @@ public class HapiClient {
                 String valueFill = pars[1].fill;
                 int valueDim = pars[1].size[0];
 
+                ArrayList<Long> dates = new ArrayList<>();
+                ArrayList<float[]> values = new ArrayList<>();
+                ArrayList<URI> uris = new ArrayList<>();
                 for (CSVRecord rec : CSVFormat.DEFAULT.parse(reader)) {
                     String time = rec.get(0);
                     if (timeFill.equals(time))
@@ -68,22 +73,29 @@ public class HapiClient {
 
                     long milli = TimeUtils.parseZ(time);
                     if (milli > TimeUtils.MINIMAL_TIME.milli && milli < TimeUtils.MAXIMAL_TIME.milli) {
-                        float[] valueArray = new float[valueDim];
-                        for (int i = 0; i < valueDim; i++) {
-                            String str = rec.get(1 + i);
-                            if (valueFill.equals(str)) {
-                                Arrays.fill(valueArray, YAxis.BLANK);
-                                break;
+                        if (pars[1].type == HapiType.STRING) {
+                            String str = rec.get(1);
+                            if (!valueFill.equals(str))
+                                uris.add(new URI(str));
+                        } else {
+                            float[] valueArray = new float[valueDim];
+                            for (int i = 0; i < valueDim; i++) {
+                                String str = rec.get(1 + i);
+                                if (valueFill.equals(str)) {
+                                    Arrays.fill(valueArray, YAxis.BLANK);
+                                    break;
+                                }
+                                valueArray[i] = Float.parseFloat(str);
                             }
-                            valueArray[i] = Float.parseFloat(str);
+                            dates.add(milli);
+                            values.add(valueArray);
                         }
-
-                        dates.add(milli);
-                        values.add(valueArray);
                     }
                 }
+                //System.out.println(">>> " + uris.size());
+                Load.Image.getAll(uris);
+                return new DatesValues(dates.stream().mapToLong(i -> i).toArray(), values.toArray(float[][]::new));
             }
-            return new DatesValues(dates.stream().mapToLong(i -> i).toArray(), values.toArray(float[][]::new));
         }
     }
 
@@ -163,6 +175,7 @@ public class HapiClient {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
+            t.printStackTrace();
             Log.error(server, t);
         }
 
