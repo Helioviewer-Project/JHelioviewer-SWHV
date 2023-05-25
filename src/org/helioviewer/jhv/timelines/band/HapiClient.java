@@ -23,12 +23,18 @@ import com.google.common.util.concurrent.FutureCallback;
 public class HapiClient {
 
     public static void submit() {
-        String server = "https://cdaweb.gsfc.nasa.gov/hapi";
+        String server = "https://cdaweb.gsfc.nasa.gov/hapi" + "/data?include=header&format=csv";
         String id = "SOLO_L2_MAG-RTN-NORMAL-1-MINUTE";
         String parameters = "B_RTN";
         String startTime = "2022-01-01T00:00:00";
         String endTime = "2022-01-02T00:00:00";
-
+/*
+        String server = "https://api.helioviewer.org/hapi" + "/data?include=header&format=csv";
+        String id = "AIA_304";
+        String parameters = "jp2_url";
+        String startTime = "2022-01-01T00:00:00";
+        String endTime = "2022-01-02T00:00:00";
+*/
         EventQueueCallbackExecutor.pool.submit(new LoadHapi(server, id, parameters, startTime, endTime), new Callback(server, new HapiReceiver()));
     }
 
@@ -39,7 +45,7 @@ public class HapiClient {
             ArrayList<Long> dates = new ArrayList<>();
             ArrayList<float[]> values = new ArrayList<>();
 
-            URI dataURI = new URI(server + "/data?include=header&id=" + id + "&parameters=" + parameters + "&time.min=" + startTime + "&time.max=" + endTime);
+            URI dataURI = new URI(server + "&id=" + id + "&parameters=" + parameters + "&time.min=" + startTime + "&time.max=" + endTime);
             try (NetClient nc = NetClient.of(dataURI); BufferedReader reader = new BufferedReader(nc.getReader())) {
                 StringBuilder sb = new StringBuilder();
                 String line;
@@ -83,7 +89,8 @@ public class HapiClient {
 
     private static HapiParameter[] parseInfo(JSONObject jo) throws Exception {
         try {
-            if (!"2.0".equals(jo.getString("HAPI")))
+            double version = jo.getDouble("HAPI");
+            if (version > 3.1 || version < 2.0)
                 throw new Exception("version");
             JSONObject status = jo.getJSONObject("status");
             if (1200 != status.getInt("code") && !"OK".equals(status.getString("message")))
@@ -105,7 +112,7 @@ public class HapiClient {
                             par2.optString("fill", "null"),
                             getHapiSize(par2.optJSONArray("size"))),
             };
-            if (!"Time".equals(pars[0].name) || pars[0].type != HapiType.ISOTIME || !"UTC".equals(pars[0].units))
+            if (pars[0].type != HapiType.ISOTIME || !"UTC".equals(pars[0].units))
                 throw new Exception("time parameter");
             if (1 != pars[1].size.length)
                 throw new Exception("parameter dimension");
