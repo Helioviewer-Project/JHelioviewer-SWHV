@@ -16,8 +16,9 @@
         <include name="lib/**/*.jar"/>
     </fileset>
     <loadfile property="version" srcFile="VERSION"/>
-    <exec executable="git" outputproperty="revision">
-        <arg line="rev-list --count HEAD"/>
+    <exec executable="sh" outputproperty="revision">
+        <arg value="-c"/>
+        <arg value="git rev-list --count HEAD || echo 0"/>
     </exec>
 
     <target name="clean">
