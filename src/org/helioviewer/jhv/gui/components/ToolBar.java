@@ -32,7 +32,7 @@ import org.helioviewer.jhv.io.SampClient;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Vec3;
-import org.helioviewer.jhv.timelines.band.HapiClient;
+//import org.helioviewer.jhv.timelines.band.HapiClient;
 
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideToggleButton;
@@ -304,12 +304,12 @@ public class ToolBar extends JToolBar {
         }
 
         add(new JToolBar.Separator(dim));
-
+/*
         ButtonText hText = new ButtonText("HAPI", "HAPI", "HAPI");
         JideButton hButton  = toolButton(hText);
         hButton.addActionListener(e -> HapiClient.submit());
         addButton(hButton);
-
+*/
 /*
         for (Map.Entry<ButtonText, ActionListener> entry : pluginButtons.entrySet()) {
             JideButton b = toolButton(entry.getKey());
