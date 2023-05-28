@@ -1144,7 +1144,7 @@ return true;</property>
       </exclude>
       <postInstallScript>${compiler:file("./resources/linux-post-install.sh")}</postInstallScript>
     </linuxDeb>
-    <linuxRPM name="Linux RPM 64 bit" id="270" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_amd64" arch="amd64">
+    <linuxRPM name="Linux RPM 64 bit" id="270" mediaFileName="${compiler:sys.shortName}.${compiler:sys.version}.x86_64" arch="x86_64">
       <excludedLaunchers>
         <launcher id="24" />
       </excludedLaunchers>
