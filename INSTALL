@@ -3,128 +3,55 @@
 **************************
 
 JHelioviewer is written in Java. In order to build the whole project you need
-Apache Ant.  However Eclipse can be used during the development phase.
+Apache Ant.
 
-JHelioviewer uses the version control system Bazaar in order to keep track of
-revisions, releases, milestones, bugs and blueprints.
+JHelioviewer uses the git version control system in order to keep track of
+revisions and releases.
 
-The source code is hosted on Launchpad:
+The source code is hosted on GitHub:
 
-https://launchpad.net/jhelioviewer
-
-This document serves only as a quick reference for building the source code.
-More detailed instructions as well as development guidelines and information can
-be found on:
-
-http://wiki.helioviewer.org/wiki/JHelioviewer_Development_Information
-
+https://github.com/Helioviewer-Project/JHelioviewer-SWHV
 
 Build instructions
 -------------------
 
 I) Get the source code. There are two alternatives:
-   
-   a) Get the latest trunk using Bazaar (http://bazaar.canonical.com/en/):
-   
-        1.) Install Bazaar
-        
+
+    - https://github.com/Helioviewer-Project/JHelioviewer-SWHV.git
+
+   a) Get the latest trunk using git:
+
+        1.) Install git
+
         2.) Choose a destination directory for the source code
 
-	3.) Open a terminal and type: 
+	3.) Open a terminal and type:
 
-            bzr branch lp:jhelioviewer ${PATH_TO_DESTINATION_DIRECTORY}
+            git clone https://github.com/Helioviewer-Project/JHelioviewer-SWHV.git ${PATH_TO_DESTINATION_DIRECTORY}
 
-   b) Get the source code of the latest release from
-		http://www.jhelioviewer.org/ and extract the archive to a
-		directory of your choice
+   b) Get the source code of the latest trunk from
+            https://github.com/Helioviewer-Project/JHelioviewer-SWHV/archive/refs/heads/master.zip
+		and extract the archive to a directory of your choice
 
 II) Build the source code with Ant (http://ant.apache.org/)
 
     1.) Open a terminal and change to the directory containing the source code
 	and the ant buildfile (build.xml)
 
-    2.) The following ant targets exist
+    2.) The following ant targets exist:
 
            ant                   - just builds JHelioviewer.jar
 
-	   ant release-all       - builds all release files for all platforms
-	                           including JHelioviewer.jar and a package
-	                           containing the source code. DMGs can only be
-	                           built on MacOS. Note that you need to have
-	                           checked out the source with bazaar in order
-	                           to package the source code
-			
-           ant release-no-src    - the same as release-all except that the
-	                           source code is not packaged.  Use this if you
-	                           downloaded the source from the website
-	      
-           ant release-windows   - build JHelioviewer-Setup.exe
-
-           ant release-tar       - build JHelioviewer.tar.gz
-			
-           ant release-mac       - build JHelioviewer.dmg containing
-                                   JHelioviewer.app
-
-           ant doc               - build the java documentation
+           ant prone             - run Error Prone static analysis tool on the source tree
 
            ant clean             - delete temporary build files. You should only
 			           do this when necessary because the build
 			           process is much faster if not all files have
 			           to be built again
 
-III) Other Notes
+    3.) The Java Development Kit version 19 or later has to be installed and present in the PATH.
 
-    1.)  If you want to start JHelioviewer from a JNLP file from inside a web
-	 browser you need to sign JHelioviewer.jar
-	 (http://java.sun.com/developer/technicalArticles/Programming/jnlp/). To
-	 do so you can set a special property when starting ant:
+    4.) After the source is built, the program can be run by executing the following
+    command:
 
-	   ant -Dsign.jar=true release-all
-	
-         You will be asked for your keystore, keystore password, alias and
-	 private key password during the build process. Alternatively you can
-	 pass these information as properties:
-			
-           ant -Dsign.jar=true "-Dsign.keystore=${MY_KEY_STORE}" \
-               "-Dsign.storepass=${MY_STORE_PASSWORD}" \
-               "-Dsign.alias=${MY_ALIAS}" \
-               "-Dsign.keypass=${MY_KEY_PASSWORD}" \
-               release-all
-	
-    2.)  If you do not want to recompile the source code and just want to bundle
-	 the existing binaries type:
-
-           ant bundle-all        - generates all release files including source
-                                   code package)
-	   
-           ant bundle-no-src     - the same as bundle-all except that the source
-                                   code is not packaged)
-	
-           ant bundle-windows
-	
-           ant bundle-mac
-	
-           ant bundle-tar
-	
-    3.)  In order to just bundle the source code type:
-
-	   ant bundle-src
-		
-
-Eclipse
----------
-
-You can also import JHelioviewer in Eclipse.
-
-1.) IMPORTANT: You have to generate some parts of the source code before you can
-    build the project in Eclipse: To do so go to the source code directory from
-    within a terminal and type:
-
-		ant precompile
-
-2.) Open Eclipse and make the jhelioviewer directory the working directory
-
-3.) Open the 'Import...' dialog and select the option to import an existing
-project
-
-4.) Choose the current working directory as the root directory
+        java --add-exports java.desktop/sun.awt=ALL-UNNAMED -jar JHelioviewer.jar
