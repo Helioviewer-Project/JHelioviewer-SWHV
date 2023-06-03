@@ -14,6 +14,7 @@ import nom.tam.fits.Header;
 import nom.tam.fits.HeaderCard;
 import nom.tam.fits.ImageHDU;
 import nom.tam.fits.header.Bitpix;
+import nom.tam.fits.header.Standard;
 import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
 
@@ -34,7 +35,7 @@ class FITSImage implements URIImageReader {
         try (NetClient nc = NetClient.of(uri);
              InputStream is = FileUtils.decompressStream(nc.getStream());
              Fits f = new Fits(is)) {
-            BasicHDU<?> hdu = findHDU(f);
+            ImageHDU hdu = findHDU(f);
             return new URIImageReader.Image(getHeaderAsXML(hdu), readHDU(hdu));
         }
     }
@@ -124,24 +125,17 @@ class FITSImage implements URIImageReader {
     private static final double MIN_MULT = 0.00001;
     private static final double MAX_MULT = 0.99999;
 
-    private static ImageBuffer readHDU(BasicHDU<?> hdu) throws Exception {
+    private static ImageBuffer readHDU(ImageHDU hdu) throws Exception {
         int[] axes = hdu.getAxes();
         if (axes == null || axes.length != 2)
             throw new Exception("Only 2D FITS files supported");
         int height = axes[0];
         int width = axes[1];
 
-        Bitpix bitpix = hdu.getBitpix();
-        Object kernel = hdu.getKernel();
-        if (!(kernel instanceof Object[] pixelData))
+        if (!(hdu.getKernel() instanceof Object[] pixelData))
             throw new Exception("Cannot retrieve pixel data");
 
-        long blank = BLANK;
-        try {
-            blank = hdu.getBlankValue();
-        } catch (Exception ignore) {
-        }
-
+        Bitpix bitpix = hdu.getBitpix();
         if (bitpix == Bitpix.BYTE) {
             byte[][] inData = (byte[][]) pixelData;
             byte[] outData = new byte[width * height];
@@ -151,10 +145,11 @@ class FITSImage implements URIImageReader {
             return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, ByteBuffer.wrap(outData));
         }
 
-        double bzero = hdu.getBZero();
-        double bscale = hdu.getBScale();
-
         Header header = hdu.getHeader();
+        long blank = header.getLongValue(Standard.BLANK, BLANK);
+        double bzero = header.getDoubleValue(Standard.BZERO, 0);
+        double bscale = header.getDoubleValue(Standard.BSCALE, 1);
+
         float[] minMax = new float[]{header.getFloatValue("HV_DMIN", Float.MAX_VALUE), header.getFloatValue("HV_DMAX", Float.MAX_VALUE)};
         if (minMax[0] == Float.MAX_VALUE || minMax[1] == Float.MAX_VALUE) {
             float[] sampleData = sampleImage(bitpix, width, height, pixelData, blank, bzero, bscale);
@@ -210,7 +205,7 @@ class FITSImage implements URIImageReader {
 
     private static final String nl = System.getProperty("line.separator");
 
-    private static String getHeaderAsXML(BasicHDU<?> hdu) {
+    private static String getHeaderAsXML(ImageHDU hdu) {
         StringBuilder builder = new StringBuilder("<meta>" + nl + "<fits>" + nl);
 
         for (Cursor<String, HeaderCard> iter = hdu.getHeader().iterator(); iter.hasNext(); ) {
