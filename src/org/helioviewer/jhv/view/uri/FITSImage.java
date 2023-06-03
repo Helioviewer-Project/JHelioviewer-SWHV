@@ -69,15 +69,31 @@ class FITSImage implements URIImageReader {
     private static final long BLANK = 0; // in case it doesn't exist, very unlikely value
 
     private static float getValue(Bitpix bitpix, Object lineData, int i, long blank, double bzero, double bscale) {
-        double v = switch (bitpix) {
-            case SHORT -> ((short[]) lineData)[i];
-            case INTEGER -> ((int[]) lineData)[i];
-            case LONG -> ((long[]) lineData)[i];
-            case FLOAT -> ((float[]) lineData)[i];
-            case DOUBLE -> ((double[]) lineData)[i];
-            default -> ImageBuffer.BAD_PIXEL;
-        };
-        return (blank != BLANK && v == blank) || !Double.isFinite(v) ? ImageBuffer.BAD_PIXEL : (float) (bzero + v * bscale);
+        switch (bitpix) {
+            case SHORT -> {
+                short v = ((short[]) lineData)[i];
+                return (blank != BLANK && v == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + v * bscale);
+            }
+            case INTEGER -> {
+                int v = ((int[]) lineData)[i];
+                return (blank != BLANK && v == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + v * bscale);
+            }
+            case LONG -> {
+                long v = ((long[]) lineData)[i];
+                return (blank != BLANK && v == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + v * bscale);
+            }
+            case FLOAT -> {
+                float v = ((float[]) lineData)[i];
+                return Float.isFinite(v) ? (float) (bzero + v * bscale) : ImageBuffer.BAD_PIXEL;
+            }
+            case DOUBLE -> {
+                double v = ((double[]) lineData)[i];
+                return Double.isFinite(v) ? (float) (bzero + v * bscale) : ImageBuffer.BAD_PIXEL;
+            }
+            default -> {
+                return ImageBuffer.BAD_PIXEL;
+            }
+        }
     }
 
     // private static final int SAMPLE = 8;
