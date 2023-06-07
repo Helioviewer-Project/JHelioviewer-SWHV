@@ -20,7 +20,7 @@ import com.google.common.util.concurrent.FutureCallback;
 
 class PfssLoaderList {
 
-    public static void submit(long start, long end) {
+    static void submit(long start, long end) {
         EventQueueCallbackExecutor.pool.submit(new ListDataLoader(start, end), new Callback(start));
         PfssPlugin.downloads++;
     }
