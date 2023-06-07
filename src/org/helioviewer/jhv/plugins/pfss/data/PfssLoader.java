@@ -15,9 +15,9 @@ import org.helioviewer.jhv.time.JHVTime;
 import com.google.common.util.concurrent.FutureCallback;
 
 import nom.tam.fits.BasicHDU;
-import nom.tam.fits.BinaryTableHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
+import nom.tam.fits.TableHDU;
 
 class PfssLoader {
 
@@ -26,15 +26,22 @@ class PfssLoader {
         PfssPlugin.downloads++;
     }
 
+    private static int findColumn(TableHDU<?> hdu, String name) throws Exception {
+        int col = hdu.findColumn(name);
+        if (col < 0)
+            throw new Exception("Column not found: " + name);
+        return col;
+    }
+
     private record DataLoader(long time, URI uri) implements Callable<PfssData> {
         @Override
         public PfssData call() throws Exception {
             try (NetClient nc = NetClient.of(uri); Fits fits = new Fits(nc.getStream())) {
                 BasicHDU<?>[] hdus = fits.read();
-                if (hdus == null || hdus.length < 2 || !(hdus[1] instanceof BinaryTableHDU bhdu))
+                if (hdus == null || hdus.length < 2 || !(hdus[1] instanceof TableHDU<?> hdu))
                     throw new Exception("Could not read FITS");
 
-                Header header = bhdu.getHeader();
+                Header header = hdu.getHeader();
                 String dateFits = header.getStringValue("DATE-OBS");
                 if (dateFits == null)
                     throw new Exception("DATE-OBS not found");
@@ -46,14 +53,24 @@ class PfssLoader {
                 if (points == 0)
                     throw new Exception("POINTS_PER_LINE not found");
 
-                short[] flinex = (short[]) bhdu.getColumn("FIELDLINEx");
-                short[] fliney = (short[]) bhdu.getColumn("FIELDLINEy");
-                short[] flinez = (short[]) bhdu.getColumn("FIELDLINEz");
-                short[] flines = (short[]) bhdu.getColumn("FIELDLINEs");
-                if (flinex.length != fliney.length || flinex.length != flinez.length || flinex.length != flines.length)
-                    throw new Exception("Fieldline arrays not equal " + flinex.length + ' ' + fliney.length + ' ' + flinez.length + ' ' + flinex.length);
+                int colX = findColumn(hdu, "FIELDLINEx");
+                int colY = findColumn(hdu, "FIELDLINEy");
+                int colZ = findColumn(hdu, "FIELDLINEz");
+                int colS = findColumn(hdu, "FIELDLINEs");
+                int rows = hdu.getNRows();
 
-                return new PfssData(date, flinex, fliney, flinez, flines, points);
+                short[] flineX = new short[rows];
+                short[] flineY = new short[rows];
+                short[] flineZ = new short[rows];
+                short[] flineS = new short[rows];
+
+                for (int i = 0; i < rows; i++) {
+                    flineX[i] = ((short[]) hdu.getElement(i, colX))[0];
+                    flineY[i] = ((short[]) hdu.getElement(i, colY))[0];
+                    flineZ[i] = ((short[]) hdu.getElement(i, colZ))[0];
+                    flineS[i] = ((short[]) hdu.getElement(i, colS))[0];
+                }
+                return new PfssData(date, flineX, flineY, flineZ, flineS, points);
             }
         }
 
