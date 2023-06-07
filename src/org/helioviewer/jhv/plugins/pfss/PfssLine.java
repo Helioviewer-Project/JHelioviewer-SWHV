@@ -26,12 +26,12 @@ class PfssLine {
     }
 
     static void calculatePositions(PfssData data, int detail, boolean fixedColor, double radius, BufVertex lineBuf) {
-        float[][] linex = data.linex;
-        float[][] liney = data.liney;
-        float[][] linez = data.linez;
-        float[][] lines = data.lines;
-        int nlines = linex.length;
-        int points = linex[0].length;
+        float[][] lineX = data.lineX;
+        float[][] lineY = data.lineY;
+        float[][] lineZ = data.lineZ;
+        float[][] lineS = data.lineS;
+        int nlines = lineX.length;
+        int points = lineX[0].length;
 
         byte[] brightColor = new byte[4];
         byte[] oneColor = loopColor;
@@ -39,21 +39,21 @@ class PfssLine {
         for (int j = 0; j < nlines; j++) {
             if (j % (PfssSettings.MAX_DETAIL + 1) <= detail) {
                 for (int i = 0; i < points; i++) {
-                    float x = linex[j][i];
-                    float y = liney[j][i];
-                    float z = linez[j][i];
+                    float x = lineX[j][i];
+                    float y = lineY[j][i];
+                    float z = lineZ[j][i];
                     double r = Math.sqrt(x * x + y * y + z * z);
 
-                    float b = lines[j][i]; // this can be index in LUT
+                    float b = lineS[j][i]; // this can be index in LUT
                     computeBrightColor(b, brightColor);
 
                     if (i == 0) {
                         lineBuf.putVertex(x, z, -y, 1, Colors.Null);
 
                         if (fixedColor) {
-                            float xo = linex[j][points - 1];
-                            float yo = liney[j][points - 1];
-                            float zo = linez[j][points - 1];
+                            float xo = lineX[j][points - 1];
+                            float yo = lineY[j][points - 1];
+                            float zo = lineZ[j][points - 1];
                             double ro = Math.sqrt(xo * xo + yo * yo + zo * zo);
 
                             if (Math.abs(r - ro) < 2.5 - 1.0 - 0.2) {
