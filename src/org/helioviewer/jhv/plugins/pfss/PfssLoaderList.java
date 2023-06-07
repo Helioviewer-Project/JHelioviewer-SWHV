@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.pfss.data;
+package org.helioviewer.jhv.plugins.pfss;
 
 import java.awt.EventQueue;
 import java.net.URI;
@@ -11,8 +11,6 @@ import javax.annotation.Nonnull;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.NetClient;
-import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
-import org.helioviewer.jhv.plugins.pfss.PfssSettings;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -20,7 +18,7 @@ import okio.BufferedSource;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-public class PfssListLoader {
+class PfssLoaderList {
 
     public static void submit(long start, long end) {
         EventQueueCallbackExecutor.pool.submit(new ListDataLoader(start, end), new Callback(start));

@@ -12,8 +12,6 @@ import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
-import org.helioviewer.jhv.plugins.pfss.data.PfssData;
-import org.helioviewer.jhv.plugins.pfss.data.PfssListLoader;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
 import org.json.JSONObject;
@@ -28,7 +26,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
     private final GLSLLine glslLine = new GLSLLine(true);
     private final BufVertex lineBuf = new BufVertex(3276 * GLSLLine.stride); // pre-allocate 64k
 
-    private PfssData previousPfssData;
+    private PfssLoader.Data lastData;
     private JHVTime pfssTime;
     private long currentTime;
 
@@ -57,10 +55,10 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
         if (!isVisible[vp.idx])
             return;
 
-        PfssData pfssData = PfssPlugin.getPfsscache().getNearestData(currentTime);
-        if (pfssData != null) {
-            renderData(gl, vp, pfssData);
-            previousPfssData = pfssData;
+        PfssLoader.Data data = PfssPlugin.getPfsscache().getNearestData(currentTime);
+        if (data != null) {
+            renderData(gl, vp, data);
+            lastData = data;
         }
     }
 
@@ -97,7 +95,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
             Movie.removeTimeListener(this);
             Movie.removeTimeRangeListener(this);
             pfssTime = null;
-            previousPfssData = null;
+            lastData = null;
         }
     }
 
@@ -108,7 +106,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
 
     @Override
     public void timeRangeChanged(long start, long end) {
-        PfssListLoader.submit(start, end);
+        PfssLoaderList.submit(start, end);
     }
 
     @Override
@@ -135,12 +133,12 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
     private boolean lastFixedColor;
     private double lastRadius;
 
-    private void renderData(GL2 gl, Viewport vp, PfssData data) {
+    private void renderData(GL2 gl, Viewport vp, PfssLoader.Data data) {
         int detail = optionsPanel.getDetail();
         boolean fixedColor = optionsPanel.getFixedColor();
         double radius = optionsPanel.getRadius();
 
-        if (data != previousPfssData || lastDetail != detail || lastFixedColor != fixedColor || lastRadius != radius) {
+        if (lastData != data || lastDetail != detail || lastFixedColor != fixedColor || lastRadius != radius) {
             lastDetail = detail;
             lastFixedColor = fixedColor;
             lastRadius = radius;
@@ -148,7 +146,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
             PfssLine.calculatePositions(data, detail, fixedColor, radius, lineBuf);
             glslLine.setVertex(gl, lineBuf);
 
-            pfssTime = data.dateObs;
+            pfssTime = data.dateObs();
             JHVFrame.getLayers().fireTimeUpdated(this);
         }
         glslLine.renderLine(gl, vp.aspect, LINEWIDTH);
