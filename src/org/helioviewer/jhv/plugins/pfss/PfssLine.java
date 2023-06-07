@@ -25,12 +25,12 @@ class PfssLine {
     }
 
     static void calculatePositions(PfssLoader.Data data, int detail, boolean fixedColor, double radius, BufVertex lineBuf) {
-        float[][] lineX = data.lineX();
-        float[][] lineY = data.lineY();
-        float[][] lineZ = data.lineZ();
-        float[][] lineS = data.lineS();
-        int nlines = lineX.length;
-        int points = lineX[0].length;
+        float[] lineX = data.lineX();
+        float[] lineY = data.lineY();
+        float[] lineZ = data.lineZ();
+        float[] lineS = data.lineS();
+        int points = data.points();
+        int nlines = lineX.length / points;
 
         byte[] brightColor = new byte[4];
         byte[] oneColor = loopColor;
@@ -38,21 +38,23 @@ class PfssLine {
         for (int j = 0; j < nlines; j++) {
             if (j % (PfssSettings.MAX_DETAIL + 1) <= detail) {
                 for (int i = 0; i < points; i++) {
-                    float x = lineX[j][i];
-                    float y = lineY[j][i];
-                    float z = lineZ[j][i];
+                    int idx = j * points + i;
+                    float x = lineX[idx];
+                    float y = lineY[idx];
+                    float z = lineZ[idx];
                     double r = Math.sqrt(x * x + y * y + z * z);
 
-                    float b = lineS[j][i]; // this can be index in LUT
+                    float b = lineS[idx]; // this can be index in LUT
                     computeBrightColor(b, brightColor);
 
                     if (i == 0) {
                         lineBuf.putVertex(x, z, -y, 1, Colors.Null);
 
                         if (fixedColor) {
-                            float xo = lineX[j][points - 1];
-                            float yo = lineY[j][points - 1];
-                            float zo = lineZ[j][points - 1];
+                            int idxLast = j * points + points - 1;
+                            float xo = lineX[idxLast];
+                            float yo = lineY[idxLast];
+                            float zo = lineZ[idxLast];
                             double ro = Math.sqrt(xo * xo + yo * yo + zo * zo);
 
                             if (Math.abs(r - ro) < 2.5 - 1.0 - 0.2) {

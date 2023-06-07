@@ -31,7 +31,7 @@ class PfssCache {
     }
 
     @Nullable
-    public PfssLoader.Data getNearestData(long time) {
+    PfssLoader.Data getNearestData(long time) {
         Long c = map.ceilingKey(time);
         Long f = map.floorKey(time);
 
@@ -44,7 +44,7 @@ class PfssCache {
         return null;
     }
 
-    public void clear() {
+    void clear() {
         map.clear();
         cache.invalidateAll();
     }

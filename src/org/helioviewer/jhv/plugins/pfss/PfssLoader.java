@@ -22,7 +22,7 @@ import nom.tam.fits.TableHDU;
 
 class PfssLoader {
 
-    record Data(JHVTime dateObs, float[][] lineX, float[][] lineY, float[][] lineZ, float[][] lineS) {
+    record Data(JHVTime dateObs, float[] lineX, float[] lineY, float[] lineZ, float[] lineS, int points) {
     }
 
     static void submit(long time, URI uri) {
@@ -68,10 +68,10 @@ class PfssLoader {
                 int rows = hdu.getNRows();
 
                 int nlines = rows / points;
-                float[][] lineX = new float[nlines][points];
-                float[][] lineY = new float[nlines][points];
-                float[][] lineZ = new float[nlines][points];
-                float[][] lineS = new float[nlines][points];
+                float[] lineX = new float[rows];
+                float[] lineY = new float[rows];
+                float[] lineZ = new float[rows];
+                float[] lineS = new float[rows];
 
                 double elon = Sun.getEarth(dateObs).lon;
                 double cphi = Math.cos(elon);
@@ -83,14 +83,12 @@ class PfssLoader {
                     double z = 3 * decodeShort(((short[]) hdu.getElement(i, colZ))[0]);
                     double s = decodeShort(((short[]) hdu.getElement(i, colS))[0]);
 
-                    int jj = i / points;
-                    int ii = i % points;
-                    lineX[jj][ii] = (float) (cphi * x + sphi * y);
-                    lineY[jj][ii] = (float) (-sphi * x + cphi * y);
-                    lineZ[jj][ii] = (float) z;
-                    lineS[jj][ii] = (float) MathUtils.clip(s, -1, 1);
+                    lineX[i] = (float) (cphi * x + sphi * y);
+                    lineY[i] = (float) (-sphi * x + cphi * y);
+                    lineZ[i] = (float) z;
+                    lineS[i] = (float) MathUtils.clip(s, -1, 1);
                 }
-                return new Data(dateObs, lineX, lineY, lineZ, lineS);
+                return new Data(dateObs, lineX, lineY, lineZ, lineS, points);
             }
         }
     }
