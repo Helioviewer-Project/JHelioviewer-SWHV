@@ -19,7 +19,7 @@ import nom.tam.fits.BinaryTableHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 
-class PfssDataLoader {
+class PfssLoader {
 
     static void submit(long time, URI uri) {
         EventQueueCallbackExecutor.pool.submit(new DataLoader(time, uri), new Callback(uri));
