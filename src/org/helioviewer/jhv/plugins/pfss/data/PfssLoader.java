@@ -6,8 +6,10 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.layers.MovieDisplay;
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.time.JHVTime;
@@ -33,6 +35,10 @@ class PfssLoader {
         return col;
     }
 
+    private static double decodeShort(short v) {
+        return (v + 32768.) * (2. / 65535.) - 1.;
+    }
+
     private record DataLoader(long time, URI uri) implements Callable<PfssData> {
         @Override
         public PfssData call() throws Exception {
@@ -45,9 +51,9 @@ class PfssLoader {
                 String dateFits = header.getStringValue("DATE-OBS");
                 if (dateFits == null)
                     throw new Exception("DATE-OBS not found");
-                JHVTime date = new JHVTime(dateFits);
-                if (time != date.milli)
-                    throw new Exception("Inconsistent DATE-OBS. Expected " + new JHVTime(time) + ", got " + date);
+                JHVTime dateObs = new JHVTime(dateFits);
+                if (time != dateObs.milli)
+                    throw new Exception("Inconsistent DATE-OBS. Expected " + new JHVTime(time) + ", got " + dateObs);
 
                 int points = header.getIntValue("HIERARCH.POINTS_PER_LINE");
                 if (points == 0)
@@ -59,21 +65,32 @@ class PfssLoader {
                 int colS = findColumn(hdu, "FIELDLINEs");
                 int rows = hdu.getNRows();
 
-                short[] flineX = new short[rows];
-                short[] flineY = new short[rows];
-                short[] flineZ = new short[rows];
-                short[] flineS = new short[rows];
+                int nlines = rows / points;
+                float[][] lineX = new float[nlines][points];
+                float[][] lineY = new float[nlines][points];
+                float[][] lineZ = new float[nlines][points];
+                float[][] lineS = new float[nlines][points];
+
+                double elon = Sun.getEarth(dateObs).lon;
+                double cphi = Math.cos(elon);
+                double sphi = Math.sin(elon);
 
                 for (int i = 0; i < rows; i++) {
-                    flineX[i] = ((short[]) hdu.getElement(i, colX))[0];
-                    flineY[i] = ((short[]) hdu.getElement(i, colY))[0];
-                    flineZ[i] = ((short[]) hdu.getElement(i, colZ))[0];
-                    flineS[i] = ((short[]) hdu.getElement(i, colS))[0];
+                    double x = 3 * decodeShort(((short[]) hdu.getElement(i, colX))[0]);
+                    double y = 3 * decodeShort(((short[]) hdu.getElement(i, colY))[0]);
+                    double z = 3 * decodeShort(((short[]) hdu.getElement(i, colZ))[0]);
+                    double s = decodeShort(((short[]) hdu.getElement(i, colS))[0]);
+
+                    int jj = i / points;
+                    int ii = i % points;
+                    lineX[jj][ii] = (float) (cphi * x + sphi * y);
+                    lineY[jj][ii] = (float) (-sphi * x + cphi * y);
+                    lineZ[jj][ii] = (float) z;
+                    lineS[jj][ii] = (float) MathUtils.clip(s, -1, 1);
                 }
-                return new PfssData(date, flineX, flineY, flineZ, flineS, points);
+                return new PfssData(dateObs, lineX, lineY, lineZ, lineS);
             }
         }
-
     }
 
     private record Callback(URI uri) implements FutureCallback<PfssData> {
