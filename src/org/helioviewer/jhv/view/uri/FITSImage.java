@@ -13,7 +13,6 @@ import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 import nom.tam.fits.HeaderCard;
 import nom.tam.fits.ImageHDU;
-import nom.tam.fits.header.Bitpix;
 import nom.tam.fits.header.Standard;
 import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
@@ -65,16 +64,18 @@ class FITSImage implements URIImageReader {
         throw new Exception("No image found");
     }
 
+    private enum PixType {BYTE, SHORT, INT, LONG, FLOAT, DOUBLE}
+
     private static final double GAMMA = 1 / 2.2;
     private static final long BLANK = 0; // in case it doesn't exist, very unlikely value
 
-    private static float getValue(Bitpix bitpix, Object lineData, int i, long blank, double bzero, double bscale) {
-        switch (bitpix) {
+    private static float getValue(PixType pixType, Object lineData, int i, long blank, double bzero, double bscale) {
+        switch (pixType) {
             case SHORT -> {
                 short v = ((short[]) lineData)[i];
                 return (blank != BLANK && v == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + v * bscale);
             }
-            case INTEGER -> {
+            case INT -> {
                 int v = ((int[]) lineData)[i];
                 return (blank != BLANK && v == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + v * bscale);
             }
@@ -99,15 +100,15 @@ class FITSImage implements URIImageReader {
     // private static final int SAMPLE = 8;
     private static final int SAMPLE = 4;
 
-    private static float[] sampleImage(Bitpix bitpix, int width, int height, Object[] pixelData, long blank, double bzero, double bscale) {
+    private static float[] sampleImage(PixType pixType, int width, int height, Object[] pixData, long blank, double bzero, double bscale) {
         int stepW = Math.max(SAMPLE * width / 1024, 1);
         int stepH = Math.max(SAMPLE * height / 1024, 1);
         ArrayList<Float> sampleData = new ArrayList<>((width / stepW) * (height / stepH));
 
         for (int j = 0; j < height; j += stepH) {
-            Object lineData = pixelData[j];
+            Object lineData = pixData[j];
             for (int i = 0; i < width; i += stepW) {
-                float v = getValue(bitpix, lineData, i, blank, bzero, bscale);
+                float v = getValue(pixType, lineData, i, blank, bzero, bscale);
                 if (v != ImageBuffer.BAD_PIXEL)
                     sampleData.add(v);
             }
@@ -116,14 +117,14 @@ class FITSImage implements URIImageReader {
     }
 
     /*
-        private static float[] getMinMax(Bitpix bitpix, int width, int height, Object[] pixelData, long blank, double bzero, double bscale) {
+        private static float[] getMinMax(PixType pixType, int width, int height, Object[] pixData, long blank, double bzero, double bscale) {
             float min = Float.MAX_VALUE;
             float max = -Float.MAX_VALUE;
 
             for (int j = 0; j < height; j++) {
-                Object lineData = pixelData[j];
+                Object lineData = pixData[j];
                 for (int i = 0; i < width; i++) {
-                    float v = getValue(bitpix, lineData, i, blank, bzero, bscale);
+                    float v = getValue(pixType, lineData, i, blank, bzero, bscale);
                     if (v != ImageBuffer.BAD_PIXEL) {
                         if (v > max)
                             max = v;
@@ -148,12 +149,25 @@ class FITSImage implements URIImageReader {
         int height = axes[0];
         int width = axes[1];
 
-        if (!(hdu.getKernel() instanceof Object[] pixelData))
-            throw new Exception("Cannot retrieve pixel data");
+        Object[] pixData = (Object[]) hdu.getData().getData();
+        PixType pixType;
+        if (pixData instanceof byte[][])
+            pixType = PixType.BYTE;
+        else if (pixData instanceof short[][])
+            pixType = PixType.SHORT;
+        else if (pixData instanceof int[][])
+            pixType = PixType.INT;
+        else if (pixData instanceof long[][])
+            pixType = PixType.LONG;
+        else if (pixData instanceof float[][])
+            pixType = PixType.FLOAT;
+        else if (pixData instanceof double[][])
+            pixType = PixType.DOUBLE;
+        else
+            throw new Exception("Unknown pixel type: " + pixData.getClass().getSimpleName());
 
-        Bitpix bitpix = hdu.getBitpix();
-        if (bitpix == Bitpix.BYTE) {
-            byte[][] inData = (byte[][]) pixelData;
+        if (pixType == PixType.BYTE) {
+            byte[][] inData = (byte[][]) pixData;
             byte[] outData = new byte[width * height];
             for (int j = 0; j < height; j++) {
                 System.arraycopy(inData[j], 0, outData, width * (height - 1 - j), width);
@@ -168,7 +182,7 @@ class FITSImage implements URIImageReader {
 
         float[] minMax = new float[]{header.getFloatValue("HV_DMIN", Float.MAX_VALUE), header.getFloatValue("HV_DMAX", Float.MAX_VALUE)};
         if (minMax[0] == Float.MAX_VALUE || minMax[1] == Float.MAX_VALUE) {
-            float[] sampleData = sampleImage(bitpix, width, height, pixelData, blank, bzero, bscale);
+            float[] sampleData = sampleImage(pixType, width, height, pixData, blank, bzero, bscale);
             Arrays.sort(sampleData);
 
             // System.out.println(">>> " + sampleData.length + " " + (int) (MIN_MULT * sampleData.length) + " " + (int) (MAX_MULT * sampleData.length));
@@ -176,7 +190,7 @@ class FITSImage implements URIImageReader {
                     sampleData[(int) (MIN_MULT * sampleData.length)],
                     sampleData[(int) (MAX_MULT * sampleData.length)]};
 
-            // minMax = getMinMax(bitpix, width, height, pixelData, blank, bzero, bscale);
+            // minMax = getMinMax(pixType, width, height, pixData, blank, bzero, bscale);
             if (minMax[0] == minMax[1]) {
                 minMax[1] = minMax[0] + 1;
             }
@@ -191,22 +205,22 @@ class FITSImage implements URIImageReader {
         //Stopwatch sw = Stopwatch.createStarted();
         ArrayList<ForkJoinTask<?>> tasks = new ArrayList<>(height);
         for (int j = 0; j < height; j++) {
-            Object lineData = pixelData[j];
+            Object lineData = pixData[j];
             int outLine = width * (height - 1 - j);
-            tasks.add(ForkJoinTask.adapt(new convert(width, bitpix, lineData, blank, bzero, bscale, scale, minMax, lut, outData, outLine)).fork());
+            tasks.add(ForkJoinTask.adapt(new convert(pixType, width, lineData, blank, bzero, bscale, scale, minMax, lut, outData, outLine)).fork());
         }
         tasks.forEach(ForkJoinTask::join);
         //System.out.println(">>> " + sw.elapsed().toNanos() / 1e9);
         return new ImageBuffer(width, height, ImageBuffer.Format.Gray16, ShortBuffer.wrap(outData), lut);
     }
 
-    private record convert(int width, Bitpix bitpix, Object lineData, long blank, double bzero, double bscale,
+    private record convert(PixType pixType, int width, Object lineData, long blank, double bzero, double bscale,
                            double scale, float[] minMax, float[] lut, short[] outData,
                            int outLine) implements Runnable {
         @Override
         public void run() {
             for (int i = 0; i < width; i++) {
-                float v = getValue(bitpix, lineData, i, blank, bzero, bscale);
+                float v = getValue(pixType, lineData, i, blank, bzero, bscale);
                 if (v == ImageBuffer.BAD_PIXEL)
                     outData[outLine + i] = 0;
                 else {
