@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.pfss.data;
+package org.helioviewer.jhv.plugins.pfss;
 
 import java.net.URI;
 import java.util.concurrent.Callable;
@@ -10,7 +10,6 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.MathUtils;
-import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.time.JHVTime;
 
@@ -22,6 +21,9 @@ import nom.tam.fits.Header;
 import nom.tam.fits.TableHDU;
 
 class PfssLoader {
+
+    record Data(JHVTime dateObs, float[][] lineX, float[][] lineY, float[][] lineZ, float[][] lineS) {
+    }
 
     static void submit(long time, URI uri) {
         EventQueueCallbackExecutor.pool.submit(new DataLoader(time, uri), new Callback(uri));
@@ -39,9 +41,9 @@ class PfssLoader {
         return (v + 32768.) * (2. / 65535.) - 1.;
     }
 
-    private record DataLoader(long time, URI uri) implements Callable<PfssData> {
+    private record DataLoader(long time, URI uri) implements Callable<Data> {
         @Override
-        public PfssData call() throws Exception {
+        public Data call() throws Exception {
             try (NetClient nc = NetClient.of(uri); Fits fits = new Fits(nc.getStream())) {
                 BasicHDU<?>[] hdus = fits.read();
                 if (hdus == null || hdus.length < 2 || !(hdus[1] instanceof TableHDU<?> hdu))
@@ -88,15 +90,15 @@ class PfssLoader {
                     lineZ[jj][ii] = (float) z;
                     lineS[jj][ii] = (float) MathUtils.clip(s, -1, 1);
                 }
-                return new PfssData(dateObs, lineX, lineY, lineZ, lineS);
+                return new Data(dateObs, lineX, lineY, lineZ, lineS);
             }
         }
     }
 
-    private record Callback(URI uri) implements FutureCallback<PfssData> {
+    private record Callback(URI uri) implements FutureCallback<Data> {
 
         @Override
-        public void onSuccess(PfssData result) {
+        public void onSuccess(Data result) {
             PfssPlugin.downloads--;
             PfssPlugin.getPfsscache().putData(uri, result);
             MovieDisplay.display(); //!

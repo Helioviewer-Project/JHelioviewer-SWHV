@@ -2,7 +2,6 @@ package org.helioviewer.jhv.plugins.pfss;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.opengl.BufVertex;
-import org.helioviewer.jhv.plugins.pfss.data.PfssData;
 
 class PfssLine {
 
@@ -25,11 +24,11 @@ class PfssLine {
         brightColor[3] = (byte) 255;
     }
 
-    static void calculatePositions(PfssData data, int detail, boolean fixedColor, double radius, BufVertex lineBuf) {
-        float[][] lineX = data.lineX;
-        float[][] lineY = data.lineY;
-        float[][] lineZ = data.lineZ;
-        float[][] lineS = data.lineS;
+    static void calculatePositions(PfssLoader.Data data, int detail, boolean fixedColor, double radius, BufVertex lineBuf) {
+        float[][] lineX = data.lineX();
+        float[][] lineY = data.lineY();
+        float[][] lineZ = data.lineZ();
+        float[][] lineS = data.lineS();
         int nlines = lineX.length;
         int points = lineX[0].length;
 
