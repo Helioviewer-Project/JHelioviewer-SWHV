@@ -20,7 +20,7 @@ import okio.BufferedSource;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-public class PfssListDataLoader {
+public class PfssListLoader {
 
     public static void submit(long start, long end) {
         EventQueueCallbackExecutor.pool.submit(new ListDataLoader(start, end), new Callback(start));

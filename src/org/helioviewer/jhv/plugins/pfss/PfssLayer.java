@@ -13,7 +13,7 @@ import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.plugins.pfss.data.PfssData;
-import org.helioviewer.jhv.plugins.pfss.data.PfssListDataLoader;
+import org.helioviewer.jhv.plugins.pfss.data.PfssListLoader;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
 import org.json.JSONObject;
@@ -108,7 +108,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
 
     @Override
     public void timeRangeChanged(long start, long end) {
-        PfssListDataLoader.submit(start, end);
+        PfssListLoader.submit(start, end);
     }
 
     @Override
