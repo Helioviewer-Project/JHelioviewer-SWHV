@@ -136,20 +136,20 @@ public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
         };
         setDefaultCancelAction(close);
 
-        JButton loadBtn = getLoadBtn();
-        JButton cancelBtn = new JButton(close);
+        JButton loadButton = getLoadButton();
+        JButton cancelButton = new JButton(close);
         cancelBtn.setText("Cancel");
 
         ButtonPanel panel = new ButtonPanel();
-        panel.add(loadBtn, ButtonPanel.AFFIRMATIVE_BUTTON);
-        panel.add(cancelBtn, ButtonPanel.CANCEL_BUTTON);
+        panel.add(loadButton, ButtonPanel.AFFIRMATIVE_BUTTON);
+        panel.add(cancelButton, ButtonPanel.CANCEL_BUTTON);
 
         return panel;
     }
 
-    private JButton getLoadBtn() {
-        JButton loadBtn = new JButton("Add");
-        loadBtn.addActionListener(e -> {
+    private JButton getLoadButton() {
+        JButton loadButton = new JButton("Add");
+        loadButton.addActionListener(e -> {
             List<SoarClient.DataItem> items = listPane.getSelectedValuesList();
             if (items.isEmpty())
                 return;
@@ -162,7 +162,7 @@ public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
                 setVisible(false);
             }
         });
-        return loadBtn;
+        return loadButton;
     }
 
     @Override
@@ -180,9 +180,9 @@ public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
         queryGroup.add(soopQuery);
 
         soopQuery.addItemListener(e -> {
-                boolean select = soopQuery.isSelected();
-                soopCombo.setEnabled(select);
-                ComponentUtils.setEnabled(timeSelectorPanel, !select);
+            boolean select = soopQuery.isSelected();
+            soopCombo.setEnabled(select);
+            ComponentUtils.setEnabled(timeSelectorPanel, !select);
         });
 
         GridBagConstraints gc = new GridBagConstraints();
