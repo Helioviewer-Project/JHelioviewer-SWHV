@@ -134,9 +134,18 @@ public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
         };
         setDefaultCancelAction(close);
 
+        JButton loadBtn = getLoadBtn();
         JButton cancelBtn = new JButton(close);
         cancelBtn.setText("Cancel");
 
+        ButtonPanel panel = new ButtonPanel();
+        panel.add(loadBtn, ButtonPanel.AFFIRMATIVE_BUTTON);
+        panel.add(cancelBtn, ButtonPanel.CANCEL_BUTTON);
+
+        return panel;
+    }
+
+    private JButton getLoadBtn() {
         JButton loadBtn = new JButton("Add");
         loadBtn.addActionListener(e -> {
             List<SoarClient.DataItem> items = listPane.getSelectedValuesList();
@@ -151,12 +160,7 @@ public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
                 setVisible(false);
             }
         });
-
-        ButtonPanel panel = new ButtonPanel();
-        panel.add(loadBtn, ButtonPanel.AFFIRMATIVE_BUTTON);
-        panel.add(cancelBtn, ButtonPanel.CANCEL_BUTTON);
-
-        return panel;
+        return loadBtn;
     }
 
     @Override
