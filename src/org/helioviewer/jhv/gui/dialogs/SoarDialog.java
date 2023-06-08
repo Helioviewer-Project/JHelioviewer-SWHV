@@ -12,6 +12,7 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -30,12 +31,11 @@ import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
 import org.helioviewer.jhv.io.SoarClient;
 
 import com.google.common.collect.ImmutableSortedMap;
-import com.google.common.collect.ImmutableSortedSet;
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings("serial")
-public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
+public class SoarDialog extends StandardDialog implements SoarClient.ReceiverItems, SoarClient.ReceiverSoops {
 
     private static final double MAX_SIZE = 2;
     private static final String[] Level = new String[]{/* "LL01", "LL02", "LL03",*/ "L1", "L2", "L3"};
@@ -50,62 +50,8 @@ public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
                     put("SWA PAS", List.of("SWA-PAS-GRND-MOM")).
             build();
 
-    // curl "http://soar.esac.esa.int/soar-sl-tap/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=csv&QUERY=SELECT+DISTINCT+soop_name+FROM+soar.soop+ORDER+BY+soop_name"
-    private static final ImmutableSortedSet<String> SOOPs = new ImmutableSortedSet.Builder<String>(JHVGlobals.alphanumComparator).
-            add("CC_OFFPOI_ALIGNMENT").
-            add("CC_OFFPOI_FLATFIELD_FULL").
-            add("CC_OFFPOI_FLATFIELD_HRI").
-            add("CC_OFFPOI_OOF").
-            add("CC_OFFPOI_STAR").
-            add("CC_OFFPOI_STRAYLIGHT").
-            add("CC_ROLLS_RS").
-            add("COORD_CALIBRATION").
-            add("I_DEFAULT").
-            add("L_BOTH_HRES_HCAD_Major-Flare").
-            add("L_BOTH_HRES_LCAD_CH-Boundary-Expansion").
-            add("L_BOTH_LRES_MCAD_Pole-to-Pole").
-            add("L_BOTH_MRES_MCAD_Farside-Connection").
-            add("L_BOTH_MRES_MCAD_Flare-SEPs").
-            add("L_FULL_HRES_HCAD_Coronal-Dynamics").
-            add("L_FULL_HRES_HCAD_Eruption-Watch").
-            add("L_FULL_HRES_LCAD_MagnFieldConfig").
-            add("L_FULL_HRES_MCAD_Coronal-He-Abundance").
-            add("L_FULL_LRES_MCAD_Coronal-Synoptic").
-            add("L_FULL_LRES_MCAD_Probe-Quadrature").
-            add("L_FULL_MRES_MCAD_CME-SEPs").
-            add("L_IS_SoloHI_STIX").
-            add("L_IS_STIX").
-            add("L_SMALL_HRES_HCAD_Fast-Wind").
-            add("L_SMALL_HRES_HCAD_Slow-Wind-Connection").
-            add("L_SMALL_MRES_MCAD_Ballistic-Connection").
-            add("L_SMALL_MRES_MCAD_Composition-Mosaic").
-            add("L_SMALL_MRES_MCAD_Connection-Mosaic").
-            add("L_SMALL_MRES_MCAD_Earth-Quadrature").
-            add("L_TEMPORARY").
-            add("R_BOTH_HRES_HCAD_Filaments").
-            add("R_BOTH_HRES_HCAD_Nanoflares").
-            add("R_BOTH_HRES_MCAD_Bright-Points").
-            add("R_FULL_HRES_HCAD_Density-Fluctuations").
-            add("R_FULL_LRES_HCAD_Full-Disk-Helioseismology").
-            add("R_FULL_LRES_LCAD_Out-of-RSW-synoptics").
-            add("R_FULL_LRES_LCAD_Transition-Corona").
-            add("R_SMALL_HRES_HCAD_AR-Dynamics").
-            add("R_SMALL_HRES_HCAD_Atmospheric-Dynamics-Structure").
-            add("R_SMALL_HRES_HCAD_Ephemeral").
-            add("R_SMALL_HRES_HCAD_Granulation-Tracking").
-            add("R_SMALL_HRES_HCAD_Local-Area-Helioseismology").
-            add("R_SMALL_HRES_HCAD_PDF-Mosaic").
-            add("R_SMALL_HRES_HCAD_RS-burst").
-            add("R_SMALL_HRES_HCAD_Wave-Stereoscopy").
-            add("R_SMALL_HRES_LCAD_Composition-vs-Height").
-            add("R_SMALL_HRES_LCAD_Fine-Scale-Structure").
-            add("R_SMALL_HRES_MCAD_AR-Heating").
-            add("R_SMALL_HRES_MCAD_Full-Disk-Mosaic").
-            add("R_SMALL_HRES_MCAD_Polar-Observations").
-            add("R_SMALL_MRES_HCAD_Sunspot-Oscillations").
-            add("R_SMALL_MRES_MCAD_AR-Long-Term").
-            build();
-
+    private boolean soopsDownloaded;
+    private final JComboBox<String> soopCombo = new JComboBox<>();
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
     private final JList<SoarClient.DataItem> listPane = new JList<>();
     private final JLabel foundLabel = new JLabel("0 found", JLabel.RIGHT);
@@ -167,22 +113,24 @@ public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
 
     @Override
     public JComponent createContentPanel() {
-        JComboBox<String> soopCombo = new JComboBox<>(SOOPs.toArray(String[]::new));
-        soopCombo.setEnabled(false);
-
         JRadioButton timeQuery = new JRadioButton("Time");
         timeQuery.setSelected(true);
         JRadioButton soopQuery = new JRadioButton("SOOP");
         soopQuery.setSelected(false);
+        soopCombo.setEnabled(false);
 
         ButtonGroup queryGroup = new ButtonGroup();
         queryGroup.add(timeQuery);
         queryGroup.add(soopQuery);
 
         soopQuery.addItemListener(e -> {
-            boolean select = soopQuery.isSelected();
-            soopCombo.setEnabled(select);
-            ComponentUtils.setEnabled(timeSelectorPanel, !select);
+            boolean selected = soopQuery.isSelected();
+            if (selected && !soopsDownloaded) {
+                soopsDownloaded = true;
+                SoarClient.submitGetSoops(this);
+            }
+            soopCombo.setEnabled(selected);
+            ComponentUtils.setEnabled(timeSelectorPanel, !selected);
         });
 
         GridBagConstraints gc = new GridBagConstraints();
@@ -267,9 +215,15 @@ public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
     }
 
     @Override
-    public void setSoarResponse(List<SoarClient.DataItem> items) {
-        listPane.setListData(items.toArray(SoarClient.DataItem[]::new));
-        foundLabel.setText(items.size() + " found");
+    public void setSoarResponseItems(List<SoarClient.DataItem> list) {
+        listPane.setListData(list.toArray(SoarClient.DataItem[]::new));
+        foundLabel.setText(list.size() + " found");
+    }
+
+    @Override
+    public void setSoarResponseSoops(List<String> list) {
+        soopCombo.setModel(new DefaultComboBoxModel<>(list.toArray(String[]::new)));
+        soopCombo.setSelectedIndex(0);
     }
 
 }
