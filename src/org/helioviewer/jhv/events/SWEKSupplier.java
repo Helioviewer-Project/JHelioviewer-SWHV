@@ -54,19 +54,24 @@ public class SWEKSupplier extends DefaultMutableTreeNode implements JHVCell {
 
         if (group.containsFilter()) {
             FilterDialog filterDialog = new FilterDialog(group, this);
-            JideButton filterButton = new JideButton("Filter");
-            filterButton.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    Point pressedLocation = e.getLocationOnScreen();
-                    Point windowLocation = new Point(pressedLocation.x, pressedLocation.y - filterDialog.getSize().height);
-                    filterDialog.setLocation(windowLocation);
-                    filterDialog.setVisible(true);
-                }
-            });
+            JideButton filterButton = getFilterButton(filterDialog);
             panel.setPreferredSize(new Dimension(SWEKGroup.RIGHT_ALIGNMENT, filterButton.getPreferredSize().height)); //!
             panel.add(filterButton, BorderLayout.LINE_END);
         }
+    }
+
+    private static JideButton getFilterButton(FilterDialog filterDialog) {
+        JideButton filterButton = new JideButton("Filter");
+        filterButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Point pressedLocation = e.getLocationOnScreen();
+                Point windowLocation = new Point(pressedLocation.x, pressedLocation.y - filterDialog.getSize().height);
+                filterDialog.setLocation(windowLocation);
+                filterDialog.setVisible(true);
+            }
+        });
+        return filterButton;
     }
 
     public static SWEKSupplier getSupplier(String name) {
