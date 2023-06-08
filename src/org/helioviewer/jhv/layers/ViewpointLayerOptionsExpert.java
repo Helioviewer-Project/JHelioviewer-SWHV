@@ -67,24 +67,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeListener.Selecti
 
         container = new SpaceObjectContainer(ja, exclusive, uv, observer, frame, start, end);
 
-        JCheckBox spiralCheckBox = new JCheckBox("Spiral", false);
-        spiralCheckBox.addActionListener(e -> {
-            spiralMult = spiralCheckBox.isSelected() ? 1 : 0;
-            MovieDisplay.display();
-        });
-
-        JLabel spiralLabel = new JLabel(spiralSpeed + " km/s");
-        JHVSlider spiralSlider = new JHVSlider(MIN_SPEED_SPIRAL, MAX_SPEED_SPIRAL, spiralSpeed);
-        spiralSlider.addChangeListener(e -> {
-            spiralSpeed = spiralSlider.getValue();
-            spiralLabel.setText(spiralSpeed + " km/s");
-            MovieDisplay.display();
-        });
-
-        JPanel spiralPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
-        spiralPanel.add(spiralCheckBox);
-        spiralPanel.add(spiralSlider);
-        spiralPanel.add(spiralLabel);
+        JPanel spiralPanel = getSpiralPanel();
 
         JPanel framePanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
         framePanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
@@ -134,6 +117,28 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeListener.Selecti
             c.gridy = 4;
             add(spiralPanel, c);
         }
+    }
+
+    private JPanel getSpiralPanel() {
+        JCheckBox spiralCheckBox = new JCheckBox("Spiral", false);
+        spiralCheckBox.addActionListener(e -> {
+            spiralMult = spiralCheckBox.isSelected() ? 1 : 0;
+            MovieDisplay.display();
+        });
+
+        JLabel spiralLabel = new JLabel(spiralSpeed + " km/s");
+        JHVSlider spiralSlider = new JHVSlider(MIN_SPEED_SPIRAL, MAX_SPEED_SPIRAL, spiralSpeed);
+        spiralSlider.addChangeListener(e -> {
+            spiralSpeed = spiralSlider.getValue();
+            spiralLabel.setText(spiralSpeed + " km/s");
+            MovieDisplay.display();
+        });
+
+        JPanel spiralPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+        spiralPanel.add(spiralCheckBox);
+        spiralPanel.add(spiralSlider);
+        spiralPanel.add(spiralLabel);
+        return spiralPanel;
     }
 
     void setTimespan(long start, long end) {
