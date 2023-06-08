@@ -1132,6 +1132,11 @@ return true;</property>
         <entry location="classes/natives-linux.jar" />
         <entry location="classes/natives-macos.jar" />
       </exclude>
+      <jreBundle>
+        <modules>
+          <module name="jdk.crypto.mscapi" />
+        </modules>
+      </jreBundle>
     </windows>
     <linuxDeb name="Linux Deb Archive 64 bit" id="218" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_amd64" bzip="true" maintainerEmail="daniel.mueller@esa.int" architectureSet="true" architecture="amd64">
       <excludedLaunchers>
