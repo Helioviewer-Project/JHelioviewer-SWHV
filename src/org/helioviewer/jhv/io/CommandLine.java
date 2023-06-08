@@ -33,7 +33,7 @@ public class CommandLine {
         arguments = args;
         // append state if user set in GUI, command line takes precedence
         String propState = Settings.getProperty("startup.loadState");
-        if (propState != null && !"false".equals(propState)) {
+        if (propState != null && !"false".equals(propState) && !"true".equals(propState)) {
             arguments = Arrays.copyOf(args, args.length + 2);
             arguments[args.length] = "-state";
             arguments[args.length + 1] = Path.of(propState).toUri().toString();

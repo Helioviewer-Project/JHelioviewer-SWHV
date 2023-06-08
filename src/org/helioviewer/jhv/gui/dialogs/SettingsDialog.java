@@ -132,27 +132,7 @@ public class SettingsDialog extends StandardDialog implements ShowableDialog {
 
         c.gridx = 1;
         c.gridy = 1;
-
-        String propState = Settings.getProperty("startup.loadState");
-        boolean loadState = propState != null && !"false".equals(propState);
-        JButton selectState = new JButton("Select State");
-        selectState.setEnabled(loadState);
-        selectState.addActionListener(e -> {
-            File file = LoadStateDialog.get();
-            if (file != null)
-                Settings.setProperty("startup.loadState", file.toString());
-        });
-
-        JCheckBox defaultState = new JCheckBox("Load state", loadState);
-        defaultState.addActionListener(e -> {
-            selectState.setEnabled(defaultState.isSelected());
-            Settings.setProperty("startup.loadState", Boolean.toString(defaultState.isSelected()));
-        });
-
-        JPanel statePanel = new JPanel(new BorderLayout());
-        statePanel.add(defaultState, BorderLayout.LINE_START);
-        statePanel.add(selectState, BorderLayout.LINE_END);
-        settings.add(statePanel, c);
+        settings.add(getStatePanel(), c);
 
         c.gridx = 1;
         c.gridy = 2;
@@ -246,6 +226,29 @@ public class SettingsDialog extends StandardDialog implements ShowableDialog {
         paramsPanel.add(cache, BorderLayout.PAGE_END);
 
         return paramsPanel;
+    }
+
+    private static JPanel getStatePanel() {
+        String propState = Settings.getProperty("startup.loadState");
+        boolean loadState = propState != null && !"false".equals(propState);
+        JButton selectState = new JButton("Select State");
+        selectState.setEnabled(loadState);
+        selectState.addActionListener(e -> {
+            File file = LoadStateDialog.get();
+            if (file != null)
+                Settings.setProperty("startup.loadState", file.toString());
+        });
+
+        JCheckBox defaultState = new JCheckBox("Load state", loadState);
+        defaultState.addActionListener(e -> {
+            selectState.setEnabled(defaultState.isSelected());
+            Settings.setProperty("startup.loadState", Boolean.toString(defaultState.isSelected()));
+        });
+
+        JPanel statePanel = new JPanel(new BorderLayout());
+        statePanel.add(defaultState, BorderLayout.LINE_START);
+        statePanel.add(selectState, BorderLayout.LINE_END);
+        return statePanel;
     }
 
     private static class DefaultsSelectionPanel extends JPanel {
