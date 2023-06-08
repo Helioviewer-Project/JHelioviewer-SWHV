@@ -63,6 +63,18 @@ class BandOptionPanel extends JPanel {
 
         c.gridx = 2;
         c.anchor = GridBagConstraints.LINE_END;
+        JideButton downloadButton = getDownloadButton(band);
+        add(downloadButton, c);
+
+        c.gridy = 1;
+        c.gridx = 0;
+        c.anchor = GridBagConstraints.LINE_START;
+        JButton availabilityButton = new JButton("Available data");
+        availabilityButton.addActionListener(e -> JHVGlobals.openURL(TimelineSettings.AVAILABILITY_URL + '#' + band.getBandType().getName()));
+        add(availabilityButton, c);
+    }
+
+    private static JideButton getDownloadButton(Band band) {
         JideButton downloadButton = new JideButton(Buttons.download);
         downloadButton.setToolTipText("Download selected layer");
         downloadButton.addActionListener(e -> {
@@ -79,14 +91,7 @@ class BandOptionPanel extends JPanel {
                 }
             }).start();
         });
-        add(downloadButton, c);
-
-        c.gridy = 1;
-        c.gridx = 0;
-        c.anchor = GridBagConstraints.LINE_START;
-        JButton availabilityButton = new JButton("Available data");
-        availabilityButton.addActionListener(e -> JHVGlobals.openURL(TimelineSettings.AVAILABILITY_URL + '#' + band.getBandType().getName()));
-        add(availabilityButton, c);
+        return downloadButton;
     }
 
 }
