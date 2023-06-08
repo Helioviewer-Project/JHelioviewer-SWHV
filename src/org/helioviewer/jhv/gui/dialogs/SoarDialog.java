@@ -2,6 +2,7 @@ package org.helioviewer.jhv.gui.dialogs;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import javax.annotation.Nullable;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -16,6 +18,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.JHVGlobals;
@@ -158,7 +161,19 @@ public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
 
     @Override
     public JComponent createContentPanel() {
+        JRadioButton timeQuery = new JRadioButton("Time");
+        timeQuery.setSelected(true);
+        JRadioButton soopQuery = new JRadioButton("SOOP");
+        soopQuery.setSelected(false);
+        ButtonGroup queryGroup = new ButtonGroup();
+        queryGroup.add(timeQuery);
+        queryGroup.add(soopQuery);
         JComboBox<String> soopCombo = new JComboBox<>(SOOPs.toArray(String[]::new));
+        JPanel queryPanel = new JPanel(new GridLayout(2, 2, 0, 0));
+        queryPanel.add(timeQuery);
+        queryPanel.add(timeSelectorPanel);
+        queryPanel.add(soopQuery);
+        queryPanel.add(soopCombo);
 
         JPanel dataSelector = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
         JComboBox<String> datasetCombo = new JComboBox<>(Dataset.keySet().toArray(String[]::new));
@@ -171,9 +186,13 @@ public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
             if (datasetCombo.getSelectedItem() instanceof String dataset && levelCombo.getSelectedItem() instanceof String level) {
                 List<String> descriptors = Dataset.get(dataset);
                 if (descriptors != null) {
-                    //SoarClient.submitSearchTime(this, descriptors, level, timeSelectorPanel.getStartTime(), timeSelectorPanel.getEndTime());
-                    SoarClient.submitSearchSoop(this, descriptors, level, "L_FULL_HRES_HCAD_Coronal-Dynamics");
-                    foundLabel.setText("Searching...");
+                    if (timeQuery.isSelected()) {
+                        SoarClient.submitSearchTime(this, descriptors, level, timeSelectorPanel.getStartTime(), timeSelectorPanel.getEndTime());
+                        foundLabel.setText("Searching...");
+                    } else if (soopCombo.getSelectedItem() instanceof String soop) {
+                        SoarClient.submitSearchSoop(this, descriptors, level, soop);
+                        foundLabel.setText("Searching...");
+                    }
                 }
             }
         });
@@ -196,8 +215,7 @@ public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
 
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
-        content.add(timeSelectorPanel);
-        content.add(soopCombo);
+        content.add(queryPanel);
         content.add(dataSelector);
         content.add(foundPanel);
         content.add(scrollPane);
