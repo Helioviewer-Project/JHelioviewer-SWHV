@@ -32,17 +32,23 @@ public class SoarClient {
         }
     }
 
-    private static void doDataSearch(@Nonnull Receiver receiver, String adql) {
+    private static void doDataSearch(@Nonnull ReceiverItems receiver, String adql) {
         String url = QUERY_URL + URLEncoder.encode(adql, StandardCharsets.UTF_8);
-        EventQueueCallbackExecutor.pool.submit(new ADQLQuery(url), new Callback(receiver));
+        EventQueueCallbackExecutor.pool.submit(new QueryItems(url), new CallbackItems(receiver));
     }
 
-    public static void submitSearchTime(@Nonnull Receiver receiver, @Nonnull List<String> descriptors, @Nonnull String level, long start, long end) {
+    public static void submitSearchTime(@Nonnull ReceiverItems receiver, @Nonnull List<String> descriptors, @Nonnull String level, long start, long end) {
         doDataSearch(receiver, adqlSearchTime(descriptors, level, start, end));
     }
 
-    public static void submitSearchSoop(@Nonnull Receiver receiver, @Nonnull List<String> descriptors, @Nonnull String level, String soop) {
+    public static void submitSearchSoop(@Nonnull ReceiverItems receiver, @Nonnull List<String> descriptors, @Nonnull String level, String soop) {
         doDataSearch(receiver, adqlSearchSoop(descriptors, level, soop));
+    }
+
+    public static void submitGetSoops(@Nonnull ReceiverSoops receiver) {
+        String adql = "SELECT DISTINCT soop_name FROM soop ORDER BY soop_name";
+        String url = QUERY_URL + URLEncoder.encode(adql, StandardCharsets.UTF_8);
+        EventQueueCallbackExecutor.pool.submit(new QuerySoops(url), new CallbackSoops(receiver));
     }
 
     public static void submitLoad(@Nonnull List<DataItem> items) {
@@ -68,7 +74,7 @@ public class SoarClient {
     }
 
     static void submitTable(@Nonnull URI uri) {
-        EventQueueCallbackExecutor.pool.submit(new TableQuery(uri), new CallbackTable());
+        EventQueueCallbackExecutor.pool.submit(new QueryTable(uri), new CallbackTable());
     }
 
     private static String adqlSearchTime(List<String> descriptors, String level, long start, long end) {
@@ -101,11 +107,26 @@ public class SoarClient {
         return result;
     }
 
-    public interface Receiver {
-        void setSoarResponse(List<DataItem> list);
+    private static List<String> json2Soops(JSONObject jo) {
+        JSONArray data = jo.getJSONArray("data");
+        int length = data.length();
+        List<String> result = new ArrayList<>(length);
+        for (int i = 0; i < length; i++) {
+            JSONArray item = data.getJSONArray(i);
+            result.add(item.getString(0));
+        }
+        return result;
     }
 
-    private record ADQLQuery(String url) implements Callable<List<DataItem>> {
+    public interface ReceiverItems {
+        void setSoarResponseItems(List<DataItem> list);
+    }
+
+    public interface ReceiverSoops {
+        void setSoarResponseSoops(List<String> list);
+    }
+
+    private record QueryItems(String url) implements Callable<List<DataItem>> {
         @Override
         public List<DataItem> call() throws Exception {
             JSONObject jo = JSONUtils.get(new URI(url));
@@ -113,18 +134,41 @@ public class SoarClient {
         }
     }
 
-    private record TableQuery(URI uri) implements Callable<List<DataItem>> {
+    private record QuerySoops(String url) implements Callable<List<String>> {
+        @Override
+        public List<String> call() throws Exception {
+            JSONObject jo = JSONUtils.get(new URI(url));
+            return json2Soops(jo);
+        }
+    }
+
+    private record QueryTable(URI uri) implements Callable<List<DataItem>> {
         @Override
         public List<DataItem> call() throws Exception {
             return SoarTable.get(uri);
         }
     }
 
-    private record Callback(Receiver receiver) implements FutureCallback<List<DataItem>> {
+    private record CallbackItems(ReceiverItems receiver) implements FutureCallback<List<DataItem>> {
 
         @Override
         public void onSuccess(List<DataItem> result) {
-            receiver.setSoarResponse(result);
+            receiver.setSoarResponseItems(result);
+        }
+
+        @Override
+        public void onFailure(@Nonnull Throwable t) {
+            Log.error(t);
+            Message.err("An error occurred querying the server", t.getMessage());
+        }
+
+    }
+
+    private record CallbackSoops(ReceiverSoops receiver) implements FutureCallback<List<String>> {
+
+        @Override
+        public void onSuccess(List<String> result) {
+            receiver.setSoarResponseSoops(result);
         }
 
         @Override
