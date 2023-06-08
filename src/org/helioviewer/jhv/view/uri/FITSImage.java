@@ -150,21 +150,7 @@ class FITSImage implements URIImageReader {
         int width = axes[1];
 
         Object[] pixData = (Object[]) hdu.getData().getData();
-        PixType pixType;
-        if (pixData instanceof byte[][])
-            pixType = PixType.BYTE;
-        else if (pixData instanceof short[][])
-            pixType = PixType.SHORT;
-        else if (pixData instanceof int[][])
-            pixType = PixType.INT;
-        else if (pixData instanceof long[][])
-            pixType = PixType.LONG;
-        else if (pixData instanceof float[][])
-            pixType = PixType.FLOAT;
-        else if (pixData instanceof double[][])
-            pixType = PixType.DOUBLE;
-        else
-            throw new Exception("Unknown pixel type: " + pixData.getClass().getSimpleName());
+        PixType pixType = getPixType(pixData);
 
         if (pixType == PixType.BYTE) {
             byte[][] inData = (byte[][]) pixData;
@@ -212,6 +198,23 @@ class FITSImage implements URIImageReader {
         tasks.forEach(ForkJoinTask::join);
         //System.out.println(">>> " + sw.elapsed().toNanos() / 1e9);
         return new ImageBuffer(width, height, ImageBuffer.Format.Gray16, ShortBuffer.wrap(outData), lut);
+    }
+
+    private static PixType getPixType(Object[] pixData) throws Exception {
+        if (pixData instanceof byte[][])
+            return PixType.BYTE;
+        else if (pixData instanceof short[][])
+            return PixType.SHORT;
+        else if (pixData instanceof int[][])
+            return PixType.INT;
+        else if (pixData instanceof long[][])
+            return PixType.LONG;
+        else if (pixData instanceof float[][])
+            return PixType.FLOAT;
+        else if (pixData instanceof double[][])
+            return PixType.DOUBLE;
+        else
+            throw new Exception("Unknown pixel type: " + pixData.getClass().getSimpleName());
     }
 
     private record convert(PixType pixType, int width, Object lineData, long blank, double bzero, double bscale,
