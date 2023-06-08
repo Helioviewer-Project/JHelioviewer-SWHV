@@ -32,10 +32,17 @@ public class SoarClient {
         }
     }
 
-    public static void submitSearch(@Nonnull Receiver receiver, @Nonnull List<String> descriptors, @Nonnull String level, long start, long end) {
-        String adql = buildADQL(descriptors, level, start, end);
+    private static void doDataSearch(@Nonnull Receiver receiver, String adql) {
         String url = QUERY_URL + URLEncoder.encode(adql, StandardCharsets.UTF_8);
         EventQueueCallbackExecutor.pool.submit(new ADQLQuery(url), new Callback(receiver));
+    }
+
+    public static void submitSearchTime(@Nonnull Receiver receiver, @Nonnull List<String> descriptors, @Nonnull String level, long start, long end) {
+        doDataSearch(receiver, adqlSearchTime(descriptors, level, start, end));
+    }
+
+    public static void submitSearchSoop(@Nonnull Receiver receiver, @Nonnull List<String> descriptors, @Nonnull String level, String soop) {
+        doDataSearch(receiver, adqlSearchSoop(descriptors, level, soop));
     }
 
     public static void submitLoad(@Nonnull List<DataItem> items) {
@@ -64,11 +71,19 @@ public class SoarClient {
         EventQueueCallbackExecutor.pool.submit(new TableQuery(uri), new CallbackTable());
     }
 
-    private static String buildADQL(List<String> descriptors, String level, long start, long end) {
+    private static String adqlSearchTime(List<String> descriptors, String level, long start, long end) {
         String desc = String.join("' OR descriptor='", descriptors);
         return "SELECT data_item_id,file_format,filesize FROM v_sc_data_item WHERE " +
                 "(descriptor='" + desc + "') AND " +
                 "begin_time >= '" + TimeUtils.format(start) + "' AND end_time <= '" + TimeUtils.format(end) + "' AND " +
+                "level='" + level + "' ORDER BY begin_time";
+    }
+
+    private static String adqlSearchSoop(List<String> descriptors, String level, String soop) {
+        String desc = String.join("' OR descriptor='", descriptors);
+        return "SELECT data_item_id,file_format,filesize FROM v_sc_data_item WHERE " +
+                "(descriptor='" + desc + "') AND " +
+                "soop_name LIKE '%" + soop + "%' AND " +
                 "level='" + level + "' ORDER BY begin_time";
     }
 

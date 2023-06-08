@@ -221,9 +221,9 @@ class FITSImage implements URIImageReader {
         public void run() {
             for (int i = 0; i < width; i++) {
                 float v = getValue(pixType, lineData, i, blank, bzero, bscale);
-                if (v == ImageBuffer.BAD_PIXEL)
+                if (v == ImageBuffer.BAD_PIXEL) {
                     outData[outLine + i] = 0;
-                else {
+                } else {
                     v = MathUtils.clip(v, minMax[0], minMax[1]); // sampling may have missed extremes
                     int p = (int) MathUtils.clip(scale * MathUtils.pow(v - minMax[0], GAMMA) + .5, 0, 65535);
                     lut[p] = v;

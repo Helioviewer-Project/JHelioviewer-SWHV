@@ -25,6 +25,7 @@ import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
 import org.helioviewer.jhv.io.SoarClient;
 
 import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.collect.ImmutableSortedSet;
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
@@ -42,6 +43,62 @@ public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
             // put("MAG SRF", List.of("MAG-SRF-NORMAL" /*, "MAG-SRF-BURST" */)).
             // put("MAG VSO", List.of("MAG-VSO-NORMAL", "MAG-VSO-NORMAL-1-MINUTE"/*, "MAG-VSO-BURST"*/)).
                     put("SWA PAS", List.of("SWA-PAS-GRND-MOM")).
+            build();
+
+    // curl "http://soar.esac.esa.int/soar-sl-tap/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=csv&QUERY=SELECT+DISTINCT+soop_name+FROM+soar.soop+ORDER+BY+soop_name"
+    private static final ImmutableSortedSet<String> SOOPs = new ImmutableSortedSet.Builder<String>(JHVGlobals.alphanumComparator).
+            add("CC_OFFPOI_ALIGNMENT").
+            add("CC_OFFPOI_FLATFIELD_FULL").
+            add("CC_OFFPOI_FLATFIELD_HRI").
+            add("CC_OFFPOI_OOF").
+            add("CC_OFFPOI_STAR").
+            add("CC_OFFPOI_STRAYLIGHT").
+            add("CC_ROLLS_RS").
+            add("COORD_CALIBRATION").
+            add("I_DEFAULT").
+            add("L_BOTH_HRES_HCAD_Major-Flare").
+            add("L_BOTH_HRES_LCAD_CH-Boundary-Expansion").
+            add("L_BOTH_LRES_MCAD_Pole-to-Pole").
+            add("L_BOTH_MRES_MCAD_Farside-Connection").
+            add("L_BOTH_MRES_MCAD_Flare-SEPs").
+            add("L_FULL_HRES_HCAD_Coronal-Dynamics").
+            add("L_FULL_HRES_HCAD_Eruption-Watch").
+            add("L_FULL_HRES_LCAD_MagnFieldConfig").
+            add("L_FULL_HRES_MCAD_Coronal-He-Abundance").
+            add("L_FULL_LRES_MCAD_Coronal-Synoptic").
+            add("L_FULL_LRES_MCAD_Probe-Quadrature").
+            add("L_FULL_MRES_MCAD_CME-SEPs").
+            add("L_IS_SoloHI_STIX").
+            add("L_IS_STIX").
+            add("L_SMALL_HRES_HCAD_Fast-Wind").
+            add("L_SMALL_HRES_HCAD_Slow-Wind-Connection").
+            add("L_SMALL_MRES_MCAD_Ballistic-Connection").
+            add("L_SMALL_MRES_MCAD_Composition-Mosaic").
+            add("L_SMALL_MRES_MCAD_Connection-Mosaic").
+            add("L_SMALL_MRES_MCAD_Earth-Quadrature").
+            add("L_TEMPORARY").
+            add("R_BOTH_HRES_HCAD_Filaments").
+            add("R_BOTH_HRES_HCAD_Nanoflares").
+            add("R_BOTH_HRES_MCAD_Bright-Points").
+            add("R_FULL_HRES_HCAD_Density-Fluctuations").
+            add("R_FULL_LRES_HCAD_Full-Disk-Helioseismology").
+            add("R_FULL_LRES_LCAD_Out-of-RSW-synoptics").
+            add("R_FULL_LRES_LCAD_Transition-Corona").
+            add("R_SMALL_HRES_HCAD_AR-Dynamics").
+            add("R_SMALL_HRES_HCAD_Atmospheric-Dynamics-Structure").
+            add("R_SMALL_HRES_HCAD_Ephemeral").
+            add("R_SMALL_HRES_HCAD_Granulation-Tracking").
+            add("R_SMALL_HRES_HCAD_Local-Area-Helioseismology").
+            add("R_SMALL_HRES_HCAD_PDF-Mosaic").
+            add("R_SMALL_HRES_HCAD_RS-burst").
+            add("R_SMALL_HRES_HCAD_Wave-Stereoscopy").
+            add("R_SMALL_HRES_LCAD_Composition-vs-Height").
+            add("R_SMALL_HRES_LCAD_Fine-Scale-Structure").
+            add("R_SMALL_HRES_MCAD_AR-Heating").
+            add("R_SMALL_HRES_MCAD_Full-Disk-Mosaic").
+            add("R_SMALL_HRES_MCAD_Polar-Observations").
+            add("R_SMALL_MRES_HCAD_Sunspot-Oscillations").
+            add("R_SMALL_MRES_MCAD_AR-Long-Term").
             build();
 
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
@@ -101,6 +158,8 @@ public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
 
     @Override
     public JComponent createContentPanel() {
+        JComboBox<String> soopCombo = new JComboBox<>(SOOPs.toArray(String[]::new));
+
         JPanel dataSelector = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
         JComboBox<String> datasetCombo = new JComboBox<>(Dataset.keySet().toArray(String[]::new));
         dataSelector.add(datasetCombo);
@@ -112,7 +171,8 @@ public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
             if (datasetCombo.getSelectedItem() instanceof String dataset && levelCombo.getSelectedItem() instanceof String level) {
                 List<String> descriptors = Dataset.get(dataset);
                 if (descriptors != null) {
-                    SoarClient.submitSearch(this, descriptors, level, timeSelectorPanel.getStartTime(), timeSelectorPanel.getEndTime());
+                    //SoarClient.submitSearchTime(this, descriptors, level, timeSelectorPanel.getStartTime(), timeSelectorPanel.getEndTime());
+                    SoarClient.submitSearchSoop(this, descriptors, level, "L_FULL_HRES_HCAD_Coronal-Dynamics");
                     foundLabel.setText("Searching...");
                 }
             }
@@ -137,6 +197,7 @@ public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
         content.add(timeSelectorPanel);
+        content.add(soopCombo);
         content.add(dataSelector);
         content.add(foundPanel);
         content.add(scrollPane);
