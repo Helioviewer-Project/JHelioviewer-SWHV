@@ -138,7 +138,7 @@ public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
 
         JButton loadButton = getLoadButton();
         JButton cancelButton = new JButton(close);
-        cancelBtn.setText("Cancel");
+        cancelButton.setText("Cancel");
 
         ButtonPanel panel = new ButtonPanel();
         panel.add(loadButton, ButtonPanel.AFFIRMATIVE_BUTTON);
