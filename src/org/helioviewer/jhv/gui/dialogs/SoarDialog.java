@@ -134,20 +134,23 @@ public class SoarDialog extends StandardDialog implements SoarClient.ReceiverIte
         });
 
         GridBagConstraints gc = new GridBagConstraints();
-        gc.weightx = 1;
         gc.weighty = 1;
         gc.fill = GridBagConstraints.BOTH;
 
         JPanel queryPanel = new JPanel(new GridBagLayout());
+        gc.weightx = 0;
         gc.gridx = 0;
         gc.gridy = 0;
         queryPanel.add(timeQuery, gc);
+        gc.weightx = 1;
         gc.gridx = 1;
         gc.gridy = 0;
         queryPanel.add(timeSelectorPanel, gc);
+        gc.weightx = 0;
         gc.gridx = 0;
         gc.gridy = 1;
         queryPanel.add(soopQuery, gc);
+        gc.weightx = 1;
         gc.gridx = 1;
         gc.gridy = 1;
         queryPanel.add(soopCombo, gc);
@@ -158,22 +161,8 @@ public class SoarDialog extends StandardDialog implements SoarClient.ReceiverIte
         JComboBox<String> levelCombo = new JComboBox<>(Level);
         levelCombo.setSelectedItem("L2");
         dataSelector.add(levelCombo);
-        JButton searchBtn = new JButton("Search");
-        searchBtn.addActionListener(e -> {
-            if (datasetCombo.getSelectedItem() instanceof String dataset && levelCombo.getSelectedItem() instanceof String level) {
-                List<String> descriptors = Dataset.get(dataset);
-                if (descriptors != null) {
-                    if (timeQuery.isSelected()) {
-                        SoarClient.submitSearchTime(this, descriptors, level, timeSelectorPanel.getStartTime(), timeSelectorPanel.getEndTime());
-                        foundLabel.setText("Searching...");
-                    } else if (soopCombo.getSelectedItem() instanceof String soop) {
-                        SoarClient.submitSearchSoop(this, descriptors, level, soop);
-                        foundLabel.setText("Searching...");
-                    }
-                }
-            }
-        });
-        dataSelector.add(searchBtn);
+        JButton searchButton = getSearchButton(datasetCombo, levelCombo, timeQuery);
+        dataSelector.add(searchButton);
 
         JPanel foundPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
         foundPanel.add(foundLabel);
@@ -200,6 +189,25 @@ public class SoarDialog extends StandardDialog implements SoarClient.ReceiverIte
 
         content.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
         return content;
+    }
+
+    private JButton getSearchButton(JComboBox<String> datasetCombo, JComboBox<String> levelCombo, JRadioButton timeQuery) {
+        JButton searchButton = new JButton("Search");
+        searchButton.addActionListener(e -> {
+            if (datasetCombo.getSelectedItem() instanceof String dataset && levelCombo.getSelectedItem() instanceof String level) {
+                List<String> descriptors = Dataset.get(dataset);
+                if (descriptors != null) {
+                    if (timeQuery.isSelected()) {
+                        SoarClient.submitSearchTime(this, descriptors, level, timeSelectorPanel.getStartTime(), timeSelectorPanel.getEndTime());
+                        foundLabel.setText("Searching...");
+                    } else if (soopCombo.getSelectedItem() instanceof String soop) {
+                        SoarClient.submitSearchSoop(this, descriptors, level, soop);
+                        foundLabel.setText("Searching...");
+                    }
+                }
+            }
+        });
+        return searchButton;
     }
 
     @Nullable
