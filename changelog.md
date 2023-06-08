@@ -4,6 +4,8 @@
 ## JHelioviewer 4.5.1 (pending)
 
 - Toolbar button for automatic image layers refresh to current data every 15 minutes
+- Allow loading IRIS SJI images from servers
+- Ability to query SOAR by SOOP
 
 ## JHelioviewer 4.5 (2023-05-10)
 
