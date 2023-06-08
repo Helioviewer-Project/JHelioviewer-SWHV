@@ -133,25 +133,22 @@ public class SoarDialog extends StandardDialog implements SoarClient.ReceiverIte
             ComponentUtils.setEnabled(timeSelectorPanel, !selected);
         });
 
+        JPanel queryPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gc = new GridBagConstraints();
         gc.weighty = 1;
         gc.fill = GridBagConstraints.BOTH;
 
-        JPanel queryPanel = new JPanel(new GridBagLayout());
         gc.weightx = 0;
         gc.gridx = 0;
         gc.gridy = 0;
         queryPanel.add(timeQuery, gc);
+        gc.gridy = 1;
+        queryPanel.add(soopQuery, gc);
+
         gc.weightx = 1;
         gc.gridx = 1;
         gc.gridy = 0;
         queryPanel.add(timeSelectorPanel, gc);
-        gc.weightx = 0;
-        gc.gridx = 0;
-        gc.gridy = 1;
-        queryPanel.add(soopQuery, gc);
-        gc.weightx = 1;
-        gc.gridx = 1;
         gc.gridy = 1;
         queryPanel.add(soopCombo, gc);
 
