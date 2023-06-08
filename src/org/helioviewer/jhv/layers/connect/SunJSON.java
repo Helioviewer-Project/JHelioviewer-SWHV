@@ -86,21 +86,7 @@ public class SunJSON {
                             coords.add(new Vec3(coord.getDouble(0), Math.toRadians(coord.getDouble(1)), Math.toRadians(coord.getDouble(2))));
                         }
                     }
-                    int coordsSize = coords.size();
-                    switch (type) {
-                        case Point -> {
-                            if (coordsSize < 1)
-                                throw new JSONException("Point type needs at least one coordinate");
-                        }
-                        case Line -> {
-                            if (coordsSize < 2)
-                                throw new JSONException("Line type needs at least two coordinates");
-                        }
-                        case Ellipse -> {
-                            if (coordsSize != 3)
-                                throw new JSONException("Ellipse type needs exactly three coordinates");
-                        }
-                    }
+                    int coordsSize = getCoordsSize(coords, type);
 
                     List<byte[]> colors = new ArrayList<>();
                     JSONArray ca = go.optJSONArray("colors");
@@ -135,6 +121,25 @@ public class SunJSON {
         }
 
         return new Pair<>(time, geometryList);
+    }
+
+    private static int getCoordsSize(List<Vec3> coords, GeometryType type) {
+        int coordsSize = coords.size();
+        switch (type) {
+            case Point -> {
+                if (coordsSize < 1)
+                    throw new JSONException("Point type needs at least one coordinate");
+            }
+            case Line -> {
+                if (coordsSize < 2)
+                    throw new JSONException("Line type needs at least two coordinates");
+            }
+            case Ellipse -> {
+                if (coordsSize != 3)
+                    throw new JSONException("Ellipse type needs exactly three coordinates");
+            }
+        }
+        return coordsSize;
     }
 
     private static void toCartesian(Vec3 v, double r, double lon, double lat) {
