@@ -2,6 +2,8 @@ package org.helioviewer.jhv.gui.dialogs;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.util.List;
@@ -22,6 +24,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
@@ -165,19 +168,42 @@ public class SoarDialog extends StandardDialog implements SoarClient.Receiver {
 
     @Override
     public JComponent createContentPanel() {
+        JComboBox<String> soopCombo = new JComboBox<>(SOOPs.toArray(String[]::new));
+        soopCombo.setEnabled(false);
+
         JRadioButton timeQuery = new JRadioButton("Time");
         timeQuery.setSelected(true);
         JRadioButton soopQuery = new JRadioButton("SOOP");
         soopQuery.setSelected(false);
+
         ButtonGroup queryGroup = new ButtonGroup();
         queryGroup.add(timeQuery);
         queryGroup.add(soopQuery);
-        JComboBox<String> soopCombo = new JComboBox<>(SOOPs.toArray(String[]::new));
-        JPanel queryPanel = new JPanel(new GridLayout(2, 2, 0, 0));
-        queryPanel.add(timeQuery);
-        queryPanel.add(timeSelectorPanel);
-        queryPanel.add(soopQuery);
-        queryPanel.add(soopCombo);
+
+        soopQuery.addItemListener(e -> {
+                boolean select = soopQuery.isSelected();
+                soopCombo.setEnabled(select);
+                ComponentUtils.setEnabled(timeSelectorPanel, !select);
+        });
+
+        GridBagConstraints gc = new GridBagConstraints();
+        gc.weightx = 1;
+        gc.weighty = 1;
+        gc.fill = GridBagConstraints.BOTH;
+
+        JPanel queryPanel = new JPanel(new GridBagLayout());
+        gc.gridx = 0;
+        gc.gridy = 0;
+        queryPanel.add(timeQuery, gc);
+        gc.gridx = 1;
+        gc.gridy = 0;
+        queryPanel.add(timeSelectorPanel, gc);
+        gc.gridx = 0;
+        gc.gridy = 1;
+        queryPanel.add(soopQuery, gc);
+        gc.gridx = 1;
+        gc.gridy = 1;
+        queryPanel.add(soopCombo, gc);
 
         JPanel dataSelector = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
         JComboBox<String> datasetCombo = new JComboBox<>(Dataset.keySet().toArray(String[]::new));
