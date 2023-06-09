@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.zip.InflaterInputStream;
 import java.util.zip.GZIPInputStream;
 
+import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.helioviewer.jhv.JHVGlobals;
@@ -29,11 +30,14 @@ public class HTTPSocket {
             String host = uri.getHost();
             int port = uri.getPort() <= 0 ? 80 : uri.getPort();
 
-            socket = switch (uri.getScheme().toLowerCase()) {
-                case "jpip" -> new Socket(ProxySettings.proxy);
-                case "jpips" -> SSLSocketFactory.getDefault().createSocket();
+            switch (uri.getScheme().toLowerCase()) {
+                case "jpip" -> socket = new Socket(ProxySettings.proxy);
+                case "jpips" -> {
+                    socket = SSLSocketFactory.getDefault().createSocket();
+                    ((SSLSocket) socket).setEnabledProtocols(new String[]{"TLSv1.3"});
+                }
                 default -> throw new IOException("JPIP scheme not supported: " + uri);
-            };
+            }
 
             socket.setReceiveBufferSize(Math.max(262144 * 8, 2 * socket.getReceiveBufferSize()));
             socket.setTrafficClass(0x10);
