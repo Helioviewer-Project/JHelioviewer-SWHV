@@ -4,7 +4,7 @@ JHelioviewer
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/9940/badge.svg)](https://scan.coverity.com/projects/9940)
 [![DOI](https://zenodo.org/badge/50179170.svg)](https://zenodo.org/badge/latestdoi/50179170)
 
-Website: http://www.jhelioviewer.org/
+Website: https://www.jhelioviewer.org
 
 User manual: http://swhv.oma.be/user_manual/
 

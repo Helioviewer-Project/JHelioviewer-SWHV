@@ -112,7 +112,7 @@ public class MenuBar extends JMenuBar {
         }
 
         helpMenu.add(new OpenURLinBrowserAction("Open User Manual", JHVGlobals.documentationURL));
-        helpMenu.add(new OpenURLinBrowserAction("Open Website", "http://www.jhelioviewer.org"));
+        helpMenu.add(new OpenURLinBrowserAction("Open Website", "https://www.jhelioviewer.org"));
         helpMenu.add(new CheckUpdateAction());
         helpMenu.addSeparator();
         helpMenu.add(new ShowDialogAction("Show Log...", new LogDialog()));
