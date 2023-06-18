@@ -9,6 +9,6 @@ public class JPIPStream implements Serializable {
     @Serial
     private static final long serialVersionUID = JPIPSegment.serialVersionUID;
 
-    public final ArrayList<JPIPSegment> segments = new ArrayList<>();
+    final ArrayList<JPIPSegment> segments = new ArrayList<>();
 
 }

@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -63,7 +64,7 @@ public class SWEKGroup extends DefaultMutableTreeNode implements JHVCell {
         panel.add(over, BorderLayout.LINE_END);
     }
 
-    public HashMap<String, String> getAllDatabaseFields() {
+    public Map<String, String> getAllDatabaseFields() {
         if (databaseFields == null) {
             createAllDatabaseFields();
         }
