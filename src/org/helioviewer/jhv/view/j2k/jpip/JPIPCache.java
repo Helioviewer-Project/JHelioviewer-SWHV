@@ -48,7 +48,7 @@ public class JPIPCache extends Kdu_cache {
         return stream;
     }
 
-    public void put(int frame, JPIPSegment seg) throws KduException {
+    void put(int frame, JPIPSegment seg) throws KduException {
         addToKdu(frame, seg);
     }
 
