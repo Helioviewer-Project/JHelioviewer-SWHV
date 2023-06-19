@@ -1,7 +1,7 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.5.1 (pending)
+## JHelioviewer 4.5.1 (2023-06-19)
 
 - Toolbar button for automatic image layers refresh to current data every 15 minutes
 - Allow loading IRIS SJI images from servers

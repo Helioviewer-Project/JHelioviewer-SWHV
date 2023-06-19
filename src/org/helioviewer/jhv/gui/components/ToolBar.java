@@ -306,7 +306,7 @@ public class ToolBar extends JToolBar {
         add(new JToolBar.Separator(dim));
 /*
         ButtonText hText = new ButtonText("HAPI", "HAPI", "HAPI");
-        JideButton hButton  = toolButton(hText);
+        JideButton hButton = toolButton(hText);
         hButton.addActionListener(e -> HapiClient.submit());
         addButton(hButton);
 */
