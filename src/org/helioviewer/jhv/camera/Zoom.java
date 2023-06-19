@@ -19,7 +19,7 @@ class Zoom {
     private static final double spdTol = 0.0005;
     private static final double spdLmt = 25;
     private static final double accLmt = 5;
-    // private static final double lambda = 0.005;
+    // private static final double lambda = Math.exp(-0.005 * MILLIS_PER_FRAME);
 
     void zoom(Camera camera, double wheelDelta) {
         if (wheelDelta == 0)
@@ -28,8 +28,7 @@ class Zoom {
         boolean sameDirection = mLastWheelDelta * wheelDelta > 0.0;
         mLastWheelDelta = wheelDelta;
 
-        if (!sameDirection) {
-            // changed direction
+        if (!sameDirection) {  // changed direction
             zeroVelocity();
             return;
         }
@@ -44,20 +43,20 @@ class Zoom {
             mVelocities.remove(0);
         }
         mVelocities.add(newVelocity);
-
         mVelocity = getAverage(mVelocities);
+
         // limit acceleration
         double acc = (mVelocity - oldVelocity) / MILLIS_PER_FRAME;
         if (Math.abs(acc) > accLmt) {
             mVelocity = oldVelocity + accLmt * MILLIS_PER_FRAME * Math.signum(acc);
         }
-        // mVelocity *= Math.exp(-lambda * MILLIS_PER_FRAME);
+        // mVelocity *= lambda; // exponential decay
 
         // limit speed
-        if (Math.abs(mVelocity) > spdLmt) {
+        double absVelocity = Math.abs(mVelocity);
+        if (absVelocity > spdLmt) {
             mVelocity = spdLmt * Math.signum(mVelocity);
-        }
-        if (Math.abs(mVelocity) < spdTol) {
+        } else if (absVelocity < spdTol) {
             zeroVelocity();
         }
 
