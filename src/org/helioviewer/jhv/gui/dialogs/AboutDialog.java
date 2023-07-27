@@ -41,7 +41,7 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
     @Override
     public JComponent createContentPanel() {
         String text = "<center>This software was built using several components including:</center><ul>" +
-                "<li><a href=\"http://www.kakadusoftware.com\">Kakadu</a> JPEG2000 Toolkit, © 2015, <a href='/licenses/Kakadu.txt'>licensed</a> from NewSouth Innovations Ltd.</li>" +
+                "<li><a href=\"https://kakadusoftware.com\">Kakadu</a> JPEG2000 Toolkit, © 2015, <a href='/licenses/Kakadu.txt'>licensed</a> from NewSouth Innovations Ltd.</li>" +
                 "<li><a href=\"https://jogamp.org\">JogAmp</a> libraries for Java 3D graphics.</li>" +
                 "<li><a href=\"https://github.com/JOML-CI/JOML\">JOML</a>, a Java math library for OpenGL rendering calculations.</li>" +
                 "<li><a href=\"https://naif.jpl.nasa.gov/naif/\">SPICE</a>, the observation geometry system for space science missions.</li>" +
@@ -49,12 +49,12 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
                 "<li><a href=\"https://github.com/square/okio\">Okio</a> and <a href=\"https://github.com/square/okhttp\">OkHttp</a> libraries by Square, Inc.</li>" +
                 "<li><a href=\"https://github.com/google/guava\">Guava</a>, Google core libraries for Java.</li>" +
                 "<li><a href=\"https://github.com/ben-manes/caffeine\">Caffeine</a>, a high performance caching library for Java.</li>" +
-                "<li><a href=\"http://www.ehcache.org\">Ehcache</a> library.</li>" +
-                "<li><a href=\"http://www.ocpsoft.org/prettytime/nlp\">PrettyTime NLP</a>, a human time parsing library.</li>" +
+                "<li><a href=\"https://www.ehcache.org\">Ehcache</a> library.</li>" +
+                "<li><a href=\"https://www.ocpsoft.org/prettytime/nlp\">PrettyTime NLP</a>, a human time parsing library.</li>" +
                 "<li><a href=\"https://github.com/jidesoft/jide-oss\">JIDE Common Layer</a>, © 2002-2017, JIDE Software, Inc.</li>" +
                 "<li><a href=\"https://github.com/JFormDesigner/FlatLaf\">FlatLaf</a>, a modern cross-platform Look and Feel for Java Swing.</li>" +
-                "<li><a href=\"http://www.star.bristol.ac.uk/%7Embt/jsamp/index.html\">JSAMP</a> toolkit for the Simple Applications Messaging Protocol.</li>" +
-                "<li><a href=\"http://nom-tam-fits.github.io/nom-tam-fits\">FITS</a> in Java public domain library.</li>" +
+                "<li><a href=\"https://www.star.bristol.ac.uk/~mbt/jsamp/\">JSAMP</a> toolkit for the Simple Applications Messaging Protocol.</li>" +
+                "<li><a href=\"https://nom-tam-fits.github.io/nom-tam-fits\">FITS</a> in Java public domain library.</li>" +
                 "<li><a href=\"https://github.com/xerial/sqlite-jdbc\">Xerial</a> SQLite JDBC driver.</li>" +
                 "<li><a href=\"https://www.ej-technologies.com/products/install4j/overview.html\">install4j</a>, the multi-platform installer builder.</li>";
 
