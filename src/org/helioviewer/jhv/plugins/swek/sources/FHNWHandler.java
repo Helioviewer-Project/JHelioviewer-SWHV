@@ -2,8 +2,6 @@ package org.helioviewer.jhv.plugins.swek.sources;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -16,6 +14,7 @@ import org.helioviewer.jhv.events.SWEKHandler;
 import org.helioviewer.jhv.events.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.io.JSONUtils;
+import org.helioviewer.jhv.io.UriTemplate;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,7 +22,7 @@ import org.json.JSONObject;
 
 public class FHNWHandler extends SWEKHandler {
 
-    private static final String QUERY_URL = "https://tap.cs.technik.fhnw.ch/__system__/tap/run/tap";
+    private static final UriTemplate queryTemplate = new UriTemplate("https://tap.cs.technik.fhnw.ch/__system__/tap/run/tap/sync").set("REQUEST", "doQuery").set("LANG", "ADQL").set("FORMAT", "json");
 
     @Override
     protected boolean parseRemote(JSONObject eventJSON, SWEKSupplier supplier) {
@@ -95,7 +94,7 @@ public class FHNWHandler extends SWEKHandler {
         String adql = "SELECT TOP 10 * FROM rhessi_flares.epn_core WHERE" +
                 " start_time >= '" + "2002-01-01T00:00:00" + //TimeUtils.format(start) +
                 "' AND end_time <= '" + TimeUtils.format(end) + "' ORDER BY start_time";
-        return new URI(QUERY_URL + "/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=" + URLEncoder.encode(adql, StandardCharsets.UTF_8));
+        return new URI(queryTemplate.set("QUERY", adql).toString());
     }
 
     @Override
