@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.astronomy;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +13,6 @@ public class SpaceObject {
 
     private final boolean internal;
     private final String spiceName;
-    private final String urlName;
     private final String uiName;
     private final double radius;
     private final byte[] color;
@@ -64,7 +61,6 @@ public class SpaceObject {
     private SpaceObject(boolean _internal, String _spiceName, String _uiName, double _radius, byte[] _color) {
         internal = _internal;
         spiceName = _spiceName;
-        urlName = URLEncoder.encode(spiceName, StandardCharsets.UTF_8);
         uiName = _uiName;
         radius = _radius;
         color = _color;
@@ -76,10 +72,6 @@ public class SpaceObject {
 
     public String getSpiceName() {
         return spiceName;
-    }
-
-    public String getUrlName() {
-        return urlName;
     }
 
     public double getRadius() {
@@ -95,13 +87,13 @@ public class SpaceObject {
         if (this == o)
             return true;
         if (o instanceof SpaceObject s)
-            return urlName.equals(s.urlName);
+            return spiceName.equals(s.spiceName);
         return false;
     }
 
     @Override
     public int hashCode() {
-        return urlName.hashCode();
+        return spiceName.hashCode();
     }
 
     @Override

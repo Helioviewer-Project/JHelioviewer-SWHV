@@ -47,8 +47,8 @@ public record PositionLoad(StatusReceiver receiver, SpaceObject target, boolean 
             }
 
             template.set("ref", frame)
-                    .set("observer", observer.getUrlName())
-                    .set("target", target.getUrlName())
+                    .set("observer", observer.getSpiceName())
+                    .set("target", target.getSpiceName())
                     .set("utc", TimeUtils.format(start))
                     .set("utc_end", TimeUtils.format(end))
                     .set("deltat", deltat);
