@@ -18,8 +18,10 @@ import com.google.common.util.concurrent.FutureCallback;
 
 public class SoarClient {
 
-    private static final UriTemplate queryTemplate = new UriTemplate("http://soar.esac.esa.int/soar-sl-tap/tap/sync").set("REQUEST", "doQuery").set("LANG", "ADQL").set("FORMAT", "json");
-    private static final UriTemplate loadTemplate = new UriTemplate("http://soar.esac.esa.int/soar-sl-tap/data").set("retrieval_type", "LAST_PRODUCT").set("product_type", "SCIENCE");
+    private static final UriTemplate queryTemplate = new UriTemplate("http://soar.esac.esa.int/soar-sl-tap/tap/sync",
+            UriTemplate.vars().set("REQUEST", "doQuery").set("LANG", "ADQL").set("FORMAT", "json"));
+    private static final UriTemplate loadTemplate = new UriTemplate("http://soar.esac.esa.int/soar-sl-tap/data",
+            UriTemplate.vars().set("retrieval_type", "LAST_PRODUCT").set("product_type", "SCIENCE"));
 
     enum FileFormat {CDF, FITS, JP2}
 
@@ -31,8 +33,7 @@ public class SoarClient {
     }
 
     private static void doDataSearch(@Nonnull ReceiverItems receiver, String adql) {
-        String url = queryTemplate.set("QUERY", adql).toString();
-        EventQueueCallbackExecutor.pool.submit(new QueryItems(url), new CallbackItems(receiver));
+        EventQueueCallbackExecutor.pool.submit(new QueryItems(adql), new CallbackItems(receiver));
     }
 
     public static void submitSearchTime(@Nonnull ReceiverItems receiver, @Nonnull List<String> descriptors, @Nonnull String level, long start, long end) {
@@ -44,8 +45,7 @@ public class SoarClient {
     }
 
     public static void submitGetSoops(@Nonnull ReceiverSoops receiver) {
-        String url = queryTemplate.set("QUERY", "SELECT DISTINCT soop_name FROM soop ORDER BY soop_name").toString();
-        EventQueueCallbackExecutor.pool.submit(new QuerySoops(url), new CallbackSoops(receiver));
+        EventQueueCallbackExecutor.pool.submit(new QuerySoops("SELECT DISTINCT soop_name FROM soop ORDER BY soop_name"), new CallbackSoops(receiver));
     }
 
     public static void submitLoad(@Nonnull List<DataItem> items) {
@@ -55,7 +55,7 @@ public class SoarClient {
 
         for (DataItem item : items) {
             try {
-                URI uri = new URI(loadTemplate.set("data_item_id", item.id).toString());
+                URI uri = new URI(loadTemplate.expand(UriTemplate.vars().set("data_item_id", item.id)));
                 switch (item.format) {
                     case CDF -> cdfUris.add(uri);
                     case FITS -> fitsUris.add(uri);
@@ -123,18 +123,20 @@ public class SoarClient {
         void setSoarResponseSoops(List<String> list);
     }
 
-    private record QueryItems(String url) implements Callable<List<DataItem>> {
+    private record QueryItems(String adql) implements Callable<List<DataItem>> {
         @Override
         public List<DataItem> call() throws Exception {
-            JSONObject jo = JSONUtils.get(new URI(url));
+            URI uri = new URI(queryTemplate.expand(UriTemplate.vars().set("QUERY", adql)));
+            JSONObject jo = JSONUtils.get(uri);
             return json2DataItems(jo);
         }
     }
 
-    private record QuerySoops(String url) implements Callable<List<String>> {
+    private record QuerySoops(String adql) implements Callable<List<String>> {
         @Override
         public List<String> call() throws Exception {
-            JSONObject jo = JSONUtils.get(new URI(url));
+            URI uri = new URI(queryTemplate.expand(UriTemplate.vars().set("QUERY", adql)));
+            JSONObject jo = JSONUtils.get(uri);
             return json2Soops(jo);
         }
     }

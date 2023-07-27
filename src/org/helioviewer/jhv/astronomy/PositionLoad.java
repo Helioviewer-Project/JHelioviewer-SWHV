@@ -46,13 +46,13 @@ public record PositionLoad(StatusReceiver receiver, SpaceObject target, boolean 
                     return new PositionResponse(p);
             }
 
-            template.set("ref", frame)
+            URI uri = new URI(template.expand(UriTemplate.vars()
+                    .set("ref", frame)
                     .set("observer", observer.getSpiceName())
                     .set("target", target.getSpiceName())
                     .set("utc", TimeUtils.format(start))
                     .set("utc_end", TimeUtils.format(end))
-                    .set("deltat", deltat);
-            URI uri = new URI(template.toString());
+                    .set("deltat", deltat)));
 
             //Stopwatch sw = Stopwatch.createStarted();
             try (NetClient nc = NetClient.of(uri, true)) {

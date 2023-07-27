@@ -28,27 +28,26 @@ public class HapiClient {
 
     public static void submit() {
 /*
-        UriTemplate template = new UriTemplate("https://cdaweb.gsfc.nasa.gov/hapi/data").set("include", "header").set("format", "csv");
+        UriTemplate template = new UriTemplate("https://cdaweb.gsfc.nasa.gov/hapi/data", UriTemplate.vars().set("include", "header").set("format", "csv"));
         String dataset = "SOLO_L2_MAG-RTN-NORMAL-1-MINUTE";
         String parameters = "B_RTN";
         String startTime = "2022-01-01T00:00:00";
         String endTime = "2022-01-02T00:00:00";
 */
-        UriTemplate template = new UriTemplate("https://api.helioviewer.org/hapi/data").set("include", "header").set("format", "csv");
+        UriTemplate template = new UriTemplate("https://api.helioviewer.org/hapi/data", UriTemplate.vars().set("include", "header").set("format", "csv"));
         String dataset = "AIA_171";
         String parameters = "jp2_url";
         long end = MoviePanel.getInstance().getEndTime();
         String startTime = TimeUtils.format(end - 2 * 60 * TimeUtils.MINUTE_IN_MILLIS);
         String endTime = TimeUtils.format(end);
 
-        EventQueueCallbackExecutor.pool.submit(new LoadHapi(template, dataset, parameters, startTime, endTime), new Callback(template.toString(), new HapiReceiver()));
+        String query = template.expand(UriTemplate.vars().set("id", dataset).set("parameters", parameters).set("time.min", startTime).set("time.max", endTime));
+        EventQueueCallbackExecutor.pool.submit(new LoadHapi(query), new Callback(query, new HapiReceiver()));
     }
 
-    private record LoadHapi(UriTemplate template, String dataset, String parameters,
-                            String startTime, String endTime) implements Callable<DatesValues> {
+    private record LoadHapi(String query) implements Callable<DatesValues> {
         @Override
         public DatesValues call() throws Exception {
-            String query = template.set("id", dataset).set("parameters", parameters).set("time.min", startTime).set("time.max", endTime).toString();
             try (NetClient nc = NetClient.of(new URI(query)); BufferedReader reader = new BufferedReader(nc.getReader())) {
                 StringBuilder sb = new StringBuilder();
                 String line;

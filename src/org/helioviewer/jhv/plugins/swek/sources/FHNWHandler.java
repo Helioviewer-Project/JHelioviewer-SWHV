@@ -22,7 +22,8 @@ import org.json.JSONObject;
 
 public class FHNWHandler extends SWEKHandler {
 
-    private static final UriTemplate queryTemplate = new UriTemplate("https://tap.cs.technik.fhnw.ch/__system__/tap/run/tap/sync").set("REQUEST", "doQuery").set("LANG", "ADQL").set("FORMAT", "json");
+    private static final UriTemplate queryTemplate = new UriTemplate("https://tap.cs.technik.fhnw.ch/__system__/tap/run/tap/sync",
+            UriTemplate.vars().set("REQUEST", "doQuery").set("LANG", "ADQL").set("FORMAT", "json"));
 
     @Override
     protected boolean parseRemote(JSONObject eventJSON, SWEKSupplier supplier) {
@@ -94,7 +95,7 @@ public class FHNWHandler extends SWEKHandler {
         String adql = "SELECT TOP 10 * FROM rhessi_flares.epn_core WHERE" +
                 " start_time >= '" + "2002-01-01T00:00:00" + //TimeUtils.format(start) +
                 "' AND end_time <= '" + TimeUtils.format(end) + "' ORDER BY start_time";
-        return new URI(queryTemplate.set("QUERY", adql).toString());
+        return new URI(queryTemplate.expand(UriTemplate.vars().set("QUERY", adql)));
     }
 
     @Override
