@@ -10,6 +10,7 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.io.NetClient;
+import org.helioviewer.jhv.io.UriTemplate;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
@@ -27,28 +28,28 @@ public class HapiClient {
 
     public static void submit() {
 /*
-        String server = "https://cdaweb.gsfc.nasa.gov/hapi" + "/data?include=header&format=csv";
+        UriTemplate template = new UriTemplate("https://cdaweb.gsfc.nasa.gov/hapi/data").set("include", "header").set("format", "csv");
         String dataset = "SOLO_L2_MAG-RTN-NORMAL-1-MINUTE";
         String parameters = "B_RTN";
         String startTime = "2022-01-01T00:00:00";
         String endTime = "2022-01-02T00:00:00";
 */
-        String server = "https://api.helioviewer.org/hapi" + "/data?include=header&format=csv";
+        UriTemplate template = new UriTemplate("https://api.helioviewer.org/hapi/data").set("include", "header").set("format", "csv");
         String dataset = "AIA_171";
         String parameters = "jp2_url";
         long end = MoviePanel.getInstance().getEndTime();
         String startTime = TimeUtils.format(end - 2 * 60 * TimeUtils.MINUTE_IN_MILLIS);
         String endTime = TimeUtils.format(end);
 
-        EventQueueCallbackExecutor.pool.submit(new LoadHapi(server, dataset, parameters, startTime, endTime), new Callback(server, new HapiReceiver()));
+        EventQueueCallbackExecutor.pool.submit(new LoadHapi(template, dataset, parameters, startTime, endTime), new Callback(template.toString(), new HapiReceiver()));
     }
 
-    private record LoadHapi(String server, String dataset, String parameters, String startTime,
-                            String endTime) implements Callable<DatesValues> {
+    private record LoadHapi(UriTemplate template, String dataset, String parameters,
+                            String startTime, String endTime) implements Callable<DatesValues> {
         @Override
         public DatesValues call() throws Exception {
-            URI dataURI = new URI(server + "&id=" + dataset + "&parameters=" + parameters + "&time.min=" + startTime + "&time.max=" + endTime);
-            try (NetClient nc = NetClient.of(dataURI); BufferedReader reader = new BufferedReader(nc.getReader())) {
+            String query = template.set("id", dataset).set("parameters", parameters).set("time.min", startTime).set("time.max", endTime).toString();
+            try (NetClient nc = NetClient.of(new URI(query)); BufferedReader reader = new BufferedReader(nc.getReader())) {
                 StringBuilder sb = new StringBuilder();
                 String line;
                 reader.mark(0);
