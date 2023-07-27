@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.gui.interfaces.StatusReceiver;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
+import org.helioviewer.jhv.io.UriTemplate;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -27,7 +28,7 @@ public record PositionLoad(StatusReceiver receiver, SpaceObject target, boolean 
                                 long end) implements Callable<PositionResponse> {
 
         private static final int MAX_POINTS = 50000;
-        private static final String BASE_URL = "http://swhv.oma.be/position?";
+        private static final UriTemplate template = new UriTemplate("http://swhv.oma.be/position");
 
         @Override
         public PositionResponse call() throws Exception {
@@ -45,9 +46,15 @@ public record PositionLoad(StatusReceiver receiver, SpaceObject target, boolean 
                     return new PositionResponse(p);
             }
 
+            template.set("ref", frame)
+                    .set("observer", observer.getUrlName())
+                    .set("target", target.getUrlName())
+                    .set("utc", TimeUtils.format(start))
+                    .set("utc_end", TimeUtils.format(end))
+                    .set("deltat", deltat);
+            URI uri = new URI(template.toString());
+
             //Stopwatch sw = Stopwatch.createStarted();
-            URI uri = new URI(BASE_URL + "ref=" + frame + "&observer=" + observer.getUrlName() + "&target=" + target.getUrlName() +
-                    "&utc=" + TimeUtils.format(start) + "&utc_end=" + TimeUtils.format(end) + "&deltat=" + deltat);
             try (NetClient nc = NetClient.of(uri, true)) {
                 JSONObject result = JSONUtils.get(nc.getReader());
                 if (nc.isSuccessful()) {

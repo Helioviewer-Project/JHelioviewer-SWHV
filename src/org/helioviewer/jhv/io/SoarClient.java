@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.io;
 
 import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -20,8 +18,8 @@ import com.google.common.util.concurrent.FutureCallback;
 
 public class SoarClient {
 
-    private static final String QUERY_URL = "http://soar.esac.esa.int/soar-sl-tap/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=";
-    private static final String LOAD_URL = "http://soar.esac.esa.int/soar-sl-tap/data?retrieval_type=LAST_PRODUCT&product_type=SCIENCE&data_item_id=";
+    private static final UriTemplate queryTemplate = new UriTemplate("http://soar.esac.esa.int/soar-sl-tap/tap/sync").set("REQUEST", "doQuery").set("LANG", "ADQL").set("FORMAT", "json");
+    private static final UriTemplate loadTemplate = new UriTemplate("http://soar.esac.esa.int/soar-sl-tap/data").set("retrieval_type", "LAST_PRODUCT").set("product_type", "SCIENCE");
 
     enum FileFormat {CDF, FITS, JP2}
 
@@ -33,7 +31,7 @@ public class SoarClient {
     }
 
     private static void doDataSearch(@Nonnull ReceiverItems receiver, String adql) {
-        String url = QUERY_URL + URLEncoder.encode(adql, StandardCharsets.UTF_8);
+        String url = queryTemplate.set("QUERY", adql).toString();
         EventQueueCallbackExecutor.pool.submit(new QueryItems(url), new CallbackItems(receiver));
     }
 
@@ -46,8 +44,7 @@ public class SoarClient {
     }
 
     public static void submitGetSoops(@Nonnull ReceiverSoops receiver) {
-        String adql = "SELECT DISTINCT soop_name FROM soop ORDER BY soop_name";
-        String url = QUERY_URL + URLEncoder.encode(adql, StandardCharsets.UTF_8);
+        String url = queryTemplate.set("QUERY", "SELECT DISTINCT soop_name FROM soop ORDER BY soop_name").toString();
         EventQueueCallbackExecutor.pool.submit(new QuerySoops(url), new CallbackSoops(receiver));
     }
 
@@ -58,7 +55,7 @@ public class SoarClient {
 
         for (DataItem item : items) {
             try {
-                URI uri = new URI(LOAD_URL + URLEncoder.encode(item.id, StandardCharsets.UTF_8));
+                URI uri = new URI(loadTemplate.set("data_item_id", item.id).toString());
                 switch (item.format) {
                     case CDF -> cdfUris.add(uri);
                     case FITS -> fitsUris.add(uri);
