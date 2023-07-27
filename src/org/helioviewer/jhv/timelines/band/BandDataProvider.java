@@ -64,7 +64,7 @@ public class BandDataProvider {
         @Override
         public BandResponse call() throws Exception {
             BandType type = band.getBandType();
-            URI uri = new URI(type.getBaseURL() + "timeline=" + type.getName() +
+            URI uri = new URI(type.getBaseURL() + "&timeline=" + type.getName() +
                     "&start_date=" + TimeUtils.formatDate(startTime) +
                     "&end_date=" + TimeUtils.formatDate(endTime));
             return new BandResponse(JSONUtils.getUncached(uri));
