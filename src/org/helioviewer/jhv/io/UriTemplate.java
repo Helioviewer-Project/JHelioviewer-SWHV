@@ -21,7 +21,7 @@ public class UriTemplate {
     }
 
     public interface Variables {
-        Variables set(String name, Object value);
+        Variables set(String key, Object value);
 
         String expand(String base);
     }
@@ -31,18 +31,18 @@ public class UriTemplate {
     }
 
     private static class VariablesImpl implements Variables {
-        private final LinkedHashMap<String, String> params = new LinkedHashMap<>();
+        private final LinkedHashMap<String, String> vars = new LinkedHashMap<>();
 
         @Override
-        public Variables set(String param, Object value) {
-            params.put('&' + param, '=' + URLEncoder.encode(value.toString(), StandardCharsets.UTF_8));
+        public Variables set(String key, Object value) {
+            vars.put('&' + key, '=' + URLEncoder.encode(value.toString(), StandardCharsets.UTF_8));
             return this;
         }
 
         @Override
         public String expand(String base) {
             StringBuilder builder = new StringBuilder(base);
-            params.forEach((key, value) -> builder.append(key).append(value));
+            vars.forEach((key, value) -> builder.append(key).append(value));
             return builder.toString();
         }
     }
