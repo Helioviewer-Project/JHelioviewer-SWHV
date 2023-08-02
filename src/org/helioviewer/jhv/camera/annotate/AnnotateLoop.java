@@ -118,7 +118,7 @@ public class AnnotateLoop extends AbstractAnnotateable {
 
     @Override
     public String getType() {
-        return Interaction.AnnotationMode.Circle.toString();
+        return Interaction.AnnotationMode.Loop.toString();
     }
 
     @Nullable

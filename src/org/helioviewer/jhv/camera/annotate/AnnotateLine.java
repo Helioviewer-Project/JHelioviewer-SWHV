@@ -82,7 +82,7 @@ public class AnnotateLine extends AbstractAnnotateable {
 
     @Override
     public String getType() {
-        return Interaction.AnnotationMode.FOV.toString();
+        return Interaction.AnnotationMode.Line.toString();
     }
 
 }
