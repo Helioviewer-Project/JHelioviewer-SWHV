@@ -23,7 +23,7 @@ public class FOVShape {
         buf.putVertex((float) centerX, (float) centerY, (float) centerZ, SIZE_POINT, color);
     }
 
-    private static double computeZ(double x, double y) {
+    public static double computeZ(double x, double y) {
         double n = 1 - x * x - y * y;
         return n > 0 ? epsilon + Math.sqrt(n) : epsilon;
     }
