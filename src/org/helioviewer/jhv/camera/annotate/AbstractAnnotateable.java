@@ -60,7 +60,7 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Nullable
-    static Vec3 computePoint(Camera camera, int x, int y) {
+    static Vec3 computePointSun(Camera camera, int x, int y) {
         if (Display.mode == Display.ProjectionMode.Orthographic) {
             Quat q = camera.getViewpoint().toQuat();
             return CameraHelper.getVectorFromSphere(camera, Display.getActiveViewport(), x, y, q, true);
@@ -68,6 +68,11 @@ abstract class AbstractAnnotateable implements Annotateable {
             Quat q = Display.gridType.toCarrington(camera.getViewpoint()); //!
             return Display.mode.transformInverse(q, Display.mode.scale.mouseToGrid(x, y, Display.getActiveViewport(), camera, Display.gridType));
         }
+    }
+
+    @Nullable
+    static Vec3 computePointSky(Camera camera, int x, int y) {
+        return CameraHelper.getVectorFromSphereOrPlane(camera, Display.getActiveViewport(), x, y, camera.getDragRotation());
     }
 
     @Nullable

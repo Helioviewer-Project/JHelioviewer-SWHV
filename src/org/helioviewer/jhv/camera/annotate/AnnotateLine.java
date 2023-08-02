@@ -1,12 +1,8 @@
 package org.helioviewer.jhv.camera.annotate;
 
-import javax.annotation.Nullable;
-
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Interaction;
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.FOVShape;
@@ -29,15 +25,10 @@ public class AnnotateLine extends AbstractAnnotateable {
                 buf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
             }
             buf.putVertex((float) x, (float) y, (float) z, 1, color);
-             if (i == SUBDIVISIONS) { // last
+            if (i == SUBDIVISIONS) { // last
                 buf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
             }
         }
-    }
-
-    @Nullable
-    private static Vec3 computePointFOV(Camera camera, int x, int y) {
-        return CameraHelper.getVectorFromSphereOrPlane(camera, Display.getActiveViewport(), x, y, camera.getDragRotation());
     }
 
     @Override
@@ -57,14 +48,14 @@ public class AnnotateLine extends AbstractAnnotateable {
 
     @Override
     public void mousePressed(Camera camera, int x, int y) {
-        Vec3 pt = computePointFOV(camera, x, y);
+        Vec3 pt = computePointSky(camera, x, y);
         if (pt != null)
             dragStartPoint = pt;
     }
 
     @Override
     public void mouseDragged(Camera camera, int x, int y) {
-        Vec3 pt = computePointFOV(camera, x, y);
+        Vec3 pt = computePointSky(camera, x, y);
         if (pt != null)
             dragEndPoint = pt;
     }

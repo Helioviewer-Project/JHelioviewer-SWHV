@@ -84,14 +84,14 @@ public class AnnotateLoop extends AbstractAnnotateable {
 
     @Override
     public void mousePressed(Camera camera, int x, int y) {
-        Vec3 pt = computePoint(camera, x, y);
+        Vec3 pt = computePointSun(camera, x, y);
         if (pt != null)
             dragStartPoint = pt;
     }
 
     @Override
     public void mouseDragged(Camera camera, int x, int y) {
-        Vec3 pt = computePoint(camera, x, y);
+        Vec3 pt = computePointSun(camera, x, y);
         if (pt != null)
             dragEndPoint = pt;
     }
