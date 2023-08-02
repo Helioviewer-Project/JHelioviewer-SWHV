@@ -4,7 +4,7 @@ import org.helioviewer.jhv.base.Colors;
 
 public class FOVShape {
 
-    public static final int RECT_SUBDIVS = 24;
+    public static final int RECT_SUBDIVS = 32;
     public static final int CIRC_SUBDIVS = 90;
     private static final float SIZE_POINT = 0.01f;
     private static final double epsilon = 0.006;

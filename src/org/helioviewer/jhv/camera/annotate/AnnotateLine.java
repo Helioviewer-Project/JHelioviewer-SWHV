@@ -10,7 +10,7 @@ import org.json.JSONObject;
 
 public class AnnotateLine extends AbstractAnnotateable {
 
-    private static final int SUBDIVISIONS = 24;
+    private static final int SUBDIVISIONS = 32;
 
     public AnnotateLine(JSONObject jo) {
         super(jo);
