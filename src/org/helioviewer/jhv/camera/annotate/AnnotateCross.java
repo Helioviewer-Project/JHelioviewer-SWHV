@@ -4,7 +4,6 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
@@ -91,11 +90,6 @@ public class AnnotateCross extends AbstractAnnotateable {
     @Override
     public boolean isDraggable() {
         return false;
-    }
-
-    @Override
-    public String getType() {
-        return Interaction.AnnotationMode.Cross.toString();
     }
 
     @Nullable

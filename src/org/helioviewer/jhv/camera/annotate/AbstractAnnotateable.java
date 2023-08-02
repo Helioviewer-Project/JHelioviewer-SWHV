@@ -6,6 +6,7 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
+import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
@@ -91,7 +92,7 @@ abstract class AbstractAnnotateable implements Annotateable {
 
     @Override
     public JSONObject toJson() {
-        JSONObject jo = new JSONObject().put("type", getType());
+        JSONObject jo = new JSONObject().put("type", Interaction.AnnotationMode.modes.get(this.getClass()));
         if (startPoint != null)
             jo.put("startPoint", startPoint.toJson());
         if (endPoint != null)

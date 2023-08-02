@@ -2,7 +2,6 @@ package org.helioviewer.jhv.camera.annotate;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.FOVShape;
@@ -78,11 +77,6 @@ public class AnnotateLine extends AbstractAnnotateable {
     @Override
     public boolean isDraggable() {
         return true;
-    }
-
-    @Override
-    public String getType() {
-        return Interaction.AnnotationMode.Line.toString();
     }
 
 }
