@@ -14,7 +14,7 @@ import org.json.JSONObject;
 
 public class AnnotateRectangle extends AbstractAnnotateable {
 
-    private static final int SUBDIVISIONS = 12;
+    private static final int SUBDIVISIONS = 24;
 
     public AnnotateRectangle(JSONObject jo) {
         super(jo);
