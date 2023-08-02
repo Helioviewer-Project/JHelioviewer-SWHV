@@ -2,7 +2,6 @@ package org.helioviewer.jhv.camera.annotate;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
@@ -139,11 +138,6 @@ public class AnnotateRectangle extends AbstractAnnotateable {
     @Override
     public boolean isDraggable() {
         return true;
-    }
-
-    @Override
-    public String getType() {
-        return Interaction.AnnotationMode.Rectangle.toString();
     }
 
 }

@@ -7,6 +7,9 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -32,6 +35,7 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
         FOV(AnnotateFOV.class), Line(AnnotateLine.class), Loop(AnnotateLoop.class);
 
         private final Class<? extends Annotateable> clazz;
+        public static final Map<Class<? extends Annotateable>, String> modes = Arrays.stream(values()).collect(Collectors.toMap(m -> m.clazz, Enum::toString));
 
         AnnotationMode(Class<? extends Annotateable> _clazz) {
             clazz = _clazz;

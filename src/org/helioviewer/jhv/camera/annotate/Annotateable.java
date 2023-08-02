@@ -27,8 +27,6 @@ public interface Annotateable {
 
     boolean isDraggable();
 
-    String getType();
-
     JSONObject toJson();
 
 }
