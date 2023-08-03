@@ -13,7 +13,7 @@ import org.helioviewer.jhv.timelines.chart.PlotPanel;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.radio.RadioData;
 import org.helioviewer.jhv.timelines.gui.TimelineDialog;
-import org.helioviewer.jhv.timelines.selector.TimelinePanel;
+import org.helioviewer.jhv.timelines.gui.TimelinePanel;
 import org.json.JSONObject;
 
 public class Timelines implements MainContentPanelPlugin {

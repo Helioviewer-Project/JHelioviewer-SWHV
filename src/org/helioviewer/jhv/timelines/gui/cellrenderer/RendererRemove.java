@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.timelines.selector.cellrenderer;
+package org.helioviewer.jhv.timelines.gui.cellrenderer;
 
 import java.awt.Font;
 
