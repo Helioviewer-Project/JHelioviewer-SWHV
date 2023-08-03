@@ -5,7 +5,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.helioviewer.jhv.layers.Layer;
 
 @SuppressWarnings("serial")
-public class RendererTime extends DefaultTableCellRenderer {
+public final class RendererTime extends DefaultTableCellRenderer {
 
     @Override
     public void setValue(Object value) {

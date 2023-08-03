@@ -17,7 +17,7 @@ import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings("serial")
-public class TimelineDialog extends StandardDialog implements ShowableDialog {
+public final class TimelineDialog extends StandardDialog implements ShowableDialog {
 
     private final TimelineDataPanel observationPanel = new TimelineDataPanel();
 

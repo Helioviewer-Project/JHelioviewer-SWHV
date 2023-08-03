@@ -18,7 +18,7 @@ import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.io.Load;
 
 @SuppressWarnings("serial")
-public class OpenLocalFileAction extends AbstractAction {
+public final class OpenLocalFileAction extends AbstractAction {
 
     public OpenLocalFileAction() {
         super("Open Image Layer...");

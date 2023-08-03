@@ -7,7 +7,7 @@ import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 
 @SuppressWarnings("serial")
-public class ZoomStatusPanel extends StatusPanel.StatusPlugin implements LazyComponent {
+public final class ZoomStatusPanel extends StatusPanel.StatusPlugin implements LazyComponent {
 
     private boolean dirty;
     private double cameraWidth;

@@ -25,7 +25,7 @@ import org.helioviewer.jhv.timelines.propagation.PropagationModelDelay;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class Band extends AbstractTimelineLayer {
+public final class Band extends AbstractTimelineLayer {
 
     private static final HashMap<BandType, Band> externalLoad = new HashMap<>();
 

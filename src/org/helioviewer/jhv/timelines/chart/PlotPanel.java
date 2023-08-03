@@ -5,7 +5,7 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
-public class PlotPanel extends JPanel {
+public final class PlotPanel extends JPanel {
 
     public PlotPanel() {
         setLayout(new BorderLayout());

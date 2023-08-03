@@ -36,7 +36,7 @@ import org.helioviewer.jhv.layers.selector.cellrenderer.RendererRemove;
 import org.helioviewer.jhv.layers.selector.cellrenderer.RendererTime;
 
 @SuppressWarnings("serial")
-public class LayersPanel extends JPanel {
+public final class LayersPanel extends JPanel {
 
     private static final int ICON_WIDTH = 12;
 

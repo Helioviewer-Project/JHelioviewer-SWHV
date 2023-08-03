@@ -17,7 +17,7 @@ import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMode;
 
-public class HelioviewerMetaData extends BaseMetaData {
+public final class HelioviewerMetaData extends BaseMetaData {
 
     private static final boolean normalizeAIA = Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA"));
     private static final boolean normalizeRadius = Boolean.parseBoolean(Settings.getProperty("display.normalize"));

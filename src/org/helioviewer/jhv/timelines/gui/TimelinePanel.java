@@ -25,7 +25,6 @@ import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.draw.DrawController;
-import org.helioviewer.jhv.timelines.gui.NewLayerAction;
 import org.helioviewer.jhv.timelines.gui.cellrenderer.RendererColor;
 import org.helioviewer.jhv.timelines.gui.cellrenderer.RendererEnabled;
 import org.helioviewer.jhv.timelines.gui.cellrenderer.RendererLoading;
@@ -35,7 +34,7 @@ import org.helioviewer.jhv.timelines.gui.cellrenderer.RendererRemove;
 import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
-public class TimelinePanel extends JPanel {
+public final class TimelinePanel extends JPanel {
 
     private static final int ICON_WIDTH = 12;
 

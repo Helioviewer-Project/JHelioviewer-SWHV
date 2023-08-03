@@ -23,7 +23,7 @@ import org.helioviewer.jhv.gui.components.base.TableValue;
 import org.json.JSONArray;
 
 @SuppressWarnings("serial")
-public class SpaceObjectContainer extends JScrollPane {
+public final class SpaceObjectContainer extends JScrollPane {
 
     private static final int ICON_WIDTH = 12;
     private static final int NUMBEROFVISIBLEROWS = 5;

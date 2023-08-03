@@ -35,7 +35,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.google.common.util.concurrent.FutureCallback;
 
-public class RadioData extends AbstractTimelineLayer {
+public final class RadioData extends AbstractTimelineLayer {
 
     static final YAxis yAxis = new YAxis(400, 20, new YAxisPositiveIdentityScale("MHz"));
 

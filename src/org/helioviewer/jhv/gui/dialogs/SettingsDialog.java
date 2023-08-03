@@ -50,7 +50,7 @@ import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings("serial")
-public class SettingsDialog extends StandardDialog implements ShowableDialog {
+public final class SettingsDialog extends StandardDialog implements ShowableDialog {
 
     private final JLabel labelCache = new JLabel("The image cache currently uses 0.0GB on disk.", JLabel.RIGHT);
 

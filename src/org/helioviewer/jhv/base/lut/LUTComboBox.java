@@ -7,7 +7,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 
 @SuppressWarnings("serial")
-public class LUTComboBox extends JComboBox<String> {
+public final class LUTComboBox extends JComboBox<String> {
 
     private final Map<String, LUT> lutMap;
 

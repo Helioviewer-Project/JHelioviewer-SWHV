@@ -3,7 +3,7 @@ package org.helioviewer.jhv.timelines.draw;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.time.TimeUtils;
 
-public class TimeAxis {
+public final class TimeAxis {
 
     private long start;
     private long end;

@@ -12,7 +12,7 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.input.KeyShortcuts;
 
 @SuppressWarnings("serial")
-public class WindowMinimizeAction extends AbstractAction {
+public final class WindowMinimizeAction extends AbstractAction {
 
     public WindowMinimizeAction() {
         super("Minimize");

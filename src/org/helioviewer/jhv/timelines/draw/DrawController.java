@@ -22,7 +22,7 @@ import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.json.JSONObject;
 
-public class DrawController implements LazyComponent, StatusReceiver, JHVEventListener.Highlight, TimeListener.Change {
+public final class DrawController implements LazyComponent, StatusReceiver, JHVEventListener.Highlight, TimeListener.Change {
 
     public interface Listener {
         void drawRequest();

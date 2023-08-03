@@ -19,7 +19,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 import com.jidesoft.swing.JideSplitButton;
 
 @SuppressWarnings("serial")
-public class TimeSelectorPanel extends JPanel {
+public final class TimeSelectorPanel extends JPanel {
 
     private enum ShiftUnit {
         Day(TimeUtils.DAY_IN_MILLIS), Week(7 * TimeUtils.DAY_IN_MILLIS), Rotation(Math.round(Carrington.CR_SYNODIC_MEAN * TimeUtils.DAY_IN_MILLIS));

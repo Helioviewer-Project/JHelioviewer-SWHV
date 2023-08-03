@@ -49,7 +49,7 @@ import org.json.JSONObject;
 import com.jogamp.opengl.GL2;
 
 // has to be public for state
-public class SWEKLayer extends AbstractLayer implements JHVEventListener.Handle, TimeListener.Range {
+public final class SWEKLayer extends AbstractLayer implements JHVEventListener.Handle, TimeListener.Range {
 
     private final SWEKPopupController controller = new SWEKPopupController(JHVFrame.getGLCanvas());
     private final JPanel optionsPanel;

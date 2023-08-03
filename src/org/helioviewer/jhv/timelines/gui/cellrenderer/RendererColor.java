@@ -8,7 +8,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 
 @SuppressWarnings("serial")
-public class RendererColor extends DefaultTableCellRenderer {
+public final class RendererColor extends DefaultTableCellRenderer {
 
     private Color c;
 

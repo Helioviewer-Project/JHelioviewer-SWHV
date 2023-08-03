@@ -21,7 +21,7 @@ import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.interfaces.JHVCell;
 
 @SuppressWarnings("serial")
-public class SWEKGroup extends DefaultMutableTreeNode implements JHVCell {
+public final class SWEKGroup extends DefaultMutableTreeNode implements JHVCell {
 
     static final int RIGHT_ALIGNMENT = 300;
 

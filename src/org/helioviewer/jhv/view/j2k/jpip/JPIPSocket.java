@@ -12,7 +12,7 @@ import org.helioviewer.jhv.view.j2k.jpip.http.HTTPMessage;
 import org.helioviewer.jhv.view.j2k.jpip.http.HTTPSocket;
 
 // Assumes a persistent HTTP connection
-public class JPIPSocket extends HTTPSocket {
+public final class JPIPSocket extends HTTPSocket {
 
     private static final String[] cnewParams = {"cid", "transport", "host", "path", "port", "auxport"};
 

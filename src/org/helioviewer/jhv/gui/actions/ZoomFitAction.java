@@ -13,7 +13,7 @@ import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
 @SuppressWarnings("serial")
-public class ZoomFitAction extends AbstractAction {
+public final class ZoomFitAction extends AbstractAction {
 
     public ZoomFitAction() {
         super("Zoom to Fit");

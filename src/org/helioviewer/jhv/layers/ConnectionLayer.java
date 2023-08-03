@@ -41,7 +41,7 @@ import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public class ConnectionLayer extends AbstractLayer implements LoadConnectivity.Receiver, LoadFootpoint.Receiver, LoadHCS.Receiver, LoadSunJSON.Receiver {
+public final class ConnectionLayer extends AbstractLayer implements LoadConnectivity.Receiver, LoadFootpoint.Receiver, LoadHCS.Receiver, LoadSunJSON.Receiver {
 
     private static final double LINEWIDTH = 2 * GLSLLine.LINEWIDTH_BASIC;
     private static final float SIZE_POINT = 0.01f;

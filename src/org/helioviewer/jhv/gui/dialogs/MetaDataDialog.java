@@ -37,7 +37,7 @@ import com.jidesoft.dialog.StandardDialog;
 import com.jidesoft.swing.JideSplitPane;
 
 @SuppressWarnings("serial")
-public class MetaDataDialog extends StandardDialog implements ShowableDialog {
+public final class MetaDataDialog extends StandardDialog implements ShowableDialog {
 
     private final JideSplitPane content = new JideSplitPane(JideSplitPane.VERTICAL_SPLIT);
     private final JButton exportFitsButton = new JButton("Export FITS Header as XML");

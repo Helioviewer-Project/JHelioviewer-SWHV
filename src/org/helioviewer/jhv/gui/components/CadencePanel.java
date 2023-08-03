@@ -10,7 +10,7 @@ import org.helioviewer.jhv.gui.components.base.JHVSpinner;
 import org.helioviewer.jhv.io.APIRequest;
 
 @SuppressWarnings("serial")
-public class CadencePanel extends JPanel {
+public final class CadencePanel extends JPanel {
 
     private static final String[] timeStepUnits = {"sec", "min", "hours", "days", "get all"};
 

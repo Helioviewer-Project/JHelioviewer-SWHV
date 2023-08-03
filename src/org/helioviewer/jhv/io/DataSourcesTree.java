@@ -22,7 +22,7 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.interfaces.ObservationSelector;
 
 @SuppressWarnings("serial")
-public class DataSourcesTree extends JTree {
+public final class DataSourcesTree extends JTree {
 
     public static class Item {
 

@@ -38,7 +38,7 @@ import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
-public class ToolBar extends JToolBar {
+public final class ToolBar extends JToolBar {
 
     private static DisplayMode displayMode = DisplayMode.ICONANDTEXT;
 

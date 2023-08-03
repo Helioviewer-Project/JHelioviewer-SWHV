@@ -9,7 +9,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 
 @SuppressWarnings("serial")
-public class RendererEnabled extends DefaultTableCellRenderer {
+public final class RendererEnabled extends DefaultTableCellRenderer {
 
     private final JCheckBox checkBox = new JCheckBox();
 

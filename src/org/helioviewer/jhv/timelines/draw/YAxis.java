@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.timelines.draw;
 
-public class YAxis {
+public final class YAxis {
 
     public static final float BLANK = -Float.MAX_VALUE;
 

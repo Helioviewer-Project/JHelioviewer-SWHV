@@ -6,7 +6,7 @@ import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.opengl.GLListener;
 
 @SuppressWarnings("serial")
-public class FramerateStatusPanel extends StatusPanel.StatusPlugin implements LazyComponent {
+public final class FramerateStatusPanel extends StatusPanel.StatusPlugin implements LazyComponent {
 
     private int fps = -1;
 

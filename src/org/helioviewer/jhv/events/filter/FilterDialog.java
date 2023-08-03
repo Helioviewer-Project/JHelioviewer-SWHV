@@ -15,7 +15,7 @@ import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.events.SWEKSupplier;
 
 @SuppressWarnings("serial")
-public class FilterDialog extends JDialog implements FocusListener, WindowFocusListener {
+public final class FilterDialog extends JDialog implements FocusListener, WindowFocusListener {
 
     private final JButton applyButton = new JButton("Apply");
 
