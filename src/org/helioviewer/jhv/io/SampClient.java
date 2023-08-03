@@ -36,7 +36,6 @@ public class SampClient extends HubConnector {
         Logger.getLogger("org.astrogrid.samp").setLevel(Level.WARNING); // shut-up SAMP info logs
     }
 
-    private static final Map<String, String> harmless = Collections.singletonMap("x-samp.mostly-harmless", "1"); // allow SAMP messages from web
     private static final String MTYPE_VIEW_DATA = "jhv.vso.load";
     private static final boolean startHub = Boolean.parseBoolean(Settings.getProperty("startup.sampHub"));
     private static final SampClient instance = new SampClient(DefaultClientProfile.getProfile());
@@ -68,6 +67,7 @@ public class SampClient extends HubConnector {
 
     private static class JHVSampHandler extends AbstractMessageHandler {
 
+        private static final Map<String, String> harmless = Collections.singletonMap("x-samp.mostly-harmless", "1"); // allow SAMP messages from web
         private final String type;
         private final CheckedConsumer<String, Message> consumer;
 
