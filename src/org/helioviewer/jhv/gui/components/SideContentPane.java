@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 // This panel hides the use of the CollapsiblePane and allows accessing
 // the children of the CollapsiblePane directly.
 @SuppressWarnings("serial")
-public class SideContentPane extends JComponent {
+public final class SideContentPane extends JComponent {
 
     private final HashMap<JComponent, CollapsiblePane> map = new HashMap<>();
     private final JPanel dummy = new JPanel();

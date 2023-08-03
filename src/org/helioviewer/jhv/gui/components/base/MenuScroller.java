@@ -32,7 +32,7 @@ import org.helioviewer.jhv.gui.UIGlobals;
  * @version 1.5.0 04/05/12
  */
 @SuppressWarnings("serial")
-public class MenuScroller {
+public final class MenuScroller {
 
     //private JMenu menu;
     private JPopupMenu menu;

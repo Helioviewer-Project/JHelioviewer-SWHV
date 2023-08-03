@@ -28,7 +28,7 @@ import org.helioviewer.jhv.view.View;
 // This element provides its own look and feel. Therefore, it is independent
 // of the global look and feel.
 @SuppressWarnings("serial")
-public class TimeSlider extends JSlider implements LazyComponent, MouseListener, MouseMotionListener, MouseWheelListener {
+public final class TimeSlider extends JSlider implements LazyComponent, MouseListener, MouseMotionListener, MouseWheelListener {
 
     private final TimeSliderUI sliderUI;
     private final JLabel frameNumberLabel;

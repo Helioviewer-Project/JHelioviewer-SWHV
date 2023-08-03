@@ -24,7 +24,7 @@ import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 
 @SuppressWarnings("serial")
-public class PositionStatusPanel extends StatusPanel.StatusPlugin implements MouseListener, MouseMotionListener {
+public final class PositionStatusPanel extends StatusPanel.StatusPlugin implements MouseListener, MouseMotionListener {
 
     private static final String nanOrtho = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
     private static final String nanLati = String.format("%7s\u00B0,%7s\u00B0", "--", "--");

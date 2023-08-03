@@ -36,7 +36,7 @@ import org.helioviewer.jhv.layers.MovieDisplay;
 
 // Menu bar of the main window
 @SuppressWarnings("serial")
-public class MenuBar extends JMenuBar {
+public final class MenuBar extends JMenuBar {
 
     public MenuBar() {
         JMenu fileMenu = new JMenu("File");

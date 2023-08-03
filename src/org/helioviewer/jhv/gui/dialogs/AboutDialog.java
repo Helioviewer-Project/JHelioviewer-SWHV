@@ -26,7 +26,7 @@ import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings("serial")
-public class AboutDialog extends StandardDialog implements ShowableDialog, HyperlinkListener {
+public final class AboutDialog extends StandardDialog implements ShowableDialog, HyperlinkListener {
 
     public AboutDialog() {
         super(JHVFrame.getFrame(), "About JHelioviewer", true);

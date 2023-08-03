@@ -5,7 +5,7 @@ import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 
 @SuppressWarnings("serial")
-public class JHVSpinner extends JSpinner {
+public final class JHVSpinner extends JSpinner {
 
     public JHVSpinner(SpinnerModel model) {
         super(model);

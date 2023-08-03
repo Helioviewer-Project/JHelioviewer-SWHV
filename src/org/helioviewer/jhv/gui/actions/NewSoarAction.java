@@ -12,7 +12,7 @@ import org.helioviewer.jhv.gui.dialogs.SoarDialog;
 import org.helioviewer.jhv.input.KeyShortcuts;
 
 @SuppressWarnings("serial")
-public class NewSoarAction extends AbstractAction {
+public final class NewSoarAction extends AbstractAction {
 
     public NewSoarAction() {
         super("New SOAR Layer...");

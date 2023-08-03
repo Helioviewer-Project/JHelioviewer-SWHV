@@ -12,7 +12,7 @@ import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 
 @SuppressWarnings("serial")
-public class RendererLoading extends DefaultTableCellRenderer {
+public final class RendererLoading extends DefaultTableCellRenderer {
 
     private final JLayer<JComponent> over = new JLayer<>(null, UITimer.busyIndicator);
 

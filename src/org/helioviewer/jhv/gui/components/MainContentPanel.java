@@ -19,7 +19,7 @@ import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 // main area of the application. Usually it contains the main image area. Below
 // the main image area plug-ins are able to display their GUI components.
 @SuppressWarnings("serial")
-public class MainContentPanel extends JPanel {
+public final class MainContentPanel extends JPanel {
 
     private static final int DIVIDER_SIZE = 3;
 

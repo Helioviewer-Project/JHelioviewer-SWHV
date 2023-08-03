@@ -11,7 +11,7 @@ import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.input.KeyShortcuts;
 
 @SuppressWarnings("serial")
-public class NewLayerAction extends AbstractAction {
+public final class NewLayerAction extends AbstractAction {
 
     public NewLayerAction() {
         super("New Image Layer...");

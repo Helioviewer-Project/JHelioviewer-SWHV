@@ -12,7 +12,7 @@ import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.timelines.Timelines;
 
 @SuppressWarnings("serial")
-public class NewLayerAction extends AbstractAction {
+public final class NewLayerAction extends AbstractAction {
 
     public NewLayerAction() {
         super("New Timeline...");

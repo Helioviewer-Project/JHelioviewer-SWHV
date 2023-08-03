@@ -18,7 +18,7 @@ import org.json.JSONObject;
 import com.jogamp.opengl.GL2;
 
 @SuppressWarnings("serial")
-public class FOVTreePane extends JScrollPane {
+public final class FOVTreePane extends JScrollPane {
 
     private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
 

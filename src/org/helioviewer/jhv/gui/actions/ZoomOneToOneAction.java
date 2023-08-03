@@ -16,7 +16,7 @@ import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.metadata.MetaData;
 
 @SuppressWarnings("serial")
-public class ZoomOneToOneAction extends AbstractAction {
+public final class ZoomOneToOneAction extends AbstractAction {
 
     public ZoomOneToOneAction() {
         super("Actual Size");

@@ -8,7 +8,7 @@ import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.time.JHVTime;
 
 @SuppressWarnings("serial")
-public class CarringtonStatusPanel extends StatusPanel.StatusPlugin implements LazyComponent {
+public final class CarringtonStatusPanel extends StatusPanel.StatusPlugin implements LazyComponent {
 
     private boolean dirty;
     private JHVTime time;

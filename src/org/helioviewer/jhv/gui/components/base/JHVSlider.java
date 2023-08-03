@@ -6,7 +6,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.JSlider;
 
 @SuppressWarnings("serial")
-public class JHVSlider extends JSlider {
+public final class JHVSlider extends JSlider {
 
     public JHVSlider(int min, int max, int defaultValue) {
         super(JSlider.HORIZONTAL, min, max, defaultValue);

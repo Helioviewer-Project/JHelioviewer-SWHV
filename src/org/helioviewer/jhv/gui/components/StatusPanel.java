@@ -15,7 +15,7 @@ import org.helioviewer.jhv.gui.UIGlobals;
 // lower right corner. New plugins can be placed at one of the two areas.
 // In addition, a status text can be displayed in the lower left corner.
 @SuppressWarnings("serial")
-public class StatusPanel extends JPanel {
+public final class StatusPanel extends JPanel {
 
     public static class StatusPlugin extends JLabel {
         protected StatusPlugin() {

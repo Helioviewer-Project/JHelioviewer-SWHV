@@ -18,7 +18,7 @@ import org.helioviewer.jhv.gui.interfaces.JHVCell;
 import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
-public class SWEKSupplier extends DefaultMutableTreeNode implements JHVCell {
+public final class SWEKSupplier extends DefaultMutableTreeNode implements JHVCell {
 
     private final String supplierName;
     private final String name;

@@ -11,7 +11,7 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.input.KeyShortcuts;
 
 @SuppressWarnings("serial")
-public class ExitProgramAction extends AbstractAction {
+public final class ExitProgramAction extends AbstractAction {
 
     public ExitProgramAction() {
         super("Quit");

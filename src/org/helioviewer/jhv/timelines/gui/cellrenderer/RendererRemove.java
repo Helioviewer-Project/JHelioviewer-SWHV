@@ -8,7 +8,7 @@ import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 
 @SuppressWarnings("serial")
-public class RendererRemove extends DefaultTableCellRenderer {
+public final class RendererRemove extends DefaultTableCellRenderer {
 
     private final Font font = Buttons.getMaterialFont(getFont().getSize2D());
 

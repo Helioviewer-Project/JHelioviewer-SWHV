@@ -22,7 +22,7 @@ import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public class MiniviewLayer extends AbstractLayer {
+public final class MiniviewLayer extends AbstractLayer {
 
     private static final int MIN_SCALE = 5;
     private static final int MAX_SCALE = 15;

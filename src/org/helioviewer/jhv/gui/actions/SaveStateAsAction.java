@@ -18,7 +18,7 @@ import org.helioviewer.jhv.layers.selector.State;
 import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
-public class SaveStateAsAction extends AbstractAction {
+public final class SaveStateAsAction extends AbstractAction {
 
     public SaveStateAsAction() {
         super("Save State As...");

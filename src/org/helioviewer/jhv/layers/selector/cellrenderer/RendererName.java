@@ -7,7 +7,7 @@ import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 
 @SuppressWarnings("serial")
-public class RendererName extends DefaultTableCellRenderer {
+public final class RendererName extends DefaultTableCellRenderer {
 
     @Override
     public void setValue(Object value) {

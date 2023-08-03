@@ -5,7 +5,7 @@ import javax.swing.JTextPane;
 import org.helioviewer.jhv.gui.UIGlobals;
 
 @SuppressWarnings("serial")
-public class HTMLPane extends JTextPane {
+public final class HTMLPane extends JTextPane {
 
     private static final String pre = String.format("<html><span style='font-size:%dpt'><font face='%s'>", UIGlobals.uiFont.getSize(), UIGlobals.uiFont.getFontName());
     private static final String post = "</font></span></html>";
