@@ -67,7 +67,6 @@ class PfssLoader {
                 int colS = findColumn(hdu, "FIELDLINEs");
                 int rows = hdu.getNRows();
 
-                int nlines = rows / points;
                 float[] lineX = new float[rows];
                 float[] lineY = new float[rows];
                 float[] lineZ = new float[rows];
