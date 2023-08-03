@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.view.j2k;
 
 import java.io.IOException;
+import java.net.URI;
 
 import kdu_jni.KduException;
 
@@ -26,12 +27,11 @@ class J2KReader implements Runnable {
     private volatile boolean isAbolished;
     private JPIPSocket socket;
 
-    J2KReader(J2KView view) throws KduException, IOException {
-        JPIPCache cache = view.getJPIPCache();
-        socket = new JPIPSocket(view.getURI(), cache);
+    J2KReader(URI uri, JPIPCache cache) throws KduException, IOException {
+        socket = new JPIPSocket(uri, cache);
         initJPIP(cache);
 
-        myThread = new Thread(this, "Reader " + view.getName());
+        myThread = new Thread(this, "Reader " + uri);
         myThread.setDaemon(true);
     }
 

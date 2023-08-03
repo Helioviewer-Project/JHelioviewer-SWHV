@@ -81,7 +81,7 @@ public class J2KView extends BaseView {
             switch (uri.getScheme().toLowerCase()) {
                 case "jpip", "jpips" -> {
                     jpipCache = new JPIPCache();
-                    reader = new J2KReader(this);
+                    reader = new J2KReader(uri, jpipCache);
                 }
                 case "file" -> {
                     jpipCache = null;
