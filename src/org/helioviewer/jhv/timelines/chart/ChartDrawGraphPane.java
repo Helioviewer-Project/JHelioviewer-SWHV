@@ -84,7 +84,7 @@ public final class ChartDrawGraphPane extends JComponent implements MouseInputLi
         }
     }
 
-    private boolean toggleAxisHightlight(Rectangle graphArea) {
+    private boolean toggleAxisHighlight(Rectangle graphArea) {
         boolean inLeftYAxis = false;
         boolean inRightYAxes = false;
         int rightYAxisNumber = -2;
@@ -117,7 +117,7 @@ public final class ChartDrawGraphPane extends JComponent implements MouseInputLi
         super.paintComponent(g1);
         Rectangle graphArea = DrawController.getGraphArea();
 
-        boolean axisHighlightChanged = toggleAxisHightlight(graphArea);
+        boolean axisHighlightChanged = toggleAxisHighlight(graphArea);
         if (redrawGraphArea || axisHighlightChanged) {
             redrawGraphArea = false;
             redrawGraph(graphArea);
