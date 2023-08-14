@@ -1,9 +1,12 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.5.2 (pending)
+## JHelioviewer 4.5.3 (pending)
+
+## JHelioviewer 4.5.2 (2023-08-14)
 
 - Add line annotation
+- Make Connection layer visible in released versions
 
 ## JHelioviewer 4.5.1 (2023-06-19)
 
