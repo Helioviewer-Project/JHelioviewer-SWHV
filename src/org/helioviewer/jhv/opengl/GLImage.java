@@ -3,8 +3,10 @@ package org.helioviewer.jhv.opengl;
 import java.nio.IntBuffer;
 
 import org.helioviewer.jhv.base.lut.LUT;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.metadata.MetaData;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -15,6 +17,8 @@ public class GLImage {
         None, Running, Base
     }
 
+    public static final int MAX_INNER = 5;
+
     private GLTexture tex;
     private GLTexture lutTex;
     private GLTexture diffTex;
@@ -23,6 +27,7 @@ public class GLImage {
     private float green = 1;
     private float blue = 1;
 
+    private double innerMask = 0;
     private double slitLeft = 0;
     private double slitRight = 1;
     private double brightOffset = 0;
@@ -56,9 +61,10 @@ public class GLImage {
         }
     }
 
-    public void applyFilters(GL2 gl, ImageData imageData, GLSLSolarShader shader) {
+    public void applyFilters(GL2 gl, MetaData metaData, ImageData imageData, GLSLSolarShader shader) {
         shader.bindSlit(gl, slitLeft, slitRight);
-        shader.bindBrightness(gl, brightOffset, brightScale * imageData.getMetaData().getResponseFactor(), 1);
+        shader.bindRadii(gl, Math.max(metaData.getInnerRadius(), (float) innerMask), Display.getShowCorona() ? metaData.getOuterRadius() : 1);
+        shader.bindBrightness(gl, brightOffset, brightScale * metaData.getResponseFactor(), 1);
         shader.bindColor(gl, red, green, blue, opacity, blend);
         shader.bindEnhanced(gl, enhanced);
         shader.bindSharpen(gl, sharpen, 1. / imageData.getImageBuffer().width, 1. / imageData.getImageBuffer().height);
@@ -102,6 +108,10 @@ public class GLImage {
             diffTex.delete(gl);
     }
 
+    public void setInnerMask(double mask) {
+        innerMask = MathUtils.clip(mask, 0, MAX_INNER);
+    }
+
     public void setSlit(double left, double right) {
         slitLeft = MathUtils.clip(left, 0, 1);
         slitRight = MathUtils.clip(right, slitLeft, 1);
@@ -110,6 +120,10 @@ public class GLImage {
     public void setBrightness(double offset, double scale) {
         brightOffset = MathUtils.clip(offset, -1, 2);
         brightScale = MathUtils.clip(scale, 0, 2 - brightOffset);
+    }
+
+    public double getInnerMask() {
+        return innerMask;
     }
 
     public double getSlitLeft() {
@@ -207,6 +221,7 @@ public class GLImage {
         setOpacity(jo.optDouble("opacity", opacity));
         setBlend(jo.optDouble("blend", blend));
         setSlit(jo.optDouble("slitLeft", slitLeft), jo.optDouble("slitRight", slitRight));
+        setInnerMask(jo.optDouble("innerMask", innerMask));
         setBrightness(jo.optDouble("brightOffset", brightOffset), jo.optDouble("brightScale", brightScale));
         enhanced = jo.optBoolean("enhanced", false);
         String strDiffMode = jo.optString("differenceMode", diffMode.toString());
@@ -230,6 +245,7 @@ public class GLImage {
         jo.put("blend", blend);
         jo.put("slitLeft", slitLeft);
         jo.put("slitRight", slitRight);
+        jo.put("innerMask", innerMask);
         jo.put("brightOffset", brightOffset);
         jo.put("brightScale", brightScale);
         jo.put("enhanced", enhanced);

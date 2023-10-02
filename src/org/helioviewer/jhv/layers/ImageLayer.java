@@ -199,7 +199,8 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         GLSLSolarShader shader = Display.mode.shader;
         shader.use(gl);
 
-        glImage.applyFilters(gl, imageData, shader);
+        MetaData metaData = imageData.getMetaData();
+        glImage.applyFilters(gl, metaData, imageData, shader);
 
         shader.bindPolarRadii(gl, Display.mode.scale.getYstart(), Display.mode.scale.getYstop()); // independent
         shader.bindMatrix(gl, camera.getTransformationInverse(vp.aspect)); // viewport dependent
@@ -208,7 +209,6 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         Position cameraViewpoint = imageData.getViewpoint(); // camera at decode command moment
         Quat q = Quat.rotate(camera.getDragRotation(), cameraViewpoint.toQuat());
 
-        MetaData metaData = imageData.getMetaData();
         Position metaViewpoint = metaData.getViewpoint();
         ImageData imageDataDiff = glImage.getDifferenceMode() == DifferenceMode.Base ? baseImageData : prevImageData;
         MetaData metaDataDiff = imageDataDiff.getMetaData();
@@ -220,7 +220,6 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         shader.bindRect(gl, imageData.getRegion(), imageDataDiff.getRegion());
 
         shader.bindCalculateDepth(gl, metaData.getCalculateDepth());
-        shader.bindRadii(gl, metaData.getInnerRadius(), Display.getShowCorona() ? metaData.getOuterRadius() : 1);
         shader.bindSector(gl, metaData.getSector0(), metaData.getSector1());
         if (metaData.getCutOffValue() > 0) {
             shader.bindCutOffDirection(gl, metaData.getCutOffX(), metaData.getCutOffY());
