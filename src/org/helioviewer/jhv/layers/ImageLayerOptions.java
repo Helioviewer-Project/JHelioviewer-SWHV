@@ -7,7 +7,10 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.lut.LUT;
+import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.layers.filters.*;
+
+import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
 class ImageLayerOptions extends JPanel {
@@ -21,10 +24,11 @@ class ImageLayerOptions extends JPanel {
         FilterDetails blendPanel = new BlendPanel(layer);
         FilterDetails channelMixerPanel = new ChannelMixerPanel(layer);
         lutPanel = new LUTPanel(layer);
-        FilterDetails slitPanel = new SlitPanel(layer);
-        FilterDetails innerMaskPanel = new InnerMaskPanel(layer);
         FilterDetails levelsPanel = new LevelsPanel(layer);
         FilterDetails sharpenPanel = new SharpenPanel(layer);
+
+        SlitPanel slitPanel = new SlitPanel(layer);
+        InnerMaskPanel innerMaskPanel = new InnerMaskPanel(layer);
 
         setLayout(new GridBagLayout());
         setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
@@ -44,10 +48,6 @@ class ImageLayerOptions extends JPanel {
         c.gridy++;
         addToGridBag(c, blendPanel);
         c.gridy++;
-        addToGridBag(c, slitPanel);
-        c.gridy++;
-        addToGridBag(c, innerMaskPanel);
-        c.gridy++;
         addToGridBag(c, sharpenPanel);
         c.gridy++;
         addToGridBag(c, levelsPanel);
@@ -55,6 +55,26 @@ class ImageLayerOptions extends JPanel {
         addToGridBag(c, lutPanel);
         c.gridy++;
         addToGridBag(c, channelMixerPanel);
+        c.gridy++;
+
+        slitPanel.setVisible(false);
+        innerMaskPanel.setVisible(false);
+
+        JideToggleButton adjButton = new JideToggleButton(Buttons.adjustmentsRight);
+        adjButton.setToolTipText("Options to control playback and recording");
+        adjButton.addActionListener(e -> {
+            boolean selected = adjButton.isSelected();
+            slitPanel.setVisible(selected);
+            innerMaskPanel.setVisible(selected);
+            adjButton.setText(selected ? Buttons.adjustmentsDown : Buttons.adjustmentsRight);
+        });
+        c.gridx = 1;
+        add(adjButton, c);
+
+        c.gridy++;
+        addToGridBag(c, slitPanel);
+        c.gridy++;
+        addToGridBag(c, innerMaskPanel);
     }
 
     private void addToGridBag(GridBagConstraints c, FilterDetails details) {

@@ -16,6 +16,7 @@ public class SlitPanel implements FilterDetails {
 
     private final RangeSlider slider;
     private final JLabel label;
+    private final JLabel title = new JLabel("Slit", JLabel.RIGHT);
 
     public SlitPanel(ImageLayer layer) {
         int left = (int) (layer.getGLImage().getSlitLeft() * 100);
@@ -47,7 +48,7 @@ public class SlitPanel implements FilterDetails {
 
     @Override
     public Component getTitle() {
-        return new JLabel("Slit", JLabel.RIGHT);
+        return title;
     }
 
     @Override
@@ -58,6 +59,12 @@ public class SlitPanel implements FilterDetails {
     @Override
     public Component getLabel() {
         return label;
+    }
+
+    public void setVisible(boolean visible) {
+        title.setVisible(visible);
+        slider.setVisible(visible);
+        label.setVisible(visible);
     }
 
 }

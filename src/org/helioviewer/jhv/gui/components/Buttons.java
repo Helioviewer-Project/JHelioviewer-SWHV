@@ -28,6 +28,11 @@ public class Buttons {
     public static final String optionsDown = "<html>Options<font face='Material Design Icons' size=4>" +
             MaterialDesign.CHEVRON_DOWN;
 
+    public static final String adjustmentsRight = "<html>Adjustments<font face='Material Design Icons' size=4>" +
+            MaterialDesign.CHEVRON_RIGHT;
+    public static final String adjustmentsDown = "<html>Adjustments<font face='Material Design Icons' size=4>" +
+            MaterialDesign.CHEVRON_DOWN;
+
     public static final String newLayer = "<html><font face='Material Design Icons' size=4>" +
             MaterialDesign.PLUS_CIRCLE + "</font>&nbsp;New Layer";
     public static final String syncLayers = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
