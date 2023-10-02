@@ -13,6 +13,7 @@ public class InnerMaskPanel implements FilterDetails {
 
     private final JHVSlider slider;
     private final JLabel label;
+    private final JLabel title = new JLabel("Mask", JLabel.RIGHT);
 
     public InnerMaskPanel(ImageLayer layer) {
         slider = new JHVSlider(0, GLImage.MAX_INNER * 10, (int) (layer.getGLImage().getInnerMask() * 10));
@@ -31,7 +32,7 @@ public class InnerMaskPanel implements FilterDetails {
 
     @Override
     public Component getTitle() {
-        return new JLabel("Mask", JLabel.RIGHT);
+        return title;
     }
 
     @Override
@@ -42,6 +43,12 @@ public class InnerMaskPanel implements FilterDetails {
     @Override
     public Component getLabel() {
         return label;
+    }
+
+    public void setVisible(boolean visible) {
+        title.setVisible(visible);
+        slider.setVisible(visible);
+        label.setVisible(visible);
     }
 
 }
