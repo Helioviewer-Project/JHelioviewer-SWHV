@@ -223,10 +223,10 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform3fv(gridRef, 2, floatArr, 0);
     }
 
-    public void bindSector(GL2 gl, float sector0, float sector1) {
-        floatArr[0] = sector0 == sector1 ? 0 : 1;
-        floatArr[1] = sector0;
-        floatArr[2] = sector1;
+    public void bindSector(GL2 gl, double sector0, double sector1) {
+        floatArr[0] = sector0 + 2 * Math.PI == sector1 ? 0 : 1; // common case
+        floatArr[1] = (float) sector0;
+        floatArr[2] = (float) sector1;
         gl.glUniform1fv(sectorRef, 3, floatArr, 0);
     }
 

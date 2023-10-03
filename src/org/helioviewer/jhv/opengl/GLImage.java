@@ -30,6 +30,8 @@ public class GLImage {
     private double innerMask = 0;
     private double slitLeft = 0;
     private double slitRight = 1;
+    private double sector0 = -Math.PI;
+    private double sector1 = Math.PI;
     private double brightOffset = 0;
     private double brightScale = 1;
     private double opacity = 1;
@@ -63,6 +65,7 @@ public class GLImage {
 
     public void applyFilters(GL2 gl, MetaData metaData, ImageData imageData, GLSLSolarShader shader) {
         shader.bindSlit(gl, slitLeft, slitRight);
+        shader.bindSector(gl, -Math.max(Math.abs(metaData.getSector0()), Math.abs(sector0)), Math.max(metaData.getSector1(), sector1));
         shader.bindRadii(gl, Math.max(metaData.getInnerRadius(), (float) innerMask), Display.getShowCorona() ? metaData.getOuterRadius() : 1);
         shader.bindBrightness(gl, brightOffset, brightScale * metaData.getResponseFactor(), 1);
         shader.bindColor(gl, red, green, blue, opacity, blend);
@@ -117,6 +120,11 @@ public class GLImage {
         slitRight = MathUtils.clip(right, slitLeft, 1);
     }
 
+    public void setSector(double left, double right) {
+        sector0 = Math.toRadians(MathUtils.clip(left, -180, 0));
+        sector1 = Math.toRadians(MathUtils.clip(right, 0, 180));
+    }
+
     public void setBrightness(double offset, double scale) {
         brightOffset = MathUtils.clip(offset, -1, 2);
         brightScale = MathUtils.clip(scale, 0, 2 - brightOffset);
@@ -128,6 +136,14 @@ public class GLImage {
 
     public double getSlitLeft() {
         return slitLeft;
+    }
+
+    public double getSector0() {
+        return Math.toDegrees(sector0);
+    }
+
+    public double getSector1() {
+        return Math.toDegrees(sector1);
     }
 
     public double getSlitRight() {
@@ -221,6 +237,7 @@ public class GLImage {
         setOpacity(jo.optDouble("opacity", opacity));
         setBlend(jo.optDouble("blend", blend));
         setSlit(jo.optDouble("slitLeft", slitLeft), jo.optDouble("slitRight", slitRight));
+        setSector(jo.optDouble("sector0", sector0), jo.optDouble("sector1", sector1));
         setInnerMask(jo.optDouble("innerMask", innerMask));
         setBrightness(jo.optDouble("brightOffset", brightOffset), jo.optDouble("brightScale", brightScale));
         enhanced = jo.optBoolean("enhanced", false);
@@ -245,6 +262,8 @@ public class GLImage {
         jo.put("blend", blend);
         jo.put("slitLeft", slitLeft);
         jo.put("slitRight", slitRight);
+        jo.put("sector0", getSector0());
+        jo.put("sector1", getSector1());
         jo.put("innerMask", innerMask);
         jo.put("brightOffset", brightOffset);
         jo.put("brightScale", brightScale);
