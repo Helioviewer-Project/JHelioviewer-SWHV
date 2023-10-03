@@ -19,24 +19,28 @@ public class LevelsPanel implements FilterDetails {
 
     private static String align3(int value) {
         if (value < -99)
-            return "\u2212" + -value + '%';
+            return "\u2212" + -value;
         if (value < -9)
-            return "\u2007\u2212" + -value + '%';
+            return "\u2007\u2212" + -value;
         if (value < 0)
-            return "\u2007\u2007\u2212" + -value + '%';
+            return "\u2007\u2007\u2212" + -value;
         if (value < 10)
-            return "\u2007\u2007\u2007" + value + '%';
+            return "\u2007\u2007\u2007" + value;
         if (value < 100)
-            return "\u2007\u2007" + value + '%';
-        return "\u2007" + value + '%';
+            return "\u2007\u2007" + value;
+        return "\u2007" + value;
     }
 
     static String align(int value) {
-        return "<html>" + align3(value);
+        return "<html>" + align3(value) + '%';
     }
 
     static String format(int low, int high) {
-        return "<html>" + align3(low) + "<br/>" + align3(high);
+        return "<html>" + align3(low) + "%<br/>" + align3(high) + '%';
+    }
+
+    static String formatDegree(int low, int high) {
+        return "<html>" + align3(low) + "\u00B0<br/>" + align3(high) + '\u00B0';
     }
 
     public LevelsPanel(ImageLayer layer) {
