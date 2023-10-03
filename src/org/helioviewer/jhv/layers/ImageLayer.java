@@ -220,7 +220,6 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         shader.bindRect(gl, imageData.getRegion(), imageDataDiff.getRegion());
 
         shader.bindCalculateDepth(gl, metaData.getCalculateDepth());
-        shader.bindSector(gl, metaData.getSector0(), metaData.getSector1());
         if (metaData.getCutOffValue() > 0) {
             shader.bindCutOffDirection(gl, metaData.getCutOffX(), metaData.getCutOffY());
             shader.bindCutOffValue(gl, metaData.getCutOffValue());

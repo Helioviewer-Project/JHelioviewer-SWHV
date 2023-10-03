@@ -17,6 +17,9 @@ class ImageLayerOptions extends JPanel {
 
     private final LUTPanel lutPanel;
     private final RunningDifferencePanel runningDifferencePanel;
+    private final SlitPanel slitPanel;
+    private final SectorPanel sectorPanel;
+    private final InnerMaskPanel innerMaskPanel;
 
     ImageLayerOptions(ImageLayer layer) {
         runningDifferencePanel = new RunningDifferencePanel(layer);
@@ -27,8 +30,9 @@ class ImageLayerOptions extends JPanel {
         FilterDetails levelsPanel = new LevelsPanel(layer);
         FilterDetails sharpenPanel = new SharpenPanel(layer);
 
-        SlitPanel slitPanel = new SlitPanel(layer);
-        InnerMaskPanel innerMaskPanel = new InnerMaskPanel(layer);
+        slitPanel = new SlitPanel(layer);
+        sectorPanel = new SectorPanel(layer);
+        innerMaskPanel = new InnerMaskPanel(layer);
 
         setLayout(new GridBagLayout());
         setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
@@ -57,22 +61,21 @@ class ImageLayerOptions extends JPanel {
         addToGridBag(c, channelMixerPanel);
         c.gridy++;
 
-        slitPanel.setVisible(false);
-        innerMaskPanel.setVisible(false);
-
         JideToggleButton adjButton = new JideToggleButton(Buttons.adjustmentsRight);
-        adjButton.setToolTipText("Options to control playback and recording");
+        adjButton.setToolTipText("Options to control the shape of the image");
         adjButton.addActionListener(e -> {
             boolean selected = adjButton.isSelected();
-            slitPanel.setVisible(selected);
-            innerMaskPanel.setVisible(selected);
+            setAdjustmentsVisibility(selected);
             adjButton.setText(selected ? Buttons.adjustmentsDown : Buttons.adjustmentsRight);
         });
         c.gridx = 1;
         add(adjButton, c);
 
+        setAdjustmentsVisibility(false);
         c.gridy++;
         addToGridBag(c, slitPanel);
+        c.gridy++;
+        addToGridBag(c, sectorPanel);
         c.gridy++;
         addToGridBag(c, innerMaskPanel);
     }
@@ -98,6 +101,12 @@ class ImageLayerOptions extends JPanel {
         c.anchor = GridBagConstraints.LINE_START;
         c.fill = GridBagConstraints.NONE;
         add(details.getLabel(), c);
+    }
+
+    private void setAdjustmentsVisibility(boolean visibility) {
+        slitPanel.setVisible(visibility);
+        sectorPanel.setVisible(visibility);
+        innerMaskPanel.setVisible(visibility);
     }
 
     void setLUT(LUT lut) {
