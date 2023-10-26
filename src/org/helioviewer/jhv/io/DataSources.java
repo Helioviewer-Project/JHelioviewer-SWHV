@@ -17,7 +17,7 @@ public class DataSources {
         void setupSources(DataSourcesParser parser);
     }
 
-    private static final String enabledDatasetsV2 = "[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2,SOLO,GOES-R,IRIS]";
+    private static final String enabledDatasetsV2 = "[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2,SOLO,GOES-R,IRIS,GONG]";
 
     private static final ImmutableMap<String, Map<String, String>> serverSettings = new ImmutableMap.Builder<String, Map<String, String>>().
 /*
