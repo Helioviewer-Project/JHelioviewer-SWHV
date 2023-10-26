@@ -18,7 +18,7 @@ class ImageLayerOptions extends JPanel {
     private final LUTPanel lutPanel;
     private final RunningDifferencePanel runningDifferencePanel;
     private final SlitPanel slitPanel;
-    private final SectorPanel sectorPanel;
+    // private final SectorPanel sectorPanel;
     private final InnerMaskPanel innerMaskPanel;
 
     ImageLayerOptions(ImageLayer layer) {
@@ -31,8 +31,8 @@ class ImageLayerOptions extends JPanel {
         FilterDetails sharpenPanel = new SharpenPanel(layer);
 
         slitPanel = new SlitPanel(layer);
-        sectorPanel = new SectorPanel(layer);
         innerMaskPanel = new InnerMaskPanel(layer);
+        // sectorPanel = new SectorPanel(layer);
 
         setLayout(new GridBagLayout());
         setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
@@ -75,9 +75,9 @@ class ImageLayerOptions extends JPanel {
         c.gridy++;
         addToGridBag(c, slitPanel);
         c.gridy++;
-        addToGridBag(c, sectorPanel);
-        c.gridy++;
         addToGridBag(c, innerMaskPanel);
+        // c.gridy++;
+        // addToGridBag(c, sectorPanel);
     }
 
     private void addToGridBag(GridBagConstraints c, FilterDetails details) {
@@ -105,8 +105,8 @@ class ImageLayerOptions extends JPanel {
 
     private void setAdjustmentsVisibility(boolean visibility) {
         slitPanel.setVisible(visibility);
-        sectorPanel.setVisible(visibility);
         innerMaskPanel.setVisible(visibility);
+        // sectorPanel.setVisible(visibility);
     }
 
     void setLUT(LUT lut) {

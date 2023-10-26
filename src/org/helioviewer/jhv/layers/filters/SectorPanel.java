@@ -19,8 +19,8 @@ public class SectorPanel implements FilterDetails {
     private final JLabel title = new JLabel("Sector", JLabel.RIGHT);
 
     public SectorPanel(ImageLayer layer) {
-        int left = (int) (layer.getGLImage().getSector0() + .5);
-        int right = (int) (layer.getGLImage().getSector1() + .5);
+        int left = 0; // (int) (layer.getGLImage().getSector0() + .5);
+        int right = 0; // (int) (layer.getGLImage().getSector1() + .5);
 
         slider = new RangeSlider(-180, 180, left, right);
         slider.addMouseListener(new MouseAdapter() {
@@ -38,7 +38,7 @@ public class SectorPanel implements FilterDetails {
         slider.addChangeListener(e -> {
             int lo = slider.getLowValue();
             int hi = slider.getHighValue();
-            layer.getGLImage().setSector(lo, hi);
+            // layer.getGLImage().setSector(lo, hi);
             label.setText(LevelsPanel.formatDegree(lo, hi));
             MovieDisplay.display();
         });
