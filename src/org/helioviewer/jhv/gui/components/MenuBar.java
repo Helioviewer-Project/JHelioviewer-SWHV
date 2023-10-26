@@ -10,7 +10,6 @@ import javax.swing.JMenuBar;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.gui.actions.CheckUpdateAction;
 import org.helioviewer.jhv.gui.actions.ClearAnnotationsAction;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.actions.LoadStateAction;
@@ -23,6 +22,7 @@ import org.helioviewer.jhv.gui.actions.ResetCameraAxisAction;
 import org.helioviewer.jhv.gui.actions.SaveStateAction;
 import org.helioviewer.jhv.gui.actions.SaveStateAsAction;
 import org.helioviewer.jhv.gui.actions.ShowDialogAction;
+import org.helioviewer.jhv.gui.actions.UpdateCheckerAction;
 import org.helioviewer.jhv.gui.actions.WindowMinimizeAction;
 import org.helioviewer.jhv.gui.actions.WindowZoomAction;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
@@ -113,7 +113,7 @@ public final class MenuBar extends JMenuBar {
 
         helpMenu.add(new OpenURLinBrowserAction("Open User Manual", JHVGlobals.documentationURL));
         helpMenu.add(new OpenURLinBrowserAction("Open Website", "https://www.jhelioviewer.org"));
-        helpMenu.add(new CheckUpdateAction());
+        helpMenu.add(new UpdateCheckerAction());
         helpMenu.addSeparator();
         helpMenu.add(new ShowDialogAction("Show Log...", new LogDialog()));
         helpMenu.add(new OpenURLinBrowserAction("Report Bug/Request Feature", JHVGlobals.bugURL));

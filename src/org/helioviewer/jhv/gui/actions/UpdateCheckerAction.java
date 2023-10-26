@@ -4,18 +4,18 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.helioviewer.jhv.JHVUpdate;
+import org.helioviewer.jhv.UpdateChecker;
 
 @SuppressWarnings("serial")
-public class CheckUpdateAction extends AbstractAction {
+public class UpdateCheckerAction extends AbstractAction {
 
-    public CheckUpdateAction() {
+    public UpdateCheckerAction() {
         super("Check for Updates...");
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        new JHVUpdate(true).check();
+        new UpdateChecker(true).check();
     }
 
 }
