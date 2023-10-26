@@ -69,6 +69,7 @@ public class JHelioviewer {
         // Save command line arguments
         CommandLine.setArguments(args);
 
+        LocationChecker.setProximityServer();
         EventQueue.invokeLater(() -> {
             UIGlobals.setLaf();
 
@@ -103,7 +104,7 @@ public class JHelioviewer {
             CommandLine.load();
             SampClient.init();
 
-            new JHVUpdate(false).check();
+            new UpdateChecker(false).check();
         });
     }
 
