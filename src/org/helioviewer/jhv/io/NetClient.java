@@ -21,6 +21,8 @@ public interface NetClient extends AutoCloseable {
 
     long getContentLength();
 
+    long getResponseTime();
+
     @Override
     void close() throws IOException;
 

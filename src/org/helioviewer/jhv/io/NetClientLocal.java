@@ -49,6 +49,11 @@ class NetClientLocal implements NetClient {
     }
 
     @Override
+    public long getResponseTime() {
+        return 0;
+    }
+
+    @Override
     public void close() throws IOException {
         response.close();
     }

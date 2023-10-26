@@ -14,6 +14,7 @@ public class DataSourcesParser {
     private final String server;
     private final DefaultMutableTreeNode rootNode;
     private DefaultMutableTreeNode defaultNode;
+    private long responseTime;
 
     DataSourcesParser(String _server) {
         server = _server;
@@ -22,6 +23,10 @@ public class DataSourcesParser {
 
     void parse(JSONObject json) {
         parse(rootNode, json, null);
+    }
+
+    void setResponseTime(long time) {
+        responseTime = time;
     }
 
     DefaultMutableTreeNode getRoot() {

@@ -43,11 +43,12 @@ class LoadSources {
             URI uri = new URI(serverUrl);
             DataSourcesParser parser = new DataSourcesParser(server);
             while (true) {
-                try {
-                    JSONObject jo = JSONUtils.get(uri);
+                try (NetClient nc = NetClient.of(uri)) {
+                    JSONObject jo = JSONUtils.get(nc.getReader());
                     if (schema != null)
                         validator.performValidation(schema, jo);
                     parser.parse(jo);
+                    parser.setResponseTime(nc.getResponseTime());
                     break;
                 } catch (IOException e) {
                     // Log.error(uri, e);

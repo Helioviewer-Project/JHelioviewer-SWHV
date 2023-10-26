@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//import javax.annotation.Nonnull;
+import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.JHVGlobals;
 //import org.helioviewer.jhv.Log;
@@ -17,7 +17,7 @@ import okhttp3.Cache;
 import okhttp3.CacheControl;
 import okhttp3.Dispatcher;
 import okhttp3.HttpUrl;
-//import okhttp3.Interceptor;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -45,11 +45,12 @@ class NetClientRemote implements NetClient {
             .cache(new Cache(JHVGlobals.clientCacheDir, cacheSize))
             .dispatcher(dispatcher)
             //.addInterceptor(logging)
-            //.addInterceptor(new LoggingInterceptor())
             .build();
 
     private final ResponseBody responseBody;
     private final boolean isSuccessful;
+
+    private long responseTime = 0;
 
     NetClientRemote(URI uri, boolean allowError, NetCache cache) throws IOException {
         HttpUrl url = HttpUrl.get(uri);
@@ -62,9 +63,8 @@ class NetClientRemote implements NetClient {
         else if (cache == NetCache.BYPASS)
             builder.cacheControl(noStore);
         Request request = builder.build();
-        //System.out.println(">>> " + url);
 
-        Response response = client.newBuilder().build() // avoid spurious connection leaked messages for LMSAL
+        Response response = client.newBuilder().addInterceptor(new LoggingInterceptor(this)).build() // avoid spurious connection leaked messages for LMSAL
                 .newCall(request).execute();
         isSuccessful = response.isSuccessful();
         if (!allowError && !isSuccessful) {
@@ -76,6 +76,10 @@ class NetClientRemote implements NetClient {
 
         //if (response.cacheResponse() != null)
         //    System.out.println(">>> cached response: " + url);
+    }
+
+    private void setResponseTime(long time) {
+        responseTime = time;
     }
 
     @Override
@@ -104,30 +108,37 @@ class NetClientRemote implements NetClient {
     }
 
     @Override
+    public long getResponseTime() {
+        return responseTime;
+    }
+
+    @Override
     public void close() {
         if (responseBody != null) {
             responseBody.close();
         }
     }
-/*
-    private static class LoggingInterceptor implements Interceptor {
+
+    private record LoggingInterceptor(NetClientRemote client) implements Interceptor {
         @Nonnull
         @Override
         public Response intercept(@Nonnull Chain chain) throws IOException {
             long t1 = System.nanoTime();
             Request r1 = chain.request();
-            Log.info(String.format("Sending request %s on %s%n%s", r1.url(), chain.connection(), r1.headers()));
+            // Log.info(String.format("Sending request %s on %s%n%s", r1.url(), chain.connection(), r1.headers()));
 
             Response r2 = chain.proceed(r1);
             long t2 = System.nanoTime();
-            Log.info(String.format("Received response for %s in %.1fms", r1.url(), (t2 - t1) / 1e6d));
+            // Log.info(String.format("Received response for %s in %.1fms", r1.url(), (t2 - t1) / 1e6d));
+            client.setResponseTime(t2 - t1);
 
+            /*
             Response r3 = r2.networkResponse();
             if (r3 != null)
                 Log.info(String.format("Network headers %s:\n%s", r1.url(), r3.headers()));
-
+            */
             return r2;
         }
     }
-*/
+
 }
