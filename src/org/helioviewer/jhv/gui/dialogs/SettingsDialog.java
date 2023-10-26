@@ -40,7 +40,6 @@ import org.helioviewer.jhv.export.VideoFormat;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.actions.LoadStateDialog;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
-import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.time.TimeMode;
@@ -117,41 +116,30 @@ public final class SettingsDialog extends StandardDialog implements ShowableDial
 
         c.gridx = 0;
         c.gridy = 0;
-        settings.add(new JLabel("Preferred server:", JLabel.RIGHT), c);
-
-        c.gridx = 1;
-        c.gridy = 0;
-        JComboBox<String> comboServers = new JComboBox<>(DataSources.getServers().toArray(String[]::new));
-        comboServers.setSelectedItem(Settings.getProperty("default.server"));
-        comboServers.addActionListener(e -> Settings.setProperty("default.server", (String) Objects.requireNonNull(comboServers.getSelectedItem())));
-        settings.add(comboServers, c);
-
-        c.gridx = 0;
-        c.gridy = 1;
         settings.add(new JLabel("At start-up:", JLabel.RIGHT), c);
 
         c.gridx = 1;
-        c.gridy = 1;
+        c.gridy = 0;
         settings.add(getStatePanel(), c);
 
         c.gridx = 1;
-        c.gridy = 2;
+        c.gridy = 1;
         JCheckBox sampHub = new JCheckBox("Load SAMP hub", Boolean.parseBoolean(Settings.getProperty("startup.sampHub")));
         sampHub.addActionListener(e -> Settings.setProperty("startup.sampHub", Boolean.toString(sampHub.isSelected())));
         settings.add(sampHub, c);
 
         c.gridx = 0;
-        c.gridy = 3;
+        c.gridy = 2;
         settings.add(new JLabel("After restart:", JLabel.RIGHT), c);
 
         c.gridx = 1;
-        c.gridy = 3;
+        c.gridy = 2;
         JCheckBox normalizeAIA = new JCheckBox("Normalize SDO/AIA brightness", Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA")));
         normalizeAIA.addActionListener(e -> Settings.setProperty("display.normalizeAIA", Boolean.toString(normalizeAIA.isSelected())));
         settings.add(normalizeAIA, c);
 
         c.gridx = 1;
-        c.gridy = 4;
+        c.gridy = 3;
         JCheckBox normalizeRadius = new JCheckBox("Normalize solar radius", Boolean.parseBoolean(Settings.getProperty("display.normalize")));
         normalizeRadius.addActionListener(e -> Settings.setProperty("display.normalize", Boolean.toString(normalizeRadius.isSelected())));
         settings.add(normalizeRadius, c);
@@ -177,15 +165,15 @@ public final class SettingsDialog extends StandardDialog implements ShowableDial
         }
 
         c.gridx = 1;
-        c.gridy = 5;
+        c.gridy = 4;
         settings.add(timePanel, c);
 
         c.gridx = 0;
-        c.gridy = 6;
+        c.gridy = 5;
         settings.add(new JLabel("Record video as:", JLabel.RIGHT), c);
 
         c.gridx = 1;
-        c.gridy = 6;
+        c.gridy = 5;
         JComboBox<VideoFormat> comboVideo = new JComboBox<>(VideoFormat.values());
         VideoFormat videoFormat = VideoFormat.H264;
         try {
@@ -197,7 +185,7 @@ public final class SettingsDialog extends StandardDialog implements ShowableDial
         settings.add(comboVideo, c);
 
         c.gridx = 0;
-        c.gridy = 7;
+        c.gridy = 6;
         settings.add(new JLabel("Plugins:", JLabel.RIGHT), c);
 
         c.gridx = 1;
