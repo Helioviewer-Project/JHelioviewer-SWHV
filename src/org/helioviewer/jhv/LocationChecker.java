@@ -11,7 +11,7 @@ import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.model.CountryResponse;
 import okio.BufferedSource;
 
-public class LocationChecker {
+class LocationChecker {
 
     static void setProximityServer() {
         new Thread(() -> {
@@ -30,9 +30,10 @@ public class LocationChecker {
                         Settings.setProperty("default.server", "IAS");
                     else
                         Settings.setProperty("default.server", "GSFC");
-                    Log.info("Location: " + continent + " -> server: " + Settings.getProperty("default.server"));
+                    Log.info("Location: " + continent + " -> default server: " + Settings.getProperty("default.server"));
                 }
             } catch (Exception e) {
+                Settings.setProperty("default.server", "GSFC");
                 Log.warn(e);
             }
         }, "Location Checker").start();
