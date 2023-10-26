@@ -39,7 +39,7 @@ public class Settings {
             setProperty("path.state", JHVDirectory.STATES.getPath());
         String server = getProperty("default.server");
         if (server == null || DataSources.getServerSetting(server, "API.getDataSources") == null)
-            setProperty("default.server", "IAS");
+            setProperty("default.server", "GSFC");
     }
 
     public static void setProperty(String key, String val) {
