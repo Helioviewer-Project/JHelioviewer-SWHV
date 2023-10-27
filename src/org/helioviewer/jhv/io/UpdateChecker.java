@@ -1,21 +1,23 @@
-package org.helioviewer.jhv;
+package org.helioviewer.jhv.io;
 
 import java.awt.EventQueue;
 import java.net.URI;
 
 import javax.swing.JOptionPane;
 
+import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.gui.dialogs.NewVersionDialog;
-import org.helioviewer.jhv.io.NetClient;
 
 import okio.BufferedSource;
 
-// Verbose whether a dialog box should be popped up.
-// A message box is shown in case of an update error.
-public record UpdateChecker(boolean verbose) {
+// Verbose whether a dialog box should be popped up
+// A message box is shown in case of an update error
+public class UpdateChecker {
 
-    public void check() {
+    public static void check(boolean verbose) {
         new Thread(() -> {
             if (!verbose) {
                 try {

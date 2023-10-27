@@ -1,19 +1,19 @@
-package org.helioviewer.jhv;
+package org.helioviewer.jhv.io;
 
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URI;
 
-import org.helioviewer.jhv.io.FileUtils;
-import org.helioviewer.jhv.io.NetClient;
+import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.Settings;
 
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.model.CountryResponse;
 import okio.BufferedSource;
 
-class LocationChecker {
+public class LocationChecker {
 
-    static void setProximityServer() {
+    public static void setProximityServer() {
         new Thread(() -> {
             try (NetClient nc = NetClient.of(new URI("https://api.ipify.org")); BufferedSource source = nc.getSource()) {
                 String address = source.readUtf8Line();

@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.helioviewer.jhv.UpdateChecker;
+import org.helioviewer.jhv.io.UpdateChecker;
 
 @SuppressWarnings("serial")
 public class UpdateCheckerAction extends AbstractAction {
@@ -15,7 +15,7 @@ public class UpdateCheckerAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        new UpdateChecker(true).check();
+        UpdateChecker.check(true);
     }
 
 }

@@ -15,7 +15,9 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
+import org.helioviewer.jhv.io.LocationChecker;
 import org.helioviewer.jhv.io.SampClient;
+import org.helioviewer.jhv.io.UpdateChecker;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
@@ -104,7 +106,7 @@ public class JHelioviewer {
             CommandLine.load();
             SampClient.init();
 
-            new UpdateChecker(false).check();
+            UpdateChecker.check(false);
         });
     }
 
