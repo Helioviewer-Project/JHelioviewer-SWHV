@@ -81,9 +81,9 @@ public class DataSources {
         build()).
 /*    */
         put("ESAC", new ImmutableMap.Builder<String, String>().
-        put("API.getDataSources", "http://soar.esac.esa.int/jpip-api/v2/getDataSources/?verbose=true&enable=[SOLO]").
-        put("API.getJP2Image", "http://soar.esac.esa.int/jpip-api/v2/getJP2Image/?").
-        put("API.getJPX", "http://soar.esac.esa.int/jpip-api/v2/getJPX/?").
+        put("API.getDataSources", "https://soar.esac.esa.int/jpip-api/v2/getDataSources/?verbose=true&enable=[SOLO]").
+        put("API.getJP2Image", "https://soar.esac.esa.int/jpip-api/v2/getJP2Image/?").
+        put("API.getJPX", "https://soar.esac.esa.int/jpip-api/v2/getJPX/?").
         put("label", "European Space Astronomy Center").
         put("schema", "/data/sources_v1.0.json").
         build()).
