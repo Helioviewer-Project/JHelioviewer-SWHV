@@ -18,9 +18,9 @@ import com.google.common.util.concurrent.FutureCallback;
 
 public class SoarClient {
 
-    private static final UriTemplate queryTemplate = new UriTemplate("http://soar.esac.esa.int/soar-sl-tap/tap/sync",
+    private static final UriTemplate queryTemplate = new UriTemplate("https://soar.esac.esa.int/soar-sl-tap/tap/sync",
             UriTemplate.vars().set("REQUEST", "doQuery").set("LANG", "ADQL").set("FORMAT", "json"));
-    private static final UriTemplate loadTemplate = new UriTemplate("http://soar.esac.esa.int/soar-sl-tap/data",
+    private static final UriTemplate loadTemplate = new UriTemplate("https://soar.esac.esa.int/soar-sl-tap/data",
             UriTemplate.vars().set("retrieval_type", "LAST_PRODUCT").set("product_type", "SCIENCE"));
 
     enum FileFormat {CDF, FITS, JP2}
