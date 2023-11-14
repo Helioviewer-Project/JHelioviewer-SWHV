@@ -58,7 +58,7 @@ public class UIGlobals {
         openHandCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
 
         uiFont = UIManager.getFont("defaultFont");
-        uiFont = uiFont == null ? UIManager.getFont("Label.font") : uiFont;
+        uiFont = uiFont == null ? UIManager.getFont("Label.font") : uiFont; // when not FlatLaf
         float defaultSize = uiFont.getSize();
 
         uiFontBold = uiFont.deriveFont(Font.BOLD);
@@ -66,7 +66,7 @@ public class UIGlobals {
         uiFontSmallBold = uiFontSmall.deriveFont(Font.BOLD);
 
         Font monoFont = UIManager.getFont("monospaced.font");
-        uiFontMonoSmall = monoFont == null ? new Font("Monospaced", Font.PLAIN, (int) (defaultSize - 2)) : monoFont.deriveFont(defaultSize - 2);
+        uiFontMonoSmall = monoFont == null ? new Font("Monospaced", Font.PLAIN, (int) (defaultSize - 2)) : monoFont.deriveFont(defaultSize - 2); // when not FlatLaf
 
         int arc = 6;
         UIManager.put("Button.arc", arc);
