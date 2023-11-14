@@ -1,11 +1,11 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.6 (pending)
+## JHelioviewer 4.5.3 (2023-11-14)
 
 - Add image inner masking
-- Set default image server by computer IP location
 - Allow loading GONG images from all servers
+- Set default image server by computer IP location (IAS for Europe, GSFC for rest of the world)
 
 ## JHelioviewer 4.5.2 (2023-08-14)
 
