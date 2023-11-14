@@ -38,6 +38,7 @@ public class UIGlobals {
         if (!Platform.isMacOS()) {
             ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
             JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+            UIManager.put("Popup.forceHeavyWeight", true);
         }
 
         foreColor = UIManager.getColor("Label.foreground");
@@ -57,6 +58,7 @@ public class UIGlobals {
         openHandCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
 
         uiFont = UIManager.getFont("defaultFont");
+        uiFont = uiFont == null ? UIManager.getFont("Label.font") : uiFont;
         float defaultSize = uiFont.getSize();
 
         uiFontBold = uiFont.deriveFont(Font.BOLD);
@@ -64,7 +66,7 @@ public class UIGlobals {
         uiFontSmallBold = uiFontSmall.deriveFont(Font.BOLD);
 
         Font monoFont = UIManager.getFont("monospaced.font");
-        uiFontMonoSmall = monoFont.deriveFont(defaultSize - 2);
+        uiFontMonoSmall = monoFont == null ? new Font("Monospaced", Font.PLAIN, (int) (defaultSize - 2)) : monoFont.deriveFont(defaultSize - 2);
 
         int arc = 6;
         UIManager.put("Button.arc", arc);
