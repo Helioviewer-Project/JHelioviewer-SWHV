@@ -1,6 +1,8 @@
 
 # Revision history for JHelioviewer
 
+## JHelioviewer 4.6 (pending)
+
 ## JHelioviewer 4.5.3 (2023-11-14)
 
 - Add image inner masking
