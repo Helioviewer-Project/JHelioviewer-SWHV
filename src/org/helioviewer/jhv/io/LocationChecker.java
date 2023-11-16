@@ -21,8 +21,7 @@ public class LocationChecker {
                     throw new Exception("Location Checker: Empty IP");
                 }
                 // Log.info(address);
-                try (InputStream is = FileUtils.getResource("/geoip/GeoLite2-Country.mmdb")) {
-                    DatabaseReader reader = new DatabaseReader.Builder(is).build();
+                try (InputStream is = FileUtils.getResource("/geoip/GeoLite2-Country.mmdb"); DatabaseReader reader = new DatabaseReader.Builder(is).build()) {
                     CountryResponse response = reader.country(InetAddress.getByName(address));
                     // Log.info(response.getCountry().getIsoCode());
                     String continent = response.getContinent().getCode();
