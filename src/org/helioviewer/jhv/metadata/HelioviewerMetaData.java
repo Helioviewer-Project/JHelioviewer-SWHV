@@ -182,8 +182,10 @@ public final class HelioviewerMetaData extends BaseMetaData {
 
         if (measurement.endsWith("."))
             measurement = measurement.substring(0, measurement.length() - 1);
-        if (measurement.endsWith(".0"))
+        else if (measurement.endsWith(".0"))
             measurement = measurement.substring(0, measurement.length() - 2);
+        else if (measurement.endsWith(".00"))
+            measurement = measurement.substring(0, measurement.length() - 3);
 
         if (instrument.contains("VSM")) {
             displayName = "NSO-SOLIS " + measurement;
