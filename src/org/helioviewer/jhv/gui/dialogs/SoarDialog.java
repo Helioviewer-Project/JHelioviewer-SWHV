@@ -180,6 +180,7 @@ public class SoarDialog extends StandardDialog implements SoarClient.ReceiverIte
                 selectedLabel.setText(items.size() + " selected " + String.format("(%.1fGiB)", getTotalSize(items)));
             }
         });
+        com.jidesoft.swing.SearchableUtils.installSearchable(listPane);
         JScrollPane scrollPane = new JScrollPane(listPane);
         scrollPane.setPreferredSize(new Dimension(350, 350));
 
