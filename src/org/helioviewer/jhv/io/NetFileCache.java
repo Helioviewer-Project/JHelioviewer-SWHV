@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 
@@ -16,10 +17,11 @@ import okio.Okio;
 
 public class NetFileCache {
 
+    private static final Set<String> uncachedSchemes = Set.of("jpip", "jpips", "file");
+
     private static final LoadingCache<URI, URI> cache = Caffeine.newBuilder().softValues().
             build(uri -> {
-                String scheme = uri.getScheme().toLowerCase();
-                if (scheme.equals("jpip") || scheme.equals("jpips") || scheme.equals("file"))
+                if (uncachedSchemes.contains(uri.getScheme().toLowerCase()))
                     return uri;
 
                 Path path = Files.createTempFile(JHVGlobals.fileCacheDir.toPath(), "jhv", null);

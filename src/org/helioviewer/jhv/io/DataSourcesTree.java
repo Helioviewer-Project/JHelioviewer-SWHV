@@ -60,12 +60,10 @@ public final class DataSourcesTree extends JTree {
 
     }
 
-    private final ObservationSelector selector;
     private final DefaultMutableTreeNode nodeRoot;
     private final HashMap<String, DefaultMutableTreeNode> nodes = new HashMap<>();
 
-    public DataSourcesTree(ObservationSelector _selector) {
-        selector = _selector;
+    public DataSourcesTree(ObservationSelector selector) {
         nodeRoot = new DefaultMutableTreeNode("Datasets");
 
         for (String serverName : DataSources.getServers()) {
@@ -83,7 +81,7 @@ public final class DataSourcesTree extends JTree {
             defaultRenderer.setLeafIcon(null);
         }
 
-        setSelectionModel(new OneLeafTreeSelectionModel());
+        setSelectionModel(new OneLeafTreeSelectionModel(selector));
         ToolTipManager.sharedInstance().registerComponent(this);
         com.jidesoft.swing.SearchableUtils.installSearchable(this).setRecursive(true);
 
@@ -196,11 +194,13 @@ public final class DataSourcesTree extends JTree {
         return null;
     }
 
-    private class OneLeafTreeSelectionModel extends DefaultTreeSelectionModel {
+    private static class OneLeafTreeSelectionModel extends DefaultTreeSelectionModel {
 
+        private final ObservationSelector selector;
         private TreePath selectedPath;
 
-        OneLeafTreeSelectionModel() {
+        OneLeafTreeSelectionModel(ObservationSelector _selector) {
+            selector = _selector;
             setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         }
 
