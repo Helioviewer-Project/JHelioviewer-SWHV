@@ -40,8 +40,8 @@ public class SoarDialog extends StandardDialog implements SoarClient.ReceiverIte
     private static final double MAX_SIZE = 2;
     private static final String[] Level = new String[]{/* "LL01", "LL02", "LL03",*/ "L1", "L2", "L3"};
     private static final ImmutableSortedMap<String, List<String>> Dataset = new ImmutableSortedMap.Builder<String, List<String>>(JHVGlobals.alphanumComparator).
-            put("EUI FSI 174", List.of("eui-fsi174-image")).
-            put("EUI FSI 304", List.of("eui-fsi304-image")).
+            put("EUI FSI 174", List.of("eui-fsi174-image", "eui-fsi174-image-occulter", "eui-fsi174-image-short")).
+            put("EUI FSI 304", List.of("eui-fsi304-image", "eui-fsi304-image-occulter", "eui-fsi304-image-short")).
             put("EUI HRI 174", List.of("eui-hrieuv174-image", "eui-hrieuvnon-image")).
             put("EUI HRI LYA", List.of("eui-hrilya1216-image")).
             put("PHI FDT", List.of("phi-fdt-blos", "phi-fdt-icnt")).

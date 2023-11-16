@@ -3,6 +3,8 @@
 
 ## JHelioviewer 4.6 (pending)
 
+- Load PHI, Metis and SoloHI datasets from SOAR
+
 ## JHelioviewer 4.5.3 (2023-11-14)
 
 - Add image inner masking
