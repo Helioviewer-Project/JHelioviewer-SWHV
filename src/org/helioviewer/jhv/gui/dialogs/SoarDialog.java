@@ -46,6 +46,7 @@ public class SoarDialog extends StandardDialog implements SoarClient.ReceiverIte
             put("EUI HRI LYA", List.of("eui-hrilya1216-image")).
             put("PHI FDT", List.of("phi-fdt-blos", "phi-fdt-icnt")).
             put("PHI HRT", List.of("phi-hrt-bazi", "phi-hrt-binc", "phi-hrt-blos", "phi-hrt-bmag", "phi-hrt-icnt", /* "phi-hrt-stokes",*/ "phi-hrt-vlos")).
+            put("Metis", List.of("metis-uv-image", "metis-vl-image", "metis-vl-pb", "metis-vl-pol-angle", "metis-vl-stokes", "metis-vl-tb")).
             put("MAG RTN", List.of("mag-rtn-normal", "mag-rtn-normal-1-minute"/*, "mag-rtn-burst"*/)).
             // put("MAG SRF", List.of("mag-srf-normal" /*, "mag-srf-burst" */)).
             // put("MAG VSO", List.of("mag-vso-normal", "mag-vso-normal-1-minute"/*, "mag-vso-burst"*/)).
