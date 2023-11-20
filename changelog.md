@@ -1,6 +1,10 @@
 
 # Revision history for JHelioviewer
 
+## JHelioviewer 4.5.5 (2023-11-20)
+
+- Avert a potential crash related to external screens
+
 ## JHelioviewer 4.5.4 (2023-11-20)
 
 - Load PHI, Metis and SoloHI datasets from SOAR
