@@ -31,7 +31,6 @@ public class KakaduSource {
     private final Jpx_source jpxSrc = new Jpx_source();
     private final Kdu_cache cache;
     private final URI uri;
-    private int numberLayers;
 
     public KakaduSource(Kdu_cache _cache, URI _uri) {
         cache = _cache;
@@ -59,8 +58,7 @@ public class KakaduSource {
     public int getNumberLayers() throws KduException {
         int[] temp = new int[1];
         jpxSrc.Count_compositing_layers(temp);
-        numberLayers = temp[0];
-        return numberLayers;
+        return temp[0];
     }
 
     public ResolutionSet getResolutionSet(int frame) throws KduException {
@@ -139,15 +137,14 @@ public class KakaduSource {
 
     private static final long[] xmlFilter = {Kdu_global.jp2_xml_4cc};
 
-    public String[] extractMetaData() throws KduException {
+    public void extractMetaData(String[] xmlMetaData) throws KduException {
         Jpx_meta_manager metaManager = jpxSrc.Access_meta_manager();
         Jpx_metanode node = new Jpx_metanode();
         int i = 0;
 
-        String[] xmlMetaData = new String[numberLayers];
         Jp2_input_box xmlBox = new Jp2_input_box();
         while ((node = metaManager.Peek_and_clear_touched_nodes(1, xmlFilter, node)).Exists()) {
-            if (i == numberLayers)
+            if (i == xmlMetaData.length)
                 break;
             if (node.Open_existing(xmlBox)) {
                 xmlMetaData[i] = xmlBox2String(xmlBox);
@@ -155,7 +152,6 @@ public class KakaduSource {
             }
             i++;
         }
-        return xmlMetaData;
     }
 
     private static String xmlBox2String(Jp2_input_box xmlBox) throws KduException {
