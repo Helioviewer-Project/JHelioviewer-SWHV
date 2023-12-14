@@ -124,9 +124,10 @@ public class J2KView extends BaseView {
             if (lut != null)
                 builtinLUT = new LUT(getName() + " built-in", lut);
 
-            if (jpipCache == null) {
+            if (jpipCache == null) { // local
                 cacheStatus = new CacheStatusLocal(source, maxFrame);
-            } else { // remote
+                source.close();
+            } else {
                 cacheStatus = new CacheStatusRemote(source, maxFrame);
                 reader.start();
             }
@@ -321,8 +322,16 @@ public class J2KView extends BaseView {
 
         @Override
         public void onSuccess(ImageBuffer result) {
-            if (params.complete)
+            if (params.complete) {
                 decodeCache.put(params, result);
+                if (jpipCache == null) { // local
+                    try {
+                        source.close();
+                    } catch (KduException e) {
+                        Log.error(e);
+                    }
+                }
+            }
             sendDataToHandler(params, result);
         }
 
@@ -367,7 +376,10 @@ public class J2KView extends BaseView {
         return cacheStatus.getResolutionSet(frame).numComps;
     }
 
-    KakaduSource getSource() {
+    KakaduSource getSource() throws Exception {
+        if (jpipCache == null) { // local
+            source.open();
+        }
         return source;
     }
 
