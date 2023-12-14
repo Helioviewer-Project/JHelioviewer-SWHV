@@ -91,6 +91,7 @@ public class J2KView extends BaseView {
             }
 
             source = new KakaduSource(jpipCache, uri);
+            source.open();
             maxFrame = source.getNumberLayers() - 1;
 
             xmlMetaData = source.extractMetaData();
@@ -161,7 +162,7 @@ public class J2KView extends BaseView {
                 }
                 try {
                     if (aSource != null) {
-                        aSource.abolish();
+                        aSource.close();
                     }
                     if (aJpipCache != null) {
                         aJpipCache.Close();

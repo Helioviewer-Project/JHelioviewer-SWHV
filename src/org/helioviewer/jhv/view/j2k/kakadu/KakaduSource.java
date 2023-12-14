@@ -29,31 +29,37 @@ public class KakaduSource {
 
     private final Jp2_threadsafe_family_src jp2Src = new Jp2_threadsafe_family_src();
     private final Jpx_source jpxSrc = new Jpx_source();
-    private final int numberLayers;
+    private final Kdu_cache cache;
+    private final URI uri;
+    private int numberLayers;
 
-    public KakaduSource(Kdu_cache cache, URI uri) throws Exception {
-        if (cache == null) { // local
-            jp2Src.Open(Path.of(uri).toString(), true);
-        } else {
-            jp2Src.Open(cache);
-        }
-        jpxSrc.Open(jp2Src, false);
-
-        int[] temp = new int[1];
-        jpxSrc.Count_compositing_layers(temp);
-        numberLayers = temp[0];
-    }
-
-    public void abolish() throws KduException {
-        jpxSrc.Close();
-        jp2Src.Close();
+    public KakaduSource(Kdu_cache _cache, URI _uri) {
+        cache = _cache;
+        uri = _uri;
     }
 
     public Jpx_source getJpxSource() {
         return jpxSrc;
     }
 
-    public int getNumberLayers() {
+    public void open() throws Exception {
+        if (cache == null) { // local
+            jp2Src.Open(Path.of(uri).toString(), true);
+        } else {
+            jp2Src.Open(cache);
+        }
+        jpxSrc.Open(jp2Src, false);
+    }
+
+    public void close() throws KduException {
+        jpxSrc.Close();
+        jp2Src.Close();
+    }
+
+    public int getNumberLayers() throws KduException {
+        int[] temp = new int[1];
+        jpxSrc.Count_compositing_layers(temp);
+        numberLayers = temp[0];
         return numberLayers;
     }
 
