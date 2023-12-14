@@ -92,10 +92,11 @@ public class J2KView extends BaseView {
 
             source = new KakaduSource(jpipCache, uri);
             source.open();
-            maxFrame = source.getNumberLayers() - 1;
 
-            xmlMetaData = source.extractMetaData();
+            maxFrame = source.getNumberLayers() - 1;
             metaData = new MetaData[maxFrame + 1];
+            xmlMetaData = new String[maxFrame + 1];
+            source.extractMetaData(xmlMetaData);
             for (int i = 0; i <= maxFrame; i++) {
                 if (xmlMetaData[i] == null) {
                     xmlMetaData[i] = "<meta/>";
