@@ -220,7 +220,7 @@ class J2KReader implements Runnable {
                     params.priority = false;
                     readerSignal.signal(params);
                 }
-            } catch (KduException | IOException e) {
+            } catch (Exception e) {
                 try {
                     socket.close();
                 } catch (IOException ioe) {

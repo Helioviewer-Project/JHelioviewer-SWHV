@@ -132,7 +132,7 @@ record J2KDecoder(J2KView view, DecodeParams params, boolean mgn) implements Cal
         return null;
     }
 
-    private static Kdu_region_compositor createCompositor(J2KView j2k, Kdu_quality_limiter quality) throws KduException {
+    private static Kdu_region_compositor createCompositor(J2KView j2k, Kdu_quality_limiter quality) throws Exception {
         Kdu_region_compositor krc = new Kdu_region_compositor();
         krc.Create(j2k.getSource().getJpxSource());
         krc.Set_surface_initialization_mode(false);
