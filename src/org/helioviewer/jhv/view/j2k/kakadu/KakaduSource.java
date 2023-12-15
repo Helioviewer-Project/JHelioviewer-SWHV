@@ -34,7 +34,7 @@ public class KakaduSource {
 
     public KakaduSource(Kdu_cache _cache, URI uri) {
         cache = _cache;
-        path = Path.of(uri).toString();
+        path = cache == null ? Path.of(uri).toString() : null;
     }
 
     public Jpx_source getJpxSource() {

@@ -8,7 +8,7 @@ import org.json.JSONObject;
 
 public record APIRequest(@Nonnull String server, int sourceId, long startTime, long endTime, int cadence) {
 
-    private static final long RANGE_EXPAND = 60 * TimeUtils.MINUTE_IN_MILLIS;
+    private static final long RANGE_EXPAND = 15 * TimeUtils.MINUTE_IN_MILLIS;
     public static final int CADENCE_ALL = -100;
     public static final int CADENCE_DEFAULT = 1800;
     public static final int CallistoID = 5000;
