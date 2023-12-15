@@ -1,6 +1,9 @@
 
 # Revision history for JHelioviewer
 
+## JHelioviewer 4.5.6 (pending)
+
+
 ## JHelioviewer 4.5.5 (2023-11-20)
 
 - Avert a potential crash related to external screens

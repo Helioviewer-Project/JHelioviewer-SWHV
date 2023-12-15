@@ -30,11 +30,11 @@ public class KakaduSource {
     private final Jp2_threadsafe_family_src jp2Src = new Jp2_threadsafe_family_src();
     private final Jpx_source jpxSrc = new Jpx_source();
     private final Kdu_cache cache;
-    private final URI uri;
+    private final String path;
 
-    public KakaduSource(Kdu_cache _cache, URI _uri) {
+    public KakaduSource(Kdu_cache _cache, URI uri) {
         cache = _cache;
-        uri = _uri;
+        path = Path.of(uri).toString();
     }
 
     public Jpx_source getJpxSource() {
@@ -43,7 +43,7 @@ public class KakaduSource {
 
     public void open() throws Exception {
         if (cache == null) { // local
-            jp2Src.Open(Path.of(uri).toString(), true);
+            jp2Src.Open(path, true);
         } else {
             jp2Src.Open(cache);
         }
