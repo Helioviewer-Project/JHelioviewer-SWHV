@@ -127,7 +127,7 @@ public class J2KView extends BaseView {
 
             if (jpipCache == null) { // local
                 cacheStatus = new CacheStatusLocal(source, maxFrame);
-                source.close();
+                source.close(); // close asap
             } else {
                 cacheStatus = new CacheStatusRemote(source, maxFrame);
                 reader.start();
@@ -325,7 +325,7 @@ public class J2KView extends BaseView {
         public void onSuccess(ImageBuffer result) {
             if (params.complete) {
                 decodeCache.put(params, result);
-                if (jpipCache == null) { // local
+                if (jpipCache == null) { // local, close asap
                     try {
                         source.close();
                     } catch (KduException e) {
@@ -378,7 +378,7 @@ public class J2KView extends BaseView {
     }
 
     KakaduSource getSource() throws Exception {
-        if (jpipCache == null) { // local
+        if (jpipCache == null) { // local, reopen
             source.open();
         }
         return source;
