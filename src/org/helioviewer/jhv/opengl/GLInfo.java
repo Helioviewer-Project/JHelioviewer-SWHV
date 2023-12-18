@@ -13,7 +13,7 @@ import com.jogamp.opengl.awt.GLCanvas;
 
 public class GLInfo {
 
-    public static final int GLSAMPLES = 4;
+    static final int GLSAMPLES = 4;
 
     public static final double[] pixelScale = {1, 1};
     public static String glVersion = "";
@@ -25,7 +25,7 @@ public class GLInfo {
         Message.fatalErr("OpenGL fatal error. JHelioviewer is not able to run:\n" + err);
     }
 
-    public static void get(GL2 gl) {
+    static void get(GL2 gl) {
         glVersion = "OpenGL " + gl.glGetString(GL2.GL_VERSION);
         Log.info(glVersion);
         // Log.info("Extensions: " + gl.glGetString(GL2.GL_EXTENSIONS));
@@ -38,7 +38,7 @@ public class GLInfo {
         maxTextureSize = out[0];
     }
 
-    public static void updatePixelScale(GLCanvas canvas) {
+    static void updatePixelScale(GLCanvas canvas) {
         GraphicsConfiguration gc = canvas.getGraphicsConfiguration();
         if (gc != null) {
             AffineTransform tx = gc.getDefaultTransform();
@@ -47,7 +47,7 @@ public class GLInfo {
         }
     }
 
-    public static boolean checkGLErrors(GL2 gl, String message) {
+    static boolean checkGLErrors(GL2 gl, String message) {
         GLU glu = new GLU();
         int glErrorCode, errors = 0;
 
