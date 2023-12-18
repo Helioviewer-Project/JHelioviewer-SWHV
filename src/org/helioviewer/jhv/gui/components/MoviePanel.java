@@ -273,7 +273,7 @@ public class MoviePanel extends JPanel implements ObservationSelector {
         // Speed
         modePanel.add(new JLabel(" Play ", JLabel.RIGHT));
 
-        int speedMax = 60;
+        int speedMax = 120;
         speedSpinner = new JHVSpinner(Movie.FPS_RELATIVE_DEFAULT, 1, speedMax, 1);
         speedSpinner.setToolTipText("Maximum " + speedMax + " fps");
         speedSpinner.addChangeListener(e -> updateMovieSpeed());
