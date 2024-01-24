@@ -319,8 +319,8 @@ public final class HelioviewerMetaData extends BaseMetaData {
 
             region = new Region(-sunX * unitPerPixelX, -sunY * unitPerPixelY, pixelW * unitPerPixelX, pixelH * unitPerPixelY);
 
-            crval.x = m.getDouble("CRVAL1").orElse(0.) * arcsecX / arcsecPerPixelX * unitPerPixelX;
-            crval.y = m.getDouble("CRVAL2").orElse(0.) * arcsecY / arcsecPerPixelY * unitPerPixelY;
+            crval.x = m.getDouble("CRVAL1").orElse(0.) * arcsecX * unitPerArcsec;
+            crval.y = m.getDouble("CRVAL2").orElse(0.) * arcsecY * unitPerArcsec;
 
             if (!CROTABlockSet.contains(instrument)) {
                 double c;
