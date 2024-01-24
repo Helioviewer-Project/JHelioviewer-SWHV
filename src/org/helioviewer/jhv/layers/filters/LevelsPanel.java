@@ -6,15 +6,13 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JLabel;
 
-import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.gui.components.base.JHVRangeSlider;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
-import com.jidesoft.swing.RangeSlider;
-
 public class LevelsPanel implements FilterDetails {
 
-    private final RangeSlider slider;
+    private final JHVRangeSlider slider;
     private final JLabel label;
 
     private static String align3(int value) {
@@ -48,7 +46,7 @@ public class LevelsPanel implements FilterDetails {
         double scale = layer.getGLImage().getBrightScale();
         int high = (int) (100 * (offset + scale));
 
-        slider = new RangeSlider(-101, 201, (int) (offset * 100), high);
+        slider = new JHVRangeSlider(-101, 201, (int) (offset * 100), high);
         slider.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -58,10 +56,8 @@ public class LevelsPanel implements FilterDetails {
                 }
             }
         });
-        slider.setRangeDraggable(true);
 
         label = new JLabel(format(slider.getLowValue(), slider.getHighValue()), JLabel.RIGHT);
-
         slider.addChangeListener(e -> {
             int lo = slider.getLowValue();
             int hi = slider.getHighValue();
@@ -69,7 +65,6 @@ public class LevelsPanel implements FilterDetails {
             label.setText(format(lo, hi));
             MovieDisplay.display();
         });
-        WheelSupport.installMouseWheelSupport(slider);
     }
 
     @Override

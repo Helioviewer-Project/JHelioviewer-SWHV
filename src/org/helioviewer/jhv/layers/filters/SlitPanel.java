@@ -6,15 +6,13 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JLabel;
 
-import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.gui.components.base.JHVRangeSlider;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
-import com.jidesoft.swing.RangeSlider;
-
 public class SlitPanel implements FilterDetails {
 
-    private final RangeSlider slider;
+    private final JHVRangeSlider slider;
     private final JLabel label;
     private final JLabel title = new JLabel("Slit", JLabel.RIGHT);
 
@@ -22,7 +20,7 @@ public class SlitPanel implements FilterDetails {
         int left = (int) (layer.getGLImage().getSlitLeft() * 100);
         int right = (int) (layer.getGLImage().getSlitRight() * 100);
 
-        slider = new RangeSlider(0, 100, left, right);
+        slider = new JHVRangeSlider(0, 100, left, right);
         slider.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -32,10 +30,8 @@ public class SlitPanel implements FilterDetails {
                 }
             }
         });
-        slider.setRangeDraggable(true);
 
         label = new JLabel(LevelsPanel.format(slider.getLowValue(), slider.getHighValue()), JLabel.RIGHT);
-
         slider.addChangeListener(e -> {
             int lo = slider.getLowValue();
             int hi = slider.getHighValue();
@@ -43,7 +39,6 @@ public class SlitPanel implements FilterDetails {
             label.setText(LevelsPanel.format(lo, hi));
             MovieDisplay.display();
         });
-        WheelSupport.installMouseWheelSupport(slider);
     }
 
     @Override
