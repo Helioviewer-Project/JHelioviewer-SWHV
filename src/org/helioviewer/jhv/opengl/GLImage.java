@@ -81,8 +81,6 @@ public class GLImage {
     }
 
     private void applyLUT(GL2 gl) {
-        lutTex.bind(gl);
-
         LUT currlut = diffMode == DifferenceMode.None ? lut : gray;
         if (lutChanged || lastLut != currlut || invertLUT != lastInverted) {
             int[] intLUT = invertLUT ? currlut.lut8Inv() : currlut.lut8();
@@ -90,6 +88,7 @@ public class GLImage {
             lastLut = currlut;
             lastInverted = invertLUT;
 
+            lutTex.bind(gl);
             GLTexture.copyBuffer1D(gl, lutBuffer);
         }
         lutChanged = false;
