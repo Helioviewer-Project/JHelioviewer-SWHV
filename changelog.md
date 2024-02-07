@@ -1,6 +1,8 @@
 
 # Revision history for JHelioviewer
 
+## JHelioviewer 4.6.1 (pending)
+
 ## JHelioviewer 4.6 (2024-02-07)
 
 - New ROB server

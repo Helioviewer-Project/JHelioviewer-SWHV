@@ -6,7 +6,7 @@ JHelioviewer
 
 Website: https://www.jhelioviewer.org
 
-User manual: http://swhv.oma.be/user_manual/
+User manual: https://swhv.oma.be/user_manual/
 
 About
 -----
