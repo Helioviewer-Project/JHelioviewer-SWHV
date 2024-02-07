@@ -28,7 +28,7 @@ public record PositionLoad(StatusReceiver receiver, SpaceObject target, boolean 
                                 long end) implements Callable<PositionResponse> {
 
         private static final int MAX_POINTS = 50000;
-        private static final UriTemplate template = new UriTemplate("http://swhv.oma.be/position");
+        private static final UriTemplate template = new UriTemplate("https://swhv.oma.be/position");
 
         @Override
         public PositionResponse call() throws Exception {
