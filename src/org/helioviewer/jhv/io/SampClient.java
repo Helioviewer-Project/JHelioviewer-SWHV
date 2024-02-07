@@ -98,7 +98,7 @@ public class SampClient extends HubConnector {
         Map<String, String> meta = new HashMap<>();
         meta.put("samp.name", "JHelioviewer");
         meta.put("samp.description.text", JHVGlobals.userAgent);
-        meta.put("samp.icon.url", "http://swhv.oma.be/user_manual/hvImage_160x160.png");
+        meta.put("samp.icon.url", "https://swhv.oma.be/user_manual/hvImage_160x160.png");
         meta.put("samp.documentation.url", JHVGlobals.documentationURL);
         meta.put("author.mail", JHVGlobals.emailAddress);
         meta.put("author.name", "ESA JHelioviewer Team");

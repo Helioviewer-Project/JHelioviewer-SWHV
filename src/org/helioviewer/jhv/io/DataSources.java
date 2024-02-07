@@ -17,37 +17,18 @@ public class DataSources {
         void setupSources(DataSourcesParser parser);
     }
 
-    private static final String enabledDatasetsV2 = "[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2,SOLO,GOES-R,IRIS,GONG]";
+    private static final String enabledDatasetsV2 = "[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2,SOLO,GOES-R,IRIS,GONG,ROB,Kanzelhoehe]";
 
     private static final ImmutableMap<String, Map<String, String>> serverSettings = new ImmutableMap.Builder<String, Map<String, String>>().
-/*
-        put("Local", new ImmutableMap.Builder<String, String>().
-        put("API.getDataSources", "http://hv.local/api/docroot/index.php/?action=getDataSources&verbose=true&enable=[SOLO]").
-        put("API.getJP2Image", "http://hv.local/api/docroot/index.php/?action=getJP2Image&").
-        put("API.getJPX", "http://hv.local/api/docroot/index.php/?action=getJPX&").
-        put("label", "Local").
-        put("schema", "/data/sources_v1.0.json").
-        put("availability.images", "http://swhv.oma.be/availability/images/availability/availability.html").
-        build()).
-*/
         put("ROB", new ImmutableMap.Builder<String, String>().
-        put("API.getDataSources", "http://swhv.oma.be/hv/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]").
-        put("API.getJP2Image", "http://swhv.oma.be/hv/api/index.php?action=getJP2Image&").
-        put("API.getJPX", "http://swhv.oma.be/hv/api/index.php?action=getJPX&").
+        put("API.getDataSources", "https://api.swhv.oma.be/hv_docpage/v2/getDataSources/?verbose=true&enable=" + enabledDatasetsV2).
+        put("API.getJP2Image", "https://api.swhv.oma.be/hv_docpage/v2/getJP2Image/?").
+        put("API.getJPX", "https://api.swhv.oma.be/hv_docpage/v2/getJPX/?").
         put("label", "Royal Observatory of Belgium").
         put("schema", "/data/sources_v1.0.json").
-        put("availability.images", "http://swhv.oma.be/availability/images/availability/availability.html").
+        put("availability.images", "https://swhv.oma.be/availability/?").
         build()).
-/*
-        put("ROB Test", new ImmutableMap.Builder<String, String>().
-        put("API.getDataSources", "http://swhv2.oma.be:8083/index.php?action=getDataSources&verbose=true&enable=" + enabledDatasetsV2).
-        put("API.getJP2Image", "http://swhv2.oma.be:8083/index.php?action=getJP2Image&").
-        put("API.getJPX", "http://swhv2.oma.be:8083/index.php?action=getJPX&").
-        put("label", "Royal Observatory of Belgium").
-        put("schema", "/data/sources_v1.0.json").
-        put("availability.images", "http://swhv2.oma.be/availability/images/availability/availability.html").
-        build()).
-*/
+/*    */
         put("IAS", new ImmutableMap.Builder<String, String>().
         put("API.getDataSources", "https://helioviewer-api.ias.u-psud.fr/v2/getDataSources/?verbose=true&enable=" + enabledDatasetsV2).
         put("API.getJP2Image", "https://helioviewer-api.ias.u-psud.fr/v2/getJP2Image/?").
