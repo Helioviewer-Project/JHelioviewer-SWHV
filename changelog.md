@@ -1,6 +1,8 @@
 
 # Revision history for JHelioviewer
 
+## JHelioviewer 4.6.2 (pending)
+
 ## JHelioviewer 4.6.1 (2024-02-08)
 
 - Fix colormap bug
