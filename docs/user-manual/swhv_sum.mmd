@@ -64,7 +64,7 @@ Compiled releases are available for Windows, macOS and Linux from <https://swhv.
 
 * Download and extract the TAR.GZ archive from <https://swhv.oma.be/download>.
 * Make sure the appropriate Java Runtime Environment 19 or higher from <https://adoptopenjdk.net> is in the PATH.
-* Run the program by typing ```java --add-exports java.desktop/sun.awt=ALL-UNNAMED -cp JHelioviewer.jar:natives-linux.jar:natives-macos.jar:natives-windows.jar org.helioviewer.jhv.JHelioviewer``` in a terminal window.
+* Run the program by typing ```java --add-exports java.desktop/sun.awt=ALL-UNNAMED --add-exports java.desktop/sun.swing=ALL-UNNAMED -cp JHelioviewer.jar:natives-linux.jar:natives-macos.jar:natives-windows.jar org.helioviewer.jhv.JHelioviewer``` in a terminal window.
 
 This procedure works for Windows, macOS and Linux.
 
@@ -600,7 +600,7 @@ To start JHelioviewer from the command line in Windows:
 
 >>`cd "C:\Program Files\JHelioviewer\classes"`
 
->>`..\jre\bin\java.exe -Xmx4g --add-exports java.desktop/sun.awt=ALL-UNNAMED -cp JHelioviewer.jar;natives-windows.jar org.helioviewer.jhv.JHelioviewer`
+>>`..\jre\bin\java.exe -Xmx4g --add-exports java.desktop/sun.awt=ALL-UNNAMED --add-exports java.desktop/sun.swing=ALL-UNNAMED -cp JHelioviewer.jar;natives-windows.jar org.helioviewer.jhv.JHelioviewer`
 
 or where is JHelioviewer installed.
 

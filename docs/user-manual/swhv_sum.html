@@ -73,7 +73,7 @@
 <ul>
 <li>Download and extract the TAR.GZ archive from <a href="https://swhv.oma.be/download">https://swhv.oma.be/download</a>.</li>
 <li>Make sure the appropriate Java Runtime Environment 19 or higher from <a href="https://adoptopenjdk.net">https://adoptopenjdk.net</a> is in the PATH.</li>
-<li>Run the program by typing <code>java --add-exports java.desktop/sun.awt=ALL-UNNAMED -cp JHelioviewer.jar:natives-linux.jar:natives-macos.jar:natives-windows.jar org.helioviewer.jhv.JHelioviewer</code> in a terminal window.</li>
+<li>Run the program by typing <code>java --add-exports java.desktop/sun.awt=ALL-UNNAMED --add-exports java.desktop/sun.swing=ALL-UNNAMED -cp JHelioviewer.jar:natives-linux.jar:natives-macos.jar:natives-windows.jar org.helioviewer.jhv.JHelioviewer</code> in a terminal window.</li>
 </ul>
 
 <p>This procedure works for Windows, macOS and Linux.</p>
@@ -1006,7 +1006,7 @@
 <blockquote>
 <p><code>cd "C:\Program Files\JHelioviewer\classes"</code></p>
 
-<p><code>..\jre\bin\java.exe -Xmx4g --add-exports java.desktop/sun.awt=ALL-UNNAMED -cp JHelioviewer.jar;natives-windows.jar org.helioviewer.jhv.JHelioviewer</code></p>
+<p><code>..\jre\bin\java.exe -Xmx4g --add-exports java.desktop/sun.awt=ALL-UNNAMED --add-exports java.desktop/sun.swing=ALL-UNNAMED -cp JHelioviewer.jar;natives-windows.jar org.helioviewer.jhv.JHelioviewer</code></p>
 </blockquote>
 </blockquote>
 
