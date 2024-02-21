@@ -33,7 +33,7 @@ public record LUT(String name, int[] lut8) {
         return inv;
     }
 
-    private static final TreeMap<String, LUT> standardList = new TreeMap<>(JHVGlobals.alphanumComparator);
+    private static final TreeMap<String, LUT> standardList = new TreeMap<String, LUT>(JHVGlobals.alphanumComparator);
     // List of rules to apply
     private static JSONArray colorRules;
 

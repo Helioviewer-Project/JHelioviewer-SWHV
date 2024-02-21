@@ -48,7 +48,7 @@ public class SpaceObject {
             .build();
 
     public static List<SpaceObject> getTargets(SpaceObject observer) {
-        List<SpaceObject> list = new ArrayList<>(objectMap.values());
+        List<SpaceObject> list = new ArrayList<SpaceObject>(objectMap.values());
         list.remove(observer);
         return list;
     }
