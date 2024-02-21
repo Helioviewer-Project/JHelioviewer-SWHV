@@ -12,6 +12,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
@@ -128,6 +129,12 @@ public class JHVFrame {
                 exitAction.actionPerformed(new ActionEvent(this, 0, ""));
             }
         });
+
+        if (Platform.isMacOS()) {
+            frame.getRootPane().putClientProperty("apple.awt.fullWindowContent", true);
+            frame.getRootPane().putClientProperty("apple.awt.transparentTitleBar", true);
+            frame.getRootPane().putClientProperty("apple.awt.windowTitleVisible", false);
+        }
 
         Dimension maxSize = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getSize();
         Dimension minSize = new Dimension(800, 600);
