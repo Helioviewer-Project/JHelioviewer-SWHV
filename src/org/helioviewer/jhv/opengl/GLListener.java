@@ -36,6 +36,7 @@ public class GLListener implements GLEventListener {
     public void init(GLAutoDrawable drawable) {
         GL2 gl = (GL2) drawable.getGL();
         GLInfo.get(gl);
+        GLInfo.updatePixelScale(canvas);
 
         gl.glDisable(GL2.GL_TEXTURE_1D);
         gl.glDisable(GL2.GL_TEXTURE_2D);
@@ -85,7 +86,7 @@ public class GLListener implements GLEventListener {
 
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-        Display.setGLSize(x, y, width, height);
+        Display.setGLSize(x, y, (int) (canvas.getWidth() * GLInfo.pixelScale[0] + .5), (int) (canvas.getHeight() * GLInfo.pixelScale[1] + .5));
         Display.reshapeAll();
         MiniviewLayer miniview = Layers.getMiniviewLayer();
         if (miniview != null)
@@ -154,9 +155,9 @@ public class GLListener implements GLEventListener {
 
     @Override
     public void display(GLAutoDrawable drawable) {
+        GLInfo.updatePixelScale(canvas);
         GL2 gl = (GL2) drawable.getGL();
         gl.glFinish();
-        GLInfo.updatePixelScale(canvas);
 
         if (whiteBack)
             gl.glClearColor(1, 1, 1, 0);
