@@ -8,12 +8,14 @@ import java.awt.event.MouseEvent;
 //import java.util.LinkedHashMap;
 //import java.util.Map;
 
+import javax.swing.Box;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToolBar;
 
+import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
@@ -138,6 +140,10 @@ public final class ToolBar extends JToolBar {
     }
 
     private void createNewToolBar() {
+        if (Platform.isMacOS()) {
+            add(Box.createHorizontalStrut(70), 0);
+        }
+
         Interaction.Mode interactionMode = JHVFrame.getInteraction().getMode();
         try {
             interactionMode = Interaction.Mode.valueOf(Settings.getProperty("display.interaction").toUpperCase());
