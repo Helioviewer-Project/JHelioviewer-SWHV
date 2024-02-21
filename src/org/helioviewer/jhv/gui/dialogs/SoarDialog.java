@@ -160,7 +160,7 @@ public class SoarDialog extends StandardDialog implements SoarClient.ReceiverIte
         queryPanel.add(soopCombo, gc);
 
         JPanel dataSelector = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
-        JComboBox<String> datasetCombo = new JComboBox<>(Dataset.keySet().toArray(String[]::new));
+        JComboBox<String> datasetCombo = new JComboBox<String>(Dataset.keySet().toArray(String[]::new));
         dataSelector.add(datasetCombo);
         JComboBox<String> levelCombo = new JComboBox<>(Level);
         levelCombo.setSelectedItem("L2");

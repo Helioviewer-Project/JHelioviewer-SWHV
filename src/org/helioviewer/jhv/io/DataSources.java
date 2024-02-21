@@ -20,6 +20,7 @@ public class DataSources {
     private static final String enabledDatasetsV2 = "[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2,SOLO,GOES-R,IRIS,GONG,ROB,Kanzelhoehe]";
 
     private static final ImmutableMap<String, Map<String, String>> serverSettings = new ImmutableMap.Builder<String, Map<String, String>>().
+/*    */
         put("ROB", new ImmutableMap.Builder<String, String>().
         put("API.getDataSources", "https://api.swhv.oma.be/hv_docpage/v2/getDataSources/?verbose=true&enable=" + enabledDatasetsV2).
         put("API.getJP2Image", "https://api.swhv.oma.be/hv_docpage/v2/getJP2Image/?").
