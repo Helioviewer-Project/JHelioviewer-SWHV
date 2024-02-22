@@ -17,6 +17,7 @@ import org.helioviewer.jhv.gui.UIGlobals;
 @SuppressWarnings("serial")
 public final class StatusPanel extends JPanel {
 
+    @SuppressWarnings("this-escape")
     public static class StatusPlugin extends JLabel {
         protected StatusPlugin() {
             setFont(UIGlobals.uiFontMonoSmall);
