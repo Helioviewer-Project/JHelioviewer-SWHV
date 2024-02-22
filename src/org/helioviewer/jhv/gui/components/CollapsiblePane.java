@@ -11,7 +11,7 @@ import org.helioviewer.jhv.gui.UIGlobals;
 
 // This panel consists of a toggle button and one arbitrary component. Clicking
 // the toggle button will toggle the visibility of the component.
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial", "this-escape"})
 public class CollapsiblePane extends JComponent implements ActionListener {
 
     final CollapsiblePaneButton toggleButton;

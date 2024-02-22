@@ -140,7 +140,7 @@ public class JHVFrame {
             frame.getRootPane().putClientProperty("apple.awt.transparentTitleBar", true);
             frame.getRootPane().putClientProperty("apple.awt.windowTitleVisible", false);
             frame.getRootPane().putClientProperty(com.formdev.flatlaf.FlatClientProperties.MACOS_WINDOW_BUTTONS_SPACING,
-                                                  com.formdev.flatlaf.FlatClientProperties.MACOS_WINDOW_BUTTONS_SPACING_MEDIUM);
+                    com.formdev.flatlaf.FlatClientProperties.MACOS_WINDOW_BUTTONS_SPACING_MEDIUM);
         }
 
         Dimension maxSize = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getSize();

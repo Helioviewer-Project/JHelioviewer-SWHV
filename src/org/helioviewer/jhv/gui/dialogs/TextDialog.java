@@ -16,7 +16,7 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial", "this-escape"})
 public class TextDialog extends StandardDialog implements ShowableDialog {
 
     private final String text;
