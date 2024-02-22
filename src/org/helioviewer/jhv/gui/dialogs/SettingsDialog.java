@@ -40,6 +40,7 @@ import org.helioviewer.jhv.export.VideoFormat;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.actions.LoadStateDialog;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
+import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.time.TimeMode;
@@ -130,18 +131,24 @@ public final class SettingsDialog extends StandardDialog implements ShowableDial
 
         c.gridx = 0;
         c.gridy = 2;
-        settings.add(new JLabel("After restart:", JLabel.RIGHT), c);
+        settings.add(new JLabel("For new layers:", JLabel.RIGHT), c);
 
         c.gridx = 1;
         c.gridy = 2;
         JCheckBox normalizeAIA = new JCheckBox("Normalize SDO/AIA brightness", Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA")));
-        normalizeAIA.addActionListener(e -> Settings.setProperty("display.normalizeAIA", Boolean.toString(normalizeAIA.isSelected())));
+        normalizeAIA.addActionListener(e -> {
+            Settings.setProperty("display.normalizeAIA", Boolean.toString(normalizeAIA.isSelected()));
+            HelioviewerMetaData.setupDisplayOptions();
+        });
         settings.add(normalizeAIA, c);
 
         c.gridx = 1;
         c.gridy = 3;
-        JCheckBox normalizeRadius = new JCheckBox("Normalize solar radius", Boolean.parseBoolean(Settings.getProperty("display.normalize")));
-        normalizeRadius.addActionListener(e -> Settings.setProperty("display.normalize", Boolean.toString(normalizeRadius.isSelected())));
+        JCheckBox normalizeRadius = new JCheckBox("Normalize solar radius", Boolean.parseBoolean(Settings.getProperty("display.normalizeRadius")));
+        normalizeRadius.addActionListener(e -> {
+            Settings.setProperty("display.normalizeRadius", Boolean.toString(normalizeRadius.isSelected()));
+            HelioviewerMetaData.setupDisplayOptions();
+        });
         settings.add(normalizeRadius, c);
 
         TimeMode timeMode = TimeMode.Observer;
@@ -158,6 +165,7 @@ public final class SettingsDialog extends StandardDialog implements ShowableDial
             radio.addItemListener(e -> {
                 if (radio.isSelected()) {
                     Settings.setProperty("display.time", mode.toString());
+                    HelioviewerMetaData.setupDisplayOptions();
                 }
             });
             timePanel.add(radio);
