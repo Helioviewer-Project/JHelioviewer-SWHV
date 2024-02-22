@@ -19,12 +19,18 @@ import org.helioviewer.jhv.time.TimeMode;
 
 public final class HelioviewerMetaData extends BaseMetaData {
 
-    private static final boolean normalizeAIA = Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA"));
-    private static final boolean normalizeRadius = Boolean.parseBoolean(Settings.getProperty("display.normalize"));
-
-    private static final TimeMode timeMode;
+    private static boolean normalizeAIA;
+    private static boolean normalizeRadius;
+    private static TimeMode timeMode;
 
     static {
+        setupDisplayOptions();
+    }
+
+    public static void setupDisplayOptions() {
+        normalizeAIA = Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA"));
+        normalizeRadius = Boolean.parseBoolean(Settings.getProperty("display.normalizeRadius"));
+
         TimeMode setTimeMode = TimeMode.Observer;
         try {
             setTimeMode = TimeMode.valueOf(Settings.getProperty("display.time"));
