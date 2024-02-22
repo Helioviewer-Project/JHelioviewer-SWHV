@@ -6,8 +6,8 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
+import org.helioviewer.jhv.DisplaySettings;
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
@@ -15,29 +15,8 @@ import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVTime;
-import org.helioviewer.jhv.time.TimeMode;
 
 public final class HelioviewerMetaData extends BaseMetaData {
-
-    private static boolean normalizeAIA;
-    private static boolean normalizeRadius;
-    private static TimeMode timeMode;
-
-    static {
-        setupDisplayOptions();
-    }
-
-    public static void setupDisplayOptions() {
-        normalizeAIA = Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA"));
-        normalizeRadius = Boolean.parseBoolean(Settings.getProperty("display.normalizeRadius"));
-
-        TimeMode setTimeMode = TimeMode.Observer;
-        try {
-            setTimeMode = TimeMode.valueOf(Settings.getProperty("display.time"));
-        } catch (Exception ignore) {
-        }
-        timeMode = setTimeMode;
-    }
 
     private static final Set<String> SECCHIDetectors = Set.of("EUVI", "COR1", "COR2", "HI1", "HI2");
     private static final Set<String> CROTABlockSet = Set.of("LASCO");
@@ -111,7 +90,7 @@ public final class HelioviewerMetaData extends BaseMetaData {
     }
 
     private void retrieveResponse() {
-        if (normalizeAIA && instrument.equals("AIA")) {
+        if (DisplaySettings.normalizeAIA() && instrument.equals("AIA")) {
             responseFactor = (float) AIAResponse.get(viewpoint.time.milli, measurement);
         }
     }
@@ -258,7 +237,7 @@ public final class HelioviewerMetaData extends BaseMetaData {
     }
 
     private static JHVTime adjustTime(JHVTime dateObs, double distObs, double distEarth) {
-        return switch (timeMode) {
+        return switch (DisplaySettings.timeMode()) {
             case Observer -> dateObs;
             case Sun -> new JHVTime((long) (dateObs.milli - distObs * Sun.RadiusMilli + .5));
             case Earth ->
@@ -344,7 +323,7 @@ public final class HelioviewerMetaData extends BaseMetaData {
     }
 
     private double getSolarRadiusFactor() {
-        if (!normalizeRadius)
+        if (!DisplaySettings.normalizeRadius())
             return 1;
 
         if (measurement.toLowerCase().contains("continuum"))

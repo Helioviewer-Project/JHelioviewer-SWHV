@@ -34,13 +34,13 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
+import org.helioviewer.jhv.DisplaySettings;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.export.VideoFormat;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.actions.LoadStateDialog;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
-import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.time.TimeMode;
@@ -138,7 +138,7 @@ public final class SettingsDialog extends StandardDialog implements ShowableDial
         JCheckBox normalizeAIA = new JCheckBox("Normalize SDO/AIA brightness", Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA")));
         normalizeAIA.addActionListener(e -> {
             Settings.setProperty("display.normalizeAIA", Boolean.toString(normalizeAIA.isSelected()));
-            HelioviewerMetaData.setupDisplayOptions();
+            DisplaySettings.setup();
         });
         settings.add(normalizeAIA, c);
 
@@ -147,7 +147,7 @@ public final class SettingsDialog extends StandardDialog implements ShowableDial
         JCheckBox normalizeRadius = new JCheckBox("Normalize solar radius", Boolean.parseBoolean(Settings.getProperty("display.normalizeRadius")));
         normalizeRadius.addActionListener(e -> {
             Settings.setProperty("display.normalizeRadius", Boolean.toString(normalizeRadius.isSelected()));
-            HelioviewerMetaData.setupDisplayOptions();
+            DisplaySettings.setup();
         });
         settings.add(normalizeRadius, c);
 
@@ -165,7 +165,7 @@ public final class SettingsDialog extends StandardDialog implements ShowableDial
             radio.addItemListener(e -> {
                 if (radio.isSelected()) {
                     Settings.setProperty("display.time", mode.toString());
-                    HelioviewerMetaData.setupDisplayOptions();
+                    DisplaySettings.setup();
                 }
             });
             timePanel.add(radio);
