@@ -141,7 +141,7 @@ public final class ToolBar extends JToolBar {
 
     private void createNewToolBar() {
         if (Platform.isMacOS()) {
-            add(Box.createHorizontalStrut(70), 0);
+            add(Box.createHorizontalStrut(90), 0);
         }
 
         Interaction.Mode interactionMode = JHVFrame.getInteraction().getMode();
