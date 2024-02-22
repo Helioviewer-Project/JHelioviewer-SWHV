@@ -8,6 +8,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
@@ -109,9 +110,13 @@ public class JHVFrame {
         statusPanel.addPlugin(carringtonStatus, StatusPanel.Alignment.RIGHT);
 
         toolBar = new ToolBar();
-        mainFrame.add(toolBar, BorderLayout.PAGE_START);
-        mainFrame.add(midSplitPane, BorderLayout.CENTER);
-        mainFrame.add(statusPanel, BorderLayout.PAGE_END);
+
+        JPanel toolBarPanel = new JPanel(new BorderLayout());
+        toolBarPanel.add(toolBar, BorderLayout.CENTER);
+
+        mainFrame.getContentPane().add(toolBarPanel, BorderLayout.NORTH);
+        mainFrame.getContentPane().add(midSplitPane, BorderLayout.CENTER);
+        mainFrame.getContentPane().add(statusPanel, BorderLayout.SOUTH);
 
         Movie.setMaster(Layers.getActiveImageLayer()); //! for nullImageLayer
 
@@ -134,6 +139,8 @@ public class JHVFrame {
             frame.getRootPane().putClientProperty("apple.awt.fullWindowContent", true);
             frame.getRootPane().putClientProperty("apple.awt.transparentTitleBar", true);
             frame.getRootPane().putClientProperty("apple.awt.windowTitleVisible", false);
+            frame.getRootPane().putClientProperty(com.formdev.flatlaf.FlatClientProperties.MACOS_WINDOW_BUTTONS_SPACING,
+                                                  com.formdev.flatlaf.FlatClientProperties.MACOS_WINDOW_BUTTONS_SPACING_MEDIUM);
         }
 
         Dimension maxSize = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getSize();
