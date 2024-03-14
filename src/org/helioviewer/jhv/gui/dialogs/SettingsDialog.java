@@ -135,38 +135,25 @@ public final class SettingsDialog extends StandardDialog implements ShowableDial
 
         c.gridx = 1;
         c.gridy = 2;
-        JCheckBox normalizeAIA = new JCheckBox("Normalize SDO/AIA brightness", Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA")));
-        normalizeAIA.addActionListener(e -> {
-            Settings.setProperty("display.normalizeAIA", Boolean.toString(normalizeAIA.isSelected()));
-            DisplaySettings.setup();
-        });
+        JCheckBox normalizeAIA = new JCheckBox("Normalize SDO/AIA brightness", DisplaySettings.getNormalizeAIA());
+        normalizeAIA.addActionListener(e -> DisplaySettings.setNormalizeAIA(normalizeAIA.isSelected()));
         settings.add(normalizeAIA, c);
 
         c.gridx = 1;
         c.gridy = 3;
-        JCheckBox normalizeRadius = new JCheckBox("Normalize solar radius", Boolean.parseBoolean(Settings.getProperty("display.normalizeRadius")));
-        normalizeRadius.addActionListener(e -> {
-            Settings.setProperty("display.normalizeRadius", Boolean.toString(normalizeRadius.isSelected()));
-            DisplaySettings.setup();
-        });
+        JCheckBox normalizeRadius = new JCheckBox("Normalize solar radius", DisplaySettings.getNormalizeRadius());
+        normalizeRadius.addActionListener(e -> DisplaySettings.setNormalizeRadius(normalizeRadius.isSelected()));
         settings.add(normalizeRadius, c);
-
-        TimeMode timeMode = TimeMode.Observer;
-        try {
-            timeMode = TimeMode.valueOf(Settings.getProperty("display.time"));
-        } catch (Exception ignore) {
-        }
 
         JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
         timePanel.add(new JLabel("Use time at", JLabel.RIGHT));
         ButtonGroup timeModeGroup = new ButtonGroup();
+        TimeMode timeMode = DisplaySettings.getTimeMode();
         for (TimeMode mode : TimeMode.values()) {
             JRadioButton radio = new JRadioButton(mode.toString(), mode == timeMode);
             radio.addItemListener(e -> {
-                if (radio.isSelected()) {
-                    Settings.setProperty("display.time", mode.toString());
-                    DisplaySettings.setup();
-                }
+                if (radio.isSelected())
+                    DisplaySettings.setTimeMode(mode);
             });
             timePanel.add(radio);
             timeModeGroup.add(radio);

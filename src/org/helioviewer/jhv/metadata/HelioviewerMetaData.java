@@ -90,7 +90,7 @@ public final class HelioviewerMetaData extends BaseMetaData {
     }
 
     private void retrieveResponse() {
-        if (DisplaySettings.normalizeAIA() && instrument.equals("AIA")) {
+        if (DisplaySettings.getNormalizeAIA() && instrument.equals("AIA")) {
             responseFactor = (float) AIAResponse.get(viewpoint.time.milli, measurement);
         }
     }
@@ -237,7 +237,7 @@ public final class HelioviewerMetaData extends BaseMetaData {
     }
 
     private static JHVTime adjustTime(JHVTime dateObs, double distObs, double distEarth) {
-        return switch (DisplaySettings.timeMode()) {
+        return switch (DisplaySettings.getTimeMode()) {
             case Observer -> dateObs;
             case Sun -> new JHVTime((long) (dateObs.milli - distObs * Sun.RadiusMilli + .5));
             case Earth ->
@@ -323,7 +323,7 @@ public final class HelioviewerMetaData extends BaseMetaData {
     }
 
     private double getSolarRadiusFactor() {
-        if (!DisplaySettings.normalizeRadius())
+        if (!DisplaySettings.getNormalizeRadius())
             return 1;
 
         if (measurement.toLowerCase().contains("continuum"))

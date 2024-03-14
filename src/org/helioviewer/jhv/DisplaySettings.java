@@ -9,10 +9,6 @@ public class DisplaySettings {
     private static TimeMode timeMode;
 
     static {
-        setup();
-    }
-
-    public static void setup() {
         normalizeAIA = Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA"));
         normalizeRadius = Boolean.parseBoolean(Settings.getProperty("display.normalizeRadius"));
 
@@ -24,16 +20,32 @@ public class DisplaySettings {
         timeMode = setTimeMode;
     }
 
-    public static boolean normalizeAIA() {
+    public static boolean getNormalizeAIA() {
         return normalizeAIA;
     }
 
-    public static boolean normalizeRadius() {
+    public static void setNormalizeAIA(boolean b) {
+        Settings.setProperty("display.normalizeAIA", Boolean.toString(b));
+        normalizeAIA = b;
+    }
+
+    public static boolean getNormalizeRadius() {
         return normalizeRadius;
     }
 
-    public static TimeMode timeMode() {
+
+    public static void setNormalizeRadius(boolean b) {
+        Settings.setProperty("display.normalizeRadius", Boolean.toString(b));
+        normalizeRadius = b;
+    }
+
+    public static TimeMode getTimeMode() {
         return timeMode;
+    }
+
+    public static void setTimeMode(TimeMode mode) {
+        Settings.setProperty("display.time", mode.toString());
+        timeMode = mode;
     }
 
 }
