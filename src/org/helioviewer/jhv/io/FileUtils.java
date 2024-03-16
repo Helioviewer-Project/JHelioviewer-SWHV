@@ -14,7 +14,6 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -71,17 +70,24 @@ public class FileUtils {
     static List<URI> unZip(URI uri) throws IOException {
         List<URI> uriList = new ArrayList<>();
         String uriPath = uri.getPath();
-        String tmpDir = tempDir(JHVGlobals.fileCacheDir, uriPath.substring(Math.max(0, uriPath.lastIndexOf('/') + 1)) + ".x").toString();
+        Path targetDir = tempDir(JHVGlobals.fileCacheDir, uriPath.substring(Math.max(0, uriPath.lastIndexOf('/') + 1)) + ".x").toPath();
 
         try (FileSystem zipfs = FileSystems.newFileSystem(URI.create("jar:" + uri), Collections.emptyMap())) {
             for (Path root : zipfs.getRootDirectories()) {
-                try (DirectoryStream<Path> stream = Files.newDirectoryStream(root)) {
-                    for (Path entry : stream) {
-                        Path extract = Path.of(tmpDir + entry);
-                        Files.copy(entry, extract, StandardCopyOption.REPLACE_EXISTING);
-                        uriList.add(extract.toUri());
+                Files.walkFileTree(root, new SimpleFileVisitor<>() {
+                    @Override
+                    public FileVisitResult visitFile(Path filePath, BasicFileAttributes attrs) throws IOException {
+                        // Make sure that we conserve the hierachy of files and folders inside the zip
+                        Path relativePathInZip = root.relativize(filePath);
+                        Path targetPath = targetDir.resolve(relativePathInZip.toString());
+                        Files.createDirectories(targetPath.getParent());
+                        // And extract the file
+                        Files.copy(filePath, targetPath);
+                        uriList.add(targetPath.toUri());
+
+                        return FileVisitResult.CONTINUE;
                     }
-                }
+                });
             }
         }
         return uriList;
