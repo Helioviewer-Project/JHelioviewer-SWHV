@@ -8,16 +8,23 @@ import java.io.PushbackInputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
+
+import org.helioviewer.jhv.JHVGlobals;
 
 import okio.Okio;
 import okio.BufferedSource;
@@ -59,6 +66,25 @@ public class FileUtils {
             }
         });
         return size.get();
+    }
+
+    static List<URI> unZip(URI uri) throws IOException {
+        List<URI> uriList = new ArrayList<>();
+        String uriPath = uri.getPath();
+        String tmpDir = tempDir(JHVGlobals.fileCacheDir, uriPath.substring(Math.max(0, uriPath.lastIndexOf('/') + 1)) + ".x").toString();
+
+        try (FileSystem zipfs = FileSystems.newFileSystem(URI.create("jar:" + uri), Collections.emptyMap())) {
+            for (Path root : zipfs.getRootDirectories()) {
+                try (DirectoryStream<Path> stream = Files.newDirectoryStream(root)) {
+                    for (Path entry : stream) {
+                        Path extract = Path.of(tmpDir + entry);
+                        Files.copy(entry, extract, StandardCopyOption.REPLACE_EXISTING);
+                        uriList.add(extract.toUri());
+                    }
+                }
+            }
+        }
+        return uriList;
     }
 
     private static class DeleteFileVisitor extends SimpleFileVisitor<Path> {

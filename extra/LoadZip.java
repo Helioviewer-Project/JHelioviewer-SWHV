@@ -15,8 +15,8 @@ import java.util.concurrent.Future;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.Message;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
 
 import com.google.common.util.concurrent.FutureCallback;
@@ -80,7 +80,7 @@ class LoadZip implements Callable<Void> {
         @Override
         public void onFailure(@Nonnull Throwable t) {
             Log.error("An error occurred while opening the remote file:", t);
-            Message.err("An error occurred while opening the remote file:", t.getMessage(), false);
+            Message.err("An error occurred while opening the remote file:", t.getMessage());
         }
 
     }
