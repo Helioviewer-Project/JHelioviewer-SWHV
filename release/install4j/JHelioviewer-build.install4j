@@ -10,6 +10,7 @@
         <module name="java.sql" />
         <module name="jdk.crypto.cryptoki" />
         <module name="jdk.unsupported" />
+        <module name="jdk.zipfs" />
       </modules>
     </jreBundles>
   </application>
