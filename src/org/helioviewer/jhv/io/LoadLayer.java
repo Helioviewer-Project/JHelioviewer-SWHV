@@ -47,20 +47,7 @@ public class LoadLayer {
     private record LoadURIImage(ImageLayer layer, List<URI> uriList, boolean forceFITS) implements Callable<View> {
         @Override
         public View call() throws Exception {
-            DecodeExecutor executor = layer.getExecutor();
-            if (uriList.size() == 1) {
-                return loadView(executor, null, uriList.get(0), forceFITS);
-            } else {
-                List<View> views = uriList.parallelStream().map(uri -> {
-                    try {
-                        return loadView(executor, null, uri, forceFITS);
-                    } catch (Exception e) {
-                        Log.warn(uri.toString(), e);
-                        return null;
-                    }
-                }).filter(Objects::nonNull).collect(Collectors.toList());
-                return new ManyView(views);
-            }
+            return loadUri(layer.getExecutor(), uriList, forceFITS);
         }
     }
 
@@ -89,15 +76,38 @@ public class LoadLayer {
 
     }
 
+    private static View loadUri(DecodeExecutor executor, List<URI> uriList, boolean forceFITS) throws Exception {
+        if (uriList.size() == 1) {
+            return loadView(executor, null, uriList.get(0), forceFITS);
+        } else {
+            List<View> views = uriList.parallelStream().map(uri -> {
+                try {
+                    return loadView(executor, null, uri, forceFITS);
+                } catch (Exception e) {
+                    Log.warn(uri.toString(), e);
+                    return null;
+                }
+            }).filter(Objects::nonNull).collect(Collectors.toList());
+            return new ManyView(views);
+        }
+    }
+
     private static View loadView(DecodeExecutor executor, APIRequest req, URI uri, boolean forceFITS) throws Exception {
         String loc = uri.toString().toLowerCase(Locale.ENGLISH);
         if (forceFITS || loc.endsWith(".fits") || loc.endsWith(".fts") || loc.endsWith(".fits.gz")) {
             return new URIView(executor, req, uri, URIView.URIType.FITS);
         } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
             return new URIView(executor, req, uri, URIView.URIType.GENERIC);
+        } else if (loc.endsWith(".zip")) {
+            return loadZip(executor, uri, forceFITS);
         } else {
             return new J2KView(executor, req, uri);
         }
+    }
+
+    private static View loadZip(DecodeExecutor executor, URI uriZip, boolean forceFITS) throws Exception {
+        List<URI> uriList = FileUtils.unZip(NetFileCache.get(uriZip));
+        return loadUri(executor, uriList, forceFITS);
     }
 
     private static URI requestAPI(String url) throws Exception {
