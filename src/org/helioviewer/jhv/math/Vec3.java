@@ -118,13 +118,9 @@ public class Vec3 {
 
     @Override
     public int hashCode() {
-        int result = 1;
-        long tmp = Double.doubleToLongBits(x);
-        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
-        tmp = Double.doubleToLongBits(y);
-        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
-        tmp = Double.doubleToLongBits(z);
-        return 31 * result + (int) (tmp ^ (tmp >>> 32));
+        int result = Double.hashCode(x);
+        result = 31 * result + Double.hashCode(y);
+        return 31 * result + Double.hashCode(z);
     }
 
     @Override

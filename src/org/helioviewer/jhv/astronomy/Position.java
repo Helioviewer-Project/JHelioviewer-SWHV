@@ -41,13 +41,9 @@ public class Position {
 
     @Override
     public int hashCode() {
-        int result = 1;
-        long tmp = Double.doubleToLongBits(distance);
-        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
-        tmp = Double.doubleToLongBits(lon);
-        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
-        tmp = Double.doubleToLongBits(lat);
-        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
+        int result = Double.hashCode(distance);
+        result = 31 * result + Double.hashCode(lon);
+        result = 31 * result + Double.hashCode(lat);
         return 31 * result + time.hashCode();
     }
 

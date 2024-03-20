@@ -18,7 +18,7 @@ public class JHVTime implements Comparable<JHVTime> {
         if (_milli < 0)
             throw new IllegalArgumentException("Argument cannot be negative");
         milli = _milli;
-        hash = (int) (milli ^ (milli >>> 32));
+        hash = Long.hashCode(milli);
     }
 
     @Override

@@ -44,15 +44,10 @@ public class Region {
 
     @Override
     public int hashCode() {
-        int result = 1;
-        long tmp = Double.doubleToLongBits(width);
-        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
-        tmp = Double.doubleToLongBits(height);
-        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
-        tmp = Double.doubleToLongBits(llx);
-        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
-        tmp = Double.doubleToLongBits(lly);
-        return 31 * result + (int) (tmp ^ (tmp >>> 32));
+        int result = Double.hashCode(width);
+        result = 31 * result + Double.hashCode(height);
+        result = 31 * result + Double.hashCode(llx);
+        return 31 * result + Double.hashCode(lly);
     }
 
     @Override
