@@ -34,7 +34,7 @@ class DateValue implements Comparable<DateValue> {
 
     @Override
     public int hashCode() {
-        return (int) (milli ^ (milli >>> 32));
+        return Long.hashCode(milli);
     }
 
 }

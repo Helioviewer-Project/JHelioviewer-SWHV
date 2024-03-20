@@ -22,8 +22,8 @@ public class Interval implements Comparable<Interval> {
     }
 
     private static int computeHash(long a, long b) {
-        int result = (int) (a ^ (a >>> 32));
-        return 31 * result + (int) (b ^ (b >>> 32));
+        int result = Long.hashCode(a);
+        return 31 * result + Long.hashCode(b);
     }
 
     private boolean containsPointInclusive(long time) {
