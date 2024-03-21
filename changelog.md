@@ -1,7 +1,11 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.6.2 (pending)
+## JHelioviewer 4.6.2 (2024-03-21)
+
+- Fix Window image canvas size bug
+- Load zip files of images
+- No need to restart after changing global image display settings
 
 ## JHelioviewer 4.6.1 (2024-02-08)
 
