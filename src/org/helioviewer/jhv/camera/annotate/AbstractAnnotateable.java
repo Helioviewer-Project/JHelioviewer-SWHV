@@ -31,13 +31,8 @@ abstract class AbstractAnnotateable implements Annotateable {
 
     AbstractAnnotateable(JSONObject jo) {
         if (jo != null) {
-            JSONArray jaStart = jo.optJSONArray("startPoint");
-            if (jaStart != null)
-                startPoint = Vec3.fromJson(jaStart);
-
-            JSONArray jaEnd = jo.optJSONArray("endPoint");
-            if (jaEnd != null)
-                endPoint = Vec3.fromJson(jaEnd);
+            startPoint = fromPointJson(jo, "startPoint");
+            endPoint = fromPointJson(jo, "endPoint");
         }
     }
 
@@ -46,8 +41,26 @@ abstract class AbstractAnnotateable implements Annotateable {
         return new Vec3(len, Math.acos(p.y / len), Math.atan2(p.x, p.z));
     }
 
+    private static JSONObject toPointJson(Vec3 p) {
+        double len = p.length();
+        double lon = Math.atan2(p.x, p.z);
+        double lat = Math.asin(p.y / len);
+        return new JSONObject().put("lon", Math.toDegrees(lon < 0 ? lon + 2 * Math.PI : lon)).put("lat", Math.toDegrees(lat));
+    }
+
     private static Vec3 toCart(double y, double z) {
         return new Vec3(Math.sin(y) * Math.sin(z), Math.cos(y), Math.sin(y) * Math.cos(z));
+    }
+
+    private static Vec3 fromPointJson(JSONObject jo, String name) {
+        JSONArray arr = jo.optJSONArray(name);
+        if (arr != null)
+            return Vec3.fromJson(arr);
+        JSONObject obj = jo.optJSONObject(name);
+        if (obj == null || !obj.has("lon") || !obj.has("lat"))
+            return null;
+        double lon = Math.toRadians(obj.getDouble("lon")), lat = Math.toRadians(obj.getDouble("lat"));
+        return new Vec3(Math.cos(lat) * Math.sin(lon), Math.sin(lat), Math.cos(lat) * Math.cos(lon));
     }
 
     static Vec3 interpolate(double t, Vec3 point1, Vec3 point2) {
@@ -94,9 +107,9 @@ abstract class AbstractAnnotateable implements Annotateable {
     public JSONObject toJson() {
         JSONObject jo = new JSONObject().put("type", Interaction.AnnotationMode.modes.get(this.getClass()));
         if (startPoint != null)
-            jo.put("startPoint", startPoint.toJson());
+            jo.put("startPoint", toPointJson(startPoint));
         if (endPoint != null)
-            jo.put("endPoint", endPoint.toJson());
+            jo.put("endPoint", toPointJson(endPoint));
         return jo;
     }
 

@@ -5,7 +5,7 @@
 
 ## JHelioviewer 4.6.2 (2024-03-21)
 
-- Fix Window image canvas size bug
+- Fix Windows image canvas size bug
 - Load zip files of images
 - No need to restart after changing global image display settings
 
