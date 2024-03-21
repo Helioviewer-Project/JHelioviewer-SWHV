@@ -1,6 +1,8 @@
 
 # Revision history for JHelioviewer
 
+## JHelioviewer 4.6.3 (pending)
+
 ## JHelioviewer 4.6.2 (2024-03-21)
 
 - Fix Window image canvas size bug
