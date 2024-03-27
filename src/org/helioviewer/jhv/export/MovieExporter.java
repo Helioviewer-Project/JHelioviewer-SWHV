@@ -84,7 +84,13 @@ class MovieExporter {
         List<String> output = List.of(
                 "-pix_fmt", "yuv420p",
                 "-tune", "animation",
+                "-vf", "scale=in_range=full:out_range=full",
                 "-movflags", "+faststart",
+                "-movflags", "+write_colr", // may be useless
+                "-color_range", "2",
+                "-colorspace", "1",
+                "-color_primaries", "1",
+                "-color_trc", "1",
                 "-y", outPath
         );
         List<String> command = new ArrayList<>(ffmpeg);
