@@ -192,12 +192,16 @@ class FITSImage implements URIImageReader {
             int outLine = width * (height - 1 - j);
 
             switch (FITSSettings.conversionMode) {
-                case Gamma:
-                    tasks.add(ForkJoinTask.adapt(new convert_gamma(pixType, width, lineData, blank, bzero, bscale, minMax, lut, outData, outLine)).fork());
+                case Gamma: {
+                    double scale = 65535. / fn_gamma(minMax[1] - minMax[0]);
+                    tasks.add(ForkJoinTask.adapt(new convert_gamma(pixType, width, lineData, blank, bzero, bscale, scale, minMax, lut, outData, outLine)).fork());
                     break;
-                case Beta:
-                    tasks.add(ForkJoinTask.adapt(new convert_beta(pixType, width, lineData, blank, bzero, bscale, minMax, lut, outData, outLine)).fork());
+                }
+                case Beta: {
+                    double scale = 65535. / fn_beta(minMax[1] - minMax[0]);
+                    tasks.add(ForkJoinTask.adapt(new convert_beta(pixType, width, lineData, blank, bzero, bscale, scale, minMax, lut, outData, outLine)).fork());
                     break;
+                }
             }
         }
         tasks.forEach(ForkJoinTask::join);
@@ -231,10 +235,10 @@ class FITSImage implements URIImageReader {
     }
 
     private record convert_gamma(PixType pixType, int width, Object lineData, long blank, double bzero, double bscale,
-                                 float[] minMax, float[] lut, short[] outData, int outLine) implements Runnable {
+                                 double scale, float[] minMax, float[] lut, short[] outData,
+                                 int outLine) implements Runnable {
         @Override
         public void run() {
-            double scale = 65535. / fn_gamma(minMax[1] - minMax[0]);
             for (int i = 0; i < width; i++) {
                 float v = getValue(pixType, lineData, i, blank, bzero, bscale);
                 if (v == ImageBuffer.BAD_PIXEL) {
@@ -250,10 +254,10 @@ class FITSImage implements URIImageReader {
     }
 
     private record convert_beta(PixType pixType, int width, Object lineData, long blank, double bzero, double bscale,
-                                float[] minMax, float[] lut, short[] outData, int outLine) implements Runnable {
+                                double scale, float[] minMax, float[] lut, short[] outData,
+                                int outLine) implements Runnable {
         @Override
         public void run() {
-            double scale = 65535. / fn_beta(minMax[1] - minMax[0]);
             for (int i = 0; i < width; i++) {
                 float v = getValue(pixType, lineData, i, blank, bzero, bscale);
                 if (v == ImageBuffer.BAD_PIXEL) {
