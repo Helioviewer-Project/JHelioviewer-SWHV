@@ -199,7 +199,7 @@ class FITSImage implements URIImageReader {
             Object lineData = pixData[j];
             int outLine = width * (height - 1 - j);
 
-            switch (FITSSettings.convertMode) {
+            switch (FITSSettings.conversionMode) {
                 case Gamma:
                     tasks.add(ForkJoinTask.adapt(new convert_gamma(pixType, width, lineData, blank, bzero, bscale, minMax, lut, outData, outLine)).fork());
                     break;
