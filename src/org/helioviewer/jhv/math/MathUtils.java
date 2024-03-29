@@ -137,4 +137,8 @@ public class MathUtils {
         return r * Double.longBitsToDouble(tmp2);
     }
 
+    public static double asinh(double x) {
+        return Math.log(x + Math.sqrt(x * x + 1));
+    }
+
 }
