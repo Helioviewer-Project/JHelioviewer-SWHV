@@ -30,18 +30,21 @@ public class FITSSettings {
 
     static ConversionMode conversionMode = ConversionMode.Gamma;
     static double GAMMA = 1. / 2.2;
-    static double BETA = 1. / (1 << 5);
+    static double BETA = 1. / (1 << 6);
 
     public static final class SettingsDialog extends JDialog implements ShowableDialog {
 
         public SettingsDialog() {
             super(JHVFrame.getFrame(), "FITS Settings", false);
+            setLocationRelativeTo(JHVFrame.getFrame());
             setType(Window.Type.UTILITY);
             setResizable(false);
 
-            JRadioButton gammaButton = new JRadioButton("Gamma");
+            JRadioButton gammaButton = new JRadioButton("\u03B3");
+            gammaButton.setToolTipText("<html><body>pixel<sup>1/\u03B3</sup>");
             gammaButton.setSelected(true);
-            JRadioButton betaButton = new JRadioButton("Beta");
+            JRadioButton betaButton = new JRadioButton("\u03B2");
+            betaButton.setToolTipText("<html><body>asinh( pixel / 2<sup>\u03B2</sup> )");
             betaButton.setSelected(false);
 
             ButtonGroup functionGroup = new ButtonGroup();
@@ -52,7 +55,7 @@ public class FITSSettings {
             int betaDefault = (int) (Math.log(1 / BETA) / Math.log(2));
             JHVSlider gammaSlider = new JHVSlider(10, 40, gammaDefault);
             JLabel gammaLabel = new JLabel(String.valueOf(gammaDefault / 10.), JLabel.RIGHT);
-            JHVSlider betaSlider = new JHVSlider(1, 10, betaDefault);
+            JHVSlider betaSlider = new JHVSlider(1, 12, betaDefault);
             JLabel betaLabel = new JLabel(String.valueOf(betaDefault), JLabel.RIGHT);
 
             gammaSlider.addChangeListener(e -> {
@@ -111,7 +114,6 @@ public class FITSSettings {
         @Override
         public void showDialog() {
             pack();
-            setLocationRelativeTo(JHVFrame.getFrame());
             setVisible(true);
         }
 
