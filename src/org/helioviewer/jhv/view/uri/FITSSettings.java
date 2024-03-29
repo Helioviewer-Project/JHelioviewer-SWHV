@@ -19,9 +19,7 @@ import org.helioviewer.jhv.layers.MovieDisplay;
 @SuppressWarnings("serial")
 public class FITSSettings {
 
-    //public static final SettingsDialog dialog = new SettingsDialog();
-
-    enum ConvertMode {
+    enum ConversionMode {
         Gamma, Beta
     }
 
@@ -30,11 +28,11 @@ public class FITSSettings {
         MovieDisplay.render(1);
     }
 
-    static ConvertMode convertMode = ConvertMode.Gamma;
+    static ConversionMode conversionMode = ConversionMode.Gamma;
     static double GAMMA = 1. / 2.2;
     static double BETA = 1. / (1 << 5);
 
-    public static class SettingsDialog extends JDialog implements ShowableDialog {
+    public static final class SettingsDialog extends JDialog implements ShowableDialog {
 
         public SettingsDialog() {
             super(JHVFrame.getFrame(), "FITS Settings", false);
@@ -74,13 +72,13 @@ public class FITSSettings {
 
             gammaButton.addItemListener(e -> {
                 if (gammaButton.isSelected()) {
-                    convertMode = ConvertMode.Gamma;
+                    conversionMode = ConversionMode.Gamma;
                     refresh();
                 }
             });
             betaButton.addItemListener(e -> {
                 if (betaButton.isSelected()) {
-                    convertMode = ConvertMode.Beta;
+                    conversionMode = ConversionMode.Beta;
                     refresh();
                 }
             });
