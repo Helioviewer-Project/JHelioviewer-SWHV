@@ -24,6 +24,10 @@ public class URIView extends BaseView {
 
     private static final Cache<URI, ImageBuffer> decodeCache = Caffeine.newBuilder().softValues().build();
 
+    static void clearURICache() {
+        decodeCache.invalidateAll();
+    }
+
     public enum URIType {
 
         FITS {

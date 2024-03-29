@@ -33,6 +33,7 @@ import org.helioviewer.jhv.gui.dialogs.AboutDialog;
 import org.helioviewer.jhv.gui.dialogs.LogDialog;
 import org.helioviewer.jhv.gui.dialogs.SettingsDialog;
 import org.helioviewer.jhv.layers.MovieDisplay;
+import org.helioviewer.jhv.view.uri.FITSSettings;
 
 // Menu bar of the main window
 @SuppressWarnings("serial")
@@ -64,6 +65,8 @@ public final class MenuBar extends JMenuBar {
         viewMenu.add(new ZoomFitAction());
         viewMenu.add(new ZoomInAction());
         viewMenu.add(new ZoomOutAction());
+        viewMenu.addSeparator();
+        viewMenu.add(new ShowDialogAction("FITS Settings...", new FITSSettings.SettingsDialog()));
         viewMenu.addSeparator();
         viewMenu.add(new ResetCameraAxisAction());
         viewMenu.add(new ResetCameraAction());

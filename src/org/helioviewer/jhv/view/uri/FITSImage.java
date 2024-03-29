@@ -66,7 +66,6 @@ class FITSImage implements URIImageReader {
 
     private enum PixType {BYTE, SHORT, INT, LONG, FLOAT, DOUBLE}
 
-    private static final double GAMMA = 1 / 2.2;
     private static final long BLANK = 0; // in case it doesn't exist, very unlikely value
 
     private static float getValue(PixType pixType, Object lineData, int i, long blank, double bzero, double bscale) {
@@ -142,6 +141,14 @@ class FITSImage implements URIImageReader {
     private static final double MIN_MULT = 0.00001;
     private static final double MAX_MULT = 0.99999;
 
+    private static double fn_gamma(double x) {
+        return MathUtils.pow(x, FITSSettings.GAMMA);
+    }
+
+    private static double fn_beta(double x) {
+        return MathUtils.asinh(x * FITSSettings.BETA);
+    }
+
     private static ImageBuffer readHDU(ImageHDU hdu) throws Exception {
         int[] axes = hdu.getAxes();
         if (axes == null || axes.length != 2)
@@ -177,23 +184,29 @@ class FITSImage implements URIImageReader {
                     sampleData[(int) (MAX_MULT * sampleData.length)]};
 
             // minMax = getMinMax(pixType, width, height, pixData, blank, bzero, bscale);
-            if (minMax[0] == minMax[1]) {
-                minMax[1] = minMax[0] + 1;
-            }
         }
-        double range = minMax[1] - minMax[0];
+        if (minMax[0] == minMax[1]) {
+            minMax[1] = minMax[0] + 1;
+        }
         // System.out.println(">>> " + minMax[0] + ' ' + minMax[1]);
 
         short[] outData = new short[width * height];
         float[] lut = new float[65536];
-        double scale = 65535. / Math.pow(range, GAMMA);
 
         //Stopwatch sw = Stopwatch.createStarted();
         ArrayList<ForkJoinTask<?>> tasks = new ArrayList<>(height);
         for (int j = 0; j < height; j++) {
             Object lineData = pixData[j];
             int outLine = width * (height - 1 - j);
-            tasks.add(ForkJoinTask.adapt(new convert(pixType, width, lineData, blank, bzero, bscale, scale, minMax, lut, outData, outLine)).fork());
+
+            switch (FITSSettings.convertMode) {
+                case Gamma:
+                    tasks.add(ForkJoinTask.adapt(new convert_gamma(pixType, width, lineData, blank, bzero, bscale, minMax, lut, outData, outLine)).fork());
+                    break;
+                case Beta:
+                    tasks.add(ForkJoinTask.adapt(new convert_beta(pixType, width, lineData, blank, bzero, bscale, minMax, lut, outData, outLine)).fork());
+                    break;
+            }
         }
         tasks.forEach(ForkJoinTask::join);
         //System.out.println(">>> " + sw.elapsed().toNanos() / 1e9);
@@ -217,18 +230,37 @@ class FITSImage implements URIImageReader {
             throw new Exception("Unknown pixel type: " + pixData.getClass().getSimpleName());
     }
 
-    private record convert(PixType pixType, int width, Object lineData, long blank, double bzero, double bscale,
-                           double scale, float[] minMax, float[] lut, short[] outData,
-                           int outLine) implements Runnable {
+    private record convert_gamma(PixType pixType, int width, Object lineData, long blank, double bzero, double bscale,
+                                 float[] minMax, float[] lut, short[] outData, int outLine) implements Runnable {
         @Override
         public void run() {
+            double scale = 65535. / fn_gamma(minMax[1] - minMax[0]);
             for (int i = 0; i < width; i++) {
                 float v = getValue(pixType, lineData, i, blank, bzero, bscale);
                 if (v == ImageBuffer.BAD_PIXEL) {
                     outData[outLine + i] = 0;
                 } else {
                     v = MathUtils.clip(v, minMax[0], minMax[1]); // sampling may have missed extremes
-                    int p = (int) MathUtils.clip(scale * MathUtils.pow(v - minMax[0], GAMMA) + .5, 0, 65535);
+                    int p = (int) MathUtils.clip(scale * fn_gamma(v - minMax[0]) + .5, 0, 65535);
+                    lut[p] = v;
+                    outData[outLine + i] = (short) p;
+                }
+            }
+        }
+    }
+
+    private record convert_beta(PixType pixType, int width, Object lineData, long blank, double bzero, double bscale,
+                                float[] minMax, float[] lut, short[] outData, int outLine) implements Runnable {
+        @Override
+        public void run() {
+            double scale = 65535. / fn_beta(minMax[1] - minMax[0]);
+            for (int i = 0; i < width; i++) {
+                float v = getValue(pixType, lineData, i, blank, bzero, bscale);
+                if (v == ImageBuffer.BAD_PIXEL) {
+                    outData[outLine + i] = 0;
+                } else {
+                    v = MathUtils.clip(v, minMax[0], minMax[1]); // sampling may have missed extremes
+                    int p = (int) MathUtils.clip(scale * fn_beta(v - minMax[0]) + .5, 0, 65535);
                     lut[p] = v;
                     outData[outLine + i] = (short) p;
                 }
