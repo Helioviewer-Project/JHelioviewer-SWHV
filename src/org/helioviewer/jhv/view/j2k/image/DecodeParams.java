@@ -25,7 +25,7 @@ public class DecodeParams {
     }
 
     private static int computeHash(int s, int fr, SubImage si, int l, float f) { // viewpoint, complete don't participate
-        int result = 31 + s;
+        int result = s;
         result = 31 * result + fr;
         result = 31 * result + si.hashCode();
         result = 31 * result + l;
