@@ -141,14 +141,6 @@ class FITSImage implements URIImageReader {
     private static final double MIN_MULT = 0.00001;
     private static final double MAX_MULT = 0.99999;
 
-    private static double fn_gamma(double x) {
-        return MathUtils.pow(x, FITSSettings.GAMMA);
-    }
-
-    private static double fn_beta(double x) {
-        return MathUtils.asinh(x * FITSSettings.BETA);
-    }
-
     private static ImageBuffer readHDU(ImageHDU hdu) throws Exception {
         int[] axes = hdu.getAxes();
         if (axes == null || axes.length != 2)
@@ -228,6 +220,14 @@ class FITSImage implements URIImageReader {
             return PixType.DOUBLE;
         else
             throw new Exception("Unknown pixel type: " + pixData.getClass().getSimpleName());
+    }
+
+    private static double fn_gamma(double x) {
+        return MathUtils.pow(x, FITSSettings.GAMMA);
+    }
+
+    private static double fn_beta(double x) {
+        return MathUtils.asinh(x * FITSSettings.BETA);
     }
 
     private record convert_gamma(PixType pixType, int width, Object lineData, long blank, double bzero, double bscale,
