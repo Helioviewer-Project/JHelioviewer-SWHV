@@ -35,7 +35,7 @@ public class SubImage {
     }
 
     private static int computeHash(int _x, int _y, int _w, int _h) {
-        int result = 31 + _x;
+        int result = _x;
         result = 31 * result + _y;
         result = 31 * result + _w;
         return 31 * result + _h;
