@@ -105,7 +105,7 @@ class ImageFilter {
     }
 
     private static final int K = 3;
-    private static final float H = 0.7f;
+    private static final float H = 0.8f;
     private static final double[] sigmas = {1, 4, 16, 64};
     private static final double[] weights = {0.25, 0.5, 0.75, 1};
 

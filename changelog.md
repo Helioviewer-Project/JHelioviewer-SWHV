@@ -3,6 +3,9 @@
 
 ## JHelioviewer 4.6.3 (pending)
 
+- Make possible to adjust the FITS pixel conversion gamma parameter. Offer an alternative conversion controlled by beta. Use menu View -> FITS Settings
+- Improve the metadata of the exported movies
+
 ## JHelioviewer 4.6.2 (2024-03-21)
 
 - Fix Windows image canvas size bug
