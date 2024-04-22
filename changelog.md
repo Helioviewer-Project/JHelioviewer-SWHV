@@ -1,6 +1,8 @@
 
 # Revision history for JHelioviewer
 
+## JHelioviewer 4.6.4 (pending)
+
 ## JHelioviewer 4.6.3 (2024-04-22)
 
 - Make possible to adjust the FITS pixel conversion gamma parameter. Offer an alternative conversion controlled by beta. Use menu View -> FITS Settings
