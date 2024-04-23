@@ -12,6 +12,7 @@ import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.time.JHVTime;
 
 public class BaseView implements View {
@@ -24,7 +25,7 @@ public class BaseView implements View {
 
     protected boolean mgn;
     protected LUT builtinLUT;
-    protected MetaData[] metaData;
+    protected MetaData[] metaData = new MetaData[] { new PixelBasedMetaData(1, 1, "") }; // paranoia
 
     public BaseView(DecodeExecutor _executor, APIRequest _request, DataUri _dataUri) {
         executor = _executor;
