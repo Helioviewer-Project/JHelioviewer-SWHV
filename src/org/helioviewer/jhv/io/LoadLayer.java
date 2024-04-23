@@ -93,15 +93,16 @@ public class LoadLayer {
     }
 
     private static View loadView(DecodeExecutor executor, APIRequest req, URI uri, boolean forceFITS) throws Exception {
-        String loc = uri.toString().toLowerCase(Locale.ENGLISH);
+        URI localUri = NetFileCache.get(uri);
+        String loc = localUri.toString().toLowerCase(Locale.ENGLISH);
         if (forceFITS || loc.endsWith(".fits") || loc.endsWith(".fts") || loc.endsWith(".fits.gz")) {
-            return new URIView(executor, req, uri, URIView.URIType.FITS);
+            return new URIView(executor, req, localUri, URIView.URIType.FITS);
         } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
-            return new URIView(executor, req, uri, URIView.URIType.GENERIC);
+            return new URIView(executor, req, localUri, URIView.URIType.GENERIC);
         } else if (loc.endsWith(".zip")) {
-            return loadZip(executor, uri, forceFITS);
+            return loadZip(executor, localUri, forceFITS);
         } else {
-            return new J2KView(executor, req, uri);
+            return new J2KView(executor, req, localUri);
         }
     }
 

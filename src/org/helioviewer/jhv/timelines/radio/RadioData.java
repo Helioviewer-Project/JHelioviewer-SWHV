@@ -18,6 +18,7 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
 import org.helioviewer.jhv.timelines.Timelines;
@@ -33,6 +34,7 @@ import org.json.JSONObject;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.FutureCallback;
 
 public final class RadioData extends AbstractTimelineLayer {
@@ -112,7 +114,7 @@ public final class RadioData extends AbstractTimelineLayer {
         @Override
         public RadioJ2KData call() throws Exception {
             APIRequest req = new APIRequest("ROB", APIRequest.CallistoID, date, date, APIRequest.CADENCE_ALL);
-            URI uri = new URI(req.toFileRequest());
+            URI uri = NetFileCache.get(new URI(req.toFileRequest()));
             DecodeExecutor executor = new DecodeExecutor();
             return new RadioJ2KData(new J2KViewCallisto(executor, req, uri), req.startTime(), executor);
         }
@@ -142,7 +144,7 @@ public final class RadioData extends AbstractTimelineLayer {
         @Override
         public void onFailure(@Nonnull Throwable t) {
             done();
-            Log.error(t);
+            Log.error(Throwables.getStackTraceAsString(t));
         }
 
     }

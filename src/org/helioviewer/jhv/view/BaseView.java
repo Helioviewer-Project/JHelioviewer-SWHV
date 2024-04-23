@@ -10,10 +10,8 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.time.JHVTime;
 
 public class BaseView implements View {
@@ -26,13 +24,12 @@ public class BaseView implements View {
 
     protected boolean mgn;
     protected LUT builtinLUT;
-    protected MetaData[] metaData = new MetaData[1];
+    protected MetaData[] metaData;
 
     public BaseView(DecodeExecutor _executor, APIRequest _request, URI _uri) throws Exception {
         executor = _executor;
         request = _request;
-        uri = _uri == null ? null : NetFileCache.get(_uri);
-        metaData[0] = new PixelBasedMetaData(1, 1, uri);
+        uri = _uri;
     }
 
     @Nullable
