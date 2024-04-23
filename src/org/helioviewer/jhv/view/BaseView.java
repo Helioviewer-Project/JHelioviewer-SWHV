@@ -10,6 +10,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.time.JHVTime;
@@ -20,22 +21,22 @@ public class BaseView implements View {
 
     protected final DecodeExecutor executor;
     protected final APIRequest request;
-    protected final URI uri;
+    protected final DataUri dataUri;
 
     protected boolean mgn;
     protected LUT builtinLUT;
     protected MetaData[] metaData;
 
-    public BaseView(DecodeExecutor _executor, APIRequest _request, URI _uri) {
+    public BaseView(DecodeExecutor _executor, APIRequest _request, DataUri _dataUri) {
         executor = _executor;
         request = _request;
-        uri = _uri;
+        dataUri = _dataUri;
     }
 
     @Nullable
     @Override
     public URI getURI() {
-        return uri;
+        return dataUri.uri();
     }
 
     @Nullable

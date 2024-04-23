@@ -31,10 +31,8 @@ public class URIView extends BaseView {
     private final String xml;
     private final Region imageRegion;
 
-    private final DataUri dataUri; // tbd
-
     public URIView(DecodeExecutor _executor, DataUri _dataUri) throws Exception {
-        super(_executor, null, _dataUri.uri());
+        super(_executor, null, _dataUri);
 
         dataUri = _dataUri;
         reader = dataUri.format() == DataUri.Format.FITS ? new FITSImage() : new GenericImage();
