@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.view.uri;
 
-import java.net.URI;
+import java.io.File;
 
 import javax.annotation.Nullable;
 
@@ -11,8 +11,8 @@ interface URIImageReader {
     record Image(@Nullable String xml, ImageBuffer buffer) {
     }
 
-    Image readImage(URI uri) throws Exception;
+    Image readImage(File file) throws Exception;
 
-    ImageBuffer readImageBuffer(URI uri) throws Exception;
+    ImageBuffer readImageBuffer(File file) throws Exception;
 
 }

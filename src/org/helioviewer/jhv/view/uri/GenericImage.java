@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
 import java.awt.image.DataBufferUShort;
-import java.net.URI;
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.Buffer;
 import java.nio.IntBuffer;
@@ -16,19 +16,19 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataNode;
+import javax.imageio.stream.FileImageInputStream;
 import javax.imageio.stream.ImageInputStream;
 
 import org.helioviewer.jhv.Log;
 //import org.helioviewer.jhv.base.XMLUtils;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
-import org.helioviewer.jhv.io.NetClient;
 
 // essentially static; local or network cache
 class GenericImage implements URIImageReader {
 
     @Override
-    public URIImageReader.Image readImage(URI uri) throws Exception {
-        try (NetClient nc = NetClient.of(uri); ImageInputStream iis = ImageIO.createImageInputStream(nc.getStream())) {
+    public URIImageReader.Image readImage(File file) throws Exception {
+        try (ImageInputStream iis = new FileImageInputStream(file)) {
             ImageReader reader = getReader(iis);
             if (reader == null)
                 throw new Exception("No image reader found");
@@ -43,7 +43,7 @@ class GenericImage implements URIImageReader {
                     xml = ((IIOMetadataNode) text).getAttribute("value");
                 }
             } catch (Exception e) {
-                Log.error(uri.toString(), e);
+                Log.error(file.toString(), e); // tbd
             }
             /*
             String[] names = metadata.getMetadataFormatNames();
@@ -61,8 +61,8 @@ class GenericImage implements URIImageReader {
     }
 
     @Override
-    public ImageBuffer readImageBuffer(URI uri) throws Exception {
-        try (NetClient nc = NetClient.of(uri); ImageInputStream iis = ImageIO.createImageInputStream(nc.getStream())) {
+    public ImageBuffer readImageBuffer(File file) throws Exception {
+        try (ImageInputStream iis = new FileImageInputStream(file)) {
             ImageReader reader = getReader(iis);
             if (reader == null)
                 throw new Exception("No image reader found");

@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.view.uri;
 
-import java.io.InputStream;
-import java.net.URI;
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
@@ -18,8 +17,6 @@ import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
 
 import org.helioviewer.jhv.imagedata.ImageBuffer;
-import org.helioviewer.jhv.io.FileUtils;
-import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.math.MathUtils;
 
 //import com.google.common.base.Stopwatch;
@@ -30,20 +27,16 @@ import com.google.common.xml.XmlEscapers;
 class FITSImage implements URIImageReader {
 
     @Override
-    public URIImageReader.Image readImage(URI uri) throws Exception {
-        try (NetClient nc = NetClient.of(uri);
-             InputStream is = FileUtils.decompressStream(nc.getStream());
-             Fits f = new Fits(is)) {
+    public URIImageReader.Image readImage(File file) throws Exception {
+        try (Fits f = new Fits(file)) {
             ImageHDU hdu = findHDU(f);
             return new URIImageReader.Image(getHeaderAsXML(hdu), readHDU(hdu));
         }
     }
 
     @Override
-    public ImageBuffer readImageBuffer(URI uri) throws Exception {
-        try (NetClient nc = NetClient.of(uri);
-             InputStream is = FileUtils.decompressStream(nc.getStream());
-             Fits f = new Fits(is)) {
+    public ImageBuffer readImageBuffer(File file) throws Exception {
+        try (Fits f = new Fits(file)) {
             return readHDU(findHDU(f));
         }
     }
