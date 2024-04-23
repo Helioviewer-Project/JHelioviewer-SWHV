@@ -13,11 +13,8 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import okio.BufferedSink;
 import okio.Okio;
-import org.apache.tika.Tika;
 
 public class NetFileCache {
-
-    private static final Tika tika = new Tika();
 
     private static final LoadingCache<URI, DataUri> cache = Caffeine.newBuilder().softValues().
             build(uri -> {
@@ -34,7 +31,7 @@ public class NetFileCache {
                         sink.writeAll(nc.getSource());
                     }
                 }
-                return new DataUri(uri, DataUri.Format.get(tika.detect(path)));
+                return new DataUri(uri, DataUri.Format.get(FileUtils.tika.detect(path)));
             });
 
     public static DataUri get(@Nonnull URI uri) throws IOException {
