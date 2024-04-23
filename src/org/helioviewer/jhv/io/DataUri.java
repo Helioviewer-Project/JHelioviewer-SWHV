@@ -9,12 +9,12 @@ public class DataUri {
 
     public enum Format {
 
-        UNKNOWN, JPIP, JPEG2000, FITS, PNG, JPEG, ZIP;
+        UNKNOWN, JPIP, JP2, JPX, FITS, PNG, JPEG, ZIP;
 
         private static final Map<String, Format> map = Map.of(
                 "application/x-jpp-stream", JPIP,
-                "image/jp2", JPEG2000,
-                "image/jpx", JPEG2000,
+                "image/jp2", JP2,
+                "image/jpx", JPX,
                 "application/fits", FITS,
                 "image/png", PNG,
                 "image/jpeg", JPEG,
