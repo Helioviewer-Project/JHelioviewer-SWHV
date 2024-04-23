@@ -2,7 +2,6 @@ package org.helioviewer.jhv.view.j2k.kakadu;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 
 import javax.annotation.Nullable;
 
