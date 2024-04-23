@@ -25,7 +25,7 @@ public class BaseView implements View {
 
     protected boolean mgn;
     protected LUT builtinLUT;
-    protected MetaData[] metaData = new MetaData[] { new PixelBasedMetaData(1, 1, "") }; // paranoia
+    protected MetaData[] metaData = new MetaData[]{PixelBasedMetaData.EMPTY}; // paranoia
 
     public BaseView(DecodeExecutor _executor, APIRequest _request, DataUri _dataUri) {
         executor = _executor;
