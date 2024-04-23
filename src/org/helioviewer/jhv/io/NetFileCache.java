@@ -25,16 +25,16 @@ public class NetFileCache {
                 if ("jpip".equals(scheme) || "jpips".equals(scheme))
                     return new DataUri(uri, DataUri.Format.JPIP);
 
-                Path path;
                 if ("file".equals(scheme)) {
-                    path = Path.of(uri);
+                    Path path = Path.of(uri);
+                    return new DataUri(uri, DataUri.Format.get(tika.detect(path)));
                 } else {
-                    path = Files.createTempFile(JHVGlobals.fileCacheDir.toPath(), "jhv", null);
+                    Path path = Files.createTempFile(JHVGlobals.fileCacheDir.toPath(), "jhv", null);
                     try (NetClient nc = NetClient.of(uri, false, NetClient.NetCache.BYPASS); BufferedSink sink = Okio.buffer(Okio.sink(path))) {
                         sink.writeAll(nc.getSource());
                     }
+                    return new DataUri(path.toUri(), DataUri.Format.get(tika.detect(path)));
                 }
-                return new DataUri(uri, DataUri.Format.get(tika.detect(path)));
             });
 
     public static DataUri get(@Nonnull URI uri) throws IOException {
