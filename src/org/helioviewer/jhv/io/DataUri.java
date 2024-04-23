@@ -5,6 +5,8 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.Map;
 
+import org.apache.commons.io.FilenameUtils;
+
 public class DataUri {
 
     public enum Format {
@@ -37,7 +39,7 @@ public class DataUri {
         uri = cachedUri;
         format = _format;
         file = format == Format.JPIP ? null : Path.of(uri).toFile();
-        baseName = originalUri.getPath().split(".+?/(?=[^/]+$)")[1];
+        baseName = FilenameUtils.getName(originalUri.toString());
     }
 
     public URI uri() {
