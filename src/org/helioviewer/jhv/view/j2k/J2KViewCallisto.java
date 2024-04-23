@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.view.j2k;
 
 import java.awt.Rectangle;
-import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.helioviewer.jhv.astronomy.Position;
