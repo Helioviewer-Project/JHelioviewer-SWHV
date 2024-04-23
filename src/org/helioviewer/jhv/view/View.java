@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.view;
 
-import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nonnull;
@@ -29,7 +28,7 @@ public interface View {
     void decode(Position viewpoint, double pixFactor, float factor);
 
     @Nullable
-    URI getURI();
+    String getBaseName();
 
     @Nullable
     LUT getDefaultLUT();

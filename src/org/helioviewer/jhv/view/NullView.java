@@ -12,7 +12,6 @@ import org.helioviewer.jhv.time.JHVTime;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class NullView implements View {
@@ -80,7 +79,7 @@ public class NullView implements View {
 
     @Nullable
     @Override
-    public URI getURI() {
+    public String getBaseName() {
         return null;
     }
 
