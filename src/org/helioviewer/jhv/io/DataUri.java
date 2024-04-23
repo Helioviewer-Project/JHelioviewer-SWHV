@@ -21,7 +21,7 @@ public class DataUri {
                 "application/zip", ZIP
         );
 
-        public static Format get(String spec) {
+        static Format get(String spec) {
             Format f = map.get(spec);
             return f == null ? UNKNOWN : f;
         }
@@ -33,11 +33,11 @@ public class DataUri {
     private final File file;
     private final String baseName;
 
-    public DataUri(URI _uri, Format _format) {
-        uri = _uri;
+    DataUri(URI cachedUri, URI originalUri, Format _format) {
+        uri = cachedUri;
         format = _format;
         file = format == Format.JPIP ? null : Path.of(uri).toFile();
-        baseName = uri.getPath().split(".+?/(?=[^/]+$)")[1];
+        baseName = originalUri.getPath().split(".+?/(?=[^/]+$)")[1];
     }
 
     public URI uri() {
