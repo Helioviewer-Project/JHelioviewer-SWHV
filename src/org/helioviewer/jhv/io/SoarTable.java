@@ -46,7 +46,10 @@ class SoarTable {
             List<SoarClient.DataItem> items = new ArrayList<>();
             try (RowSequence rseq = table.getRowSequence()) {
                 while (rseq.next()) {
-                    items.add(new SoarClient.DataItem((String) rseq.getCell(col_id), SoarClient.FileFormat.valueOf((String) rseq.getCell(col_format)), (Long) rseq.getCell(col_size)));
+                    items.add(new SoarClient.DataItem(
+                            (String) rseq.getCell(col_id),
+                            SoarClient.SoarFileFormat.valueOf((String) rseq.getCell(col_format)),
+                            (Long) rseq.getCell(col_size)));
                 }
             }
             return items;
