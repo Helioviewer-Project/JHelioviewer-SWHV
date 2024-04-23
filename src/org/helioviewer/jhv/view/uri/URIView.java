@@ -49,7 +49,7 @@ public class URIView extends BaseView {
             }
 
             imageRegion = m.roiToRegion(0, 0, m.getPixelWidth(), m.getPixelHeight(), 1, 1);
-            metaData = new MetaData[]{m};
+            metaData[0] = m;
             decodeCache.put(dataUri, image.buffer());
         } catch (Exception e) {
             throw new Exception(e.getMessage() + ": " + dataUri, e);
