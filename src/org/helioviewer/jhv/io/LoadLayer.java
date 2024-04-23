@@ -93,7 +93,7 @@ public class LoadLayer {
     }
 
     private static View loadView(DecodeExecutor executor, APIRequest req, URI uri, boolean forceFITS) throws Exception {
-        URI localUri = NetFileCache.get(uri);
+        URI localUri = NetFileCache.get(uri).uri();
         String loc = localUri.toString().toLowerCase(Locale.ENGLISH);
         if (forceFITS || loc.endsWith(".fits") || loc.endsWith(".fts") || loc.endsWith(".fits.gz")) {
             return new URIView(executor, req, localUri, URIView.URIType.FITS);
@@ -107,7 +107,7 @@ public class LoadLayer {
     }
 
     private static View loadZip(DecodeExecutor executor, URI uriZip, boolean forceFITS) throws Exception {
-        List<URI> uriList = FileUtils.unZip(NetFileCache.get(uriZip));
+        List<URI> uriList = FileUtils.unZip(NetFileCache.get(uriZip).uri());
         return loadUri(executor, uriList, forceFITS);
     }
 

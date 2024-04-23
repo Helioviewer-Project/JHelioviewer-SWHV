@@ -114,7 +114,7 @@ public final class RadioData extends AbstractTimelineLayer {
         @Override
         public RadioJ2KData call() throws Exception {
             APIRequest req = new APIRequest("ROB", APIRequest.CallistoID, date, date, APIRequest.CADENCE_ALL);
-            URI uri = NetFileCache.get(new URI(req.toFileRequest()));
+            URI uri = NetFileCache.get(new URI(req.toFileRequest())).uri();
             DecodeExecutor executor = new DecodeExecutor();
             return new RadioJ2KData(new J2KViewCallisto(executor, req, uri), req.startTime(), executor);
         }
