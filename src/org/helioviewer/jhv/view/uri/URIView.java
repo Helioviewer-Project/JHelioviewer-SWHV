@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.view.uri;
 
 import java.awt.EventQueue;
-import java.net.URI;
 
 import javax.annotation.Nonnull;
 
@@ -42,7 +41,7 @@ public class URIView extends BaseView {
 
         try {
             MetaData m;
-            URIImageReader.Image image = reader.readImage(uri);
+            URIImageReader.Image image = reader.readImage(dataUri.file());
             String readXml = image.xml();
             if (readXml == null) {
                 xml = "<meta/>";
@@ -64,7 +63,7 @@ public class URIView extends BaseView {
     public void decode(Position viewpoint, double pixFactor, float factor) {
         ImageBuffer imageBuffer = decodeCache.getIfPresent(dataUri);
         if (imageBuffer == null) {
-            executor.decode(new URIDecoder(uri, reader, mgn), new Callback(viewpoint));
+            executor.decode(new URIDecoder(dataUri.file(), reader, mgn), new Callback(viewpoint));
         } else {
             sendDataToHandler(imageBuffer, viewpoint);
         }
