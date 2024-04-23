@@ -9,7 +9,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
-import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
@@ -28,33 +28,14 @@ public class URIView extends BaseView {
         decodeCache.invalidateAll();
     }
 
-    public enum URIType {
-
-        FITS {
-            @Override
-            protected URIImageReader getReader() {
-                return new FITSImage();
-            }
-        },
-        GENERIC {
-            @Override
-            protected URIImageReader getReader() {
-                return new GenericImage();
-            }
-        };
-
-        protected abstract URIImageReader getReader();
-
-    }
-
     private final URIImageReader reader;
     private final String xml;
     private final Region imageRegion;
 
-    public URIView(DecodeExecutor _executor, APIRequest _request, URI _uri, URIType type) throws Exception {
-        super(_executor, _request, _uri);
+    public URIView(DecodeExecutor _executor, DataUri dataUri) throws Exception {
+        super(_executor, null, dataUri.uri());
 
-        reader = type.getReader();
+        reader = dataUri.format() == DataUri.Format.FITS ? new FITSImage() : new GenericImage();
 
         try {
             MetaData m;
@@ -62,17 +43,17 @@ public class URIView extends BaseView {
             String readXml = image.xml();
             if (readXml == null) {
                 xml = "<meta/>";
-                m = new PixelBasedMetaData(100, 100, uri);
+                m = new PixelBasedMetaData(100, 100, dataUri.baseName());
             } else {
                 xml = readXml;
                 m = new XMLMetaDataContainer(xml).getHVMetaData();
             }
 
             imageRegion = m.roiToRegion(0, 0, m.getPixelWidth(), m.getPixelHeight(), 1, 1);
-            metaData = new MetaData[] { m };
+            metaData = new MetaData[]{m};
             decodeCache.put(uri, image.buffer());
         } catch (Exception e) {
-            throw new Exception(e.getMessage() + ": " + uri, e);
+            throw new Exception(e.getMessage() + ": " + dataUri, e);
         }
     }
 
@@ -80,17 +61,17 @@ public class URIView extends BaseView {
     public void decode(Position viewpoint, double pixFactor, float factor) {
         ImageBuffer imageBuffer = decodeCache.getIfPresent(uri);
         if (imageBuffer == null) {
-            executor.decode(new URIDecoder(uri, reader, mgn), new URICallback(viewpoint));
+            executor.decode(new URIDecoder(uri, reader, mgn), new Callback(viewpoint));
         } else {
             sendDataToHandler(imageBuffer, viewpoint);
         }
     }
 
-    private class URICallback extends DecodeCallback {
+    private class Callback extends DecodeCallback {
 
         private final Position viewpoint;
 
-        URICallback(Position _viewpoint) {
+        Callback(Position _viewpoint) {
             viewpoint = _viewpoint;
         }
 

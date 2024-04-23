@@ -6,6 +6,17 @@ import org.helioviewer.jhv.astronomy.Sun;
 
 public class PixelBasedMetaData extends BaseMetaData {
 
+    public PixelBasedMetaData(int _pixelW, int _pixelH, String _displayName) {
+        pixelW = _pixelW;
+        pixelH = _pixelH;
+
+        region = defaultRegion;
+        unitPerPixelX = Sun.Radius / pixelW;
+        unitPerPixelY = Sun.Radius / pixelH;
+
+        displayName = _displayName;
+    }
+
     public PixelBasedMetaData(int _pixelW, int _pixelH, URI uri) {
         pixelW = _pixelW;
         pixelH = _pixelH;

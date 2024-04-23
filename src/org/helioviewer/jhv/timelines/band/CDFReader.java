@@ -34,7 +34,7 @@ import uk.ac.bristol.star.cdf.VariableAttribute;
 public class CDFReader {
 
     public static void load(URI uri) throws Exception {
-        List<BandData> lines = read(NetFileCache.get(uri).uri());
+        List<BandData> lines = read(NetFileCache.get(uri).uri()); // tbd : sniff type
         if (lines.isEmpty()) // failed
             return;
         long[] dates = lines.get(0).dates();
