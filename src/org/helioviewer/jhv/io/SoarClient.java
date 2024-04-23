@@ -23,9 +23,9 @@ public class SoarClient {
     private static final UriTemplate loadTemplate = new UriTemplate("https://soar.esac.esa.int/soar-sl-tap/data",
             UriTemplate.vars().set("retrieval_type", "LAST_PRODUCT").set("product_type", "SCIENCE"));
 
-    enum FileFormat {CDF, FITS, JP2}
+    enum SoarFileFormat {CDF, FITS, JP2}
 
-    public record DataItem(String id, FileFormat format, long size) {
+    public record DataItem(String id, SoarFileFormat format, long size) {
         @Override
         public String toString() {
             return id;
@@ -97,7 +97,7 @@ public class SoarClient {
         for (int i = 0; i < length; i++) {
             JSONArray item = data.getJSONArray(i);
             try {
-                result.add(new DataItem(item.getString(0), FileFormat.valueOf(item.getString(1)), item.getLong(2)));
+                result.add(new DataItem(item.getString(0), SoarFileFormat.valueOf(item.getString(1)), item.getLong(2)));
             } catch (Exception ignore) { // ignore unknown formats
             }
         }
