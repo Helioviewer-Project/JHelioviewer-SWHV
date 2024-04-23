@@ -26,7 +26,7 @@ public class BaseView implements View {
     protected LUT builtinLUT;
     protected MetaData[] metaData;
 
-    public BaseView(DecodeExecutor _executor, APIRequest _request, URI _uri) throws Exception {
+    public BaseView(DecodeExecutor _executor, APIRequest _request, URI _uri) {
         executor = _executor;
         request = _request;
         uri = _uri;
