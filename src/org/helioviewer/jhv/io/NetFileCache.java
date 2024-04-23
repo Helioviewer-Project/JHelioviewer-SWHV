@@ -20,7 +20,7 @@ public class NetFileCache {
     private static final Tika tika = new Tika();
 
     private static DataUri.Format detect(Path path) throws IOException {
-        if (path.toString().toLowerCase().endsWith(".fits.gz"))
+        if (path.toString().toLowerCase().endsWith(".fits.gz")) // hack
             return DataUri.Format.FITS;
         else
             return DataUri.Format.get(tika.detect(path));
@@ -31,17 +31,16 @@ public class NetFileCache {
                 String scheme = uri.getScheme().toLowerCase();
                 if ("jpip".equals(scheme) || "jpips".equals(scheme))
                     return new DataUri(uri, uri, DataUri.Format.JPIP);
-
                 if ("file".equals(scheme)) {
                     Path path = Path.of(uri);
                     return new DataUri(uri, uri, detect(path));
-                } else {
-                    Path path = Files.createTempFile(JHVGlobals.fileCacheDir.toPath(), "jhv", null);
-                    try (NetClient nc = NetClient.of(uri, false, NetClient.NetCache.BYPASS); BufferedSink sink = Okio.buffer(Okio.sink(path))) {
-                        sink.writeAll(nc.getSource());
-                    }
-                    return new DataUri(path.toUri(), uri, detect(path));
                 }
+
+                Path path = Files.createTempFile(JHVGlobals.fileCacheDir.toPath(), "jhv", null);
+                try (NetClient nc = NetClient.of(uri, false, NetClient.NetCache.BYPASS); BufferedSink sink = Okio.buffer(Okio.sink(path))) {
+                    sink.writeAll(nc.getSource());
+                }
+                return new DataUri(path.toUri(), uri, detect(path));
             });
 
     public static DataUri get(@Nonnull URI uri) throws IOException {
