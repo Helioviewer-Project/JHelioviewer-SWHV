@@ -5,7 +5,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.Map;
 
-public record DataUri(URI uri, Format format) {
+public class DataUri {
 
     public enum Format {
 
@@ -28,8 +28,39 @@ public record DataUri(URI uri, Format format) {
 
     }
 
-    public File toFile() {
-        return Path.of(uri).toFile();
+    private final URI uri;
+    private final Format format;
+    private final File file;
+    private final String baseName;
+
+    public DataUri(URI _uri, Format _format) {
+        uri = _uri;
+        format = _format;
+        file = format == Format.JPIP ? null : Path.of(uri).toFile();
+
+        String path = uri.getPath();
+        baseName = path.substring(Math.max(0, path.lastIndexOf('/')));
+    }
+
+    public URI uri() {
+        return uri;
+    }
+
+    public Format format() {
+        return format;
+    }
+
+    public File file() {
+        return file;
+    }
+
+    public String baseName() {
+        return baseName;
+    }
+
+    @Override
+    public String toString() {
+        return uri.toString();
     }
 
 }
