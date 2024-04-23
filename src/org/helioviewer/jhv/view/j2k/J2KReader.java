@@ -22,12 +22,14 @@ import org.helioviewer.jhv.view.j2k.jpip.JPIPStream;
 class J2KReader implements Runnable {
 
     private final BooleanSignal readerSignal = new BooleanSignal();
-
+    private final URI uri;
     private final Thread myThread;
+
     private volatile boolean isAbolished;
     private JPIPSocket socket;
 
-    J2KReader(URI uri, JPIPCache cache) throws KduException, IOException {
+    J2KReader(URI _uri, JPIPCache cache) throws KduException, IOException {
+        uri = _uri;
         socket = new JPIPSocket(uri, cache);
         initJPIP(cache);
 
@@ -133,7 +135,7 @@ class J2KReader implements Runnable {
             try {
                 if (socket.isClosed()) {
                     // System.out.println(">>> reconnect");
-                    socket = new JPIPSocket(view.getURI(), cache);
+                    socket = new JPIPSocket(uri, cache);
                 }
                 // choose cache strategy
                 boolean singleFrame = numFrames <= 1 /* one frame */ || params.priority;
@@ -230,7 +232,7 @@ class J2KReader implements Runnable {
                 if (retries++ < 13)
                     readerSignal.signal(params); // signal to retry
                 else
-                    Log.error("Retry limit reached: " + view.getURI()); // something may be terribly wrong
+                    Log.error("Retry limit reached: " + uri); // something may be terribly wrong
             }
         }
     }
