@@ -32,22 +32,22 @@ public class LoadLayer {
         return EventQueueCallbackExecutor.pool.submit(new LoadRemote(layer, req), new Callback(layer));
     }
 
-    public static void submit(@Nonnull ImageLayer layer, @Nonnull List<URI> uriList, boolean forceFITS) {
-        EventQueueCallbackExecutor.pool.submit(new LoadURIImage(layer, uriList, forceFITS), new Callback(layer));
+    public static void submit(@Nonnull ImageLayer layer, @Nonnull List<URI> uriList) {
+        EventQueueCallbackExecutor.pool.submit(new LoadURIImage(layer, uriList), new Callback(layer));
     }
 
     private record LoadRemote(ImageLayer layer, APIRequest req) implements Callable<View> {
         @Override
         public View call() throws Exception {
             URI uri = requestAPI(req.toJpipUrl());
-            return uri == null ? null : loadView(layer.getExecutor(), req, uri, false);
+            return uri == null ? null : loadView(layer.getExecutor(), req, uri);
         }
     }
 
-    private record LoadURIImage(ImageLayer layer, List<URI> uriList, boolean forceFITS) implements Callable<View> {
+    private record LoadURIImage(ImageLayer layer, List<URI> uriList) implements Callable<View> {
         @Override
         public View call() throws Exception {
-            return loadUri(layer.getExecutor(), uriList, forceFITS);
+            return loadUri(layer.getExecutor(), uriList);
         }
     }
 
@@ -76,13 +76,13 @@ public class LoadLayer {
 
     }
 
-    private static View loadUri(DecodeExecutor executor, List<URI> uriList, boolean forceFITS) throws Exception {
+    private static View loadUri(DecodeExecutor executor, List<URI> uriList) throws Exception {
         if (uriList.size() == 1) {
-            return loadView(executor, null, uriList.get(0), forceFITS);
+            return loadView(executor, null, uriList.get(0));
         } else {
             List<View> views = uriList.parallelStream().map(uri -> {
                 try {
-                    return loadView(executor, null, uri, forceFITS);
+                    return loadView(executor, null, uri);
                 } catch (Exception e) {
                     Log.warn(uri.toString(), e);
                     return null;
@@ -92,23 +92,23 @@ public class LoadLayer {
         }
     }
 
-    private static View loadView(DecodeExecutor executor, APIRequest req, URI uri, boolean forceFITS) throws Exception {
+    private static View loadView(DecodeExecutor executor, APIRequest req, URI uri) throws Exception {
         URI localUri = NetFileCache.get(uri).uri();
         String loc = localUri.toString().toLowerCase(Locale.ENGLISH);
-        if (forceFITS || loc.endsWith(".fits") || loc.endsWith(".fts") || loc.endsWith(".fits.gz")) {
+        if (loc.endsWith(".fits") || loc.endsWith(".fts") || loc.endsWith(".fits.gz")) {
             return new URIView(executor, req, localUri, URIView.URIType.FITS);
         } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
             return new URIView(executor, req, localUri, URIView.URIType.GENERIC);
         } else if (loc.endsWith(".zip")) {
-            return loadZip(executor, localUri, forceFITS);
+            return loadZip(executor, localUri);
         } else {
             return new J2KView(executor, req, localUri);
         }
     }
 
-    private static View loadZip(DecodeExecutor executor, URI uriZip, boolean forceFITS) throws Exception {
+    private static View loadZip(DecodeExecutor executor, URI uriZip) throws Exception {
         List<URI> uriList = FileUtils.unZip(NetFileCache.get(uriZip).uri());
-        return loadUri(executor, uriList, forceFITS);
+        return loadUri(executor, uriList);
     }
 
     private static URI requestAPI(String url) throws Exception {
