@@ -3,7 +3,6 @@ package org.helioviewer.jhv.io;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -93,21 +92,17 @@ public class LoadLayer {
     }
 
     private static View loadView(DecodeExecutor executor, APIRequest req, URI uri) throws Exception {
-        URI localUri = NetFileCache.get(uri).uri();
-        String loc = localUri.toString().toLowerCase(Locale.ENGLISH);
-        if (loc.endsWith(".fits") || loc.endsWith(".fts") || loc.endsWith(".fits.gz")) {
-            return new URIView(executor, req, localUri, URIView.URIType.FITS);
-        } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
-            return new URIView(executor, req, localUri, URIView.URIType.GENERIC);
-        } else if (loc.endsWith(".zip")) {
-            return loadZip(executor, localUri);
-        } else {
-            return new J2KView(executor, req, localUri);
-        }
+        DataUri dataUri = NetFileCache.get(uri);
+        return switch (dataUri.format()) {
+            case JPIP -> new J2KView(executor, req, dataUri.uri()); // tbd
+            case FITS, PNG, JPEG -> new URIView(executor, dataUri);
+            case ZIP -> loadZip(executor, dataUri.uri());
+            default -> throw new Exception("Unknown image type");
+        };
     }
 
     private static View loadZip(DecodeExecutor executor, URI uriZip) throws Exception {
-        List<URI> uriList = FileUtils.unZip(NetFileCache.get(uriZip).uri());
+        List<URI> uriList = FileUtils.unZip(uriZip);
         return loadUri(executor, uriList);
     }
 
