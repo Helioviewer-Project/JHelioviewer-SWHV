@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 
@@ -14,24 +13,31 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import okio.BufferedSink;
 import okio.Okio;
+import org.apache.tika.Tika;
 
 public class NetFileCache {
 
-    private static final Set<String> uncachedSchemes = Set.of("jpip", "jpips", "file");
+    private static final Tika tika = new Tika();
 
-    private static final LoadingCache<URI, URI> cache = Caffeine.newBuilder().softValues().
+    private static final LoadingCache<URI, DataUri> cache = Caffeine.newBuilder().softValues().
             build(uri -> {
-                if (uncachedSchemes.contains(uri.getScheme().toLowerCase()))
-                    return uri;
+                String scheme = uri.getScheme().toLowerCase();
+                if ("jpip".equals(scheme) || "jpips".equals(scheme))
+                    return new DataUri(uri, DataUri.Format.JPIP);
 
-                Path path = Files.createTempFile(JHVGlobals.fileCacheDir.toPath(), "jhv", null);
-                try (NetClient nc = NetClient.of(uri, false, NetClient.NetCache.BYPASS); BufferedSink sink = Okio.buffer(Okio.sink(path))) {
-                    sink.writeAll(nc.getSource());
+                Path path;
+                if ("file".equals(scheme)) {
+                    path = Path.of(uri);
+                } else {
+                    path = Files.createTempFile(JHVGlobals.fileCacheDir.toPath(), "jhv", null);
+                    try (NetClient nc = NetClient.of(uri, false, NetClient.NetCache.BYPASS); BufferedSink sink = Okio.buffer(Okio.sink(path))) {
+                        sink.writeAll(nc.getSource());
+                    }
                 }
-                return path.toUri();
+                return new DataUri(uri, DataUri.Format.get(tika.detect(path)));
             });
 
-    public static URI get(@Nonnull URI uri) throws IOException {
+    public static DataUri get(@Nonnull URI uri) throws IOException {
         try {
             return cache.get(uri);
         } catch (Exception e) {
