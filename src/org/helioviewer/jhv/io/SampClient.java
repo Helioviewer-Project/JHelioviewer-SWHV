@@ -108,7 +108,7 @@ public class SampClient extends HubConnector {
             Object url = msg.getParam("url");
             if (url != null) {
                 URI uri = toURI(url.toString());
-                EventQueue.invokeLater(() -> Load.fits.get(uri));
+                EventQueue.invokeLater(() -> Load.image.get(uri));
             }
         }));
         // load VOTable only from SOAR
@@ -127,7 +127,7 @@ public class SampClient extends HubConnector {
                 Object url = msg.getParam("url");
                 if (url != null) {
                     URI uri = toURI(url.toString());
-                    EventQueue.invokeLater(() -> Load.fits.get(uri));
+                    EventQueue.invokeLater(() -> Load.image.get(uri));
                 }
             }
         }));

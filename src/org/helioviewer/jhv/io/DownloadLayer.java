@@ -62,7 +62,7 @@ public class DownloadLayer {
         @Override
         public void onSuccess(Void result) {
             layer.doneDownload();
-            LoadLayer.submit(layer, List.of(dstPath.toUri()), false);
+            LoadLayer.submit(layer, List.of(dstPath.toUri()));
             JHVGlobals.displayNotification(dstPath.toString());
         }
 

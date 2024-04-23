@@ -18,7 +18,6 @@ public interface Load {
     }
 
     Load cdf = new CDF();
-    Load fits = new FITS();
     Load image = new Image();
     LoadString request = new Request();
     LoadString state = new State();
@@ -36,20 +35,7 @@ public interface Load {
 
         public static void getAll(@Nonnull List<URI> uris) {
             if (!uris.isEmpty()) {
-                LoadLayer.submit(ImageLayer.create(null), uris, false);
-            }
-        }
-    }
-
-    class FITS implements Load {
-        @Override
-        public void get(@Nonnull URI uri) {
-            getAll(List.of(uri));
-        }
-
-        public static void getAll(@Nonnull List<URI> uris) {
-            if (!uris.isEmpty()) {
-                LoadLayer.submit(ImageLayer.create(null), uris, true);
+                LoadLayer.submit(ImageLayer.create(null), uris);
             }
         }
     }
