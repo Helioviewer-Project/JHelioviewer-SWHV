@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.view.j2k.kakadu;
 
-import java.net.URI;
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
@@ -32,9 +32,9 @@ public class KakaduSource {
     private final Kdu_cache cache;
     private final String path;
 
-    public KakaduSource(Kdu_cache _cache, URI uri) {
+    public KakaduSource(Kdu_cache _cache, File file) {
         cache = _cache;
-        path = cache == null ? Path.of(uri).toString() : null;
+        path = file == null ? null : file.toString();
     }
 
     public Jpx_source getJpxSource() {
