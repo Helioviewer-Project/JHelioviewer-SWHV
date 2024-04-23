@@ -2,7 +2,6 @@ package org.helioviewer.jhv.view.j2k;
 
 import java.awt.EventQueue;
 import java.lang.ref.Cleaner;
-import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -74,23 +73,25 @@ public class J2KView extends BaseView {
         }
     }
 
-    // private final DataUri dataUri; // tbd
+    private final DataUri dataUri; // tbd
 
     public J2KView(DecodeExecutor _executor, APIRequest _request, DataUri _dataUri) throws Exception {
         super(_executor, _request, _dataUri.uri());
         serial = incrementSerial();
 
+        dataUri = _dataUri;
+
         try {
-            switch (uri.getScheme().toLowerCase()) {
-                case "jpip", "jpips" -> {
+            switch (dataUri.format()) {
+                case JPIP -> {
                     jpipCache = new JPIPCache();
-                    reader = new J2KReader(uri, jpipCache);
+                    reader = new J2KReader(dataUri.uri(), jpipCache);
                 }
-                case "file" -> {
+                case JP2, JPX -> {
                     jpipCache = null;
                     reader = null;
                 }
-                default -> throw new Exception("J2K scheme not supported: " + uri);
+                default -> throw new Exception("Unknown image type");
             }
 
             source = new KakaduSource(jpipCache, uri);
@@ -103,7 +104,7 @@ public class J2KView extends BaseView {
             for (int i = 0; i <= maxFrame; i++) {
                 if (xmlMetaData[i] == null) {
                     xmlMetaData[i] = "<meta/>";
-                    metaData[i] = new PixelBasedMetaData(100, 100, uri);
+                    metaData[i] = new PixelBasedMetaData(100, 100, dataUri.baseName());
                     Log.warn("Helioviewer metadata missing for layer " + i);
                 } else
                     metaData[i] = new XMLMetaDataContainer(xmlMetaData[i]).getHVMetaData();
@@ -118,7 +119,7 @@ public class J2KView extends BaseView {
                 for (int i = 0; i <= maxFrame; i++) {
                     long milli = frameMap.key(i).milli;
                     if (milli != metaData[i].getViewpoint().time.milli)
-                        Log.warn("Badly ordered metadata: " + uri + "[" + i + "]: expected " + frameMap.key(i) + ", got " + metaData[i].getViewpoint().time);
+                        Log.warn("Badly ordered metadata: " + dataUri + "[" + i + "]: expected " + frameMap.key(i) + ", got " + metaData[i].getViewpoint().time);
 
                     cacheKey[i] = request.sourceId() + "+" + milli;
                 }
@@ -139,7 +140,7 @@ public class J2KView extends BaseView {
             abolishable = reaper.register(this, new J2KAbolisher(serial, reader, source, jpipCache));
         } catch (Exception e) {
             String msg = e instanceof KduException ? "Kakadu error" : e.getMessage();
-            throw new Exception(msg + ": " + uri, e);
+            throw new Exception(msg + ": " + dataUri, e);
         }
     }
 
