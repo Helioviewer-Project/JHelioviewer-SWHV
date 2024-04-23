@@ -94,7 +94,7 @@ public class J2KView extends BaseView {
                 default -> throw new Exception("Unknown image type");
             }
 
-            source = new KakaduSource(jpipCache, uri);
+            source = new KakaduSource(jpipCache, dataUri.file());
             source.open();
 
             maxFrame = source.getNumberLayers() - 1;
