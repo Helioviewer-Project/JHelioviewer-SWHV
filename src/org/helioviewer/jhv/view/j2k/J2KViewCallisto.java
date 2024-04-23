@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.j2k.image.DecodeParams;
 import org.helioviewer.jhv.view.j2k.image.ReadParams;
@@ -14,8 +15,8 @@ import org.helioviewer.jhv.view.j2k.image.SubImage;
 
 public class J2KViewCallisto extends J2KView {
 
-    public J2KViewCallisto(DecodeExecutor _executor, APIRequest _request, URI _uri) throws Exception {
-        super(_executor, _request, _uri);
+    public J2KViewCallisto(DecodeExecutor _executor, APIRequest _request, DataUri _dataUri) throws Exception {
+        super(_executor, _request, _dataUri);
     }
 
     public void setRegion(Rectangle r) {
