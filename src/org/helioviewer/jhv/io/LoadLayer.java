@@ -23,6 +23,7 @@ import org.helioviewer.jhv.threads.JHVThread;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.FutureCallback;
 
 public class LoadLayer {
@@ -69,7 +70,7 @@ public class LoadLayer {
 
             layer.unload();
 
-            Log.error(t);
+            Log.error(Throwables.getStackTraceAsString(t));
             Message.err("An error occurred opening the remote file", t.getMessage());
         }
 
