@@ -95,7 +95,7 @@ public class LoadLayer {
     private static View loadView(DecodeExecutor executor, APIRequest req, URI uri) throws Exception {
         DataUri dataUri = NetFileCache.get(uri);
         return switch (dataUri.format()) {
-            case JPIP -> new J2KView(executor, req, dataUri.uri()); // tbd
+            case JPIP, JP2, JPX -> new J2KView(executor, req, dataUri);
             case FITS, PNG, JPEG -> new URIView(executor, dataUri);
             case ZIP -> loadZip(executor, dataUri.uri());
             default -> throw new Exception("Unknown image type");

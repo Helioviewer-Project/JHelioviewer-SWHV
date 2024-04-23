@@ -18,6 +18,7 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
@@ -114,9 +115,12 @@ public final class RadioData extends AbstractTimelineLayer {
         @Override
         public RadioJ2KData call() throws Exception {
             APIRequest req = new APIRequest("ROB", APIRequest.CallistoID, date, date, APIRequest.CADENCE_ALL);
-            URI uri = NetFileCache.get(new URI(req.toFileRequest())).uri();
+            DataUri dataUri = NetFileCache.get(new URI(req.toFileRequest()));
+            if (dataUri.format() != DataUri.Format.JP2) // paranoia
+                throw new Exception("Invalid data format");
+
             DecodeExecutor executor = new DecodeExecutor();
-            return new RadioJ2KData(new J2KViewCallisto(executor, req, uri), req.startTime(), executor);
+            return new RadioJ2KData(new J2KViewCallisto(executor, req, dataUri), req.startTime(), executor);
         }
 
     }

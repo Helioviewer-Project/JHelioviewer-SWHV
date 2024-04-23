@@ -18,6 +18,7 @@ import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
@@ -73,8 +74,10 @@ public class J2KView extends BaseView {
         }
     }
 
-    public J2KView(DecodeExecutor _executor, APIRequest _request, URI _uri) throws Exception {
-        super(_executor, _request, _uri);
+    // private final DataUri dataUri; // tbd
+
+    public J2KView(DecodeExecutor _executor, APIRequest _request, DataUri _dataUri) throws Exception {
+        super(_executor, _request, _dataUri.uri());
         serial = incrementSerial();
 
         try {
