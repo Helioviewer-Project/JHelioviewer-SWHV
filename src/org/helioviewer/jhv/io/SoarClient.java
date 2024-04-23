@@ -49,25 +49,22 @@ public class SoarClient {
     }
 
     public static void submitLoad(@Nonnull List<DataItem> items) {
-        List<URI> fitsUris = new ArrayList<>();
-        List<URI> jp2Uris = new ArrayList<>();
+        List<URI> imageUris = new ArrayList<>();
         List<URI> cdfUris = new ArrayList<>();
 
         for (DataItem item : items) {
             try {
                 URI uri = new URI(loadTemplate.expand(UriTemplate.vars().set("data_item_id", item.id)));
                 switch (item.format) {
+                    case FITS, JP2 -> imageUris.add(uri);
                     case CDF -> cdfUris.add(uri);
-                    case FITS -> fitsUris.add(uri);
-                    case JP2 -> jp2Uris.add(uri);
                 }
             } catch (Exception e) {
                 Log.warn(e);
             }
         }
         Load.CDF.getAll(cdfUris);
-        Load.FITS.getAll(fitsUris);
-        Load.Image.getAll(jp2Uris);
+        Load.Image.getAll(imageUris);
     }
 
     static void submitTable(@Nonnull URI uri) {
