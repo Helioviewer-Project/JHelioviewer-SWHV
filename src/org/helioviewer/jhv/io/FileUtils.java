@@ -27,8 +27,11 @@ import org.helioviewer.jhv.JHVGlobals;
 
 import okio.Okio;
 import okio.BufferedSource;
+import org.apache.tika.Tika;
 
 public class FileUtils {
+
+    static final Tika tika = new Tika();
 
     public static InputStream getResource(String path) throws IOException {
         InputStream is = FileUtils.class.getResourceAsStream(path);
