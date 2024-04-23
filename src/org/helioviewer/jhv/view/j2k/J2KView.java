@@ -73,13 +73,9 @@ public class J2KView extends BaseView {
         }
     }
 
-    private final DataUri dataUri; // tbd
-
     public J2KView(DecodeExecutor _executor, APIRequest _request, DataUri _dataUri) throws Exception {
-        super(_executor, _request, _dataUri.uri());
+        super(_executor, _request, _dataUri);
         serial = incrementSerial();
-
-        dataUri = _dataUri;
 
         try {
             switch (dataUri.format()) {
