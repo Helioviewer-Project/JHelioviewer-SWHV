@@ -98,7 +98,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     }
 
     public void unload() {
-        if (view.getURI() == null)
+        if (view.getBaseName() == null)
             JHVFrame.getLayers().remove(this);
         if (worker != null) {
             worker.cancel(true);
@@ -367,8 +367,8 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         if (downloadTask != null)
             downloadTask.cancel(true);
         APIRequest req = view.getAPIRequest();
-        if (req != null && view.getURI() != null) // should not happen
-            downloadTask = DownloadLayer.submit(req, this, view.getURI());
+        if (req != null && view.getBaseName() != null) // should not happen
+            downloadTask = DownloadLayer.submit(req, this, view.getBaseName());
     }
 
     public void stopDownload() {

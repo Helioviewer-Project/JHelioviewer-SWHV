@@ -27,9 +27,8 @@ import com.google.common.util.concurrent.FutureCallback;
 public class DownloadLayer {
 
     @Nullable
-    public static Future<Void> submit(@Nonnull APIRequest req, @Nonnull ImageLayer layer, @Nonnull URI dst) {
-        String path = dst.getPath();
-        Path dstPath = Path.of(JHVDirectory.DOWNLOADS.getPath(), path.substring(Math.max(0, path.lastIndexOf('/'))));
+    public static Future<Void> submit(@Nonnull APIRequest req, @Nonnull ImageLayer layer, @Nonnull String baseName) {
+        Path dstPath = Path.of(JHVDirectory.DOWNLOADS.getPath(), baseName);
         return EventQueueCallbackExecutor.pool.submit(new LayerDownload(req, layer, dstPath), new Callback(layer, dstPath));
     }
 
