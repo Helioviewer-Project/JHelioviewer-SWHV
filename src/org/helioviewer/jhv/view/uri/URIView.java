@@ -22,7 +22,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 
 public class URIView extends BaseView {
 
-    private static final Cache<URI, ImageBuffer> decodeCache = Caffeine.newBuilder().softValues().build();
+    private static final Cache<DataUri, ImageBuffer> decodeCache = Caffeine.newBuilder().softValues().build();
 
     static void clearURICache() {
         decodeCache.invalidateAll();
@@ -32,9 +32,12 @@ public class URIView extends BaseView {
     private final String xml;
     private final Region imageRegion;
 
-    public URIView(DecodeExecutor _executor, DataUri dataUri) throws Exception {
-        super(_executor, null, dataUri.uri());
+    private final DataUri dataUri; // tbd
 
+    public URIView(DecodeExecutor _executor, DataUri _dataUri) throws Exception {
+        super(_executor, null, _dataUri.uri());
+
+        dataUri = _dataUri;
         reader = dataUri.format() == DataUri.Format.FITS ? new FITSImage() : new GenericImage();
 
         try {
@@ -51,7 +54,7 @@ public class URIView extends BaseView {
 
             imageRegion = m.roiToRegion(0, 0, m.getPixelWidth(), m.getPixelHeight(), 1, 1);
             metaData = new MetaData[]{m};
-            decodeCache.put(uri, image.buffer());
+            decodeCache.put(dataUri, image.buffer());
         } catch (Exception e) {
             throw new Exception(e.getMessage() + ": " + dataUri, e);
         }
@@ -59,7 +62,7 @@ public class URIView extends BaseView {
 
     @Override
     public void decode(Position viewpoint, double pixFactor, float factor) {
-        ImageBuffer imageBuffer = decodeCache.getIfPresent(uri);
+        ImageBuffer imageBuffer = decodeCache.getIfPresent(dataUri);
         if (imageBuffer == null) {
             executor.decode(new URIDecoder(uri, reader, mgn), new Callback(viewpoint));
         } else {
@@ -77,7 +80,7 @@ public class URIView extends BaseView {
 
         @Override
         public void onSuccess(ImageBuffer result) {
-            decodeCache.put(uri, result);
+            decodeCache.put(dataUri, result);
             sendDataToHandler(result, viewpoint);
         }
 
@@ -99,7 +102,7 @@ public class URIView extends BaseView {
 
     @Override
     public void abolish() {
-        decodeCache.invalidate(uri);
+        decodeCache.invalidate(dataUri);
     }
 
     @Override

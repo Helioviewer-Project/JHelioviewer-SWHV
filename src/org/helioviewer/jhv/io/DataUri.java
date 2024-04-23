@@ -37,7 +37,6 @@ public class DataUri {
         uri = _uri;
         format = _format;
         file = format == Format.JPIP ? null : Path.of(uri).toFile();
-
         baseName = uri.getPath().split(".+?/(?=[^/]+$)")[1];
     }
 
