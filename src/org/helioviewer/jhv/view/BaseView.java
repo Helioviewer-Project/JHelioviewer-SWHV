@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.view;
 
-import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nonnull;
@@ -35,8 +34,8 @@ public class BaseView implements View {
 
     @Nullable
     @Override
-    public URI getURI() {
-        return dataUri.uri();
+    public String getBaseName() {
+        return dataUri == null ? null : dataUri.baseName();
     }
 
     @Nullable

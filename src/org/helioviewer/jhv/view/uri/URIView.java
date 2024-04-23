@@ -34,7 +34,6 @@ public class URIView extends BaseView {
     public URIView(DecodeExecutor _executor, DataUri _dataUri) throws Exception {
         super(_executor, null, _dataUri);
 
-        dataUri = _dataUri;
         reader = dataUri.format() == DataUri.Format.FITS ? new FITSImage() : new GenericImage();
 
         try {

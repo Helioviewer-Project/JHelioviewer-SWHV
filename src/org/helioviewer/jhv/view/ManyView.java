@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.view;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -89,7 +88,7 @@ public class ManyView implements View {
 
     @Nullable
     @Override
-    public URI getURI() {
+    public String getBaseName() {
         return null;
     }
 
