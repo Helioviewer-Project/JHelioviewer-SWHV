@@ -42,7 +42,7 @@ public class NetFileCache {
                     sink.writeAll(nc.getSource());
                 }
                 File file = path.toFile();
-                return new DataUri(path.toUri(), uri, file, detect(file));
+                return new DataUri(uri, path.toUri(), file, detect(file));
             });
 
     public static DataUri get(@Nonnull URI uri) throws IOException {
