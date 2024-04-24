@@ -35,10 +35,10 @@ public class DataUri {
     private final File file;
     private final String baseName;
 
-    DataUri(URI cachedUri, URI originalUri, Format _format) {
+    DataUri(URI cachedUri, URI originalUri, File _file, Format _format) {
         uri = cachedUri;
         format = _format;
-        file = format == Format.JPIP ? null : Path.of(uri).toFile();
+        file = _file;
         baseName = FilenameUtils.getName(originalUri.toString());
     }
 
