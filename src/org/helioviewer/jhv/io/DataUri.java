@@ -35,7 +35,7 @@ public class DataUri {
     private final File file;
     private final String baseName;
 
-    DataUri(URI cachedUri, URI originalUri, File _file, Format _format) {
+    DataUri(URI originalUri, URI cachedUri, File _file, Format _format) {
         uri = cachedUri;
         format = _format;
         file = _file;
