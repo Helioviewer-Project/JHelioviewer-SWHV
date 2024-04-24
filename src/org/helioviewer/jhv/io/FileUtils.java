@@ -80,7 +80,9 @@ public class FileUtils {
                         // Make sure that we conserve the hierachy of files and folders inside the zip
                         Path relativePathInZip = root.relativize(filePath);
                         Path targetPath = targetDir.resolve(relativePathInZip.toString());
-                        Files.createDirectories(targetPath.getParent());
+                        Path parent = targetPath.getParent();
+                        if (parent != null)
+                            Files.createDirectories(parent);
                         // And extract the file
                         Files.copy(filePath, targetPath);
                         uriList.add(targetPath.toUri());
