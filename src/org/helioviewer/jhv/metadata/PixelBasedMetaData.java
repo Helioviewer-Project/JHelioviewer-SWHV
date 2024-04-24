@@ -15,6 +15,6 @@ public class PixelBasedMetaData extends BaseMetaData {
         displayName = _displayName;
     }
 
-    public static PixelBasedMetaData EMPTY = new PixelBasedMetaData(1, 1, "");
+    public static final PixelBasedMetaData EMPTY = new PixelBasedMetaData(1, 1, "");
 
 }
