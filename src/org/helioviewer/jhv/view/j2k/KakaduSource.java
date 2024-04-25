@@ -171,10 +171,12 @@ abstract class KakaduSource {
         }
     }
 
+    private static final String EMPTY_METAXML = "<meta/>";
+
     private static String xmlBox2String(Jp2_input_box xmlBox) throws KduException {
         int len = (int) xmlBox.Get_remaining_bytes();
         if (len <= 0)
-            return "<meta/>";
+            return EMPTY_METAXML;
         byte[] buf = new byte[len];
         xmlBox.Read(buf, len);
         return new String(buf, StandardCharsets.UTF_8).trim().replace("&", "&amp;");

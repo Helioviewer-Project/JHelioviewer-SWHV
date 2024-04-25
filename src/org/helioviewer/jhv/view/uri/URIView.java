@@ -41,7 +41,7 @@ public class URIView extends BaseView {
             URIImageReader.Image image = reader.readImage(dataUri.file());
             String readXml = image.xml();
             if (readXml == null) {
-                xml = "<meta/>";
+                xml = EMPTY_METAXML;
                 m = new PixelBasedMetaData(100, 100, dataUri.baseName());
             } else {
                 xml = readXml;

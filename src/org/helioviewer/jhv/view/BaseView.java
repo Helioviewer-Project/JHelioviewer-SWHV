@@ -18,6 +18,7 @@ import org.helioviewer.jhv.time.JHVTime;
 public class BaseView implements View {
 
     private static final AtomicBoolean complete = new AtomicBoolean(true);
+    protected static final String EMPTY_METAXML = "<meta/>";
 
     protected final DecodeExecutor executor;
     protected final APIRequest request;
@@ -138,7 +139,7 @@ public class BaseView implements View {
     @Nonnull
     @Override
     public String getXMLMetaData() {
-        return "<meta/>";
+        return EMPTY_METAXML;
     }
 
     @Override
