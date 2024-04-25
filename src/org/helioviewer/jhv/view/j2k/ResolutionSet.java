@@ -1,44 +1,46 @@
-package org.helioviewer.jhv.view.j2k.image;
+package org.helioviewer.jhv.view.j2k;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.helioviewer.jhv.view.j2k.image.SubImage;
 
 // A class describing the available resolution levels for a given image
 public class ResolutionSet {
 
     // The indices represent the number of discardLayers
-    private final ResolutionLevel[] resolutions;
+    private final Level[] resolutions;
     private final AtomicBoolean[] complete;
     private final int numLevels;
-    public final int numComps;
+    final int numComps;
 
-    public ResolutionSet(int _numLevels, int _numComps) {
+    ResolutionSet(int _numLevels, int _numComps) {
         numLevels = _numLevels;
         numComps = _numComps;
-        resolutions = new ResolutionLevel[numLevels];
+        resolutions = new Level[numLevels];
 
         complete = new AtomicBoolean[numLevels];
         for (int i = 0; i < numLevels; i++)
             complete[i] = new AtomicBoolean();
     }
 
-    public void setComplete(int level) {
+    void setComplete(int level) {
         for (int i = level; i < numLevels; i++)
             complete[i].set(true);
     }
 
-    public AtomicBoolean getComplete(int level) {
+    AtomicBoolean getComplete(int level) {
         return complete[Math.min(level, numLevels - 1)];
     }
 
-    public void addResolutionLevel(int discardLayer, int width, int height, double scaleX, double scaleY) {
-        resolutions[discardLayer] = new ResolutionLevel(discardLayer, width, height, scaleX, scaleY);
+    void addLevel(int discardLayer, int width, int height, double scaleX, double scaleY) {
+        resolutions[discardLayer] = new Level(discardLayer, width, height, scaleX, scaleY);
     }
 
-    public ResolutionLevel getResolutionLevel(int idx) {
+    Level getLevel(int idx) {
         return resolutions[idx];
     }
 
-    public ResolutionLevel getPreviousResolutionLevel(int w, int h) {
+    Level getPreviousLevel(int w, int h) {
         int idx = 0;
         for (int i = 0; i < numLevels; i++) {
             idx = i;
@@ -48,7 +50,7 @@ public class ResolutionSet {
         return resolutions[idx];
     }
 
-    public ResolutionLevel getNextResolutionLevel(int w, int h) {
+    Level getNextLevel(int w, int h) {
         for (int i = 1; i < numLevels; ++i) {
             if (resolutions[i].width < w || resolutions[i].height < h)
                 return resolutions[i - 1];
@@ -56,18 +58,18 @@ public class ResolutionSet {
         return resolutions[numLevels - 1];
     }
 
-    public static class ResolutionLevel {
+    public static class Level {
 
-        public final int level;
+        final int level;
 
         public final int width;
         public final int height;
-        public final SubImage subImage;
+        final SubImage subImage;
 
-        public final double factorX;
-        public final double factorY;
+        final double factorX;
+        final double factorY;
 
-        ResolutionLevel(int _level, int _width, int _height, double _factorX, double _factorY) {
+        Level(int _level, int _width, int _height, double _factorX, double _factorY) {
             level = _level;
             width = _width;
             height = _height;

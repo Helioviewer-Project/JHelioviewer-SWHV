@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 import kdu_jni.KduException;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.view.j2k.image.ResolutionSet;
 
 interface CompletionLevel {
 

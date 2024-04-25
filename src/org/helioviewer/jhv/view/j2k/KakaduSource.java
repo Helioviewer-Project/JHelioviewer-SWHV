@@ -22,7 +22,6 @@ import kdu_jni.Kdu_dims;
 import kdu_jni.Kdu_global;
 
 import org.helioviewer.jhv.math.MathUtils;
-import org.helioviewer.jhv.view.j2k.image.ResolutionSet;
 
 abstract class KakaduSource {
 
@@ -107,14 +106,14 @@ abstract class KakaduSource {
         stream.Get_dims(0, dims);
         Kdu_coords siz = dims.Access_size();
         int width0 = siz.Get_x(), height0 = siz.Get_y();
-        res.addResolutionLevel(0, width0, height0, 1, 1);
+        res.addLevel(0, width0, height0, 1, 1);
 
         for (int i = 1; i <= maxDWT; i++) {
             stream.Apply_input_restrictions(0, 0, i, 0, null, Kdu_global.KDU_WANT_CODESTREAM_COMPONENTS);
             stream.Get_dims(0, dims);
             siz = dims.Access_size();
             int width = siz.Get_x(), height = siz.Get_y();
-            res.addResolutionLevel(i, width, height, width0 / (double) width, height0 / (double) height);
+            res.addLevel(i, width, height, width0 / (double) width, height0 / (double) height);
         }
 
         stream.Destroy();

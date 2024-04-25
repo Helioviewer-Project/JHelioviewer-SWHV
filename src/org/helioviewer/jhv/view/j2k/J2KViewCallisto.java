@@ -9,7 +9,6 @@ import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.j2k.image.DecodeParams;
 import org.helioviewer.jhv.view.j2k.image.ReadParams;
-import org.helioviewer.jhv.view.j2k.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.jhv.view.j2k.image.SubImage;
 
 public class J2KViewCallisto extends J2KView {
@@ -26,7 +25,7 @@ public class J2KViewCallisto extends J2KView {
 
     @Override
     protected DecodeParams getDecodeParams(Position viewpoint, int frame, double pixFactor, float factor) {
-        ResolutionLevel res = getResolutionLevel(frame, 0);
+        ResolutionSet.Level res = getResolutionLevel(frame, 0);
         SubImage subImage = new SubImage(region.x, region.y, region.width, region.height, res.width, res.height);
         AtomicBoolean status = completionLevel.getFrameStatus(frame, res.level);
         return new DecodeParams(serial, frame, subImage, res.level, factor, status != null && status.get(), viewpoint);
