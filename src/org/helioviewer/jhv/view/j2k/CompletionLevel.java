@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 import kdu_jni.KduException;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.view.j2k.kakadu.KakaduSource;
 import org.helioviewer.jhv.view.j2k.image.ResolutionSet;
 
 interface CompletionLevel {
@@ -31,7 +30,7 @@ interface CompletionLevel {
         private final ResolutionSet[] resolutionSet;
         private final int maxFrame;
 
-        public Local(KakaduSource source, int _maxFrame) throws KduException {
+        Local(KakaduSource source, int _maxFrame) throws KduException {
             maxFrame = _maxFrame;
             resolutionSet = new ResolutionSet[maxFrame + 1];
             for (int i = 0; i <= maxFrame; ++i) {
@@ -77,7 +76,7 @@ interface CompletionLevel {
 
         private int partialUntil = 0;
 
-        public Remote(KakaduSource source, int _maxFrame) throws KduException {
+        Remote(KakaduSource source, int _maxFrame) throws KduException {
             maxFrame = _maxFrame;
             resolutionSet = new ResolutionSet[maxFrame + 1];
             resolutionSet[0] = source.getResolutionSet(0);

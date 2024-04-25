@@ -13,8 +13,8 @@ import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.ProxySettings;
 import org.helioviewer.jhv.metadata.AIAResponse;
+import org.helioviewer.jhv.view.j2k.KakaduMessageSystem;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
-import org.helioviewer.jhv.view.j2k.kakadu.KakaduMessageSystem;
 
 import nom.tam.fits.FitsFactory;
 
