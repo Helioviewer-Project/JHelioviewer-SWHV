@@ -11,9 +11,7 @@ import org.helioviewer.jhv.math.Vec2;
 
 class BaseMetaData implements MetaData {
 
-    protected static final Region defaultRegion = new Region(-0.5, -0.5, 1, 1);
-
-    protected Region region;
+    protected Region region = Region.DEFAULT;
     protected String displayName = "unknown";
     protected String unit = "";
     protected float[] physLUT;

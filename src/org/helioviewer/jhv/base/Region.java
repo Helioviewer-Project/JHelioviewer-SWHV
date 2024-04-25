@@ -2,6 +2,8 @@ package org.helioviewer.jhv.base;
 
 public class Region {
 
+    public static final Region DEFAULT = new Region(-0.5, -0.5, 1, 1);
+
     public final double width;
     public final double height;
 
