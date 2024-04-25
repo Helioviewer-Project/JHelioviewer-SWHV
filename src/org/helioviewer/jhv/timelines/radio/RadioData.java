@@ -27,7 +27,7 @@ import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis.YAxisPositiveIdentityScale;
-import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
+import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.j2k.J2KViewCallisto;
 import org.json.JSONObject;
@@ -97,7 +97,7 @@ public final class RadioData extends AbstractTimelineLayer {
         for (int i = 0; i < DAYS_IN_CACHE; i++) {
             long date = end - i * TimeUtils.DAY_IN_MILLIS;
             if (!downloading.contains(date) && cache.getIfPresent(date) == null) {
-                EventQueueCallbackExecutor.pool.submit(new RadioJPXDownload(date), new RadioJPXCallback(date));
+                EDTCallbackExecutor.pool.submit(new RadioJPXDownload(date), new RadioJPXCallback(date));
             }
         }
     }

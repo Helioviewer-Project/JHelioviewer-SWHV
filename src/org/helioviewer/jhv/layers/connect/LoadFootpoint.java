@@ -13,7 +13,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.NetClient;
-import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
+import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -29,7 +29,7 @@ public class LoadFootpoint {
     private static final DateTimeFormatter euroTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     public static void submit(@Nonnull URI uri, Receiver receiver) {
-        EventQueueCallbackExecutor.pool.submit(new Footpoint(uri), new Callback(receiver));
+        EDTCallbackExecutor.pool.submit(new Footpoint(uri), new Callback(receiver));
     }
 
     private static long parseTime(String s) {

@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class EventDispatchQueue {
+public class EDTQueue {
 
     // http://kotek.net/blog/swingutilities.invokeandwait_with_return_value
     public static <E> E invokeAndWait(Callable<E> r) throws InterruptedException, InvocationTargetException {

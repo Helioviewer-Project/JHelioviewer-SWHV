@@ -20,7 +20,7 @@ import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
+import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 
 import com.google.common.util.concurrent.FutureCallback;
 
@@ -79,7 +79,7 @@ public final class SWEKEventInformationDialog extends JDialog implements DataCol
 
         add(allTablePanel, allTablePanelConstraint);
 
-        EventQueueCallbackExecutor.pool.submit(new DatabaseCallable(event), new DatabaseCallback());
+        EDTCallbackExecutor.pool.submit(new DatabaseCallable(event), new DatabaseCallback());
     }
 
     private void initAllTablePanel() {

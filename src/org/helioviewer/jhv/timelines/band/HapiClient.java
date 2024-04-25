@@ -13,7 +13,7 @@ import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.io.UriTemplate;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.YAxis;
-import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
+import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -42,7 +42,7 @@ public class HapiClient {
         String endTime = TimeUtils.format(end);
 
         String query = template.expand(UriTemplate.vars().set("id", dataset).set("parameters", parameters).set("time.min", startTime).set("time.max", endTime));
-        EventQueueCallbackExecutor.pool.submit(new LoadHapi(query), new Callback(query, new HapiReceiver()));
+        EDTCallbackExecutor.pool.submit(new LoadHapi(query), new Callback(query, new HapiReceiver()));
     }
 
     private record LoadHapi(String query) implements Callable<DatesValues> {

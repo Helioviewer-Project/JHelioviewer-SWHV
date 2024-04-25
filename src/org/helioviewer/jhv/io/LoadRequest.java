@@ -9,8 +9,8 @@ import javax.annotation.Nonnull;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.threads.EventDispatchQueue;
-import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
+import org.helioviewer.jhv.threads.EDTCallbackExecutor;
+import org.helioviewer.jhv.threads.EDTQueue;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.band.BandDataProvider;
 import org.helioviewer.jhv.timelines.band.CDFReader;
@@ -22,15 +22,15 @@ import com.google.common.util.concurrent.FutureCallback;
 class LoadRequest {
 
     static void submit(@Nonnull URI uri) {
-        EventQueueCallbackExecutor.pool.submit(new LoadRequestURI(uri), new Callback());
+        EDTCallbackExecutor.pool.submit(new LoadRequestURI(uri), new Callback());
     }
 
     static void submit(@Nonnull String json) {
-        EventQueueCallbackExecutor.pool.submit(new LoadRequestString(json), new Callback());
+        EDTCallbackExecutor.pool.submit(new LoadRequestString(json), new Callback());
     }
 
     static void submitCDF(@Nonnull List<URI> uriList) {
-        EventQueueCallbackExecutor.pool.submit(new LoadRequestCDF(uriList), new CallbackCDF());
+        EDTCallbackExecutor.pool.submit(new LoadRequestCDF(uriList), new CallbackCDF());
         Timelines.dc.setStatus("Loading...");
     }
 
@@ -40,7 +40,7 @@ class LoadRequest {
             int len = ji.length();
             for (int i = 0; i < len; i++) {
                 APIRequest req = APIRequest.fromRequestJson(ji.getJSONObject(i));
-                ImageLayer layer = EventDispatchQueue.invokeAndWait(() -> ImageLayer.create(null));
+                ImageLayer layer = EDTQueue.invokeAndWait(() -> ImageLayer.create(null));
                 LoadLayer.submit(layer, req);
             }
         }

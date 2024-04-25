@@ -18,7 +18,7 @@ import org.helioviewer.jhv.view.ManyView;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.j2k.J2KView;
 import org.helioviewer.jhv.view.uri.URIView;
-import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
+import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -29,11 +29,11 @@ import com.google.common.util.concurrent.FutureCallback;
 public class LoadLayer {
 
     public static Future<View> submit(@Nonnull ImageLayer layer, @Nonnull APIRequest req) {
-        return EventQueueCallbackExecutor.pool.submit(new LoadRemote(layer, req), new Callback(layer));
+        return EDTCallbackExecutor.pool.submit(new LoadRemote(layer, req), new Callback(layer));
     }
 
     public static void submit(@Nonnull ImageLayer layer, @Nonnull List<URI> uriList) {
-        EventQueueCallbackExecutor.pool.submit(new LoadURIImage(layer, uriList), new Callback(layer));
+        EDTCallbackExecutor.pool.submit(new LoadURIImage(layer, uriList), new Callback(layer));
     }
 
     private record LoadRemote(ImageLayer layer, APIRequest req) implements Callable<View> {

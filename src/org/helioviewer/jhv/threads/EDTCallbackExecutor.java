@@ -13,9 +13,9 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
-public class EventQueueCallbackExecutor extends ForwardingListeningExecutorService {
+public class EDTCallbackExecutor extends ForwardingListeningExecutorService {
 
-    public static final EventQueueCallbackExecutor pool = new EventQueueCallbackExecutor(MoreExecutors.listeningDecorator(JHVExecutor.cachedPool));
+    public static final EDTCallbackExecutor pool = new EDTCallbackExecutor(MoreExecutors.listeningDecorator(JHVExecutor.cachedPool));
 
     private static class EventQueueExecutor implements Executor {
         @Override
@@ -28,7 +28,7 @@ public class EventQueueCallbackExecutor extends ForwardingListeningExecutorServi
 
     private final ListeningExecutorService delegate;
 
-    public EventQueueCallbackExecutor(@Nonnull ListeningExecutorService _delegate) {
+    public EDTCallbackExecutor(@Nonnull ListeningExecutorService _delegate) {
         delegate = _delegate;
     }
 

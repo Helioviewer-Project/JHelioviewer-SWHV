@@ -22,7 +22,7 @@ import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.plugins.PluginManager;
-import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
+import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
@@ -179,7 +179,7 @@ public class State {
         boolean refresh = data.optBoolean("refresh", JHVFrame.getToolBar().getRefreshButton().isSelected());
         boolean play = data.optBoolean("play", false);
 
-        EventQueueCallbackExecutor.pool.submit(new WaitLoad(newLayers.keySet()), new Callback(newLayers, masterLayer, time, tracking, refresh, play));
+        EDTCallbackExecutor.pool.submit(new WaitLoad(newLayers.keySet()), new Callback(newLayers, masterLayer, time, tracking, refresh, play));
     }
 
     private record WaitLoad(Set<ImageLayer> newLayers) implements Callable<Void> {
