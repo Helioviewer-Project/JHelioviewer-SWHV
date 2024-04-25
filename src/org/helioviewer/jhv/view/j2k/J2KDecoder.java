@@ -44,7 +44,7 @@ record J2KDecoder(J2KView view, DecodeParams params, boolean mgn) implements Cal
     public ImageBuffer call() throws Exception {
         SubImage subImage = params.subImage;
         int frame = params.frame;
-        int numComponents = view.getNumComponents(frame);
+        int numComponents = view.numComponents(frame);
         Kdu_region_compositor compositor = createCompositor(view, params.factor < 1 ? qualityLow : qualityHigh);
 
         Kdu_dims empty = new Kdu_dims();
@@ -134,7 +134,7 @@ record J2KDecoder(J2KView view, DecodeParams params, boolean mgn) implements Cal
 
     private static Kdu_region_compositor createCompositor(J2KView j2k, Kdu_quality_limiter quality) throws Exception {
         Kdu_region_compositor krc = new Kdu_region_compositor();
-        krc.Create(j2k.getSource().getJpxSource());
+        krc.Create(j2k.source().getJpxSource());
         krc.Set_surface_initialization_mode(false);
         krc.Set_quality_limiting(quality, -1, -1);
         krc.Set_thread_env(localThread.get(), null);

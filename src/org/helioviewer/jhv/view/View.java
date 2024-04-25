@@ -46,7 +46,7 @@ public interface View {
     boolean isComplete();
 
     @Nullable
-    AtomicBoolean getFrameCacheStatus(int frame);
+    AtomicBoolean getFrameCompletion(int frame);
 
     JHVTime getFrameTime(int frame);
 

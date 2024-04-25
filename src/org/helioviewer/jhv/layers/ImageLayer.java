@@ -358,7 +358,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     }
 
     public boolean isLoadedForState() {
-        return worker == null && view.getFrameCacheStatus(view.getMaximumFrameNumber()) != null;
+        return worker == null && view.getFrameCompletion(view.getMaximumFrameNumber()) != null;
     }
 
     private Future<?> downloadTask;

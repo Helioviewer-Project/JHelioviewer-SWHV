@@ -130,9 +130,9 @@ public class ManyView implements View {
 
     @Nullable
     @Override
-    public AtomicBoolean getFrameCacheStatus(int frame) {
+    public AtomicBoolean getFrameCompletion(int frame) {
         FrameInfo frameInfo = frameMap.indexedValue(frame);
-        return frameInfo.view.getFrameCacheStatus(frameInfo.idxView);
+        return frameInfo.view.getFrameCompletion(frameInfo.idxView);
     }
 
     @Override

@@ -7,7 +7,6 @@ import kdu_jni.KduException;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.UITimer;
-import org.helioviewer.jhv.view.j2k.cache.CacheStatus;
 import org.helioviewer.jhv.view.j2k.image.ReadParams;
 import org.helioviewer.jhv.view.j2k.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.jhv.view.j2k.jpip.DatabinMap;
@@ -119,8 +118,8 @@ class J2KReader implements Runnable {
             }
 
             J2KView view = params.view;
-            JPIPCache cache = view.getJPIPCache();
-            CacheStatus cacheStatus = view.getCacheStatus();
+            JPIPCache cache = view.jpipCache();
+            CompletionLevel completionLevel = view.completionLevel();
             int numFrames = view.getMaximumFrameNumber() + 1;
 
             int frame = params.decodeParams.frame;
@@ -150,7 +149,7 @@ class J2KReader implements Runnable {
                 } else {
                     stepQuerys = createMultiQuery(fSiz, numFrames);
 
-                    int partial = cacheStatus.getPartialUntil();
+                    int partial = completionLevel.getPartialUntil();
                     currentStep = partial < numFrames - 1 ? partial : frame;
                 }
 
@@ -189,14 +188,14 @@ class J2KReader implements Runnable {
                         completeSteps++;
                         stepQuerys[currentStep] = null;
 
-                        cacheStatus.setFrameComplete(view.getSource(), currentStep, level); // tell the cache status
+                        completionLevel.setFrameComplete(view.source(), currentStep, level); // tell the completion level
                         if (singleFrame)
                             view.signalDecoderFromReader(params); // refresh current image
                     } else {
-                        cacheStatus.setFramePartial(view.getSource(), currentStep); // tell the cache status
+                        completionLevel.setFramePartial(view.source(), currentStep); // tell the completion level
                     }
 
-                    UITimer.cacheStatusChanged();
+                    UITimer.completionChanged();
 
                     // select next query based on strategy
                     if (!singleFrame)
@@ -210,7 +209,7 @@ class J2KReader implements Runnable {
                 view.setDownloading(false);
 
                 // suicide if fully done
-                if (cacheStatus.isComplete(0)) {
+                if (completionLevel.isComplete(0)) {
                     try {
                         socket.close();
                     } catch (IOException ignore) {
@@ -218,7 +217,7 @@ class J2KReader implements Runnable {
                     return;
                 }
                 // if single frame & not interrupted & incomplete -> signal again to go on reading
-                if (singleFrame && !stopReading && !cacheStatus.isComplete(level)) {
+                if (singleFrame && !stopReading && !completionLevel.isComplete(level)) {
                     params.priority = false;
                     readerSignal.signal(params);
                 }
