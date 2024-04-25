@@ -29,7 +29,6 @@ import org.helioviewer.jhv.view.DecodeCallback;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.j2k.image.DecodeParams;
 import org.helioviewer.jhv.view.j2k.image.ReadParams;
-import org.helioviewer.jhv.view.j2k.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.jhv.view.j2k.image.SubImage;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCache;
 
@@ -257,14 +256,14 @@ public class J2KView extends BaseView {
     }
 
     protected DecodeParams getDecodeParams(Position viewpoint, int frame, double pixFactor, float factor) {
-        ResolutionLevel res;
+        ResolutionSet.Level res;
         if (Movie.isRecording()) { // all bets are off
-            res = completionLevel.getResolutionSet(frame).getResolutionLevel(0);
+            res = completionLevel.getResolutionSet(frame).getLevel(0);
             factor = 1;
         } else {
             MetaData m = metaData[frame];
             int reqHeight = (int) (m.getPhysicalRegion().height * pixFactor + .5);
-            res = completionLevel.getResolutionSet(frame).getNextResolutionLevel(reqHeight, reqHeight);
+            res = completionLevel.getResolutionSet(frame).getNextLevel(reqHeight, reqHeight);
         }
 
         AtomicBoolean status = completionLevel.getFrameStatus(frame, res.level); // before signalling to reader
@@ -339,7 +338,7 @@ public class J2KView extends BaseView {
         int frame = decodeParams.frame;
         MetaData m = metaData[frame];
         SubImage roi = decodeParams.subImage;
-        ResolutionLevel resolution = getResolutionLevel(frame, decodeParams.level);
+        ResolutionSet.Level resolution = getResolutionLevel(frame, decodeParams.level);
         Region r = m.roiToRegion(roi.x, roi.y, roi.w, roi.h, resolution.factorX, resolution.factorY);
         ImageData data = new ImageData(imageBuffer, m, r, decodeParams.viewpoint);
 
@@ -366,8 +365,8 @@ public class J2KView extends BaseView {
         return xmlMetaData[targetFrame];
     }
 
-    public ResolutionLevel getResolutionLevel(int frame, int level) {
-        return completionLevel.getResolutionSet(frame).getResolutionLevel(level);
+    public ResolutionSet.Level getResolutionLevel(int frame, int level) {
+        return completionLevel.getResolutionSet(frame).getLevel(level);
     }
 
     int numComponents(int frame) {

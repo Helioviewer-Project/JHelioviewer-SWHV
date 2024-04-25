@@ -8,7 +8,6 @@ import kdu_jni.KduException;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.view.j2k.image.ReadParams;
-import org.helioviewer.jhv.view.j2k.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.jhv.view.j2k.jpip.DatabinMap;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCache;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
@@ -125,9 +124,9 @@ class J2KReader implements Runnable {
             int frame = params.decodeParams.frame;
             int level = params.decodeParams.level;
 
-            ResolutionLevel resolution = view.getResolutionLevel(frame, level);
-            int width = resolution.width;
-            int height = resolution.height;
+            ResolutionSet.Level resLevel = view.getResolutionLevel(frame, level);
+            int width = resLevel.width;
+            int height = resLevel.height;
 
             view.setDownloading(true);
 

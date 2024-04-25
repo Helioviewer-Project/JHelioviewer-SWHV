@@ -17,7 +17,7 @@ import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.j2k.J2KViewCallisto;
-import org.helioviewer.jhv.view.j2k.image.ResolutionSet;
+import org.helioviewer.jhv.view.j2k.ResolutionSet;
 
 class RadioJ2KData implements ImageDataHandler {
 
@@ -37,7 +37,7 @@ class RadioJ2KData implements ImageDataHandler {
 
     RadioJ2KData(J2KViewCallisto _view, long start, DecodeExecutor _executor) throws Exception {
         try {
-            ResolutionSet.ResolutionLevel resLevel = _view.getResolutionLevel(0, 0);
+            ResolutionSet.Level resLevel = _view.getResolutionLevel(0, 0);
             j2kWidth = resLevel.width;
             j2kHeight = resLevel.height;
 
