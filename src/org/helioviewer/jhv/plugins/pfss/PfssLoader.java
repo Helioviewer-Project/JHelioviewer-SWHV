@@ -10,7 +10,7 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.MathUtils;
-import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
+import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.helioviewer.jhv.time.JHVTime;
 
 import com.google.common.util.concurrent.FutureCallback;
@@ -26,7 +26,7 @@ class PfssLoader {
     }
 
     static void submit(long time, URI uri) {
-        EventQueueCallbackExecutor.pool.submit(new DataLoader(time, uri), new Callback(uri));
+        EDTCallbackExecutor.pool.submit(new DataLoader(time, uri), new Callback(uri));
         PfssPlugin.downloads++;
     }
 

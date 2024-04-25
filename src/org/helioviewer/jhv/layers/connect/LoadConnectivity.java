@@ -14,7 +14,7 @@ import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.math.Vec3;
-import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
+import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -43,7 +43,7 @@ public class LoadConnectivity {
     }
 
     public static void submit(@Nonnull URI uri, Receiver receiver) {
-        EventQueueCallbackExecutor.pool.submit(new ConnectivityLoad(uri), new Callback(receiver));
+        EDTCallbackExecutor.pool.submit(new ConnectivityLoad(uri), new Callback(receiver));
     }
 
     private record ConnectivityLoad(URI uri) implements Callable<Connectivity> {

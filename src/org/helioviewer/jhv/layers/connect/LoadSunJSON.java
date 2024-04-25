@@ -12,7 +12,7 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
+import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.json.JSONObject;
 
 import com.google.common.util.concurrent.FutureCallback;
@@ -26,13 +26,13 @@ public class LoadSunJSON {
     public static void submit(@Nonnull List<URI> uriList) {
         Receiver receiver = Layers.getConnectionLayer();
         if (receiver != null) // ConnectionLayer() can be null in current releases
-            EventQueueCallbackExecutor.pool.submit(new LoadSunJSONURI(uriList), new Callback(receiver));
+            EDTCallbackExecutor.pool.submit(new LoadSunJSONURI(uriList), new Callback(receiver));
     }
 
     public static void submit(@Nonnull String json) {
         Receiver receiver = Layers.getConnectionLayer();
         if (receiver != null) // ConnectionLayer() can be null in current releases
-            EventQueueCallbackExecutor.pool.submit(new LoadSunJSONString(json), new Callback(receiver));
+            EDTCallbackExecutor.pool.submit(new LoadSunJSONString(json), new Callback(receiver));
     }
 
     private record LoadSunJSONURI(List<URI> uriList) implements Callable<List<SunJSON.GeometryCollection>> {

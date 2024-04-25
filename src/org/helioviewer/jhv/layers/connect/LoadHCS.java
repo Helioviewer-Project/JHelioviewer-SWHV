@@ -13,7 +13,7 @@ import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.math.Vec3;
-import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
+import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 
 import com.google.common.util.concurrent.FutureCallback;
 
@@ -24,7 +24,7 @@ public class LoadHCS {
     }
 
     public static void submit(@Nonnull URI uri, Receiver receiver) {
-        EventQueueCallbackExecutor.pool.submit(new HCS(uri), new Callback(receiver));
+        EDTCallbackExecutor.pool.submit(new HCS(uri), new Callback(receiver));
     }
 
     private record HCS(URI uri) implements Callable<OrthoScaleList> {

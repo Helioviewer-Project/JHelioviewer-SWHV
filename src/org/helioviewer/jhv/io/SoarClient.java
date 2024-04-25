@@ -9,7 +9,7 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.Message;
-import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
+import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -33,7 +33,7 @@ public class SoarClient {
     }
 
     private static void doDataSearch(@Nonnull ReceiverItems receiver, String adql) {
-        EventQueueCallbackExecutor.pool.submit(new QueryItems(adql), new CallbackItems(receiver));
+        EDTCallbackExecutor.pool.submit(new QueryItems(adql), new CallbackItems(receiver));
     }
 
     public static void submitSearchTime(@Nonnull ReceiverItems receiver, @Nonnull List<String> descriptors, @Nonnull String level, long start, long end) {
@@ -45,7 +45,7 @@ public class SoarClient {
     }
 
     public static void submitGetSoops(@Nonnull ReceiverSoops receiver) {
-        EventQueueCallbackExecutor.pool.submit(new QuerySoops("SELECT DISTINCT soop_name FROM soop ORDER BY soop_name"), new CallbackSoops(receiver));
+        EDTCallbackExecutor.pool.submit(new QuerySoops("SELECT DISTINCT soop_name FROM soop ORDER BY soop_name"), new CallbackSoops(receiver));
     }
 
     public static void submitLoad(@Nonnull List<DataItem> items) {
@@ -68,7 +68,7 @@ public class SoarClient {
     }
 
     static void submitTable(@Nonnull URI uri) {
-        EventQueueCallbackExecutor.pool.submit(new QueryTable(uri), new CallbackTable());
+        EDTCallbackExecutor.pool.submit(new QueryTable(uri), new CallbackTable());
     }
 
     private static String adqlSearchTime(List<String> descriptors, String level, long start, long end) {

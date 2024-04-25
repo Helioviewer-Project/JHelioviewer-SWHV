@@ -152,6 +152,7 @@ abstract class KakaduSource {
     }
 
     private static final long[] xmlFilter = {Kdu_global.jp2_xml_4cc};
+    private static final String EMPTY_METAXML = "<meta/>";
 
     void extractMetaData(String[] xmlMetaData) throws KduException {
         Jpx_meta_manager metaManager = jpxSrc.Access_meta_manager();
@@ -169,8 +170,6 @@ abstract class KakaduSource {
             i++;
         }
     }
-
-    private static final String EMPTY_METAXML = "<meta/>";
 
     private static String xmlBox2String(Jp2_input_box xmlBox) throws KduException {
         int len = (int) xmlBox.Get_remaining_bytes();

@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.io.JSONUtils;
-import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
+import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.TimelineSettings;
@@ -25,18 +25,18 @@ public class BandDataProvider {
     private static final ArrayListMultimap<Band, Future<BandResponse>> workerMap = ArrayListMultimap.create();
 
     public static void loadBandTypes() {
-        EventQueueCallbackExecutor.pool.submit(new BandTypeDownload(), new BandTypeDownloadCallback());
+        EDTCallbackExecutor.pool.submit(new BandTypeDownload(), new BandTypeDownloadCallback());
     }
 
     public static void loadBand(JSONObject jo) {
-        EventQueueCallbackExecutor.pool.submit(new BandLoad(jo), new BandLoadCallback());
+        EDTCallbackExecutor.pool.submit(new BandLoad(jo), new BandLoadCallback());
     }
 
     static void addDownloads(Band band, List<Interval> intervals) {
         if ("".equals(band.getBandType().getBaseURL()))
             return;
         for (Interval interval : intervals) {
-            Future<BandResponse> worker = EventQueueCallbackExecutor.pool.submit(
+            Future<BandResponse> worker = EDTCallbackExecutor.pool.submit(
                     new BandDownload(band, interval.start, interval.end), new BandDownloadCallback(band));
             workerMap.put(band, worker);
         }

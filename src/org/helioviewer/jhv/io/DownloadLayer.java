@@ -15,7 +15,7 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.threads.EventQueueCallbackExecutor;
+import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 
 import okio.Buffer;
 import okio.Okio;
@@ -29,7 +29,7 @@ public class DownloadLayer {
     @Nullable
     public static Future<Void> submit(@Nonnull APIRequest req, @Nonnull ImageLayer layer, @Nonnull String baseName) {
         Path dstPath = Path.of(JHVDirectory.DOWNLOADS.getPath(), baseName);
-        return EventQueueCallbackExecutor.pool.submit(new LayerDownload(req, layer, dstPath), new Callback(layer, dstPath));
+        return EDTCallbackExecutor.pool.submit(new LayerDownload(req, layer, dstPath), new Callback(layer, dstPath));
     }
 
     private static final int BUFSIZ = 1024 * 1024;
