@@ -10,7 +10,6 @@ public class NullMetaData extends BaseMetaData {
 
         pixelW = 1024;
         pixelH = 1024;
-        region = defaultRegion;
     }
 
 }
