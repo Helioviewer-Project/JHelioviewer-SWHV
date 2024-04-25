@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.j2k.kakadu;
+package org.helioviewer.jhv.view.j2k;
 
 import kdu_jni.KduException;
 import kdu_jni.Kdu_global;

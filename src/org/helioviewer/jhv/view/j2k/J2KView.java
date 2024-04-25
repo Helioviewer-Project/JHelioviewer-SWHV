@@ -32,7 +32,6 @@ import org.helioviewer.jhv.view.j2k.image.ReadParams;
 import org.helioviewer.jhv.view.j2k.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.jhv.view.j2k.image.SubImage;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCache;
-import org.helioviewer.jhv.view.j2k.kakadu.KakaduSource;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -79,15 +78,16 @@ public class J2KView extends BaseView {
                 case JPIP -> {
                     jpipCache = new JPIPCache();
                     reader = new J2KReader(dataUri.uri(), jpipCache);
+                    source = new KakaduSource.Remote(jpipCache);
                 }
                 case JP2, JPX -> {
                     jpipCache = null;
                     reader = null;
+                    source = new KakaduSource.Local(dataUri.file());
                 }
                 default -> throw new Exception("Unknown image type");
             }
 
-            source = new KakaduSource(jpipCache, dataUri.file());
             source.open();
 
             maxFrame = source.getNumberLayers() - 1;

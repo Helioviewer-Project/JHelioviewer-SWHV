@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.j2k.kakadu;
+package org.helioviewer.jhv.view.j2k;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -24,43 +24,61 @@ import kdu_jni.Kdu_global;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.view.j2k.image.ResolutionSet;
 
-public class KakaduSource {
+abstract class KakaduSource {
 
     private final Jp2_threadsafe_family_src jp2Src = new Jp2_threadsafe_family_src();
     private final Jpx_source jpxSrc = new Jpx_source();
-    private final Kdu_cache cache;
-    private final String path;
 
-    public KakaduSource(Kdu_cache _cache, File file) {
-        cache = _cache;
-        path = file == null ? null : file.toString();
-    }
+    static class Local extends KakaduSource {
 
-    public Jpx_source getJpxSource() {
-        return jpxSrc;
-    }
+        private final String path;
 
-    public void open() throws Exception {
-        if (cache == null) { // local
-            jp2Src.Open(path, true);
-        } else {
-            jp2Src.Open(cache);
+        Local(File file) {
+            path = file.toString();
         }
-        jpxSrc.Open(jp2Src, false);
+
+        @Override
+        void open() throws Exception {
+            super.jp2Src.Open(path, true);
+            super.jpxSrc.Open(super.jp2Src, false);
+        }
+
     }
 
-    public void close() throws KduException {
+    static class Remote extends KakaduSource {
+
+        private final Kdu_cache cache;
+
+        Remote(Kdu_cache _cache) {
+            cache = _cache;
+        }
+
+        @Override
+        void open() throws Exception {
+            super.jp2Src.Open(cache);
+            super.jpxSrc.Open(super.jp2Src, false);
+        }
+
+    }
+
+    abstract void open() throws Exception;
+
+    void close() throws KduException {
         jpxSrc.Close();
         jp2Src.Close();
     }
 
-    public int getNumberLayers() throws KduException {
+    Jpx_source jpxSource() {
+        return jpxSrc;
+    }
+
+    int getNumberLayers() throws KduException {
         int[] temp = new int[1];
         jpxSrc.Count_compositing_layers(temp);
         return temp[0];
     }
 
-    public ResolutionSet getResolutionSet(int frame) throws KduException {
+    ResolutionSet getResolutionSet(int frame) throws KduException {
         Jpx_codestream_source xstream = jpxSrc.Access_codestream(frame);
         Jpx_input_box inputBox = xstream.Open_stream();
         Kdu_codestream stream = new Kdu_codestream();
@@ -107,7 +125,7 @@ public class KakaduSource {
     }
 
     @Nullable
-    public int[] getLUT() throws KduException {
+    int[] getLUT() throws KduException {
         Jpx_codestream_source xstream = jpxSrc.Access_codestream(0);
         if (!xstream.Exists()) {
             throw new KduException(">> stream does not exist");
@@ -136,7 +154,7 @@ public class KakaduSource {
 
     private static final long[] xmlFilter = {Kdu_global.jp2_xml_4cc};
 
-    public void extractMetaData(String[] xmlMetaData) throws KduException {
+    void extractMetaData(String[] xmlMetaData) throws KduException {
         Jpx_meta_manager metaManager = jpxSrc.Access_meta_manager();
         Jpx_metanode node = new Jpx_metanode();
         int i = 0;
