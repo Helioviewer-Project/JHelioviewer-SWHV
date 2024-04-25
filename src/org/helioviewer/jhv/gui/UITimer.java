@@ -22,18 +22,18 @@ public class UITimer {
             lazyComponents.add(component);
     }
 
-    private static volatile boolean cacheChanged = false;
+    private static volatile boolean completionChanged = false;
 
     // accessed from J2KReader threads
-    public static void cacheStatusChanged() {
-        cacheChanged = true;
+    public static void completionChanged() {
+        completionChanged = true;
     }
 
     private static void action() {
         BusyIndicator.incrementAngle();
 
-        if (cacheChanged) {
-            cacheChanged = false;
+        if (completionChanged) {
+            completionChanged = false;
             MoviePanel.getTimeSlider().repaint();
         }
 

@@ -145,9 +145,9 @@ public final class TimeSlider extends JSlider implements LazyComponent, MouseLis
     // All functions for size calculations stay the same.
     private static class TimeSliderUI extends BasicSliderUI {
 
-        private static final Color completeCachedColor = UIManager.getColor("Table.selectionBackground");
-        private static final Color partialCachedColor = completeCachedColor.darker();
-        private static final Color notCachedColor = UIManager.getColor("ProgressBar.background");
+        private static final Color completeColor = UIManager.getColor("Table.selectionBackground");
+        private static final Color partialColor = completeColor.darker();
+        private static final Color emptyColor = UIManager.getColor("ProgressBar.background");
 
         private static final BasicStroke thinStroke = new BasicStroke(1);
         private static final BasicStroke thickStroke = new BasicStroke(4);
@@ -177,10 +177,10 @@ public final class TimeSlider extends JSlider implements LazyComponent, MouseLis
             View view;
             ImageLayer layer = Layers.getActiveImageLayer();
             if (layer == null) {
-                g.setColor(notCachedColor);
+                g.setColor(emptyColor);
                 g.drawLine(trackRect.x, y, trackRect.x + trackRect.width, y);
             } else if ((view = layer.getView()).isComplete()) {
-                g.setColor(completeCachedColor);
+                g.setColor(completeColor);
                 g.drawLine(trackRect.x, y, trackRect.x + trackRect.width, y);
             } else {
                 int len = view.getMaximumFrameNumber();
@@ -190,8 +190,8 @@ public final class TimeSlider extends JSlider implements LazyComponent, MouseLis
                     if (end == begin)
                         end++;
 
-                    AtomicBoolean status = view.getFrameCacheStatus(i);
-                    g.setColor(status == null ? notCachedColor : (status.get() ? completeCachedColor : partialCachedColor));
+                    AtomicBoolean status = view.getFrameCompletion(i);
+                    g.setColor(status == null ? emptyColor : (status.get() ? completeColor : partialColor));
                     g.drawLine(trackRect.x + begin, y, trackRect.x + end, y);
                 }
             }

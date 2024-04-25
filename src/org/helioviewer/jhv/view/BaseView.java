@@ -17,7 +17,7 @@ import org.helioviewer.jhv.time.JHVTime;
 
 public class BaseView implements View {
 
-    private static final AtomicBoolean fullCache = new AtomicBoolean(true);
+    private static final AtomicBoolean complete = new AtomicBoolean(true);
 
     protected final DecodeExecutor executor;
     protected final APIRequest request;
@@ -50,8 +50,8 @@ public class BaseView implements View {
     }
 
     @Override
-    public AtomicBoolean getFrameCacheStatus(int frame) {
-        return fullCache;
+    public AtomicBoolean getFrameCompletion(int frame) {
+        return complete;
     }
 
     @Override

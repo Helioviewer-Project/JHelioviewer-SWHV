@@ -27,9 +27,6 @@ import org.helioviewer.jhv.time.TimeMap;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.DecodeCallback;
 import org.helioviewer.jhv.view.DecodeExecutor;
-import org.helioviewer.jhv.view.j2k.cache.CacheStatus;
-import org.helioviewer.jhv.view.j2k.cache.CacheStatusLocal;
-import org.helioviewer.jhv.view.j2k.cache.CacheStatusRemote;
 import org.helioviewer.jhv.view.j2k.image.DecodeParams;
 import org.helioviewer.jhv.view.j2k.image.ReadParams;
 import org.helioviewer.jhv.view.j2k.image.ResolutionSet.ResolutionLevel;
@@ -60,7 +57,7 @@ public class J2KView extends BaseView {
     private final JPIPCache jpipCache;
 
     protected final int serial;
-    protected final CacheStatus cacheStatus;
+    protected final CompletionLevel completionLevel;
     protected final J2KReader reader;
 
     private static int incrementSerial() {
@@ -126,10 +123,10 @@ public class J2KView extends BaseView {
                 builtinLUT = new LUT(getName() + " built-in", lut);
 
             if (jpipCache == null) { // local
-                cacheStatus = new CacheStatusLocal(source, maxFrame);
+                completionLevel = new CompletionLevel.Local(source, maxFrame);
                 source.close(); // close asap
             } else {
-                cacheStatus = new CacheStatusRemote(source, maxFrame);
+                completionLevel = new CompletionLevel.Remote(source, maxFrame);
                 reader.start();
             }
 
@@ -216,7 +213,7 @@ public class J2KView extends BaseView {
     public boolean setNearestFrame(JHVTime time) {
         int frame = frameMap.nearestValue(time);
         if (frame != targetFrame) {
-            if (frame > cacheStatus.getPartialUntil())
+            if (frame > completionLevel.getPartialUntil())
                 return false;
             targetFrame = frame;
         }
@@ -262,15 +259,15 @@ public class J2KView extends BaseView {
     protected DecodeParams getDecodeParams(Position viewpoint, int frame, double pixFactor, float factor) {
         ResolutionLevel res;
         if (Movie.isRecording()) { // all bets are off
-            res = cacheStatus.getResolutionSet(frame).getResolutionLevel(0);
+            res = completionLevel.getResolutionSet(frame).getResolutionLevel(0);
             factor = 1;
         } else {
             MetaData m = metaData[frame];
             int reqHeight = (int) (m.getPhysicalRegion().height * pixFactor + .5);
-            res = cacheStatus.getResolutionSet(frame).getNextResolutionLevel(reqHeight, reqHeight);
+            res = completionLevel.getResolutionSet(frame).getNextResolutionLevel(reqHeight, reqHeight);
         }
 
-        AtomicBoolean status = cacheStatus.getFrameStatus(frame, res.level); // before signalling to reader
+        AtomicBoolean status = completionLevel.getFrameStatus(frame, res.level); // before signalling to reader
         return new DecodeParams(serial, frame, res.subImage, res.level, factor, status != null && status.get(), viewpoint);
     }
 
@@ -354,13 +351,13 @@ public class J2KView extends BaseView {
 
     @Nullable
     @Override
-    public AtomicBoolean getFrameCacheStatus(int frame) {
-        return cacheStatus.getFrameStatus(frame, currentLevel);
+    public AtomicBoolean getFrameCompletion(int frame) {
+        return completionLevel.getFrameStatus(frame, currentLevel);
     }
 
     @Override
     public boolean isComplete() {
-        return cacheStatus.isComplete(currentLevel);
+        return completionLevel.isComplete(currentLevel);
     }
 
     @Nonnull
@@ -370,26 +367,26 @@ public class J2KView extends BaseView {
     }
 
     public ResolutionLevel getResolutionLevel(int frame, int level) {
-        return cacheStatus.getResolutionSet(frame).getResolutionLevel(level);
+        return completionLevel.getResolutionSet(frame).getResolutionLevel(level);
     }
 
-    int getNumComponents(int frame) {
-        return cacheStatus.getResolutionSet(frame).numComps;
+    int numComponents(int frame) {
+        return completionLevel.getResolutionSet(frame).numComps;
     }
 
-    KakaduSource getSource() throws Exception {
+    KakaduSource source() throws Exception {
         if (jpipCache == null) { // local, reopen
             source.open();
         }
         return source;
     }
 
-    JPIPCache getJPIPCache() {
+    JPIPCache jpipCache() {
         return jpipCache;
     }
 
-    CacheStatus getCacheStatus() {
-        return cacheStatus;
+    CompletionLevel completionLevel() {
+        return completionLevel;
     }
 
 }

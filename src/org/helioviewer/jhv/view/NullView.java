@@ -40,7 +40,7 @@ public class NullView implements View {
     }
 
     private static final String emptyXML = "<xml/>";
-    private static final AtomicBoolean fullCache = new AtomicBoolean(true);
+    private static final AtomicBoolean complete = new AtomicBoolean(true);
 
     private final JHVTime time;
     private final MetaData metaData;
@@ -120,8 +120,8 @@ public class NullView implements View {
 
     @Nullable
     @Override
-    public AtomicBoolean getFrameCacheStatus(int frame) {
-        return fullCache;
+    public AtomicBoolean getFrameCompletion(int frame) {
+        return complete;
     }
 
     @Override
