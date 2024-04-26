@@ -15,12 +15,8 @@ import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.Load;
 
-import org.apache.commons.validator.routines.UrlValidator;
-
 @SuppressWarnings("serial")
 class DropHandler extends TransferHandler {
-
-    private static final UrlValidator urlValidator = new UrlValidator(new String[]{"http", "https", "jpip", "jpips"});
 
     @Override
     public boolean canImport(TransferHandler.TransferSupport support) {
@@ -39,16 +35,18 @@ class DropHandler extends TransferHandler {
             imageUris.add(uri);
     }
 
-    private static void classifyWord(String word, List<URI> imageUris, List<URI> jsonUris, List<URI> cdfUris) throws Exception {
-        URI uri = new URI(word);
-        String loc = word.toLowerCase(Locale.ENGLISH);
-        if (loc.endsWith(".json"))
-            jsonUris.add(uri);
-        else if (loc.endsWith(".cdf"))
-            cdfUris.add(uri);
-        else
-            imageUris.add(uri);
+    private static void classifyFile(File file, List<URI> imageUris, List<URI> jsonUris, List<URI> cdfUris) {
+        if (file.isFile() && file.canRead()) {
+            classifyUri(file.toURI(), imageUris, jsonUris, cdfUris);
+        } else if (file.isDirectory()) {
+            try {
+                FileUtils.listDir(file.toPath()).forEach(uri -> classifyUri(uri, imageUris, jsonUris, cdfUris));
+            } catch (Exception e) {
+                Log.warn("Error reading directory: " + file, e);
+            }
+        }
     }
+
 
     @Override
     public boolean importData(TransferHandler.TransferSupport support) {
@@ -64,16 +62,8 @@ class DropHandler extends TransferHandler {
                 List<URI> jsonUris = new ArrayList<>(objects.size());
                 List<URI> cdfUris = new ArrayList<>(objects.size());
                 for (Object o : objects) {
-                    if (o instanceof File f) {
-                        if (f.isFile() && f.canRead()) {
-                            classifyUri(f.toURI(), imageUris, jsonUris, cdfUris);
-                        } else if (f.isDirectory()) {
-                            try {
-                                FileUtils.listDir(f.toPath()).forEach(uri -> classifyUri(uri, imageUris, jsonUris, cdfUris));
-                            } catch (Exception e) {
-                                Log.warn("Error reading directory " + f, e);
-                            }
-                        }
+                    if (o instanceof File file) {
+                        classifyFile(file, imageUris, jsonUris, cdfUris);
                     }
                 }
 
@@ -90,8 +80,14 @@ class DropHandler extends TransferHandler {
                 List<URI> jsonUris = new ArrayList<>(words.length);
                 List<URI> cdfUris = new ArrayList<>(words.length);
                 for (String word : words) {
-                    if (urlValidator.isValid(word)) {
-                        classifyWord(word, imageUris, jsonUris, cdfUris);
+                    try {
+                        URI uri = new URI(word); // attempt to check if it's an URI
+                        if (uri.getScheme() == null) { // maybe on filesystem
+                            classifyFile(new File(word), imageUris, jsonUris, cdfUris);
+                        } else
+                            classifyUri(uri, imageUris, jsonUris, cdfUris);
+                    } catch (Exception e) {
+                        Log.warn("Not found: " + word, e);
                     }
                 }
 
