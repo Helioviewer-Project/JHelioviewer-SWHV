@@ -17,6 +17,7 @@ import org.helioviewer.jhv.gui.actions.NewLayerAction;
 import org.helioviewer.jhv.gui.actions.NewSoarAction;
 import org.helioviewer.jhv.gui.actions.OpenLocalFileAction;
 import org.helioviewer.jhv.gui.actions.OpenURLinBrowserAction;
+import org.helioviewer.jhv.gui.actions.PasteAction;
 import org.helioviewer.jhv.gui.actions.ResetCameraAction;
 import org.helioviewer.jhv.gui.actions.ResetCameraAxisAction;
 import org.helioviewer.jhv.gui.actions.SaveStateAction;
@@ -58,6 +59,11 @@ public final class MenuBar extends JMenuBar {
             fileMenu.add(exitAction);
         }
         add(fileMenu);
+
+        JMenu editMenu = new JMenu("Edit");
+        editMenu.setMnemonic(KeyEvent.VK_E);
+        editMenu.add(new PasteAction());
+        add(editMenu);
 
         JMenu viewMenu = new JMenu("View");
         viewMenu.setMnemonic(KeyEvent.VK_V);
