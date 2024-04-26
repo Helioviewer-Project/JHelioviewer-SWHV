@@ -19,6 +19,8 @@ import org.apache.commons.validator.routines.UrlValidator;
 @SuppressWarnings("serial")
 class DropHandler extends TransferHandler {
 
+    private static final UrlValidator urlValidator = new UrlValidator(new String[]{"http", "https", "jpip", "jpips"});
+
     @Override
     public boolean canImport(TransferHandler.TransferSupport support) {
         Transferable transferable = support.getTransferable();
@@ -72,7 +74,7 @@ class DropHandler extends TransferHandler {
             } else if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                 String loc = (String) transferable.getTransferData(DataFlavor.stringFlavor);
 
-                if (UrlValidator.getInstance().isValid(loc)) {
+                if (urlValidator.isValid(loc)) {
                     URI uri = new URI(loc);
                     if (loc.endsWith(".json"))
                         Load.sunJSON.get(uri);
