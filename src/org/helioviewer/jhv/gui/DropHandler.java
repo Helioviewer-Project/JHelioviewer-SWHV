@@ -84,7 +84,7 @@ class DropHandler extends TransferHandler {
                 return true;
             } else if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                 String loc = (String) transferable.getTransferData(DataFlavor.stringFlavor);
-                String[] words = Regex.CommasSpaces.split(loc);
+                String[] words = Regex.MultiCommaSpace.split(loc);
 
                 List<URI> imageUris = new ArrayList<>(words.length);
                 List<URI> jsonUris = new ArrayList<>(words.length);
