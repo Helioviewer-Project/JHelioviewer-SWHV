@@ -1,6 +1,10 @@
 package org.helioviewer.jhv.gui;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.io.File;
 import java.net.URI;
@@ -16,7 +20,7 @@ import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.Load;
 
 @SuppressWarnings("serial")
-class DropHandler extends TransferHandler {
+public class JHVTransferHandler extends TransferHandler implements ClipboardOwner {
 
     @Override
     public boolean canImport(TransferHandler.TransferSupport support) {
@@ -101,6 +105,37 @@ class DropHandler extends TransferHandler {
         }
 
         return false;
+    }
+
+    public void toClipboard(String data) {
+        Transferable stringSelection = new StringSelection(data);
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, this);
+    }
+
+    public static String fromClipboard() {
+        Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+        boolean hasTransferableText = contents != null && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
+        if (hasTransferableText) {
+            try {
+                return (String) contents.getTransferData(DataFlavor.stringFlavor);
+            } catch (Exception e) {
+                Log.warn(e);
+            }
+        }
+        return "";
+    }
+
+    @Override
+    public void lostOwnership(Clipboard clipboard, Transferable contents) {
+    }
+
+    private static final JHVTransferHandler instance = new JHVTransferHandler();
+
+    public static JHVTransferHandler getInstance() {
+        return instance;
+    }
+
+    private JHVTransferHandler() {
     }
 
 }

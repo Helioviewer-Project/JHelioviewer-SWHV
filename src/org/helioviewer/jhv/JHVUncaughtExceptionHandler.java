@@ -12,7 +12,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 
-import org.helioviewer.jhv.gui.ClipBoardCopier;
+import org.helioviewer.jhv.gui.JHVTransferHandler;
 import org.helioviewer.jhv.gui.components.base.HTMLPane;
 
 class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
@@ -40,7 +40,7 @@ class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
         copyToClipboard.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent me) {
-                ClipBoardCopier.getSingletonInstance().setString(msg);
+                JHVTransferHandler.getInstance().toClipboard(msg);
                 JOptionPane.showMessageDialog(null, "Error report copied to clipboard.");
             }
         });

@@ -13,8 +13,8 @@ import javax.swing.JTextArea;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.gui.ClipBoardCopier;
 import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.JHVTransferHandler;
 import org.helioviewer.jhv.gui.components.base.HTMLPane;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
@@ -34,7 +34,7 @@ public class LogDialog implements ShowableDialog {
         copyToClipboard.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent me) {
-                ClipBoardCopier.getSingletonInstance().setString(log);
+                JHVTransferHandler.getInstance().toClipboard(log);
                 JOptionPane.showMessageDialog(null, "Log copied to clipboard.");
             }
         });

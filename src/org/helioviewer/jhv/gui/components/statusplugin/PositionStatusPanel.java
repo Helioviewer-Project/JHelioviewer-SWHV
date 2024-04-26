@@ -13,8 +13,8 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.ClipBoardCopier;
 import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.JHVTransferHandler;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -147,7 +147,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
     @Override
     public void mouseClicked(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON3)
-            ClipBoardCopier.getSingletonInstance().setString(camera.getViewpoint().time.toString() + getText());
+            JHVTransferHandler.getInstance().toClipboard(camera.getViewpoint().time.toString() + getText());
     }
 
 }
