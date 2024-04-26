@@ -51,14 +51,8 @@ public class JHVTransferHandler extends TransferHandler implements ClipboardOwne
         }
     }
 
-
-    @Override
-    public boolean importData(TransferHandler.TransferSupport support) {
-        if (!canImport(support))
-            return false;
-
+    private boolean transferData(Transferable transferable) {
         try {
-            Transferable transferable = support.getTransferable();
             if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                 List<?> objects = (List<?>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 
@@ -85,7 +79,7 @@ public class JHVTransferHandler extends TransferHandler implements ClipboardOwne
                 List<URI> cdfUris = new ArrayList<>(words.length);
                 for (String word : words) {
                     try {
-                        URI uri = new URI(word); // attempt to check if it's an URI
+                        URI uri = new URI(word); // attempt to check if it's a URI
                         if (uri.getScheme() == null) { // maybe on filesystem
                             classifyFile(new File(word), imageUris, jsonUris, cdfUris);
                         } else
@@ -103,26 +97,27 @@ public class JHVTransferHandler extends TransferHandler implements ClipboardOwne
         } catch (Exception e) {
             Log.warn("Import error", e);
         }
+        return false;
+    }
 
+    @Override
+    public boolean importData(TransferHandler.TransferSupport support) {
+        if (!canImport(support))
+            return false;
+        return transferData(support.getTransferable());
+    }
+
+    public boolean readClipboard() {
+        Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+        if (contents != null) {
+            return transferData(contents);
+        }
         return false;
     }
 
     public void toClipboard(String data) {
         Transferable stringSelection = new StringSelection(data);
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, this);
-    }
-
-    public static String fromClipboard() {
-        Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
-        boolean hasTransferableText = contents != null && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
-        if (hasTransferableText) {
-            try {
-                return (String) contents.getTransferData(DataFlavor.stringFlavor);
-            } catch (Exception e) {
-                Log.warn(e);
-            }
-        }
-        return "";
     }
 
     @Override
