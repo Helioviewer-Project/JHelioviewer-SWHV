@@ -15,5 +15,6 @@ public class Regex {
     public static final Pattern Space = Pattern.compile(" ");
     public static final Pattern MultiSpace = Pattern.compile(" +");
     public static final Pattern HttpField = Pattern.compile(": ");
+    public static final Pattern CommasSpaces = Pattern.compile(",+|\s+|\n+");
 
 }

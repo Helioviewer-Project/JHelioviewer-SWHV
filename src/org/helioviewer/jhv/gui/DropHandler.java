@@ -11,6 +11,7 @@ import java.util.Locale;
 import javax.swing.TransferHandler;
 
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.Load;
 
@@ -28,8 +29,19 @@ class DropHandler extends TransferHandler {
                 transferable.isDataFlavorSupported(DataFlavor.stringFlavor));
     }
 
-    private static void classify(URI uri, List<URI> imageUris, List<URI> jsonUris, List<URI> cdfUris) {
+    private static void classifyUri(URI uri, List<URI> imageUris, List<URI> jsonUris, List<URI> cdfUris) {
         String loc = uri.toString().toLowerCase(Locale.ENGLISH);
+        if (loc.endsWith(".json"))
+            jsonUris.add(uri);
+        else if (loc.endsWith(".cdf"))
+            cdfUris.add(uri);
+        else
+            imageUris.add(uri);
+    }
+
+    private static void classifyWord(String word, List<URI> imageUris, List<URI> jsonUris, List<URI> cdfUris) throws Exception {
+        URI uri = new URI(word);
+        String loc = word.toLowerCase(Locale.ENGLISH);
         if (loc.endsWith(".json"))
             jsonUris.add(uri);
         else if (loc.endsWith(".cdf"))
@@ -54,10 +66,10 @@ class DropHandler extends TransferHandler {
                 for (Object o : objects) {
                     if (o instanceof File f) {
                         if (f.isFile() && f.canRead()) {
-                            classify(f.toURI(), imageUris, jsonUris, cdfUris);
+                            classifyUri(f.toURI(), imageUris, jsonUris, cdfUris);
                         } else if (f.isDirectory()) {
                             try {
-                                FileUtils.listDir(f.toPath()).forEach(uri -> classify(uri, imageUris, jsonUris, cdfUris));
+                                FileUtils.listDir(f.toPath()).forEach(uri -> classifyUri(uri, imageUris, jsonUris, cdfUris));
                             } catch (Exception e) {
                                 Log.warn("Error reading directory " + f, e);
                             }
@@ -69,24 +81,24 @@ class DropHandler extends TransferHandler {
                 Load.SunJSON.getAll(jsonUris);
                 Load.CDF.getAll(cdfUris);
                 Load.Image.getAll(imageUris);
-
                 return true;
             } else if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                 String loc = (String) transferable.getTransferData(DataFlavor.stringFlavor);
+                String[] words = Regex.CommasSpaces.split(loc);
 
-                if (urlValidator.isValid(loc)) {
-                    URI uri = new URI(loc);
-                    if (loc.endsWith(".json"))
-                        Load.sunJSON.get(uri);
-                    else if (loc.endsWith(".cdf"))
-                        Load.cdf.get(uri);
-                    else if (loc.endsWith(".jhv"))
-                        Load.state.get(uri);
-                    else
-                        Load.image.get(uri);
-
-                    return true;
+                List<URI> imageUris = new ArrayList<>(words.length);
+                List<URI> jsonUris = new ArrayList<>(words.length);
+                List<URI> cdfUris = new ArrayList<>(words.length);
+                for (String word : words) {
+                    if (urlValidator.isValid(word)) {
+                        classifyWord(word, imageUris, jsonUris, cdfUris);
+                    }
                 }
+
+                Load.SunJSON.getAll(jsonUris);
+                Load.CDF.getAll(cdfUris);
+                Load.Image.getAll(imageUris);
+                return true;
             }
         } catch (Exception e) {
             Log.warn("Import error", e);
