@@ -70,11 +70,11 @@ public class TimestampLayer extends AbstractLayer {
         if (Display.multiview) {
             ImageLayer im = ImageLayers.getImageLayerInViewport(vp.idx);
             if (im != null) {
-                text = im.getName() + ' ';
+                text = ' ' + im.getName();
                 viewpoint = im.getMetaData().getViewpoint();
             }
         }
-        text += viewpoint.time.toString();
+        text = viewpoint.time.toString() + text;
 
         if (extra) {
             text += String.format(" | D\u2609: %7.4fau", viewpoint.distance * Sun.MeanEarthDistanceInv);
