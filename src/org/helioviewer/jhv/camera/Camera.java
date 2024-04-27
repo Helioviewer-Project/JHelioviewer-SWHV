@@ -56,8 +56,6 @@ public class Camera {
         float clip = cameraWidth < 32 ? clipNarrow : clipWide;
         Transform.setOrthoSymmetricProjection((float) (cameraWidth * aspect), (float) cameraWidth, -clip, clip);
         Transform.setTranslateView((float) translation.x, (float) translation.y, 0);
-        Transform.cacheMVP();
-
         Transform.rotateView(rotation);
         Transform.cacheMVP();
     }
