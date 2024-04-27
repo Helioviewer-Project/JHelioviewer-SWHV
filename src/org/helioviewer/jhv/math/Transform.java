@@ -38,8 +38,8 @@ public class Transform {
         viewDepth--;
     }
 
-    public static void setOrthoProjection(float left, float right, float bottom, float top, float zNear, float zFar) {
-        proj.setOrtho(left, right, bottom, top, zNear, zFar);
+    public static void setOrtho2DProjection(float left, float right, float bottom, float top) {
+        proj.setOrtho2D(left, right, bottom, top);
     }
 
     public static void setOrthoSymmetricProjection(float width, float height, float zNear, float zFar) {
