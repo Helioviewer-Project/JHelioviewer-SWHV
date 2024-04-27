@@ -435,7 +435,7 @@ public class JhvTextRenderer {
             gl.glDisable(GL2.GL_DEPTH_TEST);
 
             Transform.pushProjection();
-            Transform.setOrthoProjection(0, width, 0, height, -1, 1);
+            Transform.setOrtho2DProjection(0, width, 0, height);
             Transform.pushView();
             Transform.setIdentityView();
         }
