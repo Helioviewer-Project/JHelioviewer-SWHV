@@ -30,7 +30,7 @@ class FITSImage implements URIImageReader {
     public URIImageReader.Image readImage(File file) throws Exception {
         try (Fits f = new Fits(file)) {
             ImageHDU hdu = findHDU(f);
-            return new URIImageReader.Image(getHeaderAsXML(hdu), readHDU(hdu));
+            return new URIImageReader.Image(getHeaderAsXML(hdu), readHDU(hdu), null);
         }
     }
 

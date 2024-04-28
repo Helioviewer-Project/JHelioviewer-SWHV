@@ -8,7 +8,7 @@ import org.helioviewer.jhv.imagedata.ImageBuffer;
 
 interface URIImageReader {
 
-    record Image(@Nullable String xml, ImageBuffer buffer) {
+    record Image(@Nullable String xml, ImageBuffer buffer, int[] lut) {
     }
 
     Image readImage(File file) throws Exception;
