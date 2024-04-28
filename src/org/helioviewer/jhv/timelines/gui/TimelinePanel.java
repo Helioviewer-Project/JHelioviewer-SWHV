@@ -25,11 +25,6 @@ import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.draw.DrawController;
-import org.helioviewer.jhv.timelines.gui.cellrenderer.RendererColor;
-import org.helioviewer.jhv.timelines.gui.cellrenderer.RendererEnabled;
-import org.helioviewer.jhv.timelines.gui.cellrenderer.RendererLoading;
-import org.helioviewer.jhv.timelines.gui.cellrenderer.RendererName;
-import org.helioviewer.jhv.timelines.gui.cellrenderer.RendererRemove;
 
 import com.jidesoft.swing.JideButton;
 
@@ -135,21 +130,21 @@ public final class TimelinePanel extends JPanel {
         grid.setColumnSelectionAllowed(false);
         grid.setIntercellSpacing(new Dimension(0, 0));
 
-        grid.getColumnModel().getColumn(ENABLED_COL).setCellRenderer(new RendererEnabled());
+        grid.getColumnModel().getColumn(ENABLED_COL).setCellRenderer(new CellRenderer.Enabled());
         grid.getColumnModel().getColumn(ENABLED_COL).setPreferredWidth(ICON_WIDTH + 8);
         grid.getColumnModel().getColumn(ENABLED_COL).setMaxWidth(ICON_WIDTH + 8);
 
-        grid.getColumnModel().getColumn(TITLE_COL).setCellRenderer(new RendererName());
+        grid.getColumnModel().getColumn(TITLE_COL).setCellRenderer(new CellRenderer.Name());
 
-        grid.getColumnModel().getColumn(LOADING_COL).setCellRenderer(new RendererLoading());
+        grid.getColumnModel().getColumn(LOADING_COL).setCellRenderer(new CellRenderer.Loading());
         grid.getColumnModel().getColumn(LOADING_COL).setPreferredWidth(ICON_WIDTH + 2);
         grid.getColumnModel().getColumn(LOADING_COL).setMaxWidth(ICON_WIDTH + 2);
 
-        grid.getColumnModel().getColumn(LINECOLOR_COL).setCellRenderer(new RendererColor());
+        grid.getColumnModel().getColumn(LINECOLOR_COL).setCellRenderer(new CellRenderer.LineColor());
         grid.getColumnModel().getColumn(LINECOLOR_COL).setPreferredWidth(20);
         grid.getColumnModel().getColumn(LINECOLOR_COL).setMaxWidth(20);
 
-        grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new RendererRemove());
+        grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new CellRenderer.Remove());
         grid.getColumnModel().getColumn(REMOVE_COL).setPreferredWidth(ICON_WIDTH + 2);
         grid.getColumnModel().getColumn(REMOVE_COL).setMaxWidth(ICON_WIDTH + 2);
 
