@@ -3,6 +3,10 @@
 
 ## JHelioviewer 4.6.4 (pending)
 
+- Attempt to detect image file formats and reduce dependency on file names extensions
+- Allow loading of images by pasting files or their locations
+- Use the possible colormap information from PNG files
+
 ## JHelioviewer 4.6.3 (2024-04-22)
 
 - Make possible to adjust the FITS pixel conversion gamma parameter. Offer an alternative conversion controlled by beta. Use menu View -> FITS Settings
