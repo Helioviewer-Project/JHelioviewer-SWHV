@@ -15,11 +15,11 @@ public class BlendPanel implements FilterDetails {
 
     public BlendPanel(ImageLayer layer) {
         slider = new JHVSlider(0, 100, (int) (layer.getGLImage().getBlend() * 100));
-        label = new JLabel(LevelsPanel.align(slider.getValue()), JLabel.RIGHT);
+        label = new JLabel(LevelsPanel.formatPercent(slider.getValue()), JLabel.RIGHT);
         slider.addChangeListener(e -> {
             int value = slider.getValue();
             layer.getGLImage().setBlend(value / 100.);
-            label.setText(LevelsPanel.align(value)); // additivity
+            label.setText(LevelsPanel.formatPercent(value)); // additivity
             MovieDisplay.display();
         });
     }

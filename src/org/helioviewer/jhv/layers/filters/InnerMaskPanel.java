@@ -17,17 +17,17 @@ public class InnerMaskPanel implements FilterDetails {
 
     public InnerMaskPanel(ImageLayer layer) {
         slider = new JHVSlider(0, GLImage.MAX_INNER * 10, (int) (layer.getGLImage().getInnerMask() * 10));
-        label = new JLabel(alignFloat(slider.getValue() / 10.), JLabel.RIGHT);
+        label = new JLabel(formatFloat(slider.getValue() / 10.), JLabel.RIGHT);
         slider.addChangeListener(e -> {
             double value = slider.getValue() / 10.;
             layer.getGLImage().setInnerMask(value);
-            label.setText(alignFloat(value));
+            label.setText(formatFloat(value));
             MovieDisplay.display();
         });
     }
 
-    private static String alignFloat(double value) {
-        return "<html>\u2007" + String.format("%.1f", value) + "R\u2609";
+    private static String formatFloat(double value) {
+        return "<html><p align='right'>" + String.format("%.1f", value) + "R\u2609</p>";
     }
 
     @Override

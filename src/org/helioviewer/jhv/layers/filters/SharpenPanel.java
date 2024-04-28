@@ -15,11 +15,11 @@ public class SharpenPanel implements FilterDetails {
 
     public SharpenPanel(ImageLayer layer) {
         slider = new JHVSlider(-100, 100, (int) (layer.getGLImage().getSharpen() * 100));
-        label = new JLabel(LevelsPanel.align(slider.getValue()), JLabel.RIGHT);
+        label = new JLabel(LevelsPanel.formatPercent(slider.getValue()), JLabel.RIGHT);
         slider.addChangeListener(e -> {
             int value = slider.getValue();
             layer.getGLImage().setSharpen(value / 100.);
-            label.setText(LevelsPanel.align(value));
+            label.setText(LevelsPanel.formatPercent(value));
             MovieDisplay.display();
         });
     }
