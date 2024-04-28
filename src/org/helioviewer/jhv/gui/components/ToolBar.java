@@ -90,7 +90,7 @@ public final class ToolBar extends JToolBar {
     }
 
     public ToolBar() {
-        setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
+        setLayout(new FlowLayout(FlowLayout.LEADING, 1, 3));
         setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, getBackground().brighter()));
         setRollover(true);
 
