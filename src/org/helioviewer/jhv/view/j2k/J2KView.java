@@ -119,7 +119,7 @@ public class J2KView extends BaseView {
 
             int[] lut = source.getLUT();
             if (lut != null)
-                builtinLUT = new LUT(getName() + " built-in", lut);
+                builtinLUT = new LUT("built-in", lut);
 
             if (jpipCache == null) { // local
                 completionLevel = new CompletionLevel.Local(source, maxFrame);
@@ -139,10 +139,6 @@ public class J2KView extends BaseView {
     @Nullable
     String getCacheKey(int frame) {
         return frame < 0 || frame >= cacheKey.length ? null : cacheKey[frame];
-    }
-
-    private final String getName() {
-        return metaData[0].getDisplayName();
     }
 
     private record J2KAbolisher(int aSerial, J2KReader aReader, KakaduSource aSource,
