@@ -15,30 +15,16 @@ public class LevelsPanel implements FilterDetails {
     private final JHVRangeSlider slider;
     private final JLabel label;
 
-    private static String align3(int value) {
-        if (value < -99)
-            return "\u2212" + -value;
-        if (value < -9)
-            return "\u2007\u2212" + -value;
-        if (value < 0)
-            return "\u2007\u2007\u2212" + -value;
-        if (value < 10)
-            return "\u2007\u2007\u2007" + value;
-        if (value < 100)
-            return "\u2007\u2007" + value;
-        return "\u2007" + value;
+    static String formatPercent(int value) {
+        return "<html><p align='right'>" + value + "%</p>";
     }
 
-    static String align(int value) {
-        return "<html><p align='right'>" + align3(value) + "%</p>";
-    }
-
-    static String format(int low, int high) {
-        return "<html><p align='right'>" + align3(low) + "%</p><p align='right'>" + align3(high) + "%</p>";
+    static String formatPercent(int low, int high) {
+        return "<html><p align='right'>" + low + "%</p><p align='right'>" + high + "%</p>";
     }
 
     static String formatDegree(int low, int high) {
-        return "<html><p align='right'>" + align3(low) + "\u00B0</p><p align='right'>" + align3(high) + "\u00B0</p>";
+        return "<html><p align='right'>" + low + "\u00B0</p><p align='right'>" + high + "\u00B0</p>";
     }
 
     public LevelsPanel(ImageLayer layer) {
@@ -57,12 +43,12 @@ public class LevelsPanel implements FilterDetails {
             }
         });
 
-        label = new JLabel(format(slider.getLowValue(), slider.getHighValue()), JLabel.RIGHT);
+        label = new JLabel(formatPercent(slider.getLowValue(), slider.getHighValue()), JLabel.RIGHT);
         slider.addChangeListener(e -> {
             int lo = slider.getLowValue();
             int hi = slider.getHighValue();
             layer.getGLImage().setBrightness(lo / 100., (hi - lo) / 100.);
-            label.setText(format(lo, hi));
+            label.setText(formatPercent(lo, hi));
             MovieDisplay.display();
         });
     }

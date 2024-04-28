@@ -15,11 +15,11 @@ public class OpacityPanel implements FilterDetails {
 
     public OpacityPanel(ImageLayer layer) {
         slider = new JHVSlider(0, 100, (int) (layer.getGLImage().getOpacity() * 100));
-        label = new JLabel(LevelsPanel.align(slider.getValue()), JLabel.RIGHT);
+        label = new JLabel(LevelsPanel.formatPercent(slider.getValue()), JLabel.RIGHT);
         slider.addChangeListener(e -> {
             int value = slider.getValue();
             layer.getGLImage().setOpacity(value / 100.);
-            label.setText(LevelsPanel.align(value));
+            label.setText(LevelsPanel.formatPercent(value));
             MovieDisplay.display();
         });
     }

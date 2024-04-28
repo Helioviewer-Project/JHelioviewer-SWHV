@@ -31,12 +31,12 @@ public class SlitPanel implements FilterDetails {
             }
         });
 
-        label = new JLabel(LevelsPanel.format(slider.getLowValue(), slider.getHighValue()), JLabel.RIGHT);
+        label = new JLabel(LevelsPanel.formatPercent(slider.getLowValue(), slider.getHighValue()), JLabel.RIGHT);
         slider.addChangeListener(e -> {
             int lo = slider.getLowValue();
             int hi = slider.getHighValue();
             layer.getGLImage().setSlit(lo / 100., hi / 100.);
-            label.setText(LevelsPanel.format(lo, hi));
+            label.setText(LevelsPanel.formatPercent(lo, hi));
             MovieDisplay.display();
         });
     }
