@@ -65,8 +65,9 @@ public class UIGlobals {
         uiFontSmall = uiFont.deriveFont(defaultSize - 2);
         uiFontSmallBold = uiFontSmall.deriveFont(Font.BOLD);
 
-        Font monoFont = UIManager.getFont("monospaced.font");
-        uiFontMonoSmall = monoFont == null ? new Font("Monospaced", Font.PLAIN, (int) (defaultSize - 2)) : monoFont.deriveFont(defaultSize - 2); // when not FlatLaf
+        uiFontMono = UIManager.getFont("monospaced.font");
+        uiFontMono = uiFontMono == null ? new Font("Monospaced", Font.PLAIN, (int) defaultSize) : uiFontMono; // when not FlatLaf
+        uiFontMonoSmall = uiFontMono.deriveFont(defaultSize - 2);
 
         int arc = 6;
         UIManager.put("Button.arc", arc);
@@ -131,6 +132,7 @@ public class UIGlobals {
     public static Font uiFontSmall;
     public static Font uiFontSmallBold;
 
+    public static Font uiFontMono;
     public static Font uiFontMonoSmall;
 
     public static Font uiFontMDI;

@@ -11,11 +11,11 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.DropMode;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableModel;
 
@@ -129,7 +129,7 @@ public final class LayersPanel extends JPanel {
         grid.getColumnModel().getColumn(TITLE_COL).setCellRenderer(new CellRenderer.Name());
 
         grid.getColumnModel().getColumn(TIME_COL).setCellRenderer(new CellRenderer.Time());
-        int timeWidth = new JLabel("2000-01-01T12:00:00.000").getPreferredSize().width;
+        int timeWidth = SwingUtilities.computeStringWidth(grid.getFontMetrics(UIGlobals.uiFontMono), "2000-01-01T12:00:00.000");
         grid.getColumnModel().getColumn(TIME_COL).setMinWidth(timeWidth);
 
         grid.getColumnModel().getColumn(DOWNLOAD_COL).setCellRenderer(new CellRenderer.Loading());

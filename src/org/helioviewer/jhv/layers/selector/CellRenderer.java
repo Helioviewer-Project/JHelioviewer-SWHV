@@ -103,6 +103,7 @@ class CellRenderer {
         @Override
         public void setValue(Object value) {
             if (value instanceof Layer layer) {
+                setFont(UIGlobals.uiFontMono);
                 setText(layer.getTimeString());
             }
         }
