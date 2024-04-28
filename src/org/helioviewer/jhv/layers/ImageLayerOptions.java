@@ -98,7 +98,7 @@ class ImageLayerOptions extends JPanel {
 
         c.gridx = 2;
         c.weightx = 0;
-        c.anchor = GridBagConstraints.LINE_START;
+        c.anchor = GridBagConstraints.LINE_END;
         c.fill = GridBagConstraints.NONE;
         add(details.getLabel(), c);
     }

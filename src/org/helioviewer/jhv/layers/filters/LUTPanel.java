@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.layers.filters;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionListener;
 
@@ -17,7 +18,7 @@ import com.jidesoft.swing.JideToggleButton;
 public class LUTPanel implements FilterDetails {
 
     private final LUTComboBox lutCombo;
-    private final JPanel buttonPanel = new JPanel();
+    private final JPanel buttonPanel = new JPanel(new BorderLayout());
 
     public LUTPanel(ImageLayer layer) {
         lutCombo = new LUTComboBox();
@@ -38,8 +39,8 @@ public class LUTPanel implements FilterDetails {
             MovieDisplay.display();
         });
 
-        buttonPanel.add(invertButton);
-        buttonPanel.add(enhanceButton);
+        buttonPanel.add(invertButton, BorderLayout.LINE_START);
+        buttonPanel.add(enhanceButton, BorderLayout.LINE_END);
     }
 
     public void setLUT(LUT lut) {

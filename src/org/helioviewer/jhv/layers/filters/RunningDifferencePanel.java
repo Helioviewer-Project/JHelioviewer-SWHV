@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.layers.filters;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -26,7 +27,7 @@ public class RunningDifferencePanel implements FilterDetails {
     private final JideToggleButton downloadButton = new JideToggleButton(Buttons.download);
     private final JProgressBar progressBar = new JProgressBar();
     private final JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
-    private final JPanel buttonPanel = new JPanel();
+    private final JPanel buttonPanel = new JPanel(new BorderLayout());
 
     public RunningDifferencePanel(ImageLayer layer) {
         ButtonGroup modeGroup = new ButtonGroup();
@@ -67,8 +68,8 @@ public class RunningDifferencePanel implements FilterDetails {
         progressBar.setUI(new CircularProgressUI());
         progressBar.setForeground(downloadButton.getForeground());
 
-        buttonPanel.add(syncButton);
-        buttonPanel.add(downloadButton);
+        buttonPanel.add(syncButton, BorderLayout.LINE_START);
+        buttonPanel.add(downloadButton, BorderLayout.LINE_END);
     }
 
     @Override

@@ -30,15 +30,15 @@ public class LevelsPanel implements FilterDetails {
     }
 
     static String align(int value) {
-        return "<html>" + align3(value) + '%';
+        return "<html><p align='right'>" + align3(value) + "%</p>";
     }
 
     static String format(int low, int high) {
-        return "<html>" + align3(low) + "%<br/>" + align3(high) + '%';
+        return "<html><p align='right'>" + align3(low) + "%</p><p align='right'>" + align3(high) + "%</p>";
     }
 
     static String formatDegree(int low, int high) {
-        return "<html>" + align3(low) + "\u00B0<br/>" + align3(high) + '\u00B0';
+        return "<html><p align='right'>" + align3(low) + "\u00B0</p><p align='right'>" + align3(high) + "\u00B0</p>";
     }
 
     public LevelsPanel(ImageLayer layer) {
