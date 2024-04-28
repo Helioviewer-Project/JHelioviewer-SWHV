@@ -20,7 +20,7 @@ import com.jidesoft.swing.JideToggleButton;
 public class ChannelMixerPanel implements FilterDetails {
 
     private final JPanel boxPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
-    private final JPanel buttonPanel = new JPanel();
+    private final JPanel buttonPanel = new JPanel(new BorderLayout());
 
     public ChannelMixerPanel(ImageLayer layer) {
         JCheckBox redCheckBox = new JCheckBox("Red", layer.getGLImage().getRed());
@@ -53,8 +53,6 @@ public class ChannelMixerPanel implements FilterDetails {
             MovieDisplay.render(1);
         });
 
-        buttonPanel.add(mgnButton);
-
         MetaDataDialog metaDialog = new MetaDataDialog();
         JideButton metaButton = new JideButton(Buttons.info);
         metaButton.setToolTipText("Show metadata of selected layer");
@@ -62,7 +60,9 @@ public class ChannelMixerPanel implements FilterDetails {
             metaDialog.setMetaData(layer);
             metaDialog.showDialog();
         });
-        buttonPanel.add(metaButton);
+
+        buttonPanel.add(mgnButton, BorderLayout.LINE_START);
+        buttonPanel.add(metaButton, BorderLayout.LINE_END);
     }
 
     @Override
