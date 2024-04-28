@@ -1,9 +1,7 @@
-package org.helioviewer.jhv.timelines.gui;
+package org.helioviewer.jhv.layers.selector;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.Graphics;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -12,9 +10,11 @@ import javax.swing.JLayer;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import org.helioviewer.jhv.gui.UITimer;
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.components.Buttons;
-import org.helioviewer.jhv.timelines.TimelineLayer;
+import org.helioviewer.jhv.gui.UITimer;
+import org.helioviewer.jhv.layers.Layer;
+import org.helioviewer.jhv.layers.Layers;
 
 @SuppressWarnings("serial")
 class CellRenderer {
@@ -26,7 +26,7 @@ class CellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
-            if (value instanceof TimelineLayer layer) {
+            if (value instanceof Layer layer) {
                 checkBox.setSelected(layer.isEnabled());
             }
             checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
@@ -35,30 +35,9 @@ class CellRenderer {
 
     }
 
-    static final class LineColor extends DefaultTableCellRenderer {
-
-        private Color c;
-
-        @Override
-        public void setValue(Object value) {
-            if (value instanceof TimelineLayer layer) {
-                c = layer.getDataColor();
-            }
-        }
-
-        @Override
-        public void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            if (c != null) {
-                g.setColor(c);
-                g.fillRect(4, getHeight() / 2 - 1, getWidth() - 4, 2);
-            }
-        }
-
-    }
-
     static final class Loading extends DefaultTableCellRenderer {
 
+        private final Font font = Buttons.getMaterialFont(getFont().getSize2D());
         private final JLayer<JComponent> over = new JLayer<>(null, UITimer.busyIndicator);
 
         @Override
@@ -68,12 +47,17 @@ class CellRenderer {
             label.setText(null);
 
             // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
-            if (value instanceof TimelineLayer layer && layer.isDownloading()) {
-                table.repaint(); // lazy
+            if (value instanceof Layer layer) {
+                if (layer.isDownloading()) {
+                    table.repaint(); // lazy
 
-                over.setForeground(label.getForeground());
-                over.setView(label);
-                return over;
+                    over.setForeground(label.getForeground());
+                    over.setView(label);
+                    return over;
+                } else if (layer.isLocal()) {
+                    label.setFont(font);
+                    label.setText(Buttons.check);
+                }
             }
             return label;
         }
@@ -83,23 +67,17 @@ class CellRenderer {
     static final class Name extends DefaultTableCellRenderer {
 
         @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            // label.setText(null);
-
-            // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
-            if (value instanceof TimelineLayer layer) {
+        public void setValue(Object value) {
+            if (value instanceof Layer layer) {
                 String layerName = layer.getName();
-                if (layer.hasData()) {
-                    label.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
-                    label.setToolTipText(layerName);
+                setText(layerName);
+                if (layer == Layers.getActiveImageLayer()) {
+                    setToolTipText(layerName + " (master)");
+                    setFont(UIGlobals.uiFontBold);
                 } else {
-                    label.setForeground(Color.GRAY);
-                    label.setToolTipText(layerName + ": No data for selected interval");
+                    setToolTipText(null);
                 }
-                label.setText(layerName);
             }
-            return label;
         }
 
     }
@@ -111,11 +89,22 @@ class CellRenderer {
         @Override
         public void setValue(Object value) {
             setBorder(null); //!
-            if (value instanceof TimelineLayer layer && layer.isDeletable()) {
+            if (value instanceof Layer layer && layer.isDeletable()) {
                 setFont(font);
                 setText(Buttons.close);
             } else
                 setText(null);
+        }
+
+    }
+
+    static final class Time extends DefaultTableCellRenderer {
+
+        @Override
+        public void setValue(Object value) {
+            if (value instanceof Layer layer) {
+                setText(layer.getTimeString());
+            }
         }
 
     }

@@ -29,11 +29,6 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MovieDisplay;
-import org.helioviewer.jhv.layers.selector.cellrenderer.RendererEnabled;
-import org.helioviewer.jhv.layers.selector.cellrenderer.RendererLoading;
-import org.helioviewer.jhv.layers.selector.cellrenderer.RendererName;
-import org.helioviewer.jhv.layers.selector.cellrenderer.RendererRemove;
-import org.helioviewer.jhv.layers.selector.cellrenderer.RendererTime;
 
 @SuppressWarnings("serial")
 public final class LayersPanel extends JPanel {
@@ -127,21 +122,21 @@ public final class LayersPanel extends JPanel {
         grid.setColumnSelectionAllowed(false);
         grid.setIntercellSpacing(new Dimension(0, 0));
 
-        grid.getColumnModel().getColumn(ENABLED_COL).setCellRenderer(new RendererEnabled());
+        grid.getColumnModel().getColumn(ENABLED_COL).setCellRenderer(new CellRenderer.Enabled());
         grid.getColumnModel().getColumn(ENABLED_COL).setPreferredWidth(ICON_WIDTH + 8);
         grid.getColumnModel().getColumn(ENABLED_COL).setMaxWidth(ICON_WIDTH + 8);
 
-        grid.getColumnModel().getColumn(TITLE_COL).setCellRenderer(new RendererName());
+        grid.getColumnModel().getColumn(TITLE_COL).setCellRenderer(new CellRenderer.Name());
 
-        grid.getColumnModel().getColumn(TIME_COL).setCellRenderer(new RendererTime());
+        grid.getColumnModel().getColumn(TIME_COL).setCellRenderer(new CellRenderer.Time());
         int timeWidth = new JLabel("2000-01-01T12:00:00.000").getPreferredSize().width;
         grid.getColumnModel().getColumn(TIME_COL).setMinWidth(timeWidth);
 
-        grid.getColumnModel().getColumn(DOWNLOAD_COL).setCellRenderer(new RendererLoading());
+        grid.getColumnModel().getColumn(DOWNLOAD_COL).setCellRenderer(new CellRenderer.Loading());
         grid.getColumnModel().getColumn(DOWNLOAD_COL).setPreferredWidth(ICON_WIDTH + 2);
         grid.getColumnModel().getColumn(DOWNLOAD_COL).setMaxWidth(ICON_WIDTH + 2);
 
-        grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new RendererRemove());
+        grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new CellRenderer.Remove());
         grid.getColumnModel().getColumn(REMOVE_COL).setPreferredWidth(ICON_WIDTH + 2);
         grid.getColumnModel().getColumn(REMOVE_COL).setMaxWidth(ICON_WIDTH + 2);
 
