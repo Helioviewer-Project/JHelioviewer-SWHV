@@ -1,9 +1,11 @@
 package org.helioviewer.jhv.view.uri;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
 import java.awt.image.DataBufferUShort;
+import java.awt.image.IndexColorModel;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.Buffer;
@@ -53,10 +55,12 @@ class GenericImage implements URIImageReader {
                 XMLUtils.displayNode(metadata.getAsTree(names[i]), 0);
             }
             */
-            ImageBuffer imageBuffer = buffered2ImageBuffer(reader.read(0));
+            BufferedImage image = reader.read(0);
+            int[] lut = readLUT(image);
+            ImageBuffer imageBuffer = readBuffered(image);
             reader.dispose();
 
-            return new URIImageReader.Image(xml, imageBuffer);
+            return new URIImageReader.Image(xml, imageBuffer, lut);
         }
     }
 
@@ -67,7 +71,7 @@ class GenericImage implements URIImageReader {
             if (reader == null)
                 throw new Exception("No image reader found");
 
-            ImageBuffer imageBuffer = buffered2ImageBuffer(reader.read(0));
+            ImageBuffer imageBuffer = readBuffered(reader.read(0));
             reader.dispose();
             return imageBuffer;
         }
@@ -86,7 +90,7 @@ class GenericImage implements URIImageReader {
         return reader;
     }
 
-    private static ImageBuffer buffered2ImageBuffer(BufferedImage image) {
+    private static ImageBuffer readBuffered(BufferedImage image) {
         int w = image.getWidth();
         int h = image.getHeight();
 
@@ -113,6 +117,26 @@ class GenericImage implements URIImageReader {
             }
         }
         return new ImageBuffer(w, h, format, buffer);
+    }
+
+    private static int[] readLUT(BufferedImage image) {
+        ColorModel cm = image.getColorModel();
+        if (cm instanceof IndexColorModel icm) {
+            int num = icm.getMapSize();
+            byte[] r = new byte[num];
+            byte[] g = new byte[num];
+            byte[] b = new byte[num];
+            icm.getReds(r);
+            icm.getGreens(g);
+            icm.getBlues(b);
+
+            int[] lut = new int[num];
+            for (int i = 0; i < num; i++) {
+                lut[i] = 0xFF000000 | ((r[i] & 0xFF) << 16) | ((g[i] & 0xFF) << 8) | (b[i] & 0xFF);
+            }
+            return lut;
+        }
+        return null;
     }
 
 }

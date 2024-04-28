@@ -6,6 +6,7 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
+import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.DataUri;
@@ -51,6 +52,10 @@ public class URIView extends BaseView {
             imageRegion = m.roiToRegion(0, 0, m.getPixelWidth(), m.getPixelHeight(), 1, 1);
             metaData[0] = m;
             decodeCache.put(dataUri, image.buffer());
+
+            int[] lut = image.lut();
+            if (lut != null)
+                builtinLUT = new LUT("built-in", lut);
         } catch (Exception e) {
             throw new Exception(e.getMessage() + ": " + dataUri, e);
         }
