@@ -9,6 +9,7 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.Message;
@@ -107,6 +108,7 @@ public class LoadLayer {
         return loadUri(executor, uriList);
     }
 
+    @Nullable
     private static URI requestAPI(String url) throws Exception {
         try {
             // Log.info(url);

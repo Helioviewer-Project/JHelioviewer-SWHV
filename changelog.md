@@ -6,6 +6,7 @@
 - Attempt to detect image file formats and reduce dependency on file names extensions
 - Allow loading of images by pasting files or their locations
 - Use the possible colormap information from PNG files
+- Switch to JetBrains Runtime; correct pixel factor for Linux HiDPI
 
 ## JHelioviewer 4.6.3 (2024-04-22)
 

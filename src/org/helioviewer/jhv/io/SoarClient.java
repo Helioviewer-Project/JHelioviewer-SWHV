@@ -49,8 +49,8 @@ public class SoarClient {
     }
 
     public static void submitLoad(@Nonnull List<DataItem> items) {
-        List<URI> imageUris = new ArrayList<>();
-        List<URI> cdfUris = new ArrayList<>();
+        List<URI> imageUris = new ArrayList<>(items.size());
+        List<URI> cdfUris = new ArrayList<>(items.size());
 
         for (DataItem item : items) {
             try {
@@ -148,7 +148,7 @@ public class SoarClient {
     private record CallbackItems(ReceiverItems receiver) implements FutureCallback<List<DataItem>> {
 
         @Override
-        public void onSuccess(List<DataItem> result) {
+        public void onSuccess(@Nonnull List<DataItem> result) {
             receiver.setSoarResponseItems(result);
         }
 
@@ -163,7 +163,7 @@ public class SoarClient {
     private record CallbackSoops(ReceiverSoops receiver) implements FutureCallback<List<String>> {
 
         @Override
-        public void onSuccess(List<String> result) {
+        public void onSuccess(@Nonnull List<String> result) {
             receiver.setSoarResponseSoops(result);
         }
 
@@ -178,7 +178,7 @@ public class SoarClient {
     private static class CallbackTable implements FutureCallback<List<DataItem>> {
 
         @Override
-        public void onSuccess(List<DataItem> result) {
+        public void onSuccess(@Nonnull List<DataItem> result) {
             submitLoad(result);
         }
 
