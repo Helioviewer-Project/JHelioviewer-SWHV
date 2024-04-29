@@ -58,10 +58,7 @@ public record APIRequest(@Nonnull String server, int sourceId, long startTime, l
         if (DataSources.getServerSetting(_server, "API.getDataSources") == null)
             _server = Settings.getProperty("default.server");
 
-        int _sourceId;
-        String dataset = jo.optString("sourceId", null);
-        if (dataset == null || (_sourceId = DataSources.select(_server, "", dataset)) < 0)
-            _sourceId = jo.optInt("sourceId", 10);
+        int _sourceId = jo.optInt("sourceId", 10);
 
         long t = System.currentTimeMillis();
         long _startTime = TimeUtils.optParse(jo.optString("startTime"), t - 2 * TimeUtils.DAY_IN_MILLIS);
