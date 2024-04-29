@@ -119,6 +119,7 @@ class GenericImage implements URIImageReader {
         return new ImageBuffer(w, h, format, buffer);
     }
 
+    @Nullable
     private static int[] readLUT(BufferedImage image) {
         ColorModel cm = image.getColorModel();
         if (cm instanceof IndexColorModel icm) {
