@@ -300,8 +300,8 @@ class CalendarPicker extends JPanel {
 
         // Sets the size of the table to the size of the available space
         void resizeTableSpace() {
-            table.setSize(new Dimension(contentPane.getWidth() - 4, contentPane.getHeight()));
-            table.setPreferredSize(new Dimension(contentPane.getWidth() - 4, contentPane.getHeight()));
+            table.setSize(new Dimension(contentPane.getWidth(), contentPane.getHeight()));
+            table.setPreferredSize(new Dimension(contentPane.getWidth(), contentPane.getHeight()));
         }
 
         // Computes the height of the rows, so they will fit to the whole height of the table
