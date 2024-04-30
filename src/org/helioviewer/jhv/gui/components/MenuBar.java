@@ -121,6 +121,7 @@ public final class MenuBar extends JMenuBar {
         }
 
         helpMenu.add(new OpenURLinBrowserAction("Open User Manual", JHVGlobals.documentationURL));
+        helpMenu.add(new OpenURLinBrowserAction("Open Change Log", "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/blob/master/changelog.md"));
         helpMenu.add(new OpenURLinBrowserAction("Open Website", "https://www.jhelioviewer.org"));
         helpMenu.add(new UpdateCheckerAction());
         helpMenu.addSeparator();
