@@ -303,7 +303,7 @@ public class J2KView extends BaseView {
         if (imageBuffer == null) {
             int numComps = completionLevel.getResolutionSet(params.frame).numComps;
             try {
-                executor.decode(new J2KDecoder(source(), params, numComps, mgn), new J2KCallback(params));
+                executor.decode(new J2KDecoder(source().jpxSource(), params, numComps, mgn), new J2KCallback(params));
             } catch (Exception e) {
                 Log.error(e);
             }
@@ -370,10 +370,6 @@ public class J2KView extends BaseView {
 
     public ResolutionSet.Level getResolutionLevel(int frame, int level) {
         return completionLevel.getResolutionSet(frame).getLevel(level);
-    }
-
-    int numComponents(int frame) {
-        return completionLevel.getResolutionSet(frame).numComps;
     }
 
     KakaduSource source() throws Exception {
