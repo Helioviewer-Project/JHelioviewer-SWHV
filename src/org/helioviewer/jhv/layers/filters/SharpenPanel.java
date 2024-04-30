@@ -12,6 +12,7 @@ public class SharpenPanel implements FilterDetails {
 
     private final JHVSlider slider;
     private final JLabel label;
+    private final JLabel title = new JLabel("Sharpen", JLabel.RIGHT);
 
     public SharpenPanel(ImageLayer layer) {
         slider = new JHVSlider(-100, 100, (int) (layer.getGLImage().getSharpen() * 100));
@@ -25,17 +26,17 @@ public class SharpenPanel implements FilterDetails {
     }
 
     @Override
-    public Component getTitle() {
-        return new JLabel("Sharpen", JLabel.RIGHT);
+    public Component getFirst() {
+        return title;
     }
 
     @Override
-    public Component getComponent() {
+    public Component getSecond() {
         return slider;
     }
 
     @Override
-    public Component getLabel() {
+    public Component getThird() {
         return label;
     }
 

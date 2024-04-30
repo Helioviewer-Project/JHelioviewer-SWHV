@@ -21,6 +21,7 @@ public class ChannelMixerPanel implements FilterDetails {
 
     private final JPanel boxPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
     private final JPanel buttonPanel = new JPanel(new BorderLayout());
+    private final JLabel title = new JLabel("Channels ", JLabel.RIGHT);
 
     public ChannelMixerPanel(ImageLayer layer) {
         JCheckBox redCheckBox = new JCheckBox("Red", layer.getGLImage().getRed());
@@ -66,17 +67,17 @@ public class ChannelMixerPanel implements FilterDetails {
     }
 
     @Override
-    public Component getTitle() {
-        return new JLabel("Channels", JLabel.RIGHT);
+    public Component getFirst() {
+        return title;
     }
 
     @Override
-    public Component getComponent() {
+    public Component getSecond() {
         return boxPanel;
     }
 
     @Override
-    public Component getLabel() {
+    public Component getThird() {
         return buttonPanel;
     }
 

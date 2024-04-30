@@ -4,10 +4,10 @@ import java.awt.Component;
 
 public interface FilterDetails {
 
-    Component getTitle();
+    Component getFirst();
 
-    Component getComponent();
+    Component getSecond();
 
-    Component getLabel();
+    Component getThird();
 
 }

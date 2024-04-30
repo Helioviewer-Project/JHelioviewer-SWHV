@@ -19,6 +19,7 @@ public class LUTPanel implements FilterDetails {
 
     private final LUTComboBox lutCombo;
     private final JPanel buttonPanel = new JPanel(new BorderLayout());
+    private final JLabel title = new JLabel("Color ", JLabel.RIGHT);
 
     public LUTPanel(ImageLayer layer) {
         lutCombo = new LUTComboBox();
@@ -48,17 +49,17 @@ public class LUTPanel implements FilterDetails {
     }
 
     @Override
-    public Component getTitle() {
-        return new JLabel("Color ", JLabel.RIGHT);
+    public Component getFirst() {
+        return title;
     }
 
     @Override
-    public Component getComponent() {
+    public Component getSecond() {
         return lutCombo;
     }
 
     @Override
-    public Component getLabel() {
+    public Component getThird() {
         return buttonPanel;
     }
 
