@@ -22,7 +22,7 @@ import org.helioviewer.jhv.opengl.GLImage;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideToggleButton;
 
-public class RunningDifferencePanel implements FilterDetails {
+public class DifferencePanel implements FilterDetails {
 
     private final JideToggleButton downloadButton = new JideToggleButton(Buttons.download);
     private final JProgressBar progressBar = new JProgressBar();
@@ -30,7 +30,7 @@ public class RunningDifferencePanel implements FilterDetails {
     private final JPanel buttonPanel = new JPanel(new BorderLayout());
     private final JLabel title = new JLabel(" Difference ", JLabel.RIGHT);
 
-    public RunningDifferencePanel(ImageLayer layer) {
+    public DifferencePanel(ImageLayer layer) {
         ButtonGroup modeGroup = new ButtonGroup();
         for (GLImage.DifferenceMode mode : GLImage.DifferenceMode.values()) {
             JRadioButton item = new JRadioButton(mode.toString());
