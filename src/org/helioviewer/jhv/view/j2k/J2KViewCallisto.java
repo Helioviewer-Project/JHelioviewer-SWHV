@@ -3,6 +3,7 @@ package org.helioviewer.jhv.view.j2k;
 import java.awt.Rectangle;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
@@ -33,7 +34,8 @@ public class J2KViewCallisto extends J2KView {
 
     @Override
     protected void signalReader(DecodeParams decodeParams) { // not used
-        reader.signalReader(new ReadParams(this, decodeParams, true));
+        Log.warn("J2KViewCallisto.signalReader called: should not happen");
+        //reader.signalReader(new ReadParams(this, decodeParams, true));
     }
 
 }

@@ -219,28 +219,15 @@ public final class RadioData extends AbstractTimelineLayer {
     }
 
     @Override
-    public void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
+    public void draw(Graphics2D g, Rectangle graphArea, TimeAxis xAxis, Point mousePosition) {
         if (!enabled)
             return;
 
-        if (timeAxis.end() - timeAxis.start() <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS) {
-            drawString(g, graphArea, timeAxis, "No data available");
-            cache.asMap().values().forEach(data -> data.draw(g, graphArea, timeAxis));
+        if (xAxis.end() - xAxis.start() <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS) {
+            drawString(g, graphArea, xAxis, "No data available");
+            cache.asMap().values().forEach(data -> data.draw(g, graphArea, xAxis));
         } else {
-            String text1 = "The selected interval is too big.";
-            Rectangle2D r1 = g.getFontMetrics().getStringBounds(text1, g);
-
-            String text2 = "Reduce the interval to see the radio spectrograms.";
-            Rectangle2D r2 = g.getFontMetrics().getStringBounds(text2, g);
-
-            int x1 = (int) (graphArea.x + 0.5 * graphArea.width - 0.5 * r1.getWidth());
-            int y1 = (int) (graphArea.y + 0.5 * graphArea.height - 1.5 * r1.getHeight());
-            int x2 = (int) (graphArea.x + 0.5 * graphArea.width - 0.5 * r2.getWidth());
-            int y2 = (int) (graphArea.y + 0.5 * graphArea.height + 0.5 * r2.getHeight());
-
-            g.setColor(Color.black);
-            g.drawString(text1, x1, y1);
-            g.drawString(text2, x2, y2);
+            drawString(g, graphArea, xAxis, "Reduce the time interval to see the radio spectrograms.");
         }
     }
 
