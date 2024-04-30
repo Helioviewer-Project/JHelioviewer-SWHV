@@ -301,11 +301,11 @@ public class J2KView extends BaseView {
     private void executeDecode(DecodeParams params) {
         ImageBuffer imageBuffer = decodeCache.getIfPresent(params);
         if (imageBuffer == null) {
-            int num = completionLevel.getResolutionSet(params.frame).numComps;
+            int numComps = completionLevel.getResolutionSet(params.frame).numComps;
             try {
-                executor.decode(new J2KDecoder(source(), params, num, mgn), new J2KCallback(params));
+                executor.decode(new J2KDecoder(source(), params, numComps, mgn), new J2KCallback(params));
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.error(e);
             }
         } else {
             sendDataToHandler(params, imageBuffer);
