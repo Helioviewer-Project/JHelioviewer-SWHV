@@ -26,7 +26,8 @@ import org.lwjgl.system.MemoryUtil;
 //import com.google.common.math.StatsAccumulator;
 //import com.google.common.base.Stopwatch;
 
-record J2KDecoder(KakaduSource source, DecodeParams params, int numComponents, boolean mgn) implements Callable<ImageBuffer> {
+record J2KDecoder(KakaduSource source, DecodeParams params, int numComps,
+                  boolean mgn) implements Callable<ImageBuffer> {
 
     // Maximum of samples to process per rendering iteration
     private static final int MAX_RENDER_SAMPLES = 256 * 1024;
@@ -47,7 +48,7 @@ record J2KDecoder(KakaduSource source, DecodeParams params, int numComponents, b
         Kdu_region_compositor compositor = createCompositor(source, params.factor < 1 ? qualityLow : qualityHigh);
 
         Kdu_dims empty = new Kdu_dims();
-        if (numComponents < 3) {
+        if (numComps < 3) {
             // alpha tbd
             compositor.Add_primitive_ilayer(frame, firstComponent, Kdu_global.KDU_WANT_CODESTREAM_COMPONENTS, empty, empty);
         } else {
@@ -73,7 +74,7 @@ record J2KDecoder(KakaduSource source, DecodeParams params, int numComponents, b
         long addr = compositorBuf.Get_buf(srcStride, false);
         ByteBuffer nativeBuffer = MemoryUtil.memByteBuffer(addr, 4 * srcStride[0] * actualHeight).order(ByteOrder.nativeOrder());
 
-        ImageBuffer.Format format = numComponents < 3 ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.ARGB32;
+        ImageBuffer.Format format = numComps < 3 ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.ARGB32;
         byte[] outBuffer = new byte[actualWidth * actualHeight * format.bytes];
 
         Kdu_dims newRegion = new Kdu_dims();
@@ -92,7 +93,7 @@ record J2KDecoder(KakaduSource source, DecodeParams params, int numComponents, b
             int dstIdx = newX + newY * actualWidth;
             int srcIdx = 0;
 
-            if (numComponents < 3) {
+            if (numComps < 3) {
                 for (int j = 0; j < newHeight; ++j, dstIdx += actualWidth, srcIdx += srcStride[0]) {
                     for (int i = 0; i < newWidth; ++i) {
                         outBuffer[dstIdx + i] = nativeBuffer.get(4 * (srcIdx + i));
