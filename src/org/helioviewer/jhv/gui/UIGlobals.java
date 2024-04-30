@@ -77,12 +77,13 @@ public class UIGlobals {
         UIManager.put("TextComponent.arc", arc);
         // UIManager.put("Component.arrowType", "triangle");
 
+        sansFont = new Font("SansSerif", Font.PLAIN, (int) defaultSize);
         try (InputStream is = FileUtils.getResource("/fonts/DejaVuSansCondensed.ttf")) {
             canvasFont = Font.createFont(Font.TRUETYPE_FONT, is);
             GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(canvasFont);
         } catch (Exception e) {
             Log.warn("Font not loaded correctly, fallback to default", e);
-            canvasFont = new Font("SansSerif", Font.PLAIN, (int) defaultSize);
+            canvasFont = sansFont;
         }
 
         try (InputStream is = FileUtils.getResource("/fonts/materialdesignicons-webfont.ttf")) {
@@ -90,7 +91,7 @@ public class UIGlobals {
             GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(uiFontMDI);
         } catch (Exception e) {
             Log.warn("Font not loaded correctly, fallback to default", e);
-            uiFontMDI = new Font("SansSerif", Font.PLAIN, (int) defaultSize);
+            uiFontMDI = sansFont;
         }
     }
 /*
@@ -125,6 +126,7 @@ public class UIGlobals {
         keys.forEach(System.out::println);
     }
 */
+    public static Font sansFont;
 
     public static Font uiFont;
     public static Font uiFontBold;

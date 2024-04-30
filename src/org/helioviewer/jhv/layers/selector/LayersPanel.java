@@ -129,7 +129,7 @@ public final class LayersPanel extends JPanel {
         grid.getColumnModel().getColumn(TITLE_COL).setCellRenderer(new CellRenderer.Name());
 
         grid.getColumnModel().getColumn(TIME_COL).setCellRenderer(new CellRenderer.Time());
-        int timeWidth = SwingUtilities.computeStringWidth(grid.getFontMetrics(UIGlobals.uiFontMono), "2000-01-01T12:00:00.000");
+        int timeWidth = SwingUtilities.computeStringWidth(grid.getFontMetrics(CellRenderer.Time.font), "2000-01-01T12:00:00.000");
         grid.getColumnModel().getColumn(TIME_COL).setMinWidth(timeWidth);
 
         grid.getColumnModel().getColumn(DOWNLOAD_COL).setCellRenderer(new CellRenderer.Loading());

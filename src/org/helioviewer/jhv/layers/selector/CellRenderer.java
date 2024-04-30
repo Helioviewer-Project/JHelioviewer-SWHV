@@ -100,10 +100,12 @@ class CellRenderer {
 
     static final class Time extends DefaultTableCellRenderer {
 
+        static final Font font = UIGlobals.sansFont;
+
         @Override
         public void setValue(Object value) {
             if (value instanceof Layer layer) {
-                setFont(UIGlobals.uiFontMono);
+                setFont(font);
                 setText(layer.getTimeString());
             }
         }
