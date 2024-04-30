@@ -107,12 +107,11 @@ public class JHVTransferHandler extends TransferHandler implements ClipboardOwne
         return transferData(support.getTransferable());
     }
 
-    public boolean readClipboard() {
+    public void readClipboard() {
         Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
         if (contents != null) {
-            return transferData(contents);
+            transferData(contents);
         }
-        return false;
     }
 
     public void toClipboard(String data) {
