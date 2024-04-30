@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.view.uri;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.Window;
 
 import javax.swing.BorderFactory;
@@ -88,26 +88,20 @@ public class FITSSettings {
 
             JPanel content = new JPanel();
             content.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-            content.setLayout(new GridBagLayout());
+            content.setLayout(new BorderLayout());
 
-            GridBagConstraints c = new GridBagConstraints();
-            c.anchor = GridBagConstraints.CENTER;
-            c.fill = GridBagConstraints.HORIZONTAL;
-            c.gridy = 0;
-            c.gridx = 0;
-            content.add(gammaButton, c);
-            c.gridx = 1;
-            content.add(gammaSlider, c);
-            c.gridx = 2;
-            content.add(gammaLabel, c);
-            c.gridy = 1;
-            c.gridx = 0;
-            content.add(betaButton, c);
-            c.gridx = 1;
-            content.add(betaSlider, c);
-            c.gridx = 2;
-            content.add(betaLabel, c);
+            JPanel gammaPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
+            gammaPanel.add(gammaButton);
+            gammaPanel.add(gammaSlider);
+            gammaPanel.add(gammaLabel);
 
+            JPanel betaPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
+            betaPanel.add(betaButton);
+            betaPanel.add(betaSlider);
+            betaPanel.add(betaLabel);
+
+            content.add(gammaPanel, BorderLayout.NORTH);
+            content.add(betaPanel, BorderLayout.SOUTH);
             add(content);
         }
 
