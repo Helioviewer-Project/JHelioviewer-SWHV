@@ -16,13 +16,13 @@ import com.jidesoft.swing.JideToggleButton;
 class ImageLayerOptions extends JPanel {
 
     private final LUTPanel lutPanel;
-    private final RunningDifferencePanel runningDifferencePanel;
+    private final DifferencePanel differencePanel;
     private final SlitPanel slitPanel;
     // private final SectorPanel sectorPanel;
     private final InnerMaskPanel innerMaskPanel;
 
     ImageLayerOptions(ImageLayer layer) {
-        runningDifferencePanel = new RunningDifferencePanel(layer);
+        differencePanel = new DifferencePanel(layer);
         FilterDetails opacityPanel = new OpacityPanel(layer);
         FilterDetails blendPanel = new BlendPanel(layer);
         FilterDetails channelMixerPanel = new ChannelMixerPanel(layer);
@@ -46,7 +46,7 @@ class ImageLayerOptions extends JPanel {
         c.gridx = 0;
 
         c.gridy = 0;
-        addToGridBag(c, runningDifferencePanel);
+        addToGridBag(c, differencePanel);
         c.gridy++;
         addToGridBag(c, opacityPanel);
         c.gridy++;
@@ -113,8 +113,8 @@ class ImageLayerOptions extends JPanel {
         lutPanel.setLUT(lut);
     }
 
-    RunningDifferencePanel getRunningDifferencePanel() {
-        return runningDifferencePanel;
+    DifferencePanel getDifferencePanel() {
+        return differencePanel;
     }
 
 }
