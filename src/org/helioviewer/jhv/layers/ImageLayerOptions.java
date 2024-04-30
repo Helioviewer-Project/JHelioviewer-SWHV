@@ -69,6 +69,9 @@ class ImageLayerOptions extends JPanel {
             adjButton.setText(selected ? Buttons.adjustmentsDown : Buttons.adjustmentsRight);
         });
         c.gridx = 1;
+        c.weightx = 0;
+        c.anchor = GridBagConstraints.LINE_START;
+        c.fill = GridBagConstraints.NONE;
         add(adjButton, c);
 
         setAdjustmentsVisibility(false);
