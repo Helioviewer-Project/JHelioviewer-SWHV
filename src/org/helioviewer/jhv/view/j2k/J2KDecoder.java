@@ -7,6 +7,7 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
 import kdu_jni.Kdu_compositor_buf;
 import kdu_jni.Kdu_coords;
@@ -26,7 +27,7 @@ import org.lwjgl.system.MemoryUtil;
 //import com.google.common.math.StatsAccumulator;
 //import com.google.common.base.Stopwatch;
 
-record J2KDecoder(KakaduSource source, DecodeParams params, int numComps,
+record J2KDecoder(Jpx_source source, DecodeParams params, int numComps,
                   boolean mgn) implements Callable<ImageBuffer> {
 
     // Maximum of samples to process per rendering iteration
@@ -132,9 +133,9 @@ record J2KDecoder(KakaduSource source, DecodeParams params, int numComps,
         return null;
     }
 
-    private static Kdu_region_compositor createCompositor(KakaduSource source, Kdu_quality_limiter quality) throws Exception {
+    private static Kdu_region_compositor createCompositor(Jpx_source source, Kdu_quality_limiter quality) throws Exception {
         Kdu_region_compositor krc = new Kdu_region_compositor();
-        krc.Create(source.jpxSource());
+        krc.Create(source);
         krc.Set_surface_initialization_mode(false);
         krc.Set_quality_limiting(quality, -1, -1);
         krc.Set_thread_env(localThread.get(), null);
