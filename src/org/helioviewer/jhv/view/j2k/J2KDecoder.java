@@ -26,7 +26,7 @@ import org.lwjgl.system.MemoryUtil;
 //import com.google.common.math.StatsAccumulator;
 //import com.google.common.base.Stopwatch;
 
-record J2KDecoder(J2KView view, DecodeParams params, boolean mgn) implements Callable<ImageBuffer> {
+record J2KDecoder(KakaduSource source, DecodeParams params, int numComponents, boolean mgn) implements Callable<ImageBuffer> {
 
     // Maximum of samples to process per rendering iteration
     private static final int MAX_RENDER_SAMPLES = 256 * 1024;
@@ -44,8 +44,7 @@ record J2KDecoder(J2KView view, DecodeParams params, boolean mgn) implements Cal
     public ImageBuffer call() throws Exception {
         SubImage subImage = params.subImage;
         int frame = params.frame;
-        int numComponents = view.numComponents(frame);
-        Kdu_region_compositor compositor = createCompositor(view, params.factor < 1 ? qualityLow : qualityHigh);
+        Kdu_region_compositor compositor = createCompositor(source, params.factor < 1 ? qualityLow : qualityHigh);
 
         Kdu_dims empty = new Kdu_dims();
         if (numComponents < 3) {
@@ -132,9 +131,9 @@ record J2KDecoder(J2KView view, DecodeParams params, boolean mgn) implements Cal
         return null;
     }
 
-    private static Kdu_region_compositor createCompositor(J2KView j2k, Kdu_quality_limiter quality) throws Exception {
+    private static Kdu_region_compositor createCompositor(KakaduSource source, Kdu_quality_limiter quality) throws Exception {
         Kdu_region_compositor krc = new Kdu_region_compositor();
-        krc.Create(j2k.source().jpxSource());
+        krc.Create(source.jpxSource());
         krc.Set_surface_initialization_mode(false);
         krc.Set_quality_limiting(quality, -1, -1);
         krc.Set_thread_env(localThread.get(), null);

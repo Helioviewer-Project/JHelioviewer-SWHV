@@ -57,6 +57,7 @@ public class J2KView extends BaseView {
     protected final int serial;
     protected final CompletionLevel completionLevel;
     protected final J2KReader reader;
+    private final boolean isJP2;
 
     private static int incrementSerial() {
         while (true) {
@@ -86,7 +87,7 @@ public class J2KView extends BaseView {
                 }
                 default -> throw new Exception("Unknown image type");
             }
-
+            isJP2 = dataUri.format() == DataUri.Format.JP2;
             source.open();
 
             maxFrame = source.getNumberLayers() - 1;
@@ -123,11 +124,12 @@ public class J2KView extends BaseView {
 
             if (jpipCache == null) { // local
                 completionLevel = new CompletionLevel.Local(source, maxFrame);
-                source.close(); // close asap
             } else {
                 completionLevel = new CompletionLevel.Remote(source, maxFrame);
                 reader.start();
             }
+            if (isJP2)
+                source.close(); // JP2, close asap
 
             abolishable = reaper.register(this, new J2KAbolisher(serial, reader, source, jpipCache));
         } catch (Exception e) {
@@ -299,7 +301,12 @@ public class J2KView extends BaseView {
     private void executeDecode(DecodeParams params) {
         ImageBuffer imageBuffer = decodeCache.getIfPresent(params);
         if (imageBuffer == null) {
-            executor.decode(new J2KDecoder(this, params, mgn), new J2KCallback(params));
+            int num = completionLevel.getResolutionSet(params.frame).numComps;
+            try {
+                executor.decode(new J2KDecoder(source(), params, num, mgn), new J2KCallback(params));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } else {
             sendDataToHandler(params, imageBuffer);
         }
@@ -317,7 +324,7 @@ public class J2KView extends BaseView {
         public void onSuccess(ImageBuffer result) {
             if (params.complete) {
                 decodeCache.put(params, result);
-                if (jpipCache == null) { // local, close asap
+                if (isJP2) { // JP2, close asap
                     try {
                         source.close();
                     } catch (KduException e) {
@@ -370,7 +377,7 @@ public class J2KView extends BaseView {
     }
 
     KakaduSource source() throws Exception {
-        if (jpipCache == null) { // local, reopen
+        if (isJP2) { // JP2, reopen
             source.open();
         }
         return source;
