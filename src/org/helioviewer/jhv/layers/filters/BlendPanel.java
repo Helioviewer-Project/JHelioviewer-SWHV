@@ -12,6 +12,7 @@ public class BlendPanel implements FilterDetails {
 
     private final JHVSlider slider;
     private final JLabel label;
+    private final JLabel title = new JLabel("Blend", JLabel.RIGHT);
 
     public BlendPanel(ImageLayer layer) {
         slider = new JHVSlider(0, 100, (int) (layer.getGLImage().getBlend() * 100));
@@ -25,17 +26,17 @@ public class BlendPanel implements FilterDetails {
     }
 
     @Override
-    public Component getTitle() {
-        return new JLabel("Blend", JLabel.RIGHT);
+    public Component getFirst() {
+        return title;
     }
 
     @Override
-    public Component getComponent() {
+    public Component getSecond() {
         return slider;
     }
 
     @Override
-    public Component getLabel() {
+    public Component getThird() {
         return label;
     }
 

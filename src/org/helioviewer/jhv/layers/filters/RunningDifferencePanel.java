@@ -28,6 +28,7 @@ public class RunningDifferencePanel implements FilterDetails {
     private final JProgressBar progressBar = new JProgressBar();
     private final JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
     private final JPanel buttonPanel = new JPanel(new BorderLayout());
+    private final JLabel title = new JLabel(" Difference ", JLabel.RIGHT);
 
     public RunningDifferencePanel(ImageLayer layer) {
         ButtonGroup modeGroup = new ButtonGroup();
@@ -73,17 +74,17 @@ public class RunningDifferencePanel implements FilterDetails {
     }
 
     @Override
-    public Component getTitle() {
-        return new JLabel(" Difference ", JLabel.RIGHT);
+    public Component getFirst() {
+        return title;
     }
 
     @Override
-    public Component getComponent() {
+    public Component getSecond() {
         return modePanel;
     }
 
     @Override
-    public Component getLabel() {
+    public Component getThird() {
         return buttonPanel;
     }
 

@@ -31,17 +31,17 @@ public class InnerMaskPanel implements FilterDetails {
     }
 
     @Override
-    public Component getTitle() {
+    public Component getFirst() {
         return title;
     }
 
     @Override
-    public Component getComponent() {
+    public Component getSecond() {
         return slider;
     }
 
     @Override
-    public Component getLabel() {
+    public Component getThird() {
         return label;
     }
 

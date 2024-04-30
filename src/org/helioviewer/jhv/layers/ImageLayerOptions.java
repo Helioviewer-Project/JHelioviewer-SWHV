@@ -88,19 +88,19 @@ class ImageLayerOptions extends JPanel {
         c.weighty = 1;
         c.anchor = GridBagConstraints.LINE_END;
         c.fill = GridBagConstraints.NONE;
-        add(details.getTitle(), c);
+        add(details.getFirst(), c);
 
         c.gridx = 1;
         c.weightx = 1;
         c.anchor = GridBagConstraints.CENTER;
         c.fill = GridBagConstraints.HORIZONTAL;
-        add(details.getComponent(), c);
+        add(details.getSecond(), c);
 
         c.gridx = 2;
         c.weightx = 0;
         c.anchor = GridBagConstraints.LINE_END;
         c.fill = GridBagConstraints.NONE;
-        add(details.getLabel(), c);
+        add(details.getThird(), c);
     }
 
     private void setAdjustmentsVisibility(boolean visibility) {
