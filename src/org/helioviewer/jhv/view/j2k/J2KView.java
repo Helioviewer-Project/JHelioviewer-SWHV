@@ -29,7 +29,6 @@ import org.helioviewer.jhv.view.DecodeCallback;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.j2k.image.DecodeParams;
 import org.helioviewer.jhv.view.j2k.image.ReadParams;
-import org.helioviewer.jhv.view.j2k.image.SubImage;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCache;
 
 import com.github.benmanes.caffeine.cache.Cache;

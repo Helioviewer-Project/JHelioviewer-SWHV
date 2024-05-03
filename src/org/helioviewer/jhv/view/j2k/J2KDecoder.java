@@ -20,7 +20,6 @@ import kdu_jni.Kdu_thread_env;
 
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.view.j2k.image.DecodeParams;
-import org.helioviewer.jhv.view.j2k.image.SubImage;
 
 import org.lwjgl.system.MemoryUtil;
 

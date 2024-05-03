@@ -9,7 +9,6 @@ import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.j2k.image.DecodeParams;
-import org.helioviewer.jhv.view.j2k.image.SubImage;
 
 public class J2KViewCallisto extends J2KView {
 
