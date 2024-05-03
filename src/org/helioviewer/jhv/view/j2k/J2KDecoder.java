@@ -131,7 +131,7 @@ record J2KDecoder(Jpx_source source, J2KParams.Decode params, int numComps,
         return null;
     }
 
-    private static Kdu_region_compositor createCompositor(Jpx_source source, Kdu_quality_limiter quality) throws Exception {
+    private static Kdu_region_compositor createCompositor(Jpx_source source, Kdu_quality_limiter quality) throws KduException {
         Kdu_region_compositor krc = new Kdu_region_compositor();
         krc.Create(source);
         krc.Set_surface_initialization_mode(false);

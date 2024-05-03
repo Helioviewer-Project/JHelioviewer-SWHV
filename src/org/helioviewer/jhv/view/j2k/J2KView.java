@@ -27,7 +27,6 @@ import org.helioviewer.jhv.time.TimeMap;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.DecodeCallback;
 import org.helioviewer.jhv.view.DecodeExecutor;
-import org.helioviewer.jhv.view.j2k.jpip.JPIPCache;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -49,7 +48,6 @@ public class J2KView extends BaseView {
     private final TimeMap<Integer> frameMap = new TimeMap<>();
 
     private final KakaduSource source;
-    private final JPIPCache jpipCache;
 
     protected final int serial;
     protected final CompletionLevel completionLevel;
@@ -73,12 +71,10 @@ public class J2KView extends BaseView {
         try {
             switch (dataUri.format()) {
                 case JPIP -> {
-                    jpipCache = new JPIPCache();
-                    reader = new J2KReader(dataUri.uri(), jpipCache);
-                    source = new KakaduSource.Remote(jpipCache);
+                    reader = new J2KReader(dataUri.uri());
+                    source = new KakaduSource.Remote(reader.getCache());
                 }
                 case JP2, JPX -> {
-                    jpipCache = null;
                     reader = null;
                     source = new KakaduSource.Local(dataUri.file());
                 }
@@ -119,7 +115,7 @@ public class J2KView extends BaseView {
             if (lut != null)
                 builtinLUT = new LUT("built-in", lut);
 
-            if (jpipCache == null) { // local
+            if (reader == null) { // local
                 completionLevel = new CompletionLevel.Local(source, maxFrame);
             } else {
                 completionLevel = new CompletionLevel.Remote(source, maxFrame);
@@ -128,7 +124,7 @@ public class J2KView extends BaseView {
             if (isJP2)
                 source.close(); // JP2, close asap
 
-            abolishable = reaper.register(this, new J2KAbolisher(serial, reader, source, jpipCache));
+            abolishable = reaper.register(this, new J2KAbolisher(serial, reader, source));
         } catch (Exception e) {
             String msg = e instanceof KduException ? "Kakadu error" : e.getMessage();
             throw new Exception(msg + ": " + dataUri, e);
@@ -140,8 +136,7 @@ public class J2KView extends BaseView {
         return frame < 0 || frame >= cacheKey.length ? null : cacheKey[frame];
     }
 
-    private record J2KAbolisher(int aSerial, J2KReader aReader, KakaduSource aSource,
-                                JPIPCache aJpipCache) implements Runnable {
+    private record J2KAbolisher(int aSerial, J2KReader aReader, KakaduSource aSource) implements Runnable {
         @Override
         public void run() {
             for (J2KParams.Decode params : decodeCache.asMap().keySet()) {
@@ -150,16 +145,12 @@ public class J2KView extends BaseView {
             }
             // reader abolish may take too long in stressed conditions
             new Thread(() -> {
-                if (aReader != null) {
-                    aReader.abolish();
-                }
                 try {
+                    if (aReader != null) {
+                        aReader.abolish();
+                    }
                     if (aSource != null) {
                         aSource.close();
-                    }
-                    if (aJpipCache != null) {
-                        aJpipCache.Close();
-                        aJpipCache.Native_destroy();
                     }
                 } catch (KduException e) {
                     Log.error(e);
@@ -373,10 +364,6 @@ public class J2KView extends BaseView {
             source.open();
         }
         return source;
-    }
-
-    JPIPCache jpipCache() {
-        return jpipCache;
     }
 
     CompletionLevel completionLevel() {

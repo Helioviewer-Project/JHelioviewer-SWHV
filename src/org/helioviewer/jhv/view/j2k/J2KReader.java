@@ -19,13 +19,14 @@ import org.helioviewer.jhv.view.j2k.jpip.JPIPStream;
 class J2KReader implements Runnable {
 
     private final BooleanSignal readerSignal = new BooleanSignal();
+    private final JPIPCache cache = new JPIPCache();
     private final URI uri;
     private final Thread myThread;
 
     private volatile boolean isAbolished;
     private JPIPSocket socket;
 
-    J2KReader(URI _uri, JPIPCache cache) throws KduException, IOException {
+    J2KReader(URI _uri) throws KduException, IOException {
         uri = _uri;
         socket = new JPIPSocket(uri, cache);
         initJPIP(cache);
@@ -34,12 +35,16 @@ class J2KReader implements Runnable {
         myThread.setDaemon(true);
     }
 
+    JPIPCache getCache() {
+        return cache;
+    }
+
     void start() {
         myThread.start();
     }
 
     // runs in abolish thread
-    void abolish() {
+    void abolish() throws KduException {
         if (isAbolished)
             return;
         isAbolished = true;
@@ -54,6 +59,9 @@ class J2KReader implements Runnable {
                 Log.error(e);
             }
         }
+
+        cache.Close();
+        cache.Native_destroy();
     }
 
     void signal(J2KParams.Read params) {
@@ -116,7 +124,6 @@ class J2KReader implements Runnable {
             }
 
             J2KView view = params.view;
-            JPIPCache cache = view.jpipCache();
             CompletionLevel completionLevel = view.completionLevel();
             int numFrames = view.getMaximumFrameNumber() + 1;
 
