@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.view.j2k;
 
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 
 import javax.annotation.Nullable;
@@ -32,12 +31,12 @@ abstract class KakaduSource {
 
         private final String path;
 
-        Local(File file) {
-            path = file.toString();
+        Local(String _path) {
+            path = _path;
         }
 
         @Override
-        void open() throws Exception {
+        void open() throws KduException {
             super.jp2Src.Open(path, true);
             super.jpxSrc.Open(super.jp2Src, false);
         }
@@ -53,14 +52,14 @@ abstract class KakaduSource {
         }
 
         @Override
-        void open() throws Exception {
+        void open() throws KduException {
             super.jp2Src.Open(cache);
             super.jpxSrc.Open(super.jp2Src, false);
         }
 
     }
 
-    abstract void open() throws Exception;
+    abstract void open() throws KduException;
 
     void close() throws KduException {
         jpxSrc.Close();
