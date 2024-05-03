@@ -80,7 +80,7 @@ public class J2KView extends BaseView {
                 case JP2, JPX -> {
                     jpipCache = null;
                     reader = null;
-                    source = new KakaduSource.Local(dataUri.file());
+                    source = new KakaduSource.Local(dataUri.file().toString());
                 }
                 default -> throw new Exception("Unknown image type");
             }
@@ -368,7 +368,7 @@ public class J2KView extends BaseView {
         return completionLevel.getResolutionSet(frame).getLevel(level);
     }
 
-    KakaduSource source() throws Exception {
+    KakaduSource source() throws KduException {
         if (isJP2) { // JP2, reopen
             source.open();
         }
