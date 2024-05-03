@@ -59,7 +59,7 @@ class J2KParams {
 
         final J2KView view;
         final Decode decodeParams;
-        public boolean priority;
+        boolean priority;
 
         Read(J2KView _view, Decode _decodeParams, boolean _priority) {
             view = _view;
