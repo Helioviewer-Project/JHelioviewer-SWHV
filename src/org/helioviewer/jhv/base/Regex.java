@@ -10,6 +10,7 @@ public class Regex {
     public static final Pattern Integer = Pattern.compile("\\d+");
 
     public static final Pattern Comma = Pattern.compile(",");
+    public static final Pattern Equal = Pattern.compile("=");
     public static final Pattern GT = Pattern.compile(">");
     public static final Pattern Return = Pattern.compile("\n");
     public static final Pattern Space = Pattern.compile(" ");
