@@ -19,14 +19,13 @@ import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
 
 import org.helioviewer.jhv.imagedata.ImageBuffer;
-import org.helioviewer.jhv.view.j2k.image.DecodeParams;
 
 import org.lwjgl.system.MemoryUtil;
 
 //import com.google.common.math.StatsAccumulator;
 //import com.google.common.base.Stopwatch;
 
-record J2KDecoder(Jpx_source source, DecodeParams params, int numComps,
+record J2KDecoder(Jpx_source source, J2KParams.Decode params, int numComps,
                   boolean mgn) implements Callable<ImageBuffer> {
 
     // Maximum of samples to process per rendering iteration

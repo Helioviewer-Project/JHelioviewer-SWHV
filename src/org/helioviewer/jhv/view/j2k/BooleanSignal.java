@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.view.j2k;
 
-import org.helioviewer.jhv.view.j2k.image.ReadParams;
-
 // Very simple way of signaling between threads. Has no sense of ownership and
 // thus any thread can signal or wait for a signal. In general, it is not a
 // problem if many threads call the signal method, but only one thread
@@ -12,19 +10,19 @@ class BooleanSignal {
     private final Object lock = new Object();
 
     private boolean isSignaled;
-    private ReadParams params;
+    private J2KParams.Read params;
 
     // Used to wait for a signal. Waits until the flag is set, then it resets
     // the flag and returns. The waiting thread can be interrupted and that
     // exception is thrown immediately.
-    ReadParams waitForSignal() throws InterruptedException {
+    J2KParams.Read waitForSignal() throws InterruptedException {
         synchronized (lock) {
             while (!isSignaled) {
                 lock.wait();
             }
             isSignaled = false;
             // drop reference to params
-            ReadParams ret = params;
+            J2KParams.Read ret = params;
             params = null;
             return ret;
         }
@@ -32,7 +30,7 @@ class BooleanSignal {
 
     // Sets the isSignaled flag and wakes up one waiting thread. Doesn't bother
     // to notifyAll since the first thread woken up resets the flag anyway.
-    void signal(ReadParams newParams) {
+    void signal(J2KParams.Read newParams) {
         synchronized (lock) {
             isSignaled = true;
             params = newParams;
