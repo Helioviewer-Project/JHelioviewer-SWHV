@@ -33,14 +33,11 @@ class J2KReader implements Runnable {
 
         myThread = new Thread(this, "Reader " + uri);
         myThread.setDaemon(true);
+        myThread.start();
     }
 
     JPIPCache getCache() {
         return cache;
-    }
-
-    void start() {
-        myThread.start();
     }
 
     // runs in abolish thread

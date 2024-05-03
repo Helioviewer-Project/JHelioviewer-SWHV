@@ -115,12 +115,7 @@ public class J2KView extends BaseView {
             if (lut != null)
                 builtinLUT = new LUT("built-in", lut);
 
-            if (reader == null) { // local
-                completionLevel = new CompletionLevel.Local(source, maxFrame);
-            } else {
-                completionLevel = new CompletionLevel.Remote(source, maxFrame);
-                reader.start();
-            }
+            completionLevel = reader == null ? new CompletionLevel.Local(source, maxFrame) : new CompletionLevel.Remote(source, maxFrame);
             if (isJP2)
                 source.close(); // JP2, close asap
 
