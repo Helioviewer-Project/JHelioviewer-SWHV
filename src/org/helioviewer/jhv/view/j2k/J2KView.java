@@ -47,7 +47,7 @@ public class J2KView extends BaseView {
     private final String[] cacheKey;
     private final TimeMap<Integer> frameMap = new TimeMap<>();
 
-    private final KakaduSource source;
+    private final J2KSource source;
 
     protected final int serial;
     protected final CompletionLevel completionLevel;
@@ -72,11 +72,11 @@ public class J2KView extends BaseView {
             switch (dataUri.format()) {
                 case JPIP -> {
                     reader = new J2KReader(dataUri.uri());
-                    source = new KakaduSource.Remote(reader.getCache());
+                    source = new J2KSource.Remote(reader.getCache());
                 }
                 case JP2, JPX -> {
                     reader = null;
-                    source = new KakaduSource.Local(dataUri.file().toString());
+                    source = new J2KSource.Local(dataUri.file().toString());
                 }
                 default -> throw new Exception("Unknown image type");
             }
@@ -131,7 +131,7 @@ public class J2KView extends BaseView {
         return frame < 0 || frame >= cacheKey.length ? null : cacheKey[frame];
     }
 
-    private record J2KAbolisher(int aSerial, J2KReader aReader, KakaduSource aSource) implements Runnable {
+    private record J2KAbolisher(int aSerial, J2KReader aReader, J2KSource aSource) implements Runnable {
         @Override
         public void run() {
             for (J2KParams.Decode params : decodeCache.asMap().keySet()) {
@@ -144,9 +144,7 @@ public class J2KView extends BaseView {
                     if (aReader != null) {
                         aReader.abolish();
                     }
-                    if (aSource != null) {
-                        aSource.close();
-                    }
+                    aSource.close();
                 } catch (KduException e) {
                     Log.error(e);
                 }
@@ -354,7 +352,7 @@ public class J2KView extends BaseView {
         return completionLevel.getResolutionSet(frame).getLevel(level);
     }
 
-    KakaduSource source() throws KduException {
+    J2KSource source() throws KduException {
         if (isJP2) { // JP2, reopen
             source.open();
         }
