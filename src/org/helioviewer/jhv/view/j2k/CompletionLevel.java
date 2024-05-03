@@ -29,7 +29,7 @@ interface CompletionLevel {
         private final ResolutionSet[] resolutionSet;
         private final int maxFrame;
 
-        Local(KakaduSource source, int _maxFrame) throws KduException {
+        Local(J2KSource source, int _maxFrame) throws KduException {
             maxFrame = _maxFrame;
             resolutionSet = new ResolutionSet[maxFrame + 1];
             for (int i = 0; i <= maxFrame; ++i) {
@@ -70,13 +70,13 @@ interface CompletionLevel {
 
     class Remote implements CompletionLevel {
 
-        private final KakaduSource source;
+        private final J2KSource source;
         private final int maxFrame;
         private final ResolutionSet[] resolutionSet;
 
         private int partialUntil = 0;
 
-        Remote(KakaduSource _source, int _maxFrame) throws KduException {
+        Remote(J2KSource _source, int _maxFrame) throws KduException {
             source = _source;
             maxFrame = _maxFrame;
             resolutionSet = new ResolutionSet[maxFrame + 1];

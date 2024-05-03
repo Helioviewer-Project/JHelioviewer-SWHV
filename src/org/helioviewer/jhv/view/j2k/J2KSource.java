@@ -22,12 +22,12 @@ import kdu_jni.Kdu_global;
 
 import org.helioviewer.jhv.math.MathUtils;
 
-abstract class KakaduSource {
+abstract class J2KSource {
 
     private final Jp2_threadsafe_family_src jp2Src = new Jp2_threadsafe_family_src();
     private final Jpx_source jpxSrc = new Jpx_source();
 
-    static class Local extends KakaduSource {
+    static class Local extends J2KSource {
 
         private final String path;
 
@@ -43,7 +43,7 @@ abstract class KakaduSource {
 
     }
 
-    static class Remote extends KakaduSource {
+    static class Remote extends J2KSource {
 
         private final Kdu_cache cache;
 
