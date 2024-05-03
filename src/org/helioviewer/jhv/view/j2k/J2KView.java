@@ -27,8 +27,6 @@ import org.helioviewer.jhv.time.TimeMap;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.DecodeCallback;
 import org.helioviewer.jhv.view.DecodeExecutor;
-import org.helioviewer.jhv.view.j2k.image.DecodeParams;
-import org.helioviewer.jhv.view.j2k.image.ReadParams;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCache;
 
 import com.github.benmanes.caffeine.cache.Cache;
@@ -38,7 +36,7 @@ public class J2KView extends BaseView {
 
     private static final AtomicInteger global_serial = new AtomicInteger(0);
 
-    private static final Cache<DecodeParams, ImageBuffer> decodeCache = Caffeine.newBuilder().softValues().build();
+    private static final Cache<J2KParams.Decode, ImageBuffer> decodeCache = Caffeine.newBuilder().softValues().build();
 
     private static final Cleaner reaper = Cleaner.create();
     private final Cleaner.Cleanable abolishable;
@@ -146,7 +144,7 @@ public class J2KView extends BaseView {
                                 JPIPCache aJpipCache) implements Runnable {
         @Override
         public void run() {
-            for (DecodeParams params : decodeCache.asMap().keySet()) {
+            for (J2KParams.Decode params : decodeCache.asMap().keySet()) {
                 if (params.serial == aSerial)
                     decodeCache.invalidate(params);
             }
@@ -252,7 +250,7 @@ public class J2KView extends BaseView {
         return isDownloading;
     }
 
-    protected DecodeParams getDecodeParams(Position viewpoint, int frame, double pixFactor, float factor) {
+    protected J2KParams.Decode getDecodeParams(Position viewpoint, int frame, double pixFactor, float factor) {
         ResolutionSet.Level res;
         if (Movie.isRecording()) { // all bets are off
             res = completionLevel.getResolutionSet(frame).getLevel(0);
@@ -264,58 +262,57 @@ public class J2KView extends BaseView {
         }
 
         AtomicBoolean status = completionLevel.getFrameStatus(frame, res.level); // before signalling to reader
-        return new DecodeParams(serial, frame, res.subImage, res.level, factor, status != null && status.get(), viewpoint);
+        return new J2KParams.Decode(serial, frame, res.subImage, res.level, factor, status != null && status.get(), viewpoint);
     }
 
     private int currentLevel = 10000;
 
-    protected void signalReader(DecodeParams decodeParams) {
+    protected void signalReader(J2KParams.Decode decodeParams) {
         int level = decodeParams.level;
         boolean priority = !Movie.isPlaying();
 
         if (priority || level < currentLevel) {
-            reader.signalReader(new ReadParams(this, decodeParams, priority));
+            reader.signal(new J2KParams.Read(this, decodeParams, priority));
         }
         currentLevel = level;
     }
 
     @Override
     public void decode(Position viewpoint, double pixFactor, float factor) {
-        DecodeParams decodeParams = getDecodeParams(viewpoint, targetFrame, pixFactor, factor);
+        J2KParams.Decode decodeParams = getDecodeParams(viewpoint, targetFrame, pixFactor, factor);
         if (reader != null && !decodeParams.complete) {
             signalReader(decodeParams);
         }
         executeDecode(decodeParams);
     }
 
-    void signalDecoderFromReader(ReadParams params) {
+    void signalDecoderFromReader(J2KParams.Read readParams) {
         EventQueue.invokeLater(() -> {
-            if (params.decodeParams.frame == targetFrame) {
-                // params.decodeParams.complete = true;
-                executeDecode(params.decodeParams);
+            if (readParams.decodeParams.frame == targetFrame) {
+                executeDecode(readParams.decodeParams);
             }
         });
     }
 
-    private void executeDecode(DecodeParams params) {
-        ImageBuffer imageBuffer = decodeCache.getIfPresent(params);
+    private void executeDecode(J2KParams.Decode decodeParams) {
+        ImageBuffer imageBuffer = decodeCache.getIfPresent(decodeParams);
         if (imageBuffer == null) {
-            int numComps = completionLevel.getResolutionSet(params.frame).numComps;
+            int numComps = completionLevel.getResolutionSet(decodeParams.frame).numComps;
             try {
-                executor.decode(new J2KDecoder(source().jpxSource(), params, numComps, mgn), new J2KCallback(params));
+                executor.decode(new J2KDecoder(source().jpxSource(), decodeParams, numComps, mgn), new J2KCallback(decodeParams));
             } catch (Exception e) {
                 Log.error(e);
             }
         } else {
-            sendDataToHandler(params, imageBuffer);
+            sendDataToHandler(decodeParams, imageBuffer);
         }
     }
 
     private class J2KCallback extends DecodeCallback {
 
-        private final DecodeParams params;
+        private final J2KParams.Decode params;
 
-        J2KCallback(DecodeParams _params) {
+        J2KCallback(J2KParams.Decode _params) {
             params = _params;
         }
 
@@ -336,7 +333,7 @@ public class J2KView extends BaseView {
 
     }
 
-    private void sendDataToHandler(DecodeParams decodeParams, ImageBuffer imageBuffer) {
+    private void sendDataToHandler(J2KParams.Decode decodeParams, ImageBuffer imageBuffer) {
         int frame = decodeParams.frame;
         MetaData m = metaData[frame];
         SubImage roi = decodeParams.subImage;

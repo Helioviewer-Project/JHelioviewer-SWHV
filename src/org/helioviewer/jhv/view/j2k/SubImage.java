@@ -2,7 +2,7 @@ package org.helioviewer.jhv.view.j2k;
 
 import org.helioviewer.jhv.math.MathUtils;
 
-public class SubImage {
+class SubImage {
 
     final int x;
     final int y;
