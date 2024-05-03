@@ -2,8 +2,6 @@ package org.helioviewer.jhv.view.j2k;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.helioviewer.jhv.view.j2k.image.SubImage;
-
 // A class describing the available resolution levels for a given image
 public class ResolutionSet {
 

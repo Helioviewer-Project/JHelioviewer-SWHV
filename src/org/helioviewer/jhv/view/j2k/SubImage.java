@@ -1,19 +1,19 @@
-package org.helioviewer.jhv.view.j2k.image;
+package org.helioviewer.jhv.view.j2k;
 
 import org.helioviewer.jhv.math.MathUtils;
 
 public class SubImage {
 
-    public final int x;
-    public final int y;
-    public final int w;
-    public final int h;
+    final int x;
+    final int y;
+    final int w;
+    final int h;
     private final int hash;
 
     private static final int QUANTA = 32;
 
     // roundoff to quanta, minimum 1 pixel, clip to full image size
-    public SubImage(int xx, int yy, int ww, int hh, int fwidth, int fheight) {
+    SubImage(int xx, int yy, int ww, int hh, int fwidth, int fheight) {
         xx = MathUtils.roundDownTo(xx, QUANTA);
         yy = MathUtils.roundDownTo(yy, QUANTA);
         ww = MathUtils.roundUpTo(ww + QUANTA, QUANTA);

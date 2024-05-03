@@ -126,6 +126,7 @@ public class UIGlobals {
         keys.forEach(System.out::println);
     }
 */
+
     public static Font sansFont;
 
     public static Font uiFont;
