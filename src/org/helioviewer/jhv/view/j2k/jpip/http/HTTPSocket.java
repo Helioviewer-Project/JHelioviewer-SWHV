@@ -2,7 +2,6 @@ package org.helioviewer.jhv.view.j2k.jpip.http;
 
 import java.io.IOException;
 import java.io.InputStream;
-//import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URI;
@@ -10,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.zip.InflaterInputStream;
 import java.util.zip.GZIPInputStream;
 
-//import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
@@ -36,7 +35,15 @@ public class HTTPSocket {
                 case "jpip" -> socket = new Socket(ProxySettings.proxy);
                 case "jpips" -> {
                     socket = SSLSocketFactory.getDefault().createSocket();
-                    ((SSLSocket) socket).setEnabledProtocols(new String[]{"TLSv1.3"});
+                    if (socket instanceof SSLSocket sslSocket) { // obviously
+                        SSLParameters parameters = sslSocket.getSSLParameters();
+                        if (parameters != null) {
+                            parameters.setProtocols(new String[]{"TLSv1.3"});
+                            parameters.setApplicationProtocols(new String[]{"http/1.1"}); // probably useless
+                            parameters.setEndpointIdentificationAlgorithm("HTTPS"); // hope this is performed
+                            sslSocket.setSSLParameters(parameters);
+                        }
+                    }
                 }
                 default -> throw new IOException("JPIP scheme not supported: " + uri);
             }
@@ -46,22 +53,8 @@ public class HTTPSocket {
             socket.setSoTimeout(TIMEOUT_READ);
             socket.setKeepAlive(true);
             socket.setTcpNoDelay(true);
-
             socket.connect(new InetSocketAddress(host, port), TIMEOUT_CONNECT);
-/* verify peer address for coverity
-            if (socket instanceof SSLSocket ssl) {
-                SSLSession session = ssl.getSession();
-                String principal = session.getPeerPrincipal().getName();
-                String[] parts = Regex.Equal.split(principal);
-                if (parts.length != 2)
-                    throw new Exception("Invalid principal name: " + principal);
 
-                InetAddress priAddr = InetAddress.getByName(parts[1]);
-                InetAddress conAddr = InetAddress.getByName(host);
-                if (!InetAddress.getByName(parts[1]).equals(InetAddress.getByName(host)))
-                    throw new Exception("Certificate name (" + parts[1] + ") does not resolve to host (" + host + ')');
-            }
-*/
             inputStream = socket.getInputStream();
 
             HTTPMessage msg = new HTTPMessage();
