@@ -1,7 +1,9 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.6.4 (pending)
+## JHelioviewer 4.6.5 (pending)
+
+## JHelioviewer 4.6.4 (2024-05-06)
 
 - Attempt to detect image file formats and reduce dependency on file names extensions
 - Allow loading of images by pasting files or their locations
