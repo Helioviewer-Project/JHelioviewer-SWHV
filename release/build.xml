@@ -61,8 +61,9 @@
         <jar destfile="${jarfile}">
             <manifest>
                 <attribute name="Automatic-Module-Name" value="org.helioviewer.jhv"/>
+                <attribute name="Add-Exports" value="java.desktop/sun.awt java.desktop/sun.swing"/>
                 <attribute name="Main-Class" value="org.helioviewer.jhv.JHelioviewer"/>
-                <attribute name="Class-Path" value="."/>
+                <attribute name="Class-Path" value="natives-linux.jar natives-macos.jar natives-windows.jar"/>
                 <attribute name="version" value="${version}"/>
                 <attribute name="revision" value="${revision}"/>
             </manifest>

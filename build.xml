@@ -99,6 +99,7 @@
             <fileset dir="${resources}"/>
             <manifest>
                 <attribute name="Automatic-Module-Name" value="org.helioviewer.jhv"/>
+                <attribute name="Add-Exports" value="java.desktop/sun.awt java.desktop/sun.swing"/>
                 <attribute name="Main-Class" value="org.helioviewer.jhv.JHelioviewer"/>
                 <attribute name="Class-Path" value="${manifest_cp}"/>
                 <attribute name="version" value="${version}"/>
