@@ -49,24 +49,6 @@
         <file path="./resources/JHV_icon.png" />
       </iconImageFiles>
     </launcher>
-    <launcher name="Linux_dis" id="296" menuName="JHelioviewer">
-      <executable name="jhelioviewer" iconSet="true" executableDir="bin" redirectStderr="false" executableMode="gui" singleInstance="true" dpiAware="false" />
-      <java mainClass="org.helioviewer.jhv.JHelioviewer" vmParameters="-Xms2g --add-exports java.desktop/sun.awt=ALL-UNNAMED --add-exports java.desktop/sun.swing=ALL-UNNAMED">
-        <classPath>
-          <archive location="classes/natives-linux.jar" failOnError="false" />
-          <archive location="classes/natives-macos.jar" failOnError="false" />
-          <archive location="classes/natives-windows.jar" failOnError="false" />
-          <archive location="classes/JHelioviewer.jar" failOnError="false" />
-        </classPath>
-        <nativeLibraryDirectories>
-          <directory name="bin" />
-        </nativeLibraryDirectories>
-      </java>
-      <vmOptionsFile mode="none" />
-      <iconImageFiles>
-        <file path="./resources/JHV_icon.png" />
-      </iconImageFiles>
-    </launcher>
   </launchers>
   <installerGui autoUpdateDescriptorUrl="https://swhv.oma.be/download/updates.xml" useAutoUpdateBaseUrl="true" autoUpdateBaseUrl="https://github.com/Helioviewer-Project/JHelioviewer-SWHV/releases/download/${compiler:sys.version}/">
     <applications>
@@ -1126,9 +1108,6 @@ return true;</property>
       </topLevelFiles>
     </macosArchive>
     <windows name="Windows 64 bit" id="150" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}" architecture="64">
-      <excludedLaunchers>
-        <launcher id="296" />
-      </excludedLaunchers>
       <exclude>
         <entry location="classes/natives-linux.jar" />
         <entry location="classes/natives-macos.jar" />
@@ -1140,24 +1119,16 @@ return true;</property>
       </jreBundle>
     </windows>
     <linuxDeb name="Linux Deb Archive 64 bit" id="218" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_amd64" bzip="true" maintainerEmail="daniel.mueller@esa.int" architectureSet="true" architecture="amd64">
-      <excludedLaunchers>
-        <launcher id="24" />
-      </excludedLaunchers>
       <exclude>
         <entry location="classes/natives-macos.jar" />
         <entry location="classes/natives-windows.jar" />
-        <entry location="Helpers" />
       </exclude>
       <postInstallScript>${compiler:file("./resources/linux-post-install.sh")}</postInstallScript>
     </linuxDeb>
     <linuxRPM name="Linux RPM 64 bit" id="270" mediaFileName="${compiler:sys.shortName}.${compiler:sys.version}.x86_64" arch="x86_64">
-      <excludedLaunchers>
-        <launcher id="24" />
-      </excludedLaunchers>
       <exclude>
         <entry location="classes/natives-macos.jar" />
         <entry location="classes/natives-windows.jar" />
-        <entry location="Helpers" />
       </exclude>
       <postInstallScript>${compiler:file("./resources/linux-post-install.sh")}</postInstallScript>
     </linuxRPM>
