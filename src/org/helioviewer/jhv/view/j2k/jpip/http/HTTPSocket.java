@@ -75,24 +75,24 @@ public class HTTPSocket {
         head = msg.getHeader("Content-Encoding");
         String contentEncoding = head == null ? "identity" : head.toLowerCase();
 
-        TransferInputStream transferInput;
+        InputStream transformStream;
         switch (transferEncoding) {
             case "identity" -> {
                 String contentLength = msg.getHeader("Content-Length");
                 try {
-                    transferInput = new FixedSizedInputStream(inputStream, Integer.parseInt(contentLength));
+                    transformStream = new FixedSizedInputStream(inputStream, Integer.parseInt(contentLength));
                 } catch (Exception e) {
                     throw new IOException("Invalid Content-Length header: " + contentLength);
                 }
             }
-            case "chunked" -> transferInput = new ChunkedInputStream(inputStream);
+            case "chunked" -> transformStream = new ChunkedInputStream(inputStream);
             default -> throw new IOException("Unsupported transfer encoding: " + transferEncoding);
         }
 
         return switch (contentEncoding) {
-            case "identity" -> transferInput;
-            case "gzip" -> new GZIPInputStream(transferInput);
-            case "deflate" -> new InflaterInputStream(transferInput);
+            case "identity" -> transformStream;
+            case "gzip" -> new GZIPInputStream(transformStream);
+            case "deflate" -> new InflaterInputStream(transformStream);
             default -> throw new IOException("Unknown content encoding: " + contentEncoding);
         };
     }

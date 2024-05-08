@@ -12,28 +12,20 @@ class JPIPSegment implements Serializable {
 
     // The data-bin in-class identifier
     public long binID;
-
     // The data-bin auxiliary information
     public long aux;
-
     // The data-bin class identifier
     public int klassID;
-
     // The code-stream index
     public long codestreamID;
-
     // Offset of this segment within the data-bin data
     public int offset;
-
     // Length of this segment
     public int length;
-
     // The segment data
     public byte[] data;
-
     // Indicates if this segment is the last one (when there is a data segment stream)
     public boolean isFinal;
-
     // Indicates if this segment is an End-Of-Response message
     public boolean isEOR;
 
