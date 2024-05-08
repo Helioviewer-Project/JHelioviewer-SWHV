@@ -17,6 +17,12 @@ public final class JPIPSocket extends HTTPSocket {
     private static final String[] cnewParams = {"cid", "transport", "host", "path", "port", "auxport"};
     private static final int mainHeaderKlass = DatabinMap.getKlass(JPIPConstants.MAIN_HEADER_DATA_BIN_CLASS);
 
+    // Maximum number of layers that can be requested at the same time
+    private static final int MAX_REQ_LAYERS = 1;
+    // The maximum length in bytes of a JPIP request
+    public static final int MAX_REQUEST_LEN = (MAX_REQ_LAYERS + 1) * (1024 * 1024);
+    public static final int META_REQUEST_LEN = 2000000;
+
     // The jpip channel ID for the connection (persistent)
     private final String jpipChannelID;
 
@@ -67,13 +73,13 @@ public final class JPIPSocket extends HTTPSocket {
 
     public void init(JPIPCache cache) throws KduException, IOException {
         JPIPResponse res;
-        String req = JPIPQuery.create(JPIPConstants.META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
+        String req = JPIPQuery.create(META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
         do {
             res = request(req, cache, 0);
         } while (!res.isResponseComplete());
 
         // prime first image
-        req = JPIPQuery.create(JPIPConstants.MAX_REQUEST_LEN, "stream", "0", "fsiz", "64,64,closest", "rsiz", "64,64", "roff", "0,0");
+        req = JPIPQuery.create(MAX_REQUEST_LEN, "stream", "0", "fsiz", "64,64,closest", "rsiz", "64,64", "roff", "0,0");
         do {
             res = request(req, cache, 0);
         } while (!res.isResponseComplete() && !cache.isDataBinCompleted(mainHeaderKlass, 0, 0));
