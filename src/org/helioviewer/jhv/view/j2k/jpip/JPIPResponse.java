@@ -27,7 +27,7 @@ public class JPIPResponse {
 
     // Tells if the response completes the last request
     public boolean isResponseComplete() {
-        return status == JPIPConstants.EOR_WINDOW_DONE || status == JPIPConstants.EOR_IMAGE_DONE;
+        return status == Constants.JPIP.EOR_WINDOW_DONE || status == Constants.JPIP.EOR_IMAGE_DONE;
     }
 
     // The last class identifier read
@@ -105,7 +105,7 @@ public class JPIPResponse {
             }
             seg.codestreamID = codestream;
 
-            Integer klassID = DatabinMap.getKlass(classID);
+            Integer klassID = Constants.getKlass(classID);
             if (klassID == null)
                 throw new ProtocolException("Invalid databin classID");
             seg.klassID = klassID;
@@ -113,7 +113,7 @@ public class JPIPResponse {
             seg.offset = (int) readVBAS(in);
             seg.length = (int) readVBAS(in);
 
-            if (classID == JPIPConstants.EXTENDED_PRECINCT_DATA_BIN_CLASS || classID == JPIPConstants.EXTENDED_TILE_DATA_BIN_CLASS)
+            if (classID == Constants.JPIP.EXTENDED_PRECINCT_DATA_BIN_CLASS || classID == Constants.JPIP.EXTENDED_TILE_DATA_BIN_CLASS)
                 seg.aux = readVBAS(in);
         }
 

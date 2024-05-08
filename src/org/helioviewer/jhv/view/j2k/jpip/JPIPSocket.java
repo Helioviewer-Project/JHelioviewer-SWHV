@@ -15,7 +15,7 @@ import org.helioviewer.jhv.view.j2k.jpip.http.HTTPSocket;
 public final class JPIPSocket extends HTTPSocket {
 
     private static final String[] cnewParams = {"cid", "transport", "host", "path", "port", "auxport"};
-    private static final int mainHeaderKlass = DatabinMap.getKlass(JPIPConstants.MAIN_HEADER_DATA_BIN_CLASS);
+    private static final int mainHeaderKlass = Constants.getKlass(Constants.JPIP.MAIN_HEADER_DATA_BIN_CLASS);
 
     // Maximum number of layers that can be requested at the same time
     private static final int MAX_REQ_LAYERS = 1;
