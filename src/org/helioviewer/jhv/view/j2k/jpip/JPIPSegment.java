@@ -41,9 +41,9 @@ class JPIPSegment implements Serializable {
     @Override
     public String toString() {
         String res = getClass().getName() + " [";
-        if (isEOR)
+        if (isEOR) {
             res += "EOR id=" + binID + " len=" + length;
-        else {
+        } else {
             res += "class=" + klassID + " stream=" + codestreamID;
             res += " id=" + binID + " off=" + offset + " len=" + length;
             if (isFinal)
