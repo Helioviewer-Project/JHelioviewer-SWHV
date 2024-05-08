@@ -9,7 +9,6 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCache;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
-import org.helioviewer.jhv.view.j2k.jpip.JPIPQuery;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPResponse;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPSocket;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPStream;
@@ -81,7 +80,7 @@ class J2KReader implements Runnable {
     }
 
     private static String createQuery(String fSiz, int layer) {
-        return JPIPQuery.create(JPIPSocket.MAX_REQUEST_LEN, "stream", String.valueOf(layer), "fsiz", fSiz + ",closest", "rsiz", fSiz, "roff", "0,0");
+        return JPIPSocket.createQuery(JPIPSocket.MAX_REQUEST_LEN, "stream", String.valueOf(layer), "fsiz", fSiz + ",closest", "rsiz", fSiz, "roff", "0,0");
     }
 
     private static String[] createMultiQuery(String fSiz, int numFrames) {
