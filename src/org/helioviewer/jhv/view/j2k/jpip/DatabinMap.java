@@ -2,7 +2,7 @@ package org.helioviewer.jhv.view.j2k.jpip;
 
 import java.util.Map;
 
-public class DatabinMap {
+class DatabinMap {
 
     // KakaduConstants
     private static final int KDU_PRECINCT_DATABIN = 0;
@@ -13,13 +13,13 @@ public class DatabinMap {
     private static final int KDU_UNDEFINED_DATABIN = 5;
 
     private static final Map<Integer, Integer> classMap = Map.of(
-            JPIPConstants.PRECINCT_DATA_BIN_CLASS,    KDU_PRECINCT_DATABIN,
+            JPIPConstants.PRECINCT_DATA_BIN_CLASS, KDU_PRECINCT_DATABIN,
             JPIPConstants.TILE_HEADER_DATA_BIN_CLASS, KDU_TILE_HEADER_DATABIN,
-            JPIPConstants.TILE_DATA_BIN_CLASS,        JPIPConstants.TILE_DATA_BIN_CLASS,
+            JPIPConstants.TILE_DATA_BIN_CLASS, JPIPConstants.TILE_DATA_BIN_CLASS,
             JPIPConstants.MAIN_HEADER_DATA_BIN_CLASS, KDU_MAIN_HEADER_DATABIN,
-            JPIPConstants.META_DATA_BIN_CLASS,        KDU_META_DATABIN);
+            JPIPConstants.META_DATA_BIN_CLASS, KDU_META_DATABIN);
 
-    public static Integer getKlass(int classID) {
+    static Integer getKlass(int classID) {
         return classMap.get(classID);
     }
 

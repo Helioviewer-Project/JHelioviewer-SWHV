@@ -15,6 +15,7 @@ import org.helioviewer.jhv.view.j2k.jpip.http.HTTPSocket;
 public final class JPIPSocket extends HTTPSocket {
 
     private static final String[] cnewParams = {"cid", "transport", "host", "path", "port", "auxport"};
+    private static final int mainHeaderKlass = DatabinMap.getKlass(JPIPConstants.MAIN_HEADER_DATA_BIN_CLASS);
 
     // The jpip channel ID for the connection (persistent)
     private final String jpipChannelID;
@@ -62,6 +63,20 @@ public final class JPIPSocket extends HTTPSocket {
         } finally {
             super.close();
         }
+    }
+
+    public void init(JPIPCache cache) throws KduException, IOException {
+        JPIPResponse res;
+        String req = JPIPQuery.create(JPIPConstants.META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
+        do {
+            res = request(req, cache, 0);
+        } while (!res.isResponseComplete());
+
+        // prime first image
+        req = JPIPQuery.create(JPIPConstants.MAX_REQUEST_LEN, "stream", "0", "fsiz", "64,64,closest", "rsiz", "64,64", "roff", "0,0");
+        do {
+            res = request(req, cache, 0);
+        } while (!res.isResponseComplete() && !cache.isDataBinCompleted(mainHeaderKlass, 0, 0));
     }
 
     private void writeRequest(String queryStr) throws IOException {
