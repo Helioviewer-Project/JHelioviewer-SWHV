@@ -16,7 +16,7 @@ import javax.annotation.Nonnull;
 
 // ChunkedInputStream allows decoding HTTP chunked responses with a simple
 // format. Does not support internal chunk headers.
-class ChunkedInputStream extends TransferInputStream {
+class ChunkedInputStream extends InputStream implements TotalLength {
 
     private int totalLength = 0;
     // The last chunk length

@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
 
 // Input stream with a fixed size. After reading the expected number of bytes
 // this input stream will behave as if the end of the stream has been reached.
-class FixedSizedInputStream extends TransferInputStream {
+class FixedSizedInputStream extends InputStream implements TotalLength {
 
     private int remainingBytes;
 
