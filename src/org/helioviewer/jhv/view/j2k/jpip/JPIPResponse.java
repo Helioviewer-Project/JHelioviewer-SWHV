@@ -105,8 +105,8 @@ public class JPIPResponse {
             }
             seg.codestreamID = codestream;
 
-            Integer klassID = Constants.getKlass(classID);
-            if (klassID == null)
+            int klassID = Constants.getKlass(classID);
+            if (klassID == Constants.UNKNOWN_DATABIN)
                 throw new ProtocolException("Invalid databin classID");
             seg.klassID = klassID;
 
