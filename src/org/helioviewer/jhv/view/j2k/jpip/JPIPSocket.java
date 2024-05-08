@@ -36,7 +36,7 @@ public final class JPIPSocket extends HTTPSocket {
 
         jpipPath = uri.getPath();
 
-        JPIPResponse res = request(JPIPQuery.create(512, "cnew", "http", "type", "jpp-stream", "tid", "0"), cache, 0); // deliberately short
+        JPIPResponse res = request(createQuery(512, "cnew", "http", "type", "jpp-stream", "tid", "0"), cache, 0); // deliberately short
         String cnew = res.getCNew();
         if (cnew == null)
             throw new IOException("The header 'JPIP-cnew' was not sent by the server");
@@ -64,22 +64,33 @@ public final class JPIPSocket extends HTTPSocket {
 
         try {
             if (jpipChannelID != null)
-                writeRequest(JPIPQuery.create(0, "cclose", jpipChannelID));
+                writeRequest(createQuery(0, "cclose", jpipChannelID));
         } catch (IOException ignore) { // no problem, server may have closed the socket
         } finally {
             super.close();
         }
     }
 
+    public static String createQuery(int len, String... values) {
+        boolean isKey = true;
+        StringBuilder buf = new StringBuilder();
+        for (String val : values) {
+            buf.append(val);
+            buf.append(isKey ? '=' : '&');
+            isKey = !isKey;
+        }
+        return buf + "len=" + len;
+    }
+
     public void init(JPIPCache cache) throws KduException, IOException {
         JPIPResponse res;
-        String req = JPIPQuery.create(META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
+        String req = createQuery(META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
         do {
             res = request(req, cache, 0);
         } while (!res.isResponseComplete());
 
         // prime first image
-        req = JPIPQuery.create(MAX_REQUEST_LEN, "stream", "0", "fsiz", "64,64,closest", "rsiz", "64,64", "roff", "0,0");
+        req = createQuery(MAX_REQUEST_LEN, "stream", "0", "fsiz", "64,64,closest", "rsiz", "64,64", "roff", "0,0");
         do {
             res = request(req, cache, 0);
         } while (!res.isResponseComplete() && !cache.isDataBinCompleted(mainHeaderKlass, 0, 0));
