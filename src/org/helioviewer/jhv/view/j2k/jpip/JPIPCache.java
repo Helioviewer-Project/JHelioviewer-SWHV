@@ -8,7 +8,7 @@ import kdu_jni.Kdu_global;
 
 public class JPIPCache extends Kdu_cache {
 
-    public boolean isDataBinCompleted(int klassID, long streamID, long binID) throws KduException {
+    boolean isDataBinCompleted(int klassID, long streamID, long binID) throws KduException {
         boolean[] complete = new boolean[1];
         Get_databin_length(klassID, streamID, binID, complete);
         return complete[0];

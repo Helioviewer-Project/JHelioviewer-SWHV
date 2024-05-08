@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.view.j2k.jpip;
 
-import java.util.Map;
-
 class Constants {
 
     static class JPIP {
@@ -57,15 +55,17 @@ class Constants {
         static final int UNDEFINED_DATABIN = 5;
     }
 
-    private static final Map<Integer, Integer> classMap = Map.of(
-            JPIP.PRECINCT_DATA_BIN_CLASS, KDU.PRECINCT_DATABIN,
-            JPIP.TILE_HEADER_DATA_BIN_CLASS, KDU.TILE_HEADER_DATABIN,
-            JPIP.TILE_DATA_BIN_CLASS, KDU.TILE_DATABIN,
-            JPIP.MAIN_HEADER_DATA_BIN_CLASS, KDU.MAIN_HEADER_DATABIN,
-            JPIP.META_DATA_BIN_CLASS, KDU.META_DATABIN);
+    static final int UNKNOWN_DATABIN = -1;
 
-    static Integer getKlass(int classID) {
-        return classMap.get(classID);
+    static int getKlass(int classID) {
+        return switch (classID) {
+            case JPIP.PRECINCT_DATA_BIN_CLASS -> KDU.PRECINCT_DATABIN;
+            case JPIP.TILE_HEADER_DATA_BIN_CLASS -> KDU.TILE_HEADER_DATABIN;
+            case JPIP.TILE_DATA_BIN_CLASS -> KDU.TILE_DATABIN;
+            case JPIP.MAIN_HEADER_DATA_BIN_CLASS -> KDU.MAIN_HEADER_DATABIN;
+            case JPIP.META_DATA_BIN_CLASS -> KDU.META_DATABIN;
+            default -> UNKNOWN_DATABIN;
+        };
     }
 
 }
