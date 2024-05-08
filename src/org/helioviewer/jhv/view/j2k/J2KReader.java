@@ -7,7 +7,6 @@ import kdu_jni.KduException;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.UITimer;
-import org.helioviewer.jhv.view.j2k.jpip.DatabinMap;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCache;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPConstants;
@@ -28,8 +27,14 @@ class J2KReader implements Runnable {
 
     J2KReader(URI _uri) throws KduException, IOException {
         uri = _uri;
+
         socket = new JPIPSocket(uri, cache);
-        initJPIP(cache);
+        try {
+            socket.init(cache);
+        } catch (Exception e) {
+            initCloseSocket();
+            throw new IOException("Error in the server communication: " + e.getMessage(), e);
+        }
 
         myThread = new Thread(this, "Reader " + uri);
         myThread.setDaemon(true);
@@ -63,27 +68,6 @@ class J2KReader implements Runnable {
 
     void signal(J2KParams.Read params) {
         readerSignal.signal(params);
-    }
-
-    private static final int mainHeaderKlass = DatabinMap.getKlass(JPIPConstants.MAIN_HEADER_DATA_BIN_CLASS);
-
-    private void initJPIP(JPIPCache cache) throws IOException {
-        try {
-            JPIPResponse res;
-            String req = JPIPQuery.create(JPIPConstants.META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
-            do {
-                res = socket.request(req, cache, 0);
-            } while (!res.isResponseComplete());
-
-            // prime first image
-            req = JPIPQuery.create(JPIPConstants.MAX_REQUEST_LEN, "stream", "0", "fsiz", "64,64,closest", "rsiz", "64,64", "roff", "0,0");
-            do {
-                res = socket.request(req, cache, 0);
-            } while (!res.isResponseComplete() && !cache.isDataBinCompleted(mainHeaderKlass, 0, 0));
-        } catch (Exception e) {
-            initCloseSocket();
-            throw new IOException("Error in the server communication: " + e.getMessage(), e);
-        }
     }
 
     private void initCloseSocket() {
