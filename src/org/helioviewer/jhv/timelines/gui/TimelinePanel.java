@@ -18,10 +18,10 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.TableValue;
-import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -45,7 +45,7 @@ public final class TimelinePanel extends JPanel {
     private final TimelineTable grid;
     private final JPanel optionsPanelWrapper;
 
-    private static class TimelineTable extends JTable implements LazyComponent {
+    private static class TimelineTable extends JTable implements Interfaces.LazyComponent {
 
         TimelineTable(TableModel tm) {
             super(tm);

@@ -15,10 +15,10 @@ import javax.swing.event.HyperlinkListener;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.IconBank;
+import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.components.base.HTMLPane;
-import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.opengl.GLInfo;
 
@@ -26,7 +26,7 @@ import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings("serial")
-public final class AboutDialog extends StandardDialog implements ShowableDialog, HyperlinkListener {
+public final class AboutDialog extends StandardDialog implements Interfaces.ShowableDialog, HyperlinkListener {
 
     public AboutDialog() {
         super(JHVFrame.getFrame(), "About JHelioviewer", true);

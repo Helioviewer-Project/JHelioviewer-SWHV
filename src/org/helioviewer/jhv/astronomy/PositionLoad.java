@@ -8,7 +8,7 @@ import java.util.concurrent.Future;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.gui.interfaces.StatusReceiver;
+import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.io.UriTemplate;
@@ -21,7 +21,7 @@ import org.json.JSONObject;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.util.concurrent.FutureCallback;
 
-public record PositionLoad(StatusReceiver receiver, SpaceObject target, boolean isHCI,
+public record PositionLoad(Interfaces.StatusReceiver receiver, SpaceObject target, boolean isHCI,
                            Future<PositionResponse> future) {
 
     private record LoadPosition(SpaceObject observer, SpaceObject target, Frame frame, long start,
@@ -69,7 +69,7 @@ public record PositionLoad(StatusReceiver receiver, SpaceObject target, boolean 
 
     }
 
-    private record Callback(StatusReceiver receiver) implements FutureCallback<PositionResponse> {
+    private record Callback(Interfaces.StatusReceiver receiver) implements FutureCallback<PositionResponse> {
 
         @Override
         public void onSuccess(PositionResponse result) {
@@ -104,7 +104,7 @@ public record PositionLoad(StatusReceiver receiver, SpaceObject target, boolean 
 
     private static final ArrayListMultimap<UpdateViewpoint, PositionLoad> loads = ArrayListMultimap.create();
 
-    public static PositionLoad submit(UpdateViewpoint uv, StatusReceiver receiver, SpaceObject observer, SpaceObject target, Frame frame, long start, long end) {
+    public static PositionLoad submit(UpdateViewpoint uv, Interfaces.StatusReceiver receiver, SpaceObject observer, SpaceObject target, Frame frame, long start, long end) {
         receiver.setStatus("Loading...");
         PositionLoad load = new PositionLoad(receiver, target, frame == Frame.SOLO_HCI, EDTCallbackExecutor.pool.submit(
                 new LoadPosition(observer, target, frame, start, end), new Callback(receiver)));

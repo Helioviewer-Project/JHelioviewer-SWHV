@@ -6,8 +6,8 @@ import java.util.List;
 import javax.swing.JComponent;
 
 import org.helioviewer.jhv.events.JHVRelatedEvents;
+import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.timelines.chart.PlotPanel;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -16,7 +16,7 @@ import org.helioviewer.jhv.timelines.gui.TimelineDialog;
 import org.helioviewer.jhv.timelines.gui.TimelinePanel;
 import org.json.JSONObject;
 
-public class Timelines implements MainContentPanelPlugin {
+public class Timelines implements Interfaces.MainContentPanelPlugin {
 
     private static final TimelineLayers layers = new TimelineLayers();
     public static final DrawController dc = new DrawController(); // sucks

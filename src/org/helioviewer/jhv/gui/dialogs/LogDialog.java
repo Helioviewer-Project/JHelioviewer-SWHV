@@ -13,12 +13,12 @@ import javax.swing.JTextArea;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.JHVTransferHandler;
 import org.helioviewer.jhv.gui.components.base.HTMLPane;
-import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
-public class LogDialog implements ShowableDialog {
+public class LogDialog implements Interfaces.ShowableDialog {
 
     @Override
     public void showDialog() {

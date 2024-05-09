@@ -12,11 +12,11 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.CadencePanel;
 import org.helioviewer.jhv.gui.components.ImageSelectorPanel;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
-import org.helioviewer.jhv.gui.interfaces.ObservationSelector;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.layers.ImageLayer;
 
@@ -24,7 +24,7 @@ import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings("serial")
-public class ObservationDialog extends StandardDialog implements ObservationSelector {
+public class ObservationDialog extends StandardDialog implements Interfaces.ObservationSelector {
 
     private final AbstractAction load = new AbstractAction() {
         @Override

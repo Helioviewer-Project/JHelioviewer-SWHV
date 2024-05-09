@@ -18,9 +18,9 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.JHVSpinner;
-import org.helioviewer.jhv.gui.interfaces.JHVCell;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Transform;
@@ -33,7 +33,7 @@ import org.json.JSONObject;
 import com.jogamp.opengl.GL2;
 
 @SuppressWarnings("serial")
-class FOVPlatform extends DefaultMutableTreeNode implements JHVCell {
+class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
 
     static final double LINEWIDTH_FOV = GLSLLine.LINEWIDTH_BASIC;
     private static final int SUBDIVISIONS = 180;

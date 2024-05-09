@@ -38,8 +38,8 @@ import org.helioviewer.jhv.DisplaySettings;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.export.VideoFormat;
+import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.time.TimeMode;
@@ -49,7 +49,7 @@ import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings("serial")
-public final class SettingsDialog extends StandardDialog implements ShowableDialog {
+public final class SettingsDialog extends StandardDialog implements Interfaces.ShowableDialog {
 
     private final JLabel labelCache = new JLabel("The image cache currently uses 0.0GB on disk.", JLabel.RIGHT);
 

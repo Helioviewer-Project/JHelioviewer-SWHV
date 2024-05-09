@@ -17,11 +17,11 @@ import javax.swing.Timer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UITimer;
-import org.helioviewer.jhv.gui.interfaces.JHVCell;
 
 @SuppressWarnings("serial")
-public final class SWEKGroup extends DefaultMutableTreeNode implements JHVCell {
+public final class SWEKGroup extends DefaultMutableTreeNode implements Interfaces.JHVCell {
 
     static final int RIGHT_ALIGNMENT = 300;
 

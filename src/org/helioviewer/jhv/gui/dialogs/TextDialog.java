@@ -9,15 +9,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.base.HTMLPane;
-import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings({"serial", "this-escape"})
-public class TextDialog extends StandardDialog implements ShowableDialog {
+public class TextDialog extends StandardDialog implements Interfaces.ShowableDialog {
 
     private final String text;
 

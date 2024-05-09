@@ -9,15 +9,15 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.timelines.TimelineSettings;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings("serial")
-public final class TimelineDialog extends StandardDialog implements ShowableDialog {
+public final class TimelineDialog extends StandardDialog implements Interfaces.ShowableDialog {
 
     private final TimelineDataPanel observationPanel = new TimelineDataPanel();
 

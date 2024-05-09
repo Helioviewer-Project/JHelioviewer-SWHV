@@ -13,7 +13,7 @@ import javax.swing.JTabbedPane;
 
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
+import org.helioviewer.jhv.gui.Interfaces;
 
 // This panel acts as a container for the GUI elements which are shown in the
 // main area of the application. Usually it contains the main image area. Below
@@ -23,7 +23,7 @@ public final class MainContentPanel extends JPanel {
 
     private static final int DIVIDER_SIZE = 3;
 
-    private final ArrayList<MainContentPanelPlugin> pluginList = new ArrayList<>();
+    private final ArrayList<Interfaces.MainContentPanelPlugin> pluginList = new ArrayList<>();
 
     private final JSplitPane splitPane;
     private final JPanel pluginContainer;
@@ -47,7 +47,7 @@ public final class MainContentPanel extends JPanel {
     }
 
     // Adds a plug-in and the associated GUI to the container. The GUI will be displayed below the main component.
-    public void addPlugin(MainContentPanelPlugin plugin) {
+    public void addPlugin(Interfaces.MainContentPanelPlugin plugin) {
         if (plugin == null || pluginList.contains(plugin)) {
             return;
         }
@@ -57,7 +57,7 @@ public final class MainContentPanel extends JPanel {
     }
 
     // Removes a plug-in and the associated GUI from the container
-    public void removePlugin(MainContentPanelPlugin plugin) {
+    public void removePlugin(Interfaces.MainContentPanelPlugin plugin) {
         if (pluginList.remove(plugin)) {
             ComponentUtils.setVisible(plugin.getVisualInterfaces().get(0), false);
             updateLayout();
@@ -90,7 +90,7 @@ public final class MainContentPanel extends JPanel {
                 pluginContainer.add(pluginList.get(0).getVisualInterfaces().get(0), BorderLayout.CENTER);
             } else {
                 JTabbedPane tabbedPane = new JTabbedPane();
-                for (MainContentPanelPlugin plugin : pluginList) {
+                for (Interfaces.MainContentPanelPlugin plugin : pluginList) {
                     for (JComponent component : plugin.getVisualInterfaces()) {
                         tabbedPane.addTab(plugin.getTabName(), component);
                     }
