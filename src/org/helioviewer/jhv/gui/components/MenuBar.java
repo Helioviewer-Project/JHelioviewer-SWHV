@@ -9,27 +9,8 @@ import javax.swing.JMenuBar;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Platform;
+import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.gui.actions.ClearAnnotationsAction;
-import org.helioviewer.jhv.gui.actions.ExitProgramAction;
-import org.helioviewer.jhv.gui.actions.LoadStateAction;
-import org.helioviewer.jhv.gui.actions.NewLayerAction;
-import org.helioviewer.jhv.gui.actions.NewSoarAction;
-import org.helioviewer.jhv.gui.actions.OpenLocalFileAction;
-import org.helioviewer.jhv.gui.actions.OpenURLinBrowserAction;
-import org.helioviewer.jhv.gui.actions.PasteAction;
-import org.helioviewer.jhv.gui.actions.ResetCameraAction;
-import org.helioviewer.jhv.gui.actions.ResetCameraAxisAction;
-import org.helioviewer.jhv.gui.actions.SaveStateAction;
-import org.helioviewer.jhv.gui.actions.SaveStateAsAction;
-import org.helioviewer.jhv.gui.actions.ShowDialogAction;
-import org.helioviewer.jhv.gui.actions.UpdateCheckerAction;
-import org.helioviewer.jhv.gui.actions.WindowMinimizeAction;
-import org.helioviewer.jhv.gui.actions.WindowZoomAction;
-import org.helioviewer.jhv.gui.actions.ZoomFitAction;
-import org.helioviewer.jhv.gui.actions.ZoomInAction;
-import org.helioviewer.jhv.gui.actions.ZoomOneToOneAction;
-import org.helioviewer.jhv.gui.actions.ZoomOutAction;
 import org.helioviewer.jhv.gui.dialogs.AboutDialog;
 import org.helioviewer.jhv.gui.dialogs.LogDialog;
 import org.helioviewer.jhv.gui.dialogs.SettingsDialog;
@@ -43,15 +24,15 @@ public final class MenuBar extends JMenuBar {
     public MenuBar() {
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
-        fileMenu.add(new NewLayerAction());
-        fileMenu.add(new NewSoarAction());
-        fileMenu.add(new OpenLocalFileAction());
+        fileMenu.add(new Actions.NewLayer());
+        fileMenu.add(new Actions.NewSoarLayer());
+        fileMenu.add(new Actions.OpenLocalFile());
         fileMenu.addSeparator();
-        fileMenu.add(new LoadStateAction());
-        fileMenu.add(new SaveStateAction());
-        fileMenu.add(new SaveStateAsAction());
+        fileMenu.add(new Actions.LoadState());
+        fileMenu.add(new Actions.SaveState());
+        fileMenu.add(new Actions.SaveStateAs());
 
-        ExitProgramAction exitAction = new ExitProgramAction();
+        Actions.ExitProgram exitAction = new Actions.ExitProgram();
         if (Platform.isMacOS()) {
             Desktop.getDesktop().setQuitHandler((e, response) -> exitAction.actionPerformed(null));
         } else {
@@ -62,22 +43,22 @@ public final class MenuBar extends JMenuBar {
 
         JMenu editMenu = new JMenu("Edit");
         editMenu.setMnemonic(KeyEvent.VK_E);
-        editMenu.add(new PasteAction());
+        editMenu.add(new Actions.Paste());
         add(editMenu);
 
         JMenu viewMenu = new JMenu("View");
         viewMenu.setMnemonic(KeyEvent.VK_V);
-        viewMenu.add(new ZoomOneToOneAction());
-        viewMenu.add(new ZoomFitAction());
-        viewMenu.add(new ZoomInAction());
-        viewMenu.add(new ZoomOutAction());
+        viewMenu.add(new Actions.ZoomOneToOne());
+        viewMenu.add(new Actions.ZoomFit());
+        viewMenu.add(new Actions.ZoomIn());
+        viewMenu.add(new Actions.ZoomOut());
         viewMenu.addSeparator();
-        viewMenu.add(new ShowDialogAction("FITS Settings...", new FITSSettings.SettingsDialog()));
+        viewMenu.add(new Actions.ShowDialog("FITS Settings...", new FITSSettings.SettingsDialog()));
         viewMenu.addSeparator();
-        viewMenu.add(new ResetCameraAxisAction());
-        viewMenu.add(new ResetCameraAction());
+        viewMenu.add(new Actions.ResetCameraAxis());
+        viewMenu.add(new Actions.ResetCamera());
         viewMenu.addSeparator();
-        viewMenu.add(new ClearAnnotationsAction());
+        viewMenu.add(new Actions.ClearAnnotations());
 
         JCheckBoxMenuItem white = new JCheckBoxMenuItem("Use White Background");
         white.addItemListener(e -> {
@@ -95,13 +76,13 @@ public final class MenuBar extends JMenuBar {
         movieMenu.add(MoviePanel.getNextFrameAction());
         add(movieMenu);
 
-        ShowDialogAction settingsAction = new ShowDialogAction("Settings...", new SettingsDialog());
+        Actions.ShowDialog settingsAction = new Actions.ShowDialog("Settings...", new SettingsDialog());
         if (Platform.isMacOS()) {
             Desktop.getDesktop().setPreferencesHandler(e -> settingsAction.actionPerformed(null));
             JMenu windowMenu = new JMenu("Window");
             windowMenu.setMnemonic(KeyEvent.VK_W);
-            windowMenu.add(new WindowMinimizeAction());
-            windowMenu.add(new WindowZoomAction());
+            windowMenu.add(new Actions.WindowMinimize());
+            windowMenu.add(new Actions.WindowZoom());
             add(windowMenu);
         } else {
             JMenu toolsMenu = new JMenu("Tools");
@@ -113,20 +94,20 @@ public final class MenuBar extends JMenuBar {
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
 
-        ShowDialogAction aboutAction = new ShowDialogAction("About JHelioviewer...", new AboutDialog());
+        Actions.ShowDialog aboutAction = new Actions.ShowDialog("About JHelioviewer...", new AboutDialog());
         if (Platform.isMacOS()) {
             Desktop.getDesktop().setAboutHandler(e -> aboutAction.actionPerformed(null));
         } else {
             helpMenu.add(aboutAction);
         }
 
-        helpMenu.add(new OpenURLinBrowserAction("Open User Manual", JHVGlobals.documentationURL));
-        helpMenu.add(new OpenURLinBrowserAction("Open Website", "https://www.jhelioviewer.org"));
-        helpMenu.add(new OpenURLinBrowserAction("Open Change Log", "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/blob/master/changelog.md"));
-        helpMenu.add(new UpdateCheckerAction());
+        helpMenu.add(new Actions.OpenURLinBrowser("Open User Manual", JHVGlobals.documentationURL));
+        helpMenu.add(new Actions.OpenURLinBrowser("Open Website", "https://www.jhelioviewer.org"));
+        helpMenu.add(new Actions.OpenURLinBrowser("Open Change Log", "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/blob/master/changelog.md"));
+        helpMenu.add(new Actions.UpdateChecker());
         helpMenu.addSeparator();
-        helpMenu.add(new ShowDialogAction("Show Log...", new LogDialog()));
-        helpMenu.add(new OpenURLinBrowserAction("Report Bug/Request Feature", JHVGlobals.bugURL));
+        helpMenu.add(new Actions.ShowDialog("Show Log...", new LogDialog()));
+        helpMenu.add(new Actions.OpenURLinBrowser("Report Bug/Request Feature", JHVGlobals.bugURL));
 
         add(helpMenu);
     }

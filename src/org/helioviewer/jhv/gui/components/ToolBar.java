@@ -19,17 +19,8 @@ import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.gui.actions.ClearAnnotationsAction;
-import org.helioviewer.jhv.gui.actions.ResetCameraAction;
-import org.helioviewer.jhv.gui.actions.ResetCameraAxisAction;
-import org.helioviewer.jhv.gui.actions.Rotate90CameraAction;
-import org.helioviewer.jhv.gui.actions.SDOCutOutAction;
-import org.helioviewer.jhv.gui.actions.ZoomFOVAnnotationAction;
-import org.helioviewer.jhv.gui.actions.ZoomFitAction;
-import org.helioviewer.jhv.gui.actions.ZoomInAction;
-import org.helioviewer.jhv.gui.actions.ZoomOneToOneAction;
-import org.helioviewer.jhv.gui.actions.ZoomOutAction;
 import org.helioviewer.jhv.io.SampClient;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.MovieDisplay;
@@ -154,23 +145,23 @@ public final class ToolBar extends JToolBar {
 
         // Zoom
         JideButton zoomIn = toolButton(ZOOMIN);
-        zoomIn.addActionListener(new ZoomInAction());
+        zoomIn.addActionListener(new Actions.ZoomIn());
         JideButton zoomOut = toolButton(ZOOMOUT);
-        zoomOut.addActionListener(new ZoomOutAction());
+        zoomOut.addActionListener(new Actions.ZoomOut());
         JideButton zoomFit = toolButton(ZOOMFIT);
-        zoomFit.addActionListener(new ZoomFitAction());
+        zoomFit.addActionListener(new Actions.ZoomFit());
         JideButton zoomOne = toolButton(ZOOMONE);
-        zoomOne.addActionListener(new ZoomOneToOneAction());
+        zoomOne.addActionListener(new Actions.ZoomOneToOne());
         JideButton resetCamera = toolButton(RESETCAMERA);
-        resetCamera.addActionListener(new ResetCameraAction());
+        resetCamera.addActionListener(new Actions.ResetCamera());
         JideButton resetCameraAxis = toolButton(RESETCAMERAAXIS);
-        resetCameraAxis.addActionListener(new ResetCameraAxisAction());
+        resetCameraAxis.addActionListener(new Actions.ResetCameraAxis());
 
         JideButton rotate90Button = toolButton(ROTATE90);
         JPopupMenu rotate90Popup = new JPopupMenu();
-        rotate90Popup.add(new Rotate90CameraAction("X Axis", Vec3.XAxis));
-        rotate90Popup.add(new Rotate90CameraAction("Y Axis", Vec3.YAxis));
-        rotate90Popup.add(new Rotate90CameraAction("Z Axis", Vec3.ZAxis));
+        rotate90Popup.add(new Actions.Rotate90Camera("X Axis", Vec3.XAxis));
+        rotate90Popup.add(new Actions.Rotate90Camera("Y Axis", Vec3.YAxis));
+        rotate90Popup.add(new Actions.Rotate90Camera("Z Axis", Vec3.ZAxis));
 
         rotate90Button.addMouseListener(new MouseAdapter() {
             @Override
@@ -279,9 +270,9 @@ public final class ToolBar extends JToolBar {
         }
 
         annotationPopup.addSeparator();
-        annotationPopup.add(new ClearAnnotationsAction());
+        annotationPopup.add(new Actions.ClearAnnotations());
         annotationPopup.addSeparator();
-        annotationPopup.add(new ZoomFOVAnnotationAction());
+        annotationPopup.add(new Actions.ZoomFOVAnnotation());
 
         anotationButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -300,7 +291,7 @@ public final class ToolBar extends JToolBar {
         add(new JToolBar.Separator(dim));
 
         JideButton cutOut = toolButton(CUTOUT);
-        cutOut.addActionListener(new SDOCutOutAction());
+        cutOut.addActionListener(new Actions.SDOCutOut());
         addButton(cutOut);
 
         if (Boolean.parseBoolean(Settings.getProperty("startup.sampHub"))) {

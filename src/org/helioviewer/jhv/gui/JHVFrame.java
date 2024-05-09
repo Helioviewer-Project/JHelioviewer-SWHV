@@ -16,7 +16,6 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.components.MainContentPanel;
 import org.helioviewer.jhv.gui.components.MenuBar;
 import org.helioviewer.jhv.gui.components.MoviePanel;
@@ -130,7 +129,7 @@ public class JHVFrame {
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                ExitProgramAction exitAction = new ExitProgramAction();
+                Actions.ExitProgram exitAction = new Actions.ExitProgram();
                 exitAction.actionPerformed(new ActionEvent(this, 0, ""));
             }
         });
