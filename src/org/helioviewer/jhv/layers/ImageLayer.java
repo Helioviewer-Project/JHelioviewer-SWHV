@@ -14,7 +14,6 @@ import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.imagedata.ImageData;
-import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DownloadLayer;
 import org.helioviewer.jhv.io.LoadLayer;
@@ -31,7 +30,7 @@ import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public class ImageLayer extends AbstractLayer implements ImageDataHandler {
+public class ImageLayer extends AbstractLayer implements ImageData.Handler {
 
     private final GLImage glImage;
     private final DecodeExecutor executor;

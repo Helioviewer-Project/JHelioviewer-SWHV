@@ -11,6 +11,10 @@ import org.helioviewer.jhv.metadata.MetaData;
 
 public class ImageData {
 
+    public interface Handler {
+        void handleData(ImageData imageData);
+    }
+
     public static final String nanValue = "----,----      ----";
 
     private boolean uploaded;
