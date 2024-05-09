@@ -8,22 +8,22 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataSourcesParser;
 import org.helioviewer.jhv.io.DataSourcesTree;
-import org.helioviewer.jhv.gui.interfaces.ObservationSelector;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
 public final class ImageSelectorPanel extends JPanel implements DataSources.Listener {
 
-    private final ObservationSelector selector;
+    private final Interfaces.ObservationSelector selector;
     private final DataSourcesTree sourcesTree;
 
-    public ImageSelectorPanel(ObservationSelector _selector) {
+    public ImageSelectorPanel(Interfaces.ObservationSelector _selector) {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         setPreferredSize(new Dimension(250, 350));
         selector = _selector;

@@ -22,7 +22,6 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.dialogs.LoadStateDialog;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.dialogs.SoarDialog;
-import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.io.Load;
@@ -297,9 +296,9 @@ public class Actions {
 
     public static class ShowDialog extends AbstractAction {
 
-        private final ShowableDialog dialog;
+        private final Interfaces.ShowableDialog dialog;
 
-        public ShowDialog(String name, ShowableDialog _dialog) {
+        public ShowDialog(String name, Interfaces.ShowableDialog _dialog) {
             super(name);
             dialog = _dialog;
         }

@@ -19,7 +19,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.gui.interfaces.ObservationSelector;
+import org.helioviewer.jhv.gui.Interfaces;
 
 @SuppressWarnings("serial")
 public final class DataSourcesTree extends JTree {
@@ -63,7 +63,7 @@ public final class DataSourcesTree extends JTree {
     private final DefaultMutableTreeNode nodeRoot;
     private final HashMap<String, DefaultMutableTreeNode> nodes = new HashMap<>();
 
-    public DataSourcesTree(ObservationSelector selector) {
+    public DataSourcesTree(Interfaces.ObservationSelector selector) {
         nodeRoot = new DefaultMutableTreeNode("Datasets");
 
         for (String serverName : DataSources.getServers()) {
@@ -196,10 +196,10 @@ public final class DataSourcesTree extends JTree {
 
     private static class OneLeafTreeSelectionModel extends DefaultTreeSelectionModel {
 
-        private final ObservationSelector selector;
+        private final Interfaces.ObservationSelector selector;
         private TreePath selectedPath;
 
-        OneLeafTreeSelectionModel(ObservationSelector _selector) {
+        OneLeafTreeSelectionModel(Interfaces.ObservationSelector _selector) {
             selector = _selector;
             setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         }

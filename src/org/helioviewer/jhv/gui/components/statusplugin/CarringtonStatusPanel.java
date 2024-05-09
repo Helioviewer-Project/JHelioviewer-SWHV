@@ -1,14 +1,14 @@
 package org.helioviewer.jhv.gui.components.statusplugin;
 
 import org.helioviewer.jhv.astronomy.Carrington;
+import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.StatusPanel;
-import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.time.JHVTime;
 
 @SuppressWarnings("serial")
-public final class CarringtonStatusPanel extends StatusPanel.StatusPlugin implements LazyComponent {
+public final class CarringtonStatusPanel extends StatusPanel.StatusPlugin implements Interfaces.LazyComponent {
 
     private boolean dirty;
     private JHVTime time;

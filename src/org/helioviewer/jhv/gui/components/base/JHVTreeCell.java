@@ -7,7 +7,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import org.helioviewer.jhv.gui.interfaces.JHVCell;
+import org.helioviewer.jhv.gui.Interfaces;
 
 public class JHVTreeCell {
 
@@ -16,8 +16,8 @@ public class JHVTreeCell {
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            if (value instanceof JHVCell) {
-                return ((JHVCell) value).getComponent();
+            if (value instanceof Interfaces.JHVCell) {
+                return ((Interfaces.JHVCell) value).getComponent();
             } else
                 return super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
         }
@@ -33,8 +33,8 @@ public class JHVTreeCell {
 
         @Override
         public Component getTreeCellEditorComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row) {
-            if (value instanceof JHVCell) {
-                return ((JHVCell) value).getComponent();
+            if (value instanceof Interfaces.JHVCell) {
+                return ((Interfaces.JHVCell) value).getComponent();
             } else
                 return super.getTreeCellEditorComponent(tree, value, selected, expanded, leaf, row);
         }

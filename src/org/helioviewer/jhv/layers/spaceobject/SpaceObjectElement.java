@@ -9,10 +9,10 @@ import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.gui.interfaces.StatusReceiver;
+import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
-class SpaceObjectElement implements StatusReceiver {
+class SpaceObjectElement implements Interfaces.StatusReceiver {
 
     private final SpaceObject target;
     private final SpaceObjectModel model;

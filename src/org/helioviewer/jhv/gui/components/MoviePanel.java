@@ -27,12 +27,12 @@ import javax.swing.SpinnerNumberModel;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.components.base.JHVSpinner;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
-import org.helioviewer.jhv.gui.interfaces.ObservationSelector;
 import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
@@ -46,7 +46,7 @@ import com.jidesoft.swing.JideToggleButton;
 import com.jidesoft.swing.JideSplitButton;
 
 @SuppressWarnings("serial")
-public class MoviePanel extends JPanel implements ObservationSelector {
+public class MoviePanel extends JPanel implements Interfaces.ObservationSelector {
 
     // different animation speeds
     private enum SpeedUnit {

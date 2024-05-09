@@ -20,10 +20,10 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.XMLUtils;
+import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.base.HTMLPane;
 import org.helioviewer.jhv.gui.components.base.WrappedTable;
-import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -37,7 +37,7 @@ import com.jidesoft.dialog.StandardDialog;
 import com.jidesoft.swing.JideSplitPane;
 
 @SuppressWarnings("serial")
-public final class MetaDataDialog extends StandardDialog implements ShowableDialog {
+public final class MetaDataDialog extends StandardDialog implements Interfaces.ShowableDialog {
 
     private final JideSplitPane content = new JideSplitPane(JideSplitPane.VERTICAL_SPLIT);
     private final JButton exportFitsButton = new JButton("Export FITS Header as XML");

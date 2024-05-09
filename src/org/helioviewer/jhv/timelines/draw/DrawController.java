@@ -10,10 +10,9 @@ import java.util.ArrayList;
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.events.JHVEventListener;
+import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.jhv.gui.interfaces.LazyComponent;
-import org.helioviewer.jhv.gui.interfaces.StatusReceiver;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
@@ -22,7 +21,7 @@ import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.json.JSONObject;
 
-public final class DrawController implements LazyComponent, StatusReceiver, JHVEventListener.Highlight, TimeListener.Change {
+public final class DrawController implements Interfaces.LazyComponent, Interfaces.StatusReceiver, JHVEventListener.Highlight, TimeListener.Change {
 
     public interface Listener {
         void drawRequest();

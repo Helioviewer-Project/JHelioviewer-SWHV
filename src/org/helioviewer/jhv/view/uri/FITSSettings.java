@@ -11,9 +11,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.base.JHVSlider;
-import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
 @SuppressWarnings("serial")
@@ -32,7 +32,7 @@ public class FITSSettings {
     static double GAMMA = 1. / 2.2;
     static double BETA = 1. / (1 << 6);
 
-    public static final class SettingsDialog extends JDialog implements ShowableDialog {
+    public static final class SettingsDialog extends JDialog implements Interfaces.ShowableDialog {
 
         public SettingsDialog() {
             super(JHVFrame.getFrame(), "FITS Settings", false);

@@ -2,12 +2,12 @@ package org.helioviewer.jhv.gui.components.statusplugin;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.StatusPanel;
-import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 
 @SuppressWarnings("serial")
-public final class ZoomStatusPanel extends StatusPanel.StatusPlugin implements LazyComponent {
+public final class ZoomStatusPanel extends StatusPanel.StatusPlugin implements Interfaces.LazyComponent {
 
     private boolean dirty;
     private double cameraWidth;

@@ -6,18 +6,17 @@ import javax.swing.Timer;
 
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.base.BusyIndicator;
-import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 
 public class UITimer {
 
-    private static final ArrayList<LazyComponent> lazyComponents = new ArrayList<>();
+    private static final ArrayList<Interfaces.LazyComponent> lazyComponents = new ArrayList<>();
     public static final BusyIndicator busyIndicator = new BusyIndicator();
 
     public static void start() {
         new Timer(1000 / 10, e -> action()).start();
     }
 
-    public static void register(LazyComponent component) {
+    public static void register(Interfaces.LazyComponent component) {
         if (!lazyComponents.contains(component))
             lazyComponents.add(component);
     }
@@ -37,7 +36,7 @@ public class UITimer {
             MoviePanel.getTimeSlider().repaint();
         }
 
-        lazyComponents.forEach(LazyComponent::lazyRepaint);
+        lazyComponents.forEach(Interfaces.LazyComponent::lazyRepaint);
     }
 
 }

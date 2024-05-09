@@ -13,12 +13,12 @@ import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.helioviewer.jhv.events.filter.FilterDialog;
-import org.helioviewer.jhv.gui.interfaces.JHVCell;
+import org.helioviewer.jhv.gui.Interfaces;
 
 import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
-public final class SWEKSupplier extends DefaultMutableTreeNode implements JHVCell {
+public final class SWEKSupplier extends DefaultMutableTreeNode implements Interfaces.JHVCell {
 
     private final String supplierName;
     private final String name;
