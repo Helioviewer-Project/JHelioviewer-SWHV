@@ -112,7 +112,7 @@ public final class TimelinePanel extends JPanel {
         jsp.getViewport().setBackground(grid.getBackground());
 
         JideButton addLayerButton = new JideButton(Buttons.newLayer);
-        addLayerButton.addActionListener(e -> new NewLayerAction().actionPerformed(new ActionEvent(addLayerButton, 0, "")));
+        addLayerButton.addActionListener(e -> new Actions.NewTimelineLayer().actionPerformed(new ActionEvent(addLayerButton, 0, "")));
 
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
         addLayerButtonWrapper.add(addLayerButton, BorderLayout.LINE_START);

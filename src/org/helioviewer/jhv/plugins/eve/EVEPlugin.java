@@ -6,15 +6,14 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.band.BandDataProvider;
-import org.helioviewer.jhv.timelines.gui.NewLayerAction;
-import org.helioviewer.jhv.timelines.gui.OpenLocalFileAction;
+import org.helioviewer.jhv.timelines.gui.Actions;
 import org.json.JSONObject;
 
 public class EVEPlugin extends Plugin {
 
     private final Timelines tl = new Timelines();
-    private final JMenuItem newItem = new JMenuItem(new NewLayerAction());
-    private final JMenuItem openItem = new JMenuItem(new OpenLocalFileAction());
+    private final JMenuItem newItem = new JMenuItem(new Actions.NewTimelineLayer());
+    private final JMenuItem openItem = new JMenuItem(new Actions.OpenLocalTimeline());
 
     public EVEPlugin() {
         super("Timelines", "Visualize 1D and 2D time series");
