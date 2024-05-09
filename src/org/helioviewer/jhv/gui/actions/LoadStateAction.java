@@ -5,6 +5,7 @@ import java.io.File;
 
 import javax.swing.AbstractAction;
 
+import org.helioviewer.jhv.gui.dialogs.LoadStateDialog;
 import org.helioviewer.jhv.io.Load;
 
 @SuppressWarnings("serial")

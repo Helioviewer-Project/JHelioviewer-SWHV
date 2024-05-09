@@ -39,7 +39,6 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.export.VideoFormat;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.gui.actions.LoadStateDialog;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.plugins.PluginManager;

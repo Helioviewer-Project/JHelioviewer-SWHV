@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.actions;
+package org.helioviewer.jhv.gui.dialogs;
 
 import java.awt.FileDialog;
 import java.io.File;
