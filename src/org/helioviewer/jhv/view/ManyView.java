@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.lut.LUT;
-import org.helioviewer.jhv.imagedata.ImageDataHandler;
+import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.time.JHVTime;
@@ -114,7 +114,7 @@ public class ManyView implements View {
     }
 
     @Override
-    public void setDataHandler(ImageDataHandler dataHandler) {
+    public void setDataHandler(ImageData.Handler dataHandler) {
         frameMap.values().forEach(frameInfo -> frameInfo.view.setDataHandler(dataHandler));
     }
 

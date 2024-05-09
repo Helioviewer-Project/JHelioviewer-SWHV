@@ -10,7 +10,6 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.image.NIOImageFactory;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
-import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -19,7 +18,7 @@ import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.j2k.J2KViewCallisto;
 import org.helioviewer.jhv.view.j2k.ResolutionSet;
 
-class RadioJ2KData implements ImageDataHandler {
+class RadioJ2KData implements ImageData.Handler {
 
     private J2KViewCallisto view;
     private DecodeExecutor executor;
