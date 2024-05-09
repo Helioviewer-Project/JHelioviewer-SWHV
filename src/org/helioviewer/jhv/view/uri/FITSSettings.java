@@ -86,10 +86,6 @@ public class FITSSettings {
                 }
             });
 
-            JPanel content = new JPanel();
-            content.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-            content.setLayout(new BorderLayout());
-
             JPanel gammaPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
             gammaPanel.add(gammaButton);
             gammaPanel.add(gammaSlider);
@@ -100,6 +96,8 @@ public class FITSSettings {
             betaPanel.add(betaSlider);
             betaPanel.add(betaLabel);
 
+            JPanel content = new JPanel(new BorderLayout());
+            content.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
             content.add(gammaPanel, BorderLayout.NORTH);
             content.add(betaPanel, BorderLayout.SOUTH);
             add(content);
