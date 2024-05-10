@@ -92,11 +92,11 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
     private InteractionType getInteractionType() {
         if (annotate)
             return interactionAnnotate;
-        else if (mode == Mode.PAN)
-            return interactionPan;
-        else if (mode == Mode.AXIS)
-            return interactionAxis;
-        return interactionRotate;
+        return switch (mode) {
+            case PAN -> interactionPan;
+            case ROTATE -> interactionRotate;
+            case AXIS -> interactionAxis;
+        };
     }
 
     @Override
