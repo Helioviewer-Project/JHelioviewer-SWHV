@@ -117,16 +117,16 @@ public class JPIPResponse {
                 seg.aux = readVBAS(in);
         }
 
-        if (seg.length > 0) {
-            seg.data = new byte[seg.length];
+        int length = seg.length;
+        if (length > 0) {
+            seg.data = new byte[length];
 
             int offset = 0;
-            int len = seg.length;
-            while (len != 0) {
-                int read = in.read(seg.data, offset, len);
+            while (length != 0) {
+                int read = in.read(seg.data, offset, length);
                 if (read == -1)
                     throw new EOFException("Unexpected EOF");
-                len -= read;
+                length -= read;
                 offset += read;
             }
         }
@@ -137,9 +137,9 @@ public class JPIPResponse {
     void readSegments(InputStream in, JPIPCache cache, int frame) throws KduException, IOException {
         JPIPSegment seg;
         while ((seg = readSegment(in)) != null) {
-            if (seg.isEOR)
+            if (seg.isEOR) {
                 status = seg.binID;
-            else if (seg.isFinal || seg.length > 0) { // avoid pointless segments
+            } else if (seg.isFinal || seg.length > 0) { // avoid pointless segments
                 cache.put(frame, seg);
             }
         }
