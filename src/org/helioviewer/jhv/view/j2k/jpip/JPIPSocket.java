@@ -104,7 +104,8 @@ public final class JPIPSocket extends HTTPSocket {
 
     public JPIPResponse request(String queryStr, JPIPCache cache, int frame) throws KduException, IOException {
         writeRequest(queryStr);
-        Message header = readHeader();
+
+        HashMap<String, String> header = readHeader();
         if (!"image/jpp-stream".equals(header.get("Content-Type")))
             throw new IOException("Expected image/jpp-stream content");
 
