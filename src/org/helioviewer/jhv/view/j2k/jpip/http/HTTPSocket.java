@@ -117,7 +117,7 @@ public class HTTPSocket {
     }
 
     protected void write(String str) throws IOException {
-        socket.getOutputStream().write(str.getBytes(StandardCharsets.UTF_8));
+        socket.getOutputStream().write(str.getBytes(StandardCharsets.US_ASCII));
     }
 
     protected void close() throws IOException {
