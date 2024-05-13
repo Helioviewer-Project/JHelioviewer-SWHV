@@ -14,10 +14,6 @@ public class JPIPCache extends Kdu_cache {
         return complete[0];
     }
 
-    private void addToKdu(int frame, JPIPSegment data) throws KduException {
-        Add_to_databin(data.klassID, frame, data.binID, data.data, data.offset, data.length, data.isFinal, true, false);
-    }
-
     private JPIPStream scan(int frame) throws KduException {
         int flags = Kdu_global.KDU_CACHE_SCAN_START | Kdu_global.KDU_CACHE_SCAN_FIX_CODESTREAM;
         int[] klassID = new int[1];
@@ -49,12 +45,12 @@ public class JPIPCache extends Kdu_cache {
     }
 
     void put(int frame, JPIPSegment seg) throws KduException {
-        addToKdu(frame, seg);
+        Add_to_databin(seg.klassID, frame, seg.binID, seg.data, seg.offset, seg.length, seg.isFinal, true, false);
     }
 
     public void put(int frame, JPIPStream stream) throws KduException {
         for (JPIPSegment seg : stream.segments)
-            addToKdu(frame, seg);
+            put(frame, seg);
     }
 
     @Nullable
