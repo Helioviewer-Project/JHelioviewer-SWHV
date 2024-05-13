@@ -16,11 +16,11 @@ public final class JPIPSocket extends HTTPSocket {
     private static final String[] cnewParams = {"cid", "transport", "host", "path", "port", "auxport"};
     private static final int mainHeaderKlass = Constants.getKlass(Constants.JPIP.MAIN_HEADER_DATA_BIN_CLASS);
 
+    private static final int META_REQUEST_LEN = 2000000;
     // Maximum number of layers that can be requested at the same time
     private static final int MAX_REQ_LAYERS = 1;
     // The maximum length in bytes of a JPIP request
-    public static final int MAX_REQUEST_LEN = (MAX_REQ_LAYERS + 1) * (1024 * 1024);
-    public static final int META_REQUEST_LEN = 2000000;
+    private static final int MAX_REQUEST_LEN = (MAX_REQ_LAYERS + 1) * (1024 * 1024);
 
     // The jpip channel ID for the connection (persistent)
     private final String jpipChannelID;
@@ -70,7 +70,7 @@ public final class JPIPSocket extends HTTPSocket {
         }
     }
 
-    public static String createQuery(int len, String... values) {
+    private static String createQuery(int len, String... values) {
         boolean isKey = true;
         StringBuilder buf = new StringBuilder();
         for (String val : values) {
@@ -79,6 +79,10 @@ public final class JPIPSocket extends HTTPSocket {
             isKey = !isKey;
         }
         return buf + "len=" + len;
+    }
+
+    public static String createLayerQuery(int layer, String fSiz) {
+        return createQuery(MAX_REQUEST_LEN, "stream", String.valueOf(layer), "fsiz", fSiz + ",closest", "rsiz", fSiz, "roff", "0,0");
     }
 
     public void init(JPIPCache cache) throws KduException, IOException {
