@@ -11,28 +11,28 @@ class JPIPSegment implements Serializable {
     static final long serialVersionUID = 42L;
 
     // The data-bin in-class identifier
-    public long binID;
+    long binID;
     // The data-bin auxiliary information
-    public long aux;
+    long aux;
     // The data-bin class identifier
-    public int klassID;
+    int klassID;
     // The code-stream index
-    public long codestreamID;
+    long codestreamID;
     // Offset of this segment within the data-bin data
-    public int offset;
+    int offset;
     // Length of this segment
-    public int length;
+    int length;
     // The segment data
-    public byte[] data;
+    byte[] data;
     // Indicates if this segment is the last one (when there is a data segment stream)
-    public boolean isFinal;
+    boolean isFinal;
     // Indicates if this segment is an End-Of-Response message
-    public boolean isEOR;
+    boolean isEOR;
 
     // Returns a string representation of the JPIP segment
     @Override
     public String toString() {
-        String res = getClass().getName() + " [";
+        String res = "JPIPSegment [";
         if (isEOR) {
             res += "EOR id=" + binID + " len=" + length;
         } else {
