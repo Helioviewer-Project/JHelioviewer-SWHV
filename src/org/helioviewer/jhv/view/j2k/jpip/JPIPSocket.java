@@ -104,16 +104,16 @@ public final class JPIPSocket extends HTTPSocket {
 
     public JPIPResponse request(String queryStr, JPIPCache cache, int frame) throws KduException, IOException {
         writeRequest(queryStr);
-        Message res = readHeader();
-        if (!"image/jpp-stream".equals(res.getHeader("Content-Type")))
+        Message header = readHeader();
+        if (!"image/jpp-stream".equals(header.get("Content-Type")))
             throw new IOException("Expected image/jpp-stream content");
 
-        JPIPResponse jpipRes = new JPIPResponse(res.getHeader("JPIP-cnew"));
-        try (InputStream in = getInputStream(res)) {
+        JPIPResponse jpipRes = new JPIPResponse(header.get("JPIP-cnew"));
+        try (InputStream in = getInputStream(header)) {
             jpipRes.readSegments(in, cache, frame);
         }
 
-        if ("close".equals(res.getHeader("Connection"))) {
+        if ("close".equals(header.get("Connection"))) {
             super.close();
         }
         return jpipRes;
