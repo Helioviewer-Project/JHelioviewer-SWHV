@@ -93,7 +93,7 @@ public final class JPIPSocket extends HTTPSocket {
         } while (!res.isResponseComplete());
 
         // prime first image
-        req = createQuery(MAX_REQUEST_LEN, "stream", "0", "fsiz", "64,64,closest", "rsiz", "64,64", "roff", "0,0");
+        req = createLayerQuery(0, "64,64");
         do {
             res = request(req, cache, 0);
         } while (!res.isResponseComplete() && !cache.isDataBinCompleted(mainHeaderKlass, 0, 0));
