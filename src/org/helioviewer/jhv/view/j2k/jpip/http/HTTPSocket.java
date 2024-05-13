@@ -20,16 +20,6 @@ import org.helioviewer.jhv.io.ProxySettings;
 
 public class HTTPSocket {
 
-    @SuppressWarnings("serial")
-    protected static class Message extends HashMap<String, String> {
-        @Override
-        public String toString() {
-            StringBuilder str = new StringBuilder();
-            forEach((key, value) -> str.append(key).append(": ").append(value).append("\r\n"));
-            return str.toString();
-        }
-    }
-
     private static final int TIMEOUT_CONNECT = 30000;
     private static final int TIMEOUT_READ = 30000;
 
@@ -68,28 +58,31 @@ public class HTTPSocket {
 
             inputStream = socket.getInputStream();
 
-            Message hdr = new Message();
+            HashMap<String, String> hdr = new HashMap<>();
             hdr.put("User-Agent", JHVGlobals.userAgent);
             hdr.put("Connection", "keep-alive");
             hdr.put("Accept-Encoding", "gzip");
             hdr.put("Cache-Control", "no-cache");
             hdr.put("Host", host + ':' + port);
-            httpHeader = " HTTP/1.1\r\n" + hdr + "\r\n";
+
+            StringBuilder sb = new StringBuilder();
+            hdr.forEach((key, value) -> sb.append(key).append(": ").append(value).append("\r\n"));
+            httpHeader = " HTTP/1.1\r\n" + sb + "\r\n";
         } catch (Exception e) { // redirect all to IOException
             throw new IOException(e);
         }
     }
 
-    protected InputStream getInputStream(Message msg) throws IOException {
-        String head = msg.get("Transfer-Encoding");
+    protected InputStream getInputStream(HashMap<String, String> hdr) throws IOException {
+        String head = hdr.get("Transfer-Encoding");
         String transferEncoding = head == null ? "identity" : head.toLowerCase();
-        head = msg.get("Content-Encoding");
+        head = hdr.get("Content-Encoding");
         String contentEncoding = head == null ? "identity" : head.toLowerCase();
 
         InputStream transferStream;
         switch (transferEncoding) {
             case "identity" -> {
-                String contentLength = msg.get("Content-Length");
+                String contentLength = hdr.get("Content-Length");
                 try {
                     transferStream = new FixedSizedInputStream(inputStream, Integer.parseInt(contentLength));
                 } catch (Exception e) {
@@ -108,22 +101,22 @@ public class HTTPSocket {
         };
     }
 
-    protected Message readHeader() throws IOException {
+    protected HashMap<String, String> readHeader() throws IOException {
         String line = LineRead.readAsciiLine(inputStream);
         if (!"HTTP/1.1 200 OK".equals(line))
             throw new IOException("Invalid HTTP response: " + line);
 
         // Parses HTTP headers
-        Message res = new Message();
+        HashMap<String, String> hdr = new HashMap<>();
         while (true) {
             line = LineRead.readAsciiLine(inputStream);
             if (line.isEmpty())
-                return res;
+                return hdr;
 
             String[] parts = Regex.HttpField.split(line);
             if (parts.length != 2)
                 throw new IOException("Invalid HTTP header field: " + line);
-            res.put(parts[0], parts[1]);
+            hdr.put(parts[0], parts[1]);
         }
     }
 
