@@ -6,6 +6,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.zip.InflaterInputStream;
 import java.util.zip.GZIPInputStream;
 
@@ -18,6 +19,27 @@ import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.ProxySettings;
 
 public class HTTPSocket {
+
+    protected static class Message {
+
+        private final HashMap<String, String> headers = new HashMap<>();
+
+        public String getHeader(String key) {
+            return headers.get(key);
+        }
+
+        void setHeader(String key, String val) {
+            headers.put(key, val);
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder str = new StringBuilder();
+            headers.forEach((key, value) -> str.append(key).append(": ").append(value).append("\r\n"));
+            return str.toString();
+        }
+
+    }
 
     private static final int TIMEOUT_CONNECT = 30000;
     private static final int TIMEOUT_READ = 30000;
@@ -57,7 +79,7 @@ public class HTTPSocket {
 
             inputStream = socket.getInputStream();
 
-            HTTPMessage msg = new HTTPMessage();
+            Message msg = new Message();
             msg.setHeader("User-Agent", JHVGlobals.userAgent);
             msg.setHeader("Connection", "keep-alive");
             msg.setHeader("Accept-Encoding", "gzip");
@@ -69,7 +91,7 @@ public class HTTPSocket {
         }
     }
 
-    protected InputStream getInputStream(HTTPMessage msg) throws IOException {
+    protected InputStream getInputStream(Message msg) throws IOException {
         String head = msg.getHeader("Transfer-Encoding");
         String transferEncoding = head == null ? "identity" : head.toLowerCase();
         head = msg.getHeader("Content-Encoding");
@@ -97,13 +119,13 @@ public class HTTPSocket {
         };
     }
 
-    protected HTTPMessage readHeader() throws IOException {
+    protected Message readHeader() throws IOException {
         String line = LineRead.readAsciiLine(inputStream);
         if (!"HTTP/1.1 200 OK".equals(line))
             throw new IOException("Invalid HTTP response: " + line);
 
         // Parses HTTP headers
-        HTTPMessage res = new HTTPMessage();
+        Message res = new Message();
         while (true) {
             line = LineRead.readAsciiLine(inputStream);
             if (line.isEmpty())
