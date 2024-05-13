@@ -8,7 +8,6 @@ import java.util.HashMap;
 import kdu_jni.KduException;
 
 import org.helioviewer.jhv.base.Regex;
-import org.helioviewer.jhv.view.j2k.jpip.http.HTTPMessage;
 import org.helioviewer.jhv.view.j2k.jpip.http.HTTPSocket;
 
 // Assumes a persistent HTTP connection
@@ -105,7 +104,7 @@ public final class JPIPSocket extends HTTPSocket {
 
     public JPIPResponse request(String queryStr, JPIPCache cache, int frame) throws KduException, IOException {
         writeRequest(queryStr);
-        HTTPMessage res = readHeader();
+        Message res = readHeader();
         if (!"image/jpp-stream".equals(res.getHeader("Content-Type")))
             throw new IOException("Expected image/jpp-stream content");
 
