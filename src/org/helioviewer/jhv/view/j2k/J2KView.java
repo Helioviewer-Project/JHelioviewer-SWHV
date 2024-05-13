@@ -42,9 +42,8 @@ public class J2KView extends BaseView {
 
     private final int maxFrame;
     private int targetFrame;
-    private final String[] xmlMetaData;
 
-    private final String[] cacheKey;
+    private final String[] xmlMetaData;
     private final TimeMap<Integer> frameMap = new TimeMap<>();
 
     private final J2KSource source;
@@ -83,6 +82,10 @@ public class J2KView extends BaseView {
             isJP2 = dataUri.format() == DataUri.Format.JP2;
             source.open();
 
+            int[] lut = source.getLUT();
+            if (lut != null)
+                builtinLUT = new LUT("built-in", lut);
+
             maxFrame = source.getNumberLayers() - 1;
             metaData = new MetaData[maxFrame + 1];
             xmlMetaData = new String[maxFrame + 1];
@@ -100,22 +103,22 @@ public class J2KView extends BaseView {
             if (frameMap.maxIndex() != maxFrame)
                 throw new Exception("Duplicated time stamps");
 
-            cacheKey = new String[maxFrame + 1];
-            if (request != null) {
-                for (int i = 0; i <= maxFrame; i++) {
-                    long milli = frameMap.key(i).milli;
-                    if (milli != metaData[i].getViewpoint().time.milli)
-                        Log.warn("Badly ordered metadata: " + dataUri + "[" + i + "]: expected " + frameMap.key(i) + ", got " + metaData[i].getViewpoint().time);
+            if (reader == null) {
+                completionLevel = new CompletionLevel.Local(source, maxFrame);
+            } else {
+                completionLevel = new CompletionLevel.Remote(source, maxFrame);
 
-                    cacheKey[i] = request.sourceId() + "+" + milli;
+                String[] cacheKey = new String[maxFrame + 1];
+                if (request != null) {
+                    for (int i = 0; i <= maxFrame; i++) {
+                        long milli = frameMap.key(i).milli;
+                        if (milli != metaData[i].getViewpoint().time.milli)
+                            Log.warn("Badly ordered metadata: " + dataUri + "[" + i + "]: expected " + frameMap.key(i) + ", got " + metaData[i].getViewpoint().time);
+                        cacheKey[i] = request.sourceId() + "+" + milli;
+                    }
                 }
+                reader.setCacheKey(cacheKey);
             }
-
-            int[] lut = source.getLUT();
-            if (lut != null)
-                builtinLUT = new LUT("built-in", lut);
-
-            completionLevel = reader == null ? new CompletionLevel.Local(source, maxFrame) : new CompletionLevel.Remote(source, maxFrame);
             if (isJP2)
                 source.close(); // JP2, close asap
 
@@ -124,11 +127,6 @@ public class J2KView extends BaseView {
             String msg = e instanceof KduException ? "Kakadu error" : e.getMessage();
             throw new Exception(msg + ": " + dataUri, e);
         }
-    }
-
-    @Nullable
-    String getCacheKey(int frame) {
-        return frame < 0 || frame >= cacheKey.length ? null : cacheKey[frame];
     }
 
     private record J2KAbolisher(int aSerial, J2KReader aReader, J2KSource aSource) implements Runnable {

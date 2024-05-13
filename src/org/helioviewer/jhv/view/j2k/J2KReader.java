@@ -22,6 +22,7 @@ class J2KReader implements Runnable {
 
     private volatile boolean isAbolished;
     private JPIPSocket socket;
+    private String[] cacheKey;
 
     J2KReader(URI _uri) throws KduException, IOException {
         uri = _uri;
@@ -41,6 +42,10 @@ class J2KReader implements Runnable {
 
     JPIPCache getCache() {
         return cache;
+    }
+
+    void setCacheKey(String[] _cacheKey) {
+        cacheKey = _cacheKey;
     }
 
     // runs in abolish thread
@@ -80,11 +85,11 @@ class J2KReader implements Runnable {
     }
 
     private static String[] createMultiQuery(int numFrames, String fSiz) {
-        String[] stepQuerys = new String[numFrames];
+        String[] stepQueries = new String[numFrames];
         for (int lpi = 0; lpi < numFrames; lpi++) {
-            stepQuerys[lpi] = JPIPSocket.createLayerQuery(lpi, fSiz);
+            stepQueries[lpi] = JPIPSocket.createLayerQuery(lpi, fSiz);
         }
-        return stepQuerys;
+        return stepQueries;
     }
 
     @Override
@@ -100,7 +105,7 @@ class J2KReader implements Runnable {
 
             J2KView view = params.view;
             CompletionLevel completionLevel = view.completionLevel();
-            int numFrames = view.getMaximumFrameNumber() + 1;
+            int numFrames = cacheKey.length;
 
             int frame = params.decodeParams.frame;
             int level = params.decodeParams.level;
@@ -121,13 +126,13 @@ class J2KReader implements Runnable {
 
                 // build query based on strategy
                 int currentStep;
-                String[] stepQuerys;
+                String[] stepQueries;
                 String fSiz = width + "," + height;
                 if (singleFrame) {
-                    stepQuerys = new String[]{JPIPSocket.createLayerQuery(frame, fSiz)};
+                    stepQueries = new String[]{JPIPSocket.createLayerQuery(frame, fSiz)};
                     currentStep = frame;
                 } else {
-                    stepQuerys = createMultiQuery(numFrames, fSiz);
+                    stepQueries = createMultiQuery(numFrames, fSiz);
 
                     int partial = completionLevel.getPartialUntil();
                     currentStep = partial < numFrames - 1 ? partial : frame;
@@ -136,22 +141,22 @@ class J2KReader implements Runnable {
                 // send queries until everything is complete or caching is interrupted
                 int completeSteps = 0;
                 boolean stopReading = false;
-                while (!stopReading && completeSteps < stepQuerys.length) {
-                    if (currentStep >= stepQuerys.length)
+                while (!stopReading && completeSteps < stepQueries.length) {
+                    if (currentStep >= stepQueries.length)
                         currentStep = 0;
 
                     // if query is already complete, go to next step
-                    if (stepQuerys[currentStep] == null) {
+                    if (stepQueries[currentStep] == null) {
                         currentStep++;
                         continue;
                     }
 
                     boolean downloadComplete = false;
                     {
-                        String key = view.getCacheKey(currentStep);
+                        String key = cacheKey[currentStep];
                         JPIPStream stream = key == null ? null : JPIPCacheManager.get(key, level);
                         if (stream == null) { // not in JPIP cache
-                            JPIPResponse res = socket.request(stepQuerys[currentStep], cache, currentStep);
+                            JPIPResponse res = socket.request(stepQueries[currentStep], cache, currentStep);
                             if (res.isResponseComplete()) { // downloaded
                                 downloadComplete = true;
                                 if (key != null && (stream = cache.get(currentStep)) != null)
@@ -166,7 +171,7 @@ class J2KReader implements Runnable {
                     if (downloadComplete) {
                         // mark query as complete
                         completeSteps++;
-                        stepQuerys[currentStep] = null;
+                        stepQueries[currentStep] = null;
 
                         completionLevel.setFrameComplete(currentStep, level); // tell the completion level
                         if (singleFrame)
