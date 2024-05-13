@@ -79,14 +79,10 @@ class J2KReader implements Runnable {
         }
     }
 
-    private static String createQuery(String fSiz, int layer) {
-        return JPIPSocket.createQuery(JPIPSocket.MAX_REQUEST_LEN, "stream", String.valueOf(layer), "fsiz", fSiz + ",closest", "rsiz", fSiz, "roff", "0,0");
-    }
-
-    private static String[] createMultiQuery(String fSiz, int numFrames) {
+    private static String[] createMultiQuery(int numFrames, String fSiz) {
         String[] stepQuerys = new String[numFrames];
         for (int lpi = 0; lpi < numFrames; lpi++) {
-            stepQuerys[lpi] = createQuery(fSiz, lpi);
+            stepQuerys[lpi] = JPIPSocket.createLayerQuery(lpi, fSiz);
         }
         return stepQuerys;
     }
@@ -128,10 +124,10 @@ class J2KReader implements Runnable {
                 String[] stepQuerys;
                 String fSiz = width + "," + height;
                 if (singleFrame) {
-                    stepQuerys = new String[]{createQuery(fSiz, frame)};
+                    stepQuerys = new String[]{JPIPSocket.createLayerQuery(frame, fSiz)};
                     currentStep = frame;
                 } else {
-                    stepQuerys = createMultiQuery(fSiz, numFrames);
+                    stepQuerys = createMultiQuery(numFrames, fSiz);
 
                     int partial = completionLevel.getPartialUntil();
                     currentStep = partial < numFrames - 1 ? partial : frame;
