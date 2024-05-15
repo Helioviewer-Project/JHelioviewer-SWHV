@@ -1,8 +1,8 @@
 package org.helioviewer.jhv;
 
-import org.helioviewer.jhv.time.TimeMode;
-
 public class DisplaySettings {
+
+    public enum TimeMode {Observer, Sun, Earth}
 
     private static boolean normalizeAIA;
     private static boolean normalizeRadius;

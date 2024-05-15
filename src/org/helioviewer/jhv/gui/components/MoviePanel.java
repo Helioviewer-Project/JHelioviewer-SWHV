@@ -522,15 +522,15 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
     private static final AbstractAction prevFrameAction = new PreviousFrameAction();
     private static final AbstractAction nextFrameAction = new NextFrameAction();
 
-    public static AbstractAction getPlayPauseAction() {
+    static AbstractAction getPlayPauseAction() {
         return playPauseAction;
     }
 
-    public static AbstractAction getPreviousFrameAction() {
+    static AbstractAction getPreviousFrameAction() {
         return prevFrameAction;
     }
 
-    public static AbstractAction getNextFrameAction() {
+    static AbstractAction getNextFrameAction() {
         return nextFrameAction;
     }
 

@@ -42,7 +42,6 @@ import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.plugins.PluginManager;
-import org.helioviewer.jhv.time.TimeMode;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
 
 import com.jidesoft.dialog.ButtonPanel;
@@ -147,8 +146,8 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
         JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
         timePanel.add(new JLabel("Use time at", JLabel.RIGHT));
         ButtonGroup timeModeGroup = new ButtonGroup();
-        TimeMode timeMode = DisplaySettings.getTimeMode();
-        for (TimeMode mode : TimeMode.values()) {
+        DisplaySettings.TimeMode timeMode = DisplaySettings.getTimeMode();
+        for (DisplaySettings.TimeMode mode : DisplaySettings.TimeMode.values()) {
             JRadioButton radio = new JRadioButton(mode.toString(), mode == timeMode);
             radio.addItemListener(e -> {
                 if (radio.isSelected())
