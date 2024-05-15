@@ -26,6 +26,7 @@ import javax.swing.SpinnerNumberModel;
 
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.export.ExportMovie;
+import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
@@ -33,7 +34,6 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.components.base.JHVSpinner;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
-import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
@@ -518,35 +518,26 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         return timeSlider;
     }
 
-    private static AbstractAction playPauseAction = null;
-    private static AbstractAction prevFrameAction = null;
-    private static AbstractAction nextFrameAction = null;
+    private static final AbstractAction playPauseAction = new PlayPauseAction();
+    private static final AbstractAction prevFrameAction = new PreviousFrameAction();
+    private static final AbstractAction nextFrameAction = new NextFrameAction();
 
     public static AbstractAction getPlayPauseAction() {
-        if (playPauseAction == null)
-            playPauseAction = new PlayPauseAction();
         return playPauseAction;
     }
 
     public static AbstractAction getPreviousFrameAction() {
-        if (prevFrameAction == null)
-            prevFrameAction = new PreviousFrameAction();
         return prevFrameAction;
     }
 
     public static AbstractAction getNextFrameAction() {
-        if (nextFrameAction == null)
-            nextFrameAction = new NextFrameAction();
         return nextFrameAction;
     }
 
-    private static class PlayPauseAction extends AbstractAction {
+    private static class PlayPauseAction extends Actions.AbstractKeyAction {
 
         PlayPauseAction() {
-            super("Play/Pause Movie");
-            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_P, UIGlobals.menuShortcutMask);
-            putValue(ACCELERATOR_KEY, key);
-            KeyShortcuts.registerKey(key, this);
+            super("Play/Pause Movie", KeyStroke.getKeyStroke(KeyEvent.VK_P, UIGlobals.menuShortcutMask));
         }
 
         @Override
@@ -557,13 +548,10 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
     }
 
-    private static class PreviousFrameAction extends AbstractAction {
+    private static class PreviousFrameAction extends Actions.AbstractKeyAction {
 
         PreviousFrameAction() {
-            super("Step to Previous Frame");
-            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, UIGlobals.menuShortcutMask | InputEvent.ALT_DOWN_MASK);
-            putValue(ACCELERATOR_KEY, key);
-            KeyShortcuts.registerKey(key, this);
+            super("Step to Previous Frame", KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, UIGlobals.menuShortcutMask | InputEvent.ALT_DOWN_MASK));
         }
 
         @Override
@@ -575,13 +563,10 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
     }
 
-    private static class NextFrameAction extends AbstractAction {
+    private static class NextFrameAction extends Actions.AbstractKeyAction {
 
         NextFrameAction() {
-            super("Step to Next Frame");
-            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, UIGlobals.menuShortcutMask | InputEvent.ALT_DOWN_MASK);
-            putValue(ACCELERATOR_KEY, key);
-            KeyShortcuts.registerKey(key, this);
+            super("Step to Next Frame", KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, UIGlobals.menuShortcutMask | InputEvent.ALT_DOWN_MASK));
         }
 
         @Override
