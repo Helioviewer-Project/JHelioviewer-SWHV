@@ -6,28 +6,23 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 
-import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.timelines.Timelines;
 
 @SuppressWarnings("serial")
-public class Actions {
+public class TimelineActions {
 
-    public static final class NewTimelineLayer extends AbstractAction {
+    public static class NewLayer extends Actions.AbstractKeyAction {
 
-        public NewTimelineLayer() {
-            super("New Timeline...");
-
-            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_N, UIGlobals.menuShortcutMask | InputEvent.ALT_DOWN_MASK);
-            putValue(ACCELERATOR_KEY, key);
-            KeyShortcuts.registerKey(key, this);
+        public NewLayer() {
+            super("New Timeline...", KeyStroke.getKeyStroke(KeyEvent.VK_N, UIGlobals.menuShortcutMask | InputEvent.ALT_DOWN_MASK));
         }
 
         @Override
@@ -37,14 +32,10 @@ public class Actions {
 
     }
 
-    public static final class OpenLocalTimeline extends AbstractAction {
+    public static class OpenLocalFile extends Actions.AbstractKeyAction {
 
-        public OpenLocalTimeline() {
-            super("Open Timeline...");
-
-            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_O, UIGlobals.menuShortcutMask | InputEvent.ALT_DOWN_MASK);
-            putValue(ACCELERATOR_KEY, key);
-            KeyShortcuts.registerKey(key, this);
+        public OpenLocalFile() {
+            super("Open Timeline...", KeyStroke.getKeyStroke(KeyEvent.VK_O, UIGlobals.menuShortcutMask | InputEvent.ALT_DOWN_MASK));
         }
 
         @Override

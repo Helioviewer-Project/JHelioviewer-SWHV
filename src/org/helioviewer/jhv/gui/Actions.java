@@ -36,8 +36,18 @@ import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.time.TimeUtils;
 
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial", "this-escape"})
 public class Actions {
+
+    public abstract static class AbstractKeyAction extends AbstractAction {
+
+        public AbstractKeyAction(String name, KeyStroke key) {
+            super(name);
+            putValue(ACCELERATOR_KEY, key);
+            KeyShortcuts.registerKey(key, this);
+        }
+
+    }
 
     public static class ClearAnnotations extends AbstractAction {
 
@@ -53,14 +63,10 @@ public class Actions {
 
     }
 
-    public static final class ExitProgram extends AbstractAction {
+    public static class ExitProgram extends AbstractKeyAction {
 
         public ExitProgram() {
-            super("Quit");
-
-            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_Q, UIGlobals.menuShortcutMask);
-            putValue(ACCELERATOR_KEY, key);
-            KeyShortcuts.registerKey(key, this);
+            super("Quit", KeyStroke.getKeyStroke(KeyEvent.VK_Q, UIGlobals.menuShortcutMask));
         }
 
         @Override
@@ -86,14 +92,10 @@ public class Actions {
 
     }
 
-    public static final class NewLayer extends AbstractAction {
+    public static class NewLayer extends AbstractKeyAction {
 
         public NewLayer() {
-            super("New Image Layer...");
-
-            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_N, UIGlobals.menuShortcutMask);
-            putValue(ACCELERATOR_KEY, key);
-            KeyShortcuts.registerKey(key, this);
+            super("New Image Layer...", KeyStroke.getKeyStroke(KeyEvent.VK_N, UIGlobals.menuShortcutMask));
         }
 
         @Override
@@ -103,14 +105,10 @@ public class Actions {
 
     }
 
-    public static final class NewSoarLayer extends AbstractAction {
+    public static class NewSoarLayer extends AbstractKeyAction {
 
         public NewSoarLayer() {
-            super("New SOAR Layer...");
-
-            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_N, UIGlobals.menuShortcutMask | InputEvent.SHIFT_DOWN_MASK);
-            putValue(ACCELERATOR_KEY, key);
-            KeyShortcuts.registerKey(key, this);
+            super("New SOAR Layer...", KeyStroke.getKeyStroke(KeyEvent.VK_N, UIGlobals.menuShortcutMask | InputEvent.SHIFT_DOWN_MASK));
         }
 
         @Override
@@ -120,14 +118,10 @@ public class Actions {
 
     }
 
-    public static final class OpenLocalFile extends AbstractAction {
+    public static class OpenLocalFile extends AbstractKeyAction {
 
         public OpenLocalFile() {
-            super("Open Image Layer...");
-
-            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_O, UIGlobals.menuShortcutMask);
-            putValue(ACCELERATOR_KEY, key);
-            KeyShortcuts.registerKey(key, this);
+            super("Open Image Layer...", KeyStroke.getKeyStroke(KeyEvent.VK_O, UIGlobals.menuShortcutMask));
         }
 
         @Override
@@ -170,14 +164,10 @@ public class Actions {
 
     }
 
-    public static final class Paste extends AbstractAction {
+    public static class Paste extends AbstractKeyAction {
 
         public Paste() {
-            super("Paste");
-
-            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_V, UIGlobals.menuShortcutMask);
-            putValue(ACCELERATOR_KEY, key);
-            KeyShortcuts.registerKey(key, this);
+            super("Paste", KeyStroke.getKeyStroke(KeyEvent.VK_V, UIGlobals.menuShortcutMask));
         }
 
         @Override
@@ -200,14 +190,10 @@ public class Actions {
 
     }
 
-    public static final class ReloadSources extends AbstractAction {
+    public static class ReloadSources extends AbstractKeyAction {
 
         public ReloadSources() {
-            super("Reload Datasets Listings");
-
-            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_R, UIGlobals.menuShortcutMask);
-            putValue(ACCELERATOR_KEY, key);
-            KeyShortcuts.registerKey(key, this);
+            super("Reload Datasets Listings", KeyStroke.getKeyStroke(KeyEvent.VK_R, UIGlobals.menuShortcutMask));
         }
 
         @Override
@@ -248,14 +234,10 @@ public class Actions {
 
     }
 
-    public static final class SaveState extends AbstractAction {
+    public static class SaveState extends AbstractKeyAction {
 
         public SaveState() {
-            super("Save State");
-
-            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_S, UIGlobals.menuShortcutMask);
-            putValue(ACCELERATOR_KEY, key);
-            KeyShortcuts.registerKey(key, this);
+            super("Save State", KeyStroke.getKeyStroke(KeyEvent.VK_S, UIGlobals.menuShortcutMask));
         }
 
         @Override
@@ -265,14 +247,10 @@ public class Actions {
 
     }
 
-    public static final class SaveStateAs extends AbstractAction {
+    public static class SaveStateAs extends AbstractKeyAction {
 
         public SaveStateAs() {
-            super("Save State As...");
-
-            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_S, UIGlobals.menuShortcutMask | InputEvent.ALT_DOWN_MASK);
-            putValue(ACCELERATOR_KEY, key);
-            KeyShortcuts.registerKey(key, this);
+            super("Save State As...", KeyStroke.getKeyStroke(KeyEvent.VK_S, UIGlobals.menuShortcutMask | InputEvent.ALT_DOWN_MASK));
         }
 
         @Override
@@ -299,14 +277,13 @@ public class Actions {
 
     public static class SDOCutOut extends AbstractAction {
 
-        private static final String baseURL = "https://www.lmsal.com/get_aia_data/?";
-
         public SDOCutOut() {
             super("SDO Cut-out");
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            String baseURL = "https://www.lmsal.com/get_aia_data/?";
             JHVGlobals.openURL(baseURL + ImageLayers.getSDOCutoutString());
         }
 
@@ -341,14 +318,10 @@ public class Actions {
 
     }
 
-    public static final class WindowMinimize extends AbstractAction {
+    public static class WindowMinimize extends AbstractKeyAction {
 
         public WindowMinimize() {
-            super("Minimize");
-
-            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_M, UIGlobals.menuShortcutMask);
-            putValue(ACCELERATOR_KEY, key);
-            KeyShortcuts.registerKey(key, this);
+            super("Minimize", KeyStroke.getKeyStroke(KeyEvent.VK_M, UIGlobals.menuShortcutMask));
         }
 
         @Override
@@ -375,14 +348,10 @@ public class Actions {
 
     }
 
-    public static final class ZoomFit extends AbstractAction {
+    public static class ZoomFit extends AbstractKeyAction {
 
         public ZoomFit() {
-            super("Zoom to Fit");
-
-            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_9, UIGlobals.menuShortcutMask);
-            putValue(ACCELERATOR_KEY, key);
-            KeyShortcuts.registerKey(key, this);
+            super("Zoom to Fit", KeyStroke.getKeyStroke(KeyEvent.VK_9, UIGlobals.menuShortcutMask));
         }
 
         @Override
@@ -407,14 +376,10 @@ public class Actions {
 
     }
 
-    public static final class ZoomIn extends AbstractAction {
+    public static class ZoomIn extends AbstractKeyAction {
 
         public ZoomIn() {
-            super("Zoom In");
-
-            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, UIGlobals.menuShortcutMask);
-            putValue(ACCELERATOR_KEY, key);
-            KeyShortcuts.registerKey(key, this);
+            super("Zoom In", KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, UIGlobals.menuShortcutMask));
         }
 
         @Override
@@ -425,14 +390,10 @@ public class Actions {
 
     }
 
-    public static final class ZoomOneToOne extends AbstractAction {
+    public static class ZoomOneToOne extends AbstractKeyAction {
 
         public ZoomOneToOne() {
-            super("Actual Size");
-
-            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_0, UIGlobals.menuShortcutMask);
-            putValue(ACCELERATOR_KEY, key);
-            KeyShortcuts.registerKey(key, this);
+            super("Actual Size", KeyStroke.getKeyStroke(KeyEvent.VK_0, UIGlobals.menuShortcutMask));
         }
 
         @Override
@@ -451,14 +412,10 @@ public class Actions {
 
     }
 
-    public static final class ZoomOut extends AbstractAction {
+    public static class ZoomOut extends AbstractKeyAction {
 
         public ZoomOut() {
-            super("Zoom Out");
-
-            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, UIGlobals.menuShortcutMask);
-            putValue(ACCELERATOR_KEY, key);
-            KeyShortcuts.registerKey(key, this);
+            super("Zoom Out", KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, UIGlobals.menuShortcutMask));
         }
 
         @Override
