@@ -23,6 +23,7 @@ import org.helioviewer.jhv.gui.dialogs.LoadStateDialog;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.dialogs.SoarDialog;
 import org.helioviewer.jhv.input.KeyShortcuts;
+import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -195,6 +196,23 @@ public class Actions {
         @Override
         public void actionPerformed(ActionEvent e) {
             Display.getCamera().reset();
+        }
+
+    }
+
+    public static final class ReloadSources extends AbstractAction {
+
+        public ReloadSources() {
+            super("Reload Datasets Listings");
+
+            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_R, UIGlobals.menuShortcutMask);
+            putValue(ACCELERATOR_KEY, key);
+            KeyShortcuts.registerKey(key, this);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            DataSources.loadSources();
         }
 
     }

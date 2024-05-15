@@ -9,6 +9,8 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.everit.json.schema.FormatValidator;
 import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
@@ -16,6 +18,10 @@ import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
 import org.helioviewer.jhv.astronomy.Spice;
 
 public class TimeUtils {
+
+    static {
+        Logger.getLogger("org.ocpsoft").setLevel(Level.WARNING); // shut-up prettytime info logs
+    }
 
     private static final ZoneOffset ZERO = ZoneOffset.ofTotalSeconds(0);
     private static final DateTimeFormatter milliFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
