@@ -19,10 +19,6 @@ import org.helioviewer.jhv.astronomy.Spice;
 
 public class TimeUtils {
 
-    static {
-        Logger.getLogger("org.ocpsoft").setLevel(Level.WARNING); // shut-up prettytime info logs
-    }
-
     private static final ZoneOffset ZERO = ZoneOffset.ofTotalSeconds(0);
     private static final DateTimeFormatter milliFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
     public static final DateTimeFormatter sqlTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
