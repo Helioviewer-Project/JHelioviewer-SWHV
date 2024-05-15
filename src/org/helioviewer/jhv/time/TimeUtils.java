@@ -9,8 +9,6 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.everit.json.schema.FormatValidator;
 import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
