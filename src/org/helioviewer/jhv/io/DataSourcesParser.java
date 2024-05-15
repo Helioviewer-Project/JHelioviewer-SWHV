@@ -20,8 +20,9 @@ public class DataSourcesParser {
         rootNode = new DefaultMutableTreeNode(server);
     }
 
-    void parse(JSONObject json) {
+    DataSourcesParser parse(JSONObject json) {
         parse(rootNode, json, null);
+        return this;
     }
 
     DefaultMutableTreeNode getRoot() {
