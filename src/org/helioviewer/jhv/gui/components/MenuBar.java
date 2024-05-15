@@ -31,6 +31,8 @@ public final class MenuBar extends JMenuBar {
         fileMenu.add(new Actions.LoadState());
         fileMenu.add(new Actions.SaveState());
         fileMenu.add(new Actions.SaveStateAs());
+        fileMenu.addSeparator();
+        fileMenu.add(new Actions.ReloadSources());
 
         Actions.ExitProgram exitAction = new Actions.ExitProgram();
         if (Platform.isMacOS()) {
