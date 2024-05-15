@@ -223,11 +223,11 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         // Time slider
         timeSlider = new TimeSlider(TimeSlider.HORIZONTAL, 0, 0, 0);
         timeSlider.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "RIGHT_ARROW");
-        timeSlider.getActionMap().put("RIGHT_ARROW", getNextFrameAction());
+        timeSlider.getActionMap().put("RIGHT_ARROW", nextFrameAction);
         timeSlider.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "LEFT_ARROW");
-        timeSlider.getActionMap().put("LEFT_ARROW", getPreviousFrameAction());
+        timeSlider.getActionMap().put("LEFT_ARROW", prevFrameAction);
         timeSlider.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false), "SPACE");
-        timeSlider.getActionMap().put("SPACE", getPlayPauseAction());
+        timeSlider.getActionMap().put("SPACE", playPauseAction);
 
         JPanel sliderPanel = new JPanel(new BorderLayout());
         sliderPanel.add(timeSlider);
@@ -240,19 +240,19 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         prevFrameButton = new JideButton(Buttons.backward);
         prevFrameButton.setFont(Buttons.getMaterialFont(small));
         prevFrameButton.setToolTipText("Step to previous frame");
-        prevFrameButton.addActionListener(getPreviousFrameAction());
+        prevFrameButton.addActionListener(prevFrameAction);
         buttonPanel.add(prevFrameButton);
 
         playButton = new JideButton(Buttons.play);
         playButton.setFont(Buttons.getMaterialFont(big));
         playButton.setToolTipText("Play movie");
-        playButton.addActionListener(getPlayPauseAction());
+        playButton.addActionListener(playPauseAction);
         buttonPanel.add(playButton);
 
         nextFrameButton = new JideButton(Buttons.forward);
         nextFrameButton.setFont(Buttons.getMaterialFont(small));
         nextFrameButton.setToolTipText("Step to next frame");
-        nextFrameButton.addActionListener(getNextFrameAction());
+        nextFrameButton.addActionListener(nextFrameAction);
         buttonPanel.add(nextFrameButton);
 
         recordButton = new RecordButton(small);
