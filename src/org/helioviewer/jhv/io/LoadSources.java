@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.io;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.concurrent.Callable;
@@ -40,21 +39,10 @@ class LoadSources {
                 schema = schemaLoader.load().build();
             }
 
-            URI uri = new URI(serverUrl);
-            DataSourcesParser parser = new DataSourcesParser(server);
-            while (true) {
-                try {
-                    JSONObject jo = JSONUtils.get(uri);
-                    if (schema != null)
-                        validator.performValidation(schema, jo);
-                    parser.parse(jo);
-                    break;
-                } catch (IOException e) {
-                    // Log.error(uri, e);
-                    Thread.sleep(15000);
-                }
-            }
-            return parser;
+            JSONObject jo = JSONUtils.get(new URI(serverUrl));
+            validator.performValidation(schema, jo);
+
+            return new DataSourcesParser(server).parse(jo);
         }
     }
 
