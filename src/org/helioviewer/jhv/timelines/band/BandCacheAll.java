@@ -31,9 +31,9 @@ class BandCacheAll implements BandCache {
 
         hasData = true;
         for (int i = 0; i < len; i++) {
+            dateVals.add(new DateValue(dates[i], yAxis.clip(values[i])));
             if (dateVals.size() >= MAX_SIZE)
                 break;
-            dateVals.add(new DateValue(dates[i], yAxis.clip(values[i])));
         }
         Collections.sort(dateVals);
 
