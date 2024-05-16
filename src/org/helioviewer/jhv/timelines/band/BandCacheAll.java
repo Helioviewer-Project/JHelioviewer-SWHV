@@ -25,13 +25,11 @@ class BandCacheAll implements BandCache {
     @Override
     public void addToCache(YAxis yAxis, float[] values, long[] dates) {
         int len = values.length;
-        if (len > 0) {
-            hasData = true;
-        }
-        if (dateVals.size() >= MAX_SIZE) {
+        if (len == 0 || dateVals.size() >= MAX_SIZE) {
             return;
         }
 
+        hasData = true;
         for (int i = 0; i < len; i++) {
             if (dateVals.size() >= MAX_SIZE)
                 break;
@@ -75,7 +73,7 @@ class BandCacheAll implements BandCache {
 
     @Override
     public float getValue(long ts) {
-        if (ts < first.milli || ts > last.milli)
+        if (first == null || ts < first.milli || ts > last.milli) // if first is not null, last cannot be null
             return YAxis.BLANK;
         int low = 0, high = dateVals.size();
         while (low != high) {
