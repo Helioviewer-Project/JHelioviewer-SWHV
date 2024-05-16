@@ -39,7 +39,7 @@ class LoadSources {
                 schema = schemaLoader.load().build();
             }
 
-            JSONObject jo = JSONUtils.get(new URI(serverUrl));
+            JSONObject jo = JSONUtils.getUncached(new URI(serverUrl));
             validator.performValidation(schema, jo);
 
             return new DataSourcesParser(server).parse(jo);
