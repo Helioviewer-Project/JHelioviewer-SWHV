@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
@@ -45,7 +44,7 @@ public class LoadSunJSON {
                     Log.warn(uri.toString(), e);
                     return null;
                 }
-            }).filter(Objects::nonNull).collect(Collectors.toUnmodifiableList());
+            }).filter(Objects::nonNull).toList();
         }
     }
 

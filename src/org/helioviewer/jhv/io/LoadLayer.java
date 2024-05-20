@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -88,7 +87,7 @@ public class LoadLayer {
                     Log.warn(uri.toString(), e);
                     return null;
                 }
-            }).filter(Objects::nonNull).collect(Collectors.toUnmodifiableList());
+            }).filter(Objects::nonNull).toList();
             return new ManyView(views);
         }
     }
