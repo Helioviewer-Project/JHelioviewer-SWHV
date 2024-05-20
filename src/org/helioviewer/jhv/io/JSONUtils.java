@@ -20,11 +20,11 @@ public class JSONUtils {
     private static final int BUFSIZ = 65536;
 
     public static JSONObject get(Reader in) throws JSONException {
-        return new JSONObject(new JSONTokener(in));
+        return new JSONObject(new JSONTokener(new BufferedReader(in, BUFSIZ)));
     }
 
     public static JSONObject get(InputStream in) throws IOException, JSONException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8), BUFSIZ)) {
+        try (InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {
             return get(reader);
         }
     }
