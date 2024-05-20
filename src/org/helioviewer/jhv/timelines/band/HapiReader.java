@@ -150,6 +150,7 @@ public class HapiReader {
         try (NetClient nc = NetClient.of(uri); BufferedInputStream is = new BufferedInputStream(nc.getStream())) {
             RowSequence rseq = dataset.reader.hapiReader.createRowSequence(is, null, "csv");
             int numParameters = dataset.reader.parameters.size();
+            int numAxes = numParameters - 1;
 
             ArrayList<Long> dates = new ArrayList<>();
             ArrayList<float[]> values = new ArrayList<>();
@@ -162,15 +163,41 @@ public class HapiReader {
                     continue;
                 dates.add(milli);
 
-                float[] valueArray = new float[numParameters - 1];
+                float[] valueArray = new float[numAxes];
                 for (int i = 1; i < numParameters; i++) {
                     Object o = rseq.getCell(i);
                     valueArray[i] = o == null ? YAxis.BLANK : ((Double) o).floatValue(); // fill
                 }
                 values.add(valueArray);
             }
-            DatesValues datesValues = new DatesValues(dates.stream().mapToLong(i -> i).toArray(), values.toArray(float[][]::new));
+            DatesValues datesValues = new DatesValues(longArray(dates), transpose(numAxes, values));
         }
+    }
+
+    private static long[] longArray(List<Long> dates) {
+        int numPoints = dates.size();
+        long[] ret = new long[numPoints];
+        if (numPoints == 0)
+            return ret;
+
+        for (int j = 0; j < numPoints; j++)
+            ret[j] = dates.get(j);
+        return ret;
+    }
+
+    private static float[][] transpose(int numAxes, List<float[]> values) {
+        int numPoints = values.size();
+        float[][] ret = new float[numAxes][numPoints];
+        if (numPoints == 0)
+            return ret;
+
+        for (int j = 0; j < numPoints; j++) {
+            float[] v = values.get(j);
+            for (int i = 0; i < numAxes; i++) {
+                ret[i][j] = v[i];
+            }
+        }
+        return ret;
     }
 
     private static JSONObject verifyResponse(JSONObject jo) throws Exception {
