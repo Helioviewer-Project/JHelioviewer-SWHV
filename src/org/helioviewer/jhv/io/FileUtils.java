@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 
@@ -148,7 +147,7 @@ public class FileUtils {
 
     public static List<URI> listDir(Path path) throws IOException {
         try (Stream<Path> stream = Files.find(path, Integer.MAX_VALUE, (filePath, fileAttr) -> fileAttr.isRegularFile())) {
-            return stream.map(Path::toUri).collect(Collectors.toUnmodifiableList());
+            return stream.map(Path::toUri).toList();
         }
     }
 
