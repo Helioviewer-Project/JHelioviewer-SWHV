@@ -45,7 +45,7 @@ public class LoadSunJSON {
                     Log.warn(uri.toString(), e);
                     return null;
                 }
-            }).filter(Objects::nonNull).collect(Collectors.toList());
+            }).filter(Objects::nonNull).collect(Collectors.toUnmodifiableList());
         }
     }
 
