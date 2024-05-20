@@ -26,15 +26,14 @@ import uk.ac.starlink.hapi.HapiParam;
 import uk.ac.starlink.hapi.HapiTableReader;
 import uk.ac.starlink.hapi.HapiVersion;
 import uk.ac.starlink.table.RowSequence;
-import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.FutureCallback;
 
 public class HapiReader {
 
     public static void submit() {
-        String server = "https://cdaweb.gsfc.nasa.gov/hapi/";
-        //String server = "https://hapi.swhv.oma.be/SWHV_Timelines/hapi/";
-        EDTCallbackExecutor.pool.submit(new LoadCatalog(server), new Callback(server));
+        //String server = "https://cdaweb.gsfc.nasa.gov/hapi/";
+        String server = "https://hapi.swhv.oma.be/SWHV_Timelines/hapi/";
+        EDTCallbackExecutor.pool.submit(new LoadCatalog(server), new CallbackCatalog(server));
     }
 
     private record Catalog(HapiVersion version, Map<String, Dataset> datasets) {
@@ -66,29 +65,28 @@ public class HapiReader {
                     ids.add(jo);
             }
 
-            //LinkedHashMap<String, Dataset> datasets = new LinkedHashMap<>();
             List<Dataset> datasets = ids.parallelStream().map(item -> {
                 String id = item.optString("id", null);
                 if (id == null)
                     return null;
                 String title = item.optString("title", id);
 
+                UriTemplate.Variables vars = UriTemplate.vars().set(version.getDatasetRequestParam(), id);
+                String uri = new UriTemplate(server + "info").expand(vars);
                 try {
-                    UriTemplate.Variables vars = UriTemplate.vars().set(version.getDatasetRequestParam(), id);
-                    URI uri = new URI(new UriTemplate(server + "info").expand(vars));
-                    JSONObject joInfo = verifyResponse(JSONUtils.get(uri));
+                    JSONObject joInfo = verifyResponse(JSONUtils.get(new URI(uri)));
                     return new Dataset(id, title, getDatasetReader(joInfo));
                 } catch (Exception e) {
-                    Log.error(e);
+                    Log.error(uri, e);
                 }
-
                 return null;
             }).filter(Objects::nonNull).toList();
             if (datasets.isEmpty())
                 throw new Exception("Empty catalog");
 
-            return null;
-            //return new Catalog(version, datasets);
+            LinkedHashMap<String, Dataset> datasetMap = new LinkedHashMap<>();
+            datasets.forEach(d -> datasetMap.put(d.id, d));
+            return new Catalog(version, datasetMap);
         }
     }
 
@@ -184,16 +182,16 @@ public class HapiReader {
         return jo;
     }
 
-    private record Callback(String server) implements FutureCallback<Catalog> {
+    private record CallbackCatalog(String server) implements FutureCallback<Catalog> {
 
         @Override
         public void onSuccess(Catalog catalog) {
-            System.out.println(">>> done");
+            System.out.println(">>> done: " + catalog.datasets.size());
         }
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log.error(Throwables.getStackTraceAsString(t));
+            Log.error(t);
         }
 
     }
