@@ -6,12 +6,16 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.Callable;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.io.UriTemplate;
+import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 
@@ -22,8 +26,16 @@ import uk.ac.starlink.hapi.HapiParam;
 import uk.ac.starlink.hapi.HapiTableReader;
 import uk.ac.starlink.hapi.HapiVersion;
 import uk.ac.starlink.table.RowSequence;
+import com.google.common.base.Throwables;
+import com.google.common.util.concurrent.FutureCallback;
 
 public class HapiReader {
+
+    public static void submit() {
+        String server = "https://cdaweb.gsfc.nasa.gov/hapi/";
+        //String server = "https://hapi.swhv.oma.be/SWHV_Timelines/hapi/";
+        EDTCallbackExecutor.pool.submit(new LoadCatalog(server), new Callback(server));
+    }
 
     private record Catalog(HapiVersion version, Map<String, Dataset> datasets) {
     }
@@ -31,49 +43,59 @@ public class HapiReader {
     private record DatasetReader(HapiTableReader hapiReader, List<Parameter> parameters) {
     }
 
-    private record Dataset(String title, DatasetReader reader) {
+    private record Dataset(String id, String title, DatasetReader reader) {
     }
 
     private record Parameter(String name, String units, String scale, JSONArray range) {
     }
 
-    public static Catalog getCatalog(String server) throws Exception {
-        JSONObject joCatalog = verifyResponse(JSONUtils.get(new URI(server + "catalog")));
-        HapiVersion version = HapiVersion.fromText(joCatalog.optString("HAPI", null));
+    private record LoadCatalog(String server) implements Callable<Catalog> {
+        @Override
+        public Catalog call() throws Exception {
+            JSONObject joCatalog = verifyResponse(JSONUtils.get(new URI(server + "catalog")));
+            HapiVersion version = HapiVersion.fromText(joCatalog.optString("HAPI", null));
 
-        JSONArray jaCatalog = joCatalog.optJSONArray("catalog");
-        if (jaCatalog == null)
-            throw new Exception("Missing catalog object");
+            JSONArray jaCatalog = joCatalog.optJSONArray("catalog");
+            if (jaCatalog == null)
+                throw new Exception("Missing catalog object");
 
-        LinkedHashMap<String, Dataset> datasets = new LinkedHashMap<>();
-        for (int i = 0; i < jaCatalog.length(); i++) {
-            JSONObject joDataset = jaCatalog.optJSONObject(i);
-            if (joDataset == null)
-                continue;
-            String id = joDataset.optString("id", null);
-            if (id == null)
-                continue;
-            String title = joDataset.optString("title", id);
+            int numIds = jaCatalog.length();
+            ArrayList<JSONObject> ids = new ArrayList<>(numIds);
+            for (Object o : jaCatalog) {
+                if (o instanceof JSONObject jo)
+                    ids.add(jo);
+            }
 
-            UriTemplate.Variables vars = UriTemplate.vars().set(version.getDatasetRequestParam(), id);
-            URI uri = new URI(new UriTemplate(server + "info").expand(vars));
-            JSONObject joInfo = verifyResponse(JSONUtils.get(uri));
-            DatasetReader reader = getDatasetReader(joInfo);
-            if (reader == null)
-                continue;
-            datasets.put(id, new Dataset(title, reader));
+            //LinkedHashMap<String, Dataset> datasets = new LinkedHashMap<>();
+            List<Dataset> datasets = ids.parallelStream().map(item -> {
+                String id = item.optString("id", null);
+                if (id == null)
+                    return null;
+                String title = item.optString("title", id);
+
+                try {
+                    UriTemplate.Variables vars = UriTemplate.vars().set(version.getDatasetRequestParam(), id);
+                    URI uri = new URI(new UriTemplate(server + "info").expand(vars));
+                    JSONObject joInfo = verifyResponse(JSONUtils.get(uri));
+                    return new Dataset(id, title, getDatasetReader(joInfo));
+                } catch (Exception e) {
+                    Log.error(e);
+                }
+
+                return null;
+            }).filter(Objects::nonNull).toList();
+            if (datasets.isEmpty())
+                throw new Exception("Empty catalog");
+
+            return null;
+            //return new Catalog(version, datasets);
         }
-        if (datasets.isEmpty())
-            throw new Exception("Empty catalog");
-
-        return new Catalog(version, datasets);
     }
 
-    @Nullable
     private static DatasetReader getDatasetReader(JSONObject jo) throws Exception {
         JSONArray jaParameters = jo.optJSONArray("parameters");
         if (jaParameters == null)
-            return null;
+            throw new Exception("Missing parameters object");
 
         int numParameters = jaParameters.length();
         List<Parameter> parameters = new ArrayList<>(numParameters);
@@ -160,6 +182,20 @@ public class HapiReader {
         if (1200 != status.optInt("code", -1) || !"OK".equals(status.optString("message", null)))
             throw new Exception("HAPI status not OK: " + status);
         return jo;
+    }
+
+    private record Callback(String server) implements FutureCallback<Catalog> {
+
+        @Override
+        public void onSuccess(Catalog catalog) {
+            System.out.println(">>> done");
+        }
+
+        @Override
+        public void onFailure(@Nonnull Throwable t) {
+            Log.error(Throwables.getStackTraceAsString(t));
+        }
+
     }
 
 }
