@@ -7,6 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.io.UriTemplate;
@@ -26,7 +28,10 @@ public class HapiReader {
     private record Catalog(HapiVersion version, Map<String, Dataset> datasets) {
     }
 
-    private record Dataset(String title, HapiTableReader reader, List<Parameter> parameters) {
+    private record DatasetReader(HapiTableReader hapiReader, List<Parameter> parameters) {
+    }
+
+    private record Dataset(String title, DatasetReader reader) {
     }
 
     private record Parameter(String name, String units, String scale, JSONArray range) {
@@ -65,8 +70,12 @@ public class HapiReader {
         UriTemplate.Variables vars = UriTemplate.vars().set(version.getDatasetRequestParam(), id);
         URI uri = new URI(new UriTemplate(server + "info").expand(vars));
         JSONObject joInfo = verifyResponse(JSONUtils.get(uri));
+        return new Dataset(title, getDatasetReader(joInfo));
+    }
 
-        JSONArray jaParameters = joInfo.optJSONArray("parameters");
+    @Nullable
+    private static DatasetReader getDatasetReader(JSONObject jo) throws Exception {
+        JSONArray jaParameters = jo.optJSONArray("parameters");
         if (jaParameters == null)
             return null;
 
@@ -76,18 +85,18 @@ public class HapiReader {
             JSONObject joParameter = jaParameters.optJSONObject(j);
             if (joParameter == null)
                 continue;
-            parameters.add(readParameter(joParameter));
+            parameters.add(getParameter(joParameter));
         }
         if (parameters.size() < 2)
             throw new Exception("At least two parameters should be present");
-        if (!"time".equalsIgnoreCase(parameters.get(0).name()))
+        if (!"time".equalsIgnoreCase(parameters.get(0).name))
             throw new Exception("First parameter should be time");
 
-        HapiTableReader reader = new HapiTableReader(HapiInfo.fromJson(joInfo));
-        return new Dataset(title, reader, parameters);
+        HapiTableReader reader = new HapiTableReader(HapiInfo.fromJson(jo));
+        return new DatasetReader(reader, parameters);
     }
 
-    private static Parameter readParameter(JSONObject jo) throws Exception {
+    private static Parameter getParameter(JSONObject jo) throws Exception {
         if (jo.optJSONArray("bins") != null)
             throw new Exception("Bins not supported");
         if (jo.optJSONArray("size") != null)
@@ -109,11 +118,11 @@ public class HapiReader {
     }
 
     public static void getData(String server, Catalog catalog, String id, String start, String stop) throws Exception {
-        Dataset dataset = catalog.datasets().get(id);
+        Dataset dataset = catalog.datasets.get(id);
         if (dataset == null)
             return;
 
-        HapiVersion version = catalog.version();
+        HapiVersion version = catalog.version;
         UriTemplate.Variables requestVars = UriTemplate.vars()
                 .set(version.getDatasetRequestParam(), id);
         UriTemplate.Variables rangeVars = UriTemplate.vars()
@@ -123,8 +132,8 @@ public class HapiReader {
 
         URI uri = new URI(uriTemplate.expand(rangeVars));
         try (NetClient nc = NetClient.of(uri); BufferedInputStream is = new BufferedInputStream(nc.getStream())) {
-            RowSequence rseq = dataset.reader().createRowSequence(is, null, "csv");
-            int numParameters = dataset.parameters().size();
+            RowSequence rseq = dataset.reader.hapiReader.createRowSequence(is, null, "csv");
+            int numParameters = dataset.reader.parameters.size();
 
             ArrayList<Long> dates = new ArrayList<>();
             ArrayList<float[]> values = new ArrayList<>();
