@@ -55,22 +55,18 @@ public class HapiReader {
                 continue;
             String title = joDataset.optString("title", id);
 
-            Dataset dataset = readDataset(server, version, id, title);
-            if (dataset == null)
+            UriTemplate.Variables vars = UriTemplate.vars().set(version.getDatasetRequestParam(), id);
+            URI uri = new URI(new UriTemplate(server + "info").expand(vars));
+            JSONObject joInfo = verifyResponse(JSONUtils.get(uri));
+            DatasetReader reader = getDatasetReader(joInfo);
+            if (reader == null)
                 continue;
-            datasets.put(id, dataset);
+            datasets.put(id, new Dataset(title, reader));
         }
         if (datasets.isEmpty())
             throw new Exception("Empty catalog");
 
         return new Catalog(version, datasets);
-    }
-
-    private static Dataset readDataset(String server, HapiVersion version, String id, String title) throws Exception {
-        UriTemplate.Variables vars = UriTemplate.vars().set(version.getDatasetRequestParam(), id);
-        URI uri = new URI(new UriTemplate(server + "info").expand(vars));
-        JSONObject joInfo = verifyResponse(JSONUtils.get(uri));
-        return new Dataset(title, getDatasetReader(joInfo));
     }
 
     @Nullable
