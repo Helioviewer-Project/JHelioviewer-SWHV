@@ -48,13 +48,13 @@ public final class AboutDialog extends StandardDialog implements Interfaces.Show
                 "<li><a href=\"https://ffmpeg.org\">FFmpeg</a>, the leading multimedia framework.</li>" +
                 "<li><a href=\"https://github.com/square/okio\">Okio</a> and <a href=\"https://github.com/square/okhttp\">OkHttp</a> libraries by Square, Inc.</li>" +
                 "<li><a href=\"https://github.com/google/guava\">Guava</a>, Google core libraries for Java.</li>" +
-                "<li><a href=\"https://github.com/ben-manes/caffeine\">Caffeine</a>, a high performance caching library for Java.</li>" +
-                "<li><a href=\"https://www.ehcache.org\">Ehcache</a> library.</li>" +
+                "<li><a href=\"https://github.com/ben-manes/caffeine\">Caffeine</a> and <a href=\"https://www.ehcache.org\">Ehcache</a> caching libraries.</li>" +
                 "<li><a href=\"https://www.ocpsoft.org/prettytime/nlp\">PrettyTime NLP</a>, a human time parsing library.</li>" +
                 "<li><a href=\"https://github.com/jidesoft/jide-oss\">JIDE Common Layer</a>, © 2002-2017, JIDE Software, Inc.</li>" +
                 "<li><a href=\"https://github.com/JFormDesigner/FlatLaf\">FlatLaf</a>, a modern cross-platform Look and Feel for Java Swing.</li>" +
-                "<li><a href=\"https://www.star.bristol.ac.uk/~mbt/jsamp/\">JSAMP</a> toolkit for the Simple Applications Messaging Protocol.</li>" +
+                "<li>JSAMP, JCDF and STIL packages by <a href=\"https://www.star.bristol.ac.uk/~mbt/\">Mark Taylor</a>.</li>" +
                 "<li><a href=\"https://nom-tam-fits.github.io/nom-tam-fits\">FITS</a> in Java public domain library.</li>" +
+                "<li><a href=\"https://tika.apache.org\">Apache Tika</a>, a content analysis toolkit.</li>" +
                 "<li><a href=\"https://github.com/xerial/sqlite-jdbc\">Xerial</a> SQLite JDBC driver.</li>" +
                 "<li><a href=\"https://www.ej-technologies.com/products/install4j/overview.html\">install4j</a>, the multi-platform installer builder.</li>";
 
