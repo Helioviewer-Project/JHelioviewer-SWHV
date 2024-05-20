@@ -148,7 +148,7 @@ public class FileUtils {
 
     public static List<URI> listDir(Path path) throws IOException {
         try (Stream<Path> stream = Files.find(path, Integer.MAX_VALUE, (filePath, fileAttr) -> fileAttr.isRegularFile())) {
-            return stream.map(Path::toUri).collect(Collectors.toList());
+            return stream.map(Path::toUri).collect(Collectors.toUnmodifiableList());
         }
     }
 
