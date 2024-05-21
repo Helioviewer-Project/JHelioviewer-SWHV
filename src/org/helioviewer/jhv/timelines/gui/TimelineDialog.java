@@ -8,10 +8,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.timelines.TimelineSettings;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
@@ -52,13 +50,9 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
         okBtn.setText("Add");
         setInitFocusedComponent(okBtn);
 
-        JButton availabilityBtn = new JButton("Available data");
-        availabilityBtn.addActionListener(e -> JHVGlobals.openURL(TimelineSettings.AVAILABILITY_URL));
-
         ButtonPanel panel = new ButtonPanel();
         panel.add(okBtn, ButtonPanel.AFFIRMATIVE_BUTTON);
         panel.add(cancelBtn, ButtonPanel.CANCEL_BUTTON);
-        panel.add(availabilityBtn, ButtonPanel.OTHER_BUTTON);
 
         return panel;
     }
