@@ -39,10 +39,7 @@ public class HapiReader {
     private record Catalog(HapiVersion version, Map<String, Dataset> datasets) {
     }
 
-    private record DatasetReader(HapiTableReader hapiReader, List<Parameter> parameters, long milliStart, long milliStop) {
-    }
-
-    private record Dataset(String id, String title, DatasetReader reader) {
+    private record Dataset(String id, HapiTableReader reader, List<BandType> types, long start, long stop) {
     }
 
     private record Parameter(String name, String units, String scale, JSONArray range) {
@@ -75,7 +72,7 @@ public class HapiReader {
                 String uri = new UriTemplate(server + "info").expand(vars);
                 try {
                     JSONObject joInfo = verifyResponse(JSONUtils.get(new URI(uri)));
-                    return new Dataset(id, title, getDatasetReader(joInfo));
+                    return getDataset(id, title, joInfo);
                 } catch (Exception e) {
                     Log.error(uri, e);
                 }
@@ -90,14 +87,14 @@ public class HapiReader {
         }
     }
 
-    private static DatasetReader getDatasetReader(JSONObject jo) throws Exception {
-        long milliStart = TimeUtils.MINIMAL_TIME.milli;
-        long milliStop = TimeUtils.MAXIMAL_TIME.milli;
+    private static Dataset getDataset(String id, String title, JSONObject jo) throws Exception {
+        long start = TimeUtils.MINIMAL_TIME.milli;
+        long stop = TimeUtils.MAXIMAL_TIME.milli;
         String startDate = jo.optString("startDate", null);
         String stopDate = jo.optString("stopDate", null);
         if (startDate != null && stopDate != null) {
-            milliStart = Math.max(milliStart, TimeUtils.parseZ(startDate));
-            milliStop = Math.min(milliStop, TimeUtils.parseZ(stopDate));
+            start = Math.max(start, TimeUtils.parseZ(startDate));
+            stop = Math.min(stop, TimeUtils.parseZ(stopDate));
         }
 
         JSONArray jaParameters = jo.optJSONArray("parameters");
@@ -117,8 +114,23 @@ public class HapiReader {
         if (!"time".equalsIgnoreCase(parameters.get(0).name))
             throw new Exception("First parameter should be time");
 
+        int numAxes = parameters.size() - 1;
+        List<BandType> types = new ArrayList<>(numAxes);
+        for (int i = 1; i < numAxes; i++) {
+            Parameter p = parameters.get(i);
+            JSONObject jobt = new JSONObject().
+                    put("baseUrl", "").
+                    put("unitLabel", p.units).
+                    put("name", id + ' ' + p.name).
+                    put("range", p.range).
+                    put("scale", p.scale).
+                    put("label", title + ' ' + p.name).
+                    put("group", "HAPI");
+            types.add(new BandType(jobt));
+        }
+
         HapiTableReader reader = new HapiTableReader(HapiInfo.fromJson(jo));
-        return new DatasetReader(reader, parameters, milliStart, milliStop);
+        return new Dataset(id, reader, types, start, stop);
     }
 
     private static Parameter getParameter(JSONObject jo) throws Exception {
@@ -142,10 +154,13 @@ public class HapiReader {
         return new Parameter(name, units, scale, range);
     }
 
-    public static void getData(String server, Catalog catalog, String id, String start, String stop) throws Exception {
+    public static void getData(String server, Catalog catalog, String id, long startMilli, long stopMilli) throws Exception {
         Dataset dataset = catalog.datasets.get(id);
         if (dataset == null)
             return;
+
+        String start = TimeUtils.formatZ(Math.max(startMilli, dataset.start));
+        String stop = TimeUtils.formatZ(Math.min(stopMilli, dataset.stop));
 
         HapiVersion version = catalog.version;
         UriTemplate.Variables requestVars = UriTemplate.vars()
@@ -157,9 +172,8 @@ public class HapiReader {
 
         URI uri = new URI(uriTemplate.expand(rangeVars));
         try (NetClient nc = NetClient.of(uri); BufferedInputStream is = new BufferedInputStream(nc.getStream())) {
-            RowSequence rseq = dataset.reader.hapiReader.createRowSequence(is, null, "csv");
-            int numParameters = dataset.reader.parameters.size();
-            int numAxes = numParameters - 1;
+            RowSequence rseq = dataset.reader.createRowSequence(is, null, "csv");
+            int numAxes = dataset.types.size();
 
             ArrayList<Long> dates = new ArrayList<>();
             ArrayList<float[]> values = new ArrayList<>();
@@ -167,13 +181,10 @@ public class HapiReader {
                 String time = (String) rseq.getCell(0);
                 if (time == null) // fill
                     continue;
-                long milli = TimeUtils.parseZ(time);
-                if (milli < TimeUtils.MINIMAL_TIME.milli || milli > TimeUtils.MAXIMAL_TIME.milli)
-                    continue;
-                dates.add(milli);
+                dates.add(TimeUtils.parseZ(time));
 
                 float[] valueArray = new float[numAxes];
-                for (int i = 1; i < numParameters; i++) {
+                for (int i = 1; i <= numAxes; i++) {
                     Object o = rseq.getCell(i);
                     valueArray[i] = o == null ? YAxis.BLANK : ((Double) o).floatValue(); // fill
                 }
