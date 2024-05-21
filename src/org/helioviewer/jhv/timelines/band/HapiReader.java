@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.timelines.band;
 
-import java.awt.EventQueue;
 import java.io.BufferedInputStream;
 import java.net.URI;
 import java.util.ArrayList;
@@ -32,10 +31,16 @@ import com.google.common.util.concurrent.FutureCallback;
 
 public class HapiReader {
 
-    public static void submit() {
+    private static Catalog theCatalog; //!
+
+    public static void requestCatalog() {
         //String server = "https://cdaweb.gsfc.nasa.gov/hapi/";
         String server = "https://hapi.swhv.oma.be/SWHV_Timelines/hapi/";
-        EDTCallbackExecutor.pool.submit(new LoadCatalog(server), new CallbackCatalog(server));
+        EDTCallbackExecutor.pool.submit(new LoadCatalog(server), new CallbackCatalog());
+    }
+
+    public static void requestData(String id, long start, long end) {
+        EDTCallbackExecutor.pool.submit(new LoadData(theCatalog, id, start, end), new CallbackData());
     }
 
     private record Catalog(HapiVersion version, Map<String, Dataset> datasets) {
@@ -118,7 +123,7 @@ public class HapiReader {
 
         int numAxes = parameters.size() - 1;
         List<BandType> types = new ArrayList<>(numAxes);
-        for (int i = 1; i < numAxes; i++) {
+        for (int i = 1; i <= numAxes; i++) {
             Parameter p = parameters.get(i);
             JSONObject jobt = new JSONObject().
                     put("baseUrl", (server + "data").intern()).
@@ -156,13 +161,15 @@ public class HapiReader {
         return new Parameter(name, units, scale, range);
     }
 
-    public static void getData(Catalog catalog, String id, long startMilli, long stopMilli) throws Exception {
+    private static final List<Band.Data> emptyList = new ArrayList<>();
+
+    private static List<Band.Data> getData(Catalog catalog, String id, long startTime, long endTime) throws Exception {
         Dataset dataset = catalog.datasets.get(id);
         if (dataset == null)
-            return;
+            return emptyList;
 
-        String start = TimeUtils.formatZ(Math.max(startMilli, dataset.start));
-        String stop = TimeUtils.formatZ(Math.min(stopMilli, dataset.stop));
+        String start = TimeUtils.formatZ(Math.max(startTime, dataset.start));
+        String stop = TimeUtils.formatZ(Math.min(endTime, dataset.stop));
 
         HapiVersion version = catalog.version;
         UriTemplate.Variables requestVars = UriTemplate.vars()
@@ -195,7 +202,7 @@ public class HapiReader {
             }
             int numPoints = dateList.size();
             if (numPoints == 0) // empty
-                return;
+                return emptyList;
 
             long[] dates = longArray(numPoints, dateList);
             float[][] values = transpose(numPoints, numAxes, valueList);
@@ -203,15 +210,7 @@ public class HapiReader {
             for (int i = 0; i < numAxes; i++) {
                 lines.add(new Band.Data(dataset.types.get(i), dates, values[i]));
             }
-
-            EventQueue.invokeLater(() -> {
-                for (Band.Data line : lines) {
-                    Band band = Band.createFromType(line.bandType());
-                    band.addToCache(line.values(), dates);
-                    Timelines.getLayers().add(band);
-                }
-                //DrawController.setSelectedInterval(dates[0], dates[dates.length - 1]);
-            });
+            return lines;
         }
     }
 
@@ -242,18 +241,44 @@ public class HapiReader {
         return jo;
     }
 
-    private record CallbackCatalog(String server) implements FutureCallback<Catalog> {
-
+    private record LoadData(Catalog catalog, String id, long start, long end) implements Callable<List<Band.Data>> {
         @Override
-        public void onSuccess(Catalog catalog) {
-            System.out.println(">>> done: " + catalog.datasets.size());
+        public List<Band.Data> call() throws Exception {
+            return getData(catalog, id, start, end);
+        }
+    }
+
+    private static class CallbackData implements FutureCallback<List<Band.Data>> {
+        @Override
+        public void onSuccess(@Nonnull List<Band.Data> lines) {
+            for (Band.Data line : lines) {
+                Band band = Band.createFromType(line.bandType());
+                band.addToCache(line.values(), line.dates());
+                Timelines.getLayers().add(band);
+            }
         }
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
             Log.error(t);
         }
+    }
 
+    private static class CallbackCatalog implements FutureCallback<Catalog> {
+        @Override
+        public void onSuccess(@Nonnull Catalog catalog) {
+            theCatalog = catalog;
+
+            for (Dataset dataset : theCatalog.datasets.values()) {
+                BandType.loadBandTypes(dataset.types);
+            }
+            Timelines.td.getObservationPanel().setupDatasets();
+        }
+
+        @Override
+        public void onFailure(@Nonnull Throwable t) {
+            Log.error(t);
+        }
     }
 
 }
