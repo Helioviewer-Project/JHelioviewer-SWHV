@@ -181,8 +181,13 @@ public class HapiReader {
         if (dataset == null)
             return emptyList;
 
-        String start = TimeUtils.formatZ(Math.max(startTime, dataset.start));
-        String stop = TimeUtils.formatZ(Math.min(endTime, dataset.stop));
+        startTime = Math.max(startTime, dataset.start);
+        endTime = Math.min(endTime, dataset.stop);
+        if (endTime <= startTime)
+            return emptyList;
+
+        String start = TimeUtils.formatZ(startTime);
+        String stop = TimeUtils.formatZ(endTime);
 
         HapiVersion version = catalog.version;
         UriTemplate.Variables requestVars = UriTemplate.vars()
