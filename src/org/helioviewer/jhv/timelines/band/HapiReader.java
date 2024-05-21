@@ -74,7 +74,7 @@ public class HapiReader {
                 String uri = new UriTemplate(server + "info").expand(vars);
                 try {
                     JSONObject joInfo = verifyResponse(JSONUtils.get(new URI(uri)));
-                    return getDataset(id, title, joInfo);
+                    return getDataset(server, id, title, joInfo);
                 } catch (Exception e) {
                     Log.error(uri, e);
                 }
@@ -89,7 +89,7 @@ public class HapiReader {
         }
     }
 
-    private static Dataset getDataset(String id, String title, JSONObject jo) throws Exception {
+    private static Dataset getDataset(String server, String id, String title, JSONObject jo) throws Exception {
         long start = TimeUtils.MINIMAL_TIME.milli;
         long stop = TimeUtils.MAXIMAL_TIME.milli;
         String startDate = jo.optString("startDate", null);
@@ -121,7 +121,7 @@ public class HapiReader {
         for (int i = 1; i < numAxes; i++) {
             Parameter p = parameters.get(i);
             JSONObject jobt = new JSONObject().
-                    put("baseUrl", "").
+                    put("baseUrl", (server + "data").intern()).
                     put("unitLabel", p.units).
                     put("name", id + ' ' + p.name).
                     put("range", p.range).
@@ -156,7 +156,7 @@ public class HapiReader {
         return new Parameter(name, units, scale, range);
     }
 
-    public static void getData(String server, Catalog catalog, String id, long startMilli, long stopMilli) throws Exception {
+    public static void getData(Catalog catalog, String id, long startMilli, long stopMilli) throws Exception {
         Dataset dataset = catalog.datasets.get(id);
         if (dataset == null)
             return;
@@ -170,7 +170,8 @@ public class HapiReader {
         UriTemplate.Variables rangeVars = UriTemplate.vars()
                 .set(version.getStartRequestParam(), start)
                 .set(version.getStopRequestParam(), stop);
-        UriTemplate uriTemplate = new UriTemplate(server + "data", requestVars);
+        String baseUrl = dataset.types.get(0).getBaseURL();
+        UriTemplate uriTemplate = new UriTemplate(baseUrl, requestVars);
 
         URI uri = new URI(uriTemplate.expand(rangeVars));
         try (NetClient nc = NetClient.of(uri); BufferedInputStream is = new BufferedInputStream(nc.getStream())) {
