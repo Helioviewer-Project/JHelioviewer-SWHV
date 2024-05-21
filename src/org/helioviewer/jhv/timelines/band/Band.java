@@ -25,6 +25,9 @@ import org.json.JSONObject;
 
 public final class Band extends AbstractTimelineLayer {
 
+    record Data(BandType bandType, long[] dates, float[] values) {
+    }
+
     private static final HashMap<BandType, Band> externalLoad = new HashMap<>();
 
     public static Band createFromType(BandType _bandType) {
