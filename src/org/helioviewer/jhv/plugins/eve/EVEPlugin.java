@@ -5,7 +5,7 @@ import javax.swing.JMenuItem;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.timelines.Timelines;
-import org.helioviewer.jhv.timelines.band.BandDataProvider;
+import org.helioviewer.jhv.timelines.band.HapiReader;
 import org.helioviewer.jhv.timelines.gui.TimelineActions;
 import org.json.JSONObject;
 
@@ -22,7 +22,7 @@ public class EVEPlugin extends Plugin {
     @Override
     public void install() {
         tl.installTimelines();
-        BandDataProvider.loadBandTypes();
+        HapiReader.requestCatalog();
         JHVFrame.getMenuBar().getMenu(0).add(newItem, 2);
         JHVFrame.getMenuBar().getMenu(0).add(openItem, 4);
     }

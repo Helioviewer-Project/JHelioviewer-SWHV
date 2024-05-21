@@ -33,12 +33,12 @@ import com.google.common.util.concurrent.FutureCallback;
 
 public class HapiReader {
 
+    private static final String ROBserver = "https://hapi.swhv.oma.be/SWHV_Timelines/hapi/";
+
     private static Catalog theCatalog; //!
 
     public static void requestCatalog() {
-        //String server = "https://cdaweb.gsfc.nasa.gov/hapi/";
-        String server = "https://hapi.swhv.oma.be/SWHV_Timelines/hapi/";
-        EDTCallbackExecutor.pool.submit(new LoadCatalog(server), new CallbackCatalog());
+        EDTCallbackExecutor.pool.submit(new LoadCatalog(ROBserver), new CallbackCatalog());
     }
 
     public static Future<List<Band.Data>> requestData(String id, String parameter, long start, long end) {
