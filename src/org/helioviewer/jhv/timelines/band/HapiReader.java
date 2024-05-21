@@ -39,7 +39,7 @@ public class HapiReader {
     private record Catalog(HapiVersion version, Map<String, Dataset> datasets) {
     }
 
-    private record DatasetReader(HapiTableReader hapiReader, List<Parameter> parameters) {
+    private record DatasetReader(HapiTableReader hapiReader, List<Parameter> parameters, long milliStart, long milliStop) {
     }
 
     private record Dataset(String id, String title, DatasetReader reader) {
@@ -91,6 +91,15 @@ public class HapiReader {
     }
 
     private static DatasetReader getDatasetReader(JSONObject jo) throws Exception {
+        long milliStart = TimeUtils.MINIMAL_TIME.milli;
+        long milliStop = TimeUtils.MAXIMAL_TIME.milli;
+        String startDate = jo.optString("startDate", null);
+        String stopDate = jo.optString("stopDate", null);
+        if (startDate != null && stopDate != null) {
+            milliStart = Math.max(milliStart, TimeUtils.parseZ(startDate));
+            milliStop = Math.min(milliStop, TimeUtils.parseZ(stopDate));
+        }
+
         JSONArray jaParameters = jo.optJSONArray("parameters");
         if (jaParameters == null)
             throw new Exception("Missing parameters object");
@@ -109,7 +118,7 @@ public class HapiReader {
             throw new Exception("First parameter should be time");
 
         HapiTableReader reader = new HapiTableReader(HapiInfo.fromJson(jo));
-        return new DatasetReader(reader, parameters);
+        return new DatasetReader(reader, parameters, milliStart, milliStop);
     }
 
     private static Parameter getParameter(JSONObject jo) throws Exception {
