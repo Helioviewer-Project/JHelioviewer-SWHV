@@ -213,7 +213,7 @@ public class HapiReader {
                 float[] valueArray = new float[numAxes];
                 for (int i = 0; i < numAxes; i++) {
                     Object o = rseq.getCell(i + 1);
-                    valueArray[i] = o == null ? YAxis.BLANK : ((Double) o).floatValue(); // fill
+                    valueArray[i] = o == null ? YAxis.BLANK : ((Number) o).floatValue(); // fill
                 }
                 valueList.add(valueArray);
             }
