@@ -61,7 +61,6 @@ public class BandType {
     private final String bandCacheType;
 
     private final String dataset;
-    private final String parameter;
 
     private final JSONObject json;
 
@@ -100,7 +99,6 @@ public class BandType {
         bandCacheType = jo.optString("bandCacheType", "BandCacheMinute");
 
         dataset = jo.optString("dataset", "unknown");
-        parameter = jo.optString("parameter", "unknown");
     }
 
     void serialize(JSONObject jo) {
@@ -147,10 +145,6 @@ public class BandType {
 
     String getDataset() {
         return dataset;
-    }
-
-    String getParameter() {
-        return parameter;
     }
 
     @Override

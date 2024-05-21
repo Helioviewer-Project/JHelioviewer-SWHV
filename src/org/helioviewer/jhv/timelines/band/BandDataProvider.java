@@ -21,7 +21,7 @@ public class BandDataProvider {
         if ("".equals(type.getBaseURL()))
             return;
         for (Interval interval : intervals) {
-            Future<List<Band.Data>> worker = HapiReader.requestData(type.getDataset(), type.getParameter(), interval.start, interval.end);
+            Future<List<Band.Data>> worker = HapiReader.requestData(type.getDataset(), interval.start, interval.end);
             workerMap.put(band, worker);
         }
     }
