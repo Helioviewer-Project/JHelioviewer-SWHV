@@ -1,19 +1,11 @@
 package org.helioviewer.jhv.timelines.band;
 
-import java.net.URI;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.io.JSONUtils;
-import org.helioviewer.jhv.threads.EDTCallbackExecutor;
-import org.helioviewer.jhv.time.TimeUtils;
-import org.helioviewer.jhv.timelines.Timelines;
-import org.helioviewer.jhv.timelines.TimelineSettings;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -24,24 +16,12 @@ public class BandDataProvider {
 
     private static final ArrayListMultimap<Band, Future<List<Band.Data>>> workerMap = ArrayListMultimap.create();
 
-    public static void loadBandTypes() {
-        EDTCallbackExecutor.pool.submit(new BandTypeDownload(), new BandTypeDownloadCallback());
-    }
-
-    public static void loadBand(JSONObject jo) {
-        EDTCallbackExecutor.pool.submit(new BandLoad(jo), new BandLoadCallback());
-    }
-
     static void addDownloads(Band band, List<Interval> intervals) {
         BandType type = band.getBandType();
         if ("".equals(type.getBaseURL()))
             return;
         for (Interval interval : intervals) {
             Future<List<Band.Data>> worker = HapiReader.requestData(type.getDataset(), type.getParameter(), interval.start, interval.end);
-            /*
-            EDTCallbackExecutor.pool.submit(
-                    new BandDownload(band, interval.start, interval.end), new BandDownloadCallback(band));
-            */
             workerMap.put(band, worker);
         }
     }
@@ -57,85 +37,6 @@ public class BandDataProvider {
                 return true;
         }
         return false;
-    }
-
-    private record BandDownload(Band band, long startTime, long endTime) implements Callable<BandResponse> {
-
-        BandDownload {
-            Timelines.getLayers().downloadStarted(band);
-        }
-
-        @Override
-        public BandResponse call() throws Exception {
-            BandType type = band.getBandType();
-            URI uri = new URI(type.getBaseURL() + "&timeline=" + type.getName() +
-                    "&start_date=" + TimeUtils.formatDate(startTime) +
-                    "&end_date=" + TimeUtils.formatDate(endTime));
-            return new BandResponse(JSONUtils.getUncached(uri));
-        }
-
-    }
-
-    private record BandDownloadCallback(Band band) implements FutureCallback<BandResponse> {
-
-        @Override
-        public void onSuccess(BandResponse result) {
-            if (result.bandName.equals(band.getBandType().getName()))
-                band.addToCache(result.values, result.dates);
-            else
-                Log.error("Expected " + band.getBandType().getName() + ", got " + result.bandName);
-        }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            Log.error(t);
-        }
-
-    }
-
-    private record BandLoad(JSONObject jo) implements Callable<BandResponse> {
-        @Override
-        public BandResponse call() {
-            return new BandResponse(jo);
-        }
-    }
-
-    private static class BandLoadCallback implements FutureCallback<BandResponse> {
-
-        @Override
-        public void onSuccess(BandResponse result) {
-            Band band = Band.createFromType(result.bandType == null ? BandType.getBandType(result.bandName) : result.bandType);
-            band.addToCache(result.values, result.dates);
-            Timelines.getLayers().add(band);
-        }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            Log.error(t);
-        }
-
-    }
-
-    private static class BandTypeDownload implements Callable<JSONArray> {
-        @Override
-        public JSONArray call() throws Exception {
-            return JSONUtils.get(new URI(TimelineSettings.BASE_URL)).getJSONArray("objects");
-        }
-    }
-
-    private static class BandTypeDownloadCallback implements FutureCallback<JSONArray> {
-
-        @Override
-        public void onSuccess(JSONArray result) {
-            BandType.loadBandTypes(result);
-            Timelines.td.getObservationPanel().setupDatasets();
-        }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            Log.error(t);
-        }
-
     }
 
 }
