@@ -93,8 +93,8 @@ public class HapiReader {
         String startDate = jo.optString("startDate", null);
         String stopDate = jo.optString("stopDate", null);
         if (startDate != null && stopDate != null) {
-            start = Math.max(start, TimeUtils.parseZ(startDate));
-            stop = Math.min(stop, TimeUtils.parseZ(stopDate));
+            start = Math.max(start, TimeUtils.optParse(startDate.replace("Z", ""), start));
+            stop = Math.min(stop, TimeUtils.optParse(stopDate.replace("Z", ""), stop));
         }
 
         JSONArray jaParameters = jo.optJSONArray("parameters");
