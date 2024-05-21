@@ -20,7 +20,6 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.helioviewer.jhv.timelines.TimelineSettings;
 import org.json.JSONObject;
 
 import com.jidesoft.swing.JideButton;
@@ -64,13 +63,6 @@ class BandOptionPanel extends JPanel {
         c.anchor = GridBagConstraints.LINE_END;
         JideButton downloadButton = getDownloadButton(band);
         add(downloadButton, c);
-
-        c.gridy = 1;
-        c.gridx = 0;
-        c.anchor = GridBagConstraints.LINE_START;
-        JButton availabilityButton = new JButton("Available data");
-        availabilityButton.addActionListener(e -> JHVGlobals.openURL(TimelineSettings.AVAILABILITY_URL + '#' + band.getBandType().getName()));
-        add(availabilityButton, c);
     }
 
     private static JideButton getDownloadButton(Band band) {
