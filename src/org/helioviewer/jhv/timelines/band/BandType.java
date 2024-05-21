@@ -41,6 +41,9 @@ public class BandType {
         return groups.keySet().toArray(String[]::new);
     }
 
+    private static final String[] XwarnLabels = new String[]{"B", "C", "M", "X"};
+    private static final double[] XwarnValues = new double[]{1e-7, 1e-6, 1e-5, 1e-4};
+
     private final String name;
     private final String group;
     private final String baseURL;
@@ -79,21 +82,9 @@ public class BandType {
 
         scale = jo.optString("scale", "linear");
 
-        JSONArray warn;
-        if (name.startsWith("GOES_XRSB")) // temporary
-            warn = new JSONArray("""
-                    [{"warnLabel":"B","warnValue":1e-7},{"warnLabel":"C","warnValue":1e-6},{"warnLabel":"M","warnValue":1e-5},{"warnLabel":"X","warnValue":1e-4}]""");
-        else
-            warn = jo.optJSONArray("warnLevels");
-        if (warn != null) {
-            int len = warn.length();
-            warnLabels = new String[len];
-            warnLevels = new double[len];
-            for (int i = 0; i < len; i++) {
-                JSONObject o = warn.getJSONObject(i);
-                warnLabels[i] = o.getString("warnLabel");
-                warnLevels[i] = o.getDouble("warnValue");
-            }
+        if (name.startsWith("GOES_XRSB")) { // temporary
+            warnLabels = XwarnLabels;
+            warnLevels = XwarnValues;
         } else {
             warnLabels = new String[0];
             warnLevels = new double[0];
