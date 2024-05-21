@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.timelines.band;
 
+import java.awt.EventQueue;
 import java.io.BufferedInputStream;
 import java.net.URI;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.io.UriTemplate;
 import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.helioviewer.jhv.time.TimeUtils;
+import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 
 import org.json.JSONArray;
@@ -175,44 +177,54 @@ public class HapiReader {
             RowSequence rseq = dataset.reader.createRowSequence(is, null, "csv");
             int numAxes = dataset.types.size();
 
-            ArrayList<Long> dates = new ArrayList<>();
-            ArrayList<float[]> values = new ArrayList<>();
+            ArrayList<Long> dateList = new ArrayList<>();
+            ArrayList<float[]> valueList = new ArrayList<>();
             while (rseq.next()) {
                 String time = (String) rseq.getCell(0);
                 if (time == null) // fill
                     continue;
-                dates.add(TimeUtils.parseZ(time));
+                dateList.add(TimeUtils.parseZ(time));
 
                 float[] valueArray = new float[numAxes];
                 for (int i = 1; i <= numAxes; i++) {
                     Object o = rseq.getCell(i);
                     valueArray[i] = o == null ? YAxis.BLANK : ((Double) o).floatValue(); // fill
                 }
-                values.add(valueArray);
+                valueList.add(valueArray);
             }
-            DatesValues datesValues = new DatesValues(longArray(dates), transpose(numAxes, values));
+            int numPoints = dateList.size();
+            if (numPoints == 0) // empty
+                return;
+
+            long[] dates = longArray(numPoints, dateList);
+            float[][] values = transpose(numPoints, numAxes, valueList);
+            List<Band.Data> lines = new ArrayList<>(numAxes);
+            for (int i = 0; i < numAxes; i++) {
+                lines.add(new Band.Data(dataset.types.get(i), dates, values[i]));
+            }
+
+            EventQueue.invokeLater(() -> {
+                for (Band.Data line : lines) {
+                    Band band = Band.createFromType(line.bandType());
+                    band.addToCache(line.values(), dates);
+                    Timelines.getLayers().add(band);
+                }
+                //DrawController.setSelectedInterval(dates[0], dates[dates.length - 1]);
+            });
         }
     }
 
-    private static long[] longArray(List<Long> dates) {
-        int numPoints = dates.size();
+    private static long[] longArray(int numPoints, List<Long> dateList) {
         long[] ret = new long[numPoints];
-        if (numPoints == 0)
-            return ret;
-
         for (int j = 0; j < numPoints; j++)
-            ret[j] = dates.get(j);
+            ret[j] = dateList.get(j);
         return ret;
     }
 
-    private static float[][] transpose(int numAxes, List<float[]> values) {
-        int numPoints = values.size();
+    private static float[][] transpose(int numPoints, int numAxes, List<float[]> valueList) {
         float[][] ret = new float[numAxes][numPoints];
-        if (numPoints == 0)
-            return ret;
-
         for (int j = 0; j < numPoints; j++) {
-            float[] v = values.get(j);
+            float[] v = valueList.get(j);
             for (int i = 0; i < numAxes; i++) {
                 ret[i][j] = v[i];
             }
