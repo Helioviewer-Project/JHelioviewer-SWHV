@@ -21,8 +21,7 @@ public class BandType {
         int len = ja.length();
         for (int i = 0; i < len; i++) {
             BandType bandType = new BandType(ja.getJSONObject(i));
-            if (!"ODI".equals(bandType.group)) //! hide ODI for the time being
-                groups.put(bandType.group, bandType);
+            groups.put(bandType.group, bandType);
         }
     }
 
@@ -88,7 +87,7 @@ public class BandType {
 
         scale = jo.optString("scale", "linear");
 
-        if (name.startsWith("GOES_XRSB")) { // temporary
+        if (label.contains("XRAY long")) {
             warnLabels = XwarnLabels;
             warnLevels = XwarnValues;
         } else {
