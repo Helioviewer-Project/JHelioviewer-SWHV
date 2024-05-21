@@ -193,7 +193,6 @@ public class HapiReader {
         String baseUrl = dataset.types.get(0).getBaseURL();
 
         String uri = new UriTemplate(baseUrl, requestVars).expand(rangeVars);
-        System.out.println(">>> " + uri);
         try (NetClient nc = NetClient.of(new URI(uri)); BufferedInputStream is = new BufferedInputStream(nc.getStream())) {
             RowSequence rseq = dataset.reader.createRowSequence(is, null, "csv");
             int numAxes = dataset.types.size();
