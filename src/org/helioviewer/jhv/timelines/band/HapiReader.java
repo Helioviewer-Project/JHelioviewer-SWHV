@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 import javax.annotation.Nonnull;
 
@@ -27,6 +28,7 @@ import uk.ac.starlink.hapi.HapiParam;
 import uk.ac.starlink.hapi.HapiTableReader;
 import uk.ac.starlink.hapi.HapiVersion;
 import uk.ac.starlink.table.RowSequence;
+import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.FutureCallback;
 
 public class HapiReader {
@@ -39,8 +41,8 @@ public class HapiReader {
         EDTCallbackExecutor.pool.submit(new LoadCatalog(server), new CallbackCatalog());
     }
 
-    public static void requestData(String id, long start, long end) {
-        EDTCallbackExecutor.pool.submit(new LoadData(theCatalog, id, start, end), new CallbackData());
+    public static Future<List<Band.Data>> requestData(String id, String parameter, long start, long end) {
+        return EDTCallbackExecutor.pool.submit(new LoadData(theCatalog, id, parameter, start, end), new CallbackData());
     }
 
     private record Catalog(HapiVersion version, Map<String, Dataset> datasets) {
@@ -132,6 +134,10 @@ public class HapiReader {
                     put("range", p.range).
                     put("scale", p.scale).
                     put("label", title + ' ' + p.name).
+                    //
+                    put("dataset", id).
+                    put("parameter", p.name).
+                    //
                     put("group", "HAPI");
             types.add(new BandType(jobt));
         }
@@ -163,7 +169,7 @@ public class HapiReader {
 
     private static final List<Band.Data> emptyList = new ArrayList<>();
 
-    private static List<Band.Data> getData(Catalog catalog, String id, long startTime, long endTime) throws Exception {
+    private static List<Band.Data> getData(Catalog catalog, String id, String parameter, long startTime, long endTime) throws Exception {
         Dataset dataset = catalog.datasets.get(id);
         if (dataset == null)
             return emptyList;
@@ -173,15 +179,15 @@ public class HapiReader {
 
         HapiVersion version = catalog.version;
         UriTemplate.Variables requestVars = UriTemplate.vars()
-                .set(version.getDatasetRequestParam(), id);
+                .set(version.getDatasetRequestParam(), id)
+                .set("parameters", parameter);
         UriTemplate.Variables rangeVars = UriTemplate.vars()
                 .set(version.getStartRequestParam(), start)
                 .set(version.getStopRequestParam(), stop);
         String baseUrl = dataset.types.get(0).getBaseURL();
-        UriTemplate uriTemplate = new UriTemplate(baseUrl, requestVars);
 
-        URI uri = new URI(uriTemplate.expand(rangeVars));
-        try (NetClient nc = NetClient.of(uri); BufferedInputStream is = new BufferedInputStream(nc.getStream())) {
+        String uri = new UriTemplate(baseUrl, requestVars).expand(rangeVars);
+        try (NetClient nc = NetClient.of(new URI(uri)); BufferedInputStream is = new BufferedInputStream(nc.getStream())) {
             RowSequence rseq = dataset.reader.createRowSequence(is, null, "csv");
             int numAxes = dataset.types.size();
 
@@ -194,8 +200,8 @@ public class HapiReader {
                 dateList.add(TimeUtils.parseZ(time));
 
                 float[] valueArray = new float[numAxes];
-                for (int i = 1; i <= numAxes; i++) {
-                    Object o = rseq.getCell(i);
+                for (int i = 0; i < numAxes; i++) {
+                    Object o = rseq.getCell(i + 1);
                     valueArray[i] = o == null ? YAxis.BLANK : ((Double) o).floatValue(); // fill
                 }
                 valueList.add(valueArray);
@@ -211,6 +217,9 @@ public class HapiReader {
                 lines.add(new Band.Data(dataset.types.get(i), dates, values[i]));
             }
             return lines;
+        } catch (Exception e) {
+            Log.error(uri, e);
+            throw e;
         }
     }
 
@@ -241,10 +250,10 @@ public class HapiReader {
         return jo;
     }
 
-    private record LoadData(Catalog catalog, String id, long start, long end) implements Callable<List<Band.Data>> {
+    private record LoadData(Catalog catalog, String id, String parameter, long start, long end) implements Callable<List<Band.Data>> {
         @Override
         public List<Band.Data> call() throws Exception {
-            return getData(catalog, id, start, end);
+            return getData(catalog, id, parameter, start, end);
         }
     }
 
@@ -260,7 +269,7 @@ public class HapiReader {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log.error(t);
+            Log.error(Throwables.getStackTraceAsString(t));
         }
     }
 

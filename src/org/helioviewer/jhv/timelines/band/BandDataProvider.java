@@ -22,7 +22,7 @@ import com.google.common.util.concurrent.FutureCallback;
 
 public class BandDataProvider {
 
-    private static final ArrayListMultimap<Band, Future<BandResponse>> workerMap = ArrayListMultimap.create();
+    private static final ArrayListMultimap<Band, Future<List<Band.Data>>> workerMap = ArrayListMultimap.create();
 
     public static void loadBandTypes() {
         EDTCallbackExecutor.pool.submit(new BandTypeDownload(), new BandTypeDownloadCallback());
@@ -33,11 +33,15 @@ public class BandDataProvider {
     }
 
     static void addDownloads(Band band, List<Interval> intervals) {
-        if ("".equals(band.getBandType().getBaseURL()))
+        BandType type = band.getBandType();
+        if ("".equals(type.getBaseURL()))
             return;
         for (Interval interval : intervals) {
-            Future<BandResponse> worker = EDTCallbackExecutor.pool.submit(
+            Future<List<Band.Data>> worker = HapiReader.requestData(type.getDataset(), type.getParameter(), interval.start, interval.end);
+            /*
+            EDTCallbackExecutor.pool.submit(
                     new BandDownload(band, interval.start, interval.end), new BandDownloadCallback(band));
+            */
             workerMap.put(band, worker);
         }
     }
@@ -48,7 +52,7 @@ public class BandDataProvider {
     }
 
     static boolean isDownloadActive(Band band) {
-        for (Future<BandResponse> worker : workerMap.get(band)) {
+        for (Future<?> worker : workerMap.get(band)) {
             if (!worker.isDone())
                 return true;
         }
