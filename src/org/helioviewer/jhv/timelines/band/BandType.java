@@ -43,8 +43,8 @@ public class BandType {
         return groups.keySet().toArray(String[]::new);
     }
 
-    private static final String[] XwarnLabels = new String[]{"B", "C", "M", "X"};
-    private static final double[] XwarnValues = new double[]{1e-7, 1e-6, 1e-5, 1e-4};
+    private static final String[] xWarnLabels = new String[]{"B", "C", "M", "X"};
+    private static final double[] xWarnValues = new double[]{1e-7, 1e-6, 1e-5, 1e-4};
 
     private final String name;
     private final String group;
@@ -59,6 +59,7 @@ public class BandType {
     private final String bandCacheType;
 
     private final String dataset;
+    private final boolean isXRSB;
 
     private final JSONObject json;
 
@@ -85,18 +86,17 @@ public class BandType {
         }
 
         scale = jo.optString("scale", "linear");
+        bandCacheType = jo.optString("bandCacheType", "BandCacheMinute");
+        dataset = jo.optString("dataset", "unknown");
 
-        if (label.contains("XRAY long")) {
-            warnLabels = XwarnLabels;
-            warnLevels = XwarnValues;
+        isXRSB = label.contains("XRAY long");
+        if (isXRSB) {
+            warnLabels = xWarnLabels;
+            warnLevels = xWarnValues;
         } else {
             warnLabels = new String[0];
             warnLevels = new double[0];
         }
-
-        bandCacheType = jo.optString("bandCacheType", "BandCacheMinute");
-
-        dataset = jo.optString("dataset", "unknown");
     }
 
     void serialize(JSONObject jo) {
@@ -143,6 +143,10 @@ public class BandType {
 
     String getDataset() {
         return dataset;
+    }
+
+    boolean isXRSB() {
+        return isXRSB;
     }
 
     @Override
