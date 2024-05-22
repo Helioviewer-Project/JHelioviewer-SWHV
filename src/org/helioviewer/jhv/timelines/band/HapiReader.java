@@ -272,12 +272,9 @@ public class HapiReader {
         @Override
         public void onSuccess(@Nonnull Catalog catalog) {
             theCatalog = catalog;
-
-            List<BandType> bandTypes = new ArrayList<>(theCatalog.parameters.size());
             for (BandParameter parameter : theCatalog.parameters.values()) {
-                bandTypes.add(parameter.type);
+                BandType.addToGroups(parameter.type);
             }
-            BandType.loadBandTypes(bandTypes);
             Timelines.td.setupDatasets();
         }
 

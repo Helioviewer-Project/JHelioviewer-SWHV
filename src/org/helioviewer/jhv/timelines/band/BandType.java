@@ -12,16 +12,8 @@ public class BandType {
 
     private static final LinkedListMultimap<String, BandType> groups = LinkedListMultimap.create();
 
-    static void loadBandTypes(List<BandType> types) {
-        types.forEach(t -> groups.put(t.group, t));
-    }
-
-    static void loadBandTypes(JSONArray ja) {
-        int len = ja.length();
-        for (int i = 0; i < len; i++) {
-            BandType bandType = new BandType(ja.getJSONObject(i));
-            groups.put(bandType.group, bandType);
-        }
+    static void addToGroups(BandType type) {
+        groups.put(type.group, type);
     }
 
     @Nonnull
