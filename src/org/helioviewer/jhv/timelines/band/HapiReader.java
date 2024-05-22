@@ -59,7 +59,11 @@ public class HapiReader {
     private record LoadCatalog(String server) implements Callable<Catalog> {
         @Override
         public Catalog call() throws Exception {
-            JSONObject joCatalog = verifyResponse(JSONUtils.get(new URI(server + "catalog")));
+            String urlCatalog = server + "catalog";
+            String urlInfo = server + "info";
+            String urlData = server + "data";
+
+            JSONObject joCatalog = verifyResponse(JSONUtils.get(new URI(urlCatalog)));
             HapiVersion version = HapiVersion.fromText(joCatalog.optString("HAPI", null));
 
             JSONArray jaCatalog = joCatalog.optJSONArray("catalog");
@@ -73,9 +77,6 @@ public class HapiReader {
                     ids.add(jo);
             }
 
-            String serverInfo = server + "info";
-            String serverData = server + "data";
-
             List<Dataset> datasets = ids.parallelStream().map(item -> {
                 String id = item.optString("id", null);
                 if (id == null)
@@ -83,10 +84,10 @@ public class HapiReader {
                 String title = item.optString("title", id);
 
                 UriTemplate.Variables vars = UriTemplate.vars().set(version.getDatasetRequestParam(), id);
-                String uri = new UriTemplate(serverInfo).expand(vars);
+                String uri = new UriTemplate(urlInfo).expand(vars);
                 try {
                     JSONObject joInfo = verifyResponse(JSONUtils.get(new URI(uri)));
-                    return getDataset(version, serverData, id, title, joInfo);
+                    return getDataset(version, urlData, id, title, joInfo);
                 } catch (Exception e) {
                     Log.error(uri, e);
                 }
@@ -108,7 +109,7 @@ public class HapiReader {
         }
     }
 
-    private static Dataset getDataset(HapiVersion version, String serverData, String id, String title, JSONObject jo) throws Exception {
+    private static Dataset getDataset(HapiVersion version, String urlData, String id, String title, JSONObject jo) throws Exception {
         long start = TimeUtils.MINIMAL_TIME.milli;
         long stop = TimeUtils.MAXIMAL_TIME.milli;
         String startDate = jo.optString("startDate", null);
@@ -143,7 +144,7 @@ public class HapiReader {
                     .set(version.getDatasetRequestParam(), id)
                     .set("parameters", p.name);
             JSONObject jobt = new JSONObject().
-                    put("baseUrl", (new UriTemplate(serverData).expand(request)).intern()).
+                    put("baseUrl", (new UriTemplate(urlData).expand(request)).intern()).
                     put("unitLabel", p.units).
                     put("name", id + ' ' + p.name).
                     put("range", p.range).
