@@ -130,7 +130,6 @@ public final class Band extends AbstractTimelineLayer {
     @Override
     public void remove() {
         BandDataProvider.stopDownloads(this);
-        BandColors.resetColor(graphColor);
         // clear caches
         requestCache = new RequestCache();
         bandCache = createBandCache(bandType.getBandCacheType());

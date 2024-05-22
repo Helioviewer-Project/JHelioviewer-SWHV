@@ -20,7 +20,7 @@ class BandColors {
             minValue++;
         }
     }
-
+/*
     static void resetColor(Color c) {
         for (int i = 0; i < usedArray.length; i++) {
             if (brightColors[i].equals(c)) {
@@ -37,5 +37,5 @@ class BandColors {
             }
         }
     }
-
+*/
 }
