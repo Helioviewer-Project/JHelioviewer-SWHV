@@ -25,7 +25,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import uk.ac.starlink.hapi.HapiInfo;
 import uk.ac.starlink.hapi.HapiParam;
-import uk.ac.starlink.hapi.HapiTableReader;
 import uk.ac.starlink.hapi.HapiVersion;
 import uk.ac.starlink.table.RowSequence;
 import com.google.common.base.Throwables;
