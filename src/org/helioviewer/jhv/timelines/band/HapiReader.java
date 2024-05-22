@@ -47,10 +47,10 @@ public class HapiReader {
     private record Catalog(HapiVersion version, Map<String, BandParameter> parameters) {
     }
 
-    private record Dataset(String id, HapiTableReader reader, List<BandType> types, long start, long stop) {
+    private record Dataset(String id, JhvHapiTableReader reader, List<BandType> types, long start, long stop) {
     }
 
-    private record BandParameter(HapiTableReader reader, BandType type, long start, long stop) {
+    private record BandParameter(JhvHapiTableReader reader, BandType type, long start, long stop) {
     }
 
     private record Parameter(String name, String units, String scale, JSONArray range) {
@@ -94,7 +94,7 @@ public class HapiReader {
 
             LinkedHashMap<String, BandParameter> parameters = new LinkedHashMap<>();
             for (Dataset dataset : datasets) {
-                HapiTableReader reader = dataset.reader;
+                JhvHapiTableReader reader = dataset.reader;
                 long start = dataset.start;
                 long stop = dataset.stop;
                 for (BandType type : dataset.types) {
@@ -147,7 +147,7 @@ public class HapiReader {
             types.add(new BandType(jobt));
         }
 
-        HapiTableReader reader = new HapiTableReader(HapiInfo.fromJson(jo));
+        JhvHapiTableReader reader = new JhvHapiTableReader(HapiInfo.fromJson(jo));
         return new Dataset(id, reader, types, start, stop);
     }
 

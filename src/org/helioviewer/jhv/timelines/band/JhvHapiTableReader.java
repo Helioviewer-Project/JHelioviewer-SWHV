@@ -30,7 +30,7 @@ import uk.ac.starlink.hapi.ParamReader;
  * @author   Mark Taylor
  * @since    12 Jan 2024
  */
-public class HapiTableReader {
+public class JhvHapiTableReader {
 
     private final ParamReader[] paramRdrs_;
     private final ColumnInfo[] colInfos_;
@@ -44,8 +44,11 @@ public class HapiTableReader {
      *
      * @param  hapiInfo  HAPI table metadata
      */
-    public HapiTableReader( HapiInfo hapiInfo ) {
-        HapiParam[] params = hapiInfo.getParameters();
+    public JhvHapiTableReader( HapiInfo hapiInfo ) {
+        this(hapiInfo.getParameters());
+    }
+
+    public JhvHapiTableReader( HapiParam[] params ) {
         nparam_ = params.length;
         paramRdrs_ = new ParamReader[ nparam_ ];
         List<ColumnInfo> cinfoList = new ArrayList<>();
