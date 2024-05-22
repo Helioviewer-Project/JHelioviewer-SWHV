@@ -38,22 +38,24 @@ public final class Band extends AbstractTimelineLayer {
     private static final int DOWNLOADER_MAX_DAYS_PER_BLOCK = 21;
 
     private final BandType bandType;
-    private final BandCache bandCache;
     private final BandOptionPanel optionsPanel = new BandOptionPanel(this);
-    private final RequestCache requestCache = new RequestCache();
 
     private final YAxis yAxis;
     private final int[] warnLevels;
     private final List<GraphPolyline> graphPolylines = new ArrayList<>();
 
+    private RequestCache requestCache;
+    private BandCache bandCache;
     private Color graphColor = BandColors.getNextColor();
     private PropagationModel propagationModel = new PropagationModel.Delay(0);
 
     private Band(BandType _bandType) {
         bandType = _bandType;
-        bandCache = bandType.getBandCacheType().equals("BandCacheAll") ? new BandCacheAll() : new BandCacheMinute();
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), YAxis.generateScale(bandType.getScale(), bandType.getUnitLabel()));
         warnLevels = new int[bandType.getWarnLevels().length];
+        // those should be cleared
+        requestCache = new RequestCache();
+        bandCache = createBandCache(bandType.getBandCacheType());
     }
 
     public Band(JSONObject jo) { // used by load state
@@ -66,6 +68,10 @@ public final class Band extends AbstractTimelineLayer {
             int b = MathUtils.clip(jcolor.optInt("b", 0), 0, 255);
             graphColor = new Color(r, g, b);
         }
+    }
+
+    private static BandCache createBandCache(String cacheType) {
+        return "BandCacheAll".equals(cacheType) ? new BandCacheAll() : new BandCacheMinute();
     }
 
     JSONObject toJson() {
@@ -125,6 +131,9 @@ public final class Band extends AbstractTimelineLayer {
     public void remove() {
         BandDataProvider.stopDownloads(this);
         BandColors.resetColor(graphColor);
+        // clear caches
+        requestCache = new RequestCache();
+        bandCache = createBandCache(bandType.getBandCacheType());
     }
 
     @Override
