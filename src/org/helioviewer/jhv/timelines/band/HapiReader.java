@@ -293,7 +293,7 @@ public class HapiReader {
             for (Dataset dataset : theCatalog.datasets.values()) {
                 BandType.loadBandTypes(dataset.types);
             }
-            Timelines.td.getObservationPanel().setupDatasets();
+            Timelines.td.setupDatasets();
         }
 
         @Override
