@@ -74,7 +74,6 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
         observationPanel.updateGroupValues();
         pack();
         setLocationRelativeTo(JHVFrame.getFrame());
-        pack(); // weird
         setVisible(true);
     }
 
