@@ -115,7 +115,7 @@ public class JhvHapiTableReader {
         int[] overread1 = new int[ 1 ];
         HapiInfo hdr = HapiInfo.fromCommentedStream( in, overread1 );
         int b0 = overread1[ 0 ];
-        Byte byte0 = ( b0 & 0xff ) == b0 ? Byte.valueOf( (byte) b0 ) : null;
+        Byte byte0 = ( b0 & 0xff ) == b0 ? (byte) b0 : null;
         String fmt = hdr.getFormat();
         return createRowSequence( in, byte0, fmt );
     }
@@ -142,13 +142,13 @@ public class JhvHapiTableReader {
         if ( byte0 == null ) {
             int b = in.read();
             if ( b >= 0 ) {
-                byte0 = Byte.valueOf( (byte) b );
+                byte0 = (byte) b;
             }
             else {
                 return EmptyRowSequence.getInstance();
             }
         }
-        byte b0 = byte0.byteValue();
+        byte b0 = byte0;
 
         /* If the first byte is an open brace ("{"), then it can't be
          * a legible CSV or binary data stream, since the first column
@@ -191,7 +191,7 @@ public class JhvHapiTableReader {
     private RowSequence createCsvRowSequence( InputStream in, Byte byte0 ) {
         CsvReader csvRdr = new CsvReader();
         if ( byte0 != null ) {
-            csvRdr.setPrefixByte( byte0.byteValue() );
+            csvRdr.setPrefixByte(byte0);
         }
         Object[][] results = createResultsArray( paramRdrs_ );
         return new RowSequence() {
@@ -304,7 +304,7 @@ public class JhvHapiTableReader {
                 int len = buf_.length;
                 int off = 0;
                 if ( byte0_ != null ) {
-                    buf_[ 0 ] = byte0_.byteValue();
+                    buf_[ 0 ] = byte0_;
                     off++;
                     len--;
                     byte0_ = null; 
@@ -340,7 +340,7 @@ public class JhvHapiTableReader {
     private static RowSequence createUnexpectedJsonRowSequence( InputStream in,
                                                                 byte byte0 )
             throws IOException {
-        StringBuffer sbuf = new StringBuffer();
+        StringBuilder sbuf = new StringBuilder();
         sbuf.append( (char) byte0 );
         sbuf.append( new String( IOUtils.readBytes( in, 100_000 ),
                                  StandardCharsets.UTF_8 ) );
