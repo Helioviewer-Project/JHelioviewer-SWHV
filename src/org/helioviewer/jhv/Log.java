@@ -1,6 +1,5 @@
 package org.helioviewer.jhv;
 
-import java.lang.StackWalker;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
