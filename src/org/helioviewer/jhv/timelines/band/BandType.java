@@ -1,12 +1,11 @@
 package org.helioviewer.jhv.timelines.band;
 
-import javax.annotation.Nonnull;
-
 import java.util.List;
+
+import javax.annotation.Nonnull;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import com.google.common.collect.LinkedListMultimap;
 
 public class BandType {
