@@ -234,7 +234,8 @@ public class HapiReader {
                 dateList.add(TimeUtils.parseZ(time));
 
                 Number value = (Number) sequence.getCell(1);
-                valueList.add(value == null ? YAxis.BLANK : value.floatValue()); // fill
+                float f = value == null ? YAxis.BLANK : value.floatValue();
+                valueList.add(Float.isFinite(f) ? f : YAxis.BLANK); // fill
             }
             int numPoints = dateList.size();
             if (numPoints == 0) // empty
