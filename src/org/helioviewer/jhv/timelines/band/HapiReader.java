@@ -174,6 +174,7 @@ public class HapiReader {
         return new Parameter(name, units, scale, range);
     }
 
+    private static final String hapiFormat = "binary";
     private static final List<Band.Data> emptyList = new ArrayList<>();
 
     private static List<Band.Data> getData(Catalog catalog, String id, long startTime, long endTime) throws Exception {
@@ -190,16 +191,16 @@ public class HapiReader {
         String stop = TimeUtils.formatZ(endTime);
 
         HapiVersion version = catalog.version;
-        UriTemplate.Variables requestVars = UriTemplate.vars()
-                .set(version.getDatasetRequestParam(), id);
-        UriTemplate.Variables rangeVars = UriTemplate.vars()
+        UriTemplate.Variables request = UriTemplate.vars()
+                .set(version.getDatasetRequestParam(), id)
+                .set("format", hapiFormat)
                 .set(version.getStartRequestParam(), start)
                 .set(version.getStopRequestParam(), stop);
         String baseUrl = dataset.types.get(0).getBaseURL();
+        String uri = new UriTemplate(baseUrl).expand(request);
 
-        String uri = new UriTemplate(baseUrl, requestVars).expand(rangeVars);
         try (NetClient nc = NetClient.of(new URI(uri)); BufferedInputStream is = new BufferedInputStream(nc.getStream())) {
-            RowSequence rseq = dataset.reader.createRowSequence(is, null, "csv");
+            RowSequence rseq = dataset.reader.createRowSequence(is, null, hapiFormat);
             int numAxes = dataset.types.size();
 
             ArrayList<Long> dateList = new ArrayList<>();
