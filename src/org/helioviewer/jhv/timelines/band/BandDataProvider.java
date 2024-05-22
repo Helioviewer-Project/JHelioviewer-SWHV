@@ -11,13 +11,13 @@ import com.google.common.collect.ArrayListMultimap;
 
 class BandDataProvider {
 
-    private static final ArrayListMultimap<Band, Future<List<Band.Data>>> workers = ArrayListMultimap.create();
+    private static final ArrayListMultimap<Band, Future<Band.Data>> workers = ArrayListMultimap.create();
 
     static void addDownloads(Band band, List<Interval> intervals) {
-        BandType type = band.getBandType();
-        if ("".equals(type.getBaseURL()))
+        String baseUrl = band.getBandType().getBaseUrl();
+        if ("".equals(baseUrl))
             return;
-        intervals.forEach(interval -> workers.put(band, HapiReader.requestData(type.getDataset(), interval.start, interval.end)));
+        intervals.forEach(interval -> workers.put(band, HapiReader.requestData(baseUrl, interval.start, interval.end)));
     }
 
     static void stopDownloads(Band band) {
