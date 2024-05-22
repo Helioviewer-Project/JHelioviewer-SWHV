@@ -223,7 +223,7 @@ public final class Band extends AbstractTimelineLayer {
         float val = bandCache.getValue(propagationModel.getObservationTime(ts));
         if (val == YAxis.BLANK) {
             return "--";
-        } else if (bandType.getName().contains("XRSB")) {
+        } else if (bandType.isXRSB()) {
             return GOESLevel.getStringValue(val);
         } else {
             return DrawConstants.valueFormatter.format(yAxis.scale(val));
