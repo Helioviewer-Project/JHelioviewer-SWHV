@@ -28,6 +28,7 @@ import org.json.JSONObject;
 import uk.ac.starlink.hapi.HapiInfo;
 import uk.ac.starlink.hapi.HapiParam;
 import uk.ac.starlink.hapi.HapiVersion;
+import uk.ac.starlink.hapi.Times;
 import uk.ac.starlink.table.RowSequence;
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.FutureCallback;
@@ -119,8 +120,8 @@ public class HapiReader {
         String startDate = jo.optString("startDate", null);
         String stopDate = jo.optString("stopDate", null);
         if (startDate != null && stopDate != null) {
-            start = Math.max(start, TimeUtils.optParse(startDate.replace("Z", ""), start));
-            stop = Math.min(stop, TimeUtils.optParse(stopDate.replace("Z", ""), stop));
+            start = Math.max(start, toMillis(startDate));
+            stop = Math.min(stop, toMillis(stopDate));
         }
 
         String bandCacheType = "BandCacheMinute";
@@ -232,7 +233,7 @@ public class HapiReader {
                 String time = (String) sequence.getCell(0);
                 if (time == null) // fill
                     continue;
-                dateList.add(TimeUtils.parseZ(time));
+                dateList.add(toMillis(time));
 
                 Number value = (Number) sequence.getCell(1);
                 float f = value == null ? YAxis.BLANK : value.floatValue();
@@ -310,6 +311,15 @@ public class HapiReader {
         @Override
         public void onFailure(@Nonnull Throwable t) {
             Log.error(t);
+        }
+    }
+
+    private static long toMillis(String isoTime) throws Exception {
+        double seconds = Times.isoToUnixSeconds(isoTime);
+        if (Double.isFinite(seconds)) {
+            return (long) (seconds * 1000 + 0.0005);
+        } else {
+            throw new Exception("Could not parse ISO-8601 string: " + isoTime);
         }
     }
 
