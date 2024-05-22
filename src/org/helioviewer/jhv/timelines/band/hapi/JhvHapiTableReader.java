@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.timelines.band;
+package org.helioviewer.jhv.timelines.band.hapi;
 
 import java.io.EOFException;
 import java.io.InputStream;
@@ -24,6 +24,8 @@ import uk.ac.starlink.hapi.CsvReader;
 import uk.ac.starlink.hapi.HapiInfo;
 import uk.ac.starlink.hapi.HapiParam;
 import uk.ac.starlink.hapi.ParamReader;
+
+// derived from https://github.com/Starlink/starjava/blob/master/hapi/src/main/uk/ac/starlink/hapi/HapiTableReader.java
 
 /**
  * Converts HAPI metadata and input streams to StarTables.

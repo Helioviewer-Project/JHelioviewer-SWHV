@@ -20,6 +20,7 @@ import org.helioviewer.jhv.io.UriTemplate;
 import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
+import org.helioviewer.jhv.timelines.band.hapi.JhvHapiTableReader;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 
 import org.json.JSONArray;
