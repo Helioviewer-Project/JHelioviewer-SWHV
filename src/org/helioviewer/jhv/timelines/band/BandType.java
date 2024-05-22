@@ -48,7 +48,7 @@ public class BandType {
 
     private final String name;
     private final String group;
-    private final String baseURL;
+    private final String baseUrl;
     private final String label;
     private final String unitLabel;
     private final String[] warnLabels;
@@ -57,8 +57,6 @@ public class BandType {
     private final double max;
     private final String scale;
     private final String bandCacheType;
-
-    private final String dataset;
     private final boolean isXRSB;
 
     private final JSONObject json;
@@ -68,7 +66,7 @@ public class BandType {
 
         name = jo.optString("name", "Unknown");
         group = jo.optString("group", "Unknown");
-        baseURL = jo.optString("baseUrl", "");
+        baseUrl = jo.optString("baseUrl", "");
         label = "<html><body>" + jo.optString("label", "Unknown").replaceAll("_(r|t|n|x|y|z|RTN|SRF|VSO|URF)", "<sub>$1</sub>");
 
         String ul = jo.optString("unitLabel", "unknown");
@@ -87,7 +85,6 @@ public class BandType {
 
         scale = jo.optString("scale", "linear");
         bandCacheType = jo.optString("bandCacheType", "BandCacheMinute");
-        dataset = jo.optString("dataset", "unknown");
 
         isXRSB = label.contains("XRAY long");
         if (isXRSB) {
@@ -137,12 +134,8 @@ public class BandType {
         return max;
     }
 
-    String getBaseURL() {
-        return baseURL;
-    }
-
-    String getDataset() {
-        return dataset;
+    String getBaseUrl() {
+        return baseUrl;
     }
 
     boolean isXRSB() {
