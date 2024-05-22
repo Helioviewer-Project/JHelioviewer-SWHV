@@ -188,7 +188,7 @@ public class HapiReader {
         return new Parameter(name, units, scale, range);
     }
 
-    private static final String hapiFormat = "csv";
+    private static final String hapiFormat = "binary";
 
     private static Band.Data getData(Catalog catalog, String baseUrl, long startTime, long endTime) throws Exception {
         BandParameter parameter = catalog.parameters.get(baseUrl);
