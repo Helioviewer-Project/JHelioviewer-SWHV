@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import uk.ac.starlink.table.AbstractStarTable;
@@ -27,8 +28,8 @@ import uk.ac.starlink.hapi.ParamReader;
 /**
  * Converts HAPI metadata and input streams to StarTables.
  *
- * @author   Mark Taylor
- * @since    12 Jan 2024
+ * @author Mark Taylor
+ * @since 12 Jan 2024
  */
 public class JhvHapiTableReader {
 
@@ -37,30 +38,30 @@ public class JhvHapiTableReader {
     private final int nparam_;
     private final int ncol_;
     private static final Logger logger_ =
-        Logger.getLogger( "uk.ac.starlink.hapi" );
+            Logger.getLogger("uk.ac.starlink.hapi");
 
     /**
      * Constructor.
      *
-     * @param  hapiInfo  HAPI table metadata
+     * @param hapiInfo HAPI table metadata
      */
-    public JhvHapiTableReader( HapiInfo hapiInfo ) {
+    public JhvHapiTableReader(HapiInfo hapiInfo) {
         this(hapiInfo.getParameters());
     }
 
-    public JhvHapiTableReader( HapiParam[] params ) {
+    public JhvHapiTableReader(HapiParam[] params) {
         nparam_ = params.length;
-        paramRdrs_ = new ParamReader[ nparam_ ];
+        paramRdrs_ = new ParamReader[nparam_];
         List<ColumnInfo> cinfoList = new ArrayList<>();
-        for ( int ip = 0; ip < nparam_; ip++ ) {
-            ParamReader paramRdr = ParamReader.createReader( params[ ip ] );
-            paramRdrs_[ ip ] = paramRdr;
+        for (int ip = 0; ip < nparam_; ip++) {
+            ParamReader paramRdr = ParamReader.createReader(params[ip]);
+            paramRdrs_[ip] = paramRdr;
             int nc = paramRdr.getColumnCount();
-            for ( int ic = 0; ic < nc; ic++ ) {
-                cinfoList.add( paramRdr.getColumnInfo( ic ) );
+            for (int ic = 0; ic < nc; ic++) {
+                cinfoList.add(paramRdr.getColumnInfo(ic));
             }
         }
-        colInfos_ = cinfoList.toArray( new ColumnInfo[ 0 ] );
+        colInfos_ = cinfoList.toArray(new ColumnInfo[0]);
         ncol_ = colInfos_.length;
     }
 
@@ -73,25 +74,27 @@ public class JhvHapiTableReader {
      * table will be data-less; its metadata methods will work,
      * but attempts to read its data will fail.
      *
-     * @param  rseqSupplier  provides sequential data for the table, or null
-     * @return   table
+     * @param rseqSupplier provides sequential data for the table, or null
+     * @return table
      */
-    public StarTable createStarTable( IOSupplier<RowSequence> rseqSupplier ) {
+    public StarTable createStarTable(IOSupplier<RowSequence> rseqSupplier) {
         return new AbstractStarTable() {
             public int getColumnCount() {
                 return colInfos_.length;
             }
-            public ColumnInfo getColumnInfo( int ic ) {
-                return colInfos_[ ic ];
+
+            public ColumnInfo getColumnInfo(int ic) {
+                return colInfos_[ic];
             }
+
             public long getRowCount() {
                 return -1;
             }
+
             public RowSequence getRowSequence() throws IOException {
-                if ( rseqSupplier != null ) {
+                if (rseqSupplier != null) {
                     return rseqSupplier.get();
-                }
-                else {
+                } else {
                     throw new UnsupportedOperationException();
                 }
             }
@@ -107,17 +110,17 @@ public class JhvHapiTableReader {
      * <p>The supplied input stream will be used as is, so any buffering
      * should be applied before calling this method.
      *
-     * @param   in  input stream including prepended HAPI header
-     * @return   row sequence
+     * @param in input stream including prepended HAPI header
+     * @return row sequence
      */
-    public RowSequence createRowSequenceUsingHeader( InputStream in )
+    public RowSequence createRowSequenceUsingHeader(InputStream in)
             throws IOException {
-        int[] overread1 = new int[ 1 ];
-        HapiInfo hdr = HapiInfo.fromCommentedStream( in, overread1 );
-        int b0 = overread1[ 0 ];
-        Byte byte0 = ( b0 & 0xff ) == b0 ? (byte) b0 : null;
+        int[] overread1 = new int[1];
+        HapiInfo hdr = HapiInfo.fromCommentedStream(in, overread1);
+        int b0 = overread1[0];
+        Byte byte0 = (b0 & 0xff) == b0 ? (byte) b0 : null;
         String fmt = hdr.getFormat();
-        return createRowSequence( in, byte0, fmt );
+        return createRowSequence(in, byte0, fmt);
     }
 
     /**
@@ -127,24 +130,23 @@ public class JhvHapiTableReader {
      * <p>The supplied input stream will be used as is, so any buffering
      * should be applied before calling this method.
      *
-     * @param  in   input stream ready for use
-     * @param  byte0  byte to read at start of input sequence, or null
-     * @param  fmt  data stream format, one of "csv" or "binary"
-     * @return  row sequence
+     * @param in    input stream ready for use
+     * @param byte0 byte to read at start of input sequence, or null
+     * @param fmt   data stream format, one of "csv" or "binary"
+     * @return row sequence
      */
-    public RowSequence createRowSequence( InputStream in, Byte byte0,
-                                          String fmt )
+    public RowSequence createRowSequence(InputStream in, Byte byte0,
+                                         String fmt)
             throws IOException {
 
         /* Ensure that we have an initial byte, even if one didn't get
          * passed to this routine.  If there is no first byte,
          * then there's no data, so return an empty row sequence. */
-        if ( byte0 == null ) {
+        if (byte0 == null) {
             int b = in.read();
-            if ( b >= 0 ) {
+            if (b >= 0) {
                 byte0 = (byte) b;
-            }
-            else {
+            } else {
                 return EmptyRowSequence.getInstance();
             }
         }
@@ -158,24 +160,21 @@ public class JhvHapiTableReader {
          * just leaving an empty stream.  So treat this case specially
          * rather than generating a nasty error condition when the
          * read is attempted. */
-        if ( b0 == '{' &&
-             ( "csv".equals( fmt ) || "binary".equals( fmt ) ) ) {
-            return createUnexpectedJsonRowSequence( in, b0 );
+        if (b0 == '{' &&
+                ("csv".equals(fmt) || "binary".equals(fmt))) {
+            return createUnexpectedJsonRowSequence(in, b0);
         }
 
         /* Otherwise dispatch to a suitable format-specific stream reader. */
-        if ( "csv".equals( fmt ) ) {
-            return createCsvRowSequence( in, byte0 );
-        }
-        else if ( "binary".equals( fmt ) ) {
-            return createBinaryRowSequence( in, byte0 );
-        }
-        else if ( "json".equals( fmt ) ) {
-            throw new TableFormatException( "Unsupported HAPI data format "
-                                          + fmt );
-        }
-        else {
-            throw new TableFormatException( "Unknown HAPI data format " + fmt );
+        if ("csv".equals(fmt)) {
+            return createCsvRowSequence(in, byte0);
+        } else if ("binary".equals(fmt)) {
+            return createBinaryRowSequence(in, byte0);
+        } else if ("json".equals(fmt)) {
+            throw new TableFormatException("Unsupported HAPI data format "
+                    + fmt);
+        } else {
+            throw new TableFormatException("Unknown HAPI data format " + fmt);
         }
     }
 
@@ -184,52 +183,54 @@ public class JhvHapiTableReader {
      * with no header.
      * The first byte may optionally be supplied separately.
      *
-     * @param  in   input stream 
-     * @param  byte0  byte to read at start of input sequence, or null
-     * @return  row sequence
+     * @param in    input stream
+     * @param byte0 byte to read at start of input sequence, or null
+     * @return row sequence
      */
-    private RowSequence createCsvRowSequence( InputStream in, Byte byte0 ) {
+    private RowSequence createCsvRowSequence(InputStream in, Byte byte0) {
         CsvReader csvRdr = new CsvReader();
-        if ( byte0 != null ) {
+        if (byte0 != null) {
             csvRdr.setPrefixByte(byte0);
         }
-        Object[][] results = createResultsArray( paramRdrs_ );
+        Object[][] results = createResultsArray(paramRdrs_);
         return new RowSequence() {
             Object[] row_;
+
             public boolean next() throws IOException {
-                String[] csvRow = csvRdr.readCsvRow( in );
-                if ( csvRow != null ) {
-                   int foff = 0;
-                   int coff = 0;
-                   row_ = new Object[ ncol_ ];
-                   for ( int ip = 0; ip < nparam_; ip++ ) {
-                        ParamReader paramRdr = paramRdrs_[ ip ];
-                        Object[] result = results[ ip ];
+                String[] csvRow = csvRdr.readCsvRow(in);
+                if (csvRow != null) {
+                    int foff = 0;
+                    int coff = 0;
+                    row_ = new Object[ncol_];
+                    for (int ip = 0; ip < nparam_; ip++) {
+                        ParamReader paramRdr = paramRdrs_[ip];
+                        Object[] result = results[ip];
                         int nf = paramRdr.getFieldCount();
                         int nc = paramRdr.getColumnCount();
-                        paramRdr.readStringValues( csvRow, foff, result );
-                        System.arraycopy( result, 0, row_, coff, nc );
+                        paramRdr.readStringValues(csvRow, foff, result);
+                        System.arraycopy(result, 0, row_, coff, nc);
                         foff += nf;
                         coff += nc;
                     }
                     return true;
-                }
-                else {
+                } else {
                     row_ = null;
                     return false;
                 }
             }
+
             public Object[] getRow() {
-                if ( row_ != null ) {
+                if (row_ != null) {
                     return row_;
-                }
-                else {
+                } else {
                     throw new IllegalStateException();
                 }
             }
-            public Object getCell( int icol ) {
-                return getRow()[ icol ];
+
+            public Object getCell(int icol) {
+                return getRow()[icol];
             }
+
             public void close() throws IOException {
                 in.close();
             }
@@ -241,52 +242,54 @@ public class JhvHapiTableReader {
      * with no header.
      * The first byte may optionally be supplied separately.
      *
-     * @param  in   input stream 
-     * @param  byte0  byte to read at start of input sequence, or null
-     * @return  row sequence
+     * @param in    input stream
+     * @param byte0 byte to read at start of input sequence, or null
+     * @return row sequence
      */
-    private RowSequence createBinaryRowSequence( InputStream in, Byte byte0 ) {
-        final int bufsize = Arrays.stream( paramRdrs_ )
-                           .mapToInt( prdr -> prdr.getByteCount() )
-                           .sum();
-        final Object[][] results = createResultsArray( paramRdrs_ );
+    private RowSequence createBinaryRowSequence(InputStream in, Byte byte0) {
+        final int bufsize = Arrays.stream(paramRdrs_)
+                .mapToInt(prdr -> prdr.getByteCount())
+                .sum();
+        final Object[][] results = createResultsArray(paramRdrs_);
         return new RowSequence() {
             Byte byte0_ = byte0;
             Object[] row_;
-            final byte[] buf_ = new byte[ bufsize ];
+            final byte[] buf_ = new byte[bufsize];
+
             public boolean next() throws IOException {
-                if ( fillBuffer() ) {
+                if (fillBuffer()) {
                     int boff = 0;
                     int coff = 0;
-                    row_ = new Object[ ncol_ ];
-                    for ( int ip = 0; ip < nparam_; ip++ ) {
-                        ParamReader prdr = paramRdrs_[ ip ];
-                        Object[] result = results[ ip ];
+                    row_ = new Object[ncol_];
+                    for (int ip = 0; ip < nparam_; ip++) {
+                        ParamReader prdr = paramRdrs_[ip];
+                        Object[] result = results[ip];
                         int nb = prdr.getByteCount();
                         int nc = prdr.getColumnCount();
-                        prdr.readBinaryValues( buf_, boff, result );
-                        System.arraycopy( result, 0, row_, coff, nc );
+                        prdr.readBinaryValues(buf_, boff, result);
+                        System.arraycopy(result, 0, row_, coff, nc);
                         boff += nb;
                         coff += nc;
                     }
                     return true;
-                }
-                else {
+                } else {
                     row_ = null;
                     return false;
                 }
             }
+
             public Object[] getRow() {
-                if ( row_ != null ) {
+                if (row_ != null) {
                     return row_;
-                }
-                else {
+                } else {
                     throw new IllegalStateException();
                 }
             }
-            public Object getCell( int icol ) {
-                return row_[ icol ];
+
+            public Object getCell(int icol) {
+                return row_[icol];
             }
+
             public void close() throws IOException {
                 in.close();
             }
@@ -298,26 +301,25 @@ public class JhvHapiTableReader {
              * If only part of the buffer can be filled before encountering
              * the end of the file, an IOException is thrown.
              *
-             * @return  true for complete buffer, false for EOF
+             * @return true for complete buffer, false for EOF
              */
             private boolean fillBuffer() throws IOException {
                 int len = buf_.length;
                 int off = 0;
-                if ( byte0_ != null ) {
-                    buf_[ 0 ] = byte0_;
+                if (byte0_ != null) {
+                    buf_[0] = byte0_;
                     off++;
                     len--;
-                    byte0_ = null; 
+                    byte0_ = null;
                 }
-                while ( len > 0 ) {
-                    int nb = in.read( buf_, off, len );
-                    if ( nb == -1 ) {
-                        if ( off == 0 ) {
+                while (len > 0) {
+                    int nb = in.read(buf_, off, len);
+                    if (nb == -1) {
+                        if (off == 0) {
                             return false;
-                        }
-                        else {
+                        } else {
                             String msg = "Unexpected end of HAPI stream";
-                            throw new EOFException( msg );
+                            throw new EOFException(msg);
                         }
                     }
                     len -= nb;
@@ -332,34 +334,32 @@ public class JhvHapiTableReader {
      * Try to interpret a stream as a JSON status object, and return
      * an empty RowSequence if it is.  If it's not, throw an error.
      *
-     * @param  in  input stream
-     * @param  byte0  single byte to prepend to the stream
-     * @return  empty row sequence if it does look like a JSON status report
-     * @throws  IOException  if it doesn't look like a JSON status report
+     * @param in    input stream
+     * @param byte0 single byte to prepend to the stream
+     * @return empty row sequence if it does look like a JSON status report
+     * @throws IOException if it doesn't look like a JSON status report
      */
-    private static RowSequence createUnexpectedJsonRowSequence( InputStream in,
-                                                                byte byte0 )
+    private static RowSequence createUnexpectedJsonRowSequence(InputStream in,
+                                                               byte byte0)
             throws IOException {
         StringBuilder sbuf = new StringBuilder();
-        sbuf.append( (char) byte0 );
-        sbuf.append( new String( IOUtils.readBytes( in, 100_000 ),
-                                 StandardCharsets.UTF_8 ) );
+        sbuf.append((char) byte0);
+        sbuf.append(new String(IOUtils.readBytes(in, 100_000),
+                StandardCharsets.UTF_8));
         JSONObject json;
         try {
-            json = new JSONObject( sbuf.toString() );
-        }
-        catch ( JSONException e ) {
+            json = new JSONObject(sbuf.toString());
+        } catch (JSONException e) {
             json = null;
         }
         JSONObject status = json == null ? null
-                                         : json.optJSONObject( "status" );
-        if ( status != null ) {
-            logger_.info( "JSON status instead of data: " + status.toString() );
+                : json.optJSONObject("status");
+        if (status != null) {
+            logger_.info("JSON status instead of data: " + status.toString());
             return EmptyRowSequence.getInstance();
-        }
-        else {
-            throw new IOException( "Unexpected content starting '"
-                                 + (char) byte0 + "' in data stream" );
+        } else {
+            throw new IOException("Unexpected content starting '"
+                    + (char) byte0 + "' in data stream");
         }
     }
 
@@ -367,14 +367,14 @@ public class JhvHapiTableReader {
      * Returns an array of object arrays suitable for use as workspace
      * with a set of ParamReaders.
      *
-     * @param   paramRdrs   parameter readers
-     * @return  array of Object arrays, one for each of this reader's
-     *          ParamReaders
+     * @param paramRdrs parameter readers
+     * @return array of Object arrays, one for each of this reader's
+     * ParamReaders
      */
-    private static Object[][] createResultsArray( ParamReader[] paramRdrs ) {
-        Object[][] results = new Object[ paramRdrs.length ][];
-        for ( int ip = 0; ip < paramRdrs.length; ip++ ) {
-            results[ ip ] = new Object[ paramRdrs[ ip ].getColumnCount() ];
+    private static Object[][] createResultsArray(ParamReader[] paramRdrs) {
+        Object[][] results = new Object[paramRdrs.length][];
+        for (int ip = 0; ip < paramRdrs.length; ip++) {
+            results[ip] = new Object[paramRdrs[ip].getColumnCount()];
         }
         return results;
     }
