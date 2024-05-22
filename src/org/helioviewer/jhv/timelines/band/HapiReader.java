@@ -47,10 +47,13 @@ public class HapiReader {
     private record Catalog(HapiVersion version, Map<String, BandParameter> parameters) {
     }
 
-    private record Dataset(String id, JhvHapiTableReader reader, List<BandType> types, long start, long stop) {
+    private record Dataset(String id, List<BandReader> readers, long start, long stop) {
     }
 
-    private record BandParameter(JhvHapiTableReader reader, BandType type, long start, long stop) {
+    private record BandParameter(BandReader reader, long start, long stop) {
+    }
+
+    private record BandReader(BandType type, JhvHapiTableReader hapiReader) {
     }
 
     private record Parameter(String name, String units, String scale, JSONArray range) {
@@ -98,11 +101,10 @@ public class HapiReader {
 
             LinkedHashMap<String, BandParameter> parameters = new LinkedHashMap<>();
             for (Dataset dataset : datasets) {
-                JhvHapiTableReader reader = dataset.reader;
                 long start = dataset.start;
                 long stop = dataset.stop;
-                for (BandType type : dataset.types) {
-                    parameters.put(type.getBaseUrl(), new BandParameter(reader, type, start, stop));
+                for (BandReader reader : dataset.readers) {
+                    parameters.put(reader.type.getBaseUrl(), new BandParameter(reader, start, stop));
                 }
             }
             return new Catalog(version, parameters);
@@ -136,8 +138,11 @@ public class HapiReader {
         if (!"time".equalsIgnoreCase(parameters.get(0).name))
             throw new Exception("First parameter should be time");
 
+        HapiInfo info = HapiInfo.fromJson(jo);
+        HapiParam[] params = info.getParameters();
+
         int numAxes = parameters.size() - 1;
-        List<BandType> types = new ArrayList<>(numAxes);
+        List<BandReader> readers = new ArrayList<>(numAxes);
         for (int i = 1; i <= numAxes; i++) {
             Parameter p = parameters.get(i);
             UriTemplate.Variables request = UriTemplate.vars()
@@ -151,11 +156,10 @@ public class HapiReader {
                     put("scale", p.scale).
                     put("label", title + ' ' + p.name).
                     put("group", "HAPI");
-            types.add(new BandType(jobt));
+            readers.add(new BandReader(new BandType(jobt), new JhvHapiTableReader(params)));
         }
 
-        JhvHapiTableReader reader = new JhvHapiTableReader(HapiInfo.fromJson(jo));
-        return new Dataset(id, reader, types, start, stop);
+        return new Dataset(id, readers, start, stop);
     }
 
     private static Parameter getParameter(JSONObject jo) throws Exception {
@@ -202,7 +206,7 @@ public class HapiReader {
         String uri = baseUrl + request.expand("");
 
         try (NetClient nc = NetClient.of(new URI(uri)); BufferedInputStream is = new BufferedInputStream(nc.getStream())) {
-            RowSequence sequence = parameter.reader.createRowSequence(is, null, hapiFormat);
+            RowSequence sequence = parameter.reader.hapiReader.createRowSequence(is, null, hapiFormat);
 
             ArrayList<Long> dateList = new ArrayList<>();
             ArrayList<Float> valueList = new ArrayList<>();
@@ -221,7 +225,7 @@ public class HapiReader {
 
             long[] dates = longArray(numPoints, dateList);
             float[] values = floatArray(numPoints, valueList);
-            return new Band.Data(parameter.type, dates, values);
+            return new Band.Data(parameter.reader.type, dates, values);
         } catch (Exception e) {
             Log.error(uri, e);
             throw e;
@@ -279,7 +283,7 @@ public class HapiReader {
         public void onSuccess(@Nonnull Catalog catalog) {
             theCatalog = catalog;
             for (BandParameter parameter : theCatalog.parameters.values()) {
-                BandType.addToGroups(parameter.type);
+                BandType.addToGroups(parameter.reader.type);
             }
             Timelines.td.setupDatasets();
         }
