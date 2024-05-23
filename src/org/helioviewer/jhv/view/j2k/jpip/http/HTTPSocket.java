@@ -38,12 +38,10 @@ public class HTTPSocket {
                     socket = SSLSocketFactory.getDefault().createSocket();
                     if (socket instanceof SSLSocket sslSocket) { // obviously
                         SSLParameters parameters = sslSocket.getSSLParameters();
-                        if (parameters != null) {
-                            parameters.setProtocols(new String[]{"TLSv1.3"});
-                            parameters.setApplicationProtocols(new String[]{"http/1.1"}); // probably useless
-                            parameters.setEndpointIdentificationAlgorithm("HTTPS"); // hope this is performed
-                            sslSocket.setSSLParameters(parameters);
-                        }
+                        parameters.setProtocols(new String[]{"TLSv1.3"});
+                        parameters.setApplicationProtocols(new String[]{"http/1.1"}); // probably useless
+                        parameters.setEndpointIdentificationAlgorithm("HTTPS"); // hope this is performed
+                        sslSocket.setSSLParameters(parameters);
                     }
                 }
                 default -> throw new IOException("JPIP scheme not supported: " + uri);
