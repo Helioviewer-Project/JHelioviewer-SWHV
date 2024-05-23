@@ -54,7 +54,7 @@ public class BandDataProvider {
     private static class BandLoadCallback implements FutureCallback<BandResponse> {
 
         @Override
-        public void onSuccess(BandResponse result) {
+        public void onSuccess(@Nonnull BandResponse result) {
             Band band = Band.createFromType(result.bandType);
             band.addToCache(result.values, result.dates);
             Timelines.getLayers().add(band);

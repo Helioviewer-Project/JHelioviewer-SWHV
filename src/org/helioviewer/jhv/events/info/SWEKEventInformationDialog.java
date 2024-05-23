@@ -207,7 +207,7 @@ public final class SWEKEventInformationDialog extends JDialog implements DataCol
     private class DatabaseCallback implements FutureCallback<List<JHVEvent>> {
 
         @Override
-        public void onSuccess(List<JHVEvent> result) {
+        public void onSuccess(@Nonnull List<JHVEvent> result) {
             result.forEach(JHVEventCache::addEvent);
 
             List<JHVRelatedEvents> rEvents = new ArrayList<>();

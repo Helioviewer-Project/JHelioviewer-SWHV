@@ -74,10 +74,6 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
 
     @Override
     public JComponent createContentPanel() {
-        JPanel content = new JPanel();
-        content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
-        content.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-
         comboGroup.addActionListener(e -> updateGroupValues());
         listBand.addMouseListener(new MouseAdapter() {
             @Override
@@ -87,15 +83,17 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
                 }
             }
         });
+        com.jidesoft.swing.SearchableUtils.installSearchable(listBand);
+        JScrollPane scrollPane = new JScrollPane(listBand);
+        scrollPane.setPreferredSize(new Dimension(350, 350));
 
         JPanel groupPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
         groupPanel.add(new JLabel("Group", JLabel.RIGHT));
         groupPanel.add(comboGroup);
 
-        com.jidesoft.swing.SearchableUtils.installSearchable(listBand);
-        JScrollPane scrollPane = new JScrollPane(listBand);
-        scrollPane.setPreferredSize(new Dimension(350, 350));
-
+        JPanel content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
+        content.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
         content.add(groupPanel);
         content.add(scrollPane);
         return content;

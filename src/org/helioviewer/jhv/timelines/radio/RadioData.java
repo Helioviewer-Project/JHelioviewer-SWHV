@@ -143,7 +143,7 @@ public final class RadioData extends AbstractTimelineLayer {
         }
 
         @Override
-        public void onSuccess(RadioJ2KData result) {
+        public void onSuccess(@Nonnull RadioJ2KData result) {
             done();
             cache.put(date, result);
             result.requestData(DrawController.selectedAxis);
