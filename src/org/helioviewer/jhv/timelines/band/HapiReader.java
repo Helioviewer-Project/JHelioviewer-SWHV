@@ -22,9 +22,9 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.band.hapi.JhvHapiTableReader;
 import org.helioviewer.jhv.timelines.draw.YAxis;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 import uk.ac.starlink.hapi.HapiInfo;
 import uk.ac.starlink.hapi.HapiParam;
 import uk.ac.starlink.hapi.HapiVersion;
@@ -165,7 +165,7 @@ public class HapiReader {
                     .set(version.getDatasetRequestParam(), id)
                     .set("parameters", p.name);
             JSONObject jobt = new JSONObject().
-                    put("baseUrl", (new UriTemplate(urlData).expand(request)).intern()).
+                    put("baseUrl", new UriTemplate(urlData).expand(request)).
                     put("unitLabel", p.units).
                     put("name", id + ' ' + p.name).
                     put("range", p.range).
@@ -205,6 +205,8 @@ public class HapiReader {
     private static final String hapiFormat = "binary";
 
     private static Band.Data getData(Catalog catalog, String baseUrl, long startTime, long endTime) throws Exception {
+        if (catalog == null) // we may be offline
+            return null;
         BandParameter parameter = catalog.parameters.get(baseUrl);
         if (parameter == null)
             return null;

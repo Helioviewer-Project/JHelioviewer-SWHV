@@ -12,6 +12,7 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.helioviewer.jhv.threads.EDTQueue;
 import org.helioviewer.jhv.timelines.Timelines;
+import org.helioviewer.jhv.timelines.band.BandDataProvider;
 import org.helioviewer.jhv.timelines.band.CDFReader;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -43,7 +44,7 @@ class LoadRequest {
                 LoadLayer.submit(layer, req);
             }
         }
-/*
+
         JSONArray jt = jo.optJSONArray("org.helioviewer.jhv.request.timeline");
         if (jt != null) {
             int len = jt.length();
@@ -51,7 +52,6 @@ class LoadRequest {
                 BandDataProvider.loadBand(jt.getJSONObject(i));
             }
         }
-*/
     }
 
     private record LoadRequestURI(URI uri) implements Callable<Void> {

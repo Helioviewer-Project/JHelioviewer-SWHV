@@ -1,15 +1,22 @@
 package org.helioviewer.jhv.timelines.band;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 import javax.annotation.Nonnull;
 
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.threads.EDTCallbackExecutor;
+import org.helioviewer.jhv.timelines.Timelines;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.util.concurrent.FutureCallback;
 
-class BandDataProvider {
+public class BandDataProvider {
 
     private static final ArrayListMultimap<Band, Future<Band.Data>> workers = ArrayListMultimap.create();
 
@@ -31,6 +38,64 @@ class BandDataProvider {
                 return true;
         }
         return false;
+    }
+
+    public static void loadBand(JSONObject jo) {
+        EDTCallbackExecutor.pool.submit(new BandLoad(jo), new BandLoadCallback());
+    }
+
+    private record BandLoad(JSONObject jo) implements Callable<BandResponse> {
+        @Override
+        public BandResponse call() throws Exception {
+            return new BandResponse(jo);
+        }
+    }
+
+    private static class BandLoadCallback implements FutureCallback<BandResponse> {
+
+        @Override
+        public void onSuccess(BandResponse result) {
+            Band band = Band.createFromType(result.bandType);
+            band.addToCache(result.values, result.dates);
+            Timelines.getLayers().add(band);
+        }
+
+        @Override
+        public void onFailure(@Nonnull Throwable t) {
+            Log.error(t);
+        }
+
+    }
+
+    private static class BandResponse {
+
+        final BandType bandType;
+        final long[] dates;
+        final float[] values;
+
+        BandResponse(JSONObject jo) throws Exception {
+            JSONObject bo = jo.optJSONObject("bandType");
+            if (bo == null)
+                throw new Exception("Missing bandType: " + jo);
+            bandType = new BandType(bo);
+
+            double multiplier = jo.optDouble("multiplier", 1);
+            JSONArray data = jo.optJSONArray("data");
+            if (data != null) {
+                int len = data.length();
+                values = new float[len];
+                dates = new long[len];
+                for (int i = 0; i < len; i++) {
+                    JSONArray entry = data.getJSONArray(i);
+                    dates[i] = entry.getLong(0) * 1000L;
+                    values[i] = (float) (entry.getDouble(1) * multiplier);
+                }
+            } else {
+                dates = new long[0];
+                values = new float[0];
+            }
+        }
+
     }
 
 }
