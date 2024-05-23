@@ -74,7 +74,6 @@ public final class Band extends AbstractTimelineLayer {
         }
 
         JSONObject jo = new JSONObject();
-        jo.put("timeline", toString());
         jo.put("multiplier", multiplier);
         bandCache.serialize(jo, 1 / multiplier);
         bandType.serialize(jo);
