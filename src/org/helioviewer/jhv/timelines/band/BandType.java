@@ -17,15 +17,6 @@ public class BandType {
     }
 
     @Nonnull
-    static BandType getBandType(String name) {
-        for (BandType bt : groups.values()) {
-            if (bt.name.equals(name))
-                return bt;
-        }
-        return new BandType(new JSONObject());
-    }
-
-    @Nonnull
     public static List<BandType> getBandTypes(String group) {
         return groups.get(group);
     }
