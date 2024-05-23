@@ -22,6 +22,7 @@ import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
+import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
@@ -66,6 +67,10 @@ public final class RadioData extends AbstractTimelineLayer {
         colorModel = createIndexColorModelFromLUT(LUT.get(cm));
         optionsPanel = new RadioOptionsPanel(cm);
         setEnabled(false);
+    }
+
+    public static TimelineLayer deserialize(JSONObject jo) { // has to be implemented for state
+        return new RadioData(jo);
     }
 
     @Override

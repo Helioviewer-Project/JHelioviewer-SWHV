@@ -16,7 +16,7 @@ public class SWEKPlugin extends Plugin {
     private static final JPanel swekPanel = new JPanel(new BorderLayout());
 
     private static final SWEKLayer layer = new SWEKLayer(null);
-    private static final EventTimelineLayer etl = new EventTimelineLayer(null);
+    private static final EventTimelineLayer etl = new EventTimelineLayer();
 
     public SWEKPlugin() {
         super("Space Weather Event Knowledgebase", "Visualize space weather relevant events");
