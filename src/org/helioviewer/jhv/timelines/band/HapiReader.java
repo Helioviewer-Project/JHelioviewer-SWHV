@@ -35,6 +35,7 @@ import com.google.common.util.concurrent.FutureCallback;
 
 public class HapiReader {
 
+    private static final String hapiFormat = "binary";
     private static final String ROBserver = "https://hapi.swhv.oma.be/SWHV_Timelines/hapi/";
 
     private static Catalog theCatalog; //!
@@ -163,6 +164,7 @@ public class HapiReader {
             Parameter p = parameters.get(i);
             UriTemplate.Variables request = UriTemplate.vars()
                     .set(version.getDatasetRequestParam(), id)
+                    .set("format", hapiFormat)
                     .set("parameters", p.name);
             JSONObject jobt = new JSONObject().
                     put("baseUrl", new UriTemplate(urlData).expand(request)).
@@ -202,8 +204,6 @@ public class HapiReader {
         return new Parameter(name, units, scale, range);
     }
 
-    private static final String hapiFormat = "binary";
-
     private static Band.Data getData(Catalog catalog, String baseUrl, long startTime, long endTime) throws Exception {
         if (catalog == null) // we may be offline
             return null;
@@ -221,7 +221,6 @@ public class HapiReader {
 
         HapiVersion version = catalog.version;
         UriTemplate.Variables request = UriTemplate.vars()
-                .set("format", hapiFormat)
                 .set(version.getStartRequestParam(), start)
                 .set(version.getStopRequestParam(), stop);
         String uri = baseUrl + request.expand("");
