@@ -17,6 +17,7 @@ import org.helioviewer.jhv.events.JHVEventParameter;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
+import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -31,8 +32,12 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
     private final YAxis yAxis = new YAxis(0, 0, new YAxisIdentityScale("Events"));
     private static EventPlotConfiguration eventUnderMouse;
 
-    public EventTimelineLayer(JSONObject jo) { // arg for state
+    EventTimelineLayer() {
         cacheUpdated();
+    }
+
+    public static TimelineLayer deserialize(JSONObject ignore) { // has to be implemented for state
+        return new EventTimelineLayer();
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.helioviewer.jhv.layers.selector;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -115,13 +116,29 @@ public class State {
         return null;
     }
 
+    @Nullable
+    private static Object deserialize2Object(JSONObject json) {
+        JSONObject data = json.optJSONObject("data");
+        if (data == null)
+            return null;
+
+        try {
+            Class<?> c = Class.forName(json.optString("className"));
+            Method m = c.getDeclaredMethod("deserialize", JSONObject.class);
+            return m.invoke(null, data);
+        } catch (Exception e) {
+            Log.error(e);
+        }
+        return null;
+    }
+
     private static void loadTimelines(JSONObject data) {
         ArrayList<TimelineLayer> newList = new ArrayList<>();
 
         for (Object o : data.getJSONArray("timelines")) {
             if (o instanceof JSONObject jo) {
                 try {
-                    if (json2Object(jo) instanceof TimelineLayer layer) {
+                    if (deserialize2Object(jo) instanceof TimelineLayer layer) {
                         newList.add(layer);
                         layer.setEnabled(jo.optBoolean("enabled", true));
                     }

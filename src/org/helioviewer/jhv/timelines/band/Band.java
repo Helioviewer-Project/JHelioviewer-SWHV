@@ -16,6 +16,7 @@ import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
+import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
@@ -58,18 +59,6 @@ public final class Band extends AbstractTimelineLayer {
         bandCache = createBandCache(bandType.getBandCacheType());
     }
 
-    public Band(JSONObject jo) { // used by load state
-        this(jo.optJSONObject("bandType") == null ? BandType.getBandType("GOES_XRSB_ODI") : new BandType(jo.getJSONObject("bandType")));
-
-        JSONObject jcolor = jo.optJSONObject("color");
-        if (jcolor != null) {
-            int r = MathUtils.clip(jcolor.optInt("r", 0), 0, 255);
-            int g = MathUtils.clip(jcolor.optInt("g", 0), 0, 255);
-            int b = MathUtils.clip(jcolor.optInt("b", 0), 0, 255);
-            graphColor = new Color(r, g, b);
-        }
-    }
-
     private static BandCache createBandCache(String cacheType) {
         return "BandCacheAll".equals(cacheType) ? new BandCacheAll() : new BandCacheMinute();
     }
@@ -97,6 +86,22 @@ public final class Band extends AbstractTimelineLayer {
     public void serialize(JSONObject jo) {
         bandType.serialize(jo);
         jo.put("color", new JSONObject().put("r", graphColor.getRed()).put("g", graphColor.getGreen()).put("b", graphColor.getBlue()));
+    }
+
+    public static TimelineLayer deserialize(JSONObject jo) throws Exception { // has to be implemented for state
+        JSONObject jobt = jo.optJSONObject("bandType");
+        if (jobt == null)
+            throw new Exception("Missing bandType: " + jo);
+        Band band = createFromType(new BandType(jobt));
+
+        JSONObject jcolor = jo.optJSONObject("color");
+        if (jcolor != null) {
+            int r = MathUtils.clip(jcolor.optInt("r", 0), 0, 255);
+            int g = MathUtils.clip(jcolor.optInt("g", 0), 0, 255);
+            int b = MathUtils.clip(jcolor.optInt("b", 0), 0, 255);
+            band.setDataColor(new Color(r, g, b));
+        }
+        return band;
     }
 
     @Override
@@ -145,7 +150,7 @@ public final class Band extends AbstractTimelineLayer {
         return graphColor;
     }
 
-    public void setDataColor(Color c) {
+    void setDataColor(Color c) {
         graphColor = c;
         DrawController.drawRequest();
     }
