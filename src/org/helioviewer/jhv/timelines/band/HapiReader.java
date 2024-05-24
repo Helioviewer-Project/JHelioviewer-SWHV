@@ -2,7 +2,6 @@ package org.helioviewer.jhv.timelines.band;
 
 import java.io.BufferedInputStream;
 import java.net.URI;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -125,16 +124,6 @@ public class HapiReader {
             stop = Math.min(stop, toMillis(stopDate));
         }
 
-        String bandCacheType = "BandCacheMinute";
-        String cadence = jo.optString("cadence", null);
-        if (cadence != null) {
-            try {
-                if (Duration.parse(cadence).getSeconds() > 60)
-                    bandCacheType = "BandCacheAll";
-            } catch (Exception ignore) {
-            }
-        }
-
         JSONArray jaParameters = jo.optJSONArray("parameters");
         if (jaParameters == null)
             throw new Exception("Missing parameters object");
@@ -173,7 +162,6 @@ public class HapiReader {
                     put("range", p.range).
                     put("scale", p.scale).
                     put("label", title + ' ' + p.name).
-                    put("bandCacheType", bandCacheType).
                     put("group", "HAPI");
 
             typeParams[1] = params[i];
@@ -246,7 +234,9 @@ public class HapiReader {
 
             long[] dates = longArray(numPoints, dateList);
             float[] values = floatArray(numPoints, valueList);
-            return new Band.Data(parameter.reader.type, dates, values);
+            DatesValues dvs = new DatesValues(dates, new float[][]{values}).rebin();
+
+            return new Band.Data(parameter.reader.type, dvs.dates(), dvs.values()[0]);
         } catch (Exception e) {
             Log.error(uri, e);
             throw e;

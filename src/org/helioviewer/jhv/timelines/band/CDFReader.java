@@ -116,7 +116,6 @@ public class CDFReader {
                     put("scale", data.scaleType).
                     put("label", "<html>" + name.replaceAll("_(r|t|n|x|y|z|RTN|SRF|VSO|URF)", "<sub>$1</sub>")).
                     put("group", "CDF");
-            //put("bandCacheType", "BandCacheAll");
             ret.add(new Band.Data(new BandType(jo), data.datesValues.dates(), data.datesValues.values()[i]));
         }
         return ret;
