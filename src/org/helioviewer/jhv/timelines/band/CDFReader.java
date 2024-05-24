@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
 
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.NetFileCache;
@@ -165,8 +164,7 @@ public class CDFReader {
             throw new IOException("Missing attributes for variable " + variableName + ": " + uri);
         }
 
-        float fillVal = Float.parseFloat(dataFillVal);
-        float[][] values = readCDFVariableFloat(data.variable, fillVal);
+        float[][] values = readCDFVariableFloat(data.variable, Float.parseFloat(dataFillVal));
         // dumpVariableAttrs(data);
         // dumpValues(dataVals);
 
@@ -300,36 +298,24 @@ public class CDFReader {
         return ret;
     }
 
-    private static float fillFloat(Object o, Float fillVal) {
-        float val = (float) o;
-        return !Float.isFinite(val) || val == fillVal ? YAxis.BLANK : val;
+    private static float fill(Object o, float fillVal) {
+        float v = ((Number) o).floatValue();
+        return !Float.isFinite(v) || v == fillVal ? YAxis.BLANK : v;
     }
 
-    private static float fillDouble(Object o, Float fillVal) {
-        float val = (float) ((double) o);
-        return !Float.isFinite(val) || val == fillVal ? YAxis.BLANK : val;
-    }
-
-    private static float[][] readCDFVariableFloat(Variable v, Float fillVal /* avoid autoboxing */) throws IOException {
+    private static float[][] readCDFVariableFloat(Variable v, float fillVal) throws IOException {
         DataType dataType = v.getDataType();
-        BiFunction<Object, Float, Float> fillFunc = switch (dataType.toString()) { // next version: patterns in switch
-            case "REAL4", "FLOAT" -> CDFReader::fillFloat;
-            case "REAL8", "DOUBLE" -> CDFReader::fillDouble;
-            default -> throw new IOException("Unimplemented data type: " + dataType);
-        };
-
         Object abuf = v.createRawValueArray();
-        int numPoints = v.getRecordCount();
-
         v.readRawRecord(0, abuf); // read first record to get number of axes
         int numAxes = Array.getLength(abuf);
+        int numPoints = v.getRecordCount();
 
         float[][] ret = new float[numAxes][numPoints];
         if (numPoints == 0)
             return ret;
 
         for (int i = 0; i < numAxes; i++)
-            ret[i][0] = fillFunc.apply(dataType.getScalar(abuf, i), fillVal);
+            ret[i][0] = fill(dataType.getScalar(abuf, i), fillVal);
 
         for (int j = 1; j < numPoints; j++) {
             v.readRawRecord(j, abuf);
@@ -338,7 +324,7 @@ public class CDFReader {
                 throw new IOException("Inconsistent number of elements: expected " + numAxes + ", got " + len);
 
             for (int i = 0; i < numAxes; i++)
-                ret[i][j] = fillFunc.apply(dataType.getScalar(abuf, i), fillVal);
+                ret[i][j] = fill(dataType.getScalar(abuf, i), fillVal);
         }
 
         return ret;

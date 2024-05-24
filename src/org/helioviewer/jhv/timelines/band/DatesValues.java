@@ -24,8 +24,7 @@ record DatesValues(long[] dates, float[][] values) {
     }
 
     DatesValues rebin() {
-        int numAxes = values.length;
-        int numPoints = values[0].length;
+        int numPoints = dates.length;
         if (numPoints == 0)
             return this;
 
@@ -36,11 +35,11 @@ record DatesValues(long[] dates, float[][] values) {
             return this;
 
         double scale = numPoints / (double) (stopMin - startMin);
-        if (Math.abs(scale - 1) < 0.1) { // data already at ~1 min cadence
+        if (Math.abs(scale - 1) < 0.1) // data already at ~1 min cadence
             return this;
-        }
         // System.out.println(">>> " + scale + " " + (stopMin - startMin + 1) + " " + numPoints);
 
+        int numAxes = values.length;
         int numBins = (int) (stopMin - startMin + 1);
         float[][] valuesBinned = new float[numAxes][numBins];
         long[] datesBinned = new long[numBins];
