@@ -34,45 +34,43 @@ record DatesValues(long[] dates, float[][] values) {
         long startMin = dates[0] / timeStep;
         long stopMin = dates[dates.length - 1] / timeStep;
 
-        double scale = (stopMin - startMin) / (double) numPoints;
+        double scale = numPoints / (double) (stopMin - startMin);
         // System.out.println(">>> " + scale + " " + (stopMin - startMin + 1) + " " + numPoints);
         if (Math.abs(scale - 1) < 0.01) { // data already at ~1 min cadence
             // System.out.println(">>> " + Math.abs(scale - 1));
             return this;
         }
 
-        if (scale > 1) { // upscaling
-            int numBins = 1 + (int) (stopMin - startMin + scale + 0.5);
-            long[] datesBinned = new long[numBins];
-            float[][] valuesBinned = new float[numAxes][numBins];
+        int numBins = (int) (stopMin - startMin + 1);
+        long[] datesBinned = new long[numBins];
+        float[][] valuesBinned = new float[numAxes][numBins];
 
-            long date = (long) (dates[0] - 0.5 * (scale * timeStep) + 0.5);
+        if (scale < 1) { // upscaling
             for (int i = 0; i < numBins; i++) {
-                datesBinned[i] = date;
-                date += timeStep;
+                datesBinned[i] = (startMin + i) * timeStep;
             }
 
-            /*
-            long startDate = (long) (dates[0] - 0.5 * (scale * timeStep) + 0.5);
-            long stopDate  = (long) (dates[numPoints - 1] + 0.5 * (scale * timeStep) + 0.5);
-            System.out.println(">>> " + TimeUtils.format(dates[0]) + " " + TimeUtils.format(dates[numPoints - 1]));
-            System.out.println(">>> " + TimeUtils.format(startDate) + " " + TimeUtils.format(stopDate));
-            System.out.println(">>> " + TimeUtils.format(datesBinned[0]) + " " + TimeUtils.format(datesBinned[numBins - 1]));
-            */
+            int numMiddles = numPoints - 1;
+            long[] middles = new long[numMiddles];
+            for (int i = 0; i < numMiddles; i++) {
+                middles[i] = (dates[i + 1] + dates[i]) / 2;
+            }
 
             for (int j = 0; j < numAxes; j++) {
                 for (int i = 0; i < numBins; i++) {
-                    int idx = -1 + (int) (i / scale);
-                    valuesBinned[j][i] = values[j][MathUtils.clip(idx, 0, numPoints - 1)];
+                    int idx = -1 + (int) (i * scale + 0.5);
+                    if (idx < 0) {
+                        valuesBinned[j][i] = values[j][0];
+                    } else if (idx > numMiddles - 1) {
+                        valuesBinned[j][i] = values[j][numPoints - 1];
+                    } else {
+                        valuesBinned[j][i] = datesBinned[i] < middles[idx] ? values[j][idx] : values[j][idx + 1];
+                    }
                 }
             }
 
             return new DatesValues(datesBinned, valuesBinned);
         }
-
-        int numBins = (int) (stopMin - startMin + 1);
-        long[] datesBinned = new long[numBins];
-        float[][] valuesBinned = new float[numAxes][numBins];
 
         Bin[][] bins = new Bin[numAxes][numBins];
         for (int j = 0; j < numAxes; j++) {
