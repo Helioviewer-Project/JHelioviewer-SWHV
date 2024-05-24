@@ -32,10 +32,12 @@ record DatesValues(long[] dates, float[][] values) {
         long timeStep = TimeUtils.MINUTE_IN_MILLIS;
         long startMin = dates[0] / timeStep;
         long stopMin = dates[dates.length - 1] / timeStep;
+        if (stopMin <= startMin)
+            return this;
 
         double scale = numPoints / (double) (stopMin - startMin);
         // System.out.println(">>> " + scale + " " + (stopMin - startMin + 1) + " " + numPoints);
-        if (Math.abs(scale - 1) < 0.01) { // data already at ~1 min cadence
+        if (scale > 0.5) { // data already "well" sampled
             return this;
         }
 
