@@ -36,10 +36,10 @@ record DatesValues(long[] dates, float[][] values) {
             return this;
 
         double scale = numPoints / (double) (stopMin - startMin);
-        // System.out.println(">>> " + scale + " " + (stopMin - startMin + 1) + " " + numPoints);
-        if (scale > 0.5) { // data already "well" sampled
+        if (Math.abs(scale - 1) < 0.1) { // data already at ~1 min cadence
             return this;
         }
+        // System.out.println(">>> " + scale + " " + (stopMin - startMin + 1) + " " + numPoints);
 
         int numBins = (int) (stopMin - startMin + 1);
         float[][] valuesBinned = new float[numAxes][numBins];
