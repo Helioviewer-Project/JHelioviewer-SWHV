@@ -221,7 +221,7 @@ public final class Band extends AbstractTimelineLayer {
             TimeAxis timeAxis = DrawController.selectedAxis;
             long start = propagationModel.getObservationTime(timeAxis.start());
             long end = propagationModel.getObservationTime(timeAxis.end());
-            for (List<DateValue> list : bandCache.getValues(SUPER_SAMPLE * GLInfo.pixelScale[0] * graphArea.width, start, end)) {
+            for (List<BandCache.DateValue> list : bandCache.getValues(SUPER_SAMPLE * GLInfo.pixelScale[0] * graphArea.width, start, end)) {
                 int size = list.size();
                 if (size == 0)
                     continue;
@@ -229,7 +229,7 @@ public final class Band extends AbstractTimelineLayer {
                 int[] dates = new int[size];
                 int[] values = new int[size];
                 for (int i = 0; i < size; i++) {
-                    DateValue dv = list.get(i);
+                    BandCache.DateValue dv = list.get(i);
                     dates[i] = timeAxis.value2pixel(graphArea.x, graphArea.width, propagationModel.getViewpointTime(dv.milli));
                     values[i] = yAxis.value2pixel(graphArea.y, graphArea.height, dv.value);
                 }
