@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.base.image;
+package org.helioviewer.jhv.imagedata.nio;
 
 import java.awt.Point;
 import java.awt.image.DataBuffer;

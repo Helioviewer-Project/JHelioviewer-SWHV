@@ -13,8 +13,8 @@ import java.util.List;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.base.image.MappedImageFactory;
-import org.helioviewer.jhv.base.image.NIOImageFactory;
+import org.helioviewer.jhv.imagedata.nio.MappedImageFactory;
+import org.helioviewer.jhv.imagedata.nio.NIOImageFactory;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.time.TimeUtils;
 

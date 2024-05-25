@@ -6,7 +6,7 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
-import org.helioviewer.jhv.base.image.NIOImageFactory;
+import org.helioviewer.jhv.imagedata.nio.NIOImageFactory;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 
