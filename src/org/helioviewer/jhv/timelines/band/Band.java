@@ -28,9 +28,9 @@ public final class Band extends AbstractTimelineLayer {
     record Data(BandType bandType, long[] dates, float[] values) {
     }
 
-    private record Polyline(IntArray xPoints, IntArray yPoints) {
+    private record Polyline(int[] xPoints, int[] yPoints) {
         int length() {
-            return xPoints.length();
+            return xPoints.length;
         }
     }
 
@@ -190,12 +190,12 @@ public final class Band extends AbstractTimelineLayer {
             return;
 
         g.setColor(graphColor);
-        polylines.forEach(line -> g.drawPolyline(line.xPoints().array(), line.yPoints().array(), line.length())); // polylines
+        polylines.forEach(line -> g.drawPolyline(line.xPoints(), line.yPoints(), line.length())); // polylines
 
 //      for (GraphPolyline line : graphPolylines) { // dots
 //          int length = line.length();
-//          int[] xPoints = line.xPoints().array();
-//          int[] yPoints = line.yPoints().array();
+//          int[] xPoints = line.xPoints();
+//          int[] yPoints = line.yPoints();
 //          for (int i = 0; i < length; i++)
 //              g.drawLine(xPoints[i], yPoints[i], xPoints[i], yPoints[i]);
 //      }
@@ -222,15 +222,18 @@ public final class Band extends AbstractTimelineLayer {
             long start = propagationModel.getObservationTime(timeAxis.start());
             long end = propagationModel.getObservationTime(timeAxis.end());
             for (List<DateValue> list : bandCache.getValues(SUPER_SAMPLE * GLInfo.pixelScale[0] * graphArea.width, start, end)) {
-                if (!list.isEmpty()) {
-                    IntArray dates = new IntArray(list.size());
-                    IntArray values = new IntArray(list.size());
-                    for (DateValue dv : list) {
-                        dates.put(timeAxis.value2pixel(graphArea.x, graphArea.width, propagationModel.getViewpointTime(dv.milli)));
-                        values.put(yAxis.value2pixel(graphArea.y, graphArea.height, dv.value));
-                    }
-                    polylines.add(new Polyline(dates, values));
+                int size = list.size();
+                if (size == 0)
+                    continue;
+
+                int[] dates = new int[size];
+                int[] values = new int[size];
+                for (int i = 0; i < size; i++) {
+                    DateValue dv = list.get(i);
+                    dates[i] = timeAxis.value2pixel(graphArea.x, graphArea.width, propagationModel.getViewpointTime(dv.milli));
+                    values[i] = yAxis.value2pixel(graphArea.y, graphArea.height, dv.value);
                 }
+                polylines.add(new Polyline(dates, values));
             }
         }
     }
