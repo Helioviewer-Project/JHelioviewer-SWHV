@@ -12,6 +12,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.events.info.SWEKEventInformationDialog;
@@ -19,6 +20,7 @@ import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 
 public class JHVRelatedEvents implements ClickableDrawable {
 
+    private static final Colors.BrightColors eventColors = new Colors.BrightColors();
     private static final ArrayList<JHVEventListener.Highlight> listeners = new ArrayList<>();
 
     private final ArrayList<JHVEvent> events = new ArrayList<>();
@@ -31,7 +33,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
 
     JHVRelatedEvents(JHVEvent event, Map<SWEKSupplier, SortedMap<Interval, JHVRelatedEvents>> eventsMap) {
         supplier = event.getSupplier();
-        color = EventColors.getNextColor();
+        color = eventColors.getNextColor();
         highlighted = false;
 
         events.add(event);

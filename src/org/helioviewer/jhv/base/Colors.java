@@ -39,7 +39,7 @@ public class Colors {
     public static final float[] LightGrayFloat = {.75f, .75f, .75f, 1};
     public static final float[] MiddleGrayFloat = {.5f, .5f, .5f, 1};
 
-    public static final Color[] brightColors = {
+    private static final Color[] brightColors = {
             new Color(144, 238, 144),
             new Color(255, 140, 0),
             new Color(255, 0, 255),
@@ -65,7 +65,7 @@ public class Colors {
     };
 
 /*
-    public static final Color[] darkerColors = { -- former BandColors
+    private static final Color[] darkerColors = { -- former BandColors
             new Color(80, 80, 80),
             new Color(204, 51, 0),
             new Color(255, 0, 255),
@@ -91,5 +91,41 @@ public class Colors {
             new Color(106, 90, 205)
     };
 */
+
+    public static class BrightColors {
+
+        private final int[] used = new int[brightColors.length];
+        private int minValue = 0;
+
+        public Color getNextColor() {
+            while (true) {
+                for (int i = 0; i < used.length; i++) {
+                    if (used[i] == minValue) {
+                        used[i]++;
+                        return brightColors[i];
+                    }
+                }
+                minValue++;
+            }
+        }
+/*
+        public void resetColor(Color c) {
+            for (int i = 0; i < used.length; i++) {
+                if (brightColors[i].equals(c)) {
+                    used[i]--;
+                    minValue = used[i];
+                }
+            }
+        }
+
+        public void setColorUsed(Color c) {
+            for (int i = 0; i < used.length; i++) {
+                if (brightColors[i].equals(c)) {
+                    used[i]++;
+                }
+            }
+        }
+*/
+    }
 
 }
