@@ -7,9 +7,9 @@ import java.awt.image.ColorModel;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.base.image.NIOImageFactory;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
+import org.helioviewer.jhv.imagedata.nio.NIOImageFactory;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;

@@ -6,11 +6,11 @@ import java.util.concurrent.ExecutorService;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.base.image.MappedImageFactory;
-import org.helioviewer.jhv.base.image.NIOImageFactory;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.MoviePanel.RecordMode;
+import org.helioviewer.jhv.imagedata.nio.MappedImageFactory;
+import org.helioviewer.jhv.imagedata.nio.NIOImageFactory;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.GLGrab;

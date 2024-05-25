@@ -26,7 +26,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.helioviewer.jhv.base.image;
+package org.helioviewer.jhv.imagedata.nio;
 
 import java.awt.image.DataBuffer;
 import java.io.IOException;
