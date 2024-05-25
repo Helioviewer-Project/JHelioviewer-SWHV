@@ -7,7 +7,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.base.conversion.GOESLevel;
+import org.helioviewer.jhv.base.GOESLevel;
 import org.helioviewer.jhv.events.SWEK;
 import org.helioviewer.jhv.events.SWEKSupplier;
 import org.helioviewer.jhv.gui.components.base.JHVSpinner;

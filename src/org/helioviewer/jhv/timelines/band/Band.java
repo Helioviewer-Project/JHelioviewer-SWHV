@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.base.conversion.GOESLevel;
+import org.helioviewer.jhv.base.GOESLevel;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.interval.RequestCache;
 import org.helioviewer.jhv.math.MathUtils;

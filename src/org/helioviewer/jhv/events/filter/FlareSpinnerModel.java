@@ -2,7 +2,7 @@ package org.helioviewer.jhv.events.filter;
 
 import javax.swing.AbstractSpinnerModel;
 
-import org.helioviewer.jhv.base.conversion.GOESLevel;
+import org.helioviewer.jhv.base.GOESLevel;
 import org.helioviewer.jhv.math.MathUtils;
 
 @SuppressWarnings("serial")
