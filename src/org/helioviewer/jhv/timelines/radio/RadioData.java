@@ -3,6 +3,8 @@ package org.helioviewer.jhv.timelines.radio;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
@@ -13,11 +15,16 @@ import java.util.HashSet;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
+import javax.swing.JButton;
+import javax.swing.JPanel;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.gui.UIGlobals;
+import org.helioviewer.jhv.base.lut.LUTComboBox;
 import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -52,7 +59,8 @@ public final class RadioData extends AbstractTimelineLayer {
             }).build();
     private static final HashSet<Long> downloading = new HashSet<>();
 
-    private final RadioOptionsPanel optionsPanel;
+    private final LUTComboBox lutCombo;
+    private final JPanel optionsPanel;
     private static IndexColorModel colorModel;
 
     public RadioData(JSONObject jo) {
@@ -64,7 +72,11 @@ public final class RadioData extends AbstractTimelineLayer {
         }
 
         colorModel = createIndexColorModelFromLUT(LUT.get(cm));
-        optionsPanel = new RadioOptionsPanel(cm);
+
+        lutCombo = new LUTComboBox(cm);
+        lutCombo.addActionListener(e -> setLUT(lutCombo.getLUT()));
+        optionsPanel = optionsPanel(lutCombo);
+
         setEnabled(false);
     }
 
@@ -74,7 +86,7 @@ public final class RadioData extends AbstractTimelineLayer {
 
     @Override
     public void serialize(JSONObject jo) {
-        jo.put("colormap", optionsPanel.getColormap());
+        jo.put("colormap", lutCombo.getColormap());
     }
 
     private static IndexColorModel createIndexColorModelFromLUT(LUT lut2) {
@@ -82,7 +94,7 @@ public final class RadioData extends AbstractTimelineLayer {
         return new IndexColorModel(8, source.length, source, 0, false, -1, DataBuffer.TYPE_BYTE);
     }
 
-    static void setLUT(LUT lut) {
+    private static void setLUT(LUT lut) {
         colorModel = createIndexColorModelFromLUT(lut);
         cache.asMap().values().forEach(data -> data.changeColormap(colorModel));
         DrawController.drawRequest();
@@ -260,6 +272,28 @@ public final class RadioData extends AbstractTimelineLayer {
 
         for (int x = dx0 + tWidth / 2; x < dx1; x += tWidth + tWidth / 2)
             g.drawString(text, x, y);
+    }
+
+    private static JPanel optionsPanel(LUTComboBox combo) {
+        JButton availabilityBtn = new JButton("Available data");
+        availabilityBtn.addActionListener(e -> JHVGlobals.openURL(DataSources.getServerSetting("ROB", "availability.images") +
+                "ID=" + APIRequest.CallistoID));
+
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.LINE_START;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 1;
+        c.weighty = 1;
+        c.fill = GridBagConstraints.NONE;
+        panel.add(combo, c);
+        c.anchor = GridBagConstraints.LINE_END;
+        c.gridx = 1;
+        c.gridy = 0;
+        panel.add(availabilityBtn, c);
+
+        return panel;
     }
 
 }
