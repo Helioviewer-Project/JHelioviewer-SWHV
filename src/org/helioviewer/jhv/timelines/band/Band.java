@@ -28,6 +28,12 @@ public final class Band extends AbstractTimelineLayer {
     record Data(BandType bandType, long[] dates, float[] values) {
     }
 
+    private record Polyline(IntArray xPoints, IntArray yPoints) {
+        int length() {
+            return xPoints.length();
+        }
+    }
+
     private static final HashMap<BandType, Band> externalLoad = new HashMap<>();
 
     public static Band createFromType(BandType _bandType) {
@@ -42,7 +48,7 @@ public final class Band extends AbstractTimelineLayer {
 
     private final YAxis yAxis;
     private final int[] warnLevels;
-    private final List<GraphPolyline> graphPolylines = new ArrayList<>();
+    private final List<Polyline> polylines = new ArrayList<>();
 
     private RequestCache requestCache;
     private BandCache bandCache;
@@ -184,12 +190,12 @@ public final class Band extends AbstractTimelineLayer {
             return;
 
         g.setColor(graphColor);
-        graphPolylines.forEach(line -> g.drawPolyline(line.xPoints(), line.yPoints(), line.length())); // polylines
+        polylines.forEach(line -> g.drawPolyline(line.xPoints().array(), line.yPoints().array(), line.length())); // polylines
 
 //      for (GraphPolyline line : graphPolylines) { // dots
 //          int length = line.length();
-//          int[] xPoints = line.xPoints();
-//          int[] yPoints = line.yPoints();
+//          int[] xPoints = line.xPoints().array();
+//          int[] yPoints = line.yPoints().array();
 //          for (int i = 0; i < length; i++)
 //              g.drawLine(xPoints[i], yPoints[i], xPoints[i], yPoints[i]);
 //      }
@@ -210,7 +216,7 @@ public final class Band extends AbstractTimelineLayer {
                 warnLevels[i] = yAxis.value2pixel(graphArea.y, graphArea.height, unconvertedWarnLevels[i]);
             }
 
-            graphPolylines.clear();
+            polylines.clear();
 
             TimeAxis timeAxis = DrawController.selectedAxis;
             long start = propagationModel.getObservationTime(timeAxis.start());
@@ -223,7 +229,7 @@ public final class Band extends AbstractTimelineLayer {
                         dates.put(timeAxis.value2pixel(graphArea.x, graphArea.width, propagationModel.getViewpointTime(dv.milli)));
                         values.put(yAxis.value2pixel(graphArea.y, graphArea.height, dv.value));
                     }
-                    graphPolylines.add(new GraphPolyline(dates, values));
+                    polylines.add(new Polyline(dates, values));
                 }
             }
         }
