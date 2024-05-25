@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.base.conversion;
+package org.helioviewer.jhv.base;
 
 public class GOESLevel {
 

@@ -10,8 +10,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.base.GOESLevel;
 import org.helioviewer.jhv.base.Pair;
-import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.database.JHVDatabaseParam;
 import org.helioviewer.jhv.events.JHVEvent;
