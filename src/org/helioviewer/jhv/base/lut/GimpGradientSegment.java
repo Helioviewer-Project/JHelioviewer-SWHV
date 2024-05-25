@@ -31,7 +31,6 @@ record GimpGradientSegment(double leftStop, double midStop, double rightStop, do
     int getGradientColor(double x) throws Exception {
         // Normalize the segment geometry.
         double f = getF(x);
-
         // Ignore foreground/background stuff
         int r = 0;
         // Interpolate the colors
@@ -76,24 +75,17 @@ record GimpGradientSegment(double leftStop, double midStop, double rightStop, do
     private double getF(double x) throws Exception {
         double mid = (midStop - leftStop) / (rightStop - leftStop);
         double pos = (x - leftStop) / (rightStop - leftStop);
-
-        // Assume linear (most common, and needed by most others).
+        // Assume linear (most common, and needed by most others)
         double f = pos <= mid ? 0.5 * (pos / mid) : 0.5 * (pos - mid) / (1.0 - mid) + 0.5;
-
-        // Find the correct interpolation factor.
-        if (blendingType == 1) { // Curved
-            f = Math.pow(pos, Math.log(.5) / Math.log(midStop));
-        } else if (blendingType == 2) { // Sinusoidal
-            f = (Math.sin(-Math.PI / 2 + Math.PI * f) + 1.0) / 2.0;
-        } else if (blendingType == 3) { // Spherical increasing
-            f -= 1.0;
-            f = Math.sqrt(1.0 - f * f);
-        } else if (blendingType == 4) { // Spherical decreasing
-            f = 1.0 - Math.sqrt(1 - f * f);
-        } else if (blendingType != 0) {
-            throw new Exception("Unknown blending type " + blendingType + " for gimp gradient file");
-        }
-        return f;
+        // Find the correct interpolation factor
+        return switch (blendingType) {
+            case 0 -> f;
+            case 1 -> Math.pow(pos, Math.log(0.5) / Math.log(midStop)); // Curved
+            case 2 -> (Math.sin(-Math.PI / 2 + Math.PI * f) + 1) / 2; // Sinusoidal
+            case 3 -> Math.sqrt(1 - (f - 1) * (f - 1)); // Spherical increasing
+            case 4 -> 1 - Math.sqrt(1 - f * f); // Spherical decreasing
+            default -> throw new Exception("Unknown blending type " + blendingType + " for gimp gradient file");
+        };
     }
 
     /**
