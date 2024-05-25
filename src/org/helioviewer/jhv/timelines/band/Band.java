@@ -44,7 +44,7 @@ public final class Band extends AbstractTimelineLayer {
     private static final int DOWNLOADER_MAX_DAYS_PER_BLOCK = 21;
 
     private final BandType bandType;
-    private final BandOptionPanel optionsPanel = new BandOptionPanel(this);
+    private final BandOptions optionsPanel = new BandOptions(this);
 
     private final YAxis yAxis;
     private final int[] warnLevels;
