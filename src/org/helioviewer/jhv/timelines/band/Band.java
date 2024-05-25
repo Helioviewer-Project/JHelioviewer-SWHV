@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.interval.RequestCache;
@@ -34,10 +35,11 @@ public final class Band extends AbstractTimelineLayer {
         }
     }
 
-    private static final HashMap<BandType, Band> externalLoad = new HashMap<>();
+    private static final Colors.BrightColors bandColors = new Colors.BrightColors();
+    private static final HashMap<BandType, Band> bandMap = new HashMap<>();
 
     public static Band createFromType(BandType _bandType) {
-        return externalLoad.computeIfAbsent(_bandType, Band::new);
+        return bandMap.computeIfAbsent(_bandType, Band::new);
     }
 
     private static final int SUPER_SAMPLE = 1; // 8 for dots
@@ -52,7 +54,7 @@ public final class Band extends AbstractTimelineLayer {
 
     private RequestCache requestCache;
     private BandCache bandCache;
-    private Color graphColor = BandColors.getNextColor();
+    private Color graphColor = bandColors.getNextColor();
     private PropagationModel propagationModel = new PropagationModel.Delay(0);
 
     private Band(BandType _bandType) {
