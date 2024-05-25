@@ -1,14 +1,16 @@
 package org.helioviewer.jhv.events;
 
+import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.events.filter.FilterManager;
 import org.helioviewer.jhv.threads.JHVThread;
 
@@ -19,7 +21,7 @@ class SWEKDownloadManager implements FilterManager.Listener {
 
     private static final int NUMBER_THREADS = 8;
     private static final long SIXHOURS = 1000 * 60 * 60 * 6;
-    private static final ExecutorService downloadEventPool = new ThreadPoolExecutor(NUMBER_THREADS, NUMBER_THREADS, 10000L, TimeUnit.MILLISECONDS,
+    private static final ThreadPoolExecutor downloadPool = new ThreadPoolExecutor(NUMBER_THREADS, NUMBER_THREADS, 10000L, TimeUnit.MILLISECONDS,
             new PriorityBlockingQueue<>(2048, new ComparePriority()),
             new JHVThread.NamedThreadFactory("SWEK Download"),
             new ThreadPoolExecutor.DiscardPolicy()) {
@@ -29,9 +31,36 @@ class SWEKDownloadManager implements FilterManager.Listener {
             JHVThread.afterExecute(r, t);
         }
     };
-    private static final ArrayListMultimap<SWEKSupplier, SWEKDownloadWorker> workerMap = ArrayListMultimap.create();
+
+    private record SWEKDownloadWorker(SWEKSupplier supplier, List<SWEK.Param> params,
+                                      long start, long end) implements Runnable {
+
+        @Override
+        public void run() {
+            boolean success = supplier.getSource().handler().remote2db(supplier, start, end, params);
+            if (success) {
+                List<Pair<Integer, Integer>> assocList = EventDatabase.associations2Program(start, end, supplier);
+                List<JHVEvent> eventList = EventDatabase.events2Program(start, end, supplier, params);
+                EventQueue.invokeLater(() -> {
+                    assocList.forEach(JHVEventCache::addAssociation);
+                    eventList.forEach(JHVEventCache::addEvent);
+                    JHVEventCache.fireEventCacheChanged();
+
+                    workerFinished(supplier, this);
+                });
+                EventDatabase.addDaterange2db(start, end, supplier);
+            } else {
+                EventQueue.invokeLater(() -> workerForcedToStop(supplier, this));
+            }
+        }
+
+        void stopWorker() { // TBD
+        }
+
+    }
 
     private static final SWEKDownloadManager instance = new SWEKDownloadManager();
+    private static final ArrayListMultimap<SWEKSupplier, SWEKDownloadWorker> workerMap = ArrayListMultimap.create();
 
     private SWEKDownloadManager() {
         FilterManager.addListener(this);
@@ -46,12 +75,12 @@ class SWEKDownloadManager implements FilterManager.Listener {
         supplier.getGroup().stoppedDownload();
     }
 
-    static void workerForcedToStop(SWEKSupplier supplier, SWEKDownloadWorker worker) {
+    private static void workerForcedToStop(SWEKSupplier supplier, SWEKDownloadWorker worker) {
         JHVEventCache.intervalNotDownloaded(supplier, worker.start(), worker.end());
         workerFinished(supplier, worker);
     }
 
-    static void workerFinished(SWEKSupplier supplier, SWEKDownloadWorker worker) {
+    private static void workerFinished(SWEKSupplier supplier, SWEKDownloadWorker worker) {
         workerMap.remove(supplier, worker);
         if (workerMap.get(supplier).isEmpty())
             supplier.getGroup().stoppedDownload();
@@ -84,8 +113,8 @@ class SWEKDownloadManager implements FilterManager.Listener {
         for (Interval interval : intervals) {
             for (Interval intt : Interval.splitInterval(interval, 2)) {
                 if (intt.start < System.currentTimeMillis() + SIXHOURS) {
-                    SWEKDownloadWorker worker = new SWEKDownloadWorker(supplier, intt.start, intt.end, params);
-                    downloadEventPool.execute(worker);
+                    SWEKDownloadWorker worker = new SWEKDownloadWorker(supplier, params, intt.start, intt.end);
+                    downloadPool.execute(worker);
                     workerMap.put(supplier, worker);
                     supplier.getGroup().startedDownload();
                 }
