@@ -15,7 +15,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
-class DrawControllerOptionsPanel extends JPanel {
+class DrawControllerOptions extends JPanel {
 
     private final JComboBox<ZoomItem> zoomCombo;
     private final JideToggleButton lockButton;
@@ -25,7 +25,7 @@ class DrawControllerOptionsPanel extends JPanel {
         CUSTOM, All, Year, Month, Day, Hour, Carrington, Movie
     }
 
-    DrawControllerOptionsPanel() {
+    DrawControllerOptions() {
         setLayout(new BorderLayout());
 
         ZoomItem[] items = {
