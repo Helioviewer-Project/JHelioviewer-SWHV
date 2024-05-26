@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.timelines.band;
 
-import javax.annotation.Nonnull;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -78,12 +76,10 @@ public class BandType {
         return unitLabel;
     }
 
-    @Nonnull
     String[] getWarnLabels() {
         return warnLabels;
     }
 
-    @Nonnull
     double[] getWarnLevels() {
         return warnLevels;
     }
