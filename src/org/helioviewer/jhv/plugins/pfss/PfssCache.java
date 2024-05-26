@@ -25,7 +25,7 @@ class PfssCache {
     private PfssLoader.Data get(long time, URI uri) {
         PfssLoader.Data ret = cache.getIfPresent(uri);
         if (ret == null) {
-            PfssLoader.submit(time, uri);
+            PfssLoader.submitData(time, uri);
         }
         return ret;
     }
