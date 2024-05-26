@@ -17,7 +17,7 @@ import org.helioviewer.jhv.threads.JHVThread;
 import com.google.common.collect.ArrayListMultimap;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-class SWEKDownloadManager implements FilterManager.Listener {
+class SWEKDownloader implements FilterManager.Listener {
 
     private static final int NUMBER_THREADS = 8;
     private static final long SIXHOURS = 1000 * 60 * 60 * 6;
@@ -32,9 +32,7 @@ class SWEKDownloadManager implements FilterManager.Listener {
         }
     };
 
-    private record SWEKDownloadWorker(SWEKSupplier supplier, List<SWEK.Param> params,
-                                      long start, long end) implements Runnable {
-
+    private record Worker(SWEKSupplier supplier, List<SWEK.Param> params, long start, long end) implements Runnable {
         @Override
         public void run() {
             boolean success = supplier.getSource().handler().remote2db(supplier, start, end, params);
@@ -59,10 +57,10 @@ class SWEKDownloadManager implements FilterManager.Listener {
 
     }
 
-    private static final SWEKDownloadManager instance = new SWEKDownloadManager();
-    private static final ArrayListMultimap<SWEKSupplier, SWEKDownloadWorker> workerMap = ArrayListMultimap.create();
+    private static final SWEKDownloader instance = new SWEKDownloader();
+    private static final ArrayListMultimap<SWEKSupplier, Worker> workerMap = ArrayListMultimap.create();
 
-    private SWEKDownloadManager() {
+    private SWEKDownloader() {
         FilterManager.addListener(this);
     }
 
@@ -75,12 +73,12 @@ class SWEKDownloadManager implements FilterManager.Listener {
         supplier.getGroup().stoppedDownload();
     }
 
-    private static void workerForcedToStop(SWEKSupplier supplier, SWEKDownloadWorker worker) {
+    private static void workerForcedToStop(SWEKSupplier supplier, Worker worker) {
         JHVEventCache.intervalNotDownloaded(supplier, worker.start(), worker.end());
         workerFinished(supplier, worker);
     }
 
-    private static void workerFinished(SWEKSupplier supplier, SWEKDownloadWorker worker) {
+    private static void workerFinished(SWEKSupplier supplier, Worker worker) {
         workerMap.remove(supplier, worker);
         if (workerMap.get(supplier).isEmpty())
             supplier.getGroup().stoppedDownload();
@@ -113,7 +111,7 @@ class SWEKDownloadManager implements FilterManager.Listener {
         for (Interval interval : intervals) {
             for (Interval intt : Interval.splitInterval(interval, 2)) {
                 if (intt.start < System.currentTimeMillis() + SIXHOURS) {
-                    SWEKDownloadWorker worker = new SWEKDownloadWorker(supplier, params, intt.start, intt.end);
+                    Worker worker = new Worker(supplier, params, intt.start, intt.end);
                     downloadPool.execute(worker);
                     workerMap.put(supplier, worker);
                     supplier.getGroup().startedDownload();
@@ -122,7 +120,7 @@ class SWEKDownloadManager implements FilterManager.Listener {
         }
     }
 
-    private static class ComparePriority<T extends SWEKDownloadWorker> implements Comparator<T> {
+    private static class ComparePriority<T extends Worker> implements Comparator<T> {
         @Override
         public int compare(T l1, T l2) {
             return Long.compare(l2.end(), l1.end());

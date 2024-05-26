@@ -111,7 +111,7 @@ public final class SWEKSupplier extends DefaultMutableTreeNode implements Interf
     }
 
     private void internalActivate(boolean b) {
-        SWEKDownloadManager.activateSupplier(this, b);
+        SWEKDownloader.activateSupplier(this, b);
     }
 
     public boolean isSelected() {
