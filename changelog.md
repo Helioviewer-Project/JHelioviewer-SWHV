@@ -1,7 +1,10 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.6.5 (pending)
+## JHelioviewer 4.7 (pending)
+
+- Restore timeline loading from new HAPI ROB server
+- Add menu item to reload the list of datasets
 
 ## JHelioviewer 4.6.4 (2024-05-06)
 
