@@ -1,33 +1,101 @@
 package org.helioviewer.jhv.plugins.pfss;
 
+import java.awt.EventQueue;
 import java.net.URI;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.helioviewer.jhv.time.JHVTime;
+import org.helioviewer.jhv.time.TimeUtils;
 
 import com.google.common.util.concurrent.FutureCallback;
-
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 import nom.tam.fits.TableHDU;
+import okio.BufferedSource;
 
 class PfssLoader {
 
     record Data(JHVTime dateObs, float[] lineX, float[] lineY, float[] lineZ, float[] lineS, int points) {
     }
 
-    static void submit(long time, URI uri) {
-        EDTCallbackExecutor.pool.submit(new DataLoader(time, uri), new Callback(uri));
+    static void submitList(long start, long end) {
+        EDTCallbackExecutor.pool.submit(new ListLoader(start, end), new CallbackList(start));
         PfssPlugin.downloads++;
+    }
+
+    static void submitData(long time, URI uri) {
+        EDTCallbackExecutor.pool.submit(new DataLoader(time, uri), new CallbackData(uri));
+        PfssPlugin.downloads++;
+    }
+
+    private record ListLoader(long start, long end) implements Callable<Void> {
+        @Override
+        public Void call() throws Exception {
+            Calendar cal = Calendar.getInstance();
+
+            cal.setTimeInMillis(start);
+            int startYear = cal.get(Calendar.YEAR);
+            int startMonth = cal.get(Calendar.MONTH);
+
+            cal.setTimeInMillis(end + 31 * TimeUtils.DAY_IN_MILLIS);
+            int endYear = cal.get(Calendar.YEAR);
+            int endMonth = cal.get(Calendar.MONTH);
+
+            do {
+                String m = startMonth < 9 ? "0" + (startMonth + 1) : Integer.toString(startMonth + 1);
+                URI listUri = new URI(PfssSettings.BASE_URL + startYear + '/' + m + "/list.txt");
+                HashMap<Long, URI> uris = new HashMap<>();
+
+                // may come from http cache
+                try (NetClient nc = NetClient.of(listUri); BufferedSource source = nc.getSource()) {
+                    String line;
+                    while ((line = source.readUtf8Line()) != null) {
+                        String[] splitted = Regex.Space.split(line);
+                        if (splitted.length != 2)
+                            throw new Exception("Invalid line: " + line);
+                        uris.put(TimeUtils.parse(splitted[0]), new URI(PfssSettings.BASE_URL + splitted[1]));
+                    }
+                } catch (Exception e) { // continue in case of list error
+                    Log.warn("PFSS list error", e);
+                }
+                EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().put(uris));
+
+                if (startMonth == 11) {
+                    startMonth = 0;
+                    startYear++;
+                } else {
+                    startMonth++;
+                }
+            } while (startYear < endYear || (startYear == endYear && startMonth <= endMonth));
+            return null;
+        }
+
+    }
+
+    private record CallbackList(long start) implements FutureCallback<Void> {
+        @Override
+        public void onSuccess(Void result) {
+            PfssPlugin.downloads--;
+            PfssPlugin.getPfsscache().getNearestData(start); // preload first
+        }
+
+        @Override
+        public void onFailure(@Nonnull Throwable t) {
+            PfssPlugin.downloads--;
+            Log.error(t);
+        }
     }
 
     private static int findColumn(TableHDU<?> hdu, String name) throws Exception {
@@ -92,8 +160,7 @@ class PfssLoader {
         }
     }
 
-    private record Callback(URI uri) implements FutureCallback<Data> {
-
+    private record CallbackData(URI uri) implements FutureCallback<Data> {
         @Override
         public void onSuccess(Data result) {
             PfssPlugin.downloads--;
@@ -106,7 +173,6 @@ class PfssLoader {
             PfssPlugin.downloads--;
             Log.error(t);
         }
-
     }
 
 }

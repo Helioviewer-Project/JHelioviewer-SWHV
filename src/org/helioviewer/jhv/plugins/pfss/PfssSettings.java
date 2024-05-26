@@ -2,8 +2,6 @@ package org.helioviewer.jhv.plugins.pfss;
 
 class PfssSettings {
 
-    static final int TIMEOUT_DOWNLOAD = 120; // seconds
-
     static final int MAX_DETAIL = 8;
     static final double MAX_RADIUS = 2.5;
 

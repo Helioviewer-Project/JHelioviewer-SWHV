@@ -106,7 +106,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
 
     @Override
     public void timeRangeChanged(long start, long end) {
-        PfssLoaderList.submit(start, end);
+        PfssLoader.submitList(start, end);
     }
 
     @Override
