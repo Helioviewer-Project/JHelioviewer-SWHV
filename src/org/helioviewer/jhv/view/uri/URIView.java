@@ -1,6 +1,8 @@
 package org.helioviewer.jhv.view.uri;
 
 import java.awt.EventQueue;
+import java.io.File;
+import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
@@ -65,9 +67,20 @@ public class URIView extends BaseView {
     public void decode(Position viewpoint, double pixFactor, float factor) {
         ImageBuffer imageBuffer = decodeCache.getIfPresent(dataUri);
         if (imageBuffer == null) {
-            executor.decode(new URIDecoder(dataUri.file(), reader, mgn), new Callback(viewpoint));
+            executor.decode(new Decoder(dataUri.file(), reader, mgn), new Callback(viewpoint));
         } else {
             sendDataToHandler(imageBuffer, viewpoint);
+        }
+    }
+
+    private record Decoder(File file, URIImageReader reader, boolean mgn) implements Callable<ImageBuffer> {
+        @Nonnull
+        @Override
+        public ImageBuffer call() throws Exception {
+            ImageBuffer imageBuffer = reader.readImageBuffer(file);
+            if (imageBuffer == null) // e.g. FITS
+                throw new Exception("Could not read: " + file);
+            return ImageBuffer.mgnFilter(imageBuffer, mgn);
         }
     }
 
