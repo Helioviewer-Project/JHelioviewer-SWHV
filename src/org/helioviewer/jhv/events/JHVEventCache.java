@@ -154,7 +154,7 @@ public class JHVEventCache {
             RequestCache rc = downloadedCache.get(supplier);
             List<Interval> missing = rc.getMissingIntervals(start, end);
             if (!missing.isEmpty()) {
-                SWEKDownloadManager.startDownloadSupplier(supplier, rc.adaptRequestCache(newStart, newEnd));
+                SWEKDownloader.startDownloadSupplier(supplier, rc.adaptRequestCache(newStart, newEnd));
             }
         }
     }
