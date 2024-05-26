@@ -1,36 +1,16 @@
 package org.helioviewer.jhv.timelines.band;
 
-import java.util.List;
-
 import javax.annotation.Nonnull;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import com.google.common.collect.LinkedListMultimap;
 
 public class BandType {
-
-    private static final LinkedListMultimap<String, BandType> groups = LinkedListMultimap.create();
-
-    static void addToGroups(BandType type) {
-        groups.put(type.group, type);
-    }
-
-    @Nonnull
-    public static List<BandType> getBandTypes(String group) {
-        return groups.get(group);
-    }
-
-    @Nonnull
-    public static String[] getGroups() {
-        return groups.keySet().toArray(String[]::new);
-    }
 
     private static final String[] xWarnLabels = new String[]{"B", "C", "M", "X"};
     private static final double[] xWarnValues = new double[]{1e-7, 1e-6, 1e-5, 1e-4};
 
     private final String name;
-    private final String group;
     private final String baseUrl;
     private final String label;
     private final String unitLabel;
@@ -48,7 +28,6 @@ public class BandType {
         json = jo;
 
         name = jo.optString("name", "Unknown");
-        group = jo.optString("group", "Unknown");
         baseUrl = jo.optString("baseUrl", "");
         label = jo.optString("label", "Unknown");
 

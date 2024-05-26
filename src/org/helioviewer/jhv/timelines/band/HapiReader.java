@@ -34,6 +34,7 @@ import com.google.common.util.concurrent.FutureCallback;
 
 public class HapiReader {
 
+    private static final String groupName = "HAPI";
     private static final String hapiFormat = "binary";
     private static final String ROBserver = "https://hapi.swhv.oma.be/SWHV_Timelines/hapi/";
 
@@ -47,7 +48,7 @@ public class HapiReader {
         return EDTCallbackExecutor.pool.submit(new LoadData(theCatalog, url, start, end), new CallbackData());
     }
 
-    private record Catalog(HapiVersion version, Map<String, BandParameter> parameters) {
+    private record Catalog(HapiVersion version, Map<String, BandParameter> parameters, BandType[] types) {
     }
 
     private record Dataset(String id, List<BandReader> readers, long start, long stop) {
@@ -110,7 +111,10 @@ public class HapiReader {
                     parameters.put(reader.type.getBaseUrl(), new BandParameter(reader, start, stop));
                 }
             }
-            return new Catalog(version, parameters);
+            ArrayList<BandType> types = new ArrayList<>();
+            parameters.values().forEach(parameter -> types.add(parameter.reader.type));
+
+            return new Catalog(version, parameters, types.toArray(BandType[]::new));
         }
     }
 
@@ -161,8 +165,7 @@ public class HapiReader {
                     put("name", id + ' ' + p.name).
                     put("range", p.range).
                     put("scale", p.scale).
-                    put("label", title + ' ' + p.name).
-                    put("group", "HAPI");
+                    put("label", title + ' ' + p.name);
 
             typeParams[1] = params[i];
             readers.add(new BandReader(new BandType(jobt), new JhvHapiTableReader(typeParams)));
@@ -293,15 +296,12 @@ public class HapiReader {
         @Override
         public void onSuccess(@Nonnull Catalog catalog) {
             theCatalog = catalog;
-            for (BandParameter parameter : theCatalog.parameters.values()) {
-                BandType.addToGroups(parameter.reader.type);
-            }
-            Timelines.td.setupDatasets();
+            Timelines.td.setupDatasets(groupName, theCatalog.types);
         }
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log.error(t);
+            Log.error(Throwables.getStackTraceAsString(t));
         }
     }
 
