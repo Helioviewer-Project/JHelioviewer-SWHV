@@ -32,7 +32,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     public static final TimeAxis selectedAxis = new TimeAxis(0, 0);
     public static final TimeAxis availableAxis = new TimeAxis(0, 0);
 
-    private static final DrawControllerOptionsPanel optionsPanel = new DrawControllerOptionsPanel();
+    private static final DrawControllerOptions optionsPanel = new DrawControllerOptions();
     private static final ArrayList<Listener> listeners = new ArrayList<>();
 
     private static Rectangle graphArea = new Rectangle();
