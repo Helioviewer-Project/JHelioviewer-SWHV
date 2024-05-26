@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.LinkedHashMap;
 
 import javax.annotation.Nullable;
 import javax.swing.AbstractAction;
@@ -112,8 +113,11 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
         setVisible(true);
     }
 
-    public void setupDatasets() {
-        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(BandType.getGroups());
+    private final LinkedHashMap<String, BandType[]> groups = new LinkedHashMap<>();
+
+    public void setupDatasets(String group, BandType[] types) {
+        groups.put(group, types);
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(groups.keySet().toArray(String[]::new));
         if (model.getSize() > 0) {
             comboGroup.setModel(model);
             comboGroup.setSelectedIndex(0);
@@ -123,7 +127,7 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
 
     private void updateGroupValues() {
         if (comboGroup.getSelectedItem() instanceof String group) {
-            listBand.setListData(BandType.getBandTypes(group).toArray(BandType[]::new));
+            listBand.setListData(groups.get(group));
             listBand.setSelectedIndex(0);
         }
     }
