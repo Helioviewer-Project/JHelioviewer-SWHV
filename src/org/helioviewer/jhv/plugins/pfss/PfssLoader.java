@@ -14,6 +14,8 @@ import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -109,6 +111,8 @@ class PfssLoader {
         return (v + 32768.) * (2. / 65535.) - 1.;
     }
 
+    private static final double adjust = 0.5 * Math.PI / 180.; // PFSS grid possibly shifted half degree
+
     private record DataLoader(long time, URI uri) implements Callable<Data> {
         @Override
         public Data call() throws Exception {
@@ -140,19 +144,19 @@ class PfssLoader {
                 float[] lineZ = new float[rows];
                 float[] lineS = new float[rows];
 
-                double elon = Sun.getEarth(dateObs).lon;
-                double cphi = Math.cos(elon);
-                double sphi = Math.sin(elon);
+                Quat q = new Quat(adjust, 0, Sun.getEarth(dateObs).lon + adjust);
+                Vec3 v = new Vec3();
 
                 for (int i = 0; i < rows; i++) {
-                    double x = 3 * decodeShort(((short[]) hdu.getElement(i, colX))[0]);
-                    double y = 3 * decodeShort(((short[]) hdu.getElement(i, colY))[0]);
-                    double z = 3 * decodeShort(((short[]) hdu.getElement(i, colZ))[0]);
+                    v.x = 3 * decodeShort(((short[]) hdu.getElement(i, colX))[0]);
+                    v.y = 3 * decodeShort(((short[]) hdu.getElement(i, colY))[0]);
+                    v.z = 3 * decodeShort(((short[]) hdu.getElement(i, colZ))[0]);
                     double s = decodeShort(((short[]) hdu.getElement(i, colS))[0]);
 
-                    lineX[i] = (float) (cphi * x + sphi * y);
-                    lineY[i] = (float) (-sphi * x + cphi * y);
-                    lineZ[i] = (float) z;
+                    Vec3 vr = q.rotateVector(v);
+                    lineX[i] = (float) vr.x;
+                    lineY[i] = (float) vr.y;
+                    lineZ[i] = (float) vr.z;
                     lineS[i] = (float) MathUtils.clip(s, -1, 1);
                 }
                 return new Data(dateObs, lineX, lineY, lineZ, lineS, points);
