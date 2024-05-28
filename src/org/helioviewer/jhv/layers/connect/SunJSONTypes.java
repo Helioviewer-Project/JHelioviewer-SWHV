@@ -36,6 +36,11 @@ public class SunJSONTypes {
     }
 
     /**/
+    static GeometryBuffer getGeometryBuffer(Geometry g) {
+        return new GeometryBuffer(g, getVertices(g));
+    }
+
+    /**/
     static void adjustColorsSize(GeometryType type, List<Vec3> coords, List<byte[]> colors) { // modifies colors
         int coordsSize = getCoordsSize(type, coords);
         int colorsSize = colors.size();
@@ -67,8 +72,7 @@ public class SunJSONTypes {
         return coordsSize;
     }
 
-    /**/
-    static BufVertex getVertices(Geometry g) {
+    private static BufVertex getVertices(Geometry g) {
         return switch (g.type) {
             case point -> getVerticesPoint(g);
             case line -> getVerticesLine(g);
