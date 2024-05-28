@@ -19,7 +19,7 @@ import com.google.common.util.concurrent.FutureCallback;
 public class LoadSunJSON {
 
     public interface Receiver {
-        void setGeometry(List<SunJSON.GeometryCollection> g);
+        void setGeometry(List<SunJSONTypes.GeometryCollection> g);
     }
 
     public static void submit(@Nonnull List<URI> uriList) {
@@ -34,9 +34,9 @@ public class LoadSunJSON {
             EDTCallbackExecutor.pool.submit(new LoadSunJSONString(json), new Callback(receiver));
     }
 
-    private record LoadSunJSONURI(List<URI> uriList) implements Callable<List<SunJSON.GeometryCollection>> {
+    private record LoadSunJSONURI(List<URI> uriList) implements Callable<List<SunJSONTypes.GeometryCollection>> {
         @Override
-        public List<SunJSON.GeometryCollection> call() {
+        public List<SunJSONTypes.GeometryCollection> call() {
             return uriList.parallelStream().map(uri -> {
                 try {
                     return SunJSON.process(JSONUtils.get(uri));
@@ -48,16 +48,16 @@ public class LoadSunJSON {
         }
     }
 
-    private record LoadSunJSONString(String json) implements Callable<List<SunJSON.GeometryCollection>> {
+    private record LoadSunJSONString(String json) implements Callable<List<SunJSONTypes.GeometryCollection>> {
         @Override
-        public List<SunJSON.GeometryCollection> call() {
+        public List<SunJSONTypes.GeometryCollection> call() {
             return List.of(SunJSON.process(new JSONObject(json)));
         }
     }
 
-    private record Callback(Receiver receiver) implements FutureCallback<List<SunJSON.GeometryCollection>> {
+    private record Callback(Receiver receiver) implements FutureCallback<List<SunJSONTypes.GeometryCollection>> {
         @Override
-        public void onSuccess(List<SunJSON.GeometryCollection> result) {
+        public void onSuccess(List<SunJSONTypes.GeometryCollection> result) {
             receiver.setGeometry(result);
         }
 

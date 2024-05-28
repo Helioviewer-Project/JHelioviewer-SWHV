@@ -27,7 +27,7 @@ import org.helioviewer.jhv.layers.connect.LoadFootpoint;
 import org.helioviewer.jhv.layers.connect.LoadHCS;
 import org.helioviewer.jhv.layers.connect.LoadSunJSON;
 import org.helioviewer.jhv.layers.connect.OrthoScaleList;
-import org.helioviewer.jhv.layers.connect.SunJSON;
+import org.helioviewer.jhv.layers.connect.SunJSONTypes;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -68,7 +68,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     private Connectivity connectivity;
     private OrthoScaleList hcs;
     private TimeMap<Position.Cartesian> footpointMap;
-    private final TimeMap<SunJSON.GeometryCollection> geometryMap = new TimeMap<>();
+    private final TimeMap<SunJSONTypes.GeometryCollection> geometryMap = new TimeMap<>();
 
     private JHVTime lastTimestamp;
 
@@ -99,7 +99,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
             drawFootpointInterpolated(camera, vp, gl);
 
         if (!geometryMap.isEmpty()) {
-            SunJSON.GeometryCollection g = geometryMap.nearestValue(camera.getViewpoint().time);
+            SunJSONTypes.GeometryCollection g = geometryMap.nearestValue(camera.getViewpoint().time);
             updateTimestamp(g.time());
             g.render(gl, geometryLine, geometryPoint, vp.aspect, CameraHelper.getPixelFactor(camera, vp));
         }
@@ -261,7 +261,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     }
 
     @Override
-    public void setGeometry(List<SunJSON.GeometryCollection> geometry) {
+    public void setGeometry(List<SunJSONTypes.GeometryCollection> geometry) {
         geometry.forEach(g -> geometryMap.put(g.time(), g));
         geometryMap.buildIndex();
         MovieDisplay.display();
