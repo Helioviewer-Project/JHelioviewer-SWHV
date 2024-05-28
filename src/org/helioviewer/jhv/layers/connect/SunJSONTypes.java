@@ -36,7 +36,19 @@ public class SunJSONTypes {
     }
 
     /**/
-    static int getCoordsSize(GeometryType type, List<Vec3> coords) {
+    static void adjustColorsSize(GeometryType type, List<Vec3> coords, List<byte[]> colors) { // modifies colors
+        int coordsSize = getCoordsSize(type, coords);
+        int colorsSize = colors.size();
+        if (colorsSize < coordsSize) {
+            byte[] last = colors.get(colorsSize - 1);
+            for (int i = 0; i < (coordsSize - colorsSize); i++) {
+                colors.add(last);
+            }
+        } else if (colorsSize > coordsSize)
+            colors.subList(coordsSize, colorsSize).clear();
+    }
+
+    private static int getCoordsSize(GeometryType type, List<Vec3> coords) {
         int coordsSize = coords.size();
         switch (type) {
             case point -> {
