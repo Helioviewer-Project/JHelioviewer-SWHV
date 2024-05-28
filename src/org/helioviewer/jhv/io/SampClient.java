@@ -82,7 +82,7 @@ public class SampClient extends HubConnector {
         public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
             try {
                 String sender = c.getMetadata(senderId).getName();
-                Log.info("{\"sender\": \"" + sender + "\",\"message\": " + SampUtils.toJson(msg, false));
+                // Log.info("{\"sender\": \"" + sender + "\",\"message\": " + SampUtils.toJson(msg, false));
                 consumer.accept(sender, msg);
             } catch (Exception e) {
                 Log.warn(type, e);
