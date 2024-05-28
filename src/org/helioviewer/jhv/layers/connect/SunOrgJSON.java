@@ -45,7 +45,7 @@ public class SunOrgJSON {
                 Log.error(e);
                 return null;
             }
-        }).filter(Objects::nonNull).map(g -> new SunJSONTypes.GeometryBuffer(g, SunJSONTypes.getVertices(g))).toList();
+        }).filter(Objects::nonNull).map(SunJSONTypes::getGeometryBuffer).toList();
     }
 
     private static SunJSONTypes.Geometry parseGeometry(JSONObject go) {
