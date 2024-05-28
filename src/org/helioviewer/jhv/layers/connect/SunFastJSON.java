@@ -11,7 +11,6 @@ import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVTime;
 
 import com.alibaba.fastjson2.JSON;
-import com.jogamp.opengl.GL2;
 
 public class SunFastJSON {
 
