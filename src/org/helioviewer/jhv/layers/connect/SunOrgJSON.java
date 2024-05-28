@@ -54,7 +54,7 @@ public class SunOrgJSON {
         List<Vec3> coords = new ArrayList<>();
         for (Object oc : go.getJSONArray("coordinates")) {
             if (oc instanceof JSONArray coord) {
-                coords.add(new Vec3(coord.getDouble(0), Math.toRadians(coord.getDouble(1)), Math.toRadians(coord.getDouble(2))));
+                coords.add(new Vec3(coord.getDouble(0), Math.toRadians(coord.getDouble(1)), Math.toRadians(coord.getDouble(2)))); // should check range
             }
         }
 
@@ -63,27 +63,17 @@ public class SunOrgJSON {
         if (ca != null) {
             for (Object oc : ca) {
                 if (oc instanceof JSONArray color) {
-                    colors.add(
-                            Colors.bytes(
-                                    MathUtils.clip(color.getInt(0), 0, 255),
-                                    MathUtils.clip(color.getInt(1), 0, 255),
-                                    MathUtils.clip(color.getInt(2), 0, 255),
-                                    MathUtils.clip(color.getInt(3), 0, 255)));
+                    colors.add(Colors.bytes(
+                            MathUtils.clip(color.getInt(0), 0, 255),
+                            MathUtils.clip(color.getInt(1), 0, 255),
+                            MathUtils.clip(color.getInt(2), 0, 255),
+                            MathUtils.clip(color.getInt(3), 0, 255)));
                 }
             }
         }
         if (colors.isEmpty())
             colors.add(Colors.Green);
-
-        int coordsSize = SunJSONTypes.getCoordsSize(type, coords);
-        int colorsSize = colors.size();
-        if (colorsSize < coordsSize) {
-            byte[] last = colors.get(colorsSize - 1);
-            for (int i = 0; i < (coordsSize - colorsSize); i++) {
-                colors.add(last);
-            }
-        } else if (colorsSize > coordsSize)
-            colors.subList(coordsSize, colorsSize).clear();
+        SunJSONTypes.adjustColorsSize(type, coords, colors);
 
         double thickness = go.optDouble("thickness", 2 * GLSLLine.LINEWIDTH_BASIC);
         return new SunJSONTypes.Geometry(type, coords, colors, thickness);

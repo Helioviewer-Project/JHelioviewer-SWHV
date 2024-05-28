@@ -59,16 +59,9 @@ public class SunFastJSON {
                     MathUtils.clip(c[2], 0, 255),
                     MathUtils.clip(c[3], 0, 255)));
         }
-
-        int coordsSize = SunJSONTypes.getCoordsSize(type, coords);
-        int colorsSize = colors.size();
-        if (colorsSize < coordsSize) {
-            byte[] last = colors.get(colorsSize - 1);
-            for (int i = 0; i < (coordsSize - colorsSize); i++) {
-                colors.add(last);
-            }
-        } else if (colorsSize > coordsSize)
-            colors.subList(coordsSize, colorsSize).clear();
+        if (colors.isEmpty())
+            colors.add(Colors.Green);
+        SunJSONTypes.adjustColorsSize(type, coords, colors);
 
         double thickness = MathUtils.clip(jg.thickness, 1e-5, 1e-1);
 
