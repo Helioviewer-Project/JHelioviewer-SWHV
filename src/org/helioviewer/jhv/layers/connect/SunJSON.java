@@ -1,10 +1,10 @@
 package org.helioviewer.jhv.layers.connect;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -45,74 +45,74 @@ public class SunJSON {
     }
 
     static GeometryCollection process(JSONObject jo) throws JSONException {
-        Pair<JHVTime, List<Geometry>> res = parse(jo);
-
-        List<GeometryBuffer> bufList = new ArrayList<>();
-        for (Geometry g : res.right()) {
-            bufList.add(new GeometryBuffer(g, getVertices(g)));
-        }
-        return new GeometryCollection(res.left(), bufList);
-    }
-
-    private static Pair<JHVTime, List<Geometry>> parse(JSONObject jo) throws JSONException {
-        List<Geometry> geometryList = new ArrayList<>();
         JHVTime time = TimeUtils.J2000;
-
         if ("SunJSON".equals(jo.optString("type"))) {
             if (jo.has("time"))
                 time = new JHVTime(jo.getString("time"));
 
-            for (Object og : jo.getJSONArray("geometry")) {
-                if (og instanceof JSONObject go) {
-                    String strType = go.getString("type");
-                    GeometryType type = switch (strType) {
-                        case "point" -> GeometryType.Point;
-                        case "line" -> GeometryType.Line;
-                        case "ellipse" -> GeometryType.Ellipse;
-                        default -> throw new JSONException("Unknown geometry type: " + strType);
-                    };
-
-                    List<Vec3> coords = new ArrayList<>();
-                    for (Object oc : go.getJSONArray("coordinates")) {
-                        if (oc instanceof JSONArray coord) {
-                            coords.add(new Vec3(coord.getDouble(0), Math.toRadians(coord.getDouble(1)), Math.toRadians(coord.getDouble(2))));
-                        }
-                    }
-                    int coordsSize = getCoordsSize(coords, type);
-
-                    List<byte[]> colors = new ArrayList<>();
-                    JSONArray ca = go.optJSONArray("colors");
-                    if (ca != null) {
-                        for (Object oc : ca) {
-                            if (oc instanceof JSONArray color) {
-                                colors.add(
-                                        Colors.bytes(
-                                                MathUtils.clip(color.getInt(0), 0, 255),
-                                                MathUtils.clip(color.getInt(1), 0, 255),
-                                                MathUtils.clip(color.getInt(2), 0, 255),
-                                                MathUtils.clip(color.getInt(3), 0, 255)));
-                            }
-                        }
-                    }
-                    if (colors.isEmpty())
-                        colors.add(Colors.Green);
-
-                    int colorsSize = colors.size();
-                    if (colorsSize < coordsSize) {
-                        byte[] last = colors.get(colorsSize - 1);
-                        for (int i = 0; i < (coordsSize - colorsSize); i++) {
-                            colors.add(last);
-                        }
-                    } else if (colorsSize > coordsSize)
-                        colors.subList(coordsSize, colorsSize).clear();
-
-                    double thickness = go.optDouble("thickness", 2 * GLSLLine.LINEWIDTH_BASIC);
-                    geometryList.add(new Geometry(type, coords, colors, thickness));
+            JSONArray ga = jo.optJSONArray("geometry");
+            if (ga instanceof JSONArray) {
+                List<GeometryBuffer> bufList = new ArrayList<>();
+                for (Geometry g : parse(ga)) {
+                    bufList.add(new GeometryBuffer(g, getVertices(g)));
                 }
+                return new GeometryCollection(time, bufList);
             }
         }
+        return new GeometryCollection(time, Collections.emptyList());
+    }
 
-        return new Pair<>(time, geometryList);
+    private static List<Geometry> parse(JSONArray ga) throws JSONException {
+        List<Geometry> geometryList = new ArrayList<>();
+        for (Object og : ga) {
+            if (og instanceof JSONObject go) {
+                String strType = go.getString("type");
+                GeometryType type = switch (strType) {
+                    case "point" -> GeometryType.Point;
+                    case "line" -> GeometryType.Line;
+                    case "ellipse" -> GeometryType.Ellipse;
+                    default -> throw new JSONException("Unknown geometry type: " + strType);
+                };
+
+                List<Vec3> coords = new ArrayList<>();
+                for (Object oc : go.getJSONArray("coordinates")) {
+                    if (oc instanceof JSONArray coord) {
+                        coords.add(new Vec3(coord.getDouble(0), Math.toRadians(coord.getDouble(1)), Math.toRadians(coord.getDouble(2))));
+                    }
+                }
+                int coordsSize = getCoordsSize(coords, type);
+
+                List<byte[]> colors = new ArrayList<>();
+                JSONArray ca = go.optJSONArray("colors");
+                if (ca != null) {
+                    for (Object oc : ca) {
+                        if (oc instanceof JSONArray color) {
+                            colors.add(
+                                    Colors.bytes(
+                                            MathUtils.clip(color.getInt(0), 0, 255),
+                                            MathUtils.clip(color.getInt(1), 0, 255),
+                                            MathUtils.clip(color.getInt(2), 0, 255),
+                                            MathUtils.clip(color.getInt(3), 0, 255)));
+                        }
+                    }
+                }
+                if (colors.isEmpty())
+                    colors.add(Colors.Green);
+
+                int colorsSize = colors.size();
+                if (colorsSize < coordsSize) {
+                    byte[] last = colors.get(colorsSize - 1);
+                    for (int i = 0; i < (coordsSize - colorsSize); i++) {
+                        colors.add(last);
+                    }
+                } else if (colorsSize > coordsSize)
+                    colors.subList(coordsSize, colorsSize).clear();
+
+                double thickness = go.optDouble("thickness", 2 * GLSLLine.LINEWIDTH_BASIC);
+                geometryList.add(new Geometry(type, coords, colors, thickness));
+            }
+        }
+        return geometryList;
     }
 
     private static int getCoordsSize(List<Vec3> coords, GeometryType type) {
