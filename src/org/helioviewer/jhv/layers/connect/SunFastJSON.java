@@ -66,7 +66,7 @@ public class SunFastJSON {
         double thickness = MathUtils.clip(jg.thickness, 1e-5, 1e-1);
 
         SunJSONTypes.Geometry g = new SunJSONTypes.Geometry(type, coords, colors, thickness);
-        return new SunJSONTypes.GeometryBuffer(g, SunJSONTypes.getVertices(g));
+        return SunJSONTypes.getGeometryBuffer(g);
     }
 
     private record JGeometry(String type, List<double[]> coordinates, List<int[]> colors, double thickness) {
