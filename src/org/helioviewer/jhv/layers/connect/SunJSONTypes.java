@@ -36,7 +36,7 @@ public class SunJSONTypes {
     }
 
     /**/
-    static int getCoordsSize(List<Vec3> coords, GeometryType type) {
+    static int getCoordsSize(GeometryType type, List<Vec3> coords) {
         int coordsSize = coords.size();
         switch (type) {
             case point -> {

@@ -19,7 +19,7 @@ import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public class SunJSON {
+public class SunOrgJSON {
 
     static SunJSONTypes.GeometryCollection process(JSONObject jo) {
         JHVTime time = TimeUtils.J2000;
@@ -57,7 +57,6 @@ public class SunJSON {
                 coords.add(new Vec3(coord.getDouble(0), Math.toRadians(coord.getDouble(1)), Math.toRadians(coord.getDouble(2))));
             }
         }
-        int coordsSize = SunJSONTypes.getCoordsSize(coords, type);
 
         List<byte[]> colors = new ArrayList<>();
         JSONArray ca = go.optJSONArray("colors");
@@ -76,6 +75,7 @@ public class SunJSON {
         if (colors.isEmpty())
             colors.add(Colors.Green);
 
+        int coordsSize = SunJSONTypes.getCoordsSize(type, coords);
         int colorsSize = colors.size();
         if (colorsSize < coordsSize) {
             byte[] last = colors.get(colorsSize - 1);
