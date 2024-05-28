@@ -39,7 +39,7 @@ public class LoadSunJSON {
         public List<SunJSONTypes.GeometryCollection> call() {
             return uriList.parallelStream().map(uri -> {
                 try {
-                    return SunJSON.process(JSONUtils.get(uri));
+                    return SunOrgJSON.process(JSONUtils.get(uri));
                 } catch (Exception e) {
                     Log.warn(uri.toString(), e);
                     return null;
@@ -51,7 +51,8 @@ public class LoadSunJSON {
     private record LoadSunJSONString(String json) implements Callable<List<SunJSONTypes.GeometryCollection>> {
         @Override
         public List<SunJSONTypes.GeometryCollection> call() {
-            return List.of(SunJSON.process(new JSONObject(json)));
+            //return List.of(SunOrgJSON.process(new JSONObject(json)));
+            return List.of(SunFastJSON.process(json));
         }
     }
 
