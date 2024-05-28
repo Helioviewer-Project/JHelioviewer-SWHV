@@ -49,15 +49,7 @@ public class SunJSON {
 
         List<GeometryBuffer> bufList = new ArrayList<>();
         for (Geometry g : res.right()) {
-            int coords = g.coordinates.size();
-
-            BufVertex vexBuf = switch (g.type) {
-                case Point -> new BufVertex(coords * GLSLShape.stride);
-                case Line -> new BufVertex((coords + 2) * GLSLLine.stride);
-                case Ellipse -> new BufVertex((SUBDIVISIONS + 1 + 2) * GLSLLine.stride);
-            };
-            putGeometry(g, vexBuf);
-            bufList.add(new GeometryBuffer(g, vexBuf));
+            bufList.add(new GeometryBuffer(g, getVertices(g)));
         }
         return new GeometryCollection(res.left(), bufList);
     }
@@ -148,78 +140,91 @@ public class SunJSON {
         v.z = r * Math.cos(lat) * Math.cos(lon);
     }
 
-    private static void putGeometry(Geometry g, BufVertex buf) {
-        switch (g.type) {
-            case Point -> {
-                Vec3 v = new Vec3();
-                int coordsSize = g.coordinates.size();
-                float pointSize = (float) (2 * g.thickness);
+    private static BufVertex getVertices(Geometry g) {
+        return switch (g.type) {
+            case Point -> getVerticesPoint(g);
+            case Line -> getVerticesLine(g);
+            case Ellipse -> getVerticesEllipse(g);
+        };
+    }
 
-                for (int i = 0; i < coordsSize; i++) {
-                    Vec3 coord = g.coordinates.get(i);
-                    if (coord.x > 1) {
-                        toCartesian(v, coord.x, coord.y, coord.z);
-                        buf.putVertex((float) v.x, (float) v.y, (float) v.z, pointSize, g.colors.get(i));
-                    }
-                }
-            }
-            case Line -> {
-                Vec3 v = new Vec3();
-                int coordsSize = g.coordinates.size();
-                boolean broken = false;
+    private static BufVertex getVerticesPoint(Geometry g) {
+        int num = g.coordinates.size();
+        BufVertex buf = new BufVertex(num * GLSLShape.stride);
 
-                for (int i = 0; i < coordsSize; i++) {
-                    Vec3 coord = g.coordinates.get(i);
-                    toCartesian(v, coord.x, coord.y, coord.z);
-                    if (i == 0)
-                        buf.putVertex(v, Colors.Null);
-                    if (coord.x <= 1) {
-                        buf.repeatVertex(Colors.Null);
-                        broken = true;
-                    } else {
-                        if (broken) {
-                            buf.putVertex(v, Colors.Null);
-                            broken = false;
-                        }
-                        buf.putVertex(v, g.colors.get(i));
-                    }
-                    if (i == coordsSize - 1)
-                        buf.repeatVertex(Colors.Null);
-                }
-            }
-            case Ellipse -> {
-                Vec3 c = g.coordinates.get(0);
-                toCartesian(c, c.x, c.y, c.z);
-                Vec3 u = g.coordinates.get(1);
-                toCartesian(u, u.x, u.y, u.z);
-                Vec3 v = g.coordinates.get(2);
-                toCartesian(v, v.x, v.y, v.z);
-                byte[] color = g.colors.get(0);
-
-                u.minus(c);
-                v.minus(c);
-                for (int j = 0; j <= SUBDIVISIONS; j++) {
-                    double a = 2 * Math.PI * j / SUBDIVISIONS;
-                    double cost = Math.cos(a);
-                    double sint = Math.sin(a);
-
-                    double x = c.x + cost * u.x + sint * v.x;
-                    double y = c.y + cost * u.y + sint * v.y;
-                    double z = c.z + cost * u.z + sint * v.z;
-
-                    if (Math.sqrt(x * x + y * y + z * z) < 1) {
-                        buf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
-                        continue;
-                    }
-
-                    if (j == 0)
-                        buf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
-                    buf.putVertex((float) x, (float) y, (float) z, 1, color);
-                    if (j == SUBDIVISIONS)
-                        buf.repeatVertex(Colors.Null);
-                }
+        Vec3 v = new Vec3();
+        float pointSize = (float) (2 * g.thickness);
+        for (int i = 0; i < num; i++) {
+            Vec3 coord = g.coordinates.get(i);
+            if (coord.x > 1) {
+                toCartesian(v, coord.x, coord.y, coord.z);
+                buf.putVertex((float) v.x, (float) v.y, (float) v.z, pointSize, g.colors.get(i));
             }
         }
+        return buf;
+    }
+
+    private static BufVertex getVerticesLine(Geometry g) {
+        int num = g.coordinates.size();
+        BufVertex buf = new BufVertex((num + 2) * GLSLLine.stride);
+
+        Vec3 v = new Vec3();
+        boolean broken = false;
+        for (int i = 0; i < num; i++) {
+            Vec3 coord = g.coordinates.get(i);
+            toCartesian(v, coord.x, coord.y, coord.z);
+            if (i == 0)
+                buf.putVertex(v, Colors.Null);
+            if (coord.x <= 1) {
+                buf.repeatVertex(Colors.Null);
+                broken = true;
+            } else {
+                if (broken) {
+                    buf.putVertex(v, Colors.Null);
+                    broken = false;
+                }
+                buf.putVertex(v, g.colors.get(i));
+            }
+            if (i == num - 1)
+                buf.repeatVertex(Colors.Null);
+        }
+        return buf;
+    }
+
+    private static BufVertex getVerticesEllipse(Geometry g) {
+        BufVertex buf = new BufVertex((SUBDIVISIONS + 1 + 2) * GLSLLine.stride);
+
+        Vec3 c = g.coordinates.get(0);
+        toCartesian(c, c.x, c.y, c.z);
+        Vec3 u = g.coordinates.get(1);
+        toCartesian(u, u.x, u.y, u.z);
+        Vec3 v = g.coordinates.get(2);
+        toCartesian(v, v.x, v.y, v.z);
+        byte[] color = g.colors.get(0);
+
+        u.minus(c);
+        v.minus(c);
+        for (int j = 0; j <= SUBDIVISIONS; j++) {
+            double a = 2 * Math.PI * j / SUBDIVISIONS;
+            double cost = Math.cos(a);
+            double sint = Math.sin(a);
+
+            double x = c.x + cost * u.x + sint * v.x;
+            double y = c.y + cost * u.y + sint * v.y;
+            double z = c.z + cost * u.z + sint * v.z;
+
+            if (Math.sqrt(x * x + y * y + z * z) < 1) {
+                buf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
+                continue;
+            }
+
+            if (j == 0)
+                buf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
+            buf.putVertex((float) x, (float) y, (float) z, 1, color);
+            if (j == SUBDIVISIONS)
+                buf.repeatVertex(Colors.Null);
+        }
+        return buf;
     }
 
 }
