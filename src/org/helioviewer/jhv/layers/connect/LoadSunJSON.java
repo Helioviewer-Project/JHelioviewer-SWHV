@@ -56,7 +56,6 @@ public class LoadSunJSON {
     }
 
     private record Callback(Receiver receiver) implements FutureCallback<List<SunJSON.GeometryCollection>> {
-
         @Override
         public void onSuccess(List<SunJSON.GeometryCollection> result) {
             receiver.setGeometry(result);
@@ -67,7 +66,6 @@ public class LoadSunJSON {
             Log.error(t);
             Message.err("An error occurred opening the remote file", t.getMessage());
         }
-
     }
 
 }

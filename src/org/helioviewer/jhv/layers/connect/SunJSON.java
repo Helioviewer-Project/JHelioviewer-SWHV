@@ -3,7 +3,10 @@ package org.helioviewer.jhv.layers.connect;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.StreamSupport;
 
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec3;
@@ -59,14 +62,16 @@ public class SunJSON {
     }
 
     private static List<GeometryBuffer> parseArray(JSONArray ga) {
-        List<GeometryBuffer> bufList = new ArrayList<>();
-        for (Object og : ga) {
-            if (og instanceof JSONObject go) {
-                Geometry g = parseGeometry(go);
-                bufList.add(new GeometryBuffer(g, getVertices(g)));
+        return StreamSupport.stream(ga.spliterator(), true).map(og -> {
+            if (!(og instanceof JSONObject go))
+                return null;
+            try {
+                return parseGeometry(go);
+            } catch (Exception e) {
+                Log.error(e);
+                return null;
             }
-        }
-        return bufList;
+        }).filter(Objects::nonNull).map(g -> new GeometryBuffer(g, getVertices(g))).toList();
     }
 
     private static Geometry parseGeometry(JSONObject go) {
