@@ -93,6 +93,12 @@ public class BufVertex {
     }
 
     public static BufVertex join(List<BufVertex> list) {
+        int listSize = list.size();
+        if (listSize == 0)
+            throw new IllegalArgumentException("Empty BufVertex list");
+        if (listSize == 1)
+            return list.get(0);
+
         int retLengthVertx = 0, retLengthColor = 0, retCount = 0, toCopy;
         for (BufVertex b : list) {
             retLengthVertx += b.lengthVertx;
