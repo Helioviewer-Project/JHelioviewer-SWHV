@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.layers.connect;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.helioviewer.jhv.Log;
@@ -11,20 +13,47 @@ import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.time.JHVTime;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimaps;
 import com.jogamp.opengl.GL2;
 
 public class SunJSONTypes {
 
-    public record GeometryCollection(JHVTime time, List<GeometryBuffer> bufList) {
-        public void render(GL2 gl, GLSLLine lines, GLSLShape points, double aspect, double factor) {
+    public static class GeometryCollection {
+
+        private final JHVTime time;
+        private final HashMap<Double, BufVertex> linesMap = new HashMap<>();
+        private final BufVertex pointsBuf;
+
+        GeometryCollection(JHVTime _time, List<GeometryBuffer> bufList) {
+            time = _time;
+
+            // accelerate drawing by combining vertices
+            List<BufVertex> pointsList = new ArrayList<>();
+            ArrayListMultimap<Double, BufVertex> linesWidths = ArrayListMultimap.create();
             for (GeometryBuffer buf : bufList) {
-                if (buf.type == BufType.point) {
-                    points.setVertexRepeatable(gl, buf.vexBuf);
-                    points.renderPoints(gl, factor);
-                } else {
-                    lines.setVertexRepeatable(gl, buf.vexBuf);
-                    lines.renderLine(gl, aspect, buf.thickness * factor * 0.5e-2 /* TBD */);
+                if (buf.type == BufType.point) { // points together in list
+                    pointsList.add(buf.vexBuf);
+                } else { // lines separated in lists per thickness
+                    linesWidths.put(buf.thickness, buf.vexBuf);
                 }
+            }
+            Multimaps.asMap(linesWidths).forEach((w, l) -> linesMap.put(w, BufVertex.join(l)));
+            pointsBuf = pointsList.isEmpty() ? null : BufVertex.join(pointsList);
+        }
+
+        public JHVTime time() {
+            return time;
+        }
+
+        public void render(GL2 gl, GLSLLine lines, GLSLShape points, double aspect, double factor) {
+            linesMap.forEach((thickness, vexBuf) -> {
+                lines.setVertexRepeatable(gl, vexBuf);
+                lines.renderLine(gl, aspect, thickness * factor * 0.5e-2 /* TBD */);
+            });
+            if (pointsBuf != null) {
+                points.setVertexRepeatable(gl, pointsBuf);
+                points.renderPoints(gl, factor);
             }
         }
     }
@@ -34,7 +63,7 @@ public class SunJSONTypes {
     }
 
     /**/
-    enum BufType {point, line} // type in BufVertex
+    private enum BufType {point, line} // type in BufVertex
 
     /**/
     static Vec3 convertCoord(double r, double lon, double lat) {
