@@ -40,9 +40,7 @@ public class SunFastJSON {
     }
 
     private static SunJSONTypes.GeometryBuffer createGeometry(JGeometry jg) {
-        SunJSONTypes.GeometryType type = SunJSONTypes.GeometryType.valueOf(jg.type);
         int size = jg.coordinates.size();
-
         List<Vec3> coords = new ArrayList<>(size);
         for (double[] c : jg.coordinates) {
             if (c.length != 3)
@@ -62,12 +60,9 @@ public class SunFastJSON {
                     MathUtils.clip(c[2], 0, 255),
                     MathUtils.clip(c[3], 0, 255)));
         }
-        if (colors.isEmpty())
-            colors.add(Colors.Green);
-        SunJSONTypes.adjustColorsSize(type, coords, colors);
 
         double thickness = MathUtils.clip(jg.thickness, 1e-5, 1e-1);
-        return SunJSONTypes.getGeometryBuffer(type, coords, colors, thickness);
+        return SunJSONTypes.getGeometryBuffer(jg.type, coords, colors, thickness);
     }
 
     private record JObject(String type, String time, List<JGeometry> geometry) {
