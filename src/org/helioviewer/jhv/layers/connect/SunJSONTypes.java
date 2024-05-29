@@ -27,24 +27,29 @@ public class SunJSONTypes {
         }
     }
 
-    /**/enum GeometryType {point, line, ellipse} // type in JSON
+    /**/record GeometryBuffer(BufType type, double thickness, BufVertex vexBuf) {
+    }
 
     /**/enum BufType {point, line} // type in BufVertex
+
+    private enum GeometryType {point, line, ellipse} // type in JSON
 
     private record Geometry(GeometryType type, List<Vec3> coordinates, List<byte[]> colors, double thickness) {
     }
 
-    /**/record GeometryBuffer(BufType type, double thickness, BufVertex vexBuf) {
-    }
-
     /**/
-    static GeometryBuffer getGeometryBuffer(GeometryType type, List<Vec3> coordinates, List<byte[]> colors, double thickness) {
+    static GeometryBuffer getGeometryBuffer(String typeString, List<Vec3> coordinates, List<byte[]> colors, double thickness) {
+        GeometryType type = GeometryType.valueOf(typeString);
+
+        if (colors.isEmpty())
+            colors.add(Colors.Green);
+        adjustColorsSize(type, coordinates, colors);
+
         Geometry g = new Geometry(type, coordinates, colors, thickness);
         return new GeometryBuffer(type == GeometryType.point ? BufType.point : BufType.line, thickness, getVertices(g));
     }
 
-    /**/
-    static void adjustColorsSize(GeometryType type, List<Vec3> coords, List<byte[]> colors) { // modifies colors
+    private static void adjustColorsSize(GeometryType type, List<Vec3> coords, List<byte[]> colors) { // modifies colors
         int coordsSize = getCoordsSize(type, coords);
         int colorsSize = colors.size();
         if (colorsSize < coordsSize) {
