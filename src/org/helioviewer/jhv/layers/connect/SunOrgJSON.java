@@ -7,8 +7,6 @@ import java.util.Objects;
 import java.util.stream.StreamSupport;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.time.JHVTime;
@@ -50,9 +48,7 @@ public class SunOrgJSON {
         for (Object oc : go.getJSONArray("coordinates")) {
             if (oc instanceof JSONArray coord) {
                 double c0 = coord.getDouble(0), c1 = coord.getDouble(1), c2 = coord.getDouble(2);
-                if (c0 < 1)
-                    Log.warn("Radius < 1: " + c0 + ' ' + c1 + ' ' + c2);
-                coords.add(SunJSONTypes.toCartesian(c0, Math.toRadians(c1), Math.toRadians(c2)));
+                coords.add(SunJSONTypes.convertCoord(c0, c1, c2));
             }
         }
 
@@ -61,11 +57,8 @@ public class SunOrgJSON {
         if (ca != null) {
             for (Object oc : ca) {
                 if (oc instanceof JSONArray color) {
-                    colors.add(Colors.bytes(
-                            MathUtils.clip(color.getInt(0), 0, 255),
-                            MathUtils.clip(color.getInt(1), 0, 255),
-                            MathUtils.clip(color.getInt(2), 0, 255),
-                            MathUtils.clip(color.getInt(3), 0, 255)));
+                    int c0 = color.getInt(0), c1 = color.getInt(1), c2 = color.getInt(2), c3 = color.getInt(3);
+                    colors.add(SunJSONTypes.convertColor(c0, c1, c2, c3));
                 }
             }
         }
