@@ -51,7 +51,10 @@ public class SunOrgJSON {
         List<Vec3> coords = new ArrayList<>();
         for (Object oc : go.getJSONArray("coordinates")) {
             if (oc instanceof JSONArray coord) {
-                coords.add(new Vec3(coord.getDouble(0), Math.toRadians(coord.getDouble(1)), Math.toRadians(coord.getDouble(2)))); // should check range
+                double c0 = coord.getDouble(0), c1 = coord.getDouble(1), c2 = coord.getDouble(2);
+                if (c0 < 1)
+                    Log.warn("Radius < 1: " + c0 + ' ' + c1 + ' ' + c2);
+                coords.add(SunJSONTypes.toCartesian(c0, Math.toRadians(c1), Math.toRadians(c2)));
             }
         }
 
