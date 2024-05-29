@@ -47,7 +47,6 @@ public class SunFastJSON {
         for (double[] c : jg.coordinates) {
             if (c.length != 3)
                 throw new IllegalArgumentException("Coordinate length not 3");
-            // should check range
             coords.add(new Vec3(c[0], Math.toRadians(c[1]), Math.toRadians(c[2]))); // should check range
         }
 
@@ -66,7 +65,6 @@ public class SunFastJSON {
         SunJSONTypes.adjustColorsSize(type, coords, colors);
 
         double thickness = MathUtils.clip(jg.thickness, 1e-5, 1e-1);
-
         SunJSONTypes.Geometry g = new SunJSONTypes.Geometry(type, coords, colors, thickness);
         return SunJSONTypes.getGeometryBuffer(g);
     }
