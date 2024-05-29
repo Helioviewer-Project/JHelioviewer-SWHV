@@ -47,7 +47,9 @@ public class SunFastJSON {
         for (double[] c : jg.coordinates) {
             if (c.length != 3)
                 throw new IllegalArgumentException("Coordinate length not 3");
-            coords.add(new Vec3(c[0], Math.toRadians(c[1]), Math.toRadians(c[2]))); // should check range
+            if (c[0] < 1)
+                Log.warn("Radius < 1: " + c[0] + ' ' + c[1] + ' ' + c[2]);
+            coords.add(SunJSONTypes.toCartesian(c[0], Math.toRadians(c[1]), Math.toRadians(c[2])));
         }
 
         List<byte[]> colors = new ArrayList<>(size);
