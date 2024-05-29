@@ -16,28 +16,31 @@ public class SunJSONTypes {
     public record GeometryCollection(JHVTime time, List<GeometryBuffer> bufList) {
         public void render(GL2 gl, GLSLLine lines, GLSLShape points, double aspect, double factor) {
             for (GeometryBuffer buf : bufList) {
-                if (buf.g.type == GeometryType.point) {
+                if (buf.type == BufType.point) {
                     points.setVertexRepeatable(gl, buf.vexBuf);
                     points.renderPoints(gl, factor);
                 } else {
                     lines.setVertexRepeatable(gl, buf.vexBuf);
-                    lines.renderLine(gl, aspect, buf.g.thickness * factor * 0.5e-2 /* TBD */);
+                    lines.renderLine(gl, aspect, buf.thickness * factor * 0.5e-2 /* TBD */);
                 }
             }
         }
     }
 
-    /**/enum GeometryType {point, line, ellipse}
+    /**/enum GeometryType {point, line, ellipse} // type in JSON
 
-    /**/record Geometry(GeometryType type, List<Vec3> coordinates, List<byte[]> colors, double thickness) {
+    /**/enum BufType {point, line} // type in BufVertex
+
+    private record Geometry(GeometryType type, List<Vec3> coordinates, List<byte[]> colors, double thickness) {
     }
 
-    /**/record GeometryBuffer(Geometry g, BufVertex vexBuf) {
+    /**/record GeometryBuffer(BufType type, double thickness, BufVertex vexBuf) {
     }
 
     /**/
-    static GeometryBuffer getGeometryBuffer(Geometry g) {
-        return new GeometryBuffer(g, getVertices(g));
+    static GeometryBuffer getGeometryBuffer(GeometryType type, List<Vec3> coordinates, List<byte[]> colors, double thickness) {
+        Geometry g = new Geometry(type, coordinates, colors, thickness);
+        return new GeometryBuffer(type == GeometryType.point ? BufType.point : BufType.line, thickness, getVertices(g));
     }
 
     /**/
