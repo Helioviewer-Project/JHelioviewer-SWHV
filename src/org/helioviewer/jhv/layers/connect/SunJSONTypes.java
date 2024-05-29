@@ -2,7 +2,9 @@ package org.helioviewer.jhv.layers.connect;
 
 import java.util.List;
 
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Colors;
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
@@ -27,10 +29,33 @@ public class SunJSONTypes {
         }
     }
 
-    /**/record GeometryBuffer(BufType type, double thickness, BufVertex vexBuf) {
+    /**/
+    record GeometryBuffer(BufType type, double thickness, BufVertex vexBuf) {
     }
 
-    /**/enum BufType {point, line} // type in BufVertex
+    /**/
+    enum BufType {point, line} // type in BufVertex
+
+    /**/
+    static Vec3 convertCoord(double r, double lon, double lat) {
+        if (r < 1)
+            Log.warn("Radius < 1: " + r + ' ' + lon + ' ' + lat);
+        lon = Math.toRadians(lon);
+        lat = Math.toRadians(lat);
+        return new Vec3(
+                r * Math.cos(lat) * Math.sin(lon),
+                r * Math.sin(lat),
+                r * Math.cos(lat) * Math.cos(lon));
+    }
+
+    /**/
+    static byte[] convertColor(int r, int g, int b, int a) {
+        return Colors.bytes(
+                MathUtils.clip(r, 0, 255),
+                MathUtils.clip(g, 0, 255),
+                MathUtils.clip(b, 0, 255),
+                MathUtils.clip(a, 0, 255));
+    }
 
     private enum GeometryType {point, line, ellipse} // type in JSON
 
@@ -83,14 +108,6 @@ public class SunJSONTypes {
             case line -> getVerticesLine(coordinates, colors);
             case ellipse -> getVerticesEllipse(coordinates, colors);
         };
-    }
-
-    /**/
-    static Vec3 toCartesian(double r, double lon, double lat) {
-        return new Vec3(
-                r * Math.cos(lat) * Math.sin(lon),
-                r * Math.sin(lat),
-                r * Math.cos(lat) * Math.cos(lon));
     }
 
     private static BufVertex getVerticesPoint(List<Vec3> coordinates, List<byte[]> colors, double thickness) {
