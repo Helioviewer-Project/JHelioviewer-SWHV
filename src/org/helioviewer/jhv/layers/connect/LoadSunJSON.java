@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.layers.connect;
 
+import java.io.BufferedInputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
@@ -9,11 +10,14 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.Message;
-import org.helioviewer.jhv.io.JSONUtils;
+//import org.helioviewer.jhv.io.JSONUtils;
+import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.json.JSONObject;
 
+//import com.google.common.base.Stopwatch;
+import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.FutureCallback;
 
 public class LoadSunJSON {
@@ -38,8 +42,9 @@ public class LoadSunJSON {
         @Override
         public List<SunJSONTypes.GeometryCollection> call() {
             return uriList.parallelStream().map(uri -> {
-                try {
-                    return SunOrgJSON.process(JSONUtils.get(uri));
+                try (NetClient nc = NetClient.of(uri); BufferedInputStream is = new BufferedInputStream(nc.getStream())) {
+                    // return SunOrgJSON.process(JSONUtils.get(uri));
+                    return SunFastJSON.process(is);
                 } catch (Exception e) {
                     Log.warn(uri.toString(), e);
                     return null;
@@ -51,7 +56,9 @@ public class LoadSunJSON {
     private record LoadSunJSONString(String json) implements Callable<List<SunJSONTypes.GeometryCollection>> {
         @Override
         public List<SunJSONTypes.GeometryCollection> call() {
-            //return List.of(SunOrgJSON.process(new JSONObject(json)));
+            // Stopwatch sw = Stopwatch.createStarted();
+            // System.out.println(">>> " + sw.elapsed().toNanos() / 1e9);
+            // return List.of(SunOrgJSON.process(new JSONObject(json)));
             return List.of(SunFastJSON.process(json));
         }
     }
@@ -64,7 +71,7 @@ public class LoadSunJSON {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log.error(t);
+            Log.error(Throwables.getStackTraceAsString(t));
             Message.err("An error occurred opening the remote file", t.getMessage());
         }
     }
