@@ -46,8 +46,6 @@ public class SunOrgJSON {
     }
 
     private static SunJSONTypes.GeometryBuffer createGeometry(JSONObject go) {
-        SunJSONTypes.GeometryType type = SunJSONTypes.GeometryType.valueOf(go.getString("type"));
-
         List<Vec3> coords = new ArrayList<>();
         for (Object oc : go.getJSONArray("coordinates")) {
             if (oc instanceof JSONArray coord) {
@@ -71,12 +69,9 @@ public class SunOrgJSON {
                 }
             }
         }
-        if (colors.isEmpty())
-            colors.add(Colors.Green);
-        SunJSONTypes.adjustColorsSize(type, coords, colors);
 
         double thickness = go.optDouble("thickness", 2 * GLSLLine.LINEWIDTH_BASIC);
-        return SunJSONTypes.getGeometryBuffer(type, coords, colors, thickness);
+        return SunJSONTypes.getGeometryBuffer(go.getString("type"), coords, colors, thickness);
     }
 
 }
