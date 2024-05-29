@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.layers.connect;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -15,25 +16,27 @@ import com.alibaba.fastjson2.JSON;
 public class SunFastJSON {
 
     static SunJSONTypes.GeometryCollection process(String string) {
-        return JSON.parseObject(string, JObject.class).jparse();
+        return parseInput(JSON.parseObject(string, JObject.class));
     }
 
-    private record JObject(String type, String time, List<JGeometry> geometry) {
-        SunJSONTypes.GeometryCollection jparse() {
-            if (!"SunJSON".equals(type))
-                throw new IllegalArgumentException("Unknown type: " + type);
+    static SunJSONTypes.GeometryCollection process(InputStream input) {
+        return parseInput(JSON.parseObject(input, JObject.class));
+    }
 
-            JHVTime jtime = new JHVTime(time);
-            List<SunJSONTypes.GeometryBuffer> gl = geometry.parallelStream().map(jg -> {
-                try {
-                    return createGeometry(jg);
-                } catch (Exception e) {
-                    Log.error(e);
-                    return null;
-                }
-            }).filter(Objects::nonNull).toList();
-            return new SunJSONTypes.GeometryCollection(jtime, gl);
-        }
+    private static SunJSONTypes.GeometryCollection parseInput(JObject jo) {
+        if (!"SunJSON".equals(jo.type))
+            throw new IllegalArgumentException("Unknown type: " + jo.type);
+
+        JHVTime time = new JHVTime(jo.time);
+        List<SunJSONTypes.GeometryBuffer> gl = jo.geometry.parallelStream().map(jg -> {
+            try {
+                return createGeometry(jg);
+            } catch (Exception e) {
+                Log.error(e);
+                return null;
+            }
+        }).filter(Objects::nonNull).toList();
+        return new SunJSONTypes.GeometryCollection(time, gl);
     }
 
     private static SunJSONTypes.GeometryBuffer createGeometry(JGeometry jg) {
@@ -66,6 +69,9 @@ public class SunFastJSON {
 
         SunJSONTypes.Geometry g = new SunJSONTypes.Geometry(type, coords, colors, thickness);
         return SunJSONTypes.getGeometryBuffer(g);
+    }
+
+    private record JObject(String type, String time, List<JGeometry> geometry) {
     }
 
     private record JGeometry(String type, List<double[]> coordinates, List<int[]> colors, double thickness) {

@@ -26,18 +26,18 @@ public class SunOrgJSON {
 
             JSONArray ga = jo.optJSONArray("geometry");
             if (ga instanceof JSONArray) {
-                return new SunJSONTypes.GeometryCollection(time, parseArray(ga));
+                return new SunJSONTypes.GeometryCollection(time, parseInput(ga));
             }
         }
         return new SunJSONTypes.GeometryCollection(time, Collections.emptyList());
     }
 
-    private static List<SunJSONTypes.GeometryBuffer> parseArray(JSONArray ga) {
+    private static List<SunJSONTypes.GeometryBuffer> parseInput(JSONArray ga) {
         return StreamSupport.stream(ga.spliterator(), true).map(og -> {
             if (!(og instanceof JSONObject go))
                 return null;
             try {
-                return parseGeometry(go);
+                return createGeometry(go);
             } catch (Exception e) {
                 Log.error(e);
                 return null;
@@ -45,7 +45,7 @@ public class SunOrgJSON {
         }).filter(Objects::nonNull).map(SunJSONTypes::getGeometryBuffer).toList();
     }
 
-    private static SunJSONTypes.Geometry parseGeometry(JSONObject go) {
+    private static SunJSONTypes.Geometry createGeometry(JSONObject go) {
         SunJSONTypes.GeometryType type = SunJSONTypes.GeometryType.valueOf(go.getString("type"));
 
         List<Vec3> coords = new ArrayList<>();
