@@ -80,24 +80,22 @@ public class SunJSONTypes {
         };
     }
 
-    private static void toCartesian(Vec3 v, double r, double lon, double lat) {
-        v.x = r * Math.cos(lat) * Math.sin(lon);
-        v.y = r * Math.sin(lat);
-        v.z = r * Math.cos(lat) * Math.cos(lon);
+    /**/
+    static Vec3 toCartesian(double r, double lon, double lat) {
+        return new Vec3(
+                r * Math.cos(lat) * Math.sin(lon),
+                r * Math.sin(lat),
+                r * Math.cos(lat) * Math.cos(lon));
     }
 
     private static BufVertex getVerticesPoint(Geometry g) {
         int num = g.coordinates.size();
         BufVertex buf = new BufVertex(num * GLSLShape.stride);
 
-        Vec3 v = new Vec3();
         float pointSize = (float) (2 * g.thickness);
         for (int i = 0; i < num; i++) {
-            Vec3 coord = g.coordinates.get(i);
-            if (coord.x > 1) {
-                toCartesian(v, coord.x, coord.y, coord.z);
-                buf.putVertex((float) v.x, (float) v.y, (float) v.z, pointSize, g.colors.get(i));
-            }
+            Vec3 v = g.coordinates.get(i);
+            buf.putVertex((float) v.x, (float) v.y, (float) v.z, pointSize, g.colors.get(i));
         }
         return buf;
     }
@@ -106,26 +104,13 @@ public class SunJSONTypes {
         int num = g.coordinates.size();
         BufVertex buf = new BufVertex((num + 2) * GLSLLine.stride);
 
-        Vec3 v = new Vec3();
-        boolean broken = false;
-        for (int i = 0; i < num; i++) {
-            Vec3 coord = g.coordinates.get(i);
-            toCartesian(v, coord.x, coord.y, coord.z);
-            if (i == 0)
-                buf.putVertex(v, Colors.Null);
-            if (coord.x <= 1) {
-                buf.repeatVertex(Colors.Null);
-                broken = true;
-            } else {
-                if (broken) {
-                    buf.putVertex(v, Colors.Null);
-                    broken = false;
-                }
-                buf.putVertex(v, g.colors.get(i));
-            }
-            if (i == num - 1)
-                buf.repeatVertex(Colors.Null);
+        Vec3 v = g.coordinates.get(0);
+        buf.putVertex(v, Colors.Null);
+        buf.repeatVertex(g.colors.get(0));
+        for (int i = 1; i < num; i++) {
+            buf.putVertex(g.coordinates.get(i), g.colors.get(i));
         }
+        buf.repeatVertex(Colors.Null);
         return buf;
     }
 
@@ -135,17 +120,14 @@ public class SunJSONTypes {
         BufVertex buf = new BufVertex((SUBDIVISIONS + 1 + 2) * GLSLLine.stride);
 
         Vec3 c = g.coordinates.get(0);
-        toCartesian(c, c.x, c.y, c.z);
         Vec3 u = g.coordinates.get(1);
-        toCartesian(u, u.x, u.y, u.z);
         Vec3 v = g.coordinates.get(2);
-        toCartesian(v, v.x, v.y, v.z);
         byte[] color = g.colors.get(0);
 
         u.minus(c);
         v.minus(c);
-        for (int j = 0; j <= SUBDIVISIONS; j++) {
-            double a = 2 * Math.PI * j / SUBDIVISIONS;
+        for (int i = 0; i <= SUBDIVISIONS; i++) {
+            double a = 2 * Math.PI * i / SUBDIVISIONS;
             double cost = Math.cos(a);
             double sint = Math.sin(a);
 
@@ -153,17 +135,11 @@ public class SunJSONTypes {
             double y = c.y + cost * u.y + sint * v.y;
             double z = c.z + cost * u.z + sint * v.z;
 
-            if (Math.sqrt(x * x + y * y + z * z) < 1) {
-                buf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
-                continue;
-            }
-
-            if (j == 0)
+            if (i == 0)
                 buf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
             buf.putVertex((float) x, (float) y, (float) z, 1, color);
-            if (j == SUBDIVISIONS)
-                buf.repeatVertex(Colors.Null);
         }
+        buf.repeatVertex(Colors.Null);
         return buf;
     }
 
