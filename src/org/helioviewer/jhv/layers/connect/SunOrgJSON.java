@@ -42,10 +42,10 @@ public class SunOrgJSON {
                 Log.error(e);
                 return null;
             }
-        }).filter(Objects::nonNull).map(SunJSONTypes::getGeometryBuffer).toList();
+        }).filter(Objects::nonNull).toList();
     }
 
-    private static SunJSONTypes.Geometry createGeometry(JSONObject go) {
+    private static SunJSONTypes.GeometryBuffer createGeometry(JSONObject go) {
         SunJSONTypes.GeometryType type = SunJSONTypes.GeometryType.valueOf(go.getString("type"));
 
         List<Vec3> coords = new ArrayList<>();
@@ -76,7 +76,7 @@ public class SunOrgJSON {
         SunJSONTypes.adjustColorsSize(type, coords, colors);
 
         double thickness = go.optDouble("thickness", 2 * GLSLLine.LINEWIDTH_BASIC);
-        return new SunJSONTypes.Geometry(type, coords, colors, thickness);
+        return SunJSONTypes.getGeometryBuffer(type, coords, colors, thickness);
     }
 
 }
