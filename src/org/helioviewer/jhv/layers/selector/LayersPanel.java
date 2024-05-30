@@ -42,7 +42,7 @@ public final class LayersPanel extends JPanel {
     private static final int REMOVE_COL = 4;
 
     public static final int NUMBER_COLUMNS = 5;
-    private static final int NUMBEROFVISIBLEROWS = 8;
+    private static final int NUMBEROFVISIBLEROWS = 9;
 
     private final LayersTable grid;
     private final JPanel optionsPanelWrapper;
