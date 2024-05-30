@@ -32,10 +32,10 @@ public class SunJSONTypes {
             List<BufVertex> pointsList = new ArrayList<>();
             ArrayListMultimap<Double, BufVertex> linesWidths = ArrayListMultimap.create();
             for (GeometryBuffer buf : bufList) {
-                if (buf.type == BufType.point) { // points together in list
-                    pointsList.add(buf.vexBuf);
-                } else { // lines separated in lists per thickness
+                if (buf.type == BufType.line) { // lines separated into lists per thickness
                     linesWidths.put(buf.thickness, buf.vexBuf);
+                } else { // points together in list
+                    pointsList.add(buf.vexBuf);
                 }
             }
             Multimaps.asMap(linesWidths).forEach((w, l) -> linesMap.put(w, BufVertex.join(l)));
@@ -185,7 +185,6 @@ public class SunJSONTypes {
             double x = c.x + cost * u.x + sint * v.x;
             double y = c.y + cost * u.y + sint * v.y;
             double z = c.z + cost * u.z + sint * v.z;
-
             if (i == 0)
                 buf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
             buf.putVertex((float) x, (float) y, (float) z, 1, color);
