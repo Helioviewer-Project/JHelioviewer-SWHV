@@ -11,8 +11,8 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.UITimer;
+import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 
