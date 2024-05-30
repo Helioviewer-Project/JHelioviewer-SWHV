@@ -192,9 +192,8 @@ public final class LayersPanel extends JPanel {
             }
         });
 
-        String timeCopy = "copy time";
-        grid.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_C, UIGlobals.menuShortcutMask), timeCopy);
-        grid.getActionMap().put(timeCopy, new AbstractAction() {
+        grid.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_C, UIGlobals.menuShortcutMask, false), "copy_time");
+        grid.getActionMap().put("copy_time", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (model.getValueAt(grid.getSelectedRow(), 0) instanceof Layer layer) {
