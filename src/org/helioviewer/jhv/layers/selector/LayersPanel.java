@@ -6,11 +6,15 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.DropMode;
+import javax.swing.KeyStroke;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -21,6 +25,7 @@ import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.Interfaces;
+import org.helioviewer.jhv.gui.JHVTransferHandler;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.base.TableValue;
@@ -175,7 +180,6 @@ public final class LayersPanel extends JPanel {
                 }
             }
         });
-
         grid.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
@@ -184,6 +188,19 @@ public final class LayersPanel extends JPanel {
                     grid.setCursor(UIGlobals.openHandCursor);
                 } else {
                     grid.setCursor(Cursor.getDefaultCursor());
+                }
+            }
+        });
+
+        String timeCopy = "copy time";
+        grid.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_C, UIGlobals.menuShortcutMask), timeCopy);
+        grid.getActionMap().put(timeCopy, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (model.getValueAt(grid.getSelectedRow(), 0) instanceof Layer layer) {
+                    String timeString = layer.getTimeString();
+                    if (timeString != null)
+                        JHVTransferHandler.getInstance().toClipboard(timeString);
                 }
             }
         });
