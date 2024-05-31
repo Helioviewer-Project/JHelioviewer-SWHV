@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.swek;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -10,6 +9,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
+import javax.swing.JPanel;
 
 import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.events.JHVEventListener;
@@ -131,7 +131,7 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
 
     @Nullable
     @Override
-    public Component getOptionsPanel() {
+    public JPanel getOptionsPanel() {
         return null;
     }
 

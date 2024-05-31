@@ -1,13 +1,14 @@
 package org.helioviewer.jhv.timelines.band;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.GOESLevel;
@@ -167,7 +168,7 @@ public final class Band extends AbstractTimelineLayer {
     }
 
     @Override
-    public Component getOptionsPanel() {
+    public JPanel getOptionsPanel() {
         return optionsPanel;
     }
 
