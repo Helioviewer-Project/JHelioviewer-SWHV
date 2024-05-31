@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.timelines.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -185,7 +184,7 @@ public final class TimelinePanel extends JPanel {
 
     private void setOptionsPanel(TimelineLayer timeline) {
         optionsPanelWrapper.removeAll();
-        Component optionsPanel = timeline == null ? null : timeline.getOptionsPanel();
+        JPanel optionsPanel = timeline == null ? null : timeline.getOptionsPanel();
         if (optionsPanel != null) {
             ComponentUtils.setEnabled(optionsPanel, timeline.isEnabled());
             optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);

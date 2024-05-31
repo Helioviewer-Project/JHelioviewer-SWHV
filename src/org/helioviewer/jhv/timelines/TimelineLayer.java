@@ -1,12 +1,12 @@
 package org.helioviewer.jhv.timelines;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 
 import javax.annotation.Nullable;
+import javax.swing.JPanel;
 
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
@@ -31,7 +31,7 @@ public interface TimelineLayer {
     boolean hasData();
 
     @Nullable
-    Component getOptionsPanel();
+    JPanel getOptionsPanel();
 
     boolean isDeletable();
 

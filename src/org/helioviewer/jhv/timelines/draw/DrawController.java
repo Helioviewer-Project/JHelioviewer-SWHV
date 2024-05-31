@@ -1,12 +1,12 @@
 package org.helioviewer.jhv.timelines.draw;
 
-import java.awt.Component;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
+import javax.swing.JPanel;
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.events.JHVEventListener;
@@ -92,7 +92,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
         optionsPanel.setLocked(jo.optBoolean("locked", false));
     }
 
-    public static Component getOptionsPanel() {
+    public static JPanel getOptionsPanel() {
         return optionsPanel;
     }
 

@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.timelines.radio;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -207,7 +206,7 @@ public final class RadioData extends AbstractTimelineLayer {
     }
 
     @Override
-    public Component getOptionsPanel() {
+    public JPanel getOptionsPanel() {
         return optionsPanel;
     }
 
