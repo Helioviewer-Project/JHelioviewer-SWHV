@@ -6,21 +6,20 @@ layout(location = 2) in vec4 NextVertex;
 layout(location = 3) in vec4 NextColor;
 out vec4 fragColor;
 
+uniform mat4 ModelViewProjectionMatrix;
 uniform float iaspect;
 uniform float thickness;
-
-uniform mat4 ModelViewProjectionMatrix;
 
 const float[] dir = float[](1, -1);
 vec4[2] pos, col;
 
-// https://forums.developer.apple.com/thread/86098
+// https://developer.apple.com/forums/thread/86098
 void main(void) {
-    if (Vertex == NextVertex) {
+/*  if (Vertex == NextVertex) {
         gl_Position = ModelViewProjectionMatrix * Vertex;
         fragColor = Color;
         return;
-    }
+    } */
 
     vec4 curr = ModelViewProjectionMatrix * Vertex;
     vec4 next = ModelViewProjectionMatrix * NextVertex;
