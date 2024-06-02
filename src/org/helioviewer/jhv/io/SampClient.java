@@ -36,21 +36,21 @@ public class SampClient extends HubConnector {
         Logger.getLogger("org.astrogrid.samp").setLevel(Level.WARNING); // shut-up SAMP info logs
     }
 
-    private static final String MTYPE_VIEW_DATA = "jhv.vso.load";
-    private static final boolean startHub = Boolean.parseBoolean(Settings.getProperty("startup.sampHub"));
-    private static final SampClient instance = new SampClient(DefaultClientProfile.getProfile());
+    private static SampClient instance; // keep instance built at startup
 
     public static void init() {
-        if (startHub) {
-            new Thread(() -> {
+        new Thread(() -> {
+            if (Boolean.parseBoolean(Settings.getProperty("startup.sampHub"))) {
                 try {
-                    if (Hub.getRunningHubs().length == 0)
+                    if (Hub.getRunningHubs().length == 0) {
                         Hub.runHub(HubServiceMode.NO_GUI);
+                    }
                 } catch (Exception e) {
                     Log.warn(e);
                 }
-            }).start();
-        }
+            }
+            instance = new SampClient(DefaultClientProfile.getProfile());
+        }).start();
     }
 
     private static URI toURI(String url) throws Exception {
@@ -178,7 +178,7 @@ public class SampClient extends HubConnector {
     }
 
     public static void notifyRequestData() {
-        Message msg = new Message(MTYPE_VIEW_DATA);
+        Message msg = new Message("jhv.vso.load");
         ImageLayers.getSAMPMessage(msg);
         try {
             HubConnection c = instance.getConnection();

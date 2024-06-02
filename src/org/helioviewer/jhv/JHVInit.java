@@ -11,7 +11,9 @@ import java.util.Set;
 import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.FileUtils;
+import org.helioviewer.jhv.io.LocationChecker;
 import org.helioviewer.jhv.io.ProxySettings;
+import org.helioviewer.jhv.io.SampClient;
 import org.helioviewer.jhv.metadata.AIAResponse;
 import org.helioviewer.jhv.view.j2k.KakaduMessageSystem;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
@@ -43,6 +45,10 @@ class JHVInit {
         } catch (Exception e) {
             Log.error("AIA response map load error", e);
         }
+
+        LocationChecker.setProximityServer();
+        SampClient.init();
+        ExitHooks.attach();
 
         FitsFactory.setUseHierarch(true);
         FitsFactory.setLongStringsEnabled(true);

@@ -15,8 +15,6 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
-import org.helioviewer.jhv.io.LocationChecker;
-import org.helioviewer.jhv.io.SampClient;
 import org.helioviewer.jhv.io.UpdateChecker;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.plugins.PluginManager;
@@ -70,12 +68,9 @@ public class JHelioviewer {
         // Save command line arguments
         CommandLine.setArguments(args);
 
-        LocationChecker.setProximityServer();
         EventQueue.invokeLater(() -> {
-            UIGlobals.setLaf();
-
             Log.info("Start main window");
-            ExitHooks.attach();
+            UIGlobals.setLaf();
             JFrame frame = JHVFrame.prepare();
 
             try {
@@ -103,7 +98,6 @@ public class JHelioviewer {
 
             DataSources.loadSources();
             CommandLine.load();
-            SampClient.init();
 
             UpdateChecker.check(false);
         });
