@@ -216,7 +216,8 @@ public class HapiReader {
                 .set(version.getStopRequestParam(), stop);
         String uri = baseUrl + request.expand("");
 
-        try (NetClient nc = NetClient.of(new URI(uri)); BufferedInputStream is = new BufferedInputStream(nc.getStream())) {
+        try (NetClient nc = NetClient.of(new URI(uri), false, NetClient.NetCache.NETWORK);
+             BufferedInputStream is = new BufferedInputStream(nc.getStream())) {
             RowSequence sequence = parameter.reader.hapiReader.createRowSequence(is, null, hapiFormat);
 
             ArrayList<Long> dateList = new ArrayList<>();
