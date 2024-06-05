@@ -23,6 +23,11 @@ import nom.tam.fits.FitsFactory;
 class JHVInit {
 
     static void init() {
+        ProxySettings.init();
+        LocationChecker.setProximityServer();
+        SampClient.init();
+        ExitHooks.attach();
+
         try {
             loadLibs();
             KakaduMessageSystem.startKduMessageSystem();
@@ -32,24 +37,16 @@ class JHVInit {
             Message.fatalErr("Failed to setup native libraries:\n" + e.getMessage());
             return;
         }
-
         try {
             JPIPCacheManager.init();
         } catch (Exception e) {
             Log.error("JPIP cache initialization error", e);
         }
-
-        ProxySettings.init();
         try {
             AIAResponse.load();
         } catch (Exception e) {
             Log.error("AIA response map load error", e);
         }
-
-        LocationChecker.setProximityServer();
-        SampClient.init();
-        ExitHooks.attach();
-
         FitsFactory.setUseHierarch(true);
         FitsFactory.setLongStringsEnabled(true);
     }
@@ -97,12 +94,14 @@ class JHVInit {
     private static void loadKernels() throws Exception {
         List<String> kernels = List.of(
                 "de432s_reduced.bsp",
+                "ahead_2009_050_definitive_predict.epm.bsp",
                 "ahead_2017_061_5295day_predict.epm.bsp",
-                "solo_ANC_soc-orbit-stp_20200210-20301120_310_V1_00348_V01.bsp",
+                "solo_ANC_soc-orbit-stp_20200210-20301120_314_V1_00352_V01.bsp",
                 "naif0012.tls",
                 "pck00011.tpc",
                 "solo_ANC_soc-ops-fk_V02.tf",
-                "solo_ANC_soc-sci-fk_V08.tf");
+                "solo_ANC_soc-sci-fk_V08.tf",
+                "jhv.tf");
 
         kernels.parallelStream().forEach(k -> {
             try (InputStream in = FileUtils.getResource("/kernels/" + k)) {
