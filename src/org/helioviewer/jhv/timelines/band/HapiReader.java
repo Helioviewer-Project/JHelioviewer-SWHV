@@ -19,13 +19,13 @@ import org.helioviewer.jhv.io.UriTemplate;
 import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
-import org.helioviewer.jhv.timelines.band.hapi.JhvHapiTableReader;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import uk.ac.starlink.hapi.HapiInfo;
 import uk.ac.starlink.hapi.HapiParam;
+import uk.ac.starlink.hapi.HapiTableReader;
 import uk.ac.starlink.hapi.HapiVersion;
 import uk.ac.starlink.hapi.Times;
 import uk.ac.starlink.table.RowSequence;
@@ -57,7 +57,7 @@ public class HapiReader {
     private record BandParameter(BandReader reader, long start, long stop) {
     }
 
-    private record BandReader(BandType type, JhvHapiTableReader hapiReader) {
+    private record BandReader(BandType type, HapiTableReader tableReader) {
     }
 
     private record Parameter(String name, String units, String scale, JSONArray range) {
@@ -168,7 +168,7 @@ public class HapiReader {
                     put("label", title + ' ' + p.name);
 
             typeParams[1] = params[i];
-            readers.add(new BandReader(new BandType(jobt), new JhvHapiTableReader(typeParams)));
+            readers.add(new BandReader(new BandType(jobt), new HapiTableReader(typeParams)));
         }
 
         return new Dataset(id, readers, start, stop);
@@ -218,7 +218,7 @@ public class HapiReader {
 
         try (NetClient nc = NetClient.of(new URI(uri), false, NetClient.NetCache.NETWORK);
              BufferedInputStream is = new BufferedInputStream(nc.getStream())) {
-            RowSequence sequence = parameter.reader.hapiReader.createRowSequence(is, null, hapiFormat);
+            RowSequence sequence = parameter.reader.tableReader.createRowSequence(is, null, hapiFormat);
 
             ArrayList<Long> dateList = new ArrayList<>();
             ArrayList<Float> valueList = new ArrayList<>();
