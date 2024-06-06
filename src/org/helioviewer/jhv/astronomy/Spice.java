@@ -92,6 +92,48 @@ public class Spice {
         return null;
     }
 
+// Stars
+
+    private static final double[] zaxis = new double[]{0.12235349347232778, -0.42307208364764326, 0.8977971010607901}; // (0,0,1) of IAU_SUN in J2000
+
+    @Nullable
+    public static double[][] twovecSun(String target, JHVTime time) {
+        try {
+            double et = milli2et(time.milli);
+
+            double[] xaxis = new double[3];
+            CSPICE.spkpos(target, et, "J2000", "NONE", "SUN", xaxis, lightTimeUnused);
+            return CSPICE.twovec(xaxis, 1, zaxis, 3);
+        } catch (Exception e) {
+            Log.error(e);
+        }
+        return null;
+    }
+
+    @Nullable
+    public static double[] radRotate(double ra, double dec, double[][] m) {
+        try {
+            return CSPICE.reclat(CSPICE.mxv(m, CSPICE.radrec(1, ra, dec)));
+        } catch (Exception e) {
+            Log.error(e);
+        }
+        return null;
+    }
+
+    @Nullable
+    public static double[] posRad(String observer, String target, JHVTime time, double[][] m) {
+        try {
+            double[] v = new double[3];
+            positionRectangular(target, time.milli, "J2000", observer, v);
+            return CSPICE.reclat(CSPICE.mxv(m, v));
+        } catch (Exception e) {
+            Log.error(e);
+        }
+        return null;
+    }
+
+// Stars
+
     private static double milli2et(long milli) throws SpiceErrorException {
         double sec = (milli - TimeUtils.J2000.milli) / 1000.;
         return sec + CSPICE.deltet(sec, "UTC");
