@@ -100,8 +100,7 @@ class JHVInit {
                 "naif0012.tls",
                 "pck00011.tpc",
                 "solo_ANC_soc-ops-fk_V02.tf",
-                "solo_ANC_soc-sci-fk_V08.tf",
-                "jhv.tf");
+                "solo_ANC_soc-sci-fk_V08.tf");
 
         kernels.parallelStream().forEach(k -> {
             try (InputStream in = FileUtils.getResource("/kernels/" + k)) {
