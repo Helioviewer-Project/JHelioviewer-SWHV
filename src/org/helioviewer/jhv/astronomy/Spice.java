@@ -94,7 +94,7 @@ public class Spice {
 
 // Stars
 
-    private static final double[] zaxis = new double[]{0.12235349347232778, -0.42307208364764326, 0.8977971010607901}; // (0,0,1) of IAU_SUN in J2000
+    private static final double[] zaxis = new double[]{0x1.f528efd03d6ddp-4, -0x1.b139ceec78046p-2, 0x1.cbac0fc6ffd8cp-1}; // IAU_SUN (0,0,1) in J2000
 
     @Nullable
     public static double[][] twovecSun(String target, JHVTime time) {
@@ -103,6 +103,12 @@ public class Spice {
 
             double[] xaxis = new double[3];
             CSPICE.spkpos(target, et, "J2000", "NONE", "SUN", xaxis, lightTimeUnused);
+/*
+            double[] zz = new double[]{0,0,1};
+            double[][] m = CSPICE.pxform("IAU_SUN", "J2000", et);
+            double[] zzz = CSPICE.mxv(m, zz);
+            System.out.println(">>> " + String.format("%a ,%a, %a", zzz[0], zzz[1], zzz[2]));
+*/
             return CSPICE.twovec(xaxis, 1, zaxis, 3);
         } catch (Exception e) {
             Log.error(e);
@@ -113,7 +119,7 @@ public class Spice {
     @Nullable
     public static double[] radRotate(double ra, double dec, double[][] m) {
         try {
-            return CSPICE.reclat(CSPICE.mxv(m, CSPICE.radrec(1, ra, dec)));
+            return CSPICE.recrad(CSPICE.mxv(m, CSPICE.radrec(1, ra, dec)));
         } catch (Exception e) {
             Log.error(e);
         }
@@ -125,7 +131,7 @@ public class Spice {
         try {
             double[] v = new double[3];
             positionRectangular(target, time.milli, "J2000", observer, v);
-            return CSPICE.reclat(CSPICE.mxv(m, v));
+            return CSPICE.recrad(CSPICE.mxv(m, v));
         } catch (Exception e) {
             Log.error(e);
         }

@@ -13,7 +13,6 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
-import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.time.JHVTime;
 import org.json.JSONObject;
@@ -176,8 +175,8 @@ private static final Vec3[] coords_2021 = new Vec3[]{
         for (int i = 0; i < num; i++) {
             double ra  = Math.toRadians(coords[i].x);
             double dec = Math.toRadians(coords[i].y);
-            double[] a = Spice.radRotate(ra, dec, mat);
 
+            double[] a = Spice.radRotate(ra, dec, mat);
             a[1] = Math.tan(a[1]);
             a[2] = Math.tan(a[2]);
             ret[i] = a;
