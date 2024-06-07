@@ -42,7 +42,7 @@ public class Spice {
             int i = 0;
             double[] v = new double[3];
             for (long milli = start; milli <= end; milli += dt) {
-                positionRectangular(target, milli, frame, observer, v);
+                positionRec(target, milli, frame, observer, v);
                 ret[i++] = new Position.Cartesian(milli, v[0], v[1], v[2]);
             }
             //System.out.println((sw.elapsed().toNanos() / 1e9));
@@ -56,7 +56,7 @@ public class Spice {
     @Nullable
     static Position getPositionLatitudinal(String observer, String target, String frame, JHVTime time) {
         try {
-            double[] c = positionLatitudinal(target, time.milli, frame, observer);
+            double[] c = positionLat(target, time.milli, frame, observer);
             return new Position(time, c[0], c[1], c[2]);
         } catch (SpiceErrorException e) {
             Log.error(e);
@@ -65,14 +65,10 @@ public class Spice {
     }
 
     @Nullable
-    public static Position getCarrington(String observer, String target, JHVTime time) {
+    public static Position getCarrington(String target, JHVTime time) {
         try {
-            double[] c = positionLatitudinal(target, time.milli, "SOLO_IAU_SUN_2009", observer);
-            // like in SSW.getEarthSSW
-            double lon = c[1];
-            if (lon < 0)
-                lon += 2 * Math.PI;
-            return new Position(time, c[0], -lon, c[2]);
+            double[] c = positionRad(target, time.milli, "SOLO_IAU_SUN_2009", "SUN");
+            return new Position(time, c[0], -c[1], c[2]);
         } catch (Exception e) {
             Log.error(e);
         }
@@ -92,7 +88,7 @@ public class Spice {
         return null;
     }
 
-// Stars
+// Stars start
 
     private static final double[] zaxis = new double[]{0x1.f528efd03d6ddp-4, -0x1.b139ceec78046p-2, 0x1.cbac0fc6ffd8cp-1}; // IAU_SUN (0,0,1) in J2000
 
@@ -119,7 +115,7 @@ public class Spice {
     @Nullable
     public static double[] radRotate(double ra, double dec, double[][] m) {
         try {
-            return CSPICE.recrad(CSPICE.mxv(m, CSPICE.radrec(1, ra, dec)));
+            return rotate2Rad(m, CSPICE.radrec(1, ra, dec));
         } catch (Exception e) {
             Log.error(e);
         }
@@ -130,15 +126,19 @@ public class Spice {
     public static double[] posRad(String observer, String target, JHVTime time, double[][] m) {
         try {
             double[] v = new double[3];
-            positionRectangular(target, time.milli, "J2000", observer, v);
-            return CSPICE.recrad(CSPICE.mxv(m, v));
+            positionRec(target, time.milli, "J2000", observer, v);
+            return rotate2Rad(m, v);
         } catch (Exception e) {
             Log.error(e);
         }
         return null;
     }
 
-// Stars
+    private static double[] rotate2Rad(double[][] m, double[] v) throws SpiceErrorException {
+        return CSPICE.recrad(CSPICE.mxv(m, v));
+    }
+
+// Stars end
 
     private static double milli2et(long milli) throws SpiceErrorException {
         double sec = (milli - TimeUtils.J2000.milli) / 1000.;
@@ -152,7 +152,7 @@ public class Spice {
 
     private static final double[] lightTimeUnused = new double[1];
 
-    private static void positionRectangular(String target, long milli, String frame, String observer, double[] result) throws SpiceErrorException {
+    private static void positionRec(String target, long milli, String frame, String observer, double[] result) throws SpiceErrorException {
         double et = milli2et(milli);
         CSPICE.spkpos(target, et, frame, "NONE", observer, result, lightTimeUnused);
         result[0] *= Sun.RadiusKMeterInv;
@@ -160,10 +160,16 @@ public class Spice {
         result[2] *= Sun.RadiusKMeterInv;
     }
 
-    private static double[] positionLatitudinal(String target, long milli, String frame, String observer) throws SpiceErrorException {
+    private static double[] positionLat(String target, long milli, String frame, String observer) throws SpiceErrorException {
         double[] v = new double[3];
-        positionRectangular(target, milli, frame, observer, v);
+        positionRec(target, milli, frame, observer, v);
         return CSPICE.reclat(v);
+    }
+
+    private static double[] positionRad(String target, long milli, String frame, String observer) throws SpiceErrorException {
+        double[] v = new double[3];
+        positionRec(target, milli, frame, observer, v);
+        return CSPICE.recrad(v);
     }
 
 }

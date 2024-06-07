@@ -150,7 +150,7 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
             return;
 
         JHVTime time = camera.getViewpoint().time;
-        Position obsPosition = Spice.getCarrington("SUN", observer, time);
+        Position obsPosition = Spice.getCarrington(observer, time);
         if (obsPosition == null)
             return;
 
