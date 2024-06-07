@@ -4,7 +4,6 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
-import javax.annotation.Nullable;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -119,12 +118,6 @@ public class TimestampLayer extends AbstractLayer {
     @Override
     public String getName() {
         return "Timestamp";
-    }
-
-    @Nullable
-    @Override
-    public String getTimeString() {
-        return null;
     }
 
     @Override

@@ -7,7 +7,6 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Objects;
 
-import javax.annotation.Nullable;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
@@ -316,12 +315,6 @@ public final class GridLayer extends AbstractLayer {
     @Override
     public String getName() {
         return "Grid";
-    }
-
-    @Nullable
-    @Override
-    public String getTimeString() {
-        return null;
     }
 
     @SuppressWarnings("serial")

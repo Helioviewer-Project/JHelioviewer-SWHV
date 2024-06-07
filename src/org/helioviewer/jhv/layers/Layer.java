@@ -47,7 +47,9 @@ public interface Layer {
     void setVisible(int idx);
 
     @Nullable
-    String getTimeString();
+    default String getTimeString() {
+        return null;
+    }
 
     default boolean isDeletable() {
         return false;

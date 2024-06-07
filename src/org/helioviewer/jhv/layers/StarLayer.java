@@ -2,8 +2,6 @@ package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
 
-import javax.annotation.Nullable;
-
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.base.Colors;
@@ -234,12 +232,6 @@ private static final Vec3[] coords_2021 = new Vec3[]{
     @Override
     public String getName() {
         return "Stars";
-    }
-
-    @Nullable
-    @Override
-    public String getTimeString() {
-        return null;
     }
 
 }

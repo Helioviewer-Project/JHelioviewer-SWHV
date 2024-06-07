@@ -8,8 +8,6 @@ import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import javax.annotation.Nullable;
-
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
@@ -74,12 +72,6 @@ public final class MiniviewLayer extends AbstractLayer {
     @Override
     public String getName() {
         return "Miniview";
-    }
-
-    @Nullable
-    @Override
-    public String getTimeString() {
-        return null;
     }
 
     @Override
