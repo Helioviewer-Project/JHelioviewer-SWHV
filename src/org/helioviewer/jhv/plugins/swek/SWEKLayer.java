@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 
-import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -454,12 +453,6 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             Movie.removeTimeListener(controller);
             Movie.removeTimeRangeListener(this);
         }
-    }
-
-    @Nullable
-    @Override
-    public String getTimeString() {
-        return null;
     }
 
     @Override

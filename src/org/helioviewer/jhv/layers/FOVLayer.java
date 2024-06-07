@@ -2,8 +2,6 @@ package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
 
-import javax.annotation.Nullable;
-
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.fov.FOVTreePane;
@@ -54,12 +52,6 @@ public class FOVLayer extends AbstractLayer {
     @Override
     public String getName() {
         return "FOV";
-    }
-
-    @Nullable
-    @Override
-    public String getTimeString() {
-        return null;
     }
 
 }
