@@ -25,7 +25,7 @@ import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-class InteractionAnnotate implements InteractionType {
+class InteractionAnnotate implements Interaction.Type {
 
     private final Camera camera;
     private final ArrayList<Annotateable> anns = new ArrayList<>();
@@ -135,7 +135,6 @@ class InteractionAnnotate implements InteractionType {
     @Override
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode();
-
         if (code == KeyEvent.VK_BACK_SPACE || code == KeyEvent.VK_DELETE) {
             remove();
             MovieDisplay.display();

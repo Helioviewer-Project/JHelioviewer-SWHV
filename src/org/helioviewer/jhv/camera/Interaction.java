@@ -51,6 +51,18 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
         }
     }
 
+    interface Type {
+        void mousePressed(MouseEvent e);
+
+        void mouseDragged(MouseEvent e);
+
+        default void mouseReleased(MouseEvent e) {
+        }
+
+        default void keyPressed(KeyEvent e) {
+        }
+    }
+
     private final Camera camera;
     private final InteractionAnnotate interactionAnnotate;
     private final InteractionAxis interactionAxis;
@@ -89,7 +101,7 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
         return annotationMode;
     }
 
-    private InteractionType getInteractionType() {
+    private Type getType() {
         if (annotate)
             return interactionAnnotate;
         return switch (mode) {
@@ -106,12 +118,12 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        getInteractionType().mouseDragged(e);
+        getType().mouseDragged(e);
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        getInteractionType().mouseReleased(e);
+        getType().mouseReleased(e);
         annotate = false;
     }
 
@@ -139,7 +151,7 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
         if (e.isShiftDown()) {
             annotate = true;
         }
-        getInteractionType().mousePressed(e);
+        getType().mousePressed(e);
     }
 
     @Override
@@ -147,7 +159,7 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
         if (e.isShiftDown()) {
             annotate = true;
         }
-        getInteractionType().keyPressed(e);
+        getType().keyPressed(e);
     }
 
     @Override
