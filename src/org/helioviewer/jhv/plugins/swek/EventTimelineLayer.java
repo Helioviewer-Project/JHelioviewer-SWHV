@@ -218,14 +218,6 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
     }
 
     @Override
-    public void zoomToFitAxis() {
-    }
-
-    @Override
-    public void resetAxis() {
-    }
-
-    @Override
     public boolean highLightChanged(Point p) {
         if (!enabled)
             return false;
