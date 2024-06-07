@@ -70,7 +70,6 @@ public record PositionLoad(Interfaces.StatusReceiver receiver, SpaceObject targe
     }
 
     private record Callback(Interfaces.StatusReceiver receiver) implements FutureCallback<PositionResponse> {
-
         @Override
         public void onSuccess(PositionResponse result) {
             receiver.setStatus("Loaded");
@@ -81,7 +80,6 @@ public record PositionLoad(Interfaces.StatusReceiver receiver, SpaceObject targe
             if (!JHVThread.isInterrupted(t))
                 receiver.setStatus(t.getMessage());
         }
-
     }
 
     private void stop() {
