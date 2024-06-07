@@ -10,10 +10,9 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 
+//import com.google.common.base.Stopwatch;
 import spice.basic.CSPICE;
 import spice.basic.SpiceErrorException;
-
-//import com.google.common.base.Stopwatch;
 
 public class Spice {
 
@@ -42,7 +41,7 @@ public class Spice {
             int i = 0;
             double[] v = new double[3];
             for (long milli = start; milli <= end; milli += dt) {
-                positionRec(target, milli, frame, observer, v);
+                positionRec(observer, target, frame, milli, v);
                 ret[i++] = new Position.Cartesian(milli, v[0], v[1], v[2]);
             }
             //System.out.println((sw.elapsed().toNanos() / 1e9));
@@ -56,7 +55,7 @@ public class Spice {
     @Nullable
     static Position getPositionLatitudinal(String observer, String target, String frame, JHVTime time) {
         try {
-            double[] c = positionLat(target, time.milli, frame, observer);
+            double[] c = positionLat(observer, target, frame, time.milli);
             return new Position(time, c[0], c[1], c[2]);
         } catch (SpiceErrorException e) {
             Log.error(e);
@@ -67,7 +66,7 @@ public class Spice {
     @Nullable
     public static Position getCarrington(String target, JHVTime time) {
         try {
-            double[] c = positionRad(target, time.milli, "SOLO_IAU_SUN_2009", "SUN");
+            double[] c = positionRad("SUN", target, "SOLO_IAU_SUN_2009", time.milli);
             return new Position(time, c[0], -c[1], c[2]);
         } catch (Exception e) {
             Log.error(e);
@@ -126,7 +125,7 @@ public class Spice {
     public static double[] posRad(String observer, String target, JHVTime time, double[][] m) {
         try {
             double[] v = new double[3];
-            positionRec(target, time.milli, "J2000", observer, v);
+            positionRec(observer, target, "J2000", time.milli, v);
             return rotate2Rad(m, v);
         } catch (Exception e) {
             Log.error(e);
@@ -152,7 +151,7 @@ public class Spice {
 
     private static final double[] lightTimeUnused = new double[1];
 
-    private static void positionRec(String target, long milli, String frame, String observer, double[] result) throws SpiceErrorException {
+    private static void positionRec(String observer, String target, String frame, long milli, double[] result) throws SpiceErrorException {
         double et = milli2et(milli);
         CSPICE.spkpos(target, et, frame, "NONE", observer, result, lightTimeUnused);
         result[0] *= Sun.RadiusKMeterInv;
@@ -160,15 +159,15 @@ public class Spice {
         result[2] *= Sun.RadiusKMeterInv;
     }
 
-    private static double[] positionLat(String target, long milli, String frame, String observer) throws SpiceErrorException {
+    private static double[] positionLat(String observer, String target, String frame, long milli) throws SpiceErrorException {
         double[] v = new double[3];
-        positionRec(target, milli, frame, observer, v);
+        positionRec(observer, target, frame, milli, v);
         return CSPICE.reclat(v);
     }
 
-    private static double[] positionRad(String target, long milli, String frame, String observer) throws SpiceErrorException {
+    private static double[] positionRad(String observer, String target, String frame, long milli) throws SpiceErrorException {
         double[] v = new double[3];
-        positionRec(target, milli, frame, observer, v);
+        positionRec(observer, target, frame, milli, v);
         return CSPICE.recrad(v);
     }
 
