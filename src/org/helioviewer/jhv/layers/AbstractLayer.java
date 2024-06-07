@@ -2,9 +2,6 @@ package org.helioviewer.jhv.layers;
 
 import java.util.Arrays;
 
-import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.Viewport;
-
 import com.jogamp.opengl.GL2;
 
 public abstract class AbstractLayer implements Layer {
@@ -42,36 +39,6 @@ public abstract class AbstractLayer implements Layer {
                 return i;
         }
         return -1;
-    }
-
-    @Override
-    public boolean isDownloading() {
-        return false;
-    }
-
-    @Override
-    public boolean isLocal() {
-        return false;
-    }
-
-    @Override
-    public void renderScale(Camera camera, Viewport vp, GL2 gl) {
-    }
-
-    @Override
-    public void prerender(GL2 gl) {
-    }
-
-    @Override
-    public void renderFloat(Camera camera, Viewport vp, GL2 gl) {
-    }
-
-    @Override
-    public void renderMiniview(Camera camera, Viewport vp, GL2 gl) {
-    }
-
-    @Override
-    public void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
     }
 
 }

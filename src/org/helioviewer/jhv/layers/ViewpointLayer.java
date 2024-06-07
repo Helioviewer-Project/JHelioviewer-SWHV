@@ -253,11 +253,6 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
     }
 
     @Override
-    public boolean isDeletable() {
-        return false;
-    }
-
-    @Override
     public void init(GL2 gl) {
         orbits.init(gl);
         planets.init(gl);

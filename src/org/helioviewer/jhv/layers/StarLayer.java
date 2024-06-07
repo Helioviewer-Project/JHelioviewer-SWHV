@@ -153,7 +153,7 @@ private static final Vec3[] coords_2021 = new Vec3[]{
         theta[1] = Math.asin(Math.sin(rho) * Math.cos(phi - P));
     }
 
-    private double[][] planets = new double[2][];
+    private final double[][] planets = new double[2][];
 
     private double[][] computeAngles(String spacecraft) {
         double[][] mat = Spice.twovecSun(spacecraft, time);
@@ -240,11 +240,6 @@ private static final Vec3[] coords_2021 = new Vec3[]{
     @Override
     public String getTimeString() {
         return null;
-    }
-
-    @Override
-    public boolean isDeletable() {
-        return false;
     }
 
 }
