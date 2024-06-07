@@ -151,6 +151,11 @@ public class J2KView extends BaseView {
         }
     }
 
+    @Nullable
+    public APIRequest getAPIRequest() {
+        return request;
+    }
+
     @Override
     public void abolish() {
         abolishable.clean();
