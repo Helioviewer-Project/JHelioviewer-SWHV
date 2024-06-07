@@ -30,7 +30,7 @@ import uk.ac.bristol.star.cdf.GlobalAttribute;
 import uk.ac.bristol.star.cdf.Variable;
 import uk.ac.bristol.star.cdf.VariableAttribute;
 
-public class CDFReader {
+public class BandReaderCdf {
 
     public static void load(URI uri) throws Exception {
         List<Band.Data> lines = read(NetFileCache.get(uri).uri()); // tbd : sniff type
