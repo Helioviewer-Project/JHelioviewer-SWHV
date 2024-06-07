@@ -38,7 +38,7 @@ import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 
 @SuppressWarnings("serial")
-public final class ChartDrawGraphPane extends JComponent implements MouseInputListener, MouseWheelListener, ComponentListener, DrawController.Listener {
+final class ChartDrawGraphPane extends JComponent implements MouseInputListener, MouseWheelListener, ComponentListener, DrawController.Listener {
 
     private enum DragMode {
         MOVIELINE, CHART, NODRAG
@@ -59,7 +59,7 @@ public final class ChartDrawGraphPane extends JComponent implements MouseInputLi
 
     private DragMode dragMode = DragMode.NODRAG;
 
-    public ChartDrawGraphPane() {
+    ChartDrawGraphPane() {
         setPreferredSize(new Dimension(-1, 50));
         setOpaque(true);
         setDoubleBuffered(false);
