@@ -34,21 +34,21 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 public class J2KView extends BaseView {
 
     private static final AtomicInteger global_serial = new AtomicInteger(0);
-
     private static final Cache<J2KParams.Decode, ImageBuffer> decodeCache = Caffeine.newBuilder().softValues().build();
-
     private static final Cleaner reaper = Cleaner.create();
+
     private final Cleaner.Cleanable abolishable;
 
+    private final APIRequest request;
+    protected final int serial;
+
+    private final J2KSource source;
     private final int maxFrame;
     private int targetFrame;
 
     private final String[] xmlMetaData;
     private final TimeMap<Integer> frameMap = new TimeMap<>();
 
-    private final J2KSource source;
-
-    protected final int serial;
     protected final CompletionLevel completionLevel;
     protected final J2KReader reader;
     private final boolean isJP2;
@@ -64,8 +64,9 @@ public class J2KView extends BaseView {
     }
 
     public J2KView(DecodeExecutor _executor, APIRequest _request, DataUri _dataUri) throws Exception {
-        super(_executor, _request, _dataUri);
+        super(_executor, _dataUri);
         serial = incrementSerial();
+        request = _request;
 
         try {
             switch (dataUri.format()) {

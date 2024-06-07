@@ -65,7 +65,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
 
     private ImageLayer(JSONObject jo) {
         try {
-            view = new BaseView(null, null, null);
+            view = new BaseView(null, null);
         } catch (Exception e) { // impossible
             e.printStackTrace();
         }

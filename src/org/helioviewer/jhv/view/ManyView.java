@@ -10,7 +10,6 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageData;
-import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
@@ -18,7 +17,6 @@ import org.helioviewer.jhv.time.TimeMap;
 public class ManyView implements View {
 
     private static class FrameInfo {
-
         final View view;
         final JHVTime timeView;
         final int idxView;
@@ -29,7 +27,6 @@ public class ManyView implements View {
             timeView = _timeView;
             idxView = _idxView;
         }
-
     }
 
     private final TimeMap<FrameInfo> frameMap = new TimeMap<>();
@@ -53,12 +50,6 @@ public class ManyView implements View {
             JHVTime t = v.getFrameTime(i);
             frameMap.put(t, new FrameInfo(v, t, i));
         }
-    }
-
-    @Nullable
-    @Override
-    public APIRequest getAPIRequest() {
-        return null;
     }
 
     @Override
@@ -88,12 +79,6 @@ public class ManyView implements View {
 
     @Nullable
     @Override
-    public String getBaseName() {
-        return null;
-    }
-
-    @Nullable
-    @Override
     public LUT getDefaultLUT() {
         return frameMap.indexedValue(0).view.getDefaultLUT();
     }
@@ -116,16 +101,6 @@ public class ManyView implements View {
     @Override
     public void setDataHandler(ImageData.Handler dataHandler) {
         frameMap.values().forEach(frameInfo -> frameInfo.view.setDataHandler(dataHandler));
-    }
-
-    @Override
-    public boolean isDownloading() {
-        return false;
-    }
-
-    @Override
-    public boolean isComplete() {
-        return true;
     }
 
     @Nullable

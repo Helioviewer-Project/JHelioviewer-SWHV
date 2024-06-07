@@ -14,39 +14,63 @@ import org.helioviewer.jhv.time.JHVTime;
 
 public interface View {
 
+    String EMPTY_METAXML = "<xml/>";
+    AtomicBoolean complete = new AtomicBoolean(true);
+
     @Nullable
-    APIRequest getAPIRequest();
+    default APIRequest getAPIRequest() {
+        return null;
+    }
 
-    void abolish();
+    default void abolish() {
+    }
 
-    void clearCache();
+    default void clearCache() {
+    }
 
     void setMGN(boolean b);
 
     boolean getMGN();
 
-    void decode(Position viewpoint, double pixFactor, float factor);
+    default void decode(Position viewpoint, double pixFactor, float factor) {
+    }
 
     @Nullable
-    String getBaseName();
+    default String getBaseName() {
+        return null;
+    }
 
     @Nullable
-    LUT getDefaultLUT();
+    default LUT getDefaultLUT() {
+        return null;
+    }
 
-    boolean isMultiFrame();
+    default boolean isMultiFrame() {
+        return false;
+    }
 
-    int getCurrentFrameNumber();
+    default int getCurrentFrameNumber() {
+        return 0;
+    }
 
-    int getMaximumFrameNumber();
+    default int getMaximumFrameNumber() {
+        return 0;
+    }
 
     void setDataHandler(ImageData.Handler dataHandler);
 
-    boolean isDownloading();
+    default boolean isDownloading() {
+        return false;
+    }
 
-    boolean isComplete();
+    default boolean isComplete() {
+        return true;
+    }
 
     @Nullable
-    AtomicBoolean getFrameCompletion(int frame);
+    default AtomicBoolean getFrameCompletion(int frame) {
+        return complete;
+    }
 
     JHVTime getFrameTime(int frame);
 
@@ -67,6 +91,8 @@ public interface View {
     // -->
 
     @Nonnull
-    String getXMLMetaData();
+    default String getXMLMetaData() {
+        return EMPTY_METAXML;
+    }
 
 }
