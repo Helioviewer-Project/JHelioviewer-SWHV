@@ -24,7 +24,7 @@ public class BandDataProvider {
         String baseUrl = band.getBandType().getBaseUrl();
         if ("".equals(baseUrl))
             return;
-        intervals.forEach(interval -> workers.put(band, HapiReader.requestData(baseUrl, interval.start, interval.end)));
+        intervals.forEach(interval -> workers.put(band, BandReaderHapi.requestData(baseUrl, interval.start, interval.end)));
     }
 
     static void stopDownloads(Band band) {
@@ -52,7 +52,6 @@ public class BandDataProvider {
     }
 
     private static class BandLoadCallback implements FutureCallback<BandResponse> {
-
         @Override
         public void onSuccess(@Nonnull BandResponse result) {
             Band band = Band.createFromType(result.bandType);
@@ -64,7 +63,6 @@ public class BandDataProvider {
         public void onFailure(@Nonnull Throwable t) {
             Log.error(t);
         }
-
     }
 
     private static class BandResponse {

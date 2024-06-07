@@ -32,7 +32,7 @@ import uk.ac.starlink.table.RowSequence;
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.FutureCallback;
 
-public class HapiReader {
+public class BandReaderHapi {
 
     private static final String groupName = "HAPI";
     private static final String hapiFormat = "binary";

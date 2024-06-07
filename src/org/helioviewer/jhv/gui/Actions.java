@@ -35,7 +35,7 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.helioviewer.jhv.timelines.band.HapiReader;
+import org.helioviewer.jhv.timelines.band.BandReaderHapi;
 
 @SuppressWarnings({"serial", "this-escape"})
 public class Actions {
@@ -200,7 +200,7 @@ public class Actions {
         @Override
         public void actionPerformed(ActionEvent e) {
             DataSources.loadSources();
-            HapiReader.requestCatalog();
+            BandReaderHapi.requestCatalog();
         }
 
     }
