@@ -98,12 +98,8 @@ public class Spice {
 
             double[] xaxis = new double[3];
             CSPICE.spkpos(target, et, "J2000", "NONE", "SUN", xaxis, lightTimeUnused);
-/*
-            double[] zz = new double[]{0,0,1};
-            double[][] m = CSPICE.pxform("IAU_SUN", "J2000", et);
-            double[] zzz = CSPICE.mxv(m, zz);
-            System.out.println(">>> " + String.format("%a ,%a, %a", zzz[0], zzz[1], zzz[2]));
-*/
+            //double[] zaxis = CSPICE.mxv(CSPICE.pxform("IAU_SUN", "J2000", et), new double[]{0, 0, 1});
+            //System.out.println(">>> " + String.format("%a ,%a, %a", zaxis[0], zaxis[1], zaxis[2]));
             return CSPICE.twovec(xaxis, 1, zaxis, 3);
         } catch (Exception e) {
             Log.error(e);

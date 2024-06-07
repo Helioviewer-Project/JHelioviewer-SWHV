@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.camera;
 
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
 import org.helioviewer.jhv.astronomy.Sun;
@@ -9,7 +8,7 @@ import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 
-class InteractionRotate implements InteractionType {
+class InteractionRotate implements Interaction.Type {
 
     private final Camera camera;
     private Vec3 rotationStartPoint;
@@ -38,14 +37,6 @@ class InteractionRotate implements InteractionType {
 
         camera.rotateDragRotation(Quat.calcRotation(rotationStartPoint, rotationEndPoint));
         MovieDisplay.display();
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
     }
 
 }
