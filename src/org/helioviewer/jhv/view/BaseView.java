@@ -1,14 +1,10 @@
 package org.helioviewer.jhv.view;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageData;
-import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
@@ -17,20 +13,15 @@ import org.helioviewer.jhv.time.JHVTime;
 
 public class BaseView implements View {
 
-    private static final AtomicBoolean complete = new AtomicBoolean(true);
-    protected static final String EMPTY_METAXML = "<meta/>";
-
     protected final DecodeExecutor executor;
-    protected final APIRequest request;
     protected final DataUri dataUri;
 
     protected boolean mgn;
     protected LUT builtinLUT;
     protected MetaData[] metaData = new MetaData[]{PixelBasedMetaData.EMPTY}; // paranoia
 
-    public BaseView(DecodeExecutor _executor, APIRequest _request, DataUri _dataUri) {
+    public BaseView(DecodeExecutor _executor, DataUri _dataUri) {
         executor = _executor;
-        request = _request;
         dataUri = _dataUri;
     }
 
@@ -38,41 +29,6 @@ public class BaseView implements View {
     @Override
     public String getBaseName() {
         return dataUri == null ? null : dataUri.baseName();
-    }
-
-    @Nullable
-    @Override
-    public APIRequest getAPIRequest() {
-        return request;
-    }
-
-    @Override
-    public void decode(Position viewpoint, double pixFactor, float factor) {
-    }
-
-    @Override
-    public AtomicBoolean getFrameCompletion(int frame) {
-        return complete;
-    }
-
-    @Override
-    public boolean isComplete() {
-        return true;
-    }
-
-    @Override
-    public boolean isMultiFrame() {
-        return false;
-    }
-
-    @Override
-    public int getCurrentFrameNumber() {
-        return 0;
-    }
-
-    @Override
-    public int getMaximumFrameNumber() {
-        return 0;
     }
 
     @Override
@@ -129,25 +85,6 @@ public class BaseView implements View {
     @Override
     public void setDataHandler(ImageData.Handler _dataHandler) {
         dataHandler = _dataHandler;
-    }
-
-    @Override
-    public boolean isDownloading() {
-        return false;
-    }
-
-    @Nonnull
-    @Override
-    public String getXMLMetaData() {
-        return EMPTY_METAXML;
-    }
-
-    @Override
-    public void abolish() {
-    }
-
-    @Override
-    public void clearCache() {
     }
 
     @Override
