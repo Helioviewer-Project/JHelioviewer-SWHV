@@ -43,24 +43,37 @@ public interface TimelineLayer {
 
     void fetchData(TimeAxis selectedAxis);
 
-    void yaxisChanged();
+    default void yaxisChanged() {
+    }
 
-    void zoomToFitAxis();
+    default void zoomToFitAxis() {
+    }
 
-    void resetAxis();
+    default void resetAxis() {
+    }
 
-    boolean highLightChanged(Point p);
+    default boolean highLightChanged(Point p) {
+        return false;
+    }
 
     @Nullable
-    String getStringValue(long ts);
+    default String getStringValue(long ts) {
+        return null;
+    }
 
     @Nullable
-    ClickableDrawable getDrawableUnderMouse();
+    default ClickableDrawable getDrawableUnderMouse() {
+        return null;
+    }
 
     void serialize(JSONObject jo);
 
-    boolean isPropagated();
+    default boolean isPropagated() {
+        return false;
+    }
 
-    long getObservationTime(long ts);
+    default long getObservationTime(long ts) {
+        return ts;
+    }
 
 }
