@@ -463,11 +463,6 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     @Override
-    public boolean isDeletable() {
-        return false;
-    }
-
-    @Override
     public void init(GL2 gl) {
         lineEvent.init(gl);
         lineThick.init(gl);

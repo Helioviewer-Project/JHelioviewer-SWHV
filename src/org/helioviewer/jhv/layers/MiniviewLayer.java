@@ -11,7 +11,6 @@ import javax.swing.JPanel;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.components.base.JHVSlider;
@@ -57,10 +56,6 @@ public final class MiniviewLayer extends AbstractLayer {
         miniViewport = new Viewport(0, offset, offset, size, size);
     }
 
-    @Override
-    public void render(Camera camera, Viewport vp, GL2 gl) {
-    }
-
     public void renderBackground(GL2 gl) {
         rectangle.renderShape(gl, GL2.GL_TRIANGLE_STRIP);
         circle.renderShape(gl, GL2.GL_TRIANGLE_STRIP);
@@ -85,11 +80,6 @@ public final class MiniviewLayer extends AbstractLayer {
     @Override
     public String getTimeString() {
         return null;
-    }
-
-    @Override
-    public boolean isDeletable() {
-        return false;
     }
 
     @Override
