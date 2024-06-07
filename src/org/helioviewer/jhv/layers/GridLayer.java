@@ -324,11 +324,6 @@ public final class GridLayer extends AbstractLayer {
         return null;
     }
 
-    @Override
-    public boolean isDeletable() {
-        return false;
-    }
-
     @SuppressWarnings("serial")
     private class GridLayerOptions extends JPanel {
 

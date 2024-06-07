@@ -236,11 +236,6 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     }
 
     @Override
-    public boolean isDeletable() {
-        return false;
-    }
-
-    @Override
     public void setConnectivity(Connectivity _connectivity) {
         connectivity = _connectivity;
         // System.out.println(">>> SSW: " + connectivity.SSW.ortho.size() + " FSW: " + connectivity.FSW.ortho.size() + " M: " + connectivity.M.ortho.size());

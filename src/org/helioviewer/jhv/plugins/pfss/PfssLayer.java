@@ -110,11 +110,6 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
     }
 
     @Override
-    public boolean isDeletable() {
-        return false;
-    }
-
-    @Override
     public void init(GL2 gl) {
         glslLine.init(gl);
     }

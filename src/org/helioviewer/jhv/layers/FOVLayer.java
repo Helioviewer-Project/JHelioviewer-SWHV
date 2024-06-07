@@ -62,9 +62,4 @@ public class FOVLayer extends AbstractLayer {
         return null;
     }
 
-    @Override
-    public boolean isDeletable() {
-        return false;
-    }
-
 }

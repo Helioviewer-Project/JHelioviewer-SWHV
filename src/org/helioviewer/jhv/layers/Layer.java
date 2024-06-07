@@ -12,17 +12,23 @@ import com.jogamp.opengl.GL2;
 
 public interface Layer {
 
-    void render(Camera camera, Viewport vp, GL2 gl);
+    default void render(Camera camera, Viewport vp, GL2 gl) {
+    }
 
-    void renderScale(Camera camera, Viewport vp, GL2 gl);
+    default void renderScale(Camera camera, Viewport vp, GL2 gl) {
+    }
 
-    void renderFloat(Camera camera, Viewport vp, GL2 gl);
+    default void renderFloat(Camera camera, Viewport vp, GL2 gl) {
+    }
 
-    void renderFullFloat(Camera camera, Viewport vp, GL2 gl);
+    default void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
+    }
 
-    void renderMiniview(Camera camera, Viewport vp, GL2 gl);
+    default void renderMiniview(Camera camera, Viewport vp, GL2 gl) {
+    }
 
-    void prerender(GL2 gl);
+    default void prerender(GL2 gl) {
+    }
 
     void remove(GL2 gl);
 
@@ -43,11 +49,17 @@ public interface Layer {
     @Nullable
     String getTimeString();
 
-    boolean isDeletable();
+    default boolean isDeletable() {
+        return false;
+    }
 
-    boolean isDownloading();
+    default boolean isDownloading() {
+        return false;
+    }
 
-    boolean isLocal();
+    default boolean isLocal() {
+        return false;
+    }
 
     void init(GL2 gl);
 

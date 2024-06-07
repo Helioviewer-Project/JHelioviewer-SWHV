@@ -57,10 +57,6 @@ public class TimestampLayer extends AbstractLayer {
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, GL2 gl) {
-    }
-
-    @Override
     public void renderFloat(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.idx])
             return;
@@ -129,11 +125,6 @@ public class TimestampLayer extends AbstractLayer {
     @Override
     public String getTimeString() {
         return null;
-    }
-
-    @Override
-    public boolean isDeletable() {
-        return false;
     }
 
     @Override
