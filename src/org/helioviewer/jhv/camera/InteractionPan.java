@@ -1,13 +1,12 @@
 package org.helioviewer.jhv.camera;
 
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Vec2;
 
-class InteractionPan implements InteractionType {
+class InteractionPan implements Interaction.Type {
 
     private final Camera camera;
     private int lastX;
@@ -34,14 +33,6 @@ class InteractionPan implements InteractionType {
         double m = 1 / CameraHelper.getImagePixelFactor(camera, Display.getActiveViewport());
         camera.setTranslation(pan.x + x * m, pan.y - y * m);
         MovieDisplay.display();
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
     }
 
 }
