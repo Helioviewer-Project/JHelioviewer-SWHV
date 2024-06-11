@@ -44,7 +44,7 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
     private static final String explanation = """
             <b>Location</b>: view from selected object.
             <b>Heliosphere</b>: view onto the solar equatorial plane.
-
+            
             If "Use movie time interval" is unselected, the viewpoint time is interpolated in the configured time interval.""";
 
     ViewpointLayerOptions(JSONObject jo) {

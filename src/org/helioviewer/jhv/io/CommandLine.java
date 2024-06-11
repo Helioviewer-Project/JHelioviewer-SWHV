@@ -15,13 +15,13 @@ public class CommandLine {
 
     private static final String usageMessage = """
             The following command-line options are available:
-
+            
             -load    file location
                    Load or request a supported file at program start. The option can be used multiple times.
-
+            
             -request request file location
                    Load a request file and issue a request at program start. The option can be used multiple times.
-
+            
             -state   state file
                    Load state file.""";
 

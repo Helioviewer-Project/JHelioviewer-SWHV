@@ -85,6 +85,7 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
             putVertex(pointsBuf, radec, dist, 2 * SIZE_POINT, Colors.Blue);
         }
         cache.put(time, Optional.of(pointsBuf));
+        MovieDisplay.display();
     }
 
     @Override
