@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.timelines.band;
 
-import java.io.BufferedInputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -216,9 +215,8 @@ public class BandReaderHapi {
                 .set(version.getStopRequestParam(), stop);
         String uri = baseUrl + request.expand("");
 
-        try (NetClient nc = NetClient.of(new URI(uri), false, NetClient.NetCache.NETWORK);
-             BufferedInputStream is = new BufferedInputStream(nc.getStream())) {
-            RowSequence sequence = parameter.reader.tableReader.createRowSequence(is, null, hapiFormat);
+        try (NetClient nc = NetClient.of(new URI(uri), false, NetClient.NetCache.NETWORK)) {
+            RowSequence sequence = parameter.reader.tableReader.createRowSequence(nc.getStream(), null, hapiFormat);
 
             ArrayList<Long> dateList = new ArrayList<>();
             ArrayList<Float> valueList = new ArrayList<>();

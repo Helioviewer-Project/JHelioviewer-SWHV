@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.layers.connect;
 
-import java.io.BufferedInputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
@@ -42,9 +41,9 @@ public class LoadSunJSON {
         @Override
         public List<SunJSONTypes.GeometryCollection> call() {
             return uriList.parallelStream().map(uri -> {
-                try (NetClient nc = NetClient.of(uri); BufferedInputStream is = new BufferedInputStream(nc.getStream())) {
-                    // return SunOrgJSON.process(JSONUtils.get(uri));
-                    return SunFastJSON.process(is);
+                // return SunOrgJSON.process(JSONUtils.get(uri));
+                try (NetClient nc = NetClient.of(uri)) {
+                    return SunFastJSON.process(nc.getStream());
                 } catch (Exception e) {
                     Log.warn(uri.toString(), e);
                     return null;

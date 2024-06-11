@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.io;
 
-import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +19,7 @@ class SoarTable {
     }
 
     public static List<SoarClient.DataItem> get(URI uri) throws Exception {
-        try (NetClient nc = NetClient.of(uri);
-             InputStream is = nc.getStream();
-             StarTable table = new StarTableFactory().makeStarTable(is, new VOTableBuilder())) {
+        try (NetClient nc = NetClient.of(uri); StarTable table = new StarTableFactory().makeStarTable(nc.getStream(), new VOTableBuilder())) {
             int col_id = -1, col_format = -1, col_size = -1;
             int num = table.getColumnCount();
             for (int i = 0; i < num; i++) {
