@@ -63,7 +63,7 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
         double[][] mat = Spice.twovecSun(sc, time);
 
         int num = stars.size();
-        BufVertex pointsBuf = new BufVertex((num + 2) * GLSLShape.stride);
+        BufVertex pointsBuf = new BufVertex((num + 3) * GLSLShape.stride);
 
         double[] radec;
 
