@@ -2,6 +2,7 @@ package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
 import java.util.List;
+import java.util.Optional;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Spice;
@@ -22,7 +23,7 @@ import com.jogamp.opengl.GL2;
 
 public final class StarLayer extends AbstractLayer implements TimeListener.Change, Vizier.ReceiverStars {
 
-    private final Cache<JHVTime, BufVertex> cache = Caffeine.newBuilder().softValues().build();
+    private final Cache<JHVTime, Optional<BufVertex>> cache = Caffeine.newBuilder().softValues().build();
 
     private static final float SIZE_POINT = 0.10f;
     private final GLSLShape points = new GLSLShape(true);
@@ -42,6 +43,7 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
         JHVTime time = new JHVTime(milli);
         if (cache.getIfPresent(time) != null) // avoid repeated calls
             return;
+        cache.put(time, Optional.empty()); // promise
 
         String sc = "STEREO AHEAD";
         double[] search = Spice.posRad(sc, "SUN", time); // HCRS in fact
@@ -82,7 +84,7 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
             radec = Spice.radRotate(ra, dec, mat);
             putVertex(pointsBuf, radec, dist, 2 * SIZE_POINT, Colors.Blue);
         }
-        cache.put(time, pointsBuf);
+        cache.put(time, Optional.of(pointsBuf));
     }
 
     @Override
@@ -91,11 +93,11 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
             return;
 
         Position viewpoint = camera.getViewpoint();
-        BufVertex pointsBuf = cache.getIfPresent(viewpoint.time);
-        if (pointsBuf == null)
+        Optional<BufVertex> optBuf = cache.getIfPresent(viewpoint.time);
+        if (optBuf == null || optBuf.isEmpty())
             return;
 
-        points.setVertexRepeatable(gl, pointsBuf);
+        points.setVertexRepeatable(gl, optBuf.get());
 
         Transform.pushView();
         Transform.rotateViewInverse(viewpoint.toQuat());
