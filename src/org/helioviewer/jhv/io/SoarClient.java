@@ -146,7 +146,6 @@ public class SoarClient {
     }
 
     private record CallbackItems(ReceiverItems receiver) implements FutureCallback<List<DataItem>> {
-
         @Override
         public void onSuccess(@Nonnull List<DataItem> result) {
             receiver.setSoarResponseItems(result);
@@ -157,11 +156,9 @@ public class SoarClient {
             Log.error(t);
             Message.err("An error occurred querying the server", t.getMessage());
         }
-
     }
 
     private record CallbackSoops(ReceiverSoops receiver) implements FutureCallback<List<String>> {
-
         @Override
         public void onSuccess(@Nonnull List<String> result) {
             receiver.setSoarResponseSoops(result);
@@ -172,11 +169,9 @@ public class SoarClient {
             Log.error(t);
             Message.err("An error occurred querying the server", t.getMessage());
         }
-
     }
 
     private static class CallbackTable implements FutureCallback<List<DataItem>> {
-
         @Override
         public void onSuccess(@Nonnull List<DataItem> result) {
             submitLoad(result);
@@ -187,7 +182,6 @@ public class SoarClient {
             Log.error(t);
             Message.err("An error occurred querying the server", t.getMessage());
         }
-
     }
 
 }
