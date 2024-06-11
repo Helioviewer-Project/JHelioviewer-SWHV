@@ -19,7 +19,8 @@ class SoarTable {
     }
 
     public static List<SoarClient.DataItem> get(URI uri) throws Exception {
-        try (NetClient nc = NetClient.of(uri); StarTable table = new StarTableFactory().makeStarTable(nc.getStream(), new VOTableBuilder())) {
+        try (NetClient nc = NetClient.of(uri);
+             StarTable table = new StarTableFactory().makeStarTable(nc.getStream(), new VOTableBuilder())) {
             int col_id = -1, col_format = -1, col_size = -1;
             int num = table.getColumnCount();
             for (int i = 0; i < num; i++) {
