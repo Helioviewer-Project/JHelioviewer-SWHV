@@ -63,7 +63,8 @@ class Vizier {
         int col_pmdec = 4;
         int col_mag = 5;
 
-        try (NetClient nc = NetClient.of(uri); StarTable table = new StarTableFactory().makeStarTable(nc.getStream(), new VOTableBuilder())) {
+        try (NetClient nc = NetClient.of(uri);
+             StarTable table = new StarTableFactory().makeStarTable(nc.getStream(), new VOTableBuilder())) {
             List<Star> stars = new ArrayList<>();
             try (RowSequence rseq = table.getRowSequence()) {
                 while (rseq.next()) {
