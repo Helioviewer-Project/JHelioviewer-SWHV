@@ -118,7 +118,19 @@ public class Spice {
     }
 
     @Nullable
-    public static double[] posRad(String observer, String target, JHVTime time, double[][] m) {
+    public static double[] posRad(String observer, String target, JHVTime time) {
+        try {
+            double[] v = new double[3];
+            positionRec(observer, target, "J2000", time.milli, v);
+            return CSPICE.recrad(v);
+        } catch (Exception e) {
+            Log.error(e);
+        }
+        return null;
+    }
+
+    @Nullable
+    public static double[] posRadM(String observer, String target, JHVTime time, double[][] m) {
         try {
             double[] v = new double[3];
             positionRec(observer, target, "J2000", time.milli, v);
