@@ -77,7 +77,7 @@ public class Spice {
     private static final int[] axes = new int[]{3, 2, 1};
 
     @Nullable
-    public static double[] getRotation(String fromFrame, String toFrame, JHVTime time) {
+    public static double[] getEulerRotation(String fromFrame, String toFrame, JHVTime time) {
         try {
             double et = milli2et(time.milli);
             return CSPICE.m2eul(CSPICE.pxform(fromFrame, toFrame, et), axes);
