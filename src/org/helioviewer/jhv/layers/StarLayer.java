@@ -25,11 +25,11 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
 
     private final Cache<JHVTime, Optional<BufVertex>> cache = Caffeine.newBuilder().softValues().build();
 
-    private static final float SIZE_POINT = 0.10f;
+    private static final float SIZE_POINT = 0.05f;
     private final GLSLShape points = new GLSLShape(true);
 
     private static final double SEARCH_CONE = 4;
-    private static final double SEARCH_MAG = 7;
+    private static final double SEARCH_MAG = 9;
 
     @Override
     public void serialize(JSONObject jo) {
@@ -60,8 +60,13 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
         pointsBuf.putVertex((float) x, (float) y, 0, size, color);
     }
 
+    private static double EPOCH_2015_5_SEC = 1435838400; // uk.ac.starlink.table.TimeMapper.DECIMAL_YEAR.toUnixSeconds(2015.5)
+
     @Override
     public void setStars(JHVTime time, String sc, double dist, List<Vizier.Star> stars) {
+        double dyr = (time.milli / 1000. - EPOCH_2015_5_SEC) / 86400. / 365.25;
+        double mas_dyr = dyr / 1000. / 3600.;
+
         double[][] mat = Spice.twovecSun(sc, time);
 
         int num = stars.size();
@@ -81,8 +86,16 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
             double ra = Math.toRadians(star.ra());
             double dec = Math.toRadians(star.dec());
 
-            radec = Spice.radRotate(ra, dec, mat);
-            putVertex(pointsBuf, radec, dist, 2 * SIZE_POINT, Colors.Blue);
+            // http://mingus.mmto.arizona.edu/~bjw/mmt/spectro_standards.html
+            double pmra = Math.toRadians(star.pmra() * mas_dyr);
+            double pmdec = Math.toRadians(star.pmdec() * mas_dyr);
+            ra += pmra / Math.cos(dec);
+            dec += pmdec;
+
+            if (Double.isFinite(ra) && Double.isFinite(dec)) {
+                radec = Spice.radRotate(ra, dec, mat);
+                putVertex(pointsBuf, radec, dist, 2 * SIZE_POINT, Colors.Blue);
+            }
         }
         cache.put(time, Optional.of(pointsBuf));
         MovieDisplay.display();
