@@ -110,7 +110,7 @@ public class Spice {
     @Nullable
     public static double[] radRotate(double ra, double dec, double[][] m) {
         try {
-            return rotate2Rad(m, CSPICE.radrec(1, ra, dec));
+            return rotate2Rad(m, SpiceMath.latrec(1, ra, dec));
         } catch (Exception e) {
             Log.error(e);
         }
@@ -122,7 +122,7 @@ public class Spice {
         try {
             double[] v = new double[3];
             positionRec(observer, target, "J2000", time.milli, v);
-            return CSPICE.recrad(v);
+            return SpiceMath.recrad(v);
         } catch (Exception e) {
             Log.error(e);
         }
@@ -142,7 +142,7 @@ public class Spice {
     }
 
     private static double[] rotate2Rad(double[][] m, double[] v) throws SpiceErrorException {
-        return CSPICE.recrad(CSPICE.mxv(m, v));
+        return SpiceMath.recrad(SpiceMath.mxv(m, v));
     }
 
 // Stars end
@@ -170,13 +170,13 @@ public class Spice {
     private static double[] positionLat(String observer, String target, String frame, long milli) throws SpiceErrorException {
         double[] v = new double[3];
         positionRec(observer, target, frame, milli, v);
-        return CSPICE.reclat(v);
+        return SpiceMath.reclat(v);
     }
 
     private static double[] positionRad(String observer, String target, String frame, long milli) throws SpiceErrorException {
         double[] v = new double[3];
         positionRec(observer, target, frame, milli, v);
-        return CSPICE.recrad(v);
+        return SpiceMath.recrad(v);
     }
 
 }
