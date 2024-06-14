@@ -4,7 +4,7 @@ import org.json.JSONArray;
 
 public class Quat {
 
-    public static final Quat ZERO = new Quat();
+    public static final Quat ZERO = new Quat(1, 0, 0, 0);
     public static final Quat X90 = Quat.createRotation(Math.PI / 2, Vec3.XAxis);
     public static final Quat Y90 = Quat.createRotation(Math.PI / 2, Vec3.YAxis);
 
@@ -13,7 +13,7 @@ public class Quat {
 
     public static Quat createRotation(double angle, Vec3 v) {
         if (angle == 0.)
-            return new Quat();
+            return ZERO;
 
         double halfAngle = angle / 2.;
         double l = v.x * v.x + v.y * v.y + v.z * v.z;
@@ -47,17 +47,13 @@ public class Quat {
         u = new Vec3(sx * cy, cx * sy, sx * sy);
     }
 
-    private Quat(double _a, double x, double y, double z) {
+    public Quat(double _a, double x, double y, double z) {
         this(_a, new Vec3(x, y, z));
     }
 
     private Quat(double _a, Vec3 _u) {
         a = _a;
         u = _u;
-    }
-
-    private Quat() {
-        this(1, new Vec3());
     }
 
     /*
@@ -220,6 +216,20 @@ public class Quat {
         double vvy = (vx * u.z - vz * u.x) * 2. + vec.y;
         double vvz = (vy * u.x - vx * u.y) * 2. + vec.z;
         return new Vec3(vvx, vvy, vvz);
+        //18 mul + 12 add
+    }
+
+    // rotateVector for array
+    public double[] qxv(double[] vec) {
+        //q'vq = vec + 2.0 * cross(q.xyz,cross(  q.xyz, vec ) + q.w * vec)
+        double vx = vec[2] * u.y - vec[1] * u.z + a * vec[0];
+        double vy = vec[0] * u.z - vec[2] * u.x + a * vec[1];
+        double vz = vec[1] * u.x - vec[0] * u.y + a * vec[2];
+
+        return new double[]{
+            (vz * u.y - vy * u.z) * 2. + vec[0],
+            (vx * u.z - vz * u.x) * 2. + vec[1],
+            (vy * u.x - vx * u.y) * 2. + vec[2]};
         //18 mul + 12 add
     }
 
