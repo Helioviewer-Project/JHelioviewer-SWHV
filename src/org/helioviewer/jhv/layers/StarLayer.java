@@ -10,6 +10,7 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.io.GaiaClient;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLShape;
@@ -21,7 +22,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.jogamp.opengl.GL2;
 
-public final class StarLayer extends AbstractLayer implements TimeListener.Change, Vizier.ReceiverStars {
+public final class StarLayer extends AbstractLayer implements TimeListener.Change, GaiaClient.ReceiverStars {
 
     private final Cache<JHVTime, Optional<BufVertex>> cache = Caffeine.newBuilder().softValues().build();
 
@@ -51,7 +52,7 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
         double ra = Math.toDegrees(search[1]);
         double dec = Math.toDegrees(search[2]);
 
-        Vizier.submitSearch(this, time, sc, dist, new Vizier.StarRequest(ra, dec, SEARCH_CONE, SEARCH_MAG));
+        GaiaClient.submitSearch(this, time, sc, dist, new GaiaClient.StarRequest(ra, dec, SEARCH_CONE, SEARCH_MAG));
     }
 
     private static void putVertex(BufVertex pointsBuf, double[] radec, double dist, float size, byte[] color) {
@@ -60,14 +61,13 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
         pointsBuf.putVertex((float) x, (float) y, 0, size, color);
     }
 
-    private static double EPOCH_2015_5_SEC = 1435838400; // uk.ac.starlink.table.TimeMapper.DECIMAL_YEAR.toUnixSeconds(2015.5)
-
     @Override
-    public void setStars(JHVTime time, String sc, double dist, List<Vizier.Star> stars) {
-        double dyr = (time.milli / 1000. - EPOCH_2015_5_SEC) / 86400. / 365.25;
+    public void setStars(JHVTime time, String sc, double dist, List<GaiaClient.Star> stars) {
+        double dyr = (time.milli / 1000. - GaiaClient.EPOCH) / 86400. / 365.25;
         double mas_dyr = dyr / 1000. / 3600.;
 
         double[][] mat = Spice.twovecSun(sc, time);
+        //double[][] mat = Spice.getRotationM("J2000", "SOLO_IAU_SUN_2009", time, -v.lon, -v.lat);
 
         int num = stars.size();
         BufVertex pointsBuf = new BufVertex((num + 3) * GLSLShape.stride);
@@ -82,7 +82,7 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
         putVertex(pointsBuf, radec, dist, 2 * SIZE_POINT, Colors.Green);
 
         for (int i = 0; i < num; i++) {
-            Vizier.Star star = stars.get(i);
+            GaiaClient.Star star = stars.get(i);
             double ra = Math.toRadians(star.ra());
             double dec = Math.toRadians(star.dec());
 
