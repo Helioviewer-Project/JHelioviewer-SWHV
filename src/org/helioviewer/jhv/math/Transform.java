@@ -59,10 +59,10 @@ public class Transform {
     }
 
     public static void rotateView(Quat q) {
-        float w = (float) q.a, w2 = w * w;
-        float x = (float) q.u.x, x2 = x * x;
-        float y = (float) q.u.y, y2 = y * y;
-        float z = (float) q.u.z, z2 = z * z;
+        float w = (float) q.w, w2 = w * w;
+        float x = (float) q.x, x2 = x * x;
+        float y = (float) q.y, y2 = y * y;
+        float z = (float) q.z, z2 = z * z;
 
         view.mulAffine(mul.set(w2 + x2 - y2 - z2,     2 * x * y + 2 * w * z, 2 * x * z - 2 * w * y, 0,
                                2 * x * y - 2 * w * z, w2 - x2 + y2 - z2,     2 * y * z + 2 * w * x, 0,
@@ -71,10 +71,10 @@ public class Transform {
     }
 
     public static void rotateViewInverse(Quat q) {
-        float w = (float) q.a, w2 = w * w;
-        float x = (float) q.u.x, x2 = x * x;
-        float y = (float) q.u.y, y2 = y * y;
-        float z = (float) q.u.z, z2 = z * z;
+        float w = (float) q.w, w2 = w * w;
+        float x = (float) q.x, x2 = x * x;
+        float y = (float) q.y, y2 = y * y;
+        float z = (float) q.z, z2 = z * z;
 
         view.mulAffine(mul.set(w2 + x2 - y2 - z2,     2 * x * y - 2 * w * z, 2 * x * z + 2 * w * y, 0,
                                2 * x * y + 2 * w * z, w2 - x2 + y2 - z2,     2 * y * z - 2 * w * x, 0,
