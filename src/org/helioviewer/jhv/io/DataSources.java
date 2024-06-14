@@ -95,8 +95,9 @@ public class DataSources {
             listeners.add(listener);
     }
 
-    static void setupSources(DataSourcesParser parser) {
-        listeners.forEach(listener -> listener.setupSources(parser));
+    static void setupSources(@Nullable DataSourcesParser parser) {
+        if (parser != null) // didn't fail
+            listeners.forEach(listener -> listener.setupSources(parser));
 
         toLoad--;
         if (toLoad == 0)
