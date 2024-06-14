@@ -15,11 +15,10 @@ import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.helioviewer.jhv.time.JHVTime;
 
-//import uk.ac.starlink.table.ColumnInfo;
+import uk.ac.starlink.fits.FitsTableBuilder;
 import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.StarTableFactory;
-import uk.ac.starlink.votable.VOTableBuilder;
 
 import com.google.common.util.concurrent.FutureCallback;
 
@@ -49,7 +48,7 @@ public class GaiaClient {
     }
 
     private static final UriTemplate queryTemplate = new UriTemplate("https://gea.esac.esa.int/tap-server/tap/sync",
-            UriTemplate.vars().set("REQUEST", "doQuery").set("LANG", "ADQL").set("FORMAT", "votable"));
+            UriTemplate.vars().set("REQUEST", "doQuery").set("LANG", "ADQL").set("FORMAT", "fits"));
 
     private static String adqlSearch(double ra, double dec, double cone, double mag) {
         return "SELECT source_id,ra,dec,pmra,pmdec,phot_g_mean_mag FROM gaiadr3.gaia_source_lite WHERE " +
@@ -64,7 +63,7 @@ public class GaiaClient {
 
             URI uri = new URI(queryTemplate.expand(UriTemplate.vars().set("QUERY", adql)));
             try (NetClient nc = NetClient.of(uri);
-                 StarTable table = new StarTableFactory().makeStarTable(nc.getStream(), new VOTableBuilder())) {
+                 StarTable table = new StarTableFactory().makeStarTable(nc.getStream(), new FitsTableBuilder())) {
                 List<Star> stars = new ArrayList<>();
                 try (RowSequence rseq = table.getRowSequence()) {
                     while (rseq.next()) {
@@ -80,7 +79,6 @@ public class GaiaClient {
                 Log.info("Found " + stars.size() + " stars with " + adql);
                 return stars;
             }
-
         }
     }
 
