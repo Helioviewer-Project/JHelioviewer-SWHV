@@ -5,25 +5,31 @@ import org.json.JSONArray;
 public class Quat {
 
     public static final Quat ZERO = new Quat(1, 0, 0, 0);
-    public static final Quat X90 = Quat.createRotation(Math.PI / 2, Vec3.XAxis);
-    public static final Quat Y90 = Quat.createRotation(Math.PI / 2, Vec3.YAxis);
+    public static final Quat X90 = Quat.createAxis(Math.PI / 2, Vec3.XAxis);
+    public static final Quat Y90 = Quat.createAxis(Math.PI / 2, Vec3.YAxis);
 
     final double w;
     final double x;
     final double y;
     final double z;
 
-    public static Quat createRotation(double angle, Vec3 v) {
-        if (angle == 0.)
-            return ZERO;
+    public static Quat createAxis(double a, Vec3.Axis v) {
+        a /= 2.;
+        double m = Math.sin(a);
+        return new Quat(Math.cos(a), m * v.x, m * v.y, m * v.z);
+    }
 
-        double halfAngle = angle / 2.;
+    private static Quat createRotation(double a, Vec3 v) {
+        if (a == 0.)
+            return ZERO;
+        a /= 2.;
+
         double l = v.x * v.x + v.y * v.y + v.z * v.z;
         double m = 0;
         if (l > 0) {
-            m = Math.sin(halfAngle) / Math.sqrt(l);
+            m = Math.sin(a) / Math.sqrt(l);
         }
-        return new Quat(Math.cos(halfAngle), v.x * m, v.y * m, v.z * m);
+        return new Quat(Math.cos(a), m * v.x, m * v.y, m * v.z);
     }
 
     public Quat(double ax, double ay, double az) {
