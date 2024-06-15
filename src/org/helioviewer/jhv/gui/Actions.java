@@ -32,7 +32,6 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.layers.selector.State;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.band.BandReaderHapi;
@@ -223,9 +222,9 @@ public class Actions {
 
         private final Quat rotation;
 
-        public Rotate90Camera(String name, Vec3.Axis axis) {
+        public Rotate90Camera(String name, Quat _rotation) {
             super(name);
-            rotation = Quat.createAxis(Math.PI / 2, axis);
+            rotation = _rotation;
         }
 
         @Override

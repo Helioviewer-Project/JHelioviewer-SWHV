@@ -24,7 +24,7 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.io.SampClient;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.MovieDisplay;
-import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.math.Quat;
 //import org.helioviewer.jhv.timelines.band.HapiReader;
 
 import com.jidesoft.swing.JideButton;
@@ -159,9 +159,9 @@ public final class ToolBar extends JToolBar {
 
         JideButton rotate90Button = toolButton(ROTATE90);
         JPopupMenu rotate90Popup = new JPopupMenu();
-        rotate90Popup.add(new Actions.Rotate90Camera("X Axis", Vec3.XAxis));
-        rotate90Popup.add(new Actions.Rotate90Camera("Y Axis", Vec3.YAxis));
-        rotate90Popup.add(new Actions.Rotate90Camera("Z Axis", Vec3.ZAxis));
+        rotate90Popup.add(new Actions.Rotate90Camera("X Axis", Quat.X90));
+        rotate90Popup.add(new Actions.Rotate90Camera("Y Axis", Quat.Y90));
+        rotate90Popup.add(new Actions.Rotate90Camera("Z Axis", Quat.Z90));
 
         rotate90Button.addMouseListener(new MouseAdapter() {
             @Override
