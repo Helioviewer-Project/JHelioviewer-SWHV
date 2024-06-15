@@ -6,9 +6,31 @@ import org.json.JSONArray;
 public class Vec3 {
 
     public static final Vec3 ZERO = new Vec3(0, 0, 0);
-    public static final Vec3 XAxis = new Vec3(1, 0, 0);
-    public static final Vec3 YAxis = new Vec3(0, 1, 0);
-    public static final Vec3 ZAxis = new Vec3(0, 0, 1);
+    public static final Axis XAxis = new Axis(1, 0, 0);
+    public static final Axis YAxis = new Axis(0, 1, 0);
+    public static final Axis ZAxis = new Axis(0, 0, 1);
+
+    public static class Axis extends Vec3 {
+        Axis(double _x, double _y, double _z) {
+            super(_x, _y, _z);
+            if (x + y + z != 1)
+                throw new IllegalArgumentException("Illegal axis");
+        }
+
+        @Override
+        public double length() {
+            return 1;
+        }
+
+        @Override
+        public double length2() {
+            return 1;
+        }
+
+        @Override
+        public void normalize() {
+        }
+    }
 
     public double x;
     public double y;
