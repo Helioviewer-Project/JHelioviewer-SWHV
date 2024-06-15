@@ -7,6 +7,7 @@ public class Quat {
     public static final Quat ZERO = new Quat(1, 0, 0, 0);
     public static final Quat X90 = Quat.createAxis(Math.PI / 2, Vec3.XAxis);
     public static final Quat Y90 = Quat.createAxis(Math.PI / 2, Vec3.YAxis);
+    public static final Quat Z90 = Quat.createAxis(Math.PI / 2, Vec3.ZAxis);
 
     final double w;
     final double x;
