@@ -223,9 +223,9 @@ public class Actions {
 
         private final Quat rotation;
 
-        public Rotate90Camera(String name, Vec3 axis) {
+        public Rotate90Camera(String name, Vec3.Axis axis) {
             super(name);
-            rotation = Quat.createRotation(Math.PI / 2, axis);
+            rotation = Quat.createAxis(Math.PI / 2, axis);
         }
 
         @Override
