@@ -125,7 +125,7 @@ public class GridMath {
         double i = 0;
         for (int j = 0; j < no_lines; j++) {
             i += step;
-            Quat q = Quat.createAxis((Math.PI / 180) * i, Vec3.ZAxis);
+            Quat q = Quat.createAxisZ((Math.PI / 180) * i);
 
             for (int k = 0; k <= LINEAR_STEPS; k++) {
                 v.x = (START_RADIUS + k * (END_RADIUS - START_RADIUS) / (double) LINEAR_STEPS) * unit;
@@ -193,7 +193,7 @@ public class GridMath {
         for (int j = 0; j < no_lon_steps; j++) {
             for (int k = -1; k <= 1; k += 2) {
                 rotation = lonstepDegrees * j * k;
-                Quat q = Quat.createAxis(Math.PI / 2 + Math.PI + (Math.PI / 180) * rotation, Vec3.YAxis);
+                Quat q = Quat.createAxisY(Math.PI / 2 + Math.PI + (Math.PI / 180) * rotation);
                 for (int i = 0; i <= HALFDIVISIONS; i++) {
                     double a = -Math.PI / 2 + Math.PI * i / HALFDIVISIONS;
                     v.x = GRID_RADIUS * Math.cos(a);

@@ -5,19 +5,29 @@ import org.json.JSONArray;
 public class Quat {
 
     public static final Quat ZERO = new Quat(1, 0, 0, 0);
-    public static final Quat X90 = Quat.createAxis(Math.PI / 2, Vec3.XAxis);
-    public static final Quat Y90 = Quat.createAxis(Math.PI / 2, Vec3.YAxis);
-    public static final Quat Z90 = Quat.createAxis(Math.PI / 2, Vec3.ZAxis);
+    public static final Quat X90 = Quat.createAxisX(Math.PI / 2);
+    public static final Quat Y90 = Quat.createAxisY(Math.PI / 2);
+    public static final Quat Z90 = Quat.createAxisZ(Math.PI / 2);
 
     final double w;
     final double x;
     final double y;
     final double z;
 
-    public static Quat createAxis(double a, Vec3.Axis v) {
+    public static Quat createAxisX(double a) {
+        a /= 2.;
+        return new Quat(Math.cos(a), Math.sin(a), 0, 0);
+    }
+
+    public static Quat createAxisY(double a) {
         a /= 2.;
         double m = Math.sin(a);
-        return new Quat(Math.cos(a), m * v.x, m * v.y, m * v.z);
+        return new Quat(Math.cos(a), 0, Math.sin(a), 0);
+    }
+
+    public static Quat createAxisZ(double a) {
+        a /= 2.;
+        return new Quat(Math.cos(a), 0, 0, Math.sin(a));
     }
 
     private static Quat createRotation(double a, Vec3 v) {
