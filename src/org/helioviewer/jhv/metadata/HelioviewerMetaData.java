@@ -13,7 +13,6 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVTime;
 
 public final class HelioviewerMetaData extends BaseMetaData {
@@ -317,7 +316,7 @@ public final class HelioviewerMetaData extends BaseMetaData {
                             .or(() -> m.getDouble("CROTA1").map(Math::toRadians))
                             .or(() -> m.getDouble("CROTA2").map(Math::toRadians)).orElse(0.);
                 }
-                crota = Quat.createAxis(c, Vec3.ZAxis);
+                crota = Quat.createAxisZ(c);
             }
         }
     }

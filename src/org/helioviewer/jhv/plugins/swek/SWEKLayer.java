@@ -222,7 +222,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         y = -y;
 
         Vec3 targetDir = new Vec3(x, y, z);
-        Quat q = Quat.rotate(Quat.createAxis(Math.atan2(x, z), Vec3.YAxis), Quat.createAxis(-Math.asin(y / targetDir.length()), Vec3.XAxis));
+        Quat q = Quat.rotate(Quat.createAxisY(Math.atan2(x, z)), Quat.createAxisX(-Math.asin(y / targetDir.length())));
 
         double width2 = width / 2.;
         double height2 = height / 2.;
