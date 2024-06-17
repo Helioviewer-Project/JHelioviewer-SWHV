@@ -31,7 +31,7 @@ class SpiceMath {
     static double[] recrad(double[] rectan) {
         double[] ret = reclat(rectan);
         if (ret[1] < 0.) {
-            ret[1] += Math.TAU;
+            ret[1] += 2 * Math.PI;
         }
         return ret;
     }
