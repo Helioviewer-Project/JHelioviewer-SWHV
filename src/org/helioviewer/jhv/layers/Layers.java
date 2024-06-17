@@ -100,7 +100,7 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
         add(new ConnectionLayer(null));
         add(new GridLayer(null));
         add(new FOVLayer(null));
-        add(new StarLayer(null));
+        // add(new StarLayer(null));
         add(new TimestampLayer(null));
         add(new MiniviewLayer(null));
     }
