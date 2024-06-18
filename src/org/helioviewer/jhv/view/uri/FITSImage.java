@@ -91,6 +91,7 @@ class FITSImage implements URIImageReader {
 
     // private static final int SAMPLE = 8;
     private static final int SAMPLE = 4;
+    private static final int MIN_SAMPLES = 10;
 
     private static float[] sampleImage(PixType pixType, int width, int height, Object[] pixData, long blank, double bzero, double bscale) {
         int stepW = Math.max(SAMPLE * width / 1024, 1);
@@ -161,13 +162,14 @@ class FITSImage implements URIImageReader {
         float[] minMax = new float[]{header.getFloatValue("HV_DMIN", Float.MAX_VALUE), header.getFloatValue("HV_DMAX", Float.MAX_VALUE)};
         if (minMax[0] == Float.MAX_VALUE || minMax[1] == Float.MAX_VALUE) {
             float[] sampleData = sampleImage(pixType, width, height, pixData, blank, bzero, bscale);
+            int sampleLen = sampleData.length;
+            if (sampleLen < MIN_SAMPLES) // couldn't find enough acceptable samples, return blank image
+                return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, ByteBuffer.wrap(new byte[width * height]));
+
             Arrays.sort(sampleData);
-
-            // System.out.println(">>> " + sampleData.length + " " + (int) (MIN_MULT * sampleData.length) + " " + (int) (MAX_MULT * sampleData.length));
             minMax = new float[]{
-                    sampleData[(int) (MIN_MULT * sampleData.length)],
-                    sampleData[(int) (MAX_MULT * sampleData.length)]};
-
+                    sampleData[(int) (MIN_MULT * sampleLen)],
+                    sampleData[(int) (MAX_MULT * sampleLen)]};
             // minMax = getMinMax(pixType, width, height, pixData, blank, bzero, bscale);
         }
         if (minMax[0] == minMax[1]) {
