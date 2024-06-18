@@ -18,6 +18,7 @@ import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
+import org.helioviewer.jhv.io.DataUri.Format.Image;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
@@ -70,17 +71,17 @@ public class J2KView extends BaseView {
 
         try {
             switch (dataUri.format()) {
-                case JPIP -> {
+                case Image.JPIP -> {
                     reader = new J2KReader(dataUri.uri());
                     source = new J2KSource.Remote(reader.getCache());
                 }
-                case JP2, JPX -> {
+                case Image.JP2, Image.JPX -> {
                     reader = null;
                     source = new J2KSource.Local(dataUri.file().toString());
                 }
                 default -> throw new Exception("Unknown image type");
             }
-            isJP2 = dataUri.format() == DataUri.Format.JP2;
+            isJP2 = dataUri.format() == Image.JP2;
             source.open();
 
             int[] lut = source.getLUT();

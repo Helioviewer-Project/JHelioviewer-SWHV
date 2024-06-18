@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.Message;
+import org.helioviewer.jhv.io.DataUri.Format.Image;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.ManyView;
@@ -95,9 +96,9 @@ public class LoadLayer {
     private static View loadView(DecodeExecutor executor, APIRequest req, URI uri) throws Exception {
         DataUri dataUri = NetFileCache.get(uri);
         return switch (dataUri.format()) {
-            case JPIP, JP2, JPX -> new J2KView(executor, req, dataUri);
-            case FITS, PNG, JPEG -> new URIView(executor, dataUri);
-            case ZIP -> loadZip(executor, dataUri.uri());
+            case Image.JPIP, Image.JP2, Image.JPX -> new J2KView(executor, req, dataUri);
+            case Image.FITS, Image.PNG, Image.JPEG -> new URIView(executor, dataUri);
+            case Image.ZIP -> loadZip(executor, dataUri.uri());
             default -> throw new Exception("Unknown image type");
         };
     }

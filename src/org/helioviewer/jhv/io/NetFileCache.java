@@ -22,16 +22,16 @@ public class NetFileCache {
 
     private static DataUri.Format detect(File file) throws IOException {
         if (file.getPath().toLowerCase().endsWith(".fits.gz")) // hack
-            return DataUri.Format.FITS;
+            return DataUri.Format.Image.FITS;
         else
-            return DataUri.Format.get(tika.detect(file));
+            return DataUri.getFormat(tika.detect(file));
     }
 
     private static final LoadingCache<URI, DataUri> cache = Caffeine.newBuilder().softValues().
             build(uri -> {
                 String scheme = uri.getScheme().toLowerCase();
                 if ("jpip".equals(scheme) || "jpips".equals(scheme))
-                    return new DataUri(uri, uri, null, DataUri.Format.JPIP);
+                    return new DataUri(uri, uri, null, DataUri.Format.Image.JPIP);
                 if ("file".equals(scheme)) {
                     File file = new File(uri.getPath()); // for files with authority (//localhost) and Windows
                     return new DataUri(uri, uri, file, detect(file));

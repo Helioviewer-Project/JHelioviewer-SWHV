@@ -8,25 +8,29 @@ import org.apache.commons.io.FilenameUtils;
 
 public class DataUri {
 
-    public enum Format {
+    private static final Map<String, Format> map = Map.of(
+            "application/x-jpp-stream", Format.Image.JPIP,
+            "image/jp2", Format.Image.JP2,
+            "image/jpx", Format.Image.JPX,
+            "application/fits", Format.Image.FITS,
+            "image/png", Format.Image.PNG,
+            "image/jpeg", Format.Image.JPEG,
+            "application/zip", Format.Image.ZIP,
+            "application/x-netcdf", Format.Timeline.CDF,
+            "text/csv", Format.Timeline.CSV
+    );
 
-        UNKNOWN, JPIP, JP2, JPX, FITS, PNG, JPEG, ZIP;
+    static Format getFormat(String spec) {
+        Format f = map.get(spec);
+        return f == null ? Format.Unknown.UNKNOWN : f;
+    }
 
-        private static final Map<String, Format> map = Map.of(
-                "application/x-jpp-stream", JPIP,
-                "image/jp2", JP2,
-                "image/jpx", JPX,
-                "application/fits", FITS,
-                "image/png", PNG,
-                "image/jpeg", JPEG,
-                "application/zip", ZIP
-        );
+    public interface Format {
+        enum Unknown implements Format {UNKNOWN}
 
-        static Format get(String spec) {
-            Format f = map.get(spec);
-            return f == null ? UNKNOWN : f;
-        }
+        enum Image implements Format {JPIP, JP2, JPX, FITS, PNG, JPEG, ZIP}
 
+        enum Timeline implements Format {CDF, CSV}
     }
 
     private final URI uri;
