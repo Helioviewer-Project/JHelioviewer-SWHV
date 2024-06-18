@@ -5,6 +5,7 @@
 
 - Restore timeline loading from new HAPI ROB server
 - Add menu item to reload the list of datasets
+- Switch to Java 21
 
 ## JHelioviewer 4.6.4 (2024-05-06)
 
