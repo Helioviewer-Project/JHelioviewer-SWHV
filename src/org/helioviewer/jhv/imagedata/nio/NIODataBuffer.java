@@ -48,20 +48,24 @@ abstract class NIODataBuffer extends DataBuffer {
     }
 
     public static DataBuffer create(Buffer buffer) {
-        if (buffer instanceof ByteBuffer) {
-            ByteDataBuffer ret = new ByteDataBuffer();
-            ret.setBuffer((ByteBuffer) buffer);
-            return ret;
-        } else if (buffer instanceof ShortBuffer) {
-            UShortDataBuffer ret = new UShortDataBuffer();
-            ret.setBuffer((ShortBuffer) buffer);
-            return ret;
-        } else if (buffer instanceof IntBuffer) {
-            IntDataBuffer ret = new IntDataBuffer();
-            ret.setBuffer((IntBuffer) buffer);
-            return ret;
-        } else
-            throw new IllegalArgumentException("Unsupported data type: " + buffer);
+        switch (buffer) {
+            case ByteBuffer byteBuffer -> {
+                ByteDataBuffer ret = new ByteDataBuffer();
+                ret.setBuffer(byteBuffer);
+                return ret;
+            }
+            case ShortBuffer shortBuffer -> {
+                UShortDataBuffer ret = new UShortDataBuffer();
+                ret.setBuffer(shortBuffer);
+                return ret;
+            }
+            case IntBuffer intBuffer -> {
+                IntDataBuffer ret = new IntDataBuffer();
+                ret.setBuffer(intBuffer);
+                return ret;
+            }
+            case null, default -> throw new IllegalArgumentException("Unsupported data type: " + buffer);
+        }
     }
 
     static class DataBufferByte extends NIODataBuffer {
