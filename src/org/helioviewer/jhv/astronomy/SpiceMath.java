@@ -3,7 +3,7 @@ package org.helioviewer.jhv.astronomy;
 import org.helioviewer.jhv.math.Quat;
 
 // Reimplementation of some basic SPICE functions: threadsafe and avoids copies between Java and C
-class SpiceMath {
+public class SpiceMath {
 
     static double[] reclat(double[] rectan) {
         double big, d1, d2;
@@ -28,7 +28,7 @@ class SpiceMath {
         }
     }
 
-    static double[] recrad(double[] rectan) {
+    public static double[] recrad(double[] rectan) {
         double[] ret = reclat(rectan);
         if (ret[1] < 0.) {
             ret[1] += Math.TAU;
@@ -44,7 +44,7 @@ class SpiceMath {
                 radius * Math.sin(lat)};
     }
 
-    static double[] mxv(double[][] m, double[] v) {
+    public static double[] mxv(double[][] m, double[] v) {
         return new double[]{
                 m[0][0] * v[0] + m[0][1] * v[1] + m[0][2] * v[2],
                 m[1][0] * v[0] + m[1][1] * v[1] + m[1][2] * v[2],

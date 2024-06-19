@@ -53,7 +53,7 @@ public class Spice {
     }
 
     @Nullable
-    static Position getPositionLatitudinal(String observer, String target, String frame, JHVTime time) {
+    static Position getPositionLat(String observer, String target, String frame, JHVTime time) {
         try {
             double[] c = positionLat(observer, target, frame, time.milli);
             return new Position(time, c[0], c[1], c[2]);
@@ -74,10 +74,34 @@ public class Spice {
         return null;
     }
 
+    @Nullable
+    public static double[] getPositionRect(String observer, String target, String frame, JHVTime time) {
+        try {
+            double[] v = new double[3];
+            positionRec(observer, target, frame, time.milli, v);
+            return v;
+        } catch (SpiceErrorException e) {
+            Log.error(e);
+        }
+        return null;
+    }
+
+    @Nullable
+    public static double[] getPositionRad(String observer, String target, String frame, JHVTime time) {
+        try {
+            double[] v = new double[3];
+            positionRec(observer, target, frame, time.milli, v);
+            return SpiceMath.recrad(v);
+        } catch (Exception e) {
+            Log.error(e);
+        }
+        return null;
+    }
+
     private static final int[] axes = new int[]{3, 2, 1};
 
     @Nullable
-    public static double[] getEulerRotation(String fromFrame, String toFrame, JHVTime time) {
+    public static double[] getRotationEuler(String fromFrame, String toFrame, JHVTime time) {
         try {
             double et = milli2et(time.milli);
             return CSPICE.m2eul(CSPICE.pxform(fromFrame, toFrame, et), axes);
@@ -87,62 +111,33 @@ public class Spice {
         return null;
     }
 
-// Stars start
-
-    private static final double[] zaxis = new double[]{0x1.f528efd03d6ddp-4, -0x1.b139ceec78046p-2, 0x1.cbac0fc6ffd8cp-1}; // IAU_SUN (0,0,1) in J2000
-
     @Nullable
-    public static double[][] twovecSun(String target, JHVTime time) {
+    public static double[][] getRotationMatrix(String fromFrame, String toFrame, JHVTime time) {
         try {
             double et = milli2et(time.milli);
-
-            double[] xaxis = new double[3];
-            CSPICE.spkpos(target, et, "J2000", "NONE", "SUN", xaxis, lightTimeUnused);
-            //double[] zaxis = CSPICE.mxv(CSPICE.pxform("IAU_SUN", "J2000", et), new double[]{0, 0, 1});
-            //System.out.println(">>> " + String.format("%a ,%a, %a", zaxis[0], zaxis[1], zaxis[2]));
-            return CSPICE.twovec(xaxis, 1, zaxis, 3);
+            return CSPICE.pxform(fromFrame, toFrame, et);
         } catch (Exception e) {
             Log.error(e);
         }
         return null;
     }
 
-    @Nullable
-    public static double[] radRotate(double ra, double dec, double[][] m) {
-        try {
-            return rotate2Rad(m, SpiceMath.latrec(1, ra, dec));
-        } catch (Exception e) {
-            Log.error(e);
-        }
-        return null;
-    }
+// Stars start
 
     @Nullable
-    public static double[] posRad(String observer, String target, JHVTime time) {
+    public static double[] posSSB(String target, JHVTime time) {
         try {
+            double et = milli2et(time.milli);
             double[] v = new double[3];
-            positionRec(observer, target, "J2000", time.milli, v);
-            return SpiceMath.recrad(v);
+            CSPICE.spkpos(target, et, "J2000", "NONE", "SSB", v, lightTimeUnused);
+            v[0] = CSPICE.convrt(v[0], "KM", "AU");
+            v[1] = CSPICE.convrt(v[1], "KM", "AU");
+            v[2] = CSPICE.convrt(v[2], "KM", "AU");
+            return v;
         } catch (Exception e) {
             Log.error(e);
         }
         return null;
-    }
-
-    @Nullable
-    public static double[] posRadM(String observer, String target, JHVTime time, double[][] m) {
-        try {
-            double[] v = new double[3];
-            positionRec(observer, target, "J2000", time.milli, v);
-            return rotate2Rad(m, v);
-        } catch (Exception e) {
-            Log.error(e);
-        }
-        return null;
-    }
-
-    private static double[] rotate2Rad(double[][] m, double[] v) throws SpiceErrorException {
-        return SpiceMath.recrad(SpiceMath.mxv(m, v));
     }
 
 // Stars end
@@ -152,10 +147,12 @@ public class Spice {
         return sec + CSPICE.deltet(sec, "UTC");
     }
 
-    private static long et2milli(double et) throws SpiceErrorException {
-        double sec = et - CSPICE.deltet(et, "ET");
-        return (long) (sec * 1000. + TimeUtils.J2000.milli + .5);
-    }
+// --Commented out by Inspection START (19/06/2024, 16:04):
+//    private static long et2milli(double et) throws SpiceErrorException {
+//        double sec = et - CSPICE.deltet(et, "ET");
+//        return (long) (sec * 1000. + TimeUtils.J2000.milli + .5);
+//    }
+// --Commented out by Inspection STOP (19/06/2024, 16:04)
 
     private static final double[] lightTimeUnused = new double[1];
 

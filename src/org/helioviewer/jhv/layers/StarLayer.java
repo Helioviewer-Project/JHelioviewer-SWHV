@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Spice;
+import org.helioviewer.jhv.astronomy.SpiceMath;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -21,6 +22,8 @@ import org.json.JSONObject;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.jogamp.opengl.GL2;
+
+import org.jastronomy.jsofa.JSOFA;
 
 public final class StarLayer extends AbstractLayer implements TimeListener.Change, GaiaClient.ReceiverStars {
 
@@ -47,7 +50,7 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
         cache.put(time, Optional.empty()); // promise
 
         String sc = "STEREO AHEAD";
-        double[] search = Spice.posRad(sc, "SUN", time); // HCRS in fact
+        double[] search = Spice.getPositionRad(sc, "SUN", "J2000", time); // HCRS in fact
         double dist = search[0];
         double ra = Math.toDegrees(search[1]);
         double dec = Math.toDegrees(search[2]);
@@ -55,10 +58,20 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
         GaiaClient.submitSearch(this, time, sc, dist, new GaiaClient.StarRequest(ra, dec, SEARCH_CONE, SEARCH_MAG));
     }
 
-    private static void putVertex(BufVertex pointsBuf, double[] radec, double dist, float size, byte[] color) {
-        double x = -dist * Math.tan(radec[1]);
-        double y = dist * Math.tan(radec[2]);
+    private static void putVertex(BufVertex pointsBuf, double Tx, double Ty, double dist, float size, byte[] color) {
+        double x = dist * Math.tan(Tx);
+        double y = dist * Math.tan(Ty);
         pointsBuf.putVertex((float) x, (float) y, 0, size, color);
+    }
+
+    private static void putPlanet(String sc, String planet, JHVTime time, double[][] mat, double[] scPos, BufVertex pointsBuf) {
+        double[] v = Spice.getPositionRect(sc, planet, "J2000", time);
+        v = SpiceMath.mxv(mat, v); // to Carrington
+        v = SpiceMath.recrad(v);
+
+        double[] theta = new double[2];
+        calcProjSimple(0, v[1], v[2], scPos[1], scPos[2], theta);
+        putVertex(pointsBuf, theta[0], theta[1], scPos[0], 2 * SIZE_POINT, Colors.Green);
     }
 
     @Override
@@ -66,20 +79,15 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
         double dyr = (time.milli / 1000. - GaiaClient.EPOCH) / 86400. / 365.25;
         double mas_dyr = dyr / 1000. / 3600.;
 
-        double[][] mat = Spice.twovecSun(sc, time);
-        //double[][] mat = Spice.getRotationM("J2000", "SOLO_IAU_SUN_2009", time, -v.lon, -v.lat);
+        double[][] mat = Spice.getRotationMatrix("J2000", "SOLO_IAU_SUN_2009", time);
+        double[] scPos = Spice.getPositionRad(sc, "SUN", "SOLO_IAU_SUN_2009", time);
 
         int num = stars.size();
         BufVertex pointsBuf = new BufVertex((num + 3) * GLSLShape.stride);
 
-        double[] radec;
-
-        radec = Spice.posRadM(sc, "MERCURY", time, mat);
-        putVertex(pointsBuf, radec, dist, 2 * SIZE_POINT, Colors.Green);
-        radec = Spice.posRadM(sc, "VENUS", time, mat);
-        putVertex(pointsBuf, radec, dist, 2 * SIZE_POINT, Colors.Green);
-        radec = Spice.posRadM(sc, "MARS BARYCENTER", time, mat);
-        putVertex(pointsBuf, radec, dist, 2 * SIZE_POINT, Colors.Green);
+        putPlanet(sc, "MERCURY", time, mat, scPos, pointsBuf);
+        putPlanet(sc, "VENUS", time, mat, scPos, pointsBuf);
+        putPlanet(sc, "MARS BARYCENTER", time, mat, scPos, pointsBuf);
 
         for (int i = 0; i < num; i++) {
             GaiaClient.Star star = stars.get(i);
@@ -87,16 +95,24 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
             double dec = Math.toRadians(star.dec());
 
             // http://mingus.mmto.arizona.edu/~bjw/mmt/spectro_standards.html
-            double pmra = Math.toRadians(star.pmra() * mas_dyr);
-            double pmdec = Math.toRadians(star.pmdec() * mas_dyr);
-            ra += pmra / Math.cos(dec);
-            dec += pmdec;
+            //double pmra = Math.toRadians(star.pmra() * mas_dyr);
+            //double pmdec = Math.toRadians(star.pmdec() * mas_dyr);
+            //ra += pmra / Math.cos(dec);
+            //dec += pmdec;
 
-            if (Double.isFinite(ra) && Double.isFinite(dec)) {
-                radec = Spice.radRotate(ra, dec, mat);
-                putVertex(pointsBuf, radec, dist, 2 * SIZE_POINT, Colors.Blue);
+            double[] ssb = Spice.posSSB("STEREO AHEAD", time);
+            double[] s = JSOFA.jauPmpx(ra, dec, Math.toRadians(star.pmra() / 1000. / 3600.) / Math.cos(dec), Math.toRadians(star.pmdec() / 1000. / 3600.), star.px() / 1000., star.rv(), dyr, ssb);
+
+            if (Double.isFinite(s[0]) && Double.isFinite(s[1]) && Double.isFinite(s[2])) {
+                s = SpiceMath.mxv(mat, s);
+                s = SpiceMath.recrad(s);
+
+                double[] theta = new double[2];
+                calcProjSimple(0, s[1], s[2], scPos[1], scPos[2], theta);
+                putVertex(pointsBuf, theta[0], theta[1], scPos[0], 2 * SIZE_POINT, Colors.Blue);
             }
         }
+
         cache.put(time, Optional.of(pointsBuf));
         MovieDisplay.display();
     }
@@ -165,6 +181,14 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
 
         theta[0] = Math.atan(-num / den * Math.sin(phi - P));
         theta[1] = Math.asin(Math.sin(rho) * Math.cos(phi - P));
+    }
+
+    private static void calcProjSimple(double P, double alpha, double delta, double alpha0, double delta0, double[] theta) {
+        double sP = Math.sin(P);
+        double cP = Math.cos(P);
+        double alphaCosDelta = (alpha - alpha0) * Math.cos(delta0);
+        theta[0] = -alphaCosDelta * cP + (delta - delta0) * sP;
+        theta[1] = alphaCosDelta * sP + (delta - delta0) * cP;
     }
 
 }
