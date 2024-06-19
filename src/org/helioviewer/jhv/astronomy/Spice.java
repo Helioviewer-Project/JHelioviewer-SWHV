@@ -122,25 +122,7 @@ public class Spice {
         return null;
     }
 
-// Stars start
-
-    @Nullable
-    public static double[] posSSB(String target, JHVTime time) {
-        try {
-            double et = milli2et(time.milli);
-            double[] v = new double[3];
-            CSPICE.spkpos(target, et, "J2000", "NONE", "SSB", v, lightTimeUnused);
-            v[0] = CSPICE.convrt(v[0], "KM", "AU");
-            v[1] = CSPICE.convrt(v[1], "KM", "AU");
-            v[2] = CSPICE.convrt(v[2], "KM", "AU");
-            return v;
-        } catch (Exception e) {
-            Log.error(e);
-        }
-        return null;
-    }
-
-// Stars end
+////
 
     private static double milli2et(long milli) throws SpiceErrorException {
         double sec = (milli - TimeUtils.J2000.milli) / 1000.;

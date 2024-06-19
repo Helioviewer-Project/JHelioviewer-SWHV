@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.astronomy.SpiceMath;
+import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -82,6 +83,11 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
         double[][] mat = Spice.getRotationMatrix("J2000", "SOLO_IAU_SUN_2009", time);
         double[] scPos = Spice.getPositionRad(sc, "SUN", "SOLO_IAU_SUN_2009", time);
 
+        double[] ssb = Spice.getPositionRect("SSB", sc, "J2000", time);
+        ssb[0] *= Sun.MeanEarthDistanceInv; // in au
+        ssb[1] *= Sun.MeanEarthDistanceInv;
+        ssb[2] *= Sun.MeanEarthDistanceInv;
+
         int num = stars.size();
         BufVertex pointsBuf = new BufVertex((num + 3) * GLSLShape.stride);
 
@@ -100,9 +106,7 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
             //ra += pmra / Math.cos(dec);
             //dec += pmdec;
 
-            double[] ssb = Spice.posSSB("STEREO AHEAD", time);
             double[] s = JSOFA.jauPmpx(ra, dec, Math.toRadians(star.pmra() / 1000. / 3600.) / Math.cos(dec), Math.toRadians(star.pmdec() / 1000. / 3600.), star.px() / 1000., star.rv(), dyr, ssb);
-
             if (Double.isFinite(s[0]) && Double.isFinite(s[1]) && Double.isFinite(s[2])) {
                 s = SpiceMath.mxv(mat, s);
                 s = SpiceMath.recrad(s);
