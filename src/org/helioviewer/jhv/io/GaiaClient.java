@@ -33,12 +33,12 @@ public class GaiaClient {
     private static final double EPOCH_2016_0_SEC = 1451606400; // DR3
     public static final double EPOCH = EPOCH_2016_0_SEC;
 
-    public static void submitSearch(ReceiverStars receiver, JHVTime time, String sc, double dist, StarRequest request) {
-        EDTCallbackExecutor.pool.submit(new QueryTap(request), new CallbackTap(receiver, time, sc, dist));
+    public static void submitSearch(ReceiverStars receiver, JHVTime time, String sc, StarRequest request) {
+        EDTCallbackExecutor.pool.submit(new QueryTap(request), new CallbackTap(receiver, time, sc));
     }
 
     public interface ReceiverStars {
-        void setStars(JHVTime time, String sc, double dist, List<Star> list);
+        void setStars(JHVTime time, String sc, List<Star> list);
     }
 
     public record StarRequest(double ra, double dec, double cone, double mag) {
@@ -84,11 +84,10 @@ public class GaiaClient {
         }
     }
 
-    private record CallbackTap(ReceiverStars receiver, JHVTime time, String sc,
-                               double dist) implements FutureCallback<List<Star>> {
+    private record CallbackTap(ReceiverStars receiver, JHVTime time, String sc) implements FutureCallback<List<Star>> {
         @Override
         public void onSuccess(@Nonnull List<Star> result) {
-            receiver.setStars(time, sc, dist, result);
+            receiver.setStars(time, sc, result);
         }
 
         @Override
