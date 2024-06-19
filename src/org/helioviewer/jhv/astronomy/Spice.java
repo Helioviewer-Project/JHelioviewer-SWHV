@@ -11,6 +11,8 @@ import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 
 //import com.google.common.base.Stopwatch;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import spice.basic.CSPICE;
 import spice.basic.SpiceErrorException;
 
@@ -111,8 +113,11 @@ public class Spice {
         return null;
     }
 
+    public static final LoadingCache<JHVTime, double[][]> j2000ToSun = Caffeine.newBuilder().maximumSize(10000)
+            .build(t -> getRotationMatrix("J2000", "SOLO_IAU_SUN_2009", t));
+
     @Nullable
-    public static double[][] getRotationMatrix(String fromFrame, String toFrame, JHVTime time) {
+    private static double[][] getRotationMatrix(String fromFrame, String toFrame, JHVTime time) {
         try {
             double et = milli2et(time.milli);
             return CSPICE.pxform(fromFrame, toFrame, et);
