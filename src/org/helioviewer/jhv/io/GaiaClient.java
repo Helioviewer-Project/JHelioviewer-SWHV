@@ -44,14 +44,14 @@ public class GaiaClient {
     public record StarRequest(double ra, double dec, double cone, double mag) {
     }
 
-    public record Star(int id, double ra, double dec, double pmra, double pmdec, double mag) {
+    public record Star(int id, double ra, double dec, double pmra, double pmdec, double px, double rv, double mag) {
     }
 
     private static final UriTemplate queryTemplate = new UriTemplate("https://gea.esac.esa.int/tap-server/tap/sync",
             UriTemplate.vars().set("REQUEST", "doQuery").set("LANG", "ADQL").set("FORMAT", "fits"));
 
     private static String adqlSearch(double ra, double dec, double cone, double mag) {
-        return "SELECT source_id,ra,dec,pmra,pmdec,phot_g_mean_mag FROM gaiadr3.gaia_source_lite WHERE " +
+        return "SELECT source_id,ra,dec,pmra,pmdec,parallax,radial_velocity,phot_g_mean_mag FROM gaiadr3.gaia_source_lite WHERE " +
                 String.format("1=CONTAINS(POINT('ICRS',ra,dec), CIRCLE('ICRS',%f,%f,%f)) AND phot_g_mean_mag<%f", ra, dec, cone, mag);
     }
 
@@ -73,7 +73,9 @@ public class GaiaClient {
                                 ((Number) rseq.getCell(2)).doubleValue(),
                                 ((Number) rseq.getCell(3)).doubleValue(),
                                 ((Number) rseq.getCell(4)).doubleValue(),
-                                ((Number) rseq.getCell(5)).doubleValue()));
+                                ((Number) rseq.getCell(5)).doubleValue(),
+                                ((Number) rseq.getCell(6)).doubleValue(),
+                                ((Number) rseq.getCell(7)).doubleValue()));
                     }
                 }
                 Log.info("Found " + stars.size() + " stars with " + adql);
