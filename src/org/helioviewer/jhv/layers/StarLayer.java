@@ -52,11 +52,10 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
 
         String sc = "STEREO AHEAD";
         double[] search = Spice.getPositionRad(sc, "SUN", "J2000", time); // HCRS in fact
-        double dist = search[0];
         double ra = Math.toDegrees(search[1]);
         double dec = Math.toDegrees(search[2]);
 
-        GaiaClient.submitSearch(this, time, sc, dist, new GaiaClient.StarRequest(ra, dec, SEARCH_CONE, SEARCH_MAG));
+        GaiaClient.submitSearch(this, time, sc, new GaiaClient.StarRequest(ra, dec, SEARCH_CONE, SEARCH_MAG));
     }
 
     private static void putVertex(BufVertex pointsBuf, double Tx, double Ty, double dist, float size, byte[] color) {
@@ -71,22 +70,28 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
         v = SpiceMath.recrad(v);
 
         double[] theta = new double[2];
-        calcProjSimple(0, v[1], v[2], scPos[1], scPos[2], theta);
+        calcProj(0, v[1], v[2], scPos[1], scPos[2], theta);
         putVertex(pointsBuf, theta[0], theta[1], scPos[0], 2 * SIZE_POINT, Colors.Green);
     }
 
     @Override
-    public void setStars(JHVTime time, String sc, double dist, List<GaiaClient.Star> stars) {
+    public void setStars(JHVTime time, String sc, List<GaiaClient.Star> stars) {
         double dyr = (time.milli / 1000. - GaiaClient.EPOCH) / 86400. / 365.25;
-        double mas_dyr = dyr / 1000. / 3600.;
+        //double mas_dyr = dyr / 1000. / 3600.;
 
         double[][] mat = Spice.j2000ToSun.get(time);
         double[] scPos = Spice.getPositionRad(sc, "SUN", "SOLO_IAU_SUN_2009", time);
 
         double[] ssb = Spice.getPositionRect("SSB", sc, "J2000", time);
-        ssb[0] *= Sun.MeanEarthDistanceInv; // in au
+        ssb[0] *= Sun.MeanEarthDistanceInv; // au
         ssb[1] *= Sun.MeanEarthDistanceInv;
         ssb[2] *= Sun.MeanEarthDistanceInv;
+
+        double[] sun = Spice.getPositionRect("SUN", sc, "J2000", time);
+        sun[0] /= scPos[0];
+        sun[1] /= scPos[0];
+        sun[2] /= scPos[0];
+        double dist = scPos[0] * Sun.MeanEarthDistanceInv; // au
 
         int num = stars.size();
         BufVertex pointsBuf = new BufVertex((num + 3) * GLSLShape.stride);
@@ -106,13 +111,18 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
             //ra += pmra / Math.cos(dec);
             //dec += pmdec;
 
-            double[] s = JSOFA.jauPmpx(ra, dec, Math.toRadians(star.pmra() / 1000. / 3600.) / Math.cos(dec), Math.toRadians(star.pmdec() / 1000. / 3600.), star.px() / 1000., star.rv(), dyr, ssb);
+            double[] s;
+            // Proper motion and parallax
+            s = JSOFA.jauPmpx(ra, dec, Math.toRadians(star.pmra() / (1000. * 3600.)) / Math.cos(dec), Math.toRadians(star.pmdec() / (1000. * 3600.)), star.px() / 1000., star.rv(), dyr, ssb);
+            // Deflection of starlight by the Sun
+            s = JSOFA.jauLdsun(s, sun, dist);
+
             if (Double.isFinite(s[0]) && Double.isFinite(s[1]) && Double.isFinite(s[2])) {
                 s = SpiceMath.mxv(mat, s);
                 s = SpiceMath.recrad(s);
 
                 double[] theta = new double[2];
-                calcProjSimple(0, s[1], s[2], scPos[1], scPos[2], theta);
+                calcProj(0, s[1], s[2], scPos[1], scPos[2], theta);
                 putVertex(pointsBuf, theta[0], theta[1], scPos[0], 2 * SIZE_POINT, Colors.Blue);
             }
         }

@@ -10,7 +10,7 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 
 public class Sun {
 
-    public static final double CLIGHT = 299792458;
+    public static final double CLIGHT = 299_792_458.;
 
     // http://asa.usno.navy.mil/static/files/2016/Astronomical_Constants_2016.pdf
     private static final double SunEarthMassRatio = 332946.0487;
@@ -24,7 +24,7 @@ public class Sun {
     public static final double RadiusKMeterInv = 1 / RadiusKMeter;
     public static final double RadiusMilli = RadiusMeter / CLIGHT * 1e3;
 
-    private static final double MeanEarthDistanceMeter = 149597870.7 * 1e3;
+    private static final double MeanEarthDistanceMeter = 149_597_870_700.;
     public static final double MeanEarthDistance = MeanEarthDistanceMeter / RadiusMeter;
     public static final double MeanEarthDistanceInv = RadiusMeter / MeanEarthDistanceMeter;
 
