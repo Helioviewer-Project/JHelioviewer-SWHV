@@ -80,7 +80,7 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
         double dyr = (time.milli / 1000. - GaiaClient.EPOCH) / 86400. / 365.25;
         double mas_dyr = dyr / 1000. / 3600.;
 
-        double[][] mat = Spice.getRotationMatrix("J2000", "SOLO_IAU_SUN_2009", time);
+        double[][] mat = Spice.j2000ToSun.get(time);
         double[] scPos = Spice.getPositionRad(sc, "SUN", "SOLO_IAU_SUN_2009", time);
 
         double[] ssb = Spice.getPositionRect("SSB", sc, "J2000", time);
