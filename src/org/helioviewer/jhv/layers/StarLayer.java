@@ -82,16 +82,18 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
         double[][] mat = Spice.j2000ToSun.get(time);
         double[] scPos = Spice.getPositionRad(sc, "SUN", "SOLO_IAU_SUN_2009", time);
 
-        double[] ssb = Spice.getPositionRect("SSB", sc, "J2000", time);
+        double[] ssb = Spice.getState("SSB", sc, "J2000", time);
         ssb[0] *= Sun.MeanEarthDistanceInv; // au
         ssb[1] *= Sun.MeanEarthDistanceInv;
         ssb[2] *= Sun.MeanEarthDistanceInv;
+        double[] vel = new double[]{ssb[3], ssb[4], ssb[5]}; // c
+        double bm1 = Math.sqrt(1 - vel[0] * vel[0] + vel[1] * vel[1] + vel[2] * vel[2]);
 
         double[] sun = Spice.getPositionRect("SUN", sc, "J2000", time);
         sun[0] /= scPos[0];
         sun[1] /= scPos[0];
         sun[2] /= scPos[0];
-        double dist = scPos[0] * Sun.MeanEarthDistanceInv; // au
+        double auDist = scPos[0] * Sun.MeanEarthDistanceInv; // au
 
         int num = stars.size();
         BufVertex pointsBuf = new BufVertex((num + 3) * GLSLShape.stride);
@@ -115,7 +117,9 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
             // Proper motion and parallax
             s = JSOFA.jauPmpx(ra, dec, Math.toRadians(star.pmra() / (1000. * 3600.)) / Math.cos(dec), Math.toRadians(star.pmdec() / (1000. * 3600.)), star.px() / 1000., star.rv(), dyr, ssb);
             // Deflection of starlight by the Sun
-            s = JSOFA.jauLdsun(s, sun, dist);
+            s = JSOFA.jauLdsun(s, sun, auDist);
+            // Apply stellar aberration (natural direction to proper direction)
+            s = JSOFA.jauAb(s, vel, auDist, bm1);
 
             if (Double.isFinite(s[0]) && Double.isFinite(s[1]) && Double.isFinite(s[2])) {
                 s = SpiceMath.mxv(mat, s);
