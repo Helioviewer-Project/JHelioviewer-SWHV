@@ -89,6 +89,18 @@ public class Spice {
     }
 
     @Nullable
+    public static double[] getState(String observer, String target, String frame, JHVTime time) {
+        try {
+            double[] v = new double[6];
+            state(observer, target, frame, time.milli, v);
+            return v;
+        } catch (SpiceErrorException e) {
+            Log.error(e);
+        }
+        return null;
+    }
+
+    @Nullable
     public static double[] getPositionRad(String observer, String target, String frame, JHVTime time) {
         try {
             double[] v = new double[3];
@@ -142,6 +154,17 @@ public class Spice {
 // --Commented out by Inspection STOP (19/06/2024, 16:04)
 
     private static final double[] lightTimeUnused = new double[1];
+
+    private static void state(String observer, String target, String frame, long milli, double[] result) throws SpiceErrorException {
+        double et = milli2et(milli);
+        CSPICE.spkezr(target, et, frame, "NONE", observer, result, lightTimeUnused);
+        result[0] *= Sun.RadiusKMeterInv;
+        result[1] *= Sun.RadiusKMeterInv;
+        result[2] *= Sun.RadiusKMeterInv;
+        result[3] *= 1000 / Sun.CLIGHT;
+        result[4] *= 1000 / Sun.CLIGHT;
+        result[5] *= 1000 / Sun.CLIGHT;
+    }
 
     private static void positionRec(String observer, String target, String frame, long milli, double[] result) throws SpiceErrorException {
         double et = milli2et(milli);
