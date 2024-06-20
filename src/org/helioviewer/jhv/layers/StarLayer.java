@@ -70,7 +70,7 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
         v = SpiceMath.recrad(v);
 
         double[] theta = new double[2];
-        calcProj(0, v[1], v[2], scPos[1], scPos[2], theta);
+        calcProj3(0, v[1], v[2], scPos[1], scPos[2], theta);
         putVertex(pointsBuf, theta[0], theta[1], scPos[0], 2 * SIZE_POINT, Colors.Green);
     }
 
@@ -126,7 +126,7 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
                 s = SpiceMath.recrad(s);
 
                 double[] theta = new double[2];
-                calcProj(0, s[1], s[2], scPos[1], scPos[2], theta);
+                calcProj3(0, s[1], s[2], scPos[1], scPos[2], theta);
                 putVertex(pointsBuf, theta[0], theta[1], scPos[0], 2 * SIZE_POINT, Colors.Blue);
             }
         }
@@ -190,7 +190,24 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
     }
 
     // https://celestialscenes.com/alma/convert/coordconvert.pdf
-    private static void calcProj(double P, double alpha, double delta, double alpha0, double delta0, double[] theta) {
+    // small angles
+    private static void calcProj1(double P, double alpha, double delta, double alpha0, double delta0, double[] theta) {
+        double sP = Math.sin(P);
+        double cP = Math.cos(P);
+        double alphaCosDelta = (alpha - alpha0) * Math.cos(delta0);
+        theta[0] = -alphaCosDelta * cP + (delta - delta0) * sP;
+        theta[1] = alphaCosDelta * sP + (delta - delta0) * cP;
+    }
+    // big angles
+    private static void calcProj3(double P, double alpha, double delta, double alpha0, double delta0, double[] theta) {
+        double phi = Math.atan2(Math.sin(alpha - alpha0), Math.tan(delta) * Math.cos(delta0) - Math.sin(delta0) * Math.cos(alpha - alpha0));
+        double rho = Math.acos(Math.cos(delta) * Math.cos(delta0) * Math.cos(alpha - alpha0) + Math.sin(delta) * Math.sin(delta0));
+        
+        theta[0] = Math.atan(-Math.tan(rho) * Math.sin(phi - P));
+        theta[1] = Math.asin(Math.sin(rho) * Math.cos(phi - P));
+    }
+    // all angles
+    private static void calcProj5(double P, double alpha, double delta, double alpha0, double delta0, double[] theta) {
         double phi = Math.atan2(Math.sin(alpha - alpha0), Math.tan(delta) * Math.cos(delta0) - Math.sin(delta0) * Math.cos(alpha - alpha0));
 
         double num = Math.hypot(Math.cos(delta) * Math.sin(alpha - alpha0), Math.cos(delta0) * Math.sin(delta) - Math.sin(delta0) * Math.cos(delta) * Math.cos(alpha - alpha0));
@@ -199,14 +216,6 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
 
         theta[0] = Math.atan(-num / den * Math.sin(phi - P));
         theta[1] = Math.asin(Math.sin(rho) * Math.cos(phi - P));
-    }
-
-    private static void calcProjSimple(double P, double alpha, double delta, double alpha0, double delta0, double[] theta) {
-        double sP = Math.sin(P);
-        double cP = Math.cos(P);
-        double alphaCosDelta = (alpha - alpha0) * Math.cos(delta0);
-        theta[0] = -alphaCosDelta * cP + (delta - delta0) * sP;
-        theta[1] = alphaCosDelta * sP + (delta - delta0) * cP;
     }
 
 }
