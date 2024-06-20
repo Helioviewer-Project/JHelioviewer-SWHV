@@ -65,7 +65,7 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
     }
 
     private static void putPlanet(String sc, String planet, JHVTime time, double[][] mat, double[] scPos, BufVertex pointsBuf) {
-        double[] v = Spice.getPositionRect(sc, planet, "J2000", time);
+        double[] v = Spice.getPositionRec(sc, planet, "J2000", time);
         v = SpiceMath.mxv(mat, v); // to Carrington
         v = SpiceMath.recrad(v);
 
@@ -89,7 +89,7 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
         double[] vel = new double[]{ssb[3], ssb[4], ssb[5]}; // c
         double bm1 = Math.sqrt(1 - vel[0] * vel[0] + vel[1] * vel[1] + vel[2] * vel[2]);
 
-        double[] sun = Spice.getPositionRect("SUN", sc, "J2000", time);
+        double[] sun = Spice.getPositionRec("SUN", sc, "J2000", time);
         sun[0] /= scPos[0];
         sun[1] /= scPos[0];
         sun[2] /= scPos[0];

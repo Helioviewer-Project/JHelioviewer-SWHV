@@ -43,7 +43,7 @@ public class Spice {
             int i = 0;
             double[] v = new double[3];
             for (long milli = start; milli <= end; milli += dt) {
-                positionRec(observer, target, frame, milli, v);
+                position(observer, target, frame, milli, v);
                 ret[i++] = new Position.Cartesian(milli, v[0], v[1], v[2]);
             }
             //System.out.println((sw.elapsed().toNanos() / 1e9));
@@ -54,33 +54,12 @@ public class Spice {
         return null;
     }
 
-    @Nullable
-    static Position getPositionLat(String observer, String target, String frame, JHVTime time) {
-        try {
-            double[] c = positionLat(observer, target, frame, time.milli);
-            return new Position(time, c[0], c[1], c[2]);
-        } catch (SpiceErrorException e) {
-            Log.error(e);
-        }
-        return null;
-    }
 
     @Nullable
-    public static Position getCarrington(String target, JHVTime time) {
-        try {
-            double[] c = positionRad("SUN", target, "SOLO_IAU_SUN_2009", time.milli);
-            return new Position(time, c[0], -c[1], c[2]);
-        } catch (Exception e) {
-            Log.error(e);
-        }
-        return null;
-    }
-
-    @Nullable
-    public static double[] getPositionRect(String observer, String target, String frame, JHVTime time) {
+    public static double[] getPositionRec(String observer, String target, String frame, JHVTime time) {
         try {
             double[] v = new double[3];
-            positionRec(observer, target, frame, time.milli, v);
+            position(observer, target, frame, time.milli, v);
             return v;
         } catch (SpiceErrorException e) {
             Log.error(e);
@@ -104,8 +83,34 @@ public class Spice {
     public static double[] getPositionRad(String observer, String target, String frame, JHVTime time) {
         try {
             double[] v = new double[3];
-            positionRec(observer, target, frame, time.milli, v);
+            position(observer, target, frame, time.milli, v);
             return SpiceMath.recrad(v);
+        } catch (Exception e) {
+            Log.error(e);
+        }
+        return null;
+    }
+
+    @Nullable
+    static Position getPositionLat(String observer, String target, String frame, JHVTime time) {
+        try {
+            double[] v = new double[3];
+            position(observer, target, frame, time.milli, v);
+            v = SpiceMath.reclat(v);
+            return new Position(time, v[0], v[1], v[2]);
+        } catch (SpiceErrorException e) {
+            Log.error(e);
+        }
+        return null;
+    }
+
+    @Nullable
+    public static Position getCarrington(String target, JHVTime time) {
+        try {
+            double[] v = new double[3];
+            position("SUN", target, "SOLO_IAU_SUN_2009", time.milli, v);
+            v = SpiceMath.recrad(v);
+            return new Position(time, v[0], -v[1], v[2]);
         } catch (Exception e) {
             Log.error(e);
         }
@@ -166,24 +171,12 @@ public class Spice {
         result[5] *= 1000 / Sun.CLIGHT;
     }
 
-    private static void positionRec(String observer, String target, String frame, long milli, double[] result) throws SpiceErrorException {
+    private static void position(String observer, String target, String frame, long milli, double[] result) throws SpiceErrorException {
         double et = milli2et(milli);
         CSPICE.spkpos(target, et, frame, "NONE", observer, result, lightTimeUnused);
         result[0] *= Sun.RadiusKMeterInv;
         result[1] *= Sun.RadiusKMeterInv;
         result[2] *= Sun.RadiusKMeterInv;
-    }
-
-    private static double[] positionLat(String observer, String target, String frame, long milli) throws SpiceErrorException {
-        double[] v = new double[3];
-        positionRec(observer, target, frame, milli, v);
-        return SpiceMath.reclat(v);
-    }
-
-    private static double[] positionRad(String observer, String target, String frame, long milli) throws SpiceErrorException {
-        double[] v = new double[3];
-        positionRec(observer, target, frame, milli, v);
-        return SpiceMath.recrad(v);
     }
 
 }
