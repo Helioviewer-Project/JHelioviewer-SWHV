@@ -11,6 +11,7 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.io.GaiaClient;
 import org.helioviewer.jhv.math.Transform;
@@ -51,11 +52,16 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
         cache.put(time, Optional.empty()); // promise
 
         String sc = "STEREO AHEAD";
-        double[] search = Spice.getPositionRad(sc, "SUN", "J2000", time); // HCRS in fact
-        double ra = Math.toDegrees(search[1]);
-        double dec = Math.toDegrees(search[2]);
+        //double[] search = Spice.getPositionRad(sc, "SUN", "J2000", time); // HCRS in fact
+        //double ra = Math.toDegrees(search[1]), dec = Math.toDegrees(search[2]);
 
-        GaiaClient.submitSearch(this, time, sc, new GaiaClient.StarRequest(ra, dec, SEARCH_CONE, SEARCH_MAG));
+        Position p = Display.getCamera().getViewpoint(); // temp
+        double[] psc = SpiceMath.latrec(-1, -p.lon, p.lat); // sc to Sun, Carrington lon was negated
+        double[] psearch = SpiceMath.recrad(SpiceMath.mtxv(Spice.j2000ToSun.get(p.time), psc)); // Sun -> J2000
+        double pra = Math.toDegrees(psearch[1]), pdec = Math.toDegrees(psearch[2]);
+        //System.out.println(">>> " + Math.abs(ra - pra) * 3600 + ' ' + Math.abs(dec - pdec) * 3600);
+
+        GaiaClient.submitSearch(this, time, sc, new GaiaClient.StarRequest(pra, pdec, SEARCH_CONE, SEARCH_MAG));
     }
 
     private static void putVertex(BufVertex pointsBuf, double Tx, double Ty, double dist, float size, byte[] color) {
@@ -198,14 +204,16 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
         theta[0] = -alphaCosDelta * cP + (delta - delta0) * sP;
         theta[1] = alphaCosDelta * sP + (delta - delta0) * cP;
     }
+
     // big angles
     private static void calcProj3(double P, double alpha, double delta, double alpha0, double delta0, double[] theta) {
         double phi = Math.atan2(Math.sin(alpha - alpha0), Math.tan(delta) * Math.cos(delta0) - Math.sin(delta0) * Math.cos(alpha - alpha0));
         double rho = Math.acos(Math.cos(delta) * Math.cos(delta0) * Math.cos(alpha - alpha0) + Math.sin(delta) * Math.sin(delta0));
-        
+
         theta[0] = Math.atan(-Math.tan(rho) * Math.sin(phi - P));
         theta[1] = Math.asin(Math.sin(rho) * Math.cos(phi - P));
     }
+
     // all angles
     private static void calcProj5(double P, double alpha, double delta, double alpha0, double delta0, double[] theta) {
         double phi = Math.atan2(Math.sin(alpha - alpha0), Math.tan(delta) * Math.cos(delta0) - Math.sin(delta0) * Math.cos(alpha - alpha0));
