@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.camera;
 
+import java.util.HashSet;
+
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
@@ -35,6 +37,21 @@ public class Camera {
 
     private Position viewpoint = Sun.StartEarth;
     private UpdateViewpoint updateViewpoint;
+
+    public interface Listener {
+        void viewpointChanged(Position v);
+    }
+
+    private final HashSet<Listener> listeners = new HashSet<>();
+
+    public void addListener(Listener listener) {
+        listeners.add(listener);
+        listener.viewpointChanged(viewpoint);
+    }
+
+    public void removeListener(Listener listener) {
+        listeners.remove(listener);
+    }
 
     ////
     private static final float clipNarrow = (float) (32 * Sun.Radius); // bit more than LASCO C3
@@ -73,6 +90,7 @@ public class Camera {
         viewpoint = Display.mode == Display.ProjectionMode.Orthographic ? v : new Position(v.time, Sun.MeanEarthDistance, v.lon, v.lat);
         updateRotation();
         updateWidth();
+        listeners.forEach(l -> l.viewpointChanged(viewpoint));
     }
 
     private void updateRotation() {
