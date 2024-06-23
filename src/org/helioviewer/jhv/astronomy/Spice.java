@@ -80,18 +80,6 @@ public class Spice {
     }
 
     @Nullable
-    public static double[] getPositionRad(String observer, String target, String frame, JHVTime time) {
-        try {
-            double[] v = new double[3];
-            position(observer, target, frame, time.milli, v);
-            return SpiceMath.recrad(v);
-        } catch (Exception e) {
-            Log.error(e);
-        }
-        return null;
-    }
-
-    @Nullable
     static Position getPositionLat(String observer, String target, String frame, JHVTime time) {
         try {
             double[] v = new double[3];
