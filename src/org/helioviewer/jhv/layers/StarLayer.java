@@ -7,13 +7,12 @@ import java.util.Optional;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.astronomy.SpiceMath;
-import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.io.GaiaClient;
+import org.helioviewer.jhv.layers.stars.GaiaClient;
 import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLShape;
@@ -51,17 +50,12 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
             return;
         cache.put(time, Optional.empty()); // promise
 
-        String sc = "STEREO AHEAD";
-        //double[] search = Spice.getPositionRad(sc, "SUN", "J2000", time); // HCRS in fact
-        //double ra = Math.toDegrees(search[1]), dec = Math.toDegrees(search[2]);
-
         Position p = Display.getCamera().getViewpoint(); // temp
-        double[] psc = SpiceMath.latrec(-1, -p.lon, p.lat); // sc to Sun, Carrington lon was negated
+        double[] psc = SpiceMath.radrec(-1, -p.lon, p.lat); // sc to Sun, Carrington lon was negated
         double[] psearch = SpiceMath.recrad(SpiceMath.mtxv(Spice.j2000ToSun.get(p.time), psc)); // Sun -> J2000
         double pra = Math.toDegrees(psearch[1]), pdec = Math.toDegrees(psearch[2]);
-        //System.out.println(">>> " + Math.abs(ra - pra) * 3600 + ' ' + Math.abs(dec - pdec) * 3600);
 
-        GaiaClient.submitSearch(this, time, sc, new GaiaClient.StarRequest(pra, pdec, SEARCH_CONE, SEARCH_MAG));
+        GaiaClient.submitSearch(this, time, new GaiaClient.StarRequest(pra, pdec, SEARCH_CONE, SEARCH_MAG));
     }
 
     private static void putVertex(BufVertex pointsBuf, double Tx, double Ty, double dist, float size, byte[] color) {
@@ -70,70 +64,54 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
         pointsBuf.putVertex((float) x, (float) y, 0, size, color);
     }
 
-    private static void putPlanet(String sc, String planet, JHVTime time, double[][] mat, double[] scPos, BufVertex pointsBuf) {
-        double[] v = Spice.getPositionRec(sc, planet, "J2000", time);
-        v = SpiceMath.mxv(mat, v); // to Carrington
+    private static void putPlanet(String planet, JHVTime time, double[] sc, double[] rsc, BufVertex pointsBuf) {
+        double[] v = Spice.getPositionRec("SUN", planet, "SOLO_IAU_SUN_2009", time);
+        v[0] -= rsc[0]; // sc->planet = sun->planet - sun->sc
+        v[1] -= rsc[1];
+        v[2] -= rsc[2];
         v = SpiceMath.recrad(v);
 
         double[] theta = new double[2];
-        calcProj3(0, v[1], v[2], scPos[1], scPos[2], theta);
-        putVertex(pointsBuf, theta[0], theta[1], scPos[0], 2 * SIZE_POINT, Colors.Green);
+        calcProj3(0, v[1], v[2], sc[1], sc[2], theta);
+        putVertex(pointsBuf, theta[0], theta[1], sc[0], 2 * SIZE_POINT, Colors.Green);
     }
 
     @Override
-    public void setStars(JHVTime time, String sc, List<GaiaClient.Star> stars) {
+    public void setStars(JHVTime time, List<GaiaClient.Star> stars) {
         double dyr = (time.milli / 1000. - GaiaClient.EPOCH) / 86400. / 365.25;
-        //double mas_dyr = dyr / 1000. / 3600.;
-
-        double[][] mat = Spice.j2000ToSun.get(time);
-        double[] scPos = Spice.getPositionRad(sc, "SUN", "SOLO_IAU_SUN_2009", time);
-
-        double[] ssb = Spice.getState("SSB", sc, "J2000", time);
-        ssb[0] *= Sun.MeanEarthDistanceInv; // au
-        ssb[1] *= Sun.MeanEarthDistanceInv;
-        ssb[2] *= Sun.MeanEarthDistanceInv;
-        double[] vel = new double[]{ssb[3], ssb[4], ssb[5]}; // c
-        double bm1 = Math.sqrt(1 - vel[0] * vel[0] + vel[1] * vel[1] + vel[2] * vel[2]);
-
-        double[] sun = Spice.getPositionRec("SUN", sc, "J2000", time);
-        sun[0] /= scPos[0];
-        sun[1] /= scPos[0];
-        sun[2] /= scPos[0];
-        double auDist = scPos[0] * Sun.MeanEarthDistanceInv; // au
+        double mas_dyr = dyr / 1000. / 3600.;
 
         int num = stars.size();
         BufVertex pointsBuf = new BufVertex((num + 3) * GLSLShape.stride);
 
-        putPlanet(sc, "MERCURY", time, mat, scPos, pointsBuf);
-        putPlanet(sc, "VENUS", time, mat, scPos, pointsBuf);
-        putPlanet(sc, "MARS BARYCENTER", time, mat, scPos, pointsBuf);
+        Position p = Display.getCamera().getViewpoint(); // temp
+        double[] sc = new double[]{p.distance, -p.lon, p.lat};
+        double[] rsc = SpiceMath.radrec(sc[0], sc[1], sc[2]);
 
+        putPlanet("MERCURY", time, sc, rsc, pointsBuf);
+        putPlanet("VENUS", time, sc, rsc, pointsBuf);
+        putPlanet("MARS BARYCENTER", time, sc, rsc, pointsBuf);
+
+        double[][] mat = Spice.j2000ToSun.get(time);
         for (int i = 0; i < num; i++) {
             GaiaClient.Star star = stars.get(i);
             double ra = Math.toRadians(star.ra());
             double dec = Math.toRadians(star.dec());
 
             // http://mingus.mmto.arizona.edu/~bjw/mmt/spectro_standards.html
-            //double pmra = Math.toRadians(star.pmra() * mas_dyr);
-            //double pmdec = Math.toRadians(star.pmdec() * mas_dyr);
-            //ra += pmra / Math.cos(dec);
-            //dec += pmdec;
+            double pmra = Math.toRadians(star.pmra() * mas_dyr);
+            double pmdec = Math.toRadians(star.pmdec() * mas_dyr);
+            ra += pmra / Math.cos(dec);
+            dec += pmdec;
 
-            double[] s;
-            // Proper motion and parallax
-            s = JSOFA.jauPmpx(ra, dec, Math.toRadians(star.pmra() / (1000. * 3600.)) / Math.cos(dec), Math.toRadians(star.pmdec() / (1000. * 3600.)), star.px() / 1000., star.rv(), dyr, ssb);
-            // Deflection of starlight by the Sun
-            s = JSOFA.jauLdsun(s, sun, auDist);
-            // Apply stellar aberration (natural direction to proper direction)
-            s = JSOFA.jauAb(s, vel, auDist, bm1);
-
-            if (Double.isFinite(s[0]) && Double.isFinite(s[1]) && Double.isFinite(s[2])) {
-                s = SpiceMath.mxv(mat, s);
+            if (Double.isFinite(ra) && Double.isFinite(dec)) {
+                double[] s = SpiceMath.radrec(1, ra, dec);
+                s = SpiceMath.mxv(mat, s); // to Carrington
                 s = SpiceMath.recrad(s);
 
                 double[] theta = new double[2];
-                calcProj3(0, s[1], s[2], scPos[1], scPos[2], theta);
-                putVertex(pointsBuf, theta[0], theta[1], scPos[0], 2 * SIZE_POINT, Colors.Blue);
+                calcProj3(0, s[1], s[2], sc[1], sc[2], theta);
+                putVertex(pointsBuf, theta[0], theta[1], sc[0], 2 * SIZE_POINT, Colors.Blue);
             }
         }
 
