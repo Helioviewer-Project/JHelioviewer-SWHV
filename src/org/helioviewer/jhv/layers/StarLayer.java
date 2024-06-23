@@ -78,9 +78,6 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
 
     @Override
     public void setStars(JHVTime time, List<GaiaClient.Star> stars) {
-        double dyr = (time.milli / 1000. - GaiaClient.EPOCH) / 86400. / 365.25;
-        double mas_dyr = dyr / 1000. / 3600.;
-
         int num = stars.size();
         BufVertex pointsBuf = new BufVertex((num + 3) * GLSLShape.stride);
 
@@ -92,31 +89,34 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
         putPlanet("VENUS", time, sc, rsc, pointsBuf);
         putPlanet("MARS BARYCENTER", time, sc, rsc, pointsBuf);
 
+        double dyr = (time.milli / 1000. - GaiaClient.EPOCH) / 86400. / 365.25;
+        double mas_dyr = dyr / 1000. / 3600.;
         double[][] mat = Spice.j2000ToSun.get(time);
-        for (int i = 0; i < num; i++) {
-            GaiaClient.Star star = stars.get(i);
-            double ra = Math.toRadians(star.ra());
-            double dec = Math.toRadians(star.dec());
-
-            // http://mingus.mmto.arizona.edu/~bjw/mmt/spectro_standards.html
-            double pmra = Math.toRadians(star.pmra() * mas_dyr);
-            double pmdec = Math.toRadians(star.pmdec() * mas_dyr);
-            ra += pmra / Math.cos(dec);
-            dec += pmdec;
-
-            if (Double.isFinite(ra) && Double.isFinite(dec)) {
-                double[] s = SpiceMath.radrec(1, ra, dec);
-                s = SpiceMath.mxv(mat, s); // to Carrington
-                s = SpiceMath.recrad(s);
-
-                double[] theta = new double[2];
-                calcProj3(0, s[1], s[2], sc[1], sc[2], theta);
-                putVertex(pointsBuf, theta[0], theta[1], sc[0], 2 * SIZE_POINT, Colors.Blue);
-            }
-        }
+        stars.parallelStream()
+                .map(s -> projectStar(s, mas_dyr, mat, sc))
+                .forEachOrdered(theta -> putVertex(pointsBuf, theta[0], theta[1], sc[0], 2 * SIZE_POINT, Colors.Blue));
 
         cache.put(time, Optional.of(pointsBuf));
         MovieDisplay.display();
+    }
+
+    private static double[] projectStar(GaiaClient.Star star, double mas_dyr, double[][] mat, double[] sc) {
+        double ra = Math.toRadians(star.ra());
+        double dec = Math.toRadians(star.dec());
+
+        // http://mingus.mmto.arizona.edu/~bjw/mmt/spectro_standards.html
+        double pmra = Math.toRadians(star.pmra() * mas_dyr);
+        double pmdec = Math.toRadians(star.pmdec() * mas_dyr);
+        ra += pmra / Math.cos(dec);
+        dec += pmdec;
+
+        double[] s = SpiceMath.radrec(1, ra, dec);
+        s = SpiceMath.mxv(mat, s); // to Carrington
+        s = SpiceMath.recrad(s);
+
+        double[] theta = new double[2];
+        calcProj3(0, s[1], s[2], sc[1], sc[2], theta);
+        return theta;
     }
 
     @Override
