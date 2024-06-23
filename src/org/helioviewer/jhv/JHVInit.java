@@ -94,7 +94,6 @@ class JHVInit {
     private static void loadKernels() throws Exception {
         List<String> kernels = List.of(
                 "de432s_reduced.bsp",
-                "ahead_2009_050_definitive_predict.epm.bsp",
                 "ahead_2017_061_5295day_predict.epm.bsp",
                 "solo_ANC_soc-orbit-stp_20200210-20301120_314_V1_00352_V01.bsp",
                 "naif0012.tls",
