@@ -36,7 +36,7 @@ public class SpiceMath {
         return ret;
     }
 
-    public static double[] latrec(double radius, double lon, double lat) { // same as radrec
+    public static double[] radrec(double radius, double lon, double lat) { // same as latrec
         double clat = Math.cos(lat);
         return new double[]{
                 radius * Math.cos(lon) * clat,
