@@ -24,11 +24,11 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.jogamp.opengl.GL2;
 
-public final class StarLayer extends AbstractLayer implements TimeListener.Change, GaiaClient.ReceiverStars {
+public final class StarLayer extends AbstractLayer implements Camera.Listener, GaiaClient.ReceiverStars {
 
-    private final Cache<JHVTime, Optional<BufVertex>> cache = Caffeine.newBuilder().softValues().build();
+    private final Cache<Position, Optional<BufVertex>> cache = Caffeine.newBuilder().softValues().build();
 
-    private static final float SIZE_POINT = 0.05f;
+    private static final float SIZE_POINT = 0.04f;
     private final GLSLShape points = new GLSLShape(true);
 
     private static final double SEARCH_CONE = 4;
@@ -42,18 +42,16 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
     }
 
     @Override
-    public void timeChanged(long milli) {
-        JHVTime time = new JHVTime(milli);
-        if (cache.getIfPresent(time) != null) // avoid repeated calls
+    public void viewpointChanged(Position viewpoint) {
+        if (cache.getIfPresent(viewpoint) != null) // avoid repeated calls
             return;
-        cache.put(time, Optional.empty()); // promise
+        cache.put(viewpoint, Optional.empty()); // promise
 
-        Position p = Display.getCamera().getViewpoint(); // temp
-        double[] psc = SpiceMath.radrec(-1, -p.lon, p.lat); // sc to Sun, Carrington lon was negated
-        double[] psearch = SpiceMath.recrad(SpiceMath.mtxv(Spice.j2000ToSun.get(p.time), psc)); // Sun -> J2000
+        double[] psc = SpiceMath.radrec(-1, -viewpoint.lon, viewpoint.lat); // sc to Sun, lon was negated
+        double[] psearch = SpiceMath.recrad(SpiceMath.mtxv(Spice.j2000ToSun.get(viewpoint.time), psc)); // Sun -> J2000
         double pra = Math.toDegrees(psearch[1]), pdec = Math.toDegrees(psearch[2]);
 
-        GaiaClient.submitSearch(this, time, new GaiaClient.StarRequest(pra, pdec, SEARCH_CONE, SEARCH_MAG));
+        GaiaClient.submitSearch(this, viewpoint, new GaiaClient.StarRequest(pra, pdec, SEARCH_CONE, SEARCH_MAG));
     }
 
     private static void putVertex(BufVertex pointsBuf, double Tx, double Ty, double dist, float size, byte[] color) {
@@ -75,14 +73,14 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
     }
 
     @Override
-    public void setStars(JHVTime time, List<GaiaClient.Star> stars) {
+    public void setStars(Position viewpoint, List<GaiaClient.Star> stars) {
         int num = stars.size();
         BufVertex pointsBuf = new BufVertex((num + 3) * GLSLShape.stride);
 
-        Position p = Display.getCamera().getViewpoint(); // temp
-        double[] sc = new double[]{p.distance, -p.lon, p.lat};
+        double[] sc = new double[]{viewpoint.distance, -viewpoint.lon, viewpoint.lat}; // lon was negated
         double[] rsc = SpiceMath.radrec(sc[0], sc[1], sc[2]);
 
+        JHVTime time = viewpoint.time;
         putPlanet("MERCURY", time, sc, rsc, pointsBuf);
         putPlanet("VENUS", time, sc, rsc, pointsBuf);
         putPlanet("MARS BARYCENTER", time, sc, rsc, pointsBuf);
@@ -110,7 +108,7 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
             putVertex(pointsBuf, theta[0], theta[1], sc[0], 2 * SIZE_POINT, Colors.Blue);
         }
 
-        cache.put(time, Optional.of(pointsBuf));
+        cache.put(viewpoint, Optional.of(pointsBuf));
         MovieDisplay.display();
     }
 
@@ -120,7 +118,7 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
             return;
 
         Position viewpoint = camera.getViewpoint();
-        Optional<BufVertex> optBuf = cache.getIfPresent(viewpoint.time);
+        Optional<BufVertex> optBuf = cache.getIfPresent(viewpoint);
         if (optBuf == null || optBuf.isEmpty())
             return;
 
@@ -137,9 +135,9 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
         super.setEnabled(_enabled);
 
         if (enabled) {
-            Movie.addTimeListener(this);
+            Display.getCamera().addListener(this);
         } else {
-            Movie.removeTimeListener(this);
+            Display.getCamera().removeListener(this);
         }
     }
 
@@ -168,15 +166,17 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
         return "Stars";
     }
 
-    // https://celestialscenes.com/alma/convert/coordconvert.pdf
-    // small angles
-    private static void calcProj1(double P, double alpha, double delta, double alpha0, double delta0, double[] theta) {
-        double sP = Math.sin(P);
-        double cP = Math.cos(P);
-        double alphaCosDelta = (alpha - alpha0) * Math.cos(delta0);
-        theta[0] = -alphaCosDelta * cP + (delta - delta0) * sP;
-        theta[1] = alphaCosDelta * sP + (delta - delta0) * cP;
-    }
+// --Commented out by Inspection START (23/06/2024, 23:15):
+//    // https://celestialscenes.com/alma/convert/coordconvert.pdf
+//    // small angles
+//    private static void calcProj1(double P, double alpha, double delta, double alpha0, double delta0, double[] theta) {
+//        double sP = Math.sin(P);
+//        double cP = Math.cos(P);
+//        double alphaCosDelta = (alpha - alpha0) * Math.cos(delta0);
+//        theta[0] = -alphaCosDelta * cP + (delta - delta0) * sP;
+//        theta[1] = alphaCosDelta * sP + (delta - delta0) * cP;
+//    }
+// --Commented out by Inspection STOP (23/06/2024, 23:15)
 
     // big angles
     private static void calcProj3(double P, double alpha, double delta, double alpha0, double delta0, double[] theta) {
@@ -187,16 +187,18 @@ public final class StarLayer extends AbstractLayer implements TimeListener.Chang
         theta[1] = Math.asin(Math.sin(rho) * Math.cos(phi - P));
     }
 
-    // all angles
-    private static void calcProj5(double P, double alpha, double delta, double alpha0, double delta0, double[] theta) {
-        double phi = Math.atan2(Math.sin(alpha - alpha0), Math.tan(delta) * Math.cos(delta0) - Math.sin(delta0) * Math.cos(alpha - alpha0));
-
-        double num = Math.hypot(Math.cos(delta) * Math.sin(alpha - alpha0), Math.cos(delta0) * Math.sin(delta) - Math.sin(delta0) * Math.cos(delta) * Math.cos(alpha - alpha0));
-        double den = Math.sin(delta) * Math.sin(delta0) + Math.cos(delta) * Math.cos(delta0) * Math.cos(alpha - alpha0);
-        double rho = Math.atan2(num, den);
-
-        theta[0] = Math.atan(-num / den * Math.sin(phi - P));
-        theta[1] = Math.asin(Math.sin(rho) * Math.cos(phi - P));
-    }
+// --Commented out by Inspection START (23/06/2024, 23:15):
+//    // all angles
+//    private static void calcProj5(double P, double alpha, double delta, double alpha0, double delta0, double[] theta) {
+//        double phi = Math.atan2(Math.sin(alpha - alpha0), Math.tan(delta) * Math.cos(delta0) - Math.sin(delta0) * Math.cos(alpha - alpha0));
+//
+//        double num = Math.hypot(Math.cos(delta) * Math.sin(alpha - alpha0), Math.cos(delta0) * Math.sin(delta) - Math.sin(delta0) * Math.cos(delta) * Math.cos(alpha - alpha0));
+//        double den = Math.sin(delta) * Math.sin(delta0) + Math.cos(delta) * Math.cos(delta0) * Math.cos(alpha - alpha0);
+//        double rho = Math.atan2(num, den);
+//
+//        theta[0] = Math.atan(-num / den * Math.sin(phi - P));
+//        theta[1] = Math.asin(Math.sin(rho) * Math.cos(phi - P));
+//    }
+// --Commented out by Inspection STOP (23/06/2024, 23:15)
 
 }

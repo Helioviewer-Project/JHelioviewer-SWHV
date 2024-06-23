@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.io.UriTemplate;
@@ -35,12 +36,12 @@ public class GaiaClient {
     private static final double EPOCH_2016_0_SEC = 1451606400; // DR3
     public static final double EPOCH = EPOCH_2016_0_SEC;
 
-    public static void submitSearch(ReceiverStars receiver, JHVTime time, StarRequest request) {
-        EDTCallbackExecutor.pool.submit(new QueryTap(request), new CallbackTap(receiver, time));
+    public static void submitSearch(ReceiverStars receiver, Position viewpoint, StarRequest request) {
+        EDTCallbackExecutor.pool.submit(new QueryTap(request), new CallbackTap(receiver, viewpoint));
     }
 
     public interface ReceiverStars {
-        void setStars(JHVTime time, List<Star> list);
+        void setStars(Position viewpoint, List<Star> list);
     }
 
     public record StarRequest(double ra, double dec, double cone, double mag) {
@@ -87,10 +88,10 @@ public class GaiaClient {
         }
     }
 
-    private record CallbackTap(ReceiverStars receiver, JHVTime time) implements FutureCallback<List<Star>> {
+    private record CallbackTap(ReceiverStars receiver, Position viewpoint) implements FutureCallback<List<Star>> {
         @Override
         public void onSuccess(@Nonnull List<Star> result) {
-            receiver.setStars(time, result);
+            receiver.setStars(viewpoint, result);
         }
 
         @Override
