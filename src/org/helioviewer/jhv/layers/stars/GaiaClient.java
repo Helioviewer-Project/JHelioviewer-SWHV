@@ -14,6 +14,7 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.astronomy.SpiceMath;
+import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.NetClient;
@@ -22,6 +23,7 @@ import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.helioviewer.jhv.time.JHVTime;
+import org.jastronomy.jsofa.JSOFA;
 
 import uk.ac.starlink.fits.FitsTableBuilder;
 import uk.ac.starlink.table.RowSequence;
@@ -39,7 +41,7 @@ public class GaiaClient {
     }
 
     public static void submitSearch(Receiver receiver, Position viewpoint) {
-        EDTCallbackExecutor.pool.submit(new QueryTap(viewpoint), new CallbackTap(receiver, viewpoint));
+        EDTCallbackExecutor.pool.submit(new Query(viewpoint), new Callback(receiver, viewpoint));
     }
 
     public interface Receiver {
@@ -58,12 +60,19 @@ public class GaiaClient {
     private record StarRequest(int ra, int dec, int cone, int mag) {
     }
 
-    private record Star(int id, double ra, double dec, double pmra, double pmdec, double mag) {
+    private record Star(int id, double ra, double dec, double pmra, double pmdec, double px, double rv, double mag) {
     }
 
     private static StarRequest computeRequest(Position viewpoint) {
         double[] sc = SpiceMath.radrec(-1, -viewpoint.lon, viewpoint.lat); // sc to Sun, lon was negated
         double[] search = SpiceMath.recrad(SpiceMath.mtxv(Spice.j2000ToSun.get(viewpoint.time), sc)); // Sun -> J2000
+        double ra = Math.toDegrees(search[1]), dec = Math.toDegrees(search[2]);
+        // reduce number of calls to catalog: divide the sky in 1x1deg, increase cone by 1deg
+        return new StarRequest((int) ra, (int) dec, SEARCH_CONE + 1, SEARCH_MAG);
+    }
+
+    private static StarRequest computeRequestPrecise(String location, JHVTime time) {
+        double[] search = SpiceMath.recrad(Spice.getPositionRec(location, "SUN", "J2000", time)); // HCRS
         double ra = Math.toDegrees(search[1]), dec = Math.toDegrees(search[2]);
         // reduce number of calls to catalog: divide the sky in 1x1deg, increase cone by 1deg
         return new StarRequest((int) ra, (int) dec, SEARCH_CONE + 1, SEARCH_MAG);
@@ -81,13 +90,20 @@ public class GaiaClient {
         putVertex(pointsBuf, theta[0], theta[1], sc[0], 2 * SIZE_PLANET, Colors.Green);
     }
 
+    private static void putPlanetPrecise(String location, String planet, JHVTime time, double[] sc, BufVertex pointsBuf) {
+        double[] v = SpiceMath.recrad(Spice.getPositionRec(location, planet, "SOLO_IAU_SUN_2009", time)); // should be LT+S
+
+        double[] theta = new double[2];
+        calcProj3(0, v[1], v[2], sc[1], sc[2], theta);
+        putVertex(pointsBuf, theta[0], theta[1], sc[0], 2 * SIZE_PLANET, Colors.Green);
+    }
+
     private static BufVertex computePoints(Position viewpoint, List<Star> stars) {
         BufVertex pointsBuf = new BufVertex(500 * GLSLShape.stride);
-
-        double[] sc = new double[]{viewpoint.distance, -viewpoint.lon, viewpoint.lat}; // lon was negated
-        double[] rsc = SpiceMath.radrec(sc[0], sc[1], sc[2]);
-
         JHVTime time = viewpoint.time;
+        double[] sc = new double[]{viewpoint.distance, -viewpoint.lon, viewpoint.lat}; // lon was negated
+
+        double[] rsc = SpiceMath.radrec(sc[0], sc[1], sc[2]);
         putPlanet("MERCURY", time, sc, rsc, pointsBuf);
         putPlanet("VENUS", time, sc, rsc, pointsBuf);
         putPlanet("MARS BARYCENTER", time, sc, rsc, pointsBuf);
@@ -95,7 +111,6 @@ public class GaiaClient {
         double dyr = (time.milli / 1000. - GaiaClient.EPOCH) / 86400. / 365.25;
         double mas_dyr = dyr / 1000. / 3600.;
         double[][] mat = Spice.j2000ToSun.get(time);
-
         double[] theta = new double[2];
         for (GaiaClient.Star star : stars) {
             double ra = Math.toRadians(star.ra());
@@ -110,7 +125,53 @@ public class GaiaClient {
             double[] s = SpiceMath.radrec(1, ra, dec);
             s = SpiceMath.mxv(mat, s); // to Carrington
             s = SpiceMath.recrad(s);
+            calcProj3(0, s[1], s[2], sc[1], sc[2], theta);
+            putVertex(pointsBuf, theta[0], theta[1], sc[0], 2 * SIZE_STAR, Colors.Blue);
+        }
+        return pointsBuf;
+    }
 
+    private static BufVertex computePointsPrecise(String location, JHVTime time, List<Star> stars) {
+        BufVertex pointsBuf = new BufVertex(500 * GLSLShape.stride);
+        double[] sc = SpiceMath.recrad(Spice.getPositionRec(location, "SUN", "SOLO_IAU_SUN_2009", time));
+
+        putPlanetPrecise(location, "MERCURY", time, sc, pointsBuf);
+        putPlanetPrecise(location, "VENUS", time, sc, pointsBuf);
+        putPlanetPrecise(location, "MARS BARYCENTER", time, sc, pointsBuf);
+
+        double[] ssb = Spice.getState("SSB", location, "J2000", time);
+        ssb[0] *= Sun.MeanEarthDistanceInv; // [au]
+        ssb[1] *= Sun.MeanEarthDistanceInv;
+        ssb[2] *= Sun.MeanEarthDistanceInv;
+        double[] vel = new double[]{ssb[3], ssb[4], ssb[5]}; // [c]
+        double bm1 = Math.sqrt(1 - vel[0] * vel[0] + vel[1] * vel[1] + vel[2] * vel[2]);
+
+        double[] sun = Spice.getPositionRec("SUN", location, "J2000", time);
+        sun[0] /= sc[0];
+        sun[1] /= sc[0];
+        sun[2] /= sc[0];
+        double auDist = sc[0] * Sun.MeanEarthDistanceInv; // [au]
+
+        double dyr = (time.milli / 1000. - GaiaClient.EPOCH) / 86400. / 365.25;
+        double[][] mat = Spice.j2000ToSun.get(time);
+        double[] theta = new double[2];
+        for (GaiaClient.Star star : stars) {
+            double ra = Math.toRadians(star.ra());
+            double dec = Math.toRadians(star.dec());
+
+            double[] s;
+            // Proper motion and parallax
+            s = JSOFA.jauPmpx(ra, dec,
+                Math.toRadians(star.pmra() / (1000. * 3600.)) / Math.cos(dec),
+                Math.toRadians(star.pmdec() / (1000. * 3600.)),
+                star.px() / 1000., star.rv(), dyr, ssb);
+            // Deflection of starlight by the Sun
+            s = JSOFA.jauLdsun(s, sun, auDist);
+            // Apply stellar aberration (natural direction to proper direction)
+            s = JSOFA.jauAb(s, vel, auDist, bm1);
+
+            s = SpiceMath.mxv(mat, s); // to Carrington
+            s = SpiceMath.recrad(s);
             calcProj3(0, s[1], s[2], sc[1], sc[2], theta);
             putVertex(pointsBuf, theta[0], theta[1], sc[0], 2 * SIZE_STAR, Colors.Blue);
         }
@@ -165,7 +226,7 @@ public class GaiaClient {
             UriTemplate.vars().set("REQUEST", "doQuery").set("LANG", "ADQL").set("FORMAT", "fits"));
 
     private static String adqlSearch(int ra, int dec, int cone, int mag) {
-        return "SELECT source_id,ra,dec,pmra,pmdec,phot_g_mean_mag FROM gaiadr3.gaia_source_lite WHERE " +
+        return "SELECT source_id,ra,dec,pmra,pmdec,parallax,radial_velocity,phot_g_mean_mag FROM gaiadr3.gaia_source_lite WHERE " +
                 String.format("1=CONTAINS(POINT('ICRS',ra,dec), CIRCLE('ICRS',%d,%d,%d)) AND phot_g_mean_mag<%d", ra, dec, cone, mag);
     }
 
@@ -181,11 +242,15 @@ public class GaiaClient {
                     double dec = ((Number) rseq.getCell(2)).doubleValue();
                     double pmra = ((Number) rseq.getCell(3)).doubleValue();
                     double pmdec = ((Number) rseq.getCell(4)).doubleValue();
-                    double mag = ((Number) rseq.getCell(5)).doubleValue();
+                    double px = ((Number) rseq.getCell(5)).doubleValue();
+                    double rv = ((Number) rseq.getCell(6)).doubleValue();
+                    double mag = ((Number) rseq.getCell(7)).doubleValue();
 
                     pmra = Double.isFinite(pmra) ? pmra : 0;
                     pmdec = Double.isFinite(pmdec) ? pmdec : 0;
-                    stars.add(new Star(source_id, ra, dec, pmra, pmdec, mag));
+                    px = Double.isFinite(px) ? px : 0;
+                    rv = Double.isFinite(rv) ? rv : 0;
+                    stars.add(new Star(source_id, ra, dec, pmra, pmdec, px, rv, mag));
                 }
             }
             Log.info("Found " + stars.size() + " stars with " + adql);
@@ -196,16 +261,25 @@ public class GaiaClient {
         return Collections.emptyList();
     }
 
-    private record QueryTap(Position viewpoint) implements Callable<BufVertex> {
+    private record Query(Position viewpoint) implements Callable<BufVertex> {
         @Override
         public BufVertex call() {
-            StarRequest req = computeRequest(viewpoint);
-            String adql = adqlSearch(req.ra, req.dec, req.cone, req.mag);
-            return computePoints(viewpoint, starCache.get(adql));
+            String location = viewpoint.getLocation();
+
+            if (location == null) {
+                StarRequest req = computeRequest(viewpoint);
+                String adql = adqlSearch(req.ra, req.dec, req.cone, req.mag);
+                return computePoints(viewpoint, starCache.get(adql));
+            } else {
+                JHVTime time = viewpoint.time;
+                StarRequest req = computeRequestPrecise(location, time);
+                String adql = adqlSearch(req.ra, req.dec, req.cone, req.mag);
+                return computePointsPrecise(location, time, starCache.get(adql));
+            }
         }
     }
 
-    private record CallbackTap(Receiver receiver, Position viewpoint) implements FutureCallback<BufVertex> {
+    private record Callback(Receiver receiver, Position viewpoint) implements FutureCallback<BufVertex> {
         @Override
         public void onSuccess(@Nonnull BufVertex result) {
             receiver.setStars(viewpoint, result);
