@@ -13,14 +13,16 @@ public class PositionResponse {
     private final Position.Cartesian[] position;
     private final long positionStart;
     private final long positionEnd;
+    private final String location;
 
-    PositionResponse(Position.Cartesian[] _position) throws Exception {
+    PositionResponse(Position.Cartesian[] _position, String _location) throws Exception {
         int len = _position.length;
         if (len == 0)
             throw new Exception("Empty response");
         position = _position;
         positionStart = position[0].milli();
         positionEnd = position[len - 1].milli();
+        location = _location;
     }
 
     PositionResponse(JSONObject jo) throws Exception {
@@ -46,6 +48,7 @@ public class PositionResponse {
         }
         positionStart = position[0].milli();
         positionEnd = position[len - 1].milli();
+        location = null;
     }
 
     long interpolateTime(long t, long start, long end) {
@@ -129,7 +132,7 @@ public class PositionResponse {
                 hgln += 2 * Math.PI;
             hglt = Math.asin(z / dist);
         }
-        return new Position(new JHVTime(time), dist, -hgln, hglt);
+        return new Position(new JHVTime(time), dist, -hgln, hglt).setLocation(location);
     }
 
     public double interpolateRectangular(long t, long start, long end, float[] xyz) {

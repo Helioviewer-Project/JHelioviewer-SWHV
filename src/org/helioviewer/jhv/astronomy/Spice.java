@@ -54,7 +54,6 @@ public class Spice {
         return null;
     }
 
-
     @Nullable
     public static double[] getPositionRec(String observer, String target, String frame, JHVTime time) {
         try {
