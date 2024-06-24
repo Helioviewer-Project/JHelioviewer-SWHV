@@ -45,12 +45,7 @@ public final class StarLayer extends AbstractLayer implements Camera.Listener, G
         if (cache.getIfPresent(viewpoint) != null) // avoid repeated calls
             return;
         cache.put(viewpoint, Optional.empty()); // promise
-
-        double[] psc = SpiceMath.radrec(-1, -viewpoint.lon, viewpoint.lat); // sc to Sun, lon was negated
-        double[] psearch = SpiceMath.recrad(SpiceMath.mtxv(Spice.j2000ToSun.get(viewpoint.time), psc)); // Sun -> J2000
-        double pra = Math.toDegrees(psearch[1]), pdec = Math.toDegrees(psearch[2]);
-
-        GaiaClient.submitSearch(this, viewpoint, new GaiaClient.StarRequest(pra, pdec, SEARCH_CONE, SEARCH_MAG));
+        GaiaClient.submitSearch(this, viewpoint);
     }
 
     private static void putVertex(BufVertex pointsBuf, double Tx, double Ty, double dist, float size, byte[] color) {
