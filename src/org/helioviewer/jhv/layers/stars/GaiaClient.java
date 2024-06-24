@@ -23,6 +23,7 @@ import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.StarTableFactory;
 
+import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.FutureCallback;
 
 public class GaiaClient {
@@ -44,7 +45,7 @@ public class GaiaClient {
         void setStars(Position viewpoint, List<Star> list);
     }
 
-    public record StarRequest(double ra, double dec, double cone, double mag) {
+    public record StarRequest(double ra, double dec, int cone, int mag) {
     }
 
     public record Star(int id, double ra, double dec, double pmra, double pmdec, double mag) {
@@ -53,16 +54,17 @@ public class GaiaClient {
     private static final UriTemplate queryTemplate = new UriTemplate("https://gea.esac.esa.int/tap-server/tap/sync",
             UriTemplate.vars().set("REQUEST", "doQuery").set("LANG", "ADQL").set("FORMAT", "fits"));
 
-    private static String adqlSearch(double ra, double dec, double cone, double mag) {
+    private static String adqlSearch(int ra, int dec, int cone, int mag) {
         return "SELECT source_id,ra,dec,pmra,pmdec,phot_g_mean_mag FROM gaiadr3.gaia_source_lite WHERE " +
-                String.format("1=CONTAINS(POINT('ICRS',ra,dec), CIRCLE('ICRS',%f,%f,%f)) AND phot_g_mean_mag<%f", ra, dec, cone, mag);
+                String.format("1=CONTAINS(POINT('ICRS',ra,dec), CIRCLE('ICRS',%d,%d,%d)) AND phot_g_mean_mag<%d", ra, dec, cone, mag);
     }
 
     private record QueryTap(StarRequest req) implements Callable<List<Star>> {
         @Override
         public List<Star> call() throws Exception {
             // return Collections.emptyList();
-            String adql = adqlSearch(req.ra, req.dec, req.cone, req.mag);
+            // reduce number of calls to catalog: divide the sky in 1x1deg, increase cone by 1deg
+            String adql = adqlSearch((int) req.ra, (int) req.dec, req.cone + 1, req.mag);
 
             URI uri = new URI(queryTemplate.expand(UriTemplate.vars().set("QUERY", adql)));
             try (NetClient nc = NetClient.of(uri);
@@ -82,7 +84,7 @@ public class GaiaClient {
                         stars.add(new Star(source_id, ra, dec, pmra, pmdec, mag));
                     }
                 }
-                Log.info("Found " + stars.size() + " stars with " + adql);
+                // Log.info("Found " + stars.size() + " stars with " + adql);
                 return stars;
             }
         }
@@ -96,7 +98,7 @@ public class GaiaClient {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log.error(t);
+            Log.error(Throwables.getStackTraceAsString(t));
             Message.err("An error occurred querying the server", t.getMessage());
         }
     }
