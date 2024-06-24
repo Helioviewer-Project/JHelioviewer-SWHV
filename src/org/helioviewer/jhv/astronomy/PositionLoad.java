@@ -43,7 +43,7 @@ public record PositionLoad(Interfaces.StatusReceiver receiver, SpaceObject targe
             if (observer.isInternal() && target.isInternal()) {
                 Position.Cartesian[] p = Spice.getPositionRange(observer.getSpiceName(), target.getSpiceName(), frame.toString(), start, end, deltat);
                 if (p != null)
-                    return new PositionResponse(p);
+                    return new PositionResponse(p, target.getSpiceName());
             }
 
             URI uri = new URI(template.expand(UriTemplate.vars()
