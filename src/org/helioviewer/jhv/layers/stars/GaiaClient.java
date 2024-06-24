@@ -2,7 +2,7 @@ package org.helioviewer.jhv.layers.stars;
 
 import java.net.URI;
 import java.util.ArrayList;
-// import java.util.Collections;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
@@ -28,7 +28,8 @@ import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.StarTableFactory;
 
-import com.google.common.base.Throwables;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.util.concurrent.FutureCallback;
 
 public class GaiaClient {
@@ -51,7 +52,8 @@ public class GaiaClient {
     private static final double EPOCH = EPOCH_2016_0_SEC;
     private static final int SEARCH_CONE = 4;
     private static final int SEARCH_MAG = 9;
-    private static final float SIZE_POINT = 0.04f;
+    private static final float SIZE_STAR = 0.04f;
+    private static final float SIZE_PLANET = 0.06f;
 
     private record StarRequest(int ra, int dec, int cone, int mag) {
     }
@@ -76,7 +78,7 @@ public class GaiaClient {
 
         double[] theta = new double[2];
         calcProj3(0, v[1], v[2], sc[1], sc[2], theta);
-        putVertex(pointsBuf, theta[0], theta[1], sc[0], 2 * SIZE_POINT, Colors.Green);
+        putVertex(pointsBuf, theta[0], theta[1], sc[0], 2 * SIZE_PLANET, Colors.Green);
     }
 
     private static BufVertex computePoints(Position viewpoint, List<Star> stars) {
@@ -110,7 +112,7 @@ public class GaiaClient {
             s = SpiceMath.recrad(s);
 
             calcProj3(0, s[1], s[2], sc[1], sc[2], theta);
-            putVertex(pointsBuf, theta[0], theta[1], sc[0], 2 * SIZE_POINT, Colors.Blue);
+            putVertex(pointsBuf, theta[0], theta[1], sc[0], 2 * SIZE_STAR, Colors.Blue);
         }
         return pointsBuf;
     }
@@ -156,6 +158,9 @@ public class GaiaClient {
 //    }
 // --Commented out by Inspection STOP (23/06/2024, 23:15)
 
+    private static final LoadingCache<String, List<Star>> starCache = Caffeine.newBuilder().maximumSize(1000)
+            .build(adql -> requestStars(adql));
+
     private static final UriTemplate queryTemplate = new UriTemplate("https://gea.esac.esa.int/tap-server/tap/sync",
             UriTemplate.vars().set("REQUEST", "doQuery").set("LANG", "ADQL").set("FORMAT", "fits"));
 
@@ -164,34 +169,39 @@ public class GaiaClient {
                 String.format("1=CONTAINS(POINT('ICRS',ra,dec), CIRCLE('ICRS',%d,%d,%d)) AND phot_g_mean_mag<%d", ra, dec, cone, mag);
     }
 
+    private static List<Star> requestStars(String adql) {
+        String uri = queryTemplate.expand(UriTemplate.vars().set("QUERY", adql));
+        try (NetClient nc = NetClient.of(new URI(uri));
+             StarTable table = new StarTableFactory().makeStarTable(nc.getStream(), new FitsTableBuilder())) {
+            List<Star> stars = new ArrayList<>();
+            try (RowSequence rseq = table.getRowSequence()) {
+                while (rseq.next()) {
+                    int source_id = ((Number) rseq.getCell(0)).intValue();
+                    double ra = ((Number) rseq.getCell(1)).doubleValue();
+                    double dec = ((Number) rseq.getCell(2)).doubleValue();
+                    double pmra = ((Number) rseq.getCell(3)).doubleValue();
+                    double pmdec = ((Number) rseq.getCell(4)).doubleValue();
+                    double mag = ((Number) rseq.getCell(5)).doubleValue();
+
+                    pmra = Double.isFinite(pmra) ? pmra : 0;
+                    pmdec = Double.isFinite(pmdec) ? pmdec : 0;
+                    stars.add(new Star(source_id, ra, dec, pmra, pmdec, mag));
+                }
+            }
+            Log.info("Found " + stars.size() + " stars with " + adql);
+            return stars;
+        } catch (Exception e) {
+            Log.error(adql + e);
+        }
+        return Collections.emptyList();
+    }
+
     private record QueryTap(Position viewpoint) implements Callable<BufVertex> {
         @Override
-        public BufVertex call() throws Exception {
-            // return Collections.emptyList();
+        public BufVertex call() {
             StarRequest req = computeRequest(viewpoint);
             String adql = adqlSearch(req.ra, req.dec, req.cone, req.mag);
-
-            URI uri = new URI(queryTemplate.expand(UriTemplate.vars().set("QUERY", adql)));
-            try (NetClient nc = NetClient.of(uri);
-                 StarTable table = new StarTableFactory().makeStarTable(nc.getStream(), new FitsTableBuilder())) {
-                List<Star> stars = new ArrayList<>();
-                try (RowSequence rseq = table.getRowSequence()) {
-                    while (rseq.next()) {
-                        int source_id = ((Number) rseq.getCell(0)).intValue();
-                        double ra = ((Number) rseq.getCell(1)).doubleValue();
-                        double dec = ((Number) rseq.getCell(2)).doubleValue();
-                        double pmra = ((Number) rseq.getCell(3)).doubleValue();
-                        double pmdec = ((Number) rseq.getCell(4)).doubleValue();
-                        double mag = ((Number) rseq.getCell(5)).doubleValue();
-
-                        pmra = Double.isFinite(pmra) ? pmra : 0;
-                        pmdec = Double.isFinite(pmdec) ? pmdec : 0;
-                        stars.add(new Star(source_id, ra, dec, pmra, pmdec, mag));
-                    }
-                }
-                Log.info("Found " + stars.size() + " stars with " + adql);
-                return computePoints(viewpoint, stars);
-            }
+            return computePoints(viewpoint, starCache.get(adql));
         }
     }
 
@@ -203,7 +213,7 @@ public class GaiaClient {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            Log.error(Throwables.getStackTraceAsString(t));
+            Log.error(t);
             Message.err("An error occurred querying the server", t.getMessage());
         }
     }
