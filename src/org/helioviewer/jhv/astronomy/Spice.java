@@ -54,28 +54,16 @@ public class Spice {
         return null;
     }
 
-    @Nullable
-    public static double[] getPositionRec(String observer, String target, String frame, JHVTime time) {
-        try {
-            double[] v = new double[3];
-            position(observer, target, frame, time.milli, v);
-            return v;
-        } catch (SpiceErrorException e) {
-            Log.error(e);
-        }
-        return null;
+    public static double[] getPosition(String observer, String target, String frame, JHVTime time) throws SpiceErrorException {
+        double[] v = new double[3];
+        position(observer, target, frame, time.milli, v);
+        return v;
     }
 
-    @Nullable
-    public static double[] getState(String observer, String target, String frame, JHVTime time) {
-        try {
-            double[] v = new double[6];
-            state(observer, target, frame, time.milli, v);
-            return v;
-        } catch (SpiceErrorException e) {
-            Log.error(e);
-        }
-        return null;
+    public static double[] getState(String observer, String target, String frame, JHVTime time) throws SpiceErrorException {
+        double[] v = new double[6];
+        state(observer, target, frame, time.milli, v);
+        return v;
     }
 
     @Nullable
