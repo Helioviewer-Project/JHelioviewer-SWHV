@@ -17,7 +17,6 @@ import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.time.JHVTime;
-import org.helioviewer.jhv.time.TimeListener;
 import org.json.JSONObject;
 
 import com.github.benmanes.caffeine.cache.Cache;
@@ -31,8 +30,8 @@ public final class StarLayer extends AbstractLayer implements Camera.Listener, G
     private static final float SIZE_POINT = 0.04f;
     private final GLSLShape points = new GLSLShape(true);
 
-    private static final double SEARCH_CONE = 4;
-    private static final double SEARCH_MAG = 9;
+    private static final int SEARCH_CONE = 4;
+    private static final int SEARCH_MAG = 9;
 
     @Override
     public void serialize(JSONObject jo) {
