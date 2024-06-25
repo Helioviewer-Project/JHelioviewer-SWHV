@@ -93,7 +93,7 @@ public class GaiaClient {
     }
 
     private static void putPlanetPrecise(String location, String planet, JHVTime time, double[] sc, BufVertex pointsBuf) throws SpiceErrorException {
-        double[] v = SpiceMath.recrad(Spice.getPosition(location, planet, "SOLO_IAU_SUN_2009", time)); // should be LT+S
+        double[] v = SpiceMath.recrad(Spice.getPosition(location, planet, "SOLO_IAU_SUN_2009", time));
 
         double[] theta = new double[2];
         calcProj3(0, v[1], v[2], sc[1], sc[2], theta);
@@ -111,7 +111,7 @@ public class GaiaClient {
         putPlanet("MARS BARYCENTER", time, sc, rsc, pointsBuf);
 
         double dyr = (time.milli / 1000. - GaiaClient.EPOCH) / 86400. / 365.25;
-        double mas_dyr = dyr / 1000. / 3600.;
+        double dyr_mas = dyr / (1000. * 3600.);
         double[][] mat = Spice.j2000ToSun.get(time);
         double[] theta = new double[2];
         for (GaiaClient.Star star : stars) {
@@ -119,8 +119,8 @@ public class GaiaClient {
             double dec = Math.toRadians(star.dec());
 
             // http://mingus.mmto.arizona.edu/~bjw/mmt/spectro_standards.html
-            double pmra = Math.toRadians(star.pmra() * mas_dyr);
-            double pmdec = Math.toRadians(star.pmdec() * mas_dyr);
+            double pmra = Math.toRadians(star.pmra() * dyr_mas);
+            double pmdec = Math.toRadians(star.pmdec() * dyr_mas);
             ra += pmra / Math.cos(dec);
             dec += pmdec;
 
