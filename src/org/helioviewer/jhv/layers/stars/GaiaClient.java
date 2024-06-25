@@ -111,21 +111,15 @@ public class GaiaClient {
         putPlanet("MARS BARYCENTER", time, sc, rsc, pointsBuf);
 
         double dyr = (time.milli / 1000. - GaiaClient.EPOCH) / 86400. / 365.25;
-        double dyr_mas = dyr / (1000. * 3600.);
-        double[][] mat = Spice.j2000ToSun.get(time);
+        double[][] carr = Spice.j2000ToSun.get(time);
         double[] theta = new double[2];
         for (GaiaClient.Star star : stars) {
-            double ra = Math.toRadians(star.ra());
-            double dec = Math.toRadians(star.dec());
-
             // http://mingus.mmto.arizona.edu/~bjw/mmt/spectro_standards.html
-            double pmra = Math.toRadians(star.pmra() * dyr_mas);
-            double pmdec = Math.toRadians(star.pmdec() * dyr_mas);
-            ra += pmra / Math.cos(dec);
-            dec += pmdec;
+            double ra = star.ra() + star.pmra() / Math.cos(star.dec()) * dyr;
+            double dec = star.dec() + star.pmdec() * dyr;
 
             double[] s = SpiceMath.radrec(1, ra, dec);
-            s = SpiceMath.mxv(mat, s); // to Carrington
+            s = SpiceMath.mxv(carr, s); // to Carrington
             s = SpiceMath.recrad(s);
             calcProj3(0, s[1], s[2], sc[1], sc[2], theta);
             putVertex(pointsBuf, theta[0], theta[1], sc[0], 2 * SIZE_STAR, Colors.Blue);
@@ -155,24 +149,18 @@ public class GaiaClient {
         double auDist = sc[0] * Sun.MeanEarthDistanceInv; // [au]
 
         double dyr = (time.milli / 1000. - GaiaClient.EPOCH) / 86400. / 365.25;
-        double[][] mat = Spice.j2000ToSun.get(time);
+        double[][] carr = Spice.j2000ToSun.get(time);
         double[] theta = new double[2];
         for (GaiaClient.Star star : stars) {
-            double ra = Math.toRadians(star.ra());
-            double dec = Math.toRadians(star.dec());
-
             double[] s;
             // Proper motion and parallax
-            s = JSOFA.jauPmpx(ra, dec,
-                    Math.toRadians(star.pmra() / (1000. * 3600.)) / Math.cos(dec),
-                    Math.toRadians(star.pmdec() / (1000. * 3600.)),
-                    star.px() / 1000., star.rv(), dyr, ssb);
+            s = JSOFA.jauPmpx(star.ra(), star.dec(), star.pmra() / Math.cos(star.dec()), star.pmdec(), star.px(), star.rv(), dyr, ssb);
             // Deflection of starlight by the Sun
             s = JSOFA.jauLdsun(s, sun, auDist);
             // Apply stellar aberration (natural direction to proper direction)
             s = JSOFA.jauAb(s, vel, auDist, bm1);
 
-            s = SpiceMath.mxv(mat, s); // to Carrington
+            s = SpiceMath.mxv(carr, s); // to Carrington
             s = SpiceMath.recrad(s);
             calcProj3(0, s[1], s[2], sc[1], sc[2], theta);
             putVertex(pointsBuf, theta[0], theta[1], sc[0], 2 * SIZE_STAR, Colors.Blue);
@@ -240,12 +228,12 @@ public class GaiaClient {
             try (RowSequence rseq = table.getRowSequence()) {
                 while (rseq.next()) {
                     int source_id = ((Number) rseq.getCell(0)).intValue();
-                    double ra = ((Number) rseq.getCell(1)).doubleValue();
-                    double dec = ((Number) rseq.getCell(2)).doubleValue();
-                    double pmra = ((Number) rseq.getCell(3)).doubleValue();
-                    double pmdec = ((Number) rseq.getCell(4)).doubleValue();
-                    double px = ((Number) rseq.getCell(5)).doubleValue();
-                    double rv = ((Number) rseq.getCell(6)).doubleValue();
+                    double ra = Math.toRadians(((Number) rseq.getCell(1)).doubleValue()); // [rad]
+                    double dec = Math.toRadians(((Number) rseq.getCell(2)).doubleValue()); // [rad]
+                    double pmra = Math.toRadians(((Number) rseq.getCell(3)).doubleValue() / (1000. * 3600.)); // [rad/yr]
+                    double pmdec = Math.toRadians(((Number) rseq.getCell(4)).doubleValue() / (1000. * 3600.)); // [rad/yr]
+                    double px = ((Number) rseq.getCell(5)).doubleValue() / 1000.; // [arcsec]
+                    double rv = ((Number) rseq.getCell(6)).doubleValue(); // [km/s]
                     double mag = ((Number) rseq.getCell(7)).doubleValue();
 
                     pmra = Double.isFinite(pmra) ? pmra : 0;
