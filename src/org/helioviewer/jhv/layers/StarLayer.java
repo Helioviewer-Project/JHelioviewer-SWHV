@@ -57,7 +57,7 @@ public final class StarLayer extends AbstractLayer implements Camera.Listener, G
         points.setVertexRepeatable(gl, optBuf.get());
 
         Transform.pushView();
-        Transform.rotateViewInverse(viewpoint.toQuat());
+        Transform.rotateViewInverse(viewpoint.toQuat()); // viewpoint was interpolated for Viewpoint->Location
         points.renderPoints(gl, CameraHelper.getPixelFactor(camera, vp));
         Transform.popView();
     }
