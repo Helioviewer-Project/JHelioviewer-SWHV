@@ -50,14 +50,19 @@ public class GaiaClient {
         void setStars(Position viewpoint, BufVertex pointBuf);
     }
 
+    private static final float SIZE_STAR = 0.08f;
+    private static final float SIZE_PLANET = 0.12f;
+    private static final byte[] COLOR_PLANET = Colors.Green;
+    private static final byte[] COLOR_STAR = Colors.Blue;
+
+    private static final double JYEAR_SEC = 365.25 * 86400;
     // uk.ac.starlink.table.TimeMapper.DECIMAL_YEAR.toUnixSeconds(2015.5)
-    // public static final double EPOCH_2015_5_SEC = 1435838400; // DR2
+    // private static final double EPOCH_2015_5_SEC = 1435838400; // DR2
     private static final double EPOCH_2016_0_SEC = 1451606400; // DR3
     private static final double EPOCH = EPOCH_2016_0_SEC;
+
     private static final int SEARCH_CONE = 4;
     private static final int SEARCH_MAG = 9;
-    private static final float SIZE_STAR = 0.04f;
-    private static final float SIZE_PLANET = 0.06f;
 
     private record StarRequest(int ra, int dec, int cone, int mag) {
     }
@@ -69,14 +74,14 @@ public class GaiaClient {
         double[] sc = SpiceMath.radrec(-1, -viewpoint.lon, viewpoint.lat); // sc to Sun, lon was negated
         double[] search = SpiceMath.recrad(SpiceMath.mtxv(Spice.j2000ToSun.get(viewpoint.time), sc)); // Sun -> J2000
         double ra = Math.toDegrees(search[1]), dec = Math.toDegrees(search[2]);
-        // reduce number of calls to catalog: divide the sky in 1x1deg, increase cone by 1deg
+        // reduce number of calls to catalog: divide the sky in 1x1deg bins, increase cone by 1deg
         return new StarRequest((int) ra, (int) dec, SEARCH_CONE + 1, SEARCH_MAG);
     }
 
     private static StarRequest computeRequestPrecise(String location, JHVTime time) throws SpiceErrorException {
         double[] search = SpiceMath.recrad(Spice.getPosition(location, "SUN", "J2000", time)); // HCRS
         double ra = Math.toDegrees(search[1]), dec = Math.toDegrees(search[2]);
-        // reduce number of calls to catalog: divide the sky in 1x1deg, increase cone by 1deg
+        // reduce number of calls to catalog: divide the sky in 1x1deg bins, increase cone by 1deg
         return new StarRequest((int) ra, (int) dec, SEARCH_CONE + 1, SEARCH_MAG);
     }
 
@@ -89,7 +94,7 @@ public class GaiaClient {
 
         double[] theta = new double[2];
         calcProj3(0, v[1], v[2], sc[1], sc[2], theta);
-        putVertex(pointsBuf, theta[0], theta[1], sc[0], 2 * SIZE_PLANET, Colors.Green);
+        putVertex(pointsBuf, theta[0], theta[1], sc[0], SIZE_PLANET, COLOR_PLANET);
     }
 
     private static void putPlanetPrecise(String location, String planet, JHVTime time, double[] sc, BufVertex pointsBuf) throws SpiceErrorException {
@@ -97,7 +102,7 @@ public class GaiaClient {
 
         double[] theta = new double[2];
         calcProj3(0, v[1], v[2], sc[1], sc[2], theta);
-        putVertex(pointsBuf, theta[0], theta[1], sc[0], 2 * SIZE_PLANET, Colors.Green);
+        putVertex(pointsBuf, theta[0], theta[1], sc[0], SIZE_PLANET, COLOR_PLANET);
     }
 
     private static BufVertex computePoints(Position viewpoint, List<Star> stars) throws SpiceErrorException {
@@ -110,10 +115,10 @@ public class GaiaClient {
         putPlanet("VENUS", time, sc, rsc, pointsBuf);
         putPlanet("MARS BARYCENTER", time, sc, rsc, pointsBuf);
 
-        double dyr = (time.milli / 1000. - GaiaClient.EPOCH) / 86400. / 365.25;
+        double dyr = (time.milli / 1000. - EPOCH) / JYEAR_SEC;
         double[][] carr = Spice.j2000ToSun.get(time);
         double[] theta = new double[2];
-        for (GaiaClient.Star star : stars) {
+        for (Star star : stars) {
             // http://mingus.mmto.arizona.edu/~bjw/mmt/spectro_standards.html
             double ra = star.ra() + star.pmra() * dyr;
             double dec = star.dec() + star.pmdec() * dyr;
@@ -122,7 +127,7 @@ public class GaiaClient {
             s = SpiceMath.mxv(carr, s); // to Carrington
             s = SpiceMath.recrad(s);
             calcProj3(0, s[1], s[2], sc[1], sc[2], theta);
-            putVertex(pointsBuf, theta[0], theta[1], sc[0], 2 * SIZE_STAR, Colors.Blue);
+            putVertex(pointsBuf, theta[0], theta[1], sc[0], SIZE_STAR, COLOR_STAR);
         }
         return pointsBuf;
     }
@@ -148,10 +153,10 @@ public class GaiaClient {
         sun[2] /= sc[0];
         double auDist = sc[0] * Sun.MeanEarthDistanceInv; // [au]
 
-        double dyr = (time.milli / 1000. - GaiaClient.EPOCH) / 86400. / 365.25;
+        double dyr = (time.milli / 1000. - EPOCH) / JYEAR_SEC;
         double[][] carr = Spice.j2000ToSun.get(time);
         double[] theta = new double[2];
-        for (GaiaClient.Star star : stars) {
+        for (Star star : stars) {
             double[] s;
             // Proper motion and parallax
             s = JSOFA.jauPmpx(star.ra(), star.dec(), star.pmra(), star.pmdec(), star.px(), star.rv(), dyr, ssb);
@@ -163,7 +168,7 @@ public class GaiaClient {
             s = SpiceMath.mxv(carr, s); // to Carrington
             s = SpiceMath.recrad(s);
             calcProj3(0, s[1], s[2], sc[1], sc[2], theta);
-            putVertex(pointsBuf, theta[0], theta[1], sc[0], 2 * SIZE_STAR, Colors.Blue);
+            putVertex(pointsBuf, theta[0], theta[1], sc[0], SIZE_STAR, COLOR_STAR);
         }
         return pointsBuf;
     }
@@ -231,7 +236,7 @@ public class GaiaClient {
                     int source_id = ((Number) rseq.getCell(0)).intValue();
                     double ra = Math.toRadians(((Number) rseq.getCell(1)).doubleValue()); // [rad]
                     double dec = Math.toRadians(((Number) rseq.getCell(2)).doubleValue()); // [rad]
-                    double pmra = Math.toRadians(((Number) rseq.getCell(3)).doubleValue() / (1000. * 3600.)) / Math.cos(dec); // [rad/yr], dRA/dt rather than cos(Dec)*dRA/dt
+                    double pmra = Math.toRadians(((Number) rseq.getCell(3)).doubleValue() / (1000. * 3600.)) / Math.cos(dec); // [rad/yr], dRA/dt instead of cos(Dec)*dRA/dt
                     double pmdec = Math.toRadians(((Number) rseq.getCell(4)).doubleValue() / (1000. * 3600.)); // [rad/yr]
                     double px = ((Number) rseq.getCell(5)).doubleValue() / 1000.; // [arcsec]
                     double rv = ((Number) rseq.getCell(6)).doubleValue(); // [km/s]
