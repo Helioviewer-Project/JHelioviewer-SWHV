@@ -85,7 +85,7 @@ public class GaiaClient {
         return new StarRequest((int) ra, (int) dec, SEARCH_CONE + 1, SEARCH_MAG);
     }
 
-    private static void computePlanet(String planet, JHVTime time, double[] sc, double[] rsc, double[] theta, BufVertex pointsBuf) throws SpiceErrorException {
+    private static void computePlanet(double[] rsc, String planet, JHVTime time, double[] sc, double[] theta, BufVertex pointsBuf) throws SpiceErrorException {
         double[] pl = Spice.getPosition("SUN", planet, "SOLO_IAU_SUN_2009", time);
         pl[0] -= rsc[0]; // sc->planet = sun->planet - sun->sc
         pl[1] -= rsc[1];
@@ -106,9 +106,9 @@ public class GaiaClient {
         double[] theta = new double[2];
 
         double[] rsc = SpiceMath.radrec(sc[0], sc[1], sc[2]);
-        computePlanet("MERCURY", time, sc, rsc, theta, pointsBuf);
-        computePlanet("VENUS", time, sc, rsc, theta, pointsBuf);
-        computePlanet("MARS BARYCENTER", time, sc, rsc, theta, pointsBuf);
+        computePlanet(rsc, "MERCURY", time, sc, theta, pointsBuf);
+        computePlanet(rsc, "VENUS", time, sc, theta, pointsBuf);
+        computePlanet(rsc, "MARS BARYCENTER", time, sc, theta, pointsBuf);
 
         double dyr = (time.milli / 1000. - EPOCH) / JYEAR_SEC;
         double[][] carr = Spice.j2000ToSun.get(time);
