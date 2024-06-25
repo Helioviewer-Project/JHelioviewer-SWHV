@@ -29,7 +29,7 @@ public class Position {
     }
 
     Position setLocation(String _location) {
-        location = _location == null ? null : _location.intern();
+        location = _location;
         return this;
     }
 
