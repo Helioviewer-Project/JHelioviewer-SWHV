@@ -85,49 +85,40 @@ public class GaiaClient {
         return new StarRequest((int) ra, (int) dec, SEARCH_CONE + 1, SEARCH_MAG);
     }
 
-    private static void putPlanet(String planet, JHVTime time, double[] sc, double[] rsc, BufVertex pointsBuf) throws SpiceErrorException {
-        double[] v = Spice.getPosition("SUN", planet, "SOLO_IAU_SUN_2009", time);
-        v[0] -= rsc[0]; // sc->planet = sun->planet - sun->sc
-        v[1] -= rsc[1];
-        v[2] -= rsc[2];
-        v = SpiceMath.recrad(v);
-
-        double[] theta = new double[2];
-        calcProj3(0, v[1], v[2], sc[1], sc[2], theta);
-        putVertex(pointsBuf, theta[0], theta[1], sc[0], SIZE_PLANET, COLOR_PLANET);
+    private static void computePlanet(String planet, JHVTime time, double[] sc, double[] rsc, double[] theta, BufVertex pointsBuf) throws SpiceErrorException {
+        double[] pl = Spice.getPosition("SUN", planet, "SOLO_IAU_SUN_2009", time);
+        pl[0] -= rsc[0]; // sc->planet = sun->planet - sun->sc
+        pl[1] -= rsc[1];
+        pl[2] -= rsc[2];
+        pl = SpiceMath.recrad(pl);
+        putPlanet(pl, sc, theta, pointsBuf);
     }
 
-    private static void putPlanetPrecise(String location, String planet, JHVTime time, double[] sc, BufVertex pointsBuf) throws SpiceErrorException {
-        double[] v = SpiceMath.recrad(Spice.getPosition(location, planet, "SOLO_IAU_SUN_2009", time));
-
-        double[] theta = new double[2];
-        calcProj3(0, v[1], v[2], sc[1], sc[2], theta);
-        putVertex(pointsBuf, theta[0], theta[1], sc[0], SIZE_PLANET, COLOR_PLANET);
+    private static void computePlanetPrecise(String location, String planet, JHVTime time, double[] sc, double[] theta, BufVertex pointsBuf) throws SpiceErrorException {
+        double[] pl = SpiceMath.recrad(Spice.getPosition(location, planet, "SOLO_IAU_SUN_2009", time));
+        putPlanet(pl, sc, theta, pointsBuf);
     }
 
     private static BufVertex computePoints(Position viewpoint, List<Star> stars) throws SpiceErrorException {
         BufVertex pointsBuf = new BufVertex(500 * GLSLShape.stride);
         JHVTime time = viewpoint.time;
         double[] sc = new double[]{viewpoint.distance, -viewpoint.lon, viewpoint.lat}; // lon was negated
+        double[] theta = new double[2];
 
         double[] rsc = SpiceMath.radrec(sc[0], sc[1], sc[2]);
-        putPlanet("MERCURY", time, sc, rsc, pointsBuf);
-        putPlanet("VENUS", time, sc, rsc, pointsBuf);
-        putPlanet("MARS BARYCENTER", time, sc, rsc, pointsBuf);
+        computePlanet("MERCURY", time, sc, rsc, theta, pointsBuf);
+        computePlanet("VENUS", time, sc, rsc, theta, pointsBuf);
+        computePlanet("MARS BARYCENTER", time, sc, rsc, theta, pointsBuf);
 
         double dyr = (time.milli / 1000. - EPOCH) / JYEAR_SEC;
         double[][] carr = Spice.j2000ToSun.get(time);
-        double[] theta = new double[2];
         for (Star star : stars) {
             // http://mingus.mmto.arizona.edu/~bjw/mmt/spectro_standards.html
             double ra = star.ra() + star.pmra() * dyr;
             double dec = star.dec() + star.pmdec() * dyr;
 
-            double[] s = SpiceMath.radrec(1, ra, dec);
-            s = SpiceMath.mxv(carr, s); // to Carrington
-            s = SpiceMath.recrad(s);
-            calcProj3(0, s[1], s[2], sc[1], sc[2], theta);
-            putVertex(pointsBuf, theta[0], theta[1], sc[0], SIZE_STAR, COLOR_STAR);
+            double[] st = SpiceMath.radrec(1, ra, dec);
+            putStar(st, sc, carr, theta, pointsBuf);
         }
         return pointsBuf;
     }
@@ -135,10 +126,11 @@ public class GaiaClient {
     private static BufVertex computePointsPrecise(String location, JHVTime time, List<Star> stars) throws SpiceErrorException {
         BufVertex pointsBuf = new BufVertex(500 * GLSLShape.stride);
         double[] sc = SpiceMath.recrad(Spice.getPosition(location, "SUN", "SOLO_IAU_SUN_2009", time));
+        double[] theta = new double[2];
 
-        putPlanetPrecise(location, "MERCURY", time, sc, pointsBuf);
-        putPlanetPrecise(location, "VENUS", time, sc, pointsBuf);
-        putPlanetPrecise(location, "MARS BARYCENTER", time, sc, pointsBuf);
+        computePlanetPrecise(location, "MERCURY", time, sc, theta, pointsBuf);
+        computePlanetPrecise(location, "VENUS", time, sc, theta, pointsBuf);
+        computePlanetPrecise(location, "MARS BARYCENTER", time, sc, theta, pointsBuf);
 
         double[] ssb = Spice.getState("SSB", location, "J2000", time);
         ssb[0] *= Sun.MeanEarthDistanceInv; // [au]
@@ -155,22 +147,29 @@ public class GaiaClient {
 
         double dyr = (time.milli / 1000. - EPOCH) / JYEAR_SEC;
         double[][] carr = Spice.j2000ToSun.get(time);
-        double[] theta = new double[2];
         for (Star star : stars) {
-            double[] s;
+            double[] st;
             // Proper motion and parallax
-            s = JSOFA.jauPmpx(star.ra(), star.dec(), star.pmra(), star.pmdec(), star.px(), star.rv(), dyr, ssb);
+            st = JSOFA.jauPmpx(star.ra(), star.dec(), star.pmra(), star.pmdec(), star.px(), star.rv(), dyr, ssb);
             // Deflection of starlight by the Sun
-            s = JSOFA.jauLdsun(s, sun, auDist);
+            st = JSOFA.jauLdsun(st, sun, auDist);
             // Apply stellar aberration (natural direction to proper direction)
-            s = JSOFA.jauAb(s, vel, auDist, bm1);
-
-            s = SpiceMath.mxv(carr, s); // to Carrington
-            s = SpiceMath.recrad(s);
-            calcProj3(0, s[1], s[2], sc[1], sc[2], theta);
-            putVertex(pointsBuf, theta[0], theta[1], sc[0], SIZE_STAR, COLOR_STAR);
+            st = JSOFA.jauAb(st, vel, auDist, bm1);
+            putStar(st, sc, carr, theta, pointsBuf);
         }
         return pointsBuf;
+    }
+
+    private static void putStar(double[] st /* rec */, double[] sc /* rad */, double[][] carr, double[] theta, BufVertex pointsBuf) {
+        st = SpiceMath.mxv(carr, st); // to Carrington
+        st = SpiceMath.recrad(st);
+        calcProj3(0, st[1], st[2], sc[1], sc[2], theta);
+        putVertex(pointsBuf, theta[0], theta[1], sc[0], SIZE_STAR, COLOR_STAR);
+    }
+
+    private static void putPlanet(double[] pl /* rad */, double[] sc /* rad */, double[] theta, BufVertex pointsBuf) {
+        calcProj3(0, pl[1], pl[2], sc[1], sc[2], theta);
+        putVertex(pointsBuf, theta[0], theta[1], sc[0], SIZE_PLANET, COLOR_PLANET);
     }
 
     private static void putVertex(BufVertex pointsBuf, double Tx, double Ty, double dist, float size, byte[] color) {
@@ -261,7 +260,6 @@ public class GaiaClient {
         @Override
         public BufVertex call() throws SpiceErrorException {
             String location = viewpoint.getLocation();
-
             if (location == null) {
                 StarRequest req = computeRequest(viewpoint);
                 String adql = adqlSearch(req.ra, req.dec, req.cone, req.mag);
