@@ -115,7 +115,7 @@ public class GaiaClient {
         double[] theta = new double[2];
         for (GaiaClient.Star star : stars) {
             // http://mingus.mmto.arizona.edu/~bjw/mmt/spectro_standards.html
-            double ra = star.ra() + star.pmra() / Math.cos(star.dec()) * dyr;
+            double ra = star.ra() + star.pmra() * dyr;
             double dec = star.dec() + star.pmdec() * dyr;
 
             double[] s = SpiceMath.radrec(1, ra, dec);
@@ -154,7 +154,7 @@ public class GaiaClient {
         for (GaiaClient.Star star : stars) {
             double[] s;
             // Proper motion and parallax
-            s = JSOFA.jauPmpx(star.ra(), star.dec(), star.pmra() / Math.cos(star.dec()), star.pmdec(), star.px(), star.rv(), dyr, ssb);
+            s = JSOFA.jauPmpx(star.ra(), star.dec(), star.pmra(), star.pmdec(), star.px(), star.rv(), dyr, ssb);
             // Deflection of starlight by the Sun
             s = JSOFA.jauLdsun(s, sun, auDist);
             // Apply stellar aberration (natural direction to proper direction)
@@ -227,10 +227,11 @@ public class GaiaClient {
             List<Star> stars = new ArrayList<>();
             try (RowSequence rseq = table.getRowSequence()) {
                 while (rseq.next()) {
+                    // https://gea.esac.esa.int/archive/documentation/GDR3/Gaia_archive/chap_datamodel/sec_dm_main_source_catalogue/ssec_dm_gaia_source.html
                     int source_id = ((Number) rseq.getCell(0)).intValue();
                     double ra = Math.toRadians(((Number) rseq.getCell(1)).doubleValue()); // [rad]
                     double dec = Math.toRadians(((Number) rseq.getCell(2)).doubleValue()); // [rad]
-                    double pmra = Math.toRadians(((Number) rseq.getCell(3)).doubleValue() / (1000. * 3600.)); // [rad/yr]
+                    double pmra = Math.toRadians(((Number) rseq.getCell(3)).doubleValue() / (1000. * 3600.)) / Math.cos(dec); // [rad/yr], dRA/dt rather than cos(Dec)*dRA/dt
                     double pmdec = Math.toRadians(((Number) rseq.getCell(4)).doubleValue() / (1000. * 3600.)); // [rad/yr]
                     double px = ((Number) rseq.getCell(5)).doubleValue() / 1000.; // [arcsec]
                     double rv = ((Number) rseq.getCell(6)).doubleValue(); // [km/s]
