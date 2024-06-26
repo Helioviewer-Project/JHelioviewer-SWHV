@@ -136,8 +136,6 @@ public class GaiaClient {
         ssb[0] *= Sun.MeanEarthDistanceInv; // [au]
         ssb[1] *= Sun.MeanEarthDistanceInv;
         ssb[2] *= Sun.MeanEarthDistanceInv;
-        double[] vel = new double[]{ssb[3], ssb[4], ssb[5]}; // [c]
-        double bm1 = Math.sqrt(1 - vel[0] * vel[0] + vel[1] * vel[1] + vel[2] * vel[2]);
 
         double[] sun = Spice.getPosition("SUN", location, "J2000", time);
         sun[0] /= sc[0];
@@ -153,8 +151,7 @@ public class GaiaClient {
             st = JSOFA.jauPmpx(star.ra(), star.dec(), star.pmra(), star.pmdec(), star.px(), star.rv(), dyr, ssb);
             // Deflection of starlight by the Sun
             st = JSOFA.jauLdsun(st, sun, auDist);
-            // Apply stellar aberration (natural direction to proper direction)
-            st = JSOFA.jauAb(st, vel, auDist, bm1);
+            // Stellar aberration correction not needed for JHV
             putStar(st, sc, carr, theta, pointsBuf);
         }
         return pointsBuf;

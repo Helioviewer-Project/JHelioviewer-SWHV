@@ -284,8 +284,8 @@ public final class HelioviewerMetaData extends BaseMetaData {
         if (instrument.equals("CALLISTO")) { // pixel based
             region = new Region(0, 0, pixelW, pixelH);
         } else {
-            double arcsecX = m.getString("CUNIT1").map(u -> u.equals("deg") ? 3600 : 1).orElse(1);
-            double arcsecY = m.getString("CUNIT2").map(u -> u.equals("deg") ? 3600 : 1).orElse(1);
+            double arcsecX = m.getString("CUNIT1").map(u -> u.toLowerCase().equals("deg") ? 3600 : 1).orElse(1);
+            double arcsecY = m.getString("CUNIT2").map(u -> u.toLowerCase().equals("deg") ? 3600 : 1).orElse(1);
             double arcsecPerPixelX = m.getRequiredDouble("CDELT1") * arcsecX;
             double arcsecPerPixelY = m.getRequiredDouble("CDELT2") * arcsecY;
 
