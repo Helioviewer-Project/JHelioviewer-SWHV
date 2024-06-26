@@ -132,13 +132,13 @@ public class GaiaClient {
         computePlanetPrecise(location, "VENUS", time, sc, theta, pointsBuf);
         computePlanetPrecise(location, "MARS BARYCENTER", time, sc, theta, pointsBuf);
 
-        double[] ssb = Spice.getState("SSB", location, "J2000", time);
+        double[] ssb = Spice.getPosition("SSB", location, "J2000", time);
         ssb[0] *= Sun.MeanEarthDistanceInv; // [au]
         ssb[1] *= Sun.MeanEarthDistanceInv;
         ssb[2] *= Sun.MeanEarthDistanceInv;
 
         double[] sun = Spice.getPosition("SUN", location, "J2000", time);
-        sun[0] /= sc[0];
+        sun[0] /= sc[0]; // normalize
         sun[1] /= sc[0];
         sun[2] /= sc[0];
         double auDist = sc[0] * Sun.MeanEarthDistanceInv; // [au]
