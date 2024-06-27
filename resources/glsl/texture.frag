@@ -10,4 +10,6 @@ uniform sampler2D image;
 
 void main(void) {
     outColor = color * texture(image, fragCoord);
+    if (length(outColor) < 0.1) // hollow letters
+        discard;
 }

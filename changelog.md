@@ -1,10 +1,11 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.7 (pending)
+## JHelioviewer 4.7 (2024-06-27)
 
 - Restore timeline loading from new HAPI ROB server
 - Add menu item to reload the list of datasets
+- Allow to copy timestamp from image layer
 - Switch to Java 21
 
 ## JHelioviewer 4.6.4 (2024-05-06)
