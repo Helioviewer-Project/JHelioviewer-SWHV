@@ -24,7 +24,7 @@ public class Position {
 
     public Quat toQuat() {
         if (q == null)
-            q = new Quat(lat, lon);
+            q = Quat.createXY(lat, lon);
         return q;
     }
 

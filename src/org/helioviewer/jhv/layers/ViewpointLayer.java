@@ -103,7 +103,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
         Position viewpoint = camera.getViewpoint();
 
         Transform.pushView();
-        Transform.rotateViewInverse(new Quat(viewpoint.lat, viewpoint.lon + relativeLon));
+        Transform.rotateViewInverse(Quat.createXY(viewpoint.lat, viewpoint.lon + relativeLon));
 
         if (spiralSpeed > 0)
             renderSpiral(gl, vp, lati, spiralSpeed);
