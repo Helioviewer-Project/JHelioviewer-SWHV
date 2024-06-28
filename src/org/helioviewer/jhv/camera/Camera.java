@@ -63,15 +63,13 @@ public class Camera {
     }
 
     public void projectionOrtho2D(double aspect) {
-        Transform.setOrthoSymmetricProjection((float) (cameraWidth * aspect), (float) cameraWidth, -1, 1);
-        Transform.setTranslateView((float) translation.x, (float) translation.y, 0);
+        Transform.setup((float) (cameraWidth * aspect), (float) cameraWidth, -1, 1, (float) translation.x, (float) translation.y);
         Transform.cacheMVP();
     }
 
     public void projectionOrtho(double aspect) {
         float clip = cameraWidth < 32 ? clipNarrow : clipWide;
-        Transform.setOrthoSymmetricProjection((float) (cameraWidth * aspect), (float) cameraWidth, -clip, clip);
-        Transform.setTranslateView((float) translation.x, (float) translation.y, 0);
+        Transform.setup((float) (cameraWidth * aspect), (float) cameraWidth, -clip, clip, (float) translation.x, (float) translation.y);
         Transform.rotateView(rotation);
         Transform.cacheMVP();
     }
