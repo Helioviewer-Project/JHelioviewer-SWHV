@@ -50,7 +50,6 @@ public class Quat {
         double sx = Math.sin(ax), cx = Math.cos(ax);
         double sy = Math.sin(ay), cy = Math.cos(ay);
         double sz = Math.sin(az), cz = Math.cos(az);
-
         return new Quat(
             cx * cy * cz + sx * sy * sz,
             sx * cy * cz - cx * sy * sz,
@@ -63,12 +62,7 @@ public class Quat {
         ay /= 2.;
         double sx = Math.sin(ax), cx = Math.cos(ax);
         double sy = Math.sin(ay), cy = Math.cos(ay);
-
-        return new Quat(
-            cx * cy,
-            sx * cy,
-            cx * sy,
-            sx * sy);
+        return new Quat(cx * cy, sx * cy, cx * sy, sx * sy);
     }
 
     public Quat(double _w, double _x, double _y, double _z) {
@@ -124,7 +118,6 @@ public class Quat {
         return result;
     }
 */
-
     private Quat normalize() {
         double l = Math.sqrt(w * w + x * x + y * y + z * z);
         return l == 0 ? this : new Quat(w / l, x / l, y / l, z / l);

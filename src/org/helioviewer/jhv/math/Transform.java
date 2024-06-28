@@ -5,6 +5,7 @@ import java.nio.FloatBuffer;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
+import org.joml.Quaternionf;
 
 public class Transform {
 
@@ -14,6 +15,7 @@ public class Transform {
     private static final Matrix4fStack proj = new Matrix4fStack(2);
     private static final Matrix4fStack view = new Matrix4fStack(3);
     private static final Matrix4f mul = new Matrix4f();
+    private static final Quaternionf quat = new Quaternionf();
 
     private static int projDepth;
     private static int viewDepth;
@@ -59,27 +61,11 @@ public class Transform {
     }
 
     public static void rotateView(Quat q) {
-        float w = (float) q.w, w2 = w * w;
-        float x = (float) q.x, x2 = x * x;
-        float y = (float) q.y, y2 = y * y;
-        float z = (float) q.z, z2 = z * z;
-
-        view.mulAffine(mul.set(w2 + x2 - y2 - z2,     2 * x * y + 2 * w * z, 2 * x * z - 2 * w * y, 0,
-                               2 * x * y - 2 * w * z, w2 - x2 + y2 - z2,     2 * y * z + 2 * w * x, 0,
-                               2 * x * z + 2 * w * y, 2 * y * z - 2 * w * x, w2 - x2 - y2 + z2,     0,
-                               0,                     0,                     0,                     w2 + x2 + y2 + z2));
+        view.rotateAffine(quat.set((float) q.x, (float) q.y, (float) q.z, (float) q.w));
     }
 
     public static void rotateViewInverse(Quat q) {
-        float w = (float) q.w, w2 = w * w;
-        float x = (float) q.x, x2 = x * x;
-        float y = (float) q.y, y2 = y * y;
-        float z = (float) q.z, z2 = z * z;
-
-        view.mulAffine(mul.set(w2 + x2 - y2 - z2,     2 * x * y - 2 * w * z, 2 * x * z + 2 * w * y, 0,
-                               2 * x * y + 2 * w * z, w2 - x2 + y2 - z2,     2 * y * z - 2 * w * x, 0,
-                               2 * x * z - 2 * w * y, 2 * y * z + 2 * w * x, w2 - x2 - y2 + z2,     0,
-                               0,                     0,                     0,                     w2 + x2 + y2 + z2));
+        view.rotateAffine(quat.set((float) q.x, (float) q.y, (float) q.z, (float) -q.w));
     }
 
     public static void cacheMVP() {
