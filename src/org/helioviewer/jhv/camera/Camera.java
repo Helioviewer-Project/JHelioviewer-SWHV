@@ -8,7 +8,6 @@ import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
-import org.helioviewer.jhv.math.Mat4f;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
@@ -74,12 +73,6 @@ public class Camera {
         Transform.cacheMVP();
     }
 
-    public float[] getTransformationInverse(double aspect) {
-        Mat4f.orthoSymmetricInverse(invProj, (float) (cameraWidth * aspect), (float) cameraWidth, -1, 1);
-        Mat4f.translate(invProj, -(float) translation.x, -(float) translation.y, 0);
-        return invProj;
-    }
-
 ////
 
     private void updateCamera(JHVTime time) {
@@ -87,7 +80,7 @@ public class Camera {
         viewpoint = Display.mode == Display.ProjectionMode.Orthographic ? v : new Position(v.time, Sun.MeanEarthDistance, v.lon, v.lat);
         updateRotation();
         updateWidth();
-        listeners.forEach(l -> l.viewpointChanged(viewpoint));
+        //listeners.forEach(l -> l.viewpointChanged(viewpoint));
     }
 
     private void updateRotation() {
