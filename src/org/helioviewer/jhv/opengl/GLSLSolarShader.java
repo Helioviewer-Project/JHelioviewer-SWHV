@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.opengl;
 
 import org.helioviewer.jhv.base.Region;
+import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 
@@ -107,8 +108,8 @@ public class GLSLSolarShader extends GLSLShader {
         logpolar._dispose(gl);
     }
 
-    public void bindMatrix(GL2 gl, float[] matrix) {
-        gl.glUniformMatrix4fv(cameraTransformationInverseRef, 1, false, matrix, 0);
+    public void bindInverseCamera(GL2 gl) {
+        gl.glUniformMatrix4fv(cameraTransformationInverseRef, 1, false, Transform.getInv());
     }
 
     public void bindCameraDifference(GL2 gl, Quat quat, Quat quatDiff) {

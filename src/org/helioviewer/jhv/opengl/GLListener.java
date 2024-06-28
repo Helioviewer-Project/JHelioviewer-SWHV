@@ -101,7 +101,7 @@ public class GLListener implements GLEventListener {
             camera.projectionOrtho(vp.aspect);
 
             GLSLSolarShader.sphere.use(gl);
-            GLSLSolarShader.sphere.bindMatrix(gl, camera.getTransformationInverse(vp.aspect));
+            GLSLSolarShader.sphere.bindInverseCamera(gl);
             GLSLSolarShader.sphere.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height);
             glslSolar.render(gl);
 

@@ -13,10 +13,12 @@ public class Transform {
 
     private static final FloatBuffer fb = BufferUtils.newFloatBuffer(16);
     private static final FloatBuffer mvp = BufferUtils.newFloatBuffer(16);
+    private static final FloatBuffer inv = BufferUtils.newFloatBuffer(16);
 
     private static final Matrix4fStack proj = new Matrix4fStack(2);
     private static final Matrix4fStack view = new Matrix4fStack(3);
     private static final Matrix4f mul = new Matrix4f();
+    private static final Matrix4f invTrans = new Matrix4f();
     private static final Quaternionf quat = new Quaternionf();
 
     private static int projDepth;
@@ -49,6 +51,7 @@ public class Transform {
     public static void setup(float width, float height, float zNear, float zFar, float x, float y) {
         proj.setOrthoSymmetric(width, height, zNear, zFar);
         view.translation(x, y, 0);
+        proj.invertOrtho(invTrans).translateLocal(-x, -y, 0).get(inv);
     }
 
     public static void setIdentityView() {
@@ -82,6 +85,10 @@ public class Transform {
         proj.mulOrthoAffine(view, mul); // assumes ortho
         mul.get(fb);
         return fb;
+    }
+
+    public static FloatBuffer getInv() {
+        return inv;
     }
 
 }
