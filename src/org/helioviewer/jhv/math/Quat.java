@@ -9,10 +9,10 @@ public class Quat {
     public static final Quat Y90 = Quat.createAxisY(Math.PI / 2);
     public static final Quat Z90 = Quat.createAxisZ(Math.PI / 2);
 
-    final double w;
-    final double x;
-    final double y;
-    final double z;
+    public final double w;
+    public final double x;
+    public final double y;
+    public final double z;
 
     public static Quat createAxisX(double a) {
         a /= 2.;
@@ -42,21 +42,22 @@ public class Quat {
         }
         return new Quat(Math.cos(a), m * v.x, m * v.y, m * v.z);
     }
-/*
-    public static Quat createXYZ(double ax, double ay, double az) {
-        ax /= 2.;
-        ay /= 2.;
-        az /= 2.;
-        double sx = Math.sin(ax), cx = Math.cos(ax);
-        double sy = Math.sin(ay), cy = Math.cos(ay);
-        double sz = Math.sin(az), cz = Math.cos(az);
-        return new Quat(
-            cx * cy * cz + sx * sy * sz,
-            sx * cy * cz - cx * sy * sz,
-            cx * sy * cz + sx * cy * sz,
-            sx * sy * cz - cx * cy * sz);
-    }
-*/
+
+    /*
+        public static Quat createXYZ(double ax, double ay, double az) {
+            ax /= 2.;
+            ay /= 2.;
+            az /= 2.;
+            double sx = Math.sin(ax), cx = Math.cos(ax);
+            double sy = Math.sin(ay), cy = Math.cos(ay);
+            double sz = Math.sin(az), cz = Math.cos(az);
+            return new Quat(
+                cx * cy * cz + sx * sy * sz,
+                sx * cy * cz - cx * sy * sz,
+                cx * sy * cz + sx * cy * sz,
+                sx * sy * cz - cx * cy * sz);
+        }
+    */
     public static Quat createXY(double ax, double ay) {
         ax /= 2.;
         ay /= 2.;
@@ -87,37 +88,38 @@ public class Quat {
                 -q1.w * q2.y + q1.y * q2.w - q1.z * q2.x + q1.x * q2.z,
                 -q1.w * q2.z + q1.z * q2.w - q1.x * q2.y + q1.y * q2.x);
     }
-/*
-    public Quat slerp(Quat r, double t) {
-        double cosAngle = dot(r);
 
-        if (cosAngle > 1 - EPSILON) {
+    /*
+        public Quat slerp(Quat r, double t) {
+            double cosAngle = dot(r);
+
+            if (cosAngle > 1 - EPSILON) {
+                Quat result = r.copy().add(this.copy().subtract(r).scale(t));
+                result.normalize();
+                return result;
+            }
+
+            if (cosAngle < 0)
+                cosAngle = 0;
+            if (cosAngle > 1)
+                cosAngle = 1;
+
+            Quat v2 = r.copy().subtract(this.copy().scale(cosAngle));
+            v2.normalize();
+
+            double theta0 = Math.acos(cosAngle);
+            double theta = theta0 * t;
+            Quat q = this.copy().scale(Math.cos(theta)).add(v2.scale(Math.sin(theta)));
+            q.normalize();
+            return q;
+        }
+
+        public Quat nlerp(Quat r, double t) {
             Quat result = r.copy().add(this.copy().subtract(r).scale(t));
             result.normalize();
             return result;
         }
-
-        if (cosAngle < 0)
-            cosAngle = 0;
-        if (cosAngle > 1)
-            cosAngle = 1;
-
-        Quat v2 = r.copy().subtract(this.copy().scale(cosAngle));
-        v2.normalize();
-
-        double theta0 = Math.acos(cosAngle);
-        double theta = theta0 * t;
-        Quat q = this.copy().scale(Math.cos(theta)).add(v2.scale(Math.sin(theta)));
-        q.normalize();
-        return q;
-    }
-
-    public Quat nlerp(Quat r, double t) {
-        Quat result = r.copy().add(this.copy().subtract(r).scale(t));
-        result.normalize();
-        return result;
-    }
-*/
+    */
     private Quat normalize() {
         double l = Math.sqrt(w * w + x * x + y * y + z * z);
         return l == 0 ? this : new Quat(w / l, x / l, y / l, z / l);

@@ -11,7 +11,6 @@ import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Mat4f;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.math.Transform;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVTime;

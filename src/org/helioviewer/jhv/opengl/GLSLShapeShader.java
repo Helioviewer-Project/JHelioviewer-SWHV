@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.opengl;
 
-import org.helioviewer.jhv.math.Transform;
+import org.helioviewer.jhv.camera.Transform;
 
 import com.jogamp.opengl.GL2;
 

@@ -1,8 +1,10 @@
-package org.helioviewer.jhv.math;
+package org.helioviewer.jhv.camera;
 
 import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.math.Quat;
+
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 import org.joml.Quaternionf;

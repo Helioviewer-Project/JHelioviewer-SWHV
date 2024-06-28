@@ -2,7 +2,7 @@ package org.helioviewer.jhv.opengl;
 
 import com.jogamp.opengl.GL2;
 
-import org.helioviewer.jhv.math.Transform;
+import org.helioviewer.jhv.camera.Transform;
 
 class GLSLTextureShader extends GLSLShader {
 
