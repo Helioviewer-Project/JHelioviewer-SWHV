@@ -46,16 +46,13 @@ public class Transform {
         proj.setOrtho2D(left, right, bottom, top);
     }
 
-    public static void setOrthoSymmetricProjection(float width, float height, float zNear, float zFar) {
+    public static void setup(float width, float height, float zNear, float zFar, float x, float y) {
         proj.setOrthoSymmetric(width, height, zNear, zFar);
+        view.translation(x, y, 0);
     }
 
     public static void setIdentityView() {
         view.identity();
-    }
-
-    public static void setTranslateView(float x, float y, float z) {
-        view.translation(x, y, z);
     }
 
     public static void mulView(Matrix4f m) {
