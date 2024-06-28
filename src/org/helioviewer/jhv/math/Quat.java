@@ -42,8 +42,8 @@ public class Quat {
         }
         return new Quat(Math.cos(a), m * v.x, m * v.y, m * v.z);
     }
-
-    public Quat(double ax, double ay, double az) {
+/*
+    public static Quat createXYZ(double ax, double ay, double az) {
         ax /= 2.;
         ay /= 2.;
         az /= 2.;
@@ -51,22 +51,24 @@ public class Quat {
         double sy = Math.sin(ay), cy = Math.cos(ay);
         double sz = Math.sin(az), cz = Math.cos(az);
 
-        w = cx * cy * cz + sx * sy * sz;
-        x = sx * cy * cz - cx * sy * sz;
-        y = cx * sy * cz + sx * cy * sz;
-        z = sx * sy * cz - cx * cy * sz;
+        return new Quat(
+            cx * cy * cz + sx * sy * sz,
+            sx * cy * cz - cx * sy * sz,
+            cx * sy * cz + sx * cy * sz,
+            sx * sy * cz - cx * cy * sz);
     }
-
-    public Quat(double ax, double ay) {
+*/
+    public static Quat createXY(double ax, double ay) {
         ax /= 2.;
         ay /= 2.;
         double sx = Math.sin(ax), cx = Math.cos(ax);
         double sy = Math.sin(ay), cy = Math.cos(ay);
 
-        w = cx * cy;
-        x = sx * cy;
-        y = cx * sy;
-        z = sx * sy;
+        return new Quat(
+            cx * cy,
+            sx * cy,
+            cx * sy,
+            sx * sy);
     }
 
     public Quat(double _w, double _x, double _y, double _z) {
