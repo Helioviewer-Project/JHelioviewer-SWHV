@@ -42,7 +42,7 @@ public interface UpdateViewpoint {
 
             List<PositionLoad> loadList = PositionLoad.get(this);
             if (!loadList.isEmpty()) {
-                PositionLoad load = loadList.get(0);
+                PositionLoad load = loadList.getFirst();
                 PositionResponse response = load.getResponse();
                 if (response != null) {
                     itime = new JHVTime(response.interpolateTime(time.milli, start, end));
@@ -61,7 +61,7 @@ public interface UpdateViewpoint {
         public Position update(JHVTime time) {
             List<PositionLoad> loadList = PositionLoad.get(this);
             if (!loadList.isEmpty()) {
-                PositionResponse response = loadList.get(0).getResponse();
+                PositionResponse response = loadList.getFirst().getResponse();
                 if (response != null) {
                     return response.interpolateCarrington(time.milli, Movie.getStartTime(), Movie.getEndTime());
                 }

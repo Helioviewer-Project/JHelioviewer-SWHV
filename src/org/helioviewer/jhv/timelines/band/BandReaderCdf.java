@@ -36,7 +36,7 @@ public class BandReaderCdf {
         List<Band.Data> lines = read(NetFileCache.get(uri).uri()); // tbd : sniff type
         if (lines.isEmpty()) // failed
             return;
-        long[] dates = lines.get(0).dates();
+        long[] dates = lines.getFirst().dates();
         if (dates.length == 0) // empty file
             return;
 

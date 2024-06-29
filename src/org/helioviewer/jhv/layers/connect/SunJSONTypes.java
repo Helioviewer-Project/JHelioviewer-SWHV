@@ -155,9 +155,9 @@ public class SunJSONTypes {
         int num = coordinates.size();
         BufVertex buf = new BufVertex((num + 2) * GLSLLine.stride);
 
-        Vec3 v = coordinates.get(0);
+        Vec3 v = coordinates.getFirst();
         buf.putVertex(v, Colors.Null);
-        buf.repeatVertex(colors.get(0));
+        buf.repeatVertex(colors.getFirst());
         for (int i = 1; i < num; i++) {
             buf.putVertex(coordinates.get(i), colors.get(i));
         }
@@ -173,7 +173,7 @@ public class SunJSONTypes {
         Vec3 c = coordinates.get(0);
         Vec3 u = coordinates.get(1);
         Vec3 v = coordinates.get(2);
-        byte[] color = colors.get(0);
+        byte[] color = colors.getFirst();
 
         u.minus(c);
         v.minus(c);

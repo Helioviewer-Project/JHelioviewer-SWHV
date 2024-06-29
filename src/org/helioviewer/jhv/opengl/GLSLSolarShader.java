@@ -109,7 +109,7 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindInverseCamera(GL2 gl) {
-        gl.glUniformMatrix4fv(cameraTransformationInverseRef, 1, false, Transform.getInv());
+        gl.glUniformMatrix4fv(cameraTransformationInverseRef, 1, false, Transform.getInverse());
     }
 
     public void bindCameraDifference(GL2 gl, Quat quat, Quat quatDiff) {

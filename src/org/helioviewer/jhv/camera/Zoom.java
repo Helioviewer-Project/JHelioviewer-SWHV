@@ -40,7 +40,7 @@ class Zoom {
 
         // calculate average velocity over last several mouse wheel events
         if (mVelocities.size() == MAX_VELOCITIES) {
-            mVelocities.remove(0);
+            mVelocities.removeFirst();
         }
         mVelocities.add(newVelocity);
         mVelocity = getAverage(mVelocities);

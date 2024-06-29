@@ -141,7 +141,7 @@ public class BandReaderHapi {
         }
         if (parameters.size() < 2)
             throw new Exception("At least two parameters should be present");
-        if (!"time".equalsIgnoreCase(parameters.get(0).name))
+        if (!"time".equalsIgnoreCase(parameters.getFirst().name))
             throw new Exception("First parameter should be time");
 
         HapiInfo info = HapiInfo.fromJson(jo);

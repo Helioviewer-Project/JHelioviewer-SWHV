@@ -49,7 +49,7 @@ public class RequestCache {
             return newCache;
         }
 
-        Interval interval = toInvert.get(0);
+        Interval interval = toInvert.getFirst();
         if (Long.MIN_VALUE != interval.start) {
             newCache.add(new Interval(Long.MIN_VALUE, interval.start));
         }
@@ -77,7 +77,7 @@ public class RequestCache {
         Collections.sort(intervals);
 
         List<Interval> result = new ArrayList<>();
-        Interval prev = intervals.get(0);
+        Interval prev = intervals.getFirst();
         for (int i = 1; i < size; i++) {
             Interval curr = intervals.get(i);
             if (prev.end >= curr.start) {

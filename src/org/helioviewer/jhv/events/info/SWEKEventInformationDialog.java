@@ -155,7 +155,7 @@ public final class SWEKEventInformationDialog extends JDialog implements DataCol
         for (JHVRelatedEvents rev : rEvents) {
             List<JHVEvent> evs = rev.getEvents();
             if (!evs.isEmpty()) {
-                allPrecedingEvents.add(createEventPanel(rev, evs.get(0)));
+                allPrecedingEvents.add(createEventPanel(rev, evs.getFirst()));
             }
         }
         return new DataCollapsiblePanel(relation, new JScrollPane(allPrecedingEvents), false, model);

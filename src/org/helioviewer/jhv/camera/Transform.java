@@ -87,7 +87,7 @@ public class Transform {
         return fb;
     }
 
-    public static FloatBuffer getInv() {
+    public static FloatBuffer getInverse() {
         return inv;
     }
 

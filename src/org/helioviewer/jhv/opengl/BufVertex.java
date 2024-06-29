@@ -97,7 +97,7 @@ public class BufVertex {
         if (listSize == 0)
             throw new IllegalArgumentException("Empty BufVertex list");
         if (listSize == 1)
-            return list.get(0);
+            return list.getFirst();
 
         int retLengthVertx = 0, retLengthColor = 0, retCount = 0, toCopy;
         for (BufVertex b : list) {
