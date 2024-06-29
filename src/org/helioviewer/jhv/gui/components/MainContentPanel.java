@@ -51,7 +51,7 @@ public final class MainContentPanel extends JPanel {
         if (plugin == null || pluginList.contains(plugin)) {
             return;
         }
-        ComponentUtils.setVisible(plugin.getVisualInterfaces().get(0), collapsiblePane.toggleButton.isSelected());
+        ComponentUtils.setVisible(plugin.getVisualInterfaces().getFirst(), collapsiblePane.toggleButton.isSelected());
         pluginList.add(plugin);
         updateLayout();
     }
@@ -59,7 +59,7 @@ public final class MainContentPanel extends JPanel {
     // Removes a plug-in and the associated GUI from the container
     public void removePlugin(Interfaces.MainContentPanelPlugin plugin) {
         if (pluginList.remove(plugin)) {
-            ComponentUtils.setVisible(plugin.getVisualInterfaces().get(0), false);
+            ComponentUtils.setVisible(plugin.getVisualInterfaces().getFirst(), false);
             updateLayout();
         }
     }
@@ -80,14 +80,14 @@ public final class MainContentPanel extends JPanel {
         }
 
         boolean isSelected = collapsiblePane.toggleButton.isSelected();
-        boolean onePlugin = pluginList.size() == 1 && pluginList.get(0).getVisualInterfaces().size() == 1;
-        collapsiblePane.setTitle(onePlugin ? pluginList.get(0).getTabName() : "Plugins");
+        boolean onePlugin = pluginList.size() == 1 && pluginList.getFirst().getVisualInterfaces().size() == 1;
+        collapsiblePane.setTitle(onePlugin ? pluginList.getFirst().getTabName() : "Plugins");
 
         if (isSelected) {
             pluginContainer.removeAll();
 
             if (onePlugin) {
-                pluginContainer.add(pluginList.get(0).getVisualInterfaces().get(0), BorderLayout.CENTER);
+                pluginContainer.add(pluginList.getFirst().getVisualInterfaces().getFirst(), BorderLayout.CENTER);
             } else {
                 JTabbedPane tabbedPane = new JTabbedPane();
                 for (Interfaces.MainContentPanelPlugin plugin : pluginList) {

@@ -138,7 +138,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         if (hcs.size == 0)
             return;
         if (Display.mode == Display.ProjectionMode.Orthographic) {
-            Vec3 first = hcs.ortho.get(0);
+            Vec3 first = hcs.ortho.getFirst();
             hcsBuf.putVertex(first, Colors.Null);
             hcs.ortho.forEach(v -> hcsBuf.putVertex(v, hcsColor));
             hcsBuf.putVertex(first, hcsColor);
@@ -147,7 +147,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
             Quat q = Display.gridType.toGrid(camera.getViewpoint());
             Vec2 previous = null;
 
-            Vec3 first = hcs.scale.get(0);
+            Vec3 first = hcs.scale.getFirst();
             GLHelper.drawVertex(q, vp, first, previous, hcsBuf, Colors.Null);
 
             int size = hcs.scale.size();

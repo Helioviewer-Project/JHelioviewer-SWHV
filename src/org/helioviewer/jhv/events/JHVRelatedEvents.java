@@ -110,7 +110,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
                 return event;
             }
         }
-        return events.get(0);
+        return events.getFirst();
     }
 
     void addAssociation(Pair<Integer, Integer> association) {

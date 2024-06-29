@@ -79,7 +79,7 @@ public class LoadLayer {
 
     private static View loadUri(DecodeExecutor executor, List<URI> uriList) throws Exception {
         if (uriList.size() == 1) {
-            return loadView(executor, null, uriList.get(0));
+            return loadView(executor, null, uriList.getFirst());
         } else {
             List<View> views = uriList.parallelStream().map(uri -> {
                 try {

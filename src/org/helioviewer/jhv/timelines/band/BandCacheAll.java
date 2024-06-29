@@ -37,8 +37,8 @@ class BandCacheAll implements BandCache {
         }
         Collections.sort(dateVals);
 
-        first = dateVals.get(0);
-        last = dateVals.get(dateVals.size() - 1);
+        first = dateVals.getFirst();
+        last = dateVals.getLast();
     }
 
     @Override
