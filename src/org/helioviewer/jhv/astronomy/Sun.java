@@ -12,7 +12,7 @@ public class Sun {
 
     public static final double CLIGHT = 299_792_458.;
 
-    // http://asa.usno.navy.mil/static/files/2016/Astronomical_Constants_2016.pdf
+    // https://aa.usno.navy.mil/downloads/publications/Constants_2021.pdf
     private static final double SunEarthMassRatio = 332946.0487;
     // https://en.wikipedia.org/wiki/Lagrangian_point#L1
     public static final double L1Factor = 1 - Math.cbrt(1 / SunEarthMassRatio / 3);

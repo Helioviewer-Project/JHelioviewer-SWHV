@@ -11,7 +11,7 @@ import org.helioviewer.jhv.math.MathUtils;
 
 class ImageFilter {
 
-    // derived from http://dev.ipol.im/~getreuer/code/
+    // derived from https://dev.ipol.im/~getreuer/code/
     private static class GaussFilter {
 
         private static final int SII_MIN_K = 3;
