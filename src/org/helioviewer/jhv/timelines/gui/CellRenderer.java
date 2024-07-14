@@ -25,7 +25,7 @@ class CellRenderer {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
+            // https://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
             if (value instanceof TimelineLayer layer) {
                 checkBox.setSelected(layer.isEnabled());
             }
@@ -67,7 +67,7 @@ class CellRenderer {
             label.setBorder(null); //!
             label.setText(null);
 
-            // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
+            // https://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
             if (value instanceof TimelineLayer layer && layer.isDownloading()) {
                 table.repaint(); // lazy
 
@@ -87,7 +87,7 @@ class CellRenderer {
             JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             // label.setText(null);
 
-            // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
+            // https://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
             if (value instanceof TimelineLayer layer) {
                 String layerName = layer.getName();
                 if (layer.hasData()) {

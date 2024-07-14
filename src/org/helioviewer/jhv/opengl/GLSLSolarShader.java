@@ -154,7 +154,7 @@ public class GLSLSolarShader extends GLSLShader {
         floatArr[0] = (float) (red * alpha);
         floatArr[1] = (float) (green * alpha);
         floatArr[2] = (float) (blue * alpha);
-        floatArr[3] = (float) (alpha * blend); // http://amindforeverprogramming.blogspot.be/2013/07/why-alpha-premultiplied-colour-blending.html
+        floatArr[3] = (float) (alpha * blend); // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
         gl.glUniform4fv(colorRef, 1, floatArr, 0);
     }
 

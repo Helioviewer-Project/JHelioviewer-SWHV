@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class EDTQueue {
 
-    // http://kotek.net/blog/swingutilities.invokeandwait_with_return_value
+    // https://kotek.net/blog/swingutilities.invokeandwait_with_return_value
     public static <E> E invokeAndWait(Callable<E> r) throws InterruptedException, InvocationTargetException {
         AtomicReference<E> ret = new AtomicReference<>();
         AtomicReference<Exception> except = new AtomicReference<>();

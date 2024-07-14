@@ -48,12 +48,6 @@ public class Transform {
         proj.setOrtho2D(left, right, bottom, top);
     }
 
-    public static void setup(float width, float height, float zNear, float zFar, float x, float y) {
-        proj.setOrthoSymmetric(width, height, zNear, zFar);
-        view.translation(x, y, 0);
-        proj.invertOrtho(invTrans).translateLocal(-x, -y, 0).get(inv);
-    }
-
     public static void setIdentityView() {
         view.identity();
     }
@@ -62,18 +56,28 @@ public class Transform {
         view.mulAffine(m);
     }
 
-    public static void rotateView(Quat q) {
-        view.rotateAffine(quat.set((float) q.x, (float) q.y, (float) q.z, (float) q.w));
-    }
-
     public static void rotateViewInverse(Quat q) {
         view.rotateAffine(quat.set((float) q.x, (float) q.y, (float) q.z, (float) -q.w));
     }
 
-    public static void cacheMVP() {
+/// Only for Camera.java
+
+    static void setup(float width, float height, float zNear, float zFar, float x, float y) {
+        proj.setOrthoSymmetric(width, height, zNear, zFar);
+        view.translation(x, y, 0);
+        proj.invertOrtho(invTrans).translateLocal(-x, -y, 0).get(inv);
+    }
+
+    static void rotateView(Quat q) {
+        view.rotateAffine(quat.set((float) q.x, (float) q.y, (float) q.z, (float) q.w));
+    }
+
+    static void cacheMVP() {
         proj.mulOrthoAffine(view, mul); // assumes ortho
         mul.get(mvp);
     }
+
+///
 
     public static FloatBuffer get() {
         if (projDepth == 0 && viewDepth == 0) {

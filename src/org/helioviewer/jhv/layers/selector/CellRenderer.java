@@ -25,7 +25,7 @@ class CellRenderer {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
+            // https://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
             if (value instanceof Layer layer) {
                 checkBox.setSelected(layer.isEnabled());
             }
@@ -46,7 +46,7 @@ class CellRenderer {
             label.setBorder(null); //!
             label.setText(null);
 
-            // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
+            // https://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
             if (value instanceof Layer layer) {
                 if (layer.isDownloading()) {
                     table.repaint(); // lazy
