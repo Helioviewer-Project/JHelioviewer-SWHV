@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.InflaterInputStream;
 import java.util.zip.GZIPInputStream;
 
@@ -71,7 +72,7 @@ public class HTTPSocket {
         }
     }
 
-    protected InputStream getInputStream(HashMap<String, String> hdr) throws IOException {
+    protected InputStream getInputStream(Map<String, String> hdr) throws IOException {
         String head = hdr.get("Transfer-Encoding");
         String transferEncoding = head == null ? "identity" : head.toLowerCase();
         head = hdr.get("Content-Encoding");
@@ -99,13 +100,13 @@ public class HTTPSocket {
         };
     }
 
-    protected HashMap<String, String> readHeader() throws IOException {
+    protected Map<String, String> readHeader() throws IOException {
         String line = LineRead.readAsciiLine(inputStream);
         if (!"HTTP/1.1 200 OK".equals(line))
             throw new IOException("Invalid HTTP response: " + line);
 
         // Parses HTTP headers
-        HashMap<String, String> hdr = new HashMap<>();
+        Map<String, String> hdr = new HashMap<>();
         while (true) {
             line = LineRead.readAsciiLine(inputStream);
             if (line.isEmpty())

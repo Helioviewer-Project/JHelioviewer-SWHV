@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.Map;
 
 import kdu_jni.KduException;
 
@@ -40,7 +41,7 @@ public final class JPIPSocket extends HTTPSocket {
         if (cnew == null)
             throw new IOException("The header 'JPIP-cnew' was not sent by the server");
 
-        HashMap<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         for (String part : Regex.Comma.split(cnew))
             for (String cnewParam : cnewParams)
                 if (part.startsWith(cnewParam + '='))
@@ -109,7 +110,7 @@ public final class JPIPSocket extends HTTPSocket {
     public JPIPResponse request(String queryStr, JPIPCache cache, int frame) throws KduException, IOException {
         writeRequest(queryStr);
 
-        HashMap<String, String> header = readHeader();
+        Map<String, String> header = readHeader();
         if (!"image/jpp-stream".equals(header.get("Content-Type")))
             throw new IOException("Expected image/jpp-stream content");
 

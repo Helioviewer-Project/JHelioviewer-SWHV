@@ -23,7 +23,7 @@ public class SunOrgJSON {
                 time = new JHVTime(jo.getString("time"));
 
             JSONArray ga = jo.optJSONArray("geometry");
-            if (ga instanceof JSONArray) {
+            if (ga != null) {
                 return new SunJSONTypes.GeometryCollection(time, parseInput(ga));
             }
         }
