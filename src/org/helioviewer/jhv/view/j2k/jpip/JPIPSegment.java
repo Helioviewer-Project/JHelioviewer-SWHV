@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.view.j2k.jpip;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 // The class JPIPSegment is used to construct objects to store
@@ -8,6 +9,7 @@ import java.io.Serializable;
 // field and the EOR message body is stored in the 'data' field.
 class JPIPSegment implements Serializable {
 
+    @Serial
     static final long serialVersionUID = 42L;
 
     // The data-bin in-class identifier

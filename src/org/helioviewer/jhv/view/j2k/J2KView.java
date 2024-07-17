@@ -153,6 +153,7 @@ public class J2KView extends BaseView {
     }
 
     @Nullable
+    @Override
     public APIRequest getAPIRequest() {
         return request;
     }
