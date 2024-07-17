@@ -21,7 +21,6 @@ public class Quat {
 
     public static Quat createAxisY(double a) {
         a /= 2.;
-        double m = Math.sin(a);
         return new Quat(Math.cos(a), 0, Math.sin(a), 0);
     }
 
