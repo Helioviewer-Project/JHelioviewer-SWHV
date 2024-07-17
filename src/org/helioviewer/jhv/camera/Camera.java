@@ -55,8 +55,6 @@ public class Camera {
     private static final float clipNarrow = (float) (32 * Sun.Radius); // bit more than LASCO C3
     private static final float clipWide = (float) (50 * Sun.MeanEarthDistance); // bit further than Pluto
 
-    private final float[] invProj = new float[16];
-
     public Camera(UpdateViewpoint _updateViewpoint) {
         updateViewpoint = _updateViewpoint;
     }
