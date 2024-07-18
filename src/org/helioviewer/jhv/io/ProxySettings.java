@@ -19,9 +19,9 @@ public class ProxySettings {
         String[] httpVars = {"http.proxyHost", "http.proxyPort", "http.proxyUser", "http.proxyPassword"};
         String[] socksVars = {"socksProxyHost", "socksProxyPort", "java.net.socks.username", "java.net.socks.password"};
 
-        Proxy _proxy = detectProxy(httpVars[0], httpVars[1], Proxy.Type.HTTP);
+        Proxy _proxy = detectProxy(socksVars[0], socksVars[1], Proxy.Type.SOCKS);
         if (_proxy == null)
-            _proxy = detectProxy(socksVars[0], socksVars[1], Proxy.Type.SOCKS);
+            _proxy = detectProxy(httpVars[0], httpVars[1], Proxy.Type.HTTP);
         if (_proxy == null)
             _proxy = Proxy.NO_PROXY;
         proxy = _proxy;
