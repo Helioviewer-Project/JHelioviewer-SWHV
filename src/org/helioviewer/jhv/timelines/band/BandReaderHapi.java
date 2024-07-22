@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.timelines.band;
 
+import java.io.PushbackInputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -40,11 +41,15 @@ public class BandReaderHapi {
     private static Catalog theCatalog; //!
 
     public static void requestCatalog() {
-        EDTCallbackExecutor.pool.submit(new LoadCatalog(ROBserver), new CallbackCatalog());
+        EDTCallbackExecutor.pool.submit(new LoadHapiCatalog(ROBserver), new CallbackCatalog());
     }
 
     static Future<Band.Data> requestData(String url, long start, long end) {
-        return EDTCallbackExecutor.pool.submit(new LoadData(theCatalog, url, start, end), new CallbackData());
+        return EDTCallbackExecutor.pool.submit(new LoadHapiStream(theCatalog, url, start, end), new CallbackData());
+    }
+
+    static void loadUri(URI uri) {
+        EDTCallbackExecutor.pool.submit(new LoadHapiUri(uri), new CallbackData());
     }
 
     private record Catalog(HapiVersion version, Map<String, BandParameter> parameters, BandType[] types) {
@@ -62,59 +67,55 @@ public class BandReaderHapi {
     private record Parameter(String name, String units, String scale, JSONArray range) {
     }
 
-    private record LoadCatalog(String server) implements Callable<Catalog> {
-        @Override
-        public Catalog call() throws Exception {
-            String urlCatalog = server + "catalog";
-            String urlInfo = server + "info";
-            String urlData = server + "data";
+    private static Catalog getCatalog(String server) throws Exception {
+        String urlCatalog = server + "catalog";
+        String urlInfo = server + "info";
+        String urlData = server + "data";
 
-            JSONObject joCatalog = verifyResponse(JSONUtils.get(new URI(urlCatalog)));
-            HapiVersion version = HapiVersion.fromText(joCatalog.optString("HAPI", null));
+        JSONObject joCatalog = verifyResponse(JSONUtils.get(new URI(urlCatalog)));
+        HapiVersion version = HapiVersion.fromText(joCatalog.optString("HAPI", null));
 
-            JSONArray jaCatalog = joCatalog.optJSONArray("catalog");
-            if (jaCatalog == null)
-                throw new Exception("Missing catalog object");
+        JSONArray jaCatalog = joCatalog.optJSONArray("catalog");
+        if (jaCatalog == null)
+            throw new Exception("Missing catalog object");
 
-            int numIds = jaCatalog.length();
-            ArrayList<JSONObject> ids = new ArrayList<>(numIds);
-            for (Object o : jaCatalog) {
-                if (o instanceof JSONObject jo)
-                    ids.add(jo);
-            }
-
-            List<Dataset> datasets = ids.parallelStream().map(item -> {
-                String id = item.optString("id", null);
-                if (id == null)
-                    return null;
-                String title = item.optString("title", id);
-
-                UriTemplate.Variables vars = UriTemplate.vars().set(version.getDatasetRequestParam(), id);
-                String uri = new UriTemplate(urlInfo).expand(vars);
-                try {
-                    JSONObject joInfo = verifyResponse(JSONUtils.get(new URI(uri)));
-                    return getDataset(version, urlData, id, title, joInfo);
-                } catch (Exception e) {
-                    Log.error(uri, e);
-                }
-                return null;
-            }).filter(Objects::nonNull).toList();
-            if (datasets.isEmpty())
-                throw new Exception("Empty catalog");
-
-            LinkedHashMap<String, BandParameter> parameters = new LinkedHashMap<>();
-            for (Dataset dataset : datasets) {
-                long start = dataset.start;
-                long stop = dataset.stop;
-                for (BandReader reader : dataset.readers) {
-                    parameters.put(reader.type.getBaseUrl(), new BandParameter(reader, start, stop));
-                }
-            }
-            ArrayList<BandType> types = new ArrayList<>();
-            parameters.values().forEach(parameter -> types.add(parameter.reader.type));
-
-            return new Catalog(version, parameters, types.toArray(BandType[]::new));
+        int numIds = jaCatalog.length();
+        ArrayList<JSONObject> ids = new ArrayList<>(numIds);
+        for (Object o : jaCatalog) {
+            if (o instanceof JSONObject jo)
+                ids.add(jo);
         }
+
+        List<Dataset> datasets = ids.parallelStream().map(item -> {
+            String id = item.optString("id", null);
+            if (id == null)
+                return null;
+            String title = item.optString("title", id);
+
+            UriTemplate.Variables vars = UriTemplate.vars().set(version.getDatasetRequestParam(), id);
+            String uri = new UriTemplate(urlInfo).expand(vars);
+            try {
+                JSONObject joInfo = verifyResponse(JSONUtils.get(new URI(uri)));
+                return getDataset(version, urlData, id, title, joInfo);
+            } catch (Exception e) {
+                Log.error(uri, e);
+            }
+            return null;
+        }).filter(Objects::nonNull).toList();
+        if (datasets.isEmpty())
+            throw new Exception("Empty catalog");
+
+        LinkedHashMap<String, BandParameter> parameters = new LinkedHashMap<>();
+        for (Dataset dataset : datasets) {
+            long start = dataset.start;
+            long stop = dataset.stop;
+            for (BandReader reader : dataset.readers) {
+                parameters.put(reader.type.getBaseUrl(), new BandParameter(reader, start, stop));
+            }
+        }
+        ArrayList<BandType> types = new ArrayList<>();
+        parameters.values().forEach(parameter -> types.add(parameter.reader.type));
+        return new Catalog(version, parameters, types.toArray(BandType[]::new));
     }
 
     private static Dataset getDataset(HapiVersion version, String urlData, String id, String title, JSONObject jo) throws Exception {
@@ -169,7 +170,6 @@ public class BandReaderHapi {
             typeParams[1] = params[i];
             readers.add(new BandReader(new BandType(jobt), new HapiTableReader(typeParams)));
         }
-
         return new Dataset(id, readers, start, stop);
     }
 
@@ -194,7 +194,7 @@ public class BandReaderHapi {
         return new Parameter(name, units, scale, range);
     }
 
-    private static Band.Data getData(Catalog catalog, String baseUrl, long startTime, long endTime) throws Exception {
+    private static Band.Data getHapiStream(Catalog catalog, String baseUrl, long startTime, long endTime) throws Exception {
         if (catalog == null) // we may be offline
             return null;
         BandParameter parameter = catalog.parameters.get(baseUrl);
@@ -268,10 +268,40 @@ public class BandReaderHapi {
         return jo;
     }
 
-    private record LoadData(Catalog catalog, String url, long start, long end) implements Callable<Band.Data> {
+    private static Band.Data getHapiUri(URI uri) throws Exception {
+        try (NetClient nc = NetClient.of(uri); PushbackInputStream pis = new PushbackInputStream(nc.getStream())) {
+            String uriString = uri.toString();
+            int[] overread1 = new int[1];
+            String jsonText = HapiInfo.readCommentedText(pis, overread1);
+            if (overread1[0] == -1)
+                throw new Exception("Could not read HAPI info from " + uriString);
+            pis.unread(overread1[0]);
+
+            JSONObject jo = new JSONObject(jsonText);
+            Dataset dataset = getDataset(HapiVersion.ASSUMED, uriString, uriString, uriString, jo);
+
+            return null;
+        }
+    }
+
+    private record LoadHapiCatalog(String server) implements Callable<Catalog> {
+        @Override
+        public Catalog call() throws Exception {
+            return getCatalog(server);
+        }
+    }
+
+    private record LoadHapiStream(Catalog catalog, String url, long start, long end) implements Callable<Band.Data> {
         @Override
         public Band.Data call() throws Exception {
-            return getData(catalog, url, start, end);
+            return getHapiStream(catalog, url, start, end);
+        }
+    }
+
+    private record LoadHapiUri(URI uri) implements Callable<Band.Data> {
+        @Override
+        public Band.Data call() throws Exception {
+            return getHapiUri(uri);
         }
     }
 
