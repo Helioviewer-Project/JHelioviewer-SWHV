@@ -146,7 +146,7 @@ public class SampClient extends HubConnector {
                 URI uri = toURI(jo.optString("url"));
                 EventQueue.invokeLater(() -> Load.image.get(uri));
             } else {
-                ArrayList<URI> uris = new ArrayList<URI>(ja.length());
+                ArrayList<URI> uris = new ArrayList<>(ja.length());
                 for (Object obj : ja) {
                     uris.add(toURI(obj.toString()));
                 }

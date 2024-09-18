@@ -13,7 +13,6 @@ import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.threads.EDTCallbackExecutor;
-import org.json.JSONObject;
 
 //import com.google.common.base.Stopwatch;
 import com.google.common.base.Throwables;
