@@ -117,7 +117,7 @@ public class TimeUtils {
         }
         // try NLP
         try {
-            return roundSec(prettyParser.parse(date).get(0).getTime());
+            return roundSec(prettyParser.parse(date).getFirst().getTime());
         } catch (Exception e) {
             return alt;
         }
