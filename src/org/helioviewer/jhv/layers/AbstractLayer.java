@@ -2,8 +2,6 @@ package org.helioviewer.jhv.layers;
 
 import java.util.Arrays;
 
-import com.jogamp.opengl.GL2;
-
 public abstract class AbstractLayer implements Layer {
 
     protected boolean enabled;
