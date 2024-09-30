@@ -48,7 +48,7 @@ public class BandReaderHapi {
         return EDTCallbackExecutor.pool.submit(new LoadHapiStream(theCatalog, url, start, end), new CallbackData());
     }
 
-    static void loadUri(URI uri) {
+    public static void loadUri(URI uri) {
         EDTCallbackExecutor.pool.submit(new LoadHapiUri(uri), new CallbackData());
     }
 
@@ -280,7 +280,38 @@ public class BandReaderHapi {
             JSONObject jo = new JSONObject(jsonText);
             Dataset dataset = getDataset(HapiVersion.ASSUMED, uriString, uriString, uriString, jo);
 
-            return null;
+            List<Long> dateList = new ArrayList<>();
+            List<Float> valueList = new ArrayList<>();
+
+            BandReader reader = dataset.readers.get(0);
+            HapiTableReader tableReader = reader.tableReader;
+            RowSequence rseq = tableReader.createRowSequence(pis, null, "csv");
+
+            try {
+                while ( rseq.next() ) {
+                    String time = (String) rseq.getCell(0);
+                    if (time == null) // fill
+                        continue;
+                    dateList.add(toMillis(time));
+    
+                    Number value = (Number) rseq.getCell(1);
+                    float f = value == null ? YAxis.BLANK : value.floatValue();
+                    valueList.add(Float.isFinite(f) ? f : YAxis.BLANK); // fill
+                }
+            }
+            finally {
+                rseq.close();
+            }
+
+            int numPoints = dateList.size();
+            if (numPoints == 0) // empty
+                return null;
+
+            long[] dates = longArray(numPoints, dateList);
+            float[] values = floatArray(numPoints, valueList);
+            DatesValues dvs = new DatesValues(dates, new float[][]{values}).rebin();
+
+            return new Band.Data(reader.type, dvs.dates(), dvs.values()[0]);
         }
     }
 
