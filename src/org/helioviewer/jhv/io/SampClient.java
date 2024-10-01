@@ -30,6 +30,8 @@ import org.helioviewer.jhv.layers.ImageLayers;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import org.helioviewer.jhv.timelines.band.BandReaderHapi;
+
 public class SampClient extends HubConnector {
 
     static {
@@ -151,6 +153,22 @@ public class SampClient extends HubConnector {
                     uris.add(toURI(obj.toString()));
                 }
                 EventQueue.invokeLater(() -> Load.Image.getAll(uris));
+            }
+        }));
+        // Add handler for the HAPI csv files
+        addMessageHandler(new JHVSampHandler("jhv.load.hapi", (sender, msg)-> {
+            JSONObject jo = new JSONObject(SampUtils.toJson(msg.getParams(), false));
+            JSONArray ja = jo.optJSONArray("url");
+
+            if (ja == null) {
+                URI uri = toURI(jo.optString("url"));
+                EventQueue.invokeLater(() -> BandReaderHapi.loadUri(uri));
+            } else {
+                ArrayList<URI> uris = new ArrayList<>(ja.length());
+                for (Object obj : ja) {
+                    URI uri = toURI(obj.toString());
+                    EventQueue.invokeLater(() -> BandReaderHapi.loadUri(uri));
+                }
             }
         }));
         addMessageHandler(inlineHandler("jhv.load.request", Load.request));
