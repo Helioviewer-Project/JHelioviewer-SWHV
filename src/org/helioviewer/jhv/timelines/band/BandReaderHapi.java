@@ -32,6 +32,10 @@ import uk.ac.starlink.table.RowSequence;
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.FutureCallback;
 
+import org.helioviewer.jhv.io.DataUri;
+import org.helioviewer.jhv.io.NetFileCache;
+import org.helioviewer.jhv.io.FileUtils;
+
 public class BandReaderHapi {
 
     private static final String groupName = "HAPI";
@@ -269,15 +273,31 @@ public class BandReaderHapi {
     }
 
     private static Band.Data getHapiUri(URI uri) throws Exception {
-        try (NetClient nc = NetClient.of(uri); PushbackInputStream pis = new PushbackInputStream(nc.getStream())) {
+
+        DataUri dataUri = NetFileCache.get(uri);
+        
+        return switch (dataUri.format()) {
+            case DataUri.Format.Image.ZIP -> HapiZIPloader(dataUri);
+            case DataUri.Format.Timeline.CSV -> HapiCSVloader(dataUri);
+            default -> throw new Exception("Unknown image type");
+        };
+    }
+
+    private static Band.Data HapiCSVloader(DataUri dataUri) throws Exception {
+        URI uri = dataUri.uri();
+        try (
+            NetClient nc = NetClient.of(uri);
+            PushbackInputStream pis = new PushbackInputStream(nc.getStream())
+            ) {
             String uriString = uri.toString();
             int[] overread1 = new int[1];
-            String jsonText = HapiInfo.readCommentedText(pis, overread1);
+
+            String jsonText= HapiInfo.readCommentedText(pis, overread1);
             if (overread1[0] == -1)
                 throw new Exception("Could not read HAPI info from " + uriString);
             pis.unread(overread1[0]);
-
             JSONObject jo = new JSONObject(jsonText);
+            
             Dataset dataset = getDataset(HapiVersion.ASSUMED, uriString, uriString, uriString, jo);
 
             List<Long> dateList = new ArrayList<>();
@@ -313,6 +333,14 @@ public class BandReaderHapi {
 
             return new Band.Data(reader.type, dvs.dates(), dvs.values()[0]);
         }
+    }
+
+    private static Band.Data HapiZIPloader(DataUri dataUri) throws Exception {
+        URI uri = dataUri.uri();
+        List<URI> uriList = FileUtils.unZip(uri);
+
+        if (uriList.size() != 1) throw new Exception("Only supporting oue CSV file per zip");
+        return getHapiUri(uriList.get(0));
     }
 
     private record LoadHapiCatalog(String server) implements Callable<Catalog> {
