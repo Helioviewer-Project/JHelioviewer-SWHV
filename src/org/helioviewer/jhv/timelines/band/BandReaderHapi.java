@@ -339,7 +339,7 @@ public class BandReaderHapi {
         URI uri = dataUri.uri();
         List<URI> uriList = FileUtils.unZip(uri);
 
-        if (uriList.size() != 1) throw new Exception("Only supporting oue CSV file per zip");
+        if (uriList.size() != 1) throw new Exception("Only supporting use CSV file per zip");
         return getHapiUri(uriList.get(0));
     }
 
