@@ -66,7 +66,7 @@ public class FileUtils {
         return size.get();
     }
 
-    static List<URI> unZip(URI uri) throws IOException {
+    public static List<URI> unZip(URI uri) throws IOException {
         List<URI> uriList = new ArrayList<>();
         String uriPath = uri.getPath();
         Path targetDir = tempDir(JHVGlobals.fileCacheDir, uriPath.substring(Math.max(0, uriPath.lastIndexOf('/') + 1)) + ".x").toPath();
