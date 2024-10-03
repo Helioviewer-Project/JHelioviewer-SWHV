@@ -1,24 +1,22 @@
 package org.helioviewer.jhv.io;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.tika.Tika;
-import org.json.JSONObject;
 
 public class DataUri {
 
     private static final Tika tika = new Tika();
 
-    private static Format detect(File f) throws IOException {
-        if (f.getPath().toLowerCase().endsWith(".fits.gz")) // hack
+    private static Format detect(File file) throws IOException {
+        if (file.getPath().toLowerCase().endsWith(".fits.gz")) // hack
             return Format.Image.FITS;
         else
-            return getFormat(f, tika.detect(f));
+            return getFormat(tika.detect(file));
     }
 
     private static final Map<String, Format> map = Map.of(
@@ -33,23 +31,9 @@ public class DataUri {
             "text/csv", Format.Timeline.CSV
     );
 
-    private static Format getFormat(File f, String spec) {
-        if ("application/json".equals(spec)) {
-            try (FileReader reader = new FileReader(f)) {
-                JSONObject jo = JSONUtils.get(reader);
-                if (jo.has("org.helioviewer.jhv.state"))
-                    return Format.Json.STATE;
-                if (jo.has("org.helioviewer.jhv.request.image") || jo.has("org.helioviewer.jhv.request.timeline"))
-                    return Format.Json.REQUEST;
-                if ("SunJSON".equals(jo.optString("type")))
-                    return Format.Json.SUNJSON;
-            } catch (Exception ignored) {
-            }
-            return null;
-        }
-
-        Format fmt = map.get(spec);
-        return fmt == null ? Format.Unknown.UNKNOWN : fmt;
+    private static Format getFormat(String spec) {
+        Format f = map.get(spec);
+        return f == null ? Format.Unknown.UNKNOWN : f;
     }
 
     public interface Format {
@@ -58,8 +42,6 @@ public class DataUri {
         enum Image implements Format {JPIP, JP2, JPX, FITS, PNG, JPEG, ZIP}
 
         enum Timeline implements Format {CDF, CSV}
-
-        enum Json implements Format {STATE, REQUEST, SUNJSON}
     }
 
     private final URI uri;
