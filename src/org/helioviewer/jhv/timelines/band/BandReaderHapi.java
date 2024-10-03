@@ -271,23 +271,18 @@ public class BandReaderHapi {
         return jo;
     }
 
-    private static Band.Data getHapiUri(URI uri) throws Exception {
-
+    private static Band.Data getHapiUri(URI uri) throws Exception { // tbd
         DataUri dataUri = NetFileCache.get(uri);
-
         return switch (dataUri.format()) {
-            case DataUri.Format.Image.ZIP -> HapiZIPloader(dataUri);
-            case DataUri.Format.Timeline.CSV -> HapiCSVloader(dataUri);
+            case DataUri.Format.Image.ZIP -> LoaderZIP(dataUri);
+            case DataUri.Format.Timeline.CSV -> LoaderCSV(dataUri);
             default -> throw new Exception("Unknown image type");
         };
     }
 
-    private static Band.Data HapiCSVloader(DataUri dataUri) throws Exception {
+    private static Band.Data LoaderCSV(DataUri dataUri) throws Exception {
         URI uri = dataUri.uri();
-        try (
-                NetClient nc = NetClient.of(uri);
-                PushbackInputStream pis = new PushbackInputStream(nc.getStream())
-        ) {
+        try (NetClient nc = NetClient.of(uri); PushbackInputStream pis = new PushbackInputStream(nc.getStream())) {
             String uriString = uri.toString();
             int[] overread1 = new int[1];
 
@@ -298,15 +293,12 @@ public class BandReaderHapi {
             JSONObject jo = new JSONObject(jsonText);
 
             Dataset dataset = getDataset(HapiVersion.ASSUMED, uriString, uriString, uriString, jo);
+            BandReader reader = dataset.readers.getFirst();
+            HapiTableReader tableReader = reader.tableReader;
 
             List<Long> dateList = new ArrayList<>();
             List<Float> valueList = new ArrayList<>();
-
-            BandReader reader = dataset.readers.get(0);
-            HapiTableReader tableReader = reader.tableReader;
-            RowSequence rseq = tableReader.createRowSequence(pis, null, "csv");
-
-            try {
+            try (RowSequence rseq = tableReader.createRowSequence(pis, null, "csv")) {
                 while (rseq.next()) {
                     String time = (String) rseq.getCell(0);
                     if (time == null) // fill
@@ -317,8 +309,6 @@ public class BandReaderHapi {
                     float f = value == null ? YAxis.BLANK : value.floatValue();
                     valueList.add(Float.isFinite(f) ? f : YAxis.BLANK); // fill
                 }
-            } finally {
-                rseq.close();
             }
 
             int numPoints = dateList.size();
@@ -333,12 +323,11 @@ public class BandReaderHapi {
         }
     }
 
-    private static Band.Data HapiZIPloader(DataUri dataUri) throws Exception {
-        URI uri = dataUri.uri();
-        List<URI> uriList = FileUtils.unZip(uri);
-
-        if (uriList.size() != 1) throw new Exception("Only supporting use CSV file per zip");
-        return getHapiUri(uriList.get(0));
+    private static Band.Data LoaderZIP(DataUri dataUri) throws Exception {
+        List<URI> uriList = FileUtils.unZip(dataUri.uri());
+        if (uriList.size() != 1)
+            throw new Exception("Only one CSV file per zip supported");
+        return getHapiUri(uriList.getFirst());
     }
 
     private record LoadHapiCatalog(String server) implements Callable<Catalog> {
