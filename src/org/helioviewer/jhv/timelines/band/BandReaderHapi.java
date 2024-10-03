@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.timelines.band;
 
-import java.io.PushbackInputStream;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -219,33 +219,57 @@ public class BandReaderHapi {
         String uri = baseUrl + request.expand("");
 
         try (NetClient nc = NetClient.of(new URI(uri), false, NetClient.NetCache.NETWORK)) {
-            RowSequence sequence = parameter.reader.tableReader.createRowSequence(nc.getStream(), null, hapiFormat);
-
-            ArrayList<Long> dateList = new ArrayList<>();
-            ArrayList<Float> valueList = new ArrayList<>();
-            while (sequence.next()) {
-                String time = (String) sequence.getCell(0);
-                if (time == null) // fill
-                    continue;
-                dateList.add(toMillis(time));
-
-                Number value = (Number) sequence.getCell(1);
-                float f = value == null ? YAxis.BLANK : value.floatValue();
-                valueList.add(Float.isFinite(f) ? f : YAxis.BLANK); // fill
-            }
-            int numPoints = dateList.size();
-            if (numPoints == 0) // empty
-                return null;
-
-            long[] dates = longArray(numPoints, dateList);
-            float[] values = floatArray(numPoints, valueList);
-            DatesValues dvs = new DatesValues(dates, new float[][]{values}).rebin();
-
-            return new Band.Data(parameter.reader.type, dvs.dates(), dvs.values()[0]);
+            return readBand(parameter.reader.type, parameter.reader.tableReader, nc.getStream(), null, hapiFormat);
         } catch (Exception e) {
             Log.error(uri, e);
             throw e;
         }
+    }
+
+    private static Band.Data getHapiLocalCSV(DataUri dataUri) throws Exception {
+        URI uri = dataUri.uri();
+        try (NetClient nc = NetClient.of(uri)) {
+            String uriString = uri.toString();
+            InputStream in = nc.getStream();
+            int[] overread1 = new int[1];
+
+            String jsonText = HapiInfo.readCommentedText(in, overread1);
+            if (overread1[0] == -1)
+                throw new Exception("Could not read HAPI info from " + uriString);
+            JSONObject jo = new JSONObject(jsonText);
+
+            Dataset dataset = getDataset(HapiVersion.ASSUMED, uriString, uriString, uriString, jo);
+            BandReader reader = dataset.readers.getFirst();
+
+            return readBand(reader.type, reader.tableReader, in, (byte) overread1[0], "csv");
+        }
+    }
+
+    private static Band.Data readBand(BandType type, HapiTableReader tableReader, InputStream in, Byte byte0, String fmt) throws Exception {
+        List<Long> dateList = new ArrayList<>();
+        List<Float> valueList = new ArrayList<>();
+        try (RowSequence rseq = tableReader.createRowSequence(in, byte0, fmt)) {
+            while (rseq.next()) {
+                String time = (String) rseq.getCell(0);
+                if (time == null) // fill
+                    continue;
+                dateList.add(toMillis(time));
+
+                Number value = (Number) rseq.getCell(1);
+                float f = value == null ? YAxis.BLANK : value.floatValue();
+                valueList.add(Float.isFinite(f) ? f : YAxis.BLANK); // fill
+            }
+        }
+
+        int numPoints = dateList.size();
+        if (numPoints == 0) // empty
+            return null;
+
+        long[] dates = longArray(numPoints, dateList);
+        float[] values = floatArray(numPoints, valueList);
+        DatesValues dvs = new DatesValues(dates, new float[][]{values}).rebin();
+
+        return new Band.Data(type, dvs.dates(), dvs.values()[0]);
     }
 
     private static long[] longArray(int numPoints, List<Long> dateList) {
@@ -275,52 +299,9 @@ public class BandReaderHapi {
         DataUri dataUri = NetFileCache.get(uri);
         return switch (dataUri.format()) {
             case DataUri.Format.Image.ZIP -> LoaderZIP(dataUri);
-            case DataUri.Format.Timeline.CSV -> LoaderCSV(dataUri);
+            case DataUri.Format.Timeline.CSV -> getHapiLocalCSV(dataUri);
             default -> throw new Exception("Unknown image type");
         };
-    }
-
-    private static Band.Data LoaderCSV(DataUri dataUri) throws Exception {
-        URI uri = dataUri.uri();
-        try (NetClient nc = NetClient.of(uri); PushbackInputStream pis = new PushbackInputStream(nc.getStream())) {
-            String uriString = uri.toString();
-            int[] overread1 = new int[1];
-
-            String jsonText = HapiInfo.readCommentedText(pis, overread1);
-            if (overread1[0] == -1)
-                throw new Exception("Could not read HAPI info from " + uriString);
-            pis.unread(overread1[0]);
-            JSONObject jo = new JSONObject(jsonText);
-
-            Dataset dataset = getDataset(HapiVersion.ASSUMED, uriString, uriString, uriString, jo);
-            BandReader reader = dataset.readers.getFirst();
-            HapiTableReader tableReader = reader.tableReader;
-
-            List<Long> dateList = new ArrayList<>();
-            List<Float> valueList = new ArrayList<>();
-            try (RowSequence rseq = tableReader.createRowSequence(pis, null, "csv")) {
-                while (rseq.next()) {
-                    String time = (String) rseq.getCell(0);
-                    if (time == null) // fill
-                        continue;
-                    dateList.add(toMillis(time));
-
-                    Number value = (Number) rseq.getCell(1);
-                    float f = value == null ? YAxis.BLANK : value.floatValue();
-                    valueList.add(Float.isFinite(f) ? f : YAxis.BLANK); // fill
-                }
-            }
-
-            int numPoints = dateList.size();
-            if (numPoints == 0) // empty
-                return null;
-
-            long[] dates = longArray(numPoints, dateList);
-            float[] values = floatArray(numPoints, valueList);
-            DatesValues dvs = new DatesValues(dates, new float[][]{values}).rebin();
-
-            return new Band.Data(reader.type, dvs.dates(), dvs.values()[0]);
-        }
     }
 
     private static Band.Data LoaderZIP(DataUri dataUri) throws Exception {
