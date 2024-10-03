@@ -11,6 +11,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.io.DataUri;
@@ -121,7 +122,7 @@ public class BandReaderHapi {
         return new Catalog(version, parameters, types.toArray(BandType[]::new));
     }
 
-    private static Dataset getDataset(HapiVersion version, String urlData, String id, String title, JSONObject jo) throws Exception {
+    private static Dataset getDataset(HapiVersion version, String urlData, @Nullable String id, @Nullable String title, JSONObject jo) throws Exception {
         long start = TimeUtils.MINIMAL_TIME.milli;
         long stop = TimeUtils.MAXIMAL_TIME.milli;
         String startDate = jo.optString("startDate", null);
@@ -158,17 +159,18 @@ public class BandReaderHapi {
         List<BandReader> readers = new ArrayList<>(numAxes);
         for (int i = 1; i <= numAxes; i++) {
             Parameter p = parameters.get(i);
-            UriTemplate.Variables request = UriTemplate.vars()
-                    .set(version.getDatasetRequestParam(), id)
-                    .set("format", hapiFormat)
-                    .set("parameters", p.name);
+            UriTemplate.Variables request = UriTemplate.vars();
+            if (id != null)
+                request.set(version.getDatasetRequestParam(), id)
+                        .set("format", hapiFormat)
+                        .set("parameters", p.name);
             JSONObject jobt = new JSONObject().
                     put("baseUrl", new UriTemplate(urlData).expand(request)).
                     put("unitLabel", p.units).
-                    put("name", id + ' ' + p.name).
+                    put("name", id == null ? p.name : id + ' ' + p.name).
                     put("range", p.range).
                     put("scale", p.scale).
-                    put("label", title + ' ' + p.name);
+                    put("label", title == null ? p.name : title + ' ' + p.name);
 
             typeParams[1] = params[i];
             readers.add(new BandReader(new BandType(jobt), new HapiTableReader(typeParams)));
@@ -229,19 +231,19 @@ public class BandReaderHapi {
     private static Band.Data getHapiLocalCSV(DataUri dataUri) throws Exception {
         URI uri = dataUri.uri();
         try (NetClient nc = NetClient.of(uri)) {
-            String uriString = uri.toString();
             InputStream in = nc.getStream();
             int[] overread1 = new int[1];
 
             String jsonText = HapiInfo.readCommentedText(in, overread1);
             if (overread1[0] == -1)
-                throw new Exception("Could not read HAPI info from " + uriString);
+                throw new Exception("Could not read HAPI info from " + uri);
             JSONObject jo = new JSONObject(jsonText);
-
-            Dataset dataset = getDataset(HapiVersion.ASSUMED, uriString, uriString, uriString, jo);
+            String fmt = jo.optString("format", "csv");
+            // not catalog, thus no 'id' nor 'title'
+            Dataset dataset = getDataset(HapiVersion.ASSUMED, uri.toString(), null, null, jo);
             BandReader reader = dataset.readers.getFirst();
 
-            return readBand(reader.type, reader.tableReader, in, (byte) overread1[0], "csv");
+            return readBand(reader.type, reader.tableReader, in, (byte) overread1[0], fmt);
         }
     }
 
