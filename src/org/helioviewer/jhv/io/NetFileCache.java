@@ -18,23 +18,14 @@ import org.apache.tika.Tika;
 
 public class NetFileCache {
 
-    private static final Tika tika = new Tika();
-
-    private static DataUri.Format detect(File file) throws IOException {
-        if (file.getPath().toLowerCase().endsWith(".fits.gz")) // hack
-            return DataUri.Format.Image.FITS;
-        else
-            return DataUri.getFormat(tika.detect(file));
-    }
-
     private static final LoadingCache<URI, DataUri> cache = Caffeine.newBuilder().softValues().
             build(uri -> {
                 String scheme = uri.getScheme().toLowerCase();
                 if ("jpip".equals(scheme) || "jpips".equals(scheme))
-                    return new DataUri(uri, uri, null, DataUri.Format.Image.JPIP);
+                    return new DataUri(uri, uri, null);
                 if ("file".equals(scheme)) {
                     File file = new File(uri.getPath()); // for files with authority (//localhost) and Windows
-                    return new DataUri(uri, uri, file, detect(file));
+                    return new DataUri(uri, uri, file);
                 }
 
                 Path path = Files.createTempFile(JHVGlobals.fileCacheDir.toPath(), "jhv", null);
@@ -42,7 +33,7 @@ public class NetFileCache {
                     sink.writeAll(nc.getSource());
                 }
                 File file = path.toFile();
-                return new DataUri(uri, path.toUri(), file, detect(file));
+                return new DataUri(uri, path.toUri(), file);
             });
 
     public static DataUri get(@Nonnull URI uri) throws IOException {
