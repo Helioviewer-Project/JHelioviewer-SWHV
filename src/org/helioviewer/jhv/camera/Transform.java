@@ -60,7 +60,7 @@ public class Transform {
         view.rotateAffine(quat.set((float) q.x, (float) q.y, (float) q.z, (float) -q.w));
     }
 
-/// Only for Camera.java
+    /// Only for Camera.java
 
     static void setup(float width, float height, float zNear, float zFar, float x, float y) {
         proj.setOrthoSymmetric(width, height, zNear, zFar);
@@ -77,7 +77,7 @@ public class Transform {
         mul.get(mvp);
     }
 
-///
+    ///
 
     public static FloatBuffer get() {
         if (projDepth == 0 && viewDepth == 0) {

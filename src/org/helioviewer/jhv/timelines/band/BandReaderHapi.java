@@ -13,8 +13,11 @@ import java.util.concurrent.Future;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.io.DataUri;
+import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
+import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.io.UriTemplate;
 import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -31,10 +34,6 @@ import uk.ac.starlink.hapi.Times;
 import uk.ac.starlink.table.RowSequence;
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.FutureCallback;
-
-import org.helioviewer.jhv.io.DataUri;
-import org.helioviewer.jhv.io.NetFileCache;
-import org.helioviewer.jhv.io.FileUtils;
 
 public class BandReaderHapi {
 
@@ -275,7 +274,7 @@ public class BandReaderHapi {
     private static Band.Data getHapiUri(URI uri) throws Exception {
 
         DataUri dataUri = NetFileCache.get(uri);
-        
+
         return switch (dataUri.format()) {
             case DataUri.Format.Image.ZIP -> HapiZIPloader(dataUri);
             case DataUri.Format.Timeline.CSV -> HapiCSVloader(dataUri);
@@ -286,18 +285,18 @@ public class BandReaderHapi {
     private static Band.Data HapiCSVloader(DataUri dataUri) throws Exception {
         URI uri = dataUri.uri();
         try (
-            NetClient nc = NetClient.of(uri);
-            PushbackInputStream pis = new PushbackInputStream(nc.getStream())
-            ) {
+                NetClient nc = NetClient.of(uri);
+                PushbackInputStream pis = new PushbackInputStream(nc.getStream())
+        ) {
             String uriString = uri.toString();
             int[] overread1 = new int[1];
 
-            String jsonText= HapiInfo.readCommentedText(pis, overread1);
+            String jsonText = HapiInfo.readCommentedText(pis, overread1);
             if (overread1[0] == -1)
                 throw new Exception("Could not read HAPI info from " + uriString);
             pis.unread(overread1[0]);
             JSONObject jo = new JSONObject(jsonText);
-            
+
             Dataset dataset = getDataset(HapiVersion.ASSUMED, uriString, uriString, uriString, jo);
 
             List<Long> dateList = new ArrayList<>();
@@ -308,18 +307,17 @@ public class BandReaderHapi {
             RowSequence rseq = tableReader.createRowSequence(pis, null, "csv");
 
             try {
-                while ( rseq.next() ) {
+                while (rseq.next()) {
                     String time = (String) rseq.getCell(0);
                     if (time == null) // fill
                         continue;
                     dateList.add(toMillis(time));
-    
+
                     Number value = (Number) rseq.getCell(1);
                     float f = value == null ? YAxis.BLANK : value.floatValue();
                     valueList.add(Float.isFinite(f) ? f : YAxis.BLANK); // fill
                 }
-            }
-            finally {
+            } finally {
                 rseq.close();
             }
 

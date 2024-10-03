@@ -156,7 +156,7 @@ public class SampClient extends HubConnector {
             }
         }));
         // Add handler for the HAPI csv files
-        addMessageHandler(new JHVSampHandler("jhv.load.hapi", (sender, msg)-> {
+        addMessageHandler(new JHVSampHandler("jhv.load.hapi", (sender, msg) -> {
             JSONObject jo = new JSONObject(SampUtils.toJson(msg.getParams(), false));
             JSONArray ja = jo.optJSONArray("url");
 
