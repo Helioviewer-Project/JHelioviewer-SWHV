@@ -1,12 +1,23 @@
 package org.helioviewer.jhv.io;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.tika.Tika;
 
 public class DataUri {
+
+    private static final Tika tika = new Tika();
+
+    private static Format detect(File file) throws IOException {
+        if (file.getPath().toLowerCase().endsWith(".fits.gz")) // hack
+            return Format.Image.FITS;
+        else
+            return getFormat(tika.detect(file));
+    }
 
     private static final Map<String, Format> map = Map.of(
             "application/x-jpp-stream", Format.Image.JPIP,
@@ -20,7 +31,7 @@ public class DataUri {
             "text/csv", Format.Timeline.CSV
     );
 
-    static Format getFormat(String spec) {
+    private static Format getFormat(String spec) {
         Format f = map.get(spec);
         return f == null ? Format.Unknown.UNKNOWN : f;
     }
@@ -38,10 +49,10 @@ public class DataUri {
     private final File file;
     private final String baseName;
 
-    DataUri(URI originalUri, URI cachedUri, File _file, Format _format) {
+    DataUri(URI originalUri, URI cachedUri, File _file) throws IOException {
         uri = cachedUri;
-        format = _format;
         file = _file;
+        format = file == null ? Format.Image.JPIP : detect(file); // JPIP not backed by file
         baseName = FilenameUtils.getName(originalUri.toString());
     }
 
