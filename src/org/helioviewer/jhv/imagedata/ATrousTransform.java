@@ -3,6 +3,8 @@ package org.helioviewer.jhv.imagedata;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.ForkJoinPool;
 
+import org.helioviewer.jhv.math.MathUtils;
+
 @SuppressWarnings("serial")
 class ATrousTransform {
 
@@ -13,15 +15,21 @@ class ATrousTransform {
         float[] result = new float[image.length];
         float[] temp = image.clone();
 
+        float[] wtemp1 = new float[image.length];
+        float[] wtemp2 = new float[image.length];
+
         ForkJoinPool pool = ForkJoinPool.commonPool();
         for (int level = 0; level < levels; level++) {
             int step = (int) Math.pow(2, level);
-            // Horizontal pass
-            pool.invoke(new ConvolutionTask(temp, result, width, height, true, step));
-            // Vertical pass
-            pool.invoke(new ConvolutionTask(result, temp, width, height, false, step));
-            // Calculate and store wavelet coefficients
+            // Calculate wavelet coefficients
+            pool.invoke(new ConvolutionTask(temp, result, width, height, true, step)); // Horizontal pass
+            pool.invoke(new ConvolutionTask(result, temp, width, height, false, step)); // Vertical pass
             pool.invoke(new WaveletCoefficientTask(image, temp, result, 0, image.length));
+            // Whiten coefficients
+            pool.invoke(new SquareTask(result, wtemp1, 0, image.length));
+            pool.invoke(new ConvolutionTask(wtemp1, wtemp2, width, height, true, step)); // Horizontal pass
+            pool.invoke(new ConvolutionTask(wtemp2, wtemp1, width, height, false, step)); // Vertical pass
+            pool.invoke(new ScaleTask(wtemp1, result, 0, image.length));
             // Update image for next level
             System.arraycopy(temp, 0, image, 0, image.length);
         }
@@ -65,8 +73,8 @@ class ATrousTransform {
             } else {
                 int mid = (start + end) / 2;
                 invokeAll(
-                    new ConvolutionTask(src, dest, width, height, isHorizontal, step, start, mid),
-                    new ConvolutionTask(src, dest, width, height, isHorizontal, step, mid, end));
+                        new ConvolutionTask(src, dest, width, height, isHorizontal, step, start, mid),
+                        new ConvolutionTask(src, dest, width, height, isHorizontal, step, mid, end));
             }
         }
 
@@ -121,14 +129,82 @@ class ATrousTransform {
             } else {
                 int mid = (start + end) / 2;
                 invokeAll(
-                    new WaveletCoefficientTask(image, temp, result, start, mid),
-                    new WaveletCoefficientTask(image, temp, result, mid, end));
+                        new WaveletCoefficientTask(image, temp, result, start, mid),
+                        new WaveletCoefficientTask(image, temp, result, mid, end));
             }
         }
 
         private void computeCoefficients() {
             for (int i = start; i < end; i++) {
                 result[i] = image[i] - temp[i]; // Store wavelet coefficients
+            }
+        }
+
+    }
+
+    private static class SquareTask extends RecursiveAction {
+
+        private final float[] src;
+        private final float[] dest;
+        private final int start;
+        private final int end;
+
+        SquareTask(float[] src, float[] dest, int start, int end) {
+            this.src = src;
+            this.dest = dest;
+            this.start = start;
+            this.end = end;
+        }
+
+        @Override
+        protected void compute() {
+            if (end - start <= THRESHOLD) {
+                computeSquare();
+            } else {
+                int mid = (start + end) / 2;
+                invokeAll(
+                        new SquareTask(src, dest, start, mid),
+                        new SquareTask(src, dest, mid, end));
+            }
+        }
+
+        private void computeSquare() {
+            for (int i = start; i < end; i++) {
+                dest[i] = src[i] * src[i];
+            }
+        }
+
+    }
+
+    private static class ScaleTask extends RecursiveAction {
+
+        private final float[] src;
+        private final float[] dest;
+        private final int start;
+        private final int end;
+
+        ScaleTask(float[] src, float[] dest, int start, int end) {
+            this.src = src;
+            this.dest = dest;
+            this.start = start;
+            this.end = end;
+        }
+
+        @Override
+        protected void compute() {
+            if (end - start <= THRESHOLD) {
+                computeScale();
+            } else {
+                int mid = (start + end) / 2;
+                invokeAll(
+                        new ScaleTask(src, dest, start, mid),
+                        new ScaleTask(src, dest, mid, end));
+            }
+        }
+
+        private void computeScale() {
+            for (int i = start; i < end; i++) {
+                dest[i] *= MathUtils.invSqrt(src[i]);
             }
         }
 
