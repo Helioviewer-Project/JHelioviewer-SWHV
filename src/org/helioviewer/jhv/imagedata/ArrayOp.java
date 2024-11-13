@@ -3,7 +3,7 @@ package org.helioviewer.jhv.imagedata;
 import java.util.concurrent.RecursiveAction;
 
 @SuppressWarnings("serial")
-class ArrayOperation {
+class ArrayOp {
 
     static final int THRESHOLD = 64; // Adjust based on image size and system
 
