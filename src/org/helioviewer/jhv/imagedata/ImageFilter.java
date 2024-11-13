@@ -36,11 +36,11 @@ class ImageFilter {
 
         private final float[] buffer;
 
-        GaussFilter(double sigma, int _K, int N) {
+        GaussFilter(float sigma, int _K, int N) {
             K = _K;
 
             int i = K - SII_MIN_K;
-            double sum = 0;
+            float sum = 0;
 
             for (int k = 0; k < K; ++k) {
                 radii[k] = (int) (radii0[i][k] * (sigma / sigma0) + 0.5);
@@ -48,7 +48,7 @@ class ImageFilter {
             }
 
             for (int k = 0; k < K; ++k)
-                weights[k] = (float) (weights0[i][k] / sum);
+                weights[k] = weights0[i][k] / sum;
 
             int pad = radii[0] + 1;
             buffer = new float[N + 2 * pad];
@@ -106,10 +106,10 @@ class ImageFilter {
 
     private static final int K = 3;
     private static final float H = 0.8f;
-    private static final double[] sigmas = {1, 4, 16, 64};
-    private static final double[] weights = {0.25, 0.5, 0.75, 1};
+    private static final float[] sigmas = {1, 4, 16, 64};
+    private static final float[] weights = {0.25f, 0.5f, 0.75f, 1f};
 
-    private record ScaleTask(float[] data, int width, int height, double sigma, double weight)
+    private record ScaleTask(float[] data, int width, int height, float sigma, float weight)
             implements Callable<float[]> {
         @Override
         public float[] call() {
@@ -128,7 +128,7 @@ class ImageFilter {
             filter.gaussianConvImage(conv2, conv2, width, height);
 
             for (int i = 0; i < size; ++i)
-                conv[i] = conv2[i] == 0 ? 0 : (float) (weight * MathUtils.clip(conv[i] / Math.sqrt(conv2[i]), -1, 1));
+                conv[i] = conv2[i] == 0 ? 0 : weight * MathUtils.clip(conv[i] * MathUtils.invSqrt(conv2[i]), -1, 1);
 
             return conv;
         }
