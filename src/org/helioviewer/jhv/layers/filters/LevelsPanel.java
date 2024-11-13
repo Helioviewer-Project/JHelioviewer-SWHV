@@ -14,7 +14,7 @@ public class LevelsPanel implements FilterDetails {
 
     private final JHVRangeSlider slider;
     private final JLabel label;
-    private final JLabel title = new JLabel("Levels", JLabel.RIGHT);
+    private final JLabel title = new JLabel("Levels ", JLabel.RIGHT);
 
     static String formatPercent(int value) {
         return "<html><p align='right'>" + value + "%</p>";

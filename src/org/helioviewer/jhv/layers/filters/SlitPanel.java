@@ -14,7 +14,7 @@ public class SlitPanel implements FilterDetails {
 
     private final JHVRangeSlider slider;
     private final JLabel label;
-    private final JLabel title = new JLabel("Slit", JLabel.RIGHT);
+    private final JLabel title = new JLabel("Slit ", JLabel.RIGHT);
 
     public SlitPanel(ImageLayer layer) {
         int left = (int) (layer.getGLImage().getSlitLeft() * 100);
