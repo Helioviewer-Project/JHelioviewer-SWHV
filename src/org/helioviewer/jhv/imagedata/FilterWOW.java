@@ -12,7 +12,7 @@ class FilterWOW implements ImageFilter.Algorithm {
     private static final float MIX_FACTOR = 0.99f;
     private static final float[] FILTER = {1f / 16, 4f / 16, 6f / 16, 4f / 16, 1f / 16};
 
-    private static final ArrayOperation.Two opMix = new ArrayOperation.Two() {
+    private static final ArrayOp.Two opMix = new ArrayOp.Two() {
         @Override
         public void accept(float[] op1, float[] op2, float[] dest, int start, int end) {
             for (int i = start; i < end; i++) {
@@ -21,7 +21,7 @@ class FilterWOW implements ImageFilter.Algorithm {
         }
     };
 
-    private static final ArrayOperation.Two opSynthesis = new ArrayOperation.Two() {
+    private static final ArrayOp.Two opSynthesis = new ArrayOp.Two() {
         @Override
         public void accept(float[] op1, float[] op2, float[] dest, int start, int end) {
             for (int i = start; i < end; i++) {
@@ -30,7 +30,7 @@ class FilterWOW implements ImageFilter.Algorithm {
         }
     };
 
-    private static final ArrayOperation.Two opCoefficients = new ArrayOperation.Two() {
+    private static final ArrayOp.Two opCoefficients = new ArrayOp.Two() {
         @Override
         public void accept(float[] op1, float[] op2, float[] dest, int start, int end) {
             for (int i = start; i < end; i++) {
@@ -39,7 +39,7 @@ class FilterWOW implements ImageFilter.Algorithm {
         }
     };
 
-    private static final ArrayOperation.One opSquare = new ArrayOperation.One() {
+    private static final ArrayOp.One opSquare = new ArrayOp.One() {
         @Override
         public void accept(float[] op1, float[] dest, int start, int end) {
             for (int i = start; i < end; i++) {
@@ -59,23 +59,22 @@ class FilterWOW implements ImageFilter.Algorithm {
         float[] wtemp2 = new float[length];
         float[] recon = new float[length];
 
-
         ForkJoinPool pool = ForkJoinPool.commonPool();
         for (int level = 0; level < LEVELS; level++) {
             int step = 1 << level;
             // Calculate wavelet coefficients
             pool.invoke(new ConvolutionTask(temp, result, width, height, true, step)); // Horizontal pass
             pool.invoke(new ConvolutionTask(result, temp, width, height, false, step)); // Vertical pass
-            pool.invoke(new ArrayOperation.TaskTwo(image, temp, result, 0, length, opCoefficients));
+            pool.invoke(new ArrayOp.TaskTwo(image, temp, result, 0, length, opCoefficients));
             // Update image for next level
             System.arraycopy(temp, 0, image, 0, length);
             // Whiten coefficients
-            pool.invoke(new ArrayOperation.TaskOne(result, wtemp1, 0, length, opSquare));
+            pool.invoke(new ArrayOp.TaskOne(result, wtemp1, 0, length, opSquare));
             pool.invoke(new ConvolutionTask(wtemp1, wtemp2, width, height, true, step)); // Horizontal pass
             pool.invoke(new ConvolutionTask(wtemp2, wtemp1, width, height, false, step)); // Vertical pass
-            pool.invoke(new ArrayOperation.TaskTwo(wtemp1, result, recon, 0, length, opSynthesis)); // Weighted synthesis
+            pool.invoke(new ArrayOp.TaskTwo(wtemp1, result, recon, 0, length, opSynthesis)); // Weighted synthesis
         }
-        pool.invoke(new ArrayOperation.TaskTwo(image, data, recon, 0, length, opMix));
+        pool.invoke(new ArrayOp.TaskTwo(image, data, recon, 0, length, opMix));
         return recon;
     }
 
@@ -107,7 +106,7 @@ class FilterWOW implements ImageFilter.Algorithm {
 
         @Override
         protected void compute() {
-            if (end - start <= ArrayOperation.THRESHOLD) {
+            if (end - start <= ArrayOp.THRESHOLD) {
                 if (isHorizontal) {
                     computeHorizontal();
                 } else {
@@ -126,7 +125,7 @@ class FilterWOW implements ImageFilter.Algorithm {
                 for (int x = 0; x < width; x++) {
                     float sum = 0;
                     for (int i = -2; i <= 2; i++) {
-                        int idx = getMirroredIndex(x + i * step, width);
+                        int idx = mirroredIdx(x + i * step, width);
                         sum += src[y * width + idx] * FILTER[i + 2];
                     }
                     dest[y * width + x] = sum;
@@ -139,7 +138,7 @@ class FilterWOW implements ImageFilter.Algorithm {
                 for (int y = 0; y < height; y++) {
                     float sum = 0;
                     for (int i = -2; i <= 2; i++) {
-                        int idx = getMirroredIndex(y + i * step, height);
+                        int idx = mirroredIdx(y + i * step, height);
                         sum += src[idx * width + x] * FILTER[i + 2];
                     }
                     dest[y * width + x] = sum;
@@ -149,13 +148,13 @@ class FilterWOW implements ImageFilter.Algorithm {
 
     }
 
-    private static int getMirroredIndex(int index, int size) {
-        if (index < 0) {
-            return Math.abs(index);
-        } else if (index >= size) {
-            return 2 * size - index - 2;
+    private static int mirroredIdx(int idx, int size) {
+        if (idx < 0) {
+            return -idx;
+        } else if (idx >= size) {
+            return 2 * size - idx - 2;
         }
-        return index;
+        return idx;
     }
 
 }
