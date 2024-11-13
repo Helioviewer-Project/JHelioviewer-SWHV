@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageData;
+import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.time.JHVTime;
@@ -28,9 +29,9 @@ public interface View {
     default void clearCache() {
     }
 
-    void setMGN(boolean b);
+    void setFilter(ImageFilter.Type t);
 
-    boolean getMGN();
+    ImageFilter.Type getFilter();
 
     default void decode(Position viewpoint, double pixFactor, float factor) {
     }

@@ -19,14 +19,15 @@ import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
 
 import org.helioviewer.jhv.imagedata.ImageBuffer;
+import org.helioviewer.jhv.imagedata.ImageFilter;
 
 import org.lwjgl.system.MemoryUtil;
 
 //import com.google.common.math.StatsAccumulator;
 //import com.google.common.base.Stopwatch;
 
-record J2KDecoder(Jpx_source source, J2KParams.Decode params, int numComps,
-                  boolean mgn) implements Callable<ImageBuffer> {
+record J2KDecoder(Jpx_source source, J2KParams.Decode params, int numComps, ImageFilter.Type filterType)
+        implements Callable<ImageBuffer> {
 
     // Maximum of samples to process per rendering iteration
     private static final int MAX_RENDER_SAMPLES = 256 * 1024;
@@ -113,7 +114,7 @@ record J2KDecoder(Jpx_source source, J2KParams.Decode params, int numComps,
             System.out.println(">>> mean: " + acc.mean() + " stddev: " + acc.sampleStandardDeviation());
 */
         ImageBuffer ib = new ImageBuffer(actualWidth, actualHeight, format, ByteBuffer.wrap(outBuffer).order(ByteOrder.nativeOrder()));
-        return ImageBuffer.mgnFilter(ib, mgn);
+        return ImageBuffer.filter(ib, filterType);
     }
 
     @Nullable

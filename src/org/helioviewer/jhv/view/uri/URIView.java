@@ -11,6 +11,7 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
+import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
@@ -67,20 +68,20 @@ public class URIView extends BaseView {
     public void decode(Position viewpoint, double pixFactor, float factor) {
         ImageBuffer imageBuffer = decodeCache.getIfPresent(dataUri);
         if (imageBuffer == null) {
-            executor.decode(new Decoder(dataUri.file(), reader, mgn), new Callback(viewpoint));
+            executor.decode(new Decoder(dataUri.file(), reader, filterType), new Callback(viewpoint));
         } else {
             sendDataToHandler(imageBuffer, viewpoint);
         }
     }
 
-    private record Decoder(File file, URIImageReader reader, boolean mgn) implements Callable<ImageBuffer> {
+    private record Decoder(File file, URIImageReader reader, ImageFilter.Type type) implements Callable<ImageBuffer> {
         @Nonnull
         @Override
         public ImageBuffer call() throws Exception {
             ImageBuffer imageBuffer = reader.readImageBuffer(file);
             if (imageBuffer == null) // e.g. FITS
                 throw new Exception("Could not read: " + file);
-            return ImageBuffer.mgnFilter(imageBuffer, mgn);
+            return ImageBuffer.filter(imageBuffer, type);
         }
     }
 

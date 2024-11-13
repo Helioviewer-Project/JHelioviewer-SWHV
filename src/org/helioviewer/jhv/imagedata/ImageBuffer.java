@@ -36,8 +36,8 @@ public class ImageBuffer {
         lut = _lut;
     }
 
-    public static ImageBuffer mgnFilter(ImageBuffer ib, boolean mgn) throws Exception {
-        if (!mgn || ib.format == Format.ARGB32)
+    public static ImageBuffer filter(ImageBuffer ib, ImageFilter.Type filterType) throws Exception {
+        if (filterType == ImageFilter.Type.None || ib.format == Format.ARGB32)
             return ib;
         return new ImageBuffer(ib.width, ib.height, ib.format, ImageFilter.mgn(ib.buffer, ib.width, ib.height), ib.lut);
     }
