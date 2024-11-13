@@ -9,9 +9,44 @@ import org.helioviewer.jhv.math.MathUtils;
 class FilterWOW implements ImageFilter.Algorithm {
 
     private static final int LEVELS = 8;
-    private static final int THRESHOLD = 64; // Adjust based on image size and system
     private static final float MIX_FACTOR = 0.99f;
     private static final float[] FILTER = {1f / 16, 4f / 16, 6f / 16, 4f / 16, 1f / 16};
+
+    private static final ArrayOperation.Two opMix = new ArrayOperation.Two() {
+        @Override
+        public void accept(float[] op1, float[] op2, float[] dest, int start, int end) {
+            for (int i = start; i < end; i++) {
+                dest[i] = (1 - MIX_FACTOR) * (dest[i] + op1[i]) + MIX_FACTOR * op2[i];
+            }
+        }
+    };
+
+    private static final ArrayOperation.Two opSynthesis = new ArrayOperation.Two() {
+        @Override
+        public void accept(float[] op1, float[] op2, float[] dest, int start, int end) {
+            for (int i = start; i < end; i++) {
+                dest[i] += MathUtils.invSqrt(op1[i]) * op2[i];
+            }
+        }
+    };
+
+    private static final ArrayOperation.Two opCoefficients = new ArrayOperation.Two() {
+        @Override
+        public void accept(float[] op1, float[] op2, float[] dest, int start, int end) {
+            for (int i = start; i < end; i++) {
+                dest[i] = op1[i] - op2[i];
+            }
+        }
+    };
+
+    private static final ArrayOperation.One opSquare = new ArrayOperation.One() {
+        @Override
+        public void accept(float[] op1, float[] dest, int start, int end) {
+            for (int i = start; i < end; i++) {
+                dest[i] = op1[i] * op1[i];
+            }
+        }
+    };
 
     @Override
     public float[] filter(float[] data, int width, int height) {
@@ -24,22 +59,23 @@ class FilterWOW implements ImageFilter.Algorithm {
         float[] wtemp2 = new float[length];
         float[] recon = new float[length];
 
+
         ForkJoinPool pool = ForkJoinPool.commonPool();
         for (int level = 0; level < LEVELS; level++) {
             int step = 1 << level;
             // Calculate wavelet coefficients
             pool.invoke(new ConvolutionTask(temp, result, width, height, true, step)); // Horizontal pass
             pool.invoke(new ConvolutionTask(result, temp, width, height, false, step)); // Vertical pass
-            pool.invoke(new WaveletCoefficientTask(image, temp, result, 0, length));
+            pool.invoke(new ArrayOperation.TaskTwo(image, temp, result, 0, length, opCoefficients));
             // Update image for next level
             System.arraycopy(temp, 0, image, 0, length);
             // Whiten coefficients
-            pool.invoke(new SquareTask(result, wtemp1, 0, length));
+            pool.invoke(new ArrayOperation.TaskOne(result, wtemp1, 0, length, opSquare));
             pool.invoke(new ConvolutionTask(wtemp1, wtemp2, width, height, true, step)); // Horizontal pass
             pool.invoke(new ConvolutionTask(wtemp2, wtemp1, width, height, false, step)); // Vertical pass
-            pool.invoke(new SynthesisTask(wtemp1, result, recon, 0, length)); // Weighted synthesis
+            pool.invoke(new ArrayOperation.TaskTwo(wtemp1, result, recon, 0, length, opSynthesis)); // Weighted synthesis
         }
-        pool.invoke(new MixTask(image, data, recon, 0, length));
+        pool.invoke(new ArrayOperation.TaskTwo(image, data, recon, 0, length, opMix));
         return recon;
     }
 
@@ -71,7 +107,7 @@ class FilterWOW implements ImageFilter.Algorithm {
 
         @Override
         protected void compute() {
-            if (end - start <= THRESHOLD) {
+            if (end - start <= ArrayOperation.THRESHOLD) {
                 if (isHorizontal) {
                     computeHorizontal();
                 } else {
@@ -108,148 +144,6 @@ class FilterWOW implements ImageFilter.Algorithm {
                     }
                     dest[y * width + x] = sum;
                 }
-            }
-        }
-
-    }
-
-    private static class WaveletCoefficientTask extends RecursiveAction {
-
-        private final float[] op1;
-        private final float[] op2;
-        private final float[] dest;
-        private final int start;
-        private final int end;
-
-        WaveletCoefficientTask(float[] op1, float[] op2, float[] dest, int start, int end) {
-            this.op1 = op1;
-            this.op2 = op2;
-            this.dest = dest;
-            this.start = start;
-            this.end = end;
-        }
-
-        @Override
-        protected void compute() {
-            if (end - start <= THRESHOLD) {
-                computeCoefficients();
-            } else {
-                int mid = (start + end) / 2;
-                invokeAll(
-                        new WaveletCoefficientTask(op1, op2, dest, start, mid),
-                        new WaveletCoefficientTask(op1, op2, dest, mid, end));
-            }
-        }
-
-        private void computeCoefficients() {
-            for (int i = start; i < end; i++) {
-                dest[i] = op1[i] - op2[i]; // Store wavelet coefficients
-            }
-        }
-
-    }
-
-    private static class SquareTask extends RecursiveAction {
-
-        private final float[] op;
-        private final float[] dest;
-        private final int start;
-        private final int end;
-
-        SquareTask(float[] op, float[] dest, int start, int end) {
-            this.op = op;
-            this.dest = dest;
-            this.start = start;
-            this.end = end;
-        }
-
-        @Override
-        protected void compute() {
-            if (end - start <= THRESHOLD) {
-                computeSquare();
-            } else {
-                int mid = (start + end) / 2;
-                invokeAll(
-                        new SquareTask(op, dest, start, mid),
-                        new SquareTask(op, dest, mid, end));
-            }
-        }
-
-        private void computeSquare() {
-            for (int i = start; i < end; i++) {
-                dest[i] = op[i] * op[i];
-            }
-        }
-
-    }
-
-    private static class SynthesisTask extends RecursiveAction {
-
-        private final float[] op1;
-        private final float[] op2;
-        private final float[] dest;
-        private final int start;
-        private final int end;
-
-        SynthesisTask(float[] op1, float[] op2, float[] dest, int start, int end) {
-            this.op1 = op1;
-            this.op2 = op2;
-            this.dest = dest;
-            this.start = start;
-            this.end = end;
-        }
-
-        @Override
-        protected void compute() {
-            if (end - start <= THRESHOLD) {
-                computeSynthesis();
-            } else {
-                int mid = (start + end) / 2;
-                invokeAll(
-                        new SynthesisTask(op1, op2, dest, start, mid),
-                        new SynthesisTask(op1, op2, dest, mid, end));
-            }
-        }
-
-        private void computeSynthesis() {
-            for (int i = start; i < end; i++) {
-                dest[i] += MathUtils.invSqrt(op1[i]) * op2[i];
-            }
-        }
-
-    }
-
-    private static class MixTask extends RecursiveAction {
-
-        private final float[] op1;
-        private final float[] op2;
-        private final float[] dest;
-        private final int start;
-        private final int end;
-
-        MixTask(float[] op1, float[] op2, float[] dest, int start, int end) {
-            this.op1 = op1;
-            this.op2 = op2;
-            this.dest = dest;
-            this.start = start;
-            this.end = end;
-        }
-
-        @Override
-        protected void compute() {
-            if (end - start <= THRESHOLD) {
-                computeMix();
-            } else {
-                int mid = (start + end) / 2;
-                invokeAll(
-                        new MixTask(op1, op2, dest, start, mid),
-                        new MixTask(op1, op2, dest, mid, end));
-            }
-        }
-
-        private void computeMix() {
-            for (int i = start; i < end; i++) {
-                dest[i] = (1 - MIX_FACTOR) * (dest[i] + op1[i]) + MIX_FACTOR * op2[i];
             }
         }
 
