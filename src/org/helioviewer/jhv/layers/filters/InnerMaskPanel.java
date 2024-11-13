@@ -13,7 +13,7 @@ public class InnerMaskPanel implements FilterDetails {
 
     private final JHVSlider slider;
     private final JLabel label;
-    private final JLabel title = new JLabel("Mask", JLabel.RIGHT);
+    private final JLabel title = new JLabel("Mask ", JLabel.RIGHT);
 
     public InnerMaskPanel(ImageLayer layer) {
         slider = new JHVSlider(0, GLImage.MAX_INNER * 10, (int) (layer.getGLImage().getInnerMask() * 10));

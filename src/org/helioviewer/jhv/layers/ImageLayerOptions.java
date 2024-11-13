@@ -29,6 +29,7 @@ class ImageLayerOptions extends JPanel {
         lutPanel = new LUTPanel(layer);
         FilterDetails levelsPanel = new LevelsPanel(layer);
         FilterDetails sharpenPanel = new SharpenPanel(layer);
+        FilterDetails imageFilterPanel = new ImageFilterPanel(layer);
 
         slitPanel = new SlitPanel(layer);
         innerMaskPanel = new InnerMaskPanel(layer);
@@ -59,6 +60,8 @@ class ImageLayerOptions extends JPanel {
         addToGridBag(c, lutPanel);
         c.gridy++;
         addToGridBag(c, channelMixerPanel);
+        c.gridy++;
+        addToGridBag(c, imageFilterPanel);
         c.gridy++;
 
         JideToggleButton adjButton = new JideToggleButton(Buttons.adjustmentsRight);

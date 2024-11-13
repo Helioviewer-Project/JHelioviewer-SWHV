@@ -12,7 +12,7 @@ public class BlendPanel implements FilterDetails {
 
     private final JHVSlider slider;
     private final JLabel label;
-    private final JLabel title = new JLabel("Blend", JLabel.RIGHT);
+    private final JLabel title = new JLabel("Blend ", JLabel.RIGHT);
 
     public BlendPanel(ImageLayer layer) {
         slider = new JHVSlider(0, 100, (int) (layer.getGLImage().getBlend() * 100));

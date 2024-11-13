@@ -17,7 +17,7 @@ public class BaseView implements View {
     protected final DecodeExecutor executor;
     protected final DataUri dataUri;
 
-    protected ImageFilter.Type filterType;
+    protected ImageFilter.Type filterType = ImageFilter.Type.None;
     protected LUT builtinLUT;
     protected MetaData[] metaData = new MetaData[]{PixelBasedMetaData.EMPTY}; // paranoia
 

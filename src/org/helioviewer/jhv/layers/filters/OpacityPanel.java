@@ -12,7 +12,7 @@ public class OpacityPanel implements FilterDetails {
 
     private final JHVSlider slider;
     private final JLabel label;
-    private final JLabel title = new JLabel("Opacity", JLabel.RIGHT);
+    private final JLabel title = new JLabel("Opacity ", JLabel.RIGHT);
 
     public OpacityPanel(ImageLayer layer) {
         slider = new JHVSlider(0, 100, (int) (layer.getGLImage().getOpacity() * 100));
