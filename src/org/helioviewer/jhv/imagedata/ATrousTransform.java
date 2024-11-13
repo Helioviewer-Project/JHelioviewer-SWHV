@@ -9,9 +9,8 @@ import org.helioviewer.jhv.math.MathUtils;
 class ATrousTransform {
 
     private static final float[] FILTER = {1f / 16, 4f / 16, 6f / 16, 4f / 16, 1f / 16};
-    private static final int THRESHOLD = 64; // Adjust based on image size and system
-
     private static final float H = 0.99f;
+    private static final int THRESHOLD = 64; // Adjust based on image size and system
 
     static float[] decompose(float[] in, int width, int height, int levels) {
         float[] image = in.clone();
@@ -38,10 +37,7 @@ class ATrousTransform {
             pool.invoke(new ConvolutionTask(wtemp2, wtemp1, width, height, false, step)); // Vertical pass
             pool.invoke(new SynthesisTask(wtemp1, result, recon, 0, length)); // Weighted synthesis
         }
-
-        for (int i = 0; i < length; ++i)
-            recon[i] = (1 - H) * (recon[i] + image[i]) + H * in[i];
-
+        pool.invoke(new MixTask(image, in, recon, 0, length));
         return recon;
     }
 
@@ -216,6 +212,42 @@ class ATrousTransform {
         private void computeSynthesis() {
             for (int i = start; i < end; i++) {
                 dest[i] += MathUtils.invSqrt(op1[i]) * op2[i];
+            }
+        }
+
+    }
+
+    private static class MixTask extends RecursiveAction {
+
+        private final float[] op1;
+        private final float[] op2;
+        private final float[] dest;
+        private final int start;
+        private final int end;
+
+        MixTask(float[] op1, float[] op2, float[] dest, int start, int end) {
+            this.op1 = op1;
+            this.op2 = op2;
+            this.dest = dest;
+            this.start = start;
+            this.end = end;
+        }
+
+        @Override
+        protected void compute() {
+            if (end - start <= THRESHOLD) {
+                computeMix();
+            } else {
+                int mid = (start + end) / 2;
+                invokeAll(
+                        new MixTask(op1, op2, dest, start, mid),
+                        new MixTask(op1, op2, dest, mid, end));
+            }
+        }
+
+        private void computeMix() {
+            for (int i = start; i < end; i++) {
+                dest[i] = (1 - H) * (dest[i] + op1[i]) + H * op2[i];
             }
         }
 
