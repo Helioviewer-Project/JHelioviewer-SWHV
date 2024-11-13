@@ -11,29 +11,38 @@ class ATrousTransform {
     private static final float[] FILTER = {1f / 16, 4f / 16, 6f / 16, 4f / 16, 1f / 16};
     private static final int THRESHOLD = 64; // Adjust based on image size and system
 
-    static float[] decompose(float[] image, int width, int height, int levels) {
-        float[] result = new float[image.length];
-        float[] temp = image.clone();
+    private static final float H = 0.99f;
 
-        float[] wtemp1 = new float[image.length];
-        float[] wtemp2 = new float[image.length];
+    static float[] decompose(float[] in, int width, int height, int levels) {
+        float[] image = in.clone();
+        float[] temp = in.clone();
+
+        int length = in.length;
+        float[] result = new float[length];
+        float[] wtemp1 = new float[length];
+        float[] wtemp2 = new float[length];
+        float[] recon = new float[length];
 
         ForkJoinPool pool = ForkJoinPool.commonPool();
         for (int level = 0; level < levels; level++) {
-            int step = (int) Math.pow(2, level);
+            int step = 1 << level;
             // Calculate wavelet coefficients
             pool.invoke(new ConvolutionTask(temp, result, width, height, true, step)); // Horizontal pass
             pool.invoke(new ConvolutionTask(result, temp, width, height, false, step)); // Vertical pass
-            pool.invoke(new WaveletCoefficientTask(image, temp, result, 0, image.length));
+            pool.invoke(new WaveletCoefficientTask(image, temp, result, 0, length));
+            // Update image for next level
+            System.arraycopy(temp, 0, image, 0, length);
             // Whiten coefficients
-            pool.invoke(new SquareTask(result, wtemp1, 0, image.length));
+            pool.invoke(new SquareTask(result, wtemp1, 0, length));
             pool.invoke(new ConvolutionTask(wtemp1, wtemp2, width, height, true, step)); // Horizontal pass
             pool.invoke(new ConvolutionTask(wtemp2, wtemp1, width, height, false, step)); // Vertical pass
-            pool.invoke(new ScaleTask(wtemp1, result, 0, image.length));
-            // Update image for next level
-            System.arraycopy(temp, 0, image, 0, image.length);
+            pool.invoke(new SynthesisTask(wtemp1, result, recon, 0, length)); // Weighted synthesis
         }
-        return result;
+
+        for (int i = 0; i < length; ++i)
+            recon[i] = (1 - H) * (recon[i] + image[i]) + H * in[i];
+
+        return recon;
     }
 
     private static class ConvolutionTask extends RecursiveAction {
@@ -108,16 +117,16 @@ class ATrousTransform {
 
     private static class WaveletCoefficientTask extends RecursiveAction {
 
-        private final float[] image;
-        private final float[] temp;
-        private final float[] result;
+        private final float[] op1;
+        private final float[] op2;
+        private final float[] dest;
         private final int start;
         private final int end;
 
-        WaveletCoefficientTask(float[] image, float[] temp, float[] result, int start, int end) {
-            this.image = image;
-            this.temp = temp;
-            this.result = result;
+        WaveletCoefficientTask(float[] op1, float[] op2, float[] dest, int start, int end) {
+            this.op1 = op1;
+            this.op2 = op2;
+            this.dest = dest;
             this.start = start;
             this.end = end;
         }
@@ -129,14 +138,14 @@ class ATrousTransform {
             } else {
                 int mid = (start + end) / 2;
                 invokeAll(
-                        new WaveletCoefficientTask(image, temp, result, start, mid),
-                        new WaveletCoefficientTask(image, temp, result, mid, end));
+                        new WaveletCoefficientTask(op1, op2, dest, start, mid),
+                        new WaveletCoefficientTask(op1, op2, dest, mid, end));
             }
         }
 
         private void computeCoefficients() {
             for (int i = start; i < end; i++) {
-                result[i] = image[i] - temp[i]; // Store wavelet coefficients
+                dest[i] = op1[i] - op2[i]; // Store wavelet coefficients
             }
         }
 
@@ -144,13 +153,13 @@ class ATrousTransform {
 
     private static class SquareTask extends RecursiveAction {
 
-        private final float[] src;
+        private final float[] op;
         private final float[] dest;
         private final int start;
         private final int end;
 
-        SquareTask(float[] src, float[] dest, int start, int end) {
-            this.src = src;
+        SquareTask(float[] op, float[] dest, int start, int end) {
+            this.op = op;
             this.dest = dest;
             this.start = start;
             this.end = end;
@@ -163,28 +172,30 @@ class ATrousTransform {
             } else {
                 int mid = (start + end) / 2;
                 invokeAll(
-                        new SquareTask(src, dest, start, mid),
-                        new SquareTask(src, dest, mid, end));
+                        new SquareTask(op, dest, start, mid),
+                        new SquareTask(op, dest, mid, end));
             }
         }
 
         private void computeSquare() {
             for (int i = start; i < end; i++) {
-                dest[i] = src[i] * src[i];
+                dest[i] = op[i] * op[i];
             }
         }
 
     }
 
-    private static class ScaleTask extends RecursiveAction {
+    private static class SynthesisTask extends RecursiveAction {
 
-        private final float[] src;
+        private final float[] op1;
+        private final float[] op2;
         private final float[] dest;
         private final int start;
         private final int end;
 
-        ScaleTask(float[] src, float[] dest, int start, int end) {
-            this.src = src;
+        SynthesisTask(float[] op1, float[] op2, float[] dest, int start, int end) {
+            this.op1 = op1;
+            this.op2 = op2;
             this.dest = dest;
             this.start = start;
             this.end = end;
@@ -193,18 +204,18 @@ class ATrousTransform {
         @Override
         protected void compute() {
             if (end - start <= THRESHOLD) {
-                computeScale();
+                computeSynthesis();
             } else {
                 int mid = (start + end) / 2;
                 invokeAll(
-                        new ScaleTask(src, dest, start, mid),
-                        new ScaleTask(src, dest, mid, end));
+                        new SynthesisTask(op1, op2, dest, start, mid),
+                        new SynthesisTask(op1, op2, dest, mid, end));
             }
         }
 
-        private void computeScale() {
+        private void computeSynthesis() {
             for (int i = start; i < end; i++) {
-                dest[i] *= MathUtils.invSqrt(src[i]);
+                dest[i] += MathUtils.invSqrt(op1[i]) * op2[i];
             }
         }
 
