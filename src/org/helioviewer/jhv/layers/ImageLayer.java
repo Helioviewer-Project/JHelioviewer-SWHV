@@ -14,6 +14,7 @@ import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.imagedata.ImageData;
+import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DownloadLayer;
 import org.helioviewer.jhv.io.LoadLayer;
@@ -122,11 +123,11 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
         if (removed) //!
             return;
 
-        boolean isMGN = view.getMGN();
+        ImageFilter.Type filterType = view.getFilter();
         unsetView();
         view = _view;
         worker = null; // drop reference
-        view.setMGN(isMGN);
+        view.setFilter(filterType);
 
         optionsPanel.getDifferencePanel().downloadVisible(!isLocal());
         setEnabled(true); // enable optionsPanel

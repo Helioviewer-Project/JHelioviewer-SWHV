@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageData;
+import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
@@ -63,13 +64,13 @@ public class ManyView implements View {
     }
 
     @Override
-    public void setMGN(boolean b) {
-        frameMap.values().forEach(frameInfo -> frameInfo.view.setMGN(b));
+    public void setFilter(ImageFilter.Type t) {
+        frameMap.values().forEach(frameInfo -> frameInfo.view.setFilter(t));
     }
 
     @Override
-    public boolean getMGN() {
-        return frameMap.indexedValue(0).view.getMGN();
+    public ImageFilter.Type getFilter() {
+        return frameMap.indexedValue(0).view.getFilter();
     }
 
     @Override

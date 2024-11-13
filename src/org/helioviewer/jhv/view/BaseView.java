@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageData;
+import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
@@ -16,7 +17,7 @@ public class BaseView implements View {
     protected final DecodeExecutor executor;
     protected final DataUri dataUri;
 
-    protected boolean mgn;
+    protected ImageFilter.Type filterType;
     protected LUT builtinLUT;
     protected MetaData[] metaData = new MetaData[]{PixelBasedMetaData.EMPTY}; // paranoia
 
@@ -88,13 +89,13 @@ public class BaseView implements View {
     }
 
     @Override
-    public void setMGN(boolean b) {
-        mgn = b;
+    public void setFilter(ImageFilter.Type t) {
+        filterType = t;
     }
 
     @Override
-    public boolean getMGN() {
-        return mgn;
+    public ImageFilter.Type getFilter() {
+        return filterType;
     }
 
 }

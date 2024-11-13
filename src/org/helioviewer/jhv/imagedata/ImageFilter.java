@@ -6,9 +6,9 @@ import java.nio.ShortBuffer;
 
 import org.helioviewer.jhv.math.MathUtils;
 
-class ImageFilter {
+public class ImageFilter {
 
-    enum Type {None, WOW, MGN}
+    public enum Type {None, WOW, MGN}
 
     private static ByteBuffer mgn(ByteBuffer buf, int width, int height) {
         int size = width * height;

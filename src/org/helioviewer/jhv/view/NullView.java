@@ -3,6 +3,7 @@ package org.helioviewer.jhv.view;
 import java.util.ArrayList;
 
 import org.helioviewer.jhv.imagedata.ImageData;
+import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.NullMetaData;
 import org.helioviewer.jhv.time.JHVTime;
@@ -44,12 +45,12 @@ public class NullView implements View {
     }
 
     @Override
-    public void setMGN(boolean b) {
+    public void setFilter(ImageFilter.Type t) {
     }
 
     @Override
-    public boolean getMGN() {
-        return false;
+    public ImageFilter.Type getFilter() {
+        return ImageFilter.Type.None;
     }
 
     @Override

@@ -289,7 +289,7 @@ public class J2KView extends BaseView {
         if (imageBuffer == null) {
             int numComps = completionLevel.getResolutionSet(decodeParams.frame).numComps;
             try {
-                executor.decode(new J2KDecoder(source().jpxSource(), decodeParams, numComps, mgn), new J2KCallback(decodeParams));
+                executor.decode(new J2KDecoder(source().jpxSource(), decodeParams, numComps, filterType), new J2KCallback(decodeParams));
             } catch (Exception e) {
                 Log.error(e);
             }
