@@ -12,7 +12,7 @@ public class SharpenPanel implements FilterDetails {
 
     private final JHVSlider slider;
     private final JLabel label;
-    private final JLabel title = new JLabel("Sharpen", JLabel.RIGHT);
+    private final JLabel title = new JLabel("Sharpen ", JLabel.RIGHT);
 
     public SharpenPanel(ImageLayer layer) {
         slider = new JHVSlider(-100, 100, (int) (layer.getGLImage().getSharpen() * 100));

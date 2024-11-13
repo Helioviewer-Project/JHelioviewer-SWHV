@@ -8,7 +8,16 @@ import org.helioviewer.jhv.math.MathUtils;
 
 public class ImageFilter {
 
-    public enum Type {None, WOW, MGN}
+    public enum Type {
+        None("No filter"), WOW("Wavelet-optimized whitening"), MGN("Multi-scale Gaussian normalization");
+
+        public final String description;
+
+        Type(String _description) {
+            description = _description;
+        }
+
+    }
 
     private static ByteBuffer mgn(ByteBuffer buf, int width, int height) {
         int size = width * height;
