@@ -6,24 +6,25 @@ import java.util.concurrent.ForkJoinPool;
 import org.helioviewer.jhv.math.MathUtils;
 
 @SuppressWarnings("serial")
-class ATrousTransform {
+class FilterWOW {
 
-    private static final float[] FILTER = {1f / 16, 4f / 16, 6f / 16, 4f / 16, 1f / 16};
-    private static final float H = 0.99f;
+    private static final int LEVELS = 8;
     private static final int THRESHOLD = 64; // Adjust based on image size and system
+    private static final float MIX_FACTOR = 0.99f;
+    private static final float[] FILTER = {1f / 16, 4f / 16, 6f / 16, 4f / 16, 1f / 16};
 
-    static float[] decompose(float[] in, int width, int height, int levels) {
-        float[] image = in.clone();
-        float[] temp = in.clone();
+    static float[] filter(float[] data, int width, int height) {
+        float[] image = data.clone();
+        float[] temp = data.clone();
 
-        int length = in.length;
+        int length = data.length;
         float[] result = new float[length];
         float[] wtemp1 = new float[length];
         float[] wtemp2 = new float[length];
         float[] recon = new float[length];
 
         ForkJoinPool pool = ForkJoinPool.commonPool();
-        for (int level = 0; level < levels; level++) {
+        for (int level = 0; level < LEVELS; level++) {
             int step = 1 << level;
             // Calculate wavelet coefficients
             pool.invoke(new ConvolutionTask(temp, result, width, height, true, step)); // Horizontal pass
@@ -37,7 +38,7 @@ class ATrousTransform {
             pool.invoke(new ConvolutionTask(wtemp2, wtemp1, width, height, false, step)); // Vertical pass
             pool.invoke(new SynthesisTask(wtemp1, result, recon, 0, length)); // Weighted synthesis
         }
-        pool.invoke(new MixTask(image, in, recon, 0, length));
+        pool.invoke(new MixTask(image, data, recon, 0, length));
         return recon;
     }
 
@@ -247,7 +248,7 @@ class ATrousTransform {
 
         private void computeMix() {
             for (int i = start; i < end; i++) {
-                dest[i] = (1 - H) * (dest[i] + op1[i]) + H * op2[i];
+                dest[i] = (1 - MIX_FACTOR) * (dest[i] + op1[i]) + MIX_FACTOR * op2[i];
             }
         }
 
