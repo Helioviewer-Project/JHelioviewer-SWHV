@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
+import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
@@ -50,7 +51,7 @@ public class ChannelMixerPanel implements FilterDetails {
         mgnButton.setToolTipText("Multi-scale Gaussian normalization");
         mgnButton.addActionListener(e -> {
             layer.getView().clearCache();
-            layer.getView().setMGN(mgnButton.isSelected());
+            layer.getView().setFilter(mgnButton.isSelected() ? ImageFilter.Type.MGN : ImageFilter.Type.None);
             MovieDisplay.render(1);
         });
 
