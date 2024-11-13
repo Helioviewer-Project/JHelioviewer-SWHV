@@ -39,7 +39,7 @@ public class ImageBuffer {
     public static ImageBuffer filter(ImageBuffer ib, ImageFilter.Type filterType) throws Exception {
         if (filterType == ImageFilter.Type.None || ib.format == Format.ARGB32)
             return ib;
-        return new ImageBuffer(ib.width, ib.height, ib.format, ImageFilter.mgn(ib.buffer, ib.width, ib.height), ib.lut);
+        return new ImageBuffer(ib.width, ib.height, ib.format, ImageFilter.filter(ib.buffer, ib.width, ib.height, filterType), ib.lut);
     }
 
     private int getPixelInternal(int x, int y) {

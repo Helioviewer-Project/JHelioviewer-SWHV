@@ -9,17 +9,23 @@ import org.helioviewer.jhv.math.MathUtils;
 public class ImageFilter {
 
     public enum Type {
-        None("No filter"), WOW("Wavelet-optimized whitening"), MGN("Multi-scale Gaussian normalization");
+        None("No filter", null), WOW("Wavelet-optimized whitening", new FilterWOW()), MGN("Multi-scale Gaussian normalization", new FilterMGN());
 
         public final String description;
+        final Algorithm algorithm;
 
-        Type(String _description) {
+        Type(String _description, Algorithm _algorithm) {
             description = _description;
+            algorithm = _algorithm;
         }
 
     }
 
-    private static ByteBuffer mgn(ByteBuffer buf, int width, int height) {
+    interface Algorithm {
+        float[] filter(float[] data, int width, int height);
+    }
+
+    private static ByteBuffer filter(ByteBuffer buf, int width, int height, Algorithm algorithm) {
         int size = width * height;
         float[] data = new float[size];
 
@@ -27,7 +33,7 @@ public class ImageFilter {
         for (int i = 0; i < size; ++i)
             data[i] = ((array[i] + 256) & 0xFF) / 255f;
 
-        float[] image = FilterMGN.filter(data, width, height);
+        float[] image = algorithm.filter(data, width, height);
 
         byte[] out = new byte[size];
         for (int i = 0; i < size; ++i)
@@ -35,7 +41,7 @@ public class ImageFilter {
         return ByteBuffer.wrap(out);
     }
 
-    private static ShortBuffer mgn(ShortBuffer buf, int width, int height) {
+    private static ShortBuffer filter(ShortBuffer buf, int width, int height, Algorithm algorithm) {
         int size = width * height;
         float[] data = new float[size];
 
@@ -43,7 +49,7 @@ public class ImageFilter {
         for (int i = 0; i < size; ++i)
             data[i] = ((array[i] + 65536) & 0xFFFF) / 65535f;
 
-        float[] image = FilterMGN.filter(data, width, height);
+        float[] image = algorithm.filter(data, width, height);
 
         short[] out = new short[size];
         for (int i = 0; i < size; ++i)
@@ -51,13 +57,13 @@ public class ImageFilter {
         return ShortBuffer.wrap(out);
     }
 
-    static Buffer mgn(Buffer buf, int width, int height) throws Exception {
+    static Buffer filter(Buffer buf, int width, int height, Type type) throws Exception {
         if (buf instanceof ByteBuffer)
-            return mgn((ByteBuffer) buf, width, height);
+            return filter((ByteBuffer) buf, width, height, type.algorithm);
         else if (buf instanceof ShortBuffer)
-            return mgn((ShortBuffer) buf, width, height);
+            return filter((ShortBuffer) buf, width, height, type.algorithm);
         else
-            throw new Exception("Unimplemented MGN filter");
+            throw new Exception("Unimplemented data type filtering");
     }
 
 }

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import org.helioviewer.jhv.math.MathUtils;
 
-class FilterMGN {
+class FilterMGN implements ImageFilter.Algorithm {
 
     // derived from https://dev.ipol.im/~getreuer/code/
     private static class GaussFilter {
@@ -131,7 +131,8 @@ class FilterMGN {
         }
     }
 
-    static float[] filter(float[] data, int width, int height) {
+    @Override
+    public float[] filter(float[] data, int width, int height) {
         ArrayList<ForkJoinTask<float[]>> tasks = new ArrayList<>(sigmas.length);
         for (int i = 0; i < sigmas.length; ++i)
             tasks.add(ForkJoinTask.adapt(new ScaleTask(data, width, height, sigmas[i], weights[i])).fork());

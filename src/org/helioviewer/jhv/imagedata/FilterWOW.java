@@ -6,14 +6,15 @@ import java.util.concurrent.ForkJoinPool;
 import org.helioviewer.jhv.math.MathUtils;
 
 @SuppressWarnings("serial")
-class FilterWOW {
+class FilterWOW implements ImageFilter.Algorithm {
 
     private static final int LEVELS = 8;
     private static final int THRESHOLD = 64; // Adjust based on image size and system
     private static final float MIX_FACTOR = 0.99f;
     private static final float[] FILTER = {1f / 16, 4f / 16, 6f / 16, 4f / 16, 1f / 16};
 
-    static float[] filter(float[] data, int width, int height) {
+    @Override
+    public float[] filter(float[] data, int width, int height) {
         float[] image = data.clone();
         float[] temp = data.clone();
 
