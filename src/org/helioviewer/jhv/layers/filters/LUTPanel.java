@@ -32,16 +32,7 @@ public class LUTPanel implements FilterDetails {
         };
         lutCombo.addActionListener(listener);
         invertButton.addActionListener(listener);
-
-        JideToggleButton enhanceButton = new JideToggleButton(Buttons.corona, layer.getGLImage().getEnhanced());
-        enhanceButton.setToolTipText("Enhance off-disk corona");
-        enhanceButton.addActionListener(e -> {
-            layer.getGLImage().setEnhanced(enhanceButton.isSelected());
-            MovieDisplay.display();
-        });
-
-        buttonPanel.add(invertButton, BorderLayout.LINE_START);
-        buttonPanel.add(enhanceButton, BorderLayout.LINE_END);
+        buttonPanel.add(invertButton, BorderLayout.LINE_END);
     }
 
     public void setLUT(LUT lut) {

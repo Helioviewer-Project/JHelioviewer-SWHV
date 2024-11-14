@@ -9,7 +9,7 @@ import org.helioviewer.jhv.math.MathUtils;
 public class ImageFilter {
 
     public enum Type {
-        None("No filter", null), WOW("Wavelet-optimized whitening", new FilterWOW()), MGN("Multi-scale Gaussian normalization", new FilterMGN());
+        None("No filter", null), MGN("Multi-scale Gaussian normalization", new FilterMGN()), WOW("Wavelet-optimized whitening", new FilterWOW());
 
         public final String description;
         final Algorithm algorithm;

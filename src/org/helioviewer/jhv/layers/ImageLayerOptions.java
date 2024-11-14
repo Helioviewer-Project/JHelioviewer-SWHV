@@ -8,8 +8,10 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.gui.components.Buttons;
+import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.layers.filters.*;
 
+import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
@@ -76,6 +78,17 @@ class ImageLayerOptions extends JPanel {
         c.anchor = GridBagConstraints.LINE_START;
         c.fill = GridBagConstraints.NONE;
         add(adjButton, c);
+
+        MetaDataDialog metaDialog = new MetaDataDialog();
+        JideButton metaButton = new JideButton(Buttons.info);
+        metaButton.setToolTipText("Show metadata of selected layer");
+        metaButton.addActionListener(e -> {
+            metaDialog.setMetaData(layer);
+            metaDialog.showDialog();
+        });
+        c.gridx = 2;
+        c.anchor = GridBagConstraints.LINE_END;
+        add(metaButton, c);
 
         setAdjustmentsVisibility(false);
         c.gridy++;
