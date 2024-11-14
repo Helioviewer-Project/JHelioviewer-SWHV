@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.layers.filters;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
 
@@ -8,6 +9,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.MovieDisplay;
@@ -18,6 +20,7 @@ import com.jidesoft.swing.JideToggleButton;
 public class ImageFilterPanel implements FilterDetails {
 
     private final JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+    private final JPanel buttonPanel = new JPanel(new BorderLayout());
     private final JLabel title = new JLabel("Filter ", JLabel.RIGHT);
 
     public ImageFilterPanel(ImageLayer layer) {
@@ -35,6 +38,14 @@ public class ImageFilterPanel implements FilterDetails {
             modeGroup.add(item);
             modePanel.add(item);
         }
+
+        JideToggleButton enhanceButton = new JideToggleButton(Buttons.corona, layer.getGLImage().getEnhanced());
+        enhanceButton.setToolTipText("Enhance off-disk corona");
+        enhanceButton.addActionListener(e -> {
+            layer.getGLImage().setEnhanced(enhanceButton.isSelected());
+            MovieDisplay.display();
+        });
+        buttonPanel.add(enhanceButton, BorderLayout.LINE_END);
     }
 
     @Override
@@ -49,7 +60,7 @@ public class ImageFilterPanel implements FilterDetails {
 
     @Override
     public Component getThird() {
-        return new JPanel();
+        return buttonPanel;
     }
 
 }
