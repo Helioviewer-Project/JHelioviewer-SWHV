@@ -36,27 +36,27 @@ class FilterWOW implements ImageFilter.Algorithm {
         float[] temp = data.clone();
 
         int length = data.length;
-        float[] result = new float[length];
+        float[] coeff = new float[length];
         float[] wtemp1 = new float[length];
         float[] wtemp2 = new float[length];
-        float[] recon = new float[length];
+        float[] synth = new float[length];
 
         ForkJoinPool pool = ForkJoinPool.commonPool();
         for (int level = 0; level < LEVELS; level++) {
             int step = 1 << level;
             // Calculate wavelet coefficients
-            pool.invoke(new ConvolutionTask(temp, result, width, height, true, step)); // Horizontal pass
-            pool.invoke(new ConvolutionTask(result, temp, width, height, false, step)); // Vertical pass
-            pool.invoke(new ArrayOp.TaskTwo(image, temp, result, 0, length, opCoefficients));
+            pool.invoke(new ConvolutionTask(temp, coeff, width, height, true, step)); // Horizontal pass
+            pool.invoke(new ConvolutionTask(coeff, temp, width, height, false, step)); // Vertical pass
+            pool.invoke(new ArrayOp.TaskTwo(image, temp, coeff, 0, length, opCoefficients));
             // Update image for next level
             System.arraycopy(temp, 0, image, 0, length);
             // Whiten coefficients
-            pool.invoke(new ConvolutionTask2(result, wtemp2, width, height, true, step)); // Squared src horizontal pass
-            pool.invoke(new ConvolutionTask(wtemp2, wtemp1, width, height, false, step)); // Vertical pass
-            pool.invoke(new ArrayOp.TaskTwo(wtemp1, result, recon, 0, length, opSynthesis)); // Weighted synthesis
+            pool.invoke(new ConvolutionTask2(coeff, wtemp1, width, height, true, step)); // Squared src horizontal pass
+            pool.invoke(new ConvolutionTask(wtemp1, wtemp2, width, height, false, step)); // Vertical pass
+            pool.invoke(new ArrayOp.TaskTwo(wtemp2, coeff, synth, 0, length, opSynthesis)); // Weighted synthesis
         }
-        pool.invoke(new ArrayOp.TaskTwo(image, data, recon, 0, length, opMix));
-        return recon;
+        pool.invoke(new ArrayOp.TaskTwo(image, data, synth, 0, length, opMix));
+        return synth;
     }
 
     private static class ConvolutionTask extends RecursiveAction {
