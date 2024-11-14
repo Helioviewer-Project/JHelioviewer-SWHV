@@ -8,7 +8,7 @@ import org.helioviewer.jhv.math.MathUtils;
 @SuppressWarnings("serial")
 class FilterWOW implements ImageFilter.Algorithm {
 
-    private static final int LEVELS = 8;
+    private static final int LEVELS = 6;
     private static final float MIX_FACTOR = 0.99f;
     private static final float[] FILTER = {1f / 16, 4f / 16, 6f / 16, 4f / 16, 1f / 16};
 
