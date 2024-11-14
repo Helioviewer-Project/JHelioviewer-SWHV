@@ -102,7 +102,7 @@ class FilterMGN implements ImageFilter.Algorithm {
     }
 
     private static final int K = 3;
-    private static final float MIX_FACTOR = 0.975f;
+    private static final float MIX_FACTOR = 0.97f;
     private static final float[] sigmas = {1, 4, 16, 64};
     private static final float[] weights = {0.125f, 0.25f, 0.5f, 1f};
 
