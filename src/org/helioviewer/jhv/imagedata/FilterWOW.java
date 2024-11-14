@@ -12,39 +12,27 @@ class FilterWOW implements ImageFilter.Algorithm {
     private static final float MIX_FACTOR = 0.99f;
     private static final float[] FILTER = {1f / 16, 4f / 16, 6f / 16, 4f / 16, 1f / 16};
 
-    private static final ArrayOp.Two opMix = new ArrayOp.Two() {
-        @Override
-        public void accept(float[] op1, float[] op2, float[] dest, int start, int end) {
-            for (int i = start; i < end; i++) {
-                dest[i] = (1 - MIX_FACTOR) * (dest[i] + op1[i]) + MIX_FACTOR * op2[i];
-            }
+    private static final ArrayOp.Two opMix = (op1, op2, dest, start, end) -> {
+        for (int i = start; i < end; i++) {
+            dest[i] = (1 - MIX_FACTOR) * (dest[i] + op1[i]) + MIX_FACTOR * op2[i];
         }
     };
 
-    private static final ArrayOp.Two opSynthesis = new ArrayOp.Two() {
-        @Override
-        public void accept(float[] op1, float[] op2, float[] dest, int start, int end) {
-            for (int i = start; i < end; i++) {
-                dest[i] += MathUtils.invSqrt(op1[i]) * op2[i];
-            }
+    private static final ArrayOp.Two opSynthesis = (op1, op2, dest, start, end) -> {
+        for (int i = start; i < end; i++) {
+            dest[i] += MathUtils.invSqrt(op1[i]) * op2[i];
         }
     };
 
-    private static final ArrayOp.Two opCoefficients = new ArrayOp.Two() {
-        @Override
-        public void accept(float[] op1, float[] op2, float[] dest, int start, int end) {
-            for (int i = start; i < end; i++) {
-                dest[i] = op1[i] - op2[i];
-            }
+    private static final ArrayOp.Two opCoefficients = (op1, op2, dest, start, end) -> {
+        for (int i = start; i < end; i++) {
+            dest[i] = op1[i] - op2[i];
         }
     };
 
-    private static final ArrayOp.One opSquare = new ArrayOp.One() {
-        @Override
-        public void accept(float[] op1, float[] dest, int start, int end) {
-            for (int i = start; i < end; i++) {
-                dest[i] = op1[i] * op1[i];
-            }
+    private static final ArrayOp.One opSquare = (op1, dest, start, end) -> {
+        for (int i = start; i < end; i++) {
+            dest[i] = op1[i] * op1[i];
         }
     };
 
