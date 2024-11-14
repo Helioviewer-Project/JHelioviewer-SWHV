@@ -102,9 +102,9 @@ class FilterMGN implements ImageFilter.Algorithm {
     }
 
     private static final int K = 3;
-    private static final float H = 0.8f;
+    private static final float MIX_FACTOR = 0.975f;
     private static final float[] sigmas = {1, 4, 16, 64};
-    private static final float[] weights = {0.25f, 0.5f, 0.75f, 1f};
+    private static final float[] weights = {0.125f, 0.25f, 0.5f, 1f};
 
     private record ScaleTask(float[] data, int width, int height, float sigma, float weight)
             implements Callable<float[]> {
@@ -125,7 +125,7 @@ class FilterMGN implements ImageFilter.Algorithm {
             filter.gaussianConvImage(conv2, conv2, width, height);
 
             for (int i = 0; i < size; ++i)
-                conv[i] = conv2[i] == 0 ? 0 : weight * MathUtils.clip(conv[i] * MathUtils.invSqrt(conv2[i]), -1, 1);
+                conv[i] = conv2[i] == 0 ? 0 : weight * conv[i] * MathUtils.invSqrt(conv2[i]);
 
             return conv;
         }
@@ -145,21 +145,8 @@ class FilterMGN implements ImageFilter.Algorithm {
                 image[i] += res[i];
         }
 
-        float min = 1e6f, max = -1e6f;
-        for (int i = 0; i < size; ++i) {
-            float v = image[i];
-            if (v > max)
-                max = v;
-            if (v < min)
-                min = v;
-        }
-
-        if (min == max)
-            return data;
-
-        float k = (1 - H) / (max - min);
         for (int i = 0; i < size; ++i)
-            image[i] = k * (image[i] - min) + H * data[i];
+            image[i] = (1 - MIX_FACTOR) * image[i] + MIX_FACTOR * data[i];
         return image;
     }
 
