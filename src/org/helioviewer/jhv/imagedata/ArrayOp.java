@@ -7,42 +7,8 @@ class ArrayOp {
 
     static final int THRESHOLD = 64; // Adjust based on image size and system
 
-    interface One {
-        void accept(float[] op1, float[] dest, int start, int end);
-    }
-
     interface Two {
         void accept(float[] op1, float[] op2, float[] dest, int start, int end);
-    }
-
-    static class TaskOne extends RecursiveAction {
-
-        private final float[] op1;
-        private final float[] dest;
-        private final int start;
-        private final int end;
-        private final One action;
-
-        TaskOne(float[] op1, float[] dest, int start, int end, One action) {
-            this.op1 = op1;
-            this.dest = dest;
-            this.start = start;
-            this.end = end;
-            this.action = action;
-        }
-
-        @Override
-        protected void compute() {
-            if (end - start <= THRESHOLD) {
-                action.accept(op1, dest, start, end);
-            } else {
-                int mid = (start + end) / 2;
-                invokeAll(
-                        new TaskOne(op1, dest, start, mid, action),
-                        new TaskOne(op1, dest, mid, end, action));
-            }
-        }
-
     }
 
     static class TaskTwo extends RecursiveAction {
