@@ -5,18 +5,17 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
+import org.helioviewer.jhv.JHVGlobals;
+
 import org.apache.commons.io.FilenameUtils;
-import org.apache.tika.Tika;
 
 public class DataUri {
-
-    private static final Tika tika = new Tika();
 
     private static Format detect(File file) throws IOException {
         if (file.getPath().toLowerCase().endsWith(".fits.gz")) // hack
             return Format.Image.FITS;
         else
-            return getFormat(tika.detect(file));
+            return getFormat(JHVGlobals.tika.detect(file));
     }
 
     private static final Map<String, Format> map = Map.of(

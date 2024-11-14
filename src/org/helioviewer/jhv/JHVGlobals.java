@@ -14,6 +14,7 @@ import org.helioviewer.jhv.gui.dialogs.TextDialog;
 import org.helioviewer.jhv.io.FileUtils;
 
 import com.jidesoft.comparator.AlphanumComparator;
+import org.apache.tika.Tika;
 
 public class JHVGlobals {
 
@@ -27,6 +28,7 @@ public class JHVGlobals {
     public static String userAgent = "JHV/SWHV-";
     public static String versionDetail = "";
 
+    public static final Tika tika = new Tika();
     public static final AlphanumComparator alphanumComparator = new AlphanumComparator(true);
 
     private static int readTimeout = -1;

@@ -3,6 +3,9 @@
 
 ## JHelioviewer 4.7.1 (pending)
 
+- Add wavelet-optimized whitening (WOW, <https://doi.org/10.1051/0004-6361/202245345>) image enhancement
+- Adjust the parameters of MGN image enhancement to bring it closer to WOW results
+
 ## JHelioviewer 4.7 (2024-07-17)
 
 - Load timelines from new HAPI ROB server
@@ -133,7 +136,7 @@
 
 ## JHelioviewer 4.0.2 (2021-06-11)
 
-- Add multi-scale Gaussian normalization (<https://arxiv.org/abs/1403.6613>) image enhancement
+- Add multi-scale Gaussian normalization (MGN, <https://arxiv.org/abs/1403.6613>) image enhancement
 
 ## JHelioviewer 4.0.1 (2021-05-31)
 
