@@ -129,7 +129,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
         worker = null; // drop reference
         view.setFilter(filterType);
 
-        optionsPanel.getDifferencePanel().downloadVisible(!isLocal());
+        optionsPanel.downloadVisible(!isLocal());
         setEnabled(true); // enable optionsPanel
         JHVFrame.getLayersPanel().setOptionsPanel(this);
 
@@ -379,11 +379,11 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
     }
 
     public void doneDownload() {
-        optionsPanel.getDifferencePanel().done();
+        optionsPanel.downloadDone();
     }
 
     public void progressDownload(int percent) {
-        optionsPanel.getDifferencePanel().setValue(percent);
+        optionsPanel.downloadProgress(percent);
     }
 
 }
