@@ -1,13 +1,18 @@
 package org.helioviewer.jhv.layers;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.gui.components.Buttons;
+import org.helioviewer.jhv.gui.components.base.CircularProgressUI;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.layers.filters.*;
 
@@ -18,13 +23,15 @@ import com.jidesoft.swing.JideToggleButton;
 class ImageLayerOptions extends JPanel {
 
     private final LUTPanel lutPanel;
-    private final DifferencePanel differencePanel;
     private final SlitPanel slitPanel;
     // private final SectorPanel sectorPanel;
     private final InnerMaskPanel innerMaskPanel;
 
+    private final JideToggleButton downloadButton = new JideToggleButton(Buttons.download);
+    private final JProgressBar progressBar = new JProgressBar();
+
     ImageLayerOptions(ImageLayer layer) {
-        differencePanel = new DifferencePanel(layer);
+        DifferencePanel differencePanel = new DifferencePanel(layer);
         FilterDetails opacityPanel = new OpacityPanel(layer);
         FilterDetails blendPanel = new BlendPanel(layer);
         FilterDetails channelMixerPanel = new ChannelMixerPanel(layer);
@@ -79,6 +86,27 @@ class ImageLayerOptions extends JPanel {
         c.fill = GridBagConstraints.NONE;
         add(adjButton, c);
 
+        downloadButton.setToolTipText("Download selected layer");
+        downloadButton.addActionListener(e -> {
+            if (downloadButton.isSelected()) {
+                Insets margin = downloadButton.getMargin();
+                if (margin == null) // satisfy coverity
+                    margin = new Insets(0, 0, 0, 0);
+                Dimension size = downloadButton.getSize(null);
+                progressBar.setPreferredSize(new Dimension(size.width - margin.left - margin.right, size.height - margin.top - margin.bottom));
+
+                downloadButton.setText(null);
+                downloadButton.add(progressBar);
+                downloadButton.setToolTipText("Stop download");
+
+                layer.startDownload();
+            } else
+                layer.stopDownload();
+        });
+
+        progressBar.setUI(new CircularProgressUI());
+        progressBar.setForeground(downloadButton.getForeground());
+
         MetaDataDialog metaDialog = new MetaDataDialog();
         JideButton metaButton = new JideButton(Buttons.info);
         metaButton.setToolTipText("Show metadata of selected layer");
@@ -86,9 +114,14 @@ class ImageLayerOptions extends JPanel {
             metaDialog.setMetaData(layer);
             metaDialog.showDialog();
         });
+
+        JPanel buttonPanel = new JPanel(new BorderLayout());
+        buttonPanel.add(downloadButton, BorderLayout.LINE_START);
+        buttonPanel.add(metaButton, BorderLayout.LINE_END);
+
         c.gridx = 2;
         c.anchor = GridBagConstraints.LINE_END;
-        add(metaButton, c);
+        add(buttonPanel, c);
 
         setAdjustmentsVisibility(false);
         c.gridy++;
@@ -132,8 +165,22 @@ class ImageLayerOptions extends JPanel {
         lutPanel.setLUT(lut);
     }
 
-    DifferencePanel getDifferencePanel() {
-        return differencePanel;
+    void downloadProgress(int value) {
+        if (value < 0)
+            progressBar.setIndeterminate(true);
+        else
+            progressBar.setValue(value);
+    }
+
+    void downloadDone() {
+        downloadButton.remove(progressBar);
+        downloadButton.setToolTipText("Download selected layer");
+        downloadButton.setText(Buttons.download);
+        downloadButton.setSelected(false);
+    }
+
+    void downloadVisible(boolean visible) {
+        downloadButton.setVisible(visible);
     }
 
 }
